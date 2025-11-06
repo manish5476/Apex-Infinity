@@ -3,10 +3,20 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "start:dev": "ng serve --configuration=development",
+    "start:qa": "ng serve --configuration=qa",
+    "start:prod": "ng serve --configuration=production",
+    "build:dev": "ng build --configuration=development",
+    "build:qa": "ng build --configuration=qa",
+    "build:prod": "ng build --configuration=production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "start": "ng serve",
+    "build": "ng build",
+    "electron:dev": "ng build --configuration=development --base-href ./ && electron electron-main.js",
+    "electron:qa": "ng build --configuration=qa --base-href ./ && electron electron-main.js",
+    "electron:prod": "ng build --configuration=production --base-href ./ && electron electron-main.js",
+    "dist": "electron-builder",
     "serve:ssr:apex": "node dist/apex/server/server.mjs"
   },
   "prettier": {
@@ -27,6 +37,7 @@
     "@angular/compiler": "^20.3.0",
     "@angular/core": "^20.3.0",
     "@angular/forms": "^20.3.0",
+    "@angular/material": "^20.2.11",
     "@angular/platform-browser": "^20.3.0",
     "@angular/platform-server": "^20.3.0",
     "@angular/router": "^20.3.0",
@@ -36,6 +47,7 @@
     "@tailwindcss/postcss": "^4.1.16",
     "express": "^5.1.0",
     "postcss": "^8.5.6",
+    "primeicons": "^7.0.0",
     "primeng": "^20.3.0",
     "rxjs": "~7.8.0",
     "tailwindcss": "^4.1.16",
@@ -55,5 +67,20 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.9.2"
+  },
+  "build": {
+    "appId": "com.apex_infinity.app",
+    "productName": "ApexInfinity",
+    "directories": {
+      "output": "dist/electron"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "src/assets/icon.ico"
+    },
+    "files": [
+      "dist/apex/**/*",
+      "electron-main.js"
+    ]
   }
 }

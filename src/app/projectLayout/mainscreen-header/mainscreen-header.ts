@@ -16,21 +16,13 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { TooltipModule } from 'primeng/tooltip';
 
 // App Services & Interfaces
-import { AuthService, User } from '../../core/services/auth.service';
 import { ThemeService, ThemeSettings } from '../../core/services/theme.service';
 import { ToggleButtonModule } from 'primeng/togglebutton';
+import { AuthService } from '../../modules/auth/services/auth-service';
 @Component({
   selector: 'app-mainscreen-header',
-  imports: [
-    CommonModule,
-    FormsModule,
-    RouterModule,
-    PopoverModule,
-    AvatarModule,
-    ButtonModule,
-    SelectButtonModule, ToggleButtonModule,
-    TooltipModule
-  ], templateUrl: './mainscreen-header.html',
+  imports: [CommonModule, FormsModule, RouterModule, PopoverModule, AvatarModule, ButtonModule, SelectButtonModule, ToggleButtonModule, TooltipModule],
+  templateUrl: './mainscreen-header.html',
   styleUrl: './mainscreen-header.scss',
 })
 export class MainscreenHeader {
@@ -39,7 +31,7 @@ export class MainscreenHeader {
   @Output() toggleSidebar = new EventEmitter<void>();
   @Output() mobileMenuToggle = new EventEmitter<void>();
 
-  currentUser$: Observable<User | null>;
+  // currentUser$: Observable<User | null>;
   private destroy$ = new Subject<void>();
 
   // --- Theme State Management ---
@@ -105,7 +97,7 @@ export class MainscreenHeader {
     private authService: AuthService,
     private themeService: ThemeService
   ) {
-    this.currentUser$ = this.authService.currentUser$;
+    // this.currentUser$ = this.authService.currentUser$;
     this.themeOptions = [
       { icon: 'pi pi-sun', value: false },
       { icon: 'pi pi-moon', value: true }
@@ -149,7 +141,7 @@ export class MainscreenHeader {
   }
 
   logout(): void {
-    this.authService.logout();
+    // this.authService.logout();
   }
 
   toggle(event: any) {

@@ -1,0 +1,14 @@
+/* Most styling is handled by Tailwind and PrimeNG. 
+  This file is for any specific overrides or component-level styling.
+*/
+
+:host {
+  display: block;
+  width: 100%;
+  background-color: #f4f7f6; /* A light background for the page */
+}
+
+/* Add a red border to invalid PrimeNG inputs */
+input.ng-invalid.ng-dirty {
+  border-color: #ef4444; /* Tailwind's red-500 */
+}

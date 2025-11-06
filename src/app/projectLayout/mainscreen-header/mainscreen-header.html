@@ -12,10 +12,12 @@
 
   <!-- Right -->
   <div class="header-right">
-    <ng-container *ngIf="currentUser$ | async as user; else loggedOut">
+    <ng-container >
+      <!-- *ngIf="currentUser$ | async as user; else loggedOut" -->
       <button class="user-menu-btn" (click)="op.toggle($event)">
-        <p-avatar [label]="getInitials(user.name)" shape="circle" styleClass="w-8 h-8 text-xs"></p-avatar>
-        <span class="user-name hidden md:inline-block">{{ user.name }}</span>
+        <p-avatar   styleClass="w-8 h-8 text-xs"></p-avatar>
+        <!-- //shape="circle" [label]="getInitials(user.name)"-->
+        <!-- <span class="user-name hidden md:inline-block">{{ user.name }}</span> -->
         <i class="pi pi-angle-down hidden md:inline-block"></i>
       </button>
 
@@ -23,11 +25,11 @@
         <div class="popover-body">
           <!-- User Info -->
           <div class="user-info">
-            <p-avatar [label]="getInitials(user.name)" shape="circle" size="large"></p-avatar>
+            <!-- <p-avatar [label]="getInitials(user.name)" shape="circle" size="large"></p-avatar>
             <div class="user-info-text">
               <div class="user-info-name">{{ user.name }}</div>
               <div class="user-info-email">{{ user.email }}</div>
-            </div>
+            </div> -->
           </div>
 
           <!-- Theme -->

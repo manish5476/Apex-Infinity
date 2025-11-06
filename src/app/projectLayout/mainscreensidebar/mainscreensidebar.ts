@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
 import { RouterModule } from '@angular/router';
-import { AuthService, User } from '../../core/services/auth.service';
 import { Observable } from 'rxjs';
+import { AuthService } from '../../modules/auth/services/auth-service';
 
 @Component({
   selector: 'app-mainscreen-sidebar',
@@ -91,10 +91,10 @@ export class Mainscreensidebar {
       ]
     }
   ];
-  currentUser$: Observable<User | null>;
+  // currentUser$: Observable<User | null>;
 
   constructor(private authService: AuthService) {
-    this.currentUser$ = this.authService.currentUser$;
+    // this.currentUser$ = this.authService.currentUser$;
   }
 
   ngOnInit() {
@@ -109,6 +109,6 @@ export class Mainscreensidebar {
   }
 
   logout() {
-    this.authService.logout();
+    // this.authService.logout();
   }
 }

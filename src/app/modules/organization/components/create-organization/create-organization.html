@@ -1,0 +1,111 @@
+<!-- PrimeNG Toast component for displaying messages -->
+<p-toast></p-toast>
+
+<div class="p-6 md:p-8 bg-white rounded-lg shadow-md max-w-4xl mx-auto my-8">
+  <h1 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-4">
+    Create Your Organization
+  </h1>
+  <p class="text-gray-600 mb-8">
+    Fill in the details below to register your new organization. Fields marked with
+    <span class="text-red-500">*</span> are required.
+  </p>
+
+  <form [formGroup]="organizationForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
+
+    <!-- Grid Layout for Form Fields -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+
+      <!-- Organization Name -->
+      <div class="flex flex-col gap-2">
+        <label for="name" class="font-semibold text-gray-700">
+          Organization Name <span class="text-red-500">*</span>
+        </label>
+        <input pInputText id="name" formControlName="name" placeholder="e.g., Apex Innovations Inc."
+          [ngClass]="{'ng-invalid ng-dirty': form['name'].invalid && (form['name'].dirty || form['name'].touched)}" />
+        @if (form['name'].invalid && (form['name'].dirty || form['name'].touched)) {
+        <small class="text-red-500">Organization name is required.</small>
+        }
+      </div>
+
+      <!-- Unique Shop ID -->
+      <div class="flex flex-col gap-2">
+        <label for="uniqueShopId" class="font-semibold text-gray-700">
+          Unique Shop ID <span class="text-red-500">*</span>
+        </label>
+        <input pInputText id="uniqueShopId" formControlName="uniqueShopId"
+          placeholder="e.g., APEX001 (No spaces, A-Z, 0-9)"
+          [ngClass]="{'ng-invalid ng-dirty': form['uniqueShopId'].invalid && (form['uniqueShopId'].dirty || form['uniqueShopId'].touched)}" />
+        @if (form['uniqueShopId'].invalid && (form['uniqueShopId'].dirty || form['uniqueShopId'].touched)) {
+        <small class="text-red-500">
+          @if (form['uniqueShopId'].errors?.['required']) {
+          Shop ID is required.
+          }
+          @if (form['uniqueShopId'].errors?.['pattern']) {
+          Shop ID must be uppercase letters and numbers only.
+          }
+        </small>
+        }
+      </div>
+
+      <!-- Primary Email -->
+      <div class="flex flex-col gap-2">
+        <label for="primaryEmail" class="font-semibold text-gray-700">
+          Primary Email <span class="text-red-500">*</span>
+        </label>
+        <input pInputText type="email" id="primaryEmail" formControlName="primaryEmail"
+          placeholder="e.g., contact@apex.com"
+          [ngClass]="{'ng-invalid ng-dirty': form['primaryEmail'].invalid && (form['primaryEmail'].dirty || form['primaryEmail'].touched)}" />
+        @if (form['primaryEmail'].invalid && (form['primaryEmail'].dirty || form['primaryEmail'].touched)) {
+        <small class="text-red-500">A valid primary email is required.</small>
+        }
+      </div>
+
+      <!-- Primary Phone -->
+      <div class="flex flex-col gap-2">
+        <label for="primaryPhone" class="font-semibold text-gray-700">
+          Primary Phone <span class="text-red-500">*</span>
+        </label>
+        <input pInputText id="primaryPhone" formControlName="primaryPhone" placeholder="e.g., +91 1234567890"
+          [ngClass]="{'ng-invalid ng-dirty': form['primaryPhone'].invalid && (form['primaryPhone'].dirty || form['primaryPhone'].touched)}" />
+        @if (form['primaryPhone'].invalid && (form['primaryPhone'].dirty || form['primaryPhone'].touched)) {
+        <small class="text-red-500">Primary phone number is required.</small>
+        }
+      </div>
+
+      <!-- GST Number (Optional) -->
+      <div class="flex flex-col gap-2">
+        <label for="gstNumber" class="font-semibold text-gray-700">
+          GST Number (Optional)
+        </label>
+        <input pInputText id="gstNumber" formControlName="gstNumber" placeholder="e.g., 22AAAAA0000A1Z5" />
+      </div>
+
+      <!-- Secondary Email (Optional) -->
+      <div class="flex flex-col gap-2">
+        <label for="secondaryEmail" class="font-semibold text-gray-700">
+          Secondary Email (Optional)
+        </label>
+        <input pInputText type="email" id="secondaryEmail" formControlName="secondaryEmail"
+          placeholder="e.g., accounts@apex.com"
+          [ngClass]="{'ng-invalid ng-dirty': form['secondaryEmail'].invalid && (form['secondaryEmail'].dirty || form['secondaryEmail'].touched)}" />
+        @if (form['secondaryEmail'].invalid && (form['secondaryEmail'].dirty || form['secondaryEmail'].touched)) {
+        <small class="text-red-500">Must be a valid email address.</small>
+        }
+      </div>
+
+      <!-- Secondary Phone (Optional) -->
+      <div class="flex flex-col gap-2">
+        <label for="secondaryPhone" class="font-semibold text-gray-700">
+          Secondary Phone (Optional)
+        </label>
+        <input pInputText id="secondaryPhone" formControlName="secondaryPhone" placeholder="e.g., +91 0987654321" />
+      </div>
+    </div>
+
+    <!-- Submission Button -->
+    <div class="flex justify-end mt-6 border-t pt-6">
+      <p-button label="Create Organization" type="submit" [loading]="isLoading()"
+        [disabled]="organizationForm.invalid || isLoading()" icon="pi pi-check"></p-button>
+    </div>
+  </form>
+</div>
