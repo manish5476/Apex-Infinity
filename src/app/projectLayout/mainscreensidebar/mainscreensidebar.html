@@ -1,0 +1,43 @@
+<div
+  class="fixed bottom-2 inset-y-0 no-scrollbar overflow-auto top-2 left-3 rounded-sm z-30 transition-all duration-400 ease-in-out mt-14"
+  [ngClass]="{
+    'w-0 overflow-hidden': !isPinned && !isHovered,
+    'w-60': isPinned || isHovered
+  }" (mouseenter)="mouseEnter.emit()" (mouseleave)="mouseLeave.emit()">
+  <div
+    class="flex flex-col h-full no-scrollbar overflow-auto bg-[var(--theme-bg-secondary)] shadow-xl rounded-md border-r border-[var(--theme-border-primary)]">
+    <div class="flex-1 overflow-y-auto px-2 pt-4 pb-2 custom-scroll no-scrollbar overflow-auto">
+      <div *ngFor="let item of menuItems; let i = index" class="mb-2">
+        <div class="flex items-center px-3 py-2 rounded-md hover:bg-[var(--theme-hover-bg)] transition cursor-pointer"
+          (click)="toggleMenuItem(i)">
+          <i [class]="item.icon + ' text-[var(--theme-accent-home)]'"></i>
+          <span class="ml-3 text-sm font-medium text-[var(--theme-text-primary)] transition-all duration-300"
+            [ngClass]="{'opacity-0 max-w-0 overflow-hidden': !isPinned && !isHovered, 'opacity-100 max-w-full': isPinned || isHovered}">{{
+            item.label }}</span>
+          <i *ngIf="item.items"
+            class="pi pi-angle-down ml-auto transition-transform duration-300 text-[var(--theme-accent-primary)]"
+            [ngClass]="{'rotate-180': expandedItems[i], 'rotate-0': !expandedItems[i]}"
+            [style]="{'opacity': (isPinned || isHovered) ? 1 : 0}"></i>
+        </div>
+        <div class="ml-6 mt-1 transition-all duration-300 ease-in-out"
+          [ngClass]="{'max-h-0 opacity-0 overflow-hidden': !expandedItems[i], 'max-h-screen opacity-100': expandedItems[i]}"
+          *ngIf="item.items">
+          <a *ngFor="let subItem of item.items" [routerLink]="subItem.routerLink"
+            class="flex items-center px-3 py-2 rounded-md hover:bg-[var(--theme-hover-bg)] transition"
+            [ngClass]="{'opacity-0 max-w-0 overflow-hidden': !isPinned && !isHovered, 'opacity-100 max-w-full': isPinned || isHovered}">
+            <i [class]="subItem.icon + ' text-[var(--theme-text-secondary)]'"></i>
+            <span class="ml-3 text-sm text-[var(--theme-text-secondary)]">{{ subItem.label }}</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="border-t border-[var(--theme-border-primary)] px-0.4 py-0.4 transition-all duration-300"
+      [ngClass]="{'opacity-0 hidden': !isPinned && !isHovered, 'opacity-100': isPinned || isHovered}">
+      <button pButton (click)="logout()" label="Logout" icon="pi pi-sign-out"
+        class="w-full p-button-danger p-button-text text-sm"
+        [ngClass]="{'text-[var(--theme-button-danger-text)] hover:bg-[var(--theme-button-danger-hover-bg)] hover:text-[var(--theme-button-danger-hover-text)]': true}"></button>
+    </div>
+  </div>
+</div>
+<div class="fixed inset-y-0 left-0 z-30 w-3 bg-transparent" (mouseenter)="mouseEnterTriggerZone.emit()"
+  *ngIf="!isPinned && !isHovered"></div>
