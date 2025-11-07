@@ -1,87 +1,47 @@
-// import { AdminDashboardComponent } from './admins/components/admin-dashboard/admin-dashboard.component';
 import { Routes } from '@angular/router';
-// import { NotFoundComponent } from './shared/Components/notfound/notfound.component';
-// import { AuthGuard } from './core/guards/authguard.guard';
-// import { MainLayoutComponent } from './layouts/mainlayout/mainlayout.component';
-// import { MainDashboardComponent } from './layouts/main-dashboard/main-dashboard.component';
-// import { AuthResolver } from './core/auth.resolver';
 import { MainScreen } from './projectLayout/main-screen/main-screen';
+import { authGuard } from './core/guards/authguard.guard';
 
 export const routes: Routes = [
+  // ==========================================================
+  //  1. PUBLIC AUTH ROUTES
+  // ==========================================================
   {
     path: 'auth',
     loadChildren: () =>
       import('./modules/auth/auth.routes').then((m) => m.AUTH_ROUTES),
+    // This will lazy-load the routes for Login, Create Org, and Employee Signup
   },
+
+  // ==========================================================
+  //  2. PROTECTED APPLICATION ROUTES
+  // ==========================================================
+
   {
-    path: '',
+    path: '', // The default path for your app
     component: MainScreen,
-    // canActivate: [AuthGuard],
-    // resolve: { isAuthenticated: AuthResolver },
-    // children: [
-    //   { path: '', component: AdminDashboardComponent }, // default (can keep or change)
-    //   { path: 'dashboard', component: AdminDashboardComponent },
-    //   { path: 'home', component: HomePageComponent }, // 👈 add this
-    //   {
-    //     path: 'admin',
-    //     loadChildren: () =>
-    //       import('./Modules/admin/admin.routes').then((m) => m.ADMIN_ROUTES),
-    //   },
-    //   {
-    //     path: 'payment',
-    //     loadChildren: () =>
-    //       import('./Modules/payment/payment.routes').then(
-    //         (m) => m.PAYMENT_ROUTES,
-    //       ),
-    //   },
-    //   {
-    //     path: 'customers',
-    //     loadChildren: () =>
-    //       import('./Modules/customer/customer.routes').then(
-    //         (m) => m.CUSTOMER_ROUTES,
-    //       ),
-    //   },
-    //   {
-    //     path: 'sellers',
-    //     loadChildren: () =>
-    //       import('./Modules/seller/seller.routes').then((m) => m.SELLER_ROUTES),
-    //   },
-    //   {
-    //     path: 'invoices',
-    //     loadChildren: () =>
-    //       import('./Modules/billing/billing.routes').then(
-    //         (m) => m.BILLING_ROUTES,
-    //       ),
-    //   },
-    //   {
-    //     path: 'products',
-    //     loadChildren: () =>
-    //       import('./Modules/product/product.routes').then(
-    //         (m) => m.PRODUCT_ROUTES,
-    //       ),
-    //   },
-    //   {
-    //     path: 'master',
-    //     loadChildren: () =>
-    //       import('./Modules/MasterList/master.routes').then(
-    //         (m) => m.MASTER_ROUTES,
-    //       ),
-    //   },
-    //   {
-    //     path: 'personalInfo',
-    //     loadChildren: () =>
-    //       import('./Modules/PersonalInfo/personalinfo.routes').then(
-    //         (m) => m.PERSONAL_INFO,
-    //       ),
-    //   },
-    //   {
-    //     path: 'Emi',
-    //     loadChildren: () =>
-    //       import('./Modules/EMI/emi.routes').then(
-    //         (m) => m.EMI_ROUTES,
-    //       ),
-    //   },
-    //   { path: '**', component: NotFoundComponent },
-    // ],
+    canActivate: [authGuard], 
+    children: [
+      // --- This is what you asked for ---
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./modules/dashboard/components/dashboard/dashboard').then(
+            (m) => m.Dashboard,
+          ),
+      },
+      // Default route for a logged-in user
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      // --- End of default child section ---
+      
+      // ... (add customers, sales, products, etc. here later)
+      
+    ],
   },
+
+  // ==========================================================
+  //  3. FALLBACK REDIRECT
+  // ==========================================================
+  // Redirect any unknown URL to the main app (which will be caught by the guard)
+  { path: '**', redirectTo: '' }
 ];

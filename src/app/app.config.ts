@@ -14,6 +14,7 @@ import { MessageService } from 'primeng/api';
 // import { LoadingInterceptor } from './core/Interceptors/loading.interceptor'; // <-- UNCOMMENTED
 // import { loggingInterceptor } from './core/Interceptors/logging.interceptor'; // <-- UNCOMMENTED
 import { DatePipe } from '@angular/common';
+import { jwtInterceptor } from './core/interceptors/jwt.interceptor';
 
 const ModernThemePreset = definePreset(Aura, {
     semantic: {
@@ -69,7 +70,7 @@ export const appConfig: ApplicationConfig = {
     providers: [
         provideHttpClient(
             // Re-enabled your interceptors
-            withInterceptors([]),
+            withInterceptors([jwtInterceptor,]),
             // withInterceptors([AuthInterceptor, loggingInterceptor, ErrorInterceptor, LoadingInterceptor]),
             withFetch()
         ),

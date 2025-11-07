@@ -1,1 +1,235 @@
-<p>signup works!</p>
+<div class="auth-wrapper">
+  <section class="auth-container">
+    <!-- === LEFT IMAGE SECTION === -->
+    <div class="auth-banner">
+      <img
+        src="https://images.unsplash.com/photo-1762112800040-b0d01696cb92?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=681"
+        alt="Workspace"
+      />
+      <div class="auth-overlay"></div>
+      <div class="auth-banner-text">
+        <h2 class="text-white">Join Apex Infinity</h2>
+        <p class="text-white">Be part of your organization’s next innovation.</p>
+      </div>
+    </div>
+
+    <!-- === RIGHT STATIC FORM PANEL === -->
+    <div class="auth-form-panel">
+      <div class="auth-content">
+        <div class="auth-header text-center">
+          <i class="pi pi-user-plus text-4xl text-[var(--theme-accent-primary)]"></i>
+          <h1 class="auth-title">Create Your Account</h1>
+          <p class="auth-subtitle">
+            Enter your details and your organization's Shop ID to get started.
+          </p>
+        </div>
+
+        <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="auth-form">
+          <div class="form-group">
+            <label>Shop ID <span class="req">*</span></label>
+            <input pInputText id="uniqueShopId" formControlName="uniqueShopId" placeholder="e.g., APEX-001" />
+          </div>
+
+          <div class="form-group">
+            <label>Full Name <span class="req">*</span></label>
+            <input pInputText id="name" formControlName="name" placeholder="e.g., John Doe" />
+          </div>
+
+          <div class="form-group">
+            <label>Email <span class="req">*</span></label>
+            <input pInputText type="email" id="email" formControlName="email" placeholder="you@company.com" />
+          </div>
+
+          <div class="form-group">
+            <label>Password <span class="req">*</span></label>
+            <p-password id="password" formControlName="password" [toggleMask]="true" placeholder="Min. 8 characters"
+              styleClass="w-full" inputStyleClass="w-full"></p-password>
+          </div>
+
+          <div class="form-group">
+            <label>Confirm Password <span class="req">*</span></label>
+            <p-password id="passwordConfirm" formControlName="passwordConfirm" [toggleMask]="true"
+              placeholder="Re-enter your password" styleClass="w-full" inputStyleClass="w-full"></p-password>
+          </div>
+
+          <div class="auth-footer">
+            <p-button label="Sign Up" icon="pi pi-user-plus" type="submit"
+              [disabled]="signupForm.invalid" styleClass="w-full justify-center"></p-button>
+
+            <p class="auth-footer-text">
+              Already have an account?
+              <a routerLink="/auth/login" class="auth-link">Login instead</a>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- <p-toast></p-toast>
+
+<div class="auth-wrapper">
+  <section class="auth-section">
+    <div class="auth-container">
+      === LEFT IMAGE PANEL ===
+      <div class="auth-banner">
+        <img src="https://images.unsplash.com/photo-1607746882042-944635dfe10e?auto=format&fit=crop&q=80&w=1000"
+          alt="Office workspace background" />
+        <div class="auth-overlay"></div>
+        <div class="auth-banner-text">
+          <h2>Join Apex Infinity</h2>
+          <p>Be a part of your organization's next innovation.</p>
+        </div>
+      </div>
+
+      === RIGHT FORM PANEL ===
+      <div class="auth-content glass-form-card">
+        <div class="auth-header text-center">
+          <i class="pi pi-user-plus text-4xl text-[var(--theme-accent-primary)]"></i>
+          <h1 class="auth-title">Create an Account</h1>
+          <p class="auth-subtitle">
+            Enter your details and your organization's Shop ID to get started.
+          </p>
+        </div>
+
+        <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="">
+          Shop ID
+          <div class="form-group">
+            <label>Shop ID <span class="req">*</span></label>
+            <input pInputText id="uniqueShopId" formControlName="uniqueShopId" placeholder="e.g., APEX-001"
+              [ngClass]="{'ng-invalid ng-dirty': form['uniqueShopId'].invalid && form['uniqueShopId'].touched}" />
+            @if (form['uniqueShopId'].invalid && form['uniqueShopId'].touched) {
+            <small class="text-red-500">Shop ID is required.</small>
+            }
+          </div>
+
+          Full Name
+          <div class="form-group">
+            <label>Full Name <span class="req">*</span></label>
+            <input pInputText id="name" formControlName="name" placeholder="e.g., John Doe"
+              [ngClass]="{'ng-invalid ng-dirty': form['name'].invalid && form['name'].touched}" />
+            @if (form['name'].invalid && form['name'].touched) {
+            <small class="text-red-500">Name is required.</small>
+            }
+          </div>
+
+          Email
+          <div class="form-group">
+            <label>Email <span class="req">*</span></label>
+            <input pInputText type="email" id="email" formControlName="email" placeholder="you@company.com"
+              [ngClass]="{'ng-invalid ng-dirty': form['email'].invalid && form['email'].touched}" />
+            @if (form['email'].invalid && form['email'].touched) {
+            <small class="text-red-500">Valid email required.</small>
+            }
+          </div>
+
+          Password
+          <div class="form-group">
+            <label>Password <span class="req">*</span></label>
+            <p-password id="password" formControlName="password" [toggleMask]="true" placeholder="Min. 8 characters"
+              styleClass="w-full" inputStyleClass="w-full"
+              [ngClass]="{'ng-invalid ng-dirty': form['password'].invalid && form['password'].touched}"></p-password>
+            @if (form['password'].invalid && form['password'].touched) {
+            <small class="text-red-500">Password must be at least 8 characters.</small>
+            }
+          </div>
+
+          Confirm Password
+          <div class="form-group">
+            <label>Confirm Password <span class="req">*</span></label>
+            <p-password id="passwordConfirm" formControlName="passwordConfirm" [toggleMask]="true"
+              placeholder="Re-enter your password" styleClass="w-full" inputStyleClass="w-full"
+              [ngClass]="{'ng-invalid ng-dirty': (form['passwordConfirm'].invalid || signupForm.errors?.['mustMatch']) && form['passwordConfirm'].touched}"></p-password>
+            @if (signupForm.errors?.['mustMatch'] && form['passwordConfirm'].touched) {
+            <small class="text-red-500">Passwords do not match.</small>
+            }
+          </div>
+
+          Footer
+          <div class="auth-footer">
+            <p-button label="Sign Up" icon="pi pi-user-plus" type="submit" [loading]="isLoading()"
+              [disabled]="signupForm.invalid || isLoading()" styleClass="w-full justify-center"></p-button>
+
+            <p class="auth-footer-text">
+              Already have an account?
+              <a routerLink="/auth/login" class="auth-link">Login instead</a>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- <p-toast></p-toast>
+
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <i class="pi pi-user-plus text-4xl text-[var(--theme-accent-primary)]"></i>
+      <h1>Join an Organization</h1>
+      <p>Enter your details and the Shop ID provided by your manager.</p>
+    </div>
+
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+      Shop ID
+      <div class="flex flex-col gap-2">
+        <label for="uniqueShopId">Shop ID <span class="text-red-500">*</span></label>
+        <input pInputText id="uniqueShopId" formControlName="uniqueShopId" placeholder="e.g., APEX-123" />
+        @if (form['uniqueShopId'].invalid && form['uniqueShopId'].touched) {
+        <small>Shop ID is required and must follow format.</small>
+        }
+      </div>
+
+      Name
+      <div class="flex flex-col gap-2">
+        <label for="name">Full Name <span class="text-red-500">*</span></label>
+        <input pInputText id="name" formControlName="name" placeholder="e.g., John Doe" />
+        @if (form['name'].invalid && form['name'].touched) {
+        <small>Your name is required.</small>
+        }
+      </div>
+
+      Email
+      <div class="flex flex-col gap-2">
+        <label for="email">Email <span class="text-red-500">*</span></label>
+        <input pInputText id="email" type="email" formControlName="email" placeholder="e.g., you@company.com" />
+        @if (form['email'].invalid && form['email'].touched) {
+        <small>A valid email is required.</small>
+        }
+      </div>
+
+      Password
+      <div class="flex flex-col gap-2">
+        <label for="password">Password <span class="text-red-500">*</span></label>
+        <p-password id="password" formControlName="password" [toggleMask]="true" placeholder="Min 8 characters"
+          styleClass="w-full" inputStyleClass="w-full"></p-password>
+        @if (form['password'].invalid && form['password'].touched) {
+        <small>Password must be at least 8 characters.</small>
+        }
+      </div>
+
+      Confirm Password
+      <div class="flex flex-col gap-2">
+        <label for="passwordConfirm">Confirm Password <span class="text-red-500">*</span></label>
+        <p-password id="passwordConfirm" formControlName="passwordConfirm" [toggleMask]="true" [feedback]="false"
+          placeholder="Repeat your password" styleClass="w-full" inputStyleClass="w-full"></p-password>
+        @if (signupForm.errors?.['mustMatch']) {
+        <small>Passwords do not match.</small>
+        }
+      </div>
+
+      Submit
+      <div class="flex flex-col gap-4 items-center">
+        <p-button label="Request to Join" type="submit" [loading]="isLoading()"
+          [disabled]="signupForm.invalid || isLoading()"></p-button>
+
+        <div class="text-sm text-[var(--theme-text-label)]">
+          Already have an account?
+          <a routerLink="/auth/login">Log In</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div> --> -->

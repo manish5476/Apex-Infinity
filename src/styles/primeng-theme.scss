@@ -1,0 +1,198 @@
+/* ==========================================
+   PRIME NG THEME OVERRIDES
+   Uses variables from theme.scss
+   ========================================== */
+
+.p-panel,
+.p-dialog {
+  background: var(--theme-bg-secondary);
+  border: var(--ui-border-width) solid var(--theme-border-primary);
+  border-radius: var(--ui-border-radius-lg);
+  box-shadow: var(--ui-shadow-lg);
+  padding: 0;
+  backdrop-filter: blur(10px) saturate(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(180%);
+}
+
+/* === Panel & Dialog Headers === */
+.p-panel-header,
+.p-dialog-header {
+  background: transparent;
+  color: var(--theme-text-primary);
+  border-bottom: var(--ui-border-width) solid var(--theme-border-primary);
+  font-family: var(--font-primary);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--ui-border-radius-lg) var(--ui-border-radius-lg) 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.p-dialog-header .p-dialog-header-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  color: var(--theme-text-label);
+  border-radius: var(--ui-border-radius-full);
+  transition: var(--ui-transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.p-dialog-header .p-dialog-header-icon:hover {
+  color: var(--theme-text-primary);
+  background-color: var(--theme-hover-bg);
+}
+
+/* === Dialog sizing === */
+.p-dialog.dialog-fullscreen {
+  width: 95vw !important;
+  height: 90vh !important;
+  max-width: 1900px;
+  max-height: 95vh;
+}
+
+.p-dialog .p-dialog-content,
+.p-panel .p-panel-content {
+  background: var(--theme-bg-primary);
+  padding: 0 !important;
+  border-radius: 0 0 var(--ui-border-radius-lg) var(--ui-border-radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* === Buttons === */
+.p-button {
+  font-family: var(--font-primary);
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  border-radius: var(--ui-border-radius);
+  padding: 0.625rem 1.25rem;
+  background: var(--theme-accent-gradient);
+  color: var(--theme-accent-text-color);
+  border: var(--ui-border-width) solid var(--theme-accent-primary);
+  box-shadow: var(--ui-shadow-xs);
+  transition: var(--ui-transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.p-button:hover {
+  background: var(--theme-accent-primary-hover);
+  transform: var(--ui-button-hover-transform);
+  box-shadow: var(--ui-shadow-md);
+}
+
+/* === Inputs === */
+.p-inputtext,
+.p-inputnumber-input,
+.p-password-input,
+.p-textarea,
+.p-select,
+.p-multiselect,
+.p-datepicker .p-inputtext {
+  width: 100%;
+  height: 2.75rem;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  color: var(--theme-text-primary);
+  background: var(--theme-bg-ternary);
+  border: var(--ui-border-width) solid var(--theme-border-primary);
+  border-radius: var(--ui-border-radius);
+  transition: var(--ui-transition);
+}
+.p-inputtext:focus,
+.p-password-input:focus,
+.p-select:focus,
+.p-multiselect:focus {
+  border-color: var(--theme-accent-primary);
+  box-shadow: 0 0 0 3px var(--theme-accent-focus-ring);
+}
+
+/* === Datatable === */
+.p-datatable-wrapper {
+  border: var(--ui-border-width) solid var(--theme-border-primary);
+  border-radius: var(--ui-border-radius);
+  overflow-x: auto;
+  box-shadow: var(--ui-shadow);
+  background: var(--theme-bg-primary);
+}
+.p-datatable .p-datatable-thead > tr > th {
+  background: var(--theme-bg-secondary);
+  color: var(--theme-text-primary);
+  font-family: var(--font-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  padding: var(--spacing-md);
+  border-bottom: var(--ui-border-width) solid var(--theme-border-primary);
+}
+.p-datatable .p-datatable-tbody > tr:hover {
+  background: var(--theme-hover-bg);
+}
+.p-datatable .p-datatable-tbody > tr > td {
+  border-bottom: var(--ui-border-width) solid var(--theme-border-secondary);
+  padding: var(--spacing-md);
+}
+
+/* === Tabs === */
+.p-tabview .p-tabview-nav {
+  background: transparent;
+  border-bottom: 2px solid var(--theme-border-primary);
+  border-radius: var(--ui-border-radius) var(--ui-border-radius) 0 0;
+}
+.p-tabview .p-tabview-nav-link {
+  background: transparent !important;
+  border: none !important;
+  color: var(--theme-text-muted) !important;
+  transition: var(--ui-transition-fast);
+  font-weight: 500;
+  border-radius: var(--ui-border-radius) var(--ui-border-radius) 0 0;
+  padding: var(--spacing-sm) var(--spacing-lg);
+}
+.p-tabview .p-tabview-nav-link:hover {
+  color: var(--theme-text-primary) !important;
+  background: var(--theme-hover-bg);
+}
+.p-tabview .p-tabview-ink-bar {
+  background-color: var(--theme-accent-primary) !important;
+  height: 3px !important;
+}
+
+/* === Tooltip === */
+.p-tooltip {
+  background: var(--theme-bg-overlay);
+  border: var(--ui-border-width) solid var(--theme-border-primary);
+  border-radius: var(--ui-border-radius);
+  box-shadow: var(--ui-shadow-md);
+  color: var(--theme-text-primary);
+  font-family: var(--font-body);
+}
+
+/* === Badge === */
+.p-badge {
+  background: var(--theme-accent-primary);
+  color: var(--theme-accent-text-color);
+  border-radius: var(--ui-border-radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+/* === Mobile Responsiveness === */
+@media screen and (max-width: 768px) {
+  .p-dialog, .p-panel {
+    width: 95vw !important;
+    height: 90vh !important;
+  }
+  .p-tabview .p-tabview-nav-link {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+  }
+  .p-datatable .p-datatable-thead > tr > th,
+  .p-datatable .p-datatable-tbody > tr > td {
+    padding: var(--spacing-sm);
+  }
+}

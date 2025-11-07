@@ -4,7 +4,7 @@ import { Signup } from "./components/signup/signup";
 import { CreateOrganization } from "../organization/components/create-organization/create-organization";
 
 export const AUTH_ROUTES: Routes = [
-  { path: '', component: CreateOrganization },
+  { path: 'org', component: CreateOrganization },
   { path: 'login', component: Login },
   { path: 'signup', component: Signup },
 

@@ -1,12 +1,15 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { ApiService } from '../../../../core/services/api';
+import { AuthService, LoginResponse } from '../../../auth/services/auth-service';
+import { PasswordModule } from 'primeng/password'; // Import PasswordModule
+
 @Component({
   selector: 'app-create-organization',
   standalone: true,
@@ -15,11 +18,14 @@ import { ApiService } from '../../../../core/services/api';
     ReactiveFormsModule,
     ToastModule,
     InputTextModule,
-    ButtonModule
-  ],
+    ButtonModule,
+    PasswordModule // Add PasswordModule
+    ,
+    RouterLink
+],
   templateUrl: './create-organization.html',
   styleUrl: './create-organization.scss',
-  providers: [MessageService] // Provide MessageService here if not globally provided
+  providers: [MessageService] 
 })
 export class CreateOrganization implements OnInit {
   // --- Injections ---
@@ -27,6 +33,7 @@ export class CreateOrganization implements OnInit {
   private apiService = inject(ApiService);
   private router = inject(Router);
   private messageService = inject(MessageService);
+  private authService = inject(AuthService); 
 
   // --- State Signals ---
   isLoading = signal(false);
@@ -43,26 +50,41 @@ export class CreateOrganization implements OnInit {
    */
   private initForm(): void {
     this.organizationForm = this.fb.group({
-      name: ['', [Validators.required]],
-      uniqueShopId: ['', [Validators.required, Validators.pattern(/^[A-Z0-9]+$/)]],
+      // --- Organization Fields ---
+      organizationName: ['', [Validators.required]],
+      uniqueShopId: ['', [Validators.required, Validators.pattern(/^[A-Z0-9-]+$/)]],
       primaryEmail: ['', [Validators.required, Validators.email]],
       primaryPhone: ['', [Validators.required]],
       gstNumber: [''],
-      secondaryEmail: ['', [Validators.email]],
-      secondaryPhone: [''],
+      // secondaryEmail: ['', [Validators.email]], // Optional
+      // secondaryPhone: [''], // Optional
+
+      // --- Owner (Super Admin) Fields ---
+      ownerName: ['', [Validators.required]],
+      ownerEmail: ['', [Validators.required, Validators.email]],
+      ownerPassword: ['', [Validators.required, Validators.minLength(8)]],
+
+      // --- Main Branch Fields ---
+      mainBranchName: ['Main Branch', [Validators.required]],
+      mainBranchAddress: this.fb.group({
+        street: ['', Validators.required],
+        city: ['', Validators.required],
+        state: ['', Validators.required],
+        zipCode: ['', Validators.required],
+      })
     });
   }
 
-  /**
-   * Helper getter for easy access to form controls in the template.
-   */
+
+  // --- Form Getters ---
   get form() {
     return this.organizationForm.controls;
   }
+  
+  get branchForm() {
+    return (this.organizationForm.get('mainBranchAddress') as FormGroup).controls;
+  }
 
-  /**
-   * Handles the form submission.
-   */
   onSubmit(): void {
     if (this.organizationForm.invalid) {
       // Mark all fields as touched to display validation errors
@@ -78,31 +100,23 @@ export class CreateOrganization implements OnInit {
     this.isLoading.set(true);
     const formData = this.organizationForm.value;
 
-    // Optional: Transform data before sending
     formData.uniqueShopId = formData.uniqueShopId.toUpperCase();
     if (formData.gstNumber) {
       formData.gstNumber = formData.gstNumber.toUpperCase();
     }
 
     this.apiService.createNewOrganization(formData).subscribe({
-      next: (response: any) => {
+      next: (response: LoginResponse) => {
         this.isLoading.set(false);
         this.messageService.add({
           severity: 'success',
           summary: 'Organization Created',
-          detail: `Organization "${response.name}" created successfully!`
+          detail: `Welcome, ${response?.data.owner}!`
         });
-
-        // Navigate to the new organization's dashboard or a relevant page
-        // You might need to adjust this path based on your routing
-        setTimeout(() => {
-          this.router.navigate(['/organization', response._id, 'dashboard']);
-        }, 1500);
+        this.authService.handleLoginSuccess(response); 
       },
       error: (err: any) => {
         this.isLoading.set(false);
-        // The error interceptor should ideally handle this,
-        // but a fallback is good.
         this.messageService.add({
           severity: 'error',
           summary: 'Creation Failed',
