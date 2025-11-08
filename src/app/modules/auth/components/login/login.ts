@@ -10,6 +10,7 @@ import { PasswordModule } from 'primeng/password';
 import { CheckboxModule } from 'primeng/checkbox';
 import { AuthService } from '../../services/auth-service';
 import { AppMessageService } from '../../../../core/services/message.service';
+import { NotificationService } from '../../../../core/services/notification.service';
 
 @Component({
   selector: 'app-login',
@@ -34,6 +35,7 @@ export class Login implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private messageService = inject(AppMessageService); // Use your custom service
+  private notificationService = inject(NotificationService); // Use your custom service
 
   // --- State Signals ---
   isLoading = signal(false);
@@ -63,35 +65,20 @@ export class Login implements OnInit {
       this.messageService.showWarn('Invalid Form', 'Please enter a valid email and password.');
       return;
     }
-
     this.isLoading.set(true);
-
-    // Call the login method from your finalized AuthService
     this.authService.login(this.loginForm.value).subscribe({
       next: (response) => {
-        // --- Success ---
-        // The service's `tap` operator already called handleLoginSuccess,
-        // which saves the token and navigates to the dashboard.
+        console.log(response);
+        const currentUser = this.authService.getCurrentUser();
+        if (currentUser) {
+          this.notificationService.connect(currentUser._id);
+        }
+        console.log(currentUser, 'currentUser');
         this.isLoading.set(false);
       },
       error: (err) => {
-        // --- Error ---
         this.isLoading.set(false);
-        // The error message is already handled by the AuthService/ApiService.
-        // We just need to stop the loading spinner.
       }
     });
   }
 }
-
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-login',
-//   imports: [],
-//   templateUrl: './login.html',
-//   styleUrl: './login.scss',
-// })
-// export class Login {
-
-// }

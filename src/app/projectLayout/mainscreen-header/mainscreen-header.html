@@ -1,39 +1,46 @@
-<div class="header-inner">
+<!-- src/app/layouts/header/mainscreen-header.html -->
+<div class="header-inner flex justify-between items-center px-4 py-2 bg-white shadow">
   <!-- Left -->
-  <div class="header-left">
-    <button class="menu-toggle-btn" (click)="toggleSidebar.emit()">
+  <div class="flex items-center space-x-3">
+    <button class="p-2" (click)="toggleSidebar.emit()">
       <i class="pi pi-bars text-lg"></i>
     </button>
-    <a href="/admin/dashboard" class="logo-link">
+    <a routerLink="/" class="flex items-center space-x-2 text-blue-600 font-semibold">
       <i class="pi pi-bolt"></i>
       <span>Shivam Electronics</span>
     </a>
   </div>
 
   <!-- Right -->
-  <div class="header-right">
-    <ng-container >
-      <!-- *ngIf="currentUser$ | async as user; else loggedOut" -->
-      <button class="user-menu-btn" (click)="op.toggle($event)">
-        <p-avatar   styleClass="w-8 h-8 text-xs"></p-avatar>
-        <!-- //shape="circle" [label]="getInitials(user.name)"-->
-        <!-- <span class="user-name hidden md:inline-block">{{ user.name }}</span> -->
-        <i class="pi pi-angle-down hidden md:inline-block"></i>
-      </button>
+  <div class="flex items-center space-x-4">
+    <button class="relative p-2" (click)="showNotificationDialog = true" pTooltip="Notifications"
+      tooltipPosition="bottom">
+      <i class="pi pi-bell text-lg transition" [ngClass]="{
+          'text-primary animate-pulse': recentNotifications.length > 0,
+          'text-gray-500': recentNotifications.length === 0
+        }"></i>
+      <span *ngIf="recentNotifications.length"
+        class="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1 rounded-full">
+        {{ recentNotifications.length }}
+      </span>
+      show
+    </button>
 
-      <p-popover #op appendTo="body">
-        <div class="popover-body">
-          <!-- User Info -->
-          <div class="user-info">
-            <!-- <p-avatar [label]="getInitials(user.name)" shape="circle" size="large"></p-avatar>
-            <div class="user-info-text">
-              <div class="user-info-name">{{ user.name }}</div>
-              <div class="user-info-email">{{ user.email }}</div>
-            </div> -->
-          </div>
+    <!-- 👤 User Dropdown -->
+    <button class="flex items-center space-x-1" (click)="op.toggle($event)">
+      <p-avatar styleClass="w-8 h-8" shape="circle"></p-avatar>
+      <i class="pi pi-angle-down text-gray-600"></i>
+    </button>
 
-          <!-- Theme -->
-          <div class="theme-section">
+    <p-popover #op appendTo="body">
+      <div class="p-3 w-48">
+        <div class="border-b pb-2 mb-2 font-medium text-gray-700">Settings</div>
+        <div class="flex items-center justify-between mb-3">
+          <span>Dark Mode</span>
+          <p-toggleButton [(ngModel)]="isDarkMode" onIcon=" pi-moon" offIcon="pi pi-sun"
+            (onChange)="onThemeModeChange(isDarkMode)"></p-toggleButton>
+        </div>
+ <div class="theme-section">
             <div class="theme-label">
               <span>Appearance</span>
               <p-toggleButton [(ngModel)]="isDarkMode" Icon="pi pi-moon" offIcon="pi pi-sun"
@@ -50,8 +57,81 @@
               </div>
             </div>
           </div>
+          
+        <a routerLink="/auth/login" (click)="logout()" class="block text-red-600 mt-2">
+          <i class="pi pi-sign-out"></i> Logout
+        </a>
+      </div>
+    </p-popover>
+  </div>
+</div>
 
-          <!-- Actions -->
+<!-- 🔔 Notification Dialog -->
+<p-dialog header="Notifications" [(visible)]="showNotificationDialog" [modal]="true" [style]="{ width: '25rem' }"
+  [closable]="true">
+  <div *ngIf="recentNotifications.length; else noNotifications">
+    <ul class="divide-y divide-gray-200">
+      <li *ngFor="let n of recentNotifications" class="p-3 hover:bg-gray-50 transition">
+        <div class="font-semibold text-gray-800">{{ n.title }}</div>
+        <div class="text-sm text-gray-600">{{ n.message }}</div>
+        <div class="text-xs text-gray-400 mt-1">
+          {{ n.createdAt || (n.timestamp | date: 'short') }}
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <ng-template #noNotifications>
+    <div class="text-center text-gray-500 p-4 text-sm">No new notifications</div>
+  </ng-template>
+</p-dialog>
+
+
+<!-- <div class="header-inner">
+
+  <div class="header-left">
+    <button class="menu-toggle-btn" (click)="toggleSidebar.emit()">
+      <i class="pi pi-bars text-lg"></i>
+    </button>
+    <a href="/admin/dashboard" class="logo-link">
+      <i class="pi pi-bolt"></i>
+      <span>Shivam Electronics</span>
+    </a>
+  </div>
+
+  <div class="header-right">
+    <ng-container>
+
+      <button class="user-menu-btn" (click)="op.toggle($event)">
+        <p-avatar styleClass="w-8 h-8 text-xs"></p-avatar>
+
+
+        <i class="pi pi-angle-down hidden md:inline-block"></i>
+      </button>
+
+      <p-popover #op appendTo="body">
+        <div class="popover-body">
+
+          <div class="user-info">
+          </div>
+
+
+          <div class="theme-section">
+            <div class="theme-label">
+              <span>Appearance</span>
+              <p-toggleButton [(ngModel)]="isDarkMode" Icon="pi pi-moon" offIcon="pi pi-sun"
+                (onChange)="onThemeModeChange(isDarkMode)" styleClass="theme-toggle-btn">
+              </p-toggleButton>
+            </div>
+            <div class="theme-colors">
+              <div *ngFor="let theme of colorThemes" class="theme-color" [style.backgroundColor]="theme.color"
+                [ngClass]="{'selected': accentColor === theme.color}"
+                (click)="onAccentColorChange(theme.class, theme.color)" pTooltip="{{theme.name}}" tooltipPosition="top">
+              </div>
+            </div>
+          </div>
+
+
           <div class="border-t border-[var(--theme-border-primary)] pt-2">
             <a routerLink="/admin/profile" class="action-link" (click)="op.hide()">
               <i class="pi pi-user"></i> My Profile
@@ -73,8 +153,33 @@
       </a>
     </ng-template>
 
-    <button class="md:hidden menu-toggle-btn" (click)="mobileMenuToggle.emit()">
-      <i class="pi pi-bars text-lg"></i>
+    <button (click)="showNotificationdialog=true">
+      <i class="pi pi-bell text-lg" [ngClass]="{
+      'border-primary animate-pulse text-primary': recentNotifications.length > 0,
+      'text-gray-500': recentNotifications.length === 0
+    }"></i>
     </button>
+
   </div>
 </div>
+
+<p-dialog header="Edit Profile" [modal]="true" [(visible)]="showNotificationdialog" [style]="{ width: '25rem' }">
+  <div class="relative">
+    <button class="relative">
+      <i class="fa fa-bell text-gray-700"></i>
+      <span *ngIf="recentNotifications.length"
+        class="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1 rounded-full">
+        {{ recentNotifications.length }}
+      </span>
+    </button>
+    <div *ngIf="recentNotifications.length" class="absolute right-0 mt-2 bg-white shadow-lg rounded-md w-72">
+      <ul>
+        <li *ngFor="let n of recentNotifications" class="p-2 border-b hover:bg-gray-100">
+          <strong>{{ n.title }}</strong>
+          <p class="text-xs text-gray-500">{{ n.message }}</p>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+</p-dialog> -->

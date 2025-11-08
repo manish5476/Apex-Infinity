@@ -13,7 +13,7 @@
     <!-- === SCROLLABLE BODY === -->
     <main class="org-body">
       <div class="glass-form-card">
-        <form [formGroup]="organizationForm" (ngSubmit)="onSubmit()" class="org-form">
+        <form [formGroup]="organizationForm"  class="org-form">
 
           <!-- === SECTION 1 === -->
           <section class="form-section">
@@ -107,7 +107,7 @@
     <!-- === FIXED FOOTER === -->
     <footer class="org-footer">
       <button pButton type="submit" label="Create" icon="pi pi-check" class="floating-btn" [loading]="isLoading()"
-        [disabled]="organizationForm.invalid || isLoading()"></button>
+       (click)="onSubmit()" [disabled]="organizationForm.invalid || isLoading()"></button>
         <button pButton type="Login" label="login" routerLink="/auth/login" icon="pi pi-login" class="floating-btn"></button>
         <button pButton type="Login" label="login" routerLink="/auth/signup" icon="pi pi-login" class="floating-btn"></button>
       </footer>

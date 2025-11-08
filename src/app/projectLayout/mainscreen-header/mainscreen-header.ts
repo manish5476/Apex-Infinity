@@ -1,7 +1,7 @@
 // File: src/app/layouts/header/header.component.ts
 // Description: Corrected component logic to work with the reactive ThemeService.
 
-import { Component, EventEmitter, Input, Output, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, OnDestroy, ViewChild, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -14,14 +14,15 @@ import { ButtonModule } from 'primeng/button';
 import { Popover, PopoverModule } from 'primeng/popover';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { TooltipModule } from 'primeng/tooltip';
-
+import { DialogModule } from 'primeng/dialog';
 // App Services & Interfaces
 import { ThemeService, ThemeSettings } from '../../core/services/theme.service';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { AuthService } from '../../modules/auth/services/auth-service';
+import { NotificationService } from '../../core/services/notification.service';
 @Component({
   selector: 'app-mainscreen-header',
-  imports: [CommonModule, FormsModule, RouterModule, PopoverModule, AvatarModule, ButtonModule, SelectButtonModule, ToggleButtonModule, TooltipModule],
+  imports: [CommonModule, FormsModule, DialogModule, RouterModule, PopoverModule, AvatarModule, ButtonModule, SelectButtonModule, ToggleButtonModule, TooltipModule],
   templateUrl: './mainscreen-header.html',
   styleUrl: './mainscreen-header.scss',
 })
@@ -37,11 +38,15 @@ export class MainscreenHeader {
   // --- Theme State Management ---
   isDarkMode: boolean = false;
   accentColor: string = '#3B82F6';
+
   activeThemeClass: string = 'theme-blue';
   themeOptions: any[];
+  // --- Notifications ---
+  recentNotifications: any[] = [];
+  showNotificationDialog = false;
+
 
   colorThemes = [
-
     // Tailwind palette inspired
     { name: 'Indigo', color: '#6366f1', class: 'theme-indigo' },
     { name: 'Slate', color: '#64748b', class: 'theme-slate' },
@@ -94,7 +99,8 @@ export class MainscreenHeader {
   ];
 
   constructor(
-    private authService: AuthService,
+    private notificationService: NotificationService,
+    private AuthService: AuthService,
     private themeService: ThemeService
   ) {
     // this.currentUser$ = this.authService.currentUser$;
@@ -105,7 +111,7 @@ export class MainscreenHeader {
   }
 
   ngOnInit() {
-    // Reactively listen for theme changes to keep the UI in sync
+    // ✅ 1. Setup Theme Subscriptions
     this.themeService.settings$
       .pipe(takeUntil(this.destroy$))
       .subscribe((settings: ThemeSettings) => {
@@ -113,7 +119,40 @@ export class MainscreenHeader {
         this.activeThemeClass = settings.themeClass;
         this.accentColor = settings.accentColor;
       });
+
+    // ✅ 2. Connect to Notifications
+    const user = this.AuthService.getCurrentUser();
+    if (user && user._id) {
+      this.notificationService.connect(user._id);
+
+      // ✅ 3. Subscribe to new notifications reactively
+      this.notificationService.notifications$
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((notifications) => {
+          this.recentNotifications = notifications.slice(0, 5);
+        });
+    }
   }
+
+  //   // Reactively listen for theme changes to keep the UI in sync
+  //   this.themeService.settings$
+  //     .pipe(takeUntil(this.destroy$))
+  //     .subscribe((settings: ThemeSettings) => {
+  //       this.isDarkMode = settings.isDarkMode;
+  //       this.activeThemeClass = settings.themeClass;
+  //       this.accentColor = settings.accentColor;
+  //     });
+  // }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // const userid = this.AuthService.getItem<any>('apex_current_user');
+    // this.notificationService.connect(userid.id);
+    // this.notificationService.notifications$.subscribe((notifications) => {
+    //   this.recentNotifications = notifications.slice(0, 5);
+    // });
+    // console.log(this.recentNotifications);
+  }
+
 
   ngOnDestroy() {
     this.destroy$.next();
@@ -141,7 +180,7 @@ export class MainscreenHeader {
   }
 
   logout(): void {
-    // this.authService.logout();
+    this.AuthService.logout();
   }
 
   toggle(event: any) {

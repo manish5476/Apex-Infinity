@@ -1,0 +1,32 @@
+<div class="relative" (click)="toggleDropdown()">
+  <button class="relative">
+    <i class="fa fa-bell text-gray-700 text-xl"></i>
+    <span
+      *ngIf="unreadCount > 0"
+      class="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 rounded-full"
+    >
+      {{ unreadCount }}
+    </span>
+  </button>
+
+  <div
+    *ngIf="showDropdown"
+    class="absolute right-0 mt-2 w-80 bg-white shadow-lg rounded-lg border border-gray-100 z-50"
+  >
+    <div class="p-2 font-semibold border-b">Notifications</div>
+    <ul class="max-h-80 overflow-y-auto">
+      <li
+        *ngFor="let n of notifications"
+        (click)="markAsRead(n)"
+        [ngClass]="{          'bg-gray-100': !n.isRead,
+          'hover:bg-gray-50 cursor-pointer': true
+        }"
+        class="p-3 border-b text-sm"
+      >
+        <strong>{{ n.title }}</strong>
+        <p class="text-gray-600">{{ n.message }}</p>
+        <p class="text-xs text-gray-400">{{ n.createdAt | date: 'short' }}</p>
+      </li>
+    </ul>
+  </div>
+</div>
