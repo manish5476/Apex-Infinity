@@ -1,0 +1,373 @@
+<div [ngSwitch]="type" class="dynamic-cell-container w-full h-full flex items-center p-0 m-0">
+    <input
+      *ngSwitchCase="'text'"
+      pInputText
+      [id]="params.colDef?.field + '-' + params.node.rowIndex"
+      class="w-full p-inputtext-sm"
+      [(ngModel)]="value"
+      (ngModelChange)="onValueChange($event)"
+      [placeholder]="inputConfig?.placeholder ?? ''"
+      [disabled]="!isEditing()"
+      [readonly]="inputConfig?.readonly ?? false"
+      [pTooltip]="inputConfig?.tooltip ?? null"
+      [tooltipPosition]="inputConfig?.tooltipPosition ?? 'top'"
+    />
+  
+    <div *ngSwitchCase="'number'" class="w-full">
+      <p-inputNumber
+        class="w-full"
+        [id]="params.colDef?.field + '-' + params.node.rowIndex"
+        [(ngModel)]="value"
+        (onInput)="onValueChange($event.value)"
+        [mode]="inputConfig?.mode ?? 'decimal'"
+        [minFractionDigits]="inputConfig?.minFractionDigits ?? null"
+        [maxFractionDigits]="inputConfig?.maxFractionDigits ?? null"
+        [useGrouping]="inputConfig?.useGrouping ?? true"
+        [placeholder]="inputConfig?.placeholder ?? ''"
+        [min]="inputConfig?.min ?? null"
+        [max]="inputConfig?.max ?? null"
+        [step]="inputConfig?.step ?? 1"
+        [prefix]="inputConfig?.prefix ?? ''"
+        [suffix]="inputConfig?.suffix ?? ''"
+        [disabled]="!isEditing()"
+        [readonly]="inputConfig?.readonly ?? false"
+        (keypress)="preventE($event)"
+        [pTooltip]="inputConfig?.tooltip ?? null"
+        [tooltipPosition]="inputConfig?.tooltipPosition ?? 'top'"
+      ></p-inputNumber>
+    </div>
+  </div>
+<!-- <div [ngSwitch]="type" class="dynamic-cell-container w-full h-full flex items-center p-0 m-0">
+
+    <input *ngSwitchCase="'text'" pInputText [id]="params.colDef?.field + '-' + params.node.rowIndex"
+        class="w-full p-inputtext-sm" [(ngModel)]="value" (ngModelChange)="onValueChange($event)"
+        [placeholder]="inputConfig?.placeholder ?? ''" [disabled]="inputConfig?.disabled ?? false"
+        [readonly]="inputConfig?.readonly ?? false" [pTooltip]="inputConfig?.tooltip ?? null"
+        [tooltipPosition]="inputConfig?.tooltipPosition ?? 'top'" />
+
+    <div *ngSwitchCase="'number'" class="w-full">
+        <p-inputNumber class="w-full" [id]="params.colDef?.field + '-' + params.node.rowIndex" [(ngModel)]="value"
+            (onInput)="onValueChange($event.value)" [mode]="inputConfig?.mode ?? 'decimal'"
+            [minFractionDigits]="inputConfig?.minFractionDigits ?? null"
+            [maxFractionDigits]="inputConfig?.maxFractionDigits ?? null"
+            [useGrouping]="inputConfig?.useGrouping ?? true" [placeholder]="inputConfig?.placeholder ?? ''"
+            [min]="inputConfig?.min ?? null" [max]="inputConfig?.max ?? null" [step]="inputConfig?.step ?? 1"
+            [prefix]="inputConfig?.prefix ?? ''" [suffix]="inputConfig?.suffix ?? ''"
+            [disabled]="inputConfig?.disabled ?? false" [readonly]="inputConfig?.readonly ?? false"
+            (keypress)="preventE($event)" [pTooltip]="inputConfig?.tooltip ?? null"
+            [tooltipPosition]="inputConfig?.tooltipPosition ?? 'top'">
+        </p-inputNumber>
+    </div>
+
+    <div *ngSwitchCase="'select'" class="w-full">
+       <p-select appendTo="body"  [inputId]="params.colDef?.field + '-' + params.node.rowIndex" [(ngModel)]="value" [options]="options"
+            [optionLabel]="inputConfig?.optionLabel ?? null" [optionValue]="inputConfig?.optionValue ?? null"
+            [placeholder]="inputConfig?.placeholder ?? 'Select'" [checkmark]="inputConfig?.checkmark ?? false"
+            [showClear]="inputConfig?.showClear ?? false" [editable]="inputConfig?.editable ?? false"
+            [filter]="inputConfig?.filter ?? false" [styleClass]="inputConfig?.styleClass ?? 'w-full'" appendTo="body"
+            [disabled]="inputConfig?.disabled ?? false" [readonly]="inputConfig?.readonly ?? false"
+            [pTooltip]="inputConfig?.tooltip ?? null" [tooltipPosition]="inputConfig?.tooltipPosition ?? 'top'">
+
+        </p-select>
+    </div>
+
+    <div *ngSwitchCase="'colorpicker'" class="w-full flex items-center space-x-2">
+
+        <span *ngIf="inputConfig?.showValue" class="text-xs truncate flex-shrink mr-1" [pTooltip]="value"
+            tooltipPosition="top">
+
+        </span>
+        <p-colorPicker [id]="params.colDef?.field + '-' + params.node.rowIndex" appendTo="body" [(ngModel)]="value"
+            (ngModelChange)="onValueChange($event)" [format]="inputConfig?.format ?? 'hex'"
+            [inline]="inputConfig?.inline ?? false" [styleClass]="'p-inputtext-sm'"
+            [disabled]="inputConfig?.disabled ?? false" [pTooltip]="inputConfig?.tooltip ?? 'Select Color'"
+            [tooltipPosition]="inputConfig?.tooltipPosition ?? 'top'">
+        </p-colorPicker>
+    </div>
+
+    <p-autoComplete *ngSwitchCase="'autocomplete'" class="w-full"
+        [id]="params.colDef?.field + '-' + params.node.rowIndex" [(ngModel)]="value"
+        (completeMethod)="onValueChange($event)" (onSelect)="onValueChange($event)" [suggestions]="options"
+        [field]="inputConfig?.field ?? null" [dropdown]="inputConfig?.dropdown ?? false"
+        [forceSelection]="inputConfig?.forceSelection ?? false" [minLength]="inputConfig?.minLength ?? 1"
+        [placeholder]="inputConfig?.placeholder ?? 'Search...'" appendTo="body"
+        [disabled]="inputConfig?.disabled ?? false" [readonly]="inputConfig?.readonly ?? false"
+        [pTooltip]="inputConfig?.tooltip ?? null" [tooltipPosition]="inputConfig?.tooltipPosition ?? 'top'">
+    </p-autoComplete>
+
+    <p-cascadeSelect *ngSwitchCase="'cascadeselect'" class="w-full"
+        [id]="params.colDef?.field + '-' + params.node.rowIndex" [(ngModel)]="value" [options]="options"
+        [optionLabel]="inputConfig?.optionLabel ?? 'cname'" [optionGroupLabel]="inputConfig?.optionGroupLabel ?? 'name'"
+        [optionGroupChildren]="inputConfig?.optionGroupChildren ?? ['states', 'cities']"
+        [style]="{ 'minWidth': inputConfig?.minWidth ?? '14rem' }"
+        [placeholder]="inputConfig?.placeholder ?? 'Select...'" [disabled]="inputConfig?.disabled ?? false"
+        [pTooltip]="inputConfig?.tooltip ?? null" [tooltipPosition]="inputConfig?.tooltipPosition ?? 'top'">
+
+    </p-cascadeSelect>
+
+    <div *ngSwitchCase="'checkbox'" class="w-full flex justify-content-center items-center">
+        <p-checkbox [(ngMode l)]="value" [binary]="inputConfig?.binary ?? true"
+            [id]="params.colDef?.field + '-' + params.node.rowIndex" [style]="inputConfig?.style ?? null"
+            [styleClass]="inputConfig?.styleClass ?? null" [disabled]="inputConfig?.disabled ?? false"
+            [readonly]="inputConfig?.readonly ?? false" [pTooltip]="inputConfig?.tooltip ?? null"
+            [tooltipPosition]="inputConfig?.tooltipPosition ?? 'top'">
+        </p-checkbox>
+    </div>
+
+
+    <p-inputMask *ngSwitchCase="'inputmask'" class="w-full" [id]="params.colDef?.field + '-' + params.node.rowIndex"
+        [(ngModel)]="value" [mask]="inputConfig?.mask ?? null" [placeholder]="inputConfig?.placeholder ?? ''"
+        [autoClear]="inputConfig?.autoClear ?? true" [disabled]="inputConfig?.disabled ?? false"
+        [readonly]="inputConfig?.readonly ?? false" [pTooltip]="inputConfig?.tooltip ?? null"
+        [tooltipPosition]="inputConfig?.tooltipPosition ?? 'top'">
+    </p-inputMask>
+
+    <p-datepicker *ngSwitchCase="'datepicker'" class="w-full" [id]="params.colDef?.field + '-' + params.node.rowIndex"
+        [(ngModel)]="value" [showButtonBar]="inputConfig?.showButtonBar ?? false"
+        [readonlyInput]="inputConfig?.readonlyInput ?? false" [showTime]="inputConfig?.showTime ?? false"
+        [hourFormat]="inputConfig?.hourFormat ?? '24'" [timeOnly]="inputConfig?.timeOnly ?? false"
+        [view]="inputConfig?.view ?? 'date'" [dateFormat]="inputConfig?.dateFormat ?? 'mm/dd/yy'"
+        [numberOfMonths]="inputConfig?.numberOfMonths ?? 1" [placeholder]="inputConfig?.placeholder ?? 'Select a date'"
+        appendTo="body" [disabled]="inputConfig?.disabled ?? false" [pTooltip]="inputConfig?.tooltip ?? null"
+        [tooltipPosition]="inputConfig?.tooltipPosition ?? 'top'">
+
+        <ng-template #date let-date>
+            <strong *ngIf="inputConfig?.dateTemplateCondition && inputConfig?.dateTemplateCondition(date)"
+                style="text-decoration: line-through">
+
+            </strong>
+            <ng-template #elseBlock>{{ date.day }}</ng-template>
+        </ng-template>
+    </p-datepicker>
+
+    <div *ngSwitchCase="'keyfilteredinput'" class="w-full">
+        <input type="text" pInputText class="w-full" [id]="params.colDef?.field + '-' + params.node.rowIndex"
+            [(ngModel)]="value" [placeholder]="inputConfig?.placeholder ?? ''"
+            [disabled]="inputConfig?.disabled ?? false" [readonly]="inputConfig?.readonly ?? false"
+            [pKeyFilter]="inputConfig?.keyFilter ?? null" [pTooltip]="inputConfig?.tooltip ?? null"
+            [tooltipPosition]="inputConfig?.tooltipPosition ?? 'top'" />
+    </div>
+
+    <div *ngSwitchCase="'knob'" class="w-full flex justify-content-center items-center">
+        <p-knob [id]="params.colDef?.field + '-' + params.node.rowIndex" [(ngModel)]="value"
+            [valueColor]="inputConfig?.valueColor ?? 'var(--primary-color)'"
+            [rangeColor]="inputConfig?.rangeColor ?? 'var(--surface-d)'" [size]="inputConfig?.size ?? 100"
+            [step]="inputConfig?.step ?? 1" [min]="inputConfig?.min ?? 0" [max]="inputConfig?.max ?? 100"
+            [disabled]="inputConfig?.disabled ?? false" [readonly]="inputConfig?.readonly ?? false"
+            [pTooltip]="inputConfig?.tooltip ?? null" [tooltipPosition]="inputConfig?.tooltipPosition ?? 'top'">
+        </p-knob>
+    </div>
+
+    <div *ngSwitchCase="'multiselect'" class="w-full">
+        <p-multiselect [id]="params.colDef?.field + '-' + params.node.rowIndex" [(ngModel)]="value" [options]="options"
+            [optionLabel]="inputConfig?.optionLabel ?? null" [optionValue]="inputConfig?.optionValue ?? null"
+            [placeholder]="inputConfig?.placeholder ?? 'Select'"
+            [maxSelectedLabels]="inputConfig?.maxSelectedLabels ?? null" [display]="inputConfig?.display ?? 'comma'"
+            [filter]="inputConfig?.filter ?? false" [styleClass]="inputConfig?.styleClass ?? 'w-full'" appendTo="body"
+            [disabled]="inputConfig?.disabled ?? false" [readonly]="inputConfig?.readonly ?? false"
+            [pTooltip]="inputConfig?.tooltip ?? null" [tooltipPosition]="inputConfig?.tooltipPosition ?? 'top'">
+
+        </p-multiselect>
+    </div>
+
+ <div *ngSwitchCase="'action'" class="w-full h-full flex items-center justify-center space-x-2">
+         <ng-container *ngIf="isEditing()">
+             <button pButton type="button" icon="pi pi-check"
+                 class="p-button-rounded p-button-success p-button-text p-button-sm"
+                 (click)="onSaveClick()"
+                 title="Save">
+             </button>
+
+             <button pButton type="button" icon="pi pi-times"
+                 class="p-button-rounded p-button-secondary p-button-text p-button-sm"
+                 (click)="onCancelClick()"
+                 title="Cancel">
+             </button>
+         </ng-container>
+
+         <ng-container *ngIf="!isEditing()">
+             <button pButton type="button" icon="pi pi-pencil"
+                 class="p-button-rounded p-button-info p-button-text p-button-sm"
+                 *ngIf="params.data" {{! Only show if row data exists }}
+                 (click)="onEditClick()"
+                 title="Edit">
+             </button>
+
+             <button pButton type="button" icon="pi pi-trash"
+                 class="p-button-rounded p-button-danger p-button-text p-button-sm"
+                  *ngIf="params.data" {{! Only show if row data exists }}
+                 (click)="onDeleteClick()"
+                 title="Delete">
+             </button>
+         </ng-container>
+     </div>
+
+     
+    <input *ngSwitchDefault pInputText [id]="params.colDef?.field + '-' + params.node.rowIndex"
+        class="w-full p-inputtext-sm" [(ngModel)]="value" (ngModelChange)="onValueChange($event)"
+        [placeholder]="inputConfig?.placeholder ?? ''" [disabled]="inputConfig?.disabled ?? false"
+        [readonly]="inputConfig?.readonly ?? false" [pTooltip]="inputConfig?.tooltip ?? null"
+        [tooltipPosition]="inputConfig?.tooltipPosition ?? 'top'" />
+
+</div>
+<!-- <div [ngSwitch]="type" class="dynamic-cell-container w-full h-full flex items-center p-0 m-0">
+
+    <input *ngSwitchCase="'text'" pInputText [id]="params.colDef?.field + '-' + params.node.rowIndex"
+        class="w-full p-inputtext-sm" [(ngModel)]="value" (ngModelChange)="onValueChange($event)"
+        [placeholder]="inputConfig?.placeholder || ''" [pTooltip]="inputConfig?.tooltip || null"
+        [tooltipPosition]="inputConfig?.tooltipPosition || 'top'" />
+
+    <div *ngSwitchCase="'number'" class="w-full">
+        <p-inputNumber class="w-full" [id]="params.colDef?.field + '-' + params.node.rowIndex" [(ngModel)]="value"
+            (onInput)="onValueChange($event)" [mode]="inputConfig?.mode || 'decimal'"
+            [minFractionDigits]="inputConfig?.minFractionDigits ?? undefined"
+            [maxFractionDigits]="inputConfig?.maxFractionDigits ?? 5" [useGrouping]="inputConfig?.useGrouping ?? true"
+            [placeholder]="inputConfig?.placeholder || ''" [min]="inputConfig?.min ?? undefined"
+            [max]="inputConfig?.max ?? undefined" [step]="inputConfig?.step ?? 1" [prefix]="inputConfig?.prefix || ''"
+            [suffix]="inputConfig?.suffix || ''" (keypress)="preventE($event)" [pTooltip]="inputConfig?.tooltip || null"
+            [tooltipPosition]="inputConfig?.tooltipPosition || 'top'">
+        </p-inputNumber>
+    </div> -->
+
+
+<!-- <div *ngSwitchCase="'select'" class="w-full">
+       <p-select appendTo="body"  [inputId]="params.colDef?.field + '-' + params.node.rowIndex" [(ngModel)]="value" [options]="options"
+            [optionLabel]="inputConfig?.optionLabel || null" [optionValue]="inputConfig?.optionValue || null"
+            [placeholder]="inputConfig?.placeholder || 'Select'" [checkmark]="inputConfig?.checkmark || false"
+            [showClear]="inputConfig?.showClear || false" [editable]="inputConfig?.editable || false"
+            [filter]="inputConfig?.filter || false" [styleClass]="inputConfig?.styleClass || 'w-full'" appendTo="body"
+            [disabled]="inputConfig?.disabled || false" [readonly]="inputConfig?.readonly || false"
+            [pTooltip]="inputConfig?.tooltip || null" [tooltipPosition]="inputConfig?.tooltipPosition || 'top'">
+
+        </p-select>
+    </div> -->
+
+<!-- color picker -->
+<!-- <div *ngSwitchCase="'colorpicker'" class="w-full flex items-center space-x-2">
+        <span *ngIf="inputConfig?.showValue" class="text-xs truncate flex-shrink mr-1" [pTooltip]="value"
+            tooltipPosition="top">
+           
+        </span>
+        <p-colorPicker [id]="params.colDef?.field + '-' + params.node.rowIndex" appendTo="body" [(ngModel)]="value"
+            (ngModelChange)="onValueChange($event)" [format]="inputConfig?.format || 'hex'"
+            [inline]="inputConfig?.inline || false" [styleClass]="'p-inputtext-sm'"
+            [pTooltip]="inputConfig?.tooltip || 'Select Color'"
+            [tooltipPosition]="inputConfig?.tooltipPosition || 'top'">
+        </p-colorPicker>
+    </div> -->
+<!--  -->
+<!-- AutoComplete Component -->
+<!-- <p-autoComplete *ngSwitchCase="'autocomplete'" class="w-full"
+        [id]="params.colDef?.field + '-' + params.node.rowIndex" [(ngModel)]="value"
+        (completeMethod)="onValueChange($event,'autocomplete')" (onSelect)="onValueChange($event)"
+        [suggestions]="options" [field]="inputConfig?.field || null" [dropdown]="inputConfig?.dropdown || false"
+        [forceSelection]="inputConfig?.forceSelection || false" [minLength]="inputConfig?.minLength || 1"
+        [placeholder]="inputConfig?.placeholder || 'Search...'" appendTo="body"
+        [pTooltip]="inputConfig?.tooltip || null" [tooltipPosition]="inputConfig?.tooltipPosition || 'top'">
+    </p-autoComplete> -->
+
+<!-- CascadeSelect Component -->
+<!-- <p-cascadeSelect *ngSwitchCase="'cascadeselect'" class="w-full"
+        [id]="params.colDef?.field + '-' + params.node.rowIndex" [(ngModel)]="value" [options]="options"
+        [optionLabel]="inputConfig?.optionLabel || 'cname'" [optionGroupLabel]="inputConfig?.optionGroupLabel || 'name'"
+        [optionGroupChildren]="inputConfig?.optionGroupChildren || ['states', 'cities']"
+        [style]="{ 'minWidth': inputConfig?.minWidth || '14rem' }"
+        [placeholder]="inputConfig?.placeholder || 'Select...'">
+    </p-cascadeSelect> -->
+
+<!-- chekbox -->
+<!-- <p-checkbox *ngSwitchCase="'checkbox'" [(ngModel)]="value" [binary]="inputConfig?.binary ?? true"
+        [id]="params.colDef?.field + '-' + params.node.rowIndex" [style]="{ 'margin-top': '0.5rem' }">
+    </p-checkbox> -->
+
+<!-- input mask  -->
+<!-- <p-inputMask *ngSwitchCase="'inputmask'" class="w-full" [id]="params.colDef?.field + '-' + params.node.rowIndex"
+        [(ngModel)]="value" [mask]="inputConfig?.mask || '99-999999'"
+        [placeholder]="inputConfig?.placeholder || '99-999999'">
+    </p-inputMask> -->
+
+<!-- input number  -->
+<!-- <p-inputNumber *ngSwitchCase="'inputnumber'" class="w-full" [id]="params.colDef?.field + '-' + params.node.rowIndex"
+        [(ngModel)]="value" [mode]="inputConfig?.mode || 'decimal'" [min]="inputConfig?.min ?? null"
+        [max]="inputConfig?.max ?? null" [useGrouping]="inputConfig?.useGrouping ?? true"
+        [minFractionDigits]="inputConfig?.minFractionDigits ?? null"
+        [maxFractionDigits]="inputConfig?.maxFractionDigits ?? null" [placeholder]="inputConfig?.placeholder || ''">
+    </p-inputNumber> -->
+
+<!-- <p-inputNumber *ngSwitchCase="'inputnumber'"
+    class="w-full"
+    [id]="params.colDef?.field + '-' + params.node.rowIndex"
+    [(ngModel)]="value"
+    [mode]="inputConfig?.mode || 'decimal'">
+</p-inputNumber>
+
+<p-inputNumber *ngSwitchCase="'inputnumber'"
+               class="w-full"
+               [id]="params.colDef?.field + '-' + params.node.rowIndex"
+               [(ngModel)]="value"
+               [mode]="inputConfig?.mode || 'decimal'"
+               [minFractionDigits]="inputConfig?.minFractionDigits || 2"
+               [maxFractionDigits]="inputConfig?.maxFractionDigits || 5">
+</p-inputNumber> -->
+
+
+
+<!-- /datepicker -->
+<!-- <p-datePicker *ngSwitchCase="'datepicker'" class="w-full"
+        [id]="params.colDef?.field + '-' + params.node.rowIndex" [(ngModel)]="value"
+        [placeholder]="inputConfig?.placeholder || 'Select a date'" dateFormat="yy-mm-dd">
+    </p-datePicker> -->
+
+<!-- <p-datepicker *ngSwitchCase="'datepicker'" class="w-full" [id]="params.colDef?.field + '-' + params.node.rowIndex"
+        [(ngModel)]="value" [showButtonBar]="inputConfig?.showButtonBar || false"
+        [readonlyInput]="inputConfig?.readonlyInput || false" [showTime]="inputConfig?.showTime || false"
+        [hourFormat]="inputConfig?.hourFormat || 24" [timeOnly]="inputConfig?.timeOnly || false"
+        [view]="inputConfig?.view || 'date'" [dateFormat]="inputConfig?.dateFormat || 'mm/dd/yy'"
+        [numberOfMonths]="inputConfig?.numberOfMonths || 1">
+        <ng-template #date let-date>
+            <strong *ngIf="inputConfig?.dateTemplate?.condition(date)" style="text-decoration: line-through">
+               
+            </strong>
+            <ng-template #elseBlock>{{ date.day }}</ng-template>
+        </ng-template>
+    </p-datepicker> -->
+
+
+<!-- custom number  -->
+<!-- <div *ngSwitchCase="'keyfilteredinput'" class="card flex justify-content-center w-full">
+        <input type="text" pInputText class="w-full" [id]="params.colDef?.field + '-' + params.node.rowIndex"
+            [(ngModel)]="value" [placeholder]="inputConfig?.placeholder || ''"
+            [disabled]="inputConfig?.disabled || false" [readonly]="inputConfig?.readonly || false"
+            [pKeyFilter]="inputConfig?.keyFilter || null"
+            [pTooltip]="inputConfig?.tooltip || null" [tooltipPosition]="inputConfig?.tooltipPosition || 'top'" />
+    </div> -->
+
+<!-- multiselect -->
+<!-- <div *ngSwitchCase="'knob'" class="card flex justify-content-center w-full">
+        <p-knob [id]="params.colDef?.field + '-' + params.node.rowIndex" [(ngModel)]="value"
+            number }} [valueColor]="inputConfig?.valueColor || 'var(--primary-color)'"
+            [rangeColor]="inputConfig?.rangeColor || 'var(--surface-d)'" [size]="inputConfig?.size || 100"
+            [step]="inputConfig?.step || 1" [min]="inputConfig?.min || 0" [max]="inputConfig?.max || 100"
+            [readonly]="inputConfig?.readonly || false" [pTooltip]="inputConfig?.tooltip || null"
+            [tooltipPosition]="inputConfig?.tooltipPosition || 'top'">
+        </p-knob>
+    </div>
+
+    <div *ngSwitchCase="'multiselect'" class="w-full">
+        <p-multiselect [id]="params.colDef?.field + '-' + params.node.rowIndex" [(ngModel)]="value" [options]="options"
+            [optionLabel]="inputConfig?.optionLabel || null" [optionValue]="inputConfig?.optionValue || null"
+            [placeholder]="inputConfig?.placeholder || 'Select'"
+            [maxSelectedLabels]="inputConfig?.maxSelectedLabels || null" [display]="inputConfig?.display || 'comma'"
+            [filter]="inputConfig?.filter || false" [styleClass]="inputConfig?.styleClass || 'w-full'" appendTo="body"
+            [disabled]="inputConfig?.disabled || false" [readonly]="inputConfig?.readonly || false"
+            [pTooltip]="inputConfig?.tooltip || null" [tooltipPosition]="inputConfig?.tooltipPosition || 'top'">
+        </p-multiselect>
+    </div>
+
+
+    <input *ngSwitchDefault pInputText [id]="params.colDef?.field + '-' + params.node.rowIndex"
+        class="w-full p-inputtext-sm" [(ngModel)]="value" (ngModelChange)="onValueChange($event)"
+        [placeholder]="inputConfig?.placeholder || ''" [pTooltip]="inputConfig?.tooltip || null"
+        [tooltipPosition]="inputConfig?.tooltipPosition || 'top'" />
+
+</div> --> -->

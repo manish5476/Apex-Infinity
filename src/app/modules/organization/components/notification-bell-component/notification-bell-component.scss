@@ -1,0 +1,38 @@
+:host ::ng-deep {
+  .notification-tabs {
+    .p-tablist {
+      background-color: var(--theme-bg-secondary);
+      border-bottom: 1px solid var(--theme-border-primary);
+      display: flex;
+      justify-content: space-around; // Evenly space the tabs
+    }
+
+    .p-tab {
+      flex: 1 1 0; // Make tabs grow to fill space
+    }
+    
+    .p-tab-link {
+      border: 0;
+      color: var(--theme-text-muted);
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+
+      &:not(.p-highlight):not(.p-disabled):hover {
+        background: var(--theme-hover-bg);
+        color: var(--theme-text-primary);
+      }
+    }
+    
+    .p-tab.p-highlight .p-tab-link {
+         color: var(--theme-accent-primary);
+         border-bottom-color: var(--theme-accent-primary);
+    }
+
+    .p-tabpanels {
+      padding: 0; // Remove default panel padding
+    }
+  }
+}

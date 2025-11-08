@@ -1,0 +1,53 @@
+<!-- 
+  File: dynamic-ag-grid-columns.component.html
+  Description: This template uses the 'isEditable()' function to switch between view and edit modes.
+  Inside the edit mode, it uses an ngSwitch to render the correct PrimeNG component based on 'params.typeOfCol'.
+-->
+<div class="dynamic-cell-wrapper h-full w-full flex items-center">
+
+  <!-- VIEW MODE: Displayed when isEditable() returns false -->
+  <div *ngIf="!isEditable()" class="view-mode w-full px-2">
+    <!-- Special case for checkbox to show a visual indicator -->
+    <ng-container *ngIf="params.typeOfCol === 'checkbox'; else defaultView">
+      <p-checkbox [ngModel]="cellValue" [disabled]="true" [binary]="true"></p-checkbox>
+    </ng-container>
+    <!-- Default view for text, dropdowns, etc. -->
+    <ng-template #defaultView>
+      <span>{{ cellValue }}</span>
+    </ng-template>
+  </div>
+
+  <!-- EDIT MODE: Displayed when isEditable() returns true -->
+  <div *ngIf="isEditable()" [ngSwitch]="params.typeOfCol" class="edit-mode w-full">
+
+    <!-- Case for PrimeNG InputText -->
+    <input *ngSwitchCase="'text'" pInputText type="text" [(ngModel)]="cellValue"
+      (ngModelChange)="onAction('textChanged', $event)" class="p-inputtext-sm w-full" />
+
+    <!-- Case for PrimeNG Dropdown -->
+   <p-select appendTo="body"  *ngSwitchCase="'dropdown'" [options]="params.options || []" [(ngModel)]="cellValue"
+      (ngModelChange)="onAction('dropdownChanged', $event)" [optionLabel]="params['optionLabel'] || 'label'"
+      [optionValue]="params['optionValue'] || 'value'" styleClass="w-full" appendTo="body"></p-select>
+
+    <!-- Case for PrimeNG Checkbox -->
+    <div *ngSwitchCase="'checkbox'" class="flex justify-center w-full">
+      <p-checkbox [(ngModel)]="cellValue" (onChange)="onAction('checkboxToggled', $event.checked)"
+        [binary]="true"></p-checkbox>
+    </div>
+
+    <!-- Case for a clickable Icon (used for dialogs or buttons) -->
+    <!-- <div *ngSwitchCase="'icon'" class="flex justify-center w-full">
+      <i [class]="params.icon" (click)="onAction('iconClicked')" [pTooltip]="params.tooltip || ''" tooltipPosition="top"
+        class="cursor-pointer text-lg p-2 hover:text-primary" aria-hidden="true"></i>
+    </div> -->
+
+    <!-- A button for the 'dialog' type -->
+    <button *ngSwitchCase="'dialog'" type="button" pButton 
+      (click)="onAction('dialogClicked')" class="p-button-sm"></button>
+      <!-- [icon]="params.icon" [label]="params.label" -->
+
+    <!-- Default Fallback (shows the value if type is unknown) -->
+    <span *ngSwitchDefault>{{ cellValue }}</span>
+  </div>
+
+</div>

@@ -1,0 +1,41 @@
+/* Ensure container takes full cell space and aligns content */
+.dynamic-cell-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 0px 4px; /* Add minimal padding inside the cell */
+    box-sizing: border-box; /* Include padding in width/height */
+}
+
+/* Fix potential height issues for PrimeNG inputs within grid cells */
+/* You might need to adjust these based on your theme and grid row height */
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-inputnumber-input,
+:host ::ng-deep .p-select,
+:host ::ng-deep .p-colorpicker {
+    width: 100%;
+    height: auto; /* Allow height to adjust or set fixed height */
+    /* Consider setting a specific height matching your row height minus padding */
+    /* Example: height: 28px; */
+    font-size: inherit; /* Inherit font size from grid cell */
+}
+
+/* Ensure InputNumber fills its wrapper */
+:host ::ng-deep .p-inputnumber {
+     width: 100%;
+     display: flex; /* Fixes potential width issues */
+}
+:host ::ng-deep .p-inputnumber .p-inputnumber-input {
+     flex-grow: 1; /* Allows input field to take available space */
+}
+
+/* Adjust dropdown overlay panel width if needed */
+/* body .p-select-panel { */
+    /* min-width: 150px; */ /* Example */
+/* } */
+
+/* Adjust colorpicker overlay */
+/* body .p-colorpicker-panel { */
+    /* z-index: 1050 !important; */ /* Ensure it's above other elements */
+/* } */

@@ -1,3 +1,4 @@
+import { ApiService } from './../../../../core/services/api';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -11,6 +12,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { AuthService } from '../../services/auth-service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { NotificationService } from '../../../../core/services/notification.service';
+import { MasterListService } from '../../../../core/services/master-list.service';
 
 @Component({
   selector: 'app-login',
@@ -36,6 +38,7 @@ export class Login implements OnInit {
   private router = inject(Router);
   private messageService = inject(AppMessageService); // Use your custom service
   private notificationService = inject(NotificationService); // Use your custom service
+  private ApiService = inject(ApiService); // Use your custom service
 
   // --- State Signals ---
   isLoading = signal(false);
@@ -80,5 +83,11 @@ export class Login implements OnInit {
         this.isLoading.set(false);
       }
     });
+    
+      // 🔹 Fetch global master list right after login
+  inject(MasterListService).load();
+
+
   }
+
 }

@@ -1,216 +1,3 @@
-/* ==============================================================
-   APEX INFINITY – ADVANCED MULTI-THEME SYSTEM
-   Modernized, Accessible, Responsive Design Tokens
-   ============================================================== */
-
-/* === BASE ROOT (DEFAULT THEME TOKENS) === */
-:root {
-  /* === CORE THEME COLORS === */
-  --theme-bg-primary: rgb(249, 250, 251);
-  --theme-bg-secondary: rgb(255, 255, 255);
-  --theme-bg-ternary: rgb(241, 245, 249);
-  --theme-bg-overlay: rgba(255, 255, 255, 0.95);
-
-  --theme-text-primary: rgb(15, 23, 42);
-  --theme-text-secondary: rgb(51, 65, 85);
-  --theme-text-label: rgb(100, 116, 139);
-  --theme-text-muted: rgb(148, 163, 184);
-  --theme-text-inverted: rgb(255, 255, 255);
-
-  --theme-border-primary: rgb(226, 232, 240);
-  --theme-border-secondary: rgb(203, 213, 225);
-  --theme-border-focus: rgb(37, 99, 235);
-
-  --theme-hover-bg: rgb(241, 245, 249);
-  --theme-active-bg: rgb(229, 231, 235);
-  --theme-scroll-track: rgb(240, 240, 242);
-  --theme-scroll-thumb: rgb(160, 160, 170);
-
-  --theme-shadow-color: rgba(0, 0, 0, 0.08);
-  --theme-shadow-color-strong: rgba(0, 0, 0, 0.18);
-
-  /* === ACCENT COLORS === */
-  --theme-accent-primary: rgb(37, 99, 235);
-  --theme-accent-primary-hover: rgb(29, 78, 216);
-  --theme-accent-primary-light: rgba(37, 99, 235, 0.1);
-  --theme-accent-text-color: rgb(255, 255, 255);
-  --theme-accent-focus-ring: rgba(37, 99, 235, 0.25);
-  --theme-accent-gradient: linear-gradient(135deg, rgb(59, 130, 246), rgb(37, 99, 235));
-
-  /* === STATUS COLORS === */
-  --theme-success-primary: rgb(46, 139, 87);
-  --theme-error-primary: rgb(220, 38, 38);
-  --theme-warning-primary: rgb(255, 193, 7);
-  --theme-info-primary: rgb(2, 132, 199);
-
-  /* === GRADIENTS === */
-  --theme-body-gradient: linear-gradient(135deg, rgb(245, 246, 250), rgb(255, 255, 255));
-  --theme-card-gradient: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(245, 246, 250, 0.85));
-  --theme-glass-gradient: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-
-  /* === TYPOGRAPHY === */
-  --font-primary: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-heading: "Playfair Display", Georgia, "Times New Roman", serif;
-  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: "Fira Code", monospace;
-
-  --font-size-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
-  --font-size-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
-  --font-size-base: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
-  --font-size-lg: clamp(1.125rem, 1rem + 0.625vw, 1.25rem);
-  --font-size-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
-  --font-size-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
-  --font-size-3xl: clamp(2rem, 1.7rem + 1.5vw, 2.5rem);
-  --font-size-4xl: clamp(2.5rem, 2rem + 2vw, 3.25rem);
-
-  --line-height-tight: 1.25;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.625;
-
-  /* === SPACING SYSTEM === */
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
-  --spacing-2xl: 3rem;
-  --spacing-3xl: 4rem;
-
-  /* === UI SYSTEM === */
-  --ui-border-width: 1px;
-  --ui-border-radius-sm: 6px;
-  --ui-border-radius: 12px;
-  --ui-border-radius-lg: 16px;
-  --ui-border-radius-full: 9999px;
-
-  --ui-shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.05);
-  --ui-shadow-md: 0 6px 16px rgba(0, 0, 0, 0.08);
-  --ui-shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.12);
-  --ui-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.15);
-
-  --ui-transition-fast: all 0.15s ease-in-out;
-  --ui-transition: all 0.25s ease-in-out;
-  --ui-transition-slow: all 0.4s ease;
-
-  --z-dropdown: 1000;
-  --z-sticky: 1020;
-  --z-modal: 1050;
-  --z-tooltip: 1070;
-}
-
-/* === DARK MODE === */
-[data-theme='dark'] {
-  --theme-bg-primary: rgb(18, 18, 18);
-  --theme-bg-secondary: rgb(28, 28, 30);
-  --theme-bg-ternary: rgb(36, 36, 38);
-  --theme-bg-overlay: rgba(18, 18, 18, 0.9);
-
-  --theme-text-primary: rgb(245, 245, 247);
-  --theme-text-secondary: rgb(199, 199, 204);
-  --theme-text-label: rgb(170, 170, 170);
-  --theme-text-inverted: rgb(18, 18, 18);
-
-  --theme-border-primary: rgb(50, 50, 50);
-  --theme-border-secondary: rgb(75, 75, 75);
-
-  --theme-hover-bg: rgb(42, 42, 44);
-  --theme-active-bg: rgb(55, 55, 57);
-
-  --theme-accent-primary: rgb(88, 166, 255);
-  --theme-accent-primary-hover: rgb(66, 140, 233);
-  --theme-accent-focus-ring: rgba(88, 166, 255, 0.3);
-
-  --theme-card-gradient: linear-gradient(145deg, rgba(30, 30, 30, 0.9), rgba(18, 18, 18, 0.8));
-  --theme-body-gradient: linear-gradient(135deg, rgb(18, 18, 18), rgb(28, 28, 30));
-
-  --ui-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --ui-shadow-md: 0 6px 16px rgba(0, 0, 0, 0.5);
-  --ui-shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.6);
-}
-
-/* === GLOBAL SCALE === */
-:root {
-  font-size: clamp(14px, 0.9vw + 0.25rem, 16px);
-}
-
-/* === ACCESSIBLE TEXT CONTRAST AUTOMATION === */
-[data-theme] {
-  color-scheme: light dark;
-}
-
-/* === THEME VARIANT COLLECTIONS === */
-
-/* CORE COLOR THEMES (Modernized Contrast & Font Harmony) */
-.theme-blue       { --theme-accent-primary: rgb(59, 130, 246); --font-body: "Inter"; }
-.theme-purple     { --theme-accent-primary: rgb(147, 51, 234); }
-.theme-pink       { --theme-accent-primary: rgb(236, 72, 153); }
-.theme-green      { --theme-accent-primary: rgb(34, 197, 94); }
-.theme-teal       { --theme-accent-primary: rgb(45, 212, 191); }
-.theme-slate      { --theme-accent-primary: rgb(100, 116, 139); }
-.theme-red        { --theme-accent-primary: rgb(239, 68, 68); }
-.theme-orange     { --theme-accent-primary: rgb(249, 115, 22); }
-.theme-amber      { --theme-accent-primary: rgb(245, 158, 11); }
-.theme-yellow     { --theme-accent-primary: rgb(234, 179, 8); }
-.theme-lime       { --theme-accent-primary: rgb(132, 204, 22); }
-.theme-emerald    { --theme-accent-primary: rgb(16, 185, 129); }
-.theme-cyan       { --theme-accent-primary: rgb(6, 182, 212); }
-.theme-sky        { --theme-accent-primary: rgb(14, 165, 233); }
-.theme-indigo     { --theme-accent-primary: rgb(99, 102, 241); }
-.theme-violet     { --theme-accent-primary: rgb(124, 58, 237); }
-.theme-fuchsia    { --theme-accent-primary: rgb(217, 70, 239); }
-.theme-rose       { --theme-accent-primary: rgb(244, 63, 94); }
-
-/* RETRO / CLASSIC THEMES (Enhanced Contrast & Warm Fonts) */
-.theme-retro-burgundy,
-.theme-retro-forest,
-.theme-retro-copper,
-.theme-retro-navy,
-.theme-retro-plum {
-  --font-primary: "Playfair Display";
-  --font-body: "Inter";
-  --theme-text-primary: rgb(34, 34, 34);
-  --theme-bg-primary: rgb(252, 250, 246);
-}
-
-/* SPECIAL THEMES */
-.theme-premium {
-  --theme-accent-primary: rgb(255, 215, 0);
-  --theme-bg-primary: rgb(15, 15, 15);
-  --theme-text-primary: rgb(245, 245, 245);
-  --font-heading: "Playfair Display";
-}
-
-.theme-modern-glass {
-  backdrop-filter: blur(12px) saturate(180%);
-  --theme-bg-primary: rgba(255, 255, 255, 0.65);
-  --theme-border-primary: rgba(0, 0, 0, 0.15);
-  --ui-shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.25);
-}
-
-.theme-vaporwave {
-  --theme-bg-primary: rgb(18, 12, 48);
-  --theme-text-primary: rgb(250, 250, 255);
-  --theme-accent-gradient: linear-gradient(45deg, rgb(255, 113, 206), rgb(5, 217, 232));
-  --theme-accent-primary: rgb(255, 113, 206);
-  --font-body: "Space Grotesk", sans-serif;
-}
-
-.theme-festive-india {
-  --theme-accent-gradient: linear-gradient(90deg, #FF9933, #FFFFFF, #138808);
-  --theme-accent-primary: rgb(255, 153, 51);
-  --theme-text-primary: rgb(46, 26, 0);
-  --font-heading: "Playfair Display";
-  --font-body: "Inter";
-}
-
-/* === AUTO-CONTRAST IMPROVEMENTS === */
-[data-theme],
-[class*="theme-"] {
-  color: var(--theme-text-primary);
-  background-color: var(--theme-bg-primary);
-}
-
-
 
 // .theme-blue {
 //   --theme-accent-gradient: linear-gradient(135deg, rgb(65, 105, 225) 0%, rgb(50, 80, 180) 100%);
@@ -885,3 +672,219 @@
 //   --ui-button-hover-transform: scale(1.07);
 //   --ui-button-active-transform: scale(0.95);
 // }
+
+
+
+
+
+/* ==============================================================
+   APEX INFINITY – ADVANCED MULTI-THEME SYSTEM
+   Modernized, Accessible, Responsive Design Tokens
+   ============================================================== */
+
+/* === BASE ROOT (DEFAULT THEME TOKENS) === */
+:root {
+  /* === CORE THEME COLORS === */
+  --theme-bg-primary: rgb(249, 250, 251);
+  --theme-bg-secondary: rgb(255, 255, 255);
+  --theme-bg-ternary: rgb(241, 245, 249);
+  --theme-bg-overlay: rgba(255, 255, 255, 0.95);
+
+  --theme-text-primary: rgb(15, 23, 42);
+  --theme-text-secondary: rgb(51, 65, 85);
+  --theme-text-label: rgb(100, 116, 139);
+  --theme-text-muted: rgb(148, 163, 184);
+  --theme-text-inverted: rgb(255, 255, 255);
+
+  --theme-border-primary: rgb(226, 232, 240);
+  --theme-border-secondary: rgb(203, 213, 225);
+  --theme-border-focus: rgb(37, 99, 235);
+
+  --theme-hover-bg: rgb(241, 245, 249);
+  --theme-active-bg: rgb(229, 231, 235);
+  --theme-scroll-track: rgb(240, 240, 242);
+  --theme-scroll-thumb: rgb(160, 160, 170);
+
+  --theme-shadow-color: rgba(0, 0, 0, 0.08);
+  --theme-shadow-color-strong: rgba(0, 0, 0, 0.18);
+
+  /* === ACCENT COLORS === */
+  --theme-accent-primary: rgb(37, 99, 235);
+  --theme-accent-primary-hover: rgb(29, 78, 216);
+  --theme-accent-primary-light: rgba(37, 99, 235, 0.1);
+  --theme-accent-text-color: rgb(255, 255, 255);
+  --theme-accent-focus-ring: rgba(37, 99, 235, 0.25);
+  --theme-accent-gradient: linear-gradient(135deg, rgb(59, 130, 246), rgb(37, 99, 235));
+
+  /* === STATUS COLORS === */
+  --theme-success-primary: rgb(46, 139, 87);
+  --theme-error-primary: rgb(220, 38, 38);
+  --theme-warning-primary: rgb(255, 193, 7);
+  --theme-info-primary: rgb(2, 132, 199);
+
+  /* === GRADIENTS === */
+  --theme-body-gradient: linear-gradient(135deg, rgb(245, 246, 250), rgb(255, 255, 255));
+  --theme-card-gradient: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(245, 246, 250, 0.85));
+  --theme-glass-gradient: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+
+  /* === TYPOGRAPHY === */
+  --font-primary: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-heading: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "Fira Code", monospace;
+
+  --font-size-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --font-size-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
+  --font-size-base: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+  --font-size-lg: clamp(1.125rem, 1rem + 0.625vw, 1.25rem);
+  --font-size-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
+  --font-size-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+  --font-size-3xl: clamp(2rem, 1.7rem + 1.5vw, 2.5rem);
+  --font-size-4xl: clamp(2.5rem, 2rem + 2vw, 3.25rem);
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+
+  /* === SPACING SYSTEM === */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+
+  /* === UI SYSTEM === */
+  --ui-border-width: 1px;
+  --ui-border-radius-sm: 6px;
+  --ui-border-radius: 12px;
+  --ui-border-radius-lg: 16px;
+  --ui-border-radius-full: 9999px;
+
+  --ui-shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.05);
+  --ui-shadow-md: 0 6px 16px rgba(0, 0, 0, 0.08);
+  --ui-shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.12);
+  --ui-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.15);
+
+  --ui-transition-fast: all 0.15s ease-in-out;
+  --ui-transition: all 0.25s ease-in-out;
+  --ui-transition-slow: all 0.4s ease;
+
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-modal: 1050;
+  --z-tooltip: 1070;
+}
+
+/* === DARK MODE === */
+[data-theme='dark'] {
+  --theme-bg-primary: rgb(18, 18, 18);
+  --theme-bg-secondary: rgb(28, 28, 30);
+  --theme-bg-ternary: rgb(36, 36, 38);
+  --theme-bg-overlay: rgba(18, 18, 18, 0.9);
+
+  --theme-text-primary: rgb(245, 245, 247);
+  --theme-text-secondary: rgb(199, 199, 204);
+  --theme-text-label: rgb(170, 170, 170);
+  --theme-text-inverted: rgb(18, 18, 18);
+
+  --theme-border-primary: rgb(50, 50, 50);
+  --theme-border-secondary: rgb(75, 75, 75);
+
+  --theme-hover-bg: rgb(42, 42, 44);
+  --theme-active-bg: rgb(55, 55, 57);
+
+  --theme-accent-primary: rgb(88, 166, 255);
+  --theme-accent-primary-hover: rgb(66, 140, 233);
+  --theme-accent-focus-ring: rgba(88, 166, 255, 0.3);
+
+  --theme-card-gradient: linear-gradient(145deg, rgba(30, 30, 30, 0.9), rgba(18, 18, 18, 0.8));
+  --theme-body-gradient: linear-gradient(135deg, rgb(18, 18, 18), rgb(28, 28, 30));
+
+  --ui-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --ui-shadow-md: 0 6px 16px rgba(0, 0, 0, 0.5);
+  --ui-shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.6);
+}
+
+/* === GLOBAL SCALE === */
+:root {
+  font-size: clamp(14px, 0.9vw + 0.25rem, 16px);
+}
+
+/* === ACCESSIBLE TEXT CONTRAST AUTOMATION === */
+[data-theme] {
+  color-scheme: light dark;
+}
+
+/* === THEME VARIANT COLLECTIONS === */
+
+/* CORE COLOR THEMES (Modernized Contrast & Font Harmony) */
+.theme-blue       { --theme-accent-primary: rgb(59, 130, 246); --font-body: "Inter"; }
+.theme-purple     { --theme-accent-primary: rgb(147, 51, 234); }
+.theme-pink       { --theme-accent-primary: rgb(236, 72, 153); }
+.theme-green      { --theme-accent-primary: rgb(34, 197, 94); }
+.theme-teal       { --theme-accent-primary: rgb(45, 212, 191); }
+.theme-slate      { --theme-accent-primary: rgb(100, 116, 139); }
+.theme-red        { --theme-accent-primary: rgb(239, 68, 68); }
+.theme-orange     { --theme-accent-primary: rgb(249, 115, 22); }
+.theme-amber      { --theme-accent-primary: rgb(245, 158, 11); }
+.theme-yellow     { --theme-accent-primary: rgb(234, 179, 8); }
+.theme-lime       { --theme-accent-primary: rgb(132, 204, 22); }
+.theme-emerald    { --theme-accent-primary: rgb(16, 185, 129); }
+.theme-cyan       { --theme-accent-primary: rgb(6, 182, 212); }
+.theme-sky        { --theme-accent-primary: rgb(14, 165, 233); }
+.theme-indigo     { --theme-accent-primary: rgb(99, 102, 241); }
+.theme-violet     { --theme-accent-primary: rgb(124, 58, 237); }
+.theme-fuchsia    { --theme-accent-primary: rgb(217, 70, 239); }
+.theme-rose       { --theme-accent-primary: rgb(244, 63, 94); }
+
+/* RETRO / CLASSIC THEMES (Enhanced Contrast & Warm Fonts) */
+.theme-retro-burgundy,
+.theme-retro-forest,
+.theme-retro-copper,
+.theme-retro-navy,
+.theme-retro-plum {
+  --font-primary: "Playfair Display";
+  --font-body: "Inter";
+  --theme-text-primary: rgb(34, 34, 34);
+  --theme-bg-primary: rgb(252, 250, 246);
+}
+
+/* SPECIAL THEMES */
+.theme-premium {
+  --theme-accent-primary: rgb(255, 215, 0);
+  --theme-bg-primary: rgb(15, 15, 15);
+  --theme-text-primary: rgb(245, 245, 245);
+  --font-heading: "Playfair Display";
+}
+
+.theme-modern-glass {
+  backdrop-filter: blur(12px) saturate(180%);
+  --theme-bg-primary: rgba(255, 255, 255, 0.65);
+  --theme-border-primary: rgba(0, 0, 0, 0.15);
+  --ui-shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+.theme-vaporwave {
+  --theme-bg-primary: rgb(18, 12, 48);
+  --theme-text-primary: rgb(250, 250, 255);
+  --theme-accent-gradient: linear-gradient(45deg, rgb(255, 113, 206), rgb(5, 217, 232));
+  --theme-accent-primary: rgb(255, 113, 206);
+  --font-body: "Space Grotesk", sans-serif;
+}
+
+.theme-festive-india {
+  --theme-accent-gradient: linear-gradient(90deg, #FF9933, #FFFFFF, #138808);
+  --theme-accent-primary: rgb(255, 153, 51);
+  --theme-text-primary: rgb(46, 26, 0);
+  --font-heading: "Playfair Display";
+  --font-body: "Inter";
+}
+
+/* === AUTO-CONTRAST IMPROVEMENTS === */
+[data-theme],
+[class*="theme-"] {
+  color: var(--theme-text-primary);
+  background-color: var(--theme-bg-primary);
+}

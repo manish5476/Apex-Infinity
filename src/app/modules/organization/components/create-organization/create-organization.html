@@ -13,7 +13,7 @@
     <!-- === SCROLLABLE BODY === -->
     <main class="org-body">
       <div class="glass-form-card">
-        <form [formGroup]="organizationForm"  class="org-form">
+        <form [formGroup]="organizationForm" class="org-form">
 
           <!-- === SECTION 1 === -->
           <section class="form-section">
@@ -101,16 +101,27 @@
             </div>
           </section>
         </form>
+        <!-- <footer class="r">
+          <button pButton type="submit" label="Create" icon="pi pi-check" class="floating-btn" [loading]="isLoading()"
+            (click)="onSubmit()" [disabled]="organizationForm.invalid || isLoading()"></button>
+          <button pButton type="Login" label="login" routerLink="/auth/login" icon="pi pi-login"
+            class="floating-btn"></button>
+          <button pButton type="Signup" label="Signup" routerLink="/auth/signup" icon="pi pi-login"
+            class="floating-btn"></button>
+        </footer> -->
       </div>
+
     </main>
 
     <!-- === FIXED FOOTER === -->
     <footer class="org-footer">
       <button pButton type="submit" label="Create" icon="pi pi-check" class="floating-btn" [loading]="isLoading()"
-       (click)="onSubmit()" [disabled]="organizationForm.invalid || isLoading()"></button>
-        <button pButton type="Login" label="login" routerLink="/auth/login" icon="pi pi-login" class="floating-btn"></button>
-        <button pButton type="Login" label="login" routerLink="/auth/signup" icon="pi pi-login" class="floating-btn"></button>
-      </footer>
+        (click)="onSubmit()" [disabled]="organizationForm.invalid || isLoading()"></button>
+      <button pButton type="Login" label="login" routerLink="/auth/login" icon="pi pi-login"
+        class="floating-btn"></button>
+      <button pButton type="signup" label="signup" routerLink="/auth/signup" icon="pi pi-login"
+        class="floating-btn"></button>
+    </footer>
   </div>
 
   <!-- PrimeNG Toast component for displaying messages

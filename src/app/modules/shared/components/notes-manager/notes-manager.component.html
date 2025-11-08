@@ -1,0 +1,439 @@
+<!-- Global Dialogs & Toasts -->
+<p-confirmDialog icon="pi pi-exclamation-triangle"></p-confirmDialog>
+<p-toast></p-toast>
+
+<div class="notes-manager-host">
+  <!-- 🧭 Main Tabs -->
+  <p-tabs [(value)]="activeTabValue" (onChange)="onTabChange($event)">
+    <p-tablist>
+      <!-- Daily Notes Tab -->
+      <p-tab value="day" class="flex items-center !gap-2">
+        <i class="pi pi-calendar"></i>
+        <span class="font-bold whitespace-nowrap">Day</span>
+      </p-tab>
+
+      <!-- Week / Month / Year Tabs -->
+      <p-tab *ngFor="let summary of summaries" [value]="summary.key" class="flex items-center !gap-2">
+        <i [class]="summary.icon"></i>
+        <span class="font-bold whitespace-nowrap">{{ summary.title }}</span>
+      </p-tab>
+    </p-tablist>
+
+    <p-tabpanels>
+      <!-- 🗓️ DAILY TAB -->
+      <p-tabpanel value="day">
+        <div class="notes-layout">
+          <!-- Sidebar -->
+          <div class="notes-sidebar">
+            <div class="sidebar-header">
+              <h2 class="section-title">Daily Notes</h2>
+              <div class="header-actions">
+                <button pButton type="button" icon="pi pi-refresh" class="p-button-text p-button-sm"
+                  (click)="refreshCurrentView()" pTooltip="Refresh"></button>
+                <button pButton icon="pi pi-plus" label="New" class="p-button-sm" (click)="startNewNote()"></button>
+              </div>
+            </div>
+
+            <div class="sidebar-content">
+              <!-- Search -->
+              <div class="search-bar">
+                <span class="p-input-icon-left w-full">
+                  <i class="pi pi-search"></i>
+                  <input type="text" pInputText placeholder="Search notes..." class="w-full p-inputtext-sm"
+                    [formControl]="searchControl" />
+                </span>
+              </div>
+
+              <!-- Notes List -->
+              <div class="notes-list-wrapper">
+                <ng-container *ngIf="isLoading.day; else dayNotesContent">
+                  <div class="skeleton-loader">
+                    <div class="skeleton-card" *ngFor="let item of [1, 2, 3, 4, 5]"></div>
+                  </div>
+                </ng-container>
+
+                <ng-template #dayNotesContent>
+                  <div class="notes-list" *ngIf="filteredDailyNotes.length > 0; else emptyState">
+                    <div *ngFor="let note of filteredDailyNotes" class="note-card"
+                      [class.active]="selectedNote?._id === note._id" (click)="selectNote(note)">
+                      <div class="note-card-border"></div>
+                      <div class="note-card-content">
+                        <h3 class="note-title">
+                          {{ note.title || 'Untitled Note' }}
+                        </h3>
+                        <p class="note-excerpt">
+                          {{ note.content | slice: 0: 80
+                          }}{{ note.content.length > 80 ? '...' : '' }}
+                        </p>
+                        <div class="note-meta">
+                          <span class="note-date">
+                            {{ note.createdAt | date: 'shortTime' }}
+                          </span>
+                          <div class="note-tags" *ngIf="note.tags.length > 0">
+                            <i class="pi pi-tag"></i>
+                            <span>{{ note.tags.length }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Editor -->
+          <div class="note-editor-panel">
+            <form [formGroup]="noteForm" (ngSubmit)="saveNote()" class="note-form">
+              <div class="editor-header">
+                <input type="text" pInputText placeholder="Give your note a title..." formControlName="title"
+                  class="title-input" />
+                <div class="editor-actions">
+                  <button pButton type="submit" label="Save" icon="pi pi-check" class="p-button-sm" [disabled]="
+                      noteForm.invalid ||
+                      isSaving ||
+                      (isEditing && !isEditable(selectedNote))
+                    " [loading]="isSaving"></button>
+                  <button *ngIf="isEditing" pButton type="button" icon="pi pi-trash"
+                    class="p-button-danger p-button-text p-button-sm" [disabled]="!isEditable(selectedNote)"
+                    (click)="deleteNote(selectedNote)"></button>
+                </div>
+              </div>
+
+              <div class="editor-body">
+                <div class="editor-content">
+                  <textarea pInputTextarea placeholder="Start writing..." formControlName="content"
+                    class="content-textarea"></textarea>
+                </div>
+
+                <div class="editor-sidebar">
+                  <div class="sidebar-section">
+                    <label><i class="pi pi-tags mr-2"></i>Tags</label>
+                    <p-autoComplete formControlName="tags" [multiple]="true" placeholder="Add tags..."></p-autoComplete>
+                  </div>
+
+                  <div class="sidebar-section">
+                    <label><i class="pi pi-paperclip mr-2"></i>Attachments</label>
+                    <!-- <app-image-uploader (uploaded)="onImageUploaded($event)"></app-image-uploader> -->
+
+                    <div class="attachments-preview" *ngIf="noteForm.get('attachments')?.value?.length > 0">
+                      <div *ngFor="let url of noteForm.get('attachments')?.value; let i = index"
+                        class="attachment-thumb">
+                        <img [src]="url" alt="Preview" />
+                        <button type="button" pButton icon="pi pi-times"
+                          class="remove-btn p-button-rounded p-button-danger p-button-text"
+                          (click)="removeAttachment(i)"></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </p-tabpanel>
+
+      <!-- 📊 SUMMARY TABS -->
+      <p-tabpanel *ngFor="let summary of summaries" [value]="summary.key">
+        <div class="notes-layout summary-layout">
+          <!-- Sidebar List -->
+          <div class="notes-sidebar">
+            <div class="sidebar-header">
+              <h2 class="section-title">{{ summary.title }} Notes</h2>
+              <button pButton type="button" icon="pi pi-refresh" class="p-button-text p-button-sm"
+                (click)="refreshCurrentView()"></button>
+            </div>
+
+            <div class="sidebar-content">
+              <div class="notes-list-wrapper">
+                <ng-container *ngIf="isLoading[summary.key]; else summaryNotes">
+                  <div class="skeleton-loader">
+                    <div class="skeleton-card" *ngFor="let item of [1, 2, 3, 4, 5]"></div>
+                  </div>
+                </ng-container>
+
+                <ng-template #summaryNotes>
+                  <div class="notes-list" *ngIf="getSummaryData(summary.key).length > 0; else emptyState">
+                    <div *ngFor="let note of getSummaryData(summary.key)" class="note-card"
+                      [class.active]="selectedNote?._id === note._id" (click)="selectForPreview(note)">
+                      <div class="note-card-border"></div>
+                      <div class="note-card-content">
+                        <h3 class="note-title">{{ note.title }}</h3>
+                        <p class="note-excerpt">
+                          {{ note.content | slice: 0: 100 }}...
+                        </p>
+                        <div class="note-meta">
+                          <span class="note-date">
+                            {{ note.createdAt | date: 'short' }}
+                          </span>
+                          <div class="note-actions" *ngIf="isEditable(note)">
+                            <button pButton type="button" icon="pi pi-pencil" class="p-button-text p-button-sm"
+                              (click)="editNoteFromCard(note, $event)" pTooltip="Edit"></button>
+                            <button pButton type="button" icon="pi pi-trash"
+                              class="p-button-danger p-button-text p-button-sm" (click)="deleteNote(note, $event)"
+                              pTooltip="Delete"></button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preview Panel -->
+          <div class="note-preview-panel">
+            <ng-container *ngIf="selectedNote; else noPreviewSelected">
+              <div class="preview-header">
+                <h2 class="section-title">{{ selectedNote.title }}</h2>
+                <div class="preview-actions">
+                  <span class="preview-date">
+                    {{ selectedNote.createdAt | date: 'fullDate' }}
+                  </span>
+                  <button *ngIf="isEditable(selectedNote)" pButton type="button" icon="pi pi-pencil"
+                    class="p-button-sm p-button-text" (click)="editNoteFromPreview(selectedNote)"
+                    pTooltip="Edit Note"></button>
+                  <button *ngIf="isEditable(selectedNote)" pButton type="button" icon="pi pi-trash"
+                    class="p-button-sm p-button-text p-button-danger" (click)="deleteNote(selectedNote)"
+                    pTooltip="Delete Note"></button>
+                </div>
+              </div>
+
+              <div class="preview-content">
+                <div class="note-tags-preview" *ngIf="selectedNote.tags?.length > 0">
+                  <span *ngFor="let tag of selectedNote.tags" class="note-tag">{{ tag }}</span>
+                </div>
+
+                <p class="preview-text" [innerHTML]="selectedNote.content"></p>
+
+                <div class="attachments-gallery" *ngIf="selectedNote.attachments?.length > 0">
+                  <h4 class="gallery-title">Attachments</h4>
+                  <div class="gallery-grid">
+                    <div *ngFor="let url of selectedNote.attachments" class="attachment-link">
+                      <p-image [src]="url" [preview]="false" alt="Note Attachment">
+                        <ng-template pTemplate="indicator">
+                          <i class="pi pi-search"></i>
+                        </ng-template>
+                      </p-image>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+
+  <!-- Empty States -->
+  <ng-template #emptyState>
+    <div class="state-placeholder">
+      <i class="pi pi-inbox placeholder-icon"></i>
+      <span class="placeholder-text">No notes here yet.</span>
+      <span class="placeholder-subtext">Click 'New' to create one!</span>
+    </div>
+  </ng-template>
+
+  <ng-template #noPreviewSelected>
+    <div class="state-placeholder">
+      <i class="pi pi-file-edit placeholder-icon"></i>
+      <span class="placeholder-text">Select a note to preview</span>
+    </div>
+  </ng-template>
+</div>
+
+
+<!-- 
+NEW: Add component for the confirmation dialog
+<p-confirmDialog icon="pi pi-exclamation-triangle"></p-confirmDialog>
+<p-toast></p-toast>
+
+<div class="notes-manager-host">
+  UPDATED: Main Tab Navigation using p-tabs
+  <p-tabs [(value)]="activeTabValue" (onChange)="onTabChange($event)">
+    <p-tablist>
+      DAY TAB
+      <p-tab value="day" class="flex items-center !gap-2">
+        <i class="pi pi-calendar"></i>
+        <span class="font-bold whitespace-nowrap">Day</span>
+      </p-tab>
+      SUMMARY TABS
+      <p-tab *ngFor="let summary of summaries" [value]="summary.key" class="flex items-center !gap-2">
+        <i [class]="summary.icon"></i>
+        <span class="font-bold whitespace-nowrap">{{ summary.title }}</span>
+      </p-tab>
+    </p-tablist>
+    <p-tabpanels>
+      DAY TAB PANEL
+      <p-tabpanel value="day">
+        <div class="notes-layout">
+          Sidebar: Notes List
+          <div class="notes-sidebar">
+            <div class="sidebar-header">
+              <h2 class="section-title">Daily Notes</h2>
+              <div class="header-actions">
+                <button pButton type="button" icon="pi pi-refresh" class="p-button-text p-button-sm" (click)="refreshCurrentView()" pTooltip="Refresh"></button>
+                <button pButton icon="pi pi-plus" label="New" class="p-button-sm" (click)="startNewNote()"></button>
+              </div>
+            </div>
+            <div class="sidebar-content">
+              <div class="search-bar">
+                <span class="p-input-icon-left w-full">
+                  <i class="pi pi-search"></i>
+                  <input type="text" pInputText placeholder="Search notes..." class="w-full p-inputtext-sm" [formControl]="searchControl">
+                </span>
+              </div>
+              <div class="notes-list-wrapper">
+                <ng-container *ngIf="isLoading.day; else dayNotesContent">
+                  <div class="skeleton-loader">
+                    <div class="skeleton-card" *ngFor="let item of [1,2,3,4,5]"></div>
+                  </div>
+                </ng-container>
+                <ng-template #dayNotesContent>
+                  <div class="notes-list" *ngIf="filteredDailyNotes.length > 0; else emptyState">
+                    <div *ngFor="let note of filteredDailyNotes" class="note-card" [class.active]="selectedNote?._id === note._id" (click)="selectNote(note)">
+                      <div class="note-card-border"></div>
+                      <div class="note-card-content">
+                        <h3 class="note-title">{{ note.title || 'Untitled Note' }}</h3>
+                        <p class="note-excerpt">{{ note.content | slice:0:80 }}{{ note.content.length > 80 ? '...' : '' }}</p>
+                        <div class="note-meta">
+                          <span class="note-date">{{ note.createdAt | date:'shortTime' }}</span>
+                          <div class="note-tags" *ngIf="note.tags.length > 0">
+                            <i class="pi pi-tag"></i>
+                            <span>{{ note.tags.length }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          Main Panel: Note Editor
+          <div class="note-editor-panel">
+            <form [formGroup]="noteForm" (ngSubmit)="saveNote()" class="note-form">
+              <div class="editor-header">
+                <input type="text" pInputText placeholder="Give your note a title..." formControlName="title" class="title-input">
+                <div class="editor-actions">
+                    <button pButton type="submit" label="Save" icon="pi pi-check" class="p-button-sm" [disabled]="noteForm.invalid || isSaving || (isEditing && !isEditable(selectedNote))" [loading]="isSaving"></button>
+                    <button *ngIf="isEditing" pButton type="button" icon="pi pi-trash" class="p-button-danger p-button-text p-button-sm" [disabled]="!isEditable(selectedNote)" (click)="deleteNote(selectedNote)"></button>
+                </div>
+              </div>
+              <div class="editor-body">
+                <div class="editor-content">
+                  <textarea pInputTextarea placeholder="Start writing..." formControlName="content" class="content-textarea"></textarea>
+                </div>
+                <div class="editor-sidebar">
+                  <div class="sidebar-section">
+                    <label><i class="pi pi-tags mr-2"></i>Tags</label>
+                    UPDATED: Replaced p-chips with p-autoComplete
+                    <p-autoComplete formControlName="tags" [multiple]="true" placeholder="Add tags..."></p-autoComplete>
+                  </div>
+                  <div class="sidebar-section">
+                    <label><i class="pi pi-paperclip mr-2"></i>Attachments</label>
+                    <app-image-uploader (uploaded)="onImageUploaded($event)"></app-image-uploader>
+                    <div class="attachments-preview" *ngIf="noteForm.get('attachments')?.value?.length > 0">
+                      <div *ngFor="let url of noteForm.get('attachments')?.value; let i = index" class="attachment-thumb">
+                        <img [src]="url" alt="Preview">
+                        <button type="button" pButton icon="pi pi-times" class="remove-btn p-button-rounded p-button-danger p-button-text" (click)="removeAttachment(i)"></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </p-tabpanel>
+      SUMMARY TAB PANELS
+      <p-tabpanel *ngFor="let summary of summaries" [value]="summary.key">
+        <div class="notes-layout summary-layout">
+          <div class="notes-sidebar">
+             <div class="sidebar-header">
+              <h2 class="section-title">{{ summary.title }} Notes</h2>
+              <button pButton type="button" icon="pi pi-refresh" class="p-button-text p-button-sm" (click)="refreshCurrentView()"></button>
+            </div>
+            <div class="sidebar-content">
+              <div class="notes-list-wrapper">
+                <ng-container *ngIf="isLoading[summary.key]; else summaryNotesContent">
+                    <div class="skeleton-loader">
+                      <div class="skeleton-card" *ngFor="let item of [1,2,3,4,5]"></div>
+                    </div>
+                </ng-container>
+                <ng-template #summaryNotesContent>
+                  <div class="notes-list" *ngIf="getSummaryData(summary.key).length > 0; else emptyState">
+                      <div *ngFor="let note of getSummaryData(summary.key)" class="note-card" [class.active]="selectedNote?._id === note._id" (click)="selectForPreview(note)">
+                        <div class="note-card-border"></div>
+                        <div class="note-card-content">
+                          <h3 class="note-title">{{ note.title }}</h3>
+                          <p class="note-excerpt">{{ note.content | slice:0:100 }}...</p>
+                          <div class="note-meta">
+                            <span class="note-date">{{ note.createdAt | date:'short' }}</span>
+                            UPDATED: Added edit/delete actions directly on each summary note card
+                            <div class="note-actions" *ngIf="isEditable(note)">
+                              <button pButton type="button" icon="pi pi-pencil" class="p-button-text p-button-sm" (click)="editNoteFromCard(note, $event)" pTooltip="Edit"></button>
+                              <button pButton type="button" icon="pi pi-trash" class="p-button-danger p-button-text p-button-sm" (click)="deleteNote(note, $event)" pTooltip="Delete"></button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="note-preview-panel">
+              <ng-container *ngIf="selectedNote; else noPreviewSelected">
+                  <div class="preview-header">
+                      <h2 class="section-title">{{ selectedNote.title }}</h2>
+                      <div class="preview-actions">
+                          <span class="preview-date">{{ selectedNote.createdAt | date:'fullDate' }}</span>
+                          <button *ngIf="isEditable(selectedNote)" pButton type="button" icon="pi pi-pencil" class="p-button-sm p-button-text" (click)="editNoteFromPreview(selectedNote)" pTooltip="Edit Note"></button>
+                          <button *ngIf="isEditable(selectedNote)" pButton type="button" icon="pi pi-trash" class="p-button-sm p-button-text p-button-danger" (click)="deleteNote(selectedNote)" pTooltip="Delete Note"></button>
+                      </div>
+                  </div>
+                  <div class="preview-content">
+                      <div class="note-tags-preview" *ngIf="selectedNote.tags?.length > 0">
+                          <span *ngFor="let tag of selectedNote.tags" class="note-tag">{{ tag }}</span>
+                      </div>
+                      <p class="preview-text" [innerHTML]="selectedNote.content"></p>
+                      
+                      <div class="attachments-gallery" *ngIf="selectedNote.attachments?.length > 0">
+                        <h4 class="gallery-title">Attachments</h4>
+                        <div class="gallery-grid">
+                          <div *ngFor="let url of selectedNote.attachments" class="attachment-link">
+                             <p-image [src]="url" [preview]="false" alt="Note Attachment">
+                                <ng-template pTemplate="indicator">
+                                    <i class="pi pi-search"></i>
+                                </ng-template>
+                             </p-image>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+              </ng-container>
+          </div>
+        </div>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+
+  Reusable Templates
+  <ng-template #emptyState>
+    <div class="state-placeholder">
+      <i class="pi pi-inbox placeholder-icon"></i>
+      <span class="placeholder-text">No notes here yet.</span>
+      <span class="placeholder-subtext">Click 'New' to create one!</span>
+    </div>
+  </ng-template>
+
+  <ng-template #noPreviewSelected>
+    <div class="state-placeholder">
+      <i class="pi pi-file-edit placeholder-icon"></i>
+      <span class="placeholder-text">Select a note to preview</span>
+    </div>
+  </ng-template>
+</div> -->

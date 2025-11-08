@@ -1,0 +1,66 @@
+<div class="rounded-lg shadow-xl overflow-hidden w-full" [style.backgroundColor]="'var(--theme-bg-primary)'"
+  [style.color]="'var(--theme-text-primary)'" [style.borderColor]="'var(--theme-border-primary)'"
+  [style.boxShadow]="'0 2px 5px var(--theme-shadow-color)'">
+
+  <div *ngIf="headerFilter" class="p-4 border-b" [style.borderColor]="'var(--theme-border-primary)'">
+    <div class="flex flex-wrap items-center justify-between gap-4 " [style.backgroundColor]="'var(--theme-bg-light)'">
+      <div class="flex items-center gap-2">
+        <label for="colorPicker" class="text-sm font-medium" [style.color]="'var(--theme-text-label)'">Accent
+          Color</label>
+        <p-colorPicker id="colorPicker" [(ngModel)]="accentColor" (onChange)="onColorChange($event)" appendTo="body"
+          [style]="{'width': '2.25rem', 'height': '2.25rem'}" class="rounded-full overflow-hidden"></p-colorPicker>
+      </div>
+      <div class="flex items-center flex-1 min-w-[16rem] rounded-lg shadow-inner focus-within:ring-2"
+        [style.backgroundColor]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-primary)'"
+        [style.boxShadow]="'inset 0 1px 2px var(--theme-shadow-color)'"
+        [style.outlineColor]="'var(--theme-accent-focus-ring)'">
+        <i class="pi pi-search text-base p-2" [style.color]="'var(--theme-text-secondary)'"></i>
+        <input type="text" placeholder="Search grid data..." (input)="onSearch($event)"
+          class="bg-transparent border-none text-sm w-full py-2 px-1 focus:outline-none"
+          [style.color]="'var(--theme-text-primary)'" [style.placeholderColor]="'var(--theme-text-secondary)'" />
+      </div>
+      <div class="flex items-center gap-2 ml-auto">
+        <button class="p-button p-component p-button-sm rounded-md px-4 py-2 text-sm" (click)="onFilterClick()"
+          [style.backgroundColor]="'var(--theme-brand-primary)'" [style.color]="'var(--theme-button-text-primary-btn)'"
+          [style.hoverBackgroundColor]="'var(--theme-brand-primary-hover)'">
+          <i class="pi pi-filter mr-2"></i> Filter
+        </button>
+        <button class="p-button p-component p-button-sm p-button-outlined rounded-md px-4 py-2 text-sm"
+          (click)="exportToCSV()" [style.borderColor]="'var(--theme-button-outlined-border)'"
+          [style.color]="'var(--theme-button-outlined-text)'"
+          [style.hoverBackgroundColor]="'var(--theme-button-outlined-hover-bg)'"
+          [style.hoverColor]="'var(--theme-button-outlined-hover-text)'">
+          <i class="pi pi-upload mr-2"></i> Export
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="relative w-full ag-grid-main-area" [style.height]="mainGridHeight">
+    <ag-grid-angular style="height: 100%; width: 100%;" [columnDefs]="columnDefs" [theme]="theme" [rowData]="rowData"
+      [defaultColDef]="defaultColDef" [rowModelType]="options.rowModelType" [cacheBlockSize]="options.cacheBlockSize"
+      [maxBlocksInCache]="options.maxBlocksInCache" [infiniteInitialRowCount]="options.infiniteInitialRowCount || 1"
+      [pagination]="false" [rowSelection]="rowSelectionMode" editType="fullRow" [rowClassRules]="mergedRowClassRules"
+      [getRowId]="getRowId" (cellValueChanged)="onCellValueChanged($event)" (rowSelected)="onRowSelected($event)"
+      (cellClicked)="onCellClicked($event)" (gridReady)="onGridReady($event)" (bodyScrollEnd)="onBodyScrollEnd($event)">
+    </ag-grid-angular>
+  </div>
+</div>
+
+<!-- <div class="relative w-full ag-grid-main-area" [style.height]="mainGridHeight">
+    <ag-grid-angular style="height: 100%; width: 100%;" [rowData]="rowData" [columnDefs]="columnDefs" [theme]="theme"
+      [defaultColDef]="defaultColDef" [pagination]="false" [rowSelection]="rowSelectionMode" editType ='fullRow'
+      [rowClassRules]="mergedRowClassRules"  [getRowId]="getRowId" (bodyScrollEnd)="onBodyScrollEnd($event)"
+      (cellValueChanged)="onCellValueChanged($event)" (rowSelected)="onRowSelected($event)"
+      (cellClicked)="onCellClicked($event)" (gridReady)="onGridReady($event)">
+    </ag-grid-angular>
+  </div> -->
+<!-- <div class="relative w-full ag-grid-main-area" [style.height]="mainGridHeight">
+    <ag-grid-angular style="height: 100%; width: 100%;" [rowData]="rowData" [columnDefs]="columnDefs" [theme]="theme"
+      [defaultColDef]="defaultColDef" [pagination]="false" [rowSelection]="rowSelectionMode" editType ='fullRow'
+      [rowClassRules]="mergedRowClassRules"  [getRowId]="getRowId"
+      (cellValueChanged)="onCellValueChanged($event)" (rowSelected)="onRowSelected($event)"
+      (cellClicked)="onCellClicked($event)" (gridReady)="onGridReady($event)">
+    </ag-grid-angular>
+  </div> -->

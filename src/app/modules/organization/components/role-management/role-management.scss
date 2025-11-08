@@ -1,0 +1,77 @@
+/* Use theme variables for consistency */
+:host {
+  display: block;
+  padding: 1rem; // Use smaller padding to fit in router-outlet
+  height: 100%;
+  overflow-y: auto;
+  background-color: var(--theme-bg-primary);
+}
+
+.role-management-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--theme-border-primary);
+  padding-bottom: 1rem;
+}
+
+.page-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--theme-text-primary);
+  margin: 0;
+}
+
+.card {
+  background: var(--theme-bg-secondary);
+  border-radius: var(--ui-border-radius);
+  box-shadow: var(--ui-shadow-sm);
+  overflow: hidden;
+}
+
+/* Style fixes for dialogs */
+:host ::ng-deep {
+  .p-dialog .p-dialog-header {
+    background-color: var(--theme-bg-secondary);
+    color: var(--theme-text-primary);
+    border-bottom: 1px solid var(--theme-border-primary);
+  }
+
+  .p-dialog .p-dialog-content {
+    background-color: var(--theme-bg-primary);
+    color: var(--theme-text-secondary);
+  }
+
+  .p-dialog .p-dialog-footer {
+    background-color: var(--theme-bg-secondary);
+    border-top: 1px solid var(--theme-border-primary);
+  }
+
+  .p-multiselect-panel {
+    background-color: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border-primary);
+    
+    .p-multiselect-header {
+      background-color: var(--theme-bg-primary);
+      border-bottom: 1px solid var(--theme-border-primary);
+    }
+    
+    .p-multiselect-item-group {
+      background-color: var(--theme-bg-ternary);
+      color: var(--theme-text-primary);
+    }
+    
+    .p-multiselect-item {
+      color: var(--theme-text-secondary);
+      &:hover {
+        background-color: var(--theme-hover-bg);
+      }
+    }
+  }
+}

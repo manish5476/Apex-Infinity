@@ -1,0 +1,23 @@
+<p-avatar *ngIf="imageUrl" [image]="imageUrl" size="large" shape="circle" (click)="onImageClick()"
+  pTooltip="Click to enlarge image" tooltipPosition="top"
+  styleClass="cursor-pointer hover:shadow-lg transition-transform duration-300 ease-in-out" />
+<p-dialog header="Image Preview" [(visible)]="displayDialog" [modal]="true" appendTo="body"
+  [style]="{ width: '90vw', maxWidth: '800px', minHeight: '90vh' }" [draggable]="false" [resizable]="false"
+  [dismissableMask]="true">
+  <div class="image-container">
+    <p-skeleton *ngIf="loading" shape="rectangle" width="100%" height="300px"></p-skeleton>
+    <img [src]="imageUrl" alt="Image preview" class="preview-image" [style.transform]="'scale(' + zoomLevel + ')' "
+      (load)="onImageLoad()" (dblclick)="resetZoom()" />
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex items-center justify-between w-full">
+      <div class="flex items-center gap-2">
+        <p-button icon="pi pi-plus" (click)="zoomIn()" styleClass="p-button-text" pTooltip="Zoom In" />
+        <p-button icon="pi pi-search" (click)="resetZoom()" styleClass="p-button-text" pTooltip="Reset Zoom" />
+        <p-button icon="pi pi-minus" (click)="zoomOut()" styleClass="p-button-text" pTooltip="Zoom Out" />
+      </div>
+      <p-button icon="pi pi-times" (click)="displayDialog=false" label="Close" styleClass="p-button-text" />
+    </div>
+  </ng-template>
+</p-dialog>

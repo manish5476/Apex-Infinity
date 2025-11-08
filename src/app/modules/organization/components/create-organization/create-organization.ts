@@ -1,5 +1,5 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Inject, OnInit, PLATFORM_ID, inject, signal } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { MessageService } from 'primeng/api';
@@ -9,6 +9,7 @@ import { ButtonModule } from 'primeng/button';
 import { ApiService } from '../../../../core/services/api';
 import { AuthService, LoginResponse } from '../../../auth/services/auth-service';
 import { PasswordModule } from 'primeng/password'; // Import PasswordModule
+import { MasterListService } from '../../../../core/services/master-list.service';
 
 @Component({
   selector: 'app-create-organization',
@@ -22,10 +23,10 @@ import { PasswordModule } from 'primeng/password'; // Import PasswordModule
     PasswordModule // Add PasswordModule
     ,
     RouterLink
-],
+  ],
   templateUrl: './create-organization.html',
   styleUrl: './create-organization.scss',
-  providers: [MessageService] 
+  providers: [MessageService]
 })
 export class CreateOrganization implements OnInit {
   // --- Injections ---
@@ -33,13 +34,21 @@ export class CreateOrganization implements OnInit {
   private apiService = inject(ApiService);
   private router = inject(Router);
   private messageService = inject(MessageService);
-  private authService = inject(AuthService); 
+  private authService = inject(AuthService);
 
   // --- State Signals ---
   isLoading = signal(false);
 
   // --- Forms ---
   organizationForm!: FormGroup;
+
+  // 3. Add this property
+  public isBrowser: boolean;
+
+  // 4. Inject PLATFORM_ID in the constructor
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+  }
 
   ngOnInit(): void {
     this.initForm();
@@ -80,7 +89,7 @@ export class CreateOrganization implements OnInit {
   get form() {
     return this.organizationForm.controls;
   }
-  
+
   get branchForm() {
     return (this.organizationForm.get('mainBranchAddress') as FormGroup).controls;
   }
@@ -113,7 +122,9 @@ export class CreateOrganization implements OnInit {
           summary: 'Organization Created',
           detail: `Welcome, ${response?.data.owner}!`
         });
-        this.authService.handleLoginSuccess(response); 
+
+        inject(MasterListService).load();
+        this.authService.handleLoginSuccess(response);
       },
       error: (err: any) => {
         this.isLoading.set(false);

@@ -1,0 +1,193 @@
+<p-toast></p-toast>
+<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+
+<div class="role-management-page">
+  <div class="page-header">
+    <h1 class="page-title">Role Management</h1>
+    <p-button label="New Role" icon="pi pi-plus" (click)="openNewRoleDialog()"></p-button>
+  </div>
+
+  <div class="card">
+    <p-table [value]="roles" [loading]="isLoading" responsiveLayout="scroll" [tableStyle]="{'min-width': '50rem'}">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Role Name</th>
+          <th>Permissions</th>
+          <th>Type</th>
+          <th style="width: 10rem">Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-role>
+        <tr>
+          <td>
+            <span class="font-semibold text-[var(--theme-text-primary)]">{{ role.name }}</span>
+          </td>
+
+          <td>
+            <!-- class.bind="role.isSuperAdmin ? 'flex' : 'flex flex-wrap gap-1'" -->
+            <div >
+              <p-tag *ngIf="role.isSuperAdmin" value="All Permissions (Super Admin)" severity="danger"></p-tag>
+
+              <ng-container *ngIf="!role.isSuperAdmin">
+                <p-tag *ngFor="let perm of role.permissions.slice(0, 4)" [value]="perm" severity="info"
+                  styleClass="text-xs"></p-tag>
+                <p-tag *ngIf="role.permissions.length > 4" [value]="'+' + (role.permissions.length - 4) + ' more'"
+                  severity="secondary" styleClass="text-xs"></p-tag>
+                <span *ngIf="role.permissions.length === 0" class="text-[var(--theme-text-muted)] text-sm">No
+                  permissions assigned.</span>
+              </ng-container>
+            </div>
+          </td>
+
+          <td>
+            <p-tag *ngIf="role.isSuperAdmin" value="Super Admin" severity="danger" icon="pi pi-shield"></p-tag>
+            <p-tag *ngIf="role.isDefault && !role.isSuperAdmin" value="Default" severity="contrast"></p-tag>
+          </td>
+
+          <td>
+            <div class="flex gap-2">
+              <p-button icon="pi pi-pencil" styleClass="p-button-text" pTooltip="Edit Role" tooltipPosition="top"
+                (click)="openEditRoleDialog(role)" [disabled]="role.isSuperAdmin">
+              </p-button>
+
+              <p-button icon="pi pi-trash" styleClass="p-button-text p-button-danger" pTooltip="Delete Role"
+                tooltipPosition="top" (click)="deleteRole(role)" [disabled]="role.isSuperAdmin || role.isDefault">
+              </p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4" class="text-center p-4 text-[var(--theme-text-muted)]">No roles found. Create one to get
+            started.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+</div>
+
+
+<p-dialog [(visible)]="showRoleDialog" [modal]="true" [style]="{width: '50vw', 'min-width': '350px'}"
+  [header]="isEditMode ? 'Edit Role' : 'Create New Role'" (onHide)="hideDialog()" [draggable]="false"
+  [resizable]="false">
+
+  <div class="flex flex-col gap-4 p-4">
+    <div class="flex flex-col gap-2">
+      <label for="roleName" class="font-semibold text-[var(--theme-text-label)]">Role Name</label>
+      <input id="roleName" type="text" pInputText [(ngModel)]="currentRole.name" placeholder="e.g., Sales Manager" />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label for="permissions" class="font-semibold text-[var(--theme-text-label)]">Permissions</label>
+      <p-multiSelect id="permissions" [options]="permissionOptions" [(ngModel)]="selectedPermissions"
+        placeholder="Select permissions for this role" optionLabel="label" optionValue="value" [filter]="true"
+        display="chip" styleClass="w-full" [group]="true"> <ng-template let-group pTemplate="group">
+          <div class="font-bold text-[var(--theme-text-primary)] px-3 py-2">
+            {{ group }}
+          </div>
+        </ng-template>
+      </p-multiSelect>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancel" icon="pi pi-times" styleClass="p-button-text" (click)="hideDialog()"></p-button>
+    <p-button [label]="isEditMode ? 'Save Changes' : 'Create Role'" [icon]="isEditMode ? 'pi pi-check' : 'pi pi-plus'"
+      (click)="saveRole()" [loading]="isLoading">
+    </p-button>
+  </ng-template>
+</p-dialog>
+
+<!-- <p-toast></p-toast>
+<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+
+<div class="role-management-page">
+  <div class="page-header">
+    <h1 class="page-title">Role Management</h1>
+    <p-button label="New Role" icon="pi pi-plus" (click)="openNewRoleDialog()"></p-button>
+  </div>
+
+  <div class="card">
+    <p-table [value]="roles" [loading]="isLoading" responsiveLayout="scroll" [tableStyle]="{'min-width': '50rem'}">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Role Name</th>
+          <th>Permissions</th>
+          <th>Type</th>
+          <th style="width: 10rem">Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-role>
+        <tr>
+          <td>
+            <span class="font-semibold text-[var(--theme-text-primary)]">{{ role.name }}</span>
+          </td>
+
+          <td>
+            <div class="flex flex-wrap gap-1">
+              <p-tag *ngIf="role.isSuperAdmin" value="All Permissions" severity="danger"></p-tag>
+              <p-tag *ngFor="let perm of role.permissions.slice(0, 4)" [value]="perm" severity="info"
+                styleClass="text-xs"></p-tag>
+              <p-tag *ngIf="role.permissions.length > 4" [value]="'+' + (role.permissions.length - 4) + ' more'"
+                severity="secondary"></p-tag>
+            </div>
+          </td>
+
+          <td>
+            <p-tag *ngIf="role.isSuperAdmin" value="Super Admin" severity="danger" icon="pi pi-shield"></p-tag>
+            <p-tag *ngIf="role.isDefault" value="Default" severity="contrast"></p-tag>
+          </td>
+
+          <td>
+            <div class="flex gap-2">
+              <p-button icon="pi pi-pencil" styleClass="p-button-text" pTooltip="Edit Role" tooltipPosition="top"
+                (click)="openEditRoleDialog(role)" [disabled]="role.isSuperAdmin">
+              </p-button>
+
+              <p-button icon="pi pi-trash" styleClass="p-button-text p-button-danger" pTooltip="Delete Role"
+                tooltipPosition="top" (click)="deleteRole(role)" [disabled]="role.isSuperAdmin || role.isDefault">
+              </p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4" class="text-center p-4">No roles found. Create one to get started.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+</div>
+
+
+<p-dialog [(visible)]="showRoleDialog" [modal]="true" [style]="{width: '50vw', 'min-width': '350px'}"
+  [header]="isEditMode ? 'Edit Role' : 'Create New Role'" (onHide)="hideDialog()">
+
+  <div class="flex flex-col gap-4 p-4">
+    <div class="flex flex-col gap-2">
+      <label for="roleName" class="font-semibold">Role Name</label>
+      <input id="roleName" type="text" pInputText [(ngModel)]="currentRole.name" placeholder="e.g., Sales Manager" />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label for="permissions" class="font-semibold">Permissions</label>
+      <p-multiSelect id="permissions" [options]="permissionOptions" [(ngModel)]="selectedPermissions"
+        placeholder="Select permissions for this role" optionLabel="label" optionValue="value" [filter]="true"
+        display="chip" styleClass="w-full">
+      </p-multiSelect>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancel" icon="pi pi-times" styleClass="p-button-text" (click)="hideDialog()"></p-button>
+    <p-button [label]="isEditMode ? 'Save Changes' : 'Create Role'" [icon]="isEditMode ? 'pi pi-check' : 'pi pi-plus'"
+      (click)="saveRole()" [loading]="isLoading">
+    </p-button>
+  </ng-template>
+</p-dialog> -->

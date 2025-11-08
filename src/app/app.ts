@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { MainScreen } from './projectLayout/main-screen/main-screen';
 import { ToastModule } from 'primeng/toast';
 import { LoadingComponent } from "./modules/shared/components/loader.component";
+import { MasterListService } from './core/services/master-list.service';
 @Component({
   selector: 'app-root',
   imports: [ToastModule, RouterOutlet, LoadingComponent],
@@ -11,4 +12,9 @@ import { LoadingComponent } from "./modules/shared/components/loader.component";
 })
 export class App {
   protected readonly title = signal('apex');
+  constructor(private masterList: MasterListService) { }
+  ngOnInit() {
+    this.masterList.initFromCache();
+  }
+
 }
