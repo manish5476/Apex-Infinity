@@ -14,16 +14,18 @@ export const ErrorInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn)
   const messageService = inject(AppMessageService);
 
   return next(req).pipe(
-    retry(1),
+    // retry(1), // Note: Retrying on 401 can cause issues. Consider removing.
     catchError((error: HttpErrorResponse) => {
       // --- Handle 401 Unauthorized: Critical for Security ---
       if (error.status === 401) {
+        // This is the ONLY place 401s should be handled.
         messageService.showError('Session Expired', 'Please log in again.');
-//         authService.logout();
+        // ✅ FIX: UNCOMMENT THIS LINE. This is the root cause.
+         authService.logout(); 
         return throwError(() => error);
       }
 
-      // --- The rest of your excellent error handling logic remains the same ---
+      // --- The rest of your error handling logic ---
       let errorSummary = `Error ${error.status}`;
       let errorMessage = 'An unknown error occurred on the server.';
       let errorBody = error.error;
