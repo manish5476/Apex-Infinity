@@ -22,7 +22,6 @@ export const routes: Routes = [
     component: MainScreen,
     canActivate: [authGuard],
     children: [
-      // --- This is what you asked for ---
       {
         path: 'dashboard',
         loadComponent: () =>
@@ -37,13 +36,12 @@ export const routes: Routes = [
             (m) => m.RoleManagementComponent
           ),
       },
-
-      // Default route for a logged-in user
+      {
+        path: 'customer',
+        loadChildren: () =>
+          import('./modules/customer/customer.routes').then((m) => m.CUSTOMER_ROUTES),
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      // --- End of default child section ---
-
-      // ... (add customers, sales, products, etc. here later)
-
     ],
   },
 

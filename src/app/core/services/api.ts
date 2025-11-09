@@ -109,15 +109,13 @@ export class ApiService extends BaseApiService {
 
   getMe(): Observable<User> {
     return this.http
-      .get<User>(`${this.baseUrl}/v1/users/getMe`)
-      .pipe(catchError((error: HttpErrorResponse) => this.errorhandler.handleError('getMe', error)));
+      .get<User>(`${this.baseUrl}/v1/users/me`)
+      .pipe(catchError((error: HttpErrorResponse) =>
+        this.errorhandler.handleError('getMe', error)
+      ));
   }
 
-
-  // ==========================================================
-  // ROLE MANAGEMENT ENDPOINTS
-  // ==========================================================
-
+  // ========================  // ROLE MANAGEMENT ENDPOINTS  // ========================
   getRoles(): Observable<any> {
     return this.http
       .get<any>(`${this.baseUrl}/v1/roles`)

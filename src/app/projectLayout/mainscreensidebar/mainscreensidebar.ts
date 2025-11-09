@@ -23,33 +23,13 @@ export class Mainscreensidebar {
   expandedItems: boolean[] = [];
 
   menuItems = [
-    // {
-    //   label: 'Master', icon: 'pi pi-database',
-    //   items: [
-    //     { label: 'Manager', icon: 'pi pi-sitemap', routerLink: ['/master/masterLists'] },
-    //     { label: 'Type', icon: 'pi pi-tags', routerLink: ['/master/masterListsType'] },
-    //     { label: 'Item', icon: 'pi pi-list', routerLink: ['/master/masterListsItem'] },
-    //   ]
-    // },
-    {
-      label: 'Admin', icon: 'pi pi-shield',
-      items: [
-        { label: 'Dashboard', icon: 'pi pi-chart-bar', routerLink: ['/admin/dashboard'] },
-        { label: 'Users', icon: 'pi pi-users', routerLink: ['/admin/users'] },
-        { label: 'Logs', icon: 'pi pi-history', routerLink: ['/admin/logs'] },
-        { label: 'Transaction', icon: 'pi pi-receipt', routerLink: ['/admin/transaction'] },
-        { label: 'Permission', icon: 'pi pi-key', routerLink: ['/admin/permission'] },
-        { label: 'Purchase', icon: 'pi pi-shopping-cart', routerLink: ['/admin/purchase'] },
-        { label: 'Subscribe', icon: 'pi pi-bell', routerLink: ['/admin/subscribe'] },
-      ]
-    },
     {
       label: 'Customers', icon: 'pi pi-users',
       items: [
-        { label: 'List', icon: 'pi pi-list', routerLink: ['/customers/list'] },
-        { label: 'Master', icon: 'pi pi-cog', routerLink: ['/customers/master'] },
-        { label: 'Details', icon: 'pi pi-info-circle', routerLink: ['/customers/detailed'] },
-        { label: 'Segment', icon: 'pi pi-chart-pie', routerLink: ['/customers/segment'] },
+        { label: 'create', icon: 'pi pi-cog', routerLink: ['/customer/create'] },
+        // { label: 'List', icon: 'pi pi-list', routerLink: ['/customers/list'] },
+        // { label: 'Details', icon: 'pi pi-info-circle', routerLink: ['/customers/detailed'] },
+        // { label: 'Segment', icon: 'pi pi-chart-pie', routerLink: ['/customers/segment'] },
       ]
     },
     {
