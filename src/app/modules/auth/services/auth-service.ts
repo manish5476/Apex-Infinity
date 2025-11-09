@@ -80,51 +80,42 @@ export class AuthService {
     // 3. Validate token on app load
     // This will now run, fetch the user, and *then* update the
     // currentUserSubject, which will "unblock" the auth guard.
-    this.validateTokenOnLoad();
+    // this.validateTokenOnLoad();
   }
 
-private validateTokenOnLoad(): void {
+ validateTokenOnLoad(): void {
   if (isPlatformBrowser(this.platformId)) {
     const token = this.getToken();
 
-    if (token) {
-      this.apiService.getMe().subscribe({
-        next: (user) => {
-          // Token valid — populate user and connect notifications
-          this.setItem(this.USER_KEY, user);
-          this.currentUserSubject.next(user);
-          if (user?._id) {
-            this.notificationService.connect(user._id);
-          }
-        },
-        error: (err: any) => {
-          // Distinguish network errors from auth errors.
-          // - network error (status === 0): backend unreachable — do NOT clear token immediately.
-          // - 401/403: token invalid/expired — clear token and redirect to login.
-          // - other statuses: show an error and keep token for now.
-          const status = err?.status ?? null;
+    // if (token) {
+    //   this.apiService.getMe().subscribe({
+    //     next: (user) => {
+    //       // Token valid — populate user and connect notifications
+    //       this.setItem(this.USER_KEY, user);
+    //       this.currentUserSubject.next(user);
+    //       if (user?._id) {
+    //         this.notificationService.connect(user._id);
+    //       }
+    //     },
+    //     error: (err: any) => {
+    //       const status = err?.status ?? null;s
+    //       if (status === 401 || status === 403) {
+    //         // definite auth failure: logout and remove token
+    //         this.logout();
+    //         return;
+    //       }
+    //       if (status === 0 || status === null) {
+    //         this.messageService.showError('Server unreachable. Retaining session token and will retry validation.', '');
+    //         this.retryValidateToken();
+    //         return;
+    //       }
 
-          if (status === 401 || status === 403) {
-            // definite auth failure: logout and remove token
-            this.logout();
-            return;
-          }
-
-          if (status === 0 || status === null) {
-            // network or CORS or server down — don't clear token immediately.
-            // Optionally show a non-intrusive notification and retry later.
-            this.messageService.showError('Server unreachable. Retaining session token and will retry validation.', '');
-            // Optionally schedule a retry with backoff (simple example shown below).
-            this.retryValidateToken();
-            return;
-          }
-
-          // For other errors, log and keep token — don't remove token automatically.
-          console.error('Unexpected error while validating token on load:', err);
-          this.messageService.showError('Unable to validate session on load. Retaining token.');
-        }
-      });
-    }
+    //       // For other errors, log and keep token — don't remove token automatically.
+    //       console.error('Unexpected error while validating token on load:', err);
+    //       this.messageService.showError('Unable to validate session on load. Retaining token.');
+    //     }
+    //   });
+    // }
   }
 }
 
@@ -255,34 +246,75 @@ private retryValidateToken(retries = 0): void {
     );
   }
 
-  // --- LocalStorage Wrappers ---
-  private setItem(key: string, value: any): void {
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.setItem(key, JSON.stringify(value));
-    }
-  }
+  // // --- LocalStorage Wrappers ---
+  // private setItem(key: string, value: any): void {
+  //   if (isPlatformBrowser(this.platformId)) {
+  //     localStorage.setItem(key, JSON.stringify(value));
+  //   }
+  // }
 
-  getItem<T>(key: string): T | null {
-    if (isPlatformBrowser(this.platformId)) {
-      try {
-        const item = localStorage.getItem(key);
-        return item ? JSON.parse(item) : null;
-      } catch (e) {
-        console.error(`Error parsing item from localStorage key: ${key}`, e);
-        this.removeItem(key);
-        return null;
-      }
-    }
-    return null;
-  }
+  // getItem<T>(key: string): T | null {
+  //   if (isPlatformBrowser(this.platformId)) {
+  //     try {
+  //       const item = localStorage.getItem(key);
+  //       return item ? JSON.parse(item) : null;
+  //     } catch (e) {
+  //       console.error(`Error parsing item from localStorage key: ${key}`, e);
+  //       this.removeItem(key);
+  //       return null;
+  //     }
+  //   }
+  //   return null;
+  // }
 
-  private removeItem(key: string): void {
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem(key);
-    }
-  }
+  // private removeItem(key: string): void {
+  //   if (isPlatformBrowser(this.platformId)) {
+  //     localStorage.removeItem(key);
+  //   }
+  // }
 
   public getCurrentUser(): User | null {
     return this.currentUserSubject.value;
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  private setItem(key: string, value: any): void {
+  if (isPlatformBrowser(this.platformId)) {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+}
+
+getItem<T>(key: string): T | null {
+  if (isPlatformBrowser(this.platformId)) {
+    try {
+      const item = localStorage.getItem(key);
+      return item ? JSON.parse(item) : null;
+    } catch (e) {
+      console.error(`Error parsing item from localStorage key: ${key}`, e);
+      this.removeItem(key);
+      return null;
+    }
+  }
+  return null;
+}
+
+private removeItem(key: string): void {
+  if (isPlatformBrowser(this.platformId)) {
+    localStorage.removeItem(key);
+  }
+}
+
 }

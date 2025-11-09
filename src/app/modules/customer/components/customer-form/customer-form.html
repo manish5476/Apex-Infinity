@@ -2,10 +2,9 @@
 
 <div class="customer-wrapper">
   <section class="customer-container">
-    <!-- === LEFT IMAGE / INFO SIDE === -->
+    
     <div class="customer-banner">
-      <img src="https://images.unsplash.com/photo-1573164713714-d90c6eafaa38?auto=format&fit=crop&q=80&w=1200"
-        alt="Customer background" />
+      <img src="https://plus.unsplash.com/premium_photo-1673803529433-d9e6cc4263fb?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=735" alt="Customer background" />
       <div class="customer-overlay"></div>
       <div class="customer-banner-text">
         <h2>Create a New Customer</h2>
@@ -13,27 +12,29 @@
       </div>
     </div>
 
-    <!-- === RIGHT FORM PANEL === -->
     <div class="customer-form-panel">
-      <div class="customer-content">
-        <h1 class="form-title">Customer Details</h1>
-        <p class="form-subtitle">Complete the information below to register your new customer.</p>
+      
+      <form [formGroup]="customerForm" (ngSubmit)="onSubmit()" class="customer-form-layout">
 
-        <form [formGroup]="customerForm" (ngSubmit)="onSubmit()" class="form-body">
-          <!-- TYPE -->
+        <div class="customer-form-header">
+          <h1 class="form-title">Customer Details</h1>
+          <p class="form-subtitle">Complete the information below to register your new customer.</p>
+        </div>
+
+        <div class="customer-form-body">
+          
           <div class="form-grid">
             <div class="form-group">
               <label>Customer Type</label>
               <p-select [options]="customerTypes" formControlName="type" optionLabel="label"
                 optionValue="value"></p-select>
             </div>
-
             <div class="form-group">
               <label>Customer Name <span class="req">*</span></label>
               <input pInputText formControlName="name" placeholder="Full name or business name" />
             </div>
           </div>
-
+          
           <div class="form-grid">
             <div class="form-group" *ngIf="customerForm.get('type')?.value === 'business'">
               <label>Contact Person</label>
@@ -69,23 +70,51 @@
             </div>
           </div>
 
-          <p-divider align="center" type="dashed"><b>Address</b></p-divider>
-          <div class="form-grid">
-            <div class="form-group col-span-2">
-              <label>Billing Street</label>
-              <input pInputText formControlName="billingAddress.street" placeholder="123 Main Street" />
+          <p-divider align="center" type="dashed"><b>Billing Address</b></p-divider>
+          <div formGroupName="billingAddress">
+            <div class="form-grid">
+              <div class="form-group col-span-2">
+                <label>Billing Street</label>
+                <input pInputText formControlName="street" placeholder="123 Main Street" />
+              </div>
+              <div class="form-group">
+                <label>Billing City</label>
+                <input pInputText formControlName="city" />
+              </div>
+              <div class="form-group">
+                <label>Billing State</label>
+                <input pInputText formControlName="state" />
+              </div>
+              <div class="form-group">
+                <label>Billing Zip</label>
+                <input pInputText formControlName="zipCode" />
+              </div>
             </div>
-            <div class="form-group">
-              <label>Billing City</label>
-              <input pInputText formControlName="billingAddress.city" />
-            </div>
-            <div class="form-group">
-              <label>Billing State</label>
-              <input pInputText formControlName="billingAddress.state" />
-            </div>
-            <div class="form-group">
-              <label>Billing Zip</label>
-              <input pInputText formControlName="billingAddress.zipCode" />
+          </div>
+
+          <p-divider align="center" type="dashed"><b>Shipping Address</b></p-divider>
+          <div class="form-group flex items-center gap-2 mb-3">
+            <p-checkbox (onChange)="copyBillingAddress($event)" [binary]="true"></p-checkbox>
+            <label>Same as Billing Address</label>
+          </div>
+          <div formGroupName="shippingAddress">
+            <div class="form-grid">
+              <div class="form-group col-span-2">
+                <label>Shipping Street</label>
+                <input pInputText formControlName="street" placeholder="123 Main Street" />
+              </div>
+              <div class="form-group">
+                <label>Shipping City</label>
+                <input pInputText formControlName="city" />
+              </div>
+              <div class="form-group">
+                <label>Shipping State</label>
+                <input pInputText formControlName="state" />
+              </div>
+              <div class="form-group">
+                <label>Shipping Zip</label>
+                <input pInputText formControlName="zipCode" />
+              </div>
             </div>
           </div>
 
@@ -116,12 +145,16 @@
             <label>Active</label>
           </div>
 
+        </div>
+
+        <div class="customer-form-footer">
           <div class="form-actions">
             <p-button label="Create Customer" icon="pi pi-check" type="submit" [loading]="isSubmitting()"
               styleClass="w-full justify-center"></p-button>
           </div>
-        </form>
-      </div>
+        </div>
+
+      </form>
     </div>
   </section>
 </div>

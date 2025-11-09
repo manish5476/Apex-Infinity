@@ -1,0 +1,57 @@
+/* =========================
+   Consistent Filter Layout
+========================= */
+:host ::ng-deep .se-filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+:host ::ng-deep .se-filter-bar label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--theme-text-label);
+}
+
+:host ::ng-deep .se-filter-bar input,
+:host ::ng-deep .se-filter-bar .p-dropdown,
+:host ::ng-deep .se-filter-bar .p-autocomplete-input {
+  height: 2.75rem !important;
+  border-radius: 0.5rem;
+  border: 1px solid var(--theme-border-primary);
+  background: var(--theme-bg-secondary);
+  font-size: 0.85rem;
+  color: var(--theme-text-primary);
+  padding: 0 0.75rem;
+  transition: all 0.2s ease;
+}
+
+:host ::ng-deep .se-filter-bar input:focus,
+:host ::ng-deep .se-filter-bar .p-dropdown.p-focus,
+:host ::ng-deep .se-filter-bar .p-autocomplete-input:focus {
+  border-color: var(--theme-accent-primary);
+  box-shadow: 0 0 0 3px var(--theme-accent-focus-ring);
+  outline: none;
+}
+
+/* =========================
+   Consistent Grid Card Look
+========================= */
+:host ::ng-deep .glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur-intensity));
+  border-radius: var(--glass-border-radius);
+  border: 1px solid var(--glass-border-color);
+  box-shadow: var(--glass-shadow);
+}
+
+:host ::ng-deep .glass-card .ag-header {
+  background: var(--theme-bg-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+:host ::ng-deep .glass-card .ag-cell {
+  font-size: 0.8rem;
+  color: var(--theme-text-primary);
+}

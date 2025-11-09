@@ -125,4 +125,23 @@ export class CustomerForm implements OnInit {
 
     return raw;
   }
+  
+  copyBillingAddress(event: any): void {
+    if (event.checked) {
+      // Get the billing address values
+      const billingAddress = this.customerForm.get('billingAddress')?.value;
+      
+      // Patch them into the shipping address
+      this.customerForm.get('shippingAddress')?.patchValue(billingAddress);
+    } else {
+      // Clear the shipping address if unchecked
+      this.customerForm.get('shippingAddress')?.reset({
+        street: '',
+        city: '',
+        state: '',
+        zipCode: '',
+        country: 'India'
+      });
+    }
+  }
 }

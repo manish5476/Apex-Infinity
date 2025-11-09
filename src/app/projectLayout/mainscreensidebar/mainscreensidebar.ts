@@ -27,7 +27,7 @@ export class Mainscreensidebar {
       label: 'Customers', icon: 'pi pi-users',
       items: [
         { label: 'create', icon: 'pi pi-cog', routerLink: ['/customer/create'] },
-        // { label: 'List', icon: 'pi pi-list', routerLink: ['/customers/list'] },
+        { label: 'CustomerList', icon: 'pi pi-list', routerLink: ['/customer/list'] },
         // { label: 'Details', icon: 'pi pi-info-circle', routerLink: ['/customers/detailed'] },
         // { label: 'Segment', icon: 'pi pi-chart-pie', routerLink: ['/customers/segment'] },
       ]
