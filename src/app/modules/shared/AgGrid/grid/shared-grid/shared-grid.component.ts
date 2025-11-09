@@ -259,12 +259,6 @@ export class SharedGridComponent implements OnInit, OnChanges {
 
   handleCellAction(action: string, data: any): void {
     this.eventFromGrid.emit({ eventType: action, data });
-    // switch (action) {
-    //   case 'edit': this.startEditingRow(data); break;
-    //   case 'save': this.saveRow(data); break;
-    //   case 'cancel': this.cancelEditingRow(data); break;
-    //   case 'delete': this.deleteRow(data); break;
-    // }
   }
 
   startEditingRow(rowData: any): void {
@@ -339,7 +333,7 @@ export class SharedGridComponent implements OnInit, OnChanges {
     this.eventFromGrid.emit({ eventType: 'RowSelectedEvent', event });
   }
 
-  onCellClicked(event: CellClickedEvent): void {
+  onCellClicked(event: CellClickedEvent): any {
     this.eventFromGrid.emit({ eventType: 'CellClickedEvent', event });
   }
 
@@ -347,7 +341,6 @@ export class SharedGridComponent implements OnInit, OnChanges {
   onGridReady(event: GridReadyEvent): void {
     this.gridApi = event.api;
     this.gridReady.emit(event);
-
     if (this.options.rowModelType === 'infinite') {
       const getRows = this.options.getRowsCallback;
       if (!getRows) {

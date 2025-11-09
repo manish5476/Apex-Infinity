@@ -55,12 +55,14 @@ export class NotificationBellComponent implements OnInit {
   // --- Approval Form State ---
   selectedRoles: { [userId: string]: string } = {};
   selectedBranches: { [userId: string]: string } = {};
+  customers:any
 
   constructor() {
     effect(() => {
       this.roles = this.masterList.roles();
+      this.customers = this.masterList.customers();
       this.branches = this.masterList.branches();
-      console.log(this.roles,
+      console.log(this.roles,this.customers ,
 this.branches);
     });
   }

@@ -1,0 +1,196 @@
+<!-- 
+  This outer div uses the 'glass-card' style from your base.scss
+  to create the main content container.
+-->
+<div class="p-6"> <!-- Added a class to the outer div -->
+  <div class="glass-card customer-details-card" *ngIf="customer(); else noCustomer">
+    
+    <!-- === HEADER === -->
+    <div class="details-header">
+      <div class="flex items-center gap-4">
+        <p-button 
+          icon="pi pi-arrow-left" 
+          styleClass="p-button-text p-button-rounded"
+          routerLink="/customer"> <!-- Path as per your lazy-loaded routes -->
+        </p-button>
+        <h2 class="form-title">{{ customer()?.name }}</h2>
+        <p-tag 
+          [value]="customer()?.isActive ? 'Active' : 'Inactive'" 
+          [severity]="customer()?.isActive ? 'success' : 'danger'">
+        </p-tag>
+      </div>
+      <div class="header-actions">
+        <!-- Add routerLink to your edit page, e.g., [routerLink]="['/customer', customer()?._id, 'edit']" -->
+        <p-button label="Edit Customer" icon="pi pi-pencil" styleClass="p-button-outlined"></p-button>
+        <p-button label="More Actions" icon="pi pi-ellipsis-v" styleClass="p-button-text"></p-button>
+      </div>
+    </div>
+
+    <p-divider></p-divider>
+
+    <!-- === BODY === -->
+    <div class="details-body">
+
+      <!-- Left Column: Profile -->
+      <div class="profile-sidebar">
+        <p-avatar 
+          [image]="customer()?.avatar" 
+          [label]="getInitials(customer()?.name || '')" 
+          styleClass="profile-avatar"
+          shape="circle">
+        </p-avatar>
+
+        <h3 class="profile-name">{{ customer()?.name }}</h3>
+        <span class="profile-type">{{ customer()?.type | titlecase }}</span>
+        
+        <p-divider></p-divider>
+
+        <div class="profile-contact">
+          <div class="detail-field">
+            <label>Contact Person</label>
+            <!-- FIX: Added explicit check for empty string -->
+            <span>{{ customer()?.contactPerson ? customer()?.contactPerson : 'N/A' }}</span>
+          </div>
+          <div class="detail-field">
+            <label>Email</label>
+            <span>{{ customer()?.email ? customer()?.email : 'N/A' }}</span>
+          </div>
+          <div class="detail-field">
+            <label>Phone</label>
+            <span>{{ customer()?.phone }}</span>
+          </div>
+          <div class="detail-field">
+            <label>Alt. Phone</label>
+            <span>{{ customer()?.altPhone ? customer()?.altPhone : 'N/A' }}</span>
+          </div>
+          <!-- NEW: Added user-friendly created date -->
+          <div class="detail-field">
+            <label>Member Since</label>
+            <span>{{ formatDate(customer()?.createdAt) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Details -->
+      <div class="main-details">
+        
+        <!-- Financial Details -->
+        <section class="detail-section">
+          <h4 class="section-title">Financial Overview</h4>
+          <div class="financial-grid">
+            <div class="stat-card">
+              <label>Outstanding</label>
+              <span class="stat-value outstanding">{{ formatCurrency(customer()?.outstandingBalance) }}</span>
+            </div>
+            <div class="stat-card">
+              <label>Credit Limit</label>
+              <span class="stat-value">{{ formatCurrency(customer()?.creditLimit) }}</span>
+            </div>
+            <div class="stat-card">
+              <label>Opening Balance</label>
+              <span class="stat-value">{{ formatCurrency(customer()?.openingBalance) }}</span>
+            </div>
+          </div>
+        </section>
+
+        <p-divider></p-divider>
+
+        <!-- Address Details -->
+        <section class="detail-section">
+          <h4 class="section-title">Address Information</h4>
+          <div class="address-grid">
+            
+            <!-- Billing Address -->
+            <div class="address-card">
+              <h5>Billing Address</h5>
+              <div class="detail-field">
+                <label>Street</label>
+                <span>{{ customer()?.billingAddress?.street ? customer()?.billingAddress?.street : 'N/A' }}</span>
+              </div>
+              <div class="detail-field">
+                <label>City</label>
+                <span>{{ customer()?.billingAddress?.city ? customer()?.billingAddress?.city : 'N/A' }}</span>
+              </div>
+              <div class="detail-field">
+                <label>State</label>
+                <span>{{ customer()?.billingAddress?.state ? customer()?.billingAddress?.state : 'N/A' }}</span>
+              </div>
+              <div class="detail-field">
+                <label>Zip Code</label>
+                <span>{{ customer()?.billingAddress?.zipCode ? customer()?.billingAddress?.zipCode : 'N/A' }}</span>
+              </div>
+            </div>
+            
+            <!-- Shipping Address -->
+            <div class="address-card">
+              <h5>Shipping Address</h5>
+              <div class="detail-field">
+                <label>Street</label>
+                <span>{{ customer()?.shippingAddress?.street ? customer()?.shippingAddress?.street : 'N/A' }}</span>
+              </div>
+              <div class="detail-field">
+                <label>City</label>
+                <span>{{ customer()?.shippingAddress?.city ? customer()?.shippingAddress?.city : 'N/A' }}</span>
+              </div>
+              <div class="detail-field">
+                <label>State</label>
+                <span>{{ customer()?.shippingAddress?.state ? customer()?.shippingAddress?.state : 'N/A' }}</span>
+              </div>
+              <div class="detail-field">
+                <label>Zip Code</label>
+                <span>{{ customer()?.shippingAddress?.zipCode ? customer()?.shippingAddress?.zipCode : 'N/A' }}</span>
+              </div>
+            </div>
+
+          </div>
+        </section>
+        
+        <p-divider></p-divider>
+
+        <!-- Other Details -->
+        <section class="detail-section">
+          <h4 class="section-title">Other Details</h4>
+          <div class="other-details-grid">
+            <div class="detail-field">
+              <label>GST Number</label>
+              <span>{{ customer()?.gstNumber ? customer()?.gstNumber : 'N/A' }}</span>
+            </div>
+            <div class="detail-field">
+              <label>PAN Number</label>
+              <span>{{ customer()?.panNumber ? customer()?.panNumber : 'N/A' }}</span>
+            </div>
+            <div class="detail-field">
+              <label>Payment Terms</label>
+              <span>{{ customer()?.paymentTerms ? customer()?.paymentTerms : 'N/A' }}</span>
+            </div>
+            <div class="detail-field">
+              <label>Tags</label>
+              <!-- FIX: Use the new helper function to show filtered tags -->
+              <div class="tags-container" *ngIf="getFilteredTags() as filteredTags; else noTags">
+                <ng-container *ngIf="filteredTags.length > 0; else noTags">
+                  <p-tag *ngFor="let tag of filteredTags" [value]="tag"></p-tag>
+                </ng-container>
+              </div>
+              <ng-template #noTags><span>N/A</span></ng-template>
+            </div>
+            <div class="detail-field notes">
+              <label>Notes</label>
+              <p>{{ customer()?.notes ? customer()?.notes : 'No notes provided.' }}</p>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Loading / Error State -->
+<ng-template #noCustomer>
+  <!-- Use a class that exists, not 'class_alias' -->
+  <div class="flex items-center justify-center p-8">
+    <h3 *ngIf="!customer()">Loading customer details...</h3>
+    <!-- You can add a more robust error message here -->
+  </div>
+</ng-template>

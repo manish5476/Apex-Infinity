@@ -7,22 +7,26 @@ import { LoadingService } from '../../../core/services/loading.service';
   selector: 'app-loading', // Selector remains 'app-loader' as requested
   standalone: true,
   imports: [CommonModule],
-  // The HTML template is now embedded directly in the component file
   template: `
-    <!-- The main container, shown only when isLoading$ is true -->
     <div *ngIf="isLoading$ | async" class="loader-overlay">
       <div class="loader-content">
-        <!-- The minimalist CSS spinner -->
-        <div class="minimal-spinner"></div>
-        <!-- Brand name with a subtle glow effect -->
-        <span class="brand-text">Shivam Electronics</span>
+        
+        <!-- Wave Equalizer -->
+        <div class="wave-equalizer">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </div>
+
+        <!-- Animated Rainbow Text -->
+        <span class="brand-text">Apex Infinity</span>
       </div>
     </div>
   `,
-  // The CSS styles are also embedded directly in the component file
   styles: [
     `
-      /* The main full-screen overlay with a backdrop blur effect */
       .loader-overlay {
         position: fixed;
         inset: 0;
@@ -47,35 +51,109 @@ import { LoadingService } from '../../../core/services/loading.service';
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 1.5rem; /* Space between spinner and text */
+        gap: 2rem; /* Increased space */
       }
 
-      /* The minimalist spinner animation */
-      .minimal-spinner {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        border: 4px solid var(--theme-border-primary);
-        /* The colored part of the spinner uses the theme's accent color */
-        border-top-color: var(--theme-accent-primary);
-        animation: spin 1s linear infinite;
+      /*
+       * 1. The Wave Equalizer
+       */
+      .wave-equalizer {
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        height: 60px;
+        gap: 6px;
+        /* REMOVED: hue-rotate animation */
       }
 
-      /* The subtle glow effect for the brand name text */
+      .wave-equalizer .bar {
+        display: block;
+        width: 10px;
+        height: 100%;
+        border-radius: 4px;
+        
+        /* NEW: Applied a vertical rainbow gradient */
+        background: linear-gradient(
+          180deg, /* Vertical gradient */
+          #ff00c1, 
+          #ff9a00, 
+          #33ff00, 
+          #00c4ff, 
+          #ff00c1
+        );
+        background-size: auto 200%; /* Sized for vertical animation */
+        
+        /* This animation makes the bars move up and down */
+        animation: 
+          waveRhythm 1.2s ease-in-out infinite alternate,
+          rainbowBar 3s linear infinite; /* NEW: Added color flow animation */
+      }
+
+      /* Stagger the animation start time for the "wave" effect */
+      .wave-equalizer .bar:nth-child(2) {
+        animation-delay: -1.0s;
+      }
+      .wave-equalizer .bar:nth-child(3) {
+        animation-delay: -0.8s;
+      }
+      .wave-equalizer .bar:nth-child(4) {
+        animation-delay: -0.6s;
+      }
+      .wave-equalizer .bar:nth-child(5) {
+        animation-delay: -0.4s;
+      }
+
+      /*
+       * 2. The Rainbow Brand Text (Unchanged, already colorful)
+       */
       .brand-text {
         font-family: var(--font-primary);
-        font-size: 1.125rem; /* 18px */
-        font-weight: 500;
-        color: var(--theme-text-secondary);
-        /* Theme-aware glow using the accent color */
-        text-shadow: 0 0 8px
-          color-mix(in srgb, var(--theme-accent-primary) 30%, transparent);
+        font-size: 1.25rem; /* 20px */
+        font-weight: 600;
+        
+        /* Animated gradient for rainbow text */
+        background: linear-gradient(
+          90deg, 
+          #ff00c1, 
+          #ff9a00, 
+          #33ff00, 
+          #00c4ff, 
+          #ff00c1
+        );
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        
+        /* This animation moves the gradient */
+        animation: rainbowText 3s linear infinite;
       }
 
-      /* Keyframe for the spinning animation */
-      @keyframes spin {
+      /*
+       * 3. Keyframes
+       */
+
+      /* Bar rhythm animation */
+      @keyframes waveRhythm {
+        from {
+          transform: scaleY(0.1);
+        }
         to {
-          transform: rotate(360deg);
+          transform: scaleY(1);
+        }
+      }
+
+      /* NEW: Animation for the bar's gradient to flow vertically */
+      @keyframes rainbowBar {
+        to {
+          background-position: 0 -200%;
+        }
+      }
+
+      /* Text gradient animation */
+      @keyframes rainbowText {
+        to {
+          background-position: -200% center;
         }
       }
 
@@ -102,137 +180,270 @@ export class LoadingComponent {
   }
 }
 
-// import {
-//   Component,
-//   ViewChild,
-//   ElementRef,
-//   Inject,
-//   PLATFORM_ID,
-//   OnDestroy,
-// } from '@angular/core';
-// import { CommonModule, isPlatformBrowser } from '@angular/common';
-// import { Observable } from 'rxjs';
+// import { Component } from '@angular/core';
+// import { CommonModule } from '@angular/common';
+// import { Observable } from 'rxjs'; // Corrected 'in' to 'from'
 // import { LoadingService } from '../../../core/services/loading.service';
 
 // @Component({
-//   selector: 'app-loading',
+//   selector: 'app-loading', // Selector remains 'app-loader' as requested
 //   standalone: true,
 //   imports: [CommonModule],
 //   template: `
-//     <div
-//       *ngIf="isLoading$ | async"
-//       class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
-//     >
-//       <canvas #earthCanvas class="w-64 h-64"></canvas>
+//     <div *ngIf="isLoading$ | async" class="loader-overlay">
+//       <div class="loader-content">
+        
+//         <!-- NEW: Wave Equalizer -->
+//         <div class="wave-equalizer">
+//           <span class="bar"></span>
+//           <span class="bar"></span>
+//           <span class="bar"></span>
+//           <span class="bar"></span>
+//           <span class="bar"></span>
+//         </div>
+
+//         <!-- NEW: Animated Rainbow Text -->
+//         <span class="brand-text">Apex Infinity</span>
+//       </div>
 //     </div>
 //   `,
-//   styles: [':host { display: block; }'],
+//   styles: [
+//     `
+//       .loader-overlay {
+//         position: fixed;
+//         inset: 0;
+//         z-index: 50;
+//         display: flex;
+//         align-items: center;
+//         justify-content: center;
+//         /* Theme-aware background color with transparency */
+//         background-color: color-mix(
+//           in srgb,
+//           var(--theme-bg-primary) 80%,
+//           transparent
+//         );
+//         -webkit-backdrop-filter: blur(4px);
+//         backdrop-filter: blur(4px);
+//         /* Fade-in animation for a smooth appearance */
+//         animation: fadeIn 0.3s ease-in-out;
+//       }
+
+//       /* Container for the spinner and text */
+//       .loader-content {
+//         display: flex;
+//         flex-direction: column;
+//         align-items: center;
+//         gap: 2rem; /* Increased space */
+//       }
+
+//       /*
+//        * 1. The Wave Equalizer
+//        */
+//       .wave-equalizer {
+//         display: flex;
+//         justify-content: center;
+//         align-items: flex-end;
+//         height: 60px;
+//         gap: 6px;
+//         /* This animation makes the bars cycle through the rainbow */
+//         animation: rainbowHue 4s linear infinite;
+//       }
+
+//       .wave-equalizer .bar {
+//         display: block;
+//         width: 10px;
+//         height: 100%;
+//         border-radius: 4px;
+//         background-color: var(--theme-accent-primary);
+        
+//         /* This animation makes the bars move up and down */
+//         animation: waveRhythm 1.2s ease-in-out infinite alternate;
+//       }
+
+//       /* Stagger the animation start time for the "wave" effect */
+//       .wave-equalizer .bar:nth-child(2) {
+//         animation-delay: -1.0s;
+//       }
+//       .wave-equalizer .bar:nth-child(3) {
+//         animation-delay: -0.8s;
+//       }
+//       .wave-equalizer .bar:nth-child(4) {
+//         animation-delay: -0.6s;
+//       }
+//       .wave-equalizer .bar:nth-child(5) {
+//         animation-delay: -0.4s;
+//       }
+
+//       /*
+//        * 2. The Rainbow Brand Text
+//        */
+//       .brand-text {
+//         font-family: var(--font-primary);
+//         font-size: 1.25rem; /* 20px */
+//         font-weight: 600;
+        
+//         /* Animated gradient for rainbow text */
+//         background: linear-gradient(
+//           90deg, 
+//           #ff00c1, 
+//           #ff9a00, 
+//           #33ff00, 
+//           #00c4ff, 
+//           #ff00c1
+//         );
+//         background-size: 200% auto;
+//         -webkit-background-clip: text;
+//         background-clip: text;
+//         -webkit-text-fill-color: transparent;
+        
+//         /* This animation moves the gradient */
+//         animation: rainbowText 3s linear infinite;
+//       }
+
+//       /*
+//        * 3. Keyframes
+//        */
+
+//       /* Bar rhythm animation */
+//       @keyframes waveRhythm {
+//         from {
+//           transform: scaleY(0.1);
+//         }
+//         to {
+//           transform: scaleY(1);
+//         }
+//       }
+
+//       /* Bar color-shifting animation */
+//       @keyframes rainbowHue {
+//         to {
+//           filter: hue-rotate(360deg);
+//         }
+//       }
+
+//       /* Text gradient animation */
+//       @keyframes rainbowText {
+//         to {
+//           background-position: -200% center;
+//         }
+//       }
+
+//       /* Keyframe for the fade-in effect */
+//       @keyframes fadeIn {
+//         from {
+//           opacity: 0;
+//         }
+//         to {
+//           opacity: 1;
+//         }
+//       }
+//     `,
+//   ],
 // })
-// export class LoadingComponent implements OnDestroy {
+// export class LoadingComponent {
+//   /**
+//    * An observable that emits true when a request is in progress, and false otherwise.
+//    */
 //   isLoading$: Observable<boolean>;
-//   private ctx!: CanvasRenderingContext2D;
-//   private animationFrameId = 0;
-//   private rotation = 0;
-//   private earthRadius = 0;
-//   private stars: { x: number; y: number; r: number }[] = [];
 
-//   @ViewChild('earthCanvas')
-//   set canvasRef(ref: ElementRef<HTMLCanvasElement>) {
-//     if (ref && isPlatformBrowser(this.platformId)) {
-//       const canvas = ref.nativeElement;
-//       this.ctx = canvas.getContext('2d')!;
-//       this.resizeCanvas(canvas);
-//       this.generateStars(canvas);
-//       window.addEventListener('resize', () => this.resizeCanvas(canvas));
-//       this.animate(canvas);
-//     }
-//   }
-
-//   constructor(
-//     private loadingService: LoadingService,
-//     @Inject(PLATFORM_ID) private platformId: Object
-//   ) {
+//   constructor(private loadingService: LoadingService) {
 //     this.isLoading$ = this.loadingService.isLoading$;
 //   }
-
-//   ngOnDestroy(): void {
-//     if (isPlatformBrowser(this.platformId)) {
-//       cancelAnimationFrame(this.animationFrameId);
-//       window.removeEventListener('resize', () => {});
-//     }
-//   }
-
-//   private resizeCanvas(canvas: HTMLCanvasElement) {
-//     const rect = canvas.getBoundingClientRect();
-//     canvas.width = rect.width;
-//     canvas.height = rect.height;
-//     this.earthRadius = Math.min(canvas.width, canvas.height) * 0.3;
-//   }
-
-//   private generateStars(canvas: HTMLCanvasElement) {
-//     this.stars = [];
-//     for (let i = 0; i < 100; i++) {
-//       this.stars.push({
-//         x: Math.random() * canvas.width,
-//         y: Math.random() * canvas.height,
-//         r: Math.random() * 1.5,
-//       });
-//     }
-//   }
-
-//   private animate(canvas: HTMLCanvasElement) {
-//     this.animationFrameId = requestAnimationFrame(() => this.animate(canvas));
-
-//     const ctx = this.ctx;
-//     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-//     // Background
-//     ctx.fillStyle = '#000';
-//     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-//     // Stars
-//     ctx.fillStyle = 'white';
-//     this.stars.forEach((s) => {
-//       ctx.beginPath();
-//       ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-//       ctx.fill();
-//     });
-
-//     const cx = canvas.width / 2;
-//     const cy = canvas.height / 2;
-
-//     // Earth Glow
-//     const glow = ctx.createRadialGradient(
-//       cx,
-//       cy,
-//       this.earthRadius * 0.8,
-//       cx,
-//       cy,
-//       this.earthRadius * 1.5
-//     );
-//     glow.addColorStop(0, 'rgba(0, 200, 255, 0.3)');
-//     glow.addColorStop(1, 'rgba(0, 200, 255, 0)');
-//     ctx.fillStyle = glow;
-//     ctx.beginPath();
-//     ctx.arc(cx, cy, this.earthRadius * 1.5, 0, Math.PI * 2);
-//     ctx.fill();
-
-//     // Earth Body
-//     ctx.beginPath();
-//     ctx.arc(cx, cy, this.earthRadius, 0, Math.PI * 2);
-//     ctx.fillStyle = '#003366';
-//     ctx.fill();
-
-//     // Rotating highlight (like continents)
-//     ctx.save();
-//     ctx.translate(cx, cy);
-//     ctx.rotate(this.rotation);
-//     ctx.fillStyle = 'rgba(0,255,200,0.6)';
-//     ctx.beginPath();
-//     ctx.ellipse(0, 0, this.earthRadius * 0.6, this.earthRadius * 0.2, 0, 0, Math.PI * 2);
-//     ctx.fill();
-//     ctx.restore();
-
-//     this.rotation += 0.01;
-//   }
 // }
+// // import { Component } from '@angular/core';
+// // import { CommonModule } from '@angular/common';
+// // import { Observable } from 'rxjs';
+// // import { LoadingService } from '../../../core/services/loading.service';
+
+// // @Component({
+// //   selector: 'app-loading', // Selector remains 'app-loader' as requested
+// //   standalone: true,
+// //   imports: [CommonModule],
+// //   template: `
+// //     <div *ngIf="isLoading$ | async" class="loader-overlay">
+// //       <div class="loader-content">
+// //         <div class="minimal-spinner"></div>
+// //         <span class="brand-text">Apex Infinity</span>
+// //       </div>
+// //     </div>
+// //   `,
+// //   styles: [
+// //     `
+// //       .loader-overlay {
+// //         position: fixed;
+// //         inset: 0;
+// //         z-index: 50;
+// //         display: flex;
+// //         align-items: center;
+// //         justify-content: center;
+// //         /* Theme-aware background color with transparency */
+// //         background-color: color-mix(
+// //           in srgb,
+// //           var(--theme-bg-primary) 80%,
+// //           transparent
+// //         );
+// //         -webkit-backdrop-filter: blur(4px);
+// //         backdrop-filter: blur(4px);
+// //         /* Fade-in animation for a smooth appearance */
+// //         animation: fadeIn 0.3s ease-in-out;
+// //       }
+
+// //       /* Container for the spinner and text */
+// //       .loader-content {
+// //         display: flex;
+// //         flex-direction: column;
+// //         align-items: center;
+// //         gap: 1.5rem; /* Space between spinner and text */
+// //       }
+
+// //       /* The minimalist spinner animation */
+// //       .minimal-spinner {
+// //         width: 50px;
+// //         height: 50px;
+// //         border-radius: 50%;
+// //         border: 4px solid var(--theme-border-primary);
+// //         /* The colored part of the spinner uses the theme's accent color */
+// //         border-top-color: var(--theme-accent-primary);
+// //         animation: spin 1s linear infinite;
+// //       }
+
+// //       /* The subtle glow effect for the brand name text */
+// //       .brand-text {
+// //         font-family: var(--font-primary);
+// //         font-size: 1.125rem; /* 18px */
+// //         font-weight: 500;
+// //         color: var(--theme-text-secondary);
+// //         /* Theme-aware glow using the accent color */
+// //         text-shadow: 0 0 8px
+// //           color-mix(in srgb, var(--theme-accent-primary) 30%, transparent);
+// //       }
+
+// //       /* Keyframe for the spinning animation */
+// //       @keyframes spin {
+// //         to {
+// //           transform: rotate(360deg);
+// //         }
+// //       }
+
+// //       /* Keyframe for the fade-in effect */
+// //       @keyframes fadeIn {
+// //         from {
+// //           opacity: 0;
+// //         }
+// //         to {
+// //           opacity: 1;
+// //         }
+// //       }
+// //     `,
+// //   ],
+// // })
+// // export class LoadingComponent {
+// //   /**
+// //    * An observable that emits true when a request is in progress, and false otherwise.
+// //    */
+// //   isLoading$: Observable<boolean>;
+
+// //   constructor(private loadingService: LoadingService) {
+// //     this.isLoading$ = this.loadingService.isLoading$;
+// //   }
+// // }

@@ -1,6 +1,17 @@
 /* =========================
    Consistent Filter Layout
 ========================= */
+
+/* This new class replaces the Tailwind 'flex' classes 
+  to ensure all filter bars look the same.
+*/
+:host ::ng-deep .se-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
 :host ::ng-deep .se-filter-field {
   display: flex;
   flex-direction: column;
@@ -13,9 +24,12 @@
   color: var(--theme-text-label);
 }
 
+/* These styles now control all inputs, dropdowns, etc.,
+  inside the filter bar for a consistent height and look.
+*/
 :host ::ng-deep .se-filter-bar input,
 :host ::ng-deep .se-filter-bar .p-dropdown,
-:host ::ng-deep .se-filter-bar .p-autocomplete-input {
+:host ::ng-deep .se-filter-bar .p-autocomplete .p-autocomplete-input {
   height: 2.75rem !important;
   border-radius: 0.5rem;
   border: 1px solid var(--theme-border-primary);
@@ -25,6 +39,17 @@
   padding: 0 0.75rem;
   transition: all 0.2s ease;
 }
+
+/* Ensures the input inside p-autocomplete is styled correctly
+  (it needs a padding-left or the text overlaps the icon)
+*/
+:host ::ng-deep .se-filter-bar .p-autocomplete .p-autocomplete-input {
+  padding-left: 0.75rem;
+}
+:host ::ng-deep .se-filter-bar .p-dropdown {
+  padding: 0; /* Override default padding for p-dropdown */
+}
+
 
 :host ::ng-deep .se-filter-bar input:focus,
 :host ::ng-deep .se-filter-bar .p-dropdown.p-focus,
@@ -45,6 +70,7 @@
   box-shadow: var(--glass-shadow);
 }
 
+/* Styles AG-Grid *inside* a glass card */
 :host ::ng-deep .glass-card .ag-header {
   background: var(--theme-bg-secondary);
   font-size: 0.8rem;

@@ -1,40 +1,29 @@
-<div class="flex flex-col h-full  gap-6 bg-[var(--theme-bg-secondary)]">
-  <!-- <div class="flex justify-between items-center">
-    <h2 class="text-2xl font-bold text-[var(--theme-text-heading)] flex items-center gap-2">
-      <i class="pi pi-users text-[var(--theme-accent-primary)]"></i>
-      Customer Management
-    </h2>
-  </div> -->
-
-  <div class="glass-card p-6 rounded-lg shadow-md">
-    <div class="flex flex-wrap items-end gap-4">
-
+<div class="flex flex-col h-full p-6 gap-6 bg-[var(--theme-bg-secondary)]">
+  <div class="glass-card p-2 rounded-lg shadow-md">
+    <div class="se-filter-bar">
       <div class="se-filter-field">
-        <label class="block text-sm font-semibold mb-1">Customer</label>
-        <p-select id="customer" [options]="customerOptions()" [(ngModel)]="customerFilter._id" [filter]="true"
+        <label>Customer</label>
+        <p-select id="customer" [options]="this.masterList.customers()" [(ngModel)]="customerFilter._id" [filter]="true" (onChange)="applyFilters()" 
           filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select a Customer"
-          appendTo="body" styleClass="themed-select w-full md:w-60 h-11">
-        </p-select>
+          appendTo="body" styleClass="w-full md:w-60"> </p-select>
       </div>
 
       <div class="se-filter-field">
-        <label class="block text-sm font-semibold mb-1">Email</label>
-        <p-autoComplete id="email" [(ngModel)]="customerFilter.email" [suggestions]="emailSuggestions"
+        <label>Email</label>
+        <p-autoComplete id="email" [(ngModel)]="customerFilter.email" [suggestions]="emailSuggestions" (keyup.enter)="applyFilters()" 
           (completeMethod)="filterEmails($event)" [forceSelection]="false" placeholder="Enter email" [minLength]="1"
-          styleClass="themed-input w-full md:w-60 h-11">
-        </p-autoComplete>
+          styleClass="w-full md:w-60"> </p-autoComplete>
       </div>
 
       <div class="se-filter-field">
-        <label class="block text-sm font-semibold mb-1">Phone</label>
-        <input id="phone" type="text" pInputText [(ngModel)]="customerFilter.phone" placeholder="Phone"
-          class="themed-input w-full md:w-40 h-11" />
+        <label>Phone</label>
+        <input id="phone" type="text" pInputText [(ngModel)]="customerFilter.phone" placeholder="Phone" (keyup.enter)="applyFilters()" 
+          class="w-full md:w-40" />
       </div>
 
       <div class="flex gap-2 items-center mt-1">
         <p-button label="Apply" icon="pi pi-check" severity="success" (onClick)="applyFilters()" class="h-11 px-4">
         </p-button>
-
         <p-button label="Reset" icon="pi pi-refresh" severity="secondary" styleClass="p-button-outlined"
           (onClick)="resetFilters()" class="h-11 px-4">
         </p-button>
@@ -43,7 +32,7 @@
   </div>
 
   <div class="flex-grow glass-card p-4 rounded-lg shadow-md min-h-0">
-    <app-shared-grid [data]="data" [gridHeight]="'230px'" [headerFilter]="false" [rowSelectionMode]="rowSelectionMode"
+    <app-shared-grid [data]="data" [gridHeight]="'210px'" [headerFilter]="false" [rowSelectionMode]="rowSelectionMode"
       [GridName]="'Customer Details'" [column]="column" (eventFromGrid)="eventFromGrid($event)"
       (gridReady)="onGridReady($event)" (scrolledToBottom)="onScrolledToBottom($event)">
     </app-shared-grid>
