@@ -1,0 +1,12 @@
+/* Re-uses all global customer form styles */
+:host {
+  display: block;
+}
+
+/* Helper for 2-column span */
+.col-span-2 {
+  grid-column: span 2;
+  @media (max-width: 640px) {
+    grid-column: auto;
+  }
+}

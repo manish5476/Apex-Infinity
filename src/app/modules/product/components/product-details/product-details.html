@@ -1,0 +1,155 @@
+<div class="p-6">
+  <div class="glass-card product-details-card" *ngIf="product(); else noProduct">
+    
+    <!-- === HEADER === -->
+    <div class="details-header">
+      <div class="flex items-center gap-4">
+        <p-button 
+          icon="pi pi-arrow-left" 
+          styleClass="p-button-text p-button-rounded"
+          routerLink="/products"> <!-- Path to your list page -->
+        </p-button>
+        <h2 class="form-title">{{ product()?.name }}</h2>
+        <p-tag 
+          [value]="product()?.isActive ? 'Active' : 'Inactive'" 
+          [severity]="product()?.isActive ? 'success' : 'danger'">
+        </p-tag>
+      </div>
+      <div class="header-actions">
+        <p-button 
+          label="Edit Product" 
+          icon="pi pi-pencil" 
+          styleClass="p-button-outlined"
+          [routerLink]="['/products', product()?._id, 'edit']"> <!-- Path to edit -->
+        </p-button>
+      </div>
+    </div>
+    <p-divider></p-divider>
+
+    <!-- === BODY === -->
+    <div class="details-body">
+
+      <!-- Left Column: Image & Core Info -->
+      <div class="profile-sidebar">
+        <div class="product-image-container">
+          <img 
+            *ngIf="product()?.images && product()?.images?.[0]; else placeholder"
+            [src]="product()?.images?.[0]" 
+            alt="Product image" 
+            class="product-image"
+          />
+          <ng-template #placeholder>
+            <div class="image-placeholder">
+              <i class="pi pi-camera" style="font-size: 3rem"></i>
+            </div>
+          </ng-template>
+        </div>
+
+        <h3 class="profile-name">{{ product()?.name }}</h3>
+        
+        <p-divider></p-divider>
+
+        <div class="profile-contact">
+          <div class="detail-field">
+            <label>SKU</label>
+            <span>{{ product()?.sku || 'N/A' }}</span>
+          </div>
+          <div class="detail-field">
+            <label>Brand</label>
+            <span>{{ product()?.brand || 'N/A' }}</span>
+          </div>
+          <div class="detail-field">
+            <label>Category</label>
+            <span>{{ product()?.category || 'N/A' }}</span>
+          </div>
+          <div class="detail-field">
+            <label>Created On</label>
+            <span>{{ formatDate(product()?.createdAt) }}</span>
+          </div>
+          <div class="detail-field">
+            <label>Tags</label>
+            <div class="tags-container" *ngIf="getFilteredTags() as filteredTags; else noTags">
+              <ng-container *ngIf="filteredTags.length > 0; else noTags">
+                <p-tag *ngFor="let tag of filteredTags" [value]="tag"></p-tag>
+              </ng-container>
+            </div>
+            <ng-template #noTags><span>N/A</span></ng-template>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Details -->
+      <div class="main-details">
+        
+        <!-- Description -->
+        <section class="detail-section">
+          <h4 class="section-title">Description</h4>
+          <p class="description-text">
+            {{ product()?.description || 'No description provided.' }}
+          </p>
+        </section>
+
+        <p-divider></p-divider>
+
+        <!-- Pricing Details -->
+        <section class="detail-section">
+          <h4 class="section-title">Pricing</h4>
+          <div class="financial-grid">
+            <div class="stat-card">
+              <label>Selling Price (MRP)</label>
+              <span class="stat-value">{{ formatCurrency(product()?.sellingPrice) }}</span>
+            </div>
+            <div class="stat-card">
+              <label>Purchase Price</label>
+              <span class="stat-value">{{ formatCurrency(product()?.purchasePrice) }}</span>
+            </div>
+            <div class="stat-card">
+              <label>Tax Rate</label>
+              <span class="stat-value">{{ product()?.taxRate || 0 }}%</span>
+            </div>
+             <div class="stat-card">
+              <label>Tax</label>
+              <span class="stat-value">{{ product()?.isTaxInclusive ? 'Inclusive' : 'Exclusive' }}</span>
+            </div>
+          </div>
+        </section>
+        
+        <p-divider></p-divider>
+
+        <!-- Inventory Details -->
+        <section class="detail-section">
+          <h4 class="section-title">Inventory by Branch</h4>
+          <div class="inventory-table">
+            <p-table [value]="product()?.inventory || []" styleClass="p-table-sm p-table-striped">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Branch Name</th>
+                  <th>Quantity</th>
+                  <th>Re-order Level</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-item>
+                <tr>
+                  <td>{{ branchNameMap.get(item.branchId) || item.branchId }}</td>
+                  <td>{{ item.quantity }}</td>
+                  <td>{{ item.reorderLevel }}</td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="summary">
+                <div class="flex justify-end pr-4">
+                  <span class="font-bold text-lg">Total Stock: {{ product()?.totalStock }}</span>
+                </div>
+              </ng-template>
+            </p-table>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #noProduct>
+  <div class="flex items-center justify-center p-8">
+    <h3>Loading product details...</h3>
+  </div>
+</ng-template>

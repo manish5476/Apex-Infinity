@@ -1,1 +1,66 @@
-<p>product-list works!</p>
+<div class="flex flex-col h-full p-6 gap-6 bg-[var(--theme-bg-secondary)]">
+  <!-- HEADER -->
+  <div class="flex justify-between items-center">
+    <h2 class="text-2xl font-bold text-[var(--theme-text-heading)] flex items-center gap-2">
+      <i class="pi pi-box text-[var(--theme-accent-primary)]"></i>
+      Product Management
+    </h2>
+    <a pButton label="New Product" icon="pi pi-plus" routerLink="['/products/create']" class="p-button">
+    </a>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="glass-card p-4 rounded-lg shadow-md">
+    <div class="se-filter-bar">
+
+      <!-- Name -->
+      <div class="se-filter-field">
+        <label>Product Name</label>
+        <input id="name" type="text" pInputText [(ngModel)]="productFilter.name" placeholder="Search by name"
+          class="w-full md:w-60" />
+      </div>
+
+      <!-- SKU -->
+      <div class="se-filter-field">
+        <label>SKU</label>
+        <input id="sku" type="text" pInputText [(ngModel)]="productFilter.sku" placeholder="Search by SKU"
+          class="w-full md:w-40" />
+      </div>
+
+      <!-- Brand -->
+      <div class="se-filter-field">
+        <label>Brand</label>
+        <p-select  appendTo="body" id="brand" [options]="brandOptions()" [(ngModel)]="productFilter.brand" [filter]="true"
+          optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select Brand" appendTo="body"
+          styleClass="w-full md:w-52">
+        </p-select>
+      </div>
+
+      <!-- Category -->
+      <div class="se-filter-field">
+        <label>Category</label>
+        <p-select  appendTo="body" id="category" [options]="categoryOptions()" [(ngModel)]="productFilter.category" [filter]="true"
+          optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select Category" appendTo="body"
+          styleClass="w-full md:w-52">
+        </p-select>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex gap-2 items-center mt-1">
+        <p-button label="Apply" icon="pi pi-check" severity="success" (onClick)="applyFilters()">
+        </p-button>
+        <p-button label="Reset" icon="pi pi-refresh" severity="secondary" styleClass="p-button-outlined"
+          (onClick)="resetFilters()">
+        </p-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRID AREA -->
+  <div class="flex-grow glass-card p-4 rounded-lg shadow-md min-h-0">
+    <app-shared-grid [data]="data" [gridHeight]="'210px'" [headerFilter]="false" [rowSelectionMode]="rowSelectionMode"
+      [GridName]="'Product Details'" [column]="column" (eventFromGrid)="eventFromGrid($event)"
+      (gridReady)="onGridReady($event)" (scrolledToBottom)="onScrolledToBottom($event)">
+    </app-shared-grid>
+  </div>
+</div>

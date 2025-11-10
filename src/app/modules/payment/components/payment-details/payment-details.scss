@@ -1,0 +1,102 @@
+/* Re-using styles from invoice-details */
+:host {
+  display: block;
+  width: 100%;
+}
+
+.payment-details-card {
+  padding: var(--spacing-lg) var(--spacing-xl);
+  max-width: 1200px; /* Payments are simpler, don't need full width */
+  margin: 0 auto; /* Center the card */
+}
+
+/* === Header === */
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.form-title {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-2xl);
+  color: var(--theme-text-primary);
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+/* === Body === */
+.payment-body-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xl);
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.section-title {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-lg);
+  color: var(--theme-text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.details-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.detail-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  label {
+    font-size: var(--font-size-sm);
+    color: var(--theme-text-label);
+    font-weight: 600;
+  }
+  span {
+    font-size: var(--font-size-base);
+    color: var(--theme-text-primary);
+    font-weight: 600;
+  }
+
+  .amount-display {
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    color: var(--theme-accent-primary);
+  }
+}
+
+.reference-column {
+  padding-left: var(--spacing-xl);
+  border-left: 1px solid var(--theme-border-primary);
+  
+  @media (max-width: 768px) {
+    padding-left: 0;
+    border-left: none;
+    border-top: 1px solid var(--theme-border-primary);
+    padding-top: var(--spacing-xl);
+  }
+}
+
+.remarks-text {
+  font-size: var(--font-size-base);
+  color: var(--theme-text-secondary);
+  font-style: italic;
+  background: var(--theme-bg-ternary);
+  padding: var(--spacing-md);
+  border-radius: var(--ui-border-radius);
+  margin: 0;
+  white-space: pre-wrap;
+}

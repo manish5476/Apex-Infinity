@@ -1,0 +1,79 @@
+<p-toast></p-toast> 
+
+<div class="customer-wrapper">
+  <section class="customer-container payment-form-container"> <!-- Re-use payment form small container -->
+    
+    <div class="customer-form-panel">
+      <form [formGroup]="emiForm" (ngSubmit)="onSubmit()" class="customer-form-layout">
+
+        <!--_ 1. STICKY HEADER _-->
+        <div class="customer-form-header">
+          <h1 class="form-title">{{ formTitle() }}</h1>
+          <p class_alias="form-subtitle">For Invoice: <strong>{{ invoice?.invoiceNumber }}</strong></p>
+        </div>
+
+        <!--_ 2. SCROLLABLE BODY _-->
+        <div class="customer-form-body">
+
+          <!-- Core Details -->
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label>Total Invoice Amount</label>
+              <p-inputNumber formControlName="totalAmount" mode="decimal" [minFractionDigits]="2" prefix="₹ "></p-inputNumber>
+            </div>
+            
+            <div class="form-group">
+              <label>Down Payment <span class="req">*</span></label>
+              <p-inputNumber formControlName="downPayment" mode="decimal" [minFractionDigits]="2" prefix="₹ "></p-inputNumber>
+            </div>
+
+            <div class="form-group">
+              <label>Loan Balance (Auto-Calculated)</label>
+              <p-inputNumber formControlName="balanceAmount" mode="decimal" [minFractionDigits]="2" prefix="₹ "></p-inputNumber>
+            </div>
+          </div>
+          
+          <p-divider></p-divider>
+
+          <!-- EMI Plan Details -->
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label>Number of Installments <span class="req">*</span></label>
+              <p-inputNumber formControlName="numberOfInstallments" mode="decimal"></p-inputNumber>
+            </div>
+
+            <div class="form-group">
+              <label>Interest Rate (%) <span class="req">*</span></label>
+              <p-inputNumber formControlName="interestRate" mode="decimal" [minFractionDigits]="2" suffix=" %"></p-inputNumber>
+            </div>
+
+            <div class="form-group">
+              <label>EMI Start Date <span class="req">*</span></label>
+              <p-datepicker formControlName="emiStartDate" [showIcon]="true" dateFormat="dd/mm/yy"></p-datepicker>
+            </div>
+          </div>
+          
+          <!-- Hidden fields for submission -->
+          <input type="hidden" formControlName="invoiceId" />
+          <input type="hidden" formControlName="customerId" />
+          <input type="hidden" formControlName="branchId" />
+
+        </div>
+
+        <!--_ 3. STICKY FOOTER _-->
+        <div class="customer-form-footer">
+          <div class="form-actions">
+            <p-button 
+              label="Create EMI Plan" 
+              icon="pi pi-check" 
+              type="submit" 
+              [loading]="isSubmitting()"
+              styleClass="w-full justify-center">
+            </p-button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </section>
+</div>

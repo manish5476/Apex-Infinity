@@ -1,0 +1,144 @@
+/* Use the full-width form layout */
+:host {
+  display: block;
+}
+
+/* Override container to be wider for invoices */
+.invoice-form-container {
+  max-width: 1600px;
+  width: 95%;
+
+  /* Remove the banner on this form */
+  .customer-banner {
+    display: none;
+  }
+}
+
+/* 4-column grid */
+.form-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.85rem;
+}
+
+/* 3-column grid */
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.85rem;
+}
+
+.align-bottom {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: 0.2rem;
+}
+
+/* --- Invoice Items --- */
+.items-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--theme-bg-ternary);
+  border-radius: var(--ui-border-radius);
+}
+
+.item-grid-header,
+.item-grid {
+  display: grid;
+  /* Product | HSN | Qty | Price | Disc | Tax | Total | Del */
+  grid-template-columns: 3fr 1fr 0.8fr 1fr 1fr 0.8fr 1fr 0.5fr;
+  gap: 0.85rem;
+  align-items: flex-start;
+}
+
+.item-grid-header {
+  padding: 0 0.5rem 0.5rem;
+  border-bottom: 1px solid var(--theme-border-primary);
+  label {
+    font-size: var(--font-size-sm);
+    color: var(--theme-text-label);
+    font-weight: 600;
+  }
+}
+
+.line-total {
+  font-weight: 600;
+  color: var(--theme-text-primary);
+  font-size: var(--font-size-base);
+  padding-top: 0.5rem; /* Align with inputs */
+  text-align: right;
+  display: block;
+}
+
+.col-span-3 {
+  grid-column: span 3;
+}
+
+@media (max-width: 1024px) {
+  .item-grid-header {
+    display: none; /* Hide header on mobile, labels in form are enough */
+  }
+  .item-grid {
+    grid-template-columns: 1fr 1fr; /* 2-column layout */
+    
+    .col-span-3 {
+      grid-column: 1 / -1; /* Product spans full width */
+    }
+  }
+}
+
+/* --- Totals Grid --- */
+.totals-notes-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Copied from invoice-details for consistency */
+.totals-card {
+  padding: var(--spacing-md);
+  background: var(--theme-bg-ternary);
+  border-radius: var(--ui-border-radius);
+  
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm) 0;
+    label {
+      font-size: var(--font-size-base);
+      color: var(--theme-text-secondary);
+      font-weight: 500;
+    }
+    span {
+      font-size: var(--font-size-base);
+      color: var(--theme-text-primary);
+      font-weight: 600;
+    }
+    &.grand-total {
+      label, span {
+        font-size: var(--font-size-lg);
+        font-weight: 700;
+      }
+    }
+    &.balance-due {
+      margin-top: var(--spacing-sm);
+      padding: var(--spacing-md);
+      background: var(--theme-bg-secondary);
+      border-radius: var(--ui-border-radius-sm);
+      label, span {
+        font-size: var(--font-size-xl);
+        font-weight: 700;
+        color: var(--theme-accent-primary);
+      }
+    }
+  }
+}

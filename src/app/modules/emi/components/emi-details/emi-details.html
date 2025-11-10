@@ -1,0 +1,149 @@
+<!-- Main Details Page -->
+<div class="p-6">
+  <div class="glass-card emi-details-card" *ngIf="emiPlan(); else noEmiPlan">
+
+    <!-- === HEADER === -->
+    <div class="details-header">
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-4">
+          <p-button icon="pi pi-arrow-left" styleClass="p-button-text p-button-rounded"
+            [routerLink]="['/invoices', invoiceId]"> <!-- Link back to invoice -->
+          </p-button>
+          <h2 class="form-title m-0">EMI Plan</h2>
+        </div>
+        <div class="flex items-center gap-2 pl-14">
+          <p-tag [value]="emiPlan()?.status | titlecase"
+           ></p-tag>
+            <!-- [severity]="getEmiStatusSeverity(emiPlan()?.status || '')" -->
+          <span class="text-sm text-[var(--theme-text-muted)]">For Invoice #{{ emiPlan()?.invoice?.invoiceNumber ||
+            invoiceId }}</span>
+        </div>
+      </div>
+      <!-- Actions -->
+      <div class="header-actions">
+        <!-- Add other actions if needed -->
+      </div>
+    </div>
+    <p-divider></p-divider>
+
+    <!-- === BODY === -->
+    <div class="emi-body">
+
+      <!-- Summary Cards -->
+      <section class="financial-grid">
+        <div class="stat-card">
+          <label>Total Loan Amount</label>
+          <span class="stat-value">{{ formatCurrency(emiPlan()?.balanceAmount) }}</span>
+        </div>
+        <div class="stat-card">
+          <label>Interest Rate</label>
+          <span class="stat-value">{{ emiPlan()?.interestRate }}%</span>
+        </div>
+        <div class="stat-card">
+          <label>Installments</label>
+          <span class="stat-value">{{ emiPlan()?.numberOfInstallments }}</span>
+        </div>
+        <div class="stat-card">
+          <label>Plan Status</label>
+          <span class="stat-value">{{ emiPlan()?.status | titlecase }}</span>
+        </div>
+      </section>
+
+      <!-- Installments Table -->
+      <section class="detail-section">
+        <h4 class="section-title">Installment Schedule</h4>
+        <p-table [value]="emiPlan()?.installments || []" styleClass="p-table-striped">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>#</th>
+              <th>Due Date</th>
+              <th>Principal</th>
+              <th>Interest</th>
+              <th>Total Amount</th>
+              <th>Paid Amount</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item>
+            <tr>
+              <td>{{ item.installmentNumber }}</td>
+              <td>{{ formatDate(item.dueDate) }}</td>
+              <td>{{ formatCurrency(item.principalAmount) }}</td>
+              <td>{{ formatCurrency(item.interestAmount) }}</td>
+              <td class="font-bold">{{ formatCurrency(item.totalAmount) }}</td>
+              <td>{{ formatCurrency(item.paidAmount) }}</td>
+              <td>
+                <p-tag [value]="item.paymentStatus | titlecase"
+                  ></p-tag>
+                  <!-- [severity]="getPaymentStatusSeverity(item.paymentStatus)" -->
+              </td>
+              <td>
+                <p-button label="Pay" icon="pi pi-dollar" styleClass="p-button-sm p-button-success"
+                  (onClick)="onPayInstallmentClick(item)" [disabled]="item.paymentStatus === 'paid'">
+                </p-button>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- "No EMI Plan" Message -->
+<ng-template #noEmiPlan>
+  <div class="glass-card emi-details-card text-center p-8">
+    <i class="pi pi-info-circle text-4xl text-[var(--theme-accent-primary)]"></i>
+    <h3 class="form-title mt-4">No EMI Plan Found</h3>
+    <p class="text-[var(--theme-text-secondary)]">
+      There is no EMI plan associated with this invoice.
+    </p>
+    <div class="mt-6">
+      <p-button label="Create EMI Plan" icon="pi pi-plus" [routerLink]="['/emi/create', invoiceId]">
+      </p-button>
+      <p-button label="Back to Invoice" icon="pi pi-arrow-left" styleClass="p-button-text"
+        [routerLink]="['/invoices', invoiceId]">
+      </p-button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Payment Modal -->
+<p-dialog header="Record Installment Payment" [(visible)]="displayPaymentModal" [modal]="true"
+  [style]="{width: '450px'}" (onHide)="onClosePaymentModal()">
+
+  <form [formGroup]="paymentForm" (ngSubmit)="onSubmitPayment()">
+    <div class="p-fluid flex flex-col gap-4" *ngIf="selectedInstallment()">
+
+      <div class="text-center">
+        <div class="text-lg text-[var(--theme-text-secondary)]">
+          Installment #{{ selectedInstallment()?.installmentNumber }}
+        </div>
+        <div class="text-3xl font-bold text-[var(--theme-text-primary)]">
+          {{ formatCurrency(selectedInstallment()?.totalAmount) }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Amount to Pay <span class="req">*</span></label>
+        <p-inputNumber formControlName="amount" mode="decimal" [minFractionDigits]="2" prefix="₹ "></p-inputNumber>
+      </div>
+
+      <div class="form-group">
+        <label>Payment Method <span class="req">*</span></label>
+        <p-select  appendTo="body" formControlName="paymentMethod" [options]="paymentMethodOptions"></p-select>
+      </div>
+
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancel" icon="pi pi-times" styleClass="p-button-text" (onClick)="onClosePaymentModal()">
+    </p-button>
+    <p-button label="Confirm Payment" icon="pi pi-check" (onClick)="onSubmitPayment()"
+      [loading]="isSubmittingPayment()">
+    </p-button>
+  </ng-template>
+</p-dialog>

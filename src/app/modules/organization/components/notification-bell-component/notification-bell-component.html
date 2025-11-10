@@ -77,12 +77,12 @@
                   <div class="text-xs text-[var(--theme-text-muted)] mb-2">{{ member.email }}</div>
                   
                   <div class="flex flex-col gap-2">
-                    <p-select [options]="roles" [(ngModel)]="selectedRoles[member._id]" optionLabel="name"
+                    <p-select  appendTo="body" [options]="roles" [(ngModel)]="selectedRoles[member._id]" optionLabel="name"
                       optionValue="_id" placeholder="Select a Role" styleClass="w-full"
                       [style]="{ 'height': '40px' }">
                     </p-select>
 
-                    <p-select [options]="branches" [(ngModel)]="selectedBranches[member._id]" optionLabel="name"
+                    <p-select  appendTo="body" [options]="branches" [(ngModel)]="selectedBranches[member._id]" optionLabel="name"
                       optionValue="_id" placeholder="Select a Branch" styleClass="w-full"
                       [style]="{ 'height': '40px' }">
                     </p-select>
@@ -201,12 +201,12 @@
               <div class="text-xs text-[var(--theme-text-muted)] mb-2">{{ member.email }}</div>
               
               <div class="flex flex-col gap-2">
-                <p-select [options]="roles" [(ngModel)]="selectedRoles[member._id]" optionLabel="name"
+                <p-select  appendTo="body" [options]="roles" [(ngModel)]="selectedRoles[member._id]" optionLabel="name"
                   optionValue="_id" placeholder="Select a Role" styleClass="w-full"
                   [style]="{ 'height': '40px' }">
                 </p-select>
 
-                <p-select [options]="branches" [(ngModel)]="selectedBranches[member._id]" optionLabel="name"
+                <p-select  appendTo="body" [options]="branches" [(ngModel)]="selectedBranches[member._id]" optionLabel="name"
                   optionValue="_id" placeholder="Select a Branch" styleClass="w-full"
                   [style]="{ 'height': '40px' }">
                 </p-select>

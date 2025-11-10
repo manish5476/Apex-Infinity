@@ -1,0 +1,118 @@
+<p-toast></p-toast> 
+
+<div class="customer-wrapper">
+  <section class="customer-container">
+    
+    <!-- BANNER -->
+    <div class="customer-banner">
+      <img src="https://images.unsplash.com/photo-1560439514-4e9b4624040b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
+        alt="Branch background" />
+      <div class="customer-overlay"></div>
+      <div class="customer-banner-text">
+        <h2>{{ formTitle() }}</h2>
+        <p>Manage your organization's locations and offices.</p>
+      </div>
+    </div>
+    
+    <!-- FORM PANEL -->
+    <div class="customer-form-panel">
+      <form [formGroup]="branchForm" (ngSubmit)="onSubmit()" class="customer-form-layout">
+
+        <!--_ 1. STICKY HEADER _-->
+        <div class="customer-form-header">
+          <h1 class="form-title">{{ formTitle() }}</h1>
+          <p class="form-subtitle">Fill in the branch details below.</p>
+        </div>
+
+        <!--_ 2. SCROLLABLE BODY _-->
+        <div class="customer-form-body">
+
+          <!-- Main Details -->
+          <p-divider align="center" type="dashed"><b>Main Details</b></p-divider>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Branch Name <span class="req">*</span></label>
+              <input pInputText formControlName="name" placeholder="e.g., Main Store" />
+            </div>
+            <div class="form-group">
+              <label>Branch Code (Optional)</label>
+              <input pInputText formControlName="branchCode" placeholder="e.g., S-001" />
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input pInputText formControlName="phoneNumber" placeholder="+91..." />
+            </div>
+            <div class="form-group">
+              <label>Manager (Optional)</label>
+              <p-select  appendTo="body" 
+                formControlName="managerId" 
+                [options]="managerOptions()" 
+                optionLabel="name" 
+                optionValue="_id"
+                [filter]="true" filterBy="name"
+                placeholder="Assign a manager">
+              </p-select>
+            </div>
+          </div>
+          
+          <!-- Address -->
+          <p-divider align="center" type="dashed"><b>Branch Address</b></p-divider>
+          
+          <!-- This div connects the 'address' FormGroup -->
+          <div formGroupName="address">
+            <div class="form-grid">
+              <div class="form-group col-span-2">
+                <label>Street</label>
+                <input pInputText formControlName="street" placeholder="123 Main Street" />
+              </div>
+              <div class="form-group">
+                <label>City</label>
+                <input pInputText formControlName="city" />
+              </div>
+              <div class="form-group">
+                <label>State</label>
+                <input pInputText formControlName="state" />
+              </div>
+              <div class="form-group">
+                <label>Zip Code</label>
+                <input pInputText formControlName="zipCode" />
+              </div>
+              <div class="form-group">
+                <label>Country</label>
+                <input pInputText formControlName="country" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Settings -->
+          <p-divider align="center" type="dashed"><b>Settings</b></p-divider>
+          <div class="flex flex-col gap-4">
+            <div class="form-group flex items-center gap-2">
+              <p-checkbox formControlName="isMainBranch" [binary]="true" inputId="isMainBranch"></p-checkbox>
+              <label for="isMainBranch">Set as Main Branch</label>
+            </div>
+            <div class="form-group flex items-center gap-2">
+              <p-checkbox formControlName="isActive" [binary]="true" inputId="isActive"></p-checkbox>
+              <label for="isActive">Branch is Active</label>
+            </div>
+          </div>
+
+        </div>
+
+        <!--_ 3. STICKY FOOTER _-->
+        <div class="customer-form-footer">
+          <div class="form-actions">
+            <p-button 
+              [label]="editMode() ? 'Save Changes' : 'Create Branch'" 
+              icon="pi pi-check" 
+              type="submit" 
+              [loading]="isSubmitting()"
+              styleClass="w-full justify-center">
+            </p-button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </section>
+</div>

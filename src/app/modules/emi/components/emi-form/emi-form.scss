@@ -1,0 +1,22 @@
+/* Re-using payment form styles */
+:host {
+  display: block;
+}
+
+/* Use a simpler, single-panel layout */
+.payment-form-container {
+  max-width: 1200px;
+  width: 90%;
+
+  /* Hide the banner */
+  .customer-banner {
+    display: none;
+  }
+}
+
+/* 3-column grid */
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.85rem;
+}

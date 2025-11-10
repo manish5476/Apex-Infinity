@@ -1,0 +1,143 @@
+<p-toast></p-toast> 
+
+<div class="customer-wrapper">
+  <section class="customer-container">
+    
+    <!-- BANNER -->
+    <div class="customer-banner">
+      <img src="https://images.unsplash.com/photo-1579532582937-16c108033501?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
+        alt="Supplier background" />
+      <div class="customer-overlay"></div>
+      <div class="customer-banner-text">
+        <h2>{{ formTitle() }}</h2>
+        <p>Manage your organization's vendors and suppliers.</p>
+      </div>
+    </div>
+    
+    <!-- FORM PANEL -->
+    <div class="customer-form-panel">
+      <form [formGroup]="supplierForm" (ngSubmit)="onSubmit()" class="customer-form-layout">
+
+        <!--_ 1. STICKY HEADER _-->
+        <div class="customer-form-header">
+          <h1 class="form-title">{{ formTitle() }}</h1>
+          <p class="form-subtitle">Fill in the supplier details below.</p>
+        </div>
+
+        <!--_ 2. SCROLLABLE BODY _-->
+        <div class="customer-form-body">
+
+          <!-- Main Details -->
+          <p-divider align="center" type="dashed"><b>Business Details</b></p-divider>
+          <div class="form-grid">
+            <div class="form-group col-span-2">
+              <label>Company Name <span class="req">*</span></label>
+              <input pInputText formControlName="companyName" placeholder="e.g., Global Tech Suppliers" />
+            </div>
+            <div class="form-group">
+              <label>Contact Person</label>
+              <input pInputText formControlName="contactPerson" placeholder="e.g., Ms. Jane Doe" />
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Email</label>
+              <input pInputText type="email" formControlName="email" placeholder="jane@supplier.com" />
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <input pInputText formControlName="phone" />
+            </div>
+            <div class="form-group">
+              <label>Alt. Phone</label>
+              <input pInputText formControlName="altPhone" />
+            </div>
+          </div>
+           <div class="form-grid">
+            <div class="form-group">
+              <label>GST Number</label>
+              <input pInputText formControlName="gstNumber" />
+            </div>
+            <div class="form-group">
+              <label>PAN Number</label>
+              <input pInputText formControlName="panNumber" />
+            </div>
+          </div>
+          
+          <!-- Address -->
+          <p-divider align="center" type="dashed"><b>Address</b></p-divider>
+          
+          <div formGroupName="address">
+            <div class="form-grid">
+              <div class="form-group col-span-2">
+                <label>Street</label>
+                <input pInputText formControlName="street" placeholder="123 Industrial Area" />
+              </div>
+              <div class="form-group">
+                <label>City</label>
+                <input pInputText formControlName="city" />
+              </div>
+            </div>
+             <div class="form-grid-3">
+              <div class="form-group">
+                <label>State</label>
+                <input pInputText formControlName="state" />
+              </div>
+              <div class="form-group">
+                <label>Zip Code</label>
+                <input pInputText formControlName="zipCode" />
+              </div>
+              <div class="form-group">
+                <label>Country</label>
+                <input pInputText formControlName="country" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Financials & Settings -->
+          <p-divider align="center" type="dashed"><b>Financials & Settings</b></p-divider>
+          <div class="form-grid-3">
+             <div class="form-group">
+              <label>Opening Balance</label>
+              <p-inputNumber formControlName="openingBalance" mode="decimal" [minFractionDigits]="2" prefix="₹ "></p-inputNumber>
+            </div>
+            <div class="form-group">
+              <label>Payment Terms</label>
+              <input pInputText formControlName="paymentTerms" placeholder="e.g., Net 30" />
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Supplies to Branches (Optional)</label>
+            <p-multiSelect 
+              formControlName="branchesSupplied" 
+              [options]="branchOptions()"
+              placeholder="Select branches this supplier serves"
+              styleClass="w-full">
+            </p-multiSelect>
+          </div>
+
+          <div class="form-group flex items-center gap-2">
+            <p-checkbox formControlName="isActive" [binary]="true" inputId="isActive"></p-checkbox>
+            <label for="isActive">Supplier is Active</label>
+          </div>
+
+        </div>
+
+        <!--_ 3. STICKY FOOTER _-->
+        <div class="customer-form-footer">
+          <div class="form-actions">
+            <p-button 
+              [label]="editMode() ? 'Save Changes' : 'Create Supplier'" 
+              icon="pi pi-check" 
+              type="submit" 
+              [loading]="isSubmitting()"
+              styleClass="w-full justify-center">
+            </p-button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </section>
+</div>

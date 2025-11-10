@@ -1,0 +1,83 @@
+/* Re-using styles from invoice-details */
+:host {
+  display: block;
+  width: 100%;
+}
+
+.emi-details-card {
+  padding: var(--spacing-lg) var(--spacing-xl);
+  max-width: 1400px; 
+  margin: 0 auto; 
+}
+
+/* === Header === */
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.form-title {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-2xl);
+  color: var(--theme-text-primary);
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+/* === Body === */
+.section-title {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-lg);
+  color: var(--theme-text-primary);
+  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Summary Cards */
+.financial-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.stat-card {
+  background: var(--theme-bg-secondary);
+  border-radius: var(--ui-border-radius);
+  padding: var(--spacing-md);
+  border: 1px solid var(--theme-border-primary);
+  
+  label {
+    font-size: var(--font-size-sm);
+    color: var(--theme-text-label);
+    font-weight: 600;
+  }
+  
+  .stat-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--theme-text-primary);
+    display: block;
+    margin-top: var(--spacing-xs);
+  }
+}
+
+/* Modal Form styles */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  
+  label {
+    font-size: var(--font-size-sm);
+    color: var(--theme-text-label);
+    font-weight: 600;
+  }
+}

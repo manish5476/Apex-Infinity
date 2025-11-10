@@ -9,6 +9,7 @@ export interface MasterList {
   products: Array<{ _id: string; name: string }>;
   customers?: Array<{ _id: string; name: string }>;
   suppliers?: Array<{ _id: string; name: string }>;
+  users?: Array<{ _id: string; name: string }>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -21,6 +22,7 @@ export class MasterListService {
   private readonly _data = signal<MasterList | null>(null);
   readonly data = computed(() => this._data());
   readonly branches = computed(() => this._data()?.branches ?? []);
+  readonly users = computed(() => this._data()?.users ?? []);
   readonly roles = computed(() => this._data()?.roles ?? []);
   readonly products = computed(() => this._data()?.products ?? []);
   readonly customers = computed(() => this._data()?.customers ?? []);

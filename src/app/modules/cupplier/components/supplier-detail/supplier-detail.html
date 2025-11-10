@@ -1,0 +1,132 @@
+<div class="p-6">
+  <div class="glass-card customer-details-card" *ngIf="supplier(); else noSupplier">
+    
+    <!-- === HEADER === -->
+    <div class="details-header">
+      <div class="flex items-center gap-4">
+        <p-button 
+          icon="pi pi-arrow-left" 
+          styleClass="p-button-text p-button-rounded"
+          routerLink="/suppliers">
+        </p-button>
+        <h2 class="form-title">{{ supplier()?.companyName }}</h2>
+        <p-tag 
+          [value]="supplier()?.isActive ? 'Active' : 'Inactive'" 
+          [severity]="supplier()?.isActive ? 'success' : 'danger'">
+        </p-tag>
+      </div>
+      <div class="header-actions">
+        <p-button 
+          label="Edit Supplier" 
+          icon="pi pi-pencil" 
+          styleClass="p-button-outlined"
+          [routerLink]="['/suppliers', supplier()?._id, 'edit']">
+        </p-button>
+      </div>
+    </div>
+
+    <p-divider></p-divider>
+
+    <!-- === BODY === -->
+    <div class="details-body">
+
+      <!-- Left Column: Profile -->
+      <div class="profile-sidebar">
+        <p-avatar 
+          icon="pi pi-truck" 
+          styleClass="profile-avatar"
+          shape="circle">
+        </p-avatar>
+
+        <h3 class="profile-name">{{ supplier()?.companyName }}</h3>
+        <span class="profile-type">{{ supplier()?.contactPerson || 'No contact person' }}</span>
+        
+        <p-divider></p-divider>
+
+        <div class="profile-contact">
+          <div class="detail-field">
+            <label>Email</label>
+            <span>{{ supplier()?.email || 'N/A' }}</span>
+          </div>
+          <div class="detail-field">
+            <label>Phone</label>
+            <span>{{ supplier()?.phone || 'N/A' }}</span>
+          </div>
+          <div class="detail-field">
+            <label>Alt. Phone</label>
+            <span>{{ supplier()?.altPhone || 'N/A' }}</span>
+          </div>
+          <div class="detail-field">
+            <label>Created On</label>
+            <span>{{ formatDate(supplier()?.createdAt) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Details -->
+      <div class="main-details">
+        
+        <!-- Financial Details -->
+        <section class="detail-section">
+          <h4 class="section-title">Financial Overview</h4>
+          <div class="financial-grid">
+            <div class="stat-card">
+              <label>Outstanding Balance</label>
+              <span class="stat-value outstanding-supplier">{{ formatCurrency(supplier()?.outstandingBalance) }}</span>
+            </div>
+            <div class="stat-card">
+              <label>Opening Balance</label>
+              <span class="stat-value">{{ formatCurrency(supplier()?.openingBalance) }}</span>
+            </div>
+            <div class="stat-card">
+              <label>Payment Terms</label>
+              <span class="stat-value terms">{{ supplier()?.paymentTerms || 'N/A' }}</span>
+            </div>
+          </div>
+        </section>
+
+        <p-divider></p-divider>
+        
+        <!-- Address -->
+        <section class="detail-section">
+          <h4 class="section-title">Address</h4>
+          <div class="address-card">
+            <div class="detail-field">
+              <label>Full Address</label>
+              <span class="full-address">{{ formatAddress(supplier()?.address) }}</span>
+            </div>
+          </div>
+        </section>
+
+        <p-divider></p-divider>
+
+        <!-- Other Details -->
+        <section class="detail-section">
+          <h4 class="section-title">Other Details</h4>
+          <div class="other-details-grid">
+            <div class="detail-field">
+              <label>GST Number</label>
+              <span>{{ supplier()?.gstNumber || 'N/A' }}</span>
+            </div>
+            <div class="detail-field">
+              <label>PAN Number</label>
+              <span>{{ supplier()?.panNumber || 'N/A' }}</span>
+            </div>
+            <div class="detail-field notes">
+              <label>Supplies to Branches</label>
+              <p>{{ branchNames() }}</p>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<ng-template #noSupplier>
+  <div class="flex items-center justify-center p-8">
+    <h3>Loading supplier details...</h3>
+  </div>
+</ng-template>

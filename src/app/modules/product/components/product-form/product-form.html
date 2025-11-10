@@ -1,1 +1,168 @@
-<p>product-form works!</p>
+<p-toast></p-toast> <!-- For displaying messages -->
+
+<div class="customer-wrapper"> <!-- Re-using customer form wrapper style -->
+  <section class="customer-container">
+
+    <!-- BANNER (Optional) -->
+    <div class="customer-banner">
+      <img
+        src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
+        alt="Product background" />
+      <div class="customer-overlay"></div>
+      <div class="customer-banner-text">
+        <h2>{{ formTitle() }}</h2>
+        <p>Manage your product catalog and inventory levels.</p>
+      </div>
+    </div>
+
+    <!-- FORM PANEL -->
+    <div class="customer-form-panel">
+      <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="customer-form-layout">
+
+        <!--_ 1. STICKY HEADER _-->
+        <div class="customer-form-header">
+          <h1 class="form-title">{{ formTitle() }}</h1>
+          <p class="form-subtitle">Fill in the product details below.</p>
+        </div>
+
+        <!--_ 2. SCROLLABLE BODY _-->
+        <div class="customer-form-body">
+
+          <!-- Basic Details -->
+          <div class="form-grid">
+            <div class="form-group col-span-2">
+              <label>Product Name <span class="req">*</span></label>
+              <input pInputText formControlName="name" placeholder="e.g., Wireless Mouse" />
+            </div>
+            <div class="form-group">
+              <label>SKU (Stock Keeping Unit)</label>
+              <input pInputText formControlName="sku" placeholder="e.g., WM-1001" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Description</label>
+            <textarea pInputTextarea formControlName="description" rows="3"
+              placeholder="Describe the product..."></textarea>
+          </div>
+
+          <!-- Categorization -->
+          <p-divider align="center" type="dashed"><b>Categorization</b></p-divider>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Brand</label>
+              <p-select  appendTo="body" formControlName="brand" [options]="brandOptions()" placeholder="Select Brand"></p-select>
+              <!-- To use string: <input pInputText formControlName="brand" /> -->
+            </div>
+            <div class="form-group">
+              <label>Category</label>
+              <p-select  appendTo="body" formControlName="category" [options]="categoryOptions()"
+                placeholder="Select Category"></p-select>
+              <!-- To use string: <input pInputText formControlName="category" /> -->
+            </div>
+          </div>
+
+          <!-- Pricing -->
+          <p-divider align="center" type="dashed"><b>Pricing</b></p-divider>
+          <div class="form-grid-4"> <!-- 4-column grid -->
+            <div class="form-group">
+              <label>Selling Price (MRP) <span class="req">*</span></label>
+              <p-inputNumber formControlName="sellingPrice" mode="decimal" [minFractionDigits]="2"
+                prefix="₹ "></p-inputNumber>
+            </div>
+            <div class="form-group">
+              <label>Purchase Price</label>
+              <p-inputNumber formControlName="purchasePrice" mode="decimal" [minFractionDigits]="2"
+                prefix="₹ "></p-inputNumber>
+            </div>
+            <div class="form-group">
+              <label>Tax Rate (%)</label>
+              <p-inputNumber formControlName="taxRate" mode="decimal" [minFractionDigits]="2"
+                suffix=" %"></p-inputNumber>
+            </div>
+            <div class="form-group align-bottom"> <!-- Aligns checkbox vertically -->
+              <div class="flex items-center gap-2">
+                <p-checkbox formControlName="isTaxInclusive" [binary]="true" inputId="taxInclusive"></p-checkbox>
+                <label for="taxInclusive">Tax Inclusive</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Inventory -->
+          <p-divider align="center" type="dashed"><b>Inventory Stock</b></p-divider>
+          <div formArrayName="inventory" class="inventory-container">
+            <!-- Loop over the FormArray -->
+            <div *ngFor="let item of inventory.controls; let i = index" [formGroupName]="i" class="inventory-item-grid">
+
+              <div class="form-group">
+                <label>Branch</label>
+                <p-select  appendTo="body" formControlName="branchId" [options]="branchOptions()" optionLabel="name" optionValue="_id"
+                  placeholder="Select Branch">
+                </p-select>
+              </div>
+
+              <div class="form-group">
+                <label>Quantity</label>
+                <p-inputNumber formControlName="quantity" mode="decimal"></p-inputNumber>
+              </div>
+
+              <div class="form-group">
+                <label>Re-order Level</label>
+                <p-inputNumber formControlName="reorderLevel" mode="decimal"></p-inputNumber>
+              </div>
+
+              <div class="form-group align-bottom">
+                <p-button icon="pi pi-trash" styleClass="p-button-danger p-button-outlined"
+                  (onClick)="removeInventoryItem(i)">
+                </p-button>
+              </div>
+
+            </div>
+
+            <!-- Show if no items -->
+            <div *ngIf="inventory.length === 0" class="text-center p-4 text-sm text-[var(--theme-text-muted)]">
+              No inventory locations added.
+            </div>
+
+            <!-- Add Item Button -->
+            <div class="mt-4">
+              <p-button label="Add Branch Stock" icon="pi pi-plus" styleClass="p-button-text" type="button"
+                (onClick)="addInventoryItem()">
+              </p-button>
+            </div>
+          </div>
+
+          <!-- Other Info -->
+          <p-divider align="center" type="dashed"><b>Other Info</b></p-divider>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Default Supplier</label>
+              <p-select  appendTo="body" formControlName="defaultSupplierId" [options]="supplierOptions()"
+                placeholder="Select Supplier"></p-select>
+            </div>
+            <div class="form-group">
+              <label>Tags (comma separated)</label>
+              <input pInputText formControlName="tags" placeholder="e.g., Best-Seller, Electronics" />
+            </div>
+          </div>
+
+          <div class="form-group flex items-center gap-2">
+            <p-checkbox formControlName="isActive" [binary]="true" inputId="isActive"></p-checkbox>
+            <label for="isActive">Product is Active (available for sale)</label>
+          </div>
+
+        </div>
+
+        <!--_ 3. STICKY FOOTER _-->
+        <div class="customer-form-footer">
+          <div class="form-actions">
+            <p-button [label]="editMode() ? 'Save Changes' : 'Create Product'" icon="pi pi-check" type="submit"
+              [loading]="isSubmitting()" styleClass="w-full justify-center">
+            </p-button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </section>
+</div>

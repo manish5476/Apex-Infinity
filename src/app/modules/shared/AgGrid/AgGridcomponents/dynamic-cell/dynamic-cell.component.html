@@ -60,7 +60,7 @@
     </div>
 
     <div *ngSwitchCase="'select'" class="w-full">
-       <p-select appendTo="body"  [inputId]="params.colDef?.field + '-' + params.node.rowIndex" [(ngModel)]="value" [options]="options"
+       <p-select  appendTo="body" appendTo="body"  [inputId]="params.colDef?.field + '-' + params.node.rowIndex" [(ngModel)]="value" [options]="options"
             [optionLabel]="inputConfig?.optionLabel ?? null" [optionValue]="inputConfig?.optionValue ?? null"
             [placeholder]="inputConfig?.placeholder ?? 'Select'" [checkmark]="inputConfig?.checkmark ?? false"
             [showClear]="inputConfig?.showClear ?? false" [editable]="inputConfig?.editable ?? false"
@@ -231,7 +231,7 @@
 
 
 <!-- <div *ngSwitchCase="'select'" class="w-full">
-       <p-select appendTo="body"  [inputId]="params.colDef?.field + '-' + params.node.rowIndex" [(ngModel)]="value" [options]="options"
+       <p-select  appendTo="body" appendTo="body"  [inputId]="params.colDef?.field + '-' + params.node.rowIndex" [(ngModel)]="value" [options]="options"
             [optionLabel]="inputConfig?.optionLabel || null" [optionValue]="inputConfig?.optionValue || null"
             [placeholder]="inputConfig?.placeholder || 'Select'" [checkmark]="inputConfig?.checkmark || false"
             [showClear]="inputConfig?.showClear || false" [editable]="inputConfig?.editable || false"

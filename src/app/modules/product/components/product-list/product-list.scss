@@ -1,0 +1,8 @@
+/* This component uses the global theme styles */
+/* from base.scss and theme.scss */
+
+/* We only add component-specific styles if needed */
+:host {
+  display: block;
+  height: 100%;
+}

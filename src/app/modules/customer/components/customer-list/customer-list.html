@@ -3,7 +3,7 @@
     <div class="se-filter-bar">
       <div class="se-filter-field">
         <label>Customer</label>
-        <p-select id="customer" [options]="this.masterList.customers()" [(ngModel)]="customerFilter._id" [filter]="true" (onChange)="applyFilters()" 
+        <p-select  appendTo="body" id="customer" [options]="this.masterList.customers()" [(ngModel)]="customerFilter._id" [filter]="true" (onChange)="applyFilters()" 
           filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select a Customer"
           appendTo="body" styleClass="w-full md:w-60"> </p-select>
       </div>

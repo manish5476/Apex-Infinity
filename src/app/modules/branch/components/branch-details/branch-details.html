@@ -1,0 +1,109 @@
+<div class="p-6">
+  <div class="glass-card customer-details-card" *ngIf="branch(); else noBranch">
+    
+    <!-- === HEADER === -->
+    <div class="details-header">
+      <div class="flex items-center gap-4">
+        <p-button 
+          icon="pi pi-arrow-left" 
+          styleClass="p-button-text p-button-rounded"
+          routerLink="/branches">
+        </p-button>
+        <h2 class="form-title">{{ branch()?.name }}</h2>
+        <p-tag 
+          *ngIf="branch()?.isMainBranch"
+          value="Main Branch" 
+          severity="info">
+        </p-tag>
+        <p-tag 
+          [value]="branch()?.isActive ? 'Active' : 'Inactive'" 
+          [severity]="branch()?.isActive ? 'success' : 'danger'">
+        </p-tag>
+      </div>
+      <div class="header-actions">
+        <p-button 
+          label="Edit Branch" 
+          icon="pi pi-pencil" 
+          styleClass="p-button-outlined"
+          [routerLink]="['/branches', branch()?._id, 'edit']">
+        </p-button>
+      </div>
+    </div>
+
+    <p-divider></p-divider>
+
+    <!-- === BODY === -->
+    <div class="details-body">
+
+      <!-- Left Column: Info -->
+      <div class="profile-sidebar">
+        <p-avatar 
+          icon="pi pi-building" 
+          styleClass="profile-avatar"
+          shape="circle">
+        </p-avatar>
+
+        <h3 class="profile-name">{{ branch()?.name }}</h3>
+        <span class="profile-type">{{ branch()?.branchCode || 'No Code' }}</span>
+        
+        <p-divider></p-divider>
+
+        <div class="profile-contact">
+          <div class="detail-field">
+            <label>Manager</label>
+            <span>{{ managerName() }}</span>
+          </div>
+          <div class="detail-field">
+            <label>Phone</label>
+            <span>{{ branch()?.phoneNumber || 'N/A' }}</span>
+          </div>
+          <div class="detail-field">
+            <label>Created On</label>
+            <span>{{ formatDate(branch()?.createdAt) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Address -->
+      <div class="main-details">
+        <section class="detail-section">
+          <h4 class="section-title">Address</h4>
+          <div class="address-card">
+            <div class="detail-field">
+              <label>Full Address</label>
+              <span class="full-address">{{ formatAddress(branch()?.address) }}</span>
+            </div>
+            
+            <div class="address-grid-half">
+              <div class="detail-field">
+                <label>City</label>
+                <span>{{ branch()?.address?.city || 'N/A' }}</span>
+              </div>
+              <div class="detail-field">
+                <label>State</label>
+                <span>{{ branch()?.address?.state || 'N/A' }}</span>
+              </div>
+              <div class="detail-field">
+                <label>Zip Code</label>
+                <span>{{ branch()?.address?.zipCode || 'N/A' }}</span>
+              </div>
+              <div class="detail-field">
+                <label>Country</label>
+                <span>{{ branch()?.address?.country || 'N/A' }}</span>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <!-- You can add more sections here if needed, e.g., for location (lat/lng) -->
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<ng-template #noBranch>
+  <div class="flex items-center justify-center p-8">
+    <h3>Loading branch details...</h3>
+  </div>
+</ng-template>

@@ -25,7 +25,7 @@
       (ngModelChange)="onAction('textChanged', $event)" class="p-inputtext-sm w-full" />
 
     <!-- Case for PrimeNG Dropdown -->
-   <p-select appendTo="body"  *ngSwitchCase="'dropdown'" [options]="params.options || []" [(ngModel)]="cellValue"
+   <p-select  appendTo="body" appendTo="body"  *ngSwitchCase="'dropdown'" [options]="params.options || []" [(ngModel)]="cellValue"
       (ngModelChange)="onAction('dropdownChanged', $event)" [optionLabel]="params['optionLabel'] || 'label'"
       [optionValue]="params['optionValue'] || 'value'" styleClass="w-full" appendTo="body"></p-select>
 
