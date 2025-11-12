@@ -62,7 +62,7 @@ export class Login implements OnInit {
     return this.loginForm.controls;
   }
 
-  onSubmit(): void {
+   onSubmit(): void {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       this.messageService.showWarn('Invalid Form', 'Please enter a valid email and password.');
@@ -70,8 +70,8 @@ export class Login implements OnInit {
     }
     this.isLoading.set(true);
     this.authService.login(this.loginForm.value).subscribe({
-      next: (response) => {
-        console.log(response);
+      next: (response:any) => {
+        this.authService.handleLoginSuccess(response)
         const currentUser = this.authService.getCurrentUser();
         if (currentUser) {
           this.notificationService.connect(currentUser._id);
@@ -83,11 +83,8 @@ export class Login implements OnInit {
         this.isLoading.set(false);
       }
     });
-    
-      // 🔹 Fetch global master list right after login
-  inject(MasterListService).load();
-
-
+      inject(MasterListService).load();
   }
+
 
 }
