@@ -1,5 +1,116 @@
 <p-toast></p-toast>
 
+<div class="customer-page">
+  <div class="customer-side-form">
+    <form [formGroup]="customerForm" (ngSubmit)="onSubmit()" class="customer-form">
+      <header class="form-header">
+        <h1>Customer Details</h1>
+        <p>Fill in customer details below.</p>
+      </header>
+
+      <div class="form-body">
+        <div class="form-row">
+          <div class="form-field">
+            <label>Customer Type</label>
+            <p-select appendTo="body" [options]="customerTypes" formControlName="type" optionLabel="label"
+              optionValue="value"></p-select>
+          </div>
+          <div class="form-field">
+            <label>Customer Name <span class="req">*</span></label>
+            <input pInputText formControlName="name" placeholder="Full name or business name" />
+          </div>
+          <div class="form-field">
+            <label>Email</label>
+            <input pInputText type="email" formControlName="email" placeholder="you@domain.com" />
+          </div>
+          <div class="form-field">
+            <label>Phone <span class="req">*</span></label>
+            <input pInputText formControlName="phone" placeholder="+91 9876543210" />
+          </div>
+          <div class="form-field">
+            <label>Alt Phone</label>
+            <input pInputText formControlName="altPhone" placeholder="+91 9876500000" />
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Financial Info</h3>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Opening Balance</label>
+              <p-inputNumber formControlName="openingBalance" mode="decimal" [minFractionDigits]="2"></p-inputNumber>
+            </div>
+            <div class="form-field">
+              <label>Credit Limit</label>
+              <p-inputNumber formControlName="creditLimit" mode="decimal" [minFractionDigits]="2"></p-inputNumber>
+            </div>
+            <div class="form-field">
+              <label>Payment Terms</label>
+              <input pInputText formControlName="paymentTerms" placeholder="e.g., 30 Days" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Billing Address</h3>
+          <div formGroupName="billingAddress" class="form-row">
+            <div class="form-field col-2">
+              <label>Street</label>
+              <input pInputText formControlName="street" placeholder="123 Main Street" />
+            </div>
+            <div class="form-field"><label>City</label><input pInputText formControlName="city" /></div>
+            <div class="form-field"><label>State</label><input pInputText formControlName="state" /></div>
+            <div class="form-field"><label>Zip</label><input pInputText formControlName="zipCode" /></div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Shipping Address</h3>
+          <div class="form-row align-items-center">
+            <p-checkbox (onChange)="copyBillingAddress($event)" [binary]="true"></p-checkbox>
+            <label>Same as Billing Address</label>
+          </div>
+          <div formGroupName="shippingAddress" class="form-row">
+            <div class="form-field col-2">
+              <label>Street</label>
+              <input pInputText formControlName="street" placeholder="123 Main Street" />
+            </div>
+            <div class="form-field"><label>City</label><input pInputText formControlName="city" /></div>
+            <div class="form-field"><label>State</label><input pInputText formControlName="state" /></div>
+            <div class="form-field"><label>Zip</label><input pInputText formControlName="zipCode" /></div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Other Info</h3>
+          <div class="form-row">
+            <div class="form-field"><label>GST Number</label><input pInputText formControlName="gstNumber" /></div>
+            <div class="form-field"><label>PAN Number</label><input pInputText formControlName="panNumber" /></div>
+          </div>
+          <div class="form-field">
+            <label>Tags</label>
+            <input pInputText formControlName="tags" placeholder="VIP, Regular, Bulk Buyer" />
+          </div>
+          <div class="form-field">
+            <label>Notes</label>
+            <textarea pInputTextarea formControlName="notes" rows="2"></textarea>
+          </div>
+          <div class="form-row align-items-center">
+            <p-checkbox formControlName="isActive" [binary]="true"></p-checkbox>
+            <label>Active</label>
+          </div>
+        </div>
+      </div>
+
+      <footer class="form-footer-fixed">
+        <p-button label="Create Customer" icon="pi pi-check" type="submit" [loading]="isSubmitting()"
+          styleClass="w-full justify-center"></p-button>
+      </footer>
+    </form>
+  </div>
+</div>
+<!-- <p-toast></p-toast>
+
 <div class="customer-wrapper">
   <section class="customer-container">
     
@@ -157,4 +268,4 @@
       </form>
     </div>
   </section>
-</div>
+</div> -->

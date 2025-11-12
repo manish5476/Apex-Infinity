@@ -1,37 +1,50 @@
-<div class="flex flex-col h-full p-6 gap-6 bg-[var(--theme-bg-secondary)]">
-  <div class="glass-card p-2 rounded-lg shadow-md">
+<div class="flex flex-col h-full p-5 gap-5 bg-[var(--theme-bg-secondary)]">
+  <!-- ===========================
+       FILTER BAR SECTION
+  ============================ -->
+  <div class="card filter-section">
     <div class="se-filter-bar">
+      <!-- Customer -->
       <div class="se-filter-field">
         <label>Customer</label>
-        <p-select  appendTo="body" id="customer" [options]="this.masterList.customers()" [(ngModel)]="customerFilter._id" [filter]="true" (onChange)="applyFilters()" 
-          filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select a Customer"
-          appendTo="body" styleClass="w-full md:w-60"> </p-select>
+        <p-select id="customer" [options]="masterList.customers()" [(ngModel)]="customerFilter._id" [filter]="true"
+          filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select Customer"
+          appendTo="body" styleClass="w-full md:w-56">
+        </p-select>
       </div>
 
+      <!-- Email -->
       <div class="se-filter-field">
         <label>Email</label>
-        <p-autoComplete id="email" [(ngModel)]="customerFilter.email" [suggestions]="emailSuggestions" (keyup.enter)="applyFilters()" 
-          (completeMethod)="filterEmails($event)" [forceSelection]="false" placeholder="Enter email" [minLength]="1"
-          styleClass="w-full md:w-60"> </p-autoComplete>
+        <p-autoComplete id="email" [(ngModel)]="customerFilter.email" [suggestions]="emailSuggestions"
+          (completeMethod)="filterEmails($event)" (keyup.enter)="applyFilters()" [forceSelection]="false"
+          placeholder="Enter email" styleClass="w-full md:w-56">
+        </p-autoComplete>
       </div>
 
+      <!-- Phone -->
       <div class="se-filter-field">
         <label>Phone</label>
-        <input id="phone" type="text" pInputText [(ngModel)]="customerFilter.phone" placeholder="Phone" (keyup.enter)="applyFilters()" 
-          class="w-full md:w-40" />
+        <input id="phone" type="text" pInputText [(ngModel)]="customerFilter.phone" placeholder="Phone"
+          (keyup.enter)="applyFilters()" class="w-full md:w-40" />
       </div>
 
-      <div class="flex gap-2 items-center mt-1">
-        <p-button label="Apply" icon="pi pi-check" severity="success" (onClick)="applyFilters()" class="h-11 px-4">
+      <!-- Buttons -->
+      <div class="filter-actions">
+        <p-button label="Apply" icon="pi pi-check" severity="success" (onClick)="applyFilters()" class="action-btn">
         </p-button>
+
         <p-button label="Reset" icon="pi pi-refresh" severity="secondary" styleClass="p-button-outlined"
-          (onClick)="resetFilters()" class="h-11 px-4">
+          (onClick)="resetFilters()" class="action-btn">
         </p-button>
       </div>
     </div>
   </div>
 
-  <div class="flex-grow glass-card p-4 rounded-lg shadow-md min-h-0">
+  <!-- ===========================
+       GRID SECTION
+  ============================ -->
+  <div class="flex-grow card grid-section min-h-0">
     <app-shared-grid [data]="data" [gridHeight]="'210px'" [headerFilter]="false" [rowSelectionMode]="rowSelectionMode"
       [GridName]="'Customer Details'" [column]="column" (eventFromGrid)="eventFromGrid($event)"
       (gridReady)="onGridReady($event)" (scrolledToBottom)="onScrolledToBottom($event)">

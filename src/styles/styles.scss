@@ -2,6 +2,9 @@
 
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
 @import "primeicons/primeicons.css";
+:root {
+  font-size: clamp(13px, 0.6vw + 0.35rem, 15px);
+}
 
 // @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
 // @import "primeicons/primeicons.css";

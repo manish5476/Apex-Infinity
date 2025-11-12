@@ -1,17 +1,162 @@
+<div class="customer-page-container">
+  <!-- === Customer Data === -->
+  <div class="customer-details-card" *ngIf="customer(); else loadingSkeleton">
+    <!-- === HEADER === -->
+    <header class="details-header">
+      <div class="header-left">
+        <p-button
+          icon="pi pi-arrow-left"
+          styleClass="p-button-text p-button-rounded"
+          routerLink="/customer">
+        </p-button>
+
+        <div class="header-info">
+          <h2 class="form-title">{{ customer()?.name }}</h2>
+          <p-tag
+            [value]="customer()?.isActive ? 'Active' : 'Inactive'"
+            [severity]="customer()?.isActive ? 'success' : 'danger'">
+          </p-tag>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <p-button label="Edit" icon="pi pi-pencil" styleClass="p-button-outlined"></p-button>
+        <p-button label="More" icon="pi pi-ellipsis-v" styleClass="p-button-text"></p-button>
+      </div>
+    </header>
+
+    <p-divider></p-divider>
+
+    <!-- === BODY === -->
+    <div class="details-body">
+      <!-- Sidebar -->
+      <aside class="profile-sidebar">
+        <p-avatar
+          [image]="customer()?.avatar"
+          [label]="getInitials(customer()?.name || '')"
+          styleClass="profile-avatar"
+          shape="circle">
+        </p-avatar>
+
+        <h3 class="profile-name">{{ customer()?.name }}</h3>
+        <span class="profile-type">{{ customer()?.type | titlecase }}</span>
+
+        <p-divider></p-divider>
+
+        <div class="profile-contact">
+          <div
+            class="contact-card"
+            *ngFor="let field of [
+              { icon: 'pi-user', label: 'Contact Person', value: customer()?.contactPerson },
+              { icon: 'pi-envelope', label: 'Email', value: customer()?.email },
+              { icon: 'pi-phone', label: 'Phone', value: customer()?.phone },
+              { icon: 'pi-mobile', label: 'Alt. Phone', value: customer()?.altPhone },
+              { icon: 'pi-calendar', label: 'Member Since', value: formatDate(customer()?.createdAt) }
+            ]">
+            <i class="pi {{ field.icon }} contact-icon"></i>
+            <div class="contact-content">
+              <label>{{ field.label }}</label>
+              <span>{{ field.value || 'N/A' }}</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Details -->
+      <section class="main-details">
+        <!-- === FINANCIAL OVERVIEW === -->
+        <div class="info-section">
+          <h4 class="section-title">Financial Overview</h4>
+          <div class="info-grid">
+            <div class="info-card" *ngFor="let item of [
+              { label: 'Outstanding', value: formatCurrency(customer()?.outstandingBalance), highlight: true },
+              { label: 'Credit Limit', value: formatCurrency(customer()?.creditLimit) },
+              { label: 'Opening Balance', value: formatCurrency(customer()?.openingBalance) }
+            ]">
+              <label>{{ item.label }}</label>
+              <span [class.outstanding]="item.highlight">{{ item.value }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- === ADDRESS DETAILS === -->
+        <div class="info-section">
+          <h4 class="section-title">Address Information</h4>
+          <div class="address-grid">
+            <div class="info-card address" *ngFor="let addr of [
+              { title: 'Billing Address', data: customer()?.billingAddress },
+              { title: 'Shipping Address', data: customer()?.shippingAddress }
+            ]">
+              <h5>{{ addr.title }}</h5>
+              <div *ngFor="let key of ['street', 'city', 'state', 'zipCode']" class="address-item">
+                <label>{{ key | titlecase }}</label>
+                <span>{{ addr.data?.[key] || 'N/A' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- === OTHER DETAILS === -->
+        <div class="info-section">
+          <h4 class="section-title">Other Details</h4>
+          <div class="info-grid">
+            <div class="info-card" *ngFor="let f of [
+              { label: 'GST Number', value: customer()?.gstNumber },
+              { label: 'PAN Number', value: customer()?.panNumber },
+              { label: 'Payment Terms', value: customer()?.paymentTerms }
+            ]">
+              <label>{{ f.label }}</label>
+              <span>{{ f.value || 'N/A' }}</span>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <label>Tags</label>
+            <div class="tags-container" *ngIf="getFilteredTags() as filteredTags">
+              <p-tag *ngFor="let tag of filteredTags" [value]="tag"></p-tag>
+            </div>
+          </div>
+
+          <div class="info-card notes">
+            <label>Notes</label>
+            <p>{{ customer()?.notes || 'No notes provided.' }}</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- === FOOTER === -->
+    <!-- <footer class="details-footer">
+      <div class="footer-actions">
+        <p-button label="Back to List" icon="pi pi-arrow-left" styleClass="p-button-text"></p-button>
+        <p-button label="Edit Customer" icon="pi pi-pencil" styleClass="p-button-primary"></p-button>
+      </div>
+    </footer> -->
+  </div>
+
+  <!-- === SKELETON LOADER === -->
+  <ng-template #loadingSkeleton>
+    <div class="skeleton-wrapper">
+      <p-skeleton height="2rem" width="50%" styleClass="mb-3"></p-skeleton>
+      <p-skeleton height="15rem" width="100%" styleClass="mb-2"></p-skeleton>
+      <p-skeleton height="15rem" width="100%" styleClass="mb-2"></p-skeleton>
+      <p-skeleton height="15rem" width="100%"></p-skeleton>
+    </div>
+  </ng-template>
+</div>
+
+
 <!-- 
-  This outer div uses the 'glass-card' style from your base.scss
-  to create the main content container.
--->
-<div class="p-6"> <!-- Added a class to the outer div -->
+<div class="p-6"> 
   <div class="glass-card customer-details-card" *ngIf="customer(); else noCustomer">
     
-    <!-- === HEADER === -->
+    
     <div class="details-header">
       <div class="flex items-center gap-4">
         <p-button 
           icon="pi pi-arrow-left" 
           styleClass="p-button-text p-button-rounded"
-          routerLink="/customer"> <!-- Path as per your lazy-loaded routes -->
+          routerLink="/customer"> 
         </p-button>
         <h2 class="form-title">{{ customer()?.name }}</h2>
         <p-tag 
@@ -20,7 +165,7 @@
         </p-tag>
       </div>
       <div class="header-actions">
-        <!-- Add routerLink to your edit page, e.g., [routerLink]="['/customer', customer()?._id, 'edit']" -->
+        
         <p-button label="Edit Customer" icon="pi pi-pencil" styleClass="p-button-outlined"></p-button>
         <p-button label="More Actions" icon="pi pi-ellipsis-v" styleClass="p-button-text"></p-button>
       </div>
@@ -28,10 +173,10 @@
 
     <p-divider></p-divider>
 
-    <!-- === BODY === -->
+    
     <div class="details-body">
 
-      <!-- Left Column: Profile -->
+      
       <div class="profile-sidebar">
         <p-avatar 
           [image]="customer()?.avatar" 
@@ -48,7 +193,7 @@
         <div class="profile-contact">
           <div class="detail-field">
             <label>Contact Person</label>
-            <!-- FIX: Added explicit check for empty string -->
+            
             <span>{{ customer()?.contactPerson ? customer()?.contactPerson : 'N/A' }}</span>
           </div>
           <div class="detail-field">
@@ -63,7 +208,7 @@
             <label>Alt. Phone</label>
             <span>{{ customer()?.altPhone ? customer()?.altPhone : 'N/A' }}</span>
           </div>
-          <!-- NEW: Added user-friendly created date -->
+          
           <div class="detail-field">
             <label>Member Since</label>
             <span>{{ formatDate(customer()?.createdAt) }}</span>
@@ -71,10 +216,10 @@
         </div>
       </div>
 
-      <!-- Right Column: Details -->
+      
       <div class="main-details">
         
-        <!-- Financial Details -->
+        
         <section class="detail-section">
           <h4 class="section-title">Financial Overview</h4>
           <div class="financial-grid">
@@ -95,12 +240,12 @@
 
         <p-divider></p-divider>
 
-        <!-- Address Details -->
+        
         <section class="detail-section">
           <h4 class="section-title">Address Information</h4>
           <div class="address-grid">
             
-            <!-- Billing Address -->
+            
             <div class="address-card">
               <h5>Billing Address</h5>
               <div class="detail-field">
@@ -121,7 +266,7 @@
               </div>
             </div>
             
-            <!-- Shipping Address -->
+            
             <div class="address-card">
               <h5>Shipping Address</h5>
               <div class="detail-field">
@@ -147,7 +292,7 @@
         
         <p-divider></p-divider>
 
-        <!-- Other Details -->
+        
         <section class="detail-section">
           <h4 class="section-title">Other Details</h4>
           <div class="other-details-grid">
@@ -165,7 +310,7 @@
             </div>
             <div class="detail-field">
               <label>Tags</label>
-              <!-- FIX: Use the new helper function to show filtered tags -->
+              
               <div class="tags-container" *ngIf="getFilteredTags() as filteredTags; else noTags">
                 <ng-container *ngIf="filteredTags.length > 0; else noTags">
                   <p-tag *ngFor="let tag of filteredTags" [value]="tag"></p-tag>
@@ -186,11 +331,11 @@
   </div>
 </div>
 
-<!-- Loading / Error State -->
+
 <ng-template #noCustomer>
-  <!-- Use a class that exists, not 'class_alias' -->
+  
   <div class="flex items-center justify-center p-8">
     <h3 *ngIf="!customer()">Loading customer details...</h3>
-    <!-- You can add a more robust error message here -->
+    
   </div>
-</ng-template>
+</ng-template> -->

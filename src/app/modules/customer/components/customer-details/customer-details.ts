@@ -13,11 +13,12 @@ import { Select } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { Message } from '../../../../core/services/message';
+import { Skeleton } from 'primeng/skeleton';
 
 @Component({
   selector: 'app-customer-details',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, ButtonModule, DividerModule, AvatarModule, TagModule],
+  imports: [CommonModule,Skeleton, FormsModule, RouterModule, ButtonModule, DividerModule, AvatarModule, TagModule],
   providers: [CustomerService], // Already provided in list, but good for standalone
   templateUrl: './customer-details.html',
   styleUrl: './customer-details.scss',

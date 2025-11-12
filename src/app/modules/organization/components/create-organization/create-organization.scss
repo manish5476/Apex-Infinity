@@ -1,247 +1,326 @@
-/* ===============================
-   PAGE LAYOUT BASE
-=============================== */
-.org-page {
+.create-org-container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  background: var(--theme-body-gradient);
+  height: 100%;
+  width: 100%;
+  padding: 1.5rem 4%;
+  background: var(--theme-bg-primary);
   color: var(--theme-text-primary);
   overflow: hidden;
 }
 
-/* ===============================
-   HEADER
-=============================== */
-.org-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(
-    135deg,
-    var(--theme-bg-primary) 0%,
-    var(--theme-bg-secondary) 100%
-  );
-  backdrop-filter: blur(10px) saturate(180%);
-  -webkit-backdrop-filter: blur(10px) saturate(180%);
-  border-bottom: 1px solid var(--theme-border-secondary);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  z-index: 50;
-}
-
-.org-header-inner {
-  max-width: 1600px;
-  margin: 0 auto;
-  padding: 1rem 3%;
-}
-
-.org-header h1 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  background: var(--theme-accent-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin: 0;
-  font-family: var(--font-heading);
-}
-
-.org-header p {
-  font-size: 0.95rem;
-  color: var(--theme-text-secondary);
-  margin-top: 0.25rem;
-}
-
-/* ===============================
-   BODY & FORM WRAPPER
-=============================== */
-/* ===============================
-   BODY & FORM WRAPPER
-=============================== */
-.org-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: calc(90px + 1rem) 1.5% 120px; /* reduced horizontal padding for more usable width */
-  display: flex;
-  justify-content: center;
-}
-
-/* === GLASS FORM CARD === */
-.glass-form-card {
-  width: 100%;
-  margin-top: 2%;
-  margin-bottom: 2%;
-  max-width: 90%; /* increased width slightly for a fuller page */
-  background: var(--glass-bg, rgba(255, 255, 255, 0.15));
-  border: 1px solid var(--glass-border-color, rgba(255, 255, 255, 0.2));
-  backdrop-filter: blur(var(--glass-blur-intensity, 12px)) saturate(180%);
-  -webkit-backdrop-filter: blur(var(--glass-blur-intensity, 12px)) saturate(180%);
-  box-shadow: var(--glass-shadow, 0 8px 32px rgba(31, 38, 135, 0.37));
-  border-radius: var(--glass-border-radius, 1rem);
-  padding: 1.75rem 2rem; /* slightly more horizontal padding inside for comfort */
-  transition: all 0.3s ease;
-}
-
-/* Hover lift for depth */
-.glass-form-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-}
-
-/* Responsive tuning */
-@media (max-width: 1024px) {
-  .org-body {
-    padding: calc(80px + 1rem) 2% 110px;
+/* Header */
+.create-org-header {
+  margin-bottom: 1rem;
+  h1 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    background: var(--theme-accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.25rem;
   }
-  .glass-form-card {
-    max-width: 100%;
-    padding: 2rem;
+
+  p {
+    font-size: 0.8rem;
+    color: var(--theme-text-secondary);
   }
 }
 
-@media (max-width: 640px) {
-  .org-body {
-    padding: calc(70px + 1rem) 1rem 100px;
-  }
-  .glass-form-card {
-    padding: 1.25rem;
-  }
-}
-
-
-/* Slight hover effect to enhance depth */
-.glass-form-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-}
-
-/* Responsive padding adjustments */
-@media (max-width: 1024px) {
-  .glass-form-card {
-    padding: 2rem;
-  }
-}
-
-@media (max-width: 640px) {
-  .glass-form-card {
-    padding: 1.25rem;
-  }
-}
-
-/* ===============================
-   FORM ELEMENTS (same style as before)
-=============================== */
+/* Form layout */
 .org-form {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.2rem;
+  width: 100%;
 }
 
+/* Section box styling */
 .form-section {
-  border-bottom: 1px solid var(--theme-border-secondary);
-  padding-bottom: 1.5rem;
-}
-
-.form-section:last-of-type {
-  border-bottom: none;
-}
-
-.form-section h2 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--theme-text-primary);
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border-primary);
   border-left: 4px solid var(--theme-accent-primary);
-  padding-left: 0.75rem;
-  margin-bottom: 1rem;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+  }
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--theme-text-primary);
+    margin-bottom: 1rem;
+  }
 }
 
+/* Compact grid */
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem 1.5rem;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
+
+  label {
+    font-size: 0.75rem;
+    color: var(--theme-text-secondary);
+    margin-bottom: 0.2rem;
+  }
+
+  input {
+    border: 1px solid var(--theme-border-primary);
+    border-radius: 6px;
+    padding: 0.45rem 0.6rem;
+    font-size: 0.8rem;
+    background: var(--theme-bg-input);
+    color: var(--theme-text-primary);
+    transition: all 0.2s ease;
+
+    &:focus {
+      border-color: var(--theme-accent-primary);
+      box-shadow: 0 0 0 2px var(--theme-accent-focus-ring);
+      outline: none;
+    }
+  }
 }
 
-.form-group label {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--theme-text-secondary);
-  margin-bottom: 0.25rem;
-}
-
-.form-group input {
-  border: 1px solid var(--theme-border-primary);
-  border-radius: 10px;
-  padding: 0.55rem 0.75rem;
-  font-size: 0.85rem;
-  background: var(--theme-bg-primary);
-  color: var(--theme-text-primary);
-  transition: all 0.2s ease;
-}
-
-.form-group input:focus {
-  border-color: var(--theme-accent-primary);
-  box-shadow: 0 0 0 2px var(--theme-accent-focus-ring);
-  outline: none;
-}
-
-/* ===============================
-   FOOTER (FIXED)
-=============================== */
-.org-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: transparent;
+/* Actions */
+.form-actions {
   display: flex;
-  justify-content: center;
   align-items: center;
-  height: 90px;
-  z-index: 100;
+  justify-content: space-between;
+  padding-top: 1rem;
+  border-top: 1px solid var(--theme-border-secondary);
 }
 
-/* Floating circular action button */
-.floating-btn {
+.submit-btn {
   background: var(--theme-accent-gradient);
   border: none;
   color: var(--theme-accent-text-color);
   font-weight: 600;
-  font-size: 1rem;
-  border-radius: 9999px;
-  padding: 1rem 2.5rem;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  font-size: 0.85rem;
+  border-radius: 20px;
+  padding: 0.6rem 1.5rem;
   transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
 }
 
-.floating-btn:hover {
-  transform: translateY(-3px) scale(1.03);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+.form-links {
+  display: flex;
+  gap: 0.75rem;
+
+  .link-btn {
+    background: transparent;
+    border: 1px solid var(--theme-border-secondary);
+    color: var(--theme-text-secondary);
+    font-size: 0.75rem;
+    border-radius: 20px;
+    padding: 0.4rem 1rem;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: var(--theme-accent-primary);
+      border-color: var(--theme-accent-primary);
+    }
+  }
 }
 
-.floating-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
+/* Responsive */
+@media (max-width: 768px) {
+  .create-org-container {
+    padding: 1rem 3%;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .submit-btn {
+    width: 100%;
+  }
+
+  .form-links {
+    justify-content: center;
+  }
 }
 
-/* ===============================
-   COMMON GLASS CARD CLASS (for reuse)
-=============================== */
-.glass-card {
-  background: var(--glass-bg, rgba(255, 255, 255, 0.15));
-  border: 1px solid var(--glass-border-color, rgba(255, 255, 255, 0.2));
-  backdrop-filter: blur(var(--glass-blur-intensity, 12px)) saturate(180%);
-  -webkit-backdrop-filter: blur(var(--glass-blur-intensity, 12px)) saturate(180%);
-  border-radius: var(--glass-border-radius, 1rem);
-  box-shadow: var(--glass-shadow, 0 8px 32px rgba(31, 38, 135, 0.37));
-  transition: all 0.25s ease;
-}
+// .create-org-container {
+//   display: flex;
+//   flex-direction: column;
+//   height: 100%;
+//   width: 100%;
+//   padding: 1rem 5%;
+//   background: var(--theme-bg-primary);
+//   color: var(--theme-text-primary);
+//   overflow: hidden;
+// }
 
-.glass-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
-}
+// /* Header */
+// .create-org-header {
+//   margin-bottom: 1rem;
+//   h1 {
+//     font-size: 1.4rem;
+//     font-weight: 600;
+//     background: var(--theme-accent-gradient);
+//     -webkit-background-clip: text;
+//     -webkit-text-fill-color: transparent;
+//     margin-bottom: 0.25rem;
+//   }
+
+//   p {
+//     font-size: 0.8rem;
+//     color: var(--theme-text-secondary);
+//   }
+// }
+
+// /* Form wrapper */
+// .create-org-body {
+//   flex: 1;
+//   overflow-y: auto;
+//   padding: 1rem 0;
+//   display: flex;
+//   flex-direction: column;
+// }
+
+// .org-form {
+//   display: flex;
+//   flex-direction: column;
+//   gap: 1.5rem;
+//   width: 100%;
+// }
+
+// /* Compact form sections */
+// .form-section {
+//   border-bottom: 1px solid var(--theme-border-secondary);
+//   padding-bottom: 1rem;
+
+//   h2 {
+//     font-size: 1rem;
+//     font-weight: 600;
+//     color: var(--theme-text-primary);
+//     border-left: 3px solid var(--theme-accent-primary);
+//     padding-left: 0.5rem;
+//     margin-bottom: 0.75rem;
+//   }
+
+//   &:last-of-type {
+//     border-bottom: none;
+//   }
+// }
+
+// /* Wide grid layout */
+// .form-grid {
+//   display: grid;
+//   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+//   gap: 1rem 1.5rem;
+// }
+
+// .form-group {
+//   display: flex;
+//   flex-direction: column;
+
+//   label {
+//     font-size: 0.75rem;
+//     color: var(--theme-text-secondary);
+//     margin-bottom: 0.2rem;
+//   }
+
+//   input {
+//     border: 1px solid var(--theme-border-primary);
+//     border-radius: 6px;
+//     padding: 0.45rem 0.6rem;
+//     font-size: 0.8rem;
+//     background: var(--theme-bg-secondary);
+//     color: var(--theme-text-primary);
+//     transition: all 0.2s ease;
+
+//     &:focus {
+//       border-color: var(--theme-accent-primary);
+//       box-shadow: 0 0 0 2px var(--theme-accent-focus-ring);
+//       outline: none;
+//     }
+//   }
+// }
+
+// /* Actions */
+// .form-actions {
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-between;
+//   padding-top: 1rem;
+//   border-top: 1px solid var(--theme-border-secondary);
+// }
+
+// .submit-btn {
+//   background: var(--theme-accent-gradient);
+//   border: none;
+//   color: var(--theme-accent-text-color);
+//   font-weight: 600;
+//   font-size: 0.85rem;
+//   border-radius: 20px;
+//   padding: 0.6rem 1.5rem;
+//   transition: all 0.3s ease;
+
+//   &:hover {
+//     transform: translateY(-2px);
+//     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+//   }
+// }
+
+// .form-links {
+//   display: flex;
+//   gap: 0.75rem;
+
+//   .link-btn {
+//     background: transparent;
+//     border: 1px solid var(--theme-border-secondary);
+//     color: var(--theme-text-secondary);
+//     font-size: 0.75rem;
+//     border-radius: 20px;
+//     padding: 0.4rem 1rem;
+//     transition: all 0.2s ease;
+
+//     &:hover {
+//       color: var(--theme-accent-primary);
+//       border-color: var(--theme-accent-primary);
+//     }
+//   }
+// }
+
+// /* Compact responsive */
+// @media (max-width: 768px) {
+//   .create-org-container {
+//     padding: 1rem 3%;
+//   }
+
+//   .form-actions {
+//     flex-direction: column;
+//     align-items: stretch;
+//     gap: 0.75rem;
+//   }
+
+//   .submit-btn {
+//     width: 100%;
+//   }
+
+//   .form-links {
+//     justify-content: center;
+//   }
+// }
