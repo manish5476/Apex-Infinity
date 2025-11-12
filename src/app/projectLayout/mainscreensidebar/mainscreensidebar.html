@@ -1,4 +1,89 @@
 <div
+  class="sidebar-container"
+  [ngClass]="{
+    'collapsed': !isPinned && !isHovered,
+    'expanded': isPinned || isHovered
+  }"
+  (mouseenter)="mouseEnter.emit()"
+  (mouseleave)="mouseLeave.emit()"
+>
+  <div class="sidebar-inner">
+    <div class="menu-list">
+      <div *ngFor="let item of menuItems; let i = index" class="menu-item">
+        <div class="menu-title" (click)="toggleMenuItem(i)">
+          <i [class]="item.icon + ' menu-icon'"></i>
+          <span
+            class="menu-label"
+            [ngClass]="{
+              'hidden-text': !isPinned && !isHovered,
+              'visible-text': isPinned || isHovered
+            }"
+            >{{ item.label }}</span
+          >
+          <i
+            *ngIf="item.items"
+            class="pi pi-angle-down menu-arrow"
+            [ngClass]="{
+              'rotate-180': expandedItems[i],
+              'rotate-0': !expandedItems[i]
+            }"
+            [style.opacity]="(isPinned || isHovered) ? 1 : 0"
+          ></i>
+        </div>
+
+        <!-- Submenu -->
+        <div
+          class="submenu"
+          [ngClass]="{
+            'submenu-collapsed': !expandedItems[i],
+            'submenu-expanded': expandedItems[i]
+          }"
+          *ngIf="item.items"
+        >
+          <a
+            *ngFor="let subItem of item.items"
+            [routerLink]="subItem.routerLink"
+            routerLinkActive="active-link"
+            class="submenu-link"
+            [ngClass]="{
+              'hidden-text': !isPinned && !isHovered,
+              'visible-text': isPinned || isHovered
+            }"
+          >
+            <i [class]="subItem.icon + ' submenu-icon'"></i>
+            <span>{{ subItem.label }}</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div
+      class="sidebar-footer"
+      [ngClass]="{
+        'hidden-footer': !isPinned && !isHovered,
+        'visible-footer': isPinned || isHovered
+      }"
+    >
+      <button
+        pButton
+        (click)="logout()"
+        label="Logout"
+        icon="pi pi-sign-out"
+        class="logout-btn"
+      ></button>
+    </div>
+  </div>
+</div>
+
+<!-- Hover trigger area when sidebar is collapsed -->
+<div
+  class="hover-trigger"
+  (mouseenter)="mouseEnterTriggerZone.emit()"
+  *ngIf="!isPinned && !isHovered"
+></div>
+
+<!-- <div
   class="fixed bottom-2 inset-y-0 no-scrollbar overflow-auto top-2 left-3 rounded-sm z-30 transition-all duration-400 ease-in-out mt-14"
   [ngClass]="{
     'w-0 overflow-hidden': !isPinned && !isHovered,
@@ -40,4 +125,4 @@
   </div>
 </div>
 <div class="fixed inset-y-0 left-0 z-30 w-3 bg-transparent" (mouseenter)="mouseEnterTriggerZone.emit()"
-  *ngIf="!isPinned && !isHovered"></div>
+  *ngIf="!isPinned && !isHovered"></div> -->

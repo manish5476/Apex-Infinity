@@ -3,12 +3,11 @@
     <!-- === LEFT IMAGE SECTION === -->
     <div class="auth-banner">
       <img
-        src="https://plus.unsplash.com/premium_photo-1674761263657-98e18717f7d2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=735"
-        alt="Professional workspace background"
-      />
+        src="https://images.unsplash.com/photo-1627037558426-c2d07beda3af?q=80&w=1275&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        alt="Professional workspace background" />
       <div class="auth-overlay"></div>
       <div class="auth-banner-text">
-        <h2>Welcome to Apex Infinity</h2>
+        <h2>Welcome to <span>Apex Infinity</span></h2>
         <p>Empowering your organization’s innovation every day.</p>
       </div>
     </div>
@@ -20,12 +19,11 @@
           <i class="pi pi-bolt text-4xl text-[var(--theme-accent-primary)]"></i>
           <h1 class="auth-title">Welcome Back</h1>
           <p class="auth-subtitle">
-            Log in to your organization's dashboard.
+            Log in to your organization’s dashboard
           </p>
         </div>
 
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
-
           <!-- Email -->
           <div class="form-group">
             <label>Email <span class="req">*</span></label>
@@ -34,10 +32,9 @@
               id="email"
               type="email"
               formControlName="email"
-              placeholder="you@company.com"
-            />
+              placeholder="you@company.com" />
             @if (form['email'].invalid && form['email'].touched) {
-              <small class="text-red-500">Please enter a valid email.</small>
+            <small class="text-red-500">Please enter a valid email.</small>
             }
           </div>
 
@@ -55,8 +52,7 @@
               [toggleMask]="true"
               placeholder="••••••••"
               styleClass="w-full"
-              inputStyleClass="w-full"
-            ></p-password>
+              inputStyleClass="w-full"></p-password>
           </div>
 
           <!-- Remember me -->
@@ -75,19 +71,27 @@
               type="submit"
               [loading]="isLoading()"
               [disabled]="loginForm.invalid || isLoading()"
-              styleClass="w-full justify-center"
-            ></p-button>
+              styleClass="auth-btn-primary w-full justify-center">
+            </p-button>
 
             <p class="auth-footer-text">
               Don’t have an account?
               <a routerLink="/auth/signup" class="auth-link">Create one</a>
             </p>
+
+            <p-button
+              label="Organization Login"
+              icon="pi pi-building"
+              routerLink="/auth/org"
+              styleClass="auth-btn-outline w-full justify-center mt-3">
+            </p-button>
           </div>
         </form>
       </div>
     </div>
   </section>
 </div>
+
 
 <!-- <p-toast></p-toast>
 

@@ -1,7 +1,244 @@
 <p-toast></p-toast>
 
+<div class="create-org-container">
+  <header class="create-org-header">
+    <h1>Create Your Organization</h1>
+    <p>Fill in the details below to register your new organization.</p>
+  </header>
+
+  <main class="create-org-body">
+    <form [formGroup]="organizationForm" class="org-form">
+
+      <!-- Organization Details -->
+      <section class="form-section">
+        <h2><i class="pi pi-building mr-2"></i> Organization Details</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Organization Name <span class="req">*</span></label>
+            <input pInputText formControlName="organizationName" placeholder="Apex Innovations Inc." />
+          </div>
+
+          <div class="form-group">
+            <label>Unique Shop ID <span class="req">*</span></label>
+            <input pInputText formControlName="uniqueShopId" placeholder="APEX001" />
+          </div>
+
+          <div class="form-group">
+            <label>Primary Email <span class="req">*</span></label>
+            <input pInputText type="email" formControlName="primaryEmail" placeholder="contact@apex.com" />
+          </div>
+
+          <div class="form-group">
+            <label>Primary Phone <span class="req">*</span></label>
+            <input pInputText formControlName="primaryPhone" placeholder="+91 9876543210" />
+          </div>
+
+          <div class="form-group">
+            <label>GST Number</label>
+            <input pInputText formControlName="gstNumber" placeholder="22AAAAA0000A1Z5" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Owner Details -->
+      <section class="form-section">
+        <h2><i class="pi pi-user mr-2"></i> Owner (Super Admin) Details</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Owner Name <span class="req">*</span></label>
+            <input pInputText formControlName="ownerName" placeholder="Your full name" />
+          </div>
+
+          <div class="form-group">
+            <label>Owner Email <span class="req">*</span></label>
+            <input pInputText type="email" formControlName="ownerEmail" placeholder="admin@apex.com" />
+          </div>
+
+          <div class="form-group col-span-2">
+            <label>Password <span class="req">*</span></label>
+            <p-password
+              formControlName="ownerPassword"
+              [toggleMask]="true"
+              placeholder="Min. 8 characters"
+              styleClass="w-full"
+            ></p-password>
+          </div>
+        </div>
+      </section>
+
+      <!-- Branch Details -->
+      <section class="form-section">
+        <h2><i class="pi pi-map-marker mr-2"></i> Main Branch Details</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Branch Name <span class="req">*</span></label>
+            <input pInputText formControlName="mainBranchName" placeholder="e.g. Apex HQ" />
+          </div>
+        </div>
+
+        <div formGroupName="mainBranchAddress" class="form-grid mt-2">
+          <div class="form-group col-span-2">
+            <label>Street Address <span class="req">*</span></label>
+            <input pInputText formControlName="street" placeholder="123 Main St" />
+          </div>
+
+          <div class="form-group">
+            <label>City <span class="req">*</span></label>
+            <input pInputText formControlName="city" />
+          </div>
+
+          <div class="form-group">
+            <label>State <span class="req">*</span></label>
+            <input pInputText formControlName="state" />
+          </div>
+
+          <div class="form-group">
+            <label>Zip Code <span class="req">*</span></label>
+            <input pInputText formControlName="zipCode" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer Buttons -->
+      <div class="form-actions">
+        <button
+          pButton
+          type="submit"
+          label="Create Organization"
+          icon="pi pi-check"
+          class="submit-btn"
+          [loading]="isLoading()"
+          (click)="onSubmit()"
+          [disabled]="organizationForm.invalid || isLoading()"
+        ></button>
+
+        <div class="form-links">
+          <button pButton label="Login" routerLink="/auth/login" class="link-btn"></button>
+          <button pButton label="Signup" routerLink="/auth/signup" class="link-btn"></button>
+        </div>
+      </div>
+    </form>
+  </main>
+</div>
+
+<!-- <p-toast></p-toast>
+
+<div class="create-org-container">
+  <header class="create-org-header">
+    <h1>Create Your Organization</h1>
+    <p>Fill in the details below to register your new organization.</p>
+  </header>
+
+  <main class="create-org-body">
+    <form [formGroup]="organizationForm" class="org-form">
+
+      Organization Details
+      <section class="form-section">
+        <h2>Organization Details</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Organization Name <span class="req">*</span></label>
+            <input pInputText formControlName="organizationName" placeholder="Apex Innovations Inc." />
+          </div>
+
+          <div class="form-group">
+            <label>Unique Shop ID <span class="req">*</span></label>
+            <input pInputText formControlName="uniqueShopId" placeholder="APEX001" />
+          </div>
+
+          <div class="form-group">
+            <label>Primary Email <span class="req">*</span></label>
+            <input pInputText type="email" formControlName="primaryEmail" placeholder="contact@apex.com" />
+          </div>
+
+          <div class="form-group">
+            <label>Primary Phone <span class="req">*</span></label>
+            <input pInputText formControlName="primaryPhone" placeholder="+91 9876543210" />
+          </div>
+
+          <div class="form-group">
+            <label>GST Number</label>
+            <input pInputText formControlName="gstNumber" placeholder="22AAAAA0000A1Z5" />
+          </div>
+        </div>
+      </section>
+
+      Owner Details
+      <section class="form-section">
+        <h2>Owner (Super Admin) Details</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Owner Name <span class="req">*</span></label>
+            <input pInputText formControlName="ownerName" placeholder="Your full name" />
+          </div>
+
+          <div class="form-group">
+            <label>Owner Email <span class="req">*</span></label>
+            <input pInputText type="email" formControlName="ownerEmail" placeholder="admin@apex.com" />
+          </div>
+
+          <div class="form-group col-span-2">
+            <label>Password <span class="req">*</span></label>
+            <p-password formControlName="ownerPassword" [toggleMask]="true" placeholder="Min. 8 characters"
+              styleClass="w-full"></p-password>
+          </div>
+        </div>
+      </section>
+
+      Branch Details
+      <section class="form-section">
+        <h2>Main Branch Details</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Branch Name <span class="req">*</span></label>
+            <input pInputText formControlName="mainBranchName" placeholder="e.g. Apex HQ" />
+          </div>
+        </div>
+
+        <div formGroupName="mainBranchAddress" class="form-grid mt-2">
+          <div class="form-group col-span-2">
+            <label>Street Address <span class="req">*</span></label>
+            <input pInputText formControlName="street" placeholder="123 Main St" />
+          </div>
+
+          <div class="form-group">
+            <label>City <span class="req">*</span></label>
+            <input pInputText formControlName="city" />
+          </div>
+
+          <div class="form-group">
+            <label>State <span class="req">*</span></label>
+            <input pInputText formControlName="state" />
+          </div>
+
+          <div class="form-group">
+            <label>Zip Code <span class="req">*</span></label>
+            <input pInputText formControlName="zipCode" />
+          </div>
+        </div>
+      </section>
+
+      Footer Buttons
+      <div class="form-actions">
+        <button pButton type="submit" label="Create Organization" icon="pi pi-check" class="submit-btn"
+          [loading]="isLoading()" (click)="onSubmit()" [disabled]="organizationForm.invalid || isLoading()"></button>
+
+        <div class="form-links">
+          <button pButton label="Login" routerLink="/auth/login" class="link-btn"></button>
+          <button pButton label="Signup" routerLink="/auth/signup" class="link-btn"></button>
+          <button pButton label="Signup" routerLink="/auth/org" class="link-btn"></button>
+        </div>
+      </div>
+    </form>
+  </main>
+</div> -->
+
+
+
+<!-- <p-toast></p-toast>
+
 <div class="org-page">
-  <!-- === FIXED HEADER === -->
+  === FIXED HEADER ===
   <div class="org-page">
     <header class="org-header">
       <div class="org-header-inner">
@@ -10,12 +247,12 @@
       </div>
     </header>
 
-    <!-- === SCROLLABLE BODY === -->
+    === SCROLLABLE BODY ===
     <main class="org-body">
       <div class="glass-form-card">
         <form [formGroup]="organizationForm" class="org-form">
 
-          <!-- === SECTION 1 === -->
+          === SECTION 1 ===
           <section class="form-section">
             <h2>Organization Details</h2>
             <div class="form-grid">
@@ -46,7 +283,7 @@
             </div>
           </section>
 
-          <!-- === SECTION 2 === -->
+          === SECTION 2 ===
           <section class="form-section">
             <h2>Owner (Super Admin) Details</h2>
             <div class="form-grid">
@@ -68,7 +305,7 @@
             </div>
           </section>
 
-          <!-- === SECTION 3 === -->
+          === SECTION 3 ===
           <section class="form-section">
             <h2>Main Branch Details</h2>
             <div class="form-grid">
@@ -106,7 +343,7 @@
 
     </main>
 
-    <!-- === FIXED FOOTER === -->
+    === FIXED FOOTER ===
     <footer class="org-footer">
       <button pButton type="submit" label="Create" icon="pi pi-check" class="floating-btn" [loading]="isLoading()"
         (click)="onSubmit()" [disabled]="organizationForm.invalid || isLoading()"></button>
@@ -115,194 +352,4 @@
       <button pButton type="signup" label="signup" routerLink="/auth/signup" icon="pi pi-login"
         class="floating-btn"></button>
     </footer>
-  </div>
-
-  <!-- PrimeNG Toast component for displaying messages
-<p-toast></p-toast>
-
-<div class="p-6 md:p-8 bg-white rounded-lg shadow-lg max-w-5xl mx-auto my-8">
-  <h1 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-4">
-    Create Your Organization
-  </h1>
-  <p class="text-gray-600 mb-8">
-    Fill in the details below to register your new organization. Fields marked with
-    <span class="text-red-500">*</span> are required.
-  </p>
-
-  <form [formGroup]="organizationForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
-
-    === SECTION 1: ORGANIZATION DETAILS ===
-    <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2">Organization Details</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
-
-      Organization Name
-      <div class="flex flex-col gap-2">
-        <label for="organizationName" class="font-semibold text-gray-700">
-          Organization Name <span class="text-red-500">*</span>
-        </label>
-        <input pInputText id="organizationName" formControlName="organizationName"
-          placeholder="e.g., Apex Innovations Inc."
-          [ngClass]="{'ng-invalid ng-dirty': form['organizationName'].invalid && form['organizationName'].touched}" />
-        @if (form['organizationName'].invalid && form['organizationName'].touched) {
-        <small class="text-red-500">Organization name is required.</small>
-        }
-      </div>
-
-      Unique Shop ID
-      <div class="flex flex-col gap-2">
-        <label for="uniqueShopId" class="font-semibold text-gray-700">
-          Unique Shop ID <span class="text-red-500">*</span>
-        </label>
-        <input pInputText id="uniqueShopId" formControlName="uniqueShopId"
-          placeholder="e.g., APEX001 (No spaces, A-Z, 0-9)"
-          [ngClass]="{'ng-invalid ng-dirty': form['uniqueShopId'].invalid && form['uniqueShopId'].touched}" />
-        @if (form['uniqueShopId'].invalid && form['uniqueShopId'].touched) {
-        <small class="text-red-500">
-          @if (form['uniqueShopId'].errors?.['required']) { Shop ID is required. }
-          @if (form['uniqueShopId'].errors?.['pattern']) { Shop ID must be uppercase A-Z, 0-9, and dashes only. }
-        </small>
-        }
-      </div>
-
-      Primary Email
-      <div class="flex flex-col gap-2">
-        <label for="primaryEmail" class="font-semibold text-gray-700">
-          Primary Email <span class="text-red-500">*</span>
-        </label>
-        <input pInputText type="email" id="primaryEmail" formControlName="primaryEmail"
-          placeholder="e.g., contact@apex.com"
-          [ngClass]="{'ng-invalid ng-dirty': form['primaryEmail'].invalid && form['primaryEmail'].touched}" />
-        @if (form['primaryEmail'].invalid && form['primaryEmail'].touched) {
-        <small class="text-red-500">A valid primary email is required.</small>
-        }
-      </div>
-
-      Primary Phone
-      <div class="flex flex-col gap-2">
-        <label for="primaryPhone" class="font-semibold text-gray-700">
-          Primary Phone <span class="text-red-500">*</span>
-        </label>
-        <input pInputText id="primaryPhone" formControlName="primaryPhone" placeholder="e.g., +91 1234567890"
-          [ngClass]="{'ng-invalid ng-dirty': form['primaryPhone'].invalid && form['primaryPhone'].touched}" />
-        @if (form['primaryPhone'].invalid && form['primaryPhone'].touched) {
-        <small class="text-red-500">Primary phone number is required.</small>
-        }
-      </div>
-
-      GST Number (Optional)
-      <div class="flex flex-col gap-2">
-        <label for="gstNumber" class="font-semibold text-gray-700">
-          GST Number (Optional)
-        </label>
-        <input pInputText id="gstNumber" formControlName="gstNumber" placeholder="e.g., 22AAAAA0000A1Z5" />
-      </div>
-    </div>
-
-    === SECTION 2: OWNER (SUPER ADMIN) DETAILS ===
-    <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2 mt-6">Owner (Super Admin) Details</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
-
-      Owner Name
-      <div class="flex flex-col gap-2">
-        <label for="ownerName" class="font-semibold text-gray-700">Owner Name <span
-            class="text-red-500">*</span></label>
-        <input pInputText id="ownerName" formControlName="ownerName" placeholder="Your full name"
-          [ngClass]="{'ng-invalid ng-dirty': form['ownerName'].invalid && form['ownerName'].touched}" />
-        @if (form['ownerName'].invalid && form['ownerName'].touched) {
-        <small class="text-red-500">Owner name is required.</small>
-        }
-      </div>
-
-      Owner Email
-      <div class="flex flex-col gap-2">
-        <label for="ownerEmail" class="font-semibold text-gray-700">Owner Email <span
-            class="text-red-500">*</span></label>
-        <input pInputText type="email" id="ownerEmail" formControlName="ownerEmail" placeholder="Your login email"
-          [ngClass]="{'ng-invalid ng-dirty': form['ownerEmail'].invalid && form['ownerEmail'].touched}" />
-        @if (form['ownerEmail'].invalid && form['ownerEmail'].touched) {
-        <small class="text-red-500">A valid login email is required.</small>
-        }
-      </div>
-
-      Owner Password
-      <div class="flex flex-col gap-2 md:col-span-2">
-        <label for="ownerPassword" class="font-semibold text-gray-700">Password <span
-            class="text-red-500">*</span></label>
-        <p-password id="ownerPassword" formControlName="ownerPassword" [toggleMask]="true"
-          placeholder="Min. 8 characters" styleClass="w-full" inputStyleClass="w-full"
-          [ngClass]="{'ng-invalid ng-dirty': form['ownerPassword'].invalid && form['ownerPassword'].touched}">
-        </p-password>
-        @if (form['ownerPassword'].invalid && form['ownerPassword'].touched) {
-        <small class="text-red-500">Password must be at least 8 characters long.</small>
-        }
-      </div>
-    </div>
-
-    === SECTION 3: MAIN BRANCH DETAILS ===
-    <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2 mt-6">Main Branch Details</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
-
-      Main Branch Name
-      <div class="flex flex-col gap-2">
-        <label for="mainBranchName" class="font-semibold text-gray-700">Branch Name <span
-            class="text-red-500">*</span></label>
-        <input pInputText id="mainBranchName" formControlName="mainBranchName"
-          [ngClass]="{'ng-invalid ng-dirty': form['mainBranchName'].invalid && form['mainBranchName'].touched}" />
-        @if (form['mainBranchName'].invalid && form['mainBranchName'].touched) {
-        <small class="text-red-500">Branch name is required.</small>
-        }
-      </div>
-    </div>
-
-    Nested FormGroup for Branch Address
-    <div formGroupName="mainBranchAddress" class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5 mt-[-1rem]">
-
-      Street
-      <div class="flex flex-col gap-2 md:col-span-2">
-        <label for="street" class="font-semibold text-gray-700">Street Address <span
-            class="text-red-500">*</span></label>
-        <input pInputText id="street" formControlName="street" placeholder="123 Main St"
-          [ngClass]="{'ng-invalid ng-dirty': branchForm['street'].invalid && branchForm['street'].touched}" />
-        @if (branchForm['street'].invalid && branchForm['street'].touched) {
-        <small class="text-red-500">Street is required.</small>
-        }
-      </div>
-
-      City
-      <div class="flex flex-col gap-2">
-        <label for="city" class="font-semibold text-gray-700">City <span class="text-red-500">*</span></label>
-        <input pInputText id="city" formControlName="city"
-          [ngClass]="{'ng-invalid ng-dirty': branchForm['city'].invalid && branchForm['city'].touched}" />
-        @if (branchForm['city'].invalid && branchForm['city'].touched) {
-        <small class="text-red-500">City is required.</small>
-        }
-      </div>
-
-      State
-      <div class="flex flex-col gap-2">
-        <label for="state" class="font-semibold text-gray-700">State <span class="text-red-500">*</span></label>
-        <input pInputText id="state" formControlName="state"
-          [ngClass]="{'ng-invalid ng-dirty': branchForm['state'].invalid && branchForm['state'].touched}" />
-        @if (branchForm['state'].invalid && branchForm['state'].touched) {
-        <small class="text-red-500">State is required.</small>
-        }
-      </div>
-
-      Zip Code
-      <div class="flex flex-col gap-2">
-        <label for="zipCode" class="font-semibold text-gray-700">Zip Code <span class="text-red-500">*</span></label>
-        <input pInputText id="zipCode" formControlName="zipCode"
-          [ngClass]="{'ng-invalid ng-dirty': branchForm['zipCode'].invalid && branchForm['zipCode'].touched}" />
-        @if (branchForm['zipCode'].invalid && branchForm['zipCode'].touched) {
-        <small class="text-red-500">Zip code is required.</small>
-        }
-      </div>
-    </div>
-
-    Submission Button
-    <div class="flex justify-end mt-6 border-t pt-6">
-      <p-button label="Create Organization" type="submit" [loading]="isLoading()"
-        [disabled]="organizationForm.invalid || isLoading()" icon="pi pi-check"></p-button>
-    </div>
-  </form>
-</div> -->
+  </div> -->

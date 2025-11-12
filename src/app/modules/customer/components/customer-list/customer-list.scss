@@ -1,83 +1,181 @@
-/* =========================
-   Consistent Filter Layout
-========================= */
+/* ==========================================
+   Compact Unified Customer Filter + Grid
+========================================== */
 
-/* This new class replaces the Tailwind 'flex' classes 
-  to ensure all filter bars look the same.
-*/
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--theme-bg-secondary);
+}
+
+/* ===== FILTER SECTION ===== */
+.filter-section {
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
 :host ::ng-deep .se-filter-bar {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: 1rem;
+  justify-content: flex-start;
+  gap: var(--spacing-md);
+  border-bottom: 1px solid var(--theme-border-secondary);
+  padding-bottom: var(--spacing-md);
 }
 
+/* ===== FIELDS ===== */
 :host ::ng-deep .se-filter-field {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--spacing-xs);
+  flex: 1 1 200px;
 }
 
 :host ::ng-deep .se-filter-bar label {
-  font-size: 0.8rem;
+  font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--theme-text-label);
 }
 
-/* These styles now control all inputs, dropdowns, etc.,
-  inside the filter bar for a consistent height and look.
-*/
+/* ===== INPUTS & DROPDOWNS ===== */
 :host ::ng-deep .se-filter-bar input,
 :host ::ng-deep .se-filter-bar .p-dropdown,
 :host ::ng-deep .se-filter-bar .p-autocomplete .p-autocomplete-input {
-  height: 2.75rem !important;
-  border-radius: 0.5rem;
-  border: 1px solid var(--theme-border-primary);
-  background: var(--theme-bg-secondary);
-  font-size: 0.85rem;
+  height: 2.5rem !important;
+  border-radius: var(--ui-border-radius);
+  border: 1px solid var(--theme-border-secondary);
+  background: var(--theme-bg-ternary);
+  font-size: var(--font-size-sm);
   color: var(--theme-text-primary);
-  padding: 0 0.75rem;
-  transition: all 0.2s ease;
+  padding: 0 var(--spacing-md);
+  transition: var(--ui-transition);
 }
-
-/* Ensures the input inside p-autocomplete is styled correctly
-  (it needs a padding-left or the text overlaps the icon)
-*/
-:host ::ng-deep .se-filter-bar .p-autocomplete .p-autocomplete-input {
-  padding-left: 0.75rem;
-}
-:host ::ng-deep .se-filter-bar .p-dropdown {
-  padding: 0; /* Override default padding for p-dropdown */
-}
-
 
 :host ::ng-deep .se-filter-bar input:focus,
 :host ::ng-deep .se-filter-bar .p-dropdown.p-focus,
 :host ::ng-deep .se-filter-bar .p-autocomplete-input:focus {
   border-color: var(--theme-accent-primary);
   box-shadow: 0 0 0 3px var(--theme-accent-focus-ring);
-  outline: none;
 }
 
-/* =========================
-   Consistent Grid Card Look
-========================= */
-:host ::ng-deep .glass-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur-intensity));
-  border-radius: var(--glass-border-radius);
-  border: 1px solid var(--glass-border-color);
-  box-shadow: var(--glass-shadow);
+/* ===== BUTTONS ===== */
+:host ::ng-deep .filter-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
 }
 
-/* Styles AG-Grid *inside* a glass card */
-:host ::ng-deep .glass-card .ag-header {
-  background: var(--theme-bg-secondary);
-  font-size: 0.8rem;
+:host ::ng-deep .action-btn {
+  font-size: var(--font-size-sm);
   font-weight: 600;
+  height: 2.5rem;
+  padding: 0 var(--spacing-lg);
+  border-radius: var(--ui-border-radius);
+}
+
+/* ===== GRID SECTION ===== */
+.grid-section {
+  @extend .glass-card;
+  padding: var(--spacing-md) var(--spacing-lg);
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+:host ::ng-deep .glass-card .ag-header {
+  background: var(--theme-bg-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--theme-text-primary);
 }
 
 :host ::ng-deep .glass-card .ag-cell {
-  font-size: 0.8rem;
-  color: var(--theme-text-primary);
+  font-size: var(--font-size-sm);
+  color: var(--theme-text-secondary);
 }
+
+// /* =========================
+//    Consistent Filter Layout
+// ========================= */
+
+// /* This new class replaces the Tailwind 'flex' classes 
+//   to ensure all filter bars look the same.
+// */
+// :host ::ng-deep .se-filter-bar {
+//   display: flex;
+//   flex-wrap: wrap;
+//   align-items: flex-end;
+//   gap: 1rem;
+// }
+
+// :host ::ng-deep .se-filter-field {
+//   display: flex;
+//   flex-direction: column;
+//   gap: 0.25rem;
+// }
+
+// :host ::ng-deep .se-filter-bar label {
+//   font-size: 0.8rem;
+//   font-weight: 600;
+//   color: var(--theme-text-label);
+// }
+
+// /* These styles now control all inputs, dropdowns, etc.,
+//   inside the filter bar for a consistent height and look.
+// */
+// :host ::ng-deep .se-filter-bar input,
+// :host ::ng-deep .se-filter-bar .p-dropdown,
+// :host ::ng-deep .se-filter-bar .p-autocomplete .p-autocomplete-input {
+//   height: 2.75rem !important;
+//   border-radius: 0.5rem;
+//   border: 1px solid var(--theme-border-primary);
+//   background: var(--theme-bg-secondary);
+//   font-size: 0.85rem;
+//   color: var(--theme-text-primary);
+//   padding: 0 0.75rem;
+//   transition: all 0.2s ease;
+// }
+
+// /* Ensures the input inside p-autocomplete is styled correctly
+//   (it needs a padding-left or the text overlaps the icon)
+// */
+// :host ::ng-deep .se-filter-bar .p-autocomplete .p-autocomplete-input {
+//   padding-left: 0.75rem;
+// }
+// :host ::ng-deep .se-filter-bar .p-dropdown {
+//   padding: 0; /* Override default padding for p-dropdown */
+// }
+
+
+// :host ::ng-deep .se-filter-bar input:focus,
+// :host ::ng-deep .se-filter-bar .p-dropdown.p-focus,
+// :host ::ng-deep .se-filter-bar .p-autocomplete-input:focus {
+//   border-color: var(--theme-accent-primary);
+//   box-shadow: 0 0 0 3px var(--theme-accent-focus-ring);
+//   outline: none;
+// }
+
+// /* =========================
+//    Consistent Grid Card Look
+// ========================= */
+// :host ::ng-deep .glass-card {
+//   background: var(--glass-bg);
+//   backdrop-filter: blur(var(--glass-blur-intensity));
+//   border-radius: var(--glass-border-radius);
+//   border: 1px solid var(--glass-border-color);
+//   box-shadow: var(--glass-shadow);
+// }
+
+// /* Styles AG-Grid *inside* a glass card */
+// :host ::ng-deep .glass-card .ag-header {
+//   background: var(--theme-bg-secondary);
+//   font-size: 0.8rem;
+//   font-weight: 600;
+// }
+
+// :host ::ng-deep .glass-card .ag-cell {
+//   font-size: 0.8rem;
+//   color: var(--theme-text-primary);
+// }
