@@ -1,181 +1,152 @@
-/* ==========================================
-   Compact Unified Customer Filter + Grid
-========================================== */
+/* ==============================================
+   CUSTOMER LIST COMPONENT
+   - Re-uses all styles from branch-list.scss
+   ============================================== */
 
 :host {
+  display: block;
+  height: 100%;
+}
+
+.list-page-container {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--theme-bg-secondary);
+  padding: var(--spacing-xl);
+  gap: var(--spacing-xl);
+  background: var(--bg-primary);
 }
 
-/* ===== FILTER SECTION ===== */
-.filter-section {
-  padding: var(--spacing-md) var(--spacing-lg);
-}
-
-:host ::ng-deep .se-filter-bar {
+/* === HEADER === */
+.list-header {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: flex-start;
-  gap: var(--spacing-md);
-  border-bottom: 1px solid var(--theme-border-secondary);
-  padding-bottom: var(--spacing-md);
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
 }
 
-/* ===== FIELDS ===== */
-:host ::ng-deep .se-filter-field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-  flex: 1 1 200px;
-}
-
-:host ::ng-deep .se-filter-bar label {
-  font-size: var(--font-size-sm);
+.list-title {
+  font-size: var(--font-size-3xl);
   font-weight: 600;
-  color: var(--theme-text-label);
-}
-
-/* ===== INPUTS & DROPDOWNS ===== */
-:host ::ng-deep .se-filter-bar input,
-:host ::ng-deep .se-filter-bar .p-dropdown,
-:host ::ng-deep .se-filter-bar .p-autocomplete .p-autocomplete-input {
-  height: 2.5rem !important;
-  border-radius: var(--ui-border-radius);
-  border: 1px solid var(--theme-border-secondary);
-  background: var(--theme-bg-ternary);
-  font-size: var(--font-size-sm);
-  color: var(--theme-text-primary);
-  padding: 0 var(--spacing-md);
-  transition: var(--ui-transition);
-}
-
-:host ::ng-deep .se-filter-bar input:focus,
-:host ::ng-deep .se-filter-bar .p-dropdown.p-focus,
-:host ::ng-deep .se-filter-bar .p-autocomplete-input:focus {
-  border-color: var(--theme-accent-primary);
-  box-shadow: 0 0 0 3px var(--theme-accent-focus-ring);
-}
-
-/* ===== BUTTONS ===== */
-:host ::ng-deep .filter-actions {
+  color: var(--text-primary);
+  margin: 0;
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-sm);
+  gap: var(--spacing-md);
 }
 
-:host ::ng-deep .action-btn {
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  height: 2.5rem;
-  padding: 0 var(--spacing-lg);
-  border-radius: var(--ui-border-radius);
+/* === CARD === */
+.themed-card {
+  background: var(--bg-secondary);
+  border-radius: var(--ui-border-radius-lg);
+  border: var(--ui-border-width) solid var(--border-primary);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-lg);
 }
 
-/* ===== GRID SECTION ===== */
-.grid-section {
-  @extend .glass-card;
-  padding: var(--spacing-md) var(--spacing-lg);
-  min-height: 0;
+/* === FILTER BAR === */
+.se-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-lg);
+  align-items: flex-end; // Aligns buttons with inputs
+}
+
+.se-filter-field {
   display: flex;
   flex-direction: column;
+  gap: var(--spacing-sm);
+  flex-grow: 1;
+  min-width: 200px;
+
+  label {
+    font-size: var(--font-size-xs);
+    color: var(--text-label);
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  // Style inputs to match our forms
+  :is(input[pInputText], .p-select, .p-autocomplete) {
+    background: var(--bg-ternary);
+  }
 }
 
-:host ::ng-deep .glass-card .ag-header {
-  background: var(--theme-bg-primary);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  color: var(--theme-text-primary);
+.se-filter-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  padding-bottom: 2px; // Minor alignment tweak
 }
 
-:host ::ng-deep .glass-card .ag-cell {
-  font-size: var(--font-size-sm);
-  color: var(--theme-text-secondary);
+
+/* === GRID AREA === */
+.list-grid-area {
+  flex-grow: 1; // This makes it fill the remaining height
+  min-height: 0; // Crucial for flex-grow to work in a flex-col
+  padding: var(--spacing-lg);
+  
+  // The grid component will fill this area
+  app-shared-grid {
+    height: 100%;
+    width: 100%;
+  }
 }
 
-// /* =========================
-//    Consistent Filter Layout
-// ========================= */
+/* === AG-GRID THEMING === */
+:host ::ng-deep {
+  /* Style the grid cells based on our theme */
+  .ag-root-wrapper {
+    border: none;
+  }
+  .ag-header {
+    background-color: var(--bg-ternary);
+    border-bottom: var(--ui-border-width) solid var(--border-primary);
+  }
+  .ag-header-cell-label {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+  .ag-row {
+    background-color: var(--bg-secondary);
+    color: var(--text-secondary);
+    border-color: var(--border-primary) !important;
+    
+    &.ag-row-hover {
+      background-color: var(--bg-ternary);
+    }
+  }
+  
+  /* Status Cell Specific */
+  .cell-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    font-weight: 600;
+    
+    &.status-active {
+      background-color: color-mix(in srgb, var(--color-success) 15%, transparent);
+      color: var(--color-success);
+    }
+    &.status-inactive {
+      background-color: color-mix(in srgb, var(--color-error) 15%, transparent);
+      color: var(--color-error);
+    }
+  }
 
-// /* This new class replaces the Tailwind 'flex' classes 
-//   to ensure all filter bars look the same.
-// */
-// :host ::ng-deep .se-filter-bar {
-//   display: flex;
-//   flex-wrap: wrap;
-//   align-items: flex-end;
-//   gap: 1rem;
-// }
+  /* Style p-autocomplete dropdown panel */
+  .p-autocomplete-panel {
+    background: var(--bg-secondary);
+    border: var(--ui-border-width) solid var(--border-primary);
 
-// :host ::ng-deep .se-filter-field {
-//   display: flex;
-//   flex-direction: column;
-//   gap: 0.25rem;
-// }
-
-// :host ::ng-deep .se-filter-bar label {
-//   font-size: 0.8rem;
-//   font-weight: 600;
-//   color: var(--theme-text-label);
-// }
-
-// /* These styles now control all inputs, dropdowns, etc.,
-//   inside the filter bar for a consistent height and look.
-// */
-// :host ::ng-deep .se-filter-bar input,
-// :host ::ng-deep .se-filter-bar .p-dropdown,
-// :host ::ng-deep .se-filter-bar .p-autocomplete .p-autocomplete-input {
-//   height: 2.75rem !important;
-//   border-radius: 0.5rem;
-//   border: 1px solid var(--theme-border-primary);
-//   background: var(--theme-bg-secondary);
-//   font-size: 0.85rem;
-//   color: var(--theme-text-primary);
-//   padding: 0 0.75rem;
-//   transition: all 0.2s ease;
-// }
-
-// /* Ensures the input inside p-autocomplete is styled correctly
-//   (it needs a padding-left or the text overlaps the icon)
-// */
-// :host ::ng-deep .se-filter-bar .p-autocomplete .p-autocomplete-input {
-//   padding-left: 0.75rem;
-// }
-// :host ::ng-deep .se-filter-bar .p-dropdown {
-//   padding: 0; /* Override default padding for p-dropdown */
-// }
-
-
-// :host ::ng-deep .se-filter-bar input:focus,
-// :host ::ng-deep .se-filter-bar .p-dropdown.p-focus,
-// :host ::ng-deep .se-filter-bar .p-autocomplete-input:focus {
-//   border-color: var(--theme-accent-primary);
-//   box-shadow: 0 0 0 3px var(--theme-accent-focus-ring);
-//   outline: none;
-// }
-
-// /* =========================
-//    Consistent Grid Card Look
-// ========================= */
-// :host ::ng-deep .glass-card {
-//   background: var(--glass-bg);
-//   backdrop-filter: blur(var(--glass-blur-intensity));
-//   border-radius: var(--glass-border-radius);
-//   border: 1px solid var(--glass-border-color);
-//   box-shadow: var(--glass-shadow);
-// }
-
-// /* Styles AG-Grid *inside* a glass card */
-// :host ::ng-deep .glass-card .ag-header {
-//   background: var(--theme-bg-secondary);
-//   font-size: 0.8rem;
-//   font-weight: 600;
-// }
-
-// :host ::ng-deep .glass-card .ag-cell {
-//   font-size: 0.8rem;
-//   color: var(--theme-text-primary);
-// }
+    .p-autocomplete-item {
+      color: var(--text-secondary);
+      &:hover {
+        background: var(--bg-ternary);
+        color: var(--text-primary);
+      }
+    }
+  }
+}

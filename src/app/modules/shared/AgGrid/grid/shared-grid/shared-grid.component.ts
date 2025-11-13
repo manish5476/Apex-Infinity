@@ -12,6 +12,7 @@ import { DynamicCellComponent } from '../../AgGridcomponents/dynamic-cell/dynami
 import { ThemeService } from '../../../../../core/services/theme.service';
 // FIX: Import the new, cleaner types from the status cell component.
 import { StatusCellComponent, StatusCellParams, Severity } from '../../AgGridcomponents/status-cell/status-cell.component';
+import { Skeleton } from "primeng/skeleton";
 ModuleRegistry.registerModules([AllCommunityModule, TooltipModule]);
 
 export interface StatusColumnOptions extends ColDef {
@@ -55,7 +56,7 @@ type InternalGridOptions = Required<Omit<SharedGridOptions, 'statusColumn' | 'ge
 @Component({
   selector: 'app-shared-grid',
   standalone: true,
-  imports: [AgGridAngular, FormsModule, ToolbarModule, CommonModule, ColorPickerModule],
+  imports: [AgGridAngular, FormsModule, ToolbarModule, CommonModule, ColorPickerModule, Skeleton],
   templateUrl: './shared-grid.component.html',
   styleUrls: ['./shared-grid.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

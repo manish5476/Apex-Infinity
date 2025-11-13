@@ -3,16 +3,7 @@
 <div class="customer-wrapper">
   <section class="customer-container">
     
-    <!-- BANNER -->
-    <div class="customer-banner">
-      <img src="https://images.unsplash.com/photo-1560439514-4e9b4624040b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
-        alt="Branch background" />
-      <div class="customer-overlay"></div>
-      <div class="customer-banner-text">
-        <h2>{{ formTitle() }}</h2>
-        <p>Manage your organization's locations and offices.</p>
-      </div>
-    </div>
+    <!-- BANNER REMOVED FOR CLEANER UI -->
     
     <!-- FORM PANEL -->
     <div class="customer-form-panel">
@@ -21,45 +12,45 @@
         <!--_ 1. STICKY HEADER _-->
         <div class="customer-form-header">
           <h1 class="form-title">{{ formTitle() }}</h1>
-          <p class="form-subtitle">Fill in the branch details below.</p>
+          <p class="form-subtitle">Fill in the branch details below. <span class="req">*</span> = required</p>
         </div>
 
         <!--_ 2. SCROLLABLE BODY _-->
         <div class="customer-form-body">
 
           <!-- Main Details -->
-          <p-divider align="center" type="dashed"><b>Main Details</b></p-divider>
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Branch Name <span class="req">*</span></label>
-              <input pInputText formControlName="name" placeholder="e.g., Main Store" />
+          <section class="form-section">
+            <h4 class="section-title">Main Details</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Branch Name <span class="req">*</span></label>
+                <input pInputText formControlName="name" placeholder="e.g., Main Store" />
+              </div>
+              <div class="form-group">
+                <label>Branch Code (Optional)</label>
+                <input pInputText formControlName="branchCode" placeholder="e.g., S-001" />
+              </div>
+              <div class="form-group">
+                <label>Phone Number</label>
+                <input pInputText formControlName="phoneNumber" placeholder="+91..." />
+              </div>
+              <div class="form-group">
+                <label>Manager (Optional)</label>
+                <p-select  appendTo="body" 
+                  formControlName="managerId" 
+                  [options]="managerOptions()" 
+                  optionLabel="name" 
+                  optionValue="_id"
+                  [filter]="true" filterBy="name"
+                  placeholder="Assign a manager">
+                </p-select>
+              </div>
             </div>
-            <div class="form-group">
-              <label>Branch Code (Optional)</label>
-              <input pInputText formControlName="branchCode" placeholder="e.g., S-001" />
-            </div>
-            <div class="form-group">
-              <label>Phone Number</label>
-              <input pInputText formControlName="phoneNumber" placeholder="+91..." />
-            </div>
-            <div class="form-group">
-              <label>Manager (Optional)</label>
-              <p-select  appendTo="body" 
-                formControlName="managerId" 
-                [options]="managerOptions()" 
-                optionLabel="name" 
-                optionValue="_id"
-                [filter]="true" filterBy="name"
-                placeholder="Assign a manager">
-              </p-select>
-            </div>
-          </div>
+          </section>
           
           <!-- Address -->
-          <p-divider align="center" type="dashed"><b>Branch Address</b></p-divider>
-          
-          <!-- This div connects the 'address' FormGroup -->
-          <div formGroupName="address">
+          <section class="form-section" formGroupName="address">
+            <h4 class="section-title">Branch Address</h4>
             <div class="form-grid">
               <div class="form-group col-span-2">
                 <label>Street</label>
@@ -82,20 +73,22 @@
                 <input pInputText formControlName="country" />
               </div>
             </div>
-          </div>
+          </section>
 
           <!-- Settings -->
-          <p-divider align="center" type="dashed"><b>Settings</b></p-divider>
-          <div class="flex flex-col gap-4">
-            <div class="form-group flex items-center gap-2">
-              <p-checkbox formControlName="isMainBranch" [binary]="true" inputId="isMainBranch"></p-checkbox>
-              <label for="isMainBranch">Set as Main Branch</label>
+          <section class="form-section">
+            <h4 class="section-title">Settings</h4>
+            <div class="flex flex-col gap-4">
+              <div class="form-group flex items-center gap-2">
+                <p-checkbox formControlName="isMainBranch" [binary]="true" inputId="isMainBranch"></p-checkbox>
+                <label for="isMainBranch" class="checkbox-label">Set as Main Branch</label>
+              </div>
+              <div class="form-group flex items-center gap-2">
+                <p-checkbox formControlName="isActive" [binary]="true" inputId="isActive"></p-checkbox>
+                <label for="isActive" class="checkbox-label">Branch is Active</label>
+              </div>
             </div>
-            <div class="form-group flex items-center gap-2">
-              <p-checkbox formControlName="isActive" [binary]="true" inputId="isActive"></p-checkbox>
-              <label for="isActive">Branch is Active</label>
-            </div>
-          </div>
+          </section>
 
         </div>
 

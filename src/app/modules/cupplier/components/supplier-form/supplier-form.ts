@@ -1,14 +1,3 @@
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-supplier-form',
-//   imports: [],
-//   templateUrl: './supplier-form.html',
-//   styleUrl: './supplier-form.scss',
-// })
-// export class SupplierForm {
-
-// }
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -25,10 +14,13 @@ import { DividerModule } from 'primeng/divider';
 import { ToastModule } from 'primeng/toast';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { SelectModule } from 'primeng/select'; // Added for peer dependency
+// import { InputTextareaModule } from 'primeng/inputtextarea'; // Added for consistency
 import { LoadingService } from '../../../../core/services/loading.service';
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { SupplierService } from '../../services/supplier-service';
+import { Textarea } from 'primeng/textarea';
 
 @Component({
   selector: 'app-supplier-form',
@@ -42,7 +34,8 @@ import { SupplierService } from '../../services/supplier-service';
     CheckboxModule,
     DividerModule,
     InputNumberModule,
-    MultiSelectModule
+    MultiSelectModule,
+    SelectModule, // Added
   ],
   templateUrl: './supplier-form.html',
   styleUrls: ['./supplier-form.scss']
@@ -172,3 +165,178 @@ export class SupplierFormComponent implements OnInit {
     });
   }
 }
+
+// // import { Component } from '@angular/core';
+
+// // @Component({
+// //   selector: 'app-supplier-form',
+// //   imports: [],
+// //   templateUrl: './supplier-form.html',
+// //   styleUrl: './supplier-form.scss',
+// // })
+// // export class SupplierForm {
+
+// // }
+// import { Component, OnInit, inject, signal } from '@angular/core';
+// import { CommonModule } from '@angular/common';
+// import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+// import { ActivatedRoute, Router } from '@angular/router';
+// // 
+// import { finalize, switchMap } from 'rxjs/operators';
+// import { of } from 'rxjs';
+
+// // PrimeNG
+// import { ButtonModule } from 'primeng/button';
+// import { InputTextModule } from 'primeng/inputtext';
+// import { CheckboxModule } from 'primeng/checkbox';
+// import { DividerModule } from 'primeng/divider';
+// import { ToastModule } from 'primeng/toast';
+// import { InputNumberModule } from 'primeng/inputnumber';
+// import { MultiSelectModule } from 'primeng/multiselect';
+// import { LoadingService } from '../../../../core/services/loading.service';
+// import { MasterListService } from '../../../../core/services/master-list.service';
+// import { AppMessageService } from '../../../../core/services/message.service';
+// import { SupplierService } from '../../services/supplier-service';
+
+// @Component({
+//   selector: 'app-supplier-form',
+//   standalone: true,
+//   imports: [
+//     CommonModule,
+//     ReactiveFormsModule,
+//     ToastModule,
+//     ButtonModule,
+//     InputTextModule,
+//     CheckboxModule,
+//     DividerModule,
+//     InputNumberModule,
+//     MultiSelectModule
+//   ],
+//   templateUrl: './supplier-form.html',
+//   styleUrls: ['./supplier-form.scss']
+// })
+// export class SupplierFormComponent implements OnInit {
+//   // --- Injected Services ---
+//   private fb = inject(FormBuilder);
+//   private route = inject(ActivatedRoute);
+//   private router = inject(Router);
+//   private supplierService = inject(SupplierService);
+//   private messageService = inject(AppMessageService);
+//   private loadingService = inject(LoadingService);
+//   private masterList = inject(MasterListService);
+
+//   // --- Form & State ---
+//   supplierForm!: FormGroup;
+//   isSubmitting = signal(false);
+//   editMode = signal(false);
+//   supplierId: string | null = null;
+//   formTitle = signal('Create New Supplier');
+
+//   // --- Master Data Signals ---
+//   branchOptions = signal<any[]>([]);
+
+//   constructor() {
+//     // Format branches for MultiSelect
+//     this.branchOptions.set(
+//       this.masterList.branches().map(b => ({ label: b.name, value: b._id }))
+//     );
+//   }
+
+//   ngOnInit(): void {
+//     this.buildForm();
+//     this.checkRouteForEditMode();
+//   }
+
+//   private checkRouteForEditMode(): void {
+//     this.route.paramMap.pipe(
+//       switchMap(params => {
+//         this.supplierId = params.get('id');
+//         if (this.supplierId) {
+//           this.editMode.set(true);
+//           this.formTitle.set('Edit Supplier');
+//           this.loadingService.show();
+//           return this.supplierService.getSupplierById(this.supplierId);
+//         }
+//         return of(null); // Create mode
+//       }),
+//       finalize(() => this.loadingService.hide())
+//     ).subscribe({
+//       next: (response) => {
+//         if (response && response.data && response.data.data) {
+//           this.patchForm(response.data.data);
+//         } else if (response) {
+//           this.messageService.showError('Error', 'Failed to load supplier data');
+//         }
+//       },
+//       error: (err) => this.messageService.showError('Error', err.error?.message)
+//     });
+//   }
+
+//   private buildForm(): void {
+//     this.supplierForm = this.fb.group({
+//       // Business Details
+//       companyName: ['', Validators.required],
+//       contactPerson: [''],
+//       email: ['', [Validators.email]],
+//       phone: [''],
+//       altPhone: [''],
+//       gstNumber: [''],
+//       panNumber: [''],
+      
+//       // Address Sub-Form
+//       address: this.fb.group({
+//         street: [''],
+//         city: [''],
+//         state: [''],
+//         zipCode: [''],
+//         country: ['India', Validators.required]
+//       }),
+      
+//       // Financials
+//       openingBalance: [0],
+//       paymentTerms: [''],
+      
+//       // Relationship
+//       branchesSupplied: [[]], // For p-multiSelect
+      
+//       // Status
+//       isActive: [true]
+//     });
+//   }
+
+//   private patchForm(supplier: any): void {
+//     // patchValue is smart enough to set the nested 'address' group
+//     this.supplierForm.patchValue(supplier);
+//   }
+
+//   onSubmit(): void {
+//     if (this.supplierForm.invalid) {
+//       this.supplierForm.markAllAsTouched();
+//       this.messageService.showError('Invalid Form', 'Please check all required fields.');
+//       return;
+//     }
+
+//     this.isSubmitting.set(true);
+//     const payload = this.supplierForm.getRawValue();
+
+//     const saveObservable = this.editMode()
+//       ? this.supplierService.updateSupplier(this.supplierId!, payload)
+//       : this.supplierService.createSupplier(payload);
+
+//     saveObservable.pipe(
+//       finalize(() => this.isSubmitting.set(false))
+//     ).subscribe({
+//       next: (res) => {
+//         this.messageService.showSuccess('Success', `Supplier ${this.editMode() ? 'updated' : 'created'} successfully.`);
+//         // Notify master list that suppliers have changed
+//         this.masterList.refresh();
+//         // this.masterList.notifyDataChange('suppliers');
+//         // Navigate to the details page
+//         this.router.navigate(['/suppliers', res.data._id]); 
+//       },
+//       error: (err) => {
+//         this.messageService.showError('Error', err.error?.message || 'Failed to save supplier.');
+//       }
+//     });
+//   }
+// }

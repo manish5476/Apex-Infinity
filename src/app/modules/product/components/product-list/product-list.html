@@ -1,55 +1,61 @@
-<div class="flex flex-col h-full p-6 gap-6 bg-[var(--theme-bg-secondary)]">
+<!-- 
+  REFACTORED:
+  - Using consistent .list-page-container layout
+  - Using .themed-card instead of .glass-card
+  - Set gridHeight="100%"
+  - Corrected routerLink on button
+-->
+<div class="list-page-container">
   <!-- HEADER -->
-  <div class="flex justify-between items-center">
-    <h2 class="text-2xl font-bold text-[var(--theme-text-heading)] flex items-center gap-2">
-      <i class="pi pi-box text-[var(--theme-accent-primary)]"></i>
+  <div class="list-header">
+    <h2 class="list-title">
+      <i class="pi pi-box text-[var(--accent-primary)]"></i>
       Product Management
     </h2>
-    <a pButton label="New Product" icon="pi pi-plus" routerLink="['/products/create']" class="p-button">
-    </a>
+    <p-button 
+      label="New Product" 
+      icon="pi pi-plus" 
+      routerLink="create"> <!-- Corrected: relative routerLink -->
+    </p-button>
   </div>
 
   <!-- FILTER BAR -->
-  <div class="glass-card p-4 rounded-lg shadow-md">
+  <div class="themed-card">
     <div class="se-filter-bar">
 
       <!-- Name -->
       <div class="se-filter-field">
-        <label>Product Name</label>
-        <input id="name" type="text" pInputText [(ngModel)]="productFilter.name" placeholder="Search by name"
-          class="w-full md:w-60" />
+        <label for="name">Product Name</label>
+        <input id="name" type="text" pInputText [(ngModel)]="productFilter.name" placeholder="Search by name" />
       </div>
 
       <!-- SKU -->
       <div class="se-filter-field">
-        <label>SKU</label>
-        <input id="sku" type="text" pInputText [(ngModel)]="productFilter.sku" placeholder="Search by SKU"
-          class="w-full md:w-40" />
+        <label for="sku">SKU</label>
+        <input id="sku" type="text" pInputText [(ngModel)]="productFilter.sku" placeholder="Search by SKU" />
       </div>
 
       <!-- Brand -->
       <div class="se-filter-field">
-        <label>Brand</label>
+        <label for="brand">Brand</label>
         <p-select  appendTo="body" id="brand" [options]="brandOptions()" [(ngModel)]="productFilter.brand" [filter]="true"
-          optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select Brand" appendTo="body"
-          styleClass="w-full md:w-52">
+          optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select Brand" appendTo="body">
         </p-select>
       </div>
 
       <!-- Category -->
       <div class="se-filter-field">
-        <label>Category</label>
+        <label for="category">Category</label>
         <p-select  appendTo="body" id="category" [options]="categoryOptions()" [(ngModel)]="productFilter.category" [filter]="true"
-          optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select Category" appendTo="body"
-          styleClass="w-full md:w-52">
+          optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select Category" appendTo="body">
         </p-select>
       </div>
 
       <!-- Actions -->
-      <div class="flex gap-2 items-center mt-1">
-        <p-button label="Apply" icon="pi pi-check" severity="success" (onClick)="applyFilters()">
+      <div class="se-filter-actions">
+        <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()">
         </p-button>
-        <p-button label="Reset" icon="pi pi-refresh" severity="secondary" styleClass="p-button-outlined"
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined"
           (onClick)="resetFilters()">
         </p-button>
       </div>
@@ -57,10 +63,17 @@
   </div>
 
   <!-- GRID AREA -->
-  <div class="flex-grow glass-card p-4 rounded-lg shadow-md min-h-0">
-    <app-shared-grid [data]="data" [gridHeight]="'210px'" [headerFilter]="false" [rowSelectionMode]="rowSelectionMode"
-      [GridName]="'Product Details'" [column]="column" (eventFromGrid)="eventFromGrid($event)"
-      (gridReady)="onGridReady($event)" (scrolledToBottom)="onScrolledToBottom($event)">
+  <div class="themed-card list-grid-area">
+    <app-shared-grid 
+      [data]="data" 
+      [gridHeight]="'210px'" 
+      [headerFilter]="false" 
+      [rowSelectionMode]="rowSelectionMode"
+      [GridName]="'Product Details'" 
+      [column]="column" 
+      (eventFromGrid)="eventFromGrid($event)"
+      (gridReady)="onGridReady($event)" 
+      (scrolledToBottom)="onScrolledToBottom($event)">
     </app-shared-grid>
   </div>
 </div>

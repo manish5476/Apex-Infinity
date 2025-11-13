@@ -22,6 +22,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { SharedGridComponent } from '../../../shared/AgGrid/grid/shared-grid/shared-grid.component';
 import { SupplierService } from '../../services/supplier-service';
+import { Toast } from "primeng/toast";
 
 // Shared
 
@@ -36,8 +37,9 @@ import { SupplierService } from '../../services/supplier-service';
     FormsModule,
     ButtonModule,
     InputTextModule,
-    RouterModule
-  ],
+    RouterModule,
+    Toast
+],
   templateUrl: './supplier-list.html',
   styleUrl: './supplier-list.scss',
 })

@@ -1,10 +1,45 @@
-@use "tailwindcss";
+/*
+| ===================================================================
+| MAIN STYLES.SCSS ENTRY POINT
+| ===================================================================
+|
+| This file imports all other SCSS files in the correct order
+| to build your application's global styles.
+|
+| Import this single file into your angular.json.
+|
+*/
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
-@import "primeicons/primeicons.css";
-:root {
-  font-size: clamp(13px, 0.6vw + 0.35rem, 15px);
-}
+/* 1. Fonts & Icons (from your original style.scss) */
+@use 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+@import 'primeicons/primeicons.css';
+
+/* 2. Tailwind (if you are using it) */
+
+// /* 3. Core Theme System (Vercel) */
+// /* Defines all CSS variables for tokens, themes, and mappings. */
+// @use 'theme';
+
+// /* 4. Animations (Vercel) */
+// /* Defines all keyframes and animation utility classes. */
+// @use 'animations';
+
+// /* 5. Common Styles (Vercel) */
+// /* Defines base resets, typography, mixins, and utility classes that USE the tokens. */
+// @use 'common';
+
+// /* 6. PrimeNG Overrides (Refactored) */
+// /* Your specific PrimeNG overrides, now using the correct tokens from theme.scss. */
+// @use 'primeng-overrides';
+
+// @use "tailwindcss";
+
+// @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
+// @import "primeicons/primeicons.css";
+// :root {
+//   font-size: clamp(13px, 0.6vw + 0.35rem, 15px);
+// }
 
 // @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
 // @import "primeicons/primeicons.css";
@@ -59,7 +94,7 @@
 //   --font-heading: "Playfair Display", Georgia, "Times New Roman", serif;
 //   --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 //   --font-mono: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, monospace;
-  
+
 //   /* Font Sizes - Fluid Typography */
 //   --font-size-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
 //   --font-size-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
@@ -209,7 +244,7 @@
 //   color: var(--theme-text-primary);
 //   height: 100%;
 //   margin: 0;
-  
+
 //   background: linear-gradient(to bottom, var(--theme-body-gradient-start), var(--theme-body-gradient-end));
 //   -webkit-font-smoothing: antialiased;
 //   -moz-osx-font-smoothing: grayscale;
@@ -562,121 +597,6 @@
 //   }
 // }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // @media (max-width: 1024px) {
 //   .se-filter-bar {
 //     flex-direction: column;
@@ -836,7 +756,7 @@
 //     box-shadow: var(--ui-shadow);
 //     margin-bottom: var(--spacing-xl);
 //   }
-  
+
 //   .se-filter-field {
 //     display: flex;
 //     flex-direction: column;
@@ -844,14 +764,14 @@
 //     flex: 1 1 220px;
 //     min-width: 200px;
 //   }
-  
+
 //   .se-filter-field label {
 //     font-size: var(--font-size-sm);
 //     font-weight: 500;
 //     color: var(--theme-text-label);
 //     padding-left: var(--spacing-xs);
 //   }
-  
+
 //   .se-filter-actions .p-button:hover {
 //     background: var(--theme-accent-primary-hover);
 //     border-color: var(--theme-accent-primary-hover);

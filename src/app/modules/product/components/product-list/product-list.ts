@@ -1,19 +1,8 @@
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-product-list',
-//   imports: [],
-//   templateUrl: './product-list.html',
-//   styleUrl: './product-list.scss',
-// })
-// export class ProductList {
-
-// }
 import { ChangeDetectorRef, Component, OnInit, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router'; // Import RouterModule
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
@@ -36,6 +25,7 @@ import { ImageCellRendererComponent } from '../../../shared/AgGrid/AgGridcompone
     FormsModule,
     ButtonModule,
     InputTextModule,
+    RouterModule // Add RouterModule
   ],
   templateUrl: './product-list.html',
   styleUrl: './product-list.scss',
@@ -59,8 +49,7 @@ export class ProductListComponent implements OnInit {
   column: any = [];
   rowSelectionMode: any = 'single';
 
-  // --- Master List Signals ---
-  // Assuming masterList provides these signals
+  // --- Master Data Signals ---
   brandOptions = signal<any[]>([]);
   categoryOptions = signal<any[]>([]);
 
@@ -182,7 +171,7 @@ export class ProductListComponent implements OnInit {
         filter: true,
         resizable: true,
         cellStyle: {
-          'color': 'var(--theme-accent-primary)',
+          'color': 'var(--accent-primary)',
           'font-weight': '600',
           'cursor': 'pointer'
         }
@@ -222,11 +211,12 @@ export class ProductListComponent implements OnInit {
         sortable: true,
         filter: 'agNumberColumnFilter',
         resizable: true,
-        cellStyle: (params: any) => {
+        // CORRECTED: Using theme-aware cellClass
+        cellClass: (params: any) => {
           if (params.value <= 10) { // Assuming reorder level
-            return { backgroundColor: '#ffe0b3', color: '#d35400', fontWeight: 'bold' };
+            return 'cell-status status-low-stock';
           }
-          return {};
+          return '';
         }
       },
       {
@@ -236,10 +226,9 @@ export class ProductListComponent implements OnInit {
         filter: true,
         resizable: true,
         valueFormatter: (params: any) => params.value ? 'Active' : 'Inactive',
-        cellStyle: (params: any) => {
-          return params.value
-            ? { backgroundColor: '#ccffcc', color: '#006400', fontWeight: 'bold' }
-            : { backgroundColor: '#ffcccc', color: '#8b0000', fontWeight: 'bold' };
+        // CORRECTED: Using theme-aware cellClass
+        cellClass: (params: any) => {
+          return params.value ? 'cell-status status-active' : 'cell-status status-inactive';
         },
       },
     ];

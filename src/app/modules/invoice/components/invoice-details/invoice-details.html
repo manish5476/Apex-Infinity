@@ -1,6 +1,9 @@
+<p-toast></p-toast> 
 <p-confirmDialog></p-confirmDialog>
-<div class="p-6">
-  <div class="glass-card invoice-details-card" *ngIf="invoice(); else noInvoice">
+
+<!-- REFACTORED: Using consistent page container -->
+<div class="invoice-page-container">
+  <div class="themed-card invoice-details-card" *ngIf="invoice(); else loadingOrError">
 
     <!-- === HEADER === -->
     <div class="details-header">
@@ -93,7 +96,7 @@
             <tr>
               <td>
                 <div class="font-bold">{{ item.name }}</div>
-                <div class="text-xs text-[var(--theme-text-muted)]" *ngIf="item.hsnCode">
+                <div class="text-xs text-[var(--text-label)]" *ngIf="item.hsnCode">
                   HSN: {{ item.hsnCode }}
                 </div>
               </td>
@@ -154,8 +157,21 @@
   </div>
 </div>
 
-<ng-template #noInvoice>
-  <div class="flex items-center justify-center p-8">
-    <h3>Loading invoice details...</h3>
+<ng-template #loadingOrError>
+  <div class="themed-card invoice-details-card">
+     <div class="details-header">
+        <div class="header-left">
+           <p-button 
+            icon="pi pi-arrow-left" 
+            styleClass="p-button-text p-button-rounded"
+            routerLink="/invoices">
+          </p-button>
+           <h2 class="form-title">Loading...</h2>
+        </div>
+     </div>
+     <p-divider></p-divider>
+     <div class->
+        <p>Loading invoice details or invoice not found.</p>
+     </div>
   </div>
 </ng-template>

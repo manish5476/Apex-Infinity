@@ -1,14 +1,3 @@
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-branch-list',
-//   imports: [],
-//   templateUrl: './branch-list.html',
-//   styleUrl: './branch-list.scss',
-// })
-// export class BranchList {
-
-// }
 import { ChangeDetectorRef, Component, OnInit, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
@@ -22,6 +11,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { SharedGridComponent } from '../../../shared/AgGrid/grid/shared-grid/shared-grid.component';
 import { BranchService } from '../../services/branch-service';
+import { Toast } from "primeng/toast";
 
 // Shared
 
@@ -36,8 +26,9 @@ import { BranchService } from '../../services/branch-service';
     FormsModule,
     ButtonModule,
     InputTextModule,
-    RouterModule
-  ],
+    RouterModule,
+    Toast
+],
   templateUrl: './branch-list.html',
   styleUrl: './branch-list.scss',
 })

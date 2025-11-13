@@ -1,9 +1,16 @@
-<!-- <p>payment-list works!</p> -->
-<div class="flex flex-col h-full p-6 gap-6 bg-[var(--theme-bg-secondary)]">
+<!-- 
+  REFACTORED:
+  - Using consistent .list-page-container layout
+  - Using .themed-card instead of .glass-card
+  - Set gridHeight="100%"
+-->
+<p-toast></p-toast> 
+
+<div class="list-page-container">
   <!-- HEADER -->
-  <div class="flex justify-between items-center">
-    <h2 class="text-2xl font-bold text-[var(--theme-text-heading)] flex items-center gap-2">
-      <i class="pi pi-dollar text-[var(--theme-accent-primary)]"></i>
+  <div class="list-header">
+    <h2 class="list-title">
+      <i class="pi pi-dollar text-[var(--accent-primary)]"></i>
       Payments Ledger
     </h2>
     <p-button label="Record Payment" icon="pi pi-plus" routerLink="create">
@@ -11,56 +18,56 @@
   </div>
 
   <!-- FILTER BAR -->
-  <div class="glass-card p-4 rounded-lg shadow-md">
+  <div class="themed-card">
     <div class="se-filter-bar">
 
       <!-- Type -->
       <div class="se-filter-field">
-        <label>Payment Type</label>
+        <label for="type">Payment Type</label>
         <p-select  appendTo="body" id="type" [options]="typeOptions" [(ngModel)]="paymentFilter.type" [showClear]="true"
-          placeholder="Inflow / Outflow" appendTo="body" styleClass="w-full md:w-52">
+          placeholder="Inflow / Outflow" appendTo="body">
         </p-select>
       </div>
 
       <!-- Customer -->
       <div class="se-filter-field">
-        <label>Customer</label>
+        <label for="customer">Customer</label>
         <p-select  appendTo="body" id="customer" [options]="customerOptions()" [(ngModel)]="paymentFilter.customerId" [filter]="true"
           filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select Customer"
-          appendTo="body" styleClass="w-full md:w-60">
+          appendTo="body">
         </p-select>
       </div>
 
       <!-- Supplier -->
       <div class="se-filter-field">
-        <label>Supplier</label>
+        <label for="supplier">Supplier</label>
         <p-select  appendTo="body" id="supplier" [options]="supplierOptions()" [(ngModel)]="paymentFilter.supplierId" [filter]="true"
           filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select Supplier"
-          appendTo="body" styleClass="w-full md:w-60">
+          appendTo="body">
         </p-select>
       </div>
 
       <!-- Payment Method -->
       <div class="se-filter-field">
-        <label>Payment Method</label>
+        <label for="paymentMethod">Payment Method</label>
         <p-select  appendTo="body" id="paymentMethod" [options]="paymentMethodOptions" [(ngModel)]="paymentFilter.paymentMethod"
-          [showClear]="true" placeholder="Select Method" appendTo="body" styleClass="w-full md:w-48">
+          [showClear]="true" placeholder="Select Method" appendTo="body">
         </p-select>
       </div>
 
       <!-- Status -->
       <div class="se-filter-field">
-        <label>Status</label>
+        <label for="status">Status</label>
         <p-select  appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="paymentFilter.status" [showClear]="true"
-          placeholder="Select Status" appendTo="body" styleClass="w-full md:w-48">
+          placeholder="Select Status" appendTo="body">
         </p-select>
       </div>
 
       <!-- Actions -->
-      <div class="flex gap-2 items-center mt-1">
-        <p-button label="Apply" icon="pi pi-check" severity="success" (onClick)="applyFilters()">
+      <div class="se-filter-actions">
+        <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()">
         </p-button>
-        <p-button label="Reset" icon="pi pi-refresh" severity="secondary" styleClass="p-button-outlined"
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined"
           (onClick)="resetFilters()">
         </p-button>
       </div>
@@ -68,10 +75,17 @@
   </div>
 
   <!-- GRID AREA -->
-  <div class="flex-grow glass-card p-4 rounded-lg shadow-md min-h-0">
-    <app-shared-grid [data]="data" [gridHeight]="'210px'" [headerFilter]="false" [rowSelectionMode]="rowSelectionMode"
-      [GridName]="'Payments'" [column]="column" (eventFromGrid)="eventFromGrid($event)"
-      (gridReady)="onGridReady($event)" (scrolledToBottom)="onScrolledToBottom($event)">
+  <div class="themed-card list-grid-area">
+    <app-shared-grid 
+      [data]="data" 
+      [gridHeight]="'210px'" 
+      [headerFilter]="false" 
+      [rowSelectionMode]="rowSelectionMode"
+      [GridName]="'Payments'" 
+      [column]="column" 
+      (eventFromGrid)="eventFromGrid($event)"
+      (gridReady)="onGridReady($event)" 
+      (scrolledToBottom)="onScrolledToBottom($event)">
     </app-shared-grid>
   </div>
 </div>

@@ -204,6 +204,7 @@ export class RoleManagementComponent implements OnInit {
 // import { ConfirmDialogModule } from 'primeng/confirmdialog';
 // import { TooltipModule } from 'primeng/tooltip';
 // import { TagModule } from 'primeng/tag';
+// import { SkeletonModule } from 'primeng/skeleton';
 
 // @Component({
 //   selector: 'app-role-management',
@@ -219,7 +220,8 @@ export class RoleManagementComponent implements OnInit {
 //     ToastModule,
 //     ConfirmDialogModule,
 //     TooltipModule,
-//     TagModule
+//     TagModule,
+//     SkeletonModule
 //   ],
 //   templateUrl: './role-management.html',
 //   styleUrl: './role-management.scss',
@@ -241,9 +243,8 @@ export class RoleManagementComponent implements OnInit {
 //   currentRole: any = {};
 //   selectedPermissions: string[] = [];
 
-//   // --- Master Data ---
-//   // This is from your roleModel.js
-//   allPermissionsList = [
+//   // --- Master Data (from your schema) ---
+//   allPermissionsList: string[] = [
 //     'read_users', 'create_users', 'update_users', 'delete_users',
 //     'read_products', 'create_products', 'update_products', 'delete_products',
 //     'read_customers', 'create_customers', 'update_customers', 'delete_customers',
@@ -254,13 +255,14 @@ export class RoleManagementComponent implements OnInit {
 //   ];
 
 //   // Formatted for the p-multiSelect component
-//   permissionOptions: { label: string; value: string }[] = [];
+//   permissionOptions: { label: string; value: string; group: string }[] = [];
 
 //   ngOnInit(): void {
 //     // Transform the string array into an object array for the dropdown
 //     this.permissionOptions = this.allPermissionsList.map(permission => ({
 //       label: this.formatPermissionName(permission),
-//       value: permission
+//       value: permission,
+//       group: this.getPermissionGroup(permission)
 //     }));
     
 //     this.loadRoles();
@@ -283,6 +285,11 @@ export class RoleManagementComponent implements OnInit {
 //   formatPermissionName(permission: string): string {
 //     return permission.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 //   }
+  
+//   getPermissionGroup(permission: string): string {
+//     const group = permission.split('_')[1]; // e.g., 'users', 'products'
+//     return group.charAt(0).toUpperCase() + group.slice(1);
+//   }
 
 //   // --- Dialog Methods ---
 
@@ -294,6 +301,10 @@ export class RoleManagementComponent implements OnInit {
 //   }
 
 //   openEditRoleDialog(role: any): void {
+//     if (role.isSuperAdmin) {
+//       this.messageService.showWarn('Not Allowed', 'The Super Admin role cannot be edited.');
+//       return;
+//     }
 //     this.currentRole = { ...role }; // Create a copy
 //     this.selectedPermissions = [...role.permissions];
 //     this.isEditMode = true;
@@ -306,7 +317,7 @@ export class RoleManagementComponent implements OnInit {
 //   }
 
 //   saveRole(): void {
-//     if (!this.currentRole.name) {
+//     if (!this.currentRole.name || this.currentRole.name.trim() === '') {
 //       this.messageService.showWarn('Validation Error', 'Role name is required.');
 //       return;
 //     }
@@ -326,18 +337,22 @@ export class RoleManagementComponent implements OnInit {
 //         this.messageService.showSuccess('Success', `Role ${this.isEditMode ? 'updated' : 'created'} successfully.`);
 //         this.loadRoles();
 //         this.hideDialog();
-//         this.isLoading = false;
 //       },
 //       error: (err) => {
 //         this.isLoading = false;
 //         // Error toast handled by interceptor
 //       }
-//     });
+//     }).add(() => this.isLoading = false); // Ensure loading is turned off
 //   }
 
 //   // --- Delete Method ---
 
 //   deleteRole(role: any): void {
+//     if (role.isSuperAdmin || role.isDefault) {
+//       this.messageService.showError('Not Allowed', 'Default or Super Admin roles cannot be deleted.');
+//       return;
+//     }
+
 //     this.confirmationService.confirm({
 //       message: `Are you sure you want to delete the role "${role.name}"? This action cannot be undone.`,
 //       header: 'Confirm Deletion',
@@ -350,26 +365,13 @@ export class RoleManagementComponent implements OnInit {
 //           next: () => {
 //             this.messageService.showSuccess('Success', `Role "${role.name}" deleted.`);
 //             this.loadRoles();
-//             this.isLoading = false;
 //           },
 //           error: (err) => {
 //             this.isLoading = false;
 //             // Error toast handled by interceptor
 //           }
-//         });
+//         }).add(() => this.isLoading = false);
 //       }
 //     });
 //   }
 // }
-
-// // import { Component } from '@angular/core';
-
-// // @Component({
-// //   selector: 'app-role-management',
-// //   imports: [],
-//   // templateUrl: './role-management.html',
-//   // styleUrl: './role-management.scss',
-// // })
-// // export class RoleManagement {
-
-// // }

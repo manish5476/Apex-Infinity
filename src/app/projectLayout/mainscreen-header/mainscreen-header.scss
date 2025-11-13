@@ -1,4 +1,7 @@
-/* ======================= HEADER – FIXED 65px, NO GAPS ======================= */
+/* ==============================================
+   HEADER SCSS
+   - Refactored to use new canonical tokens
+   ============================================== */
 
 :host {
   display: block;
@@ -6,14 +9,14 @@
   top: 0;
   left: 0;
   right: 0;
-  z-index: 50;
+  z-index: var(--z-sticky); // Use z-index token
   height: 65px;
-  background: var(--theme-bg-secondary);
-  border-bottom: 1px solid var(--theme-border-primary);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: var(--bg-secondary); // Use canonical token
+  border-bottom: 1px solid var(--border-primary); // Use canonical token
+  box-shadow: var(--shadow-sm); // Use shadow token
   padding: 0;
   margin: 0;
-  font-family: var(--font-primary);
+  font-family: var(--font-body); // Use body font token
   line-height: 1;
 }
 
@@ -39,14 +42,14 @@
   align-items: center;
   gap: 0.5rem;
   text-decoration: none;
-  color: var(--theme-text-primary);
+  color: var(--text-primary); // Use canonical token
   font-weight: 700;
   font-size: 1.25rem;
 }
 
 .logo-link i {
   font-size: 1.5rem;
-  color: var(--theme-accent-primary);
+  color: var(--accent-primary); // Use canonical token
 }
 
 .menu-toggle-btn {
@@ -58,14 +61,14 @@
   border-radius: 0.5rem;
   background: transparent;
   border: none;
-  color: var(--theme-text-secondary);
+  color: var(--text-secondary); // Use canonical token
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .menu-toggle-btn:hover {
-  background: var(--theme-hover-bg);
-  color: var(--theme-text-primary);
+  background: var(--bg-ternary); // Use canonical token
+  color: var(--text-primary); // Use canonical token
   transform: scale(1.05);
 }
 
@@ -81,23 +84,23 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.375rem 0.75rem 0.375rem 0.375rem;
-  background: var(--theme-bg-ternary);
-  border: 1px solid var(--theme-border-primary);
+  background: var(--bg-ternary); // Use canonical token
+  border: 1px solid var(--border-primary); // Use canonical token
   border-radius: 9999px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .user-menu-btn:hover {
-  background: var(--theme-hover-bg);
-  border-color: var(--theme-accent-primary);
+  background: var(--bg-ternary); // Use canonical token
+  border-color: var(--accent-primary); // Use canonical token
 }
 
 .user-avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--theme-accent-primary);
+  background: var(--accent-primary); // Use canonical token
   color: white;
   display: flex;
   align-items: center;
@@ -109,7 +112,7 @@
 .user-name {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--theme-text-primary);
+  color: var(--text-primary); // Use canonical token
   max-width: 100px;
   white-space: nowrap;
   overflow: hidden;
@@ -118,12 +121,12 @@
 
 .user-role {
   font-size: 0.75rem;
-  color: var(--theme-text-secondary);
+  color: var(--text-secondary); // Use canonical token
 }
 
 .pi-angle-down {
   font-size: 0.75rem;
-  color: var(--theme-text-secondary);
+  color: var(--text-secondary); // Use canonical token
   transition: transform 0.2s ease;
 }
 
@@ -134,13 +137,13 @@
 /* Popover */
 :host ::ng-deep .p-popover {
   border-radius: 0.75rem;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--theme-border-primary);
+  box-shadow: var(--shadow-lg); // Use shadow token
+  border: 1px solid var(--border-primary); // Use canonical token
 }
 
 :host ::ng-deep .p-popover .p-popover-content {
   padding: 0;
-  background: var(--theme-bg-ternary);
+  background: var(--bg-ternary); // Use canonical token
 }
 
 .popover-body {
@@ -154,7 +157,7 @@
   gap: 0.75rem;
   padding-bottom: 0.75rem;
   margin-bottom: 0.75rem;
-  border-bottom: 1px solid var(--theme-border-primary);
+  border-bottom: 1px solid var(--border-primary); // Use canonical token
 }
 
 .user-info .p-avatar {
@@ -168,12 +171,12 @@
 
 .user-info-name {
   font-weight: 600;
-  color: var(--theme-text-primary);
+  color: var(--text-primary); // Use canonical token
 }
 
 .user-info-email {
   font-size: 0.75rem;
-  color: var(--theme-text-secondary);
+  color: var(--text-secondary); // Use canonical token
 }
 
 .theme-section {
@@ -187,7 +190,7 @@
   margin-bottom: 0.5rem;
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--theme-text-label);
+  color: var(--text-label); // Use canonical token
 }
 
 .theme-colors {
@@ -207,12 +210,12 @@
 
 .theme-color:hover {
   transform: scale(1.1);
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 2px var(--bg-secondary); // Use canonical token
 }
 
 .theme-color.selected {
-  border-color: var(--theme-accent-primary);
-  box-shadow: 0 0 0 2px white, 0 0 0 4px var(--theme-accent-primary);
+  border-color: var(--accent-primary); // Use canonical token
+  box-shadow: 0 0 0 2px var(--bg-secondary), 0 0 0 4px var(--accent-primary); // Use canonical tokens
 }
 
 .action-link {
@@ -221,23 +224,24 @@
   gap: 0.5rem;
   padding: 0.5rem 0.75rem;
   border-radius: 0.5rem;
-  color: var(--theme-text-secondary);
+  color: var(--text-secondary); // Use canonical token
   font-size: 0.875rem;
   transition: all 0.2s ease;
+  text-decoration: none; // Explicitly remove underline
 }
 
 .action-link:hover {
-  background: var(--theme-hover-bg);
-  color: var(--theme-text-primary);
+  background: var(--bg-ternary); // Use canonical token
+  color: var(--text-primary); // Use canonical token
 }
 
 .action-link.danger {
-  color: #dc2626;
+  color: var(--color-error); // Use canonical token
 }
 
 .action-link.danger:hover {
-  background: rgba(220, 38, 38, 0.1);
-  color: #b91c1c;
+  background: color-mix(in srgb, var(--color-error) 10%, transparent); // Use color-mix for hover
+  color: var(--color-error); // Use canonical token
 }
 
 /* Mobile */
@@ -249,3 +253,513 @@
     padding: 0 0.75rem;
   }
 }
+
+// /* ==============================================
+//    HEADER SCSS
+//    - Refactored to use new canonical tokens
+//    ============================================== */
+
+// :host {
+//   display: block;
+//   position: fixed;
+//   top: 0;
+//   left: 0;
+//   right: 0;
+//   z-index: var(--z-sticky); // Use z-index token
+//   height: 65px;
+//   background: var(--bg-secondary); // Use canonical token
+//   border-bottom: 1px solid var(--border-primary); // Use canonical token
+//   box-shadow: var(--shadow-sm); // Use shadow token
+//   padding: 0;
+//   margin: 0;
+//   font-family: var(--font-body); // Use body font token
+//   line-height: 1;
+// }
+
+// /* Inner Container */
+// .header-inner {
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-between;
+//   height: 100%;
+//   padding: 0 1rem;
+//   margin: 0;
+// }
+
+// /* Left: Logo + Toggle */
+// .header-left {
+//   display: flex;
+//   align-items: center;
+//   gap: 0.75rem;
+// }
+
+// .logo-link {
+//   display: flex;
+//   align-items: center;
+//   gap: 0.5rem;
+//   text-decoration: none;
+//   color: var(--text-primary); // Use canonical token
+//   font-weight: 700;
+//   font-size: 1.25rem;
+// }
+
+// .logo-link i {
+//   font-size: 1.5rem;
+//   color: var(--accent-primary); // Use canonical token
+// }
+
+// .menu-toggle-btn {
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   width: 40px;
+//   height: 40px;
+//   border-radius: 0.5rem;
+//   background: transparent;
+//   border: none;
+//   color: var(--text-secondary); // Use canonical token
+//   cursor: pointer;
+//   transition: all 0.2s ease;
+// }
+
+// .menu-toggle-btn:hover {
+//   background: var(--bg-ternary); // Use canonical token
+//   color: var(--text-primary); // Use canonical token
+//   transform: scale(1.05);
+// }
+
+// /* Right: User Menu */
+// .header-right {
+//   display: flex;
+//   align-items: center;
+//   gap: 0.75rem;
+// }
+
+// .user-menu-btn {
+//   display: flex;
+//   align-items: center;
+//   gap: 0.5rem;
+//   padding: 0.375rem 0.75rem 0.375rem 0.375rem;
+//   background: var(--bg-ternary); // Use canonical token
+//   border: 1px solid var(--border-primary); // Use canonical token
+//   border-radius: 9999px;
+//   cursor: pointer;
+//   transition: all 0.2s ease;
+// }
+
+// .user-menu-btn:hover {
+//   background: var(--bg-ternary); // Use canonical token
+//   border-color: var(--accent-primary); // Use canonical token
+// }
+
+// .user-avatar {
+//   width: 32px;
+//   height: 32px;
+//   border-radius: 50%;
+//   background: var(--accent-primary); // Use canonical token
+//   color: white;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   font-weight: 600;
+//   font-size: 0.75rem;
+// }
+
+// .user-name {
+//   font-size: 0.875rem;
+//   font-weight: 500;
+//   color: var(--text-primary); // Use canonical token
+//   max-width: 100px;
+//   white-space: nowrap;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+// }
+
+// .user-role {
+//   font-size: 0.75rem;
+//   color: var(--text-secondary); // Use canonical token
+// }
+
+// .pi-angle-down {
+//   font-size: 0.75rem;
+//   color: var(--text-secondary); // Use canonical token
+//   transition: transform 0.2s ease;
+// }
+
+// .user-menu-btn:hover .pi-angle-down {
+//   transform: rotate(180deg);
+// }
+
+// /* Popover */
+// :host ::ng-deep .p-popover {
+//   border-radius: 0.75rem;
+//   box-shadow: var(--shadow-lg); // Use shadow token
+//   border: 1px solid var(--border-primary); // Use canonical token
+// }
+
+// :host ::ng-deep .p-popover .p-popover-content {
+//   padding: 0;
+//   background: var(--bg-ternary); // Use canonical token
+// }
+
+// .popover-body {
+//   padding: 1rem;
+//   min-width: 250px;
+// }
+
+// .user-info {
+//   display: flex;
+//   align-items: center;
+//   gap: 0.75rem;
+//   padding-bottom: 0.75rem;
+//   margin-bottom: 0.75rem;
+//   border-bottom: 1px solid var(--border-primary); // Use canonical token
+// }
+
+// .user-info .p-avatar {
+//   width: 48px;
+//   height: 48px;
+// }
+
+// .user-info-text {
+//   flex: 1;
+// }
+
+// .user-info-name {
+//   font-weight: 600;
+//   color: var(--text-primary); // Use canonical token
+// }
+
+// .user-info-email {
+//   font-size: 0.75rem;
+//   color: var(--text-secondary); // Use canonical token
+// }
+
+// .theme-section {
+//   margin: 0.75rem 0;
+// }
+
+// .theme-label {
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   margin-bottom: 0.5rem;
+//   font-size: 0.875rem;
+//   font-weight: 500;
+//   color: var(--text-label); // Use canonical token
+// }
+
+// .theme-colors {
+//   display: grid;
+//   grid-template-columns: repeat(6, 1fr);
+//   gap: 0.5rem;
+// }
+
+// .theme-color {
+//   width: 24px;
+//   height: 24px;
+//   border-radius: 50%;
+//   cursor: pointer;
+//   border: 2px solid transparent;
+//   transition: all 0.2s ease;
+// }
+
+// .theme-color:hover {
+//   transform: scale(1.1);
+//   box-shadow: 0 0 0 2px var(--bg-secondary); // Use canonical token
+// }
+
+// .theme-color.selected {
+//   border-color: var(--accent-primary); // Use canonical token
+//   box-shadow: 0 0 0 2px var(--bg-secondary), 0 0 0 4px var(--accent-primary); // Use canonical tokens
+// }
+
+// .action-link {
+//   display: flex;
+//   align-items: center;
+//   gap: 0.5rem;
+//   padding: 0.5rem 0.75rem;
+//   border-radius: 0.5rem;
+//   color: var(--text-secondary); // Use canonical token
+//   font-size: 0.875rem;
+//   transition: all 0.2s ease;
+//   text-decoration: none; // Explicitly remove underline
+// }
+
+// .action-link:hover {
+//   background: var(--bg-ternary); // Use canonical token
+//   color: var(--text-primary); // Use canonical token
+// }
+
+// .action-link.danger {
+//   color: var(--color-error); // Use canonical token
+// }
+
+// .action-link.danger:hover {
+//   background: color-mix(in srgb, var(--color-error) 10%, transparent); // Use color-mix for hover
+//   color: var(--color-error); // Use canonical token
+// }
+
+// /* Mobile */
+// @media (max-width: 768px) {
+//   .user-name,
+//   .user-role,
+//   .pi-angle-down {
+//     display: none;
+//   }
+//   .header-inner {
+//     padding: 0 0.75rem;
+//   }
+// }
+
+// // /* ======================= HEADER – FIXED 65px, NO GAPS ======================= */
+
+// // :host {
+// //   display: block;
+// //   position: fixed;
+// //   top: 0;
+// //   left: 0;
+// //   right: 0;
+// //   z-index: 50;
+// //   height: 65px;
+// //   background: var(--theme-bg-secondary);
+// //   border-bottom: 1px solid var(--theme-border-primary);
+// //   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+// //   padding: 0;
+// //   margin: 0;
+// //   font-family: var(--font-primary);
+// //   line-height: 1;
+// // }
+
+// // /* Inner Container */
+// // .header-inner {
+// //   display: flex;
+// //   align-items: center;
+// //   justify-content: space-between;
+// //   height: 100%;
+// //   padding: 0 1rem;
+// //   margin: 0;
+// // }
+
+// // /* Left: Logo + Toggle */
+// // .header-left {
+// //   display: flex;
+// //   align-items: center;
+// //   gap: 0.75rem;
+// // }
+
+// // .logo-link {
+// //   display: flex;
+// //   align-items: center;
+// //   gap: 0.5rem;
+// //   text-decoration: none;
+// //   color: var(--theme-text-primary);
+// //   font-weight: 700;
+// //   font-size: 1.25rem;
+// // }
+
+// // .logo-link i {
+// //   font-size: 1.5rem;
+// //   color: var(--theme-accent-primary);
+// // }
+
+// // .menu-toggle-btn {
+// //   display: flex;
+// //   align-items: center;
+// //   justify-content: center;
+// //   width: 40px;
+// //   height: 40px;
+// //   border-radius: 0.5rem;
+// //   background: transparent;
+// //   border: none;
+// //   color: var(--theme-text-secondary);
+// //   cursor: pointer;
+// //   transition: all 0.2s ease;
+// // }
+
+// // .menu-toggle-btn:hover {
+// //   background: var(--theme-hover-bg);
+// //   color: var(--theme-text-primary);
+// //   transform: scale(1.05);
+// // }
+
+// // /* Right: User Menu */
+// // .header-right {
+// //   display: flex;
+// //   align-items: center;
+// //   gap: 0.75rem;
+// // }
+
+// // .user-menu-btn {
+// //   display: flex;
+// //   align-items: center;
+// //   gap: 0.5rem;
+// //   padding: 0.375rem 0.75rem 0.375rem 0.375rem;
+// //   background: var(--theme-bg-ternary);
+// //   border: 1px solid var(--theme-border-primary);
+// //   border-radius: 9999px;
+// //   cursor: pointer;
+// //   transition: all 0.2s ease;
+// // }
+
+// // .user-menu-btn:hover {
+// //   background: var(--theme-hover-bg);
+// //   border-color: var(--theme-accent-primary);
+// // }
+
+// // .user-avatar {
+// //   width: 32px;
+// //   height: 32px;
+// //   border-radius: 50%;
+// //   background: var(--theme-accent-primary);
+// //   color: white;
+// //   display: flex;
+// //   align-items: center;
+// //   justify-content: center;
+// //   font-weight: 600;
+// //   font-size: 0.75rem;
+// // }
+
+// // .user-name {
+// //   font-size: 0.875rem;
+// //   font-weight: 500;
+// //   color: var(--theme-text-primary);
+// //   max-width: 100px;
+// //   white-space: nowrap;
+// //   overflow: hidden;
+// //   text-overflow: ellipsis;
+// // }
+
+// // .user-role {
+// //   font-size: 0.75rem;
+// //   color: var(--theme-text-secondary);
+// // }
+
+// // .pi-angle-down {
+// //   font-size: 0.75rem;
+// //   color: var(--theme-text-secondary);
+// //   transition: transform 0.2s ease;
+// // }
+
+// // .user-menu-btn:hover .pi-angle-down {
+// //   transform: rotate(180deg);
+// // }
+
+// // /* Popover */
+// // :host ::ng-deep .p-popover {
+// //   border-radius: 0.75rem;
+// //   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+// //   border: 1px solid var(--theme-border-primary);
+// // }
+
+// // :host ::ng-deep .p-popover .p-popover-content {
+// //   padding: 0;
+// //   background: var(--theme-bg-ternary);
+// // }
+
+// // .popover-body {
+// //   padding: 1rem;
+// //   min-width: 250px;
+// // }
+
+// // .user-info {
+// //   display: flex;
+// //   align-items: center;
+// //   gap: 0.75rem;
+// //   padding-bottom: 0.75rem;
+// //   margin-bottom: 0.75rem;
+// //   border-bottom: 1px solid var(--theme-border-primary);
+// // }
+
+// // .user-info .p-avatar {
+// //   width: 48px;
+// //   height: 48px;
+// // }
+
+// // .user-info-text {
+// //   flex: 1;
+// // }
+
+// // .user-info-name {
+// //   font-weight: 600;
+// //   color: var(--theme-text-primary);
+// // }
+
+// // .user-info-email {
+// //   font-size: 0.75rem;
+// //   color: var(--theme-text-secondary);
+// // }
+
+// // .theme-section {
+// //   margin: 0.75rem 0;
+// // }
+
+// // .theme-label {
+// //   display: flex;
+// //   justify-content: space-between;
+// //   align-items: center;
+// //   margin-bottom: 0.5rem;
+// //   font-size: 0.875rem;
+// //   font-weight: 500;
+// //   color: var(--theme-text-label);
+// // }
+
+// // .theme-colors {
+// //   display: grid;
+// //   grid-template-columns: repeat(6, 1fr);
+// //   gap: 0.5rem;
+// // }
+
+// // .theme-color {
+// //   width: 24px;
+// //   height: 24px;
+// //   border-radius: 50%;
+// //   cursor: pointer;
+// //   border: 2px solid transparent;
+// //   transition: all 0.2s ease;
+// // }
+
+// // .theme-color:hover {
+// //   transform: scale(1.1);
+// //   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+// // }
+
+// // .theme-color.selected {
+// //   border-color: var(--theme-accent-primary);
+// //   box-shadow: 0 0 0 2px white, 0 0 0 4px var(--theme-accent-primary);
+// // }
+
+// // .action-link {
+// //   display: flex;
+// //   align-items: center;
+// //   gap: 0.5rem;
+// //   padding: 0.5rem 0.75rem;
+// //   border-radius: 0.5rem;
+// //   color: var(--theme-text-secondary);
+// //   font-size: 0.875rem;
+// //   transition: all 0.2s ease;
+// // }
+
+// // .action-link:hover {
+// //   background: var(--theme-hover-bg);
+// //   color: var(--theme-text-primary);
+// // }
+
+// // .action-link.danger {
+// //   color: #dc2626;
+// // }
+
+// // .action-link.danger:hover {
+// //   background: rgba(220, 38, 38, 0.1);
+// //   color: #b91c1c;
+// // }
+
+// // /* Mobile */
+// // @media (max-width: 768px) {
+// //   .user-name, .user-role, .pi-angle-down {
+// //     display: none;
+// //   }
+// //   .header-inner {
+// //     padding: 0 0.75rem;
+// //   }
+// // }

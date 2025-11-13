@@ -1,14 +1,3 @@
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-payment-details',
-//   imports: [],
-  // templateUrl: './payment-details.html',
-  // styleUrl: './payment-details.scss',
-// })
-// export class PaymentDetails {
-
-// }
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
@@ -24,6 +13,9 @@ import { LoadingService } from '../../../../core/services/loading.service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { PaymentService } from '../../services/payment-service';
 
+// Define the specific severity type for PrimeNG
+type Severity = 'success' | 'secondary' | 'info' | 'warn' | 'danger' | 'contrast';
+
 @Component({
   selector: 'app-payment-details',
   standalone: true,
@@ -35,7 +27,7 @@ import { PaymentService } from '../../services/payment-service';
     TagModule
   ],
    templateUrl: './payment-details.html',
-  styleUrl: './payment-details.scss',
+   styleUrl: './payment-details.scss',
 })
 export class PaymentDetailsComponent implements OnInit {
   // Injected services
@@ -88,15 +80,16 @@ export class PaymentDetailsComponent implements OnInit {
     return new Date(dateString).toLocaleString();
   }
   
-  getPaymentType(type: string): { label: string, severity: string } {
+  // CORRECTED: Return type is now the specific Severity
+  getPaymentType(type: string): { label: string, severity: Severity } {
     if (type === 'inflow') {
       return { label: 'Inflow (Received)', severity: 'success' };
     }
     return { label: 'Outflow (Paid)', severity: 'danger' };
   }
   
-  // "success" | "secondary" | "info" | "warn" | "danger" | "contrast"
-  getStatus(status: any): any{
+  // CORRECTED: Return type is now the specific Severity
+  getStatus(status: any): { label: string, severity: Severity } {
     switch (status) {
       case 'completed': return { label: 'Completed', severity: 'success' };
       case 'pending': return { label: 'Pending', severity: 'warn' };
