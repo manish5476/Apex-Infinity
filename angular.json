@@ -43,12 +43,7 @@
               "core-js",
               "raf",
               "rgbcolor"
-            ],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "src/server.ts"
-            }
+            ]
           },
           "configurations": {
             "production": {
@@ -56,7 +51,7 @@
                 {
                   "type": "initial",
                   "maximumWarning": "7mb",
-                  "maximumError": "8MB"
+                  "maximumError": "8mb"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -109,7 +104,7 @@
           },
           "defaultConfiguration": "development"
         },
-        "extract-i1n": {
+        "extract-i18n": {
           "builder": "@angular/build:extract-i18n"
         },
         "test": {

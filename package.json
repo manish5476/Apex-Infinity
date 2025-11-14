@@ -41,7 +41,6 @@
     "@angular/platform-browser": "^20.3.0",
     "@angular/platform-server": "^20.3.0",
     "@angular/router": "^20.3.0",
-    "@angular/ssr": "^20.3.9",
     "@primeng/themes": "^20.3.0",
     "@primeuix/themes": "^1.2.5",
     "@tailwindcss/postcss": "^4.1.16",
