@@ -1,77 +1,151 @@
-/* Use theme variables for consistency */
+/* CORRECTED:
+  - Using canonical theme variables
+  - Added theme styles for p-table, p-confirm-dialog,
+    and inputs/multiselect inside the dialog.
+*/
 :host {
   display: block;
-  padding: 1rem; // Use smaller padding to fit in router-outlet
+  padding: var(--spacing-xl); // Use theme spacing
   height: 100%;
   overflow-y: auto;
-  background-color: var(--theme-bg-primary);
+  background-color: var(--bg-primary); // Use canonical token
 }
 
 .role-management-page {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--spacing-xl); // Use theme spacing
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid var(--theme-border-primary);
-  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-primary); // Use canonical token
+  padding-bottom: var(--spacing-lg); // Use theme spacing
 }
 
 .page-title {
-  font-size: 1.75rem;
+  font-size: var(--font-size-3xl); // Use theme font size
   font-weight: 600;
-  color: var(--theme-text-primary);
+  color: var(--text-primary); // Use canonical token
   margin: 0;
 }
 
 .card {
-  background: var(--theme-bg-secondary);
-  border-radius: var(--ui-border-radius);
-  box-shadow: var(--ui-shadow-sm);
+  background: var(--bg-secondary); // Use canonical token
+  border-radius: var(--ui-border-radius-lg); // Use canonical token
+  box-shadow: var(--shadow-sm); // Use canonical token
   overflow: hidden;
+  border: 1px solid var(--border-primary);
 }
 
 /* Style fixes for dialogs */
 :host ::ng-deep {
-  .p-dialog .p-dialog-header {
-    background-color: var(--theme-bg-secondary);
-    color: var(--theme-text-primary);
-    border-bottom: 1px solid var(--theme-border-primary);
+  /* === Table Styles === */
+  .p-table {
+    .p-table-thead > tr > th {
+      background: var(--bg-ternary);
+      color: var(--text-primary);
+      border-color: var(--border-primary);
+      font-size: var(--font-size-sm);
+    }
+    .p-table-tbody > tr > td {
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      border-color: var(--border-primary);
+      font-size: var(--font-size-sm);
+    }
+    .p-table-tbody > tr:hover {
+      background: var(--bg-ternary);
+    }
   }
 
-  .p-dialog .p-dialog-content {
-    background-color: var(--theme-bg-primary);
-    color: var(--theme-text-secondary);
+  /* === Dialog Styles === */
+  .p-dialog {
+    .p-dialog-header {
+      background-color: var(--bg-secondary);
+      color: var(--text-primary);
+      border-bottom: 1px solid var(--border-primary);
+    }
+
+    .p-dialog-content {
+      background-color: var(--bg-primary); // Use primary for contrast
+      color: var(--text-secondary);
+      
+      // Style inputs inside the dialog
+      .p-inputtext, .p-multiselect {
+         background: var(--bg-ternary);
+         border-color: var(--border-primary);
+         color: var(--text-primary);
+      }
+      .p-multiselect-label {
+        color: var(--text-primary);
+      }
+    }
+
+    .p-dialog-footer {
+      background-color: var(--bg-secondary);
+      border-top: 1px solid var(--border-primary);
+    }
+  }
+  
+  /* === Confirmation Dialog === */
+  .p-confirm-dialog {
+    background: var(--bg-secondary);
+    border: var(--ui-border-width) solid var(--border-primary);
+    border-radius: var(--ui-border-radius-lg);
+
+    .p-dialog-header {
+      background: transparent;
+      color: var(--text-primary);
+      border-bottom: 1px solid var(--border-primary);
+      font-weight: 600;
+    }
+    .p-dialog-content {
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+    }
+    .p-dialog-footer {
+      background: var(--bg-ternary);
+      border-top: 1px solid var(--border-primary);
+      display: flex;
+      gap: var(--spacing-sm);
+    }
   }
 
-  .p-dialog .p-dialog-footer {
-    background-color: var(--theme-bg-secondary);
-    border-top: 1px solid var(--theme-border-primary);
-  }
-
+  /* === MultiSelect Panel === */
   .p-multiselect-panel {
-    background-color: var(--theme-bg-secondary);
-    border: 1px solid var(--theme-border-primary);
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
     
     .p-multiselect-header {
-      background-color: var(--theme-bg-primary);
-      border-bottom: 1px solid var(--theme-border-primary);
+      background-color: var(--bg-ternary); // CORRECTED
+      border-bottom: 1px solid var(--border-primary);
+      
+      .p-multiselect-filter {
+        background: var(--bg-primary); // CORRECTED
+        color: var(--text-primary);
+        border-color: var(--border-secondary);
+      }
     }
     
     .p-multiselect-item-group {
-      background-color: var(--theme-bg-ternary);
-      color: var(--theme-text-primary);
+      background-color: var(--bg-ternary); // CORRECTED
+      color: var(--text-primary);
+      font-weight: 600;
     }
     
     .p-multiselect-item {
-      color: var(--theme-text-secondary);
+      color: var(--text-secondary);
       &:hover {
-        background-color: var(--theme-hover-bg);
+        background-color: var(--bg-ternary); // CORRECTED
       }
+    }
+    
+    .p-multiselect-item.p-highlight {
+      background: var(--accent-focus); // CORRECTED
+      color: var(--accent-primary); // CORRECTED
     }
   }
 }

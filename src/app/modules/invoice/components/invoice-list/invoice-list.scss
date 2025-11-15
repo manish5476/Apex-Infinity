@@ -1,4 +1,178 @@
+/* ==============================================
+   INVOICE LIST COMPONENT
+   - Re-uses all styles from branch-list.scss
+   - Adds status-specific cell styles
+   ============================================== */
+
 :host {
   display: block;
   height: 100%;
+}
+
+.list-page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--spacing-xl);
+  gap: var(--spacing-xl);
+  background: var(--bg-primary);
+}
+
+/* === HEADER === */
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.list-title {
+  font-size: var(--font-size-3xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+/* === CARD === */
+.themed-card {
+  background: var(--bg-secondary);
+  border-radius: var(--ui-border-radius-lg);
+  border: var(--ui-border-width) solid var(--border-primary);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-lg);
+}
+
+/* === FILTER BAR === */
+.se-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-lg);
+  align-items: flex-end; // Aligns buttons with inputs
+}
+
+.se-filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  flex-grow: 1;
+  min-width: 200px;
+
+  label {
+    font-size: var(--font-size-xs);
+    color: var(--text-label);
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  // Style inputs to match our forms
+  :is(input[pInputText], p-select) {
+    background: var(--bg-ternary);
+  }
+}
+
+.se-filter-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  padding-bottom: 2px; // Minor alignment tweak
+}
+
+
+/* === GRID AREA === */
+.list-grid-area {
+  flex-grow: 1; // This makes it fill the remaining height
+  min-height: 0; // Crucial for flex-grow to work in a flex-col
+  padding: var(--spacing-lg);
+  
+  // The grid component will fill this area
+  app-shared-grid {
+    height: 100%;
+    width: 100%;
+  }
+}
+
+/* === AG-GRID THEMING === */
+:host ::ng-deep {
+  /* Style the grid cells based on our theme */
+  .ag-root-wrapper {
+    border: none;
+  }
+  .ag-header {
+    background-color: var(--bg-ternary);
+    border-bottom: var(--ui-border-width) solid var(--border-primary);
+  }
+  .ag-header-cell-label {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+  .ag-row {
+    background-color: var(--bg-secondary);
+    color: var(--text-secondary);
+    border-color: var(--border-primary) !important;
+    
+    &.ag-row-hover {
+      background-color: var(--bg-ternary);
+    }
+  }
+  
+  /* Status Cell Specific */
+  .cell-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    font-weight: 600;
+    text-transform: capitalize;
+
+    /* Payment Status */
+    &.status-paid {
+      background-color: color-mix(in srgb, var(--color-success) 15%, transparent);
+      color: var(--color-success);
+    }
+    &.status-partial {
+      background-color: color-mix(in srgb, var(--color-warning) 15%, transparent);
+      color: var(--color-warning);
+    }
+    &.status-unpaid {
+      background-color: color-mix(in srgb, var(--color-error) 15%, transparent);
+      color: var(--color-error);
+    }
+
+    /* Invoice Status */
+     &.status-issued {
+      background-color: color-mix(in srgb, var(--color-info) 15%, transparent);
+      color: var(--color-info);
+    }
+     &.status-draft {
+      background-color: color-mix(in srgb, var(--text-label) 15%, transparent);
+      color: var(--text-label);
+      font-style: italic;
+    }
+     &.status-cancelled {
+      background-color: color-mix(in srgb, var(--color-error) 15%, transparent);
+      color: var(--color-error);
+    }
+  }
+
+  /* p-select dropdown panel */
+  .p-select-panel {
+    background: var(--bg-secondary);
+    border: var(--ui-border-width) solid var(--border-primary);
+    
+    .p-select-item {
+      color: var(--text-secondary);
+      &:hover {
+        background: var(--bg-ternary);
+        color: var(--text-primary);
+      }
+    }
+    .p-select-item.p-highlight {
+      background: var(--accent-focus);
+      color: var(--accent-primary);
+    }
+  }
 }

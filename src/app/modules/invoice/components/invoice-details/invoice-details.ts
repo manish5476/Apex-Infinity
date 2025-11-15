@@ -27,6 +27,7 @@ import { ConfirmationService } from 'primeng/api';
 import { LoadingService } from '../../../../core/services/loading.service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { InvoiceService } from '../../services/invoice-service';
+import { Toast } from "primeng/toast";
 
 // Simple model based on schema
 interface IInvoice {
@@ -61,8 +62,9 @@ interface IInvoice {
     TagModule,
     TableModule,
     TooltipModule,
-    ConfirmDialogModule
-  ],
+    ConfirmDialogModule,
+    Toast
+],
   providers: [ConfirmationService],
   templateUrl: './invoice-details.html',
   styleUrl: './invoice-details.scss',

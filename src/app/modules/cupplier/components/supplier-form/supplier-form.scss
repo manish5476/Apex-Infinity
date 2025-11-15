@@ -1,18 +1,222 @@
-/* Re-uses all global customer form styles */
+/* ==============================================
+   SUPPLIER FORM COMPONENT
+   - Re-uses all theme styles from product-form
+   ============================================== */
+
 :host {
   display: block;
+  width: 100%;
+  height: 100%;
 }
 
-/* Helper for 2-column span */
-.col-span-2 {
-  grid-column: span 2;
-  @media (max-width: 640px) {
-    grid-column: auto;
+/* === Main Wrapper (from invoice form) === */
+.customer-wrapper {
+  width: 100%;
+  height: 100%;
+  overflow: hidden; // This holds the layout
+  display: flex;
+  justify-content: center;
+  background: var(--bg-primary);
+  padding: var(--spacing-xl);
+}
+
+.customer-container {
+  width: 100%;
+}
+
+/* === Form Panel (from invoice form) === */
+.customer-form-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-secondary);
+  border-radius: var(--ui-border-radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  border: var(--ui-border-width) solid var(--border-primary);
+  max-height: 100%; 
+}
+
+.customer-form-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* === 1. Sticky Header (from invoice form) === */
+.customer-form-header {
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background: var(--bg-secondary);
+  border-bottom: var(--ui-border-width) solid var(--border-primary);
+  flex-shrink: 0;
+  z-index: 10;
+
+  .form-title {
+    font-size: var(--font-size-2xl);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
   }
+  .form-subtitle {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin: 0;
+  }
+  .req {
+    color: var(--color-error);
+  }
+}
+
+/* === 2. Scrollable Body (from invoice form) === */
+.customer-form-body {
+  flex: 1; // Grow to fill space
+  overflow-y: auto; // This is the scrollable part
+  padding: var(--spacing-xl);
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+/* === 3. Sticky Footer (from invoice form) === */
+.customer-form-footer {
+  background: var(--bg-secondary);
+  border-top: var(--ui-border-width) solid var(--border-primary);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+/* === NEW: Form Section (from customer-form) === */
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-xl);
+  background: var(--bg-secondary); // Use secondary bg for sections
+  border-radius: var(--ui-border-radius-lg); // Make sections rounded
+  border: var(--ui-border-width) solid var(--border-primary);
+  box-shadow: var(--shadow-sm); // Add shadow to lift section
+
+  .section-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 var(--spacing-sm) 0; // Add bottom margin
+    border-left: 4px solid var(--accent-primary);
+    padding-left: var(--spacing-md);
+  }
+}
+
+
+/* === Form Group Styling (from invoice form) === */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+
+  label {
+    font-size: var(--font-size-xs);
+    color: var(--text-label);
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .req {
+    color: var(--color-error);
+  }
+  // For checkboxes
+  .checkbox-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+    text-transform: none;
+    font-weight: 400;
+  }
+}
+
+/* === Grids (from invoice form) === */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
 }
 
 .form-grid-3 {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 0.85rem;
+  gap: var(--spacing-lg);
+}
+
+.col-span-2 {
+  grid-column: span 2;
+  @media (max-width: 600px) {
+    grid-column: span 1;
+  }
+}
+
+/* === Validation & Component Overrides (from invoice form) === */
+:host ::ng-deep {
+  // Ensure all form components take full width
+  :is(p-select, .p-inputnumber, .p-inputtextarea, .p-fileupload, p-datepicker, p-multiSelect) {
+    width: 100%;
+  }
+
+  // Set input backgrounds to contrast
+  :is(.p-inputtext, .p-inputnumber-input, .p-textarea) {
+    background: var(--bg-ternary);
+    color: var(--text-primary);
+    width: 100%;
+  }
+  
+  // p-select and p-multiSelect
+  :is(.p-select, .p-multiselect) {
+    background: var(--bg-ternary);
+    color: var(--text-primary);
+    .p-select-label, .p-multiselect-label {
+      background: transparent;
+      color: var(--text-primary);
+    }
+  }
+
+  // Style invalid touched form fields
+  .ng-invalid.ng-touched {
+    :is(.p-inputtext, p-select, .p-inputnumber, .p-inputtextarea, p-multiSelect) {
+      border-color: var(--color-error);
+    }
+  }
+
+  // Ensure dropdown panels match theme
+  :is(.p-select-panel, .p-multiselect-panel) {
+    background: var(--bg-secondary);
+    border: var(--ui-border-width) solid var(--border-primary);
+    
+    :is(.p-select-item, .p-multiselect-item) {
+      color: var(--text-secondary);
+      &:hover {
+        background: var(--bg-ternary);
+        color: var(--text-primary);
+      }
+    }
+    :is(.p-select-item.p-highlight, .p-multiselect-item.p-highlight) {
+      background: var(--accent-focus);
+      color: var(--accent-primary);
+    }
+  }
+  
+  // MultiSelect header
+  .p-multiselect-header {
+      background: var(--bg-ternary);
+      border-bottom-color: var(--border-primary);
+      
+      .p-checkbox {
+         background: var(--bg-primary);
+         border-color: var(--border-secondary);
+      }
+      .p-multiselect-filter-icon, .p-multiselect-close {
+        color: var(--text-secondary);
+      }
+  }
 }

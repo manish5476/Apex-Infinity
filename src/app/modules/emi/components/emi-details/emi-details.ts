@@ -1,20 +1,6 @@
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-emi-details',
-//   imports: [],
-  // templateUrl: './emi-details.html',
-  // styleUrl: './emi-details.scss',
-// })
-// export class EmiDetails {
-
-// }
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
-// import { EmiService } from '../../services/emi.service';
-// import { LoadingService } from '../../../../../core/services/loading.service';
-// import { AppMessageService } from '../../../../../core/services/message.service';
 import { finalize, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -31,6 +17,7 @@ import { SelectModule } from 'primeng/select';
 import { LoadingService } from '../../../../core/services/loading.service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { EmiService } from '../../services/emi-service';
+import { Toast } from "primeng/toast";
 
 @Component({
   selector: 'app-emi-details',
@@ -46,8 +33,9 @@ import { EmiService } from '../../services/emi-service';
     TooltipModule,
     DialogModule,
     InputNumberModule,
-    SelectModule
-  ],
+    SelectModule,
+    Toast
+],
   templateUrl: './emi-details.html',
   styleUrl: './emi-details.scss',
 })
@@ -180,7 +168,7 @@ export class EmiDetailsComponent implements OnInit {
     return new Date(dateString).toLocaleDateString();
   }
   
-  getPaymentStatusSeverity(status: string): string {
+  getPaymentStatusSeverity(status: string): any {
     switch (status) {
       case 'paid': return 'success';
       case 'partial': return 'warn';
@@ -190,12 +178,12 @@ export class EmiDetailsComponent implements OnInit {
     }
   }
 
-  getEmiStatusSeverity(status: string): string {
+  getEmiStatusSeverity(status: string): any {
     switch (status) {
       case 'active': return 'success';
       case 'completed': return 'info';
       case 'defaulted': return 'danger';
-      default: return 'secondary';
+      default: return 'warn';
     }
   }
 }

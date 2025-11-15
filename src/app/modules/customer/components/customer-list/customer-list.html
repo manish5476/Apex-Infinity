@@ -1,53 +1,72 @@
-<div class="flex flex-col h-full p-5 gap-5 bg-[var(--theme-bg-secondary)]">
-  <!-- ===========================
-       FILTER BAR SECTION
-  ============================ -->
-  <div class="card filter-section">
-    <div class="se-filter-bar">
-      <!-- Customer -->
-      <div class="se-filter-field">
-        <label>Customer</label>
-        <p-select id="customer" [options]="masterList.customers()" [(ngModel)]="customerFilter._id" [filter]="true"
-          filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select Customer"
-          appendTo="body" styleClass="w-full md:w-56">
-        </p-select>
-      </div>
+<p-toast></p-toast>
 
-      <!-- Email -->
-      <div class="se-filter-field">
-        <label>Email</label>
-        <p-autoComplete id="email" [(ngModel)]="customerFilter.email" [suggestions]="emailSuggestions"
-          (completeMethod)="filterEmails($event)" (keyup.enter)="applyFilters()" [forceSelection]="false"
-          placeholder="Enter email" styleClass="w-full md:w-56">
-        </p-autoComplete>
-      </div>
-
-      <!-- Phone -->
-      <div class="se-filter-field">
-        <label>Phone</label>
-        <input id="phone" type="text" pInputText [(ngModel)]="customerFilter.phone" placeholder="Phone"
-          (keyup.enter)="applyFilters()" class="w-full md:w-40" />
-      </div>
-
-      <!-- Buttons -->
-      <div class="filter-actions">
-        <p-button label="Apply" icon="pi pi-check" severity="success" (onClick)="applyFilters()" class="action-btn">
-        </p-button>
-
-        <p-button label="Reset" icon="pi pi-refresh" severity="secondary" styleClass="p-button-outlined"
-          (onClick)="resetFilters()" class="action-btn">
-        </p-button>
-      </div>
-    </div>
-  </div>
+<!-- 
+  REFACTORED:
+  - Using the consistent list page layout
+-->
+<div class="list-page-container">
 
   <!-- ===========================
-       GRID SECTION
-  ============================ -->
-  <div class="flex-grow card grid-section min-h-0">
-    <app-shared-grid [data]="data" [gridHeight]="'210px'" [headerFilter]="false" [rowSelectionMode]="rowSelectionMode"
-      [GridName]="'Customer Details'" [column]="column" (eventFromGrid)="eventFromGrid($event)"
-      (gridReady)="onGridReady($event)" (scrolledToBottom)="onScrolledToBottom($event)">
-    </app-shared-grid>
+       HEADER
+  ============================ -->
+  <div class="list-header">
+    <h2 class="list-title">
+      <i class="pi pi-users text-[var(--accent-primary)]"></i>
+      Customer Management
+    </h2>
+    <p-button label="New Customer" icon="pi pi-plus" routerLink="create">
+    </p-button>
   </div>
+
+    <!-- ===========================
+       FILTER BAR SECTION
+  ============================ -->
+  <div class="themed-card"> <!-- REFACTORED: Using themed-card -->
+        <div class="se-filter-bar">
+            <!-- Customer -->
+            <div class="se-filter-field">
+                <label for="customer">Customer</label>
+                <p-select id="customer" [options]="masterList.customers()" [(ngModel)]="customerFilter._id"
+          [filter]="true"           filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true"
+          placeholder="Select Customer"           appendTo="body">
+                  </p-select>
+              </div>
+
+            <!-- Email -->
+            <div class="se-filter-field">
+                <label for="email">Email</label>
+                <p-autoComplete id="email" [(ngModel)]="customerFilter.email" [suggestions]="emailSuggestions"          
+          (completeMethod)="filterEmails($event)" (keyup.enter)="applyFilters()" [forceSelection]="false"          
+          placeholder="Enter email">
+                  </p-autoComplete>
+              </div>
+
+            <!-- Phone -->
+            <div class="se-filter-field">
+                <label for="phone">Phone</label>
+                <input id="phone" type="text" pInputText [(ngModel)]="customerFilter.phone" placeholder="Phone"        
+            (keyup.enter)="applyFilters()" />
+              </div>
+
+            <!-- Buttons -->
+            <div class="se-filter-actions">
+                <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()">
+                  </p-button>
+                <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined"          
+          (onClick)="resetFilters()">
+                  </p-button>
+              </div>
+          </div>
+      </div>
+
+    <!-- ===========================
+       GRID SECTION
+  ============================ -->
+  <div class="themed-card list-grid-area"> <!-- REFACTORED: Using themed-card and list-grid-area -->
+        <app-shared-grid [data]="data" [gridHeight]="'210px'" [headerFilter]="false"
+      [rowSelectionMode]="rowSelectionMode"       [GridName]="'Customer Details'" [column]="column"
+      (eventFromGrid)="eventFromGrid($event)"       (gridReady)="onGridReady($event)"
+      (scrolledToBottom)="onScrolledToBottom($event)">
+          </app-shared-grid>
+      </div>
 </div>

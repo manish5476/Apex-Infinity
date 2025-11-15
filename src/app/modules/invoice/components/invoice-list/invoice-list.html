@@ -1,8 +1,10 @@
-<div class="flex flex-col h-full p-6 gap-6 bg-[var(--theme-bg-secondary)]">
-  <!-- HEADER -->
-  <div class="flex justify-between items-center">
-    <h2 class="text-2xl font-bold text-[var(--theme-text-heading)] flex items-center gap-2">
-      <i class="pi pi-receipt text-[var(--theme-accent-primary)]"></i>
+<p-toast></p-toast>
+
+<div class="list-page-container">
+  
+  <div class="list-header">
+    <h2 class="list-title">
+      <i class="pi pi-receipt text-[var(--accent-primary)]"></i>
       Invoices
     </h2>
     <p-button 
@@ -12,25 +14,20 @@
     </p-button>
   </div>
 
-  <!-- FILTER BAR -->
-  <div class="glass-card p-4 rounded-lg shadow-md">
-    <div class="se-filter-bar">
+  <div class="themed-card"> <div class="se-filter-bar">
       
-      <!-- Invoice Number -->
       <div class="se-filter-field">
-        <label>Invoice Number</label>
+        <label for="invoiceNumber">Invoice Number</label>
         <input 
           id="invoiceNumber" 
           type="text" 
           pInputText 
           [(ngModel)]="invoiceFilter.invoiceNumber"
-          placeholder="Search by number" 
-          class="w-full md:w-40" />
+          placeholder="Search by number" />
       </div>
       
-      <!-- Customer -->
       <div class="se-filter-field">
-        <label>Customer</label>
+        <label for="customer">Customer</label>
         <p-select  appendTo="body" 
           id="customer" 
           [options]="customerOptions()" 
@@ -41,51 +38,43 @@
           optionValue="_id"
           [showClear]="true" 
           placeholder="Select Customer" 
-          appendTo="body"
-          styleClass="w-full md:w-60">
+          appendTo="body">
         </p-select>
       </div>
 
-      <!-- Status -->
       <div class="se-filter-field">
-        <label>Status</label>
+        <label for="status">Status</label>
         <p-select  appendTo="body" 
           id="status" 
           [options]="statusOptions" 
           [(ngModel)]="invoiceFilter.status"
           [showClear]="true" 
           placeholder="Select Status" 
-          appendTo="body"
-          styleClass="w-full md:w-40">
+          appendTo="body">
         </p-select>
       </div>
       
-      <!-- Payment Status -->
       <div class="se-filter-field">
-        <label>Payment Status</label>
+        <label for="paymentStatus">Payment Status</label>
         <p-select  appendTo="body" 
           id="paymentStatus" 
           [options]="paymentStatusOptions" 
           [(ngModel)]="invoiceFilter.paymentStatus"
           [showClear]="true" 
           placeholder="Select Payment" 
-          appendTo="body"
-          styleClass="w-full md:w-40">
+          appendTo="body">
         </p-select>
       </div>
 
-      <!-- Actions -->
-      <div class="flex gap-2 items-center mt-1">
+      <div class="se-filter-actions">
         <p-button 
           label="Apply" 
           icon="pi pi-check" 
-          severity="success" 
           (onClick)="applyFilters()">
         </p-button>
         <p-button 
           label="Reset" 
           icon="pi pi-refresh" 
-          severity="secondary" 
           styleClass="p-button-outlined"
           (onClick)="resetFilters()">
         </p-button>
@@ -93,12 +82,9 @@
     </div>
   </div>
 
-  <!-- GRID AREA -->
-  <div class="flex-grow glass-card p-4 rounded-lg shadow-md min-h-0">
-    <app-shared-grid 
+  <div class="themed-card list-grid-area"> <app-shared-grid 
       [data]="data" 
-      [gridHeight]="'219px'" 
-      [headerFilter]="false" 
+      [gridHeight]="'210px'" [headerFilter]="false" 
       [rowSelectionMode]="rowSelectionMode"
       [GridName]="'Invoices'" 
       [column]="column" 
@@ -107,4 +93,5 @@
       (scrolledToBottom)="onScrolledToBottom($event)">
     </app-shared-grid>
   </div>
+
 </div>

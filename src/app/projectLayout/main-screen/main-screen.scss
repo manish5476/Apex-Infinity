@@ -1,14 +1,22 @@
-/* ======================= MAIN LAYOUT – STARTS AT TOP ======================= */
+/* =======================
+   MAIN LAYOUT (REFACTORED)
+   - Sidebar hides completely (width: 0)
+   ======================= */
+
+// --- Layout Variables ---
+$header-height: 65px;
+$sidebar-width: 16rem;
+$sidebar-width-mobile: 14rem;
+// REMOVED collapsed-width
 
 :host {
   display: block;
   height: 100vh;
   overflow: hidden;
-  background: var(--theme-bg-ternary);
-  color: var(--theme-text-primary);
+  background: var(--bg-primary); 
+  color: var(--text-primary);
 }
 
-/* Full layout */
 .layout-container {
   position: relative;
   height: 100vh;
@@ -17,95 +25,53 @@
 }
 
 /* Header: fixed top */
-app-header {
+app-mainscreen-header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 65px;
-  z-index: 50;
-  background: var(--theme-bg-secondary);
-  border-bottom: 1px solid var(--theme-border-primary);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  z-index: var(--z-sticky);
+  flex-shrink: 0;
 }
 
 /* Main area: starts exactly below header */
 .main-content-area {
-  position: absolute;
-  top: 65px;           /* Starts right under header */
-  left: 0;
-  right: 0;
-  bottom: 0;
+  position: relative;
+  padding-top: $header-height; 
+  height: 100vh;
   display: flex;
   overflow: hidden;
 }
 
-/* Sidebar: fixed below header */
-app-sidebar {
-  position: fixed;
-  top: 65px;
-  left: 0;
-  width: 0;
-  height: calc(100vh - 65px);
-  z-index: 40;
-  transition: width 0.1s ease-out;
-  overflow: hidden;
-}
-
-app-sidebar.w-64 {
-  width: 16rem;
+/* Sidebar: also controlled by its own component */
+app-mainscreen-sidebar {
+  flex-shrink: 0;
 }
 
 /* Main content: fills remaining space */
-main {
+.main-content {
   flex: 1;
   min-width: 0;
-  padding: 0.5rem;
-  overflow: hidden;
-  transition: margin-left 0.1s ease-out;
+  overflow: hidden; 
+  transition: margin-left 0.2s ease-in-out; // Use matching transition
   display: flex;
   flex-direction: column;
+  
+  /* CORRECTION: 
+    - No margin-left by default.
+    - Only apply margin when sidebar is expanded.
+  */
+  margin-left: 0; 
+
+  &.content-expanded {
+    margin-left: $sidebar-width;
+  }
 }
 
-main.ml-64 {
-  margin-left: 16rem;
-}
-
-/* Content card */
-.content-card {
-  flex: 1;
-  background: var(--theme-bg-primary);
-  border: 1px solid var(--theme-border-primary);
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  margin: 0;
-}
-
-/* Inner padding */
-.content-inner {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Hide scrollbars */
-.content-inner,
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.content-inner::-webkit-scrollbar,
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
 
 /* Responsive */
 @media (max-width: 768px) {
-  app-sidebar.w-64 { width: 14rem; }
-  main.ml-64 { margin-left: 14rem; }
+  .main-content.content-expanded {
+     margin-left: $sidebar-width-mobile; 
+  }
 }

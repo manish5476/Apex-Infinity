@@ -1,6 +1,8 @@
+<p-toast></p-toast> 
+
 <!-- Main Details Page -->
-<div class="p-6">
-  <div class="glass-card emi-details-card" *ngIf="emiPlan(); else noEmiPlan">
+<div class="emi-page-container">
+  <div class="themed-card emi-details-card" *ngIf="emiPlan(); else noEmiPlan">
 
     <!-- === HEADER === -->
     <div class="details-header">
@@ -13,9 +15,9 @@
         </div>
         <div class="flex items-center gap-2 pl-14">
           <p-tag [value]="emiPlan()?.status | titlecase"
-           ></p-tag>
-            <!-- [severity]="getEmiStatusSeverity(emiPlan()?.status || '')" -->
-          <span class="text-sm text-[var(--theme-text-muted)]">For Invoice #{{ emiPlan()?.invoice?.invoiceNumber ||
+            [severity]="getEmiStatusSeverity(emiPlan()?.status)">
+          </p-tag>
+          <span class="text-sm text-[var(--text-label)]">For Invoice #{{ emiPlan()?.invoice?.invoiceNumber ||
             invoiceId }}</span>
         </div>
       </div>
@@ -75,11 +77,11 @@
               <td>{{ formatCurrency(item.paidAmount) }}</td>
               <td>
                 <p-tag [value]="item.paymentStatus | titlecase"
-                  ></p-tag>
-                  <!-- [severity]="getPaymentStatusSeverity(item.paymentStatus)" -->
+                   [severity]="getPaymentStatusSeverity(item.paymentStatus)">
+                </p-tag>
               </td>
               <td>
-                <p-button label="Pay" icon="pi pi-dollar" styleClass="p-button-sm p-button-success"
+                <p-button label="Pay" icon="pi pi-dollar" styleClass="p-button-sm"
                   (onClick)="onPayInstallmentClick(item)" [disabled]="item.paymentStatus === 'paid'">
                 </p-button>
               </td>
@@ -94,13 +96,13 @@
 
 <!-- "No EMI Plan" Message -->
 <ng-template #noEmiPlan>
-  <div class="glass-card emi-details-card text-center p-8">
-    <i class="pi pi-info-circle text-4xl text-[var(--theme-accent-primary)]"></i>
+  <div class="themed-card emi-details-card text-center p-8">
+    <i class="pi pi-info-circle text-4xl text-[var(--accent-primary)]"></i>
     <h3 class="form-title mt-4">No EMI Plan Found</h3>
-    <p class="text-[var(--theme-text-secondary)]">
+    <p class="text-[var(--text-secondary)]">
       There is no EMI plan associated with this invoice.
     </p>
-    <div class="mt-6">
+    <div class="mt-6 flex justify-center gap-2">
       <p-button label="Create EMI Plan" icon="pi pi-plus" [routerLink]="['/emi/create', invoiceId]">
       </p-button>
       <p-button label="Back to Invoice" icon="pi pi-arrow-left" styleClass="p-button-text"
@@ -118,10 +120,10 @@
     <div class="p-fluid flex flex-col gap-4" *ngIf="selectedInstallment()">
 
       <div class="text-center">
-        <div class="text-lg text-[var(--theme-text-secondary)]">
+        <div class="text-lg text-[var(--text-secondary)]">
           Installment #{{ selectedInstallment()?.installmentNumber }}
         </div>
-        <div class="text-3xl font-bold text-[var(--theme-text-primary)]">
+        <div class="text-3xl font-bold text-[var(--text-primary)]">
           {{ formatCurrency(selectedInstallment()?.totalAmount) }}
         </div>
       </div>

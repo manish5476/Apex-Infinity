@@ -1,11 +1,36 @@
-/* Re-using styles from invoice-details */
+/* REFACTORED:
+  - Using canonical theme tokens
+  - Using consistent page container and card styles
+*/
 :host {
   display: block;
   width: 100%;
+  height: 100%;
+}
+
+/* === Page Container === */
+.customer-page-container {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background: var(--bg-primary);
+  padding: var(--spacing-xl);
+}
+
+/* === Card === */
+.themed-card {
+  background: var(--bg-secondary);
+  border-radius: var(--ui-border-radius-lg);
+  border: var(--ui-border-width) solid var(--border-primary);
+  box-shadow: var(--shadow-sm);
+  width: 100%;
+  padding: var(--spacing-lg) var(--spacing-xl);
 }
 
 .payment-details-card {
-  padding: var(--spacing-lg) var(--spacing-xl);
   max-width: 1200px; /* Payments are simpler, don't need full width */
   margin: 0 auto; /* Center the card */
 }
@@ -19,10 +44,22 @@
   gap: var(--spacing-md);
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.header-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
 .form-title {
   font-family: var(--font-heading);
   font-size: var(--font-size-2xl);
-  color: var(--theme-text-primary);
+  color: var(--text-primary); // CORRECTED
   margin: 0;
 }
 
@@ -46,7 +83,7 @@
 .section-title {
   font-family: var(--font-heading);
   font-size: var(--font-size-lg);
-  color: var(--theme-text-primary);
+  color: var(--text-primary); // CORRECTED
   margin-bottom: var(--spacing-md);
 }
 
@@ -62,41 +99,48 @@
   gap: 2px;
   label {
     font-size: var(--font-size-sm);
-    color: var(--theme-text-label);
+    color: var(--text-label); // CORRECTED
     font-weight: 600;
   }
   span {
     font-size: var(--font-size-base);
-    color: var(--theme-text-primary);
+    color: var(--text-primary); // CORRECTED
     font-weight: 600;
   }
 
   .amount-display {
     font-size: var(--font-size-3xl);
     font-weight: 700;
-    color: var(--theme-accent-primary);
+    color: var(--accent-primary); // CORRECTED
   }
 }
 
 .reference-column {
   padding-left: var(--spacing-xl);
-  border-left: 1px solid var(--theme-border-primary);
+  border-left: 1px solid var(--border-primary); // CORRECTED
   
   @media (max-width: 768px) {
     padding-left: 0;
     border-left: none;
-    border-top: 1px solid var(--theme-border-primary);
+    border-top: 1px solid var(--border-primary); // CORRECTED
     padding-top: var(--spacing-xl);
   }
 }
 
 .remarks-text {
   font-size: var(--font-size-base);
-  color: var(--theme-text-secondary);
+  color: var(--text-secondary); // CORRECTED
   font-style: italic;
-  background: var(--theme-bg-ternary);
+  background: var(--bg-ternary); // CORRECTED
   padding: var(--spacing-md);
   border-radius: var(--ui-border-radius);
   margin: 0;
   white-space: pre-wrap;
+}
+
+/* === UTILITY === */
+:host ::ng-deep .p-button.p-button-rounded {
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
 }

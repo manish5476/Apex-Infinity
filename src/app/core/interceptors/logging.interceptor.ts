@@ -1,17 +1,33 @@
+// src/app/core/interceptors/logging.interceptor.ts
 import { HttpHandlerFn, HttpRequest, HttpResponse } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
 
 export const loggingInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn) => {
-  const startTime = Date.now();
+  const start = Date.now();
   return next(req).pipe(
-    tap((event) => {
+    tap(event => {
       if (event instanceof HttpResponse) {
-        const endTime = Date.now();
-        const duration = endTime - startTime;
-        console.log(
-          `[${event.status}] Response from ${event.url} in ${duration}ms`
-        );
+        const d = Date.now() - start;
+        console.log(`[${event.status}] ${event.url} (${d}ms)`);
       }
     })
   );
 };
+
+// import { HttpHandlerFn, HttpRequest, HttpResponse } from '@angular/common/http';
+// import { tap } from 'rxjs/operators';
+
+// export const loggingInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn) => {
+//   const startTime = Date.now();
+//   return next(req).pipe(
+//     tap((event) => {
+//       if (event instanceof HttpResponse) {
+//         const endTime = Date.now();
+//         const duration = endTime - startTime;
+//         console.log(
+//           `[${event.status}] Response from ${event.url} in ${duration}ms`
+//         );
+//       }
+//     })
+//   );
+// };

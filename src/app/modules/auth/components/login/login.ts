@@ -33,6 +33,7 @@ import { MasterListService } from '../../../../core/services/master-list.service
 })
 export class Login implements OnInit {
   // --- Injections ---
+  private masterListService = inject(MasterListService);
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
@@ -72,6 +73,7 @@ export class Login implements OnInit {
     this.authService.login(this.loginForm.value).subscribe({
       next: (response:any) => {
         this.authService.handleLoginSuccess(response)
+        this.masterListService.load(); 
         const currentUser = this.authService.getCurrentUser();
         if (currentUser) {
           this.notificationService.connect(currentUser._id);

@@ -1,147 +1,143 @@
 <p-toast></p-toast> 
 
 <div class="customer-wrapper">
-  <!-- This form is simpler, so we'll use a single-panel layout -->
-  <section class="customer-container payment-form-container">
+  <section class="customer-container">
     
     <div class="customer-form-panel">
       <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()" class="customer-form-layout">
 
-        <!--_ 1. STICKY HEADER _-->
         <div class="customer-form-header">
           <h1 class="form-title">{{ formTitle() }}</h1>
           <p class="form-subtitle">All fields marked with <span class="req">*</span> are required.</p>
         </div>
 
-        <!--_ 2. SCROLLABLE BODY _-->
         <div class="customer-form-body">
 
-          <!-- Core Details -->
-          <div class="form-grid-4">
-            <div class="form-group">
-              <label>Payment Type <span class="req">*</span></label>
-              <p-select  appendTo="body" formControlName="type" [options]="typeOptions"></p-select>
-            </div>
-            
-            <div class="form-group">
-              <label>Amount <span class="req">*</span></label>
-              <p-inputNumber formControlName="amount" mode="decimal" [minFractionDigits]="2" prefix="₹ "></p-inputNumber>
-            </div>
-
-            <div class="form-group">
-              <label>Payment Date <span class="req">*</span></label>
-              <p-datepicker formControlName="paymentDate" [showIcon]="true" dateFormat="dd/mm/yy"></p-datepicker>
-            </div>
-            
-            <div class="form-group">
-              <label>Payment Method <span class="req">*</span></label>
-              <p-select  appendTo="body" formControlName="paymentMethod" [options]="paymentMethodOptions"></p-select>
-            </div>
-          </div>
-          
-          <p-divider></p-divider>
-
-          <!-- Dynamic Party Details -->
-          <div class="form-grid-4">
-            
-            <!-- === INFLOW FIELDS === -->
-            <ng-container *ngIf="paymentForm.get('type')?.value === 'inflow'">
+          <section class="form-section">
+            <h4 class="section-title">Core Details</h4>
+            <div class="form-grid-4">
               <div class="form-group">
-                <label>Customer <span class="req">*</span></label>
+                <label>Payment Type <span class="req">*</span></label>
+                <p-select  appendTo="body" formControlName="type" [options]="typeOptions"></p-select>
+              </div>
+              
+              <div class="form-group">
+                <label>Amount <span class="req">*</span></label>
+                <p-inputNumber formControlName="amount" mode="decimal" [minFractionDigits]="2" prefix="₹ "></p-inputNumber>
+              </div>
+
+              <div class="form-group">
+                <label>Payment Date <span class="req">*</span></label>
+                <p-datepicker formControlName="paymentDate" [showIcon]="true" dateFormat="dd/mm/yy"></p-datepicker>
+              </div>
+              
+              <div class="form-group">
+                <label>Payment Method <span class="req">*</span></label>
+                <p-select  appendTo="body" formControlName="paymentMethod" [options]="paymentMethodOptions"></p-select>
+              </div>
+            </div>
+          </section>
+          
+          <section class="form-section">
+            <h4 class="section-title">Party Details</h4>
+            <div class="form-grid-4">
+              
+              <ng-container *ngIf="paymentForm.get('type')?.value === 'inflow'">
+                <div class="form-group">
+                  <label>Customer <span class="req">*</span></label>
+                  <p-select  appendTo="body" 
+                    formControlName="customerId" 
+                    [options]="customerOptions()" 
+                    optionLabel="name" 
+                    optionValue="_id"
+                    [filter]="true" filterBy="name"
+                    placeholder="Select Customer">
+                  </p-select>
+                </div>
+                <div class="form-group">
+                  <label>Invoice (Optional)</label>
+                  <p-select  appendTo="body" 
+                    formControlName="invoiceId" 
+                    [options]="invoiceOptions()" 
+                    optionLabel="invoiceNumber" 
+                    optionValue="_id"
+                    [filter]="true" filterBy="invoiceNumber"
+                    placeholder="Link to Invoice">
+                  </p-select>
+                </div>
+              </ng-container>
+
+              <ng-container *ngIf="paymentForm.get('type')?.value === 'outflow'">
+                <div class="form-group">
+                  <label>Supplier <span class="req">*</span></label>
+                  <p-select  appendTo="body" 
+                    formControlName="supplierId" 
+                    [options]="supplierOptions()" 
+                    optionLabel="name" 
+                    optionValue="_id"
+                    [filter]="true" filterBy="name"
+                    placeholder="Select Supplier">
+                  </p-select>
+                </div>
+                <div class="form-group">
+                  <label>Purchase (Optional)</label>
+                   <p-select  appendTo="body" 
+                    formControlName="purchaseId" 
+                    [options]="purchaseOptions()" 
+                    optionLabel="purchaseNumber" 
+                    optionValue="_id"
+                    [filter]="true" filterBy="purchaseNumber"
+                    placeholder="Link to Purchase">
+                  </p-select>
+                </div>
+              </ng-container>
+            </div>
+          </section>
+          
+          <section class="form-section">
+            <h4 class="section-title">Additional Details (Optional)</h4>
+            <div class="form-grid-4">
+              <div class="form-group">
+                <label>Reference #</label>
+                <input pInputText formControlName="referenceNumber" placeholder="e.g., Cheque No., TXN ID" />
+              </div>
+              
+              <div class="form-group">
+                <label>Transaction ID</label>
+                <input pInputText formControlName="transactionId" />
+              </div>
+
+              <div class="form-group">
+                <label>Bank Name</label>
+                <input pInputText formControlName="bankName" />
+              </div>
+
+              <div class="form-group">
+                <label>Status</label>
+                <p-select  appendTo="body" formControlName="status" [options]="statusOptions"></p-select>
+              </div>
+              
+              <div class="form-group col-span-2">
+                <label>Branch</label>
                 <p-select  appendTo="body" 
-                  formControlName="customerId" 
-                  [options]="customerOptions()" 
+                  formControlName="branchId" 
+                  [options]="branchOptions()" 
                   optionLabel="name" 
                   optionValue="_id"
                   [filter]="true" filterBy="name"
-                  placeholder="Select Customer">
+                  placeholder="Select Branch">
                 </p-select>
               </div>
-              <div class="form-group">
-                <label>Invoice (Optional)</label>
-                <p-select  appendTo="body" 
-                  formControlName="invoiceId" 
-                  [options]="invoiceOptions()" 
-                  optionLabel="invoiceNumber" 
-                  optionValue="_id"
-                  [filter]="true" filterBy="invoiceNumber"
-                  placeholder="Link to Invoice">
-                </p-select>
-              </div>
-            </ng-container>
-
-            <!-- === OUTFLOW FIELDS === -->
-            <ng-container *ngIf="paymentForm.get('type')?.value === 'outflow'">
-              <div class="form-group">
-                <label>Supplier <span class="req">*</span></label>
-                <p-select  appendTo="body" 
-                  formControlName="supplierId" 
-                  [options]="supplierOptions()" 
-                  optionLabel="name" 
-                  optionValue="_id"
-                  [filter]="true" filterBy="name"
-                  placeholder="Select Supplier">
-                </p-select>
-              </div>
-              <div class="form-group">
-                <label>Purchase (Optional)</label>
-                 <p-select  appendTo="body" 
-                  formControlName="purchaseId" 
-                  [options]="purchaseOptions()" 
-                  optionLabel="purchaseNumber" 
-                  optionValue="_id"
-                  [filter]="true" filterBy="purchaseNumber"
-                  placeholder="Link to Purchase">
-                </p-select>
-              </div>
-            </ng-container>
-
-          </div>
-          
-          <p-divider align="center" type="dashed"><b>Additional Details (Optional)</b></p-divider>
-
-          <div class="form-grid-4">
-            <div class="form-group">
-              <label>Reference #</label>
-              <input pInputText formControlName="referenceNumber" placeholder="e.g., Cheque No., TXN ID" />
             </div>
             
             <div class="form-group">
-              <label>Transaction ID</label>
-              <input pInputText formControlName="transactionId" />
+              <label>Remarks</label>
+              <textarea pInputTextarea formControlName="remarks" rows="3" placeholder="Add any notes for this payment..."></textarea>
             </div>
-
-            <div class="form-group">
-              <label>Bank Name</label>
-              <input pInputText formControlName="bankName" />
-            </div>
-
-            <div class="form-group">
-              <label>Status</label>
-              <p-select  appendTo="body" formControlName="status" [options]="statusOptions"></p-select>
-            </div>
-            
-            <div class="form-group col-span-2">
-              <label>Branch</label>
-              <p-select  appendTo="body" 
-                formControlName="branchId" 
-                [options]="branchOptions()" 
-                optionLabel="name" 
-                optionValue="_id"
-                [filter]="true" filterBy="name"
-                placeholder="Select Branch">
-              </p-select>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label>Remarks</label>
-            <textarea pInputTextarea formControlName="remarks" rows="3" placeholder="Add any notes for this payment..."></textarea>
-          </div>
+          </section>
 
         </div>
 
-        <!--_ 3. STICKY FOOTER _-->
         <div class="customer-form-footer">
           <div class="form-actions">
             <p-button 

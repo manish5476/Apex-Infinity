@@ -1,18 +1,7 @@
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-product-details',
-//   imports: [],
-  // templateUrl: './product-details.html',
-  // styleUrl: './product-details.scss',
-// })
-// export class ProductDetails {
-
-// }
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { finalize, switchMap } from  'rxjs/operators';
+import { finalize, switchMap } from 'rxjs/operators';
 import { of, map } from 'rxjs';
 
 // PrimeNG
@@ -121,7 +110,12 @@ export class ProductDetailsComponent implements OnInit {
 
   formatDate(dateString: string | undefined): string {
     if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleString();
+    // Using a more readable format
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
   }
 
   getFilteredTags(): string[] {

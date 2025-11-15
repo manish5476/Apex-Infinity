@@ -1,6 +1,6 @@
 <div class="relative">
   <button class="relative p-2" (click)="toggleDropdown()" pTooltip="Notifications" tooltipPosition="bottom">
-    <i class="pi pi-bell text-lg text-[var(--theme-text-primary)]"></i>
+    <i class="pi pi-bell text-lg text-[var(--text-primary)]"></i>
     
     @if (unreadCount > 0) {
       <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 rounded-full animate-pulse">
@@ -10,7 +10,8 @@
   </button>
 
   @if (showDropdown) {
-    <div class="absolute right-0 mt-2 w-80 sm:w-96 bg-[var(--theme-bg-secondary)] shadow-lg rounded-lg border border-[var(--theme-border-primary)] z-50 overflow-hidden">
+    <!-- CORRECTED: Using canonical theme tokens -->
+    <div class="absolute right-0 mt-2 w-80 sm:w-96 bg-[var(--bg-secondary)] shadow-lg rounded-lg border border-[var(--border-primary)] z-50 overflow-hidden">
       
       <p-tabs value="0" styleClass="notification-tabs">
         <p-tablist>
@@ -27,7 +28,7 @@
             <i class="pi pi-user-plus"></i>
             <span>Approvals</span>
             @if (pendingMembers.length > 0) {
-              <p-badge [value]="pendingMembers.length" severity="warn"></p-badge>
+              <p-badge [value]="pendingMembers.length" [severity]="'warn'"></p-badge>
             }
           </p-tab>
 
@@ -42,18 +43,20 @@
           <p-tabpanel value="0">
             <ul class="max-h-80 overflow-y-auto p-0 m-0 list-none">
               
+              <!-- CORRECTED: Using canonical theme tokens -->
               @for (n of realtimeNotifications; track n._id) {
                 <li (click)="markAsRead(n)"
-                  [ngClass]="{ 'bg-[var(--theme-hover-bg)]': !n.isRead, 'hover:bg-[var(--theme-hover-bg)] cursor-pointer': true }"
-                  class="p-3 border-b border-[var(--theme-border-primary)] text-sm">
-                  <strong class="text-[var(--theme-text-primary)]">{{ n.title }}</strong>
-                  <p class="text-[var(--theme-text-secondary)] m-0">{{ n.message }}</p>
-                  <p class="text-xs text-[var(--theme-text-muted)] m-0 mt-1">{{ n.createdAt | date: 'short' }}</p>
+                  [ngClass]="{ 'bg-[var(--bg-ternary)]': !n.isRead, 'hover:bg-[var(--bg-ternary)] cursor-pointer': true }"
+                  class="p-3 border-b border-[var(--border-primary)] text-sm">
+                  <strong class="text-[var(--text-primary)]">{{ n.title }}</strong>
+                  <p class="text-[var(--text-secondary)] m-0">{{ n.message }}</p>
+                  <p class="text-xs text-[var(--text-label)] m-0 mt-1">{{ n.createdAt | date: 'short' }}</p>
                 </li>
               }
               
+              <!-- CORRECTED: Using canonical theme tokens -->
               @if (!isLoading && realtimeNotifications.length === 0) {
-                <li class="p-4 text-center text-[var(--theme-text-muted)]">
+                <li class="p-4 text-center text-[var(--text-label)]">
                   No new notifications.
                 </li>
               }
@@ -71,10 +74,11 @@
                 </li>
               }
               
+              <!-- CORRECTED: Using canonical theme tokens -->
               @for (member of pendingMembers; track member._id) {
-                <li class="p-3 border-b border-[var(--theme-border-primary)] text-sm">
-                  <div class="font-semibold text-[var(--theme-text-primary)]">{{ member.name }}</div>
-                  <div class="text-xs text-[var(--theme-text-muted)] mb-2">{{ member.email }}</div>
+                <li class="p-3 border-b border-[var(--border-primary)] text-sm">
+                  <div class="font-semibold text-[var(--text-primary)]">{{ member.name }}</div>
+                  <div class="text-xs text-[var(--text-label)] mb-2">{{ member.email }}</div>
                   
                   <div class="flex flex-col gap-2">
                     <p-select  appendTo="body" [options]="roles" [(ngModel)]="selectedRoles[member._id]" optionLabel="name"
@@ -87,7 +91,7 @@
                       [style]="{ 'height': '40px' }">
                     </p-select>
 
-                    <p-button label="Approve" icon="pi pi-check" styleClass="p-button-sm p-button-success w-full"
+                    <p-button label="Approve" icon="pi pi-check" styleClass="p-button-sm w-full"
                       (click)="approveMember(member)"
                       [disabled]="!selectedRoles[member._id] || !selectedBranches[member._id]">
                     </p-button>
@@ -95,8 +99,9 @@
                 </li>
               }
               
+              <!-- CORRECTED: Using canonical theme tokens -->
               @if (!isLoading && pendingMembers.length === 0) {
-                <li class="p-4 text-center text-[var(--theme-text-muted)]">
+                <li class="p-4 text-center text-[var(--text-label)]">
                   No pending approval requests.
                 </li>
               }
@@ -114,16 +119,18 @@
                 </li>
               }
               
+              <!-- CORRECTED: Using canonical theme tokens -->
               @for (n of allNotifications; track n._id) {
-                <li class="p-3 border-b border-[var(--theme-border-primary)] text-sm hover:bg-[var(--theme-hover-bg)]">
-                  <strong class="text-[var(--theme-text-primary)]">{{ n.title }}</strong>
-                  <p class="text-[var(--theme-text-secondary)] m-0">{{ n.message }}</p>
-                  <p class="text-xs text-[var(--theme-text-muted)] m-0 mt-1">{{ n.createdAt | date: 'short' }}</p>
+                <li class="p-3 border-b border-[var(--border-primary)] text-sm hover:bg-[var(--bg-ternary)]">
+                  <strong class="text-[var(--text-primary)]">{{ n.title }}</strong>
+                  <p class="text-[var(--text-secondary)] m-0">{{ n.message }}</p>
+                  <p class="text-xs text-[var(--text-label)] m-0 mt-1">{{ n.createdAt | date: 'short' }}</p>
                 </li>
               }
               
+              <!-- CORRECTED: Using canonical theme tokens -->
               @if (!isLoading && allNotifications.length === 0) {
-                <li class="p-4 text-center text-[var(--theme-text-muted)]">
+                <li class="p-4 text-center text-[var(--text-label)]">
                   No historical notifications.
                 </li>
               }
@@ -134,114 +141,3 @@
     </div>
   }
 </div>
-<!-- <div class="relative">
-  <button class="relative p-2" (click)="toggleDropdown()" pTooltip="Notifications" tooltipPosition="bottom">
-    <i class="pi pi-bell text-lg text-[var(--theme-text-primary)]"></i>
-    <span *ngIf="unreadCount > 0"
-      class="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 rounded-full animate-pulse">
-      {{ unreadCount }}
-    </span>
-  </button>
-
-  <div @if(showDropdown) 
-    class="absolute right-0 mt-2 w-80 sm:w-96 bg-[var(--theme-bg-secondary)] shadow-lg rounded-lg border border-[var(--theme-border-primary)] z-50 overflow-hidden">
-    <p-tabs value="0" styleClass="notification-tabs">
-      <p-tablist>
-        <p-tab value="0">
-          <ng-template pTemplate="header">
-            <i class="pi pi-bolt mr-2"></i>
-            <span>New</span>
-            <p-badge *ngIf="unreadCount > 0" [value]="unreadCount" severity="danger" styleClass="ml-2"></p-badge>
-          </ng-template>
-        </p-tab>
-        
-        <p-tab value="1">
-           <ng-template pTemplate="header">
-            <i class="pi pi-user-plus mr-2"></i>
-            <span>Approvals</span>
-            <p-badge *ngIf="pendingMembers.length > 0" [value]="pendingMembers.length" severity="warn"
-              styleClass="ml-2"></p-badge>
-           </ng-template>
-        </p-tab>
-
-        <p-tab value="2">
-           <ng-template pTemplate="header">
-            <i class="pi pi-history mr-2"></i>
-            <span>All</span>
-           </ng-template>
-        </p-tab>
-      </p-tablist>
-      
-      <p-tabpanels>
-        <p-tabpanel value="0">
-          <ul class="max-h-80 overflow-y-auto p-0 m-0 list-none">
-            <li *ngFor="let n of realtimeNotifications" (click)="markAsRead(n)"
-              [ngClass]="{ 'bg-[var(--theme-hover-bg)]': !n.isRead, 'hover:bg-[var(--theme-hover-bg)] cursor-pointer': true }"
-              class="p-3 border-b border-[var(--theme-border-primary)] text-sm">
-              <strong class="text-[var(--theme-text-primary)]">{{ n.title }}</strong>
-              <p class="text-[var(--theme-text-secondary)] m-0">{{ n.message }}</p>
-              <p class="text-xs text-[var(--theme-text-muted)] m-0 mt-1">{{ n.createdAt | date: 'short' }}</p>
-            </li>
-            <li *ngIf="!isLoading && realtimeNotifications.length === 0" class="p-4 text-center text-[var(--theme-text-muted)]">
-              No new notifications.
-            </li>
-          </ul>
-        </p-tabpanel>
-        
-        <p-tabpanel value="1">
-          <ul class="max-h-80 overflow-y-auto p-0 m-0 list-none">
-            <li *ngIf="isLoading" class="p-3">
-              <p-skeleton height="2rem" styleClass="mb-2"></p-skeleton>
-              <p-skeleton height="2rem" styleClass="mb-2"></p-skeleton>
-              <p-skeleton height="2rem"></p-skeleton>
-            </li>
-            <li *ngFor="let member of pendingMembers"
-              class="p-3 border-b border-[var(--theme-border-primary)] text-sm">
-              <div class="font-semibold text-[var(--theme-text-primary)]">{{ member.name }}</div>
-              <div class="text-xs text-[var(--theme-text-muted)] mb-2">{{ member.email }}</div>
-              
-              <div class="flex flex-col gap-2">
-                <p-select  appendTo="body" [options]="roles" [(ngModel)]="selectedRoles[member._id]" optionLabel="name"
-                  optionValue="_id" placeholder="Select a Role" styleClass="w-full"
-                  [style]="{ 'height': '40px' }">
-                </p-select>
-
-                <p-select  appendTo="body" [options]="branches" [(ngModel)]="selectedBranches[member._id]" optionLabel="name"
-                  optionValue="_id" placeholder="Select a Branch" styleClass="w-full"
-                  [style]="{ 'height': '40px' }">
-                </p-select>
-
-                <p-button label="Approve" icon="pi pi-check" styleClass="p-button-sm p-button-success w-full"
-                  (click)="approveMember(member)"
-                  [disabled]="!selectedRoles[member._id] || !selectedBranches[member._id]">
-                </p-button>
-              </div>
-            </li>
-            <li *ngIf="!isLoading && pendingMembers.length === 0" class="p-4 text-center text-[var(--theme-text-muted)]">
-              No pending approval requests.
-            </li>
-          </ul>
-        </p-tabpanel>
-        
-        <p-tabpanel value="2">
-           <ul class="max-h-80 overflow-y-auto p-0 m-0 list-none">
-             <li *ngIf="isLoading" class="p-3">
-              <p-skeleton styleClass="mb-2"></p-skeleton>
-              <p-skeleton styleClass="mb-2"></p-skeleton>
-              <p-skeleton></p-skeleton>
-            </li>
-            <li *ngFor="let n of allNotifications"
-              class="p-3 border-b border-[var(--theme-border-primary)] text-sm hover:bg-[var(--theme-hover-bg)]">
-              <strong class="text-[var(--theme-text-primary)]">{{ n.title }}</strong>
-              <p class="text-[var(--theme-text-secondary)] m-0">{{ n.message }}</p>
-              <p class="text-xs text-[var(--theme-text-muted)] m-0 mt-1">{{ n.createdAt | date: 'short' }}</p>
-            </li>
-            <li *ngIf="!isLoading && allNotifications.length === 0" class="p-4 text-center text-[var(--theme-text-muted)]">
-              No historical notifications.
-            </li>
-          </ul>
-        </p-tabpanel>
-      </p-tabpanels>
-    </p-tabs>
-  </div>
-</div> -->

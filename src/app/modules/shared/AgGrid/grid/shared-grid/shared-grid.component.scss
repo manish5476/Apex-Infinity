@@ -1,7 +1,10 @@
-/* Premium AG Grid Row & Overall Design - Enhanced spacing, bigger rows, premium aesthetics */
-/* Builds on your previous container styles for consistency - Apply via ::ng-deep */
+/* =======================================================
+   SHARED GRID COMPONENT SCSS
+   - Using canonical theme tokens
+   - This file styles the grid and its wrapper
+   ======================================================= */
 
-/* Base Grid Container - Premium elevation with subtle spacing */
+/* Base Grid Container */
 :host {
   display: block;
   width: 100%;
@@ -12,258 +15,283 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: var(--spacing-md); /* Balanced padding from your previous CSS */
-  gap: var(--spacing-sm); /* Added gap for premium spacing */
+  padding: 0; // The parent (list page) now provides padding
+  gap: var(--spacing-md); // Spacing between header and grid
 }
 
+/* === REFACTORED: Grid Header === */
 .grid-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: var(--spacing-sm); /* Slimmer from previous */
-  border-bottom: var(--ui-border-width) solid var(--theme-border-primary);
-  margin-bottom: var(--spacing-md); /* Consistent spacing */
+  padding: var(--spacing-sm) 0; // Padding provided by parent card
+  gap: var(--spacing-lg);
 }
 
+.grid-search {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background-color: var(--bg-ternary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--ui-border-radius);
+  padding: 0 var(--spacing-md);
+  flex-grow: 1;
+  max-width: 400px;
+  
+  i {
+    color: var(--text-label);
+  }
+  
+  .grid-search-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    padding: var(--spacing-md) 0;
+    font-size: var(--font-size-sm);
+    width: 100%;
+    
+    &::placeholder {
+      color: var(--text-label);
+    }
+  }
+  
+  &:focus-within {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--accent-focus);
+  }
+}
+
+.grid-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+  
+  .action-group {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    
+    label {
+      font-size: var(--font-size-xs);
+      color: var(--text-label);
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+  }
+}
+
+
+/* === Grid Wrapper === */
 .grid-wrapper {
   position: relative;
   flex-grow: 1;
-  border-radius: var(--ui-border-radius-lg); /* Rounded for premium look */
-  overflow: hidden; /* Clean overflow */
-  box-shadow: var(--ui-shadow-md); /* Premium shadow */
-  border: var(--ui-border-width) solid var(--theme-border-primary);
+  border-radius: var(--ui-border-radius-lg); 
+  overflow: hidden; 
+  box-shadow: var(--shadow-sm); // Use a subtle shadow
+  border: var(--ui-border-width) solid var(--border-primary);
 }
 
+/* === Loading Overlay === */
 .loading-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: var(--theme-bg-overlay);
+  /* Use color-mix for a theme-aware transparent bg */
+  background-color: color-mix(in srgb, var(--bg-secondary) 80%, transparent);
   display: flex;
-  flex-direction: column; /* Stack for better layout */
+  flex-direction: column; 
   align-items: center;
   justify-content: center;
   z-index: 10;
-  border-radius: inherit; /* Match container */
-  gap: var(--spacing-sm); /* Spacing for loader elements */
-  backdrop-filter: var(--ui-glass-backdrop); /* Premium blur */
+  border-radius: inherit; 
+  gap: var(--spacing-md); // Space out skeletons
+  padding: var(--spacing-lg);
+  backdrop-filter: blur(4px); 
 }
 
-:host-context(.dark-mode) .loading-overlay {
-  background-color: rgba(15, 15, 15, 0.95);
-}
+/* ========================================================
+  AG Grid Theme Overrides
+  - This is the powerful SCSS you provided,
+    using canonical theme tokens.
+========================================================
+*/
 
 /* Enhanced AG Grid Theme - Bigger rows, premium spacing & interactions */
 :host ::ng-deep .ag-theme-quartz {
-  --ag-row-height: 3.5rem; /* Bigger rows for premium feel & better spacing */
-  --ag-header-height: 3.5rem; /* Matching header */
-  --ag-font-size: var(--font-size-base, 1rem); /* Slightly larger text */
-  --ag-border-radius: var(--ui-border-radius, 12px);
-  --ag-header-column-border-color: var(--theme-border-secondary);
-  --ag-row-border-color: var(--theme-border-secondary);
-  --ag-row-hover-color: var(--theme-hover-bg);
-  --ag-row-selected-color: var(--theme-accent-primary-light);
-  --ag-range-selection-border-color: var(--theme-accent-primary);
-  --ag-range-selection-background-color: rgba(59, 130, 246, 0.08); /* Softer premium selection */
-  --ag-range-selection-highlight-color: var(--theme-accent-primary);
-  --ag-header-background-color: var(--theme-bg-secondary);
-  --ag-odd-row-background-color: var(--theme-bg-ternary); /* Premium subtle stripe */
-  --ag-even-row-background-color: var(--theme-bg-primary);
-  --ag-header-foreground-color: var(--theme-text-primary);
-  --ag-background-color: var(--theme-bg-primary);
-  --ag-foreground-color: var(--theme-text-primary);
-  --ag-secondary-foreground-color: var(--theme-text-secondary);
-  --ag-border-color: var(--theme-border-primary);
-  --ag-header-column-separator-color: var(--theme-border-secondary);
-  --ag-row-separator-color: var(--ui-border-width) solid var(--theme-border-secondary); /* Thin, elegant separators */
-  --ag-header-column-resize-handle-color: var(--theme-accent-primary);
-  --ag-header-cell-hover-background-color: var(--theme-hover-bg);
-  --ag-row-hover-color: var(--theme-hover-bg);
-  --ag-cell-horizontal-border: none; /* Clean horizontal - rely on row separators */
-  --ag-cell-vertical-border: 1px solid transparent; /* Subtle vertical for structure */
-  font-family: var(--font-body, Inter, sans-serif);
-  border-radius: inherit; /* Inherit from wrapper */
+  /* Main row/header sizing */
+  --ag-row-height: 50px; // Use a comfortable, modern height
+  --ag-header-height: 50px;
+  
+  /* Fonts */
+  --ag-font-size: var(--font-size-sm); // Use theme token
+  --ag-font-family: var(--font-body); // Use theme token
+
+  /* Borders & Radius */
+  --ag-border-radius: var(--ui-border-radius);
+  --ag-border-color: var(--border-primary);
+  --ag-header-column-border-color: var(--border-primary);
+  --ag-row-border-color: var(--border-primary);
+  --ag-cell-horizontal-border: none;
+  --ag-cell-vertical-border: 1px solid var(--border-primary);
+  --ag-header-column-separator-color: var(--border-primary);
+  
+  /* Colors - Backgrounds */
+  --ag-background-color: var(--bg-secondary);
+  --ag-header-background-color: var(--bg-ternary);
+  --ag-odd-row-background-color: var(--bg-secondary);
+  --ag-even-row-background-color: var(--bg-secondary); // No striping by default
+  --ag-row-hover-color: var(--bg-ternary);
+
+  /* Colors - Text */
+  --ag-foreground-color: var(--text-secondary);
+  --ag-header-foreground-color: var(--text-primary);
+  --ag-secondary-foreground-color: var(--text-label);
+
+  /* Selection & Interaction */
+  --ag-selected-row-background-color: var(--accent-focus);
+  --ag-range-selection-border-color: var(--accent-primary);
+  --ag-range-selection-background-color: var(--accent-focus);
+  --ag-range-selection-highlight-color: var(--accent-primary);
+  --ag-header-cell-hover-background-color: var(--bg-ternary);
+  --ag-header-column-resize-handle-color: var(--accent-primary);
+
+  border-radius: inherit; 
   overflow: hidden;
 }
 
 /* Header - Premium with better spacing & subtle elevation */
 :host ::ng-deep .ag-theme-quartz .ag-header {
-  background: var(--theme-card-gradient); /* Gradient for depth */
-  border-bottom: var(--ui-border-width-thick) solid var(--theme-border-primary);
-  padding: 0 var(--spacing-md); /* Balanced header padding */
-  box-shadow: var(--ui-shadow-xs); /* Subtle header shadow */
+  border-bottom: var(--ui-border-width) solid var(--border-primary);
 }
 
 :host ::ng-deep .ag-theme-quartz .ag-header-cell {
-  font-size: var(--font-size-base);
-  font-weight: 500;
-  color: var(--theme-text-primary);
-  padding: var(--spacing-md) var(--spacing-lg); /* Ample spacing for premium feel */
-  border-right: var(--ui-border-width) solid var(--theme-border-secondary);
-  transition: var(--ui-transition);
-  line-height: 1.4; /* Better text alignment */
-}
-
-:host ::ng-deep .ag-theme-quartz .ag-header-cell:hover {
-  background: var(--theme-hover-bg);
-  transform: translateY(-1px); /* Premium lift effect */
-  box-shadow: var(--ui-shadow-xs);
+  font-size: var(--font-size-xs); // Make headers smaller
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-label); // Use label color
+  padding: 0 var(--spacing-lg);
+  line-height: 1.4; 
 }
 
 /* Rows - Premium design with enhanced spacing, borders, and interactions */
 :host ::ng-deep .ag-theme-quartz .ag-row {
-  transition: var(--ui-transition-slow); /* Smoother for premium UX */
-  border-bottom: var(--ui-border-width) solid var(--theme-border-secondary); /* Elegant spacing via border */
+  transition: background-color 0.1s ease; 
+  border-bottom: var(--ui-border-width) solid var(--border-primary);
   min-height: var(--ag-row-height);
-  padding: 0 var(--spacing-md); /* Consistent row padding */
-  margin-bottom: var(--spacing-xs); /* Extra micro-spacing if needed */
-}
-
-:host ::ng-deep .ag-theme-quartz .ag-row:not(:last-child) {
-  margin-bottom: var(--spacing-xs); /* Subtle bottom spacing between rows */
+  padding: 0 var(--spacing-md);
+  color: var(--text-secondary); // Default row text
 }
 
 :host ::ng-deep .ag-theme-quartz .ag-row:hover {
-  background: linear-gradient(90deg, var(--theme-hover-bg), var(--theme-active-bg)) !important; /* Gradient hover for depth */
-  transform: translateX(var(--spacing-sm)) translateY(-1px); /* Premium slide & lift */
-  box-shadow: var(--ui-shadow-md); /* Elevated shadow */
-  z-index: 2; /* Layer above others */
-  border-left: 3px solid var(--theme-accent-primary); /* Accent indicator */
+  background-color: var(--bg-ternary) !important; 
 }
 
 :host ::ng-deep .ag-theme-quartz .ag-row-selected {
-  background: linear-gradient(90deg, var(--theme-accent-primary-light), rgba(59, 130, 246, 0.15)) !important; /* Premium gradient selection */
-  border-left: 4px solid var(--theme-accent-primary);
-  box-shadow: inset 0 0 0 1px var(--theme-accent-primary); /* Inner glow */
+  background-color: var(--accent-focus) !important;
+  color: var(--accent-primary);
+  font-weight: 600;
 }
 
-/* Even/Odd Row Alternation - Premium subtle texture */
+/* Even/Odd Row Alternation - Using your defined classes */
 :host ::ng-deep .ag-theme-quartz .ag-row.row-even {
-  background: var(--theme-bg-primary);
+  background: var(--bg-secondary);
 }
-
 :host ::ng-deep .ag-theme-quartz .ag-row.row-odd {
-  background: linear-gradient(90deg, var(--theme-bg-ternary), rgba(230, 230, 233, 0.5)); /* Faint gradient for premium stripe */
+  background: var(--bg-primary); // Use primary for subtle stripe
 }
 
 /* Editing Row - Enhanced highlight with animation */
 :host ::ng-deep .ag-theme-quartz .ag-row.editing-row {
-  background: linear-gradient(90deg, var(--theme-accent-primary-light), rgba(59, 130, 246, 0.2)) !important;
-  border-left: 4px solid var(--theme-accent-primary);
-  box-shadow: 0 0 0 1px var(--theme-accent-primary), inset 0 0 0 1px var(--theme-accent-primary);
-  animation: editingPulse 2s infinite; /* Premium pulse animation */
+  background: var(--accent-focus) !important;
+  border-left: 3px solid var(--accent-primary);
+  animation: editingPulse 2s infinite;
 }
 
 @keyframes editingPulse {
-  0%, 100% { box-shadow: 0 0 0 1px var(--theme-accent-primary), inset 0 0 0 1px var(--theme-accent-primary); }
-  50% { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3), inset 0 0 0 1px var(--theme-accent-primary); }
+  0%, 100% { box-shadow: inset 0 0 0 1px var(--accent-focus); }
+  50% { box-shadow: inset 0 0 0 2px var(--accent-primary); }
 }
 
-/* Status-Based Rows - Premium with icons & spacing */
+/* Status-Based Rows */
 :host ::ng-deep .ag-theme-quartz .ag-row.row-out-of-stock {
-  background: linear-gradient(90deg, var(--theme-error-light), rgba(220, 20, 60, 0.05)) !important;
-  border-left: 3px solid var(--theme-error-primary);
+  background: color-mix(in srgb, var(--color-error) 8%, transparent) !important;
+  border-left: 3px solid var(--color-error);
 }
 
 :host ::ng-deep .ag-theme-quartz .ag-row.row-in-stock {
-  background: linear-gradient(90deg, var(--theme-success-light), rgba(46, 139, 87, 0.05)) !important;
-  border-left: 3px solid var(--theme-success-primary);
+  background: color-mix(in srgb, var(--color-success) 8%, transparent) !important;
+  border-left: 3px solid var(--color-success);
 }
 
 /* Cell Styling - Premium typography, spacing & focus */
 :host ::ng-deep .ag-theme-quartz .ag-cell {
-  font-size: var(--font-size-base);
-  font-weight: 400; /* Clean readability */
-  color: var(--theme-text-primary);
-  padding: var(--spacing-md) var(--spacing-lg); /* Generous spacing for premium airiness */
-  line-height: 1.5; /* Enhanced text flow */
-  border-right: var(--ui-border-width) solid transparent; /* Subtle on focus only */
+  padding: var(--spacing-sm) var(--spacing-lg); 
+  line-height: 1.5; 
   display: flex;
-  align-items: center; /* Vertical centering */
+  align-items: center; 
 }
 
 :host ::ng-deep .ag-theme-quartz .ag-cell:focus {
   outline: none;
-  box-shadow: 0 0 0 2px var(--theme-accent-focus-ring);
-  background: var(--theme-hover-bg);
-  border-right-color: var(--theme-accent-primary); /* Accent on focus */
+  box-shadow: inset 0 0 0 2px var(--accent-primary);
+  background: var(--bg-ternary);
 }
 
-/* Checkbox and Selection - Premium with smooth animations */
+/* Checkbox and Selection */
 :host ::ng-deep .ag-theme-quartz .ag-selection-checkbox .ag-icon {
-  color: var(--theme-accent-primary);
+  color: var(--accent-primary);
   font-size: var(--font-size-base);
-  transition: var(--ui-transition-fast);
-  border-radius: var(--ui-border-radius-full); /* Rounded for premium */
+  transition: var(--transition-fast);
 }
 
-:host ::ng-deep .ag-theme-quartz .ag-row-selected .ag-selection-checkbox .ag-icon {
-  background: var(--theme-accent-primary);
-  color: var(--theme-accent-text-color);
-  transform: scale(1.1); /* Subtle scale on select */
+:host ::ng-deep .ag-theme-quartz .ag-row-selected .ag-selection-checkbox .ag-icon-checkbox-checked {
+  color: var(--accent-primary);
 }
 
 /* Scrollbar - Premium thin & elegant */
 :host ::ng-deep .ag-theme-quartz .ag-body-viewport::-webkit-scrollbar {
-  width: 6px; /* Thinner for premium minimalism */
+  width: 6px; 
   height: 6px;
 }
-
 :host ::ng-deep .ag-theme-quartz .ag-body-viewport::-webkit-scrollbar-track {
-  background: var(--theme-bg-ternary);
-  border-radius: var(--ui-border-radius-full);
+  background: var(--bg-ternary);
+  border-radius: 10px;
 }
-
 :host ::ng-deep .ag-theme-quartz .ag-body-viewport::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--theme-scroll-thumb), var(--theme-accent-primary-light)); /* Gradient for depth */
-  border-radius: var(--ui-border-radius-full);
-  border: 1px solid var(--theme-border-primary);
-  transition: var(--ui-transition);
+  background: var(--scroll-thumb-c); 
+  border-radius: 10px;
+  border: 1px solid var(--bg-ternary);
 }
-
 :host ::ng-deep .ag-theme-quartz .ag-body-viewport::-webkit-scrollbar-thumb:hover {
-  background: var(--theme-accent-primary);
-  transform: scaleX(1.2); /* Subtle expand on hover */
+  background: var(--accent-primary);
 }
 
-/* Loading Overlay - Premium integration with theme */
-:host ::ng-deep .ag-theme-quartz .ag-overlay-loading-center {
-  background: var(--theme-bg-overlay);
-  border-radius: var(--ui-border-radius);
-  box-shadow: var(--ui-shadow-lg);
-  padding: var(--spacing-lg);
-  backdrop-filter: var(--ui-glass-backdrop); /* Glass effect */
-  gap: var(--spacing-sm); /* Spacing for elements */
-}
-
-:host ::ng-deep .ag-theme-quartz .ag-overlay-loading-center .ag-spinner {
-  color: var(--theme-accent-primary);
-  width: 2rem;
-  height: 2rem;
-}
-
-/* No Rows Overlay - Premium styled message with icon */
+/* No Rows Overlay */
 :host ::ng-deep .ag-theme-quartz .ag-overlay-no-rows-center {
-  color: var(--theme-text-muted);
+  color: var(--text-label);
   font-size: var(--font-size-base);
   padding: var(--spacing-2xl);
-  background: var(--theme-card-gradient);
+  background: var(--bg-primary);
   border-radius: var(--ui-border-radius-lg);
-  box-shadow: var(--ui-shadow-sm);
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--spacing-md);
-  border: var(--ui-border-width) dashed var(--theme-border-secondary);
+  border: var(--ui-border-width) dashed var(--border-primary);
 }
 
 :host ::ng-deep .ag-theme-quartz .ag-overlay-no-rows-center::before {
-  content: '\f07a'; /* Font Awesome empty icon - adjust if needed */
+  content: '\e9b0'; /* Using a PrimeIcon */
   font-family: 'PrimeIcons';
   font-size: var(--font-size-3xl);
-  color: var(--theme-text-muted);
+  color: var(--text-label);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -274,14 +302,14 @@
   }
 
   :host ::ng-deep .ag-theme-quartz {
-    --ag-row-height: 3rem; /* Slightly compact on mobile */
-    --ag-header-height: 3rem;
+    --ag-row-height: 48px; 
+    --ag-header-height: 48px;
     border-radius: var(--ui-border-radius);
   }
 
   :host ::ng-deep .ag-theme-quartz .ag-cell,
   :host ::ng-deep .ag-theme-quartz .ag-header-cell {
-    padding: var(--spacing-sm) var(--spacing-md); /* Tighter but premium */
+    padding: var(--spacing-sm) var(--spacing-md); 
     font-size: var(--font-size-sm);
   }
 
@@ -289,3 +317,295 @@
     padding: var(--spacing-lg);
   }
 }
+
+// /* Premium AG Grid Row & Overall Design - Enhanced spacing, bigger rows, premium aesthetics */
+// /* Builds on your previous container styles for consistency - Apply via ::ng-deep */
+
+// /* Base Grid Container - Premium elevation with subtle spacing */
+// :host {
+//   display: block;
+//   width: 100%;
+//   height: 100%;
+// }
+
+// .shared-grid-container {
+//   display: flex;
+//   flex-direction: column;
+//   height: 100%;
+//   padding: var(--spacing-md); /* Balanced padding from your previous CSS */
+//   gap: var(--spacing-sm); /* Added gap for premium spacing */
+// }
+
+// .grid-header {
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   padding-bottom: var(--spacing-sm); /* Slimmer from previous */
+//   border-bottom: var(--ui-border-width) solid var(--theme-border-primary);
+//   margin-bottom: var(--spacing-md); /* Consistent spacing */
+// }
+
+// .grid-wrapper {
+//   position: relative;
+//   flex-grow: 1;
+//   border-radius: var(--ui-border-radius-lg); /* Rounded for premium look */
+//   overflow: hidden; /* Clean overflow */
+//   box-shadow: var(--ui-shadow-md); /* Premium shadow */
+//   border: var(--ui-border-width) solid var(--theme-border-primary);
+// }
+
+// .loading-overlay {
+//   position: absolute;
+//   top: 0;
+//   left: 0;
+//   width: 100%;
+//   height: 100%;
+//   background-color: var(--theme-bg-overlay);
+//   display: flex;
+//   flex-direction: column; /* Stack for better layout */
+//   align-items: center;
+//   justify-content: center;
+//   z-index: 10;
+//   border-radius: inherit; /* Match container */
+//   gap: var(--spacing-sm); /* Spacing for loader elements */
+//   backdrop-filter: var(--ui-glass-backdrop); /* Premium blur */
+// }
+
+// :host-context(.dark-mode) .loading-overlay {
+//   background-color: rgba(15, 15, 15, 0.95);
+// }
+
+// /* Enhanced AG Grid Theme - Bigger rows, premium spacing & interactions */
+// :host ::ng-deep .ag-theme-quartz {
+//   --ag-row-height: 3.5rem; /* Bigger rows for premium feel & better spacing */
+//   --ag-header-height: 3.5rem; /* Matching header */
+//   --ag-font-size: var(--font-size-base, 1rem); /* Slightly larger text */
+//   --ag-border-radius: var(--ui-border-radius, 12px);
+//   --ag-header-column-border-color: var(--theme-border-secondary);
+//   --ag-row-border-color: var(--theme-border-secondary);
+//   --ag-row-hover-color: var(--theme-hover-bg);
+//   --ag-row-selected-color: var(--theme-accent-primary-light);
+//   --ag-range-selection-border-color: var(--theme-accent-primary);
+//   --ag-range-selection-background-color: rgba(59, 130, 246, 0.08); /* Softer premium selection */
+//   --ag-range-selection-highlight-color: var(--theme-accent-primary);
+//   --ag-header-background-color: var(--theme-bg-secondary);
+//   --ag-odd-row-background-color: var(--theme-bg-ternary); /* Premium subtle stripe */
+//   --ag-even-row-background-color: var(--theme-bg-primary);
+//   --ag-header-foreground-color: var(--theme-text-primary);
+//   --ag-background-color: var(--theme-bg-primary);
+//   --ag-foreground-color: var(--theme-text-primary);
+//   --ag-secondary-foreground-color: var(--theme-text-secondary);
+//   --ag-border-color: var(--theme-border-primary);
+//   --ag-header-column-separator-color: var(--theme-border-secondary);
+//   --ag-row-separator-color: var(--ui-border-width) solid var(--theme-border-secondary); /* Thin, elegant separators */
+//   --ag-header-column-resize-handle-color: var(--theme-accent-primary);
+//   --ag-header-cell-hover-background-color: var(--theme-hover-bg);
+//   --ag-row-hover-color: var(--theme-hover-bg);
+//   --ag-cell-horizontal-border: none; /* Clean horizontal - rely on row separators */
+//   --ag-cell-vertical-border: 1px solid transparent; /* Subtle vertical for structure */
+//   font-family: var(--font-body, Inter, sans-serif);
+//   border-radius: inherit; /* Inherit from wrapper */
+//   overflow: hidden;
+// }
+
+// /* Header - Premium with better spacing & subtle elevation */
+// :host ::ng-deep .ag-theme-quartz .ag-header {
+//   background: var(--theme-card-gradient); /* Gradient for depth */
+//   border-bottom: var(--ui-border-width-thick) solid var(--theme-border-primary);
+//   padding: 0 var(--spacing-md); /* Balanced header padding */
+//   box-shadow: var(--ui-shadow-xs); /* Subtle header shadow */
+// }
+
+// :host ::ng-deep .ag-theme-quartz .ag-header-cell {
+//   font-size: var(--font-size-base);
+//   font-weight: 500;
+//   color: var(--theme-text-primary);
+//   padding: var(--spacing-md) var(--spacing-lg); /* Ample spacing for premium feel */
+//   border-right: var(--ui-border-width) solid var(--theme-border-secondary);
+//   transition: var(--ui-transition);
+//   line-height: 1.4; /* Better text alignment */
+// }
+
+// :host ::ng-deep .ag-theme-quartz .ag-header-cell:hover {
+//   background: var(--theme-hover-bg);
+//   transform: translateY(-1px); /* Premium lift effect */
+//   box-shadow: var(--ui-shadow-xs);
+// }
+
+// /* Rows - Premium design with enhanced spacing, borders, and interactions */
+// :host ::ng-deep .ag-theme-quartz .ag-row {
+//   transition: var(--ui-transition-slow); /* Smoother for premium UX */
+//   border-bottom: var(--ui-border-width) solid var(--theme-border-secondary); /* Elegant spacing via border */
+//   min-height: var(--ag-row-height);
+//   padding: 0 var(--spacing-md); /* Consistent row padding */
+//   margin-bottom: var(--spacing-xs); /* Extra micro-spacing if needed */
+// }
+
+// :host ::ng-deep .ag-theme-quartz .ag-row:not(:last-child) {
+//   margin-bottom: var(--spacing-xs); /* Subtle bottom spacing between rows */
+// }
+
+// :host ::ng-deep .ag-theme-quartz .ag-row:hover {
+//   background: linear-gradient(90deg, var(--theme-hover-bg), var(--theme-active-bg)) !important; /* Gradient hover for depth */
+//   transform: translateX(var(--spacing-sm)) translateY(-1px); /* Premium slide & lift */
+//   box-shadow: var(--ui-shadow-md); /* Elevated shadow */
+//   z-index: 2; /* Layer above others */
+//   border-left: 3px solid var(--theme-accent-primary); /* Accent indicator */
+// }
+
+// :host ::ng-deep .ag-theme-quartz .ag-row-selected {
+//   background: linear-gradient(90deg, var(--theme-accent-primary-light), rgba(59, 130, 246, 0.15)) !important; /* Premium gradient selection */
+//   border-left: 4px solid var(--theme-accent-primary);
+//   box-shadow: inset 0 0 0 1px var(--theme-accent-primary); /* Inner glow */
+// }
+
+// /* Even/Odd Row Alternation - Premium subtle texture */
+// :host ::ng-deep .ag-theme-quartz .ag-row.row-even {
+//   background: var(--theme-bg-primary);
+// }
+
+// :host ::ng-deep .ag-theme-quartz .ag-row.row-odd {
+//   background: linear-gradient(90deg, var(--theme-bg-ternary), rgba(230, 230, 233, 0.5)); /* Faint gradient for premium stripe */
+// }
+
+// /* Editing Row - Enhanced highlight with animation */
+// :host ::ng-deep .ag-theme-quartz .ag-row.editing-row {
+//   background: linear-gradient(90deg, var(--theme-accent-primary-light), rgba(59, 130, 246, 0.2)) !important;
+//   border-left: 4px solid var(--theme-accent-primary);
+//   box-shadow: 0 0 0 1px var(--theme-accent-primary), inset 0 0 0 1px var(--theme-accent-primary);
+//   animation: editingPulse 2s infinite; /* Premium pulse animation */
+// }
+
+// @keyframes editingPulse {
+//   0%, 100% { box-shadow: 0 0 0 1px var(--theme-accent-primary), inset 0 0 0 1px var(--theme-accent-primary); }
+//   50% { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3), inset 0 0 0 1px var(--theme-accent-primary); }
+// }
+
+// /* Status-Based Rows - Premium with icons & spacing */
+// :host ::ng-deep .ag-theme-quartz .ag-row.row-out-of-stock {
+//   background: linear-gradient(90deg, var(--theme-error-light), rgba(220, 20, 60, 0.05)) !important;
+//   border-left: 3px solid var(--theme-error-primary);
+// }
+
+// :host ::ng-deep .ag-theme-quartz .ag-row.row-in-stock {
+//   background: linear-gradient(90deg, var(--theme-success-light), rgba(46, 139, 87, 0.05)) !important;
+//   border-left: 3px solid var(--theme-success-primary);
+// }
+
+// /* Cell Styling - Premium typography, spacing & focus */
+// :host ::ng-deep .ag-theme-quartz .ag-cell {
+//   font-size: var(--font-size-base);
+//   font-weight: 400; /* Clean readability */
+//   color: var(--theme-text-primary);
+//   padding: var(--spacing-md) var(--spacing-lg); /* Generous spacing for premium airiness */
+//   line-height: 1.5; /* Enhanced text flow */
+//   border-right: var(--ui-border-width) solid transparent; /* Subtle on focus only */
+//   display: flex;
+//   align-items: center; /* Vertical centering */
+// }
+
+// :host ::ng-deep .ag-theme-quartz .ag-cell:focus {
+//   outline: none;
+//   box-shadow: 0 0 0 2px var(--theme-accent-focus-ring);
+//   background: var(--theme-hover-bg);
+//   border-right-color: var(--theme-accent-primary); /* Accent on focus */
+// }
+
+// /* Checkbox and Selection - Premium with smooth animations */
+// :host ::ng-deep .ag-theme-quartz .ag-selection-checkbox .ag-icon {
+//   color: var(--theme-accent-primary);
+//   font-size: var(--font-size-base);
+//   transition: var(--ui-transition-fast);
+//   border-radius: var(--ui-border-radius-full); /* Rounded for premium */
+// }
+
+// :host ::ng-deep .ag-theme-quartz .ag-row-selected .ag-selection-checkbox .ag-icon {
+//   background: var(--theme-accent-primary);
+//   color: var(--theme-accent-text-color);
+//   transform: scale(1.1); /* Subtle scale on select */
+// }
+
+// /* Scrollbar - Premium thin & elegant */
+// :host ::ng-deep .ag-theme-quartz .ag-body-viewport::-webkit-scrollbar {
+//   width: 6px; /* Thinner for premium minimalism */
+//   height: 6px;
+// }
+
+// :host ::ng-deep .ag-theme-quartz .ag-body-viewport::-webkit-scrollbar-track {
+//   background: var(--theme-bg-ternary);
+//   border-radius: var(--ui-border-radius-full);
+// }
+
+// :host ::ng-deep .ag-theme-quartz .ag-body-viewport::-webkit-scrollbar-thumb {
+//   background: linear-gradient(180deg, var(--theme-scroll-thumb), var(--theme-accent-primary-light)); /* Gradient for depth */
+//   border-radius: var(--ui-border-radius-full);
+//   border: 1px solid var(--theme-border-primary);
+//   transition: var(--ui-transition);
+// }
+
+// :host ::ng-deep .ag-theme-quartz .ag-body-viewport::-webkit-scrollbar-thumb:hover {
+//   background: var(--theme-accent-primary);
+//   transform: scaleX(1.2); /* Subtle expand on hover */
+// }
+
+// /* Loading Overlay - Premium integration with theme */
+// :host ::ng-deep .ag-theme-quartz .ag-overlay-loading-center {
+//   background: var(--theme-bg-overlay);
+//   border-radius: var(--ui-border-radius);
+//   box-shadow: var(--ui-shadow-lg);
+//   padding: var(--spacing-lg);
+//   backdrop-filter: var(--ui-glass-backdrop); /* Glass effect */
+//   gap: var(--spacing-sm); /* Spacing for elements */
+// }
+
+// :host ::ng-deep .ag-theme-quartz .ag-overlay-loading-center .ag-spinner {
+//   color: var(--theme-accent-primary);
+//   width: 2rem;
+//   height: 2rem;
+// }
+
+// /* No Rows Overlay - Premium styled message with icon */
+// :host ::ng-deep .ag-theme-quartz .ag-overlay-no-rows-center {
+//   color: var(--theme-text-muted);
+//   font-size: var(--font-size-base);
+//   padding: var(--spacing-2xl);
+//   background: var(--theme-card-gradient);
+//   border-radius: var(--ui-border-radius-lg);
+//   box-shadow: var(--ui-shadow-sm);
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   gap: var(--spacing-md);
+//   border: var(--ui-border-width) dashed var(--theme-border-secondary);
+// }
+
+// :host ::ng-deep .ag-theme-quartz .ag-overlay-no-rows-center::before {
+//   content: '\f07a'; /* Font Awesome empty icon - adjust if needed */
+//   font-family: 'PrimeIcons';
+//   font-size: var(--font-size-3xl);
+//   color: var(--theme-text-muted);
+//   margin-bottom: var(--spacing-sm);
+// }
+
+// /* Mobile - Adaptive for premium responsiveness */
+// @media (max-width: 768px) {
+//   .shared-grid-container {
+//     padding: var(--spacing-sm);
+//   }
+
+//   :host ::ng-deep .ag-theme-quartz {
+//     --ag-row-height: 3rem; /* Slightly compact on mobile */
+//     --ag-header-height: 3rem;
+//     border-radius: var(--ui-border-radius);
+//   }
+
+//   :host ::ng-deep .ag-theme-quartz .ag-cell,
+//   :host ::ng-deep .ag-theme-quartz .ag-header-cell {
+//     padding: var(--spacing-sm) var(--spacing-md); /* Tighter but premium */
+//     font-size: var(--font-size-sm);
+//   }
+
+//   .loading-overlay {
+//     padding: var(--spacing-lg);
+//   }
+// }

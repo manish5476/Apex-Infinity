@@ -1,11 +1,56 @@
 <div class="layout-container">
+  
+  <!-- 
+    The header component is now 'app-mainscreen-header' 
+    based on the .ts file you provided for it.
+  -->
+  <app-mainscreen-header 
+    (toggleSidebar)="toggleSidebar()" 
+    (mobileMenuToggle)="toggleMobileMenu()">
+  </app-mainscreen-header>
+
+  <div class="main-content-area">
+    
+    <!-- 
+      The sidebar component is 'app-mainscreen-sidebar' 
+      based on the .ts file you provided for it.
+    -->
+    <app-mainscreen-sidebar 
+      [isPinned]="isSidebarPinned" 
+      [isHovered]="isSidebarHovered" 
+      (pinToggle)="togglePin()"
+      (mouseEnter)="onMouseEnter()" 
+      (mouseEnterTriggerZone)="onMouseEnterTriggerZone()" 
+      (mouseLeave)="onMouseLeave()">
+    </app-mainscreen-sidebar>
+
+    <!-- 
+      Main content area.
+      The [class.ml-64] logic is now handled in SCSS for consistency.
+    -->
+    <main class="main-content" 
+      [class.content-expanded]="isSidebarPinned || isSidebarHovered" 
+      (mouseenter)="onMouseEnterMainContent()">
+      
+      <!-- 
+        The content-card and content-inner styles have been removed.
+        Those styles are now correctly defined on the list/details 
+        pages themselves (e.g., customer-list, product-details).
+      -->
+      <router-outlet></router-outlet>
+      
+    </main>
+  </div>
+</div>
+
+<!-- <div class="layout-container">
   <app-mainscreen-header (toggleSidebar)="toggleSidebar()" (mobileMenuToggle)="toggleMobileMenu()"></app-mainscreen-header>
   <div class="main-content-area">
     <app-mainscreen-sidebar [isPinned]="isSidebarPinned" [isHovered]="isSidebarHovered" (pinToggle)="togglePin()"
       (mouseEnter)="onMouseEnter()" (mouseEnterTriggerZone)="onMouseEnterTriggerZone()" (mouseLeave)="onMouseLeave()">
     </app-mainscreen-sidebar>
 
-    <!-- Main Content -->
+    Main Content
     <main [class.ml-64]="isSidebarPinned || isSidebarHovered" (mouseenter)="onMouseEnterMainContent()">
       <div class="content-card">
         <div class="content-inner">
@@ -14,4 +59,4 @@
       </div>
     </main>
   </div>
-</div>
+</div> -->

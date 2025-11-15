@@ -1,11 +1,36 @@
-/* Re-using styles from invoice-details */
+/* ==============================================
+   EMI DETAILS COMPONENT
+   - Using canonical theme tokens
+   ============================================== */
+
 :host {
   display: block;
   width: 100%;
+  height: 100%;
+}
+
+.emi-page-container {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  display: flex; // Center the card
+  justify-content: center;
+  align-items: flex-start;
+  background: var(--bg-primary);
+  padding: var(--spacing-xl);
+}
+
+/* === CARD === */
+.themed-card {
+  background: var(--bg-secondary);
+  border-radius: var(--ui-border-radius-lg);
+  border: var(--ui-border-width) solid var(--border-primary);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-lg) var(--spacing-xl);
 }
 
 .emi-details-card {
-  padding: var(--spacing-lg) var(--spacing-xl);
+  width: 100%;
   max-width: 1400px; 
   margin: 0 auto; 
 }
@@ -22,7 +47,7 @@
 .form-title {
   font-family: var(--font-heading);
   font-size: var(--font-size-2xl);
-  color: var(--theme-text-primary);
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -33,10 +58,16 @@
 }
 
 /* === Body === */
+.emi-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
 .section-title {
   font-family: var(--font-heading);
   font-size: var(--font-size-lg);
-  color: var(--theme-text-primary);
+  color: var(--text-primary);
   margin-top: var(--spacing-lg);
   margin-bottom: var(--spacing-md);
 }
@@ -44,26 +75,27 @@
 /* Summary Cards */
 .financial-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--spacing-md);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-lg);
 }
 
 .stat-card {
-  background: var(--theme-bg-secondary);
+  background: var(--bg-primary); // Use primary for contrast
   border-radius: var(--ui-border-radius);
-  padding: var(--spacing-md);
-  border: 1px solid var(--theme-border-primary);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border-primary);
   
   label {
     font-size: var(--font-size-sm);
-    color: var(--theme-text-label);
-    font-weight: 600;
+    color: var(--text-label);
+    font-weight: 500;
+    text-transform: uppercase;
   }
   
   .stat-value {
-    font-size: 1.4rem;
+    font-size: var(--font-size-3xl);
     font-weight: 700;
-    color: var(--theme-text-primary);
+    color: var(--text-primary);
     display: block;
     margin-top: var(--spacing-xs);
   }
@@ -73,11 +105,87 @@
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
   
   label {
-    font-size: var(--font-size-sm);
-    color: var(--theme-text-label);
-    font-weight: 600;
+    font-size: var(--font-size-xs);
+    color: var(--text-label);
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+  .req {
+    color: var(--color-error);
+  }
+}
+
+/* === NG-DEEP Overrides === */
+:host ::ng-deep {
+
+  /* Table Styles */
+  .p-table {
+    .p-table-thead > tr > th {
+      background: var(--bg-ternary);
+      color: var(--text-primary);
+      border-color: var(--border-primary);
+      font-size: var(--font-size-sm);
+    }
+    .p-table-tbody > tr > td {
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      border-color: var(--border-primary);
+      font-size: var(--font-size-sm);
+    }
+    .p-table-tbody > tr:hover {
+      background: var(--bg-ternary);
+    }
+  }
+
+  /* Dialog Styles */
+  .p-dialog {
+    background: var(--bg-secondary);
+    border: var(--ui-border-width) solid var(--border-primary);
+    border-radius: var(--ui-border-radius-lg);
+
+    .p-dialog-header {
+      background: transparent;
+      color: var(--text-primary);
+      border-bottom: 1px solid var(--border-primary);
+    }
+    .p-dialog-content {
+      background: var(--bg-primary); // Use primary for contrast
+      color: var(--text-secondary);
+    }
+    .p-dialog-footer {
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-primary);
+    }
+  }
+
+  /* Modal Input Styles */
+  .p-inputnumber-input {
+    background: var(--bg-ternary);
+    color: var(--text-primary);
+  }
+  .p-select {
+    background: var(--bg-ternary);
+    .p-select-label {
+      color: var(--text-primary);
+    }
+  }
+  .p-select-panel {
+    background: var(--bg-secondary);
+    border: var(--ui-border-width) solid var(--border-primary);
+    
+    .p-select-item {
+      color: var(--text-secondary);
+      &:hover {
+        background: var(--bg-ternary);
+        color: var(--text-primary);
+      }
+    }
+    .p-select-item.p-highlight {
+      background: var(--accent-focus);
+      color: var(--accent-primary);
+    }
   }
 }

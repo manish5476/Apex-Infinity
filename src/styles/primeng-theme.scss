@@ -1,198 +1,210 @@
-/* ==========================================
-   PRIME NG THEME OVERRIDES
-   Uses variables from theme.scss
-   ========================================== */
-
-.p-panel,
-.p-dialog {
-  background: var(--theme-bg-secondary);
-  border: var(--ui-border-width) solid var(--theme-border-primary);
-  border-radius: var(--ui-border-radius-lg);
-  box-shadow: var(--ui-shadow-lg);
-  padding: 0;
-  backdrop-filter: blur(10px) saturate(180%);
-  -webkit-backdrop-filter: blur(10px) saturate(180%);
-}
-
-/* === Panel & Dialog Headers === */
-.p-panel-header,
-.p-dialog-header {
-  background: transparent;
-  color: var(--theme-text-primary);
-  border-bottom: var(--ui-border-width) solid var(--theme-border-primary);
-  font-family: var(--font-primary);
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--ui-border-radius-lg) var(--ui-border-radius-lg) 0 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.p-dialog-header .p-dialog-header-icon {
-  width: 2.25rem;
-  height: 2.25rem;
-  color: var(--theme-text-label);
-  border-radius: var(--ui-border-radius-full);
-  transition: var(--ui-transition);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.p-dialog-header .p-dialog-header-icon:hover {
-  color: var(--theme-text-primary);
-  background-color: var(--theme-hover-bg);
-}
-
-/* === Dialog sizing === */
-.p-dialog.dialog-fullscreen {
-  width: 95vw !important;
-  height: 90vh !important;
-  max-width: 1900px;
-  max-height: 95vh;
-}
-
-.p-dialog .p-dialog-content,
-.p-panel .p-panel-content {
-  background: var(--theme-bg-primary);
-  padding: 0 !important;
-  border-radius: 0 0 var(--ui-border-radius-lg) var(--ui-border-radius-lg);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-/* === Buttons === */
 .p-button {
-  font-family: var(--font-primary);
   font-weight: 600;
   font-size: var(--font-size-sm);
-  border-radius: var(--ui-border-radius);
-  padding: 0.625rem 1.25rem;
-  background: var(--theme-accent-gradient);
-  color: var(--theme-accent-text-color);
-  border: var(--ui-border-width) solid var(--theme-accent-primary);
-  box-shadow: var(--ui-shadow-xs);
-  transition: var(--ui-transition);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  padding: var(--spacing-md) var(--spacing-xl); /* Using new spacing tokens */
+  border-radius: 999px;
+  background: var(--accent-gradient); /* This token is now defined! */
+  color: #fff;
+  border: none;
+  transition: var(--transition-base); /* Using new transition token */
+}
+.p-button:focus-visible {
+  /* Using focus-visible for accessibility */
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus); /* Using new focus tokens */
 }
 .p-button:hover {
-  background: var(--theme-accent-primary-hover);
-  transform: var(--ui-button-hover-transform);
-  box-shadow: var(--ui-shadow-md);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md); /* Using new shadow token */
 }
 
-/* === Inputs === */
+/* Inputs and selects */
 .p-inputtext,
 .p-inputnumber-input,
 .p-password-input,
 .p-textarea,
-.p-select,
-.p-multiselect,
-.p-datepicker .p-inputtext {
+.p-dropdown,
+.p-inputmask {
   width: 100%;
-  height: 2.75rem;
-  padding: var(--spacing-sm) var(--spacing-md);
-  font-family: var(--font-body);
-  font-size: var(--font-size-sm);
-  color: var(--theme-text-primary);
-  // background: var(--theme-bg-ternary);
-  // border: var(--ui-border-width) solid var(--theme-border-primary);
+  /* remove static height, let padding define it */
+  padding: var(--spacing-md) var(--spacing-lg); /* Using new spacing tokens */
   border-radius: var(--ui-border-radius);
-  transition: var(--ui-transition);
+  border: var(--ui-border-width) solid var(--border-secondary);
+  background: var(--bg-ternary);
+  color: var(--text-primary);
+  transition: var(--transition-fast);
 }
 .p-inputtext:focus,
+.p-dropdown:focus,
+.p-inputnumber-input:focus,
 .p-password-input:focus,
-.p-select:focus,
-.p-multiselect:focus {
-  border-color: var(--theme-accent-primary);
-  box-shadow: 0 0 0 3px var(--theme-accent-focus-ring);
+.p-textarea:focus,
+.p-inputmask:focus {
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus); /* Using new focus tokens */
+  border-color: var(--accent-primary);
 }
 
-/* === Datatable === */
+/* Dialog / Panel */
+.p-dialog,
+.p-panel,
+.p-card {
+  background: var(--bg-secondary);
+  border: var(--ui-border-width) solid var(--border-primary);
+  border-radius: var(--ui-border-radius-lg);
+  box-shadow: var(--shadow-md); /* Using new shadow token */
+}
+.p-dialog-header,
+.p-panel-header {
+  background: transparent;
+  border-bottom: var(--ui-border-width) solid var(--border-primary);
+  padding: var(--spacing-lg) var(--spacing-xl); /* Using new spacing tokens */
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Datatable */
 .p-datatable-wrapper {
-  border: var(--ui-border-width) solid var(--theme-border-primary);
+  border: var(--ui-border-width) solid var(--border-primary);
+  background: var(--bg-primary);
   border-radius: var(--ui-border-radius);
-  overflow-x: auto;
-  box-shadow: var(--ui-shadow);
-  background: var(--theme-bg-primary);
+  overflow: hidden; /* Good practice for rounded corners */
 }
 .p-datatable .p-datatable-thead > tr > th {
-  background: var(--theme-bg-secondary);
-  color: var(--theme-text-primary);
-  font-family: var(--font-primary);
-  font-size: var(--font-size-sm);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   font-weight: 600;
-  padding: var(--spacing-md);
-  border-bottom: var(--ui-border-width) solid var(--theme-border-primary);
-}
-.p-datatable .p-datatable-tbody > tr:hover {
-  background: var(--theme-hover-bg);
+  padding: var(--spacing-lg); /* Using new spacing tokens */
 }
 .p-datatable .p-datatable-tbody > tr > td {
-  border-bottom: var(--ui-border-width) solid var(--theme-border-secondary);
-  padding: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg); /* Using new spacing tokens */
+  color: var(--text-secondary);
+  border-color: var(--border-primary);
+}
+.p-datatable .p-datatable-tbody > tr:hover {
+  background: var(--bg-ternary);
 }
 
-/* === Tabs === */
-.p-tabview .p-tabview-nav {
-  background: transparent;
-  border-bottom: 2px solid var(--theme-border-primary);
-  border-radius: var(--ui-border-radius) var(--ui-border-radius) 0 0;
-}
+/* Tabs */
 .p-tabview .p-tabview-nav-link {
   background: transparent !important;
-  border: none !important;
-  color: var(--theme-text-muted) !important;
-  transition: var(--ui-transition-fast);
+  color: var(--text-secondary) !important;
+  padding: var(--spacing-md) var(--spacing-lg); /* Using new spacing tokens */
   font-weight: 500;
-  border-radius: var(--ui-border-radius) var(--ui-border-radius) 0 0;
-  padding: var(--spacing-sm) var(--spacing-lg);
+  transition: var(--transition-fast);
 }
 .p-tabview .p-tabview-nav-link:hover {
-  color: var(--theme-text-primary) !important;
-  background: var(--theme-hover-bg);
+  color: var(--text-primary) !important;
+  background: var(--bg-ternary) !important;
 }
 .p-tabview .p-tabview-ink-bar {
-  background-color: var(--theme-accent-primary) !important;
+  background: var(--accent-primary) !important;
   height: 3px !important;
 }
 
-/* === Tooltip === */
+/* Tooltip */
 .p-tooltip {
-  background: var(--theme-bg-overlay);
-  border: var(--ui-border-width) solid var(--theme-border-primary);
+  background: var(--bg-secondary);
   border-radius: var(--ui-border-radius);
-  box-shadow: var(--ui-shadow-md);
-  color: var(--theme-text-primary);
-  font-family: var(--font-body);
+  padding: var(--spacing-sm) var(--spacing-md); /* Using new spacing tokens */
+  color: var(--text-primary);
+  box-shadow: var(--shadow-lg);
 }
 
-/* === Badge === */
+/* Badge */
 .p-badge {
-  background: var(--theme-accent-primary);
-  color: var(--theme-accent-text-color);
-  border-radius: var(--ui-border-radius-full);
-  font-size: var(--font-size-xs);
+  background: var(--accent-primary);
+  color: #fff;
+  border-radius: 999px;
   font-weight: 600;
+  padding: var(--spacing-xs) var(--spacing-md); /* Using new spacing tokens */
 }
 
-/* === Mobile Responsiveness === */
-@media screen and (max-width: 768px) {
-  .p-dialog, .p-panel {
+/* Mobile tweaks (PrimeNG components often need slight adjustments on small widths) */
+@media (max-width: 768px) {
+  .p-dialog,
+  .p-panel {
     width: 95vw !important;
-    height: 90vh !important;
-  }
-  .p-tabview .p-tabview-nav-link {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: var(--font-size-xs);
+    height: auto !important;
+    max-width: 100%;
   }
   .p-datatable .p-datatable-thead > tr > th,
   .p-datatable .p-datatable-tbody > tr > td {
-    padding: var(--spacing-sm);
+    padding: var(--spacing-md); /* Using new spacing tokens */
   }
 }
+
+// /* ============================
+//    PRIME NG OVERRIDES
+//    - Use tokens (accent-primary, bg-secondary, border-primary)
+//    - Loads LAST (after theme & base)
+// ============================ */
+
+// /* Buttons */
+// .p-button {
+//   font-weight: 600;
+//   font-size: var(--font-size-sm);
+//   padding: 0.55rem 1.1rem;
+//   border-radius: 999px;
+//   background: var(--accent-gradient);
+//   color: #fff;
+//   border: none;
+//   transition: var(--ui-transition);
+// }
+// .p-button:focus { box-shadow: 0 0 0 4px var(--accent-focus); }
+// .p-button:hover { transform: translateY(-2px); box-shadow: var(--ui-shadow-md); }
+
+// /* Inputs and selects */
+// .p-inputtext,
+// .p-inputnumber-input,
+// .p-password-input,
+// .p-textarea,
+// .p-dropdown,
+// .p-inputmask {
+//   width: 100%;
+//   height: 2.75rem;
+//   padding: calc(var(--spacing-sm)) calc(var(--spacing-md));
+//   border-radius: var(--ui-border-radius);
+//   border: var(--ui-border-width) solid var(--border-secondary);
+//   background: var(--bg-ternary);
+// }
+// .p-inputtext:focus, .p-dropdown:focus { box-shadow: 0 0 0 4px var(--accent-focus); border-color: var(--accent-primary); }
+
+// /* Dialog / Panel */
+// .p-dialog, .p-panel, .p-card {
+//   background: var(--bg-secondary);
+//   border: var(--ui-border-width) solid var(--border-primary);
+//   border-radius: var(--ui-border-radius-lg);
+//   box-shadow: var(--ui-shadow-md);
+// }
+// .p-dialog-header, .p-panel-header {
+//   background: transparent;
+//   border-bottom: var(--ui-border-width) solid var(--border-primary);
+//   padding: calc(var(--spacing-sm)) calc(var(--spacing-lg));
+//   font-weight: 600;
+// }
+
+// /* Datatable */
+// .p-datatable-wrapper {
+//   border: var(--ui-border-width) solid var(--border-primary);
+//   background: var(--bg-primary);
+//   border-radius: var(--ui-border-radius);
+// }
+// .p-datatable .p-datatable-thead > tr > th {
+//   background: var(--bg-secondary); color: var(--text-primary); font-weight: 600; padding: calc(var(--spacing-md));
+// }
+
+// /* Tabs */
+// .p-tabview .p-tabview-nav-link { background: transparent !important; color: var(--text-secondary) !important; padding: calc(var(--spacing-sm)) calc(var(--spacing-md)); }
+// .p-tabview .p-tabview-nav-link:hover { color: var(--text-primary) !important; background: var(--bg-ternary); }
+// .p-tabview .p-tabview-ink-bar { background: var(--accent-primary) !important; height: 3px !important; }
+
+// /* Tooltip */
+// .p-tooltip { background: var(--bg-secondary); border-radius: var(--ui-border-radius); padding: calc(var(--spacing-xs)) calc(var(--spacing-sm)); color: var(--text-primary); }
+
+// /* Badge */
+// .p-badge { background: var(--accent-primary); color: #fff; border-radius: 999px; font-weight: 600; padding: 0.25rem 0.5rem; }
+
+// /* Mobile tweaks (PrimeNG components often need slight adjustments on small widths) */
+// @media (max-width: 768px) {
+//   .p-dialog, .p-panel { width: 95vw !important; height: auto !important; max-width: 100%; }
+//   .p-datatable .p-datatable-thead > tr > th, .p-datatable .p-datatable-tbody > tr > td { padding: calc(var(--spacing-sm)); }
+// }

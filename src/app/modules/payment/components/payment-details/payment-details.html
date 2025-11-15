@@ -1,22 +1,30 @@
-<div class="p-6">
-  <div class="glass-card payment-details-card" *ngIf="payment(); else noPayment">
+<!-- 
+  REFACTORED:
+  - Using consistent page container
+  - Using 'themed-card' instead of 'glass-card'
+  - Removed Tailwind utility classes in favor of SCSS
+  - Uncommented severity binding for Payment Type
+-->
+<div class="customer-page-container">
+  <div class="themed-card payment-details-card" *ngIf="payment(); else noPayment">
     
     <!-- === HEADER === -->
     <div class="details-header">
       <!-- Left Side -->
-      <div class="flex flex-col gap-2">
-        <div class="flex items-center gap-4">
-          <p-button 
-            icon="pi pi-arrow-left" 
-            styleClass="p-button-text p-button-rounded"
-            routerLink="/payments">
-          </p-button>
-          <h2 class="form-title m-0">Payment Details</h2>
-        </div>
-        <div class="flex items-center gap-2 pl-14">
-          <p-tag [value]="getPaymentType(payment()?.type).label"></p-tag>
-          <!-- // [severity]="getPaymentType(payment()?.type).severity" -->
-          <p-tag [value]="getStatus(payment()?.status).label" [severity]="getStatus(payment()?.status).severity"></p-tag>
+      <div class="header-left">
+        <p-button 
+          icon="pi pi-arrow-left" 
+          styleClass="p-button-text p-button-rounded"
+          routerLink="/payments">
+        </p-button>
+        <div class="header-info">
+          <h2 class="form-title">Payment Details</h2>
+          <p-tag [value]="getPaymentType(payment()?.type).label"
+                 [severity]="getPaymentType(payment()?.type).severity">
+          </p-tag>
+          <p-tag [value]="getStatus(payment()?.status).label" 
+                 [severity]="getStatus(payment()?.status).severity">
+          </p-tag>
         </div>
       </div>
       
@@ -114,7 +122,7 @@
 </div>
 
 <ng-template #noPayment>
-  <div class="flex items-center justify-center p-8">
+  <div class="themed-card payment-details-card text-center p-8">
     <h3>Loading payment details...</h3>
   </div>
 </ng-template>
