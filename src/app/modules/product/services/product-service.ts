@@ -16,7 +16,7 @@ export class ProductService extends BaseApiService {
       .post(`${this.baseUrl}${this.endpoint}`, data)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('createProduct', error),
+          this.errorhandler.handleError(error,'createProduct'),
         ),
       );
   }
@@ -31,7 +31,7 @@ export class ProductService extends BaseApiService {
       })
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getAllProducts', error),
+          this.errorhandler.handleError(error,'getAllProducts'),
         ),
       );
   }
@@ -44,7 +44,7 @@ export class ProductService extends BaseApiService {
       .get<any>(`${this.baseUrl}${this.endpoint}/${id}`)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getProductById', error),
+          this.errorhandler.handleError(error,'getProductById'),
         ),
       );
   }
@@ -57,7 +57,7 @@ export class ProductService extends BaseApiService {
       .patch(`${this.baseUrl}${this.endpoint}/${productId}`, data)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('updateProduct', error),
+          this.errorhandler.handleError(error,'updateProduct'),
         ),
       );
   }
@@ -70,7 +70,7 @@ export class ProductService extends BaseApiService {
       .patch(`${this.baseUrl}${this.endpoint}/${productId}/restore`, {})
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('restoreProduct', error),
+          this.errorhandler.handleError(error,'restoreProduct'),
         ),
       );
   }
@@ -83,7 +83,7 @@ export class ProductService extends BaseApiService {
       .delete(`${this.baseUrl}${this.endpoint}/${productId}`)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('deleteProductById', error),
+          this.errorhandler.handleError(error,'deleteProductById'),
         ),
       );
   }
@@ -102,7 +102,7 @@ export class ProductService extends BaseApiService {
   //     .delete(url, { body })
   //     .pipe(
   //       catchError((error: HttpErrorResponse) =>
-  //         this.errorhandler.handleError('deleteProducts', error),
+  //         this.errorhandler.handleError(error,'deleteProducts'),
   //       ),
   //     );
   // }
@@ -115,7 +115,7 @@ export class ProductService extends BaseApiService {
   //   const apiUrl = `${this.baseUrl}${this.endpoint}/${productId}/upload`;
   //   return this.http.post(apiUrl, formData).pipe(
   //     catchError((error: HttpErrorResponse) =>
-  //       this.errorhandler.handleError('uploadProductImage', error),
+  //       this.errorhandler.handleError(error,'uploadProductImage'),
   //     ),
   //   );
   // }

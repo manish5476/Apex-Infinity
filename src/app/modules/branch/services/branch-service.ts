@@ -17,7 +17,7 @@ export class BranchService extends BaseApiService {
       .post(`${this.baseUrl}${this.endpoint}`, data)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('createBranch', error),
+          this.errorhandler.handleError(error,'createBranch'),
         ),
       );
   }
@@ -33,7 +33,7 @@ export class BranchService extends BaseApiService {
       })
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getAllBranches', error),
+          this.errorhandler.handleError(error,'getAllBranches'),
         ),
       );
   }
@@ -47,7 +47,7 @@ export class BranchService extends BaseApiService {
       .get<any>(`${this.baseUrl}${this.endpoint}/my-branches`)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getMyBranches', error),
+          this.errorhandler.handleError(error,'getMyBranches'),
         ),
       );
   }
@@ -61,7 +61,7 @@ export class BranchService extends BaseApiService {
       .get<any>(`${this.baseUrl}${this.endpoint}/${branchId}`)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getBranchById', error),
+          this.errorhandler.handleError(error,'getBranchById'),
         ),
       );
   }
@@ -75,7 +75,7 @@ export class BranchService extends BaseApiService {
       .patch(`${this.baseUrl}${this.endpoint}/${branchId}`, data)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('updateBranch', error),
+          this.errorhandler.handleError(error,'updateBranch'),
         ),
       );
   }
@@ -90,7 +90,7 @@ export class BranchService extends BaseApiService {
       .delete(`${this.baseUrl}${this.endpoint}/${branchId}`)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('deleteBranch', error),
+          this.errorhandler.handleError(error,'deleteBranch'),
         ),
       );
   }
@@ -107,7 +107,7 @@ export class BranchService extends BaseApiService {
   //     .patch(`${this.baseUrl}${this.endpoint}/${branchId}/restore`, {})
   //     .pipe(
   //       catchError((error: HttpErrorResponse) =>
-  //         this.errorhandler.handleError('restoreBranch', error),
+  //         this.errorhandler.handleError(error,'restoreBranch'),
   //       ),
   //     );
   // }
@@ -120,7 +120,7 @@ export class BranchService extends BaseApiService {
   //   const apiUrl = `${this.baseUrl}${this.endpoint}/${branchId}/upload`;
   //   return this.http.post(apiUrl, formData).pipe(
   //     catchError((error: any) =>
-  //       this.errorhandler.handleError('uploadBranchFile', error),
+  //       this.errorhandler.handleError(error,'uploadBranchFile'),
   //     ),
   //   );
   // }

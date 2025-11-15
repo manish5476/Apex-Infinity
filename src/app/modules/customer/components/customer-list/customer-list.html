@@ -1,14 +1,7 @@
 <p-toast></p-toast>
 
-<!-- 
-  REFACTORED:
-  - Using the consistent list page layout
--->
 <div class="list-page-container">
 
-  <!-- ===========================
-       HEADER
-  ============================ -->
   <div class="list-header">
     <h2 class="list-title">
       <i class="pi pi-users text-[var(--accent-primary)]"></i>
@@ -18,55 +11,47 @@
     </p-button>
   </div>
 
-    <!-- ===========================
-       FILTER BAR SECTION
-  ============================ -->
-  <div class="themed-card"> <!-- REFACTORED: Using themed-card -->
-        <div class="se-filter-bar">
-            <!-- Customer -->
-            <div class="se-filter-field">
-                <label for="customer">Customer</label>
-                <p-select id="customer" [options]="masterList.customers()" [(ngModel)]="customerFilter._id"
-          [filter]="true"           filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true"
-          placeholder="Select Customer"           appendTo="body">
-                  </p-select>
-              </div>
+  <div class="themed-card list-content-area">
 
-            <!-- Email -->
-            <div class="se-filter-field">
-                <label for="email">Email</label>
-                <p-autoComplete id="email" [(ngModel)]="customerFilter.email" [suggestions]="emailSuggestions"          
-          (completeMethod)="filterEmails($event)" (keyup.enter)="applyFilters()" [forceSelection]="false"          
+    <div class="se-filter-bar">
+      <div class="se-filter-field">
+        <label for="customer">Customer</label>
+        <p-select id="customer" [options]="masterList.customers()" [(ngModel)]="customerFilter._id"
+          [filter]="true" filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true"
+          placeholder="Select Customer" appendTo="body">
+        </p-select>
+      </div>
+
+      <div class="se-filter-field">
+        <label for="email">Email</label>
+        <p-autoComplete id="email" [(ngModel)]="customerFilter.email" [suggestions]="emailSuggestions"
+          (completeMethod)="filterEmails($event)" (keyup.enter)="applyFilters()" [forceSelection]="false"
           placeholder="Enter email">
-                  </p-autoComplete>
-              </div>
+        </p-autoComplete>
+      </div>
 
-            <!-- Phone -->
-            <div class="se-filter-field">
-                <label for="phone">Phone</label>
-                <input id="phone" type="text" pInputText [(ngModel)]="customerFilter.phone" placeholder="Phone"        
-            (keyup.enter)="applyFilters()" />
-              </div>
+      <div class="se-filter-field">
+        <label for="phone">Phone</label>
+        <input id="phone" type="text" pInputText [(ngModel)]="customerFilter.phone" placeholder="Phone"
+          (keyup.enter)="applyFilters()" />
+      </div>
 
-            <!-- Buttons -->
-            <div class="se-filter-actions">
-                <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()">
-                  </p-button>
-                <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined"          
+      <div class="se-filter-actions">
+        <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()">
+        </p-button>
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined"
           (onClick)="resetFilters()">
-                  </p-button>
-              </div>
-          </div>
-      </div>
+        </p-button>
+      </div>
+    </div>
 
-    <!-- ===========================
-       GRID SECTION
-  ============================ -->
-  <div class="themed-card list-grid-area"> <!-- REFACTORED: Using themed-card and list-grid-area -->
-        <app-shared-grid [data]="data" [gridHeight]="'210px'" [headerFilter]="false"
-      [rowSelectionMode]="rowSelectionMode"       [GridName]="'Customer Details'" [column]="column"
-      (eventFromGrid)="eventFromGrid($event)"       (gridReady)="onGridReady($event)"
-      (scrolledToBottom)="onScrolledToBottom($event)">
-          </app-shared-grid>
-      </div>
+    <div class="list-grid-wrapper">
+      <app-shared-grid [data]="data" [gridHeight]="'210px'" [headerFilter]="false"
+        [rowSelectionMode]="rowSelectionMode" [GridName]="'Customer Details'" [column]="column"
+        (eventFromGrid)="eventFromGrid($event)" (gridReady)="onGridReady($event)"
+        (scrolledToBottom)="onScrolledToBottom($event)">
+      </app-shared-grid>
+    </div>
+
+  </div>
 </div>

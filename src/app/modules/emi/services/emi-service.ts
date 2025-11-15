@@ -18,7 +18,7 @@ export class EmiService extends BaseApiService {
       .post(`${this.baseUrl}${this.endpoint}`, planData)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('createEmiPlan', error),
+          this.errorhandler.handleError(error,'createEmiPlan'),
         ),
       );
   }
@@ -32,7 +32,7 @@ export class EmiService extends BaseApiService {
       .get<any>(`${this.baseUrl}${this.endpoint}/invoice/${invoiceId}`)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getEmiByInvoice', error),
+          this.errorhandler.handleError(error,'getEmiByInvoice'),
         ),
       );
   }
@@ -47,7 +47,7 @@ export class EmiService extends BaseApiService {
       .patch(`${this.baseUrl}${this.endpoint}/pay`, paymentData)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('payEmiInstallment', error),
+          this.errorhandler.handleError(error,'payEmiInstallment'),
         ),
       );
   }
@@ -66,7 +66,7 @@ export class EmiService extends BaseApiService {
   //     })
   //     .pipe(
   //       catchError((error: HttpErrorResponse) =>
-  //         this.errorhandler.handleError('getAllEmiPlans', error),
+  //         this.errorhandler.handleError(error,'getAllEmiPlans'),
   //       ),
   //     );
   // }
@@ -80,7 +80,7 @@ export class EmiService extends BaseApiService {
   //     .patch(`${this.baseUrl}${this.endpoint}/${emiId}`, data)
   //     .pipe(
   //       catchError((error: HttpErrorResponse) =>
-  //         this.errorhandler.handleError('updateEmiPlan', error),
+  //         this.errorhandler.handleError(error,'updateEmiPlan'),
   //       ),
   //     );
   // }

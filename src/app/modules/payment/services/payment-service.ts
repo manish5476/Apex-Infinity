@@ -18,7 +18,7 @@ export class PaymentService extends BaseApiService {
       .post(`${this.baseUrl}${this.endpoint}`, paymentData)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('createPayment', error),
+          this.errorhandler.handleError(error,'createPayment'),
         ),
       );
   }
@@ -33,7 +33,7 @@ export class PaymentService extends BaseApiService {
       })
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getAllPayments', error),
+          this.errorhandler.handleError(error,'getAllPayments'),
         ),
       );
   }
@@ -46,7 +46,7 @@ export class PaymentService extends BaseApiService {
       .get<any>(`${this.baseUrl}${this.endpoint}/${id}`)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getPaymentById', error),
+          this.errorhandler.handleError(error,'getPaymentById'),
         ),
       );
   }
@@ -59,7 +59,7 @@ export class PaymentService extends BaseApiService {
       .get<any>(`${this.baseUrl}${this.endpoint}/customer/${customerId}`)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getPaymentsByCustomer', error),
+          this.errorhandler.handleError(error,'getPaymentsByCustomer'),
         ),
       );
   }
@@ -72,7 +72,7 @@ export class PaymentService extends BaseApiService {
       .get<any>(`${this.baseUrl}${this.endpoint}/supplier/${supplierId}`)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getPaymentsBySupplier', error),
+          this.errorhandler.handleError(error,'getPaymentsBySupplier'),
         ),
       );
   }
@@ -85,7 +85,7 @@ export class PaymentService extends BaseApiService {
       .patch(`${this.baseUrl}${this.endpoint}/${paymentId}`, paymentData)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('updatePayment', error),
+          this.errorhandler.handleError(error,'updatePayment'),
         ),
       );
   }
@@ -98,7 +98,7 @@ export class PaymentService extends BaseApiService {
       .delete(`${this.baseUrl}${this.endpoint}/${paymentId}`)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('deletePayment', error),
+          this.errorhandler.handleError(error,'deletePayment'),
         ),
       );
   }

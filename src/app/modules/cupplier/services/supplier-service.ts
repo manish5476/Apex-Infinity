@@ -23,7 +23,7 @@ export class SupplierService extends BaseApiService {
       .post(`${this.baseUrl}${this.endpoint}`, data)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('createSupplier', error),
+          this.errorhandler.handleError(error,'createSupplier'),
         ),
       );
   }
@@ -39,7 +39,7 @@ export class SupplierService extends BaseApiService {
       })
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getAllSuppliers', error),
+          this.errorhandler.handleError(error,'getAllSuppliers'),
         ),
       );
   }
@@ -53,7 +53,7 @@ export class SupplierService extends BaseApiService {
       .get<any[]>(`${this.baseUrl}${this.endpoint}/list`)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getSupplierList', error),
+          this.errorhandler.handleError(error,'getSupplierList'),
         ),
       );
   }
@@ -67,7 +67,7 @@ export class SupplierService extends BaseApiService {
       .get<any>(`${this.baseUrl}${this.endpoint}/${id}`)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getSupplierById', error),
+          this.errorhandler.handleError(error,'getSupplierById'),
         ),
       );
   }
@@ -81,7 +81,7 @@ export class SupplierService extends BaseApiService {
       .patch(`${this.baseUrl}${this.endpoint}/${id}`, data)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('updateSupplier', error),
+          this.errorhandler.handleError(error,'updateSupplier'),
         ),
       );
   }
@@ -96,7 +96,7 @@ export class SupplierService extends BaseApiService {
       .delete(`${this.baseUrl}${this.endpoint}/${id}`)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('deleteSupplier', error),
+          this.errorhandler.handleError(error,'deleteSupplier'),
         ),
       );
   }
@@ -108,7 +108,7 @@ export class SupplierService extends BaseApiService {
   //   const apiUrl = `${this.baseUrl}${this.endpoint}/${supplierId}/upload`;
   //   return this.http.post(apiUrl, formData).pipe(
   //     catchError((error: HttpErrorResponse) =>
-  //       this.errorhandler.handleError('uploadProfileImage', error),
+  //       this.errorhandler.handleError(error,'uploadProfileImage'),
   //     ),
   //   );
   // }

@@ -24,7 +24,7 @@ export class InvoiceService extends BaseApiService {
       .post(`${this.baseUrl}${this.endpoint}`, data)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('createInvoice', error),
+          this.errorhandler.handleError(error,'createInvoice'),
         ),
       );
   }
@@ -39,7 +39,7 @@ export class InvoiceService extends BaseApiService {
       })
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getAllInvoices', error),
+          this.errorhandler.handleError(error,'getAllInvoices'),
         ),
       );
   }
@@ -52,7 +52,7 @@ export class InvoiceService extends BaseApiService {
       .get<any>(`${this.baseUrl}${this.endpoint}/${id}`)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getInvoiceById', error),
+          this.errorhandler.handleError(error,'getInvoiceById'),
         ),
       );
   }
@@ -65,7 +65,7 @@ export class InvoiceService extends BaseApiService {
       .get<any>(`${this.baseUrl}${this.endpoint}/customer/${customerId}`)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getInvoicesByCustomer', error),
+          this.errorhandler.handleError(error,'getInvoicesByCustomer'),
         ),
       );
   }
@@ -78,7 +78,7 @@ export class InvoiceService extends BaseApiService {
       .patch(`${this.baseUrl}${this.endpoint}/${id}`, data)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('updateInvoice', error),
+          this.errorhandler.handleError(error,'updateInvoice'),
         ),
       );
   }
@@ -91,7 +91,7 @@ export class InvoiceService extends BaseApiService {
       .delete(`${this.baseUrl}${this.endpoint}/${id}`)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('deleteInvoiceById', error),
+          this.errorhandler.handleError(error,'deleteInvoiceById'),
         ),
       );
   }
@@ -110,7 +110,7 @@ export class InvoiceService extends BaseApiService {
       })
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('downloadInvoice', error),
+          this.errorhandler.handleError(error,'downloadInvoice'),
         ),
       );
   }
@@ -123,7 +123,7 @@ export class InvoiceService extends BaseApiService {
       .post<any>(`${this.baseUrl}${this.endpoint}/pdf/${id}/email`, {})
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('emailInvoice', error),
+          this.errorhandler.handleError(error,'emailInvoice'),
         ),
       );
   }
@@ -141,7 +141,7 @@ export class InvoiceService extends BaseApiService {
   //     .patch(`${this.baseUrl}${this.endpoint}/${id}/restore`, {})
   //     .pipe(
   //       catchError((error: HttpErrorResponse) =>
-  //         this.errorhandler.handleError('restoreInvoice', error),
+  //         this.errorhandler.handleError(error,'restoreInvoice'),
   //       ),
   //     );
   // }
@@ -155,7 +155,7 @@ export class InvoiceService extends BaseApiService {
   //     .delete(`${this.baseUrl}${this.endpoint}`, { body: { ids } })
   //     .pipe(
   //       catchError((error: HttpErrorResponse) =>
-  //         this.errorhandler.handleError('deleteInvoices', error),
+  //         this.errorhandler.handleError(error,'deleteInvoices'),
   //       ),
   //     );
   // }

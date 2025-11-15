@@ -15,7 +15,7 @@ export class CustomerService extends BaseApiService {
       .post(`${this.baseUrl}${this.endpoint}`, data)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('createNewCustomer', error),
+          this.errorhandler.handleError(error,'createNewCustomer'),
         ),
       );
   }
@@ -27,7 +27,7 @@ export class CustomerService extends BaseApiService {
       })
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getAllCustomerData', error),
+          this.errorhandler.handleError(error,'getAllCustomerData'),
         ),
       );
   }
@@ -37,7 +37,7 @@ export class CustomerService extends BaseApiService {
       .get<any>(`${this.baseUrl}${this.endpoint}/${id}`)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getCustomerDataWithId', error),
+          this.errorhandler.handleError(error,'getCustomerDataWithId'),
         ),
       );
   }
@@ -48,7 +48,7 @@ export class CustomerService extends BaseApiService {
       .patch(`${this.baseUrl}${this.endpoint}/${customerId}`, data)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('updateCustomer', error),
+          this.errorhandler.handleError(error,'updateCustomer'),
         ),
       );
   }
@@ -58,7 +58,7 @@ export class CustomerService extends BaseApiService {
       .patch(`${this.baseUrl}${this.endpoint}/${customerId}/restore`, data)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('reStoreCustomer', error),
+          this.errorhandler.handleError(error,'reStoreCustomer'),
         ),
       );
   }
@@ -72,7 +72,7 @@ export class CustomerService extends BaseApiService {
       .delete(url)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('deleteCustomerID', error),
+          this.errorhandler.handleError(error,'deleteCustomerID'),
         ),
       );
   }
@@ -91,7 +91,7 @@ export class CustomerService extends BaseApiService {
       .delete(url, { body })
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('deleteCustomers', error),
+          this.errorhandler.handleError(error,'deleteCustomers'),
         ),
       );
   }
@@ -101,7 +101,7 @@ uploadProfileImage(formData: FormData, customerId: string): Observable<any> {
   const apiUrl = `${this.baseUrl}${this.endpoint}/${customerId}/upload`;
   return this.http.post(apiUrl, formData).pipe(
     catchError((error: any) =>
-      this.errorhandler.handleError("uploadProfileImage", error)
+      this.errorhandler.handleError(error,"uploadProfileImage")
     )
   );
 }
@@ -112,7 +112,7 @@ uploadProfileImage(formData: FormData, customerId: string): Observable<any> {
   //     .get<any[]>(`${this.baseUrl}${this.endpoint}/customerDropDown`)
   //     .pipe(
   //       catchError((error: HttpErrorResponse) =>
-  //         this.errorhandler.handleError('getCustomerDropDown', error),
+  //         this.errorhandler.handleError(error,'getCustomerDropDown'),
   //       ),
   //     );
   // }
@@ -122,7 +122,7 @@ uploadProfileImage(formData: FormData, customerId: string): Observable<any> {
   //     .get<any[]>(`${this.baseUrl}${this.endpoint}/${id}/snapshot`)
   //     .pipe(
   //       catchError((error: HttpErrorResponse) =>
-  //         this.errorhandler.handleError('getCustomerSnapShot', error),
+  //         this.errorhandler.handleError(error,'getCustomerSnapShot'),
   //       ),
   //     );
   // }

@@ -25,7 +25,7 @@ export class NoteService extends BaseApiService {
       })
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getNotes', error)
+          this.errorhandler.handleError(error,'getNotes')
         )
       );
   }
@@ -41,7 +41,7 @@ export class NoteService extends BaseApiService {
       })
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getNotesForMonth', error)
+          this.errorhandler.handleError(error,'getNotesForMonth')
         )
       );
   }
@@ -54,7 +54,7 @@ export class NoteService extends BaseApiService {
       .get<any>(`${this.baseUrl}${this.endpoint}/${id}`)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getNoteById', error)
+          this.errorhandler.handleError(error,'getNoteById')
         )
       );
   }
@@ -67,7 +67,7 @@ export class NoteService extends BaseApiService {
       .post<any>(`${this.baseUrl}${this.endpoint}`, data)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('createNote', error)
+          this.errorhandler.handleError(error,'createNote')
         )
       );
   }
@@ -80,7 +80,7 @@ export class NoteService extends BaseApiService {
       .patch<any>(`${this.baseUrl}${this.endpoint}/${id}`, data)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('updateNote', error)
+          this.errorhandler.handleError(error,'updateNote')
         )
       );
   }
@@ -93,7 +93,7 @@ export class NoteService extends BaseApiService {
       .delete<any>(`${this.baseUrl}${this.endpoint}/${id}`)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('deleteNote', error)
+          this.errorhandler.handleError(error,'deleteNote')
         )
       );
   }
@@ -106,7 +106,7 @@ export class NoteService extends BaseApiService {
       .get<any>(`${this.baseUrl}/v1/notifications/login-summary`)
       .pipe(
         catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getLoginSummary', error)
+          this.errorhandler.handleError(error,'getLoginSummary')
         )
       );
   }
