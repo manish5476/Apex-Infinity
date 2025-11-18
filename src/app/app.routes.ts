@@ -55,6 +55,11 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./modules/payment/payment.routes').then((m) => m.PAYMENT_ROUTES),
       },
+      {
+        path: 'emis',
+        loadChildren: () =>
+          import('./modules/emi/emi.routes').then((m) => m.EMI_ROUTES),
+      },
       // --- ADMIN & SETTINGS ---
       {
         path: 'admin/roles',

@@ -139,7 +139,7 @@ export class SupplierListComponent implements OnInit {
   }
 
   eventFromGrid(event: any) {
-    if (event.eventType === 'onRowClicked') {
+    if (event.eventType === 'RowSelectedEvent') {
       const supplierId = event.event.data._id;
       if (supplierId) {
         this.router.navigate([supplierId], { relativeTo: this.route });

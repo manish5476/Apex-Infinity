@@ -165,7 +165,6 @@ export class CustomerList implements OnInit {
    * Handles other events from the grid (e.g., row clicks).
    */
   eventFromGrid(event: any) {
-    console.log(event);
     if (event.eventType === 'RowSelectedEvent') {
       const customerId = event.event.data._id;
       if (customerId) {

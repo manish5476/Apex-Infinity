@@ -33,6 +33,7 @@ import { SkeletonModule } from 'primeng/skeleton'; // Corrected import
   styleUrl: './customer-details.scss',
 })
 export class CustomerDetails implements OnInit {
+
   private route = inject(ActivatedRoute);
   private customerService = inject(CustomerService);
   private MessageService = inject(Message);
@@ -102,6 +103,10 @@ export class CustomerDetails implements OnInit {
       month: 'short',
       day: 'numeric',
     });
+  }
+
+  isSameAddress(): any {
+    
   }
 
   /**

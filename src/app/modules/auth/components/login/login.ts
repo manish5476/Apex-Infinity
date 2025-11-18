@@ -78,7 +78,6 @@ export class Login implements OnInit {
         if (currentUser) {
           this.notificationService.connect(currentUser._id);
         }
-        console.log(currentUser, 'currentUser');
         this.isLoading.set(false);
       },
       error: (err) => {

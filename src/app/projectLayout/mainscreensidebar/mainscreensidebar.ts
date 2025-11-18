@@ -85,14 +85,16 @@ export class Mainscreensidebar implements OnInit {
      },
   
      {
-       label: 'Sellers', icon: 'pi pi-briefcase',
+       label: 'Suppliers', icon: 'pi pi-briefcase',
        items: [
-         { label: 'Seller', icon: 'pi pi-id-card', routerLink: ['/sellers/Seller'] },
-         { label: 'Seller Details', icon: 'pi pi-user-edit', routerLink: ['/sellers/Sellerdetails'] },
+         { label: 'Supplier', icon: 'pi pi-id-card', routerLink: ['/suppliers/create'] },
+         { label: 'Supplier List', icon: 'pi pi-user-edit', routerLink: ['/suppliers'] },
+         { label: 'Supplier edit', icon: 'pi pi-user-edit', routerLink: ['/suppliers/123/edit'] },
+         { label: 'Supplier Details', icon: 'pi pi-user-edit', routerLink: ['/suppliers/123'] },
        ]
      },
      {
-       label: 'Invoices', icon: 'pi pi-file',
+       label: 'Invoice', icon: 'pi pi-file',
        items: [
          { label: 'View Invoice', icon: 'pi pi-eye', routerLink: ['/invoices'] },
          { label: 'Create Invoice', icon: 'pi pi-plus-circle', routerLink: ['/invoices/create'] },
@@ -101,9 +103,11 @@ export class Mainscreensidebar implements OnInit {
      },
      {
        label: 'Emi', icon: 'pi pi-indian-rupee',
-       items: [
-         { label: 'Create Emi', icon: 'pi pi-eye', routerLink: ['/Emi/create'] },
-         { label: 'Emi dashboard', icon: 'pi pi-eye', routerLink: ['/Emi/emidashboard'] },
+      items: [
+        { label: 'Emi List', icon: 'pi pi-user-edit', routerLink: ['/emis'] },
+        { label: 'create', icon: 'pi pi-id-card', routerLink: ['/emis/create'] },
+         { label: 'Emi edit', icon: 'pi pi-user-edit', routerLink: ['/emis/123/edit'] },
+         { label: 'Emi Details', icon: 'pi pi-user-edit', routerLink: ['/emis/123'] },
        ]
      },
   

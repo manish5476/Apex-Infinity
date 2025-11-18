@@ -1,15 +1,3 @@
-
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-emi-form',
-//   imports: [],
-//   templateUrl: './emi-form.html',
-//   styleUrl: './emi-form.scss',
-// })
-// export class EmiForm {
-
-// }
 import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';

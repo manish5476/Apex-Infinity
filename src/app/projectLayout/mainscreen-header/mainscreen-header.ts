@@ -97,7 +97,6 @@ export class MainscreenHeader implements OnInit, OnDestroy {
         .pipe(takeUntil(this.destroy$))
         .subscribe((notifications) => {
           this.recentNotifications = notifications.slice(0, 5);
-          console.log(this.recentNotifications);
         });
     }
   }

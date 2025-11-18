@@ -11,6 +11,8 @@ export interface MasterList {
   customers?: Array<{ _id: string; name: string }>;
   suppliers?: Array<{ _id: string; name: string }>;
   users?: Array<{ _id: string; name: string }>;
+  categories?: Array<{ _id: string; name: string }>;
+  brands?: Array<{ _id: string; name: string }>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -26,6 +28,8 @@ export class MasterListService {
   readonly products = computed(() => this._data()?.products ?? []);
   readonly customers = computed(() => this._data()?.customers ?? []);
   readonly suppliers = computed(() => this._data()?.suppliers ?? []);
+  readonly categories = computed(() => this._data()?.categories ?? []);
+  readonly brands = computed(() => this._data()?.brands ?? []);
 
   constructor() {
     this.initFromCache();

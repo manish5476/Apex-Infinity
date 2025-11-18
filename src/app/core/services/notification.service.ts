@@ -21,9 +21,7 @@ export class NotificationService implements OnDestroy {
   private notifications = new BehaviorSubject<NotificationData[]>([]);
   public notifications$ = this.notifications.asObservable();
 
-  /**
-   * Connects the user to the Socket.IO server.
-   */
+
   connect(userId: string): void {
     if (this.socket?.connected) {
       console.log('⚠️ Socket already connected.');

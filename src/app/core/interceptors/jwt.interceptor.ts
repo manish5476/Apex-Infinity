@@ -7,7 +7,6 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
 
   try {
     token = localStorage.getItem('apex_auth_token');
-    console.log(token);
   } catch (e) {
     token = null;
   }
