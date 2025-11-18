@@ -101,16 +101,16 @@ export class Mainscreensidebar implements OnInit {
          { label: 'Invoice Details', icon: 'pi pi-file-edit', routerLink: ['/invoices/123/edit'] }
        ]
      },
-     {
-       label: 'Emi', icon: 'pi pi-indian-rupee',
-      items: [
-        { label: 'Emi List', icon: 'pi pi-user-edit', routerLink: ['/emis'] },
-        { label: 'create', icon: 'pi pi-id-card', routerLink: ['/emis/create'] },
-         { label: 'Emi edit', icon: 'pi pi-user-edit', routerLink: ['/emis/123/edit'] },
-         { label: 'Emi Details', icon: 'pi pi-user-edit', routerLink: ['/emis/123'] },
-       ]
-     },
-  
+   {
+  label: 'Emi', icon: 'pi pi-indian-rupee',
+  items: [
+    { label: 'Emi List', icon: 'pi pi-user-edit', routerLink: ['/emi'] },
+    { label: 'Create', icon: 'pi pi-id-card', routerLink: ['/emi/create'] },
+    { label: 'Emi Edit', icon: 'pi pi-user-edit', routerLink: ['/emi/123/edit'] },
+    { label: 'Emi Details', icon: 'pi pi-user-edit', routerLink: ['/emi/123'] },
+  ]
+}
+
    ];
    }
 
