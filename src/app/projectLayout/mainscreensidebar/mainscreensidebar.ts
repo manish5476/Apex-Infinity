@@ -59,6 +59,12 @@ export class Mainscreensidebar implements OnInit {
     getCorrectMenuItems(): any[] {
      return [
      {
+       label: 'Admin', icon: 'pi pi-users',
+       items: [
+         { label: 'masterList', icon: 'pi pi-cog', routerLink: ['/masterList'] },
+       ]
+     },
+     {
        label: 'Customers', icon: 'pi pi-users',
        items: [
          { label: 'create', icon: 'pi pi-cog', routerLink: ['/customer/create'] },

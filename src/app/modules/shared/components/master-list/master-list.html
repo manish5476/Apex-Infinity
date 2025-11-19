@@ -1,0 +1,208 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="master-page-container">
+  <div class="themed-card master-card">
+    <p-toolbar styleClass="master-toolbar">
+      <div class="p-toolbar-group-start">
+        <h2 class="section-heading">Master Data Management</h2>
+      </div>
+      <div class="p-toolbar-group-end flex-gap-sm">
+        <p-button label="Bulk Add" icon="pi pi-table" styleClass="p-button-outlined"
+          (click)="openBulkCreate()"></p-button>
+        <p-button label="Add New" icon="pi pi-plus" (click)="openCreate()"></p-button>
+      </div>
+    </p-toolbar>
+
+    <p-table #dt [value]="masters()" [loading]="loading()" dataKey="_id"
+      [globalFilterFields]="['name', 'code', 'type', 'description']" styleClass="p-table-premium"
+      [tableStyle]="{ 'min-width': '60rem' }">
+
+      <ng-template pTemplate="caption">
+        <div class="flex">
+          <p-iconfield iconPosition="left" class="ml-auto">
+            <p-inputicon>
+              <i class="pi pi-search"></i>
+            </p-inputicon>
+            <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+              placeholder="Search keyword" />
+          </p-iconfield>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 15%">Type</th>
+          <th style="width: 25%">Name</th>
+          <th style="width: 15%">Code</th>
+          <th style="width: 30%">Description</th>
+          <th style="width: 15%" class="text-center">Actions</th>
+        </tr>
+
+        <tr>
+          <th>
+            <p-columnFilter field="type" matchMode="equals" [showMenu]="false">
+              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                <p-select [ngModel]="value" [options]="masterTypes" (onChange)="filter($event.value)"
+                  placeholder="Select One" [showClear]="true" optionLabel="label" optionValue="value" appendTo="body"
+                  styleClass="w-full">
+                  <ng-template let-option pTemplate="item">
+                    <p-tag [value]="option.label" [severity]="getSeverity(option.value)"></p-tag>
+                  </ng-template>
+                </p-select>
+              </ng-template>
+            </p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="name" placeholder="Search Name" ariaLabel="Filter Name"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="code" placeholder="Search Code" ariaLabel="Filter Code"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="description" placeholder="Search Desc"
+              ariaLabel="Filter Description"></p-columnFilter>
+          </th>
+          <th></th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-row>
+        <tr>
+          <td>
+            <p-tag [value]="row.type" [severity]="getSeverity(row.type)" styleClass="uppercase"></p-tag>
+          </td>
+          <td>{{ row.name }}</td>
+          <td>{{ row.code || '-' }}</td>
+          <td>{{ row.description || '-' }}</td>
+          <td class="text-center actions-column">
+            <p-button icon="pi pi-pencil" class="p-button-text p-button-sm" pTooltip="Edit"
+              (click)="openEdit(row)"></p-button>
+            <p-button icon="pi pi-trash" class="p-button-text p-button-sm p-button-danger" pTooltip="Delete"
+              (click)="deleteMaster(row)"></p-button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="text-center p-4 text-[var(--text-secondary)]">No master data found.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<p-dialog [(visible)]="singleDialogVisible" [modal]="true" [style]="{ width: '500px' }"
+  header="{{ isEdit() ? 'Edit Master Entry' : 'Create New Master Entry' }}" styleClass="master-dialog">
+
+  <form [formGroup]="singleForm" class="dialog-form">
+    <div class="form-group">
+      <label>Type <span class="req">*</span></label>
+      <p-select [options]="masterTypes" formControlName="type" optionLabel="label" optionValue="value"
+        placeholder="Select type" appendTo="body" styleClass="w-full">
+      </p-select>
+      @if (singleForm.get('type')?.invalid && singleForm.get('type')?.touched) {
+      <small class="error-message">Type is required.</small>
+      }
+    </div>
+
+    <div class="form-group">
+      <label>Name <span class="req">*</span></label>
+      <input pInputText formControlName="name" placeholder="Enter name (e.g., Electronics)" class="w-full" />
+      @if (singleForm.get('name')?.invalid && singleForm.get('name')?.touched) {
+      <small class="error-message">Name is required.</small>
+      }
+    </div>
+
+    <div class="form-group">
+      <label>Code</label>
+      <input pInputText formControlName="code" placeholder="Optional short code (e.g., ELE)"
+        class="w-full style-uppercase" />
+    </div>
+
+    <div class="form-group">
+      <label>Description</label>
+      <textarea pInputTextarea formControlName="description" rows="3" placeholder="Optional details..."
+        class="w-full"></textarea>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancel" class="p-button-text p-button-secondary"
+      (click)="singleDialogVisible.set(false)"></p-button>
+    <p-button label="Save" (click)="saveSingle()" [disabled]="singleForm.invalid || loading()"></p-button>
+  </ng-template>
+
+</p-dialog>
+
+
+<p-dialog [(visible)]="bulkDialogVisible" [modal]="true" [style]="{ width: '900px' }" header="Bulk Add Master Data"
+  styleClass="bulk-dialog" [draggable]="false" [resizable]="false">
+
+  <div class="bulk-scroll-wrapper" style="max-height: 60vh; overflow-y: auto; padding: 0.5rem;">
+
+    <form [formGroup]="bulkForm" class="dialog-form bulk-form-layout">
+
+      <div class="bulk-control-panel flex justify-between items-end border-b pb-4 mb-4">
+        <div class="form-group w-1/3">
+          <label class="font-semibold block mb-2">Master Type <span class="req text-red-500">*</span></label>
+          <p-select [options]="masterTypes" formControlName="type" optionLabel="label" optionValue="value"
+            placeholder="Select ONE type for all entries" appendTo="body" styleClass="w-full">
+          </p-select>
+          @if (bulkForm.get('type')?.invalid && bulkForm.get('type')?.touched) {
+          <small class="error-message text-red-500">Master Type is required.</small>
+          }
+        </div>
+        <p-button label="Add Row" icon="pi pi-plus" (click)="addBulkDataItem()"
+          styleClass="p-button-outlined p-button-sm" [disabled]="bulkForm.get('type')?.invalid"></p-button>
+      </div>
+
+      <div class="bulk-data-table border rounded">
+        <div class="bulk-header-row flex bg-gray-100 p-2 font-semibold border-b">
+          <span style="width: 35%;">Name <span class="text-red-500">*</span></span>
+          <span style="width: 25%;">Code (Uppercase)</span>
+          <span style="width: 30%;">Description</span>
+          <span style="width: 10%;"></span>
+        </div>
+
+        <div formArrayName="bulkData" class="bulk-data-rows bg-white">
+          @for (item of bulkData.controls; track $index; let i = $index) {
+          <div [formGroupName]="i" class="bulk-item-row flex items-center p-2 gap-2 border-b last:border-b-0">
+            <div class="form-group-inline" style="width: 35%;">
+              <input pInputText formControlName="name" placeholder="Enter name" class="w-full p-inputtext-sm" />
+              @if (item.get('name')?.invalid && item.get('name')?.touched) {
+              <small class="error-message text-red-500 text-xs">Required</small>
+              }
+            </div>
+            <div class="form-group-inline" style="width: 25%;">
+              <input pInputText formControlName="code" placeholder="Code"
+                class="w-full p-inputtext-sm uppercase-input" />
+            </div>
+
+            <div class="form-group-inline" style="width: 30%;">
+              <input pInputText formControlName="description" placeholder="Description" class="w-full p-inputtext-sm" />
+            </div>
+
+            <div style="width: 10%;" class="text-center">
+              <p-button icon="pi pi-trash" [text]="true" severity="danger" (click)="removeBulkDataItem(i)"
+                [disabled]="bulkData.length === 1">
+              </p-button>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+    </form>
+
+  </div>
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-2 pt-2">
+      <p-button label="Cancel" class="p-button-text p-button-secondary" (click)="bulkDialogVisible.set(false)">
+      </p-button>
+
+      <p-button label="Save All" (click)="saveBulk()" [loading]="loading()" [disabled]="bulkData.length === 0">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>

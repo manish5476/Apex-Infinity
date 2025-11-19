@@ -16,7 +16,7 @@
     <div class="se-filter-bar">
       <div class="se-filter-field">
         <label for="customer">Customer</label>
-        <p-select id="customer" [options]="masterList.customers()" [(ngModel)]="customerFilter._id"
+        <p-select  (onChange)="applyFilters()" id="customer" [options]="masterList.customers()" [(ngModel)]="customerFilter._id"
           [filter]="true" filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true"
           placeholder="Select Customer" appendTo="body">
         </p-select>
@@ -24,7 +24,7 @@
 
       <div class="se-filter-field">
         <label for="email">Email</label>
-        <p-autoComplete id="email" [(ngModel)]="customerFilter.email" [suggestions]="emailSuggestions"
+        <p-autoComplete   (onChange)="applyFilters()" id="email" [(ngModel)]="customerFilter.email" [suggestions]="emailSuggestions"
           (completeMethod)="filterEmails($event)" (keyup.enter)="applyFilters()" [forceSelection]="false"
           placeholder="Enter email">
         </p-autoComplete>
@@ -32,13 +32,13 @@
 
       <div class="se-filter-field">
         <label for="phone">Phone</label>
-        <input id="phone" type="text" pInputText [(ngModel)]="customerFilter.phone" placeholder="Phone"
+        <input   (keydown.enter)="applyFilters()" (blur)="applyFilters()" id="phone" type="text" pInputText [(ngModel)]="customerFilter.phone" placeholder="Phone"
           (keyup.enter)="applyFilters()" />
       </div>
 
       <div class="se-filter-actions">
-        <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()">
-        </p-button>
+        <!-- <p-button label="Apply" icon="pi pi-check" (onCick)="applyFilters()">
+        </p-button> -->
         <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined"
           (onClick)="resetFilters()">
         </p-button>

@@ -27,7 +27,7 @@
             </div>
           </div>
         </div>
-  
+        
         <div class="header-actions">
           <p-button 
             label="Edit Product" 
@@ -41,9 +41,9 @@
           </p-button>
         </div>
       </div>
-  
+      
       <div class="details-body">
-  
+        
         <aside class="profile-sidebar animate-slideInUp">
           <div class="product-image-wrapper">
             <div class="product-image-container">
@@ -57,10 +57,18 @@
               }
             </div>
           </div>
-  
+          
           <p-divider styleClass="w-full"></p-divider>
-  
+          
           <div class="attributes-list">
+              <div class="attribute-item">
+                  <div class="attr-icon"><i class="pi pi-truck"></i></div>
+                  <div class="attr-data">
+                      <label>Default Supplier</label>
+                      <span>{{ p.defaultSupplierId?.companyName || 'None Assigned' }}</span>
+                  </div>
+              </div>
+
               <div class="attribute-item">
                   <div class="attr-icon"><i class="pi pi-folder"></i></div>
                   <div class="attr-data">
@@ -76,14 +84,16 @@
                       <span>{{ formatDate(p.createdAt) }}</span>
                   </div>
               </div>
-  
+              
               <div class="attribute-item">
                   <div class="attr-icon"><i class="pi pi-tags"></i></div>
                   <div class="attr-data">
                       <label>Tags</label>
                       <div class="tags-cloud">
-                          @for (tag of getFilteredTags(); track $index) {
-                            <span class="mini-tag">{{tag}}</span>
+                          @for (tag of p.tags; track $index) {
+                            @if (tag && tag.trim()) {
+                              <span class="mini-tag">{{tag}}</span>
+                            }
                           } @empty {
                             <span class="text-muted">No Tags</span>
                           }
@@ -92,7 +102,7 @@
               </div>
           </div>
         </aside>
-  
+        
         <section class="main-details">
           
           <div class="metrics-grid animate-slideInUp" style="animation-delay: 0.1s;">
@@ -105,14 +115,14 @@
                       <i class="pi pi-wallet"></i>
                   </div>
               </div>
-  
+              
               <div class="metric-card">
                   <div class="metric-content">
                       <label>Purchase Price</label>
                       <span class="value secondary">{{ formatCurrency(p.purchasePrice) }}</span>
                   </div>
               </div>
-  
+              
               <div class="metric-card">
                   <div class="metric-content">
                       <label>Tax Info</label>
@@ -122,7 +132,7 @@
                       </span>
                   </div>
               </div>
-  
+              
                <div class="metric-card">
                   <div class="metric-content">
                       <label>Total Stock</label>
@@ -132,7 +142,7 @@
                   </div>
               </div>
           </div>
-  
+          
           <div class="content-section animate-slideInUp" style="animation-delay: 0.2s;">
             <h4 class="section-heading"><i class="pi pi-align-left"></i> Description</h4>
             <div class="description-box">
@@ -162,7 +172,7 @@
                 </ng-template>
                 <ng-template pTemplate="body" let-item>
                   <tr>
-                    <td class="font-medium">{{ branchNameMap.get(item.branchId) || item.branchId }}</td>
+                    <td class="font-medium">{{ item.branchId?.name || 'N/A' }}</td>
                     <td class="text-right font-bold">{{ item.quantity }}</td>
                     <td class="text-right text-secondary">{{ item.reorderLevel }}</td>
                     <td class="text-center">
@@ -183,7 +193,7 @@
               </p-table>
             </div>
           </div>
-  
+          
         </section>
       </div>
     </div>
@@ -194,173 +204,3 @@
     </div>
   }
 </div>
-<!-- 
-<div class="customer-page-container">
-  <div class="themed-card product-details-card" *ngIf="product(); else noProduct">
-    
-    === HEADER ===
-    <div class="details-header">
-      <div class="header-left">
-        <p-button 
-          icon="pi pi-arrow-left" 
-          styleClass="p-button-text p-button-rounded"
-          routerLink="/products"> Path to your list page
-        </p-button>
-        <div class="header-info">
-          <h2 class="form-title">{{ product()?.name }}</h2>
-          <p-tag 
-            [value]="product()?.isActive ? 'Active' : 'Inactive'" 
-            [severity]="product()?.isActive ? 'success' : 'danger'">
-          </p-tag>
-        </div>
-      </div>
-      <div class="header-actions">
-        <p-button 
-          label="Edit Product" 
-          icon="pi pi-pencil" 
-          styleClass="p-button-outlined"
-          [routerLink]="['/products', product()?._id, 'edit']"> Path to edit
-        </p-button>
-      </div>
-    </div>
-    <p-divider></p-divider>
-
-    === BODY ===
-    <div class="details-body">
-
-      Left Column: Image & Core Info
-      <aside class="profile-sidebar">
-        <div class="product-image-container">
-          <img 
-            *ngIf="product()?.images && product()?.images?.[0]; else placeholder"
-            [src]="product()?.images?.[0]" 
-            alt="Product image" 
-            class="product-image"
-          />
-          <ng-template #placeholder>
-            <div class="image-placeholder">
-              <i class="pi pi-camera" style="font-size: 3rem"></i>
-            </div>
-          </ng-template>
-        </div>
-
-        <h3 class="profile-name">{{ product()?.name }}</h3>
-        
-        <p-divider></p-divider>
-
-        Using consistent contact-card style
-        <div class="profile-contact">
-          <div class="contact-card">
-            <i class="pi pi-tag contact-icon"></i>
-            <div class="contact-content">
-              <label>SKU</label>
-              <span>{{ product()?.sku || 'N/A' }}</span>
-            </div>
-          </div>
-          <div class="contact-card">
-            <i class="pi pi-bookmark contact-icon"></i>
-            <div class="contact-content">
-              <label>Brand</label>
-              <span>{{ product()?.brand || 'N/A' }}</span>
-            </div>
-          </div>
-          <div class="contact-card">
-            <i class="pi pi-folder contact-icon"></i>
-            <div class="contact-content">
-              <label>Category</label>
-              <span>{{ product()?.category || 'N/A' }}</span>
-            </div>
-          </div>
-          <div class="contact-card">
-            <i class="pi pi-calendar contact-icon"></i>
-            <div class="contact-content">
-              <label>Created On</label>
-              <span>{{ formatDate(product()?.createdAt) }}</span>
-            </div>
-          </div>
-          <div class="contact-card tags-card">
-            <i class="pi pi-tags contact-icon"></i>
-            <div class="contact-content">
-              <label>Tags</label>
-              <div class="tags-container" *ngIf="getFilteredTags() as filteredTags; else noTags">
-                <ng-container *ngIf="filteredTags.length > 0; else noTags">
-                  <p-tag *ngFor="let tag of filteredTags" [value]="tag"></p-tag>
-                </ng-container>
-              </div>
-            </div>
-          </div>
-          <ng-template #noTags><span>N/A</span></ng-template>
-        </div>
-      </aside>
-
-      Right Column: Details
-      <section class="main-details">
-        
-        Description
-        <div class="info-section">
-          <h4 class="section-title">Description</h4>
-          <p class="description-text">
-            {{ product()?.description || 'No description provided.' }}
-          </p>
-        </div>
-
-        Pricing Details
-        <div class="info-section">
-          <h4 class="section-title">Pricing</h4>
-          <div class="financial-grid">
-            <div class="info-card stat-card">
-              <label>Selling Price (MRP)</label>
-              <span class="stat-value">{{ formatCurrency(product()?.sellingPrice) }}</span>
-            </div>
-            <div class="info-card stat-card">
-              <label>Purchase Price</label>
-              <span class="stat-value">{{ formatCurrency(product()?.purchasePrice) }}</span>
-            </div>
-            <div class="info-card stat-card">
-              <label>Tax Rate</label>
-              <span class="stat-value">{{ product()?.taxRate || 0 }}%</span>
-            </div>
-             <div class="info-card stat-card">
-              <label>Tax</label>
-              <span class="stat-value">{{ product()?.isTaxInclusive ? 'Inclusive' : 'Exclusive' }}</span>
-            </div>
-          </div>
-        </div>
-        
-        Inventory Details
-        <div class="info-section">
-          <h4 class="section-title">Inventory by Branch</h4>
-          <div class="inventory-table">
-            <p-table [value]="product()?.inventory || []" styleClass="p-table-sm p-table-striped">
-              <ng-template pTemplate="header">
-                <tr>
-                  <th>Branch Name</th>
-                  <th class="text-right">Quantity</th>
-                  <th class="text-right">Re-order Level</th>
-                </tr>
-              </ng-template>
-              <ng-template pTemplate="body" let-item>
-                <tr>
-                  <td>{{ branchNameMap.get(item.branchId) || item.branchId }}</td>
-                  <td class="text-right">{{ item.quantity }}</td>
-                  <td class="text-right">{{ item.reorderLevel }}</td>
-                </tr>
-              </ng-template>
-              <ng-template pTemplate="summary">
-                <div class="flex justify-end pr-4">
-                  <span class="font-bold text-lg text-[var(--text-primary)]">Total Stock: {{ product()?.totalStock }}</span>
-                </div>
-              </ng-template>
-            </p-table>
-          </div>
-        </div>
-      </section>
-    </div>
-  </div>
-</div>
-
-<ng-template #noProduct>
-  <div class="themed-card product-details-card text-center p-8">
-    <h3>Loading product details...</h3>
-  </div>
-</ng-template> -->

@@ -29,7 +29,7 @@ interface IProduct {
   isTaxInclusive?: boolean;
   inventory: { branchId: string; quantity: number; reorderLevel: number }[];
   images?: string[];
-  defaultSupplierId?: string;
+  defaultSupplierId?: any;
   tags?: string[];
   isActive: boolean;
   totalStock: number; // The virtual

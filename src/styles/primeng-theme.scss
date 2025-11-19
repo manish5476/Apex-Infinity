@@ -1,23 +1,28 @@
+/* ============================================================
+   PRIMENG GLOBAL OVERRIDES (FINAL THEME ALIGNMENT)
+   ============================================================ */
+
+/* --- 1. Buttons (.p-button) --- */
 .p-button {
   font-weight: 600;
   font-size: var(--font-size-sm);
-  padding: var(--spacing-md) var(--spacing-xl); /* Using new spacing tokens */
+  padding: var(--spacing-md) var(--spacing-xl);
   border-radius: 999px;
-  background: var(--accent-gradient); /* This token is now defined! */
+  background: var(--accent-gradient);
   color: #fff;
   border: none;
-  transition: var(--transition-base); /* Using new transition token */
+  transition: var(--transition-base); 
 }
 .p-button:focus-visible {
-  /* Using focus-visible for accessibility */
-  box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus); /* Using new focus tokens */
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus); 
+  outline: none;
 }
 .p-button:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md); /* Using new shadow token */
+  box-shadow: var(--shadow-md); 
 }
 
-/* Inputs and selects */
+/* --- 2. Inputs, Selects, Textareas --- */
 .p-inputtext,
 .p-inputnumber-input,
 .p-password-input,
@@ -25,12 +30,11 @@
 .p-dropdown,
 .p-inputmask {
   width: 100%;
-  /* remove static height, let padding define it */
-  padding: var(--spacing-md) var(--spacing-lg); /* Using new spacing tokens */
+  padding: var(--spacing-md) var(--spacing-lg);
   border-radius: var(--ui-border-radius);
-  border: var(--ui-border-width) solid var(--border-secondary);
-  background: var(--bg-ternary);
-  color: var(--text-primary);
+  border: var(--ui-border-width) solid var(--border-secondary); 
+  background: var(--bg-ternary); /* Input field background */
+  color: var(--text-primary); /* Ensures text is visible in all modes */
   transition: var(--transition-fast);
 }
 .p-inputtext:focus,
@@ -39,86 +43,102 @@
 .p-password-input:focus,
 .p-textarea:focus,
 .p-inputmask:focus {
-  box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus); /* Using new focus tokens */
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus); 
   border-color: var(--accent-primary);
+  outline: none;
 }
 
-/* Dialog / Panel */
+/* --- 3. Dialog / Panel / Card (Unified Backgrounds) --- */
 .p-dialog,
 .p-panel,
 .p-card {
-  background: var(--bg-secondary);
+  background: var(--bg-secondary); /* Primary container background */
   border: var(--ui-border-width) solid var(--border-primary);
   border-radius: var(--ui-border-radius-lg);
-  box-shadow: var(--shadow-md); /* Using new shadow token */
+  box-shadow: var(--shadow-md); 
 }
 .p-dialog-header,
 .p-panel-header {
   background: transparent;
   border-bottom: var(--ui-border-width) solid var(--border-primary);
-  padding: var(--spacing-lg) var(--spacing-xl); /* Using new spacing tokens */
+  padding: var(--spacing-lg) var(--spacing-xl);
   font-weight: 600;
   color: var(--text-primary);
 }
+/* Ensure dialog footers/content areas use clear dark/light hierarchy */
+.p-dialog-footer {
+    background: var(--bg-ternary); /* Slightly different background for footer actions */
+    border-top: var(--ui-border-width) solid var(--border-primary);
+}
 
-/* Datatable */
+
+/* --- 4. Datatable (Table) --- */
 .p-datatable-wrapper {
-  border: var(--ui-border-width) solid var(--border-primary);
-  background: var(--bg-primary);
+  border: var(--ui-border-width) solid var(--border-primary); 
+  background: var(--bg-primary); /* Background of the area surrounding the table body */
   border-radius: var(--ui-border-radius);
-  overflow: hidden; /* Good practice for rounded corners */
+  overflow: hidden; 
 }
 .p-datatable .p-datatable-thead > tr > th {
-  background: var(--bg-secondary);
+  background: var(--bg-ternary); /* Header background for separation */
   color: var(--text-primary);
   font-weight: 600;
-  padding: var(--spacing-lg); /* Using new spacing tokens */
+  padding: var(--spacing-lg);
+  border-color: var(--border-primary) !important;
 }
 .p-datatable .p-datatable-tbody > tr > td {
-  padding: var(--spacing-md) var(--spacing-lg); /* Using new spacing tokens */
-  color: var(--text-secondary);
+  padding: var(--spacing-md) var(--spacing-lg);
+  color: var(--text-primary); /* FIXED: Use primary text color for readability in ALL modes */
   border-color: var(--border-primary);
 }
+.p-datatable .p-datatable-tbody > tr {
+    background: var(--bg-secondary); /* Default row background */
+    transition: background var(--transition-fast);
+}
 .p-datatable .p-datatable-tbody > tr:hover {
-  background: var(--bg-ternary);
+  background: var(--bg-ternary); /* Hover: Distinct contrast for row selection */
 }
 
-/* Tabs */
+/* --- 5. Tabs (Consistent Hover/Active) --- */
 .p-tabview .p-tabview-nav-link {
   background: transparent !important;
   color: var(--text-secondary) !important;
-  padding: var(--spacing-md) var(--spacing-lg); /* Using new spacing tokens */
+  padding: var(--spacing-md) var(--spacing-lg);
   font-weight: 500;
   transition: var(--transition-fast);
 }
 .p-tabview .p-tabview-nav-link:hover {
   color: var(--text-primary) !important;
-  background: var(--bg-ternary) !important;
+  background: var(--bg-ternary) !important; /* Consistent hover color */
+}
+.p-tabview .p-tabview-nav-link.p-highlight {
+    color: var(--text-primary) !important;
+    font-weight: 600;
 }
 .p-tabview .p-tabview-ink-bar {
   background: var(--accent-primary) !important;
   height: 3px !important;
 }
 
-/* Tooltip */
+/* --- 6. Tooltip --- */
 .p-tooltip {
   background: var(--bg-secondary);
   border-radius: var(--ui-border-radius);
-  padding: var(--spacing-sm) var(--spacing-md); /* Using new spacing tokens */
+  padding: var(--spacing-sm) var(--spacing-md);
   color: var(--text-primary);
   box-shadow: var(--shadow-lg);
 }
 
-/* Badge */
+/* --- 7. Badge --- */
 .p-badge {
   background: var(--accent-primary);
   color: #fff;
   border-radius: 999px;
   font-weight: 600;
-  padding: var(--spacing-xs) var(--spacing-md); /* Using new spacing tokens */
+  padding: var(--spacing-xs) var(--spacing-md);
 }
 
-/* Mobile tweaks (PrimeNG components often need slight adjustments on small widths) */
+/* --- 8. Mobile Tweaks --- */
 @media (max-width: 768px) {
   .p-dialog,
   .p-panel {
@@ -128,6 +148,140 @@
   }
   .p-datatable .p-datatable-thead > tr > th,
   .p-datatable .p-datatable-tbody > tr > td {
-    padding: var(--spacing-md); /* Using new spacing tokens */
+    padding: var(--spacing-md);
   }
 }
+
+// .p-button {
+//   font-weight: 600;
+//   font-size: var(--font-size-sm);
+//   padding: var(--spacing-md) var(--spacing-xl); /* Using new spacing tokens */
+//   border-radius: 999px;
+//   background: var(--accent-gradient); /* This token is now defined! */
+//   color: #fff;
+//   border: none;
+//   transition: var(--transition-base); /* Using new transition token */
+// }
+// .p-button:focus-visible {
+//   /* Using focus-visible for accessibility */
+//   box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus); /* Using new focus tokens */
+// }
+// .p-button:hover {
+//   transform: translateY(-2px);
+//   box-shadow: var(--shadow-md); /* Using new shadow token */
+// }
+
+// /* Inputs and selects */
+// .p-inputtext,
+// .p-inputnumber-input,
+// .p-password-input,
+// .p-textarea,
+// .p-dropdown,
+// .p-inputmask {
+//   width: 100%;
+//   /* remove static height, let padding define it */
+//   padding: var(--spacing-md) var(--spacing-lg); /* Using new spacing tokens */
+//   border-radius: var(--ui-border-radius);
+//   border: var(--ui-border-width) solid var(--border-secondary);
+//   background: var(--bg-ternary);
+//   color: var(--text-primary);
+//   transition: var(--transition-fast);
+// }
+// .p-inputtext:focus,
+// .p-dropdown:focus,
+// .p-inputnumber-input:focus,
+// .p-password-input:focus,
+// .p-textarea:focus,
+// .p-inputmask:focus {
+//   box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus); /* Using new focus tokens */
+//   border-color: var(--accent-primary);
+// }
+
+// /* Dialog / Panel */
+// .p-dialog,
+// .p-panel,
+// .p-card {
+//   background: var(--bg-secondary);
+//   border: var(--ui-border-width) solid var(--border-primary);
+//   border-radius: var(--ui-border-radius-lg);
+//   box-shadow: var(--shadow-md); /* Using new shadow token */
+// }
+// .p-dialog-header,
+// .p-panel-header {
+//   background: transparent;
+//   border-bottom: var(--ui-border-width) solid var(--border-primary);
+//   padding: var(--spacing-lg) var(--spacing-xl); /* Using new spacing tokens */
+//   font-weight: 600;
+//   color: var(--text-primary);
+// }
+
+// /* Datatable */
+// .p-datatable-wrapper {
+//   border: var(--ui-border-width) solid var(--border-primary);
+//   background: var(--bg-primary);
+//   border-radius: var(--ui-border-radius);
+//   overflow: hidden; /* Good practice for rounded corners */
+// }
+// .p-datatable .p-datatable-thead > tr > th {
+//   background: var(--bg-secondary);
+//   color: var(--text-primary);
+//   font-weight: 600;
+//   padding: var(--spacing-lg); /* Using new spacing tokens */
+// }
+// .p-datatable .p-datatable-tbody > tr > td {
+//   padding: var(--spacing-md) var(--spacing-lg); /* Using new spacing tokens */
+//   color: var(--text-secondary);
+//   border-color: var(--border-primary);
+// }
+// .p-datatable .p-datatable-tbody > tr:hover {
+//   background: var(--bg-ternary);
+// }
+
+// /* Tabs */
+// .p-tabview .p-tabview-nav-link {
+//   background: transparent !important;
+//   color: var(--text-secondary) !important;
+//   padding: var(--spacing-md) var(--spacing-lg); /* Using new spacing tokens */
+//   font-weight: 500;
+//   transition: var(--transition-fast);
+// }
+// .p-tabview .p-tabview-nav-link:hover {
+//   color: var(--text-primary) !important;
+//   background: var(--bg-ternary) !important;
+// }
+// .p-tabview .p-tabview-ink-bar {
+//   background: var(--accent-primary) !important;
+//   height: 3px !important;
+// }
+
+// /* Tooltip */
+// .p-tooltip {
+//   background: var(--bg-secondary);
+//   border-radius: var(--ui-border-radius);
+//   padding: var(--spacing-sm) var(--spacing-md); /* Using new spacing tokens */
+//   color: var(--text-primary);
+//   box-shadow: var(--shadow-lg);
+// }
+
+// /* Badge */
+// .p-badge {
+//   background: var(--accent-primary);
+//   color: #fff;
+//   border-radius: 999px;
+//   font-weight: 600;
+//   padding: var(--spacing-xs) var(--spacing-md); /* Using new spacing tokens */
+// }
+
+// /* Mobile tweaks (PrimeNG components often need slight adjustments on small widths) */
+// @media (max-width: 768px) {
+//   .p-dialog,
+//   .p-panel {
+//     width: 95vw !important;
+//     height: auto !important;
+//     max-width: 100%;
+//   }
+//   .p-datatable .p-datatable-thead > tr > th,
+//   .p-datatable .p-datatable-tbody > tr > td {
+//     padding: var(--spacing-md); /* Using new spacing tokens */
+//   }
+// }
