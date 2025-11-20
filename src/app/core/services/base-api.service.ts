@@ -1,18 +1,24 @@
-// src/app/core/services/base-api.service.ts
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { inject } from '@angular/core';
+import { inject, Injectable } from '@angular/core'; // Added Injectable
 import { Observable } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { ErrorhandlingService } from './errorhandling.service';
 import { environment } from '../../../environments/environment';
 
+@Injectable({
+  providedIn: 'root' // Optional, but good practice for abstract services in some setups
+})
 export abstract class BaseApiService {
   protected http = inject(HttpClient);
   protected errorhandler = inject(ErrorhandlingService);
   protected baseUrl = environment.apiUrl;
 
+  // Converts a plain object { key: value } into HttpParams.Filters out null, undefined, and empty strings.   */
   protected createHttpParams(filterParams?: any): HttpParams {
     let params = new HttpParams();
     if (!filterParams) return params;
+    // If it's already HttpParams, return it directly
+    if (filterParams instanceof HttpParams) return filterParams;
     Object.entries(filterParams).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
         params = params.set(key, String(value));
@@ -20,29 +26,62 @@ export abstract class BaseApiService {
     });
     return params;
   }
+
+  // Generic GET Automatically converts 'params' object to HttpParams   */
+  protected get<T>(endpoint: string, params: any = {}, context: string = 'API GET'): Observable<T> {
+    const httpParams = this.createHttpParams(params);
+    return this.http
+      .get<T>(`${this.baseUrl}${endpoint}`, { params: httpParams })
+      .pipe(catchError((error) => this.errorhandler.handleError(error, context)));
+  }
+
+  // Generic POST   */
+  protected post<T>(endpoint: string, data: any, context: string = 'API POST'): Observable<T> {
+    return this.http
+      .post<T>(`${this.baseUrl}${endpoint}`, data)
+      .pipe(catchError((error) => this.errorhandler.handleError(error, context)));
+  }
+
+  // Generic PATCH   */
+  protected patch<T>(endpoint: string, data: any, context: string = 'API PATCH'): Observable<T> {
+    return this.http
+      .patch<T>(`${this.baseUrl}${endpoint}`, data)
+      .pipe(catchError((error) => this.errorhandler.handleError(error, context)));
+  }
+
+  // Generic DELETE   */
+  protected delete<T>(endpoint: string, context: string = 'API DELETE'): Observable<T> {
+    return this.http
+      .delete<T>(`${this.baseUrl}${endpoint}`)
+      .pipe(catchError((error) => this.errorhandler.handleError(error, context)));
+  }
 }
 
 
+
+
+
+
+// // src/app/core/services/base-api.service.ts
 // import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 // import { inject } from '@angular/core';
-// import { Observable, throwError } from 'rxjs';
-// import { ErrorhandlingService } from './errorhandling.service'; // Adjust path if needed
-// import { environment } from '../../../environments/environment'; // Adjust path if needed
+// import { Observable } from 'rxjs';
+// import { ErrorhandlingService } from './errorhandling.service';
+// import { environment } from '../../../environments/environment';
 
 // export abstract class BaseApiService {
-//   // Use inject() for cleaner dependency injection in base classes
 //   protected http = inject(HttpClient);
 //   protected errorhandler = inject(ErrorhandlingService);
 //   protected baseUrl = environment.apiUrl;
+
 //   protected createHttpParams(filterParams?: any): HttpParams {
 //     let params = new HttpParams();
-//     if (filterParams) {
-//       Object.entries(filterParams).forEach(([key, value]) => {
-//         if (value !== undefined && value !== null && value !== '') {
-//           params = params.set(key, String(value));
-//         }
-//       });
-//     }
+//     if (!filterParams) return params;
+//     Object.entries(filterParams).forEach(([key, value]) => {
+//       if (value !== undefined && value !== null && value !== '') {
+//         params = params.set(key, String(value));
+//       }
+//     });
 //     return params;
 //   }
 // }

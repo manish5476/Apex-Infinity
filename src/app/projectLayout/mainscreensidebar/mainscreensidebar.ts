@@ -56,69 +56,67 @@ export class Mainscreensidebar implements OnInit {
     // --- End of Fix ---
   }
 
-    getCorrectMenuItems(): any[] {
-     return [
-     {
-       label: 'Admin', icon: 'pi pi-users',
-       items: [
-         { label: 'masterList', icon: 'pi pi-cog', routerLink: ['/masterList'] },
-       ]
-     },
-     {
-       label: 'Customers', icon: 'pi pi-users',
-       items: [
-         { label: 'create', icon: 'pi pi-cog', routerLink: ['/customer/create'] },
-         { label: 'CustomerList', icon: 'pi pi-list', routerLink: ['/customer'] },
-         // { label: 'Details', icon: 'pi pi-info-circle', routerLink: ['/customer/'] },
-         // { label: 'Segment', icon: 'pi pi-chart-pie', routerLink: ['/customers/segment'] },
-       ]
-     },
-     {
-       label: 'Products', icon: 'pi pi-shopping-bag',
-       items: [
-         { label: 'Product List', icon: 'pi pi-list', routerLink: ['/product'] },
-         { label: 'Product Master', icon: 'pi pi-cog', routerLink: ['/product/create'] },
-         { label: 'Product Details', icon: 'pi pi-info-circle', routerLink: ['/product/123/edit'] } // use dynamic ID at runtime
-       ]
-     },
+  getCorrectMenuItems(): any[] {
+    return [
       {
-       label: 'Payments', icon: 'pi pi-wallet',
-       items: [
-         { label: 'Payment List', icon: 'pi pi-list', routerLink: ['/payment'] },
-         { label: 'Payment', icon: 'pi pi-money-bill', routerLink: ['/payment/create'] },
-         { label: 'View Payment', icon: 'pi pi-eye', routerLink: ['/payment/123/edit'] },
-       ]
-     },
-  
-     {
-       label: 'Suppliers', icon: 'pi pi-briefcase',
-       items: [
-         { label: 'Supplier', icon: 'pi pi-id-card', routerLink: ['/suppliers/create'] },
-         { label: 'Supplier List', icon: 'pi pi-user-edit', routerLink: ['/suppliers'] },
-         { label: 'Supplier edit', icon: 'pi pi-user-edit', routerLink: ['/suppliers/123/edit'] },
-         { label: 'Supplier Details', icon: 'pi pi-user-edit', routerLink: ['/suppliers/123'] },
-       ]
-     },
-     {
-       label: 'Invoice', icon: 'pi pi-file',
-       items: [
-         { label: 'View Invoice', icon: 'pi pi-eye', routerLink: ['/invoices'] },
-         { label: 'Create Invoice', icon: 'pi pi-plus-circle', routerLink: ['/invoices/create'] },
-         { label: 'Invoice Details', icon: 'pi pi-file-edit', routerLink: ['/invoices/123/edit'] }
-       ]
-     },
-   {
-  label: 'Emi', icon: 'pi pi-indian-rupee',
-  items: [
-    { label: 'Emi List', icon: 'pi pi-user-edit', routerLink: ['/emi'] },
-    { label: 'Create', icon: 'pi pi-id-card', routerLink: ['/emi/create'] },
-    { label: 'Emi Edit', icon: 'pi pi-user-edit', routerLink: ['/emi/123/edit'] },
-    { label: 'Emi Details', icon: 'pi pi-user-edit', routerLink: ['/emi/123'] },
-  ]
-}
-
-   ];
-   }
+        label: 'Dashboard', icon: 'pi pi-home',
+        items: [
+           { label: 'Overview', icon: 'pi pi-chart-bar', routerLink: ['/dashboard'] }
+        ]
+      },
+      {
+        label: 'Admin', icon: 'pi pi-shield',
+        items: [
+          { label: 'Master List', icon: 'pi pi-database', routerLink: ['/masterList'] },
+          { label: 'Roles', icon: 'pi pi-lock', routerLink: ['/admin/roles'] },
+          { label: 'Branches', icon: 'pi pi-building', routerLink: ['/branches'] }, // List
+          { label: 'Add Branch', icon: 'pi pi-plus', routerLink: ['/branches/create'] },
+        ]
+      },
+      {
+        label: 'Customers', icon: 'pi pi-users',
+        items: [
+          { label: 'All Customers', icon: 'pi pi-list', routerLink: ['/customer'] },
+          { label: 'Add Customer', icon: 'pi pi-user-plus', routerLink: ['/customer/create'] },
+        ]
+      },
+      {
+        label: 'Suppliers', icon: 'pi pi-briefcase',
+        items: [
+          { label: 'All Suppliers', icon: 'pi pi-list', routerLink: ['/suppliers'] },
+          { label: 'Add Supplier', icon: 'pi pi-plus', routerLink: ['/suppliers/create'] },
+        ]
+      },
+      {
+        label: 'Products', icon: 'pi pi-box',
+        items: [
+          { label: 'Inventory', icon: 'pi pi-list', routerLink: ['/product'] },
+          { label: 'Add Product', icon: 'pi pi-plus', routerLink: ['/product/create'] },
+        ]
+      },
+      {
+        label: 'Invoices', icon: 'pi pi-file',
+        items: [
+          { label: 'All Invoices', icon: 'pi pi-list', routerLink: ['/invoices'] },
+          { label: 'New Invoice', icon: 'pi pi-plus-circle', routerLink: ['/invoices/create'] },
+        ]
+      },
+      {
+        label: 'Payments', icon: 'pi pi-wallet',
+        items: [
+          { label: 'Transaction History', icon: 'pi pi-history', routerLink: ['/payment'] },
+          { label: 'Record Payment', icon: 'pi pi-plus', routerLink: ['/payment/create'] },
+        ]
+      },
+      {
+        label: 'EMI', icon: 'pi pi-calendar',
+        items: [
+          { label: 'EMI Plans', icon: 'pi pi-list', routerLink: ['/emis'] },
+          { label: 'Create Plan', icon: 'pi pi-plus', routerLink: ['/emis/create'] },
+        ]
+      }
+    ];
+  }
 
 
 

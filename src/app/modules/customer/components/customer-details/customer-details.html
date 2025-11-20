@@ -1,163 +1,170 @@
-<!-- <div class="customer-page-container">
-  === Customer Data ===
-  <div class="customer-details-card" *ngIf="customer(); else loadingSkeleton">
-    === HEADER ===
-    <header class="details-header">
-      <div class="header-left">
-        <p-button
-          icon="pi pi-arrow-left"
-          styleClass="p-button-text p-button-rounded"
-          routerLink="/customer">
-        </p-button>
-
-        <div class="header-info">
-          <h2 class="form-title">{{ customer()?.name }}</h2>
-          <p-tag
-            [value]="customer()?.isActive ? 'Active' : 'Inactive'"
-            [severity]="customer()?.isActive ? 'success' : 'danger'">
-          </p-tag>
-        </div>
-      </div>
-
-      <div class="header-actions">
-        <p-button label="Edit" icon="pi pi-pencil" styleClass="p-button-outlined"></p-button>
-        <p-button label="More" icon="pi pi-ellipsis-v" styleClass="p-button-text p-button-rounded"></p-button>
-      </div>
-    </header>
-
-    <p-divider></p-divider>
-
-    === BODY ===
-    <div class="details-body">
-      Sidebar
-      <aside class="profile-sidebar">
-        <p-avatar
-          [image]="customer()?.avatar"
-          [label]="getInitials(customer()?.name || '')"
-          styleClass="profile-avatar"
-          shape="circle">
-        </p-avatar>
-
-        <h3 class="profile-name">{{ customer()?.name }}</h3>
-        <span class="profile-type">{{ customer()?.type | titlecase }}</span>
-
-        <p-divider></p-divider>
-
-        <div class="profile-contact">
-          <div
-            class="contact-card"
-            *ngFor="let field of [
-              { icon: 'pi-user', label: 'Contact Person', value: customer()?.contactPerson },
-              { icon: 'pi-envelope', label: 'Email', value: customer()?.email },
-              { icon: 'pi-phone', label: 'Phone', value: customer()?.phone },
-              { icon: 'pi-mobile', label: 'Alt. Phone', value: customer()?.altPhone },
-              { icon: 'pi-calendar', label: 'Member Since', value: formatDate(customer()?.createdAt) }
-            ]">
-            <i class="pi {{ field.icon }} contact-icon"></i>
-            <div class="contact-content">
-              <label>{{ field.label }}</label>
-              <span>{{ field.value || 'N/A' }}</span>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      Main Details
-      <section class="main-details">
-        === FINANCIAL OVERVIEW ===
-        <div class="info-section">
-          <h4 class="section-title">Financial Overview</h4>
-          <div class="info-grid">
-            <div class="info-card" *ngFor="let item of [
-              { label: 'Outstanding', value: formatCurrency(customer()?.outstandingBalance), highlight: true },
-              { label: 'Credit Limit', value: formatCurrency(customer()?.creditLimit) },
-              { label: 'Opening Balance', value: formatCurrency(customer()?.openingBalance) }
-            ]">
-              <label>{{ item.label }}</label>
-              <span [class.outstanding]="item.highlight">{{ item.value }}</span>
-            </div>
-          </div>
-        </div>
-
-        === ADDRESS DETAILS ===
-        <div class="info-section">
-          <h4 class="section-title">Address Information</h4>
-          <div class="address-grid">
-            <div class="info-card address" *ngFor="let addr of [
-              { title: 'Billing Address', data: customer()?.billingAddress },
-              { title: 'Shipping Address', data: customer()?.shippingAddress }
-            ]">
-              <h5>{{ addr.title }}</h5>
-              <div *ngFor="let key of ['street', 'city', 'state', 'zipCode']" class="address-item">
-                <label>{{ key | titlecase }}</label>
-                <span>{{ addr.data?.[key] || 'N/A' }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        === OTHER DETAILS ===
-        <div class="info-section">
-          <h4 class="section-title">Other Details</h4>
-          <div class="info-grid">
-            <div class="info-card" *ngFor="let f of [
-              { label: 'GST Number', value: customer()?.gstNumber },
-              { label: 'PAN Number', value: customer()?.panNumber },
-              { label: 'Payment Terms', value: customer()?.paymentTerms }
-            ]">
-              <label>{{ f.label }}</label>
-              <span>{{ f.value || 'N/A' }}</span>
-            </div>
-          </div>
-
-          <div class="info-card tags-card">
-            <label>Tags</label>
-            <div class="tags-container" *ngIf="getFilteredTags() as filteredTags">
-              <ng-container *ngIf="filteredTags.length > 0; else noTags">
-                <p-tag *ngFor="let tag of filteredTags" [value]="tag"></p-tag>
-              </ng-container>
-              <ng-template #noTags>
-                <span>N/A</span>
-              </ng-template>
-            </div>
-          </div>
-
-          <div class="info-card notes">
-            <label>Notes</label>
-            <p>{{ customer()?.notes || 'No notes provided.' }}</p>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    === FOOTER ===
-    <footer class="details-footer">
-      <p-button label="Back to List" icon="pi pi-arrow-left" styleClass="p-button-text" routerLink="/customer"></p-button>
-      <p-button label="Edit Customer" icon="pi pi-pencil"></p-button>
-    </footer>
-  </div>
-
-  === SKELETON LOADER ===
-  <ng-template #loadingSkeleton>
-    <div class="skeleton-wrapper">
-        <div class="skeleton-header">
-            <p-skeleton height="2rem" width="40%"></p-skeleton>
-        </div>
-        <div class="skeleton-body">
-            <p-skeleton width="22%" height="400px"></p-skeleton>
-            <div class="skeleton-main">
-                <p-skeleton height="10rem" width="100%"></p-skeleton>
-                <p-skeleton height="10rem" width="100%"></p-skeleton>
-                <p-skeleton height="10rem" width="100%"></p-skeleton>
-            </div>
-        </div>
-    </div>
-  </ng-template>
-</div> -->
 <div class="form-page-container">
   @if (customer(); as c) {
     <div class="form-card animate-fadeIn">
-      
+      <header class="form-header">
+        <div class="header-content">
+          <h2 class="form-title">{{ c.name }}</h2>
+          <div class="header-badges">
+            <span class="id-badge">ID: {{ c.code || 'GEN-' + (c._id | slice:-4) }}</span>
+            <p-tag 
+              [value]="c.isActive ? 'Active' : 'Inactive'" 
+              [severity]="c.isActive ? 'success' : 'danger'">
+            </p-tag>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <p-button icon="pi pi-arrow-left" label="Back" styleClass="p-button-text" routerLink="/customer"></p-button>
+          <!-- Using relative path for edit -->
+          <p-button icon="pi pi-pencil" label="Edit" styleClass="p-button-outlined" [routerLink]="['../../customer/create']" [queryParams]="{id: c._id}"></p-button>
+        </div>
+      </header>
+
+      <p-divider styleClass="m-0"></p-divider>
+
+      <div class="form-body">
+
+        <section class="form-section summary-section">
+           <div class="summary-grid">
+              <div class="identity-box">
+                 <p-avatar 
+                    [image]="c.avatar" 
+                    [label]="common.getInitials(c.name)" 
+                    size="xlarge" 
+                    shape="circle" 
+                    styleClass="shadow-1">
+                 </p-avatar>
+                 <div class="identity-text">
+                    <h3>{{ c.contactPerson || c.name }}</h3>
+                    <span>{{ c.type | titlecase }} Customer</span>
+                 </div>
+              </div>
+
+              <div class="financial-snapshot">
+                  <div class="snapshot-item">
+                      <label>Outstanding</label>
+                      <span class="value" [class.text-red-500]="c.outstandingBalance > 0">
+                          {{ common.formatCurrency(c.outstandingBalance) }}
+                      </span>
+                  </div>
+                  <div class="snapshot-divider"></div>
+                  <div class="snapshot-item">
+                      <label>Credit Limit</label>
+                      <span class="value">{{ common.formatCurrency(c.creditLimit) }}</span>
+                  </div>
+              </div>
+           </div>
+        </section>
+
+        <section class="form-section">
+          <h4 class="section-title">Basic Information</h4>
+          <div class="form-grid">
+            
+            <div class="read-only-field">
+              <label>Email Address</label>
+              <div class="field-value">
+                  <i class="pi pi-envelope text-xs mr-2 text-gray-400"></i>
+                  {{ c.email || '-' }}
+              </div>
+            </div>
+
+            <div class="read-only-field">
+              <label>Primary Phone</label>
+              <div class="field-value">
+                  <i class="pi pi-phone text-xs mr-2 text-gray-400"></i>
+                  {{ c.phone || '-' }}
+              </div>
+            </div>
+
+            <div class="read-only-field">
+              <label>Alternate Phone</label>
+              <div class="field-value">{{ c.altPhone || '-' }}</div>
+            </div>
+
+            <div class="read-only-field">
+              <label>GST Number</label>
+              <div class="field-value font-mono">{{ c.gstNumber || '-' }}</div>
+            </div>
+
+            <div class="read-only-field">
+              <label>PAN Number</label>
+              <div class="field-value font-mono">{{ c.panNumber || '-' }}</div>
+            </div>
+
+            <div class="read-only-field">
+              <label>Payment Terms</label>
+              <div class="field-value">{{ c.paymentTerms || 'Standard' }}</div>
+            </div>
+
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h4 class="section-title">Addresses</h4>
+          <div class="address-grid">
+              
+              <div class="address-card read-only">
+                  <h5>Billing Address</h5>
+                  <div class="addr-content">
+                      <p>{{ c.billingAddress?.street || 'No Street' }}</p>
+                      <p>{{ c.billingAddress?.city || 'No City' }}, {{ c.billingAddress?.state }}</p>
+                      <p>{{ c.billingAddress?.zipCode }}</p>
+                  </div>
+              </div>
+
+              <div class="address-card read-only">
+                  <div class="address-header">
+                      <h5>Shipping Address</h5>
+                      @if (isSameAddress()) {
+                        <span class="pill text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded">Same as Billing</span>
+                      }
+                  </div>
+                  <div class="addr-content">
+                      <p>{{ c.shippingAddress?.street || 'No Street' }}</p>
+                      <p>{{ c.shippingAddress?.city || 'No City' }}, {{ c.shippingAddress?.state }}</p>
+                      <p>{{ c.shippingAddress?.zipCode }}</p>
+                  </div>
+              </div>
+
+          </div>
+        </section>
+
+        <section class="form-section">
+           <h4 class="section-title">Notes & Tags</h4>
+           <div class="form-grid">
+               <div class="read-only-field span-2">
+                   <label>Internal Notes</label>
+                   <div class="field-value description-box">
+                       {{ c.notes || 'No notes available.' }}
+                   </div>
+               </div>
+               <div class="read-only-field span-2">
+                   <label>Tags</label>
+                   <div class="tags-container flex gap-2 mt-1">
+                      @for (tag of getFilteredTags(); track $index) {
+                        <p-tag [value]="tag" severity="info"></p-tag>
+                      } @empty {
+                        <span class="text-sm text-gray-400">No tags</span>
+                      }
+                   </div>
+               </div>
+           </div>
+        </section>
+
+      </div>
+    </div>
+  } @else {
+    <div class="form-page-container flex justify-center items-center h-64">
+        <p-skeleton width="100%" height="400px"></p-skeleton>
+    </div>
+  }
+</div>
+
+
+<!-- 
+<div class="form-page-container">
+  @if (customer(); as c) {
+    <div class="form-card animate-fadeIn">
       <header class="form-header">
         <div class="header-content">
           <h2 class="form-title">{{ c.name }}</h2>
@@ -314,151 +321,4 @@
         <i class="pi pi-spin pi-spinner text-4xl text-[var(--text-secondary)]"></i>
     </div>
   }
-</div>
- <!-- <div class="customer-page-container">
-  === Customer Data ===
-  <div class="customer-details-card" *ngIf="customer(); else loadingSkeleton">
-    === HEADER ===
-    <header class="details-header">
-      <div class="header-left">
-        <p-button
-          icon="pi pi-arrow-left"
-          styleClass="p-button-text p-button-rounded"
-          routerLink="/customer">
-        </p-button>
-
-        <div class="header-info">
-          <h2 class="form-title">{{ customer()?.name }}</h2>
-          <p-tag
-            [value]="customer()?.isActive ? 'Active' : 'Inactive'"
-            [severity]="customer()?.isActive ? 'success' : 'danger'">
-          </p-tag>
-        </div>
-      </div>
-
-      <div class="header-actions">
-        <p-button label="Edit" icon="pi pi-pencil" styleClass="p-button-outlined"></p-button>
-        <p-button label="More" icon="pi pi-ellipsis-v" styleClass="p-button-text"></p-button>
-      </div>
-    </header>
-
-    <p-divider></p-divider>
-
-    === BODY ===
-    <div class="details-body">
-      Sidebar
-      <aside class="profile-sidebar">
-        <p-avatar
-          [image]="customer()?.avatar"
-          [label]="getInitials(customer()?.name || '')"
-          styleClass="profile-avatar"
-          shape="circle">
-        </p-avatar>
-
-        <h3 class="profile-name">{{ customer()?.name }}</h3>
-        <span class="profile-type">{{ customer()?.type | titlecase }}</span>
-
-        <p-divider></p-divider>
-
-        <div class="profile-contact">
-          <div
-            class="contact-card"
-            *ngFor="let field of [
-              { icon: 'pi-user', label: 'Contact Person', value: customer()?.contactPerson },
-              { icon: 'pi-envelope', label: 'Email', value: customer()?.email },
-              { icon: 'pi-phone', label: 'Phone', value: customer()?.phone },
-              { icon: 'pi-mobile', label: 'Alt. Phone', value: customer()?.altPhone },
-              { icon: 'pi-calendar', label: 'Member Since', value: formatDate(customer()?.createdAt) }
-            ]">
-            <i class="pi {{ field.icon }} contact-icon"></i>
-            <div class="contact-content">
-              <label>{{ field.label }}</label>
-              <span>{{ field.value || 'N/A' }}</span>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      Main Details
-      <section class="main-details">
-        === FINANCIAL OVERVIEW ===
-        <div class="info-section">
-          <h4 class="section-title">Financial Overview</h4>
-          <div class="info-grid">
-            <div class="info-card" *ngFor="let item of [
-              { label: 'Outstanding', value: formatCurrency(customer()?.outstandingBalance), highlight: true },
-              { label: 'Credit Limit', value: formatCurrency(customer()?.creditLimit) },
-              { label: 'Opening Balance', value: formatCurrency(customer()?.openingBalance) }
-            ]">
-              <label>{{ item.label }}</label>
-              <span [class.outstanding]="item.highlight">{{ item.value }}</span>
-            </div>
-          </div>
-        </div>
-
-        === ADDRESS DETAILS ===
-        <div class="info-section">
-          <h4 class="section-title">Address Information</h4>
-          <div class="address-grid">
-            <div class="info-card address" *ngFor="let addr of [
-              { title: 'Billing Address', data: customer()?.billingAddress },
-              { title: 'Shipping Address', data: customer()?.shippingAddress }
-            ]">
-              <h5>{{ addr.title }}</h5>
-              <div *ngFor="let key of ['street', 'city', 'state', 'zipCode']" class="address-item">
-                <label>{{ key | titlecase }}</label>
-                <span>{{ addr.data?.[key] || 'N/A' }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        === OTHER DETAILS ===
-        <div class="info-section">
-          <h4 class="section-title">Other Details</h4>
-          <div class="info-grid">
-            <div class="info-card" *ngFor="let f of [
-              { label: 'GST Number', value: customer()?.gstNumber },
-              { label: 'PAN Number', value: customer()?.panNumber },
-              { label: 'Payment Terms', value: customer()?.paymentTerms }
-            ]">
-              <label>{{ f.label }}</label>
-              <span>{{ f.value || 'N/A' }}</span>
-            </div>
-          </div>
-
-          <div class="info-card">
-            <label>Tags</label>
-            <div class="tags-container" *ngIf="getFilteredTags() as filteredTags">
-              <p-tag *ngFor="let tag of filteredTags" [value]="tag"></p-tag>
-            </div>
-          </div>
-
-          <div class="info-card notes">
-            <label>Notes</label>
-            <p>{{ customer()?.notes || 'No notes provided.' }}</p>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    === FOOTER ===
-    <footer class="details-footer">
-      <div class="footer-actions">
-        <p-button label="Back to List" icon="pi pi-arrow-left" styleClass="p-button-text"></p-button>
-        <p-button label="Edit Customer" icon="pi pi-pencil" styleClass="p-button-primary"></p-button>
-      </div>
-    </footer>
-  </div>
-
-  === SKELETON LOADER ===
-  <ng-template #loadingSkeleton>
-    <div class="skeleton-wrapper">
-      <p-skeleton height="2rem" width="50%" styleClass="mb-3"></p-skeleton>
-      <p-skeleton height="15rem" width="100%" styleClass="mb-2"></p-skeleton>
-      <p-skeleton height="15rem" width="100%" styleClass="mb-2"></p-skeleton>
-      <p-skeleton height="15rem" width="100%"></p-skeleton>
-    </div>
-  </ng-template>
-</div>
- --> -->
+</div> -->

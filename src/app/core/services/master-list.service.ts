@@ -1,18 +1,32 @@
-// src/app/core/services/master-list.service.ts
-import { Injectable, signal, computed, inject, Inject, PLATFORM_ID } from '@angular/core';
+// ... existing imports ...
+import { Injectable, signal, computed, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { catchError, of } from 'rxjs';
 import { ApiService } from './api';
 
+
+export interface MasterItem {
+  _id: string;
+  name: string; // <--- Removed the '?' to make it required
+  title?: string;
+  customLabel?: string;
+  [key: string]: any;
+}
+
 export interface MasterList {
-  branches: Array<{ _id: string; name: string }>;
-  roles: Array<{ _id: string; name: string }>;
-  products: Array<{ _id: string; name: string }>;
-  customers?: Array<{ _id: string; name: string }>;
-  suppliers?: Array<{ _id: string; name: string }>;
-  users?: Array<{ _id: string; name: string }>;
-  categories?: Array<{ _id: string; name: string }>;
-  brands?: Array<{ _id: string; name: string }>;
+  branches: MasterItem[];
+  roles: MasterItem[];
+  products: MasterItem[];
+  customers: MasterItem[];
+  suppliers: MasterItem[];
+  users: MasterItem[];
+  accounts: MasterItem[]; // Added
+  emis: MasterItem[];     // Added
+  // Flattened from 'masters' object:
+  categories?: MasterItem[];
+  brands?: MasterItem[];
+  units?: MasterItem[];
+  taxes?: MasterItem[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -20,21 +34,36 @@ export class MasterListService {
   private api = inject(ApiService);
   private platformId = inject(PLATFORM_ID);
 
+  // The main state signal
   private readonly _data = signal<MasterList | null>(null);
+
+  // --- Computed Signals (Read-only accessors) ---
   readonly data = computed(() => this._data());
+  
+  // Core Entities
   readonly branches = computed(() => this._data()?.branches ?? []);
-  readonly users = computed(() => this._data()?.users ?? []);
   readonly roles = computed(() => this._data()?.roles ?? []);
-  readonly products = computed(() => this._data()?.products ?? []);
+  readonly users = computed(() => this._data()?.users ?? []);
   readonly customers = computed(() => this._data()?.customers ?? []);
   readonly suppliers = computed(() => this._data()?.suppliers ?? []);
+  readonly products = computed(() => this._data()?.products ?? []);
+  readonly accounts = computed(() => this._data()?.accounts ?? []);
+  readonly emis = computed(() => this._data()?.emis ?? []);
+
+  // Dynamic Masters (Flattened)
   readonly categories = computed(() => this._data()?.categories ?? []);
   readonly brands = computed(() => this._data()?.brands ?? []);
+  readonly units = computed(() => this._data()?.units ?? []);
+  readonly taxes = computed(() => this._data()?.taxes ?? []);
 
   constructor() {
     this.initFromCache();
   }
 
+  /**
+   * 1. HEAVY LOAD
+   * Fetches everything at once. Best for App Initialization.
+   */
   load(): void {
     this.api.getMasterList().pipe(
       catchError(err => {
@@ -43,12 +72,66 @@ export class MasterListService {
       })
     ).subscribe((res: any) => {
       if (res?.data) {
-        this._data.set(res.data);
-        if (isPlatformBrowser(this.platformId)) {
-          try { localStorage.setItem('masterList', JSON.stringify(res.data)); } catch {}
-        }
+        // Flatten logic: Merge 'masters' (generic types) into the root object
+        // Backend sends: { branches: [], masters: { category: [], brand: [] } }
+        const genericMasters = res.data.masters || {}; 
+        
+        const finalData: MasterList = {
+          ...res.data,
+          ...genericMasters // Spreads category, brand, units, etc. to top level
+        };
+
+        this.updateState(finalData);
       }
     });
+  }
+
+  /**
+   * 2. LIGHTWEIGHT REFRESH
+   * Refreshes ONLY one list. Best used after creating/editing an item.
+   * Usage: masterList.refreshSpecific('customer');
+   */
+  refreshSpecific(type: string): void {
+    // Map 'singular' API type to 'plural' State key
+    const keyMap: { [key: string]: keyof MasterList } = {
+      'branch': 'branches',
+      'role': 'roles',
+      'customer': 'customers',
+      'supplier': 'suppliers',
+      'product': 'products',
+      'user': 'users',
+      'account': 'accounts',
+      'emi': 'emis'
+    };
+
+    const stateKey = keyMap[type.toLowerCase()];
+    if (!stateKey) {
+      // If it's not a core entity, it might be a generic master (category, brand)
+      // For now, we only support optimized refresh for core entities. 
+      // Fallback to full load if needed or extend logic.
+      return; 
+    }
+
+    this.api.getSpecificList(type).subscribe({
+      next: (res) => {
+        if (res?.data) {
+          const currentData = this._data() || {} as MasterList;
+          // Patch the specific array in the signal
+          const updatedData = { ...currentData, [stateKey]: res.data };
+          this.updateState(updatedData);
+        }
+      },
+      error: (err) => console.error(`Failed to refresh ${type}`, err)
+    });
+  }
+
+  private updateState(data: MasterList): void {
+    this._data.set(data);
+    if (isPlatformBrowser(this.platformId)) {
+      try {
+        localStorage.setItem('masterList', JSON.stringify(data));
+      } catch {}
+    }
   }
 
   initFromCache(): void {
@@ -72,60 +155,136 @@ export class MasterListService {
     }
   }
 
-  refresh(): void { this.load(); }
+  refresh(): void { 
+    this.load(); 
+  }
 }
-
-
-// import { Injectable, signal, computed, inject, Inject, PLATFORM_ID } from '@angular/core';
+// import { Injectable, signal, computed, inject, PLATFORM_ID } from '@angular/core';
 // import { isPlatformBrowser } from '@angular/common';
-// import { catchError, of, tap } from 'rxjs';
+// import { catchError, of } from 'rxjs';
 // import { ApiService } from './api';
 
+// export interface MasterItem {
+//   _id: string;
+//   name?: string;
+//   title?: string;
+//   customLabel?: string; // The new field we added in backend
+//   [key: string]: any;
+// }
+
 // export interface MasterList {
-//   branches: Array<{ _id: string; name: string }>;
-//   roles: Array<{ _id: string; name: string }>;
-//   products: Array<{ _id: string; name: string }>;
-//   customers?: Array<{ _id: string; name: string }>;
-//   suppliers?: Array<{ _id: string; name: string }>;
-//   users?: Array<{ _id: string; name: string }>;
+//   branches: MasterItem[];
+//   roles: MasterItem[];
+//   products: MasterItem[];
+//   customers: MasterItem[];
+//   suppliers: MasterItem[];
+//   users: MasterItem[];
+//   accounts: MasterItem[]; // Added
+//   emis: MasterItem[];     // Added
+//   // Flattened from 'masters' object:
+//   categories?: MasterItem[];
+//   brands?: MasterItem[];
+//   units?: MasterItem[];
+//   taxes?: MasterItem[];
 // }
 
 // @Injectable({ providedIn: 'root' })
 // export class MasterListService {
-//   // --- Injections ---
 //   private api = inject(ApiService);
 //   private platformId = inject(PLATFORM_ID);
 
-//   // --- State Signals ---
+//   // The main state signal
 //   private readonly _data = signal<MasterList | null>(null);
+
+//   // --- Computed Signals (Read-only accessors) ---
 //   readonly data = computed(() => this._data());
+  
+//   // Core Entities
 //   readonly branches = computed(() => this._data()?.branches ?? []);
-//   readonly users = computed(() => this._data()?.users ?? []);
 //   readonly roles = computed(() => this._data()?.roles ?? []);
-//   readonly products = computed(() => this._data()?.products ?? []);
+//   readonly users = computed(() => this._data()?.users ?? []);
 //   readonly customers = computed(() => this._data()?.customers ?? []);
 //   readonly suppliers = computed(() => this._data()?.suppliers ?? []);
+//   readonly products = computed(() => this._data()?.products ?? []);
+//   readonly accounts = computed(() => this._data()?.accounts ?? []);
+//   readonly emis = computed(() => this._data()?.emis ?? []);
+
+//   // Dynamic Masters (Flattened)
+//   readonly categories = computed(() => this._data()?.categories ?? []);
+//   readonly brands = computed(() => this._data()?.brands ?? []);
+//   readonly units = computed(() => this._data()?.units ?? []);
+//   readonly taxes = computed(() => this._data()?.taxes ?? []);
 
 //   constructor() {
 //     this.initFromCache();
 //   }
 
+//   /**
+//    * 1. HEAVY LOAD
+//    * Fetches everything at once. Best for App Initialization.
+//    */
 //   load(): void {
 //     this.api.getMasterList().pipe(
 //       catchError(err => {
-//         console.error('❌ Failed to load master list', err);
+//         console.error('Failed to load master list', err);
 //         return of({ data: null });
 //       })
 //     ).subscribe((res: any) => {
 //       if (res?.data) {
-//         console.log('API Response:', res);
-//         this._data.set(res.data);
-//         if (isPlatformBrowser(this.platformId)) {
-//           localStorage.setItem('masterList', JSON.stringify(res.data)); // persist
-//         }
-//         console.log('✅ Master list loaded');
+//         const genericMasters = res.data.masters || {}; 
+        
+//         const finalData: MasterList = {
+//           ...res.data,
+//           ...genericMasters // Spreads category, brand, units, etc. to top level
+//         };
+
+//         this.updateState(finalData);
 //       }
 //     });
+//   }
+
+//   /**
+//    * 2. LIGHTWEIGHT REFRESH
+//    * Refreshes ONLY one list. Best used after creating/editing an item.
+//    * Usage: masterList.refreshSpecific('customer');
+//    */
+//   refreshSpecific(type: string): void {
+//     // Map 'singular' API type to 'plural' State key
+//     const keyMap: { [key: string]: keyof MasterList } = {
+//       'branch': 'branches',
+//       'role': 'roles',
+//       'customer': 'customers',
+//       'supplier': 'suppliers',
+//       'product': 'products',
+//       'user': 'users',
+//       'account': 'accounts',
+//       'emi': 'emis'
+//     };
+
+//     const stateKey = keyMap[type.toLowerCase()];
+//     if (!stateKey) {
+//       return; 
+//     }
+
+//     this.api.getSpecificList(type).subscribe({
+//       next: (res) => {
+//         if (res?.data) {
+//           const currentData = this._data() || {} as MasterList;
+//           const updatedData = { ...currentData, [stateKey]: res.data };
+//           this.updateState(updatedData);
+//         }
+//       },
+//       error: (err) => console.error(`Failed to refresh ${type}`, err)
+//     });
+//   }
+
+//   private updateState(data: MasterList): void {
+//     this._data.set(data);
+//     if (isPlatformBrowser(this.platformId)) {
+//       try {
+//         localStorage.setItem('masterList', JSON.stringify(data));
+//       } catch {}
+//     }
 //   }
 
 //   initFromCache(): void {
@@ -134,18 +293,11 @@ export class MasterListService {
 //       if (cache) {
 //         try {
 //           this._data.set(JSON.parse(cache));
-//           console.log('💾 Master list restored from cache');
 //         } catch (e) {
 //           console.error('Failed to parse master list cache', e);
 //           localStorage.removeItem('masterList');
-//           this.load();
 //         }
-//       } else {
-//         this.load();
 //       }
-//     } else {
-//       // SSR mode — skip localStorage entirely
-//       this.load();
 //     }
 //   }
 
@@ -156,124 +308,86 @@ export class MasterListService {
 //     }
 //   }
 
-//   /** Optional: refresh on demand */
-//   public refresh(): void {
-//     this.load();
+//   refresh(): void { 
+//     this.load(); 
 //   }
 // }
 
+
+// // // src/app/core/services/master-list.service.ts
 // // import { Injectable, signal, computed, inject, Inject, PLATFORM_ID } from '@angular/core';
 // // import { isPlatformBrowser } from '@angular/common';
+// // import { catchError, of } from 'rxjs';
 // // import { ApiService } from './api';
-// // import { catchError, of, tap } from 'rxjs';
 
 // // export interface MasterList {
-// //   branches: Array<{ _id: string; name: string }>;
-// //   roles: Array<{ _id: string; name: string }>;
-// //   products: Array<{ _id: string; name: string }>;
-// //   customers?: Array<{ _id: string; name: string }>;
-// //   suppliers?: Array<{ _id: string; name: string }>;
+// //   branches: Array<{ _id: string; name: string }>;
+// //   roles: Array<{ _id: string; name: string }>;
+// //   products: Array<{ _id: string; name: string }>;
+// //   customers?: Array<{ _id: string; name: string }>;
+// //   suppliers?: Array<{ _id: string; name: string }>;
+// //   users?: Array<{ _id: string; name: string }>;
+// //   categories?: Array<{ _id: string; name: string }>;
+// //   brands?: Array<{ _id: string; name: string }>;
 // // }
 
 // // @Injectable({ providedIn: 'root' })
 // // export class MasterListService {
-// //   private api = inject(ApiService);
-// //   private platformId = inject(PLATFORM_ID);
-// //   // --- State Signals ---
-// //   private readonly _data = signal<MasterList | null>(null);
-// //   readonly data = computed(() => this._data());
-// //   readonly branches = computed(() => this._data()?.branches ?? []);
-// //   readonly roles = computed(() => this._data()?.roles ?? []);
-// //   readonly products = computed(() => this._data()?.products ?? []);
-// //   readonly customers = computed(() => this._data()?.customers ?? []);
-// //   readonly suppliers = computed(() => this._data()?.suppliers ?? []);
+// //   private api = inject(ApiService);
+// //   private platformId = inject(PLATFORM_ID);
 
-// //   constructor() {
+// //   private readonly _data = signal<MasterList | null>(null);
+// //   readonly data = computed(() => this._data());
+// //   readonly branches = computed(() => this._data()?.branches ?? []);
+// //   readonly users = computed(() => this._data()?.users ?? []);
+// //   readonly roles = computed(() => this._data()?.roles ?? []);
+// //   readonly products = computed(() => this._data()?.products ?? []);
+// //   readonly customers = computed(() => this._data()?.customers ?? []);
+// //   readonly suppliers = computed(() => this._data()?.suppliers ?? []);
+// //   readonly categories = computed(() => this._data()?.categories ?? []);
+// //   readonly brands = computed(() => this._data()?.brands ?? []);
+
+// //   constructor() {
 // //     this.initFromCache();
 // //   }
 
-// //    load(): void { 
-// //     this.api.getMasterList().pipe(
-// //       catchError(err => {
-// //         console.error('❌ Failed to load master list', err);
-// //         return of({ data: null });
-// //       })
-// //     ).subscribe((res: any) => {
-// //       if (res?.data) {
-// //   console.log(res);
-// //         this._data.set(res.data);
-// //         // ✅ FIX 1: Guard localStorage access
+// //   load(): void {
+// //     this.api.getMasterList().pipe(
+// //       catchError(err => {
+// //         console.error('Failed to load master list', err);
+// //         return of({ data: null });
+// //       })
+// //     ).subscribe((res: any) => {
+// //       if (res?.data) {
+// //         this._data.set(res.data);
 // //         if (isPlatformBrowser(this.platformId)) {
-// //           localStorage.setItem('masterList', JSON.stringify(res.data)); // persist
+// //           try { localStorage.setItem('masterList', JSON.stringify(res.data)); } catch {}
 // //         }
-// //         console.log('✅ Master list loaded');
-// //       }
-// //     });
-// //   }
-
-// // initFromCache(): void {
-// //   if (isPlatformBrowser(this.platformId)) {
-// //     const cache = localStorage.getItem('masterList');
-// //     if (cache) {
-// //       try {
-// //         this._data.set(JSON.parse(cache));
-// //         console.log('💾 Master list restored from cache');
-// //       } catch (e) {
-// //         console.error('Failed to parse master list cache', e);
-// //         localStorage.removeItem('masterList');
-// //         this.load();
 // //       }
-// //     } else {
-// //       this.load();
+// //     });
+// //   }
+
+// //   initFromCache(): void {
+// //     if (isPlatformBrowser(this.platformId)) {
+// //       const cache = localStorage.getItem('masterList');
+// //       if (cache) {
+// //         try {
+// //           this._data.set(JSON.parse(cache));
+// //         } catch (e) {
+// //           console.error('Failed to parse master list cache', e);
+// //           localStorage.removeItem('masterList');
+// //         }
+// //       }
 // //     }
-// //   } else {
-// //     // SSR mode — skip localStorage entirely
-// //     this.load();
 // //   }
-// // }
 
-// // clear(): void {
-// //   this._data.set(null);
-// //   if (isPlatformBrowser(this.platformId)) {
-// //     localStorage.removeItem('masterList');
+// //   clear(): void {
+// //     this._data.set(null);
+// //     if (isPlatformBrowser(this.platformId)) {
+// //       localStorage.removeItem('masterList');
+// //     }
 // //   }
+
+// //   refresh(): void { this.load(); }
 // // }
 
-
-// //   /** Load from cache (if any) before making an API call */
-// // //    initFromCache(): void {
-// // //     // ✅ FIX 1: Guard localStorage access
-// // //     if (isPlatformBrowser(this.platformId)) {
-// // //       const cache = localStorage.getItem('masterList');
-// // //       if (cache) {
-// // //         try {
-// // //           this._data.set(JSON.parse(cache));
-// // //           console.log('💾 Master list restored from cache');
-// // //         } catch (e) {
-// // //           console.error('Failed to parse master list cache', e);
-// // //           localStorage.removeItem('masterList');
-// // //           this.load(); // Cache was bad, load from API
-// // //         }
-// // //       } else {
-// // //         this.load(); // No cache, load from API
-// // //       }
-// // //     } else {
-// // //       // If we are on the server (SSR), just load from API.
-// // //       // The data will NOT be cached, which is correct server behavior.
-// // //       this.load();
-// // //     }
-// // //   }
-
-// //   /** Optional: refresh on demand */
-// //   public refresh(): void {
-// //     this.load();
-// //   }
-
-// // //   public clear(): void {
-// // //     this._data.set(null);
-// // //     // ✅ FIX 1: Guard localStorage access
-// // //     if (isPlatformBrowser(this.platformId)) {
-// // //       localStorage.removeItem('masterList');
-// // //     }
-// // //   }
-// // }

@@ -58,12 +58,8 @@ export class ProductDetailsComponent implements OnInit {
   private loadingService = inject(LoadingService);
   private messageService = inject(AppMessageService);
   private masterList = inject(MasterListService); // To get branch names
-
   product = signal<IProduct | null>(null);
-  
-  // We need to map branch IDs to names for the inventory table
   branchNameMap = new Map<string, string>();
-
   constructor() {
     // Create a map from the master list of branches
     this.masterList.branches().forEach(branch => {

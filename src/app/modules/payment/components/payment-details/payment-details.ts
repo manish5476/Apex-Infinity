@@ -41,7 +41,6 @@ export class PaymentDetailsComponent implements OnInit {
   ngOnInit(): void {
     this.loadPaymentData();
   }
-
   private loadPaymentData(): void {
     this.route.paramMap.pipe(
       switchMap(params => {
