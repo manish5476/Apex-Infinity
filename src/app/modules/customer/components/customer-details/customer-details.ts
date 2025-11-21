@@ -1,17 +1,24 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 
-// PrimeNG
+// PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
 import { AvatarModule } from 'primeng/avatar';
 import { TagModule } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
+import { TableModule } from 'primeng/table';
+import { CardModule } from 'primeng/card';
+import { TooltipModule } from 'primeng/tooltip';
+import { TabsModule } from 'primeng/tabs';
 
 // Services
 import { CustomerService } from '../../services/customer-service';
+import { InvoiceService } from '../../../invoice/services/invoice-service';
+import { PaymentService } from '../../../payment/services/payment-service';
+import { FinancialService } from '../../../../core/services/financial.service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
 
@@ -20,198 +27,280 @@ import { CommonMethodService } from '../../../../core/utils/common-method.servic
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
     RouterModule,
     ButtonModule,
     DividerModule,
     AvatarModule,
     TagModule,
-    SkeletonModule
+    SkeletonModule,
+    TabsModule,
+    TableModule,
+    CardModule,
+    TooltipModule
   ],
-  providers: [CustomerService],
+  providers: [CustomerService, InvoiceService, PaymentService, FinancialService],
   templateUrl: './customer-details.html',
   styleUrl: './customer-details.scss',
 })
 export class CustomerDetails implements OnInit {
+  // --- Dependencies ---
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private customerService = inject(CustomerService);
+  private invoiceService = inject(InvoiceService);
+  private paymentService = inject(PaymentService);
+  private financialService = inject(FinancialService);
   private messageService = inject(AppMessageService);
   
-  // Inject Common Service (Public for HTML access)
   public common = inject(CommonMethodService);
 
-  // Signals
+  // --- State ---
+  loading = signal(true);
+  
+  // Data Signals
   customer = signal<any | null>(null);
-  customerId: string | null = null;
+  invoices = signal<any[]>([]);
+  payments = signal<any[]>([]);
+  ledgerHistory = signal<any[]>([]);
+  
+  // Derived Stats
+  closingBalance = signal(0);
+  totalInvoiced = computed(() => this.invoices().reduce((acc, inv) => acc + (inv.grandTotal || 0), 0));
+  totalPaid = computed(() => this.payments().reduce((acc, pay) => acc + (pay.amount || 0), 0));
 
   ngOnInit(): void {
-    this.loadCustomerData();
+    this.loadCustomerDashboard();
   }
 
-  private loadCustomerData(): void {
+  private loadCustomerDashboard(): void {
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
-      this.customerId = id;
-
       if (!id) {
         this.messageService.showError('Navigation Error', 'No customer ID provided');
         this.router.navigate(['/customer']);
         return;
       }
 
-      // 🚀 Use Common API Call
+      this.loading.set(true);
+
       this.common.apiCall(
-        this.customerService.getCustomerDataWithId(id),
-        (response: any) => {
-          if (response?.data) {
-            this.customer.set(response.data.data || response.data);
-          } else {
-             // Fallback if data structure varies
-             this.customer.set(response);
-          }
+        forkJoin({
+          profile: this.customerService.getCustomerDataWithId(id),
+          invoices: this.invoiceService.getInvoicesByCustomer(id),
+          payments: this.paymentService.getPaymentsByCustomer(id),
+          ledger: this.financialService.getCustomerLedger(id)
+        }),
+        (res: any) => {
+          const profile = res.profile?.data?.data || res.profile?.data || {};
+          this.customer.set(profile);
+
+          const invList = res.invoices?.data?.invoices || res.invoices?.data || [];
+          this.invoices.set(invList);
+
+          const payList = res.payments?.data?.payments || res.payments?.data || [];
+          this.payments.set(payList);
+
+          const ledgerData = res.ledger?.data || {};
+          this.ledgerHistory.set(ledgerData.history || []);
+          this.closingBalance.set(ledgerData.closingBalance ?? profile.outstandingBalance ?? 0);
+
+          this.loading.set(false);
         },
-        'Fetch Customer'
+        'Fetch Customer Dashboard'
       );
     });
   }
 
-  // === Helpers ===
+  // --- Actions (Downloads) ---
 
-  getFilteredTags(): string[] {
-    const tags = this.customer()?.tags;
-    if (Array.isArray(tags)) {
-      return tags.filter((tag: string) => tag && tag.trim() !== '');
-    }
-    return [];
+  downloadInvoice(inv: any): void {
+    if (!inv?._id) return;
+    
+    this.common.apiCall(
+      this.invoiceService.downloadInvoice(inv._id),
+      (res: any) => {
+        if (!res || !res.body) {
+          this.messageService.showError('Download Failed', 'File empty.');
+          return;
+        }
+        // Use invoice number or ID for filename
+        const filename = `invoice-${inv.invoiceNumber || inv._id}.pdf`;
+        this.common.downloadBlob(res.body, filename);
+        this.messageService.showSuccess('Success', 'Invoice downloaded.');
+      },
+      'Download Invoice'
+    );
+  }
+
+  downloadReceipt(pay: any): void {
+    if (!pay?._id) return;
+
+    this.common.apiCall(
+      this.paymentService.downloadReceipt(pay._id),
+      (res: any) => {
+        if (!res || !res.body) {
+           this.messageService.showError('Download Failed', 'File empty.');
+           return;
+        }
+        const ref = pay.referenceNumber || pay.transactionId || 'receipt';
+        this.common.downloadBlob(res.body, `payment-${ref}.pdf`);
+        this.messageService.showSuccess('Success', 'Receipt downloaded.');
+      },
+      'Download Receipt'
+    );
+  }
+
+  // --- UI Helpers ---
+  getLedgerSeverity(type: string): 'success' | 'danger' | 'info' {
+    return type === 'credit' ? 'success' : 'danger';
   }
 
   isSameAddress(): boolean {
     const c = this.customer();
-    if (!c || !c.billingAddress || !c.shippingAddress) return false;
-    // Use common deep comparison
-    return JSON.stringify(c.billingAddress) === JSON.stringify(c.shippingAddress);
+    if (!c?.billingAddress || !c?.shippingAddress) return false;
+    const { _id: bId, ...bill } = c.billingAddress;
+    const { _id: sId, ...ship } = c.shippingAddress;
+    return JSON.stringify(bill) === JSON.stringify(ship);
   }
 }
 
-// import { MessageService } from 'primeng/api';
-// import { Component, OnInit, inject, signal } from '@angular/core';
+// import { Component, OnInit, inject, signal, computed } from '@angular/core';
 // import { CommonModule } from '@angular/common';
-// import { ActivatedRoute, RouterModule } from '@angular/router';
-// import { CustomerService } from '../../services/customer-service';
-// import { finalize, switchMap } from 'rxjs/operators';
-// import { Observable, of } from 'rxjs';
+// import { ActivatedRoute, RouterModule, Router } from '@angular/router';
+// import { forkJoin } from 'rxjs';
+
+// // PrimeNG Imports
 // import { ButtonModule } from 'primeng/button';
 // import { DividerModule } from 'primeng/divider';
 // import { AvatarModule } from 'primeng/avatar';
 // import { TagModule } from 'primeng/tag';
-// import { Select } from 'primeng/select';
-// import { FormsModule } from '@angular/forms';
-// import { MasterListService } from '../../../../core/services/master-list.service';
-// import { Message } from '../../../../core/services/message';
-// import { SkeletonModule } from 'primeng/skeleton'; // Corrected import
+// import { SkeletonModule } from 'primeng/skeleton';
+// import { TableModule } from 'primeng/table';
+// import { CardModule } from 'primeng/card';
+// import { TooltipModule } from 'primeng/tooltip';
+// import { TabsModule } from 'primeng/tabs';
+// // Services
+// import { CustomerService } from '../../services/customer-service';
+// import { InvoiceService } from '../../../invoice/services/invoice-service';
+// import { PaymentService } from '../../../payment/services/payment-service';
+// import { FinancialService } from '../../../../core/services/financial.service';
+// import { AppMessageService } from '../../../../core/services/message.service';
+// import { CommonMethodService } from '../../../../core/utils/common-method.service';
 
 // @Component({
 //   selector: 'app-customer-details',
 //   standalone: true,
 //   imports: [
 //     CommonModule,
-//     FormsModule,
 //     RouterModule,
 //     ButtonModule,
 //     DividerModule,
 //     AvatarModule,
 //     TagModule,
-//     SkeletonModule // Corrected import
+//     SkeletonModule,
+//     TabsModule,
+//     TableModule,
+//     CardModule,
+//     TooltipModule
 //   ],
-//   providers: [CustomerService], // Already provided in list, but good for standalone
-//   templateUrl: './customer-details.html', // Corrected extension
+//   providers: [CustomerService, InvoiceService, PaymentService, FinancialService],
+//   templateUrl: './customer-details.html',
 //   styleUrl: './customer-details.scss',
 // })
 // export class CustomerDetails implements OnInit {
-
+//   // --- Dependencies ---
 //   private route = inject(ActivatedRoute);
+//   private router = inject(Router);
 //   private customerService = inject(CustomerService);
-//   private MessageService = inject(Message);
-//   public MasterList = inject(MasterListService);
-//   customerId: any
-//   // Signal to hold customer data
+//   private invoiceService = inject(InvoiceService);
+//   private paymentService = inject(PaymentService);
+//   private financialService = inject(FinancialService);
+//   private messageService = inject(AppMessageService);
+  
+//   public common = inject(CommonMethodService);
+
+//   // --- State & Data Signals ---
+//   loading = signal(true);
+  
+//   // Primary Data
 //   customer = signal<any | null>(null);
+//   invoices = signal<any[]>([]);
+//   payments = signal<any[]>([]);
+//   ledgerHistory = signal<any[]>([]);
+  
+//   // Derived Stats
+//   closingBalance = signal(0);
+//   totalInvoiced = computed(() => this.invoices().reduce((acc, inv) => acc + (inv.grandTotal || 0), 0));
+//   totalPaid = computed(() => this.payments().reduce((acc, pay) => acc + (pay.amount || 0), 0));
+
 //   ngOnInit(): void {
-//     this.loadCustomerData();
+//     this.loadCustomerDashboard();
 //   }
 
-//   loadCustomerData(): void {
-//     this.route.paramMap.pipe(
-//       switchMap(params => {
-//         const customerId = params.get('id');
-//         this.customerId = customerId; // Store customerId
-//         if (!customerId) {
-//           return of(null);
-//         }
-//         return this.customerService.getCustomerDataWithId(customerId).pipe(
-//           // Removed unnecessary pipe
-//         );
-//       })
-//     ).subscribe({
-//       next: (response: any) => {
-//         if (response && response.data) {
-//           this.customer.set(response.data.data);
-//         } else if (response === null) {
-//           // Handle case where customerId was null
-//           this.MessageService.handleError('Error', 'No customer ID provided.');
-//         } else {
-//           this.MessageService.handleResponse(response.Message);
-//         }
-//       },
-//       error: (err) => {
-//         console.error('Failed to fetch customer:', err);
-//         this.MessageService.handleError('Error', err.error?.message || 'Could not fetch customer');
+//   private loadCustomerDashboard(): void {
+//     this.route.paramMap.subscribe(params => {
+//       const id = params.get('id');
+//       if (!id) {
+//         this.messageService.showError('Navigation Error', 'No customer ID provided');
+//         this.router.navigate(['/customer']);
+//         return;
 //       }
+
+//       this.loading.set(true);
+
+//       // 🚀 ForkJoin: Execute all 4 API calls in parallel
+//       this.common.apiCall(
+//         forkJoin({
+//           profile: this.customerService.getCustomerDataWithId(id),
+//           invoices: this.invoiceService.getInvoicesByCustomer(id),
+//           payments: this.paymentService.getPaymentsByCustomer(id),
+//           ledger: this.financialService.getCustomerLedger(id)
+//         }),
+//         (res: any) => {
+//           // 1. Handle Profile (API structure: data.data)
+//           const profile = res.profile?.data?.data || res.profile?.data || {};
+//           this.customer.set(profile);
+
+//           // 2. Handle Invoices (API structure: data.invoices array)
+//           const invList = res.invoices?.data?.invoices || res.invoices?.data || [];
+//           this.invoices.set(invList);
+
+//           // 3. Handle Payments (API structure: data.payments array)
+//           const payList = res.payments?.data?.payments || res.payments?.data || [];
+//           this.payments.set(payList);
+
+//           // 4. Handle Ledger (API structure: data.history array + closingBalance)
+//           const ledgerData = res.ledger?.data || {};
+//           this.ledgerHistory.set(ledgerData.history || []);
+//           // Use ledger closing balance if available, else fallback to profile's outstanding
+//           this.closingBalance.set(ledgerData.closingBalance ?? profile.outstandingBalance ?? 0);
+
+//           this.loading.set(false);
+//         },
+//         'Fetch Customer Dashboard'
+//       );
 //     });
+//   }
+
+//   // --- UI Helpers ---
+
+//   /**
+//    * Returns severity for ledger transaction types (credit = green, debit = red)
+//    */
+//   getLedgerSeverity(type: string): 'success' | 'danger' | 'info' {
+//     return type === 'credit' ? 'success' : 'danger';
 //   }
 
 //   /**
-//   * Helper to get initials from a name
-//   */
-//   getInitials(name: string): string {
-//     if (!name) return 'C';
-//     const names = name.split(' ');
-//     if (names.length > 1) {
-//       return (names[0][0] + names[names.length - 1][0]).toUpperCase();
-//     }
-//     return names[0].substring(0, 2).toUpperCase();
-//   }
-
-//   getFilteredTags(): string[] {
-//     const tags = this.customer()?.tags;
-//     if (Array.isArray(tags)) {
-//       return tags.filter(tag => tag && tag.trim() !== '');
-//     }
-//     return [];
-//   }
-
-//   formatDate(dateString: string | undefined): string {
-//     if (!dateString) return 'N/A';
-//     // Using a more readable format
-//     return new Date(dateString).toLocaleDateString('en-US', {
-//       year: 'numeric',
-//       month: 'short',
-//       day: 'numeric',
-//     });
-//   }
-
-//   isSameAddress(): any {
+//    * Checks if billing and shipping addresses are identical
+//    */
+//   isSameAddress(): boolean {
+//     const c = this.customer();
+//     if (!c?.billingAddress || !c?.shippingAddress) return false;
     
-//   }
-
-//   /**
-//   * Helper to format currency
-//   */
-//   formatCurrency(value: number | undefined | null): string {
-//     if (value === undefined || value === null) {
-//       value = 0;
-//     }
-//     return `₹ ${value.toFixed(2)}`;
+//     // Compare properties excluding ID
+//     const { _id: bId, ...bill } = c.billingAddress;
+//     const { _id: sId, ...ship } = c.shippingAddress;
+//     return JSON.stringify(bill) === JSON.stringify(ship);
 //   }
 // }
