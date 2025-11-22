@@ -6,7 +6,6 @@
     <div class="header-left">
       <p-button icon="pi pi-arrow-left" styleClass="p-button-text p-button-rounded back-btn"
         routerLink="/customer"></p-button>
-
       <div class="customer-identity">
         <div class="name-row">
           <h1>{{ c.name }}</h1>
@@ -42,12 +41,53 @@
     <aside class="profile-card">
       <div class="card-banner"></div>
 
-      <div class="identity-section">
+      <!-- <div class="identity-section">
         <div class="avatar-wrapper">
           <p-avatar [image]="c.avatar" [label]="common.getInitials(c.name)" size="xlarge" shape="circle"
             styleClass="user-avatar"></p-avatar>
           <div class="status-indicator" [class.active]="c.isActive"></div>
         </div>
+        <h3>{{ c.contactPerson || c.name }}</h3>
+        <span class="email">{{ c.email }}</span>
+      </div> -->
+      <!-- <div class="identity-section">
+
+        <div class="avatar-wrapper relative group cursor-pointer" [appImageViewer]="c.avatar">
+          <p-avatar [image]="c.avatar" [label]="c.avatar ? '' : common.getInitials(c.name)" size="xlarge" shape="circle"
+            styleClass="user-avatar">
+          </p-avatar>
+          <div class="avatar-overlay" (click)="fileInput.click()">
+            <i class="pi pi-camera text-xl text-white"></i>
+            <span class="text-xs text-white font-bold mt-1">Edit</span>
+          </div>
+
+          <input #fileInput type="file" accept="image/*" style="display: none" (change)="onFileSelected($event)">
+
+          <div class="status-indicator" [class.active]="c.isActive"></div>
+        </div>
+
+        <h3>{{ c.contactPerson || c.name }}</h3>
+        <span class="email">{{ c.email }}</span>
+      </div> -->
+      <div class="identity-section">
+
+        <div class="avatar-wrapper relative inline-block">
+
+          <p-avatar [appImageViewer]="c.avatar" [image]="c.avatar"
+            [label]="c.avatar ? '' : common.getInitials(c.name)" size="xlarge" shape="circle"
+            styleClass="user-avatar cursor-zoom-in">
+          </p-avatar>
+
+          <button pButton type="button" icon="pi pi-pencil"
+            class="p-button-rounded p-button-secondary p-button-sm edit-btn" pTooltip="Change Photo"
+            tooltipPosition="bottom" (click)="fileInput.click(); $event.stopPropagation()">
+          </button>
+
+          <input #fileInput type="file" accept="image/*" style="display: none" (change)="onFileSelected($event)">
+
+          <div class="status-indicator" [class.active]="c.isActive"></div>
+        </div>
+
         <h3>{{ c.contactPerson || c.name }}</h3>
         <span class="email">{{ c.email }}</span>
       </div>

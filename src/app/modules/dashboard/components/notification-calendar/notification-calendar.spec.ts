@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Dashboard } from './dashboard';
+import { NotificationCalendar } from './notification-calendar';
 
-describe('Dashboard', () => {
-  let component: Dashboard;
-  let fixture: ComponentFixture<Dashboard>;
+describe('NotificationCalendar', () => {
+  let component: NotificationCalendar;
+  let fixture: ComponentFixture<NotificationCalendar>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Dashboard]
+      imports: [NotificationCalendar]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(Dashboard);
+    fixture = TestBed.createComponent(NotificationCalendar);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

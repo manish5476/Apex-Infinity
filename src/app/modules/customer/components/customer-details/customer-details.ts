@@ -20,16 +20,16 @@ import { DialogModule } from 'primeng/dialog';
 import { CustomerService } from '../../services/customer-service';
 import { InvoiceService } from '../../../invoice/services/invoice-service';
 import { PaymentService } from '../../../payment/services/payment-service';
-import { FinancialService } from '../../../../core/services/financial.service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
 import { CustomerTransactions } from '../../../transactions/customer-transactions/customer-transactions';
-
+import { ImageViewerDirective } from '../../../shared/directives/image-viewer.directive';
+import { FinancialService } from '../../../Ledger/financial.service';
 @Component({
   selector: 'app-customer-details',
   standalone: true,
   imports: [
-    CommonModule,
+    CommonModule,ImageViewerDirective,
     RouterModule,
     ButtonModule,
     DividerModule,
@@ -192,7 +192,59 @@ export class CustomerDetails implements OnInit {
     const { _id: sId, ...ship } = c.shippingAddress;
     return JSON.stringify(bill) === JSON.stringify(ship);
   }
+
+  /**
+   * HANDLER: Triggered when user selects a file from the hidden input
+   */
+  onFileSelected(event: any): void {
+    const file: File = event.target.files[0];
+
+    if (file) {
+      // 1. Basic Validation (Optional: check size/type)
+      if (!file.type.startsWith('image/')) {
+        this.messageService.showError('Invalid File', 'Please select an image file.');
+        return;
+      }
+
+      // 2. Prepare FormData
+      const formData = new FormData();
+      // IMPORTANT: 'photo' must match the field name in your Node router (e.g., upload.single('photo'))
+      formData.append('photo', file); 
+
+      this.uploadPhoto(formData);
+    }
+  }
+
+  /**
+   * API CALL: Upload the image
+   */
+  private uploadPhoto(formData: FormData): void {
+    const customerId = this.customer()?._id;
+    if (!customerId) return;
+
+    this.loading.set(true);
+
+    this.common.apiCall(
+      this.customerService.uploadProfileImage(formData, customerId),
+      (res: any) => {
+        const updatedCustomer = res.data?.customer;
+        if (updatedCustomer) {
+          // Update the signal locally to reflect changes immediately
+          this.customer.update(current => ({
+            ...current,
+            avatar: updatedCustomer.photo // assuming backend maps 'photo' to the URL
+          }));
+          
+              this.loadCustomerDashboard();
+          this.messageService.showSuccess('Success', 'Profile photo updated successfully');
+        }
+        this.loading.set(false);
+      },
+      'Upload Profile Photo'
+    );
+  }
 }
+
 // import { Component, OnInit, inject, signal, computed } from '@angular/core';
 // import { CommonModule } from '@angular/common';
 // import { ActivatedRoute, RouterModule, Router } from '@angular/router';

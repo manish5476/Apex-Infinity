@@ -1,0 +1,103 @@
+/* notes-timeline.scss */
+:host {
+    display: block;
+    padding: var(--spacing-md);
+    /* Make the timeline pop out slightly from the clean background */
+    background: var(--bg-ternary); 
+    border-radius: var(--ui-border-radius-xl);
+    border: var(--ui-border-width) solid var(--border-primary);
+    margin-bottom: var(--spacing-lg); /* Space below timeline */
+    box-shadow: var(--shadow-sm);
+}
+
+.timeline-header {
+    display: flex;
+    align-items: center;
+    padding-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+    border-bottom: var(--ui-border-width) solid var(--border-secondary);
+    color: var(--accent-primary);
+    font-weight: var(--font-weight-semibold);
+}
+
+.timeline-title {
+    font-size: var(--font-size-lg);
+    flex-grow: 1;
+    color: var(--text-primary);
+}
+
+.timeline-month-view {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end; 
+    gap: 1px;
+    height: 100px;
+    padding: 0 1px;
+    background: var(--bg-secondary); /* Light track background */
+    border-radius: var(--ui-border-radius-sm);
+    overflow: hidden;
+    border: var(--ui-border-width) solid var(--border-secondary);
+}
+
+.timeline-day {
+    flex: 1;
+    min-width: 10px;
+    height: 40px; 
+    background: var(--bg-ternary);
+    border-radius: var(--ui-border-radius-sm) var(--ui-border-radius-sm) 0 0;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s var(--transition-base); /* Use token transition */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 5px;
+    box-shadow: var(--shadow-xs);
+    border-top: 2px solid var(--border-secondary);
+    overflow: hidden;
+}
+
+.timeline-day:hover {
+    background: var(--component-bg-hover);
+    box-shadow: 0 -4px 8px var(--accent-focus);
+    border-top-color: var(--accent-primary);
+}
+
+.timeline-day.has-notes {
+    /* Use the primary accent color for a clear visual */
+    background: linear-gradient(to top, var(--accent-primary) 50%, var(--component-bg-hover)); 
+    border-top-color: var(--accent-primary);
+    color: var(--text-primary);
+}
+
+.timeline-day.today {
+    /* Use a state color (e.g., info) for today */
+    background: linear-gradient(to top, var(--color-info) 50%, rgba(37, 99, 235, 0.2)); 
+    border-top-color: var(--color-info);
+}
+
+.day-label {
+    position: absolute;
+    top: 2px;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+    opacity: 0.8;
+}
+
+.timeline-day.has-notes .day-label,
+.timeline-day.today .day-label {
+    color: var(--text-primary);
+    opacity: 1;
+}
+
+.note-badge {
+    position: absolute;
+    bottom: 5px;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    color: var(--bg-secondary);
+    background: var(--text-primary);
+    padding: 1px 4px;
+    border-radius: var(--ui-border-radius-full);
+}

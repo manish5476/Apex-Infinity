@@ -27,12 +27,7 @@
           <!-- Email -->
           <div class="form-group">
             <label>Email <span class="req">*</span></label>
-            <input
-              pInputText
-              id="email"
-              type="email"
-              formControlName="email"
-              placeholder="you@company.com" />
+            <input pInputText id="email" type="email" formControlName="email" placeholder="you@company.com" />
             @if (form['email'].invalid && form['email'].touched) {
             <small class="text-red-500">Please enter a valid email.</small>
             }
@@ -46,13 +41,8 @@
                 Forgot?
               </a>
             </div>
-            <p-password
-              id="password"
-              formControlName="password"
-              [toggleMask]="true"
-              placeholder="••••••••"
-              styleClass="w-full"
-              inputStyleClass="w-full"></p-password>
+            <p-password id="password" formControlName="password" [toggleMask]="true" placeholder="••••••••"
+              styleClass="w-full" inputStyleClass="w-full"></p-password>
           </div>
 
           <!-- Remember me -->
@@ -65,13 +55,8 @@
 
           <!-- Footer -->
           <div class="auth-footer">
-            <p-button
-              label="Login"
-              icon="pi pi-sign-in"
-              type="submit"
-              [loading]="isLoading()"
-              [disabled]="loginForm.invalid || isLoading()"
-              styleClass="auth-btn-primary w-full justify-center">
+            <p-button label="Login" icon="pi pi-sign-in" type="submit" [loading]="isLoading()"
+              [disabled]="loginForm.invalid || isLoading()" styleClass="auth-btn-primary w-full justify-center">
             </p-button>
 
             <p class="auth-footer-text">
@@ -79,12 +64,14 @@
               <a routerLink="/auth/signup" class="auth-link">Create one</a>
             </p>
 
-            <p-button
-              label="Organization Login"
-              icon="pi pi-building"
-              routerLink="/auth/org"
-              styleClass="auth-btn-outline w-full justify-center mt-3">
-            </p-button>
+            <div class="text-center mt-4">
+              <p class="text-secondary text-sm">
+                Want to start your own company?
+                <a routerLink="/auth/org" class="text-primary font-bold hover:underline cursor-pointer">
+                  Register Organization
+                </a>
+              </p>
+            </div>
           </div>
         </form>
       </div>

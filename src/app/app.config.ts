@@ -28,7 +28,8 @@ export function initializeAuth(auth: AuthService) {
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(
-      withInterceptors([ jwtInterceptor, loggingInterceptor, ErrorInterceptor, LoadingInterceptor ]),
+      withInterceptors([ jwtInterceptor, loggingInterceptor,  LoadingInterceptor ]),
+      // ErrorInterceptor
       withFetch()
     ),
     provideRouter(routes),
