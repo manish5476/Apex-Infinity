@@ -1,52 +1,45 @@
-<!-- Using consistent page container -->
 <div class="customer-page-container">
   <div class="customer-details-card" *ngIf="supplier(); else loadingOrError">
-    
-    <!-- === HEADER === -->
     <header class="details-header">
       <div class="header-left">
-        <p-button 
-          icon="pi pi-arrow-left" 
-          styleClass="p-button-text p-button-rounded"
-          routerLink="/suppliers">
+        <p-button icon="pi pi-arrow-left" styleClass="p-button-text p-button-rounded" routerLink="/suppliers">
         </p-button>
         <div class="header-info">
           <h2 class="form-title">{{ supplier()?.companyName }}</h2>
-          <p-tag 
-            [value]="supplier()?.isActive ? 'Active' : 'Inactive'" 
+          <p-tag [value]="supplier()?.isActive ? 'Active' : 'Inactive'"
             [severity]="supplier()?.isActive ? 'success' : 'danger'">
           </p-tag>
         </div>
       </div>
-      <div class="header-actions">
+      <div class="header-actions" style="display: flex; gap: 10px;">
+
         <p-button 
-          label="Edit Supplier" 
-          icon="pi pi-pencil" 
-          styleClass="p-button-outlined"
+            label="Transactions" 
+            icon="pi pi-list" 
+            styleClass="p-button-outlined" 
+            (onClick)="showTransactionsDialog = true">
+        </p-button>
+
+        <p-button label="Edit" icon="pi pi-pencil" styleClass="p-button-outlined"
           [routerLink]="['/suppliers', supplier()?._id, 'edit']">
         </p-button>
+
       </div>
     </header>
 
     <p-divider></p-divider>
 
-    <!-- === BODY === -->
     <div class="details-body">
 
-      <!-- Left Column: Profile -->
       <aside class="profile-sidebar">
-        <p-avatar 
-          icon="pi pi-truck" 
-          styleClass="profile-avatar"
-          shape="circle">
+        <p-avatar icon="pi pi-truck" styleClass="profile-avatar" shape="circle">
         </p-avatar>
 
         <h3 class="profile-name">{{ supplier()?.companyName }}</h3>
         <span class="profile-type">{{ supplier()?.contactPerson || 'No contact person' }}</span>
-        
+
         <p-divider></p-divider>
 
-        <!-- Using consistent contact-card from branch/customer -->
         <div class="profile-contact">
           <div class="contact-card">
             <i class="pi pi-envelope contact-icon"></i>
@@ -79,10 +72,8 @@
         </div>
       </aside>
 
-      <!-- Right Column: Details -->
       <section class="main-details">
-        
-        <!-- Financial Details -->
+
         <div class="info-section">
           <h4 class="section-title">Financial Overview</h4>
           <div class="financial-grid">
@@ -100,8 +91,7 @@
             </div>
           </div>
         </div>
-        
-        <!-- Address -->
+
         <div class="info-section">
           <h4 class="section-title">Address</h4>
           <div class="info-card address-full">
@@ -110,7 +100,6 @@
           </div>
         </div>
 
-        <!-- Other Details -->
         <div class="info-section">
           <h4 class="section-title">Other Details</h4>
           <div class="other-details-grid">
@@ -128,28 +117,41 @@
             </div>
           </div>
         </div>
-
-      </section>
+        
+        </section>
     </div>
 
   </div>
 </div>
 
+<p-dialog 
+    header="Transaction History - {{ supplier()?.companyName }}" 
+    [(visible)]="showTransactionsDialog" 
+    [modal]="true" 
+    [style]="{ width: '90vw', height: '90vh' }" 
+    [maximizable]="true"
+    [draggable]="false" 
+    [resizable]="false"
+    appendTo="body">
+    
+    <ng-container *ngIf="showTransactionsDialog">
+        <app-supplier-transactions [inputSupplierId]="supplier()?._id"></app-supplier-transactions>
+    </ng-container>
+</p-dialog>
+
+
 <ng-template #loadingOrError>
   <div class="customer-details-card">
-     <div class="details-header">
-        <div class="header-left">
-           <p-button 
-            icon="pi pi-arrow-left" 
-            styleClass="p-button-text p-button-rounded"
-            routerLink="/suppliers">
-          </p-button>
-           <h2 class="form-title">Loading...</h2>
-        </div>
-     </div>
-     <p-divider></p-divider>
-     <div class="details-body">
-        <p>Loading supplier details or supplier not found.</p>
-     </div>
+    <div class="details-header">
+      <div class="header-left">
+        <p-button icon="pi pi-arrow-left" styleClass="p-button-text p-button-rounded" routerLink="/suppliers">
+        </p-button>
+        <h2 class="form-title">Loading...</h2>
+      </div>
+    </div>
+    <p-divider></p-divider>
+    <div class="details-body">
+      <p>Loading supplier details or supplier not found.</p>
+    </div>
   </div>
 </ng-template>

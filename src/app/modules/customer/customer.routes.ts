@@ -15,5 +15,6 @@ export const CUSTOMER_ROUTES: Routes = [
   {
     path: ':id', // <-- CHANGED: Was 'customer/:id'.
     component: CustomerDetails,
+
   },
 ];

@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { MainScreen } from './projectLayout/main-screen/main-screen';
 import { authGuard } from './core/guards/authguard.guard';
 import { MasterList } from './modules/shared/components/master-list/master-list';
+import { Transactions } from './modules/transactions/transactions/transactions';
 
 export const routes: Routes = [
   // ==========================================================
@@ -38,6 +39,10 @@ export const routes: Routes = [
         component: MasterList,
       },
       {
+        path: 'transactions',
+        component: Transactions,
+      },
+      {
         path: 'admin/roles',
         loadComponent: () =>
           import('./modules/organization/components/role-management/role-management').then(
@@ -50,7 +55,6 @@ export const routes: Routes = [
           import('./modules/branch/branch.routes').then((m) => m.BRANCH_ROUTES),
       },
 
-      // --- CORE MODULES ---
       {
         path: 'customer',
         loadChildren: () =>
@@ -66,7 +70,6 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./modules/product/product.routes').then((m) => m.PRODUCT_ROUTES),
       },
-
       // --- FINANCIALS ---
       {
         path: 'invoices',

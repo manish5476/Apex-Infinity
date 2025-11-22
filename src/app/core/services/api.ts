@@ -94,6 +94,18 @@ export class ApiService extends BaseApiService {
   getAllNotifications(): Observable<LoginResponse> {
     return this.get<LoginResponse>('/v1/notifications/my-notifications', {}, 'getAllNotifications');
   }
+  // ======================== AUTH EXTRA ROUTES ========================
+
+// Refresh JWT Token
+refreshToken(): Observable<any> {
+  return this.post('/v1/auth/refresh-token', {}, 'refreshToken');
+}
+
+// Verify Token Validity (useful on app load)
+verifyToken(): Observable<any> {
+  return this.get('/v1/auth/verify-token', {}, 'verifyToken');
+}
+
 
   // ======================== USER ========================
 

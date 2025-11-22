@@ -71,6 +71,9 @@ export class Mainscreensidebar implements OnInit {
           { label: 'Roles', icon: 'pi pi-lock', routerLink: ['/admin/roles'] },
           { label: 'Branches', icon: 'pi pi-building', routerLink: ['/branches'] }, // List
           { label: 'Add Branch', icon: 'pi pi-plus', routerLink: ['/branches/create'] },
+          { label: 'transactions', icon: 'pi pi-plus', routerLink: ['/transactions'] },
+          { label: 'transcustomer transactionsactions', icon: 'pi pi-plus', routerLink: ['/customertransactions'] },
+          { label: 'supplier transactions', icon: 'pi pi-plus', routerLink: ['/suppliertransactions'] },
         ]
       },
       {
