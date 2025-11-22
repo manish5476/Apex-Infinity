@@ -192,10 +192,8 @@ export class ProductFormComponent implements OnInit {
     const payload = {
       ...rawValue,
       tags: rawValue.tags
-      // tags: rawValue.tags.split(',').map((t: string) => t.trim()).filter((t: string) => t)
     };
 
-    // Determine if creating or updating
     const saveObservable = this.editMode()
       ? this.productService.updateProduct(this.productId!, payload)
       : this.productService.createProduct(payload);
@@ -205,7 +203,6 @@ export class ProductFormComponent implements OnInit {
     ).subscribe({
       next: (res) => {
         this.messageService.showSuccess('Success', `Product ${this.editMode() ? 'updated' : 'created'} successfully.`);
-        // Navigate to the details page of the saved product
         this.router.navigate(['/products', res.data._id]);
       },
       error: (err) => {

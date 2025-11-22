@@ -22,7 +22,7 @@
 
 .customer-container {
   width: 100%;
-  max-width: 1600px;
+  max-width: 100%;
 }
 
 /* === Form Panel === */
@@ -322,6 +322,42 @@
      }
   }
 }
+
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    background: var(--bg-secondary);
+    border-radius: var(--ui-border-radius);
+    overflow: hidden;
+
+    th, td {
+        padding: .75rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border-primary);
+        vertical-align: middle;
+    }
+
+    th {
+        background: var(--bg-ternary);
+        font-size: var(--font-size-xs);
+        text-transform: uppercase;
+        color: var(--text-label);
+        font-weight: 600;
+        white-space: nowrap;
+    }
+}
+
+.col-product {
+    min-width: 250px;
+}
+
+:host ::ng-deep {
+    .p-select, .p-inputnumber, .p-inputtext {
+        width: 100%;
+    }
+}
+
 
 // /* Use the full-width form layout */
 // :host {

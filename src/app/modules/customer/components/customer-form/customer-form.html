@@ -66,6 +66,76 @@
       </section>
 
       <section class="form-section">
+  <h4 class="section-title">Address Details</h4>
+
+  <div class="address-grid">
+
+    <!-- Billing Address -->
+    <div class="address-card" formGroupName="billingAddress">
+      <h5>Billing Address</h5>
+
+      <div class="form-field">
+        <label>Street</label>
+        <input pInputText formControlName="street" />
+      </div>
+
+      <div class="form-field">
+        <label>City</label>
+        <input pInputText formControlName="city" />
+      </div>
+
+      <div class="form-field">
+        <label>State</label>
+        <input pInputText formControlName="state" />
+      </div>
+
+      <div class="form-field">
+        <label>Zip Code</label>
+        <input pInputText formControlName="zipCode" />
+      </div>
+    </div>
+
+    <!-- Shipping Address -->
+    <div class="address-card" formGroupName="shippingAddress">
+
+      <div class="address-header">
+        <h5>Shipping Address</h5>
+
+        <div class="copy-address">
+          <p-checkbox 
+            label="Same as Billing"
+            binary="true"
+            (onChange)="copyBillingAddress($event)">
+          </p-checkbox>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label>Street</label>
+        <input pInputText formControlName="street" />
+      </div>
+
+      <div class="form-field">
+        <label>City</label>
+        <input pInputText formControlName="city" />
+      </div>
+
+      <div class="form-field">
+        <label>State</label>
+        <input pInputText formControlName="state" />
+      </div>
+
+      <div class="form-field">
+        <label>Zip Code</label>
+        <input pInputText formControlName="zipCode" />
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+      <!-- <section class="form-section">
         <h4 class="section-title">Address Details</h4>
         <div class="address-grid">
           
@@ -115,7 +185,7 @@
           </div>
 
         </div>
-      </section>
+      </section> -->
 
       <section class="form-section">
         <h4 class="section-title">Financials & Other Details</h4>

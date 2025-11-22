@@ -113,7 +113,7 @@ export class MasterListService {
     }
 
     this.api.getSpecificList(type).subscribe({
-      next: (res) => {
+      next: (res:any) => {
         if (res?.data) {
           const currentData = this._data() || {} as MasterList;
           // Patch the specific array in the signal
@@ -121,7 +121,7 @@ export class MasterListService {
           this.updateState(updatedData);
         }
       },
-      error: (err) => console.error(`Failed to refresh ${type}`, err)
+      error: (err:any) => console.error(`Failed to refresh ${type}`, err)
     });
   }
 
