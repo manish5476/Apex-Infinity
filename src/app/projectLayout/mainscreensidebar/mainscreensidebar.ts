@@ -62,6 +62,7 @@ export class Mainscreensidebar implements OnInit {
       label: 'Dashboard', icon: 'pi pi-home',
       items: [
         { label: 'Overview', icon: 'pi pi-chart-bar', routerLink: ['/dashboard'] },
+        { label: 'Notes', icon: 'pi pi-chart-bar', routerLink: ['/notes'] },
         { label: 'organization setting', icon: 'pi pi-cog', routerLink: ['/admin/organization'] } // Added cog icon for clarity
       ]
     },
@@ -69,9 +70,7 @@ export class Mainscreensidebar implements OnInit {
     {
       label: 'Financials', icon: 'pi pi-file-excel',
       items: [
-        { label: 'P&L Statement', icon: 'pi pi-chart-line', routerLink: ['/financials/statements/pl'] },
-        // { label: 'Balance Sheet', icon: 'pi pi-balance-scale', routerLink: ['/financials/statements/balance-sheet'] },
-        // { label: 'Trial Balance', icon: 'pi pi-table', routerLink: ['/financials/statements/trial-balance'] },
+        { label: 'P&L Statement', icon: 'pi pi-chart-line', routerLink: ['/financials'] },
       ]
     },
     // -----------------------------------------------------

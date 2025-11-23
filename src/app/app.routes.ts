@@ -4,6 +4,7 @@ import { authGuard } from './core/guards/authguard.guard';
 import { MasterList } from './modules/shared/components/master-list/master-list';
 import { Transactions } from './modules/transactions/transactions/transactions';
 import { LedgerComponent } from './modules/Ledger/ledger/ledger';
+import { NotesPageComponent } from './modules/dashboard/components/notes-page.component';
 
 export const routes: Routes = [
   // ==========================================================
@@ -34,18 +35,23 @@ export const routes: Routes = [
             (m) => m.AdminDashboardComponent
           ),
       },
+      {
+    path: 'notes',
+    component: NotesPageComponent,
+    title: 'My Notes'
+  },
 {
   path: 'financials',
-  component: MainScreen, // Or whichever wrapper component you use
-  canActivate: [authGuard],
-  children: [
-    { path: '', redirectTo: 'statements/pl', pathMatch: 'full' },
-    {
-      path: 'statements', // Main wrapper route
-      component: LedgerComponent, 
-    },
-    // ... ledgers, etc.
-  ]
+  component: LedgerComponent, // Or whichever wrapper component you use
+  // canActivate: [authGuard],
+  // children: [
+  //   { path: '', redirectTo: 'statements/pl', pathMatch: 'full' },
+  //   {
+  //     path: 'statements', // Main wrapper route
+  //     component: LedgerComponent, 
+  //   },
+  //   // ... ledgers, etc.
+  // ]
 },
       // --- ORGANIZATION & ADMIN SETTINGS (New) ---
       {

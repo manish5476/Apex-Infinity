@@ -17,7 +17,6 @@ import { ScrollPanelModule } from 'primeng/scrollpanel'; // For the main scrolla
 import { DialogModule } from 'primeng/dialog';
 import { finalize } from 'rxjs';
 import { NoteService } from '../../../../core/services/notes.service';
-import { NotesManagerComponent } from '../../../shared/components/notes-manager/notes-manager.component';
 import { PopoverModule } from 'primeng/popover';
 // --- Interfaces for Note/Event Blocks ---
 export interface TimelineNote {
@@ -40,7 +39,6 @@ export interface TimelineNote {
     ButtonModule, 
     PopoverModule, 
     ScrollPanelModule, 
-    NotesManagerComponent,
     DialogModule
   ],
   templateUrl: './schedule-planner.html',

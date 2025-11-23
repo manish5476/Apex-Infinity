@@ -26,7 +26,7 @@ import { NotificationCalendarComponent } from "../notification-calendar/notifica
     SkeletonModule,
     TagModule,
     TooltipModule,
-    NotificationCalendarComponent
+    // NotificationCalendarComponent
 ],
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.scss'

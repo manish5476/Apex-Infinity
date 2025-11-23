@@ -18,8 +18,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BadgeModule } from 'primeng/badge';
 import { NoteService } from '../../../../core/services/notes.service';
 import { NotificationService } from '../../../../core/services/notification.service';
-import { NotesManagerComponent } from '../../../shared/components/notes-manager/notes-manager.component';
-import { NotesTimelineComponent } from '../notes-timeline/notes-timeline';
+// import { NotesTimelineComponent } from '../notes-timeline/notes-timeline';
 import { TabsModule } from 'primeng/tabs';
 
 // ... existing interfaces ... (HeatmapDay, DailySummary, CalendarDay)
@@ -42,8 +41,8 @@ interface CalendarDay {
   imports: [
     CommonModule,
     DatePipe, // Ensure DatePipe is available
-    NotesManagerComponent,
-    NotesTimelineComponent, // 🆕 Add NotesTimelineComponent
+    // NotesManagerComponent,
+    // // NotesTimelineComponent, // 🆕 Add NotesTimelineComponent
     ProgressSpinnerModule,
     TabsModule,
     BadgeModule,
