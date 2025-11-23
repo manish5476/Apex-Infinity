@@ -3,6 +3,169 @@
 <div class="customer-wrapper">
   <section class="customer-container">
     
+    <div class="customer-form-panel animate-fadeIn">
+      <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()" class="customer-form-layout">
+
+        <div class="customer-form-header">
+          <h1 class="form-title">{{ formTitle() }}</h1>
+          <p class="form-subtitle">All fields marked with <span class="req">*</span> are required.</p>
+        </div>
+
+        <div class="customer-form-body">
+
+          <section class="form-section">
+            <h4 class="section-title">Core Details</h4>
+            <div class="form-grid-4">
+              <div class="form-group">
+                <label>Payment Type <span class="req">*</span></label>
+                <p-select appendTo="body" formControlName="type" [options]="typeOptions" placeholder="Select Type"></p-select>
+              </div>
+              
+              <div class="form-group">
+                <label>Amount <span class="req">*</span></label>
+                <p-inputNumber formControlName="amount" mode="currency" currency="INR" locale="en-IN" [minFractionDigits]="2" placeholder="₹ 0.00"></p-inputNumber>
+              </div>
+
+              <div class="form-group">
+                <label>Payment Date <span class="req">*</span></label>
+                <p-datepicker formControlName="paymentDate" [showIcon]="true" dateFormat="dd/mm/yy" appendTo="body"></p-datepicker>
+              </div>
+              
+              <div class="form-group">
+                <label>Payment Method <span class="req">*</span></label>
+                <p-select appendTo="body" formControlName="paymentMethod" [options]="paymentMethodOptions" placeholder="Select Method"></p-select>
+              </div>
+            </div>
+          </section>
+          
+          <section class="form-section">
+            <h4 class="section-title">Party Details</h4>
+            <div class="form-grid-4">
+              
+              @if (paymentForm.get('type')?.value === 'inflow') {
+                <div class="form-group">
+                  <label>Customer <span class="req">*</span></label>
+                  <p-select appendTo="body" 
+                    formControlName="customerId" 
+                    [options]="customerOptions()" 
+                    optionLabel="name" 
+                    optionValue="_id"
+                    [filter]="true" filterBy="name"
+                    [showClear]="true"
+                    placeholder="Select Customer">
+                  </p-select>
+                </div>
+                <div class="form-group">
+                  <label>Invoice (Optional)</label>
+                  <p-select appendTo="body" 
+                    formControlName="invoiceId" 
+                    [options]="invoiceOptions()" 
+                    optionLabel="invoiceNumber" 
+                    optionValue="_id"
+                    [filter]="true" filterBy="invoiceNumber"
+                    [showClear]="true"
+                    placeholder="Link to Invoice">
+                  </p-select>
+                </div>
+              }
+
+              @if (paymentForm.get('type')?.value === 'outflow') {
+                <div class="form-group">
+                  <label>Supplier <span class="req">*</span></label>
+                  <p-select appendTo="body" 
+                    formControlName="supplierId" 
+                    [options]="supplierOptions()" 
+                    optionLabel="name" 
+                    optionValue="_id"
+                    [filter]="true" filterBy="name"
+                    [showClear]="true"
+                    placeholder="Select Supplier">
+                  </p-select>
+                </div>
+                <div class="form-group">
+                  <label>Purchase (Optional)</label>
+                   <p-select appendTo="body" 
+                    formControlName="purchaseId" 
+                    [options]="purchaseOptions()" 
+                    optionLabel="purchaseNumber" 
+                    optionValue="_id"
+                    [filter]="true" filterBy="purchaseNumber"
+                    [showClear]="true"
+                    placeholder="Link to Purchase">
+                  </p-select>
+                </div>
+              }
+
+            </div>
+          </section>
+          
+          <section class="form-section">
+            <h4 class="section-title">Additional Details</h4>
+            <div class="form-grid-4">
+              <div class="form-group">
+                <label>Reference #</label>
+                <input pInputText formControlName="referenceNumber" placeholder="e.g., Cheque No., TXN ID" />
+              </div>
+              
+              <div class="form-group">
+                <label>Transaction ID</label>
+                <input pInputText formControlName="transactionId" placeholder="Bank TXN ID" />
+              </div>
+
+              <div class="form-group">
+                <label>Bank Name</label>
+                <input pInputText formControlName="bankName" placeholder="Issuing Bank" />
+              </div>
+
+              <div class="form-group">
+                <label>Status</label>
+                <p-select appendTo="body" formControlName="status" [options]="statusOptions" placeholder="Status"></p-select>
+              </div>
+              
+              <div class="form-group col-span-2">
+                <label>Branch</label>
+                <p-select appendTo="body" 
+                  formControlName="branchId" 
+                  [options]="branchOptions()" 
+                  optionLabel="name" 
+                  optionValue="_id"
+                  [filter]="true" filterBy="name"
+                  [showClear]="true"
+                  placeholder="Select Branch">
+                </p-select>
+              </div>
+            </div>
+            
+            <div class="form-group mt-4">
+              <label>Remarks</label>
+              <textarea pInputTextarea formControlName="remarks" rows="3" [autoResize]="true" placeholder="Add any notes for this payment..."></textarea>
+            </div>
+          </section>
+
+        </div>
+
+        <div class="customer-form-footer">
+          <div class="form-actions flex gap-2">
+            <p-button label="Cancel" styleClass="p-button-text p-button-secondary" routerLink="/payments"></p-button>
+            <p-button 
+              [label]="editMode() ? 'Save Changes' : 'Record Payment'" 
+              icon="pi pi-check" 
+              type="submit" 
+              [loading]="isSubmitting()"
+              [disabled]="paymentForm.invalid || isSubmitting()">
+            </p-button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </section>
+</div>
+<!-- <p-toast></p-toast> 
+
+<div class="customer-wrapper">
+  <section class="customer-container">
+    
     <div class="customer-form-panel">
       <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()" class="customer-form-layout">
 
@@ -153,4 +316,4 @@
       </form>
     </div>
   </section>
-</div>
+</div> -->

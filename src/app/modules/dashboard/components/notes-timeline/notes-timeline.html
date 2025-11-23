@@ -1,0 +1,56 @@
+<div class="timeline-wrapper">
+  <div class="timeline-header">
+    <div class="month-navigator">
+      <button pButton icon="pi pi-chevron-left" class="p-button-text p-button-rounded p-button-sm nav-btn" 
+              (click)="changeMonth(-1)"></button>
+      
+      <span class="current-month">{{ currentMonthName }}</span>
+      
+      <button pButton icon="pi pi-chevron-right" class="p-button-text p-button-rounded p-button-sm nav-btn" 
+              (click)="changeMonth(1)"></button>
+    </div>
+
+    <button pButton label="Today" class="p-button-text p-button-sm today-btn" 
+            (click)="jumpToToday()" *ngIf="!isCurrentMonth()"></button>
+  </div>
+
+  <div class="timeline-strip" #scrollContainer>
+    
+    @if (isLoading) {
+      <div class="day-card-skeleton-wrapper">
+        @for (i of [1,2,3,4,5,6,7,8,9,10]; track i) {
+          <div class="day-card-skeleton">
+            <p-skeleton width="30px" height="10px" styleClass="mb-2"></p-skeleton>
+            <p-skeleton width="20px" height="20px"></p-skeleton>
+          </div>
+        }
+      </div>
+    } @else {
+      @for (day of timelineDays; track day.date) {
+        <div 
+          class="day-card" 
+          [class.active]="isSelected(day)"
+          [class.has-notes]="day.count > 0"
+          [class.today]="isToday(day)"
+          (click)="selectDate(day.date)"
+          [pTooltip]="getTooltipText(day)" 
+          tooltipPosition="top">
+          
+          <span class="day-name">{{ day.dayName }}</span>
+          <span class="day-num">{{ day.dayNum }}</span>
+
+          <div class="activity-bar">
+             @if (day.count > 0) {
+                @for (i of getDotArray(day.count); track i) {
+                  <div class="note-pill"></div>
+                }
+                @if (day.count > 3) {
+                   <div class="note-pill-overflow">+</div>
+                }
+             }
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>

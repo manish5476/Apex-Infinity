@@ -1,113 +1,111 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
 import { BaseApiService } from './base-api.service';
-import { HttpErrorResponse } from '@angular/common/http';
-
-export interface NoteFilterParams {
-  date?: string;  // 'YYYY-MM-DD'
-  week?: string;  // 'YYYY-MM-DD'
-  month?: number; // 1–12
-  year?: number;  // YYYY
-}
+import { Note, NoteFilterParams, DailyNoteCount, NoteAttachment } from '../models/note.types';
 
 @Injectable({ providedIn: 'root' })
 export class NoteService extends BaseApiService {
+  // Only define the sub-path here. BaseApiService handles environment.apiUrl
   private endpoint = '/v1/notes';
 
-  /**
-   * 🔹 Fetch notes for a specific time period
-   */
-  getNotes(filterParams: NoteFilterParams): Observable<any> {
-    return this.http
-      .get<any>(`${this.baseUrl}${this.endpoint}`, {
-        params: this.createHttpParams(filterParams),
-      })
-      .pipe(
-        catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getNotes', error)
-        )
-      );
+  // --- 1. GET FILTERED NOTES ---
+  getNotes(filterParams: NoteFilterParams): Observable<{ data: { notes: Note[] } }> {
+    // Your BaseApiService automatically converts filterParams object to HttpParams
+    return this.get(this.endpoint, filterParams, 'getNotes');
   }
 
-  /**
-   * 🔹 Fetch all note days for a given month (calendar summary)
-   * Example: /api/v1/notes/calendar-summary?year=2025&month=11
-   */
-  getNotesForMonth(year: number, month: number): Observable<any> {
-    return this.http
-      .get<any>(`${this.baseUrl}${this.endpoint}/calendar-summary`, {
-        params: this.createHttpParams({ year, month }),
-      })
-      .pipe(
-        catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getNotesForMonth', error)
-        )
-      );
+  // --- 2. GET TIMELINE STATS ---
+  // Returns the array of { day: 5, count: 2 } for the calendar strip
+  getDailyNoteCounts(year: number, month: number): Observable<{ data: DailyNoteCount[] }> {
+    return this.get(`${this.endpoint}/daily-count`, { year, month }, 'getDailyNoteCounts');
   }
 
-  /**
-   * 🔹 Fetch one note by ID
-   */
-  getNoteById(id: string): Observable<any> {
-    return this.http
-      .get<any>(`${this.baseUrl}${this.endpoint}/${id}`)
-      .pipe(
-        catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getNoteById', error)
-        )
-      );
+  // --- 3. GET SINGLE NOTE ---
+  getNoteById(id: string): Observable<{ data: { note: Note } }> {
+    return this.get(`${this.endpoint}/${id}`, {}, 'getNoteById');
   }
 
-  /**
-   * 🔹 Create a new note
-   */
-  createNote(data: any): Observable<any> {
-    return this.http
-      .post<any>(`${this.baseUrl}${this.endpoint}`, data)
-      .pipe(
-        catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('createNote', error)
-        )
-      );
+  // --- 4. CREATE NOTE (Step 2 of flow) ---
+  createNote(data: Partial<Note>): Observable<{ data: { note: Note } }> {
+    return this.post(this.endpoint, data, 'createNote');
   }
 
-  /**
-   * 🔹 Update an existing note
-   */
-  updateNote(id: string, data: any): Observable<any> {
-    return this.http
-      .patch<any>(`${this.baseUrl}${this.endpoint}/${id}`, data)
-      .pipe(
-        catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('updateNote', error)
-        )
-      );
+  // --- 5. UPDATE NOTE ---
+  updateNote(id: string, data: Partial<Note>): Observable<{ data: { note: Note } }> {
+    return this.patch(`${this.endpoint}/${id}`, data, 'updateNote');
   }
 
-  /**
-   * 🔹 Delete a note
-   */
-  deleteNote(id: string): Observable<any> {
-    return this.http
-      .delete<any>(`${this.baseUrl}${this.endpoint}/${id}`)
-      .pipe(
-        catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('deleteNote', error)
-        )
-      );
+  // --- 6. DELETE NOTE ---
+  deleteNote(id: string): Observable<void> {
+    return this.delete(`${this.endpoint}/${id}`, 'deleteNote');
   }
 
-  /**
-   * 🔹 Optional helper – fetch login summary from notifications
-   */
-  getLoginSummary(): Observable<any> {
-    return this.http
-      .get<any>(`${this.baseUrl}/v1/notifications/login-summary`)
-      .pipe(
-        catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getLoginSummary', error)
-        )
-      );
+  // --- 7. UPLOAD MEDIA (Step 1 of flow) ---
+  // This bypasses the generic 'post' JSON behavior because we need FormData
+  uploadMedia(files: File[]): Observable<{ data: NoteAttachment[] }> {
+    const formData = new FormData();
+    files.forEach(file => {
+      // 'files' must match the backend multer.array('files')
+      formData.append('files', file);
+    });
+
+    // Note: We call this.http.post directly or ensure BaseApiService.post supports FormData.
+    // Since BaseApiService.post takes 'any' as data, Angular's HttpClient will detect FormData 
+    // and set the correct multipart headers automatically.
+    return this.post(`${this.endpoint}/upload-media`, formData, 'uploadMedia');
   }
 }
+
+// import { Injectable } from '@angular/core';
+// import { Observable } from 'rxjs';
+// import { BaseApiService } from './base-api.service';
+
+// export interface NoteFilterParams {
+//   date?: string;
+//   week?: string;
+//   month?: number;
+//   year?: number;
+// }
+
+// export interface DailyNoteCount {
+//   day: number;
+//   count: number;
+// }
+
+// @Injectable({ providedIn: 'root' })
+// export class NoteService extends BaseApiService {
+//   private endpoint = '/v1/notes';
+
+//   // --- EXISTING METHODS ---
+//   getNotes(filterParams: NoteFilterParams): Observable<any> {
+//     return this.get(this.endpoint, filterParams, 'getNotes');
+//   }
+
+//   getDailyNoteCounts(year: number, month: number): Observable<DailyNoteCount[]> {
+//     return this.get(`${this.endpoint}/daily-count`, { year, month }, 'getDailyNoteCounts');
+//   }
+
+//   getNoteById(id: string): Observable<any> {
+//     return this.get(`${this.endpoint}/${id}`, {}, 'getNoteById');
+//   }
+
+//   createNote(data: any): Observable<any> {
+//     return this.post(this.endpoint, data, 'createNote');
+//   }
+
+//   updateNote(id: string, data: any): Observable<any> {
+//     return this.patch(`${this.endpoint}/${id}`, data, 'updateNote');
+//   }
+
+//   deleteNote(id: string): Observable<any> {
+//     return this.delete(`${this.endpoint}/${id}`, 'deleteNote');
+//   }
+
+//   uploadMedia(files: File[]): Observable<any> {
+//     const formData = new FormData();
+//         files.forEach(file => {
+//       formData.append('files', file);
+//     });
+//     return this.post(`${this.endpoint}/upload-media`, formData, 'uploadMedia');
+//   }
+// }

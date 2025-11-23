@@ -1,28 +1,29 @@
-<p-toast></p-toast> 
+<p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
 
-<!-- REFACTORED: Using consistent page container -->
 <div class="invoice-page-container">
-  <div class="themed-card invoice-details-card" *ngIf="invoice(); else loadingOrError">
 
-    <!-- === HEADER === -->
+  @if (invoice(); as inv) {
+  <div class="themed-card invoice-details-card animate-fadeIn">
+
     <div class="details-header">
-      <!-- Left Side -->
       <div class="flex flex-col gap-2">
         <div class="flex items-center gap-4">
-          <p-button icon="pi pi-arrow-left" styleClass="p-button-text p-button-rounded" routerLink="/invoices">
-          </p-button>
-          <h2 class="form-title m-0">Invoice {{ invoice()?.invoiceNumber }}</h2>
+          <p-button icon="pi pi-arrow-left" styleClass="p-button-text p-button-rounded"
+            routerLink="/invoices"></p-button>
+          <h2 class="form-title m-0">Invoice {{ inv.invoiceNumber }}</h2>
         </div>
         <div class="flex items-center gap-2 pl-14">
-          <p-tag [value]="invoice()?.status | titlecase" [severity]="getSeverity(invoice()?.status ?? '')"></p-tag>
+          <!-- Use mapStatusToSeverity for both tags -->
+          <p-tag [value]="inv.status | titlecase" [severity]="common.mapStatusToSeverity(inv.status ?? '')">
+          </p-tag>
 
-          <p-tag [value]="invoice()?.paymentStatus | titlecase"
-            [severity]="getSeverity(invoice()?.paymentStatus || '')"></p-tag>
+          <p-tag [value]="inv.paymentStatus | titlecase"
+            [severity]="common.mapStatusToSeverity(inv.paymentStatus || '')">
+          </p-tag>
         </div>
       </div>
 
-      <!-- Right Side: Actions -->
       <div class="header-actions">
         <p-button label="Email" icon="pi pi-send" styleClass="p-button-text" [loading]="isProcessing()"
           (onClick)="onEmail()" pTooltip="Email PDF to customer">
@@ -31,7 +32,7 @@
           (onClick)="onDownload()" pTooltip="Download as PDF">
         </p-button>
         <p-button label="Edit" icon="pi pi-pencil" styleClass="p-button-outlined"
-          [routerLink]="['/invoices', invoice()?._id, 'edit']">
+          [routerLink]="['/invoices', inv._id, 'edit']">
         </p-button>
         <p-button icon="pi pi-trash" styleClass="p-button-danger p-button-outlined" (onClick)="onDelete()"
           pTooltip="Delete Invoice">
@@ -40,48 +41,45 @@
     </div>
     <p-divider></p-divider>
 
-    <!-- === BODY === -->
     <div class="invoice-body">
 
-      <!-- Billing Info -->
       <section class="billing-info-grid">
         <div class="info-card">
           <label>Billed To</label>
-          <span class="font-bold text-lg">{{ invoice()?.customer?.name || 'N/A' }}</span>
-          <span>{{ invoice()?.customer?.email || '' }}</span>
-          <span>{{ invoice()?.customer?.phone || '' }}</span>
-          <p class="address-text">{{ invoice()?.billingAddress || 'No billing address on file.' }}</p>
+          <span class="font-bold text-lg">{{ inv.customer?.name || 'N/A' }}</span>
+          <span>{{ inv.customer?.email || '' }}</span>
+          <span>{{ inv.customer?.phone || '' }}</span>
+          <p class="address-text">{{ inv.billingAddress || 'No billing address on file.' }}</p>
         </div>
 
         <div class="info-card">
           <label>Ship To</label>
-          <p class="address-text">{{ invoice()?.shippingAddress || 'No shipping address on file.' }}</p>
+          <p class="address-text">{{ inv.shippingAddress || 'No shipping address on file.' }}</p>
         </div>
 
         <div class="info-card-grid">
           <div class="detail-field">
             <label>Invoice Number</label>
-            <span>{{ invoice()?.invoiceNumber }}</span>
+            <span>{{ inv.invoiceNumber }}</span>
           </div>
           <div class="detail-field">
             <label>Invoice Date</label>
-            <span>{{ formatDate(invoice()?.invoiceDate) }}</span>
+            <span>{{ common.formatDate(inv.invoiceDate,'dd MMM yyyy') }}</span>
           </div>
           <div class="detail-field">
             <label>Due Date</label>
-            <span>{{ formatDate(invoice()?.dueDate) }}</span>
+            <span>{{ common.formatDate(inv.dueDate,'dd MMM yyyy') }}</span>
           </div>
           <div class="detail-field">
             <label>Paid Amount</label>
-            <span>{{ formatCurrency(invoice()?.paidAmount) }}</span>
+            <span>{{ common.formatCurrency(inv.paidAmount) }}</span>
           </div>
         </div>
       </section>
 
-      <!-- Items Table -->
       <section class="detail-section">
         <h4 class="section-title">Invoice Items</h4>
-        <p-table [value]="invoice()?.items || []" styleClass="p-table-striped">
+        <p-table [value]="inv.items || []" styleClass="p-table-striped">
           <ng-template pTemplate="header">
             <tr>
               <th>Item</th>
@@ -96,82 +94,80 @@
             <tr>
               <td>
                 <div class="font-bold">{{ item.name }}</div>
-                <div class="text-xs text-[var(--text-label)]" *ngIf="item.hsnCode">
+                @if (item.hsnCode) {
+                <div class="text-xs text-[var(--text-label)]">
                   HSN: {{ item.hsnCode }}
                 </div>
+                }
               </td>
               <td class="text-right">{{ item.quantity }} {{ item.unit }}</td>
-              <td class="text-right">{{ formatCurrency(item.price) }}</td>
-              <td class="text-right">{{ formatCurrency(item.discount) }}</td>
+              <td class="text-right">{{ common.formatCurrency(item.price) }}</td>
+              <td class="text-right">{{ common.formatCurrency(item.discount) }}</td>
               <td class="text-right">{{ item.taxRate }}%</td>
               <td class="text-right font-bold">
-                {{ formatCurrency((item.price * item.quantity) - item.discount + ((item.taxRate / 100) * (item.price *
-                item.quantity - item.discount))) }}
+                {{ common.formatCurrency(item.totalAmount) }}
               </td>
             </tr>
           </ng-template>
         </p-table>
       </section>
 
-      <!-- Totals & Notes -->
       <section class="totals-notes-grid">
         <div class="notes-card">
           <label>Notes</label>
-          <p>{{ invoice()?.notes || 'No notes provided.' }}</p>
+          <p>{{ inv.notes || 'No notes provided.' }}</p>
         </div>
 
         <div class="totals-card">
           <div class="total-row">
             <label>Subtotal</label>
-            <span>{{ formatCurrency(invoice()?.subTotal) }}</span>
+            <span>{{ common.formatCurrency(inv.subTotal) }}</span>
           </div>
           <div class="total-row">
             <label>Total Discount</label>
-            <span>- {{ formatCurrency(invoice()?.totalDiscount) }}</span>
+            <span>- {{ common.formatCurrency(inv.totalDiscount) }}</span>
           </div>
           <div class="total-row">
             <label>Total Tax</label>
-            <span>+ {{ formatCurrency(invoice()?.totalTax) }}</span>
+            <span>+ {{ common.formatCurrency(inv.totalTax) }}</span>
           </div>
-          <div class="total-row" *ngIf="invoice()?.roundOff">
+          @if (inv.roundOff) {
+          <div class="total-row">
             <label>Round Off</label>
-            <span>{{ formatCurrency(invoice()?.roundOff) }}</span>
+            <span>{{ common.formatCurrency(inv.roundOff) }}</span>
           </div>
+          }
           <p-divider></p-divider>
           <div class="total-row grand-total">
             <label>Grand Total</label>
-            <span>{{ formatCurrency(invoice()?.grandTotal) }}</span>
+            <span>{{ common.formatCurrency(inv.grandTotal) }}</span>
           </div>
           <div class="total-row">
             <label>Amount Paid</label>
-            <span>- {{ formatCurrency(invoice()?.paidAmount) }}</span>
+            <span>- {{ common.formatCurrency(inv.paidAmount) }}</span>
           </div>
           <div class="total-row balance-due">
             <label>Balance Due</label>
-            <span>{{ formatCurrency(invoice()?.balanceAmount) }}</span>
+            <span>{{ common.formatCurrency(inv.balanceAmount) }}</span>
           </div>
         </div>
       </section>
 
     </div>
   </div>
-</div>
-
-<ng-template #loadingOrError>
+  } @else {
   <div class="themed-card invoice-details-card">
-     <div class="details-header">
-        <div class="header-left">
-           <p-button 
-            icon="pi pi-arrow-left" 
-            styleClass="p-button-text p-button-rounded"
-            routerLink="/invoices">
-          </p-button>
-           <h2 class="form-title">Loading...</h2>
-        </div>
-     </div>
-     <p-divider></p-divider>
-     <div class->
-        <p>Loading invoice details or invoice not found.</p>
-     </div>
+    <div class="details-header">
+      <div class="header-left">
+        <p-button icon="pi pi-arrow-left" styleClass="p-button-text p-button-rounded" routerLink="/invoices">
+        </p-button>
+        <h2 class="form-title">Loading...</h2>
+      </div>
+    </div>
+    <p-divider></p-divider>
+    <div class="details-body">
+      <p>Loading invoice details or invoice not found.</p>
+    </div>
   </div>
-</ng-template>
+  }
+</div>

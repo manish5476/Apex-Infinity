@@ -24,7 +24,7 @@
       <!-- Type -->
       <div class="se-filter-field">
         <label for="type">Payment Type</label>
-        <p-select  appendTo="body" id="type" [options]="typeOptions" [(ngModel)]="paymentFilter.type" [showClear]="true"
+        <p-select  (onChange)="applyFilters()"  appendTo="body" id="type" [options]="typeOptions" [(ngModel)]="paymentFilter.type" [showClear]="true"
           placeholder="Inflow / Outflow" appendTo="body">
         </p-select>
       </div>
@@ -32,7 +32,7 @@
       <!-- Customer -->
       <div class="se-filter-field">
         <label for="customer">Customer</label>
-        <p-select  appendTo="body" id="customer" [options]="customerOptions()" [(ngModel)]="paymentFilter.customerId" [filter]="true"
+        <p-select  (onChange)="applyFilters()"  appendTo="body" id="customer" [options]="customerOptions()" [(ngModel)]="paymentFilter.customerId" [filter]="true"
           filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select Customer"
           appendTo="body">
         </p-select>
@@ -41,7 +41,7 @@
       <!-- Supplier -->
       <div class="se-filter-field">
         <label for="supplier">Supplier</label>
-        <p-select  appendTo="body" id="supplier" [options]="supplierOptions()" [(ngModel)]="paymentFilter.supplierId" [filter]="true"
+        <p-select  (onChange)="applyFilters()"  appendTo="body" id="supplier" [options]="supplierOptions()" [(ngModel)]="paymentFilter.supplierId" [filter]="true"
           filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select Supplier"
           appendTo="body">
         </p-select>
@@ -50,7 +50,7 @@
       <!-- Payment Method -->
       <div class="se-filter-field">
         <label for="paymentMethod">Payment Method</label>
-        <p-select  appendTo="body" id="paymentMethod" [options]="paymentMethodOptions" [(ngModel)]="paymentFilter.paymentMethod"
+        <p-select  (onChange)="applyFilters()"  appendTo="body" id="paymentMethod" [options]="paymentMethodOptions" [(ngModel)]="paymentFilter.paymentMethod"
           [showClear]="true" placeholder="Select Method" appendTo="body">
         </p-select>
       </div>
@@ -58,15 +58,15 @@
       <!-- Status -->
       <div class="se-filter-field">
         <label for="status">Status</label>
-        <p-select  appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="paymentFilter.status" [showClear]="true"
+        <p-select  (onChange)="applyFilters()"  appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="paymentFilter.status" [showClear]="true"
           placeholder="Select Status" appendTo="body">
         </p-select>
       </div>
 
       <!-- Actions -->
       <div class="se-filter-actions">
-        <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()">
-        </p-button>
+        <!-- <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()">
+        </p-button> -->
         <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined"
           (onClick)="resetFilters()">
         </p-button>

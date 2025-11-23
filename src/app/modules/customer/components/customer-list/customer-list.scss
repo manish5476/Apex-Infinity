@@ -150,3 +150,32 @@
     }
   }
 }
+/* ==============================================
+   REPLACE .list-grid-area WITH THESE STYLES
+   ============================================== */
+
+/* === UNIFIED CONTENT CARD === */
+/* This class is on the themed-card */
+.list-content-area {
+  flex-grow: 1; /* This MAKES THE CARD fill the remaining height */
+  min-height: 0; /* Crucial for flex-grow to work */
+  
+  /* We use flex-column to stack the filters ON TOP of the grid */
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg); /* This creates space between filters and grid */
+  
+  /* The padding is already on .themed-card, so we're good */
+}
+
+/* === GRID WRAPPER === */
+/* This wrapper ensures the grid component fills the space INSIDE the card */
+.list-grid-wrapper {
+  flex-grow: 1; /* This MAKES THE GRID fill the remaining space */
+  min-height: 0; /* Crucial again */
+
+  app-shared-grid {
+    height: 100%;
+    width: 100%;
+  }
+}

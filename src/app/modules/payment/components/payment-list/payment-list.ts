@@ -162,7 +162,7 @@ export class PaymentListComponent implements OnInit {
   }
 
   eventFromGrid(event: any) {
-    if (event.eventType === 'onRowClicked') {
+    if (event.eventType === 'RowSelectedEvent') {
       const paymentId = event.event.data._id;
       if (paymentId) {
         this.router.navigate([paymentId], { relativeTo: this.route });

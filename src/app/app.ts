@@ -15,7 +15,7 @@ export class App {
   constructor(private masterList: MasterListService) { }
   ngOnInit() {
     this.masterList.initFromCache();
-    this.masterList.load();
+    // this.masterList.load();
   }
 
 }

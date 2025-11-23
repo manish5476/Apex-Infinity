@@ -1,212 +1,614 @@
-/* ==============================================
-   CREATE ORGANIZATION COMPONENT
-   - Using canonical theme tokens
-   ============================================== */
+/* =========================================
+   PAGE: Create Organization (Full Width)
+   ========================================= */
+
 :host {
   display: block;
+  width: 100%;
   height: 100%;
 }
 
-.create-org-container {
+.create-org-wrapper {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  width: 100%;
-  padding: 1.5rem 4%;
-  background: var(--bg-primary); // THEMED
-  color: var(--text-primary); // THEMED
-  overflow: auto; // Allow scrolling on small screens
+  height: 100vh; /* Full viewport height */
+  background-color: var(--bg-ternary); /* Light grey background */
+  overflow: hidden;
 }
 
-/* Header */
-.create-org-header {
-  margin-bottom: 1rem;
+/* --- 1. HEADER --- */
+.org-header {
+  flex: 0 0 auto;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-primary);
+  padding: var(--spacing-xl) var(--spacing-3xl); /* Wide padding */
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.icon-box {
+  width: 48px;
+  height: 48px;
+  background: var(--component-bg-active);
+  border-radius: var(--ui-border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+  font-size: 1.5rem;
+}
+
+.header-text {
   h1 {
-    font-size: 1.4rem;
-    font-weight: 600;
-    background: var(--accent-gradient); // THEMED
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 0.25rem;
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    font-weight: 700;
   }
-
   p {
-    font-size: 0.8rem;
-    color: var(--text-secondary); // THEMED
+    margin: 4px 0 0 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
   }
 }
 
-/* Form layout */
+/* --- 2. CONTENT (Scrollable) --- */
+.org-content {
+  flex: 1;
+  overflow-y: auto; /* Internal scroll */
+  padding: var(--spacing-2xl) var(--spacing-3xl);
+  max-width: 1920px; /* Allow it to go very wide */
+  margin: 0 auto;
+  width: 100%;
+}
+
 .org-form {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
-  width: 100%;
+  gap: var(--spacing-2xl);
 }
 
-/* Section box styling */
+/* --- FORM SECTIONS --- */
 .form-section {
-  background: var(--bg-secondary); // THEMED
-  border: 1px solid var(--border-primary); // THEMED
-  border-left: 4px solid var(--accent-primary); // THEMED
-  border-radius: 10px;
-  padding: 1rem 1.25rem;
-  box-shadow: var(--shadow-sm); // THEMED
-  transition: all 0.3s ease;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--ui-border-radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
 
-  &:hover {
-    box-shadow: var(--shadow-md); // THEMED
-    transform: translateY(-1px);
-  }
-
-  h2 {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-primary); // THEMED
-    margin-bottom: 1rem;
+  /* Special styling for Admin section */
+  &.highlight {
+    border-left: 4px solid var(--accent-primary);
+    background: var(--component-bg-hover); /* Subtle tint */
   }
 }
 
-/* Compact grid */
+.section-header {
+  margin-bottom: var(--spacing-xl);
+  border-bottom: 1px solid var(--border-secondary);
+  padding-bottom: var(--spacing-md);
+
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .section-desc {
+    font-size: 0.85rem;
+    color: var(--text-tertiary);
+  }
+}
+
+/* --- RESPONSIVE GRID --- */
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.75rem 1.5rem;
+  /* Auto-fit columns: Minimum 300px width, otherwise fill space */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-xl) var(--spacing-2xl); /* Row gap, Col gap */
+  align-items: start;
 }
 
-.col-span-2 {
+/* Utility to span columns on large screens */
+.span-2 {
   grid-column: span 2;
-  @media (max-width: 600px) {
-    grid-column: auto;
-  }
 }
 
+/* --- INPUT GROUPS --- */
 .form-group {
   display: flex;
   flex-direction: column;
+  gap: 6px;
 
   label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    .req { color: var(--color-error); }
+  }
+
+  /* Ensure inputs fill their grid cell */
+  input, ::ng-deep .p-inputtext, ::ng-deep .p-password, ::ng-deep .p-password-input {
+    width: 100%;
+  }
+
+  .hint {
     font-size: 0.75rem;
-    color: var(--text-label); // THEMED
-    margin-bottom: 0.2rem;
-  }
-
-  /* Style pInputText */
-  input[pInputText] {
-    border: 1px solid var(--border-primary); // THEMED
-    border-radius: 6px;
-    padding: 0.45rem 0.6rem;
-    font-size: 0.8rem;
-    background: var(--bg-ternary); // THEMED (was --theme-bg-input)
-    color: var(--text-primary); // THEMED
-    transition: all 0.2s ease;
-
-    &:focus {
-      border-color: var(--accent-primary); // THEMED
-      box-shadow: 0 0 0 3px var(--accent-focus); // THEMED (was --theme-accent-focus-ring)
-      outline: none;
-    }
+    color: var(--text-tertiary);
+    margin-top: 2px;
   }
 }
 
-/* === ADDED: Style p-password to match === */
-:host ::ng-deep {
-  .p-password {
-    width: 100%;
-  }
-
-  .p-password-input {
-    border: 1px solid var(--border-primary) !important;
-    border-radius: 6px !important;
-    padding: 0.45rem 0.6rem !important;
-    font-size: 0.8rem !important;
-    background: var(--bg-ternary) !important;
-    color: var(--text-primary) !important;
-    transition: all 0.2s ease !important;
-    width: 100%;
-  }
-
-  .p-password-input:focus {
-    border-color: var(--accent-primary) !important;
-    box-shadow: 0 0 0 3px var(--accent-focus) !important;
-    outline: none !important;
-  }
-
-  // Style invalid touched fields
-  .ng-invalid.ng-touched {
-    input[pInputText],
-    .p-password-input {
-      border-color: var(--color-error) !important;
-    }
-  }
+/* --- 3. FOOTER (Sticky) --- */
+.org-footer {
+  flex: 0 0 auto;
+  background: var(--bg-primary);
+  border-top: 1px solid var(--border-primary);
+  padding: var(--spacing-lg) var(--spacing-3xl);
 }
 
-
-/* Actions */
-.form-actions {
+.footer-content {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border-secondary); // THEMED
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  max-width: 1920px;
+  margin: 0 auto;
 }
 
 .submit-btn {
-  background: var(--accent-gradient); // THEMED
-  border: none;
-  color: white; // THEMED (standard)
+  min-width: 150px;
   font-weight: 600;
-  font-size: 0.85rem;
-  border-radius: 20px;
-  padding: 0.6rem 1.5rem;
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md); // THEMED
-  }
 }
 
-.form-links {
-  display: flex;
-  gap: 0.75rem;
-
-  .link-btn {
-    background: transparent;
-    border: 1px solid var(--border-secondary); // THEMED
-    color: var(--text-secondary); // THEMED
-    font-size: 0.75rem;
-    border-radius: 20px;
-    padding: 0.4rem 1rem;
-    transition: all 0.2s ease;
-
-    &:hover {
-      color: var(--accent-primary); // THEMED
-      border-color: var(--accent-primary); // THEMED
-    }
+/* --- RESPONSIVE ADJUSTMENTS --- */
+@media (max-width: 1024px) {
+  .form-grid {
+    grid-template-columns: 1fr 1fr; /* Force 2 columns on tablet */
   }
+  .span-2 { grid-column: auto; }
 }
 
-/* Responsive */
 @media (max-width: 768px) {
-  .create-org-container {
-    padding: 1rem 3%;
+  .org-header, .org-content, .org-footer {
+    padding-left: var(--spacing-lg);
+    padding-right: var(--spacing-lg);
   }
-
-  .form-actions {
+  
+  .form-grid {
+    grid-template-columns: 1fr; /* Stack on mobile */
+  }
+  
+  .header-content {
     flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
-  }
-
-  .submit-btn {
-    width: 100%;
-  }
-
-  .form-links {
-    justify-content: center;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
   }
 }
+// /* =========================================
+//    PAGE: Create Organization
+//    Theme: Premium Enterprise
+//    ========================================= */
+
+// :host {
+//   display: block;
+//   height: 100%;
+//   width: 100%;
+// }
+
+// .auth-page-container {
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   min-height: 100vh;
+//   width: 100%;
+//   background: var(--bg-primary); /* Global Background */
+//   padding: var(--spacing-xl);
+// }
+
+// /* --- MAIN CARD --- */
+// .auth-card {
+//   width: 100%;
+//   max-width: 850px; /* Wider for this form */
+//   background: var(--bg-secondary);
+//   border: 1px solid var(--border-primary);
+//   border-radius: var(--ui-border-radius-lg);
+//   box-shadow: var(--shadow-xl);
+//   display: flex;
+//   flex-direction: column;
+//   overflow: hidden;
+  
+//   /* Glass Effect (if theme supports it) */
+//   backdrop-filter: blur(var(--glass-blur-c));
+//   -webkit-backdrop-filter: blur(var(--glass-blur-c));
+// }
+
+// /* --- HEADER --- */
+// .auth-header {
+//   padding: var(--spacing-2xl);
+//   background: var(--bg-primary); /* Contrast Header */
+//   border-bottom: 1px solid var(--border-secondary);
+//   text-align: center;
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+
+//   .icon-badge {
+//     width: 48px;
+//     height: 48px;
+//     background: var(--component-bg-active);
+//     color: var(--accent-primary);
+//     border-radius: 50%;
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     font-size: 1.5rem;
+//     margin-bottom: var(--spacing-lg);
+//   }
+
+//   h1 {
+//     margin: 0 0 var(--spacing-sm) 0;
+//     font-family: var(--font-heading);
+//     font-size: 1.75rem;
+//     font-weight: 700;
+//     color: var(--text-primary);
+//     background: var(--accent-gradient);
+//     -webkit-background-clip: text;
+//     -webkit-text-fill-color: transparent;
+//   }
+
+//   p {
+//     margin: 0;
+//     color: var(--text-secondary);
+//     font-size: 0.95rem;
+//   }
+// }
+
+// /* --- FORM BODY --- */
+// .auth-content {
+//   padding: var(--spacing-2xl);
+//   background: var(--bg-secondary);
+// }
+
+// .org-form {
+//   display: flex;
+//   flex-direction: column;
+//   gap: var(--spacing-2xl);
+// }
+
+// /* --- FORM SECTIONS --- */
+// .form-section {
+//   position: relative;
+  
+//   .section-title {
+//     font-size: 0.9rem;
+//     text-transform: uppercase;
+//     letter-spacing: 0.05em;
+//     font-weight: 700;
+//     color: var(--text-label);
+//     margin-bottom: var(--spacing-lg);
+//     display: flex;
+//     align-items: center;
+//     border-bottom: 1px solid var(--border-secondary);
+//     padding-bottom: var(--spacing-sm);
+//   }
+  
+//   /* Highlight the Admin Section */
+//   &.highlight-section {
+//     background: var(--component-bg-hover);
+//     padding: var(--spacing-lg);
+//     border-radius: var(--ui-border-radius);
+//     border: 1px solid var(--border-secondary);
+    
+//     .section-title {
+//         border-bottom: none;
+//         margin-bottom: var(--spacing-md);
+//         color: var(--accent-primary);
+//     }
+//   }
+// }
+
+// /* --- GRID LAYOUT --- */
+// .form-grid {
+//   display: grid;
+//   grid-template-columns: 1fr 1fr; /* 2 Columns default */
+//   gap: var(--spacing-lg);
+  
+//   &.single-col {
+//       grid-template-columns: 1fr;
+//   }
+// }
+
+// .span-full {
+//   grid-column: 1 / -1;
+// }
+
+// /* --- INPUT GROUPS --- */
+// .form-group {
+//   display: flex;
+//   flex-direction: column;
+//   gap: 6px;
+
+//   label {
+//     font-size: 0.85rem;
+//     font-weight: 500;
+//     color: var(--text-secondary);
+    
+//     .req { color: var(--color-error); }
+//   }
+
+//   .hint {
+//       font-size: 0.75rem;
+//       color: var(--text-tertiary);
+//   }
+  
+//   /* Input Styles (relying on global PrimeNG overrides, but reinforcing width) */
+//   input, ::ng-deep .p-password, ::ng-deep .p-password-input {
+//       width: 100%;
+//   }
+// }
+
+// /* --- ACTIONS --- */
+// .form-actions {
+//   margin-top: var(--spacing-lg);
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   gap: var(--spacing-lg);
+// }
+
+// .submit-btn {
+//   padding: var(--spacing-md) var(--spacing-xl);
+//   font-size: 1rem;
+// }
+
+// .auth-links {
+//   font-size: 0.9rem;
+//   color: var(--text-secondary);
+  
+//   .text-link {
+//     color: var(--accent-primary);
+//     font-weight: 600;
+//     margin-left: 4px;
+//     cursor: pointer;
+//     transition: color 0.2s;
+    
+//     &:hover {
+//       color: var(--accent-hover);
+//       text-decoration: underline;
+//     }
+//   }
+// }
+
+// /* --- RESPONSIVE --- */
+// @media (max-width: 768px) {
+//   .auth-page-container {
+//       padding: var(--spacing-md);
+//       align-items: flex-start; /* Allow scroll on mobile */
+//   }
+  
+//   .form-grid {
+//     grid-template-columns: 1fr; /* Stack on mobile */
+//   }
+  
+//   .auth-header h1 {
+//       font-size: 1.5rem;
+//   }
+// }
+
+// // /* ==============================================
+// //    CREATE ORGANIZATION COMPONENT
+// //    - Using canonical theme tokens
+// //    ============================================== */
+// // :host {
+// //   display: block;
+// //   height: 100%;
+// // }
+
+// // .create-org-container {
+// //   display: flex;
+// //   flex-direction: column;
+// //   height: 100%;
+// //   width: 100%;
+// //   padding: 1.5rem 4%;
+// //   background: var(--bg-primary); // THEMED
+// //   color: var(--text-primary); // THEMED
+// //   overflow: auto; // Allow scrolling on small screens
+// // }
+
+// // /* Header */
+// // .create-org-header {
+// //   margin-bottom: 1rem;
+// //   h1 {
+// //     font-size: 1.4rem;
+// //     font-weight: 600;
+// //     background: var(--accent-gradient); // THEMED
+// //     -webkit-background-clip: text;
+// //     -webkit-text-fill-color: transparent;
+// //     margin-bottom: 0.25rem;
+// //   }
+
+// //   p {
+// //     font-size: 0.8rem;
+// //     color: var(--text-secondary); // THEMED
+// //   }
+// // }
+
+// // /* Form layout */
+// // .org-form {
+// //   display: flex;
+// //   flex-direction: column;
+// //   gap: 1.2rem;
+// //   width: 100%;
+// // }
+
+// // /* Section box styling */
+// // .form-section {
+// //   background: var(--bg-secondary); // THEMED
+// //   border: 1px solid var(--border-primary); // THEMED
+// //   border-left: 4px solid var(--accent-primary); // THEMED
+// //   border-radius: 10px;
+// //   padding: 1rem 1.25rem;
+// //   box-shadow: var(--shadow-sm); // THEMED
+// //   transition: all 0.3s ease;
+
+// //   &:hover {
+// //     box-shadow: var(--shadow-md); // THEMED
+// //     transform: translateY(-1px);
+// //   }
+
+// //   h2 {
+// //     display: flex;
+// //     align-items: center;
+// //     gap: 0.25rem;
+// //     font-size: 1rem;
+// //     font-weight: 600;
+// //     color: var(--text-primary); // THEMED
+// //     margin-bottom: 1rem;
+// //   }
+// // }
+
+// // /* Compact grid */
+// // .form-grid {
+// //   display: grid;
+// //   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+// //   gap: 0.75rem 1.5rem;
+// // }
+
+// // .col-span-2 {
+// //   grid-column: span 2;
+// //   @media (max-width: 600px) {
+// //     grid-column: auto;
+// //   }
+// // }
+
+// // .form-group {
+// //   display: flex;
+// //   flex-direction: column;
+
+// //   label {
+// //     font-size: 0.75rem;
+// //     color: var(--text-label); // THEMED
+// //     margin-bottom: 0.2rem;
+// //   }
+
+// //   /* Style pInputText */
+// //   input[pInputText] {
+// //     border: 1px solid var(--border-primary); // THEMED
+// //     border-radius: 6px;
+// //     padding: 0.45rem 0.6rem;
+// //     font-size: 0.8rem;
+// //     background: var(--bg-ternary); // THEMED (was --theme-bg-input)
+// //     color: var(--text-primary); // THEMED
+// //     transition: all 0.2s ease;
+
+// //     &:focus {
+// //       border-color: var(--accent-primary); // THEMED
+// //       box-shadow: 0 0 0 3px var(--accent-focus); // THEMED (was --theme-accent-focus-ring)
+// //       outline: none;
+// //     }
+// //   }
+// // }
+
+// // /* === ADDED: Style p-password to match === */
+// // :host ::ng-deep {
+// //   .p-password {
+// //     width: 100%;
+// //   }
+
+// //   .p-password-input {
+// //     border: 1px solid var(--border-primary) !important;
+// //     border-radius: 6px !important;
+// //     padding: 0.45rem 0.6rem !important;
+// //     font-size: 0.8rem !important;
+// //     background: var(--bg-ternary) !important;
+// //     color: var(--text-primary) !important;
+// //     transition: all 0.2s ease !important;
+// //     width: 100%;
+// //   }
+
+// //   .p-password-input:focus {
+// //     border-color: var(--accent-primary) !important;
+// //     box-shadow: 0 0 0 3px var(--accent-focus) !important;
+// //     outline: none !important;
+// //   }
+
+// //   // Style invalid touched fields
+// //   .ng-invalid.ng-touched {
+// //     input[pInputText],
+// //     .p-password-input {
+// //       border-color: var(--color-error) !important;
+// //     }
+// //   }
+// // }
+
+
+// // /* Actions */
+// // .form-actions {
+// //   display: flex;
+// //   align-items: center;
+// //   justify-content: space-between;
+// //   padding-top: 1rem;
+// //   border-top: 1px solid var(--border-secondary); // THEMED
+// // }
+
+// // .submit-btn {
+// //   background: var(--accent-gradient); // THEMED
+// //   border: none;
+// //   color: white; // THEMED (standard)
+// //   font-weight: 600;
+// //   font-size: 0.85rem;
+// //   border-radius: 20px;
+// //   padding: 0.6rem 1.5rem;
+// //   transition: all 0.3s ease;
+
+// //   &:hover {
+// //     transform: translateY(-2px);
+// //     box-shadow: var(--shadow-md); // THEMED
+// //   }
+// // }
+
+// // .form-links {
+// //   display: flex;
+// //   gap: 0.75rem;
+
+// //   .link-btn {
+// //     background: transparent;
+// //     border: 1px solid var(--border-secondary); // THEMED
+// //     color: var(--text-secondary); // THEMED
+// //     font-size: 0.75rem;
+// //     border-radius: 20px;
+// //     padding: 0.4rem 1rem;
+// //     transition: all 0.2s ease;
+
+// //     &:hover {
+// //       color: var(--accent-primary); // THEMED
+// //       border-color: var(--accent-primary); // THEMED
+// //     }
+// //   }
+// // }
+
+// // /* Responsive */
+// // @media (max-width: 768px) {
+// //   .create-org-container {
+// //     padding: 1rem 3%;
+// //   }
+
+// //   .form-actions {
+// //     flex-direction: column;
+// //     align-items: stretch;
+// //     gap: 0.75rem;
+// //   }
+
+// //   .submit-btn {
+// //     width: 100%;
+// //   }
+
+// //   .form-links {
+// //     justify-content: center;
+// //   }
+// // }

@@ -1,128 +1,542 @@
-<!-- 
-  REFACTORED:
-  - Using consistent page container
-  - Using 'themed-card' instead of 'glass-card'
-  - Removed Tailwind utility classes in favor of SCSS
-  - Uncommented severity binding for Payment Type
--->
-<div class="customer-page-container">
-  <div class="themed-card payment-details-card" *ngIf="payment(); else noPayment">
-    
-    <!-- === HEADER === -->
-    <div class="details-header">
-      <!-- Left Side -->
-      <div class="header-left">
-        <p-button 
-          icon="pi pi-arrow-left" 
-          styleClass="p-button-text p-button-rounded"
-          routerLink="/payments">
-        </p-button>
-        <div class="header-info">
-          <h2 class="form-title">Payment Details</h2>
-          <p-tag [value]="getPaymentType(payment()?.type).label"
-                 [severity]="getPaymentType(payment()?.type).severity">
-          </p-tag>
-          <p-tag [value]="getStatus(payment()?.status).label" 
-                 [severity]="getStatus(payment()?.status).severity">
-          </p-tag>
-        </div>
-      </div>
+<div class="customer-page-container animate-fadeIn">
+  
+  @if (payment(); as p) {
+    <div class="themed-card payment-details-card">
       
-      <!-- Right Side: Actions -->
-      <div class="header-actions">
-        <p-button 
-          label="Edit Payment" 
-          icon="pi pi-pencil" 
-          styleClass="p-button-outlined"
-          [routerLink]="['/payments', payment()?._id, 'edit']">
-        </p-button>
-      </div>
-    </div>
-    <p-divider></p-divider>
-
-    <!-- === BODY === -->
-    <div class="payment-body-grid">
-      
-      <!-- Left Column: Details -->
-      <div class="details-column">
-        <h4 class="section-title">Transaction Details</h4>
-        <div class="details-grid">
-          <div class="detail-field">
-            <label>Amount</label>
-            <span class="amount-display">{{ formatCurrency(payment()?.amount) }}</span>
-          </div>
-          <div class="detail-field">
-            <label>Payment Date</label>
-            <span>{{ formatDate(payment()?.paymentDate) }}</span>
-          </div>
-          <div class="detail-field">
-            <label>Payment Method</label>
-            <span>{{ payment()?.paymentMethod | titlecase }}</span>
-          </div>
-           <div class="detail-field">
-            <label>Reference #</label>
-            <span>{{ payment()?.referenceNumber || 'N/A' }}</span>
-          </div>
-          <div class="detail-field">
-            <label>Bank Name</label>
-            <span>{{ payment()?.bankName || 'N/A' }}</span>
-          </div>
-          <div class="detail-field">
-            <label>Transaction ID</label>
-            <span>{{ payment()?.transactionId || 'N/A' }}</span>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Right Column: References -->
-      <div class="reference-column">
-        <h4 class="section-title">References</h4>
-        <div class="details-grid">
-          <!-- Show Customer or Supplier -->
-          <div class="detail-field" *ngIf="payment()?.type === 'inflow' && payment()?.customer">
-            <label>Customer</label>
-            <span>{{ payment()?.customer.name }}</span>
-            <!-- Add routerLink if needed -->
-          </div>
-          <div class="detail-field" *ngIf="payment()?.type === 'outflow' && payment()?.supplier">
-            <label>Supplier</label>
-            <span>{{ payment()?.supplier.name }}</span>
-            <!-- Add routerLink if needed -->
-          </div>
+      <div class="details-header">
+        <div class="header-left">
+          <p-button 
+            icon="pi pi-arrow-left" 
+            styleClass="p-button-text p-button-rounded p-button-secondary"
+            routerLink="/payments">
+          </p-button>
           
-          <!-- Show Invoice or Purchase -->
-          <div class="detail-field" *ngIf="payment()?.invoice">
-            <label>Linked Invoice</label>
-            <span>{{ payment()?.invoice.invoiceNumber }}</span>
-            <!-- Add routerLink if needed -->
-          </div>
-           <div class="detail-field" *ngIf="payment()?.purchase">
-            <label>Linked Purchase</label>
-            <span>{{ payment()?.purchase.purchaseNumber }}</span>
-            <!-- Add routerLink if needed -->
-          </div>
-          
-           <div class="detail-field">
-            <label>Branch</label>
-            <span>{{ payment()?.branch?.name || 'N/A' }}</span>
+          <div class="header-identity">
+             <div class="title-row">
+               <h2 class="form-title">Payment #{{ p.referenceNumber || (p._id | slice:-6) | uppercase }}</h2>
+               <p-tag 
+                 [value]="p.status | uppercase" 
+                 [severity]="getStatusSeverity(p.status)"
+                 styleClass="status-tag">
+               </p-tag>
+             </div>
+             <div class="subtitle-row">
+               <span class="date-text"><i class="pi pi-calendar"></i> {{ p.paymentDate | date:'mediumDate' }}</span>
+               <span class="separator">•</span>
+               <span class="method-text"><i class="pi pi-clock"></i> {{ p.paymentDate | date:'shortTime' }}</span>
+             </div>
           </div>
         </div>
-
-        <p-divider></p-divider>
         
-        <div class="detail-field">
-          <label>Remarks</label>
-          <p class="remarks-text">{{ payment()?.remarks || 'No remarks provided.' }}</p>
-        </div>
+        <div class="header-actions">
+          <p-button 
+            label="Email Receipt" 
+            icon="pi pi-envelope" 
+            styleClass="p-button-outlined p-button-secondary p-button-sm"
+            (onClick)="sendEmail()">
+          </p-button>
+          
+          <p-button 
+            label="Download PDF" 
+            icon="pi pi-download" 
+            styleClass="p-button-outlined p-button-primary p-button-sm"
+            (onClick)="downloadReceipt()">
+          </p-button>
 
+          <p-button 
+             icon="pi pi-pencil" 
+             pTooltip="Edit Payment"
+             tooltipPosition="bottom"
+             styleClass="p-button-text p-button-rounded p-button-secondary" 
+             [routerLink]="['/payments', p._id, 'edit']">
+          </p-button>
+        </div>
       </div>
 
+      <div class="details-body">
+        <aside class="profile-sidebar animate-slideInUp">
+          <div class="flow-indicator" [class.inflow]="p.type === 'inflow'" [class.outflow]="p.type === 'outflow'">
+              <i class="pi" [class.pi-arrow-down-left]="p.type === 'inflow'" [class.pi-arrow-up-right]="p.type === 'outflow'"></i>
+              <span>{{ p.type === 'inflow' ? 'Payment Received' : 'Payment Made' }}</span>
+          </div>
+          <p-divider styleClass="w-full"></p-divider>
+          <div class="party-card">
+              <label class="text-xs uppercase text-[var(--text-secondary)] font-bold mb-2 block">
+                 {{ p.type === 'inflow' ? 'Received From' : 'Paid To' }}
+              </label>
+              @if (p.type === 'inflow' && p.customerId) {
+                 <div class="party-info">
+                    <div class="avatar-placeholder customer"><i class="pi pi-user"></i></div>
+                    <div class="party-text">
+                       <h4>{{ p.customerId.name }}</h4>
+                       <div class="contact-row" *ngIf="p.customerId.email || p.customerId.phone">
+                          <span *ngIf="p.customerId.email" [pTooltip]="p.customerId.email"><i class="pi pi-envelope"></i> Email</span>
+                          <span class="sep" *ngIf="p.customerId.email && p.customerId.phone">•</span>
+                          <span *ngIf="p.customerId.phone" [pTooltip]="p.customerId.phone"><i class="pi pi-phone"></i> {{p.customerId.phone}}</span>
+                       </div>
+                       <a [routerLink]="['/customer', p.customerId._id]" class="link mt-1">View Profile</a>
+                    </div>
+                 </div>
+              }
+              
+              @if (p.organizationId) {
+                <div class="org-info mt-3">
+                   <label class="text-[10px] uppercase text-[var(--text-label)]">Billed Branch</label>
+                   <div class="branch-chip">
+                      <i class="pi pi-building"></i> {{ p.branchId?.name || 'Main Branch' }}
+                   </div>
+                </div>
+              }
+          </div>
+
+          <div class="attributes-list mt-4">
+              <div class="attribute-item">
+                 <div class="attr-icon"><i class="pi pi-wallet"></i></div>
+                 <div class="attr-data">
+                    <label>Payment Method</label>
+                    <span>{{ p.paymentMethod | titlecase }}</span>
+                 </div>
+              </div>
+
+              <div class="attribute-item">
+                <div class="attr-icon"><i class="pi pi-cog"></i></div>
+                <div class="attr-data">
+                   <label>Transaction Mode</label>
+                   <span>{{ (p.transactionMode | titlecase) || 'Standard' }}</span>
+                </div>
+             </div>
+
+              <div class="attribute-item">
+                 <div class="attr-icon"><i class="pi pi-hashtag"></i></div>
+                 <div class="attr-data">
+                    <label>Transaction ID</label>
+                    <span class="font-mono text-xs">{{ p.transactionId || 'N/A' }}</span>
+                 </div>
+              </div>
+              
+              <div class="attribute-item" *ngIf="p.bankName">
+                <div class="attr-icon"><i class="pi pi-building"></i></div>
+                <div class="attr-data">
+                   <label>Bank Name</label>
+                   <span>{{ p.bankName }}</span>
+                </div>
+             </div>
+          </div>
+        </aside>
+
+        <section class="main-details">
+
+           <div class="amount-hero-card animate-slideInUp" [class.inflow]="p.type === 'inflow'" [class.outflow]="p.type === 'outflow'">
+              <div class="amount-content">
+                 <label>Total Amount</label>
+                 <div class="amount-value">
+                    <span class="currency">₹</span>
+                    <span class="val">{{ p.amount | number:'1.2-2' }}</span>
+                 </div>
+              </div>
+              <div class="status-pill">
+                 <i class="pi pi-check-circle"></i> {{ p.status | titlecase }}
+              </div>
+           </div>
+
+           @if (p.invoiceId || p.purchaseId) {
+             <div class="content-section animate-slideInUp" style="animation-delay: 0.1s;">
+                <h4 class="section-heading"><i class="pi pi-link"></i> Linked Documents</h4>
+                
+                <div class="linked-docs-grid">
+                   @if (p.invoiceId) {
+                      <div class="doc-card invoice"> <div class="doc-icon"><i class="pi pi-file"></i></div>
+                         <div class="doc-info">
+                            <label>Sales Invoice</label>
+                            <span class="doc-number">View Invoice</span>
+                         </div>
+                         <p-button icon="pi pi-arrow-right" styleClass="p-button-rounded p-button-text" [routerLink]="['/invoices', p.invoiceId]"></p-button>
+                      </div>
+                   }
+                </div>
+             </div>
+           }
+
+           <div class="content-section animate-slideInUp" style="animation-delay: 0.2s;">
+              <h4 class="section-heading"><i class="pi pi-align-left"></i> Remarks</h4>
+              <div class="remarks-box">
+                 <p>{{ p.remarks || 'No additional remarks provided for this transaction.' }}</p>
+              </div>
+           </div>
+
+           <div class="content-section audit-section animate-slideInUp" style="animation-delay: 0.3s;">
+             <h4 class="section-heading"><i class="pi pi-history"></i> Audit Information</h4>
+             <div class="audit-grid">
+                <div class="audit-item">
+                   <label>Created By</label>
+                   <span>System Admin ({{ p.createdBy | slice:-4 }})</span> </div>
+                <div class="audit-item">
+                  <label>Created At</label>
+                  <span>{{ p.createdAt | date:'medium' }}</span>
+               </div>
+               <div class="audit-item">
+                  <label>Last Updated</label>
+                  <span>{{ p.updatedAt | date:'medium' }}</span>
+               </div>
+             </div>
+           </div>
+
+        </section>
+
+      </div>
     </div>
-  </div>
+  } @else {
+    <div class="loading-state">
+       <i class="pi pi-spin pi-spinner text-4xl text-[var(--text-secondary)]"></i>
+       <p class="mt-2 text-[var(--text-secondary)]">Loading Payment...</p>
+    </div>
+  }
 </div>
 
-<ng-template #noPayment>
-  <div class="themed-card payment-details-card text-center p-8">
-    <h3>Loading payment details...</h3>
-  </div>
-</ng-template>
+<!-- <div class="customer-page-container animate-fadeIn">
+  
+  @if (payment(); as p) {
+    <div class="themed-card payment-details-card">
+      
+      === HEADER ===
+      <div class="details-header">
+        <div class="header-left">
+          <p-button 
+            icon="pi pi-arrow-left" 
+            styleClass="p-button-text p-button-rounded p-button-secondary"
+            routerLink="/payment">
+          </p-button>
+          
+          <div class="header-identity">
+             <div class="title-row">
+               <h2 class="form-title">Payment #{{ p.referenceNumber || (p._id | slice:-6) | uppercase }}</h2>
+               <p-tag 
+                 [value]="p.status | uppercase" 
+                 [severity]="common.mapStatusToSeverity(p.status)"
+                 styleClass="status-tag">
+               </p-tag>
+             </div>
+             <div class="subtitle-row">
+               <span class="date-text"><i class="pi pi-calendar"></i> {{ common.formatDate(p.paymentDate) }}</span>
+               <span class="separator">•</span>
+               <span class="method-text"><i class="pi pi-wallet"></i> {{ p.paymentMethod | titlecase }}</span>
+             </div>
+          </div>
+        </div>
+        
+        <div class="header-actions">
+          <p-button label="Download" icon="pi pi-download" styleClass="p-button-outlined p-button-sm" (onClick)="downloadReceipt()"></p-button>
+          <p-button label="Email" icon="pi pi-envelope" styleClass="p-button-outlined p-button-sm" (onClick)="sendEmail()"></p-button>
+          <p-button label="Edit" icon="pi pi-pencil" styleClass="p-button-primary p-button-sm" [routerLink]="['/payment', p._id, 'edit']"></p-button>
+        </div>
+      </div>
+
+      <div class="details-body">
+
+        === SIDEBAR ===
+        <aside class="profile-sidebar animate-slideInUp">
+          
+          <div class="flow-indicator" [class.inflow]="p.type === 'inflow'" [class.outflow]="p.type === 'outflow'">
+             <i class="pi" [class.pi-arrow-down-left]="p.type === 'inflow'" [class.pi-arrow-up-right]="p.type === 'outflow'"></i>
+             <span>{{ p.type === 'inflow' ? 'Payment Received' : 'Payment Made' }}</span>
+          </div>
+
+          <p-divider styleClass="w-full"></p-divider>
+
+          Party Card (Customer or Supplier)
+          <div class="party-card">
+             <label class="text-xs uppercase text-[var(--text-secondary)] font-bold mb-2 block">
+                {{ p.type === 'inflow' ? 'Received From' : 'Paid To' }}
+             </label>
+             
+             Customer Logic
+             @if (p.type === 'inflow' && p.customerId) {
+                <div class="party-info">
+                   <div class="avatar-placeholder customer"><i class="pi pi-user"></i></div>
+                   <div class="party-text">
+                      <h4>{{ p.customerId.name }}</h4>
+                      <span class="text-xs text-gray-500">{{ p.customerId.phone }}</span>
+                      <a [routerLink]="['/customer', p.customerId._id]" class="link mt-1">View Profile</a>
+                   </div>
+                </div>
+             }
+             Supplier Logic
+             @if (p.type === 'outflow' && p.supplierId) {
+                <div class="party-info">
+                   <div class="avatar-placeholder supplier"><i class="pi pi-box"></i></div>
+                   <div class="party-text">
+                      <h4>{{ p.supplierId.companyName || 'Supplier' }}</h4>
+                      <span class="text-xs text-gray-500">{{ p.supplierId.phone }}</span>
+                   </div>
+                </div>
+             }
+          </div>
+
+          Payment Attributes
+          <div class="attributes-list mt-4">
+             <div class="attribute-item">
+                <div class="attr-icon"><i class="pi pi-map-marker"></i></div>
+                <div class="attr-data">
+                   <label>Branch</label>
+                   <span>{{ p.branchId?.name || 'Main Branch' }}</span>
+                </div>
+             </div>
+             <div class="attribute-item">
+                <div class="attr-icon"><i class="pi pi-cog"></i></div>
+                <div class="attr-data">
+                   <label>Transaction Mode</label>
+                   <span>{{ p.transactionMode | titlecase }}</span>
+                </div>
+             </div>
+             @if (p.bankName) {
+               <div class="attribute-item">
+                  <div class="attr-icon"><i class="pi pi-building"></i></div>
+                  <div class="attr-data">
+                     <label>Bank / Gateway</label>
+                     <span>{{ p.bankName }}</span>
+                  </div>
+               </div>
+             }
+             <div class="attribute-item">
+                <div class="attr-icon"><i class="pi pi-receipt"></i></div>
+                <div class="attr-data">
+                   <label>Transaction ID</label>
+                   <span class="font-mono text-xs text-gray-600">{{ p.transactionId || 'N/A' }}</span>
+                </div>
+             </div>
+          </div>
+
+        </aside>
+
+        === MAIN CONTENT ===
+        <section class="main-details">
+
+           Amount Card
+           <div class="amount-hero-card animate-slideInUp" [class.inflow]="p.type === 'inflow'" [class.outflow]="p.type === 'outflow'">
+              <div class="amount-content">
+                 <label>Total Amount</label>
+                 <div class="amount-value">
+                    <span class="currency">₹</span>
+                    <span class="val">{{ p.amount | number:'1.2-2' }}</span>
+                 </div>
+              </div>
+              <div class="status-pill">
+                 <i class="pi pi-check-circle"></i> {{ p.status | titlecase }}
+              </div>
+           </div>
+
+           Linked Documents
+           @if (p.invoiceId || p.purchaseId) {
+             <div class="content-section animate-slideInUp" style="animation-delay: 0.1s;">
+                <h4 class="section-heading"><i class="pi pi-link"></i> Linked Documents</h4>
+                
+                <div class="linked-docs-grid">
+                   Linked Sales Invoice
+                   @if (p.invoiceId) {
+                      <div class="doc-card invoice" [routerLink]="['/invoices', p.invoiceId._id || p.invoiceId]">
+                         <div class="doc-icon"><i class="pi pi-file"></i></div>
+                         <div class="doc-info">
+                            <label>Sales Invoice</label>
+                            Handle case where invoiceId is populated or just an ID string
+                            <span class="doc-number">{{ p.invoiceId.invoiceNumber || 'View Invoice' }}</span>
+                         </div>
+                         <p-button icon="pi pi-arrow-right" styleClass="p-button-rounded p-button-text"></p-button>
+                      </div>
+                   }
+                   Linked Purchase Order
+                   @if (p.purchaseId) {
+                      <div class="doc-card purchase">
+                         <div class="doc-icon"><i class="pi pi-shopping-bag"></i></div>
+                         <div class="doc-info">
+                            <label>Purchase Order</label>
+                            <span class="doc-number">{{ p.purchaseId.invoiceNumber || 'View Purchase' }}</span>
+                         </div>
+                         <p-button icon="pi pi-arrow-right" styleClass="p-button-rounded p-button-text"></p-button>
+                      </div>
+                   }
+                </div>
+             </div>
+           }
+
+           Remarks
+           <div class="content-section animate-slideInUp" style="animation-delay: 0.2s;">
+              <h4 class="section-heading"><i class="pi pi-align-left"></i> Remarks</h4>
+              <div class="remarks-box">
+                 <p>{{ p.remarks || 'No additional remarks provided for this transaction.' }}</p>
+              </div>
+           </div>
+
+        </section>
+
+      </div>
+    </div>
+  } @else {
+    <div class="loading-state">
+       <i class="pi pi-spin pi-spinner text-4xl text-[var(--text-secondary)]"></i>
+       <p class="mt-2 text-[var(--text-secondary)]">Loading Payment...</p>
+    </div>
+  }
+</div> -->
+
+
+<!-- <div class="customer-page-container animate-fadeIn">
+  
+  @if (payment(); as p) {
+    <div class="themed-card payment-details-card">
+      
+      <div class="details-header">
+        <div class="header-left">
+          <p-button 
+            icon="pi pi-arrow-left" 
+            styleClass="p-button-text p-button-rounded p-button-secondary"
+            routerLink="/payments">
+          </p-button>
+          
+          <div class="header-identity">
+             <div class="title-row">
+               <h2 class="form-title">Payment #{{ p.referenceNumber || (p._id | slice:-6) | uppercase }}</h2>
+               <p-tag 
+                 [value]="p.status | uppercase" 
+                 [severity]="getStatusSeverity(p.status)"
+                 styleClass="status-tag">
+               </p-tag>
+             </div>
+             <div class="subtitle-row">
+               <span class="date-text"><i class="pi pi-calendar"></i> {{ formatDate(p.paymentDate) }}</span>
+               <span class="separator">•</span>
+               <span class="method-text"><i class="pi pi-wallet"></i> {{ p.paymentMethod | titlecase }}</span>
+             </div>
+          </div>
+        </div>
+        
+        <div class="header-actions">
+          <p-button label="Print Receipt" icon="pi pi-print" styleClass="p-button-outlined p-button-sm"></p-button>
+          <p-button label="Edit" icon="pi pi-pencil" styleClass="p-button-primary p-button-sm" [routerLink]="['/payments', p._id, 'edit']"></p-button>
+          <p-button icon="pi pi-ellipsis-v" styleClass="p-button-text p-button-rounded p-button-secondary"></p-button>
+        </div>
+      </div>
+
+      <div class="details-body">
+
+        <aside class="profile-sidebar animate-slideInUp">
+          
+          <div class="flow-indicator" [class.inflow]="p.type === 'inflow'" [class.outflow]="p.type === 'outflow'">
+             <i class="pi" [class.pi-arrow-down-left]="p.type === 'inflow'" [class.pi-arrow-up-right]="p.type === 'outflow'"></i>
+             <span>{{ p.type === 'inflow' ? 'Payment Received' : 'Payment Made' }}</span>
+          </div>
+
+          <p-divider styleClass="w-full"></p-divider>
+
+          <div class="party-card">
+             <label class="text-xs uppercase text-[var(--text-secondary)] font-bold mb-2 block">
+                {{ p.type === 'inflow' ? 'Received From' : 'Paid To' }}
+             </label>
+             
+             @if (p.type === 'inflow' && p.customer) {
+                <div class="party-info">
+                   <div class="avatar-placeholder customer"><i class="pi pi-user"></i></div>
+                   <div class="party-text">
+                      <h4>{{ p.customer.name }}</h4>
+                      <a [routerLink]="['/customer', p.customer._id]" class="link">View Profile</a>
+                   </div>
+                </div>
+             }
+             @if (p.type === 'outflow' && p.supplier) {
+                <div class="party-info">
+                   <div class="avatar-placeholder supplier"><i class="pi pi-box"></i></div>
+                   <div class="party-text">
+                      <h4>{{ p.supplier.name }}</h4>
+                      <span>Supplier</span>
+                   </div>
+                </div>
+             }
+          </div>
+
+          <div class="attributes-list mt-4">
+             <div class="attribute-item">
+                <div class="attr-icon"><i class="pi pi-building"></i></div>
+                <div class="attr-data">
+                   <label>Bank / Gateway</label>
+                   <span>{{ p.bankName || 'N/A' }}</span>
+                </div>
+             </div>
+             <div class="attribute-item">
+                <div class="attr-icon"><i class="pi pi-receipt"></i></div>
+                <div class="attr-data">
+                   <label>Transaction ID</label>
+                   <span class="font-mono text-xs">{{ p.transactionId || 'N/A' }}</span>
+                </div>
+             </div>
+             <div class="attribute-item">
+                <div class="attr-icon"><i class="pi pi-map-marker"></i></div>
+                <div class="attr-data">
+                   <label>Branch</label>
+                   <span>{{ p.branch?.name || 'Main Branch' }}</span>
+                </div>
+             </div>
+          </div>
+
+        </aside>
+
+        <section class="main-details">
+
+           <div class="amount-hero-card animate-slideInUp" [class.inflow]="p.type === 'inflow'" [class.outflow]="p.type === 'outflow'">
+              <div class="amount-content">
+                 <label>Total Amount</label>
+                 <div class="amount-value">
+                    <span class="currency">₹</span>
+                    <span class="val">{{ p.amount | number:'1.2-2' }}</span>
+                 </div>
+              </div>
+              <div class="status-pill">
+                 <i class="pi pi-check-circle"></i> {{ p.status | titlecase }}
+              </div>
+           </div>
+
+           @if (p.invoice || p.purchase) {
+             <div class="content-section animate-slideInUp" style="animation-delay: 0.1s;">
+                <h4 class="section-heading"><i class="pi pi-link"></i> Linked Documents</h4>
+                
+                <div class="linked-docs-grid">
+                   @if (p.invoice) {
+                      <div class="doc-card invoice">
+                         <div class="doc-icon"><i class="pi pi-file"></i></div>
+                         <div class="doc-info">
+                            <label>Sales Invoice</label>
+                            <span class="doc-number">{{ p.invoice.invoiceNumber }}</span>
+                         </div>
+                         <p-button icon="pi pi-arrow-right" styleClass="p-button-rounded p-button-text"></p-button>
+                      </div>
+                   }
+                   @if (p.purchase) {
+                      <div class="doc-card purchase">
+                         <div class="doc-icon"><i class="pi pi-shopping-bag"></i></div>
+                         <div class="doc-info">
+                            <label>Purchase Order</label>
+                            <span class="doc-number">{{ p.purchase.purchaseNumber }}</span>
+                         </div>
+                         <p-button icon="pi pi-arrow-right" styleClass="p-button-rounded p-button-text"></p-button>
+                      </div>
+                   }
+                </div>
+             </div>
+           }
+
+           <div class="content-section animate-slideInUp" style="animation-delay: 0.2s;">
+              <h4 class="section-heading"><i class="pi pi-align-left"></i> Remarks</h4>
+              <div class="remarks-box">
+                 <p>{{ p.remarks || 'No additional remarks provided for this transaction.' }}</p>
+              </div>
+           </div>
+
+        </section>
+
+      </div>
+    </div>
+  } @else {
+    <div class="loading-state">
+       <i class="pi pi-spin pi-spinner text-4xl text-[var(--text-secondary)]"></i>
+       <p class="mt-2 text-[var(--text-secondary)]">Loading Payment...</p>
+    </div>
+  }
+</div> -->

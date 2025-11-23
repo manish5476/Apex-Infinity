@@ -1,210 +1,233 @@
-.p-button {
-  font-weight: 600;
-  font-size: var(--font-size-sm);
-  padding: var(--spacing-md) var(--spacing-xl); /* Using new spacing tokens */
-  border-radius: 999px;
-  background: var(--accent-gradient); /* This token is now defined! */
-  color: #fff;
-  border: none;
-  transition: var(--transition-base); /* Using new transition token */
-}
-.p-button:focus-visible {
-  /* Using focus-visible for accessibility */
-  box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus); /* Using new focus tokens */
-}
-.p-button:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md); /* Using new shadow token */
+/* ============================================================
+   PRIMENG GLOBAL OVERRIDES (PERFECT MATCH)
+   Consuming: theme.css Canonical Tokens
+   ============================================================ */
+
+/* --- 1. GENERAL COMPONENT RESET --- */
+.p-component {
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm); /* Compact Enterprise sizing */
+  color: var(--text-primary);
 }
 
-/* Inputs and selects */
+/* --- 2. BUTTONS (.p-button) --- */
+.p-button {
+  background: var(--accent-gradient);
+  border: 1px solid transparent; /* smooths rendering */
+  color: #ffffff;
+  border-radius: 999px; /* Pill shape */
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-weight: var(--font-weight-semibold);
+  transition: var(--transition-base);
+  box-shadow: var(--shadow-sm);
+}
+
+.p-button:enabled:hover {
+  background: var(--accent-hover); /* Fallback to solid on hover for clarity */
+  color: #ffffff;
+  border-color: transparent;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.p-button:focus {
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus);
+}
+
+/* Outlined Button Variant */
+.p-button.p-button-outlined {
+  background: transparent;
+  border: 1px solid var(--border-primary);
+  color: var(--text-secondary);
+}
+.p-button.p-button-outlined:enabled:hover {
+  background: var(--component-bg-hover);
+  color: var(--text-primary);
+  border-color: var(--text-primary);
+}
+
+/* --- 3. INPUTS & FORM ELEMENTS --- */
 .p-inputtext,
 .p-inputnumber-input,
-.p-password-input,
 .p-textarea,
 .p-dropdown,
-.p-inputmask {
-  width: 100%;
-  /* remove static height, let padding define it */
-  padding: var(--spacing-md) var(--spacing-lg); /* Using new spacing tokens */
-  border-radius: var(--ui-border-radius);
-  border: var(--ui-border-width) solid var(--border-secondary);
-  background: var(--bg-ternary);
+.p-multiselect,
+.p-calendar-input {
+  background: var(--bg-ternary); /* Subtle contrast from card bg */
+  border: 1px solid var(--border-secondary);
   color: var(--text-primary);
+  border-radius: var(--ui-border-radius);
+  padding: var(--spacing-md) var(--spacing-lg);
   transition: var(--transition-fast);
 }
-.p-inputtext:focus,
-.p-dropdown:focus,
-.p-inputnumber-input:focus,
-.p-password-input:focus,
-.p-textarea:focus,
-.p-inputmask:focus {
-  box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus); /* Using new focus tokens */
+
+/* Focus State - The "Glow" */
+.p-inputtext:enabled:focus,
+.p-inputnumber-input:enabled:focus,
+.p-textarea:enabled:focus,
+.p-dropdown:not(.p-disabled).p-focus,
+.p-multiselect:not(.p-disabled).p-focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus);
+  background: var(--bg-secondary); /* Brighten on focus */
+}
+
+/* Placeholder Text */
+::placeholder {
+  color: var(--text-label);
+  opacity: 1;
+}
+
+/* --- 4. CARDS, DIALOGS & PANELS (The Glass Effect) --- */
+.p-card,
+.p-panel,
+.p-dialog {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-radius: var(--ui-border-radius-lg);
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-lg);
+  
+  /* THE MAGIC: Frosted Glass Effect */
+  backdrop-filter: blur(var(--glass-blur-c)); 
+  -webkit-backdrop-filter: blur(var(--glass-blur-c));
+}
+
+/* Dialog Header/Footer Transparency */
+.p-dialog .p-dialog-header,
+.p-dialog .p-dialog-footer {
+  background: transparent; /* Let the glass background show through */
+  border-color: var(--border-primary);
+  padding: var(--spacing-lg) var(--spacing-xl);
+}
+
+.p-dialog .p-dialog-header .p-dialog-title {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-xl);
+}
+
+/* --- 5. DATATABLE (Seamless & Modern) --- */
+.p-datatable .p-datatable-wrapper {
+  background: transparent;
+  border-radius: 0;
+}
+
+/* Header: Transparent with simple bottom border */
+.p-datatable .p-datatable-thead > tr > th {
+  background: var(--bg-ternary); /* Slight contrast */
+  color: var(--text-label);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: var(--font-weight-bold);
+  padding: var(--spacing-lg);
+  border: none;
+  border-bottom: 1px solid var(--border-primary);
+}
+
+/* Body: Clean lines */
+.p-datatable .p-datatable-tbody > tr {
+  background: transparent;
+  color: var(--text-primary);
+  transition: background-color var(--transition-fast);
+  border-bottom: 1px solid var(--border-secondary);
+}
+
+.p-datatable .p-datatable-tbody > tr > td {
+  padding: var(--spacing-lg);
+  border: none;
+}
+
+/* Hover Effect */
+.p-datatable .p-datatable-tbody > tr:hover {
+  background-color: var(--component-bg-hover) !important;
+}
+
+/* Paginator: Blend it in */
+.p-paginator {
+  background: transparent;
+  border-top: 1px solid var(--border-primary);
+  padding: var(--spacing-md);
+}
+.p-paginator .p-paginator-element {
+  color: var(--text-secondary);
+  min-width: 2rem;
+  height: 2rem;
+  border-radius: var(--ui-border-radius);
+}
+.p-paginator .p-paginator-element.p-highlight {
+  background: var(--component-bg-active);
+  color: var(--accent-primary);
+  border-color: transparent;
+}
+
+/* --- 6. TABS (PrimeNG Standard) --- */
+.p-tabview .p-tabview-nav {
+  background: transparent;
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.p-tabview .p-tabview-nav li .p-tabview-nav-link {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  padding: var(--spacing-lg);
+  font-weight: var(--font-weight-medium);
+  transition: color var(--transition-fast);
+  margin-bottom: -1px; /* Align with border */
+}
+
+.p-tabview .p-tabview-nav li:not(.p-highlight):not(.p-disabled):hover .p-tabview-nav-link {
+  color: var(--text-primary);
+  background: var(--component-bg-hover);
+  border-color: transparent;
+}
+
+.p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+  color: var(--accent-primary);
   border-color: var(--accent-primary);
 }
 
-/* Dialog / Panel */
-.p-dialog,
-.p-panel,
-.p-card {
-  background: var(--bg-secondary);
-  border: var(--ui-border-width) solid var(--border-primary);
-  border-radius: var(--ui-border-radius-lg);
-  box-shadow: var(--shadow-md); /* Using new shadow token */
-}
-.p-dialog-header,
-.p-panel-header {
-  background: transparent;
-  border-bottom: var(--ui-border-width) solid var(--border-primary);
-  padding: var(--spacing-lg) var(--spacing-xl); /* Using new spacing tokens */
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-/* Datatable */
-.p-datatable-wrapper {
-  border: var(--ui-border-width) solid var(--border-primary);
-  background: var(--bg-primary);
-  border-radius: var(--ui-border-radius);
-  overflow: hidden; /* Good practice for rounded corners */
-}
-.p-datatable .p-datatable-thead > tr > th {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  font-weight: 600;
-  padding: var(--spacing-lg); /* Using new spacing tokens */
-}
-.p-datatable .p-datatable-tbody > tr > td {
-  padding: var(--spacing-md) var(--spacing-lg); /* Using new spacing tokens */
-  color: var(--text-secondary);
-  border-color: var(--border-primary);
-}
-.p-datatable .p-datatable-tbody > tr:hover {
-  background: var(--bg-ternary);
-}
-
-/* Tabs */
-.p-tabview .p-tabview-nav-link {
-  background: transparent !important;
-  color: var(--text-secondary) !important;
-  padding: var(--spacing-md) var(--spacing-lg); /* Using new spacing tokens */
-  font-weight: 500;
-  transition: var(--transition-fast);
-}
-.p-tabview .p-tabview-nav-link:hover {
-  color: var(--text-primary) !important;
-  background: var(--bg-ternary) !important;
-}
+/* Hide the default PrimeNG Ink Bar if you prefer the border-bottom style above */
 .p-tabview .p-tabview-ink-bar {
-  background: var(--accent-primary) !important;
-  height: 3px !important;
+  display: none; 
 }
 
-/* Tooltip */
-.p-tooltip {
+/* --- 7. TAGS & BADGES --- */
+.p-tag {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  padding: 2px 8px;
+  border-radius: var(--ui-border-radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Semantic Tags mappings */
+.p-tag.p-tag-success { background: rgba(16, 185, 129, 0.15); color: var(--color-success); }
+.p-tag.p-tag-warning { background: rgba(245, 158, 11, 0.15); color: var(--color-warning); }
+.p-tag.p-tag-danger  { background: rgba(239, 68, 68, 0.15); color: var(--color-error); }
+.p-tag.p-tag-info    { background: rgba(59, 130, 246, 0.15); color: var(--color-info); }
+
+/* --- 8. TOASTS & OVERLAYS --- */
+.p-toast .p-toast-message {
   background: var(--bg-secondary);
-  border-radius: var(--ui-border-radius);
-  padding: var(--spacing-sm) var(--spacing-md); /* Using new spacing tokens */
+  backdrop-filter: blur(var(--glass-blur-c));
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-xl);
   color: var(--text-primary);
-  box-shadow: var(--shadow-lg);
+  border-radius: var(--ui-border-radius-lg);
 }
-
-/* Badge */
-.p-badge {
-  background: var(--accent-primary);
-  color: #fff;
-  border-radius: 999px;
-  font-weight: 600;
-  padding: var(--spacing-xs) var(--spacing-md); /* Using new spacing tokens */
-}
-
-/* Mobile tweaks (PrimeNG components often need slight adjustments on small widths) */
+/* --- 9. RESPONSIVE FIXES --- */
 @media (max-width: 768px) {
-  .p-dialog,
-  .p-panel {
+  .p-dialog {
     width: 95vw !important;
-    height: auto !important;
-    max-width: 100%;
+    max-height: 90vh;
   }
   .p-datatable .p-datatable-thead > tr > th,
   .p-datatable .p-datatable-tbody > tr > td {
-    padding: var(--spacing-md); /* Using new spacing tokens */
+    padding: var(--spacing-md);
   }
 }
-
-// /* ============================
-//    PRIME NG OVERRIDES
-//    - Use tokens (accent-primary, bg-secondary, border-primary)
-//    - Loads LAST (after theme & base)
-// ============================ */
-
-// /* Buttons */
-// .p-button {
-//   font-weight: 600;
-//   font-size: var(--font-size-sm);
-//   padding: 0.55rem 1.1rem;
-//   border-radius: 999px;
-//   background: var(--accent-gradient);
-//   color: #fff;
-//   border: none;
-//   transition: var(--ui-transition);
-// }
-// .p-button:focus { box-shadow: 0 0 0 4px var(--accent-focus); }
-// .p-button:hover { transform: translateY(-2px); box-shadow: var(--ui-shadow-md); }
-
-// /* Inputs and selects */
-// .p-inputtext,
-// .p-inputnumber-input,
-// .p-password-input,
-// .p-textarea,
-// .p-dropdown,
-// .p-inputmask {
-//   width: 100%;
-//   height: 2.75rem;
-//   padding: calc(var(--spacing-sm)) calc(var(--spacing-md));
-//   border-radius: var(--ui-border-radius);
-//   border: var(--ui-border-width) solid var(--border-secondary);
-//   background: var(--bg-ternary);
-// }
-// .p-inputtext:focus, .p-dropdown:focus { box-shadow: 0 0 0 4px var(--accent-focus); border-color: var(--accent-primary); }
-
-// /* Dialog / Panel */
-// .p-dialog, .p-panel, .p-card {
-//   background: var(--bg-secondary);
-//   border: var(--ui-border-width) solid var(--border-primary);
-//   border-radius: var(--ui-border-radius-lg);
-//   box-shadow: var(--ui-shadow-md);
-// }
-// .p-dialog-header, .p-panel-header {
-//   background: transparent;
-//   border-bottom: var(--ui-border-width) solid var(--border-primary);
-//   padding: calc(var(--spacing-sm)) calc(var(--spacing-lg));
-//   font-weight: 600;
-// }
-
-// /* Datatable */
-// .p-datatable-wrapper {
-//   border: var(--ui-border-width) solid var(--border-primary);
-//   background: var(--bg-primary);
-//   border-radius: var(--ui-border-radius);
-// }
-// .p-datatable .p-datatable-thead > tr > th {
-//   background: var(--bg-secondary); color: var(--text-primary); font-weight: 600; padding: calc(var(--spacing-md));
-// }
-
-// /* Tabs */
-// .p-tabview .p-tabview-nav-link { background: transparent !important; color: var(--text-secondary) !important; padding: calc(var(--spacing-sm)) calc(var(--spacing-md)); }
-// .p-tabview .p-tabview-nav-link:hover { color: var(--text-primary) !important; background: var(--bg-ternary); }
-// .p-tabview .p-tabview-ink-bar { background: var(--accent-primary) !important; height: 3px !important; }
-
-// /* Tooltip */
-// .p-tooltip { background: var(--bg-secondary); border-radius: var(--ui-border-radius); padding: calc(var(--spacing-xs)) calc(var(--spacing-sm)); color: var(--text-primary); }
-
-// /* Badge */
-// .p-badge { background: var(--accent-primary); color: #fff; border-radius: 999px; font-weight: 600; padding: 0.25rem 0.5rem; }
-
-// /* Mobile tweaks (PrimeNG components often need slight adjustments on small widths) */
-// @media (max-width: 768px) {
-//   .p-dialog, .p-panel { width: 95vw !important; height: auto !important; max-width: 100%; }
-//   .p-datatable .p-datatable-thead > tr > th, .p-datatable .p-datatable-tbody > tr > td { padding: calc(var(--spacing-sm)); }
-// }

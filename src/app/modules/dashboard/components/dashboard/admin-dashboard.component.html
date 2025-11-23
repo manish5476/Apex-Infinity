@@ -1,0 +1,169 @@
+  <!-- <app-notification-calendar></app-notification-calendar> -->
+
+<div class="dashboard-container animate-fadeIn">
+  <header class="dashboard-header">
+    <div class="header-content">
+      <h1 class="page-title">Overview</h1>
+      <p class="page-subtitle">Welcome back, here's what's happening today.</p>
+    </div>
+    
+    <div class="header-actions">
+      <p-button label="Download Report" icon="pi pi-download" styleClass="p-button-outlined p-button-sm"></p-button>
+      <p-button label="Refresh Data" icon="pi pi-refresh" (onClick)="loadDashboard()" [loading]="loading()" styleClass="p-button-sm"></p-button>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="grid-layout">
+      <p-skeleton height="8rem" borderRadius="10px" styleClass="w-full"></p-skeleton>
+      <p-skeleton height="8rem" borderRadius="10px" styleClass="w-full"></p-skeleton>
+      <p-skeleton height="8rem" borderRadius="10px" styleClass="w-full"></p-skeleton>
+      <p-skeleton height="8rem" borderRadius="10px" styleClass="w-full"></p-skeleton>
+    </div>
+  } @else {
+
+    <div class="grid-layout kpi-section">
+      
+      <div class="glass-card kpi-card">
+        <div class="kpi-top">
+          <div class="icon-wrapper accent-wrapper">
+            <i class="pi pi-wallet"></i>
+          </div>
+          <span class="trend-badge positive">
+            <i class="pi pi-arrow-up"></i> 12.5%
+          </span>
+        </div>
+        <div class="kpi-content">
+          <span class="kpi-label">Total Revenue</span>
+          <h3 class="kpi-value">{{ common.formatCurrency(summaryData()?.totalSales) }}</h3>
+        </div>
+      </div>
+
+      <div class="glass-card kpi-card">
+        <div class="kpi-top">
+          <div class="icon-wrapper success-wrapper">
+            <i class="pi pi-percentage"></i>
+          </div>
+          <span class="trend-badge" [class.positive]="summaryData()?.netProfit > 0" [class.negative]="summaryData()?.netProfit < 0">
+            <i class="pi" [class.pi-arrow-up]="summaryData()?.netProfit > 0" [class.pi-arrow-down]="summaryData()?.netProfit < 0"></i>
+            {{ summaryData()?.netProfit > 0 ? '+5.2%' : '-2.1%' }}
+          </span>
+        </div>
+        <div class="kpi-content">
+          <span class="kpi-label">Net Profit</span>
+          <h3 class="kpi-value">{{ common.formatCurrency(summaryData()?.netProfit) }}</h3>
+        </div>
+      </div>
+
+      <div class="glass-card kpi-card">
+        <div class="kpi-top">
+          <div class="icon-wrapper info-wrapper">
+            <i class="pi pi-shopping-cart"></i>
+          </div>
+          <span class="trend-badge neutral">
+            <i class="pi pi-minus"></i> 0.0%
+          </span>
+        </div>
+        <div class="kpi-content">
+          <span class="kpi-label">Total Invoices</span>
+          <h3 class="kpi-value">{{ summaryData()?.invoiceCount || 0 }}</h3>
+        </div>
+      </div>
+
+      <div class="glass-card kpi-card">
+        <div class="kpi-top">
+          <div class="icon-wrapper warning-wrapper">
+            <i class="pi pi-receipt"></i>
+          </div>
+          <span class="trend-badge negative">
+            <i class="pi pi-arrow-up"></i> +4.1%
+          </span>
+        </div>
+        <div class="kpi-content">
+          <span class="kpi-label">Expenses</span>
+          <h3 class="kpi-value">{{ common.formatCurrency(summaryData()?.expenses) }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content-grid">
+
+      <div class="glass-card chart-section">
+        <div class="card-header">
+          <div>
+            <h3>Revenue Analytics</h3>
+            <span class="text-xs text-secondary">Monthly performance overview</span>
+          </div>
+          <p-button icon="pi pi-ellipsis-h" styleClass="p-button-text p-button-rounded p-button-secondary"></p-button>
+        </div>
+        <div class="chart-wrapper">
+          <p-chart type="line" [data]="chartData()" [options]="chartOptions()" height="100%"></p-chart>
+        </div>
+      </div>
+
+      <div class="glass-card products-section">
+        <div class="card-header">
+          <div>
+            <h3>Top Products</h3>
+            <span class="text-xs text-secondary">Best selling items</span>
+          </div>
+        </div>
+        
+        <div class="table-container">
+          <p-table [value]="topProducts()" styleClass="p-datatable-sm">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Product</th>
+                <th class="text-right">Vol</th>
+                <th class="text-right">Rev</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-p>
+              <tr>
+                <td>
+                  <div class="flex flex-col">
+                    <span class="font-medium text-sm">{{ p.productName }}</span>
+                  </div>
+                </td>
+                <td class="text-right font-mono text-xs">{{ p.quantitySold }}</td>
+                <td class="text-right font-bold text-xs text-primary">{{ common.formatCurrency(p.totalRevenue) }}</td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+               <tr><td colspan="3" class="text-center text-xs text-secondary p-4">No data available</td></tr>
+            </ng-template>
+          </p-table>
+        </div>
+        
+        <div class="card-footer">
+          <button class="p-button-text w-full text-xs text-accent">View All Inventory</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="glass-card mt-6">
+      <div class="card-header border-b border-primary-subtle p-4">
+        <h3>Outstanding Receivables</h3>
+      </div>
+      <p-table [value]="receivables()" [rows]="5" [paginator]="true" styleClass="p-datatable-sm">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Customer</th>
+            <th>Contact</th>
+            <th>Status</th>
+            <th class="text-right">Amount Due</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item>
+          <tr>
+            <td class="font-medium">{{ item.party?.name }}</td>
+            <td class="text-secondary text-xs">{{ item.party?.phone }}</td>
+            <td><p-tag  value="Pending"></p-tag></td>
+            <td class="text-right font-bold text-error">{{ common.formatCurrency(item.outstanding) }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  }
+</div>

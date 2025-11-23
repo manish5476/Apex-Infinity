@@ -1,0 +1,342 @@
+:host {
+    display: block;
+    width: 100%;
+}
+
+.timeline-wrapper {
+  background: var(--bg-primary); /* Matches parent card */
+  /* Remove border-bottom here if parent handles it, otherwise keep */
+  border-bottom: 1px solid var(--border-secondary); 
+  padding: var(--spacing-md) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  user-select: none;
+}
+
+/* Header */
+.timeline-header {
+  padding: 0 var(--spacing-xl);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .month-navigator {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    
+    .current-month {
+      font-family: var(--font-heading);
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      min-width: 140px;
+      text-align: center;
+    }
+
+    .nav-btn {
+        color: var(--text-secondary);
+        &:hover {
+            color: var(--text-primary);
+            background: var(--component-bg-hover);
+        }
+    }
+  }
+
+  .today-btn {
+      color: var(--accent-primary);
+      font-weight: var(--font-weight-semibold);
+  }
+}
+
+/* Strip */
+.timeline-strip {
+  display: flex;
+  gap: var(--spacing-md);
+  overflow-x: auto;
+  padding: var(--spacing-xs) var(--spacing-xl) var(--spacing-lg) var(--spacing-xl);
+  scroll-behavior: smooth;
+  
+  /* Scrollbar Styling */
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--text-label);
+  }
+}
+
+/* Day Card */
+.day-card {
+  flex: 0 0 auto;
+  width: 64px;
+  height: 96px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--ui-border-radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+
+  /* Text Colors */
+  .day-name {
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    color: var(--text-label);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: 2px;
+  }
+
+  .day-num {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+  }
+
+  /* Hover State */
+  &:hover {
+    background: var(--component-bg-hover);
+    border-color: var(--accent-primary);
+    transform: translateY(-2px);
+  }
+
+  /* Today State (Subtle border) */
+  &.today {
+      border-color: var(--text-label); 
+      background: var(--bg-ternary);
+  }
+
+  /* Active State (Selected) */
+  &.active {
+    border-color: var(--accent-primary);
+    background: var(--component-bg-active);
+    box-shadow: var(--shadow-sm);
+    
+    .day-name, .day-num {
+      color: var(--accent-primary);
+    }
+    
+    .note-pill {
+      background-color: var(--accent-primary);
+    }
+    .note-pill-overflow {
+        color: var(--accent-primary);
+    }
+  }
+
+  /* Activity Bar (Dots) */
+  .activity-bar {
+    margin-top: 8px;
+    display: flex;
+    gap: 3px;
+    height: 6px;
+    align-items: center;
+  }
+
+  .note-pill {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: var(--text-label); /* Default dot color */
+    opacity: 0.7;
+  }
+  
+  .note-pill-overflow {
+    font-size: 8px;
+    color: var(--text-label);
+    line-height: 4px;
+    font-weight: bold;
+    margin-left: 1px;
+  }
+
+  /* Visual fix: If day has notes but is NOT active, make dots accent color? */
+  &.has-notes:not(.active) .note-pill {
+      background-color: var(--accent-primary);
+      opacity: 0.5;
+  }
+}
+
+/* Skeleton Wrapper */
+.day-card-skeleton-wrapper {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.day-card-skeleton {
+    @extend .day-card;
+    border-color: transparent;
+    background: var(--bg-ternary);
+    pointer-events: none;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+// // Variables (match your global theme)
+// $primary-color: #10b981; // Tailwind Emerald-500
+// $primary-light: #d1fae5; // Emerald-100
+// $bg-card: #ffffff;
+// $bg-hover: #f9fafb;
+// $text-main: #1f2937;
+// $text-muted: #9ca3af;
+// $border-color: #e5e7eb;
+
+// .timeline-wrapper {
+//   background: $bg-card;
+//   border-bottom: 1px solid $border-color;
+//   padding: 1rem 0;
+//   display: flex;
+//   flex-direction: column;
+//   gap: 1rem;
+//   overflow: hidden; // Prevent outer scroll
+// }
+
+// .timeline-header {
+//   padding: 0 1.5rem;
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-between;
+
+//   .month-navigator {
+//     display: flex;
+//     align-items: center;
+//     gap: 1rem;
+    
+//     .current-month {
+//       font-size: 1.1rem;
+//       font-weight: 600;
+//       color: $text-main;
+//       min-width: 140px;
+//       text-align: center;
+//     }
+//   }
+// }
+
+// // The Horizontal Scroll Container
+// .timeline-strip {
+//   display: flex;
+//   gap: 0.75rem;
+//   overflow-x: auto;
+//   padding: 0.5rem 1.5rem 1rem 1.5rem; // Bottom padding for scrollbar space
+//   scroll-behavior: smooth;
+  
+//   // Hide scrollbar for clean look (optional)
+//   &::-webkit-scrollbar {
+//     height: 6px;
+//   }
+//   &::-webkit-scrollbar-track {
+//     background: transparent;
+//   }
+//   &::-webkit-scrollbar-thumb {
+//     background: #e5e7eb;
+//     border-radius: 10px;
+//   }
+//   &::-webkit-scrollbar-thumb:hover {
+//     background: #d1d5db;
+//   }
+// }
+
+// // Individual Day Card
+// .day-card {
+//   flex: 0 0 auto; // Don't shrink
+//   width: 60px;
+//   height: 90px;
+//   background: $bg-card;
+//   border: 1px solid $border-color;
+//   border-radius: 12px;
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   justify-content: center;
+//   cursor: pointer;
+//   transition: all 0.2s ease;
+//   user-select: none;
+
+//   // Hover State
+//   &:hover {
+//     background: $bg-hover;
+//     border-color: darken($border-color, 10%);
+//     transform: translateY(-2px);
+//   }
+
+//   // Active/Selected State
+//   &.active {
+//     border-color: $primary-color;
+//     background: $primary-light;
+//     box-shadow: 0 4px 6px -1px rgba($primary-color, 0.2);
+    
+//     .day-name, .day-num {
+//       color: darken($primary-color, 20%);
+//     }
+    
+//     .note-pill {
+//       background-color: darken($primary-color, 10%);
+//     }
+//   }
+
+//   .day-name {
+//     font-size: 0.7rem;
+//     text-transform: uppercase;
+//     color: $text-muted;
+//     font-weight: 600;
+//     margin-bottom: 2px;
+//   }
+
+//   .day-num {
+//     font-size: 1.2rem;
+//     font-weight: 700;
+//     color: $text-main;
+//   }
+
+//   // Visual Dots at the bottom
+//   .activity-bar {
+//     margin-top: 6px;
+//     display: flex;
+//     gap: 3px;
+//     height: 6px; // Fixed height area
+//     align-items: flex-end;
+//   }
+
+//   .note-pill {
+//     width: 6px;
+//     height: 6px;
+//     border-radius: 50%;
+//     background-color: $primary-color;
+//     opacity: 0.6;
+//   }
+  
+//   .note-pill-overflow {
+//     font-size: 8px;
+//     color: $primary-color;
+//     line-height: 4px;
+//   }
+  
+//   // Specific styling for empty days vs days with notes
+//   &:not(.has-notes) .activity-bar {
+//     display: none; // Clean look for empty days
+//   }
+// }
+
+// // Skeleton
+// .day-card-skeleton {
+//   @extend .day-card;
+//   border: 1px solid transparent; // Remove border for skeleton
+//   background: #f3f4f6;
+//   pointer-events: none;
+// }

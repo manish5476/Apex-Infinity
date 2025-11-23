@@ -1,8 +1,3 @@
-<!-- 
-  REFACTORED:
-  - Using 'label' as the key for expandedItems
-  - Using `routerLinkActiveOptions` for exact match on dashboard
--->
 <div
   class="sidebar-container"
   [ngClass]="{
@@ -15,28 +10,41 @@
   <div class="sidebar-inner">
     <div class="menu-list">
       
-      <!-- Iterate over menu groups -->
-      <div *ngFor="let group of menuItems" class="menu-group">
+      <div
+        *ngFor="let item of menuItems"
+        class="menu-item-wrapper"
+        routerLinkActive="active-parent" 
         
-        <!-- Group Header -->
-        <div classs="group-header" 
-           [ngClass]="{
-             'hidden-text': !isPinned && !isHovered,
-             'visible-text': isPinned || isHovered
-           }">
-          {{ group.label }}
-        </div>
+        [routerLinkActiveOptions]="item.label === 'Dashboard' ? {exact: true} : {exact: false}"
         
-        <!-- Iterate over items in the group -->
-        <div *ngFor="let item of group.items" class="menu-item">
+        (mouseleave)="onMenuTitleLeave(item.label)"
+      >
+        
+        <a
+          *ngIf="!item.items; else multiItem"
+          [routerLink]="item.routerLink"
+          routerLinkActive="active-link"
           
-          <!-- Single Link (no submenu) -->
-          <a
-            *ngIf="!item.items; else multiItem"
-            [routerLink]="item.routerLink"
-            routerLinkActive="active-link"
-            [routerLinkActiveOptions]="item.routerLink.includes('/dashboard') ? {exact: true} : {exact: false}"
-            class="menu-title"
+          [routerLinkActiveOptions]="item.label === 'Dashboard' ? {exact: true} : {exact: false}"
+          
+          class="menu-title"
+        >
+          <i [class]="item.icon + ' menu-icon'"></i>
+          <span
+            class="menu-label"
+            [ngClass]="{
+              'hidden-text': !isPinned && !isHovered,
+              'visible-text': isPinned || isHovered
+            }"
+            >{{ item.label }}</span
+          >
+        </a>
+
+        <ng-template #multiItem>
+          <div 
+            class="menu-title" 
+            (click)="toggleMenuItem(item.label)"
+            (mouseenter)="onMenuTitleEnter(item.label)"
           >
             <i [class]="item.icon + ' menu-icon'"></i>
             <span
@@ -47,59 +55,42 @@
               }"
               >{{ item.label }}</span
             >
-          </a>
-
-          <!-- Item with Submenu -->
-          <ng-template #multiItem>
-            <div class="menu-title" (click)="toggleMenuItem(item.label)">
-              <i [class]="item.icon + ' menu-icon'"></i>
-              <span
-                class="menu-label"
-                [ngClass]="{
-                  'hidden-text': !isPinned && !isHovered,
-                  'visible-text': isPinned || isHovered
-                }"
-                >{{ item.label }}</span
-              >
-              <i
-                class="pi pi-angle-down menu-arrow"
-                [ngClass]="{
-                  'rotate-180': expandedItems[item.label],
-                  'rotate-0': !expandedItems[item.label]
-                }"
-                [style.opacity]="(isPinned || isHovered) ? 1 : 0"
-              ></i>
-            </div>
-
-            <!-- Submenu -->
-            <div
-              class="submenu"
+            <i
+              class="pi pi-angle-down menu-arrow"
               [ngClass]="{
-                'submenu-collapsed': !expandedItems[item.label],
-                'submenu-expanded': expandedItems[item.label]
+                'rotate-180': expandedItems[item.label],
+                'rotate-0': !expandedItems[item.label]
+              }"
+              [style.opacity]="(isPinned || isHovered) ? 1 : 0"
+            ></i>
+          </div>
+
+          <div
+            class="submenu"
+            [ngClass]="{
+              'submenu-collapsed': !expandedItems[item.label],
+              'submenu-expanded': expandedItems[item.label]
+            }"
+          >
+            <a
+              *ngFor="let subItem of item.items"
+              [routerLink]="subItem.routerLink"
+              routerLinkActive="active-link"
+              class="submenu-link"
+              [ngClass]="{
+                'hidden-text': !isPinned && !isHovered,
+                'visible-text': isPinned || isHovered
               }"
             >
-              <a
-                *ngFor="let subItem of item.items"
-                [routerLink]="subItem.routerLink"
-                routerLinkActive="active-link"
-                class="submenu-link"
-                [ngClass]="{
-                  'hidden-text': !isPinned && !isHovered,
-                  'visible-text': isPinned || isHovered
-                }"
-              >
-                <i [class]="subItem.icon + ' submenu-icon'"></i>
-                <span>{{ subItem.label }}</span>
-              </a>
-            </div>
-          </ng-template>
+              <i [class]="subItem.icon + ' submenu-icon'"></i>
+              <span>{{ subItem.label }}</span>
+            </a>
+          </div>
+        </ng-template>
 
-        </div>
       </div>
     </div>
 
-    <!-- Footer -->
     <div
       class="sidebar-footer"
       [ngClass]="{
@@ -118,7 +109,6 @@
   </div>
 </div>
 
-<!-- Hover trigger area when sidebar is collapsed -->
 <div
   class="hover-trigger"
   (mouseenter)="mouseEnterTriggerZone.emit()"

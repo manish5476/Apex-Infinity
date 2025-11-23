@@ -1,121 +1,107 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { HttpErrorResponse } from '@angular/common/http';
 import { BaseApiService } from '../../../core/services/base-api.service';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class PaymentService extends BaseApiService {
   private endpoint = '/v1/payments';
 
-  /**
-   * 🧾 Create a new payment
-   */
   createPayment(paymentData: any): Observable<any> {
-    return this.http
-      .post(`${this.baseUrl}${this.endpoint}`, paymentData)
-      .pipe(
-        catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('createPayment', error),
-        ),
-      );
+    return this.post(this.endpoint, paymentData, 'createPayment');
   }
 
-  /**
-   * 📄 Get all payments (with optional filters)
-   */
   getAllPayments(filterParams?: any): Observable<any> {
-    return this.http
-      .get<any>(`${this.baseUrl}${this.endpoint}`, {
-        params: this.createHttpParams(filterParams),
-      })
-      .pipe(
-        catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getAllPayments', error),
-        ),
-      );
+    return this.get(this.endpoint, filterParams, 'getAllPayments');
   }
 
-  /**
-   * 🔍 Get payment by ID
-   */
   getPaymentById(id: string): Observable<any> {
-    return this.http
-      .get<any>(`${this.baseUrl}${this.endpoint}/${id}`)
-      .pipe(
-        catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getPaymentById', error),
-        ),
-      );
+    return this.get(`${this.endpoint}/${id}`, {}, 'getPaymentById');
   }
 
-  /**
-   * 👥 Get payments by customer ID
-   */
   getPaymentsByCustomer(customerId: string): Observable<any> {
-    return this.http
-      .get<any>(`${this.baseUrl}${this.endpoint}/customer/${customerId}`)
-      .pipe(
-        catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getPaymentsByCustomer', error),
-        ),
-      );
+    return this.get(`${this.endpoint}/customer/${customerId}`, {}, 'getPaymentsByCustomer');
   }
 
-  /**
-   * 🏢 Get payments by supplier ID
-   */
   getPaymentsBySupplier(supplierId: string): Observable<any> {
-    return this.http
-      .get<any>(`${this.baseUrl}${this.endpoint}/supplier/${supplierId}`)
-      .pipe(
-        catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('getPaymentsBySupplier', error),
-        ),
-      );
+    return this.get(`${this.endpoint}/supplier/${supplierId}`, {}, 'getPaymentsBySupplier');
   }
 
-  /**
-   * ✏️ Update payment details
-   */
   updatePayment(paymentId: string, paymentData: any): Observable<any> {
-    return this.http
-      .patch(`${this.baseUrl}${this.endpoint}/${paymentId}`, paymentData)
-      .pipe(
-        catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('updatePayment', error),
-        ),
-      );
+    return this.patch(`${this.endpoint}/${paymentId}`, paymentData, 'updatePayment');
+  }
+
+  deletePayment(paymentId: string): Observable<any> {
+    return this.delete(`${this.endpoint}/${paymentId}`, 'deletePayment');
+  }
+
+  // ============================================================
+  // 📄 DOCUMENTS & ACTIONS
+  // ============================================================
+
+  /**
+   * Download Payment Receipt (PDF)
+   * NOTE: We use this.http.get directly because BaseApi.get() expects JSON, 
+   * but here we need 'blob' (Binary Large Object) for files.
+   */
+  downloadReceipt(paymentId: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}${this.endpoint}/${paymentId}/receipt/download`, {
+      responseType: 'blob', // <--- CRITICAL for files
+      observe: 'response'
+    }).pipe(
+      catchError(err => this.errorhandler.handleError(err, 'downloadReceipt'))
+    );
   }
 
   /**
-   * 🗑️ Delete a payment by ID
+   * Email Payment Receipt
    */
-  deletePayment(paymentId: string): Observable<any> {
-    return this.http
-      .delete(`${this.baseUrl}${this.endpoint}/${paymentId}`)
-      .pipe(
-        catchError((error: HttpErrorResponse) =>
-          this.errorhandler.handleError('deletePayment', error),
-        ),
-      );
+  emailReceipt(paymentId: string): Observable<any> {
+    return this.post(`${this.endpoint}/${paymentId}/receipt/email`, {}, 'emailReceipt');
   }
-
-  // 💡 Future extensions
-  // -------------------------------------------------------
-  // restorePayment(paymentId: string)
-  // bulkDeletePayments(paymentIds: string[])
-  // uploadPaymentProof(paymentId: string, formData: FormData)
 }
 
-
 // import { Injectable } from '@angular/core';
+// import { Observable } from 'rxjs';
+// import { BaseApiService } from '../../../core/services/base-api.service';
 
-// @Injectable({
-//   providedIn: 'root',
-// })
-// export class PaymentService {
-  
+// @Injectable({ providedIn: 'root' })
+// export class PaymentService extends BaseApiService {
+//   private endpoint = '/v1/payments';
+
+//   createPayment(paymentData: any): Observable<any> {
+//     return this.post(this.endpoint, paymentData, 'createPayment');
+//   }
+
+//   getAllPayments(filterParams?: any): Observable<any> {
+//     return this.get(this.endpoint, filterParams, 'getAllPayments');
+//   }
+
+//   getPaymentById(id: string): Observable<any> {
+//     return this.get(`${this.endpoint}/${id}`, {}, 'getPaymentById');
+//   }
+
+//   getPaymentsByCustomer(customerId: string): Observable<any> {
+//     return this.get(`${this.endpoint}/customer/${customerId}`, {}, 'getPaymentsByCustomer');
+//   }
+
+//   downloadPaymentsByCustomer(paymentId: string): Observable<any> {
+//     return this.get(`${this.endpoint}/${paymentId}/receipt/download`, {}, 'downloadPaymentsByCustomer');
+//   }
+
+//   EmailPaymentsByCustomer(paymentId: string): Observable<any> {
+//     return this.post(`${this.endpoint}/${paymentId}/receipt/email`, {}, 'EmailPaymentsByCustomer');
+//   }
+
+//   getPaymentsBySupplier(supplierId: string): Observable<any> {
+//     return this.get(`${this.endpoint}/supplier/${supplierId}`, {}, 'getPaymentsBySupplier');
+//   }
+
+//   updatePayment(paymentId: string, paymentData: any): Observable<any> {
+//     return this.patch(`${this.endpoint}/${paymentId}`, paymentData, 'updatePayment');
+//   }
+
+//   deletePayment(paymentId: string): Observable<any> {
+//     return this.delete(`${this.endpoint}/${paymentId}`, 'deletePayment');
+//   }
 // }

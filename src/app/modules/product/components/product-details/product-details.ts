@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { finalize, switchMap } from 'rxjs/operators';
 import { of, map } from 'rxjs';
-
+import { CarouselModule } from 'primeng/carousel'; // <--- IMPORT THIS
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
@@ -14,6 +14,7 @@ import { LoadingService } from '../../../../core/services/loading.service';
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { ProductService } from '../../services/product-service';
+import { ImageViewerDirective } from '../../../shared/directives/image-viewer.directive';
 
 // A simplified interface based on your model
 interface IProduct {
@@ -29,7 +30,7 @@ interface IProduct {
   isTaxInclusive?: boolean;
   inventory: { branchId: string; quantity: number; reorderLevel: number }[];
   images?: string[];
-  defaultSupplierId?: string;
+  defaultSupplierId?: any;
   tags?: string[];
   isActive: boolean;
   totalStock: number; // The virtual
@@ -42,11 +43,11 @@ interface IProduct {
   imports: [
     CommonModule,
     RouterModule,
-    ButtonModule,
+    ButtonModule,ImageViewerDirective,
     DividerModule,
     TagModule,
     AvatarModule,
-    TableModule
+    TableModule,CarouselModule
   ],
   templateUrl: './product-details.html',
   styleUrl: './product-details.scss',
@@ -58,12 +59,8 @@ export class ProductDetailsComponent implements OnInit {
   private loadingService = inject(LoadingService);
   private messageService = inject(AppMessageService);
   private masterList = inject(MasterListService); // To get branch names
-
   product = signal<IProduct | null>(null);
-  
-  // We need to map branch IDs to names for the inventory table
   branchNameMap = new Map<string, string>();
-
   constructor() {
     // Create a map from the master list of branches
     this.masterList.branches().forEach(branch => {
@@ -125,4 +122,58 @@ export class ProductDetailsComponent implements OnInit {
     }
     return [];
   }
+  onFileSelected(event: any): void {
+    const input = event.target;
+    const files: FileList = input.files;
+
+    if (files && files.length > 0) {
+      const formData = new FormData();
+
+      // 1. Loop through all selected files
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+
+        // Validate each file
+        if (!file.type.startsWith('image/')) {
+          this.messageService.showError('Invalid File', `File ${file.name} is not an image.`);
+          continue; 
+        }
+
+        // 2. Append using the SAME key 'photos' (must match backend upload.array('photos'))
+        formData.append('photos', file);
+      }
+
+      // 3. Call API
+      this.uploadImage(formData);
+
+      // 4. CRITICAL FIX: Reset input value so the (change) event fires 
+      // even if you select the same file again later.
+      input.value = ''; 
+    }
+  }
+
+  private uploadImage(formData: FormData): void {
+    const productId = this.product()?._id;
+    if (!productId) return;
+
+    this.loadingService.show();
+
+    // Ensure your ProductService calls .patch properly
+    this.productService.uploadProductFile(productId, formData).subscribe({
+      next: (res: any) => {
+        const updatedProduct = res.data?.product;
+        if (updatedProduct) {
+          this.product.set(updatedProduct);
+          this.messageService.showSuccess('Success', 'Images uploaded successfully');
+        }
+        this.loadingService.hide();
+      },
+      error: (err) => {
+        console.error(err);
+        this.messageService.showError('Upload Failed', 'Could not upload images');
+        this.loadingService.hide();
+      }
+    });
+  }
+
 }

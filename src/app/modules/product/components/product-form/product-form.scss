@@ -1,8 +1,5 @@
 /* ==============================================
-   PRODUCT FORM COMPONENT
-   - Using canonical theme tokens
-   - Re-using .customer-wrapper layout
-   - Full-width with section-based layout
+   PRODUCT FORM STYLES
    ============================================== */
 
 :host {
@@ -11,25 +8,25 @@
   height: 100%;
 }
 
-/* === Main Wrapper (from invoice form) === */
 .customer-wrapper {
   width: 100%;
   height: 100%;
-  overflow: hidden; // This holds the layout
+  overflow: hidden;
   display: flex;
   justify-content: center;
   background: var(--bg-primary);
   padding: var(--spacing-xl);
+
+  @media (max-width: 768px) {
+    padding: 0; // Full screen on mobile
+  }
 }
 
 .customer-container {
   width: 100%;
-  // max-width: 1200px; // Removed for full width
+  height: 100%;
 }
 
-/* === BANNER STYLES REMOVED === */
-
-/* === Form Panel (from invoice form) === */
 .customer-form-panel {
   display: flex;
   flex-direction: column;
@@ -40,7 +37,11 @@
   box-shadow: var(--shadow-md);
   overflow: hidden;
   border: var(--ui-border-width) solid var(--border-primary);
-  max-height: 100%; // Use full height as banner is gone
+
+  @media (max-width: 768px) {
+    border-radius: 0;
+    border: none;
+  }
 }
 
 .customer-form-layout {
@@ -49,13 +50,12 @@
   height: 100%;
 }
 
-/* === 1. Sticky Header (from invoice form) === */
+/* === HEADER === */
 .customer-form-header {
   padding: var(--spacing-lg) var(--spacing-xl);
   background: var(--bg-secondary);
   border-bottom: var(--ui-border-width) solid var(--border-primary);
   flex-shrink: 0;
-  z-index: 10;
 
   .form-title {
     font-size: var(--font-size-2xl);
@@ -66,17 +66,15 @@
   .form-subtitle {
     font-size: var(--font-size-sm);
     color: var(--text-secondary);
-    margin: 0;
+    margin: 4px 0 0 0;
   }
-  .req {
-    color: var(--color-error);
-  }
+  .req { color: var(--color-error); }
 }
 
-/* === 2. Scrollable Body (from invoice form) === */
+/* === BODY === */
 .customer-form-body {
-  flex: 1; // Grow to fill space
-  overflow-y: auto; // This is the scrollable part
+  flex: 1;
+  overflow-y: auto;
   padding: var(--spacing-xl);
   background: var(--bg-primary);
   display: flex;
@@ -84,65 +82,25 @@
   gap: var(--spacing-xl);
 }
 
-/* === 3. Sticky Footer (from invoice form) === */
-.customer-form-footer {
-  background: var(--bg-secondary);
-  border-top: var(--ui-border-width) solid var(--border-primary);
-  padding: var(--spacing-lg) var(--spacing-xl);
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-md);
-  flex-shrink: 0;
-  z-index: 10;
-}
-
-/* === NEW: Form Section (from customer-form) === */
+/* === SECTIONS === */
 .form-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-  padding: var(--spacing-xl);
-  background: var(--bg-secondary); // Use secondary bg for sections
-  border-radius: var(--ui-border-radius-lg); // Make sections rounded
+  background: var(--bg-secondary);
   border: var(--ui-border-width) solid var(--border-primary);
-  box-shadow: var(--shadow-sm); // Add shadow to lift section
+  border-radius: var(--ui-border-radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
 
   .section-title {
     font-size: var(--font-size-lg);
     font-weight: 600;
     color: var(--text-primary);
-    margin: 0 0 var(--spacing-sm) 0; // Add bottom margin
+    margin: 0 0 var(--spacing-lg) 0;
     border-left: 4px solid var(--accent-primary);
     padding-left: var(--spacing-md);
   }
 }
 
-
-/* === Form Group Styling (from invoice form) === */
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-
-  label {
-    font-size: var(--font-size-xs);
-    color: var(--text-label);
-    text-transform: uppercase;
-    font-weight: 500;
-  }
-  .req {
-    color: var(--color-error);
-  }
-  // For checkboxes
-  .checkbox-label {
-    font-size: var(--font-size-sm);
-    color: var(--text-primary);
-    text-transform: none;
-    font-weight: 400;
-  }
-}
-
-/* === Grids (from invoice form) === */
+/* === GRIDS & GROUPS === */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -157,250 +115,380 @@
 
 .col-span-2 {
   grid-column: span 2;
-  @media (max-width: 600px) {
-    grid-column: span 1;
+  @media (max-width: 768px) { grid-column: span 1; }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+
+  label {
+    font-size: var(--font-size-xs);
+    color: var(--text-label);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .req { color: var(--color-error); }
+  
+  .checkbox-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+    text-transform: none;
+    font-weight: 500;
   }
 }
 
-/* === Inventory Section === */
+/* === INVENTORY SPECIFIC === */
 .inventory-container {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding: var(--spacing-lg);
-  background: var(--bg-primary); // Use primary bg (section is secondary)
-  border-radius: var(--ui-border-radius);
-  border: var(--ui-border-width) solid var(--border-primary);
+  gap: var(--spacing-md);
 }
 
 .inventory-item-grid {
   display: grid;
-  grid-template-columns: 3fr 1fr 1fr 0.5fr; /* Branch | Qty | Reorder | Delete */
+  grid-template-columns: 3fr 1.5fr 1.5fr auto; /* Adjusted ratios */
   gap: var(--spacing-lg);
   align-items: flex-start;
   padding: var(--spacing-md);
-  background: var(--bg-ternary); // Use ternary for each item row
-  border-radius: var(--ui-border-radius-sm);
+  background: var(--bg-ternary);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--ui-border-radius);
+  transition: background 0.2s;
+
+  &:hover {
+    background: color-mix(in srgb, var(--bg-ternary) 95%, var(--border-primary));
+  }
 
   @media (max-width: 768px) {
-    grid-template-columns: 1fr; /* Stack on mobile */
+    grid-template-columns: 1fr; // Stack
+    gap: var(--spacing-sm);
   }
 }
 
-.empty-inventory-message {
-  text-align: center;
-  padding: var(--spacing-lg);
-  font-size: var(--font-size-sm);
-  color: var(--text-secondary);
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-2xl);
+    background: var(--bg-ternary);
+    border: 1px dashed var(--border-secondary);
+    border-radius: var(--ui-border-radius);
+    color: var(--text-secondary);
+    gap: var(--spacing-md);
+    
+    p { margin: 0; }
 }
 
-/* Vertical alignment helper */
-.align-bottom {
+/* === FOOTER === */
+.customer-form-footer {
+  background: var(--bg-secondary);
+  border-top: var(--ui-border-width) solid var(--border-primary);
+  padding: var(--spacing-lg) var(--spacing-xl);
   display: flex;
-  flex-direction: column;
   justify-content: flex-end;
-  height: 100%; // Ensure it aligns
-  
-  // Tweak for checkbox
-  .flex {
-    padding-bottom: var(--spacing-md); // Align with inputs
-  }
-  
-  // Tweak for button
-  .p-button {
-    margin-top: auto; // Pushes button down
-  }
+  gap: var(--spacing-md);
+  flex-shrink: 0;
 }
 
-
-/* === Validation & Component Overrides (from invoice form) === */
+/* === NG-DEEP OVERRIDES === */
 :host ::ng-deep {
-  // Ensure all form components take full width
-  :is(p-select, .p-inputnumber, .p-inputtextarea, .p-fileupload, p-datepicker) {
+  // Inputs full width
+  .p-inputtext, .p-inputnumber, .p-select, .p-textarea, .p-chips, .p-chips-multiple-container {
     width: 100%;
   }
 
-  // Set input backgrounds to contrast
-  :is(.p-inputtext, .p-inputnumber-input, .p-textarea) {
-    background: var(--bg-ternary);
+  // Theme Consistency
+  .p-inputtext, .p-select, .p-textarea, .p-chips-multiple-container {
+    background: var(--bg-primary); // Input bg is primary (on secondary section)
     color: var(--text-primary);
-    width: 100%;
-  }
-  
-  .p-select {
-    background: var(--bg-ternary);
-    .p-select-label {
-      color: var(--text-primary);
-    }
+    border-color: var(--border-secondary);
   }
 
-  // Style invalid touched form fields
+  .p-inputnumber-button {
+    background: var(--bg-ternary);
+    color: var(--text-secondary);
+    border-color: var(--border-secondary);
+  }
+
+  // Error States
   .ng-invalid.ng-touched {
-    :is(.p-inputtext, p-select, .p-inputnumber, .p-inputtextarea) {
+    :is(.p-inputtext, .p-select, .p-textarea) {
       border-color: var(--color-error);
     }
   }
-
-  // Ensure dropdown panels match theme
-  .p-select-panel {
-    background: var(--bg-secondary);
-    border: var(--ui-border-width) solid var(--border-primary);
-    
-    .p-select-item {
-      color: var(--text-secondary);
-      &:hover {
-        background: var(--bg-ternary);
-        color: var(--text-primary);
-      }
-    }
-    .p-select-item.p-highlight {
-      background: var(--accent-focus);
-      color: var(--accent-primary);
-    }
-  }
 }
-// .product-wrapper {
-//   background: var(--surface-ground);
-//   padding: 2rem;
+
+/* Helper */
+.align-bottom {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
+    padding-bottom: 1px; // Micro adjustment
+}
+
+// /* ==============================================
+//    PRODUCT FORM COMPONENT
+//    - Using canonical theme tokens
+//    - Re-using .customer-wrapper layout
+//    - Full-width with section-based layout
+//    ============================================== */
+
+// :host {
+//   display: block;
+//   width: 100%;
+//   height: 100%;
+// }
+
+// /* === Main Wrapper (from invoice form) === */
+// .customer-wrapper {
+//   width: 100%;
+//   height: 100%;
+//   overflow: hidden; // This holds the layout
 //   display: flex;
 //   justify-content: center;
+//   background: var(--bg-primary);
+//   padding: var(--spacing-xl);
 // }
 
-// .product-container {
+// .customer-container {
 //   width: 100%;
-//   max-width: 1200px;
+//   // max-width: 1200px; // Removed for full width
 // }
 
-// .banner {
-//   position: relative;
-//   border-radius: 1.5rem;
+// /* === BANNER STYLES REMOVED === */
+
+// /* === Form Panel (from invoice form) === */
+// .customer-form-panel {
+//   display: flex;
+//   flex-direction: column;
+//   width: 100%;
+//   height: 100%;
+//   background: var(--bg-secondary);
+//   border-radius: var(--ui-border-radius-lg);
+//   box-shadow: var(--shadow-md);
 //   overflow: hidden;
-//   margin-bottom: 2rem;
+//   border: var(--ui-border-width) solid var(--border-primary);
+//   max-height: 100%; // Use full height as banner is gone
 // }
 
-// .banner img {
-//   width: 100%;
-//   height: 220px;
-//   object-fit: cover;
-//   filter: brightness(0.6);
-//   transition: transform 0.4s ease;
+// .customer-form-layout {
+//   display: flex;
+//   flex-direction: column;
+//   height: 100%;
 // }
 
-// .banner:hover img {
-//   transform: scale(1.05);
+// /* === 1. Sticky Header (from invoice form) === */
+// .customer-form-header {
+//   padding: var(--spacing-lg) var(--spacing-xl);
+//   background: var(--bg-secondary);
+//   border-bottom: var(--ui-border-width) solid var(--border-primary);
+//   flex-shrink: 0;
+//   z-index: 10;
+
+//   .form-title {
+//     font-size: var(--font-size-2xl);
+//     font-weight: 600;
+//     color: var(--text-primary);
+//     margin: 0;
+//   }
+//   .form-subtitle {
+//     font-size: var(--font-size-sm);
+//     color: var(--text-secondary);
+//     margin: 0;
+//   }
+//   .req {
+//     color: var(--color-error);
+//   }
 // }
 
-// .overlay {
-//   position: absolute;
-//   inset: 0;
-//   background: rgba(0, 0, 0, 0.3);
+// /* === 2. Scrollable Body (from invoice form) === */
+// .customer-form-body {
+//   flex: 1; // Grow to fill space
+//   overflow-y: auto; // This is the scrollable part
+//   padding: var(--spacing-xl);
+//   background: var(--bg-primary);
+//   display: flex;
+//   flex-direction: column;
+//   gap: var(--spacing-xl);
 // }
 
-// .banner-text {
-//   position: absolute;
-//   bottom: 1.5rem;
-//   left: 2rem;
-//   color: #fff;
+// /* === 3. Sticky Footer (from invoice form) === */
+// .customer-form-footer {
+//   background: var(--bg-secondary);
+//   border-top: var(--ui-border-width) solid var(--border-primary);
+//   padding: var(--spacing-lg) var(--spacing-xl);
+//   display: flex;
+//   justify-content: flex-end;
+//   gap: var(--spacing-md);
+//   flex-shrink: 0;
+//   z-index: 10;
 // }
 
-// .form-panel {
-//   background: var(--surface-card);
-//   border-radius: 1.25rem;
-//   box-shadow: var(--card-shadow);
-//   padding: 2rem;
-//   transition: all 0.3s ease;
+// /* === NEW: Form Section (from customer-form) === */
+// .form-section {
+//   display: flex;
+//   flex-direction: column;
+//   gap: var(--spacing-lg);
+//   padding: var(--spacing-xl);
+//   background: var(--bg-secondary); // Use secondary bg for sections
+//   border-radius: var(--ui-border-radius-lg); // Make sections rounded
+//   border: var(--ui-border-width) solid var(--border-primary);
+//   box-shadow: var(--shadow-sm); // Add shadow to lift section
+
+//   .section-title {
+//     font-size: var(--font-size-lg);
+//     font-weight: 600;
+//     color: var(--text-primary);
+//     margin: 0 0 var(--spacing-sm) 0; // Add bottom margin
+//     border-left: 4px solid var(--accent-primary);
+//     padding-left: var(--spacing-md);
+//   }
 // }
 
-// .glassy {
-//   backdrop-filter: blur(8px);
-//   background: rgba(255, 255, 255, 0.85);
+
+// /* === Form Group Styling (from invoice form) === */
+// .form-group {
+//   display: flex;
+//   flex-direction: column;
+//   gap: var(--spacing-sm);
+
+//   label {
+//     font-size: var(--font-size-xs);
+//     color: var(--text-label);
+//     text-transform: uppercase;
+//     font-weight: 500;
+//   }
+//   .req {
+//     color: var(--color-error);
+//   }
+//   // For checkboxes
+//   .checkbox-label {
+//     font-size: var(--font-size-sm);
+//     color: var(--text-primary);
+//     text-transform: none;
+//     font-weight: 400;
+//   }
 // }
 
-// .form-header {
-//   margin-bottom: 1.5rem;
+// /* === Grids (from invoice form) === */
+// .form-grid {
+//   display: grid;
+//   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+//   gap: var(--spacing-lg);
 // }
 
-// .form-title {
-//   font-size: 1.5rem;
-//   font-weight: 600;
-// }
-
-// .form-grid,
 // .form-grid-4 {
 //   display: grid;
-//   gap: 1rem;
-// }
-
-// .form-grid {
-//   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-// }
-
-// .form-grid-4 {
 //   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+//   gap: var(--spacing-lg);
 // }
 
-// .form-footer {
-//   margin-top: 2rem;
+// .col-span-2 {
+//   grid-column: span 2;
+//   @media (max-width: 600px) {
+//     grid-column: span 1;
+//   }
+// }
+
+// /* === Inventory Section === */
+// .inventory-container {
+//   display: flex;
+//   flex-direction: column;
+//   gap: 1rem;
+//   padding: var(--spacing-lg);
+//   background: var(--bg-primary); // Use primary bg (section is secondary)
+//   border-radius: var(--ui-border-radius);
+//   border: var(--ui-border-width) solid var(--border-primary);
 // }
 
 // .inventory-item-grid {
 //   display: grid;
-//   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-//   gap: 1rem;
-//   padding: 1rem;
-//   border: 1px dashed var(--surface-border);
-//   border-radius: 1rem;
-//   background: var(--surface-section);
-//   margin-bottom: 1rem;
-//   transition: 0.3s;
+//   grid-template-columns: 3fr 1fr 1fr 0.5fr; /* Branch | Qty | Reorder | Delete */
+//   gap: var(--spacing-lg);
+//   align-items: flex-start;
+//   padding: var(--spacing-md);
+//   background: var(--bg-ternary); // Use ternary for each item row
+//   border-radius: var(--ui-border-radius-sm);
+
+//   @media (max-width: 768px) {
+//     grid-template-columns: 1fr; /* Stack on mobile */
+//   }
 // }
 
-// .inventory-item-grid:hover {
-//   border-color: var(--primary-color);
+// .empty-inventory-message {
+//   text-align: center;
+//   padding: var(--spacing-lg);
+//   font-size: var(--font-size-sm);
+//   color: var(--text-secondary);
 // }
 
-// .req {
-//   color: var(--red-500);
+// /* Vertical alignment helper */
+// .align-bottom {
+//   display: flex;
+//   flex-direction: column;
+//   justify-content: flex-end;
+//   height: 100%; // Ensure it aligns
+  
+//   // Tweak for checkbox
+//   .flex {
+//     padding-bottom: var(--spacing-md); // Align with inputs
+//   }
+  
+//   // Tweak for button
+//   .p-button {
+//     margin-top: auto; // Pushes button down
+//   }
 // }
 
-// // /* Re-using the customer form layout styles from base.scss/theme.scss */
-// // /* We just need to add styles for the new inventory grid */
-// // :host {
-// //   display: block;
-// // }
 
-// // /* 4-column grid for pricing */
-// // .form-grid-4 {
-// //   display: grid;
-// //   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-// //   gap: 0.85rem;
-// // }
+// /* === Validation & Component Overrides (from invoice form) === */
+// :host ::ng-deep {
+//   // Ensure all form components take full width
+//   :is(p-select, .p-inputnumber, .p-inputtextarea, .p-fileupload, p-datepicker) {
+//     width: 100%;
+//   }
 
-// // /* Vertical alignment helper */
-// // .align-bottom {
-// //   display: flex;
-// //   flex-direction: column;
-// //   justify-content: flex-end;
-// //   padding-bottom: 0.2rem; /* Minor tweak */
-// // }
+//   // Set input backgrounds to contrast
+//   :is(.p-inputtext, .p-inputnumber-input, .p-textarea) {
+//     background: var(--bg-ternary);
+//     color: var(--text-primary);
+//     width: 100%;
+//   }
+  
+//   .p-select {
+//     background: var(--bg-ternary);
+//     .p-select-label {
+//       color: var(--text-primary);
+//     }
+//   }
 
-// // /* Inventory section */
-// // .inventory-container {
-// //   display: flex;
-// //   flex-direction: column;
-// //   gap: 1rem;
-// //   padding: 1rem;
-// //   background: var(--theme-bg-ternary);
-// //   border-radius: var(--ui-border-radius);
-// // }
+//   // Style invalid touched form fields
+//   .ng-invalid.ng-touched {
+//     :is(.p-inputtext, p-select, .p-inputnumber, .p-inputtextarea) {
+//       border-color: var(--color-error);
+//     }
+//   }
 
-// // .inventory-item-grid {
-// //   display: grid;
-// //   grid-template-columns: 3fr 1fr 1fr 0.5fr; /* Branch | Qty | Reorder | Delete */
-// //   gap: 0.85rem;
-// //   align-items: flex-start;
-
-// //   @media (max-width: 768px) {
-// //     grid-template-columns: 1fr; /* Stack on mobile */
-// //   }
-// // }
+//   // Ensure dropdown panels match theme
+//   .p-select-panel {
+//     background: var(--bg-secondary);
+//     border: var(--ui-border-width) solid var(--border-primary);
+    
+//     .p-select-item {
+//       color: var(--text-secondary);
+//       &:hover {
+//         background: var(--bg-ternary);
+//         color: var(--text-primary);
+//       }
+//     }
+//     .p-select-item.p-highlight {
+//       background: var(--accent-focus);
+//       color: var(--accent-primary);
+//     }
+//   }
+// }

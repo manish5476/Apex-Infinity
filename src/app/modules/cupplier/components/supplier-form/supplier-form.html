@@ -3,22 +3,157 @@
 <div class="customer-wrapper">
   <section class="customer-container">
     
-    <!-- BANNER REMOVED FOR A CLEANER, FULL-WIDTH FORM -->
-    
-    <!-- FORM PANEL -->
-    <div class="customer-form-panel">
+    <div class="customer-form-panel animate-fadeIn">
       <form [formGroup]="supplierForm" (ngSubmit)="onSubmit()" class="customer-form-layout">
 
-        <!--_ 1. STICKY HEADER _-->
         <div class="customer-form-header">
           <h1 class="form-title">{{ formTitle() }}</h1>
           <p class="form-subtitle">Fill in the supplier details below. <span class="req">*</span> = required</p>
         </div>
 
-        <!--_ 2. SCROLLABLE BODY _-->
         <div class="customer-form-body">
 
-          <!-- Main Details -->
+          <section class="form-section">
+            <h4 class="section-title">Business & Contact Details</h4>
+            <div class="form-grid">
+              
+              <div class="form-group col-span-2">
+                <label>Company Name <span class="req">*</span></label>
+                <input pInputText formControlName="companyName" placeholder="e.g., Global Tech Suppliers" />
+              </div>
+              
+              <div class="form-group">
+                <label>Contact Person</label>
+                <input pInputText formControlName="contactPerson" placeholder="e.g., Ms. Jane Doe" />
+              </div>
+              
+              <div class="form-group">
+                <label>Email</label>
+                <input pInputText type="email" formControlName="email" placeholder="jane@supplier.com" />
+              </div>
+              
+              <div class="form-group">
+                <label>Phone</label>
+                <input pInputText formControlName="phone" />
+              </div>
+              
+              <div class="form-group">
+                <label>Alt. Phone</label>
+                <input pInputText formControlName="altPhone" />
+              </div>
+
+              <div class="form-group">
+                <label>GST Number</label>
+                <input pInputText formControlName="gstNumber" class="uppercase" />
+              </div>
+              
+              <div class="form-group">
+                <label>PAN Number</label>
+                <input pInputText formControlName="panNumber" class="uppercase" />
+              </div>
+            </div>
+          </section>
+          
+          <section class="form-section" formGroupName="address">
+            <h4 class="section-title">Primary Address</h4>
+            <div class="form-grid">
+              <div class="form-group col-span-2">
+                <label>Street</label>
+                <input pInputText formControlName="street" placeholder="123 Industrial Area" />
+              </div>
+              <div class="form-group">
+                <label>City</label>
+                <input pInputText formControlName="city" />
+              </div>
+              <div class="form-group">
+                <label>State</label>
+                <input pInputText formControlName="state" />
+              </div>
+              <div class="form-group">
+                <label>Zip Code</label>
+                <input pInputText formControlName="zipCode" />
+              </div>
+              <div class="form-group">
+                <label>Country <span class="req">*</span></label>
+                <input pInputText formControlName="country" />
+              </div>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <h4 class="section-title">Financials & Operations</h4>
+            <div class="form-grid-3">
+              <div class="form-group">
+                <label>Opening Balance</label>
+                <p-inputNumber formControlName="openingBalance" mode="currency" currency="INR" locale="en-IN"></p-inputNumber>
+              </div>
+              <div class="form-group">
+                <label>Payment Terms</label>
+                <input pInputText formControlName="paymentTerms" placeholder="e.g., Net 30" />
+              </div>
+            </div>
+            
+            <div class="form-group mt-4">
+              <label>Branches Supplied</label>
+              <p-multiSelect 
+                appendTo="body"
+                formControlName="branchesSupplied" 
+                [options]="branchOptions()"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Select branches this supplier serves"
+                styleClass="w-full">
+              </p-multiSelect>
+            </div>
+
+            <div class="form-group flex items-center gap-2">
+              <p-checkbox formControlName="isActive" [binary]="true" inputId="isActive"></p-checkbox>
+              <label for="isActive" class="checkbox-label">Supplier is Active</label>
+            </div>
+          </section>
+
+        </div>
+
+        <div class="customer-form-footer">
+          <div class="form-actions flex gap-2">
+            <p-button label="Cancel" styleClass="p-button-text p-button-secondary" routerLink="/suppliers"></p-button>
+            <p-button 
+              [label]="editMode() ? 'Save Changes' : 'Create Supplier'" 
+              icon="pi pi-check" 
+              type="submit" 
+              [loading]="isSubmitting()"
+              [disabled]="supplierForm.invalid || isSubmitting()"
+              styleClass="w-full justify-center">
+            </p-button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </section>
+</div>
+
+<!-- <p-toast></p-toast> 
+
+<div class="customer-wrapper">
+  <section class="customer-container">
+    
+    BANNER REMOVED FOR A CLEANER, FULL-WIDTH FORM
+    
+    FORM PANEL
+    <div class="customer-form-panel">
+      <form [formGroup]="supplierForm" (ngSubmit)="onSubmit()" class="customer-form-layout">
+
+        _ 1. STICKY HEADER _
+        <div class="customer-form-header">
+          <h1 class="form-title">{{ formTitle() }}</h1>
+          <p class="form-subtitle">Fill in the supplier details below. <span class="req">*</span> = required</p>
+        </div>
+
+        _ 2. SCROLLABLE BODY _
+        <div class="customer-form-body">
+
+          Main Details
           <section class="form-section">
             <h4 class="section-title">Business Details</h4>
             <div class="form-grid">
@@ -57,7 +192,7 @@
             </div>
           </section>
           
-          <!-- Address -->
+          Address
           <section class="form-section" formGroupName="address">
             <h4 class="section-title">Address</h4>
             <div class="form-grid">
@@ -86,7 +221,7 @@
             </div>
           </section>
 
-          <!-- Financials & Settings -->
+          Financials & Settings
           <section class="form-section">
              <h4 class="section-title">Financials & Settings</h4>
             <div class="form-grid-3">
@@ -119,7 +254,7 @@
 
         </div>
 
-        <!--_ 3. STICKY FOOTER _-->
+        _ 3. STICKY FOOTER _
         <div class="customer-form-footer">
           <div class="form-actions">
             <p-button 
@@ -135,4 +270,4 @@
       </form>
     </div>
   </section>
-</div>
+</div> -->

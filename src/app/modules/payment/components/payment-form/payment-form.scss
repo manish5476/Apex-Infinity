@@ -1,6 +1,5 @@
 /* ==============================================
-   PAYMENT FORM COMPONENT
-   - Re-uses all theme styles from supplier-form
+   PAYMENT FORM STYLES (FULL WIDTH)
    ============================================== */
 
 :host {
@@ -9,23 +8,28 @@
   height: 100%;
 }
 
-/* === Main Wrapper (from invoice form) === */
+/* === Main Wrapper === */
 .customer-wrapper {
   width: 100%;
   height: 100%;
-  overflow: hidden; // This holds the layout
+  overflow: hidden;
   display: flex;
   justify-content: center;
   background: var(--bg-primary);
   padding: var(--spacing-xl);
+
+  @media (max-width: 768px) {
+    padding: 0;
+  }
 }
 
 .customer-container {
   width: 100%;
-  max-width: 1200px; // Set max-width for this simpler form
+  height: 100%;
+  // max-width removed to allow full screen expansion
 }
 
-/* === Form Panel (from invoice form) === */
+/* === Form Panel === */
 .customer-form-panel {
   display: flex;
   flex-direction: column;
@@ -36,7 +40,11 @@
   box-shadow: var(--shadow-md);
   overflow: hidden;
   border: var(--ui-border-width) solid var(--border-primary);
-  max-height: 100%; 
+
+  @media (max-width: 768px) {
+    border-radius: 0;
+    border: none;
+  }
 }
 
 .customer-form-layout {
@@ -45,13 +53,12 @@
   height: 100%;
 }
 
-/* === 1. Sticky Header (from invoice form) === */
+/* === Header === */
 .customer-form-header {
   padding: var(--spacing-lg) var(--spacing-xl);
   background: var(--bg-secondary);
   border-bottom: var(--ui-border-width) solid var(--border-primary);
   flex-shrink: 0;
-  z-index: 10;
 
   .form-title {
     font-size: var(--font-size-2xl);
@@ -62,17 +69,15 @@
   .form-subtitle {
     font-size: var(--font-size-sm);
     color: var(--text-secondary);
-    margin: 0;
+    margin: 4px 0 0 0;
   }
-  .req {
-    color: var(--color-error);
-  }
+  .req { color: var(--color-error); }
 }
 
-/* === 2. Scrollable Body (from invoice form) === */
+/* === Body === */
 .customer-form-body {
-  flex: 1; // Grow to fill space
-  overflow-y: auto; // This is the scrollable part
+  flex: 1;
+  overflow-y: auto;
   padding: var(--spacing-xl);
   background: var(--bg-primary);
   display: flex;
@@ -80,41 +85,40 @@
   gap: var(--spacing-xl);
 }
 
-/* === 3. Sticky Footer (from invoice form) === */
-.customer-form-footer {
-  background: var(--bg-secondary);
-  border-top: var(--ui-border-width) solid var(--border-primary);
-  padding: var(--spacing-lg) var(--spacing-xl);
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-md);
-  flex-shrink: 0;
-  z-index: 10;
-}
-
-/* === NEW: Form Section (from customer-form) === */
+/* === Form Sections === */
 .form-section {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
   padding: var(--spacing-xl);
-  background: var(--bg-secondary); // Use secondary bg for sections
-  border-radius: var(--ui-border-radius-lg); // Make sections rounded
+  background: var(--bg-secondary);
+  border-radius: var(--ui-border-radius-lg);
   border: var(--ui-border-width) solid var(--border-primary);
-  box-shadow: var(--shadow-sm); // Add shadow to lift section
+  box-shadow: var(--shadow-sm);
 
   .section-title {
     font-size: var(--font-size-lg);
     font-weight: 600;
     color: var(--text-primary);
-    margin: 0 0 var(--spacing-sm) 0; // Add bottom margin
+    margin: 0 0 var(--spacing-sm) 0;
     border-left: 4px solid var(--accent-primary);
     padding-left: var(--spacing-md);
   }
 }
 
+/* === Grids & Layouts === */
+.form-grid-4 {
+  display: grid;
+  /* Increased minmax to 280px so on ultra-wide screens fields don't look too thin */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+}
 
-/* === Form Group Styling (from invoice form) === */
+.col-span-2 {
+  grid-column: span 2;
+  @media (max-width: 1200px) { grid-column: span 1; }
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
@@ -124,123 +128,321 @@
     font-size: var(--font-size-xs);
     color: var(--text-label);
     text-transform: uppercase;
-    font-weight: 500;
+    font-weight: 600;
+    letter-spacing: 0.5px;
   }
-  .req {
-    color: var(--color-error);
-  }
+  .req { color: var(--color-error); }
 }
 
-/* === Grids (from invoice form) === */
-.form-grid-4 {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: var(--spacing-lg);
+/* === Footer === */
+.customer-form-footer {
+  background: var(--bg-secondary);
+  border-top: var(--ui-border-width) solid var(--border-primary);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  flex-shrink: 0;
 }
 
-.col-span-2 {
-  grid-column: span 2;
-  @media (max-width: 600px) {
-    grid-column: span 1;
-  }
-}
-
-/* === Validation & Component Overrides (from invoice form) === */
+/* === PrimeNG Component Overrides (Deep) === */
 :host ::ng-deep {
-  // Ensure all form components take full width
-  :is(p-select, .p-inputnumber, .p-inputtextarea, .p-fileupload, p-datepicker, p-multiSelect) {
+  // Ensure full width
+  :is(.p-inputtext, .p-inputnumber, .p-select, .p-textarea, .p-datepicker) {
     width: 100%;
   }
 
-  // Set input backgrounds to contrast
-  :is(.p-inputtext, .p-inputnumber-input, .p-textarea, .p-datepicker-input) {
+  // Input Styles
+  :is(.p-inputtext, .p-select, .p-textarea) {
     background: var(--bg-ternary);
     color: var(--text-primary);
-    width: 100%;
+    border-color: var(--border-secondary);
+    
+    &:enabled:hover { border-color: var(--accent-primary); }
+    &:enabled:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 2px var(--accent-focus); }
   }
-  
-  // p-select and p-multiSelect
-  :is(.p-select, .p-multiselect) {
-    background: var(--bg-ternary);
-    color: var(--text-primary);
-    .p-select-label, .p-multiselect-label {
-      background: transparent;
-      color: var(--text-primary);
+
+  // Dropdown Specifics
+  .p-select {
+    .p-select-label {
+       background: transparent;
+       color: var(--text-primary);
     }
   }
 
-  // Style invalid touched form fields
+  // Input Number
+  .p-inputnumber-button {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    border-color: var(--border-secondary);
+  }
+
+  // Error States
   .ng-invalid.ng-touched {
-    :is(.p-inputtext, p-select, .p-inputnumber, .p-inputtextarea, p-multiSelect, p-datepicker) {
+    :is(.p-inputtext, .p-select, .p-textarea, .p-inputnumber-input) {
       border-color: var(--color-error);
     }
   }
 
-  // Ensure dropdown panels match theme
-  :is(.p-select-panel, .p-multiselect-panel) {
-    background: var(--bg-secondary);
-    border: var(--ui-border-width) solid var(--border-primary);
-    
-    :is(.p-select-item, .p-multiselect-item) {
-      color: var(--text-secondary);
-      &:hover {
+  // Datepicker Panel
+  .p-datepicker {
+     background: var(--bg-secondary);
+     border-color: var(--border-primary);
+     .p-datepicker-header {
         background: var(--bg-ternary);
         color: var(--text-primary);
-      }
-    }
-    :is(.p-select-item.p-highlight, .p-multiselect-item.p-highlight) {
-      background: var(--accent-focus);
-      color: var(--accent-primary);
-    }
-  }
-  
-  // MultiSelect header
-  .p-multiselect-header {
-      background: var(--bg-ternary);
-      border-bottom-color: var(--border-primary);
-      
-      .p-checkbox {
-         background: var(--bg-primary);
-         border-color: var(--border-secondary);
-      }
-      .p-multiselect-filter-icon, .p-multiselect-close {
-        color: var(--text-secondary);
-      }
-  }
-  
-  // Datepicker panel
-  .p-datepicker-panel {
-     background: var(--bg-secondary);
-     border: var(--ui-border-width) solid var(--border-primary);
-     
-     .p-datepicker-header {
-       background: var(--bg-ternary);
-       color: var(--text-primary);
-       border-bottom-color: var(--border-primary);
-       
-       .p-datepicker-prev, .p-datepicker-next {
-         color: var(--text-secondary);
-         &:hover {
-           background: var(--bg-primary);
-         }
-       }
+        border-bottom-color: var(--border-primary);
      }
-     
-     .p-datepicker-calendar {
-       td span {
-         color: var(--text-primary);
-         &:hover {
-           background: var(--bg-ternary);
-         }
-       }
-       td.p-datepicker-today span {
-         background: var(--accent-focus);
-         color: var(--accent-primary);
-      }
-       td.p-highlight span {
-         background: var(--accent-primary);
-         color: #fff; // Assuming white text on accent
-       }
+     table td {
+        color: var(--text-primary);
+        > span:hover { background: var(--bg-ternary); }
+        > span.p-highlight { background: var(--accent-primary); color: #fff; }
      }
   }
 }
+// /* ==============================================
+//    PAYMENT FORM COMPONENT
+//    - Re-uses all theme styles from supplier-form
+//    ============================================== */
+
+// :host {
+//   display: block;
+//   width: 100%;
+//   height: 100%;
+// }
+
+// /* === Main Wrapper (from invoice form) === */
+// .customer-wrapper {
+//   width: 100%;
+//   height: 100%;
+//   overflow: hidden; // This holds the layout
+//   display: flex;
+//   justify-content: center;
+//   background: var(--bg-primary);
+//   padding: var(--spacing-xl);
+// }
+
+// .customer-container {
+//   width: 100%;
+//   max-width: 1200px; // Set max-width for this simpler form
+// }
+
+// /* === Form Panel (from invoice form) === */
+// .customer-form-panel {
+//   display: flex;
+//   flex-direction: column;
+//   width: 100%;
+//   height: 100%;
+//   background: var(--bg-secondary);
+//   border-radius: var(--ui-border-radius-lg);
+//   box-shadow: var(--shadow-md);
+//   overflow: hidden;
+//   border: var(--ui-border-width) solid var(--border-primary);
+//   max-height: 100%; 
+// }
+
+// .customer-form-layout {
+//   display: flex;
+//   flex-direction: column;
+//   height: 100%;
+// }
+
+// /* === 1. Sticky Header (from invoice form) === */
+// .customer-form-header {
+//   padding: var(--spacing-lg) var(--spacing-xl);
+//   background: var(--bg-secondary);
+//   border-bottom: var(--ui-border-width) solid var(--border-primary);
+//   flex-shrink: 0;
+//   z-index: 10;
+
+//   .form-title {
+//     font-size: var(--font-size-2xl);
+//     font-weight: 600;
+//     color: var(--text-primary);
+//     margin: 0;
+//   }
+//   .form-subtitle {
+//     font-size: var(--font-size-sm);
+//     color: var(--text-secondary);
+//     margin: 0;
+//   }
+//   .req {
+//     color: var(--color-error);
+//   }
+// }
+
+// /* === 2. Scrollable Body (from invoice form) === */
+// .customer-form-body {
+//   flex: 1; // Grow to fill space
+//   overflow-y: auto; // This is the scrollable part
+//   padding: var(--spacing-xl);
+//   background: var(--bg-primary);
+//   display: flex;
+//   flex-direction: column;
+//   gap: var(--spacing-xl);
+// }
+
+// /* === 3. Sticky Footer (from invoice form) === */
+// .customer-form-footer {
+//   background: var(--bg-secondary);
+//   border-top: var(--ui-border-width) solid var(--border-primary);
+//   padding: var(--spacing-lg) var(--spacing-xl);
+//   display: flex;
+//   justify-content: flex-end;
+//   gap: var(--spacing-md);
+//   flex-shrink: 0;
+//   z-index: 10;
+// }
+
+// /* === NEW: Form Section (from customer-form) === */
+// .form-section {
+//   display: flex;
+//   flex-direction: column;
+//   gap: var(--spacing-lg);
+//   padding: var(--spacing-xl);
+//   background: var(--bg-secondary); // Use secondary bg for sections
+//   border-radius: var(--ui-border-radius-lg); // Make sections rounded
+//   border: var(--ui-border-width) solid var(--border-primary);
+//   box-shadow: var(--shadow-sm); // Add shadow to lift section
+
+//   .section-title {
+//     font-size: var(--font-size-lg);
+//     font-weight: 600;
+//     color: var(--text-primary);
+//     margin: 0 0 var(--spacing-sm) 0; // Add bottom margin
+//     border-left: 4px solid var(--accent-primary);
+//     padding-left: var(--spacing-md);
+//   }
+// }
+
+
+// /* === Form Group Styling (from invoice form) === */
+// .form-group {
+//   display: flex;
+//   flex-direction: column;
+//   gap: var(--spacing-sm);
+
+//   label {
+//     font-size: var(--font-size-xs);
+//     color: var(--text-label);
+//     text-transform: uppercase;
+//     font-weight: 500;
+//   }
+//   .req {
+//     color: var(--color-error);
+//   }
+// }
+
+// /* === Grids (from invoice form) === */
+// .form-grid-4 {
+//   display: grid;
+//   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+//   gap: var(--spacing-lg);
+// }
+
+// .col-span-2 {
+//   grid-column: span 2;
+//   @media (max-width: 600px) {
+//     grid-column: span 1;
+//   }
+// }
+
+// /* === Validation & Component Overrides (from invoice form) === */
+// :host ::ng-deep {
+//   // Ensure all form components take full width
+//   :is(p-select, .p-inputnumber, .p-inputtextarea, .p-fileupload, p-datepicker, p-multiSelect) {
+//     width: 100%;
+//   }
+
+//   // Set input backgrounds to contrast
+//   :is(.p-inputtext, .p-inputnumber-input, .p-textarea, .p-datepicker-input) {
+//     background: var(--bg-ternary);
+//     color: var(--text-primary);
+//     width: 100%;
+//   }
+  
+//   // p-select and p-multiSelect
+//   :is(.p-select, .p-multiselect) {
+//     background: var(--bg-ternary);
+//     color: var(--text-primary);
+//     .p-select-label, .p-multiselect-label {
+//       background: transparent;
+//       color: var(--text-primary);
+//     }
+//   }
+
+//   // Style invalid touched form fields
+//   .ng-invalid.ng-touched {
+//     :is(.p-inputtext, p-select, .p-inputnumber, .p-inputtextarea, p-multiSelect, p-datepicker) {
+//       border-color: var(--color-error);
+//     }
+//   }
+
+//   // Ensure dropdown panels match theme
+//   :is(.p-select-panel, .p-multiselect-panel) {
+//     background: var(--bg-secondary);
+//     border: var(--ui-border-width) solid var(--border-primary);
+    
+//     :is(.p-select-item, .p-multiselect-item) {
+//       color: var(--text-secondary);
+//       &:hover {
+//         background: var(--bg-ternary);
+//         color: var(--text-primary);
+//       }
+//     }
+//     :is(.p-select-item.p-highlight, .p-multiselect-item.p-highlight) {
+//       background: var(--accent-focus);
+//       color: var(--accent-primary);
+//     }
+//   }
+  
+//   // MultiSelect header
+//   .p-multiselect-header {
+//       background: var(--bg-ternary);
+//       border-bottom-color: var(--border-primary);
+      
+//       .p-checkbox {
+//          background: var(--bg-primary);
+//          border-color: var(--border-secondary);
+//       }
+//       .p-multiselect-filter-icon, .p-multiselect-close {
+//         color: var(--text-secondary);
+//       }
+//   }
+  
+//   // Datepicker panel
+//   .p-datepicker-panel {
+//      background: var(--bg-secondary);
+//      border: var(--ui-border-width) solid var(--border-primary);
+     
+//      .p-datepicker-header {
+//        background: var(--bg-ternary);
+//        color: var(--text-primary);
+//        border-bottom-color: var(--border-primary);
+       
+//        .p-datepicker-prev, .p-datepicker-next {
+//          color: var(--text-secondary);
+//          &:hover {
+//            background: var(--bg-primary);
+//          }
+//        }
+//      }
+     
+//      .p-datepicker-calendar {
+//        td span {
+//          color: var(--text-primary);
+//          &:hover {
+//            background: var(--bg-ternary);
+//          }
+//        }
+//        td.p-datepicker-today span {
+//          background: var(--accent-focus);
+//          color: var(--accent-primary);
+//       }
+//        td.p-highlight span {
+//          background: var(--accent-primary);
+//          color: #fff; // Assuming white text on accent
+//        }
+//      }
+//   }
+// }

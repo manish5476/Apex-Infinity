@@ -1,0 +1,193 @@
+<div class="card p-4">
+  <h2>📘 Financial Ledgers and Statements</h2>
+
+  <div class="flex gap-3 mb-4 items-end bg-gray-50 p-3 rounded-lg shadow-sm" [formGroup]="filterForm">
+
+    @if (activeid === "1") {
+    <div class="w-64">
+      <label class="block text-sm font-medium text-gray-700">Customer</label>
+      <p-select [options]="customerOptions()" formControlName="customerId" placeholder="Select Customer" (onChange)="loadData('customer')"
+        [showClear]="true" [filter]="true" appendTo="body">
+      </p-select>
+    </div>
+    }
+
+    @if (activeid === "2") {
+    <div class="w-64">
+      <label class="block text-sm font-medium text-gray-700">Supplier</label>
+      <p-select [options]="supplierOptions()" formControlName="supplierId" placeholder="Select Supplier" (onChange)="loadData('supplier')"
+        [showClear]="true" [filter]="true" appendTo="body">
+      </p-select>
+    </div>
+    }
+
+    <div class="ml-auto">
+      <p-button label="Apply Filter" icon="pi pi-filter" (onClick)="applyFilters()" [loading]="isLoading()">
+      </p-button>
+    </div>
+  </div>
+
+  <p-tabs [value]="tabValue()" (valueChange)="onTabChange($event)">
+    <p-tablist>
+      <p-tab value="0">All Ledgers</p-tab>
+      <p-tab value="1">Customer Ledger</p-tab>
+      <p-tab value="2">Supplier Ledger</p-tab>
+      <p-tab value="3">Org Summary</p-tab>
+      <p-tab value="4">Profit & Loss (P&L)</p-tab>
+      <p-tab value="5">Balance Sheet</p-tab>
+      <p-tab value="6">Trial Balance</p-tab>
+    </p-tablist>
+
+    <p-tabpanels>
+
+      <p-tabpanel value="0">
+        <app-shared-grid [data]="data()" [column]="column()" (eventFromGrid)="onGridEvent($event)">
+        </app-shared-grid>
+        <!-- [isLoading]="isLoading()" -->
+      </p-tabpanel>
+
+      <p-tabpanel value="1">
+        @if (!filterForm.value.customerId) {
+        <div class="text-center p-5 text-gray-500">
+          Please select a Customer to view their ledger.
+        </div>
+        } @else {
+        <app-shared-grid [data]="data()" [column]="column()" (eventFromGrid)="onGridEvent($event)">
+        </app-shared-grid>
+        <!-- [isLoading]="isLoading()" -->
+        }
+      </p-tabpanel>
+
+      <p-tabpanel value="2">
+        @if (!filterForm.value.supplierId) {
+        <div class="text-center p-5 text-gray-500">
+          Please select a Supplier to view their ledger.
+        </div>
+        } @else {
+        <app-shared-grid [data]="data()" [column]="column()" (eventFromGrid)="onGridEvent($event)">
+        </app-shared-grid>
+        <!-- [isLoading]="isLoading()" -->
+        }
+      </p-tabpanel>
+
+      <p-tabpanel value="3">
+        <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <h3 class="text-lg font-semibold text-blue-800 mb-2">Overall Ledger Snapshot</h3>
+        </div>
+        <app-shared-grid [data]="data()" [column]="column()" (eventFromGrid)="onGridEvent($event)">
+        </app-shared-grid>
+        <!-- [isLoading]="isLoading()" -->
+      </p-tabpanel>
+
+      <p-tabpanel value="4">
+        <app-shared-grid [data]="data()" [column]="column()" (eventFromGrid)="onGridEvent($event)">
+        </app-shared-grid>
+        <!-- [isLoading]="isLoading()" -->
+      </p-tabpanel>
+
+      <p-tabpanel value="5">
+        <app-shared-grid [data]="data()" [column]="column()" (eventFromGrid)="onGridEvent($event)">
+        </app-shared-grid>
+        <!-- [isLoading]="isLoading()" -->
+      </p-tabpanel>
+
+      <p-tabpanel value="6">
+        <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <h3 class="text-lg font-semibold text-yellow-800 mb-2">Debit must equal Credit</h3>
+          <p class class="text-sm">
+            Total Debit: {{ common.formatCurrency(getTrialBalanceTotal('debit')) }} |
+            Total Credit: {{ common.formatCurrency(getTrialBalanceTotal('credit')) }}
+          </p>
+        </div>
+        <app-shared-grid [data]="data()" [column]="column()" (eventFromGrid)="onGridEvent($event)">
+        </app-shared-grid>
+        <!-- [isLoading]="isLoading()" -->
+      </p-tabpanel>
+
+    </p-tabpanels>
+  </p-tabs>
+</div>
+
+<!-- <div class="card p-4">
+  <h2>📘 Financial Ledgers and Statements</h2>
+
+  <div class="flex gap-3 mb-4 items-end bg-gray-50 p-3 rounded-lg shadow-sm" [formGroup]="filterForm">
+
+    <div *ngIf="currentTab() === 'customer'" class="w-64">
+      <label class="block text-sm font-medium text-gray-700">Customer</label>
+      <p-select [options]="customerOptions()" formControlName="customerId" placeholder="Select Customer"
+        [showClear]="true" [filter]="true" appendTo="body">
+      </p-select>
+    </div>
+
+    <div *ngIf="currentTab() === 'supplier'" class="w-64">
+      <label class="block text-sm font-medium text-gray-700">Supplier</label>
+      <p-select [options]="supplierOptions()" formControlName="supplierId" placeholder="Select Supplier"
+        [showClear]="true" [filter]="true" appendTo="body">
+      </p-select>
+    </div>
+
+    <div class="ml-auto">
+      <p-button label="Apply Filter" icon="pi pi-filter" (onClick)="applyFilters()" [loading]="isLoading()">
+      </p-button>
+    </div>
+  </div>
+
+  <p-tabView [activeIndex]="tabValue()" (onChange)="onTabChange($event)">
+    <p-tabPanel header="All Ledgers">
+      <app-shared-grid [data]="data()" [column]="column()" [isLoading]="isLoading()"
+        (eventFromGrid)="onGridEvent($event)">
+      </app-shared-grid>
+    </p-tabPanel>
+
+    <p-tabPanel header="Customer Ledger">
+      <div *ngIf="!filterForm.value.customerId" class="text-center p-5 text-gray-500">
+        Please select a Customer to view their ledger.
+      </div>
+      <app-shared-grid *ngIf="filterForm.value.customerId" [data]="data()" [column]="column()" [isLoading]="isLoading()"
+        (eventFromGrid)="onGridEvent($event)">
+      </app-shared-grid>
+    </p-tabPanel>
+
+    <p-tabPanel header="Supplier Ledger">
+      <div *ngIf="!filterForm.value.supplierId" class="text-center p-5 text-gray-500">
+        Please select a Supplier to view their ledger.
+      </div>
+      <app-shared-grid *ngIf="filterForm.value.supplierId" [data]="data()" [column]="column()" [isLoading]="isLoading()"
+        (eventFromGrid)="onGridEvent($event)">
+      </app-shared-grid>
+    </p-tabPanel>
+
+    <p-tabPanel header="Org Summary">
+      <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <h3 class="text-lg font-semibold text-blue-800 mb-2">Overall Ledger Snapshot</h3>
+      </div>
+      <app-shared-grid [data]="data()" [column]="column()" [isLoading]="isLoading()"
+        (eventFromGrid)="onGridEvent($event)">
+      </app-shared-grid>
+    </p-tabPanel>
+
+    <p-tabPanel header="Profit & Loss (P&L)">
+      <app-shared-grid [data]="data()" [column]="column()" [isLoading]="isLoading()"
+        (eventFromGrid)="onGridEvent($event)">
+      </app-shared-grid>
+    </p-tabPanel>
+
+    <p-tabPanel header="Balance Sheet">
+      <app-shared-grid [data]="data()" [column]="column()" [isLoading]="isLoading()"
+        (eventFromGrid)="onGridEvent($event)">
+      </app-shared-grid>
+    </p-tabPanel>
+
+    <p-tabPanel header="Trial Balance">
+      <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <h3 class="text-lg font-semibold text-yellow-800 mb-2">Debit must equal Credit</h3>
+        <p class="text-sm">Total Debit: {{ common.formatCurrency(data().find(d => d.totals)?.totals.debit || 0) }} |
+          Total Credit: {{ common.formatCurrency(data().find(d => d.totals)?.totals.credit || 0) }}</p>
+      </div>
+      <app-shared-grid [data]="data()" [column]="column()" [isLoading]="isLoading()"
+        (eventFromGrid)="onGridEvent($event)">
+      </app-shared-grid>
+    </p-tabPanel>
+  </p-tabView>
+</div> -->

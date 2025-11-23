@@ -1,0 +1,29 @@
+<p-toast></p-toast>
+<div class="list-page-container">
+  <div class="themed-card list-content-area">
+    <div class="se-filter-bar">
+      <div class="se-filter-field">
+        <label>Date Range</label>
+        <p-datepicker [(ngModel)]="rangeDates" selectionMode="range" [readonlyInput]="true" placeholder="Start - End" [showIcon]="true" appendTo="body" (onClose)="applyFilters()"></p-datepicker>
+      </div>
+      <div class="se-filter-field">
+        <label>Type</label>
+        <p-select (onChange)="applyFilters()" [options]="transactionTypes" [(ngModel)]="filterParams.type" [showClear]="true" placeholder="All" appendTo="body"></p-select>
+      </div>
+      <div class="se-filter-field">
+        <label>Effect</label>
+        <p-select (onChange)="applyFilters()" [options]="transactionEffects" [(ngModel)]="filterParams.effect" [showClear]="true" placeholder="All" appendTo="body"></p-select>
+      </div>
+      <div class="se-filter-field">
+        <label>Search</label>
+        <input (keydown.enter)="applyFilters()" (blur)="applyFilters()" type="text" pInputText [(ngModel)]="filterParams.search" placeholder="Desc or Ref" />
+      </div>
+      <div class="se-filter-actions">
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined" (onClick)="resetFilters()"></p-button>
+      </div>
+    </div>
+    <div class="list-grid-wrapper">
+      <app-shared-grid [data]="data" [gridHeight]="'210px'" [headerFilter]="false" [GridName]="'Customer History'" [column]="column" (gridReady)="onGridReady($event)" (scrolledToBottom)="onScrolledToBottom($event)"></app-shared-grid>
+    </div>
+  </div>
+</div>

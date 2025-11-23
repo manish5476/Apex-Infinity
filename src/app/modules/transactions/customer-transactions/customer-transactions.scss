@@ -1,0 +1,114 @@
+/* =========================================================
+   TRANSACTION LIST STYLES
+   ========================================================= */
+
+:host {
+  display: block;
+  height: 100%;
+  width: 100%;
+  /* Ensures the component fills the Dialog body */
+  min-height: 0; 
+}
+
+.list-page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  padding: 0.5rem;
+  
+  /* Remove padding if inside a dialog for a flush look */
+  @media (min-width: 768px) {
+    padding: 1rem;
+  }
+}
+
+/* === CARD CONTAINER === */
+.themed-card {
+  background: var(--surface-card, #fff);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--surface-border, #e5e7eb);
+  
+  /* Flex magic to make Grid fill space */
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0; /* CRITICAL for scrollable children */
+  gap: 1.5rem;
+}
+
+/* === FILTER BAR === */
+.se-filter-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding-bottom: 1rem;
+  border-bottom: 1px dashed var(--surface-border, #e5e7eb);
+
+  .se-filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 200px; /* Prevent squashing */
+    max-width: 300px;
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary, #6c757d);
+      letter-spacing: 0.3px;
+    }
+
+    /* Force PrimeNG inputs to fill width */
+    ::ng-deep .p-inputtext,
+    ::ng-deep .p-select,
+    ::ng-deep .p-datepicker,
+    input {
+      width: 100%;
+    }
+    
+    ::ng-deep .p-select {
+        min-width: 100%; /* Ensures dropdown arrow doesn't shift */
+    }
+  }
+
+  .se-filter-actions {
+    display: flex;
+    gap: 0.5rem;
+    padding-bottom: 2px; /* Align with input borders */
+    
+    /* On mobile, make buttons full width */
+    @media (max-width: 768px) {
+        width: 100%;
+        justify-content: flex-end;
+        margin-top: 0.5rem;
+    }
+  }
+}
+
+/* === GRID WRAPPER === */
+.list-grid-wrapper {
+  flex: 1;
+  min-height: 0; /* Allows Ag-Grid to scroll internally */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
+  /* Force the shared grid component to fill this container */
+  ::ng-deep app-shared-grid {
+    height: 100%;
+    width: 100%;
+    display: block;
+    
+    /* Override the passed [gridHeight] if needed to force full height 
+       when inside a flex container like this */
+    .ag-theme-alpine, 
+    .ag-theme-balham {
+        height: 100% !important;
+    }
+  }
+}

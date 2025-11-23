@@ -27,12 +27,7 @@
           <!-- Email -->
           <div class="form-group">
             <label>Email <span class="req">*</span></label>
-            <input
-              pInputText
-              id="email"
-              type="email"
-              formControlName="email"
-              placeholder="you@company.com" />
+            <input pInputText id="email" type="email" formControlName="email" placeholder="you@company.com" />
             @if (form['email'].invalid && form['email'].touched) {
             <small class="text-red-500">Please enter a valid email.</small>
             }
@@ -46,13 +41,8 @@
                 Forgot?
               </a>
             </div>
-            <p-password
-              id="password"
-              formControlName="password"
-              [toggleMask]="true"
-              placeholder="••••••••"
-              styleClass="w-full"
-              inputStyleClass="w-full"></p-password>
+            <p-password id="password" formControlName="password" [toggleMask]="true" placeholder="••••••••"
+              styleClass="w-full" inputStyleClass="w-full"></p-password>
           </div>
 
           <!-- Remember me -->
@@ -65,13 +55,8 @@
 
           <!-- Footer -->
           <div class="auth-footer">
-            <p-button
-              label="Login"
-              icon="pi pi-sign-in"
-              type="submit"
-              [loading]="isLoading()"
-              [disabled]="loginForm.invalid || isLoading()"
-              styleClass="auth-btn-primary w-full justify-center">
+            <p-button label="Login" icon="pi pi-sign-in" type="submit" [loading]="isLoading()"
+              [disabled]="loginForm.invalid || isLoading()" styleClass="auth-btn-primary w-full justify-center">
             </p-button>
 
             <p class="auth-footer-text">
@@ -79,133 +64,17 @@
               <a routerLink="/auth/signup" class="auth-link">Create one</a>
             </p>
 
-            <p-button
-              label="Organization Login"
-              icon="pi pi-building"
-              routerLink="/auth/org"
-              styleClass="auth-btn-outline w-full justify-center mt-3">
-            </p-button>
+            <div class="text-center mt-4">
+              <p class="text-secondary text-sm">
+                Want to start your own company?
+                <a routerLink="/auth/org" class="text-primary font-bold hover:underline cursor-pointer">
+                  Register Organization
+                </a>
+              </p>
+            </div>
           </div>
         </form>
       </div>
     </div>
   </section>
 </div>
-
-
-<!-- <p-toast></p-toast>
-
-<div class="auth-wrapper">
-  <section class="auth-section">
-    <div class="auth-container">
-      === LEFT IMAGE PANEL ===
-      <div class="auth-banner">
-        <img src="https://images.unsplash.com/photo-1581093588401-22aa1e5f0c8f?auto=format&fit=crop&q=80&w=1000"
-          alt="Tech background" />
-        <div class="auth-overlay"></div>
-        <div class="auth-banner-text">
-          <h2>Welcome Back</h2>
-          <p>Login to continue managing your organization.</p>
-        </div>
-      </div>
-
-      === RIGHT FORM PANEL ===
-      <div class="auth-content glass-form-card">
-        <div class="auth-header text-center">
-          <i class="pi pi-bolt text-4xl text-[var(--theme-accent-primary)]"></i>
-          <h1 class="auth-title">Login to Dashboard</h1>
-          <p class="auth-subtitle">Access your organization's tools and analytics.</p>
-        </div>
-
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
-          <div class="form-group">
-            <label>Email</label>
-            <input pInputText formControlName="email" placeholder="you@company.com"
-              [ngClass]="{'ng-invalid ng-dirty': form['email'].invalid && form['email'].touched}" />
-          </div>
-
-          <div class="form-group">
-            <label>Password</label>
-            <p-password formControlName="password" [toggleMask]="true" [feedback]="false" placeholder="••••••••"
-              styleClass="w-full" inputStyleClass="w-full"></p-password>
-          </div>
-
-          <div class="flex justify-between items-center">
-            <div class="flex items-center gap-2">
-              <p-checkbox formControlName="remember" [binary]="true" inputId="remember"></p-checkbox>
-              <label for="remember" class="cursor-pointer text-[var(--theme-text-secondary)]">
-                Remember me
-              </label>
-            </div>
-            <a routerLink="/auth/forgot-password" class="auth-link text-sm">Forgot Password?</a>
-          </div>
-
-          <div class="auth-footer">
-            <p-button label="Login" icon="pi pi-sign-in" type="submit" [loading]="isLoading()"
-              [disabled]="loginForm.invalid || isLoading()" styleClass="w-full justify-center"></p-button>
-
-            <p class="auth-footer-text">
-              Don’t have an account?
-              <a routerLink="/auth/signup" class="auth-link">Sign Up</a>
-            </p>
-          </div>
-        </form>
-      </div>
-    </div>
-  </section>
-</div> -->
-
-
-<!-- <p-toast></p-toast>
-
-<div class="auth-container">
-  <div class="auth-card">
-    <div class="auth-header">
-      <i class="pi pi-bolt text-4xl text-[var(--theme-accent-primary)]"></i>
-      <h1>Welcome Back!</h1>
-      <p>Log in to your organization's dashboard.</p>
-    </div>
-
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      Email
-      <div class="flex flex-col gap-2">
-        <label for="email">Email</label>
-        <input pInputText id="email" formControlName="email" placeholder="e.g., you@company.com" />
-        @if (form['email'].invalid && form['email'].touched) {
-        <small>A valid email is required.</small>
-        }
-      </div>
-
-      Password
-      <div class="flex flex-col gap-2">
-        <div class="flex justify-between items-center">
-          <label for="password">Password</label>
-          <a routerLink="/auth/forgot-password">Forgot Password?</a>
-        </div>
-        <p-password id="password" formControlName="password" [toggleMask]="true" [feedback]="false"
-          placeholder="••••••••" styleClass="w-full" inputStyleClass="w-full"></p-password>
-        @if (form['password'].invalid && form['password'].touched) {
-        <small>Password is required.</small>
-        }
-      </div>
-
-      Remember Me
-      <div class="flex items-center gap-2">
-        <p-checkbox formControlName="remember" [binary]="true" inputId="remember"></p-checkbox>
-        <label for="remember">Remember me</label>
-      </div>
-
-      Submit
-      <div class="flex flex-col gap-4 items-center">
-        <p-button label="Login" type="submit" [loading]="isLoading()"
-          [disabled]="loginForm.invalid || isLoading()"></p-button>
-
-        <div class="text-sm text-[var(--theme-text-label)]">
-          Don't have an account?
-          <a routerLink="/auth/create-organization">Create an Organization</a> or
-          <a routerLink="/auth/join">Join a Shop</a>
-        </div>
-      </div>
-    </form>
-  </div>
-</div> -->

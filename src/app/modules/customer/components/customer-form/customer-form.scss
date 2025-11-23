@@ -216,599 +216,67 @@
     }
   }
 }
-// /* ==============================================
-//    CUSTOMER FORM COMPONENT
-//    - Using canonical theme tokens
-//    - Improved visual hierarchy
-//    ============================================== */
-
-// :host {
-//   display: block;
-//   width: 100%;
-//   height: 100%;
-// }
-
-// .form-page-container {
-//   width: 100%;
-//   height: 100%;
-//   overflow-y: auto; // Allow page to scroll
-//   display: flex;
-//   flex-direction: column;
-//   align-items: center; // Center the card
-//   background: var(--bg-primary);
-//   padding: var(--spacing-xl);
-// }
-
-// /* === Card Layout === */
-// .form-card {
-//   display: flex;
-//   flex-direction: column;
-//   width: 100%;
-//   // max-width: 1200px; // Removed to allow full width
-//   background: var(--bg-secondary);
-//   border-radius: var(--ui-border-radius-lg);
-//   box-shadow: var(--shadow-md);
-//   overflow: hidden;
-//   border: var(--ui-border-width) solid var(--border-primary);
-// }
-
-// /* === HEADER === */
-// .form-header {
-//   display: flex;
-//   justify-content: space-between;
-//   align-items: center;
-//   padding: var(--spacing-lg) var(--spacing-xl);
-//   background: var(--bg-secondary);
-//   border-bottom: var(--ui-border-width) solid var(--border-primary);
-//   flex-shrink: 0;
-
-//   .form-title {
-//     font-size: var(--font-size-2xl);
-//     font-weight: 600;
-//     color: var(--text-primary);
-//     margin: 0;
-//   }
-// }
-
-// /* === FORM BODY === */
-// .form-body {
-//   display: flex;
-//   flex-direction: column;
-//   gap: var(--spacing-xl);
-//   padding: var(--spacing-xl);
-//   overflow-y: auto;
-//   background-color: var(--bg-primary); // Use primary bg for contrast
-// }
-
-// .form-section {
-//   display: flex;
-//   flex-direction: column;
-//   gap: var(--spacing-lg);
-//   padding: var(--spacing-xl);
-//   background: var(--bg-secondary); // Use secondary bg for sections
-//   border-radius: var(--ui-border-radius-lg); // Make sections rounded
-//   border: var(--ui-border-width) solid var(--border-primary);
-//   box-shadow: var(--shadow-sm); // Add shadow to lift section
-
-//   .section-title {
-//     font-size: var(--font-size-lg);
-//     font-weight: 600;
-//     color: var(--text-primary);
-//     margin: 0;
-//     border-left: 4px solid var(--accent-primary);
-//     padding-left: var(--spacing-md);
-//   }
-// }
-
-// /* === Form Grid System === */
-// .form-grid {
-//   display: grid;
-//   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-//   gap: var(--spacing-lg) var(--spacing-xl);
-// }
-
-// .form-field {
-//   display: flex;
-//   flex-direction: column;
-//   gap: var(--spacing-sm);
-
-//   label {
-//     font-size: var(--font-size-xs);
-//     color: var(--text-label);
-//     text-transform: uppercase;
-//     font-weight: 500;
-//   }
-
-//   /* This rule is now in ::ng-deep to ensure
-//     all components get 100% width reliably.
-//   */
-//   &.span-2 {
-//     grid-column: 1 / -1;
-//   }
-// }
-
-// /* === Address Grid === */
-// .address-grid {
-//   display: grid;
-//   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-//   gap: var(--spacing-xl);
-// }
-
-// .address-card {
-//   display: flex;
-//   flex-direction: column;
-//   gap: var(--spacing-lg);
-//   padding: var(--spacing-lg);
-//   background: var(--bg-primary); // Use primary for contrast inside section
-//   border-radius: var(--ui-border-radius);
-//   border: var(--ui-border-width) solid var(--border-primary);
-
-//   h5 {
-//     font-size: var(--font-size-md);
-//     font-weight: 600;
-//     color: var(--text-primary);
-//     margin: 0;
-//   }
-
-//   .address-header {
-//     display: flex;
-//     justify-content: space-between;
-//     align-items: center;
-//   }
-
-//   .copy-address {
-//     display: flex;
-//     align-items: center;
-//     gap: var(--spacing-sm);
-//   }
-// }
-
-
-// /* === FOOTER === */
-// .form-footer {
-//   background: var(--bg-secondary);
-//   border-top: var(--ui-border-width) solid var(--border-primary);
-//   padding: var(--spacing-lg) var(--spacing-xl);
-//   display: flex;
-//   justify-content: flex-end;
-//   gap: var(--spacing-md);
-//   flex-shrink: 0;
-// }
-
-// /* === Validation Styling === */
-// :host ::ng-deep {
-
-//   // Ensure all form components take full width inside a form-field
-//   .form-field {
-//     :is(p-select, .p-inputnumber, .p-inputtextarea, .p-fileupload) {
-//       width: 100%;
-//     }
-//   }
-
-//   // Set input backgrounds to contrast with the section (bg-secondary)
-//   // Use bg-ternary for inputs
-//   :is(.p-inputtext, .p-inputnumber-input, .p-textarea) {
-//     background: var(--bg-ternary);
-//     color: var(--text-primary);
-//   }
-  
-//   // p-select has a wrapper, so we style it and its label
-//   .p-select {
-//     background: var(--bg-ternary);
-//     color: var(--text-primary);
-//     .p-select-label {
-//       background: transparent;
-//       color: var(--text-primary);
-//     }
-//   }
-
-//   // Style invalid touched form fields
-//   .ng-invalid.ng-touched {
-//     :is(.p-inputtext, p-select, .p-inputnumber, .p-inputtextarea) {
-//       border-color: var(--color-error);
-//     }
-    
-//     // Target the button inside p-inputnumber
-//     .p-inputnumber-button {
-//       border-color: var(--color-error);
-//     }
-//   }
-
-//   // Ensure dropdown panels match theme
-//   .p-select-panel {
-//     background: var(--bg-secondary);
-//     border: var(--ui-border-width) solid var(--border-primary);
-    
-//     .p-select-item {
-//       color: var(--text-secondary);
-//       &:hover {
-//         background: var(--bg-ternary);
-//         color: var(--text-primary);
-//       }
-//     }
-//     .p-select-item.p-highlight {
-//       background: var(--accent-focus);
-//       color: var(--accent-primary);
-//     }
-//   }
-// }
-
-// // /* ==============================================
-// //    CUSTOMER FORM COMPONENT
-// //    - Using canonical theme tokens
-// //    - Improved visual hierarchy
-// //    ============================================== */
-
-// // :host {
-// //   display: block;
-// //   width: 100%;
-// //   height: 100%;
-// // }
-
-// // .form-page-container {
-// //   width: 100%;
-// //   height: 100%;
-// //   overflow-y: auto; // Allow page to scroll
-// //   display: flex;
-// //   flex-direction: column;
-// //   align-items: center; // Center the card
-// //   background: var(--bg-primary);
-// //   padding: var(--spacing-xl);
-// // }
-
-// // /* === Card Layout === */
-// // .form-card {
-// //   display: flex;
-// //   flex-direction: column;
-// //   width: 100%;
-// //   max-width: 1200px; // Max width for the form
-// //   background: var(--bg-secondary);
-// //   border-radius: var(--ui-border-radius-lg);
-// //   box-shadow: var(--shadow-md);
-// //   overflow: hidden;
-// //   border: var(--ui-border-width) solid var(--border-primary);
-// // }
-
-// // /* === HEADER === */
-// // .form-header {
-// //   display: flex;
-// //   justify-content: space-between;
-// //   align-items: center;
-// //   padding: var(--spacing-lg) var(--spacing-xl);
-// //   background: var(--bg-secondary);
-// //   border-bottom: var(--ui-border-width) solid var(--border-primary);
-// //   flex-shrink: 0;
-
-// //   .form-title {
-// //     font-size: var(--font-size-2xl);
-// //     font-weight: 600;
-// //     color: var(--text-primary);
-// //     margin: 0;
-// //   }
-// // }
-
-// // /* === FORM BODY === */
-// // .form-body {
-// //   display: flex;
-// //   flex-direction: column;
-// //   gap: var(--spacing-xl);
-// //   padding: var(--spacing-xl);
-// //   overflow-y: auto;
-// //   background-color: var(--bg-primary); // Use primary bg for contrast
-// // }
-
-// // .form-section {
-// //   display: flex;
-// //   flex-direction: column;
-// //   gap: var(--spacing-lg);
-// //   padding: var(--spacing-xl);
-// //   background: var(--bg-secondary); // Use secondary bg for sections
-// //   border-radius: var(--ui-border-radius-lg); // Make sections rounded
-// //   border: var(--ui-border-width) solid var(--border-primary);
-// //   box-shadow: var(--shadow-sm); // Add shadow to lift section
-
-// //   .section-title {
-// //     font-size: var(--font-size-lg);
-// //     font-weight: 600;
-// //     color: var(--text-primary);
-// //     margin: 0;
-// //     border-left: 4px solid var(--accent-primary);
-// //     padding-left: var(--spacing-md);
-// //   }
-// // }
-
-// // /* === Form Grid System === */
-// // .form-grid {
-// //   display: grid;
-// //   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-// //   gap: var(--spacing-lg) var(--spacing-xl);
-// // }
-
-// // .form-field {
-// //   display: flex;
-// //   flex-direction: column;
-// //   gap: var(--spacing-sm);
-
-// //   label {
-// //     font-size: var(--font-size-xs);
-// //     color: var(--text-label);
-// //     text-transform: uppercase;
-// //     font-weight: 500;
-// //   }
-
-// //   /* This rule is now in ::ng-deep to ensure
-// //     all components get 100% width reliably.
-// //   */
-// //   &.span-2 {
-// //     grid-column: 1 / -1;
-// //   }
-// // }
-
-// // /* === Address Grid === */
-// // .address-grid {
-// //   display: grid;
-// //   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-// //   gap: var(--spacing-xl);
-// // }
-
-// // .address-card {
-// //   display: flex;
-// //   flex-direction: column;
-// //   gap: var(--spacing-lg);
-// //   padding: var(--spacing-lg);
-// //   background: var(--bg-primary); // Use primary for contrast inside section
-// //   border-radius: var(--ui-border-radius);
-// //   border: var(--ui-border-width) solid var(--border-primary);
-
-// //   h5 {
-// //     font-size: var(--font-size-md);
-// //     font-weight: 600;
-// //     color: var(--text-primary);
-// //     margin: 0;
-// //   }
-
-// //   .address-header {
-// //     display: flex;
-// //     justify-content: space-between;
-// //     align-items: center;
-// //   }
-
-// //   .copy-address {
-// //     display: flex;
-// //     align-items: center;
-// //     gap: var(--spacing-sm);
-// //   }
-// // }
-
-
-// // /* === FOOTER === */
-// // .form-footer {
-// //   background: var(--bg-secondary);
-// //   border-top: var(--ui-border-width) solid var(--border-primary);
-// //   padding: var(--spacing-lg) var(--spacing-xl);
-// //   display: flex;
-// //   justify-content: flex-end;
-// //   gap: var(--spacing-md);
-// //   flex-shrink: 0;
-// // }
-
-// // /* === Validation Styling === */
-// // :host ::ng-deep {
-
-// //   // Ensure all form components take full width inside a form-field
-// //   .form-field {
-// //     :is(p-select, .p-inputnumber, .p-inputtextarea, .p-fileupload) {
-// //       width: 100%;
-// //     }
-// //   }
-
-// //   // Set input backgrounds to contrast with the section (bg-secondary)
-// //   // Use bg-ternary for inputs
-// //   :is(.p-inputtext, .p-inputnumber-input, .p-textarea) {
-// //     background: var(--bg-ternary);
-// //     color: var(--text-primary);
-// //   }
-  
-// //   // p-select has a wrapper, so we style it and its label
-// //   .p-select {
-// //     background: var(--bg-ternary);
-// //     color: var(--text-primary);
-// //     .p-select-label {
-// //       background: transparent;
-// //       color: var(--text-primary);
-// //     }
-// //   }
-
-// //   // Style invalid touched form fields
-// //   .ng-invalid.ng-touched {
-// //     :is(.p-inputtext, p-select, .p-inputnumber, .p-inputtextarea) {
-// //       border-color: var(--color-error);
-// //     }
-    
-// //     // Target the button inside p-inputnumber
-// //     .p-inputnumber-button {
-// //       border-color: var(--color-error);
-// //     }
-// //   }
-
-// //   // Ensure dropdown panels match theme
-// //   .p-select-panel {
-// //     background: var(--bg-secondary);
-// //     border: var(--ui-border-width) solid var(--border-primary);
-    
-// //     .p-select-item {
-// //       color: var(--text-secondary);
-// //       &:hover {
-// //         background: var(--bg-ternary);
-// //         color: var(--text-primary);
-// //       }
-// //     }
-// //     .p-select-item.p-highlight {
-// //       background: var(--accent-focus);
-// //       color: var(--accent-primary);
-// //     }
-// //   }
-// // }
-// // // .customer-page {
-// // //   width: 100%;
-// // //   height: 100%;
-// // //   background: var(--theme-bg-primary);
-// // //   color: var(--theme-text-primary);
-// // //   display: flex;
-// // //   justify-content: center;
-// // //   align-items: center;
-// // //   overflow: hidden;
-// // // }
-
-// // // /* FULL-WIDTH FORM SECTION */
-// // // .customer-side-form {
-// // //   width: 100%;
-// // //   height: 100%;
-// // //   padding: 0;
-// // //   display: flex;
-// // //   flex-direction: column;
-// // //   overflow: hidden;
-// // // }
-
-// // // /* FORM */
-// // // .customer-form {
-// // //   flex: 1;
-// // //   overflow-y: auto;
-// // //   background: var(--theme-bg-primary);
-// // //   border-radius: 10px;
-// // //   border: 1px solid var(--theme-border-primary);
-// // //   padding: 1rem 2rem 5rem 2rem;
-// // //   font-size: 0.8rem;
-// // //   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
-// // // }
-
-// // // /* HEADER */
-// // // .form-header {
-// // //   text-align: center;
-// // //   margin-bottom: 0.75rem;
-
-// // //   h1 {
-// // //     font-size: 1rem;
-// // //     font-weight: 600;
-// // //     color: var(--theme-accent-primary);
-// // //     margin: 0;
-// // //   }
-
-// // //   p {
-// // //     font-size: 0.72rem;
-// // //     color: var(--theme-text-secondary);
-// // //   }
-// // // }
-
-// // // /* BODY */
-// // // .form-body {
-// // //   display: flex;
-// // //   flex-direction: column;
-// // //   gap: 0.75rem;
-// // // }
-
-// // // .form-section {
-// // //   border-top: 1px dashed var(--theme-border-primary);
-// // //   padding-top: 0.5rem;
-
-// // //   h3 {
-// // //     font-size: 0.85rem;
-// // //     color: var(--theme-accent-primary);
-// // //     margin-bottom: 0.4rem;
-// // //     font-weight: 600;
-// // //   }
-// // // }
-
-// // // .form-row {
-// // //   display: flex;
-// // //   flex-wrap: wrap;
-// // //   gap: 0.6rem;
-// // // }
-
-// // // .form-field {
-// // //   flex: 1;
-// // //   display: flex;
-// // //   flex-direction: column;
-// // //   min-width: 180px;
-
-// // //   label {
-// // //     font-size: 0.7rem;
-// // //     color: var(--theme-text-secondary);
-// // //     margin-bottom: 0.2rem;
-// // //   }
-
-// // //   input,
-// // //   textarea,
-// // //   .p-inputtext,
-// // //   .p-select,
-// // //   .p-inputnumber {
-// // //     font-size: 0.75rem;
-// // //     // border: 1px solid var(--theme-border-secondary);
-// // //     border-radius: 6px;
-// // //     // background: var(--theme-bg-ternary);
-// // //     color: var(--theme-text-primary);
-// // //     padding: 0.35rem 0.55rem;
-// // //   }
-
-// // //   input:focus,
-// // //   textarea:focus {
-// // //     border-color: var(--theme-accent-primary);
-// // //     box-shadow: 0 0 0 2px var(--theme-accent-focus-ring);
-// // //   }
-// // // }
-
-// // // /* STICKY FOOTER BUTTON */
-// // // .form-footer {
-// // //   position: sticky;
-// // //   bottom: 0;
-// // //   background: var(--theme-bg-primary);
-// // //   border-top: 1px solid var(--theme-border-primary);
-// // //   padding: 0.75rem 0;
-// // //   text-align: center;
-// // //   z-index: 10;
-
-// // //   .p-button {
-// // //     border-radius: 9999px;
-// // //     font-size: 0.78rem;
-// // //     font-weight: 600;
-// // //     height: 36px;
-// // //     background: var(--theme-accent-gradient);
-// // //     width: 200px;
-// // //   }
-
-// // //   .p-button:hover {
-// // //     transform: translateY(-1px);
-// // //     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
-// // //   }
-// // // }
-// // // /* FIXED FOOTER BUTTON */
-// // // .form-footer-fixed {
-// // //   position: fixed;
-// // //   bottom: 0;
-// // //   left: 0;
-// // //   width: 100%;
-// // //   background: var(--theme-bg-primary);
-// // //   border-top: 1px solid var(--theme-border-primary);
-// // //   box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.08);
-// // //   padding: 0.75rem 1rem;
-// // //   display: flex;
-// // //   justify-content: center;
-// // //   align-items: center;
-// // //   z-index: 100;
-
-// // //   .p-button {
-// // //     width: 220px;
-// // //     border-radius: 9999px;
-// // //     font-size: 0.8rem;
-// // //     font-weight: 600;
-// // //     height: 38px;
-// // //     background: var(--theme-accent-gradient);
-// // //     border: none;
-// // //     transition: all 0.2s ease;
-// // //   }
-
-// // //   .p-button:hover {
-// // //     transform: translateY(-1px);
-// // //     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
-// // //   }
-// // // }
+/* === Address Grid (two cards side-by-side) === */
+.address-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--spacing-xl);
+}
+
+/* === Address Card (fields inside become 2-per-row) === */
+.address-card {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 form fields per row */
+  gap: var(--spacing-lg);
+  padding: var(--spacing-xl);
+  background: var(--bg-primary); /* consistent with inner section contrast */
+  border-radius: var(--ui-border-radius-lg);
+  border: var(--ui-border-width) solid var(--border-primary);
+}
+
+/* Title + header spans full row */
+.address-card h5,
+.address-card .address-header {
+  grid-column: 1 / -1;
+}
+
+.address-card h5 {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Header flex for Shipping Address */
+.address-card .address-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.address-card .copy-address {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* Standard form-field remains unchanged */
+.address-card .form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.address-card .form-field label {
+  font-size: var(--font-size-xs);
+  color: var(--text-label);
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+/* Mobile: stack inputs (1-per-row) */
+@media (max-width: 768px) {
+  .address-card {
+    grid-template-columns: 1fr;
+  }
+}

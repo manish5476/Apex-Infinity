@@ -1,0 +1,257 @@
+@use 'sass:math';
+
+// Using Premium/Dark Theme for the look (assuming global vars are set)
+
+$day-column-width: 1fr;
+$time-column-width: 4rem;
+$hour-slot-height: 48px; // The height of one hour block (for vertical positioning reference)
+$total-visible-hours: 18; // 6 AM to 11 PM
+
+.planner-container {
+    display: flex;
+    flex-direction: column;
+    height: 90vh;
+    background: var(--bg-secondary);
+    border-radius: var(--ui-border-radius-xl);
+    border: var(--ui-border-width) solid var(--border-primary);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
+
+.planner-header {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-lg) var(--spacing-2xl);
+    border-bottom: var(--ui-border-width) solid var(--border-secondary);
+    flex-shrink: 0;
+
+    .month-label {
+        font-size: var(--font-size-xl);
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-primary);
+    }
+    
+    .week-nav-group {
+        display: flex;
+        align-items: center;
+        margin-left: var(--spacing-xl);
+        gap: var(--spacing-md);
+        
+        .nav-arrow {
+            cursor: pointer;
+            padding: var(--spacing-xs);
+            border-radius: var(--ui-border-radius-full);
+            color: var(--text-tertiary);
+            transition: var(--transition-fast);
+            
+            &:hover {
+                background: var(--component-bg-hover);
+                color: var(--accent-primary);
+            }
+        }
+        
+        .nav-today {
+            cursor: pointer;
+            font-weight: var(--font-weight-medium);
+            color: var(--accent-primary);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--ui-border-radius);
+            &:hover {
+                background: var(--component-bg-hover);
+            }
+        }
+    }
+    
+    .view-tabs {
+        margin-left: auto;
+        display: flex;
+        border: var(--ui-border-width) solid var(--border-secondary);
+        border-radius: var(--ui-border-radius);
+        overflow: hidden;
+        
+        .view-tab {
+            padding: var(--spacing-xs) var(--spacing-md);
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+            color: var(--text-secondary);
+            border-right: var(--ui-border-width) solid var(--border-secondary);
+            
+            &:last-child {
+                border-right: none;
+            }
+            
+            &.active {
+                background: var(--accent-primary);
+                color: var(--bg-secondary);
+                font-weight: var(--font-weight-semibold);
+            }
+        }
+    }
+}
+
+.planner-scroll-panel {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.schedule-grid {
+    display: grid;
+    // 1 column for time, 7 columns for days
+    grid-template-columns: $time-column-width repeat(7, $day-column-width);
+    min-height: calc($total-visible-hours * $hour-slot-height);
+    background: var(--bg-primary); // Slight contrast to the card background
+}
+
+.time-column {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background: var(--bg-primary);
+    border-right: var(--ui-border-width) solid var(--border-primary);
+    
+    .hour-label {
+        height: $hour-slot-height;
+        position: relative;
+        font-size: var(--font-size-xs);
+        color: var(--text-tertiary);
+        text-align: right;
+        padding-right: var(--spacing-sm);
+        padding-top: var(--spacing-xs);
+        
+        &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: var(--ui-border-width);
+            background: var(--border-secondary);
+        }
+    }
+}
+
+.day-column {
+    display: flex;
+    flex-direction: column;
+    border-right: var(--ui-border-width) solid var(--border-secondary);
+    position: relative;
+
+    .day-header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background: var(--bg-secondary);
+        padding: var(--spacing-md) 0;
+        text-align: center;
+        border-bottom: var(--ui-border-width) solid var(--border-primary);
+        display: flex;
+        flex-direction: column;
+        
+        .weekday {
+            font-size: var(--font-size-sm);
+            color: var(--text-tertiary);
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .day-number {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-primary);
+            line-height: var(--line-height-tight);
+        }
+        
+        &.today .day-number {
+            color: var(--bg-secondary);
+            background: var(--accent-primary);
+            width: 2rem;
+            height: 2rem;
+            border-radius: var(--ui-border-radius-full);
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+}
+
+.event-timeline {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    
+    .hour-slot {
+        height: $hour-slot-height;
+        border-bottom: var(--ui-border-width) dashed var(--border-secondary);
+    }
+    
+    .note-block {
+        position: absolute;
+        left: 5%;
+        width: 90%;
+        padding: var(--spacing-sm);
+        border-radius: var(--ui-border-radius);
+        background: var(--accent-focus); 
+        border-left: 3px solid var(--accent-primary);
+        color: var(--text-primary);
+        font-size: var(--font-size-sm);
+        cursor: pointer;
+        z-index: 30;
+        overflow: hidden;
+        transition: box-shadow 0.1s;
+        
+        &:hover {
+            box-shadow: var(--shadow-md);
+            z-index: 40;
+            
+            // Show the popup near the block on hover (using OverlayPanel in HTML)
+        }
+
+        .note-title {
+            font-weight: var(--font-weight-semibold);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .note-time {
+            font-size: var(--font-size-xs);
+            color: var(--text-tertiary);
+        }
+    }
+}
+
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    z-index: 100;
+}
+
+// Overlay Panel Styling (Tooltips)
+.note-tooltip {
+    max-width: 300px;
+    padding: var(--spacing-md);
+    
+    h4 {
+        margin-top: 0;
+        font-size: var(--font-size-lg);
+        color: var(--text-primary);
+    }
+    
+    p {
+        font-size: var(--font-size-sm);
+        color: var(--text-secondary);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    button {
+        // Adjust button styling to match theme
+    }
+}

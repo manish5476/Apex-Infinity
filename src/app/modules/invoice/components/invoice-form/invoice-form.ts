@@ -1,11 +1,16 @@
-import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { finalize, switchMap, tap, startWith, debounceTime } from 'rxjs/operators';
-import { of, Subscription } from 'rxjs';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { startWith, debounceTime } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
-// PrimeNG
+// Services
+import { InvoiceService } from '../../services/invoice-service';
+import { MasterListService } from '../../../../core/services/master-list.service';
+import { AppMessageService } from '../../../../core/services/message.service';
+
+// PrimeNG Modules
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -13,12 +18,9 @@ import { SelectModule } from 'primeng/select';
 import { DividerModule } from 'primeng/divider';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
-import { DatePickerModule } from 'primeng/datepicker'; // Corrected import for p-datepicker
-import { LoadingService } from '../../../../core/services/loading.service';
-import { MasterListService } from '../../../../core/services/master-list.service';
-import { AppMessageService } from '../../../../core/services/message.service';
-import { InvoiceService } from '../../services/invoice-service';
-import { Textarea } from 'primeng/textarea';
+import { DatePickerModule } from 'primeng/datepicker';
+import { TextareaModule } from 'primeng/textarea';
+import { CommonMethodService } from '../../../../core/utils/common-method.service';
 
 @Component({
   selector: 'app-invoice-form',
@@ -26,40 +28,46 @@ import { Textarea } from 'primeng/textarea';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    RouterModule,
     ToastModule,
     ButtonModule,
     InputTextModule,
     InputNumberModule,
-    DatePickerModule, // Corrected module
+    DatePickerModule,
     SelectModule,
     DividerModule,
     TooltipModule,
-  Textarea
+    TextareaModule
   ],
   templateUrl: './invoice-form.html',
   styleUrls: ['./invoice-form.scss']
 })
 export class InvoiceFormComponent implements OnInit, OnDestroy {
-  // --- Injected Services ---
+  // --- Dependencies ---
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private invoiceService = inject(InvoiceService);
-  private messageService = inject(AppMessageService);
-  private loadingService = inject(LoadingService);
   private masterList = inject(MasterListService);
+  private messageService = inject(AppMessageService);
+  
+  // Inject Common Service
+  public common = inject(CommonMethodService);
+  isSubmitting = signal(false);
 
   // --- Form & State ---
   invoiceForm!: FormGroup;
-  isSubmitting = signal(false);
   editMode = signal(false);
   invoiceId: string | null = null;
-  formTitle = signal('Create New Invoice');
+  
+  // Computed Labels
+  formTitle = computed(() => this.editMode() ? 'Edit Invoice' : 'Create New Invoice');
+  submitLabel = computed(() => this.editMode() ? 'Update Invoice' : 'Create Invoice');
 
   // --- Master Data Signals ---
-  customerOptions = signal<any[]>([]);
-  productOptions = signal<any[]>([]);
-  branchOptions = signal<any[]>([]);
+  customerOptions = computed(() => this.masterList.customers());
+  productOptions = computed(() => this.masterList.products());
+  branchOptions = computed(() => this.masterList.branches());
   
   statusOptions = [
     { label: 'Draft', value: 'draft' },
@@ -87,12 +95,6 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
   balanceAmount = signal(0);
   private totalsSub!: Subscription;
 
-  constructor() {
-    this.customerOptions.set(this.masterList.customers());
-    this.productOptions.set(this.masterList.products()); // Assumes products are loaded
-    this.branchOptions.set(this.masterList.branches());
-  }
-
   ngOnInit(): void {
     this.buildForm();
     this.setupTotalsCalculation();
@@ -105,29 +107,33 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
     }
   }
 
+  // === 1. Initialization & Edit Mode ===
   private checkRouteForEditMode(): void {
-    this.route.paramMap.pipe(
-      switchMap(params => {
-        this.invoiceId = params.get('id');
-        if (this.invoiceId) {
-          this.editMode.set(true);
-          this.formTitle.set('Edit Invoice');
-          this.loadingService.show();
-          return this.invoiceService.getInvoiceById(this.invoiceId);
-        }
-        return of(null); // Create mode
-      }),
-      finalize(() => this.loadingService.hide())
-    ).subscribe({
-      next: (response) => {
-        if (response && response.data && response.data.data) {
-          this.patchForm(response.data.data);
-        } else if (response) {
-          this.messageService.showError('Error', 'Failed to load invoice data');
+    // Check route param (:id)
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
+      if (id) {
+        this.invoiceId = id;
+        this.editMode.set(true);
+        this.loadInvoiceData(id);
+      } else {
+        // If create mode, add one empty item by default
+        this.addItem();
+      }
+    });
+  }
+
+  private loadInvoiceData(id: string): void {
+    this.common.apiCall(
+      this.invoiceService.getInvoiceById(id),
+      (response: any) => {
+        const data = response.data?.data || response.data;
+        if (data) {
+          this.patchForm(data);
         }
       },
-      error: (err) => this.messageService.showError('Error', err.error?.message)
-    });
+      'Load Invoice Data'
+    );
   }
 
   private buildForm(): void {
@@ -139,8 +145,8 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
       dueDate: [null],
       status: ['issued', Validators.required],
       
-      billingAddress: [''], // Will auto-fill
-      shippingAddress: [''], // Will auto-fill
+      billingAddress: [''], 
+      shippingAddress: [''], 
       
       items: this.fb.array([], [Validators.required, Validators.minLength(1)]),
       
@@ -157,7 +163,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
       customerId: invoice.customerId,
       branchId: invoice.branchId,
       invoiceNumber: invoice.invoiceNumber,
-      invoiceDate: new Date(invoice.invoiceDate),
+      invoiceDate: invoice.invoiceDate ? new Date(invoice.invoiceDate) : new Date(),
       dueDate: invoice.dueDate ? new Date(invoice.dueDate) : null,
       status: invoice.status,
       billingAddress: invoice.billingAddress,
@@ -175,7 +181,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
       invoice.items.forEach((item: any) => {
         this.items.push(this.fb.group({
           productId: [item.productId, Validators.required],
-          name: [item.name, Validators.required],
+          name: [item.name, Validators.required], // Keep enabled if editing names is allowed
           hsnCode: [item.hsnCode],
           quantity: [item.quantity, [Validators.required, Validators.min(1)]],
           unit: [item.unit || 'pcs'],
@@ -187,7 +193,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
     }
   }
 
-  // --- FormArray Getters & Methods ---
+  // === 2. FormArray Management ===
   get items(): FormArray {
     return this.invoiceForm.get('items') as FormArray;
   }
@@ -195,7 +201,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
   createItem(): FormGroup {
     return this.fb.group({
       productId: [null, Validators.required],
-      name: [{value: '', disabled: true}, Validators.required], // Disabled, auto-filled
+      name: ['', Validators.required],
       hsnCode: [''],
       quantity: [1, [Validators.required, Validators.min(1)]],
       unit: ['pcs'],
@@ -213,19 +219,17 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
     this.items.removeAt(index);
   }
 
-  // --- Auto-fill Logic ---
+  // === 3. Auto-fill Logic ===
   onCustomerSelect(event: any): void {
     const customer = this.customerOptions().find(c => c._id === event.value);
     if (customer) {
-      // Auto-fill addresses (assuming simple string format)
-      const billAddr = customer.billingAddress ? 
-        `${customer.billingAddress.street}\n${customer.billingAddress.city}, ${customer.billingAddress.state} ${customer.billingAddress.zipCode}` : '';
-      const shipAddr = customer.shippingAddress ?
-        `${customer.shippingAddress.street}\n${customer.shippingAddress.city}, ${customer.shippingAddress.state} ${customer.shippingAddress.zipCode}` : '';
+      // Format address for text area
+      const formatAddr = (addr: any) => addr ? 
+        `${addr.street || ''}\n${addr.city || ''}, ${addr.state || ''} ${addr.zipCode || ''}`.trim() : '';
 
       this.invoiceForm.patchValue({
-        billingAddress: billAddr,
-        shippingAddress: shipAddr || billAddr
+        billingAddress: formatAddr(customer['billingAddress']),
+        shippingAddress: formatAddr(customer['shippingAddress'] || customer['billingAddress'])
       });
     }
   }
@@ -235,28 +239,28 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
     if (product) {
       itemGroup.patchValue({
         name: product.name,
-        price: product.sellingPrice,
-        taxRate: product.taxRate || 0,
-        hsnCode: product.sku || '' // Assuming SKU can be HSN
+        price: product['sellingPrice'],
+        taxRate: product['taxRate'] || 0,
+        hsnCode: product['sku'] || ''
       });
     }
   }
 
-  // --- Real-time Totals Calculation ---
+  // === 4. Calculations ===
   private setupTotalsCalculation(): void {
     this.totalsSub = this.invoiceForm.valueChanges.pipe(
-      startWith(this.invoiceForm.value), // Calculate on init
-      debounceTime(50) // Prevent rapid fire
+      startWith(this.invoiceForm.value),
+      debounceTime(50)
     ).subscribe(value => {
       let subTotal = 0;
       let totalDiscount = 0;
       let totalTax = 0;
 
-      value.items.forEach((item: any) => {
-        const qty = item.quantity || 0;
-        const price = item.price || 0;
-        const discount = item.discount || 0;
-        const taxRate = item.taxRate || 0;
+      (value.items || []).forEach((item: any) => {
+        const qty = Number(item.quantity) || 0;
+        const price = Number(item.price) || 0;
+        const discount = Number(item.discount) || 0;
+        const taxRate = Number(item.taxRate) || 0;
 
         const lineTotal = (qty * price) - discount;
         totalDiscount += discount;
@@ -264,8 +268,9 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
         subTotal += (qty * price);
       });
 
-      const grand = subTotal - totalDiscount + totalTax + (value.roundOff || 0);
-      const paid = value.paidAmount || 0;
+      const roundOff = Number(value.roundOff) || 0;
+      const grand = subTotal - totalDiscount + totalTax + roundOff;
+      const paid = Number(value.paidAmount) || 0;
 
       this.subTotal.set(subTotal);
       this.totalDiscount.set(totalDiscount);
@@ -275,57 +280,52 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
     });
   }
 
-  // --- Form Submission ---
+  // === 5. Submission ===
   onSubmit(): void {
+        this.isSubmitting.set(true);
     if (this.invoiceForm.invalid) {
       this.invoiceForm.markAllAsTouched();
-      this.messageService.showError('Invalid Form', 'Please check all required fields.');
+      console.warn(this.common.getFormValidationErrors(this.invoiceForm)); 
+      this.messageService.showWarn('Invalid Form', 'Please check all required fields (marked red).');
+          this.isSubmitting.set(false);
+
       return;
     }
 
-    this.isSubmitting.set(true);
-    // Get raw value to include disabled fields like 'name'
     const payload = this.invoiceForm.getRawValue();
-
-    // The backend pre-save hook calculates totals,
-    // but we send our calculated values just in case.
+    
+    // Append calculated totals
     payload.subTotal = this.subTotal();
     payload.totalDiscount = this.totalDiscount();
     payload.totalTax = this.totalTax();
     payload.grandTotal = this.grandTotal();
     payload.balanceAmount = this.balanceAmount();
 
-    const saveObservable = this.editMode()
+    const request$ = this.editMode()
       ? this.invoiceService.updateInvoice(this.invoiceId!, payload)
       : this.invoiceService.createInvoice(payload);
 
-    saveObservable.pipe(
-      finalize(() => this.isSubmitting.set(false))
-    ).subscribe({
-      next: (res) => {
-        this.messageService.showSuccess('Success', `Invoice ${this.editMode() ? 'updated' : 'created'} successfully.`);
-        // Navigate to the new/edited invoice's detail page
-        this.router.navigate(['/invoices', res.data._id]); 
+    // 🚀 Use Common API Call
+    this.common.apiCall(
+      request$,
+      (res: any) => {
+        this.messageService.showSuccess(
+          'Success', 
+          `Invoice ${this.editMode() ? 'updated' : 'created'} successfully.`
+        );
+          this.isSubmitting.set(false);
+        const targetId = res.data?._id || this.invoiceId;
+        if (targetId) {
+            this.router.navigate(['/invoices', targetId]); 
+        } else {
+            this.router.navigate(['/invoices']);
+        }
       },
-      error: (err) => {
-        this.messageService.showError('Error', err.error?.message || 'Failed to save invoice.');
-      }
-    });
+      'Save Invoice'
+    );
   }
 }
 
-// import { TextareaModule } from 'primeng/textarea';
-// // import { Component } from '@angular/core';
-
-// // @Component({
-// //   selector: 'app-invoice-form',
-// //   imports: [],
-// //   templateUrl: './invoice-form.html',
-// //   styleUrl: './invoice-form.scss',
-// // })
-// // export class InvoiceForm {
-
-// // }
 // import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 // import { CommonModule } from '@angular/common';
 // import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -341,11 +341,12 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 // import { DividerModule } from 'primeng/divider';
 // import { ToastModule } from 'primeng/toast';
 // import { TooltipModule } from 'primeng/tooltip';
-// import { DatePicker } from 'primeng/datepicker';
+// import { DatePickerModule } from 'primeng/datepicker'; // Corrected import for p-datepicker
 // import { LoadingService } from '../../../../core/services/loading.service';
 // import { MasterListService } from '../../../../core/services/master-list.service';
 // import { AppMessageService } from '../../../../core/services/message.service';
 // import { InvoiceService } from '../../services/invoice-service';
+// import { Textarea } from 'primeng/textarea';
 
 // @Component({
 //   selector: 'app-invoice-form',
@@ -357,11 +358,11 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 //     ButtonModule,
 //     InputTextModule,
 //     InputNumberModule,
-//     DatePicker,
-//     TextareaModule,
+//     DatePickerModule, // Corrected module
 //     SelectModule,
 //     DividerModule,
-//     TooltipModule
+//     TooltipModule,
+//   Textarea
 //   ],
 //   templateUrl: './invoice-form.html',
 //   styleUrls: ['./invoice-form.scss']
@@ -548,7 +549,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 //       const billAddr = customer.billingAddress ? 
 //         `${customer.billingAddress.street}\n${customer.billingAddress.city}, ${customer.billingAddress.state} ${customer.billingAddress.zipCode}` : '';
 //       const shipAddr = customer.shippingAddress ?
-//          `${customer.shippingAddress.street}\n${customer.shippingAddress.city}, ${customer.shippingAddress.state} ${customer.shippingAddress.zipCode}` : '';
+//         `${customer.shippingAddress.street}\n${customer.shippingAddress.city}, ${customer.shippingAddress.state} ${customer.shippingAddress.zipCode}` : '';
 
 //       this.invoiceForm.patchValue({
 //         billingAddress: billAddr,

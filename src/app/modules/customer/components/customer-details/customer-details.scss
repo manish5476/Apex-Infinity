@@ -1,693 +1,745 @@
-/* ==============================================
-   CUSTOMER DETAILS COMPONENT
-   - Refactored to use canonical theme tokens
-   ============================================== */
+/* =========================================================
+   COMPONENT STYLES (Dark Mode Optimized)
+   ========================================================= */
 
 :host {
   display: block;
   width: 100%;
   height: 100%;
+  overflow-y: auto;
+  background: var(--bg-primary);
+  font-family: var(--font-body);
+  color: var(--text-primary);
 }
 
-.customer-page-container {
+.dashboard-container {
   width: 100%;
-  height: 100%;
-  overflow: hidden; // Prevents whole page scroll
+  max-width: 100%;
+  padding: var(--spacing-2xl);
   display: flex;
   flex-direction: column;
-  background: var(--bg-primary);
+  gap: var(--spacing-2xl);
+
+  @media (max-width: 768px) {
+    padding: var(--spacing-md);
+    gap: var(--spacing-xl);
+  }
 }
 
-/* === Card Layout === */
-.customer-details-card {
-  display: flex;
-  flex-direction: column;
-  flex: 1; // Grow to fill container
-  background: var(--bg-primary);
-  border-radius: var(--ui-border-radius-lg);
-  box-shadow: var(--shadow-md);
-  overflow: hidden; // Important for body scrolling
-  margin: var(--spacing-xl); // Add some margin
-}
-
-/* === HEADER === */
-.details-header {
+/* === 1. HEADER === */
+.dashboard-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-lg) var(--spacing-xl);
-  background: var(--bg-secondary);
-  border-bottom: var(--ui-border-width) solid var(--border-primary);
-  flex-shrink: 0; // Prevent header from shrinking
+  flex-wrap: wrap;
+  gap: var(--spacing-lg);
 
   .header-left {
     display: flex;
     align-items: center;
     gap: var(--spacing-lg);
-
-    .header-info {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-md);
-      .form-title {
-        font-size: var(--font-size-2xl); // Larger title
-        font-weight: 600;
-        color: var(--text-primary);
-        margin: 0; // Remove default margin
-      }
-    }
-  }
-
-  .header-actions {
-    display: flex;
-    gap: var(--spacing-sm);
-  }
-}
-
-/* === BODY === */
-.details-body {
-  display: flex;
-  gap: var(--spacing-xl);
-  padding: var(--spacing-xl);
-  overflow-y: auto; // Allow this section to scroll
-  flex: 1; // Grow to fill space
-  background-color: var(--bg-primary);
-}
-
-/* === SIDEBAR === */
-.profile-sidebar {
-  width: 24%;
-  min-width: 250px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: var(--bg-secondary);
-  border-radius: var(--ui-border-radius-lg);
-  padding: var(--spacing-xl);
-  border: var(--ui-border-width) solid var(--border-primary);
-  box-shadow: var(--shadow-sm);
-  align-self: flex-start; // Stick to top
-  gap: var(--spacing-md);
-
-  .profile-avatar {
-    width: 80px;
-    height: 80px;
-    font-size: var(--font-size-4xl);
-  }
-
-  .profile-name {
-    font-size: var(--font-size-xl);
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0;
-  }
-
-  .profile-type {
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary);
-  }
-
-  .profile-contact {
-    width: 100%;
-    margin-top: var(--spacing-lg);
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-md);
-
-    .contact-card {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-lg);
-      background: var(--bg-primary); // Use primary bg
-      border: var(--ui-border-width) solid var(--border-primary);
-      border-radius: var(--ui-border-radius);
-      padding: var(--spacing-md) var(--spacing-lg);
+    .back-btn {
+      color: var(--text-tertiary);
       transition: var(--transition-fast);
-
-      &:hover {
-        background: var(--bg-ternary);
-        transform: translateY(-2px);
-        border-color: var(--border-secondary);
+      &:hover { color: var(--text-primary); background: var(--component-bg-hover); }
+    }
+    .customer-identity {
+      display: flex; flex-direction: column; gap: 4px;
+      .name-row {
+        display: flex; align-items: center; gap: var(--spacing-md);
+        h1 { font-family: var(--font-heading); font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--text-primary); margin: 0; letter-spacing: -0.02em; }
       }
-
-      .contact-icon {
-        color: var(--accent-primary);
-        font-size: 1rem;
-      }
-
-      .contact-content {
-        display: flex;
-        flex-direction: column;
-        overflow: hidden; // For text truncation
-        label {
-          font-size: var(--font-size-xs);
-          color: var(--text-label);
-          text-transform: uppercase;
-        }
-        span {
-          font-size: var(--font-size-sm);
-          font-weight: 500;
-          color: var(--text-primary);
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
+      .badges {
+        display: flex; align-items: center; gap: var(--spacing-md);
+        .id-pill { font-family: var(--font-mono); font-size: var(--font-size-xs); background: var(--bg-ternary); border: 1px solid var(--border-primary); padding: 2px 8px; border-radius: var(--ui-border-radius); color: var(--text-secondary); }
+        .type-label { font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); color: var(--text-label); text-transform: uppercase; letter-spacing: 0.05em; }
       }
     }
   }
+  .header-actions { display: flex; gap: var(--spacing-md); }
 }
 
-/* === MAIN DETAILS === */
-.main-details {
-  flex: 1;
+/* === 2. LAYOUT GRID === */
+.layout-grid {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: var(--spacing-2xl);
+  align-items: start;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* === 3. RIGHT CONTENT === */
+.right-content {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xl);
-  min-width: 0; // Prevent flex overflow
+  min-width: 0; 
+}
 
-  .info-section {
+/* === 4. METRICS GRID (Fixed for Dark Mode) === */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); 
+  gap: var(--spacing-xl);
+
+  @media (max-width: 900px) {
+     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .metric-card {
     background: var(--bg-secondary);
-    border: var(--ui-border-width) solid var(--border-primary);
+    /* Glass effect needs to be subtle in dark mode */
+    backdrop-filter: blur(var(--glass-blur-c));
+    -webkit-backdrop-filter: blur(var(--glass-blur-c));
+    border: 1px solid var(--border-primary);
+    box-shadow: var(--shadow-sm);
     border-radius: var(--ui-border-radius-lg);
     padding: var(--spacing-xl);
-
-    .section-title {
-      font-size: var(--font-size-lg);
-      font-weight: 600;
-      color: var(--text-primary);
-      margin: 0 0 var(--spacing-lg) 0;
-      border-left: 4px solid var(--accent-primary);
-      padding-left: var(--spacing-md);
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: var(--spacing-lg);
-    }
-
-    .info-card {
-      background: var(--bg-primary);
-      border-radius: var(--ui-border-radius);
-      padding: var(--spacing-md) var(--spacing-lg);
-      border: var(--ui-border-width) solid var(--border-primary);
-      display: flex;
-      flex-direction: column;
-      gap: var(--spacing-xs);
-      transition: var(--transition-fast);
-
-      &:hover {
-        background: var(--bg-ternary);
-        transform: translateY(-2px);
-      }
-
-      label {
-        font-size: var(--font-size-xs);
-        color: var(--text-label);
-        text-transform: uppercase;
-        font-weight: 500;
-      }
-
-      span {
-        font-weight: 600;
-        font-size: var(--font-size-md);
-        color: var(--text-primary);
-      }
-
-      // Specific outstanding balance style
-      span.outstanding {
-        color: var(--color-error); // Use theme token
-        font-weight: 700;
-        font-size: var(--font-size-lg);
-      }
-
-      &.tags-card {
-        // Need to override the default span style for this card
-        span {
-            font-weight: 500;
-            font-size: var(--font-size-sm);
-            color: var(--text-secondary);
-        }
-      }
-      
-      .tags-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: var(--spacing-sm);
-        margin-top: var(--spacing-xs);
-      }
-
-      &.notes {
-        grid-column: 1 / -1; // Make notes span full width
-      }
-
-      &.notes p {
-        font-size: var(--font-size-sm);
-        color: var(--text-secondary);
-        margin: 0;
-        line-height: var(--line-height-relaxed);
-      }
-    }
-
-    .address-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: var(--spacing-lg);
-    }
-
-    .address {
-      h5 {
-        font-weight: 600;
-        margin: 0 0 var(--spacing-md) 0;
-        color: var(--text-primary);
-        font-size: var(--font-size-md);
-      }
-      .address-item {
-        display: flex;
-        justify-content: space-between;
-        gap: var(--spacing-md);
-        padding: var(--spacing-xs) 0;
-        
-        label {
-          font-size: var(--font-size-sm);
-          color: var(--text-label);
-          font-weight: 400;
-          text-transform: none;
-        }
-        span {
-          font-size: var(--font-size-sm);
-          font-weight: 500;
-          text-align: right;
-        }
-      }
-    }
-  }
-}
-
-/* === FOOTER === */
-.details-footer {
-  background: var(--bg-secondary);
-  border-top: var(--ui-border-width) solid var(--border-primary);
-  padding: var(--spacing-lg) var(--spacing-xl);
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-md);
-  flex-shrink: 0; // Prevent footer from shrinking
-}
-
-/* === SKELETON === */
-.skeleton-wrapper {
-  padding: var(--spacing-xl);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xl);
-
-  .skeleton-header {
-    padding: var(--spacing-lg) 0;
-  }
-
-  .skeleton-body {
     display: flex;
-    gap: var(--spacing-xl);
+    align-items: center;
+    gap: var(--spacing-lg);
+    transition: var(--transition-base);
 
-    .class_skeleton-main {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-xl);
+    &:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+
+    .icon-box {
+      width: 48px; height: 48px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: var(--font-size-xl);
+      /* Default fallback */
+      background: var(--bg-ternary); 
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+
+    .data-box {
+      display: flex; flex-direction: column; min-width: 0;
+      label { font-size: var(--font-size-xs); text-transform: uppercase; font-weight: var(--font-weight-bold); letter-spacing: 0.05em; color: var(--text-label); margin-bottom: 4px; white-space: nowrap;}
+      .value { font-family: var(--font-heading); font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--text-primary); }
+    }
+
+    /* === COLOR FIXES === */
+    /* Use RGBA values so they are transparent in Dark Mode */
+    
+    &.outstanding {
+      .icon-box { 
+        background: rgba(239, 68, 68, 0.15); /* Red with transparency */
+        color: var(--color-error); 
+      }
+      .value { color: var(--color-error); }
+    }
+
+    &.invoiced {
+      .icon-box { 
+        background: rgba(59, 130, 246, 0.15); /* Blue with transparency */
+        color: var(--color-info); 
+      }
+    }
+
+    &.received {
+      .icon-box { 
+        background: rgba(16, 185, 129, 0.15); /* Green with transparency */
+        color: var(--color-success); 
+      }
+    }
+
+    &.limit {
+      .icon-box { 
+        background: var(--bg-ternary); /* Uses theme neutral background */
+        color: var(--text-secondary); 
+      }
     }
   }
 }
 
-/* === UTILITY === */
-/* Helper for p-button-rounded as it's not in the global override */
-:host ::ng-deep .p-button.p-button-rounded {
-  border-radius: 50%;
-  width: 2.5rem;  // Standard PrimeNG size
-  height: 2.5rem;
+/* === 5. PROFILE CARD === */
+.profile-card {
+  background: var(--bg-secondary);
+  backdrop-filter: blur(var(--glass-blur-c));
+  -webkit-backdrop-filter: blur(var(--glass-blur-c));
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--ui-border-radius-lg);
+  
+  position: sticky; top: 20px; z-index: 10; height: fit-content;
+  display: flex; flex-direction: column; overflow: hidden; padding: 0;
+
+  /* Updated Banner Image */
+  .card-banner {
+    height: 140px;
+    width: 100%;
+    background-image: url('https://images.unsplash.com/photo-1758568938040-fb8b7275ca5f?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); 
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.3); 
+    }
+  }
+
+  .identity-section {
+    padding: 0 var(--spacing-xl) var(--spacing-lg); text-align: center; margin-top: -70px; position: relative;
+    .avatar-wrapper {
+      position: relative; display: inline-block; margin-bottom: var(--spacing-md);
+      .user-avatar {
+        width: 120px; height: 120px; font-size: 3rem; background: var(--bg-secondary); padding: 5px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); color: var(--text-primary);
+        ::ng-deep img { border-radius: 50%; }
+      }
+      .status-indicator { position: absolute; bottom: 12px; right: 12px; width: 18px; height: 18px; background: #ccc; border: 3px solid var(--bg-secondary); border-radius: 50%; &.active { background: var(--color-success); } }
+    }
+    h3 { margin: 0 0 4px 0; font-size: 1.35rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.01em; }
+    .email { font-size: var(--font-size-sm); color: var(--text-secondary); display: block; margin-bottom: var(--spacing-md); }
+  }
+
+  .details-list {
+    padding: 0 var(--spacing-xl) var(--spacing-xl); display: flex; flex-direction: column; gap: var(--spacing-lg);
+    .detail-item {
+      display: flex; align-items: flex-start; gap: var(--spacing-lg); padding: var(--spacing-md); border-radius: var(--ui-border-radius); background: var(--bg-ternary); border: 1px solid transparent; transition: var(--transition-fast);
+      &:hover { background: var(--component-bg-hover); border-color: var(--border-primary); }
+      .icon-circle { width: 32px; height: 32px; border-radius: 8px; background: var(--bg-secondary); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; box-shadow: var(--shadow-sm); }
+      .meta {
+        display: flex; flex-direction: column; overflow: hidden;
+        label { font-size: 0.65rem; text-transform: uppercase; font-weight: 700; color: var(--text-label); letter-spacing: 0.5px; margin-bottom: 2px; }
+        span { font-size: var(--font-size-sm); color: var(--text-primary); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .text-muted { color: var(--text-tertiary); font-weight: 400; }
+      }
+    }
+  }
 }
 
-// .customer-page-container {
+/* === 6. ACTIVITY PANEL === */
+.activity-panel {
+  background: var(--bg-secondary);
+  backdrop-filter: blur(var(--glass-blur-c));
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--ui-border-radius-lg);
+  overflow: hidden;
+  height: fit-content;
+  
+  display: flex; flex-direction: column;
+
+  ::ng-deep .p-tabs { display: flex; flex-direction: column; }
+  ::ng-deep .p-tablist { background: transparent; border-bottom: 1px solid var(--border-primary); padding: 0 var(--spacing-lg); }
+  ::ng-deep .p-tabpanels { padding: 0; }
+}
+
+/* === 7. THE PERFECT TABLE (Using --bg-ternary) === */
+::ng-deep .p-datatable {
+  
+  /* Header Styling */
+  .p-datatable-header {
+    background: transparent !important;
+    border: none;
+    padding: var(--spacing-lg);
+  }
+
+  .p-datatable-thead > tr > th {
+    background: var(--bg-ternary) !important; 
+    color: var(--text-label) !important;
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.05em;
+    border: none;
+    border-bottom: 1px solid var(--border-primary) !important;
+    padding: var(--spacing-md) var(--spacing-xl);
+    white-space: nowrap;
+  }
+
+  /* THE BODY */
+  .p-datatable-tbody {
+      background: var(--bg-ternary) !important;
+  }
+
+  /* Apply --bg-ternary to rows */
+  .p-datatable-tbody > tr {
+    background: var(--bg-ternary) !important;
+    background-color: var(--bg-ternary) !important;
+    color: var(--text-primary) !important;
+    border-bottom: 1px solid var(--border-secondary) !important;
+    transition: var(--transition-fast);
+  }
+
+  /* Apply --bg-ternary to cells */
+  .p-datatable-tbody > tr > td {
+    background: var(--bg-ternary) !important;
+    background-color: var(--bg-ternary) !important;
+    color: var(--text-primary) !important;
+    border: none;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    vertical-align: middle;
+  }
+
+  /* HOVER STATE */
+  .p-datatable-tbody > tr:hover > td {
+    background-color: var(--component-bg-hover) !important;
+  }
+
+  /* PAGINATOR */
+  .p-paginator {
+    background: var(--bg-ternary) !important; 
+    background-color: var(--bg-ternary) !important;
+    border-top: 1px solid var(--border-primary) !important;
+    padding: var(--spacing-md);
+  }
+  
+  .p-paginator .p-paginator-element {
+    background: transparent !important;
+    color: var(--text-secondary) !important;
+    min-width: 32px; height: 32px;
+    border-radius: var(--ui-border-radius);
+  }
+
+  .p-paginator .p-paginator-element:hover {
+    background: var(--component-bg-hover) !important;
+    color: var(--text-primary) !important;
+  }
+
+  .p-paginator .p-paginator-element.p-highlight {
+    background: var(--component-bg-active) !important;
+    color: var(--accent-primary) !important;
+    font-weight: bold;
+  }
+
+  /* EMPTY MESSAGE */
+  .p-datatable-emptymessage td {
+      background: var(--bg-ternary) !important;
+      color: var(--text-tertiary) !important;
+      text-align: center;
+      padding: 3rem !important;
+      font-style: italic;
+  }
+}
+
+/* UTILITIES */
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.font-mono { font-family: var(--font-mono); }
+.status-badge {
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.5px;
+  &.success { background: rgba(16, 185, 129, 0.1); color: var(--color-success); }
+  &.danger { background: rgba(239, 68, 68, 0.1); color: var(--color-error); }
+  &.info { background: rgba(59, 130, 246, 0.1); color: var(--color-info); }
+  &.warning { background: rgba(245, 158, 11, 0.1); color: var(--color-warning); }
+}
+
+/* Animation */
+.animate-fadeInDown { animation: fadeInDown 0.4s ease-out forwards; }
+.animate-fadeInUp { animation: fadeInUp 0.5s ease-out forwards; opacity: 0; }
+
+@keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+// customer-details.scss
+
+// 1. Target the component container
+:host ::ng-deep .user-avatar {
+  width: 120px !important;  // Set explicit width
+  height: 120px !important; // Set explicit height
+  font-size: 2rem;          // For the Initials text fallback
+  background-color: #f3f4f6;
+}
+
+// 2. CRITICAL: Target the image tag INSIDE the component
+:host ::ng-deep .user-avatar img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important; // Prevents stretching
+  border-radius: 50%;           // Keeps it circular
+}
+
+// 3. Wrapper styles (keep existing)
+.avatar-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 120px; // Match avatar size
+  height: 120px; // Match avatar size
+  margin: 0 auto;
+
+  // Hover overlay styles
+  .avatar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    cursor: pointer;
+    z-index: 10;
+  }
+
+  &:hover .avatar-overlay {
+    opacity: 1;
+  }
+}
+
+// /* =========================================================
+//    COMPONENT STYLES (Dark Mode Optimized)
+//    ========================================================= */
+
+// :host {
+//   display: block;
 //   width: 100%;
 //   height: 100%;
-//   overflow: hidden;
-//   display: flex;
-//   flex-direction: column;
-//   background: var(--theme-bg-primary);
+//   overflow-y: auto;
+//   background: var(--bg-primary);
+//   font-family: var(--font-body);
+//   color: var(--text-primary);
 // }
 
-// /* === Card Layout === */
-// .customer-details-card {
+// .dashboard-container {
+//   width: 100%;
+//   max-width: 100%;
+//   padding: var(--spacing-2xl);
 //   display: flex;
 //   flex-direction: column;
-//   flex: 1;
-//   background: var(--theme-bg-primary);
-//   border-radius: 0.75rem;
-//   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-//   overflow: hidden;
+//   gap: var(--spacing-2xl);
+
+//   @media (max-width: 768px) {
+//     padding: var(--spacing-md);
+//     gap: var(--spacing-xl);
+//   }
 // }
 
-// /* === HEADER === */
-// .details-header {
+// /* === 1. HEADER === */
+// .dashboard-header {
 //   display: flex;
 //   justify-content: space-between;
 //   align-items: center;
-//   padding: 0.75rem 1rem;
-//   background: var(--theme-bg-secondary);
-//   border-bottom: 1px solid var(--theme-border-primary);
+//   flex-wrap: wrap;
+//   gap: var(--spacing-lg);
 
 //   .header-left {
 //     display: flex;
 //     align-items: center;
-//     gap: 0.75rem;
-
-//     .header-info {
-//       display: flex;
-//       align-items: center;
-//       gap: 0.5rem;
-//       .form-title {
-//         font-size: 1.25rem;
-//         font-weight: 600;
-//         color: var(--theme-text-primary);
+//     gap: var(--spacing-lg);
+//     .back-btn {
+//       color: var(--text-tertiary);
+//       transition: var(--transition-fast);
+//       &:hover { color: var(--text-primary); background: var(--component-bg-hover); }
+//     }
+//     .customer-identity {
+//       display: flex; flex-direction: column; gap: 4px;
+//       .name-row {
+//         display: flex; align-items: center; gap: var(--spacing-md);
+//         h1 { font-family: var(--font-heading); font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--text-primary); margin: 0; letter-spacing: -0.02em; }
+//       }
+//       .badges {
+//         display: flex; align-items: center; gap: var(--spacing-md);
+//         .id-pill { font-family: var(--font-mono); font-size: var(--font-size-xs); background: var(--bg-ternary); border: 1px solid var(--border-primary); padding: 2px 8px; border-radius: var(--ui-border-radius); color: var(--text-secondary); }
+//         .type-label { font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); color: var(--text-label); text-transform: uppercase; letter-spacing: 0.05em; }
 //       }
 //     }
 //   }
+//   .header-actions { display: flex; gap: var(--spacing-md); }
+// }
 
-//   .header-actions {
+// /* === 2. LAYOUT GRID === */
+// .layout-grid {
+//   display: grid;
+//   grid-template-columns: 360px 1fr;
+//   gap: var(--spacing-2xl);
+//   align-items: start;
+
+//   @media (max-width: 1200px) {
+//     grid-template-columns: 1fr;
+//   }
+// }
+
+// /* === 3. RIGHT CONTENT === */
+// .right-content {
+//   display: flex;
+//   flex-direction: column;
+//   gap: var(--spacing-xl);
+//   min-width: 0; 
+// }
+
+// /* === 4. METRICS GRID (Fixed for Dark Mode) === */
+// .metrics-grid {
+//   display: grid;
+//   grid-template-columns: repeat(4, 1fr); 
+//   gap: var(--spacing-xl);
+
+//   @media (max-width: 900px) {
+//      grid-template-columns: repeat(2, 1fr);
+//   }
+
+//   .metric-card {
+//     background: var(--bg-secondary);
+//     /* Glass effect needs to be subtle in dark mode */
+//     backdrop-filter: blur(var(--glass-blur-c));
+//     -webkit-backdrop-filter: blur(var(--glass-blur-c));
+//     border: 1px solid var(--border-primary);
+//     box-shadow: var(--shadow-sm);
+//     border-radius: var(--ui-border-radius-lg);
+//     padding: var(--spacing-xl);
 //     display: flex;
-//     gap: 0.5rem;
-//   }
-// }
+//     align-items: center;
+//     gap: var(--spacing-lg);
+//     transition: var(--transition-base);
 
-// /* === BODY === */
-// .details-body {
-//   display: flex;
-//   gap: 1rem;
-//   padding: 1rem;
-//   overflow-y: auto;
-//   flex: 1;
-// }
+//     &:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
 
-// /* === SIDEBAR === */
-// .profile-sidebar {
-//   width: 22%;
-//   min-width: 240px;
-//   display: flex;
-//   flex-direction: column;
-//   align-items: center;
-//   background: var(--theme-bg-secondary);
-//   border-radius: 0.75rem;
-//   padding: 1rem;
-//   border: 1px solid var(--theme-border-primary);
-//   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+//     .icon-box {
+//       width: 48px; height: 48px; border-radius: 50%;
+//       display: flex; align-items: center; justify-content: center;
+//       font-size: var(--font-size-xl);
+//       /* Default fallback */
+//       background: var(--bg-ternary); 
+//       color: var(--text-secondary);
+//       flex-shrink: 0;
+//     }
 
-//   .profile-avatar {
-//     width: 80px;
-//     height: 80px;
-//     margin-bottom: 0.75rem;
-//   }
+//     .data-box {
+//       display: flex; flex-direction: column; min-width: 0;
+//       label { font-size: var(--font-size-xs); text-transform: uppercase; font-weight: var(--font-weight-bold); letter-spacing: 0.05em; color: var(--text-label); margin-bottom: 4px; white-space: nowrap;}
+//       .value { font-family: var(--font-heading); font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--text-primary); }
+//     }
 
-//   .profile-name {
-//     font-size: 1.1rem;
-//     font-weight: 600;
-//     color: var(--theme-text-primary);
-//   }
-
-//   .profile-type {
-//     font-size: 0.85rem;
-//     color: var(--theme-text-secondary);
-//   }
-
-//   .profile-contact {
-//     width: 100%;
-//     margin-top: 1rem;
-//     display: flex;
-//     flex-direction: column;
-//     gap: 0.5rem;
-
-//     .contact-card {
-//       display: flex;
-//       align-items: center;
-//       gap: 0.75rem;
-//       background: linear-gradient(135deg, var(--theme-bg-primary), var(--theme-bg-ternary));
-//       border: 1px solid var(--theme-border-primary);
-//       border-radius: 0.5rem;
-//       padding: 0.6rem 0.75rem;
-//       transition: all 0.25s ease;
-
-//       &:hover {
-//         background: var(--theme-bg-secondary);
-//         transform: translateY(-2px);
+//     /* === COLOR FIXES === */
+//     /* Use RGBA values so they are transparent in Dark Mode */
+    
+//     &.outstanding {
+//       .icon-box { 
+//         background: rgba(239, 68, 68, 0.15); /* Red with transparency */
+//         color: var(--color-error); 
 //       }
+//       .value { color: var(--color-error); }
+//     }
 
-//       .contact-icon {
-//         color: var(--theme-accent-primary);
-//         font-size: 1rem;
+//     &.invoiced {
+//       .icon-box { 
+//         background: rgba(59, 130, 246, 0.15); /* Blue with transparency */
+//         color: var(--color-info); 
 //       }
+//     }
 
-//       .contact-content {
-//         display: flex;
-//         flex-direction: column;
-//         label {
-//           font-size: 0.75rem;
-//           color: var(--theme-text-label);
-//         }
-//         span {
-//           font-size: 0.85rem;
-//           font-weight: 500;
-//           color: var(--theme-text-primary);
-//         }
+//     &.received {
+//       .icon-box { 
+//         background: rgba(16, 185, 129, 0.15); /* Green with transparency */
+//         color: var(--color-success); 
+//       }
+//     }
+
+//     &.limit {
+//       .icon-box { 
+//         background: var(--bg-ternary); /* Uses theme neutral background */
+//         color: var(--text-secondary); 
 //       }
 //     }
 //   }
 // }
 
-// /* === MAIN DETAILS === */
-// .main-details {
-//   flex: 1;
-//   display: flex;
-//   flex-direction: column;
-//   gap: 1rem;
+// /* === 5. PROFILE CARD === */
+// .profile-card {
+//   background: var(--bg-secondary);
+//   backdrop-filter: blur(var(--glass-blur-c));
+//   -webkit-backdrop-filter: blur(var(--glass-blur-c));
+//   border: 1px solid var(--border-primary);
+//   box-shadow: var(--shadow-lg);
+//   border-radius: var(--ui-border-radius-lg);
+  
+//   position: sticky; top: 20px; z-index: 10; height: fit-content;
+//   display: flex; flex-direction: column; overflow: hidden; padding: 0;
 
-//   .info-section {
-//     background: var(--theme-bg-secondary);
-//     border: 1px solid var(--theme-border-primary);
-//     border-radius: 0.75rem;
-//     padding: 1rem;
+//   // .card-banner { height: 140px; width: 100%; background: var(--accent-gradient); opacity: 0.15; }
 
-//     .section-title {
-//       font-size: 1rem;
-//       font-weight: 600;
-//       color: var(--theme-text-primary);
-//       margin-bottom: 0.75rem;
-//       border-left: 4px solid var(--theme-accent-primary);
-//       padding-left: 0.5rem;
+//   .identity-section {
+//     padding: 0 var(--spacing-xl) var(--spacing-lg); text-align: center; margin-top: -70px; position: relative;
+//     .avatar-wrapper {
+//       position: relative; display: inline-block; margin-bottom: var(--spacing-md);
+//       .user-avatar {
+//         width: 120px; height: 120px; font-size: 3rem; background: var(--bg-secondary); padding: 5px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); color: var(--text-primary);
+//         ::ng-deep img { border-radius: 50%; }
+//       }
+//       .status-indicator { position: absolute; bottom: 12px; right: 12px; width: 18px; height: 18px; background: #ccc; border: 3px solid var(--bg-secondary); border-radius: 50%; &.active { background: var(--color-success); } }
 //     }
+//     h3 { margin: 0 0 4px 0; font-size: 1.35rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.01em; }
+//     .email { font-size: var(--font-size-sm); color: var(--text-secondary); display: block; margin-bottom: var(--spacing-md); }
+//   }
 
-//     .info-grid {
-//       display: grid;
-//       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-//       gap: 0.75rem;
-//     }
-
-//     .info-card {
-//       background: var(--theme-bg-primary);
-//       border-radius: 0.5rem;
-//       padding: 0.75rem 1rem;
-//       border: 1px solid var(--theme-border-primary);
-//       display: flex;
-//       flex-direction: column;
-//       transition: all 0.25s ease;
-
-//       &:hover {
-//         background: var(--theme-bg-ternary);
-//         transform: translateY(-2px);
-//       }
-
-//       label {
-//         font-size: 0.75rem;
-//         color: var(--theme-text-label);
-//       }
-
-//       span {
-//         font-weight: 600;
-//         font-size: 0.9rem;
-//         color: var(--theme-text-primary);
-//       }
-
-//       &.notes p {
-//         font-size: 0.85rem;
-//         color: var(--theme-text-secondary);
-//         margin-top: 0.25rem;
-//       }
-//     }
-
-//     .address-grid {
-//       display: grid;
-//       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-//       gap: 1rem;
-//     }
-
-//     .address {
-//       h5 {
-//         font-weight: 600;
-//         margin-bottom: 0.5rem;
-//         color: var(--theme-text-primary);
-//       }
-//       .address-item {
-//         display: flex;
-//         justify-content: space-between;
-//         label {
-//           font-size: 0.75rem;
-//           color: var(--theme-text-label);
-//         }
-//         span {
-//           font-size: 0.85rem;
-//           font-weight: 500;
-//         }
+//   .details-list {
+//     padding: 0 var(--spacing-xl) var(--spacing-xl); display: flex; flex-direction: column; gap: var(--spacing-lg);
+//     .detail-item {
+//       display: flex; align-items: flex-start; gap: var(--spacing-lg); padding: var(--spacing-md); border-radius: var(--ui-border-radius); background: var(--bg-ternary); border: 1px solid transparent; transition: var(--transition-fast);
+//       &:hover { background: var(--component-bg-hover); border-color: var(--border-primary); }
+//       .icon-circle { width: 32px; height: 32px; border-radius: 8px; background: var(--bg-secondary); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; box-shadow: var(--shadow-sm); }
+//       .meta {
+//         display: flex; flex-direction: column; overflow: hidden;
+//         label { font-size: 0.65rem; text-transform: uppercase; font-weight: 700; color: var(--text-label); letter-spacing: 0.5px; margin-bottom: 2px; }
+//         span { font-size: var(--font-size-sm); color: var(--text-primary); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+//         .text-muted { color: var(--text-tertiary); font-weight: 400; }
 //       }
 //     }
 //   }
 // }
 
-// /* === FOOTER === */
-// .details-footer {
-//   background: var(--theme-bg-secondary);
-//   border-top: 1px solid var(--theme-border-primary);
-//   padding: 0.75rem 1rem;
-//   display: flex;
-//   justify-content: flex-end;
-
-//   .footer-actions {
-//     display: flex;
-//     gap: 0.75rem;
-//   }
-// }
-
-// /* === SKELETON === */
-// .skeleton-wrapper {
-//   padding: 1rem;
-//   display: flex;
-//   flex-direction: column;
-//   gap: 1rem;
-// }
-
-// /* ===================== BUTTON STYLING FIX ===================== */
-
-// /* General button reset */
-// .p-button {
-//   font-size: 0.85rem;
-//   font-weight: 500;
-//   border-radius: 0.5rem;
-//   padding: 0.45rem 0.9rem;
-//   transition: all 0.2s ease-in-out;
-// }
-
-// /* Primary button */
-// .p-button.p-button-primary {
-//   background-color: var(--theme-primary, #4b7bec);
-//   border: 1px solid var(--theme-primary, #4b7bec);
-//   color: #fff;
-
-//   &:hover {
-//     background-color: darken(#4b7bec, 5%);
-//     border-color: darken(#4b7bec, 5%);
-//   }
-
-//   &:focus {
-//     box-shadow: 0 0 0 2px rgba(75, 123, 236, 0.3);
-//   }
-// }
-
-// /* Outlined button */
-// .p-button.p-button-outlined {
-//   background-color: transparent;
-//   color: var(--theme-primary, #4b7bec);
-//   border: 1px solid var(--theme-primary, #4b7bec);
-
-//   &:hover {
-//     background-color: rgba(75, 123, 236, 0.1);
-//   }
-// }
-
-// /* Text button */
-// .p-button.p-button-text {
-//   background: transparent;
-//   border: none;
-//   color: var(--theme-text-primary, #444);
-
-//   &:hover {
-//     background: rgba(0, 0, 0, 0.05);
-//   }
-// }
-
-// /* Rounded buttons (for icons) */
-// .p-button.p-button-rounded {
-//   border-radius: 50%;
-//   width: 2.25rem;
-//   height: 2.25rem;
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-// }
-
-// /* Footer buttons spacing */
-// .details-footer {
-//   display: flex;
-//   justify-content: space-between;
-//   align-items: center;
-//   padding: 1rem;
-//   background: var(--theme-bg-secondary, #f8f9fb);
-//   border-top: 1px solid var(--theme-border-primary, #ddd);
-
-//   .p-button {
-//     min-width: 8rem;
-//   }
-// }
-// /* ======================= FOOTER FIX ======================= */
-// .details-footer {
-//   display: flex;
-//   justify-content: flex-end;
-//   align-items: center;
-//   gap: 1rem;
-
-//   background: var(--theme-bg-secondary, #f9fafc);
-//   border-top: 1px solid var(--theme-border-primary, #e0e0e0);
-
-//   padding: 0.75rem 1.5rem;
-//   position: sticky;
-//   bottom: 0;
-//   z-index: 5;
-
-//   /* Rounded corners at bottom to match card */
-//   border-bottom-left-radius: 0.75rem;
-//   border-bottom-right-radius: 0.75rem;
-// }
-
-// /* Ensure footer buttons look clean and fit */
-// .details-footer .p-button {
-//   min-width: 8rem;
-//   font-size: 0.85rem;
-//   font-weight: 500;
-// }
-
-// /* Space footer nicely within main content */
-// .customer-details-card {
-//   display: flex;
-//   flex-direction: column;
-//   height: 100%;
-// }
-
-// .details-body {
-//   flex: 1;
-//   overflow-y: auto;
-//   padding: 1rem;
-// }
-
-// /* Prevent entire card from overflowing out of content container */
-// .customer-page-container {
-//   height: 100%;
-//   display: flex;
-//   flex-direction: column;
+// /* === 6. ACTIVITY PANEL === */
+// .activity-panel {
+//   background: var(--bg-secondary);
+//   backdrop-filter: blur(var(--glass-blur-c));
+//   border: 1px solid var(--border-primary);
+//   box-shadow: var(--shadow-sm);
+//   border-radius: var(--ui-border-radius-lg);
 //   overflow: hidden;
+//   height: fit-content;
+  
+//   display: flex; flex-direction: column;
+
+//   ::ng-deep .p-tabs { display: flex; flex-direction: column; }
+//   ::ng-deep .p-tablist { background: transparent; border-bottom: 1px solid var(--border-primary); padding: 0 var(--spacing-lg); }
+//   ::ng-deep .p-tabpanels { padding: 0; }
 // }
+
+// /* === 7. TABLE STYLING === */
+// ::ng-deep .p-datatable {
+//   .p-datatable-header { background: transparent; border: none; padding: var(--spacing-lg); }
+//   .p-datatable-thead > tr > th { background: var(--bg-ternary); color: var(--text-label); font-size: var(--font-size-xs); text-transform: uppercase; font-weight: var(--font-weight-bold); letter-spacing: 0.05em; border: none; border-bottom: 1px solid var(--border-primary); padding: var(--spacing-md) var(--spacing-xl); white-space: nowrap; }
+//   .p-datatable-tbody > tr {
+//     background: transparent; color: var(--text-primary); transition: var(--transition-fast); border-bottom: 1px solid var(--border-secondary);
+//     > td { border: none; padding: var(--spacing-lg) var(--spacing-xl); font-size: var(--font-size-sm); vertical-align: middle; }
+//     &:hover { background-color: var(--component-bg-hover) !important; }
+//     &:last-child { border-bottom: none; }
+//   }
+//   .p-datatable-emptymessage td { text-align: center; padding: var(--spacing-4xl) !important; color: var(--text-tertiary); font-style: italic; }
+//   .p-paginator {
+//     background: transparent; border-top: 1px solid var(--border-primary); padding: var(--spacing-md);
+//     .p-paginator-element {
+//       color: var(--text-secondary); border-radius: var(--ui-border-radius); min-width: 32px; height: 32px;
+//       &:hover { background: var(--component-bg-hover); }
+//       &.p-highlight { background: var(--component-bg-active); color: var(--accent-primary); font-weight: bold; }
+//     }
+//   }
+// }
+
+// /* UTILITIES */
+// .text-right { text-align: right; }
+// .text-center { text-align: center; }
+// .font-mono { font-family: var(--font-mono); }
+// .status-badge {
+//   font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.5px;
+//   &.success { background: rgba(16, 185, 129, 0.1); color: var(--color-success); }
+//   &.danger { background: rgba(239, 68, 68, 0.1); color: var(--color-error); }
+//   &.info { background: rgba(59, 130, 246, 0.1); color: var(--color-info); }
+//   &.warning { background: rgba(245, 158, 11, 0.1); color: var(--color-warning); }
+// }
+// /* =========================================================
+//    THE PERFECT TABLE (Using --bg-ternary)
+//    ========================================================= */
+// ::ng-deep .p-datatable {
+  
+//   /* 1. Header Styling */
+//   .p-datatable-header {
+//     background: transparent !important;
+//     border: none;
+//     padding: var(--spacing-lg);
+//   }
+
+//   .p-datatable-thead > tr > th {
+//     background: var(--bg-ternary) !important; /* Matches body now */
+//     color: var(--text-label) !important;
+//     font-size: var(--font-size-xs);
+//     text-transform: uppercase;
+//     font-weight: var(--font-weight-bold);
+//     letter-spacing: 0.05em;
+//     border: none;
+//     border-bottom: 1px solid var(--border-primary) !important;
+//     padding: var(--spacing-md) var(--spacing-xl);
+//     white-space: nowrap;
+//   }
+
+//   /* 2. THE BODY */
+//   .p-datatable-tbody {
+//       background: var(--bg-ternary) !important;
+//   }
+
+//   /* Apply --bg-ternary to rows */
+//   .p-datatable-tbody > tr {
+//     background: var(--bg-ternary) !important;
+//     background-color: var(--bg-ternary) !important;
+//     color: var(--text-primary) !important;
+//     border-bottom: 1px solid var(--border-secondary) !important;
+//   }
+
+//   /* Apply --bg-ternary to cells */
+//   .p-datatable-tbody > tr > td {
+//     background: var(--bg-ternary) !important;
+//     background-color: var(--bg-ternary) !important;
+//     color: var(--text-primary) !important;
+//     border: none;
+//     padding: var(--spacing-lg) var(--spacing-xl);
+//     vertical-align: middle;
+//   }
+
+//   /* 3. HOVER STATE */
+//   .p-datatable-tbody > tr:hover > td {
+//     background-color: var(--component-bg-hover) !important;
+//   }
+
+//   /* 4. PAGINATOR */
+//   .p-paginator {
+//     background: var(--bg-ternary) !important; /* Paginator matches table body */
+//     background-color: var(--bg-ternary) !important;
+//     border-top: 1px solid var(--border-primary) !important;
+//     padding: var(--spacing-md);
+//   }
+  
+//   .p-paginator .p-paginator-element {
+//     background: transparent !important;
+//     color: var(--text-secondary) !important;
+//     min-width: 32px; height: 32px;
+//     border-radius: var(--ui-border-radius);
+//   }
+
+//   .p-paginator .p-paginator-element:hover {
+//     background: var(--component-bg-hover) !important;
+//     color: var(--text-primary) !important;
+//   }
+
+//   .p-paginator .p-paginator-element.p-highlight {
+//     background: var(--component-bg-active) !important;
+//     color: var(--accent-primary) !important;
+//     font-weight: bold;
+//   }
+
+//   /* 5. EMPTY MESSAGE */
+//   .p-datatable-emptymessage td {
+//       background: var(--bg-ternary) !important;
+//       color: var(--text-tertiary) !important;
+//       text-align: center;
+//       padding: 3rem !important;
+//   }
+// }
+// .card-banner {
+//     height: 140px;
+//     width: 100%;
+    
+//     /* Point to your image file */
+//     background-image: url('https://images.unsplash.com/photo-1758568938040-fb8b7275ca5f?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); 
+    
+//     background-size: cover; /* Ensures image covers area */
+//     background-position: center; /* Centers the image */
+    
+//     /* Adds a dark dim layer so text/avatar pops */
+//     position: relative;
+//     &::before {
+//         content: '';
+//         position: absolute;
+//         inset: 0;
+//         background: rgba(0,0,0,0.3); 
+//     }
+//   }

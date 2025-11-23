@@ -1,9 +1,13 @@
 <p-toast></p-toast>
-<div class="form-page-container">
+
+<div class="form-page-container animate-fadeIn">
   <div class="form-card">
-    <!-- === HEADER === -->
+    
     <header class="form-header">
-      <h2 class="form-title">Create New Customer</h2>
+      <div class="flex flex-col">
+          <h2 class="form-title">{{ pageTitle() }}</h2>
+          <span class="text-xs text-[var(--text-secondary)] mt-1">Manage customer details and addresses</span>
+      </div>
       <p-button
         icon="pi pi-arrow-left"
         label="Back to List"
@@ -12,40 +16,35 @@
       </p-button>
     </header>
 
-    <p-divider></p-divider>
-
-    <!-- === FORM BODY === -->
     <form [formGroup]="customerForm" (ngSubmit)="onSubmit()" class="form-body">
       
-      <!-- === BASIC INFO SECTION === -->
       <section class="form-section">
         <h4 class="section-title">Basic Information</h4>
         <div class="form-grid">
           
           <div class="form-field">
             <label for="type">Customer Type</label>
-            <!-- Corrected: Using p-select -->
-            <p-select id="type" formControlName="type" [options]="customerTypes" optionLabel="label" optionValue="value"></p-select>
+            <p-select id="type" appendTo="body" formControlName="type" [options]="customerTypes" optionLabel="label" optionValue="value" placeholder="Select Type"></p-select>
           </div>
           
           <div class="form-field">
             <label for="name">Customer Name</label>
-            <input id="name" type="text" pInputText formControlName="name" />
+            <input id="name" type="text" pInputText formControlName="name" placeholder="Enter full name" />
           </div>
 
           <div class="form-field">
             <label for="contactPerson">Contact Person</label>
-            <input id="contactPerson" type="text" pInputText formControlName="contactPerson" />
+            <input id="contactPerson" type="text" pInputText formControlName="contactPerson" placeholder="Primary contact" />
           </div>
 
           <div class="form-field">
             <label for="email">Email</label>
-            <input id="email" type="email" pInputText formControlName="email" />
+            <input id="email" type="email" pInputText formControlName="email" placeholder="name@example.com" />
           </div>
 
           <div class="form-field">
             <label for="phone">Phone Number</label>
-            <input id="phone" type="text" pInputText formControlName="phone" />
+            <input id="phone" type="text" pInputText formControlName="phone" placeholder="+91 ..." />
           </div>
 
           <div class="form-field">
@@ -55,23 +54,91 @@
 
           <div class="form-field">
             <label for="gstNumber">GST Number</label>
-            <input id="gstNumber" type="text" pInputText formControlName="gstNumber" />
+            <input id="gstNumber" type="text" pInputText formControlName="gstNumber" class="uppercase" />
           </div>
 
           <div class="form-field">
             <label for="panNumber">PAN Number</label>
-            <input id="panNumber" type="text" pInputText formControlName="panNumber" />
+            <input id="panNumber" type="text" pInputText formControlName="panNumber" class="uppercase" />
           </div>
 
         </div>
       </section>
 
-      <!-- === ADDRESS SECTION === -->
       <section class="form-section">
+  <h4 class="section-title">Address Details</h4>
+
+  <div class="address-grid">
+
+    <!-- Billing Address -->
+    <div class="address-card" formGroupName="billingAddress">
+      <h5>Billing Address</h5>
+
+      <div class="form-field">
+        <label>Street</label>
+        <input pInputText formControlName="street" />
+      </div>
+
+      <div class="form-field">
+        <label>City</label>
+        <input pInputText formControlName="city" />
+      </div>
+
+      <div class="form-field">
+        <label>State</label>
+        <input pInputText formControlName="state" />
+      </div>
+
+      <div class="form-field">
+        <label>Zip Code</label>
+        <input pInputText formControlName="zipCode" />
+      </div>
+    </div>
+
+    <!-- Shipping Address -->
+    <div class="address-card" formGroupName="shippingAddress">
+
+      <div class="address-header">
+        <h5>Shipping Address</h5>
+
+        <div class="copy-address">
+          <p-checkbox 
+            label="Same as Billing"
+            binary="true"
+            (onChange)="copyBillingAddress($event)">
+          </p-checkbox>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label>Street</label>
+        <input pInputText formControlName="street" />
+      </div>
+
+      <div class="form-field">
+        <label>City</label>
+        <input pInputText formControlName="city" />
+      </div>
+
+      <div class="form-field">
+        <label>State</label>
+        <input pInputText formControlName="state" />
+      </div>
+
+      <div class="form-field">
+        <label>Zip Code</label>
+        <input pInputText formControlName="zipCode" />
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+      <!-- <section class="form-section">
         <h4 class="section-title">Address Details</h4>
         <div class="address-grid">
           
-          <!-- Billing Address -->
           <div class="address-card" formGroupName="billingAddress">
             <h5>Billing Address</h5>
             <div class="form-field">
@@ -92,7 +159,6 @@
             </div>
           </div>
 
-          <!-- Shipping Address -->
           <div class="address-card" formGroupName="shippingAddress">
             <div class="address-header">
               <h5>Shipping Address</h5>
@@ -119,9 +185,8 @@
           </div>
 
         </div>
-      </section>
+      </section> -->
 
-      <!-- === FINANCIALS & OTHER === -->
       <section class="form-section">
         <h4 class="section-title">Financials & Other Details</h4>
         <div class="form-grid">
@@ -138,7 +203,7 @@
 
           <div class="form-field">
             <label for="paymentTerms">Payment Terms</label>
-            <input id="paymentTerms" type="text" pInputText formControlName="paymentTerms" />
+            <input id="paymentTerms" type="text" pInputText formControlName="paymentTerms" placeholder="e.g. Net 30" />
           </div>
 
           <div class="form-field">
@@ -148,7 +213,7 @@
 
           <div class="form-field span-2">
             <label for="notes">Notes</label>
-            <textarea id="notes" pInputTextarea formControlName="notes" [autoResize]="true" rows="4"></textarea>
+            <textarea id="notes" pInputTextarea formControlName="notes" [autoResize]="true" rows="3"></textarea>
           </div>
           
           <div class="form-field span-2">
@@ -158,21 +223,22 @@
                 chooseLabel="Upload Avatar"
                 [auto]="true"
                 [customUpload]="true"
-                (onSelect)="onFileUpload($event)"
+                (uploadHandler)="onFileUpload($event)"
                 accept="image/*"
-                [maxFileSize]="1000000">
+                [maxFileSize]="1000000"
+                styleClass="w-full">
             </p-fileUpload>
           </div>
 
         </div>
       </section>
 
-      <!-- === FORM FOOTER === -->
       <footer class="form-footer">
-        <p-button label="Reset" type="button" styleClass="p-button-text" (click)="buildForm()"></p-button>
+        <p-button label="Cancel" type="button" styleClass="p-button-text p-button-secondary" routerLink="/customer"></p-button>
         <p-button
-          label="{{ isSubmitting() ? 'Submitting...' : 'Create Customer' }}"
+          [label]="submitLabel()"
           type="submit"
+          icon="pi pi-check"
           [loading]="isSubmitting()"
           [disabled]="customerForm.invalid || isSubmitting()">
         </p-button>
@@ -181,274 +247,3 @@
     </form>
   </div>
 </div>
-<!-- <p-toast></p-toast>
-
-<div class="customer-page">
-  <div class="customer-side-form">
-    <form [formGroup]="customerForm" (ngSubmit)="onSubmit()" class="customer-form">
-      <header class="form-header">
-        <h1>Customer Details</h1>
-        <p>Fill in customer details below.</p>
-      </header>
-
-      <div class="form-body">
-        <div class="form-row">
-          <div class="form-field">
-            <label>Customer Type</label>
-            <p-select appendTo="body" [options]="customerTypes" formControlName="type" optionLabel="label"
-              optionValue="value"></p-select>
-          </div>
-          <div class="form-field">
-            <label>Customer Name <span class="req">*</span></label>
-            <input pInputText formControlName="name" placeholder="Full name or business name" />
-          </div>
-          <div class="form-field">
-            <label>Email</label>
-            <input pInputText type="email" formControlName="email" placeholder="you@domain.com" />
-          </div>
-          <div class="form-field">
-            <label>Phone <span class="req">*</span></label>
-            <input pInputText formControlName="phone" placeholder="+91 9876543210" />
-          </div>
-          <div class="form-field">
-            <label>Alt Phone</label>
-            <input pInputText formControlName="altPhone" placeholder="+91 9876500000" />
-          </div>
-        </div>
-
-        <div class="form-section">
-          <h3>Financial Info</h3>
-          <div class="form-row">
-            <div class="form-field">
-              <label>Opening Balance</label>
-              <p-inputNumber formControlName="openingBalance" mode="decimal" [minFractionDigits]="2"></p-inputNumber>
-            </div>
-            <div class="form-field">
-              <label>Credit Limit</label>
-              <p-inputNumber formControlName="creditLimit" mode="decimal" [minFractionDigits]="2"></p-inputNumber>
-            </div>
-            <div class="form-field">
-              <label>Payment Terms</label>
-              <input pInputText formControlName="paymentTerms" placeholder="e.g., 30 Days" />
-            </div>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <h3>Billing Address</h3>
-          <div formGroupName="billingAddress" class="form-row">
-            <div class="form-field col-2">
-              <label>Street</label>
-              <input pInputText formControlName="street" placeholder="123 Main Street" />
-            </div>
-            <div class="form-field"><label>City</label><input pInputText formControlName="city" /></div>
-            <div class="form-field"><label>State</label><input pInputText formControlName="state" /></div>
-            <div class="form-field"><label>Zip</label><input pInputText formControlName="zipCode" /></div>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <h3>Shipping Address</h3>
-          <div class="form-row align-items-center">
-            <p-checkbox (onChange)="copyBillingAddress($event)" [binary]="true"></p-checkbox>
-            <label>Same as Billing Address</label>
-          </div>
-          <div formGroupName="shippingAddress" class="form-row">
-            <div class="form-field col-2">
-              <label>Street</label>
-              <input pInputText formControlName="street" placeholder="123 Main Street" />
-            </div>
-            <div class="form-field"><label>City</label><input pInputText formControlName="city" /></div>
-            <div class="form-field"><label>State</label><input pInputText formControlName="state" /></div>
-            <div class="form-field"><label>Zip</label><input pInputText formControlName="zipCode" /></div>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <h3>Other Info</h3>
-          <div class="form-row">
-            <div class="form-field"><label>GST Number</label><input pInputText formControlName="gstNumber" /></div>
-            <div class="form-field"><label>PAN Number</label><input pInputText formControlName="panNumber" /></div>
-          </div>
-          <div class="form-field">
-            <label>Tags</label>
-            <input pInputText formControlName="tags" placeholder="VIP, Regular, Bulk Buyer" />
-          </div>
-          <div class="form-field">
-            <label>Notes</label>
-            <textarea pInputTextarea formControlName="notes" rows="2"></textarea>
-          </div>
-          <div class="form-row align-items-center">
-            <p-checkbox formControlName="isActive" [binary]="true"></p-checkbox>
-            <label>Active</label>
-          </div>
-        </div>
-      </div>
-
-      <footer class="form-footer-fixed">
-        <p-button label="Create Customer" icon="pi pi-check" type="submit" [loading]="isSubmitting()"
-          styleClass="w-full justify-center"></p-button>
-      </footer>
-    </form>
-  </div>
-</div>
-<!-- <p-toast></p-toast>
-
-<div class="customer-wrapper">
-  <section class="customer-container">
-    
-    <div class="customer-banner">
-      <img src="https://plus.unsplash.com/premium_photo-1673803529433-d9e6cc4263fb?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=735" alt="Customer background" />
-      <div class="customer-overlay"></div>
-      <div class="customer-banner-text">
-        <h2>Create a New Customer</h2>
-        <p>Maintain accurate customer records and improve your sales workflow.</p>
-      </div>
-    </div>
-
-    <div class="customer-form-panel">
-      
-      <form [formGroup]="customerForm" (ngSubmit)="onSubmit()" class="customer-form-layout">
-
-        <div class="customer-form-header">
-          <h1 class="form-title">Customer Details</h1>
-          <p class="form-subtitle">Complete the information below to register your new customer.</p>
-        </div>
-
-        <div class="customer-form-body">
-          
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Customer Type</label>
-              <p-select  appendTo="body"  appendTo="body" [options]="customerTypes" formControlName="type" optionLabel="label"
-                optionValue="value"></p-select>
-            </div>
-            <div class="form-group">
-              <label>Customer Name <span class="req">*</span></label>
-              <input pInputText formControlName="name" placeholder="Full name or business name" />
-            </div>
-          </div>
-          
-          <div class="form-grid">
-            <div class="form-group" *ngIf="customerForm.get('type')?.value === 'business'">
-              <label>Contact Person</label>
-              <input pInputText formControlName="contactPerson" placeholder="Person to contact" />
-            </div>
-            <div class="form-group">
-              <label>Email</label>
-              <input pInputText type="email" formControlName="email" placeholder="you@domain.com" />
-            </div>
-            <div class="form-group">
-              <label>Phone <span class="req">*</span></label>
-              <input pInputText formControlName="phone" placeholder="+91 9876543210" />
-            </div>
-            <div class="form-group">
-              <label>Alt Phone</label>
-              <input pInputText formControlName="altPhone" placeholder="+91 9876500000" />
-            </div>
-          </div>
-
-          <p-divider align="center" type="dashed"><b>Financial Info</b></p-divider>
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Opening Balance</label>
-              <p-inputNumber formControlName="openingBalance" mode="decimal" [minFractionDigits]="2"></p-inputNumber>
-            </div>
-            <div class="form-group">
-              <label>Credit Limit</label>
-              <p-inputNumber formControlName="creditLimit" mode="decimal" [minFractionDigits]="2"></p-inputNumber>
-            </div>
-            <div class="form-group">
-              <label>Payment Terms</label>
-              <input pInputText formControlName="paymentTerms" placeholder="e.g., 30 Days" />
-            </div>
-          </div>
-
-          <p-divider align="center" type="dashed"><b>Billing Address</b></p-divider>
-          <div formGroupName="billingAddress">
-            <div class="form-grid">
-              <div class="form-group col-span-2">
-                <label>Billing Street</label>
-                <input pInputText formControlName="street" placeholder="123 Main Street" />
-              </div>
-              <div class="form-group">
-                <label>Billing City</label>
-                <input pInputText formControlName="city" />
-              </div>
-              <div class="form-group">
-                <label>Billing State</label>
-                <input pInputText formControlName="state" />
-              </div>
-              <div class="form-group">
-                <label>Billing Zip</label>
-                <input pInputText formControlName="zipCode" />
-              </div>
-            </div>
-          </div>
-
-          <p-divider align="center" type="dashed"><b>Shipping Address</b></p-divider>
-          <div class="form-group flex items-center gap-2 mb-3">
-            <p-checkbox (onChange)="copyBillingAddress($event)" [binary]="true"></p-checkbox>
-            <label>Same as Billing Address</label>
-          </div>
-          <div formGroupName="shippingAddress">
-            <div class="form-grid">
-              <div class="form-group col-span-2">
-                <label>Shipping Street</label>
-                <input pInputText formControlName="street" placeholder="123 Main Street" />
-              </div>
-              <div class="form-group">
-                <label>Shipping City</label>
-                <input pInputText formControlName="city" />
-              </div>
-              <div class="form-group">
-                <label>Shipping State</label>
-                <input pInputText formControlName="state" />
-              </div>
-              <div class="form-group">
-                <label>Shipping Zip</label>
-                <input pInputText formControlName="zipCode" />
-              </div>
-            </div>
-          </div>
-
-          <p-divider align="center" type="dashed"><b>Other Info</b></p-divider>
-          <div class="form-grid">
-            <div class="form-group">
-              <label>GST Number</label>
-              <input pInputText formControlName="gstNumber" />
-            </div>
-            <div class="form-group">
-              <label>PAN Number</label>
-              <input pInputText formControlName="panNumber" />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Tags (comma separated)</label>
-            <input pInputText formControlName="tags" placeholder="VIP, Regular, Bulk Buyer" />
-          </div>
-
-          <div class="form-group">
-            <label>Notes</label>
-            <textarea pInputTextarea formControlName="notes" rows="3"></textarea>
-          </div>
-
-          <div class="form-group flex items-center gap-2">
-            <p-checkbox formControlName="isActive" [binary]="true"></p-checkbox>
-            <label>Active</label>
-          </div>
-
-        </div>
-
-        <div class="customer-form-footer">
-          <div class="form-actions">
-            <p-button label="Create Customer" icon="pi pi-check" type="submit" [loading]="isSubmitting()"
-              styleClass="w-full justify-center"></p-button>
-          </div>
-        </div>
-
-      </form>
-    </div>
-  </section>
-</div> --> -->

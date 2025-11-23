@@ -10,10 +10,16 @@ import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
 import { TagModule } from 'primeng/tag';
 import { AvatarModule } from 'primeng/avatar';
+import { DialogModule } from 'primeng/dialog'; // 👈 1. Import Dialog
+
+// Services & Components
 import { SupplierService } from '../../services/supplier-service';
 import { LoadingService } from '../../../../core/services/loading.service';
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../core/services/message.service';
+import { SupplierTransactions } from '../../../transactions/supplier-transactions/supplier-transactions';
+
+// 👈 2. Import the Transaction Component (Adjust path if needed)
 
 @Component({
   selector: 'app-supplier-details',
@@ -24,9 +30,11 @@ import { AppMessageService } from '../../../../core/services/message.service';
     ButtonModule,
     DividerModule,
     TagModule,
-    AvatarModule
+    AvatarModule,
+    DialogModule,        // 👈 3. Add to Imports
+    SupplierTransactions // 👈 4. Add to Imports
   ],
-   templateUrl: './supplier-detail.html',
+  templateUrl: './supplier-detail.html',
   styleUrl: './supplier-detail.scss',
 })
 export class SupplierDetailsComponent implements OnInit {
@@ -39,6 +47,9 @@ export class SupplierDetailsComponent implements OnInit {
 
   supplier = signal<any | null>(null);
   branchNames = signal('N/A');
+
+  // 👈 5. State for the Dialog
+  showTransactionsDialog = false;
 
   ngOnInit(): void {
     this.loadSupplierData();
@@ -91,7 +102,6 @@ export class SupplierDetailsComponent implements OnInit {
 
   formatDate(dateString: string | undefined): string {
     if (!dateString) return 'N/A';
-    // Using a more readable format
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -112,17 +122,6 @@ export class SupplierDetailsComponent implements OnInit {
   }
 }
 
-// // import { Component } from '@angular/core';
-
-// // @Component({
-// //   selector: 'app-supplier-detail',
-// //   imports: [],
-// //   templateUrl: './supplier-detail.html',
-// //   styleUrl: './supplier-detail.scss',
-// // })
-// // export class SupplierDetail {
-
-// // }
 // import { Component, OnInit, inject, signal } from '@angular/core';
 // import { CommonModule } from '@angular/common';
 // import { ActivatedRoute, RouterModule } from '@angular/router';
@@ -151,8 +150,8 @@ export class SupplierDetailsComponent implements OnInit {
 //     TagModule,
 //     AvatarModule
 //   ],
-  //  templateUrl: './supplier-detail.html',
-  // styleUrl: './supplier-detail.scss',
+//    templateUrl: './supplier-detail.html',
+//   styleUrl: './supplier-detail.scss',
 // })
 // export class SupplierDetailsComponent implements OnInit {
 //   // Injected services
@@ -216,7 +215,12 @@ export class SupplierDetailsComponent implements OnInit {
 
 //   formatDate(dateString: string | undefined): string {
 //     if (!dateString) return 'N/A';
-//     return new Date(dateString).toLocaleString();
+//     // Using a more readable format
+//     return new Date(dateString).toLocaleDateString('en-US', {
+//       year: 'numeric',
+//       month: 'short',
+//       day: 'numeric',
+//     });
 //   }
   
 //   formatAddress(address: any): string {

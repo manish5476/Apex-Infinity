@@ -134,8 +134,12 @@ export class CustomerList implements OnInit {
 
     this.customerService.getAllCustomerData(filterParams).subscribe(
       (res: any) => {
-        let newData: any[] = [];// Corrected data pathif (res.data && Array.isArray(res.data.data)) {  newData = res.data.data;}
-        // Corrected total count paththis.totalCount = res.results || this.totalCount;this.data = [...this.data, ...newData];if (this.gridApi) {  if (isReset) {    // replace existing rows with the refreshed data using applyTransaction    // this.gridApi.applyTransaction({ replace: this.data });  } else {    this.gridApi.applyTransaction({ add: newData });  }}
+        let newData: any[] = [];// Corrected data path
+        if (res.data && Array.isArray(res.data.data)) { newData = res.data.data; }
+        this.totalCount = res.results || this.totalCount;
+        this.data = [...this.data, ...newData]; if (this.gridApi) {
+        
+        }
         this.currentPage++; this.isLoading = false; this.cdr.markForCheck();
       },
       (err: any) => {
@@ -161,7 +165,6 @@ export class CustomerList implements OnInit {
    * Handles other events from the grid (e.g., row clicks).
    */
   eventFromGrid(event: any) {
-    console.log(event);
     if (event.eventType === 'RowSelectedEvent') {
       const customerId = event.event.data._id;
       if (customerId) {
