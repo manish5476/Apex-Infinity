@@ -1,171 +1,57 @@
-/* ==============================================
-   NOTIFICATION BELL COMPONENT
-   - Styles for the dropdown and tabs
-   - CORRECTED: Using canonical theme tokens
-   ============================================== */
-
-/* ADDED: A wrapper for when the component is used as modal content */
-.notification-container {
-  width: 100%;
-  /* The 'absolute' and 'z-index' styles are no longer needed 
-    as this component now lives inside a dialog.
-  */
+.notif-filter-btn {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
   background: var(--bg-secondary);
-  border-radius: var(--ui-border-radius-lg);
-  overflow: hidden;
-}
+  border-right: 1px solid var(--border-primary);
 
-:host ::ng-deep {
-  .notification-tabs {
-    .p-tablist {
-      background-color: var(--bg-secondary); // CORRECTED
-      border-bottom: 1px solid var(--border-primary); // CORRECTED
-      display: flex;
-      justify-content: space-around; // Evenly space the tabs
-    }
-
-    .p-tab {
-      flex: 1 1 0; // Make tabs grow to fill space
-    }
-    
-    .p-tab-link {
-      border: 0;
-      color: var(--text-label); // CORRECTED
-      font-size: 0.875rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-
-      &:not(.p-highlight):not(.p-disabled):hover {
-        background: var(--bg-ternary); // CORRECTED
-        color: var(--text-primary); // CORRECTED
-      }
-    }
-    
-    .p-tab.p-highlight .p-tab-link {
-         color: var(--accent-primary); // CORRECTED
-         border-bottom-color: var(--accent-primary); // CORRECTED
-     }
-
-    .p-tabpanels {
-      padding: 0; // Remove default panel padding
-    }
-  }
-
-  /* ADDED: Styles for p-select inside the dropdown
-    to match the rest of the application theme.
-  */
-  .p-select {
+  &.active {
     background: var(--bg-ternary);
-    border: 1px solid var(--border-primary);
-    color: var(--text-primary);
-    .p-select-label {
-      color: var(--text-primary);
-      padding-top: var(--spacing-sm); // Adjust padding for 40px height
-      padding-bottom: var(--spacing-sm);
-    }
-  }
-  
-  .p-select:not(.p-disabled):hover {
-    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    font-weight: 600;
   }
 
-  // Ensure dropdown panels match theme
-  .p-select-panel {
-    background: var(--bg-secondary);
-    border: var(--ui-border-width) solid var(--border-primary);
-    
-    .p-select-item {
-      color: var(--text-secondary);
-      &:hover {
-        background: var(--bg-ternary);
-        color: var(--text-primary);
-      }
-    }
-    .p-select-item.p-highlight {
-      background: var(--accent-focus);
-      color: var(--accent-primary);
-    }
+  &:last-child {
+    border-right: 0;
   }
 }
-// /* ==============================================
-//    NOTIFICATION BELL COMPONENT
-//    - Styles for the dropdown and tabs
-//    - CORRECTED: Using canonical theme tokens
-//    ============================================== */
 
-// :host ::ng-deep {
-//   .notification-tabs {
-//     .p-tablist {
-//       background-color: var(--bg-secondary); // CORRECTED
-//       border-bottom: 1px solid var(--border-primary); // CORRECTED
-//       display: flex;
-//       justify-content: space-around; // Evenly space the tabs
-//     }
+.notif-item {
+  padding: 14px;
+  border-bottom: 1px solid var(--border-primary);
+  cursor: pointer;
 
-//     .p-tab {
-//       flex: 1 1 0; // Make tabs grow to fill space
-//     }
-    
-//     .p-tab-link {
-//       border: 0;
-//       color: var(--text-label); // CORRECTED
-//       font-size: 0.875rem;
-//       display: flex;
-//       align-items: center;
-//       justify-content: center;
-//       width: 100%;
+  &.unread {
+    background: var(--bg-ternary);
+    border-left: 3px solid var(--accent-primary);
+  }
 
-//       &:not(.p-highlight):not(.p-disabled):hover {
-//         background: var(--bg-ternary); // CORRECTED
-//         color: var(--text-primary); // CORRECTED
-//       }
-//     }
-    
-//     .p-tab.p-highlight .p-tab-link {
-//          color: var(--accent-primary); // CORRECTED
-//          border-bottom-color: var(--accent-primary); // CORRECTED
-//      }
+  &:hover {
+    background: var(--bg-ternary);
+  }
 
-//     .p-tabpanels {
-//       padding: 0; // Remove default panel padding
-//     }
-//   }
+  .notif-title {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
 
-//   /* ADDED: Styles for p-select inside the dropdown
-//     to match the rest of the application theme.
-//   */
-//   .p-select {
-//     background: var(--bg-ternary);
-//     border: 1px solid var(--border-primary);
-//     color: var(--text-primary);
-//     .p-select-label {
-//       color: var(--text-primary);
-//       padding-top: var(--spacing-sm); // Adjust padding for 40px height
-//       padding-bottom: var(--spacing-sm);
-//     }
-//   }
-  
-//   .p-select:not(.p-disabled):hover {
-//     border-color: var(--accent-primary);
-//   }
+  .notif-msg {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    margin-top: 3px;
+  }
 
-//   // Ensure dropdown panels match theme
-//   .p-select-panel {
-//     background: var(--bg-secondary);
-//     border: var(--ui-border-width) solid var(--border-primary);
-    
-//     .p-select-item {
-//       color: var(--text-secondary);
-//       &:hover {
-//         background: var(--bg-ternary);
-//         color: var(--text-primary);
-//       }
-//     }
-//     .p-select-item.p-highlight {
-//       background: var(--accent-focus);
-//       color: var(--accent-primary);
-//     }
-//   }
-// }
+  .notif-time {
+    font-size: 0.75rem;
+    color: var(--text-label);
+    margin-top: 3px;
+  }
+}
+
+.empty-msg {
+  text-align: center;
+  color: var(--text-label);
+  padding: 20px 0;
+}
