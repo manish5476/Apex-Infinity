@@ -41,37 +41,37 @@ export class ApiService extends BaseApiService {
 
   // ======================== ORGANIZATION ========================
 
-  createNewOrganization(data: any): Observable<LoginResponse> {
-    return this.post<LoginResponse>('/v1/organization/create', data, 'createNewOrganization');
-  }
+  // createNewOrganization(data: any): Observable<LoginResponse> {
+  //   return this.post<LoginResponse>('/v1/organization/create', data, 'createNewOrganization');
+  // }
 
-  approveMember(data: { userId: string, roleId: string, branchId: string }): Observable<any> {
-    return this.post('/v1/organization/approve-member', data, 'approveMember');
-  }
+  // approveMember(data: { userId: string, roleId: string, branchId: string }): Observable<any> {
+  //   return this.post('/v1/organization/approve-member', data, 'approveMember');
+  // }
 
-  getPendingMembers(): Observable<any> {
-    return this.get('/v1/organization/pending-members', {}, 'getPendingMembers');
-  }
+  // getPendingMembers(): Observable<any> {
+  //   return this.get('/v1/organization/pending-members', {}, 'getPendingMembers');
+  // }
 
-  getMyOrganization(): Observable<any> {
-    return this.get('/v1/organization/my-organization', {}, 'getMyOrganization');
-  }
+  // getMyOrganization(): Observable<any> {
+  //   return this.get('/v1/organization/my-organization', {}, 'getMyOrganization');
+  // }
 
-  updateOrganization(data: any): Observable<any> {
-    return this.patch('/v1/organization/my-organization', data, 'updateOrganization');
-  }
+  // updateOrganization(data: any): Observable<any> {
+  //   return this.patch('/v1/organization/my-organization', data, 'updateOrganization');
+  // }
 
-  deleteMyOrganization(): Observable<any> {
-    return this.delete('/v1/organization/my-organization', 'deleteMyOrganization');
-  }
+  // deleteMyOrganization(): Observable<any> {
+  //   return this.delete('/v1/organization/my-organization', 'deleteMyOrganization');
+  // }
 
-  getOrganizationRoles(): Observable<any> {
-    return this.get('/v1/roles', {}, 'getOrganizationRoles');
-  }
+  // getOrganizationRoles(): Observable<any> {
+  //   return this.get('/v1/roles', {}, 'getOrganizationRoles');
+  // }
 
-  getOrganizationBranches(): Observable<any> {
-    return this.get('/v1/branches', {}, 'getOrganizationBranches');
-  }
+  // getOrganizationBranches(): Observable<any> {
+  //   return this.get('/v1/branches', {}, 'getOrganizationBranches');
+  // }
 
   // ======================== AUTHENTICATION ========================
 

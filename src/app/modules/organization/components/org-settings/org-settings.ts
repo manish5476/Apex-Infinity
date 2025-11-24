@@ -107,7 +107,6 @@ export class OrgSettingsComponent implements OnInit {
   // ------------------------------------------------------
   loadDashboardData() {
     this.isLoading.set(true);
-
     forkJoin({
       org: this.orgService.getMyOrganization(),
       pending: this.orgService.getPendingMembers(),

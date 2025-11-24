@@ -122,8 +122,8 @@ export class Mainscreensidebar implements OnInit {
     {
       label: 'EMI', icon: 'pi pi-calendar',
       items: [
-        { label: 'EMI Plans', icon: 'pi pi-list', routerLink: ['/emis'] },
-        { label: 'Create Plan', icon: 'pi pi-plus', routerLink: ['/emis/create'] },
+        { label: 'EMI Lists', icon: 'pi pi-list', routerLink: ['/emis'] },
+        // { label: 'Create Plan', icon: 'pi pi-plus', routerLink: ['/emis/create'] },
       ]
     }
   ];

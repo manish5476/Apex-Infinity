@@ -1,1 +1,77 @@
-<p>emi-list works!</p>
+<p-toast></p-toast>
+
+<div class="list-page-container">
+
+  <div class="list-header">
+    <h2 class="list-title">
+      <i class="pi pi-calendar-plus text-[var(--accent-primary)]"></i>
+      EMI Management
+    </h2>
+    <p-button label="New EMI Plan" icon="pi pi-plus" routerLink="create">
+    </p-button>
+  </div>
+
+  <div class="themed-card list-content-area">
+
+    <div class="se-filter-bar">
+      
+      <div class="se-filter-field">
+        <label for="status">Status</label>
+        <p-select 
+          (onChange)="applyFilters()" 
+          id="status" 
+          [options]="statusOptions" 
+          [(ngModel)]="emiFilter.status"
+          optionLabel="label" 
+          optionValue="value" 
+          [showClear]="true"
+          placeholder="Select Status" 
+          appendTo="body"
+          [style]="{'width':'100%'}">
+        </p-select>
+      </div>
+
+      <div class="se-filter-field">
+        <label for="customer">Customer</label>
+        <p-select 
+          (onChange)="applyFilters()" 
+          id="customer" 
+          [options]="customerOptions()" 
+          [(ngModel)]="emiFilter.customerId"
+          [filter]="true" 
+          filterBy="name" 
+          optionLabel="name" 
+          optionValue="_id" 
+          [showClear]="true"
+          placeholder="Filter by Customer" 
+          appendTo="body"
+          [style]="{'width':'100%'}">
+        </p-select>
+      </div>
+
+      <div class="se-filter-actions">
+        <p-button 
+          label="Reset" 
+          icon="pi pi-refresh" 
+          styleClass="p-button-outlined"
+          (onClick)="resetFilters()">
+        </p-button>
+      </div>
+    </div>
+
+    <div class="list-grid-wrapper">
+      <app-shared-grid 
+        [data]="data" 
+        [gridHeight]="'210px'" 
+        [headerFilter]="false"
+        [rowSelectionMode]="rowSelectionMode" 
+        [GridName]="'EMI Plans'" 
+        [column]="column"
+        (eventFromGrid)="eventFromGrid($event)" 
+        (gridReady)="onGridReady($event)"
+        (scrolledToBottom)="onScrolledToBottom($event)">
+      </app-shared-grid>
+    </div>
+
+  </div>
+</div>

@@ -1,3 +1,4 @@
+import { OrganizationService } from './../../organization/organization.service';
 // src/app/modules/auth/services/auth-service.ts
 import { Injectable, Inject, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
@@ -34,6 +35,7 @@ export class AuthService {
   public isAuthenticated$: Observable<boolean>;
 
   private apiService = inject(ApiService);
+  private OrganizationService = inject(OrganizationService);
   private messageService = inject(AppMessageService);
   private router = inject(Router);
 
@@ -123,7 +125,7 @@ initializeFromStorage(): Promise<void> {
   }
 
   createOrganization(data: any) {
-    return this.apiService.createNewOrganization(data).pipe(
+    return this.OrganizationService.createNewOrganization(data).pipe(
       tap(response => {
         this.handleLoginSuccess(response);
         this.messageService.showSuccess('Organization Created', 'Welcome!');

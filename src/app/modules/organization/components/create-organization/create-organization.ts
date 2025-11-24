@@ -7,9 +7,9 @@ import { ToastModule } from 'primeng/toast';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { PasswordModule } from 'primeng/password';
-import { ApiService } from '../../../../core/services/api';
 import { AuthService, LoginResponse } from '../../../auth/services/auth-service';
 import { MasterListService } from '../../../../core/services/master-list.service';
+import { OrganizationService } from '../../organization.service';
 
 @Component({
   selector: 'app-create-organization',
@@ -30,7 +30,7 @@ import { MasterListService } from '../../../../core/services/master-list.service
 export class CreateOrganization implements OnInit {
   // --- Injections ---
   private fb = inject(FormBuilder);
-  private apiService = inject(ApiService);
+  private OrganizationService = inject(OrganizationService);
   private router = inject(Router);
   private messageService = inject(MessageService);
   private authService = inject(AuthService);
@@ -94,7 +94,7 @@ export class CreateOrganization implements OnInit {
     formData.uniqueShopId = formData.uniqueShopId.toUpperCase();
     if (formData.gstNumber) formData.gstNumber = formData.gstNumber.toUpperCase();
 
-    this.apiService.createNewOrganization(formData).subscribe({
+    this.OrganizationService.createNewOrganization(formData).subscribe({
       next: (response: LoginResponse) => {
         this.isLoading.set(false);
         this.messageService.add({
@@ -127,7 +127,7 @@ export class CreateOrganization implements OnInit {
 // import { ToastModule } from 'primeng/toast';
 // import { InputTextModule } from 'primeng/inputtext';
 // import { ButtonModule } from 'primeng/button';
-// import { ApiService } from '../../../../core/services/api';
+// import { OrganizationService } from '../../../../core/services/api';
 // import { AuthService, LoginResponse } from '../../../auth/services/auth-service';
 // import { PasswordModule } from 'primeng/password'; // Import PasswordModule
 // import { MasterListService } from '../../../../core/services/master-list.service';
@@ -151,7 +151,7 @@ export class CreateOrganization implements OnInit {
 // export class CreateOrganization implements OnInit {
 //   // --- Injections ---
 //   private fb = inject(FormBuilder);
-//   private apiService = inject(ApiService);
+//   private OrganizationService = inject(OrganizationService);
 //   private router = inject(Router);
 //   private messageService = inject(MessageService);
 //   private authService = inject(AuthService);
@@ -233,7 +233,7 @@ export class CreateOrganization implements OnInit {
 //       formData.gstNumber = formData.gstNumber.toUpperCase();
 //     }
 
-//     this.apiService.createNewOrganization(formData).subscribe({
+//     this.OrganizationService.createNewOrganization(formData).subscribe({
 //       next: (response: LoginResponse) => {
 //         this.isLoading.set(false);
 //         this.messageService.add({

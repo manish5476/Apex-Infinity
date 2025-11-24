@@ -11,6 +11,10 @@ export class OrganizationService extends BaseApiService {
     return this.get(`${this.endpoint}/my-organization`, {}, 'getMyOrganization');
   }
 
+   createNewOrganization(data: any): Observable<any> {
+    return this.post<any>('/v1/organization/create', data, 'createNewOrganization');
+  }
+
   updateMyOrganization(data: any): Observable<any> {
     return this.patch(`${this.endpoint}/my-organization`, data, 'updateMyOrganization');
   }
