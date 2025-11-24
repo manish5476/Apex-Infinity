@@ -1,143 +1,138 @@
+<div class="bell-trigger relative cursor-pointer" (click)="toggleDropdown()">
+  <i class="pi pi-bell text-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"></i>
+  @if (unreadCount > 0) {
+    <p-badge [value]="unreadCount" severity="danger" styleClass="absolute -top-2 -right-2 text-xs"></p-badge>
+  }
+</div>
+
 @if (showDropdown) {
-<div class="notification-panel">
-
-  <div class="panel-header">
-    <div class="nav-segment">
-      <button type="button" 
-              [class.active]="activeTab === 0" 
-              (click)="setActiveTab(0)">
-        <span>New</span>
-        @if (unreadCount > 0) {
-          <span class="badge-dot"></span>
-        }
-      </button>
-
-      <button type="button" 
-              [class.active]="activeTab === 1" 
-              (click)="setActiveTab(1)">
-        <span>Approvals</span>
-        @if (pendingMembers.length > 0) {
-          <span class="badge-count">{{ pendingMembers.length }}</span>
-        }
-      </button>
-
-      <button type="button" 
-              [class.active]="activeTab === 2" 
-              (click)="setActiveTab(2)">
-        <span>History</span>
-      </button>
-    </div>
-  </div>
-
-  <div class="panel-body">
+  <div class="notification-dropdown-overlay">
     
-    @if (activeTab === 0) {
-      <ul class="notification-list">
-        @for (n of realtimeNotifications; track n._id) {
-          <li (click)="markAsRead(n)" class="notif-item unread">
-            <div class="notif-icon">
-              <i class="pi pi-bell text-blue-500"></i>
-            </div>
-            <div class="notif-content">
-              <strong class="title">{{ n.title }}</strong>
-              <p class="message">{{ n.message }}</p>
-              <span class="time">{{ n.createdAt | date: 'shortTime' }}</span>
-            </div>
-            <div class="notif-action">
-              <div class="read-dot"></div>
-            </div>
-          </li>
-        }
-        @if (!isLoading && realtimeNotifications.length === 0) {
-          <div class="empty-state">
-            <i class="pi pi-check-circle"></i>
-            <p>You're all caught up!</p>
-          </div>
-        }
-      </ul>
-    }
+    <div class="dropdown-header">
+      <div class="tab-segment">
+        
+        <button class="tab-btn" [class.active]="activeTab === 0" (click)="switchTab(0)">
+          <span>New</span>
+          @if (unreadCount > 0) {
+            <span class="count-badge red">{{ unreadCount }}</span>
+          }
+        </button>
 
-    @if (activeTab === 1) {
-      <ul class="notification-list">
-        @if (isLoading) {
-          <div class="p-4 flex flex-col gap-3">
-            <p-skeleton height="3rem"></p-skeleton>
-            <p-skeleton height="3rem"></p-skeleton>
-          </div>
-        }
+        <button class="tab-btn" [class.active]="activeTab === 1" (click)="switchTab(1)">
+          <span>Approvals</span>
+          @if (pendingMembers.length > 0) {
+            <span class="count-badge orange">{{ pendingMembers.length }}</span>
+          }
+        </button>
 
-        @for (member of pendingMembers; track member._id) {
-          <li class="approval-item">
-            <div class="approval-header">
-              <div class="user-info">
-                <span class="name">{{ member.name }}</span>
-                <span class="email">{{ member.email }}</span>
+        <button class="tab-btn" [class.active]="activeTab === 2" (click)="switchTab(2)">
+          <span>History</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="dropdown-body">
+      
+      @if (activeTab === 0) {
+        <ul class="notif-list">
+          @for (n of realtimeNotifications; track n._id) {
+            <li class="notif-item unread" (click)="markAsRead(n)">
+              <div class="icon-box blue"><i class="pi pi-bolt"></i></div>
+              <div class="content">
+                <div class="row-top">
+                  <span class="title">{{ n.title }}</span>
+                  <span class="time">{{ n.createdAt | date:'shortTime' }}</span>
+                </div>
+                <p class="msg">{{ n.message }}</p>
               </div>
-              <i class="pi pi-user text-orange-500"></i>
+              <div class="status-dot"></div>
+            </li>
+          }
+          @if (!isLoading && realtimeNotifications.length === 0) {
+            <div class="empty-state">
+              <i class="pi pi-check-circle"></i>
+              <p>You're all caught up!</p>
             </div>
-            
-            <div class="approval-form">
-              <div class="form-row">
+          }
+        </ul>
+      }
+
+      @if (activeTab === 1) {
+        <div class="approval-list">
+          @if (isLoading) {
+             <div class="p-3"><p-skeleton height="4rem"></p-skeleton></div>
+          }
+
+          @for (member of pendingMembers; track member._id) {
+            <div class="approval-card">
+              <div class="card-head">
+                <div class="user-details">
+                  <span class="name">{{ member.name }}</span>
+                  <span class="email">{{ member.email }}</span>
+                </div>
+                <i class="pi pi-user-edit text-[var(--accent-primary)]"></i>
+              </div>
+              
+              <div class="card-form">
                 <p-select appendTo="body" 
                           [options]="roles" 
                           [(ngModel)]="selectedRoles[member._id]" 
                           optionLabel="name" 
                           optionValue="_id" 
-                          placeholder="Role" 
-                          styleClass="w-full text-sm">
+                          placeholder="Select Role" 
+                          styleClass="w-full text-sm mb-2">
                 </p-select>
-              </div>
-              <div class="form-row">
+
                 <p-select appendTo="body" 
                           [options]="branches" 
                           [(ngModel)]="selectedBranches[member._id]" 
                           optionLabel="name" 
                           optionValue="_id" 
-                          placeholder="Branch" 
-                          styleClass="w-full text-sm">
+                          placeholder="Select Branch" 
+                          styleClass="w-full text-sm mb-2">
                 </p-select>
-              </div>
-              <p-button label="Approve" 
-                        icon="pi pi-check" 
-                        size="small"
-                        [rounded]="true"
-                        styleClass="w-full mt-2" 
-                        (click)="approveMember(member)" 
-                        [disabled]="!selectedRoles[member._id] || !selectedBranches[member._id]">
-              </p-button>
-            </div>
-          </li>
-        }
-        @if (!isLoading && pendingMembers.length === 0) {
-          <div class="empty-state">
-            <i class="pi pi-users"></i>
-            <p>No pending approvals.</p>
-          </div>
-        }
-      </ul>
-    }
 
-    @if (activeTab === 2) {
-      <ul class="notification-list">
-        @for (n of allNotifications; track n._id) {
-          <li class="notif-item">
-            <div class="notif-content full-width">
-              <div class="flex justify-between items-start">
-                <strong class="title">{{ n.title }}</strong>
-                <span class="time text-xs">{{ n.createdAt | date: 'MMM d' }}</span>
+                <p-button label="Approve Request" 
+                          icon="pi pi-check" 
+                          styleClass="w-full p-button-sm" 
+                          [disabled]="!selectedRoles[member._id] || !selectedBranches[member._id]"
+                          (onClick)="approveMember(member)">
+                </p-button>
               </div>
-              <p class="message">{{ n.message }}</p>
             </div>
-          </li>
-        }
-        @if (!isLoading && allNotifications.length === 0) {
-          <div class="empty-state">
-            <i class="pi pi-inbox"></i>
-            <p>No notification history.</p>
-          </div>
-        }
-      </ul>
-    }
+          }
+          
+          @if (!isLoading && pendingMembers.length === 0) {
+            <div class="empty-state">
+              <i class="pi pi-users"></i>
+              <p>No pending approvals.</p>
+            </div>
+          }
+        </div>
+      }
+
+      @if (activeTab === 2) {
+        <ul class="notif-list">
+          @for (n of allNotifications; track n._id) {
+            <li class="notif-item">
+              <div class="content full">
+                <div class="row-top">
+                  <span class="title">{{ n.title }}</span>
+                  <span class="time">{{ n.createdAt | date:'MMM d' }}</span>
+                </div>
+                <p class="msg">{{ n.message }}</p>
+              </div>
+            </li>
+          }
+          @if (!isLoading && allNotifications.length === 0) {
+            <div class="empty-state">
+              <i class="pi pi-history"></i>
+              <p>No history found.</p>
+            </div>
+          }
+        </ul>
+      }
+
+    </div>
   </div>
-</div>
 }
