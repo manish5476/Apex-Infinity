@@ -13,7 +13,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { SkeletonModule } from 'primeng/skeleton';
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
 import { SelectModule } from 'primeng/select'; // Correct import for p-select
-
+activeSection: 'new' | 'approvals' | 'all' = 'new';
 @Component({
   selector: 'app-notification-bell',
   standalone: true,
@@ -76,29 +76,24 @@ export class NotificationBellComponent implements OnInit {
   }
 
   loadData() {
-    this.isLoading = true;
+  this.isLoading = true;
 
-    this.masterList.refresh();
+  this.masterList.refresh();
 
-    this.apiService.getPendingMembers().subscribe(res => {
-      this.pendingMembers = res.data.pendingMembers || [];
-    });
+  this.apiService.getPendingMembers().subscribe(res => {
+    this.pendingMembers = res.data.pendingMembers || [];
+  });
 
-    // --- THIS SECTION IS THE FIX ---
-    this.apiService.getAllNotifications().subscribe((res: any) => {
-      // 1. Populate the "All" tab (Tab 2)
+  this.apiService.getAllNotifications().subscribe({
+    next: res => {
       this.allNotifications = res.data.notifications || [];
-
-      // 2. Populate the "New" tab (Tab 0) with unread items from the "All" list
       this.realtimeNotifications = this.allNotifications.filter(n => !n.isRead);
-
-      // 3. Update the badge count from this initial list
       this.unreadCount = this.realtimeNotifications.length;
-    });
-    // --- END FIX ---
-
-    this.isLoading = false;
-  }
+      this.isLoading = false;
+    },
+    error: () => this.isLoading = false
+  });
+}
 
   toggleDropdown() {
     this.showDropdown = !this.showDropdown;
