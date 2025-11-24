@@ -80,9 +80,18 @@
 </div>
 
 <!-- Increased size for better usability -->
-<p-dialog header="Notifications" [modal]="true" [(visible)]="showNotificationdialog" [style]="{ width: '90rem', height: '90rem', 'max-height': '90vh' }">
+<p-dialog 
+  header="Notifications" 
+  [modal]="true" 
+  [(visible)]="showNotificationdialog"
+  styleClass="notification-modal-override"
+  [contentStyle]="{ 'padding': '0', 'height': '100%', 'overflow': 'hidden' }"
+  [style]="{ width: '40rem', height: '85vh', 'max-height': '90vh' }">
+  
   <app-notification-bell></app-notification-bell>
+
 </p-dialog>
+
 
 <!-- <div class="header-inner">
 
