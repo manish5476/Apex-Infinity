@@ -1,19 +1,18 @@
-import { Component, inject, OnInit, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-
-// PrimeNG
-import { ButtonModule } from 'primeng/button';
-import { BadgeModule } from 'primeng/badge';
-import { TooltipModule } from 'primeng/tooltip';
-import { SelectModule } from 'primeng/select';
-import { SkeletonModule } from 'primeng/skeleton';
-
-// Services
+import { Component, OnInit, inject, effect } from '@angular/core';
 import { NotificationService } from '../../../../core/services/notification.service';
+import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../../core/services/api';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { MasterListService } from '../../../../core/services/master-list.service';
+
+// --- PrimeNG Modules ---
+import { ButtonModule } from 'primeng/button';
+import { FormsModule } from '@angular/forms';
+import { BadgeModule } from 'primeng/badge';
+import { TooltipModule } from 'primeng/tooltip';
+import { SkeletonModule } from 'primeng/skeleton';
+import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
+import { SelectModule } from 'primeng/select'; // Correct import for p-select
 
 @Component({
   selector: 'app-notification-bell',
@@ -21,115 +20,118 @@ import { MasterListService } from '../../../../core/services/master-list.service
   imports: [
     CommonModule,
     FormsModule,
+    Tabs,
+    SelectModule, // Correct import
     ButtonModule,
     BadgeModule,
     TooltipModule,
-    SelectModule,
-    SkeletonModule
+    SkeletonModule,
+    TabList,
+    Tab,
+    TabPanels,
+    TabPanel
   ],
   templateUrl: './notification-bell-component.html',
-  styleUrls: ['./notification-bell-component.scss']
+  styleUrl: './notification-bell-component.scss'
 })
 export class NotificationBellComponent implements OnInit {
-
+  // --- Injections ---
   private notificationService = inject(NotificationService);
   private apiService = inject(ApiService);
-  private masterList = inject(MasterListService);
   private messageService = inject(AppMessageService);
+  private masterList = inject(MasterListService);
 
-  // State ---
-  realtimeNotifications: any[] = [];
-  allNotifications: any[] = [];
+  // --- State ---
+  realtimeNotifications: any[] = []; // <-- For "New" tab (Tab 0)
+  allNotifications: any[] = [];      // <-- For "All" tab (Tab 2)
   pendingMembers: any[] = [];
-
   roles: any[] = [];
   branches: any[] = [];
 
-  selectedRoles: Record<string, string> = {};
-  selectedBranches: Record<string, string> = {};
-
-  activeTab: 'new' | 'approvals' | 'all' = 'new';
   showDropdown = false;
   unreadCount = 0;
   isLoading = false;
 
+  // --- Approval Form State ---
+  selectedRoles: { [userId: string]: string } = {};
+  selectedBranches: { [userId: string]: string } = {};
+  customers: any
+
   constructor() {
     effect(() => {
       this.roles = this.masterList.roles();
+      this.customers = this.masterList.customers();
       this.branches = this.masterList.branches();
     });
   }
 
   ngOnInit() {
-    this.subscribeRealtime();
-    this.loadData();
-  }
-
-  private subscribeRealtime() {
-    this.notificationService.notifications$.subscribe(data => {
+    // This subscription is for REAL-TIME updates (e.g., from a socket)
+    // It updates the badge and list *after* the component is loaded
+    this.notificationService.notifications$.subscribe((data) => {
       this.realtimeNotifications = data;
       this.unreadCount = data.filter(n => !n.isRead).length;
     });
+    this.loadData();
   }
 
   loadData() {
     this.isLoading = true;
+
     this.masterList.refresh();
 
-    // Pending Member Approvals
     this.apiService.getPendingMembers().subscribe(res => {
       this.pendingMembers = res.data.pendingMembers || [];
     });
 
-    // All Notifications
-    this.apiService.getAllNotifications().subscribe(res => {
+    // --- THIS SECTION IS THE FIX ---
+    this.apiService.getAllNotifications().subscribe((res: any) => {
+      // 1. Populate the "All" tab (Tab 2)
       this.allNotifications = res.data.notifications || [];
+
+      // 2. Populate the "New" tab (Tab 0) with unread items from the "All" list
       this.realtimeNotifications = this.allNotifications.filter(n => !n.isRead);
+
+      // 3. Update the badge count from this initial list
       this.unreadCount = this.realtimeNotifications.length;
-      this.isLoading = false;
     });
+    // --- END FIX ---
+
+    this.isLoading = false;
   }
 
   toggleDropdown() {
     this.showDropdown = !this.showDropdown;
-
     if (this.showDropdown) {
-      this.activeTab = 'new';
-      this.loadData();
+       // Refresh data every time it's opened
     }
   }
 
   markAsRead(notification: any) {
-    if (!notification._id) return;
-
-    this.notificationService.markAsRead(notification._id);
-    notification.isRead = true;
-
-    this.unreadCount = this.realtimeNotifications.filter(n => !n.isRead).length;
+    // This tells the service, which (presumably) will trigger the
+    // observable in ngOnInit to update the list automatically.
+    this.notificationService.markAsRead(notification._id!);
   }
 
   approveMember(member: any) {
-    const id = member._id;
-    const roleId = this.selectedRoles[id];
-    const branchId = this.selectedBranches[id];
+    const userId = member._id;
+    const roleId = this.selectedRoles[userId];
+    const branchId = this.selectedBranches[userId];
 
     if (!roleId || !branchId) {
-      this.messageService.showWarn(
-        'Missing Info',
-        'Select both role and branch'
-      );
+      this.messageService.showWarn('Missing Info', 'Please select a role and branch.');
       return;
     }
 
-    const payload = { userId: id, roleId, branchId };
+    const payload = { userId, roleId, branchId };
 
     this.apiService.approveMember(payload).subscribe({
-      next: () => {
-        this.messageService.showSuccess(
-          'Approval Done',
-          `${member.name} activated`
-        );
-        this.loadData();
+      next: (response) => {
+        this.messageService.showSuccess('Member Approved', `${member.name} is now active.`);
+        this.loadData(); // Refresh lists
+      },
+      error: (err) => {
+        // Error is already handled
       }
     });
   }
