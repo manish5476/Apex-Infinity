@@ -224,4 +224,160 @@
       }
     }
   }
+}/* ==============================================
+   FULL HEIGHT LAYOUT FIX
+   ============================================== */
+
+:host {
+  /* CRITICAL: Makes the angular component fill the PrimeNG Dialog Content */
+  display: flex;
+  flex-direction: column;
+  height: 100%; 
+  width: 100%;
+  overflow: hidden; /* Prevents double scrollbars */
 }
+
+/* Main Container */
+.notification-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Force it to take full available height */
+  background: var(--bg-primary);
+}
+
+/* 1. Header (Tabs) - Stays at top, doesn't shrink */
+.panel-header {
+  flex-shrink: 0; /* Never shrink */
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-primary);
+
+  .nav-segment {
+    display: flex;
+    background: var(--bg-ternary);
+    padding: 4px;
+    border-radius: var(--ui-border-radius);
+    gap: 4px;
+
+    button {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 10px; /* Bigger touch area for mobile */
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      border-radius: var(--ui-border-radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+
+      &.active {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        box-shadow: var(--shadow-sm);
+        font-weight: 600;
+      }
+
+      .badge-dot {
+        width: 8px;
+        height: 8px;
+        background-color: var(--color-error);
+        border-radius: 50%;
+      }
+      
+      .badge-count {
+        background: var(--accent-primary);
+        color: #fff;
+        font-size: 0.75rem;
+        padding: 2px 6px;
+        border-radius: 10px;
+      }
+    }
+  }
+}
+
+/* 2. Body (The List) - THE FIX IS HERE */
+.panel-body {
+  flex-grow: 1;  /* This tells the list to EAT all that white space */
+  overflow-y: auto; /* Scroll only occurs inside this area */
+  height: 0; /* CSS trick to make flex-grow work perfectly in nested flex containers */
+  background: var(--bg-primary);
+  padding-bottom: 20px; /* Safety padding at bottom */
+}
+
+/* === List Items Styling (Same as before) === */
+.notification-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  .notif-item {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-primary);
+    display: flex;
+    gap: 12px;
+    cursor: pointer;
+    
+    &:hover { background: var(--bg-ternary); }
+
+    .notif-content {
+      flex: 1;
+      .title { display: block; font-weight: 600; margin-bottom: 4px; color: var(--text-primary); }
+      .msg { font-size: 0.85rem; color: var(--text-secondary); margin: 0; }
+      .time { font-size: 0.75rem; color: var(--text-label); margin-top: 4px; display: block; }
+    }
+    
+    &.unread {
+      background: rgba(var(--accent-primary-rgb), 0.05);
+      border-left: 3px solid var(--accent-primary);
+    }
+  }
+}
+
+/* Approval Item Styling */
+.approval-item {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-primary);
+  
+  .user-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    .name { font-weight: 600; display: block; }
+    .email { font-size: 0.85rem; color: var(--text-secondary); }
+  }
+
+  .approval-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+/* Empty State - Centers in the available white space */
+.empty-state {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-label);
+  min-height: 200px;
+  
+  i { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.5; }
+}
+
+/* === GLOBAL OVERRIDES === */
+:host ::ng-deep {
+  .p-select { width: 100%; }
+  /* Fix dropdown clipping in modal */
+  .p-select-panel { 
+    z-index: 100000 !important; 
+    position: fixed !important; 
+  }
+}
+
