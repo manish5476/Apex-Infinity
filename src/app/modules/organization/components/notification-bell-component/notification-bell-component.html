@@ -1,116 +1,108 @@
 <div class="relative">
-  <button class="relative p-2" (click)="toggleDropdown()" pTooltip="Notifications" tooltipPosition="bottom">
+  <button class="relative p-2"
+          (click)="toggleDropdown()"
+          pTooltip="Notifications"
+          tooltipPosition="bottom">
     <i class="pi pi-bell text-lg text-[var(--text-primary)]"></i>
 
     @if (unreadCount > 0) {
-      <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 rounded-full animate-pulse">
+      <span class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px]
+                   px-1.5 rounded-full font-semibold">
         {{ unreadCount }}
       </span>
     }
   </button>
 
   @if (showDropdown) {
-    <div class="absolute right-0 mt-2 w-80 sm:w-96 notif-box">
+    <div class="dropdown-panel">
+      
+      <!-- Category Buttons -->
+      <div class="category-bar">
+        <button [class.active]="activeTab === 'new'"
+                (click)="activeTab = 'new'">New</button>
 
-      <!-- Filter Buttons -->
-      <div class="flex filter-container">
-        <button class="filter-btn"
-          [ngClass]="{ 'active': activeSection === 'new' }"
-          (click)="activeSection = 'new'">
-          New
-        </button>
+        <button [class.active]="activeTab === 'approvals'"
+                (click)="activeTab = 'approvals'">Approvals</button>
 
-        <button class="filter-btn"
-          [ngClass]="{ 'active': activeSection === 'approvals' }"
-          (click)="activeSection = 'approvals'">
-          Approvals
-        </button>
-
-        <button class="filter-btn"
-          [ngClass]="{ 'active': activeSection === 'all' }"
-          (click)="activeSection = 'all'">
-          All
-        </button>
+        <button [class.active]="activeTab === 'all'"
+                (click)="activeTab = 'all'">All</button>
       </div>
 
-      <!-- Scrollable Content -->
-      <div class="notif-content">
+      <!-- Panels -->
+      <div class="content-panel">
+        @switch (activeTab) {
 
-        @if (isLoading) {
-          <div class="p-3">
-            <p-skeleton height="2rem" styleClass="mb-2"></p-skeleton>
-            <p-skeleton height="2rem" styleClass="mb-2"></p-skeleton>
-            <p-skeleton height="2rem"></p-skeleton>
-          </div>
-        }
-
-        <!-- New Notifications -->
-        @if (!isLoading && activeSection === 'new') {
-          @for (n of realtimeNotifications; track n._id) {
-            <div class="notif-item unread" (click)="markAsRead(n)">
-              <div class="notif-title">{{ n.title }}</div>
-              <div class="notif-msg">{{ n.message }}</div>
-              <div class="notif-time">{{ n.createdAt | date: 'short' }}</div>
-            </div>
-          }
-
-          @if (realtimeNotifications.length === 0) {
-            <div class="empty">No new notifications.</div>
-          }
-        }
-
-        <!-- Approvals -->
-        @if (!isLoading && activeSection === 'approvals') {
-          @for (member of pendingMembers; track member._id) {
-            <div class="notif-item">
-              <div class="notif-title">{{ member.name }}</div>
-              <div class="notif-time">{{ member.email }}</div>
-
-              <div class="mt-3 flex flex-col gap-2">
-                <p-select appendTo="body"
-                  [options]="roles"
-                  optionLabel="name"
-                  optionValue="_id"
-                  [(ngModel)]="selectedRoles[member._id]"
-                  placeholder="Select Role"></p-select>
-
-                <p-select appendTo="body"
-                  [options]="branches"
-                  optionLabel="name"
-                  optionValue="_id"
-                  [(ngModel)]="selectedBranches[member._id]"
-                  placeholder="Select Branch"></p-select>
-
-                <p-button label="Approve" icon="pi pi-check"
-                  styleClass="p-button-sm w-full"
-                  [disabled]="!selectedRoles[member._id] || !selectedBranches[member._id]"
-                  (click)="approveMember(member)">
-                </p-button>
-
+        @case('new') {
+          <ng-container>
+            @for (n of realtimeNotifications; track n._id) {
+              <div class="notif-item"
+                   (click)="markAsRead(n)"
+                   [class.unread]="!n.isRead">
+                <div class="title">{{ n.title }}</div>
+                <div class="msg">{{ n.message }}</div>
+                <div class="time">{{ n.createdAt | date:'short' }}</div>
               </div>
-            </div>
-          }
+            }
 
-          @if (pendingMembers.length === 0) {
-            <div class="empty">No pending requests.</div>
-          }
+            @if (realtimeNotifications.length === 0) {
+              <div class="empty">No new notifications.</div>
+            }
+          </ng-container>
         }
 
-        <!-- All Notifications -->
-        @if (!isLoading && activeSection === 'all') {
+        @case('approvals') {
+          <ng-container>
+            @for (member of pendingMembers; track member._id) {
+              <div class="approval-box">
+                <div class="title">{{ member.name }}</div>
+                <div class="email">{{ member.email }}</div>
+
+                <p-select appendTo="body"
+                          [options]="roles"
+                          [(ngModel)]="selectedRoles[member._id]"
+                          optionLabel="name"
+                          optionValue="_id"
+                          placeholder="Role">
+                </p-select>
+
+                <p-select appendTo="body"
+                          [options]="branches"
+                          [(ngModel)]="selectedBranches[member._id]"
+                          optionLabel="name"
+                          optionValue="_id"
+                          placeholder="Branch">
+                </p-select>
+
+                <p-button label="Approve"
+                          icon="pi pi-check"
+                          (click)="approveMember(member)"
+                          [disabled]="!selectedRoles[member._id] || !selectedBranches[member._id]">
+                </p-button>
+              </div>
+            }
+
+            @if (pendingMembers.length === 0) {
+              <div class="empty">No pending approvals.</div>
+            }
+          </ng-container>
+        }
+
+        @default {
           @for (n of allNotifications; track n._id) {
             <div class="notif-item">
-              <div class="notif-title">{{ n.title }}</div>
-              <div class="notif-msg">{{ n.message }}</div>
-              <div class="notif-time">{{ n.createdAt | date: 'short' }}</div>
+              <div class="title">{{ n.title }}</div>
+              <div class="msg">{{ n.message }}</div>
+              <div class="time">{{ n.createdAt | date:'short' }}</div>
             </div>
           }
-
           @if (allNotifications.length === 0) {
-            <div class="empty">No history.</div>
+            <div class="empty">No notifications.</div>
           }
         }
+
+        }
       </div>
+
     </div>
   }
 </div>
