@@ -1,256 +1,31 @@
-:host {
-  display: block;
-  position: relative; /* Anchor for the dropdown */
-}
-
-/* === Main Dropdown Container === */
-.notification-dropdown-overlay {
-  position: absolute;
-  top: 100%;
-  right: 0; /* Aligns right edge of dropdown with right edge of bell */
-  margin-top: 12px;
-  width: 360px; /* Fixed width prevents squashing */
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius-lg);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3); /* Strong shadow for "floating" effect */
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  overflow: visible; /* CRITICAL: Allows elements to pop out if needed */
-}
-
-/* === 1. Header & Tabs === */
-.dropdown-header {
-  padding: 12px;
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius-lg) var(--ui-border-radius-lg) 0 0;
-
-  .tab-segment {
-    display: flex;
-    background: var(--bg-ternary);
-    padding: 4px;
-    border-radius: var(--ui-border-radius);
-    gap: 4px;
-  }
-
-  .tab-btn {
-    flex: 1;
-    border: none;
-    background: transparent;
-    padding: 8px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--text-secondary);
-    border-radius: var(--ui-border-radius-sm);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    transition: all 0.2s;
-
-    &:hover { color: var(--text-primary); }
-    
-    &.active {
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-      font-weight: 600;
-    }
-
-    .count-badge {
-      font-size: 0.7rem;
-      padding: 1px 6px;
-      border-radius: 10px;
-      color: #fff;
-      &.red { background: var(--color-error); }
-      &.orange { background: #f97316; }
-    }
-  }
-}
-
-/* === 2. Scrollable Body === */
-.dropdown-body {
-  max-height: 400px; /* Limits height */
-  overflow-y: auto;  /* Allows scrolling INSIDE the body only */
-  background: var(--bg-primary);
-  border-radius: 0 0 var(--ui-border-radius-lg) var(--ui-border-radius-lg);
-}
-
-/* === List Styles === */
-.notif-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-
-  .notif-item {
-    display: flex;
-    gap: 12px;
-    padding: 12px;
-    border-bottom: 1px solid var(--border-primary);
-    cursor: pointer;
-    transition: background 0.2s;
-
-    &:hover { background: var(--bg-ternary); }
-    
-    /* Icon Styles */
-    .icon-box {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      &.blue { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
-    }
-
-    .content {
-      flex: 1;
-      &.full { width: 100%; }
-      
-      .row-top {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 2px;
-        .title { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
-        .time { font-size: 0.75rem; color: var(--text-label); white-space: nowrap; }
-      }
-      .msg {
-        font-size: 0.8rem;
-        color: var(--text-secondary);
-        margin: 0;
-        line-height: 1.4;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
-    }
-
-    /* Unread Indicator */
-    &.unread {
-      background: rgba(var(--accent-primary-rgb), 0.03);
-      .status-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--accent-primary);
-        margin-top: 6px;
-      }
-    }
-  }
-}
-
-/* === Approval Card Styles === */
-.approval-list {
-  padding: 0;
-  
-  .approval-card {
-    background: var(--bg-secondary);
-    border-bottom: 1px solid var(--border-primary);
-    padding: 16px;
-
-    .card-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 12px;
-
-      .user-details {
-        display: flex;
-        flex-direction: column;
-        .name { font-weight: 600; font-size: 0.95rem; color: var(--text-primary); }
-        .email { font-size: 0.8rem; color: var(--text-secondary); }
-      }
-    }
-
-    .card-form {
-      background: var(--bg-ternary);
-      padding: 10px;
-      border-radius: var(--ui-border-radius);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-  }
-}
-
-/* === Empty State === */
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-  color: var(--text-label);
-  gap: 8px;
-  i { font-size: 2rem; opacity: 0.5; }
-  p { margin: 0; font-size: 0.9rem; }
-}
-
-/* === GLOBAL COMPONENT OVERRIDES (Safe via ng-deep) === */
-:host ::ng-deep {
-  /* 1. Ensure Dropdowns fit and are visible */
-  .p-select {
-    width: 100% !important;
-    .p-select-label { 
-      padding: 8px 10px; 
-      font-size: 0.85rem; 
-    }
-  }
-
-  /* 2. Style the Dropdown Panel (which is attached to body) */
-  .p-select-panel {
-    background: var(--bg-secondary) !important;
-    border: 1px solid var(--border-primary) !important;
-    box-shadow: var(--shadow-xl) !important;
-    z-index: 99999 !important; /* Forces it above everything else */
-    
-    .p-select-item {
-      color: var(--text-primary) !important;
-      padding: 8px 12px;
-      font-size: 0.85rem;
-      
-      &:hover {
-        background: var(--bg-ternary) !important;
-      }
-      
-      &.p-highlight {
-        background: var(--accent-focus) !important;
-        color: var(--accent-primary) !important;
-      }
-    }
-  }
-}/* ==============================================
-   FULL HEIGHT LAYOUT FIX
+/* ==============================================
+   SCROLL FIX: notification-bell-component.scss
    ============================================== */
 
 :host {
-  /* CRITICAL: Makes the angular component fill the PrimeNG Dialog Content */
-  display: flex;
-  flex-direction: column;
-  height: 100%; 
+  display: block;
+  /* CRITICAL 1: Force the component to take exactly 100% of the parent (Sidebar/Dialog) */
+  height: 100%;
   width: 100%;
-  overflow: hidden; /* Prevents double scrollbars */
+  overflow: hidden; /* Prevent double scrollbars on the host */
 }
 
-/* Main Container */
 .notification-layout {
   display: flex;
   flex-direction: column;
-  height: 100%; /* Force it to take full available height */
+  /* CRITICAL 2: The layout must fill the host height */
+  height: 100%;
   background: var(--bg-primary);
+  box-sizing: border-box;
 }
 
-/* 1. Header (Tabs) - Stays at top, doesn't shrink */
+/* === 1. Header (Tabs) === */
 .panel-header {
-  flex-shrink: 0; /* Never shrink */
+  flex-shrink: 0; /* Never let the header shrink */
   padding: 1rem;
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-primary);
+  z-index: 10; /* Keep on top of scrolling content */
 
   .nav-segment {
     display: flex;
@@ -263,7 +38,7 @@
       flex: 1;
       border: none;
       background: transparent;
-      padding: 10px; /* Bigger touch area for mobile */
+      padding: 10px;
       font-size: 0.9rem;
       font-weight: 500;
       color: var(--text-secondary);
@@ -300,20 +75,24 @@
   }
 }
 
-/* 2. Body (The List) - THE FIX IS HERE */
+/* === 2. Body (The List) - THE CRITICAL FIX IS HERE === */
 .panel-body {
-  flex-grow: 1;  /* This tells the list to EAT all that white space */
-  overflow-y: auto; /* Scroll only occurs inside this area */
-  height: 0; /* CSS trick to make flex-grow work perfectly in nested flex containers */
+  flex-grow: 1;  /* Push to fill remaining space */
+  overflow-y: auto; /* Enable vertical scrolling */
+  
+  /* CRITICAL 3: This magic property fixes the "cut off" issue in Flex containers */
+  min-height: 0; 
+  
   background: var(--bg-primary);
-  padding-bottom: 20px; /* Safety padding at bottom */
+  padding-bottom: 20px; /* Space at bottom for safe scrolling */
 }
 
-/* === List Items Styling (Same as before) === */
+/* === List Items === */
 .notification-list {
   list-style: none;
   padding: 0;
   margin: 0;
+  width: 100%; /* Ensure list takes full width */
 
   .notif-item {
     padding: 1rem;
@@ -321,14 +100,42 @@
     display: flex;
     gap: 12px;
     cursor: pointer;
+    width: 100%;
     
     &:hover { background: var(--bg-ternary); }
 
     .notif-content {
       flex: 1;
-      .title { display: block; font-weight: 600; margin-bottom: 4px; color: var(--text-primary); }
-      .msg { font-size: 0.85rem; color: var(--text-secondary); margin: 0; }
-      .time { font-size: 0.75rem; color: var(--text-label); margin-top: 4px; display: block; }
+      /* Prevent text from widening the container */
+      min-width: 0; 
+      
+      .title { 
+        display: block; 
+        font-weight: 600; 
+        margin-bottom: 4px; 
+        color: var(--text-primary);
+        /* Truncate long titles */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .msg { 
+        font-size: 0.85rem; 
+        color: var(--text-secondary); 
+        margin: 0; 
+        
+        /* Limit message to 2 lines */
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .time { 
+        font-size: 0.75rem; 
+        color: var(--text-label); 
+        margin-top: 4px; 
+        display: block; 
+      }
     }
     
     &.unread {
@@ -338,10 +145,11 @@
   }
 }
 
-/* Approval Item Styling */
+/* Approval Items */
 .approval-item {
   padding: 1rem;
   border-bottom: 1px solid var(--border-primary);
+  width: 100%;
   
   .user-info {
     display: flex;
@@ -358,7 +166,7 @@
   }
 }
 
-/* Empty State - Centers in the available white space */
+/* Empty State */
 .empty-state {
   height: 100%;
   display: flex;
@@ -366,18 +174,18 @@
   align-items: center;
   justify-content: center;
   color: var(--text-label);
-  min-height: 200px;
+  min-height: 200px; /* Ensure it takes up vertical space if empty */
   
   i { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.5; }
 }
 
-/* === GLOBAL OVERRIDES === */
+/* === Global Overrides === */
 :host ::ng-deep {
   .p-select { width: 100%; }
+  
   /* Fix dropdown clipping in modal */
   .p-select-panel { 
     z-index: 100000 !important; 
     position: fixed !important; 
   }
 }
-
