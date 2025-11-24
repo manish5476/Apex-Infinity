@@ -26,8 +26,8 @@ import { SelectModule } from 'primeng/select';
     SkeletonModule,
     SelectModule
   ],
-  templateUrl: './notification-bell.component.html',
-  styleUrl: './notification-bell.component.scss'
+  templateUrl: './notification-bell.html',
+  styleUrl: './notification-bell.scss'
 })
 export class NotificationBellComponent implements OnInit {
 
