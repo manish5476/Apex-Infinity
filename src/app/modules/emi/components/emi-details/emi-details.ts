@@ -122,7 +122,8 @@ export class EmiDetailsComponent implements OnInit {
   initPaymentForm() {
     this.paymentForm = this.fb.group({
       amount: [0, [Validators.required, Validators.min(1)]],
-      paymentId: ['', Validators.required], 
+      paymentId: ['', Validators.required],
+      // paymentMethod: "cash",
       paymentMode: ['cash', Validators.required],
       notes: ['']
     });
@@ -130,10 +131,8 @@ export class EmiDetailsComponent implements OnInit {
 
   openPaymentDialog(installment: any) {
     if (installment.paymentStatus === 'paid') return;
-
     this.selectedInstallment = installment;
     const dueAmount = installment.totalAmount - installment.paidAmount;
-
     this.paymentForm.patchValue({
       amount: dueAmount,
       paymentId: '',
@@ -159,7 +158,8 @@ export class EmiDetailsComponent implements OnInit {
       emiId: emiId,
       installmentNumber: this.selectedInstallment.installmentNumber,
       amount: amount,
-      paymentId: `${paymentMode.toUpperCase()}-${paymentId}`
+      paymentMethod:paymentMode,
+      referenceNumber: `${paymentMode.toUpperCase()}-${paymentId}`
     };
 
     this.common.apiCall(
