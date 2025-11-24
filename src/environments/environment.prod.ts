@@ -4,6 +4,6 @@ export const environment = {
   // apiUrl: 'https://shivamelectronicsbackend.onrender.com/api'
   // apiUrl: 'https://shivamelectronicsbackendprod.onrender.com/api'
   apiUrl: 'https://apex-1ed5.onrender.com/api',
-  socketUrl: 'http://localhost:5000',
+  socketUrl:'https://apex-1ed5.onrender.com',
 
 };
