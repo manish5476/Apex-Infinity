@@ -253,6 +253,26 @@
     padding: 0 0.75rem;
   }
 }
+/* ==============================================
+   NOTIFICATION DIALOG INTEGRATION FIX
+   ============================================== */
+:host ::ng-deep {
+  
+  .notification-modal-override {
+    /* Ensure the dialog itself flexes correctly */
+    display: flex;
+    flex-direction: column;
+
+    /* Target the INTERNAL content wrapper of PrimeNG Dialog */
+    .p-dialog-content {
+      flex-grow: 1;           /* Grow to fill the dialog height */
+      display: flex;          /* Make THIS a flex container too */
+      flex-direction: column; /* Column layout */
+      padding: 0 !important;  /* Zero padding is crucial */
+      height: 100%;           /* Force full height */
+    }
+  }
+}
 
 // /* ==============================================
 //    HEADER SCSS
