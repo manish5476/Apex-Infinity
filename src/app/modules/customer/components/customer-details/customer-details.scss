@@ -386,6 +386,48 @@
     opacity: 1;
   }
 }
+/* === CUSTOM TABS STYLING === */
+.custom-tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--border-primary);
+  padding: 0 var(--spacing-lg);
+  background: var(--bg-secondary);
+  
+  .tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.25rem;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    i { font-size: 1rem; }
+
+    &:hover {
+      color: var(--text-primary);
+      background: var(--bg-ternary);
+    }
+
+    &.active {
+      color: var(--accent-primary);
+      border-bottom-color: var(--accent-primary);
+      background: rgba(var(--accent-primary-rgb), 0.05);
+    }
+  }
+}
+
+/* Ensure the panel grows properly */
+.activity-panel {
+  min-height: 400px; /* Minimum height to prevent jumps */
+}
+
 
 // /* =========================================================
 //    COMPONENT STYLES (Dark Mode Optimized)
