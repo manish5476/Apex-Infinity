@@ -4,140 +4,156 @@
 <div class="page-container animate-fadeIn">
 
   @if (isLoading()) {
-    <div class="loading-state">
-      <i class="pi pi-spin pi-spinner text-4xl text-[var(--text-secondary)]"></i>
-      <p>Loading EMI Plan...</p>
+    <div class="loading-container">
+      <p-skeleton width="100%" height="4rem" class="mb-4"></p-skeleton>
+      <div class="flex gap-4 w-full px-8">
+         <p-skeleton width="25%" height="8rem"></p-skeleton>
+         <p-skeleton width="25%" height="8rem"></p-skeleton>
+         <p-skeleton width="25%" height="8rem"></p-skeleton>
+         <p-skeleton width="25%" height="8rem"></p-skeleton>
+      </div>
     </div>
   } @else if (emiData(); as emi) {
 
-    <!-- HEADER -->
-    <div class="details-header">
+    <!-- 1. STICKY HEADER -->
+    <header class="details-header">
       <div class="header-left">
         <p-button icon="pi pi-arrow-left" styleClass="p-button-text p-button-rounded back-btn" 
                   routerLink="/emis"></p-button>
         <div class="title-group">
-          <div class="flex items-center gap-3">
-<h1>EMI Plan #{{ emi._id.slice(-6).toUpperCase() }}</h1>
-            <!-- USING COMMON SERVICE FOR SEVERITY -->
-            <p-tag [value]="emi.status | titlecase" [severity]="common.mapStatusToSeverity(emi.status)"></p-tag>
-          </div>
+          <h1>
+            EMI Plan #{{ emi._id.slice(-6).toUpperCase() }}
+            <p-tag [value]="emi.status" [severity]="common.mapStatusToSeverity(emi.status)"></p-tag>
+          </h1>
           <span class="subtitle">Created on {{ common.formatDate(emi.createdAt) }}</span>
         </div>
       </div>
       
-      <div class="header-right">
-         <p-button label="View Invoice" icon="pi pi-file" styleClass="p-button-outlined"
+      <div class="header-right flex gap-2">
+         <p-button label="Invoice" icon="pi pi-file" styleClass="p-button-outlined p-button-secondary"
                    [routerLink]="['/invoices', emi.invoiceId?._id]"></p-button>
+         <!-- Add more actions like 'Close Loan' if needed -->
       </div>
-    </div>
+    </header>
 
-    <!-- MAIN GRID -->
-    <div class="layout-grid">
+    <!-- 2. STATS BAR (Quick View) -->
+    <section class="stats-bar">
+      <div class="stat-item">
+        <div class="icon-box blue"><i class="pi pi-money-bill"></i></div>
+        <div class="stat-content">
+          <label>Loan Amount</label>
+          <strong>{{ common.formatCurrency(emi.totalAmount) }}</strong>
+        </div>
+      </div>
+      
+      <div class="stat-item">
+        <div class="icon-box green"><i class="pi pi-check-circle"></i></div>
+        <div class="stat-content">
+          <label>Total Paid</label>
+          <strong class="text-success">{{ common.formatCurrency(totalPaidAmount()) }}</strong>
+        </div>
+      </div>
 
-      <!-- LEFT COLUMN: INFO CARDS -->
-      <div class="left-col">
+      <div class="stat-item">
+        <div class="icon-box orange"><i class="pi pi-info-circle"></i></div>
+        <div class="stat-content">
+          <label>Remaining</label>
+          <strong class="text-danger">{{ common.formatCurrency(remainingAmount()) }}</strong>
+        </div>
+      </div>
+
+      <div class="stat-item">
+        <div class="icon-box purple"><i class="pi pi-chart-line"></i></div>
+        <div class="stat-content">
+          <label>Interest Rate</label>
+          <strong>{{ emi.interestRate }}%</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. MAIN LAYOUT -->
+    <div class="layout-body">
+
+      <!-- LEFT: INFO SIDEBAR -->
+      <aside class="sidebar-col">
         
-        <!-- CUSTOMER CARD -->
-        <div class="info-card">
+        <!-- CUSTOMER PROFILE -->
+        <div class="glass-card">
           <div class="card-header">
-            <i class="pi pi-user"></i>
-            <span>Customer Details</span>
+            <h3><i class="pi pi-user"></i> Customer</h3>
+            <p-button icon="pi pi-external-link" styleClass="p-button-text p-button-sm" 
+                      [routerLink]="['/customer', emi.customerId?._id]"></p-button>
           </div>
-          <div class="card-body">
+          <div class="card-content">
             <div class="info-row">
-              <label>Name</label>
-              <span class="value link" [routerLink]="['/customer', emi.customerId?._id]">
-                {{ emi.customerId?.name || 'Unknown' }}
+              <span class="label">Name</span>
+              <span class="val link" [routerLink]="['/customer', emi.customerId?._id]">
+                {{ emi.customerId?.name }}
               </span>
             </div>
             <div class="info-row">
-              <label>Email</label>
-              <span class="value">{{ emi.customerId?.email || '-' }}</span>
+              <span class="label">Email</span>
+              <span class="val">{{ emi.customerId?.email || '-' }}</span>
             </div>
             <div class="info-row">
-              <label>Phone</label>
-              <span class="value">{{ emi.customerId?.phone || '-' }}</span>
+              <span class="label">Phone</span>
+              <span class="val">{{ emi.customerId?.phone }}</span>
             </div>
           </div>
         </div>
 
-        <!-- INVOICE SUMMARY CARD -->
-        <div class="info-card">
+        <!-- CONFIG SUMMARY -->
+        <div class="glass-card">
           <div class="card-header">
-            <i class="pi pi-receipt"></i>
-            <span>Invoice Summary</span>
+            <h3><i class="pi pi-cog"></i> Terms</h3>
           </div>
-          <div class="card-body">
+          <div class="card-content">
             <div class="info-row">
-              <label>Invoice No</label>
-              <span class="value font-mono">#{{ emi.invoiceId?.invoiceNumber }}</span>
+              <span class="label">Invoice No</span>
+              <span class="val font-mono">#{{ emi.invoiceId?.invoiceNumber }}</span>
+            </div>
+            <p-divider styleClass="my-1"></p-divider>
+            <div class="info-row">
+              <span class="label">Down Payment</span>
+              <span class="val text-success">- {{ common.formatCurrency(emi.downPayment) }}</span>
             </div>
             <div class="info-row">
-              <label>Grand Total</label>
-              <span class="value font-bold">{{ common.formatCurrency(emi.invoiceId?.grandTotal) }}</span>
+              <span class="label">Principal</span>
+              <span class="val">{{ common.formatCurrency(emi.balanceAmount) }}</span>
             </div>
-            <p-divider></p-divider>
-            <div class="info-row highlight">
-              <label>Loan Amount</label>
-              <span class="value">{{ common.formatCurrency(emi.totalAmount) }}</span>
+            <div class="info-row">
+              <span class="label">Total Installments</span>
+              <span class="val">{{ emi.numberOfInstallments }}</span>
             </div>
-            <div class="info-row success">
-              <label>Down Payment</label>
-              <span class="value">- {{ common.formatCurrency(emi.downPayment) }}</span>
-            </div>
-            <div class="info-row danger">
-              <label>Principal Balance</label>
-              <span class="value">{{ common.formatCurrency(emi.balanceAmount) }}</span>
+            <div class="info-row">
+              <span class="label">Start Date</span>
+              <span class="val">{{ common.formatDate(emi.emiStartDate) }}</span>
             </div>
           </div>
         </div>
 
-        <!-- LOAN CONFIG CARD -->
-         <div class="info-card">
-          <div class="card-header">
-            <i class="pi pi-cog"></i>
-            <span>Configuration</span>
-          </div>
-          <div class="card-body">
-            <div class="grid-2">
-              <div class="mini-stat">
-                <label>Installments</label>
-                <strong>{{ emi.numberOfInstallments }}</strong>
-              </div>
-              <div class="mini-stat">
-                <label>Interest Rate</label>
-                <strong>{{ emi.interestRate }}%</strong>
-              </div>
-            </div>
-            <div class="info-row mt-3">
-              <label>Start Date</label>
-              <span class="value">{{ common.formatDate(emi.emiStartDate) }}</span>
-            </div>
-            <div class="info-row">
-              <label>End Date</label>
-              <span class="value">{{ common.formatDate(emi.emiEndDate) }}</span>
-            </div>
-          </div>
-         </div>
+      </aside>
 
-      </div>
-
-      <!-- RIGHT COLUMN: SCHEDULE -->
-      <div class="right-col">
+      <!-- RIGHT: SCHEDULE CONTENT -->
+      <main class="main-col">
         
-        <!-- PROGRESS BAR -->
-        <div class="progress-card">
-          <div class="progress-header">
-            <span>Repayment Progress</span>
-            <span class="percentage">{{ progress() }}%</span>
+        <!-- PROGRESS -->
+        <div class="progress-widget">
+          <div class="widget-header">
+            <h4>Repayment Progress</h4>
+            <span>{{ progress() }}%</span>
           </div>
-          <p-progressBar [value]="progress()" [showValue]="false" styleClass="h-2"></p-progressBar>
+          <p-progressBar [value]="progress()" [showValue]="false"></p-progressBar>
         </div>
 
-        <!-- INSTALLMENTS TABLE -->
-        <div class="schedule-card">
-          <h3>Installment Schedule</h3>
-          <p-table [value]="emi.installments" styleClass="p-table-striped" responsiveLayout="scroll">
+        <!-- INSTALLMENT TABLE -->
+        <div class="table-card">
+          <div class="table-header">
+            <h3>Installment Schedule</h3>
+            <!-- Optional: Filter/Export buttons here -->
+          </div>
+          
+          <p-table [value]="emi.installments" styleClass="p-datatable" responsiveLayout="scroll">
             <ng-template pTemplate="header">
               <tr>
                 <th style="width: 50px">#</th>
@@ -148,16 +164,15 @@
                 <th class="text-center" style="width: 100px">Action</th>
               </tr>
             </ng-template>
+            
             <ng-template pTemplate="body" let-inst>
               <tr [class.row-paid]="inst.paymentStatus === 'paid'">
-                <td class="text-center font-bold text-secondary">{{ inst.installmentNumber }}</td>
+                <td class="text-center font-bold text-[var(--text-secondary)]">{{ inst.installmentNumber }}</td>
                 <td>
                   <div class="flex flex-col">
                     <span class="font-medium">{{ common.formatDate(inst.dueDate) }}</span>
-                    
-                    <!-- FIXED: Use helper method to avoid template errors -->
                     @if(isOverdue(inst)) {
-                       <small class="text-red-500 text-xs font-bold">Overdue</small>
+                       <small class="text-danger font-bold">OVERDUE</small>
                     }
                   </div>
                 </td>
@@ -166,7 +181,6 @@
                   {{ inst.paidAmount > 0 ? common.formatCurrency(inst.paidAmount) : '-' }}
                 </td>
                 <td class="text-center">
-                  <!-- USING COMMON SERVICE FOR SEVERITY -->
                   <p-tag [value]="inst.paymentStatus | titlecase" 
                          [severity]="common.mapStatusToSeverity(inst.paymentStatus)"></p-tag>
                 </td>
@@ -174,11 +188,12 @@
                   @if (inst.paymentStatus !== 'paid') {
                     <button pButton icon="pi pi-wallet" 
                             class="p-button-text p-button-sm p-button-rounded" 
-                            pTooltip="Pay Now"
+                            pTooltip="Record Payment"
+                            tooltipPosition="left"
                             (click)="openPaymentDialog(inst)">
                     </button>
                   } @else {
-                    <i class="pi pi-check-circle text-green-500 text-lg"></i>
+                    <i class="pi pi-check-circle text-success text-lg"></i>
                   }
                 </td>
               </tr>
@@ -186,15 +201,10 @@
           </p-table>
         </div>
 
-      </div>
+      </main>
+
     </div>
 
-  } @else {
-    <div class="error-state">
-      <i class="pi pi-exclamation-triangle"></i>
-      <h3>EMI Plan Not Found</h3>
-      <p-button label="Go Back" routerLink="/emis"></p-button>
-    </div>
   }
 </div>
 
@@ -203,200 +213,59 @@
           [(visible)]="showPaymentDialog" 
           [modal]="true" 
           [style]="{width: '400px'}" 
-          styleClass="payment-dialog">
+          [draggable]="false" 
+          [resizable]="false">
   
   @if (selectedInstallment) {
-    <div class="dialog-content" [formGroup]="paymentForm">
+    <div class="flex flex-col gap-4" [formGroup]="paymentForm">
       
-      <div class="summary mb-4 p-3 bg-[var(--bg-ternary)] rounded">
-        <div class="flex justify-between mb-1">
-          <span class="text-sm text-[var(--text-secondary)]">Installment #</span>
-          <span class="font-bold">{{ selectedInstallment.installmentNumber }}</span>
+      <div class="bg-[var(--bg-ternary)] p-3 rounded border border-[var(--border-primary)]">
+        <div class="flex justify-between mb-1 text-sm text-[var(--text-secondary)]">
+          <span>Installment #{{ selectedInstallment.installmentNumber }}</span>
+          <span>Due Date: {{ common.formatDate(selectedInstallment.dueDate) }}</span>
         </div>
-        <div class="flex justify-between">
-          <span class="text-sm text-[var(--text-secondary)]">Total Due</span>
-          <span class="font-bold text-[var(--accent-primary)]">{{ common.formatCurrency(selectedInstallment.totalAmount - selectedInstallment.paidAmount) }}</span>
-        </div>
-      </div>
-
-      <div class="flex flex-col gap-4">
-        <div class="form-field">
-          <label>Payment Amount <span class="req">*</span></label>
-          <p-inputNumber formControlName="amount" mode="decimal" 
-                         [minFractionDigits]="2" prefix="₹ " 
-                         styleClass="w-full" class="w-full"></p-inputNumber>
-        </div>
-
-        <div class="form-field">
-          <label>Payment Mode <span class="req">*</span></label>
-          <p-select formControlName="paymentMode" [options]="paymentModes" 
-                    optionLabel="label" optionValue="value" 
-                    styleClass="w-full" appendTo="body"></p-select>
-        </div>
-
-        <div class="form-field">
-          <label>Transaction ID / Ref <span class="req">*</span></label>
-          <input pInputText formControlName="paymentId" class="w-full" placeholder="e.g. UPI-123456" />
+        <div class="flex justify-between items-end mt-2">
+          <span class="text-sm">Total Due</span>
+          <span class="text-xl font-bold text-[var(--accent-primary)]">
+            {{ common.formatCurrency(selectedInstallment.totalAmount - selectedInstallment.paidAmount) }}
+          </span>
         </div>
       </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-xs uppercase font-bold text-[var(--text-label)]">Amount</label>
+        <p-inputNumber formControlName="amount" mode="decimal" 
+                       [minFractionDigits]="2" prefix="₹ " 
+                       styleClass="w-full"></p-inputNumber>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-xs uppercase font-bold text-[var(--text-label)]">Payment Mode</label>
+        <p-select formControlName="paymentMode" [options]="paymentModes" 
+                  optionLabel="label" optionValue="value" 
+                  styleClass="w-full" appendTo="body"></p-select>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-xs uppercase font-bold text-[var(--text-label)]">Reference ID</label>
+        <input pInputText formControlName="paymentId" placeholder="e.g. UPI-123456" />
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-xs uppercase font-bold text-[var(--text-label)]">Notes (Optional)</label>
+        <input pInputText formControlName="notes" />
+      </div>
+
     </div>
 
-    <div class="dialog-footer mt-6 flex justify-end gap-2">
-      <p-button label="Cancel" styleClass="p-button-text p-button-secondary" (onClick)="showPaymentDialog = false"></p-button>
-      <p-button label="Confirm Payment" icon="pi pi-check" 
-                [loading]="isSubmittingPayment()"
-                (onClick)="submitPayment()"></p-button>
-    </div>
+    <ng-template pTemplate="footer">
+      <div class="flex justify-end gap-2 mt-4">
+        <p-button label="Cancel" styleClass="p-button-text p-button-secondary" (onClick)="showPaymentDialog = false"></p-button>
+        <p-button label="Confirm Payment" icon="pi pi-check" 
+                  [loading]="isSubmittingPayment()"
+                  (onClick)="submitPayment()"></p-button>
+      </div>
+    </ng-template>
   }
 </p-dialog>
-<!-- 
 
-
-<div class="emi-page-container">
-  <div class="themed-card emi-details-card" *ngIf="emiPlan(); else noEmiPlan">
-
-    
-    <div class="details-header">
-      <div class="flex flex-col gap-2">
-        <div class="flex items-center gap-4">
-          <p-button icon="pi pi-arrow-left" styleClass="p-button-text p-button-rounded"
-            [routerLink]="['/invoices', invoiceId]"> 
-          </p-button>
-          <h2 class="form-title m-0">EMI Plan</h2>
-        </div>
-        <div class="flex items-center gap-2 pl-14">
-          <p-tag [value]="emiPlan()?.status | titlecase"
-            [severity]="getEmiStatusSeverity(emiPlan()?.status)">
-          </p-tag>
-          <span class="text-sm text-[var(--text-label)]">For Invoice #{{ emiPlan()?.invoice?.invoiceNumber ||
-            invoiceId }}</span>
-        </div>
-      </div>
-      
-      <div class="header-actions">
-        
-      </div>
-    </div>
-    <p-divider></p-divider>
-
-    
-    <div class="emi-body">
-
-      
-      <section class="financial-grid">
-        <div class="stat-card">
-          <label>Total Loan Amount</label>
-          <span class="stat-value">{{ formatCurrency(emiPlan()?.balanceAmount) }}</span>
-        </div>
-        <div class="stat-card">
-          <label>Interest Rate</label>
-          <span class="stat-value">{{ emiPlan()?.interestRate }}%</span>
-        </div>
-        <div class="stat-card">
-          <label>Installments</label>
-          <span class="stat-value">{{ emiPlan()?.numberOfInstallments }}</span>
-        </div>
-        <div class="stat-card">
-          <label>Plan Status</label>
-          <span class="stat-value">{{ emiPlan()?.status | titlecase }}</span>
-        </div>
-      </section>
-
-      
-      <section class="detail-section">
-        <h4 class="section-title">Installment Schedule</h4>
-        <p-table [value]="emiPlan()?.installments || []" styleClass="p-table-striped">
-          <ng-template pTemplate="header">
-            <tr>
-              <th>#</th>
-              <th>Due Date</th>
-              <th>Principal</th>
-              <th>Interest</th>
-              <th>Total Amount</th>
-              <th>Paid Amount</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-item>
-            <tr>
-              <td>{{ item.installmentNumber }}</td>
-              <td>{{ formatDate(item.dueDate) }}</td>
-              <td>{{ formatCurrency(item.principalAmount) }}</td>
-              <td>{{ formatCurrency(item.interestAmount) }}</td>
-              <td class="font-bold">{{ formatCurrency(item.totalAmount) }}</td>
-              <td>{{ formatCurrency(item.paidAmount) }}</td>
-              <td>
-                <p-tag [value]="item.paymentStatus | titlecase"
-                   [severity]="getPaymentStatusSeverity(item.paymentStatus)">
-                </p-tag>
-              </td>
-              <td>
-                <p-button label="Pay" icon="pi pi-dollar" styleClass="p-button-sm"
-                  (onClick)="onPayInstallmentClick(item)" [disabled]="item.paymentStatus === 'paid'">
-                </p-button>
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </section>
-
-    </div>
-  </div>
-</div>
-
-
-<ng-template #noEmiPlan>
-  <div class="themed-card emi-details-card text-center p-8">
-    <i class="pi pi-info-circle text-4xl text-[var(--accent-primary)]"></i>
-    <h3 class="form-title mt-4">No EMI Plan Found</h3>
-    <p class="text-[var(--text-secondary)]">
-      There is no EMI plan associated with this invoice.
-    </p>
-    <div class="mt-6 flex justify-center gap-2">
-      <p-button label="Create EMI Plan" icon="pi pi-plus" [routerLink]="['/emi/create', invoiceId]">
-      </p-button>
-      <p-button label="Back to Invoice" icon="pi pi-arrow-left" styleClass="p-button-text"
-        [routerLink]="['/invoices', invoiceId]">
-      </p-button>
-    </div>
-  </div>
-</ng-template>
-
-
-<p-dialog header="Record Installment Payment" [(visible)]="displayPaymentModal" [modal]="true"
-  [style]="{width: '450px'}" (onHide)="onClosePaymentModal()">
-
-  <form [formGroup]="paymentForm" (ngSubmit)="onSubmitPayment()">
-    <div class="p-fluid flex flex-col gap-4" *ngIf="selectedInstallment()">
-
-      <div class="text-center">
-        <div class="text-lg text-[var(--text-secondary)]">
-          Installment #{{ selectedInstallment()?.installmentNumber }}
-        </div>
-        <div class="text-3xl font-bold text-[var(--text-primary)]">
-          {{ formatCurrency(selectedInstallment()?.totalAmount) }}
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>Amount to Pay <span class="req">*</span></label>
-        <p-inputNumber formControlName="amount" mode="decimal" [minFractionDigits]="2" prefix="₹ "></p-inputNumber>
-      </div>
-
-      <div class="form-group">
-        <label>Payment Method <span class="req">*</span></label>
-        <p-select  appendTo="body" formControlName="paymentMethod" [options]="paymentMethodOptions"></p-select>
-      </div>
-
-    </div>
-  </form>
-
-  <ng-template pTemplate="footer">
-    <p-button label="Cancel" icon="pi pi-times" styleClass="p-button-text" (onClick)="onClosePaymentModal()">
-    </p-button>
-    <p-button label="Confirm Payment" icon="pi pi-check" (onClick)="onSubmitPayment()"
-      [loading]="isSubmittingPayment()">
-    </p-button>
-  </ng-template>
-</p-dialog> --> -->

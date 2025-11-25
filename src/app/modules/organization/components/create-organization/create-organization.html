@@ -1,43 +1,42 @@
 <p-toast></p-toast>
 
-<div class="create-org-wrapper">
-  
-  <header class="org-header">
-    <div class="header-content">
-      <div class="icon-box">
-        <i class="pi pi-building"></i>
-      </div>
-      <div class="header-text">
-        <h1>Create Organization</h1>
-        <p>Setup your enterprise profile and administrative credentials.</p>
-      </div>
+<div class="page-container">
+
+  <!-- 1. HEADER -->
+  <header class="setup-header">
+    <div class="icon-box">
+      <i class="pi pi-building"></i>
+    </div>
+    <div class="header-text">
+      <h1>Setup Organization</h1>
+      <p>Register your enterprise profile, branch details, and administrative access.</p>
     </div>
   </header>
 
-  <main class="org-content">
-    <form [formGroup]="organizationForm" class="org-form">
+  <!-- 2. FORM CONTENT -->
+  <main class="setup-content">
+    <!-- Added style="max-width: 100%" to force full width layout -->
+    <form [formGroup]="organizationForm" class="form-wrapper" style="max-width: 100%">
 
+      <!-- SECTION 1: ORGANIZATION DETAILS -->
       <section class="form-section">
         <div class="section-header">
-          <h3>Organization Details</h3>
-          <span class="section-desc">Basic company identification</span>
+          <h3><i class="pi pi-id-card"></i> Organization Profile</h3>
+          <span class="section-desc">Basic identification and contact information for your company.</span>
         </div>
-        
+
         <div class="form-grid">
           <div class="form-group">
             <label>Organization Name <span class="req">*</span></label>
-            <input pInputText formControlName="organizationName" placeholder="Apex Innovations Inc." />
+            <input pInputText formControlName="organizationName" placeholder="Ex: Apex Innovations"
+              (blur)="generateShopId()" />
           </div>
 
           <div class="form-group">
             <label>Unique Shop ID <span class="req">*</span></label>
-            <input pInputText formControlName="uniqueShopId" placeholder="APEX-001" style="text-transform: uppercase"/>
-            <small class="hint">Unique URL identifier</small>
-          </div>
-
-          <div class="form-group">
-            <label>GST Number</label>
-            <input pInputText formControlName="gstNumber" placeholder="22AAAAA0000A1Z5" />
+            <input pInputText formControlName="uniqueShopId" placeholder="Ex: APEX-001"
+              style="text-transform: uppercase" />
+            <small class="hint">Auto-generated ID for system referencing.</small>
           </div>
 
           <div class="form-group">
@@ -47,27 +46,35 @@
 
           <div class="form-group">
             <label>Primary Phone <span class="req">*</span></label>
-            <input pInputText formControlName="primaryPhone" placeholder="+91 9876543210" />
+            <input pInputText formControlName="primaryPhone" placeholder="+91 98765 43210" />
+          </div>
+
+          <div class="form-group">
+            <label>GST Number</label>
+            <input pInputText formControlName="gstNumber" placeholder="22AAAAA0000A1Z5"
+              style="text-transform: uppercase" />
           </div>
         </div>
       </section>
 
+      <!-- SECTION 2: MAIN BRANCH -->
       <section class="form-section">
         <div class="section-header">
-          <h3>Headquarters Location</h3>
-          <span class="section-desc">Primary branch address details</span>
+          <h3><i class="pi pi-map-marker"></i> Headquarters Location</h3>
+          <span class="section-desc">Details for your primary operating branch.</span>
         </div>
 
         <div class="form-grid">
           <div class="form-group span-2">
             <label>Branch Name <span class="req">*</span></label>
-            <input pInputText formControlName="mainBranchName" placeholder="Head Office" />
+            <input pInputText formControlName="mainBranchName" placeholder="Ex: Head Office" />
           </div>
 
+          <!-- Nested Address Group -->
           <ng-container formGroupName="mainBranchAddress">
             <div class="form-group span-2">
               <label>Street Address <span class="req">*</span></label>
-              <input pInputText formControlName="street" placeholder="123 Business Park, Main Road" />
+              <input pInputText formControlName="street" placeholder="123 Business Park" />
             </div>
 
             <div class="form-group">
@@ -88,32 +95,30 @@
         </div>
       </section>
 
+      <!-- SECTION 3: ADMIN ACCOUNT -->
       <section class="form-section highlight">
         <div class="section-header">
-          <h3>Super Admin Account</h3>
-          <span class="section-desc">This user will have full system access</span>
+          <h3><i class="pi pi-shield"></i> Super Admin Access</h3>
+          <span class="section-desc">Credentials for the primary owner of this organization.</span>
         </div>
 
         <div class="form-grid">
           <div class="form-group">
             <label>Owner Name <span class="req">*</span></label>
-            <input pInputText formControlName="ownerName" placeholder="John Doe" />
+            <input pInputText formControlName="ownerName" placeholder="Full Name" />
           </div>
 
           <div class="form-group">
-            <label>Owner Email <span class="req">*</span></label>
+            <label>Login Email <span class="req">*</span></label>
             <input pInputText type="email" formControlName="ownerEmail" placeholder="admin@company.com" />
           </div>
 
           <div class="form-group">
             <label>Password <span class="req">*</span></label>
-            <p-password
-              formControlName="ownerPassword"
-              [toggleMask]="true"
-              placeholder="Secure password"
-              styleClass="w-full"
-              [feedback]="true" 
-            ></p-password>
+            <p-password formControlName="ownerPassword" [toggleMask]="true" [feedback]="true"
+              promptLabel="Enter a strong password" weakLabel="Weak" mediumLabel="Medium" strongLabel="Strong"
+              placeholder="Min 8 characters">
+            </p-password>
           </div>
         </div>
       </section>
@@ -121,140 +126,14 @@
     </form>
   </main>
 
-  <footer class="org-footer">
-    <div class="footer-content">
-      <button pButton type="button" label="Cancel" routerLink="/auth/login" class="p-button-text p-button-secondary"></button>
-      <button
-        pButton
-        type="button"
-        (click)="onSubmit()"
-        label="Create Organization"
-        icon="pi pi-check"
-        class="submit-btn"
-        [loading]="isLoading()"
-        [disabled]="organizationForm.invalid || isLoading()"
-      ></button>
+  <!-- 3. FOOTER -->
+  <footer class="setup-footer">
+    <!-- Added style="max-width: 100%" to ensure footer actions align with full width -->
+    <div class="footer-content" style="max-width: 100%">
+      <button pButton type="button" label="Back to Login" icon="pi pi-arrow-left"
+        class="p-button-text p-button-secondary" routerLink="/auth/login"></button>
+      <button pButton type="button" label="Create Organization" icon="pi pi-check" class="p-button-primary"
+        [loading]="isLoading()" (click)="onSubmit()"></button>
     </div>
   </footer>
 </div>
-<!-- <p-toast></p-toast>
-
-<div class="create-org-container">
-  <header class="create-org-header">
-    <h1>Create Your Organization</h1>
-    <p>Fill in the details below to register your new organization.</p>
-  </header>
-
-  <main class="create-org-body">
-    <form [formGroup]="organizationForm" (ngSubmit)="onSubmit()" class="org-form">
-
-      Organization Details
-      <section class="form-section">
-        <h2><i class="pi pi-building mr-2"></i> Organization Details</h2>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Organization Name <span class="req">*</span></label>
-            <input pInputText formControlName="organizationName" placeholder="Apex Innovations Inc." />
-          </div>
-
-          <div class="form-group">
-            <label>Unique Shop ID <span class="req">*</span></label>
-            <input pInputText formControlName="uniqueShopId" placeholder="APEX001" />
-          </div>
-
-          <div class="form-group">
-            <label>Primary Email <span class="req">*</span></label>
-            <input pInputText type="email" formControlName="primaryEmail" placeholder="contact@apex.com" />
-          </div>
-
-          <div class="form-group">
-            <label>Primary Phone <span class="req">*</span></label>
-            <input pInputText formControlName="primaryPhone" placeholder="+91 9876543210" />
-          </div>
-
-          <div class="form-group">
-            <label>GST Number</label>
-            <input pInputText formControlName="gstNumber" placeholder="22AAAAA0000A1Z5" />
-          </div>
-        </div>
-      </section>
-
-      Owner Details
-      <section class="form-section">
-        <h2><i class="pi pi-user mr-2"></i> Owner (Super Admin) Details</h2>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Owner Name <span class="req">*</span></label>
-            <input pInputText formControlName="ownerName" placeholder="Your full name" />
-          </div>
-
-          <div class="form-group">
-            <label>Owner Email <span class="req">*</span></label>
-            <input pInputText type="email" formControlName="ownerEmail" placeholder="admin@apex.com" />
-          </div>
-
-          <div class="form-group col-span-2">
-            <label>Password <span class="req">*</span></label>
-            <p-password
-              formControlName="ownerPassword"
-              [toggleMask]="true"
-              placeholder="Min. 8 characters"
-              styleClass="w-full"
-            ></p-password>
-          </div>
-        </div>
-      </section>
-
-      Branch Details
-      <section class="form-section">
-        <h2><i class="pi pi-map-marker mr-2"></i> Main Branch Details</h2>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Branch Name <span class="req">*</span></label>
-            <input pInputText formControlName="mainBranchName" placeholder="e.g. Apex HQ" />
-          </div>
-        </div>
-
-        <div formGroupName="mainBranchAddress" class="form-grid mt-2">
-          <div class="form-group col-span-2">
-            <label>Street Address <span class="req">*</span></label>
-            <input pInputText formControlName="street" placeholder="123 Main St" />
-          </div>
-
-          <div class="form-group">
-            <label>City <span class="req">*</span></label>
-            <input pInputText formControlName="city" />
-          </div>
-
-          <div class="form-group">
-            <label>State <span class="req">*</span></label>
-            <input pInputText formControlName="state" />
-          </div>
-
-          <div class="form-group">
-            <label>Zip Code <span class="req">*</span></label>
-            <input pInputText formControlName="zipCode" />
-          </div>
-        </div>
-      </section>
-
-      Footer Buttons
-      <div class="form-actions">
-        <button
-          pButton
-          type="submit"
-          label="Create Organization"
-          icon="pi pi-check"
-          class="submit-btn"
-          [loading]="isLoading()"
-          [disabled]="organizationForm.invalid || isLoading()"
-        ></button> Removed (click) handler, using form (ngSubmit)
-
-        <div class="form-links">
-          <button pButton label="Login" routerLink="/auth/login" class="link-btn"></button>
-          <button pButton label="Signup" routerLink="/auth/signup" class="link-btn"></button>
-        </div>
-      </div>
-    </form>
-  </main>
-</div> -->

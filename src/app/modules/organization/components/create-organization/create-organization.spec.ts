@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CreateOrganization } from './create-organization';
 
 describe('CreateOrganization', () => {
   let component: CreateOrganization;

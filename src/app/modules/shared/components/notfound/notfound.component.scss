@@ -1,50 +1,179 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* =========================================
+   404 PAGE (Premium Enterprise Glass)
+   ========================================= */
 
-/* Adding enhanced animations and hover effects */
-.error-container {
-  animation: fadeInUp 0.8s ease-out;
+:host {
+  display: block;
+  width: 100%;
+  height: 100vh; /* Full Viewport */
 }
 
-.error-svg {
-  animation: float 3s ease-in-out infinite;
+.not-found-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  overflow: hidden;
+  padding: 2rem;
 }
 
+/* --- AMBIENT BACKGROUND GLOW --- */
+.ambient-glow {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(var(--accent-primary-rgb), 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  animation: pulseGlow 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.orb-1, .orb-2 {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: 0;
+  opacity: 0.4;
+}
+
+.orb-1 {
+  width: 300px; height: 300px;
+  background: var(--accent-secondary);
+  top: 10%; left: 20%;
+  animation: floatOrb 10s ease-in-out infinite;
+}
+
+.orb-2 {
+  width: 400px; height: 400px;
+  background: var(--accent-tertiary);
+  bottom: 10%; right: 10%;
+  animation: floatOrb 12s ease-in-out infinite reverse;
+}
+
+/* --- GLASS CARD --- */
+.content-card {
+  position: relative;
+  z-index: 10;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  padding: 3rem;
+  
+  /* The Glass Effect */
+  background: var(--glass-bg-c);
+  backdrop-filter: blur(var(--glass-blur-c));
+  -webkit-backdrop-filter: blur(var(--glass-blur-c));
+  border: 1px solid var(--border-primary);
+  border-radius: var(--ui-border-radius-xl);
+  box-shadow: var(--shadow-2xl);
+  
+  animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* --- ILLUSTRATION --- */
+.illustration-wrapper {
+  margin-bottom: 2rem;
+  height: 240px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  svg {
+    height: 100%;
+    width: auto;
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));
+    animation: float 6s ease-in-out infinite;
+    
+    /* Map SVG colors to Theme Variables */
+    color: var(--accent-primary); 
+    fill: currentColor;
+  }
+}
+
+/* --- TYPOGRAPHY --- */
+h1 {
+  margin: 0 0 1rem 0;
+  font-family: var(--font-heading);
+  font-size: 3rem; /* Large Impact */
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  
+  /* Gradient Text */
+  background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+p {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 2.5rem 0;
+}
+
+/* --- BUTTON --- */
 .home-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2.5rem;
+  background: var(--accent-primary);
+  color: #ffffff; /* Always white text on primary button */
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 99px; /* Pill shape */
+  text-decoration: none;
+  box-shadow: 0 4px 15px rgba(var(--accent-primary-rgb), 0.4);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border: 1px solid transparent;
+  
+  i { font-size: 1.1rem; transition: transform 0.2s; }
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(var(--accent-primary-rgb), 0.5);
+    
+    i { transform: translateX(-3px); }
+  }
+  
+  &:active {
+    transform: translateY(-1px);
+  }
 }
 
-.home-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
-}
-
+/* --- ANIMATIONS --- */
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
 }
 
-/* Adding responsive improvements */
+@keyframes floatOrb {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(30px, -30px); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.5; }
+}
+
+/* Responsive */
 @media (max-width: 640px) {
-  .error-svg {
-    height: 200px;
-  }
+  .content-card { padding: 2rem; margin: 1rem; }
+  h1 { font-size: 2.25rem; }
+  .illustration-wrapper { height: 180px; }
 }

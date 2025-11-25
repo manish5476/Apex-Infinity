@@ -5,6 +5,7 @@ import { MasterList } from './modules/shared/components/master-list/master-list'
 import { Transactions } from './modules/transactions/transactions/transactions';
 import { LedgerComponent } from './modules/Ledger/ledger/ledger';
 import { NotesPageComponent } from './modules/dashboard/components/notes-page.component';
+import { NotFoundComponent } from './modules/shared/components/notfound/notfound.component';
 
 export const routes: Routes = [
   // ==========================================================
@@ -113,5 +114,5 @@ export const routes: Routes = [
   // ==========================================================
   //  3. FALLBACK REDIRECT
   // ==========================================================
-  { path: '**', redirectTo: '' }
+  { path: '**', component: NotFoundComponent }
 ];
