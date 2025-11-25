@@ -13,14 +13,59 @@
   <div class="header-right">
     <ng-container>
       <button class="user-menu-btn" (click)="op.toggle($event)">
-        <!-- Add getInitials logic or default avatar -->
         <p-avatar label="U" styleClass="w-8 h-8 text-xs"></p-avatar>
         <i class="pi pi-angle-down hidden md:inline-block"></i>
       </button>
       <p-popover #op appendTo="body">
         <div class="popover-body">
+
+          <!-- User Info -->
           <div class="user-info">
-            <!-- Add user info logic -->
+            <p-avatar [label]="getInitials(currentUser.name)" styleClass="w-12 h-12 text-lg"></p-avatar>
+            <div class="user-info-text">
+              <div class="user-info-name">{{ currentUser.name }}</div>
+              <div class="user-info-email">{{ currentUser.email }}</div>
+            </div>
+          </div>
+
+          <!-- Theme Section -->
+          <div class="theme-section">
+            <div class="theme-label">
+              <span>Appearance</span>
+              <p-toggleButton [(ngModel)]="isDarkMode" offIcon="pi pi-sun" onIcon=" pi-moon"
+                (onChange)="onThemeModeChange(isDarkMode)" styleClass="theme-toggle-btn">
+              </p-toggleButton>
+            </div>
+
+            <!-- Theme Colors Grid -->
+            <div class="theme-colors">
+              @for (theme of lightThemes; track theme.class) {
+              <div class="theme-color" [style.background-color]="theme.color"
+                [ngClass]="{'selected': activeLightThemeClass === theme.class && !isDarkMode}"
+                (click)="onLightThemeChange(theme.class)" pTooltip="{{theme.name}}" tooltipPosition="top">
+              </div>
+              }
+            </div>
+          </div>
+
+          <!-- Menu Actions -->
+          <div class="border-t border-[var(--border-primary)] pt-2">
+            <a routerLink="/admin/profile" class="action-link" (click)="op.hide()">
+              <i class="pi pi-user"></i> My Profile
+            </a>
+            <a routerLink="/auth/update-password" class="action-link" (click)="op.hide()">
+              <i class="pi pi-key"></i> Update Password
+            </a>
+            <a class="action-link danger" (click)="logout(); op.hide()">
+              <i class="pi pi-sign-out"></i> Logout
+            </a>
+          </div>
+
+        </div>
+      </p-popover>
+      <!-- <p-popover #op appendTo="body">
+        <div class="popover-body">
+          <div class="user-info">
             <p-avatar label="U" styleClass="w-12 h-12 text-lg"></p-avatar>
             <div class="user-info-text">
                 <div class="user-info-name">User Name</div>
@@ -30,18 +75,11 @@
           <div class="theme-section">
             <div class="theme-label">
               <span>Appearance</span>
-              <!-- This p-toggleButton now correctly reflects the dark mode state -->
               <p-toggleButton [(ngModel)]="isDarkMode" offIcon="pi pi-sun" onIcon=" pi-moon"
                 (onChange)="onThemeModeChange(isDarkMode)" styleClass="theme-toggle-btn">
               </p-toggleButton>
             </div>
             <div class="theme-colors">
-              <!--
-                REFACTORED:
-                - Loops over 'lightThemes' array from component
-                - [ngClass] checks 'activeLightThemeClass === theme.class'
-                - (click) calls 'onLightThemeChange(theme.class)'
-              -->
               <div *ngFor="let theme of lightThemes" class="theme-color" [style.backgroundColor]="theme.color"
                 [ngClass]="{'selected': activeLightThemeClass === theme.class && !isDarkMode}"
                 (click)="onLightThemeChange(theme.class)" pTooltip="{{theme.name}}" tooltipPosition="top">
@@ -60,7 +98,7 @@
             </a>
           </div>
         </div>
-      </p-popover>
+      </p-popover> -->
     </ng-container>
 
     <ng-template #loggedOut>
@@ -79,87 +117,10 @@
   </div>
 </div>
 
-<!-- Increased size for better usability -->
-<p-dialog 
-  header="Notifications" 
-  [modal]="true" 
-  [(visible)]="showNotificationdialog"
-  styleClass="notification-modal-override"
-  [contentStyle]="{ 'padding': '0', 'height': '100%', 'overflow': 'hidden' }"
+<p-dialog header="Notifications" [modal]="true" [(visible)]="showNotificationdialog"
+  styleClass="notification-modal-override" [contentStyle]="{ 'padding': '0', 'height': '100%', 'overflow': 'hidden' }"
   [style]="{ width: '40rem', height: '85vh', 'max-height': '90vh' }">
-  
+
   <app-notification-bell></app-notification-bell>
 
 </p-dialog>
-
-
-<!-- <div class="header-inner">
-
-  <div class="header-left">
-    <button class="menu-toggle-btn" (click)="toggleSidebar.emit()">
-      <i class="pi pi-bars text-lg"></i>
-    </button>
-    <a href="/admin/dashboard" class="logo-link">
-      <i class="pi pi-bolt"></i>
-      <span>Shivam Electronics</span>
-    </a>
-  </div>
-
-  <div class="header-right">
-    <ng-container>
-      <button class="user-menu-btn" (click)="op.toggle($event)">
-        <p-avatar styleClass="w-8 h-8 text-xs"></p-avatar>
-        <i class="pi pi-angle-down hidden md:inline-block"></i>
-      </button>
-      <p-popover #op appendTo="body">
-        <div class="popover-body">
-          <div class="user-info">
-          </div>
-          <div class="theme-section">
-            <div class="theme-label">
-              <span>Appearance</span>
-              <p-toggleButton [(ngModel)]="isDarkMode" Icon="pi pi-moon" offIcon="pi pi-sun"
-                (onChange)="onThemeModeChange(isDarkMode)" styleClass="theme-toggle-btn">
-              </p-toggleButton>
-            </div>
-            <div class="theme-colors">
-              <div *ngFor="let theme of colorThemes" class="theme-color" [style.backgroundColor]="theme.color"
-                [ngClass]="{'selected': accentColor === theme.color}"
-                (click)="onAccentColorChange(theme.class, theme.color)" pTooltip="{{theme.name}}" tooltipPosition="top">
-              </div>
-            </div>
-          </div>
-          <div class="border-t border-[var(--theme-border-primary)] pt-2">
-            <a routerLink="/admin/profile" class="action-link" (click)="op.hide()">
-              <i class="pi pi-user"></i> My Profile
-            </a>
-            <a routerLink="/auth/update-password" class="action-link" (click)="op.hide()">
-              <i class="pi pi-key"></i> Update Password
-            </a>
-            <a class="action-link danger" (click)="logout(); op.hide()">
-              <i class="pi pi-sign-out"></i> Logout
-            </a>
-          </div>
-        </div>
-      </p-popover>
-    </ng-container>
-
-    <ng-template #loggedOut>
-      <a routerLink="/auth/login" class="action-link">
-        <i class="pi pi-sign-in"></i> Login
-      </a>
-    </ng-template>
-
-    <button (click)="showNotificationdialog=true">
-      <i class="pi pi-bell text-lg" [ngClass]="{
-      'border-primary animate-pulse text-primary': recentNotifications.length > 0,
-      'text-gray-500': recentNotifications.length === 0
-    }"></i>
-    </button>
-
-  </div>
-</div>
-
-<p-dialog header="Edit Profile" [modal]="true" [(visible)]="showNotificationdialog" [style]="{ width: '90rem', height: '90rem' }">
-  <app-notification-bell></app-notification-bell>
-</p-dialog> -->

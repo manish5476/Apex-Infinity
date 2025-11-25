@@ -54,7 +54,7 @@ export class EmiFormComponent implements OnInit, OnDestroy {
   // Store fetched invoice data
   public invoice: any = null;
 
-  constructor() {}
+  constructor() { }
 
   ngOnInit(): void {
     this.buildForm();
@@ -69,14 +69,18 @@ export class EmiFormComponent implements OnInit, OnDestroy {
   }
 
   private loadInvoiceData(): void {
-    this.route.paramMap.pipe(
+    this.route.queryParamMap.pipe(
       switchMap(params => {
         this.invoiceId = params.get('invoiceId');
         if (!this.invoiceId) {
+          this.invoiceId = this.route.snapshot.paramMap.get('invoiceId');
+        }
+        if (!this.invoiceId) {
           this.messageService.showError('Error', 'No Invoice ID provided.');
-          this.router.navigate(['/invoices']); // Go back to safety
+          this.router.navigate(['/invoices']);
           return of(null);
         }
+
         this.loadingService.show();
         return this.invoiceService.getInvoiceById(this.invoiceId);
       }),
@@ -156,7 +160,7 @@ export class EmiFormComponent implements OnInit, OnDestroy {
       next: (res) => {
         this.messageService.showSuccess('Success', 'EMI Plan created successfully.');
         // Navigate to the details page for this invoice's EMI
-        this.router.navigate(['/emi/invoice', this.invoiceId]); 
+        this.router.navigate(['/emi/invoice', this.invoiceId]);
       },
       error: (err) => {
         this.messageService.showError('Error', err.error?.message || 'Failed to create EMI plan.');
