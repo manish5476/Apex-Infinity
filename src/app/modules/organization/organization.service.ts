@@ -39,7 +39,7 @@ export class OrganizationService extends BaseApiService {
     return this.get(`${this.endpoint}/${id}`, {}, 'getOrganizationById');
   }
 
-  updateOrganization(id: string, data: any): Observable<any> {
+updateOrganization(id: string, data: any): Observable<any> {
     return this.patch(`${this.endpoint}/${id}`, data, 'updateOrganization');
   }
 

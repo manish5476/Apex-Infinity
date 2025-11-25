@@ -1,5 +1,255 @@
 <div class="dashboard-container animate-fadeInDown">
 
+  <!-- 1. LOADING STATE (Skeleton) -->
+  @if (loadingProfile()) {
+    <div class="dashboard-header mb-6">
+       <div class="flex gap-4 items-center">
+         <p-skeleton shape="circle" size="4rem"></p-skeleton>
+         <div class="flex flex-col gap-2">
+           <p-skeleton width="15rem" height="2rem"></p-skeleton>
+           <p-skeleton width="8rem" height="1rem"></p-skeleton>
+         </div>
+       </div>
+    </div>
+    <div class="layout-grid">
+       <div class="w-full"><p-skeleton height="400px" styleClass="rounded-xl"></p-skeleton></div>
+       <div class="w-full flex flex-col gap-4">
+          <div class="flex gap-4">
+             <p-skeleton width="25%" height="100px" styleClass="rounded-xl"></p-skeleton>
+             <p-skeleton width="25%" height="100px" styleClass="rounded-xl"></p-skeleton>
+             <p-skeleton width="25%" height="100px" styleClass="rounded-xl"></p-skeleton>
+             <p-skeleton width="25%" height="100px" styleClass="rounded-xl"></p-skeleton>
+          </div>
+          <p-skeleton height="400px" styleClass="rounded-xl"></p-skeleton>
+       </div>
+    </div>
+  } 
+  
+  <!-- 2. ERROR STATE (Retry Button) -->
+  @else if (isError()) {
+    <div class="flex flex-col items-center justify-center h-[60vh] gap-4 text-center animate-fadeInUp">
+       <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center text-red-500 text-2xl mb-2">
+          <i class="pi pi-exclamation-triangle"></i>
+       </div>
+       <h2 class="text-xl font-bold text-primary">Unable to load customer profile</h2>
+       <p class="text-secondary max-w-md">There was a problem connecting to the server. Please check your internet connection or try again.</p>
+       <div class="flex gap-3 mt-2">
+          <button pButton label="Go Back" icon="pi pi-arrow-left" class="p-button-outlined" routerLink="/customer"></button>
+          <button pButton label="Retry" icon="pi pi-refresh" (click)="retryLoad()"></button>
+       </div>
+    </div>
+  }
+
+  <!-- 3. DATA STATE (Main UI) -->
+  @else if (customer(); as c) {
+    
+    <header class="dashboard-header">
+      <div class="header-left">
+        <button pButton icon="pi pi-arrow-left" class="p-button-text p-button-rounded back-btn"
+          routerLink="/customer"></button>
+        <div class="customer-identity">
+          <div class="name-row">
+            <h1>{{ c.name }}</h1>
+            <p-tag [value]="c.isActive ? 'Active' : 'Inactive'" [severity]="c.isActive ? 'success' : 'danger'"
+              styleClass="text-xs font-bold"></p-tag>
+          </div>
+          <div class="badges">
+            <span class="id-pill">
+              <i class="pi pi-hashtag text-xs mr-1"></i>
+              {{ c.code || c._id.substring(c._id.length - 6).toUpperCase() }}
+            </span>
+            <span class="type-label">{{ c.type }} CUSTOMER</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button pButton label="Transactions" icon="pi pi-list" class="p-button-outlined p-button-secondary p-button-sm"
+          (click)="showTransactionsDialog = true">
+        </button>
+        <button pButton label="Edit Profile" icon="pi pi-user-edit"
+          class="p-button-outlined p-button-secondary p-button-sm" [routerLink]="['../../customer/create']"
+          [queryParams]="{id: c._id}"></button>
+        <button pButton label="New Invoice" icon="pi pi-plus" class="p-button-primary p-button-sm"
+          routerLink="/invoices/create" [queryParams]="{customerId: c._id}"></button>
+      </div>
+    </header>
+
+    <div class="layout-grid animate-fadeInUp" style="animation-delay: 0.1s;">
+
+      <!-- LEFT SIDEBAR -->
+      <aside class="profile-card">
+        <div class="card-banner"></div>
+        <div class="identity-section">
+          <div class="avatar-wrapper relative inline-block">
+            <p-avatar [appImageViewer]="c.avatar" [image]="c.avatar"
+              [label]="c.avatar ? '' : common.getInitials(c.name)" size="xlarge" shape="circle"
+              styleClass="user-avatar cursor-zoom-in">
+            </p-avatar>
+            <button pButton type="button" icon="pi pi-pencil"
+              class="p-button-rounded p-button-secondary p-button-sm edit-btn" pTooltip="Change Photo"
+              tooltipPosition="bottom" (click)="fileInput.click(); $event.stopPropagation()">
+            </button>
+            <input #fileInput type="file" accept="image/*" style="display: none" (change)="onFileSelected($event)">
+            <div class="status-indicator" [class.active]="c.isActive"></div>
+          </div>
+          <h3>{{ c.contactPerson || c.name }}</h3>
+          <span class="email">{{ c.email }}</span>
+        </div>
+
+        <div class="details-list">
+          <div class="detail-item">
+            <div class="icon-circle"><i class="pi pi-phone"></i></div>
+            <div class="meta"><label>Phone</label><span>{{ c.phone || 'N/A' }}</span></div>
+          </div>
+          <div class="detail-item">
+            <div class="icon-circle"><i class="pi pi-id-card"></i></div>
+            <div class="meta"><label>GST</label><span class="font-mono">{{ c.gstNumber || 'N/A' }}</span></div>
+          </div>
+          <div class="detail-item">
+            <div class="icon-circle"><i class="pi pi-map-marker"></i></div>
+            <div class="meta">
+              <label>Address</label>
+              <span>{{ c.billingAddress?.city || 'City not set' }}</span>
+              <span class="text-muted text-xs">{{ c.billingAddress?.street }}</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- RIGHT MAIN CONTENT -->
+      <main class="right-content">
+
+        <!-- Metrics -->
+        <section class="metrics-grid">
+          <div class="metric-card outstanding">
+            <div class="icon-box"><i class="pi pi-wallet"></i></div>
+            <div class="data-box"><label>Outstanding</label><span class="value">{{ common.formatCurrency(closingBalance()) }}</span></div>
+          </div>
+          <div class="metric-card invoiced">
+            <div class="icon-box"><i class="pi pi-receipt"></i></div>
+            <div class="data-box"><label>Invoiced</label><span class="value">{{ common.formatCurrency(totalInvoiced()) }}</span></div>
+          </div>
+          <div class="metric-card received">
+            <div class="icon-box"><i class="pi pi-check-circle"></i></div>
+            <div class="data-box"><label>Received</label><span class="value">{{ common.formatCurrency(totalPaid()) }}</span></div>
+          </div>
+          <div class="metric-card limit">
+            <div class="icon-box"><i class="pi pi-shield"></i></div>
+            <div class="data-box"><label>Limit</label><span class="value">{{ common.formatCurrency(c.creditLimit) }}</span></div>
+          </div>
+        </section>
+
+        <!-- Activity Tabs -->
+        <div class="activity-panel">
+          
+          <div class="custom-tabs">
+            <button class="tab-btn" [class.active]="activeTab() === 'ledger'" (click)="switchTab('ledger')">
+              <i class="pi pi-list"></i> Ledger
+            </button>
+            <button class="tab-btn" [class.active]="activeTab() === 'invoices'" (click)="switchTab('invoices')">
+              <i class="pi pi-file"></i> Invoices
+            </button>
+            <button class="tab-btn" [class.active]="activeTab() === 'payments'" (click)="switchTab('payments')">
+              <i class="pi pi-wallet"></i> Payments
+            </button>
+          </div>
+
+          <!-- TAB: LEDGER -->
+          @if (activeTab() === 'ledger') {
+            @if (tabStatus.ledger.loading) {
+               <div class="p-4"><p-skeleton width="100%" height="150px"></p-skeleton></div>
+            } @else {
+              <div class="animate-fadeInUp">
+                <p-table [value]="ledgerHistory()" [paginator]="true" [rows]="10" styleClass="p-datatable-sm">
+                  <ng-template pTemplate="header">
+                    <tr><th>Date</th><th>Description</th><th>Type</th><th class="text-right">Amount</th><th class="text-right">Balance</th></tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-row>
+                    <tr>
+                      <td class="font-mono text-xs text-secondary">{{ common.formatDate(row.date) }}</td>
+                      <td class="font-medium">{{ row.description }}</td>
+                      <td><span class="status-badge" [class.success]="row.type === 'credit'" [class.danger]="row.type === 'debit'">{{ row.type }}</span></td>
+                      <td class="text-right font-bold" [style.color]="row.type === 'credit' ? 'var(--color-success)' : 'var(--color-error)'">{{ common.formatCurrency(row.amount) }}</td>
+                      <td class="text-right font-bold text-secondary">{{ common.formatCurrency(row.balance) }}</td>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="emptymessage"><tr><td colspan="5">No transactions found.</td></tr></ng-template>
+                </p-table>
+              </div>
+            }
+          }
+
+          <!-- TAB: INVOICES -->
+          @if (activeTab() === 'invoices') {
+            @if (tabStatus.invoices.loading) {
+               <div class="p-4"><p-skeleton width="100%" height="150px"></p-skeleton></div>
+            } @else {
+              <div class="animate-fadeInUp">
+                <p-table [value]="invoices()" [paginator]="true" [rows]="10" styleClass="p-datatable-sm">
+                  <ng-template pTemplate="header">
+                    <tr><th>Invoice #</th><th>Date</th><th>Status</th><th class="text-right">Total</th><th class="text-right">Due</th><th class="text-center">Action</th></tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-inv>
+                    <tr>
+                      <td class="font-bold cursor-pointer text-primary hover:underline" [routerLink]="['/invoices', inv._id]">{{ inv.invoiceNumber }}</td>
+                      <td class="text-xs text-secondary">{{ common.formatDate(inv.invoiceDate) }}</td>
+                      <td><p-tag [value]="inv.paymentStatus" [severity]="common.mapStatusToSeverity(inv.paymentStatus)"></p-tag></td>
+                      <td class="text-right">{{ common.formatCurrency(inv.grandTotal) }}</td>
+                      <td class="text-right font-bold">{{ common.formatCurrency(inv.balanceAmount) }}</td>
+                      <td class="text-center">
+                        <button pButton icon="pi pi-download" class="p-button-text p-button-rounded p-button-sm text-secondary" (click)="downloadInvoice(inv)"></button>
+                      </td>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="emptymessage"><tr><td colspan="6">No invoices found.</td></tr></ng-template>
+                </p-table>
+              </div>
+            }
+          }
+
+          <!-- TAB: PAYMENTS -->
+          @if (activeTab() === 'payments') {
+            @if (tabStatus.payments.loading) {
+               <div class="p-4"><p-skeleton width="100%" height="150px"></p-skeleton></div>
+            } @else {
+              <div class="animate-fadeInUp">
+                <p-table [value]="payments()" [paginator]="true" [rows]="10" styleClass="p-datatable-sm">
+                  <ng-template pTemplate="header">
+                    <tr><th>Date</th><th>Mode</th><th>Ref ID</th><th class="text-right">Amount</th><th class="text-center">Action</th></tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-pay>
+                    <tr>
+                      <td class="text-xs text-secondary">{{ common.formatDate(pay.paymentDate) }}</td>
+                      <td>{{ pay.paymentMethod | titlecase }}</td>
+                      <td class="font-mono text-xs text-tertiary">{{ pay.transactionId || '-' }}</td>
+                      <td class="text-right font-bold text-success">+ {{ common.formatCurrency(pay.amount) }}</td>
+                      <td class="text-center">
+                        <button pButton icon="pi pi-download" class="p-button-text p-button-rounded p-button-sm text-secondary" (click)="downloadReceipt(pay)"></button>
+                      </td>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="emptymessage"><tr><td colspan="5">No payments found.</td></tr></ng-template>
+                </p-table>
+              </div>
+            }
+          }
+
+        </div>
+      </main>
+    </div>
+  }
+</div>
+
+<p-dialog header="Transaction History - {{ customer()?.name }}" [(visible)]="showTransactionsDialog" [modal]="true"
+  [style]="{ width: '90vw', height: '90vh' }" [maximizable]="true" appendTo="body">
+  <ng-container *ngIf="showTransactionsDialog">
+    <app-customer-transactions [inputCustomerId]="customer()?._id"></app-customer-transactions>
+  </ng-container>
+</p-dialog>
+
+<!-- <div class="dashboard-container animate-fadeInDown">
+
   @if (loadingProfile()) {
     <div class="dashboard-header mb-6">
        <div class="flex gap-4 items-center">
@@ -208,4 +458,4 @@
   <ng-container *ngIf="showTransactionsDialog">
     <app-customer-transactions [inputCustomerId]="customer()?._id"></app-customer-transactions>
   </ng-container>
-</p-dialog>
+</p-dialog> -->
