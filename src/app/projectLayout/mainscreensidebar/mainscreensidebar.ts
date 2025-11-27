@@ -63,7 +63,8 @@ export class Mainscreensidebar implements OnInit {
       items: [
         { label: 'Overview', icon: 'pi pi-chart-bar', routerLink: ['/dashboard'] },
         { label: 'Notes', icon: 'pi pi-chart-bar', routerLink: ['/notes'] },
-        { label: 'organization setting', icon: 'pi pi-cog', routerLink: ['/admin/organization'] } // Added cog icon for clarity
+        { label: 'organization setting', icon: 'pi pi-cog', routerLink: ['/admin/organization'] }, 
+        { label: 'sessions', icon: 'pi pi-cog', routerLink: ['/sessions'] } 
       ]
     },
     // 🚀 NEW: FINANCIALS SECTION
@@ -71,6 +72,7 @@ export class Mainscreensidebar implements OnInit {
       label: 'Financials', icon: 'pi pi-file-excel',
       items: [
         { label: 'P&L Statement', icon: 'pi pi-chart-line', routerLink: ['/financials'] },
+        { label: 'Sales', icon: 'pi pi-chart-line', routerLink: ['/sales'] },
       ]
     },
     // -----------------------------------------------------

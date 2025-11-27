@@ -7,6 +7,8 @@ import { LedgerComponent } from './modules/Ledger/ledger/ledger';
 import { NotesPageComponent } from './modules/dashboard/components/notes-page.component';
 import { NotFoundComponent } from './modules/shared/components/notfound/notfound.component';
 import { LogsComponent } from './modules/transactions/logs/logs';
+import { SalesListComponent } from './modules/sales/sales-list/sales-list';
+import { Sessions } from './modules/auth/sessions/sessions/sessions';
 
 export const routes: Routes = [
   // ==========================================================
@@ -71,8 +73,16 @@ export const routes: Routes = [
         component: Transactions,
       },
       {
+        path: 'sessions',
+        component: Sessions,
+      },
+      {
         path: 'logs',
         component: LogsComponent,
+      },
+      {
+        path: 'sales',
+        component: SalesListComponent,
       },
 
       // --- MODULES ---

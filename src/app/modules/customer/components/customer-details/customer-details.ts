@@ -2,17 +2,19 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { of } from 'rxjs'; 
-import { catchError, finalize, delay } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 
 // PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
 import { TagModule } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
-import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
+
+// Shared Grid
+import { SharedGridComponent } from '../../../shared/AgGrid/grid/shared-grid/shared-grid.component';
 
 // Services & Components
 import { CustomerService } from '../../services/customer-service';
@@ -37,11 +39,11 @@ type TabType = 'ledger' | 'invoices' | 'payments';
     AvatarModule,
     TagModule,
     SkeletonModule,
-    TableModule,
     TooltipModule,
     DialogModule,
     ToastModule,
-    CustomerTransactions
+    CustomerTransactions,
+    SharedGridComponent
   ],
   providers: [CustomerService, InvoiceService, PaymentService, FinancialService],
   templateUrl: './customer-details.html',
@@ -59,37 +61,39 @@ export class CustomerDetails implements OnInit {
   public common = inject(CommonMethodService);
 
   // --- State Signals ---
-  
-  // 1. Profile State (Critical)
   loadingProfile = signal(true);
-  isError = signal(false); // New: Tracks critical load failures
+  isError = signal(false);
   customerId = signal<string | null>(null);
   customer = signal<any | null>(null);
 
-  // 2. Tab State (Lazy Loaded)
+  // Tab State
   activeTab = signal<TabType>('ledger');
-  
-  // Track loading/loaded status for each tab to prevent re-fetching
   tabStatus = {
     ledger:   { loaded: false, loading: false, error: false },
     invoices: { loaded: false, loading: false, error: false },
     payments: { loaded: false, loading: false, error: false }
   };
 
-  // 3. Data Signals
+  // Data Signals (For Grid)
   invoices = signal<any[]>([]);
   payments = signal<any[]>([]);
   ledgerHistory = signal<any[]>([]);
 
-  // 4. Dialogs
+  // Column Definitions
+  ledgerColumns: any[] = [];
+  invoiceColumns: any[] = [];
+  paymentColumns: any[] = [];
+
+  // Dialogs
   showTransactionsDialog = false;
 
-  // 5. Derived Stats
+  // Stats
   closingBalance = signal(0);
   totalInvoiced = computed(() => this.invoices().reduce((acc, inv) => acc + (inv.grandTotal || 0), 0));
   totalPaid = computed(() => this.payments().reduce((acc, pay) => acc + (pay.amount || 0), 0));
 
   ngOnInit(): void {
+    this.initColumns();
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (!id) {
@@ -101,7 +105,71 @@ export class CustomerDetails implements OnInit {
     });
   }
 
-  // --- Step 1: Load Critical Profile Data ---
+  initColumns() {
+    // 1. Ledger Columns
+    this.ledgerColumns = [
+      { 
+        field: 'date', headerName: 'Date', sortable: true, width: 120,
+        valueFormatter: (p: any) => this.common.formatDate(p.value) 
+      },
+      { field: 'description', headerName: 'Description', sortable: true, flex: 2 },
+      { 
+        field: 'type', headerName: 'Type', width: 100,
+        cellClass: (p: any) => p.value === 'credit' ? 'text-green-600 font-bold uppercase text-xs' : 'text-red-600 font-bold uppercase text-xs'
+      },
+      { 
+        field: 'amount', headerName: 'Amount', type: 'rightAligned', width: 130,
+        valueFormatter: (p: any) => this.common.formatCurrency(p.value),
+        cellStyle: { fontWeight: 'bold' }
+      },
+      { 
+        field: 'balance', headerName: 'Balance', type: 'rightAligned', width: 130,
+        valueFormatter: (p: any) => this.common.formatCurrency(p.value),
+        cellStyle: { color: 'var(--text-secondary)' }
+      }
+    ];
+
+    // 2. Invoice Columns
+    this.invoiceColumns = [
+      { 
+        field: 'invoiceNumber', headerName: 'Invoice #', sortable: true, width: 150,
+        cellStyle: { color: 'var(--accent-primary)', fontWeight: 'bold', cursor: 'pointer' }
+      },
+      { 
+        field: 'invoiceDate', headerName: 'Date', sortable: true, width: 120,
+        valueFormatter: (p: any) => this.common.formatDate(p.value) 
+      },
+      { 
+        field: 'paymentStatus', headerName: 'Status', width: 120,
+        cellClass: (p: any) => this.getStatusClass(p.value)
+      },
+      { 
+        field: 'grandTotal', headerName: 'Total', type: 'rightAligned', width: 130,
+        valueFormatter: (p: any) => this.common.formatCurrency(p.value)
+      },
+      { 
+        field: 'balanceAmount', headerName: 'Due', type: 'rightAligned', width: 130,
+        valueFormatter: (p: any) => this.common.formatCurrency(p.value),
+        cellStyle: (p: any) => p.value > 0 ? { color: 'var(--color-error)', fontWeight: 'bold' } : { color: 'var(--color-success)' }
+      }
+    ];
+
+    // 3. Payment Columns
+    this.paymentColumns = [
+      { 
+        field: 'paymentDate', headerName: 'Date', sortable: true, width: 120,
+        valueFormatter: (p: any) => this.common.formatDate(p.value) 
+      },
+      { field: 'paymentMethod', headerName: 'Mode', width: 120, valueFormatter: (p:any) => (p.value || '').toUpperCase() },
+      { field: 'transactionId', headerName: 'Reference ID', width: 150 },
+      { 
+        field: 'amount', headerName: 'Amount', type: 'rightAligned', width: 130,
+        valueFormatter: (p: any) => this.common.formatCurrency(p.value),
+        cellStyle: { color: 'var(--color-success)', fontWeight: 'bold' }
+      }
+    ];
+  }
+
   loadProfile(id: string): void {
     this.loadingProfile.set(true);
     this.isError.set(false);
@@ -109,8 +177,7 @@ export class CustomerDetails implements OnInit {
     this.customerService.getCustomerDataWithId(id)
       .pipe(
         catchError(err => {
-          console.error('Profile Load Error:', err);
-          this.isError.set(true); // Set error state so UI can show retry button
+          this.isError.set(true);
           this.messageService.showError('Error', 'Could not load customer profile');
           return of(null);
         }),
@@ -120,124 +187,80 @@ export class CustomerDetails implements OnInit {
         if (res?.data) {
           const data = res.data.data || res.data;
           this.customer.set(data);
-          // Set initial balance from profile as fallback
           this.closingBalance.set(data.outstandingBalance || 0);
 
-          // 2. Once profile is safe, load default tab (Ledger)
-          // We verify customer ID exists before triggering tabs
           if (this.customer()?._id) {
              this.switchTab('ledger');
           }
         } else if (!this.isError()) {
-           // If response is success but data is missing
            this.isError.set(true);
         }
       });
   }
 
-  // --- Step 2: Lazy Load Tabs ---
   switchTab(tab: TabType) {
     this.activeTab.set(tab);
-
-    // If data is already loaded or currently loading, stop here.
-    if (this.tabStatus[tab].loaded || this.tabStatus[tab].loading) {
-      return;
-    }
-
+    if (this.tabStatus[tab].loaded || this.tabStatus[tab].loading) return;
     const id = this.customerId();
     if (!id) return;
 
     this.tabStatus[tab].loading = true;
-    this.tabStatus[tab].error = false;
 
-    switch (tab) {
-      case 'ledger':
-        this.fetchLedger(id);
-        break;
-      case 'invoices':
-        this.fetchInvoices(id);
-        break;
-      case 'payments':
-        this.fetchPayments(id);
-        break;
-    }
+    if (tab === 'ledger') this.fetchLedger(id);
+    else if (tab === 'invoices') this.fetchInvoices(id);
+    else if (tab === 'payments') this.fetchPayments(id);
   }
-
-  // --- Individual API Calls (Isolated Errors) ---
 
   private fetchLedger(id: string) {
     this.financialService.getCustomerLedger(id).pipe(
-      catchError(err => {
-        console.warn('Ledger Load Error', err);
-        this.tabStatus.ledger.error = true;
-        // Return safe default so the subscription doesn't crash
-        return of({ data: { history: [], closingBalance: 0 } });
-      }),
+      catchError(() => of({ data: { history: [], closingBalance: 0 } })),
       finalize(() => this.tabStatus.ledger.loading = false)
     ).subscribe((res: any) => {
       const data = res?.data || {};
       this.ledgerHistory.set(data.history || []);
-      
-      if (data.closingBalance !== undefined && data.closingBalance !== null) {
-        this.closingBalance.set(data.closingBalance);
-      }
+      if (data.closingBalance !== undefined) this.closingBalance.set(data.closingBalance);
       this.tabStatus.ledger.loaded = true;
     });
   }
 
   private fetchInvoices(id: string) {
     this.invoiceService.getInvoicesByCustomer(id).pipe(
-      catchError(err => {
-        console.warn('Invoice Load Error', err);
-        this.tabStatus.invoices.error = true;
-        return of({ data: [] });
-      }),
+      catchError(() => of({ data: [] })),
       finalize(() => this.tabStatus.invoices.loading = false)
     ).subscribe((res: any) => {
-      const list = res?.data?.invoices || res?.data || [];
-      this.invoices.set(list);
+      this.invoices.set(res?.data?.invoices || res?.data || []);
       this.tabStatus.invoices.loaded = true;
     });
   }
 
   private fetchPayments(id: string) {
     this.paymentService.getPaymentsByCustomer(id).pipe(
-      catchError(err => {
-        console.warn('Payment Load Error', err);
-        this.tabStatus.payments.error = true;
-        return of({ data: [] });
-      }),
+      catchError(() => of({ data: [] })),
       finalize(() => this.tabStatus.payments.loading = false)
     ).subscribe((res: any) => {
-      const list = res?.data?.payments || res?.data || [];
-      this.payments.set(list);
+      this.payments.set(res?.data?.payments || res?.data || []);
       this.tabStatus.payments.loaded = true;
     });
   }
 
-
-  // --- Actions ---
-
-  downloadInvoice(inv: any): void {
-    if (!inv?._id) return;
-    this.common.apiCall(
-      this.invoiceService.downloadInvoice(inv._id),
-      (res: any) => {
-        if (res?.body) this.common.downloadBlob(res.body, `invoice-${inv.invoiceNumber}.pdf`);
-      }, 'Download Invoice'
-    );
+  // --- Grid Events ---
+  onGridEvent(event: any, type: TabType) {
+    if (event.eventType === 'RowSelectedEvent' && type === 'invoices') {
+       const invoiceId = event.event.data._id;
+       this.router.navigate(['/invoices', invoiceId]);
+    }
   }
 
-  downloadReceipt(pay: any): void {
-    if (!pay?._id) return;
-    this.common.apiCall(
-      this.paymentService.downloadReceipt(pay._id),
-      (res: any) => {
-        if (res?.body) this.common.downloadBlob(res.body, `receipt-${pay.transactionId}.pdf`);
-      }, 'Download Receipt'
-    );
+  // Helper for styling
+  getStatusClass(status: string) {
+    switch(status?.toLowerCase()) {
+      case 'paid': return 'text-green-600 bg-green-50 px-2 py-1 rounded uppercase text-xs font-bold';
+      case 'partial': return 'text-orange-600 bg-orange-50 px-2 py-1 rounded uppercase text-xs font-bold';
+      default: return 'text-red-600 bg-red-50 px-2 py-1 rounded uppercase text-xs font-bold';
+    }
   }
 
+  // --- File Upload & Actions ---
   onFileSelected(event: any): void {
     const file: File = event.target.files[0];
     if (file && this.customer()?._id) {
@@ -255,19 +278,17 @@ export class CustomerDetails implements OnInit {
       );
     }
   }
-  
-  // Helper to manually retry loading profile
+
   retryLoad() {
-    if(this.customerId()) {
-      this.loadProfile(this.customerId()!);
-    }
+    if(this.customerId()) this.loadProfile(this.customerId()!);
   }
 }
+
 // import { Component, OnInit, inject, signal, computed } from '@angular/core';
 // import { CommonModule } from '@angular/common';
 // import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 // import { of } from 'rxjs'; 
-// import { catchError, finalize } from 'rxjs/operators';
+// import { catchError, finalize, delay } from 'rxjs/operators';
 
 // // PrimeNG Imports
 // import { ButtonModule } from 'primeng/button';
@@ -277,6 +298,7 @@ export class CustomerDetails implements OnInit {
 // import { TableModule } from 'primeng/table';
 // import { TooltipModule } from 'primeng/tooltip';
 // import { DialogModule } from 'primeng/dialog';
+// import { ToastModule } from 'primeng/toast';
 
 // // Services & Components
 // import { CustomerService } from '../../services/customer-service';
@@ -304,6 +326,7 @@ export class CustomerDetails implements OnInit {
 //     TableModule,
 //     TooltipModule,
 //     DialogModule,
+//     ToastModule,
 //     CustomerTransactions
 //   ],
 //   providers: [CustomerService, InvoiceService, PaymentService, FinancialService],
@@ -325,6 +348,8 @@ export class CustomerDetails implements OnInit {
   
 //   // 1. Profile State (Critical)
 //   loadingProfile = signal(true);
+//   isError = signal(false); // New: Tracks critical load failures
+//   customerId = signal<string | null>(null);
 //   customer = signal<any | null>(null);
 
 //   // 2. Tab State (Lazy Loaded)
@@ -332,9 +357,9 @@ export class CustomerDetails implements OnInit {
   
 //   // Track loading/loaded status for each tab to prevent re-fetching
 //   tabStatus = {
-//     ledger:   { loaded: false, loading: false },
-//     invoices: { loaded: false, loading: false },
-//     payments: { loaded: false, loading: false }
+//     ledger:   { loaded: false, loading: false, error: false },
+//     invoices: { loaded: false, loading: false, error: false },
+//     payments: { loaded: false, loading: false, error: false }
 //   };
 
 //   // 3. Data Signals
@@ -346,7 +371,6 @@ export class CustomerDetails implements OnInit {
 //   showTransactionsDialog = false;
 
 //   // 5. Derived Stats
-//   // We use the ledger's closing balance if available, otherwise 0
 //   closingBalance = signal(0);
 //   totalInvoiced = computed(() => this.invoices().reduce((acc, inv) => acc + (inv.grandTotal || 0), 0));
 //   totalPaid = computed(() => this.payments().reduce((acc, pay) => acc + (pay.amount || 0), 0));
@@ -358,18 +382,21 @@ export class CustomerDetails implements OnInit {
 //         this.router.navigate(['/customer']);
 //         return;
 //       }
-//       // 1. Load Profile Immediately
+//       this.customerId.set(id);
 //       this.loadProfile(id);
 //     });
 //   }
 
 //   // --- Step 1: Load Critical Profile Data ---
-//   private loadProfile(id: string): void {
+//   loadProfile(id: string): void {
 //     this.loadingProfile.set(true);
+//     this.isError.set(false);
 
 //     this.customerService.getCustomerDataWithId(id)
 //       .pipe(
 //         catchError(err => {
+//           console.error('Profile Load Error:', err);
+//           this.isError.set(true); // Set error state so UI can show retry button
 //           this.messageService.showError('Error', 'Could not load customer profile');
 //           return of(null);
 //         }),
@@ -383,7 +410,13 @@ export class CustomerDetails implements OnInit {
 //           this.closingBalance.set(data.outstandingBalance || 0);
 
 //           // 2. Once profile is safe, load default tab (Ledger)
-//           this.switchTab('ledger'); 
+//           // We verify customer ID exists before triggering tabs
+//           if (this.customer()?._id) {
+//              this.switchTab('ledger');
+//           }
+//         } else if (!this.isError()) {
+//            // If response is success but data is missing
+//            this.isError.set(true);
 //         }
 //       });
 //   }
@@ -397,21 +430,21 @@ export class CustomerDetails implements OnInit {
 //       return;
 //     }
 
-//     const customerId = this.customer()?._id;
-//     if (!customerId) return;
+//     const id = this.customerId();
+//     if (!id) return;
 
-//     // Trigger specific fetch
 //     this.tabStatus[tab].loading = true;
+//     this.tabStatus[tab].error = false;
 
 //     switch (tab) {
 //       case 'ledger':
-//         this.fetchLedger(customerId);
+//         this.fetchLedger(id);
 //         break;
 //       case 'invoices':
-//         this.fetchInvoices(customerId);
+//         this.fetchInvoices(id);
 //         break;
 //       case 'payments':
-//         this.fetchPayments(customerId);
+//         this.fetchPayments(id);
 //         break;
 //     }
 //   }
@@ -420,16 +453,18 @@ export class CustomerDetails implements OnInit {
 
 //   private fetchLedger(id: string) {
 //     this.financialService.getCustomerLedger(id).pipe(
-//       catchError(() => {
-//         // Silent fail - just show empty table
+//       catchError(err => {
+//         console.warn('Ledger Load Error', err);
+//         this.tabStatus.ledger.error = true;
+//         // Return safe default so the subscription doesn't crash
 //         return of({ data: { history: [], closingBalance: 0 } });
 //       }),
 //       finalize(() => this.tabStatus.ledger.loading = false)
 //     ).subscribe((res: any) => {
-//       const data = res.data || {};
+//       const data = res?.data || {};
 //       this.ledgerHistory.set(data.history || []);
-//       // Update balance with accurate ledger data
-//       if (data.closingBalance !== undefined) {
+      
+//       if (data.closingBalance !== undefined && data.closingBalance !== null) {
 //         this.closingBalance.set(data.closingBalance);
 //       }
 //       this.tabStatus.ledger.loaded = true;
@@ -438,10 +473,14 @@ export class CustomerDetails implements OnInit {
 
 //   private fetchInvoices(id: string) {
 //     this.invoiceService.getInvoicesByCustomer(id).pipe(
-//       catchError(() => of({ data: [] })),
+//       catchError(err => {
+//         console.warn('Invoice Load Error', err);
+//         this.tabStatus.invoices.error = true;
+//         return of({ data: [] });
+//       }),
 //       finalize(() => this.tabStatus.invoices.loading = false)
 //     ).subscribe((res: any) => {
-//       const list = res.data?.invoices || res.data || [];
+//       const list = res?.data?.invoices || res?.data || [];
 //       this.invoices.set(list);
 //       this.tabStatus.invoices.loaded = true;
 //     });
@@ -449,10 +488,14 @@ export class CustomerDetails implements OnInit {
 
 //   private fetchPayments(id: string) {
 //     this.paymentService.getPaymentsByCustomer(id).pipe(
-//       catchError(() => of({ data: [] })),
+//       catchError(err => {
+//         console.warn('Payment Load Error', err);
+//         this.tabStatus.payments.error = true;
+//         return of({ data: [] });
+//       }),
 //       finalize(() => this.tabStatus.payments.loading = false)
 //     ).subscribe((res: any) => {
-//       const list = res.data?.payments || res.data || [];
+//       const list = res?.data?.payments || res?.data || [];
 //       this.payments.set(list);
 //       this.tabStatus.payments.loaded = true;
 //     });
@@ -496,6 +539,13 @@ export class CustomerDetails implements OnInit {
 //           }
 //         }, 'Upload Photo'
 //       );
+//     }
+//   }
+  
+//   // Helper to manually retry loading profile
+//   retryLoad() {
+//     if(this.customerId()) {
+//       this.loadProfile(this.customerId()!);
 //     }
 //   }
 // }

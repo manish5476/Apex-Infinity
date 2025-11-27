@@ -32,7 +32,7 @@ export class ProductService extends BaseApiService {
   // PATCH /v1/products/:id/upload
   uploadProductFile(productId: string, formData: FormData): Observable<any> {
     const url = `${this.baseUrl}${this.endpoint}/${productId}/upload`;
-    
+
     // 1. Use standard http.patch
     // 2. Use the fixed catchAndHandle
     return this.http.patch(url, formData)
@@ -48,6 +48,15 @@ export class ProductService extends BaseApiService {
     const url = `${this.baseUrl}${this.endpoint}/bulk-import`;
     return this.http.post(url, formData)
       .pipe(this.catchAndHandle('bulkImportProducts'));
+  }
+
+  bulkProductUpdate(formData: FormData): Observable<any> {
+    const url = `${this.baseUrl}${this.endpoint}/bulk-update`;
+    return this.http.post(url, formData).pipe(this.catchAndHandle('bulkImportProducts'));
+  }
+  ProductsStockAdjustment(formData: FormData): Observable<any> {
+    const url = `${this.baseUrl}${this.endpoint}/:id/stock-adjust`;
+    return this.http.post(url, formData).pipe(this.catchAndHandle('bulkImportProducts'));
   }
 
   // ================= DELETE =================
