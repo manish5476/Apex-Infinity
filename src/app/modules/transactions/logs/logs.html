@@ -1,0 +1,53 @@
+<p-toast></p-toast>
+
+<div class="list-page-container">
+
+  <div class="list-header">
+    <h2 class="list-title">
+      <i class="pi pi-file text-[var(--accent-primary)]"></i>
+      System Logs
+    </h2>
+  </div>
+
+  <div class="themed-card list-content-area">
+
+    <!-- FILTER BAR -->
+    <div class="se-filter-bar">
+
+      <div class="se-filter-field">
+        <label for="file">Log File</label>
+        <p-select id="file" [options]="logFiles" [(ngModel)]="filters.file" placeholder="Select File"
+          (onChange)="applyFilters()">
+        </p-select>
+      </div>
+
+      <div class="se-filter-field">
+        <label for="search">Search</label>
+        <input id="search" type="text" pInputText [(ngModel)]="filters.search" (keydown.enter)="applyFilters()"
+          placeholder="Search text..." />
+      </div>
+
+      <div class="se-filter-field">
+        <label>Date Range</label>
+        <p-datepicker [(ngModel)]="dateRange" selectionMode="range" [showIcon]="true" appendTo="body"
+          (onClose)="applyFilters()">
+        </p-datepicker>
+      </div>
+
+      <div class="se-filter-actions">
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined" (onClick)="resetFilters()">
+        </p-button>
+      </div>
+
+    </div>
+
+    <!-- LOG VIEW -->
+    <div class="list-grid-wrapper">
+      <app-shared-grid [data]="logs" [gridHeight]="'400px'" [headerFilter]="false" [rowSelectionMode]="'single'"
+        [column]="column">
+      </app-shared-grid>
+       <!-- (gridReady)="onGridReady($event)" -->
+    </div>
+
+  </div>
+</div>

@@ -6,6 +6,7 @@ import { Transactions } from './modules/transactions/transactions/transactions';
 import { LedgerComponent } from './modules/Ledger/ledger/ledger';
 import { NotesPageComponent } from './modules/dashboard/components/notes-page.component';
 import { NotFoundComponent } from './modules/shared/components/notfound/notfound.component';
+import { LogsComponent } from './modules/transactions/logs/logs';
 
 export const routes: Routes = [
   // ==========================================================
@@ -68,6 +69,10 @@ export const routes: Routes = [
       {
         path: 'transactions',
         component: Transactions,
+      },
+      {
+        path: 'logs',
+        component: LogsComponent,
       },
 
       // --- MODULES ---

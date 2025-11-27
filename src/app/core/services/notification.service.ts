@@ -1,7 +1,9 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Inject, Injectable, OnDestroy } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { AuthService } from '../../modules/auth/services/auth-service';
+import { AppMessageService } from './message.service';
 
 export interface NotificationData {
   _id?: string;
@@ -20,6 +22,8 @@ export class NotificationService implements OnDestroy {
   private readonly serverUrl = environment.socketUrl; // e.g., http://localhost:5000
   private notifications = new BehaviorSubject<NotificationData[]>([]);
   public notifications$ = this.notifications.asObservable();
+private authService=Inject(AuthService)
+private messageService=Inject(AppMessageService)
 
 
   connect(userId: string): void {
@@ -55,7 +59,16 @@ export class NotificationService implements OnDestroy {
     this.socket.on('disconnect', (reason) => {
       console.warn('⚠️ Socket disconnected:', reason);
     });
+
+    this.socket.on('forceLogout', (payload) => {
+      // if payload.sessionId matches current session (or always), logout
+      this.authService.logout(); // clears token and navigates to login
+      this.messageService.showError('Session ended', 'You were logged out from another device or admin revoked your session.');
+    });
+
   }
+
+
 
   /**
    * Marks a notification as read locally (for UI).
