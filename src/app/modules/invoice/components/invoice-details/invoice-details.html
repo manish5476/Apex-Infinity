@@ -84,9 +84,9 @@
             <h3><i class="pi pi-user"></i> Billed To</h3>
           </div>
           <div class="card-body">
-            <div class="name">{{ inv.customer?.name || 'Unknown Customer' }}</div>
-            <div class="text">{{ inv.customer?.email }}</div>
-            <div class="text">{{ inv.customer?.phone }}</div>
+            <div class="name">{{ inv.customerId?.name || 'Unknown customerId' }}</div>
+            <div class="text">{{ inv.customerId?.email }}</div>
+            <div class="text">{{ inv.customerId?.phone }}</div>
             <div class="address">{{ inv.billingAddress || 'No billing address' }}</div>
           </div>
         </div>
