@@ -42,6 +42,10 @@ export class ApiService extends BaseApiService {
   login(credentials: any): Observable<LoginResponse> {
     return this.post<LoginResponse>('/v1/auth/login', credentials, 'login');
   }
+  
+  logOut(): Observable<LoginResponse> {
+    return this.post<LoginResponse>('/v1/auth/logout', {}, 'logout');
+  }
 
   employeeSignup(data: any): Observable<any> {
     return this.post('/v1/auth/signup', data, 'employeeSignup');

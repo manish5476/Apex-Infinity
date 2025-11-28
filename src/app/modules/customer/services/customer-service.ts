@@ -30,6 +30,11 @@ export class CustomerService extends BaseApiService {
   reStoreCustomer(customerId: string, data: any): Observable<any> {
     return this.patch(`${this.endpoint}/${customerId}/restore`, data, 'reStoreCustomer');
   }
+  
+  //  const { creditLimit } = req.body;
+  customerCreditlimit(customerId: string, data: any): Observable<any> {
+    return this.patch(`${this.endpoint}/${customerId}/credit-limit`, data, 'customerCreditlimit');
+  }
 
   deleteCustomerID(customerId: string): Observable<any> {
     return this.delete(`${this.endpoint}/${customerId}`, 'deleteCustomerID');

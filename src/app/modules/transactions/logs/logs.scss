@@ -4,8 +4,6 @@
     width: 100%;
 }
 
-/* ------------------------------ PAGE LAYOUT ------------------------------ */
-
 .list-page-container {
     display: flex;
     flex-direction: column;
@@ -26,14 +24,12 @@
         align-items: center;
         gap: 0.5rem;
         margin: 0;
-
+        
         i {
             font-size: 1.4rem;
         }
     }
 }
-
-/* ------------------------------ CARD ------------------------------ */
 
 .themed-card {
     background: var(--surface-card, #fff);
@@ -46,8 +42,6 @@
     flex: 1;
     overflow: hidden;
 }
-
-/* ------------------------------ FILTER BAR ------------------------------ */
 
 .se-filter-bar {
     display: flex;
@@ -74,46 +68,13 @@
     }
 }
 
-/* ------------------------------ GRID WRAPPER ------------------------------ */
-
 .list-grid-wrapper {
     flex: 1;
-    min-height: 0;
-
-    /* Force shared-grid full height */
+    min-height: 0; /* Important for grid scrolling */
+    
+    /* Ensure the grid takes full height */
     ::ng-deep app-shared-grid {
         height: 100%;
         display: block;
     }
-}
-
-/* ------------------------------ LOG-SPECIFIC TWEAKS ------------------------------ */
-
-/* Make long log messages readable */
-::ng-deep .ag-cell {
-    white-space: normal !important;
-    line-height: 1.3;
-    padding-top: 6px !important;
-    padding-bottom: 6px !important;
-}
-
-/* Auto height for message rows */
-::ng-deep .ag-row {
-    height: auto !important;
-}
-
-/* Highlight error, warn, info levels */
-::ng-deep .log-cell-info {
-    color: #0047b3;
-    font-weight: 600;
-}
-
-::ng-deep .log-cell-warn {
-    color: #b36b00;
-    font-weight: 600;
-}
-
-::ng-deep .log-cell-error {
-    color: #b30000;
-    font-weight: 700;
 }

@@ -1,0 +1,59 @@
+<div class="list-page-container">
+
+  <!-- HEADER -->
+  <div class="list-header">
+    <h2 class="list-title">
+      <i class="pi pi-chart-line text-[var(--accent-primary)]"></i>
+      Sales Register
+    </h2>
+    <p-button label="New Sale" icon="pi pi-plus" (onClick)="onCreateSales()">
+    </p-button>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="themed-card">
+    <div class="se-filter-bar">
+
+      <!-- Search Input -->
+      <div class="se-filter-field" style="flex: 2">
+        <label for="search">Search</label>
+        <input id="search" type="text" pInputText [formControl]="searchControl"
+          placeholder="Search Invoice # or Customer Name..." />
+      </div>
+
+      <!-- Payment Status -->
+      <div class="se-filter-field">
+        <label for="payStatus">Payment Status</label>
+        <p-select appendTo="body" id="payStatus" [options]="paymentStatusOptions"
+          [(ngModel)]="salesFilter.paymentStatus" [showClear]="true" placeholder="All Status" styleClass="w-full">
+        </p-select>
+      </div>
+
+      <!-- Order Status -->
+      <div class="se-filter-field">
+        <label for="status">Order Status</label>
+        <p-select appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="salesFilter.status"
+          [showClear]="true" placeholder="All Orders" styleClass="w-full">
+        </p-select>
+      </div>
+
+      <!-- Actions -->
+      <div class="se-filter-actions">
+        <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()">
+        </p-button>
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined" (onClick)="resetFilters()">
+        </p-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRID AREA -->
+  <div class="list-grid-area themed-card">
+    <app-shared-grid [data]="this.data" [gridHeight]="'210px'" [headerFilter]="false"
+      [rowSelectionMode]="rowSelectionMode" [GridName]="'SalesRegisterList'" [column]="column"
+      (eventFromGrid)="eventFromGrid($event)" (gridReady)="onGridReady($event)"
+      (scrolledToBottom)="onScrolledToBottom($event)">
+    </app-shared-grid>
+  </div>
+
+</div>

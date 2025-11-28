@@ -18,10 +18,9 @@ export class TransactionService extends BaseApiService {
     return this.get(`/v1/partytransactions/suppliers/${supplierId}/transactions`, filterParams, 'getSupplierTransactions');
   }
 
-  // getCustomerTransactions(customerId: string): Observable<any> {
-  //   return this.get(`/v1/partytransactions/customers/${customerId}/transactions`, {}, 'getCustomerTransactions');
-  // }
-
+    getLogs(params: any): Observable<any> {
+    return this.get('/v1/logs', params, 'Logs');
+  }
   // getSupplierTransactions(supplierId: string): Observable<any> {
   //   return this.get(`/v1/partytransactions/suppliers/${supplierId}/transactions`, {}, 'getSupplierTransactions');
   // }

@@ -9,7 +9,6 @@ export class UserManagementService extends BaseApiService {
   // ============================================================
   // =============== USER SELF-SERVICE ROUTES ====================
   // ============================================================
-
   /** PATCH /v1/users/me — Update profile */
   updateMyProfile(data: any): Observable<any> {
     return this.patch('/v1/users/me', data, 'updateMyProfile');
@@ -56,6 +55,18 @@ export class UserManagementService extends BaseApiService {
   /** DELETE /v1/users/:id — Admin: Soft delete a user */
   deleteUser(id: string): Observable<any> {
     return this.delete(`/v1/users/${id}`, 'deleteUser');
+  }
+
+  getSearchUser(): Observable<any> {
+    return this.get('/v1/users/search', {}, 'getAllUsers');
+  }
+  
+  deActivateUserAccount(id: string): Observable<any> {
+    return this.patch(`/v1/users/${id}/deactivate`, {}, 'deActivateUserAccount');
+  }
+
+ activateUser(id: string): Observable<any> {
+    return this.patch(`/v1/users/${id}/activate`, {}, 'activateUSer');
   }
 
 
