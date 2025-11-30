@@ -170,7 +170,6 @@ export class Transactions implements OnInit {
   }
   
   getColumn(): void {
-      // ... your existing getColumn logic
       this.column = [
       {
         field: 'date', headerName: 'Date', sortable: true, width: 180,

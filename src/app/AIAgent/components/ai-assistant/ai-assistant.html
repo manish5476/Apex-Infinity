@@ -3,19 +3,18 @@
 </div>
 
 <div class="chat-window" *ngIf="isOpen">
-  
+
   <div class="chat-header">
     <h3>CRM Assistant</h3>
     <span class="status-dot"></span>
   </div>
 
   <div class="chat-body" #scrollContainer>
-    <div *ngFor="let msg of messages" 
-         [class.message-user]="msg.sender === 'user'"
-         [class.message-bot]="msg.sender === 'bot'">
-      
+    <div *ngFor="let msg of messages" [class.message-user]="msg.sender === 'user'"
+      [class.message-bot]="msg.sender === 'bot'">
+
       <div class="bubble">
-        <span [innerHTML]="msg.text"></span> 
+        <span [innerHTML]="msg.text"></span>
       </div>
       <div class="time">{{ msg.timestamp | date:'shortTime' }}</div>
     </div>
@@ -28,12 +27,7 @@
   </div>
 
   <div class="chat-footer">
-    <input 
-      [(ngModel)]="userMessage" 
-      (keyup.enter)="sendMessage()" 
-      placeholder="Ask about sales, stock..." 
-      type="text"
-    >
+    <input [(ngModel)]="userMessage" (keyup.enter)="sendMessage()" placeholder="Ask about sales, stock..." type="text">
     <button (click)="sendMessage()" [disabled]="isLoading || !userMessage">➤</button>
   </div>
 </div>

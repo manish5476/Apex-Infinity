@@ -1,6 +1,478 @@
 <p-confirmDialog icon="pi pi-exclamation-triangle"></p-confirmDialog>
 <p-toast></p-toast>
 
+<div class="notes-manager-host" [class.focus-mode]="isFocusMode">
+
+  <!-- GLOBAL TOOLBAR -->
+  <div class="notes-toolbar">
+    <div class="toolbar-left">
+      <div class="title-block">
+        <h1 class="notes-title">Notes</h1>
+        <div class="notes-subtitle">
+          <span class="scope-label">{{ activeScopeLabel }}</span>
+          <span class="dot-separator">•</span>
+          <span class="scope-count">{{ totalNotesInScope }} {{ totalNotesInScope === 1 ? 'note' : 'notes' }}</span>
+
+          @if (lastUpdatedLabel) {
+            <span class="dot-separator">•</span>
+            <span class="last-updated">Last updated {{ lastUpdatedLabel }}</span>
+          }
+
+          @if (attachmentsCount > 0) {
+            <span class="dot-separator">•</span>
+            <span class="attachments-count">
+              <i class="pi pi-paperclip mr-1"></i>{{ attachmentsCount }} attachment{{ attachmentsCount > 1 ? 's' : '' }}
+            </span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="toolbar-right">
+      <div class="shortcut-hints">
+        <span class="kbd-chip">Ctrl</span><span class="kbd-plus">+</span><span class="kbd-chip">N</span>
+        <span class="hint-label">New</span>
+        <span class="hint-divider"></span>
+        <span class="kbd-chip">Ctrl</span><span class="kbd-plus">+</span><span class="kbd-chip">S</span>
+        <span class="hint-label">Save</span>
+      </div>
+
+      <button
+        pButton
+        type="button"
+        icon="pi" 
+        [icon]="isFocusMode ? 'pi pi-clone' : 'pi pi-arrows-h'"
+        class="p-button-text p-button-rounded p-button-sm focus-btn"
+        pTooltip="Toggle focus mode (hide/show list)"
+        (click)="toggleFocusMode()">
+      </button>
+
+      <button
+        pButton
+        type="button"
+        icon="pi pi-refresh"
+        class="p-button-text p-button-sm"
+        (click)="refreshCurrentView()"
+        pTooltip="Refresh notes">
+      </button>
+
+      <button
+        pButton
+        icon="pi pi-plus"
+        label="New"
+        class="p-button-sm p-button-rounded primary-new-btn"
+        (click)="startNewNote()">
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN BODY WITH TABS -->
+  <p-tabs [(value)]="activeTabValue" (onChange)="onTabChange($event)">
+    <p-tablist>
+      <p-tab value="day" class="flex items-center !gap-2">
+        <i class="pi pi-calendar"></i>
+        <span class="font-bold whitespace-nowrap">Day</span>
+      </p-tab>
+
+      @for (summary of summaries; track summary.key) {
+        <p-tab [value]="summary.key" class="flex items-center !gap-2">
+          <i [class]="summary.icon"></i>
+          <span class="font-bold whitespace-nowrap">{{ summary.title }}</span>
+        </p-tab>
+      }
+    </p-tablist>
+
+    <p-tabpanels>
+      <!-- ========== DAY VIEW (WRITE MODE) ========== -->
+      <p-tabpanel value="day">
+        <div class="notes-layout">
+
+          <!-- SIDEBAR -->
+          <div class="notes-sidebar" *ngIf="!isFocusMode">
+            <div class="sidebar-header">
+              <h2 class="section-title">Daily Notes</h2>
+              <div class="header-actions">
+                <button
+                  pButton
+                  type="button"
+                  icon="pi pi-filter"
+                  class="p-button-text p-button-sm hidden md:inline-flex"
+                  pTooltip="Search by title/content only (for now)">
+                </button>
+              </div>
+            </div>
+
+            <div class="sidebar-content">
+              <div class="search-bar">
+                <span class="p-input-icon-left w-full">
+                  <i class="pi pi-search"></i>
+                  <input
+                    type="text"
+                    pInputText
+                    placeholder="Search in today’s notes..."
+                    class="w-full p-inputtext-sm"
+                    [formControl]="searchControl" />
+                </span>
+              </div>
+
+              <div class="notes-list-wrapper">
+                @if (isLoading.day) {
+                  <div class="skeleton-loader">
+                    @for (item of [1, 2, 3, 4, 5]; track item) {
+                      <div class="skeleton-card"></div>
+                    }
+                  </div>
+                } @else {
+                  @if (filteredDailyNotes.length > 0) {
+                    <div class="notes-list">
+                      @for (note of filteredDailyNotes; track note._id) {
+                        <div
+                          class="note-card"
+                          [class.active]="selectedNote?._id === note._id"
+                          (click)="selectNote(note)">
+                          <div class="note-card-border"></div>
+                          <div class="note-card-content">
+                            <div class="note-card-header">
+                              <h3 class="note-title">
+                                {{ note.title || 'Untitled Note' }}
+                              </h3>
+                              <span
+                                class="note-status-pill"
+                                [class.locked]="!isEditable(note)">
+                                <span class="status-dot"></span>
+                                {{ isEditable(note) ? 'Editable' : 'Locked' }}
+                              </span>
+                            </div>
+
+                            <p class="note-excerpt">
+                              {{ note.content | slice: 0: 80 }}{{ note.content.length > 80 ? '...' : '' }}
+                            </p>
+
+                            <div class="note-meta">
+                              <span class="note-date">
+                                {{ note.createdAt | date: 'shortTime' }}
+                              </span>
+
+                              <div class="note-meta-right">
+                                @if (note.tags && note.tags.length > 0) {
+                                  <div class="note-tags">
+                                    <i class="pi pi-tag"></i>
+                                    <span>{{ note.tags.length }}</span>
+                                  </div>
+                                }
+                                @if (note.attachments && note.attachments.length > 0) {
+                                  <div class="note-tags">
+                                    <i class="pi pi-paperclip"></i>
+                                  </div>
+                                }
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <ng-container *ngTemplateOutlet="emptyState"></ng-container>
+                  }
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- EDITOR -->
+          <div class="note-editor-panel">
+            <form [formGroup]="noteForm" (ngSubmit)="saveNote()" class="note-form">
+              <div class="editor-header">
+                <div class="editor-header-left">
+                  <input
+                    type="text"
+                    pInputText
+                    placeholder="Give your note a title..."
+                    formControlName="title"
+                    class="title-input" />
+                  <span class="date-indicator">
+                    {{ date['date'] | date: 'fullDate' }}
+                  </span>
+                </div>
+
+                <div class="editor-actions">
+                  <button
+                    pButton
+                    type="submit"
+                    label="Save"
+                    icon="pi pi-check"
+                    class="p-button-sm"
+                    [disabled]="
+                      noteForm.invalid ||
+                      isSaving ||
+                      (isEditing && !isEditable(selectedNote))
+                    "
+                    [loading]="isSaving">
+                  </button>
+
+                  @if (isEditing) {
+                    <button
+                      pButton
+                      type="button"
+                      icon="pi pi-trash"
+                      class="p-button-danger p-button-text p-button-sm"
+                      [disabled]="!isEditable(selectedNote)"
+                      (click)="deleteNote(selectedNote)">
+                    </button>
+                  }
+                </div>
+              </div>
+
+              <div class="editor-body">
+                <div class="editor-content">
+                  <textarea
+                    pInputTextarea
+                    placeholder="Capture today's important context, decisions or events..."
+                    formControlName="content"
+                    class="content-textarea">
+                  </textarea>
+                </div>
+
+                <div class="editor-sidebar">
+                  <div class="sidebar-section">
+                    <label><i class="pi pi-tags mr-2"></i>Tags</label>
+                    <p-autoComplete
+                      formControlName="tags"
+                      [multiple]="true"
+                      placeholder="Add tags (e.g. 'client', 'idea', 'bug')"
+                      class="w-full">
+                    </p-autoComplete>
+                  </div>
+
+                  <div class="sidebar-section">
+                    <label><i class="pi pi-paperclip mr-2"></i>Attachments</label>
+
+                    <div class="upload-controls mb-2">
+                      <button
+                        pButton
+                        type="button"
+                        icon="pi pi-plus"
+                        label="Add Image"
+                        class="p-button-outlined p-button-sm w-full"
+                        (click)="fileInput.click()">
+                      </button>
+                      <input
+                        #fileInput
+                        type="file"
+                        (change)="onFileSelect($event)"
+                        multiple
+                        accept="image/*"
+                        style="display: none;">
+                    </div>
+
+                    @if (imagePreviews.length > 0) {
+                      <div class="attachments-preview">
+                        @for (preview of imagePreviews; track i; let i = $index) {
+                          <div class="attachment-thumb local-preview">
+                            <img [src]="preview" alt="New Upload" />
+                            <div class="upload-badge">New</div>
+                            <button
+                              type="button"
+                              pButton
+                              icon="pi pi-times"
+                              class="remove-btn p-button-rounded p-button-danger p-button-text"
+                              (click)="removeLocalPreview(i)">
+                            </button>
+                          </div>
+                        }
+                      </div>
+                    }
+
+                    @if (noteForm.get('attachments')?.value?.length > 0) {
+                      <div class="attachments-preview">
+                        @for (att of noteForm.get('attachments')?.value; track i; let i = $index) {
+                          <div class="attachment-thumb">
+                            <img [src]="att.url" alt="Saved Attachment" />
+                            <button
+                              type="button"
+                              pButton
+                              icon="pi pi-times"
+                              class="remove-btn p-button-rounded p-button-danger p-button-text"
+                              (click)="removeServerAttachment(i)">
+                            </button>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </p-tabpanel>
+
+      <!-- ========== SUMMARY VIEWS (READ MODE) ========== -->
+      @for (summary of summaries; track summary.key) {
+        <p-tabpanel [value]="summary.key">
+          <div class="notes-layout summary-layout">
+
+            <!-- SIDEBAR LIST -->
+            <div class="notes-sidebar">
+              <div class="sidebar-header">
+                <h2 class="section-title">{{ summary.title }} Notes</h2>
+                <button
+                  pButton
+                  type="button"
+                  icon="pi pi-refresh"
+                  class="p-button-text p-button-sm"
+                  (click)="refreshCurrentView()">
+                </button>
+              </div>
+
+              <div class="sidebar-content">
+                <div class="notes-list-wrapper">
+                  @if (isLoading[summary.key]) {
+                    <div class="skeleton-loader">
+                      @for (item of [1, 2, 3, 4, 5]; track item) {
+                        <div class="skeleton-card"></div>
+                      }
+                    </div>
+                  } @else {
+                    @if (getSummaryData(summary.key).length > 0) {
+                      <div class="notes-list">
+                        @for (note of getSummaryData(summary.key); track note._id) {
+                          <div
+                            class="note-card"
+                            [class.active]="selectedNote?._id === note._id"
+                            (click)="selectNote(note)">
+                            <div class="note-card-border"></div>
+                            <div class="note-card-content">
+                              <div class="note-card-header">
+                                <h3 class="note-title">{{ note.title || 'Untitled' }}</h3>
+                                <span
+                                  class="note-status-pill"
+                                  [class.locked]="!isEditable(note)">
+                                  <span class="status-dot"></span>
+                                  {{ isEditable(note) ? 'Editable' : 'Locked' }}
+                                </span>
+                              </div>
+
+                              <p class="note-excerpt">
+                                {{ note.content | slice: 0: 100 }}...
+                              </p>
+
+                              <div class="note-meta">
+                                <span class="note-date">
+                                  {{ note.createdAt | date: 'short' }}
+                                </span>
+                                @if (isEditable(note)) {
+                                  <div class="note-actions">
+                                    <button
+                                      pButton
+                                      type="button"
+                                      icon="pi pi-trash"
+                                      class="p-button-danger p-button-text p-button-sm"
+                                      (click)="deleteNote(note, $event)"
+                                      pTooltip="Delete">
+                                    </button>
+                                  </div>
+                                }
+                              </div>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    } @else {
+                      <ng-container *ngTemplateOutlet="emptyState"></ng-container>
+                    }
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- PREVIEW PANEL -->
+            <div class="note-preview-panel">
+              @if (selectedNote; as note) {
+                <div class="preview-header">
+                  <div>
+                    <h2 class="section-title">{{ note.title || 'Untitled' }}</h2>
+                    <div class="preview-subtitle">
+                      {{ note.createdAt | date: 'fullDate' }}
+                    </div>
+                  </div>
+                  <div class="preview-actions">
+                    @if (isEditable(note)) {
+                      <button
+                        pButton
+                        type="button"
+                        icon="pi pi-pencil"
+                        label="Edit in Day View"
+                        class="p-button-sm p-button-outlined"
+                        (click)="activeTabValue = 'day'; loadDailyNotes()"
+                        pTooltip="Go to Day View to Edit">
+                      </button>
+                    }
+                  </div>
+                </div>
+
+                <div class="preview-content">
+                  @if (note.tags && note.tags.length > 0) {
+                    <div class="note-tags-preview">
+                      @for (tag of note.tags; track tag) {
+                        <span class="note-tag">{{ tag }}</span>
+                      }
+                    </div>
+                  }
+
+                  <p class="preview-text" [innerHTML]="note.content"></p>
+
+                  @if (note.attachments && note.attachments.length > 0) {
+                    <div class="attachments-gallery">
+                      <h4 class="gallery-title">Attachments</h4>
+                      <div class="gallery-grid">
+                        @for (att of note.attachments; track att.url) {
+                          <div class="attachment-link">
+                            <p-image [src]="att.url" [preview]="true" alt="Note Attachment" width="100%">
+                              <ng-template pTemplate="indicator">
+                                <i class="pi pi-search"></i>
+                              </ng-template>
+                            </p-image>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <ng-container *ngTemplateOutlet="noPreviewSelected"></ng-container>
+              }
+            </div>
+          </div>
+        </p-tabpanel>
+      }
+    </p-tabpanels>
+  </p-tabs>
+
+  <!-- EMPTY STATES -->
+  <ng-template #emptyState>
+    <div class="state-placeholder">
+      <i class="pi pi-inbox placeholder-icon"></i>
+      <span class="placeholder-text">No notes found.</span>
+      @if (activeTabValue === 'day') {
+        <span class="placeholder-subtext">Click 'New' or use Ctrl+N to start writing.</span>
+      }
+    </div>
+  </ng-template>
+
+  <ng-template #noPreviewSelected>
+    <div class="state-placeholder">
+      <i class="pi pi-file-edit placeholder-icon"></i>
+      <span class="placeholder-text">Select a note to view details</span>
+      <span class="placeholder-subtext">Use the list on the left to browse notes.</span>
+    </div>
+  </ng-template>
+</div>
+
+
+<!-- <p-confirmDialog icon="pi pi-exclamation-triangle"></p-confirmDialog>
+<p-toast></p-toast>
+
 <div class="notes-manager-host">
   <p-tabs [(value)]="activeTabValue" (onChange)="onTabChange($event)">
     <p-tablist>
@@ -290,4 +762,4 @@
       <span class="placeholder-text">Select a note to view details</span>
     </div>
   </ng-template>
-</div>
+</div> -->

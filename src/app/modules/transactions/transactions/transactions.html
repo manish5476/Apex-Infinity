@@ -1,75 +1,64 @@
 <p-toast></p-toast>
 
-<div class="list-page-container">
+<div class="txn-container">
 
-  <div class="list-header">
-    <h2 class="list-title">
-      <i class="pi pi-receipt text-[var(--accent-primary)]"></i>
-      Transaction History
-    </h2>
-    <p-button label="Export CSV" icon="pi pi-download" styleClass="p-button-outlined"
-      (onClick)="downloadCsv()">
+  <!-- HEADER -->
+  <div class="txn-header">
+    <div class="title-section">
+      <i class="pi pi-receipt icon"></i>
+      <h2>Transactions</h2>
+    </div>
+
+    <p-button label="Export CSV" icon="pi pi-download" styleClass="se-btn-outline" (onClick)="downloadCsv()">
     </p-button>
   </div>
 
-  <div class="themed-card list-content-area">
+  <!-- CARD -->
+  <div class="txn-card">
 
-    <div class="se-filter-bar">
-      
-      <div class="se-filter-field">
-        <label for="dateRange">Date Range</label>
-        <p-datepicker 
-          id="dateRange"
-          [(ngModel)]="rangeDates" 
-          selectionMode="range" 
-          [readonlyInput]="true"
-          placeholder="Start - End"
-          [showIcon]="true"
-          appendTo="body"
-          (onClose)="applyFilters()"> </p-datepicker>
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+
+      <div class="filter-field">
+        <label>Date Range</label>
+        <p-datepicker [(ngModel)]="rangeDates" selectionMode="range" [readonlyInput]="true" placeholder="Start  -  End"
+          [showIcon]="true" appendTo="body" class="se-input" (onClose)="applyFilters()">
+        </p-datepicker>
       </div>
 
-      <div class="se-filter-field">
-        <label for="type">Type</label>
-        <p-select (onChange)="applyFilters()" id="type" [options]="transactionTypes" 
-          [(ngModel)]="filterParams.type"
-          [showClear]="true" placeholder="Select Type" appendTo="body">
+      <div class="filter-field">
+        <label>Type</label>
+        <p-select [(ngModel)]="filterParams.type" [options]="transactionTypes" [showClear]="true"
+          placeholder="Select type" appendTo="body" class="se-input" (onChange)="applyFilters()">
         </p-select>
       </div>
 
-      <div class="se-filter-field">
-        <label for="effect">Effect</label>
-        <p-select (onChange)="applyFilters()" id="effect" [options]="transactionEffects" 
-          [(ngModel)]="filterParams.effect"
-          [showClear]="true" placeholder="Credit/Debit" appendTo="body">
+      <div class="filter-field">
+        <label>Effect</label>
+        <p-select [(ngModel)]="filterParams.effect" [options]="transactionEffects" [showClear]="true"
+          placeholder="Credit / Debit" appendTo="body" class="se-input" (onChange)="applyFilters()">
         </p-select>
       </div>
 
-      <div class="se-filter-field">
-        <label for="search">Search</label>
-        <input (keydown.enter)="applyFilters()" (blur)="applyFilters()" id="search" 
-          type="text" pInputText [(ngModel)]="filterParams.search" 
-          placeholder="Desc or Ref Number" />
+      <div class="filter-field">
+        <label>Search</label>
+        <input type="text" placeholder="Desc or Ref No..." [(ngModel)]="filterParams.search"
+          (keydown.enter)="applyFilters()" class="se-input" pInputText />
       </div>
 
-      <div class="se-filter-actions">
-        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined"
-          (onClick)="resetFilters()">
+      <div class="filter-actions">
+        <p-button icon="pi pi-refresh" label="Reset" styleClass="se-btn-outline" (onClick)="resetFilters()">
         </p-button>
       </div>
     </div>
 
-    <div class="list-grid-wrapper">
-      <app-shared-grid 
-        [data]="data" 
-        [gridHeight]="'180px'" 
-        [headerFilter]="false"
-        [rowSelectionMode]="rowSelectionMode" 
-        [GridName]="'Transactions'" 
-        [column]="column"
-        (gridReady)="onGridReady($event)"
+    <!-- GRID -->
+    <div class="grid-wrapper">
+      <app-shared-grid [data]="data" [gridHeight]="'210px'" [headerFilter]="true" [rowSelectionMode]="rowSelectionMode"
+        [GridName]="'Transactions'" [column]="column" (gridReady)="onGridReady($event)"
         (scrolledToBottom)="onScrolledToBottom($event)">
       </app-shared-grid>
     </div>
+
   </div>
 </div>
