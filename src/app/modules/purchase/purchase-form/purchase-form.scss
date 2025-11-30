@@ -1,7 +1,3 @@
-/* ==============================================
-   PRODUCT FORM STYLES
-   ============================================== */
-
 :host {
   display: block;
   width: 100%;
@@ -68,7 +64,9 @@
     color: var(--text-secondary);
     margin: 4px 0 0 0;
   }
-  .req { color: var(--color-error); }
+  .req {
+    color: var(--color-error);
+  }
 }
 
 /* === BODY === */
@@ -115,7 +113,9 @@
 
 .col-span-2 {
   grid-column: span 2;
-  @media (max-width: 768px) { grid-column: span 1; }
+  @media (max-width: 768px) {
+    grid-column: span 1;
+  }
 }
 
 .form-group {
@@ -130,8 +130,10 @@
     font-weight: 600;
     letter-spacing: 0.5px;
   }
-  .req { color: var(--color-error); }
-  
+  .req {
+    color: var(--color-error);
+  }
+
   .checkbox-label {
     font-size: var(--font-size-sm);
     color: var(--text-primary);
@@ -169,18 +171,20 @@
 }
 
 .empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: var(--spacing-2xl);
-    background: var(--bg-ternary);
-    border: 1px dashed var(--border-secondary);
-    border-radius: var(--ui-border-radius);
-    color: var(--text-secondary);
-    gap: var(--spacing-md);
-    
-    p { margin: 0; }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl);
+  background: var(--bg-ternary);
+  border: 1px dashed var(--border-secondary);
+  border-radius: var(--ui-border-radius);
+  color: var(--text-secondary);
+  gap: var(--spacing-md);
+
+  p {
+    margin: 0;
+  }
 }
 
 /* === FOOTER === */
@@ -197,12 +201,20 @@
 /* === NG-DEEP OVERRIDES === */
 :host ::ng-deep {
   // Inputs full width
-  .p-inputtext, .p-inputnumber, .p-select, .p-textarea, .p-chips, .p-chips-multiple-container {
+  .p-inputtext,
+  .p-inputnumber,
+  .p-select,
+  .p-textarea,
+  .p-chips,
+  .p-chips-multiple-container {
     width: 100%;
   }
 
   // Theme Consistency
-  .p-inputtext, .p-select, .p-textarea, .p-chips-multiple-container {
+  .p-inputtext,
+  .p-select,
+  .p-textarea,
+  .p-chips-multiple-container {
     background: var(--bg-primary); // Input bg is primary (on secondary section)
     color: var(--text-primary);
     border-color: var(--border-secondary);
@@ -224,9 +236,35 @@
 
 /* Helper */
 .align-bottom {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    height: 100%;
-    padding-bottom: 1px; // Micro adjustment
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  padding-bottom: 1px; // Micro adjustment
+}
+
+/* Customize the grid for purchase lines which have more columns */
+@media (min-width: 768px) {
+  .inventory-item-grid.purchase-row {
+    /* Product | Qty | Cost | Tax | Disc | Total | Trash */
+    grid-template-columns: 3fr 1fr 1.5fr 1fr 1fr 1.5fr auto;
+    align-items: center;
+
+    .form-group {
+      margin-bottom: 0; // Remove bottom margin in grid
+    }
+  }
+}
+
+/* Make read-only inputs look slightly different */
+:host ::ng-deep .p-input-filled .p-inputtext {
+  background-color: var(--bg-ternary);
+  font-weight: 600;
+}
+
+/* Adjust File Upload styles to fit theme */
+:host ::ng-deep .p-fileupload-content {
+  background: transparent;
+  border: none;
+  padding: 0;
 }

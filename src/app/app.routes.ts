@@ -106,6 +106,11 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./modules/product/product.routes').then((m) => m.PRODUCT_ROUTES),
       },
+      {
+        path: 'purchase',
+        loadChildren: () =>
+          import('./modules/purchase/purchase.routes').then((m) => m.PURCHASE_ROUTES),
+      },
 
       // --- FINANCIALS ---
       {

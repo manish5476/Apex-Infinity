@@ -1,0 +1,211 @@
+<p-toast></p-toast>
+
+<div class="customer-wrapper">
+  <section class="customer-container">
+
+    <div class="customer-form-panel animate-fadeIn">
+      <form [formGroup]="purchaseForm" (ngSubmit)="onSubmit()" class="customer-form-layout">
+
+        <div class="customer-form-header">
+          <div class="flex justify-between items-center">
+            <div>
+              <h1 class="form-title">{{ formTitle() }}</h1>
+              <p class="form-subtitle">Manage procurement and inventory intake.</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="flex flex-col items-end">
+                <span class="text-xs uppercase text-[var(--text-secondary)] font-bold mb-1">Status</span>
+                <p-select formControlName="status" [options]="statusOptions" class="w-32"></p-select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="customer-form-body">
+
+          <section class="form-section">
+            <h4 class="section-title">Invoice Details</h4>
+            <div class="form-grid-4">
+
+              <div class="form-group">
+                <label>Supplier <span class="req">*</span></label>
+                <p-select appendTo="body" formControlName="supplierId" [options]="supplierOptions()"
+                  optionLabel="companyName" optionValue="_id" placeholder="Select Supplier" [filter]="true">
+                </p-select>
+              </div>
+
+              <div class="form-group">
+                <label>Branch <span class="req">*</span></label>
+                <p-select appendTo="body" formControlName="branchId" [options]="branchOptions()" optionLabel="name"
+                  optionValue="_id" placeholder="Recieving Branch">
+                </p-select>
+              </div>
+
+              <div class="form-group">
+                <label>Invoice No. <span class="req">*</span></label>
+                <input pInputText formControlName="invoiceNumber" placeholder="INV-001" />
+              </div>
+
+              <div class="form-group">
+                <label>Purchase Date <span class="req">*</span></label>
+                <p-datepicker formControlName="purchaseDate" dateFormat="dd/mm/yy" [showIcon]="true"></p-datepicker>
+              </div>
+
+            </div>
+          </section>
+          <section class="form-section">
+            <div class="flex justify-between items-center mb-4">
+              <h4 class="section-title m-0">Purchase Items</h4>
+              <p-button label="Add Item" icon="pi pi-plus" size="small" styleClass="p-button-outlined"
+                (onClick)="addItem()"></p-button>
+            </div>
+            <div formArrayName="items" class="inventory-container">
+              <div
+                class="hidden md:grid grid-cols-[3fr_1fr_1.5fr_1fr_1fr_1.5fr_auto] gap-4 px-4 pb-2 text-xs uppercase font-bold text-[var(--text-secondary)]">
+                <span>Product</span>
+                <span class="text-center">Qty</span>
+                <span>Unit Cost</span>
+                <span>Tax %</span>
+                <span>Discount</span>
+                <span>Total</span>
+                <span></span>
+              </div>
+
+              @for (item of items.controls; track i; let i = $index) {
+              <div [formGroupName]="i" class="inventory-item-grid animate-slideInUp purchase-row">
+
+                <div class="form-group">
+                  <label class="md:hidden">Product</label>
+                  <p-select appendTo="body" formControlName="productId" [options]="productOptions()" optionLabel="name"
+                    optionValue="_id" placeholder="Search Product" [filter]="true"
+                    (onChange)="onProductSelect(i, $event.value)">
+                  </p-select>
+                </div>
+
+                <div class="form-group">
+                  <label class="md:hidden">Qty</label>
+                  <p-inputNumber formControlName="quantity" [min]="1" inputStyleClass="text-center"></p-inputNumber>
+                </div>
+
+                <div class="form-group">
+                  <label class="md:hidden">Cost</label>
+                  <p-inputNumber formControlName="purchasePrice" mode="currency" currency="INR"
+                    locale="en-IN"></p-inputNumber>
+                </div>
+
+                <div class="form-group">
+                  <label class="md:hidden">Tax</label>
+                  <p-inputNumber formControlName="taxRate" suffix="%"></p-inputNumber>
+                </div>
+
+                <div class="form-group">
+                  <label class="md:hidden">Disc.</label>
+                  <p-inputNumber formControlName="discount" mode="currency" currency="INR"
+                    locale="en-IN"></p-inputNumber>
+                </div>
+
+                <div class="form-group">
+                  <label class="md:hidden">Total</label>
+                  <p-inputNumber formControlName="rowTotal" mode="currency" currency="INR" locale="en-IN"
+                    [readonly]="true" styleClass="p-input-filled"></p-inputNumber>
+                </div>
+
+                <div class="form-group align-bottom">
+                  <p-button icon="pi pi-trash" styleClass="p-button-danger p-button-text"
+                    (onClick)="removeItem(i)"></p-button>
+                </div>
+
+              </div>
+              } @empty {
+              <div class="empty-state">
+                <i class="pi pi-shopping-cart text-4xl text-[var(--text-tertiary)]"></i>
+                <p>No items added to this purchase order.</p>
+                <p-button label="Add First Item" link="true" (onClick)="addItem()"></p-button>
+              </div>
+              }
+
+            </div>
+          </section>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-[var(--spacing-xl)]">
+
+            <div class="flex flex-col gap-[var(--spacing-xl)]">
+              <section class="form-section h-full">
+                <h4 class="section-title">Attachments & Notes</h4>
+
+                <div class="form-group mb-4">
+                  <label>Notes</label>
+                  <textarea pInputTextarea formControlName="notes" rows="3"
+                    placeholder="Shipping details, remarks..."></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label>Upload Bills/Invoice</label>
+                  <p-fileUpload mode="advanced" name="attachments[]" [multiple]="true" accept="image/*,application/pdf"
+                    [maxFileSize]="5000000" [customUpload]="true" (onSelect)="onFileSelect($event)"
+                    (onRemove)="onFileRemove($event)" [showUploadButton]="false" [showCancelButton]="false">
+                  </p-fileUpload>
+                </div>
+              </section>
+            </div>
+
+            <section class="form-section">
+              <h4 class="section-title">Payment & Totals</h4>
+
+              <div class="form-grid mb-4">
+                <div class="form-group">
+                  <label>Amount Paid</label>
+                  <p-inputNumber formControlName="paidAmount" mode="currency" currency="INR"
+                    locale="en-IN"></p-inputNumber>
+                </div>
+                <div class="form-group">
+                  <label>Payment Method</label>
+                  <p-select formControlName="paymentMethod" [options]="paymentMethods" appendTo="body"></p-select>
+                </div>
+              </div>
+
+              <p-divider></p-divider>
+
+              <div class="flex flex-col gap-2 mt-4 text-sm">
+                <div class="flex justify-between text-[var(--text-secondary)]">
+                  <span>Sub Total</span>
+                  <span>{{ purchaseForm.get('subTotal')?.value | currency:'INR' }}</span>
+                </div>
+                <div class="flex justify-between text-[var(--text-secondary)]">
+                  <span>Total Tax</span>
+                  <span>+ {{ purchaseForm.get('totalTax')?.value | currency:'INR' }}</span>
+                </div>
+                <div class="flex justify-between text-[var(--text-secondary)]">
+                  <span>Total Discount</span>
+                  <span>- {{ purchaseForm.get('totalDiscount')?.value | currency:'INR' }}</span>
+                </div>
+
+                <div
+                  class="flex justify-between text-xl font-bold text-[var(--text-primary)] mt-2 pt-2 border-t border-[var(--border-secondary)]">
+                  <span>Grand Total</span>
+                  <span>{{ purchaseForm.get('grandTotal')?.value | currency:'INR' }}</span>
+                </div>
+
+                <div class="flex justify-between text-sm font-semibold mt-1"
+                  [ngClass]="{'text-green-600': purchaseForm.get('balanceAmount')?.value <= 0, 'text-red-500': purchaseForm.get('balanceAmount')?.value > 0}">
+                  <span>Balance Due</span>
+                  <span>{{ purchaseForm.get('balanceAmount')?.value | currency:'INR' }}</span>
+                </div>
+              </div>
+
+            </section>
+          </div>
+
+        </div>
+
+        <div class="customer-form-footer">
+          <p-button label="Cancel" styleClass="p-button-text p-button-secondary" routerLink="/purchase"></p-button>
+          <p-button [label]="editMode() ? 'Update Purchase' : 'Create Purchase'" icon="pi pi-check" type="submit"
+            [loading]="isSubmitting()" [disabled]="purchaseForm.invalid || isSubmitting()">
+          </p-button>
+        </div>
+
+      </form>
+    </div>
+  </section>
+</div>
