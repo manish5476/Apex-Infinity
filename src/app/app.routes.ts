@@ -9,7 +9,7 @@ import { NotFoundComponent } from './modules/shared/components/notfound/notfound
 import { LogsComponent } from './modules/transactions/logs/logs';
 import { SalesListComponent } from './modules/sales/sales-list/sales-list';
 import { Sessions } from './modules/auth/sessions/sessions/sessions';
-import { AppLandingPage } from './landingPage/app-landing-page';
+import { LandingComponent } from './landingPage/landing.component';
 
 export const routes: Routes = [
   // ==========================================================
@@ -18,7 +18,7 @@ export const routes: Routes = [
   // ==========================================================
   {
     path: '',
-    component: AppLandingPage,
+    component: LandingComponent,
     pathMatch: 'full' // Important: ensures this only matches the exact root
   },
 

@@ -1,0 +1,128 @@
+/* Modern Reset */
+:host {
+  display: block;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* 1. REVEAL ANIMATION (Apple Style) */
+.reveal-item {
+  opacity: 0;
+  transform: translateY(40px) scale(0.98);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+
+  &.in-view {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 2. TEXT SHIMMER (Linear Style) */
+.animate-text-shimmer {
+  background-size: 200% auto;
+  animation: textShimmer 4s linear infinite;
+}
+
+@keyframes textShimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* 3. ORGANIC BACKGROUND FLOATS */
+.animate-float {
+  animation: float 10s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulseSlow 8s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-20px, 20px); }
+}
+
+@keyframes pulseSlow {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(1.1); }
+}
+
+/* Animation Delay Utility */
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+
+// /* ----------------------------------------------------------
+//    accountech-landing.component.css
+// ---------------------------------------------------------- */
+
+// :host {
+//   display: block;
+// }
+
+// html {
+//   scroll-behavior: smooth;
+// }
+
+// @media (prefers-reduced-motion: reduce) {
+//   html {
+//     scroll-behavior: auto;
+//   }
+// }
+
+// .animate-gradient {
+//   background-size: 200% 200%;
+//   animation: gradient 8s ease infinite;
+// }
+
+// @keyframes gradient {
+//   0%, 100% {
+//     background-position: 0% 50%;
+//   }
+//   50% {
+//     background-position: 100% 50%;
+//   }
+// }
+
+// .reveal-section {
+//   opacity: 0;
+// }
+
+// /* Custom glass-card utility (extra safety) */
+// .glass-card {
+//   background-color: rgba(255, 255, 255, 0.8);
+//   backdrop-filter: blur(18px);
+// }
+
+// /* Scrollbar */
+// ::-webkit-scrollbar {
+//   width: 8px;
+// }
+
+// ::-webkit-scrollbar-track {
+//   background: rgba(15, 23, 42, 0.03);
+// }
+
+// ::-webkit-scrollbar-thumb {
+//   background: rgba(148, 163, 184, 0.8);
+//   border-radius: 999px;
+// }
+
+// ::-webkit-scrollbar-thumb:hover {
+//   background: rgba(100, 116, 139, 0.9);
+// }
+// .reveal-section {
+//   opacity: 0;
+//   transform: translateY(40px) scale(0.96);
+//   transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+// }
+
+// .reveal-section.visible {
+//   opacity: 1;
+//   transform: translateY(0) scale(1);
+// }
