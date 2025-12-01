@@ -1,0 +1,50 @@
+<div class="list-page-container">
+  <div class="list-header">
+    <h2 class="list-title">
+      <i class="pi pi-shopping-bag text-[var(--accent-primary)]"></i>
+      Purchase Management
+    </h2>
+    <p-button label="New Purchase" icon="pi pi-plus" routerLink="create">
+    </p-button>
+  </div>
+
+  <div class="themed-card">
+    <div class="se-filter-bar">
+      <div class="se-filter-field">
+        <label for="invoice">Invoice No</label>
+        <input id="invoice" type="text" pInputText [(ngModel)]="purchaseFilter.invoiceNumber"
+          placeholder="Search Invoice" />
+      </div>
+      <div class="se-filter-field">
+        <label for="supplier">Supplier</label>
+        <p-select appendTo="body" id="supplier" [options]="supplierOptions()" [(ngModel)]="purchaseFilter.supplierId"
+          optionLabel="companyName" optionValue="_id" [showClear]="true" placeholder="Select Supplier" [filter]="true">
+        </p-select>
+      </div>
+      <div class="se-filter-field">
+        <label for="dateRange">Date Range</label>
+        <p-datepicker id="dateRange" [(ngModel)]="purchaseFilter.dateRange" selectionMode="range" [readonlyInput]="true"
+          placeholder="Select Range" appendTo="body" dateFormat="dd/mm/yy" [showIcon]="true">
+        </p-datepicker>
+      </div>
+      <div class="se-filter-field">
+        <label for="status">Order Status</label>
+        <p-select appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="purchaseFilter.status"
+          [showClear]="true" placeholder="Any Status">
+        </p-select>
+      </div>
+      <div class="se-filter-actions">
+        <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()">
+        </p-button>
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined" (onClick)="resetFilters()">
+        </p-button>
+      </div>
+    </div>
+  </div>
+  <div class="themed-card list-grid-area">
+    <app-shared-grid [data]="data" [gridHeight]="'210px'" [headerFilter]="false" [rowSelectionMode]="rowSelectionMode"
+      [GridName]="'Purchase History'" [column]="column" (eventFromGrid)="eventFromGrid($event)"
+      (gridReady)="onGridReady($event)" (scrolledToBottom)="onScrolledToBottom($event)">
+    </app-shared-grid>
+  </div>
+</div>

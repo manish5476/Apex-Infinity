@@ -1,0 +1,222 @@
+<div class="customer-page-container animate-fadeIn">
+
+  @if (purchase(); as p) {
+  <div class="themed-card product-details-card">
+
+    <!-- HEADER -->
+    <div class="details-header">
+      <div class="header-left">
+        <p-button icon="pi pi-arrow-left" styleClass="p-button-text p-button-rounded p-button-secondary"
+          routerLink="/purchase">
+        </p-button>
+
+        <div class="header-identity">
+          <div class="title-row">
+            <h2 class="product-title">Invoice #{{ p.invoiceNumber }}</h2>
+            <p-tag [value]="p.status | titlecase" [severity]="getStatusSeverity(p.status)"
+              styleClass="status-tag px-3 uppercase">
+            </p-tag>
+          </div>
+          <div class="subtitle-row">
+            <span class="sku-badge"><i class="pi pi-calendar"></i> {{ formatDate(p.purchaseDate) }}</span>
+            <span class="separator">•</span>
+            <span class="brand-text">Created by {{ p.createdBy?.name || 'Unknown' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <p-button label="Edit Invoice" icon="pi pi-pencil" styleClass="p-button-outlined p-button-sm"
+          [routerLink]="['/purchase', p._id, 'edit']" [disabled]="p.status === 'received'">
+        </p-button>
+        <p-button label="Print" icon="pi pi-print" styleClass="p-button-text p-button-secondary"></p-button>
+      </div>
+    </div>
+
+    <!-- BODY -->
+    <div class="details-body">
+      
+      <!-- SIDEBAR: Supplier & Attachments -->
+      <aside class="profile-sidebar animate-slideInUp">
+        
+        <!-- Supplier Card -->
+        <div class="supplier-card-wrapper">
+           <div class="supplier-header">
+              <div class="supplier-icon"><i class="pi pi-building"></i></div>
+              <div>
+                <label class="text-xs uppercase text-[var(--text-label)] font-bold">Supplier</label>
+                <div class="text-lg font-bold text-[var(--text-primary)] leading-tight">{{ p.supplierId?.companyName }}</div>
+              </div>
+           </div>
+           <div class="mt-3 text-sm text-[var(--text-secondary)]">
+              <div class="flex gap-2 items-center mb-1"><i class="pi pi-phone text-xs"></i> {{ p.supplierId?.phone || 'N/A' }}</div>
+              <div class="flex gap-2 items-center"><i class="pi pi-map-marker text-xs"></i> {{ p.supplierId?.city || 'N/A' }}</div>
+           </div>
+        </div>
+
+        <p-divider styleClass="w-full my-2"></p-divider>
+
+        <div class="attributes-list">
+          <div class="attribute-item">
+            <div class="attr-icon"><i class="pi pi-shop"></i></div>
+            <div class="attr-data">
+              <label>Recieving Branch</label>
+              <span>{{ p.branchId?.name || 'Head Office' }}</span>
+            </div>
+          </div>
+
+          <div class="attribute-item">
+            <div class="attr-icon"><i class="pi pi-clock"></i></div>
+            <div class="attr-data">
+              <label>Due Date</label>
+              <span>{{ p.dueDate ? formatDate(p.dueDate) : 'Immediate' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <p-divider styleClass="w-full my-2"></p-divider>
+
+        <!-- Attachments Section -->
+        <div class="attachments-section">
+          <label class="section-label">Attachments ({{ p.attachedFiles?.length || 0 }})</label>
+          
+          <div class="files-grid">
+            @for(file of p.attachedFiles; track $index) {
+              <div class="file-item" (click)="downloadAttachment(file)">
+                <div class="file-icon">
+                  <i class="pi pi-file-pdf text-red-500 text-xl"></i>
+                </div>
+                <div class="file-info">
+                   <span class="file-name">Invoice_Scan_{{$index + 1}}</span>
+                   <span class="file-action">Click to view</span>
+                </div>
+              </div>
+            } @empty {
+              <div class="no-files">
+                <i class="pi pi-file text-2xl mb-2 opacity-30"></i>
+                <span>No documents attached</span>
+              </div>
+            }
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <section class="main-details">
+        
+        <!-- Financial Metrics -->
+        <div class="metrics-grid animate-slideInUp" style="animation-delay: 0.1s;">
+          <div class="metric-card primary-metric">
+            <div class="metric-content">
+              <label>Grand Total</label>
+              <span class="value">{{ p.grandTotal | currency:'INR' }}</span>
+            </div>
+            <div class="metric-icon">
+              <i class="pi pi-wallet"></i>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-content">
+              <label>Amount Paid</label>
+              <span class="value text-green-600">{{ p.paidAmount | currency:'INR' }}</span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-content">
+              <label>Balance Due</label>
+              <span class="value" [class.text-red-500]="p.balanceAmount > 0" [class.text-gray-400]="p.balanceAmount <= 0">
+                {{ p.balanceAmount | currency:'INR' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-content">
+              <label>Payment Status</label>
+              <p-tag [value]="p.paymentStatus | uppercase" [severity]="getPaymentSeverity(p.paymentStatus)"></p-tag>
+            </div>
+          </div>
+        </div>
+
+        <!-- Items Table -->
+        <div class="content-section animate-slideInUp" style="animation-delay: 0.2s;">
+          <div class="section-header-row">
+            <h4 class="section-heading"><i class="pi pi-list"></i> Purchased Items</h4>
+            <div class="text-sm text-[var(--text-secondary)]">Total Qty: <span class="font-bold text-[var(--text-primary)]">{{ p.totalQuantity || 0 }}</span></div>
+          </div>
+
+          <div class="table-wrapper">
+            <p-table [value]="p.items" styleClass="p-table-premium">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Product</th>
+                  <th class="text-center">Qty</th>
+                  <th class="text-right">Unit Price</th>
+                  <th class="text-right">Tax %</th>
+                  <th class="text-right">Discount</th>
+                  <th class="text-right">Total</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-item>
+                <tr>
+                  <td>
+                    <div class="font-medium">{{ item.name }}</div>
+                    <div class="text-xs text-[var(--text-secondary)]" *ngIf="item.productId?.sku">SKU: {{ item.productId.sku }}</div>
+                  </td>
+                  <td class="text-center font-bold">{{ item.quantity }}</td>
+                  <td class="text-right">{{ item.purchasePrice | currency:'INR' }}</td>
+                  <td class="text-right">{{ item.taxRate }}%</td>
+                  <td class="text-right text-red-400">-{{ item.discount | currency:'INR' }}</td>
+                  <td class="text-right font-bold text-[var(--text-primary)]">
+                    {{ ((item.purchasePrice * item.quantity) - (item.discount || 0)) * (1 + (item.taxRate/100)) | currency:'INR' }}
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+
+          <!-- Footer Summary -->
+          <div class="flex justify-end mt-4 px-4">
+             <div class="w-64 flex flex-col gap-2">
+                <div class="flex justify-between text-sm text-[var(--text-secondary)]">
+                   <span>Subtotal</span>
+                   <span>{{ p.subTotal | currency:'INR' }}</span>
+                </div>
+                <div class="flex justify-between text-sm text-[var(--text-secondary)]">
+                   <span>Tax</span>
+                   <span>+ {{ p.totalTax | currency:'INR' }}</span>
+                </div>
+                 <div class="flex justify-between text-sm text-[var(--text-secondary)]">
+                   <span>Discount</span>
+                   <span>- {{ p.totalDiscount | currency:'INR' }}</span>
+                </div>
+                <p-divider styleClass="my-1"></p-divider>
+                <div class="flex justify-between text-lg font-bold text-[var(--text-primary)]">
+                   <span>Total</span>
+                   <span>{{ p.grandTotal | currency:'INR' }}</span>
+                </div>
+             </div>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="content-section animate-slideInUp" style="animation-delay: 0.3s;" *ngIf="p.notes">
+          <h4 class="section-heading"><i class="pi pi-align-left"></i> Notes</h4>
+          <div class="description-box bg-[var(--bg-ternary)] p-3 rounded border border-[var(--border-secondary)]">
+            <p>{{ p.notes }}</p>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </div>
+  } @else {
+  <div class="loading-state">
+    <i class="pi pi-spin pi-spinner"></i>
+    <p>Retrieving Invoice Details...</p>
+  </div>
+  }
+</div>

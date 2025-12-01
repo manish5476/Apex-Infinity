@@ -1,6 +1,5 @@
 /* =========================================
-   COMPONENT STYLES: Notes Manager
-   Consumes Global CSS Variables
+   COMPONENT STYLES: Notes Manager (Pro)
    ========================================= */
 
 :host {
@@ -14,40 +13,154 @@
   flex-direction: column;
   height: 100%;
   width: 100%;
-  background: var(--bg-primary); /* Global Token */
+  background: var(--bg-primary);
   border-radius: var(--ui-border-radius-lg);
   overflow: hidden;
   border: 1px solid var(--border-primary);
   box-shadow: var(--shadow-md);
 }
 
-/* --- TABS --- */
-/* We rely on global PrimeNG overrides, but ensure spacing here */
-::ng-deep .p-tabview-panels {
-    padding: 0 !important;
-    height: 100%;
+/* ---------- TOP TOOLBAR ---------- */
+
+.notes-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-bottom: 1px solid var(--border-primary);
+  background: radial-gradient(circle at top left, rgba(148, 163, 253, 0.15), transparent 55%),
+              var(--bg-secondary);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 5;
 }
+
+.notes-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+
+.notes-subtitle {
+  margin-top: 2px;
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.scope-label {
+  font-weight: var(--font-weight-medium);
+}
+
+.dot-separator {
+  opacity: 0.5;
+}
+
+.last-updated,
+.attachments-count {
+  opacity: 0.85;
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.shortcut-hints {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+}
+
+.kbd-chip {
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  background: var(--bg-primary);
+}
+
+.kbd-plus {
+  opacity: 0.6;
+  font-size: 0.7rem;
+}
+
+.hint-label {
+  margin-left: 2px;
+}
+
+.hint-divider {
+  width: 1px;
+  height: 14px;
+  background: var(--border-secondary);
+  margin: 0 2px;
+  opacity: 0.6;
+}
+
+.primary-new-btn {
+  background: var(--accent-primary);
+  color: #fff;
+  border-radius: 999px;
+  padding-inline: 14px;
+  box-shadow: 0 6px 18px rgba(59, 130, 246, 0.35);
+  transition: var(--transition-base);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.45);
+  }
+}
+
+.focus-btn {
+  border-radius: 999px;
+}
+
+/* ---------- TABS BASE ---------- */
 
 ::ng-deep .p-tabview {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
-/* --- LAYOUTS --- */
+::ng-deep .p-tabview-panels {
+  padding: 0 !important;
+  height: 100%;
+}
+
+/* Elegant Active Tab */
+::ng-deep .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+  background: linear-gradient(90deg, var(--accent-primary), transparent);
+  border-radius: 8px;
+  color: white !important;
+}
+
+/* ---------- LAYOUTS ---------- */
+
 .notes-layout,
 .summary-layout {
   display: flex;
-  width: 100%; /* Full Width */
-  height: calc(100vh - 180px); /* Dynamic height adjustment */
-  min-height: 600px;
+  width: 100%;
+  height: calc(100vh - 210px); /* adjusted due to custom toolbar */
+  min-height: 560px;
   overflow: hidden;
   background: var(--bg-primary);
 }
 
-/* --- SIDEBAR (Left Panel) --- */
+/* ---------- SIDEBAR (LEFT) ---------- */
+
 .notes-sidebar {
-  width: 380px; /* Fixed width for list */
+  width: 360px;
   min-width: 320px;
   background: var(--bg-secondary);
   border-right: 1px solid var(--border-primary);
@@ -56,12 +169,16 @@
   z-index: 2;
 }
 
+.notes-manager-host.focus-mode .notes-sidebar {
+  display: none;
+}
+
 .sidebar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: var(--spacing-lg);
-  background: var(--bg-secondary); /* Seamless header */
+  background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-primary);
 
   .section-title {
@@ -78,7 +195,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: var(--bg-ternary); /* Subtle contrast for list area */
+  background: var(--bg-ternary);
 }
 
 .search-bar {
@@ -93,7 +210,8 @@
   padding: var(--spacing-md);
 }
 
-/* --- NOTE CARDS --- */
+/* ---------- NOTE CARDS ---------- */
+
 .notes-list {
   display: flex;
   flex-direction: column;
@@ -102,34 +220,36 @@
 
 .note-card {
   position: relative;
-  background: var(--bg-secondary); /* Card bg */
+  background: var(--bg-secondary);
   border: 1px solid var(--border-secondary);
   border-radius: var(--ui-border-radius);
   padding: var(--spacing-md);
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.22s cubic-bezier(0.2, 0.9, 0.2, 1);
   overflow: hidden;
 
-  /* Hover State */
   &:hover {
     border-color: var(--accent-primary);
-    transform: translateY(-2px);
+    transform: translateX(4px);
     box-shadow: var(--shadow-md);
     background: var(--component-bg-hover);
   }
 
-  /* Active/Selected State */
   &.active {
-    background: var(--bg-primary);
+    background: linear-gradient(
+      135deg,
+      rgba(59, 130, 246, 0.12),
+      rgba(59, 130, 246, 0.02)
+    );
     border-color: var(--accent-primary);
     box-shadow: var(--shadow-sm);
-    
+
     .note-card-border {
       opacity: 1;
     }
-    
+
     .note-title {
-        color: var(--accent-primary);
+      color: var(--accent-primary);
     }
   }
 
@@ -145,19 +265,55 @@
   }
 }
 
+.note-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
+}
+
 .note-title {
-  margin: 0 0 var(--spacing-xs) 0;
+  margin: 0;
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
   transition: color 0.2s;
 }
 
+.note-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.65rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border-secondary);
+  color: var(--text-tertiary);
+  background: var(--bg-primary);
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--color-success);
+  }
+
+  &.locked {
+    border-color: rgba(239, 68, 68, 0.4);
+    color: var(--color-error);
+
+    .status-dot {
+      background: var(--color-error);
+    }
+  }
+}
+
 .note-excerpt {
   margin: 0 0 var(--spacing-sm) 0;
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
-  line-height: 1.4;
+  line-height: 1.5;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -171,6 +327,12 @@
   color: var(--text-tertiary);
 }
 
+.note-meta-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .note-tags {
   display: flex;
   align-items: center;
@@ -178,10 +340,11 @@
   color: var(--text-label);
 }
 
-/* --- MAIN EDITOR / PREVIEW PANEL (Right Panel) --- */
+/* ---------- MAIN PANELS (RIGHT) ---------- */
+
 .note-editor-panel,
 .note-preview-panel {
-  flex: 1; /* Takes remaining full width */
+  flex: 1;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -195,6 +358,7 @@
 }
 
 /* Header Area */
+
 .editor-header,
 .preview-header {
   display: flex;
@@ -203,12 +367,19 @@
   padding: var(--spacing-lg) var(--spacing-xl);
   border-bottom: 1px solid var(--border-primary);
   background: var(--bg-primary);
-  height: 70px;
+  height: 72px;
+}
+
+.editor-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex: 1;
 }
 
 .title-input {
   flex: 1;
-  margin-right: var(--spacing-lg);
+  margin-right: var(--spacing-sm);
   font-family: var(--font-heading);
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-bold);
@@ -216,19 +387,28 @@
   background: transparent;
   color: var(--text-primary);
   padding: 0;
-  
+
   &:focus {
     box-shadow: none;
     outline: none;
   }
-  
+
   &::placeholder {
-      color: var(--text-label);
-      font-weight: var(--font-weight-normal);
+    color: var(--text-label);
+    font-weight: var(--font-weight-normal);
   }
 }
 
-/* Split View: Editor Content + Tools Sidebar */
+.date-indicator {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--bg-ternary);
+}
+
+/* Body */
+
 .editor-body {
   display: flex;
   flex: 1;
@@ -242,7 +422,7 @@
   flex-direction: column;
   padding: var(--spacing-xl);
   overflow-y: auto;
-  
+
   .content-textarea {
     flex: 1;
     width: 100%;
@@ -254,19 +434,20 @@
     line-height: 1.7;
     color: var(--text-primary);
     padding: 0;
-    
+
     &:focus {
       box-shadow: none;
     }
   }
 }
 
-/* Right Tools Sidebar (Tags/Attachments) */
+/* Sidebar */
+
 .editor-sidebar {
   width: 300px;
   padding: var(--spacing-lg);
   border-left: 1px solid var(--border-primary);
-  background: var(--bg-secondary); /* Distinction from writing area */
+  background: var(--bg-secondary);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -283,12 +464,15 @@
     margin-bottom: var(--spacing-sm);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    
-    i { margin-right: 6px; }
+
+    i {
+      margin-right: 6px;
+    }
   }
 }
 
-/* --- ATTACHMENTS --- */
+/* Attachments */
+
 .attachments-preview {
   display: flex;
   flex-direction: column;
@@ -303,11 +487,11 @@
   border: 1px solid var(--border-secondary);
   background: var(--bg-primary);
   transition: transform 0.2s;
-  
+
   &:hover {
-      border-color: var(--accent-primary);
+    border-color: var(--accent-primary);
   }
-  
+
   img {
     width: 100%;
     height: 140px;
@@ -322,17 +506,16 @@
     background: rgba(255, 255, 255, 0.9);
     width: 24px;
     height: 24px;
-    
+
     &:hover {
       background: #fff;
       color: var(--color-error);
     }
   }
-  
-  /* Local Upload Badge */
+
   &.local-preview {
     border: 1px dashed var(--accent-primary);
-    
+
     .upload-badge {
       position: absolute;
       bottom: 6px;
@@ -348,14 +531,21 @@
   }
 }
 
-/* --- PREVIEW PANEL (Read Mode) --- */
+/* Preview */
+
 .preview-content {
   flex: 1;
-  padding: var(--spacing-2xl); /* More breathing room for reading */
+  padding: var(--spacing-2xl);
   overflow-y: auto;
-  max-width: 900px; /* Optimal reading width */
+  max-width: 900px;
   margin: 0 auto;
   width: 100%;
+}
+
+.preview-subtitle {
+  margin-top: 2px;
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
 }
 
 .preview-text {
@@ -389,7 +579,8 @@
   margin-top: var(--spacing-xl);
 }
 
-/* --- UTILITIES --- */
+/* Empty States */
+
 .state-placeholder {
   height: 100%;
   display: flex;
@@ -399,27 +590,30 @@
   color: var(--text-tertiary);
   padding: var(--spacing-xl);
   text-align: center;
-  
+
   .placeholder-icon {
-    font-size: 4rem;
+    font-size: 6rem;
     margin-bottom: var(--spacing-lg);
-    opacity: 0.2;
-    color: var(--text-primary);
+    background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
-  
+
   .placeholder-text {
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-medium);
     color: var(--text-primary);
     margin-bottom: var(--spacing-xs);
   }
-  
+
   .placeholder-subtext {
-      font-size: var(--font-size-sm);
+    font-size: var(--font-size-sm);
   }
 }
 
-/* --- SKELETON LOADING --- */
+/* Skeleton */
+
 .skeleton-loader {
   display: flex;
   flex-direction: column;
@@ -429,77 +623,568 @@
 
 .skeleton-card {
   height: 90px;
-  background: var(--bg-ternary);
   border-radius: var(--ui-border-radius);
-  animation: pulse 1.5s infinite ease-in-out;
-}
-
-@keyframes pulse {
-  0% { opacity: 0.5; }
-  50% { opacity: 0.8; }
-  100% { opacity: 0.5; }
-}
-
-/* --- RESPONSIVE ADJUSTMENTS --- */
-@media (max-width: 1024px) {
-    .editor-body {
-        flex-direction: column;
-    }
-    .editor-sidebar {
-        width: 100%;
-        height: auto;
-        max-height: 300px;
-        border-left: none;
-        border-top: 1px solid var(--border-primary);
-    }
-}
-
-@media (max-width: 768px) {
-    .notes-layout {
-        flex-direction: column;
-    }
-    .notes-sidebar {
-        width: 100%;
-        height: 300px; /* Fixed height list on mobile */
-        border-right: none;
-        border-bottom: 1px solid var(--border-primary);
-    }
-}
-/* Shimmer Skeleton */
-.skeleton-card {
   background: linear-gradient(90deg, #f0f0f0 25%, #f8f8f8 50%, #f0f0f0 75%);
   background-size: 200% 100%;
   animation: shimmer 1.8s infinite;
 }
+
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-/* Elegant Active Tab */
-::ng-deep .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
-  background: linear-gradient(90deg, var(--accent-primary), transparent);
-  border-radius: 8px;
-  color: white !important;
-}
-
-/* Floating New Button */
-.header-actions button[icon="pi pi-plus"] {
-  background: var(--accent-primary);
-  color: white;
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-  transition: all 0.3s ease;
-  &:hover {
-    transform: translateY(-3px) scale(1.08);
-    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.5);
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
   }
 }
 
-/* Gradient Icon in Empty State */
-.state-placeholder .placeholder-icon {
-  font-size: 6rem;
-  background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 1024px) {
+  .editor-body {
+    flex-direction: column;
+  }
+
+  .editor-sidebar {
+    width: 100%;
+    height: auto;
+    max-height: 280px;
+    border-left: none;
+    border-top: 1px solid var(--border-primary);
+  }
 }
+
+@media (max-width: 768px) {
+  .notes-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+
+  .toolbar-right {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .notes-layout {
+    flex-direction: column;
+  }
+
+  .notes-sidebar {
+    width: 100%;
+    height: 260px;
+    border-right: none;
+    border-bottom: 1px solid var(--border-primary);
+  }
+
+  .notes-manager-host.focus-mode .notes-sidebar {
+    display: none;
+  }
+}
+
+
+// /* =========================================
+//    COMPONENT STYLES: Notes Manager
+//    Consumes Global CSS Variables
+//    ========================================= */
+
+// :host {
+//   display: block;
+//   height: 100%;
+//   width: 100%;
+// }
+
+// .notes-manager-host {
+//   display: flex;
+//   flex-direction: column;
+//   height: 100%;
+//   width: 100%;
+//   background: var(--bg-primary); /* Global Token */
+//   border-radius: var(--ui-border-radius-lg);
+//   overflow: hidden;
+//   border: 1px solid var(--border-primary);
+//   box-shadow: var(--shadow-md);
+// }
+
+// /* --- TABS --- */
+// /* We rely on global PrimeNG overrides, but ensure spacing here */
+// ::ng-deep .p-tabview-panels {
+//     padding: 0 !important;
+//     height: 100%;
+// }
+
+// ::ng-deep .p-tabview {
+//     display: flex;
+//     flex-direction: column;
+//     height: 100%;
+// }
+
+// /* --- LAYOUTS --- */
+// .notes-layout,
+// .summary-layout {
+//   display: flex;
+//   width: 100%; /* Full Width */
+//   height: calc(100vh - 180px); /* Dynamic height adjustment */
+//   min-height: 600px;
+//   overflow: hidden;
+//   background: var(--bg-primary);
+// }
+
+// /* --- SIDEBAR (Left Panel) --- */
+// .notes-sidebar {
+//   width: 380px; /* Fixed width for list */
+//   min-width: 320px;
+//   background: var(--bg-secondary);
+//   border-right: 1px solid var(--border-primary);
+//   display: flex;
+//   flex-direction: column;
+//   z-index: 2;
+// }
+
+// .sidebar-header {
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-between;
+//   padding: var(--spacing-lg);
+//   background: var(--bg-secondary); /* Seamless header */
+//   border-bottom: 1px solid var(--border-primary);
+
+//   .section-title {
+//     margin: 0;
+//     font-family: var(--font-heading);
+//     font-size: var(--font-size-lg);
+//     font-weight: var(--font-weight-semibold);
+//     color: var(--text-primary);
+//   }
+// }
+
+// .sidebar-content {
+//   flex: 1;
+//   display: flex;
+//   flex-direction: column;
+//   overflow: hidden;
+//   background: var(--bg-ternary); /* Subtle contrast for list area */
+// }
+
+// .search-bar {
+//   padding: var(--spacing-md);
+//   background: var(--bg-secondary);
+//   border-bottom: 1px solid var(--border-secondary);
+// }
+
+// .notes-list-wrapper {
+//   flex: 1;
+//   overflow-y: auto;
+//   padding: var(--spacing-md);
+// }
+
+// /* --- NOTE CARDS --- */
+// .notes-list {
+//   display: flex;
+//   flex-direction: column;
+//   gap: var(--spacing-sm);
+// }
+
+// .note-card {
+//   position: relative;
+//   background: var(--bg-secondary); /* Card bg */
+//   border: 1px solid var(--border-secondary);
+//   border-radius: var(--ui-border-radius);
+//   padding: var(--spacing-md);
+//   cursor: pointer;
+//   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+//   overflow: hidden;
+
+//   /* Hover State */
+//   &:hover {
+//     border-color: var(--accent-primary);
+//     transform: translateY(-2px);
+//     box-shadow: var(--shadow-md);
+//     background: var(--component-bg-hover);
+//   }
+
+//   /* Active/Selected State */
+//   &.active {
+//     background: var(--bg-primary);
+//     border-color: var(--accent-primary);
+//     box-shadow: var(--shadow-sm);
+    
+//     .note-card-border {
+//       opacity: 1;
+//     }
+    
+//     .note-title {
+//         color: var(--accent-primary);
+//     }
+//   }
+
+//   .note-card-border {
+//     position: absolute;
+//     top: 0;
+//     left: 0;
+//     bottom: 0;
+//     width: 3px;
+//     background: var(--accent-primary);
+//     opacity: 0;
+//     transition: opacity 0.2s;
+//   }
+// }
+
+// .note-title {
+//   margin: 0 0 var(--spacing-xs) 0;
+//   font-size: var(--font-size-md);
+//   font-weight: var(--font-weight-semibold);
+//   color: var(--text-primary);
+//   transition: color 0.2s;
+// }
+
+// .note-excerpt {
+//   margin: 0 0 var(--spacing-sm) 0;
+//   font-size: var(--font-size-sm);
+//   color: var(--text-secondary);
+//   line-height: 1.4;
+//   display: -webkit-box;
+//   -webkit-box-orient: vertical;
+//   overflow: hidden;
+// }
+
+// .note-meta {
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-between;
+//   font-size: var(--font-size-xs);
+//   color: var(--text-tertiary);
+// }
+
+// .note-tags {
+//   display: flex;
+//   align-items: center;
+//   gap: 4px;
+//   color: var(--text-label);
+// }
+
+// /* --- MAIN EDITOR / PREVIEW PANEL (Right Panel) --- */
+// .note-editor-panel,
+// .note-preview-panel {
+//   flex: 1; /* Takes remaining full width */
+//   display: flex;
+//   flex-direction: column;
+//   min-width: 0;
+//   background: var(--bg-primary);
+// }
+
+// .note-form {
+//   display: flex;
+//   flex-direction: column;
+//   height: 100%;
+// }
+
+// /* Header Area */
+// .editor-header,
+// .preview-header {
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-between;
+//   padding: var(--spacing-lg) var(--spacing-xl);
+//   border-bottom: 1px solid var(--border-primary);
+//   background: var(--bg-primary);
+//   height: 70px;
+// }
+
+// .title-input {
+//   flex: 1;
+//   margin-right: var(--spacing-lg);
+//   font-family: var(--font-heading);
+//   font-size: var(--font-size-xl);
+//   font-weight: var(--font-weight-bold);
+//   border: none;
+//   background: transparent;
+//   color: var(--text-primary);
+//   padding: 0;
+  
+//   &:focus {
+//     box-shadow: none;
+//     outline: none;
+//   }
+  
+//   &::placeholder {
+//       color: var(--text-label);
+//       font-weight: var(--font-weight-normal);
+//   }
+// }
+
+// /* Split View: Editor Content + Tools Sidebar */
+// .editor-body {
+//   display: flex;
+//   flex: 1;
+//   overflow: hidden;
+//   position: relative;
+// }
+
+// .editor-content {
+//   flex: 1;
+//   display: flex;
+//   flex-direction: column;
+//   padding: var(--spacing-xl);
+//   overflow-y: auto;
+  
+//   .content-textarea {
+//     flex: 1;
+//     width: 100%;
+//     resize: none;
+//     border: none;
+//     background: transparent;
+//     font-family: var(--font-body);
+//     font-size: var(--font-size-base);
+//     line-height: 1.7;
+//     color: var(--text-primary);
+//     padding: 0;
+    
+//     &:focus {
+//       box-shadow: none;
+//     }
+//   }
+// }
+
+// /* Right Tools Sidebar (Tags/Attachments) */
+// .editor-sidebar {
+//   width: 300px;
+//   padding: var(--spacing-lg);
+//   border-left: 1px solid var(--border-primary);
+//   background: var(--bg-secondary); /* Distinction from writing area */
+//   overflow-y: auto;
+//   display: flex;
+//   flex-direction: column;
+//   gap: var(--spacing-xl);
+// }
+
+// .sidebar-section {
+//   label {
+//     display: flex;
+//     align-items: center;
+//     font-size: var(--font-size-xs);
+//     font-weight: var(--font-weight-bold);
+//     color: var(--text-label);
+//     margin-bottom: var(--spacing-sm);
+//     text-transform: uppercase;
+//     letter-spacing: 0.05em;
+    
+//     i { margin-right: 6px; }
+//   }
+// }
+
+// /* --- ATTACHMENTS --- */
+// .attachments-preview {
+//   display: flex;
+//   flex-direction: column;
+//   gap: var(--spacing-sm);
+//   margin-top: var(--spacing-sm);
+// }
+
+// .attachment-thumb {
+//   position: relative;
+//   border-radius: var(--ui-border-radius);
+//   overflow: hidden;
+//   border: 1px solid var(--border-secondary);
+//   background: var(--bg-primary);
+//   transition: transform 0.2s;
+  
+//   &:hover {
+//       border-color: var(--accent-primary);
+//   }
+  
+//   img {
+//     width: 100%;
+//     height: 140px;
+//     object-fit: cover;
+//     display: block;
+//   }
+
+//   .remove-btn {
+//     position: absolute;
+//     top: 6px;
+//     right: 6px;
+//     background: rgba(255, 255, 255, 0.9);
+//     width: 24px;
+//     height: 24px;
+    
+//     &:hover {
+//       background: #fff;
+//       color: var(--color-error);
+//     }
+//   }
+  
+//   /* Local Upload Badge */
+//   &.local-preview {
+//     border: 1px dashed var(--accent-primary);
+    
+//     .upload-badge {
+//       position: absolute;
+//       bottom: 6px;
+//       left: 6px;
+//       background: var(--accent-primary);
+//       color: white;
+//       font-size: 0.65rem;
+//       padding: 2px 8px;
+//       border-radius: 4px;
+//       font-weight: 700;
+//       text-transform: uppercase;
+//     }
+//   }
+// }
+
+// /* --- PREVIEW PANEL (Read Mode) --- */
+// .preview-content {
+//   flex: 1;
+//   padding: var(--spacing-2xl); /* More breathing room for reading */
+//   overflow-y: auto;
+//   max-width: 900px; /* Optimal reading width */
+//   margin: 0 auto;
+//   width: 100%;
+// }
+
+// .preview-text {
+//   font-size: var(--font-size-base);
+//   line-height: 1.8;
+//   color: var(--text-primary);
+//   white-space: pre-wrap;
+// }
+
+// .note-tags-preview {
+//   margin-bottom: var(--spacing-lg);
+//   display: flex;
+//   flex-wrap: wrap;
+//   gap: var(--spacing-sm);
+// }
+
+// .note-tag {
+//   background: var(--component-bg-active);
+//   color: var(--accent-primary);
+//   padding: 4px 12px;
+//   border-radius: 99px;
+//   font-size: var(--font-size-xs);
+//   font-weight: var(--font-weight-medium);
+//   border: 1px solid transparent;
+// }
+
+// .gallery-grid {
+//   display: grid;
+//   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+//   gap: var(--spacing-md);
+//   margin-top: var(--spacing-xl);
+// }
+
+// /* --- UTILITIES --- */
+// .state-placeholder {
+//   height: 100%;
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   justify-content: center;
+//   color: var(--text-tertiary);
+//   padding: var(--spacing-xl);
+//   text-align: center;
+  
+//   .placeholder-icon {
+//     font-size: 4rem;
+//     margin-bottom: var(--spacing-lg);
+//     opacity: 0.2;
+//     color: var(--text-primary);
+//   }
+  
+//   .placeholder-text {
+//     font-size: var(--font-size-lg);
+//     font-weight: var(--font-weight-medium);
+//     color: var(--text-primary);
+//     margin-bottom: var(--spacing-xs);
+//   }
+  
+//   .placeholder-subtext {
+//       font-size: var(--font-size-sm);
+//   }
+// }
+
+// /* --- SKELETON LOADING --- */
+// .skeleton-loader {
+//   display: flex;
+//   flex-direction: column;
+//   gap: var(--spacing-md);
+//   padding: var(--spacing-xs);
+// }
+
+// .skeleton-card {
+//   height: 90px;
+//   background: var(--bg-ternary);
+//   border-radius: var(--ui-border-radius);
+//   animation: pulse 1.5s infinite ease-in-out;
+// }
+
+// @keyframes pulse {
+//   0% { opacity: 0.5; }
+//   50% { opacity: 0.8; }
+//   100% { opacity: 0.5; }
+// }
+
+// /* --- RESPONSIVE ADJUSTMENTS --- */
+// @media (max-width: 1024px) {
+//     .editor-body {
+//         flex-direction: column;
+//     }
+//     .editor-sidebar {
+//         width: 100%;
+//         height: auto;
+//         max-height: 300px;
+//         border-left: none;
+//         border-top: 1px solid var(--border-primary);
+//     }
+// }
+
+// @media (max-width: 768px) {
+//     .notes-layout {
+//         flex-direction: column;
+//     }
+//     .notes-sidebar {
+//         width: 100%;
+//         height: 300px; /* Fixed height list on mobile */
+//         border-right: none;
+//         border-bottom: 1px solid var(--border-primary);
+//     }
+// }
+// /* Shimmer Skeleton */
+// .skeleton-card {
+//   background: linear-gradient(90deg, #f0f0f0 25%, #f8f8f8 50%, #f0f0f0 75%);
+//   background-size: 200% 100%;
+//   animation: shimmer 1.8s infinite;
+// }
+// @keyframes shimmer {
+//   0% { background-position: 200% 0; }
+//   100% { background-position: -200% 0; }
+// }
+
+// /* Elegant Active Tab */
+// ::ng-deep .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+//   background: linear-gradient(90deg, var(--accent-primary), transparent);
+//   border-radius: 8px;
+//   color: white !important;
+// }
+
+// /* Floating New Button */
+// .header-actions button[icon="pi pi-plus"] {
+//   background: var(--accent-primary);
+//   color: white;
+//   box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+//   transition: all 0.3s ease;
+//   &:hover {
+//     transform: translateY(-3px) scale(1.08);
+//     box-shadow: 0 10px 25px rgba(99, 102, 241, 0.5);
+//   }
+// }
+
+// /* Gradient Icon in Empty State */
+// .state-placeholder .placeholder-icon {
+//   font-size: 6rem;
+//   background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+//   -webkit-background-clip: text;
+//   -webkit-text-fill-color: transparent;
+//   background-clip: text;
+// }

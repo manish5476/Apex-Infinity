@@ -1,0 +1,206 @@
+/* ==============================================
+   PURCHASE LIST COMPONENT
+   - Inherits structure from Product List
+   ============================================== */
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+.list-page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--spacing-xl);
+  gap: var(--spacing-xl);
+  background: var(--bg-primary);
+}
+
+/* === HEADER === */
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.list-title {
+  font-size: var(--font-size-3xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+/* === CARD === */
+.themed-card {
+  background: var(--bg-secondary);
+  border-radius: var(--ui-border-radius-lg);
+  border: var(--ui-border-width) solid var(--border-primary);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-lg);
+}
+
+/* === FILTER BAR === */
+.se-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-lg);
+  align-items: flex-end;
+}
+
+.se-filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  flex-grow: 1;
+  min-width: 180px;
+
+  label {
+    font-size: var(--font-size-xs);
+    color: var(--text-label);
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  /* Unified Input Styles */
+  :is(input[pInputText], p-select, p-calendar) {
+    width: 100%;
+    /* Note: p-calendar width is handled by its host, ensuring input is styled */
+  }
+  
+  /* Targeting PrimeNG internal inputs for background consistency */
+  :host ::ng-deep .p-inputtext {
+      background: var(--bg-ternary);
+      border-color: var(--border-secondary);
+      color: var(--text-primary);
+  }
+}
+
+.se-filter-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  padding-bottom: 2px;
+}
+
+
+/* === GRID AREA === */
+.list-grid-area {
+  flex-grow: 1;
+  min-height: 0;
+  padding: var(--spacing-lg);
+  
+  app-shared-grid {
+    height: 100%;
+    width: 100%;
+  }
+}
+
+/* === AG-GRID THEMING & BADGES === */
+:host ::ng-deep {
+  .ag-root-wrapper { border: none; }
+  .ag-header {
+    background-color: var(--bg-ternary);
+    border-bottom: var(--ui-border-width) solid var(--border-primary);
+  }
+  .ag-header-cell-label {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+  .ag-row {
+    background-color: var(--bg-secondary);
+    color: var(--text-secondary);
+    border-color: var(--border-primary) !important;
+    
+    &.ag-row-hover {
+      background-color: var(--bg-ternary);
+    }
+  }
+
+  /* === BADGES (Cell Status) === */
+  .cell-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 60%; /* Smaller height for badge look */
+    width: fit-content;
+    min-width: 80px;
+    margin-top: 8px; /* Vertical Center hack for Ag-Grid default row height */
+    padding: 0 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    /* Order Status */
+    &.status-received {
+      background-color: color-mix(in srgb, var(--color-success) 15%, transparent);
+      color: var(--color-success);
+      border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent);
+    }
+    &.status-draft {
+      background-color: var(--bg-ternary);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-secondary);
+    }
+    &.status-cancelled {
+      background-color: color-mix(in srgb, var(--color-error) 15%, transparent);
+      color: var(--color-error);
+      border: 1px solid color-mix(in srgb, var(--color-error) 30%, transparent);
+    }
+
+    /* Payment Status */
+    &.pay-paid {
+      background-color: color-mix(in srgb, var(--color-success) 15%, transparent);
+      color: var(--color-success);
+    }
+    &.pay-partial {
+      background-color: color-mix(in srgb, var(--color-warning) 15%, transparent);
+      color: var(--color-warning);
+    }
+    &.pay-unpaid {
+      background-color: color-mix(in srgb, var(--color-error) 15%, transparent);
+      color: var(--color-error);
+    }
+  }
+
+  /* PrimeNG Dropdown Tweaks */
+  .p-select-panel {
+    background: var(--bg-secondary);
+    border: var(--ui-border-width) solid var(--border-primary);
+    
+    .p-select-item {
+      color: var(--text-secondary);
+      &:hover {
+        background: var(--bg-ternary);
+        color: var(--text-primary);
+      }
+    }
+    .p-select-item.p-highlight {
+      background: var(--accent-focus);
+      color: var(--accent-primary);
+    }
+  }
+  
+  /* Calendar Tweaks */
+  .p-datepicker {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      
+      .p-datepicker-header {
+          background: var(--bg-ternary);
+          color: var(--text-primary);
+      }
+      table td > span {
+          color: var(--text-secondary);
+      }
+      table td > span.p-highlight {
+          background: var(--accent-primary);
+          color: white;
+      }
+  }
+}
