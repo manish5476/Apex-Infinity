@@ -83,8 +83,11 @@ export class Login implements OnInit {
           this.notificationService.connect(currentUser._id);
         }
 
-        this.isLoading.set(false);
-this.router.navigate(['/app/dashboard']); 
+          this.isLoading.set(false);
+
+    // ✅ REVERTED: Navigate to standard dashboard
+    this.router.navigate(['/dashboard']); 
+  },
       },
       error: (err) => {
         this.isLoading.set(false);
