@@ -84,6 +84,7 @@ export class Login implements OnInit {
         }
 
         this.isLoading.set(false);
+this.router.navigate(['/app/dashboard']); 
       },
       error: (err) => {
         this.isLoading.set(false);
