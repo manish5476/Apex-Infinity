@@ -16,69 +16,62 @@
     </div>
   </div>
 
-  <nav
-  class="fixed top-0 inset-x-0 z-50 transition-all duration-300 border-b border-transparent"
-  [class.bg-slate-950/70]="scrollY > 20"
-  [class.backdrop-blur-lg]="scrollY > 20"
-  [class.border-white/10]="scrollY > 20"
->
+<nav class="fixed top-0 inset-x-0 z-50 transition-all duration-300 border-b border-transparent"
+     [class.bg-slate-950/70]="scrollY() > 20" 
+     [class.backdrop-blur-lg]="scrollY() > 20"
+     [class.border-white/10]="scrollY() > 20">
+  
   <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+    
     <!-- Logo -->
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-3 cursor-pointer" routerLink="/">
       <div class="relative w-8 h-8 flex items-center justify-center bg-gradient-to-tr from-indigo-500 to-cyan-400 rounded-lg shadow-lg shadow-indigo-500/20">
         <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
         </svg>
       </div>
-      <span class="text-xl font-bold tracking-tight">
-        Apex<span class="text-indigo-400">Infinity</span>
-      </span>
+      <span class="text-xl font-bold tracking-tight">Apex<span class="text-indigo-400">Infinity</span></span>
     </div>
 
     <!-- Desktop Menu -->
     <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-      <a routerLink="/#features" routerLinkActive="text-white" class="hover:text-white transition-colors">Features</a>
-      <a routerLink="/#testimonials" routerLinkActive="text-white" class="hover:text-white transition-colors">Customers</a>
-      <a routerLink="/#pricing" routerLinkActive="text-white" class="hover:text-white transition-colors">Pricing</a>
+      <!-- Use fragment navigation if these are on the same page -->
+      <a routerLink="." fragment="features" class="hover:text-white transition-colors cursor-pointer">Features</a>
+      <a routerLink="." fragment="testimonials" class="hover:text-white transition-colors cursor-pointer">Customers</a>
+      <a routerLink="." fragment="pricing" class="hover:text-white transition-colors cursor-pointer">Pricing</a>
     </div>
 
-    <!-- Desktop Auth Buttons -->
+    <!-- Desktop Actions -->
     <div class="hidden md:flex items-center gap-4">
-      <button
-        routerLink="/auth/login"
-        routerLinkActive="text-white"
-        class="text-sm font-medium text-slate-300 hover:text-white transition-colors"
-      >
+      <button class="text-sm font-medium text-slate-300 hover:text-white" routerLink="/auth/login">
         Log in
       </button>
 
-      <button
-        routerLink="/auth/org"
-        class="group relative px-5 py-2 rounded-full bg-white text-slate-950 text-sm font-semibold hover:bg-slate-200 transition-all overflow-hidden"
-      >
+      <button routerLink="/auth/org" class="group relative px-5 py-2 rounded-full bg-white text-slate-950 text-sm font-semibold hover:bg-slate-200 transition-all overflow-hidden">
         <span class="relative z-10">Get Started</span>
-        <div class="absolute inset-0 bg-gradient-to-r from-indigo-200 to-cyan-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-indigo-200 to-cyan-200 opacity-0 group-hover:opacity-100 transition-opacity"></div>
       </button>
     </div>
 
-    <!-- Mobile Menu Toggle -->
-    <button class="md:hidden text-slate-300" (click)="toggleMobileMenu()">
+    <!-- Mobile Menu Button -->
+    <button class="md:hidden text-slate-300 focus:outline-none" (click)="mobileMenuOpen.set(!mobileMenuOpen())">
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+        <path *ngIf="!mobileMenuOpen()" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+        <path *ngIf="mobileMenuOpen()" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
       </svg>
     </button>
   </div>
 
-  <!-- Mobile Menu (Optional - add if you want slide-down menu) -->
-  <div *ngIf="mobileMenuOpen" class="md:hidden bg-slate-950/95 backdrop-blur-lg border-t border-white/10">
-    <div class="px-6 py-4 space-y-4 text-center">
-      <a routerLink="/#features" (click)="mobileMenuOpen = false" class="block text-slate-300 hover:text-white">Features</a>
-      <a routerLink="/#testimonials" (click)="mobileMenuOpen = false" class="block text-slate-300 hover:text-white">Customers</a>
-      <a routerLink="/#pricing" (click)="mobileMenuOpen = false" class="block text-slate-300 hover:text-white">Pricing</a>
-      <button routerLink="/auth/login" class="block w-full py-2 text-slate-300 hover:text-white">Log in</button>
-      <button routerLink="/auth/org" class="block w-full py-3 mt-4 rounded-full bg-white text-slate-950 font-semibold">
-        Get Started
-      </button>
+  <!-- Mobile Menu Dropdown -->
+  <div class="md:hidden absolute top-20 left-0 w-full bg-slate-950/95 backdrop-blur-xl border-b border-white/10 transition-all duration-300 overflow-hidden"
+       [style.max-height]="mobileMenuOpen() ? '300px' : '0px'">
+    <div class="px-6 py-4 flex flex-col gap-4 text-slate-300">
+      <a routerLink="." fragment="features" (click)="mobileMenuOpen.set(false)" class="hover:text-white transition-colors">Features</a>
+      <a routerLink="." fragment="testimonials" (click)="mobileMenuOpen.set(false)" class="hover:text-white transition-colors">Customers</a>
+      <a routerLink="." fragment="pricing" (click)="mobileMenuOpen.set(false)" class="hover:text-white transition-colors">Pricing</a>
+      <div class="h-px bg-white/10 my-2"></div>
+      <button routerLink="/auth/login" (click)="mobileMenuOpen.set(false)" class="text-left hover:text-white">Log in</button>
+      <button routerLink="/auth/org" (click)="mobileMenuOpen.set(false)" class="text-left text-indigo-400 font-semibold hover:text-indigo-300">Get Started</button>
     </div>
   </div>
 </nav>
