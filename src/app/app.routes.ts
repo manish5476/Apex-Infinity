@@ -9,21 +9,11 @@ import { NotFoundComponent } from './modules/shared/components/notfound/notfound
 import { LogsComponent } from './modules/transactions/logs/logs';
 import { SalesListComponent } from './modules/sales/sales-list/sales-list';
 import { Sessions } from './modules/auth/sessions/sessions/sessions';
-import { LandingComponent } from './landingPage/landing.component';
+// import { LandingComponent } from './landingPage/landing.component'; // Removed for now
 
 export const routes: Routes = [
   // ==========================================================
-  //  1. LANDING PAGE (Root Path)
-  //  URL: localhost:4200/
-  // ==========================================================
-  {
-    path: '',
-    component: LandingComponent,
-    pathMatch: 'full' 
-  },
-
-  // ==========================================================
-  //  2. PUBLIC AUTH ROUTES
+  //  1. PUBLIC AUTH ROUTES
   //  URL: /auth/login, /auth/signup
   // ==========================================================
   {
@@ -33,13 +23,13 @@ export const routes: Routes = [
   },
 
   // ==========================================================
-  //  3. PROTECTED APPLICATION ROUTES
-  //  URL: /app/dashboard
+  //  2. PROTECTED APPLICATION ROUTES (Back at Root)
+  //  URL: /dashboard, /financials, etc.
   // ==========================================================
   {
-    path: 'app', 
+    path: '',
     component: MainScreen,
-    canActivate: [authGuard],
+    canActivate: [authGuard], // 🔒 Locks the root
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
@@ -51,6 +41,8 @@ export const routes: Routes = [
       },
       { path: 'notes', component: NotesPageComponent, title: 'My Notes' },
       { path: 'financials', component: LedgerComponent },
+      
+      // --- Admin & Settings ---
       {
         path: 'admin/organization',
         loadComponent: () =>
@@ -66,6 +58,8 @@ export const routes: Routes = [
             (m) => m.RoleManagementComponent
           ),
       },
+
+      // --- MASTERS & TRANSACTIONS ---
       { path: 'masterList', component: MasterList },
       { path: 'transactions', component: Transactions },
       { path: 'sessions', component: Sessions },
@@ -109,7 +103,7 @@ export const routes: Routes = [
   },
 
   // ==========================================================
-  //  4. FALLBACK REDIRECT
+  //  3. FALLBACK REDIRECT
   // ==========================================================
   { path: '**', component: NotFoundComponent }
 ];
