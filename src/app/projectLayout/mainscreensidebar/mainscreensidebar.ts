@@ -31,14 +31,18 @@ export class Mainscreensidebar implements OnInit {
   ngOnInit() {
     this.menuItems = this.getCorrectMenuItems();
 
-    // Auto-expand active menu on load
+    // --- Auto-expand active menu on load ---
     this.menuItems.forEach(item => {
-      if (item.items) {
+      if (item.items) { 
+        // Check if any child route is currently active
         const isChildActive = item.items.some((subItem:any) => {
           const childPath = subItem.routerLink.join('/');
-          // This logic still works because childPath will now be '/app/dashboard' etc.
+          
+          // Now that all paths start with /app, simple inclusion check works best
           return this.router.url.includes(childPath);
         });
+
+        // Set the parent to expanded if a child is active
         if(isChildActive) {
             this.expandedItems[item.label] = true;
         }
@@ -47,7 +51,7 @@ export class Mainscreensidebar implements OnInit {
   }
 
   // =========================================================
-  // ✅ FIX: Added '/app' prefix to all routerLinks
+  // ✅ FIX: ALL LINKS NOW HAVE '/app' PREFIX
   // =========================================================
   getCorrectMenuItems(): any[] {
     return [
@@ -129,7 +133,7 @@ export class Mainscreensidebar implements OnInit {
     ];
   }
 
-  // --- No changes needed below ---
+  // --- No changes below ---
   toggleMenuItem(label: string) {
     if (this.expandedItems.hasOwnProperty(label)) {
       this.expandedItems[label] = !this.expandedItems[label];
