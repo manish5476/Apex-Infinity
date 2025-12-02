@@ -170,12 +170,25 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   isSubmitting = false;
   isSuccess = false;
 
-  constructor() {}
+  constructor() {
+    // Optional: Reset success message after 3s
+    effect(() => {
+      if (this.isSuccess()) {
+        setTimeout(() => this.isSuccess.set(false), 3000);
+      }
+    });
+  }
 
   ngOnInit(): void {}
+ngAfterViewInit(): void {
+    this.setupRevealObserver();
+  }
 
-  ngAfterViewInit(): void {
-    // Setup Intersection Observer for "reveal on scroll"
+  ngOnDestroy(): void {
+    this.observer?.disconnect();
+  }
+
+  private setupRevealObserver() {
     const options = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
     this.observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -189,63 +202,132 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
     this.revealItems.forEach(item => this.observer?.observe(item.nativeElement));
   }
 
-  ngOnDestroy(): void {
-    this.observer?.disconnect();
-  }
-
-  @HostListener('window:scroll', [])
+  @HostListener('window:scroll')
   onWindowScroll() {
-    this.scrollY = window.scrollY;
+    this.scrollY.set(window.scrollY);
     this.checkStatsAnimation();
   }
 
-  toggleYearly() {
-    this.isYearly = !this.isYearly;
+  scrollToSection(id: string) {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    this.mobileMenuOpen.set(false);
   }
 
   toggleFaq(index: number) {
-    this.activeFaqIndex = this.activeFaqIndex === index ? null : index;
+    this.activeFaqIndex.set(this.activeFaqIndex() === index ? null : index);
   }
 
   submitForm() {
-    if(!this.emailInput) return;
-    this.isSubmitting = true;
+    if (!this.emailInput().trim()) return;
+    this.isSubmitting.set(true);
     setTimeout(() => {
-      this.isSubmitting = false;
-      this.isSuccess = true;
-      this.emailInput = '';
+      this.isSubmitting.set(false);
+      this.isSuccess.set(true);
+      this.emailInput.set('');
     }, 1500);
   }
 
   private checkStatsAnimation() {
     if (this.hasAnimatedStats) return;
-    const statsSection = document.getElementById('stats-section');
-    if (statsSection) {
-      const rect = statsSection.getBoundingClientRect();
-      if (rect.top < window.innerHeight - 100) {
-        this.hasAnimatedStats = true;
-        this.runCounter('users', 0, 15000, 2000);
-        this.runCounter('revenue', 0, 45, 2000); // 45M
-        this.runCounter('uptime', 90, 99.9, 2000);
-      }
+    const el = document.getElementById('stats-section');
+    if (el && el.getBoundingClientRect().top < window.innerHeight - 100) {
+      this.hasAnimatedStats = true;
+      this.animateValue('users', 0, 15234, 2200);
+      this.animateValue('revenue', 0, 45, 2200);
+      this.animateValue('uptime', 90, 99.9, 2200);
     }
   }
 
-  private runCounter(key: 'users' | 'revenue' | 'uptime', start: number, end: number, duration: number) {
+  private animateValue(key: 'users' | 'revenue' | 'uptime', start: number, end: number, duration: number) {
     let startTime: number | null = null;
     const step = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
       const progress = Math.min((timestamp - startTime) / duration, 1);
-      const value = start + (end - start) * (1 - Math.pow(1 - progress, 3)); // Cubic ease out
-      
-      if (key === 'uptime') this.stats[key] = parseFloat(value.toFixed(1));
-      else this.stats[key] = Math.floor(value);
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      const value = start + (end - start) * easeOut;
 
-      if (progress < 1) window.requestAnimationFrame(step);
+      this.stats.update(s => ({
+        ...s,
+        [key]: key === 'uptime' ? +value.toFixed(1) : Math.floor(value)
+      }));
+
+      if (progress < 1) requestAnimationFrame(step);
     };
-    window.requestAnimationFrame(step);
+    requestAnimationFrame(step);
   }
 }
+//   ngAfterViewInit(): void {
+//     // Setup Intersection Observer for "reveal on scroll"
+//     const options = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+//     this.observer = new IntersectionObserver((entries) => {
+//       entries.forEach(entry => {
+//         if (entry.isIntersecting) {
+//           entry.target.classList.add('in-view');
+//           this.observer?.unobserve(entry.target);
+//         }
+//       });
+//     }, options);
+
+//     this.revealItems.forEach(item => this.observer?.observe(item.nativeElement));
+//   }
+
+//   ngOnDestroy(): void {
+//     this.observer?.disconnect();
+//   }
+
+//   @HostListener('window:scroll', [])
+//   onWindowScroll() {
+//     this.scrollY = window.scrollY;
+//     this.checkStatsAnimation();
+//   }
+
+//   toggleYearly() {
+//     this.isYearly = !this.isYearly;
+//   }
+
+//   toggleFaq(index: number) {
+//     this.activeFaqIndex = this.activeFaqIndex === index ? null : index;
+//   }
+
+//   submitForm() {
+//     if(!this.emailInput) return;
+//     this.isSubmitting = true;
+//     setTimeout(() => {
+//       this.isSubmitting = false;
+//       this.isSuccess = true;
+//       this.emailInput = '';
+//     }, 1500);
+//   }
+
+//   private checkStatsAnimation() {
+//     if (this.hasAnimatedStats) return;
+//     const statsSection = document.getElementById('stats-section');
+//     if (statsSection) {
+//       const rect = statsSection.getBoundingClientRect();
+//       if (rect.top < window.innerHeight - 100) {
+//         this.hasAnimatedStats = true;
+//         this.runCounter('users', 0, 15000, 2000);
+//         this.runCounter('revenue', 0, 45, 2000); // 45M
+//         this.runCounter('uptime', 90, 99.9, 2000);
+//       }
+//     }
+//   }
+
+//   private runCounter(key: 'users' | 'revenue' | 'uptime', start: number, end: number, duration: number) {
+//     let startTime: number | null = null;
+//     const step = (timestamp: number) => {
+//       if (!startTime) startTime = timestamp;
+//       const progress = Math.min((timestamp - startTime) / duration, 1);
+//       const value = start + (end - start) * (1 - Math.pow(1 - progress, 3)); // Cubic ease out
+      
+//       if (key === 'uptime') this.stats[key] = parseFloat(value.toFixed(1));
+//       else this.stats[key] = Math.floor(value);
+
+//       if (progress < 1) window.requestAnimationFrame(step);
+//     };
+//     window.requestAnimationFrame(step);
+//   }
+// }
 
 // import { CommonModule, isPlatformBrowser, DecimalPipe, ViewportScroller } from '@angular/common';
 // import { Component, HostListener, Inject, PLATFORM_ID, AfterViewInit, ElementRef, ViewChildren, QueryList, signal, computed, effect } from '@angular/core';
