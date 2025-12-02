@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, OnInit, AfterViewInit, ElementRef, ViewChildren, QueryList, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, RouterLinkActive } from '@angular/common';
 interface Feature {
   title: string;
   desc: string;
