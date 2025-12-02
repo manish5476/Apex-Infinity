@@ -154,7 +154,7 @@ showNotesDialog = signal(false);
 
   selectDay(day: any): void {
     if (!day.isCurrentMonth || !day.heatmapData) return;
-    this.showSummaryDialog.set(true);
+    // this.showSummaryDialog.set(true);
     this.selectedDay.set(day);
     this.fetchDailySummary(day.date);
   }
@@ -165,7 +165,7 @@ showNotesDialog = signal(false);
     event.stopPropagation();
     // ✅ Pass the full day object
     this.selectedNoteDate.set(day);
-    this.showNotesDialog.set(true);
+    // this.showNotesDialog.set(true);
   }
 
   handleTimelineDaySelect(date: Date): void {
@@ -174,7 +174,7 @@ showNotesDialog = signal(false);
 
     if (targetDay) {
       this.selectedNoteDate.set(targetDay);
-      this.showNotesDialog.set(true);
+      // this.showNotesDialog.set(true);
     }
   }
   // --- UTILITY METHODS (Unchanged) ---

@@ -70,7 +70,7 @@ export class BranchFormComponent implements OnInit {
       switchMap(params => {
         this.branchId = params.get('id');
         if (this.branchId) {
-          this.editMode.set(true);
+          // this.editMode.set(true);
           this.formTitle.set('Edit Branch');
           this.loadingService.show();
           return this.branchService.getBranchById(this.branchId);
@@ -121,7 +121,7 @@ export class BranchFormComponent implements OnInit {
       return;
     }
 
-    this.isSubmitting.set(true);
+    // this.isSubmitting.set(true);
     const payload = this.branchForm.getRawValue();
 
     const saveObservable = this.editMode()

@@ -70,7 +70,7 @@ export class InvoiceDetailsComponent implements OnInit {
         return;
       }
 
-      this.isLoading.set(true);
+       // this.isLoading.set(true);
 
       this.common.apiCall(
         this.invoiceService.getInvoiceById(invoiceId),
@@ -112,7 +112,7 @@ export class InvoiceDetailsComponent implements OnInit {
     const id = this.invoice()?._id;
     if (!id) return;
     
-    this.isProcessing.set(true);
+    // this.isProcessing.set(true);
     this.common.apiCall(
         this.invoiceService.emailInvoice(id),
         () => {
@@ -127,7 +127,7 @@ export class InvoiceDetailsComponent implements OnInit {
     const id = this.invoice()?._id;
     if (!id) return;
 
-    this.isProcessing.set(true); // Show spinner on button
+    // this.isProcessing.set(true); // Show spinner on button
     this.common.apiCall(
       this.invoiceService.downloadInvoice(id),
       (res: any) => {
@@ -237,7 +237,7 @@ export class InvoiceDetailsComponent implements OnInit {
 //         return;
 //       }
 
-//       this.isLoading.set(true);
+//        // this.isLoading.set(true);
 
 //       this.common.apiCall(
 //         this.invoiceService.getInvoiceById(invoiceId),

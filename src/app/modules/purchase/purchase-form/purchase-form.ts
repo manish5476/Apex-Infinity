@@ -241,7 +241,7 @@ export class PurchaseFormComponent implements OnInit {
       return;
     }
 
-    this.isSubmitting.set(true);
+    // this.isSubmitting.set(true);
     const formValue = this.purchaseForm.getRawValue();
     const fd = new FormData();
 
@@ -294,7 +294,7 @@ export class PurchaseFormComponent implements OnInit {
       switchMap(params => {
         this.purchaseId = params.get('id');
         if (this.purchaseId) {
-          this.editMode.set(true);
+          // this.editMode.set(true);
           this.formTitle.set('Edit Purchase');
           return this.purchaseService.getPurchaseById(this.purchaseId);
         }

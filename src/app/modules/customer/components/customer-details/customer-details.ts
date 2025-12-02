@@ -171,13 +171,13 @@ export class CustomerDetails implements OnInit {
   }
 
   loadProfile(id: string): void {
-    this.loadingProfile.set(true);
+    // this.loadingProfile.set(true);
     this.isError.set(false);
 
     this.customerService.getCustomerDataWithId(id)
       .pipe(
         catchError(err => {
-          this.isError.set(true);
+          // this.isError.set(true);
           this.messageService.showError('Error', 'Could not load customer profile');
           return of(null);
         }),
@@ -193,7 +193,7 @@ export class CustomerDetails implements OnInit {
              this.switchTab('ledger');
           }
         } else if (!this.isError()) {
-           this.isError.set(true);
+          //  this.isError.set(true);
         }
       });
   }

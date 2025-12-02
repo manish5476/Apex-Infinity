@@ -46,7 +46,7 @@ export class PurchaseDetailsComponent implements OnInit {
       switchMap(params => {
         const id = params.get('id');
         if (id) {
-          this.isLoading.set(true);
+           // this.isLoading.set(true);
           return this.purchaseService.getPurchaseById(id);
         }
         return [];

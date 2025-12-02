@@ -64,7 +64,7 @@ export class AdminDashboardComponent implements OnInit {
     this.loadDashboard();
   }
  loadDashboard(start?: string, end?: string) {
-    this.loading.set(true);
+    // this.loading.set(true);
 
     forkJoin({
       overview: this.analyticsService.getDashboardOverview(start, end),

@@ -66,7 +66,7 @@ export class Sessions implements OnInit {
 
   // --- Data Loading ---
   loadData() {
-    this.isLoading.set(true);
+     // this.isLoading.set(true);
     this.data = [];
 
     const req$ = this.viewMode() === 'mine' 
@@ -175,7 +175,7 @@ export class Sessions implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.isRevoking.set(true);
+        // this.isRevoking.set(true);
         this.sessionService.revokeSession(this.selectedSession._id).subscribe({
           next: () => {
             this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Session revoked' });
@@ -202,7 +202,7 @@ export class Sessions implements OnInit {
       icon: 'pi pi-trash',
       acceptButtonStyleClass: 'p-button-danger p-button-outlined',
       accept: () => {
-        this.isDeleting.set(true);
+        // this.isDeleting.set(true);
         this.sessionService.deleteSession(this.selectedSession._id).subscribe({
             next: () => {
                 this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Record removed' });
@@ -305,7 +305,7 @@ export class Sessions implements OnInit {
 
 //   // --- Data Loading ---
 //   loadData() {
-//     this.isLoading.set(true);
+//      // this.isLoading.set(true);
 //     this.data = []; // Clear current data
 
 //     const req$ = this.viewMode() === 'mine' 

@@ -108,7 +108,7 @@ export class PaymentFormComponent implements OnInit, OnDestroy {
       switchMap(params => {
         this.paymentId = params.get('id');
         if (this.paymentId) {
-          this.editMode.set(true);
+          // this.editMode.set(true);
           this.formTitle.set('Edit Payment');
           this.loadingService.show();
           return this.paymentService.getPaymentById(this.paymentId);
@@ -204,7 +204,7 @@ export class PaymentFormComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.isSubmitting.set(true);
+    // this.isSubmitting.set(true);
     const payload = this.paymentForm.getRawValue();
 
     const saveObservable = this.editMode()

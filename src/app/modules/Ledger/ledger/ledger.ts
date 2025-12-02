@@ -173,7 +173,7 @@ export class LedgerComponent implements OnInit {
   }
 
   loadData(tab: LedgerTab) {
-    this.isLoading.set(true);
+     // this.isLoading.set(true);
     let apiCall: Observable<any>;
     const filters = this.filterForm.value;
 

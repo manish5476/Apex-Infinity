@@ -120,7 +120,7 @@ export class EmiDetailsComponent implements OnInit {
   }
 
   private fetchEmiDetails(id: string) {
-    this.isLoading.set(true);
+     // this.isLoading.set(true);
     this.common.apiCall(
       this.emiService.getEmiById(id),
       (res: any) => {
@@ -163,16 +163,12 @@ export class EmiDetailsComponent implements OnInit {
   }
 
   submitPayment() {
-    if (this.paymentForm.invalid) {
-      this.paymentForm.markAllAsTouched();
+    if (this.paymentForm.invalid) {this.paymentForm.markAllAsTouched() 
       return;
     }
-
     const emiId = this.emiData()._id;
     const { amount, paymentId, paymentMode } = this.paymentForm.value;
-
-    this.isSubmittingPayment.set(true);
-
+    // this.isSubmittingPayment.set(true);
     const payload = {
       emiId: emiId,
       installmentNumber: this.selectedInstallment.installmentNumber,
@@ -310,7 +306,7 @@ export class EmiDetailsComponent implements OnInit {
 //   }
 
 //   private fetchEmiDetails(id: string) {
-//     this.isLoading.set(true);
+//      // this.isLoading.set(true);
 //     this.common.apiCall(
 //       this.emiService.getEmiById(id),
 //       (res: any) => {

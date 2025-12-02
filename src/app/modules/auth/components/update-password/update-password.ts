@@ -113,7 +113,7 @@ export class UpdatePasswordComponent {
       return;
     }
 
-    this.isLoading.set(true);
+     // this.isLoading.set(true);
     this.authService.updateUserPassword(this.updateForm.value).subscribe({
       next: () => {
         this.isLoading.set(false);
@@ -240,7 +240,7 @@ export class UpdatePasswordComponent {
 //       return;
 //     }
 
-//     this.isLoading.set(true);
+//      // this.isLoading.set(true);
 //     this.authService.updateUserPassword(this.updateForm.value).subscribe({
 //       next: () => {
 //         this.isLoading.set(false);

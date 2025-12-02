@@ -114,7 +114,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
       const id = params.get('id');
       if (id) {
         this.invoiceId = id;
-        this.editMode.set(true);
+        // this.editMode.set(true);
         this.loadInvoiceData(id);
       } else {
         this.isLoading.set(false);
@@ -326,9 +326,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
       this.messageService.showWarn('Missing Data', 'Please fill in all required fields.');
       return;
     }
-
-    this.isSubmitting.set(true);
-    
+    // this.isSubmitting.set(true);
     // Prepare Payload
     const formValue = this.invoiceForm.getRawValue();
     const payload = {

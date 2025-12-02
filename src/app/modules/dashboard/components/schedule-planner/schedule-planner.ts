@@ -96,7 +96,7 @@ todayDate: string|number|Date=new Date();
     // --- Data Fetching ---
 
     fetchWeekNotes(): void {
-        this.isLoading.set(true);
+         // this.isLoading.set(true);
         const dates = this.displayedDates();
         
         // Use the first day (Monday) and last day (Sunday) for API filtering

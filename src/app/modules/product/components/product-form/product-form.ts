@@ -82,7 +82,7 @@ export class ProductFormComponent implements OnInit {
       switchMap(params => {
         this.productId = params.get('id');
         if (this.productId) {
-          this.editMode.set(true);
+          // this.editMode.set(true)set(true);
           this.formTitle.set('Edit Product');
           this.loadingService.show();
           return this.productService.getProductById(this.productId);
@@ -185,7 +185,7 @@ export class ProductFormComponent implements OnInit {
       return;
     }
 
-    this.isSubmitting.set(true);
+    // this.isSubmitting.set(true);
     const rawValue = this.productForm.getRawValue();
 
     // Prepare payload

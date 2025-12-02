@@ -104,7 +104,7 @@ export class CreateOrganizationComponent implements OnInit {
       return;
     }
 
-    this.isLoading.set(true);
+     // this.isLoading.set(true);
     const payload = this.organizationForm.value;
 
     // Ensure uppercase consistency
@@ -230,7 +230,7 @@ export class CreateOrganizationComponent implements OnInit {
 //       return;
 //     }
 
-//     this.isLoading.set(true);
+//      // this.isLoading.set(true);
 //     const formData = this.organizationForm.value;
 
 //     // Format Data

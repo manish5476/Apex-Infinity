@@ -111,7 +111,7 @@ export class ResetPasswordComponent implements OnInit {
       return;
     }
 
-    this.isLoading.set(true);
+    //  // this.isLoading.set(true);
     this.authService.resetPassword(this.token, this.resetForm.value).subscribe({
       next: () => this.isLoading.set(false),
       error: (err) => {
@@ -235,7 +235,7 @@ export class ResetPasswordComponent implements OnInit {
 //       return;
 //     }
 
-//     this.isLoading.set(true);
+//      // this.isLoading.set(true);
 //     this.authService.resetPassword(this.token, this.resetForm.value).subscribe({
 //       next: () => this.isLoading.set(false),
 //       error: (err) => {

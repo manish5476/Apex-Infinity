@@ -370,7 +370,7 @@ export class SalesListComponent implements OnInit {
 //   }
 
 //   loadSales(page: number, limit: number) {
-//     this.isLoading.set(true);
+//      // this.isLoading.set(true);
     
 //     // Backend expects query params
 //     const params = {

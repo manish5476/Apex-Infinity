@@ -67,7 +67,7 @@ export class Signup implements OnInit {
       return;
     }
 
-    this.isLoading.set(true);
+    //  // this.isLoading.set(true);
     const formData = this.signupForm.value;
     formData.uniqueShopId = formData.uniqueShopId.toUpperCase();
 

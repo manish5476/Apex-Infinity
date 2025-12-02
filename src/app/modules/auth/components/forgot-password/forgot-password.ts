@@ -101,7 +101,7 @@ export class ForgotPasswordComponent {
 
   onSubmit() {
     if (this.forgotForm.invalid) return;
-    this.isLoading.set(true);
+    //  // this.isLoading.set(true);
     
     this.authService.forgotPassword(this.forgotForm.value.email!).subscribe({
       next: () => this.isLoading.set(false),
@@ -216,7 +216,7 @@ export class ForgotPasswordComponent {
 
 //   onSubmit() {
 //     if (this.forgotForm.invalid) return;
-//     this.isLoading.set(true);
+//      // this.isLoading.set(true);
     
 //     this.authService.forgotPassword(this.forgotForm.value.email!).subscribe({
 //       next: () => this.isLoading.set(false),

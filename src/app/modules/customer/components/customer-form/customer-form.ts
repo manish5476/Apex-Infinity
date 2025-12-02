@@ -126,13 +126,13 @@ export class CustomerForm implements OnInit {
 
     if (id) {
       this.customerId.set(id);
-      this.editMode.set(true);
+      // this.editMode.set(true);
       this.loadCustomerData(id);
     }
   }
 
   private loadCustomerData(id: string): void {
-    this.loadingData.set(true);
+    // this.loadingData.set(true);
     
     this.common.apiCall(
       this.customerService.getCustomerDataWithId(id),
@@ -140,11 +140,7 @@ export class CustomerForm implements OnInit {
         const data = response.data?.data || response.data || response;
         if (data) {
           this.customerForm.patchValue(data);
-          
-          // Store avatar URL for preview
           if (data.avatar) this.currentAvatarUrl = data.avatar;
-
-          // Patch addresses safely
           if (data.billingAddress) this.customerForm.get('billingAddress')?.patchValue(data.billingAddress);
           if (data.shippingAddress) this.customerForm.get('shippingAddress')?.patchValue(data.shippingAddress);
         }
@@ -154,15 +150,12 @@ export class CustomerForm implements OnInit {
     );
   }
 
-  // === 2. File Upload ===
   onFileUpload(event: any): void {
     const file = event.files[0];
     if (file) {
       this.customerForm.patchValue({ avatar: file });
       this.customerForm.get('avatar')?.markAsDirty();
-      
-      // Create local preview
-      const reader = new FileReader();
+          const reader = new FileReader();
       reader.onload = (e: any) => this.currentAvatarUrl = e.target.result;
       reader.readAsDataURL(file);
     }
@@ -176,9 +169,8 @@ export class CustomerForm implements OnInit {
       return;
     }
 
-    this.isSubmitting.set(true);
+    // this.isSubmitting.set(true);
     const formData = this.prepareFormData();
-
     const request$ = this.editMode()
         ? this.customerService.updateCustomer(this.customerId()!, formData)
         : this.customerService.createNewCustomer(formData);
@@ -186,11 +178,8 @@ export class CustomerForm implements OnInit {
     this.common.apiCall(
       request$,
       (res: any) => {
-        this.messageService.showSuccess(
-          this.editMode() ? 'Updated' : 'Created', 
-          `Customer saved successfully.`
-        );
-        this.isSubmitting.set(false);
+        this.messageService.showSuccess(this.editMode() ? 'Updated' : 'Created', `Customer saved successfully.` );
+        // this.isSubmitting.set(false);
         setTimeout(() => this.router.navigate(['/customer']), 500);
       },
       'Save Customer'

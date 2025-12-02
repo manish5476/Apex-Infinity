@@ -74,7 +74,7 @@ export class NoteTimelineComponent implements OnInit {
 
   // --- Data Loading ---
   loadMonthData(): void {
-    this.isLoading.set(true);
+     // this.isLoading.set(true);
     const year = this.currentDate().getFullYear();
     const month = this.currentDate().getMonth() + 1;
 
