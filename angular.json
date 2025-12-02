@@ -93,6 +93,11 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "allowedHosts": ["all"],
+            "host": "0.0.0.0",
+            "port": 5000
+          },
           "configurations": {
             "production": {
               "buildTarget": "apex:build:production"
@@ -135,6 +140,6 @@
     }
   },
   "cli": {
-    "analytics": "02a2b5c3-f10b-4eed-a92f-ac1ce8cfd3a2"
+    "analytics": false
   }
 }
