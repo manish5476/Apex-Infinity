@@ -23,7 +23,7 @@ interface Plan {
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [CommonModule, FormsModule,RouterLink, RouterLinkActive],
+  imports: [CommonModule, FormsModule],
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss'],
 })
