@@ -1,669 +1,327 @@
 /* =========================================================
-   COMPONENT STYLES (Dark Mode Optimized)
+   CUSTOMER DETAILS - RESPONSIVE STYLES
+   Mobile-First Architecture
    ========================================================= */
 
+/* 1. SCROLL FIX */
 :host {
   display: block;
-  width: 100%;
   height: 100%;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   background: var(--bg-primary);
   font-family: var(--font-body);
   color: var(--text-primary);
 }
 
 .dashboard-container {
+  min-height: 100%;
   width: 100%;
-  max-width: 100%;
-  padding: var(--spacing-2xl);
+  padding: var(--spacing-md);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-2xl);
+  gap: var(--spacing-lg);
+  padding-bottom: var(--spacing-2xl); /* Bottom spacing for mobile */
 
-  @media (max-width: 768px) {
-    padding: var(--spacing-md);
+  @media (min-width: 768px) {
+    padding: var(--spacing-xl);
     gap: var(--spacing-xl);
   }
 }
 
-/* === 1. HEADER === */
+/* === 2. HEADER === */
 .dashboard-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--spacing-lg);
+  flex-direction: column;
+  gap: var(--spacing-md);
+
+  @media (min-width: 992px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
 
   .header-left {
     display: flex;
-    align-items: center;
-    gap: var(--spacing-lg);
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    flex: 1;
+    min-width: 0; /* Ensures truncation works */
+
     .back-btn {
       color: var(--text-tertiary);
-      transition: var(--transition-fast);
+      flex-shrink: 0;
+      margin-top: 4px;
       &:hover { color: var(--text-primary); background: var(--component-bg-hover); }
     }
+
     .customer-identity {
-      display: flex; flex-direction: column; gap: 4px;
+      display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1;
+
       .name-row {
-        display: flex; align-items: center; gap: var(--spacing-md);
-        h1 { font-family: var(--font-heading); font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--text-primary); margin: 0; letter-spacing: -0.02em; }
+        display: flex; align-items: center; gap: var(--spacing-sm); flex-wrap: wrap;
+        
+        h1 { 
+          font-family: var(--font-heading); 
+          font-size: 1.5rem; 
+          font-weight: var(--font-weight-bold); 
+          color: var(--text-primary); 
+          margin: 0;
+          line-height: 1.2;
+        }
+
+        @media (min-width: 768px) {
+          h1 { font-size: 1.85rem; }
+        }
       }
+
       .badges {
-        display: flex; align-items: center; gap: var(--spacing-md);
-        .id-pill { font-family: var(--font-mono); font-size: var(--font-size-xs); background: var(--bg-ternary); border: 1px solid var(--border-primary); padding: 2px 8px; border-radius: var(--ui-border-radius); color: var(--text-secondary); }
-        .type-label { font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); color: var(--text-label); text-transform: uppercase; letter-spacing: 0.05em; }
+        display: flex; align-items: center; gap: var(--spacing-sm); flex-wrap: wrap;
+        
+        .id-pill { 
+          font-family: var(--font-mono); font-size: 0.75rem; 
+          background: var(--bg-ternary); border: 1px solid var(--border-primary); 
+          padding: 2px 8px; border-radius: 4px; color: var(--text-secondary); 
+          white-space: nowrap;
+        }
+        
+        .type-label { 
+          font-size: 0.7rem; font-weight: 600; 
+          color: var(--text-label); text-transform: uppercase; letter-spacing: 0.05em; 
+          white-space: nowrap;
+        }
       }
     }
   }
-  .header-actions { display: flex; gap: var(--spacing-md); }
+
+  .header-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 2px;
+
+    .action-btn { flex: 1; white-space: nowrap; }
+
+    @media (min-width: 576px) {
+      width: auto;
+      .action-btn { flex: initial; }
+    }
+  }
 }
 
-/* === 2. LAYOUT GRID === */
+/* === 3. LAYOUT GRID === */
 .layout-grid {
   display: grid;
-  grid-template-columns: 360px 1fr;
-  gap: var(--spacing-2xl);
+  grid-template-columns: 1fr; /* Default Stack */
+  gap: var(--spacing-lg);
   align-items: start;
 
-  @media (max-width: 1200px) {
-    grid-template-columns: 1fr;
+  @media (min-width: 1200px) {
+    grid-template-columns: 320px 1fr; /* Sidebar + Main */
+    gap: var(--spacing-xl);
   }
 }
 
-/* === 3. RIGHT CONTENT === */
-.right-content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xl);
-  min-width: 0; 
-}
-
-/* === 4. METRICS GRID === */
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr); 
-  gap: var(--spacing-xl);
-
-  @media (max-width: 900px) {
-     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .metric-card {
-    background: var(--bg-secondary);
-    backdrop-filter: blur(var(--glass-blur-c));
-    -webkit-backdrop-filter: blur(var(--glass-blur-c));
-    border: 1px solid var(--border-primary);
-    box-shadow: var(--shadow-sm);
-    border-radius: var(--ui-border-radius-lg);
-    padding: var(--spacing-xl);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-lg);
-    transition: var(--transition-base);
-
-    &:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
-
-    .icon-box {
-      width: 48px; height: 48px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: var(--font-size-xl);
-      background: var(--bg-ternary); 
-      color: var(--text-secondary);
-      flex-shrink: 0;
-    }
-
-    .data-box {
-      display: flex; flex-direction: column; min-width: 0;
-      label { font-size: var(--font-size-xs); text-transform: uppercase; font-weight: var(--font-weight-bold); letter-spacing: 0.05em; color: var(--text-label); margin-bottom: 4px; white-space: nowrap;}
-      .value { font-family: var(--font-heading); font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--text-primary); }
-    }
-
-    &.outstanding {
-      .icon-box { background: rgba(239, 68, 68, 0.15); color: var(--color-error); }
-      .value { color: var(--color-error); }
-    }
-    &.invoiced .icon-box { background: rgba(59, 130, 246, 0.15); color: var(--color-info); }
-    &.received .icon-box { background: rgba(16, 185, 129, 0.15); color: var(--color-success); }
-    &.limit .icon-box { background: var(--bg-ternary); color: var(--text-secondary); }
-  }
-}
-
-/* === 5. PROFILE CARD === */
+/* === 4. PROFILE SIDEBAR === */
 .profile-card {
-  background: var(--bg-secondary);
-  backdrop-filter: blur(var(--glass-blur-c));
-  -webkit-backdrop-filter: blur(var(--glass-blur-c));
-  border: 1px solid var(--border-primary);
-  box-shadow: var(--shadow-lg);
-  border-radius: var(--ui-border-radius-lg);
+  display: flex; flex-direction: column;
+  padding: 0; overflow: hidden;
   
-  position: sticky; top: 20px; z-index: 10; height: fit-content;
-  display: flex; flex-direction: column; overflow: hidden; padding: 0;
+  @media (min-width: 1200px) {
+    position: sticky; top: var(--spacing-lg);
+  }
 
   .card-banner {
-    height: 140px; width: 100%;
+    height: 100px; width: 100%;
     background-image: url('https://images.unsplash.com/photo-1758568938040-fb8b7275ca5f?q=80&w=1332&auto=format&fit=crop'); 
     background-size: cover; background-position: center; position: relative;
     &::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.3); }
   }
 
   .identity-section {
-    padding: 0 var(--spacing-xl) var(--spacing-lg); text-align: center; margin-top: -70px; position: relative;
+    padding: 0 var(--spacing-lg) var(--spacing-lg); 
+    text-align: center; 
+    margin-top: -50px; 
+    position: relative;
+
     .avatar-wrapper {
-      position: relative; display: inline-block; margin-bottom: var(--spacing-md); width: 120px; height: 120px;
+      position: relative; display: inline-block; margin-bottom: var(--spacing-sm); 
+      width: 100px; height: 100px;
+
       .edit-btn {
-        position: absolute; bottom: 0; right: 0; z-index: 20; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        position: absolute; bottom: 0; right: 0; z-index: 20; 
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        width: 32px; height: 32px;
       }
-      .status-indicator { position: absolute; bottom: 12px; right: 12px; width: 18px; height: 18px; background: #ccc; border: 3px solid var(--bg-secondary); border-radius: 50%; z-index: 15; &.active { background: var(--color-success); } }
+      
+      .status-indicator { 
+        position: absolute; bottom: 8px; right: 8px; width: 14px; height: 14px; 
+        background: #ccc; border: 2px solid var(--bg-secondary); border-radius: 50%; z-index: 15; 
+        &.active { background: var(--color-success); } 
+      }
     }
-    h3 { margin: 0 0 4px 0; font-size: 1.35rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.01em; }
-    .email { font-size: var(--font-size-sm); color: var(--text-secondary); display: block; margin-bottom: var(--spacing-md); }
+
+    h3 { margin: 4px 0; font-size: 1.25rem; font-weight: 700; color: var(--text-primary); }
+    .email { font-size: 0.85rem; color: var(--text-secondary); display: block; overflow-wrap: break-word; }
   }
 
   .details-list {
-    padding: 0 var(--spacing-xl) var(--spacing-xl); display: flex; flex-direction: column; gap: var(--spacing-lg);
+    padding: 0 var(--spacing-lg) var(--spacing-lg); 
+    display: flex; flex-direction: column; gap: var(--spacing-md);
+
     .detail-item {
-      display: flex; align-items: flex-start; gap: var(--spacing-lg); padding: var(--spacing-md); border-radius: var(--ui-border-radius); background: var(--bg-ternary); border: 1px solid transparent; transition: var(--transition-fast);
+      display: flex; align-items: center; gap: var(--spacing-md); 
+      padding: var(--spacing-md); border-radius: var(--ui-border-radius); 
+      background: var(--bg-ternary); border: 1px solid transparent; 
+      transition: var(--transition-fast);
+      
       &:hover { background: var(--component-bg-hover); border-color: var(--border-primary); }
-      .icon-circle { width: 32px; height: 32px; border-radius: 8px; background: var(--bg-secondary); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; box-shadow: var(--shadow-sm); }
+
+      .icon-circle { 
+        width: 36px; height: 36px; border-radius: 50%; 
+        background: var(--bg-secondary); color: var(--text-secondary); 
+        display: flex; align-items: center; justify-content: center; 
+        font-size: 1rem; flex-shrink: 0; box-shadow: var(--shadow-sm); 
+      }
+
       .meta {
-        display: flex; flex-direction: column; overflow: hidden;
-        label { font-size: 0.65rem; text-transform: uppercase; font-weight: 700; color: var(--text-label); letter-spacing: 0.5px; margin-bottom: 2px; }
-        span { font-size: var(--font-size-sm); color: var(--text-primary); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .text-muted { color: var(--text-tertiary); font-weight: 400; }
+        display: flex; flex-direction: column; min-width: 0;
+        label { 
+          font-size: 0.65rem; text-transform: uppercase; font-weight: 700; 
+          color: var(--text-label); letter-spacing: 0.5px; 
+        }
+        span, a { 
+          font-size: 0.9rem; color: var(--text-primary); font-weight: 500; 
+        }
+        .link-text:hover { color: var(--accent-primary); text-decoration: underline; }
       }
     }
   }
 }
 
-/* === 6. ACTIVITY PANEL & TABS === */
+/* === 5. METRICS (Scrollable Row) === */
+.right-content {
+  display: flex; flex-direction: column; gap: var(--spacing-lg); min-width: 0;
+}
+
+.metrics-scroll-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); /* Adaptive Grid */
+  gap: var(--spacing-md);
+
+  /* Mobile: Horizontal Scroll Snap */
+  @media (max-width: 640px) {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 4px; /* Space for scrollbar */
+    
+    .metric-card {
+      min-width: 160px; /* Fixed width for scroll items */
+      scroll-snap-align: start;
+    }
+  }
+
+  .metric-card {
+    padding: var(--spacing-lg);
+    display: flex; flex-direction: column; justify-content: space-between;
+    min-height: 110px;
+    position: relative;
+
+    .icon-box {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; margin-bottom: var(--spacing-md);
+      background: var(--bg-ternary); color: var(--text-secondary);
+    }
+
+    .data-box {
+      display: flex; flex-direction: column;
+      label { font-size: 0.7rem; text-transform: uppercase; font-weight: 700; color: var(--text-label); margin-bottom: 2px; }
+      .value { font-family: var(--font-heading); font-size: 1.4rem; font-weight: 700; color: var(--text-primary); line-height: 1.1; }
+    }
+
+    /* Colors */
+    &.outstanding { .icon-box { background: rgba(239, 68, 68, 0.1); color: var(--color-error); } .value { color: var(--color-error); } }
+    &.invoiced { .icon-box { background: rgba(59, 130, 246, 0.1); color: var(--color-info); } }
+    &.received { .icon-box { background: rgba(16, 185, 129, 0.1); color: var(--color-success); } }
+  }
+}
+
+/* === 6. ACTIVITY PANEL === */
 .activity-panel {
-  background: var(--bg-secondary);
-  backdrop-filter: blur(var(--glass-blur-c));
-  border: 1px solid var(--border-primary);
-  box-shadow: var(--shadow-sm);
-  border-radius: var(--ui-border-radius-lg);
-  overflow: hidden;
-  height: fit-content;
-  min-height: 400px;
   display: flex; flex-direction: column;
+  overflow: hidden; /* For rounded corners */
+}
+
+/* Scrollable Tabs Wrapper */
+.custom-tabs-scroll {
+  width: 100%;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
 }
 
 .custom-tabs {
-  display: flex; gap: 0.5rem; border-bottom: 1px solid var(--border-primary); padding: 0 var(--spacing-lg); background: var(--bg-secondary);
+  display: flex; gap: 0.5rem; padding: 0 var(--spacing-md); min-width: max-content;
+  
   .tab-btn {
-    display: flex; align-items: center; gap: 0.5rem; padding: 1rem 1.25rem; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease;
+    display: flex; align-items: center; gap: 0.5rem; 
+    padding: 1rem 1.25rem; background: transparent; 
+    border: none; border-bottom: 3px solid transparent; 
+    color: var(--text-secondary); font-weight: 600; font-size: 0.9rem; 
+    cursor: pointer; transition: all 0.2s ease;
+    
     &:hover { color: var(--text-primary); background: var(--bg-ternary); }
-    &.active { color: var(--accent-primary); border-bottom-color: var(--accent-primary); background: rgba(var(--accent-primary-rgb), 0.05); }
-  }
-}
-
-/* === 7. TABLE STYLES === */
-::ng-deep .p-datatable {
-  .p-datatable-header { background: transparent !important; border: none; padding: var(--spacing-lg); }
-  .p-datatable-thead > tr > th {
-    background: var(--bg-ternary) !important; color: var(--text-label) !important; font-size: var(--font-size-xs); text-transform: uppercase; font-weight: var(--font-weight-bold); letter-spacing: 0.05em; border: none; border-bottom: 1px solid var(--border-primary) !important; padding: var(--spacing-md) var(--spacing-xl); white-space: nowrap;
-  }
-  .p-datatable-tbody > tr {
-    background: var(--bg-ternary) !important; color: var(--text-primary) !important; border-bottom: 1px solid var(--border-secondary) !important; transition: var(--transition-fast);
-    &:hover > td { background-color: var(--component-bg-hover) !important; }
-  }
-  .p-datatable-tbody > tr > td {
-    background: var(--bg-ternary) !important; color: var(--text-primary) !important; border: none; padding: var(--spacing-lg) var(--spacing-xl); vertical-align: middle;
-  }
-  .p-paginator { background: var(--bg-ternary) !important; border-top: 1px solid var(--border-primary) !important; padding: var(--spacing-md); }
-  .p-paginator .p-paginator-element { background: transparent !important; color: var(--text-secondary) !important; min-width: 32px; height: 32px; border-radius: var(--ui-border-radius); }
-  .p-paginator .p-paginator-element:hover { background: var(--component-bg-hover) !important; color: var(--text-primary) !important; }
-  .p-paginator .p-paginator-element.p-highlight { background: var(--component-bg-active) !important; color: var(--accent-primary) !important; font-weight: bold; }
-}
-
-/* UTILITIES */
-.text-right { text-align: right; }
-.text-center { text-align: center; }
-.font-mono { font-family: var(--font-mono); }
-.status-badge {
-  font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.5px;
-  &.success { background: rgba(16, 185, 129, 0.1); color: var(--color-success); }
-  &.danger { background: rgba(239, 68, 68, 0.1); color: var(--color-error); }
-}
-
-/* AVATAR OVERRIDES */
-:host ::ng-deep .user-avatar { width: 120px !important; height: 120px !important; font-size: 2rem; background-color: var(--bg-secondary); }
-:host ::ng-deep .user-avatar img { width: 100% !important; height: 100% !important; object-fit: cover !important; border-radius: 50%; }
-
-/* Animation */
-.animate-fadeInDown { animation: fadeInDown 0.4s ease-out forwards; }
-.animate-fadeInUp { animation: fadeInUp 0.5s ease-out forwards; opacity: 0; }
-@keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-// /* =========================================================
-//    COMPONENT STYLES (Dark Mode Optimized)
-//    ========================================================= */
-
-// :host {
-//   display: block;
-//   width: 100%;
-//   height: 100%;
-//   overflow-y: auto;
-//   background: var(--bg-primary);
-//   font-family: var(--font-body);
-//   color: var(--text-primary);
-// }
-
-// .dashboard-container {
-//   width: 100%;
-//   max-width: 100%;
-//   padding: var(--spacing-2xl);
-//   display: flex;
-//   flex-direction: column;
-//   gap: var(--spacing-2xl);
-
-//   @media (max-width: 768px) {
-//     padding: var(--spacing-md);
-//     gap: var(--spacing-xl);
-//   }
-// }
-
-// /* === 1. HEADER === */
-// .dashboard-header {
-//   display: flex;
-//   justify-content: space-between;
-//   align-items: center;
-//   flex-wrap: wrap;
-//   gap: var(--spacing-lg);
-
-//   .header-left {
-//     display: flex;
-//     align-items: center;
-//     gap: var(--spacing-lg);
-//     .back-btn {
-//       color: var(--text-tertiary);
-//       transition: var(--transition-fast);
-//       &:hover { color: var(--text-primary); background: var(--component-bg-hover); }
-//     }
-//     .customer-identity {
-//       display: flex; flex-direction: column; gap: 4px;
-//       .name-row {
-//         display: flex; align-items: center; gap: var(--spacing-md);
-//         h1 { font-family: var(--font-heading); font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--text-primary); margin: 0; letter-spacing: -0.02em; }
-//       }
-//       .badges {
-//         display: flex; align-items: center; gap: var(--spacing-md);
-//         .id-pill { font-family: var(--font-mono); font-size: var(--font-size-xs); background: var(--bg-ternary); border: 1px solid var(--border-primary); padding: 2px 8px; border-radius: var(--ui-border-radius); color: var(--text-secondary); }
-//         .type-label { font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); color: var(--text-label); text-transform: uppercase; letter-spacing: 0.05em; }
-//       }
-//     }
-//   }
-//   .header-actions { display: flex; gap: var(--spacing-md); }
-// }
-
-// /* === 2. LAYOUT GRID === */
-// .layout-grid {
-//   display: grid;
-//   grid-template-columns: 360px 1fr;
-//   gap: var(--spacing-2xl);
-//   align-items: start;
-
-//   @media (max-width: 1200px) {
-//     grid-template-columns: 1fr;
-//   }
-// }
-
-// /* === 3. RIGHT CONTENT === */
-// .right-content {
-//   display: flex;
-//   flex-direction: column;
-//   gap: var(--spacing-xl);
-//   min-width: 0; 
-// }
-
-// /* === 4. METRICS GRID (Fixed for Dark Mode) === */
-// .metrics-grid {
-//   display: grid;
-//   grid-template-columns: repeat(4, 1fr); 
-//   gap: var(--spacing-xl);
-
-//   @media (max-width: 900px) {
-//      grid-template-columns: repeat(2, 1fr);
-//   }
-
-//   .metric-card {
-//     background: var(--bg-secondary);
-//     /* Glass effect needs to be subtle in dark mode */
-//     backdrop-filter: blur(var(--glass-blur-c));
-//     -webkit-backdrop-filter: blur(var(--glass-blur-c));
-//     border: 1px solid var(--border-primary);
-//     box-shadow: var(--shadow-sm);
-//     border-radius: var(--ui-border-radius-lg);
-//     padding: var(--spacing-xl);
-//     display: flex;
-//     align-items: center;
-//     gap: var(--spacing-lg);
-//     transition: var(--transition-base);
-
-//     &:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
-
-//     .icon-box {
-//       width: 48px; height: 48px; border-radius: 50%;
-//       display: flex; align-items: center; justify-content: center;
-//       font-size: var(--font-size-xl);
-//       /* Default fallback */
-//       background: var(--bg-ternary); 
-//       color: var(--text-secondary);
-//       flex-shrink: 0;
-//     }
-
-//     .data-box {
-//       display: flex; flex-direction: column; min-width: 0;
-//       label { font-size: var(--font-size-xs); text-transform: uppercase; font-weight: var(--font-weight-bold); letter-spacing: 0.05em; color: var(--text-label); margin-bottom: 4px; white-space: nowrap;}
-//       .value { font-family: var(--font-heading); font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--text-primary); }
-//     }
-
-//     /* === COLOR FIXES === */
-//     /* Use RGBA values so they are transparent in Dark Mode */
     
-//     &.outstanding {
-//       .icon-box { 
-//         background: rgba(239, 68, 68, 0.15); /* Red with transparency */
-//         color: var(--color-error); 
-//       }
-//       .value { color: var(--color-error); }
-//     }
+    &.active { 
+      color: var(--accent-primary); 
+      border-bottom-color: var(--accent-primary); 
+      background: rgba(var(--accent-primary-rgb), 0.05); 
+    }
+  }
+}
 
-//     &.invoiced {
-//       .icon-box { 
-//         background: rgba(59, 130, 246, 0.15); /* Blue with transparency */
-//         color: var(--color-info); 
-//       }
-//     }
+/* Grid Wrapper for Horizontal Scroll */
+.grid-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  min-height: 400px;
+  background: var(--bg-primary);
+}
 
-//     &.received {
-//       .icon-box { 
-//         background: rgba(16, 185, 129, 0.15); /* Green with transparency */
-//         color: var(--color-success); 
-//       }
-//     }
+/* === 7. GLASS CARD UTILITY === */
+.glass-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--ui-border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
 
-//     &.limit {
-//       .icon-box { 
-//         background: var(--bg-ternary); /* Uses theme neutral background */
-//         color: var(--text-secondary); 
-//       }
-//     }
-//   }
-// }
-
-// /* === 5. PROFILE CARD === */
-// .profile-card {
-//   background: var(--bg-secondary);
-//   backdrop-filter: blur(var(--glass-blur-c));
-//   -webkit-backdrop-filter: blur(var(--glass-blur-c));
-//   border: 1px solid var(--border-primary);
-//   box-shadow: var(--shadow-lg);
-//   border-radius: var(--ui-border-radius-lg);
+/* === 8. ERROR STATE === */
+.error-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 60vh; text-align: center; gap: var(--spacing-md);
   
-//   position: sticky; top: 20px; z-index: 10; height: fit-content;
-//   display: flex; flex-direction: column; overflow: hidden; padding: 0;
-
-//   /* Updated Banner Image */
-//   .card-banner {
-//     height: 140px;
-//     width: 100%;
-//     background-image: url('https://images.unsplash.com/photo-1758568938040-fb8b7275ca5f?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); 
-//     background-size: cover;
-//     background-position: center;
-//     position: relative;
-//     &::before {
-//         content: '';
-//         position: absolute;
-//         inset: 0;
-//         background: rgba(0,0,0,0.3); 
-//     }
-//   }
-
-//   .identity-section {
-//     padding: 0 var(--spacing-xl) var(--spacing-lg); text-align: center; margin-top: -70px; position: relative;
-//     .avatar-wrapper {
-//       position: relative; display: inline-block; margin-bottom: var(--spacing-md);
-//       .user-avatar {
-//         width: 120px; height: 120px; font-size: 3rem; background: var(--bg-secondary); padding: 5px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); color: var(--text-primary);
-//         ::ng-deep img { border-radius: 50%; }
-//       }
-//       .status-indicator { position: absolute; bottom: 12px; right: 12px; width: 18px; height: 18px; background: #ccc; border: 3px solid var(--bg-secondary); border-radius: 50%; &.active { background: var(--color-success); } }
-//     }
-//     h3 { margin: 0 0 4px 0; font-size: 1.35rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.01em; }
-//     .email { font-size: var(--font-size-sm); color: var(--text-secondary); display: block; margin-bottom: var(--spacing-md); }
-//   }
-
-//   .details-list {
-//     padding: 0 var(--spacing-xl) var(--spacing-xl); display: flex; flex-direction: column; gap: var(--spacing-lg);
-//     .detail-item {
-//       display: flex; align-items: flex-start; gap: var(--spacing-lg); padding: var(--spacing-md); border-radius: var(--ui-border-radius); background: var(--bg-ternary); border: 1px solid transparent; transition: var(--transition-fast);
-//       &:hover { background: var(--component-bg-hover); border-color: var(--border-primary); }
-//       .icon-circle { width: 32px; height: 32px; border-radius: 8px; background: var(--bg-secondary); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; box-shadow: var(--shadow-sm); }
-//       .meta {
-//         display: flex; flex-direction: column; overflow: hidden;
-//         label { font-size: 0.65rem; text-transform: uppercase; font-weight: 700; color: var(--text-label); letter-spacing: 0.5px; margin-bottom: 2px; }
-//         span { font-size: var(--font-size-sm); color: var(--text-primary); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-//         .text-muted { color: var(--text-tertiary); font-weight: 400; }
-//       }
-//     }
-//   }
-// }
-
-// /* === 6. ACTIVITY PANEL === */
-// .activity-panel {
-//   background: var(--bg-secondary);
-//   backdrop-filter: blur(var(--glass-blur-c));
-//   border: 1px solid var(--border-primary);
-//   box-shadow: var(--shadow-sm);
-//   border-radius: var(--ui-border-radius-lg);
-//   overflow: hidden;
-//   height: fit-content;
+  .error-icon-wrapper {
+    width: 64px; height: 64px; background: rgba(239, 68, 68, 0.1); 
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    color: var(--color-error); font-size: 2rem; margin-bottom: var(--spacing-sm);
+  }
   
-//   display: flex; flex-direction: column;
+  h2 { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); }
+}
 
-//   ::ng-deep .p-tabs { display: flex; flex-direction: column; }
-//   ::ng-deep .p-tablist { background: transparent; border-bottom: 1px solid var(--border-primary); padding: 0 var(--spacing-lg); }
-//   ::ng-deep .p-tabpanels { padding: 0; }
-// }
+/* UTILS */
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
 
-// /* === 7. THE PERFECT TABLE (Using --bg-ternary) === */
-// ::ng-deep .p-datatable {
-  
-//   /* Header Styling */
-//   .p-datatable-header {
-//     background: transparent !important;
-//     border: none;
-//     padding: var(--spacing-lg);
-//   }
-
-//   .p-datatable-thead > tr > th {
-//     background: var(--bg-ternary) !important; 
-//     color: var(--text-label) !important;
-//     font-size: var(--font-size-xs);
-//     text-transform: uppercase;
-//     font-weight: var(--font-weight-bold);
-//     letter-spacing: 0.05em;
-//     border: none;
-//     border-bottom: 1px solid var(--border-primary) !important;
-//     padding: var(--spacing-md) var(--spacing-xl);
-//     white-space: nowrap;
-//   }
-
-//   /* THE BODY */
-//   .p-datatable-tbody {
-//       background: var(--bg-ternary) !important;
-//   }
-
-//   /* Apply --bg-ternary to rows */
-//   .p-datatable-tbody > tr {
-//     background: var(--bg-ternary) !important;
-//     background-color: var(--bg-ternary) !important;
-//     color: var(--text-primary) !important;
-//     border-bottom: 1px solid var(--border-secondary) !important;
-//     transition: var(--transition-fast);
-//   }
-
-//   /* Apply --bg-ternary to cells */
-//   .p-datatable-tbody > tr > td {
-//     background: var(--bg-ternary) !important;
-//     background-color: var(--bg-ternary) !important;
-//     color: var(--text-primary) !important;
-//     border: none;
-//     padding: var(--spacing-lg) var(--spacing-xl);
-//     vertical-align: middle;
-//   }
-
-//   /* HOVER STATE */
-//   .p-datatable-tbody > tr:hover > td {
-//     background-color: var(--component-bg-hover) !important;
-//   }
-
-//   /* PAGINATOR */
-//   .p-paginator {
-//     background: var(--bg-ternary) !important; 
-//     background-color: var(--bg-ternary) !important;
-//     border-top: 1px solid var(--border-primary) !important;
-//     padding: var(--spacing-md);
-//   }
-  
-//   .p-paginator .p-paginator-element {
-//     background: transparent !important;
-//     color: var(--text-secondary) !important;
-//     min-width: 32px; height: 32px;
-//     border-radius: var(--ui-border-radius);
-//   }
-
-//   .p-paginator .p-paginator-element:hover {
-//     background: var(--component-bg-hover) !important;
-//     color: var(--text-primary) !important;
-//   }
-
-//   .p-paginator .p-paginator-element.p-highlight {
-//     background: var(--component-bg-active) !important;
-//     color: var(--accent-primary) !important;
-//     font-weight: bold;
-//   }
-
-//   /* EMPTY MESSAGE */
-//   .p-datatable-emptymessage td {
-//       background: var(--bg-ternary) !important;
-//       color: var(--text-tertiary) !important;
-//       text-align: center;
-//       padding: 3rem !important;
-//       font-style: italic;
-//   }
-// }
-
-// /* UTILITIES */
-// .text-right { text-align: right; }
-// .text-center { text-align: center; }
-// .font-mono { font-family: var(--font-mono); }
-// .status-badge {
-//   font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.5px;
-//   &.success { background: rgba(16, 185, 129, 0.1); color: var(--color-success); }
-//   &.danger { background: rgba(239, 68, 68, 0.1); color: var(--color-error); }
-//   &.info { background: rgba(59, 130, 246, 0.1); color: var(--color-info); }
-//   &.warning { background: rgba(245, 158, 11, 0.1); color: var(--color-warning); }
-// }
-
-// /* Animation */
-// .animate-fadeInDown { animation: fadeInDown 0.4s ease-out forwards; }
-// .animate-fadeInUp { animation: fadeInUp 0.5s ease-out forwards; opacity: 0; }
-
-// @keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-// @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-// // customer-details.scss
-
-// // 1. Target the component container
-// :host ::ng-deep .user-avatar {
-//   width: 120px !important;  // Set explicit width
-//   height: 120px !important; // Set explicit height
-//   font-size: 2rem;          // For the Initials text fallback
-//   background-color: #f3f4f6;
-// }
-
-// // 2. CRITICAL: Target the image tag INSIDE the component
-// :host ::ng-deep .user-avatar img {
-//   width: 100% !important;
-//   height: 100% !important;
-//   object-fit: cover !important; // Prevents stretching
-//   border-radius: 50%;           // Keeps it circular
-// }
-
-// // 3. Wrapper styles (keep existing)
-// .avatar-wrapper {
-//   position: relative;
-//   display: inline-block;
-//   width: 120px; // Match avatar size
-//   height: 120px; // Match avatar size
-//   margin: 0 auto;
-
-//   // Hover overlay styles
-//   .avatar-overlay {
-//     position: absolute;
-//     top: 0;
-//     left: 0;
-//     width: 100%;
-//     height: 100%;
-//     border-radius: 50%;
-//     background-color: rgba(0, 0, 0, 0.5);
-//     display: flex;
-//     flex-direction: column;
-//     align-items: center;
-//     justify-content: center;
-//     opacity: 0;
-//     transition: opacity 0.2s ease;
-//     cursor: pointer;
-//     z-index: 10;
-//   }
-
-//   &:hover .avatar-overlay {
-//     opacity: 1;
-//   }
-// }
-// /* === CUSTOM TABS STYLING === */
-// .custom-tabs {
-//   display: flex;
-//   gap: 0.5rem;
-//   border-bottom: 1px solid var(--border-primary);
-//   padding: 0 var(--spacing-lg);
-//   background: var(--bg-secondary);
-  
-//   .tab-btn {
-//     display: flex;
-//     align-items: center;
-//     gap: 0.5rem;
-//     padding: 1rem 1.25rem;
-//     background: transparent;
-//     border: none;
-//     border-bottom: 2px solid transparent;
-//     color: var(--text-secondary);
-//     font-weight: 600;
-//     font-size: 0.9rem;
-//     cursor: pointer;
-//     transition: all 0.2s ease;
-    
-//     i { font-size: 1rem; }
-
-//     &:hover {
-//       color: var(--text-primary);
-//       background: var(--bg-ternary);
-//     }
-
-//     &.active {
-//       color: var(--accent-primary);
-//       border-bottom-color: var(--accent-primary);
-//       background: rgba(var(--accent-primary-rgb), 0.05);
-//     }
-//   }
-// }
-
-// /* Ensure the panel grows properly */
-// .activity-panel {
-//   min-height: 400px; /* Minimum height to prevent jumps */
-// }
-
+/* PRIME NG OVERRIDES for Dark Mode / Compactness */
+:host ::ng-deep .user-avatar { 
+  background-color: var(--bg-ternary); 
+  border: 2px solid var(--bg-secondary);
+  img { object-fit: cover; }
+}
