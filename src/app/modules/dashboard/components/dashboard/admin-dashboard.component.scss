@@ -1,37 +1,41 @@
-/* ==========================================
-   DASHBOARD RESPONSIVE STYLES
-   Adheres to common.scss breakpoints
-   ========================================== */
+/* =========================================================
+   RESPONSIVE DASHBOARD STYLES (Mobile-First Architecture)
+   ========================================================= */
 
+/* 1. SCROLL FIX: Forces the component to handle overflow properly */
 :host {
   display: block;
-  width: 100%;
+  height: 100%;                  /* Take full height of parent router-outlet */
+  overflow-y: auto;              /* Enable vertical scrolling */
+  -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
 }
 
+/* 2. MAIN CONTAINER */
 .dashboard-container {
-  /* Use variable padding */
-  padding: var(--spacing-lg); 
+  min-height: 100%;              /* Allow content to grow */
+  padding: var(--spacing-md);    /* Smaller padding on mobile */
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xl);
-  
-  /* Increase padding on larger screens */
+  gap: var(--spacing-lg);        /* Gap between sections */
+  padding-bottom: var(--spacing-2xl); /* Bottom breathing room */
+
+  /* Tablet & Desktop Padding Increase */
   @media (min-width: 768px) {
-    padding: var(--spacing-2xl);
-    gap: var(--spacing-2xl);
+    padding: var(--spacing-xl);
+    gap: var(--spacing-xl);
   }
 }
 
-/* --- HEADER (Mobile First: Column) --- */
+/* 3. HEADER (Stack on Mobile -> Row on Desktop) */
 .dashboard-header {
   display: flex;
-  flex-direction: column; /* Default to stack */
-  gap: var(--spacing-lg);
+  flex-direction: column;
+  gap: var(--spacing-md);
 
   .header-content {
     .page-title {
       font-family: var(--font-heading);
-      font-size: var(--font-size-2xl); /* Smaller on mobile */
+      font-size: 1.5rem; /* Mobile Size */
       font-weight: var(--font-weight-bold);
       color: var(--text-primary);
       margin: 0;
@@ -39,33 +43,33 @@
     .page-subtitle {
       color: var(--text-secondary);
       font-size: var(--font-size-sm);
-      margin-top: var(--spacing-xs);
+      margin-top: 4px;
     }
   }
 
-  /* Switch to row on Desktop */
+  /* Desktop Layout */
   @media (min-width: 992px) {
     flex-direction: row;
     justify-content: space-between;
     align-items: flex-end;
 
     .header-content .page-title {
-      font-size: var(--font-size-3xl);
+      font-size: 1.85rem; /* Larger Size */
     }
   }
 }
 
-/* --- HEADER ACTIONS --- */
+/* 4. ACTIONS & FILTERS */
 .header-actions {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
   width: 100%;
 
   @media (min-width: 992px) {
     width: auto;
+    flex-direction: row;
     align-items: center;
-    flex-direction: row; 
   }
 }
 
@@ -73,8 +77,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
-  
-  /* On tablet/desktop, put chips and datepicker in one row */
+
+  /* Tablet+: Row layout for filters */
   @media (min-width: 576px) {
     flex-direction: row;
     align-items: center;
@@ -83,21 +87,16 @@
   .preset-group {
     display: flex;
     gap: var(--spacing-sm);
-    /* Ensure chips wrap on very small screens */
-    flex-wrap: wrap; 
   }
 
   .date-range-wrapper {
     width: 100%;
-    
+    /* Ensure Calendar fits */
+    ::ng-deep .p-calendar { width: 100%; }
+    ::ng-deep .p-inputtext { width: 100%; }
+
     @media (min-width: 576px) {
-      width: auto;
-      min-width: 200px;
-    }
-    
-    /* Force PrimeNG calendar to fit */
-    ::ng-deep .p-calendar {
-      width: 100%;
+      width: 220px; /* Fixed width on desktop */
     }
   }
 }
@@ -105,23 +104,19 @@
 .action-buttons {
   display: flex;
   gap: var(--spacing-sm);
-  width: 100%;
-
-  @media (min-width: 576px) {
-    width: auto; /* Shrink to fit content on larger screens */
-  }
 }
 
+/* Filter Chip Styling */
 .filter-chip {
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 999px;
   background: var(--bg-ternary);
   border: 1px solid var(--border-secondary);
   color: var(--text-secondary);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
   cursor: pointer;
-  transition: var(--transition-fast);
-  white-space: nowrap;
+  transition: all 0.2s ease;
 
   &.active {
     background: var(--component-bg-active);
@@ -130,109 +125,199 @@
   }
 }
 
-/* --- GRID LAYOUTS --- */
+/* 5. GRID LAYOUTS */
 .grid-layout {
   display: grid;
-  /* Mobile: 1 full column */
-  grid-template-columns: 1fr;
+  /* Auto-fit: Will stack on mobile, 2 cols on tablet, 3-4 on desktop */
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: var(--spacing-md);
-
-  /* Tablet: 2 columns */
-  @media (min-width: 576px) {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  }
 }
 
 .main-content-grid {
   display: grid;
-  grid-template-columns: 1fr; /* Default stack */
+  grid-template-columns: 1fr; /* Stacked by default */
   gap: var(--spacing-lg);
 
-  /* Desktop: Side by Side (2fr 1fr) */
+  /* Desktop Split */
   @media (min-width: 1024px) {
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 2fr 1fr; /* Chart takes 2/3 space */
   }
 }
 
-/* --- CARDS & UTILITIES --- */
+/* 6. GLASS CARDS */
 .glass-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border-primary);
   border-radius: var(--ui-border-radius-lg);
   box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(18px);
-  padding: var(--spacing-lg); /* Reduced padding for mobile */
-  
-  @media (min-width: 768px) {
-    padding: var(--spacing-xl);
+  /* The blur effect */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s;
+
+  &:hover {
+    border-color: var(--accent-focus);
   }
 }
 
+/* KPI Specifics */
 .kpi-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
   min-height: 130px;
+  justify-content: space-between;
 
   .kpi-top {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-md);
+    align-items: flex-start;
   }
 
   .kpi-value {
-    font-size: var(--font-size-2xl); /* fluid typography */
-    font-weight: var(--font-weight-bold);
+    font-size: 1.6rem;
+    font-weight: 700;
     color: var(--text-primary);
-    margin: var(--spacing-xs) 0;
+    margin: 8px 0 4px 0;
+  }
+
+  .kpi-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+  }
+  
+  .kpi-sub {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin: 0;
   }
 }
 
-/* --- RESPONSIVE TABLES --- */
-/* Critical for preventing 'jumbled' layouts */
+/* Chart & Rankings Heights */
+.chart-section, .rankings-section {
+  min-height: 350px; /* Minimum visual height */
+  
+  @media (min-width: 1024px) {
+    height: 420px; /* Fixed height on desktop alignment */
+  }
+}
+
+.chart-wrapper {
+  flex: 1;
+  position: relative;
+  min-height: 0; /* Prevents flex overflow */
+}
+
+/* 7. CARD HEADER */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border-secondary);
+  padding-bottom: var(--spacing-sm);
+
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+}
+
+/* 8. RESPONSIVE TABLES (The Magic Fix) */
 .table-responsive-wrapper {
   width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+  overflow-x: auto; /* Enable horizontal scroll */
+  -webkit-overflow-scrolling: touch;
   
-  /* Ensure header doesn't break */
+  /* Force table width so it doesn't squash columns on mobile */
   ::ng-deep .p-datatable {
-    min-width: 600px; /* Forces scroll if screen < 600px */
+    min-width: 500px; 
   }
 }
 
-.chart-section, .rankings-section {
-  /* Height auto on mobile to fit content, fixed on desktop */
-  height: auto;
-  min-height: 350px;
-
-  @media (min-width: 1024px) {
-    height: 400px;
-    display: flex;
-    flex-direction: column;
+.ranking-tabs {
+  display: flex;
+  background: var(--bg-ternary);
+  padding: 2px;
+  border-radius: 999px;
+  
+  .ranking-tab {
+    background: transparent;
+    border: none;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 999px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    
+    &.active {
+      background: var(--bg-secondary);
+      color: var(--accent-primary);
+      box-shadow: var(--shadow-sm);
+    }
   }
 }
 
-.chart-wrapper, .table-container {
-  flex: 1;
-  min-height: 250px; /* Ensure visual height on mobile */
-}
-
-/* --- HELPERS --- */
+/* 9. UTILITIES & ICONS */
 .w-full { width: 100% !important; }
-.hidden-xs {
-  @media (max-width: 576px) {
-    display: none !important;
-  }
-}
-.mt-md { margin-top: var(--spacing-lg); }
 
-/* --- ICON WRAPPERS --- */
-.icon-wrapper {
-   width: 36px; height: 36px;
-   border-radius: 50%;
-   display: flex; align-items: center; justify-content: center;
-   
-   &.accent-wrapper { background: var(--component-bg-active); color: var(--accent-primary); }
+/* Hide elements on mobile to save space */
+.hidden-mobile {
+  @media (max-width: 576px) { display: none !important; }
 }
+
+/* Show elements only on mobile */
+.visible-mobile {
+  display: none;
+  @media (max-width: 576px) { display: block; }
+}
+
+.text-error { color: var(--color-error); }
+.text-primary { color: var(--accent-primary); }
+.text-right { text-align: right; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Icon Circles */
+.icon-wrapper {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+
+  &.accent-wrapper { background: var(--component-bg-active); color: var(--accent-primary); }
+  &.success-wrapper { background: rgba(16, 185, 129, 0.1); color: var(--color-success); }
+  &.info-wrapper { background: rgba(59, 130, 246, 0.1); color: var(--color-info); }
+  &.warning-wrapper { background: rgba(245, 158, 11, 0.1); color: var(--color-warning); }
+}
+
+.trend-badge {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  display: flex; align-items: center; gap: 4px;
+  
+  &.positive { color: var(--color-success); background: rgba(16, 185, 129, 0.1); }
+  &.negative { color: var(--color-error); background: rgba(239, 68, 68, 0.1); }
+  &.neutral { color: var(--text-secondary); background: var(--bg-ternary); }
+}
+
+.rank-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--bg-ternary);
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.badge-pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  display: flex; align-items: center; gap: 6px;
+}
+.badge-danger { background: rgba(239, 68, 68, 0.1); color: var(--color-error); }
