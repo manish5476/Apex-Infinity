@@ -71,6 +71,29 @@ export class NoteTimelineComponent implements OnInit {
   ngOnInit(): void {
     this.loadMonthData();
   }
+  scrollToSelected() {
+  if (!this.scrollContainer) return;
+  
+  setTimeout(() => {
+    const container = this.scrollContainer.nativeElement;
+    const activeEl = container.querySelector('.day-card.active') as HTMLElement;
+    
+    if (activeEl) {
+      // Logic for perfect centering
+      const containerWidth = container.offsetWidth;
+      const elLeft = activeEl.offsetLeft;
+      const elWidth = activeEl.offsetWidth;
+      
+      // Calculate scroll position to center the element
+      const scrollPos = elLeft - (containerWidth / 2) + (elWidth / 2);
+      
+      container.scrollTo({
+        left: scrollPos,
+        behavior: 'smooth'
+      });
+    }
+  }, 100);
+}
 
   // --- Data Loading ---
   loadMonthData(): void {
