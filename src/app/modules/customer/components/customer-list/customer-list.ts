@@ -138,7 +138,7 @@ export class CustomerList implements OnInit {
         if (res.data && Array.isArray(res.data.data)) { newData = res.data.data; }
         this.totalCount = res.results || this.totalCount;
         this.data = [...this.data, ...newData]; if (this.gridApi) {
-        
+
         }
         this.currentPage++; this.isLoading = false; this.cdr.markForCheck();
       },
@@ -176,20 +176,10 @@ export class CustomerList implements OnInit {
   getColumn(): void {
     this.column = [
       {
-        field: 'avatar', headerName: 'Avatar', cellRenderer: ImageCellRendererComponent,
-        width: 100,
-        autoHeight: true,
-        filter: false,
-        sortable: false,
+        field: 'avatar', headerName: 'Avatar', cellRenderer: ImageCellRendererComponent, width: 100, autoHeight: true, filter: false, sortable: false,
       },
       {
-        field: 'name',
-        headerName: 'Name',
-        sortable: true,
-        filter: true,
-        resizable: true,
-        tooltipField: 'name',
-        // --- Add this style to make the name look clickable ---
+        field: 'name', headerName: 'Name', sortable: true, filter: true, resizable: true, tooltipField: 'name',
         cellStyle: {
           'color': 'var(--theme-accent-primary)',
           'font-weight': '600',

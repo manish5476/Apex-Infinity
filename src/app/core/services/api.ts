@@ -26,6 +26,9 @@ export class ApiService extends BaseApiService {
   getMasterList(): Observable<ApiResponse<any>> {
     return this.get<ApiResponse<any>>('/v1/master-list', {}, 'getMasterList');
   }
+  permissions(): Observable<ApiResponse<any>> {
+    return this.get<ApiResponse<any>>('/v1/master-list/permissions', {}, 'getMasterList');
+  }
 
   /**
    * Fetch specific list (e.g. Invoice, Customer)

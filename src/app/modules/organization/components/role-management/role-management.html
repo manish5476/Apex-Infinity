@@ -1,108 +1,116 @@
-
 <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
 
-<div class="role-management-page">
-  <div class="page-header">
-    <h1 class="page-title">Role Management</h1>
-    <p-button label="New Role" icon="pi pi-plus" (click)="openNewRoleDialog()"></p-button>
+<div class="list-page-container">
+  <!-- Header -->
+  <div class="list-header">
+    <h2 class="list-title">
+      <i class="pi pi-id-card text-[var(--accent-primary)]"></i>
+      Role Management
+    </h2>
+    <p-button label="New Role" icon="pi pi-plus" (onClick)="openNewRoleDialog()"></p-button>
   </div>
 
-  <div class="card">
-    <p-table [value]="roles" [loading]="isLoading" responsiveLayout="scroll" [tableStyle]="{'min-width': '50rem'}">
-      <ng-template pTemplate="header">
-        <tr>
-          <th>Role Name</th>
-          <th>Permissions</th>
-          <th>Type</th>
-          <th style="width: 10rem">Actions</th>
-        </tr>
-      </ng-template>
-
-      <ng-template pTemplate="body" let-role>
-        <tr>
-          <td>
-            <span class="font-semibold text-[var(--text-primary)]">{{ role.name }}</span>
-          </td>
-
-          <td>
-            <!-- 
-              CORRECTED: 
-              - Added 'flex flex-wrap gap-1' to allow tags to wrap horizontally.
-            -->
-            <div class="flex flex-wrap gap-1">
-              <p-tag *ngIf="role.isSuperAdmin" value="All Permissions (Super Admin)" severity="danger"></p-tag>
-
-              <ng-container *ngIf="!role.isSuperAdmin">
-                <p-tag *ngFor="let perm of role.permissions.slice(0, 4)" [value]="perm" severity="info"
-                  styleClass="text-xs"></p-tag>
-                <p-tag *ngIf="role.permissions.length > 4" [value]="'+' + (role.permissions.length - 4) + ' more'"
-                  severity="secondary" styleClass="text-xs"></p-tag>
-                <span *ngIf="role.permissions.length === 0" class="text-[var(--text-label)] text-sm">No
-                  permissions assigned.</span>
-              </ng-container>
-            </div>
-          </td>
-
-          <td>
-            <p-tag *ngIf="role.isSuperAdmin" value="Super Admin" severity="danger" icon="pi pi-shield"></p-tag>
-            <p-tag *ngIf="role.isDefault && !role.isSuperAdmin" value="Default" severity="contrast"></p-tag>
-          </td>
-
-          <td>
-            <div class="flex gap-2">
-              <p-button icon="pi pi-pencil" styleClass="p-button-text" pTooltip="Edit Role" tooltipPosition="top"
-                (click)="openEditRoleDialog(role)" [disabled]="role.isSuperAdmin">
-              </p-button>
-
-              <p-button icon="pi pi-trash" styleClass="p-button-text p-button-danger" pTooltip="Delete Role"
-                tooltipPosition="top" (click)="deleteRole(role)" [disabled]="role.isSuperAdmin || role.isDefault">
-              </p-button>
-            </div>
-          </td>
-        </tr>
-      </ng-template>
-
-      <ng-template pTemplate="emptymessage">
-        <tr>
-          <td colspan="4" class="text-center p-4 text-[var(--text-label)]">No roles found. Create one to get
-            started.</td>
-        </tr>
-      </ng-template>
-    </p-table>
+  <!-- Filter -->
+  <div class="themed-card">
+    <div class="se-filter-bar">
+      <div class="se-filter-field">
+        <label>Role Search</label>
+        <span class="p-input-icon-left w-full">
+          <i class="pi pi-search"></i>
+          <input type="text" pInputText [(ngModel)]="roleFilter.name" (keydown.enter)="applyFilters()" 
+                 placeholder="Search by name..." class="w-full"/>
+        </span>
+      </div>
+      <div class="se-filter-actions">
+        <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()"></p-button>
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined" (onClick)="resetFilters()"></p-button>
+      </div>
+    </div>
   </div>
 
+  <!-- Grid -->
+  <div class="themed-card list-grid-area">
+    <app-shared-grid 
+      [data]="data" [column]="column" [gridHeight]="'210px'"
+      [GridName]="'Roles'" (eventFromGrid)="eventFromGrid($event)"
+      (gridReady)="onGridReady($event)">
+    </app-shared-grid>
+  </div>
 </div>
 
+<!-- NEW IMPROVED DIALOG -->
+<p-dialog [(visible)]="showRoleDialog" [modal]="true" [style]="{width: '70vw', 'min-width': '600px', 'max-height': '90vh'}"
+  [header]="isEditMode ? 'Edit Role Configuration' : 'Create New Role'" (onHide)="hideDialog()" 
+  [draggable]="false" [resizable]="false" styleClass="role-dialog" [contentStyle]="{'overflow': 'visible'}">
 
-<p-dialog [(visible)]="showRoleDialog" [modal]="true" [style]="{width: '50vw', 'min-width': '350px'}"
-  [header]="isEditMode ? 'Edit Role' : 'Create New Role'" (onHide)="hideDialog()" [draggable]="false"
-  [resizable]="false">
+  <div class="dialog-content-wrapper">
+    
+    <!-- TOP ROW: INPUTS -->
+    <div class="form-row">
+      <!-- 1. Role Name Input -->
+      <div class="form-field flex-1">
+        <label for="roleName">Role Name <span class="required">*</span></label>
+        <input id="roleName" type="text" pInputText [(ngModel)]="currentRole.name" 
+               placeholder="e.g. Sales Associate" class="w-full" />
+      </div>
 
-  <div class="flex flex-col gap-4 p-4">
-    <div class="flex flex-col gap-2">
-      <label for="roleName" class="font-semibold text-[var(--text-label)]">Role Name</label>
-      <input id="roleName" type="text" pInputText [(ngModel)]="currentRole.name" placeholder="e.g., Sales Manager" />
+      <!-- 2. Permission Picker -->
+      <div class="form-field flex-1">
+        <label for="permPicker">Add Permissions</label>
+        <p-multiSelect id="permPicker" [options]="permissionOptions" [(ngModel)]="selectedPermissions"
+          defaultLabel="Select permissions..." optionLabel="label" optionValue="value" 
+          optionGroupLabel="label" optionGroupChildren="items" [group]="true"
+          [filter]="true" [showHeader]="true" display="chip"
+          [style]="{'width':'100%'}" appendTo="body" scrollHeight="300px">
+        </p-multiSelect>
+      </div>
     </div>
 
-    <div class="flex flex-col gap-2">
-      <label for="permissions" class="font-semibold text-[var(--text-label)]">Permissions</label>
-      <p-multiSelect id="permissions" [options]="permissionOptions" [(ngModel)]="selectedPermissions"
-        placeholder="Select permissions for this role" optionLabel="label" optionValue="value" [filter]="true"
-        display="chip" styleClass="w-full" [group]="true" appendTo="body"> 
-        <ng-template let-group pTemplate="group">
-          <div class="font-bold text-[var(--text-primary)] px-3 py-2">
-            {{ group }}
+    <p-divider align="center">
+      <span class="text-sm font-semibold text-[var(--text-secondary)]">ACCESS CAPABILITIES SUMMARY</span>
+    </p-divider>
+
+    <!-- BOTTOM ROW: VISUAL SUMMARY (The "Better UI" part) -->
+    <div class="permissions-summary-area">
+      
+      <!-- Empty State -->
+      <div *ngIf="selectedPermissions.length === 0" class="empty-state">
+        <i class="pi pi-lock-open text-4xl mb-2 text-[var(--text-secondary)] opacity-50"></i>
+        <p>No permissions selected yet.</p>
+        <small>Use the dropdown above to assign capabilities to this role.</small>
+      </div>
+
+      <!-- Grouped Cards -->
+      <div class="perm-groups-grid" *ngIf="selectedPermissions.length > 0">
+        <div class="perm-group-card" *ngFor="let group of groupedSelectedPermissions">
+          <div class="group-header">
+            <i class="pi pi-folder-open"></i>
+            <span>{{ group.name }}</span>
+            <span class="count-badge">{{ group.items.length }}</span>
           </div>
-        </ng-template>
-      </p-multiSelect>
+          <div class="group-items">
+            <div class="perm-item-chip" *ngFor="let item of group.items">
+              <i class="pi pi-check-circle text-green-500 text-xs"></i>
+              <span>{{ item.description }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
+
   </div>
 
   <ng-template pTemplate="footer">
-    <p-button label="Cancel" icon="pi pi-times" styleClass="p-button-text" (click)="hideDialog()"></p-button>
-    <p-button [label]="isEditMode ? 'Save Changes' : 'Create Role'" [icon]="isEditMode ? 'pi pi-check' : 'pi pi-plus'"
-      (click)="saveRole()" [loading]="isLoading">
-    </p-button>
+    <div class="dialog-footer">
+      <div class="summary-text" *ngIf="selectedPermissions.length > 0">
+        Total: <strong>{{ selectedPermissions.length }}</strong> permissions assigned
+      </div>
+      <div class="footer-actions">
+        <p-button label="Cancel" icon="pi pi-times" styleClass="p-button-text" (onClick)="hideDialog()"></p-button>
+        <p-button label="Save Configuration" icon="pi pi-save" (onClick)="saveRole()" [loading]="isLoading"></p-button>
+      </div>
+    </div>
   </ng-template>
 </p-dialog>

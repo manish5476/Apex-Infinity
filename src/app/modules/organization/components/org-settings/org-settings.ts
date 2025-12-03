@@ -24,6 +24,7 @@ import { BadgeModule } from 'primeng/badge';
 /* Services */
 import { AuthService } from '../../../auth/services/auth-service';
 import { OrganizationService } from '../../organization.service';
+import { Toast } from "primeng/toast";
 
 @Component({
   selector: 'app-org-settings',
@@ -45,8 +46,9 @@ import { OrganizationService } from '../../organization.service';
     DividerModule,
     TooltipModule,
     SelectModule,
-    BadgeModule
-  ],
+    BadgeModule,
+    Toast
+],
   providers: [ConfirmationService, MessageService],
   templateUrl: './org-settings.html',
   styleUrl: './org-settings.scss',

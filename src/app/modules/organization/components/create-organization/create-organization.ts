@@ -125,7 +125,7 @@ export class CreateOrganizationComponent implements OnInit {
           if (response.token) {
             this.authService.handleLoginSuccess(response);
             this.masterList.load(); // Refresh master data
-            setTimeout(() => this.router.navigate(['/admin/dashboard']), 1000);
+            setTimeout(() => this.router.navigate(['/dashboard']), 1000);
           } else {
             this.router.navigate(['/auth/login']);
           }

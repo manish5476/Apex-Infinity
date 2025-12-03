@@ -1,151 +1,132 @@
-/* CORRECTED:
-  - Using canonical theme variables
-  - Added theme styles for p-table, p-confirm-dialog,
-    and inputs/multiselect inside the dialog.
-*/
-:host {
-  display: block;
-  padding: var(--spacing-xl); // Use theme spacing
-  height: 100%;
+:host { display: block; height: 100%; }
+
+.list-page-container {
+  display: flex; flex-direction: column; height: 100%;
+  padding: var(--spacing-xl); gap: var(--spacing-xl);
+  background: var(--bg-primary);
+}
+
+.list-header {
+  display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+}
+.list-title {
+  font-size: var(--font-size-3xl); font-weight: 600; color: var(--text-primary);
+  margin: 0; display: flex; align-items: center; gap: var(--spacing-md);
+}
+
+.themed-card {
+  background: var(--bg-secondary);
+  border-radius: var(--ui-border-radius-lg);
+  border: var(--ui-border-width) solid var(--border-primary);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-lg);
+}
+
+.se-filter-bar {
+  display: flex; flex-wrap: wrap; gap: var(--spacing-lg); align-items: flex-end;
+}
+.se-filter-field {
+  display: flex; flex-direction: column; gap: var(--spacing-sm); flex-grow: 1; min-width: 250px;
+  label { font-size: var(--font-size-xs); color: var(--text-label); text-transform: uppercase; font-weight: 600; }
+  input[pInputText] { background: var(--bg-ternary); border-color: var(--border-primary); }
+}
+.se-filter-actions { display: flex; gap: var(--spacing-md); padding-bottom: 2px; }
+
+.list-grid-area {
+  flex-grow: 1; min-height: 0; padding: 0; overflow: hidden;
+  app-shared-grid { height: 100%; width: 100%; display: block; }
+}
+
+/* === DIALOG CUSTOM STYLES === */
+.dialog-content-wrapper {
+  display: flex; flex-direction: column; gap: 1rem; padding-top: 0.5rem;
+}
+
+.form-row {
+  display: flex; gap: 1.5rem;
+  .form-field {
+    display: flex; flex-direction: column; gap: 0.5rem;
+    label { font-weight: 600; color: var(--text-primary); font-size: 0.9rem; }
+    .required { color: var(--color-error); }
+  }
+}
+
+/* Visual Summary Area */
+.permissions-summary-area {
+  background: var(--bg-ternary);
+  border-radius: 8px;
+  padding: 1rem;
+  min-height: 200px;
+  max-height: 400px;
   overflow-y: auto;
-  background-color: var(--bg-primary); // Use canonical token
-}
-
-.role-management-page {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xl); // Use theme spacing
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 2px solid var(--border-primary); // Use canonical token
-  padding-bottom: var(--spacing-lg); // Use theme spacing
-}
-
-.page-title {
-  font-size: var(--font-size-3xl); // Use theme font size
-  font-weight: 600;
-  color: var(--text-primary); // Use canonical token
-  margin: 0;
-}
-
-.card {
-  background: var(--bg-secondary); // Use canonical token
-  border-radius: var(--ui-border-radius-lg); // Use canonical token
-  box-shadow: var(--shadow-sm); // Use canonical token
-  overflow: hidden;
   border: 1px solid var(--border-primary);
 }
 
-/* Style fixes for dialogs */
-:host ::ng-deep {
-  /* === Table Styles === */
-  .p-table {
-    .p-table-thead > tr > th {
-      background: var(--bg-ternary);
-      color: var(--text-primary);
-      border-color: var(--border-primary);
-      font-size: var(--font-size-sm);
-    }
-    .p-table-tbody > tr > td {
-      background: var(--bg-secondary);
-      color: var(--text-secondary);
-      border-color: var(--border-primary);
-      font-size: var(--font-size-sm);
-    }
-    .p-table-tbody > tr:hover {
-      background: var(--bg-ternary);
-    }
-  }
+.empty-state {
+  height: 100%; display: flex; flex-direction: column; 
+  align-items: center; justify-content: center; color: var(--text-secondary);
+  p { font-weight: 500; margin: 0; }
+}
 
-  /* === Dialog Styles === */
-  .p-dialog {
-    .p-dialog-header {
-      background-color: var(--bg-secondary);
-      color: var(--text-primary);
-      border-bottom: 1px solid var(--border-primary);
-    }
+/* Permission Groups Grid (Masonry-like look) */
+.perm-groups-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
 
-    .p-dialog-content {
-      background-color: var(--bg-primary); // Use primary for contrast
-      color: var(--text-secondary);
-      
-      // Style inputs inside the dialog
-      .p-inputtext, .p-multiselect {
-         background: var(--bg-ternary);
-         border-color: var(--border-primary);
-         color: var(--text-primary);
-      }
-      .p-multiselect-label {
-        color: var(--text-primary);
-      }
-    }
-
-    .p-dialog-footer {
-      background-color: var(--bg-secondary);
-      border-top: 1px solid var(--border-primary);
-    }
-  }
+.perm-group-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex; flex-direction: column;
   
-  /* === Confirmation Dialog === */
-  .p-confirm-dialog {
-    background: var(--bg-secondary);
-    border: var(--ui-border-width) solid var(--border-primary);
-    border-radius: var(--ui-border-radius-lg);
+  .group-header {
+    background: color-mix(in srgb, var(--accent-primary) 10%, transparent);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem; font-weight: 600; color: var(--text-primary);
+    display: flex; align-items: center; gap: 0.5rem;
+    border-bottom: 1px solid var(--border-primary);
 
-    .p-dialog-header {
-      background: transparent;
-      color: var(--text-primary);
-      border-bottom: 1px solid var(--border-primary);
-      font-weight: 600;
-    }
-    .p-dialog-content {
-      background: var(--bg-secondary);
-      color: var(--text-secondary);
-    }
-    .p-dialog-footer {
-      background: var(--bg-ternary);
-      border-top: 1px solid var(--border-primary);
-      display: flex;
-      gap: var(--spacing-sm);
+    .count-badge {
+      margin-left: auto; background: var(--bg-primary); 
+      padding: 1px 6px; border-radius: 10px; font-size: 0.7rem;
     }
   }
 
-  /* === MultiSelect Panel === */
-  .p-multiselect-panel {
-    background-color: var(--bg-secondary);
-    border: 1px solid var(--border-primary);
-    
-    .p-multiselect-header {
-      background-color: var(--bg-ternary); // CORRECTED
-      border-bottom: 1px solid var(--border-primary);
-      
-      .p-multiselect-filter {
-        background: var(--bg-primary); // CORRECTED
-        color: var(--text-primary);
-        border-color: var(--border-secondary);
-      }
-    }
-    
-    .p-multiselect-item-group {
-      background-color: var(--bg-ternary); // CORRECTED
-      color: var(--text-primary);
-      font-weight: 600;
-    }
-    
-    .p-multiselect-item {
-      color: var(--text-secondary);
-      &:hover {
-        background-color: var(--bg-ternary); // CORRECTED
-      }
-    }
-    
-    .p-multiselect-item.p-highlight {
-      background: var(--accent-focus); // CORRECTED
-      color: var(--accent-primary); // CORRECTED
-    }
+  .group-items {
+    padding: 0.75rem;
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+  }
+}
+
+.perm-item-chip {
+  display: flex; align-items: center; gap: 0.4rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  padding: 4px 8px; border-radius: 4px;
+  font-size: 0.8rem; color: var(--text-secondary);
+}
+
+.dialog-footer {
+  display: flex; justify-content: space-between; align-items: center; width: 100%;
+  .summary-text { font-size: 0.9rem; color: var(--text-secondary); }
+  .footer-actions { display: flex; gap: 0.5rem; }
+}
+
+/* AG Grid Badges & Actions */
+:host ::ng-deep {
+  .ag-badge { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+  .badge-danger { background: #fee2e2; color: #991b1b; }
+  .badge-info { background: #e0f2fe; color: #075985; }
+  .badge-contrast { background: #f3f4f6; color: #1f2937; }
+  .ag-tag { background: var(--bg-ternary); padding: 1px 6px; border-radius: 4px; font-size: 11px; border: 1px solid var(--border-primary); }
+
+  .action-btn {
+    width: 28px; height: 28px; border-radius: 6px; border: none; background: transparent; cursor: pointer;
+    &.action-edit { color: var(--color-info); &:hover { background: #e0f2fe; } }
+    &.action-delete { color: var(--color-error); &:hover { background: #fee2e2; } }
+    &:disabled { opacity: 0.3; cursor: not-allowed; }
   }
 }
