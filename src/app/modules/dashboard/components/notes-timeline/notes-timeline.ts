@@ -209,28 +209,28 @@ export class NoteTimelineComponent implements OnInit {
     return Array(Math.min(count, 3)).fill(0);
   }
 
-  scrollToSelected() {
-    if (!this.scrollContainer) return;
+  // scrollToSelected() {
+  //   if (!this.scrollContainer) return;
     
-    // Find the active element in the list
-    // We use a timeout to ensure view is updated
-    setTimeout(() => {
-      const container = this.scrollContainer.nativeElement;
-      const activeEl = container.querySelector('.day-card.active') as HTMLElement;
+  //   // Find the active element in the list
+  //   // We use a timeout to ensure view is updated
+  //   setTimeout(() => {
+  //     const container = this.scrollContainer.nativeElement;
+  //     const activeEl = container.querySelector('.day-card.active') as HTMLElement;
       
-      if (activeEl) {
-        const containerWidth = container.offsetWidth;
-        const elLeft = activeEl.offsetLeft;
-        const elWidth = activeEl.offsetWidth;
+  //     if (activeEl) {
+  //       const containerWidth = container.offsetWidth;
+  //       const elLeft = activeEl.offsetLeft;
+  //       const elWidth = activeEl.offsetWidth;
         
-        // Center calculation
-        const scrollPos = elLeft - (containerWidth / 2) + (elWidth / 2);
+  //       // Center calculation
+  //       const scrollPos = elLeft - (containerWidth / 2) + (elWidth / 2);
         
-        container.scrollTo({
-          left: scrollPos,
-          behavior: 'smooth'
-        });
-      }
-    }, 50);
-  }
+  //       container.scrollTo({
+  //         left: scrollPos,
+  //         behavior: 'smooth'
+  //       });
+  //     }
+  //   }, 50);
+  // }
 }
