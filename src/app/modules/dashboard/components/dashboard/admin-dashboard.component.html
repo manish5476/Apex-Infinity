@@ -3,7 +3,7 @@
     <div class="header-content">
       <h1 class="page-title">Executive Overview</h1>
       <p class="page-subtitle">
-        Snapshot of your sales, cashflow and risk.
+        Snapshot of your sales, cashflow and risk in one glance.
       </p>
     </div>
 
@@ -20,10 +20,11 @@
         </div>
 
         <div class="date-range-wrapper">
+          <span class="date-label hidden-xs">Custom</span>
           <p-datepicker selectionMode="range" [showIcon]="true" [maxDate]="today" dateFormat="yy-mm-dd"
             [(ngModel)]="dateRangeModel" (onSelect)="onDateRangeChange()" appendTo="body"
             styleClass="w-full" inputStyleClass="w-full"
-            placeholder="Custom Range"
+            placeholder="Select Date Range"
             inputId="dashboardDateRange"></p-datepicker>
         </div>
       </div>
@@ -37,34 +38,156 @@
 
   @if (loading()) {
     <div class="grid-layout">
-      <p-skeleton height="8rem" borderRadius="10px" styleClass="w-full"></p-skeleton>
-      <p-skeleton height="8rem" borderRadius="10px" styleClass="w-full"></p-skeleton>
+      <p-skeleton height="9rem" borderRadius="10px" styleClass="w-full"></p-skeleton>
+      <p-skeleton height="9rem" borderRadius="10px" styleClass="w-full"></p-skeleton>
+      <p-skeleton height="9rem" borderRadius="10px" styleClass="w-full"></p-skeleton>
+      <p-skeleton height="9rem" borderRadius="10px" styleClass="w-full"></p-skeleton>
     </div>
   } @else {
 
   <section class="grid-layout kpi-section">
+    
     <div class="glass-card kpi-card">
       <div class="kpi-top">
-        <div class="icon-wrapper accent-wrapper"><i class="pi pi-wallet"></i></div>
-        <span class="trend-badge positive"><i class="pi pi-arrow-up"></i> This period</span>
+        <div class="icon-wrapper accent-wrapper">
+          <i class="pi pi-wallet"></i>
+        </div>
+        <span class="trend-badge positive">
+          <i class="pi pi-arrow-up"></i>
+          This period
+        </span>
       </div>
       <div class="kpi-content">
         <span class="kpi-label">Total Revenue</span>
-        <h3 class="kpi-value">{{ common.formatCurrency(totalSales()) }}</h3>
-        <p class="kpi-sub">Income: {{ common.formatCurrency(income()) }}</p>
+        <h3 class="kpi-value">
+          {{ common.formatCurrency(totalSales()) }}
+        </h3>
+        <p class="kpi-sub">
+          Income: {{ common.formatCurrency(income()) }}
+        </p>
       </div>
     </div>
-    
-    </section>
+
+    <div class="glass-card kpi-card">
+      <div class="kpi-top">
+        <div class="icon-wrapper success-wrapper">
+          <i class="pi pi-percentage"></i>
+        </div>
+        <span class="trend-badge" [class.positive]="netProfit() > 0" [class.negative]="netProfit() < 0"
+          [class.neutral]="netProfit() === 0">
+          <i class="pi" [class.pi-arrow-up]="netProfit() > 0" [class.pi-arrow-down]="netProfit() < 0"
+            [class.pi-minus]="netProfit() === 0"></i>
+          {{ netProfit() > 0 ? 'Profitable' : netProfit() < 0 ? 'Loss' : 'Breakeven' }} 
+        </span>
+      </div>
+      <div class="kpi-content">
+        <span class="kpi-label">Net Profit</span>
+        <h3 class="kpi-value">
+          {{ common.formatCurrency(netProfit()) }}
+        </h3>
+        <p class="kpi-sub">
+          Expenses: {{ common.formatCurrency(totalExpenses()) }}
+        </p>
+      </div>
+    </div>
+
+    <div class="glass-card kpi-card">
+      <div class="kpi-top">
+        <div class="icon-wrapper info-wrapper">
+          <i class="pi pi-arrow-down-left"></i>
+        </div>
+        <span class="trend-badge neutral">
+          <i class="pi pi-circle-fill"></i>
+          Cash In
+        </span>
+      </div>
+      <div class="kpi-content">
+        <span class="kpi-label">Total Receipts</span>
+        <h3 class="kpi-value">
+          {{ common.formatCurrency(totalReceipts()) }}
+        </h3>
+        <p class="kpi-sub">From invoices & collections</p>
+      </div>
+    </div>
+
+    <div class="glass-card kpi-card">
+      <div class="kpi-top">
+        <div class="icon-wrapper info-wrapper">
+          <i class="pi pi-shopping-cart"></i>
+        </div>
+        <span class="trend-badge neutral">
+          <i class="pi pi-list-check"></i>
+          Billing
+        </span>
+      </div>
+      <div class="kpi-content">
+        <span class="kpi-label">Total Invoices</span>
+        <h3 class="kpi-value">
+          {{ invoiceCount() }}
+        </h3>
+        <p class="kpi-sub">
+          Outstanding:
+          {{ common.formatCurrency(outstandingReceivables()) }}
+        </p>
+      </div>
+    </div>
+
+    <div class="glass-card kpi-card">
+      <div class="kpi-top">
+        <div class="icon-wrapper warning-wrapper">
+          <i class="pi pi-database"></i>
+        </div>
+        <span class="trend-badge neutral">
+          <i class="pi pi-warehouse"></i>
+          Inventory
+        </span>
+      </div>
+      <div class="kpi-content">
+        <span class="kpi-label">Stock Value</span>
+        <h3 class="kpi-value">
+          {{ common.formatCurrency(stockValue()) }}
+        </h3>
+        <p class="kpi-sub">
+          {{ stockQty() }} units across all products
+        </p>
+      </div>
+    </div>
+
+    <div class="glass-card kpi-card">
+      <div class="kpi-top">
+        <div class="icon-wrapper accent-wrapper">
+          <i class="pi pi-users"></i>
+        </div>
+        <span class="trend-badge neutral">
+          <i class="pi pi-user"></i>
+          Parties
+        </span>
+      </div>
+      <div class="kpi-content">
+        <span class="kpi-label">Customers & Suppliers</span>
+        <h3 class="kpi-value">
+          {{ totalCustomers() }} C · {{ totalSuppliers() }} S
+        </h3>
+        <p class="kpi-sub">
+          Active relationships
+        </p>
+      </div>
+    </div>
+  </section>
 
   <section class="main-content-grid">
     <div class="glass-card chart-section">
       <div class="card-header">
         <div>
-          <h3>Revenue Trend</h3>
-          <span class="text-xs text-secondary">Last 6 months</span>
+          <h3>Revenue & Receipts</h3>
+          <span class="text-xs text-secondary">
+            Sales vs cash collections (last 6 months)
+          </span>
         </div>
+        <p-button icon="pi pi-chart-line" styleClass="p-button-text p-button-rounded p-button-secondary"
+          pTooltip="Sales & cashflow trend" tooltipPosition="bottom"></p-button>
       </div>
+
       <div class="chart-wrapper">
         <p-chart type="bar" [data]="chartData()" [options]="chartOptions()" height="100%"></p-chart>
       </div>
@@ -72,30 +195,166 @@
 
     <div class="glass-card rankings-section">
       <div class="card-header card-header--split">
-        <h3>Rankings</h3>
+        <div>
+          <h3>Performance</h3>
+          <span class="text-xs text-secondary">Top drivers</span>
+        </div>
+
         <div class="ranking-tabs">
-          <button class="ranking-tab" [class.active]="activeRankingTab() === 'products'" (click)="setRankingTab('products')">Products</button>
-          <button class="ranking-tab" [class.active]="activeRankingTab() === 'customers'" (click)="setRankingTab('customers')">Customers</button>
+          <button class="ranking-tab" [class.active]="activeRankingTab() === 'products'"
+            (click)="setRankingTab('products')">
+            Products
+          </button>
+          <button class="ranking-tab" [class.active]="activeRankingTab() === 'customers'"
+            (click)="setRankingTab('customers')">
+            Customers
+          </button>
         </div>
       </div>
 
       <div class="table-responsive-wrapper">
-        <p-table [value]="activeRankingTab() === 'products' ? topProducts() : topCustomers()" styleClass="p-datatable-sm">
-            </p-table>
+        
+        @if (activeRankingTab() === 'products') {
+        <p-table [value]="topProducts()" styleClass="p-datatable-sm">
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 3rem">#</th>
+              <th>Product</th>
+              <th class="text-right">Qty</th>
+              <th class="text-right">Rev</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-p let-rowIndex="rowIndex">
+            <tr>
+              <td class="rank-cell">
+                <span class="rank-badge"> {{ rowIndex + 1 }} </span>
+              </td>
+              <td>
+                <div class="flex flex-col">
+                  <span class="font-medium text-sm truncate" style="max-width: 120px;">
+                    {{ p.productName }}
+                  </span>
+                </div>
+              </td>
+              <td class="text-right font-mono text-xs">
+                {{ p.quantitySold }}
+              </td>
+              <td class="text-right font-bold text-xs text-primary">
+                {{ common.formatCurrency(p.totalRevenue) }}
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="4" class="text-center text-xs text-secondary p-4">
+                No data available.
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+        } @else {
+        <p-table [value]="topCustomers()" styleClass="p-datatable-sm">
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 3rem">#</th>
+              <th>Customer</th>
+              <th class="text-right">Spent</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-c let-rowIndex="rowIndex">
+            <tr>
+              <td class="rank-cell">
+                <span class="rank-badge"> {{ rowIndex + 1 }} </span>
+              </td>
+              <td>
+                <div class="flex flex-col">
+                  <span class="font-medium text-sm truncate" style="max-width: 120px;">
+                    {{ c.customerName }}
+                  </span>
+                </div>
+              </td>
+              <td class="text-right font-bold text-xs text-primary">
+                {{ common.formatCurrency(c.totalSpent) }}
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="3" class="text-center text-xs text-secondary p-4">
+                No data available.
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+        }
       </div>
     </div>
   </section>
 
   <section class="glass-card mt-md receivables-section">
     <div class="card-header receivables-header">
-      <h3>Outstanding</h3>
-      <div class="receivables-summary hidden-xs"> <span class="badge-pill badge-danger"><i class="pi pi-exclamation-triangle"></i> Action Needed</span>
+      <div>
+        <h3>Receivables</h3>
+        <span class="text-xs text-secondary">
+          Pending: {{ common.formatCurrency(outstandingReceivables()) }}
+        </span>
+      </div>
+
+      <div class="receivables-summary hidden-xs">
+        <span class="badge-pill badge-danger">
+          <i class="pi pi-exclamation-triangle"></i>
+          Attention
+        </span>
       </div>
     </div>
-    
+
     <div class="table-responsive-wrapper">
-      <p-table [value]="receivables()" styleClass="p-datatable-sm">
-         </p-table>
+      <p-table [value]="receivables()" [rows]="5" [paginator]="true" styleClass="p-datatable-sm">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Customer</th>
+            <th class="hidden-xs">Contact</th>
+            <th class="hidden-xs">Invoiced</th>
+            <th class="hidden-xs">Paid</th>
+            <th class="text-right">Due</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-item>
+          <tr>
+            <td class="font-medium">
+              {{ item.party?.name }}
+              <div class="show-xs text-xs text-secondary mt-1">
+                 {{ item.party?.phone }}
+              </div>
+            </td>
+            <td class="text-secondary text-xs hidden-xs">
+              {{ item.party?.phone }}
+            </td>
+            <td class="text-xs hidden-xs">
+              {{ common.formatCurrency(item.invoiced || 0) }}
+            </td>
+            <td class="text-xs hidden-xs">
+              {{ common.formatCurrency(item.paid || 0) }}
+            </td>
+            <td class="text-right font-bold text-error">
+              {{ common.formatCurrency(item.outstanding || 0) }}
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5" class="text-center text-xs text-secondary p-4">
+              No pending receivables.
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
     </div>
   </section>
   }
