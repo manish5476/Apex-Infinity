@@ -1,8 +1,8 @@
+
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
-import { Observable } from 'rxjs';
 
 // Services
 import { CustomerService } from '../../services/customer-service';
@@ -18,7 +18,7 @@ import { CardModule } from 'primeng/card';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DividerModule } from 'primeng/divider';
 import { ToastModule } from 'primeng/toast';
-import { SelectModule } from 'primeng/select'; 
+import { SelectModule } from 'primeng/select'; // PrimeNG v18
 import { TextareaModule } from 'primeng/textarea';
 import { SkeletonModule } from 'primeng/skeleton';
 import { AvatarModule } from 'primeng/avatar';
@@ -76,16 +76,12 @@ export class CustomerForm implements OnInit {
 
   // Avatar Preview Helper
   currentAvatarUrl: string | null = null;
-  
-  // Checkbox State for Address Copy
-  copyAddressChecked = signal(false);
 
   ngOnInit(): void {
     this.buildForm();
     this.checkEditMode();
   }
 
-  // --- Form Initialization ---
   buildForm(): void {
     this.customerForm = this.fb.group({
       // BASIC INFO
@@ -123,11 +119,11 @@ export class CustomerForm implements OnInit {
       paymentTerms: [''],
       tags: [''],
       notes: [''],
-      isActive: [true]
+      isActive: [true] // Explicitly included the missing boolean control
     });
   }
 
-  // --- Edit Mode & Data Loading ---
+  // === 1. Edit Mode Logic ===
   private checkEditMode(): void {
     const routeId = this.route.snapshot.paramMap.get('id');
     const queryId = this.route.snapshot.queryParamMap.get('id');
@@ -135,19 +131,21 @@ export class CustomerForm implements OnInit {
 
     if (id) {
       this.customerId.set(id);
-      this.editMode.set(true); 
+      this.editMode.set(true); // Set edit mode here
       this.loadCustomerData(id);
     }
   }
 
   private loadCustomerData(id: string): void {
-    this.loadingData.set(true); 
+    this.loadingData.set(true); // Start loading state
     
     this.common.apiCall(
       this.customerService.getCustomerDataWithId(id),
       (response: any) => {
+        // Assuming response structure might be nested
         const data = response.data?.data || response.data || response;
         if (data) {
+          // Patching data directly, including address subdocuments
           this.customerForm.patchValue(data);
           
           if (data.avatar) {
@@ -159,25 +157,22 @@ export class CustomerForm implements OnInit {
         this.loadingData.set(false);
       },
       'Fetch Customer Data'
-      // Note: Relying on apiCall's internal error handling for loadingData reset
     );
   }
 
-  // --- File Handling ---
   onFileUpload(event: any): void {
     const file = event.files[0];
     if (file) {
       this.customerForm.patchValue({ avatar: file });
       this.customerForm.get('avatar')?.markAsDirty();
       
-      // Setup preview
       const reader = new FileReader();
       reader.onload = (e: any) => this.currentAvatarUrl = e.target.result;
       reader.readAsDataURL(file);
     }
   }
 
-  // --- Submission ---
+  // === 3. Submit Handler ===
   onSubmit(): void {
     if (this.customerForm.invalid) {
       this.customerForm.markAllAsTouched();
@@ -186,48 +181,30 @@ export class CustomerForm implements OnInit {
     }
 
     this.isSubmitting.set(true);
-    const formData = this.prepareFormData(); 
+    const formData = this.prepareFormData(); // Use the fixed preparation logic
     
-    // Determine the correct request Observable
-    let request$: Observable<any>;
-    if (this.editMode() && this.customerId()) {
-        request$ = this.customerService.updateCustomer(this.customerId()!, formData);
-    } else {
-        request$ = this.customerService.createNewCustomer(formData);
-    }
-
+    const request$ = this.editMode()
+      ? this.customerService.updateCustomer(this.customerId()!, formData)
+      : this.customerService.createNewCustomer(formData);
 
     this.common.apiCall(
       request$,
       (res: any) => {
         this.messageService.showSuccess(this.editMode() ? 'Updated' : 'Created', `Customer saved successfully.` );
-        // The submission state MUST be reset on success
-        this.isSubmitting.set(false); 
+        this.isSubmitting.set(false);
         setTimeout(() => this.router.navigate(['/customer']), 500);
       },
       'Save Customer',
-      // If the service's apiCall supports an error/finally callback:
-      // If the apiCall fails, we must reset the submitting state.
       () => {
         this.isSubmitting.set(false);
-      } 
-      // Based on your error message, if this 4th argument causes a compilation
-      // error ("expected 2-3 arguments got 4"), REMOVE it and ensure your
-      // CommonMethodService handles error cleanup internally.
-      // If removing it fixes the build, use the 3-argument version:
-      /*
-      // this.common.apiCall(
-      //   request$,
-      //   (res: any) => { ... success logic ... },
-      //   'Save Customer' 
-      // );
-      */
+      } // Ensure submission state is reset on error
     );
   }
 
   /**
-   * Prepares FormData: Sends non-file fields as a single JSON string ('data')
-   * and the file separately ('avatar').
+   * FIX: Prepares FormData by sending all non-file fields (including addresses) 
+   * as a single JSON string under the key 'data', and the file under 'avatar'.
+   * The backend must be configured to parse the 'data' field.
    */
   private prepareFormData(): FormData {
     const raw = this.customerForm.getRawValue();
@@ -235,26 +212,25 @@ export class CustomerForm implements OnInit {
     
     const avatarValue = raw.avatar;
     
-    // Remove avatar from the main data object since it needs special handling
+    // Remove avatar from the main data object
     delete raw.avatar; 
 
     // 1. Append all non-file data as a single JSON string
-    // This handles nested objects like addresses correctly.
+    // This correctly handles nested objects like billingAddress and shippingAddress.
     fd.append('data', JSON.stringify(raw)); 
 
-    // 2. Append the file separately (only if it's a new File object)
+    // 2. Append the file separately
+    // The value must be a File object. We skip appending if it's the old URL string.
     if (avatarValue instanceof File) {
       fd.append('avatar', avatarValue);
     }
-    // If avatarValue is a URL string (old avatar), it remains in the 'data' JSON.
+    
+    // Note: If avatarValue is a URL string (old avatar), it's already in the 'data' JSON.
 
     return fd;
   }
   
-  // --- Utility Methods ---
-
   copyBillingAddress(event: any): void {
-    this.copyAddressChecked.set(event.checked);
     if (event.checked) {
       const billingAddress = this.customerForm.get('billingAddress')?.value;
       this.customerForm.get('shippingAddress')?.patchValue(billingAddress);
@@ -270,262 +246,7 @@ export class CustomerForm implements OnInit {
     const control = this.customerForm.get(field);
     return !!(control && control.invalid && (control.dirty || control.touched));
   }
-
-  // Helper for validation messages in nested form groups
-  isNestedFieldInvalid(groupName: string, field: string): boolean {
-    const group = this.customerForm.get(groupName) as FormGroup;
-    const control = group?.get(field);
-    return !!(control && control.invalid && (control.dirty || control.touched));
-  }
 }
-// import { Component, OnInit, inject, signal, computed } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
-// import { Router, ActivatedRoute, RouterModule } from '@angular/router';
-
-// // Services
-// import { CustomerService } from '../../services/customer-service';
-// import { AppMessageService } from '../../../../core/services/message.service';
-// import { CommonMethodService } from '../../../../core/utils/common-method.service';
-
-// // PrimeNG Modules
-// import { InputTextModule } from 'primeng/inputtext';
-// import { FileUploadModule } from 'primeng/fileupload';
-// import { ButtonModule } from 'primeng/button';
-// import { CheckboxModule } from 'primeng/checkbox';
-// import { CardModule } from 'primeng/card';
-// import { InputNumberModule } from 'primeng/inputnumber';
-// import { DividerModule } from 'primeng/divider';
-// import { ToastModule } from 'primeng/toast';
-// import { SelectModule } from 'primeng/select'; // PrimeNG v18
-// import { TextareaModule } from 'primeng/textarea';
-// import { SkeletonModule } from 'primeng/skeleton';
-// import { AvatarModule } from 'primeng/avatar';
-
-// @Component({
-//   selector: 'app-customer-form',
-//   standalone: true,
-//   imports: [
-//     CommonModule,
-//     ReactiveFormsModule,
-//     RouterModule,
-//     InputTextModule,
-//     FileUploadModule,
-//     ButtonModule,
-//     CheckboxModule,
-//     CardModule,
-//     InputNumberModule,
-//     DividerModule,
-//     ToastModule,
-//     SelectModule,
-//     TextareaModule,
-//     SkeletonModule,
-//     AvatarModule
-//   ],
-//   providers: [CustomerService],
-//   templateUrl: './customer-form.html',
-//   styleUrls: ['./customer-form.scss']
-// })
-// export class CustomerForm implements OnInit {
-//   // Dependencies
-//   private customerService = inject(CustomerService);
-//   private fb = inject(FormBuilder);
-//   private router = inject(Router);
-//   private route = inject(ActivatedRoute);
-//   public common = inject(CommonMethodService);
-//   private messageService = inject(AppMessageService);
-
-//   // Signals
-//   isSubmitting = signal(false);
-//   loadingData = signal(false); 
-//   editMode = signal(false);
-//   customerId = signal<string | null>(null);
-  
-//   // Computed
-//   pageTitle = computed(() => this.editMode() ? 'Edit Customer' : 'Create New Customer');
-//   submitLabel = computed(() => this.isSubmitting() ? 'Submitting...' : (this.editMode() ? 'Save Changes' : 'Create Customer'));
-
-//   customerForm!: FormGroup;
-  
-//   // Dropdown Options
-//   customerTypes = [
-//     { label: 'Individual', value: 'individual' },
-//     { label: 'Business', value: 'business' }
-//   ];
-
-//   // Avatar Preview Helper
-//   currentAvatarUrl: string | null = null;
-
-//   ngOnInit(): void {
-//     this.buildForm();
-//     this.checkEditMode();
-//   }
-
-//   buildForm(): void {
-//     this.customerForm = this.fb.group({
-//       // BASIC INFO
-//       type: ['individual', Validators.required],
-//       name: ['', Validators.required],
-//       contactPerson: [''],
-//       email: ['', [Validators.email]],
-//       phone: ['', Validators.required],
-//       altPhone: [''],
-//       // Added basic length/pattern validators for client-side UX
-//       gstNumber: ['', [Validators.minLength(15), Validators.maxLength(15)]], 
-//       panNumber: ['', [Validators.minLength(10), Validators.maxLength(10)]],
-//       avatar: [null],
-
-//       // ADDRESSES
-//       billingAddress: this.fb.group({
-//         street: [''],
-//         city: [''],
-//         state: [''],
-//         zipCode: [''],
-//         country: ['India']
-//       }),
-
-//       shippingAddress: this.fb.group({
-//         street: [''],
-//         city: [''],
-//         state: [''],
-//         zipCode: [''],
-//         country: ['India']
-//       }),
-
-//       // FINANCIAL & OTHER
-//       openingBalance: [0],
-//       creditLimit: [0],
-//       paymentTerms: [''],
-//       tags: [''],
-//       notes: [''],
-//       isActive: [true] // Explicitly included the missing boolean control
-//     });
-//   }
-
-//   // === 1. Edit Mode Logic ===
-//   private checkEditMode(): void {
-//     const routeId = this.route.snapshot.paramMap.get('id');
-//     const queryId = this.route.snapshot.queryParamMap.get('id');
-//     const id = routeId || queryId;
-
-//     if (id) {
-//       this.customerId.set(id);
-//       this.editMode.set(true); // Set edit mode here
-//       this.loadCustomerData(id);
-//     }
-//   }
-
-//   private loadCustomerData(id: string): void {
-//     this.loadingData.set(true); // Start loading state
-    
-//     this.common.apiCall(
-//       this.customerService.getCustomerDataWithId(id),
-//       (response: any) => {
-//         // Assuming response structure might be nested
-//         const data = response.data?.data || response.data || response;
-//         if (data) {
-//           // Patching data directly, including address subdocuments
-//           this.customerForm.patchValue(data);
-          
-//           if (data.avatar) {
-//             this.currentAvatarUrl = data.avatar;
-//             // Ensure existing avatar URL is stored in the form control for submission payload
-//             this.customerForm.get('avatar')?.setValue(data.avatar); 
-//           }
-//         }
-//         this.loadingData.set(false);
-//       },
-//       'Fetch Customer Data'
-//     );
-//   }
-
-//   onFileUpload(event: any): void {
-//     const file = event.files[0];
-//     if (file) {
-//       this.customerForm.patchValue({ avatar: file });
-//       this.customerForm.get('avatar')?.markAsDirty();
-      
-//       const reader = new FileReader();
-//       reader.onload = (e: any) => this.currentAvatarUrl = e.target.result;
-//       reader.readAsDataURL(file);
-//     }
-//   }
-
-//   // === 3. Submit Handler ===
-//   onSubmit(): void {
-//     if (this.customerForm.invalid) {
-//       this.customerForm.markAllAsTouched();
-//       this.messageService.showWarn('Validation Error', 'Please check the highlighted fields.');
-//       return;
-//     }
-
-//     this.isSubmitting.set(true);
-//     const formData = this.prepareFormData(); // Use the fixed preparation logic
-    
-//     const request$ = this.editMode()
-//       ? this.customerService.updateCustomer(this.customerId()!, formData)
-//       : this.customerService.createNewCustomer(formData);
-
-//     this.common.apiCall(
-//       request$,
-//       (res: any) => {
-//         this.messageService.showSuccess(this.editMode() ? 'Updated' : 'Created', `Customer saved successfully.` );
-//         this.isSubmitting.set(false);
-//         setTimeout(() => this.router.navigate(['/customer']), 500);
-//       },
-//       'Save Customer',
-//       () => {
-//         this.isSubmitting.set(false);
-//       } // Ensure submission state is reset on error
-//     );
-//   }
-
-//   /**
-//    * FIX: Prepares FormData by sending all non-file fields (including addresses) 
-//    * as a single JSON string under the key 'data', and the file under 'avatar'.
-//    * The backend must be configured to parse the 'data' field.
-//    */
-//   private prepareFormData(): FormData {
-//     const raw = this.customerForm.getRawValue();
-//     const fd = new FormData();
-    
-//     const avatarValue = raw.avatar;
-    
-//     // Remove avatar from the main data object
-//     delete raw.avatar; 
-
-//     // 1. Append all non-file data as a single JSON string
-//     // This correctly handles nested objects like billingAddress and shippingAddress.
-//     fd.append('data', JSON.stringify(raw)); 
-
-//     // 2. Append the file separately
-//     // The value must be a File object. We skip appending if it's the old URL string.
-//     if (avatarValue instanceof File) {
-//       fd.append('avatar', avatarValue);
-//     }
-    
-//     // Note: If avatarValue is a URL string (old avatar), it's already in the 'data' JSON.
-
-//     return fd;
-//   }
-  
-//   copyBillingAddress(event: any): void {
-//     if (event.checked) {
-//       const billingAddress = this.customerForm.get('billingAddress')?.value;
-//       this.customerForm.get('shippingAddress')?.patchValue(billingAddress);
-//     } else {
-//       this.customerForm.get('shippingAddress')?.reset({
-//         street: '', city: '', state: '', zipCode: '', country: 'India'
-//       });
-//     }
-//   }
-  
-//   // Helper for validation messages
-//   isFieldInvalid(field: string): boolean {
-//     const control = this.customerForm.get(field);
-//     return !!(control && control.invalid && (control.dirty || control.touched));
-//   }
-// }
 // // import { Component, OnInit, inject, signal, computed } from '@angular/core';
 // // import { CommonModule } from '@angular/common';
 // // import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
