@@ -114,7 +114,7 @@ export class SupplierFormComponent implements OnInit {
       switchMap(params => {
         this.supplierId = params.get('id');
         if (this.supplierId) {
-          // this.editMode.set(true);
+          this.editMode.set(true);
           this.formTitle.set('Edit Supplier');
           this.loadingService.show();
           return this.supplierService.getSupplierById(this.supplierId);
@@ -176,7 +176,7 @@ export class SupplierFormComponent implements OnInit {
       return;
     }
 
-    // this.isSubmitting.set(true);
+    this.isSubmitting.set(true);
     const payload = this.supplierForm.getRawValue();
 
     const request$ = this.editMode()
