@@ -3,7 +3,6 @@
 <div class="form-page-container animate-fadeIn">
   <div class="form-card">
     
-    <!-- HEADER -->
     <header class="form-header">
       <div class="flex flex-col">
           <h2 class="form-title">{{ pageTitle() }}</h2>
@@ -17,24 +16,21 @@
       </p-button>
     </header>
 
-    <!-- LOADING STATE -->
     @if (loadingData()) {
       <div class="p-8 flex flex-col gap-8">
-         <div class="grid grid-cols-2 gap-8">
+          <div class="grid grid-cols-2 gap-8">
             <p-skeleton height="3rem"></p-skeleton>
             <p-skeleton height="3rem"></p-skeleton>
             <p-skeleton height="3rem"></p-skeleton>
             <p-skeleton height="3rem"></p-skeleton>
-         </div>
-         <p-skeleton height="15rem"></p-skeleton>
+          </div>
+          <p-skeleton height="15rem"></p-skeleton>
       </div>
     } 
     
-    <!-- DATA STATE -->
     @else {
       <form [formGroup]="customerForm" (ngSubmit)="onSubmit()" class="form-body">
         
-        <!-- 1. BASIC INFO -->
         <section class="form-section">
           <h4 class="section-title">Basic Information</h4>
           <div class="form-grid">
@@ -85,13 +81,11 @@
           </div>
         </section>
 
-        <!-- 2. ADDRESSES -->
         <section class="form-section">
           <h4 class="section-title">Address Details</h4>
 
           <div class="address-grid">
 
-            <!-- Billing Address -->
             <div class="address-card" formGroupName="billingAddress">
               <h5>Billing Address</h5>
 
@@ -121,7 +115,6 @@
               </div>
             </div>
 
-            <!-- Shipping Address -->
             <div class="address-card" formGroupName="shippingAddress">
 
               <div class="address-header">
@@ -164,7 +157,256 @@
           </div>
         </section>
 
-        <!-- 3. FINANCIAL & OTHER -->
+        <section class="form-section">
+          <h4 class="section-title">Financials & Other Details</h4>
+          <div class="form-grid">
+
+            <div class="form-field">
+              <label for="openingBalance">Opening Balance</label>
+              <p-inputNumber id="openingBalance" formControlName="openingBalance" mode="currency" currency="INR" locale="en-IN"></p-inputNumber>
+            </div>
+
+            <div class="form-field">
+              <label for="creditLimit">Credit Limit</label>
+              <p-inputNumber id="creditLimit" formControlName="creditLimit" mode="currency" currency="INR" locale="en-IN"></p-inputNumber>
+            </div>
+
+            <div class="form-field">
+              <label for="paymentTerms">Payment Terms</label>
+              <input id="paymentTerms" type="text" pInputText formControlName="paymentTerms" placeholder="e.g. Net 30" />
+            </div>
+
+            <div class="form-field">
+              <label for="tags">Tags (comma separated)</label>
+              <input id="tags" type="text" pInputText formControlName="tags" />
+            </div>
+            
+            <div class="form-field">
+                <label for="isActive">Status</label>
+                <p-checkbox 
+                    id="isActive"
+                    label="Active"
+                    binary="true"
+                    formControlName="isActive">
+                </p-checkbox>
+            </div>
+            
+            <div class="form-field"></div> 
+
+            <div class="form-field span-2">
+              <label for="notes">Notes</label>
+              <textarea id="notes" pInputTextarea formControlName="notes" [autoResize]="true" rows="3"></textarea>
+            </div>
+            
+            <div class="form-field span-2">
+              <label>Profile Avatar</label>
+              <div class="avatar-upload-container">
+                  @if(currentAvatarUrl) {
+                      <p-avatar [image]="currentAvatarUrl" shape="circle" size="xlarge" styleClass="avatar-preview"></p-avatar>
+                  } @else {
+                      <p-avatar icon="pi pi-user" shape="circle" size="xlarge" styleClass="avatar-preview bg-[var(--bg-ternary)]"></p-avatar>
+                  }
+                  <div class="flex-1">
+                     <p-fileUpload
+                        mode="basic"
+                        chooseLabel="Select Image"
+                        [auto]="true"
+                        [customUpload]="true"
+                        (uploadHandler)="onFileUpload($event)"
+                        accept="image/*"
+                        [maxFileSize]="1000000"
+                        styleClass="p-button-sm p-button-outlined p-button-secondary">
+                      </p-fileUpload>
+                      <small class="block mt-1 text-[var(--text-secondary)]">Max size 1MB. Supported formats: JPEG, PNG.</small>
+                  </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <footer class="form-footer">
+          <p-button label="Cancel" type="button" styleClass="p-button-text p-button-secondary" routerLink="/customer"></p-button>
+          <p-button
+            [label]="submitLabel()"
+            type="submit"
+            icon="pi pi-check"
+            [loading]="isSubmitting()"
+            [disabled]="customerForm.invalid || isSubmitting()">
+          </p-button>
+        </footer>
+
+      </form>
+    }
+  </div>
+</div>
+<!-- <p-toast></p-toast>
+
+<div class="form-page-container animate-fadeIn">
+  <div class="form-card">
+    
+    HEADER
+    <header class="form-header">
+      <div class="flex flex-col">
+          <h2 class="form-title">{{ pageTitle() }}</h2>
+          <span class="text-xs text-[var(--text-secondary)] mt-1">Manage customer details and addresses</span>
+      </div>
+      <p-button
+        icon="pi pi-arrow-left"
+        label="Back to List"
+        styleClass="p-button-text p-button-secondary"
+        routerLink="/customer">
+      </p-button>
+    </header>
+
+    LOADING STATE
+    @if (loadingData()) {
+      <div class="p-8 flex flex-col gap-8">
+         <div class="grid grid-cols-2 gap-8">
+            <p-skeleton height="3rem"></p-skeleton>
+            <p-skeleton height="3rem"></p-skeleton>
+            <p-skeleton height="3rem"></p-skeleton>
+            <p-skeleton height="3rem"></p-skeleton>
+         </div>
+         <p-skeleton height="15rem"></p-skeleton>
+      </div>
+    } 
+    
+    DATA STATE
+    @else {
+      <form [formGroup]="customerForm" (ngSubmit)="onSubmit()" class="form-body">
+        
+        1. BASIC INFO
+        <section class="form-section">
+          <h4 class="section-title">Basic Information</h4>
+          <div class="form-grid">
+            
+            <div class="form-field">
+              <label for="type">Customer Type</label>
+              <p-select id="type" appendTo="body" formControlName="type" [options]="customerTypes" optionLabel="label" optionValue="value" placeholder="Select Type"></p-select>
+            </div>
+            
+            <div class="form-field">
+              <label for="name">Customer Name <span class="text-red-500">*</span></label>
+              <input id="name" type="text" pInputText formControlName="name" placeholder="Enter full name" />
+              @if (isFieldInvalid('name')) { <small>Name is required.</small> }
+            </div>
+
+            <div class="form-field">
+              <label for="contactPerson">Contact Person</label>
+              <input id="contactPerson" type="text" pInputText formControlName="contactPerson" placeholder="Primary contact" />
+            </div>
+
+            <div class="form-field">
+              <label for="email">Email</label>
+              <input id="email" type="email" pInputText formControlName="email" placeholder="name@example.com" />
+              @if (isFieldInvalid('email')) { <small>Enter a valid email address.</small> }
+            </div>
+
+            <div class="form-field">
+              <label for="phone">Phone Number <span class="text-red-500">*</span></label>
+              <input id="phone" type="text" pInputText formControlName="phone" placeholder="+91 ..." />
+              @if (isFieldInvalid('phone')) { <small>Phone is required.</small> }
+            </div>
+
+            <div class="form-field">
+              <label for="altPhone">Alternate Phone</label>
+              <input id="altPhone" type="text" pInputText formControlName="altPhone" />
+            </div>
+
+            <div class="form-field">
+              <label for="gstNumber">GST Number</label>
+              <input id="gstNumber" type="text" pInputText formControlName="gstNumber" class="uppercase" />
+            </div>
+
+            <div class="form-field">
+              <label for="panNumber">PAN Number</label>
+              <input id="panNumber" type="text" pInputText formControlName="panNumber" class="uppercase" />
+            </div>
+
+          </div>
+        </section>
+
+        2. ADDRESSES
+        <section class="form-section">
+          <h4 class="section-title">Address Details</h4>
+
+          <div class="address-grid">
+
+            Billing Address
+            <div class="address-card" formGroupName="billingAddress">
+              <h5>Billing Address</h5>
+
+              <div class="form-field span-2">
+                <label>Street Address</label>
+                <input pInputText formControlName="street" />
+              </div>
+
+              <div class="form-field">
+                <label>City</label>
+                <input pInputText formControlName="city" />
+              </div>
+
+              <div class="form-field">
+                <label>Zip Code</label>
+                <input pInputText formControlName="zipCode" />
+              </div>
+
+              <div class="form-field">
+                <label>State</label>
+                <input pInputText formControlName="state" />
+              </div>
+              
+              <div class="form-field">
+                <label>Country</label>
+                <input pInputText formControlName="country" />
+              </div>
+            </div>
+
+            Shipping Address
+            <div class="address-card" formGroupName="shippingAddress">
+
+              <div class="address-header">
+                <h5>Shipping Address</h5>
+                <div class="copy-address">
+                  <p-checkbox 
+                    label="Same as Billing"
+                    binary="true"
+                    (onChange)="copyBillingAddress($event)">
+                  </p-checkbox>
+                </div>
+              </div>
+
+              <div class="form-field span-2">
+                <label>Street Address</label>
+                <input pInputText formControlName="street" />
+              </div>
+
+              <div class="form-field">
+                <label>City</label>
+                <input pInputText formControlName="city" />
+              </div>
+
+              <div class="form-field">
+                <label>Zip Code</label>
+                <input pInputText formControlName="zipCode" />
+              </div>
+
+              <div class="form-field">
+                <label>State</label>
+                <input pInputText formControlName="state" />
+              </div>
+
+              <div class="form-field">
+                <label>Country</label>
+                <input pInputText formControlName="country" />
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        3. FINANCIAL & OTHER
         <section class="form-section">
           <h4 class="section-title">Financials & Other Details</h4>
           <div class="form-grid">
@@ -235,7 +477,7 @@
       </form>
     }
   </div>
-</div>
+</div> -->
 
 <!-- <p-toast></p-toast>
 
