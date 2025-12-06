@@ -41,7 +41,6 @@
           <section class="form-section">
             <h4 class="section-title">Party Details</h4>
             <div class="form-grid-4">
-              
               @if (paymentForm.get('type')?.value === 'inflow') {
                 <div class="form-group">
                   <label>Customer <span class="req">*</span></label>
@@ -75,9 +74,9 @@
                   <p-select appendTo="body" 
                     formControlName="supplierId" 
                     [options]="supplierOptions()" 
-                    optionLabel="name" 
+                    optionLabel="companyName" 
                     optionValue="_id"
-                    [filter]="true" filterBy="name"
+                    [filter]="true" filterBy="companyName"
                     [showClear]="true"
                     placeholder="Select Supplier">
                   </p-select>

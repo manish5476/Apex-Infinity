@@ -1,15 +1,26 @@
+/* ========================================================================
+   ANGULAR v20 AccounTech Theme - Organization Details
+   Based on Provided Design Tokens & Glass Theme
+   ======================================================================== */
+
 :host {
+ 
+  /* Host Layout */
   display: block;
   height: 100%;
   font-family: var(--font-body);
-  overflow: hidden;
+  overflow: hidden; /* Important: Let internal containers scroll */
 }
 
+/* ============================================
+   2. PAGE LAYOUT
+   ============================================ */
 .page-container {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: var(--bg-primary);
+  background: var(--bg-primary); /* Solid fallback */
+  background-image: var(--bg-gradient); /* Glass gradient */
   overflow: hidden;
 }
 
@@ -20,415 +31,283 @@
   overflow: hidden;
 }
 
+/* ============================================
+   3. PREMIUM HEADER
+   ============================================ */
 .org-header {
   position: relative;
+  /* Premium Gradient Background */
   background: linear-gradient(
     135deg,
     var(--accent-primary) 0%,
-    color-mix(in srgb, var(--accent-primary) 85%, #000) 100%
+    color-mix(in srgb, var(--accent-primary) 80%, #000) 100%
   );
-  padding: 1.5rem 2rem;
+  padding: var(--spacing-xl) var(--spacing-2xl);
   color: var(--text-white);
   box-shadow: var(--shadow-lg);
-  border-bottom: 1px solid color-mix(in srgb, var(--accent-primary) 40%, transparent);
-  
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  z-index: 10;
+
+  /* Subtle bottom highlight */
   &::after {
     content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.1) 50%,
-      transparent 100%
-    );
+    position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
   }
 
   .header-content {
-    max-width: 100%;
+    max-width: 1600px;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 1.5rem;
+    gap: var(--spacing-xl);
 
     @media (max-width: 768px) {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 1rem;
+      flex-direction: column; align-items: flex-start; gap: var(--spacing-md);
     }
   }
 
   .header-left {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex: 1;
-    min-width: 0;
+    display: flex; align-items: center; gap: var(--spacing-lg); flex: 1; min-width: 0;
   }
 
   .back-button {
-    flex-shrink: 0;
-    width: 2.5rem;
-    height: 2.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--ui-border-radius);
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    flex-shrink: 0; width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: var(--ui-border-radius-lg);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     color: var(--text-white);
     cursor: pointer;
     transition: var(--transition-base);
+    backdrop-filter: blur(4px);
 
     &:hover {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.25);
       transform: translateX(-2px);
     }
   }
 
   .org-identity {
-    flex: 1;
-    min-width: 0;
+    flex: 1; min-width: 0;
 
     h1 {
-      margin: 0 0 0.5rem 0;
-      font-size: clamp(1.25rem, 3vw, 1.75rem);
+      margin: 0 0 0.25rem 0;
+      font-size: var(--font-size-3xl);
       font-weight: 700;
       font-family: var(--font-heading);
       letter-spacing: -0.02em;
       color: var(--text-white);
-      line-height: var(--line-height-tight);
+      line-height: 1.2;
     }
 
     .org-meta {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-      font-size: var(--font-size-sm);
-      opacity: 0.95;
+      display: flex; align-items: center; gap: var(--spacing-md);
+      flex-wrap: wrap; font-size: var(--font-size-sm); opacity: 0.9;
 
       .meta-item {
-        display: flex;
-        align-items: center;
-        gap: 0.375rem;
+        display: flex; align-items: center; gap: 0.375rem;
         padding: 0.25rem 0.625rem;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: var(--ui-border-radius-sm);
-        backdrop-filter: blur(8px);
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: var(--ui-border-radius);
         
-        i {
-          font-size: 0.7rem;
-        }
+        i { font-size: 0.7rem; opacity: 0.8; }
       }
 
-      .meta-separator {
-        opacity: 0.4;
-        font-weight: 300;
-      }
+      .meta-separator { opacity: 0.4; }
     }
   }
 
   .header-right {
-    display: flex;
-    gap: 0.75rem;
-    flex-shrink: 0;
+    display: flex; gap: var(--spacing-md); flex-shrink: 0;
 
-    @media (max-width: 768px) {
-      width: 100%;
-      justify-content: flex-end;
-    }
+    @media (max-width: 768px) { width: 100%; justify-content: flex-end; }
 
     button {
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.2);
       color: var(--text-white);
-      padding: 0.5rem 1rem;
-      border-radius: var(--ui-border-radius);
-      font-weight: 500;
-      font-size: var(--font-size-sm);
-      transition: var(--transition-base);
       backdrop-filter: blur(8px);
+      transition: var(--transition-base);
 
       &:hover {
         background: rgba(255, 255, 255, 0.2);
-        border-color: rgba(255, 255, 255, 0.3);
-        transform: translateY(-1px);
       }
     }
   }
 }
 
 /* ============================================
-   2. BODY LAYOUT - Responsive Grid
+   4. BODY GRID (Sidebar + Content)
    ============================================ */
 .org-body {
   flex: 1;
   display: grid;
   grid-template-columns: 320px 1fr;
-  gap: 1.5rem;
-  padding: 1.5rem;
+  gap: var(--spacing-2xl);
+  padding: var(--spacing-2xl);
   max-width: 1600px;
   width: 100%;
   margin: 0 auto;
-  overflow-y: auto;
+  overflow-y: auto; /* Enable scroll here */
 
-  @media (max-width: 1024px) {
-    grid-template-columns: 280px 1fr;
-    gap: 1rem;
-  }
-
-  @media (max-width: 900px) {
-    grid-template-columns: 1fr;
-    padding: 1rem;
-  }
+  @media (max-width: 1024px) { grid-template-columns: 280px 1fr; gap: var(--spacing-xl); }
+  @media (max-width: 900px) { grid-template-columns: 1fr; padding: var(--spacing-lg); }
 }
 
 /* ============================================
-   3. SIDEBAR - Premium Glass Effect
+   5. SIDEBAR (Glass Card)
    ============================================ */
 .org-sidebar {
   height: fit-content;
   position: sticky;
-  top: 1.5rem;
+  top: 0; /* Adjusted since scrolling happens in .org-body */
+  
+  /* Glass Tokens */
   background: var(--bg-secondary);
   border: 1px solid var(--border-primary);
   border-radius: var(--ui-border-radius-xl);
-  padding: 2rem;
-  box-shadow: var(--shadow-md);
+  padding: var(--spacing-xl);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur));
+  
   transition: var(--transition-base);
 
-  @media (max-width: 900px) {
-    position: static;
-  }
+  @media (max-width: 900px) { position: static; }
 
   &:hover {
     box-shadow: var(--shadow-lg);
+    border-color: color-mix(in srgb, var(--accent-primary) 30%, var(--border-primary));
   }
 
-  /* Logo Section */
+  /* Logo */
   .logo-section {
     text-align: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
     border-bottom: 1px solid var(--border-primary);
 
     .logo-wrapper {
-      display: inline-flex;
-      position: relative;
-      margin-bottom: 1rem;
+      display: inline-flex; position: relative; margin-bottom: var(--spacing-md);
 
       .logo-placeholder {
-        width: 96px;
-        height: 96px;
-        background: linear-gradient(
-          135deg,
-          var(--bg-ternary) 0%,
-          color-mix(in srgb, var(--bg-ternary) 90%, var(--accent-primary)) 100%
-        );
-        border: 2px solid var(--border-secondary);
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        width: 80px; height: 80px;
+        background: linear-gradient(135deg, var(--bg-ternary) 0%, white 100%);
+        border: 1px solid var(--border-secondary);
+        border-radius: 18px;
+        display: flex; align-items: center; justify-content: center;
         box-shadow: var(--shadow-md);
-        transition: var(--transition-base);
-
-        &:hover {
-          transform: scale(1.05);
-          box-shadow: var(--shadow-lg);
-        }
-
+        
         span {
-          font-size: 2.5rem;
-          font-weight: 800;
-          background: linear-gradient(135deg, var(--accent-primary), var(--color-accent-purple));
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          font-family: var(--font-heading);
+          font-size: 2rem; font-weight: 800; font-family: var(--font-heading);
+          background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
       }
 
       .status-indicator {
-        position: absolute;
-        bottom: 4px;
-        right: 4px;
-        width: 16px;
-        height: 16px;
-        background: var(--color-accent);
-        border: 3px solid var(--bg-secondary);
+        position: absolute; bottom: -2px; right: -2px;
+        width: 14px; height: 14px;
+        background: var(--color-success);
+        border: 2px solid white;
         border-radius: 50%;
-        box-shadow: 0 0 0 2px var(--color-accent);
+        box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
       }
     }
 
     .org-name-display {
-      font-size: var(--font-size-md);
-      font-weight: 600;
-      color: var(--text-primary);
+      font-size: var(--font-size-lg); font-weight: 700; color: var(--text-primary);
       margin: 0.5rem 0 0.25rem 0;
     }
-
     .org-id-display {
-      font-size: var(--font-size-xs);
-      color: var(--text-secondary);
-      font-family: var(--font-mono);
+      font-size: var(--font-size-xs); color: var(--text-tertiary); font-family: var(--font-mono);
     }
   }
 
-  /* Details Grid */
+  /* Details List */
   .sidebar-details {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-    margin-bottom: 1.5rem;
+    display: flex; flex-direction: column; gap: var(--spacing-lg); margin-bottom: var(--spacing-xl);
 
     .detail-item {
-      display: flex;
-      flex-direction: column;
-      gap: 0.375rem;
-      padding: 0.75rem;
+      display: flex; flex-direction: column; gap: 0.25rem;
+      padding: var(--spacing-md);
       background: var(--bg-ternary);
       border-radius: var(--ui-border-radius);
-      transition: var(--transition-colors);
-
-      &:hover {
-        background: color-mix(in srgb, var(--bg-ternary) 90%, var(--accent-primary));
-      }
-
-      label {
-        font-size: var(--font-size-xs);
-        text-transform: uppercase;
-        font-weight: 600;
-        color: var(--text-label);
-        letter-spacing: 0.06em;
-        display: flex;
-        align-items: center;
-        gap: 0.375rem;
-
-        i {
-          font-size: 0.7rem;
-          opacity: 0.7;
-        }
-      }
-
-      .value {
-        color: var(--text-primary);
-        font-weight: 500;
-        font-size: var(--font-size-sm);
-        word-break: break-word;
-        line-height: var(--line-height-normal);
-      }
-
-      .value-empty {
-        color: var(--text-secondary);
-        font-style: italic;
-        opacity: 0.6;
-      }
-    }
-  }
-
-  /* Stats Cards */
-  .sidebar-stats {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border-primary);
-
-    .stat-card {
-      background: linear-gradient(
-        135deg,
-        var(--bg-ternary) 0%,
-        color-mix(in srgb, var(--bg-ternary) 95%, var(--accent-primary)) 100%
-      );
-      border: 1px solid var(--border-secondary);
-      border-radius: var(--ui-border-radius-lg);
-      padding: 1rem;
-      text-align: center;
+      border: 1px solid transparent;
       transition: var(--transition-base);
 
       &:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
+        background: white;
         border-color: var(--accent-primary);
+        box-shadow: var(--shadow-sm);
       }
+
+      label {
+        font-size: var(--font-size-xs); text-transform: uppercase; font-weight: 700;
+        color: var(--text-label); letter-spacing: 0.05em;
+        display: flex; align-items: center; gap: 0.5rem;
+        i { color: var(--accent-primary); font-size: 0.8rem; }
+      }
+
+      .value {
+        color: var(--text-primary); font-weight: 500; font-size: var(--font-size-sm); word-break: break-word;
+      }
+      .value-empty { color: var(--text-tertiary); font-style: italic; }
+    }
+  }
+
+  /* Quick Stats */
+  .sidebar-stats {
+    display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);
+    padding-top: var(--spacing-lg); border-top: 1px solid var(--border-primary);
+
+    .stat-card {
+      background: linear-gradient(135deg, var(--bg-ternary) 0%, rgba(255,255,255,0.5) 100%);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--ui-border-radius-lg);
+      padding: var(--spacing-md);
+      text-align: center;
 
       .stat-value {
-        font-size: var(--font-size-2xl);
-        font-weight: 700;
-        color: var(--accent-primary);
-        font-family: var(--font-heading);
-        line-height: 1;
-        margin-bottom: 0.375rem;
+        font-size: var(--font-size-xl); font-weight: 800; color: var(--accent-primary);
+        font-family: var(--font-heading); line-height: 1; margin-bottom: 0.25rem;
       }
-
       .stat-label {
-        font-size: var(--font-size-xs);
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        font-weight: 600;
+        font-size: 0.6rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;
       }
     }
   }
 }
 
 /* ============================================
-   4. CONTENT AREA - Modern Tabs
+   6. CONTENT AREA (Tabs)
    ============================================ */
 .org-content {
   min-width: 0;
 
-  /* Tab Navigation */
   ::ng-deep .p-tablist {
     background: var(--bg-secondary);
     border: 1px solid var(--border-primary);
     border-radius: var(--ui-border-radius-lg);
-    padding: 0.375rem;
-    margin-bottom: 1.5rem;
-    display: flex;
-    gap: 0.25rem;
+    padding: 0.25rem;
+    margin-bottom: var(--spacing-xl);
+    display: flex; gap: 0.25rem;
     box-shadow: var(--shadow-sm);
-    overflow-x: auto;
-
-    @media (max-width: 640px) {
-      flex-wrap: nowrap;
-    }
   }
 
   ::ng-deep .p-tab {
     flex: 1;
-    min-width: fit-content;
-    background: transparent;
-    border: none;
+    background: transparent; border: none;
     border-radius: var(--ui-border-radius);
     color: var(--text-secondary);
-    font-weight: 500;
-    font-size: var(--font-size-sm);
-    padding: 0.625rem 1rem;
+    font-weight: 600; font-size: var(--font-size-sm);
+    padding: 0.6rem 1rem;
     transition: var(--transition-base);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    white-space: nowrap;
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem;
 
-    i {
-      font-size: var(--font-size-sm);
-    }
-
-    &:hover:not(.p-tab-active) {
-      background: var(--bg-ternary);
-      color: var(--text-primary);
-    }
-
+    &:hover:not(.p-tab-active) { background: var(--bg-ternary); color: var(--text-primary); }
+    
     &.p-tab-active {
       background: var(--accent-primary);
       color: var(--text-white);
@@ -436,375 +315,175 @@
     }
   }
 
-  ::ng-deep .p-tabpanels {
-    padding: 0;
-    background: transparent;
-  }
+  ::ng-deep .p-tabpanels { padding: 0; background: transparent; }
 }
 
 /* ============================================
-   5. PANEL CONTENT - Cards System
+   7. PANELS & CARDS
    ============================================ */
 .panel-content {
   background: var(--bg-secondary);
   border: 1px solid var(--border-primary);
   border-radius: var(--ui-border-radius-xl);
-  padding: 2rem;
-  box-shadow: var(--shadow-md);
-  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-
-  @media (max-width: 640px) {
-    padding: 1.25rem;
-  }
+  padding: var(--spacing-2xl);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur));
+  
+  @media (max-width: 640px) { padding: var(--spacing-lg); }
 
   .panel-header {
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-lg);
     border-bottom: 1px solid var(--border-primary);
 
     h3 {
-      margin: 0 0 0.5rem 0;
-      color: var(--text-primary);
-      font-size: var(--font-size-xl);
-      font-weight: 700;
-      font-family: var(--font-heading);
+      margin: 0 0 0.25rem 0; color: var(--text-primary);
+      font-size: var(--font-size-lg); font-weight: 700;
     }
-
-    p {
-      margin: 0;
-      color: var(--text-secondary);
-      font-size: var(--font-size-sm);
-      line-height: var(--line-height-relaxed);
-    }
+    p { margin: 0; color: var(--text-secondary); font-size: var(--font-size-sm); }
   }
 }
 
 /* ============================================
-   6. FORM STYLES - Modern Input Design
+   8. FORMS (Modern Input Design)
    ============================================ */
 .form-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-xl);
 
   .field {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    display: flex; flex-direction: column; gap: 0.35rem;
 
     label {
-      font-size: var(--font-size-sm);
-      font-weight: 600;
-      color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      gap: 0.375rem;
-
-      .required {
-        color: var(--color-error);
-      }
+      font-size: var(--font-size-xs); font-weight: 700; color: var(--text-primary);
+      text-transform: uppercase; display: flex; align-items: center; gap: 0.25rem;
+      .required { color: var(--color-error); }
     }
 
-    input,
-    select,
-    textarea {
-      width: 100%;
-      padding: 0.625rem 0.875rem;
+    input, select, textarea {
+      width: 100%; padding: 0.6rem 0.8rem;
       background: var(--bg-ternary);
       border: 1px solid var(--border-primary);
       border-radius: var(--ui-border-radius);
       color: var(--text-primary);
       font-size: var(--font-size-sm);
-      transition: var(--transition-colors);
+      transition: var(--transition-base);
       font-family: var(--font-body);
 
       &:focus {
-        outline: none;
-        border-color: var(--accent-primary);
-        background: var(--bg-secondary);
+        outline: none; border-color: var(--accent-primary); background: white;
         box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 15%, transparent);
       }
-
-      &:disabled {
-        opacity: var(--state-disabled-opacity);
-        cursor: not-allowed;
-      }
-
-      &::placeholder {
-        color: var(--text-secondary);
-        opacity: 0.6;
-      }
+      &::placeholder { color: var(--text-tertiary); }
     }
 
-    .field-hint {
-      font-size: var(--font-size-xs);
-      color: var(--text-secondary);
-      margin-top: 0.25rem;
-    }
-
-    .field-error {
-      font-size: var(--font-size-xs);
-      color: var(--color-error);
-      margin-top: 0.25rem;
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-    }
+    .field-hint { font-size: var(--font-size-xs); color: var(--text-tertiary); margin-top: 0.15rem; }
   }
 
   .form-actions {
     grid-column: 1 / -1;
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
-    margin-top: 1rem;
-    padding-top: 1.5rem;
+    display: flex; justify-content: flex-end; gap: var(--spacing-md);
+    margin-top: var(--spacing-lg); padding-top: var(--spacing-lg);
     border-top: 1px solid var(--border-primary);
-
-    @media (max-width: 640px) {
-      flex-direction: column-reverse;
-
-      button {
-        width: 100%;
-      }
-    }
   }
 }
 
 /* ============================================
-   7. TABLE ENHANCEMENTS
+   9. DATA TABLES (Clean)
    ============================================ */
 ::ng-deep .p-datatable {
-  .p-datatable-header {
-    background: transparent;
-    border: none;
-    padding: 0 0 1rem 0;
-  }
+  .p-datatable-header { background: transparent; border: none; padding: 0 0 1rem 0; }
 
   .p-datatable-thead > tr > th {
     background: var(--bg-ternary);
-    color: var(--text-secondary);
+    color: var(--text-label);
     font-size: var(--font-size-xs);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-weight: 600;
-    padding: 0.75rem 1rem;
-    border: none;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    padding: 0.75rem 1rem; border: none;
     border-bottom: 2px solid var(--border-primary);
   }
 
   .p-datatable-tbody > tr {
-    background: var(--bg-secondary);
-    transition: var(--transition-base);
+    background: transparent; transition: background-color 0.2s;
+    
+    &:hover { background: rgba(59, 130, 246, 0.04) !important; }
 
-    &:hover {
-      background: var(--bg-ternary) !important;
-    }
-
-    > td {
-      padding: 1rem;
-      border-bottom: 1px solid var(--border-primary);
-      color: var(--text-primary);
-      font-size: var(--font-size-sm);
+    td {
+      padding: 1rem; border-bottom: 1px solid var(--border-secondary);
+      color: var(--text-primary); font-size: var(--font-size-sm);
+      vertical-align: middle;
     }
   }
 }
 
 /* ============================================
-   8. DANGER ZONE - Warning Design
+   10. TIMELINE (Activity Log)
+   ============================================ */
+.log-item {
+  display: flex; flex-direction: column; gap: 0.25rem;
+  padding: 1rem; background: var(--bg-ternary);
+  border-radius: var(--ui-border-radius);
+  border-left: 3px solid var(--accent-primary);
+
+  .log-date { font-size: var(--font-size-xs); color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; }
+  .log-desc { font-weight: 600; color: var(--text-primary); font-size: var(--font-size-sm); }
+  .log-user { font-size: var(--font-size-xs); color: var(--accent-primary); font-weight: 600; margin-top: 0.25rem; }
+}
+
+/* ============================================
+   11. DANGER ZONE
    ============================================ */
 .danger-box {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: var(--spacing-xl);
   border: 1px solid var(--border-primary);
   border-radius: var(--ui-border-radius-lg);
-  margin-bottom: 1rem;
+  margin-bottom: var(--spacing-lg);
   background: var(--bg-ternary);
   transition: var(--transition-base);
 
-  @media (max-width: 640px) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
+  @media (max-width: 640px) { flex-direction: column; align-items: flex-start; gap: 1rem; }
 
   &.warning {
-    border-color: color-mix(in srgb, var(--color-accent-amber) 40%, transparent);
-    background: color-mix(in srgb, var(--color-accent-amber) 8%, transparent);
-
-    &:hover {
-      border-color: color-mix(in srgb, var(--color-accent-amber) 60%, transparent);
-    }
+    border-color: color-mix(in srgb, var(--color-warning) 30%, transparent);
+    background: color-mix(in srgb, var(--color-warning) 5%, transparent);
+    &:hover { border-color: var(--color-warning); background: color-mix(in srgb, var(--color-warning) 10%, transparent); }
   }
 
   &.delete {
-    border-color: color-mix(in srgb, var(--color-error) 40%, transparent);
-    background: color-mix(in srgb, var(--color-error) 8%, transparent);
-
-    &:hover {
-      border-color: color-mix(in srgb, var(--color-error) 60%, transparent);
-    }
+    border-color: color-mix(in srgb, var(--color-error) 30%, transparent);
+    background: color-mix(in srgb, var(--color-error) 5%, transparent);
+    &:hover { border-color: var(--color-error); background: color-mix(in srgb, var(--color-error) 10%, transparent); }
   }
 
   .box-info {
     flex: 1;
-
-    strong {
-      display: block;
-      color: var(--text-primary);
-      font-weight: 600;
-      font-size: var(--font-size-md);
-      margin-bottom: 0.375rem;
-    }
-
-    p {
-      margin: 0;
-      font-size: var(--font-size-sm);
-      color: var(--text-secondary);
-      line-height: var(--line-height-relaxed);
-    }
-  }
-
-  button {
-    flex-shrink: 0;
+    strong { display: block; color: var(--text-primary); font-size: var(--font-size-md); margin-bottom: 0.25rem; }
+    p { margin: 0; font-size: var(--font-size-sm); color: var(--text-secondary); max-width: 500px; }
   }
 }
 
 /* ============================================
-   9. TIMELINE/ACTIVITY LOG
+   12. LOADING & UTILS
    ============================================ */
-::ng-deep .p-timeline {
-  .p-timeline-event {
-    min-height: 80px;
-  }
-
-  .p-timeline-event-marker {
-    width: 1.5rem;
-    height: 1.5rem;
-    background: var(--accent-primary);
-    border: 3px solid var(--bg-secondary);
-    box-shadow: 0 0 0 3px var(--border-primary);
-  }
-
-  .p-timeline-event-connector {
-    background: var(--border-primary);
-    width: 2px;
-  }
+.loading-state, .empty-state {
+  min-height: 300px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 1rem;
+  color: var(--text-tertiary);
+  
+  i { font-size: 3rem; opacity: 0.5; color: var(--accent-primary); }
+  p { font-size: var(--font-size-md); }
 }
 
-.log-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-  padding: 1rem;
-  background: var(--bg-ternary);
-  border-radius: var(--ui-border-radius);
-  border-left: 3px solid var(--accent-primary);
+.glass-surface { backdrop-filter: blur(var(--glass-blur)); }
+.animate-fadeInUp { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-  .log-date {
-    font-size: var(--font-size-xs);
-    color: var(--text-secondary);
-    font-weight: 500;
-  }
-
-  .log-desc {
-    font-weight: 600;
-    color: var(--text-primary);
-    font-size: var(--font-size-sm);
-    line-height: var(--line-height-normal);
-  }
-
-  .log-user {
-    font-size: var(--font-size-xs);
-    color: var(--accent-primary);
-    font-weight: 600;
-  }
-}
-
-/* ============================================
-   10. LOADING & EMPTY STATES
-   ============================================ */
-.loading-state,
-.empty-state {
-  min-height: 400px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  color: var(--text-secondary);
-
-  i {
-    font-size: 3rem;
-    color: var(--accent-primary);
-    opacity: 0.7;
-  }
-
-  p {
-    font-size: var(--font-size-md);
-    color: var(--text-secondary);
-  }
-}
-
-/* ============================================
-   11. ANIMATIONS
-   ============================================ */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.animate-fadeIn {
-  animation: fadeIn 0.3s ease-in;
-}
-
-.animate-fadeInUp {
-  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* ============================================
-   12. UTILITY CLASSES
-   ============================================ */
-.glass-surface {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-.text-gradient {
-  background: linear-gradient(135deg, var(--accent-primary), var(--color-accent-purple));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* ============================================
-   13. RESPONSIVE UTILITIES
-   ============================================ */
-@media (max-width: 640px) {
-  .hide-mobile { display: none !important; }
-}
-
-@media (min-width: 641px) {
-  .show-mobile { display: none !important; }
-}
-
-// /* =========================================================
-//    ORGANIZATION SETTINGS - ENHANCED UI/UX DESIGN
-//    Built with AccounTech Design System
-//    ========================================================= */
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-primary); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
 
 // :host {
 //   display: block;
@@ -828,12 +507,8 @@
 //   overflow: hidden;
 // }
 
-// /* ============================================
-//    1. REFINED HEADER with Depth
-//    ============================================ */
 // .org-header {
 //   position: relative;
-//   flex-shrink: 0;
 //   background: linear-gradient(
 //     135deg,
 //     var(--accent-primary) 0%,
@@ -843,7 +518,6 @@
 //   color: var(--text-white);
 //   box-shadow: var(--shadow-lg);
 //   border-bottom: 1px solid color-mix(in srgb, var(--accent-primary) 40%, transparent);
-//   z-index: 10;
   
 //   &::after {
 //     content: '';
@@ -981,7 +655,6 @@
 //    ============================================ */
 // .org-body {
 //   flex: 1;
-//   min-height: 0;
 //   display: grid;
 //   grid-template-columns: 320px 1fr;
 //   gap: 1.5rem;
@@ -990,7 +663,6 @@
 //   width: 100%;
 //   margin: 0 auto;
 //   overflow-y: auto;
-//   overflow-x: hidden;
 
 //   @media (max-width: 1024px) {
 //     grid-template-columns: 280px 1fr;
@@ -1615,1092 +1287,3 @@
 // @media (min-width: 641px) {
 //   .show-mobile { display: none !important; }
 // }
-
-// // /* =========================================================
-// //    ORGANIZATION SETTINGS - ENHANCED UI/UX DESIGN
-// //    Built with AccounTech Design System
-// //    ========================================================= */
-
-// // :host {
-// //   display: block;
-// //   height: 100%;
-// //   font-family: var(--font-body);
-// // }
-
-// // .page-container {
-// //   height: 100%;
-// //   display: flex;
-// //   flex-direction: column;
-// //   background: var(--bg-primary);
-// // }
-
-// // /* ============================================
-// //    1. REFINED HEADER with Depth
-// //    ============================================ */
-// // .org-header {
-// //   position: relative;
-// //   background: linear-gradient(
-// //     135deg,
-// //     var(--accent-primary) 0%,
-// //     color-mix(in srgb, var(--accent-primary) 85%, #000) 100%
-// //   );
-// //   padding: 1.5rem 2rem;
-// //   color: var(--text-white);
-// //   box-shadow: var(--shadow-lg);
-// //   border-bottom: 1px solid color-mix(in srgb, var(--accent-primary) 40%, transparent);
-  
-// //   &::after {
-// //     content: '';
-// //     position: absolute;
-// //     bottom: 0;
-// //     left: 0;
-// //     right: 0;
-// //     height: 1px;
-// //     background: linear-gradient(
-// //       90deg,
-// //       transparent 0%,
-// //       rgba(255, 255, 255, 0.1) 50%,
-// //       transparent 100%
-// //     );
-// //   }
-
-// //   .header-content {
-// //     max-width: 100%;
-// //     margin: 0 auto;
-// //     display: flex;
-// //     justify-content: space-between;
-// //     align-items: center;
-// //     gap: 1.5rem;
-
-// //     @media (max-width: 768px) {
-// //       flex-direction: column;
-// //       align-items: flex-start;
-// //       gap: 1rem;
-// //     }
-// //   }
-
-// //   .header-left {
-// //     display: flex;
-// //     align-items: center;
-// //     gap: 1rem;
-// //     flex: 1;
-// //     min-width: 0;
-// //   }
-
-// //   .back-button {
-// //     flex-shrink: 0;
-// //     width: 2.5rem;
-// //     height: 2.5rem;
-// //     display: flex;
-// //     align-items: center;
-// //     justify-content: center;
-// //     border-radius: var(--ui-border-radius);
-// //     background: rgba(255, 255, 255, 0.1);
-// //     border: 1px solid rgba(255, 255, 255, 0.15);
-// //     color: var(--text-white);
-// //     cursor: pointer;
-// //     transition: var(--transition-base);
-
-// //     &:hover {
-// //       background: rgba(255, 255, 255, 0.2);
-// //       transform: translateX(-2px);
-// //     }
-// //   }
-
-// //   .org-identity {
-// //     flex: 1;
-// //     min-width: 0;
-
-// //     h1 {
-// //       margin: 0 0 0.5rem 0;
-// //       font-size: clamp(1.25rem, 3vw, 1.75rem);
-// //       font-weight: 700;
-// //       font-family: var(--font-heading);
-// //       letter-spacing: -0.02em;
-// //       color: var(--text-white);
-// //       line-height: var(--line-height-tight);
-// //     }
-
-// //     .org-meta {
-// //       display: flex;
-// //       align-items: center;
-// //       gap: 0.75rem;
-// //       flex-wrap: wrap;
-// //       font-size: var(--font-size-sm);
-// //       opacity: 0.95;
-
-// //       .meta-item {
-// //         display: flex;
-// //         align-items: center;
-// //         gap: 0.375rem;
-// //         padding: 0.25rem 0.625rem;
-// //         background: rgba(255, 255, 255, 0.1);
-// //         border-radius: var(--ui-border-radius-sm);
-// //         backdrop-filter: blur(8px);
-        
-// //         i {
-// //           font-size: 0.7rem;
-// //         }
-// //       }
-
-// //       .meta-separator {
-// //         opacity: 0.4;
-// //         font-weight: 300;
-// //       }
-// //     }
-// //   }
-
-// //   .header-right {
-// //     display: flex;
-// //     gap: 0.75rem;
-// //     flex-shrink: 0;
-
-// //     @media (max-width: 768px) {
-// //       width: 100%;
-// //       justify-content: flex-end;
-// //     }
-
-// //     button {
-// //       background: rgba(255, 255, 255, 0.1);
-// //       border: 1px solid rgba(255, 255, 255, 0.2);
-// //       color: var(--text-white);
-// //       padding: 0.5rem 1rem;
-// //       border-radius: var(--ui-border-radius);
-// //       font-weight: 500;
-// //       font-size: var(--font-size-sm);
-// //       transition: var(--transition-base);
-// //       backdrop-filter: blur(8px);
-
-// //       &:hover {
-// //         background: rgba(255, 255, 255, 0.2);
-// //         border-color: rgba(255, 255, 255, 0.3);
-// //         transform: translateY(-1px);
-// //       }
-// //     }
-// //   }
-// // }
-
-// // /* ============================================
-// //    2. BODY LAYOUT - Responsive Grid
-// //    ============================================ */
-// // .org-body {
-// //   flex: 1;
-// //   display: grid;
-// //   grid-template-columns: 320px 1fr;
-// //   gap: 1.5rem;
-// //   padding: 1.5rem;
-// //   max-width: 1600px;
-// //   width: 100%;
-// //   margin: 0 auto;
-// //   overflow-y: auto;
-
-// //   @media (max-width: 1024px) {
-// //     grid-template-columns: 280px 1fr;
-// //     gap: 1rem;
-// //   }
-
-// //   @media (max-width: 900px) {
-// //     grid-template-columns: 1fr;
-// //     padding: 1rem;
-// //   }
-// // }
-
-// // /* ============================================
-// //    3. SIDEBAR - Premium Glass Effect
-// //    ============================================ */
-// // .org-sidebar {
-// //   height: fit-content;
-// //   position: sticky;
-// //   top: 1.5rem;
-// //   background: var(--bg-secondary);
-// //   border: 1px solid var(--border-primary);
-// //   border-radius: var(--ui-border-radius-xl);
-// //   padding: 2rem;
-// //   box-shadow: var(--shadow-md);
-// //   transition: var(--transition-base);
-
-// //   @media (max-width: 900px) {
-// //     position: static;
-// //   }
-
-// //   &:hover {
-// //     box-shadow: var(--shadow-lg);
-// //   }
-
-// //   /* Logo Section */
-// //   .logo-section {
-// //     text-align: center;
-// //     margin-bottom: 2rem;
-// //     padding-bottom: 1.5rem;
-// //     border-bottom: 1px solid var(--border-primary);
-
-// //     .logo-wrapper {
-// //       display: inline-flex;
-// //       position: relative;
-// //       margin-bottom: 1rem;
-
-// //       .logo-placeholder {
-// //         width: 96px;
-// //         height: 96px;
-// //         background: linear-gradient(
-// //           135deg,
-// //           var(--bg-ternary) 0%,
-// //           color-mix(in srgb, var(--bg-ternary) 90%, var(--accent-primary)) 100%
-// //         );
-// //         border: 2px solid var(--border-secondary);
-// //         border-radius: 20px;
-// //         display: flex;
-// //         align-items: center;
-// //         justify-content: center;
-// //         box-shadow: var(--shadow-md);
-// //         transition: var(--transition-base);
-
-// //         &:hover {
-// //           transform: scale(1.05);
-// //           box-shadow: var(--shadow-lg);
-// //         }
-
-// //         span {
-// //           font-size: 2.5rem;
-// //           font-weight: 800;
-// //           background: linear-gradient(135deg, var(--accent-primary), var(--color-accent-purple));
-// //           -webkit-background-clip: text;
-// //           -webkit-text-fill-color: transparent;
-// //           background-clip: text;
-// //           font-family: var(--font-heading);
-// //         }
-// //       }
-
-// //       .status-indicator {
-// //         position: absolute;
-// //         bottom: 4px;
-// //         right: 4px;
-// //         width: 16px;
-// //         height: 16px;
-// //         background: var(--color-accent);
-// //         border: 3px solid var(--bg-secondary);
-// //         border-radius: 50%;
-// //         box-shadow: 0 0 0 2px var(--color-accent);
-// //       }
-// //     }
-
-// //     .org-name-display {
-// //       font-size: var(--font-size-md);
-// //       font-weight: 600;
-// //       color: var(--text-primary);
-// //       margin: 0.5rem 0 0.25rem 0;
-// //     }
-
-// //     .org-id-display {
-// //       font-size: var(--font-size-xs);
-// //       color: var(--text-secondary);
-// //       font-family: var(--font-mono);
-// //     }
-// //   }
-
-// //   /* Details Grid */
-// //   .sidebar-details {
-// //     display: flex;
-// //     flex-direction: column;
-// //     gap: 1.25rem;
-// //     margin-bottom: 1.5rem;
-
-// //     .detail-item {
-// //       display: flex;
-// //       flex-direction: column;
-// //       gap: 0.375rem;
-// //       padding: 0.75rem;
-// //       background: var(--bg-ternary);
-// //       border-radius: var(--ui-border-radius);
-// //       transition: var(--transition-colors);
-
-// //       &:hover {
-// //         background: color-mix(in srgb, var(--bg-ternary) 90%, var(--accent-primary));
-// //       }
-
-// //       label {
-// //         font-size: var(--font-size-xs);
-// //         text-transform: uppercase;
-// //         font-weight: 600;
-// //         color: var(--text-label);
-// //         letter-spacing: 0.06em;
-// //         display: flex;
-// //         align-items: center;
-// //         gap: 0.375rem;
-
-// //         i {
-// //           font-size: 0.7rem;
-// //           opacity: 0.7;
-// //         }
-// //       }
-
-// //       .value {
-// //         color: var(--text-primary);
-// //         font-weight: 500;
-// //         font-size: var(--font-size-sm);
-// //         word-break: break-word;
-// //         line-height: var(--line-height-normal);
-// //       }
-
-// //       .value-empty {
-// //         color: var(--text-secondary);
-// //         font-style: italic;
-// //         opacity: 0.6;
-// //       }
-// //     }
-// //   }
-
-// //   /* Stats Cards */
-// //   .sidebar-stats {
-// //     display: grid;
-// //     grid-template-columns: repeat(2, 1fr);
-// //     gap: 0.75rem;
-// //     margin-top: 1.5rem;
-// //     padding-top: 1.5rem;
-// //     border-top: 1px solid var(--border-primary);
-
-// //     .stat-card {
-// //       background: linear-gradient(
-// //         135deg,
-// //         var(--bg-ternary) 0%,
-// //         color-mix(in srgb, var(--bg-ternary) 95%, var(--accent-primary)) 100%
-// //       );
-// //       border: 1px solid var(--border-secondary);
-// //       border-radius: var(--ui-border-radius-lg);
-// //       padding: 1rem;
-// //       text-align: center;
-// //       transition: var(--transition-base);
-
-// //       &:hover {
-// //         transform: translateY(-2px);
-// //         box-shadow: var(--shadow-md);
-// //         border-color: var(--accent-primary);
-// //       }
-
-// //       .stat-value {
-// //         font-size: var(--font-size-2xl);
-// //         font-weight: 700;
-// //         color: var(--accent-primary);
-// //         font-family: var(--font-heading);
-// //         line-height: 1;
-// //         margin-bottom: 0.375rem;
-// //       }
-
-// //       .stat-label {
-// //         font-size: var(--font-size-xs);
-// //         color: var(--text-secondary);
-// //         text-transform: uppercase;
-// //         letter-spacing: 0.05em;
-// //         font-weight: 600;
-// //       }
-// //     }
-// //   }
-// // }
-
-// // /* ============================================
-// //    4. CONTENT AREA - Modern Tabs
-// //    ============================================ */
-// // .org-content {
-// //   min-width: 0;
-
-// //   /* Tab Navigation */
-// //   ::ng-deep .p-tablist {
-// //     background: var(--bg-secondary);
-// //     border: 1px solid var(--border-primary);
-// //     border-radius: var(--ui-border-radius-lg);
-// //     padding: 0.375rem;
-// //     margin-bottom: 1.5rem;
-// //     display: flex;
-// //     gap: 0.25rem;
-// //     box-shadow: var(--shadow-sm);
-// //     overflow-x: auto;
-
-// //     @media (max-width: 640px) {
-// //       flex-wrap: nowrap;
-// //     }
-// //   }
-
-// //   ::ng-deep .p-tab {
-// //     flex: 1;
-// //     min-width: fit-content;
-// //     background: transparent;
-// //     border: none;
-// //     border-radius: var(--ui-border-radius);
-// //     color: var(--text-secondary);
-// //     font-weight: 500;
-// //     font-size: var(--font-size-sm);
-// //     padding: 0.625rem 1rem;
-// //     transition: var(--transition-base);
-// //     display: flex;
-// //     align-items: center;
-// //     justify-content: center;
-// //     gap: 0.5rem;
-// //     white-space: nowrap;
-
-// //     i {
-// //       font-size: var(--font-size-sm);
-// //     }
-
-// //     &:hover:not(.p-tab-active) {
-// //       background: var(--bg-ternary);
-// //       color: var(--text-primary);
-// //     }
-
-// //     &.p-tab-active {
-// //       background: var(--accent-primary);
-// //       color: var(--text-white);
-// //       box-shadow: var(--shadow-sm);
-// //     }
-// //   }
-
-// //   ::ng-deep .p-tabpanels {
-// //     padding: 0;
-// //     background: transparent;
-// //   }
-// // }
-
-// // /* ============================================
-// //    5. PANEL CONTENT - Cards System
-// //    ============================================ */
-// // .panel-content {
-// //   background: var(--bg-secondary);
-// //   border: 1px solid var(--border-primary);
-// //   border-radius: var(--ui-border-radius-xl);
-// //   padding: 2rem;
-// //   box-shadow: var(--shadow-md);
-// //   animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-
-// //   @media (max-width: 640px) {
-// //     padding: 1.25rem;
-// //   }
-
-// //   .panel-header {
-// //     margin-bottom: 2rem;
-// //     padding-bottom: 1.5rem;
-// //     border-bottom: 1px solid var(--border-primary);
-
-// //     h3 {
-// //       margin: 0 0 0.5rem 0;
-// //       color: var(--text-primary);
-// //       font-size: var(--font-size-xl);
-// //       font-weight: 700;
-// //       font-family: var(--font-heading);
-// //     }
-
-// //     p {
-// //       margin: 0;
-// //       color: var(--text-secondary);
-// //       font-size: var(--font-size-sm);
-// //       line-height: var(--line-height-relaxed);
-// //     }
-// //   }
-// // }
-
-// // /* ============================================
-// //    6. FORM STYLES - Modern Input Design
-// //    ============================================ */
-// // .form-grid {
-// //   display: grid;
-// //   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-// //   gap: 1.5rem;
-
-// //   .field {
-// //     display: flex;
-// //     flex-direction: column;
-// //     gap: 0.5rem;
-
-// //     label {
-// //       font-size: var(--font-size-sm);
-// //       font-weight: 600;
-// //       color: var(--text-primary);
-// //       display: flex;
-// //       align-items: center;
-// //       gap: 0.375rem;
-
-// //       .required {
-// //         color: var(--color-error);
-// //       }
-// //     }
-
-// //     input,
-// //     select,
-// //     textarea {
-// //       width: 100%;
-// //       padding: 0.625rem 0.875rem;
-// //       background: var(--bg-ternary);
-// //       border: 1px solid var(--border-primary);
-// //       border-radius: var(--ui-border-radius);
-// //       color: var(--text-primary);
-// //       font-size: var(--font-size-sm);
-// //       transition: var(--transition-colors);
-// //       font-family: var(--font-body);
-
-// //       &:focus {
-// //         outline: none;
-// //         border-color: var(--accent-primary);
-// //         background: var(--bg-secondary);
-// //         box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 15%, transparent);
-// //       }
-
-// //       &:disabled {
-// //         opacity: var(--state-disabled-opacity);
-// //         cursor: not-allowed;
-// //       }
-
-// //       &::placeholder {
-// //         color: var(--text-secondary);
-// //         opacity: 0.6;
-// //       }
-// //     }
-
-// //     .field-hint {
-// //       font-size: var(--font-size-xs);
-// //       color: var(--text-secondary);
-// //       margin-top: 0.25rem;
-// //     }
-
-// //     .field-error {
-// //       font-size: var(--font-size-xs);
-// //       color: var(--color-error);
-// //       margin-top: 0.25rem;
-// //       display: flex;
-// //       align-items: center;
-// //       gap: 0.25rem;
-// //     }
-// //   }
-
-// //   .form-actions {
-// //     grid-column: 1 / -1;
-// //     display: flex;
-// //     justify-content: flex-end;
-// //     gap: 0.75rem;
-// //     margin-top: 1rem;
-// //     padding-top: 1.5rem;
-// //     border-top: 1px solid var(--border-primary);
-
-// //     @media (max-width: 640px) {
-// //       flex-direction: column-reverse;
-
-// //       button {
-// //         width: 100%;
-// //       }
-// //     }
-// //   }
-// // }
-
-// // /* ============================================
-// //    7. TABLE ENHANCEMENTS
-// //    ============================================ */
-// // ::ng-deep .p-datatable {
-// //   .p-datatable-header {
-// //     background: transparent;
-// //     border: none;
-// //     padding: 0 0 1rem 0;
-// //   }
-
-// //   .p-datatable-thead > tr > th {
-// //     background: var(--bg-ternary);
-// //     color: var(--text-secondary);
-// //     font-size: var(--font-size-xs);
-// //     text-transform: uppercase;
-// //     letter-spacing: 0.06em;
-// //     font-weight: 600;
-// //     padding: 0.75rem 1rem;
-// //     border: none;
-// //     border-bottom: 2px solid var(--border-primary);
-// //   }
-
-// //   .p-datatable-tbody > tr {
-// //     background: var(--bg-secondary);
-// //     transition: var(--transition-base);
-
-// //     &:hover {
-// //       background: var(--bg-ternary) !important;
-// //     }
-
-// //     > td {
-// //       padding: 1rem;
-// //       border-bottom: 1px solid var(--border-primary);
-// //       color: var(--text-primary);
-// //       font-size: var(--font-size-sm);
-// //     }
-// //   }
-// // }
-
-// // /* ============================================
-// //    8. DANGER ZONE - Warning Design
-// //    ============================================ */
-// // .danger-box {
-// //   display: flex;
-// //   justify-content: space-between;
-// //   align-items: center;
-// //   padding: 1.5rem;
-// //   border: 1px solid var(--border-primary);
-// //   border-radius: var(--ui-border-radius-lg);
-// //   margin-bottom: 1rem;
-// //   background: var(--bg-ternary);
-// //   transition: var(--transition-base);
-
-// //   @media (max-width: 640px) {
-// //     flex-direction: column;
-// //     align-items: flex-start;
-// //     gap: 1rem;
-// //   }
-
-// //   &.warning {
-// //     border-color: color-mix(in srgb, var(--color-accent-amber) 40%, transparent);
-// //     background: color-mix(in srgb, var(--color-accent-amber) 8%, transparent);
-
-// //     &:hover {
-// //       border-color: color-mix(in srgb, var(--color-accent-amber) 60%, transparent);
-// //     }
-// //   }
-
-// //   &.delete {
-// //     border-color: color-mix(in srgb, var(--color-error) 40%, transparent);
-// //     background: color-mix(in srgb, var(--color-error) 8%, transparent);
-
-// //     &:hover {
-// //       border-color: color-mix(in srgb, var(--color-error) 60%, transparent);
-// //     }
-// //   }
-
-// //   .box-info {
-// //     flex: 1;
-
-// //     strong {
-// //       display: block;
-// //       color: var(--text-primary);
-// //       font-weight: 600;
-// //       font-size: var(--font-size-md);
-// //       margin-bottom: 0.375rem;
-// //     }
-
-// //     p {
-// //       margin: 0;
-// //       font-size: var(--font-size-sm);
-// //       color: var(--text-secondary);
-// //       line-height: var(--line-height-relaxed);
-// //     }
-// //   }
-
-// //   button {
-// //     flex-shrink: 0;
-// //   }
-// // }
-
-// // /* ============================================
-// //    9. TIMELINE/ACTIVITY LOG
-// //    ============================================ */
-// // ::ng-deep .p-timeline {
-// //   .p-timeline-event {
-// //     min-height: 80px;
-// //   }
-
-// //   .p-timeline-event-marker {
-// //     width: 1.5rem;
-// //     height: 1.5rem;
-// //     background: var(--accent-primary);
-// //     border: 3px solid var(--bg-secondary);
-// //     box-shadow: 0 0 0 3px var(--border-primary);
-// //   }
-
-// //   .p-timeline-event-connector {
-// //     background: var(--border-primary);
-// //     width: 2px;
-// //   }
-// // }
-
-// // .log-item {
-// //   display: flex;
-// //   flex-direction: column;
-// //   gap: 0.375rem;
-// //   padding: 1rem;
-// //   background: var(--bg-ternary);
-// //   border-radius: var(--ui-border-radius);
-// //   border-left: 3px solid var(--accent-primary);
-
-// //   .log-date {
-// //     font-size: var(--font-size-xs);
-// //     color: var(--text-secondary);
-// //     font-weight: 500;
-// //   }
-
-// //   .log-desc {
-// //     font-weight: 600;
-// //     color: var(--text-primary);
-// //     font-size: var(--font-size-sm);
-// //     line-height: var(--line-height-normal);
-// //   }
-
-// //   .log-user {
-// //     font-size: var(--font-size-xs);
-// //     color: var(--accent-primary);
-// //     font-weight: 600;
-// //   }
-// // }
-
-// // /* ============================================
-// //    10. LOADING & EMPTY STATES
-// //    ============================================ */
-// // .loading-state,
-// // .empty-state {
-// //   min-height: 400px;
-// //   display: flex;
-// //   flex-direction: column;
-// //   align-items: center;
-// //   justify-content: center;
-// //   gap: 1rem;
-// //   color: var(--text-secondary);
-
-// //   i {
-// //     font-size: 3rem;
-// //     color: var(--accent-primary);
-// //     opacity: 0.7;
-// //   }
-
-// //   p {
-// //     font-size: var(--font-size-md);
-// //     color: var(--text-secondary);
-// //   }
-// // }
-
-// // /* ============================================
-// //    11. ANIMATIONS
-// //    ============================================ */
-// // @keyframes fadeInUp {
-// //   from {
-// //     opacity: 0;
-// //     transform: translateY(20px);
-// //   }
-// //   to {
-// //     opacity: 1;
-// //     transform: translateY(0);
-// //   }
-// // }
-
-// // @keyframes fadeIn {
-// //   from { opacity: 0; }
-// //   to { opacity: 1; }
-// // }
-
-// // .animate-fadeIn {
-// //   animation: fadeIn 0.3s ease-in;
-// // }
-
-// // .animate-fadeInUp {
-// //   animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-// // }
-
-// // /* ============================================
-// //    12. UTILITY CLASSES
-// //    ============================================ */
-// // .glass-surface {
-// //   backdrop-filter: blur(12px);
-// //   -webkit-backdrop-filter: blur(12px);
-// // }
-
-// // .text-gradient {
-// //   background: linear-gradient(135deg, var(--accent-primary), var(--color-accent-purple));
-// //   -webkit-background-clip: text;
-// //   -webkit-text-fill-color: transparent;
-// //   background-clip: text;
-// // }
-
-// // /* ============================================
-// //    13. RESPONSIVE UTILITIES
-// //    ============================================ */
-// // @media (max-width: 640px) {
-// //   .hide-mobile { display: none !important; }
-// // }
-
-// // @media (min-width: 641px) {
-// //   .show-mobile { display: none !important; }
-// // }
-// // // /* =========================================================
-// // //    ORGANIZATION SETTINGS PAGE (Responsive & Themed)
-// // //    ========================================================= */
-
-// // // :host {
-// // //   display: block;
-// // //   height: 100%;
-// // // }
-
-// // // .page-container {
-// // //   height: 100%;
-// // //   display: flex;
-// // //   flex-direction: column;
-// // //   background-color: var(--bg-primary);
-// // //   // overflow: hidden;
-// // // }
-
-// // // /* 1. HEADER (Gradient Style) */
-// // // .org-header {
-// // //   /* Uses a subtle gradient based on the active theme's accent */
-// // //   background: linear-gradient(135deg, var(--accent-primary) 0%, color-mix(in srgb, var(--accent-primary) 80%, black) 100%);
-// // //   padding: 1.5rem 2rem;
-// // //   color: #fff;
-// // //   flex-shrink: 0;
-// // //   box-shadow: var(--shadow-md);
-
-// // //   .header-content {
-// // //     max-width: 1400px;
-// // //     margin: 0 auto;
-// // //     display: flex;
-// // //     justify-content: space-between;
-// // //     align-items: center;
-// // //   }
-
-// // //   .header-left {
-// // //     display: flex;
-// // //     align-items: center;
-// // //     gap: 1rem;
-// // //   }
-
-// // //   .org-identity {
-// // //     display: flex;
-// // //     flex-direction: column;
-// // //     gap: 0.25rem;
-
-// // //     h1 {
-// // //       margin: 0;
-// // //       font-size: 1.75rem;
-// // //       font-weight: 700;
-// // //       font-family: var(--font-heading);
-// // //       letter-spacing: -0.02em;
-// // //     }
-
-// // //     .org-meta {
-// // //       display: flex;
-// // //       align-items: center;
-// // //       gap: 0.5rem;
-// // //       font-size: 0.875rem;
-// // //       opacity: 0.9;
-// // //     }
-
-// // //     .meta-separator { opacity: 0.5; }
-// // //   }
-// // // }
-
-// // // /* 2. BODY LAYOUT */
-// // // .org-body {
-// // //   flex: 1;
-// // //   display: flex;
-// // //   gap: 2rem;
-// // //   padding: 2rem;
-// // //   max-width: 1400px;
-// // //   width: 100%;
-// // //   margin: 0 auto;
-// // //   overflow-y: auto;
-
-// // //   @media (max-width: 900px) {
-// // //     flex-direction: column;
-// // //     padding: 1rem;
-// // //     gap: 1rem;
-// // //   }
-// // // }
-
-// // // /* 3. SIDEBAR (Glass Effect) */
-// // // .org-sidebar {
-// // //   width: 300px;
-// // //   flex-shrink: 0;
-// // //   height: fit-content;
-// // //   padding: 2rem;
-// // //   border: 1px solid var(--border-primary);
-// // //   background: var(--bg-secondary);
-// // //   border-radius: var(--ui-border-radius-lg);
-  
-// // //   /* Logo */
-// // //   .logo-wrapper {
-// // //     display: flex;
-// // //     justify-content: center;
-// // //     margin-bottom: 2rem;
-// // //   }
-  
-// // //   .logo-placeholder {
-// // //     width: 100px;
-// // //     height: 100px;
-// // //     background: var(--bg-ternary);
-// // //     border: 1px solid var(--border-secondary);
-// // //     border-radius: 20px;
-// // //     display: flex;
-// // //     align-items: center;
-// // //     justify-content: center;
-    
-// // //     span {
-// // //       font-size: 2.5rem;
-// // //       font-weight: 800;
-// // //       color: var(--accent-primary);
-// // //       font-family: var(--font-heading);
-// // //     }
-// // //   }
-
-// // //   /* Details */
-// // //   .sidebar-details {
-// // //     display: flex;
-// // //     flex-direction: column;
-// // //     gap: 1.25rem;
-
-// // //     .detail-item {
-// // //       display: flex;
-// // //       flex-direction: column;
-// // //       gap: 0.25rem;
-
-// // //       label {
-// // //         font-size: 0.75rem;
-// // //         text-transform: uppercase;
-// // //         font-weight: 600;
-// // //         color: var(--text-label);
-// // //         letter-spacing: 0.05em;
-// // //       }
-
-// // //       span {
-// // //         color: var(--text-primary);
-// // //         font-weight: 500;
-// // //         font-size: 0.95rem;
-// // //         word-break: break-all;
-// // //       }
-// // //     }
-// // //   }
-
-// // //   /* Stats */
-// // //   .sidebar-stats {
-// // //     display: flex;
-// // //     justify-content: space-around;
-    
-// // //     .stat {
-// // //       display: flex;
-// // //       flex-direction: column;
-// // //       align-items: center;
-      
-// // //       strong {
-// // //         font-size: 1.5rem;
-// // //         color: var(--text-primary);
-// // //       }
-// // //       span {
-// // //         font-size: 0.8rem;
-// // //         color: var(--text-secondary);
-// // //       }
-// // //     }
-// // //   }
-// // // }
-
-// // // /* 4. CONTENT AREA (Tabs) */
-// // // .org-content {
-// // //   flex: 1;
-// // //   min-width: 0; /* Prevents flex overflow */
-
-// // //   ::ng-deep .p-tablist {
-// // //     background: transparent;
-// // //     border-color: var(--border-primary);
-// // //     margin-bottom: 1.5rem;
-// // //   }
-
-// // //   ::ng-deep .p-tab {
-// // //     background: transparent;
-// // //     border-color: transparent;
-// // //     color: var(--text-secondary);
-// // //     font-weight: 500;
-// // //     transition: all 0.2s;
-    
-// // //     &:hover {
-// // //       color: var(--text-primary);
-// // //     }
-
-// // //     &.p-tab-active {
-// // //       color: var(--accent-primary);
-// // //       border-bottom-color: var(--accent-primary);
-// // //     }
-// // //   }
-
-// // //   ::ng-deep .p-tabpanels {
-// // //     padding: 0;
-// // //     background: transparent;
-// // //   }
-// // // }
-
-// // // /* 5. TAB PANELS */
-// // // .panel-content {
-// // //   background: var(--bg-secondary);
-// // //   border: 1px solid var(--border-primary);
-// // //   border-radius: var(--ui-border-radius-lg);
-// // //   padding: 2rem;
-// // //   box-shadow: var(--shadow-sm);
-
-// // //   .panel-header {
-// // //     margin-bottom: 2rem;
-// // //     h3 { margin: 0 0 0.5rem 0; color: var(--text-primary); }
-// // //     p { margin: 0; color: var(--text-secondary); font-size: 0.9rem; }
-// // //   }
-// // // }
-
-// // // /* Forms */
-// // // .form-grid {
-// // //   display: grid;
-// // //   grid-template-columns: repeat(2, 1fr);
-// // //   gap: 1.5rem;
-
-// // //   @media(max-width: 768px) { grid-template-columns: 1fr; }
-
-// // //   .field {
-// // //     display: flex;
-// // //     flex-direction: column;
-// // //     gap: 0.5rem;
-    
-// // //     label {
-// // //       font-size: 0.875rem;
-// // //       font-weight: 500;
-// // //       color: var(--text-primary);
-// // //     }
-    
-// // //     input { width: 100%; }
-// // //   }
-
-// // //   .form-actions {
-// // //     grid-column: 1 / -1;
-// // //     display: flex;
-// // //     justify-content: flex-end;
-// // //     margin-top: 1rem;
-// // //   }
-// // // }
-
-// // // /* Danger Zone */
-// // // .danger-box {
-// // //   display: flex;
-// // //   justify-content: space-between;
-// // //   align-items: center;
-// // //   padding: 1.5rem;
-// // //   border: 1px solid var(--border-primary);
-// // //   border-radius: var(--ui-border-radius);
-// // //   margin-bottom: 1rem;
-// // //   background: var(--bg-ternary);
-
-// // //   &.delete {
-// // //     border-color: color-mix(in srgb, var(--color-error) 30%, transparent);
-// // //     background: color-mix(in srgb, var(--color-error) 5%, transparent);
-// // //   }
-
-// // //   .box-info {
-// // //     strong { display: block; color: var(--text-primary); margin-bottom: 0.25rem; }
-// // //     p { margin: 0; font-size: 0.875rem; color: var(--text-secondary); }
-// // //   }
-// // // }
-
-// // // /* Timeline */
-// // // .log-item {
-// // //   display: flex;
-// // //   flex-direction: column;
-// // //   gap: 0.25rem;
-  
-// // //   .log-desc { font-weight: 600; color: var(--text-primary); }
-// // //   .log-date { font-size: 0.75rem; color: var(--text-secondary); }
-// // //   .log-user { font-size: 0.8rem; color: var(--accent-primary); }
-// // // }
-
-// // // /* Loading */
-// // // .loading-state {
-// // //   height: 100%;
-// // //   display: flex;
-// // //   align-items: center;
-// // //   justify-content: center;
-// // // }

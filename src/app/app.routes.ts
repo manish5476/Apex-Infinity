@@ -4,11 +4,11 @@ import { authGuard } from './core/guards/authguard.guard';
 import { MasterList } from './modules/shared/components/master-list/master-list';
 import { Transactions } from './modules/transactions/transactions/transactions';
 import { LedgerComponent } from './modules/Ledger/ledger/ledger';
-import { NotesPageComponent } from './modules/dashboard/components/notes-page.component';
 import { NotFoundComponent } from './modules/shared/components/notfound/notfound.component';
 import { LogsComponent } from './modules/transactions/logs/logs';
 import { SalesListComponent } from './modules/sales/sales-list/sales-list';
 import { Sessions } from './modules/auth/sessions/sessions/sessions';
+import { NotesManagerComponent } from './modules/shared/components/notes-manager/notes-manager.component';
 // import { LandingComponent } from './landingPage/landing.component'; // Removed for now
 
 export const routes: Routes = [
@@ -39,7 +39,7 @@ export const routes: Routes = [
             (m) => m.AdminDashboardComponent
           ),
       },
-      { path: 'notes', component: NotesPageComponent, title: 'My Notes' },
+      { path: 'notes', component: NotesManagerComponent, title: 'My Notes' },
       { path: 'financials', component: LedgerComponent },
       
       // --- Admin & Settings ---
@@ -92,7 +92,7 @@ export const routes: Routes = [
         loadChildren: () => import('./modules/invoice/invoice.routes').then((m) => m.INVOICE_ROUTES),
       },
       {
-        path: 'payment',
+        path: 'payments',
         loadChildren: () => import('./modules/payment/payment.routes').then((m) => m.PAYMENT_ROUTES),
       },
       {

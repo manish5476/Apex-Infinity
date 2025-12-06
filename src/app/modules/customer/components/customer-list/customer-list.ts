@@ -6,7 +6,7 @@ import { AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocompl
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
-import { Router } from '@angular/router'; // 1. Import the Angular Router
+import { Router, RouterModule } from '@angular/router'; // 1. Import the Angular Router
 
 // --- Shared Components / Services ---
 import { SharedGridComponent } from '../../../shared/AgGrid/grid/shared-grid/shared-grid.component';
@@ -25,7 +25,7 @@ import { Toast } from "primeng/toast";
     SelectModule,
     AutoCompleteModule,
     FormsModule,
-    ButtonModule,
+    ButtonModule,RouterModule,    
     InputTextModule,
     Toast
   ],

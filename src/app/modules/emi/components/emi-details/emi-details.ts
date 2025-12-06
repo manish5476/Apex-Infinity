@@ -76,11 +76,9 @@ export class EmiDetailsComponent implements OnInit {
     if (!data) return 0;
     
     // Calculate based on paid Amount vs Total Amount
-    // Sometimes data might have a pre-calculated field, but safer to sum
     const totalPaid = data.installments.reduce((acc: number, curr: any) => acc + (curr.paidAmount || 0), 0);
-    const totalLoanAmount = data.totalAmount; // Assuming this includes interest
+    const totalLoanAmount = data.totalAmount; 
     
-    // Ensure we don't divide by zero
     if(totalLoanAmount === 0) return 0;
 
     const percentage = (totalPaid / totalLoanAmount) * 100;
@@ -99,9 +97,10 @@ export class EmiDetailsComponent implements OnInit {
 
   paymentModes = [
     { label: 'Cash', value: 'cash' },
-    { label: 'Bank Transfer', value: 'bank_transfer' },
+    { label: 'Bank Transfer', value: 'bank' },
     { label: 'UPI', value: 'upi' },
-    { label: 'Cheque', value: 'cheque' }
+    { label: 'credit', value: 'credit' },
+    { label: 'Cheque', value: 'other' }
   ];
 
   constructor() {
@@ -120,7 +119,7 @@ export class EmiDetailsComponent implements OnInit {
   }
 
   private fetchEmiDetails(id: string) {
-     // this.isLoading.set(true);
+     this.isLoading.set(true);
     this.common.apiCall(
       this.emiService.getEmiById(id),
       (res: any) => {
@@ -148,27 +147,36 @@ export class EmiDetailsComponent implements OnInit {
 
   openPaymentDialog(installment: any) {
     if (installment.paymentStatus === 'paid') return;
-    
     this.selectedInstallment = installment;
+    
     const dueAmount = installment.totalAmount - (installment.paidAmount || 0);
     
     this.paymentForm.patchValue({
       amount: dueAmount,
-      paymentId: '',
+      paymentId: '', // Reset Reference ID
       paymentMode: 'cash',
       notes: ''
     });
-
+    
+    // Reset validation state so errors don't show immediately
+    this.paymentForm.markAsPristine();
+    this.paymentForm.markAsUntouched();
+    
     this.showPaymentDialog = true;
   }
 
   submitPayment() {
-    if (this.paymentForm.invalid) {this.paymentForm.markAllAsTouched() 
+    if (this.paymentForm.invalid) {
+      this.paymentForm.markAllAsTouched(); // This triggers the UI errors
+      this.messageService.showError('Validation Error', 'Please fill all required fields (Reference ID is mandatory).');
       return;
     }
+
     const emiId = this.emiData()._id;
     const { amount, paymentId, paymentMode } = this.paymentForm.value;
-    // this.isSubmittingPayment.set(true);
+    
+    this.isSubmittingPayment.set(true);
+    
     const payload = {
       emiId: emiId,
       installmentNumber: this.selectedInstallment.installmentNumber,
@@ -222,6 +230,8 @@ export class EmiDetailsComponent implements OnInit {
 // import { ToastModule } from 'primeng/toast';
 // import { ConfirmDialogModule } from 'primeng/confirmdialog';
 // import { ConfirmationService } from 'primeng/api';
+// import { TooltipModule } from 'primeng/tooltip';
+// import { SkeletonModule } from 'primeng/skeleton';
 
 // // Services
 // import { EmiService } from '../../services/emi-service';
@@ -246,7 +256,9 @@ export class EmiDetailsComponent implements OnInit {
 //     InputTextModule,
 //     SelectModule,
 //     ToastModule,
-//     ConfirmDialogModule
+//     ConfirmDialogModule,
+//     TooltipModule,
+//     SkeletonModule
 //   ],
 //   providers: [ConfirmationService],
 //   templateUrl: './emi-details.html',
@@ -259,8 +271,6 @@ export class EmiDetailsComponent implements OnInit {
 //   private emiService = inject(EmiService);
 //   private messageService = inject(AppMessageService);
 //   private fb = inject(FormBuilder);
-  
-//   // Inject your CommonMethodService publically for the template
 //   public common = inject(CommonMethodService);
 
 //   // --- State ---
@@ -277,10 +287,27 @@ export class EmiDetailsComponent implements OnInit {
 //   progress = computed(() => {
 //     const data = this.emiData();
 //     if (!data) return 0;
+    
+//     // Calculate based on paid Amount vs Total Amount
+//     // Sometimes data might have a pre-calculated field, but safer to sum
 //     const totalPaid = data.installments.reduce((acc: number, curr: any) => acc + (curr.paidAmount || 0), 0);
-//     const totalCollected = totalPaid + (data.downPayment || 0);
-//     const percentage = (totalCollected / data.totalAmount) * 100;
+//     const totalLoanAmount = data.totalAmount; // Assuming this includes interest
+    
+//     // Ensure we don't divide by zero
+//     if(totalLoanAmount === 0) return 0;
+
+//     const percentage = (totalPaid / totalLoanAmount) * 100;
 //     return Math.min(100, Math.round(percentage));
+//   });
+
+//   totalPaidAmount = computed(() => {
+//      const data = this.emiData();
+//      return data ? data.installments.reduce((acc: number, curr: any) => acc + (curr.paidAmount || 0), 0) : 0;
+//   });
+
+//   remainingAmount = computed(() => {
+//      const data = this.emiData();
+//      return data ? data.totalAmount - this.totalPaidAmount() : 0;
 //   });
 
 //   paymentModes = [
@@ -306,11 +333,10 @@ export class EmiDetailsComponent implements OnInit {
 //   }
 
 //   private fetchEmiDetails(id: string) {
-//      // this.isLoading.set(true);
+//      this.isLoading.set(true);
 //     this.common.apiCall(
 //       this.emiService.getEmiById(id),
 //       (res: any) => {
-//         // Handle both wrapped {data: {emi: ...}} and direct {data: ...} responses
 //         if (res.data && res.data.emi) {
 //           this.emiData.set(res.data.emi);
 //         } else if (res.data) {
@@ -328,7 +354,6 @@ export class EmiDetailsComponent implements OnInit {
 //     this.paymentForm = this.fb.group({
 //       amount: [0, [Validators.required, Validators.min(1)]],
 //       paymentId: ['', Validators.required],
-//       // paymentMethod: "cash",
 //       paymentMode: ['cash', Validators.required],
 //       notes: ['']
 //     });
@@ -337,33 +362,28 @@ export class EmiDetailsComponent implements OnInit {
 //   openPaymentDialog(installment: any) {
 //     if (installment.paymentStatus === 'paid') return;
 //     this.selectedInstallment = installment;
-//     const dueAmount = installment.totalAmount - installment.paidAmount;
+//     const dueAmount = installment.totalAmount - (installment.paidAmount || 0);
 //     this.paymentForm.patchValue({
 //       amount: dueAmount,
 //       paymentId: '',
 //       paymentMode: 'cash',
 //       notes: ''
 //     });
-
 //     this.showPaymentDialog = true;
 //   }
 
 //   submitPayment() {
-//     if (this.paymentForm.invalid) {
-//       this.paymentForm.markAllAsTouched();
-//       return;
+//     if (this.paymentForm.invalid) {this.paymentForm.markAllAsTouched() 
+//  return;
 //     }
-
 //     const emiId = this.emiData()._id;
 //     const { amount, paymentId, paymentMode } = this.paymentForm.value;
-
 //     this.isSubmittingPayment.set(true);
-
 //     const payload = {
 //       emiId: emiId,
 //       installmentNumber: this.selectedInstallment.installmentNumber,
 //       amount: amount,
-//       paymentMethod:paymentMode,
+//       paymentMethod: paymentMode,
 //       referenceNumber: `${paymentMode.toUpperCase()}-${paymentId}`
 //     };
 
@@ -373,7 +393,7 @@ export class EmiDetailsComponent implements OnInit {
 //         this.messageService.showSuccess('Payment Recorded', `Installment #${this.selectedInstallment.installmentNumber} updated.`);
 //         this.showPaymentDialog = false;
 //         this.isSubmittingPayment.set(false);
-//         this.fetchEmiDetails(emiId);
+//         this.fetchEmiDetails(emiId); // Refresh data
 //       },
 //       'Record Payment'
 //     );
@@ -381,19 +401,11 @@ export class EmiDetailsComponent implements OnInit {
 
 //   // --- Helpers ---
 
-//   /**
-//    * Check if an installment is overdue
-//    * Returns true if status is NOT paid and due date is in the past
-//    */
 //   isOverdue(installment: any): boolean {
-//     if (!installment || installment.paymentStatus === 'paid') {
-//       return false;
-//     }
+//     if (!installment || installment.paymentStatus === 'paid') return false;
     
 //     const dueDate = new Date(installment.dueDate);
 //     const today = new Date();
-    
-//     // Reset hours to ensure we compare dates only (start of day)
 //     dueDate.setHours(0, 0, 0, 0);
 //     today.setHours(0, 0, 0, 0);
     

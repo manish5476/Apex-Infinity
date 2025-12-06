@@ -1,21 +1,127 @@
 <p-toast></p-toast> 
 
 <div class="customer-wrapper">
-  <section class="customer-container"> <!-- Removed payment-form-container for consistency -->
+  <section class="customer-container">
     
     <div class="customer-form-panel">
       <form [formGroup]="emiForm" (ngSubmit)="onSubmit()" class="customer-form-layout">
 
-        <!--_ 1. STICKY HEADER _-->
+        <!-- 1. STICKY HEADER -->
+        <div class="customer-form-header">
+          <h1 class="form-title">{{ formTitle() }}</h1>
+          <p class="form-subtitle" *ngIf="invoice">
+            For Invoice: <strong>{{ invoice?.invoiceNumber }}</strong> 
+            <span class="text-gray-400 mx-2">|</span> 
+            Customer: <strong>{{ invoice?.customerId?.name }}</strong>
+          </p>
+        </div>
+
+        <!-- 2. SCROLLABLE BODY -->
+        <div class="customer-form-body">
+
+          <!-- Core Details -->
+          <section class="form-section">
+            <h4 class="section-title">Loan Calculation</h4>
+            <!-- Changed to grid-4 to fit the extra field neatly -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              
+              <div class="form-group">
+                <label>Total Invoice</label>
+                <p-inputNumber formControlName="totalAmount" mode="decimal" [minFractionDigits]="2" prefix="₹ " styleClass="w-full"></p-inputNumber>
+              </div>
+
+              <div class="form-group">
+                <label class="text-green-600">Already Paid</label>
+                <p-inputNumber formControlName="alreadyPaid" mode="decimal" [minFractionDigits]="2" prefix="₹ " styleClass="w-full"></p-inputNumber>
+              </div>
+              
+              <div class="form-group">
+                <label>New Down Payment</label>
+                <p-inputNumber formControlName="downPayment" mode="decimal" [minFractionDigits]="2" prefix="₹ " styleClass="w-full"></p-inputNumber>
+                <small class="text-gray-500">Pay now (optional)</small>
+              </div>
+
+              <div class="form-group">
+                <label class="font-bold text-[var(--accent-primary)]">Loan Amount</label>
+                <p-inputNumber formControlName="balanceAmount" mode="decimal" [minFractionDigits]="2" prefix="₹ " styleClass="w-full font-bold"></p-inputNumber>
+                <small class="text-gray-500">Amount to be financed</small>
+              </div>
+
+            </div>
+          </section>
+          
+          <p-divider></p-divider>
+
+          <!-- EMI Plan Details -->
+          <section class="form-section">
+             <h4 class="section-title">Plan Configuration</h4>
+            <div class="form-grid-3">
+              <div class="form-group">
+                <label>Number of Installments <span class="req">*</span></label>
+                <p-inputNumber formControlName="numberOfInstallments" mode="decimal" [min]="1" suffix=" Months" styleClass="w-full"></p-inputNumber>
+              </div>
+
+              <div class="form-group">
+                <label>Interest Rate (Annual %) <span class="req">*</span></label>
+                <p-inputNumber formControlName="interestRate" mode="decimal" [minFractionDigits]="2" suffix=" %" styleClass="w-full"></p-inputNumber>
+              </div>
+
+              <div class="form-group">
+                <label>EMI Start Date <span class="req">*</span></label>
+                <p-datepicker formControlName="emiStartDate" [showIcon]="true" dateFormat="dd/mm/yy" styleClass="w-full" appendTo="body"></p-datepicker>
+              </div>
+            </div>
+          </section>
+          
+          <!-- Hidden fields -->
+          <input type="hidden" formControlName="invoiceId" />
+          <input type="hidden" formControlName="customerId" />
+          <input type="hidden" formControlName="branchId" />
+
+        </div>
+
+        <!-- 3. STICKY FOOTER -->
+        <div class="customer-form-footer">
+          <div class="form-actions">
+            <p-button 
+              label="Cancel" 
+              icon="pi pi-times" 
+              styleClass="p-button-text p-button-secondary"
+              (onClick)="router.navigate(['/invoice'])">
+            </p-button>
+            <p-button 
+              label="Generate Plan" 
+              icon="pi pi-check" 
+              type="submit" 
+              [loading]="isSubmitting()"
+              styleClass="px-6">
+            </p-button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </section>
+</div>
+
+<!-- <p-toast></p-toast> 
+
+<div class="customer-wrapper">
+  <section class="customer-container"> Removed payment-form-container for consistency
+    
+    <div class="customer-form-panel">
+      <form [formGroup]="emiForm" (ngSubmit)="onSubmit()" class="customer-form-layout">
+
+        _ 1. STICKY HEADER _
         <div class="customer-form-header">
           <h1 class="form-title">{{ formTitle() }}</h1>
           <p class="form-subtitle">For Invoice: <strong>{{ invoice?.invoiceNumber }}</strong>. <span class="req">*</span> = required</p>
         </div>
 
-        <!--_ 2. SCROLLABLE BODY _-->
+        _ 2. SCROLLABLE BODY _
         <div class="customer-form-body">
 
-          <!-- Core Details -->
+          Core Details
           <section class="form-section">
             <h4 class="section-title">Loan Details</h4>
             <div class="form-grid-3">
@@ -36,7 +142,7 @@
             </div>
           </section>
           
-          <!-- EMI Plan Details -->
+          EMI Plan Details
           <section class="form-section">
              <h4 class="section-title">Plan Configuration</h4>
             <div class="form-grid-3">
@@ -57,14 +163,14 @@
             </div>
           </section>
           
-          <!-- Hidden fields for submission -->
+          Hidden fields for submission
           <input type="hidden" formControlName="invoiceId" />
           <input type="hidden" formControlName="customerId" />
           <input type="hidden" formControlName="branchId" />
 
         </div>
 
-        <!--_ 3. STICKY FOOTER _-->
+        _ 3. STICKY FOOTER _
         <div class="customer-form-footer">
           <div class="form-actions">
             <p-button 
@@ -80,4 +186,4 @@
       </form>
     </div>
   </section>
-</div>
+</div> -->

@@ -264,11 +264,11 @@ export class CustomerDetails implements OnInit {
   onFileSelected(event: any): void {
     const file: File = event.target.files[0];
     if (file && this.customer()?._id) {
-      const formData = new FormData();
-      formData.append('photo', file);
+      // const formData = new FormData();
+      // formData.append('photo', file);
       
       this.common.apiCall(
-        this.customerService.uploadProfileImage(formData, this.customer()._id),
+        this.customerService.uploadCustomerPhoto(this.customer()._id,file ),
         (res: any) => {
           if(res.data?.customer?.photo) {
              this.customer.update(c => ({...c, avatar: res.data.customer.photo}));

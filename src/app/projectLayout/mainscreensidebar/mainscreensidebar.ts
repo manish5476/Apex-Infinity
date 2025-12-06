@@ -124,8 +124,8 @@ export class Mainscreensidebar implements OnInit {
     {
       label: 'Payments', icon: 'pi pi-wallet',
       items: [
-        { label: 'Transaction History', icon: 'pi pi-history', routerLink: ['/payment'] },
-        { label: 'Record Payment', icon: 'pi pi-plus', routerLink: ['/payment/create'] },
+        { label: 'Transaction History', icon: 'pi pi-history', routerLink: ['/payments'] },
+        { label: 'Record Payments', icon: 'pi pi-plus', routerLink: ['/payments/create'] },
       ]
     },
     {

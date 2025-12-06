@@ -1,323 +1,409 @@
-/* =========================================================
-   RESPONSIVE DASHBOARD STYLES (Mobile-First Architecture)
-   ========================================================= */
+/* ========================================================================
+   ANGULAR v20 AccounTech Theme - Dashboard Component
+   Based on Provided Design Tokens & Glass Theme
+   ======================================================================== */
 
-/* 1. SCROLL FIX: Forces the component to handle overflow properly */
+/* --------------------------------------------------------------------------
+   1. GLOBAL PRIMITIVES (Locally Scoped for this Component)
+   -------------------------------------------------------------------------- */
 :host {
+  /* ===== TYPOGRAPHY ===== */
+  /* Host Styles */
   display: block;
-  height: 100%;                  /* Take full height of parent router-outlet */
-  overflow-y: auto;              /* Enable vertical scrolling */
-  -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
 }
 
-/* 2. MAIN CONTAINER */
+/* =========================================================
+   CONTAINER & LAYOUT
+   ========================================================= */
 .dashboard-container {
-  min-height: 100%;              /* Allow content to grow */
-  padding: var(--spacing-md);    /* Smaller padding on mobile */
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);        /* Gap between sections */
-  padding-bottom: var(--spacing-2xl); /* Bottom breathing room */
-
-  /* Tablet & Desktop Padding Increase */
-  @media (min-width: 768px) {
-    padding: var(--spacing-xl);
-    gap: var(--spacing-xl);
-  }
-}
-
-/* 3. HEADER (Stack on Mobile -> Row on Desktop) */
-.dashboard-header {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-
-  .header-content {
-    .page-title {
-      font-family: var(--font-heading);
-      font-size: 1.5rem; /* Mobile Size */
-      font-weight: var(--font-weight-bold);
-      color: var(--text-primary);
-      margin: 0;
-    }
-    .page-subtitle {
-      color: var(--text-secondary);
-      font-size: var(--font-size-sm);
-      margin-top: 4px;
-    }
-  }
-
-  /* Desktop Layout */
-  @media (min-width: 992px) {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-end;
-
-    .header-content .page-title {
-      font-size: 1.85rem; /* Larger Size */
-    }
-  }
-}
-
-/* 4. ACTIONS & FILTERS */
-.header-actions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
+  padding: var(--spacing-2xl); /* 24px */
   width: 100%;
-
-  @media (min-width: 992px) {
-    width: auto;
-    flex-direction: row;
-    align-items: center;
-  }
-}
-
-.header-filters {
+  max-width: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
-
-  /* Tablet+: Row layout for filters */
-  @media (min-width: 576px) {
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .preset-group {
-    display: flex;
-    gap: var(--spacing-sm);
-  }
-
-  .date-range-wrapper {
-    width: 100%;
-    /* Ensure Calendar fits */
-    ::ng-deep .p-calendar { width: 100%; }
-    ::ng-deep .p-inputtext { width: 100%; }
-
-    @media (min-width: 576px) {
-      width: 220px; /* Fixed width on desktop */
-    }
-  }
+  gap: var(--spacing-2xl);
+  box-sizing: border-box;
 }
 
-.action-buttons {
-  display: flex;
-  gap: var(--spacing-sm);
-}
+/* =========================================================
+   HEADER (Sticky Glass)
+   ========================================================= */
+.dashboard-header {
+  position: sticky;
+  top: 0;
+  z-index: 200; /* --z-sticky */
 
-/* Filter Chip Styling */
-.filter-chip {
-  padding: 6px 14px;
-  border-radius: 999px;
-  background: var(--bg-ternary);
-  border: 1px solid var(--border-secondary);
-  color: var(--text-secondary);
-  font-size: var(--font-size-xs);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  /* Glass Effect */
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-bottom: 1px solid var(--theme-border-primary);
+  box-shadow: var(--glass-shadow);
 
-  &.active {
-    background: var(--component-bg-active);
-    color: var(--accent-primary);
-    border-color: var(--accent-primary);
-  }
-}
+  margin: calc(var(--spacing-2xl) * -1) calc(var(--spacing-2xl) * -1) var(--spacing-xl)
+    calc(var(--spacing-2xl) * -1);
+  padding: var(--spacing-lg) var(--spacing-2xl);
 
-/* 5. GRID LAYOUTS */
-.grid-layout {
-  display: grid;
-  /* Auto-fit: Will stack on mobile, 2 cols on tablet, 3-4 on desktop */
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: var(--spacing-md);
-}
-
-.main-content-grid {
-  display: grid;
-  grid-template-columns: 1fr; /* Stacked by default */
-  gap: var(--spacing-lg);
-
-  /* Desktop Split */
-  @media (min-width: 1024px) {
-    grid-template-columns: 2fr 1fr; /* Chart takes 2/3 space */
-  }
-}
-
-/* 6. GLASS CARDS */
-.glass-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius-lg);
-  box-shadow: var(--shadow-sm);
-  /* The blur effect */
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  padding: var(--spacing-lg);
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.2s;
-
-  &:hover {
-    border-color: var(--accent-focus);
-  }
-}
-
-/* KPI Specifics */
-.kpi-card {
-  min-height: 130px;
-  justify-content: space-between;
-
-  .kpi-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-  }
-
-  .kpi-value {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin: 8px 0 4px 0;
-  }
-
-  .kpi-label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    color: var(--text-secondary);
-    letter-spacing: 0.5px;
-  }
-  
-  .kpi-sub {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    margin: 0;
-  }
-}
-
-/* Chart & Rankings Heights */
-.chart-section, .rankings-section {
-  min-height: 350px; /* Minimum visual height */
-  
-  @media (min-width: 1024px) {
-    height: 420px; /* Fixed height on desktop alignment */
-  }
-}
-
-.chart-wrapper {
-  flex: 1;
-  position: relative;
-  min-height: 0; /* Prevents flex overflow */
-}
-
-/* 7. CARD HEADER */
-.card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-md);
-  border-bottom: 1px solid var(--border-secondary);
-  padding-bottom: var(--spacing-sm);
+  flex-wrap: wrap;
+  gap: var(--spacing-lg);
 
-  h3 {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-primary);
+  .header-title {
+    h1 {
+      font-family: var(--font-heading);
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+    p {
+      margin: 2px 0 0;
+      color: var(--text-secondary);
+      font-size: var(--font-size-md);
+    }
+  }
+
+  .header-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
   }
 }
 
-/* 8. RESPONSIVE TABLES (The Magic Fix) */
-.table-responsive-wrapper {
-  width: 100%;
-  overflow-x: auto; /* Enable horizontal scroll */
-  -webkit-overflow-scrolling: touch;
-  
-  /* Force table width so it doesn't squash columns on mobile */
-  ::ng-deep .p-datatable {
-    min-width: 500px; 
-  }
-}
-
-.ranking-tabs {
-  display: flex;
+/* Custom Filter Toggle */
+.filter-toggle {
   background: var(--bg-ternary);
-  padding: 2px;
-  border-radius: 999px;
-  
-  .ranking-tab {
-    background: transparent;
+  padding: 4px;
+  border-radius: var(--ui-border-radius-lg);
+  border: 1px solid var(--border-secondary);
+  display: flex;
+  gap: 2px;
+
+  button {
     border: none;
-    font-size: 0.75rem;
-    padding: 4px 10px;
-    border-radius: 999px;
+    background: transparent;
+    padding: var(--spacing-sm) var(--spacing-xl);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
     color: var(--text-secondary);
+    border-radius: var(--ui-border-radius);
     cursor: pointer;
-    
+    transition: var(--transition-base);
+
+    &:hover {
+      color: var(--text-primary);
+    }
     &.active {
-      background: var(--bg-secondary);
+      background: #ffffff;
       color: var(--accent-primary);
       box-shadow: var(--shadow-sm);
     }
   }
 }
 
-/* 9. UTILITIES & ICONS */
-.w-full { width: 100% !important; }
+/* =========================================================
+   CARDS & GLASS PANELS
+   ========================================================= */
+.kpi-card,
+.content-card,
+.glass-card {
+  background: var(--bg-secondary); /* 80% opacity white */
+  border: 1px solid var(--border-primary);
+  border-radius: var(--ui-border-radius-xl);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(var(--glass-blur));
+  transition: var(--transition-base);
+  position: relative;
+  overflow: hidden;
 
-/* Hide elements on mobile to save space */
-.hidden-mobile {
-  @media (max-width: 576px) { display: none !important; }
+  /* Premium Hover Effect */
+  &:hover {
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent-focus);
+    transform: translateY(-2px);
+  }
 }
 
-/* Show elements only on mobile */
-.visible-mobile {
-  display: none;
-  @media (max-width: 576px) { display: block; }
+.content-area {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xl);
 }
 
-.text-error { color: var(--color-error); }
-.text-primary { color: var(--accent-primary); }
-.text-right { text-align: right; }
-.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-/* Icon Circles */
-.icon-wrapper {
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1rem;
-
-  &.accent-wrapper { background: var(--component-bg-active); color: var(--accent-primary); }
-  &.success-wrapper { background: rgba(16, 185, 129, 0.1); color: var(--color-success); }
-  &.info-wrapper { background: rgba(59, 130, 246, 0.1); color: var(--color-info); }
-  &.warning-wrapper { background: rgba(245, 158, 11, 0.1); color: var(--color-warning); }
+/* =========================================================
+   KPI GRID
+   ========================================================= */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--spacing-xl);
 }
 
-.trend-badge {
-  font-size: 0.7rem;
-  padding: 2px 8px;
-  border-radius: 999px;
-  display: flex; align-items: center; gap: 4px;
-  
-  &.positive { color: var(--color-success); background: rgba(16, 185, 129, 0.1); }
-  &.negative { color: var(--color-error); background: rgba(239, 68, 68, 0.1); }
-  &.neutral { color: var(--text-secondary); background: var(--bg-ternary); }
+.kpi-card {
+  padding: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  /* Colored Accents */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: transparent;
+  }
+  &.type-revenue::before {
+    background: var(--accent-primary);
+  }
+  &.type-profit::before {
+    background: var(--color-success);
+  }
+  &.type-risk::before {
+    background: var(--color-error);
+  }
+  &.type-asset::before {
+    background: var(--accent-secondary);
+  }
+
+  .kpi-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+
+    .label {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-label);
+    }
+
+    .icon-box {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--ui-border-radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+
+      &.indigo {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--accent-primary);
+      }
+      &.emerald {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--color-success);
+      }
+      &.rose {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--color-error);
+      }
+      &.sky {
+        background: rgba(6, 182, 212, 0.1);
+        color: var(--accent-secondary);
+      }
+    }
+  }
+
+  .kpi-body {
+    .value {
+      font-family: var(--font-heading);
+      font-size: var(--font-size-4xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      line-height: 1;
+      margin-bottom: var(--spacing-xs);
+    }
+    .sub-text {
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+
+      .trend {
+        font-weight: var(--font-weight-semibold);
+        padding: 2px 8px;
+        border-radius: var(--ui-border-radius);
+
+        &.up {
+          background: rgba(16, 185, 129, 0.15);
+          color: var(--color-success);
+        }
+        &.down {
+          background: rgba(239, 68, 68, 0.15);
+          color: var(--color-error);
+        }
+      }
+    }
+  }
 }
 
-.rank-badge {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 20px; height: 20px;
-  border-radius: 50%;
+/* =========================================================
+   CHARTS SECTION
+   ========================================================= */
+.main-charts-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--spacing-xl);
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.content-card {
+  display: flex;
+  flex-direction: column;
+
+  .card-header {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-bottom: 1px solid var(--border-secondary);
+    background: rgba(255, 255, 255, 0.4); /* Subtle header tint */
+
+    h3 {
+      margin: 0;
+      font-family: var(--font-heading);
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-primary);
+    }
+  }
+
+  .card-body {
+    padding: var(--spacing-xl);
+    flex: 1;
+    position: relative;
+  }
+
+  &.p-0 .card-body {
+    padding: 0;
+  }
+}
+
+/* =========================================================
+   DATA TABLES (Modern & Clean)
+   ========================================================= */
+.clean-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    text-align: left;
+    padding: var(--spacing-md) var(--spacing-xl);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    color: var(--text-label);
+    background: var(--bg-ternary);
+    border-bottom: 1px solid var(--border-primary);
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(8px);
+  }
+
+  td {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-secondary);
+    transition: background-color 0.1s;
+
+    .primary-text {
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-primary);
+      display: block;
+    }
+    .secondary-text {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+    }
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+  tr:hover td {
+    background: var(--component-bg-hover, rgba(241, 245, 249, 0.5));
+  }
+}
+
+/* =========================================================
+   UTILITIES & OVERRIDES
+   ========================================================= */
+.text-right {
+  text-align: right;
+}
+.text-success {
+  color: var(--color-success);
+}
+.text-danger {
+  color: var(--color-error);
+}
+.font-bold {
+  font-weight: var(--font-weight-bold);
+}
+
+/* PrimeNG Datepicker Override for Glass Theme */
+:host ::ng-deep .p-calendar .p-inputtext {
   background: var(--bg-ternary);
-  font-size: 0.7rem;
-  color: var(--text-secondary);
+  border: 1px solid var(--border-secondary);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--ui-border-radius);
+
+  &:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px var(--theme-accent-focus);
+  }
 }
 
-.badge-pill {
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  display: flex; align-items: center; gap: 6px;
+:host ::ng-deep .p-button.p-button-rounded {
+  border-radius: var(--ui-border-radius-lg);
 }
-.badge-danger { background: rgba(239, 68, 68, 0.1); color: var(--color-error); }
+
+/* Animations */
+.animate-fadeIn {
+  animation: fadeIn var(--transition-slower) ease-out forwards;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--theme-border-primary);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
