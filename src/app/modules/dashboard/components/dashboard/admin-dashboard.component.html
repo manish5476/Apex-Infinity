@@ -1,273 +1,83 @@
+<div class="dashboard-wrapper">
 
-<div class="dashboard-container">
-
-  <!-- STICKY GLASS HEADER -->
+  <!-- Sticky Header -->
   <header class="dashboard-header">
-    <div class="header-title">
-      <h1>Executive Overview</h1>
-      <p>Financial performance & operational insights.</p>
+    <div>
+      <h2>Executive Overview</h2>
+      <p>Performance snapshot — revenue, expenses, risk and growth.</p>
     </div>
-    
-    <div class="header-controls">
-      <!-- Custom Toggle -->
-      <div class="filter-toggle">
+
+    <div class="actions">
+      <div class="preset-group">
         <button [class.active]="activePreset() === 'all'" (click)="applyPreset('all')">All Time</button>
         <button [class.active]="activePreset() === 'month'" (click)="applyPreset('month')">This Month</button>
       </div>
 
-      <!-- Date Picker -->
-      <p-datepicker [(ngModel)]="dateRange" selectionMode="range" [readonlyInput]="true" 
-        placeholder="Select Range" (onSelect)="onDateSelect()"
-        styleClass="w-full sm:w-48 text-sm" inputStyleClass="py-2 text-sm"></p-datepicker>
-      
-      <p-button icon="pi pi-refresh" styleClass="p-button-rounded p-button-text" 
-        (onClick)="loadAllData()" [loading]="loading()"></p-button>
+      <p-datepicker [(ngModel)]="dateRangeModel" selectionMode="range" placeholder="Custom Range"
+        inputStyleClass="date-input" (onSelect)="onDateChange()">
+      </p-datepicker>
+
+      <button class="icon-btn" (click)="facade.load()">
+        <i class="pi pi-refresh"></i>
+      </button>
     </div>
   </header>
 
-  <div class="content-area">
-    
-    @if (loading()) {
-      <!-- Loading Skeletons -->
-      <div class="kpi-grid">
-        <p-skeleton height="140px" borderRadius="12px"></p-skeleton>
-        <p-skeleton height="140px" borderRadius="12px"></p-skeleton>
-        <p-skeleton height="140px" borderRadius="12px"></p-skeleton>
-        <p-skeleton height="140px" borderRadius="12px"></p-skeleton>
-      </div>
-    } @else {
 
-      <!-- 1. KPI CARDS -->
-      <section class="kpi-grid">
-        
-        <!-- Revenue -->
-        <div class="kpi-card type-revenue">
-          <div class="kpi-header">
-            <span class="label">Total Revenue</span>
-            <div class="icon-box indigo"><i class="pi pi-wallet"></i></div>
-          </div>
-          <div class="kpi-body">
-            <div class="value">{{ common.formatCurrency(kpi.totalRevenue?.value) }}</div>
-            <div class="sub-text">
-              <span class="trend up"><i class="pi pi-arrow-up"></i> {{ kpi.totalRevenue?.growth }}%</span>
-              <span>vs prev. period</span>
-            </div>
-          </div>
-        </div>
+  <!-- KPI Section -->
+  <section class="kpi-grid" *ngIf="facade.kpi()">
+    <kpi-card label="Revenue" icon="pi-wallet" [value]="facade.kpi()?.revenue" [growth]="facade.kpi()?.revenueGrowth">
+    </kpi-card>
 
-        <!-- Net Profit -->
-        <div class="kpi-card type-profit">
-          <div class="kpi-header">
-            <span class="label">Net Profit</span>
-            <div class="icon-box emerald"><i class="pi pi-chart-line"></i></div>
-          </div>
-          <div class="kpi-body">
-            <div class="value text-success">{{ common.formatCurrency(kpi.netProfit?.value) }}</div>
-            <div class="sub-text">
-              <span>Expenses: {{ common.formatCurrency(kpi.totalExpense?.value) }}</span>
-            </div>
-          </div>
-        </div>
+    <kpi-card label="Net Profit" icon="pi-chart-line" [value]="facade.kpi()?.profit"
+      [growth]="facade.kpi()?.profitGrowth">
+    </kpi-card>
 
-        <!-- Outstanding -->
-        <div class="kpi-card type-risk">
-          <div class="kpi-header">
-            <span class="label">Outstanding Due</span>
-            <div class="icon-box rose"><i class="pi pi-exclamation-circle"></i></div>
-          </div>
-          <div class="kpi-body">
-            <div class="value text-danger">{{ common.formatCurrency(kpi.outstanding?.receivables) }}</div>
-            <div class="sub-text">
-              <span>Payables: {{ common.formatCurrency(kpi.outstanding?.payables) }}</span>
-            </div>
-          </div>
-        </div>
+    <kpi-card label="Outstanding Receivable" icon="pi-exclamation-circle" [value]="facade.kpi()?.receivables">
+    </kpi-card>
 
-        <!-- Inventory -->
-        <div class="kpi-card type-asset">
-          <div class="kpi-header">
-            <span class="label">Inventory Value</span>
-            <div class="icon-box sky"><i class="pi pi-box"></i></div>
-          </div>
-          <div class="kpi-body">
-            <div class="value">{{ common.formatCurrency(stockVal?.totalValue) }}</div>
-            <div class="sub-text">
-              <span>{{ stockVal?.totalItems | number }} Items</span>
-            </div>
-          </div>
-        </div>
+    <kpi-card label="Inventory Value" icon="pi-box" [value]="facade.inventory()?.totalValue">
+    </kpi-card>
+  </section>
 
-      </section>
 
-      <!-- 2. CHARTS SECTION -->
-      <section class="main-charts-grid">
-        
-        <!-- Revenue Trend -->
-        <div class="content-card">
-          <div class="card-header">
-            <h3>Revenue Growth</h3>
-          </div>
-          <div class="card-body">
-            <p-chart type="line" [data]="revenueChartData()" [options]="revenueChartOptions()" height="320px"></p-chart>
-          </div>
-        </div>
+  <!-- Chart Zone -->
+  <section class="chart-grid">
+    <revenue-chart [data]="facade.timelineChart()"></revenue-chart>
 
-        <!-- Collection Stats -->
-        <div class="flex flex-col gap-6">
-          <div class="content-card flex-1">
-            <div class="card-header">
-              <h3>Collections</h3>
-            </div>
-            <div class="card-body flex justify-center items-center">
-              <p-chart type="doughnut" [data]="paymentChartData()" [options]="paymentChartOptions()" height="220px"></p-chart>
-            </div>
-          </div>
+    <div class="side-stack">
+      <payment-donut [data]="facade.paymentModes()"></payment-donut>
+      <div class="placeholder"></div>
+    </div>
+  </section>
 
-          <!-- Mini Tax Summary -->
-          <div class="content-card" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; border: none;">
-            <div class="card-body">
-              <div class="flex justify-between items-center mb-4">
-                <span class="text-slate-400 text-sm font-bold uppercase">GST Liability</span>
-                <i class="pi pi-file text-slate-500"></i>
-              </div>
-              <div class="text-3xl font-bold mb-1">{{ common.formatCurrency(taxData()?.netPayable) }}</div>
-              <div class="flex justify-between text-xs text-slate-400 mt-3">
-                <span>Input: <span class="text-emerald-400">{{ common.formatCurrency(taxData()?.inputTax) }}</span></span>
-                <span>Output: <span class="text-rose-400">{{ common.formatCurrency(taxData()?.outputTax) }}</span></span>
-              </div>
-            </div>
-          </div>
-        </div>
 
-      </section>
+  <!-- Branch Comparison-->
+  <section class="chart-wide">
+    <branch-comparison [data]="facade.branchComparison()"></branch-comparison>
+  </section>
 
-      <!-- 3. RISK & ALERTS (Row 3) -->
-      <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <!-- Low Stock Alerts -->
-        <div class="content-card p-0">
-          <div class="card-header border-l-4 border-orange-500">
-            <h3>⚠️ Low Stock Alerts</h3>
-            <span class="text-xs text-slate-500">{{ inventoryData()?.lowStockAlerts?.length || 0 }} Items</span>
-          </div>
-          <div class="overflow-auto max-h-80">
-            <table class="clean-table">
-              <thead><tr><th>Product</th><th class="text-right">Stock</th></tr></thead>
-              <tbody>
-                @for (item of inventoryData()?.lowStockAlerts; track item._id) {
-                  <tr>
-                    <td>
-                      <span class="primary-text">{{ item.name }}</span>
-                      <span class="secondary-text">{{ item.sku }}</span>
-                    </td>
-                    <td class="text-right font-bold text-danger">{{ item.currentStock }} / {{ item.reorderLevel }}</td>
-                  </tr>
-                } @empty {
-                  <tr><td colspan="2" class="text-center py-6 text-slate-400">Stock levels healthy.</td></tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        </div>
 
-        <!-- High Credit Risk (Restored Feature) -->
-        <div class="content-card p-0">
-          <div class="card-header border-l-4 border-red-500">
-            <h3>🚨 High Credit Risk</h3>
-            <span class="text-xs text-slate-500">Customers with high dues</span>
-          </div>
-          <div class="overflow-auto max-h-80">
-            <table class="clean-table">
-              <thead><tr><th>Customer</th><th class="text-right">Due Amount</th></tr></thead>
-              <tbody>
-                @for (cust of customerData()?.creditRisk; track cust._id) {
-                  <tr>
-                    <td>
-                      <span class="primary-text">{{ cust.name }}</span>
-                      <span class="secondary-text">{{ cust.phone }}</span>
-                    </td>
-                    <td class="text-right font-bold text-danger">{{ common.formatCurrency(cust.outstandingBalance) }}</td>
-                  </tr>
-                } @empty {
-                  <tr><td colspan="2" class="text-center py-6 text-slate-400">No high-risk customers.</td></tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        </div>
+  <!-- Top Lists -->
+  <section class="bottom-grid">
+    <div class="grid-lists">
+      <top-products [products]="facade.leaders()?.topProducts ?? null"></top-products>
+      <top-customers [customers]="facade.leaders()?.topCustomers ?? null"></top-customers>
+    </div>
+  </section>
 
-        <!-- Dead Stock (Restored Feature) -->
-        <div class="content-card p-0">
-          <div class="card-header border-l-4 border-slate-500">
-            <h3>🧊 Dead Stock</h3>
-            <span class="text-xs text-slate-500">Slow moving inventory</span>
-          </div>
-          <div class="overflow-auto max-h-80">
-            <table class="clean-table">
-              <thead><tr><th>Product</th><th class="text-right">Value Stuck</th></tr></thead>
-              <tbody>
-                @for (item of productData()?.deadStock?.slice(0,5); track item._id) {
-                  <tr>
-                    <td class="primary-text text-sm">{{ item.name }}</td>
-                    <td class="text-right font-medium text-slate-600">{{ common.formatCurrency(item.value) }}</td>
-                  </tr>
-                } @empty {
-                  <tr><td colspan="2" class="text-center py-6 text-slate-400">Inventory moving well.</td></tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        </div>
 
-      </section>
+  <!-- Insights Panels -->
+  <section class="lower-widgets">
+    <risk-panel [risk]="facade.risk()"></risk-panel>
+    <inventory-status [inventory]="facade.inventory()"></inventory-status>
+    <segmentation-chart [segmentation]="facade.segmentation()"></segmentation-chart>
+  </section>
 
-      <!-- 4. PERFORMANCE LEADERS (Row 4) -->
-      <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
-        <!-- Top Products -->
-        <div class="content-card p-0">
-          <div class="card-header">
-            <h3>🏆 High Margin Products</h3>
-          </div>
-          <div class="overflow-auto max-h-80">
-            <table class="clean-table">
-              <thead><tr><th>Product</th><th class="text-right">Margin</th><th class="text-right">Profit</th></tr></thead>
-              <tbody>
-                @for (prod of productData()?.highMargin?.slice(0,5); track prod._id) {
-                  <tr>
-                    <td class="primary-text">{{ prod.name }}</td>
-                    <td class="text-right text-success font-bold">{{ prod.marginPercent | number:'1.1-1' }}%</td>
-                    <td class="text-right">{{ common.formatCurrency(prod.margin) }}</td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        </div>
 
-        <!-- Top Customers (Restored Feature) -->
-        <div class="content-card p-0">
-          <div class="card-header">
-            <h3>👑 Top Customers</h3>
-          </div>
-          <div class="overflow-auto max-h-80">
-            <table class="clean-table">
-              <thead><tr><th>Customer</th><th class="text-center">Trans.</th><th class="text-right">Total Spent</th></tr></thead>
-              <tbody>
-                @for (cust of dashboardData()?.leaders?.topCustomers; track cust._id) {
-                  <tr>
-                    <td class="primary-text">{{ cust.name }}</td>
-                    <td class="text-center text-slate-500">{{ cust.transactions }}</td>
-                    <td class="text-right font-bold text-indigo-600">{{ common.formatCurrency(cust.totalSpent) }}</td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        </div>
+  <!-- Activity Log -->
+  <section class="timeline-section">
+    <!-- <activity-log [events]="facade.security() ?? []"></activity-log> -->
+  </section>
 
-      </section>
-
-    }
-  </div>
 </div>

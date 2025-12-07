@@ -5,113 +5,175 @@ import { BaseApiService } from './base-api.service';
 @Injectable({ providedIn: 'root' })
 export class AdminAnalyticsService extends BaseApiService {
 
-  private getParams(start?: string, end?: string, branchId?: string, extra?: any) {
-    const params: any = { ...extra };
-    if (start) params.startDate = start;
-    if (end) params.endDate = end;
-    if (branchId) params.branchId = branchId;
-    return params;
+  // ==========================================================================
+  // 🛠️ HELPER: Standardize Query Params
+  // ==========================================================================
+  private buildParams(startDate?: string, endDate?: string, branchId?: string, extra: any = {}) {
+    // BaseApiService will automatically filter out null/undefined/empty strings
+    return {
+      startDate,
+      endDate,
+      branchId,
+      ...extra
+    };
   }
 
-  // ------------------------- 1. EXECUTIVE -------------------------
-
-  getDashboardOverview(start?: string, end?: string, branchId?: string): Observable<any> {
-    return this.get('/v1/analytics/dashboard', this.getParams(start, end, branchId), 'Dashboard Overview');
+  // ==========================================================================
+  // 1. EXECUTIVE & STRATEGIC (Dashboard & Benchmarks)
+  // ==========================================================================
+  
+  // 📊 Main KPI Dashboard
+  getDashboardOverview(startDate?: string, endDate?: string, branchId?: string): Observable<any> {
+    const params = this.buildParams(startDate, endDate, branchId);
+    return this.get<any>('/v1/analytics/dashboard', params, 'Dashboard Overview');
   }
 
-  getBranchComparison(start?: string, end?: string): Observable<any> {
-    return this.get('/v1/analytics/branch-comparison', this.getParams(start, end), 'Branch Comparison');
+  // 🆚 Branch vs. Branch Comparison
+  getBranchComparison(startDate?: string, endDate?: string): Observable<any> {
+    const params = this.buildParams(startDate, endDate);
+    return this.get<any>('/v1/analytics/branch-comparison', params, 'Branch Comparison');
   }
 
-  // ------------------------- 2. FINANCIAL -------------------------
-
-  getFinancialReport(start?: string, end?: string, branchId?: string): Observable<any> {
-    return this.get('/v1/analytics/financials', this.getParams(start, end, branchId), 'Financial Report');
+  // 🔮 AI Revenue Forecast (Linear Regression)
+  getSalesForecast(branchId?: string): Observable<any> {
+    const params = this.buildParams(undefined, undefined, branchId);
+    return this.get<any>('/v1/analytics/forecast', params, 'Sales Forecast');
   }
 
-  getCashFlowReport(start?: string, end?: string, branchId?: string): Observable<any> {
-    return this.get('/v1/analytics/cashflow', this.getParams(start, end, branchId), 'Cash Flow Report');
+  // 🚨 Critical Alerts (Low Stock + High Risk Debt)
+  getCriticalAlerts(branchId?: string): Observable<any> {
+    const params = this.buildParams(undefined, undefined, branchId);
+    return this.get<any>('/v1/analytics/critical-alerts', params, 'Critical Alerts');
   }
 
-  getTaxReport(start?: string, end?: string, branchId?: string): Observable<any> {
-    return this.get('/v1/analytics/tax', this.getParams(start, end, branchId), 'Tax Report');
+  // ==========================================================================
+  // 2. FINANCIAL INTELLIGENCE (P&L, Tax, Cash)
+  // ==========================================================================
+
+  getFinancialReport(startDate?: string, endDate?: string, branchId?: string): Observable<any> {
+    const params = this.buildParams(startDate, endDate, branchId);
+    return this.get<any>('/v1/analytics/financials', params, 'Financial Report');
   }
 
-  getProfitabilityReport(start?: string, end?: string, branchId?: string): Observable<any> {
-    return this.get('/v1/analytics/profitability', this.getParams(start, end, branchId), 'Profitability');
+  // 💰 Real Profit (Sales - COGS)
+  getProfitabilityReport(startDate?: string, endDate?: string, branchId?: string): Observable<any> {
+    const params = this.buildParams(startDate, endDate, branchId);
+    return this.get<any>('/v1/analytics/profitability', params, 'Profitability Report');
   }
 
+  getCashFlowReport(startDate?: string, endDate?: string, branchId?: string): Observable<any> {
+    const params = this.buildParams(startDate, endDate, branchId);
+    return this.get<any>('/v1/analytics/cash-flow', params, 'Cash Flow Report');
+  }
+
+  // ⏳ Who owes money? (0-30, 31-60, 90+ days)
   getDebtorAgingReport(branchId?: string): Observable<any> {
-    return this.get('/v1/analytics/debtor-aging', this.getParams(undefined, undefined, branchId), 'Debtor Aging');
+    const params = this.buildParams(undefined, undefined, branchId);
+    return this.get<any>('/v1/analytics/debtor-aging', params, 'Debtor Aging');
   }
 
-  // ------------------------- 3. PROCUREMENT -------------------------
-
-  getProcurementAnalysis(start?: string, end?: string, branchId?: string): Observable<any> {
-    return this.get('/v1/analytics/procurement', this.getParams(start, end, branchId), 'Procurement');
+  getTaxReport(startDate?: string, endDate?: string, branchId?: string): Observable<any> {
+    const params = this.buildParams(startDate, endDate, branchId);
+    return this.get<any>('/v1/analytics/tax-report', params, 'Tax Report');
   }
 
-  // ------------------------- 4. INVENTORY -------------------------
+  // ==========================================================================
+  // 3. OPERATIONAL & STAFF EFFICIENCY
+  // ==========================================================================
+
+  // 🏆 Employee Leaderboard
+  getStaffPerformance(startDate?: string, endDate?: string, branchId?: string): Observable<any> {
+    const params = this.buildParams(startDate, endDate, branchId);
+    return this.get<any>('/v1/analytics/staff-performance', params, 'Staff Performance');
+  }
+
+  // 📉 Cancellation Rates & Discounts
+  getOperationalMetrics(startDate?: string, endDate?: string, branchId?: string): Observable<any> {
+    const params = this.buildParams(startDate, endDate, branchId);
+    return this.get<any>('/v1/analytics/operational-metrics', params, 'Operational Metrics');
+  }
+
+  // 🔥 Heatmap (Busiest Hours)
+  getPeakBusinessHours(branchId?: string): Observable<any> {
+    const params = this.buildParams(undefined, undefined, branchId);
+    return this.get<any>('/v1/analytics/peak-hours', params, 'Peak Business Hours');
+  }
+
+  getProcurementAnalysis(startDate?: string, endDate?: string, branchId?: string): Observable<any> {
+    const params = this.buildParams(startDate, endDate, branchId);
+    return this.get<any>('/v1/analytics/procurement', params, 'Procurement Analysis');
+  }
+
+  // ==========================================================================
+  // 4. INVENTORY INTELLIGENCE
+  // ==========================================================================
 
   getInventoryReport(branchId?: string): Observable<any> {
-    return this.get('/v1/analytics/inventory', this.getParams(undefined, undefined, branchId), 'Inventory');
+    const params = this.buildParams(undefined, undefined, branchId);
+    return this.get<any>('/v1/analytics/inventory', params, 'Inventory Report');
   }
 
-  getProductPerformance(branchId?: string): Observable<any> {
-    return this.get('/v1/analytics/product-performance', this.getParams(undefined, undefined, branchId), 'Product Performance');
+  getProductPerformance(startDate?: string, endDate?: string, branchId?: string): Observable<any> {
+    const params = this.buildParams(startDate, endDate, branchId);
+    return this.get<any>('/v1/analytics/product-performance', params, 'Product Performance');
   }
 
+  // 💀 Items stuck on shelves > X days
   getDeadStockReport(branchId?: string, daysThreshold: number = 90): Observable<any> {
-    return this.get('/v1/analytics/dead-stock', this.getParams(undefined, undefined, branchId, { daysThreshold }), 'Dead Stock');
+    const params = this.buildParams(undefined, undefined, branchId, { daysThreshold });
+    return this.get<any>('/v1/analytics/dead-stock', params, 'Dead Stock Report');
   }
 
-  getStockForecast(branchId?: string): Observable<any> {
-    return this.get('/v1/analytics/stock-forecast', this.getParams(undefined, undefined, branchId), 'Stock Forecast');
+  // 📉 "Will run out in 7 days" predictions
+  getStockOutPredictions(branchId?: string): Observable<any> {
+    const params = this.buildParams(undefined, undefined, branchId);
+    return this.get<any>('/v1/analytics/stock-predictions', params, 'Stock Predictions');
   }
 
-  // ------------------------- 5. CUSTOMER INTELLIGENCE -------------------------
+  // ==========================================================================
+  // 5. CUSTOMER INSIGHTS
+  // ==========================================================================
 
+  getCustomerInsights(branchId?: string): Observable<any> {
+    const params = this.buildParams(undefined, undefined, branchId);
+    return this.get<any>('/v1/analytics/customer-insights', params, 'Customer Insights');
+  }
+
+  // 🎯 RFM Segmentation (Champions, Loyal, At Risk)
   getCustomerSegmentation(): Observable<any> {
-    return this.get('/v1/analytics/segmentation', {}, 'Segmentation');
+    return this.get<any>('/v1/analytics/customer-segmentation', {}, 'Customer Segmentation');
   }
 
-  getCustomerRetention(): Observable<any> {
-    return this.get('/v1/analytics/retention', {}, 'Retention');
+  // 🔄 Cohort Analysis (Retention)
+  getCustomerRetention(months: number = 6): Observable<any> {
+    return this.get<any>('/v1/analytics/customer-retention', { months }, 'Customer Retention');
   }
 
-  // ------------------------- 6. OPERATIONAL -------------------------
+  // ==========================================================================
+  // 6. SECURITY & EXPORTS
+  // ==========================================================================
 
-  getOperationalReport(start?: string, end?: string, branchId?: string): Observable<any> {
-    return this.get('/v1/analytics/operational', this.getParams(start, end, branchId), 'Operational Stats');
+  getSecurityAuditLog(startDate?: string, endDate?: string): Observable<any> {
+    const params = this.buildParams(startDate, endDate);
+    return this.get<any>('/v1/analytics/security-audit', params, 'Security Audit Log');
   }
 
-  getPeakBusinessHours(branchId?: string): Observable<any> {
-    return this.get('/v1/analytics/peak-hours', this.getParams(undefined, undefined, branchId), 'Peak Hours');
-  }
+  /**
+   * 📥 EXPORT DATA (Handles Binary/Blob)
+   * We skip `this.get()` because BaseApiService expects JSON, 
+   * but this endpoint returns a file (Blob).
+   */
+  exportAnalyticsData(type: 'sales' | 'inventory' | 'tax', startDate?: string, endDate?: string): Observable<Blob> {
+    // 1. Build Params
+    const rawParams = this.buildParams(startDate, endDate, undefined, { type, format: 'csv' });
+    
+    // 2. Convert to HttpParams using your BaseApiService helper
+    const httpParams = this.createHttpParams(rawParams);
 
-  // ------------------------- 7. SECURITY -------------------------
-
-  getSecurityAuditLog(start?: string, end?: string): Observable<any> {
-    return this.get('/v1/analytics/security-audit', this.getParams(start, end), 'Security Audit');
-  }
-
-  // ------------------------- 8. FORECAST -------------------------
-
-  getSalesForecast(branchId?: string): Observable<any> {
-    return this.get('/v1/analytics/forecast', this.getParams(undefined, undefined, branchId), 'Sales Forecast');
-  }
-
-  // ------------------------- 9. ALERTS -------------------------
-
-  getAlerts(branchId?: string): Observable<any> {
-    return this.get('/v1/analytics/alerts', this.getParams(undefined, undefined, branchId), 'Critical Alerts');
-  }
-
-  // ------------------------- 10. EXPORTS -------------------------
-
-  exportData(type: string, start?: string, end?: string, format: string = 'csv'): Observable<any> {
-    return this.get('/v1/analytics/export', this.getParams(start, end, undefined, { type, format }), `Export: ${type}`);
+    // 3. Raw HTTP call with 'blob' response type
+    return this.http.get(`${this.baseUrl}/v1/analytics/export`, {
+      params: httpParams,
+      responseType: 'blob' 
+    });
   }
 }
-
-

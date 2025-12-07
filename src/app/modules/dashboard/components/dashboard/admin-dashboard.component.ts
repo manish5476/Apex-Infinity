@@ -1,235 +1,629 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, signal, effect } from '@angular/core';
+import { AnalyticsFacadeService } from '../../../../core/services/analytics-facade.service';
+import { DatePicker } from "primeng/datepicker";
 import { FormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs';
-
-// PrimeNG
-import { ButtonModule } from 'primeng/button';
-import { ChartModule } from 'primeng/chart';
-import { TableModule } from 'primeng/table';
-import { SkeletonModule } from 'primeng/skeleton';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-import { DatePicker } from 'primeng/datepicker';
-import { SelectButtonModule } from 'primeng/selectbutton';
-
-// Services
-import { CommonMethodService } from '../../../../core/utils/common-method.service';
-import { AdminAnalyticsService } from '../../../../core/services/admin-analytics.service';
+import { CommonModule } from '@angular/common';
+import { RevenueChartComponent } from "../../reusable/revenue-chart";
+import { ActivityLogComponent } from '../../reusable/activity-log';
+import { BranchComparisonComponent } from '../../reusable/branch-comparison';
+import { InventoryStatusComponent } from '../../reusable/inventory-status';
+import { KpiCardComponent } from '../../reusable/kpi-card';
+import { PaymentDonutComponent } from '../../reusable/payment-donut';
+import { RiskPanelComponent } from '../../reusable/risk-panel';
+import { SegmentationChartComponent } from '../../reusable/segmentation-chart';
+import { TopCustomersComponent } from '../../reusable/top-customer';
+import { TopProductsComponent } from '../../reusable/top-products';
+// ... other imports
 
 @Component({
-  selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [
-    CommonModule,
-    ButtonModule,
-    ChartModule,
-    FormsModule,
-    DatePicker,
-    TableModule,
-    SkeletonModule,
-    TagModule,
-    TooltipModule,
-    SelectButtonModule
-  ],
+  selector: 'admin-dashboard',
   templateUrl: './admin-dashboard.component.html',
-  styleUrl: './admin-dashboard.component.scss'
+  styleUrls: ['./admin-dashboard.component.scss'],
+  imports: [DatePicker, FormsModule, CommonModule, KpiCardComponent, RevenueChartComponent, PaymentDonutComponent, TopProductsComponent, TopCustomersComponent, BranchComparisonComponent, RiskPanelComponent, SegmentationChartComponent, InventoryStatusComponent]
 })
-export class AdminDashboardComponent implements OnInit {
-  private analyticsService = inject(AdminAnalyticsService);
-  public common = inject(CommonMethodService);
+export class AdminDashboardComponent {
 
-  // --- State Signals ---
-  loading = signal(true);
-  
-  // Data Buckets
-  dashboardData = signal<any>(null); // KPIs, Leaders, Main Chart
-  financeData = signal<any>(null);   // Payment Modes
-  taxData = signal<any>(null);       // Input/Output Tax
-  inventoryData = signal<any>(null); // Valuation, Low Stock
-  productData = signal<any>(null);   // Margins, Dead Stock
-  customerData = signal<any>(null);  // Risks
+  facade = inject(AnalyticsFacadeService);
 
-  // Charts
-  revenueChartData = signal<any>(null);
-  revenueChartOptions = signal<any>(null);
-  
-  paymentChartData = signal<any>(null);
-  paymentChartOptions = signal<any>(null);
-
-  // Date Filters
-  dateRange: Date[] | null = null;
-  activePreset = signal<'all' | 'month'>('all');
-
+  activePreset = signal<'all' | 'month' | 'custom'>('all');
+    dateRangeModel: Date[] | null = null; 
   ngOnInit() {
-    this.loadAllData();
+    this.facade.load();
   }
 
-  // --- Data Loading ---
-  loadAllData(start?: string, end?: string) {
-    this.loading.set(true);
-
-    forkJoin({
-      dashboard: this.analyticsService.getDashboardOverview(start, end),
-      financials: this.analyticsService.getFinancialReport(start, end),
-      tax: this.analyticsService.getTaxReport(start, end),
-      inventory: this.analyticsService.getInventoryReport(),
-      // products: this.analyticsService.getProductPerformance(start, end),
-      // customers: this.analyticsService.getCustomerInsights()
-    }).subscribe({
-      next: (res: any) => {
-        if(res.dashboard?.status === 'success') {
-          this.dashboardData.set(res.dashboard.data);
-          this.initRevenueChart(res.dashboard.data.charts?.timeline || []);
-        }
-        if(res.financials?.status === 'success') {
-          this.financeData.set(res.financials.data);
-          this.initPaymentChart(res.financials.data.paymentModes || []);
-        }
-        if(res.tax?.status === 'success') this.taxData.set(res.tax.data);
-        if(res.inventory?.status === 'success') this.inventoryData.set(res.inventory.data);
-        if(res.products?.status === 'success') this.productData.set(res.products.data);
-        if(res.customers?.status === 'success') this.customerData.set(res.customers.data);
-
-        this.loading.set(false);
-      },
-      error: (err) => {
-        console.error('Dashboard Load Error', err);
-        this.loading.set(false);
-      }
-    });
-  }
-
-  // --- Chart Initialization ---
-
-  initRevenueChart(timeline: any[]) {
-    const documentStyle = getComputedStyle(document.documentElement);
-    const textColor = '#64748b';
-    const textColorSecondary = '#94a3b8';
-    const surfaceBorder = '#f1f5f9';
-    
-    // Gradient Setup happens in the canvas context, but here we define colors
-    const accentColor = '#6366f1'; // Indigo 500
-    const profitColor = '#10b981'; // Emerald 500
-
-    this.revenueChartData.set({
-      labels: timeline.map(t => t.date),
-      datasets: [
-        {
-          label: 'Total Revenue',
-          data: timeline.map(t => t.income),
-          fill: true,
-          borderColor: accentColor,
-          backgroundColor: (context: any) => {
-            const ctx = context.chart.ctx;
-            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-            gradient.addColorStop(0, 'rgba(99, 102, 241, 0.25)'); // Indigo with opacity
-            gradient.addColorStop(1, 'rgba(99, 102, 241, 0)');
-            return gradient;
-          },
-          tension: 0.35,
-          pointRadius: 4,
-          pointHoverRadius: 6,
-          pointBackgroundColor: '#ffffff',
-          pointBorderColor: accentColor,
-          pointBorderWidth: 2
-        },
-        {
-          label: 'Net Profit',
-          data: timeline.map(t => t.profit),
-          fill: false,
-          borderColor: profitColor,
-          borderDash: [5, 5],
-          tension: 0.35,
-          pointRadius: 0,
-          pointHoverRadius: 4
-        }
-      ]
-    });
-
-    this.revenueChartOptions.set({
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          labels: { color: textColor, usePointStyle: true, font: { family: "'Inter', sans-serif", size: 12 } }
-        },
-        tooltip: {
-          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          titleColor: '#1e293b',
-          bodyColor: '#475569',
-          borderColor: '#e2e8f0',
-          borderWidth: 1,
-          padding: 12,
-          displayColors: true,
-          boxPadding: 4
-        }
-      },
-      scales: {
-        x: {
-          ticks: { color: textColorSecondary, font: { size: 11 } },
-          grid: { display: false, drawBorder: false }
-        },
-        y: {
-          ticks: { color: textColorSecondary, callback: (val: any) => this.formatK(val) },
-          grid: { color: surfaceBorder, borderDash: [4, 4], drawBorder: false },
-          beginAtZero: true
-        }
-      },
-      interaction: {
-        mode: 'index',
-        intersect: false,
-      }
-    });
-  }
-
-  initPaymentChart(modes: any[]) {
-    this.paymentChartData.set({
-      labels: modes.map(m => m.name.toUpperCase()),
-      datasets: [{
-        data: modes.map(m => m.value),
-        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'],
-        hoverBackgroundColor: ['#2563eb', '#059669', '#d97706', '#dc2626'],
-        borderWidth: 0
-      }]
-    });
-
-    this.paymentChartOptions.set({
-      cutout: '70%',
-      plugins: {
-        legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { size: 11 } } }
-      }
-    });
-  }
-
-  // --- Filter Logic ---
   applyPreset(type: 'all' | 'month') {
     this.activePreset.set(type);
-    this.dateRange = null;
-    const now = new Date();
+    this.dateRangeModel = null; // Reset picker UI
+
+    if (type === 'all') return this.facade.load();
+
+    if (type === 'month') {
+      const now = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth(), 1);
+      this.facade.load(start, now);
+    }
+  }
+
+  onDateChange() {
+    // PrimeNG updates 'dateRangeModel' automatically via ngModel
+    if (!this.dateRangeModel || this.dateRangeModel.length !== 2) return;
     
-    if (type === 'all') {
-      this.loadAllData();
-    } else {
-      const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-      const end = now.toISOString();
-      this.loadAllData(start, end);
-    }
-  }
-
-  onDateSelect() {
-    if (this.dateRange && this.dateRange[1]) {
-      this.activePreset.set('all'); // Clear preset visuals
-      this.loadAllData(this.dateRange[0].toISOString(), this.dateRange[1].toISOString());
-    }
-  }
-
-  // --- Helpers ---
-  get kpi() { return this.dashboardData()?.kpi || {}; }
-  get stockVal() { return this.inventoryData()?.inventoryValuation || {}; }
-
-  // Simple formatter for chart Y-axis (e.g., 1200 -> 1.2k)
-  formatK(value: number) {
-    if (value >= 1000) return (value / 1000).toFixed(1) + 'k';
-    return value;
+    this.activePreset.set('custom');
+    const [start, end] = this.dateRangeModel;
+    
+    // Pass to facade
+    this.facade.load(start, end);
   }
 }
+
+// import { Component, inject, signal } from '@angular/core';
+// import { AnalyticsFacadeService } from '../../../../core/services/analytics-facade.service';
+// import { DatePicker } from "primeng/datepicker";
+// import { FormsModule } from '@angular/forms';
+// import { CommonModule } from '@angular/common';
+// import { KpiCardComponent } from '../../reusable/kpi-card/kpi-card';
+// import { RevenueChartComponent } from "../../reusable/revenue-chart/revenue-chart";
+// import { PaymentDonutComponent } from "../../reusable/payment-donut/payment-donut";
+// import { TopProductsComponent } from "../../reusable/top-products/top-products";
+// import { TopCustomersComponent } from "../../reusable/top-customer/top-customer";
+// import { BranchComparisonComponent } from "../../reusable/branch-comparison/branch-comparison";
+// import { RiskPanelComponent } from "../../reusable/risk-panel/risk-panel";
+// import { SegmentationChartComponent } from "../../reusable/segmentation-chart/segmentation-chart";
+// import { InventoryStatusComponent } from "../../reusable/inventory-status/inventory-status";
+// import { ActivityLogComponent } from "../../reusable/activity-log/activity-log";
+
+// @Component({
+//   standalone: true,
+//   selector: 'admin-dashboard',
+//   templateUrl: './admin-dashboard.component.html',
+//   styleUrls: ['./admin-dashboard.component.scss'],
+//   imports: [DatePicker, FormsModule, CommonModule, KpiCardComponent, RevenueChartComponent, PaymentDonutComponent, TopProductsComponent, TopCustomersComponent, BranchComparisonComponent, RiskPanelComponent, SegmentationChartComponent, InventoryStatusComponent, ActivityLogComponent]
+// })
+// export class AdminDashboardComponent {
+
+//   facade = inject(AnalyticsFacadeService);
+
+//   activePreset = signal<'all' | 'month' | 'custom'>('all');
+//   dateRange = signal<Date[] | null>(null);
+
+//   ngOnInit() {
+//     this.facade.load();
+//   }
+
+//   applyPreset(type: 'all' | 'month') {
+//     this.activePreset.set(type);
+//     this.dateRange.set(null);
+
+//     if (type === 'all') return this.facade.load();
+
+//     if (type === 'month') {
+//       const now = new Date();
+//       const start = new Date(now.getFullYear(), now.getMonth(), 1);
+//       this.facade.load(start, now);
+//     }
+//   }
+
+//   onDateChange() {
+//     if (!this.dateRange() || this.dateRange()?.length !== 2) return;
+//     this.activePreset.set('custom');
+//     const [start, end] = this.dateRange()!;
+//     this.facade.load(start, end);
+//   }
+// }
+
+
+
+// // import { Component, OnInit, inject, signal } from '@angular/core';
+// // import { CommonModule } from '@angular/common';
+// // import { forkJoin } from 'rxjs';
+
+// // // PrimeNG Modules
+// // import { ButtonModule } from 'primeng/button';
+// // import { ChartModule } from 'primeng/chart';
+// // import { TableModule } from 'primeng/table';
+// // import { SkeletonModule } from 'primeng/skeleton';
+// // import { TagModule } from 'primeng/tag';
+// // import { TooltipModule } from 'primeng/tooltip';
+
+// // // Services
+// // import { CommonMethodService } from '../../../../core/utils/common-method.service';
+// // import { AdminAnalyticsService } from '../../../../core/services/admin-analytics.service';
+// // import { FormsModule } from '@angular/forms';
+// // import { DatePicker } from 'primeng/datepicker';
+
+// // @Component({
+// //   selector: 'app-admin-dashboard',
+// //   standalone: true,
+// //   imports: [
+// //     CommonModule,
+// //     ButtonModule,
+// //     ChartModule,
+// //     FormsModule,          
+// //     DatePicker,
+// //     TableModule,
+// //     SkeletonModule,
+// //     TagModule,
+// //     TooltipModule
+// //   ],
+// //   templateUrl: './admin-dashboard.component.html',
+// //   styleUrl: './admin-dashboard.component.scss'
+// // })
+// // export class AdminDashboardComponent implements OnInit {
+// //   private analyticsService = inject(AdminAnalyticsService);
+
+// //   // Expose for template usage
+// //   public common = inject(CommonMethodService);
+
+// //   // State
+// //   loading = signal(true);
+
+// //   // Overview summary from /v1/dashboard
+// //   overviewSummary = signal<any | null>(null);
+
+// //   // Ledger-style summary from /v1/admin/summary (totals)
+// //   financeSummary = signal<any | null>(null);
+
+// //   topProducts = signal<any[]>([]);
+// //   topCustomers = signal<any[]>([]);
+// //   receivables = signal<any[]>([]);
+// //   payables = signal<any[]>([]); // For future use if needed
+
+// //   // Chart
+// //   chartData = signal<any>(null);
+// //   chartOptions = signal<any>(null);
+
+// //   // UI
+// //   activeRankingTab = signal<'products' | 'customers'>('products');
+
+// //   ngOnInit() {
+// //     this.loadDashboard();
+// //   }
+// //  loadDashboard(start?: string, end?: string) {
+// //     // this.loading.set(true);
+
+// //     forkJoin({
+// //       // overview: this.analyticsService.getDashboardOverview(start, end),
+// //       // // summary: this.analyticsService.getSummary(start, end),
+// //       // trends: this.analyticsService.getMonthlyTrends(6), // still month-based overall
+// //       // outstanding: this.analyticsService.getOutstanding('receivable', 5)
+// //     }).subscribe({
+// //       next: (res: any) => {
+// //         if (res.overview?.status === 'success') {
+// //           const data = res.overview.data;
+// //           this.overviewSummary.set(data.summary || null);
+// //           this.topProducts.set(data.topProducts || []);
+// //           this.topCustomers.set(data.topCustomers || []);
+// //         }
+
+// //         if (res.summary?.status === 'success') {
+// //           this.financeSummary.set(res.summary.data?.totals || null);
+// //         }
+
+// //         if (res.trends?.status === 'success') {
+// //           this.initChart(res.trends.data.series || []);
+// //         }
+
+// //         if (res.outstanding?.status === 'success') {
+// //           this.receivables.set(res.outstanding.data?.list || []);
+// //         }
+
+// //         this.loading.set(false);
+// //       },
+// //       error: (err) => {
+// //         console.error(err);
+// //         this.loading.set(false);
+// //       }
+// //     });
+// //   }
+// //     // ---------------------------
+// //   // DATE FILTER STATE + HELPERS
+// //   // ---------------------------
+
+// //   // Stores the date range selected from calendar
+// //   dateRangeModel: Date[] | null = null;
+
+// //   // Tracks which preset filter is active: All time, This month or Custom
+// //   activePreset = signal<'all' | 'month' | 'custom'>('all');
+
+// //   // Returns today so we use it as calendar limit
+// //   get today(): Date {
+// //     return new Date();
+// //   }
+
+// //   // Converts JS Date → backend format yyyy-MM-dd
+// //   private toApiDate(d?: Date | null): string | undefined {
+// //     if (!d) return undefined;
+// //     const year = d.getFullYear();
+// //     const month = String(d.getMonth() + 1).padStart(2, '0');
+// //     const day = String(d.getDate()).padStart(2, '0');
+// //     return `${year}-${month}-${day}`;
+// //   }
+
+// //   // Apply quick preset filters
+// //   applyPreset(preset: 'all' | 'month') {
+// //     this.activePreset.set(preset);
+// //     this.dateRangeModel = null; // Reset custom date selection
+
+// //     if (preset === 'all') {
+// //       this.loadDashboard(undefined, undefined);
+// //       return;
+// //     }
+
+// //     if (preset === 'month') {
+// //       const now = new Date();
+// //       const start = new Date(now.getFullYear(), now.getMonth(), 1);
+// //       const startStr = this.toApiDate(start);
+// //       const endStr = this.toApiDate(now);
+
+// //       this.loadDashboard(startStr, endStr);
+// //     }
+// //   }
+
+// //   // Triggered when user picks custom date
+// //   onDateRangeChange() {
+// //     this.activePreset.set('custom');
+
+// //     if (!this.dateRangeModel || this.dateRangeModel.length < 2) return;
+
+// //     const [startDate, endDate] = this.dateRangeModel;
+// //     const startStr = this.toApiDate(startDate);
+// //     const endStr = this.toApiDate(endDate || startDate);
+
+// //     this.loadDashboard(startStr, endStr);
+// //   }
+
+
+
+// //   setRankingTab(tab: 'products' | 'customers') {
+// //     this.activeRankingTab.set(tab);
+// //   }
+
+// //   /**
+// //    * Build "Revenue vs Receipts" line+bar chart
+// //    */
+// //   initChart(series: any[]) {
+// //     const documentStyle = getComputedStyle(document.documentElement);
+
+// //     const textColor =
+// //       documentStyle.getPropertyValue('--text-secondary').trim() || '#64748b';
+// //     const surfaceBorder =
+// //       documentStyle.getPropertyValue('--border-secondary').trim() || '#e2e8f0';
+
+// //     let accentPrimary = documentStyle.getPropertyValue('--accent-primary').trim();
+// //     if (!accentPrimary) accentPrimary = '#0d9488';
+
+// //     let accentSecondary = documentStyle.getPropertyValue('--accent-secondary').trim();
+// //     if (!accentSecondary) accentSecondary = '#6366f1';
+
+// //     // Filter out broken records (where month is an object)
+// //     const validSeries = (series || []).filter(
+// //       (item: any) => typeof item.month === 'string'
+// //     );
+
+// //     const labels = validSeries.map((i: any) => i.month);
+// //     const sales = validSeries.map((i: any) => i.sales || 0);
+// //     const receipts = validSeries.map((i: any) => i.paymentsIn || 0);
+
+// //     this.chartData.set({
+// //       labels,
+// //       datasets: [
+// //         {
+// //           type: 'line',
+// //           label: 'Sales',
+// //           data: sales,
+// //           fill: true,
+// //           borderColor: accentPrimary,
+// //           pointBackgroundColor: '#ffffff',
+// //           pointBorderColor: accentPrimary,
+// //           pointBorderWidth: 2,
+// //           tension: 0.35,
+// //           backgroundColor: (context: any) => {
+// //             const ctx = context.chart.ctx;
+// //             const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+// //             gradient.addColorStop(0, this.hexToRgba(accentPrimary, 0.25));
+// //             gradient.addColorStop(1, this.hexToRgba(accentPrimary, 0));
+// //             return gradient;
+// //           }
+// //         },
+// //         {
+// //           type: 'bar',
+// //           label: 'Receipts',
+// //           data: receipts,
+// //           borderRadius: 6,
+// //           barPercentage: 0.45,
+// //           categoryPercentage: 0.5,
+// //           backgroundColor: this.hexToRgba(accentSecondary, 0.65)
+// //         }
+// //       ]
+// //     });
+
+// //     this.chartOptions.set({
+// //       maintainAspectRatio: false,
+// //       plugins: {
+// //         legend: {
+// //           display: true,
+// //           labels: {
+// //             usePointStyle: true,
+// //             color: textColor,
+// //             font: { size: 11 }
+// //           }
+// //         },
+// //         tooltip: {
+// //           backgroundColor: '#ffffff',
+// //           titleColor: '#0f172a',
+// //           bodyColor: textColor,
+// //           borderColor: surfaceBorder,
+// //           borderWidth: 1,
+// //           padding: 10,
+// //           displayColors: true
+// //         }
+// //       },
+// //       scales: {
+// //         x: {
+// //           ticks: { color: textColor, font: { size: 11 } },
+// //           grid: { color: 'transparent', drawBorder: false }
+// //         },
+// //         y: {
+// //           ticks: { color: textColor, font: { size: 11 } },
+// //           grid: {
+// //             color: surfaceBorder,
+// //             drawBorder: false,
+// //             borderDash: [5, 5]
+// //           }
+// //         }
+// //       }
+// //     });
+// //   }
+
+// //   hexToRgba(hex: string, alpha: number) {
+// //     if (!hex) return `rgba(0, 0, 0, ${alpha})`;
+
+// //     hex = hex.trim();
+
+// //     if (hex.startsWith('#')) {
+// //       const r = parseInt(hex.substring(1, 3), 16);
+// //       const g = parseInt(hex.substring(3, 5), 16);
+// //       const b = parseInt(hex.substring(5, 7), 16);
+
+// //       if (isNaN(r) || isNaN(g) || isNaN(b)) return `rgba(0, 0, 0, ${alpha})`;
+// //       return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+// //     }
+
+// //     // Assume already rgb/rgba
+// //     return hex;
+// //   }
+
+// //   // Small helpers for template (avoid ugly null checks in HTML)
+// //   totalSales() {
+// //     return this.overviewSummary()?.totalSales || 0;
+// //   }
+
+// //   netProfit() {
+// //     return this.overviewSummary()?.netProfit || 0;
+// //   }
+
+// //   totalReceipts() {
+// //     return this.overviewSummary()?.totalReceipts || 0;
+// //   }
+
+// //   totalExpenses() {
+// //     return this.overviewSummary()?.expenses || 0;
+// //   }
+
+// //   invoiceCount() {
+// //     return this.financeSummary()?.invoiceCount || 0;
+// //   }
+
+// //   outstandingReceivables() {
+// //     return this.financeSummary()?.outstandingReceivables || 0;
+// //   }
+
+// //   outstandingPayables() {
+// //     return this.financeSummary()?.outstandingPayables || 0;
+// //   }
+
+// //   income() {
+// //     return this.overviewSummary()?.income || 0;
+// //   }
+
+// //   totalCustomers() {
+// //     return this.overviewSummary()?.totalCustomers || 0;
+// //   }
+
+// //   totalSuppliers() {
+// //     return this.overviewSummary()?.totalSuppliers || 0;
+// //   }
+
+// //   stockValue() {
+// //     return this.overviewSummary()?.stockValue || 0;
+// //   }
+
+// //   stockQty() {
+// //     return this.overviewSummary()?.totalStockQuantity || 0;
+// //   }
+
+// //   netProfitSeverity(): 'success' | 'danger' | 'warning' {
+// //     const value = this.netProfit();
+// //     if (value > 0) return 'success';
+// //     if (value < 0) return 'danger';
+// //     return 'warning';
+// //   }
+// // }
+
+
+// // // import { Component, OnInit, inject, signal } from '@angular/core';
+// // // import { CommonModule } from '@angular/common';
+// // // import { forkJoin } from 'rxjs';
+
+// // // // PrimeNG Modules
+// // // import { ButtonModule } from 'primeng/button';
+// // // import { ChartModule } from 'primeng/chart';
+// // // import { TableModule } from 'primeng/table';
+// // // import { SkeletonModule } from 'primeng/skeleton';
+// // // import { TagModule } from 'primeng/tag';
+// // // import { TooltipModule } from 'primeng/tooltip';
+
+// // // // Services
+// // // import { CommonMethodService } from '../../../../core/utils/common-method.service'; // <--- Using your service
+// // // import { AdminAnalyticsService } from '../../../../core/services/admin-analytics.service';
+// // // import { NotificationCalendarComponent } from "../notification-calendar/notification-calendar";
+
+// // // @Component({
+// // //   selector: 'app-admin-dashboard',
+// // //   standalone: true,
+// // //   imports: [
+// // //     CommonModule,
+// // //     ButtonModule,
+// // //     ChartModule,
+// // //     TableModule,
+// // //     SkeletonModule,
+// // //     TagModule,
+// // //     TooltipModule,
+// // //     // NotificationCalendarComponent
+// // // ],
+// // //   templateUrl: './admin-dashboard.component.html',
+// // //   styleUrl: './admin-dashboard.component.scss'
+// // // })
+// // // export class AdminDashboardComponent implements OnInit {
+// // //   private analyticsService = inject(AdminAnalyticsService);
+  
+// // //   // Inject as PUBLIC so HTML can use 'common.formatCurrency' and 'common.mapStatusToSeverity'
+// // //   public common = inject(CommonMethodService); 
+
+// // //   // Signals
+// // //   loading = signal(true);
+// // //   summaryData = signal<any>(null);
+// // //   topProducts = signal<any[]>([]);
+// // //   receivables = signal<any[]>([]);
+  
+// // //   // Chart Config
+// // //   chartData = signal<any>(null);
+// // //   chartOptions = signal<any>(null);
+
+// // //   ngOnInit() {
+// // //     this.loadDashboard();
+// // //   }
+
+// // //   loadDashboard() {
+// // //     this.loading.set(true);
+
+// // //     forkJoin({
+// // //       overview: this.analyticsService.getDashboardOverview(),
+// // //       trends: this.analyticsService.getMonthlyTrends(6),
+// // //       outstanding: this.analyticsService.getOutstanding('receivable', 5)
+// // //     }).subscribe({
+// // //       next: (res: any) => {
+// // //         if (res.overview?.status === 'success') {
+// // //           this.summaryData.set(res.overview.data.summary);
+// // //           this.topProducts.set(res.overview.data.topProducts);
+// // //         }
+
+// // //         if (res.trends?.status === 'success') {
+// // //           this.initChart(res.trends.data.series);
+// // //         }
+
+// // //         if (res.outstanding?.status === 'success') {
+// // //           this.receivables.set(res.outstanding.data.list);
+// // //         }
+
+// // //         this.loading.set(false);
+// // //       },
+// // //       error: (err) => {
+// // //         console.error(err);
+// // //         this.loading.set(false);
+// // //       }
+// // //     });
+// // //   }
+
+// // // /**
+// // //    * Initializes the Chart with Theme-Aware Colors & Fallbacks
+// // //    */
+// // //   initChart(series: any[]) {
+// // //     const documentStyle = getComputedStyle(document.documentElement);
+    
+// // //     // 1. Safe Property Fetching with Fallbacks
+// // //     // If the CSS var is missing, it defaults to a standard gray or teal to prevent crashing
+// // //     const textColor = documentStyle.getPropertyValue('--text-secondary').trim() || '#64748b';
+// // //     const surfaceBorder = documentStyle.getPropertyValue('--border-secondary').trim() || '#e2e8f0';
+    
+// // //     // CRITICAL FIX: Default to Teal (#0d9488) if var is empty
+// // //     let accentPrimary = documentStyle.getPropertyValue('--accent-primary').trim();
+// // //     if (!accentPrimary) accentPrimary = '#0d9488'; 
+
+// // //     const validSeries = series.filter(item => typeof item.month === 'string');
+// // //     const labels = validSeries.map(i => i.month);
+// // //     const sales = validSeries.map(i => i.sales);
+
+// // //     this.chartData.set({
+// // //       labels: labels,
+// // //       datasets: [
+// // //         {
+// // //           label: 'Revenue',
+// // //           data: sales,
+// // //           fill: true,
+// // //           borderColor: accentPrimary, 
+// // //           backgroundColor: (context: any) => {
+// // //             const ctx = context.chart.ctx;
+// // //             const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            
+// // //             // 2. Use the safe helper (no more crashing)
+// // //             gradient.addColorStop(0, this.hexToRgba(accentPrimary, 0.2));
+// // //             gradient.addColorStop(1, this.hexToRgba(accentPrimary, 0.0));
+// // //             return gradient;
+// // //           },
+// // //           tension: 0.4,
+// // //           pointBackgroundColor: '#ffffff',
+// // //           pointBorderColor: accentPrimary,
+// // //           pointBorderWidth: 2
+// // //         }
+// // //       ]
+// // //     });
+
+// // //     this.chartOptions.set({
+// // //       maintainAspectRatio: false,
+// // //       plugins: {
+// // //         legend: { display: false },
+// // //         tooltip: {
+// // //           backgroundColor: '#ffffff', // Hardcoded fallback for safety
+// // //           titleColor: '#1e293b',
+// // //           bodyColor: textColor,
+// // //           borderColor: surfaceBorder,
+// // //           borderWidth: 1,
+// // //           padding: 10,
+// // //           displayColors: false
+// // //         }
+// // //       },
+// // //       scales: {
+// // //         x: {
+// // //           ticks: { color: textColor, font: { size: 11 } },
+// // //           grid: { color: 'transparent', drawBorder: false }
+// // //         },
+// // //         y: {
+// // //           ticks: { color: textColor, font: { size: 11 } },
+// // //           grid: { color: surfaceBorder, drawBorder: false, borderDash: [5, 5] }
+// // //         }
+// // //       }
+// // //     });
+// // //   }
+
+// // //   // 3. Updated Helper to handle missing/invalid colors
+// // //   hexToRgba(hex: string, alpha: number) {
+// // //     if (!hex) return `rgba(0, 0, 0, ${alpha})`; // Safety fallback
+
+// // //     hex = hex.trim();
+    
+// // //     // Handle standard Hex (#123456)
+// // //     if (hex.startsWith('#')) {
+// // //       const r = parseInt(hex.substring(1, 3), 16);
+// // //       const g = parseInt(hex.substring(3, 5), 16);
+// // //       const b = parseInt(hex.substring(5, 7), 16);
+      
+// // //       if (isNaN(r) || isNaN(g) || isNaN(b)) return `rgba(0, 0, 0, ${alpha})`;
+// // //       return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+// // //     }
+    
+// // //     // If it's already an rgb/rgba string or variable, just return it (simple fallback)
+// // //     return hex;
+// // //   }
+// // // }

@@ -1,409 +1,123 @@
-/* ========================================================================
-   ANGULAR v20 AccounTech Theme - Dashboard Component
-   Based on Provided Design Tokens & Glass Theme
-   ======================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. GLOBAL PRIMITIVES (Locally Scoped for this Component)
-   -------------------------------------------------------------------------- */
 :host {
-  /* ===== TYPOGRAPHY ===== */
-  /* Host Styles */
   display: block;
   height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
   background: var(--bg-primary);
   color: var(--text-primary);
-  font-family: var(--font-body);
+  overflow-y: auto; /* Dashboard scrolls, header stays sticky */
 }
 
-/* =========================================================
-   CONTAINER & LAYOUT
-   ========================================================= */
-.dashboard-container {
-  padding: var(--spacing-2xl); /* 24px */
-  width: 100%;
-  max-width: 100%;
+.dashboard-wrapper {
+  padding: 24px 32px;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-2xl);
-  box-sizing: border-box;
+  gap: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
-/* =========================================================
-   HEADER (Sticky Glass)
-   ========================================================= */
+/* ---------------- HEADER ---------------- */
 .dashboard-header {
   position: sticky;
-  top: 0;
-  z-index: 200; /* --z-sticky */
-
+  top: 10px;
+  z-index: 100;
+  
   /* Glass Effect */
   background: var(--glass-bg);
   backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border-bottom: 1px solid var(--theme-border-primary);
-  box-shadow: var(--glass-shadow);
-
-  margin: calc(var(--spacing-2xl) * -1) calc(var(--spacing-2xl) * -1) var(--spacing-xl)
-    calc(var(--spacing-2xl) * -1);
-  padding: var(--spacing-lg) var(--spacing-2xl);
-
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-sm);
+  
+  padding: 16px 24px;
+  border-radius: var(--ui-border-radius-xl);
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: var(--spacing-lg);
+  gap: 16px;
 
-  .header-title {
-    h1 {
-      font-family: var(--font-heading);
-      font-size: var(--font-size-3xl);
-      font-weight: var(--font-weight-bold);
-      color: var(--text-primary);
-      margin: 0;
-      letter-spacing: -0.02em;
+  h2 { margin: 0; font-size: 20px; font-weight: 700; color: var(--text-primary); }
+  p { margin: 4px 0 0; font-size: 13px; color: var(--text-secondary); }
+
+  .actions {
+    display: flex; align-items: center; gap: 12px;
+
+    .preset-group {
+      background: var(--bg-secondary);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--border-secondary);
+      display: flex; gap: 4px;
+
+      button {
+        border: none; background: transparent; padding: 6px 14px;
+        font-size: 13px; font-weight: 500; cursor: pointer;
+        color: var(--text-secondary); border-radius: 8px; transition: 0.2s;
+        
+        &.active { background: var(--component-surface-raised); color: var(--text-primary); box-shadow: var(--shadow-xs); }
+        &:hover:not(.active) { color: var(--text-primary); }
+      }
     }
-    p {
-      margin: 2px 0 0;
-      color: var(--text-secondary);
-      font-size: var(--font-size-md);
-    }
-  }
 
-  .header-controls {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-  }
-}
-
-/* Custom Filter Toggle */
-.filter-toggle {
-  background: var(--bg-ternary);
-  padding: 4px;
-  border-radius: var(--ui-border-radius-lg);
-  border: 1px solid var(--border-secondary);
-  display: flex;
-  gap: 2px;
-
-  button {
-    border: none;
-    background: transparent;
-    padding: var(--spacing-sm) var(--spacing-xl);
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-semibold);
-    color: var(--text-secondary);
-    border-radius: var(--ui-border-radius);
-    cursor: pointer;
-    transition: var(--transition-base);
-
-    &:hover {
-      color: var(--text-primary);
-    }
-    &.active {
-      background: #ffffff;
-      color: var(--accent-primary);
-      box-shadow: var(--shadow-sm);
+    .icon-btn {
+      width: 40px; height: 40px; border: none; border-radius: 10px;
+      background: var(--bg-secondary); border: 1px solid var(--border-secondary);
+      cursor: pointer; transition: 0.2s; color: var(--text-secondary);
+      display: flex; align-items: center; justify-content: center;
+      
+      &:hover { background: var(--accent-primary); color: white; border-color: var(--accent-primary); }
     }
   }
 }
 
-/* =========================================================
-   CARDS & GLASS PANELS
-   ========================================================= */
-.kpi-card,
-.content-card,
-.glass-card {
-  background: var(--bg-secondary); /* 80% opacity white */
-  border: 1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius-xl);
-  box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(var(--glass-blur));
-  transition: var(--transition-base);
-  position: relative;
-  overflow: hidden;
+/* ---------------- GRIDS ---------------- */
 
-  /* Premium Hover Effect */
-  &:hover {
-    box-shadow: var(--shadow-lg);
-    border-color: var(--accent-focus);
-    transform: translateY(-2px);
-  }
-}
-
-.content-area {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2xl);
-}
-
-/* =========================================================
-   KPI GRID
-   ========================================================= */
+/* KPI Area */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: var(--spacing-xl);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
 }
 
-.kpi-card {
-  padding: var(--spacing-xl);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-
-  /* Colored Accents */
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 4px;
-    background: transparent;
-  }
-  &.type-revenue::before {
-    background: var(--accent-primary);
-  }
-  &.type-profit::before {
-    background: var(--color-success);
-  }
-  &.type-risk::before {
-    background: var(--color-error);
-  }
-  &.type-asset::before {
-    background: var(--accent-secondary);
-  }
-
-  .kpi-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-lg);
-
-    .label {
-      font-size: var(--font-size-xs);
-      font-weight: var(--font-weight-bold);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-label);
-    }
-
-    .icon-box {
-      width: 40px;
-      height: 40px;
-      border-radius: var(--ui-border-radius-lg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.25rem;
-
-      &.indigo {
-        background: rgba(59, 130, 246, 0.1);
-        color: var(--accent-primary);
-      }
-      &.emerald {
-        background: rgba(16, 185, 129, 0.1);
-        color: var(--color-success);
-      }
-      &.rose {
-        background: rgba(239, 68, 68, 0.1);
-        color: var(--color-error);
-      }
-      &.sky {
-        background: rgba(6, 182, 212, 0.1);
-        color: var(--accent-secondary);
-      }
-    }
-  }
-
-  .kpi-body {
-    .value {
-      font-family: var(--font-heading);
-      font-size: var(--font-size-4xl);
-      font-weight: var(--font-weight-bold);
-      color: var(--text-primary);
-      line-height: 1;
-      margin-bottom: var(--spacing-xs);
-    }
-    .sub-text {
-      font-size: var(--font-size-sm);
-      color: var(--text-secondary);
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-sm);
-
-      .trend {
-        font-weight: var(--font-weight-semibold);
-        padding: 2px 8px;
-        border-radius: var(--ui-border-radius);
-
-        &.up {
-          background: rgba(16, 185, 129, 0.15);
-          color: var(--color-success);
-        }
-        &.down {
-          background: rgba(239, 68, 68, 0.15);
-          color: var(--color-error);
-        }
-      }
-    }
-  }
-}
-
-/* =========================================================
-   CHARTS SECTION
-   ========================================================= */
-.main-charts-grid {
+/* Chart Zone: Revenue (2/3) + Donut (1/3) */
+.chart-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: var(--spacing-xl);
+  gap: 24px;
 
-  @media (max-width: 1024px) {
-    grid-template-columns: 1fr;
-  }
-}
+  @media(max-width: 1024px) { grid-template-columns: 1fr; }
 
-.content-card {
-  display: flex;
-  flex-direction: column;
-
-  .card-header {
-    padding: var(--spacing-lg) var(--spacing-xl);
-    border-bottom: 1px solid var(--border-secondary);
-    background: rgba(255, 255, 255, 0.4); /* Subtle header tint */
-
-    h3 {
-      margin: 0;
-      font-family: var(--font-heading);
-      font-size: var(--font-size-lg);
-      font-weight: var(--font-weight-semibold);
-      color: var(--text-primary);
+  .side-stack {
+    display: flex; flex-direction: column; gap: 24px;
+    
+    /* Fill the placeholder space if needed */
+    .placeholder {
+       flex: 1; 
+       background: var(--bg-ternary); 
+       border-radius: var(--ui-border-radius-xl); 
+       opacity: 0.5;
+       border: 1px dashed var(--border-secondary);
     }
   }
-
-  .card-body {
-    padding: var(--spacing-xl);
-    flex: 1;
-    position: relative;
-  }
-
-  &.p-0 .card-body {
-    padding: 0;
-  }
 }
 
-/* =========================================================
-   DATA TABLES (Modern & Clean)
-   ========================================================= */
-.clean-table {
+/* Branch Comparison (Full Width) */
+.chart-wide {
   width: 100%;
-  border-collapse: collapse;
+}
 
-  th {
-    text-align: left;
-    padding: var(--spacing-md) var(--spacing-xl);
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-bold);
-    text-transform: uppercase;
-    color: var(--text-label);
-    background: var(--bg-ternary);
-    border-bottom: 1px solid var(--border-primary);
-    position: sticky;
-    top: 0;
-    backdrop-filter: blur(8px);
-  }
-
-  td {
-    padding: var(--spacing-lg) var(--spacing-xl);
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary);
-    border-bottom: 1px solid var(--border-secondary);
-    transition: background-color 0.1s;
-
-    .primary-text {
-      font-weight: var(--font-weight-semibold);
-      color: var(--text-primary);
-      display: block;
-    }
-    .secondary-text {
-      font-size: var(--font-size-xs);
-      color: var(--text-tertiary);
-    }
-  }
-
-  tr:last-child td {
-    border-bottom: none;
-  }
-  tr:hover td {
-    background: var(--component-bg-hover, rgba(241, 245, 249, 0.5));
+/* Top Lists (Two columns) */
+.bottom-grid {
+  .grid-lists {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    @media(max-width: 768px) { grid-template-columns: 1fr; }
   }
 }
 
-/* =========================================================
-   UTILITIES & OVERRIDES
-   ========================================================= */
-.text-right {
-  text-align: right;
-}
-.text-success {
-  color: var(--color-success);
-}
-.text-danger {
-  color: var(--color-error);
-}
-.font-bold {
-  font-weight: var(--font-weight-bold);
-}
-
-/* PrimeNG Datepicker Override for Glass Theme */
-:host ::ng-deep .p-calendar .p-inputtext {
-  background: var(--bg-ternary);
-  border: 1px solid var(--border-secondary);
-  color: var(--text-primary);
-  font-size: var(--font-size-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--ui-border-radius);
-
-  &:focus {
-    border-color: var(--accent-primary);
-    box-shadow: 0 0 0 2px var(--theme-accent-focus);
-  }
-}
-
-:host ::ng-deep .p-button.p-button-rounded {
-  border-radius: var(--ui-border-radius-lg);
-}
-
-/* Animations */
-.animate-fadeIn {
-  animation: fadeIn var(--transition-slower) ease-out forwards;
-}
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--theme-border-primary);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-tertiary);
+/* Lower Widgets (Risk, Inventory, Segmentation) */
+.lower-widgets {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
 }
