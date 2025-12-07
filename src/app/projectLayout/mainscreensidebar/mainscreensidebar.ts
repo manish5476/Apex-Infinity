@@ -61,148 +61,163 @@ export class Mainscreensidebar implements OnInit {
       label: 'Dashboard', icon: 'pi pi-home',
       items: [
         { label: 'Overview', icon: 'pi pi-chart-bar', routerLink: ['/dashboard'] },
-        { label: 'Notes', icon: 'pi pi-chart-bar', routerLink: ['/notes'] },
-        { label: 'organization setting', icon: 'pi pi-cog', routerLink: ['/admin/organization'] }, 
-        { label: 'sessions', icon: 'pi pi-cog', routerLink: ['/sessions'] } 
+        { label: 'Notes', icon: 'pi pi-pencil', routerLink: ['/notes'] },
+        { label: 'Organization', icon: 'pi pi-cog', routerLink: ['/admin/organization'] }, 
+        { label: 'Sessions', icon: 'pi pi-clock', routerLink: ['/sessions'] } 
       ]
     },
-    // 🚀 NEW: FINANCIALS SECTION
     {
-      label: 'Financials', icon: 'pi pi-file-excel',
+      label: 'Financials', icon: 'pi pi-wallet',
       items: [
         { label: 'P&L Statement', icon: 'pi pi-chart-line', routerLink: ['/financials'] },
-        { label: 'Sales', icon: 'pi pi-chart-line', routerLink: ['/sales'] },
+        { label: 'Sales Reports', icon: 'pi pi-chart-bar', routerLink: ['/sales'] },
       ]
     },
-    // -----------------------------------------------------
     {
-      label: 'Admin', icon: 'pi pi-shield',
+      label: 'Admin Panel', icon: 'pi pi-shield',
       items: [
         { label: 'Master List', icon: 'pi pi-database', routerLink: ['/masterList'] },
-        { label: 'Roles', icon: 'pi pi-lock', routerLink: ['/admin/roles'] },
+        { label: 'Roles & Access', icon: 'pi pi-key', routerLink: ['/admin/roles'] },
         { label: 'Branches', icon: 'pi pi-building', routerLink: ['/branches'] },
-        { label: 'Add Branch', icon: 'pi pi-plus', routerLink: ['/branches/create'] },
-        { label: 'Transactions', icon: 'pi pi-address-book', routerLink: ['/transactions'] },
-        { label: 'logs', icon: 'pi pi-address-book', routerLink: ['/logs'] },
+        { label: 'Create Branch', icon: 'pi pi-plus-circle', routerLink: ['/branches/create'] },
+        { label: 'Transactions', icon: 'pi pi-book', routerLink: ['/transactions'] },
+        { label: 'System Logs', icon: 'pi pi-history', routerLink: ['/logs'] },
       ]
     },
     {
-      label: 'Customers', icon: 'pi pi-users',
+      label: 'Customers', icon: 'pi pi-user',
       items: [
-        { label: 'All Customers', icon: 'pi pi-list', routerLink: ['/customer'] },
+        { label: 'Customer List', icon: 'pi pi-users', routerLink: ['/customer'] },
         { label: 'Add Customer', icon: 'pi pi-user-plus', routerLink: ['/customer/create'] },
       ]
     },
     {
-      label: 'Suppliers', icon: 'pi pi-briefcase',
+      label: 'Suppliers', icon: 'pi pi-truck',
       items: [
-        { label: 'All Suppliers', icon: 'pi pi-list', routerLink: ['/suppliers'] },
+        { label: 'Supplier List', icon: 'pi pi-list', routerLink: ['/suppliers'] },
         { label: 'Add Supplier', icon: 'pi pi-plus', routerLink: ['/suppliers/create'] },
       ]
     },
     {
       label: 'Products', icon: 'pi pi-box',
       items: [
-        { label: 'Inventory', icon: 'pi pi-list', routerLink: ['/product'] },
-        { label: 'Add Product', icon: 'pi pi-plus', routerLink: ['/product/create'] },
+        { label: 'Inventory', icon: 'pi pi-list-check', routerLink: ['/product'] },
+        { label: 'Add Product', icon: 'pi pi-plus-circle', routerLink: ['/product/create'] },
       ]
     },
     {
-      label: 'purchase', icon: 'pi pi-box',
+      label: 'Purchase', icon: 'pi pi-shopping-cart',
       items: [
-        { label: 'Inventory buy', icon: 'pi pi-list', routerLink: ['/purchase'] },
-        { label: 'Add purchase', icon: 'pi pi-plus', routerLink: ['/purchase/create'] },
+        { label: 'Purchase List', icon: 'pi pi-list', routerLink: ['/purchase'] },
+        { label: 'New Purchase', icon: 'pi pi-cart-plus', routerLink: ['/purchase/create'] },
       ]
     },
     {
       label: 'Invoices', icon: 'pi pi-file',
       items: [
         { label: 'All Invoices', icon: 'pi pi-list', routerLink: ['/invoices'] },
-        { label: 'New Invoice', icon: 'pi pi-plus-circle', routerLink: ['/invoices/create'] },
+        { label: 'Create Invoice', icon: 'pi pi-plus-circle', routerLink: ['/invoices/create'] },
       ]
     },
     {
-      label: 'Payments', icon: 'pi pi-wallet',
+      label: 'Payments', icon: 'pi pi-credit-card',
       items: [
-        { label: 'Transaction History', icon: 'pi pi-history', routerLink: ['/payments'] },
-        { label: 'Record Payments', icon: 'pi pi-plus', routerLink: ['/payments/create'] },
+        { label: 'Payment History', icon: 'pi pi-history', routerLink: ['/payments'] },
+        { label: 'Record Payment', icon: 'pi pi-money-bill', routerLink: ['/payments/create'] },
       ]
     },
     {
-      label: 'EMI', icon: 'pi pi-calendar',
+      label: 'EMI Manager', icon: 'pi pi-calendar-clock',
       items: [
-        { label: 'EMI Lists', icon: 'pi pi-list', routerLink: ['/emis'] },
-        // { label: 'Create Plan', icon: 'pi pi-plus', routerLink: ['/emis/create'] },
+        { label: 'EMI List', icon: 'pi pi-list', routerLink: ['/emis'] },
       ]
     }
   ];
 }
-  // getCorrectMenuItems(): any[] {
-  //   return [
-  //     {
-  //       label: 'Dashboard', icon: 'pi pi-home',
-  //       items: [
-  //          { label: 'Overview', icon: 'pi pi-chart-bar', routerLink: ['/dashboard'] },
-  //          { label: 'organization setting', icon: 'pi pi-chart-bar', routerLink: ['/admin/organization'] }
-  //       ]
-  //     },
-  //     {
-  //       label: 'Admin', icon: 'pi pi-shield',
-  //       items: [
-  //         { label: 'Master List', icon: 'pi pi-database', routerLink: ['/masterList'] },
-  //         { label: 'Roles', icon: 'pi pi-lock', routerLink: ['/admin/roles'] },
-  //         { label: 'Branches', icon: 'pi pi-building', routerLink: ['/branches'] }, // List
-  //         { label: 'Add Branch', icon: 'pi pi-plus', routerLink: ['/branches/create'] },
-  //         { label: 'transactions', icon: 'pi pi-address-book', routerLink: ['/transactions'] },
-  //       ]
-  //     },
-  //     {
-  //       label: 'Customers', icon: 'pi pi-users',
-  //       items: [
-  //         { label: 'All Customers', icon: 'pi pi-list', routerLink: ['/customer'] },
-  //         { label: 'Add Customer', icon: 'pi pi-user-plus', routerLink: ['/customer/create'] },
-  //       ]
-  //     },
-  //     {
-  //       label: 'Suppliers', icon: 'pi pi-briefcase',
-  //       items: [
-  //         { label: 'All Suppliers', icon: 'pi pi-list', routerLink: ['/suppliers'] },
-  //         { label: 'Add Supplier', icon: 'pi pi-plus', routerLink: ['/suppliers/create'] },
-  //       ]
-  //     },
-  //     {
-  //       label: 'Products', icon: 'pi pi-box',
-  //       items: [
-  //         { label: 'Inventory', icon: 'pi pi-list', routerLink: ['/product'] },
-  //         { label: 'Add Product', icon: 'pi pi-plus', routerLink: ['/product/create'] },
-  //       ]
-  //     },
-  //     {
-  //       label: 'Invoices', icon: 'pi pi-file',
-  //       items: [
-  //         { label: 'All Invoices', icon: 'pi pi-list', routerLink: ['/invoices'] },
-  //         { label: 'New Invoice', icon: 'pi pi-plus-circle', routerLink: ['/invoices/create'] },
-  //       ]
-  //     },
-  //     {
-  //       label: 'Payments', icon: 'pi pi-wallet',
-  //       items: [
-  //         { label: 'Transaction History', icon: 'pi pi-history', routerLink: ['/payment'] },
-  //         { label: 'Record Payment', icon: 'pi pi-plus', routerLink: ['/payment/create'] },
-  //       ]
-  //     },
-  //     {
-  //       label: 'EMI', icon: 'pi pi-calendar',
-  //       items: [
-  //         { label: 'EMI Plans', icon: 'pi pi-list', routerLink: ['/emis'] },
-  //         { label: 'Create Plan', icon: 'pi pi-plus', routerLink: ['/emis/create'] },
-  //       ]
-  //     }
-  //   ];
-  // }
 
 
-
+//   getCorrectMenuItems(): any[] {
+//   return [
+//     {
+//       label: 'Dashboard', icon: 'pi pi-home',
+//       items: [
+//         { label: 'Overview', icon: 'pi pi-chart-bar', routerLink: ['/dashboard'] },
+//         { label: 'Notes', icon: 'pi pi-chart-bar', routerLink: ['/notes'] },
+//         { label: 'organization setting', icon: 'pi pi-cog', routerLink: ['/admin/organization'] }, 
+//         { label: 'sessions', icon: 'pi pi-cog', routerLink: ['/sessions'] } 
+//       ]
+//     },
+//     // 🚀 NEW: FINANCIALS SECTION
+//     {
+//       label: 'Financials', icon: 'pi pi-file-excel',
+//       items: [
+//         { label: 'P&L Statement', icon: 'pi pi-chart-line', routerLink: ['/financials'] },
+//         { label: 'Sales', icon: 'pi pi-chart-line', routerLink: ['/sales'] },
+//       ]
+//     },
+//     // -----------------------------------------------------
+//     {
+//       label: 'Admin', icon: 'pi pi-shield',
+//       items: [
+//         { label: 'Master List', icon: 'pi pi-database', routerLink: ['/masterList'] },
+//         { label: 'Roles', icon: 'pi pi-lock', routerLink: ['/admin/roles'] },
+//         { label: 'Branches', icon: 'pi pi-building', routerLink: ['/branches'] },
+//         { label: 'Add Branch', icon: 'pi pi-plus', routerLink: ['/branches/create'] },
+//         { label: 'Transactions', icon: 'pi pi-address-book', routerLink: ['/transactions'] },
+//         { label: 'logs', icon: 'pi pi-address-book', routerLink: ['/logs'] },
+//       ]
+//     },
+//     {
+//       label: 'Customers', icon: 'pi pi-users',
+//       items: [
+//         { label: 'All Customers', icon: 'pi pi-list', routerLink: ['/customer'] },
+//         { label: 'Add Customer', icon: 'pi pi-user-plus', routerLink: ['/customer/create'] },
+//       ]
+//     },
+//     {
+//       label: 'Suppliers', icon: 'pi pi-briefcase',
+//       items: [
+//         { label: 'All Suppliers', icon: 'pi pi-list', routerLink: ['/suppliers'] },
+//         { label: 'Add Supplier', icon: 'pi pi-plus', routerLink: ['/suppliers/create'] },
+//       ]
+//     },
+//     {
+//       label: 'Products', icon: 'pi pi-box',
+//       items: [
+//         { label: 'Inventory', icon: 'pi pi-list', routerLink: ['/product'] },
+//         { label: 'Add Product', icon: 'pi pi-plus', routerLink: ['/product/create'] },
+//       ]
+//     },
+//     {
+//       label: 'purchase', icon: 'pi pi-box',
+//       items: [
+//         { label: 'Inventory buy', icon: 'pi pi-list', routerLink: ['/purchase'] },
+//         { label: 'Add purchase', icon: 'pi pi-plus', routerLink: ['/purchase/create'] },
+//       ]
+//     },
+//     {
+//       label: 'Invoices', icon: 'pi pi-file',
+//       items: [
+//         { label: 'All Invoices', icon: 'pi pi-list', routerLink: ['/invoices'] },
+//         { label: 'New Invoice', icon: 'pi pi-plus-circle', routerLink: ['/invoices/create'] },
+//       ]
+//     },
+//     {
+//       label: 'Payments', icon: 'pi pi-wallet',
+//       items: [
+//         { label: 'Transaction History', icon: 'pi pi-history', routerLink: ['/payments'] },
+//         { label: 'Record Payments', icon: 'pi pi-plus', routerLink: ['/payments/create'] },
+//       ]
+//     },
+//     {
+//       label: 'EMI', icon: 'pi pi-calendar',
+//       items: [
+//         { label: 'EMI Lists', icon: 'pi pi-list', routerLink: ['/emis'] },
+//         // { label: 'Create Plan', icon: 'pi pi-plus', routerLink: ['/emis/create'] },
+//       ]
+//     }
+//   ];
+// }
   // --- No changes to the functions below ---
   toggleMenuItem(label: string) {
     if (this.expandedItems.hasOwnProperty(label)) {
