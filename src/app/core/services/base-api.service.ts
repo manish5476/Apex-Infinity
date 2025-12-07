@@ -27,33 +27,59 @@ export abstract class BaseApiService {
     return params;
   }
 
-  // Generic GET Automatically converts 'params' object to HttpParams   */
   protected get<T>(endpoint: string, params: any = {}, context: string = 'API GET'): Observable<T> {
     const httpParams = this.createHttpParams(params);
     return this.http
-      .get<T>(`${this.baseUrl}${endpoint}`, { params: httpParams })
+      .get<T>(`${this.baseUrl}${endpoint}`, { params: httpParams, withCredentials: true })
       .pipe(catchError((error) => this.errorhandler.handleError(error, context)));
   }
 
-  // Generic POST   */
   protected post<T>(endpoint: string, data: any, context: string = 'API POST'): Observable<T> {
     return this.http
-      .post<T>(`${this.baseUrl}${endpoint}`, data)
+      .post<T>(`${this.baseUrl}${endpoint}`, data, { withCredentials: true })
       .pipe(catchError((error) => this.errorhandler.handleError(error, context)));
   }
 
-  // Generic PATCH   */
   protected patch<T>(endpoint: string, data: any, context: string = 'API PATCH'): Observable<T> {
     return this.http
-      .patch<T>(`${this.baseUrl}${endpoint}`, data)
+      .patch<T>(`${this.baseUrl}${endpoint}`, data, { withCredentials: true })
       .pipe(catchError((error) => this.errorhandler.handleError(error, context)));
   }
 
-  // Generic DELETE   */
   protected delete<T>(endpoint: string, context: string = 'API DELETE'): Observable<T> {
     return this.http
-      .delete<T>(`${this.baseUrl}${endpoint}`)
+      .delete<T>(`${this.baseUrl}${endpoint}`, { withCredentials: true })
       .pipe(catchError((error) => this.errorhandler.handleError(error, context)));
   }
+
+
+  // Generic GET Automatically converts 'params' object to HttpParams   */
+  // protected get<T>(endpoint: string, params: any = {}, context: string = 'API GET'): Observable<T> {
+  //   const httpParams = this.createHttpParams(params);
+  //   return this.http
+  //     .get<T>(`${this.baseUrl}${endpoint}`, { params: httpParams })
+  //     .pipe(catchError((error) => this.errorhandler.handleError(error, context)));
+  // }
+
+  // // Generic POST   */
+  // protected post<T>(endpoint: string, data: any, context: string = 'API POST'): Observable<T> {
+  //   return this.http
+  //     .post<T>(`${this.baseUrl}${endpoint}`, data)
+  //     .pipe(catchError((error) => this.errorhandler.handleError(error, context)));
+  // }
+
+  // // Generic PATCH   */
+  // protected patch<T>(endpoint: string, data: any, context: string = 'API PATCH'): Observable<T> {
+  //   return this.http
+  //     .patch<T>(`${this.baseUrl}${endpoint}`, data)
+  //     .pipe(catchError((error) => this.errorhandler.handleError(error, context)));
+  // }
+
+  // // Generic DELETE   */
+  // protected delete<T>(endpoint: string, context: string = 'API DELETE'): Observable<T> {
+  //   return this.http
+  //     .delete<T>(`${this.baseUrl}${endpoint}`)
+  //     .pipe(catchError((error) => this.errorhandler.handleError(error, context)));
+  // }
 }
 
