@@ -1,710 +1,923 @@
-<p-confirmDialog icon="pi pi-exclamation-triangle"></p-confirmDialog>
-<p-toast></p-toast>
+<p-toast position="bottom-right" zIndex="2000"></p-toast>
 
-<div class="notes-manager-host" [class.focus-mode]="isFocusMode">
-
-  <!-- 1. UNIFIED TOOLBAR -->
-  <div class="notes-toolbar">
-    <div class="toolbar-left">
-      <div class="title-block">
-        <h1 class="notes-title">Journal</h1>
-        <div class="notes-subtitle">
-          <span class="scope-label">{{ selectedDate() | date:'fullDate' }}</span>
-          <span class="dot-separator">•</span>
-          <span class="scope-count">{{ filteredDailyNotes.length }} entries</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="toolbar-right">
-      <div class="shortcut-hints hidden md:flex">
-        <span class="kbd-chip">Ctrl</span><span class="kbd-plus">+</span><span class="kbd-chip">S</span>
-        <span class="hint-label">Save</span>
-      </div>
-
-      <button pButton icon="pi pi-arrows-alt" 
-              class="p-button-text p-button-rounded focus-btn"
-              (click)="toggleFocusMode()" pTooltip="Focus Mode"></button>
-
-      <button pButton icon="pi pi-plus" label="New Note" 
-              class="primary-new-btn p-button-sm p-button-rounded"
-              (click)="startNewNote()"></button>
-    </div>
+<section class="notes-container">
+  <!-- Animated Background -->
+  <div class="bg-decoration">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
   </div>
 
-  <!-- 2. TIMELINE STRIP (Enhanced Dock) -->
-  <div class="timeline-wrapper">
-    <div class="timeline-header">
-      <div class="nav-controls">
-        <button class="nav-btn" (click)="changeTimelineMonth(-1)"><i class="pi pi-chevron-left"></i></button>
-        <span class="current-month" (click)="jumpToToday()" pTooltip="Jump to Today">{{ currentMonthName() }}</span>
-        <button class="nav-btn" (click)="changeTimelineMonth(1)"><i class="pi pi-chevron-right"></i></button>
-      </div>
-    </div>
-
-    <div class="timeline-strip" #scrollContainer>
-      @if (isTimelineLoading()) {
-        <div class="skeleton-wrapper flex gap-2 justify-center">
-          @for (i of [1,2,3,4,5,6,7,8,9,10]; track i) {
-            <div class="day-card skeleton bg-gray-100 animate-pulse"></div>
-          }
+  <div class="content-wrapper">
+    <!-- Header Navigation -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="logo-section">
+          <div class="logo-icon">
+            <i class="pi pi-book"></i>
+          </div>
+          <h1 class="app-title">Notes</h1>
         </div>
-      } @else {
-        @for (day of timelineDays(); track day.date) {
-          <div class="day-card"
-               [class.active]="isSameDate(day.date, selectedDate())"
-               [class.today]="isToday(day.date)"
-               (click)="onDateSelect(day.date)" pRipple>
-            <span class="day-name">{{ day.dayName }}</span>
-            <span class="day-num">{{ day.dayNum }}</span>
-            <div class="indicators">
-              <!-- Show dots based on intensity -->
-              @if (day.count > 0) {
-                <div class="dot primary"></div>
-                @if(day.count > 2) { <div class="dot primary"></div> }
-                @if(day.count > 5) { <div class="dot primary"></div> }
-              } @else {
-                <!-- Empty placeholder dots for alignment -->
-                <div class="dot"></div>
-              }
-            </div>
-          </div>
-        }
-      }
-    </div>
-  </div>
 
-  <!-- 3. MAIN CONTENT (Tabs) -->
-  <p-tabs [(value)]="activeTabValue" (onChange)="onTabChange($event)" styleClass="h-full flex flex-col">
-    <p-tablist>
-      <p-tab value="day">Day Editor</p-tab>
-      <p-tab value="week">Week Summary</p-tab>
-      <p-tab value="month">Month Summary</p-tab>
-    </p-tablist>
-
-    <p-tabpanels>
-      
-      <!-- DAY VIEW (Editor) -->
-      <p-tabpanel value="day">
-        <div class="notes-layout">
-          
-          <!-- SIDEBAR (List) -->
-          <div class="notes-sidebar" *ngIf="!isFocusMode">
-            <div class="search-bar">
-              <span class="p-input-icon-left w-full">
-                <i class="pi pi-search"></i>
-                <input type="text" pInputText placeholder="Search notes..." 
-                       [formControl]="searchControl" class="w-full p-inputtext-sm" />
-              </span>
-            </div>
-
-            <div class="notes-list-wrapper">
-              @if (isContentLoading()) {
-                <div class="flex flex-col gap-3 p-3">
-                  <p-skeleton height="80px" styleClass="w-full"></p-skeleton>
-                  <p-skeleton height="80px" styleClass="w-full"></p-skeleton>
-                </div>
-              } @else {
-                <div class="notes-list">
-                  @for (note of filteredDailyNotes; track note._id) {
-                    <div class="note-card" [class.active]="selectedNote?._id === note._id"
-                         (click)="selectNote(note)">
-                      <div class="note-card-border"></div>
-                      <div class="note-card-header">
-                        <h3 class="note-title">{{ note.title || 'Untitled' }}</h3>
-                      </div>
-                      <div class="note-meta">
-                        <span class="note-time">{{ note.createdAt | date:'shortTime' }}</span>
-                        @if(note.attachments.length) { <i class="pi pi-paperclip"></i> }
-                      </div>
-                      <p class="note-excerpt">{{ note.content | slice:0:60 }}...</p>
-                    </div>
-                  } @empty {
-                    <div class="empty-list">
-                      <i class="pi pi-pencil mb-2 text-2xl"></i>
-                      <p>No notes for this day.</p>
-                    </div>
-                  }
-                </div>
-              }
-            </div>
-          </div>
-
-          <!-- EDITOR -->
-          <div class="note-editor-panel">
-            <form [formGroup]="noteForm" (ngSubmit)="saveNote()" class="note-form">
-              
-              <div class="editor-header">
-                <input type="text" pInputText placeholder="Title your thought..." 
-                       formControlName="title" class="title-input" />
-                <div class="editor-actions">
-                  <button pButton type="button" icon="pi pi-trash" 
-                          class="p-button-text p-button-danger p-button-rounded"
-                          *ngIf="isEditing" (click)="deleteNote(selectedNote)"></button>
-                  <button pButton type="submit" icon="pi pi-check" label="Save" 
-                          class="p-button-sm p-button-rounded" [loading]="isSaving"></button>
-                </div>
-              </div>
-
-              <div class="editor-body">
-                <div class="editor-content">
-                  <textarea pInputTextarea placeholder="Write something..." 
-                            formControlName="content" class="content-textarea"></textarea>
-                  
-                  <!-- Attachments Preview -->
-                  <div class="attachments-area" *ngIf="imagePreviews.length || noteForm.get('attachments')?.value?.length">
-                    <div class="attachment-thumb" *ngFor="let att of noteForm.get('attachments')?.value; let i=index">
-                      <img [src]="att.url" />
-                      <button type="button" class="remove-btn" (click)="removeServerAttachment(i)"><i class="pi pi-times"></i></button>
-                    </div>
-                    <div class="attachment-thumb local" *ngFor="let prev of imagePreviews; let i=index">
-                      <img [src]="prev" />
-                      <button type="button" class="remove-btn" (click)="removeLocalPreview(i)"><i class="pi pi-times"></i></button>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Editor Sidebar -->
-                <div class="editor-sidebar">
-                  <div class="sidebar-section">
-                    <label>Tags</label>
-                    <p-autoComplete formControlName="tags" [multiple]="true" placeholder="+ Tag" class="w-full"></p-autoComplete>
-                  </div>
-                  <div class="sidebar-section">
-                    <label>Media</label>
-                    <button pButton type="button" label="Upload" icon="pi pi-upload" 
-                            class="p-button-outlined p-button-sm w-full"
-                            (click)="fileInput.click()"></button>
-                    <input #fileInput type="file" (change)="onFileSelect($event)" 
-                           multiple accept="image/*" style="display:none">
-                  </div>
-                </div>
-              </div>
-
-            </form>
-          </div>
-
-        </div>
-      </p-tabpanel>
-
-      <!-- SUMMARY VIEWS (New Masonry Grid) -->
-      @for (summary of summaries; track summary.key) {
-        <p-tabpanel [value]="summary.key">
-          <div class="summary-container">
-            <!-- @if (isLoading[summary.key]) {
-              <div class="summary-grid">
-                <p-skeleton height="150px" borderRadius="12px"></p-skeleton>
-                <p-skeleton height="150px" borderRadius="12px"></p-skeleton>
-                <p-skeleton height="150px" borderRadius="12px"></p-skeleton>
-              </div>
-            } @else { -->
-              @if (getSummaryData(summary.key).length > 0) {
-                <div class="summary-grid">
-                  @for (note of getSummaryData(summary.key); track note._id) {
-                    <div class="summary-card" (click)="selectNote(note); activeTabValue='day'">
-                      <div class="card-header">
-                        <h4 class="card-title">{{ note.title || 'Untitled' }}</h4>
-                        <span class="card-date">{{ note.createdAt | date:'MMM d' }}</span>
-                      </div>
-                      <p class="card-preview">{{ note.content }}</p>
-                      
-                      <div class="card-footer">
-                        <div class="tags-list">
-                          @for (tag of note.tags; track tag) {
-                            <span class="mini-tag">{{ tag }}</span>
-                          }
-                        </div>
-                        <div class="meta-icons">
-                          @if(note.attachments.length) { <span><i class="pi pi-paperclip"></i> {{note.attachments.length}}</span> }
-                        </div>
-                      </div>
-                    </div>
-                  }
-                </div>
-              } @else {
-                <div class="empty-summary">
-                  <i class="pi pi-inbox"></i>
-                  <h3>No notes found</h3>
-                  <p>There are no notes recorded for this {{ summary.key }}.</p>
-                </div>
-              }
-            <!-- } -->
-          </div>
-        </p-tabpanel>
-      }
-
-    </p-tabpanels>
-  </p-tabs>
-
-</div>
-
-<!-- <p-confirmDialog icon="pi pi-exclamation-triangle"></p-confirmDialog>
-<p-toast></p-toast>
-
-<div class="notes-manager-host" [class.focus-mode]="isFocusMode">
-
-  GLOBAL TOOLBAR
-  <div class="notes-toolbar">
-    <div class="toolbar-left">
-      <div class="title-block">
-        <h1 class="notes-title">Notes</h1>
-        <div class="notes-subtitle">
-          <span class="scope-label">{{ activeScopeLabel }}</span>
-          <span class="dot-separator">•</span>
-          <span class="scope-count">{{ totalNotesInScope }} {{ totalNotesInScope === 1 ? 'note' : 'notes' }}</span>
-
-          @if (lastUpdatedLabel) {
-            <span class="dot-separator">•</span>
-            <span class="last-updated">Last updated {{ lastUpdatedLabel }}</span>
-          }
-
-          @if (attachmentsCount > 0) {
-            <span class="dot-separator">•</span>
-            <span class="attachments-count">
-              <i class="pi pi-paperclip mr-1"></i>{{ attachmentsCount }} attachment{{ attachmentsCount > 1 ? 's' : '' }}
-            </span>
-          }
-        </div>
-      </div>
-    </div>
-
-    <div class="toolbar-right">
-      <div class="shortcut-hints">
-        <span class="kbd-chip">Ctrl</span><span class="kbd-plus">+</span><span class="kbd-chip">N</span>
-        <span class="hint-label">New</span>
-        <span class="hint-divider"></span>
-        <span class="kbd-chip">Ctrl</span><span class="kbd-plus">+</span><span class="kbd-chip">S</span>
-        <span class="hint-label">Save</span>
+        <nav class="view-tabs">
+          <button class="tab-btn" [class.active]="activeView() === 'calendar'" (click)="switchView('calendar')">
+            <i class="pi pi-calendar"></i>
+            <span>Calendar</span>
+          </button>
+          <button class="tab-btn" [class.active]="activeView() === 'archive'" (click)="switchView('archive')">
+            <i class="pi pi-database"></i>
+            <span>All Notes</span>
+          </button>
+        </nav>
       </div>
 
-      <button
-        pButton
-        type="button"
-        icon="pi" 
-        [icon]="isFocusMode ? 'pi pi-clone' : 'pi pi-arrows-h'"
-        class="p-button-text p-button-rounded p-button-sm focus-btn"
-        pTooltip="Toggle focus mode (hide/show list)"
-        (click)="toggleFocusMode()">
+      <button class="btn-new-note" (click)="openNewNote()" pTooltip="New Note" tooltipPosition="bottom">
+        <i class="pi pi-plus"></i>
+        <span>New Note</span>
       </button>
+    </header>
 
-      <button
-        pButton
-        type="button"
-        icon="pi pi-refresh"
-        class="p-button-text p-button-sm"
-        (click)="refreshCurrentView()"
-        pTooltip="Refresh notes">
-      </button>
-
-      <button
-        pButton
-        icon="pi pi-plus"
-        label="New"
-        class="p-button-sm p-button-rounded primary-new-btn"
-        (click)="startNewNote()">
-      </button>
-    </div>
-  </div>
-
-  MAIN BODY WITH TABS
-  <p-tabs [(value)]="activeTabValue" (onChange)="onTabChange($event)">
-    <p-tablist>
-      <p-tab value="day" class="flex items-center !gap-2">
-        <i class="pi pi-calendar"></i>
-        <span class="font-bold whitespace-nowrap">Day</span>
-      </p-tab>
-
-      @for (summary of summaries; track summary.key) {
-        <p-tab [value]="summary.key" class="flex items-center !gap-2">
-          <i [class]="summary.icon"></i>
-          <span class="font-bold whitespace-nowrap">{{ summary.title }}</span>
-        </p-tab>
-      }
-    </p-tablist>
-
-    <p-tabpanels>
-      ========== DAY VIEW (WRITE MODE) ==========
-      <p-tabpanel value="day">
-        <div class="notes-layout">
-
-          SIDEBAR
-          <div class="notes-sidebar" *ngIf="!isFocusMode">
+    <!-- CALENDAR VIEW -->
+    @if (activeView() === 'calendar') {
+      <div class="view-content">
+        <div class="calendar-layout">
+          <!-- Sidebar: Daily Notes -->
+          <aside class="sidebar-notes">
             <div class="sidebar-header">
-              <h2 class="section-title">Daily Notes</h2>
-              <div class="header-actions">
-                <button
-                  pButton
-                  type="button"
-                  icon="pi pi-filter"
-                  class="p-button-text p-button-sm hidden md:inline-flex"
-                  pTooltip="Search by title/content only (for now)">
-                </button>
+              <div class="date-info">
+                <h2 class="day-name">{{ selectedDate() | date:'EEEE' }}</h2>
+                <p class="date-full">{{ selectedDate() | date:'MMMM d, y' }}</p>
               </div>
             </div>
 
-            <div class="sidebar-content">
-              <div class="search-bar">
-                <span class="p-input-icon-left w-full">
-                  <i class="pi pi-search"></i>
-                  <input
-                    type="text"
-                    pInputText
-                    placeholder="Search in today’s notes..."
-                    class="w-full p-inputtext-sm"
-                    [formControl]="searchControl" />
-                </span>
-              </div>
-
-              <div class="notes-list-wrapper">
-                @if (isLoading.day) {
-                  <div class="skeleton-loader">
-                    @for (item of [1, 2, 3, 4, 5]; track item) {
-                      <div class="skeleton-card"></div>
-                    }
+            <div class="notes-list">
+              @for (note of dailyNotes(); track note._id) {
+                <article class="note-card" (click)="viewNote(note)">
+                  <div class="note-header-row">
+                    <span class="note-time">
+                      <i class="pi pi-clock"></i>
+                      {{ note.createdAt | date:'shortTime' }}
+                    </span>
+                    <!-- Optional: Quick actions on hover could go here -->
                   </div>
-                } @else {
-                  @if (filteredDailyNotes.length > 0) {
-                    <div class="notes-list">
-                      @for (note of filteredDailyNotes; track note._id) {
-                        <div
-                          class="note-card"
-                          [class.active]="selectedNote?._id === note._id"
-                          (click)="selectNote(note)">
-                          <div class="note-card-border"></div>
-                          <div class="note-card-content">
-                            <div class="note-card-header">
-                              <h3 class="note-title">
-                                {{ note.title || 'Untitled Note' }}
-                              </h3>
-                              <span
-                                class="note-status-pill"
-                                [class.locked]="!isEditable(note)">
-                                <span class="status-dot"></span>
-                                {{ isEditable(note) ? 'Editable' : 'Locked' }}
-                              </span>
-                            </div>
 
-                            <p class="note-excerpt">
-                              {{ note.content | slice: 0: 80 }}{{ note.content.length > 80 ? '...' : '' }}
-                            </p>
+                  <h3 class="note-title">{{ note.title || 'Untitled' }}</h3>
+                  <p class="note-excerpt">{{ note.content }}</p>
 
-                            <div class="note-meta">
-                              <span class="note-date">
-                                {{ note.createdAt | date: 'shortTime' }}
-                              </span>
-
-                              <div class="note-meta-right">
-                                @if (note.tags && note.tags.length > 0) {
-                                  <div class="note-tags">
-                                    <i class="pi pi-tag"></i>
-                                    <span>{{ note.tags.length }}</span>
-                                  </div>
-                                }
-                                @if (note.attachments && note.attachments.length > 0) {
-                                  <div class="note-tags">
-                                    <i class="pi pi-paperclip"></i>
-                                  </div>
-                                }
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                  @if (note.tags.length) {
+                    <div class="note-tags" style="display: flex; gap: 4px; margin-top: 8px;">
+                      @for (tag of note.tags; track tag) {
+                        <span style="font-size: 10px; opacity: 0.7; background: var(--bg-ternary); padding: 2px 4px; border-radius: 4px;">#{{tag}}</span>
                       }
                     </div>
-                  } @else {
-                    <ng-container *ngTemplateOutlet="emptyState"></ng-container>
                   }
+                </article>
+              } @empty {
+                <div class="empty-state">
+                  <i class="pi pi-book"></i>
+                  <p>No entries for this day</p>
+                  <button class="btn-new-note" style="width: auto; padding: 0.5rem 1rem; font-size: 0.8rem;" (click)="openNewNote()">
+                    Start Writing
+                  </button>
+                </div>
+              }
+            </div>
+          </aside>
+
+          <!-- Main: Calendar -->
+          <main class="calendar-main">
+            <div class="calendar-card">
+              <!-- Calendar Controls -->
+              <div class="calendar-controls">
+                <div class="month-nav">
+                  <button class="btn-icon" (click)="changeMonth(-1)">
+                    <i class="pi pi-chevron-left"></i>
+                  </button>
+                  <h3 class="month-title">{{ currentMonthName() }}</h3>
+                  <button class="btn-icon" (click)="changeMonth(1)">
+                    <i class="pi pi-chevron-right"></i>
+                  </button>
+                </div>
+
+                <button class="btn-today" (click)="jumpToToday()">Today</button>
+              </div>
+
+              <!-- Calendar Grid -->
+              <div class="calendar-grid">
+                @for (day of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; track day) {
+                  <div class="calendar-header-cell">{{ day }}</div>
+                }
+
+                @for (day of calendarDays(); track $index) {
+                  <div class="calendar-day" 
+                       [class.other-month]="!day.isCurrentMonth" 
+                       [class.today]="day.isToday"
+                       [class.selected]="day.isSelected" 
+                       (click)="selectDay(day)">
+
+                    <span class="day-number">{{ day.dayNum }}</span>
+
+                    @if (day.noteCount > 0) {
+                      <div class="day-indicators">
+                        @for (item of getIndicators(day.noteCount); track $index) {
+                          <span class="indicator" 
+                                [class.high]="day.noteCount > 2" 
+                                [class.medium]="day.noteCount === 2"
+                                [class.low]="day.noteCount === 1">
+                          </span>
+                        }
+                      </div>
+                    }
+                  </div>
                 }
               </div>
             </div>
+
+            <!-- Stats Card -->
+            <div class="stats-card">
+              <div class="stats-content">
+                <h3>Daily Momentum</h3>
+                <p>
+                  <strong>{{ dailyNotes().length }}</strong> {{ dailyNotes().length === 1 ? 'note' : 'notes' }} today.
+                  Keep going!
+                </p>
+              </div>
+              <i class="pi pi-chart-line stats-icon"></i>
+            </div>
+          </main>
+        </div>
+      </div>
+    }
+
+    <!-- ARCHIVE VIEW -->
+    @if (activeView() === 'archive') {
+      <div class="view-content">
+        <!-- Archive Controls -->
+        <div class="archive-controls">
+          <div class="search-box">
+            <i class="pi pi-search"></i>
+            <input type="text" placeholder="Search notes..." [value]="searchQuery()"
+              (input)="searchQuery.set($any($event.target).value)">
           </div>
 
-          EDITOR
-          <div class="note-editor-panel">
-            <form [formGroup]="noteForm" (ngSubmit)="saveNote()" class="note-form">
-              <div class="editor-header">
-                <div class="editor-header-left">
-                  <input
-                    type="text"
-                    pInputText
-                    placeholder="Give your note a title..."
-                    formControlName="title"
-                    class="title-input" />
-                  <span class="date-indicator">
-                    {{ date['date'] | date: 'fullDate' }}
-                  </span>
-                </div>
+          <div class="filter-select" style="position: relative;">
+            <i class="pi pi-tag" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); pointer-events: none;"></i>
+            <select [value]="filterTag()" (change)="filterTag.set($any($event.target).value)" 
+                    style="padding-left: 36px; height: 100%; border: 1px solid var(--border-secondary); border-radius: 8px; background: var(--bg-primary); color: var(--text-primary); cursor: pointer;">
+              <option value="all">All Tags</option>
+              @for (tag of allTags(); track tag) {
+                <option [value]="tag">{{ tag }}</option>
+              }
+            </select>
+          </div>
 
-                <div class="editor-actions">
-                  <button
-                    pButton
-                    type="submit"
-                    label="Save"
-                    icon="pi pi-check"
-                    class="p-button-sm"
-                    [disabled]="
-                      noteForm.invalid ||
-                      isSaving ||
-                      (isEditing && !isEditable(selectedNote))
-                    "
-                    [loading]="isSaving">
-                  </button>
+          <button class="btn-new-note" style="background: white; color: var(--text-secondary); border: 1px solid var(--border-secondary); box-shadow: none;" 
+                  (click)="toggleViewMode()" pTooltip="Toggle View">
+            <i class="pi" [class.pi-th-large]="viewMode() === 'list'" [class.pi-list]="viewMode() === 'grid'"></i>
+          </button>
+        </div>
 
-                  @if (isEditing) {
-                    <button
-                      pButton
-                      type="button"
-                      icon="pi pi-trash"
-                      class="p-button-danger p-button-text p-button-sm"
-                      [disabled]="!isEditable(selectedNote)"
-                      (click)="deleteNote(selectedNote)">
-                    </button>
-                  }
-                </div>
-              </div>
+        <!-- Notes Grid/List -->
+        <div class="archive-content">
+          @for (group of notesGroupedByMonth(); track group.monthKey) {
+            <section class="month-section">
+              <h3 style="font-family: var(--font-heading); font-size: var(--font-size-lg); font-weight: 700; color: var(--text-secondary); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">
+                <i class="pi pi-calendar" style="color: var(--accent-primary);"></i>
+                {{ group.monthName }}
+                <span style="margin-left: auto; font-size: 0.8rem; font-weight: 400; color: var(--text-tertiary);">{{ group.notes.length }} notes</span>
+              </h3>
 
-              <div class="editor-body">
-                <div class="editor-content">
-                  <textarea
-                    pInputTextarea
-                    placeholder="Capture today's important context, decisions or events..."
-                    formControlName="content"
-                    class="content-textarea">
-                  </textarea>
-                </div>
-
-                <div class="editor-sidebar">
-                  <div class="sidebar-section">
-                    <label><i class="pi pi-tags mr-2"></i>Tags</label>
-                    <p-autoComplete
-                      formControlName="tags"
-                      [multiple]="true"
-                      placeholder="Add tags (e.g. 'client', 'idea', 'bug')"
-                      class="w-full">
-                    </p-autoComplete>
-                  </div>
-
-                  <div class="sidebar-section">
-                    <label><i class="pi pi-paperclip mr-2"></i>Attachments</label>
-
-                    <div class="upload-controls mb-2">
-                      <button
-                        pButton
-                        type="button"
-                        icon="pi pi-plus"
-                        label="Add Image"
-                        class="p-button-outlined p-button-sm w-full"
-                        (click)="fileInput.click()">
-                      </button>
-                      <input
-                        #fileInput
-                        type="file"
-                        (change)="onFileSelect($event)"
-                        multiple
-                        accept="image/*"
-                        style="display: none;">
+              <div class="notes-grid" [style.grid-template-columns]="viewMode() === 'list' ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))'">
+                @for (note of group.notes; track note._id) {
+                  <article class="archive-note-card">
+                    <div class="card-header">
+                      <span class="card-date">{{ note.createdAt | date:'MMM d' }}</span>
+                      <div class="card-actions" style="display: flex; gap: 4px;">
+                        <button class="btn-icon" style="width: 24px; height: 24px; border: none; background: transparent; cursor: pointer; color: var(--text-tertiary);" (click)="editNote(note); $event.stopPropagation()">
+                          <i class="pi pi-pencil" style="font-size: 12px;"></i>
+                        </button>
+                         <button class="btn-icon" style="width: 24px; height: 24px; border: none; background: transparent; cursor: pointer; color: var(--color-error);" (click)="deleteNote(note); $event.stopPropagation()">
+                          <i class="pi pi-trash" style="font-size: 12px;"></i>
+                        </button>
+                      </div>
                     </div>
 
-                    @if (imagePreviews.length > 0) {
-                      <div class="attachments-preview">
-                        @for (preview of imagePreviews; track i; let i = $index) {
-                          <div class="attachment-thumb local-preview">
-                            <img [src]="preview" alt="New Upload" />
-                            <div class="upload-badge">New</div>
-                            <button
-                              type="button"
-                              pButton
-                              icon="pi pi-times"
-                              class="remove-btn p-button-rounded p-button-danger p-button-text"
-                              (click)="removeLocalPreview(i)">
-                            </button>
-                          </div>
-                        }
-                      </div>
-                    }
+                    <h4 class="card-title" (click)="viewNote(note)">{{ note.title || 'Untitled' }}</h4>
+                    <p class="card-content">{{ note.content }}</p>
 
-                    @if (noteForm.get('attachments')?.value?.length > 0) {
-                      <div class="attachments-preview">
-                        @for (att of noteForm.get('attachments')?.value; track i; let i = $index) {
-                          <div class="attachment-thumb">
-                            <img [src]="att.url" alt="Saved Attachment" />
-                            <button
-                              type="button"
-                              pButton
-                              icon="pi pi-times"
-                              class="remove-btn p-button-rounded p-button-danger p-button-text"
-                              (click)="removeServerAttachment(i)">
-                            </button>
-                          </div>
-                        }
-                      </div>
-                    }
-                  </div>
+                    <div style="margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border-primary); display: flex; gap: 8px;">
+                         @if(note.attachments.length) {
+                          <span style="font-size: 10px; color: var(--text-tertiary); display: flex; align-items: center; gap: 4px;">
+                            <i class="pi pi-paperclip"></i> {{ note.attachments.length }}
+                          </span>
+                         }
+                    </div>
+                  </article>
+                }
+              </div>
+            </section>
+          } @empty {
+            <div class="empty-state">
+              <i class="pi pi-inbox"></i>
+              <h3>No notes found</h3>
+              <p>Try adjusting your search or filters</p>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</section>
+
+<!-- EDITOR DIALOG -->
+<p-dialog 
+  [(visible)]="isEditorVisible" 
+  [modal]="true" 
+  [style]="{width: '90vw', maxWidth: '800px', height: 'auto'}" 
+  [showHeader]="true"
+  styleClass="editor-dialog" 
+  [draggable]="false" 
+  [resizable]="false"
+  [closeOnEscape]="false">
+
+  <!-- HEADER TEMPLATE -->
+  <ng-template pTemplate="header">
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em;">
+          {{ selectedDate() | date:'fullDate' }}
+        </span>
+        @if (isSaving) {
+          <span style="font-size: 0.75rem; color: var(--accent-primary); display: flex; align-items: center; gap: 4px;">
+            <i class="pi pi-spin pi-spinner"></i> Saving...
+          </span>
+        }
+      </div>
+      
+      <button class="btn-icon" 
+              style="width: 32px; height: 32px; border: 1px solid var(--border-secondary); background: transparent; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center;"
+              (click)="toggleEditMode()"
+              [pTooltip]="isPreviewMode ? 'Edit' : 'Preview'">
+        <i class="pi" [class.pi-pencil]="isPreviewMode" [class.pi-eye]="!isPreviewMode"></i>
+      </button>
+    </div>
+  </ng-template>
+
+  <!-- CONTENT -->
+  <div class="editor-content" [class.preview-mode]="isPreviewMode" style="padding: 0;">
+    <form [formGroup]="noteForm">
+
+      @if (!isPreviewMode) {
+        <input type="text" formControlName="title" class="editor-title" placeholder="Title your thought..." />
+
+        <!-- Toolbar -->
+        <div style="display: flex; gap: 12px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-primary);">
+          <div style="flex: 1;">
+            <p-autoComplete formControlName="tags" [multiple]="true" placeholder="+ Add tags" styleClass="w-full"></p-autoComplete>
+          </div>
+          
+          <button type="button" 
+                  style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; border: 1px solid var(--border-secondary); background: var(--bg-ternary); border-radius: 6px; cursor: pointer; color: var(--text-secondary); font-size: 0.85rem;" 
+                  (click)="triggerFileUpload()">
+            <i class="pi pi-image"></i>
+            <span>Media</span>
+          </button>
+          <input #fileInput type="file" (change)="onFileSelect($event)" multiple accept="image/*" style="display: none;">
+        </div>
+
+        @if (imagePreviews.length > 0) {
+          <div style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 16px;">
+            @for (img of imagePreviews; track $index) {
+              <div style="position: relative; flex-shrink: 0; width: 100px; height: 100px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-secondary);">
+                <img [src]="img.url" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">
+                <button (click)="removeAttachment($index)" style="position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; border-radius: 50%; background: white; border: none; color: red; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                  <i class="pi pi-times" style="font-size: 10px;"></i>
+                </button>
+              </div>
+            }
+          </div>
+        }
+
+        <textarea formControlName="content" class="editor-textarea" placeholder="Start writing your story here..."></textarea>
+      } @else {
+        <!-- PREVIEW MODE -->
+        <h2 style="font-family: var(--font-heading); font-size: 1.75rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem;">
+          {{ noteForm.get('title')?.value || 'Untitled' }}
+        </h2>
+
+        @if (noteForm.get('tags')?.value?.length) {
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px;">
+            @for (tag of noteForm.get('tags')?.value; track tag) {
+              <span style="background: var(--accent-focus); color: var(--accent-primary); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">#{{tag}}</span>
+            }
+          </div>
+        }
+
+        @if (imagePreviews.length > 0) {
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 24px;">
+            @for (img of imagePreviews; track $index) {
+              <img [src]="img.url" alt="Attachment" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-secondary);">
+            }
+          </div>
+        }
+
+        <div style="font-size: 1rem; line-height: 1.6; color: var(--text-primary); white-space: pre-wrap;">
+          {{ noteForm.get('content')?.value }}
+        </div>
+      }
+    </form>
+  </div>
+
+  <!-- FOOTER TEMPLATE -->
+  <ng-template pTemplate="footer">
+    <div style="display: flex; justify-content: flex-end; gap: 12px; align-items: center;">
+      <button class="btn-secondary" 
+              style="padding: 10px 20px; border: 1px solid var(--border-secondary); background: white; border-radius: 8px; cursor: pointer; color: var(--text-secondary); font-weight: 600;"
+              (click)="isEditorVisible=false">
+        {{ isPreviewMode ? 'Close' : 'Discard' }}
+      </button>
+
+      @if (!isPreviewMode) {
+        <button class="btn-primary" 
+                style="padding: 10px 24px; border: none; background: var(--accent-gradient); border-radius: 8px; cursor: pointer; color: white; font-weight: 600; display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow-lg);"
+                (click)="saveNote()" 
+                [disabled]="isSaving">
+          <i class="pi" [class.pi-save]="!isSaving" [class.pi-spin]="isSaving" [class.pi-spinner]="isSaving"></i>
+          <span>{{ isSaving ? 'Saving...' : 'Save Entry' }}</span>
+        </button>
+      }
+    </div>
+  </ng-template>
+
+</p-dialog>
+
+<!-- <p-toast></p-toast>
+
+<section class="notes-container">
+
+  Animated Background
+  <div class="bg-decoration">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <div class="content-wrapper">
+
+    Header Navigation
+    <header class="app-header">
+      <div class="header-left">
+        <div class="logo-section">
+          <div class="logo-icon">
+            <i class="pi pi-book"></i>
+          </div>
+          <h1 class="app-title">Notes</h1>
+        </div>
+
+        <nav class="view-tabs">
+          <button class="tab-btn" [class.active]="activeView() === 'calendar'" (click)="switchView('calendar')">
+            <i class="pi pi-calendar"></i>
+            <span>Calendar</span>
+          </button>
+          <button class="tab-btn" [class.active]="activeView() === 'archive'" (click)="switchView('archive')">
+            <i class="pi pi-database"></i>
+            <span>All Notes</span>
+          </button>
+        </nav>
+      </div>
+
+      <button class="btn-new-note" (click)="openNewNote()" pTooltip="New Note" tooltipPosition="bottom">
+        <i class="pi pi-plus"></i>
+        <span>New Note</span>
+      </button>
+    </header>
+
+    CALENDAR VIEW
+    <div class="view-content" *ngIf="activeView() === 'calendar'">
+      <div class="calendar-layout">
+
+        Sidebar: Daily Notes
+        <aside class="sidebar-notes">
+          <div class="sidebar-header">
+            <div class="date-info">
+              <h2 class="day-name">{{ selectedDate() | date:'EEEE' }}</h2>
+              <p class="date-full">{{ selectedDate() | date:'MMMM d, y' }}</p>
+            </div>
+            <button class="btn-icon-sm" (click)="openNewNote()" pTooltip="New Entry">
+              <i class="pi pi-plus"></i>
+            </button>
+          </div>
+
+          <div class="notes-list">
+            @for (note of dailyNotes(); track note._id) {
+            <article class="note-card" (click)="viewNote(note)">
+              <div class="note-header-row">
+                <span class="note-time">
+                  <i class="pi pi-clock"></i>
+                  {{ note.createdAt | date:'shortTime' }}
+                </span>
+                <div class="note-actions">
+                  @if(note.attachments.length) {
+                  <i class="pi pi-paperclip"></i>
+                  }
+                  <button class="btn-icon-xs" (click)="editNote(note); $event.stopPropagation()" pTooltip="Edit">
+                    <i class="pi pi-pencil"></i>
+                  </button>
                 </div>
               </div>
-            </form>
+
+              <h3 class="note-title">{{ note.title || 'Untitled' }}</h3>
+              <p class="note-excerpt">{{ note.content }}</p>
+
+              @if (note.tags.length) {
+              <div class="note-tags">
+                @for (tag of note.tags; track tag) {
+                <span class="tag">#{{tag}}</span>
+                }
+              </div>
+              }
+            </article>
+            } @empty {
+            <div class="empty-state">
+              <i class="pi pi-book"></i>
+              <p>No entries for this day</p>
+              <button class="btn-link" (click)="openNewNote()">Start Writing</button>
+            </div>
+            }
           </div>
-        </div>
-      </p-tabpanel>
+        </aside>
 
-      ========== SUMMARY VIEWS (READ MODE) ==========
-      @for (summary of summaries; track summary.key) {
-        <p-tabpanel [value]="summary.key">
-          <div class="notes-layout summary-layout">
+        Main: Calendar
+        <main class="calendar-main">
+          <div class="calendar-card">
 
-            SIDEBAR LIST
-            <div class="notes-sidebar">
-              <div class="sidebar-header">
-                <h2 class="section-title">{{ summary.title }} Notes</h2>
-                <button
-                  pButton
-                  type="button"
-                  icon="pi pi-refresh"
-                  class="p-button-text p-button-sm"
-                  (click)="refreshCurrentView()">
+            Calendar Controls
+            <div class="calendar-controls">
+              <div class="month-nav">
+                <button class="btn-icon" (click)="changeMonth(-1)">
+                  <i class="pi pi-chevron-left"></i>
+                </button>
+                <h3 class="month-title">{{ currentMonthName() }}</h3>
+                <button class="btn-icon" (click)="changeMonth(1)">
+                  <i class="pi pi-chevron-right"></i>
                 </button>
               </div>
 
-              <div class="sidebar-content">
-                <div class="notes-list-wrapper">
-                  @if (isLoading[summary.key]) {
-                    <div class="skeleton-loader">
-                      @for (item of [1, 2, 3, 4, 5]; track item) {
-                        <div class="skeleton-card"></div>
-                      }
-                    </div>
-                  } @else {
-                    @if (getSummaryData(summary.key).length > 0) {
-                      <div class="notes-list">
-                        @for (note of getSummaryData(summary.key); track note._id) {
-                          <div
-                            class="note-card"
-                            [class.active]="selectedNote?._id === note._id"
-                            (click)="selectNote(note)">
-                            <div class="note-card-border"></div>
-                            <div class="note-card-content">
-                              <div class="note-card-header">
-                                <h3 class="note-title">{{ note.title || 'Untitled' }}</h3>
-                                <span
-                                  class="note-status-pill"
-                                  [class.locked]="!isEditable(note)">
-                                  <span class="status-dot"></span>
-                                  {{ isEditable(note) ? 'Editable' : 'Locked' }}
-                                </span>
-                              </div>
-
-                              <p class="note-excerpt">
-                                {{ note.content | slice: 0: 100 }}...
-                              </p>
-
-                              <div class="note-meta">
-                                <span class="note-date">
-                                  {{ note.createdAt | date: 'short' }}
-                                </span>
-                                @if (isEditable(note)) {
-                                  <div class="note-actions">
-                                    <button
-                                      pButton
-                                      type="button"
-                                      icon="pi pi-trash"
-                                      class="p-button-danger p-button-text p-button-sm"
-                                      (click)="deleteNote(note, $event)"
-                                      pTooltip="Delete">
-                                    </button>
-                                  </div>
-                                }
-                              </div>
-                            </div>
-                          </div>
-                        }
-                      </div>
-                    } @else {
-                      <ng-container *ngTemplateOutlet="emptyState"></ng-container>
-                    }
-                  }
-                </div>
-              </div>
+              <button class="btn-today" (click)="jumpToToday()">Today</button>
             </div>
 
-            PREVIEW PANEL
-            <div class="note-preview-panel">
-              @if (selectedNote; as note) {
-                <div class="preview-header">
-                  <div>
-                    <h2 class="section-title">{{ note.title || 'Untitled' }}</h2>
-                    <div class="preview-subtitle">
-                      {{ note.createdAt | date: 'fullDate' }}
-                    </div>
-                  </div>
-                  <div class="preview-actions">
-                    @if (isEditable(note)) {
-                      <button
-                        pButton
-                        type="button"
-                        icon="pi pi-pencil"
-                        label="Edit in Day View"
-                        class="p-button-sm p-button-outlined"
-                        (click)="activeTabValue = 'day'; loadDailyNotes()"
-                        pTooltip="Go to Day View to Edit">
-                      </button>
-                    }
-                  </div>
-                </div>
+            Calendar Grid
+            <div class="calendar-grid">
+              @for (day of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; track day) {
+              <div class="calendar-header-cell">{{ day }}</div>
+              }
 
-                <div class="preview-content">
-                  @if (note.tags && note.tags.length > 0) {
-                    <div class="note-tags-preview">
-                      @for (tag of note.tags; track tag) {
-                        <span class="note-tag">{{ tag }}</span>
-                      }
-                    </div>
-                  }
+              @for (day of calendarDays(); track $index) {
+              <div class="calendar-day" [class.other-month]="!day.isCurrentMonth" [class.today]="day.isToday"
+                [class.selected]="day.isSelected" [class.has-notes]="day.noteCount > 0" (click)="selectDay(day)">
 
-                  <p class="preview-text" [innerHTML]="note.content"></p>
+                <span class="day-number">{{ day.dayNum }}</span>
 
-                  @if (note.attachments && note.attachments.length > 0) {
-                    <div class="attachments-gallery">
-                      <h4 class="gallery-title">Attachments</h4>
-                      <div class="gallery-grid">
-                        @for (att of note.attachments; track att.url) {
-                          <div class="attachment-link">
-                            <p-image [src]="att.url" [preview]="true" alt="Note Attachment" width="100%">
-                              <ng-template pTemplate="indicator">
-                                <i class="pi pi-search"></i>
-                              </ng-template>
-                            </p-image>
-                          </div>
-                        }
-                      </div>
-                    </div>
+                @if (day.noteCount > 0) {
+                <div class="day-indicators">
+                  @for (item of getIndicators(day.noteCount); track $index) {
+                  <span class="indicator" [class.high]="day.noteCount > 2" [class.medium]="day.noteCount === 2"
+                    [class.low]="day.noteCount === 1">
+                  </span>
                   }
                 </div>
-              } @else {
-                <ng-container *ngTemplateOutlet="noPreviewSelected"></ng-container>
+                }
+              </div>
               }
             </div>
           </div>
-        </p-tabpanel>
-      }
-    </p-tabpanels>
-  </p-tabs>
 
-  EMPTY STATES
-  <ng-template #emptyState>
-    <div class="state-placeholder">
-      <i class="pi pi-inbox placeholder-icon"></i>
-      <span class="placeholder-text">No notes found.</span>
-      @if (activeTabValue === 'day') {
-        <span class="placeholder-subtext">Click 'New' or use Ctrl+N to start writing.</span>
-      }
+          Stats Card
+          <div class="stats-card">
+            <div class="stats-content">
+              <h4 class="stats-title">Daily Momentum</h4>
+              <p class="stats-desc">
+                <strong>{{ dailyNotes().length }}</strong> {{ dailyNotes().length === 1 ? 'note' : 'notes' }} today.
+                Keep going!
+              </p>
+            </div>
+            <i class="pi pi-chart-line stats-icon"></i>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    ARCHIVE VIEW
+    <div class="view-content" *ngIf="activeView() === 'archive'">
+
+      Archive Controls
+      <div class="archive-controls">
+        <div class="search-filter-group">
+          <div class="search-box">
+            <i class="pi pi-search"></i>
+            <input type="text" placeholder="Search notes..." [value]="searchQuery()"
+              (input)="searchQuery.set($any($event.target).value)">
+          </div>
+
+          <div class="filter-select">
+            <i class="pi pi-tag"></i>
+            <select [value]="filterTag()" (change)="filterTag.set($any($event.target).value)">
+              <option value="all">All Tags</option>
+              @for (tag of allTags(); track tag) {
+              <option [value]="tag">{{ tag }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <button class="btn-view-toggle" (click)="toggleViewMode()" pTooltip="Toggle View">
+          <i class="pi" [class.pi-th-large]="viewMode() === 'list'" [class.pi-list]="viewMode() === 'grid'"></i>
+        </button>
+      </div>
+
+      Notes Grid/List
+      <div class="archive-content">
+        @for (group of notesGroupedByMonth(); track group.monthKey) {
+        <section class="month-section">
+          <h3 class="month-header">
+            <i class="pi pi-calendar"></i>
+            {{ group.monthName }}
+            <span class="note-count">{{ group.notes.length }} {{ group.notes.length === 1 ? 'note' : 'notes' }}</span>
+          </h3>
+
+          <div class="notes-grid" [class.list-view]="viewMode() === 'list'">
+            @for (note of group.notes; track note._id) {
+            <article class="archive-note-card">
+              <div class="card-header">
+                <div class="card-meta">
+                  <span class="card-date">
+                    <i class="pi pi-calendar"></i>
+                    {{ note.createdAt | date:'MMM d' }}
+                  </span>
+                  <span class="card-time">
+                    <i class="pi pi-clock"></i>
+                    {{ note.createdAt | date:'shortTime' }}
+                  </span>
+                </div>
+                <div class="card-actions">
+                  <button class="btn-icon-xs" (click)="viewNote(note)" pTooltip="View">
+                    <i class="pi pi-eye"></i>
+                  </button>
+                  <button class="btn-icon-xs" (click)="editNote(note)" pTooltip="Edit">
+                    <i class="pi pi-pencil"></i>
+                  </button>
+                  <button class="btn-icon-xs btn-danger" (click)="deleteNote(note); $event.stopPropagation()"
+                    pTooltip="Delete">
+                    <i class="pi pi-trash"></i>
+                  </button>
+                </div>
+              </div>
+
+              <h4 class="card-title" (click)="viewNote(note)">{{ note.title || 'Untitled' }}</h4>
+              <p class="card-content">{{ note.content }}</p>
+
+              <div class="card-footer">
+                @if (note.tags.length) {
+                <div class="card-tags">
+                  @for (tag of note.tags; track tag) {
+                  <span class="tag">#{{tag}}</span>
+                  }
+                </div>
+                }
+                @if(note.attachments.length) {
+                <span class="attachment-badge">
+                  <i class="pi pi-paperclip"></i>
+                  {{ note.attachments.length }}
+                </span>
+                }
+              </div>
+            </article>
+            }
+          </div>
+        </section>
+        } @empty {
+        <div class="empty-archive">
+          <i class="pi pi-inbox"></i>
+          <h3>No notes found</h3>
+          <p>Try adjusting your search or filters</p>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+EDITOR DIALOG
+<p-dialog [(visible)]="isEditorVisible" [modal]="true" [style]="{width: '90vw', maxWidth: '800px'}" [showHeader]="true"
+  styleClass="editor-dialog" [draggable]="false" [resizable]="false">
+
+  <ng-template pTemplate="header">
+    <div class="dialog-header-content">
+      <div class="header-info">
+        <span class="header-date">{{ selectedDate() | date:'fullDate' }}</span>
+        <span *ngIf="isSaving" class="saving-indicator">
+          <i class="pi pi-spin pi-spinner"></i> Saving...
+        </span>
+      </div>
+      <button *ngIf="selectedNote" class="btn-icon" (click)="toggleEditMode()"
+        [pTooltip]="isPreviewMode ? 'Edit' : 'Preview'">
+        <i class="pi" [class.pi-pencil]="isPreviewMode" [class.pi-eye]="!isPreviewMode"></i>
+      </button>
     </div>
   </ng-template>
 
-  <ng-template #noPreviewSelected>
-    <div class="state-placeholder">
-      <i class="pi pi-file-edit placeholder-icon"></i>
-      <span class="placeholder-text">Select a note to view details</span>
-      <span class="placeholder-subtext">Use the list on the left to browse notes.</span>
+  <div class="editor-content" [class.preview-mode]="isPreviewMode">
+    <form [formGroup]="noteForm">
+
+      @if (!isPreviewMode) {
+      <input type="text" formControlName="title" class="editor-title" placeholder="Title your thought..." />
+
+      <div class="editor-toolbar">
+        <p-autoComplete formControlName="tags" [multiple]="true" placeholder="+ Add tags"
+          styleClass="tags-input"></p-autoComplete>
+
+        <button type="button" class="btn-toolbar" (click)="triggerFileUpload()">
+          <i class="pi pi-image"></i>
+          <span>Add Media</span>
+        </button>
+        <input #fileInput type="file" (change)="onFileSelect($event)" multiple accept="image/*" class="hidden">
+      </div>
+
+      @if (imagePreviews.length > 0) {
+      <div class="media-preview">
+        @for (img of imagePreviews; track $index) {
+        <div class="preview-item">
+          <img [src]="img.url" alt="Preview">
+          <button class="btn-remove" (click)="removeAttachment($index)">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+        }
+      </div>
+      }
+
+      <textarea formControlName="content" class="editor-textarea"
+        placeholder="Start writing your story here..."></textarea>
+      } @else {
+      <h2 class="preview-title">{{ noteForm.get('title')?.value || 'Untitled' }}</h2>
+
+      @if (noteForm.get('tags')?.value?.length) {
+      <div class="preview-tags">
+        @for (tag of noteForm.get('tags')?.value; track tag) {
+        <span class="tag">#{{tag}}</span>
+        }
+      </div>
+      }
+
+      @if (imagePreviews.length > 0) {
+      <div class="preview-media">
+        @for (img of imagePreviews; track $index) {
+        <img [src]="img.url" alt="Attachment">
+        }
+      </div>
+      }
+
+      <div class="preview-content">{{ noteForm.get('content')?.value }}</div>
+      }
+    </form>
+  </div>
+
+  <div class="dialog-footer">
+    <button class="btn-secondary" (click)="isEditorVisible=false">
+      {{ isPreviewMode ? 'Close' : 'Discard' }}
+    </button>
+    @if (!isPreviewMode) {
+    <button class="btn-primary" (click)="saveNote()" [disabled]="isSaving">
+      <i class="pi" [class.pi-save]="!isSaving" [class.pi-spin]="isSaving" [class.pi-spinner]="isSaving"></i>
+      <span>{{ isSaving ? 'Saving...' : 'Save Entry' }}</span>
+    </button>
+    }
+  </div>
+</p-dialog>
+<p-toast></p-toast>
+
+<section class="relative bg-stone-50 min-h-screen font-manrope overflow-hidden flex flex-col">
+
+  <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+    <div class="bg-indigo-300 w-96 h-96 rounded-full absolute -top-20 -left-20 opacity-20 blur-3xl animate-pulse"></div>
+    <div class="bg-emerald-300 w-80 h-80 rounded-full absolute top-40 -right-20 opacity-20 blur-3xl"></div>
+    <div class="bg-purple-300 w-64 h-64 rounded-full absolute bottom-0 left-1/3 opacity-20 blur-3xl"></div>
+  </div>
+
+  <div class="relative z-10 w-full max-w-[1600px] mx-auto px-4 py-8 lg:px-8 h-screen flex flex-col">
+
+    <div class="grid grid-cols-12 gap-6 h-full">
+
+      <div
+        class="col-span-12 xl:col-span-4 flex flex-col h-full bg-white/60 backdrop-blur-md rounded-3xl border border-white/50 shadow-xl overflow-hidden">
+
+        <div class="p-6 pb-2 flex justify-between items-center bg-white/40">
+          <div>
+            <h2 class="text-2xl font-bold text-slate-800">{{ selectedDate() | date:'EEEE' }}</h2>
+            <p class="text-slate-500">{{ selectedDate() | date:'MMMM d, y' }}</p>
+          </div>
+          <button (click)="openNewNote()" pTooltip="New Entry" tooltipPosition="left"
+            class="w-10 h-10 rounded-full bg-indigo-600 text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 flex items-center justify-center transition-transform hover:scale-105 active:scale-95">
+            <i class="pi pi-plus font-bold"></i>
+          </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3">
+          @for (note of dailyNotes(); track note._id) {
+          <div
+            class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 cursor-pointer hover:shadow-md hover:border-indigo-100 transition-all group animate-slide-up"
+            (click)="editNote(note)">
+
+            <div class="flex justify-between items-start mb-2">
+              <span
+                class="inline-flex items-center gap-2 px-2 py-1 rounded-md bg-slate-50 text-xs font-semibold text-slate-500">
+                <i class="pi pi-clock text-[10px]"></i> {{ note.createdAt | date:'shortTime' }}
+              </span>
+              @if(note.attachments?.length) {
+              <i class="pi pi-paperclip text-slate-400"></i>
+              }
+            </div>
+
+            <h3
+              class="font-bold text-slate-800 text-lg mb-1 leading-tight group-hover:text-indigo-600 transition-colors">
+              {{ note.title || 'Untitled' }}
+            </h3>
+            <p class="text-slate-500 text-sm line-clamp-2 leading-relaxed">
+              {{ note.content }}
+            </p>
+
+            @if (note.tags?.length) {
+            <div class="flex flex-wrap gap-1 mt-3">
+              @for (tag of note.tags; track tag) {
+              <span
+                class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 font-medium">#{{tag}}</span>
+              }
+            </div>
+            }
+          </div>
+          } @empty {
+          <div class="h-64 flex flex-col items-center justify-center text-slate-400">
+            <i class="pi pi-book text-4xl mb-3 opacity-50"></i>
+            <p class="text-sm">No entries for this day.</p>
+            <button class="mt-4 text-indigo-600 text-sm font-semibold hover:underline" (click)="openNewNote()">Start
+              Writing</button>
+          </div>
+          }
+        </div>
+      </div>
+
+      <div class="col-span-12 xl:col-span-8 flex flex-col gap-6">
+
+        <div
+          class="bg-white rounded-3xl p-8 shadow-xl shadow-indigo-100/50 border border-indigo-50 flex flex-col h-fit">
+
+          <div class="flex justify-between items-center mb-8">
+            <div class="flex items-center gap-4">
+              <div class="flex items-center bg-slate-100 rounded-full p-1">
+                <button (click)="changeMonth(-1)"
+                  class="w-8 h-8 rounded-full hover:bg-white hover:shadow-sm flex items-center justify-center transition-all text-slate-600"><i
+                    class="pi pi-chevron-left text-xs"></i></button>
+                <span class="px-4 font-bold text-slate-700 min-w-[140px] text-center select-none">{{ currentMonthName()
+                  }}</span>
+                <button (click)="changeMonth(1)"
+                  class="w-8 h-8 rounded-full hover:bg-white hover:shadow-sm flex items-center justify-center transition-all text-slate-600"><i
+                    class="pi pi-chevron-right text-xs"></i></button>
+              </div>
+              <button (click)="jumpToToday()"
+                class="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition-colors">Today</button>
+            </div>
+
+            <div class="hidden sm:flex gap-4">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span class="text-xs text-slate-500 font-medium">Light</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                <span class="text-xs text-slate-500 font-medium">Heavy</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="calendar-grid">
+            @for (day of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; track day) {
+            <div
+              class="h-10 flex items-center justify-center text-xs font-bold text-slate-400 uppercase tracking-widest bg-slate-50">
+              {{ day }}
+            </div>
+            }
+
+            @for (day of calendarDays(); track $index) {
+            <div
+              class="aspect-square relative group transition-colors hover:bg-slate-50 cursor-pointer flex flex-col items-center justify-start pt-2"
+              [ngClass]="{'bg-slate-50/30 text-slate-300': !day.isCurrentMonth, 'bg-white text-slate-700': day.isCurrentMonth}"
+              (click)="selectDay(day)">
+
+              <span
+                class="w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium transition-all z-10"
+                [ngClass]="{
+                        'bg-indigo-600 text-white shadow-lg shadow-indigo-300': day.isSelected,
+                        'text-indigo-600 font-bold bg-indigo-50': day.isToday && !day.isSelected
+                      }">
+                {{ day.dayNum }}
+              </span>
+
+              <div class="flex gap-1 mt-2 h-2">
+                @if (day.noteCount > 0) {
+                <span class="w-1.5 h-1.5 rounded-full"
+                  [ngClass]="day.noteCount > 2 ? 'bg-indigo-600' : (day.noteCount > 1 ? 'bg-indigo-400' : 'bg-emerald-400')"></span>
+                }
+                @if (day.noteCount > 1) {
+                <span class="w-1.5 h-1.5 rounded-full"
+                  [ngClass]="day.noteCount > 2 ? 'bg-indigo-600' : 'bg-indigo-400'"></span>
+                }
+                @if (day.noteCount > 2) {
+                <span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
+                }
+              </div>
+
+            </div>
+            }
+          </div>
+
+        </div>
+
+        <div
+          class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-3xl p-8 text-white shadow-lg flex justify-between items-center">
+          <div>
+            <h4 class="text-xl font-bold mb-1">Weekly Focus</h4>
+            <p class="text-indigo-100 text-sm opacity-90">You have {{ dailyNotes().length }} notes today. Keep the
+              momentum going!</p>
+          </div>
+          <i class="pi pi-chart-line text-4xl opacity-20"></i>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<p-dialog [(visible)]="isEditorVisible" [modal]="true" [style]="{width: '90vw', maxWidth: '700px'}" [showHeader]="true"
+  styleClass="premium-dialog" [draggable]="false" [resizable]="false">
+
+  <ng-template pTemplate="header">
+    <div class="w-full flex justify-between items-center">
+      <span class="text-slate-400 text-sm font-semibold uppercase tracking-wider">
+        {{ selectedDate() | date:'fullDate' }}
+      </span>
+      <span *ngIf="isSaving" class="text-xs text-indigo-500 font-medium animate-pulse flex items-center gap-1">
+        <i class="pi pi-spin pi-spinner"></i> Saving...
+      </span>
     </div>
   </ng-template>
-</div> -->
+
+  <div class="bg-white p-8">
+    <form [formGroup]="noteForm" class="flex flex-col gap-6">
+
+      <input type="text" formControlName="title"
+        class="w-full text-3xl font-bold text-slate-800 border-none outline-none placeholder:text-slate-300 focus:ring-0 bg-transparent p-0"
+        placeholder="Title your thought..." />
+
+      <div class="flex items-center gap-3">
+        <p-autoComplete formControlName="tags" [multiple]="true" placeholder="+ Add tags"
+          styleClass="w-full max-w-xs border-none"
+          inputStyleClass="bg-slate-50 border-none text-sm px-3 py-1.5 rounded-lg text-slate-600 placeholder:text-slate-400"></p-autoComplete>
+
+        <button type="button" (click)="triggerFileUpload()"
+          class="flex items-center gap-2 text-xs font-semibold text-slate-500 bg-slate-50 px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors">
+          <i class="pi pi-image"></i> Add Media
+        </button>
+        <input #fileInput type="file" (change)="onFileSelect($event)" multiple accept="image/*" class="hidden">
+      </div>
+
+      @if (imagePreviews.length > 0) {
+      <div class="flex gap-3 overflow-x-auto pb-2">
+        @for (img of imagePreviews; track $index) {
+        <div class="relative group w-24 h-24 flex-shrink-0 rounded-xl overflow-hidden border border-slate-100">
+          <img [src]="img.url" class="w-full h-full object-cover">
+          <button (click)="removeAttachment($index)"
+            class="absolute top-1 right-1 w-6 h-6 bg-white/90 rounded-full text-red-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110 shadow-sm">
+            <i class="pi pi-times text-[10px] font-bold"></i>
+          </button>
+        </div>
+        }
+      </div>
+      }
+
+      <textarea formControlName="content"
+        class="w-full min-h-[300px] text-lg text-slate-600 leading-relaxed border-none outline-none resize-none focus:ring-0 bg-transparent p-0 custom-scrollbar placeholder:text-slate-300"
+        placeholder="Start writing your story here..."></textarea>
+    </form>
+  </div>
+
+  <div class="bg-slate-50 px-8 py-4 flex justify-end gap-3 rounded-b-2xl border-t border-slate-100">
+    <button (click)="isEditorVisible=false"
+      class="px-6 py-2.5 rounded-xl text-slate-500 font-semibold hover:bg-slate-200 transition-colors text-sm">Discard</button>
+    <button (click)="saveNote()" [disabled]="isSaving"
+      class="px-8 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:shadow-indigo-300 transition-all transform active:scale-95 text-sm flex items-center gap-2">
+      <span *ngIf="!isSaving">Save Entry</span>
+      <span *ngIf="isSaving">Saving...</span>
+    </button>
+  </div>
+</p-dialog> --> -->
