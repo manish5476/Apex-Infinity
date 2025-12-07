@@ -725,6 +725,54 @@
   &:focus { outline: none; }
   &::placeholder { color: var(--text-tertiary); }
 }
+/* Modern Tabs Styling */
+:host ::ng-deep .custom-tabs {
+  .p-tabview-nav {
+    background: transparent;
+    border: none;
+    padding: 0;
+    
+    li {
+      margin-right: 1rem;
+      .p-tabview-nav-link {
+        background: transparent;
+        border: none;
+        padding: 0.5rem 0.25rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #94a3b8;
+        transition: color 0.2s;
+        box-shadow: none !important;
+        
+        &:hover { color: #64748b; }
+      }
+      
+      &.p-highlight .p-tabview-nav-link {
+        color: #4f46e5; /* Indigo 600 */
+        border-bottom: 2px solid #4f46e5;
+      }
+    }
+  }
+  .p-tabview-panels {
+    background: transparent;
+    padding: 0;
+    border: none;
+  }
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  /* Use grid-auto-rows to handle resizing better */
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Ensure no window scrollbar */
+:host {
+  height: 100vh;
+  overflow: hidden;
+}
 // @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap');
 
 // :host {
