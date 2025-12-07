@@ -1,5 +1,5 @@
 import { OrganizationService } from './../../organization.service';
-import { Component, OnInit, inject, effect } from '@angular/core';
+import { Component, OnInit, inject, effect, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -32,13 +32,12 @@ import { SelectModule } from 'primeng/select';
   styleUrl: './notification-bell-component.scss'
 })
 export class NotificationBellComponent implements OnInit {
-
   private notificationService = inject(NotificationService);
   private apiService = inject(ApiService);
   private messageService = inject(AppMessageService);
   private OrganizationService = inject(OrganizationService);
   private masterList = inject(MasterListService);
-  
+
   realtimeNotifications: any[] = []; // Tab 0
   pendingMembers: any[] = []
   allNotifications: any[] = []
@@ -128,4 +127,27 @@ export class NotificationBellComponent implements OnInit {
       }
     });
   }
+  getIcon(type: string): string {
+  switch(type) {
+    case 'success': return 'pi-check-circle';
+    case 'warn': return 'pi-exclamation-triangle';
+    case 'error': return 'pi-times-circle';
+    default: return 'pi-info-circle';
+  }
+}
+
+markAllRead() {
+  this.realtimeNotifications.forEach(n => this.markAsRead(n));
+}
+@Output() close = new EventEmitter<void>(); // Or use a shared service to toggle visibility
+
+closeDialog() {
+  // If you used the [(visible)]="showNotificationdialog" in the parent, 
+  // you might need an Output here, or just toggle the variable if this component controls it.
+  // Easiest way: Inject the parent component or use a shared state.
+  // OR simply:
+  document.querySelector('.p-dialog-mask')?.remove(); // Hacky? No. 
+  // Better:
+  // this.showNotificationdialog = false; // If you bind this variable in the component
+}
 }

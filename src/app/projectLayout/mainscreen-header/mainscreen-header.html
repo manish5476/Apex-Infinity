@@ -12,21 +12,18 @@
 
   <!-- Right: Actions -->
   <div class="header-right">
-    
+
     <!-- Notification Bell -->
-    <button class="notification-btn" 
-            [class.has-new]="recentNotifications.length > 0"
-            (click)="showNotificationdialog = true"
-            pTooltip="Notifications" tooltipPosition="bottom">
+    <button class="notification-btn" [class.has-new]="recentNotifications.length > 0"
+      (click)="showNotificationdialog = true" pTooltip="Notifications" tooltipPosition="bottom">
       <i class="pi pi-bell text-lg"></i>
     </button>
 
     <!-- User Profile Dropdown -->
     <ng-container *ngIf="currentUser; else loggedOut">
       <button class="user-profile-trigger" (click)="op.toggle($event)">
-        <p-avatar [label]="getInitials(currentUser?.name)" 
-                  shape="circle"
-                  [style]="{'background-color': 'var(--accent-primary)', 'color': '#fff'}">
+        <p-avatar [label]="getInitials(currentUser?.name)" shape="circle"
+          [style]="{'background-color': 'var(--accent-primary)', 'color': '#fff'}">
         </p-avatar>
         <span class="text-sm font-medium hidden md:block text-[var(--text-primary)]">
           {{ currentUser?.name }}
@@ -35,14 +32,14 @@
       </button>
 
       <!-- Premium Popover -->
-      <p-popover #op appendTo="body" [showTransitionOptions]="'150ms cubic-bezier(0, 0, 0.2, 1)'" [hideTransitionOptions]="'100ms linear'">
+      <p-popover #op appendTo="body" [showTransitionOptions]="'150ms cubic-bezier(0, 0, 0.2, 1)'"
+        [hideTransitionOptions]="'100ms linear'">
         <div class="popover-container">
-          
+
           <!-- User Header -->
           <div class="user-header">
-            <p-avatar [label]="getInitials(currentUser?.name)" 
-                      styleClass="w-16 h-16 text-xl mb-2"
-                      [style]="{'background-color': 'var(--accent-primary)', 'color': '#fff', 'width': '64px', 'height': '64px', 'font-size': '1.5rem'}">
+            <p-avatar [label]="getInitials(currentUser?.name)" styleClass="w-16 h-16 text-xl mb-2"
+              [style]="{'background-color': 'var(--accent-primary)', 'color': '#fff', 'width': '64px', 'height': '64px', 'font-size': '1.5rem'}">
             </p-avatar>
             <div class="user-details">
               <h4>{{ currentUser?.name }}</h4>
@@ -55,24 +52,19 @@
             <div class="section-title">
               <span>Theme</span>
               <!-- Auto/Manual Toggle for Dark Mode -->
-              <p-toggleButton [(ngModel)]="isDarkMode" 
-                              onIcon="pi-moon" 
-                              offIcon="pi pi-sun"
-                              styleClass="w-8 h-8 rounded-full border-0 bg-transparent text-[var(--text-secondary)] hover:text-[var(--accent-primary)] focus:shadow-none"
-                              (onChange)="toggleDarkMode($event.checked)">
+              <p-toggleButton [(ngModel)]="isDarkMode" onIcon="pi-moon" offIcon="pi pi-sun"
+                styleClass="w-8 h-8 rounded-full border-0 bg-transparent text-[var(--text-secondary)] hover:text-[var(--accent-primary)] focus:shadow-none"
+                (onChange)="toggleDarkMode($event.checked)">
               </p-toggleButton>
             </div>
 
             <!-- 13-Theme Grid -->
             <div class="theme-grid">
               @for (theme of allThemes; track theme.id) {
-                <div class="theme-option"
-                     [style.background-color]="theme.color"
-                     [class.active]="activeThemeId === theme.id"
-                     [pTooltip]="theme.name" 
-                     tooltipPosition="top"
-                     (click)="selectTheme(theme.id)">
-                </div>
+              <div class="theme-option" [style.background-color]="theme.color"
+                [class.active]="activeThemeId === theme.id" [pTooltip]="theme.name" tooltipPosition="top"
+                (click)="selectTheme(theme.id)">
+              </div>
               }
             </div>
           </div>
@@ -95,7 +87,8 @@
     </ng-container>
 
     <ng-template #loggedOut>
-      <a routerLink="/auth/login" class="px-4 py-2 rounded-lg bg-[var(--accent-primary)] text-white text-sm font-medium hover:opacity-90 transition-opacity no-underline">
+      <a routerLink="/auth/login"
+        class="px-4 py-2 rounded-lg bg-[var(--accent-primary)] text-white text-sm font-medium hover:opacity-90 transition-opacity no-underline">
         Login
       </a>
     </ng-template>
@@ -104,13 +97,21 @@
 </div>
 
 <!-- Notification Modal -->
-<p-dialog header="Notifications" 
-          [modal]="true" 
-          [(visible)]="showNotificationdialog" 
-          styleClass="notification-modal-override"
-          [draggable]="false"
-          [resizable]="false"
-          [dismissableMask]="true"
-          [style]="{ width: '100%', maxWidth: '450px', height: '100%', maxHeight: '100vh', margin: '0', position: 'fixed', right: '0', top: '0', border: 'none', borderRadius: '0' }">
+<!-- <p-dialog header="Notifications" [modal]="true" [(visible)]="showNotificationdialog"
+  styleClass="notification-modal-override" [draggable]="false" [resizable]="false" [dismissableMask]="true"
+  [style]="{ width: '100%', maxWidth: '450px', height: '100%', maxHeight: '100vh', margin: '0', position: 'fixed', right: '0', top: '0', border: 'none', borderRadius: '0' }">
+  <app-notification-bell></app-notification-bell>
+</p-dialog> -->
+<p-dialog 
+  [(visible)]="showNotificationdialog" 
+  [modal]="true" 
+  [draggable]="false" 
+  [resizable]="false" 
+  [dismissableMask]="true"
+  [showHeader]="false" 
+  styleClass="premium-notification-dialog"
+  [style]="{ width: '90%', maxWidth: '500px', maxHeight: '85vh', borderRadius: '16px', overflow: 'hidden' }"
+  maskStyleClass="backdrop-blur-sm bg-black/40">
+  
   <app-notification-bell></app-notification-bell>
 </p-dialog>

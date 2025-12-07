@@ -1,4 +1,132 @@
-<div class="notification-layout">
+<div class="notification-panel">
+
+  <div class="panel-header">
+    <div class="header-top">
+      <h3>Notifications</h3>
+      <div class="header-actions">
+        <button class="icon-btn" pTooltip="Mark all as read" tooltipPosition="bottom" (click)="markAllRead()">
+          <i class="pi pi-check-circle"></i>
+        </button>
+        <button class="icon-btn close-btn" (click)="closeDialog()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="segmented-control">
+      <div class="segment-bg" [style.transform]="'translateX(' + (activeTab * 100) + '%)'"></div>
+      
+      <button type="button" [class.active]="activeTab === 0" (click)="switchTab(0)">
+        <span>New</span>
+        @if (unreadCount > 0) { <span class="badge-pill">{{ unreadCount }}</span> }
+      </button>
+      
+      <button type="button" [class.active]="activeTab === 1" (click)="switchTab(1)">
+        <span>Approvals</span>
+        @if (pendingMembers.length > 0) { <span class="badge-pill warn">{{ pendingMembers.length }}</span> }
+      </button>
+      
+      <button type="button" [class.active]="activeTab === 2" (click)="switchTab(2)">
+        <span>History</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="panel-body custom-scrollbar">
+    
+    @if (activeTab === 0) {
+      <div class="list-container">
+        @for (n of realtimeNotifications; track n._id) {
+          <div class="notif-card" [class.unread]="!n.isRead" (click)="markAsRead(n)">
+            <div class="notif-icon" [ngClass]="n.type || 'info'">
+              <i class="pi" [ngClass]="getIcon(n.type)"></i>
+            </div>
+            <div class="notif-content">
+              <div class="notif-row">
+                <span class="title">{{ n.title }}</span>
+                <span class="time">{{ n.createdAt | date:'shortTime' }}</span>
+              </div>
+              <p class="message">{{ n.message }}</p>
+            </div>
+            @if (!n.isRead) { <div class="unread-dot"></div> }
+          </div>
+        }
+        @if (!isLoading && realtimeNotifications.length === 0) {
+          <div class="empty-state">
+            <div class="empty-icon">
+              <i class="pi pi-bell-slash"></i>
+            </div>
+            <h3>All caught up!</h3>
+            <p>No new notifications at the moment.</p>
+          </div>
+        }
+      </div>
+    }
+
+    @if (activeTab === 1) {
+      <div class="list-container">
+        @for (member of pendingMembers; track member._id) {
+          <div class="approval-card">
+            <div class="user-row">
+              <div class="avatar-circle">
+                {{ member.name.charAt(0).toUpperCase() }}
+              </div>
+              <div class="user-meta">
+                <span class="name">{{ member.name }}</span>
+                <span class="email">{{ member.email }}</span>
+              </div>
+              <div class="date-badge">
+                {{ member.requestedAt | date:'MMM d' }}
+              </div>
+            </div>
+
+            <div class="action-grid">
+              <p-select appendTo="body" [options]="roles" [(ngModel)]="selectedRoles[member._id]" 
+                        optionLabel="name" optionValue="_id" placeholder="Role" styleClass="w-full text-sm">
+              </p-select>
+              <p-select appendTo="body" [options]="branches" [(ngModel)]="selectedBranches[member._id]" 
+                        optionLabel="name" optionValue="_id" placeholder="Branch" styleClass="w-full text-sm">
+              </p-select>
+            </div>
+            
+            <button class="approve-btn" 
+                    [disabled]="!selectedRoles[member._id] || !selectedBranches[member._id]"
+                    (click)="approveMember(member)">
+              <i class="pi pi-check"></i> Approve Request
+            </button>
+          </div>
+        }
+        @if (pendingMembers.length === 0) {
+          <div class="empty-state">
+            <div class="empty-icon success">
+              <i class="pi pi-check-circle"></i>
+            </div>
+            <h3>No Pending Requests</h3>
+            <p>Your team is all set.</p>
+          </div>
+        }
+      </div>
+    }
+
+    @if (activeTab === 2) {
+      <div class="list-container">
+        @for (n of allNotifications; track n._id) {
+          <div class="notif-card history">
+            <div class="notif-content">
+              <div class="notif-row">
+                <span class="title">{{ n.title }}</span>
+                <span class="time">{{ n.createdAt | date:'MMM d, h:mm a' }}</span>
+              </div>
+              <p class="message">{{ n.message }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>
+
+<!-- <div class="notification-layout">
 
   <div class="panel-header">
     <div class="nav-segment">
@@ -80,4 +208,4 @@
       </ul>
     }
   </div>
-</div>
+</div> -->

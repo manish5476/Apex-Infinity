@@ -1,191 +1,530 @@
-/* ==============================================
-   SCROLL FIX: notification-bell-component.scss
-   ============================================== */
-
 :host {
   display: block;
-  /* CRITICAL 1: Force the component to take exactly 100% of the parent (Sidebar/Dialog) */
   height: 100%;
   width: 100%;
-  overflow: hidden; /* Prevent double scrollbars on the host */
+  font-family: 'Inter', system-ui, sans-serif; /* Ensure a clean font */
 }
 
-.notification-layout {
+/* --- VARIABLES --- */
+$primary: var(--accent-primary, #6366f1);
+$bg-dialog: var(--bg-primary, #ffffff);
+$bg-subtle: var(--bg-secondary, #f8fafc);
+$text-main: var(--text-primary, #0f172a);
+$text-muted: var(--text-secondary, #64748b);
+$border: var(--border-primary, #e2e8f0);
+
+.notification-panel {
   display: flex;
   flex-direction: column;
-  /* CRITICAL 2: The layout must fill the host height */
   height: 100%;
-  background: var(--bg-primary);
-  box-sizing: border-box;
+  background: $bg-dialog;
+  position: relative;
 }
 
-/* === 1. Header (Tabs) === */
+/* === 1. HEADER === */
 .panel-header {
-  flex-shrink: 0; /* Never let the header shrink */
-  padding: 1rem;
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-primary);
-  z-index: 10; /* Keep on top of scrolling content */
+  padding: 1.25rem 1.5rem 0.5rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid $border;
+  z-index: 10;
+  position: sticky;
+  top: 0;
 
-  .nav-segment {
+  .header-top {
     display: flex;
-    background: var(--bg-ternary);
-    padding: 4px;
-    border-radius: var(--ui-border-radius);
-    gap: 4px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
 
-    button {
-      flex: 1;
+    h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 0;
+      color: $text-main;
+      letter-spacing: -0.02em;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
       border: none;
       background: transparent;
-      padding: 10px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: var(--text-secondary);
-      border-radius: var(--ui-border-radius-sm);
+      color: $text-muted;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
       transition: all 0.2s;
 
-      &.active {
-        background: var(--bg-secondary);
-        color: var(--text-primary);
-        box-shadow: var(--shadow-sm);
-        font-weight: 600;
-      }
-
-      .badge-dot {
-        width: 8px;
-        height: 8px;
-        background-color: var(--color-error);
-        border-radius: 50%;
+      &:hover {
+        background: $bg-subtle;
+        color: $text-main;
       }
       
-      .badge-count {
-        background: var(--accent-primary);
-        color: #fff;
-        font-size: 0.75rem;
-        padding: 2px 6px;
-        border-radius: 10px;
+      &.close-btn:hover {
+        background: #fee2e2;
+        color: #ef4444;
       }
     }
   }
 }
 
-/* === 2. Body (The List) - THE CRITICAL FIX IS HERE === */
-.panel-body {
-  flex-grow: 1;  /* Push to fill remaining space */
-  overflow-y: auto; /* Enable vertical scrolling */
+/* === 2. SEGMENTED TABS (iOS Style) === */
+.segmented-control {
+  position: relative;
+  display: flex;
+  background: $bg-subtle;
+  padding: 4px;
+  border-radius: 10px;
+  margin-bottom: 0.75rem;
   
-  /* CRITICAL 3: This magic property fixes the "cut off" issue in Flex containers */
-  min-height: 0; 
-  
-  background: var(--bg-primary);
-  padding-bottom: 20px; /* Space at bottom for safe scrolling */
-}
+  /* The sliding background pill */
+  .segment-bg {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    width: calc(33.33% - 5px);
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1);
+    pointer-events: none;
+    z-index: 1;
+  }
 
-/* === List Items === */
-.notification-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  width: 100%; /* Ensure list takes full width */
-
-  .notif-item {
-    padding: 1rem;
-    border-bottom: 1px solid var(--border-primary);
-    display: flex;
-    gap: 12px;
+  button {
+    flex: 1;
+    position: relative;
+    z-index: 2;
+    border: none;
+    background: transparent;
+    padding: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: $text-muted;
     cursor: pointer;
-    width: 100%;
-    
-    &:hover { background: var(--bg-ternary); }
+    border-radius: 8px;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
 
-    .notif-content {
-      flex: 1;
-      /* Prevent text from widening the container */
-      min-width: 0; 
-      
-      .title { 
-        display: block; 
-        font-weight: 600; 
-        margin-bottom: 4px; 
-        color: var(--text-primary);
-        /* Truncate long titles */
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-      .msg { 
-        font-size: 0.85rem; 
-        color: var(--text-secondary); 
-        margin: 0; 
-        
-        /* Limit message to 2 lines */
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
-      .time { 
-        font-size: 0.75rem; 
-        color: var(--text-label); 
-        margin-top: 4px; 
-        display: block; 
-      }
-    }
-    
-    &.unread {
-      background: rgba(var(--accent-primary-rgb), 0.05);
-      border-left: 3px solid var(--accent-primary);
+    &.active {
+      color: $text-main;
+      font-weight: 600;
     }
   }
 }
 
-/* Approval Items */
-.approval-item {
-  padding: 1rem;
-  border-bottom: 1px solid var(--border-primary);
-  width: 100%;
+.badge-pill {
+  background: $primary;
+  color: white;
+  font-size: 0.7rem;
+  padding: 1px 6px;
+  border-radius: 99px;
+  font-weight: 700;
   
-  .user-info {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    .name { font-weight: 600; display: block; }
-    .email { font-size: 0.85rem; color: var(--text-secondary); }
+  &.warn { background: #f59e0b; }
+}
+
+/* === 3. BODY & LIST === */
+.panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+  background: #f8fafc; /* Slightly darker bg for list area */
+}
+
+.list-container {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Notification Cards */
+.notif-card {
+  background: white;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  border: 1px solid transparent;
+  display: flex;
+  gap: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
   }
 
-  .approval-actions {
+  &.unread {
+    background: white;
+    border-color: rgba($primary, 0.2);
+    
+    .title { color: $primary; }
+    .notif-icon { background: rgba($primary, 0.1); color: $primary; }
+  }
+
+  .notif-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: $bg-subtle;
+    color: $text-muted;
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .notif-content {
+    flex: 1;
+    min-width: 0;
+
+    .notif-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      
+      .title { font-weight: 600; font-size: 0.9rem; color: $text-main; }
+      .time { font-size: 0.75rem; color: $text-muted; white-space: nowrap; margin-left: 8px;}
+    }
+
+    .message {
+      font-size: 0.85rem;
+      color: $text-muted;
+      margin: 0;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  }
+
+  .unread-dot {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    background: $primary;
+    border-radius: 50%;
+  }
+}
+
+/* Approval Cards */
+.approval-card {
+  background: white;
+  padding: 1.25rem;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border: 1px solid $border;
+
+  .user-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+    
+    .avatar-circle {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, $primary, darken($primary, 10%));
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .user-meta {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      
+      .name { font-weight: 600; color: $text-main; }
+      .email { font-size: 0.8rem; color: $text-muted; }
+    }
+    
+    .date-badge {
+      font-size: 0.7rem;
+      background: $bg-subtle;
+      padding: 4px 8px;
+      border-radius: 6px;
+      color: $text-muted;
+      font-weight: 600;
+    }
+  }
+
+  .action-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .approve-btn {
+    width: 100%;
+    background: $text-main; /* Dark sleek button */
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: opacity 0.2s;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    &:not(:disabled):hover {
+      background: black;
+    }
   }
 }
 
 /* Empty State */
 .empty-state {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-label);
-  min-height: 200px; /* Ensure it takes up vertical space if empty */
+  text-align: center;
+  padding: 3rem 1rem;
   
-  i { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.5; }
+  .empty-icon {
+    width: 64px;
+    height: 64px;
+    background: #e0e7ff;
+    color: $primary;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 1.75rem;
+    
+    &.success { background: #dcfce7; color: #16a34a; }
+  }
+
+  h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; color: $text-main; }
+  p { font-size: 0.9rem; color: $text-muted; }
 }
 
-/* === Global Overrides === */
-:host ::ng-deep {
-  .p-select { width: 100%; }
-  
-  /* Fix dropdown clipping in modal */
-  .p-select-panel { 
-    z-index: 100000 !important; 
-    position: fixed !important; 
-  }
+/* Scrollbar Polish */
+.custom-scrollbar {
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+  &::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 }
+// /* ==============================================
+//    SCROLL FIX: notification-bell-component.scss
+//    ============================================== */
+
+// :host {
+//   display: block;
+//   /* CRITICAL 1: Force the component to take exactly 100% of the parent (Sidebar/Dialog) */
+//   height: 100%;
+//   width: 100%;
+//   overflow: hidden; /* Prevent double scrollbars on the host */
+// }
+
+// .notification-layout {
+//   display: flex;
+//   flex-direction: column;
+//   /* CRITICAL 2: The layout must fill the host height */
+//   height: 100%;
+//   background: var(--bg-primary);
+//   box-sizing: border-box;
+// }
+
+// /* === 1. Header (Tabs) === */
+// .panel-header {
+//   flex-shrink: 0; /* Never let the header shrink */
+//   padding: 1rem;
+//   background: var(--bg-secondary);
+//   border-bottom: 1px solid var(--border-primary);
+//   z-index: 10; /* Keep on top of scrolling content */
+
+//   .nav-segment {
+//     display: flex;
+//     background: var(--bg-ternary);
+//     padding: 4px;
+//     border-radius: var(--ui-border-radius);
+//     gap: 4px;
+
+//     button {
+//       flex: 1;
+//       border: none;
+//       background: transparent;
+//       padding: 10px;
+//       font-size: 0.9rem;
+//       font-weight: 500;
+//       color: var(--text-secondary);
+//       border-radius: var(--ui-border-radius-sm);
+//       cursor: pointer;
+//       display: flex;
+//       align-items: center;
+//       justify-content: center;
+//       gap: 6px;
+//       transition: all 0.2s;
+
+//       &.active {
+//         background: var(--bg-secondary);
+//         color: var(--text-primary);
+//         box-shadow: var(--shadow-sm);
+//         font-weight: 600;
+//       }
+
+//       .badge-dot {
+//         width: 8px;
+//         height: 8px;
+//         background-color: var(--color-error);
+//         border-radius: 50%;
+//       }
+      
+//       .badge-count {
+//         background: var(--accent-primary);
+//         color: #fff;
+//         font-size: 0.75rem;
+//         padding: 2px 6px;
+//         border-radius: 10px;
+//       }
+//     }
+//   }
+// }
+
+// /* === 2. Body (The List) - THE CRITICAL FIX IS HERE === */
+// .panel-body {
+//   flex-grow: 1;  /* Push to fill remaining space */
+//   overflow-y: auto; /* Enable vertical scrolling */
+  
+//   /* CRITICAL 3: This magic property fixes the "cut off" issue in Flex containers */
+//   min-height: 0; 
+  
+//   background: var(--bg-primary);
+//   padding-bottom: 20px; /* Space at bottom for safe scrolling */
+// }
+
+// /* === List Items === */
+// .notification-list {
+//   list-style: none;
+//   padding: 0;
+//   margin: 0;
+//   width: 100%; /* Ensure list takes full width */
+
+//   .notif-item {
+//     padding: 1rem;
+//     border-bottom: 1px solid var(--border-primary);
+//     display: flex;
+//     gap: 12px;
+//     cursor: pointer;
+//     width: 100%;
+    
+//     &:hover { background: var(--bg-ternary); }
+
+//     .notif-content {
+//       flex: 1;
+//       /* Prevent text from widening the container */
+//       min-width: 0; 
+      
+//       .title { 
+//         display: block; 
+//         font-weight: 600; 
+//         margin-bottom: 4px; 
+//         color: var(--text-primary);
+//         /* Truncate long titles */
+//         white-space: nowrap;
+//         overflow: hidden;
+//         text-overflow: ellipsis;
+//       }
+//       .msg { 
+//         font-size: 0.85rem; 
+//         color: var(--text-secondary); 
+//         margin: 0; 
+        
+//         /* Limit message to 2 lines */
+//         display: -webkit-box;
+//         -webkit-line-clamp: 2;
+//         -webkit-box-orient: vertical;
+//         overflow: hidden;
+//       }
+//       .time { 
+//         font-size: 0.75rem; 
+//         color: var(--text-label); 
+//         margin-top: 4px; 
+//         display: block; 
+//       }
+//     }
+    
+//     &.unread {
+//       background: rgba(var(--accent-primary-rgb), 0.05);
+//       border-left: 3px solid var(--accent-primary);
+//     }
+//   }
+// }
+
+// /* Approval Items */
+// .approval-item {
+//   padding: 1rem;
+//   border-bottom: 1px solid var(--border-primary);
+//   width: 100%;
+  
+//   .user-info {
+//     display: flex;
+//     justify-content: space-between;
+//     margin-bottom: 10px;
+//     .name { font-weight: 600; display: block; }
+//     .email { font-size: 0.85rem; color: var(--text-secondary); }
+//   }
+
+//   .approval-actions {
+//     display: flex;
+//     flex-direction: column;
+//     gap: 10px;
+//   }
+// }
+
+// /* Empty State */
+// .empty-state {
+//   height: 100%;
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   justify-content: center;
+//   color: var(--text-label);
+//   min-height: 200px; /* Ensure it takes up vertical space if empty */
+  
+//   i { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.5; }
+// }
+
+// /* === Global Overrides === */
+// :host ::ng-deep {
+//   .p-select { width: 100%; }
+  
+//   /* Fix dropdown clipping in modal */
+//   .p-select-panel { 
+//     z-index: 100000 !important; 
+//     position: fixed !important; 
+//   }
+// }
