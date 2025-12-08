@@ -9,6 +9,7 @@ import { LogsComponent } from './modules/transactions/logs/logs';
 import { SalesListComponent } from './modules/sales/sales-list/sales-list';
 import { Sessions } from './modules/auth/sessions/sessions/sessions';
 import { NotesManagerComponent } from './modules/shared/components/notes-manager/notes-manager.component';
+import { ChatLayoutComponent } from './chat/chat.component/chat.component';
 // import { LandingComponent } from './landingPage/landing.component'; // Removed for now
 
 export const routes: Routes = [
@@ -41,7 +42,7 @@ export const routes: Routes = [
       },
       { path: 'notes', component: NotesManagerComponent, title: 'My Notes' },
       { path: 'financials', component: LedgerComponent },
-      
+
       // --- Admin & Settings ---
       {
         path: 'admin/organization',
@@ -58,7 +59,7 @@ export const routes: Routes = [
             (m) => m.RoleManagementComponent
           ),
       },
-
+      { path: 'chat', component: ChatLayoutComponent },
       // --- MASTERS & TRANSACTIONS ---
       { path: 'masterList', component: MasterList },
       { path: 'transactions', component: Transactions },

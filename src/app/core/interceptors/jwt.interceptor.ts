@@ -8,14 +8,10 @@ import { environment } from '../../../environments/environment';
 
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
-
   let token: any;
   try {
     token = localStorage.getItem('apex_auth_token');
-  } catch (e) {
-    token = null;
-  }
-
+  } catch (e) { token = null }
   const isApiUrl = req.url.startsWith(environment.apiUrl);
   if (token && isApiUrl) {
     req = req.clone({
@@ -39,7 +35,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
 
         localStorage.removeItem('apex_auth_token');
         localStorage.removeItem('apex_user');
-        
+
         // Redirect to login
         router.navigate(['/auth/login']);
 

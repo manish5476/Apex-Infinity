@@ -69,7 +69,7 @@ export class ApiService extends BaseApiService {
 
 // Refresh JWT Token
 refreshToken(): Observable<any> {
-  return this.post('/v1/auth/refresh-token', {}, 'refreshToken');
+return this.post('/v1/auth/refresh-token', {}, 'refreshToken');
 }
 
 // Verify Token Validity (useful on app load)

@@ -61,6 +61,7 @@ export class Mainscreensidebar implements OnInit {
       label: 'Dashboard', icon: 'pi pi-home',
       items: [
         { label: 'Overview', icon: 'pi pi-chart-bar', routerLink: ['/dashboard'] },
+        { label: 'chat', icon: 'pi pi-message', routerLink: ['/chat'] },
         { label: 'Notes', icon: 'pi pi-pencil', routerLink: ['/notes'] },
         { label: 'Organization', icon: 'pi pi-cog', routerLink: ['/admin/organization'] }, 
         { label: 'Sessions', icon: 'pi pi-clock', routerLink: ['/sessions'] } 
