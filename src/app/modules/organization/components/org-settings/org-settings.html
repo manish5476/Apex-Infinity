@@ -323,7 +323,7 @@
 
                 <!-- Pending Approvals Section -->
                 @if (pendingMembers().length > 0) {
-                <div class="mt-8 pt-6" style="border-top: 1px solid var(--border-primary);">
+                <!-- <div class="mt-8 pt-6" style="border-top: 1px solid var(--border-primary);">
 
                   <div class="flex items-center gap-2 mb-4">
                     <i class="pi pi-clock text-[var(--color-accent-amber)]"></i>
@@ -368,7 +368,71 @@
 
                   </p-table>
 
+                </div> -->
+                <div class="mt-8 pt-6" style="border-top: 1px solid var(--border-primary);">
+
+                  <div class="flex items-center gap-2 mb-4">
+                    <i class="pi pi-clock text-[var(--color-accent-amber)]"></i>
+                    <h3 class="text-[var(--color-accent-amber)] m-0">Pending Approvals</h3>
+                    <p-badge [value]="pendingMembers().length.toString()" severity="warn"></p-badge>
+                  </div>
+
+                  <p-table [value]="pendingMembers()" styleClass="p-datatable-sm">
+
+                    <ng-template pTemplate="header">
+                      <tr>
+                        <th style="width: 30%">User</th>
+                        <th style="width: 20%">Requested</th>
+                        <th style="width: 25%">Role</th>
+                        <th style="width: 25%">Branch</th>
+                        <th style="width: 15%; text-align: right;">Action</th>
+                      </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-pending>
+                      <tr>
+                        <!-- User -->
+                        <td>
+                          <div class="font-semibold">{{ pending.name }}</div>
+                          <div class="text-xs text-[var(--text-secondary)] mt-1">
+                            {{ pending.email }}
+                          </div>
+                        </td>
+
+                        <!-- Requested Date -->
+                        <td class="text-sm text-[var(--text-secondary)]">
+                          {{ pending.requestedAt || pending.createdAt | date:'MMM d, y' }}
+                        </td>
+
+                        <!-- Role Dropdown -->
+                        <td>
+                          <p-select [options]="roles" [(ngModel)]="selectedRoles[pending._id]" optionLabel="name"
+                            optionValue="_id" placeholder="Select Role" styleClass="w-full text-sm" />
+                        </td>
+
+                        <!-- Branch Dropdown -->
+                        <td>
+                          <p-select [options]="branches" [(ngModel)]="selectedBranches[pending._id]" optionLabel="name"
+                            optionValue="_id" placeholder="Select Branch" styleClass="w-full text-sm" />
+                        </td>
+
+                        <!-- Approve Button -->
+                        <td style="text-align: right;">
+                          <button pButton label="Approve" icon="pi pi-check" size="small"
+                            class="p-button-success p-button-sm"
+                            [disabled]="!selectedRoles[pending._id] || !selectedBranches[pending._id]"
+                            (click)="approveMember(pending._id)"></button>
+
+                          <button pButton icon="pi pi-times" size="small"
+                            class="p-button-text p-button-danger p-button-sm ml-2" pTooltip="Reject"></button>
+                        </td>
+                      </tr>
+                    </ng-template>
+
+                  </p-table>
+
                 </div>
+
                 }
 
               </div>
