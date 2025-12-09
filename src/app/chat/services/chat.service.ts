@@ -278,11 +278,11 @@ export class ChatService {
     // prefer REST for pagination
     const params: any = { limit };
     if (before) params.before = before;
-    return this.http.get<{ messages: Message[] }>(`${environment.apiUrl}/chat/channels/${channelId}/messages`, { params });
+    return this.http.get<{ messages: Message[] }>(`${environment.apiUrl}/v1/chat/channels/${channelId}/messages`, { params });
   }
 
   listChannels() {
-    return this.http.get<Channel[]>(`${environment.apiUrl}/chat/channels`);
+    return this.http.get<Channel[]>(`${environment.apiUrl}/v1/chat/channels`);
   }
 
   // Flush queued outgoing messages immediately (called on reconnect)
@@ -403,7 +403,7 @@ export class ChatService {
 
   // Inside ChatService class
 createChannel(name: string, type: 'public' | 'private' = 'public', members: string[] = []) {
-  return this.http.post<Channel>(`${environment.apiUrl}/chat/channels`, {
+  return this.http.post<Channel>(`${environment.apiUrl}/v1/chat/channels`, {
     name,
     type,
     members
