@@ -5,17 +5,31 @@ import { BehaviorSubject, Subject, timer, Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 
-/**
- * Minimal models (import yours if available)
- */
+// 1. Define a minimal User interface
+export interface ChatUser {
+  _id: string;
+  name: string;
+  email?: string;
+}
+
+// 2. Update Message to allow senderId to be an Object OR a String
 export interface Message {
   _id?: string;
   channelId: string;
-  senderId?: string;
+  senderId?: string | ChatUser | any; 
   body?: string;
   attachments?: any[];
   createdAt?: string;
 }
+
+export interface Channel { 
+  _id: string; 
+  name?: string; 
+  type?: string; 
+  members?: string[]; 
+  isActive?: boolean; 
+}
+
 export interface Channel { _id: string; name?: string; type?: string; members?: string[]; isActive?: boolean; }
 
 @Injectable({ providedIn: 'root' })

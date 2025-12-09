@@ -3,16 +3,147 @@
   <aside class="sidebar">
     <div class="sidebar-header">
       <h3>Organization</h3>
+      <button class="add-channel-btn" (click)="openCreateModal()" title="Create New Channel"
+        aria-label="Create Channel">
+        +
+      </button>
+    </div>
+
+    <div class="channel-list">
+      <div class="section-label">Channels</div>
+
+      <div *ngFor="let channel of channels$ | async" (click)="selectChannel(channel)"
+        [class.active]="channel._id === activeChannelId" class="channel-item">
+        <span class="hash">#</span>
+        <span class="name">{{ channel.name || 'Unnamed' }}</span>
+      </div>
+
+      <div *ngIf="(channels$ | async)?.length === 0" class="section-label" style="text-transform: none; opacity: 0.5;">
+        No channels found
+      </div>
+    </div>
+  </aside>
+
+  <main class="chat-area">
+
+    <header class="chat-header" *ngIf="activeChannelId">
+      <div class="channel-info">
+        <h4>{{ getChannelName(activeChannelId) }}</h4>
+        <small>{{ (chatService.channelUsers$ | async)?.[activeChannelId]?.length || 0 }} members online</small>
+      </div>
+    </header>
+
+    <div class="messages-feed" #scrollContainer>
+
+      <div *ngIf="!(messages$ | async)?.length && activeChannelId" class="empty-state">
+        <p>No messages yet. Start the conversation in #{{ getChannelName(activeChannelId) }}!</p>
+      </div>
+
+      <div *ngIf="!activeChannelId" class="empty-state">
+        <p>Select a channel to start chatting</p>
+      </div>
+
+      <div *ngFor="let msg of messages$ | async" class="message-row" [class.mine]="getSenderId(msg) === currentUserdId">
+
+        <div class="avatar" *ngIf="getSenderId(msg) !== currentUserdId">
+          {{ getSenderName(msg).slice(0,2).toUpperCase() }}
+        </div>
+
+        <div class="message-bubble">
+          <div class="msg-meta" *ngIf="getSenderId(msg) !== currentUserdId">
+            <span class="sender-name">{{ getSenderName(msg) }}</span>
+          </div>
+
+          <div class="msg-body">{{ msg.body }}</div>
+
+          <div class="msg-time">{{ msg.createdAt | date:'shortTime' }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="typing-indicator" *ngIf="typingUsers$ | async as typer">
+      <small>{{ typer }} is typing...</small>
+    </div>
+
+    <footer class="chat-input-area">
+      <div class="input-wrapper">
+        <input type="text" [(ngModel)]="messageInput" (keyup.enter)="sendMessage()" (input)="onTyping()"
+          placeholder="Message #{{ getChannelName(activeChannelId) }}..." [disabled]="!activeChannelId" />
+
+        <button class="send-btn" (click)="sendMessage()" [disabled]="!messageInput.trim() || !activeChannelId">
+          Send
+        </button>
+      </div>
+    </footer>
+
+  </main>
+</div>
+
+<div class="modal-overlay" *ngIf="showCreateModal" (click)="closeCreateModal()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h2>Create New Channel</h2>
+      <button class="close-btn" (click)="closeCreateModal()" aria-label="Close">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Channel Name</label>
+        <div class="input-prefix-group">
+          <span class="prefix">#</span>
+          <input type="text" [(ngModel)]="newChannelName" (keyup.enter)="submitCreateChannel()"
+            placeholder="e.g. announcements" autofocus />
+        </div>
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="privateCheck" [(ngModel)]="isPrivateChannel">
+        <label for="privateCheck">
+          <strong>Make Private</strong>
+          <small>Only invited members (and you) can view this channel.</small>
+        </label>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeCreateModal()">Cancel</button>
+      <button class="btn-create" (click)="submitCreateChannel()" [disabled]="!newChannelName.trim()">
+        Create Channel
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- <div class="chat-layout">
+  <div *ngFor="let msg of messages$ | async" class="message-row" [class.mine]="getSenderId(msg) === currentUserdId">
+    <div class="avatar" *ngIf="getSenderId(msg) !== currentUserdId">
+      {{ getSenderName(msg).slice(0,2).toUpperCase() }}
+    </div>
+
+    <div class="message-bubble">
+      <div class="msg-meta" *ngIf="getSenderId(msg) !== currentUserdId">
+        <span class="sender-name">{{ getSenderName(msg) }}</span>
+      </div>
+
+      <div class="msg-body">{{ msg.body }}</div>
+
+      <div class="msg-time">{{ msg.createdAt | date:'shortTime' }}</div>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h3>Organization</h3>
       <button class="add-channel-btn" (click)="openCreateModal()" title="Create Channel">+</button>
     </div>
 
     <div class="channel-list">
       <div class="section-label">Public Channels</div>
 
-      <div *ngFor="let channel of channels$ | async"
-           (click)="selectChannel(channel)"
-           [class.active]="channel._id === activeChannelId"
-           class="channel-item">
+      <div *ngFor="let channel of channels$ | async" (click)="selectChannel(channel)"
+        [class.active]="channel._id === activeChannelId" class="channel-item">
         <span class="hash">#</span> {{ channel.name || 'Unnamed' }}
       </div>
 
@@ -21,7 +152,7 @@
 
   <main class="chat-area">
 
-    <!-- HEADER -->
+    HEADER
     <header class="chat-header" *ngIf="activeChannelId">
       <div class="channel-info">
         <h4># {{ getChannelName(activeChannelId) }}</h4>
@@ -29,15 +160,13 @@
       </div>
     </header>
 
-    <!-- MESSAGES FEED -->
+    MESSAGES FEED
     <div class="messages-feed" #scrollContainer>
       <div *ngIf="!(messages$ | async)?.length" class="empty-state">
         <p>No messages yet. Start the conversation!</p>
       </div>
 
-      <div *ngFor="let msg of messages$ | async"
-           class="message-row"
-           [class.mine]="msg.senderId === currentUserdId">
+      <div *ngFor="let msg of messages$ | async" class="message-row" [class.mine]="msg.senderId === currentUserdId">
 
         <div class="avatar" *ngIf="msg.senderId !== currentUserdId">
           {{ msg.senderId?.slice(0,2) }}
@@ -55,25 +184,19 @@
       </div>
     </div>
 
-    <!-- TYPING INDICATOR -->
+    TYPING INDICATOR
     <div class="typing-indicator" *ngIf="typingUsers$ | async as typer">
       <small *ngIf="typer">{{ typer }} is typing...</small>
     </div>
 
-    <!-- INPUT AREA -->
+    INPUT AREA
     <footer class="chat-input-area">
       <div class="input-wrapper">
 
-        <input type="text"
-               [(ngModel)]="messageInput"
-               (keyup.enter)="sendMessage()"
-               (input)="onTyping()"
-               placeholder="Message #{{ getChannelName(activeChannelId) }}..."
-               [disabled]="!activeChannelId" />
+        <input type="text" [(ngModel)]="messageInput" (keyup.enter)="sendMessage()" (input)="onTyping()"
+          placeholder="Message #{{ getChannelName(activeChannelId) }}..." [disabled]="!activeChannelId" />
 
-        <button class="send-btn"
-                (click)="sendMessage()"
-                [disabled]="!messageInput.trim()">
+        <button class="send-btn" (click)="sendMessage()" [disabled]="!messageInput.trim()">
           Send
         </button>
       </div>
@@ -82,7 +205,7 @@
   </main>
 </div>
 
-<!-- CREATE CHANNEL MODAL -->
+CREATE CHANNEL MODAL
 <div class="modal-overlay" *ngIf="showCreateModal" (click)="closeCreateModal()">
   <div class="modal-box" (click)="$event.stopPropagation()">
 
@@ -97,11 +220,8 @@
 
         <div class="input-prefix-group">
           <span class="prefix">#</span>
-          <input type="text"
-                 [(ngModel)]="newChannelName"
-                 (keyup.enter)="submitCreateChannel()"
-                 placeholder="e.g. announcements"
-                 autofocus />
+          <input type="text" [(ngModel)]="newChannelName" (keyup.enter)="submitCreateChannel()"
+            placeholder="e.g. announcements" autofocus />
         </div>
       </div>
 
@@ -116,12 +236,10 @@
 
     <div class="modal-footer">
       <button class="btn-cancel" (click)="closeCreateModal()">Cancel</button>
-      <button class="btn-create"
-              (click)="submitCreateChannel()"
-              [disabled]="!newChannelName.trim()">
+      <button class="btn-create" (click)="submitCreateChannel()" [disabled]="!newChannelName.trim()">
         Create
       </button>
     </div>
 
   </div>
-</div>
+</div> -->
