@@ -12,65 +12,133 @@
     <div class="channel-list">
       <div class="section-label">Channels</div>
 
-      <div *ngFor="let channel of channels$ | async" (click)="selectChannel(channel)"
-        [class.active]="channel._id === activeChannelId" class="channel-item">
+      @for (channel of channels$ | async; track channel._id) {
+      <div (click)="selectChannel(channel)" [class.active]="channel._id === activeChannelId" class="channel-item">
         <span class="hash">#</span>
         <span class="name">{{ channel.name || 'Unnamed' }}</span>
       </div>
+      }
 
-      <div *ngIf="(channels$ | async)?.length === 0" class="section-label" style="text-transform: none; opacity: 0.5;">
+      @if ((channels$ | async)?.length === 0) {
+      <div class="section-label" style="text-transform: none; opacity: 0.5;">
         No channels found
       </div>
+      }
     </div>
   </aside>
 
   <main class="chat-area">
 
-    <header class="chat-header" *ngIf="activeChannelId">
+    @if (activeChannelId) {
+    <header class="chat-header">
       <div class="channel-info">
         <h4>{{ getChannelName(activeChannelId) }}</h4>
         <small>{{ (chatService.channelUsers$ | async)?.[activeChannelId]?.length || 0 }} members online</small>
       </div>
     </header>
+    }
 
     <div class="messages-feed" #scrollContainer>
 
-      <div *ngIf="!(messages$ | async)?.length && activeChannelId" class="empty-state">
+      @if (!(messages$ | async)?.length && activeChannelId) {
+      <div class="empty-state">
         <p>No messages yet. Start the conversation in #{{ getChannelName(activeChannelId) }}!</p>
       </div>
+      }
 
-      <div *ngIf="!activeChannelId" class="empty-state">
+      @if (!activeChannelId) {
+      <div class="empty-state">
         <p>Select a channel to start chatting</p>
       </div>
+      }
 
-      <div *ngFor="let msg of messages$ | async" class="message-row" [class.mine]="getSenderId(msg) === currentUserdId">
+      @for (msg of messages$ | async; track msg._id) {
+      <div class="message-row" [class.mine]="getSenderId(msg) === currentUserdId">
 
-        <div class="avatar" *ngIf="getSenderId(msg) !== currentUserdId">
+        @if (getSenderId(msg) !== currentUserdId) {
+        <div class="avatar">
           {{ getSenderName(msg).slice(0,2).toUpperCase() }}
         </div>
+        }
 
-        <div class="message-bubble">
-          <div class="msg-meta" *ngIf="getSenderId(msg) !== currentUserdId">
+        <div class="message-bubble" [class.is-deleted]="msg.deleted">
+
+          @if (getSenderId(msg) !== currentUserdId && !msg.deleted) {
+          <div class="msg-meta">
             <span class="sender-name">{{ getSenderName(msg) }}</span>
           </div>
+          }
 
+          @if (!msg.deleted) {
+          @if (msg.body) {
           <div class="msg-body">{{ msg.body }}</div>
+          }
+
+          @if (msg.attachments?.length) {
+          <div class="attachments-grid">
+            @for (file of msg.attachments; track file.url) {
+            <div class="attachment-item">
+              @if (isImage(file.url)) {
+              <a [appImageViewer]="file.url" target="_blank">
+                <img [src]="file.url" alt="attachment" class="chat-image" />
+              </a>
+              } @else {
+              <a [appImageViewer]="file.url" target="_blank" class="file-link">
+                <span class="icon">📄</span> {{ file.name }}
+              </a>
+              <!-- <a [href]="file.url" target="_blank" class="file-link">
+                <span class="icon">📄</span> {{ file.name }}
+              </a> -->
+              }
+            </div>
+            }
+          </div>
+          }
+          } @else {
+          <div class="msg-body deleted-text">
+            <i>🚫 This message was deleted</i>
+          </div>
+          }
 
           <div class="msg-time">{{ msg.createdAt | date:'shortTime' }}</div>
+
+          @if (getSenderId(msg) === currentUserdId && !msg.deleted) {
+          <button class="delete-btn" (click)="deleteMessage(msg)" title="Delete">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </button>
+          }
+
         </div>
       </div>
+      }
     </div>
 
-    <div class="typing-indicator" *ngIf="typingUsers$ | async as typer">
+    @if (typingUsers$ | async; as typer) {
+    <div class="typing-indicator">
       <small>{{ typer }} is typing...</small>
     </div>
+    }
 
     <footer class="chat-input-area">
       <div class="input-wrapper">
+
+        <input type="file" #fileInput (change)="handleFileUpload($event)" style="display: none" />
+
+        <button class="attach-btn" (click)="fileInput.click()" title="Attach File" [disabled]="isUploading">
+          @if (isUploading) {
+          <span class="loader">⏳</span>
+          } @else {
+          📎
+          }
+        </button>
+
         <input type="text" [(ngModel)]="messageInput" (keyup.enter)="sendMessage()" (input)="onTyping()"
           placeholder="Message #{{ getChannelName(activeChannelId) }}..." [disabled]="!activeChannelId" />
 
-        <button class="send-btn" (click)="sendMessage()" [disabled]="!messageInput.trim() || !activeChannelId">
+        <button class="send-btn" (click)="sendMessage()" [disabled]="!messageInput.trim() && !isUploading">
           Send
         </button>
       </div>
@@ -79,7 +147,8 @@
   </main>
 </div>
 
-<div class="modal-overlay" *ngIf="showCreateModal" (click)="closeCreateModal()">
+@if (showCreateModal) {
+<div class="modal-overlay" (click)="closeCreateModal()">
   <div class="modal-box" (click)="$event.stopPropagation()">
 
     <div class="modal-header">
@@ -115,131 +184,4 @@
 
   </div>
 </div>
-
-<!-- <div class="chat-layout">
-  <div *ngFor="let msg of messages$ | async" class="message-row" [class.mine]="getSenderId(msg) === currentUserdId">
-    <div class="avatar" *ngIf="getSenderId(msg) !== currentUserdId">
-      {{ getSenderName(msg).slice(0,2).toUpperCase() }}
-    </div>
-
-    <div class="message-bubble">
-      <div class="msg-meta" *ngIf="getSenderId(msg) !== currentUserdId">
-        <span class="sender-name">{{ getSenderName(msg) }}</span>
-      </div>
-
-      <div class="msg-body">{{ msg.body }}</div>
-
-      <div class="msg-time">{{ msg.createdAt | date:'shortTime' }}</div>
-    </div>
-  </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <h3>Organization</h3>
-      <button class="add-channel-btn" (click)="openCreateModal()" title="Create Channel">+</button>
-    </div>
-
-    <div class="channel-list">
-      <div class="section-label">Public Channels</div>
-
-      <div *ngFor="let channel of channels$ | async" (click)="selectChannel(channel)"
-        [class.active]="channel._id === activeChannelId" class="channel-item">
-        <span class="hash">#</span> {{ channel.name || 'Unnamed' }}
-      </div>
-
-    </div>
-  </aside>
-
-  <main class="chat-area">
-
-    HEADER
-    <header class="chat-header" *ngIf="activeChannelId">
-      <div class="channel-info">
-        <h4># {{ getChannelName(activeChannelId) }}</h4>
-        <small>{{ (chatService.channelUsers$ | async)?.[activeChannelId]?.length || 0 }} members online</small>
-      </div>
-    </header>
-
-    MESSAGES FEED
-    <div class="messages-feed" #scrollContainer>
-      <div *ngIf="!(messages$ | async)?.length" class="empty-state">
-        <p>No messages yet. Start the conversation!</p>
-      </div>
-
-      <div *ngFor="let msg of messages$ | async" class="message-row" [class.mine]="msg.senderId === currentUserdId">
-
-        <div class="avatar" *ngIf="msg.senderId !== currentUserdId">
-          {{ msg.senderId?.slice(0,2) }}
-        </div>
-
-        <div class="message-bubble">
-          <div class="msg-meta" *ngIf="msg.senderId !== currentUserdId">
-            <span class="sender-name">{{ msg.senderId }}</span>
-          </div>
-
-          <div class="msg-body">{{ msg.body }}</div>
-
-          <div class="msg-time">{{ msg.createdAt | date:'shortTime' }}</div>
-        </div>
-      </div>
-    </div>
-
-    TYPING INDICATOR
-    <div class="typing-indicator" *ngIf="typingUsers$ | async as typer">
-      <small *ngIf="typer">{{ typer }} is typing...</small>
-    </div>
-
-    INPUT AREA
-    <footer class="chat-input-area">
-      <div class="input-wrapper">
-
-        <input type="text" [(ngModel)]="messageInput" (keyup.enter)="sendMessage()" (input)="onTyping()"
-          placeholder="Message #{{ getChannelName(activeChannelId) }}..." [disabled]="!activeChannelId" />
-
-        <button class="send-btn" (click)="sendMessage()" [disabled]="!messageInput.trim()">
-          Send
-        </button>
-      </div>
-    </footer>
-
-  </main>
-</div>
-
-CREATE CHANNEL MODAL
-<div class="modal-overlay" *ngIf="showCreateModal" (click)="closeCreateModal()">
-  <div class="modal-box" (click)="$event.stopPropagation()">
-
-    <div class="modal-header">
-      <h2>Create New Channel</h2>
-      <button class="close-btn" (click)="closeCreateModal()">&times;</button>
-    </div>
-
-    <div class="modal-body">
-      <div class="form-group">
-        <label>Channel Name</label>
-
-        <div class="input-prefix-group">
-          <span class="prefix">#</span>
-          <input type="text" [(ngModel)]="newChannelName" (keyup.enter)="submitCreateChannel()"
-            placeholder="e.g. announcements" autofocus />
-        </div>
-      </div>
-
-      <div class="form-group checkbox-group">
-        <input type="checkbox" id="privateCheck" [(ngModel)]="isPrivateChannel">
-        <label for="privateCheck">
-          <strong>Make Private</strong>
-          <small>Only invited members can view this channel.</small>
-        </label>
-      </div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn-cancel" (click)="closeCreateModal()">Cancel</button>
-      <button class="btn-create" (click)="submitCreateChannel()" [disabled]="!newChannelName.trim()">
-        Create
-      </button>
-    </div>
-
-  </div>
-</div> -->
+}

@@ -1,36 +1,43 @@
-// src/app/chat/chat.service.ts
 import { inject, Injectable, NgZone } from '@angular/core';
 import { io, Socket, ManagerOptions, SocketOptions } from 'socket.io-client';
 import { BehaviorSubject, Subject, timer, Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 
-// 1. Define a minimal User interface
+// --- INTERFACES ---
+
 export interface ChatUser {
   _id: string;
   name: string;
   email?: string;
+  avatar?: string;
 }
 
-// 2. Update Message to allow senderId to be an Object OR a String
+export interface Attachment {
+  name: string;
+  url: string;
+  type: string; // e.g. 'image/png', 'application/pdf'
+  size?: number;
+}
+
 export interface Message {
   _id?: string;
   channelId: string;
-  senderId?: string | ChatUser | any; 
+  // senderId can be string (sending) or object (receiving)
+  senderId?: string | ChatUser | any;
   body?: string;
-  attachments?: any[];
+  attachments?: Attachment[]; // ✅ Updated to use strict Interface
   createdAt?: string;
+  deleted?: boolean;
 }
 
-export interface Channel { 
-  _id: string; 
-  name?: string; 
-  type?: string; 
-  members?: string[]; 
-  isActive?: boolean; 
+export interface Channel {
+  _id: string;
+  name?: string;
+  type?: string;
+  members?: string[];
+  isActive?: boolean;
 }
-
-export interface Channel { _id: string; name?: string; type?: string; members?: string[]; isActive?: boolean; }
 
 @Injectable({ providedIn: 'root' })
 export class ChatService {
@@ -40,28 +47,27 @@ export class ChatService {
   private socket: Socket | null = null;
   private token: string | null = null;
 
-  // reconnect strategy
-  private baseReconnectMs = 500; // initial
+  // Reconnect Strategy
+  private baseReconnectMs = 500;
   private maxReconnectMs = 30_000;
   private reconnectAttempts = 0;
   private reconnectTimerSub: Subscription | null = null;
   private manualDisconnect = false;
 
-  // outbound queue (when offline)
+  // Outbound Queue (for offline messaging)
   private outboundQueue: Array<{ event: string; payload: any }> = [];
   private maxQueueSize = 200;
 
-  // simple rate limiting (token bucket)
+  // Rate Limiting (Token Bucket)
   private bucketTokens = 20;
   private bucketCapacity = 20;
-  private bucketRefillIntervalMs = 1000; // refill tokens every second
+  private bucketRefillIntervalMs = 1000;
   private bucketRefillSub: Subscription | null = null;
 
-  // token refresh hook: optional function provided by app to refresh token when expired
-  // signature: () => Promise<string> - must resolve to new token
+  // Token Refresh Hook
   private tokenRefreshFn?: () => Promise<string>;
 
-  // Observables / Subjects
+  // --- STATE OBSERVABLES ---
   public messages$ = new Subject<Message>();
   public messagesBatch$ = new BehaviorSubject<Message[]>([]);
   public channels$ = new BehaviorSubject<Channel[]>([]);
@@ -70,41 +76,33 @@ export class ChatService {
   public typing$ = new Subject<{ channelId: string; userId: string; typing: boolean }>();
   public connectionStatus$ = new BehaviorSubject<'connected' | 'disconnected' | 'reconnecting'>('disconnected');
 
-  // presence cache (in-memory)
-  private channelPresence = new Map<string, Set<string>>(); // channelId -> Set(userId)
-  private orgOnlineUsers = new Map<string, Set<string>>(); // orgId -> Set(userId)
+  // Internal Caches
+  private channelPresence = new Map<string, Set<string>>();
+  private orgOnlineUsers = new Map<string, Set<string>>();
 
-  // public config
+  // Config
   public autoReconnect = true;
   public maxReconnectAttempts = 50;
 
   constructor() {
-    // start bucket refill
     this.startBucketRefill();
   }
 
-  /**
-   * Set token refresh function so the service can attempt refresh when socket auth fails.
-   * Example: chatService.setTokenRefresh(() => authService.refreshTokenPromise());
-   */
   setTokenRefresh(fn: () => Promise<string>) {
     this.tokenRefreshFn = fn;
   }
 
-  /**
-   * Connect socket with JWT token. Will attempt reconnect automatically with backoff.
-   */
+  // ==========================================================================
+  // 🔌 SOCKET CONNECTION MANAGEMENT
+  // ==========================================================================
+
   connect(token: string) {
     this.manualDisconnect = false;
     this.token = token;
     if (this.socket && this.connectionStatus$.value === 'connected') return;
-
     this.zone.runOutsideAngular(() => this.openSocket());
   }
 
-  /**
-   * Disconnect and stop reconnect attempts.
-   */
   disconnect() {
     this.manualDisconnect = true;
     this.clearReconnectTimer();
@@ -118,34 +116,28 @@ export class ChatService {
       return;
     }
 
-    // If existing socket exists, close it
     if (this.socket) this._closeSocket();
 
     const opts: Partial<ManagerOptions & SocketOptions> = {
       transports: ['websocket'],
       auth: { token: this.token },
-      reconnection: false, // we manage reconnection manually for fine control
+      reconnection: false, // Manual control
     };
 
     try {
       this.socket = io(environment.socketUrl, opts);
 
-      // socket events
       this.socket.on('connect', () => {
         this.reconnectAttempts = 0;
         this.connectionStatus$.next('connected');
         this.zone.run(() => {
-          // register user if token contains sub (best-effort)
           const payload = this.decodeJwt(this.token!);
           if (payload?.sub) this.socket?.emit('registerUser', payload.sub);
         });
-
-        // flush queued messages
         this.flushQueue();
       });
 
       this.socket.on('connect_error', async (err: any) => {
-        // If auth error, try token refresh if provided
         const message = err?.message || err?.toString?.() || 'connect_error';
         if (message.toLowerCase().includes('auth') || message.toLowerCase().includes('invalid token')) {
           if (this.tokenRefreshFn) {
@@ -153,7 +145,6 @@ export class ChatService {
               const newToken = await this.tokenRefreshFn();
               if (newToken) {
                 this.token = newToken;
-                // re-open with new token after short delay
                 this.scheduleReconnect(300);
                 return;
               }
@@ -162,25 +153,25 @@ export class ChatService {
             }
           }
         }
-        // otherwise schedule reconnect
         if (!this.manualDisconnect && this.autoReconnect) this.scheduleReconnect();
       });
 
-      this.socket.on('disconnect', (reason: any) => {
-        if (this.manualDisconnect) return; // intentional
+      this.socket.on('disconnect', () => {
+        if (this.manualDisconnect) return;
         this.connectionStatus$.next('disconnected');
         if (this.autoReconnect) this.scheduleReconnect();
       });
 
-      // domain events
+      // --- EVENTS ---
       this.socket.on('newMessage', (msg: Message) => this.zone.run(() => this.onNewMessage(msg)));
-      this.socket.on('messages', (payload: { channelId: string; messages: Message[] }) => this.zone.run(() => this.onMessages(payload)));
-      this.socket.on('channelUsers', (data: { channelId: string; users: string[] }) => this.zone.run(() => this.onChannelUsers(data)));
-      this.socket.on('userJoinedChannel', (data: { channelId: string; userId: string }) => this.zone.run(() => this.onUserJoinedChannel(data)));
-      this.socket.on('userLeftChannel', (data: { channelId: string; userId: string }) => this.zone.run(() => this.onUserLeftChannel(data)));
-      this.socket.on('userOnline', (data: { userId: string; organizationId?: string }) => this.zone.run(() => this.onUserOnline(data)));
-      this.socket.on('userOffline', (data: { userId: string; organizationId?: string }) => this.zone.run(() => this.onUserOffline(data)));
-      this.socket.on('userTyping', (data: { channelId: string; userId: string; typing: boolean }) => this.zone.run(() => this.typing$.next(data)));
+      this.socket.on('messageDeleted', (data: { messageId: string }) => this.zone.run(() => this.onMessageDeleted(data)));
+      this.socket.on('messages', (payload) => this.zone.run(() => this.onMessages(payload)));
+      this.socket.on('channelUsers', (data) => this.zone.run(() => this.onChannelUsers(data)));
+      this.socket.on('userJoinedChannel', (data) => this.zone.run(() => this.onUserJoinedChannel(data)));
+      this.socket.on('userLeftChannel', (data) => this.zone.run(() => this.onUserLeftChannel(data)));
+      this.socket.on('userOnline', (data) => this.zone.run(() => this.onUserOnline(data)));
+      this.socket.on('userOffline', (data) => this.zone.run(() => this.onUserOffline(data)));
+      this.socket.on('userTyping', (data) => this.zone.run(() => this.typing$.next(data)));
 
     } catch (err) {
       console.error('ChatService.openSocket error', err);
@@ -188,30 +179,39 @@ export class ChatService {
     }
   }
 
-  // -----------------------
-  // Socket helpers & events
-  // -----------------------
+  // ==========================================================================
+  // 📥 INCOMING EVENT HANDLERS
+  // ==========================================================================
+
   private onNewMessage(msg: Message) {
     this.messages$.next(msg);
-    // batch buffer
     const batch = this.messagesBatch$.value || [];
     batch.push(msg);
-    if (batch.length > 100) batch.splice(0, batch.length - 100); // keep last 100 in memory
+    if (batch.length > 100) batch.splice(0, batch.length - 100);
     this.messagesBatch$.next(batch);
   }
 
+  private onMessageDeleted(data: { messageId: string }) {
+    // Soft delete in UI: Find message and mark as deleted
+    const current = this.messagesBatch$.value;
+    const updated = current.map(m => {
+      if (m._id === data.messageId) {
+        return { ...m, body: '', attachments: [], deleted: true };
+      }
+      return m;
+    });
+    this.messagesBatch$.next(updated);
+  }
+
   private onMessages(payload: { channelId: string; messages: Message[] }) {
-    // server sent a batch
     const existing = this.messagesBatch$.value || [];
     const merged = [...payload.messages.reverse(), ...existing];
-    // Trim to reasonable size
     if (merged.length > 500) merged.splice(500);
     this.messagesBatch$.next(merged);
   }
 
   private onChannelUsers(data: { channelId: string; users: string[] }) {
     this.channelUsers$.next({ ...this.channelUsers$.value, [data.channelId]: data.users });
-    // update internal presence map
     this.channelPresence.set(data.channelId, new Set(data.users));
   }
 
@@ -219,7 +219,6 @@ export class ChatService {
     const cur = { ...this.channelUsers$.value };
     cur[data.channelId] = Array.from(new Set([...(cur[data.channelId] || []), data.userId]));
     this.channelUsers$.next(cur);
-    // update map
     if (!this.channelPresence.has(data.channelId)) this.channelPresence.set(data.channelId, new Set());
     this.channelPresence.get(data.channelId)!.add(data.userId);
   }
@@ -228,16 +227,13 @@ export class ChatService {
     const cur = { ...this.channelUsers$.value };
     cur[data.channelId] = (cur[data.channelId] || []).filter(u => u !== data.userId);
     this.channelUsers$.next(cur);
-    // update map
     this.channelPresence.get(data.channelId)?.delete(data.userId);
   }
 
   private onUserOnline(data: { userId: string; organizationId?: string }) {
-    // update onlineUsers BehaviorSubject
     const set = new Set(this.onlineUsers$.value);
     set.add(data.userId);
     this.onlineUsers$.next(set);
-    // update org map if present
     if (data.organizationId) {
       if (!this.orgOnlineUsers.has(data.organizationId)) this.orgOnlineUsers.set(data.organizationId, new Set());
       this.orgOnlineUsers.get(data.organizationId)!.add(data.userId);
@@ -251,9 +247,10 @@ export class ChatService {
     if (data.organizationId) this.orgOnlineUsers.get(data.organizationId)?.delete(data.userId);
   }
 
-  // -----------------------
-  // Public API: actions
-  // -----------------------
+  // ==========================================================================
+  // 📤 PUBLIC API & ACTIONS
+  // ==========================================================================
+
   joinChannel(channelId: string) {
     if (!channelId) return;
     this.emitOrQueue('joinChannel', { channelId });
@@ -262,22 +259,36 @@ export class ChatService {
   leaveChannel(channelId: string) {
     if (!channelId) return;
     this.emitOrQueue('leaveChannel', { channelId });
-    // also local cleanup
     this.channelPresence.get(channelId)?.delete(this.decodeJwt(this.token || '')?.sub);
   }
 
   /**
-   * Send message. If socket not connected, queue it.
+   * Send Message: Can include body AND/OR attachments
    */
-  sendMessage(channelId: string, body: string, attachments: any[] = []) {
-    if (!channelId || !(body || attachments?.length)) return Promise.reject(new Error('invalid payload'));
+  sendMessage(channelId: string, body: string, attachments: Attachment[] = []) {
+    if (!channelId || (!body && !attachments.length)) return Promise.reject(new Error('invalid payload'));
+    
     const payload: Message = { channelId, body, attachments };
-    // rate limit
+    
     if (!this.consumeBucket()) {
-      // reject quickly or queue depending on design; we'll queue
       return this.queueMessage('sendMessage', payload);
     }
     return this.emitOrQueue('sendMessage', payload);
+  }
+
+  /**
+   * ✅ NEW: Upload File
+   * Uploads to backend, returns the Attachment object (url, type, name)
+   */
+  uploadAttachment(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+    // You must create this route in your backend!
+    return this.http.post<Attachment>(`${environment.apiUrl}/v1/chat/upload`, formData);
+  }
+
+  deleteMessage(messageId: string) {
+    return this.http.delete(`${environment.apiUrl}/v1/chat/messages/${messageId}`);
   }
 
   setTyping(channelId: string, typing: boolean) {
@@ -289,7 +300,6 @@ export class ChatService {
   }
 
   fetchMessages(channelId: string, before?: string, limit = 50) {
-    // prefer REST for pagination
     const params: any = { limit };
     if (before) params.before = before;
     return this.http.get<{ messages: Message[] }>(`${environment.apiUrl}/v1/chat/channels/${channelId}/messages`, { params });
@@ -299,7 +309,18 @@ export class ChatService {
     return this.http.get<Channel[]>(`${environment.apiUrl}/v1/chat/channels`);
   }
 
-  // Flush queued outgoing messages immediately (called on reconnect)
+  createChannel(name: string, type: 'public' | 'private' = 'public', members: string[] = []) {
+    return this.http.post<Channel>(`${environment.apiUrl}/v1/chat/channels`, {
+      name,
+      type,
+      members
+    });
+  }
+
+  // ==========================================================================
+  // ⚙️ INTERNAL UTILITIES (Queue, Bucket, JWT)
+  // ==========================================================================
+
   flushQueue() {
     if (!this.socket || this.connectionStatus$.value !== 'connected') return;
     while (this.outboundQueue.length) {
@@ -308,33 +329,24 @@ export class ChatService {
         this.socket.emit(item.event, item.payload);
       } catch (err) {
         console.error('flushQueue emit error', err);
-        // push back to front and break
         this.outboundQueue.unshift(item);
         break;
       }
     }
   }
 
-  // -----------------------
-  // Internal utilities
-  // -----------------------
   private emitOrQueue(event: string, payload: any): Promise<any> {
     if (this.socket && this.connectionStatus$.value === 'connected') {
       try {
         this.socket.emit(event, payload);
         return Promise.resolve(true);
-      } catch (err) {
-        // fallthrough to queue
-      }
+      } catch (err) { }
     }
     return this.queueMessage(event, payload);
   }
 
   private queueMessage(event: string, payload: any): Promise<any> {
-    if (this.outboundQueue.length >= this.maxQueueSize) {
-      // drop oldest to keep queue bounded
-      this.outboundQueue.shift();
-    }
+    if (this.outboundQueue.length >= this.maxQueueSize) this.outboundQueue.shift();
     this.outboundQueue.push({ event, payload });
     return Promise.resolve(true);
   }
@@ -355,12 +367,8 @@ export class ChatService {
   private scheduleReconnect(waitMs?: number) {
     if (this.manualDisconnect) return;
     this.reconnectAttempts++;
-    if (this.reconnectAttempts > this.maxReconnectAttempts) {
-      console.warn('ChatService: max reconnect attempts reached');
-      return;
-    }
+    if (this.reconnectAttempts > this.maxReconnectAttempts) return;
 
-    // compute backoff with jitter
     const base = waitMs ?? Math.min(this.baseReconnectMs * Math.pow(2, this.reconnectAttempts - 1), this.maxReconnectMs);
     const jitter = Math.floor(Math.random() * Math.min(1000, base));
     const delay = Math.max(300, base + jitter);
@@ -368,9 +376,7 @@ export class ChatService {
     this.clearReconnectTimer();
     this.connectionStatus$.next('reconnecting');
 
-    this.reconnectTimerSub = timer(delay).subscribe(() => {
-      this.openSocket();
-    });
+    this.reconnectTimerSub = timer(delay).subscribe(() => this.openSocket());
   }
 
   private clearReconnectTimer() {
@@ -380,9 +386,6 @@ export class ChatService {
     }
   }
 
-  // -----------------------
-  // Rate limiting token bucket
-  // -----------------------
   private startBucketRefill() {
     if (this.bucketRefillSub) return;
     this.bucketRefillSub = timer(0, this.bucketRefillIntervalMs).subscribe(() => {
@@ -401,32 +404,15 @@ export class ChatService {
     return true;
   }
 
-  // -----------------------
-  // JWT / helpers
-  // -----------------------
   private decodeJwt(token: string | null): any {
     try {
       if (!token) return null;
       const parts = token.split('.');
       if (parts.length !== 3) return null;
       return JSON.parse(atob(parts[1]));
-    } catch {
-      return null;
-    }
+    } catch { return null; }
   }
 
-  // Inside ChatService class
-createChannel(name: string, type: 'public' | 'private' = 'public', members: string[] = []) {
-  return this.http.post<Channel>(`${environment.apiUrl}/v1/chat/channels`, {
-    name,
-    type,
-    members
-  });
-}
-
-  // -----------------------
-  // Cleanup on destroy (optional)
-  // -----------------------
   destroy() {
     this.disconnect();
     this.stopBucketRefill();
