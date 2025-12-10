@@ -1,4 +1,1195 @@
-<div
+<div class="landing-root">
+  <div class="mesh-bg"></div>
+
+  <nav class="nav">
+    <div class="container nav-inner">
+      <div class="brand">
+        <div class="logo">A</div>
+        <span class="brand-text">Apex<span class="highlight">Infinity</span></span>
+      </div>
+      <div class="nav-links">
+        <a href="#" class="link">Features</a>
+        <a href="#" class="link">Pricing</a>
+        <a href="#" class="link">API</a>
+      </div>
+      <div class="nav-actions">
+        <button class="btn ghost" (click)="toggleTheme()">
+          <i class="pi" [ngClass]="theme === 'light' ? 'pi-moon' : 'pi-sun'"></i>
+        </button>
+        <button class="btn primary">Login</button>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="container hero-grid">
+      <div class="hero-content" #revealItem>
+        <div class="pill">
+          <span class="dot"></span> v20.0.0 Stable Release
+        </div>
+        <h1>The Operating System for <br> <span class="gradient-text">Modern Commerce</span></h1>
+        <p class="lead">
+          Combine CRM, Inventory, and Financials into one fluid timeline.
+          Powered by Generative AI to predict your next move.
+        </p>
+        <div class="hero-actions">
+          <button class="btn primary large">Start Free Trial</button>
+          <button class="btn secondary large"> <i class="pi pi-play"></i> Watch Demo</button>
+        </div>
+
+        <div class="trusted-by">
+          <span>Trusted by 500+ Enterprises</span>
+          <div class="logos">
+            <div class="logo-box">HDFC</div>
+            <div class="logo-box">Zoho</div>
+            <div class="logo-box">Tally</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual" #revealItem>
+        <div class="glass-card dashboard-mock">
+          <div class="mock-header">
+            <div class="circles"><span></span><span></span><span></span></div>
+          </div>
+          <div class="mock-body">
+            <div class="sidebar"></div>
+            <div class="main-view">
+              <div class="graph-area"></div>
+              <div class="row">
+                <div class="card-sm"></div>
+                <div class="card-sm"></div>
+              </div>
+            </div>
+          </div>
+          <div class="code-floater">
+            <pre>{{ codeSnippet }}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section id="stats-section" class="stats">
+    <div class="container stats-grid">
+      <div class="stat-item" #revealItem>
+        <div class="value">{{ stats.users }}+</div>
+        <div class="label">Active Users</div>
+      </div>
+      <div class="stat-item" #revealItem>
+        <div class="value">₹{{ stats.transactions }}Cr</div>
+        <div class="label">Processed Monthly</div>
+      </div>
+      <div class="stat-item" #revealItem>
+        <div class="value">{{ stats.uptime }}%</div>
+        <div class="label">System Uptime</div>
+      </div>
+      <div class="stat-item" #revealItem>
+        <div class="value">24/7</div>
+        <div class="label">AI Availability</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="modules section-pad">
+    <div class="container">
+      <div class="section-header center">
+        <h2>Unified Architecture</h2>
+        <p>Switch contexts instantly. No data silos.</p>
+      </div>
+
+      <div class="tabs-container" #revealItem>
+        <div class="tabs-list">
+          <button *ngFor="let m of modules" (click)="setActiveTab(m.id)" [class.active]="activeTab === m.id"
+            class="tab-btn">
+            <i [class]="m.icon"></i>
+            {{ m.label }}
+          </button>
+        </div>
+
+        <div class="tab-content">
+          <ng-container *ngFor="let m of modules">
+            <div *ngIf="activeTab === m.id" class="content-animate">
+              <div class="module-detail">
+                <div class="module-text">
+                  <h3>{{ m.title }}</h3>
+                  <p>{{ m.desc }}</p>
+                  <div class="tags">
+                    <span *ngFor="let t of m.tags" class="tag-badge">{{ t }}</span>
+                  </div>
+                  <button class="btn text-link">Explore {{ m.label }} &rarr;</button>
+                </div>
+                <div class="module-graphic">
+                  <div class="graphic-placeholder {{m.id}}"></div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bento section-pad">
+    <div class="container">
+      <div class="section-header">
+        <h2>Engineered for Scale</h2>
+      </div>
+      <div class="bento-grid">
+        <div *ngFor="let f of bentoFeatures" class="bento-card" [ngClass]="f.class" #revealItem>
+          <div class="bento-icon"><i [class]="f.icon"></i></div>
+          <h3>{{ f.title }}</h3>
+          <p>{{ f.desc }}</p>
+          <div class="bg-glow"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="roi section-pad">
+    <div class="container">
+      <div class="roi-card" #revealItem>
+        <div class="roi-inputs">
+          <h3>Calculate your ROI</h3>
+          <p>See how much Apex Infinity saves you.</p>
+
+          <div class="input-group">
+            <label>Finance Team Size</label>
+            <input type="range" min="1" max="50" [(ngModel)]="roiEmployees">
+            <span class="val">{{ roiEmployees }} Employees</span>
+          </div>
+
+          <div class="input-group">
+            <label>Hours Saved / Week</label>
+            <input type="range" min="1" max="20" [(ngModel)]="roiHoursSaved">
+            <span class="val">{{ roiHoursSaved }} Hours</span>
+          </div>
+        </div>
+
+        <div class="roi-result">
+          <div class="saving-label">Potential Monthly Savings</div>
+          <div class="saving-value">₹{{ monthlySavings | number }}</div>
+          <p class="sub">Based on avg industry hourly rates.</p>
+          <button class="btn primary">Get Full Report</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cases section-pad">
+    <div class="container">
+      <div class="section-header center">
+        <h2>Impact Stories</h2>
+      </div>
+      <div class="carousel-wrapper" #revealItem>
+        <button class="nav-btn prev" (click)="prevCase()">&larr;</button>
+        <div class="case-card">
+          <div class="case-metric">{{ caseStudies[carouselIndex].metric }}</div>
+          <div class="case-label">{{ caseStudies[carouselIndex].label }}</div>
+          <h4>{{ caseStudies[carouselIndex].name }}</h4>
+          <p>"{{ caseStudies[carouselIndex].brief }}"</p>
+        </div>
+        <button class="nav-btn next" (click)="nextCase()">&rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="pricing section-pad">
+    <div class="container">
+      <div class="pricing-grid">
+        <div *ngFor="let p of pricing" class="price-card" [class.highlight]="p.highlight" #revealItem>
+          <div class="p-name">{{ p.name }}</div>
+          <div class="p-cost">{{ p.price }}<span>{{ p.period }}</span></div>
+          <ul class="p-features">
+            <li *ngFor="let f of p.features"><i class="pi pi-check"></i> {{ f }}</li>
+          </ul>
+          <button class="btn" [ngClass]="p.highlight ? 'primary' : 'secondary'">Choose Plan</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-brand">28%
+        <h3>Apex Infinity</h3>
+        <p>&copy; 2025 Apex Systems.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Status</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- Root wrapper provides correct scroll container
+<div class="landing-root">
+
+  Visual backdrop (non-blocking)
+  <div class="backdrop" aria-hidden="true"></div>
+
+  NAV
+  <nav class="nav">
+    <div class="container nav-inner">
+      <div class="brand">
+        <div class="logo">A</div>
+        <div class="brand-text">
+          <div class="name">Apex <span class="brand-gradient">Infinity</span></div>
+          <div class="tag">Enterprise OS • Finance • AI</div>
+        </div>
+      </div>
+
+      <div class="nav-links">
+        <a href="#modules">Modules</a>
+        <a href="#ai">AI</a>
+        <a href="#security">Security</a>
+        <a href="#pricing">Pricing</a>
+      </div>
+
+      <div class="nav-actions">
+        <select (change)="toggleTheme($any($event.target).value)">
+          <option value="light" selected>Light</option>
+          <option value="dark">Dark</option>
+        </select>
+        <a routerLink="/auth/login" class="link">Log in</a>
+        <a routerLink="/auth/org" class="btn primary">Get Started</a>
+      </div>
+    </div>
+  </nav>
+
+  HERO
+  <header class="hero container">
+    <div class="hero-grid">
+      <div class="hero-copy reveal-item" #revealItem>
+        <div class="badge">v2.0 • Live</div>
+        <h1>
+          The Operating System for Modern Enterprises
+          <span class="gradient-text">AI · Finance · Inventory</span>
+        </h1>
+        <p class="lead">Unify financials, inventory and operations in one secure, auditable platform built for scale.
+        </p>
+
+        <div class="hero-actions">
+          <a class="btn primary large" href="#pricing">Start Free Trial</a>
+          <a class="btn ghost" href="#ai">Watch Demo</a>
+        </div>
+
+        <div class="trusted">
+          <small>Trusted by</small>
+          <div class="logos">
+            <div class="logo-pill">AR</div>
+            <div class="logo-pill">BD</div>
+            <div class="logo-pill">CS</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mock reveal-item" #revealItem>
+        <div class="mock-header">app.apex-infinity.com/dashboard</div>
+        <div class="mock-body">
+          <aside class="mock-side"></aside>
+          <section class="mock-main">
+            <div class="kpis">
+              <div class="kpi"><span class="label">Total Revenue</span><span class="value">₹4.25M</span></div>
+              <div class="kpi"><span class="label">Active Branches</span><span class="value">12</span></div>
+              <div class="kpi"><span class="label">Pending Invoices</span><span class="value">24</span></div>
+            </div>
+            <div class="chart-hero" aria-hidden="true"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  STATS
+  <section id="stats-section" class="stats container reveal-item" #revealItem>
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="num">{{ stats.users }}+</div>
+        <div class="label">Active Organizations</div>
+      </div>
+      <div class="stat">
+        <div class="num">₹{{ stats.transactions }}M</div>
+        <div class="label">Processed Volume</div>
+      </div>
+      <div class="stat">
+        <div class="num">{{ stats.uptime }}%</div>
+        <div class="label">System Uptime</div>
+      </div>
+      <div class="stat">
+        <div class="num">150+</div>
+        <div class="label">Countries Supported</div>
+      </div>
+    </div>
+  </section>
+
+  MODULES
+  <section id="modules" class="modules-section container">
+    <div class="modules-grid">
+      <div class="module-list reveal-item" #revealItem>
+        <h3>Core Modules</h3>
+        <div *ngFor="let mod of modules" (click)="setActiveTab(mod.id)" class="module-item"
+          [class.active]="activeTab===mod.id">
+          <div class="left">
+            <div class="icon"><i [class]="mod.icon"></i></div>
+            <div class="meta">
+              <div class="label">{{ mod.label }}</div>
+              <div class="sub">Integrated & Sync-ready</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="module-detail reveal-item" #revealItem>
+        <div *ngFor="let mod of modules" [hidden]="activeTab !== mod.id">
+          <div class="module-card">
+            <h2>{{ mod.title }}</h2>
+            <p class="muted">{{ mod.desc }}</p>
+            <ul class="feature-list">
+              <li *ngFor="let f of mod.features">{{ f }}</li>
+            </ul>
+            <div class="cta-row"><a routerLink="/auth/org" class="btn primary">Explore {{ mod.label }}</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  FEATURES
+  <section class="features-section container">
+    <h3 class="section-title reveal-item" #revealItem>Engineered for Scale</h3>
+    <p class="section-sub muted reveal-item" #revealItem>Everything a growing enterprise needs, out of the box.</p>
+
+    <div class="features-grid reveal-item" #revealItem>
+      <div *ngFor="let f of features" class="feature-card">
+        <div class="feature-icon" [class.highlight]="f.highlight"></div>
+        <h4>{{ f.title }}</h4>
+        <p class="muted">{{ f.desc }}</p>
+      </div>
+    </div>
+  </section>
+
+  AI
+  <section id="ai" class="ai-section container reveal-item" #revealItem>
+    <div class="ai-grid">
+      <div class="ai-copy">
+        <span class="label-sm">Artificial Intelligence</span>
+        <h3>Meet your Financial Analyst</h3>
+        <p class="muted">Natural language forecasts, anomaly detection, and action-ready recommendations.</p>
+
+        <div class="ai-box">
+          <input placeholder="Ask: Forecast next month's revenue" />
+          <button class="btn primary">Ask</button>
+        </div>
+
+        <ul class="ai-bullets">
+          <li>Top product growth: Wireless Earbuds (+12% WoW)</li>
+          <li>Cashflow dip alert: 3 pending vendor payments</li>
+          <li>Inventory risk: 42 SKUs low in Surat branch</li>
+        </ul>
+      </div>
+
+      <div class="ai-preview">
+        <div class="insight-card">
+          <div class="insight-head">Forecast</div>
+          <div class="insight-body"><strong>₹1.2 Cr</strong> (+15% MoM)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  SECURITY
+  <section id="security" class="security-section container reveal-item" #revealItem>
+    <div class="split">
+      <div>
+        <h3>Security & Compliance</h3>
+        <p class="muted">Audit trails, RBAC, export governance and session monitoring. Designed for enterprise audits.
+        </p>
+        <ul class="security-list">
+          <li>Audit logs & activity streams</li>
+          <li>RBAC with granular permissions</li>
+          <li>Export controls & retention</li>
+        </ul>
+      </div>
+      <div class="security-visual">
+        <div class="secure-box">SOC-ready • ISO-aligned</div>
+      </div>
+    </div>
+  </section>
+
+  PERMISSIONS
+  <section class="perms-section container reveal-item" #revealItem>
+    <h3>Platform Capabilities (selected)</h3>
+    <p class="muted">Representative capabilities derived from Apex permissions map.</p>
+
+    <div class="perms-grid">
+      <div *ngFor="let p of permissionsList" class="perm-card">
+        <div class="perm-tag">{{ p.tag }}</div>
+        <div class="perm-desc">{{ p.desc }}</div>
+        <div class="perm-group">{{ p.group }}</div>
+      </div>
+    </div>
+  </section>
+
+  CASE STUDIES
+  <section class="case-section container reveal-item" #revealItem>
+    <h3>Customer Results</h3>
+    <div class="case-carousel">
+      <button class="carousel-btn" (click)="prevCase()">‹</button>
+      <div class="case-track">
+        <div class="case" *ngFor="let cs of caseStudies; let i=index" [class.active]="i===carouselIndex" #carouselItem>
+          <h4>{{ cs.name }}</h4>
+          <div class="metric">{{ cs.metric }}</div>
+          <p class="muted">{{ cs.brief }}</p>
+        </div>
+      </div>
+      <button class="carousel-btn" (click)="nextCase()">›</button>
+    </div>
+  </section>
+
+  ROADMAP
+  <section class="roadmap-section container reveal-item" #revealItem>
+    <h3>Roadmap</h3>
+    <ol class="roadmap">
+      <li><strong>Q1:</strong> Multi-branch autosync & EMIs</li>
+      <li><strong>Q2:</strong> Advanced AI forecasting & plugins</li>
+      <li><strong>Q3:</strong> Enterprise SSO & audit workflows</li>
+    </ol>
+  </section>
+
+  COMPARISON TABLE
+  <section class="compare-section container reveal-item" #revealItem>
+    <h3>How Apex compares</h3>
+    <p class="muted">Feature-first comparison for decision-makers.</p>
+
+    <div class="table-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Accounting</th>
+            <th>Inventory</th>
+            <th>AI</th>
+            <th>Permissions</th>
+            <th>Enterprise</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of comparison">
+            <td class="product">{{ row.product }}</td>
+            <td>{{ row.accounting }}</td>
+            <td>{{ row.inventory }}</td>
+            <td>{{ row.ai }}</td>
+            <td>{{ row.permissions }}</td>
+            <td>{{ row.enterprise }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  PRICING
+  <section id="pricing" class="pricing-section container reveal-item" #revealItem>
+    <h3>Pricing (teaser)</h3>
+    <div class="pricing-grid">
+      <div *ngFor="let p of pricing" class="price-card">
+        <div class="tier">{{ p.name }}</div>
+        <div class="price">{{ p.price }}</div>
+        <ul>
+          <li *ngFor="let b of p.bullets">{{ b }}</li>
+        </ul>
+        <a class="btn ghost">Choose</a>
+      </div>
+    </div>
+  </section>
+
+  CTA
+  <section class="cta-section container reveal-item" #revealItem>
+    <div class="cta-inner">
+      <div>
+        <h2>Start your 14-day free trial</h2>
+        <p class="muted">No credit card required. Enterprise onboarding available.</p>
+      </div>
+      <div><a routerLink="/auth/org" class="btn primary large">Get Started</a></div>
+    </div>
+  </section>
+
+  FOOTER
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <h4>Apex Infinity</h4>
+        <p class="muted">The complete operating system for modern enterprises.</p>
+      </div>
+      <div>
+        <h5>Platform</h5>
+        <ul class="muted">
+          <li>Dashboard</li>
+          <li>Inventory</li>
+          <li>Invoicing</li>
+        </ul>
+      </div>
+      <div>
+        <h5>Company</h5>
+        <ul class="muted">
+          <li>About</li>
+          <li>Security</li>
+          <li>Contact</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom container">
+      <div>© 2025 Apex Infinity</div>
+      <div class="muted">Privacy · Terms</div>
+    </div>
+  </footer>
+
+</div> -->
+
+
+<!-- 
+<div class="landing-root">
+
+  soft gradient fog
+  <div class="backdrop" aria-hidden="true"></div>
+
+  NAV
+  <nav class="nav">
+    <div class="container nav-inner">
+      <div class="brand">
+        <div class="logo">A</div>
+        <div class="brand-text">
+          <div class="name">Apex <span class="brand-gradient">Infinity</span></div>
+          <div class="tag">Enterprise OS • Finance • AI</div>
+        </div>
+      </div>
+
+      <div class="nav-links">
+        <a href="#modules">Modules</a>
+        <a href="#ai">AI</a>
+        <a href="#security">Security</a>
+        <a href="#pricing">Pricing</a>
+      </div>
+
+      <div class="nav-actions">
+        <select (change)="toggleTheme($any($event.target).value)">
+          <option value="light" selected>Light</option>
+          <option value="dark">Dark</option>
+        </select>
+        <a routerLink="/auth/login" class="link">Log in</a>
+        <a routerLink="/auth/org" class="btn primary">Get Started</a>
+      </div>
+    </div>
+  </nav>
+
+  HERO
+  <header class="hero container" id="hero">
+    <div class="hero-grid">
+      <div class="hero-copy reveal-item" #revealItem>
+        <div class="badge">v2.0 • Live</div>
+        <h1>
+          The Operating System for Modern Enterprises
+          <span class="gradient-text">AI · Finance · Inventory</span>
+        </h1>
+        <p class="lead">Unify financials, inventory and operations in one secure, auditable platform built for scale.</p>
+
+        <div class="hero-actions">
+          <a class="btn primary large" href="#pricing">Start Free Trial</a>
+          <a class="btn ghost" href="#ai">Watch Demo</a>
+        </div>
+
+        <div class="trusted">
+          <small>Trusted by</small>
+          <div class="logos">
+            <div class="logo-pill">AR</div>
+            <div class="logo-pill">BD</div>
+            <div class="logo-pill">CS</div>
+          </div>
+        </div>
+      </div>
+
+      MOCK
+      <div class="mock reveal-item" #revealItem>
+        <div class="mock-header">app.apex-infinity.com/dashboard</div>
+        <div class="mock-body">
+          <aside class="mock-side">
+            <div class="accents"></div>
+            <div class="navline"></div>
+          </aside>
+          <section class="mock-main">
+            <div class="kpis">
+              <div class="kpi"><span class="label">Total Revenue</span><span class="value">₹4.25M</span></div>
+              <div class="kpi"><span class="label">Active Branches</span><span class="value">12</span></div>
+              <div class="kpi"><span class="label">Pending Invoices</span><span class="value">24</span></div>
+            </div>
+
+            <div class="chart-hero" aria-hidden="true"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  STATS
+  <section id="stats-section" class="stats container reveal-item" #revealItem>
+    <div class="stats-grid">
+      <div class="stat"><div class="num">{{ stats.users }}+</div><div class="label">Active Organizations</div></div>
+      <div class="stat"><div class="num">₹{{ stats.transactions }}M</div><div class="label">Processed Volume</div></div>
+      <div class="stat"><div class="num">{{ stats.uptime }}%</div><div class="label">System Uptime</div></div>
+      <div class="stat"><div class="num">150+</div><div class="label">Countries Supported</div></div>
+    </div>
+  </section>
+
+  MODULES
+  <section id="modules" class="modules-section container">
+    <div class="modules-grid">
+      <div class="module-list reveal-item" #revealItem>
+        <h3>Core Modules</h3>
+        <div *ngFor="let mod of modules" (click)="setActiveTab(mod.id)" class="module-item" [class.active]="activeTab===mod.id">
+          <div class="left">
+            <div class="icon"><i [class]="mod.icon"></i></div>
+            <div class="meta">
+              <div class="label">{{ mod.label }}</div>
+              <div class="sub">Integrated & Sync-ready</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="module-detail reveal-item" #revealItem>
+        <div *ngFor="let mod of modules" [hidden]="activeTab !== mod.id">
+          <div class="module-card">
+            <h2>{{ mod.title }}</h2>
+            <p class="muted">{{ mod.desc }}</p>
+            <ul class="feature-list">
+              <li *ngFor="let f of mod.features">{{ f }}</li>
+            </ul>
+            <div class="cta-row">
+              <a routerLink="/auth/org" class="btn primary">Explore {{ mod.label }}</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  FEATURES
+  <section class="features-section container">
+    <h3 class="section-title reveal-item" #revealItem>Engineered for Scale</h3>
+    <p class="section-sub muted reveal-item" #revealItem>Everything a growing enterprise needs, out of the box.</p>
+
+    <div class="features-grid reveal-item" #revealItem>
+      <div *ngFor="let f of features" class="feature-card">
+        <div class="feature-icon" [class.highlight]="f.highlight"></div>
+        <h4>{{ f.title }}</h4>
+        <p class="muted">{{ f.desc }}</p>
+      </div>
+    </div>
+  </section>
+
+  AI CFO
+  <section id="ai" class="ai-section container reveal-item" #revealItem>
+    <div class="ai-grid">
+      <div class="ai-copy">
+        <span class="label-sm">Artificial Intelligence</span>
+        <h3>Meet your Financial Analyst</h3>
+        <p class="muted">Natural language forecasts, anomaly detection, and action-ready recommendations.</p>
+
+        <div class="ai-box">
+          <input placeholder="Ask: Forecast next month's revenue" />
+          <button class="btn primary">Ask</button>
+        </div>
+
+        <ul class="ai-bullets">
+          <li>Top product growth: Wireless Earbuds (+12% WoW)</li>
+          <li>Cashflow dip alert: 3 pending vendor payments</li>
+          <li>Inventory risk: 42 SKUs low in Surat branch</li>
+        </ul>
+      </div>
+
+      <div class="ai-preview">
+        <div class="insight-card">
+          <div class="insight-head">Forecast</div>
+          <div class="insight-body"><strong>₹1.2 Cr</strong> (+15% MoM)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  SECURITY
+  <section id="security" class="security-section container reveal-item" #revealItem>
+    <div class="split">
+      <div>
+        <h3>Security & Compliance</h3>
+        <p class="muted">Audit trails, RBAC, export governance and session monitoring. Designed for enterprise audits.</p>
+
+        <ul class="security-list">
+          <li>Audit logs & activity streams</li>
+          <li>RBAC with granular permissions</li>
+          <li>Export controls & retention</li>
+        </ul>
+      </div>
+      <div class="security-visual">
+        <div class="secure-box">SOC-ready • ISO-aligned</div>
+      </div>
+    </div>
+  </section>
+
+  PERMISSIONS GRID
+  <section class="perms-section container reveal-item" #revealItem>
+    <h3>Platform Capabilities (selected)</h3>
+    <p class="muted">Representative capabilities derived from Apex permissions map.</p>
+
+    <div class="perms-grid">
+      <div *ngFor="let p of permissionsList" class="perm-card">
+        <div class="perm-tag">{{ p.tag }}</div>
+        <div class="perm-desc">{{ p.desc }}</div>
+        <div class="perm-group">{{ p.group }}</div>
+      </div>
+    </div>
+  </section>
+
+  CASE STUDIES
+  <section class="case-section container reveal-item" #revealItem>
+    <h3>Customer Results</h3>
+    <div class="case-carousel">
+      <button class="carousel-btn" (click)="prevCase()">‹</button>
+      <div class="case-track">
+        <div class="case" *ngFor="let cs of caseStudies; let i=index" [class.active]="i===carouselIndex" #carouselItem>
+          <h4>{{ cs.name }}</h4>
+          <div class="metric">{{ cs.metric }}</div>
+          <p class="muted">{{ cs.brief }}</p>
+        </div>
+      </div>
+      <button class="carousel-btn" (click)="nextCase()">›</button>
+    </div>
+  </section>
+
+  ROADMAP
+  <section class="roadmap-section container reveal-item" #revealItem>
+    <h3>Roadmap</h3>
+    <ol class="roadmap">
+      <li><strong>Q1:</strong> Multi-branch autosync & EMIs</li>
+      <li><strong>Q2:</strong> Advanced AI forecasting & plugins</li>
+      <li><strong>Q3:</strong> Enterprise SSO & audit workflows</li>
+    </ol>
+  </section>
+
+  COMPARISON TABLE
+  <section class="compare-section container reveal-item" #revealItem>
+    <h3>How Apex compares</h3>
+    <p class="muted">A practical, feature-first comparison for decision-makers.</p>
+
+    <div class="table-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Accounting</th>
+            <th>Inventory</th>
+            <th>AI</th>
+            <th>Permissions</th>
+            <th>Enterprise</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of comparison">
+            <td class="product">{{ row.product }}</td>
+            <td>{{ row.accounting }}</td>
+            <td>{{ row.inventory }}</td>
+            <td>{{ row.ai }}</td>
+            <td>{{ row.permissions }}</td>
+            <td>{{ row.enterprise }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  PRICING
+  <section id="pricing" class="pricing-section container reveal-item" #revealItem>
+    <h3>Pricing (teaser)</h3>
+    <div class="pricing-grid">
+      <div *ngFor="let p of pricing" class="price-card">
+        <div class="tier">{{ p.name }}</div>
+        <div class="price">{{ p.price }}</div>
+        <ul>
+          <li *ngFor="let b of p.bullets">{{ b }}</li>
+        </ul>
+        <a class="btn ghost">Choose</a>
+      </div>
+    </div>
+  </section>
+
+  CTA
+  <section class="cta-section container reveal-item" #revealItem>
+    <div class="cta-inner">
+      <div>
+        <h2>Start your 14-day free trial</h2>
+        <p class="muted">No credit card required. Enterprise onboarding available.</p>
+      </div>
+      <div>
+        <a routerLink="/auth/org" class="btn primary large">Get Started</a>
+      </div>
+    </div>
+  </section>
+
+  FOOTER
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <h4>Apex Infinity</h4>
+        <p class="muted">The complete operating system for modern enterprises.</p>
+      </div>
+      <div>
+        <h5>Platform</h5>
+        <ul class="muted"><li>Dashboard</li><li>Inventory</li><li>Invoicing</li></ul>
+      </div>
+      <div>
+        <h5>Company</h5>
+        <ul class="muted"><li>About</li><li>Security</li><li>Contact</li></ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom container">
+      <div>© 2025 Apex Infinity</div>
+      <div class="muted">Privacy · Terms</div>
+    </div>
+  </footer>
+
+</div> -->
+
+<!-- <div class="relative min-h-screen bg-[#0B0F19] text-white font-sans overflow-x-hidden selection:bg-cyan-500/30">
+
+  <div class="fixed inset-0 z-0 pointer-events-none">
+    <div class="absolute top-[-20%] left-[20%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse-slow"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan-600/10 rounded-full blur-[120px]"></div>
+    <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+  </div>
+
+  <nav class="fixed top-0 inset-x-0 z-50 border-b border-white/5 bg-[#0B0F19]/80 backdrop-blur-xl transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="relative w-8 h-8 bg-gradient-to-br from-indigo-500 to-cyan-400 rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(99,102,241,0.5)]">
+          <span class="font-bold text-white text-lg">A</span>
+        </div>
+        <span class="text-xl font-bold tracking-tight">Apex<span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Infinity</span></span>
+      </div>
+
+      <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400">
+        <a href="#features" class="hover:text-cyan-400 transition-colors">Modules</a>
+        <a href="#ai" class="hover:text-cyan-400 transition-colors">AI Agent</a>
+        <a href="#pricing" class="hover:text-cyan-400 transition-colors">Enterprise</a>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <a routerLink="/auth/login" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Log in</a>
+        <a routerLink="/auth/org" class="group relative px-5 py-2 rounded-full bg-white text-black text-sm font-bold hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] transition-all overflow-hidden">
+          <span class="relative z-10">Get Started</span>
+          <div class="absolute inset-0 bg-gradient-to-r from-cyan-200 to-indigo-200 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="relative z-10 pt-32">
+
+    <section class="px-6 mb-32 text-center max-w-7xl mx-auto relative">
+      <div #revealItem class="reveal-item flex flex-col items-center">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 text-xs font-semibold mb-8 backdrop-blur-md shadow-[0_0_10px_rgba(34,211,238,0.2)]">
+          <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+          Apex Infinity v2.0 Live
+        </div>
+
+        <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-tight">
+          The Operating System <br />
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-cyan-400">for Modern Enterprises</span>
+        </h1>
+
+        <p class="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+          Unify your Organization, Branches, Inventory, and Financials in one high-performance dashboard. Powered by AI.
+        </p>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
+          <button class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 text-white font-semibold shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:scale-105 transition-transform">
+            Start Free Trial
+          </button>
+          <button class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-[#1A1F2E] border border-white/10 text-white font-semibold hover:bg-white/5 transition-colors flex items-center gap-2">
+            <i class="pi pi-play text-cyan-400 text-xs"></i> Watch Demo
+          </button>
+        </div>
+
+        <div class="relative w-full max-w-5xl mx-auto group perspective-1000">
+          <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-cyan-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+          
+          <div class="relative rounded-xl bg-[#0B0F19] border border-white/10 shadow-2xl overflow-hidden transform transition-transform duration-700 group-hover:rotate-x-2">
+            <div class="h-10 border-b border-white/5 bg-[#131825] flex items-center px-4 gap-2">
+              <div class="flex gap-1.5">
+                <div class="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"></div>
+                <div class="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50"></div>
+                <div class="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50"></div>
+              </div>
+              <div class="mx-auto w-64 h-5 bg-[#1E2538] rounded-md flex items-center justify-center text-[10px] text-slate-500 font-mono">
+                app.apex-infinity.com/dashboard
+              </div>
+            </div>
+
+            <div class="flex h-[400px] md:h-[600px]">
+              <div class="w-16 md:w-64 border-r border-white/5 bg-[#0F1420] p-4 hidden md:flex flex-col gap-4">
+                <div class="h-8 w-32 bg-indigo-500/20 rounded animate-pulse"></div>
+                <div class="space-y-2 mt-4">
+                  <div class="h-8 w-full bg-white/5 rounded hover:bg-white/10 cursor-pointer"></div>
+                  <div class="h-8 w-full bg-transparent rounded hover:bg-white/5 cursor-pointer"></div>
+                  <div class="h-8 w-full bg-transparent rounded hover:bg-white/5 cursor-pointer"></div>
+                </div>
+              </div>
+
+              <div class="flex-1 p-6 bg-[#0B0F19] relative overflow-hidden">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                  <div class="h-32 rounded-lg bg-[#151A29] border border-white/5 p-4 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent"></div>
+                    <div class="text-xs text-slate-400 uppercase">Total Revenue</div>
+                    <div class="text-2xl text-white font-bold mt-2">₹4,250,000</div>
+                    <div class="mt-4 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+                      <div class="h-full w-[70%] bg-indigo-500"></div>
+                    </div>
+                  </div>
+                  <div class="h-32 rounded-lg bg-[#151A29] border border-white/5 p-4 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent"></div>
+                    <div class="text-xs text-slate-400 uppercase">Active Branches</div>
+                    <div class="text-2xl text-white font-bold mt-2">12</div>
+                    <div class="mt-4 flex gap-1">
+                      <div class="h-1.5 w-1.5 rounded-full bg-emerald-400"></div>
+                      <div class="text-[10px] text-emerald-400">All Operational</div>
+                    </div>
+                  </div>
+                  <div class="h-32 rounded-lg bg-[#151A29] border border-white/5 p-4 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent"></div>
+                    <div class="text-xs text-slate-400 uppercase">Pending Invoices</div>
+                    <div class="text-2xl text-white font-bold mt-2">24</div>
+                    <div class="text-[10px] text-orange-400 mt-1">Needs Attention</div>
+                  </div>
+                </div>
+
+                <div class="h-64 w-full rounded-lg bg-[#151A29] border border-white/5 relative p-4 flex items-end justify-between gap-2">
+                   <div class="w-full bg-indigo-500/20 rounded-t h-[40%]"></div>
+                   <div class="w-full bg-indigo-500/30 rounded-t h-[60%]"></div>
+                   <div class="w-full bg-indigo-500/40 rounded-t h-[50%]"></div>
+                   <div class="w-full bg-cyan-500/50 rounded-t h-[80%] shadow-[0_0_15px_rgba(6,182,212,0.3)]"></div>
+                   <div class="w-full bg-indigo-500/20 rounded-t h-[45%]"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="stats-section" class="border-y border-white/5 bg-[#0F1420]/50 backdrop-blur-sm py-12 mb-32">
+      <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div class="text-center group">
+          <div class="text-4xl font-bold text-white mb-1 group-hover:text-cyan-400 transition-colors">{{ stats.users }}+</div>
+          <div class="text-xs text-slate-500 uppercase tracking-widest font-semibold">Active Organizations</div>
+        </div>
+        <div class="text-center group">
+          <div class="text-4xl font-bold text-white mb-1 group-hover:text-indigo-400 transition-colors">₹{{ stats.transactions }}M</div>
+          <div class="text-xs text-slate-500 uppercase tracking-widest font-semibold">Processed Volume</div>
+        </div>
+        <div class="text-center group">
+          <div class="text-4xl font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">{{ stats.uptime }}%</div>
+          <div class="text-xs text-slate-500 uppercase tracking-widest font-semibold">System Uptime</div>
+        </div>
+        <div class="text-center group">
+          <div class="text-4xl font-bold text-white mb-1 group-hover:text-purple-400 transition-colors">150+</div>
+          <div class="text-xs text-slate-500 uppercase tracking-widest font-semibold">Countries Supported</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-6 mb-32">
+      <div class="flex flex-col md:flex-row gap-12">
+        <div class="w-full md:w-1/3 space-y-2">
+          <h3 class="text-2xl font-bold mb-6 px-4">Core Modules</h3>
+          <div *ngFor="let mod of modules" 
+               (click)="setActiveTab(mod.id)"
+               class="cursor-pointer p-4 rounded-xl border transition-all duration-300 group"
+               [ngClass]="activeTab === mod.id ? 'bg-white/5 border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.1)]' : 'border-transparent hover:bg-white/5'">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center transition-colors"
+                   [ngClass]="activeTab === mod.id ? 'bg-cyan-500/20 text-cyan-400' : 'bg-slate-800 text-slate-400 group-hover:text-white'">
+                <i [class]="mod.icon + ' text-xl'"></i>
+              </div>
+              <div>
+                <div class="font-semibold text-white" [ngClass]="{'text-cyan-400': activeTab === mod.id}">{{ mod.label }}</div>
+                <div class="text-xs text-slate-500 mt-1">Integrated & Sync-ready</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="w-full md:w-2/3 relative min-h-[400px]">
+          <div *ngFor="let mod of modules" 
+               class="absolute inset-0 transition-all duration-500 ease-in-out"
+               [ngClass]="activeTab === mod.id ? 'opacity-100 translate-x-0 z-10' : 'opacity-0 translate-x-10 z-0 pointer-events-none'">
+            
+            <div class="h-full rounded-3xl bg-gradient-to-br from-[#131825] to-[#0B0F19] border border-white/10 p-8 md:p-12 relative overflow-hidden">
+              <div class="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-[80px]"></div>
+
+              <h2 class="text-3xl font-bold mb-4 relative z-10">{{ mod.title }}</h2>
+              <p class="text-slate-400 text-lg mb-8 max-w-lg relative z-10">{{ mod.desc }}</p>
+
+              <ul class="space-y-4 mb-10 relative z-10">
+                <li *ngFor="let feat of mod.features" class="flex items-center gap-3 text-slate-300">
+                  <span class="flex items-center justify-center w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 text-xs">✓</span>
+                  {{ feat }}
+                </li>
+              </ul>
+
+              <div class="relative z-10 pt-6 border-t border-white/5">
+                <a routerLink="/auth/org" class="text-cyan-400 font-semibold hover:text-cyan-300 flex items-center gap-2">
+                  Explore {{ mod.label }} <i class="pi pi-arrow-right text-xs"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-6 mb-32">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-5xl font-bold mb-4">Engineered for Scale</h2>
+        <p class="text-slate-400">Everything a growing enterprise needs, out of the box.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div *ngFor="let feature of features" #revealItem
+             class="reveal-item group relative rounded-3xl overflow-hidden border border-white/5 bg-[#131825] p-8 transition-all duration-300"
+             [ngClass]="[feature.cols === 2 ? 'md:col-span-2' : 'md:col-span-1', feature.border]">
+          
+          <div class="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500" [ngClass]="feature.color"></div>
+
+          <div class="relative z-10">
+            <div class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-6 border border-white/10 group-hover:scale-110 transition-transform duration-500">
+              <ng-container [ngSwitch]="feature.icon">
+                <svg *ngSwitchCase="'ai'" class="w-6 h-6 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                <svg *ngSwitchCase="'branch'" class="w-6 h-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                <svg *ngSwitchCase="'emi'" class="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <svg *ngSwitchCase="'lock'" class="w-6 h-6 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+              </ng-container>
+            </div>
+
+            <h3 class="text-xl font-bold text-white mb-2">{{ feature.title }}</h3>
+            <p class="text-slate-400 text-sm leading-relaxed">{{ feature.desc }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="ai" class="relative py-24 bg-[#0F1420] border-y border-white/5 overflow-hidden">
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-full bg-indigo-500/5 blur-[100px]"></div>
+
+      <div class="max-w-7xl mx-auto px-6 relative z-10 flex flex-col md:flex-row items-center gap-16">
+        <div class="flex-1">
+          <div class="inline-flex items-center gap-2 text-indigo-400 font-semibold uppercase tracking-wider text-xs mb-4">
+            <i class="pi pi-sparkles"></i> Artificial Intelligence
+          </div>
+          <h2 class="text-4xl md:text-5xl font-bold mb-6">Meet your new <br/> <span class="text-indigo-400">Financial Analyst</span></h2>
+          <p class="text-slate-400 text-lg mb-8 leading-relaxed">
+            Apex AI doesn't just display data; it understands it. Ask natural questions about your revenue, inventory risks, or tax liabilities and get answers instantly.
+          </p>
+          
+          <div class="space-y-4">
+            <div class="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5">
+              <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-xs">AI</div>
+              <div class="text-sm text-indigo-200">"Your cash flow is projected to dip next Tuesday due to 3 pending vendor payments."</div>
+            </div>
+            <div class="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5 opacity-60">
+              <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-xs">AI</div>
+              <div class="text-sm text-indigo-200">"Top selling product in Surat Branch is 'Wireless Earbuds' (+12% WoW)."</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex-1 w-full relative">
+          <div class="rounded-2xl bg-[#0B0F19] border border-white/10 shadow-2xl p-6">
+            <div class="space-y-4 mb-6">
+               <div class="flex justify-end">
+                 <div class="bg-indigo-600 text-white px-4 py-2 rounded-2xl rounded-tr-none text-sm">Predict next month's revenue</div>
+               </div>
+               <div class="flex justify-start">
+                 <div class="bg-slate-800 text-slate-300 px-4 py-2 rounded-2xl rounded-tl-none text-sm max-w-[90%]">
+                   Based on current trends and pending invoices, forecasted revenue is <strong>₹1.2 Cr</strong> (+15% vs last month).
+                 </div>
+               </div>
+               <div class="h-32 bg-[#151A29] rounded-lg border border-white/5 relative overflow-hidden">
+                 <svg class="absolute inset-0 w-full h-full text-indigo-500/50" viewBox="0 0 100 50" preserveAspectRatio="none">
+                    <path d="M0 40 Q 25 30 50 35 T 100 10" fill="none" stroke="currentColor" stroke-width="2" />
+                    <path d="M0 40 Q 25 30 50 35 T 100 10 V 50 H 0 Z" fill="url(#grad)" class="opacity-30" />
+                    <defs>
+                      <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:rgb(99,102,241);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:rgb(99,102,241);stop-opacity:0" />
+                      </linearGradient>
+                    </defs>
+                 </svg>
+               </div>
+            </div>
+            <div class="relative">
+              <input type="text" placeholder="Ask Apex AI..." class="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors">
+              <button class="absolute right-2 top-2 p-1.5 bg-indigo-500 rounded-lg text-white hover:bg-indigo-400">
+                <i class="pi pi-arrow-up text-xs"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="border-t border-white/10 bg-[#0B0F19] pt-20 pb-10">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
+          <div class="col-span-2">
+            <span class="text-2xl font-bold tracking-tight text-white">Apex<span class="text-indigo-400">Infinity</span></span>
+            <p class="mt-4 text-slate-500 max-w-xs leading-relaxed">
+              The complete financial operating system for forward-thinking enterprises.
+            </p>
+          </div>
+          <div>
+            <h4 class="font-bold text-white mb-6">Platform</h4>
+            <ul class="space-y-3 text-slate-400 text-sm">
+              <li><a href="#" class="hover:text-cyan-400 transition-colors">Dashboard</a></li>
+              <li><a href="#" class="hover:text-cyan-400 transition-colors">Inventory</a></li>
+              <li><a href="#" class="hover:text-cyan-400 transition-colors">Invoicing</a></li>
+              <li><a href="#" class="hover:text-cyan-400 transition-colors">AI Agent</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-bold text-white mb-6">Company</h4>
+            <ul class="space-y-3 text-slate-400 text-sm">
+              <li><a href="#" class="hover:text-cyan-400 transition-colors">About</a></li>
+              <li><a href="#" class="hover:text-cyan-400 transition-colors">Security</a></li>
+              <li><a href="#" class="hover:text-cyan-400 transition-colors">Contact</a></li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-600">
+          <p>&copy; 2025 Apex Infinity. Built for scale.</p>
+          <div class="flex gap-6">
+            <a href="#" class="hover:text-slate-400">Privacy</a>
+            <a href="#" class="hover:text-slate-400">Terms</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  </main>
+</div> -->
+
+<!-- <div
   class="relative min-h-screen bg-slate-950 text-white overflow-x-hidden font-sans selection:bg-indigo-500 selection:text-white">
 
   <div class="fixed inset-0 z-0 pointer-events-none">
@@ -37,7 +1228,7 @@
       </div>
 
      <div class="hidden md:flex items-center gap-4">
-  <!-- Login Button -->
+  Login Button
   <button
     class="text-sm font-medium text-slate-300 hover:text-white"
     routerLink="/auth/login"
@@ -45,7 +1236,7 @@
     Log in
   </button>
 
-  <!-- Get Started Button -->
+  Get Started Button
   <button
     routerLink="/auth/org"
     class="group relative px-5 py-2 rounded-full bg-white text-slate-950 text-sm font-semibold hover:bg-slate-200 transition-all overflow-hidden"
@@ -523,4 +1714,4 @@
 
 
 
-
+ -->

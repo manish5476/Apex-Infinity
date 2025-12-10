@@ -55,7 +55,7 @@ export class LedgerComponent implements OnInit {
   // --- State ---
   tabValue = signal<number>(0);
   currentTab = computed<LedgerTab>(() => this.getTabType(this.tabValue()));
-  
+
   // Computed: Should we show the filter bar?
   showFilterBar = computed(() => {
     const tab = this.currentTab();
@@ -76,7 +76,7 @@ export class LedgerComponent implements OnInit {
     effect(() => {
       const tab = this.currentTab();
       this.initColumns(tab);
-      
+
       // Only auto-load if not dependent on a filter, or if filter is already set
       if (tab !== 'customer' && tab !== 'supplier') {
         this.loadData(tab);
@@ -111,11 +111,13 @@ export class LedgerComponent implements OnInit {
   // --- Columns ---
   private getTransactionLedgerColumns() {
     return [
-      { field: 'entryDate', headerName: 'Date', sortable: true, flex: 1, valueFormatter: (p: any) => this.common.formatDate(p.value) },
-      { field: 'type', headerName: 'Type', sortable: true, width: 100, cellRenderer: (p:any) => `<span class="badge ${p.value}">${p.value}</span>` },
+      {
+        field: this.tabValue() == 1 || this.tabValue() == 2 ? 'date' : 'entryDate', headerName: 'Date', sortable: true, flex: 1, valueFormatter: (p: any) => this.common.formatDate(p.value)
+      },
+      { field: 'type', headerName: 'Type', sortable: true, width: 100, cellRenderer: (p: any) => `<span class="badge ${p.value}">${p.value}</span>` },
       { field: 'description', headerName: 'Description', sortable: true, flex: 2 },
-      { 
-        field: 'amount', headerName: 'Amount', sortable: true, flex: 1, 
+      {
+        field: 'amount', headerName: 'Amount', sortable: true, flex: 1,
         type: 'rightAligned',
         cellStyle: (p: any) => p.data.type === 'debit' ? { color: 'var(--color-error)', fontWeight: '600' } : { color: 'var(--color-success)', fontWeight: '600' },
         valueFormatter: (p: any) => this.common.formatCurrency(p.value)
@@ -153,14 +155,14 @@ export class LedgerComponent implements OnInit {
         { field: 'account', headerName: 'Description', flex: 2, cellStyle: { fontWeight: '500' } },
         { field: 'value', headerName: 'Amount', flex: 1, type: 'rightAligned', valueFormatter: (p: any) => this.common.formatCurrency(p.value) }
       ];
-      
+
       // Small adjustments for specific APIs structure
-      if(tab === 'balanceSheet') {
-         cols = [
-            { field: 'category', headerName: 'Category', rowGroup: true, hide: true },
-            { field: 'account', headerName: 'Account Head', flex: 2 },
-            { field: 'amount', headerName: 'Balance', flex: 1, type: 'rightAligned', valueFormatter: (p: any) => this.common.formatCurrency(p.value) }
-         ];
+      if (tab === 'balanceSheet') {
+        cols = [
+          { field: 'category', headerName: 'Category', rowGroup: true, hide: true },
+          { field: 'account', headerName: 'Account Head', flex: 2 },
+          { field: 'amount', headerName: 'Balance', flex: 1, type: 'rightAligned', valueFormatter: (p: any) => this.common.formatCurrency(p.value) }
+        ];
       }
     }
     this.column.set(cols);
@@ -173,19 +175,19 @@ export class LedgerComponent implements OnInit {
   }
 
   loadData(tab: LedgerTab) {
-     // this.isLoading.set(true);
+    // this.isLoading.set(true);
     let apiCall: Observable<any>;
     const filters = this.filterForm.value;
 
     switch (tab) {
       case 'all': apiCall = this.financialService.getAllLedgers(); break;
-      case 'customer': 
+      case 'customer':
         if (!filters.customerId) { this.isLoading.set(false); return; }
-        apiCall = this.financialService.getCustomerLedger(filters.customerId); 
+        apiCall = this.financialService.getCustomerLedger(filters.customerId);
         break;
-      case 'supplier': 
+      case 'supplier':
         if (!filters.supplierId) { this.isLoading.set(false); return; }
-        apiCall = this.financialService.getSupplierLedger(filters.supplierId); 
+        apiCall = this.financialService.getSupplierLedger(filters.supplierId);
         break;
       case 'orgSummary': apiCall = this.financialService.getOrgLedgerSummary(); break;
       case 'pnl': apiCall = this.financialService.getProfitAndLoss(filters); break;
@@ -208,7 +210,7 @@ export class LedgerComponent implements OnInit {
 
   private processResponse(tab: LedgerTab, res: any) {
     let rows: any[] = [];
-    
+
     if (tab === 'customer' || tab === 'supplier') {
       rows = res.data.history || [];
     } else if (tab === 'all') {
@@ -232,9 +234,9 @@ export class LedgerComponent implements OnInit {
       const b = res.data;
       // Simplified mapping for grid
       rows = [
-         ...this.mapObjToRows(b.assets, 'Assets'),
-         ...this.mapObjToRows(b.liabilities, 'Liabilities'),
-         ...this.mapObjToRows(b.equity, 'Equity'),
+        ...this.mapObjToRows(b.assets, 'Assets'),
+        ...this.mapObjToRows(b.liabilities, 'Liabilities'),
+        ...this.mapObjToRows(b.equity, 'Equity'),
       ];
     } else if (tab === 'trialBalance') {
       rows = res.data.rows || [];
@@ -244,12 +246,12 @@ export class LedgerComponent implements OnInit {
   }
 
   private mapObjToRows(obj: any, category: string) {
-     if(!obj) return [];
-     return Object.keys(obj).map(key => ({
-        category,
-        account: key.replace(/([A-Z])/g, ' $1').trim(), // camelCase to Space
-        amount: obj[key]
-     }));
+    if (!obj) return [];
+    return Object.keys(obj).map(key => ({
+      category,
+      account: key.replace(/([A-Z])/g, ' $1').trim(), // camelCase to Space
+      amount: obj[key]
+    }));
   }
 
   // Helper for Trial Balance Footer

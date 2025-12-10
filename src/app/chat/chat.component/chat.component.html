@@ -1,5 +1,172 @@
-<div class="chat-layout">
+<div class="chat-layout theme-glass">
 
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="org-info">
+        <h3 class="org-name">Organization</h3>
+        <span class="status-badge" [class.connected]="(chatService.connectionStatus$ | async) === 'connected'">
+          {{ (chatService.connectionStatus$ | async) }}
+        </span>
+      </div>
+      <button class="btn-icon-soft" (click)="openCreateModal()" title="Create channel">
+        <span class="icon">＋</span>
+      </button>
+    </div>
+    <div class="sidebar-content">
+      <div class="section-header">CHANNELS</div>
+      <div class="channel-list">
+        <div *ngFor="let ch of channels" class="channel-item" [class.active]="ch._id === activeChannelId"
+          (click)="selectChannel(ch)">
+          <div class="channel-info">
+            <span class="hash">#</span>
+            <span class="name">{{ ch.name || 'Unnamed' }}</span>
+          </div>
+          <span class="lock-icon" *ngIf="ch.type === 'private'">🔒</span>
+        </div>
+        <div *ngIf="channels.length === 0" class="empty-channels">
+          No channels found
+        </div>
+      </div>
+    </div>
+  </aside>
+  <main class="chat-main">
+    <header class="chat-header" *ngIf="activeChannelId">
+      <div class="header-info">
+        <h4 class="channel-title">
+          <span class="hash">#</span> {{ getChannelName(activeChannelId) }}
+        </h4>
+        <small class="member-count">
+          {{ (channelUsers[activeChannelId]?.length || 0) }} members online
+        </small>
+      </div>
+    </header>
+    <div class="messages-container" #scrollContainer>
+      <div *ngIf="!activeChannelId" class="placeholder-state">
+        <div class="placeholder-content">
+          <div class="icon-large">👋</div>
+          <h3>Welcome Back</h3>
+          <p>Select a channel from the sidebar to start chatting.</p>
+        </div>
+      </div>
+
+      <div *ngIf="activeChannelId && messages.length === 0" class="placeholder-state">
+        <div class="placeholder-content">
+          <p>No messages yet. Be the first to say hello in <strong>#{{ getChannelName(activeChannelId) }}</strong>!</p>
+        </div>
+      </div>
+
+      <div *ngFor="let msg of messages" class="message-group" [class.mine]="getSenderId(msg) === currentUserId">
+
+        <div class="avatar" *ngIf="getSenderId(msg) !== currentUserId">
+          {{ getSenderName(msg).slice(0,2) | uppercase }}
+        </div>
+
+        <div class="message-content">
+          <div class="message-meta" *ngIf="!msg.deleted && getSenderId(msg) !== currentUserId">
+            <span class="sender-name">{{ getSenderName(msg) }}</span>
+            <span class="timestamp">{{ msg.createdAt | date:'shortTime' }}</span>
+          </div>
+
+          <div class="bubble" [class.deleted]="msg.deleted">
+
+            <div *ngIf="!msg.deleted">
+              <div *ngIf="msg.body" class="text-content">{{ msg.body }}</div>
+
+              <div *ngIf="msg.attachments?.length" class="attachments-grid">
+                <div *ngFor="let f of msg.attachments" class="attach-item">
+                  <a *ngIf="isImage(f.url)" [href]="f.url" target="_blank" class="img-preview-link">
+                    <img [src]="f.url" alt="attachment" loading="lazy" />
+                  </a>
+                  <a *ngIf="!isImage(f.url)" [href]="f.url" target="_blank" class="file-card">
+                    <span class="file-icon">📄</span>
+                    <span class="file-name">{{ f.name }}</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="msg.deleted" class="deleted-notice">
+              <span>🚫 Message deleted</span>
+            </div>
+
+            <button *ngIf="getSenderId(msg) === currentUserId && !msg.deleted" class="btn-delete"
+              (click)="deleteMessage(msg)" title="Delete Message">🗑</button>
+          </div>
+
+          <div class="message-meta mine" *ngIf="!msg.deleted && getSenderId(msg) === currentUserId">
+            {{ msg.createdAt | date:'shortTime' }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="typing-pill" *ngIf="typingUser">
+      <span class="dots">•••</span> {{ typingUser }} is typing
+    </div>
+
+    <footer class="composer-area">
+      <div class="composer-glass">
+        <input #fileInput type="file" (change)="handleFileUpload($event)" hidden />
+
+        <button class="btn-attach" (click)="triggerFilePicker()" [disabled]="isUploading">
+          {{ isUploading ? '⏳' : '📎' }}
+        </button>
+
+        <input class="input-message" type="text" [(ngModel)]="messageInput" (input)="onTypingInput()"
+          (keyup.enter)="sendMessage()" [disabled]="!activeChannelId"
+          placeholder="Message #{{ getChannelName(activeChannelId) }}..." />
+
+        <button class="btn-send" (click)="sendMessage()" [disabled]="!messageInput.trim() && !isUploading">
+          ➤
+        </button>
+      </div>
+    </footer>
+  </main>
+
+  <div class="modal-backdrop" *ngIf="showCreateModal">
+    <div class="glass-modal">
+      <div class="modal-header">
+        <h3>Create Channel</h3>
+        <button class="btn-close" (click)="closeCreateModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Channel Name</label>
+          <div class="input-wrapper">
+            <span class="prefix">#</span>
+            <input type="text" [(ngModel)]="newChannelName" placeholder="announcements" />
+          </div>
+        </div>
+
+        <div class="form-group checkbox">
+          <label class="switch-label">
+            <input type="checkbox" [(ngModel)]="isPrivateChannel" />
+            <span class="label-text">Private Channel</span>
+          </label>
+        </div>
+
+        <div *ngIf="isPrivateChannel" class="members-select-area">
+          <small class="label-sm">Select Members</small>
+          <div class="members-scroller">
+            <label *ngFor="let u of masterUsers" class="member-row">
+              <input type="checkbox" [checked]="selectedMembers.has(u._id)" (change)="toggleMemberSelection(u._id)" />
+              <span class="name">{{ u.name }}</span>
+            </label>
+            <div *ngIf="masterUsers.length === 0" class="text-muted">No other users found</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" (click)="closeCreateModal()">Cancel</button>
+        <button class="btn-primary" (click)="submitCreateChannel()" [disabled]="!newChannelName.trim()">Create
+          Channel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- <div class="chat-layout">
   <aside class="sidebar">
     <div class="sidebar-header">
       <h3>Organization</h3>
@@ -86,9 +253,7 @@
               <a [appImageViewer]="file.url" target="_blank" class="file-link">
                 <span class="icon">📄</span> {{ file.name }}
               </a>
-              <!-- <a [href]="file.url" target="_blank" class="file-link">
-                <span class="icon">📄</span> {{ file.name }}
-              </a> -->
+             
               }
             </div>
             }
@@ -184,4 +349,4 @@
 
   </div>
 </div>
-}
+} -->

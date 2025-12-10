@@ -18,7 +18,7 @@ import { CardModule } from 'primeng/card';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DividerModule } from 'primeng/divider';
 import { ToastModule } from 'primeng/toast';
-import { SelectModule } from 'primeng/select'; 
+import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { SkeletonModule } from 'primeng/skeleton';
 import { AvatarModule } from 'primeng/avatar';
@@ -26,23 +26,7 @@ import { AvatarModule } from 'primeng/avatar';
 @Component({
   selector: 'app-customer-form',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterModule,
-    InputTextModule,
-    FileUploadModule,
-    ButtonModule,
-    CheckboxModule,
-    CardModule,
-    InputNumberModule,
-    DividerModule,
-    ToastModule,
-    SelectModule,
-    TextareaModule,
-    SkeletonModule,
-    AvatarModule
-  ],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, InputTextModule, FileUploadModule, ButtonModule, CheckboxModule, CardModule, InputNumberModule, DividerModule, ToastModule, SelectModule, TextareaModule, SkeletonModule, AvatarModule],
   providers: [CustomerService],
   templateUrl: './customer-form.html',
   styleUrls: ['./customer-form.scss']
@@ -61,13 +45,12 @@ export class CustomerForm implements OnInit {
   loadingData = signal(false);
   editMode = signal(false);
   customerId = signal<string | null>(null);
-  
+
   // Computed
   pageTitle = computed(() => this.editMode() ? 'Edit Customer' : 'Create New Customer');
   submitLabel = computed(() => this.isSubmitting() ? 'Submitting...' : (this.editMode() ? 'Save Changes' : 'Create Customer'));
-
   customerForm!: FormGroup;
-  
+
   // Dropdown Options
   customerTypes = [
     { label: 'Individual', value: 'individual' },
@@ -87,7 +70,7 @@ export class CustomerForm implements OnInit {
       type: ['individual', Validators.required],
       name: ['', Validators.required],
       contactPerson: [''],
-      email: ['', [Validators.email]], 
+      email: ['', [Validators.email]],
       phone: ['', Validators.required],
       altPhone: [''],
       gstNumber: [''],
@@ -134,7 +117,7 @@ export class CustomerForm implements OnInit {
 
   private loadCustomerData(id: string): void {
     this.loadingData.set(true);
-    
+
     this.common.apiCall(
       this.customerService.getCustomerDataWithId(id),
       (response: any) => {
@@ -142,7 +125,7 @@ export class CustomerForm implements OnInit {
         if (data) {
           this.customerForm.patchValue(data);
           if (data.avatar) this.currentAvatarUrl = data.avatar;
-          
+
           // Patch nested addresses safely
           if (data.billingAddress) this.customerForm.get('billingAddress')?.patchValue(data.billingAddress);
           if (data.shippingAddress) this.customerForm.get('shippingAddress')?.patchValue(data.shippingAddress);
@@ -158,7 +141,7 @@ export class CustomerForm implements OnInit {
     if (file) {
       this.customerForm.patchValue({ avatar: file });
       this.customerForm.get('avatar')?.markAsDirty();
-      
+
       const reader = new FileReader();
       reader.onload = (e: any) => this.currentAvatarUrl = e.target.result;
       reader.readAsDataURL(file);
@@ -185,14 +168,14 @@ export class CustomerForm implements OnInit {
     // 3. Determine if Create or Update
     // Note: Update logic might differ slightly depending on if you want to support 2-step update too
     // For now, let's assume Create uses 2-step, and Update uses standard JSON (or 2-step if you adapt API)
-    
+
     if (this.editMode()) {
-       // --- UPDATE FLOW ---
-       // If you updated your Update API to be JSON-only too, use this:
-       this.handleUpdate(this.customerId()!, formValue, avatarFile);
+      // --- UPDATE FLOW ---
+      // If you updated your Update API to be JSON-only too, use this:
+      this.handleUpdate(this.customerId()!, formValue, avatarFile);
     } else {
-       // --- CREATE FLOW (2-Step) ---
-       this.handleCreate(formValue, avatarFile);
+      // --- CREATE FLOW (2-Step) ---
+      this.handleCreate(formValue, avatarFile);
     }
   }
 
@@ -252,7 +235,7 @@ export class CustomerForm implements OnInit {
     console.error('Error:', err);
     this.messageService.showError('Error', err.error?.message);
   }
-  
+
   copyBillingAddress(event: any): void {
     if (event.checked) {
       const billingAddress = this.customerForm.get('billingAddress')?.value;
@@ -263,7 +246,7 @@ export class CustomerForm implements OnInit {
       });
     }
   }
-  
+
   isFieldInvalid(field: string): boolean {
     const control = this.customerForm.get(field);
     return !!(control && control.invalid && (control.dirty || control.touched));

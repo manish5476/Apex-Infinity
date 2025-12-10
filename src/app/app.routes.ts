@@ -9,7 +9,8 @@ import { LogsComponent } from './modules/transactions/logs/logs';
 import { SalesListComponent } from './modules/sales/sales-list/sales-list';
 import { Sessions } from './modules/auth/sessions/sessions/sessions';
 import { NotesManagerComponent } from './modules/shared/components/notes-manager/notes-manager.component';
-import { ChatLayoutComponent } from './chat/chat.component/chat.component';
+import { ChatComponent } from './chat/chat.component/chat.component';
+import { LandingComponent } from './landingPage/landing.component';
 // import { LandingComponent } from './landingPage/landing.component'; // Removed for now
 
 export const routes: Routes = [
@@ -30,7 +31,7 @@ export const routes: Routes = [
   {
     path: '',
     component: MainScreen,
-    canActivate: [authGuard], // 🔒 Locks the root
+    canActivate: [authGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
@@ -59,12 +60,13 @@ export const routes: Routes = [
             (m) => m.RoleManagementComponent
           ),
       },
-      { path: 'chat', component: ChatLayoutComponent },
+      { path: 'chat', component: ChatComponent },
       // --- MASTERS & TRANSACTIONS ---
       { path: 'masterList', component: MasterList },
       { path: 'transactions', component: Transactions },
       { path: 'sessions', component: Sessions },
       { path: 'logs', component: LogsComponent },
+      { path: 'landing', component: LandingComponent },
       { path: 'sales', component: SalesListComponent },
 
       // --- LAZY LOADED MODULES ---
