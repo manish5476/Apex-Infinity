@@ -49,8 +49,5 @@ export class NoteService extends BaseApiService {
       formData.append('files', file);
     });
 
-    // Note: We call this.http.post directly or ensure BaseApiService.post supports FormData.
-    // Since BaseApiService.post takes 'any' as data, Angular's HttpClient will detect FormData 
-    // and set the correct multipart headers automatically.
     return this.post(`${this.endpoint}/upload-media`, formData, 'uploadMedia');
   }}

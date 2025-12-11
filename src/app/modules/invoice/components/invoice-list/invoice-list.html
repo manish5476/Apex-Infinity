@@ -1,97 +1,137 @@
 <p-toast></p-toast>
 
 <div class="list-page-container">
-  
+
   <div class="list-header">
     <h2 class="list-title">
       <i class="pi pi-receipt text-[var(--accent-primary)]"></i>
       Invoices
     </h2>
-    <p-button 
-      label="New Invoice" 
-      icon="pi pi-plus" 
-      routerLink="create">
-    </p-button>
+    <div class="flex gap-2">
+      <p-button label="Export CSV" icon="pi pi-download" styleClass="p-button-outlined p-button-secondary"
+        [loading]="isExporting" (onClick)="exportReport()">
+      </p-button>
+
+      <p-button label="New Invoice" icon="pi pi-plus" routerLink="create">
+      </p-button>
+    </div>
   </div>
 
-  <div class="themed-card"> <div class="se-filter-bar">
-      
+  <div class="themed-card">
+    <div class="se-filter-bar">
+
+      <div class="se-filter-field" style="min-width: 220px;">
+        <label for="dateRange">Date Range</label>
+        <p-datepicker [(ngModel)]="dateRange" selectionMode="range" [readonlyInput]="true" placeholder="Start - End"
+          [showIcon]="true" inputId="dateRange" appendTo="body" (onClose)="applyFilters()">
+        </p-datepicker>
+      </div>
+
       <div class="se-filter-field">
         <label for="invoiceNumber">Invoice Number</label>
-        <input 
-          id="invoiceNumber" 
-          type="text" 
-          pInputText 
-          [(ngModel)]="invoiceFilter.invoiceNumber"
-          placeholder="Search by number" />
+        <input id="invoiceNumber" type="text" pInputText [(ngModel)]="invoiceFilter.invoiceNumber"
+          placeholder="Search number" (keydown.enter)="applyFilters()" />
       </div>
-      
+
       <div class="se-filter-field">
         <label for="customer">Customer</label>
-        <p-select  appendTo="body" 
-          id="customer" 
-          [options]="customerOptions()" 
-          [(ngModel)]="invoiceFilter.customerId"
-          [filter]="true" 
-          filterBy="name"
-          optionLabel="name" 
-          optionValue="_id"
-          [showClear]="true" 
-          placeholder="Select Customer" 
-          appendTo="body">
+        <p-select appendTo="body" id="customer" [options]="customerOptions()" [(ngModel)]="invoiceFilter.customerId"
+          [filter]="true" filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true"
+          placeholder="All Customers" (onChange)="applyFilters()">
         </p-select>
       </div>
 
       <div class="se-filter-field">
         <label for="status">Status</label>
-        <p-select  appendTo="body" 
-          id="status" 
-          [options]="statusOptions" 
-          [(ngModel)]="invoiceFilter.status"
-          [showClear]="true" 
-          placeholder="Select Status" 
-          appendTo="body">
+        <p-select appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="invoiceFilter.status"
+          [showClear]="true" placeholder="All Status" (onChange)="applyFilters()">
         </p-select>
       </div>
-      
+
       <div class="se-filter-field">
-        <label for="paymentStatus">Payment Status</label>
-        <p-select  appendTo="body" 
-          id="paymentStatus" 
-          [options]="paymentStatusOptions" 
-          [(ngModel)]="invoiceFilter.paymentStatus"
-          [showClear]="true" 
-          placeholder="Select Payment" 
-          appendTo="body">
+        <label for="paymentStatus">Payment</label>
+        <p-select appendTo="body" id="paymentStatus" [options]="paymentStatusOptions"
+          [(ngModel)]="invoiceFilter.paymentStatus" [showClear]="true" placeholder="All Payments"
+          (onChange)="applyFilters()">
         </p-select>
       </div>
 
       <div class="se-filter-actions">
-        <p-button 
-          label="Apply" 
-          icon="pi pi-check" 
-          (onClick)="applyFilters()">
+        <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()">
         </p-button>
-        <p-button 
-          label="Reset" 
-          icon="pi pi-refresh" 
-          styleClass="p-button-outlined"
-          (onClick)="resetFilters()">
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined" (onClick)="resetFilters()">
         </p-button>
       </div>
     </div>
   </div>
 
-  <div class="themed-card list-grid-area"> <app-shared-grid 
-      [data]="data" 
-      [gridHeight]="'210px'" [headerFilter]="false" 
-      [rowSelectionMode]="rowSelectionMode"
-      [GridName]="'Invoices'" 
-      [column]="column" 
-      (eventFromGrid)="eventFromGrid($event)"
-      (gridReady)="onGridReady($event)" 
-      (scrolledToBottom)="onScrolledToBottom($event)">
+  <div class="themed-card list-grid-area">
+    <app-shared-grid [data]="data" [gridHeight]="'210px'" [headerFilter]="false" [rowSelectionMode]="rowSelectionMode"
+      [GridName]="'Invoices'" [column]="column" (eventFromGrid)="eventFromGrid($event)"
+      (gridReady)="onGridReady($event)" (scrolledToBottom)="onScrolledToBottom($event)">
     </app-shared-grid>
   </div>
 
 </div>
+
+<!-- <p-toast></p-toast>
+
+<div class="list-page-container">
+
+  <div class="list-header">
+    <h2 class="list-title">
+      <i class="pi pi-receipt text-[var(--accent-primary)]"></i>
+      Invoices
+    </h2>
+    <p-button label="New Invoice" icon="pi pi-plus" routerLink="create">
+    </p-button>
+  </div>
+
+  <div class="themed-card">
+    <div class="se-filter-bar">
+
+      <div class="se-filter-field">
+        <label for="invoiceNumber">Invoice Number</label>
+        <input id="invoiceNumber" type="text" pInputText [(ngModel)]="invoiceFilter.invoiceNumber"
+          placeholder="Search by number" />
+      </div>
+
+      <div class="se-filter-field">
+        <label for="customer">Customer</label>
+        <p-select appendTo="body" id="customer" [options]="customerOptions()" [(ngModel)]="invoiceFilter.customerId"
+          [filter]="true" filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true"
+          placeholder="Select Customer" appendTo="body">
+        </p-select>
+      </div>
+
+      <div class="se-filter-field">
+        <label for="status">Status</label>
+        <p-select appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="invoiceFilter.status"
+          [showClear]="true" placeholder="Select Status" appendTo="body">
+        </p-select>
+      </div>
+
+      <div class="se-filter-field">
+        <label for="paymentStatus">Payment Status</label>
+        <p-select appendTo="body" id="paymentStatus" [options]="paymentStatusOptions"
+          [(ngModel)]="invoiceFilter.paymentStatus" [showClear]="true" placeholder="Select Payment" appendTo="body">
+        </p-select>
+      </div>
+
+      <div class="se-filter-actions">
+        <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()">
+        </p-button>
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined" (onClick)="resetFilters()">
+        </p-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="themed-card list-grid-area"> <app-shared-grid [data]="data" [gridHeight]="'210px'" [headerFilter]="false"
+      [rowSelectionMode]="rowSelectionMode" [GridName]="'Invoices'" [column]="column"
+      (eventFromGrid)="eventFromGrid($event)" (gridReady)="onGridReady($event)"
+      (scrolledToBottom)="onScrolledToBottom($event)">
+    </app-shared-grid>
+  </div>
+
+</div> -->

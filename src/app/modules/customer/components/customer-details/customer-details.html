@@ -192,7 +192,7 @@
             }
 
             @if (activeTab() === 'payments') {
-              <app-shared-grid [data]="payments()" [column]="paymentColumns" 
+              <app-shared-grid [data]="payments()" [column]="paymentColumns"   (eventFromGrid)="onGridEvent($event, 'payments')"
                 [gridHeight]="'400px'" [headerFilter]="false" GridName="CustomerPaymentGrid">
               </app-shared-grid>
             }

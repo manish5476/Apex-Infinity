@@ -245,12 +245,18 @@ export class CustomerDetails implements OnInit {
 
   // --- Grid Events ---
   onGridEvent(event: any, type: TabType) {
-    if (event.eventType === 'RowSelectedEvent' && type === 'invoices') {
+    if (event.eventType === 'CellClickedEvent' && type === 'invoices') {
        const invoiceId = event.event.data._id;
        this.router.navigate(['/invoices', invoiceId]);
     }
+    if (event.eventType === 'CellClickedEvent' && type === 'payments') {
+       const paymentid = event.event.data._id;
+       this.router.navigate(['/payments', paymentid]);
+    }
   }
 
+
+  
   // Helper for styling
   getStatusClass(status: string) {
     switch(status?.toLowerCase()) {
@@ -273,6 +279,15 @@ export class CustomerDetails implements OnInit {
           if(res.data?.customer?.photo) {
              this.customer.update(c => ({...c, avatar: res.data.customer.photo}));
              this.messageService.showSuccess('Success', 'Photo updated');
+              this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
+      if (!id) {
+        this.router.navigate(['/customer']);
+        return;
+      }
+      this.customerId.set(id);
+      this.loadProfile(id);
+    });
           }
         }, 'Upload Photo'
       );

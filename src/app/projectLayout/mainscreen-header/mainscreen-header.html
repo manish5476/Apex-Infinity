@@ -19,7 +19,6 @@
       <i class="pi pi-bell text-lg"></i>
     </button>
 
-    <!-- User Profile Dropdown -->
     <ng-container *ngIf="currentUser; else loggedOut">
       <button class="user-profile-trigger" (click)="op.toggle($event)">
         <p-avatar [label]="getInitials(currentUser?.name)" shape="circle"
@@ -71,7 +70,7 @@
 
           <!-- Actions -->
           <div class="menu-actions">
-            <a routerLink="/admin/profile" class="menu-item" (click)="op.hide()">
+            <a routerLink="/user/profile" class="menu-item" (click)="op.hide()">
               <i class="pi pi-user"></i> Profile Settings
             </a>
             <a routerLink="/auth/update-password" class="menu-item" (click)="op.hide()">

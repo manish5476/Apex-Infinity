@@ -75,6 +75,10 @@ export const routes: Routes = [
         loadChildren: () => import('./modules/branch/branch.routes').then((m) => m.BRANCH_ROUTES),
       },
       {
+        path: 'user',
+        loadChildren: () => import('./modules/user/user.routes').then((m) => m.USER_ROUTES),
+      },
+      {
         path: 'customer',
         loadChildren: () => import('./modules/customer/customer.routes').then((m) => m.CUSTOMER_ROUTES),
       },

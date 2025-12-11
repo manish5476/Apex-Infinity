@@ -1,7 +1,57 @@
 /* ==========================================================================
    GLOBAL DESIGN TOKENS & THEME ENGINE (Angular v20)
    ========================================================================== */
+/* ==========================================================================
+   SCROLL FIX FOR LANDING PAGE
+   ========================================================================== */
 
+/* 1. Make the Angular Host the scroll container */
+:host {
+  display: block;
+  width: 100%;
+  height: 100vh;       /* Occupy full viewport height */
+  overflow-y: auto;    /* ENABLE VERTICAL SCROLL HERE */
+  overflow-x: hidden;  /* Prevent horizontal scroll */
+  position: relative;
+  
+  /* Smooth scrolling */
+  scroll-behavior: smooth;
+}
+
+/* 2. Ensure the root div lets the host handle scrolling */
+.landing-root {
+  width: 100%;
+  min-height: 100%;    /* Allow content to grow */
+  position: relative;
+  /* Remove overflow from here, let :host handle it */
+  overflow: visible; 
+}
+
+/* 3. Fix the Mesh Background so it stays fixed while you scroll */
+.mesh-bg {
+  position: fixed;     /* Must be fixed relative to viewport */
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100%;
+  z-index: -1;         /* Behind everything */
+  pointer-events: none; /* Let clicks pass through */
+  background: 
+    radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%);
+  filter: blur(80px);
+}
+
+/* 4. Fix Navigation Bar sticking */
+/* Since :host is scrolling, 'fixed' works relative to viewport, 
+   but 'sticky' might behave differently. Keep nav fixed. */
+.nav {
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  z-index: 999;
+}
 /* --------------------------------------------------------------------------
    1. GLOBAL PRIMITIVES (Constant across all themes)
    -------------------------------------------------------------------------- */

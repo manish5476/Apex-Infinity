@@ -21,11 +21,10 @@ export interface ListResponse<T> {
 })
 export class ApiService extends BaseApiService {
 
-  // ======================== MASTER LISTS ========================
-
   getMasterList(): Observable<ApiResponse<any>> {
     return this.get<ApiResponse<any>>('/v1/master-list', {}, 'getMasterList');
   }
+  
   permissions(): Observable<ApiResponse<any>> {
     return this.get<ApiResponse<any>>('/v1/master-list/permissions', {}, 'getMasterList');
   }
@@ -36,8 +35,8 @@ export class ApiService extends BaseApiService {
    */
   getSpecificList(typeName: string): Observable<ListResponse<any>> {
     return this.get<ListResponse<any>>(
-      '/v1/master-list/list', 
-      { type: typeName }, 
+      '/v1/master-list/list',
+      { type: typeName },
       `getSpecificList-${typeName}`
     );
   }
@@ -45,7 +44,7 @@ export class ApiService extends BaseApiService {
   login(credentials: any): Observable<LoginResponse> {
     return this.post<LoginResponse>('/v1/auth/login', credentials, 'login');
   }
-  
+
   logOut(): Observable<LoginResponse> {
     return this.post<LoginResponse>('/v1/auth/logout', {}, 'logout');
   }
@@ -67,15 +66,15 @@ export class ApiService extends BaseApiService {
   }
   // ======================== AUTH EXTRA ROUTES ========================
 
-// Refresh JWT Token
-refreshToken(): Observable<any> {
-return this.post('/v1/auth/refresh-token', {}, 'refreshToken');
-}
+  // Refresh JWT Token
+  refreshToken(): Observable<any> {
+    return this.post('/v1/auth/refresh-token', {}, 'refreshToken');
+  }
 
-// Verify Token Validity (useful on app load)
-verifyToken(): Observable<any> {
-  return this.get('/v1/auth/verify-token', {}, 'verifyToken');
-}
+  // Verify Token Validity (useful on app load)
+  verifyToken(): Observable<any> {
+    return this.get('/v1/auth/verify-token', {}, 'verifyToken');
+  }
 
 
   // ======================== USER ========================
@@ -107,40 +106,3 @@ verifyToken(): Observable<any> {
   }
 }
 
-
-
-  // ======================== ORGANIZATION ========================
-
-  // createNewOrganization(data: any): Observable<LoginResponse> {
-  //   return this.post<LoginResponse>('/v1/organization/create', data, 'createNewOrganization');
-  // }
-
-  // approveMember(data: { userId: string, roleId: string, branchId: string }): Observable<any> {
-  //   return this.post('/v1/organization/approve-member', data, 'approveMember');
-  // }
-
-  // getPendingMembers(): Observable<any> {
-  //   return this.get('/v1/organization/pending-members', {}, 'getPendingMembers');
-  // }
-
-  // getMyOrganization(): Observable<any> {
-  //   return this.get('/v1/organization/my-organization', {}, 'getMyOrganization');
-  // }
-
-  // updateOrganization(data: any): Observable<any> {
-  //   return this.patch('/v1/organization/my-organization', data, 'updateOrganization');
-  // }
-
-  // deleteMyOrganization(): Observable<any> {
-  //   return this.delete('/v1/organization/my-organization', 'deleteMyOrganization');
-  // }
-
-  // getOrganizationRoles(): Observable<any> {
-  //   return this.get('/v1/roles', {}, 'getOrganizationRoles');
-  // }
-
-  // getOrganizationBranches(): Observable<any> {
-  //   return this.get('/v1/branches', {}, 'getOrganizationBranches');
-  // }
-
-  // ======================== AUTHENTICATION ========================

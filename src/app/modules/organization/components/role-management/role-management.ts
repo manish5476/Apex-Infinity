@@ -141,7 +141,6 @@ export class RoleManagementComponent implements OnInit {
     });
   }
 
-  // ... (Grid setupColumns logic remains the same as previous) ...
   setupColumns(): void {
     this.column = [
       { field: 'name', headerName: 'Role Name', flex: 1, cellStyle: { 'font-weight': '600' } },

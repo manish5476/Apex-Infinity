@@ -44,24 +44,3 @@ export class EmiService extends BaseApiService {
     return this.patch(`${this.endpoint}/pay`, paymentData, 'payEmiInstallment');
   }
 }
-
-// import { Injectable } from '@angular/core';
-// import { Observable } from 'rxjs';
-// import { BaseApiService } from '../../../core/services/base-api.service';
-
-// @Injectable({ providedIn: 'root' })
-// export class EmiService extends BaseApiService {
-//   private endpoint = '/v1/emi';
-
-//   createEmiPlan(planData: any): Observable<any> {
-//     return this.post(this.endpoint, planData, 'createEmiPlan');
-//   }
-
-//   getEmiByInvoice(invoiceId: string): Observable<any> {
-//     return this.get(`${this.endpoint}/invoice/${invoiceId}`, {}, 'getEmiByInvoice');
-//   }
-
-//   payEmiInstallment(paymentData: any): Observable<any> {
-//     return this.patch(`${this.endpoint}/pay`, paymentData, 'payEmiInstallment');
-//   }
-// }

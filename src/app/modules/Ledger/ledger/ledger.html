@@ -1,20 +1,41 @@
 <div class="page-container">
 
-  <!-- 1. HEADER -->
   <header class="page-header">
     <div class="title-row">
       <h1>
         <i class="pi pi-book"></i>
         Financial Ledger
       </h1>
-      <div class="flex gap-2">
-        <p-button label="Export Report" icon="pi pi-download"
-          styleClass="p-button-outlined p-button-secondary p-button-sm"></p-button>
+
+      <div class="header-actions">
+
+        <p-datepicker [formControl]="$any(filterForm.get('dateRange'))" selectionMode="range" [readonlyInput]="true"
+          placeholder="Select Date Range" [showIcon]="true" appendTo="body" styleClass="p-inputtext-sm date-filter"
+          (onClose)="applyFilters()">
+        </p-datepicker>
+
+        @if (currentTab() === 'customer') {
+        <p-select [options]="customerOptions()" [formControl]="$any(filterForm.get('customerId'))"
+          placeholder="Select Customer" [filter]="true" [showClear]="true" styleClass="header-dropdown" appendTo="body"
+          (onChange)="applyFilters()">
+        </p-select>
+        }
+
+        @if (currentTab() === 'supplier') {
+        <p-select [options]="supplierOptions()" [formControl]="$any(filterForm.get('supplierId'))"
+          placeholder="Select Supplier" [filter]="true" [showClear]="true" styleClass="header-dropdown" appendTo="body"
+          (onChange)="applyFilters()">
+        </p-select>
+        }
+
+        <p-button label="Export" icon="pi pi-download" styleClass="p-button-outlined p-button-secondary p-button-sm"
+          [loading]="isExporting()" (onClick)="handleExportClick()">
+        </p-button>
+
       </div>
     </div>
   </header>
 
-  <!-- 2. TABS NAVIGATION -->
   <div class="tabs-container">
     <p-tabs [value]="tabValue()" (valueChange)="onTabChange($event)">
       <p-tablist>
@@ -29,15 +50,133 @@
     </p-tabs>
   </div>
 
-  <!-- 3. CONTEXTUAL FILTER BAR -->
-  <!-- Only visible when a filterable tab is selected -->
-  @if (showFilterBar()) {
+  <div class="grid-container">
+    @if (isLoading()) {
+    <div class="p-4">
+      <p-skeleton width="100%" height="40px" styleClass="mb-2"></p-skeleton>
+      <p-skeleton width="100%" height="200px"></p-skeleton>
+    </div>
+    }
+    @else if ((currentTab() === 'customer' && !filterForm.value.customerId) ||
+    (currentTab() === 'supplier' && !filterForm.value.supplierId)) {
+    <div class="empty-placeholder">
+      <i class="pi pi-filter"></i>
+      <p>Please select a {{ currentTab() }} to view records.</p>
+    </div>
+    }
+    @else {
+    <app-shared-grid [gridHeight]="'calc(100vh - 190px)'" [headerFilter]="false" [data]="data()" [column]="column()">
+    </app-shared-grid>
+    }
+  </div>
+
+  @if (currentTab() === 'trialBalance' && data().length > 0) {
+  <div class="footer-summary">
+    <div class="total-item"><span>Debit:</span><strong>{{ common.formatCurrency(getTrialTotal('debit')) }}</strong>
+    </div>
+    <div class="total-item"><span>Credit:</span><strong>{{ common.formatCurrency(getTrialTotal('credit')) }}</strong>
+    </div>
+    <div class="total-item mismatch"><span>Diff:</span><strong>{{ common.formatCurrency(getTrialTotal('debit') -
+        getTrialTotal('credit')) }}</strong></div>
+  </div>
+  }
+
+</div>
+
+<p-dialog header="Export Transactions" [(visible)]="showExportDialog" [modal]="true" [style]="{ width: '400px' }">
+  <div class="flex flex-column gap-3 pt-2" [formGroup]="exportForm">
+
+    <div class="field">
+      <label class="block mb-2 font-bold">Date Range</label>
+      <p-datepicker formControlName="dateRange" selectionMode="range" [readonlyInput]="true" [showIcon]="true"
+        appendTo="body" styleClass="w-full"></p-datepicker>
+    </div>
+
+    <div class="field">
+      <label class="block mb-2 font-bold">Filter Data By:</label>
+      <div class="flex gap-3">
+        <div class="flex align-items-center">
+          <p-radiobutton name="exportType" value="all" formControlName="exportType" label="All"></p-radiobutton>
+        </div>
+        <div class="flex align-items-center">
+          <p-radiobutton name="exportType" value="customer" formControlName="exportType"
+            label="Customer"></p-radiobutton>
+        </div>
+        <div class="flex align-items-center">
+          <p-radiobutton name="exportType" value="supplier" formControlName="exportType"
+            label="Supplier"></p-radiobutton>
+        </div>
+      </div>
+    </div>
+
+    @if (exportForm.get('exportType')?.value === 'customer') {
+    <div class="field fadein">
+      <label class="block mb-2 font-bold">Select Customer</label>
+      <p-select [options]="customerOptions()" formControlName="specificId" placeholder="Choose Customer" [filter]="true"
+        styleClass="w-full" appendTo="body"></p-select>
+    </div>
+    }
+    @if (exportForm.get('exportType')?.value === 'supplier') {
+    <div class="field fadein">
+      <label class="block mb-2 font-bold">Select Supplier</label>
+      <p-select [options]="supplierOptions()" formControlName="specificId" placeholder="Choose Supplier" [filter]="true"
+        styleClass="w-full" appendTo="body"></p-select>
+    </div>
+    }
+
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button label="Cancel" styleClass="p-button-text" (onClick)="showExportDialog.set(false)"></p-button>
+    <p-button label="Download CSV" icon="pi pi-download" (onClick)="submitExportDialog()"
+      [disabled]="isExporting()"></p-button>
+  </ng-template>
+</p-dialog>
+
+
+<!-- <div class="page-container">
+
+  <header class="page-header">
+    <div class="title-row">
+      <h1>
+        <i class="pi pi-book"></i>
+        Financial Ledger
+      </h1>
+      <div class="flex gap-2">
+        <p-button label="Export CSV" icon="pi pi-download" 
+          styleClass="p-button-outlined p-button-secondary p-button-sm"
+          (onClick)="exportReport()"></p-button>
+      </div>
+    </div>
+  </header>
+
+  <div class="tabs-container">
+    <p-tabs [value]="tabValue()" (valueChange)="onTabChange($event)">
+      <p-tablist>
+        <p-tab [value]="0">Transactions</p-tab>
+        <p-tab [value]="1">Customer Ledger</p-tab>
+        <p-tab [value]="2">Supplier Ledger</p-tab>
+        <p-tab [value]="3">Org Summary</p-tab>
+        <p-tab [value]="4">Profit & Loss</p-tab>
+        <p-tab [value]="5">Balance Sheet</p-tab>
+        <p-tab [value]="6">Trial Balance</p-tab>
+      </p-tablist>
+    </p-tabs>
+  </div>
+
   <div class="filter-bar" [formGroup]="filterForm">
+    
+    <div class="filter-item">
+      <label>Date Range</label>
+      <p-datepicker formControlName="dateRange" selectionMode="range" 
+        [readonlyInput]="true" placeholder="Select dates..." 
+        [showIcon]="true" styleClass="w-full" (onClose)="applyFilters()">
+      </p-datepicker>
+    </div>
 
     @if (currentTab() === 'customer') {
     <div class="filter-item">
-      <label>Select Customer</label>
-      <p-select [options]="customerOptions()" formControlName="customerId" placeholder="Choose Customer..."
+      <label>Customer</label>
+      <p-select [options]="customerOptions()" formControlName="customerId" placeholder="Select Customer"
         [filter]="true" [showClear]="true" styleClass="w-full" (onChange)="applyFilters()">
       </p-select>
     </div>
@@ -45,166 +184,61 @@
 
     @if (currentTab() === 'supplier') {
     <div class="filter-item">
-      <label>Select Supplier</label>
-      <p-select [options]="supplierOptions()" formControlName="supplierId" placeholder="Choose Supplier..."
+      <label>Supplier</label>
+      <p-select [options]="supplierOptions()" formControlName="supplierId" placeholder="Select Supplier"
         [filter]="true" [showClear]="true" styleClass="w-full" (onChange)="applyFilters()">
       </p-select>
     </div>
     }
 
     <div class="actions">
-      <p-button icon="pi pi-refresh" styleClass="p-button-text p-button-rounded" pTooltip="Refresh Data"
-        (onClick)="applyFilters()"></p-button>
+      <p-button icon="pi pi-refresh" styleClass="p-button-text p-button-rounded" 
+        pTooltip="Refresh Data" (onClick)="applyFilters()"></p-button>
     </div>
   </div>
-  }
 
-  <!-- 4. MAIN GRID AREA -->
   <div class="grid-container">
-
-    <!-- Check if we need to show empty state for unselected filters -->
-    @if ((currentTab() === 'customer' && !filterForm.value.customerId) ||
-    (currentTab() === 'supplier' && !filterForm.value.supplierId)) {
-
-    <div class="empty-placeholder">
-      <i class="pi pi-filter"></i>
-      <p>Please select a {{ currentTab() }} to view the ledger.</p>
-    </div>
-
-    } @else {
-    <!-- The Shared Grid takes up full remaining height -->
-    <app-shared-grid  [gridHeight]="'210px'" [headerFilter]="false" [data]="data()" [column]="column()">  </app-shared-grid>
+    
+    @if (isLoading()) {
+      <div class="p-4">
+        <p-skeleton width="100%" height="40px" styleClass="mb-2"></p-skeleton>
+        <p-skeleton width="100%" height="200px"></p-skeleton>
+      </div>
+    } 
+    
+    @else if ((currentTab() === 'customer' && !filterForm.value.customerId) ||
+             (currentTab() === 'supplier' && !filterForm.value.supplierId)) {
+      <div class="empty-placeholder">
+        <i class="pi pi-filter"></i>
+        <p>Please select a {{ currentTab() }} to view records.</p>
+      </div>
+    } 
+    
+    @else {
+      <app-shared-grid 
+        [gridHeight]="'190px'" 
+        [headerFilter]="false" 
+        [data]="data()" 
+        [column]="column()">
+      </app-shared-grid>
     }
-
   </div>
 
-  <!-- 5. FOOTER (Trial Balance Only) -->
   @if (currentTab() === 'trialBalance' && data().length > 0) {
-  <div class="footer-summary">
-    <div class="total-item">
-      <span>Total Debit:</span>
-      <strong>{{ common.formatCurrency(getTrialTotal('debit')) }}</strong>
+    <div class="footer-summary">
+      <div class="total-item">
+        <span>Total Debit:</span>
+        <strong>{{ common.formatCurrency(getTrialTotal('debit')) }}</strong>
+      </div>
+      <div class="total-item">
+        <span>Total Credit:</span>
+        <strong>{{ common.formatCurrency(getTrialTotal('credit')) }}</strong>
+      </div>
+      <div class="total-item" [class.match]="getTrialTotal('debit') === getTrialTotal('credit')"
+        [class.mismatch]="getTrialTotal('debit') !== getTrialTotal('credit')">
+        <span>Diff:</span>
+        <strong>{{ common.formatCurrency(getTrialTotal('debit') - getTrialTotal('credit')) }}</strong>
+      </div>
     </div>
-    <div class="total-item">
-      <span>Total Credit:</span>
-      <strong>{{ common.formatCurrency(getTrialTotal('credit')) }}</strong>
-    </div>
-    <div class="total-item" [class.match]="getTrialTotal('debit') === getTrialTotal('credit')"
-      [class.mismatch]="getTrialTotal('debit') !== getTrialTotal('credit')">
-      <span>Difference:</span>
-      <strong>{{ common.formatCurrency(getTrialTotal('debit') - getTrialTotal('credit')) }}</strong>
-    </div>
-  </div>
   }
-
-</div>
-
-<!-- <div class="card p-4">
-  <h2>📘 Financial Ledgers and Statements</h2>
-
-  <div class="flex gap-3 mb-4 items-end bg-gray-50 p-3 rounded-lg shadow-sm" [formGroup]="filterForm">
-
-    @if (activeid === "1") {
-    <div class="w-64">
-      <label class="block text-sm font-medium text-gray-700">Customer</label>
-      <p-select [options]="customerOptions()" formControlName="customerId" placeholder="Select Customer" (onChange)="loadData('customer')"
-        [showClear]="true" [filter]="true" appendTo="body">
-      </p-select>
-    </div>
-    }
-
-    @if (activeid === "2") {
-    <div class="w-64">
-      <label class="block text-sm font-medium text-gray-700">Supplier</label>
-      <p-select [options]="supplierOptions()" formControlName="supplierId" placeholder="Select Supplier" (onChange)="loadData('supplier')"
-        [showClear]="true" [filter]="true" appendTo="body">
-      </p-select>
-    </div>
-    }
-
-    <div class="ml-auto">
-      <p-button label="Apply Filter" icon="pi pi-filter" (onClick)="applyFilters()" [loading]="isLoading()">
-      </p-button>
-    </div>
-  </div>
-
-  <p-tabs [value]="tabValue()" (valueChange)="onTabChange($event)">
-    <p-tablist>
-      <p-tab value="0">All Ledgers</p-tab>
-      <p-tab value="1">Customer Ledger</p-tab>
-      <p-tab value="2">Supplier Ledger</p-tab>
-      <p-tab value="3">Org Summary</p-tab>
-      <p-tab value="4">Profit & Loss (P&L)</p-tab>
-      <p-tab value="5">Balance Sheet</p-tab>
-      <p-tab value="6">Trial Balance</p-tab>
-    </p-tablist>
-
-    <p-tabpanels>
-
-      <p-tabpanel value="0">
-         [height]="'230px" [data]="data()" [column]="column()" (eventFromGrid)="onGridEvent($event)">
-        </app-shared-grid>
-        [isLoading]="isLoading()"
-      </p-tabpanel>
-
-      <p-tabpanel value="1">
-        @if (!filterForm.value.customerId) {
-        <div class="text-center p-5 text-gray-500">
-          Please select a Customer to view their ledger.
-        </div>
-        } @else {
-         [height]="'230px" [data]="data()" [column]="column()" (eventFromGrid)="onGridEvent($event)">
-        </app-shared-grid>
-        [isLoading]="isLoading()"
-        }
-      </p-tabpanel>
-
-      <p-tabpanel value="2">
-        @if (!filterForm.value.supplierId) {
-        <div class="text-center p-5 text-gray-500">
-          Please select a Supplier to view their ledger.
-        </div>
-        } @else {
-         [height]="'230px" [data]="data()" [column]="column()" (eventFromGrid)="onGridEvent($event)">
-        </app-shared-grid>
-        [isLoading]="isLoading()"
-        }
-      </p-tabpanel>
-
-      <p-tabpanel value="3">
-        <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <h3 class="text-lg font-semibold text-blue-800 mb-2">Overall Ledger Snapshot</h3>
-        </div>
-         [height]="'230px" [data]="data()" [column]="column()" (eventFromGrid)="onGridEvent($event)">
-        </app-shared-grid>
-        [isLoading]="isLoading()"
-      </p-tabpanel>
-
-      <p-tabpanel value="4">
-         [height]="'230px" [data]="data()" [column]="column()" (eventFromGrid)="onGridEvent($event)">
-        </app-shared-grid>
-        [isLoading]="isLoading()"
-      </p-tabpanel>
-
-      <p-tabpanel value="5">
-         [height]="'230px" [data]="data()" [column]="column()" (eventFromGrid)="onGridEvent($event)">
-        </app-shared-grid>
-        [isLoading]="isLoading()"
-      </p-tabpanel>
-
-      <p-tabpanel value="6">
-        <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <h3 class="text-lg font-semibold text-yellow-800 mb-2">Debit must equal Credit</h3>
-          <p class class="text-sm">
-            Total Debit: {{ common.formatCurrency(getTrialBalanceTotal('debit')) }} |
-            Total Credit: {{ common.formatCurrency(getTrialBalanceTotal('credit')) }}
-          </p>
-        </div>
-         [height]="'230px" [data]="data()" [column]="column()" (eventFromGrid)="onGridEvent($event)">
-        </app-shared-grid>
-        [isLoading]="isLoading()"
-      </p-tabpanel>
-
-    </p-tabpanels>
-  </p-tabs>
 </div> -->
