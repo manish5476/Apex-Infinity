@@ -14,146 +14,257 @@ type StatKey = 'users' | 'transactions' | 'uptime';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChildren('revealItem') revealItems!: QueryList<ElementRef>;
-  @HostListener('scroll', ['$event']) 
-onScroll(event: Event) {
-  this.checkStatsAnimation();
-}
-  // UI State
-  activeTab = 'finance';
-  theme: 'light' | 'dark' = 'light';
+  // --- Signals & State ---
+  searchQuery = signal('');
+  selectedCategory = signal('All');
+  isYearly = signal(true);
   
-  // Animated Stats
-  stats = { users: 0, transactions: 0, uptime: 0 };
-  private hasAnimatedStats = false;
-  private observer: IntersectionObserver | null = null;
+  // FAQ State
+  openFaqIndex = signal<number | null>(null);
 
-  // --- NEW: ROI Calculator Logic ---
-  roiEmployees = 10;
-  roiHoursSaved = 5;
-  roiHourlyRate = 500; // INR
+  // --- Data ---
+  features: Feature[] = [
+    { title: "Executive Dashboard", desc: "High-level strategic insights & KPI monitoring.", group: "Analytics", icon: "layout-dashboard", tags: "view_executive" },
+    { title: "Branch Comparison", desc: "Benchmark performance across multiple locations.", group: "Analytics", icon: "git-compare", tags: "view_branch_comparison" },
+    { title: "AI Revenue Forecast", desc: "Predict sales & revenue using AI models.", group: "Analytics", icon: "trending-up", tags: "view_forecast" },
+    { title: "Critical Alerts", desc: "Real-time risk & stock-out notifications.", group: "Analytics", icon: "alert-triangle", tags: "view_alerts" },
+    { title: "Financial Summary", desc: "P&L, Revenue, and Expense overview.", group: "Analytics", icon: "pie-chart", tags: "view_financial" },
+    { title: "Cash Flow Analysis", desc: "Track cash movement & payment modes.", group: "Analytics", icon: "banknote", tags: "view_cashflow" },
+    { title: "GST & Tax Reports", desc: "Input/Output tax analysis for compliance.", group: "Analytics", icon: "file-text", tags: "view_tax" },
+    { title: "Debtor Aging", desc: "0-90+ days outstanding payment analysis.", group: "Analytics", icon: "hourglass", tags: "view_debtor_aging" },
+    { title: "Profitability Matrix", desc: "Real Gross Profit & Margin tracking.", group: "Analytics", icon: "bar-chart-2", tags: "view_profitability" },
+    { title: "Staff Leaderboard", desc: "Employee performance tracking & KPIs.", group: "Analytics", icon: "award", tags: "view_staff_performance" },
+    { title: "Peak Hour Heatmap", desc: "Visualize busiest times & days.", group: "Analytics", icon: "thermometer", tags: "view_peak_hours" },
+    { title: "Dead Stock Detector", desc: "Identify items non-moving > 90 days.", group: "Analytics", icon: "skull", tags: "view_dead_stock" },
+    { title: "Stock-out Prediction", desc: "AI run-rate analysis for restocking.", group: "Analytics", icon: "zap", tags: "view_stock_forecast" },
+    { title: "RFM Segmentation", desc: "Segment by Recency, Frequency, Money.", group: "Analytics", icon: "users", tags: "view_customer_segmentation" },
+    { title: "Cohort Retention", desc: "Analyze customer loyalty over time.", group: "Analytics", icon: "magnet", tags: "view_customer_retention" },
+    { title: "Credit Limits", desc: "Set & manage customer credit limits.", group: "CRM", icon: "credit-card", tags: "customer:credit_limit" },
+    { title: "Purchase Orders", desc: "Manage supplier purchasing lifecyle.", group: "Inventory", icon: "shopping-cart", tags: "purchase:read create update delete" },
+    { title: "Invoice Engine", desc: "Create, Edit & Delete Invoices.", group: "Sales", icon: "file-plus", tags: "invoice:read create update delete" },
+    { title: "EMI Management", desc: "Create EMI plans & collect payments.", group: "Finance", icon: "calendar-clock", tags: "emi:read create pay" },
+    { title: "RBAC Controls", desc: "Manage roles & granular permissions.", group: "System", icon: "lock", tags: "role:manage" },
+    { title: "Audit Logs", desc: "View security logs & suspicious activity.", group: "System", icon: "file-search", tags: "logs:view analytics:view_security_audit" },
+    { title: "AI Assistant", desc: "Chat with your data using AI.", group: "Utilities", icon: "bot", tags: "ai:chat" },
+  ];
+
+  // --- Computed Values ---
+  categories = computed(() => ['All', ...new Set(this.features.map(f => f.group))]);
   
-  // Computed property (simple getter for UI)
-  get monthlySavings(): number {
-    return this.roiEmployees * this.roiHoursSaved * this.roiHourlyRate;
-  }
+  filteredFeatures = computed(() => {
+    const q = this.searchQuery().toLowerCase();
+    const group = this.selectedCategory();
+    
+    return this.features.filter(f => {
+      const matchesGroup = group === 'All' || f.group === group;
+      const matchesSearch = f.title.toLowerCase().includes(q) || 
+                            f.desc.toLowerCase().includes(q) || 
+                            f.tags.toLowerCase().includes(q);
+      return matchesGroup && matchesSearch;
+    });
+  });
 
-  // --- NEW: Developer Mode Snippet ---
-  codeSnippet = `
-  // Apex Infinity API
-  // Automated Reconciliation
-  {
-    "status": "success",
-    "data": {
-       "reconciled": true,
-       "confidence": 0.99,
-       "matched_ledger": "HDFC_001"
-    }
-  }`;
-
-  // Existing Data Modules
-  modules = [
-    { id: 'finance', label: 'Financial Core', title: 'Complete Financial Control', desc: 'Invoices, ledgers, GST, and reconciliation—auditable and fast.', icon: 'pi pi-wallet', tags: ['GST Ready', 'Auto-Recon'] },
-    { id: 'inventory', label: 'Inventory Hub', title: 'Multi-Branch Inventory', desc: 'Real-time syncing across branches with dead-stock detection.', icon: 'pi pi-box', tags: ['Sync', 'Forecast'] },
-    { id: 'ai', label: 'Apex AI', title: 'The Neural Analyst', desc: 'Natural language queries for your entire business database.', icon: 'pi pi-bolt', tags: ['Generative', 'Predictive'] }
-  ];
-
-  // Refined Features for Bento Grid
-  bentoFeatures = [
-    { title: 'Predictive AI', desc: 'Forecasts revenue with 94% accuracy.', class: 'span-2', icon: 'pi pi-chart-line' },
-    { title: 'Role-Based Access', desc: 'Granular permissions.', class: 'span-1', icon: 'pi pi-lock' },
-    { title: 'Auto-Invoicing', desc: 'Recurring billing engine.', class: 'span-1', icon: 'pi pi-receipt' },
-    { title: 'Multi-Branch Sync', desc: 'Real-time data mesh.', class: 'span-2', icon: 'pi pi-sitemap' },
-  ];
-
-  permissionsList = [
-    { tag: 'analytics:view_executive', group: 'Analytics', desc: 'Strategic Insights' },
-    { tag: 'product:stock_adjust', group: 'Inventory', desc: 'Stock Adjustment' },
-    { tag: 'ai:chat', group: 'Utilities', desc: 'AI Assistant' },
-    { tag: 'reconciliation:read', group: 'Finance', desc: 'Reconciliation Reports' }
-  ];
-
-  caseStudies = [
-    { name: 'Shardha Electronics', metric: '+28%', label: 'Revenue Growth', brief: 'Reduced dead stock across 8 branches.' },
-    { name: 'Mehta Distributors', metric: '+18%', label: 'Cashflow', brief: 'Automated vendor scheduling.' },
-    { name: 'Urban Retail', metric: '99.9%', label: 'Uptime', brief: 'Centralized operations across 26 stores.' }
-  ];
-  carouselIndex = 0;
-
-  pricing = [
-    { name: 'Starter', price: '₹999', period: '/mo', features: ['Core Finance', '1 Branch', 'Email Support'], highlight: false },
-    { name: 'Scale', price: '₹4,999', period: '/mo', features: ['Multi-Branch', 'AI Forecasts', 'Priority Support'], highlight: true },
-    { name: 'Enterprise', price: 'Custom', period: '', features: ['SLA', 'Onboarding', 'Dedicated Manager'], highlight: false }
-  ];
-
-  constructor() {}
-
-  ngOnInit(): void {
-    document.documentElement.setAttribute('data-theme', this.theme);
-  }
-
-  ngAfterViewInit(): void {
-    const options = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
-    this.observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('in-view');
-          this.observer?.unobserve(entry.target);
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private el: ElementRef
+  ) {
+    // Effect to re-render icons when DOM changes due to filtering
+    effect(() => {
+      // Access signals to register dependency
+      this.filteredFeatures(); 
+      
+      // Wait for DOM update then render icons
+      setTimeout(() => {
+        if (typeof lucide !== 'undefined') {
+          lucide.createIcons();
         }
       });
-    }, options);
-
-    setTimeout(() => {
-      this.revealItems?.forEach(item => this.observer?.observe(item.nativeElement));
-    }, 100);
-    
-    this.checkStatsAnimation();
+    });
   }
 
-  ngOnDestroy(): void { this.observer?.disconnect(); }
-
-  @HostListener('window:scroll')
-  onWindowScroll() { this.checkStatsAnimation(); }
-
-  toggleTheme() {
-    this.theme = this.theme === 'light' ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', this.theme);
-  }
-
-  setActiveTab(tabId: string) { this.activeTab = tabId; }
-
-  nextCase() { this.carouselIndex = (this.carouselIndex + 1) % this.caseStudies.length; }
-  prevCase() { this.carouselIndex = (this.carouselIndex - 1 + this.caseStudies.length) % this.caseStudies.length; }
-
-  // Animation Logic (Kept optimized)
-  private checkStatsAnimation() {
-    if (this.hasAnimatedStats) return;
-    const statsSection = document.getElementById('stats-section');
-    if (!statsSection) return;
-    const rect = statsSection.getBoundingClientRect();
-    if (rect.top < window.innerHeight - 100) {
-      this.hasAnimatedStats = true;
-      this.runCounter('users', 0, 1200, 1500);
-      this.runCounter('transactions', 0, 85, 1500);
-      this.runCounter('uptime', 90, 99.9, 1500);
+  ngAfterViewInit() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.initIntersectionObserver();
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
     }
   }
 
-  private runCounter(key: StatKey, start: number, end: number, duration: number) {
-    let startTime: number | null = null;
-    const step = (t: number) => {
-      if (!startTime) startTime = t;
-      const progress = Math.min((t - startTime) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3); // Cubic ease out
-      const value = start + (end - start) * eased;
-      
-      if (key === 'uptime') this.stats[key] = parseFloat(value.toFixed(1));
-      else this.stats[key] = Math.floor(value);
-      
-      if (progress < 1) window.requestAnimationFrame(step);
-    };
-    window.requestAnimationFrame(step);
+  // --- Actions ---
+
+  togglePricing() {
+    this.isYearly.update(v => !v);
   }
+
+  setCategory(cat: string) {
+    this.selectedCategory.set(cat);
+  }
+
+  toggleFaq(index: number) {
+    this.openFaqIndex.update(current => current === index ? null : index);
+  }
+
+  getCategoryCount(cat: string): number {
+    if (cat === 'All') return this.features.length;
+    return this.features.filter(f => f.group === cat).length;
+  }
+
+  // --- Animations ---
+  
+  private initIntersectionObserver() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    const elements = this.el.nativeElement.querySelectorAll('.reveal');
+    elements.forEach((el: any) => observer.observe(el));
+  }
+  
+//   @ViewChildren('revealItem') revealItems!: QueryList<ElementRef>;
+//   @HostListener('scroll', ['$event']) 
+// onScroll(event: Event) {
+//   this.checkStatsAnimation();
+// }
+//   // UI State
+//   activeTab = 'finance';
+//   theme: 'light' | 'dark' = 'light';
+  
+//   // Animated Stats
+//   stats = { users: 0, transactions: 0, uptime: 0 };
+//   private hasAnimatedStats = false;
+//   private observer: IntersectionObserver | null = null;
+
+//   // --- NEW: ROI Calculator Logic ---
+//   roiEmployees = 10;
+//   roiHoursSaved = 5;
+//   roiHourlyRate = 500; // INR
+  
+//   // Computed property (simple getter for UI)
+//   get monthlySavings(): number {
+//     return this.roiEmployees * this.roiHoursSaved * this.roiHourlyRate;
+//   }
+
+//   // --- NEW: Developer Mode Snippet ---
+//   codeSnippet = `
+//   // Apex Infinity API
+//   // Automated Reconciliation
+//   {
+//     "status": "success",
+//     "data": {
+//        "reconciled": true,
+//        "confidence": 0.99,
+//        "matched_ledger": "HDFC_001"
+//     }
+//   }`;
+
+//   // Existing Data Modules
+//   modules = [
+//     { id: 'finance', label: 'Financial Core', title: 'Complete Financial Control', desc: 'Invoices, ledgers, GST, and reconciliation—auditable and fast.', icon: 'pi pi-wallet', tags: ['GST Ready', 'Auto-Recon'] },
+//     { id: 'inventory', label: 'Inventory Hub', title: 'Multi-Branch Inventory', desc: 'Real-time syncing across branches with dead-stock detection.', icon: 'pi pi-box', tags: ['Sync', 'Forecast'] },
+//     { id: 'ai', label: 'Apex AI', title: 'The Neural Analyst', desc: 'Natural language queries for your entire business database.', icon: 'pi pi-bolt', tags: ['Generative', 'Predictive'] }
+//   ];
+
+//   // Refined Features for Bento Grid
+//   bentoFeatures = [
+//     { title: 'Predictive AI', desc: 'Forecasts revenue with 94% accuracy.', class: 'span-2', icon: 'pi pi-chart-line' },
+//     { title: 'Role-Based Access', desc: 'Granular permissions.', class: 'span-1', icon: 'pi pi-lock' },
+//     { title: 'Auto-Invoicing', desc: 'Recurring billing engine.', class: 'span-1', icon: 'pi pi-receipt' },
+//     { title: 'Multi-Branch Sync', desc: 'Real-time data mesh.', class: 'span-2', icon: 'pi pi-sitemap' },
+//   ];
+
+//   permissionsList = [
+//     { tag: 'analytics:view_executive', group: 'Analytics', desc: 'Strategic Insights' },
+//     { tag: 'product:stock_adjust', group: 'Inventory', desc: 'Stock Adjustment' },
+//     { tag: 'ai:chat', group: 'Utilities', desc: 'AI Assistant' },
+//     { tag: 'reconciliation:read', group: 'Finance', desc: 'Reconciliation Reports' }
+//   ];
+
+//   caseStudies = [
+//     { name: 'Shardha Electronics', metric: '+28%', label: 'Revenue Growth', brief: 'Reduced dead stock across 8 branches.' },
+//     { name: 'Mehta Distributors', metric: '+18%', label: 'Cashflow', brief: 'Automated vendor scheduling.' },
+//     { name: 'Urban Retail', metric: '99.9%', label: 'Uptime', brief: 'Centralized operations across 26 stores.' }
+//   ];
+//   carouselIndex = 0;
+
+//   pricing = [
+//     { name: 'Starter', price: '₹999', period: '/mo', features: ['Core Finance', '1 Branch', 'Email Support'], highlight: false },
+//     { name: 'Scale', price: '₹4,999', period: '/mo', features: ['Multi-Branch', 'AI Forecasts', 'Priority Support'], highlight: true },
+//     { name: 'Enterprise', price: 'Custom', period: '', features: ['SLA', 'Onboarding', 'Dedicated Manager'], highlight: false }
+//   ];
+
+//   constructor() {}
+
+//   ngOnInit(): void {
+//     document.documentElement.setAttribute('data-theme', this.theme);
+//   }
+
+//   ngAfterViewInit(): void {
+//     const options = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+//     this.observer = new IntersectionObserver((entries) => {
+//       entries.forEach(entry => {
+//         if (entry.isIntersecting) {
+//           entry.target.classList.add('in-view');
+//           this.observer?.unobserve(entry.target);
+//         }
+//       });
+//     }, options);
+
+//     setTimeout(() => {
+//       this.revealItems?.forEach(item => this.observer?.observe(item.nativeElement));
+//     }, 100);
+    
+//     this.checkStatsAnimation();
+//   }
+
+//   ngOnDestroy(): void { this.observer?.disconnect(); }
+
+//   @HostListener('window:scroll')
+//   onWindowScroll() { this.checkStatsAnimation(); }
+
+//   toggleTheme() {
+//     this.theme = this.theme === 'light' ? 'dark' : 'light';
+//     document.documentElement.setAttribute('data-theme', this.theme);
+//   }
+
+//   setActiveTab(tabId: string) { this.activeTab = tabId; }
+
+//   nextCase() { this.carouselIndex = (this.carouselIndex + 1) % this.caseStudies.length; }
+//   prevCase() { this.carouselIndex = (this.carouselIndex - 1 + this.caseStudies.length) % this.caseStudies.length; }
+
+//   // Animation Logic (Kept optimized)
+//   private checkStatsAnimation() {
+//     if (this.hasAnimatedStats) return;
+//     const statsSection = document.getElementById('stats-section');
+//     if (!statsSection) return;
+//     const rect = statsSection.getBoundingClientRect();
+//     if (rect.top < window.innerHeight - 100) {
+//       this.hasAnimatedStats = true;
+//       this.runCounter('users', 0, 1200, 1500);
+//       this.runCounter('transactions', 0, 85, 1500);
+//       this.runCounter('uptime', 90, 99.9, 1500);
+//     }
+//   }
+
+//   private runCounter(key: StatKey, start: number, end: number, duration: number) {
+//     let startTime: number | null = null;
+//     const step = (t: number) => {
+//       if (!startTime) startTime = t;
+//       const progress = Math.min((t - startTime) / duration, 1);
+//       const eased = 1 - Math.pow(1 - progress, 3); // Cubic ease out
+//       const value = start + (end - start) * eased;
+      
+//       if (key === 'uptime') this.stats[key] = parseFloat(value.toFixed(1));
+//       else this.stats[key] = Math.floor(value);
+      
+//       if (progress < 1) window.requestAnimationFrame(step);
+//     };
+//     window.requestAnimationFrame(step);
+//   }
 }
 
 // import { CommonModule } from '@angular/common';
