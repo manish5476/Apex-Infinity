@@ -4,10 +4,11 @@ import { MainScreen } from './projectLayout/main-screen/main-screen';
 import { ToastModule } from 'primeng/toast';
 import { LoadingComponent } from "./modules/shared/components/loader.component";
 import { MasterListService } from './core/services/master-list.service';
+import { AnnouncementListenerComponent } from "./modules/shared/components/announcement-banner/announcement-banner.component";
 // import { AiAssistantComponent } from "./AIAgent/components/ai-assistant/ai-assistant";
 @Component({
   selector: 'app-root',
-  imports: [ToastModule, RouterOutlet, LoadingComponent],
+  imports: [ToastModule, RouterOutlet, LoadingComponent, AnnouncementListenerComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

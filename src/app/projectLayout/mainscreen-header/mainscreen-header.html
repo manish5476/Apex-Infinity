@@ -1,5 +1,275 @@
 <div class="header-inner">
-  <!-- Left: Toggle & Logo -->
+  <div class="header-left">
+    <button class="menu-toggle-btn" (click)="toggleSidebar.emit()">
+      <i class="pi pi-bars"></i>
+    </button>
+    <a routerLink="/admin/dashboard" class="logo-link">
+      <div class="logo-icon">
+        <i class="pi pi-bolt"></i>
+      </div>
+      <span>Apex Infinity</span>
+    </a>
+  </div>
+
+  <div class="header-right">
+
+    <button class="notification-btn" [class.has-new]="recentNotifications.length > 0"
+      (click)="showNotificationdialog = true" pTooltip="Notifications" tooltipPosition="bottom">
+      <i class="pi pi-bell text-lg"></i>
+    </button>
+
+    @if (currentUser) {
+      <button class="user-profile-trigger" (click)="op.toggle($event)">
+        <p-avatar [label]="getInitials(currentUser?.name)" shape="circle"
+          [style]="{'background-color': 'var(--accent-primary)', 'color': '#fff', 'font-weight': '700'}">
+        </p-avatar>
+        <div class="user-meta hidden md:flex">
+          <span class="name">{{ currentUser?.name }}</span>
+          <span class="role">{{ currentUser?.role.name || 'Admin' }}</span>
+        </div>
+        <i class="pi pi-angle-down text-xs opacity-60 hidden md:block" style="color: var(--text-secondary)"></i>
+      </button>
+
+      <p-popover #op appendTo="body" [showTransitionOptions]="'150ms cubic-bezier(0, 0, 0.2, 1)'"
+        [hideTransitionOptions]="'100ms linear'" styleClass="premium-popover-override">
+
+        <div class="popover-container">
+
+          <div class="popover-tabs-container">
+            <div class="popover-tabs">
+              <div class="tab-slider" [style.transform]="activeTab === 'settings' ? 'translateX(0%)' : 'translateX(100%)'"></div>
+              
+              <button class="tab-btn" [class.active]="activeTab === 'settings'" (click)="activeTab = 'settings'">
+                Settings
+              </button>
+              
+              <button class="tab-btn" [class.active]="activeTab === 'notifications'" (click)="activeTab = 'notifications'">
+                Notifications
+                @if (recentNotifications.length) {
+                  <span class="tab-badge">{{ recentNotifications.length }}</span>
+                }
+              </button>
+            </div>
+          </div>
+
+          @if (activeTab === 'settings') {
+            <div class="user-header">
+              <p-avatar [label]="getInitials(currentUser?.name)" styleClass="xl-avatar"></p-avatar>
+              <div class="user-details">
+                <h4>{{ currentUser?.name }}</h4>
+                <span>{{ currentUser?.email }}</span>
+              </div>
+            </div>
+
+            <div class="theme-selector">
+              <div class="section-title">
+                <span>Appearance</span>
+                <p-toggleButton [(ngModel)]="isDarkMode" onIcon=" pi-moon" offIcon="pi pi-sun"
+                  styleClass="mini-toggle" (onChange)="toggleDarkMode($event.checked)">
+                </p-toggleButton>
+              </div>
+
+              <div class="theme-grid">
+                @for (theme of allThemes; track theme.id) {
+                  <div class="theme-option" [style.background-color]="theme.color"
+                    [class.active]="activeThemeId === theme.id" 
+                    [pTooltip]="theme.name" tooltipPosition="top"
+                    (click)="selectTheme(theme.id)">
+                    @if (activeThemeId === theme.id) {
+                      <i class="pi pi-check"></i>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="menu-actions">
+              <a routerLink="/user/profile" class="menu-item" (click)="op.hide()">
+                <div class="icon-box"><i class="pi pi-user"></i></div>
+                <div class="item-text">
+                  <span class="label">Profile Settings</span>
+                  <span class="sub-label">Manage account</span>
+                </div>
+                <i class="pi pi-chevron-right arrow"></i>
+              </a>
+              
+              <a routerLink="/auth/update-password" class="menu-item" (click)="op.hide()">
+                <div class="icon-box"><i class="pi pi-lock"></i></div>
+                <div class="item-text">
+                  <span class="label">Security</span>
+                  <span class="sub-label">Password & 2FA</span>
+                </div>
+                <i class="pi pi-chevron-right arrow"></i>
+              </a>
+              
+              <button class="menu-item danger" (click)="logout(); op.hide()">
+                <div class="icon-box danger"><i class="pi pi-power-off"></i></div>
+                <span class="label">Sign Out</span>
+              </button>
+            </div>
+          }
+
+          @if (activeTab === 'notifications') {
+             <div class="notification-wrapper custom-scrollbar">
+                <app-notification-bell></app-notification-bell>
+             </div>
+          }
+
+        </div>
+      </p-popover>
+    } 
+    @else {
+      <a routerLink="/auth/login" class="login-btn">Login</a>
+    }
+
+  </div>
+</div>
+
+<p-dialog [(visible)]="showNotificationdialog" [modal]="true" [draggable]="false" [resizable]="false"
+  [dismissableMask]="true" [showHeader]="false" styleClass="premium-notification-dialog"
+  [style]="{ width: '90%', maxWidth: '500px', maxHeight: '85vh', borderRadius: '16px', overflow: 'hidden' }"
+  maskStyleClass="backdrop-blur-sm bg-black/40">
+  <app-notification-bell></app-notification-bell>
+</p-dialog>
+
+<!-- <div class="header-inner">
+  <div class="header-left">
+    <button class="menu-toggle-btn" (click)="toggleSidebar.emit()">
+      <i class="pi pi-bars"></i>
+    </button>
+    <a routerLink="/admin/dashboard" class="logo-link">
+      <div class="logo-icon">
+        <i class="pi pi-bolt"></i>
+      </div>
+      <span>Apex Infinity</span>
+    </a>
+  </div>
+
+  <div class="header-right">
+
+    <button class="notification-btn" [class.has-new]="recentNotifications.length > 0"
+      (click)="showNotificationdialog = true" pTooltip="Expand Notifications" tooltipPosition="bottom">
+      <i class="pi pi-bell text-lg"></i>
+    </button>
+
+    @if(currentUser){
+    <ng-container>
+
+      <button class="user-profile-trigger" (click)="togglePopover(op, $event)">
+        <p-avatar [label]="getInitials(currentUser?.name)" shape="circle"
+          [style]="{'background-color': 'var(--accent-primary)', 'color': '#fff', 'font-weight': '700'}">
+        </p-avatar>
+        <div class="user-meta hidden md:flex">
+          <span class="name">{{ currentUser?.name }}</span>
+          <span class="role">{{ currentUser?.role || 'Member' }}</span>
+        </div>
+        <i class="pi pi-angle-down text-xs text-[var(--text-secondary)] hidden md:block opacity-60"></i>
+        @if(recentNotifications.length > 0){
+        <span class="profile-badge"></span>
+        }
+      </button>
+
+      <p-popover #op appendTo="body" [showTransitionOptions]="'150ms cubic-bezier(0, 0, 0.2, 1)'"
+        [hideTransitionOptions]="'100ms linear'" styleClass="premium-popover">
+
+        <div class="popover-container">
+
+          <div class="popover-tabs">
+            <div class="tab-slider" [style.transform]="activeTab === 'settings' ? 'translateX(0)' : 'translateX(100%)'">
+            </div>
+
+            <button class="tab-btn" [class.active]="activeTab === 'settings'" (click)="activeTab = 'settings'">
+              Settings
+            </button>
+
+            <button class="tab-btn" [class.active]="activeTab === 'notifications'"
+              (click)="activeTab = 'notifications'">
+              Notifications
+              <span *ngIf="recentNotifications.length" class="tab-badge">{{ recentNotifications.length }}</span>
+            </button>
+          </div>
+
+          <ng-container *ngIf="activeTab === 'settings'">
+
+            <div class="user-header">
+              <div class="avatar-box">
+                <p-avatar [label]="getInitials(currentUser?.name)" styleClass="xl-avatar"></p-avatar>
+              </div>
+              <div class="user-details">
+                <h4>{{ currentUser?.name }}</h4>
+                <span>{{ currentUser?.email }}</span>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="theme-selector">
+              <div class="section-title">
+                <span>Appearance</span>
+                <p-toggleButton [(ngModel)]="isDarkMode" onIcon="pi-moon" offIcon="pi pi-sun" styleClass="mini-toggle"
+                  (onChange)="toggleDarkMode($event.checked)">
+                </p-toggleButton>
+              </div>
+
+              <div class="theme-grid">
+                @for (theme of allThemes; track theme.id) {
+                <div class="theme-option" [style.background-color]="theme.color"
+                  [class.active]="activeThemeId === theme.id" [pTooltip]="theme.name" tooltipPosition="top"
+                  (click)="selectTheme(theme.id)">
+                  <i class="pi pi-check" *ngIf="activeThemeId === theme.id"></i>
+                </div>
+                }
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="menu-actions">
+              <a routerLink="/user/profile" class="menu-item" (click)="op.hide()">
+                <div class="icon-box"><i class="pi pi-user"></i></div>
+                <span>Profile Settings</span>
+                <i class="pi pi-chevron-right arrow"></i>
+              </a>
+              <a routerLink="/auth/update-password" class="menu-item" (click)="op.hide()">
+                <div class="icon-box"><i class="pi pi-lock"></i></div>
+                <span>Security</span>
+                <i class="pi pi-chevron-right arrow"></i>
+              </a>
+              <button class="menu-item danger" (click)="logout(); op.hide()">
+                <div class="icon-box danger"><i class="pi pi-power-off"></i></div>
+                <span>Sign Out</span>
+              </button>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="activeTab === 'notifications'">
+            <div class="notification-wrapper">
+              <app-notification-bell></app-notification-bell>
+            </div>
+          </ng-container>
+
+        </div>
+      </p-popover>
+    </ng-container>
+    }@else{
+    <ng-template #loggedOut>
+      <a routerLink="/auth/login" class="login-btn">Login</a>
+    </ng-template>
+    }
+
+
+
+  </div>
+</div>
+
+<p-dialog [(visible)]="showNotificationdialog" [modal]="true" [draggable]="false" [resizable]="false"
+  [dismissableMask]="true" [showHeader]="false" styleClass="premium-notification-dialog"
+  [style]="{ width: '90%', maxWidth: '500px', maxHeight: '85vh', borderRadius: '16px', overflow: 'hidden' }"
+  maskStyleClass="backdrop-blur-sm bg-black/40">
+  <app-notification-bell></app-notification-bell>
+</p-dialog> -->
+
+<!-- <div class="header-inner">
   <div class="header-left">
     <button class="menu-toggle-btn" (click)="toggleSidebar.emit()">
       <i class="pi pi-bars"></i>
@@ -10,10 +280,8 @@
     </a>
   </div>
 
-  <!-- Right: Actions -->
   <div class="header-right">
 
-    <!-- Notification Bell -->
     <button class="notification-btn" [class.has-new]="recentNotifications.length > 0"
       (click)="showNotificationdialog = true" pTooltip="Notifications" tooltipPosition="bottom">
       <i class="pi pi-bell text-lg"></i>
@@ -30,12 +298,11 @@
         <i class="pi pi-angle-down text-xs text-[var(--text-secondary)] hidden md:block"></i>
       </button>
 
-      <!-- Premium Popover -->
       <p-popover #op appendTo="body" [showTransitionOptions]="'150ms cubic-bezier(0, 0, 0.2, 1)'"
         [hideTransitionOptions]="'100ms linear'">
         <div class="popover-container">
 
-          <!-- User Header -->
+          
           <div class="user-header">
             <p-avatar [label]="getInitials(currentUser?.name)" styleClass="w-16 h-16 text-xl mb-2"
               [style]="{'background-color': 'var(--accent-primary)', 'color': '#fff', 'width': '64px', 'height': '64px', 'font-size': '1.5rem'}">
@@ -46,18 +313,18 @@
             </div>
           </div>
 
-          <!-- Theme Engine -->
+          
           <div class="theme-selector">
             <div class="section-title">
               <span>Theme</span>
-              <!-- Auto/Manual Toggle for Dark Mode -->
+              
               <p-toggleButton [(ngModel)]="isDarkMode" onIcon="pi-moon" offIcon="pi pi-sun"
                 styleClass="w-8 h-8 rounded-full border-0 bg-transparent text-[var(--text-secondary)] hover:text-[var(--accent-primary)] focus:shadow-none"
                 (onChange)="toggleDarkMode($event.checked)">
               </p-toggleButton>
             </div>
 
-            <!-- 13-Theme Grid -->
+            
             <div class="theme-grid">
               @for (theme of allThemes; track theme.id) {
               <div class="theme-option" [style.background-color]="theme.color"
@@ -68,7 +335,6 @@
             </div>
           </div>
 
-          <!-- Actions -->
           <div class="menu-actions">
             <a routerLink="/user/profile" class="menu-item" (click)="op.hide()">
               <i class="pi pi-user"></i> Profile Settings
@@ -84,7 +350,6 @@
         </div>
       </p-popover>
     </ng-container>
-
     <ng-template #loggedOut>
       <a routerLink="/auth/login"
         class="px-4 py-2 rounded-lg bg-[var(--accent-primary)] text-white text-sm font-medium hover:opacity-90 transition-opacity no-underline">
@@ -95,22 +360,9 @@
   </div>
 </div>
 
-<!-- Notification Modal -->
-<!-- <p-dialog header="Notifications" [modal]="true" [(visible)]="showNotificationdialog"
-  styleClass="notification-modal-override" [draggable]="false" [resizable]="false" [dismissableMask]="true"
-  [style]="{ width: '100%', maxWidth: '450px', height: '100%', maxHeight: '100vh', margin: '0', position: 'fixed', right: '0', top: '0', border: 'none', borderRadius: '0' }">
-  <app-notification-bell></app-notification-bell>
-</p-dialog> -->
-<p-dialog 
-  [(visible)]="showNotificationdialog" 
-  [modal]="true" 
-  [draggable]="false" 
-  [resizable]="false" 
-  [dismissableMask]="true"
-  [showHeader]="false" 
-  styleClass="premium-notification-dialog"
+<p-dialog [(visible)]="showNotificationdialog" [modal]="true" [draggable]="false" [resizable]="false"
+  [dismissableMask]="true" [showHeader]="false" styleClass="premium-notification-dialog"
   [style]="{ width: '90%', maxWidth: '500px', maxHeight: '85vh', borderRadius: '16px', overflow: 'hidden' }"
   maskStyleClass="backdrop-blur-sm bg-black/40">
-  
   <app-notification-bell></app-notification-bell>
-</p-dialog>
+</p-dialog> -->

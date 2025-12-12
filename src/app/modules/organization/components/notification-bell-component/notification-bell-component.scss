@@ -374,3 +374,45 @@ $border: var(--border-primary);
     color: $text-muted;
   }
 }
+
+// ... existing styles ...
+
+// Update the grid for 4 tabs instead of 3
+.segmented-control {
+  // ... existing ...
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr; // Changed to 4 columns
+  
+  // Update segment-bg width if you hardcoded strict widths previously
+  // If you used flex, verify the width logic.
+}
+
+.broadcast-container {
+  padding: 1rem;
+  
+  .form-group {
+    margin-bottom: 1rem;
+    
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #64748b; // slate-500
+      margin-bottom: 0.4rem;
+    }
+
+    input, textarea {
+      width: 100%;
+      border-radius: 6px;
+    }
+  }
+
+  .mt-3 {
+    margin-top: 1rem;
+  }
+}
+
+// Override PrimeNG MultiSelect styles if needed for small containers
+::ng-deep .p-multiselect {
+  width: 100%;
+}

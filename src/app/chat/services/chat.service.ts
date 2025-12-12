@@ -19,7 +19,14 @@ export interface Attachment {
   type: string; // e.g. 'image/png', 'application/pdf'
   size?: number;
 }
-
+export interface Announcement {
+  _id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'warning' | 'success' | 'urgent';
+  createdAt: string;
+  senderId?: any;
+}
 export interface Message {
   _id?: string;
   channelId: string;
@@ -46,6 +53,7 @@ export class ChatService {
 
   private socket: Socket | null = null;
   private token: string | null = null;
+  public announcement$ = new Subject<Announcement>(); // ✅ Add this
 
   // Reconnect Strategy
   private baseReconnectMs = 500;
@@ -162,6 +170,24 @@ export class ChatService {
         if (this.autoReconnect) this.scheduleReconnect();
       });
 
+      this.socket.on('newAnnouncement', (payload: any) => {
+        console.log('🔔 SOCKET EVENT RECEIVED:', payload); // <--- ADD THIS
+        this.zone.run(() => {
+          if (payload && payload.data) {
+            this.announcement$.next(payload.data);
+          }
+        });
+      });
+
+      // this.socket.on('newAnnouncement', (payload: any) => {
+      //   this.zone.run(() => {
+      //     // payload structure: { type: 'ANNOUNCEMENT', data: AnnouncementObj }
+      //     if (payload && payload.data) {
+      //       this.announcement$.next(payload.data);
+      //     }
+      //   });
+      // });
+
       // --- EVENTS ---
       this.socket.on('newMessage', (msg: Message) => this.zone.run(() => this.onNewMessage(msg)));
       this.socket.on('messageDeleted', (data: { messageId: string }) => this.zone.run(() => this.onMessageDeleted(data)));
@@ -267,9 +293,9 @@ export class ChatService {
    */
   sendMessage(channelId: string, body: string, attachments: Attachment[] = []) {
     if (!channelId || (!body && !attachments.length)) return Promise.reject(new Error('invalid payload'));
-    
+
     const payload: Message = { channelId, body, attachments };
-    
+
     if (!this.consumeBucket()) {
       return this.queueMessage('sendMessage', payload);
     }

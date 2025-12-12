@@ -1,4 +1,3 @@
-import { OrganizationService } from './../../organization.service';
 import { Component, OnInit, inject, effect, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -8,13 +7,18 @@ import { NotificationService } from '../../../../core/services/notification.serv
 import { ApiService } from '../../../../core/services/api';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { MasterListService } from '../../../../core/services/master-list.service';
+import { OrganizationService } from './../../organization.service';
+import { AnnouncementService } from '../../../../core/services/announcement.service';
 
 // --- PrimeNG Modules ---
 import { ButtonModule } from 'primeng/button';
 import { BadgeModule } from 'primeng/badge';
 import { TooltipModule } from 'primeng/tooltip';
 import { SkeletonModule } from 'primeng/skeleton';
-import { SelectModule } from 'primeng/select';
+import { SelectModule } from 'primeng/select'; // Or DropdownModule depending on your version
+import { MultiSelectModule } from 'primeng/multiselect'; // <--- NEW
+import { InputTextModule } from 'primeng/inputtext';     // <--- NEW
+import { TextareaModule } from 'primeng/textarea';       // <--- NEW
 
 @Component({
   selector: 'app-notification-bell',
@@ -23,6 +27,9 @@ import { SelectModule } from 'primeng/select';
     CommonModule,
     FormsModule,
     SelectModule,
+    MultiSelectModule, // <--- Add this
+    InputTextModule,   // <--- Add this
+    TextareaModule,    // <--- Add this
     ButtonModule,
     BadgeModule,
     TooltipModule,
@@ -32,32 +39,69 @@ import { SelectModule } from 'primeng/select';
   styleUrl: './notification-bell-component.scss'
 })
 export class NotificationBellComponent implements OnInit {
+  // ... existing injections ...
   private notificationService = inject(NotificationService);
   private apiService = inject(ApiService);
   private messageService = inject(AppMessageService);
   private OrganizationService = inject(OrganizationService);
   private masterList = inject(MasterListService);
+  private announcementService = inject(AnnouncementService);
 
-  realtimeNotifications: any[] = []; // Tab 0
-  pendingMembers: any[] = []
-  allNotifications: any[] = []
+  // ... existing state variables ...
+  realtimeNotifications: any[] = [];
+  pendingMembers: any[] = [];
+  allNotifications: any[] = [];
+  
+  // Master Data
   roles: any[] = [];
   branches: any[] = [];
+  users: any[] = []; // Users list for specific targeting
+
   showDropdown = false;
   unreadCount = 0;
   isLoading = false;
-  activeTab = 0; // 0 = New, 1 = Approvals, 2 = History
+  
+  // Tabs: 0=New, 1=Approvals, 2=History, 3=Broadcast (New)
+  activeTab = 0; 
+  
   selectedRoles: { [userId: string]: string } = {};
   selectedBranches: { [userId: string]: string } = {};
+
+  // --- ANNOUNCEMENT FORM STATE ---
+  announcement = {
+    title: '',
+    message: '',
+    type: 'info',
+    targetAudience: 'all' // 'all', 'role', 'specific'
+  };
+
+  // Holds the IDs selected in the MultiSelect
+  selectedTargetIds: string[] = []; 
+
+  // Dropdown Options
+  audienceOptions = [
+    { label: 'Entire Organization', value: 'all' },
+    { label: 'Specific Roles', value: 'role' },
+    { label: 'Specific People', value: 'specific' }
+  ];
+
+  typeOptions = [
+    { label: 'Information', value: 'info', icon: 'pi pi-info-circle' },
+    { label: 'Success', value: 'success', icon: 'pi pi-check-circle' },
+    { label: 'Warning', value: 'warning', icon: 'pi pi-exclamation-triangle' },
+    { label: 'Urgent', value: 'urgent', icon: 'pi pi-megaphone' }
+  ];
 
   constructor() {
     effect(() => {
       this.roles = this.masterList.roles();
+      this.users = this.masterList.users(); // Ensure this returns array of users
       this.branches = this.masterList.branches();
     });
   }
 
   ngOnInit() {
+    // ... existing subscription logic ...
     this.notificationService.notifications$.subscribe((data) => {
       this.realtimeNotifications = data;
       this.unreadCount = data.filter(n => !n.isRead).length;
@@ -68,35 +112,28 @@ export class NotificationBellComponent implements OnInit {
     this.loadData();
   }
 
+  // ... existing loadData, fetchPendingMembers, etc ...
   loadData() {
     this.isLoading = true;
     this.masterList.refresh();
-
-    // Use helper to fetch pending
     this.fetchPendingMembers();
 
     this.apiService.getAllNotifications().subscribe({
       next: (res: any) => {
         this.allNotifications = res.data.notifications || [];
-        // Only override realtime if we are loading initial state
         if (this.realtimeNotifications.length === 0) {
-             this.realtimeNotifications = this.allNotifications.filter(n => !n.isRead);
+          this.realtimeNotifications = this.allNotifications.filter(n => !n.isRead);
         }
         this.unreadCount = this.realtimeNotifications.length;
         this.isLoading = false;
       },
-      error: () => {
-        this.isLoading = false;
-      }
+      error: () => { this.isLoading = false; }
     });
   }
 
-  // ✅ Helper method to refresh the list independently
   fetchPendingMembers() {
     this.OrganizationService.getPendingMembers().subscribe({
-      next: (res) => {
-        this.pendingMembers = res.data.pendingMembers || [];
-      },
+      next: (res) => { this.pendingMembers = res.data.pendingMembers || []; },
       error: () => { }
     });
   }
@@ -118,33 +155,32 @@ export class NotificationBellComponent implements OnInit {
     this.notificationService.markAsRead(notification._id!);
     notification.isRead = true;
     this.unreadCount = Math.max(0, this.unreadCount - 1);
-    this.realtimeNotifications = this.realtimeNotifications.filter(n => n._id !== notification._id);
   }
 
   approveMember(member: any) {
-    const userId = member._id;
-    const roleId = this.selectedRoles[userId];
-    const branchId = this.selectedBranches[userId];
-    if (!roleId || !branchId) {
-      this.messageService.showWarn('Missing Info', 'Please select a role and branch.');
-      return;
-    }
-    const payload = { userId, roleId, branchId };
-    this.OrganizationService.approveMember(payload).subscribe({
-      next: () => {
-        this.messageService.showSuccess('Approved', `${member.name} is now active.`);
-        this.pendingMembers = this.pendingMembers.filter(m => m._id !== userId);
-      },
-      error: () => {
-      }
-    });
+     // ... existing logic ...
+     const userId = member._id;
+     const roleId = this.selectedRoles[userId];
+     const branchId = this.selectedBranches[userId];
+     if (!roleId || !branchId) {
+       this.messageService.showWarn('Missing Info', 'Please select a role and branch.');
+       return;
+     }
+     const payload = { userId, roleId, branchId };
+     this.OrganizationService.approveMember(payload).subscribe({
+       next: () => {
+         this.messageService.showSuccess('Approved', `${member.name} is now active.`);
+         this.pendingMembers = this.pendingMembers.filter(m => m._id !== userId);
+       },
+       error: () => { }
+     });
   }
 
   getIcon(type: string): string {
     switch (type) {
       case 'success': return 'pi-check-circle';
-      case 'warn': return 'pi-exclamation-triangle';
-      case 'error': return 'pi-times-circle';
+      case 'warning': return 'pi-exclamation-triangle';
+      case 'urgent': return 'pi-megaphone';
       default: return 'pi-info-circle';
     }
   }
@@ -158,8 +194,49 @@ export class NotificationBellComponent implements OnInit {
   closeDialog() {
     document.querySelector('.p-dialog-mask')?.remove();
   }
-}
 
+  // --- UPDATED SEND ANNOUNCEMENT LOGIC ---
+  
+  onAudienceChange() {
+    // Clear selections when audience type changes to prevent mismatch
+    this.selectedTargetIds = [];
+  }
+
+  sendAnnouncement() {
+    // 1. Basic Validation
+    if (!this.announcement.title || !this.announcement.message) {
+      this.messageService.showWarn('Validation', 'Title and Message are required');
+      return;
+    }
+
+    // 2. Target Validation
+    if (this.announcement.targetAudience !== 'all' && this.selectedTargetIds.length === 0) {
+      this.messageService.showWarn('Validation', 'Please select at least one Role or User');
+      return;
+    }
+
+    // 3. Prepare Payload
+    const payload = {
+      ...this.announcement,
+      targetIds: this.selectedTargetIds // The array of RoleIDs or UserIDs
+    };
+
+    // 4. API Call
+    this.announcementService.create(payload).subscribe({
+      next: () => {
+        this.messageService.showSuccess('Announcement broadcasted successfully');
+        // Reset Form
+        this.announcement = { title: '', message: '', type: 'info', targetAudience: 'all' };
+        this.selectedTargetIds = [];
+        this.activeTab = 0; // Go back to notifications
+      },
+      error: (err) => {
+        console.error(err);
+        this.messageService.showError('Failed', 'Could not send announcement');
+      }
+    });
+  }
+}
 
 // import { OrganizationService } from './../../organization.service';
 // import { Component, OnInit, inject, effect, EventEmitter, Output } from '@angular/core';
@@ -178,6 +255,7 @@ export class NotificationBellComponent implements OnInit {
 // import { TooltipModule } from 'primeng/tooltip';
 // import { SkeletonModule } from 'primeng/skeleton';
 // import { SelectModule } from 'primeng/select';
+// import { AnnouncementService } from '../../../../core/services/announcement.service';
 
 // @Component({
 //   selector: 'app-notification-bell',
@@ -200,6 +278,7 @@ export class NotificationBellComponent implements OnInit {
 //   private messageService = inject(AppMessageService);
 //   private OrganizationService = inject(OrganizationService);
 //   private masterList = inject(MasterListService);
+//   private announcementService = inject(AnnouncementService);
 
 //   realtimeNotifications: any[] = []; // Tab 0
 //   pendingMembers: any[] = []
@@ -212,10 +291,11 @@ export class NotificationBellComponent implements OnInit {
 //   activeTab = 0; // 0 = New, 1 = Approvals, 2 = History
 //   selectedRoles: { [userId: string]: string } = {};
 //   selectedBranches: { [userId: string]: string } = {};
-
+//   users: any
 //   constructor() {
 //     effect(() => {
 //       this.roles = this.masterList.roles();
+//       this.users = this.masterList.users();
 //       this.branches = this.masterList.branches();
 //     });
 //   }
@@ -224,6 +304,9 @@ export class NotificationBellComponent implements OnInit {
 //     this.notificationService.notifications$.subscribe((data) => {
 //       this.realtimeNotifications = data;
 //       this.unreadCount = data.filter(n => !n.isRead).length;
+//       if (data.length > 0 && data[0].title === 'New Signup Request') {
+//         this.fetchPendingMembers();
+//       }
 //     });
 //     this.loadData();
 //   }
@@ -232,23 +315,32 @@ export class NotificationBellComponent implements OnInit {
 //     this.isLoading = true;
 //     this.masterList.refresh();
 
-//     this.OrganizationService.getPendingMembers().subscribe({
-//       next: (res) => {
-//         this.pendingMembers = res.data.pendingMembers || [];
-//       },
-//       error: () => { }
-//     });
+//     // Use helper to fetch pending
+//     this.fetchPendingMembers();
 
 //     this.apiService.getAllNotifications().subscribe({
 //       next: (res: any) => {
 //         this.allNotifications = res.data.notifications || [];
-//         this.realtimeNotifications = this.allNotifications.filter(n => !n.isRead);
+//         // Only override realtime if we are loading initial state
+//         if (this.realtimeNotifications.length === 0) {
+//           this.realtimeNotifications = this.allNotifications.filter(n => !n.isRead);
+//         }
 //         this.unreadCount = this.realtimeNotifications.length;
 //         this.isLoading = false;
 //       },
 //       error: () => {
 //         this.isLoading = false;
 //       }
+//     });
+//   }
+
+//   // ✅ Helper method to refresh the list independently
+//   fetchPendingMembers() {
+//     this.OrganizationService.getPendingMembers().subscribe({
+//       next: (res) => {
+//         this.pendingMembers = res.data.pendingMembers || [];
+//       },
+//       error: () => { }
 //     });
 //   }
 
@@ -290,27 +382,42 @@ export class NotificationBellComponent implements OnInit {
 //       }
 //     });
 //   }
+
 //   getIcon(type: string): string {
-//   switch(type) {
-//     case 'success': return 'pi-check-circle';
-//     case 'warn': return 'pi-exclamation-triangle';
-//     case 'error': return 'pi-times-circle';
-//     default: return 'pi-info-circle';
+//     switch (type) {
+//       case 'success': return 'pi-check-circle';
+//       case 'warn': return 'pi-exclamation-triangle';
+//       case 'error': return 'pi-times-circle';
+//       default: return 'pi-info-circle';
+//     }
 //   }
-// }
 
-// markAllRead() {
-//   this.realtimeNotifications.forEach(n => this.markAsRead(n));
-// }
-// @Output() close = new EventEmitter<void>(); // Or use a shared service to toggle visibility
+//   markAllRead() {
+//     this.realtimeNotifications.forEach(n => this.markAsRead(n));
+//   }
 
-// closeDialog() {
-//   // If you used the [(visible)]="showNotificationdialog" in the parent, 
-//   // you might need an Output here, or just toggle the variable if this component controls it.
-//   // Easiest way: Inject the parent component or use a shared state.
-//   // OR simply:
-//   document.querySelector('.p-dialog-mask')?.remove(); // Hacky? No. 
-//   // Better:
-//   // this.showNotificationdialog = false; // If you bind this variable in the component
-// }
+//   @Output() close = new EventEmitter<void>();
+
+//   closeDialog() {
+//     document.querySelector('.p-dialog-mask')?.remove();
+//   }
+//   // ... inside the class
+
+//   // Form model
+//   announcement = {
+//     title: '',
+//     message: '',
+//     type: 'info',
+//     targetAudience: 'all'
+//   };
+//   sendAnnouncement() {
+//     this.announcementService.create(this.announcement).subscribe({
+//       next: () => {
+//         this.messageService.showSuccess('Announcement broadcasted successfully');
+//         this.announcement = { title: '', message: '', type: 'info', targetAudience: 'all' }; // Reset
+//       },
+//       error: (err) => console.error(err)
+//     });
+//   }
+
 // }

@@ -1,33 +1,76 @@
 /* ==========================================================================
-   HEADER COMPONENT (Angular v20 / Enterprise V3)
+   HEADER + POPOVER — THEME-SAFE FINAL SCSS
+   Drop this into your header component SCSS (replace older popover/header rules)
+   - Ensures fixed/same width, 16px rounded curves, theme tokens usage
+   - Works with PrimeNG p-popover (styleClass="premium-popover-override")
+   - Uses ::ng-deep where popover is appended to body
    ========================================================================== */
 
-:host {
-  display: block;
-  position: sticky;
-  top: 0;
-  z-index: var(--z-sticky);
-  width: 100%;
+/* -------------------------
+   POPOVER (PrimeNG) OVERRIDES
+   ------------------------- */
+/* ::ng-deep required because p-popover is appended to body */
+:host ::ng-deep .premium-popover-override {
+  /* Shell sizing & placement */
+  min-width: 360px;           /* same width you requested */
+  width: 360px;               /* force same width */
+  max-width: calc(95vw);      /* responsive fallback */
+  border: none !important;
+  background: transparent !important;
+  margin-top: 10px !important;
+  z-index: var(--z-tooltip, 700) !important; /* ensure above other UI */
+
+  /* Remove arrow decorations for a clean floating pill */
+  &.p-popover-top::after,
+  &.p-popover-top::before,
+  &.p-popover-bottom::after,
+  &.p-popover-bottom::before {
+    display: none !important;
+  }
+
+  /* Actual content area inside the popover */
+  .p-popover-content {
+    padding: 0 !important; /* we manage padding inside children */
+    box-sizing: border-box !important;
+
+    /* THEME TOKENS — force them so popover doesn't get camouflaged */
+    background: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+
+    /* Rounded curve and border */
+    border-radius: 16px !important;              /* your rounded curve */
+    border: 1px solid var(--border-primary) !important;
+
+    /* Depth consistent with tokens */
+    box-shadow: var(--shadow-xl) !important;
+
+    /* Prevent inner overflow clipping of radius */
+    overflow: hidden !important;
+  }
 }
 
-/* 1. Main Navbar Bar */
+/* If PrimeNG renders a different wrapper class, catch it too */
+:host ::ng-deep .premium-popover-override.p-overlaypanel,
+:host ::ng-deep .premium-popover-override.p-overlay {
+  min-width: 360px;
+  width: 360px;
+  max-width: calc(95vw);
+}
+
+/* -------------------------
+   HEADER (Main)
+   ------------------------- */
 .header-inner {
   height: 64px;
   padding: 0 1.5rem;
-  
-  /* Glassmorphism Base */
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-primary);
-  backdrop-filter: blur(var(--glass-blur-c));
-  -webkit-backdrop-filter: blur(var(--glass-blur-c));
-  
   display: flex;
   align-items: center;
   justify-content: space-between;
-  transition: var(--transition-colors);
 }
 
-/* 2. Left Section */
+/* LEFT */
 .header-left {
   display: flex;
   align-items: center;
@@ -37,12 +80,11 @@
     width: 36px;
     height: 36px;
     border-radius: var(--ui-border-radius);
-    border: 1px solid transparent;
+    border: none;
     background: transparent;
     color: var(--text-secondary);
     cursor: pointer;
-    transition: var(--transition-base);
-
+    transition: var(--transition-fast);
     &:hover {
       background: var(--component-bg-hover);
       color: var(--text-primary);
@@ -54,24 +96,23 @@
     align-items: center;
     gap: 0.75rem;
     text-decoration: none;
-    
-    i {
-      font-size: 1.25rem;
-      color: var(--accent-primary);
-      filter: drop-shadow(0 0 8px var(--accent-focus));
-    }
+    font-weight: 700;
+    color: var(--text-primary);
 
-    span {
-      font-family: var(--font-heading);
-      font-weight: 700;
-      font-size: 1.125rem;
-      color: var(--text-primary);
-      letter-spacing: -0.02em;
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--accent-primary);
+      border-radius: var(--ui-border-radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
     }
   }
 }
 
-/* 3. Right Section */
+/* RIGHT */
 .header-right {
   display: flex;
   align-items: center;
@@ -86,27 +127,21 @@
     background: transparent;
     color: var(--text-secondary);
     cursor: pointer;
-    transition: var(--transition-base);
-
+    transition: var(--transition-fast);
     &:hover {
       background: var(--component-bg-hover);
       color: var(--accent-primary);
     }
-
-    &.has-new {
-      color: var(--text-primary);
-      
-      &::after {
-        content: '';
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        width: 8px;
-        height: 8px;
-        background: var(--color-error);
-        border-radius: 50%;
-        border: 2px solid var(--bg-secondary);
-      }
+    &.has-new::after {
+      content: '';
+      position: absolute;
+      top: 9px;
+      right: 9px;
+      width: 9px;
+      height: 9px;
+      background: var(--color-error);
+      border-radius: 50%;
+      border: 2px solid var(--bg-secondary);
     }
   }
 
@@ -114,450 +149,522 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 4px 8px 4px 4px;
+    padding: 4px 12px 4px 4px;
     border-radius: 99px;
-    background: transparent;
     border: 1px solid transparent;
+    background: transparent;
     cursor: pointer;
-    transition: var(--transition-base);
-
-    &:hover, &.active {
+    transition: var(--transition-fast);
+    &:hover {
       background: var(--component-bg-hover);
       border-color: var(--border-primary);
     }
-  }
-}
-
-/* 4. POPOVER DESIGN (The "Best" Part) */
-/* We use ::ng-deep to penetrate PrimeNG's view encapsulation */
-:host ::ng-deep {
-  .p-popover {
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    margin-top: 8px;
-
-    .p-popover-content {
-      background: var(--bg-secondary);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--border-primary);
-      box-shadow: var(--shadow-xl);
-      border-radius: var(--ui-border-radius-xl);
-      padding: 0;
-      overflow: hidden;
-      min-width: 320px;
-    }
-
-    /* Arrow customization */
-    &::after, &::before {
-      border-bottom-color: var(--bg-secondary) !important;
-    }
-  }
-}
-
-/* 5. Popover Internals */
-.popover-container {
-  display: flex;
-  flex-direction: column;
-}
-
-.user-header {
-  padding: 1.5rem;
-  background: linear-gradient(to bottom, var(--component-bg-hover), transparent);
-  border-bottom: 1px solid var(--border-primary);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 0.75rem;
-
-  .user-details {
-    h4 {
-      margin: 0;
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-    span {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-    }
-  }
-}
-
-.theme-selector {
-  padding: 1.25rem;
-  
-  .section-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--text-label);
-    margin-bottom: 1rem;
-    font-weight: 600;
-  }
-
-  .theme-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 0.75rem;
-  }
-
-  .theme-option {
-    width: 100%;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    border: 1px solid var(--border-primary);
-    cursor: pointer;
-    position: relative;
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-
-    &::after {
-      content: '';
-      position: absolute;
-      inset: -3px;
-      border-radius: 50%;
-      border: 2px solid transparent;
-      transition: border-color 0.2s ease;
-    }
-
-    &:hover {
-      transform: scale(1.15);
-      z-index: 10;
-    }
-
-    &.active::after {
-      border-color: var(--accent-primary);
-    }
-  }
-}
-
-.menu-actions {
-  padding: 0.5rem;
-  border-top: 1px solid var(--border-primary);
-  background: var(--bg-ternary);
-
-  .menu-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: none;
-    background: transparent;
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-    border-radius: var(--ui-border-radius);
-    cursor: pointer;
-    text-decoration: none;
-    transition: all 0.2s;
-
-    i { font-size: 1rem; }
-
-    &:hover {
-      background: var(--component-bg-hover);
-      color: var(--text-primary);
-      transform: translateX(4px);
-    }
-
-    &.danger {
-      color: var(--color-error);
-      &:hover {
-        background: color-mix(in srgb, var(--color-error) 10%, transparent);
+    .user-meta {
+      display: flex;
+      flex-direction: column;
+      .name {
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+      .role {
+        font-size: 0.7rem;
+        color: var(--text-secondary);
       }
     }
   }
 }
 
-/* Mobile Tweaks */
-@media (max-width: 768px) {
-  .header-inner { padding: 0 1rem; }
-  .user-profile-trigger span, 
-  .user-profile-trigger i.pi-angle-down { display: none; }
+/* -------------------------
+   POPOVER INTERNAL LAYOUT
+   ------------------------- */
+.popover-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* Dialog Override */
-:host ::ng-deep .notification-modal-override .p-dialog-content {
-  padding: 0 !important;
-  height: 100%;
+/* Tabs area (pills) */
+.popover-tabs-container {
+  padding: 1rem;
+}
+.popover-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 4px;
+  background: var(--bg-ternary);
+  border-radius: 12px;
+  border: 1px solid var(--border-primary);
+  position: relative;
+  isolation: isolate;
+
+  .tab-slider {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: calc(50% - 4px);
+    height: calc(100% - 8px);
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.18s ease;
+    z-index: 0;
+  }
+
+  .tab-btn {
+    position: relative;
+    z-index: 1; /* above slider */
+    padding: 8px;
+    border: none;
+    background: transparent;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    &.active {
+      color: var(--text-primary);
+    }
+    .tab-badge {
+      background: var(--color-error);
+      color: #fff;
+      padding: 0 6px;
+      font-size: 0.7rem;
+      border-radius: 10px;
+      min-width: 18px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
 }
 
-// /* ==============================================
-//    HEADER SCSS
-//    - Refactored to use new canonical tokens
-//    ============================================== */
+/* User header inside popover */
+.user-header {
+  padding: 1.25rem 1.25rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  background: transparent; /* parent (.p-popover-content) provides bg */
+  border-bottom: 1px solid var(--border-primary);
+  ::ng-deep .xl-avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 1.7rem;
+    background: var(--accent-primary);
+    color: #fff;
+  }
+  .user-details {
+    h4 {
+      margin: 0;
+      font-size: var(--font-size-md);
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    span {
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+    }
+  }
+}
+
+/* Theme selector */
+.theme-selector {
+  padding: 1rem 1.25rem;
+  .section-title {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    span {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-label);
+    }
+  }
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    .theme-option {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      border: 1px solid var(--border-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      &:hover {
+        transform: translateY(-2px);
+      }
+      &.active {
+        box-shadow: 0 0 0 2px var(--bg-secondary), 0 0 0 4px var(--accent-primary);
+        border-color: transparent;
+      }
+      i { color: #fff; font-size: 0.9rem; }
+    }
+  }
+}
+
+/* Menu actions */
+.menu-actions {
+  padding: 0.75rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px solid var(--border-primary);
+
+  .menu-item {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.75rem;
+    border-radius: 12px;
+    background: transparent;
+    text-decoration: none;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    width: 100%;
+    .icon-box {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: var(--bg-ternary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+    }
+    .icon-box.danger {
+      background: rgba(239, 68, 68, 0.08);
+      color: var(--color-error);
+    }
+    .item-text { display: flex; flex-direction: column;
+      .label { color: var(--text-primary); font-weight: 600; }
+      .sub-label { color: var(--text-secondary); font-size: 0.7rem; }
+    }
+    .arrow { margin-left: auto; color: var(--text-secondary); }
+    &:hover {
+      background: var(--component-bg-hover);
+      .icon-box { background: #fff; color: var(--accent-primary); box-shadow: var(--shadow-sm); }
+      .icon-box.danger { background: var(--color-error); color: #fff; }
+    }
+  }
+}
+
+/* Notification wrapper (embedded component) */
+.notification-wrapper {
+  height: 400px;
+  overflow-y: auto;
+  ::ng-deep app-notification-bell {
+    .notification-panel { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
+    .panel-header { display: none !important; }
+    .panel-body { padding: 0 !important; }
+  }
+}
+
+/* MOBILE: shrink popover width on very small screens */
+@media (max-width: 420px) {
+  :host ::ng-deep .premium-popover-override {
+    width: calc(92vw) !important;
+    min-width: unset !important;
+    left: 4vw !important;
+    right: 4vw !important;
+  }
+}
+
+// /* ==========================================================================
+//    HEADER COMPONENT (Angular v20 / Enterprise V3)
+//    ========================================================================== */
 
 // :host {
 //   display: block;
-//   position: fixed;
+//   position: sticky;
 //   top: 0;
-//   left: 0;
-//   right: 0;
-//   z-index: var(--z-sticky); // Use z-index token
-//   height: 65px;
-//   background: var(--bg-secondary); // Use canonical token
-//   border-bottom: 1px solid var(--border-primary); // Use canonical token
-//   box-shadow: var(--shadow-sm); // Use shadow token
-//   padding: 0;
-//   margin: 0;
-//   font-family: var(--font-body); // Use body font token
-//   line-height: 1;
+//   z-index: var(--z-sticky);
+//   width: 100%;
 // }
 
-// /* Inner Container */
+// /* 1. Main Navbar Bar */
 // .header-inner {
+//   height: 64px;
+//   padding: 0 1.5rem;
+  
+//   /* Glassmorphism Base */
+//   background: var(--bg-secondary);
+//   border-bottom: 1px solid var(--border-primary);
+//   backdrop-filter: blur(var(--glass-blur-c));
+//   -webkit-backdrop-filter: blur(var(--glass-blur-c));
+  
 //   display: flex;
 //   align-items: center;
 //   justify-content: space-between;
-//   height: 100%;
-//   padding: 0 1rem;
-//   margin: 0;
+//   transition: var(--transition-colors);
 // }
 
-// /* Left: Logo + Toggle */
+// /* 2. Left Section */
 // .header-left {
 //   display: flex;
 //   align-items: center;
-//   gap: 0.75rem;
+//   gap: 1rem;
+
+//   .menu-toggle-btn {
+//     width: 36px;
+//     height: 36px;
+//     border-radius: var(--ui-border-radius);
+//     border: 1px solid transparent;
+//     background: transparent;
+//     color: var(--text-secondary);
+//     cursor: pointer;
+//     transition: var(--transition-base);
+
+//     &:hover {
+//       background: var(--component-bg-hover);
+//       color: var(--text-primary);
+//     }
+//   }
+
+//   .logo-link {
+//     display: flex;
+//     align-items: center;
+//     gap: 0.75rem;
+//     text-decoration: none;
+    
+//     i {
+//       font-size: 1.25rem;
+//       color: var(--accent-primary);
+//       filter: drop-shadow(0 0 8px var(--accent-focus));
+//     }
+
+//     span {
+//       font-family: var(--font-heading);
+//       font-weight: 700;
+//       font-size: 1.125rem;
+//       color: var(--text-primary);
+//       letter-spacing: -0.02em;
+//     }
+//   }
 // }
 
-// .logo-link {
-//   display: flex;
-//   align-items: center;
-//   gap: 0.5rem;
-//   text-decoration: none;
-//   color: var(--text-primary); // Use canonical token
-//   font-weight: 700;
-//   font-size: 1.25rem;
-// }
-
-// .logo-link i {
-//   font-size: 1.5rem;
-//   color: var(--accent-primary); // Use canonical token
-// }
-
-// .menu-toggle-btn {
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   width: 40px;
-//   height: 40px;
-//   border-radius: 0.5rem;
-//   background: transparent;
-//   border: none;
-//   color: var(--text-secondary); // Use canonical token
-//   cursor: pointer;
-//   transition: all 0.2s ease;
-// }
-
-// .menu-toggle-btn:hover {
-//   background: var(--bg-ternary); // Use canonical token
-//   color: var(--text-primary); // Use canonical token
-//   transform: scale(1.05);
-// }
-
-// /* Right: User Menu */
+// /* 3. Right Section */
 // .header-right {
 //   display: flex;
 //   align-items: center;
-//   gap: 0.75rem;
-// }
+//   gap: 1rem;
 
-// .user-menu-btn {
-//   display: flex;
-//   align-items: center;
-//   gap: 0.5rem;
-//   padding: 0.375rem 0.75rem 0.375rem 0.375rem;
-//   background: var(--bg-ternary); // Use canonical token
-//   border: 1px solid var(--border-primary); // Use canonical token
-//   border-radius: 9999px;
-//   cursor: pointer;
-//   transition: all 0.2s ease;
-// }
+//   .notification-btn {
+//     position: relative;
+//     width: 40px;
+//     height: 40px;
+//     border-radius: 50%;
+//     border: none;
+//     background: transparent;
+//     color: var(--text-secondary);
+//     cursor: pointer;
+//     transition: var(--transition-base);
 
-// .user-menu-btn:hover {
-//   background: var(--bg-ternary); // Use canonical token
-//   border-color: var(--accent-primary); // Use canonical token
-// }
+//     &:hover {
+//       background: var(--component-bg-hover);
+//       color: var(--accent-primary);
+//     }
 
-// .user-avatar {
-//   width: 32px;
-//   height: 32px;
-//   border-radius: 50%;
-//   background: var(--accent-primary); // Use canonical token
-//   color: white;
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   font-weight: 600;
-//   font-size: 0.75rem;
-// }
-
-// .user-name {
-//   font-size: 0.875rem;
-//   font-weight: 500;
-//   color: var(--text-primary); // Use canonical token
-//   max-width: 100px;
-//   white-space: nowrap;
-//   overflow: hidden;
-//   text-overflow: ellipsis;
-// }
-
-// .user-role {
-//   font-size: 0.75rem;
-//   color: var(--text-secondary); // Use canonical token
-// }
-
-// .pi-angle-down {
-//   font-size: 0.75rem;
-//   color: var(--text-secondary); // Use canonical token
-//   transition: transform 0.2s ease;
-// }
-
-// .user-menu-btn:hover .pi-angle-down {
-//   transform: rotate(180deg);
-// }
-
-// /* Popover */
-// :host ::ng-deep .p-popover {
-//   border-radius: 0.75rem;
-//   box-shadow: var(--shadow-lg); // Use shadow token
-//   border: 1px solid var(--border-primary); // Use canonical token
-// }
-
-// :host ::ng-deep .p-popover .p-popover-content {
-//   padding: 0;
-//   background: var(--bg-ternary); // Use canonical token
-// }
-
-// .popover-body {
-//   padding: 1rem;
-//   min-width: 250px;
-// }
-
-// .user-info {
-//   display: flex;
-//   align-items: center;
-//   gap: 0.75rem;
-//   padding-bottom: 0.75rem;
-//   margin-bottom: 0.75rem;
-//   border-bottom: 1px solid var(--border-primary); // Use canonical token
-// }
-
-// .user-info .p-avatar {
-//   width: 48px;
-//   height: 48px;
-// }
-
-// .user-info-text {
-//   flex: 1;
-// }
-
-// .user-info-name {
-//   font-weight: 600;
-//   color: var(--text-primary); // Use canonical token
-// }
-
-// .user-info-email {
-//   font-size: 0.75rem;
-//   color: var(--text-secondary); // Use canonical token
-// }
-
-// .theme-section {
-//   margin: 0.75rem 0;
-// }
-
-// .theme-label {
-//   display: flex;
-//   justify-content: space-between;
-//   align-items: center;
-//   margin-bottom: 0.5rem;
-//   font-size: 0.875rem;
-//   font-weight: 500;
-//   color: var(--text-label); // Use canonical token
-// }
-
-// .theme-colors {
-//   display: grid;
-//   grid-template-columns: repeat(6, 1fr);
-//   gap: 0.5rem;
-// }
-
-// .theme-color {
-//   width: 24px;
-//   height: 24px;
-//   border-radius: 50%;
-//   cursor: pointer;
-//   border: 2px solid transparent;
-//   transition: all 0.2s ease;
-// }
-
-// .theme-color:hover {
-//   transform: scale(1.1);
-//   box-shadow: 0 0 0 2px var(--bg-secondary); // Use canonical token
-// }
-
-// .theme-color.selected {
-//   border-color: var(--accent-primary); // Use canonical token
-//   box-shadow: 0 0 0 2px var(--bg-secondary), 0 0 0 4px var(--accent-primary); // Use canonical tokens
-// }
-
-// .action-link {
-//   display: flex;
-//   align-items: center;
-//   gap: 0.5rem;
-//   padding: 0.5rem 0.75rem;
-//   border-radius: 0.5rem;
-//   color: var(--text-secondary); // Use canonical token
-//   font-size: 0.875rem;
-//   transition: all 0.2s ease;
-//   text-decoration: none; // Explicitly remove underline
-// }
-
-// .action-link:hover {
-//   background: var(--bg-ternary); // Use canonical token
-//   color: var(--text-primary); // Use canonical token
-// }
-
-// .action-link.danger {
-//   color: var(--color-error); // Use canonical token
-// }
-
-// .action-link.danger:hover {
-//   background: color-mix(in srgb, var(--color-error) 10%, transparent); // Use color-mix for hover
-//   color: var(--color-error); // Use canonical token
-// }
-
-// /* Mobile */
-// @media (max-width: 768px) {
-//   .user-name, .user-role, .pi-angle-down {
-//     display: none;
-//   }
-//   .header-inner {
-//     padding: 0 0.75rem;
-//   }
-// }
-// /* ==============================================
-//    NOTIFICATION DIALOG INTEGRATION FIX
-//    ============================================== */
-// :host ::ng-deep {
-  
-//   .notification-modal-override {
-//     /* Ensure the dialog itself flexes correctly */
-//     display: flex;
-//     flex-direction: column;
-
-//     /* Target the INTERNAL content wrapper of PrimeNG Dialog */
-//     .p-dialog-content {
-//       flex-grow: 1;           /* Grow to fill the dialog height */
-//       display: flex;          /* Make THIS a flex container too */
-//       flex-direction: column; /* Column layout */
-//       padding: 0 !important;  /* Zero padding is crucial */
-//       height: 100%;           /* Force full height */
+//     &.has-new {
+//       color: var(--text-primary);
+      
+//       &::after {
+//         content: '';
+//         position: absolute;
+//         top: 10px;
+//         right: 10px;
+//         width: 8px;
+//         height: 8px;
+//         background: var(--color-error);
+//         border-radius: 50%;
+//         border: 2px solid var(--bg-secondary);
+//       }
 //     }
 //   }
+
+//   .user-profile-trigger {
+//     display: flex;
+//     align-items: center;
+//     gap: 0.75rem;
+//     padding: 4px 8px 4px 4px;
+//     border-radius: 99px;
+//     background: transparent;
+//     border: 1px solid transparent;
+//     cursor: pointer;
+//     transition: var(--transition-base);
+
+//     &:hover, &.active {
+//       background: var(--component-bg-hover);
+//       border-color: var(--border-primary);
+//     }
+//   }
+// }
+
+// /* 4. POPOVER DESIGN (The "Best" Part) */
+// /* We use ::ng-deep to penetrate PrimeNG's view encapsulation */
+// :host ::ng-deep {
+//   .p-popover {
+//     background: transparent;
+//     border: none;
+//     box-shadow: none;
+//     margin-top: 8px;
+
+//     .p-popover-content {
+//       background: var(--bg-secondary);
+//       backdrop-filter: blur(20px);
+//       -webkit-backdrop-filter: blur(20px);
+//       border: 1px solid var(--border-primary);
+//       box-shadow: var(--shadow-xl);
+//       border-radius: var(--ui-border-radius-xl);
+//       padding: 0;
+//       overflow: hidden;
+//       min-width: 320px;
+//     }
+
+//     /* Arrow customization */
+//     &::after, &::before {
+//       border-bottom-color: var(--bg-secondary) !important;
+//     }
+//   }
+// }
+
+// /* 5. Popover Internals */
+// .popover-container {
+//   display: flex;
+//   flex-direction: column;
+// }
+
+// .user-header {
+//   padding: 1.5rem;
+//   background: linear-gradient(to bottom, var(--component-bg-hover), transparent);
+//   border-bottom: 1px solid var(--border-primary);
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   text-align: center;
+//   gap: 0.75rem;
+
+//   .user-details {
+//     h4 {
+//       margin: 0;
+//       font-size: 1rem;
+//       font-weight: 600;
+//       color: var(--text-primary);
+//     }
+//     span {
+//       font-size: 0.8rem;
+//       color: var(--text-secondary);
+//     }
+//   }
+// }
+
+// .theme-selector {
+//   padding: 1.25rem;
+  
+//   .section-title {
+//     display: flex;
+//     justify-content: space-between;
+//     align-items: center;
+//     font-size: 0.75rem;
+//     text-transform: uppercase;
+//     letter-spacing: 0.05em;
+//     color: var(--text-label);
+//     margin-bottom: 1rem;
+//     font-weight: 600;
+//   }
+
+//   .theme-grid {
+//     display: grid;
+//     grid-template-columns: repeat(5, 1fr);
+//     gap: 0.75rem;
+//   }
+
+//   .theme-option {
+//     width: 100%;
+//     aspect-ratio: 1;
+//     border-radius: 50%;
+//     border: 1px solid var(--border-primary);
+//     cursor: pointer;
+//     position: relative;
+//     transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+//     &::after {
+//       content: '';
+//       position: absolute;
+//       inset: -3px;
+//       border-radius: 50%;
+//       border: 2px solid transparent;
+//       transition: border-color 0.2s ease;
+//     }
+
+//     &:hover {
+//       transform: scale(1.15);
+//       z-index: 10;
+//     }
+
+//     &.active::after {
+//       border-color: var(--accent-primary);
+//     }
+//   }
+// }
+
+// .menu-actions {
+//   padding: 0.5rem;
+//   border-top: 1px solid var(--border-primary);
+//   background: var(--bg-ternary);
+
+//   .menu-item {
+//     display: flex;
+//     align-items: center;
+//     gap: 0.75rem;
+//     width: 100%;
+//     padding: 0.75rem 1rem;
+//     border: none;
+//     background: transparent;
+//     color: var(--text-secondary);
+//     font-size: 0.875rem;
+//     border-radius: var(--ui-border-radius);
+//     cursor: pointer;
+//     text-decoration: none;
+//     transition: all 0.2s;
+
+//     i { font-size: 1rem; }
+
+//     &:hover {
+//       background: var(--component-bg-hover);
+//       color: var(--text-primary);
+//       transform: translateX(4px);
+//     }
+
+//     &.danger {
+//       color: var(--color-error);
+//       &:hover {
+//         background: color-mix(in srgb, var(--color-error) 10%, transparent);
+//       }
+//     }
+//   }
+// }
+
+// /* Mobile Tweaks */
+// @media (max-width: 768px) {
+//   .header-inner { padding: 0 1rem; }
+//   .user-profile-trigger span, 
+//   .user-profile-trigger i.pi-angle-down { display: none; }
+// }
+
+// /* Dialog Override */
+// :host ::ng-deep .notification-modal-override .p-dialog-content {
+//   padding: 0 !important;
+//   height: 100%;
 // }
