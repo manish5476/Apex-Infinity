@@ -1,102 +1,89 @@
-/* ==========================================================================
-   GLOBAL DESIGN TOKENS & THEME ENGINE (Angular v20)
-   ========================================================================== */
-/* ==========================================================================
-   SCROLL FIX FOR LANDING PAGE
-   ========================================================================== */
+// ... existing code ...
 
-/* 1. Make the Angular Host the scroll container */
+/* ========================================================================== */
+/*   SCROLL FIX FOR LANDING PAGE */
+/* ========================================================================== */
+
 :host {
   display: block;
   width: 100%;
-  height: 100vh;       /* Occupy full viewport height */
-  overflow-y: auto;    /* ENABLE VERTICAL SCROLL HERE */
-  overflow-x: hidden;  /* Prevent horizontal scroll */
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
   position: relative;
-  
-  /* Smooth scrolling */
   scroll-behavior: smooth;
 }
 
-/* 2. Ensure the root div lets the host handle scrolling */
 .landing-root {
   width: 100%;
-  min-height: 100%;    /* Allow content to grow */
+  min-height: 100%;
   position: relative;
-  /* Remove overflow from here, let :host handle it */
-  overflow: visible; 
+  overflow: visible;
 }
 
-/* 3. Fix the Mesh Background so it stays fixed while you scroll */
 .mesh-bg {
-  position: fixed;     /* Must be fixed relative to viewport */
-  top: 0; 
-  left: 0; 
-  width: 100%; 
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
   height: 100%;
-  z-index: -1;         /* Behind everything */
-  pointer-events: none; /* Let clicks pass through */
+  z-index: -1;
+  pointer-events: none;
   background: 
     radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%);
+    radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(168, 85, 247, 0.1) 0px, transparent 50%);
   filter: blur(80px);
 }
 
-/* 4. Fix Navigation Bar sticking */
-/* Since :host is scrolling, 'fixed' works relative to viewport, 
-   but 'sticky' might behave differently. Keep nav fixed. */
 .nav {
-  position: fixed; 
-  top: 0; 
-  left: 0; 
-  width: 100%; 
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
   z-index: 999;
 }
-/* --------------------------------------------------------------------------
-   1. GLOBAL PRIMITIVES (Constant across all themes)
-   -------------------------------------------------------------------------- */
+
+/* ========================================================================== */
+/*   GLOBAL PRIMITIVES */
+/* ========================================================================== */
+
 :root {
-  /* ===== TYPOGRAPHY (Refined Compact Scale) ===== */
   --font-body: 'Inter', -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-heading: 'Poppins', -apple-system, system-ui, sans-serif;
   --font-mono: 'Fira Code', 'Courier New', monospace;
 
-  /* Compact font sizes */
-  --font-size-xs: 0.65rem;     /* 10.4px */
-  --font-size-sm: 0.75rem;     /* 12px */
-  --font-size-base: 0.8125rem; /* 13px */
-  --font-size-md: 0.875rem;    /* 14px */
-  --font-size-lg: 0.9375rem;   /* 15px */
-  --font-size-xl: 1rem;        /* 16px */
-  --font-size-2xl: 1.125rem;   /* 18px */
-  --font-size-3xl: 1.375rem;   /* 22px */
-  --font-size-4xl: 1.75rem;    /* 28px */
-  --font-size-5xl: 2.25rem;    /* 36px */
+  --font-size-xs: 0.65rem;
+  --font-size-sm: 0.75rem;
+  --font-size-base: 0.8125rem;
+  --font-size-md: 0.875rem;
+  --font-size-lg: 0.9375rem;
+  --font-size-xl: 1rem;
+  --font-size-2xl: 1.125rem;
+  --font-size-3xl: 1.375rem;
+  --font-size-4xl: 1.75rem;
+  --font-size-5xl: 2.25rem;
 
-  /* Line height */
   --line-height-tight: 1.1;
   --line-height-normal: 1.3;
   --line-height-relaxed: 1.5;
 
-  /* Font weights */
   --font-weight-light: 300;
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
 
-  /* ===== SPACING (Compact Grid) ===== */
-  --spacing-xs: 0.25rem;   /* 4px */
-  --spacing-sm: 0.375rem;  /* 6px */
-  --spacing-md: 0.5rem;    /* 8px */
-  --spacing-lg: 0.75rem;   /* 12px */
-  --spacing-xl: 1rem;      /* 16px */
-  --spacing-2xl: 1.5rem;   /* 24px */
-  --spacing-3xl: 2rem;     /* 32px */
-  --spacing-4xl: 2.75rem;  /* 44px */
-  --spacing-5xl: 3.5rem;   /* 56px */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.375rem;
+  --spacing-md: 0.5rem;
+  --spacing-lg: 0.75rem;
+  --spacing-xl: 1rem;
+  --spacing-2xl: 1.5rem;
+  --spacing-3xl: 2rem;
+  --spacing-4xl: 2.75rem;
+  --spacing-5xl: 3.5rem;
 
-  /* ===== UI CONSTANTS ===== */
   --ui-border-radius: 5px;
   --ui-border-radius-lg: 10px;
   --ui-border-radius-xl: 16px;
@@ -104,7 +91,6 @@
   --ui-border-width: 1px;
   --ui-border-width-lg: 2px;
 
-  /* Enhanced Shadow System */
   --shadow-xs: 0 0.5px 1px rgba(0, 0, 0, 0.04);
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.08);
@@ -116,7 +102,6 @@
   --shadow-5xl: 0 24px 56px rgba(0, 0, 0, 0.22);
   --shadow-6xl: 0 28px 64px rgba(0, 0, 0, 0.25);
 
-  /* Transitions */
   --transition-fast: all 0.12s cubic-bezier(0.23, 1, 0.32, 1);
   --transition-base: all 0.22s cubic-bezier(0.2, 0.9, 0.2, 1);
   --transition-slow: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
@@ -124,14 +109,12 @@
   --transition-colors: color 0.2s cubic-bezier(0.2, 0.9, 0.2, 1), background-color 0.2s cubic-bezier(0.2, 0.9, 0.2, 1), border-color 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
   --transition-transform: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1);
 
-  /* Focus States */
   --focus-ring-width: 2px;
   --focus-ring-offset: 2px;
   --focus-ring-color: rgba(59, 130, 246, 0.3);
   --focus-ring-color-alt: rgba(139, 92, 246, 0.3);
   --focus-outline-width: 3px;
 
-  /* Z-Index Hierarchy */
   --z-dropdown: 100;
   --z-sticky: 200;
   --z-fixed: 300;
@@ -140,102 +123,73 @@
   --z-toast: 600;
   --z-tooltip: 700;
 
-  /* State Opacities */
   --state-disabled-opacity: 0.5;
   --state-loading-opacity: 0.7;
   --state-readonly-opacity: 0.6;
 }
 
-/* --------------------------------------------------------------------------
-   2. BASE RESET (Fixes Scrolling Issues)
-   -------------------------------------------------------------------------- */
-html, body {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden; /* Prevents horizontal scrollbar */
-  overflow-y: auto;   /* Ensures vertical scrolling works */
-  
-  /* Applies global defaults */
-  font-family: var(--font-body);
-  background-color: var(--bg-primary, #0f172a); /* Default dark bg fallback */
-  color: var(--text-primary, #ffffff);
-}
+/* ========================================================================== */
+/*   ENHANCED COMPONENT STYLES */
+/* ========================================================================== */
 
-/* --------------------------------------------------------------------------
-   3. THEME ENGINE MIXIN
-   -------------------------------------------------------------------------- */
-@mixin apply-canonical-mapping {
-  --bg-primary: var(--theme-bg-primary);
-  --bg-secondary: var(--theme-bg-secondary);
-  --bg-ternary: var(--theme-bg-ternary);
-  --text-primary: var(--theme-text-primary);
-  --text-secondary: var(--theme-text-secondary);
-  --text-tertiary: var(--theme-text-tertiary);
-  --text-label: var(--theme-text-label);
-  --border-primary: var(--theme-border-primary);
-  --border-secondary: var(--theme-border-secondary);
-  --accent-primary: var(--theme-accent-primary);
-  --accent-secondary: var(--theme-accent-secondary);
-  --accent-tertiary: var(--theme-accent-tertiary);
-  --accent-gradient: var(--theme-accent-gradient);
-  --accent-focus: var(--theme-accent-focus);
-  --accent-hover: var(--theme-accent-hover);
-  --color-success: var(--theme-success);
-  --color-warning: var(--theme-warning);
-  --color-error: var(--theme-error);
-  --color-info: var(--theme-info);
-  --color-disabled: var(--theme-disabled);
-  --color-disabled-text: var(--theme-disabled-text);
-  --glass-bg-c: var(--glass-bg);
-  --glass-blur-c: var(--glass-blur);
-  --glass-border-c: var(--glass-border);
-  --glass-shadow-c: var(--glass-shadow, 0 8px 32px rgba(0, 0, 0, 0.1));
-  --component-bg-hover: var(--component-bg-hover);
-  --component-bg-active: var(--component-bg-active);
-  --component-border-focus: var(--component-border-focus);
-  --component-surface-raised: var(--component-surface-raised);
-  --component-divider: var(--component-divider);
-  --scroll-thumb-c: var(--scroll-thumb);
-  --scroll-track-c: var(--scroll-track);
-}
-
-/* --------------------------------------------------------------------------
-   4. COMPONENT SPECIFIC STYLES (Animations & Glassmorphism)
-   -------------------------------------------------------------------------- */
-
-/* Glassmorphism */
+/* <CHANGE> Enhanced glassmorphism with better effects */
 .glass {
   background: rgba(15, 23, 42, 0.6);
   backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px); /* Safari support */
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: var(--transition-base);
 }
+
 .glass:hover {
   border-color: rgba(99, 102, 241, 0.3);
   background: rgba(30, 41, 59, 0.7);
 }
 
-/* 3D Hero Perspective */
-.hero-3d-container {
-  perspective: 1000px;
-}
-.hero-3d-element {
-  transform: rotateX(20deg) scale(0.9);
-  transition: transform 0.5s ease;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-}
-.hero-3d-container:hover .hero-3d-element {
-  transform: rotateX(5deg) scale(0.95);
+/* <CHANGE> New enhanced glass variant */
+.glass-enhanced {
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: var(--transition-base);
 }
 
-/* Gradient Text */
+.glass-enhanced:hover {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+/* 3D Hero Perspective */
+.hero-3d-container {
+  perspective: 1200px;
+}
+
+.hero-3d-element {
+  transform: rotateX(15deg) scale(0.92);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6);
+}
+
+.hero-3d-container:hover .hero-3d-element {
+  transform: rotateX(3deg) scale(0.96);
+}
+
+/* <CHANGE> Enhanced gradient text with animation */
 .gradient-text {
   background: linear-gradient(to right, #818cf8, #c084fc, #38bdf8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-clip: text; /* Standard syntax */
+  background-clip: text;
+}
+
+.gradient-text-enhanced {
+  background: linear-gradient(90deg, #818cf8, #c084fc, #f472b6, #38bdf8, #818cf8);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 4s ease infinite;
 }
 
 /* Scroll Animations */
@@ -244,42 +198,49 @@ html, body {
   transform: translateY(30px);
   transition: all 0.8s ease-out;
 }
+
 .reveal.active {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* Custom Scrollbar - Works on Chrome/Safari/Edge */
+/* Custom Scrollbar */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: #0f172a; }
 ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
-/* Utility to hide scrollbar but allow scrolling */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none;    /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Grid Background */
 .bg-grid {
   background-size: 50px 50px;
-  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
 }
 
-/* Keyframes */
+/* ========================================================================== */
+/*   ENHANCED ANIMATIONS */
+/* ========================================================================== */
+
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-20px); }
 }
+
 @keyframes scroll {
   0% { transform: translateX(0); }
   100% { transform: translateX(-100%); }
 }
+
 @keyframes blob {
   0% { transform: translate(0px, 0px) scale(1); }
   33% { transform: translate(30px, -50px) scale(1.1); }
@@ -287,15 +248,122 @@ html, body {
   100% { transform: translate(0px, 0px) scale(1); }
 }
 
+/* <CHANGE> New gradient shift animation */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* <CHANGE> New shimmer animation for buttons */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* <CHANGE> New pulse animation */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
 /* Utility Animation Classes */
 .animate-float { animation: float 6s ease-in-out infinite; }
 .animate-scroll { animation: scroll 25s linear infinite; }
 .animate-blob { animation: blob 7s infinite; }
+.animate-gradient { animation: gradient-shift 4s ease infinite; }
+.animate-shimmer { 
+  background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 50%, #4f46e5 100%);
+  background-size: 200% auto;
+  animation: shimmer 3s linear infinite;
+}
+.animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
+
 .animation-delay-2000 { animation-delay: 2s; }
+.animation-delay-4000 { animation-delay: 4s; }
+.animation-delay-200 { animation-delay: 0.2s; }
+
+/* Hover Effects */
+.hover\:scale-105:hover {
+  transform: scale(1.05);
+}
+
+.hover\:scale-\[1\.02\]:hover {
+  transform: scale(1.02);
+}
+
+.hover\:-translate-y-1:hover {
+  transform: translateY(-0.25rem);
+}
+
+/* Text Utilities */
+.text-balance {
+  text-wrap: balance;
+}
+
+.text-pretty {
+  text-wrap: pretty;
+}
+
+/* Background Utilities */
+.bg-clip-text {
+  -webkit-background-clip: text;
+  background-clip: text;
+
 // /* ==========================================================================
 //    GLOBAL DESIGN TOKENS & THEME ENGINE (Angular v20)
 //    ========================================================================== */
+// /* ==========================================================================
+//    SCROLL FIX FOR LANDING PAGE
+//    ========================================================================== */
 
+// /* 1. Make the Angular Host the scroll container */
+// :host {
+//   display: block;
+//   width: 100%;
+//   height: 100vh;       /* Occupy full viewport height */
+//   overflow-y: auto;    /* ENABLE VERTICAL SCROLL HERE */
+//   overflow-x: hidden;  /* Prevent horizontal scroll */
+//   position: relative;
+  
+//   /* Smooth scrolling */
+//   scroll-behavior: smooth;
+// }
+
+// /* 2. Ensure the root div lets the host handle scrolling */
+// .landing-root {
+//   width: 100%;
+//   min-height: 100%;    /* Allow content to grow */
+//   position: relative;
+//   /* Remove overflow from here, let :host handle it */
+//   overflow: visible; 
+// }
+
+// /* 3. Fix the Mesh Background so it stays fixed while you scroll */
+// .mesh-bg {
+//   position: fixed;     /* Must be fixed relative to viewport */
+//   top: 0; 
+//   left: 0; 
+//   width: 100%; 
+//   height: 100%;
+//   z-index: -1;         /* Behind everything */
+//   pointer-events: none; /* Let clicks pass through */
+//   background: 
+//     radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
+//     radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%);
+//   filter: blur(80px);
+// }
+
+// /* 4. Fix Navigation Bar sticking */
+// /* Since :host is scrolling, 'fixed' works relative to viewport, 
+//    but 'sticky' might behave differently. Keep nav fixed. */
+// .nav {
+//   position: fixed; 
+//   top: 0; 
+//   left: 0; 
+//   width: 100%; 
+//   z-index: 999;
+// }
 // /* --------------------------------------------------------------------------
 //    1. GLOBAL PRIMITIVES (Constant across all themes)
 //    -------------------------------------------------------------------------- */
@@ -391,7 +459,24 @@ html, body {
 // }
 
 // /* --------------------------------------------------------------------------
-//    2. THEME ENGINE MIXIN
+//    2. BASE RESET (Fixes Scrolling Issues)
+//    -------------------------------------------------------------------------- */
+// html, body {
+//   height: 100%;
+//   width: 100%;
+//   margin: 0;
+//   padding: 0;
+//   overflow-x: hidden; /* Prevents horizontal scrollbar */
+//   overflow-y: auto;   /* Ensures vertical scrolling works */
+  
+//   /* Applies global defaults */
+//   font-family: var(--font-body);
+//   background-color: var(--bg-primary, #0f172a); /* Default dark bg fallback */
+//   color: var(--text-primary, #ffffff);
+// }
+
+// /* --------------------------------------------------------------------------
+//    3. THEME ENGINE MIXIN
 //    -------------------------------------------------------------------------- */
 // @mixin apply-canonical-mapping {
 //   --bg-primary: var(--theme-bg-primary);
@@ -429,13 +514,14 @@ html, body {
 // }
 
 // /* --------------------------------------------------------------------------
-//    3. COMPONENT SPECIFIC STYLES (Animations & Glassmorphism)
+//    4. COMPONENT SPECIFIC STYLES (Animations & Glassmorphism)
 //    -------------------------------------------------------------------------- */
 
 // /* Glassmorphism */
 // .glass {
 //   background: rgba(15, 23, 42, 0.6);
 //   backdrop-filter: blur(12px);
+//   -webkit-backdrop-filter: blur(12px); /* Safari support */
 //   border: 1px solid rgba(255, 255, 255, 0.05);
 // }
 // .glass:hover {
@@ -461,6 +547,7 @@ html, body {
 //   background: linear-gradient(to right, #818cf8, #c084fc, #38bdf8);
 //   -webkit-background-clip: text;
 //   -webkit-text-fill-color: transparent;
+//   background-clip: text; /* Standard syntax */
 // }
 
 // /* Scroll Animations */
@@ -474,18 +561,19 @@ html, body {
 //   transform: translateY(0);
 // }
 
-// /* Custom Scrollbar */
+// /* Custom Scrollbar - Works on Chrome/Safari/Edge */
 // ::-webkit-scrollbar { width: 8px; }
 // ::-webkit-scrollbar-track { background: #0f172a; }
 // ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
 // ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
+// /* Utility to hide scrollbar but allow scrolling */
 // .no-scrollbar::-webkit-scrollbar {
 //   display: none;
 // }
 // .no-scrollbar {
-//   -ms-overflow-style: none;
-//   scrollbar-width: none;
+//   -ms-overflow-style: none; /* IE and Edge */
+//   scrollbar-width: none;    /* Firefox */
 // }
 
 // /* Grid Background */
@@ -519,7 +607,7 @@ html, body {
 // // /* ==========================================================================
 // //    GLOBAL DESIGN TOKENS & THEME ENGINE (Angular v20)
 // //    ========================================================================== */
-// // <script src="https://unpkg.com/lucide@latest"></script>
+
 // // /* --------------------------------------------------------------------------
 // //    1. GLOBAL PRIMITIVES (Constant across all themes)
 // //    -------------------------------------------------------------------------- */
@@ -739,4 +827,228 @@ html, body {
 // // .animate-float { animation: float 6s ease-in-out infinite; }
 // // .animate-scroll { animation: scroll 25s linear infinite; }
 // // .animate-blob { animation: blob 7s infinite; }
-// // .animation-delay-2000 { animation-delay: 2s; }-font-size-xs);
+// // .animation-delay-2000 { animation-delay: 2s; }
+// // // /* ==========================================================================
+// // //    GLOBAL DESIGN TOKENS & THEME ENGINE (Angular v20)
+// // //    ========================================================================== */
+// // // <script src="https://unpkg.com/lucide@latest"></script>
+// // // /* --------------------------------------------------------------------------
+// // //    1. GLOBAL PRIMITIVES (Constant across all themes)
+// // //    -------------------------------------------------------------------------- */
+// // // :root {
+// // //   /* ===== TYPOGRAPHY (Refined Compact Scale) ===== */
+// // //   --font-body: 'Inter', -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+// // //   --font-heading: 'Poppins', -apple-system, system-ui, sans-serif;
+// // //   --font-mono: 'Fira Code', 'Courier New', monospace;
+
+// // //   /* Compact font sizes */
+// // //   --font-size-xs: 0.65rem;     /* 10.4px */
+// // //   --font-size-sm: 0.75rem;     /* 12px */
+// // //   --font-size-base: 0.8125rem; /* 13px */
+// // //   --font-size-md: 0.875rem;    /* 14px */
+// // //   --font-size-lg: 0.9375rem;   /* 15px */
+// // //   --font-size-xl: 1rem;        /* 16px */
+// // //   --font-size-2xl: 1.125rem;   /* 18px */
+// // //   --font-size-3xl: 1.375rem;   /* 22px */
+// // //   --font-size-4xl: 1.75rem;    /* 28px */
+// // //   --font-size-5xl: 2.25rem;    /* 36px */
+
+// // //   /* Line height */
+// // //   --line-height-tight: 1.1;
+// // //   --line-height-normal: 1.3;
+// // //   --line-height-relaxed: 1.5;
+
+// // //   /* Font weights */
+// // //   --font-weight-light: 300;
+// // //   --font-weight-normal: 400;
+// // //   --font-weight-medium: 500;
+// // //   --font-weight-semibold: 600;
+// // //   --font-weight-bold: 700;
+
+// // //   /* ===== SPACING (Compact Grid) ===== */
+// // //   --spacing-xs: 0.25rem;   /* 4px */
+// // //   --spacing-sm: 0.375rem;  /* 6px */
+// // //   --spacing-md: 0.5rem;    /* 8px */
+// // //   --spacing-lg: 0.75rem;   /* 12px */
+// // //   --spacing-xl: 1rem;      /* 16px */
+// // //   --spacing-2xl: 1.5rem;   /* 24px */
+// // //   --spacing-3xl: 2rem;     /* 32px */
+// // //   --spacing-4xl: 2.75rem;  /* 44px */
+// // //   --spacing-5xl: 3.5rem;   /* 56px */
+
+// // //   /* ===== UI CONSTANTS ===== */
+// // //   --ui-border-radius: 5px;
+// // //   --ui-border-radius-lg: 10px;
+// // //   --ui-border-radius-xl: 16px;
+// // //   --ui-border-radius-sm: 3px;
+// // //   --ui-border-width: 1px;
+// // //   --ui-border-width-lg: 2px;
+
+// // //   /* Enhanced Shadow System */
+// // //   --shadow-xs: 0 0.5px 1px rgba(0, 0, 0, 0.04);
+// // //   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+// // //   --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.08);
+// // //   --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.1);
+// // //   --shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.12);
+// // //   --shadow-2xl: 0 12px 32px rgba(0, 0, 0, 0.15);
+// // //   --shadow-3xl: 0 16px 40px rgba(0, 0, 0, 0.18);
+// // //   --shadow-4xl: 0 20px 48px rgba(0, 0, 0, 0.2);
+// // //   --shadow-5xl: 0 24px 56px rgba(0, 0, 0, 0.22);
+// // //   --shadow-6xl: 0 28px 64px rgba(0, 0, 0, 0.25);
+
+// // //   /* Transitions */
+// // //   --transition-fast: all 0.12s cubic-bezier(0.23, 1, 0.32, 1);
+// // //   --transition-base: all 0.22s cubic-bezier(0.2, 0.9, 0.2, 1);
+// // //   --transition-slow: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+// // //   --transition-slower: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+// // //   --transition-colors: color 0.2s cubic-bezier(0.2, 0.9, 0.2, 1), background-color 0.2s cubic-bezier(0.2, 0.9, 0.2, 1), border-color 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
+// // //   --transition-transform: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+
+// // //   /* Focus States */
+// // //   --focus-ring-width: 2px;
+// // //   --focus-ring-offset: 2px;
+// // //   --focus-ring-color: rgba(59, 130, 246, 0.3);
+// // //   --focus-ring-color-alt: rgba(139, 92, 246, 0.3);
+// // //   --focus-outline-width: 3px;
+
+// // //   /* Z-Index Hierarchy */
+// // //   --z-dropdown: 100;
+// // //   --z-sticky: 200;
+// // //   --z-fixed: 300;
+// // //   --z-modal-backdrop: 400;
+// // //   --z-modal: 500;
+// // //   --z-toast: 600;
+// // //   --z-tooltip: 700;
+
+// // //   /* State Opacities */
+// // //   --state-disabled-opacity: 0.5;
+// // //   --state-loading-opacity: 0.7;
+// // //   --state-readonly-opacity: 0.6;
+// // // }
+
+// // // /* --------------------------------------------------------------------------
+// // //    2. THEME ENGINE MIXIN
+// // //    -------------------------------------------------------------------------- */
+// // // @mixin apply-canonical-mapping {
+// // //   --bg-primary: var(--theme-bg-primary);
+// // //   --bg-secondary: var(--theme-bg-secondary);
+// // //   --bg-ternary: var(--theme-bg-ternary);
+// // //   --text-primary: var(--theme-text-primary);
+// // //   --text-secondary: var(--theme-text-secondary);
+// // //   --text-tertiary: var(--theme-text-tertiary);
+// // //   --text-label: var(--theme-text-label);
+// // //   --border-primary: var(--theme-border-primary);
+// // //   --border-secondary: var(--theme-border-secondary);
+// // //   --accent-primary: var(--theme-accent-primary);
+// // //   --accent-secondary: var(--theme-accent-secondary);
+// // //   --accent-tertiary: var(--theme-accent-tertiary);
+// // //   --accent-gradient: var(--theme-accent-gradient);
+// // //   --accent-focus: var(--theme-accent-focus);
+// // //   --accent-hover: var(--theme-accent-hover);
+// // //   --color-success: var(--theme-success);
+// // //   --color-warning: var(--theme-warning);
+// // //   --color-error: var(--theme-error);
+// // //   --color-info: var(--theme-info);
+// // //   --color-disabled: var(--theme-disabled);
+// // //   --color-disabled-text: var(--theme-disabled-text);
+// // //   --glass-bg-c: var(--glass-bg);
+// // //   --glass-blur-c: var(--glass-blur);
+// // //   --glass-border-c: var(--glass-border);
+// // //   --glass-shadow-c: var(--glass-shadow, 0 8px 32px rgba(0, 0, 0, 0.1));
+// // //   --component-bg-hover: var(--component-bg-hover);
+// // //   --component-bg-active: var(--component-bg-active);
+// // //   --component-border-focus: var(--component-border-focus);
+// // //   --component-surface-raised: var(--component-surface-raised);
+// // //   --component-divider: var(--component-divider);
+// // //   --scroll-thumb-c: var(--scroll-thumb);
+// // //   --scroll-track-c: var(--scroll-track);
+// // // }
+
+// // // /* --------------------------------------------------------------------------
+// // //    3. COMPONENT SPECIFIC STYLES (Animations & Glassmorphism)
+// // //    -------------------------------------------------------------------------- */
+
+// // // /* Glassmorphism */
+// // // .glass {
+// // //   background: rgba(15, 23, 42, 0.6);
+// // //   backdrop-filter: blur(12px);
+// // //   border: 1px solid rgba(255, 255, 255, 0.05);
+// // // }
+// // // .glass:hover {
+// // //   border-color: rgba(99, 102, 241, 0.3);
+// // //   background: rgba(30, 41, 59, 0.7);
+// // // }
+
+// // // /* 3D Hero Perspective */
+// // // .hero-3d-container {
+// // //   perspective: 1000px;
+// // // }
+// // // .hero-3d-element {
+// // //   transform: rotateX(20deg) scale(0.9);
+// // //   transition: transform 0.5s ease;
+// // //   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+// // // }
+// // // .hero-3d-container:hover .hero-3d-element {
+// // //   transform: rotateX(5deg) scale(0.95);
+// // // }
+
+// // // /* Gradient Text */
+// // // .gradient-text {
+// // //   background: linear-gradient(to right, #818cf8, #c084fc, #38bdf8);
+// // //   -webkit-background-clip: text;
+// // //   -webkit-text-fill-color: transparent;
+// // // }
+
+// // // /* Scroll Animations */
+// // // .reveal {
+// // //   opacity: 0;
+// // //   transform: translateY(30px);
+// // //   transition: all 0.8s ease-out;
+// // // }
+// // // .reveal.active {
+// // //   opacity: 1;
+// // //   transform: translateY(0);
+// // // }
+
+// // // /* Custom Scrollbar */
+// // // ::-webkit-scrollbar { width: 8px; }
+// // // ::-webkit-scrollbar-track { background: #0f172a; }
+// // // ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+// // // ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+// // // .no-scrollbar::-webkit-scrollbar {
+// // //   display: none;
+// // // }
+// // // .no-scrollbar {
+// // //   -ms-overflow-style: none;
+// // //   scrollbar-width: none;
+// // // }
+
+// // // /* Grid Background */
+// // // .bg-grid {
+// // //   background-size: 50px 50px;
+// // //   background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+// // //                     linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+// // // }
+
+// // // /* Keyframes */
+// // // @keyframes float {
+// // //   0%, 100% { transform: translateY(0); }
+// // //   50% { transform: translateY(-20px); }
+// // // }
+// // // @keyframes scroll {
+// // //   0% { transform: translateX(0); }
+// // //   100% { transform: translateX(-100%); }
+// // // }
+// // // @keyframes blob {
+// // //   0% { transform: translate(0px, 0px) scale(1); }
+// // //   33% { transform: translate(30px, -50px) scale(1.1); }
+// // //   66% { transform: translate(-20px, 20px) scale(0.9); }
+// // //   100% { transform: translate(0px, 0px) scale(1); }
+// // // }
+
+// // // /* Utility Animation Classes */
+// // // .animate-float { animation: float 6s ease-in-out infinite; }
+// // // .animate-scroll { animation: scroll 25s linear infinite; }
+// // // .animate-blob { animation: blob 7s infinite; }
+// // // .animation-delay-2000 { animation-delay: 2s; }-font-size-xs);
