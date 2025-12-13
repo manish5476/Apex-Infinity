@@ -1,12 +1,12 @@
 /* ==========================================
-   SALES LIST (Enterprise Layout)
-   Matches Product List Design
+   SALES LIST (Enterprise Full Height)
    ========================================== */
 
 :host {
   display: block;
   width: 100%;
   height: 100%;
+  overflow: hidden; /* Prevent host scrolling */
 }
 
 .list-page-container {
@@ -15,9 +15,9 @@
   height: 100%;
   width: 100%;
   background: var(--bg-primary);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-xl);
   gap: var(--spacing-lg);
-  overflow: hidden; /* Prevent double scrollbars */
+  overflow: hidden;
 }
 
 /* --- 1. HEADER --- */
@@ -30,7 +30,7 @@
   .list-title {
     margin: 0;
     font-family: var(--font-heading);
-    font-size: 1.5rem;
+    font-size: var(--font-size-2xl);
     font-weight: 700;
     color: var(--text-primary);
     display: flex;
@@ -51,7 +51,7 @@
 
 .se-filter-bar {
   display: flex;
-  align-items: flex-end; /* Align buttons with inputs */
+  align-items: flex-end;
   gap: var(--spacing-lg);
   flex-wrap: wrap;
 }
@@ -59,7 +59,7 @@
 .se-filter-field {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 6px;
   flex: 1;
   min-width: 200px;
 
@@ -67,70 +67,94 @@
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
-    color: var(--text-secondary);
+    color: var(--text-tertiary);
     letter-spacing: 0.5px;
   }
 }
 
 .se-filter-actions {
   display: flex;
-  gap: var(--spacing-sm);
-  margin-left: auto; /* Push to right */
+  gap: var(--spacing-md);
+  margin-left: auto;
+  padding-bottom: 2px;
   
   @media (max-width: 1024px) {
     width: 100%;
     margin-left: 0;
     justify-content: flex-end;
-    margin-top: var(--spacing-sm);
+    margin-top: var(--spacing-md);
   }
 }
 
-/* --- 3. GRID AREA (Fills remaining space) --- */
+/* --- 3. GRID AREA (The Flex Magic) --- */
 .list-grid-area {
-  flex: 1;
-  overflow: hidden; /* Contain grid */
+  flex: 1;             /* Grow to fill space */
+  min-height: 0;       /* CRITICAL: Allows shrinking below content size */
+  overflow: hidden;    /* Contain grid scroll */
   display: flex;
   flex-direction: column;
-  padding: 0;
+  padding: 0;          /* Remove padding for flush grid */
   
-  /* Override themed-card padding for grid to be flush */
+  /* Override default card styles for grid container */
   &.themed-card {
     padding: 0;
-    border: none;
-    background: transparent;
+    border: 1px solid var(--border-primary);
+    background: var(--bg-secondary);
+  }
+
+  app-ag-share-grid {
+    width: 100%;
+    height: 100%;
+    display: block;
   }
 }
 
 /* --- GLOBAL OVERRIDES --- */
 :host ::ng-deep {
   
-  /* Full width inputs in filters */
-  .se-filter-field .p-inputtext,
-  .se-filter-field .p-select {
-    width: 100%;
-  }
-  
-  /* Input Styles */
+  /* Inputs */
   .p-inputtext, .p-select {
-    background: var(--bg-primary);
+    background: var(--bg-ternary);
     border-color: var(--border-secondary);
     color: var(--text-primary);
+    border-radius: var(--ui-border-radius);
     
     &:enabled:focus {
       border-color: var(--accent-primary);
       box-shadow: 0 0 0 1px var(--accent-primary);
     }
+    
+    &:enabled:hover {
+      border-color: var(--text-tertiary);
+    }
   }
   
-  /* Status Cells in Grid */
-  .cell-status {
-    display: flex;
-    align-items: center;
-    height: 100%;
-    font-weight: 600;
-    font-size: 0.85rem;
+  /* Status Badges */
+  .status-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-block;
+    line-height: 1;
     
-    &.status-active, &.status-in-stock { color: var(--color-success); }
-    &.status-inactive, &.status-low-stock { color: var(--color-error); }
+    &.status-active, &.status-paid {
+      background: color-mix(in srgb, var(--color-success) 15%, transparent);
+      color: var(--color-success);
+      border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent);
+    }
+    
+    &.status-unpaid, &.status-pending {
+      background: color-mix(in srgb, var(--color-error) 15%, transparent);
+      color: var(--color-error);
+      border: 1px solid color-mix(in srgb, var(--color-error) 30%, transparent);
+    }
+
+    &.status-partial {
+        background: color-mix(in srgb, var(--color-warning) 15%, transparent);
+        color: var(--color-warning);
+        border: 1px solid color-mix(in srgb, var(--color-warning) 30%, transparent);
+    }
   }
 }

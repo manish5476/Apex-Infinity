@@ -43,9 +43,12 @@
 
     <!-- LOG VIEW -->
     <div class="list-grid-wrapper">
-      <app-shared-grid [data]="logs" [gridHeight]="'400px'" [headerFilter]="false" [rowSelectionMode]="'single'"
+      <!-- <app-shared-grid [data]="logs" [gridHeight]="'400px'" [headerFilter]="false" [rowSelectionMode]="'single'"
         [column]="column">
-      </app-shared-grid>
+      </app-shared-grid> -->
+      
+    <app-ag-share-grid [columns]="column" [data]="logs" [showActions]="false" selectionMode="multiple"
+      (gridEvent)="eventFromGrid($event)" style="height: 210px; width: 100%; display: block;"></app-ag-share-grid>
        <!-- (gridReady)="onGridReady($event)" -->
     </div>
 

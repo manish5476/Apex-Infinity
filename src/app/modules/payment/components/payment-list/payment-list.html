@@ -1,91 +1,74 @@
-<!-- 
-  REFACTORED:
-  - Using consistent .list-page-container layout
-  - Using .themed-card instead of .glass-card
-  - Set gridHeight="100%"
--->
-<p-toast></p-toast> 
+<p-toast></p-toast>
 
 <div class="list-page-container">
-  <!-- HEADER -->
   <div class="list-header">
-    <h2 class="list-title">
-      <i class="pi pi-dollar text-[var(--accent-primary)]"></i>
-      Payments Ledger
-    </h2>
-    <p-button label="Record Payment" icon="pi pi-plus" routerLink="create">
-    </p-button>
+    <div class="title-section">
+      <div class="icon-box">
+        <i class="pi pi-dollar"></i>
+      </div>
+      <div class="text-content">
+        <h2 class="list-title">Payments Ledger</h2>
+        <p class="list-subtitle">Track inflows, outflows, and reconciliation status.</p>
+      </div>
+    </div>
+    <p-button label="Record Payment" icon="pi pi-plus" routerLink="create" styleClass="p-button-primary"></p-button>
   </div>
 
-  <!-- FILTER BAR -->
   <div class="themed-card">
     <div class="se-filter-bar">
 
-      <!-- Type -->
       <div class="se-filter-field">
         <label for="type">Payment Type</label>
-        <p-select  (onChange)="applyFilters()"  appendTo="body" id="type" [options]="typeOptions" [(ngModel)]="paymentFilter.type" [showClear]="true"
-          placeholder="Inflow / Outflow" appendTo="body">
+        <p-select (onChange)="applyFilters()" appendTo="body" id="type" [options]="typeOptions"
+          [(ngModel)]="paymentFilter.type" [showClear]="true" placeholder="Inflow / Outflow" styleClass="w-full">
         </p-select>
       </div>
 
-      <!-- Customer -->
       <div class="se-filter-field">
         <label for="customer">Customer</label>
-        <p-select  (onChange)="applyFilters()"  appendTo="body" id="customer" [options]="customerOptions()" [(ngModel)]="paymentFilter.customerId" [filter]="true"
-          filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select Customer"
-          appendTo="body">
+        <p-select (onChange)="applyFilters()" appendTo="body" id="customer" [options]="customerOptions()"
+          [(ngModel)]="paymentFilter.customerId" [filter]="true" filterBy="name" optionLabel="name" optionValue="_id"
+          [showClear]="true" placeholder="Select Customer" styleClass="w-full">
         </p-select>
       </div>
 
-      <!-- Supplier -->
       <div class="se-filter-field">
         <label for="supplier">Supplier</label>
-        <p-select  (onChange)="applyFilters()"  appendTo="body" id="supplier" [options]="supplierOptions()" [(ngModel)]="paymentFilter.supplierId" [filter]="true"
-          filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select Supplier"
-          appendTo="body">
+        <p-select (onChange)="applyFilters()" appendTo="body" id="supplier" [options]="supplierOptions()"
+          [(ngModel)]="paymentFilter.supplierId" [filter]="true" filterBy="name" optionLabel="name" optionValue="_id"
+          [showClear]="true" placeholder="Select Supplier" styleClass="w-full">
         </p-select>
       </div>
 
-      <!-- Payment Method -->
       <div class="se-filter-field">
         <label for="paymentMethod">Payment Method</label>
-        <p-select  (onChange)="applyFilters()"  appendTo="body" id="paymentMethod" [options]="paymentMethodOptions" [(ngModel)]="paymentFilter.paymentMethod"
-          [showClear]="true" placeholder="Select Method" appendTo="body">
+        <p-select (onChange)="applyFilters()" appendTo="body" id="paymentMethod" [options]="paymentMethodOptions"
+          [(ngModel)]="paymentFilter.paymentMethod" [showClear]="true" placeholder="Select Method" styleClass="w-full">
         </p-select>
       </div>
 
-      <!-- Status -->
       <div class="se-filter-field">
         <label for="status">Status</label>
-        <p-select  (onChange)="applyFilters()"  appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="paymentFilter.status" [showClear]="true"
-          placeholder="Select Status" appendTo="body">
+        <p-select (onChange)="applyFilters()" appendTo="body" id="status" [options]="statusOptions"
+          [(ngModel)]="paymentFilter.status" [showClear]="true" placeholder="Select Status" styleClass="w-full">
         </p-select>
       </div>
 
-      <!-- Actions -->
       <div class="se-filter-actions">
-        <!-- <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()">
-        </p-button> -->
-        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined"
-          (onClick)="resetFilters()">
-        </p-button>
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary" 
+          (onClick)="resetFilters()"></p-button>
       </div>
     </div>
   </div>
 
-  <!-- GRID AREA -->
-  <div class="themed-card list-grid-area">
-    <app-shared-grid 
+  <div class="list-grid-area themed-card">
+    <app-ag-share-grid 
+      [columns]="column" 
       [data]="data" 
-      [gridHeight]="'210px'" 
-      [headerFilter]="false" 
-      [rowSelectionMode]="rowSelectionMode"
-      [GridName]="'Payments'" 
-      [column]="column" 
-      (eventFromGrid)="eventFromGrid($event)"
-      (gridReady)="onGridReady($event)" 
-      (scrolledToBottom)="onScrolledToBottom($event)">
-    </app-shared-grid>
+      [showActions]="false" 
+      selectionMode="multiple"
+      (gridEvent)="eventFromGrid($event)" 
+      style="height: 100%; width: 100%; display: block;">
+    </app-ag-share-grid>
   </div>
 </div>

@@ -3,59 +3,62 @@
 
 <div class="list-page-container">
 
-  <!-- HEADER -->
   <div class="list-header">
-    <h2 class="list-title">
-      <i class="pi pi-shield text-[var(--accent-primary)]"></i>
-      Session Management
-    </h2>
+    <div class="title-section">
+      <div class="icon-box">
+        <i class="pi pi-shield"></i>
+      </div>
+      <div class="text-content">
+        <h2 class="list-title">Session Management</h2>
+        <p class="list-subtitle">Monitor and control active sessions across all devices.</p>
+      </div>
+    </div>
 
-    <div class="flex gap-2">
-      <div class="p-buttongroup">
-        <button pButton label="All Sessions"
-          [ngClass]="viewMode() === 'all' ? 'p-button-primary' : 'p-button-outlined p-button-secondary'"
+    <div class="actions-section">
+      <div class="p-buttongroup mode-toggle">
+        <button pButton label="All Sessions" [ngClass]="viewMode() === 'all' ? 'active-mode' : 'p-button-text'"
           (click)="toggleViewMode('all')"></button>
-        <button pButton label="My Sessions"
-          [ngClass]="viewMode() === 'mine' ? 'p-button-primary' : 'p-button-outlined p-button-secondary'"
+        <button pButton label="My Sessions" [ngClass]="viewMode() === 'mine' ? 'active-mode' : 'p-button-text'"
           (click)="toggleViewMode('mine')"></button>
       </div>
 
-      <button pButton label="Revoke Others" icon="pi pi-ban" class="p-button-warning p-button-outlined ml-2"
+      <button pButton label="Revoke Others" icon="pi pi-ban" class="p-button-warning p-button-outlined"
         (click)="revokeAllOthers()" pTooltip="Log out from all other devices">
       </button>
     </div>
   </div>
 
-  <!-- GRID CONTENT -->
-  <div class="themed-card list-grid-area">
-    <app-shared-grid [data]="data" [gridHeight]="'210px'" [headerFilter]="true" [rowSelectionMode]="rowSelectionMode"
-      [GridName]="'SessionsGrid'" [column]="column" (eventFromGrid)="eventFromGrid($event)"
-      (gridReady)="onGridReady($event)">
-    </app-shared-grid>
+  <div class="glass-panel">
+    <app-ag-share-grid [columns]="column" [data]="data" [showActions]="false" selectionMode="multiple"
+      (gridEvent)="eventFromGrid($event)" style="height: 100%; width: 100%; display: block;">
+    </app-ag-share-grid>
   </div>
 
 </div>
 
-<!-- DETAILS DIALOG -->
-<p-dialog header="Session Details" [(visible)]="displayDialog" [modal]="true" ngClass="session-dialog"
+<p-dialog header="Session Details" [(visible)]="displayDialog" [modal]="true" styleClass="glass-dialog"
   [draggable]="false" [resizable]="false">
 
   @if (selectedSession) {
   <div class="session-details-form">
 
-    <!-- Status Banner -->
     <div class="status-banner" [class.active]="selectedSession.isValid" [class.revoked]="!selectedSession.isValid">
       <i class="pi" [class]="selectedSession.isValid ? 'pi-check-circle' : 'pi-times-circle'"></i>
-      <span>{{ selectedSession.isValid ? 'Active Session' : 'Revoked Session' }}</span>
+      <div class="banner-text">
+        <strong>{{ selectedSession.isValid ? 'Active Session' : 'Revoked Session' }}</strong>
+        <span>{{ selectedSession.isValid ? 'This session allows access to the system.' : 'Access has been terminated for
+          this session.' }}</span>
+      </div>
     </div>
 
     <div class="detail-grid">
 
-      <!-- User Info (If Available) -->
       <div class="detail-group full-width" *ngIf="selectedSession.userId">
         <label>User Account</label>
-        <div class="value-box">
-          <i class="pi pi-user mr-2"></i>
+        <div class="value-box user-box">
+          <div class="user-avatar-small">
+            {{ selectedSession.userId.name.charAt(0).toUpperCase() }}
+          </div>
           <div class="flex flex-col">
             <span class="font-bold">{{ selectedSession.userId.name }}</span>
             <span class="text-xs text-secondary">{{ selectedSession.userId.email }}</span>
@@ -63,37 +66,42 @@
         </div>
       </div>
 
-      <!-- Device Info -->
       <div class="detail-group full-width">
         <label>Device / Browser</label>
         <div class="value-box">
-          <i class="pi pi-globe mr-2"></i>
-          {{ selectedSession.browser }} on {{ selectedSession.os }}
+          <i class="pi pi-globe text-accent"></i>
+          <span class="simple-value">{{ selectedSession.browser }} <span class="text-tertiary">on</span> {{
+            selectedSession.os }}</span>
         </div>
       </div>
 
-      <!-- IP -->
       <div class="detail-group">
         <label>IP Address</label>
-        <div class="value">{{ selectedSession.ipAddress }}</div>
+        <div class="value-box">
+          <i class="pi pi-map-marker text-accent"></i>
+          <span class="simple-value font-mono">{{ selectedSession.ipAddress }}</span>
+        </div>
       </div>
 
-      <!-- Created At -->
       <div class="detail-group">
         <label>Logged In</label>
-        <div class="value">{{ common.formatDate(selectedSession.loggedInAt, 'medium') }}</div>
+        <div class="value-box">
+          <i class="pi pi-calendar text-accent"></i>
+          <span class="simple-value">{{ common.formatDate(selectedSession.loggedInAt, 'medium') }}</span>
+        </div>
       </div>
 
-      <!-- Last Active -->
       <div class="detail-group full-width">
         <label>Last Activity</label>
-        <div class="value">{{ common.formatDate(selectedSession.lastActivityAt, 'medium') }}</div>
+        <div class="value-box">
+          <i class="pi pi-clock text-accent"></i>
+          <span class="simple-value">{{ common.formatDate(selectedSession.lastActivityAt, 'medium') }}</span>
+        </div>
       </div>
 
-      <!-- User Agent -->
       <div class="detail-group full-width">
-        <label>User Agent</label>
-        <div class="value text-xs text-secondary break-words bg-ternary p-2 rounded">
+        <label>User Agent String</label>
+        <div class="code-block">
           {{ selectedSession.userAgent }}
         </div>
       </div>
@@ -103,16 +111,14 @@
 
   <div class="dialog-footer">
     <button pButton label="Close" class="p-button-text p-button-secondary" (click)="displayDialog = false"></button>
-
-    <!-- Delete Button (Always visible if admin) -->
-    <button pButton label="Delete Record" icon="pi pi-trash" class="p-button-outlined p-button-danger"
-      [loading]="isDeleting()" (click)="deleteSession()"></button>
-
-    <!-- Revoke Button (Only if active) -->
-    @if (selectedSession.isValid) {
-    <button pButton label="Revoke Session" icon="pi pi-power-off" class="p-button-danger" [loading]="isRevoking()"
-      (click)="revokeSession()"></button>
-    }
+    <div class="right-actions">
+      <button pButton label="Delete" icon="pi pi-trash" class="p-button-outlined p-button-danger"
+        [loading]="isDeleting()" (click)="deleteSession()"></button>
+      @if (selectedSession.isValid) {
+      <button pButton label="Revoke Access" icon="pi pi-power-off" class="p-button-danger" [loading]="isRevoking()"
+        (click)="revokeSession()"></button>
+      }
+    </div>
   </div>
   }
 </p-dialog>

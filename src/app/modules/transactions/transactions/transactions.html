@@ -2,62 +2,82 @@
 
 <div class="txn-container">
 
-  <!-- HEADER -->
   <div class="txn-header">
     <div class="title-section">
-      <i class="pi pi-receipt icon"></i>
-      <h2>Transactions</h2>
+      <div class="icon-box">
+        <i class="pi pi-receipt"></i>
+      </div>
+      <div class="text-content">
+        <h2>Transactions</h2>
+        <p>Monitor financial movements across invoices, payments, and ledgers.</p>
+      </div>
     </div>
 
-    <p-button label="Export CSV" icon="pi pi-download" styleClass="se-btn-outline" (onClick)="downloadCsv()">
-    </p-button>
+    <div class="actions-section">
+      <div class="p-buttongroup mode-toggle">
+        <button pButton label="All Transactions" 
+          [ngClass]="viewMode() === 'all' ? 'active-mode' : 'p-button-text'"
+          (click)="toggleViewMode('all')"></button>
+        <button pButton label="My Transactions" 
+          [ngClass]="viewMode() === 'mine' ? 'active-mode' : 'p-button-text'"
+          (click)="toggleViewMode('mine')"></button>
+      </div>
+
+      <button pButton label="Export CSV" icon="pi pi-download" class="p-button-outlined p-button-secondary" 
+        (click)="downloadCsv()">
+      </button>
+    </div>
   </div>
 
-  <!-- CARD -->
   <div class="txn-card">
 
-    <!-- FILTER BAR -->
     <div class="filter-bar">
 
       <div class="filter-field">
         <label>Date Range</label>
-        <p-datepicker [(ngModel)]="rangeDates" selectionMode="range" [readonlyInput]="true" placeholder="Start  -  End"
-          [showIcon]="true" appendTo="body" class="se-input" (onClose)="applyFilters()">
+        <p-datepicker [(ngModel)]="rangeDates" selectionMode="range" [readonlyInput]="true" placeholder="Start - End"
+          [showIcon]="true" appendTo="body" styleClass="w-full" inputStyleClass="w-full" (onClose)="applyFilters()">
         </p-datepicker>
       </div>
 
       <div class="filter-field">
         <label>Type</label>
         <p-select [(ngModel)]="filterParams.type" [options]="transactionTypes" [showClear]="true"
-          placeholder="Select type" appendTo="body" class="se-input" (onChange)="applyFilters()">
+          placeholder="Select type" appendTo="body" styleClass="w-full" (onChange)="applyFilters()">
         </p-select>
       </div>
 
       <div class="filter-field">
         <label>Effect</label>
         <p-select [(ngModel)]="filterParams.effect" [options]="transactionEffects" [showClear]="true"
-          placeholder="Credit / Debit" appendTo="body" class="se-input" (onChange)="applyFilters()">
+          placeholder="Credit / Debit" appendTo="body" styleClass="w-full" (onChange)="applyFilters()">
         </p-select>
       </div>
 
-      <div class="filter-field">
+      <div class="filter-field search-field">
         <label>Search</label>
-        <input type="text" placeholder="Desc or Ref No..." [(ngModel)]="filterParams.search"
-          (keydown.enter)="applyFilters()" class="se-input" pInputText />
+        <span class="p-input-icon-left w-full">
+          <i class="pi pi-search"></i>
+          <input type="text" placeholder="Desc or Ref No..." [(ngModel)]="filterParams.search"
+            (keydown.enter)="applyFilters()" pInputText class="w-full" />
+        </span>
       </div>
 
       <div class="filter-actions">
-        <p-button icon="pi pi-refresh" label="Reset" styleClass="se-btn-outline" (onClick)="resetFilters()">
+        <p-button icon="pi pi-refresh" label="Reset" styleClass="p-button-outlined p-button-secondary" (onClick)="resetFilters()">
         </p-button>
       </div>
     </div>
 
-    <!-- GRID -->
     <div class="grid-wrapper">
-      <app-shared-grid [data]="data" [gridHeight]="'210px'" [headerFilter]="true" [rowSelectionMode]="rowSelectionMode"
-        [GridName]="'Transactions'" [column]="column" (gridReady)="onGridReady($event)"
-        (scrolledToBottom)="onScrolledToBottom($event)">
-      </app-shared-grid>
+      <app-ag-share-grid 
+        [columns]="column" 
+        [data]="data" 
+        [showActions]="false" 
+        selectionMode="multiple"
+        (gridEvent)="eventFromGrid($event)" 
+        style="height: 100%; width: 100%; display: block;">
+      </app-ag-share-grid>
     </div>
 
   </div>

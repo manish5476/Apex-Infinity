@@ -9,9 +9,9 @@ import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { AppMessageService } from '../../../../core/services/message.service';
-import { SharedGridComponent } from '../../../shared/AgGrid/grid/shared-grid/shared-grid.component';
 import { BranchService } from '../../services/branch-service';
 import { Toast } from "primeng/toast";
+import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
 
 // Shared
 
@@ -21,13 +21,14 @@ import { Toast } from "primeng/toast";
   standalone: true,
   imports: [
     CommonModule,
-    SharedGridComponent,
+
     SelectModule,
     FormsModule,
     ButtonModule,
     InputTextModule,
     RouterModule,
-    Toast
+    Toast,
+    AgShareGrid
 ],
   templateUrl: './branch-list.html',
   styleUrl: './branch-list.scss',
@@ -116,7 +117,7 @@ export class BranchListComponent implements OnInit {
     });
   }
 
-  onScrolledToBottom(_: any) {
+  onScrolledToBottom(_?: any) {
     if (!this.isLoading && this.data.length < this.totalCount) {
       this.getData(false);
     }
@@ -127,11 +128,14 @@ export class BranchListComponent implements OnInit {
   }
 
   eventFromGrid(event: any) {
-    if (event.eventType === 'RowSelectedEvent') {
-      const branchId = event.event.data._id;
+    if (event.type=== 'cellClicked') {
+      const branchId = event.row._id;
       if (branchId) {
         this.router.navigate([branchId], { relativeTo: this.route });
       }
+    }
+     if (event.eventType === 'reachedBottom') {
+      this.onScrolledToBottom()
     }
   }
 

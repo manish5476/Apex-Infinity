@@ -3,74 +3,54 @@
 <div class="list-page-container">
 
   <div class="list-header">
-    <h2 class="list-title">
-      <i class="pi pi-calendar-plus text-[var(--accent-primary)]"></i>
-      EMI Management
-    </h2>
-    <p-button label="New EMI Plan" icon="pi pi-plus" routerLink="create">
+    <div class="title-section">
+      <div class="icon-box">
+        <i class="pi pi-calendar-plus"></i>
+      </div>
+      <div class="text-content">
+        <h2 class="list-title">EMI Management</h2>
+        <p class="list-subtitle">Track loan schedules, payments, and defaults.</p>
+      </div>
+    </div>
+    <p-button label="New EMI Plan" icon="pi pi-plus" routerLink="create" styleClass="p-button-primary">
     </p-button>
   </div>
 
   <div class="themed-card list-content-area">
 
     <div class="se-filter-bar">
-      
+
       <div class="se-filter-field">
-        <label for="status">Status</label>
-        <p-select 
-          (onChange)="applyFilters()" 
-          id="status" 
-          [options]="statusOptions" 
-          [(ngModel)]="emiFilter.status"
-          optionLabel="label" 
-          optionValue="value" 
-          [showClear]="true"
-          placeholder="Select Status" 
-          appendTo="body"
-          [style]="{'width':'100%'}">
+        <label for="customer">Customer</label>
+        <p-select (onChange)="applyFilters()" id="customer" [options]="customerOptions()"
+          [(ngModel)]="emiFilter.customerId" [filter]="true" filterBy="name" optionLabel="name" optionValue="_id"
+          [showClear]="true" placeholder="Filter by Customer" appendTo="body" styleClass="w-full">
         </p-select>
       </div>
 
       <div class="se-filter-field">
-        <label for="customer">Customer</label>
-        <p-select 
-          (onChange)="applyFilters()" 
-          id="customer" 
-          [options]="customerOptions()" 
-          [(ngModel)]="emiFilter.customerId"
-          [filter]="true" 
-          filterBy="name" 
-          optionLabel="name" 
-          optionValue="_id" 
-          [showClear]="true"
-          placeholder="Filter by Customer" 
-          appendTo="body"
-          [style]="{'width':'100%'}">
+        <label for="status">Status</label>
+        <p-select (onChange)="applyFilters()" id="status" [options]="statusOptions" [(ngModel)]="emiFilter.status"
+          optionLabel="label" optionValue="value" [showClear]="true" placeholder="Select Status" appendTo="body"
+          styleClass="w-full">
         </p-select>
       </div>
 
       <div class="se-filter-actions">
-        <p-button 
-          label="Reset" 
-          icon="pi pi-refresh" 
-          styleClass="p-button-outlined"
-          (onClick)="resetFilters()">
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary" (onClick)="resetFilters()">
         </p-button>
       </div>
     </div>
 
     <div class="list-grid-wrapper">
-      <app-shared-grid 
+      <app-ag-share-grid 
+        [columns]="column" 
         [data]="data" 
-        [gridHeight]="'210px'" 
-        [headerFilter]="false"
-        [rowSelectionMode]="rowSelectionMode" 
-        [GridName]="'EMI Plans'" 
-        [column]="column"
-        (eventFromGrid)="eventFromGrid($event)" 
-        (gridReady)="onGridReady($event)"
-        (scrolledToBottom)="onScrolledToBottom($event)">
-      </app-shared-grid>
+        [showActions]="false" 
+        selectionMode="multiple"
+        (gridEvent)="eventFromGrid($event)" 
+        style="height: 100%; width: 100%; display: block;">
+      </app-ag-share-grid>
     </div>
 
   </div>

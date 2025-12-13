@@ -7,7 +7,6 @@ import { ConfirmationService } from 'primeng/api';
 
 // --- AG Grid ---
 import { GridApi, GridReadyEvent, ICellRendererParams } from 'ag-grid-community';
-import { SharedGridComponent } from '../../../shared/AgGrid/grid/shared-grid/shared-grid.component';
 
 // --- PrimeNG Modules ---
 import { ButtonModule } from 'primeng/button';
@@ -18,7 +17,8 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
-import { DividerModule } from 'primeng/divider'; // Added Divider
+import { DividerModule } from 'primeng/divider';
+import { AgShareGrid } from "../../../shared/components/ag-shared-grid"; // Added Divider
 
 @Component({
   selector: 'app-role-management',
@@ -26,7 +26,7 @@ import { DividerModule } from 'primeng/divider'; // Added Divider
   imports: [
     CommonModule,
     FormsModule,
-    SharedGridComponent,
+
     ButtonModule,
     DialogModule,
     InputTextModule,
@@ -35,8 +35,9 @@ import { DividerModule } from 'primeng/divider'; // Added Divider
     ConfirmDialogModule,
     TooltipModule,
     TagModule,
-    DividerModule
-  ],
+    DividerModule,
+    AgShareGrid
+],
   templateUrl: './role-management.html',
   styleUrl: './role-management.scss',
   providers: [ConfirmationService]
@@ -176,7 +177,7 @@ export class RoleManagementComponent implements OnInit {
   
   eventFromGrid(event: any) {
     console.log(event);
-    if (event.eventType === 'CellClickedEvent') {
+    if (event.type=== 'cellClicked') {
       const target = event.event.event.target;
       if (target.closest('.action-edit')) this.openEditRoleDialog(event.event.data);
       if (target.closest('.action-delete')) this.deleteRole(event.event.data);

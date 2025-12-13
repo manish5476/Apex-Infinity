@@ -16,16 +16,19 @@ import { DatePicker } from "primeng/datepicker";
 import { Select } from "primeng/select";
 import { FormsModule } from '@angular/forms';
 import { Toast } from "primeng/toast";
-import { SharedGridComponent } from '../../shared/AgGrid/grid/shared-grid/shared-grid.component';
 import { CommonModule } from '@angular/common';
 import { CommonMethodService } from '../../../core/utils/common-method.service';
+import { AgShareGrid, SharedGridEvent } from "../../shared/components/ag-shared-grid";
 @Component({
   selector: 'app-logs',
-  imports: [Button, DatePicker, Select, FormsModule, SharedGridComponent, CommonModule, Toast],
+  imports: [Button, DatePicker, Select, FormsModule,  CommonModule, Toast, AgShareGrid],
   templateUrl: './logs.html',
   styleUrl: './logs.scss',
 })
 export class LogsComponent implements OnInit {
+eventFromGrid($event: SharedGridEvent<any>) {
+throw new Error('Method not implemented.');
+}
 
   private logsService = inject(TransactionService);
   private cdr = inject(ChangeDetectorRef);

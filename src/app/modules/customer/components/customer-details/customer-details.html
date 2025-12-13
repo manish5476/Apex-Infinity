@@ -1,182 +1,205 @@
 <div class="dashboard-container animate-fadeInDown">
 
   @if (loadingProfile()) {
-    <div class="dashboard-header mb-md">
-      <div class="flex gap-md items-center">
-        <p-skeleton shape="circle" size="4rem"></p-skeleton>
-        <div class="flex flex-col gap-sm">
-          <p-skeleton width="12rem" height="1.5rem"></p-skeleton>
-          <p-skeleton width="6rem" height="1rem"></p-skeleton>
-        </div>
+  <div class="dashboard-header mb-md">
+    <div class="flex gap-md items-center">
+      <p-skeleton shape="circle" size="4rem"></p-skeleton>
+      <div class="flex flex-col gap-sm">
+        <p-skeleton width="12rem" height="1.5rem"></p-skeleton>
+        <p-skeleton width="6rem" height="1rem"></p-skeleton>
       </div>
     </div>
-    <div class="layout-grid">
-      <div class="w-full">
-        <p-skeleton height="300px" styleClass="rounded-xl"></p-skeleton>
-      </div>
-      <div class="w-full flex flex-col gap-md">
-        <div class="flex gap-md overflow-hidden">
-          <p-skeleton width="100px" height="80px" styleClass="rounded-xl"></p-skeleton>
-          <p-skeleton width="100px" height="80px" styleClass="rounded-xl"></p-skeleton>
-          <p-skeleton width="100px" height="80px" styleClass="rounded-xl"></p-skeleton>
-        </div>
-        <p-skeleton height="300px" styleClass="rounded-xl"></p-skeleton>
-      </div>
+  </div>
+  <div class="layout-grid">
+    <div class="w-full">
+      <p-skeleton height="300px" styleClass="rounded-xl"></p-skeleton>
     </div>
+    <div class="w-full flex flex-col gap-md">
+      <div class="flex gap-md overflow-hidden">
+        <p-skeleton width="100px" height="80px" styleClass="rounded-xl"></p-skeleton>
+        <p-skeleton width="100px" height="80px" styleClass="rounded-xl"></p-skeleton>
+        <p-skeleton width="100px" height="80px" styleClass="rounded-xl"></p-skeleton>
+      </div>
+      <p-skeleton height="300px" styleClass="rounded-xl"></p-skeleton>
+    </div>
+  </div>
   }
 
   @else if (isError()) {
-    <div class="error-state">
-      <div class="error-icon-wrapper">
-        <i class="pi pi-exclamation-triangle"></i>
-      </div>
-      <h2>Unable to load customer profile</h2>
-      <button pButton label="Go Back" icon="pi pi-arrow-left" class="p-button-outlined" routerLink="/customer"></button>
-      <button pButton label="Retry" icon="pi pi-refresh" class="p-button-text mt-2" (click)="retryLoad()"></button>
+  <div class="error-state">
+    <div class="error-icon-wrapper">
+      <i class="pi pi-exclamation-triangle"></i>
     </div>
+    <h2>Unable to load customer profile</h2>
+    <button pButton label="Go Back" icon="pi pi-arrow-left" class="p-button-outlined" routerLink="/customer"></button>
+    <button pButton label="Retry" icon="pi pi-refresh" class="p-button-text mt-2" (click)="retryLoad()"></button>
+  </div>
   }
 
   @else if (customer(); as c) {
 
-    <header class="dashboard-header">
-      <div class="header-left">
-        <button pButton icon="pi pi-arrow-left" class="p-button-text p-button-rounded back-btn"
-          routerLink="/customer"></button>
-        
-        <div class="customer-identity">
-          <div class="name-row">
-            <h1 class="truncate">{{ c.name }}</h1>
-            <p-tag [value]="c.isActive ? 'Active' : 'Inactive'" [severity]="c.isActive ? 'success' : 'danger'"
-              styleClass="text-xs font-bold"></p-tag>
+  <header class="dashboard-header">
+    <div class="header-left">
+      <button pButton icon="pi pi-arrow-left" class="p-button-text p-button-rounded back-btn"
+        routerLink="/customer"></button>
+
+      <div class="customer-identity">
+        <div class="name-row">
+          <h1 class="truncate">{{ c.name }}</h1>
+          <p-tag [value]="c.isActive ? 'Active' : 'Inactive'" [severity]="c.isActive ? 'success' : 'danger'"
+            styleClass="text-xs font-bold"></p-tag>
+        </div>
+
+        <div class="badges">
+          <span class="id-pill">
+            <i class="pi pi-hashtag text-xs mr-1"></i>
+            {{ c.code || c._id | uppercase }}
+          </span>
+          <span class="type-label">{{ c.type }} CUSTOMER</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button pButton label="Transactions" icon="pi pi-list"
+        class="p-button-outlined p-button-secondary p-button-sm action-btn"
+        (click)="showTransactionsDialog = true"></button>
+
+      <button pButton label="Edit" icon="pi pi-user-edit"
+        class="p-button-outlined p-button-secondary p-button-sm action-btn" [routerLink]="['../../customer/create']"
+        [queryParams]="{id: c._id}"></button>
+
+      <button pButton label="New Invoice" icon="pi pi-plus" class="p-button-primary p-button-sm action-btn"
+        routerLink="/invoices/create" [queryParams]="{customerId: c._id}"></button>
+    </div>
+  </header>
+
+  <div class="layout-grid">
+
+    <aside class="profile-card glass-card">
+      <div class="card-banner"></div>
+
+      <div class="identity-section">
+        <div class="avatar-wrapper">
+          <p-avatar [appImageViewer]="c.avatar" [image]="c.avatar" [label]="c.avatar ? '' : common.getInitials(c.name)"
+            size="xlarge" shape="circle" styleClass="user-avatar shadow-lg">
+          </p-avatar>
+
+          <button pButton type="button" icon="pi pi-pencil"
+            class="p-button-rounded p-button-secondary p-button-sm edit-btn" pTooltip="Change Photo"
+            (click)="fileInput.click(); $event.stopPropagation()">
+          </button>
+          <input #fileInput type="file" accept="image/*" style="display: none" (change)="onFileSelected($event)">
+
+          <div class="status-indicator" [class.active]="c.isActive"></div>
+        </div>
+
+        <h3 class="truncate">{{ c.contactPerson || c.name }}</h3>
+        <span class="email truncate">{{ c.email }}</span>
+      </div>
+
+      <div class="details-list">
+        <div class="detail-item">
+          <div class="icon-circle"><i class="pi pi-phone"></i></div>
+          <div class="meta">
+            <label>Phone</label>
+            <a [href]="'tel:' + c.phone" class="link-text">{{ c.phone || 'N/A' }}</a>
           </div>
-          
-          <div class="badges">
-            <span class="id-pill">
-              <i class="pi pi-hashtag text-xs mr-1"></i>
-              {{ c.code || c._id | uppercase }}
-            </span>
-            <span class="type-label">{{ c.type }} CUSTOMER</span>
+        </div>
+
+        <div class="detail-item">
+          <div class="icon-circle"><i class="pi pi-id-card"></i></div>
+          <div class="meta">
+            <label>GSTIN</label>
+            <span class="font-mono select-all">{{ c.gstNumber || 'N/A' }}</span>
+          </div>
+        </div>
+
+        <div class="detail-item">
+          <div class="icon-circle"><i class="pi pi-map-marker"></i></div>
+          <div class="meta">
+            <label>Address</label>
+            <span class="truncate">{{ c.billingAddress?.city || 'City not set' }}</span>
+            <span class="text-muted text-xs truncate">{{ c.billingAddress?.street }}</span>
           </div>
         </div>
       </div>
+    </aside>
 
-      <div class="header-actions">
-        <button pButton label="Transactions" icon="pi pi-list" class="p-button-outlined p-button-secondary p-button-sm action-btn"
-          (click)="showTransactionsDialog = true"></button>
-        
-        <button pButton label="Edit" icon="pi pi-user-edit"
-          class="p-button-outlined p-button-secondary p-button-sm action-btn" [routerLink]="['../../customer/create']"
-          [queryParams]="{id: c._id}"></button>
-        
-        <button pButton label="New Invoice" icon="pi pi-plus" class="p-button-primary p-button-sm action-btn"
-          routerLink="/invoices/create" [queryParams]="{customerId: c._id}"></button>
-      </div>
-    </header>
+    <main class="right-content">
 
-    <div class="layout-grid">
+      <section class="metrics-scroll-container">
+        <div class="metric-card glass-card outstanding">
+          <div class="icon-box"><i class="pi pi-wallet"></i></div>
+          <div class="data-box">
+            <label>Outstanding</label>
+            <span class="value">{{ common.formatCurrency(closingBalance()) }}</span>
+          </div>
+        </div>
 
-      <aside class="profile-card glass-card">
-        <div class="card-banner"></div>
-        
-        <div class="identity-section">
-          <div class="avatar-wrapper">
-            <p-avatar [appImageViewer]="c.avatar" [image]="c.avatar" 
-              [label]="c.avatar ? '' : common.getInitials(c.name)"
-              size="xlarge" shape="circle" styleClass="user-avatar shadow-lg">
-            </p-avatar>
-            
-            <button pButton type="button" icon="pi pi-pencil"
-              class="p-button-rounded p-button-secondary p-button-sm edit-btn" pTooltip="Change Photo"
-              (click)="fileInput.click(); $event.stopPropagation()">
+        <div class="metric-card glass-card invoiced">
+          <div class="icon-box"><i class="pi pi-receipt"></i></div>
+          <div class="data-box">
+            <label>Invoiced</label>
+            <span class="value">{{ common.formatCurrency(totalInvoiced()) }}</span>
+          </div>
+        </div>
+
+        <div class="metric-card glass-card received">
+          <div class="icon-box"><i class="pi pi-check-circle"></i></div>
+          <div class="data-box">
+            <label>Received</label>
+            <span class="value">{{ common.formatCurrency(totalPaid()) }}</span>
+          </div>
+        </div>
+
+        <div class="metric-card glass-card limit">
+          <div class="icon-box"><i class="pi pi-shield"></i></div>
+          <div class="data-box">
+            <label>Credit Limit</label>
+            <span class="value">{{ common.formatCurrency(c.creditLimit) }}</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="activity-panel glass-card">
+        <div class="custom-tabs-scroll">
+          <div class="custom-tabs">
+            <button class="tab-btn" [class.active]="activeTab() === 'ledger'" (click)="switchTab('ledger')">
+              <i class="pi pi-list"></i> Ledger
             </button>
-            <input #fileInput type="file" accept="image/*" style="display: none" (change)="onFileSelected($event)">
-            
-            <div class="status-indicator" [class.active]="c.isActive"></div>
-          </div>
-          
-          <h3 class="truncate">{{ c.contactPerson || c.name }}</h3>
-          <span class="email truncate">{{ c.email }}</span>
-        </div>
-
-        <div class="details-list">
-          <div class="detail-item">
-            <div class="icon-circle"><i class="pi pi-phone"></i></div>
-            <div class="meta">
-              <label>Phone</label>
-              <a [href]="'tel:' + c.phone" class="link-text">{{ c.phone || 'N/A' }}</a>
-            </div>
-          </div>
-          
-          <div class="detail-item">
-            <div class="icon-circle"><i class="pi pi-id-card"></i></div>
-            <div class="meta">
-              <label>GSTIN</label>
-              <span class="font-mono select-all">{{ c.gstNumber || 'N/A' }}</span>
-            </div>
-          </div>
-          
-          <div class="detail-item">
-            <div class="icon-circle"><i class="pi pi-map-marker"></i></div>
-            <div class="meta">
-              <label>Address</label>
-              <span class="truncate">{{ c.billingAddress?.city || 'City not set' }}</span>
-              <span class="text-muted text-xs truncate">{{ c.billingAddress?.street }}</span>
-            </div>
+            <button class="tab-btn" [class.active]="activeTab() === 'invoices'" (click)="switchTab('invoices')">
+              <i class="pi pi-file"></i> Invoices
+            </button>
+            <button class="tab-btn" [class.active]="activeTab() === 'payments'" (click)="switchTab('payments')">
+              <i class="pi pi-wallet"></i> Payments
+            </button>
           </div>
         </div>
-      </aside>
+        <div class="grid-wrapper">
+          @if (activeTab() === 'ledger') {
+          <app-ag-share-grid [columns]="ledgerColumns" [data]="ledgerHistory()" [showActions]="false"
+            selectionMode="multiple" style="height: 400px; width: 100%; display: block;">
+          </app-ag-share-grid>
+          }
 
-      <main class="right-content">
+          @if (activeTab() === 'invoices') {
+          <app-ag-share-grid [columns]="invoiceColumns" [data]="invoices()" [showActions]="false"
+            selectionMode="multiple" (gridEvent)="onGridEvent($event, 'invoices')"
+            style="height: 400px; width: 100%; display: block;">
+          </app-ag-share-grid>
+          }
 
-        <section class="metrics-scroll-container">
-          <div class="metric-card glass-card outstanding">
-            <div class="icon-box"><i class="pi pi-wallet"></i></div>
-            <div class="data-box">
-              <label>Outstanding</label>
-              <span class="value">{{ common.formatCurrency(closingBalance()) }}</span>
-            </div>
-          </div>
-          
-          <div class="metric-card glass-card invoiced">
-            <div class="icon-box"><i class="pi pi-receipt"></i></div>
-            <div class="data-box">
-              <label>Invoiced</label>
-              <span class="value">{{ common.formatCurrency(totalInvoiced()) }}</span>
-            </div>
-          </div>
-          
-          <div class="metric-card glass-card received">
-            <div class="icon-box"><i class="pi pi-check-circle"></i></div>
-            <div class="data-box">
-              <label>Received</label>
-              <span class="value">{{ common.formatCurrency(totalPaid()) }}</span>
-            </div>
-          </div>
-          
-          <div class="metric-card glass-card limit">
-            <div class="icon-box"><i class="pi pi-shield"></i></div>
-            <div class="data-box">
-              <label>Credit Limit</label>
-              <span class="value">{{ common.formatCurrency(c.creditLimit) }}</span>
-            </div>
-          </div>
-        </section>
+          @if (activeTab() === 'payments') {
+          <app-ag-share-grid [columns]="paymentColumns" [data]="payments()" [showActions]="false"
+            selectionMode="multiple" (gridEvent)="onGridEvent($event, 'payments')"
+            style="height: 400px; width: 100%; display: block;">
+          </app-ag-share-grid>
+          }
+        </div>
 
-        <div class="activity-panel glass-card">
-          <div class="custom-tabs-scroll">
-            <div class="custom-tabs">
-              <button class="tab-btn" [class.active]="activeTab() === 'ledger'" (click)="switchTab('ledger')">
-                <i class="pi pi-list"></i> Ledger
-              </button>
-              <button class="tab-btn" [class.active]="activeTab() === 'invoices'" (click)="switchTab('invoices')">
-                <i class="pi pi-file"></i> Invoices
-              </button>
-              <button class="tab-btn" [class.active]="activeTab() === 'payments'" (click)="switchTab('payments')">
-                <i class="pi pi-wallet"></i> Payments
-              </button>
-            </div>
-          </div>
 
+        <!-- 
           <div class="grid-wrapper">
             @if (activeTab() === 'ledger') {
               <app-shared-grid [data]="ledgerHistory()" [column]="ledgerColumns" 
@@ -196,17 +219,17 @@
                 [gridHeight]="'400px'" [headerFilter]="false" GridName="CustomerPaymentGrid">
               </app-shared-grid>
             }
-          </div>
-        </div>
+          </div> -->
+      </div>
 
-      </main>
-    </div>
+    </main>
+  </div>
   }
 </div>
 
-<p-dialog header="Transaction History" [(visible)]="showTransactionsDialog" 
-  [modal]="true" [style]="{ width: '95vw', maxWidth: '1200px', height: '90vh' }" 
-  [maximizable]="true" [draggable]="false" [resizable]="false" appendTo="body">
+<p-dialog header="Transaction History" [(visible)]="showTransactionsDialog" [modal]="true"
+  [style]="{ width: '95vw', maxWidth: '1200px', height: '90vh' }" [maximizable]="true" [draggable]="false"
+  [resizable]="false" appendTo="body">
   <ng-container *ngIf="showTransactionsDialog">
     <app-customer-transactions [inputCustomerId]="customer()?._id"></app-customer-transactions>
   </ng-container>

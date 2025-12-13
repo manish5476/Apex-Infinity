@@ -20,9 +20,9 @@ import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { AppMessageService } from '../../../../core/services/message.service';
-import { SharedGridComponent } from '../../../shared/AgGrid/grid/shared-grid/shared-grid.component';
 import { SupplierService } from '../../services/supplier-service';
 import { Toast } from "primeng/toast";
+import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
 
 // Shared
 
@@ -32,14 +32,15 @@ import { Toast } from "primeng/toast";
   standalone: true,
   imports: [
     CommonModule,
-    SharedGridComponent,
+
     SelectModule,
     FormsModule,
     ButtonModule,
     InputTextModule,
     RouterModule,
-    Toast
-],
+    Toast,
+    AgShareGrid
+  ],
   templateUrl: './supplier-list.html',
   styleUrl: './supplier-list.scss',
 })
@@ -128,22 +129,21 @@ export class SupplierListComponent implements OnInit {
     });
   }
 
-  onScrolledToBottom(_: any) {
+  onScrolledToBottom(_?: any) {
     if (!this.isLoading && this.data.length < this.totalCount) {
       this.getData(false);
     }
   }
 
-  onGridReady(params: GridReadyEvent) {
-    this.gridApi = params.api;
-  }
-
   eventFromGrid(event: any) {
-    if (event.eventType === 'RowSelectedEvent') {
-      const supplierId = event.event.data._id;
+    if (event.type=== 'cellClicked') {
+      const supplierId = event.row._id;
       if (supplierId) {
         this.router.navigate([supplierId], { relativeTo: this.route });
       }
+    }
+    if (event.eventType === 'reachedBottom') {
+      this.onScrolledToBottom()
     }
   }
 

@@ -9,26 +9,27 @@ import { InputTextModule } from 'primeng/inputtext';
 import { Router, RouterModule } from '@angular/router'; // 1. Import the Angular Router
 
 // --- Shared Components / Services ---
-import { SharedGridComponent } from '../../../shared/AgGrid/grid/shared-grid/shared-grid.component';
 import { ImageCellRendererComponent } from '../../../shared/AgGrid/AgGridcomponents/image-cell-renderer/image-cell-renderer.component';
 import { CustomerService } from '../../services/customer-service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { Toast } from "primeng/toast";
+import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
 
 @Component({
   selector: 'app-customer-list',
   standalone: true,
   imports: [
     CommonModule,
-    SharedGridComponent,
+
     SelectModule,
     AutoCompleteModule,
     FormsModule,
-    ButtonModule,RouterModule,    
+    ButtonModule, RouterModule,
     InputTextModule,
-    Toast
-  ],
+    Toast,
+    AgShareGrid
+],
   providers: [CustomerService],
   templateUrl: './customer-list.html',
   styleUrl: './customer-list.scss',
@@ -151,7 +152,7 @@ export class CustomerList implements OnInit {
   /**
    * Triggered by the grid's infinite scroll.
    */
-  onScrolledToBottom(_: any) {
+  onScrolledToBottom(_?: any) {
     if (!this.isLoading && this.data.length < this.totalCount) {
       this.getData(false);
     }
@@ -165,11 +166,14 @@ export class CustomerList implements OnInit {
    * Handles other events from the grid (e.g., row clicks).
    */
   eventFromGrid(event: any) {
-    if (event.eventType === 'RowSelectedEvent') {
-      const customerId = event.event.data._id;
+    if (event.type=== 'cellClicked') {
+      const customerId = event.row._id;
       if (customerId) {
         this.router.navigate(['/customer', customerId]);
       }
+    }
+     if (event.eventType === 'reachedBottom') {
+      this.onScrolledToBottom()
     }
   }
 

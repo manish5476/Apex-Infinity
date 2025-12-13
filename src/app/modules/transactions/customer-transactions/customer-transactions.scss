@@ -35,7 +35,7 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  min-height: 0; /* CRITICAL for scrollable children */
+  min-height: 500px; /* CRITICAL for scrollable children */
   gap: 1.5rem;
 }
 

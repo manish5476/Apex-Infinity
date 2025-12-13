@@ -2,54 +2,80 @@
    1. CORE LAYOUT & VARIABLES
    ============================================== */
 :host {
-  display: block;
+  display: flex;          /* Changed to flex */
+  flex-direction: column;
   width: 100%;
-  height: 100%;
+  height: 100%;           /* Fill parent */
   padding: var(--spacing-xl);
   background: var(--bg-primary);
+  overflow: hidden;       /* Prevent host scroll */
   
   /* Local Variables for the "Rectangular" look */
-  --radius-sharp: 2px; /* The secret to the rectangular feel */
+  --radius-sharp: 2px;
   --shadow-deep: 0 10px 40px -10px rgba(0, 0, 0, 0.3);
 }
 
 .master-page-container {
-    height: 100%;
-    width: 100%;
-    margin: 0 auto;
+  height: 100%;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;          /* Ensure container flexes */
+  flex-direction: column;
 }
 
 /* ==============================================
    2. CARD & TOOLBAR (PREMIUM SHARP LOOK)
    ============================================== */
 .master-card {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    padding: var(--spacing-xl);
-    background: var(--bg-secondary); /* Ensure card has bg */
-    border: 1px solid var(--border-primary); /* Sharp border */
+  flex: 1;                /* Grow to fill height */
+  min-height: 0;          /* Allow shrinking */
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-xl);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  /* Optional: overflow hidden if you want rounded corners clipping content */
+  /* overflow: hidden; */ 
 }
 
 .master-toolbar {
-    background: transparent !important;
-    border: none !important;
-    padding: 0 0 var(--spacing-lg) 0 !important;
-    border-bottom: 1px solid var(--border-primary) !important;
-    margin-bottom: var(--spacing-lg);
-    border-radius: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 0 var(--spacing-lg) 0 !important;
+  border-bottom: 1px solid var(--border-primary) !important;
+  margin-bottom: var(--spacing-lg);
+  border-radius: 0 !important;
+  flex-shrink: 0; /* Keep toolbar visible */
 
-    .section-heading {
-        font-size: 1.5rem; /* 2xl */
-        font-weight: 700;
-        letter-spacing: -0.02em; /* Tighter, modern text */
-        color: var(--text-primary);
-        margin: 0;
-    }
+  .section-heading {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    margin: 0;
+  }
 }
 
 /* ==============================================
-   3. SHARP COMPONENT OVERRIDES
+   3. GRID WRAPPER (THE HEIGHT FIX)
+   ============================================== */
+.master-grid-wrapper {
+  flex: 1;                /* Grow to fill remaining space */
+  min-height: 0;          /* CRITICAL for grid scrolling */
+  border: 1px solid var(--border-primary);
+  background: var(--bg-primary); /* Optional contrast */
+  border-radius: var(--radius-sharp);
+  overflow: hidden;
+
+  app-ag-share-grid {
+    height: 100%;
+    width: 100%;
+    display: block;
+  }
+}
+
+/* ==============================================
+   4. SHARP COMPONENT OVERRIDES
    ============================================== */
 :host ::ng-deep {
     
@@ -63,7 +89,7 @@
         }
     }
 
-    /* --- Inputs: Rectangular with clear focus --- */
+    /* --- Inputs: Rectangular --- */
     .p-inputtext, .p-inputtextarea, .p-select {
         border-radius: var(--radius-sharp) !important;
         background: var(--bg-ternary);
@@ -73,7 +99,7 @@
 
         &:enabled:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 1px var(--primary-color); /* Sharp focus ring */
+            box-shadow: 0 0 0 1px var(--primary-color);
         }
         
         &::placeholder {
@@ -90,57 +116,14 @@
     }
 
     /* ==============================================
-       4. PREMIUM TABLE STYLING
-       ============================================== */
-    .p-table-premium {
-        .p-datatable-wrapper {
-            border: 1px solid var(--border-primary);
-            border-radius: var(--radius-sharp);
-            background: var(--bg-secondary);
-        }
-
-        .p-datatable-header {
-            background: var(--bg-secondary) !important;
-            border-bottom: 1px solid var(--border-primary);
-            padding: var(--spacing-md);
-        }
-
-        .p-table-thead > tr > th {
-            background: var(--bg-ternary) !important;
-            color: var(--text-label);
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.05em;
-            padding: var(--spacing-md) var(--spacing-lg);
-            border-bottom: 1px solid var(--border-secondary);
-        }
-        
-        .p-table-tbody > tr {
-            background: var(--bg-secondary) !important;
-            color: var(--text-primary);
-            transition: background-color 0.15s;
-            
-            &:hover {
-                background: var(--bg-ternary) !important;
-            }
-
-            > td {
-                border-bottom: 1px solid var(--border-secondary);
-                padding: 1rem var(--spacing-lg);
-            }
-        }
-    }
-
-    /* ==============================================
-       5. RECTANGULAR DIALOGS (THE CORE REQUEST)
+       5. RECTANGULAR DIALOGS
        ============================================== */
     .master-dialog, .bulk-dialog {
         .p-dialog {
             border-radius: var(--radius-sharp) !important;
             box-shadow: var(--shadow-deep);
-            border: 1px solid var(--border-primary); /* Explicit border for definition */
-            overflow: hidden; /* Ensures headers/footers don't spill out */
+            border: 1px solid var(--border-primary);
+            overflow: hidden;
         }
 
         .p-dialog-header {
@@ -161,7 +144,6 @@
             color: var(--text-primary);
             padding: 1.5rem;
             
-            /* Scrollbar styling for content */
             &::-webkit-scrollbar { width: 6px; }
             &::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 3px; }
         }
@@ -173,7 +155,6 @@
             border-radius: 0;
         }
 
-        /* Form adjustments */
         .form-group {
             margin-bottom: 0.5rem;
             
@@ -203,7 +184,6 @@
     margin-bottom: 1rem;
 }
 
-/* The Data Table Container */
 .bulk-data-table {
     border: 1px solid var(--border-primary);
     border-radius: var(--radius-sharp);
@@ -212,7 +192,6 @@
     flex-direction: column;
 }
 
-/* Header Row */
 .bulk-header-row {
     display: flex;
     background: var(--bg-ternary);
@@ -228,13 +207,12 @@
     }
 }
 
-/* Data Rows */
 .bulk-data-rows {
     background: var(--bg-secondary);
     
     .bulk-item-row {
         display: flex;
-        align-items: flex-start; /* Align top if error messages appear */
+        align-items: flex-start;
         border-bottom: 1px solid var(--border-secondary);
         padding: 0.5rem 1rem;
         background: var(--bg-secondary);
@@ -254,330 +232,27 @@
             flex-direction: column;
             
             input {
-                height: 2.4rem; /* Slightly taller for easier clicking */
+                height: 2.4rem;
                 font-size: 0.9rem;
             }
             
             .uppercase-input {
-                font-family: monospace; /* Helps distinguish codes */
+                font-family: monospace;
                 letter-spacing: 1px;
             }
         }
     }
 }
 
-/* Scroll Wrapper utility */
 .bulk-scroll-wrapper {
-    /* Custom Scrollbar for the internal bulk area */
     &::-webkit-scrollbar { width: 8px; }
     &::-webkit-scrollbar-track { background: transparent; }
     &::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 4px; }
 }
 
-/* Utility for Error Text */
 .error-message {
-    color: #ef4444; /* Tailwind red-500 */
+    color: #ef4444;
     font-size: 0.75rem;
     margin-top: 2px;
     display: block;
 }
-
-// /* ==============================================
-//    MASTER LIST - PREMIUM STYLES
-//    ============================================== */
-
-// :host {
-//   display: block;
-//   width: 100%;
-//   height: 100%;
-//   padding: var(--spacing-xl);
-//   background: var(--bg-primary);
-// }
-
-// .master-page-container {
-//     height: 100%;
-//     width: 100%;
-//     margin: 0 auto;
-// }
-
-// /* === CARD & TOOLBAR === */
-// .master-card {
-//     height: 100%;
-//     display: flex;
-//     flex-direction: column;
-//     padding: var(--spacing-xl);
-// }
-
-// .master-toolbar {
-//     background: var(--bg-secondary) !important;
-//     border: none !important;
-//     padding: 0 0 var(--spacing-lg) 0 !important;
-//     border-bottom: 1px solid var(--border-primary);
-//     margin-bottom: var(--spacing-lg);
-
-//     .section-heading {
-//         font-size: var(--font-size-2xl);
-//         font-weight: 700;
-//         color: var(--text-primary);
-//         margin: 0;
-//     }
-// }
-
-// .filter-bar {
-//     padding-bottom: var(--spacing-lg);
-// }
-
-// .p-input-icon-left {
-//     i {
-//         color: var(--text-label);
-//     }
-//     input {
-//         background: var(--bg-ternary);
-//         border-color: var(--border-secondary);
-//         color: var(--text-primary);
-//     }
-// }
-
-// /* === TABLE STYLING === */
-// :host ::ng-deep {
-//     /* Set table header and row colors consistently */
-//     .p-table-premium {
-//         .p-datatable-wrapper {
-//             border: 1px solid var(--border-primary);
-//             border-radius: var(--ui-radius);
-//             overflow: hidden;
-//         }
-
-//         .p-datatable-header, .p-table-thead {
-//             background: var(--bg-ternary) !important;
-//             color: var(--text-label);
-//             font-size: var(--font-size-sm);
-//         }
-        
-//         .p-table-tbody > tr {
-//             background: var(--bg-secondary);
-            
-//             &:hover {
-//                 background: color-mix(in srgb, var(--bg-ternary) 50%, var(--bg-secondary));
-//             }
-//         }
-        
-//         .actions-column {
-//             width: 120px;
-//         }
-//     }
-// }
-
-// /* === DIALOG STYLING === */
-// .master-dialog, .bulk-dialog {
-//     .dialog-form {
-//         display: flex;
-//         flex-direction: column;
-//         gap: var(--spacing-lg);
-//     }
-
-//     .form-group {
-//         display: flex;
-//         flex-direction: column;
-//         gap: var(--spacing-sm);
-        
-//         label {
-//             font-size: var(--font-size-sm);
-//             color: var(--text-label);
-//             font-weight: 600;
-//         }
-        
-//         input, .p-dropdown, .p-select {
-//             background: var(--bg-ternary);
-//             border-color: var(--border-secondary);
-//             color: var(--text-primary);
-//             width: 100%;
-//         }
-        
-//         .error-message {
-//             color: var(--color-error);
-//             font-size: var(--font-size-xs);
-//             margin-top: 2px;
-//         }
-//     }
-// }
-
-
-// /* === BULK EDITOR STYLES === */
-// .bulk-form-layout {
-//     gap: var(--spacing-md);
-// }
-
-// .bulk-control-panel {
-//     display: flex;
-//     justify-content: space-between;
-//     align-items: flex-start;
-//     padding-bottom: var(--spacing-lg);
-//     border-bottom: 1px solid var(--border-primary);
-// }
-
-// .bulk-data-table {
-//     display: flex;
-//     flex-direction: column;
-//     max-height: 400px;
-//     overflow-y: auto;
-//     border: 1px solid var(--border-primary);
-//     border-radius: var(--ui-radius);
-// }
-
-// .bulk-header-row {
-//     display: flex;
-//     align-items: center;
-//     background: var(--bg-ternary);
-//     padding: var(--spacing-md) var(--spacing-lg);
-//     font-weight: 600;
-//     color: var(--text-label);
-//     font-size: var(--font-size-sm);
-//     border-bottom: 1px solid var(--border-primary);
-//     flex-shrink: 0;
-// }
-
-// .bulk-data-rows {
-//     display: flex;
-//     flex-direction: column;
-//     gap: 1px; /* Visual separation */
-//     background: var(--border-primary); /* Use border color as separator */
-// }
-
-// .bulk-item-row {
-//     display: flex;
-//     align-items: center;
-//     padding: var(--spacing-md) var(--spacing-lg);
-//     background: var(--bg-secondary);
-//     gap: var(--spacing-lg);
-//     flex-shrink: 0;
-    
-//     .form-group-inline {
-//         display: flex;
-//         flex-direction: column;
-//         gap: 4px;
-        
-//         input {
-//             width: 100%;
-//             height: 2.2rem;
-//             font-size: var(--font-size-sm);
-//             padding: 0.5rem;
-//         }
-//     }
-    
-//     /* Column widths mirroring the header */
-//     .form-group-inline:nth-child(1) { width: 35%; }
-//     .form-group-inline:nth-child(2) { width: 25%; }
-//     .form-group-inline:nth-child(3) { width: 30%; }
-//     .p-button { width: 10%; }
-// }
-
-// /* ==============================================
-//    MASTER LIST - PREMIUM STYLES (DARK MODE FIX)
-//    ============================================== */
-
-// :host {
-//   display: block;
-//   width: 100%;
-//   height: 100%;
-//   padding: var(--spacing-xl);
-//   background: var(--bg-primary);
-// }
-
-// .master-page-container {
-//     height: 100%;
-//     width: 100%;
-//     margin: 0 auto;
-// }
-
-// /* === CARD & TOOLBAR === (Unchanged) */
-// .master-card {
-//     height: 100%;
-//     display: flex;
-//     flex-direction: column;
-//     padding: var(--spacing-xl);
-// }
-
-// .master-toolbar {
-//     background: var(--bg-secondary) !important;
-//     border: none !important;
-//     padding: 0 0 var(--spacing-lg) 0 !important;
-//     border-bottom: 1px solid var(--border-primary);
-//     margin-bottom: var(--spacing-lg);
-
-//     .section-heading {
-//         font-size: var(--font-size-2xl);
-//         font-weight: 700;
-//         color: var(--text-primary);
-//         margin: 0;
-//     }
-// }
-
-// /* --- Filter Styling --- */
-// .p-input-icon-left {
-//     i { color: var(--text-label); }
-//     input {
-//         background: var(--bg-ternary);
-//         border-color: var(--border-secondary);
-//         color: var(--text-primary);
-//     }
-// }
-
-
-// /* === TABLE STYLING FIXES === */
-// :host ::ng-deep {
-//     .p-table-premium {
-//         .p-datatable-wrapper {
-//             border: 1px solid var(--border-primary);
-//             border-radius: var(--ui-radius);
-//             overflow: hidden;
-//         }
-
-//         /* 1. Header (Low contrast) */
-//         .p-datatable-header, .p-table-thead {
-//             background: var(--bg-ternary) !important;
-//             color: var(--text-label); /* Use secondary/label color for titles */
-//         }
-        
-//         /* 2. Row Background Fix for Dark Mode */
-//         .p-table-tbody > tr {
-//             // Ensure the main row background uses the card background color
-//             background: var(--bg-secondary) !important; 
-//             color: var(--text-primary);
-            
-//             &:hover {
-//                 // Use a slightly different color (ternary) for hover feedback
-//                 background: var(--bg-ternary) !important;
-//             }
-//         }
-        
-//         /* 3. Cell Styling */
-//         .p-table-tbody > tr > td {
-//              // Important: Set background property on the <tr> instead of <td> for seamless color.
-//             border-color: var(--border-secondary); 
-//             color: var(--text-primary); /* Ensure text is visible in dark mode */
-//             padding: var(--spacing-md) var(--spacing-lg);
-//         }
-        
-//         .actions-column {
-//             width: 120px;
-//         }
-//     }
-
-//     /* === DIALOG STYLING (Unchanged but retained for completeness) === */
-//     .master-dialog, .bulk-dialog {
-//         // Ensuring all internal components adhere to dark mode colors
-//         .p-dialog-header, .p-dialog-content {
-//             background: var(--bg-secondary) !important;
-//             color: var(--text-primary) !important;
-//         }
-//         .p-dialog-footer {
-//              background: var(--bg-ternary) !important;
-//              border-top: 1px solid var(--border-primary);
-//         }
-//         .form-group input, .p-select {
-//             background: var(--bg-ternary);
-//             border-color: var(--border-secondary);
-//         }
-//     }
-// }

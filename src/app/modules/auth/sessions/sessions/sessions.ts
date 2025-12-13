@@ -13,24 +13,25 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
 
 // Shared
-import { SharedGridComponent } from '../../../shared/AgGrid/grid/shared-grid/shared-grid.component';
 import { SessionService } from '../../services/session.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
+import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
 
 @Component({
   selector: 'app-sessions',
   standalone: true,
   imports: [
     CommonModule,
-    SharedGridComponent,
+
     FormsModule,
     ButtonModule,
     DialogModule,
     TagModule,
     ToastModule,
     ConfirmDialogModule,
-    TooltipModule
-  ],
+    TooltipModule,
+    AgShareGrid
+],
   providers: [ConfirmationService, MessageService],
   templateUrl: './sessions.html',
   styleUrl: './sessions.scss',
@@ -154,8 +155,9 @@ export class Sessions implements OnInit {
   }
 
   eventFromGrid(event: any) {
-    if (event.eventType === 'RowSelectedEvent') {
-      this.openSessionDetails(event.event.data);
+    console.log(event);
+    if (event.type === 'cellClicked') {
+      this.openSessionDetails(event.row._id);
     }
   }
 

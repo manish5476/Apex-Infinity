@@ -8,18 +8,18 @@ import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { DatePickerModule } from 'primeng/datepicker';
 import { Toast } from "primeng/toast";
-
-import { SharedGridComponent } from '../../shared/AgGrid/grid/shared-grid/shared-grid.component';
 import { CommonMethodService } from '../../../core/utils/common-method.service'; // Adjust path if needed
-import { TransactionService } from '../transaction.service'; // Adjust path if needed
+import { TransactionService } from '../transaction.service';
+import { AgShareGrid } from "../../shared/components/ag-shared-grid"; // Adjust path if needed
 
 @Component({
   selector: 'app-supplier-transactions',
   standalone: true,
   imports: [
-    CommonModule, SharedGridComponent, SelectModule, FormsModule, 
-    ButtonModule, InputTextModule, Toast, DatePickerModule
-  ],
+    CommonModule, SelectModule, FormsModule,
+    ButtonModule, InputTextModule, Toast, DatePickerModule,
+    AgShareGrid
+],
   templateUrl: './supplier-transactions.html',
   styleUrl: './supplier-transactions.scss',
 })
@@ -117,6 +117,11 @@ export class SupplierTransactions implements OnInit {
 
   onScrolledToBottom(_: any) {
     if (this.data.length < this.totalCount) this.getData(false);
+  }
+    eventFromGrid(event: any) {
+    if (event.eventType === 'reachedBottom') {
+      this.onScrolledToBottom(event)
+    }
   }
 
   onGridReady(params: GridReadyEvent) { this.gridApi = params.api; }

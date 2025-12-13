@@ -1,79 +1,69 @@
-<!-- 
-  REFACTORED:
-  - Using consistent .list-page-container layout
-  - Using .themed-card instead of .glass-card
-  - Set gridHeight="100%"
-  - Corrected routerLink on button
--->
 <div class="list-page-container">
-  <!-- HEADER -->
+
   <div class="list-header">
-    <h2 class="list-title">
-      <i class="pi pi-box text-[var(--accent-primary)]"></i>
-      Product Management
-    </h2>
-    <p-button 
-      label="New Product" 
-      icon="pi pi-plus" 
-      routerLink="create"> <!-- Corrected: relative routerLink -->
-    </p-button>
+    <div class="title-section">
+      <div class="icon-box">
+        <i class="pi pi-box"></i>
+      </div>
+      <div class="text-content">
+        <h2 class="list-title">Product Management</h2>
+        <p class="list-subtitle">Manage inventory, prices, and product details.</p>
+      </div>
+    </div>
+    <p-button label="New Product" icon="pi pi-plus" routerLink="create" styleClass="p-button-primary"></p-button>
   </div>
 
-  <!-- FILTER BAR -->
   <div class="themed-card">
     <div class="se-filter-bar">
 
-      <!-- Name -->
-      <div class="se-filter-field">
+      <div class="se-filter-field" style="flex: 2">
         <label for="name">Product Name</label>
-        <input id="name" type="text" pInputText [(ngModel)]="productFilter.name" placeholder="Search by name" />
+        <div class="p-input-icon-left w-full">
+          <i class="pi pi-search"></i>
+          <input id="name" type="text" pInputText [(ngModel)]="productFilter.name" 
+            placeholder="Search by name..." class="w-full"/>
+        </div>
       </div>
 
-      <!-- SKU -->
       <div class="se-filter-field">
         <label for="sku">SKU</label>
-        <input id="sku" type="text" pInputText [(ngModel)]="productFilter.sku" placeholder="Search by SKU" />
+        <input id="sku" type="text" pInputText [(ngModel)]="productFilter.sku" 
+          placeholder="Search by SKU" class="w-full"/>
       </div>
 
-      <!-- Brand -->
       <div class="se-filter-field">
         <label for="brand">Brand</label>
-        <p-select  appendTo="body" id="brand" [options]="brandOptions()" [(ngModel)]="productFilter.brand" [filter]="true"
-          optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select Brand" appendTo="body">
+        <p-select appendTo="body" id="brand" [options]="brandOptions()" [(ngModel)]="productFilter.brand"
+          [filter]="true" optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select Brand"
+          styleClass="w-full">
         </p-select>
       </div>
 
-      <!-- Category -->
       <div class="se-filter-field">
         <label for="category">Category</label>
-        <p-select  appendTo="body" id="category" [options]="categoryOptions()" [(ngModel)]="productFilter.category" [filter]="true"
-          optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select Category" appendTo="body">
+        <p-select appendTo="body" id="category" [options]="categoryOptions()" [(ngModel)]="productFilter.category"
+          [filter]="true" optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select Category"
+          styleClass="w-full">
         </p-select>
       </div>
 
-      <!-- Actions -->
       <div class="se-filter-actions">
-        <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()">
-        </p-button>
-        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined"
-          (onClick)="resetFilters()">
-        </p-button>
+        <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()"></p-button>
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary" 
+          (onClick)="resetFilters()"></p-button>
       </div>
     </div>
   </div>
 
-  <!-- GRID AREA -->
-  <div class="themed-card list-grid-area">
-    <app-shared-grid 
+  <div class="list-grid-area themed-card">
+    <app-ag-share-grid 
+      [columns]="column" 
       [data]="data" 
-      [gridHeight]="'210px'" 
-      [headerFilter]="false" 
-      [rowSelectionMode]="rowSelectionMode"
-      [GridName]="'Product Details'" 
-      [column]="column" 
-      (eventFromGrid)="eventFromGrid($event)"
-      (gridReady)="onGridReady($event)" 
-      (scrolledToBottom)="onScrolledToBottom($event)">
-    </app-shared-grid>
+      [showActions]="false" 
+      selectionMode="multiple"
+      (gridEvent)="eventFromGrid($event)" 
+      style="height: 100%; width: 100%; display: block;">
+    </app-ag-share-grid>
   </div>
+
 </div>

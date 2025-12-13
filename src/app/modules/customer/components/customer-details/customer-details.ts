@@ -14,8 +14,6 @@ import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
 
 // Shared Grid
-import { SharedGridComponent } from '../../../shared/AgGrid/grid/shared-grid/shared-grid.component';
-
 // Services & Components
 import { CustomerService } from '../../services/customer-service';
 import { InvoiceService } from '../../../invoice/services/invoice-service';
@@ -25,6 +23,7 @@ import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
 import { CustomerTransactions } from '../../../transactions/customer-transactions/customer-transactions';
 import { ImageViewerDirective } from '../../../shared/directives/image-viewer.directive';
+import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
 
 type TabType = 'ledger' | 'invoices' | 'payments';
 
@@ -43,8 +42,9 @@ type TabType = 'ledger' | 'invoices' | 'payments';
     DialogModule,
     ToastModule,
     CustomerTransactions,
-    SharedGridComponent
-  ],
+
+    AgShareGrid
+],
   providers: [CustomerService, InvoiceService, PaymentService, FinancialService],
   templateUrl: './customer-details.html',
   styleUrl: './customer-details.scss',
@@ -245,12 +245,12 @@ export class CustomerDetails implements OnInit {
 
   // --- Grid Events ---
   onGridEvent(event: any, type: TabType) {
-    if (event.eventType === 'CellClickedEvent' && type === 'invoices') {
-       const invoiceId = event.event.data._id;
+    if (event.type=== 'cellClicked' && type === 'invoices') {
+       const invoiceId = event.row._id;
        this.router.navigate(['/invoices', invoiceId]);
     }
-    if (event.eventType === 'CellClickedEvent' && type === 'payments') {
-       const paymentid = event.event.data._id;
+    if (event.type=== 'cellClicked' && type === 'payments') {
+       const paymentid = event.row._id;
        this.router.navigate(['/payments', paymentid]);
     }
   }

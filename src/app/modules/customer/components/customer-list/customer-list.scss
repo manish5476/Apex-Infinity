@@ -1,19 +1,22 @@
 /* ==============================================
    CUSTOMER LIST COMPONENT
-   - Re-uses all styles from branch-list.scss
+   Theme: Enterprise Full Height
    ============================================== */
 
 :host {
   display: block;
+  width: 100%;
   height: 100%;
+  overflow: hidden; /* Prevent double scrollbars */
 }
 
 .list-page-container {
   display: flex;
   flex-direction: column;
   height: 100%;
+  width: 100%;
   padding: var(--spacing-xl);
-  gap: var(--spacing-xl);
+  gap: var(--spacing-lg);
   background: var(--bg-primary);
 }
 
@@ -23,23 +26,57 @@
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
+  padding-bottom: var(--spacing-md);
+
+  .title-section {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+
+    .icon-box {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      border-radius: var(--ui-border-radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.25rem;
+      box-shadow: var(--shadow-md);
+    }
+
+    .text-content {
+      .list-title {
+        font-family: var(--font-heading);
+        font-size: var(--font-size-2xl);
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+        line-height: 1.2;
+      }
+      .list-subtitle {
+        font-size: var(--font-size-sm);
+        color: var(--text-secondary);
+        margin: 2px 0 0 0;
+      }
+    }
+  }
 }
 
-.list-title {
-  font-size: var(--font-size-3xl);
-  font-weight: 600;
-  color: var(--text-primary);
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-}
-
-/* === CARD === */
+/* === CONTENT CARD (Flex Container) === */
 .themed-card {
+  /* This makes the card fill the remaining vertical space */
+  flex: 1;
+  min-height: 0; 
+  
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  
   background: var(--bg-secondary);
-  border-radius: var(--ui-border-radius-lg);
-  border: var(--ui-border-width) solid var(--border-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--ui-border-radius-xl);
   box-shadow: var(--shadow-sm);
   padding: var(--spacing-lg);
 }
@@ -49,133 +86,81 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-lg);
-  align-items: flex-end; // Aligns buttons with inputs
-}
-
-.se-filter-field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  flex-grow: 1;
-  min-width: 200px;
-
-  label {
-    font-size: var(--font-size-xs);
-    color: var(--text-label);
-    text-transform: uppercase;
-    font-weight: 500;
-  }
-
-  // Style inputs to match our forms
-  :is(input[pInputText], .p-select, .p-autocomplete) {
-    background: var(--bg-ternary);
-  }
-}
-
-.se-filter-actions {
-  display: flex;
-  gap: var(--spacing-md);
-  padding-bottom: 2px; // Minor alignment tweak
-}
-
-
-/* === GRID AREA === */
-.list-grid-area {
-  flex-grow: 1; // This makes it fill the remaining height
-  min-height: 0; // Crucial for flex-grow to work in a flex-col
-  padding: var(--spacing-lg);
+  align-items: flex-end;
+  flex-shrink: 0; /* Filters don't shrink */
   
-  // The grid component will fill this area
-  app-shared-grid {
-    height: 100%;
-    width: 100%;
-  }
-}
-
-/* === AG-GRID THEMING === */
-:host ::ng-deep {
-  /* Style the grid cells based on our theme */
-  .ag-root-wrapper {
-    border: none;
-  }
-  .ag-header {
-    background-color: var(--bg-ternary);
-    border-bottom: var(--ui-border-width) solid var(--border-primary);
-  }
-  .ag-header-cell-label {
-    color: var(--text-primary);
-    font-weight: 600;
-  }
-  .ag-row {
-    background-color: var(--bg-secondary);
-    color: var(--text-secondary);
-    border-color: var(--border-primary) !important;
-    
-    &.ag-row-hover {
-      background-color: var(--bg-ternary);
-    }
-  }
-  
-  /* Status Cell Specific */
-  .cell-status {
+  .se-filter-field {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
-    margin: 0;
-    font-weight: 600;
-    
-    &.status-active {
-      background-color: color-mix(in srgb, var(--color-success) 15%, transparent);
-      color: var(--color-success);
-    }
-    &.status-inactive {
-      background-color: color-mix(in srgb, var(--color-error) 15%, transparent);
-      color: var(--color-error);
+    flex-direction: column;
+    gap: 6px;
+    flex-grow: 1;
+    min-width: 200px;
+    max-width: 300px;
+
+    label {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
     }
   }
 
-  /* Style p-autocomplete dropdown panel */
-  .p-autocomplete-panel {
-    background: var(--bg-secondary);
-    border: var(--ui-border-width) solid var(--border-primary);
+  .se-filter-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    padding-bottom: 2px; /* Visual alignment with inputs */
+  }
+}
 
-    .p-autocomplete-item {
+/* === GRID WRAPPER (Grows to fill card) === */
+.list-grid-wrapper {
+  flex: 1;
+  min-height: 0; /* Crucial: Allows grid to shrink & scroll internally */
+  border-radius: var(--ui-border-radius);
+  overflow: hidden;
+  border: 1px solid var(--border-secondary);
+
+  app-ag-share-grid {
+    height: 100%;
+    width: 100%;
+    display: block;
+  }
+}
+
+/* === PRIME NG OVERRIDES === */
+:host ::ng-deep {
+  .p-inputtext, .p-dropdown, .p-autocomplete-input {
+    background: var(--bg-ternary);
+    border-color: var(--border-secondary);
+    color: var(--text-primary);
+    border-radius: var(--ui-border-radius);
+    
+    &:enabled:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 1px var(--accent-primary);
+    }
+    
+    &:enabled:hover {
+      border-color: var(--text-tertiary);
+    }
+  }
+
+  .p-dropdown-panel, .p-autocomplete-panel {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    box-shadow: var(--shadow-lg);
+    
+    .p-dropdown-item, .p-autocomplete-item {
       color: var(--text-secondary);
       &:hover {
-        background: var(--bg-ternary);
+        background: var(--component-bg-hover);
         color: var(--text-primary);
       }
+      &.p-highlight {
+        background: var(--component-bg-active);
+        color: var(--accent-primary);
+      }
     }
-  }
-}
-/* ==============================================
-   REPLACE .list-grid-area WITH THESE STYLES
-   ============================================== */
-
-/* === UNIFIED CONTENT CARD === */
-/* This class is on the themed-card */
-.list-content-area {
-  flex-grow: 1; /* This MAKES THE CARD fill the remaining height */
-  min-height: 0; /* Crucial for flex-grow to work */
-  
-  /* We use flex-column to stack the filters ON TOP of the grid */
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg); /* This creates space between filters and grid */
-  
-  /* The padding is already on .themed-card, so we're good */
-}
-
-/* === GRID WRAPPER === */
-/* This wrapper ensures the grid component fills the space INSIDE the card */
-.list-grid-wrapper {
-  flex-grow: 1; /* This MAKES THE GRID fill the remaining space */
-  min-height: 0; /* Crucial again */
-
-  app-shared-grid {
-    height: 100%;
-    width: 100%;
   }
 }

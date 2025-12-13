@@ -1,0 +1,616 @@
+import {
+  Component,
+  ChangeDetectionStrategy,
+  ViewEncapsulation,
+  input,
+  output,
+  computed
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { AgGridAngular } from 'ag-grid-angular';
+
+import {
+  
+  ColDef,
+  GridApi,
+  GridReadyEvent,
+  GridOptions,
+  RowSelectionOptions,
+  ClientSideRowModelModule,
+  CsvExportModule,
+  TooltipModule,
+  BodyScrollEndEvent,
+  CellClickedEvent,
+  themeQuartz,
+  Theme
+} from 'ag-grid-community';
+
+import { ActionbuttonsComponent } from '../AgGrid/AgGridcomponents/actionbuttons/actionbuttons.component';
+
+/* --------------------------------------------------
+   AG GRID MODULE REGISTRATION
+--------------------------------------------------- */
+// ModuleRegistry.registerModules([
+//   ClientSideRowModelModule,
+//   CsvExportModule,
+//   TooltipModule
+// ]);
+import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
+ModuleRegistry.registerModules([AllCommunityModule]);
+/* --------------------------------------------------
+   GRID EVENT CONTRACT
+--------------------------------------------------- */
+export type SharedGridEvent<T> =
+  | { type: 'init'; api: GridApi<T> }
+  | { type: 'cellClicked'; row: T; field: string; value: any }
+  | { type: 'selectionChanged'; rows: T[] }
+  | { type: 'cellEdited'; row: T; field: string; value: any }
+  | { type: 'editStart'; row: T }
+  | { type: 'save'; row: T }
+  | { type: 'cancel'; row: T }
+  | { type: 'delete'; row: T }
+  | { type: 'reachedBottom' };
+
+@Component({
+  selector: 'app-ag-share-grid',
+  standalone: true,
+  imports: [CommonModule, FormsModule, AgGridAngular],
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+
+  template: `
+    <div class="shared-grid-root">
+      <ag-grid-angular
+        class="ag-theme-quartz"
+        style="width:100%; height:100%;"
+        [theme]="agTheme()"
+        [components]="components"
+        [rowData]="data() ?? []"
+        [columnDefs]="resolvedColumns()"
+        [gridOptions]="gridOptions"
+        [rowSelection]="selectionOptions"
+        (gridReady)="onGridReady($event)"
+        (cellClicked)="onCellClicked($event)"
+        (cellValueChanged)="onCellValueChanged($event)"
+        (selectionChanged)="onSelectionChanged()"
+        (bodyScrollEnd)="onBodyScrollEnd($event)">
+      </ag-grid-angular>
+    </div>
+  `,
+
+  styles: [`
+    :host {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .shared-grid-root {
+      width: 100%;
+      height: 100%;
+      min-height: 350px;
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius-lg);
+      overflow: hidden;
+      background: var(--bg-primary);
+    }
+  `]
+})
+export class AgShareGrid<T = any> {
+
+  /* --------------------------------------------------
+     INPUTS
+  --------------------------------------------------- */
+  readonly columns = input.required<ColDef<T>[]>();
+  readonly data = input<T[] | null>([]);
+  readonly selectionMode = input<'single' | 'multiple' | null>(null);
+  readonly showActions = input(false);
+
+  /* --------------------------------------------------
+     OUTPUT
+  --------------------------------------------------- */
+  readonly gridEvent = output<SharedGridEvent<T>>();
+
+  /* --------------------------------------------------
+     INTERNAL STATE
+  --------------------------------------------------- */
+  private api!: GridApi<T>;
+  private editingRowId: string | number | null = null;
+  private originalRowSnapshot: any = null;
+
+  /* --------------------------------------------------
+     AG GRID COMPONENT REGISTRY (v33+)
+  --------------------------------------------------- */
+  components = {
+    ActionbuttonsComponent
+  };
+
+  /* --------------------------------------------------
+     THEME (TOKEN DRIVEN)
+  --------------------------------------------------- */
+  // readonly agTheme = computed<Theme>(() =>
+  //   themeQuartz.withParams({
+  //     fontFamily: 'var(--font-body)',
+  //     fontSize: 'var(--font-size-base)',
+
+  //     backgroundColor: 'var(--bg-primary)',
+  //     headerBackgroundColor: 'var(--bg-secondary)',
+  //     foregroundColor: 'var(--text-primary)',
+  //     secondaryForegroundColor: 'var(--text-secondary)',
+  //     headerTextColor: 'var(--text-label)',
+
+  //     borderColor: 'var(--border-primary)',
+  //     rowHoverColor: 'var(--component-bg-hover)',
+  //     selectedRowBackgroundColor: 'var(--accent-focus)',
+
+  //     inputBackgroundColor: 'var(--bg-ternary)',
+  //     inputBorderColor: 'var(--component-border-focus)',
+
+  //     scrollbarThumbColor: 'var(--scroll-thumb-c)',
+  //     scrollbarTrackColor: 'var(--scroll-track-c)',
+
+  //     rowHeight: 44,
+  //     headerHeight: 44,
+  //     spacing: 6
+  //   })
+  // );
+readonly agTheme = computed<Theme>(() =>
+  themeQuartz.withParams({
+    /* Typography */
+    fontFamily: 'var(--font-body)',
+    fontSize: 'var(--font-size-base)',
+
+    /* Backgrounds */
+    backgroundColor: 'var(--bg-primary)',
+    headerBackgroundColor: 'var(--bg-secondary)',
+
+    /* Text */
+    foregroundColor: 'var(--text-primary)',
+    headerTextColor: 'var(--text-label)',
+
+    /* Borders */
+    borderColor: 'var(--border-primary)',
+
+    /* Interaction */
+    rowHoverColor: 'var(--component-bg-hover)',
+    selectedRowBackgroundColor: 'var(--accent-focus)',
+    rangeSelectionBackgroundColor: 'var(--accent-focus)',
+    rangeSelectionBorderColor: 'var(--accent-primary)',
+
+    /* Inputs */
+    inputBackgroundColor: 'var(--bg-ternary)',
+    inputBorder: 'var(--component-border-focus)',
+    inputPlaceholderTextColor: 'var(--text-tertiary)',
+
+    /* Scrollbars */
+    // scrollbarThumbColor: 'var(--scroll-thumb-c)',
+    // scrollbarTrackColor: 'var(--scroll-track-c)',
+
+    /* Density */
+    rowHeight: 44,
+    headerHeight: 44,
+    spacing: 6
+  })
+);
+
+  /* --------------------------------------------------
+     GRID OPTIONS (CLIENT SIDE SAFE)
+  --------------------------------------------------- */
+  gridOptions: GridOptions<T> = {
+    defaultColDef: {
+      flex: 1,
+      minWidth: 120,
+      sortable: true,
+      filter: true,
+      resizable: true,
+      editable: params =>
+        this.editingRowId === this.getRowId(params.data)
+    },
+    suppressCellFocus: false, // IMPORTANT for clicks
+    animateRows: false,
+    rowBuffer: 20
+  };
+
+  /* --------------------------------------------------
+     COLUMN RESOLUTION
+  --------------------------------------------------- */
+  resolvedColumns = computed<ColDef<T>[]>(() => {
+    const base = this.columns?.();
+    if (!base || base.length === 0) return [];
+
+    const cols = [...base];
+
+    if (this.showActions()) {
+      cols.push({
+        headerName: 'Actions',
+        colId: '__actions__',
+        pinned: 'right',
+        width: 120,
+        editable: false,
+        sortable: false,
+        filter: false,
+        cellRenderer: 'ActionbuttonsComponent',
+        cellRendererParams: {
+          actionHandler: (action: string, row: T) =>
+            this.handleRowAction(action, row),
+          isRowEditing: (id: string | number) =>
+            this.editingRowId === id
+        }
+      });
+    }
+
+    return cols;
+  });
+
+  /* --------------------------------------------------
+     SELECTION
+  --------------------------------------------------- */
+  get selectionOptions(): RowSelectionOptions | undefined {
+    if (!this.selectionMode()) return undefined;
+    return {
+      mode: this.selectionMode() === 'single' ? 'singleRow' : 'multiRow'
+    };
+  }
+
+  /* --------------------------------------------------
+     GRID EVENTS
+  --------------------------------------------------- */
+  onGridReady(e: GridReadyEvent<T>) {
+    this.api = e.api;
+    this.gridEvent.emit({ type: 'init', api: this.api });
+  }
+
+  onSelectionChanged() {
+    this.gridEvent.emit({
+      type: 'selectionChanged',
+      rows: this.api.getSelectedRows()
+    });
+  }
+
+  /**
+   * ✅ THIS IS WHAT YOU WERE MISSING
+   * Fires ONLY when NOT editing
+   */
+  onCellClicked(e: CellClickedEvent<T>) {
+    if (!e.data) return;
+
+    const rowId = this.getRowId(e.data);
+    if (this.editingRowId === rowId) return; // ignore clicks during edit
+
+    this.gridEvent.emit({
+      type: 'cellClicked',
+      row: e.data,
+      field: e.colDef.field!,
+      value: e.value
+    });
+  }
+
+  onCellValueChanged(e: any) {
+    this.gridEvent.emit({
+      type: 'cellEdited',
+      row: e.data,
+      field: e.colDef.field!,
+      value: e.newValue
+    });
+  }
+
+  onBodyScrollEnd(_: BodyScrollEndEvent) {
+    const viewport = document.querySelector('.ag-body-viewport') as HTMLElement;
+    if (!viewport) return;
+
+    if (viewport.scrollTop + viewport.clientHeight >= viewport.scrollHeight - 2) {
+      this.gridEvent.emit({ type: 'reachedBottom' });
+    }
+  }
+
+  /* --------------------------------------------------
+     CRUD CORE
+  --------------------------------------------------- */
+  private handleRowAction(action: string, row: T) {
+    const id = this.getRowId(row);
+
+    switch (action) {
+      case 'edit':
+        this.editingRowId = id;
+        this.originalRowSnapshot = { ...row };
+        this.gridEvent.emit({ type: 'editStart', row });
+        break;
+
+      case 'save':
+        this.editingRowId = null;
+        this.originalRowSnapshot = null;
+        this.gridEvent.emit({ type: 'save', row });
+        break;
+
+      case 'cancel':
+        this.restoreRow(id);
+        this.editingRowId = null;
+        this.originalRowSnapshot = null;
+        this.gridEvent.emit({ type: 'cancel', row });
+        break;
+
+      case 'delete':
+        this.gridEvent.emit({ type: 'delete', row });
+        break;
+    }
+
+    this.api.refreshCells({ force: true });
+  }
+
+  private restoreRow(rowId: string | number) {
+    if (!this.originalRowSnapshot) return;
+    const node = this.api.getRowNode(String(rowId));
+    node?.setData(this.originalRowSnapshot);
+  }
+
+  private getRowId(row: any): string | number {
+    return row?._id ?? row?.id;
+  }
+}
+
+
+// import {
+//   Component,
+//   ChangeDetectionStrategy,
+//   ViewEncapsulation,
+//   input,
+//   output,
+//   computed
+// } from '@angular/core';
+// import { CommonModule } from '@angular/common';
+// import { FormsModule } from '@angular/forms';
+// import { AgGridAngular } from 'ag-grid-angular';
+
+// import {
+//   ModuleRegistry,
+//   ColDef,
+//   GridApi,
+//   GridReadyEvent,
+//   GridOptions,
+//   RowSelectionOptions,
+//   ClientSideRowModelModule,
+//   CsvExportModule,
+//   TooltipModule,
+//   BodyScrollEndEvent
+// } from 'ag-grid-community';
+
+// import { ActionbuttonsComponent } from '../AgGrid/AgGridcomponents/actionbuttons/actionbuttons.component';
+
+// /* --------------------------------------------------
+//    AG GRID MODULE REGISTRATION (CLIENT SIDE ONLY)
+// --------------------------------------------------- */
+// ModuleRegistry.registerModules([
+//   ClientSideRowModelModule,
+//   CsvExportModule,
+//   TooltipModule
+// ]);
+
+// /* --------------------------------------------------
+//    GRID EVENT CONTRACT
+// --------------------------------------------------- */
+// export type SharedGridEvent<T> =
+//   | { type: 'init'; api: GridApi<T> }
+//   | { type: 'selectionChanged'; rows: T[] }
+//   | { type: 'rowClicked'; row: T }
+//   | { type: 'cellEdited'; row: T; field: string; value: any }
+//   | { type: 'editStart'; row: T }
+//   | { type: 'save'; row: T }
+//   | { type: 'cancel'; row: T }
+//   | { type: 'delete'; row: T }
+//   | { type: 'reachedBottom' };
+
+// @Component({
+//   selector: 'app-ag-share-grid',
+//   standalone: true,
+//   imports: [CommonModule, FormsModule, AgGridAngular],
+//   encapsulation: ViewEncapsulation.None,
+//   changeDetection: ChangeDetectionStrategy.OnPush,
+
+//   template: `
+//     <div class="shared-grid-root">
+//       <ag-grid-angular
+//         class="ag-theme-quartz"
+//         style="width:100%; height:100%;"
+//         [components]="components"
+//         [rowData]="data() ?? []"
+//         [columnDefs]="resolvedColumns()"
+//         [gridOptions]="gridOptions"
+//         [rowSelection]="selectionOptions"
+//         (gridReady)="onGridReady($event)"
+//         (rowClicked)="onRowClicked($event)"
+//         (cellValueChanged)="onCellValueChanged($event)"
+//         (selectionChanged)="onSelectionChanged()"
+//         (bodyScrollEnd)="onBodyScrollEnd($event)">
+//       </ag-grid-angular>
+//     </div>
+//   `,
+
+//   styles: [`
+//     :host {
+//       display: block;
+//       width: 100%;
+//       height: 100%;
+//     }
+
+//     .shared-grid-root {
+//       display: flex;
+//       flex-direction: column;
+//       width: 100%;
+//       height: 100%;
+//       min-height: 350px; /* REQUIRED */
+//       border: 1px solid #e5e7eb;
+//       border-radius: 10px;
+//       overflow: hidden;
+//     }
+//   `]
+// })
+// export class AgShareGrid<T = any> {
+
+//   /* --------------------------------------------------
+//      INPUTS
+//   --------------------------------------------------- */
+//   readonly columns = input.required<ColDef<T>[]>();
+//   readonly data = input<T[] | null>([]);
+//   readonly selectionMode = input<'single' | 'multiple' | null>(null);
+//   readonly showActions = input(false);
+
+//   /* --------------------------------------------------
+//      OUTPUT
+//   --------------------------------------------------- */
+//   readonly gridEvent = output<SharedGridEvent<T>>();
+
+//   /* --------------------------------------------------
+//      INTERNAL STATE
+//   --------------------------------------------------- */
+//   private api!: GridApi<T>;
+//   private editingRowId: string | number | null = null;
+//   private originalRowSnapshot: any = null;
+
+//   /* --------------------------------------------------
+//      AG GRID COMPONENT REGISTRY (v33+)
+//   --------------------------------------------------- */
+//   components = {
+//     ActionbuttonsComponent
+//   };
+
+//   /* --------------------------------------------------
+//      GRID OPTIONS (CLIENT SIDE SAFE)
+//   --------------------------------------------------- */
+//   gridOptions: GridOptions<T> = {
+//     defaultColDef: {
+//       flex: 1,
+//       minWidth: 120,
+//       sortable: true,
+//       filter: true,
+//       resizable: true,
+//       editable: params =>
+//         this.editingRowId === this.getRowId(params.data)
+//     },
+//     animateRows: false,
+//     suppressCellFocus: true,
+//     rowBuffer: 20
+//   };
+
+//   /* --------------------------------------------------
+//      COLUMN RESOLUTION
+//   --------------------------------------------------- */
+//   resolvedColumns = computed<ColDef<T>[]>(() => {
+//     const base = this.columns?.();
+//     if (!base || base.length === 0) return [];
+
+//     const cols = [...base];
+
+//     if (this.showActions()) {
+//       cols.push({
+//         headerName: 'Actions',
+//         colId: '__actions__',
+//         pinned: 'right',
+//         width: 120,
+//         editable: false,
+//         sortable: false,
+//         filter: false,
+//         cellRenderer: 'ActionbuttonsComponent',
+//         cellRendererParams: {
+//           actionHandler: (action: string, row: T) =>
+//             this.handleRowAction(action, row),
+//           isRowEditing: (id: string | number) =>
+//             this.editingRowId === id
+//         }
+//       });
+//     }
+
+//     return cols;
+//   });
+
+//   /* --------------------------------------------------
+//      SELECTION
+//   --------------------------------------------------- */
+//   get selectionOptions(): RowSelectionOptions | undefined {
+//     if (!this.selectionMode()) return undefined;
+//     return {
+//       mode: this.selectionMode() === 'single' ? 'singleRow' : 'multiRow'
+//     };
+//   }
+
+//   /* --------------------------------------------------
+//      GRID EVENTS
+//   --------------------------------------------------- */
+//   onGridReady(e: GridReadyEvent<T>) {
+//     this.api = e.api;
+//     this.gridEvent.emit({ type: 'init', api: this.api });
+//   }
+
+//   onSelectionChanged() {
+//     this.gridEvent.emit({
+//       type: 'selectionChanged',
+//       rows: this.api.getSelectedRows()
+//     });
+//   }
+
+//   onRowClicked(e: any) {
+//     this.gridEvent.emit({ type: 'rowClicked', row: e.data });
+//   }
+
+//   onCellValueChanged(e: any) {
+//     this.gridEvent.emit({
+//       type: 'cellEdited',
+//       row: e.data,
+//       field: e.colDef.field!,
+//       value: e.newValue
+//     });
+//   }
+
+//   onBodyScrollEnd(_: BodyScrollEndEvent) {
+//     const viewport = document.querySelector('.ag-body-viewport') as HTMLElement;
+//     if (!viewport) return;
+
+//     if (viewport.scrollTop + viewport.clientHeight >= viewport.scrollHeight - 2) {
+//       this.gridEvent.emit({ type: 'reachedBottom' });
+//     }
+//   }
+
+//   /* --------------------------------------------------
+//      CRUD CORE
+//   --------------------------------------------------- */
+//   private handleRowAction(action: string, row: T) {
+//     const id = this.getRowId(row);
+
+//     switch (action) {
+//       case 'edit':
+//         this.editingRowId = id;
+//         this.originalRowSnapshot = { ...row };
+//         this.gridEvent.emit({ type: 'editStart', row });
+//         break;
+
+//       case 'save':
+//         this.editingRowId = null;
+//         this.originalRowSnapshot = null;
+//         this.gridEvent.emit({ type: 'save', row });
+//         break;
+
+//       case 'cancel':
+//         this.restoreRow(id);
+//         this.editingRowId = null;
+//         this.originalRowSnapshot = null;
+//         this.gridEvent.emit({ type: 'cancel', row });
+//         break;
+
+//       case 'delete':
+//         this.gridEvent.emit({ type: 'delete', row });
+//         break;
+//     }
+
+//     this.api.refreshCells({ force: true });
+//   }
+
+//   private restoreRow(rowId: string | number) {
+//     if (!this.originalRowSnapshot) return;
+//     const node = this.api.getRowNode(String(rowId));
+//     node?.setData(this.originalRowSnapshot);
+//   }
+
+//   private getRowId(row: any): string | number {
+//     return row?._id ?? row?.id;
+//   }
+// }

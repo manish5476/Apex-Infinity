@@ -2,7 +2,6 @@
 <p-confirmDialog></p-confirmDialog>
 
 <div class="list-page-container">
-  <!-- Header -->
   <div class="list-header">
     <h2 class="list-title">
       <i class="pi pi-id-card text-[var(--accent-primary)]"></i>
@@ -11,57 +10,55 @@
     <p-button label="New Role" icon="pi pi-plus" (onClick)="openNewRoleDialog()"></p-button>
   </div>
 
-  <!-- Filter -->
   <div class="themed-card">
     <div class="se-filter-bar">
       <div class="se-filter-field">
         <label>Role Search</label>
         <span class="p-input-icon-left w-full">
           <i class="pi pi-search"></i>
-          <input type="text" pInputText [(ngModel)]="roleFilter.name" (keydown.enter)="applyFilters()" 
-                 placeholder="Search by name..." class="w-full"/>
+          <input type="text" pInputText [(ngModel)]="roleFilter.name" (keydown.enter)="applyFilters()"
+            placeholder="Search by name..." class="w-full" />
         </span>
       </div>
       <div class="se-filter-actions">
         <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()"></p-button>
-        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined" (onClick)="resetFilters()"></p-button>
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined"
+          (onClick)="resetFilters()"></p-button>
       </div>
     </div>
   </div>
 
-  <!-- Grid -->
   <div class="themed-card list-grid-area">
-    <app-shared-grid 
-      [data]="data" [column]="column" [gridHeight]="'210px'"
-      [GridName]="'Roles'" (eventFromGrid)="eventFromGrid($event)"
-      (gridReady)="onGridReady($event)">
-    </app-shared-grid>
+    <app-ag-share-grid 
+      [columns]="column" 
+      [data]="data" 
+      [showActions]="false" 
+      selectionMode="multiple"
+      (gridEvent)="eventFromGrid($event)" 
+      style="height: 100%; width: 100%; display: block;">
+    </app-ag-share-grid>
   </div>
 </div>
 
-<!-- NEW IMPROVED DIALOG -->
-<p-dialog [(visible)]="showRoleDialog" [modal]="true" [style]="{width: '70vw', 'min-width': '600px', 'max-height': '90vh'}"
-  [header]="isEditMode ? 'Edit Role Configuration' : 'Create New Role'" (onHide)="hideDialog()" 
-  [draggable]="false" [resizable]="false" styleClass="role-dialog" [contentStyle]="{'overflow': 'visible'}">
+<p-dialog [(visible)]="showRoleDialog" [modal]="true"
+  [style]="{width: '70vw', 'min-width': '600px', 'max-height': '90vh'}"
+  [header]="isEditMode ? 'Edit Role Configuration' : 'Create New Role'" (onHide)="hideDialog()" [draggable]="false"
+  [resizable]="false" styleClass="role-dialog" [contentStyle]="{'overflow': 'visible'}">
 
   <div class="dialog-content-wrapper">
-    
-    <!-- TOP ROW: INPUTS -->
+
     <div class="form-row">
-      <!-- 1. Role Name Input -->
       <div class="form-field flex-1">
         <label for="roleName">Role Name <span class="required">*</span></label>
-        <input id="roleName" type="text" pInputText [(ngModel)]="currentRole.name" 
-               placeholder="e.g. Sales Associate" class="w-full" />
+        <input id="roleName" type="text" pInputText [(ngModel)]="currentRole.name" placeholder="e.g. Sales Associate"
+          class="w-full" />
       </div>
 
-      <!-- 2. Permission Picker -->
       <div class="form-field flex-1">
         <label for="permPicker">Add Permissions</label>
         <p-multiSelect id="permPicker" [options]="permissionOptions" [(ngModel)]="selectedPermissions"
-          defaultLabel="Select permissions..." optionLabel="label" optionValue="value" 
-          optionGroupLabel="label" optionGroupChildren="items" [group]="true"
-          [filter]="true" [showHeader]="true" display="chip"
+          defaultLabel="Select permissions..." optionLabel="label" optionValue="value" optionGroupLabel="label"
+          optionGroupChildren="items" [group]="true" [filter]="true" [showHeader]="true" display="chip"
           [style]="{'width':'100%'}" appendTo="body" scrollHeight="300px">
         </p-multiSelect>
       </div>
@@ -71,17 +68,14 @@
       <span class="text-sm font-semibold text-[var(--text-secondary)]">ACCESS CAPABILITIES SUMMARY</span>
     </p-divider>
 
-    <!-- BOTTOM ROW: VISUAL SUMMARY (The "Better UI" part) -->
     <div class="permissions-summary-area">
-      
-      <!-- Empty State -->
+
       <div *ngIf="selectedPermissions.length === 0" class="empty-state">
         <i class="pi pi-lock-open text-4xl mb-2 text-[var(--text-secondary)] opacity-50"></i>
         <p>No permissions selected yet.</p>
         <small>Use the dropdown above to assign capabilities to this role.</small>
       </div>
 
-      <!-- Grouped Cards -->
       <div class="perm-groups-grid" *ngIf="selectedPermissions.length > 0">
         <div class="perm-group-card" *ngFor="let group of groupedSelectedPermissions">
           <div class="group-header">

@@ -1,6 +1,7 @@
+<p-toast></p-toast>
+
 <div class="list-page-container">
 
-  <!-- HEADER -->
   <div class="list-header">
     <h2 class="list-title">
       <i class="pi pi-chart-line text-[var(--accent-primary)]"></i>
@@ -10,18 +11,15 @@
     </p-button>
   </div>
 
-  <!-- FILTER BAR -->
   <div class="themed-card">
     <div class="se-filter-bar">
 
-      <!-- Search Input -->
       <div class="se-filter-field" style="flex: 2">
         <label for="search">Search</label>
         <input id="search" type="text" pInputText [formControl]="searchControl"
-          placeholder="Search Invoice # or Customer Name..." />
+          placeholder="Search Invoice # or Customer Name..." class="w-full" />
       </div>
 
-      <!-- Payment Status -->
       <div class="se-filter-field">
         <label for="payStatus">Payment Status</label>
         <p-select appendTo="body" id="payStatus" [options]="paymentStatusOptions"
@@ -29,7 +27,6 @@
         </p-select>
       </div>
 
-      <!-- Order Status -->
       <div class="se-filter-field">
         <label for="status">Order Status</label>
         <p-select appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="salesFilter.status"
@@ -37,7 +34,6 @@
         </p-select>
       </div>
 
-      <!-- Actions -->
       <div class="se-filter-actions">
         <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()">
         </p-button>
@@ -47,13 +43,15 @@
     </div>
   </div>
 
-  <!-- GRID AREA -->
   <div class="list-grid-area themed-card">
-    <app-shared-grid [data]="this.data" [gridHeight]="'210px'" [headerFilter]="false"
-      [rowSelectionMode]="rowSelectionMode" [GridName]="'SalesRegisterList'" [column]="column"
-      (eventFromGrid)="eventFromGrid($event)" (gridReady)="onGridReady($event)"
-      (scrolledToBottom)="onScrolledToBottom($event)">
-    </app-shared-grid>
+    <app-ag-share-grid 
+      [columns]="column" 
+      [data]="data" 
+      [showActions]="false" 
+      selectionMode="multiple"
+      (gridEvent)="eventFromGrid($event)" 
+      style="height: 100%; width: 100%; display: block;">
+    </app-ag-share-grid>
   </div>
 
 </div>

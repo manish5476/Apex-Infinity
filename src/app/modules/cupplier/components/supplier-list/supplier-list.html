@@ -2,58 +2,39 @@
 
 <!-- Using the consistent list page layout -->
 <div class="list-page-container">
-  
+
   <!-- HEADER -->
   <div class="list-header">
     <h2 class="list-title">
       <i class="pi pi-truck text-[var(--accent-primary)]"></i>
       Supplier Management
     </h2>
-    <p-button 
-      label="New Supplier" 
-      icon="pi pi-plus" 
-      routerLink="create">
+    <p-button label="New Supplier" icon="pi pi-plus" routerLink="create">
     </p-button>
   </div>
 
   <!-- FILTER BAR -->
   <div class="themed-card">
     <div class="se-filter-bar">
-      
+
       <!-- Company Name -->
       <div class="se-filter-field">
         <label for="companyName">Company Name</label>
-        <input 
-          id="companyName" 
-          type="text" 
-          pInputText 
-          [(ngModel)]="supplierFilter.companyName"
+        <input id="companyName" type="text" pInputText [(ngModel)]="supplierFilter.companyName"
           placeholder="Search by name" />
       </div>
 
       <!-- Phone -->
       <div class="se-filter-field">
         <label for="phone">Phone</label>
-        <input 
-          id="phone" 
-          type="text" 
-          pInputText 
-          [(ngModel)]="supplierFilter.phone"
-          placeholder="Search by phone" />
+        <input id="phone" type="text" pInputText [(ngModel)]="supplierFilter.phone" placeholder="Search by phone" />
       </div>
 
       <!-- Actions -->
       <div class="se-filter-actions">
-        <p-button 
-          label="Apply" 
-          icon="pi pi-check" 
-          (onClick)="applyFilters()">
+        <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()">
         </p-button>
-        <p-button 
-          label="Reset" 
-          icon="pi pi-refresh" 
-          styleClass="p-button-outlined"
-          (onClick)="resetFilters()">
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined" (onClick)="resetFilters()">
         </p-button>
       </div>
     </div>
@@ -61,7 +42,11 @@
 
   <!-- GRID AREA -->
   <div class="themed-card list-grid-area">
-    <app-shared-grid 
+    <app-ag-share-grid [columns]="column" [data]="data" [showActions]="false" selectionMode="multiple"
+      (gridEvent)="eventFromGrid($event)" style="height: 210px; width: 100%; display: block;">
+    </app-ag-share-grid>
+
+    <!-- <app-shared-grid 
       [data]="data" 
       [gridHeight]="'210px'" 
       [headerFilter]="false" 
@@ -71,7 +56,7 @@
       (eventFromGrid)="eventFromGrid($event)"
       (gridReady)="onGridReady($event)" 
       (scrolledToBottom)="onScrolledToBottom($event)">
-    </app-shared-grid>
+    </app-shared-grid> -->
   </div>
 
 </div>

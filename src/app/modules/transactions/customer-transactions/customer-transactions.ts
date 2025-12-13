@@ -9,20 +9,22 @@ import { InputTextModule } from 'primeng/inputtext';
 import { DatePickerModule } from 'primeng/datepicker';
 import { Toast } from "primeng/toast";
 import { CommonMethodService } from '../../../core/utils/common-method.service';
-import { SharedGridComponent } from '../../shared/AgGrid/grid/shared-grid/shared-grid.component';
 import { TransactionService } from '../transaction.service';
 
 @Component({
   selector: 'app-customer-transactions',
   standalone: true,
   imports: [
-    CommonModule, SharedGridComponent, SelectModule, FormsModule, 
+    CommonModule,  SelectModule, FormsModule, 
     ButtonModule, InputTextModule, Toast, DatePickerModule
   ],
   templateUrl: './customer-transactions.html',
   styleUrl: './customer-transactions.scss',
 })
 export class CustomerTransactions implements OnInit {
+eventFromGrid($event: Event) {
+throw new Error('Method not implemented.');
+}
   private cdr = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute); // Inject Route
   private transactionService = inject(TransactionService);

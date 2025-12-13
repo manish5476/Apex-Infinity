@@ -22,6 +22,7 @@ import { AppMessageService } from '../../../../core/services/message.service';
 import { Textarea } from 'primeng/textarea';
 import { ChipModule } from 'primeng/chip';
 import { ChipsComponent } from '../../../shared/components/chips.component';
+import { ToggleButton } from 'primeng/togglebutton';
 @Component({
   selector: 'app-product-form',
   standalone: true,
@@ -29,7 +30,7 @@ import { ChipsComponent } from '../../../shared/components/chips.component';
     CommonModule,
     ReactiveFormsModule,
     ToastModule,ChipModule,ChipsComponent,
-    ButtonModule,
+    ButtonModule,ToggleButton,
     AccordionModule, // Added import
     InputTextModule,
     InputNumberModule,
@@ -67,8 +68,8 @@ export class ProductFormComponent implements OnInit {
   constructor() {
     this.branchOptions.set(this.masterList.branches());
     // Example:
-    // this.categoryOptions.set(this.masterList.categories());
-    // this.brandOptions.set(this.masterList.brands());
+    this.categoryOptions.set(this.masterList.categories());
+    this.brandOptions.set(this.masterList.brands());
     this.supplierOptions.set(this.masterList.suppliers());
   }
 
