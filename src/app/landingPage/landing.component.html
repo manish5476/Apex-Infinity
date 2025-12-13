@@ -1,103 +1,116 @@
-<div class="font-sans antialiased selection:bg-indigo-500 selection:text-white bg-slate-950 text-slate-50 overflow-x-hidden w-full min-h-screen relative">
+<div class="landing-root font-sans antialiased selection:bg-indigo-500 selection:text-white bg-slate-950 text-slate-50 w-full min-h-screen relative">
 
+  <!-- Background Effects -->
+  <div class="mesh-bg"></div>
   <div class="fixed inset-0 bg-grid pointer-events-none z-0"></div>
   <div class="fixed top-0 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-[128px] animate-blob z-0"></div>
   <div class="fixed bottom-0 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[128px] animate-blob animation-delay-2000 z-0"></div>
+  <div class="fixed top-1/2 right-1/3 w-96 h-96 bg-cyan-600/15 rounded-full blur-[128px] animate-blob animation-delay-4000 z-0"></div>
 
-  <nav class="fixed w-full z-50 top-0 border-b border-white/5 bg-slate-950/80 backdrop-blur-xl transition-all duration-300">
+  <!-- Navigation -->
+  <nav class="nav border-b border-white/5 bg-slate-950/90 backdrop-blur-xl transition-all duration-300 shadow-xl">
     <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
       <div class="flex items-center gap-2 font-display font-bold text-2xl tracking-tight cursor-pointer">
-        <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+        <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30 animate-pulse-slow">
           <i class="pi pi-clone text-white" style="font-size: 1.5rem"></i>
         </div>
-        Nexus<span class="text-indigo-400">ERP</span>
+        Nexus<span class="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">ERP</span>
       </div>
       
       <div class="hidden md:flex gap-8 text-sm font-medium text-slate-300">
-        <a href="#features" class="hover:text-white transition">Features</a>
-        <a href="#pricing" class="hover:text-white transition">Pricing</a>
-        <a href="#testimonials" class="hover:text-white transition">Stories</a>
-        <a href="#faq" class="hover:text-white transition">FAQ</a>
+        <a href="#features" class="hover:text-white transition-colors hover:scale-105 transform">Features</a>
+        <a href="#communication" class="hover:text-white transition-colors hover:scale-105 transform">Communication</a>
+        <a href="#pricing" class="hover:text-white transition-colors hover:scale-105 transform">Pricing</a>
+        <a href="#testimonials" class="hover:text-white transition-colors hover:scale-105 transform">Stories</a>
+        <a href="#faq" class="hover:text-white transition-colors hover:scale-105 transform">FAQ</a>
       </div>
 
       <div class="flex gap-4">
-        <button class="hidden sm:block text-slate-300 hover:text-white text-sm font-medium transition">Log in</button>
-        <button class="px-6 py-2.5 bg-white text-slate-900 rounded-lg text-sm font-bold hover:bg-indigo-50 transition shadow-[0_0_20px_rgba(255,255,255,0.3)]">
-          Start Trial
+        <button class="hidden sm:block text-slate-300 hover:text-white text-sm font-medium transition-all hover:scale-105">Log in</button>
+        <button class="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-sm font-bold hover:shadow-2xl hover:shadow-indigo-500/50 transition-all hover:scale-105 animate-shimmer">
+          Start Free Trial
         </button>
       </div>
     </div>
   </nav>
 
+  <!-- Hero Section -->
   <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
     <div class="max-w-7xl mx-auto px-4 text-center relative z-10">
       
-      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 border border-indigo-500/30 text-indigo-300 text-xs font-semibold tracking-wide mb-8 animate-float">
+      <!-- Badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-slate-900 via-indigo-900/50 to-slate-900 border border-indigo-500/30 text-indigo-300 text-xs font-semibold tracking-wide mb-8 animate-float shadow-xl shadow-indigo-500/20">
         <span class="relative flex h-2 w-2">
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
           <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
         </span>
-        New: AI Revenue Forecasting Live v2.0
+        New: Real-time Chat & Broadcast Features Live!
       </div>
 
-      <h1 class="text-5xl md:text-7xl lg:text-8xl font-display font-bold tracking-tight mb-8 leading-[1.1]">
-        Run your business on <br />
-        <span class="gradient-text">pure intelligence.</span>
+      <!-- Headline -->
+      <h1 class="text-5xl md:text-7xl lg:text-8xl font-display font-bold tracking-tight mb-8 leading-[1.1] text-balance">
+        Run your business with <br />
+        <span class="gradient-text-enhanced animate-gradient">pure intelligence.</span>
       </h1>
       
-      <p class="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-        Stop guessing. Start knowing. The only ERP that combines Finance, Inventory, and CRM with predictive AI to forecast your next move.
+      <p class="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed text-pretty">
+        Stop guessing. Start knowing. The only ERP that combines Finance, Inventory, CRM, and <span class="text-indigo-400 font-semibold">Team Communication</span> with predictive AI to forecast your next move.
       </p>
 
+      <!-- CTA Buttons -->
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
-        <button class="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl font-bold text-lg hover:scale-105 transition duration-200 shadow-2xl shadow-indigo-500/40 flex items-center gap-2">
-          Start Free Trial <i class="pi pi-arrow-right" style="font-size: 1rem"></i>
+        <button class="group px-8 py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-xl font-bold text-lg hover:scale-105 transition-all duration-300 shadow-2xl shadow-indigo-500/40 flex items-center gap-2 hover:shadow-indigo-500/60">
+          Start Free Trial 
+          <i class="pi pi-arrow-right group-hover:translate-x-1 transition-transform" style="font-size: 1rem"></i>
         </button>
-        <button class="px-8 py-4 glass rounded-xl font-bold text-lg text-white hover:bg-white/10 transition flex items-center gap-2">
-          <i class="pi pi-play-circle" style="font-size: 1.25rem"></i> Watch Demo
+        <button class="group px-8 py-4 glass rounded-xl font-bold text-lg text-white hover:bg-white/10 transition-all flex items-center gap-2 border border-white/10 hover:border-indigo-400/30">
+          <i class="pi pi-play-circle group-hover:scale-110 transition-transform" style="font-size: 1.25rem"></i> 
+          Watch Demo
         </button>
       </div>
 
+      <!-- 3D Dashboard Preview -->
       <div class="hero-3d-container max-w-6xl mx-auto px-4">
-        <div class="hero-3d-element bg-slate-900 border border-slate-700 rounded-xl overflow-hidden shadow-2xl relative">
-          <div class="h-10 bg-slate-800 border-b border-slate-700 flex items-center px-4 gap-2">
-            <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
-            <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
-            <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
-            <div class="ml-4 px-3 py-1 bg-slate-900 rounded-md text-xs text-slate-500 font-mono">nexus-erp.app/dashboard</div>
+        <div class="hero-3d-element bg-slate-900/80 border border-slate-700/50 rounded-2xl overflow-hidden shadow-2xl relative backdrop-blur-sm">
+          <div class="h-10 bg-slate-800/90 border-b border-slate-700/50 flex items-center px-4 gap-2">
+            <div class="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-400 transition-colors cursor-pointer"></div>
+            <div class="w-3 h-3 rounded-full bg-yellow-500/80 hover:bg-yellow-400 transition-colors cursor-pointer"></div>
+            <div class="w-3 h-3 rounded-full bg-green-500/80 hover:bg-green-400 transition-colors cursor-pointer"></div>
+            <div class="ml-4 px-3 py-1 bg-slate-900/80 rounded-md text-xs text-slate-500 font-mono">nexus-erp.app/dashboard</div>
           </div>
-          <div class="relative bg-slate-900 aspect-video flex items-center justify-center group">
-            <div class="absolute inset-0 bg-gradient-to-b from-slate-900 to-indigo-900/20"></div>
-            <div class="grid grid-cols-12 gap-4 p-8 w-full h-full opacity-80">
-                <div class="col-span-2 bg-slate-800/50 rounded-lg h-full border border-white/5"></div>
+          <div class="relative bg-gradient-to-br from-slate-900 via-slate-900/95 to-indigo-900/30 aspect-video flex items-center justify-center group">
+            <div class="absolute inset-0 bg-gradient-to-b from-slate-900/50 to-indigo-900/20"></div>
+            <div class="grid grid-cols-12 gap-4 p-8 w-full h-full opacity-90">
+                <div class="col-span-2 bg-slate-800/50 rounded-lg h-full border border-white/5 backdrop-blur-sm"></div>
                 <div class="col-span-10 grid grid-cols-3 gap-4">
                     <div class="col-span-3 h-16 flex justify-between items-center mb-4">
                         <div class="h-8 w-48 bg-slate-700/50 rounded animate-pulse"></div>
-                        <div class="h-8 w-24 bg-indigo-600/50 rounded animate-pulse"></div>
+                        <div class="h-8 w-24 bg-gradient-to-r from-indigo-600/50 to-purple-600/50 rounded animate-pulse"></div>
                     </div>
-                    <div class="h-32 bg-slate-800/50 rounded-lg border border-white/5 p-4">
+                    <div class="h-32 bg-slate-800/50 rounded-xl border border-white/5 p-4 hover:border-green-500/30 transition-colors">
                         <div class="h-4 w-12 bg-green-500/20 rounded mb-2"></div>
                         <div class="h-8 w-24 bg-white/10 rounded"></div>
                     </div>
-                    <div class="h-32 bg-slate-800/50 rounded-lg border border-white/5 p-4">
+                    <div class="h-32 bg-slate-800/50 rounded-xl border border-white/5 p-4 hover:border-blue-500/30 transition-colors">
                         <div class="h-4 w-12 bg-blue-500/20 rounded mb-2"></div>
                         <div class="h-8 w-24 bg-white/10 rounded"></div>
                     </div>
-                    <div class="h-32 bg-slate-800/50 rounded-lg border border-white/5 p-4">
+                    <div class="h-32 bg-slate-800/50 rounded-xl border border-white/5 p-4 hover:border-purple-500/30 transition-colors">
                         <div class="h-4 w-12 bg-purple-500/20 rounded mb-2"></div>
                         <div class="h-8 w-24 bg-white/10 rounded"></div>
                     </div>
-                    <div class="col-span-2 h-64 bg-slate-800/50 rounded-lg border border-white/5 flex items-end p-4 gap-2">
-                        <div class="w-full bg-indigo-500/20 h-[40%] rounded-t"></div>
-                        <div class="w-full bg-indigo-500/40 h-[70%] rounded-t"></div>
-                        <div class="w-full bg-indigo-500/60 h-[50%] rounded-t"></div>
-                        <div class="w-full bg-indigo-500/80 h-[90%] rounded-t"></div>
+                    <div class="col-span-2 h-64 bg-slate-800/50 rounded-xl border border-white/5 flex items-end p-4 gap-2">
+                        <div class="w-full bg-indigo-500/20 h-[40%] rounded-t hover:bg-indigo-500/30 transition-colors"></div>
+                        <div class="w-full bg-indigo-500/40 h-[70%] rounded-t hover:bg-indigo-500/50 transition-colors"></div>
+                        <div class="w-full bg-indigo-500/60 h-[50%] rounded-t hover:bg-indigo-500/70 transition-colors"></div>
+                        <div class="w-full bg-indigo-500/80 h-[90%] rounded-t hover:bg-indigo-500/90 transition-colors"></div>
                     </div>
-                    <div class="col-span-1 h-64 bg-slate-800/50 rounded-lg border border-white/5"></div>
+                    <div class="col-span-1 h-64 bg-slate-800/50 rounded-xl border border-white/5"></div>
                 </div>
             </div>
             
-            <div class="absolute top-1/4 right-10 glass px-6 py-4 rounded-xl animate-float shadow-xl">
+            <!-- Floating Stat Cards -->
+            <div class="absolute top-1/4 right-10 glass px-6 py-4 rounded-xl animate-float shadow-2xl border border-indigo-500/20 backdrop-blur-md">
                 <div class="flex items-center gap-3">
                     <div class="p-2 bg-green-500/20 rounded-lg text-green-400">
                         <i class="pi pi-chart-line" style="font-size: 1.5rem"></i>
@@ -108,37 +121,157 @@
                     </div>
                 </div>
             </div>
+
+            <div class="absolute bottom-1/4 left-10 glass px-6 py-4 rounded-xl animate-float animation-delay-2000 shadow-2xl border border-purple-500/20 backdrop-blur-md">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-purple-500/20 rounded-lg text-purple-400">
+                        <i class="pi pi-comments" style="font-size: 1.5rem"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs text-slate-400">Team Messages</div>
+                        <div class="text-xl font-bold font-display text-white">1,247</div>
+                    </div>
+                </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <div class="w-full py-10 border-y border-white/5 bg-slate-900/50 backdrop-blur-sm overflow-hidden">
+  <!-- Social Proof -->
+  <div class="w-full py-10 border-y border-white/5 bg-slate-900/30 backdrop-blur-sm overflow-hidden">
     <p class="text-center text-slate-500 text-sm font-medium mb-6 uppercase tracking-widest">Trusted by 500+ Market Leaders</p>
     <div class="relative flex overflow-x-hidden group">
       <div class="animate-scroll whitespace-nowrap flex gap-16 items-center">
-        <span class="text-2xl font-display font-bold text-slate-600">ACME Corp</span>
-        <span class="text-2xl font-display font-bold text-slate-600">Stark Industries</span>
-        <span class="text-2xl font-display font-bold text-slate-600">Wayne Ent.</span>
-        <span class="text-2xl font-display font-bold text-slate-600">Cyberdyne</span>
-        <span class="text-2xl font-display font-bold text-slate-600">Massive Dynamic</span>
-        <span class="text-2xl font-display font-bold text-slate-600">Umbrella Corp</span>
-        <span class="text-2xl font-display font-bold text-slate-600">Globex</span>
-        <span class="text-2xl font-display font-bold text-slate-600">ACME Corp</span>
-        <span class="text-2xl font-display font-bold text-slate-600">Stark Industries</span>
-        <span class="text-2xl font-display font-bold text-slate-600">Wayne Ent.</span>
-        <span class="text-2xl font-display font-bold text-slate-600">Cyberdyne</span>
+        <span class="text-2xl font-display font-bold text-slate-600 hover:text-slate-500 transition-colors">ACME Corp</span>
+        <span class="text-2xl font-display font-bold text-slate-600 hover:text-slate-500 transition-colors">Stark Industries</span>
+        <span class="text-2xl font-display font-bold text-slate-600 hover:text-slate-500 transition-colors">Wayne Ent.</span>
+        <span class="text-2xl font-display font-bold text-slate-600 hover:text-slate-500 transition-colors">Cyberdyne</span>
+        <span class="text-2xl font-display font-bold text-slate-600 hover:text-slate-500 transition-colors">Massive Dynamic</span>
+        <span class="text-2xl font-display font-bold text-slate-600 hover:text-slate-500 transition-colors">Umbrella Corp</span>
+        <span class="text-2xl font-display font-bold text-slate-600 hover:text-slate-500 transition-colors">Globex</span>
+        <span class="text-2xl font-display font-bold text-slate-600 hover:text-slate-500 transition-colors">ACME Corp</span>
+        <span class="text-2xl font-display font-bold text-slate-600 hover:text-slate-500 transition-colors">Stark Industries</span>
+        <span class="text-2xl font-display font-bold text-slate-600 hover:text-slate-500 transition-colors">Wayne Ent.</span>
+        <span class="text-2xl font-display font-bold text-slate-600 hover:text-slate-500 transition-colors">Cyberdyne</span>
       </div>
     </div>
   </div>
 
-  <section id="features" class="py-24 relative z-10 min-h-screen">
+  <!-- <CHANGE> New Communication Features Highlight Section -->
+  <section id="communication" class="py-24 relative z-10 overflow-hidden">
     <div class="max-w-7xl mx-auto px-4">
       <div class="text-center mb-16 reveal">
-        <h2 class="text-4xl md:text-5xl font-display font-bold mb-4">The Complete <span class="gradient-text">Feature Suite</span></h2>
-        <p class="text-slate-400 max-w-2xl mx-auto text-lg">
-          Search through our comprehensive module list. From granular permissions to high-level AI strategy.
+        <h2 class="text-4xl md:text-5xl font-display font-bold mb-4">Built-in <span class="gradient-text-enhanced">Team Communication</span></h2>
+        <p class="text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed text-pretty">
+          Stop switching between apps. Chat, broadcast announcements, and collaborate right inside your ERP.
+        </p>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-8 items-center mb-16">
+        <!-- Chat Feature Card -->
+        <div class="reveal group">
+          <div class="glass-enhanced p-8 rounded-2xl border border-indigo-500/20 hover:border-indigo-500/40 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-indigo-500/20">
+            <div class="flex items-center gap-4 mb-6">
+              <div class="p-4 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl shadow-lg group-hover:scale-110 transition-transform">
+                <i class="pi pi-comments text-white" style="font-size: 2rem"></i>
+              </div>
+              <div>
+                <h3 class="text-2xl font-display font-bold text-white mb-1">Real-time Team Chat</h3>
+                <p class="text-sm text-indigo-400 font-medium">Instant collaboration</p>
+              </div>
+            </div>
+            <p class="text-slate-300 mb-6 leading-relaxed">
+              Organize conversations by departments, projects, or topics. Send direct messages, create group channels, and share files seamlessly. All conversations are encrypted and searchable.
+            </p>
+            <ul class="space-y-3 text-sm text-slate-300">
+              <li class="flex items-center gap-3">
+                <i class="pi pi-check-circle text-green-400"></i> 
+                Public & private channels
+              </li>
+              <li class="flex items-center gap-3">
+                <i class="pi pi-check-circle text-green-400"></i> 
+                File & image sharing
+              </li>
+              <li class="flex items-center gap-3">
+                <i class="pi pi-check-circle text-green-400"></i> 
+                Thread replies & reactions
+              </li>
+              <li class="flex items-center gap-3">
+                <i class="pi pi-check-circle text-green-400"></i> 
+                Message search & history
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Broadcast Feature Card -->
+        <div class="reveal group animation-delay-200">
+          <div class="glass-enhanced p-8 rounded-2xl border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/20">
+            <div class="flex items-center gap-4 mb-6">
+              <div class="p-4 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl shadow-lg group-hover:scale-110 transition-transform">
+                <i class="pi pi-megaphone text-white" style="font-size: 2rem"></i>
+              </div>
+              <div>
+                <h3 class="text-2xl font-display font-bold text-white mb-1">Broadcast Messages</h3>
+                <p class="text-sm text-purple-400 font-medium">Reach everyone instantly</p>
+              </div>
+            </div>
+            <p class="text-slate-300 mb-6 leading-relaxed">
+              Send company-wide announcements, policy updates, or urgent alerts to your entire team instantly. Target specific departments or locations with precision broadcasting.
+            </p>
+            <ul class="space-y-3 text-sm text-slate-300">
+              <li class="flex items-center gap-3">
+                <i class="pi pi-check-circle text-purple-400"></i> 
+                Company-wide announcements
+              </li>
+              <li class="flex items-center gap-3">
+                <i class="pi pi-check-circle text-purple-400"></i> 
+                Department-specific targeting
+              </li>
+              <li class="flex items-center gap-3">
+                <i class="pi pi-check-circle text-purple-400"></i> 
+                Urgent priority messaging
+              </li>
+              <li class="flex items-center gap-3">
+                <i class="pi pi-check-circle text-purple-400"></i> 
+                Read receipt tracking
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Communication Stats -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 reveal">
+        <div class="glass text-center p-6 rounded-xl hover:scale-105 transition-transform border border-white/5">
+          <div class="text-3xl font-display font-bold text-white mb-1">< 100ms</div>
+          <div class="text-xs text-slate-400 uppercase tracking-wide">Message Latency</div>
+        </div>
+        <div class="glass text-center p-6 rounded-xl hover:scale-105 transition-transform border border-white/5">
+          <div class="text-3xl font-display font-bold text-white mb-1">256-bit</div>
+          <div class="text-xs text-slate-400 uppercase tracking-wide">Encryption</div>
+        </div>
+        <div class="glass text-center p-6 rounded-xl hover:scale-105 transition-transform border border-white/5">
+          <div class="text-3xl font-display font-bold text-white mb-1">Unlimited</div>
+          <div class="text-xs text-slate-400 uppercase tracking-wide">Message History</div>
+        </div>
+        <div class="glass text-center p-6 rounded-xl hover:scale-105 transition-transform border border-white/5">
+          <div class="text-3xl font-display font-bold text-white mb-1">99.9%</div>
+          <div class="text-xs text-slate-400 uppercase tracking-wide">Uptime SLA</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="py-24 relative z-10 min-h-screen border-t border-white/5">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="text-center mb-16 reveal">
+        <h2 class="text-4xl md:text-5xl font-display font-bold mb-4">The Complete <span class="gradient-text-enhanced">Feature Suite</span></h2>
+        <p class="text-slate-400 max-w-2xl mx-auto text-lg text-pretty">
+          Search through our comprehensive module list. From granular permissions to high-level AI strategy and team communication.
         </p>
       </div>
 
@@ -146,14 +279,14 @@
         <div class="flex flex-col md:flex-row justify-between gap-6 items-center mb-8">
           <div class="relative w-full md:max-w-md group">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <i class="pi pi-search text-slate-500 group-focus-within:text-indigo-400 transition" style="font-size: 1.25rem"></i>
+              <i class="pi pi-search text-slate-500 group-focus-within:text-indigo-400 transition-colors" style="font-size: 1.25rem"></i>
             </div>
             <input 
               type="text" 
               [ngModel]="searchQuery()"
               (ngModelChange)="searchQuery.set($event)"
               placeholder="Search capabilities..." 
-              class="w-full pl-12 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-white placeholder-slate-500 transition-all">
+              class="w-full pl-12 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-white placeholder-slate-500 transition-all backdrop-blur-sm">
           </div>
         </div>
 
@@ -161,8 +294,8 @@
           @for (cat of categories(); track cat) {
             <button 
               (click)="setCategory(cat)"
-              class="whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all border"
-              [class]="selectedCategory() === cat ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-500 hover:text-white'">
+              class="whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all border hover:scale-105"
+              [class]="selectedCategory() === cat ? 'bg-gradient-to-r from-indigo-600 to-purple-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/30' : 'bg-slate-900/50 border-slate-700 text-slate-400 hover:border-slate-500 hover:text-white'">
               {{ cat }} <span class="ml-1 opacity-60 text-xs">({{ getCategoryCount(cat) }})</span>
             </button>
           }
@@ -171,47 +304,47 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         @for (f of filteredFeatures(); track f.title) {
-          <div class="glass p-6 rounded-xl group transition-all duration-300 hover:-translate-y-1 hover:border-indigo-500/30 reveal">
+          <div class="glass-enhanced p-6 rounded-xl group transition-all duration-300 hover:-translate-y-1 hover:border-indigo-500/40 hover:shadow-xl hover:shadow-indigo-500/10 reveal cursor-pointer">
             <div class="flex justify-between items-start mb-4">
-              <div class="p-3 bg-slate-800/50 rounded-lg text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+              <div class="p-3 bg-slate-800/50 rounded-lg text-indigo-400 group-hover:bg-gradient-to-br group-hover:from-indigo-600 group-hover:to-purple-600 group-hover:text-white transition-all duration-300 group-hover:scale-110">
                 <i class="pi" [ngClass]="f.icon" style="font-size: 1.25rem"></i>
               </div>
-              <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500 border border-slate-800 px-2 py-1 rounded bg-slate-900/50">{{ f.group }}</span>
+              <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500 border border-slate-800 px-2 py-1 rounded bg-slate-900/50 group-hover:border-indigo-500/30 transition-colors">{{ f.group }}</span>
             </div>
-            <h3 class="text-white font-semibold text-base mb-2">{{ f.title }}</h3>
+            <h3 class="text-white font-semibold text-base mb-2 group-hover:text-indigo-300 transition-colors">{{ f.title }}</h3>
             <p class="text-slate-400 text-xs leading-relaxed">{{ f.desc }}</p>
           </div>
         } @empty {
           <div class="col-span-full text-center py-20">
-            <div class="inline-flex p-4 bg-slate-800 rounded-full mb-4">
+            <div class="inline-flex p-4 bg-slate-800/50 rounded-full mb-4">
                 <i class="pi pi-search-minus text-slate-400" style="font-size: 2rem"></i>
             </div>
             <h3 class="text-xl font-bold text-white">No features found</h3>
+            <p class="text-slate-400 mt-2">Try adjusting your search or category filter</p>
           </div>
         }
       </div>
     </div>
   </section>
 
+  <!-- Testimonials -->
   <section id="testimonials" class="py-24 bg-slate-900/30 border-y border-white/5 relative overflow-hidden">
     <div class="max-w-7xl mx-auto px-4">
       <div class="text-center mb-16 reveal">
         <h2 class="text-4xl font-display font-bold mb-4">Loved by CFOs & CTOs</h2>
-        <p class="text-slate-400">See why fast-growing enterprises switch to Nexus.</p>
+        <p class="text-slate-400 text-lg">See why fast-growing enterprises switch to Nexus.</p>
       </div>
 
       <div class="grid md:grid-cols-3 gap-8">
-        <div class="glass p-8 rounded-2xl reveal hover:scale-[1.02] transition duration-300">
+        <div class="glass-enhanced p-8 rounded-2xl reveal hover:scale-[1.02] transition-all duration-300 border border-white/5 hover:border-indigo-500/20 hover:shadow-xl">
           <div class="flex text-yellow-400 mb-4 gap-1">
-            <i class="pi pi-star-fill" style="font-size: 1rem"></i>
-            <i class="pi pi-star-fill" style="font-size: 1rem"></i>
-            <i class="pi pi-star-fill" style="font-size: 1rem"></i>
-            <i class="pi pi-star-fill" style="font-size: 1rem"></i>
-            <i class="pi pi-star-fill" style="font-size: 1rem"></i>
+            @for (i of [1,2,3,4,5]; track i) {
+              <i class="pi pi-star-fill" style="font-size: 1rem"></i>
+            }
           </div>
           <p class="text-slate-300 mb-6 leading-relaxed">"The AI forecasting is spooky accurate. It predicted a stock-out 3 weeks in advance, saving us about $50k in potential lost revenue."</p>
           <div class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center font-bold text-white">JS</div>
+            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center font-bold text-white shadow-lg">JS</div>
             <div>
               <div class="font-bold text-white">James Smith</div>
               <div class="text-xs text-slate-500 uppercase tracking-wide">CFO, RetailGiant</div>
@@ -219,17 +352,15 @@
           </div>
         </div>
 
-        <div class="glass p-8 rounded-2xl reveal hover:scale-[1.02] transition duration-300 delay-100">
+        <div class="glass-enhanced p-8 rounded-2xl reveal hover:scale-[1.02] transition-all duration-300 delay-100 border border-white/5 hover:border-purple-500/20 hover:shadow-xl">
           <div class="flex text-yellow-400 mb-4 gap-1">
-            <i class="pi pi-star-fill" style="font-size: 1rem"></i>
-            <i class="pi pi-star-fill" style="font-size: 1rem"></i>
-            <i class="pi pi-star-fill" style="font-size: 1rem"></i>
-            <i class="pi pi-star-fill" style="font-size: 1rem"></i>
-            <i class="pi pi-star-fill" style="font-size: 1rem"></i>
+            @for (i of [1,2,3,4,5]; track i) {
+              <i class="pi pi-star-fill" style="font-size: 1rem"></i>
+            }
           </div>
           <p class="text-slate-300 mb-6 leading-relaxed">"Finally, an ERP that doesn't feel like it was built in 1995. The UI is stunning and the API documentation is a dream for our dev team."</p>
           <div class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-400 to-pink-500 flex items-center justify-center font-bold text-white">EL</div>
+            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-400 to-pink-500 flex items-center justify-center font-bold text-white shadow-lg">EL</div>
             <div>
               <div class="font-bold text-white">Elena Li</div>
               <div class="text-xs text-slate-500 uppercase tracking-wide">CTO, TechFlow</div>
@@ -237,17 +368,15 @@
           </div>
         </div>
 
-        <div class="glass p-8 rounded-2xl reveal hover:scale-[1.02] transition duration-300 delay-200">
+        <div class="glass-enhanced p-8 rounded-2xl reveal hover:scale-[1.02] transition-all duration-300 delay-200 border border-white/5 hover:border-orange-500/20 hover:shadow-xl">
           <div class="flex text-yellow-400 mb-4 gap-1">
-            <i class="pi pi-star-fill" style="font-size: 1rem"></i>
-            <i class="pi pi-star-fill" style="font-size: 1rem"></i>
-            <i class="pi pi-star-fill" style="font-size: 1rem"></i>
-            <i class="pi pi-star-fill" style="font-size: 1rem"></i>
-            <i class="pi pi-star-fill" style="font-size: 1rem"></i>
+            @for (i of [1,2,3,4,5]; track i) {
+              <i class="pi pi-star-fill" style="font-size: 1rem"></i>
+            }
           </div>
-          <p class="text-slate-300 mb-6 leading-relaxed">"The RBAC (Role Based Access) is granular enough for our 500+ staff. Secure, fast, and the support team actually responds."</p>
+          <p class="text-slate-300 mb-6 leading-relaxed">"The built-in chat and broadcast features eliminated our need for Slack. Everything is in one place now. Our team communication improved 10x."</p>
           <div class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-orange-400 to-red-500 flex items-center justify-center font-bold text-white">MK</div>
+            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-orange-400 to-red-500 flex items-center justify-center font-bold text-white shadow-lg">MK</div>
             <div>
               <div class="font-bold text-white">Marcus King</div>
               <div class="text-xs text-slate-500 uppercase tracking-wide">Ops Director, LogiCorp</div>
@@ -258,63 +387,73 @@
     </div>
   </section>
 
+  <!-- Pricing -->
   <section id="pricing" class="py-24 relative">
     <div class="max-w-7xl mx-auto px-4">
       <div class="text-center mb-10 reveal">
         <h2 class="text-4xl font-display font-bold mb-4">Simple, Transparent Pricing</h2>
-        <p class="text-slate-400">No hidden fees. Cancel anytime.</p>
+        <p class="text-slate-400 text-lg">No hidden fees. Cancel anytime.</p>
         
         <div class="flex items-center justify-center gap-4 mt-8">
           <span class="text-sm font-medium text-slate-300">Monthly</span>
-          <button (click)="togglePricing()" class="w-14 h-8 rounded-full p-1 transition-colors relative" 
-            [class.bg-indigo-600]="isYearly()" [class.bg-slate-600]="!isYearly()">
-            <div class="w-6 h-6 bg-white rounded-full transition-transform transform" [class.translate-x-6]="isYearly()"></div>
+          <button (click)="togglePricing()" class="w-14 h-8 rounded-full p-1 transition-colors relative shadow-lg" 
+            [class.bg-gradient-to-r]="isYearly()"
+            [class.from-indigo-600]="isYearly()"
+            [class.to-purple-600]="isYearly()" 
+            [class.bg-slate-600]="!isYearly()">
+            <div class="w-6 h-6 bg-white rounded-full transition-transform transform shadow-md" [class.translate-x-6]="isYearly()"></div>
           </button>
-          <span class="text-sm font-medium text-white">Yearly <span class="text-green-400 text-xs ml-1 font-bold">-20%</span></span>
+          <span class="text-sm font-medium text-white">Yearly <span class="text-green-400 text-xs ml-1 font-bold px-2 py-1 bg-green-500/10 rounded-full">Save 20%</span></span>
         </div>
       </div>
 
       <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-        <div class="glass p-8 rounded-2xl border border-white/5 reveal">
+        <!-- Starter Plan -->
+        <div class="glass-enhanced p-8 rounded-2xl border border-white/5 reveal hover:scale-[1.02] transition-all">
           <h3 class="text-lg font-bold text-slate-300 mb-2">Starter</h3>
           <div class="text-4xl font-display font-bold mb-6 text-white">
             {{ isYearly() ? '$39' : '$49' }}<span class="text-lg text-slate-500 font-normal">/mo</span>
           </div>
           <p class="text-slate-400 text-sm mb-8">Perfect for small businesses just getting started.</p>
-          <button class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-bold transition mb-8">Start Free Trial</button>
+          <button class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-bold transition-all hover:scale-105 mb-8">Start Free Trial</button>
           <ul class="space-y-4 text-sm text-slate-300">
             <li class="flex items-center gap-3"><i class="pi pi-check text-green-400"></i> Single Branch</li>
             <li class="flex items-center gap-3"><i class="pi pi-check text-green-400"></i> Basic Analytics</li>
             <li class="flex items-center gap-3"><i class="pi pi-check text-green-400"></i> 5 Users</li>
+            <li class="flex items-center gap-3"><i class="pi pi-check text-green-400"></i> Team Chat (10 channels)</li>
             <li class="flex items-center gap-3"><i class="pi pi-check text-green-400"></i> Email Support</li>
           </ul>
         </div>
 
-        <div class="p-8 rounded-2xl border border-indigo-500 bg-slate-900/80 relative transform md:-translate-y-4 shadow-2xl shadow-indigo-500/20 reveal">
-          <div class="absolute top-0 right-0 bg-indigo-600 text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg">POPULAR</div>
+        <!-- Growth Plan (Popular) -->
+        <div class="p-8 rounded-2xl border-2 border-indigo-500 bg-slate-900/80 relative transform md:-translate-y-4 shadow-2xl shadow-indigo-500/20 reveal hover:scale-[1.02] transition-all backdrop-blur-sm">
+          <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-indigo-600 to-purple-600 text-xs font-bold px-4 py-2 rounded-full shadow-lg">MOST POPULAR</div>
           <h3 class="text-lg font-bold text-indigo-400 mb-2">Growth</h3>
           <div class="text-4xl font-display font-bold mb-6 text-white">
             {{ isYearly() ? '$119' : '$149' }}<span class="text-lg text-slate-500 font-normal">/mo</span>
           </div>
           <p class="text-slate-400 text-sm mb-8">For scaling companies needing AI power.</p>
-          <button class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold transition mb-8 shadow-lg shadow-indigo-500/25">Get Started</button>
+          <button class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:shadow-2xl hover:shadow-indigo-500/40 text-white rounded-lg font-bold transition-all hover:scale-105 mb-8">Get Started</button>
           <ul class="space-y-4 text-sm text-slate-300">
             <li class="flex items-center gap-3"><i class="pi pi-check text-indigo-400"></i> Multi-Branch (Up to 5)</li>
             <li class="flex items-center gap-3"><i class="pi pi-check text-indigo-400"></i> <strong>AI Forecasting</strong></li>
             <li class="flex items-center gap-3"><i class="pi pi-check text-indigo-400"></i> 25 Users</li>
+            <li class="flex items-center gap-3"><i class="pi pi-check text-indigo-400"></i> <strong>Unlimited Chat & Broadcast</strong></li>
             <li class="flex items-center gap-3"><i class="pi pi-check text-indigo-400"></i> Priority Support</li>
           </ul>
         </div>
 
-        <div class="glass p-8 rounded-2xl border border-white/5 reveal">
+        <!-- Enterprise Plan -->
+        <div class="glass-enhanced p-8 rounded-2xl border border-white/5 reveal hover:scale-[1.02] transition-all">
           <h3 class="text-lg font-bold text-slate-300 mb-2">Enterprise</h3>
           <div class="text-4xl font-display font-bold mb-6 text-white">Custom</div>
           <p class="text-slate-400 text-sm mb-8">Full control for large organizations.</p>
-          <button class="w-full py-3 bg-white text-slate-900 hover:bg-slate-200 rounded-lg font-bold transition mb-8">Contact Sales</button>
+          <button class="w-full py-3 bg-white text-slate-900 hover:bg-slate-200 rounded-lg font-bold transition-all hover:scale-105 mb-8">Contact Sales</button>
           <ul class="space-y-4 text-sm text-slate-300">
             <li class="flex items-center gap-3"><i class="pi pi-check text-green-400"></i> Unlimited Branches</li>
             <li class="flex items-center gap-3"><i class="pi pi-check text-green-400"></i> Dedicated Server</li>
             <li class="flex items-center gap-3"><i class="pi pi-check text-green-400"></i> Unlimited Users</li>
+            <li class="flex items-center gap-3"><i class="pi pi-check text-green-400"></i> Advanced Security</li>
             <li class="flex items-center gap-3"><i class="pi pi-check text-green-400"></i> 24/7 Phone Support</li>
           </ul>
         </div>
@@ -322,2202 +461,107 @@
     </div>
   </section>
 
+  <!-- FAQ -->
   <section id="faq" class="py-24 max-w-3xl mx-auto px-4">
     <div class="text-center mb-12 reveal">
       <h2 class="text-3xl font-display font-bold">Frequently Asked Questions</h2>
     </div>
     <div class="space-y-4">
-      <div class="glass rounded-xl overflow-hidden reveal">
-        <button (click)="toggleFaq(1)" class="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none">
+      <div class="glass-enhanced rounded-xl overflow-hidden reveal border border-white/5 hover:border-indigo-500/20 transition-colors">
+        <button (click)="toggleFaq(1)" class="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none hover:bg-white/5 transition-colors">
           <span class="font-medium text-slate-200">Is my data secure?</span>
           <i class="pi pi-chevron-down text-slate-500 transition-transform" [class.rotate-180]="openFaqIndex() === 1"></i>
         </button>
-        <div class="px-6 pb-4 text-slate-400 text-sm" [class.hidden]="openFaqIndex() !== 1">
-          Absolutely. We use bank-grade 256-bit AES encryption for data at rest and TLS 1.3 for data in transit. We also conduct weekly security audits.
+        <div class="px-6 pb-4 text-slate-400 text-sm leading-relaxed" [class.hidden]="openFaqIndex() !== 1">
+          Absolutely. We use bank-grade 256-bit AES encryption for data at rest and TLS 1.3 for data in transit. All chat messages and broadcasts are encrypted end-to-end. We also conduct weekly security audits and maintain SOC 2 compliance.
         </div>
       </div>
-      <div class="glass rounded-xl overflow-hidden reveal">
-        <button (click)="toggleFaq(2)" class="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none">
+      <div class="glass-enhanced rounded-xl overflow-hidden reveal border border-white/5 hover:border-indigo-500/20 transition-colors">
+        <button (click)="toggleFaq(2)" class="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none hover:bg-white/5 transition-colors">
           <span class="font-medium text-slate-200">Can I import data from Tally/Quickbooks?</span>
           <i class="pi pi-chevron-down text-slate-500 transition-transform" [class.rotate-180]="openFaqIndex() === 2"></i>
         </button>
-        <div class="px-6 pb-4 text-slate-400 text-sm" [class.hidden]="openFaqIndex() !== 2">
-          Yes! We have one-click importers for major accounting software including Tally, Quickbooks, and Zoho Books.
+        <div class="px-6 pb-4 text-slate-400 text-sm leading-relaxed" [class.hidden]="openFaqIndex() !== 2">
+          Yes! We have one-click importers for major accounting software including Tally, Quickbooks, and Zoho Books. Our migration team can also help transfer your data safely with zero downtime.
         </div>
       </div>
-      <div class="glass rounded-xl overflow-hidden reveal">
-        <button (click)="toggleFaq(3)" class="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none">
+      <div class="glass-enhanced rounded-xl overflow-hidden reveal border border-white/5 hover:border-indigo-500/20 transition-colors">
+        <button (click)="toggleFaq(3)" class="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none hover:bg-white/5 transition-colors">
           <span class="font-medium text-slate-200">Does the AI really work for small datasets?</span>
           <i class="pi pi-chevron-down text-slate-500 transition-transform" [class.rotate-180]="openFaqIndex() === 3"></i>
         </button>
-        <div class="px-6 pb-4 text-slate-400 text-sm" [class.hidden]="openFaqIndex() !== 3">
-          Our AI models are pre-trained on industry benchmarks. While more data helps, you will see valuable insights immediately after your first month of usage.
+        <div class="px-6 pb-4 text-slate-400 text-sm leading-relaxed" [class.hidden]="openFaqIndex() !== 3">
+          Our AI models are pre-trained on industry benchmarks. While more data helps, you will see valuable insights immediately after your first month of usage. The system learns from your specific business patterns over time.
+        </div>
+      </div>
+      <div class="glass-enhanced rounded-xl overflow-hidden reveal border border-white/5 hover:border-indigo-500/20 transition-colors">
+        <button (click)="toggleFaq(4)" class="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none hover:bg-white/5 transition-colors">
+          <span class="font-medium text-slate-200">How does the team chat compare to Slack?</span>
+          <i class="pi pi-chevron-down text-slate-500 transition-transform" [class.rotate-180]="openFaqIndex() === 4"></i>
+        </button>
+        <div class="px-6 pb-4 text-slate-400 text-sm leading-relaxed" [class.hidden]="openFaqIndex() !== 4">
+          Our chat is built specifically for business operations. It integrates directly with your ERP data, so you can share invoices, inventory updates, and reports without leaving the conversation. Plus, it's included in your plan—no extra subscription needed.
         </div>
       </div>
     </div>
   </section>
 
+  <!-- CTA Section -->
   <section class="py-32 relative overflow-hidden text-center px-4">
-    <div class="absolute inset-0 bg-gradient-to-t from-indigo-900/40 to-slate-950"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-indigo-900/40 via-purple-900/20 to-slate-950"></div>
     <div class="relative z-10 max-w-3xl mx-auto reveal">
-      <h2 class="text-5xl font-display font-bold mb-8">Ready to modernize?</h2>
-      <p class="text-xl text-slate-400 mb-10">Join the platform that is replacing legacy ERP systems globally.</p>
-      <button class="px-10 py-5 bg-white text-slate-900 rounded-full font-bold text-xl hover:scale-105 transition shadow-2xl shadow-indigo-500/20">
+      <h2 class="text-5xl md:text-6xl font-display font-bold mb-8 text-balance">Ready to modernize?</h2>
+      <p class="text-xl text-slate-400 mb-10 text-pretty">Join the platform that is replacing legacy ERP systems globally.</p>
+      <button class="group px-10 py-5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-full font-bold text-xl hover:scale-105 transition-all shadow-2xl shadow-indigo-500/30 hover:shadow-indigo-500/50 flex items-center gap-3 mx-auto">
         Get Started Now
+        <i class="pi pi-arrow-right group-hover:translate-x-1 transition-transform"></i>
       </button>
       <p class="mt-6 text-sm text-slate-500">No credit card required for 14-day trial.</p>
     </div>
   </section>
 
-  <footer class="border-t border-slate-800 bg-slate-950 pt-16 pb-8 px-4">
+  <!-- Footer -->
+  <footer class="border-t border-slate-800 bg-slate-950/80 backdrop-blur-sm pt-16 pb-8 px-4">
     <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
       <div class="col-span-2 md:col-span-1">
         <div class="flex items-center gap-2 font-display font-bold text-xl mb-4">
-          <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+          <div class="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
             <i class="pi pi-clone text-white" style="font-size: 1.25rem"></i>
           </div>
           Nexus
         </div>
-        <p class="text-slate-500 text-sm">Empowering enterprises with intelligence.</p>
+        <p class="text-slate-500 text-sm leading-relaxed">Empowering enterprises with intelligence.</p>
       </div>
       <div>
         <h4 class="font-bold text-white mb-4">Product</h4>
         <ul class="space-y-2 text-sm text-slate-400">
-          <li><a href="#" class="hover:text-indigo-400">Features</a></li>
-          <li><a href="#" class="hover:text-indigo-400">Pricing</a></li>
-          <li><a href="#" class="hover:text-indigo-400">API</a></li>
-          <li><a href="#" class="hover:text-indigo-400">Integrations</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4 class="font-bold text-white mb-4">Company</h4>
-        <ul class="space-y-2 text-sm text-slate-400">
-          <li><a href="#" class="hover:text-indigo-400">About</a></li>
-          <li><a href="#" class="hover:text-indigo-400">Blog</a></li>
-          <li><a href="#" class="hover:text-indigo-400">Careers</a></li>
-          <li><a href="#" class="hover:text-indigo-400">Contact</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4 class="font-bold text-white mb-4">Legal</h4>
-        <ul class="space-y-2 text-sm text-slate-400">
-          <li><a href="#" class="hover:text-indigo-400">Privacy</a></li>
-          <li><a href="#" class="hover:text-indigo-400">Terms</a></li>
-          <li><a href="#" class="hover:text-indigo-400">Security</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="max-w-7xl mx-auto border-t border-slate-800 pt-8 text-center text-slate-600 text-sm">
-      &copy; 2025 NexusERP Inc. All rights reserved.
-    </div>
-  </footer>
-
-</div>
-<!-- <div class="font-sans antialiased selection:bg-indigo-500 selection:text-white bg-slate-950 text-slate-50 overflow-x-hidden w-full min-h-screen relative">
-
-  <div class="fixed inset-0 bg-grid pointer-events-none z-0"></div>
-  <div class="fixed top-0 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-[128px] animate-blob z-0"></div>
-  <div class="fixed bottom-0 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[128px] animate-blob animation-delay-2000 z-0"></div>
-
-  <nav class="fixed w-full z-50 top-0 border-b border-white/5 bg-slate-950/80 backdrop-blur-xl transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
-      <div class="flex items-center gap-2 font-display font-bold text-2xl tracking-tight cursor-pointer">
-        <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
-          <i data-lucide="layers" class="text-white w-6 h-6"></i>
-        </div>
-        Nexus<span class="text-indigo-400">ERP</span>
-      </div>
-      
-      <div class="hidden md:flex gap-8 text-sm font-medium text-slate-300">
-        <a href="#features" class="hover:text-white transition">Features</a>
-        <a href="#pricing" class="hover:text-white transition">Pricing</a>
-        <a href="#testimonials" class="hover:text-white transition">Stories</a>
-        <a href="#faq" class="hover:text-white transition">FAQ</a>
-      </div>
-
-      <div class="flex gap-4">
-        <button class="hidden sm:block text-slate-300 hover:text-white text-sm font-medium transition">Log in</button>
-        <button class="px-6 py-2.5 bg-white text-slate-900 rounded-lg text-sm font-bold hover:bg-indigo-50 transition shadow-[0_0_20px_rgba(255,255,255,0.3)]">
-          Start Trial
-        </button>
-      </div>
-    </div>
-  </nav>
-
-  <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-    <div class="max-w-7xl mx-auto px-4 text-center relative z-10">
-      
-      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 border border-indigo-500/30 text-indigo-300 text-xs font-semibold tracking-wide mb-8 animate-float">
-        <span class="relative flex h-2 w-2">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-        </span>
-        New: AI Revenue Forecasting Live v2.0
-      </div>
-
-      <h1 class="text-5xl md:text-7xl lg:text-8xl font-display font-bold tracking-tight mb-8 leading-[1.1]">
-        Run your business on <br />
-        <span class="gradient-text">pure intelligence.</span>
-      </h1>
-      
-      <p class="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-        Stop guessing. Start knowing. The only ERP that combines Finance, Inventory, and CRM with predictive AI to forecast your next move.
-      </p>
-
-      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
-        <button class="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl font-bold text-lg hover:scale-105 transition duration-200 shadow-2xl shadow-indigo-500/40 flex items-center gap-2">
-          Start Free Trial <i data-lucide="arrow-right" class="w-5 h-5"></i>
-        </button>
-        <button class="px-8 py-4 glass rounded-xl font-bold text-lg text-white hover:bg-white/10 transition flex items-center gap-2">
-          <i data-lucide="play-circle" class="w-5 h-5"></i> Watch Demo
-        </button>
-      </div>
-
-      <div class="hero-3d-container max-w-6xl mx-auto px-4">
-        <div class="hero-3d-element bg-slate-900 border border-slate-700 rounded-xl overflow-hidden shadow-2xl relative">
-          <div class="h-10 bg-slate-800 border-b border-slate-700 flex items-center px-4 gap-2">
-            <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
-            <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
-            <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
-            <div class="ml-4 px-3 py-1 bg-slate-900 rounded-md text-xs text-slate-500 font-mono">nexus-erp.app/dashboard</div>
-          </div>
-          <div class="relative bg-slate-900 aspect-video flex items-center justify-center group">
-            <div class="absolute inset-0 bg-gradient-to-b from-slate-900 to-indigo-900/20"></div>
-            <div class="grid grid-cols-12 gap-4 p-8 w-full h-full opacity-80">
-                <div class="col-span-2 bg-slate-800/50 rounded-lg h-full border border-white/5"></div>
-                <div class="col-span-10 grid grid-cols-3 gap-4">
-                    <div class="col-span-3 h-16 flex justify-between items-center mb-4">
-                        <div class="h-8 w-48 bg-slate-700/50 rounded animate-pulse"></div>
-                        <div class="h-8 w-24 bg-indigo-600/50 rounded animate-pulse"></div>
-                    </div>
-                    <div class="h-32 bg-slate-800/50 rounded-lg border border-white/5 p-4">
-                        <div class="h-4 w-12 bg-green-500/20 rounded mb-2"></div>
-                        <div class="h-8 w-24 bg-white/10 rounded"></div>
-                    </div>
-                    <div class="h-32 bg-slate-800/50 rounded-lg border border-white/5 p-4">
-                        <div class="h-4 w-12 bg-blue-500/20 rounded mb-2"></div>
-                        <div class="h-8 w-24 bg-white/10 rounded"></div>
-                    </div>
-                    <div class="h-32 bg-slate-800/50 rounded-lg border border-white/5 p-4">
-                        <div class="h-4 w-12 bg-purple-500/20 rounded mb-2"></div>
-                        <div class="h-8 w-24 bg-white/10 rounded"></div>
-                    </div>
-                    <div class="col-span-2 h-64 bg-slate-800/50 rounded-lg border border-white/5 flex items-end p-4 gap-2">
-                        <div class="w-full bg-indigo-500/20 h-[40%] rounded-t"></div>
-                        <div class="w-full bg-indigo-500/40 h-[70%] rounded-t"></div>
-                        <div class="w-full bg-indigo-500/60 h-[50%] rounded-t"></div>
-                        <div class="w-full bg-indigo-500/80 h-[90%] rounded-t"></div>
-                    </div>
-                    <div class="col-span-1 h-64 bg-slate-800/50 rounded-lg border border-white/5"></div>
-                </div>
-            </div>
-            
-            <div class="absolute top-1/4 right-10 glass px-6 py-4 rounded-xl animate-float shadow-xl">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 bg-green-500/20 rounded-lg text-green-400"><i data-lucide="trending-up" class="w-6 h-6"></i></div>
-                    <div>
-                        <div class="text-xs text-slate-400">Revenue Forecast</div>
-                        <div class="text-xl font-bold font-display text-white">+24.5%</div>
-                    </div>
-                </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <div class="w-full py-10 border-y border-white/5 bg-slate-900/50 backdrop-blur-sm overflow-hidden">
-    <p class="text-center text-slate-500 text-sm font-medium mb-6 uppercase tracking-widest">Trusted by 500+ Market Leaders</p>
-    <div class="relative flex overflow-x-hidden group">
-      <div class="animate-scroll whitespace-nowrap flex gap-16 items-center">
-        <span class="text-2xl font-display font-bold text-slate-600">ACME Corp</span>
-        <span class="text-2xl font-display font-bold text-slate-600">Stark Industries</span>
-        <span class="text-2xl font-display font-bold text-slate-600">Wayne Ent.</span>
-        <span class="text-2xl font-display font-bold text-slate-600">Cyberdyne</span>
-        <span class="text-2xl font-display font-bold text-slate-600">Massive Dynamic</span>
-        <span class="text-2xl font-display font-bold text-slate-600">Umbrella Corp</span>
-        <span class="text-2xl font-display font-bold text-slate-600">Globex</span>
-        <span class="text-2xl font-display font-bold text-slate-600">ACME Corp</span>
-        <span class="text-2xl font-display font-bold text-slate-600">Stark Industries</span>
-        <span class="text-2xl font-display font-bold text-slate-600">Wayne Ent.</span>
-        <span class="text-2xl font-display font-bold text-slate-600">Cyberdyne</span>
-      </div>
-    </div>
-  </div>
-
-  <section id="features" class="py-24 relative z-10 min-h-screen">
-    <div class="max-w-7xl mx-auto px-4">
-      <div class="text-center mb-16 reveal">
-        <h2 class="text-4xl md:text-5xl font-display font-bold mb-4">The Complete <span class="gradient-text">Feature Suite</span></h2>
-        <p class="text-slate-400 max-w-2xl mx-auto text-lg">
-          Search through our comprehensive module list. From granular permissions to high-level AI strategy.
-        </p>
-      </div>
-
-      <div class="max-w-7xl mx-auto mb-10 reveal">
-        <div class="flex flex-col md:flex-row justify-between gap-6 items-center mb-8">
-          <div class="relative w-full md:max-w-md group">
-            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <i data-lucide="search" class="text-slate-500 w-5 h-5 group-focus-within:text-indigo-400 transition"></i>
-            </div>
-            <input 
-              type="text" 
-              [ngModel]="searchQuery()"
-              (ngModelChange)="searchQuery.set($event)"
-              placeholder="Search capabilities..." 
-              class="w-full pl-12 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-white placeholder-slate-500 transition-all">
-          </div>
-        </div>
-
-        <div class="flex overflow-x-auto pb-4 gap-2 no-scrollbar">
-          @for (cat of categories(); track cat) {
-            <button 
-              (click)="setCategory(cat)"
-              class="whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all border"
-              [class]="selectedCategory() === cat ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-500 hover:text-white'">
-              {{ cat }} <span class="ml-1 opacity-60 text-xs">({{ getCategoryCount(cat) }})</span>
-            </button>
-          }
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        @for (f of filteredFeatures(); track f.title) {
-          <div class="glass p-6 rounded-xl group transition-all duration-300 hover:-translate-y-1 hover:border-indigo-500/30 reveal">
-            <div class="flex justify-between items-start mb-4">
-              <div class="p-3 bg-slate-800/50 rounded-lg text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                <i [attr.data-lucide]="f.icon" class="w-5 h-5"></i>
-              </div>
-              <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500 border border-slate-800 px-2 py-1 rounded bg-slate-900/50">{{ f.group }}</span>
-            </div>
-            <h3 class="text-white font-semibold text-base mb-2">{{ f.title }}</h3>
-            <p class="text-slate-400 text-xs leading-relaxed">{{ f.desc }}</p>
-          </div>
-        } @empty {
-          <div class="col-span-full text-center py-20">
-            <div class="inline-flex p-4 bg-slate-800 rounded-full mb-4"><i data-lucide="search-x" class="text-slate-400 w-8 h-8"></i></div>
-            <h3 class="text-xl font-bold text-white">No features found</h3>
-          </div>
-        }
-      </div>
-    </div>
-  </section>
-
-  <section id="testimonials" class="py-24 bg-slate-900/30 border-y border-white/5 relative overflow-hidden">
-    <div class="max-w-7xl mx-auto px-4">
-      <div class="text-center mb-16 reveal">
-        <h2 class="text-4xl font-display font-bold mb-4">Loved by CFOs & CTOs</h2>
-        <p class="text-slate-400">See why fast-growing enterprises switch to Nexus.</p>
-      </div>
-
-      <div class="grid md:grid-cols-3 gap-8">
-        <div class="glass p-8 rounded-2xl reveal hover:scale-[1.02] transition duration-300">
-          <div class="flex text-yellow-400 mb-4 gap-1">
-            <i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i>
-          </div>
-          <p class="text-slate-300 mb-6 leading-relaxed">"The AI forecasting is spooky accurate. It predicted a stock-out 3 weeks in advance, saving us about $50k in potential lost revenue."</p>
-          <div class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center font-bold text-white">JS</div>
-            <div>
-              <div class="font-bold text-white">James Smith</div>
-              <div class="text-xs text-slate-500 uppercase tracking-wide">CFO, RetailGiant</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="glass p-8 rounded-2xl reveal hover:scale-[1.02] transition duration-300 delay-100">
-          <div class="flex text-yellow-400 mb-4 gap-1">
-            <i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i>
-          </div>
-          <p class="text-slate-300 mb-6 leading-relaxed">"Finally, an ERP that doesn't feel like it was built in 1995. The UI is stunning and the API documentation is a dream for our dev team."</p>
-          <div class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-400 to-pink-500 flex items-center justify-center font-bold text-white">EL</div>
-            <div>
-              <div class="font-bold text-white">Elena Li</div>
-              <div class="text-xs text-slate-500 uppercase tracking-wide">CTO, TechFlow</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="glass p-8 rounded-2xl reveal hover:scale-[1.02] transition duration-300 delay-200">
-          <div class="flex text-yellow-400 mb-4 gap-1">
-            <i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i><i data-lucide="star" class="w-4 h-4 fill-current"></i>
-          </div>
-          <p class="text-slate-300 mb-6 leading-relaxed">"The RBAC (Role Based Access) is granular enough for our 500+ staff. Secure, fast, and the support team actually responds."</p>
-          <div class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-orange-400 to-red-500 flex items-center justify-center font-bold text-white">MK</div>
-            <div>
-              <div class="font-bold text-white">Marcus King</div>
-              <div class="text-xs text-slate-500 uppercase tracking-wide">Ops Director, LogiCorp</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="pricing" class="py-24 relative">
-    <div class="max-w-7xl mx-auto px-4">
-      <div class="text-center mb-10 reveal">
-        <h2 class="text-4xl font-display font-bold mb-4">Simple, Transparent Pricing</h2>
-        <p class="text-slate-400">No hidden fees. Cancel anytime.</p>
-        
-        <div class="flex items-center justify-center gap-4 mt-8">
-          <span class="text-sm font-medium text-slate-300">Monthly</span>
-          <button (click)="togglePricing()" class="w-14 h-8 rounded-full p-1 transition-colors relative" 
-            [class.bg-indigo-600]="isYearly()" [class.bg-slate-600]="!isYearly()">
-            <div class="w-6 h-6 bg-white rounded-full transition-transform transform" [class.translate-x-6]="isYearly()"></div>
-          </button>
-          <span class="text-sm font-medium text-white">Yearly <span class="text-green-400 text-xs ml-1 font-bold">-20%</span></span>
-        </div>
-      </div>
-
-      <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-        <div class="glass p-8 rounded-2xl border border-white/5 reveal">
-          <h3 class="text-lg font-bold text-slate-300 mb-2">Starter</h3>
-          <div class="text-4xl font-display font-bold mb-6 text-white">
-            {{ isYearly() ? '$39' : '$49' }}<span class="text-lg text-slate-500 font-normal">/mo</span>
-          </div>
-          <p class="text-slate-400 text-sm mb-8">Perfect for small businesses just getting started.</p>
-          <button class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-bold transition mb-8">Start Free Trial</button>
-          <ul class="space-y-4 text-sm text-slate-300">
-            <li class="flex items-center gap-3"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> Single Branch</li>
-            <li class="flex items-center gap-3"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> Basic Analytics</li>
-            <li class="flex items-center gap-3"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> 5 Users</li>
-          </ul>
-        </div>
-
-        <div class="p-8 rounded-2xl border border-indigo-500 bg-slate-900/80 relative transform md:-translate-y-4 shadow-2xl shadow-indigo-500/20 reveal">
-          <div class="absolute top-0 right-0 bg-indigo-600 text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg">POPULAR</div>
-          <h3 class="text-lg font-bold text-indigo-400 mb-2">Growth</h3>
-          <div class="text-4xl font-display font-bold mb-6 text-white">
-            {{ isYearly() ? '$119' : '$149' }}<span class="text-lg text-slate-500 font-normal">/mo</span>
-          </div>
-          <p class="text-slate-400 text-sm mb-8">For scaling companies needing AI power.</p>
-          <button class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold transition mb-8 shadow-lg shadow-indigo-500/25">Get Started</button>
-          <ul class="space-y-4 text-sm text-slate-300">
-            <li class="flex items-center gap-3"><i data-lucide="check" class="w-4 h-4 text-indigo-400"></i> Multi-Branch (Up to 5)</li>
-            <li class="flex items-center gap-3"><i data-lucide="check" class="w-4 h-4 text-indigo-400"></i> <strong>AI Forecasting</strong></li>
-            <li class="flex items-center gap-3"><i data-lucide="check" class="w-4 h-4 text-indigo-400"></i> 25 Users</li>
-          </ul>
-        </div>
-
-        <div class="glass p-8 rounded-2xl border border-white/5 reveal">
-          <h3 class="text-lg font-bold text-slate-300 mb-2">Enterprise</h3>
-          <div class="text-4xl font-display font-bold mb-6 text-white">Custom</div>
-          <p class="text-slate-400 text-sm mb-8">Full control for large organizations.</p>
-          <button class="w-full py-3 bg-white text-slate-900 hover:bg-slate-200 rounded-lg font-bold transition mb-8">Contact Sales</button>
-          <ul class="space-y-4 text-sm text-slate-300">
-            <li class="flex items-center gap-3"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> Unlimited Branches</li>
-            <li class="flex items-center gap-3"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> Dedicated Server</li>
-            <li class="flex items-center gap-3"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> 24/7 Phone Support</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="faq" class="py-24 max-w-3xl mx-auto px-4">
-    <div class="text-center mb-12 reveal">
-      <h2 class="text-3xl font-display font-bold">Frequently Asked Questions</h2>
-    </div>
-    <div class="space-y-4">
-      <div class="glass rounded-xl overflow-hidden reveal">
-        <button (click)="toggleFaq(1)" class="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none">
-          <span class="font-medium text-slate-200">Is my data secure?</span>
-          <i data-lucide="chevron-down" class="w-5 h-5 text-slate-500 transition-transform" [class.rotate-180]="openFaqIndex() === 1"></i>
-        </button>
-        <div class="px-6 pb-4 text-slate-400 text-sm" [class.hidden]="openFaqIndex() !== 1">
-          Absolutely. We use bank-grade 256-bit AES encryption for data at rest and TLS 1.3 for data in transit. We also conduct weekly security audits.
-        </div>
-      </div>
-      <div class="glass rounded-xl overflow-hidden reveal">
-        <button (click)="toggleFaq(2)" class="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none">
-          <span class="font-medium text-slate-200">Can I import data from Tally/Quickbooks?</span>
-          <i data-lucide="chevron-down" class="w-5 h-5 text-slate-500 transition-transform" [class.rotate-180]="openFaqIndex() === 2"></i>
-        </button>
-        <div class="px-6 pb-4 text-slate-400 text-sm" [class.hidden]="openFaqIndex() !== 2">
-          Yes! We have one-click importers for major accounting software including Tally, Quickbooks, and Zoho Books.
-        </div>
-      </div>
-      <div class="glass rounded-xl overflow-hidden reveal">
-        <button (click)="toggleFaq(3)" class="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none">
-          <span class="font-medium text-slate-200">Does the AI really work for small datasets?</span>
-          <i data-lucide="chevron-down" class="w-5 h-5 text-slate-500 transition-transform" [class.rotate-180]="openFaqIndex() === 3"></i>
-        </button>
-        <div class="px-6 pb-4 text-slate-400 text-sm" [class.hidden]="openFaqIndex() !== 3">
-          Our AI models are pre-trained on industry benchmarks. While more data helps, you will see valuable insights immediately after your first month of usage.
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="py-32 relative overflow-hidden text-center px-4">
-    <div class="absolute inset-0 bg-gradient-to-t from-indigo-900/40 to-slate-950"></div>
-    <div class="relative z-10 max-w-3xl mx-auto reveal">
-      <h2 class="text-5xl font-display font-bold mb-8">Ready to modernize?</h2>
-      <p class="text-xl text-slate-400 mb-10">Join the platform that is replacing legacy ERP systems globally.</p>
-      <button class="px-10 py-5 bg-white text-slate-900 rounded-full font-bold text-xl hover:scale-105 transition shadow-2xl shadow-indigo-500/20">
-        Get Started Now
-      </button>
-      <p class="mt-6 text-sm text-slate-500">No credit card required for 14-day trial.</p>
-    </div>
-  </section>
-
-  <footer class="border-t border-slate-800 bg-slate-950 pt-16 pb-8 px-4">
-    <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-      <div class="col-span-2 md:col-span-1">
-        <div class="flex items-center gap-2 font-display font-bold text-xl mb-4">
-          <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center"><i data-lucide="layers" class="text-white w-5 h-5"></i></div>
-          Nexus
-        </div>
-        <p class="text-slate-500 text-sm">Empowering enterprises with intelligence.</p>
-      </div>
-      <div>
-        <h4 class="font-bold text-white mb-4">Product</h4>
-        <ul class="space-y-2 text-sm text-slate-400">
-          <li><a href="#" class="hover:text-indigo-400">Features</a></li>
-          <li><a href="#" class="hover:text-indigo-400">Pricing</a></li>
-          <li><a href="#" class="hover:text-indigo-400">API</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4 class="font-bold text-white mb-4">Company</h4>
-        <ul class="space-y-2 text-sm text-slate-400">
-          <li><a href="#" class="hover:text-indigo-400">About</a></li>
-          <li><a href="#" class="hover:text-indigo-400">Careers</a></li>
-          <li><a href="#" class="hover:text-indigo-400">Contact</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4 class="font-bold text-white mb-4">Legal</h4>
-        <ul class="space-y-2 text-sm text-slate-400">
-          <li><a href="#" class="hover:text-indigo-400">Privacy</a></li>
-          <li><a href="#" class="hover:text-indigo-400">Terms</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="max-w-7xl mx-auto border-t border-slate-800 pt-8 text-center text-slate-600 text-sm">
-      &copy; 2025 NexusERP Inc. All rights reserved.
-    </div>
-  </footer>
-
-</div> -->
-<!-- <div class="landing-root">
-  <div class="mesh-bg"></div>
-
-  <nav class="nav">
-    <div class="container nav-inner">
-      <div class="brand">
-        <div class="logo">A</div>
-        <span class="brand-text">Apex<span class="highlight">Infinity</span></span>
-      </div>
-      <div class="nav-links">
-        <a href="#" class="link">Features</a>
-        <a href="#" class="link">Pricing</a>
-        <a href="#" class="link">API</a>
-      </div>
-      <div class="nav-actions">
-        <button class="btn ghost" (click)="toggleTheme()">
-          <i class="pi" [ngClass]="theme === 'light' ? 'pi-moon' : 'pi-sun'"></i>
-        </button>
-        <button class="btn primary">Login</button>
-      </div>
-    </div>
-  </nav>
-
-  <header class="hero">
-    <div class="container hero-grid">
-      <div class="hero-content" #revealItem>
-        <div class="pill">
-          <span class="dot"></span> v20.0.0 Stable Release
-        </div>
-        <h1>The Operating System for <br> <span class="gradient-text">Modern Commerce</span></h1>
-        <p class="lead">
-          Combine CRM, Inventory, and Financials into one fluid timeline.
-          Powered by Generative AI to predict your next move.
-        </p>
-        <div class="hero-actions">
-          <button class="btn primary large">Start Free Trial</button>
-          <button class="btn secondary large"> <i class="pi pi-play"></i> Watch Demo</button>
-        </div>
-
-        <div class="trusted-by">
-          <span>Trusted by 500+ Enterprises</span>
-          <div class="logos">
-            <div class="logo-box">HDFC</div>
-            <div class="logo-box">Zoho</div>
-            <div class="logo-box">Tally</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="hero-visual" #revealItem>
-        <div class="glass-card dashboard-mock">
-          <div class="mock-header">
-            <div class="circles"><span></span><span></span><span></span></div>
-          </div>
-          <div class="mock-body">
-            <div class="sidebar"></div>
-            <div class="main-view">
-              <div class="graph-area"></div>
-              <div class="row">
-                <div class="card-sm"></div>
-                <div class="card-sm"></div>
-              </div>
-            </div>
-          </div>
-          <div class="code-floater">
-            <pre>{{ codeSnippet }}</pre>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <section id="stats-section" class="stats">
-    <div class="container stats-grid">
-      <div class="stat-item" #revealItem>
-        <div class="value">{{ stats.users }}+</div>
-        <div class="label">Active Users</div>
-      </div>
-      <div class="stat-item" #revealItem>
-        <div class="value">₹{{ stats.transactions }}Cr</div>
-        <div class="label">Processed Monthly</div>
-      </div>
-      <div class="stat-item" #revealItem>
-        <div class="value">{{ stats.uptime }}%</div>
-        <div class="label">System Uptime</div>
-      </div>
-      <div class="stat-item" #revealItem>
-        <div class="value">24/7</div>
-        <div class="label">AI Availability</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="modules section-pad">
-    <div class="container">
-      <div class="section-header center">
-        <h2>Unified Architecture</h2>
-        <p>Switch contexts instantly. No data silos.</p>
-      </div>
-
-      <div class="tabs-container" #revealItem>
-        <div class="tabs-list">
-          <button *ngFor="let m of modules" (click)="setActiveTab(m.id)" [class.active]="activeTab === m.id"
-            class="tab-btn">
-            <i [class]="m.icon"></i>
-            {{ m.label }}
-          </button>
-        </div>
-
-        <div class="tab-content">
-          <ng-container *ngFor="let m of modules">
-            <div *ngIf="activeTab === m.id" class="content-animate">
-              <div class="module-detail">
-                <div class="module-text">
-                  <h3>{{ m.title }}</h3>
-                  <p>{{ m.desc }}</p>
-                  <div class="tags">
-                    <span *ngFor="let t of m.tags" class="tag-badge">{{ t }}</span>
-                  </div>
-                  <button class="btn text-link">Explore {{ m.label }} &rarr;</button>
-                </div>
-                <div class="module-graphic">
-                  <div class="graphic-placeholder {{m.id}}"></div>
-                </div>
-              </div>
-            </div>
-          </ng-container>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="bento section-pad">
-    <div class="container">
-      <div class="section-header">
-        <h2>Engineered for Scale</h2>
-      </div>
-      <div class="bento-grid">
-        <div *ngFor="let f of bentoFeatures" class="bento-card" [ngClass]="f.class" #revealItem>
-          <div class="bento-icon"><i [class]="f.icon"></i></div>
-          <h3>{{ f.title }}</h3>
-          <p>{{ f.desc }}</p>
-          <div class="bg-glow"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="roi section-pad">
-    <div class="container">
-      <div class="roi-card" #revealItem>
-        <div class="roi-inputs">
-          <h3>Calculate your ROI</h3>
-          <p>See how much Apex Infinity saves you.</p>
-
-          <div class="input-group">
-            <label>Finance Team Size</label>
-            <input type="range" min="1" max="50" [(ngModel)]="roiEmployees">
-            <span class="val">{{ roiEmployees }} Employees</span>
-          </div>
-
-          <div class="input-group">
-            <label>Hours Saved / Week</label>
-            <input type="range" min="1" max="20" [(ngModel)]="roiHoursSaved">
-            <span class="val">{{ roiHoursSaved }} Hours</span>
-          </div>
-        </div>
-
-        <div class="roi-result">
-          <div class="saving-label">Potential Monthly Savings</div>
-          <div class="saving-value">₹{{ monthlySavings | number }}</div>
-          <p class="sub">Based on avg industry hourly rates.</p>
-          <button class="btn primary">Get Full Report</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="cases section-pad">
-    <div class="container">
-      <div class="section-header center">
-        <h2>Impact Stories</h2>
-      </div>
-      <div class="carousel-wrapper" #revealItem>
-        <button class="nav-btn prev" (click)="prevCase()">&larr;</button>
-        <div class="case-card">
-          <div class="case-metric">{{ caseStudies[carouselIndex].metric }}</div>
-          <div class="case-label">{{ caseStudies[carouselIndex].label }}</div>
-          <h4>{{ caseStudies[carouselIndex].name }}</h4>
-          <p>"{{ caseStudies[carouselIndex].brief }}"</p>
-        </div>
-        <button class="nav-btn next" (click)="nextCase()">&rarr;</button>
-      </div>
-    </div>
-  </section>
-
-  <section class="pricing section-pad">
-    <div class="container">
-      <div class="pricing-grid">
-        <div *ngFor="let p of pricing" class="price-card" [class.highlight]="p.highlight" #revealItem>
-          <div class="p-name">{{ p.name }}</div>
-          <div class="p-cost">{{ p.price }}<span>{{ p.period }}</span></div>
-          <ul class="p-features">
-            <li *ngFor="let f of p.features"><i class="pi pi-check"></i> {{ f }}</li>
-          </ul>
-          <button class="btn" [ngClass]="p.highlight ? 'primary' : 'secondary'">Choose Plan</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <footer class="site-footer">
-    <div class="container footer-content">
-      <div class="footer-brand">28%
-        <h3>Apex Infinity</h3>
-        <p>&copy; 2025 Apex Systems.</p>
-      </div>
-      <div class="footer-links">
-        <a href="#">Privacy</a>
-        <a href="#">Terms</a>
-        <a href="#">Status</a>
-      </div>
-    </div>
-  </footer>
-</div> -->
-
-<!-- Root wrapper provides correct scroll container
-<div class="landing-root">
-
-  Visual backdrop (non-blocking)
-  <div class="backdrop" aria-hidden="true"></div>
-
-  NAV
-  <nav class="nav">
-    <div class="container nav-inner">
-      <div class="brand">
-        <div class="logo">A</div>
-        <div class="brand-text">
-          <div class="name">Apex <span class="brand-gradient">Infinity</span></div>
-          <div class="tag">Enterprise OS • Finance • AI</div>
-        </div>
-      </div>
-
-      <div class="nav-links">
-        <a href="#modules">Modules</a>
-        <a href="#ai">AI</a>
-        <a href="#security">Security</a>
-        <a href="#pricing">Pricing</a>
-      </div>
-
-      <div class="nav-actions">
-        <select (change)="toggleTheme($any($event.target).value)">
-          <option value="light" selected>Light</option>
-          <option value="dark">Dark</option>
-        </select>
-        <a routerLink="/auth/login" class="link">Log in</a>
-        <a routerLink="/auth/org" class="btn primary">Get Started</a>
-      </div>
-    </div>
-  </nav>
-
-  HERO
-  <header class="hero container">
-    <div class="hero-grid">
-      <div class="hero-copy reveal-item" #revealItem>
-        <div class="badge">v2.0 • Live</div>
-        <h1>
-          The Operating System for Modern Enterprises
-          <span class="gradient-text">AI · Finance · Inventory</span>
-        </h1>
-        <p class="lead">Unify financials, inventory and operations in one secure, auditable platform built for scale.
-        </p>
-
-        <div class="hero-actions">
-          <a class="btn primary large" href="#pricing">Start Free Trial</a>
-          <a class="btn ghost" href="#ai">Watch Demo</a>
-        </div>
-
-        <div class="trusted">
-          <small>Trusted by</small>
-          <div class="logos">
-            <div class="logo-pill">AR</div>
-            <div class="logo-pill">BD</div>
-            <div class="logo-pill">CS</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="mock reveal-item" #revealItem>
-        <div class="mock-header">app.apex-infinity.com/dashboard</div>
-        <div class="mock-body">
-          <aside class="mock-side"></aside>
-          <section class="mock-main">
-            <div class="kpis">
-              <div class="kpi"><span class="label">Total Revenue</span><span class="value">₹4.25M</span></div>
-              <div class="kpi"><span class="label">Active Branches</span><span class="value">12</span></div>
-              <div class="kpi"><span class="label">Pending Invoices</span><span class="value">24</span></div>
-            </div>
-            <div class="chart-hero" aria-hidden="true"></div>
-          </section>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  STATS
-  <section id="stats-section" class="stats container reveal-item" #revealItem>
-    <div class="stats-grid">
-      <div class="stat">
-        <div class="num">{{ stats.users }}+</div>
-        <div class="label">Active Organizations</div>
-      </div>
-      <div class="stat">
-        <div class="num">₹{{ stats.transactions }}M</div>
-        <div class="label">Processed Volume</div>
-      </div>
-      <div class="stat">
-        <div class="num">{{ stats.uptime }}%</div>
-        <div class="label">System Uptime</div>
-      </div>
-      <div class="stat">
-        <div class="num">150+</div>
-        <div class="label">Countries Supported</div>
-      </div>
-    </div>
-  </section>
-
-  MODULES
-  <section id="modules" class="modules-section container">
-    <div class="modules-grid">
-      <div class="module-list reveal-item" #revealItem>
-        <h3>Core Modules</h3>
-        <div *ngFor="let mod of modules" (click)="setActiveTab(mod.id)" class="module-item"
-          [class.active]="activeTab===mod.id">
-          <div class="left">
-            <div class="icon"><i [class]="mod.icon"></i></div>
-            <div class="meta">
-              <div class="label">{{ mod.label }}</div>
-              <div class="sub">Integrated & Sync-ready</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="module-detail reveal-item" #revealItem>
-        <div *ngFor="let mod of modules" [hidden]="activeTab !== mod.id">
-          <div class="module-card">
-            <h2>{{ mod.title }}</h2>
-            <p class="muted">{{ mod.desc }}</p>
-            <ul class="feature-list">
-              <li *ngFor="let f of mod.features">{{ f }}</li>
-            </ul>
-            <div class="cta-row"><a routerLink="/auth/org" class="btn primary">Explore {{ mod.label }}</a></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  FEATURES
-  <section class="features-section container">
-    <h3 class="section-title reveal-item" #revealItem>Engineered for Scale</h3>
-    <p class="section-sub muted reveal-item" #revealItem>Everything a growing enterprise needs, out of the box.</p>
-
-    <div class="features-grid reveal-item" #revealItem>
-      <div *ngFor="let f of features" class="feature-card">
-        <div class="feature-icon" [class.highlight]="f.highlight"></div>
-        <h4>{{ f.title }}</h4>
-        <p class="muted">{{ f.desc }}</p>
-      </div>
-    </div>
-  </section>
-
-  AI
-  <section id="ai" class="ai-section container reveal-item" #revealItem>
-    <div class="ai-grid">
-      <div class="ai-copy">
-        <span class="label-sm">Artificial Intelligence</span>
-        <h3>Meet your Financial Analyst</h3>
-        <p class="muted">Natural language forecasts, anomaly detection, and action-ready recommendations.</p>
-
-        <div class="ai-box">
-          <input placeholder="Ask: Forecast next month's revenue" />
-          <button class="btn primary">Ask</button>
-        </div>
-
-        <ul class="ai-bullets">
-          <li>Top product growth: Wireless Earbuds (+12% WoW)</li>
-          <li>Cashflow dip alert: 3 pending vendor payments</li>
-          <li>Inventory risk: 42 SKUs low in Surat branch</li>
-        </ul>
-      </div>
-
-      <div class="ai-preview">
-        <div class="insight-card">
-          <div class="insight-head">Forecast</div>
-          <div class="insight-body"><strong>₹1.2 Cr</strong> (+15% MoM)</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  SECURITY
-  <section id="security" class="security-section container reveal-item" #revealItem>
-    <div class="split">
-      <div>
-        <h3>Security & Compliance</h3>
-        <p class="muted">Audit trails, RBAC, export governance and session monitoring. Designed for enterprise audits.
-        </p>
-        <ul class="security-list">
-          <li>Audit logs & activity streams</li>
-          <li>RBAC with granular permissions</li>
-          <li>Export controls & retention</li>
-        </ul>
-      </div>
-      <div class="security-visual">
-        <div class="secure-box">SOC-ready • ISO-aligned</div>
-      </div>
-    </div>
-  </section>
-
-  PERMISSIONS
-  <section class="perms-section container reveal-item" #revealItem>
-    <h3>Platform Capabilities (selected)</h3>
-    <p class="muted">Representative capabilities derived from Apex permissions map.</p>
-
-    <div class="perms-grid">
-      <div *ngFor="let p of permissionsList" class="perm-card">
-        <div class="perm-tag">{{ p.tag }}</div>
-        <div class="perm-desc">{{ p.desc }}</div>
-        <div class="perm-group">{{ p.group }}</div>
-      </div>
-    </div>
-  </section>
-
-  CASE STUDIES
-  <section class="case-section container reveal-item" #revealItem>
-    <h3>Customer Results</h3>
-    <div class="case-carousel">
-      <button class="carousel-btn" (click)="prevCase()">‹</button>
-      <div class="case-track">
-        <div class="case" *ngFor="let cs of caseStudies; let i=index" [class.active]="i===carouselIndex" #carouselItem>
-          <h4>{{ cs.name }}</h4>
-          <div class="metric">{{ cs.metric }}</div>
-          <p class="muted">{{ cs.brief }}</p>
-        </div>
-      </div>
-      <button class="carousel-btn" (click)="nextCase()">›</button>
-    </div>
-  </section>
-
-  ROADMAP
-  <section class="roadmap-section container reveal-item" #revealItem>
-    <h3>Roadmap</h3>
-    <ol class="roadmap">
-      <li><strong>Q1:</strong> Multi-branch autosync & EMIs</li>
-      <li><strong>Q2:</strong> Advanced AI forecasting & plugins</li>
-      <li><strong>Q3:</strong> Enterprise SSO & audit workflows</li>
-    </ol>
-  </section>
-
-  COMPARISON TABLE
-  <section class="compare-section container reveal-item" #revealItem>
-    <h3>How Apex compares</h3>
-    <p class="muted">Feature-first comparison for decision-makers.</p>
-
-    <div class="table-wrap">
-      <table class="compare-table">
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th>Accounting</th>
-            <th>Inventory</th>
-            <th>AI</th>
-            <th>Permissions</th>
-            <th>Enterprise</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let row of comparison">
-            <td class="product">{{ row.product }}</td>
-            <td>{{ row.accounting }}</td>
-            <td>{{ row.inventory }}</td>
-            <td>{{ row.ai }}</td>
-            <td>{{ row.permissions }}</td>
-            <td>{{ row.enterprise }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  PRICING
-  <section id="pricing" class="pricing-section container reveal-item" #revealItem>
-    <h3>Pricing (teaser)</h3>
-    <div class="pricing-grid">
-      <div *ngFor="let p of pricing" class="price-card">
-        <div class="tier">{{ p.name }}</div>
-        <div class="price">{{ p.price }}</div>
-        <ul>
-          <li *ngFor="let b of p.bullets">{{ b }}</li>
-        </ul>
-        <a class="btn ghost">Choose</a>
-      </div>
-    </div>
-  </section>
-
-  CTA
-  <section class="cta-section container reveal-item" #revealItem>
-    <div class="cta-inner">
-      <div>
-        <h2>Start your 14-day free trial</h2>
-        <p class="muted">No credit card required. Enterprise onboarding available.</p>
-      </div>
-      <div><a routerLink="/auth/org" class="btn primary large">Get Started</a></div>
-    </div>
-  </section>
-
-  FOOTER
-  <footer class="site-footer">
-    <div class="container footer-grid">
-      <div>
-        <h4>Apex Infinity</h4>
-        <p class="muted">The complete operating system for modern enterprises.</p>
-      </div>
-      <div>
-        <h5>Platform</h5>
-        <ul class="muted">
-          <li>Dashboard</li>
-          <li>Inventory</li>
-          <li>Invoicing</li>
-        </ul>
-      </div>
-      <div>
-        <h5>Company</h5>
-        <ul class="muted">
-          <li>About</li>
-          <li>Security</li>
-          <li>Contact</li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-bottom container">
-      <div>© 2025 Apex Infinity</div>
-      <div class="muted">Privacy · Terms</div>
-    </div>
-  </footer>
-
-</div> -->
-
-
-<!-- 
-<div class="landing-root">
-
-  soft gradient fog
-  <div class="backdrop" aria-hidden="true"></div>
-
-  NAV
-  <nav class="nav">
-    <div class="container nav-inner">
-      <div class="brand">
-        <div class="logo">A</div>
-        <div class="brand-text">
-          <div class="name">Apex <span class="brand-gradient">Infinity</span></div>
-          <div class="tag">Enterprise OS • Finance • AI</div>
-        </div>
-      </div>
-
-      <div class="nav-links">
-        <a href="#modules">Modules</a>
-        <a href="#ai">AI</a>
-        <a href="#security">Security</a>
-        <a href="#pricing">Pricing</a>
-      </div>
-
-      <div class="nav-actions">
-        <select (change)="toggleTheme($any($event.target).value)">
-          <option value="light" selected>Light</option>
-          <option value="dark">Dark</option>
-        </select>
-        <a routerLink="/auth/login" class="link">Log in</a>
-        <a routerLink="/auth/org" class="btn primary">Get Started</a>
-      </div>
-    </div>
-  </nav>
-
-  HERO
-  <header class="hero container" id="hero">
-    <div class="hero-grid">
-      <div class="hero-copy reveal-item" #revealItem>
-        <div class="badge">v2.0 • Live</div>
-        <h1>
-          The Operating System for Modern Enterprises
-          <span class="gradient-text">AI · Finance · Inventory</span>
-        </h1>
-        <p class="lead">Unify financials, inventory and operations in one secure, auditable platform built for scale.</p>
-
-        <div class="hero-actions">
-          <a class="btn primary large" href="#pricing">Start Free Trial</a>
-          <a class="btn ghost" href="#ai">Watch Demo</a>
-        </div>
-
-        <div class="trusted">
-          <small>Trusted by</small>
-          <div class="logos">
-            <div class="logo-pill">AR</div>
-            <div class="logo-pill">BD</div>
-            <div class="logo-pill">CS</div>
-          </div>
-        </div>
-      </div>
-
-      MOCK
-      <div class="mock reveal-item" #revealItem>
-        <div class="mock-header">app.apex-infinity.com/dashboard</div>
-        <div class="mock-body">
-          <aside class="mock-side">
-            <div class="accents"></div>
-            <div class="navline"></div>
-          </aside>
-          <section class="mock-main">
-            <div class="kpis">
-              <div class="kpi"><span class="label">Total Revenue</span><span class="value">₹4.25M</span></div>
-              <div class="kpi"><span class="label">Active Branches</span><span class="value">12</span></div>
-              <div class="kpi"><span class="label">Pending Invoices</span><span class="value">24</span></div>
-            </div>
-
-            <div class="chart-hero" aria-hidden="true"></div>
-          </section>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  STATS
-  <section id="stats-section" class="stats container reveal-item" #revealItem>
-    <div class="stats-grid">
-      <div class="stat"><div class="num">{{ stats.users }}+</div><div class="label">Active Organizations</div></div>
-      <div class="stat"><div class="num">₹{{ stats.transactions }}M</div><div class="label">Processed Volume</div></div>
-      <div class="stat"><div class="num">{{ stats.uptime }}%</div><div class="label">System Uptime</div></div>
-      <div class="stat"><div class="num">150+</div><div class="label">Countries Supported</div></div>
-    </div>
-  </section>
-
-  MODULES
-  <section id="modules" class="modules-section container">
-    <div class="modules-grid">
-      <div class="module-list reveal-item" #revealItem>
-        <h3>Core Modules</h3>
-        <div *ngFor="let mod of modules" (click)="setActiveTab(mod.id)" class="module-item" [class.active]="activeTab===mod.id">
-          <div class="left">
-            <div class="icon"><i [class]="mod.icon"></i></div>
-            <div class="meta">
-              <div class="label">{{ mod.label }}</div>
-              <div class="sub">Integrated & Sync-ready</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="module-detail reveal-item" #revealItem>
-        <div *ngFor="let mod of modules" [hidden]="activeTab !== mod.id">
-          <div class="module-card">
-            <h2>{{ mod.title }}</h2>
-            <p class="muted">{{ mod.desc }}</p>
-            <ul class="feature-list">
-              <li *ngFor="let f of mod.features">{{ f }}</li>
-            </ul>
-            <div class="cta-row">
-              <a routerLink="/auth/org" class="btn primary">Explore {{ mod.label }}</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  FEATURES
-  <section class="features-section container">
-    <h3 class="section-title reveal-item" #revealItem>Engineered for Scale</h3>
-    <p class="section-sub muted reveal-item" #revealItem>Everything a growing enterprise needs, out of the box.</p>
-
-    <div class="features-grid reveal-item" #revealItem>
-      <div *ngFor="let f of features" class="feature-card">
-        <div class="feature-icon" [class.highlight]="f.highlight"></div>
-        <h4>{{ f.title }}</h4>
-        <p class="muted">{{ f.desc }}</p>
-      </div>
-    </div>
-  </section>
-
-  AI CFO
-  <section id="ai" class="ai-section container reveal-item" #revealItem>
-    <div class="ai-grid">
-      <div class="ai-copy">
-        <span class="label-sm">Artificial Intelligence</span>
-        <h3>Meet your Financial Analyst</h3>
-        <p class="muted">Natural language forecasts, anomaly detection, and action-ready recommendations.</p>
-
-        <div class="ai-box">
-          <input placeholder="Ask: Forecast next month's revenue" />
-          <button class="btn primary">Ask</button>
-        </div>
-
-        <ul class="ai-bullets">
-          <li>Top product growth: Wireless Earbuds (+12% WoW)</li>
-          <li>Cashflow dip alert: 3 pending vendor payments</li>
-          <li>Inventory risk: 42 SKUs low in Surat branch</li>
-        </ul>
-      </div>
-
-      <div class="ai-preview">
-        <div class="insight-card">
-          <div class="insight-head">Forecast</div>
-          <div class="insight-body"><strong>₹1.2 Cr</strong> (+15% MoM)</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  SECURITY
-  <section id="security" class="security-section container reveal-item" #revealItem>
-    <div class="split">
-      <div>
-        <h3>Security & Compliance</h3>
-        <p class="muted">Audit trails, RBAC, export governance and session monitoring. Designed for enterprise audits.</p>
-
-        <ul class="security-list">
-          <li>Audit logs & activity streams</li>
-          <li>RBAC with granular permissions</li>
-          <li>Export controls & retention</li>
-        </ul>
-      </div>
-      <div class="security-visual">
-        <div class="secure-box">SOC-ready • ISO-aligned</div>
-      </div>
-    </div>
-  </section>
-
-  PERMISSIONS GRID
-  <section class="perms-section container reveal-item" #revealItem>
-    <h3>Platform Capabilities (selected)</h3>
-    <p class="muted">Representative capabilities derived from Apex permissions map.</p>
-
-    <div class="perms-grid">
-      <div *ngFor="let p of permissionsList" class="perm-card">
-        <div class="perm-tag">{{ p.tag }}</div>
-        <div class="perm-desc">{{ p.desc }}</div>
-        <div class="perm-group">{{ p.group }}</div>
-      </div>
-    </div>
-  </section>
-
-  CASE STUDIES
-  <section class="case-section container reveal-item" #revealItem>
-    <h3>Customer Results</h3>
-    <div class="case-carousel">
-      <button class="carousel-btn" (click)="prevCase()">‹</button>
-      <div class="case-track">
-        <div class="case" *ngFor="let cs of caseStudies; let i=index" [class.active]="i===carouselIndex" #carouselItem>
-          <h4>{{ cs.name }}</h4>
-          <div class="metric">{{ cs.metric }}</div>
-          <p class="muted">{{ cs.brief }}</p>
-        </div>
-      </div>
-      <button class="carousel-btn" (click)="nextCase()">›</button>
-    </div>
-  </section>
-
-  ROADMAP
-  <section class="roadmap-section container reveal-item" #revealItem>
-    <h3>Roadmap</h3>
-    <ol class="roadmap">
-      <li><strong>Q1:</strong> Multi-branch autosync & EMIs</li>
-      <li><strong>Q2:</strong> Advanced AI forecasting & plugins</li>
-      <li><strong>Q3:</strong> Enterprise SSO & audit workflows</li>
-    </ol>
-  </section>
-
-  COMPARISON TABLE
-  <section class="compare-section container reveal-item" #revealItem>
-    <h3>How Apex compares</h3>
-    <p class="muted">A practical, feature-first comparison for decision-makers.</p>
-
-    <div class="table-wrap">
-      <table class="compare-table">
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th>Accounting</th>
-            <th>Inventory</th>
-            <th>AI</th>
-            <th>Permissions</th>
-            <th>Enterprise</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let row of comparison">
-            <td class="product">{{ row.product }}</td>
-            <td>{{ row.accounting }}</td>
-            <td>{{ row.inventory }}</td>
-            <td>{{ row.ai }}</td>
-            <td>{{ row.permissions }}</td>
-            <td>{{ row.enterprise }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  PRICING
-  <section id="pricing" class="pricing-section container reveal-item" #revealItem>
-    <h3>Pricing (teaser)</h3>
-    <div class="pricing-grid">
-      <div *ngFor="let p of pricing" class="price-card">
-        <div class="tier">{{ p.name }}</div>
-        <div class="price">{{ p.price }}</div>
-        <ul>
-          <li *ngFor="let b of p.bullets">{{ b }}</li>
-        </ul>
-        <a class="btn ghost">Choose</a>
-      </div>
-    </div>
-  </section>
-
-  CTA
-  <section class="cta-section container reveal-item" #revealItem>
-    <div class="cta-inner">
-      <div>
-        <h2>Start your 14-day free trial</h2>
-        <p class="muted">No credit card required. Enterprise onboarding available.</p>
-      </div>
-      <div>
-        <a routerLink="/auth/org" class="btn primary large">Get Started</a>
-      </div>
-    </div>
-  </section>
-
-  FOOTER
-  <footer class="site-footer">
-    <div class="container footer-grid">
-      <div>
-        <h4>Apex Infinity</h4>
-        <p class="muted">The complete operating system for modern enterprises.</p>
-      </div>
-      <div>
-        <h5>Platform</h5>
-        <ul class="muted"><li>Dashboard</li><li>Inventory</li><li>Invoicing</li></ul>
-      </div>
-      <div>
-        <h5>Company</h5>
-        <ul class="muted"><li>About</li><li>Security</li><li>Contact</li></ul>
-      </div>
-    </div>
-
-    <div class="footer-bottom container">
-      <div>© 2025 Apex Infinity</div>
-      <div class="muted">Privacy · Terms</div>
-    </div>
-  </footer>
-
-</div> -->
-
-<!-- <div class="relative min-h-screen bg-[#0B0F19] text-white font-sans overflow-x-hidden selection:bg-cyan-500/30">
-
-  <div class="fixed inset-0 z-0 pointer-events-none">
-    <div class="absolute top-[-20%] left-[20%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse-slow"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan-600/10 rounded-full blur-[120px]"></div>
-    <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
-  </div>
-
-  <nav class="fixed top-0 inset-x-0 z-50 border-b border-white/5 bg-[#0B0F19]/80 backdrop-blur-xl transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="relative w-8 h-8 bg-gradient-to-br from-indigo-500 to-cyan-400 rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(99,102,241,0.5)]">
-          <span class="font-bold text-white text-lg">A</span>
-        </div>
-        <span class="text-xl font-bold tracking-tight">Apex<span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Infinity</span></span>
-      </div>
-
-      <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400">
-        <a href="#features" class="hover:text-cyan-400 transition-colors">Modules</a>
-        <a href="#ai" class="hover:text-cyan-400 transition-colors">AI Agent</a>
-        <a href="#pricing" class="hover:text-cyan-400 transition-colors">Enterprise</a>
-      </div>
-
-      <div class="flex items-center gap-4">
-        <a routerLink="/auth/login" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Log in</a>
-        <a routerLink="/auth/org" class="group relative px-5 py-2 rounded-full bg-white text-black text-sm font-bold hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] transition-all overflow-hidden">
-          <span class="relative z-10">Get Started</span>
-          <div class="absolute inset-0 bg-gradient-to-r from-cyan-200 to-indigo-200 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-        </a>
-      </div>
-    </div>
-  </nav>
-
-  <main class="relative z-10 pt-32">
-
-    <section class="px-6 mb-32 text-center max-w-7xl mx-auto relative">
-      <div #revealItem class="reveal-item flex flex-col items-center">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 text-xs font-semibold mb-8 backdrop-blur-md shadow-[0_0_10px_rgba(34,211,238,0.2)]">
-          <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
-          Apex Infinity v2.0 Live
-        </div>
-
-        <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-tight">
-          The Operating System <br />
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-cyan-400">for Modern Enterprises</span>
-        </h1>
-
-        <p class="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-          Unify your Organization, Branches, Inventory, and Financials in one high-performance dashboard. Powered by AI.
-        </p>
-
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
-          <button class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 text-white font-semibold shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:scale-105 transition-transform">
-            Start Free Trial
-          </button>
-          <button class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-[#1A1F2E] border border-white/10 text-white font-semibold hover:bg-white/5 transition-colors flex items-center gap-2">
-            <i class="pi pi-play text-cyan-400 text-xs"></i> Watch Demo
-          </button>
-        </div>
-
-        <div class="relative w-full max-w-5xl mx-auto group perspective-1000">
-          <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-cyan-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-          
-          <div class="relative rounded-xl bg-[#0B0F19] border border-white/10 shadow-2xl overflow-hidden transform transition-transform duration-700 group-hover:rotate-x-2">
-            <div class="h-10 border-b border-white/5 bg-[#131825] flex items-center px-4 gap-2">
-              <div class="flex gap-1.5">
-                <div class="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"></div>
-                <div class="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50"></div>
-                <div class="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50"></div>
-              </div>
-              <div class="mx-auto w-64 h-5 bg-[#1E2538] rounded-md flex items-center justify-center text-[10px] text-slate-500 font-mono">
-                app.apex-infinity.com/dashboard
-              </div>
-            </div>
-
-            <div class="flex h-[400px] md:h-[600px]">
-              <div class="w-16 md:w-64 border-r border-white/5 bg-[#0F1420] p-4 hidden md:flex flex-col gap-4">
-                <div class="h-8 w-32 bg-indigo-500/20 rounded animate-pulse"></div>
-                <div class="space-y-2 mt-4">
-                  <div class="h-8 w-full bg-white/5 rounded hover:bg-white/10 cursor-pointer"></div>
-                  <div class="h-8 w-full bg-transparent rounded hover:bg-white/5 cursor-pointer"></div>
-                  <div class="h-8 w-full bg-transparent rounded hover:bg-white/5 cursor-pointer"></div>
-                </div>
-              </div>
-
-              <div class="flex-1 p-6 bg-[#0B0F19] relative overflow-hidden">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                  <div class="h-32 rounded-lg bg-[#151A29] border border-white/5 p-4 relative overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent"></div>
-                    <div class="text-xs text-slate-400 uppercase">Total Revenue</div>
-                    <div class="text-2xl text-white font-bold mt-2">₹4,250,000</div>
-                    <div class="mt-4 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
-                      <div class="h-full w-[70%] bg-indigo-500"></div>
-                    </div>
-                  </div>
-                  <div class="h-32 rounded-lg bg-[#151A29] border border-white/5 p-4 relative overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent"></div>
-                    <div class="text-xs text-slate-400 uppercase">Active Branches</div>
-                    <div class="text-2xl text-white font-bold mt-2">12</div>
-                    <div class="mt-4 flex gap-1">
-                      <div class="h-1.5 w-1.5 rounded-full bg-emerald-400"></div>
-                      <div class="text-[10px] text-emerald-400">All Operational</div>
-                    </div>
-                  </div>
-                  <div class="h-32 rounded-lg bg-[#151A29] border border-white/5 p-4 relative overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent"></div>
-                    <div class="text-xs text-slate-400 uppercase">Pending Invoices</div>
-                    <div class="text-2xl text-white font-bold mt-2">24</div>
-                    <div class="text-[10px] text-orange-400 mt-1">Needs Attention</div>
-                  </div>
-                </div>
-
-                <div class="h-64 w-full rounded-lg bg-[#151A29] border border-white/5 relative p-4 flex items-end justify-between gap-2">
-                   <div class="w-full bg-indigo-500/20 rounded-t h-[40%]"></div>
-                   <div class="w-full bg-indigo-500/30 rounded-t h-[60%]"></div>
-                   <div class="w-full bg-indigo-500/40 rounded-t h-[50%]"></div>
-                   <div class="w-full bg-cyan-500/50 rounded-t h-[80%] shadow-[0_0_15px_rgba(6,182,212,0.3)]"></div>
-                   <div class="w-full bg-indigo-500/20 rounded-t h-[45%]"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="stats-section" class="border-y border-white/5 bg-[#0F1420]/50 backdrop-blur-sm py-12 mb-32">
-      <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
-        <div class="text-center group">
-          <div class="text-4xl font-bold text-white mb-1 group-hover:text-cyan-400 transition-colors">{{ stats.users }}+</div>
-          <div class="text-xs text-slate-500 uppercase tracking-widest font-semibold">Active Organizations</div>
-        </div>
-        <div class="text-center group">
-          <div class="text-4xl font-bold text-white mb-1 group-hover:text-indigo-400 transition-colors">₹{{ stats.transactions }}M</div>
-          <div class="text-xs text-slate-500 uppercase tracking-widest font-semibold">Processed Volume</div>
-        </div>
-        <div class="text-center group">
-          <div class="text-4xl font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">{{ stats.uptime }}%</div>
-          <div class="text-xs text-slate-500 uppercase tracking-widest font-semibold">System Uptime</div>
-        </div>
-        <div class="text-center group">
-          <div class="text-4xl font-bold text-white mb-1 group-hover:text-purple-400 transition-colors">150+</div>
-          <div class="text-xs text-slate-500 uppercase tracking-widest font-semibold">Countries Supported</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="max-w-7xl mx-auto px-6 mb-32">
-      <div class="flex flex-col md:flex-row gap-12">
-        <div class="w-full md:w-1/3 space-y-2">
-          <h3 class="text-2xl font-bold mb-6 px-4">Core Modules</h3>
-          <div *ngFor="let mod of modules" 
-               (click)="setActiveTab(mod.id)"
-               class="cursor-pointer p-4 rounded-xl border transition-all duration-300 group"
-               [ngClass]="activeTab === mod.id ? 'bg-white/5 border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.1)]' : 'border-transparent hover:bg-white/5'">
-            <div class="flex items-center gap-4">
-              <div class="w-10 h-10 rounded-lg flex items-center justify-center transition-colors"
-                   [ngClass]="activeTab === mod.id ? 'bg-cyan-500/20 text-cyan-400' : 'bg-slate-800 text-slate-400 group-hover:text-white'">
-                <i [class]="mod.icon + ' text-xl'"></i>
-              </div>
-              <div>
-                <div class="font-semibold text-white" [ngClass]="{'text-cyan-400': activeTab === mod.id}">{{ mod.label }}</div>
-                <div class="text-xs text-slate-500 mt-1">Integrated & Sync-ready</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="w-full md:w-2/3 relative min-h-[400px]">
-          <div *ngFor="let mod of modules" 
-               class="absolute inset-0 transition-all duration-500 ease-in-out"
-               [ngClass]="activeTab === mod.id ? 'opacity-100 translate-x-0 z-10' : 'opacity-0 translate-x-10 z-0 pointer-events-none'">
-            
-            <div class="h-full rounded-3xl bg-gradient-to-br from-[#131825] to-[#0B0F19] border border-white/10 p-8 md:p-12 relative overflow-hidden">
-              <div class="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-[80px]"></div>
-
-              <h2 class="text-3xl font-bold mb-4 relative z-10">{{ mod.title }}</h2>
-              <p class="text-slate-400 text-lg mb-8 max-w-lg relative z-10">{{ mod.desc }}</p>
-
-              <ul class="space-y-4 mb-10 relative z-10">
-                <li *ngFor="let feat of mod.features" class="flex items-center gap-3 text-slate-300">
-                  <span class="flex items-center justify-center w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 text-xs">✓</span>
-                  {{ feat }}
-                </li>
-              </ul>
-
-              <div class="relative z-10 pt-6 border-t border-white/5">
-                <a routerLink="/auth/org" class="text-cyan-400 font-semibold hover:text-cyan-300 flex items-center gap-2">
-                  Explore {{ mod.label }} <i class="pi pi-arrow-right text-xs"></i>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="max-w-7xl mx-auto px-6 mb-32">
-      <div class="text-center mb-16">
-        <h2 class="text-3xl md:text-5xl font-bold mb-4">Engineered for Scale</h2>
-        <p class="text-slate-400">Everything a growing enterprise needs, out of the box.</p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div *ngFor="let feature of features" #revealItem
-             class="reveal-item group relative rounded-3xl overflow-hidden border border-white/5 bg-[#131825] p-8 transition-all duration-300"
-             [ngClass]="[feature.cols === 2 ? 'md:col-span-2' : 'md:col-span-1', feature.border]">
-          
-          <div class="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500" [ngClass]="feature.color"></div>
-
-          <div class="relative z-10">
-            <div class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-6 border border-white/10 group-hover:scale-110 transition-transform duration-500">
-              <ng-container [ngSwitch]="feature.icon">
-                <svg *ngSwitchCase="'ai'" class="w-6 h-6 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                <svg *ngSwitchCase="'branch'" class="w-6 h-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-                <svg *ngSwitchCase="'emi'" class="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                <svg *ngSwitchCase="'lock'" class="w-6 h-6 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-              </ng-container>
-            </div>
-
-            <h3 class="text-xl font-bold text-white mb-2">{{ feature.title }}</h3>
-            <p class="text-slate-400 text-sm leading-relaxed">{{ feature.desc }}</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="ai" class="relative py-24 bg-[#0F1420] border-y border-white/5 overflow-hidden">
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-full bg-indigo-500/5 blur-[100px]"></div>
-
-      <div class="max-w-7xl mx-auto px-6 relative z-10 flex flex-col md:flex-row items-center gap-16">
-        <div class="flex-1">
-          <div class="inline-flex items-center gap-2 text-indigo-400 font-semibold uppercase tracking-wider text-xs mb-4">
-            <i class="pi pi-sparkles"></i> Artificial Intelligence
-          </div>
-          <h2 class="text-4xl md:text-5xl font-bold mb-6">Meet your new <br/> <span class="text-indigo-400">Financial Analyst</span></h2>
-          <p class="text-slate-400 text-lg mb-8 leading-relaxed">
-            Apex AI doesn't just display data; it understands it. Ask natural questions about your revenue, inventory risks, or tax liabilities and get answers instantly.
-          </p>
-          
-          <div class="space-y-4">
-            <div class="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5">
-              <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-xs">AI</div>
-              <div class="text-sm text-indigo-200">"Your cash flow is projected to dip next Tuesday due to 3 pending vendor payments."</div>
-            </div>
-            <div class="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5 opacity-60">
-              <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-xs">AI</div>
-              <div class="text-sm text-indigo-200">"Top selling product in Surat Branch is 'Wireless Earbuds' (+12% WoW)."</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex-1 w-full relative">
-          <div class="rounded-2xl bg-[#0B0F19] border border-white/10 shadow-2xl p-6">
-            <div class="space-y-4 mb-6">
-               <div class="flex justify-end">
-                 <div class="bg-indigo-600 text-white px-4 py-2 rounded-2xl rounded-tr-none text-sm">Predict next month's revenue</div>
-               </div>
-               <div class="flex justify-start">
-                 <div class="bg-slate-800 text-slate-300 px-4 py-2 rounded-2xl rounded-tl-none text-sm max-w-[90%]">
-                   Based on current trends and pending invoices, forecasted revenue is <strong>₹1.2 Cr</strong> (+15% vs last month).
-                 </div>
-               </div>
-               <div class="h-32 bg-[#151A29] rounded-lg border border-white/5 relative overflow-hidden">
-                 <svg class="absolute inset-0 w-full h-full text-indigo-500/50" viewBox="0 0 100 50" preserveAspectRatio="none">
-                    <path d="M0 40 Q 25 30 50 35 T 100 10" fill="none" stroke="currentColor" stroke-width="2" />
-                    <path d="M0 40 Q 25 30 50 35 T 100 10 V 50 H 0 Z" fill="url(#grad)" class="opacity-30" />
-                    <defs>
-                      <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" style="stop-color:rgb(99,102,241);stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:rgb(99,102,241);stop-opacity:0" />
-                      </linearGradient>
-                    </defs>
-                 </svg>
-               </div>
-            </div>
-            <div class="relative">
-              <input type="text" placeholder="Ask Apex AI..." class="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors">
-              <button class="absolute right-2 top-2 p-1.5 bg-indigo-500 rounded-lg text-white hover:bg-indigo-400">
-                <i class="pi pi-arrow-up text-xs"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <footer class="border-t border-white/10 bg-[#0B0F19] pt-20 pb-10">
-      <div class="max-w-7xl mx-auto px-6">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
-          <div class="col-span-2">
-            <span class="text-2xl font-bold tracking-tight text-white">Apex<span class="text-indigo-400">Infinity</span></span>
-            <p class="mt-4 text-slate-500 max-w-xs leading-relaxed">
-              The complete financial operating system for forward-thinking enterprises.
-            </p>
-          </div>
-          <div>
-            <h4 class="font-bold text-white mb-6">Platform</h4>
-            <ul class="space-y-3 text-slate-400 text-sm">
-              <li><a href="#" class="hover:text-cyan-400 transition-colors">Dashboard</a></li>
-              <li><a href="#" class="hover:text-cyan-400 transition-colors">Inventory</a></li>
-              <li><a href="#" class="hover:text-cyan-400 transition-colors">Invoicing</a></li>
-              <li><a href="#" class="hover:text-cyan-400 transition-colors">AI Agent</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 class="font-bold text-white mb-6">Company</h4>
-            <ul class="space-y-3 text-slate-400 text-sm">
-              <li><a href="#" class="hover:text-cyan-400 transition-colors">About</a></li>
-              <li><a href="#" class="hover:text-cyan-400 transition-colors">Security</a></li>
-              <li><a href="#" class="hover:text-cyan-400 transition-colors">Contact</a></li>
-            </ul>
-          </div>
-        </div>
-        
-        <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-600">
-          <p>&copy; 2025 Apex Infinity. Built for scale.</p>
-          <div class="flex gap-6">
-            <a href="#" class="hover:text-slate-400">Privacy</a>
-            <a href="#" class="hover:text-slate-400">Terms</a>
-          </div>
-        </div>
-      </div>
-    </footer>
-
-  </main>
-</div> -->
-
-<!-- <div
-  class="relative min-h-screen bg-slate-950 text-white overflow-x-hidden font-sans selection:bg-indigo-500 selection:text-white">
-
-  <div class="fixed inset-0 z-0 pointer-events-none">
-    <div
-      class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/20 rounded-full blur-[120px] animate-pulse-slow">
-    </div>
-    <div
-      class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-cyan-600/20 rounded-full blur-[120px] animate-pulse-slow animation-delay-2000">
-    </div>
-    <div
-      class="absolute top-[40%] left-[40%] w-[30%] h-[30%] bg-fuchsia-600/10 rounded-full blur-[100px] animate-float">
-    </div>
-    <div class="absolute inset-0 opacity-[0.03]"
-      style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22 opacity=%221%22/%3E%3C/svg%3E');">
-    </div>
-  </div>
-
-  <nav class="fixed top-0 inset-x-0 z-50 transition-all duration-300 border-b border-transparent"
-    [class.bg-slate-950/70]="scrollY > 20" [class.backdrop-blur-lg]="scrollY > 20"
-    [class.border-white/10]="scrollY > 20">
-    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div
-          class="relative w-8 h-8 flex items-center justify-center bg-gradient-to-tr from-indigo-500 to-cyan-400 rounded-lg shadow-lg shadow-indigo-500/20">
-          <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-        </div>
-        <span class="text-xl font-bold tracking-tight">Apex<span class="text-indigo-400">Infinity</span></span>
-      </div>
-
-      <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-        <a href="#features" class="hover:text-white transition-colors">Features</a>
-        <a href="#testimonials" class="hover:text-white transition-colors">Customers</a>
-        <a href="#pricing" class="hover:text-white transition-colors">Pricing</a>
-      </div>
-
-     <div class="hidden md:flex items-center gap-4">
-  Login Button
-  <button
-    class="text-sm font-medium text-slate-300 hover:text-white"
-    routerLink="/auth/login"
-  >
-    Log in
-  </button>
-
-  Get Started Button
-  <button
-    routerLink="/auth/org"
-    class="group relative px-5 py-2 rounded-full bg-white text-slate-950 text-sm font-semibold hover:bg-slate-200 transition-all overflow-hidden"
-  >
-    <span class="relative z-10">Get Started</span>
-    <div
-      class="absolute inset-0 bg-gradient-to-r from-indigo-200 to-cyan-200 opacity-0 group-hover:opacity-100 transition-opacity"
-    ></div>
-  </button>
-</div>
-
-
-      <button class="md:hidden text-slate-300" (click)="mobileMenuOpen = !mobileMenuOpen">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-        </svg>
-      </button>
-    </div>
-  </nav>
-
-  <main class="relative z-10 pt-32 pb-20">
-
-    <section class="px-6 mb-32 text-center max-w-5xl mx-auto">
-      <div #revealItem class="reveal-item">
-        <div
-          class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-indigo-300 text-xs font-semibold mb-8 backdrop-blur-md">
-          <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
-          v2.0 is now live
-        </div>
-
-        <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-8 leading-[1.1]">
-          The Financial OS for <br />
-          <span
-            class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-cyan-400 to-emerald-400 animate-text-shimmer">Hyper-Growth
-            Teams</span>
-        </h1>
-
-        <p class="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-          Manage invoices, inventory, and automated GST filing in one futuristic dashboard.
-          Stop wrestling with spreadsheets. Start scaling.
-        </p>
-
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <button
-            class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-semibold shadow-xl shadow-indigo-600/20 hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2">
-            Start 14-Day Free Trial
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </button>
-          <button
-            class="w-full sm:w-auto px-8 py-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-semibold backdrop-blur-sm transition-all flex items-center justify-center gap-2">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Watch Demo
-          </button>
-        </div>
-      </div>
-
-      <div #revealItem class="reveal-item mt-20 relative rounded-2xl p-2 bg-gradient-to-b from-white/10 to-transparent">
-        <div class="rounded-xl overflow-hidden bg-slate-900 border border-white/10 shadow-2xl shadow-indigo-500/20">
-          <div
-            class="aspect-[16/9] w-full bg-slate-900 flex items-center justify-center relative overflow-hidden group">
-            <div
-              class="absolute inset-x-0 top-0 h-12 border-b border-white/5 bg-slate-800/50 flex items-center px-4 gap-2">
-              <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
-              <div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
-              <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
-            </div>
-            <div class="absolute inset-0 flex items-center justify-center">
-              <div class="text-slate-600 font-mono text-sm">[ Interactive Dashboard Preview ]</div>
-            </div>
-            <div
-              class="absolute inset-0 bg-gradient-to-tr from-indigo-500/10 via-transparent to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="stats-section" class="border-y border-white/5 bg-white/[0.02] py-12 mb-32">
-      <div class="max-w-7xl mx-auto px-6">
-        <p class="text-center text-slate-500 text-sm font-semibold uppercase tracking-widest mb-8">Trusted by industry
-          leaders</p>
-
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-          <div class="text-center">
-            <div class="text-3xl md:text-4xl font-bold text-white mb-1">{{ stats.users | number }}+</div>
-            <div class="text-xs text-slate-400 uppercase tracking-wide">Active Users</div>
-          </div>
-          <div class="text-center">
-            <div class="text-3xl md:text-4xl font-bold text-white mb-1">₹{{ stats.revenue }}M</div>
-            <div class="text-xs text-slate-400 uppercase tracking-wide">Processed</div>
-          </div>
-          <div class="text-center">
-            <div class="text-3xl md:text-4xl font-bold text-white mb-1">{{ stats.uptime }}%</div>
-            <div class="text-xs text-slate-400 uppercase tracking-wide">Uptime SLA</div>
-          </div>
-          <div class="text-center">
-            <div class="text-3xl md:text-4xl font-bold text-white mb-1">SOC-2</div>
-            <div class="text-xs text-slate-400 uppercase tracking-wide">Certified</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="features" class="max-w-7xl mx-auto px-6 mb-32">
-      <div class="text-center mb-16">
-        <h2 class="text-3xl md:text-5xl font-bold mb-4">Everything you need</h2>
-        <p class="text-slate-400">Packed with power, designed for simplicity.</p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div *ngFor="let feature of features" #revealItem
-          class="reveal-item group relative rounded-3xl overflow-hidden border border-white/10 bg-slate-900/50 backdrop-blur-sm p-8 hover:bg-slate-800/50 transition-colors duration-500"
-          [ngClass]="feature.cols === 2 ? 'md:col-span-2' : 'md:col-span-1'">
-
-          <div
-            class="absolute -right-12 -top-12 w-40 h-40 bg-gradient-to-br rounded-full blur-[60px] opacity-0 group-hover:opacity-40 transition-opacity duration-500"
-            [ngClass]="feature.gradient"></div>
-
-          <div class="relative z-10">
-            <div
-              class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-6 text-white border border-white/10 group-hover:scale-110 transition-transform duration-500">
-              <svg *ngIf="feature.icon === 'invoice'" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <svg *ngIf="feature.icon === 'box'" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-              </svg>
-              <svg *ngIf="feature.icon === 'chart'" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                  d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
-              </svg>
-              <svg *ngIf="feature.icon === 'users'" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            </div>
-
-            <h3 class="text-xl font-bold text-white mb-2">{{ feature.title }}</h3>
-            <p class="text-slate-400 leading-relaxed">{{ feature.desc }}</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="pricing" class="max-w-7xl mx-auto px-6 mb-32">
-      <div class="flex flex-col items-center mb-16">
-        <h2 class="text-3xl md:text-5xl font-bold mb-6">Simple, transparent pricing</h2>
-
-        <div class="flex items-center gap-4 bg-slate-900/50 p-1 rounded-full border border-white/10">
-          <button (click)="isYearly = false" [class.bg-white/10]="!isYearly" [class.text-white]="!isYearly"
-            class="px-6 py-2 rounded-full text-sm font-medium text-slate-400 transition-all">Monthly</button>
-          <button (click)="isYearly = true" [class.bg-white/10]="isYearly" [class.text-white]="isYearly"
-            class="px-6 py-2 rounded-full text-sm font-medium text-slate-400 transition-all">Yearly <span
-              class="text-emerald-400 text-xs ml-1">-20%</span></button>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div *ngFor="let plan of plans" #revealItem
-          class="reveal-item relative p-8 rounded-3xl border transition-all duration-300 flex flex-col"
-          [ngClass]="plan.isPopular ? 'bg-indigo-900/20 border-indigo-500/50 shadow-2xl shadow-indigo-500/10' : 'bg-slate-900/20 border-white/5'">
-
-          <div *ngIf="plan.isPopular"
-            class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-indigo-500 text-white text-xs font-bold uppercase tracking-wide">
-            Most Popular</div>
-
-          <h3 class="text-lg font-medium text-slate-300 mb-2">{{ plan.name }}</h3>
-          <div class="flex items-baseline gap-1 mb-2">
-            <span class="text-4xl font-bold text-white">{{ plan.price }}</span>
-            <span class="text-sm text-slate-500" *ngIf="plan.price !== 'Custom'">/ {{ isYearly ? 'year' : 'mo' }}</span>
-          </div>
-          <p class="text-sm text-slate-400 mb-8 pb-8 border-b border-white/5">{{ plan.desc }}</p>
-
-          <ul class="space-y-4 mb-8 flex-1">
-            <li *ngFor="let feat of plan.features" class="flex items-center gap-3 text-sm text-slate-300">
-              <svg class="w-5 h-5 text-indigo-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              {{ feat }}
-            </li>
-          </ul>
-
-          <button class="w-full py-3 rounded-xl font-semibold transition-all"
-            [ngClass]="plan.isPopular ? 'bg-indigo-500 hover:bg-indigo-400 text-white shadow-lg shadow-indigo-500/25' : 'bg-white/10 hover:bg-white/20 text-white'">
-            {{ plan.cta }}
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <section class="max-w-5xl mx-auto px-6 mb-20">
-      <div
-        class="relative rounded-[2.5rem] bg-gradient-to-br from-indigo-600 to-purple-700 p-12 md:p-20 text-center overflow-hidden">
-        <div
-          class="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2">
-        </div>
-        <div
-          class="absolute bottom-0 right-0 w-64 h-64 bg-black/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2">
-        </div>
-
-        <h2 class="relative z-10 text-3xl md:text-5xl font-bold mb-6">Ready to launch?</h2>
-        <p class="relative z-10 text-indigo-100 text-lg mb-10 max-w-xl mx-auto">Join the new generation of business. No
-          credit card required.</p>
-
-        <form (ngSubmit)="submitForm()" class="relative z-10 flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-          <input type="email" [(ngModel)]="emailInput" name="email" placeholder="Enter your email"
-            class="flex-1 px-6 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-indigo-200 focus:outline-none focus:ring-2 focus:ring-white/50 backdrop-blur-sm transition-all" />
-
-          <button type="submit"
-            class="px-8 py-4 rounded-xl bg-white text-indigo-600 font-bold hover:bg-indigo-50 transition-colors shadow-xl">
-            {{ isSubmitting ? '...' : (isSuccess ? 'Sent!' : 'Get Started') }}
-          </button>
-        </form>
-      </div>
-    </section>
-    <section class="max-w-7xl mx-auto px-6 mb-32 flex flex-col md:flex-row items-center gap-12 md:gap-20">
-      <div #revealItem class="reveal-item flex-1 w-full relative group">
-        <div
-          class="absolute inset-0 bg-indigo-500/20 blur-[80px] rounded-full opacity-50 group-hover:opacity-70 transition-opacity">
-        </div>
-
-        <div class="relative rounded-2xl bg-slate-900 border border-white/10 p-6 shadow-2xl overflow-hidden">
-          <div class="flex items-center gap-4 mb-6 border-b border-white/5 pb-4">
-            <div class="flex gap-2">
-              <div class="w-3 h-3 rounded-full bg-slate-700"></div>
-              <div class="w-3 h-3 rounded-full bg-slate-700"></div>
-            </div>
-            <div class="h-2 w-32 bg-slate-800 rounded-full"></div>
-          </div>
-          <div class="flex items-end gap-3 h-48 px-2">
-            <div
-              class="w-full bg-indigo-500/20 rounded-t-sm h-[40%] relative group-hover:h-[60%] transition-all duration-700">
-            </div>
-            <div
-              class="w-full bg-indigo-500/40 rounded-t-sm h-[70%] relative group-hover:h-[80%] transition-all duration-700 delay-75">
-            </div>
-            <div
-              class="w-full bg-indigo-500/60 rounded-t-sm h-[50%] relative group-hover:h-[90%] transition-all duration-700 delay-100">
-            </div>
-            <div class="w-full bg-cyan-400 rounded-t-sm h-[85%] relative shadow-[0_0_20px_rgba(34,211,238,0.5)]"></div>
-          </div>
-        </div>
-      </div>
-
-      <div #revealItem class="reveal-item flex-1 space-y-6">
-        <div class="inline-flex items-center gap-2 text-cyan-400 font-semibold uppercase tracking-wider text-xs">
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-          Real-time Insights
-        </div>
-        <h3 class="text-3xl md:text-4xl font-bold leading-tight">
-          Stop waiting for <br /> <span class="text-white">end-of-month reports.</span>
-        </h3>
-        <p class="text-slate-400 text-lg leading-relaxed">
-          See your cash flow, profit margins, and tax liability update in real-time with every invoice you send. Make
-          decisions based on today's data, not last month's.
-        </p>
-        <ul class="space-y-3 mt-4">
-          <li class="flex items-center gap-3 text-slate-300">
-            <div
-              class="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-xs">✓
-            </div>
-            <span>Live P&L Statements</span>
-          </li>
-          <li class="flex items-center gap-3 text-slate-300">
-            <div
-              class="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-xs">✓
-            </div>
-            <span>Tax Liability Forecast</span>
-          </li>
-        </ul>
-      </div>
-    </section>
-
-    <section class="max-w-7xl mx-auto px-6 mb-32 flex flex-col md:flex-row-reverse items-center gap-12 md:gap-20">
-      <div #revealItem class="reveal-item flex-1 w-full relative group">
-        <div
-          class="absolute inset-0 bg-emerald-500/20 blur-[80px] rounded-full opacity-50 group-hover:opacity-70 transition-opacity">
-        </div>
-
-        <div class="relative rounded-2xl bg-slate-900 border border-white/10 p-6 shadow-2xl">
-          <div class="space-y-4">
-            <div
-              class="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5 transform group-hover:translate-x-2 transition-transform duration-500">
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded bg-indigo-500/20 flex items-center justify-center text-indigo-400">#</div>
-                <div class="space-y-1">
-                  <div class="h-2 w-20 bg-slate-700 rounded"></div>
-                  <div class="h-2 w-12 bg-slate-800 rounded"></div>
-                </div>
-              </div>
-              <div class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs">Paid</div>
-            </div>
-
-            <div
-              class="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5 transform group-hover:-translate-x-2 transition-transform duration-500 delay-75">
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded bg-orange-500/20 flex items-center justify-center text-orange-400">#</div>
-                <div class="space-y-1">
-                  <div class="h-2 w-24 bg-slate-700 rounded"></div>
-                  <div class="h-2 w-16 bg-slate-800 rounded"></div>
-                </div>
-              </div>
-              <div class="px-3 py-1 rounded-full bg-orange-500/20 text-orange-400 text-xs">Overdue</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div #revealItem class="reveal-item flex-1 space-y-6">
-        <div class="inline-flex items-center gap-2 text-emerald-400 font-semibold uppercase tracking-wider text-xs">
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          Smart Automation
-        </div>
-        <h3 class="text-3xl md:text-4xl font-bold leading-tight">
-          Put your receivables <br /> <span class="text-white">on autopilot.</span>
-        </h3>
-        <p class="text-slate-400 text-lg leading-relaxed">
-          Apex Infinity automatically chases overdue payments for you. Set up custom reminders via Email and WhatsApp,
-          so you get paid faster without the awkward conversations.
-        </p>
-        <button class="text-white border-b border-indigo-500 pb-0.5 hover:text-indigo-400 transition-colors">Learn about
-          workflows →</button>
-      </div>
-    </section>
-
-    <section class="border-y border-white/5 bg-white/[0.02] py-24 mb-32">
-      <div class="max-w-7xl mx-auto px-6 text-center">
-        <h2 class="text-2xl md:text-3xl font-bold mb-12">Connects with your favorite tools</h2>
-
-        <div class="flex flex-wrap justify-center gap-4 md:gap-8">
-          <div *ngFor="let item of integrations"
-            class="group relative px-6 py-4 rounded-2xl bg-slate-900 border border-white/10 hover:border-indigo-500/50 hover:bg-slate-800 transition-all duration-300 cursor-default">
-            <div class="flex items-center gap-3">
-              <div class="w-2 h-2 rounded-full bg-indigo-500 group-hover:animate-pulse"></div>
-              <span class="font-medium text-slate-300 group-hover:text-white">{{ item.name }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="max-w-3xl mx-auto px-6 mb-32">
-      <h2 class="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
-
-      <div class="space-y-4">
-        <div *ngFor="let item of faqs; let i = index"
-          class="rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden transition-all duration-300"
-          [class.bg-white/[0.05]]="activeFaqIndex === i">
-
-          <button (click)="toggleFaq(i)"
-            class="w-full flex items-center justify-between p-6 text-left focus:outline-none">
-            <span class="font-medium text-lg" [class.text-indigo-400]="activeFaqIndex === i">{{ item.q }}</span>
-            <svg class="w-5 h-5 text-slate-500 transform transition-transform duration-300"
-              [class.rotate-180]="activeFaqIndex === i" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-
-          <div class="px-6 text-slate-400 overflow-hidden transition-all duration-300 ease-in-out"
-            [style.max-height]="activeFaqIndex === i ? '200px' : '0'" [style.opacity]="activeFaqIndex === i ? '1' : '0'"
-            [style.padding-bottom]="activeFaqIndex === i ? '24px' : '0'">
-            {{ item.a }}
-          </div>
-        </div>
-      </div>
-    </section>
-    <section class="max-w-5xl mx-auto px-6 mb-24">
-      <div
-        class="relative rounded-[2.5rem] bg-gradient-to-br from-indigo-600 to-purple-700 p-12 md:p-20 text-center overflow-hidden shadow-2xl shadow-indigo-900/50">
-        <div
-          class="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2">
-        </div>
-        <div
-          class="absolute bottom-0 right-0 w-64 h-64 bg-black/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2">
-        </div>
-        <div
-          class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay">
-        </div>
-
-        <h2 class="relative z-10 text-3xl md:text-5xl font-bold mb-6 text-white">Ready to launch?</h2>
-        <p class="relative z-10 text-indigo-100 text-lg mb-10 max-w-xl mx-auto">Join the new generation of business. No
-          credit card required.</p>
-
-        <form (ngSubmit)="submitForm()" class="relative z-10 flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-          <input type="email" [(ngModel)]="emailInput" name="email" placeholder="Enter your email"
-            class="flex-1 px-6 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-indigo-200 focus:outline-none focus:ring-2 focus:ring-white/50 backdrop-blur-sm transition-all" />
-
-          <button type="submit"
-            class="px-8 py-4 rounded-xl bg-white text-indigo-600 font-bold hover:bg-indigo-50 transition-colors shadow-xl">
-            {{ isSubmitting ? '...' : (isSuccess ? 'Sent!' : 'Get Started') }}
-          </button>
-        </form>
-      </div>
-    </section>
-
-  </main>
-
-  <footer class="border-t border-white/10 bg-slate-950 pt-16 pb-8 text-sm">
-    <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-10 mb-12">
-      <div class="col-span-2 md:col-span-1">
-        <div class="flex items-center gap-2 mb-4">
-          <div class="w-6 h-6 rounded bg-gradient-to-tr from-indigo-500 to-cyan-400"></div>
-          <span class="font-bold text-lg tracking-tight">ApexInfinity</span>
-        </div>
-        <p class="text-slate-500 mb-6 max-w-xs">
-          The operating system for modern finance. Built for speed, designed for scale.
-        </p>
-        <div class="flex gap-4">
-          <a href="#"
-            class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-white/10 hover:text-white transition-colors">𝕏</a>
-          <a href="#"
-            class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-white/10 hover:text-white transition-colors">In</a>
-        </div>
-      </div>
-
-      <div>
-        <h4 class="font-bold text-white mb-4">Product</h4>
-        <ul class="space-y-2 text-slate-400">
-          <li><a href="#" class="hover:text-indigo-400 transition-colors">Features</a></li>
+          <li><a href="#features" class="hover:text-indigo-400 transition-colors">Features</a></li>
+          <li><a href="#pricing" class="hover:text-indigo-400 transition-colors">Pricing</a></li>
+          <li><a href="#" class="hover:text-indigo-400 transition-colors">API</a></li>
           <li><a href="#" class="hover:text-indigo-400 transition-colors">Integrations</a></li>
-          <li><a href="#" class="hover:text-indigo-400 transition-colors">Pricing</a></li>
-          <li><a href="#" class="hover:text-indigo-400 transition-colors">Changelog</a></li>
         </ul>
       </div>
-
       <div>
-        <h4 class="font-bold text-white mb-4">Resources</h4>
-        <ul class="space-y-2 text-slate-400">
-          <li><a href="#" class="hover:text-indigo-400 transition-colors">Documentation</a></li>
-          <li><a href="#" class="hover:text-indigo-400 transition-colors">API Reference</a></li>
-          <li><a href="#" class="hover:text-indigo-400 transition-colors">Community</a></li>
-          <li><a href="#" class="hover:text-indigo-400 transition-colors">Help Center</a></li>
+        <h4 class="font-bold text-white mb-4">Company</h4>
+        <ul class="space-y-2 text-sm text-slate-400">
+          <li><a href="#" class="hover:text-indigo-400 transition-colors">About</a></li>
+          <li><a href="#" class="hover:text-indigo-400 transition-colors">Blog</a></li>
+          <li><a href="#" class="hover:text-indigo-400 transition-colors">Careers</a></li>
+          <li><a href="#" class="hover:text-indigo-400 transition-colors">Contact</a></li>
         </ul>
       </div>
-
       <div>
         <h4 class="font-bold text-white mb-4">Legal</h4>
-        <ul class="space-y-2 text-slate-400">
-          <li><a href="#" class="hover:text-indigo-400 transition-colors">Privacy Policy</a></li>
-          <li><a href="#" class="hover:text-indigo-400 transition-colors">Terms of Service</a></li>
-          <li><a href="#" class="hover:text-indigo-400 transition-colors">Security (SOC2)</a></li>
+        <ul class="space-y-2 text-sm text-slate-400">
+          <li><a href="#" class="hover:text-indigo-400 transition-colors">Privacy</a></li>
+          <li><a href="#" class="hover:text-indigo-400 transition-colors">Terms</a></li>
+          <li><a href="#" class="hover:text-indigo-400 transition-colors">Security</a></li>
         </ul>
       </div>
     </div>
-
-    <div
-      class="max-w-7xl mx-auto px-6 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500">
-      <p>&copy; 2025 Apex Infinity Labs. All rights reserved.</p>
-      <div class="flex items-center gap-2">
-        <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
-        <span>All Systems Operational</span>
-      </div>
+    <div class="max-w-7xl mx-auto border-t border-slate-800 pt-8 text-center text-slate-600 text-sm">
+      &copy; 2025 NexusERP Inc. All rights reserved.
     </div>
   </footer>
+
 </div>
-
-
-
-
-
- -->
