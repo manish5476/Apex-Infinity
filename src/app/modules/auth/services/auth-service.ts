@@ -104,7 +104,24 @@ export class AuthService {
 
   //   this.router.navigate(['/']);
   // }
-  public handleLoginSuccess(response: LoginResponse): void {
+  // public handleLoginSuccess(response: LoginResponse): void {
+  //   const user = response.data.user || response.data.owner;
+  //   if (!response.token || !user) return;
+
+  //   this.setItem(this.TOKEN_KEY, response.token);
+  //   this.setItem(this.USER_KEY, user);
+  //   this.currentUserSubject.next(user);
+
+  //   this.notificationService.connect(user._id, response.token, user.organizationId);
+
+  //   // IMPORTANT: set refresh function HERE, NOT IN BOOTSTRAP
+  //   const chat = this.injector.get(ChatService);
+  //   chat.setTokenRefresh(() => this.refreshTokenPromise());
+  //   chat.connect(response.token);
+
+  //   this.router.navigate(['/']);
+  // }
+public handleLoginSuccess(response: LoginResponse): void {
     const user = response.data.user || response.data.owner;
     if (!response.token || !user) return;
 
@@ -114,14 +131,13 @@ export class AuthService {
 
     this.notificationService.connect(user._id, response.token, user.organizationId);
 
-    // IMPORTANT: set refresh function HERE, NOT IN BOOTSTRAP
     const chat = this.injector.get(ChatService);
     chat.setTokenRefresh(() => this.refreshTokenPromise());
     chat.connect(response.token);
 
-    this.router.navigate(['/']);
-  }
-
+    // ✅ UPDATED: Navigate to dashboard instead of root ('/')
+    this.router.navigate(['/dashboard']);
+}
 
   // public handleLoginSuccess(response: LoginResponse): void {
   //   const user = response.data.user || response.data.owner;
