@@ -11,7 +11,7 @@ import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { EmiService } from '../../services/emi-service';
-import { AgShareGrid } from "../../../shared/components/ag-shared-grid"; 
+import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
 
 @Component({
   selector: 'app-emi-list',
@@ -102,12 +102,12 @@ export class EmiList implements OnInit {
         if (res.data && Array.isArray(res.data.data)) {
           newData = res.data.data;
         } else if (res.data && Array.isArray(res.data)) {
-           newData = res.data;
+          newData = res.data;
         }
-        
+
         this.totalCount = res.results || this.totalCount;
         this.data = [...this.data, ...newData];
-        
+
         this.currentPage++;
         this.isLoading = false;
         this.cdr.markForCheck();
@@ -133,9 +133,9 @@ export class EmiList implements OnInit {
     if (event.type === 'cellClicked') {
       const emiId = event.row._id;
       if (emiId) {
-        this.router.navigate(['/emis', emiId]); 
+        this.router.navigate(['/emis', emiId]);
       }
-    } 
+    }
     if (event.eventType === 'reachedBottom') {
       this.onScrolledToBottom()
     }
@@ -228,8 +228,6 @@ export class EmiList implements OnInit {
   }
 
   private formatCurrency(value: number): string {
-    return value !== undefined && value !== null 
-      ? `₹ ${value.toFixed(2)}` 
-      : '₹ 0.00';
+    return value !== undefined && value !== null ? `₹ ${value.toFixed(2)}` : '₹ 0.00';
   }
 }
