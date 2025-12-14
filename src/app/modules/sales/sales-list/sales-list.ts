@@ -144,16 +144,16 @@ export class SalesListComponent implements OnInit {
   }
 
   eventFromGrid(event: any) {
-    if (event.eventType === 'cellClicked') {
-      // Handle navigation on invoice number click
-      if (event.event.colDef.field === 'invoiceNumber') {
-         const invoiceId = event.event.data.invoiceId?._id || event.event.data.invoiceId;
+    console.log(event);
+    if (event.type === 'cellClicked') {
+      if (event.field === 'invoiceNumber') {
+         const invoiceId =event.row.invoiceId._id;
          if (invoiceId) {
            this.router.navigate(['/invoices', invoiceId]);
          }
       }
     }
-    if (event.eventType === 'reachedBottom') {
+    if (event.type === 'reachedBottom') {
       this.onScrolledToBottom(event)
     }
   }
