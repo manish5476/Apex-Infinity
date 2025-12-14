@@ -85,10 +85,10 @@
         </div>
 
         <div class="action-grid">
-          <p-select appendTo="body" [options]="roles" [(ngModel)]="selectedRoles[member._id]" optionLabel="name"
+          <p-select appendTo="body" appendTo="body" [options]="roles" [(ngModel)]="selectedRoles[member._id]" optionLabel="name"
             optionValue="_id" placeholder="Role" styleClass="w-full text-sm">
           </p-select>
-          <p-select appendTo="body" [options]="branches" [(ngModel)]="selectedBranches[member._id]" optionLabel="name"
+          <p-select appendTo="body" appendTo="body" [options]="branches" [(ngModel)]="selectedBranches[member._id]" optionLabel="name"
             optionValue="_id" placeholder="Branch" styleClass="w-full text-sm">
           </p-select>
         </div>
@@ -137,7 +137,7 @@
 
       <div class="form-group">
         <label>Target Audience</label>
-        <p-select [options]="audienceOptions" [(ngModel)]="announcement.targetAudience" (onChange)="onAudienceChange()"
+        <p-select appendTo="body" [options]="audienceOptions" [(ngModel)]="announcement.targetAudience" (onChange)="onAudienceChange()"
           optionLabel="label" optionValue="value" styleClass="w-full">
         </p-select>
       </div>
@@ -162,7 +162,7 @@
 
       <div class="form-group">
         <label>Type</label>
-        <p-select [options]="typeOptions" [(ngModel)]="announcement.type" optionLabel="label" optionValue="value"
+        <p-select appendTo="body" [options]="typeOptions" [(ngModel)]="announcement.type" optionLabel="label" optionValue="value"
           styleClass="w-full">
           <ng-template pTemplate="selectedItem" let-selectedOption>
             <div class="flex align-items-center gap-2" *ngIf="selectedOption">

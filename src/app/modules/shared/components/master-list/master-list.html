@@ -44,7 +44,7 @@
   <form [formGroup]="singleForm" class="dialog-form">
     <div class="form-group">
       <label>Type <span class="req">*</span></label>
-      <p-select [options]="masterTypes" formControlName="type" optionLabel="label" optionValue="value"
+      <p-select appendTo="body" [options]="masterTypes" formControlName="type" optionLabel="label" optionValue="value"
         placeholder="Select type" appendTo="body" styleClass="w-full">
       </p-select>
       @if (singleForm.get('type')?.invalid && singleForm.get('type')?.touched) {
@@ -93,7 +93,7 @@
       <div class="bulk-control-panel flex justify-between items-end border-b pb-4 mb-4">
         <div class="form-group w-1/3">
           <label class="font-semibold block mb-2">Master Type <span class="req text-red-500">*</span></label>
-          <p-select [options]="masterTypes" formControlName="type" optionLabel="label" optionValue="value"
+          <p-select appendTo="body" [options]="masterTypes" formControlName="type" optionLabel="label" optionValue="value"
             placeholder="Select ONE type for all entries" appendTo="body" styleClass="w-full">
           </p-select>
           @if (bulkForm.get('type')?.invalid && bulkForm.get('type')?.touched) {

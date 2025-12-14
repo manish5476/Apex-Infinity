@@ -11,31 +11,10 @@ import { FormsModule } from '@angular/forms';
 import { AgGridAngular } from 'ag-grid-angular';
 
 import {
-  
-  ColDef,
-  GridApi,
-  GridReadyEvent,
-  GridOptions,
-  RowSelectionOptions,
-  ClientSideRowModelModule,
-  CsvExportModule,
-  TooltipModule,
-  BodyScrollEndEvent,
-  CellClickedEvent,
-  themeQuartz,
-  Theme
+  ColDef, GridApi, GridReadyEvent, GridOptions, RowSelectionOptions, ClientSideRowModelModule, CsvExportModule, TooltipModule, BodyScrollEndEvent, CellClickedEvent, themeQuartz, Theme
 } from 'ag-grid-community';
 
 import { ActionbuttonsComponent } from '../AgGrid/AgGridcomponents/actionbuttons/actionbuttons.component';
-
-/* --------------------------------------------------
-   AG GRID MODULE REGISTRATION
---------------------------------------------------- */
-// ModuleRegistry.registerModules([
-//   ClientSideRowModelModule,
-//   CsvExportModule,
-//   TooltipModule
-// ]);
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 ModuleRegistry.registerModules([AllCommunityModule]);
 /* --------------------------------------------------
@@ -155,44 +134,44 @@ export class AgShareGrid<T = any> {
   //     spacing: 6
   //   })
   // );
-readonly agTheme = computed<Theme>(() =>
-  themeQuartz.withParams({
-    /* Typography */
-    fontFamily: 'var(--font-body)',
-    fontSize: 'var(--font-size-base)',
+  readonly agTheme = computed<Theme>(() =>
+    themeQuartz.withParams({
+      /* Typography */
+      fontFamily: 'var(--font-body)',
+      fontSize: 'var(--font-size-base)',
 
-    /* Backgrounds */
-    backgroundColor: 'var(--bg-primary)',
-    headerBackgroundColor: 'var(--bg-secondary)',
+      /* Backgrounds */
+      backgroundColor: 'var(--bg-primary)',
+      headerBackgroundColor: 'var(--bg-secondary)',
 
-    /* Text */
-    foregroundColor: 'var(--text-primary)',
-    headerTextColor: 'var(--text-label)',
+      /* Text */
+      foregroundColor: 'var(--text-primary)',
+      headerTextColor: 'var(--text-label)',
 
-    /* Borders */
-    borderColor: 'var(--border-primary)',
+      /* Borders */
+      borderColor: 'var(--border-primary)',
 
-    /* Interaction */
-    rowHoverColor: 'var(--component-bg-hover)',
-    selectedRowBackgroundColor: 'var(--accent-focus)',
-    rangeSelectionBackgroundColor: 'var(--accent-focus)',
-    rangeSelectionBorderColor: 'var(--accent-primary)',
+      /* Interaction */
+      rowHoverColor: 'var(--component-bg-hover)',
+      selectedRowBackgroundColor: 'var(--accent-focus)',
+      rangeSelectionBackgroundColor: 'var(--accent-focus)',
+      rangeSelectionBorderColor: 'var(--accent-primary)',
 
-    /* Inputs */
-    inputBackgroundColor: 'var(--bg-ternary)',
-    inputBorder: 'var(--component-border-focus)',
-    inputPlaceholderTextColor: 'var(--text-tertiary)',
+      /* Inputs */
+      inputBackgroundColor: 'var(--bg-ternary)',
+      inputBorder: 'var(--component-border-focus)',
+      inputPlaceholderTextColor: 'var(--text-tertiary)',
 
-    /* Scrollbars */
-    // scrollbarThumbColor: 'var(--scroll-thumb-c)',
-    // scrollbarTrackColor: 'var(--scroll-track-c)',
+      /* Scrollbars */
+      // scrollbarThumbColor: 'var(--scroll-thumb-c)',
+      // scrollbarTrackColor: 'var(--scroll-track-c)',
 
-    /* Density */
-    rowHeight: 44,
-    headerHeight: 44,
-    spacing: 6
-  })
-);
+      /* Density */
+      rowHeight: 44,
+      headerHeight: 44,
+      spacing: 6
+    })
+  );
 
   /* --------------------------------------------------
      GRID OPTIONS (CLIENT SIDE SAFE)

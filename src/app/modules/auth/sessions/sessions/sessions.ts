@@ -31,7 +31,7 @@ import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
     ConfirmDialogModule,
     TooltipModule,
     AgShareGrid
-],
+  ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './sessions.html',
   styleUrl: './sessions.scss',
@@ -53,7 +53,7 @@ export class Sessions implements OnInit {
 
   // --- View State ---
   viewMode = signal<'all' | 'mine'>('all');
-  
+
   // --- Dialog State ---
   displayDialog: boolean = false;
   selectedSession: any = null;
@@ -67,10 +67,10 @@ export class Sessions implements OnInit {
 
   // --- Data Loading ---
   loadData() {
-     // this.isLoading.set(true);
+    // this.isLoading.set(true);
     this.data = [];
 
-    const req$ = this.viewMode() === 'mine' 
+    const req$ = this.viewMode() === 'mine'
       ? this.sessionService.getMySessions()
       : this.sessionService.getAllSessions();
 
@@ -101,14 +101,14 @@ export class Sessions implements OnInit {
       {
         field: 'isValid',
         headerName: 'Status',
-        width: 120,
+        width: 130,
         cellRenderer: (params: any) => {
-          return params.value 
-            ? `<span class="p-tag p-tag-success font-bold">Active</span>` 
-            : `<span class="p-tag p-tag-danger font-bold">Revoked</span>`;
+          // Determine status string
+          const status = params.value ? 'active' : 'revoked';
+          const label = params.value ? 'Active' : 'Revoked';
+          return `<span class="status-badge status-${status}">${label}</span>`;
         }
       },
-      // 1. New User Column (Only for Admin View)
       ...(this.viewMode() === 'all' ? [{
         field: 'userId.name', // Access nested property directly for sorting/filtering
         headerName: 'User',
@@ -117,8 +117,8 @@ export class Sessions implements OnInit {
         width: 180,
         cellStyle: { fontWeight: '600', color: 'var(--text-primary)' },
         valueGetter: (params: any) => {
-             // Handle case where population might fail or user is deleted
-             return params.data.userId?.name || 'Unknown User';
+          // Handle case where population might fail or user is deleted
+          return params.data.userId?.name || 'Unknown User';
         }
       }] : []),
       {
@@ -157,7 +157,7 @@ export class Sessions implements OnInit {
   eventFromGrid(event: any) {
     console.log(event);
     if (event.type === 'cellClicked') {
-      this.openSessionDetails(event.row._id);
+      this.openSessionDetails(event.row);
     }
   }
 
@@ -206,16 +206,16 @@ export class Sessions implements OnInit {
       accept: () => {
         // this.isDeleting.set(true);
         this.sessionService.deleteSession(this.selectedSession._id).subscribe({
-            next: () => {
-                this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Record removed' });
-                this.displayDialog = false;
-                this.isDeleting.set(false);
-                this.loadData();
-            },
-            error: (err) => {
-                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not delete' });
-                this.isDeleting.set(false);
-            }
+          next: () => {
+            this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Record removed' });
+            this.displayDialog = false;
+            this.isDeleting.set(false);
+            this.loadData();
+          },
+          error: (err) => {
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not delete' });
+            this.isDeleting.set(false);
+          }
         });
       }
     });

@@ -46,7 +46,7 @@
 
       <div class="se-filter-field">
         <label for="customer">Customer</label>
-        <p-select appendTo="body" id="customer" [options]="customerOptions()" [(ngModel)]="invoiceFilter.customerId"
+        <p-select appendTo="body" appendTo="body" id="customer" [options]="customerOptions()" [(ngModel)]="invoiceFilter.customerId"
           [filter]="true" filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true"
           placeholder="All Customers" (onChange)="applyFilters()" styleClass="w-full">
         </p-select>
@@ -54,14 +54,14 @@
 
       <div class="se-filter-field">
         <label for="status">Status</label>
-        <p-select appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="invoiceFilter.status"
+        <p-select appendTo="body" appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="invoiceFilter.status"
           [showClear]="true" placeholder="All Status" (onChange)="applyFilters()" styleClass="w-full">
         </p-select>
       </div>
 
       <div class="se-filter-field">
         <label for="paymentStatus">Payment</label>
-        <p-select appendTo="body" id="paymentStatus" [options]="paymentStatusOptions"
+        <p-select appendTo="body" appendTo="body" id="paymentStatus" [options]="paymentStatusOptions"
           [(ngModel)]="invoiceFilter.paymentStatus" [showClear]="true" placeholder="All Payments"
           (onChange)="applyFilters()" styleClass="w-full">
         </p-select>

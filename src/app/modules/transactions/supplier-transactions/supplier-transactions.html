@@ -15,14 +15,14 @@
 
       <div class="se-filter-field">
         <label for="type">Type</label>
-        <p-select (onChange)="applyFilters()" id="type" [options]="transactionTypes" [(ngModel)]="filterParams.type"
+        <p-select appendTo="body" (onChange)="applyFilters()" id="type" [options]="transactionTypes" [(ngModel)]="filterParams.type"
           [showClear]="true" placeholder="All Types" appendTo="body">
         </p-select>
       </div>
 
       <div class="se-filter-field">
         <label for="effect">Effect</label>
-        <p-select (onChange)="applyFilters()" id="effect" [options]="transactionEffects"
+        <p-select appendTo="body" (onChange)="applyFilters()" id="effect" [options]="transactionEffects"
           [(ngModel)]="filterParams.effect" [showClear]="true" placeholder="All" appendTo="body">
         </p-select>
       </div>

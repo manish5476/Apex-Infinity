@@ -22,7 +22,7 @@
 
       <div class="se-filter-field">
         <label for="customer">Customer</label>
-        <p-select (onChange)="applyFilters()" id="customer" [options]="customerOptions()"
+        <p-select appendTo="body" (onChange)="applyFilters()" id="customer" [options]="customerOptions()"
           [(ngModel)]="emiFilter.customerId" [filter]="true" filterBy="name" optionLabel="name" optionValue="_id"
           [showClear]="true" placeholder="Filter by Customer" appendTo="body" styleClass="w-full">
         </p-select>
@@ -30,7 +30,7 @@
 
       <div class="se-filter-field">
         <label for="status">Status</label>
-        <p-select (onChange)="applyFilters()" id="status" [options]="statusOptions" [(ngModel)]="emiFilter.status"
+        <p-select appendTo="body" (onChange)="applyFilters()" id="status" [options]="statusOptions" [(ngModel)]="emiFilter.status"
           optionLabel="label" optionValue="value" [showClear]="true" placeholder="Select Status" appendTo="body"
           styleClass="w-full">
         </p-select>

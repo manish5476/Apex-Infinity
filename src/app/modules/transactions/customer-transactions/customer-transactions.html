@@ -8,11 +8,11 @@
       </div>
       <div class="se-filter-field">
         <label>Type</label>
-        <p-select (onChange)="applyFilters()" [options]="transactionTypes" [(ngModel)]="filterParams.type" [showClear]="true" placeholder="All" appendTo="body"></p-select>
+        <p-select appendTo="body" (onChange)="applyFilters()" [options]="transactionTypes" [(ngModel)]="filterParams.type" [showClear]="true" placeholder="All" appendTo="body"></p-select>
       </div>
       <div class="se-filter-field">
         <label>Effect</label>
-        <p-select (onChange)="applyFilters()" [options]="transactionEffects" [(ngModel)]="filterParams.effect" [showClear]="true" placeholder="All" appendTo="body"></p-select>
+        <p-select appendTo="body" (onChange)="applyFilters()" [options]="transactionEffects" [(ngModel)]="filterParams.effect" [showClear]="true" placeholder="All" appendTo="body"></p-select>
       </div>
       <div class="se-filter-field">
         <label>Search</label>

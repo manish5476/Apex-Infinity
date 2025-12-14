@@ -21,7 +21,7 @@
     <div class="se-filter-bar">
       <div class="se-filter-field">
         <label for="customer">Customer</label>
-        <p-select (onChange)="applyFilters()" id="customer" [options]="masterList.customers()"
+        <p-select appendTo="body" (onChange)="applyFilters()" id="customer" [options]="masterList.customers()"
           [(ngModel)]="customerFilter._id" [filter]="true" filterBy="name" optionLabel="name" optionValue="_id"
           [showClear]="true" placeholder="Select Customer" appendTo="body" styleClass="w-full">
         </p-select>

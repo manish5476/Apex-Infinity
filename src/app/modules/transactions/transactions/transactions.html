@@ -42,14 +42,14 @@
 
       <div class="filter-field">
         <label>Type</label>
-        <p-select [(ngModel)]="filterParams.type" [options]="transactionTypes" [showClear]="true"
+        <p-select appendTo="body" [(ngModel)]="filterParams.type" [options]="transactionTypes" [showClear]="true"
           placeholder="Select type" appendTo="body" styleClass="w-full" (onChange)="applyFilters()">
         </p-select>
       </div>
 
       <div class="filter-field">
         <label>Effect</label>
-        <p-select [(ngModel)]="filterParams.effect" [options]="transactionEffects" [showClear]="true"
+        <p-select appendTo="body" [(ngModel)]="filterParams.effect" [options]="transactionEffects" [showClear]="true"
           placeholder="Credit / Debit" appendTo="body" styleClass="w-full" (onChange)="applyFilters()">
         </p-select>
       </div>

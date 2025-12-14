@@ -87,8 +87,7 @@
 
   <div class="header-right">
 
-    <button class="notification-btn" [class.has-new]="recentNotifications.length > 0"
-      (click)="showNotificationdialog = true" pTooltip="Notifications" tooltipPosition="bottom">
+    <button (click)="showNotificationdialog = true"  class="notification-btn" [class.has-new]="recentNotifications && recentNotifications.length > 0" pTooltip="Notifications" tooltipPosition="bottom">
       <i class="pi pi-bell text-lg"></i>
     </button>
 

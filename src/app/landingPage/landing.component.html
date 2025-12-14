@@ -296,7 +296,7 @@
       </div>
 
       <div class="max-w-7xl mx-auto mb-10 reveal">
-        <div class="flex flex-col md:flex-row justify-between gap-6 items-center mb-8">
+        <div class="flex flex-col md:flex-row justify-between gap-6 items-center mb-5">
           <div class="relative w-full md:max-w-md group">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <i class="pi pi-search text-[var(--text-tertiary)] group-focus-within:text-[var(--accent-primary)] transition-colors" style="font-size: 1.25rem"></i>
@@ -310,7 +310,7 @@
           </div>
         </div>
 
-        <div class="flex overflow-x-auto pb-4 gap-2 no-scrollbar">
+        <div class="flex overflow-x-auto pb-4 mt-2 gap-2 no-scrollbar">
           @for (cat of categories(); track cat) {
             <button 
               (click)="setCategory(cat)"

@@ -17,14 +17,14 @@
         </p-datepicker>
 
         @if (currentTab() === 'customer') {
-        <p-select [options]="customerOptions()" [formControl]="$any(filterForm.get('customerId'))"
+        <p-select appendTo="body" [options]="customerOptions()" [formControl]="$any(filterForm.get('customerId'))"
           placeholder="Select Customer" [filter]="true" [showClear]="true" styleClass="w-full" appendTo="body"
           (onChange)="applyFilters()">
         </p-select>
         }
 
         @if (currentTab() === 'supplier') {
-        <p-select [options]="supplierOptions()" [formControl]="$any(filterForm.get('supplierId'))"
+        <p-select appendTo="body" [options]="supplierOptions()" [formControl]="$any(filterForm.get('supplierId'))"
           placeholder="Select Supplier" [filter]="true" [showClear]="true" styleClass="w-full" appendTo="body"
           (onChange)="applyFilters()">
         </p-select>
@@ -128,14 +128,14 @@
     @if (exportForm.get('exportType')?.value === 'customer') {
     <div class="field fadein">
       <label class="block mb-2 font-bold text-sm text-[var(--text-secondary)] uppercase">Select Customer</label>
-      <p-select [options]="customerOptions()" formControlName="specificId" placeholder="Choose Customer" [filter]="true"
+      <p-select appendTo="body" [options]="customerOptions()" formControlName="specificId" placeholder="Choose Customer" [filter]="true"
         styleClass="w-full" appendTo="body"></p-select>
     </div>
     }
     @if (exportForm.get('exportType')?.value === 'supplier') {
     <div class="field fadein">
       <label class="block mb-2 font-bold text-sm text-[var(--text-secondary)] uppercase">Select Supplier</label>
-      <p-select [options]="supplierOptions()" formControlName="specificId" placeholder="Choose Supplier" [filter]="true"
+      <p-select appendTo="body" [options]="supplierOptions()" formControlName="specificId" placeholder="Choose Supplier" [filter]="true"
         styleClass="w-full" appendTo="body"></p-select>
     </div>
     }
@@ -167,14 +167,14 @@
         </p-datepicker>
 
         @if (currentTab() === 'customer') {
-        <p-select [options]="customerOptions()" [formControl]="$any(filterForm.get('customerId'))"
+        <p-select appendTo="body" [options]="customerOptions()" [formControl]="$any(filterForm.get('customerId'))"
           placeholder="Select Customer" [filter]="true" [showClear]="true" styleClass="header-dropdown" appendTo="body"
           (onChange)="applyFilters()">
         </p-select>
         }
 
         @if (currentTab() === 'supplier') {
-        <p-select [options]="supplierOptions()" [formControl]="$any(filterForm.get('supplierId'))"
+        <p-select appendTo="body" [options]="supplierOptions()" [formControl]="$any(filterForm.get('supplierId'))"
           placeholder="Select Supplier" [filter]="true" [showClear]="true" styleClass="header-dropdown" appendTo="body"
           (onChange)="applyFilters()">
         </p-select>
@@ -265,14 +265,14 @@
     @if (exportForm.get('exportType')?.value === 'customer') {
     <div class="field fadein">
       <label class="block mb-2 font-bold">Select Customer</label>
-      <p-select [options]="customerOptions()" formControlName="specificId" placeholder="Choose Customer" [filter]="true"
+      <p-select appendTo="body" [options]="customerOptions()" formControlName="specificId" placeholder="Choose Customer" [filter]="true"
         styleClass="w-full" appendTo="body"></p-select>
     </div>
     }
     @if (exportForm.get('exportType')?.value === 'supplier') {
     <div class="field fadein">
       <label class="block mb-2 font-bold">Select Supplier</label>
-      <p-select [options]="supplierOptions()" formControlName="specificId" placeholder="Choose Supplier" [filter]="true"
+      <p-select appendTo="body" [options]="supplierOptions()" formControlName="specificId" placeholder="Choose Supplier" [filter]="true"
         styleClass="w-full" appendTo="body"></p-select>
     </div>
     }

@@ -15,7 +15,7 @@
             <div class="flex items-center gap-3">
               <div class="flex flex-col items-end">
                 <span class="text-xs uppercase text-[var(--text-secondary)] font-bold mb-1">Status</span>
-                <p-select formControlName="status" [options]="statusOptions" class="w-32"></p-select>
+                <p-select appendTo="body" formControlName="status" [options]="statusOptions" class="w-32"></p-select>
               </div>
             </div>
           </div>
@@ -29,14 +29,14 @@
 
               <div class="form-group">
                 <label>Supplier <span class="req">*</span></label>
-                <p-select appendTo="body" formControlName="supplierId" [options]="supplierOptions()"
+                <p-select appendTo="body" appendTo="body" formControlName="supplierId" [options]="supplierOptions()"
                   optionLabel="companyName" optionValue="_id" placeholder="Select Supplier" [filter]="true">
                 </p-select>
               </div>
 
               <div class="form-group">
                 <label>Branch <span class="req">*</span></label>
-                <p-select appendTo="body" formControlName="branchId" [options]="branchOptions()" optionLabel="name"
+                <p-select appendTo="body" appendTo="body" formControlName="branchId" [options]="branchOptions()" optionLabel="name"
                   optionValue="_id" placeholder="Recieving Branch">
                 </p-select>
               </div>
@@ -76,7 +76,7 @@
 
                 <div class="form-group">
                   <label class="md:hidden">Product</label>
-                  <p-select appendTo="body" formControlName="productId" [options]="productOptions()" optionLabel="name"
+                  <p-select appendTo="body" appendTo="body" formControlName="productId" [options]="productOptions()" optionLabel="name"
                     optionValue="_id" placeholder="Search Product" [filter]="true"
                     (onChange)="onProductSelect(i, $event.value)">
                   </p-select>
@@ -160,7 +160,7 @@
                 </div>
                 <div class="form-group">
                   <label>Payment Method</label>
-                  <p-select formControlName="paymentMethod" [options]="paymentMethods" appendTo="body"></p-select>
+                  <p-select appendTo="body" formControlName="paymentMethod" [options]="paymentMethods" appendTo="body"></p-select>
                 </div>
               </div>
 

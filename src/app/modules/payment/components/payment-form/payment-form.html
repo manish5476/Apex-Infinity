@@ -18,7 +18,7 @@
             <div class="form-grid-4">
               <div class="form-group">
                 <label>Payment Type <span class="req">*</span></label>
-                <p-select appendTo="body" formControlName="type" [options]="typeOptions" placeholder="Select Type"></p-select>
+                <p-select appendTo="body" appendTo="body" formControlName="type" [options]="typeOptions" placeholder="Select Type"></p-select>
               </div>
               
               <div class="form-group">
@@ -33,7 +33,7 @@
               
               <div class="form-group">
                 <label>Payment Method <span class="req">*</span></label>
-                <p-select appendTo="body" formControlName="paymentMethod" [options]="paymentMethodOptions" placeholder="Select Method"></p-select>
+                <p-select appendTo="body" appendTo="body" formControlName="paymentMethod" [options]="paymentMethodOptions" placeholder="Select Method"></p-select>
               </div>
             </div>
           </section>
@@ -44,7 +44,7 @@
               @if (paymentForm.get('type')?.value === 'inflow') {
                 <div class="form-group">
                   <label>Customer <span class="req">*</span></label>
-                  <p-select appendTo="body" 
+                  <p-select appendTo="body" appendTo="body" 
                     formControlName="customerId" 
                     [options]="customerOptions()" 
                     optionLabel="name" 
@@ -56,7 +56,7 @@
                 </div>
                 <div class="form-group">
                   <label>Invoice (Optional)</label>
-                  <p-select appendTo="body" 
+                  <p-select appendTo="body" appendTo="body" 
                     formControlName="invoiceId" 
                     [options]="invoiceOptions()" 
                     optionLabel="invoiceNumber" 
@@ -71,7 +71,7 @@
               @if (paymentForm.get('type')?.value === 'outflow') {
                 <div class="form-group">
                   <label>Supplier <span class="req">*</span></label>
-                  <p-select appendTo="body" 
+                  <p-select appendTo="body" appendTo="body" 
                     formControlName="supplierId" 
                     [options]="supplierOptions()" 
                     optionLabel="companyName" 
@@ -83,7 +83,7 @@
                 </div>
                 <div class="form-group">
                   <label>Purchase (Optional)</label>
-                   <p-select appendTo="body" 
+                   <p-select appendTo="body" appendTo="body" 
                     formControlName="purchaseId" 
                     [options]="purchaseOptions()" 
                     optionLabel="purchaseNumber" 
@@ -118,12 +118,12 @@
 
               <div class="form-group">
                 <label>Status</label>
-                <p-select appendTo="body" formControlName="status" [options]="statusOptions" placeholder="Status"></p-select>
+                <p-select appendTo="body" appendTo="body" formControlName="status" [options]="statusOptions" placeholder="Status"></p-select>
               </div>
               
               <div class="form-group col-span-2">
                 <label>Branch</label>
-                <p-select appendTo="body" 
+                <p-select appendTo="body" appendTo="body" 
                   formControlName="branchId" 
                   [options]="branchOptions()" 
                   optionLabel="name" 
@@ -180,7 +180,7 @@
             <div class="form-grid-4">
               <div class="form-group">
                 <label>Payment Type <span class="req">*</span></label>
-                <p-select  appendTo="body" formControlName="type" [options]="typeOptions"></p-select>
+                <p-select appendTo="body"  appendTo="body" formControlName="type" [options]="typeOptions"></p-select>
               </div>
               
               <div class="form-group">
@@ -195,7 +195,7 @@
               
               <div class="form-group">
                 <label>Payment Method <span class="req">*</span></label>
-                <p-select  appendTo="body" formControlName="paymentMethod" [options]="paymentMethodOptions"></p-select>
+                <p-select appendTo="body"  appendTo="body" formControlName="paymentMethod" [options]="paymentMethodOptions"></p-select>
               </div>
             </div>
           </section>
@@ -207,7 +207,7 @@
               <ng-container *ngIf="paymentForm.get('type')?.value === 'inflow'">
                 <div class="form-group">
                   <label>Customer <span class="req">*</span></label>
-                  <p-select  appendTo="body" 
+                  <p-select appendTo="body"  appendTo="body" 
                     formControlName="customerId" 
                     [options]="customerOptions()" 
                     optionLabel="name" 
@@ -218,7 +218,7 @@
                 </div>
                 <div class="form-group">
                   <label>Invoice (Optional)</label>
-                  <p-select  appendTo="body" 
+                  <p-select appendTo="body"  appendTo="body" 
                     formControlName="invoiceId" 
                     [options]="invoiceOptions()" 
                     optionLabel="invoiceNumber" 
@@ -232,7 +232,7 @@
               <ng-container *ngIf="paymentForm.get('type')?.value === 'outflow'">
                 <div class="form-group">
                   <label>Supplier <span class="req">*</span></label>
-                  <p-select  appendTo="body" 
+                  <p-select appendTo="body"  appendTo="body" 
                     formControlName="supplierId" 
                     [options]="supplierOptions()" 
                     optionLabel="name" 
@@ -243,7 +243,7 @@
                 </div>
                 <div class="form-group">
                   <label>Purchase (Optional)</label>
-                   <p-select  appendTo="body" 
+                   <p-select appendTo="body"  appendTo="body" 
                     formControlName="purchaseId" 
                     [options]="purchaseOptions()" 
                     optionLabel="purchaseNumber" 
@@ -276,12 +276,12 @@
 
               <div class="form-group">
                 <label>Status</label>
-                <p-select  appendTo="body" formControlName="status" [options]="statusOptions"></p-select>
+                <p-select appendTo="body"  appendTo="body" formControlName="status" [options]="statusOptions"></p-select>
               </div>
               
               <div class="form-group col-span-2">
                 <label>Branch</label>
-                <p-select  appendTo="body" 
+                <p-select appendTo="body"  appendTo="body" 
                   formControlName="branchId" 
                   [options]="branchOptions()" 
                   optionLabel="name" 

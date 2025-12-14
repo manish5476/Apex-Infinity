@@ -238,7 +238,7 @@
     <!-- Payment Mode -->
     <div class="flex flex-col gap-1">
       <label class="text-xs uppercase font-bold text-gray-500">Payment Mode</label>
-      <p-select formControlName="paymentMode" [options]="paymentModes" optionLabel="label" optionValue="value"
+      <p-select appendTo="body" formControlName="paymentMode" [options]="paymentModes" optionLabel="label" optionValue="value"
         styleClass="w-full" appendTo="body"></p-select>
     </div>
 
@@ -508,7 +508,7 @@ PAYMENT DIALOG
 
     <div class="flex flex-col gap-1">
       <label class="text-xs uppercase font-bold text-[var(--text-label)]">Payment Mode</label>
-      <p-select formControlName="paymentMode" [options]="paymentModes" optionLabel="label" optionValue="value"
+      <p-select appendTo="body" formControlName="paymentMode" [options]="paymentModes" optionLabel="label" optionValue="value"
         styleClass="w-full" appendTo="body"></p-select>
     </div>
 

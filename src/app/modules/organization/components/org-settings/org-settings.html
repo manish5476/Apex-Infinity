@@ -2,9 +2,383 @@
   @if (!isLoading() && organization()) {
   <div class="org-layout">
 
-    <!-- ========================================
+    <header class="org-header">
+      <div class="header-content">
+        <div class="header-left">
+          <button class="back-button" routerLink="/admin/dashboard" pTooltip="Back to Dashboard"
+            tooltipPosition="bottom">
+            <i class="pi pi-arrow-left"></i>
+          </button>
+
+          <div class="org-identity">
+            <h1>{{ organization().name }}</h1>
+            <div class="org-meta">
+              <div class="meta-item">
+                <p-tag [value]="organization().isActive ? 'Active' : 'Inactive'"
+                  [severity]="organization().isActive ? 'success' : 'danger'" [rounded]="true"></p-tag>
+              </div>
+              <span class="meta-separator">•</span>
+              <div class="meta-item">
+                <i class="pi pi-hashtag"></i>
+                <span>{{ organization().uniqueShopId }}</span>
+              </div>
+              <span class="meta-separator hide-mobile">•</span>
+              <div class="meta-item hide-mobile">
+                <i class="pi pi-user"></i>
+                <span>{{ organization().owner?.name }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <button pButton icon="pi pi-download" label="Export" class="p-button-sm hide-mobile"
+            pTooltip="Export organization data"></button>
+          <button pButton icon="pi pi-share-alt" label="Share" class="p-button-sm"></button>
+        </div>
+      </div>
+    </header>
+
+    <main class="org-body">
+
+      <aside class="org-sidebar glass-surface">
+        <div class="logo-section">
+          <div class="logo-wrapper">
+            <div class="logo-placeholder">
+              <span>{{ getInitials(organization().name) }}</span>
+            </div>
+            @if (organization().isActive) {
+            <div class="status-indicator" pTooltip="Organization Active"></div>
+            }
+          </div>
+          <h4 class="org-name-display">{{ organization().name }}</h4>
+          <p class="org-id-display">#{{ organization().uniqueShopId }}</p>
+        </div>
+
+        <div class="sidebar-details">
+          <div class="detail-item">
+            <label><i class="pi pi-envelope"></i> Primary Email</label>
+            <span class="value">{{ organization().primaryEmail }}</span>
+          </div>
+          <div class="detail-item">
+            <label><i class="pi pi-phone"></i> Phone Number</label>
+            <span [class]="organization().primaryPhone ? 'value' : 'value value-empty'">
+              {{ organization().primaryPhone || 'Not provided' }}
+            </span>
+          </div>
+          <div class="detail-item">
+            <label><i class="pi pi-file"></i> GST Number</label>
+            <span [class]="organization().gstNumber ? 'value' : 'value value-empty'">
+              {{ organization().gstNumber || 'Not registered' }}
+            </span>
+          </div>
+          <div class="detail-item">
+            <label><i class="pi pi-map-marker"></i> Main Branch</label>
+            <span class="value">{{ organization().branches?.[0]?.name || 'Head Office' }}</span>
+          </div>
+        </div>
+
+        <div class="sidebar-stats">
+          <div class="stat-card">
+            <div class="stat-value">{{ activeMembers().length }}</div>
+            <div class="stat-label">Members</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">{{ organization().branches?.length || 1 }}</div>
+            <div class="stat-label">Branches</div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="org-content">
+        <p-tabs [value]="activeTabValue()" (valueChange)="onTabChange($event)">
+          <p-tablist>
+            <p-tab value="0"><i class="pi pi-cog"></i> <span>General</span></p-tab>
+            <p-tab value="1">
+              <i class="pi pi-users"></i> <span>Team</span>
+              @if (pendingMembers().length) {
+              <p-badge [value]="pendingMembers().length.toString()" severity="warn"
+                [style]="{'margin-left': '0.5rem'}"></p-badge>
+              }
+            </p-tab>
+            <p-tab value="2"><i class="pi pi-history"></i> <span>Activity</span></p-tab>
+            @if (isOwner()) {
+            <p-tab value="3"><i class="pi pi-shield"></i> <span>Security</span></p-tab>
+            }
+          </p-tablist>
+
+          <p-tabpanels>
+
+            <p-tabpanel value="0">
+              <div class="panel-content animate-fadeInUp">
+                <div class="panel-header">
+                  <h3>Organization Details</h3>
+                  <p>Update your company's information, contact details, and tax registration.</p>
+                </div>
+                <form [formGroup]="orgForm" (ngSubmit)="updateOrgDetails()" class="form-grid">
+                  <div class="field">
+                    <label>Company Name <span class="required">*</span></label>
+                    <input pInputText formControlName="name" placeholder="Enter company name" />
+                  </div>
+                  <div class="field">
+                    <label>GST Number</label>
+                    <input pInputText formControlName="gstNumber" placeholder="22AAAAA0000A1Z5"
+                      style="text-transform: uppercase;" />
+                  </div>
+                  <div class="field">
+                    <label>Primary Email <span class="required">*</span></label>
+                    <input pInputText type="email" formControlName="primaryEmail" />
+                  </div>
+                  <div class="field">
+                    <label>Primary Phone</label>
+                    <input pInputText type="tel" formControlName="primaryPhone" />
+                  </div>
+                  <div class="field">
+                    <label>Website</label>
+                    <input pInputText type="url" placeholder="https://company.com" />
+                  </div>
+                  <div class="field">
+                    <label>Industry</label>
+                    <select class="p-inputtext">
+                      <option value="">Select industry</option>
+                      <option value="retail">Retail</option>
+                      <option value="technology">Technology</option>
+                    </select>
+                  </div>
+                  <div class="form-actions">
+                    <button pButton label="Save Changes" icon="pi pi-check" type="submit"
+                      [loading]="isSaving()"></button>
+                  </div>
+                </form>
+              </div>
+            </p-tabpanel>
+
+            <p-tabpanel value="1">
+              <div class="panel-content animate-fadeInUp">
+
+                <div class="flex justify-between items-center mb-6">
+                  <div>
+                    <h3 class="m-0 text-lg font-semibold">Active Team Members</h3>
+                    <p class="text-sm text-[var(--text-secondary)] m-0 mt-1">Manage roles and permissions</p>
+                  </div>
+                  <button pButton label="Invite Member" icon="pi pi-user-plus" (click)="showInviteDialog = true"
+                    class="p-button-sm"></button>
+                </div>
+
+                <div class="grid-wrapper">
+                  <app-ag-share-grid [columns]="column" [data]="activeMembers()" [showActions]="true"
+                    (gridEvent)="eventFromGrid($event)" style="height: 100%; width: 100%; display: block;">
+                  </app-ag-share-grid>
+                </div>
+
+                @if (pendingMembers().length > 0) {
+                <div class="mt-8 pt-6" style="border-top: 1px solid var(--border-primary);">
+                  <div class="flex items-center gap-2 mb-4">
+                    <i class="pi pi-clock text-[var(--color-accent-amber)]"></i>
+                    <h3 class="text-[var(--color-accent-amber)] m-0">Pending Approvals</h3>
+                    <p-badge [value]="pendingMembers().length.toString()" severity="warn"></p-badge>
+                  </div>
+
+                  <p-table [value]="pendingMembers()" styleClass="p-datatable-sm">
+                    <ng-template pTemplate="header">
+                      <tr>
+                        <th style="width: 30%">User</th>
+                        <th style="width: 20%">Requested</th>
+                        <th style="width: 25%">Role</th>
+                        <th style="width: 25%">Branch</th>
+                        <th style="width: 15%; text-align: right;">Action</th>
+                      </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-pending>
+                      <tr>
+                        <td>
+                          <div class="font-semibold">{{ pending.name }}</div>
+                          <div class="text-xs text-[var(--text-secondary)] mt-1">{{ pending.email }}</div>
+                        </td>
+                        <td class="text-sm text-[var(--text-secondary)]">
+                          {{ pending.requestedAt || pending.createdAt | date:'MMM d, y' }}
+                        </td>
+                        <td>
+                          <p-select appendTo="body" [options]="roles" [(ngModel)]="selectedRoles[pending._id]"
+                            optionLabel="name" optionValue="_id" placeholder="Select Role"
+                            styleClass="w-full text-sm" />
+                        </td>
+                        <td>
+                          <p-select appendTo="body" [options]="branches" [(ngModel)]="selectedBranches[pending._id]"
+                            optionLabel="name" optionValue="_id" placeholder="Select Branch"
+                            styleClass="w-full text-sm" />
+                        </td>
+                        <td style="text-align: right;">
+                          <button pButton icon="pi pi-check" class="p-button-success p-button-sm"
+                            [disabled]="!selectedRoles[pending._id] || !selectedBranches[pending._id]"
+                            (click)="approveMember(pending._id)"></button>
+                        </td>
+                      </tr>
+                    </ng-template>
+                  </p-table>
+                </div>
+                }
+              </div>
+            </p-tabpanel>
+            <p-tabpanel value="2">
+              <div class="panel-content animate-fadeInUp">
+                <div class="panel-header">
+                  <h3>Activity Log</h3>
+                  <p>Track all important events and changes.</p>
+                </div>
+
+                @if (activityLogs().length > 0) {
+                <p-timeline [value]="activityLogs()" align="left" styleClass="timeline-custom">
+
+                  <ng-template pTemplate="marker" let-log>
+                    <div class="custom-marker">
+                      <i class="pi pi-bolt"></i>
+                    </div>
+                  </ng-template>
+
+                  <ng-template pTemplate="content" let-log>
+                    <div class="log-item">
+                      <div class="log-header">
+                        <span class="log-desc">{{ log.description }}</span>
+                      </div>
+                      <div class="log-meta">
+                        <span class="log-date">
+                          <i class="pi pi-calendar"></i>
+                          {{ log.createdAt | date:'MMM d, h:mm a' }}
+                        </span>
+                        <span class="log-user">
+                          <i class="pi pi-user"></i>
+                          {{ log.userId?.name || 'System' }}
+                        </span>
+                      </div>
+                    </div>
+                  </ng-template>
+                </p-timeline>
+                } @else {
+                <div class="empty-state">
+                  <i class="pi pi-history"></i>
+                  <p>No activity recorded yet</p>
+                </div>
+                }
+              </div>
+            </p-tabpanel>
+            <!-- <p-tabpanel value="2">
+              <div class="panel-content animate-fadeInUp">
+                <div class="panel-header">
+                  <h3>Activity Log</h3>
+                </div>
+                @if (activityLogs().length > 0) {
+                <p-timeline [value]="activityLogs()" align="left">
+                  <ng-template pTemplate="content" let-log>
+                    <div class="log-item">
+                      <span class="log-date">{{ log.createdAt | date:'MMM d, y - h:mm a' }}</span>
+                      <span class="log-desc">{{ log.description }}</span>
+                      <span class="log-user">{{ log.userId?.name || 'System' }}</span>
+                    </div>
+                  </ng-template>
+                </p-timeline>
+                } @else {
+                <div class="empty-state">
+                  <i class="pi pi-history"></i>
+                  <p>No activity recorded yet</p>
+                </div>
+                }
+              </div>
+            </p-tabpanel> -->
+
+            @if (isOwner()) {
+            <p-tabpanel value="3">
+              <div class="panel-content animate-fadeInUp">
+                <div class="panel-header">
+                  <h3 style="color: var(--color-error);"><i class="pi pi-exclamation-triangle mr-2"></i>Danger Zone</h3>
+                </div>
+                <div class="danger-box warning">
+                  <div class="box-info">
+                    <strong>Transfer Ownership</strong>
+                    <p>Hand over complete control. You will lose owner privileges.</p>
+                  </div>
+                  <button pButton label="Transfer" icon="pi pi-arrow-right" class="p-button-warning"
+                    (click)="showTransferDialog = true"></button>
+                </div>
+                <div class="danger-box delete">
+                  <div class="box-info">
+                    <strong>Delete Organization</strong>
+                    <p>Permanently remove this organization and data.</p>
+                  </div>
+                  <button pButton label="Delete Forever" icon="pi pi-trash" class="p-button-danger"
+                    (click)="deleteOrganization()"></button>
+                </div>
+              </div>
+            </p-tabpanel>
+            }
+
+          </p-tabpanels>
+        </p-tabs>
+      </section>
+    </main>
+  </div>
+  } @else {
+  <div class="loading-state">
+    <i class="pi pi-spin pi-spinner" style="font-size: 3rem; color: var(--accent-primary)"></i>
+    <p>Loading organization details...</p>
+  </div>
+  }
+</div>
+
+<p-dialog header="Invite Team Member" [(visible)]="showInviteDialog" [modal]="true" [style]="{width: '450px'}">
+  <form [formGroup]="inviteForm" class="flex flex-col gap-4 mt-3">
+    <div class="field">
+      <label>Full Name <span class="required">*</span></label>
+      <input pInputText formControlName="name" placeholder="John Doe" />
+    </div>
+    <div class="field">
+      <label>Email Address <span class="required">*</span></label>
+      <input pInputText type="email" formControlName="email" />
+    </div>
+    <div class="field">
+      <label>Role</label>
+      <select formControlName="role" class="p-inputtext w-full">
+        <option [ngValue]="null">Select Role</option>
+        @for (r of availableRoles; track r.value) { <option [value]="r.value">{{r.label}}</option> }
+      </select>
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <button pButton label="Send Invite" (click)="inviteUser()" [disabled]="inviteForm.invalid"
+      [loading]="isSaving()"></button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog header="Transfer Ownership" [(visible)]="showTransferDialog" [modal]="true" [style]="{width: '500px'}">
+  <form [formGroup]="transferForm" class="flex flex-col gap-4 mt-3">
+    <div class="field">
+      <label>Select New Owner</label>
+      <select formControlName="newOwnerId" class="p-inputtext w-full">
+        @for (m of activeMembers(); track m._id) {
+        @if (m._id !== organization().owner._id) { <option [value]="m._id">{{m.name}}</option> }
+        }
+      </select>
+    </div>
+    <div class="field">
+      <label>Type <strong>"CONFIRM"</strong></label>
+      <input pInputText formControlName="confirmName" />
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <button pButton label="Transfer Ownership" class="p-button-danger" (click)="transferOwnership()"
+      [disabled]="transferForm.invalid || transferForm.value.confirmName !== 'CONFIRM'"></button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog></p-confirmDialog>
+<p-toast position="top-right"></p-toast>
+
+
+<!-- <div class="page-container animate-fadeIn">
+  @if (!isLoading() && organization()) {
+  <div class="org-layout">
+
          HEADER - Premium Gradient Banner
-         ======================================== -->
     <header class="org-header">
       <div class="header-content">
 
@@ -50,15 +424,13 @@
       </div>
     </header>
 
-    <!-- ========================================
          MAIN BODY - Two Column Layout
-         ======================================== -->
     <main class="org-body">
 
-      <!-- SIDEBAR: Organization Info Card -->
+      SIDEBAR: Organization Info Card
       <aside class="org-sidebar glass-surface">
 
-        <!-- Logo & Status -->
+        Logo & Status
         <div class="logo-section">
           <div class="logo-wrapper">
             <div class="logo-placeholder">
@@ -73,7 +445,7 @@
           <p class="org-id-display">#{{ organization().uniqueShopId }}</p>
         </div>
 
-        <!-- Contact Details -->
+        Contact Details
         <div class="sidebar-details">
 
           <div class="detail-item">
@@ -114,7 +486,7 @@
 
         </div>
 
-        <!-- Quick Stats -->
+        Quick Stats
         <div class="sidebar-stats">
           <div class="stat-card">
             <div class="stat-value">{{ activeMembers().length }}</div>
@@ -129,12 +501,12 @@
 
       </aside>
 
-      <!-- CONTENT: Tabbed Sections -->
+      CONTENT: Tabbed Sections
       <section class="org-content">
 
         <p-tabs [value]="activeTabValue()">
 
-          <!-- Tab Navigation -->
+          Tab Navigation
           <p-tablist>
             <p-tab value="0">
               <i class="pi pi-cog"></i>
@@ -163,10 +535,10 @@
             }
           </p-tablist>
 
-          <!-- Tab Panels -->
+          Tab Panels
           <p-tabpanels>
 
-            <!-- ==================== TAB 0: GENERAL ==================== -->
+            ==================== TAB 0: GENERAL ====================
             <p-tabpanel value="0">
               <div class="panel-content animate-fadeInUp">
 
@@ -236,11 +608,11 @@
               </div>
             </p-tabpanel>
 
-            <!-- ==================== TAB 1: TEAM ==================== -->
+            ==================== TAB 1: TEAM ====================
             <p-tabpanel value="1">
               <div class="panel-content animate-fadeInUp">
 
-                <!-- Active Members Section -->
+                Active Members Section
                 <div class="flex justify-between items-center mb-6">
                   <div>
                     <h3 class="m-0 text-lg font-semibold">Active Team Members</h3>
@@ -321,55 +693,9 @@
 
                 </p-table>
 
-                <!-- Pending Approvals Section -->
+                Pending Approvals Section
                 @if (pendingMembers().length > 0) {
-                <!-- <div class="mt-8 pt-6" style="border-top: 1px solid var(--border-primary);">
-
-                  <div class="flex items-center gap-2 mb-4">
-                    <i class="pi pi-clock text-[var(--color-accent-amber)]"></i>
-                    <h3 class="text-[var(--color-accent-amber)] m-0">
-                      Pending Approvals
-                    </h3>
-                    <p-badge [value]="pendingMembers().length.toString()" severity="warn"></p-badge>
-                  </div>
-
-                  <p-table [value]="pendingMembers()" styleClass="p-datatable-sm">
-
-                    <ng-template pTemplate="header">
-                      <tr>
-                        <th style="width: 40%">User</th>
-                        <th style="width: 30%">Requested</th>
-                        <th style="width: 30%; text-align: right;">Action</th>
-                      </tr>
-                    </ng-template>
-
-                    <ng-template pTemplate="body" let-pending>
-                      <tr>
-                        <td>
-                          <div class="font-semibold">{{ pending.name }}</div>
-                          <div class="text-xs text-[var(--text-secondary)] mt-1">
-                            {{ pending.email }}
-                          </div>
-                        </td>
-
-                        <td class="text-sm text-[var(--text-secondary)]">
-                          {{ pending.createdAt | date:'MMM d, y' }}
-                        </td>
-
-                        <td style="text-align: right;">
-                          <button pButton label="Approve" icon="pi pi-check" size="small"
-                            class="p-button-success p-button-sm" (click)="approveMember(pending._id)"></button>
-
-                          <button pButton icon="pi pi-times" size="small"
-                            class="p-button-text p-button-danger p-button-sm ml-2" pTooltip="Reject"></button>
-                        </td>
-                      </tr>
-                    </ng-template>
-
-                  </p-table>
-
-                </div> -->
-                <div class="mt-8 pt-6" style="border-top: 1px solid var(--border-primary);">
+               <div class="mt-8 pt-6" style="border-top: 1px solid var(--border-primary);">
 
                   <div class="flex items-center gap-2 mb-4">
                     <i class="pi pi-clock text-[var(--color-accent-amber)]"></i>
@@ -391,7 +717,7 @@
 
                     <ng-template pTemplate="body" let-pending>
                       <tr>
-                        <!-- User -->
+                        User
                         <td>
                           <div class="font-semibold">{{ pending.name }}</div>
                           <div class="text-xs text-[var(--text-secondary)] mt-1">
@@ -399,24 +725,24 @@
                           </div>
                         </td>
 
-                        <!-- Requested Date -->
+                        Requested Date
                         <td class="text-sm text-[var(--text-secondary)]">
                           {{ pending.requestedAt || pending.createdAt | date:'MMM d, y' }}
                         </td>
 
-                        <!-- Role Dropdown -->
+                        Role Dropdown
                         <td>
-                          <p-select [options]="roles" [(ngModel)]="selectedRoles[pending._id]" optionLabel="name"
+                          <p-select appendTo="body" [options]="roles" [(ngModel)]="selectedRoles[pending._id]" optionLabel="name"
                             optionValue="_id" placeholder="Select Role" styleClass="w-full text-sm" />
                         </td>
 
-                        <!-- Branch Dropdown -->
+                        Branch Dropdown
                         <td>
-                          <p-select [options]="branches" [(ngModel)]="selectedBranches[pending._id]" optionLabel="name"
+                          <p-select appendTo="body" [options]="branches" [(ngModel)]="selectedBranches[pending._id]" optionLabel="name"
                             optionValue="_id" placeholder="Select Branch" styleClass="w-full text-sm" />
                         </td>
 
-                        <!-- Approve Button -->
+                        Approve Button
                         <td style="text-align: right;">
                           <button pButton label="Approve" icon="pi pi-check" size="small"
                             class="p-button-success p-button-sm"
@@ -438,7 +764,7 @@
               </div>
             </p-tabpanel>
 
-            <!-- ==================== TAB 2: ACTIVITY ==================== -->
+            ==================== TAB 2: ACTIVITY ====================
             <p-tabpanel value="2">
               <div class="panel-content animate-fadeInUp">
 
@@ -489,7 +815,7 @@
               </div>
             </p-tabpanel>
 
-            <!-- ==================== TAB 3: SECURITY (Owner Only) ==================== -->
+            ==================== TAB 3: SECURITY (Owner Only) ====================
             @if (isOwner()) {
             <p-tabpanel value="3">
               <div class="panel-content animate-fadeInUp">
@@ -502,7 +828,7 @@
                   <p>Critical actions that permanently affect your organization.</p>
                 </div>
 
-                <!-- Transfer Ownership -->
+                Transfer Ownership
                 <div class="danger-box warning">
                   <div class="box-info">
                     <strong>Transfer Ownership</strong>
@@ -515,7 +841,7 @@
                     (click)="showTransferDialog = true"></button>
                 </div>
 
-                <!-- Delete Organization -->
+                Delete Organization
                 <div class="danger-box delete">
                   <div class="box-info">
                     <strong>Delete Organization</strong>
@@ -544,7 +870,7 @@
 
   } @else {
 
-  <!-- Loading State -->
+  Loading State
   <div class="loading-state">
     <i class="pi pi-spin pi-spinner" style="font-size: 3rem; color: var(--accent-primary)"></i>
     <p>Loading organization details...</p>
@@ -554,9 +880,6 @@
 
 </div>
 
-<!-- ========================================
-     DIALOG: Invite Team Member
-     ======================================== -->
 <p-dialog header="Invite Team Member" [(visible)]="showInviteDialog" [modal]="true" [dismissableMask]="true"
   [style]="{width: '450px', maxWidth: '95vw'}">
 
@@ -594,15 +917,12 @@
 
 </p-dialog>
 
-<!-- ========================================
-     DIALOG: Transfer Ownership
-     ======================================== -->
 <p-dialog header="Transfer Ownership" [(visible)]="showTransferDialog" [modal]="true" [dismissableMask]="true"
   [style]="{width: '500px', maxWidth: '95vw'}">
 
   <form [formGroup]="transferForm" class="flex flex-col gap-4 mt-3">
 
-    <!-- Warning Banner -->
+    Warning Banner
     <div style="
       background: color-mix(in srgb, var(--color-accent-amber) 15%, transparent);
       border: 1px solid color-mix(in srgb, var(--color-accent-amber) 40%, transparent);
@@ -649,8 +969,8 @@
 
 </p-dialog>
 
-<!-- Confirmation Dialog Component -->
+Confirmation Dialog Component
 <p-confirmDialog></p-confirmDialog>
 
-<!-- Toast Notifications -->
-<p-toast position="top-right"></p-toast>
+Toast Notifications
+<p-toast position="top-right"></p-toast> -->

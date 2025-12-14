@@ -21,7 +21,7 @@
             
             <div class="form-group flex-1 min-w-[200px]">
               <label>Customer <span class="req">*</span></label>
-              <p-select appendTo="body" formControlName="customerId" [options]="customerOptions()" optionLabel="name"
+              <p-select appendTo="body" appendTo="body" formControlName="customerId" [options]="customerOptions()" optionLabel="name"
                 optionValue="_id" [filter]="true" filterBy="name" placeholder="Select Customer"
                 (onChange)="onCustomerSelect($event); generateInvoiceNumber()" styleClass="w-full">
               </p-select>
@@ -45,19 +45,19 @@
 
             <div class="form-group flex-1 min-w-[120px]">
               <label>Status</label>
-              <p-select appendTo="body" formControlName="status" [options]="statusOptions" styleClass="w-full"></p-select>
+              <p-select appendTo="body" appendTo="body" formControlName="status" [options]="statusOptions" styleClass="w-full"></p-select>
             </div>
 
             <div class="form-group flex-1 min-w-[150px]">
               <label>Branch (Optional)</label>
-              <p-select appendTo="body" formControlName="branchId" [options]="branchOptions()" optionLabel="name"
+              <p-select appendTo="body" appendTo="body" formControlName="branchId" [options]="branchOptions()" optionLabel="name"
                 optionValue="_id" [filter]="true" filterBy="name" placeholder="Select Branch" styleClass="w-full">
               </p-select>
             </div>
 
             <div class="form-group flex-1 min-w-[150px]">
               <label>GST Type</label>
-              <p-select appendTo="body" formControlName="gstType" [options]="gstTypeOptions" styleClass="w-full"></p-select>
+              <p-select appendTo="body" appendTo="body" formControlName="gstType" [options]="gstTypeOptions" styleClass="w-full"></p-select>
             </div>
 
           </div>
@@ -85,7 +85,7 @@
 
                   <!-- Product -->
                   <td class="p-2 col-product">
-                    <p-select appendTo="body" formControlName="productId" [options]="productOptions()"
+                    <p-select appendTo="body" appendTo="body" formControlName="productId" [options]="productOptions()"
                       optionLabel="name" optionValue="_id" [filter]="true" filterBy="name" placeholder="Select Product"
                       (onChange)="onProductSelect($event, i)" styleClass="w-full border-none bg-transparent">
                     </p-select>
@@ -166,7 +166,7 @@
                 
                 <div class="form-group">
                   <label class="text-xs font-bold uppercase text-[var(--text-secondary)] mb-1 block">Payment Method</label>
-                  <p-select appendTo="body" formControlName="paymentMethod" [options]="paymentMethodOptions" styleClass="w-full"></p-select>
+                  <p-select appendTo="body" appendTo="body" formControlName="paymentMethod" [options]="paymentMethodOptions" styleClass="w-full"></p-select>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4">
