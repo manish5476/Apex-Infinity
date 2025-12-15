@@ -1,251 +1,194 @@
 /* ========================================================================
-   ANGULAR v20 AccounTech Theme - Organization Details
+   ANGULAR v20 AccounTech Theme - Org Settings (Compact / High Density)
    ======================================================================== */
 
 :host {
   display: block;
+  width: 100%;
   height: 100%;
-  font-family: var(--font-body);
-  overflow: hidden;
+  /* Sets a smaller base font size for this component to mimic 70% zoom */
+  font-size: 0.85rem;
 }
 
-/* ============================================
-   2. PAGE LAYOUT
-   ============================================ */
 .page-container {
-  height: 100%;
   display: flex;
   flex-direction: column;
-  background: var(--bg-primary);
+  background-color: var(--bg-primary);
+  height: 100%;
   overflow: hidden;
-}
 
-.org-layout {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  @media (max-width: 900px) {
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+  }
 }
 
 /* ============================================
-   3. PREMIUM HEADER (Updated for better look)
+   1. HEADER (Compact)
    ============================================ */
 .org-header {
-  position: relative;
-  /* Cleaner Gradient */
+  flex-shrink: 0;
+  padding: 0.75rem 1.5rem; /* Reduced padding */
   background: linear-gradient(
     135deg,
     var(--accent-primary) 0%,
     color-mix(in srgb, var(--accent-primary) 70%, #000) 100%
   );
-  /* Reduced padding for a sleeker look */
-  padding: 1rem 1.5rem;
-  color: var(--text-white);
-  box-shadow: var(--shadow-md);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  position: relative;
   z-index: 10;
-  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+
+  @media (max-width: 768px) {
+    padding: 0.75rem;
+    position: sticky;
+    top: 0;
+  }
 
   .header-content {
-    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
+    align-items: flex-start;
   }
 
   .header-left {
     display: flex;
-    align-items: center;
     gap: 1rem;
-    flex: 1;
-    min-width: 0;
+    align-items: center;
   }
 
   .back-button {
-    flex-shrink: 0;
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px; /* Smaller button */
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%; /* Circle looks cleaner */
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: #ffffff;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     cursor: pointer;
-    transition: all 0.2s;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(5px);
+    transition: var(--transition-fast);
+
+    i {
+      font-size: 0.8rem;
+    } /* Smaller Icon */
 
     &:hover {
-      background: rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.25);
       transform: translateX(-2px);
     }
   }
 
   .org-identity {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
     h1 {
       margin: 0;
-      font-size: 1.25rem; /* Smaller, cleaner font size */
+      font-size: 1.1rem; /* Reduced font size */
       font-weight: 700;
-      font-family: var(--font-heading);
-      letter-spacing: -0.01em;
-      color: #ffffff;
+      letter-spacing: -0.3px;
+      color: #fff;
       line-height: 1.2;
     }
-
     .org-meta {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 2px;
       font-size: 0.75rem;
       opacity: 0.9;
-      margin-top: 2px;
-
+      color: #fff;
       .meta-item {
         display: flex;
         align-items: center;
-        gap: 0.25rem;
-
-        /* Removed background pill for text items for cleaner look */
-        span {
-          opacity: 0.9;
-        }
-        i {
-          font-size: 0.7rem;
-          opacity: 0.7;
-        }
-      }
-
-      .meta-separator {
-        opacity: 0.4;
-      }
-    }
-  }
-
-  .header-right {
-    display: flex;
-    gap: 0.5rem;
-    flex-shrink: 0;
-
-    button {
-      background: rgba(255, 255, 255, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #ffffff;
-      backdrop-filter: blur(8px);
-      transition: all 0.2s;
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.25);
+        gap: 0.3rem;
       }
     }
   }
 }
 
 /* ============================================
-   4. BODY GRID (Sidebar + Content)
+   2. MAIN LAYOUT
    ============================================ */
 .org-body {
   flex: 1;
   display: grid;
-  grid-template-columns: 280px 1fr; /* Slightly narrower sidebar */
-  gap: var(--spacing-xl);
-  padding: var(--spacing-xl);
-  width: 100%;
+  /* Reduced Sidebar Width (280px -> 240px) */
+  grid-template-columns: 240px 1fr;
+  gap: 1rem; /* Tighter gap */
+  padding: 1rem; /* Tighter padding */
   overflow-y: auto;
+  width: 100%;
 
   @media (max-width: 1024px) {
-    grid-template-columns: 260px 1fr;
-    gap: var(--spacing-lg);
-  }
-  @media (max-width: 900px) {
     grid-template-columns: 1fr;
-    padding: var(--spacing-lg);
+    gap: 1rem;
+    padding: 0.75rem;
+    overflow-y: visible;
   }
 }
 
 /* ============================================
-   5. SIDEBAR (Glass Card)
+   3. SIDEBAR (Compact)
    ============================================ */
 .org-sidebar {
   height: fit-content;
-  position: sticky;
-  top: 0;
-
   background: var(--bg-secondary);
+  border-radius: 8px; /* Tighter radius */
+  box-shadow: var(--shadow-xs);
   border: 1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius-lg);
-  padding: var(--spacing-lg); /* Reduced padding */
-  box-shadow: var(--shadow-sm);
+  padding: 1rem; /* Reduced internal padding */
 
-  /* Logo */
+  @media (min-width: 1025px) {
+    position: sticky;
+    top: 0;
+  }
+
+  /* Logo Area */
   .logo-section {
     text-align: center;
-    margin-bottom: var(--spacing-lg);
-    padding-bottom: var(--spacing-lg);
-    border-bottom: 1px solid var(--border-primary);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px dashed var(--border-secondary);
 
-    .logo-wrapper {
-      display: inline-flex;
-      position: relative;
-      margin-bottom: 0.5rem;
-
-      .logo-placeholder {
-        width: 64px;
-        height: 64px; /* Smaller Logo */
-        background: linear-gradient(135deg, var(--bg-ternary) 0%, var(--bg-primary) 100%);
-        border: 1px solid var(--border-secondary);
-        border-radius: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        span {
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: var(--accent-primary);
-        }
-      }
-
-      .status-indicator {
-        position: absolute;
-        bottom: -2px;
-        right: -2px;
-        width: 12px;
-        height: 12px;
-        background: var(--color-success);
-        border: 2px solid var(--bg-secondary);
-        border-radius: 50%;
-      }
+    .logo-placeholder {
+      width: 60px;
+      height: 60px; /* Smaller Logo */
+      margin: 0 auto 0.75rem;
+      background: linear-gradient(135deg, var(--bg-ternary), var(--bg-secondary));
+      border: 1px solid var(--border-secondary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent-primary);
+      box-shadow: var(--shadow-sm);
     }
 
-    .org-name-display {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--text-primary);
+    h4 {
       margin: 0;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      font-weight: 700;
     }
-    .org-id-display {
-      font-size: 0.75rem;
+    p {
+      margin: 2px 0 0;
+      font-size: 0.7rem;
       color: var(--text-tertiary);
-      font-family: var(--font-mono);
-      margin-top: 2px;
+      font-family: monospace;
     }
   }
 
-  /* Details List */
+  /* Info List */
   .sidebar-details {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: var(--spacing-lg);
+    gap: 0.85rem;
 
     .detail-item {
       display: flex;
@@ -253,56 +196,53 @@
       gap: 2px;
 
       label {
-        font-size: 0.7rem;
-        text-transform: uppercase;
+        font-size: 0.65rem;
         font-weight: 700;
+        text-transform: uppercase;
         color: var(--text-tertiary);
         display: flex;
         align-items: center;
         gap: 0.4rem;
         i {
           color: var(--accent-primary);
+          font-size: 0.8rem;
         }
       }
 
       .value {
-        color: var(--text-primary);
+        padding-left: 1.25rem;
         font-weight: 500;
-        font-size: 0.85rem;
-        word-break: break-word;
-        padding-left: 1.1rem; /* Align under text */
-      }
-      .value-empty {
-        color: var(--text-tertiary);
-        font-style: italic;
+        font-size: 0.8rem;
+        color: var(--text-primary);
+        word-break: break-all;
       }
     }
   }
 
-  /* Quick Stats */
+  /* Stats Grid */
   .sidebar-stats {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.5rem;
-    padding-top: var(--spacing-lg);
-    border-top: 1px solid var(--border-primary);
+    margin-top: 1.25rem;
 
     .stat-card {
       background: var(--bg-ternary);
-      border: 1px solid var(--border-secondary);
-      border-radius: var(--ui-border-radius);
-      padding: 0.5rem;
+      border-radius: 6px;
+      padding: 0.6rem;
       text-align: center;
+      border: 1px solid var(--border-secondary);
 
       .stat-value {
         font-size: 1rem;
-        font-weight: 700;
+        font-weight: 800;
         color: var(--text-primary);
         line-height: 1;
         margin-bottom: 2px;
       }
       .stat-label {
-        font-size: 0.65rem;
+        font-size: 0.6rem;
+        font-weight: 600;
         color: var(--text-secondary);
         text-transform: uppercase;
       }
@@ -311,83 +251,220 @@
 }
 
 /* ============================================
-   6. CONTENT AREA (Tabs)
+   4. CONTENT & TABS
    ============================================ */
 .org-content {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 
+  /* Modern Tabs (Compact) */
   ::ng-deep .p-tablist {
-    background: transparent;
     border-bottom: 1px solid var(--border-primary);
-    padding: 0 0 4px 0;
-    margin-bottom: var(--spacing-lg);
-    gap: 1rem;
+    margin-bottom: 1rem;
+    overflow-x: auto;
+    white-space: nowrap;
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 
   ::ng-deep .p-tab {
-    background: transparent;
-    border: none;
-    border-bottom: 2px solid transparent;
-    border-radius: 0;
-    color: var(--text-secondary);
+    padding: 0.65rem 1rem; /* Smaller tabs */
     font-weight: 600;
-    font-size: 0.9rem;
-    padding: 0.5rem 0.25rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    border-bottom: 2px solid transparent;
+    transition: var(--transition-base);
 
-    &:hover:not(.p-tab-active) {
+    &:hover {
       color: var(--text-primary);
       background: transparent;
     }
 
     &.p-tab-active {
-      border-bottom-color: var(--accent-primary);
       color: var(--accent-primary);
-      background: transparent;
-      box-shadow: none;
+      border-bottom-color: var(--accent-primary);
     }
   }
 
   ::ng-deep .p-tabpanels {
+    flex: 1;
     padding: 0;
     background: transparent;
+    overflow: hidden;
+    @media (max-width: 900px) {
+      overflow: visible;
+    }
   }
 }
 
-/* ============================================
-   7. PANELS & CARDS
-   ============================================ */
+/* Panel Card Styling */
 .panel-content {
   background: var(--bg-secondary);
+  border-radius: 12px;
+  box-shadow: var(--shadow-xs);
   border: 1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius-lg);
-  padding: var(--spacing-xl);
+  padding: 1.25rem; /* Reduced padding */
+
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+    height: auto;
+  }
 
   .panel-header {
-    margin-bottom: var(--spacing-lg);
-    padding-bottom: var(--spacing-lg);
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
     border-bottom: 1px solid var(--border-primary);
-
     h3 {
-      margin: 0 0 0.25rem 0;
-      color: var(--text-primary);
-      font-size: 1.1rem;
+      margin: 0 0 0.25rem;
+      font-size: 1rem;
       font-weight: 700;
+      color: var(--text-primary);
     }
     p {
       margin: 0;
       color: var(--text-secondary);
-      font-size: 0.85rem;
+      font-size: 0.8rem;
     }
   }
 }
 
 /* ============================================
-   8. FORMS (Grid Layout)
+   5. GRID WRAPPER
+   ============================================ */
+.grid-wrapper {
+  height: 100%; /* Fill available space */
+  min-height: 400px; /* Safety min */
+  width: 100%;
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+
+  @media (max-width: 900px) {
+    height: 60vh;
+  }
+
+  ::ng-deep app-ag-share-grid {
+    flex: 1;
+    height: 100%;
+    width: 100%;
+    display: block;
+  }
+}
+
+/* ============================================
+   6. ACTIVITY LOG SCROLL
+   ============================================ */
+.activity-scroll-container {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+  /* Since font is smaller, we can fit more lines, height relies on flex:1 parent */
+
+  @media (max-width: 900px) {
+    max-height: 60vh;
+    overflow: visible;
+  }
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+    border-radius: 10px;
+  }
+}
+
+/* Log Item Styling */
+.log-item {
+  background: var(--bg-ternary);
+  padding: 0.75rem;
+  border-radius: 6px;
+  border-left: 3px solid var(--accent-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-bottom: 0.75rem;
+
+  .log-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .log-desc {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+  }
+
+  .log-meta {
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+    span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+  }
+}
+
+/* ============================================
+   7. LIST ITEMS (Mobile Pending)
+   ============================================ */
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  transition: transform 0.2s;
+
+  &:hover {
+    border-color: var(--accent-primary);
+    transform: translateY(-1px);
+  }
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    .actions {
+      width: 100%;
+      display: flex;
+      gap: 0.5rem;
+      button {
+        flex: 1;
+      }
+    }
+  }
+}
+
+/* ============================================
+   8. FORMS (Compact)
    ============================================ */
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+  gap: 1rem;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -396,38 +473,30 @@
   .field {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.25rem;
 
     label {
       font-size: 0.75rem;
-      font-weight: 700;
+      font-weight: 600;
       color: var(--text-secondary);
-      text-transform: uppercase;
-      .required {
-        color: var(--color-error);
-        margin-left: 2px;
-      }
     }
 
     input,
     select {
       width: 100%;
-      padding: 0.6rem;
-      background: var(--bg-ternary);
-      border: 1px solid var(--border-primary);
-      border-radius: var(--ui-border-radius);
+      padding: 0.5rem 0.65rem; /* Compact padding */
+      border: 1px solid var(--border-secondary);
+      border-radius: 6px;
+      background: var(--bg-primary);
       color: var(--text-primary);
-      font-size: 0.9rem;
+      transition: var(--transition-fast);
+      font-size: 0.85rem;
 
       &:focus {
-        outline: none;
         border-color: var(--accent-primary);
-        box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-primary) 15%, transparent);
+        box-shadow: 0 0 0 2px var(--accent-focus);
+        outline: none;
       }
-    }
-    .field-hint {
-      font-size: 0.75rem;
-      color: var(--text-tertiary);
     }
   }
 
@@ -435,426 +504,45 @@
     grid-column: 1 / -1;
     display: flex;
     justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border-primary);
-  }
-}
-
-/* ============================================
-   9. GRID WRAPPER (Updated Height)
-   ============================================ */
-.grid-wrapper {
-  /* REDUCED HEIGHT as requested */
-  height: 350px;
-  width: 100%;
-  border: 1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius);
-  overflow: hidden;
-  margin-top: 1rem;
-  background: var(--bg-primary);
-
-  /* Inner grid component needs to fill this wrapper */
-  ::ng-deep app-ag-share-grid {
-    height: 100%;
-    width: 100%;
-    display: block;
-  }
-}
-
-/* ============================================
-   10. CUSTOM RENDERERS (Avatars/Badges)
-   ============================================ */
-:host ::ng-deep {
-  .user-avatar-circle {
-    width: 28px;
-    height: 28px;
-    background: var(--accent-primary);
-    color: #fff;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 0.75rem;
-  }
-
-  .owner-badge {
-    color: var(--accent-primary);
-    font-size: 0.65rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    margin-top: 2px;
-  }
-
-  .ag-badge {
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    &.badge-info {
-      background: rgba(59, 130, 246, 0.1);
-      color: #3b82f6;
-      border: 1px solid rgba(59, 130, 246, 0.2);
-    }
-    &.badge-secondary {
-      background: var(--bg-ternary);
-      color: var(--text-secondary);
-      border: 1px solid var(--border-secondary);
-    }
-  }
-
-  .action-btn.delete-btn {
-    color: var(--color-error);
-    background: transparent;
-    border: 1px solid transparent;
-    width: 26px;
-    height: 26px;
-    border-radius: 4px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    &:hover {
-      background: rgba(239, 68, 68, 0.1);
-      border-color: rgba(239, 68, 68, 0.2);
+    margin-top: 0.5rem;
+    button {
+      width: auto;
+      padding: 0.4rem 1rem;
+      font-size: 0.85rem;
+      @media (max-width: 600px) {
+        width: 100%;
+      }
     }
   }
 }
 
 /* ============================================
-   11. TIMELINE & DANGER ZONE
+   9. UTILITIES
    ============================================ */
-.log-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  padding: 0.75rem;
-  background: var(--bg-ternary);
-  border-radius: var(--ui-border-radius);
-  border-left: 2px solid var(--accent-primary);
-
-  .log-date {
-    font-size: 0.7rem;
-    color: var(--text-tertiary);
-    font-weight: 600;
-    text-transform: uppercase;
-  }
-  .log-desc {
-    font-weight: 500;
-    color: var(--text-primary);
-    font-size: 0.85rem;
-  }
-  .log-user {
-    font-size: 0.75rem;
-    color: var(--accent-primary);
-    font-weight: 600;
+.hide-mobile {
+  @media (max-width: 768px) {
+    display: none !important;
   }
 }
-
-.danger-box {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  border: 1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius);
-  margin-bottom: 1rem;
-  background: var(--bg-ternary);
-
-  &.warning {
-    border-color: rgba(245, 158, 11, 0.3);
-    background: rgba(245, 158, 11, 0.05);
-  }
-  &.delete {
-    border-color: rgba(239, 68, 68, 0.3);
-    background: rgba(239, 68, 68, 0.05);
-  }
-
-  .box-info {
-    strong {
-      display: block;
-      color: var(--text-primary);
-      font-size: 0.9rem;
-      margin-bottom: 0.1rem;
-    }
-    p {
-      margin: 0;
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-    }
-  }
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
 }
-
 .animate-fadeInUp {
   animation: fadeInUp 0.3s ease-out;
 }
-@keyframes fadeInUp {
+
+@keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
-}
-
-/* ... Existing header/layout/sidebar/form styles ... */
-
-/* ============================================
-   9. GRID WRAPPER
-   ============================================ */
-.grid-wrapper {
-  height: 350px;
-  width: 100%;
-  border: 1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius);
-  overflow: hidden;
-  margin-top: 1rem;
-  background: var(--bg-primary);
-
-  ::ng-deep app-ag-share-grid {
-    height: 100%;
-    width: 100%;
-    display: block;
-  }
-}
-
-/* ============================================
-   10. CUSTOM RENDERERS (Grid & Badges)
-   ============================================ */
-:host ::ng-deep {
-  /* --- User Cell Fix --- */
-  .user-cell-wrapper {
-    display: flex;
-    align-items: center;
-    height: 100%;
-    width: 100%; /* Ensure it takes full cell width */
-    gap: 12px;
-  }
-
-  .user-avatar-circle {
-    width: 32px;
-    height: 32px;
-    min-width: 32px; /* Prevent shrinking */
-    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-    color: #fff;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 0.75rem;
-    box-shadow: var(--shadow-sm);
-  }
-
-  .user-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex: 1; /* Take remaining space */
-    min-width: 0; /* CRITICAL: Allows text truncation to work inside flex */
-  }
-
-  .user-name {
-    font-weight: 600;
-    color: var(--text-primary);
-    font-size: 0.9rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block; /* Ensure text behavior */
-  }
-
-  /* Owner Badge */
-  .owner-badge {
-    background: rgba(245, 158, 11, 0.15);
-    color: #d97706;
-    border: 1px solid rgba(245, 158, 11, 0.3);
-    font-size: 0.65rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    padding: 2px 6px;
-    border-radius: 6px;
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    flex-shrink: 0; /* Prevent badge from shrinking */
-  }
-
-  /* Actions */
-  .action-btn.delete-btn {
-    color: var(--color-error);
-    background: transparent;
-    border: 1px solid transparent;
-    width: 28px;
-    height: 28px;
-    border-radius: 4px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    &:hover {
-      background: rgba(239, 68, 68, 0.1);
-      border-color: rgba(239, 68, 68, 0.2);
-    }
-  }
-}
-
-/* ============================================
-   11. TIMELINE (Redesigned)
-   ============================================ */
-
-/* Wrapper for the timeline component */
-:host ::ng-deep .timeline-custom {
-  /* Connector Line */
-  .p-timeline-event-connector {
-    background-color: var(--border-secondary);
-    width: 2px;
-  }
-
-  /* Marker Bubble */
-  .custom-marker {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    z-index: 1;
-    background: var(--bg-secondary);
-    border: 2px solid var(--accent-primary);
-    color: var(--accent-primary);
-    box-shadow: 0 0 0 4px var(--bg-primary); /* "Halo" effect to separate from line */
-
-    i {
-      font-size: 0.9rem;
-    }
-  }
-
-  /* Content Spacing */
-  .p-timeline-event-content {
-    padding-bottom: 2rem;
-  }
-
-  /* Remove default opposite slot padding to align left */
-  .p-timeline-event-opposite {
-    flex: 0;
-    padding: 0;
-    min-width: 0;
-  }
-}
-
-/* The Log Card itself */
-.log-item {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius-lg);
-  padding: 1rem;
-  margin-left: 1rem;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.2s;
-
-  &:hover {
-    transform: translateX(4px);
-    border-color: var(--accent-primary);
-  }
-
-  .log-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 0.5rem;
-  }
-
-  .log-desc {
-    font-size: 0.9rem;
-    color: var(--text-primary);
-    font-weight: 500;
-    line-height: 1.4;
-  }
-
-  .log-meta {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-top: 0.75rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid var(--border-secondary);
-
-    span {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-      font-weight: 600;
-
-      i {
-        color: var(--text-tertiary);
-      }
-    }
-
-    .log-user {
-      color: var(--accent-primary);
-      i {
-        color: var(--accent-primary);
-        opacity: 0.7;
-      }
-    }
-  }
-}
-
-/* Danger Zone Styles (kept from previous) */
-.danger-box {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  border: 1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius);
-  margin-bottom: 1rem;
-  background: var(--bg-ternary);
-
-  &.warning {
-    border-color: rgba(245, 158, 11, 0.3);
-    background: rgba(245, 158, 11, 0.05);
-  }
-  &.delete {
-    border-color: rgba(239, 68, 68, 0.3);
-    background: rgba(239, 68, 68, 0.05);
-  }
-
-  .box-info {
-    strong {
-      display: block;
-      color: var(--text-primary);
-      font-size: 0.9rem;
-      margin-bottom: 0.1rem;
-    }
-    p {
-      margin: 0;
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-    }
-  }
-}
-
-/* Animation */
-.animate-fadeInUp {
-  animation: fadeInUp 0.3s ease-out;
 }
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(5px);
   }
   to {
     opacity: 1;

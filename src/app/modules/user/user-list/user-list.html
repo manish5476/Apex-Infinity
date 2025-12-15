@@ -1,0 +1,59 @@
+<p-toast></p-toast>
+
+<div class="list-page-container">
+
+  <div class="list-header">
+    <div class="title-section">
+      <div class="icon-box">
+        <i class="pi pi-users"></i>
+      </div>
+      <div class="text-content">
+        <h2 class="list-title">User Management</h2>
+        <p class="list-subtitle">Manage employees, roles, and system access.</p>
+      </div>
+    </div>
+
+    <p-button label="Add User" icon="pi pi-plus" (onClick)="createNew()" styleClass="p-button-primary"></p-button>
+  </div>
+
+  <div class="themed-card list-content-area">
+
+    <div class="se-filter-bar">
+
+      <div class="se-filter-field">
+        <label for="role">Role</label>
+        <p-select appendTo="body" (onChange)="applyFilters()" id="role" [options]="roleOptions()"
+          [(ngModel)]="userFilter.role" optionLabel="name" optionValue="_id" [showClear]="true"
+          placeholder="Filter by Role" styleClass="w-full">
+        </p-select>
+      </div>
+
+      <div class="se-filter-field">
+        <label for="branch">Branch</label>
+        <p-select appendTo="body" (onChange)="applyFilters()" id="branch" [options]="branchOptions()"
+          [(ngModel)]="userFilter.branchId" optionLabel="name" optionValue="_id" [showClear]="true"
+          placeholder="Filter by Branch" styleClass="w-full">
+        </p-select>
+      </div>
+
+      <div class="se-filter-field">
+        <label for="search">Search</label>
+        <input id="search" type="text" pInputText [(ngModel)]="userFilter.search" (keydown.enter)="applyFilters()"
+          (blur)="applyFilters()" placeholder="Name or Email..." class="w-full" />
+      </div>
+
+      <div class="se-filter-actions">
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary"
+          (onClick)="resetFilters()">
+        </p-button>
+      </div>
+    </div>
+
+    <div class="list-grid-wrapper">
+      <app-ag-share-grid [columns]="column" [data]="data" [showActions]="false" selectionMode="single"
+        (gridEvent)="eventFromGrid($event)" style="height: 100%; width: 100%; display: block;">
+      </app-ag-share-grid>
+    </div>
+
+  </div>
+</div>

@@ -1,3 +1,4 @@
+import { User } from './modules/auth/services/auth-service';
 import { Routes } from '@angular/router';
 import { MainScreen } from './projectLayout/main-screen/main-screen';
 import { authGuard } from './core/guards/authguard.guard';

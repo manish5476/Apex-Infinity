@@ -76,7 +76,6 @@ export class ApiService extends BaseApiService {
     return this.get('/v1/auth/verify-token', {}, 'verifyToken');
   }
 
-
   // ======================== USER ========================
 
   updateMyPassword(data: any): Observable<LoginResponse> {

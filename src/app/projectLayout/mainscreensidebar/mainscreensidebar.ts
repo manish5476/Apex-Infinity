@@ -87,6 +87,14 @@ export class Mainscreensidebar implements OnInit {
       ]
     },
     {
+      label: 'USers Panel', icon: 'pi pi-shield',
+      items: [
+        { label: 'user List', icon: 'pi pi-database', routerLink: ['user/list'] },
+        { label: 'User List', icon: 'pi pi-database', routerLink: ['user/create'] },
+      
+      ]
+    },
+    {
       label: 'Customers', icon: 'pi pi-user',
       items: [
         { label: 'Customer List', icon: 'pi pi-users', routerLink: ['/customer'] },

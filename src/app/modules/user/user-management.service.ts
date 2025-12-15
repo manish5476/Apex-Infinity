@@ -5,22 +5,19 @@ import { BaseApiService } from '../../core/services/base-api.service';
 @Injectable({ providedIn: 'root' })
 export class UserManagementService extends BaseApiService {
   private endpoint = '/v1/users';
-
   // Admin: Get all users with pagination & search
   getAllUsers(params?: any): Observable<any> {
     return this.get(this.endpoint, params, 'getAllUsers');
   }
-
   // Admin: Search specific users
   searchUsers(query: string): Observable<any> {
     return this.get(`${this.endpoint}/search`, { q: query }, 'searchUsers');
   }
-  
+
   uploadProfilePhoto(formData: FormData): Observable<any> {
     return this.patch('/v1/users/me/photo', formData, 'uploadProfilePhoto');
   }
   
-
   // Admin: Create Employee/Manager
   createUser(data: any): Observable<any> {
     return this.post(this.endpoint, data, 'createUser');
@@ -51,5 +48,13 @@ export class UserManagementService extends BaseApiService {
 
   getMe(): Observable<any> {
     return this.get<any>('/v1/users/me', {}, 'getMe');
+  }
+  // --- 🆕 ADDED MISSING METHODS ---
+  getUser(id: string): Observable<any> {
+    return this.get(`${this.endpoint}/${id}`, {}, 'getUser');
+  }
+
+  deleteUser(id: string): Observable<any> {
+    return this.delete(`${this.endpoint}/${id}`, 'deleteUser');
   }
 }

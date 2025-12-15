@@ -23,7 +23,7 @@ export class SystemAdminService extends BaseApiService {
   downloadSalesReport(format: 'pdf' | 'csv' = 'pdf'): void {
     // Downloads usually require specific handling for Blob responses
     const url = `/v1/analytics/export/sales?format=${format}`;
-    window.open(this.apiUrl + url, '_blank'); 
+    window.open(this.baseUrl + url, '_blank'); 
   }
 
   // --- Organization Extras ---

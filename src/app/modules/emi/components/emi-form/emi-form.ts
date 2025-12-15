@@ -197,7 +197,7 @@ export class EmiFormComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (res) => {
         this.messageService.showSuccess('Success', 'EMI Plan created successfully.');
-        this.router.navigate(['/emi/invoice', this.invoiceId]);
+        this.router.navigate(['/emis/', this.invoiceId]);
       },
       error: (err) => {
         this.messageService.showError('Error', err.error?.message || 'Failed to create EMI plan.');
