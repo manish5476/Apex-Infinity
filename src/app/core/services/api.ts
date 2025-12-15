@@ -86,7 +86,60 @@ export class ApiService extends BaseApiService {
   getMe(): Observable<User> {
     return this.get<User>('/v1/users/me', {}, 'getMe');
   }
+// ======================== USER SELF-MANAGEMENT (Missing) ========================
 
+  updateMyProfile(data: any): Observable<any> {
+    return this.patch('/v1/users/me', data, 'updateMyProfile');
+  }
+
+  uploadProfilePhoto(formData: FormData): Observable<any> {
+    // Note: formData must be passed directly, don't wrap it in {}
+    return this.patch('/v1/users/me/photo', formData, 'uploadProfilePhoto');
+  }
+
+  // ======================== ADMIN USER MANAGEMENT (Missing) ========================
+
+  getAllUsers(): Observable<any> {
+    return this.get('/v1/users', {}, 'getAllUsers');
+  }
+
+  createUser(data: any): Observable<any> {
+    return this.post('/v1/users', data, 'createUser');
+  }
+
+  searchUsers(query: string): Observable<any> {
+    return this.get('/v1/users/search', { q: query }, 'searchUsers');
+  }
+
+  getUser(id: string): Observable<any> {
+    return this.get(`/v1/users/${id}`, {}, 'getUser');
+  }
+
+  updateUser(id: string, data: any): Observable<any> {
+    return this.patch(`/v1/users/${id}`, data, 'updateUser');
+  }
+
+  deleteUser(id: string): Observable<any> {
+    return this.delete(`/v1/users/${id}`, 'deleteUser');
+  }
+
+  // --- Security & Status ---
+
+  deactivateUser(id: string): Observable<any> {
+    return this.patch(`/v1/users/${id}/deactivate`, {}, 'deactivateUser');
+  }
+
+  activateUser(id: string): Observable<any> {
+    return this.patch(`/v1/users/${id}/activate`, {}, 'activateUser');
+  }
+
+  adminUpdatePassword(id: string, password: string): Observable<any> {
+    return this.patch(`/v1/users/${id}/password`, { password }, 'adminUpdatePassword');
+  }
+
+  getUserActivity(id: string): Observable<any> {
+    return this.get(`/v1/users/${id}/activity`, {}, 'getUserActivity');
+  }
   // ======================== ROLES ========================
 
   getRoles(): Observable<any> {
