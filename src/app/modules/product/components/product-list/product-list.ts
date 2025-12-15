@@ -131,7 +131,8 @@ export class ProductListComponent implements OnInit {
   }
 
   eventFromGrid(event: any) {
-    if (event.type === 'cellClicked') {
+    console.log(event)
+     if (event.type=== 'cellClicked') {
       const productId = event.row._id;
       if (productId) {
         this.router.navigate([productId], { relativeTo: this.route });
