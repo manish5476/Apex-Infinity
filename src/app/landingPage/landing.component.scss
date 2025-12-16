@@ -1,80 +1,95 @@
-/* ========================================================================== */
-/* SCROLL FIX FOR LANDING PAGE */
-/* ========================================================================== */
-
+/* ==========================================================================
+   1. CORE STRUCTURE & VARIABLES
+   ========================================================================== */
 :host {
+  /* CRITICAL FIX: Ensure window scrolls naturally */
   display: block;
   width: 100%;
-  height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
+  min-height: 100vh;
   position: relative;
-  scroll-behavior: smooth;
+
+  /* Fallback Variables (Safety net if ThemeService fails) */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-ternary: #f1f5f9;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-tertiary: #64748b;
+  --text-label: #94a3b8;
+  --border-primary: #e2e8f0;
+  --border-secondary: #cbd5e1;
+  --accent-primary: #4f46e5;
+  --accent-secondary: #8b5cf6;
+  --accent-tertiary: #ec4899;
+  --glass-bg-c: rgba(255, 255, 255, 0.7);
+  --glass-border-c: rgba(255, 255, 255, 0.5);
+  --glass-blur-c: 12px;
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --component-bg-hover: #f1f5f9;
 }
 
 .landing-root {
   width: 100%;
-  min-height: 100%;
   position: relative;
-  overflow: visible;
+  overflow-x: hidden;
+  padding-bottom: 3rem;
 }
 
 .mesh-bg {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   z-index: -1;
   pointer-events: none;
-  background: 
+  background:
     radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
     radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%),
     radial-gradient(at 50% 100%, rgba(168, 85, 247, 0.1) 0px, transparent 50%);
   filter: blur(80px);
 }
 
-.nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 999;
+/* ==========================================================================
+   2. TEXT UTILITIES (Added back for safety)
+   ========================================================================== */
+.text-balance {
+  text-wrap: balance;
 }
 
-/* ========================================================================== */
-/* ENHANCED COMPONENT STYLES */
-/* ========================================================================== */
+.text-pretty {
+  text-wrap: pretty;
+}
 
-/* Enhanced glassmorphism with better effects */
+.bg-clip-text {
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* ==========================================================================
+   3. COMPONENT STYLES (Glass & 3D)
+   ========================================================================== */
 .glass {
   background: var(--glass-bg-c);
   backdrop-filter: blur(var(--glass-blur-c));
   -webkit-backdrop-filter: blur(var(--glass-blur-c));
   border: 1px solid var(--glass-border-c);
-  transition: var(--transition-base);
+  transition: all 0.3s ease;
 }
 
-.glass:hover {
-  border-color: var(--accent-primary);
-  background: var(--component-bg-hover);
-}
-
-/* New enhanced glass variant */
 .glass-enhanced {
   background: var(--glass-bg-c);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border-c);
-  transition: var(--transition-base);
+  transition: all 0.3s ease;
 }
 
-.glass-enhanced:hover {
+.glass-enhanced:hover, .glass:hover {
   background: var(--component-bg-hover);
   border-color: var(--accent-primary);
 }
 
-/* 3D Hero Perspective */
 .hero-3d-container {
   perspective: 1200px;
 }
@@ -89,28 +104,14 @@
   transform: rotateX(3deg) scale(0.96);
 }
 
-/* Enhanced gradient text with animation */
-.gradient-text {
-  background: var(--accent-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.gradient-text-enhanced {
-  background: linear-gradient(90deg, #818cf8, #c084fc, #f472b6, #38bdf8, #818cf8);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: gradient-shift 4s ease infinite;
-}
-
-/* Scroll Animations */
+/* ==========================================================================
+   4. ANIMATIONS
+   ========================================================================== */
 .reveal {
   opacity: 0;
   transform: translateY(30px);
-  transition: all 0.8s ease-out;
+  transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+  will-change: opacity, transform;
 }
 
 .reveal.active {
@@ -118,83 +119,54 @@
   transform: translateY(0);
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: var(--bg-primary); }
-::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
-
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* Grid Background */
-.bg-grid {
-  background-size: 50px 50px;
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-}
-
-/* ========================================================================== */
-/* ENHANCED ANIMATIONS */
-/* ========================================================================== */
-
+/* Float Animation */
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-20px); }
 }
+.animate-float { animation: float 6s ease-in-out infinite; }
 
-@keyframes scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
+/* Shimmer Animation */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, var(--accent-primary) 0%, var(--accent-secondary) 50%, var(--accent-primary) 100%);
+  background-size: 200% auto;
+  animation: shimmer 3s linear infinite;
 }
 
+/* Gradient Text Animation */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.animate-gradient {
+  background: linear-gradient(90deg, #818cf8, #c084fc, #f472b6, #38bdf8, #818cf8);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 4s ease infinite;
+}
+
+/* Extra Animations (From original code) */
 @keyframes blob {
   0% { transform: translate(0px, 0px) scale(1); }
   33% { transform: translate(30px, -50px) scale(1.1); }
   66% { transform: translate(-20px, 20px) scale(0.9); }
   100% { transform: translate(0px, 0px) scale(1); }
 }
-
-@keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
-}
+.animate-blob { animation: blob 7s infinite; }
 
 @keyframes pulse-slow {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.8; transform: scale(1.05); }
 }
-
-/* Utility Animation Classes */
-.animate-float { animation: float 6s ease-in-out infinite; }
-.animate-scroll { animation: scroll 25s linear infinite; }
-.animate-blob { animation: blob 7s infinite; }
-.animate-gradient { animation: gradient-shift 4s ease infinite; }
-.animate-shimmer { 
-  background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 50%, #4f46e5 100%);
-  background-size: 200% auto;
-  animation: shimmer 3s linear infinite;
-}
 .animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
 
-.animation-delay-2000 { animation-delay: 2s; }
-.animation-delay-4000 { animation-delay: 4s; }
-.animation-delay-200 { animation-delay: 0.2s; }
-
-/* Text Utilities */
-.text-balance { text-wrap: balance; }
-.text-pretty { text-wrap: pretty; }
-.bg-clip-text { -webkit-background-clip: text; background-clip: text; }
+/* Scrollbar Utility */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
