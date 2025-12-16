@@ -309,26 +309,65 @@ export class OrgSettingsComponent implements OnInit {
     });
   }
 
+  // transferOwnership() {
+  //   if (this.transferForm.invalid) return;
+
+  //   this.confirmationService.confirm({
+  //     message: 'This action is irreversible. You will become a regular admin.',
+  //     header: 'Transfer Ownership',
+  //     icon: 'pi pi-exclamation-triangle',
+  //     acceptButtonStyleClass: 'p-button-danger',
+  //     accept: () => {
+  //       this.orgService.transferOwnership({ user: this.transferForm.value.newOwnerId }).subscribe({
+  //         next: () => {
+  //           this.messageService.add({ severity: 'success', summary: 'Transferred', detail: 'Ownership updated.' });
+  //           window.location.reload();
+  //         },
+  //         error: (err) => this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message })
+  //       });
+  //     }
+  //   });
+  // }
   transferOwnership() {
     if (this.transferForm.invalid) return;
 
+    // 1. Get the target user ID from the form
+    const targetUserId = this.transferForm.value.newOwnerId;
+
     this.confirmationService.confirm({
-      message: 'This action is irreversible. You will become a regular admin.',
-      header: 'Transfer Ownership',
-      icon: 'pi pi-exclamation-triangle',
-      acceptButtonStyleClass: 'p-button-danger',
+      message: 'This will send an email to the selected user. They must accept the request to finalize the transfer.',
+      header: 'Initiate Ownership Transfer',
+      icon: 'pi pi-send',
+      acceptButtonStyleClass: 'p-button-warning',
       accept: () => {
-        this.orgService.transferOwnership({ user: this.transferForm.value.newOwnerId }).subscribe({
-          next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Transferred', detail: 'Ownership updated.' });
-            window.location.reload();
-          },
-          error: (err) => this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message })
-        });
+
+        // 2. Call the Initiate API
+        // Backend expects { userId: string } based on your previous controller logic
+        const payload = { userId: targetUserId };
+
+        this.orgService.initiateTransfer(payload)
+          .pipe(finalize(() => this.showTransferDialog = false))
+          .subscribe({
+            next: (res: any) => {
+              // 3. Update UI to reflect "Pending" state (no page reload needed yet)
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Request Sent',
+                detail: 'An email has been sent to the new owner to accept the transfer.'
+              });
+              this.transferForm.reset();
+            },
+            error: (err) => {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Transfer Failed',
+                detail: err.error?.message || 'Could not initiate transfer'
+              });
+            }
+          });
       }
     });
   }
-
   deleteOrganization() {
     const orgId = this.organization()?._id;
 

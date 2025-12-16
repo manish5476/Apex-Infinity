@@ -161,7 +161,7 @@ export class Transactions implements OnInit {
   }
 
   eventFromGrid(event: any) {
-    if (event.eventType === 'reachedBottom') {
+    if (event.type === 'reachedBottom') {
       this.onScrolledToBottom(event)
     }
   }
@@ -415,7 +415,7 @@ export class Transactions implements OnInit {
 
 //   eventFromGrid(event: any) {
 //     console.log(event);
-//     if (event.eventType === 'reachedBottom') {
+//     if (event.type === 'reachedBottom') {
 //       this.onScrolledToBottom(event)
 //     }
 //   }

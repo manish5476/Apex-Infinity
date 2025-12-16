@@ -12,6 +12,7 @@ import { Sessions } from './modules/auth/sessions/sessions/sessions';
 import { NotesManagerComponent } from './modules/shared/components/notes-manager/notes-manager.component';
 import { ChatComponent } from './chat/chat.component/chat.component';
 import { LandingComponent } from './landingPage/landing.component';
+import { AcceptOwnershipComponent } from './modules/organization/components/AcceptOwnershipComponent';
 
 export const routes: Routes = [
   // ==========================================================
@@ -77,7 +78,7 @@ export const routes: Routes = [
           ),
       },
       { path: 'chat', component: ChatComponent },
-      
+
       // --- MASTERS & TRANSACTIONS ---
       { path: 'masterList', component: MasterList },
       { path: 'transactions', component: Transactions },
@@ -118,6 +119,12 @@ export const routes: Routes = [
         path: 'payments',
         loadChildren: () => import('./modules/payment/payment.routes').then((m) => m.PAYMENT_ROUTES),
       },
+      {
+        path: 'dashboard/settings/ownership', // Matches the link sent in email
+        component: AcceptOwnershipComponent,
+        canActivate: [authGuard] // Ensure they are logged in to accept
+      }
+,
       {
         path: 'emis',
         loadChildren: () => import('./modules/emi/emi.routes').then((m) => m.EMI_ROUTES),

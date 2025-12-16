@@ -23,7 +23,7 @@ import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
 import { CustomerTransactions } from '../../../transactions/customer-transactions/customer-transactions';
 import { ImageViewerDirective } from '../../../shared/directives/image-viewer.directive';
-import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
+import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
 
 type TabType = 'ledger' | 'invoices' | 'payments';
 
@@ -42,7 +42,6 @@ type TabType = 'ledger' | 'invoices' | 'payments';
     DialogModule,
     ToastModule,
     CustomerTransactions,
-
     AgShareGrid
 ],
   providers: [CustomerService, InvoiceService, PaymentService, FinancialService],

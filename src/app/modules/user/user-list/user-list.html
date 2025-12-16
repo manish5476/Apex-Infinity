@@ -1,5 +1,5 @@
 <p-toast></p-toast>
-
+<p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
 <div class="list-page-container">
 
   <div class="list-header">
@@ -50,7 +50,7 @@
     </div>
 
     <div class="list-grid-wrapper">
-      <app-ag-share-grid [columns]="column" [data]="data" [showActions]="false" selectionMode="single"
+      <app-ag-share-grid [columns]="column" [data]="data" [showActions]="true" selectionMode="single"
         (gridEvent)="eventFromGrid($event)" style="height: 100%; width: 100%; display: block;">
       </app-ag-share-grid>
     </div>

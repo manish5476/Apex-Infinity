@@ -17,7 +17,12 @@ export class UserManagementService extends BaseApiService {
   uploadProfilePhoto(formData: FormData): Observable<any> {
     return this.patch('/v1/users/me/photo', formData, 'uploadProfilePhoto');
   }
-  
+
+  uploadUserPhoto(id: string, formData: FormData): Observable<any> {
+    // Assuming your backend supports PATCH /v1/users/:id/photo
+    return this.patch(`${this.endpoint}/${id}/photo`, formData, 'uploadUserPhoto');
+  }
+
   // Admin: Create Employee/Manager
   createUser(data: any): Observable<any> {
     return this.post(this.endpoint, data, 'createUser');

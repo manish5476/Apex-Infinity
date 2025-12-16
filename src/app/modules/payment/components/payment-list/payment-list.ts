@@ -161,7 +161,7 @@ export class PaymentListComponent implements OnInit {
         this.router.navigate([paymentId], { relativeTo: this.route });
       }
     }
-    if (event.eventType === 'reachedBottom') {
+    if (event.type === 'reachedBottom') {
       this.onScrolledToBottom(event)
     }
   }
