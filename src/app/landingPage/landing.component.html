@@ -1,495 +1,242 @@
-<div class="landing-root font-sans antialiased selection:bg-[var(--accent-primary)] selection:text-white bg-[var(--bg-primary)] text-[var(--text-primary)] w-full min-h-screen relative transition-colors duration-300">
-
+<div class="landing-root">
   <div class="mesh-bg"></div>
-  <div class="fixed inset-0 bg-grid pointer-events-none z-0 opacity-10"></div>
-  <div class="fixed top-0 left-1/4 w-96 h-96 bg-[var(--accent-primary)]/20 rounded-full blur-[128px] animate-blob z-0"></div>
-  <div class="fixed bottom-0 right-1/4 w-96 h-96 bg-[var(--accent-secondary)]/20 rounded-full blur-[128px] animate-blob animation-delay-2000 z-0"></div>
-  <div class="fixed top-1/2 right-1/3 w-96 h-96 bg-[var(--accent-tertiary)]/15 rounded-full blur-[128px] animate-blob animation-delay-4000 z-0"></div>
 
-  <nav class="nav border-b border-[var(--border-primary)] bg-[var(--bg-primary)]/90 backdrop-blur-xl transition-all duration-300 shadow-xl">
-    <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
-      
-      <div class="flex items-center cursor-pointer" routerLink="/">
-        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-           viewBox="0 0 1000 500" style="enable-background:new 0 0 1000 500;" xml:space="preserve" class="h-16 w-auto">
-          <style type="text/css">
-            .main-text { font-family: 'Georgia', 'Times New Roman', serif; font-weight: bold; font-size: 68px; fill: url(#text-gold-grad); filter: url(#dropShadow); }
-            .tagline-text { font-family: 'Segoe UI', 'Verdana', sans-serif; font-size: 16px; letter-spacing: 6px; fill: #5D4037; text-transform: uppercase; font-weight: 600; }
-            .divider-style { fill: none; stroke: #8C5E4A; stroke-width: 2; }
-            .divider-diamond { fill: #8C5E4A; }
-          </style>
-          <defs>
-            <linearGradient id="text-gold-grad" gradientUnits="userSpaceOnUse" x1="300" y1="400" x2="700" y2="400">
-              <stop offset="0" style="stop-color:#8B5A2B"/> <stop offset="0.3" style="stop-color:#CDA434"/> <stop offset="0.5" style="stop-color:#FCE6C9"/> <stop offset="0.7" style="stop-color:#CDA434"/> <stop offset="1" style="stop-color:#8B5A2B"/> 
-            </linearGradient>
-            <linearGradient id="logo-border-grad" gradientUnits="userSpaceOnUse" x1="344" y1="289.5" x2="733" y2="289.5">
-              <stop offset="0" style="stop-color:#B88A4D"/> <stop offset="0.20" style="stop-color:#EDC988"/> <stop offset="0.40" style="stop-color:#B88A4D"/> <stop offset="0.60" style="stop-color:#EDC988"/> <stop offset="0.80" style="stop-color:#B88A4D"/> <stop offset="1" style="stop-color:#EDC988"/>
-            </linearGradient>
-            <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur in="SourceAlpha" stdDeviation="2"/> <feOffset dx="2" dy="2" result="offsetblur"/>
-                <feComponentTransfer> <feFuncA type="linear" slope="0.5"/> </feComponentTransfer>
-                <feMerge> <feMergeNode/> <feMergeNode in="SourceGraphic"/> </feMerge>
-            </filter>
-          </defs>
-          <g>
-            <path style="fill:none;stroke:url(#logo-border-grad);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;" d="M344,443l125-307l49,137c15,36,49,84,99,110c50,26,100,11,116-36c16-47-12-100-62-126 c-50-26-94,0-135,33L413,357L344,443"/>
-          </g>
-          <g transform="translate(500, 380)">
-            <text x="0" y="50" text-anchor="middle" class="main-text">APEX-INFINITY</text>
-            <g transform="translate(0, 70)">
+  <nav class="fixed top-0 left-0 w-full z-50 glass border-b border-[var(--border-primary)]/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-20">
+        <div class="flex items-center cursor-pointer" routerLink="/">
+          <svg version="1.1" viewBox="0 0 1000 500" class="h-12 md:h-16 w-auto">
+            <style type="text/css">
+              .main-text { font-family: serif; font-weight: bold; font-size: 68px; fill: url(#text-gold-grad); filter: url(#dropShadow); }
+              .tagline-text { font-family: sans-serif; font-size: 16px; letter-spacing: 6px; fill: #5D4037; text-transform: uppercase; font-weight: 600; }
+              .divider-style { fill: none; stroke: #8C5E4A; stroke-width: 2; }
+              .divider-diamond { fill: #8C5E4A; }
+            </style>
+            <defs>
+              <linearGradient id="text-gold-grad" gradientUnits="userSpaceOnUse" x1="300" y1="400" x2="700" y2="400">
+                <stop offset="0" style="stop-color:#8B5A2B"/>
+                <stop offset="0.5" style="stop-color:#FCE6C9"/>
+                <stop offset="1" style="stop-color:#8B5A2B"/>
+              </linearGradient>
+              <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+                <feOffset dx="2" dy="2" result="offsetblur"/>
+                <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+            <g transform="translate(500, 380)">
+              <text x="0" y="50" text-anchor="middle" class="main-text">APEX-INFINITY</text>
+              <g transform="translate(0, 70)">
                 <line x1="-120" y1="0" x2="-15" y2="0" class="divider-style"/>
                 <rect x="-6" y="-6" width="12" height="12" transform="rotate(45)" class="divider-diamond"/>
                 <line x1="15" y1="0" x2="120" y2="0" class="divider-style"/>
+              </g>
+              <text x="0" y="100" text-anchor="middle" class="tagline-text">EMPOWERING INNOVATION</text>
             </g>
-            <text x="0" y="100" text-anchor="middle" class="tagline-text">EMPOWERING INNOVATION</text>
-          </g>
-        </svg>
-      </div>
-      
-      <div class="hidden md:flex gap-8 text-sm font-medium text-[var(--text-secondary)]">
-        <a href="#features" class="hover:text-[var(--text-primary)] transition-colors hover:scale-105 transform">Features</a>
-        <a href="#communication" class="hover:text-[var(--text-primary)] transition-colors hover:scale-105 transform">Communication</a>
-        <a href="#pricing" class="hover:text-[var(--text-primary)] transition-colors hover:scale-105 transform">Pricing</a>
-        <a href="#testimonials" class="hover:text-[var(--text-primary)] transition-colors hover:scale-105 transform">Stories</a>
-      </div>
-
-      <div class="flex items-center gap-4">
-        
-        <div class="relative group hidden sm:block">
-          <button class="flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition">
-            <i class="pi pi-palette"></i> Theme
-          </button>
-          <div class="absolute right-0 top-full mt-2 w-40 bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-lg shadow-xl overflow-hidden hidden group-hover:block max-h-64 overflow-y-auto z-50">
-            @for(theme of availableThemes; track theme.name) {
-              <button (click)="selectTheme(theme.class)" 
-                      class="w-full text-left px-4 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--component-bg-hover)] hover:text-[var(--text-primary)]">
-                {{ theme.name }}
-              </button>
-            }
-          </div>
+          </svg>
         </div>
 
-        <a routerLink="/auth/login" class="hidden sm:block text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm font-medium transition-all hover:scale-105 cursor-pointer">Log in</a>
-        
-        <a routerLink="/auth/org" class="px-6 py-2.5 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-white rounded-lg text-sm font-bold hover:shadow-2xl hover:shadow-[var(--accent-primary)]/50 transition-all hover:scale-105 animate-shimmer cursor-pointer">
-          Start Free Trial
-        </a>
+        <div class="hidden md:flex gap-8 text-sm font-medium text-[var(--text-secondary)]">
+          <a href="#features" class="hover:text-[var(--text-primary)] transition-colors hover:scale-105 transform">Features</a>
+          <a href="#pricing" class="hover:text-[var(--text-primary)] transition-colors hover:scale-105 transform">Pricing</a>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <div class="relative group hidden sm:block">
+            <button class="flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition">
+              <i class="pi pi-palette"></i> Theme
+            </button>
+            <div class="absolute right-0 top-full mt-2 w-40 bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-lg shadow-xl overflow-hidden hidden group-hover:block max-h-64 overflow-y-auto z-50">
+              @for(theme of availableThemes; track theme.name) {
+                <button (click)="selectTheme(theme.class)" class="w-full text-left px-4 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--component-bg-hover)] hover:text-[var(--text-primary)]">
+                  {{ theme.name }}
+                </button>
+              }
+            </div>
+          </div>
+          <a routerLink="/auth/login" class="hidden sm:block text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm font-medium transition-all hover:scale-105 cursor-pointer">Log in</a>
+          <a routerLink="/auth/org" class="px-6 py-2.5 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-white rounded-lg text-sm font-bold hover:shadow-2xl hover:shadow-[var(--accent-primary)]/50 transition-all hover:scale-105 animate-shimmer cursor-pointer">
+            Start Free Trial
+          </a>
+        </div>
       </div>
     </div>
   </nav>
 
-  <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-    <div class="max-w-7xl mx-auto px-4 text-center relative z-10">
-      
-      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--bg-secondary)] border border-[var(--accent-primary)]/30 text-[var(--accent-primary)] text-xs font-semibold tracking-wide mb-8 animate-float shadow-xl shadow-[var(--accent-primary)]/20">
-        <span class="relative flex h-2 w-2">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--accent-primary)] opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-2 w-2 bg-[var(--accent-primary)]"></span>
-        </span>
-        New: Real-time Chat & Broadcast Features Live!
-      </div>
+  <div class="pt-32 pb-20 px-4 text-center">
+    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--bg-secondary)] border border-[var(--accent-primary)]/30 text-[var(--accent-primary)] text-xs font-semibold tracking-wide mb-8 animate-float shadow-xl shadow-[var(--accent-primary)]/20">
+      <span class="relative flex h-2 w-2">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--accent-primary)] opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-[var(--accent-primary)]"></span>
+      </span>
+      New: Real-time Chat & Broadcast Features Live!
+    </div>
 
-      <h1 class="text-5xl md:text-7xl lg:text-8xl font-display font-bold tracking-tight mb-8 leading-[1.1] text-balance text-[var(--text-primary)]">
-        Run your business with <br />
-        <span class="gradient-text-enhanced animate-gradient">pure intelligence.</span>
-      </h1>
-      
-      <p class="text-[var(--text-tertiary)] text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed text-pretty">
-        Stop guessing. Start knowing. The only ERP that combines Finance, Inventory, CRM, and <span class="text-[var(--accent-primary)] font-semibold">Team Communication</span> with predictive AI.
-      </p>
+    <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-8 leading-[1.1] text-balance text-[var(--text-primary)]">
+      Run your business with <br />
+      <span class="animate-gradient">pure intelligence.</span>
+    </h1>
+    <p class="text-[var(--text-tertiary)] text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed text-pretty">
+      Stop guessing. Start knowing. The only ERP that combines Finance, Inventory, CRM, and <span class="text-[var(--accent-primary)] font-semibold">Team Communication</span> with predictive AI.
+    </p>
 
-      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
-        <a routerLink="/auth/org" class="group px-8 py-4 bg-gradient-to-r from-[var(--accent-primary)] via-[var(--accent-secondary)] to-[var(--accent-tertiary)] rounded-xl font-bold text-lg text-white hover:scale-105 transition-all duration-300 shadow-2xl shadow-[var(--accent-primary)]/40 flex items-center gap-2 hover:shadow-[var(--accent-primary)]/60 cursor-pointer">
-          Start Free Trial 
-          <i class="pi pi-arrow-right group-hover:translate-x-1 transition-transform" style="font-size: 1rem"></i>
-        </a>
-        <button class="group px-8 py-4 glass rounded-xl font-bold text-lg text-[var(--text-primary)] hover:bg-[var(--glass-bg-c)] transition-all flex items-center gap-2 border border-[var(--border-primary)] hover:border-[var(--accent-primary)]/30">
-          <i class="pi pi-play-circle group-hover:scale-110 transition-transform" style="font-size: 1.25rem"></i> 
-          Watch Demo
-        </button>
-      </div>
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
+      <a routerLink="/auth/org" class="group px-8 py-4 bg-gradient-to-r from-[var(--accent-primary)] via-[var(--accent-secondary)] to-[var(--accent-tertiary)] rounded-xl font-bold text-lg text-white hover:scale-105 transition-all duration-300 shadow-2xl flex items-center gap-2 cursor-pointer">
+        Start Free Trial <i class="pi pi-arrow-right group-hover:translate-x-1 transition-transform"></i>
+      </a>
+      <button class="group px-8 py-4 glass rounded-xl font-bold text-lg text-[var(--text-primary)] hover:bg-[var(--glass-bg-c)] transition-all flex items-center gap-2 border border-[var(--border-primary)]">
+        <i class="pi pi-play-circle group-hover:scale-110 transition-transform text-[var(--accent-primary)]"></i> Watch Demo
+      </button>
+    </div>
 
-      <div class="hero-3d-container max-w-6xl mx-auto px-4">
-        <div class="hero-3d-element bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-2xl overflow-hidden shadow-2xl relative backdrop-blur-sm">
-          <div class="h-10 bg-[var(--bg-ternary)] border-b border-[var(--border-primary)] flex items-center px-4 gap-2">
-            <div class="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-400 transition-colors cursor-pointer"></div>
-            <div class="w-3 h-3 rounded-full bg-yellow-500/80 hover:bg-yellow-400 transition-colors cursor-pointer"></div>
-            <div class="w-3 h-3 rounded-full bg-green-500/80 hover:bg-green-400 transition-colors cursor-pointer"></div>
-            <div class="ml-4 px-3 py-1 bg-[var(--bg-primary)] rounded-md text-xs text-[var(--text-tertiary)] font-mono">apex-infinity.app/dashboard</div>
+    <div class="hero-3d-container max-w-6xl mx-auto px-4 reveal">
+      <div class="hero-3d-element bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-2xl overflow-hidden shadow-2xl relative backdrop-blur-sm">
+        <div class="h-10 bg-[var(--bg-ternary)] border-b border-[var(--border-primary)] flex items-center px-4 gap-2">
+          <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+          <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+          <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+          <div class="ml-4 px-3 py-1 bg-[var(--bg-primary)] rounded-md text-xs text-[var(--text-tertiary)] font-mono">apex-infinity.app/dashboard</div>
+        </div>
+        <div class="relative bg-gradient-to-br from-[var(--bg-primary)] via-[var(--bg-secondary)] to-[var(--accent-primary)]/10 aspect-video flex items-center justify-center group">
+          <div class="grid grid-cols-12 gap-4 p-8 w-full h-full opacity-90">
+             <div class="col-span-2 bg-[var(--bg-ternary)]/50 rounded-lg h-full border border-[var(--border-secondary)]"></div>
+             <div class="col-span-10 grid grid-cols-3 gap-4">
+               <div class="col-span-3 h-16 flex justify-between items-center mb-4">
+                 <div class="h-8 w-48 bg-[var(--bg-ternary)]/50 rounded animate-pulse"></div>
+                 <div class="h-8 w-24 bg-gradient-to-r from-[var(--accent-primary)]/50 to-[var(--accent-secondary)]/50 rounded animate-pulse"></div>
+               </div>
+               <div class="col-span-1 h-32 bg-[var(--bg-ternary)]/50 rounded-xl border border-[var(--border-secondary)]"></div>
+               <div class="col-span-1 h-32 bg-[var(--bg-ternary)]/50 rounded-xl border border-[var(--border-secondary)]"></div>
+               <div class="col-span-1 h-32 bg-[var(--bg-ternary)]/50 rounded-xl border border-[var(--border-secondary)]"></div>
+               <div class="col-span-2 h-64 bg-[var(--bg-ternary)]/50 rounded-xl border border-[var(--border-secondary)] mt-4"></div>
+             </div>
           </div>
-          <div class="relative bg-gradient-to-br from-[var(--bg-primary)] via-[var(--bg-secondary)] to-[var(--accent-primary)]/10 aspect-video flex items-center justify-center group">
-            
-            <div class="grid grid-cols-12 gap-4 p-8 w-full h-full opacity-90">
-                <div class="col-span-2 bg-[var(--bg-ternary)]/50 rounded-lg h-full border border-[var(--border-secondary)] backdrop-blur-sm"></div>
-                <div class="col-span-10 grid grid-cols-3 gap-4">
-                    <div class="col-span-3 h-16 flex justify-between items-center mb-4">
-                        <div class="h-8 w-48 bg-[var(--bg-ternary)]/50 rounded animate-pulse"></div>
-                        <div class="h-8 w-24 bg-gradient-to-r from-[var(--accent-primary)]/50 to-[var(--accent-secondary)]/50 rounded animate-pulse"></div>
-                    </div>
-                    <div class="h-32 bg-[var(--bg-ternary)]/50 rounded-xl border border-[var(--border-secondary)] p-4 hover:border-green-500/30 transition-colors">
-                        <div class="h-4 w-12 bg-green-500/20 rounded mb-2"></div>
-                        <div class="h-8 w-24 bg-[var(--text-tertiary)]/20 rounded"></div>
-                    </div>
-                    <div class="h-32 bg-[var(--bg-ternary)]/50 rounded-xl border border-[var(--border-secondary)] p-4 hover:border-blue-500/30 transition-colors">
-                        <div class="h-4 w-12 bg-blue-500/20 rounded mb-2"></div>
-                        <div class="h-8 w-24 bg-[var(--text-tertiary)]/20 rounded"></div>
-                    </div>
-                    <div class="h-32 bg-[var(--bg-ternary)]/50 rounded-xl border border-[var(--border-secondary)] p-4 hover:border-purple-500/30 transition-colors">
-                        <div class="h-4 w-12 bg-purple-500/20 rounded mb-2"></div>
-                        <div class="h-8 w-24 bg-[var(--text-tertiary)]/20 rounded"></div>
-                    </div>
-                    <div class="col-span-2 h-64 bg-[var(--bg-ternary)]/50 rounded-xl border border-[var(--border-secondary)] flex items-end p-4 gap-2">
-                        <div class="w-full bg-[var(--accent-primary)]/20 h-[40%] rounded-t"></div>
-                        <div class="w-full bg-[var(--accent-primary)]/40 h-[70%] rounded-t"></div>
-                        <div class="w-full bg-[var(--accent-primary)]/60 h-[50%] rounded-t"></div>
-                        <div class="w-full bg-[var(--accent-primary)]/80 h-[90%] rounded-t"></div>
-                    </div>
-                    <div class="col-span-1 h-64 bg-[var(--bg-ternary)]/50 rounded-xl border border-[var(--border-secondary)]"></div>
-                </div>
-            </div>
-            
-            <div class="absolute top-1/4 right-10 glass px-6 py-4 rounded-xl animate-float shadow-2xl border border-[var(--accent-primary)]/20 backdrop-blur-md">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 bg-green-500/20 rounded-lg text-green-400">
-                        <i class="pi pi-chart-line" style="font-size: 1.5rem"></i>
-                    </div>
-                    <div>
-                        <div class="text-xs text-[var(--text-tertiary)]">Revenue Forecast</div>
-                        <div class="text-xl font-bold font-display text-[var(--text-primary)]">+24.5%</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="absolute bottom-1/4 left-10 glass px-6 py-4 rounded-xl animate-float animation-delay-2000 shadow-2xl border border-[var(--accent-secondary)]/20 backdrop-blur-md">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 bg-[var(--accent-secondary)]/20 rounded-lg text-[var(--accent-secondary)]">
-                        <i class="pi pi-comments" style="font-size: 1.5rem"></i>
-                    </div>
-                    <div>
-                        <div class="text-xs text-[var(--text-tertiary)]">Team Messages</div>
-                        <div class="text-xl font-bold font-display text-[var(--text-primary)]">1,247</div>
-                    </div>
-                </div>
+          <div class="absolute top-1/4 right-10 glass px-6 py-4 rounded-xl animate-float shadow-2xl border border-[var(--accent-primary)]/20 backdrop-blur-md">
+            <div class="flex items-center gap-3">
+              <div class="p-2 bg-green-500/20 rounded-lg text-green-400"><i class="pi pi-chart-line" style="font-size: 1.5rem"></i></div>
+              <div>
+                <div class="text-xs text-[var(--text-tertiary)]">Revenue Forecast</div>
+                <div class="text-xl font-bold font-display text-[var(--text-primary)]">+24.5%</div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <div class="w-full py-10 border-y border-[var(--border-primary)] bg-[var(--bg-ternary)]/30 backdrop-blur-sm overflow-hidden">
-    <p class="text-center text-[var(--text-label)] text-sm font-medium mb-6 uppercase tracking-widest">Trusted by 500+ Market Leaders</p>
-    <div class="relative flex overflow-x-hidden group">
-      <div class="animate-scroll whitespace-nowrap flex gap-16 items-center">
-        <span class="text-2xl font-display font-bold text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors">ACME Corp</span>
-        <span class="text-2xl font-display font-bold text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors">Stark Industries</span>
-        <span class="text-2xl font-display font-bold text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors">Wayne Ent.</span>
-        <span class="text-2xl font-display font-bold text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors">Cyberdyne</span>
-        <span class="text-2xl font-display font-bold text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors">Massive Dynamic</span>
-        <span class="text-2xl font-display font-bold text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors">Umbrella Corp</span>
-        <span class="text-2xl font-display font-bold text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors">Globex</span>
       </div>
     </div>
   </div>
 
-  <section id="communication" class="py-24 relative z-10 overflow-hidden bg-[var(--bg-primary)]">
-    <div class="max-w-7xl mx-auto px-4">
-      <div class="text-center mb-16 reveal">
-        <h2 class="text-4xl md:text-5xl font-display font-bold mb-4 text-[var(--text-primary)]">Built-in <span class="gradient-text-enhanced">Team Communication</span></h2>
-        <p class="text-[var(--text-tertiary)] max-w-2xl mx-auto text-lg leading-relaxed text-pretty">
-          Stop switching between apps. Chat, broadcast announcements, and collaborate right inside your ERP.
-        </p>
-      </div>
-
-      <div class="grid lg:grid-cols-2 gap-8 items-center mb-16">
-        <div class="reveal group">
-          <div class="glass-enhanced p-8 rounded-2xl border border-[var(--accent-primary)]/20 hover:border-[var(--accent-primary)]/40 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-[var(--accent-primary)]/20">
-            <div class="flex items-center gap-4 mb-6">
-              <div class="p-4 bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] rounded-2xl shadow-lg group-hover:scale-110 transition-transform">
-                <i class="pi pi-comments text-white" style="font-size: 2rem"></i>
-              </div>
-              <div>
-                <h3 class="text-2xl font-display font-bold text-[var(--text-primary)] mb-1">Real-time Team Chat</h3>
-                <p class="text-sm text-[var(--accent-primary)] font-medium">Instant collaboration</p>
-              </div>
-            </div>
-            <p class="text-[var(--text-secondary)] mb-6 leading-relaxed">
-              Organize conversations by departments, projects, or topics. Send direct messages, create group channels, and share files seamlessly. All conversations are encrypted and searchable.
-            </p>
-            <ul class="space-y-3 text-sm text-[var(--text-secondary)]">
-              <li class="flex items-center gap-3">
-                <i class="pi pi-check-circle text-green-400"></i> 
-                Public & private channels
-              </li>
-              <li class="flex items-center gap-3">
-                <i class="pi pi-check-circle text-green-400"></i> 
-                File & image sharing
-              </li>
-              <li class="flex items-center gap-3">
-                <i class="pi pi-check-circle text-green-400"></i> 
-                Thread replies & reactions
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="reveal group animation-delay-200">
-          <div class="glass-enhanced p-8 rounded-2xl border border-[var(--accent-secondary)]/20 hover:border-[var(--accent-secondary)]/40 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-[var(--accent-secondary)]/20">
-            <div class="flex items-center gap-4 mb-6">
-              <div class="p-4 bg-gradient-to-br from-[var(--accent-secondary)] to-[var(--accent-tertiary)] rounded-2xl shadow-lg group-hover:scale-110 transition-transform">
-                <i class="pi pi-megaphone text-white" style="font-size: 2rem"></i>
-              </div>
-              <div>
-                <h3 class="text-2xl font-display font-bold text-[var(--text-primary)] mb-1">Broadcast Messages</h3>
-                <p class="text-sm text-[var(--accent-secondary)] font-medium">Reach everyone instantly</p>
-              </div>
-            </div>
-            <p class="text-[var(--text-secondary)] mb-6 leading-relaxed">
-              Send company-wide announcements, policy updates, or urgent alerts to your entire team instantly. Target specific departments or locations with precision broadcasting.
-            </p>
-            <ul class="space-y-3 text-sm text-[var(--text-secondary)]">
-              <li class="flex items-center gap-3">
-                <i class="pi pi-check-circle text-[var(--accent-secondary)]"></i> 
-                Company-wide announcements
-              </li>
-              <li class="flex items-center gap-3">
-                <i class="pi pi-check-circle text-[var(--accent-secondary)]"></i> 
-                Department-specific targeting
-              </li>
-              <li class="flex items-center gap-3">
-                <i class="pi pi-check-circle text-[var(--accent-secondary)]"></i> 
-                Read receipt tracking
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 reveal">
-        <div class="glass text-center p-6 rounded-xl hover:scale-105 transition-transform border border-[var(--border-primary)]">
-          <div class="text-3xl font-display font-bold text-[var(--text-primary)] mb-1">< 100ms</div>
-          <div class="text-xs text-[var(--text-tertiary)] uppercase tracking-wide">Message Latency</div>
-        </div>
-        <div class="glass text-center p-6 rounded-xl hover:scale-105 transition-transform border border-[var(--border-primary)]">
-          <div class="text-3xl font-display font-bold text-[var(--text-primary)] mb-1">256-bit</div>
-          <div class="text-xs text-[var(--text-tertiary)] uppercase tracking-wide">Encryption</div>
-        </div>
-        <div class="glass text-center p-6 rounded-xl hover:scale-105 transition-transform border border-[var(--border-primary)]">
-          <div class="text-3xl font-display font-bold text-[var(--text-primary)] mb-1">Unlimited</div>
-          <div class="text-xs text-[var(--text-tertiary)] uppercase tracking-wide">Message History</div>
-        </div>
-        <div class="glass text-center p-6 rounded-xl hover:scale-105 transition-transform border border-[var(--border-primary)]">
-          <div class="text-3xl font-display font-bold text-[var(--text-primary)] mb-1">99.9%</div>
-          <div class="text-xs text-[var(--text-tertiary)] uppercase tracking-wide">Uptime SLA</div>
-        </div>
-      </div>
+  <div id="features" class="max-w-7xl mx-auto px-4 py-20">
+    <div class="text-center mb-12 reveal">
+      <h2 class="text-4xl font-bold text-[var(--text-primary)] mb-4">The Complete Feature Suite</h2>
+      <p class="text-[var(--text-secondary)]">Search through our comprehensive module list.</p>
     </div>
-  </section>
 
-  <section id="features" class="py-24 relative z-10 min-h-screen border-t border-[var(--border-primary)] bg-[var(--bg-primary)]">
-    <div class="max-w-7xl mx-auto px-4">
-      <div class="text-center mb-16 reveal">
-        <h2 class="text-4xl md:text-5xl font-display font-bold mb-4 text-[var(--text-primary)]">The Complete <span class="gradient-text-enhanced">Feature Suite</span></h2>
-        <p class="text-[var(--text-tertiary)] max-w-2xl mx-auto text-lg text-pretty">
-          Search through our comprehensive module list. From granular permissions to high-level AI strategy and team communication.
-        </p>
+    <div class="mb-10 reveal">
+      <div class="relative w-full md:max-w-md mx-auto mb-6 group">
+        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <i class="pi pi-search text-[var(--text-tertiary)]"></i>
+        </div>
+        <input 
+          type="text" 
+          [ngModel]="searchQuery()" 
+          (ngModelChange)="searchQuery.set($event)" 
+          placeholder="Search capabilities..." 
+          class="w-full pl-12 pr-4 py-3 bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] text-[var(--text-primary)] transition-all">
       </div>
 
-      <div class="max-w-7xl mx-auto mb-10 reveal">
-        <div class="flex flex-col md:flex-row justify-between gap-6 items-center mb-5">
-          <div class="relative w-full md:max-w-md group">
-            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <i class="pi pi-search text-[var(--text-tertiary)] group-focus-within:text-[var(--accent-primary)] transition-colors" style="font-size: 1.25rem"></i>
-            </div>
-            <input 
-              type="text" 
-              [ngModel]="searchQuery()"
-              (ngModelChange)="searchQuery.set($event)"
-              placeholder="Search capabilities..." 
-              class="w-full pl-12 pr-4 py-3 bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-transparent text-[var(--text-primary)] placeholder-[var(--text-label)] transition-all backdrop-blur-sm">
-          </div>
-        </div>
-
-        <div class="flex overflow-x-auto pb-4 mt-2 gap-2 no-scrollbar">
-          @for (cat of categories(); track cat) {
-            <button 
-              (click)="setCategory(cat)"
-              class="whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all border hover:scale-105"
-              [class]="selectedCategory() === cat ? 'bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] border-[var(--accent-primary)] text-white shadow-lg' : 'bg-[var(--bg-secondary)] border-[var(--border-primary)] text-[var(--text-secondary)] hover:border-[var(--text-primary)] hover:text-[var(--text-primary)]'">
-              {{ cat }} <span class="ml-1 opacity-60 text-xs">({{ getCategoryCount(cat) }})</span>
-            </button>
-          }
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        @for (f of filteredFeatures(); track f.title) {
-          <div class="glass-enhanced p-6 rounded-xl group transition-all duration-300 hover:-translate-y-1 hover:border-[var(--accent-primary)] hover:shadow-xl reveal cursor-pointer bg-[var(--bg-secondary)]">
-            <div class="flex justify-between items-start mb-4">
-              <div class="p-3 bg-[var(--bg-ternary)] rounded-lg text-[var(--accent-primary)] group-hover:bg-gradient-to-br group-hover:from-[var(--accent-primary)] group-hover:to-[var(--accent-secondary)] group-hover:text-white transition-all duration-300 group-hover:scale-110">
-                <i class="pi" [ngClass]="f.icon" style="font-size: 1.25rem"></i>
-              </div>
-              <span class="text-[10px] uppercase font-bold tracking-wider text-[var(--text-label)] border border-[var(--border-primary)] px-2 py-1 rounded bg-[var(--bg-ternary)] group-hover:border-[var(--accent-primary)]/30 transition-colors">{{ f.group }}</span>
-            </div>
-            <h3 class="text-[var(--text-primary)] font-semibold text-base mb-2 group-hover:text-[var(--accent-secondary)] transition-colors">{{ f.title }}</h3>
-            <p class="text-[var(--text-tertiary)] text-xs leading-relaxed">{{ f.desc }}</p>
-          </div>
-        } @empty {
-          <div class="col-span-full text-center py-20">
-            <div class="inline-flex p-4 bg-[var(--bg-secondary)] rounded-full mb-4">
-                <i class="pi pi-search-minus text-[var(--text-tertiary)]" style="font-size: 2rem"></i>
-            </div>
-            <h3 class="text-xl font-bold text-[var(--text-primary)]">No features found</h3>
-          </div>
+      <div class="flex flex-wrap justify-center gap-2">
+        @for (cat of categories(); track cat) {
+          <button 
+            (click)="setCategory(cat)" 
+            class="px-4 py-2 rounded-full text-sm font-medium transition-all border cursor-pointer select-none"
+            [class.bg-gradient-to-r]="selectedCategory() === cat"
+            [class.from-[var(--accent-primary)]]="selectedCategory() === cat"
+            [class.to-[var(--accent-secondary)]]="selectedCategory() === cat"
+            [class.text-white]="selectedCategory() === cat"
+            [class.border-transparent]="selectedCategory() === cat"
+            [class.bg-[var(--bg-secondary)]]="selectedCategory() !== cat"
+            [class.text-[var(--text-secondary)]]="selectedCategory() !== cat">
+            {{ cat }} 
+            <span class="ml-1 opacity-70 text-xs">({{ getCategoryCount(cat) }})</span>
+          </button>
         }
       </div>
     </div>
-  </section>
 
-  <section id="pricing" class="py-24 relative bg-[var(--bg-ternary)]">
-    <div class="max-w-7xl mx-auto px-4">
-      <div class="text-center mb-10 reveal">
-        <h2 class="text-4xl font-display font-bold mb-4 text-[var(--text-primary)]">Simple, Transparent Pricing</h2>
-        <p class="text-[var(--text-secondary)] text-lg">No hidden fees. Cancel anytime.</p>
-        
-        <div class="flex items-center justify-center gap-4 mt-8">
-          <span class="text-sm font-medium text-[var(--text-secondary)]">Monthly</span>
-          <button (click)="togglePricing()" class="w-14 h-8 rounded-full p-1 transition-colors relative shadow-lg" 
-            [class.bg-gradient-to-r]="isYearly()"
-            [class.from-[var(--accent-primary)]]="isYearly()"
-            [class.to-[var(--accent-secondary)]]="isYearly()" 
-            [class.bg-[var(--border-primary)]]="!isYearly()">
-            <div class="w-6 h-6 bg-white rounded-full transition-transform transform shadow-md" [class.translate-x-6]="isYearly()"></div>
-          </button>
-          <span class="text-sm font-medium text-[var(--text-primary)]">Yearly <span class="text-green-400 text-xs ml-1 font-bold px-2 py-1 bg-green-500/10 rounded-full">Save 20%</span></span>
-        </div>
-      </div>
-
-      <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-        <div class="glass-enhanced p-8 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-primary)] reveal hover:scale-[1.02] transition-all">
-          <h3 class="text-lg font-bold text-[var(--text-secondary)] mb-2">Starter</h3>
-          <div class="text-4xl font-display font-bold mb-6 text-[var(--text-primary)]">
-            {{ isYearly() ? '$39' : '$49' }}<span class="text-lg text-[var(--text-tertiary)] font-normal">/mo</span>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      @for (f of filteredFeatures(); track f.title) {
+        <div class="reveal glass-enhanced p-6 rounded-xl group hover:-translate-y-1 transition-all duration-300 hover:shadow-xl cursor-pointer bg-[var(--bg-secondary)]">
+          <div class="flex justify-between items-start mb-4">
+            <div class="p-3 bg-[var(--bg-ternary)] rounded-lg text-[var(--accent-primary)] group-hover:bg-gradient-to-br group-hover:from-[var(--accent-primary)] group-hover:to-[var(--accent-secondary)] group-hover:text-white transition-all duration-300">
+              <i class="pi" [ngClass]="f.icon" style="font-size: 1.25rem"></i>
+            </div>
+            <span class="text-[10px] uppercase font-bold tracking-wider text-[var(--text-label)] border border-[var(--border-primary)] px-2 py-1 rounded bg-[var(--bg-ternary)]">{{ f.group }}</span>
           </div>
-          <p class="text-[var(--text-tertiary)] text-sm mb-8">Perfect for small businesses just getting started.</p>
-          <button routerLink="/auth/org" class="w-full py-3 bg-[var(--bg-ternary)] hover:bg-[var(--border-primary)] text-[var(--text-primary)] rounded-lg font-bold transition-all hover:scale-105 mb-8 border border-[var(--border-primary)]">Start Free Trial</button>
-          <ul class="space-y-4 text-sm text-[var(--text-secondary)]">
-            <li class="flex items-center gap-3"><i class="pi pi-check text-green-500"></i> Single Branch</li>
-            <li class="flex items-center gap-3"><i class="pi pi-check text-green-500"></i> 5 Users</li>
-            <li class="flex items-center gap-3"><i class="pi pi-check text-green-500"></i> Team Chat (10 channels)</li>
-          </ul>
+          <h3 class="text-[var(--text-primary)] font-semibold text-base mb-2">{{ f.title }}</h3>
+          <p class="text-[var(--text-tertiary)] text-xs leading-relaxed">{{ f.desc }}</p>
         </div>
+      } @empty {
+        <div class="col-span-full text-center py-20 reveal">
+          <i class="pi pi-search-minus text-[var(--text-tertiary)] text-4xl mb-4"></i>
+          <h3 class="text-xl font-bold text-[var(--text-primary)]">No features found</h3>
+        </div>
+      }
+    </div>
+  </div>
 
-        <div class="p-8 rounded-2xl border-2 border-[var(--accent-primary)] bg-[var(--bg-primary)] relative transform md:-translate-y-4 shadow-2xl shadow-[var(--accent-primary)]/10 reveal hover:scale-[1.02] transition-all backdrop-blur-sm">
-          <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg">MOST POPULAR</div>
-          <h3 class="text-lg font-bold text-[var(--accent-primary)] mb-2">Growth</h3>
-          <div class="text-4xl font-display font-bold mb-6 text-[var(--text-primary)]">
-            {{ isYearly() ? '$119' : '$149' }}<span class="text-lg text-[var(--text-tertiary)] font-normal">/mo</span>
-          </div>
-          <p class="text-[var(--text-tertiary)] text-sm mb-8">For scaling companies needing AI power.</p>
-          <button routerLink="/auth/org" class="w-full py-3 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:shadow-2xl hover:shadow-[var(--accent-primary)]/40 text-white rounded-lg font-bold transition-all hover:scale-105 mb-8">Get Started</button>
-          <ul class="space-y-4 text-sm text-[var(--text-secondary)]">
-            <li class="flex items-center gap-3"><i class="pi pi-check text-[var(--accent-primary)]"></i> Multi-Branch (Up to 5)</li>
-            <li class="flex items-center gap-3"><i class="pi pi-check text-[var(--accent-primary)]"></i> <strong>AI Forecasting</strong></li>
-            <li class="flex items-center gap-3"><i class="pi pi-check text-[var(--accent-primary)]"></i> <strong>Unlimited Chat</strong></li>
-          </ul>
-        </div>
-
-        <div class="glass-enhanced p-8 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-primary)] reveal hover:scale-[1.02] transition-all">
-          <h3 class="text-lg font-bold text-[var(--text-secondary)] mb-2">Enterprise</h3>
-          <div class="text-4xl font-display font-bold mb-6 text-[var(--text-primary)]">Custom</div>
-          <p class="text-[var(--text-tertiary)] text-sm mb-8">Full control for large organizations.</p>
-          <button class="w-full py-3 bg-[var(--text-primary)] text-[var(--bg-primary)] hover:opacity-90 rounded-lg font-bold transition-all hover:scale-105 mb-8">Contact Sales</button>
-          <ul class="space-y-4 text-sm text-[var(--text-secondary)]">
-            <li class="flex items-center gap-3"><i class="pi pi-check text-green-500"></i> Unlimited Branches</li>
-            <li class="flex items-center gap-3"><i class="pi pi-check text-green-500"></i> Dedicated Server</li>
-            <li class="flex items-center gap-3"><i class="pi pi-check text-green-500"></i> 24/7 Phone Support</li>
-          </ul>
-        </div>
+  <div id="pricing" class="max-w-5xl mx-auto px-4 py-20">
+    <div class="text-center mb-12 reveal">
+      <h2 class="text-4xl font-bold text-[var(--text-primary)] mb-4">Simple, Transparent Pricing</h2>
+      
+      <div class="flex items-center justify-center gap-4 mt-8">
+        <span class="text-sm font-medium text-[var(--text-secondary)]">Monthly</span>
+        <button (click)="togglePricing()" class="w-14 h-8 rounded-full p-1 transition-colors relative shadow-lg" [class.bg-gradient-to-r]="isYearly()" [class.from-[var(--accent-primary)]]="isYearly()" [class.to-[var(--accent-secondary)]]="isYearly()" [class.bg-[var(--border-primary)]]="!isYearly()">
+          <div class="w-6 h-6 bg-white rounded-full transition-transform transform shadow-md" [class.translate-x-6]="isYearly()"></div>
+        </button>
+        <span class="text-sm font-medium text-[var(--text-primary)]">Yearly <span class="text-green-400 text-xs ml-1 font-bold px-2 py-1 bg-green-500/10 rounded-full">Save 20%</span></span>
       </div>
     </div>
-  </section>
 
-  <section class="py-32 relative overflow-hidden text-center px-4 bg-[var(--bg-primary)]">
-    <div class="absolute inset-0 bg-gradient-to-t from-[var(--accent-primary)]/40 via-[var(--accent-secondary)]/20 to-[var(--bg-primary)]"></div>
-    <div class="relative z-10 max-w-3xl mx-auto reveal">
-      <h2 class="text-5xl md:text-6xl font-display font-bold mb-8 text-balance text-[var(--text-primary)]">Ready to modernize?</h2>
-      <p class="text-xl text-[var(--text-secondary)] mb-10 text-pretty">Join the platform that is replacing legacy ERP systems globally.</p>
-      <a routerLink="/auth/org" class="group px-10 py-5 bg-gradient-to-r from-[var(--accent-primary)] via-[var(--accent-secondary)] to-[var(--accent-tertiary)] text-white rounded-full font-bold text-xl hover:scale-105 transition-all shadow-2xl shadow-[var(--accent-primary)]/30 hover:shadow-[var(--accent-primary)]/50 flex items-center gap-3 mx-auto justify-center cursor-pointer inline-flex">
-        Get Started Now
-        <i class="pi pi-arrow-right group-hover:translate-x-1 transition-transform"></i>
-      </a>
-      <p class="mt-6 text-sm text-[var(--text-tertiary)]">No credit card required for 14-day trial.</p>
-    </div>
-  </section>
-
-  <footer class="border-t border-[var(--border-primary)] bg-[var(--bg-ternary)] pt-16 pb-8 px-4">
-    <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-      <div class="col-span-2 md:col-span-1">
-        <div class="flex items-center mb-4">
-          <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 1000 500" style="enable-background:new 0 0 1000 500;" xml:space="preserve" class="h-12 w-auto">
-            <style type="text/css">
-                .main-text { font-family: 'Georgia', 'Times New Roman', serif; font-weight: bold; font-size: 68px; fill: url(#text-gold-grad-footer); filter: url(#dropShadowFooter); }
-                .tagline-text { font-family: 'Segoe UI', 'Verdana', sans-serif; font-size: 16px; letter-spacing: 6px; fill: #5D4037; text-transform: uppercase; font-weight: 600; }
-                .divider-style { fill: none; stroke: #8C5E4A; stroke-width: 2; }
-                .divider-diamond { fill: #8C5E4A; }
-            </style>
-            <defs>
-                <linearGradient id="text-gold-grad-footer" gradientUnits="userSpaceOnUse" x1="300" y1="400" x2="700" y2="400">
-                    <stop offset="0" style="stop-color:#8B5A2B"/> <stop offset="0.3" style="stop-color:#CDA434"/> <stop offset="0.5" style="stop-color:#FCE6C9"/> <stop offset="0.7" style="stop-color:#CDA434"/> <stop offset="1" style="stop-color:#8B5A2B"/> 
-                </linearGradient>
-                <linearGradient id="logo-border-grad-footer" gradientUnits="userSpaceOnUse" x1="344" y1="289.5" x2="733" y2="289.5">
-                    <stop offset="0" style="stop-color:#B88A4D"/> <stop offset="0.20" style="stop-color:#EDC988"/> <stop offset="0.40" style="stop-color:#B88A4D"/> <stop offset="0.60" style="stop-color:#EDC988"/> <stop offset="0.80" style="stop-color:#B88A4D"/> <stop offset="1" style="stop-color:#EDC988"/>
-                </linearGradient>
-                <filter id="dropShadowFooter" x="-20%" y="-20%" width="140%" height="140%">
-                    <feGaussianBlur in="SourceAlpha" stdDeviation="2"/> <feOffset dx="2" dy="2" result="offsetblur"/>
-                    <feComponentTransfer> <feFuncA type="linear" slope="0.5"/> </feComponentTransfer>
-                    <feMerge> <feMergeNode/> <feMergeNode in="SourceGraphic"/> </feMerge>
-                </filter>
-            </defs>
-            <g>
-                <path style="fill:none;stroke:url(#logo-border-grad-footer);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;" d="M344,443l125-307l49,137c15,36,49,84,99,110c50,26,100,11,116-36c16-47-12-100-62-126 c-50-26-94,0-135,33L413,357L344,443"/>
-            </g>
-            <g transform="translate(500, 380)">
-                <text x="0" y="50" text-anchor="middle" class="main-text">APEX-INFINITY</text>
-                <g transform="translate(0, 70)">
-                    <line x1="-120" y1="0" x2="-15" y2="0" class="divider-style"/>
-                    <rect x="-6" y="-6" width="12" height="12" transform="rotate(45)" class="divider-diamond"/>
-                    <line x1="15" y1="0" x2="120" y2="0" class="divider-style"/>
-                </g>
-                <text x="0" y="100" text-anchor="middle" class="tagline-text">EMPOWERING INNOVATION</text>
-            </g>
-          </svg>
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="reveal glass-enhanced p-8 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-primary)]">
+        <h3 class="text-lg font-bold text-[var(--text-secondary)] mb-2">Starter</h3>
+        <div class="text-4xl font-bold mb-6 text-[var(--text-primary)]">
+          {{ isYearly() ? '$39' : '$49' }}<span class="text-lg text-[var(--text-tertiary)] font-normal">/mo</span>
         </div>
-        <p class="text-[var(--text-tertiary)] text-sm leading-relaxed">Empowering enterprises with intelligence.</p>
-      </div>
-      <div>
-        <h4 class="font-bold text-[var(--text-primary)] mb-4">Product</h4>
-        <ul class="space-y-2 text-sm text-[var(--text-secondary)]">
-          <li><a href="#" class="hover:text-[var(--accent-primary)]">Features</a></li>
-          <li><a href="#" class="hover:text-[var(--accent-primary)]">Pricing</a></li>
-          <li><a href="#" class="hover:text-[var(--accent-primary)]">API</a></li>
+        <button routerLink="/auth/org" class="w-full py-3 bg-[var(--bg-ternary)] hover:bg-[var(--border-primary)] text-[var(--text-primary)] rounded-lg font-bold transition-all mb-8 border border-[var(--border-primary)]">Start Free Trial</button>
+        <ul class="space-y-4 text-sm text-[var(--text-secondary)]">
+          <li class="flex items-center gap-3"><i class="pi pi-check text-green-500"></i> Single Branch</li>
+          <li class="flex items-center gap-3"><i class="pi pi-check text-green-500"></i> 5 Users</li>
         </ul>
       </div>
-      <div>
-        <h4 class="font-bold text-[var(--text-primary)] mb-4">Company</h4>
-        <ul class="space-y-2 text-sm text-[var(--text-secondary)]">
-          <li><a href="#" class="hover:text-[var(--accent-primary)]">About</a></li>
-          <li><a href="#" class="hover:text-[var(--accent-primary)]">Blog</a></li>
-          <li><a href="#" class="hover:text-[var(--accent-primary)]">Contact</a></li>
+
+      <div class="reveal p-8 rounded-2xl border-2 border-[var(--accent-primary)] bg-[var(--bg-primary)] relative transform md:-translate-y-4 shadow-2xl">
+        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg">MOST POPULAR</div>
+        <h3 class="text-lg font-bold text-[var(--accent-primary)] mb-2">Growth</h3>
+        <div class="text-4xl font-bold mb-6 text-[var(--text-primary)]">
+          {{ isYearly() ? '$119' : '$149' }}<span class="text-lg text-[var(--text-tertiary)] font-normal">/mo</span>
+        </div>
+        <button routerLink="/auth/org" class="w-full py-3 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-white rounded-lg font-bold transition-all mb-8 shadow-lg">Get Started</button>
+        <ul class="space-y-4 text-sm text-[var(--text-secondary)]">
+          <li class="flex items-center gap-3"><i class="pi pi-check text-[var(--accent-primary)]"></i> Multi-Branch (Up to 5)</li>
+          <li class="flex items-center gap-3"><i class="pi pi-check text-[var(--accent-primary)]"></i> <strong>AI Forecasting</strong></li>
+          <li class="flex items-center gap-3"><i class="pi pi-check text-[var(--accent-primary)]"></i> <strong>Unlimited Chat</strong></li>
         </ul>
       </div>
-      <div>
-        <h4 class="font-bold text-[var(--text-primary)] mb-4">Legal</h4>
-        <ul class="space-y-2 text-sm text-[var(--text-secondary)]">
-          <li><a href="#" class="hover:text-[var(--accent-primary)]">Privacy</a></li>
-          <li><a href="#" class="hover:text-[var(--accent-primary)]">Terms</a></li>
+      
+      <div class="reveal glass-enhanced p-8 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-primary)]">
+        <h3 class="text-lg font-bold text-[var(--text-secondary)] mb-2">Enterprise</h3>
+        <div class="text-4xl font-bold mb-6 text-[var(--text-primary)]">Custom</div>
+        <button class="w-full py-3 bg-[var(--text-primary)] text-[var(--bg-primary)] hover:opacity-90 rounded-lg font-bold transition-all mb-8">Contact Sales</button>
+        <ul class="space-y-4 text-sm text-[var(--text-secondary)]">
+          <li class="flex items-center gap-3"><i class="pi pi-check text-green-500"></i> Unlimited Branches</li>
+          <li class="flex items-center gap-3"><i class="pi pi-check text-green-500"></i> Dedicated Server</li>
         </ul>
       </div>
     </div>
-    <div class="max-w-7xl mx-auto border-t border-[var(--border-primary)] pt-8 text-center text-[var(--text-tertiary)] text-sm">
-      &copy; 2025 Apex-Infinity Inc. All rights reserved.
-    </div>
+  </div>
+
+  <footer class="border-t border-[var(--border-primary)] bg-[var(--bg-secondary)] py-12 text-center text-[var(--text-tertiary)] text-sm">
+    <p>&copy; 2025 Apex-Infinity Inc. All rights reserved.</p>
   </footer>
-
 </div>
