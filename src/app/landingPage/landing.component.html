@@ -1,242 +1,308 @@
 <div class="landing-root">
-  <div class="mesh-bg"></div>
 
-  <nav class="fixed top-0 left-0 w-full z-50 glass border-b border-[var(--border-primary)]/50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-20">
-        <div class="flex items-center cursor-pointer" routerLink="/">
-          <svg version="1.1" viewBox="0 0 1000 500" class="h-12 md:h-16 w-auto">
-            <style type="text/css">
-              .main-text { font-family: serif; font-weight: bold; font-size: 68px; fill: url(#text-gold-grad); filter: url(#dropShadow); }
-              .tagline-text { font-family: sans-serif; font-size: 16px; letter-spacing: 6px; fill: #5D4037; text-transform: uppercase; font-weight: 600; }
-              .divider-style { fill: none; stroke: #8C5E4A; stroke-width: 2; }
-              .divider-diamond { fill: #8C5E4A; }
-            </style>
-            <defs>
-              <linearGradient id="text-gold-grad" gradientUnits="userSpaceOnUse" x1="300" y1="400" x2="700" y2="400">
-                <stop offset="0" style="stop-color:#8B5A2B"/>
-                <stop offset="0.5" style="stop-color:#FCE6C9"/>
-                <stop offset="1" style="stop-color:#8B5A2B"/>
-              </linearGradient>
-              <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
-                <feOffset dx="2" dy="2" result="offsetblur"/>
-                <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
-              </filter>
-            </defs>
-            <g transform="translate(500, 380)">
-              <text x="0" y="50" text-anchor="middle" class="main-text">APEX-INFINITY</text>
-              <g transform="translate(0, 70)">
-                <line x1="-120" y1="0" x2="-15" y2="0" class="divider-style"/>
-                <rect x="-6" y="-6" width="12" height="12" transform="rotate(45)" class="divider-diamond"/>
-                <line x1="15" y1="0" x2="120" y2="0" class="divider-style"/>
-              </g>
-              <text x="0" y="100" text-anchor="middle" class="tagline-text">EMPOWERING INNOVATION</text>
-            </g>
-          </svg>
-        </div>
+  <!-- Background Mesh & Noise -->
+  <div class="fixed inset-0 z-[-1] pointer-events-none">
+    <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[var(--accent-primary)] rounded-full blur-[150px] opacity-20 animate-float"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[var(--accent-secondary)] rounded-full blur-[150px] opacity-20" style="animation-delay: 2s"></div>
+    <!-- Noise Texture for Titanium feel -->
+    <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
+  </div>
 
-        <div class="hidden md:flex gap-8 text-sm font-medium text-[var(--text-secondary)]">
-          <a href="#features" class="hover:text-[var(--text-primary)] transition-colors hover:scale-105 transform">Features</a>
-          <a href="#pricing" class="hover:text-[var(--text-primary)] transition-colors hover:scale-105 transform">Pricing</a>
-        </div>
+  <!-- Navigation -->
+  <nav class="glass-nav">
+    <div class="max-w-container w-full flex items-center justify-between">
+      
+      <!-- Logo Section -->
+      <div class="flex items-center gap-3 cursor-pointer" routerLink="/">
+        <!-- Your SVG Logo Scaled Down for Nav -->
+        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" class="h-10 w-auto">
+          <defs>
+            <linearGradient id="nav-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:var(--accent-primary)"/>
+              <stop offset="100%" style="stop-color:var(--accent-secondary)"/>
+            </linearGradient>
+          </defs>
+          <g transform="translate(500, 380)">
+             <!-- Simplified Path for Small Sizes -->
+             <text x="0" y="50" text-anchor="middle" font-family="serif" font-weight="bold" font-size="68px" fill="white">APEX</text>
+             <text x="0" y="100" text-anchor="middle" font-family="sans-serif" font-size="20px" letter-spacing="4px" fill="var(--text-secondary)">INFINITY</text>
+          </g>
+        </svg>
+      </div>
 
-        <div class="flex items-center gap-4">
-          <div class="relative group hidden sm:block">
-            <button class="flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition">
-              <i class="pi pi-palette"></i> Theme
-            </button>
-            <div class="absolute right-0 top-full mt-2 w-40 bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-lg shadow-xl overflow-hidden hidden group-hover:block max-h-64 overflow-y-auto z-50">
-              @for(theme of availableThemes; track theme.name) {
-                <button (click)="selectTheme(theme.class)" class="w-full text-left px-4 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--component-bg-hover)] hover:text-[var(--text-primary)]">
-                  {{ theme.name }}
-                </button>
-              }
-            </div>
+      <!-- Links -->
+      <div class="hidden md:flex items-center gap-8 text-[var(--font-size-sm)] font-medium text-[var(--text-secondary)]">
+        <a href="#features" class="hover:text-white transition-colors">Features</a>
+        <a href="#pricing" class="hover:text-white transition-colors">Pricing</a>
+        <a href="#testimonials" class="hover:text-white transition-colors">Stories</a>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-4">
+        <!-- Theme Selector -->
+        <div class="relative group hidden sm:block">
+          <button class="btn btn-glass text-[var(--font-size-xs)] py-2 px-3">
+            <i class="pi pi-palette"></i> Theme
+          </button>
+          <div class="absolute right-0 top-full mt-2 w-40 bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-[var(--ui-border-radius)] shadow-xl overflow-hidden hidden group-hover:block z-50">
+            @for(theme of availableThemes; track theme.name) {
+              <button (click)="selectTheme(theme.class)" class="w-full text-left px-4 py-2 text-[var(--font-size-sm)] text-[var(--text-secondary)] hover:bg-[var(--bg-ternary)] hover:text-white">
+                {{ theme.name }}
+              </button>
+            }
           </div>
-          <a routerLink="/auth/login" class="hidden sm:block text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm font-medium transition-all hover:scale-105 cursor-pointer">Log in</a>
-          <a routerLink="/auth/org" class="px-6 py-2.5 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-white rounded-lg text-sm font-bold hover:shadow-2xl hover:shadow-[var(--accent-primary)]/50 transition-all hover:scale-105 animate-shimmer cursor-pointer">
-            Start Free Trial
-          </a>
         </div>
+
+        <button class="btn btn-glass" routerLink="/auth/login">Log in</button>
+        <button class="btn btn-primary" routerLink="/auth/org">Start Free Trial</button>
       </div>
     </div>
   </nav>
 
-  <div class="pt-32 pb-20 px-4 text-center">
-    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--bg-secondary)] border border-[var(--accent-primary)]/30 text-[var(--accent-primary)] text-xs font-semibold tracking-wide mb-8 animate-float shadow-xl shadow-[var(--accent-primary)]/20">
-      <span class="relative flex h-2 w-2">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--accent-primary)] opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-2 w-2 bg-[var(--accent-primary)]"></span>
-      </span>
-      New: Real-time Chat & Broadcast Features Live!
-    </div>
-
-    <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-8 leading-[1.1] text-balance text-[var(--text-primary)]">
-      Run your business with <br />
-      <span class="animate-gradient">pure intelligence.</span>
-    </h1>
-    <p class="text-[var(--text-tertiary)] text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed text-pretty">
-      Stop guessing. Start knowing. The only ERP that combines Finance, Inventory, CRM, and <span class="text-[var(--accent-primary)] font-semibold">Team Communication</span> with predictive AI.
-    </p>
-
-    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
-      <a routerLink="/auth/org" class="group px-8 py-4 bg-gradient-to-r from-[var(--accent-primary)] via-[var(--accent-secondary)] to-[var(--accent-tertiary)] rounded-xl font-bold text-lg text-white hover:scale-105 transition-all duration-300 shadow-2xl flex items-center gap-2 cursor-pointer">
-        Start Free Trial <i class="pi pi-arrow-right group-hover:translate-x-1 transition-transform"></i>
-      </a>
-      <button class="group px-8 py-4 glass rounded-xl font-bold text-lg text-[var(--text-primary)] hover:bg-[var(--glass-bg-c)] transition-all flex items-center gap-2 border border-[var(--border-primary)]">
-        <i class="pi pi-play-circle group-hover:scale-110 transition-transform text-[var(--accent-primary)]"></i> Watch Demo
-      </button>
-    </div>
-
-    <div class="hero-3d-container max-w-6xl mx-auto px-4 reveal">
-      <div class="hero-3d-element bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-2xl overflow-hidden shadow-2xl relative backdrop-blur-sm">
-        <div class="h-10 bg-[var(--bg-ternary)] border-b border-[var(--border-primary)] flex items-center px-4 gap-2">
-          <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
-          <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
-          <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
-          <div class="ml-4 px-3 py-1 bg-[var(--bg-primary)] rounded-md text-xs text-[var(--text-tertiary)] font-mono">apex-infinity.app/dashboard</div>
+  <main>
+    <!-- HERO SECTION -->
+    <section class="section-spacing pt-40 text-center max-w-container">
+      <div #revealItem class="reveal-item">
+        <!-- Badge -->
+        <div class="hero-pill animate-float">
+          <span class="w-2 h-2 rounded-full bg-[var(--accent-primary)] animate-pulse"></span>
+          New: Real-time Chat & Broadcast Live!
         </div>
-        <div class="relative bg-gradient-to-br from-[var(--bg-primary)] via-[var(--bg-secondary)] to-[var(--accent-primary)]/10 aspect-video flex items-center justify-center group">
-          <div class="grid grid-cols-12 gap-4 p-8 w-full h-full opacity-90">
-             <div class="col-span-2 bg-[var(--bg-ternary)]/50 rounded-lg h-full border border-[var(--border-secondary)]"></div>
-             <div class="col-span-10 grid grid-cols-3 gap-4">
-               <div class="col-span-3 h-16 flex justify-between items-center mb-4">
-                 <div class="h-8 w-48 bg-[var(--bg-ternary)]/50 rounded animate-pulse"></div>
-                 <div class="h-8 w-24 bg-gradient-to-r from-[var(--accent-primary)]/50 to-[var(--accent-secondary)]/50 rounded animate-pulse"></div>
-               </div>
-               <div class="col-span-1 h-32 bg-[var(--bg-ternary)]/50 rounded-xl border border-[var(--border-secondary)]"></div>
-               <div class="col-span-1 h-32 bg-[var(--bg-ternary)]/50 rounded-xl border border-[var(--border-secondary)]"></div>
-               <div class="col-span-1 h-32 bg-[var(--bg-ternary)]/50 rounded-xl border border-[var(--border-secondary)]"></div>
-               <div class="col-span-2 h-64 bg-[var(--bg-ternary)]/50 rounded-xl border border-[var(--border-secondary)] mt-4"></div>
+
+        <!-- Headline -->
+        <h1 class="hero-title text-balance text-white">
+          Run your business with <br />
+          <span class="text-gradient-accent">Pure Intelligence.</span>
+        </h1>
+
+        <!-- Subhead -->
+        <p class="text-[var(--font-size-lg)] text-[var(--text-secondary)] mb-[var(--spacing-3xl)] max-w-2xl mx-auto leading-relaxed text-pretty">
+          Stop guessing. Start knowing. The only ERP that combines Finance, Inventory, CRM, and <span class="text-[var(--accent-primary)] font-bold">Team Communication</span> with predictive AI.
+        </p>
+
+        <!-- CTA -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-[var(--spacing-md)]">
+          <button routerLink="/auth/org" class="btn btn-primary shadow-glow">
+            Start Free Trial <i class="pi pi-arrow-right"></i>
+          </button>
+          <button class="btn btn-glass">
+            <i class="pi pi-play-circle text-[var(--accent-primary)]"></i> Watch Demo
+          </button>
+        </div>
+      </div>
+
+      <!-- 3D Dashboard Preview -->
+      <div #revealItem class="reveal-item mt-[var(--spacing-5xl)]">
+        <div class="border border-[var(--border-primary)] rounded-[var(--ui-border-radius-xl)] bg-[var(--bg-secondary)] overflow-hidden shadow-2xl relative">
+          <!-- Window Controls -->
+          <div class="h-10 bg-[var(--bg-ternary)] border-b border-[var(--border-primary)] flex items-center px-4 gap-2">
+             <div class="flex gap-2">
+               <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
+               <div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
+               <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
              </div>
+             <div class="ml-4 px-3 py-1 bg-[var(--bg-primary)] rounded-md text-[10px] text-[var(--text-tertiary)] font-mono border border-[var(--border-secondary)]">apex-infinity.app/dashboard</div>
           </div>
-          <div class="absolute top-1/4 right-10 glass px-6 py-4 rounded-xl animate-float shadow-2xl border border-[var(--accent-primary)]/20 backdrop-blur-md">
-            <div class="flex items-center gap-3">
-              <div class="p-2 bg-green-500/20 rounded-lg text-green-400"><i class="pi pi-chart-line" style="font-size: 1.5rem"></i></div>
-              <div>
-                <div class="text-xs text-[var(--text-tertiary)]">Revenue Forecast</div>
-                <div class="text-xl font-bold font-display text-[var(--text-primary)]">+24.5%</div>
+          
+          <!-- Detailed Mock Dashboard -->
+          <div class="relative bg-[var(--bg-secondary)] aspect-video flex flex-col overflow-hidden group">
+            <div class="flex h-full">
+              
+              <!-- Mock Sidebar -->
+              <div class="w-16 md:w-48 bg-[var(--bg-ternary)] border-r border-[var(--border-primary)] flex flex-col p-4 gap-4 hidden sm:flex">
+                 <div class="h-8 w-8 md:w-24 bg-[var(--bg-primary)] rounded opacity-50 mb-4"></div>
+                 <!-- Sidebar Items -->
+                 <div class="space-y-3">
+                   <div class="h-3 w-12 md:w-32 bg-[var(--accent-primary)]/20 rounded"></div>
+                   <div class="h-3 w-10 md:w-24 bg-[var(--text-tertiary)]/10 rounded"></div>
+                   <div class="h-3 w-8 md:w-28 bg-[var(--text-tertiary)]/10 rounded"></div>
+                   <div class="h-3 w-10 md:w-20 bg-[var(--text-tertiary)]/10 rounded"></div>
+                   <div class="h-3 w-12 md:w-32 bg-[var(--text-tertiary)]/10 rounded"></div>
+                 </div>
+                 <!-- Bottom Sidebar -->
+                 <div class="mt-auto space-y-3">
+                    <div class="h-3 w-full bg-[var(--text-tertiary)]/10 rounded"></div>
+                 </div>
+              </div>
+
+              <!-- Main Area -->
+              <div class="flex-1 flex flex-col bg-[var(--bg-primary)]/50 relative">
+                <!-- Header -->
+                <div class="h-14 border-b border-[var(--border-primary)] flex items-center justify-between px-6 bg-[var(--bg-secondary)]/50">
+                  <div class="h-3 w-32 bg-[var(--text-tertiary)]/20 rounded"></div>
+                  <div class="flex gap-3">
+                    <div class="h-8 w-8 rounded-full bg-[var(--bg-ternary)] border border-[var(--border-primary)]"></div>
+                    <div class="h-8 w-8 rounded-full bg-[var(--accent-secondary)]/20"></div>
+                  </div>
+                </div>
+
+                <!-- Dashboard Content Grid -->
+                <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-4 h-full overflow-hidden">
+                   
+                   <!-- Card 1: Revenue -->
+                   <div class="col-span-1 h-28 rounded-[var(--ui-border-radius)] bg-[var(--bg-ternary)] border border-[var(--border-primary)] p-5 flex flex-col justify-between shadow-lg shadow-[var(--accent-primary)]/5 relative overflow-hidden group/card">
+                      <div class="absolute inset-0 bg-gradient-to-br from-[var(--accent-primary)]/5 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity"></div>
+                      <div class="flex justify-between items-start">
+                        <div class="h-2 w-16 bg-[var(--text-tertiary)]/30 rounded"></div>
+                        <i class="pi pi-arrow-up-right text-[var(--color-success)] text-xs"></i>
+                      </div>
+                      <div class="text-[var(--font-size-3xl)] font-bold text-white relative z-10">₹{{ stats.revenue }}M</div>
+                   </div>
+
+                   <!-- Card 2: Users -->
+                   <div class="col-span-1 h-28 rounded-[var(--ui-border-radius)] bg-[var(--bg-ternary)] border border-[var(--border-primary)] p-5 flex flex-col justify-between">
+                      <div class="h-2 w-12 bg-[var(--text-tertiary)]/30 rounded"></div>
+                      <div class="text-[var(--font-size-3xl)] font-bold text-[var(--color-success)] flex items-center gap-2">
+                        +{{ stats.users | number }} <span class="text-[var(--font-size-xs)] text-[var(--text-tertiary)] font-normal">users</span>
+                      </div>
+                   </div>
+
+                   <!-- Card 3: Static -->
+                   <div class="col-span-1 h-28 rounded-[var(--ui-border-radius)] bg-[var(--bg-ternary)] border border-[var(--border-primary)] p-5 flex flex-col justify-between">
+                      <div class="h-2 w-20 bg-[var(--text-tertiary)]/30 rounded"></div>
+                      <div class="h-6 w-1/2 bg-[var(--bg-primary)] rounded"></div>
+                   </div>
+
+                   <!-- Main Chart Area -->
+                   <div class="col-span-3 flex-1 rounded-[var(--ui-border-radius)] bg-[var(--bg-ternary)] border border-[var(--border-primary)] relative overflow-hidden flex items-end px-8 pb-0 gap-4 mt-2 min-h-[160px]">
+                      <!-- Grid Lines Background -->
+                      <div class="absolute inset-0 border-t border-[var(--border-secondary)] top-1/4 opacity-30"></div>
+                      <div class="absolute inset-0 border-t border-[var(--border-secondary)] top-2/4 opacity-30"></div>
+                      <div class="absolute inset-0 border-t border-[var(--border-secondary)] top-3/4 opacity-30"></div>
+
+                      <!-- Animated Bars -->
+                      <div class="w-full bg-[var(--accent-primary)]/20 h-[40%] rounded-t-sm transition-all duration-1000 group-hover:h-[60%]"></div>
+                      <div class="w-full bg-[var(--accent-primary)]/40 h-[60%] rounded-t-sm transition-all duration-1000 delay-75 group-hover:h-[80%]"></div>
+                      <div class="w-full bg-[var(--accent-primary)]/60 h-[30%] rounded-t-sm transition-all duration-1000 delay-100 group-hover:h-[50%]"></div>
+                      <div class="w-full bg-gradient-to-t from-[var(--accent-primary)] to-[var(--accent-secondary)] h-[75%] rounded-t-sm transition-all duration-1000 delay-150 group-hover:h-[90%] shadow-[0_0_20px_var(--accent-primary)] relative z-10"></div>
+                      <div class="w-full bg-[var(--accent-primary)]/50 h-[50%] rounded-t-sm transition-all duration-1000 delay-200 group-hover:h-[70%]"></div>
+                      <div class="w-full bg-[var(--accent-primary)]/30 h-[45%] rounded-t-sm transition-all duration-1000 delay-300 group-hover:h-[65%]"></div>
+                   </div>
+                </div>
               </div>
             </div>
+
+            <!-- Floating Notification / Toast -->
+            <div class="absolute bottom-6 right-6 bg-[var(--bg-secondary)] border border-[var(--border-primary)] p-3 rounded-[var(--ui-border-radius)] shadow-xl animate-float flex items-center gap-3 z-20 backdrop-blur-md">
+               <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 border border-green-500/30">
+                 <i class="pi pi-check text-xs"></i>
+               </div>
+               <div>
+                 <div class="text-[10px] text-[var(--text-tertiary)] uppercase tracking-wider">System Status</div>
+                 <div class="text-[var(--font-size-sm)] font-bold text-white">99.9% Uptime</div>
+               </div>
+            </div>
+
           </div>
         </div>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <div id="features" class="max-w-7xl mx-auto px-4 py-20">
-    <div class="text-center mb-12 reveal">
-      <h2 class="text-4xl font-bold text-[var(--text-primary)] mb-4">The Complete Feature Suite</h2>
-      <p class="text-[var(--text-secondary)]">Search through our comprehensive module list.</p>
-    </div>
-
-    <div class="mb-10 reveal">
-      <div class="relative w-full md:max-w-md mx-auto mb-6 group">
-        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <i class="pi pi-search text-[var(--text-tertiary)]"></i>
-        </div>
-        <input 
-          type="text" 
-          [ngModel]="searchQuery()" 
-          (ngModelChange)="searchQuery.set($event)" 
-          placeholder="Search capabilities..." 
-          class="w-full pl-12 pr-4 py-3 bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] text-[var(--text-primary)] transition-all">
+    <!-- FEATURES (Bento Grid) -->
+    <section id="features" class="section-spacing max-w-container">
+      <div class="text-center mb-[var(--spacing-3xl)] reveal-item" #revealItem>
+        <h2 class="text-[var(--font-size-4xl)] font-bold text-white mb-2">The Complete Feature Suite</h2>
+        <p class="text-[var(--text-secondary)]">Search through our comprehensive module list.</p>
       </div>
 
-      <div class="flex flex-wrap justify-center gap-2">
-        @for (cat of categories(); track cat) {
-          <button 
-            (click)="setCategory(cat)" 
-            class="px-4 py-2 rounded-full text-sm font-medium transition-all border cursor-pointer select-none"
-            [class.bg-gradient-to-r]="selectedCategory() === cat"
-            [class.from-[var(--accent-primary)]]="selectedCategory() === cat"
-            [class.to-[var(--accent-secondary)]]="selectedCategory() === cat"
-            [class.text-white]="selectedCategory() === cat"
-            [class.border-transparent]="selectedCategory() === cat"
-            [class.bg-[var(--bg-secondary)]]="selectedCategory() !== cat"
-            [class.text-[var(--text-secondary)]]="selectedCategory() !== cat">
-            {{ cat }} 
-            <span class="ml-1 opacity-70 text-xs">({{ getCategoryCount(cat) }})</span>
-          </button>
+      <!-- Search & Filter -->
+      <!-- <div class="mb-[var(--spacing-2xl)] reveal-item" #revealItem>
+        <div class="max-w-md mx-auto mb-6 relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i class="pi pi-search text-[var(--text-tertiary)]"></i>
+          </div>
+          <input 
+            type="text" 
+            [ngModel]="searchQuery()" 
+            (ngModelChange)="searchQuery.set($event)" 
+            placeholder="Search capabilities..." 
+            class="input-glass pl-10" />
+        </div>
+
+        <div class="flex justify-center flex-wrap gap-2">
+          @for (cat of categories(); track cat) {
+            <button (click)="setCategory(cat)" 
+              class="px-4 py-2 rounded-full text-[var(--font-size-xs)] font-medium transition-all border cursor-pointer"
+              [class]="selectedCategory() === cat ? 'bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white' : 'bg-[var(--bg-secondary)] border-[var(--border-primary)] text-[var(--text-tertiary)] hover:border-[var(--text-primary)]'">
+              {{ cat }}
+            </button>
+          }
+        </div>
+      </div> -->
+
+      <!-- Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[var(--spacing-lg)]">
+        @for (f of filteredFeatures(); track f.title) {
+          <div class="bento-card reveal-item group cursor-default" #revealItem>
+             <div class="flex justify-between items-start mb-4">
+                <div class="w-10 h-10 rounded-[var(--ui-border-radius)] bg-[var(--bg-ternary)] flex items-center justify-center text-[var(--accent-primary)] group-hover:bg-[var(--accent-primary)] group-hover:text-white transition-colors shadow-sm">
+                  <i class="pi" [ngClass]="f.icon"></i>
+                </div>
+                <span class="text-[10px] uppercase font-bold tracking-wider text-[var(--text-tertiary)] border border-[var(--border-primary)] px-2 py-1 rounded bg-[var(--bg-primary)]">{{ f.group }}</span>
+             </div>
+             <h3 class="text-white font-bold text-[var(--font-size-md)] mb-2 group-hover:text-[var(--accent-secondary)] transition-colors">{{ f.title }}</h3>
+             <p class="text-[var(--text-secondary)] text-[var(--font-size-sm)] leading-relaxed">{{ f.desc }}</p>
+          </div>
+        } @empty {
+          <div class="col-span-full text-center py-20 text-[var(--text-tertiary)]">
+            <i class="pi pi-search text-2xl mb-2"></i>
+            <p>No features found matching your search.</p>
+          </div>
         }
       </div>
-    </div>
+    </section>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-      @for (f of filteredFeatures(); track f.title) {
-        <div class="reveal glass-enhanced p-6 rounded-xl group hover:-translate-y-1 transition-all duration-300 hover:shadow-xl cursor-pointer bg-[var(--bg-secondary)]">
-          <div class="flex justify-between items-start mb-4">
-            <div class="p-3 bg-[var(--bg-ternary)] rounded-lg text-[var(--accent-primary)] group-hover:bg-gradient-to-br group-hover:from-[var(--accent-primary)] group-hover:to-[var(--accent-secondary)] group-hover:text-white transition-all duration-300">
-              <i class="pi" [ngClass]="f.icon" style="font-size: 1.25rem"></i>
+    <!-- PRICING -->
+    <section id="pricing" class="section-spacing max-w-container">
+      <div class="text-center mb-[var(--spacing-4xl)] reveal-item" #revealItem>
+        <h2 class="text-[var(--font-size-4xl)] font-bold text-white mb-4">Simple, Transparent Pricing</h2>
+        <div class="inline-flex bg-[var(--bg-secondary)] p-1 rounded-full border border-[var(--border-primary)]">
+          <button (click)="togglePricing()" [class.bg-[var(--bg-ternary)]]="!isYearly()" [class.text-white]="!isYearly()" class="px-6 py-2 rounded-full text-[var(--font-size-sm)] font-medium text-[var(--text-tertiary)] transition-all">Monthly</button>
+          <button (click)="togglePricing()" [class.bg-[var(--bg-ternary)]]="isYearly()" [class.text-white]="isYearly()" class="px-6 py-2 rounded-full text-[var(--font-size-sm)] font-medium text-[var(--text-tertiary)] transition-all">Yearly <span class="text-[var(--accent-secondary)] text-xs ml-1 font-bold">-20%</span></button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-[var(--spacing-xl)] items-start">
+        @for (plan of plans; track plan.name) {
+          <div class="pricing-card reveal-item" [class.popular]="plan.isPopular" #revealItem>
+            
+            @if (plan.isPopular) {
+              <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-white text-[10px] font-bold uppercase tracking-wide shadow-lg">Most Popular</div>
+            }
+
+            <h3 class="text-[var(--font-size-lg)] font-bold text-[var(--text-secondary)] mb-2">{{ plan.name }}</h3>
+            <div class="flex items-baseline gap-1 mb-2">
+              <span class="text-[var(--font-size-4xl)] font-bold text-white">{{ plan.price }}</span>
+              @if (plan.price !== 'Custom' && plan.price !== 'Free') {
+                <span class="text-[var(--font-size-sm)] text-[var(--text-tertiary)]">/ {{ isYearly() ? 'yr' : 'mo' }}</span>
+              }
             </div>
-            <span class="text-[10px] uppercase font-bold tracking-wider text-[var(--text-label)] border border-[var(--border-primary)] px-2 py-1 rounded bg-[var(--bg-ternary)]">{{ f.group }}</span>
+            <p class="text-[var(--font-size-sm)] text-[var(--text-tertiary)] mb-8 pb-8 border-b border-[var(--border-secondary)]">{{ plan.desc }}</p>
+
+            <ul class="space-y-4 mb-8">
+              @for (feat of plan.features; track feat) {
+                <li class="flex items-center gap-3 text-[var(--font-size-sm)] text-[var(--text-secondary)]">
+                  <i class="pi pi-check text-[var(--accent-secondary)]"></i> {{ feat }}
+                </li>
+              }
+            </ul>
+
+            <button class="w-full btn"
+                    [ngClass]="plan.isPopular ? 'btn-primary' : 'btn-glass'">
+              {{ plan.cta }}
+            </button>
           </div>
-          <h3 class="text-[var(--text-primary)] font-semibold text-base mb-2">{{ f.title }}</h3>
-          <p class="text-[var(--text-tertiary)] text-xs leading-relaxed">{{ f.desc }}</p>
-        </div>
-      } @empty {
-        <div class="col-span-full text-center py-20 reveal">
-          <i class="pi pi-search-minus text-[var(--text-tertiary)] text-4xl mb-4"></i>
-          <h3 class="text-xl font-bold text-[var(--text-primary)]">No features found</h3>
-        </div>
-      }
-    </div>
-  </div>
-
-  <div id="pricing" class="max-w-5xl mx-auto px-4 py-20">
-    <div class="text-center mb-12 reveal">
-      <h2 class="text-4xl font-bold text-[var(--text-primary)] mb-4">Simple, Transparent Pricing</h2>
-      
-      <div class="flex items-center justify-center gap-4 mt-8">
-        <span class="text-sm font-medium text-[var(--text-secondary)]">Monthly</span>
-        <button (click)="togglePricing()" class="w-14 h-8 rounded-full p-1 transition-colors relative shadow-lg" [class.bg-gradient-to-r]="isYearly()" [class.from-[var(--accent-primary)]]="isYearly()" [class.to-[var(--accent-secondary)]]="isYearly()" [class.bg-[var(--border-primary)]]="!isYearly()">
-          <div class="w-6 h-6 bg-white rounded-full transition-transform transform shadow-md" [class.translate-x-6]="isYearly()"></div>
-        </button>
-        <span class="text-sm font-medium text-[var(--text-primary)]">Yearly <span class="text-green-400 text-xs ml-1 font-bold px-2 py-1 bg-green-500/10 rounded-full">Save 20%</span></span>
+        }
       </div>
-    </div>
+    </section>
 
-    <div class="grid md:grid-cols-3 gap-8">
-      <div class="reveal glass-enhanced p-8 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-primary)]">
-        <h3 class="text-lg font-bold text-[var(--text-secondary)] mb-2">Starter</h3>
-        <div class="text-4xl font-bold mb-6 text-[var(--text-primary)]">
-          {{ isYearly() ? '$39' : '$49' }}<span class="text-lg text-[var(--text-tertiary)] font-normal">/mo</span>
-        </div>
-        <button routerLink="/auth/org" class="w-full py-3 bg-[var(--bg-ternary)] hover:bg-[var(--border-primary)] text-[var(--text-primary)] rounded-lg font-bold transition-all mb-8 border border-[var(--border-primary)]">Start Free Trial</button>
-        <ul class="space-y-4 text-sm text-[var(--text-secondary)]">
-          <li class="flex items-center gap-3"><i class="pi pi-check text-green-500"></i> Single Branch</li>
-          <li class="flex items-center gap-3"><i class="pi pi-check text-green-500"></i> 5 Users</li>
-        </ul>
+    <!-- FOOTER -->
+    <footer class="border-t border-[var(--border-primary)] bg-[var(--bg-ternary)] py-[var(--spacing-3xl)] text-center">
+      <div class="mb-4">
+        <span class="text-xl font-bold font-heading tracking-tight text-white">Apex<span class="text-[var(--accent-primary)]">Infinity</span></span>
       </div>
+      <p class="text-[var(--text-tertiary)] text-[var(--font-size-sm)]">&copy; 2025 Apex Infinity Inc. Built for hyper-growth.</p>
+    </footer>
 
-      <div class="reveal p-8 rounded-2xl border-2 border-[var(--accent-primary)] bg-[var(--bg-primary)] relative transform md:-translate-y-4 shadow-2xl">
-        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg">MOST POPULAR</div>
-        <h3 class="text-lg font-bold text-[var(--accent-primary)] mb-2">Growth</h3>
-        <div class="text-4xl font-bold mb-6 text-[var(--text-primary)]">
-          {{ isYearly() ? '$119' : '$149' }}<span class="text-lg text-[var(--text-tertiary)] font-normal">/mo</span>
-        </div>
-        <button routerLink="/auth/org" class="w-full py-3 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-white rounded-lg font-bold transition-all mb-8 shadow-lg">Get Started</button>
-        <ul class="space-y-4 text-sm text-[var(--text-secondary)]">
-          <li class="flex items-center gap-3"><i class="pi pi-check text-[var(--accent-primary)]"></i> Multi-Branch (Up to 5)</li>
-          <li class="flex items-center gap-3"><i class="pi pi-check text-[var(--accent-primary)]"></i> <strong>AI Forecasting</strong></li>
-          <li class="flex items-center gap-3"><i class="pi pi-check text-[var(--accent-primary)]"></i> <strong>Unlimited Chat</strong></li>
-        </ul>
-      </div>
-      
-      <div class="reveal glass-enhanced p-8 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-primary)]">
-        <h3 class="text-lg font-bold text-[var(--text-secondary)] mb-2">Enterprise</h3>
-        <div class="text-4xl font-bold mb-6 text-[var(--text-primary)]">Custom</div>
-        <button class="w-full py-3 bg-[var(--text-primary)] text-[var(--bg-primary)] hover:opacity-90 rounded-lg font-bold transition-all mb-8">Contact Sales</button>
-        <ul class="space-y-4 text-sm text-[var(--text-secondary)]">
-          <li class="flex items-center gap-3"><i class="pi pi-check text-green-500"></i> Unlimited Branches</li>
-          <li class="flex items-center gap-3"><i class="pi pi-check text-green-500"></i> Dedicated Server</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <footer class="border-t border-[var(--border-primary)] bg-[var(--bg-secondary)] py-12 text-center text-[var(--text-tertiary)] text-sm">
-    <p>&copy; 2025 Apex-Infinity Inc. All rights reserved.</p>
-  </footer>
+  </main>
 </div>
