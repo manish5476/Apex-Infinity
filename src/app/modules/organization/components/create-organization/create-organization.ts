@@ -124,7 +124,7 @@ export class CreateOrganizationComponent implements OnInit {
           // Handle auto-login if token returned
           if (response.token) {
             this.authService.handleLoginSuccess(response);
-            this.masterList.load(); // Refresh master data
+            this.masterList.load();
             setTimeout(() => this.router.navigate(['/dashboard']), 1000);
           } else {
             this.router.navigate(['/auth/login']);
@@ -248,7 +248,7 @@ export class CreateOrganizationComponent implements OnInit {
         
 //         // Refresh app state
 //         this.masterList.load(); 
-//         this.authService.handleLoginSuccess(response);
+        // this.authService.handleLoginSuccess(response);
 //       },
 //       error: (err: any) => {
 //         this.isLoading.set(false);

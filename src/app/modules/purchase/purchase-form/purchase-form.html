@@ -73,7 +73,6 @@
 
               @for (item of items.controls; track i; let i = $index) {
               <div [formGroupName]="i" class="inventory-item-grid animate-slideInUp purchase-row">
-
                 <div class="form-group">
                   <label class="md:hidden">Product</label>
                   <p-select appendTo="body" appendTo="body" formControlName="productId" [options]="productOptions()" optionLabel="name"
