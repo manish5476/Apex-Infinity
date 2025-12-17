@@ -11,7 +11,7 @@ export class OrganizationService extends BaseApiService {
     return this.get(`${this.endpoint}/my-organization`, {}, 'getMyOrganization');
   }
 
-   createNewOrganization(data: any): Observable<any> {
+  createNewOrganization(data: any): Observable<any> {
     return this.post<any>('/v1/organization/create', data, 'createNewOrganization');
   }
 
@@ -26,6 +26,9 @@ export class OrganizationService extends BaseApiService {
   approveMember(data: { userId: string; roleId: string; branchId?: string }): Observable<any> {
     return this.post(`${this.endpoint}/approve-member`, data, 'approveMember');
   }
+  rejectMember(data: { userId: string }): Observable<any> {
+    return this.post(`${this.endpoint}/reject-member`, data, 'approveMember');
+  }
 
   // ---------------------------------------------------
   // PLATFORM ADMIN ROUTES
@@ -39,7 +42,7 @@ export class OrganizationService extends BaseApiService {
     return this.get(`${this.endpoint}/${id}`, {}, 'getOrganizationById');
   }
 
-updateOrganization(id: string, data: any): Observable<any> {
+  updateOrganization(id: string, data: any): Observable<any> {
     return this.patch(`${this.endpoint}/${id}`, data, 'updateOrganization');
   }
 
@@ -65,5 +68,18 @@ updateOrganization(id: string, data: any): Observable<any> {
 
   getActivityLog(): Observable<any> {
     return this.get(`${this.newEndpoint}/activity-log`, {}, 'getActivityLog');
+  }
+
+
+  // =======================================
+  // organization ownership transfer 
+  // =======================================
+  newEndpoints = '/v1/ownership';
+  initiateTransfer(data: any): Observable<any> {
+    return this.post(`${this.newEndpoints}/initiate`, data, 'initiateTransfer');
+  }
+
+  finalizaTransfer(data: any): Observable<any> {
+    return this.post(`${this.newEndpoints}/finalize`, data, 'finalizaTransfer');
   }
 }

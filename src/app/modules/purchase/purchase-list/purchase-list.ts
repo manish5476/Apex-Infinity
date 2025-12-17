@@ -158,7 +158,7 @@ export class PurchaseListComponent implements OnInit {
         this.router.navigate([purchaseId], { relativeTo: this.route });
       }
     }
-    if (event.eventType === 'reachedBottom') {
+    if (event.type === 'reachedBottom') {
       this.onScrolledToBottom(event)
     }
   }
@@ -388,7 +388,7 @@ export class PurchaseListComponent implements OnInit {
 //       if (purchaseId) {
 //         this.router.navigate([purchaseId], { relativeTo: this.route });
 //       }
-//     }if (event.eventType === 'reachedBottom') {
+//     }if (event.type === 'reachedBottom') {
 //       this.onScrolledToBottom(event)
 //     }
 //   }

@@ -136,7 +136,7 @@ export class EmiList implements OnInit {
         this.router.navigate(['/emis', emiId]);
       }
     }
-    if (event.eventType === 'reachedBottom') {
+    if (event.type === 'reachedBottom') {
       this.onScrolledToBottom()
     }
   }

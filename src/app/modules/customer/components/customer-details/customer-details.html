@@ -230,7 +230,7 @@
 <p-dialog header="Transaction History" [(visible)]="showTransactionsDialog" [modal]="true"
   [style]="{ width: '95vw', maxWidth: '1200px', height: '90vh' }" [maximizable]="true" [draggable]="false"
   [resizable]="false" appendTo="body">
-  <ng-container *ngIf="showTransactionsDialog">
+  <ng-container>
     <app-customer-transactions [inputCustomerId]="customer()?._id"></app-customer-transactions>
   </ng-container>
 </p-dialog>

@@ -189,13 +189,14 @@ export class InvoiceListComponent implements OnInit {
   }
 
   eventFromGrid(event: any) {
-    if (event.eventType === 'cellClicked') {
-      const invoiceId = event.event.data._id;
+    console.log(event);
+    if (event.type === 'cellClicked') {
+      const invoiceId = event.row._id;
       if (invoiceId) {
         this.router.navigate([invoiceId], { relativeTo: this.route });
       }
     } 
-    if (event.eventType === 'reachedBottom') {
+    if (event.type === 'reachedBottom') {
       this.onScrolledToBottom(event)
     }
   }

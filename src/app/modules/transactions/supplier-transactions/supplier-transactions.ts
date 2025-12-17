@@ -119,7 +119,7 @@ export class SupplierTransactions implements OnInit {
     if (this.data.length < this.totalCount) this.getData(false);
   }
     eventFromGrid(event: any) {
-    if (event.eventType === 'reachedBottom') {
+    if (event.type === 'reachedBottom') {
       this.onScrolledToBottom(event)
     }
   }

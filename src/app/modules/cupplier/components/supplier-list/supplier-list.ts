@@ -142,7 +142,7 @@ export class SupplierListComponent implements OnInit {
         this.router.navigate([supplierId], { relativeTo: this.route });
       }
     }
-    if (event.eventType === 'reachedBottom') {
+    if (event.type === 'reachedBottom') {
       this.onScrolledToBottom()
     }
   }

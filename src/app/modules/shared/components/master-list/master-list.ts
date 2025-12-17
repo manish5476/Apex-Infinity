@@ -139,7 +139,7 @@ export class MasterList implements OnInit, OnDestroy {
 
   // Handle Edit/Delete events from Shared Grid
   eventFromGrid(event: any) {
-    const action = event.eventType;
+    const action = event.type;
     const data = event.data;
     if (action === 'edit') {
       this.openEdit(data);
@@ -471,7 +471,7 @@ export class MasterList implements OnInit, OnDestroy {
 
 //   // Handle Edit/Delete events from Shared Grid
 //   eventFromGrid(event: any) {
-//     const action = event.eventType;
+//     const action = event.type;
 //     const data = event.data;
 //     if (action === 'edit') {
 //       this.openEdit(data);

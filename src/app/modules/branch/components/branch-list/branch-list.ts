@@ -134,7 +134,7 @@ export class BranchListComponent implements OnInit {
         this.router.navigate([branchId], { relativeTo: this.route });
       }
     }
-     if (event.eventType === 'reachedBottom') {
+     if (event.type === 'reachedBottom') {
       this.onScrolledToBottom()
     }
   }

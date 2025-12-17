@@ -10,21 +10,20 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { Toast } from "primeng/toast";
 import { CommonMethodService } from '../../../core/utils/common-method.service';
 import { TransactionService } from '../transaction.service';
+import { AgShareGrid } from '../../shared/components/ag-shared-grid';
 
 @Component({
   selector: 'app-customer-transactions',
   standalone: true,
   imports: [
-    CommonModule,  SelectModule, FormsModule, 
-    ButtonModule, InputTextModule, Toast, DatePickerModule
+    CommonModule, SelectModule, FormsModule,
+    ButtonModule, InputTextModule, Toast, DatePickerModule, AgShareGrid
   ],
   templateUrl: './customer-transactions.html',
   styleUrl: './customer-transactions.scss',
 })
 export class CustomerTransactions implements OnInit {
-eventFromGrid($event: Event) {
-throw new Error('Method not implemented.');
-}
+
   private cdr = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute); // Inject Route
   private transactionService = inject(TransactionService);
@@ -40,11 +39,11 @@ throw new Error('Method not implemented.');
   pageSize = 100;
   data: any[] = [];
   column: any = [];
-  
+
   // Filters
   rangeDates: Date[] | undefined;
   filterParams: any = { type: null, effect: null, search: '' };
-  
+
   transactionTypes = [
     { label: 'Invoice', value: 'invoice' },
     { label: 'Payment', value: 'payment' },
@@ -53,26 +52,22 @@ throw new Error('Method not implemented.');
   transactionEffects = [{ label: 'Credit', value: 'credit' }, { label: 'Debit', value: 'debit' }];
 
   ngOnInit(): void {
-    // 2. Logic: Prefer Input (Dialog), fallback to Route (Page)
     if (this.inputCustomerId) {
       this.customerId = this.inputCustomerId;
     } else {
-      // Check current route or parent route (in case of nesting)
-      this.customerId = this.route.snapshot.paramMap.get('id') || 
-                        this.route.parent?.snapshot.paramMap.get('id') || '';
+      this.customerId = this.route.snapshot.paramMap.get('id') ||
+        this.route.parent?.snapshot.paramMap.get('id') || '';
     }
-    
+
     this.getColumn();
-    
-    if(this.customerId) {
-        this.getData(true);
+
+    if (this.customerId) {
+      this.getData(true);
     } else {
-        console.error("Customer Transactions: No Customer ID provided via Input or Route.");
+      console.error("Customer Transactions: No Customer ID provided via Input or Route.");
     }
   }
-
   applyFilters() { this.getData(true); }
-
   resetFilters() {
     this.filterParams = { type: null, effect: null, search: '' };
     this.rangeDates = undefined;
@@ -102,7 +97,9 @@ throw new Error('Method not implemented.');
       this.transactionService.getCustomerTransactions(this.customerId, queryParams),
       (res: any) => {
         let newData: any[] = [];
-        if (res.results && Array.isArray(res.results)) { newData = res.results; }
+        if (res.results && Array.isArray(res.results)) {
+          newData = res.results;
+        }
         this.totalCount = res.total || this.totalCount;
         this.data = [...this.data, ...newData];
         this.currentPage++;
@@ -118,7 +115,20 @@ throw new Error('Method not implemented.');
     return localDate.toISOString().split('T')[0];
   }
 
-  onScrolledToBottom(_: any) {
+  eventFromGrid(event: any) {
+    // if (event.type === 'cellClicked') {
+    //   const customerId = event.row._id;
+    //   if (customerId) {
+    //     this.router.navigate(['/customer', customerId]);
+    //   }
+    // }
+    if (event.type === 'reachedBottom') {
+      this.onScrolledToBottom()
+    }
+  }
+
+
+  onScrolledToBottom(_?: any) {
     if (this.data.length < this.totalCount) this.getData(false);
   }
 
@@ -130,11 +140,12 @@ throw new Error('Method not implemented.');
       { field: 'type', headerName: 'Type', sortable: true, width: 120, cellStyle: { 'text-transform': 'capitalize', 'font-weight': '600' } },
       { field: 'description', headerName: 'Description', sortable: true, flex: 1 },
       { field: 'refNumber', headerName: 'Ref #', sortable: true, width: 150, valueGetter: (params: any) => params.data.refNumber || params.data.refId || '-' },
-      { field: 'amount', headerName: 'Amount', sortable: true, width: 140, valueFormatter: (params: any) => this.common.formatCurrency(params.value),
+      {
+        field: 'amount', headerName: 'Amount', sortable: true, width: 140, valueFormatter: (params: any) => this.common.formatCurrency(params.value),
         cellStyle: (params: any) => {
-           const color = params.data.effect === 'credit' ? '#006400' : '#8b0000';
-           const bg = params.data.effect === 'credit' ? '#ccffcc' : '#ffcccc';
-           return { color: color, fontWeight: 'bold', backgroundColor: bg };
+          const color = params.data.effect === 'credit' ? '#006400' : '#8b0000';
+          const bg = params.data.effect === 'credit' ? '#ccffcc' : '#ffcccc';
+          return { color: color, fontWeight: 'bold', backgroundColor: bg };
         }
       },
       { field: 'effect', headerName: 'Effect', sortable: true, width: 100, valueFormatter: (params: any) => params.value ? params.value.toUpperCase() : '' },

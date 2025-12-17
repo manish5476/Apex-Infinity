@@ -14,7 +14,7 @@ import { CustomerService } from '../../services/customer-service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { Toast } from "primeng/toast";
-import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
+import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
 
 @Component({
   selector: 'app-customer-list',
@@ -172,7 +172,7 @@ export class CustomerList implements OnInit {
         this.router.navigate(['/customer', customerId]);
       }
     }
-     if (event.eventType === 'reachedBottom') {
+     if (event.type === 'reachedBottom') {
       this.onScrolledToBottom()
     }
   }

@@ -4,26 +4,34 @@
     <div class="se-filter-bar">
       <div class="se-filter-field">
         <label>Date Range</label>
-        <p-datepicker [(ngModel)]="rangeDates" selectionMode="range" [readonlyInput]="true" placeholder="Start - End" [showIcon]="true" appendTo="body" (onClose)="applyFilters()"></p-datepicker>
+        <p-datepicker [(ngModel)]="rangeDates" selectionMode="range" [readonlyInput]="true" placeholder="Start - End"
+          [showIcon]="true" appendTo="body" (onClose)="applyFilters()"></p-datepicker>
       </div>
       <div class="se-filter-field">
         <label>Type</label>
-        <p-select appendTo="body" (onChange)="applyFilters()" [options]="transactionTypes" [(ngModel)]="filterParams.type" [showClear]="true" placeholder="All" appendTo="body"></p-select>
+        <p-select appendTo="body" (onChange)="applyFilters()" [options]="transactionTypes"
+          [(ngModel)]="filterParams.type" [showClear]="true" placeholder="All" appendTo="body"></p-select>
       </div>
       <div class="se-filter-field">
         <label>Effect</label>
-        <p-select appendTo="body" (onChange)="applyFilters()" [options]="transactionEffects" [(ngModel)]="filterParams.effect" [showClear]="true" placeholder="All" appendTo="body"></p-select>
+        <p-select appendTo="body" (onChange)="applyFilters()" [options]="transactionEffects"
+          [(ngModel)]="filterParams.effect" [showClear]="true" placeholder="All" appendTo="body"></p-select>
       </div>
       <div class="se-filter-field">
         <label>Search</label>
-        <input (keydown.enter)="applyFilters()" (blur)="applyFilters()" type="text" pInputText [(ngModel)]="filterParams.search" placeholder="Desc or Ref" />
+        <input (keydown.enter)="applyFilters()" (blur)="applyFilters()" type="text" pInputText
+          [(ngModel)]="filterParams.search" placeholder="Desc or Ref" />
       </div>
       <div class="se-filter-actions">
-        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined" (onClick)="resetFilters()"></p-button>
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined"
+          (onClick)="resetFilters()"></p-button>
       </div>
     </div>
     <div class="list-grid-wrapper">
       
+      <app-ag-share-grid [columns]="column" [data]="data" [showActions]="false" selectionMode="multiple"
+        (gridEvent)="eventFromGrid($event)" style="height: 100%; width: 100%; display: block;">
+      </app-ag-share-grid>
       <!-- <app-shared-grid [data]="data" [gridHeight]="'210px'" [headerFilter]="false" [GridName]="'Customer History'" [column]="column" (gridReady)="onGridReady($event)" (scrolledToBottom)="onScrolledToBottom($event)"></app-shared-grid> -->
     </div>
   </div>

@@ -138,7 +138,7 @@ export class ProductListComponent implements OnInit {
         this.router.navigate([productId], { relativeTo: this.route });
       }
     }
-    if (event.eventType === 'reachedBottom') {
+    if (event.type === 'reachedBottom') {
       this.onScrolledToBottom(event)
     }
   }
@@ -375,7 +375,7 @@ export class ProductListComponent implements OnInit {
 //         this.router.navigate([productId], { relativeTo: this.route });
 //       }
 //     }
-//     if (event.eventType === 'reachedBottom') {
+//     if (event.type === 'reachedBottom') {
 //       this.onScrolledToBottom(event)
 //     }
 //   }

@@ -1,42 +1,55 @@
+/* ==========================================================================
+   COMPONENT: Notification Bell Panel
+   THEME: Angular v20 Token System
+   ========================================================================== */
+
+// Import your global mixins file if it's external, or assume it's available globally
+// @import 'path/to/theme-engine'; 
+
 :host {
   display: block;
   height: 100%;
   width: 100%;
+  
+  // 1. Initialize Theme Mapping
+  // (This maps the theme-* vars to the canonical vars like --bg-primary)
+  // @include apply-canonical-mapping;
+
+  // 2. Base Typography
   font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  line-height: var(--line-height-normal);
 }
 
 /* -----------------------------------------------------------------------------
-   TOKEN MAPPINGS (LOCAL SHORTCUTS)
-   ----------------------------------------------------------------------------- */
-$primary: var(--accent-primary);
-$bg-dialog: var(--bg-primary);
-$bg-subtle: var(--bg-secondary);
-$text-main: var(--text-primary);
-$text-muted: var(--text-secondary);
-$border: var(--border-primary);
-
-/* -----------------------------------------------------------------------------
-   MAIN PANEL
+   MAIN LAYOUT CONTAINER
    ----------------------------------------------------------------------------- */
 .notification-panel {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: $bg-dialog;
+  width: 100%;
+  background: var(--bg-ternary); // Base background
   position: relative;
+  overflow: hidden;
 }
 
 /* -----------------------------------------------------------------------------
-   HEADER
+   1. GLASS HEADER & ACTIONS
    ----------------------------------------------------------------------------- */
 .panel-header {
-  padding: var(--spacing-2xl) var(--spacing-3xl) var(--spacing-lg);
-  background: var(--component-surface-raised);
+  flex-shrink: 0;
+  padding: var(--spacing-xl) var(--spacing-xl) var(--spacing-md);
+  
+  // Glassmorphism Effect
+  background: var(--glass-bg-c);
   backdrop-filter: blur(var(--glass-blur-c));
-  border-bottom: var(--ui-border-width) solid $border;
-  position: sticky;
-  top: 0;
+  -webkit-backdrop-filter: blur(var(--glass-blur-c));
+  border-bottom: var(--ui-border-width) solid var(--glass-border-c);
+  
   z-index: var(--z-sticky);
+  position: relative;
 
   .header-top {
     display: flex;
@@ -45,79 +58,88 @@ $border: var(--border-primary);
     margin-bottom: var(--spacing-lg);
 
     h3 {
-      font-size: var(--font-size-xl);
+      font-family: var(--font-heading);
+      font-size: var(--font-size-lg);
       font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
       margin: 0;
-      color: $text-main;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.01em;
     }
 
     .header-actions {
       display: flex;
       gap: var(--spacing-sm);
     }
+  }
+}
 
-    .icon-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: var(--ui-border-radius-lg);
-      background: transparent;
-      border: none;
-      color: $text-muted;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      transition: var(--transition-fast);
+/* --- Action Buttons (Icon Only) --- */
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--ui-border-radius); // slightly more squared for modern look
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-fast);
 
-      &:hover {
-        background: $bg-subtle;
-        color: $text-main;
-      }
+  i { font-size: 1rem; }
 
-      &.close-btn:hover {
-        background: rgba(var(--color-error), 0.1);
-        color: var(--color-error);
-      }
-    }
+  &:hover {
+    background: var(--component-bg-hover);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+  }
+
+  &.close-btn:hover {
+    background: rgba(var(--color-error), 0.1);
+    color: var(--color-error);
+    border-color: rgba(var(--color-error), 0.2);
   }
 }
 
 /* -----------------------------------------------------------------------------
-   SEGMENTED CONTROL (iOS Variant)
+   2. SEGMENTED CONTROL (iOS Style - Refined)
    ----------------------------------------------------------------------------- */
 .segmented-control {
-  background: $bg-subtle;
-  padding: 4px;
+  background: var(--bg-secondary);
+  padding: 4px; // Fixed padding for the "track"
   border-radius: var(--ui-border-radius-lg);
   position: relative;
-  display: flex;
-  margin-bottom: var(--spacing-md);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); // 4 Equal columns
+  border: var(--ui-border-width) solid var(--border-secondary);
 
+  // The sliding white pill
   .segment-bg {
     position: absolute;
     top: 4px;
     bottom: 4px;
-    left: 4px;
-    width: calc(33.33% - 5px);
-    background: var(--bg-primary);
+    left: 0; // Controlled by transform
+    width: calc(25% - 2px); // 100% / 4 minus slight margin
+    margin-left: 2px; // Offset
+    background: var(--component-surface-raised);
     border-radius: var(--ui-border-radius);
     box-shadow: var(--shadow-sm);
-    transition: var(--transition-transform);
+    transition: var(--transition-transform); // Smooth slide
     z-index: 1;
     pointer-events: none;
+    border: var(--ui-border-width) solid var(--border-primary);
   }
 
   button {
-    flex: 1;
     position: relative;
     z-index: 2;
     background: transparent;
     border: none;
-    padding: var(--spacing-sm);
-    font-size: var(--font-size-sm);
+    padding: var(--spacing-sm) 0;
+    font-size: var(--font-size-xs);
     font-weight: var(--font-weight-medium);
-    color: $text-muted;
+    color: var(--text-secondary);
     cursor: pointer;
     border-radius: var(--ui-border-radius);
     transition: var(--transition-colors);
@@ -126,87 +148,128 @@ $border: var(--border-primary);
     justify-content: center;
     gap: 6px;
 
+    span { user-select: none; }
+
     &.active {
-      color: $text-main;
+      color: var(--text-primary);
       font-weight: var(--font-weight-semibold);
+    }
+
+    &:hover:not(.active) {
+      color: var(--text-primary);
     }
   }
 }
 
 .badge-pill {
-  background: $primary;
+  background: var(--accent-primary);
   color: #fff;
-  padding: 1px 6px;
-  border-radius: 999px;
-  font-size: var(--font-size-xs);
+  padding: 1px 5px;
+  border-radius: 99px;
+  font-size: 10px; // Very small
   font-weight: var(--font-weight-bold);
+  min-width: 16px;
+  text-align: center;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-  &.warn { background: var(--color-warning); }
+  &.warn { background: var(--color-warning); color: #000; }
 }
 
 /* -----------------------------------------------------------------------------
-   PANEL BODY
+   3. PANEL BODY (Scroll Area)
    ----------------------------------------------------------------------------- */
 .panel-body {
   flex: 1;
   overflow-y: auto;
-  background: var(--bg-ternary);
   padding: 0;
+  position: relative;
 
-  &.custom-scrollbar {
-    &::-webkit-scrollbar { width: 6px; }
-    &::-webkit-scrollbar-thumb { background: var(--scroll-thumb-c); border-radius: 3px; }
-    &::-webkit-scrollbar-track { background: transparent; }
+  // Scrollbar customization
+  &::-webkit-scrollbar { width: 5px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { 
+    background: var(--scroll-thumb-c); 
+    border-radius: 10px; 
   }
+  &::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
 }
 
+/* Container for list items */
 .list-container {
-  padding: var(--spacing-xl);
+  padding: var(--spacing-lg);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
+  
+  // Subtle fade in for content
+  animation: fadeIn var(--transition-base);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* -----------------------------------------------------------------------------
-   NOTIFICATION CARD
+   4. NOTIFICATION CARD (Refined)
    ----------------------------------------------------------------------------- */
 .notif-card {
   background: var(--bg-primary);
-  padding: var(--spacing-xl);
-  border-radius: var(--ui-border-radius-xl);
+  padding: var(--spacing-lg);
+  border-radius: var(--ui-border-radius-lg);
+  
+  // Border logic
+  border: var(--ui-border-width) solid var(--border-secondary);
   box-shadow: var(--shadow-xs);
-  border: 1px solid transparent;
+  
   display: flex;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-md);
   cursor: pointer;
   transition: var(--transition-base);
   position: relative;
 
+  // Hover Effect
   &:hover {
-    transform: translateY(-1px);
+    transform: translateY(-2px);
     box-shadow: var(--shadow-md);
-  }
-
-  &.unread {
-    border-color: rgba($primary, 0.25);
-
-    .title { color: $primary; }
+    border-color: var(--border-primary);
+    
     .notif-icon {
-      background: rgba($primary, 0.1);
-      color: $primary;
+        background: var(--bg-ternary);
+        color: var(--text-primary);
     }
   }
 
+  // Unread State
+  &.unread {
+    background: linear-gradient(to right, rgba(var(--accent-primary), 0.03), var(--bg-primary));
+    border-left: 3px solid var(--accent-primary);
+
+    .title { color: var(--text-primary); font-weight: var(--font-weight-bold); }
+    .time { color: var(--accent-primary); font-weight: var(--font-weight-medium); }
+  }
+
+  // Icon Box
   .notif-icon {
     width: 36px;
     height: 36px;
-    border-radius: var(--ui-border-radius-lg);
-    background: $bg-subtle;
-    color: $text-muted;
+    border-radius: var(--ui-border-radius);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    transition: var(--transition-colors);
+    font-size: 1rem;
+
+    // Type Specific Colors
+    &.success { color: var(--color-success); background: rgba(var(--color-success), 0.1); }
+    &.warning { color: var(--color-warning); background: rgba(var(--color-warning), 0.1); }
+    &.urgent  { color: var(--color-error);   background: rgba(var(--color-error), 0.1); }
   }
 
   .notif-content {
@@ -216,203 +279,278 @@ $border: var(--border-primary);
     .notif-row {
       display: flex;
       justify-content: space-between;
+      align-items: baseline;
       margin-bottom: var(--spacing-xs);
 
       .title {
-        font-size: var(--font-size-md);
+        font-size: var(--font-size-sm);
         font-weight: var(--font-weight-semibold);
-        color: $text-main;
+        color: var(--text-primary);
       }
 
       .time {
         font-size: var(--font-size-xs);
-        color: $text-muted;
+        color: var(--text-tertiary);
         white-space: nowrap;
+        margin-left: var(--spacing-sm);
       }
     }
 
     .message {
       font-size: var(--font-size-sm);
-      color: $text-muted;
+      color: var(--text-secondary);
       line-height: var(--line-height-relaxed);
-      overflow: hidden;
+      margin: 0;
+      
+      // Ellipsis logic
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
+      overflow: hidden;
     }
   }
 
+  // The little dot for unread
   .unread-dot {
     position: absolute;
-    right: var(--spacing-xl);
-    top: 50%;
-    transform: translateY(-50%);
-    width: 8px;
-    height: 8px;
-    background: $primary;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    width: 6px;
+    height: 6px;
+    background: var(--accent-primary);
     border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--bg-primary); // cutout effect
   }
 }
 
 /* -----------------------------------------------------------------------------
-   APPROVAL CARD
+   5. APPROVAL CARDS
    ----------------------------------------------------------------------------- */
 .approval-card {
-  background: var(--bg-primary);
-  padding: var(--spacing-2xl);
-  border-radius: var(--ui-border-radius-xl);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-primary);
+  @extend .notif-card; // Inherit base card styles
+  display: block; // Change from flex to block for grid layout inside
+  cursor: default;
+
+  &:hover { transform: none; } // Disable lift on hover for this form-like card
 
   .user-row {
     display: flex;
-    gap: var(--spacing-lg);
-    margin-bottom: var(--spacing-xl);
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: var(--ui-border-width) dashed var(--border-secondary);
 
     .avatar-circle {
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       background: var(--accent-gradient);
       color: #fff;
       font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-md);
       display: flex;
       align-items: center;
       justify-content: center;
+      box-shadow: var(--shadow-sm);
     }
 
     .user-meta {
       flex: 1;
-
-      .name {
-        font-weight: var(--font-weight-semibold);
-        color: $text-main;
+      .name { 
+        display: block; 
+        font-weight: var(--font-weight-semibold); 
+        color: var(--text-primary); 
+        font-size: var(--font-size-sm);
       }
-
-      .email {
-        font-size: var(--font-size-xs);
-        color: $text-muted;
+      .email { 
+        display: block; 
+        font-size: var(--font-size-xs); 
+        color: var(--text-tertiary); 
       }
-    }
-
-    .date-badge {
-      background: $bg-subtle;
-      padding: var(--spacing-xs) var(--spacing-sm);
-      border-radius: var(--ui-border-radius-sm);
-      font-size: var(--font-size-xs);
-      color: $text-muted;
-      font-weight: var(--font-weight-semibold);
     }
   }
 
   .action-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-md);
+    gap: var(--spacing-sm);
     margin-bottom: var(--spacing-md);
   }
 
-  .approve-btn {
-    background: $text-main;
-    color: #fff;
-    padding: var(--spacing-md);
-    border-radius: var(--ui-border-radius);
-    display: flex;
-    gap: 6px;
-    justify-content: center;
-    align-items: center;
-    border: none;
-    font-weight: var(--font-weight-medium);
-    font-size: var(--font-size-sm);
-    cursor: pointer;
-    transition: var(--transition-fast);
+  .btn-row {
+      display: flex;
+      gap: var(--spacing-sm);
+      
+      button {
+          flex: 1;
+      }
+  }
+}
 
-    &:disabled {
-      opacity: var(--state-disabled-opacity);
-      cursor: not-allowed;
-    }
+/* -----------------------------------------------------------------------------
+   6. BROADCAST FORM
+   ----------------------------------------------------------------------------- */
+.broadcast-container {
+  padding: var(--spacing-xl);
+  animation: fadeIn var(--transition-base);
 
-    &:not(:disabled):hover {
-      background: #000;
+  .form-group {
+    margin-bottom: var(--spacing-lg);
+
+    label {
+      display: block;
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-label);
+      margin-bottom: var(--spacing-xs);
     }
   }
 }
 
 /* -----------------------------------------------------------------------------
-   EMPTY STATE
+   7. PRIMENG OVERRIDES (Deep)
+   Forces PrimeNG components to look like our system
+   ----------------------------------------------------------------------------- */
+::ng-deep {
+    // Inputs & Dropdowns
+    .p-inputtext, .p-textarea, .p-select, .p-multiselect {
+        width: 100%;
+        background: var(--bg-secondary);
+        border: var(--ui-border-width) solid var(--border-secondary);
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        font-size: var(--font-size-sm);
+        border-radius: var(--ui-border-radius);
+        padding: var(--spacing-sm) var(--spacing-md);
+        transition: var(--transition-colors);
+
+        &:enabled:hover {
+            border-color: var(--border-primary);
+            background: var(--bg-primary);
+        }
+
+        &:enabled:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+        }
+    }
+
+    // Select specific
+    .p-select-label, .p-multiselect-label {
+        padding: 0; // Reset PrimeNG padding to match ours
+    }
+    
+    // Dropdown Panels
+    .p-select-overlay, .p-multiselect-overlay {
+        background: var(--bg-primary);
+        border: var(--ui-border-width) solid var(--border-primary);
+        box-shadow: var(--shadow-xl);
+        border-radius: var(--ui-border-radius-lg);
+        
+        .p-select-list-container, .p-multiselect-list-container {
+             .p-select-option, .p-multiselect-option {
+                 color: var(--text-secondary);
+                 padding: var(--spacing-sm) var(--spacing-md);
+                 font-size: var(--font-size-sm);
+                 border-radius: var(--ui-border-radius-sm);
+                 margin: 2px var(--spacing-xs);
+                 
+                 &:hover, &.p-highlight {
+                     background: var(--bg-secondary);
+                     color: var(--text-primary);
+                 }
+                 &.p-highlight {
+                     background: rgba(var(--accent-primary), 0.1);
+                     color: var(--accent-primary);
+                 }
+             }
+        }
+    }
+
+    // Buttons
+    .approve-btn, .reject-btn {
+        width: 100%;
+        padding: var(--spacing-md);
+        border-radius: var(--ui-border-radius);
+        border: none;
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-semibold);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--spacing-sm);
+        transition: var(--transition-fast);
+        
+        i { font-size: 0.8rem; }
+    }
+
+    .approve-btn {
+        background: var(--text-primary);
+        color: var(--bg-primary); // Inverted styling
+        
+        &:hover { background: var(--accent-primary); }
+        &:disabled { opacity: 0.5; cursor: not-allowed; }
+    }
+
+    .reject-btn {
+        background: transparent;
+        border: 1px solid var(--border-secondary);
+        color: var(--text-secondary);
+        
+        &:hover {
+            border-color: var(--color-error);
+            color: var(--color-error);
+            background: rgba(var(--color-error), 0.05);
+        }
+    }
+}
+
+/* -----------------------------------------------------------------------------
+   8. EMPTY STATES
    ----------------------------------------------------------------------------- */
 .empty-state {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: var(--spacing-4xl) var(--spacing-xl);
+  text-align: center;
+  animation: fadeIn 0.5s ease-out;
 
   .empty-icon {
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    background: var(--accent-focus);
-    color: $primary;
+    background: var(--bg-secondary);
+    color: var(--text-muted);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto var(--spacing-xl);
-    font-size: 1.75rem;
+    margin-bottom: var(--spacing-lg);
+    font-size: 1.5rem;
+    border: 1px dashed var(--border-primary);
 
     &.success {
-      background: rgba(var(--color-success), 0.18);
-      color: var(--color-success);
+        color: var(--color-success);
+        background: rgba(var(--color-success), 0.05);
+        border-color: rgba(var(--color-success), 0.2);
     }
   }
 
   h3 {
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-md);
     font-weight: var(--font-weight-semibold);
-    color: $text-main;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
   }
 
   p {
     font-size: var(--font-size-sm);
-    color: $text-muted;
+    color: var(--text-tertiary);
   }
-}
-
-// ... existing styles ...
-
-// Update the grid for 4 tabs instead of 3
-.segmented-control {
-  // ... existing ...
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr; // Changed to 4 columns
-  
-  // Update segment-bg width if you hardcoded strict widths previously
-  // If you used flex, verify the width logic.
-}
-
-.broadcast-container {
-  padding: 1rem;
-  
-  .form-group {
-    margin-bottom: 1rem;
-    
-    label {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #64748b; // slate-500
-      margin-bottom: 0.4rem;
-    }
-
-    input, textarea {
-      width: 100%;
-      border-radius: 6px;
-    }
-  }
-
-  .mt-3 {
-    margin-top: 1rem;
-  }
-}
-
-// Override PrimeNG MultiSelect styles if needed for small containers
-::ng-deep .p-multiselect {
-  width: 100%;
 }
