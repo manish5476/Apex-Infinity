@@ -23,8 +23,8 @@ export interface MasterList {
   accounts: MasterItem[]; // Added
   emis: MasterItem[];     // Added
   // Flattened from 'masters' object:
-  categories?: MasterItem[];
-  brands?: MasterItem[];
+  category?: MasterItem[];
+  brand?: MasterItem[];
   units?: MasterItem[];
   taxes?: MasterItem[];
 }
@@ -51,8 +51,8 @@ export class MasterListService {
   readonly emis = computed(() => this._data()?.emis ?? []);
 
   // Dynamic Masters (Flattened)
-  readonly categories = computed(() => this._data()?.categories ?? []);
-  readonly brands = computed(() => this._data()?.brands ?? []);
+  readonly categories = computed(() => this._data()?.category ?? []);
+  readonly brands = computed(() => this._data()?.brand ?? []);
   readonly units = computed(() => this._data()?.units ?? []);
   readonly taxes = computed(() => this._data()?.taxes ?? []);
 
@@ -75,12 +75,10 @@ export class MasterListService {
         // Flatten logic: Merge 'masters' (generic types) into the root object
         // Backend sends: { branches: [], masters: { category: [], brand: [] } }
         const genericMasters = res.data.masters || {}; 
-        
         const finalData: MasterList = {
           ...res.data,
           ...genericMasters // Spreads category, brand, units, etc. to top level
         };
-
         this.updateState(finalData);
       }
     });

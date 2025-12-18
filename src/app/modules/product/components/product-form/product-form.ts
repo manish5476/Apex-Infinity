@@ -50,7 +50,7 @@ export class ProductFormComponent implements OnInit {
   private productService = inject(ProductService);
   private messageService = inject(AppMessageService);
   private loadingService = inject(LoadingService);
-  private masterList = inject(MasterListService);
+  public masterList = inject(MasterListService);
 
   // --- Form & State ---
   productForm!: FormGroup;
@@ -71,6 +71,7 @@ export class ProductFormComponent implements OnInit {
     this.categoryOptions.set(this.masterList.categories());
     this.brandOptions.set(this.masterList.brands());
     this.supplierOptions.set(this.masterList.suppliers());
+    console.log(this.masterList.brands(),this.masterList.categories());
   }
 
   ngOnInit(): void {

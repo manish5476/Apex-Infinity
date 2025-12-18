@@ -5,7 +5,6 @@
 
     <div class="customer-form-panel animate-fadeIn">
       <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="customer-form-layout">
-
         <div class="customer-form-header">
           <div class="flex justify-between items-center">
             <div>
@@ -46,12 +45,12 @@
             <div class="form-grid">
               <div class="form-group">
                 <label>Brand</label>
-                <p-select appendTo="body" appendTo="body" formControlName="brand" [options]="brandOptions()" placeholder="Select Brand"
+                <p-select optionLabel="name" optionValue="value" appendTo="body" appendTo="body" formControlName="brand" [options]="this.masterList.brands()" placeholder="Select Brand"
                   [filter]="true"></p-select>
               </div>
               <div class="form-group">
                 <label>Category</label>
-                <p-select appendTo="body" appendTo="body" formControlName="category" [options]="categoryOptions()"
+                <p-select optionLabel="name" optionValue="value" appendTo="body" appendTo="body" formControlName="category" [options]="this.masterList.categories()"
                   placeholder="Select Category" [filter]="true"></p-select>
               </div>
             </div>
@@ -95,7 +94,6 @@
 
               @for (item of inventory.controls; track i; let i = $index) {
               <div [formGroupName]="i" class="inventory-item-grid animate-slideInUp">
-
                 <div class="form-group">
                   <label>Branch</label>
                   <p-select appendTo="body" appendTo="body" formControlName="branchId" [options]="branchOptions()" optionLabel="name"

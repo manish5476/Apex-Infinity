@@ -73,6 +73,7 @@ export class PurchaseFormComponent implements OnInit {
     this.branchOptions.set(this.masterList.branches());
     this.supplierOptions.set(this.masterList.suppliers());
     this.productOptions.set(this.masterList.products()); 
+    console.log(this.masterList.products());
   }
 
   ngOnInit(): void {
