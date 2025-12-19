@@ -179,15 +179,6 @@ export class ChatService {
         });
       });
 
-      // this.socket.on('newAnnouncement', (payload: any) => {
-      //   this.zone.run(() => {
-      //     // payload structure: { type: 'ANNOUNCEMENT', data: AnnouncementObj }
-      //     if (payload && payload.data) {
-      //       this.announcement$.next(payload.data);
-      //     }
-      //   });
-      // });
-
       // --- EVENTS ---
       this.socket.on('newMessage', (msg: Message) => this.zone.run(() => this.onNewMessage(msg)));
       this.socket.on('messageDeleted', (data: { messageId: string }) => this.zone.run(() => this.onMessageDeleted(data)));

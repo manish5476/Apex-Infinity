@@ -1,0 +1,131 @@
+@mixin glass-panel-base {
+  background: var(--glass-bg-c);
+  backdrop-filter: blur(var(--glass-blur-c));
+  -webkit-backdrop-filter: blur(var(--glass-blur-c));
+  border: 1px solid var(--glass-border-c);
+  box-shadow: var(--glass-shadow-c);
+  border-radius: var(--ui-border-radius-xl);
+  transition: var(--transition-base);
+  padding: var(--spacing-xl);
+  
+  &:hover {
+    box-shadow: var(--shadow-xl);
+    border-color: rgba(255, 255, 255, 0.8);
+  }
+}
+
+.overview-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xl);
+}
+
+// 1. KPI Row
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--spacing-xl);
+}
+
+// 2. Charts Row
+.charts-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--spacing-xl);
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.glass-panel {
+  @include glass-panel-base;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-panel {
+  min-height: 380px;
+  
+  &.wide {
+    grid-column: span 1; // Explicit
+  }
+}
+
+.card-header {
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h3 {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+  }
+
+  .badge {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-success);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+}
+
+// 3. Lists Row
+.lists-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--spacing-xl);
+
+  @media (max-width: 1200px) {
+    grid-template-columns: 1fr 1fr;
+    .insight-stack {
+      grid-column: span 2;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-xl);
+    }
+  }
+
+  @media (max-width: 850px) {
+    grid-template-columns: 1fr;
+    .insight-stack {
+      grid-column: span 1;
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+.list-panel {
+  min-height: 400px;
+  max-height: 500px;
+  overflow: hidden;
+}
+
+.insight-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.mini-panel {
+  flex: 1;
+  min-height: 150px;
+  
+  &.empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+    color: var(--text-tertiary);
+    font-size: var(--font-size-sm);
+    border: 1px dashed var(--border-secondary);
+    background: rgba(255,255,255,0.2);
+    
+    i { font-size: 1.5rem; opacity: 0.5; }
+  }
+}
