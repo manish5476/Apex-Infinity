@@ -2,7 +2,7 @@ import { Injectable, NgZone, OnDestroy, inject } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { BehaviorSubject, Subject, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { AuthService } from 'src/app/modules/auth/services/auth-service'; // Assuming you have this
+import { AuthService } from '../../modules/auth/services/auth-service';
 import { AppMessageService } from './message.service';
 
 // --- SHARED INTERFACES ---
