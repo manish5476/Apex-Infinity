@@ -1,11 +1,4 @@
-// import { Injectable } from '@angular/core';
 
-// @Injectable({
-//   providedIn: 'root',
-// })
-// export class PurchaseService {
-  
-// }
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';

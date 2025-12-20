@@ -35,39 +35,3 @@ export class SalesService extends BaseApiService {
     return this.delete(`${this.endpoint}/${id}`, 'deleteSales');
   }
 }
-
-
-
-
-// import { Injectable } from '@angular/core';
-// import { Observable } from 'rxjs';
-// import { catchError } from 'rxjs/operators'; // <--- IMPORT THIS
-// import { BaseApiService } from '../../core/services/base-api.service';
-// @Injectable({ providedIn: 'root' })
-// export class SalesService extends BaseApiService {
-//   private endpoint = '/v1/sales';
-
-//   // ================= CREATE =================
-//   createSales(data: any): Observable<any> {
-//     return this.post(this.endpoint, data, 'createSales');
-//   }
-
-//   // ================= GET =================
-//   getAllSaless(filterParams?: any): Observable<any> {
-//     return this.get(this.endpoint, filterParams, 'getAllSaless');
-//   }
-
-//   getSalesById(id: string): Observable<any> {
-//     return this.get(`${this.endpoint}/${id}`, {}, 'getSalesById');
-//   }
-
-//   searchSaless(query: any): Observable<any> {
-//     return this.get(`${this.endpoint}/search`, query, 'searchSaless');
-//   }
-
-//   // ================= UPDATE =================
-//   updateSales(SalesId: string, data: any): Observable<any> {
-//     return this.patch(`${this.endpoint}/${SalesId}`, data, 'updateSales');
-//   }
-
-// }
