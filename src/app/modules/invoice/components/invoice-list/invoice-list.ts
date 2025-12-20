@@ -72,7 +72,7 @@ export class InvoiceListComponent implements OnInit {
   ];
 
   invoiceFilter = {
-    invoiceNumber: '',
+    invoiceNumber: null,
     customerId: null,
     status: null,
     paymentStatus: null,
@@ -97,7 +97,7 @@ export class InvoiceListComponent implements OnInit {
 
   resetFilters() {
     this.invoiceFilter = {
-      invoiceNumber: '',
+      invoiceNumber: null,
       customerId: null,
       status: null,
       paymentStatus: null,
@@ -109,9 +109,7 @@ export class InvoiceListComponent implements OnInit {
   exportReport() {
     if (this.isExporting) return;
     this.isExporting = true;
-
     const params: any = { ...this.invoiceFilter, format: 'csv' };
-    
     if (this.dateRange && this.dateRange[0]) {
       params.start = this.dateRange[0].toISOString();
     }

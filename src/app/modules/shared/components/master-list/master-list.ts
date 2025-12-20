@@ -103,30 +103,62 @@ export class MasterList implements OnInit, OnDestroy {
 
   // --- Grid Logic ---
 
-  getColumn(): void {
-    this.column = [
-      {
-        field: 'type',
-        headerName: 'Type',
-        sortable: true,
-        filter: true,
-        width: 150,
-        // Simulate Badge Styling via Cell Style
-        cellStyle: (params: any) => {
-          switch (params.value?.toLowerCase()) {
-            case 'category': return { color: '#0ea5e9', fontWeight: '600', textTransform: 'uppercase' }; // Blue
-            case 'brand': return { color: '#10b981', fontWeight: '600', textTransform: 'uppercase' }; // Green
-            case 'unit': return { color: '#f59e0b', fontWeight: '600', textTransform: 'uppercase' }; // Orange
-            default: return { color: '#64748b', fontWeight: '600', textTransform: 'uppercase' }; // Gray
-          }
-        }
-      },
-      { field: 'name', headerName: 'Name', sortable: true, filter: true, flex: 1, minWidth: 200, cellStyle: { fontWeight: '500' } },
-      { field: 'code', headerName: 'Code', sortable: true, filter: true, width: 150 },
-      { field: 'description', headerName: 'Description', sortable: true, filter: true, flex: 1, minWidth: 250 },
-    ];
-  }
-
+getColumn(): void {
+  this.column = [
+    {
+      field: 'type',
+      headerName: 'Type',
+      sortable: true,
+      filter: true,
+      width: 130,
+      cellClass: 'd-flex-center', // Vertical centering helper
+      cellRenderer: (params: any) => {
+        if (!params.value) return '';
+        const val = params.value.toLowerCase();
+        // Dynamic class based on value: badge-category, badge-brand, etc.
+        return `
+          <div class="badge-container">
+            <span class="pill-badge badge-${val}">${params.value}</span>
+          </div>`;
+      }
+    },
+    { 
+      field: 'name', 
+      headerName: 'Name', 
+      sortable: true, 
+      filter: true, 
+      flex: 1, 
+      minWidth: 200, 
+      cellStyle: { 
+        'font-family': 'var(--font-heading)', 
+        'font-weight': 'var(--font-weight-semibold)',
+        'color': 'var(--text-primary)' 
+      } 
+    },
+    { 
+      field: 'code', 
+      headerName: 'Code', 
+      sortable: true, 
+      filter: true, 
+      width: 140,
+      cellStyle: { 
+        'font-family': 'var(--font-mono)', 
+        'font-size': 'var(--font-size-xs)',
+        'color': 'var(--text-tertiary)'
+      }
+    },
+    { 
+      field: 'description', 
+      headerName: 'Description', 
+      sortable: true, 
+      filter: true, 
+      flex: 1, 
+      minWidth: 250,
+      cellStyle: { 'color': 'var(--text-secondary)', 'font-size': 'var(--font-size-sm)' }
+    },
+  ];
+  this.cdr.detectChanges();
+}
   onGridReady(params: GridReadyEvent) {
     this.gridApi = params.api;
   }

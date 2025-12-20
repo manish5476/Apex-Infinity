@@ -109,29 +109,84 @@ export class SalesListComponent implements OnInit {
 
     this.salesService.getAllSales(filterParams).subscribe({
       next: (res: any) => {
+        // --- UPGRADED DATA PARSING ---
+        // Accessing res.data.data based on your shared JSON structure
         let newData: any[] = [];
-        if (res.success && Array.isArray(res.rows)) {
-          newData = res.rows;
+        if (res.status === 'success' && res.data && Array.isArray(res.data.data)) {
+          newData = res.data.data;
         }
 
-        this.totalCount = res.total || this.totalCount;
+        // --- UPGRADED PAGINATION LOGIC ---
+        // Getting total from pagination object or total property
+        if (res.pagination) {
+          this.totalCount = res.pagination.total;
+        } else {
+          this.totalCount = res.results || 0;
+        }
         
         if (isReset) {
           this.data = newData;
         } else {
+          // Append data for infinite scroll
           this.data = [...this.data, ...newData];
         }
 
-        this.currentPage++;
+        // Only increment page if we actually received data
+        if (newData.length > 0) {
+          this.currentPage++;
+        }
+        
         this.isLoading = false;
         this.cdr.markForCheck();
       },
       error: (err: any) => {
         this.isLoading = false;
-        this.messageService.showError('Error', 'Failed to fetch sales.');
+        this.messageService.showError('Error', 'Failed to fetch sales records.');
       }
     });
   }
+  // getData(isReset: boolean = false) {
+  //   if (this.isLoading && !isReset) return;
+  //   this.isLoading = true;
+
+  //   if (isReset) {
+  //     this.currentPage = 1;
+  //     this.data = [];
+  //     this.totalCount = 0;
+  //   }
+
+  //   const filterParams = {
+  //     ...this.salesFilter,
+  //     search: this.searchControl.value,
+  //     page: this.currentPage,
+  //     limit: this.pageSize,
+  //   };
+
+  //   this.salesService.getAllSales(filterParams).subscribe({
+  //     next: (res: any) => {
+  //       let newData: any[] = [];
+  //       if (res.success && Array.isArray(res.rows)) {
+  //         newData = res.rows;
+  //       }
+
+  //       this.totalCount = res.total || this.totalCount;
+        
+  //       if (isReset) {
+  //         this.data = newData;
+  //       } else {
+  //         this.data = [...this.data, ...newData];
+  //       }
+
+  //       this.currentPage++;
+  //       this.isLoading = false;
+  //       this.cdr.markForCheck();
+  //     },
+  //     error: (err: any) => {
+  //       this.isLoading = false;
+  //       this.messageService.showError('Error', 'Failed to fetch sales.');
+  //     }
+  //   });
+  // }
 
   onScrolledToBottom(event: any) {
     if (!this.isLoading && this.data.length < this.totalCount) {
@@ -157,80 +212,167 @@ export class SalesListComponent implements OnInit {
       this.onScrolledToBottom(event)
     }
   }
-
-  getColumn(): void {
-    this.column = [
-      {
-        field: 'createdAt',
-        headerName: 'Date',
-        sortable: true,
-        width: 140,
-        valueFormatter: (params: any) => this.common.formatDate(params.value, 'dd MMM yyyy'),
-        cellStyle: { 'color': 'var(--text-secondary)' }
-      },
-      {
-        field: 'invoiceNumber',
-        headerName: 'Invoice #',
-        sortable: true,
-        width: 180,
-        // Using cellStyle to indicate it's clickable
-        cellStyle: { 'font-weight': '600', 'color': 'var(--accent-primary)', 'cursor': 'pointer' }
-      },
-      {
-        field: 'customerId.name', 
-        headerName: 'Customer',
-        sortable: true,
-        flex: 1,
-        minWidth: 200,
-        // Safely access customer name from object
-        valueGetter: (params: any) => params.data.customerId?.name || 'Walk-in Customer'
-      },
-      {
-        field: 'items',
-        headerName: 'Items',
-        width: 100,
-        type: 'rightAligned',
-        valueGetter: (params: any) => params.data.items?.length || 0,
-      },
-      {
-        field: 'totalAmount',
-        headerName: 'Total',
-        sortable: true,
-        width: 130,
-        type: 'rightAligned',
-        valueFormatter: (params: any) => this.common.formatCurrency(params.value),
-        cellStyle: { 'font-weight': 'bold' }
-      },
-      {
-        field: 'dueAmount',
-        headerName: 'Due',
-        sortable: true,
-        width: 130,
-        type: 'rightAligned',
-        valueFormatter: (params: any) => this.common.formatCurrency(params.value),
-        cellStyle: (params: any) => params.value > 0 ? {'color': 'var(--color-error)'} : {'color': 'var(--color-success)'}
-      },
-      {
-        field: 'paymentStatus',
-        headerName: 'Payment',
-        sortable: true,
-        width: 130,
-        cellRenderer: (params: any) => {
-          const status = params.value?.toLowerCase() || 'unpaid';
-          return `<span class="status-badge status-${status}">${status}</span>`;
-        }
-      },
-      {
-        field: 'status',
-        headerName: 'Order Status',
-        sortable: true,
-        width: 130,
-        valueFormatter: (params: any) => (params.value || '').toUpperCase(),
-        cellStyle: { 'font-size': '0.75rem', 'font-weight': '600', 'color': 'var(--text-secondary)' }
+getColumn(): void {
+  this.column = [
+    {
+      field: 'createdAt',
+      headerName: 'Date',
+      sortable: true,
+      width: 140,
+      valueFormatter: (params: any) => this.common.formatDate(params.value, 'dd MMM yyyy'),
+      cellStyle: { 'color': 'var(--text-secondary)' }
+    },
+    {
+      field: 'invoiceNumber',
+      headerName: 'Invoice #',
+      sortable: true,
+      width: 180,
+      // Keeps your specific blue-accent and pointer cursor
+      cellStyle: { 'font-weight': '600', 'color': 'var(--accent-primary)', 'cursor': 'pointer' }
+    },
+    {
+      field: 'customerId.name', 
+      headerName: 'Customer',
+      sortable: true,
+      flex: 1,
+      minWidth: 200,
+      // Safely access the populated customer object from the new response
+      valueGetter: (params: any) => params.data.customerId?.name || 'Walk-in Customer'
+    },
+    {
+      field: 'branchId.name',
+      headerName: 'Branch',
+      sortable: true,
+      width: 150,
+      // Pulls the branch name from the populated branch object
+      valueGetter: (params: any) => params.data.branchId?.name || '-'
+    },
+    {
+      field: 'items',
+      headerName: 'Items',
+      width: 100,
+      type: 'rightAligned',
+      // Correctly counts items in the nested array
+      valueGetter: (params: any) => params.data.items?.length || 0,
+    },
+    {
+      field: 'totalAmount',
+      headerName: 'Total',
+      sortable: true,
+      width: 130,
+      type: 'rightAligned',
+      valueFormatter: (params: any) => this.common.formatCurrency(params.value),
+      cellStyle: { 'font-weight': 'bold' }
+    },
+    {
+      field: 'dueAmount',
+      headerName: 'Due',
+      sortable: true,
+      width: 130,
+      type: 'rightAligned',
+      valueFormatter: (params: any) => this.common.formatCurrency(params.value),
+      // Keeps your conditional logic for red/green colors
+      cellStyle: (params: any) => params.value > 0 
+        ? {'color': 'var(--color-error)'} 
+        : {'color': 'var(--color-success)'}
+    },
+    {
+      field: 'paymentStatus',
+      headerName: 'Payment',
+      sortable: true,
+      width: 130,
+      // Maintains your custom badge HTML structure
+      cellRenderer: (params: any) => {
+        const status = params.value?.toLowerCase() || 'unpaid';
+        return `<span class="status-badge status-${status}">${status}</span>`;
       }
-    ];
-    this.cdr.detectChanges();
-  }
+    },
+    {
+      field: 'status',
+      headerName: 'Order Status',
+      sortable: true,
+      width: 130,
+      valueFormatter: (params: any) => (params.value || '').toUpperCase(),
+      cellStyle: { 'font-size': '0.75rem', 'font-weight': '600', 'color': 'var(--text-secondary)' }
+    }
+  ];
+  
+  // Triggers change detection to ensure Ag-Grid picks up the column definitions
+  this.cdr.detectChanges();
+}
+  // getColumn(): void {
+  //   this.column = [
+  //     {
+  //       field: 'createdAt',
+  //       headerName: 'Date',
+  //       sortable: true,
+  //       width: 140,
+  //       valueFormatter: (params: any) => this.common.formatDate(params.value, 'dd MMM yyyy'),
+  //       cellStyle: { 'color': 'var(--text-secondary)' }
+  //     },
+  //     {
+  //       field: 'invoiceNumber',
+  //       headerName: 'Invoice #',
+  //       sortable: true,
+  //       width: 180,
+  //       // Using cellStyle to indicate it's clickable
+  //       cellStyle: { 'font-weight': '600', 'color': 'var(--accent-primary)', 'cursor': 'pointer' }
+  //     },
+  //     {
+  //       field: 'customerId.name', 
+  //       headerName: 'Customer',
+  //       sortable: true,
+  //       flex: 1,
+  //       minWidth: 200,
+  //       // Safely access customer name from object
+  //       valueGetter: (params: any) => params.data.customerId?.name || 'Walk-in Customer'
+  //     },
+  //     {
+  //       field: 'items',
+  //       headerName: 'Items',
+  //       width: 100,
+  //       type: 'rightAligned',
+  //       valueGetter: (params: any) => params.data.items?.length || 0,
+  //     },
+  //     {
+  //       field: 'totalAmount',
+  //       headerName: 'Total',
+  //       sortable: true,
+  //       width: 130,
+  //       type: 'rightAligned',
+  //       valueFormatter: (params: any) => this.common.formatCurrency(params.value),
+  //       cellStyle: { 'font-weight': 'bold' }
+  //     },
+  //     {
+  //       field: 'dueAmount',
+  //       headerName: 'Due',
+  //       sortable: true,
+  //       width: 130,
+  //       type: 'rightAligned',
+  //       valueFormatter: (params: any) => this.common.formatCurrency(params.value),
+  //       cellStyle: (params: any) => params.value > 0 ? {'color': 'var(--color-error)'} : {'color': 'var(--color-success)'}
+  //     },
+  //     {
+  //       field: 'paymentStatus',
+  //       headerName: 'Payment',
+  //       sortable: true,
+  //       width: 130,
+  //       cellRenderer: (params: any) => {
+  //         const status = params.value?.toLowerCase() || 'unpaid';
+  //         return `<span class="status-badge status-${status}">${status}</span>`;
+  //       }
+  //     },
+  //     {
+  //       field: 'status',
+  //       headerName: 'Order Status',
+  //       sortable: true,
+  //       width: 130,
+  //       valueFormatter: (params: any) => (params.value || '').toUpperCase(),
+  //       cellStyle: { 'font-size': '0.75rem', 'font-weight': '600', 'color': 'var(--text-secondary)' }
+  //     }
+  //   ];
+  //   this.cdr.detectChanges();
+  // }
   
   onCreateSales() {
       this.router.navigate(['/invoices/create']); 

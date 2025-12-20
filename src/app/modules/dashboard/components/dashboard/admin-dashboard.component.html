@@ -22,6 +22,12 @@
           (click)="activeTab.set('finance')">
           Finance
         </button>
+        <button 
+          class="toggle-btn" 
+          [class.active]="activeTab() === 'customers'" 
+          (click)="activeTab.set('customers')">
+          Customers
+        </button>
       </div>
 
       <div class="separator"></div>
@@ -99,7 +105,7 @@
     </section>
   </ng-container>
 
-  <!-- 4. VIEW: FINANCE (New Section) -->
+  <!-- 4. VIEW: FINANCE -->
   <ng-container *ngIf="activeTab() === 'finance'">
     <finance-overview
       [profitability]="facade.branchComparison()"
@@ -107,6 +113,15 @@
       [agingReport]="facade.debtorAging()"
       [tax]="facade.tax()">
     </finance-overview>
+  </ng-container>
+
+  <!-- 5. VIEW: CUSTOMERS (New Section) -->
+  <ng-container *ngIf="activeTab() === 'customers'">
+    <customer-overview
+      [insights]="facade.customerInsights()"
+      [segmentation]="facade.segmentation()"
+      [retention]="facade.customerRetention()">
+    </customer-overview>
   </ng-container>
 
 </div>

@@ -105,28 +105,65 @@ export class CustomerDetails implements OnInit {
   }
 
   initColumns() {
-    // 1. Ledger Columns
-    this.ledgerColumns = [
-      { 
-        field: 'date', headerName: 'Date', sortable: true, width: 120,
-        valueFormatter: (p: any) => this.common.formatDate(p.value) 
-      },
-      { field: 'description', headerName: 'Description', sortable: true, flex: 2 },
-      { 
-        field: 'type', headerName: 'Type', width: 100,
-        cellClass: (p: any) => p.value === 'credit' ? 'text-green-600 font-bold uppercase text-xs' : 'text-red-600 font-bold uppercase text-xs'
-      },
-      { 
-        field: 'amount', headerName: 'Amount', type: 'rightAligned', width: 130,
-        valueFormatter: (p: any) => this.common.formatCurrency(p.value),
-        cellStyle: { fontWeight: 'bold' }
-      },
-      { 
-        field: 'balance', headerName: 'Balance', type: 'rightAligned', width: 130,
-        valueFormatter: (p: any) => this.common.formatCurrency(p.value),
-        cellStyle: { color: 'var(--text-secondary)' }
-      }
-    ];
+   this.ledgerColumns = [
+  { 
+    field: 'date', 
+    headerName: 'Date', 
+    width: 130,
+    valueFormatter: (p: any) => this.common.formatDate(p.value),
+    cellStyle: { color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }
+  },
+  { 
+    field: 'referenceType', 
+    headerName: 'Type', 
+    width: 110,
+    cellRenderer: (p: any) => {
+      if (!p.value) return '';
+      const type = p.value.toLowerCase();
+      const badgeClass = type === 'invoice' ? 'badge-category' : 'badge-brand'; 
+      return `<div class="badge-container">
+                <span class="pill-badge ${badgeClass}">${p.value}</span>
+              </div>`;
+    }
+  },
+  { 
+    field: 'description', 
+    headerName: 'Description', 
+    flex: 2, 
+    minWidth: 200,
+    cellStyle: { fontWeight: '500' }
+  },
+  { 
+    field: 'debit', 
+    headerName: 'Debit (+)', 
+    width: 130, 
+    type: 'rightAligned',
+    headerClass: 'text-red', // Optional: CSS to make header red
+    valueFormatter: (p: any) => p.value > 0 ? this.common.formatCurrency(p.value) : '',
+    cellStyle: { color: '#dc2626', fontWeight: '600' } // Red for money owed
+  },
+  { 
+    field: 'credit', 
+    headerName: 'Credit (-)', 
+    width: 130, 
+    type: 'rightAligned',
+    headerClass: 'text-green',
+    valueFormatter: (p: any) => p.value > 0 ? this.common.formatCurrency(p.value) : '',
+    cellStyle: { color: '#059669', fontWeight: '600' } // Green for money paid
+  },
+  { 
+    field: 'balance', 
+    headerName: 'Running Balance', 
+    width: 150, 
+    type: 'rightAligned',
+    valueFormatter: (p: any) => this.common.formatCurrency(p.value),
+    cellStyle: (p: any) => ({
+      fontWeight: 'bold',
+      backgroundColor: 'var(--bg-ternary)',
+      color: 'var(--text-primary)'
+    })
+  }
+];
 
     // 2. Invoice Columns
     this.invoiceColumns = [
@@ -210,17 +247,26 @@ export class CustomerDetails implements OnInit {
     else if (tab === 'payments') this.fetchPayments(id);
   }
 
-  private fetchLedger(id: string) {
-    this.financialService.getCustomerLedger(id).pipe(
-      catchError(() => of({ data: { history: [], closingBalance: 0 } })),
-      finalize(() => this.tabStatus.ledger.loading = false)
-    ).subscribe((res: any) => {
-      const data = res?.data || {};
-      this.ledgerHistory.set(data.history || []);
-      if (data.closingBalance !== undefined) this.closingBalance.set(data.closingBalance);
-      this.tabStatus.ledger.loaded = true;
-    });
-  }
+ private fetchLedger(id: string) {
+  this.tabStatus.ledger.loading = true;
+  this.financialService.getCustomerLedger(id).pipe(
+    catchError(() => of({ history: [], closingBalance: 0, openingBalance: 0 })),
+    finalize(() => this.tabStatus.ledger.loading = false)
+  ).subscribe((res: any) => {
+    // The API sends history directly in the root or res.data
+    const history = res?.history || res?.data?.history || [];
+    const closing = res?.closingBalance ?? 0;
+    const opening = res?.openingBalance ?? 0;
+
+    this.ledgerHistory.set(history);
+    this.closingBalance.set(closing);
+    // If you have an opening balance signal:
+    // this.openingBalance.set(opening);
+
+    this.tabStatus.ledger.loaded = true;
+    // this.cdr.markForCheck();
+  });
+}
 
   private fetchInvoices(id: string) {
     this.invoiceService.getInvoicesByCustomer(id).pipe(
