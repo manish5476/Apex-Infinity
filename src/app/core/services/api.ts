@@ -119,7 +119,7 @@ export class ApiService extends BaseApiService {
   }
 
   deleteUser(id: string): Observable<any> {
-    return this.delete(`/v1/users/${id}`, 'deleteUser');
+    return this.delete(`/v1/users/${id}`,null, 'deleteUser');
   }
 
   // --- Security & Status ---
@@ -154,7 +154,7 @@ export class ApiService extends BaseApiService {
   }
 
   deleteRole(roleId: string): Observable<any> {
-    return this.delete(`/v1/roles/${roleId}`, 'deleteRole');
+    return this.delete(`/v1/roles/${roleId}`,null, 'deleteRole');
   }
 }
 

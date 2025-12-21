@@ -27,7 +27,7 @@ export class SupplierService extends BaseApiService {
   }
 
   deleteSupplier(id: string): Observable<any> {
-    return this.delete(`${this.endpoint}/${id}`, 'deleteSupplier');
+    return this.delete(`${this.endpoint}/${id}`,null, 'deleteSupplier');
   }
 
   // For file upload (direct http usage needed for FormData if not auto-handled)

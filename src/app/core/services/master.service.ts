@@ -24,7 +24,7 @@ export class MasterService extends BaseApiService {
   }
 
   deleteMaster(id: string): Observable<any> {
-    return this.delete(`${this.masterEndpoint}/${id}`, 'deleteMaster');
+    return this.delete(`${this.masterEndpoint}/${id}`,null, 'deleteMaster');
   }
 
   /* ==================== BULK IMPORT ==================== */
@@ -49,6 +49,6 @@ export class MasterService extends BaseApiService {
   }
 
   deleteMasterType(id: string): Observable<any> {
-    return this.delete(`${this.masterTypeEndpoint}/${id}`, 'deleteMasterType');
+    return this.delete(`${this.masterTypeEndpoint}/${id}`,null, 'deleteMasterType');
   }
 }

@@ -60,6 +60,6 @@ export class UserManagementService extends BaseApiService {
   }
 
   deleteUser(id: string): Observable<any> {
-    return this.delete(`${this.endpoint}/${id}`, 'deleteUser');
+    return this.delete(`${this.endpoint}/${id}`,null, 'deleteUser');
   }
 }

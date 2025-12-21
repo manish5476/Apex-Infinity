@@ -29,14 +29,14 @@ export class PurchaseService extends BaseApiService {
 
   // ================= DELETE =================
   deletePurchase(id: string): Observable<any> {
-    return this.delete(`${this.endpoint}/${id}`, 'deletePurchase');
+    return this.delete(`${this.endpoint}/${id}`,null, 'deletePurchase');
   }
 
   // ================= ATTACHMENT OPERATIONS =================
   // DELETE /v1/purchases/:id/attachments/:fileIndex
   deleteAttachment(purchaseId: string, fileIndex: number): Observable<any> {
     const url = `${this.endpoint}/${purchaseId}/attachments/${fileIndex}`;
-    return this.delete(url, 'deleteAttachment');
+    return this.delete(url,null, 'deleteAttachment');
   }
 
   // ================= HELPER =================

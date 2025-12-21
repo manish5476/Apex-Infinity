@@ -68,10 +68,11 @@ export class BaseApiService {
   // -------------------------------
   // DELETE
   // -------------------------------
-  protected delete<T>(url: string, _context?: string): Observable<T> {
-    return this.http.delete<T>(`${this.baseUrl}${url}`, {
-      withCredentials: true,      // <-- REQUIRED
-    });
-  }
+  protected delete<T>(url: string, body?: any, _context?: string): Observable<T> {
+  return this.http.delete<T>(`${this.baseUrl}${url}`, {
+    body: body,             
+    withCredentials: true,
+  });
+}
   
 }

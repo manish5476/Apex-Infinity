@@ -32,7 +32,7 @@ export class PaymentService extends BaseApiService {
   }
 
   deletePayment(paymentId: string): Observable<any> {
-    return this.delete(`${this.endpoint}/${paymentId}`, 'deletePayment');
+    return this.delete(`${this.endpoint}/${paymentId}`,null, 'deletePayment');
   }
 
   // ============================================================

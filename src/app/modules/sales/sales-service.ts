@@ -32,6 +32,6 @@ export class SalesService extends BaseApiService {
 
   // ================= DELETE =================
   deleteSales(id: string): Observable<any> {
-    return this.delete(`${this.endpoint}/${id}`, 'deleteSales');
+    return this.delete(`${this.endpoint}/${id}`,null, 'deleteSales');
   }
 }

@@ -33,7 +33,7 @@ export class AutomationFeedTransactionService extends BaseApiService {
 
   /** Delete automation */
   deleteAutomation(id: string): Observable<any> {
-    return this.delete(`${this.automation}/${id}`, 'deleteAutomation');
+    return this.delete(`${this.automation}/${id}`,null, 'deleteAutomation');
   }
 
   /** Webhook registration */
@@ -65,7 +65,7 @@ export class AutomationFeedTransactionService extends BaseApiService {
 
   /** Delete feed post */
   deleteFeedPost(id: string): Observable<any> {
-    return this.delete(`${this.feed}/${id}`, 'deleteFeedPost');
+    return this.delete(`${this.feed}/${id}`,null, 'deleteFeedPost');
   }
 
   /** React / comment */
@@ -102,7 +102,7 @@ export class AutomationFeedTransactionService extends BaseApiService {
 
   /** Delete */
   deleteTransaction(id: string): Observable<any> {
-    return this.delete(`${this.transactions}/${id}`, 'deleteTransaction');
+    return this.delete(`${this.transactions}/${id}`,null, 'deleteTransaction');
   }
 
   /** Settlement / reconciliation */

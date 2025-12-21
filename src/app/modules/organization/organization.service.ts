@@ -47,7 +47,7 @@ export class OrganizationService extends BaseApiService {
   }
 
   deleteOrganization(id: string): Observable<any> {
-    return this.delete(`${this.endpoint}/${id}`, 'deleteOrganization');
+    return this.delete(`${this.endpoint}/${id}`,null, 'deleteOrganization');
   }
 
   // ---------------------------------------------------
@@ -63,7 +63,7 @@ export class OrganizationService extends BaseApiService {
   }
 
   removeMember(memberId: string): Observable<any> {
-    return this.delete(`${this.newEndpoint}/members/${memberId}`, 'removeMember');
+    return this.delete(`${this.newEndpoint}/members/${memberId}`,null, 'removeMember');
   }
 
   getActivityLog(): Observable<any> {

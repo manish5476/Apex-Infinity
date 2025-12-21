@@ -26,15 +26,23 @@ export class SessionService extends BaseApiService {
   revokeSession(sessionId: string): Observable<any> {
     return this.patch(`/v1/sessions/${sessionId}/revoke`, {}, 'revokeSession');
   }
-  
+
   /**
    * DELETE /sessions/:id
    * Permanently delete a session
    */
   deleteSession(sessionId: string): Observable<any> {
-    return this.delete(`/v1/sessions/${sessionId}`, 'deleteSession');
+    return this.delete(`/v1/sessions/${sessionId}`, null, 'deleteSession');
   }
 
+  /**
+   * DELETE /sessions/bulk-delete
+   * Bulk delete passing an array of IDs in the body
+   */
+  bulkDeleteSessions(sessionIds: any): Observable<any> {
+    const body = { ids: sessionIds };
+    return this.delete('/v1/sessions/bulk-delete', body, 'bulkDeleteSessions');
+  }
   /**
    * PATCH /sessions/revoke-all
    */

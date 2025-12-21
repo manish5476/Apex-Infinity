@@ -121,13 +121,13 @@
       @if ( (currentTab() === 'customer' && !filterForm.value.customerId) || (currentTab() === 'supplier' &&
       !filterForm.value.supplierId) ) {
       <div class="empty-state">
-        <img src="assets/no-data.png" alt="Select Entity" class="opacity-50 w-24">
+        <img src="src/app/assets/undraw_adventure_9my9.svg" alt="Select Entity" class="opacity-50 w-24">
         <p>Please select a {{ currentTab() }} to view ledger history.</p>
       </div>
       }
       @else if (gridData().length === 0) {
       <div class="empty-state">
-        <img src="assets/nodata.svg" alt="No Data" class="w-32">
+        <img src="src/app/assets/undraw_adventure_9my9.svg" alt="No Data" class="w-32">
         <p>No transactions found for this period.</p>
       </div>
       }

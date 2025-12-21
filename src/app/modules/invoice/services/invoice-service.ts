@@ -29,7 +29,7 @@ export class InvoiceService extends BaseApiService {
   }
 
   deleteInvoiceById(id: string): Observable<any> {
-    return this.delete(`${this.endpoint}/${id}`, 'deleteInvoiceById');
+    return this.delete(`${this.endpoint}/${id}`,null, 'deleteInvoiceById');
   }
 
   // --- 🌟 NEW: POWER FEATURES ---

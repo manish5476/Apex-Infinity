@@ -43,7 +43,7 @@ export class Sessions implements OnInit {
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
   public common = inject(CommonMethodService);
-
+  selectedIds: any[]=[]
   // --- Grid State ---
   private gridApi!: GridApi;
   data: any[] = [];
@@ -67,13 +67,10 @@ export class Sessions implements OnInit {
 
   // --- Data Loading ---
   loadData() {
-    // this.isLoading.set(true);
     this.data = [];
-
     const req$ = this.viewMode() === 'mine'
       ? this.sessionService.getMySessions()
       : this.sessionService.getAllSessions();
-
     req$.subscribe({
       next: (res: any) => {
         const rows = res.data?.data || res.data || [];
@@ -155,9 +152,12 @@ export class Sessions implements OnInit {
   }
 
   eventFromGrid(event: any) {
-    console.log(event);
     if (event.type === 'cellClicked') {
       this.openSessionDetails(event.row);
+    }
+    if (event.type === 'selectionChanged') {
+      this.selectedIds = event.rows.map((item: any) => item._id)
+      console.log(this.selectedIds);
     }
   }
 
@@ -170,7 +170,6 @@ export class Sessions implements OnInit {
 
   revokeSession() {
     if (!this.selectedSession) return;
-
     this.confirmationService.confirm({
       message: 'Revoking this session will immediately log the user out. Continue?',
       header: 'Revoke Access',
@@ -197,7 +196,6 @@ export class Sessions implements OnInit {
   // 2. New Delete Method
   deleteSession() {
     if (!this.selectedSession) return;
-
     this.confirmationService.confirm({
       message: 'This will permanently delete the session record from history. This cannot be undone.',
       header: 'Delete Record',
@@ -208,6 +206,30 @@ export class Sessions implements OnInit {
         this.sessionService.deleteSession(this.selectedSession._id).subscribe({
           next: () => {
             this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Record removed' });
+            this.displayDialog = false;
+            this.isDeleting.set(false);
+            this.loadData();
+          },
+          error: (err) => {
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not delete' });
+            this.isDeleting.set(false);
+          }
+        });
+      }
+    });
+  }
+
+  deleteBulkSession() {
+    this.confirmationService.confirm({
+      message: 'This will permanently delete the session record from history. This cannot be undone.',
+      header: 'Delete Record',
+      icon: 'pi pi-trash',
+      acceptButtonStyleClass: 'p-button-danger p-button-outlined',
+      accept: () => {
+        let payload = this.selectedIds
+        this.sessionService.bulkDeleteSessions(payload).subscribe({
+          next: () => {
+            this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Records removed' });
             this.displayDialog = false;
             this.isDeleting.set(false);
             this.loadData();

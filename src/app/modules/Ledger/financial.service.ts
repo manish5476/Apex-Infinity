@@ -45,7 +45,7 @@ export class FinancialService extends BaseApiService {
   }
 
   deleteLedger(id: string): Observable<any> {
-    return this.delete(`/v1/ledgers/${id}`, 'deleteLedger');
+    return this.delete(`/v1/ledgers/${id}`,null, 'deleteLedger');
   }
 
   /**
