@@ -15,6 +15,6 @@ export class AnnouncementService extends BaseApiService {
   }
 
   deleteAnnouncement(id: string): Observable<any> {
-    return this.delete(`${this.endpoint}/${id}`, 'deleteAnnouncement');
+    return this.delete(`${this.endpoint}/${id}`,null, 'deleteAnnouncement');
   }
 }

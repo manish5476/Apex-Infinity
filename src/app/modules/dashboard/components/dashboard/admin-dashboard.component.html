@@ -1,83 +1,127 @@
-<div class="dashboard-wrapper">
-
-  <!-- Sticky Header -->
-  <header class="dashboard-header">
-    <div>
-      <h2>Executive Overview</h2>
-      <p>Performance snapshot — revenue, expenses, risk and growth.</p>
+<div class="dashboard-container">
+  
+  <!-- 1. HEADER & CONTROLS -->
+  <header class="dashboard-header glass-panel">
+    <div class="header-content">
+      <h1>Executive Dashboard</h1>
+      <p class="subtitle">Real-time performance snapshot — revenue, risk, and operational growth.</p>
     </div>
 
-    <div class="actions">
-      <div class="preset-group">
-        <button [class.active]="activePreset() === 'all'" (click)="applyPreset('all')">All Time</button>
-        <button [class.active]="activePreset() === 'month'" (click)="applyPreset('month')">This Month</button>
+    <div class="header-actions">
+      <!-- Section Tabs -->
+      <div class="toggle-group nav-tabs">
+        <button 
+          class="toggle-btn" 
+          [class.active]="activeTab() === 'overview'" 
+          (click)="activeTab.set('overview')">
+          Overview
+        </button>
+        <button 
+          class="toggle-btn" 
+          [class.active]="activeTab() === 'finance'" 
+          (click)="activeTab.set('finance')">
+          Finance
+        </button>
+        <button 
+          class="toggle-btn" 
+          [class.active]="activeTab() === 'customers'" 
+          (click)="activeTab.set('customers')">
+          Customers
+        </button>
       </div>
 
-      <p-datepicker [(ngModel)]="dateRangeModel" selectionMode="range" placeholder="Custom Range"
-        inputStyleClass="date-input" (onSelect)="onDateChange()">
-      </p-datepicker>
+      <div class="separator"></div>
 
-      <button class="icon-btn" (click)="facade.load()">
-        <i class="pi pi-refresh"></i>
+      <!-- Date Presets -->
+      <div class="toggle-group">
+        <button 
+          class="toggle-btn" 
+          [class.active]="activePreset() === 'all'" 
+          (click)="applyPreset('all')">
+          All
+        </button>
+        <button 
+          class="toggle-btn" 
+          [class.active]="activePreset() === 'month'" 
+          (click)="applyPreset('month')">
+          Month
+        </button>
+      </div>
+
+      <!-- Date Picker -->
+      <div class="date-picker-wrapper">
+        <p-datepicker 
+          [(ngModel)]="dateRangeModel" 
+          selectionMode="range" 
+          [readonlyInput]="true"
+          placeholder="Custom Range"
+          inputStyleClass="glass-input" 
+          panelStyleClass="glass-datepicker-panel"
+          (onSelect)="onDateChange()">
+        </p-datepicker>
+        <i class="pi pi-calendar calendar-icon"></i>
+      </div>
+
+      <!-- Refresh -->
+      <button class="icon-btn glass-btn" (click)="facade.load()" [disabled]="facade.loading()">
+        <i class="pi pi-refresh" [class.spin]="facade.loading()"></i>
       </button>
     </div>
   </header>
 
+  <!-- 2. LOADING STATE -->
+  <div *ngIf="facade.loading() && !facade.kpi()" class="loading-overlay">
+    <div class="spinner"></div>
+    <span>Gathering Insights...</span>
+  </div>
 
-  <!-- KPI Section -->
-  <section class="kpi-grid" *ngIf="facade.kpi()">
-    <kpi-card label="Revenue" icon="pi-wallet" [value]="facade.kpi()?.revenue" [growth]="facade.kpi()?.revenueGrowth">
-    </kpi-card>
+  <!-- 3. VIEW: OVERVIEW -->
+  <ng-container *ngIf="activeTab() === 'overview'">
+    <dashboard-overview
+      *ngIf="!facade.loading() || facade.kpi()"
+      [kpi]="facade.kpi()"
+      [timeline]="facade.timelineChart()"
+      [paymentModes]="facade.paymentModes()"
+      [leaders]="facade.leaders()"
+      [inventory]="facade.inventory()">
+    </dashboard-overview>
 
-    <kpi-card label="Net Profit" icon="pi-chart-line" [value]="facade.kpi()?.profit"
-      [growth]="facade.kpi()?.profitGrowth">
-    </kpi-card>
+    <section class="branch-section">
+      <div class="glass-panel full-width">
+        <div class="card-header">
+          <h3>Branch Performance Comparison</h3>
+        </div>
+        <branch-comparison [data]="facade.branchComparison()"></branch-comparison>
+      </div>
+    </section>
 
-    <kpi-card label="Outstanding Receivable" icon="pi-exclamation-circle" [value]="facade.kpi()?.receivables">
-    </kpi-card>
+    <section class="extra-insights-grid">
+      <div class="mini-panel glass-panel warning-border">
+        <risk-panel [risk]="facade.risk()"></risk-panel>
+      </div>
+      <div class="mini-panel glass-panel">
+        <segmentation-chart [segmentation]="facade.segmentation()"></segmentation-chart>
+      </div>
+    </section>
+  </ng-container>
 
-    <kpi-card label="Inventory Value" icon="pi-box" [value]="facade.inventory()?.totalValue">
-    </kpi-card>
-  </section>
+  <!-- 4. VIEW: FINANCE -->
+  <ng-container *ngIf="activeTab() === 'finance'">
+    <finance-overview
+      [profitability]="facade.branchComparison()"
+      [paymentChartData]="facade.paymentModes()"
+      [agingReport]="facade.debtorAging()"
+      [tax]="facade.tax()">
+    </finance-overview>
+  </ng-container>
 
-
-  <!-- Chart Zone -->
-  <section class="chart-grid">
-    <revenue-chart [data]="facade.timelineChart()"></revenue-chart>
-
-    <div class="side-stack">
-      <payment-donut [data]="facade.paymentModes()"></payment-donut>
-      <div class="placeholder"></div>
-    </div>
-  </section>
-
-
-  <!-- Branch Comparison-->
-  <section class="chart-wide">
-    <branch-comparison [data]="facade.branchComparison()"></branch-comparison>
-  </section>
-
-
-  <!-- Top Lists -->
-  <section class="bottom-grid">
-    <div class="grid-lists">
-      <top-products [products]="facade.leaders()?.topProducts ?? null"></top-products>
-      <top-customers [customers]="facade.leaders()?.topCustomers ?? null"></top-customers>
-    </div>
-  </section>
-
-
-  <!-- Insights Panels -->
-  <section class="lower-widgets">
-    <risk-panel [risk]="facade.risk()"></risk-panel>
-    <inventory-status [inventory]="facade.inventory()"></inventory-status>
-    <segmentation-chart [segmentation]="facade.segmentation()"></segmentation-chart>
-  </section>
-
-
-  <!-- Activity Log -->
-  <section class="timeline-section">
-    <!-- <activity-log [events]="facade.security() ?? []"></activity-log> -->
-  </section>
+  <!-- 5. VIEW: CUSTOMERS (New Section) -->
+  <ng-container *ngIf="activeTab() === 'customers'">
+    <customer-overview
+      [insights]="facade.customerInsights()"
+      [segmentation]="facade.segmentation()"
+      [retention]="facade.customerRetention()">
+    </customer-overview>
+  </ng-container>
 
 </div>

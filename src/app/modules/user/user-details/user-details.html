@@ -1,4 +1,158 @@
 <p-toast></p-toast>
+<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+
+<div class="page-container animate-fadeIn">
+  @if (user(); as userData) {
+  
+  <header class="details-header">
+    <div class="header-content flex items-center justify-between">
+      <div class="flex items-center">
+        <p-button icon="pi pi-arrow-left" styleClass="p-button-text p-button-rounded p-button-secondary"
+          (onClick)="onBack()" pTooltip="Back to List"></p-button>
+        <div class="header-separator"></div>
+        <div class="flex flex-col">
+          <h1>{{ userData.name | titlecase }}</h1>
+          <span class="text-xs font-mono opacity-50">{{ userData.email }}</span>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <p-tag [value]="userData.isActive ? 'ACTIVE' : 'INACTIVE'"
+          [severity]="userData.isActive ? 'success' : 'danger'" [rounded]="true"></p-tag>
+        <p-button label="Edit Profile" icon="pi pi-pencil" styleClass="p-button-sm p-button-outlined" (onClick)="onEditUser()"></p-button>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout-body">
+    <aside class="sidebar-col">
+      
+      <div class="glass-card profile-card">
+        <div class="profile-banner"></div>
+        <div class="avatar-container group" (click)="!uploading() && fileInput.click()">
+          <input #fileInput type="file" accept="image/*" hidden (change)="onFileSelected($event)">
+          <div class="avatar-circle">
+            @if (userData.avatar) { <img [src]="userData.avatar" class="w-full h-full object-cover"> } 
+            @else { {{ userData.name[0] | uppercase }} }
+            <div class="avatar-overlay">
+              <i class="pi pi-camera"></i>
+            </div>
+          </div>
+          @if (uploading()) {
+            <div class="avatar-loader"><i class="pi pi-spin pi-spinner"></i></div>
+          }
+        </div>
+
+        <div class="p-6 text-center">
+          <h2 class="text-lg font-bold m-0 text-primary">{{ userData.role?.name || 'Standard User' }}</h2>
+          <p class="text-sm opacity-60 m-0">{{ userData.branchId?.name || 'Main Office' }}</p>
+        </div>
+
+        <div class="info-section">
+          <div class="info-item">
+            <i class="pi pi-phone"></i>
+            <div class="info-content">
+              <label>Phone</label>
+              <span>{{ userData.phone || '-' }}</span>
+            </div>
+          </div>
+          <div class="info-item">
+            <i class="pi pi-calendar"></i>
+            <div class="info-content">
+              <label>Joined</label>
+              <span>{{ userData.createdAt | date:'mediumDate' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card">
+        <div class="card-label-header">SECURITY & ACCESS</div>
+        <div class="p-2">
+          <button type="button" class="action-btn" (click)="showPasswordDialog = true">
+            <div class="action-icon bg-blue"><i class="pi pi-key"></i></div>
+            <div class="flex flex-col">
+              <span class="text-sm font-semibold">Reset Password</span>
+              <span class="text-xs opacity-50">Admin override</span>
+            </div>
+          </button>
+
+          <button type="button" class="action-btn" (click)="toggleStatus()">
+            <div class="action-icon" [ngClass]="userData.isActive ? 'bg-red' : 'bg-green'">
+              <i class="pi" [ngClass]="userData.isActive ? 'pi-ban' : 'pi-check-circle'"></i>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-sm font-semibold">{{ userData.isActive ? 'Deactivate' : 'Activate' }}</span>
+              <span class="text-xs opacity-50">User Status</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="glass-card timeline-card">
+        <div class="card-header-main">
+          <span class="font-bold flex items-center gap-2"><i class="pi pi-history"></i> Activity History</span>
+          <span class="event-count-badge">{{ activities().length }} Events</span>
+        </div>
+        <div class="timeline-wrapper scrollable-timeline custom-scrollbar">
+          <p-timeline [value]="activities()" styleClass="modern-timeline">
+            <ng-template pTemplate="content" let-activity>
+              <div class="activity-box">
+                <div class="flex justify-between items-start mb-2">
+                  <span class="activity-action-label" [attr.data-action]="activity.action">{{ activity.action }}</span>
+                  <span class="text-xs opacity-40">{{ activity.createdAt | date:'MMM d, h:mm a' }}</span>
+                </div>
+                <p class="text-sm m-0">{{ activity.details }}</p>
+                @if(activity.ipAddress) {
+                  <div class="mt-2 text-xs opacity-30 flex items-center gap-1">
+                    <i class="pi pi-globe"></i> {{ activity.ipAddress }}
+                  </div>
+                }
+              </div>
+            </ng-template>
+          </p-timeline>
+          @if (activities().length === 0) {
+            <div class="empty-state">
+              <i class="pi pi-inbox"></i>
+              <p>No activity recorded</p>
+            </div>
+          }
+        </div>
+      </div>
+    </main>
+  </div>
+
+  } @else {
+    }
+</div>
+
+<p-dialog header="Reset User Password" [(visible)]="showPasswordDialog" [modal]="true" 
+  [style]="{width: '400px'}" [draggable]="false" [resizable]="false" 
+  appendTo="body" styleClass="custom-dialog">
+  
+  <form [formGroup]="passwordForm" class="flex flex-col gap-4 pt-4">
+    <div class="bg-blue-50 border border-blue-200 rounded p-3 text-xs text-blue-800">
+      <i class="pi pi-info-circle mr-1"></i> Admin override: Setting a new password will take effect immediately.
+    </div>
+    
+    <div class="flex flex-col gap-1">
+      <label class="text-xs font-bold opacity-50 uppercase">New Password</label>
+      <input pInputText type="password" formControlName="password" class="w-full" placeholder="Min 6 characters" />
+    </div>
+    
+    <div class="flex flex-col gap-1">
+      <label class="text-xs font-bold opacity-50 uppercase">Confirm Password</label>
+      <input pInputText type="password" formControlName="passwordConfirm" class="w-full" placeholder="Re-type password" />
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancel" styleClass="p-button-text p-button-secondary" (onClick)="showPasswordDialog = false"></p-button>
+    <p-button label="Reset Password" icon="pi pi-check" (onClick)="resetPassword()" [loading]="isSubmitting" [disabled]="passwordForm.invalid"></p-button>
+  </ng-template>
+</p-dialog>
+<!-- <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
 
 <div class="page-container animate-fadeIn">
@@ -224,7 +378,7 @@
       <p-button label="Reset" icon="pi pi-check" (onClick)="resetPassword()" [loading]="isSubmitting"></p-button>
     </div>
   </ng-template>
-</p-dialog>
+</p-dialog> -->
 
 <!-- <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>

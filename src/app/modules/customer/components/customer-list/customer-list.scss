@@ -1,13 +1,8 @@
-/* ==============================================
-   CUSTOMER LIST COMPONENT
-   Theme: Enterprise Full Height
-   ============================================== */
-
 :host {
   display: block;
   width: 100%;
   height: 100%;
-  overflow: hidden; /* Prevent double scrollbars */
+  overflow: hidden;
 }
 
 .list-page-container {
@@ -15,108 +10,62 @@
   flex-direction: column;
   height: 100%;
   width: 100%;
-  padding: var(--spacing-xl);
-  gap: var(--spacing-lg);
+  padding: var(--spacing-md); // Reduced padding to give grid more room
   background: var(--bg-primary);
 }
 
-/* === HEADER === */
-.list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-shrink: 0;
-  padding-bottom: var(--spacing-md);
-
-  .title-section {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-lg);
-
-    .icon-box {
-      width: 48px;
-      height: 48px;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      border-radius: var(--ui-border-radius-lg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 1.25rem;
-      box-shadow: var(--shadow-md);
-    }
-
-    .text-content {
-      .list-title {
-        font-family: var(--font-heading);
-        font-size: var(--font-size-2xl);
-        font-weight: 700;
-        color: var(--text-primary);
-        margin: 0;
-        line-height: 1.2;
-      }
-      .list-subtitle {
-        font-size: var(--font-size-sm);
-        color: var(--text-secondary);
-        margin: 2px 0 0 0;
-      }
-    }
-  }
-}
-
-/* === CONTENT CARD (Flex Container) === */
 .themed-card {
-  /* This makes the card fill the remaining vertical space */
   flex: 1;
   min-height: 0; 
-  
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
-  
+  gap: var(--spacing-md);
   background: var(--bg-secondary);
   border: 1px solid var(--border-primary);
   border-radius: var(--ui-border-radius-xl);
-  box-shadow: var(--shadow-sm);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md); // Reduced internal padding
 }
 
-/* === FILTER BAR === */
+/* === UPDATED FILTER BAR === */
 .se-filter-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-md);
   align-items: flex-end;
-  flex-shrink: 0; /* Filters don't shrink */
-  
+  flex-shrink: 0;
+  width: 100%;
+
   .se-filter-field {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    flex-grow: 1;
-    min-width: 200px;
-    max-width: 300px;
+    gap: 4px;
+    flex: 0 1 220px; // Fixed base size so they don't grow too much
 
     label {
-      font-size: var(--font-size-xs);
+      font-size: 10px;
       color: var(--text-tertiary);
       text-transform: uppercase;
-      font-weight: 600;
-      letter-spacing: 0.5px;
+      font-weight: 700;
     }
   }
 
   .se-filter-actions {
     display: flex;
-    gap: var(--spacing-md);
-    padding-bottom: 2px; /* Visual alignment with inputs */
+    gap: var(--spacing-sm);
+  }
+
+  /* Pushes the button to the far right */
+  .se-filter-right {
+    margin-left: auto; 
+    display: flex;
+    align-items: flex-end;
   }
 }
 
-/* === GRID WRAPPER (Grows to fill card) === */
+/* === MAXIMIZED GRID WRAPPER === */
 .list-grid-wrapper {
   flex: 1;
-  min-height: 0; /* Crucial: Allows grid to shrink & scroll internally */
+  min-height: 0;
   border-radius: var(--ui-border-radius);
   overflow: hidden;
   border: 1px solid var(--border-secondary);
@@ -128,39 +77,176 @@
   }
 }
 
-/* === PRIME NG OVERRIDES === */
+/* Clean UI Overrides */
 :host ::ng-deep {
-  .p-inputtext, .p-dropdown, .p-autocomplete-input {
-    background: var(--bg-ternary);
-    border-color: var(--border-secondary);
-    color: var(--text-primary);
-    border-radius: var(--ui-border-radius);
-    
-    &:enabled:focus {
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 1px var(--accent-primary);
-    }
-    
-    &:enabled:hover {
-      border-color: var(--text-tertiary);
-    }
-  }
-
-  .p-dropdown-panel, .p-autocomplete-panel {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-primary);
-    box-shadow: var(--shadow-lg);
-    
-    .p-dropdown-item, .p-autocomplete-item {
-      color: var(--text-secondary);
-      &:hover {
-        background: var(--component-bg-hover);
-        color: var(--text-primary);
-      }
-      &.p-highlight {
-        background: var(--component-bg-active);
-        color: var(--accent-primary);
-      }
-    }
+  .p-button {
+    font-size: var(--font-size-sm);
   }
 }
+
+// /* ==============================================
+//    CUSTOMER LIST COMPONENT
+//    Theme: Enterprise Full Height
+//    ============================================== */
+
+// :host {
+//   display: block;
+//   width: 100%;
+//   height: 100%;
+//   overflow: hidden; /* Prevent double scrollbars */
+// }
+
+// .list-page-container {
+//   display: flex;
+//   flex-direction: column;
+//   height: 100%;
+//   width: 100%;
+//   padding: var(--spacing-xl);
+//   gap: var(--spacing-lg);
+//   background: var(--bg-primary);
+// }
+
+// /* === HEADER === */
+// .list-header {
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   flex-shrink: 0;
+//   padding-bottom: var(--spacing-md);
+
+//   .title-section {
+//     display: flex;
+//     align-items: center;
+//     gap: var(--spacing-lg);
+
+//     .icon-box {
+//       width: 48px;
+//       height: 48px;
+//       background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+//       border-radius: var(--ui-border-radius-lg);
+//       display: flex;
+//       align-items: center;
+//       justify-content: center;
+//       color: #fff;
+//       font-size: 1.25rem;
+//       box-shadow: var(--shadow-md);
+//     }
+
+//     .text-content {
+//       .list-title {
+//         font-family: var(--font-heading);
+//         font-size: var(--font-size-2xl);
+//         font-weight: 700;
+//         color: var(--text-primary);
+//         margin: 0;
+//         line-height: 1.2;
+//       }
+//       .list-subtitle {
+//         font-size: var(--font-size-sm);
+//         color: var(--text-secondary);
+//         margin: 2px 0 0 0;
+//       }
+//     }
+//   }
+// }
+
+// /* === CONTENT CARD (Flex Container) === */
+// .themed-card {
+//   /* This makes the card fill the remaining vertical space */
+//   flex: 1;
+//   min-height: 0; 
+  
+//   display: flex;
+//   flex-direction: column;
+//   gap: var(--spacing-lg);
+  
+//   background: var(--bg-secondary);
+//   border: 1px solid var(--border-primary);
+//   border-radius: var(--ui-border-radius-xl);
+//   box-shadow: var(--shadow-sm);
+//   padding: var(--spacing-lg);
+// }
+
+// /* === FILTER BAR === */
+// .se-filter-bar {
+//   display: flex;
+//   flex-wrap: wrap;
+//   gap: var(--spacing-lg);
+//   align-items: flex-end;
+//   flex-shrink: 0; /* Filters don't shrink */
+  
+//   .se-filter-field {
+//     display: flex;
+//     flex-direction: column;
+//     gap: 6px;
+//     flex-grow: 1;
+//     min-width: 200px;
+//     max-width: 300px;
+
+//     label {
+//       font-size: var(--font-size-xs);
+//       color: var(--text-tertiary);
+//       text-transform: uppercase;
+//       font-weight: 600;
+//       letter-spacing: 0.5px;
+//     }
+//   }
+
+//   .se-filter-actions {
+//     display: flex;
+//     gap: var(--spacing-md);
+//     padding-bottom: 2px; /* Visual alignment with inputs */
+//   }
+// }
+
+// /* === GRID WRAPPER (Grows to fill card) === */
+// .list-grid-wrapper {
+//   flex: 1;
+//   min-height: 0; /* Crucial: Allows grid to shrink & scroll internally */
+//   border-radius: var(--ui-border-radius);
+//   overflow: hidden;
+//   border: 1px solid var(--border-secondary);
+
+//   app-ag-share-grid {
+//     height: 100%;
+//     width: 100%;
+//     display: block;
+//   }
+// }
+
+// /* === PRIME NG OVERRIDES === */
+// :host ::ng-deep {
+//   .p-inputtext, .p-dropdown, .p-autocomplete-input {
+//     background: var(--bg-ternary);
+//     border-color: var(--border-secondary);
+//     color: var(--text-primary);
+//     border-radius: var(--ui-border-radius);
+    
+//     &:enabled:focus {
+//       border-color: var(--accent-primary);
+//       box-shadow: 0 0 0 1px var(--accent-primary);
+//     }
+    
+//     &:enabled:hover {
+//       border-color: var(--text-tertiary);
+//     }
+//   }
+
+//   .p-dropdown-panel, .p-autocomplete-panel {
+//     background: var(--bg-secondary);
+//     border: 1px solid var(--border-primary);
+//     box-shadow: var(--shadow-lg);
+    
+//     .p-dropdown-item, .p-autocomplete-item {
+//       color: var(--text-secondary);
+//       &:hover {
+//         background: var(--component-bg-hover);
+//         color: var(--text-primary);
+//       }
+//       &.p-highlight {
+//         background: var(--component-bg-active);
+//         color: var(--accent-primary);
+//       }
+//     }
+//   }
+// }

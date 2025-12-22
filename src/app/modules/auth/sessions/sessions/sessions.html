@@ -25,6 +25,9 @@
       <button pButton label="Revoke Others" icon="pi pi-ban" class="p-button-warning p-button-outlined"
         (click)="revokeAllOthers()" pTooltip="Log out from all other devices">
       </button>
+      <button pButton label="Delete" icon="pi pi-ban" class="p-button-warning p-button-outlined"
+        [hidden]="selectedIds.length === 0" (click)="deleteBulkSession()" pTooltip="Log out from all other devices">
+      </button>
     </div>
   </div>
 

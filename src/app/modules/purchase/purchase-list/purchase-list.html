@@ -1,67 +1,57 @@
 <div class="list-page-container">
 
-  <div class="list-header">
-    <div class="title-section">
-      <div class="icon-box">
-        <i class="pi pi-shopping-bag"></i>
-      </div>
-      <div class="text-content">
-        <h2 class="list-title">Purchase Management</h2>
-        <p class="list-subtitle">Track orders, manage suppliers, and monitor expenses.</p>
-      </div>
-    </div>
-    <p-button label="New Purchase" icon="pi pi-plus" routerLink="create" styleClass="p-button-primary"></p-button>
-  </div>
-
   <div class="themed-card">
     <div class="se-filter-bar">
 
       <div class="se-filter-field">
         <label for="invoice">Invoice No</label>
         <div class="p-input-icon-left w-full">
-          <i class="pi pi-search"></i>
+          <!-- <i class="pi pi-search"></i> -->
           <input id="invoice" type="text" pInputText [(ngModel)]="purchaseFilter.invoiceNumber"
-            placeholder="Search Invoice" class="w-full"/>
+            (keydown.enter)="applyFilters()" placeholder="Search Invoice" class="w-full"/>
         </div>
       </div>
 
       <div class="se-filter-field">
         <label for="supplier">Supplier</label>
-        <p-select appendTo="body" appendTo="body" id="supplier" [options]="supplierOptions()" [(ngModel)]="purchaseFilter.supplierId"
-          optionLabel="companyName" optionValue="_id" [showClear]="true" placeholder="Select Supplier" [filter]="true"
-          styleClass="w-full">
+        <p-select appendTo="body" id="supplier" [options]="supplierOptions()" [(ngModel)]="purchaseFilter.supplierId"
+          (onChange)="applyFilters()" optionLabel="companyName" optionValue="_id" [showClear]="true" 
+          placeholder="Select Supplier" [filter]="true" styleClass="w-full">
         </p-select>
       </div>
 
       <div class="se-filter-field" style="min-width: 220px;">
         <label for="dateRange">Date Range</label>
-        <p-datepicker id="dateRange" [(ngModel)]="purchaseFilter.dateRange" selectionMode="range" [readonlyInput]="true"
-          placeholder="Select Range" appendTo="body" dateFormat="dd/mm/yy" [showIcon]="true" styleClass="w-full" inputStyleClass="w-full">
+        <p-datepicker id="dateRange" [(ngModel)]="purchaseFilter.dateRange" (onSelect)="applyFilters()"
+          selectionMode="range" [readonlyInput]="true" placeholder="Select Range" appendTo="body" 
+          dateFormat="dd/mm/yy" [showIcon]="true" styleClass="w-full" inputStyleClass="w-full">
         </p-datepicker>
       </div>
 
       <div class="se-filter-field">
         <label for="status">Order Status</label>
-        <p-select appendTo="body" appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="purchaseFilter.status"
-          [showClear]="true" placeholder="Any Status" styleClass="w-full">
+        <p-select appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="purchaseFilter.status"
+          (onChange)="applyFilters()" [showClear]="true" placeholder="Any Status" styleClass="w-full">
         </p-select>
       </div>
 
       <div class="se-filter-actions">
-        <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()"></p-button>
         <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary" (onClick)="resetFilters()"></p-button>
+      </div>
+
+      <div class="se-filter-right">
+        <p-button label="New Purchase" icon="pi pi-plus" routerLink="create" styleClass="p-button-primary"></p-button>
       </div>
     </div>
   </div>
 
-  <div class="list-grid-area themed-card">
+  <div class="list-grid-area themed-card grow-grid">
     <app-ag-share-grid 
       [columns]="column" 
       [data]="data" 
       [showActions]="false" 
       selectionMode="multiple"
-      (gridEvent)="eventFromGrid($event)" 
-      style="height: 100%; width: 100%; display: block;">
+      (gridEvent)="eventFromGrid($event)">
     </app-ag-share-grid>
   </div>
 

@@ -29,7 +29,7 @@ export class InvoiceService extends BaseApiService {
   }
 
   deleteInvoiceById(id: string): Observable<any> {
-    return this.delete(`${this.endpoint}/${id}`, 'deleteInvoiceById');
+    return this.delete(`${this.endpoint}/${id}`,null, 'deleteInvoiceById');
   }
 
   // --- 🌟 NEW: POWER FEATURES ---
@@ -72,53 +72,3 @@ export class InvoiceService extends BaseApiService {
     });
   }
 }
-
-// import { Injectable } from '@angular/core';
-// import { Observable } from 'rxjs';
-// import { catchError } from 'rxjs/operators';
-// import { BaseApiService } from '../../../core/services/base-api.service';
-
-// @Injectable({ providedIn: 'root' })
-// export class InvoiceService extends BaseApiService {
-//   private endpoint = '/v1/invoices';
-
-//   createInvoice(data: any): Observable<any> {
-//     return this.post(this.endpoint, data, 'createInvoice');
-//   }
-
-//   getAllInvoices(filterParams?: any): Observable<any> {
-//     return this.get(this.endpoint, filterParams, 'getAllInvoices');
-//   }
-
-//   getInvoiceById(id: string): Observable<any> {
-//     return this.get(`${this.endpoint}/${id}`, {}, 'getInvoiceById');
-//   }
-
-//   getInvoicesByCustomer(customerId: string): Observable<any> {
-//     return this.get(`${this.endpoint}/customer/${customerId}`, {}, 'getInvoicesByCustomer');
-//   }
-
-//   updateInvoice(id: string, data: any): Observable<any> {
-//     return this.patch(`${this.endpoint}/${id}`, data, 'updateInvoice');
-//   }
-
-//   deleteInvoiceById(id: string): Observable<any> {
-//     return this.delete(`${this.endpoint}/${id}`, 'deleteInvoiceById');
-//   }
-
-//   // Special case: Email
-//   emailInvoice(id: string): Observable<any> {
-//     return this.post(`${this.endpoint}/pdf/${id}/email`, {}, 'emailInvoice');
-//   }
-
-//   // Special case: Blob Response for Download
-//   downloadInvoice(id: string): Observable<any> {
-//     return this.http.get(`${this.baseUrl}${this.endpoint}/pdf/${id}/download`, {
-//       responseType: 'blob',
-//       observe: 'response'
-//     }).pipe(
-//       catchError(err => this.errorhandler.handleError(err, 'downloadInvoice'))
-//     );
-//   }
-// }
-

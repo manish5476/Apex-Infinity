@@ -1,29 +1,14 @@
 <p-toast></p-toast>
 
 <div class="list-page-container">
-
-  <div class="list-header">
-    <div class="title-section">
-      <div class="icon-box">
-        <i class="pi pi-users"></i>
-      </div>
-      <div class="text-content">
-        <h2 class="list-title">Customer Management</h2>
-        <p class="list-subtitle">View and manage customer profiles and history.</p>
-      </div>
-    </div>
-    
-    <p-button label="New Customer" icon="pi pi-plus" routerLink="create" styleClass="p-button-primary"></p-button>
-  </div>
-
   <div class="themed-card list-content-area">
-
+    
     <div class="se-filter-bar">
       <div class="se-filter-field">
         <label for="customer">Customer</label>
         <p-select appendTo="body" (onChange)="applyFilters()" id="customer" [options]="masterList.customers()"
           [(ngModel)]="customerFilter._id" [filter]="true" filterBy="name" optionLabel="name" optionValue="_id"
-          [showClear]="true" placeholder="Select Customer" appendTo="body" styleClass="w-full">
+          [showClear]="true" placeholder="Select Customer" styleClass="w-full">
         </p-select>
       </div>
 
@@ -45,6 +30,10 @@
         <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary" (onClick)="resetFilters()">
         </p-button>
       </div>
+
+      <div class="se-filter-right">
+        <p-button label="New Customer" icon="pi pi-plus" routerLink="create" styleClass="p-button-primary"></p-button>
+      </div>
     </div>
 
     <div class="list-grid-wrapper">
@@ -53,8 +42,7 @@
         [data]="data" 
         [showActions]="false" 
         selectionMode="multiple"
-        (gridEvent)="eventFromGrid($event)" 
-        style="height: 100%; width: 100%; display: block;">
+        (gridEvent)="eventFromGrid($event)">
       </app-ag-share-grid>
     </div>
 

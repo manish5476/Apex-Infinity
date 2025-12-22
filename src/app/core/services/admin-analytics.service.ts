@@ -21,7 +21,7 @@ export class AdminAnalyticsService extends BaseApiService {
   // ==========================================================================
   // 1. EXECUTIVE & STRATEGIC (Dashboard & Benchmarks)
   // ==========================================================================
-  
+
   // 📊 Main KPI Dashboard
   getDashboardOverview(startDate?: string, endDate?: string, branchId?: string): Observable<any> {
     const params = this.buildParams(startDate, endDate, branchId);
@@ -158,22 +158,47 @@ export class AdminAnalyticsService extends BaseApiService {
     return this.get<any>('/v1/analytics/security-audit', params, 'Security Audit Log');
   }
 
+  // ==========================================================================
+  // 7. CHARTS & VISUAL ANALYTICS
+  // ==========================================================================
+
+  getFinancialTrend(startDate?: string, endDate?: string, branchId?: string) {
+    const params = this.buildParams(startDate, endDate, branchId);
+    return this.get<any>('/v1/chart/financial-trend', params, 'Financial Trend');
+  }
+
+  getSalesDistribution(startDate?: string, endDate?: string, branchId?: string) {
+    const params = this.buildParams(startDate, endDate, branchId);
+    return this.get<any>('/v1/chart/sales-distribution', params, 'Sales Distribution');
+  }
+
+  getBranchPerformanceRadar(branchId?: string) {
+    const params = this.buildParams(undefined, undefined, branchId);
+    return this.get<any>('/v1/chart/branch-radar', params, 'Branch Radar');
+  }
+
+  getOrderFunnel(startDate?: string, endDate?: string, branchId?: string) {
+    const params = this.buildParams(startDate, endDate, branchId);
+    return this.get<any>('/v1/chart/order-funnel', params, 'Order Funnel');
+  }
+
   /**
    * 📥 EXPORT DATA (Handles Binary/Blob)
    * We skip `this.get()` because BaseApiService expects JSON, 
    * but this endpoint returns a file (Blob).
    */
+
   exportAnalyticsData(type: 'sales' | 'inventory' | 'tax', startDate?: string, endDate?: string): Observable<Blob> {
     // 1. Build Params
     const rawParams = this.buildParams(startDate, endDate, undefined, { type, format: 'csv' });
-    
+
     // 2. Convert to HttpParams using your BaseApiService helper
     const httpParams = this.createHttpParams(rawParams);
 
     // 3. Raw HTTP call with 'blob' response type
     return this.http.get(`${this.baseUrl}/v1/analytics/export`, {
       params: httpParams,
-      responseType: 'blob' 
+      responseType: 'blob'
     });
   }
 }

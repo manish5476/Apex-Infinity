@@ -70,7 +70,7 @@ export class MasterApiService extends BaseApiService {
   }
 
   deleteUser(id: string): Observable<any> {
-    return this.delete(`/v1/users/${id}`, 'deleteUser');
+    return this.delete(`/v1/users/${id}`,null, 'deleteUser');
   }
 
   searchUsers(query: string): Observable<any> {
@@ -127,7 +127,7 @@ export class MasterApiService extends BaseApiService {
   }
 
   removeMember(memberId: string): Observable<any> {
-    return this.delete(`/v1/neworganization/members/${memberId}`, 'removeMember');
+    return this.delete(`/v1/neworganization/members/${memberId}`,null, 'removeMember');
   }
 
   getOrgActivityLog(): Observable<any> {
@@ -152,7 +152,7 @@ export class MasterApiService extends BaseApiService {
   }
 
   deleteBranch(id: string): Observable<any> {
-    return this.delete(`/v1/branches/${id}`, 'deleteBranch');
+    return this.delete(`/v1/branches/${id}`,null, 'deleteBranch');
   }
 
   // ==========================================================================
@@ -176,7 +176,7 @@ export class MasterApiService extends BaseApiService {
   }
 
   deleteInvoice(id: string): Observable<any> {
-    return this.delete(`/v1/invoices/${id}`, 'deleteInvoice');
+    return this.delete(`/v1/invoices/${id}`,null, 'deleteInvoice');
   }
 
   validateInvoiceNumber(number: string): Observable<any> {
@@ -254,7 +254,7 @@ export class MasterApiService extends BaseApiService {
   }
 
   deleteCustomer(id: string): Observable<any> {
-    return this.delete(`/v1/customers/${id}`, 'deleteCustomer');
+    return this.delete(`/v1/customers/${id}`,null, 'deleteCustomer');
   }
 
   searchCustomers(query: string): Observable<any> {
@@ -289,7 +289,7 @@ export class MasterApiService extends BaseApiService {
   }
 
   deleteSupplier(id: string): Observable<any> {
-    return this.delete(`/v1/suppliers/${id}`, 'deleteSupplier');
+    return this.delete(`/v1/suppliers/${id}`,null, 'deleteSupplier');
   }
 
   searchSuppliers(query: string): Observable<any> {
@@ -317,7 +317,7 @@ export class MasterApiService extends BaseApiService {
   }
 
   deleteProduct(id: string): Observable<any> {
-    return this.delete(`/v1/products/${id}`, 'deleteProduct');
+    return this.delete(`/v1/products/${id}`,null, 'deleteProduct');
   }
 
   searchProducts(query: string): Observable<any> {

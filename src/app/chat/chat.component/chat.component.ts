@@ -4,12 +4,18 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
-  inject
+  inject,
+  effect,
+  ChangeDetectorRef // 1. IMPORT THIS
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ChatService, Channel, Message, Attachment } from '../services/chat.service';
 import { Subscription } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+
+// Import Types
+import { SocketService, ChatMessage, Channel } from '../../core/services/socket.service';
 import { MasterListService } from '../../core/services/master-list.service';
 
 @Component({
@@ -20,486 +26,522 @@ import { MasterListService } from '../../core/services/master-list.service';
   styleUrls: ['./chat.component.scss']
 })
 export class ChatComponent implements OnInit, OnDestroy {
-  // Services (public for template)
-  public chatService = inject(ChatService);
+  // Services
+  public socketService = inject(SocketService);
   private masterList = inject(MasterListService);
+  private http = inject(HttpClient);
+  
+  // 2. INJECT CHANGE DETECTOR
+  private cdr = inject(ChangeDetectorRef); 
 
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
   @ViewChild('fileInput') private fileInput!: ElementRef<HTMLInputElement>;
 
   // UI state
   channels: Channel[] = [];
-  channelsSub?: Subscription;
-
-  messages: Message[] = [];
-  messagesSub?: Subscription;
-
-  channelUsers: Record<string, string[]> = {};
-  channelUsersSub?: Subscription;
-
-  typingSub?: Subscription;
-  typingUser: string | null = null;
-
-  connectionSub?: Subscription;
-
+  messages: ChatMessage[] = []; 
+  
   activeChannelId: string | null = null;
   currentUserId = '';
   messageInput = '';
   isUploading = false;
+  typingUser: string | null = null;
+  channelUsers: Record<string, string[]> = {}; 
 
-  // Create modal
+  // Modal
   showCreateModal = false;
   newChannelName = '';
   isPrivateChannel = false;
-  // members selection uses master list users
-  masterUsers: { _id: string; name: string }[] = [];
+  masterUsers: any[] = [];
   selectedMembers = new Set<string>();
 
-  // helper
   private subs: Subscription[] = [];
 
-  constructor() {}
-
-  ngOnInit(): void {
-    // sync caches from ChatService BehaviorSubjects (safe, no arrow in template)
-    this.channelsSub = this.chatService.channels$.subscribe(list => {
-      this.channels = list || [];
-    });
-    this.subs.push(this.channelsSub);
-
-    this.messagesSub = this.chatService.messagesBatch$.subscribe(list => {
-      this.messages = list || [];
-      // small microtask to scroll after DOM updated
-      setTimeout(() => this.scrollToBottom(), 80);
-    });
-    this.subs.push(this.messagesSub);
-
-    this.channelUsersSub = this.chatService.channelUsers$.subscribe(map => {
-      this.channelUsers = map || {};
-    });
-    this.subs.push(this.channelUsersSub);
-
-    this.typingSub = this.chatService.typing$.subscribe(t => {
-      if (t && t.channelId === this.activeChannelId && t.typing) {
-        this.typingUser = t.userId;
-      } else {
-        this.typingUser = null;
-      }
-    });
-    this.subs.push(this.typingSub);
-
-    // read master users (if MasterListService has data cached)
-    try {
-      const users = (this.masterList as any).users?.() ?? []; // masterList.users is a signal -> call it
-      this.masterUsers = users.map((u: any) => ({ _id: u._id, name: u.name }));
-    } catch (e) {
-      this.masterUsers = [];
-    }
-
-    // pick up current user id from token if present
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        this.currentUserId = payload.sub || payload._id || '';
-      } catch {
-        this.currentUserId = '';
-      }
-    }
-
-    // initial channels load (keeps compatible with your ChatService)
-    this.chatService.listChannels().subscribe({
-      next: (channels) => {
-        this.chatService.channels$.next(channels);
-        if (channels.length && !this.activeChannelId) {
-          this.selectChannel(channels[0]);
-        }
-      },
-      error: (err) => console.error('Failed to list channels', err)
+  constructor() {
+    effect(() => {
+        const users = this.masterList.users();
+        this.masterUsers = users || [];
+        // Optional: Update view if master data loads late
+        this.cdr.markForCheck(); 
     });
   }
 
-  // ------------------------
-  // CHANNEL UI ACTIONS
-  // ------------------------
+  ngOnInit(): void {
+    // --- 1. CHANNELS ---
+    this.subs.push(this.socketService.channels$.subscribe(list => {
+      this.channels = list || [];
+      if (this.channels.length > 0 && !this.activeChannelId) {
+        this.selectChannel(this.channels[0]);
+      }
+      this.cdr.detectChanges(); // ⚡ Force Update
+    }));
+
+    // --- 2. MESSAGES (The Critical Part) ---
+    this.subs.push(this.socketService.messagesBatch$.subscribe(list => {
+      this.messages = list || [];
+      
+      // ⚡ FORCE UPDATE IMMEDIATELY
+      this.cdr.detectChanges(); 
+
+      // Scroll after view updates
+      setTimeout(() => this.scrollToBottom(), 100);
+    }));
+
+    // --- 3. PRESENCE ---
+    this.subs.push(this.socketService.channelUsers$.subscribe(map => {
+        this.channelUsers = map || {};
+        this.cdr.detectChanges(); // ⚡ Force Update
+    }));
+
+    // --- 4. TYPING ---
+    this.subs.push(this.socketService.typing$.subscribe(t => {
+      if (t.channelId === this.activeChannelId && t.typing && t.userId !== this.currentUserId) {
+        const user = this.masterUsers.find(u => u._id === t.userId);
+        this.typingUser = user ? user.name : 'Someone';
+      } else {
+        this.typingUser = null;
+      }
+      this.cdr.detectChanges(); // ⚡ Force Update (Typing pill needs to show instantly)
+    }));
+
+    this.getCurrentUser();
+    this.loadChannels();
+  }
+
+  getCurrentUser() {
+    const token = localStorage.getItem('apex_auth_token');
+    if (token) {
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            this.currentUserId = payload.sub || payload._id;
+        } catch {}
+    }
+  }
+
+  loadChannels() {
+    this.socketService.listChannels().subscribe({
+        next: (res) => this.socketService.channels$.next(res),
+        error: (err) => console.error('Channel list failed', err)
+    });
+  }
+
   selectChannel(channel: Channel) {
     if (!channel) return;
     if (this.activeChannelId === channel._id) return;
 
-    // leave previous channel
-    if (this.activeChannelId) {
-      this.chatService.leaveChannel(this.activeChannelId);
-    }
-
+    if (this.activeChannelId) this.socketService.leaveChannel(this.activeChannelId);
+    
     this.activeChannelId = channel._id;
-    // join new channel and fetch history
-    this.chatService.joinChannel(this.activeChannelId);
-    this.chatService.fetchMessages(this.activeChannelId).subscribe({
-      next: (res: any) => {
-        // backend returns { messages: Message[] }
-        if (res?.messages) this.chatService.messagesBatch$.next(res.messages.reverse());
-      },
-      error: (err) => console.error('fetchMessages error', err)
+    this.socketService.joinChannel(this.activeChannelId);
+    
+    this.socketService.fetchMessages(this.activeChannelId).subscribe({
+        next: (res: any) => {
+            if(res.messages) this.socketService.messagesBatch$.next(res.messages.reverse());
+        }
     });
   }
 
-  getChannelName(channelId: string | null): string {
-    if (!channelId) return '';
-    const c = this.channels.find(ch => ch._id === channelId);
-    return c?.name ?? 'Unnamed';
-  }
-
-  // ------------------------
-  // MESSAGES
-  // ------------------------
   sendMessage() {
-    if (!this.activeChannelId) return;
-    const text = this.messageInput.trim();
-    if (!text) return;
+    if (!this.messageInput.trim() || !this.activeChannelId) return;
+    
+    const msg: any = { 
+        channelId: this.activeChannelId,
+        body: this.messageInput.trim(),
+        senderId: this.currentUserId,
+        attachments: []
+    };
 
-    // Use ChatService sendMessage (returns Promise or emits)
-    this.chatService.sendMessage(this.activeChannelId, text, []).catch(err => {
-      // if sendMessage returns Promise rejection, log; the service queues if offline
-      console.error('sendMessage error', err);
-    });
-
+    // Optimistic Update (Optional: Add to list immediately if you want zero latency feeling)
+    // this.messages.push(msg); 
+    
+    this.socketService.sendMessage(msg);
     this.messageInput = '';
-    // typing stop
-    this.chatService.setTyping(this.activeChannelId, false);
-  }
-
-  deleteMessage(msg: Message) {
-    if (!msg._id) return;
-    if (!confirm('Delete this message?')) return;
-    this.chatService.deleteMessage(msg._id).subscribe({
-      next: () => {
-        // optimistic UI handled by socket event 'messageDeleted' in service
-      }, error: (err) => console.error('delete failed', err)
-    });
-  }
-
-  onTypingInput() {
-    if (!this.activeChannelId) return;
-    this.chatService.setTyping(this.activeChannelId, true);
-    // local debounce to stop typing after 2s
-    window.clearTimeout((this as any)._typingTimeout);
-    (this as any)._typingTimeout = window.setTimeout(() => {
-      this.chatService.setTyping(this.activeChannelId!, false);
-    }, 1800);
-  }
-
-  // ------------------------
-  // ATTACHMENTS
-  // ------------------------
-  triggerFilePicker() {
-    this.fileInput?.nativeElement?.click();
+    this.socketService.sendTyping(this.activeChannelId, false);
+    
+    // Force clear input visually
+    this.cdr.detectChanges(); 
   }
 
   handleFileUpload(ev: Event) {
     const input = ev.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file || !this.activeChannelId) return;
+
     this.isUploading = true;
+    this.cdr.detectChanges(); // Show spinner
 
-    this.chatService.uploadAttachment(file).subscribe({
-      next: (attachment: Attachment) => {
-        this.isUploading = false;
-        // send message with attachment
-        this.chatService.sendMessage(this.activeChannelId!, '', [attachment]).catch(err => console.error(err));
-      },
-      error: (err) => {
-        this.isUploading = false;
-        console.error('upload failed', err);
-      }
+    this.socketService.uploadAttachment(file).subscribe({
+        next: (attachment: any) => {
+            this.isUploading = false;
+            this.socketService.sendMessage({
+                channelId: this.activeChannelId!,
+                body: '',
+                attachments: [attachment],
+                senderId: this.currentUserId
+            });
+            this.cdr.detectChanges();
+        },
+        error: () => {
+            this.isUploading = false;
+            this.cdr.detectChanges();
+        }
     });
-
-    // reset input
     input.value = '';
   }
 
-  // ------------------------
-  // CREATE CHANNEL (modal)
-  // ------------------------
-  openCreateModal() {
-    this.showCreateModal = true;
-    this.newChannelName = '';
-    this.isPrivateChannel = false;
-    this.selectedMembers.clear();
+  triggerFilePicker() { this.fileInput?.nativeElement?.click(); }
+  onTypingInput() { if(this.activeChannelId) this.socketService.sendTyping(this.activeChannelId, true); }
+
+  // --- Modal Logic ---
+  openCreateModal() { 
+      this.showCreateModal = true; 
+      this.newChannelName = ''; 
+      this.isPrivateChannel = false;
+      this.selectedMembers.clear();
+      this.cdr.detectChanges(); // Open Modal
   }
 
-  closeCreateModal() {
-    this.showCreateModal = false;
+  closeCreateModal() { 
+      this.showCreateModal = false; 
+      this.cdr.detectChanges(); // Close Modal
   }
-
+  
   toggleMemberSelection(id: string) {
-    if (this.selectedMembers.has(id)) this.selectedMembers.delete(id);
-    else this.selectedMembers.add(id);
+      if(this.selectedMembers.has(id)) this.selectedMembers.delete(id);
+      else this.selectedMembers.add(id);
   }
 
   submitCreateChannel() {
-    const name = this.newChannelName.trim();
-    if (!name) return;
+      if(!this.newChannelName.trim()) return;
+      const members = this.isPrivateChannel ? Array.from(this.selectedMembers) : [];
+      if(this.isPrivateChannel && this.currentUserId) members.push(this.currentUserId);
 
-    const type = this.isPrivateChannel ? 'private' : 'public';
-    // If private, use selectedMembers; always ensure creator is included
-    let members: string[] = [];
-
-    if (this.isPrivateChannel) {
-      members = Array.from(this.selectedMembers).filter(Boolean);
-      if (!members.includes(this.currentUserId) && this.currentUserId) members.push(this.currentUserId);
-    }
-
-    // Basic client-side sanitize to avoid empty strings
-    members = members.filter(id => typeof id === 'string' && id.trim().length === 24 ? true : id.trim().length > 0);
-
-    this.chatService.createChannel(name, type as any, members).subscribe({
-      next: (ch: Channel) => {
-        // update channel list locally and auto-select
-        const updated = [...this.channels, ch];
-        this.chatService.channels$.next(updated);
-        this.showCreateModal = false;
-        this.selectChannel(ch);
-      },
-      error: (err) => {
-        console.error('createChannel error', err);
-        alert('Failed to create channel');
-      }
-    });
+      this.socketService.createChannel(this.newChannelName, this.isPrivateChannel ? 'private' : 'public', members)
+      .subscribe(ch => {
+          const current = this.socketService.channels$.value;
+          this.socketService.channels$.next([...current, ch]);
+          this.showCreateModal = false;
+          this.selectChannel(ch);
+          this.cdr.detectChanges();
+      });
   }
 
-  // ------------------------
-  // HELPERS & UTIL
-  // ------------------------
-  scrollToBottom() {
-    if (!this.scrollContainer) {
-      try { this.scrollContainer = (this as any).scrollContainer; } catch {}
+  // --- Helpers ---
+
+  getChannelName(id: string | null): string {
+      if (!id) return '';
+      const c = this.channels.find(ch => ch._id === id);
+      return c?.name || 'Unnamed';
+  }
+
+  getSenderId(msg: ChatMessage): string {
+    if (!msg || !msg.senderId) return '';
+    return typeof msg.senderId === 'string' ? msg.senderId : (msg.senderId._id || '');
+  }
+
+  getSenderName(msg: ChatMessage): string {
+    if (!msg || !msg.senderId) return 'Unknown';
+    if (typeof msg.senderId === 'object' && msg.senderId.name) return msg.senderId.name;
+    if (typeof msg.senderId === 'string') {
+        const u = this.masterUsers.find(user => user._id === msg.senderId);
+        if (u) return u.name;
+        return msg.senderId.slice(0, 6);
     }
+    return 'User';
+  }
+
+  isImage(url?: string): boolean {
+    if (!url) return false;
+    return /\.(jpe?g|png|gif|webp|svg)$/i.test(url) || url.includes('cloudinary');
+  }
+
+  deleteMessage(msg: ChatMessage) {
+      if(msg._id && confirm('Delete message?')) {
+          this.socketService.deleteMessage(msg._id).subscribe();
+      }
+  }
+
+  scrollToBottom() {
     if (this.scrollContainer?.nativeElement) {
       const el = this.scrollContainer.nativeElement;
       el.scrollTop = el.scrollHeight;
     }
   }
 
-  getSenderId(msg: Message): string {
-    if (!msg) return '';
-    if (!msg.senderId) return '';
-    return typeof msg.senderId === 'string' ? msg.senderId : (msg.senderId._id || '');
-  }
-
-  getSenderName(msg: Message): string {
-    if (!msg || !msg.senderId) return 'Unknown';
-    if (typeof msg.senderId === 'string') return msg.senderId.slice(0, 8);
-    return msg.senderId.name || msg.senderId.email || 'User';
-  }
-
-  isImage(url?: string) {
-    if (!url) return false;
-    return /\.(jpe?g|png|gif|webp|svg)$/i.test(url) || url.includes('cloudinary');
-  }
-
-  // ------------------------
-  // LIFECYCLE
-  // ------------------------
-  ngOnDestroy(): void {
+  ngOnDestroy() {
     this.subs.forEach(s => s.unsubscribe());
-    // Do not destroy ChatService here (shared)
   }
 }
 
-
-
-// import { Component, ElementRef, OnInit, ViewChild, OnDestroy, inject } from '@angular/core';
+// import {
+//   Component,
+//   ElementRef,
+//   OnDestroy,
+//   OnInit,
+//   ViewChild,
+//   inject,
+//   effect
+// } from '@angular/core';
 // import { CommonModule } from '@angular/common';
 // import { FormsModule } from '@angular/forms';
-// import { ChatService, Channel, Message } from '../services/chat.service';
-// import { Subject, takeUntil, combineLatest, map } from 'rxjs';
-// import { ImageViewerDirective } from '../../modules/shared/directives/image-viewer.directive';
+// import { Subscription } from 'rxjs';
+// import { HttpClient } from '@angular/common/http';
+// import { environment } from '../../../environments/environment';
+
+// // ✅ IMPORT ChatMessage specifically to avoid conflicts
+// import { SocketService, ChatMessage, Channel } from '../../core/services/socket.service';
+// import { MasterListService } from '../../core/services/master-list.service';
 
 // @Component({
-//   selector: 'app-chat-layout',
+//   selector: 'app-chat',
 //   standalone: true,
-//   imports: [CommonModule,ImageViewerDirective, FormsModule],
+//   imports: [CommonModule, FormsModule],
 //   templateUrl: './chat.component.html',
 //   styleUrls: ['./chat.component.scss']
 // })
-// export class ChatLayoutComponent implements OnInit, OnDestroy {
+// export class ChatComponent implements OnInit, OnDestroy {
+//   // --- INJECTIONS ---
+//   public socketService = inject(SocketService);
+//   private masterList = inject(MasterListService);
+//   private http = inject(HttpClient);
 
-//   // Public for template access
-//   public chatService = inject(ChatService);
-
+//   // --- VIEW CHILDREN ---
 //   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
+//   @ViewChild('fileInput') private fileInput!: ElementRef<HTMLInputElement>;
+
+//   // --- STATE ---
+//   channels: Channel[] = [];
+//   messages: ChatMessage[] = []; // Using strict type from SocketService
   
-//   // State
 //   activeChannelId: string | null = null;
-//   currentUserdId = '';
+//   currentUserId = '';
 //   messageInput = '';
 //   isUploading = false;
+//   typingUser: string | null = null;
   
-//   // Modal State
+//   // Presence map (channelId -> [userIds])
+//   channelUsers: Record<string, string[]> = {}; 
+
+//   // --- MODAL STATE ---
 //   showCreateModal = false;
 //   newChannelName = '';
 //   isPrivateChannel = false;
-
-//   // Streams
-//   channels$ = this.chatService.channels$;
-//   messages$ = this.chatService.messagesBatch$;
   
-//   // Helpers
-//   channelsSnapshot: Channel[] = [];
-//   private destroy$ = new Subject<void>();
-//   private typingTimeout: any;
+//   // Master data for user selection
+//   masterUsers: any[] = [];
+//   selectedMembers = new Set<string>();
 
-//   // Derive typing user name/id
-//   typingUsers$ = combineLatest([
-//     this.chatService.typing$,
-//     this.chatService.channelUsers$
-//   ]).pipe(
-//     map(([typingEvent, usersMap]) => {
-//       if (typingEvent.channelId === this.activeChannelId && typingEvent.typing) {
-//         return typingEvent.userId; 
-//       }
-//       return null;
-//     })
-//   );
+//   private subs: Subscription[] = [];
 
-//   ngOnInit() {
-//     // Sync local snapshot for helper methods
-//     this.channels$.pipe(takeUntil(this.destroy$)).subscribe(list => {
-//       this.channelsSnapshot = list || [];
+//   constructor() {
+//     // Load users from master list for the modal
+//     effect(() => {
+//         const users = this.masterList.users();
+//         this.masterUsers = users || [];
 //     });
+//   }
 
+//   ngOnInit(): void {
+//     // 1. Subscribe to Channels
+//     this.subs.push(this.socketService.channels$.subscribe(list => {
+//       this.channels = list || [];
+//       // Auto-select first channel if none selected
+//       if (this.channels.length > 0 && !this.activeChannelId) {
+//         this.selectChannel(this.channels[0]);
+//       }
+//     }));
+
+//     // 2. Subscribe to Messages Batch (History + New)
+//     this.subs.push(this.socketService.messagesBatch$.subscribe(list => {
+//       this.messages = list || [];
+//       setTimeout(() => this.scrollToBottom(), 100);
+//     }));
+
+//     // 3. Subscribe to Presence (Who is online in channel)
+//     this.subs.push(this.socketService.channelUsers$.subscribe(map => {
+//         this.channelUsers = map || {};
+//     }));
+
+//     // 4. Typing Indicator
+//     this.subs.push(this.socketService.typing$.subscribe(t => {
+//       if (t.channelId === this.activeChannelId && t.typing && t.userId !== this.currentUserId) {
+//         // Try to resolve name
+//         const user = this.masterUsers.find(u => u._id === t.userId);
+//         this.typingUser = user ? user.name : 'Someone';
+//       } else {
+//         this.typingUser = null;
+//       }
+//     }));
+
+//     // 5. Setup
+//     this.getCurrentUser();
 //     this.loadChannels();
+//   }
 
-//     // Decode Token for User ID
-//     const token = localStorage.getItem('token');
+//   // --- INIT HELPERS ---
+
+//   getCurrentUser() {
+//     const token = localStorage.getItem('apex_auth_token');
 //     if (token) {
-//       try {
-//         const payload = JSON.parse(atob(token.split('.')[1]));
-//         this.currentUserdId = payload.sub || payload._id;
-//       } catch (e) { console.error('Token decode error', e); }
+//         try {
+//             const payload = JSON.parse(atob(token.split('.')[1]));
+//             this.currentUserId = payload.sub || payload._id;
+//         } catch {}
 //     }
-
-//     // Auto-scroll on new messages
-//     this.messages$.pipe(takeUntil(this.destroy$)).subscribe(() => 
-//       setTimeout(() => this.scrollToBottom(), 100)
-//     );
 //   }
 
 //   loadChannels() {
-//     this.chatService.listChannels().subscribe({
-//       next: (channels) => {
-//         this.chatService.channels$.next(channels);
-//         // Auto-select first channel
-//         if (channels.length > 0 && !this.activeChannelId) {
-//           this.selectChannel(channels[0]);
-//         }
-//       }
+//     this.socketService.listChannels().subscribe({
+//         next: (res) => this.socketService.channels$.next(res),
+//         error: (err) => console.error('Channel list failed', err)
 //     });
 //   }
 
-//   // --- Actions ---
+//   // --- CHANNEL ACTIONS ---
 
 //   selectChannel(channel: Channel) {
+//     if (!channel) return;
 //     if (this.activeChannelId === channel._id) return;
-//     if (this.activeChannelId) this.chatService.leaveChannel(this.activeChannelId);
 
+//     // Leave old channel room
+//     if (this.activeChannelId) this.socketService.leaveChannel(this.activeChannelId);
+    
 //     this.activeChannelId = channel._id;
-//     this.chatService.joinChannel(this.activeChannelId);
-
-//     this.chatService.fetchMessages(this.activeChannelId).subscribe(res => {
-//       this.chatService.messagesBatch$.next(res.messages.reverse());
+//     this.socketService.joinChannel(this.activeChannelId);
+    
+//     // Fetch History via HTTP
+//     this.socketService.fetchMessages(this.activeChannelId).subscribe({
+//         next: (res: any) => {
+//             if(res.messages) this.socketService.messagesBatch$.next(res.messages.reverse());
+//         }
 //     });
-//   }
-
-//   sendMessage() {
-//     if (!this.messageInput.trim() || !this.activeChannelId) return;
-//     this.chatService.sendMessage(this.activeChannelId, this.messageInput);
-//     this.messageInput = '';
-//     this.onTyping();
-//   }
-
-//   deleteMessage(msg: Message) {
-//     if (!msg._id) return;
-//     if (confirm('Delete this message?')) {
-//       this.chatService.deleteMessage(msg._id).subscribe();
-//     }
-//   }
-
-//   handleFileUpload(event: any) {
-//     const file = event.target.files[0];
-//     if (!file) return;
-
-//     this.isUploading = true;
-//     this.chatService.uploadAttachment(file).subscribe({
-//       next: (attachment) => {
-//         this.isUploading = false;
-//         // Send immediately with attachment
-//         this.chatService.sendMessage(this.activeChannelId!, '', [attachment]);
-//       },
-//       error: (err) => {
-//         console.error('Upload failed', err);
-//         this.isUploading = false;
-//       }
-//     });
-//     event.target.value = ''; 
-//   }
-
-//   // --- Modal ---
-//   openCreateModal() { this.showCreateModal = true; this.newChannelName = ''; }
-//   closeCreateModal() { this.showCreateModal = false; }
-  
-//   submitCreateChannel() {
-//     if (!this.newChannelName.trim()) return;
-//     const type = this.isPrivateChannel ? 'private' : 'public';
-//     // Add current user to private list so backend doesn't lock you out
-//     const members = this.isPrivateChannel ? [this.currentUserdId] : [];
-
-//     this.chatService.createChannel(this.newChannelName, type, members).subscribe({
-//       next: (newChannel) => {
-//         this.closeCreateModal();
-//         this.loadChannels();
-//         this.selectChannel(newChannel);
-//       }
-//     });
-//   }
-
-//   // --- Utilities ---
-
-//   onTyping() {
-//     if (!this.activeChannelId) return;
-//     this.chatService.setTyping(this.activeChannelId, true);
-//     clearTimeout(this.typingTimeout);
-//     this.typingTimeout = setTimeout(() => {
-//       this.chatService.setTyping(this.activeChannelId!, false);
-//     }, 2000);
-//   }
-
-//   scrollToBottom(): void {
-//     if (this.scrollContainer) {
-//       this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
-//     }
 //   }
 
 //   getChannelName(id: string | null): string {
-//     return this.channelsSnapshot.find(c => c._id === id)?.name ?? '';
+//       if (!id) return '';
+//       const c = this.channels.find(ch => ch._id === id);
+//       return c?.name || 'Unnamed';
 //   }
 
-//   getSenderId(msg: any): string {
-//     if (!msg.senderId) return '';
-//     return typeof msg.senderId === 'object' ? msg.senderId._id : msg.senderId;
+//   // --- MESSAGING ---
+
+//   sendMessage() {
+//     if (!this.messageInput.trim() || !this.activeChannelId) return;
+    
+//     const msg: any = { 
+//         channelId: this.activeChannelId,
+//         body: this.messageInput.trim(),
+//         senderId: this.currentUserId,
+//         attachments: []
+//     };
+
+//     this.socketService.sendMessage(msg);
+//     this.messageInput = '';
+//     this.socketService.sendTyping(this.activeChannelId, false);
 //   }
 
-//   getSenderName(msg: any): string {
-//     if (!msg.senderId) return 'Unknown';
-//     return typeof msg.senderId === 'object' ? (msg.senderId.name || 'User') : 'User';
+//   onTypingInput() {
+//       if(this.activeChannelId) this.socketService.sendTyping(this.activeChannelId, true);
 //   }
 
-//   isImage(url: string): boolean {
-//     return url.match(/\.(jpeg|jpg|gif|png|webp|svg)$/i) != null || url.includes('cloudinary');
+//   // --- ATTACHMENTS ---
+
+//   handleFileUpload(ev: Event) {
+//     const input = ev.target as HTMLInputElement;
+//     const file = input.files?.[0];
+//     if (!file || !this.activeChannelId) return;
+
+//     this.isUploading = true;
+//     this.socketService.uploadAttachment(file).subscribe({
+//         next: (attachment: any) => {
+//             this.isUploading = false;
+//             this.socketService.sendMessage({
+//                 channelId: this.activeChannelId!,
+//                 body: '',
+//                 attachments: [attachment],
+//                 senderId: this.currentUserId
+//             });
+//         },
+//         error: () => this.isUploading = false
+//     });
+//     input.value = '';
+//   }
+
+//   triggerFilePicker() { this.fileInput?.nativeElement?.click(); }
+
+//   // --- MODAL LOGIC (Restored) ---
+
+//   openCreateModal() { 
+//       this.showCreateModal = true; 
+//       this.newChannelName = ''; 
+//       this.isPrivateChannel = false;
+//       this.selectedMembers.clear();
+//   }
+
+//   closeCreateModal() { 
+//       this.showCreateModal = false; 
+//   }
+  
+//   toggleMemberSelection(id: string) {
+//       if(this.selectedMembers.has(id)) this.selectedMembers.delete(id);
+//       else this.selectedMembers.add(id);
+//   }
+
+//   submitCreateChannel() {
+//       if(!this.newChannelName.trim()) return;
+      
+//       const members = this.isPrivateChannel ? Array.from(this.selectedMembers) : [];
+//       // Ensure creator is in private channel
+//       if(this.isPrivateChannel && this.currentUserId) members.push(this.currentUserId);
+
+//       this.socketService.createChannel(this.newChannelName, this.isPrivateChannel ? 'private' : 'public', members)
+//       .subscribe(ch => {
+//           const current = this.socketService.channels$.value;
+//           this.socketService.channels$.next([...current, ch]);
+//           this.showCreateModal = false;
+//           this.selectChannel(ch);
+//       });
+//   }
+
+//   // --- TEMPLATE HELPERS (Restored) ---
+
+//   getSenderId(msg: ChatMessage): string {
+//     if (!msg || !msg.senderId) return '';
+//     return typeof msg.senderId === 'string' ? msg.senderId : (msg.senderId._id || '');
+//   }
+
+//   getSenderName(msg: ChatMessage): string {
+//     if (!msg || !msg.senderId) return 'Unknown';
+//     // If populated object
+//     if (typeof msg.senderId === 'object' && msg.senderId.name) return msg.senderId.name;
+//     // If string ID, try to find in master list
+//     if (typeof msg.senderId === 'string') {
+//         const u = this.masterUsers.find(user => user._id === msg.senderId);
+//         if (u) return u.name;
+//         return msg.senderId.slice(0, 6);
+//     }
+//     return 'User';
+//   }
+
+//   isImage(url?: string): boolean {
+//     if (!url) return false;
+//     return /\.(jpe?g|png|gif|webp|svg)$/i.test(url) || url.includes('cloudinary');
+//   }
+
+//   deleteMessage(msg: ChatMessage) {
+//       if(msg._id && confirm('Delete message?')) {
+//           this.socketService.deleteMessage(msg._id).subscribe();
+//       }
+//   }
+
+//   scrollToBottom() {
+//     if (this.scrollContainer?.nativeElement) {
+//       const el = this.scrollContainer.nativeElement;
+//       el.scrollTop = el.scrollHeight;
+//     }
 //   }
 
 //   ngOnDestroy() {
-//     this.destroy$.next();
-//     this.destroy$.complete();
+//     this.subs.forEach(s => s.unsubscribe());
 //   }
 // }

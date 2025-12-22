@@ -58,8 +58,8 @@ export class CustomerList implements OnInit {
   // --- Filters ---
   customerFilter = {
     _id: null,
-    email: '',
-    phone: '',
+    email: null,
+    phone: null,
   };
 
   emailSuggestions: string[] = [];
@@ -93,8 +93,8 @@ export class CustomerList implements OnInit {
   resetFilters() {
     this.customerFilter = {
       _id: null,
-      email: '',
-      phone: '',
+      email: null,
+      phone: null,
     };
     this.getData(true);
   }

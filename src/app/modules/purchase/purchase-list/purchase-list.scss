@@ -1,5 +1,5 @@
 /* ==============================================
-   PURCHASE LIST (Enterprise Full Height)
+   PURCHASE LIST (Optimized Full Height)
    ============================================== */
 
 :host {
@@ -15,62 +15,18 @@
   height: 100%;
   width: 100%;
   background: var(--bg-primary);
-  padding: var(--spacing-xl);
-  gap: var(--spacing-lg);
+  padding: var(--spacing-md); // Reduced padding for larger grid
+  gap: var(--spacing-md);
   overflow: hidden;
 }
 
-/* --- 1. HEADER --- */
-.list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-shrink: 0;
-  padding-bottom: var(--spacing-md);
-
-  .title-section {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-lg);
-
-    .icon-box {
-      width: 48px;
-      height: 48px;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      border-radius: var(--ui-border-radius-lg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 1.25rem;
-      box-shadow: var(--shadow-md);
-    }
-
-    .text-content {
-      .list-title {
-        margin: 0;
-        font-family: var(--font-heading);
-        font-size: var(--font-size-2xl);
-        font-weight: 700;
-        color: var(--text-primary);
-        line-height: 1.2;
-      }
-      .list-subtitle {
-        margin: 2px 0 0 0;
-        font-size: var(--font-size-sm);
-        color: var(--text-secondary);
-      }
-    }
-  }
-}
-
-/* --- 2. FILTER BAR --- */
+/* --- FILTER CARD --- */
 .themed-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border-primary);
   border-radius: var(--ui-border-radius-lg);
   box-shadow: var(--shadow-sm);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md); // Balanced padding
   flex-shrink: 0;
 }
 
@@ -78,46 +34,50 @@
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: var(--spacing-lg);
-}
+  gap: var(--spacing-md);
+  width: 100%;
 
-.se-filter-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 1;
-  min-width: 180px;
+  .se-filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 0 1 200px; // Standardized width
 
-  label {
-    font-size: var(--font-size-xs);
-    font-weight: 600;
-    text-transform: uppercase;
-    color: var(--text-tertiary);
-    letter-spacing: 0.5px;
+    label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .se-filter-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+  }
+
+  /* Right-Aligned New Button */
+  .se-filter-right {
+    margin-left: auto;
+    display: flex;
+    align-items: flex-end;
   }
 }
 
-.se-filter-actions {
-  display: flex;
-  gap: var(--spacing-md);
-  margin-left: auto;
-  padding-bottom: 2px;
-}
-
-/* --- 3. GRID AREA (The Flex Magic) --- */
+/* --- MAXIMIZED GRID AREA --- */
 .list-grid-area {
-  flex: 1;             /* Grow to fill remaining height */
-  min-height: 0;       /* Allow shrinking/scrolling */
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  padding: 0;          /* Flush grid */
   
-  /* Override themed-card default */
   &.themed-card {
-    padding: 0;
+    padding: 0; // Flush grid for better look
     background: var(--bg-secondary);
     border: 1px solid var(--border-primary);
+    border-radius: var(--ui-border-radius-lg);
   }
 
   app-ag-share-grid {
@@ -127,50 +87,28 @@
   }
 }
 
-/* --- GLOBAL OVERRIDES --- */
+/* --- GLOBAL THEME OVERRIDES --- */
 :host ::ng-deep {
-  
-  /* Inputs */
   .p-inputtext, .p-select, .p-datepicker {
     background: var(--bg-ternary);
     border-color: var(--border-secondary);
     color: var(--text-primary);
     border-radius: var(--ui-border-radius);
+    font-size: var(--font-size-sm);
     
     &:enabled:focus {
       border-color: var(--accent-primary);
       box-shadow: 0 0 0 1px var(--accent-primary);
     }
-    
-    &:enabled:hover {
-      border-color: var(--text-tertiary);
-    }
   }
 
-  /* Icons inside inputs */
-  .p-input-icon-left {
-    width: 100%;
-    i { color: var(--text-tertiary); z-index: 1; top: 50%; margin-top: -0.5rem; }
-    .p-inputtext { padding-left: 2.5rem; }
+  .p-input-icon-left i {
+    color: var(--text-tertiary);
   }
-  
-  /* Grid Status Badges */
-  .cell-status {
-    display: flex;
-    align-items: center;
-    height: 100%;
-    font-weight: 700;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    
-    /* Order Status */
-    &.status-received { color: var(--color-success); }
-    &.status-draft { color: var(--text-secondary); font-style: italic; }
-    &.status-cancelled { color: var(--text-tertiary); text-decoration: line-through; }
 
-    /* Payment Status */
-    &.pay-paid { color: var(--color-success); }
-    &.pay-partial { color: var(--color-warning); }
-    &.pay-unpaid { color: var(--color-error); }
+  /* Grid Header Token Sync */
+  .ag-header {
+    background-color: var(--bg-ternary) !important;
+    border-bottom: 1px solid var(--border-primary) !important;
   }
 }

@@ -37,7 +37,7 @@ export class NoteService extends BaseApiService {
 
   // --- 6. DELETE NOTE ---
   deleteNote(id: string): Observable<void> {
-    return this.delete(`${this.endpoint}/${id}`, 'deleteNote');
+    return this.delete(`${this.endpoint}/${id}`,null, 'deleteNote');
   }
 
   // --- 7. UPLOAD MEDIA (Step 1 of flow) ---

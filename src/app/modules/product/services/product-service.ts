@@ -59,7 +59,7 @@ export class ProductService extends BaseApiService {
 
   // ================= DELETE =================
   deleteProductById(productId: string): Observable<any> {
-    return this.delete(`${this.endpoint}/${productId}`, 'deleteProductById');
+    return this.delete(`${this.endpoint}/${productId}`,null, 'deleteProductById');
   }
 
   // ================= HELPER (FIXED) =================

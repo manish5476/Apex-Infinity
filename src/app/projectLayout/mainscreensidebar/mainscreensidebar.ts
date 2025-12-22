@@ -83,7 +83,7 @@ export class Mainscreensidebar implements OnInit {
         { label: 'Branches', icon: 'pi pi-building', routerLink: ['/branches'] },
         { label: 'Create Branch', icon: 'pi pi-plus-circle', routerLink: ['/branches/create'] },
         { label: 'Transactions', icon: 'pi pi-book', routerLink: ['/transactions'] },
-        { label: 'System Logs', icon: 'pi pi-history', routerLink: ['/logs'] },
+        // { label: 'System Logs', icon: 'pi pi-history', routerLink: ['/logs'] },
       ]
     },
     {

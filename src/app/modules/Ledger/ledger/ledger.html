@@ -1,4 +1,320 @@
-<div class="page-container">
+<div class="ledger-container">
+
+  <!-- HEADER & CONTROLS -->
+  <header class="glass-header">
+    <div class="header-content">
+      <div class="title-section">
+        <div class="icon-wrapper">
+          <i class="pi pi-book text-xl text-primary"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-semibold text-primary">Financial Ledger</h1>
+          <p class="text-xs text-secondary">Track transactions, reports, and balances.</p>
+        </div>
+      </div>
+
+      <!-- GLOBAL FILTERS ROW (Aligned to Right) -->
+      <div class="filters-row" [formGroup]="filterForm">
+
+        <!-- Branch Selector -->
+        <p-select [options]="branchOptions()" formControlName="branchId" placeholder="All Branches" [showClear]="true"
+          appendTo="body" styleClass="glass-input filter-branch" (onChange)="applyFilters()">
+        </p-select>
+
+        <!-- Date Range -->
+        <p-datepicker formControlName="dateRange" selectionMode="range" [readonlyInput]="true"
+          placeholder="Select Period" [showIcon]="true" appendTo="body" styleClass="glass-input filter-date"
+          (onClose)="applyFilters()">
+        </p-datepicker>
+
+        <!-- Filters Moved to Header (Conditional) -->
+        @if (!isReportView) {
+        <!-- All Trans Filters -->
+        @if (currentTab() === 'all') {
+        <span class="p-input-icon-left">
+          <!-- <i class="pi pi-search"></i> -->
+          <input pInputText formControlName="search" placeholder="Search..." (keyup.enter)="applyFilters()"
+            class="glass-input-sm filter-search" />
+        </span>
+        <p-select [options]="accountOptions()" formControlName="accountId" placeholder="Account" [showClear]="true"
+          appendTo="body" styleClass="glass-input-sm filter-account" (onChange)="applyFilters()"></p-select>
+        <p-select formControlName="txnType"
+          [options]="[{label:'Debit', value:'debit'}, {label:'Credit', value:'credit'}]" placeholder="Type"
+          [showClear]="true" appendTo="body" styleClass="glass-input-sm filter-type"
+          (onChange)="applyFilters()"></p-select>
+        }
+
+        <!-- Entity Selectors -->
+        @if (currentTab() === 'customer') {
+        <p-select [options]="customerOptions()" formControlName="customerId" placeholder="Select Customer"
+          [filter]="true" [showClear]="true" appendTo="body" styleClass="glass-input filter-entity"
+          (onChange)="applyFilters()"></p-select>
+        }
+        @if (currentTab() === 'supplier') {
+        <p-select [options]="supplierOptions()" formControlName="supplierId" placeholder="Select Supplier"
+          [filter]="true" [showClear]="true" appendTo="body" styleClass="glass-input filter-entity"
+          (onChange)="applyFilters()"></p-select>
+        }
+        }
+
+        <!-- Export -->
+        <p-button label="Export" icon="pi pi-download" styleClass="p-button-outlined p-button-secondary glass-btn"
+          [loading]="isExporting()" (onClick)="handleExportClick()">
+        </p-button>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs-wrapper">
+      <p-tabs [value]="tabIndex()" (valueChange)="onTabChange($event)" styleClass="glass-tabs">
+        <p-tablist>
+          <p-tab [value]="0">Transactions</p-tab>
+          <p-tab [value]="1">Customer</p-tab>
+          <p-tab [value]="2">Supplier</p-tab>
+          <p-tab [value]="3">Summary</p-tab>
+          <p-tab [value]="4">P & L</p-tab>
+          <p-tab [value]="5">Balance Sheet</p-tab>
+          <p-tab [value]="6">Trial Balance</p-tab>
+        </p-tablist>
+      </p-tabs>
+    </div>
+  </header>
+
+  <!-- CONTENT AREA -->
+  <main class="ledger-content">
+
+    <!-- LOADING STATE -->
+    @if (isLoading() && !gridData().length && !reportData()) {
+    <div class="loading-state">
+      <p-skeleton width="100%" height="60px" class="mb-3"></p-skeleton>
+      <p-skeleton width="100%" height="60px" class="mb-3"></p-skeleton>
+      <p-skeleton width="100%" height="60px" class="mb-3"></p-skeleton>
+    </div>
+    }
+
+    <!-- 1. GRID VIEWS (All, Customer, Supplier, Trial) -->
+    @else if (!isReportView) {
+
+    <!-- Entity Summary Header (If Selected) -->
+    @if (isEntityView && entityDetails()) {
+    <div class="entity-summary-card">
+      <div class="details">
+        <h3>{{ entityDetails().details.name || entityDetails().details.companyName }}</h3>
+        <p><i class="pi pi-phone mr-1"></i> {{ entityDetails().details.phone || 'N/A' }}</p>
+      </div>
+      <div class="balances">
+        <div class="bal-item">
+          <label>Opening</label>
+          <span>{{ common.formatCurrency(entityDetails().openingBalance) }}</span>
+        </div>
+        <div class="divider"></div>
+        <div class="bal-item closing">
+          <label>Closing / Outstanding</label>
+          <span>{{ common.formatCurrency(entityDetails().closingBalance) }}</span>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- The Grid -->
+    <div class="grid-wrapper glass-panel">
+      @if ( (currentTab() === 'customer' && !filterForm.value.customerId) || (currentTab() === 'supplier' &&
+      !filterForm.value.supplierId) ) {
+      <div class="empty-state">
+        <img src="src/app/assets/undraw_adventure_9my9.svg" alt="Select Entity" class="opacity-50 w-24">
+        <p>Please select a {{ currentTab() }} to view ledger history.</p>
+      </div>
+      }
+      @else if (gridData().length === 0) {
+      <div class="empty-state">
+        <img src="src/app/assets/undraw_adventure_9my9.svg" alt="No Data" class="w-32">
+        <p>No transactions found for this period.</p>
+      </div>
+      }
+      @else {
+      <app-ag-share-grid [columns]="gridColumns()" [data]="gridData()" style="height: 100%; width: 100%"
+        (gridEvent)="eventFromGrid($event)">
+      </app-ag-share-grid>
+      }
+    </div>
+
+    <!-- Trial Balance Footer -->
+    @if (currentTab() === 'trialBalance' && reportData()) {
+    <div class="trial-footer glass-panel">
+      <div class="tf-item">Total Debit: <span class="text-error">{{ common.formatCurrency(reportData().debit) }}</span>
+      </div>
+      <div class="tf-item">Total Credit: <span class="text-success">{{ common.formatCurrency(reportData().credit)
+          }}</span></div>
+      <div class="tf-item">Diff: <span [class.text-error]="reportData().diff !== 0">{{
+          common.formatCurrency(reportData().diff) }}</span></div>
+    </div>
+    }
+    }
+
+    <!-- 2. REPORT VIEWS (Summaries) -->
+    @else {
+    <div class="report-container">
+
+      <!-- ORG SUMMARY -->
+      @if (currentTab() === 'orgSummary' && reportData()) {
+      <div class="report-grid">
+        <div class="kpi-card glass-card accent-blue">
+          <div class="kpi-header"><i class="pi pi-wallet"></i> Total Income</div>
+          <div class="kpi-value text-success">{{ common.formatCurrency(reportData().income) }}</div>
+        </div>
+        <div class="kpi-card glass-card accent-red">
+          <div class="kpi-header"><i class="pi pi-shopping-cart"></i> Total Expenses</div>
+          <div class="kpi-value text-error">{{ common.formatCurrency(reportData().expense) }}</div>
+        </div>
+        <div class="kpi-card glass-card accent-green">
+          <div class="kpi-header"><i class="pi pi-dollar"></i> Net Profit</div>
+          <div class="kpi-value">{{ common.formatCurrency(reportData().netProfit) }}</div>
+        </div>
+        <div class="kpi-card glass-card accent-orange">
+          <div class="kpi-header"><i class="pi pi-building"></i> Equity</div>
+          <div class="kpi-value">{{ common.formatCurrency(reportData().equity) }}</div>
+        </div>
+      </div>
+
+      <div class="report-row mt-4">
+        <div class="glass-card p-4 flex-1">
+          <h3>Assets vs Liabilities</h3>
+          <div class="flex justify-content-between mt-4">
+            <div>
+              <label class="block text-secondary mb-1">Total Assets</label>
+              <span class="text-2xl font-bold text-primary">{{ common.formatCurrency(reportData().asset) }}</span>
+            </div>
+            <div>
+              <label class="block text-secondary mb-1">Total Liabilities</label>
+              <span class="text-2xl font-bold text-error">{{ common.formatCurrency(reportData().liability) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- P & L -->
+      @if (currentTab() === 'pnl' && reportData()) {
+      <div class="document-sheet glass-sheet">
+        <div class="sheet-header">
+          <h2>Profit & Loss Statement</h2>
+          <p>{{ reportData().period?.startDate | date }} - {{ reportData().period?.endDate | date }}</p>
+        </div>
+
+        <div class="sheet-section">
+          <div class="line-item header"><span>Category</span> <span>Amount</span></div>
+
+          <div class="line-item">
+            <span>Total Income</span>
+            <span class="text-success">{{ common.formatCurrency(reportData().income) }}</span>
+          </div>
+
+          <div class="line-item">
+            <span>Total Expenses</span>
+            <span class="text-error">{{ common.formatCurrency(reportData().expenses) }}</span>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="line-item total">
+            <span>Net Profit / (Loss)</span>
+            <span [class.text-success]="reportData().netProfit >= 0" [class.text-error]="reportData().netProfit < 0">
+              {{ common.formatCurrency(reportData().netProfit) }}
+            </span>
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- BALANCE SHEET -->
+      @if (currentTab() === 'balanceSheet' && reportData()) {
+      <div class="document-sheet glass-sheet">
+        <div class="sheet-header">
+          <h2>Balance Sheet</h2>
+          <p>As of {{ reportData().asOnDate | date:'medium' }}</p>
+        </div>
+
+        <div class="sheet-body grid grid-cols-2 gap-8">
+          <!-- Left Side -->
+          <div class="sheet-column">
+            <h3 class="border-b pb-2 mb-4">Assets</h3>
+            <div class="line-item">
+              <span>Total Assets</span>
+              <span class="font-bold">{{ common.formatCurrency(reportData().assets) }}</span>
+            </div>
+          </div>
+
+          <!-- Right Side -->
+          <div class="sheet-column">
+            <h3 class="border-b pb-2 mb-4">Liabilities & Equity</h3>
+            <div class="line-item">
+              <span>Liabilities</span>
+              <span>{{ common.formatCurrency(reportData().liabilities) }}</span>
+            </div>
+            <div class="line-item">
+              <span>Equity</span>
+              <span>{{ common.formatCurrency(reportData().equity) }}</span>
+            </div>
+            <div class="line-item" *ngIf="reportData().details?.retainedEarnings">
+              <span class="pl-4 text-sm text-secondary">Retained Earnings</span>
+              <span class="text-sm">{{ common.formatCurrency(reportData().details.retainedEarnings) }}</span>
+            </div>
+            <div class="divider"></div>
+            <div class="line-item total">
+              <span>Total L & E</span>
+              <span>{{ common.formatCurrency(reportData().liabilities + reportData().equity) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+    }
+
+  </main>
+</div>
+
+<!-- EXPORT DIALOG -->
+<p-dialog header="Export Data" [(visible)]="showExportDialog" [modal]="true" [style]="{width: '800px'}"
+  styleClass="glass-dialog">
+
+  <div [formGroup]="exportForm" class="flex flex-column gap-4 py-2">
+    <div class="field-radio">
+      <label class="text-sm text-secondary block mb-1">All Ledger</label>
+
+      <p-radiobutton name="exportType" value="all" formControlName="exportType" label="All Ledger"></p-radiobutton>
+    </div>
+    <div class="field-radio">
+      <label class="text-sm text-secondary block mb-1">Profit & Loss</label>
+
+      <p-radiobutton name="exportType" value="pnl" formControlName="exportType" label="Profit & Loss"></p-radiobutton>
+    </div>
+    <div class="field-radio">
+      <label class="text-sm text-secondary block mb-1">Balance Sheet </label>
+
+      <p-radiobutton name="exportType" value="balanceSheet" formControlName="exportType"
+        label="Balance Sheet"></p-radiobutton>
+    </div>
+
+    <div class="field mt-2">
+      <label class="text-sm text-secondary block mb-1">Date Range</label>
+      <p-datepicker formControlName="dateRange" selectionMode="range" [readonlyInput]="true" appendTo="body"
+        styleClass="w-full"></p-datepicker>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancel" styleClass="p-button-text p-button-sm text-secondary"
+      (onClick)="showExportDialog.set(false)"></p-button>
+    <p-button label="Download CSV" icon="pi pi-download" styleClass="p-button-sm glass-btn-primary"
+      (onClick)="submitExportDialog()" [loading]="isExporting()"></p-button>
+  </ng-template>
+</p-dialog>
+
+
+
+
+<!-- <div class="page-container">
 
   <header class="page-header">
     <div class="title-row">
@@ -148,140 +464,4 @@
         [loading]="isExporting()"></p-button>
     </div>
   </ng-template>
-</p-dialog>
-
-<!-- <div class="page-container">
-
-  <header class="page-header">
-    <div class="title-row">
-      <h1>
-        <i class="pi pi-book"></i>
-        Financial Ledger
-      </h1>
-
-      <div class="header-actions">
-
-        <p-datepicker [formControl]="$any(filterForm.get('dateRange'))" selectionMode="range" [readonlyInput]="true"
-          placeholder="Select Date Range" [showIcon]="true" appendTo="body" styleClass="p-inputtext-sm date-filter"
-          (onClose)="applyFilters()">
-        </p-datepicker>
-
-        @if (currentTab() === 'customer') {
-        <p-select appendTo="body" [options]="customerOptions()" [formControl]="$any(filterForm.get('customerId'))"
-          placeholder="Select Customer" [filter]="true" [showClear]="true" styleClass="header-dropdown" appendTo="body"
-          (onChange)="applyFilters()">
-        </p-select>
-        }
-
-        @if (currentTab() === 'supplier') {
-        <p-select appendTo="body" [options]="supplierOptions()" [formControl]="$any(filterForm.get('supplierId'))"
-          placeholder="Select Supplier" [filter]="true" [showClear]="true" styleClass="header-dropdown" appendTo="body"
-          (onChange)="applyFilters()">
-        </p-select>
-        }
-
-        <p-button label="Export" icon="pi pi-download" styleClass="p-button-outlined p-button-secondary p-button-sm"
-          [loading]="isExporting()" (onClick)="handleExportClick()">
-        </p-button>
-
-      </div>
-    </div>
-  </header>
-
-  <div class="tabs-container">
-    <p-tabs [value]="tabValue()" (valueChange)="onTabChange($event)">
-      <p-tablist>
-        <p-tab [value]="0">All Transactions</p-tab>
-        <p-tab [value]="1">Customer Ledger</p-tab>
-        <p-tab [value]="2">Supplier Ledger</p-tab>
-        <p-tab [value]="3">Org Summary</p-tab>
-        <p-tab [value]="4">Profit & Loss</p-tab>
-        <p-tab [value]="5">Balance Sheet</p-tab>
-        <p-tab [value]="6">Trial Balance</p-tab>
-      </p-tablist>
-    </p-tabs>
-  </div>
-
-  <div class="grid-container">
-    @if (isLoading()) {
-    <div class="p-4">
-      <p-skeleton width="100%" height="40px" styleClass="mb-2"></p-skeleton>
-      <p-skeleton width="100%" height="200px"></p-skeleton>
-    </div>
-    }
-    @else if ((currentTab() === 'customer' && !filterForm.value.customerId) ||
-    (currentTab() === 'supplier' && !filterForm.value.supplierId)) {
-    <div class="empty-placeholder">
-      <i class="pi pi-filter"></i>
-      <p>Please select a {{ currentTab() }} to view records.</p>
-    </div>
-    }
-    @else {
-  
-     <app-ag-share-grid [columns]="column()" [data]="data()" selectionMode="multiple" (gridEvent)="eventFromGrid($event)">
-    </app-ag-share-grid>
-    }
-  </div>
-
-  @if (currentTab() === 'trialBalance' && data().length > 0) {
-  <div class="footer-summary">
-    <div class="total-item"><span>Debit:</span><strong>{{ common.formatCurrency(getTrialTotal('debit')) }}</strong>
-    </div>
-    <div class="total-item"><span>Credit:</span><strong>{{ common.formatCurrency(getTrialTotal('credit')) }}</strong>
-    </div>
-    <div class="total-item mismatch"><span>Diff:</span><strong>{{ common.formatCurrency(getTrialTotal('debit') -
-        getTrialTotal('credit')) }}</strong></div>
-  </div>
-  }
-
-</div>
-
-<p-dialog header="Export Transactions" [(visible)]="showExportDialog" [modal]="true" [style]="{ width: '400px' }">
-  <div class="flex flex-column gap-3 pt-2" [formGroup]="exportForm">
-
-    <div class="field">
-      <label class="block mb-2 font-bold">Date Range</label>
-      <p-datepicker formControlName="dateRange" selectionMode="range" [readonlyInput]="true" [showIcon]="true"
-        appendTo="body" styleClass="w-full"></p-datepicker>
-    </div>
-
-    <div class="field">
-      <label class="block mb-2 font-bold">Filter Data By:</label>
-      <div class="flex gap-3">
-        <div class="flex align-items-center">
-          <p-radiobutton name="exportType" value="all" formControlName="exportType" label="All"></p-radiobutton>
-        </div>
-        <div class="flex align-items-center">
-          <p-radiobutton name="exportType" value="customer" formControlName="exportType"
-            label="Customer"></p-radiobutton>
-        </div>
-        <div class="flex align-items-center">
-          <p-radiobutton name="exportType" value="supplier" formControlName="exportType"
-            label="Supplier"></p-radiobutton>
-        </div>
-      </div>
-    </div>
-
-    @if (exportForm.get('exportType')?.value === 'customer') {
-    <div class="field fadein">
-      <label class="block mb-2 font-bold">Select Customer</label>
-      <p-select appendTo="body" [options]="customerOptions()" formControlName="specificId" placeholder="Choose Customer" [filter]="true"
-        styleClass="w-full" appendTo="body"></p-select>
-    </div>
-    }
-    @if (exportForm.get('exportType')?.value === 'supplier') {
-    <div class="field fadein">
-      <label class="block mb-2 font-bold">Select Supplier</label>
-      <p-select appendTo="body" [options]="supplierOptions()" formControlName="specificId" placeholder="Choose Supplier" [filter]="true"
-        styleClass="w-full" appendTo="body"></p-select>
-    </div>
-    }
-
-  </div>
-  <ng-template pTemplate="footer">
-    <p-button label="Cancel" styleClass="p-button-text" (onClick)="showExportDialog.set(false)"></p-button>
-    <p-button label="Download CSV" icon="pi pi-download" (onClick)="submitExportDialog()"
-      [disabled]="isExporting()"></p-button>
-  </ng-template>
-</p-dialog>
- -->
+</p-dialog> -->

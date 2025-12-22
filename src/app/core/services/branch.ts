@@ -27,6 +27,6 @@ export class BranchService extends BaseApiService {
   }
 
   deleteBranch(branchId: string): Observable<any> {
-    return this.delete(`${this.endpoint}/${branchId}`, 'deleteBranch');
+    return this.delete(`${this.endpoint}/${branchId}`,null, 'deleteBranch');
   }
 }
