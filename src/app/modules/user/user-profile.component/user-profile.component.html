@@ -1,4 +1,286 @@
-@if (currentUser(); as user) {
+<!-- =========================================================
+     VARIANT 3: DETAILED PROFILE VIEW (Full Page Layout)
+     ========================================================= -->
+@if (config().variant === 'detailed-profile') {
+  <div class="profile-wrapper fade-in" [class.is-loading]="isLoading()">
+    
+    @if (isLoading()) {
+      <div class="loading-skeleton">
+        <div class="hero-sk"></div>
+        <div class="grid-sk">
+          <div class="side-sk"></div>
+          <div class="main-sk"></div>
+        </div>
+      </div>
+    } @else {
+      <!-- 1. HERO CARD -->
+      <div class="hero-card">
+        <div class="hero-cover"></div>
+        
+        <div class="hero-content">
+          <!-- Avatar Section -->
+          <div class="avatar-wrapper">
+            <div class="avatar-circle">
+              @if (getValue(config().imageKey)) {
+                <img [src]="getValue(config().imageKey)" [alt]="getValue(config().titleKey)" class="profile-image">
+              } @else {
+                {{ getInitials(getValue(config().titleKey)) }}
+              }
+            </div>
+
+            <!-- Status Indicator -->
+            @if (config().statusKey) {
+              <div class="status-indicator" 
+                   [class.active]="statusColor() === 'success'"
+                   [class.warn]="statusColor() === 'warning'"
+                   [class.error]="statusColor() === 'error'">
+              </div>
+            }
+
+            <!-- Upload Button -->
+            <button class="upload-btn" (click)="triggerFileInput()" [disabled]="uploading()">
+              @if (uploading()) { <div class="spinner"></div> } @else { <span class="upload-icon">📸</span> }
+            </button>
+            <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none;">
+          </div>
+
+          <!-- Identity Text -->
+          <div class="identity-section">
+            <div class="name-block">
+              <h1 class="user-name">{{ getValue(config().titleKey) }}</h1>
+              <p class="user-role">
+                {{ getValue(config().subtitleKey) }} 
+                @if (config().idKey) { • {{ getValue(config().idKey) | slice:0:8 }}... }
+              </p>
+            </div>
+            
+            <!-- Hero Actions -->
+            <div class="action-buttons">
+              @if (config().idKey) {
+                <div class="id-badge">
+                  <span class="label">UID</span>
+                  <span class="value">{{ getValue(config().idKey) | slice:0:8 }}</span>
+                </div>
+              }
+              @for (action of config().actions; track action.id) {
+                <button class="btn" [class]="'btn-' + (action.variant || 'secondary')" (click)="onAction(action.id, $event)">
+                  {{ action.label }}
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. CONTENT GRID -->
+      <div class="content-grid">
+        
+        <!-- SIDEBAR -->
+        <aside class="side-column">
+          <!-- Contact Card -->
+          <section class="card detail-card">
+            <h3 class="section-heading">Contact Info</h3>
+            <ul class="info-list">
+              @if (config().emailKey) {
+                <li class="info-item">
+                  <span class="icon">📧</span>
+                  <div class="info-data">
+                    <span class="label">Email</span>
+                    <span class="value">{{ getValue(config().emailKey) }}</span>
+                  </div>
+                </li>
+              }
+              @if (config().joinedDateKey) {
+                <li class="info-item">
+                  <span class="icon">📅</span>
+                  <div class="info-data">
+                    <span class="label">Joined</span>
+                    <span class="value">{{ getValue(config().joinedDateKey) | date:'mediumDate' }}</span>
+                  </div>
+                </li>
+              }
+            </ul>
+          </section>
+
+          <!-- Branch / Location -->
+          @if (config().branchKey; as bKey) {
+            @if (getValue(bKey); as branch) {
+              <section class="card detail-card branch-card">
+                <h3 class="section-heading">Location</h3>
+                <div class="location-preview">
+                  <div class="map-placeholder"><span class="map-icon">📍</span></div>
+                  <div class="location-details">
+                    <h4>{{ branch.name | titlecase }}</h4>
+                    <p>{{ branch.address?.city || 'Unknown City' }}</p>
+                  </div>
+                </div>
+              </section>
+            }
+          }
+
+          <!-- Preferences -->
+          @if (config().preferencesKey; as pKey) {
+            @if (getValue(pKey); as prefs) {
+              <section class="card detail-card">
+                <h3 class="section-heading">Preferences</h3>
+                <div class="pref-toggles">
+                  <div class="toggle-row" (click)="togglePreference('theme', prefs.theme === 'dark')">
+                    <span>Dark Mode</span>
+                    <div class="pill-toggle" [class.on]="prefs.theme === 'dark'"></div>
+                  </div>
+                  <div class="toggle-row" (click)="togglePreference('denseMode', prefs.denseMode)">
+                    <span>Dense Mode</span>
+                    <div class="pill-toggle" [class.on]="prefs.denseMode"></div>
+                  </div>
+                  <!-- Notification Pills -->
+                  @if (prefs.notifications) {
+                    <div class="notification-pills">
+                      @for (key of ['email', 'push', 'sms']; track key) {
+                        <span class="pill" [class.active]="prefs.notifications[key]">
+                          {{ key | titlecase }}
+                        </span>
+                      }
+                    </div>
+                  }
+                </div>
+              </section>
+            }
+          }
+        </aside>
+
+        <!-- MAIN COLUMN -->
+        <main class="main-column">
+          <!-- Permissions -->
+          @if (config().permissionsKey) {
+            <section class="card large-card">
+              <div class="card-header">
+                <h3 class="section-heading">Permissions & Access</h3>
+                <span class="counter">{{ getValue(config().permissionsKey)?.length || 0 }}</span>
+              </div>
+              <div class="permissions-grid">
+                @for (perm of getValue(config().permissionsKey); track perm) {
+                  <div class="permission-chip">
+                    <span class="check">✓</span>
+                    {{ formatPermission(perm) | titlecase }}
+                  </div>
+                } @empty {
+                  <p class="text-tertiary">No permissions assigned.</p>
+                }
+              </div>
+            </section>
+          }
+
+          <!-- System Metadata -->
+          <section class="card large-card">
+            <h3 class="section-heading">System Metadata</h3>
+            <div class="meta-grid">
+              <div class="meta-box">
+                <span class="label">Last Updated</span>
+                <span class="val">{{ data().updatedAt | date:'medium' }}</span>
+              </div>
+              <div class="meta-box">
+                <span class="label">Status</span>
+                <span class="val status-text" 
+                      [class.active]="statusColor() === 'success'"
+                      [class.warn]="statusColor() === 'warning'">
+                  {{ getValue(config().statusKey) || 'Unknown' }}
+                </span>
+              </div>
+            </div>
+          </section>
+        </main>
+
+      </div>
+    }
+  </div>
+}
+
+<!-- =========================================================
+     VARIANTS 1 & 2: CARD VIEWS (Cover & Profile)
+     ========================================================= -->
+@else {
+  <div class="card-container" 
+       [class.variant-cover]="config().variant === 'cover'"
+       [class.variant-profile]="config().variant === 'profile'"
+       [class.is-loading]="isLoading()">
+
+    <!-- EXISTING LOADING SKELETON -->
+    @if (isLoading()) {
+      <div class="skeleton-loader">
+        <div class="sk-image"></div>
+        <div class="sk-content">
+          <div class="sk-line w-3/4"></div>
+          <div class="sk-line w-1/2"></div>
+        </div>
+      </div>
+    } @else {
+      <!-- 1. HEADER / MEDIA AREA -->
+      <div class="card-media">
+        <!-- Status Badge -->
+        @if (config().statusKey && getValue(config().statusKey!)) {
+          <span class="status-badge" [class]="statusColor()">
+            {{ getValue(config().statusKey!) }}
+          </span>
+        }
+
+        <!-- Image -->
+        <div class="img-wrapper">
+          <img [src]="getValue(config().imageKey) || 'assets/no-data.png'" 
+               [alt]="getValue(config().titleKey)"
+               loading="lazy"
+               class="main-img" />
+        </div>
+      </div>
+
+      <!-- 2. CONTENT BODY -->
+      <div class="card-content">
+        <div class="card-header">
+          <h3 class="card-title truncate" [title]="getValue(config().titleKey)">
+            {{ getValue(config().titleKey) }}
+          </h3>
+          @if (config().subtitleKey) {
+            <p class="card-subtitle truncate">
+              {{ getValue(config().subtitleKey!) }}
+            </p>
+          }
+        </div>
+
+        <div class="card-divider"></div>
+
+        @if (config().details?.length) {
+          <div class="card-details-grid">
+            @for (item of config().details; track item.label) {
+              <div class="detail-item">
+                <span class="label">{{ item.label }}</span>
+                <span class="value truncate">
+                  @switch (item.type) {
+                    @case ('currency') { {{ getValue(item.key) | currency }} }
+                    @case ('date') { {{ getValue(item.key) | date:'mediumDate' }} }
+                    @default { {{ getValue(item.key) || '-' }} }
+                  }
+                </span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- 3. ACTIONS FOOTER -->
+      @if (config().actions?.length) {
+        <div class="card-actions">
+          @for (action of config().actions; track action.id) {
+            <button class="btn-action" 
+                    [class]="action.variant || 'secondary'"
+                    (click)="onAction(action.id, $event)">
+              @if (action.icon) { <i [class]="action.icon"></i> }
+              <span>{{ action.label }}</span>
+            </button>
+          }
+        </div>
+      }
+    }
+  </div>
+}<!-- @if (currentUser(); as user) {
   <div class="profile-wrapper fade-in">
     
     <div class="hero-card">
@@ -153,4 +435,4 @@
   </div>
 } @else {
   <div class="loading-skeleton">Loading...</div>
-}
+} -->
