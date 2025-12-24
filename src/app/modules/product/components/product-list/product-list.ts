@@ -51,8 +51,8 @@ export class ProductListComponent implements OnInit {
   categoryOptions = signal<any[]>([]);
 
   productFilter = {
-    name: '',
-    sku: '',
+    name: null,
+    sku: null,
     brand: null,
     category: null,
   };
@@ -75,7 +75,7 @@ export class ProductListComponent implements OnInit {
   }
 
   resetFilters() {
-    this.productFilter = { name: '', sku: '', brand: null, category: null };
+    this.productFilter = { name: null, sku: null, brand: null, category: null };
     this.getData(true);
   }
 
@@ -202,7 +202,7 @@ export class ProductListComponent implements OnInit {
         type: 'rightAligned',
         cellClass: (params: any) => {
           if (params.value <= 10) return 'cell-status status-low-stock';
-          return '';
+          return null;
         }
       },
       {
@@ -279,8 +279,8 @@ export class ProductListComponent implements OnInit {
 
 //   // --- Filters ---
 //   productFilter = {
-//     name: '',
-//     sku: '',
+//     name: null,
+//     sku: null,
 //     brand: null,
 //     category: null,
 //   };
@@ -303,8 +303,8 @@ export class ProductListComponent implements OnInit {
 
 //   resetFilters() {
 //     this.productFilter = {
-//       name: '',
-//       sku: '',
+//       name: null,
+//       sku: null,
 //       brand: null,
 //       category: null,
 //     };
@@ -443,7 +443,7 @@ export class ProductListComponent implements OnInit {
 //           if (params.value <= 10) { // Assuming reorder level
 //             return 'cell-status status-low-stock';
 //           }
-//           return '';
+//           return null;
 //         }
 //       },
 //       {
