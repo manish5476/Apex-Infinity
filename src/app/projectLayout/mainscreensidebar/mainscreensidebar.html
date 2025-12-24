@@ -1,65 +1,4 @@
-<!-- mainscreen-sidebar.html -->
-<div class="sidebar-container"
-     [ngClass]="{ 'expanded': isPinned || isHovered, 'collapsed': !(isPinned || isHovered) }"
-     (mouseenter)="mouseEnter.emit()"
-     (mouseleave)="mouseLeave.emit()">
 
-  <div class="sidebar-inner">
-    <div class="menu-list">
-      <div *ngFor="let item of menuItems" class="menu-item-wrapper"
-           [class.active-parent]="isParentActive(item) && !isDirectActive(item)">
-
-        <!-- Single level (no children) -->
-        <a *ngIf="!item.items; else multiLevel"
-           [routerLink]="item.routerLink"
-           routerLinkActive="active-link"
-           [routerLinkActiveOptions]="{ exact: true }"
-           class="menu-title">
-          <i [class]="item.icon + ' menu-icon'"></i>
-          <span class="menu-label">{{ item.label }}</span>
-        </a>
-
-        <!-- Multi-level -->
-        <ng-template #multiLevel>
-          <div class="menu-title"
-               (click)="toggleMenuItem(item.label)"
-               (mouseenter)="onMenuTitleEnter(item.label)"
-               (mouseleave)="onMenuTitleLeave(item.label)">
-            <i [class]="item.icon + ' menu-icon'"></i>
-            <span class="menu-label">{{ item.label }}</span>
-            <i class="pi pi-angle-down menu-arrow"
-               [ngClass]="{ 'rotated': expandedItems[item.label] }"></i>
-          </div>
-
-          <div class="submenu"
-               [ngClass]="{ 'expanded': expandedItems[item.label], 'collapsed': !expandedItems[item.label] }">
-            <a *ngFor="let sub of item.items"
-               [routerLink]="sub.routerLink"
-               routerLinkActive="active-link"
-               class="submenu-item">
-              <i [class]="sub.icon + ' submenu-icon'"></i>
-              <span>{{ sub.label }}</span>
-            </a>
-          </div>
-        </ng-template>
-      </div>
-    </div>
-
-    <!-- Footer with Logout -->
-    <div class="sidebar-footer">
-      <button pButton
-              label="Log out"
-              icon="pi pi-sign-out"
-              class="logout-btn"
-              (click)="logout()"></button>
-    </div>
-  </div>
-</div>
-
-<!-- Hover trigger zone (unchanged) -->
-<div class="hover-trigger"
-     (mouseenter)="mouseEnterTriggerZone.emit()"
-     *ngIf="!(isPinned || isHovered)"></div><!-- 
 <div class="sidebar-container"
   [ngClass]="{ 'collapsed': !isPinned && !isHovered, 'expanded': isPinned || isHovered }"
   (mouseenter)="mouseEnter.emit()"
@@ -73,7 +12,7 @@
         [class.active-parent]="expandedItems[item.label]"
         (mouseleave)="onMenuTitleLeave(item.label)">
 
-        Single-level link
+        <!-- Single-level link -->
         <a *ngIf="!item.items; else multiItem"
           [routerLink]="item.routerLink"
           routerLinkActive="active-link"
@@ -87,7 +26,7 @@
           </span>
         </a>
 
-        Multi-level menu
+        <!-- Multi-level menu -->
         <ng-template #multiItem>
           <div class="menu-title"
             (click)="toggleMenuItem(item.label)"
@@ -131,7 +70,7 @@
 
 <div class="hover-trigger"
   (mouseenter)="mouseEnterTriggerZone.emit()"
-  *ngIf="!isPinned && !isHovered"></div> -->
+  *ngIf="!isPinned && !isHovered"></div>
 
   <!-- <div class="sidebar-container" [ngClass]="{
     'collapsed': !isPinned && !isHovered,
