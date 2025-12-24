@@ -64,8 +64,8 @@ export class SupplierListComponent implements OnInit {
 
   // --- Filters ---
   supplierFilter = {
-    companyName: '',
-    phone: '',
+    companyName: null,
+    phone: null,
   };
 
   constructor() { }
@@ -81,8 +81,8 @@ export class SupplierListComponent implements OnInit {
 
   resetFilters() {
     this.supplierFilter = {
-      companyName: '',
-      phone: '',
+      companyName: null,
+      phone: null,
     };
     this.getData(true);
   }
