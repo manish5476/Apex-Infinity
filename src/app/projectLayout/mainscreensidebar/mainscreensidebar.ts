@@ -145,7 +145,17 @@ export class Mainscreensidebar implements OnInit {
   ];
 }
 
+  isDirectActive(item: any): boolean {
+    if (!item.routerLink) return false;
+    return this.router.isActive(this.router.createUrlTree(item.routerLink).toString(), true);
+  }
 
+  isParentActive(item: any): boolean {
+    if (!item.items) return false;
+    return item.items.some((sub: any) =>
+      this.router.isActive(this.router.createUrlTree(sub.routerLink).toString(), true)
+    );
+  }
 //   getCorrectMenuItems(): any[] {
 //   return [
 //     {
