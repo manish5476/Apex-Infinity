@@ -95,4 +95,4 @@ export class UserProfileComponent {
   formatPermission(perm: string): string {
     return perm.replace(/_/g, ' ').toUpperCase();
   }
-// }
+}
