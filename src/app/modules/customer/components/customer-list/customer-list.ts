@@ -177,82 +177,170 @@ export class CustomerList implements OnInit {
     }
   }
 
+  // getColumn(): void {
+  //   this.column = [
+  //     {
+  //       field: 'avatar', headerName: 'Avatar', cellRenderer: ImageCellRendererComponent, width: 100, autoHeight: true, filter: false, sortable: false,
+  //     },
+  //     {
+  //       field: 'name', headerName: 'Name', sortable: true, filter: true, resizable: true, tooltipField: 'name',
+  //       cellStyle: {
+  //         'color': 'var(--theme-accent-primary)',
+  //         'font-weight': '600',
+  //         'cursor': 'pointer'
+  //       }
+  //     },
+  //     {
+  //       field: 'isActive',
+  //       headerName: 'Status',
+  //       sortable: true,
+  //       filter: true,
+  //       resizable: true,
+  //       valueFormatter: (params: any) => params.value ? 'Active' : 'Inactive',
+  //       cellStyle: (params: any) => {
+  //         return params.value
+  //           ? { backgroundColor: '#ccffcc', color: '#006400', fontWeight: 'bold' }
+  //           : { backgroundColor: '#ffcccc', color: '#8b0000', fontWeight: 'bold' };
+  //       },
+  //     },
+  //     {
+  //       field: 'email',
+  //       headerName: 'Email',
+  //       sortable: true,
+  //       filter: true,
+  //       resizable: true,
+  //       tooltipField: 'email',
+  //     },
+  //     {
+  //       field: 'phone',
+  //       headerName: 'Phone',
+  //       sortable: true,
+  //       filter: true,
+  //       resizable: true,
+  //       tooltipField: 'phone',
+  //     },
+  //     {
+  //       field: 'altPhone', headerName: 'Alt. Phone', sortable: true, filter: true, resizable: true, tooltipField: 'altPhone',
+  //     },
+  //     {
+  //       field: 'type', headerName: 'Type', sortable: true, filter: true, resizable: true,
+  //     },
+  //     {
+  //       field: 'contactPerson', headerName: 'Contact Person', sortable: true, filter: true, resizable: true, tooltipField: 'contactPerson',
+  //     },
+  //     {
+  //       field: 'outstandingBalance', headerName: 'Outstanding', sortable: true, filter: 'agNumberColumnFilter', resizable: true, valueFormatter: (params: any) => (typeof params.value === 'number') ? `₹ ${params.value.toFixed(2)}` : '₹ 0.00', cellStyle: (params: any) => { if (params.value > 0) { return { backgroundColor: '#ffe0b3', color: '#d35400', fontWeight: 'bold' }; } if (params.value === 0) { return { backgroundColor: '#ccffcc', color: '#006400', fontWeight: 'bold' }; } return {}; },
+  //     },
+  //     {
+  //       field: 'creditLimit', headerName: 'Credit Limit', sortable: true, filter: 'agNumberColumnFilter', resizable: true, valueFormatter: (params: any) => (typeof params.value === 'number') ? `₹ ${params.value.toFixed(2)}` : '₹ 0.00',
+  //     },
+  //     {
+  //       field: 'openingBalance', headerName: 'Opening Balance', sortable: true, filter: 'agNumberColumnFilter', resizable: true, valueFormatter: (params: any) => (typeof params.value === 'number') ? `₹ ${params.value.toFixed(2)}` : '₹ 0.00',
+  //     },
+  //     {
+  //       field: 'billingAddress.city', headerName: 'City', sortable: true, filter: true, resizable: true, valueGetter: (params: any) => params.data.billingAddress?.city,
+  //     },
+  //     {
+  //       field: 'billingAddress.state', headerName: 'State', sortable: true, filter: true, resizable: true, valueGetter: (params: any) => params.data.billingAddress?.state,
+  //     },
+  //     {
+  //       field: 'gstNumber', headerName: 'GST', sortable: true, filter: true, resizable: true, tooltipField: 'gstNumber',
+  //     },
+  //     {
+  //       field: 'tags', headerName: 'Tags', sortable: false, filter: true, resizable: true, valueFormatter: (params: any) => Array.isArray(params.value) ? params.value.join(', ') : '',
+  //     },
+  //     {
+  //       field: 'createdAt', headerName: 'Created On', sortable: true, filter: 'agDateColumnFilter', resizable: true, valueFormatter: (params: any) => params.value ? new Date(params.value).toLocaleString() : '',
+  //     },
+  //   ];
+    // this.cdr.detectChanges();
+  // }
   getColumn(): void {
-    this.column = [
-      {
-        field: 'avatar', headerName: 'Avatar', cellRenderer: ImageCellRendererComponent, width: 100, autoHeight: true, filter: false, sortable: false,
-      },
-      {
-        field: 'name', headerName: 'Name', sortable: true, filter: true, resizable: true, tooltipField: 'name',
-        cellStyle: {
-          'color': 'var(--theme-accent-primary)',
-          'font-weight': '600',
-          'cursor': 'pointer'
-        }
-      },
-      {
-        field: 'isActive',
-        headerName: 'Status',
-        sortable: true,
-        filter: true,
-        resizable: true,
-        valueFormatter: (params: any) => params.value ? 'Active' : 'Inactive',
-        cellStyle: (params: any) => {
-          return params.value
-            ? { backgroundColor: '#ccffcc', color: '#006400', fontWeight: 'bold' }
-            : { backgroundColor: '#ffcccc', color: '#8b0000', fontWeight: 'bold' };
+  this.column = [
+    {
+      headerName: 'Basic Info',
+      children: [
+        {
+          field: 'name',
+          headerName: 'Name',
+          pinned: 'left', // Keep name visible while scrolling
+          minWidth: 180,
+          flex: 1,
+          cellStyle: {
+            'color': 'var(--theme-accent-primary)',
+            'font-weight': '600',
+            'cursor': 'pointer'
+          }
         },
-      },
-      {
-        field: 'email',
-        headerName: 'Email',
-        sortable: true,
-        filter: true,
-        resizable: true,
-        tooltipField: 'email',
-      },
-      {
-        field: 'phone',
-        headerName: 'Phone',
-        sortable: true,
-        filter: true,
-        resizable: true,
-        tooltipField: 'phone',
-      },
-      {
-        field: 'altPhone', headerName: 'Alt. Phone', sortable: true, filter: true, resizable: true, tooltipField: 'altPhone',
-      },
-      {
-        field: 'type', headerName: 'Type', sortable: true, filter: true, resizable: true,
-      },
-      {
-        field: 'contactPerson', headerName: 'Contact Person', sortable: true, filter: true, resizable: true, tooltipField: 'contactPerson',
-      },
-      {
-        field: 'outstandingBalance', headerName: 'Outstanding', sortable: true, filter: 'agNumberColumnFilter', resizable: true, valueFormatter: (params: any) => (typeof params.value === 'number') ? `₹ ${params.value.toFixed(2)}` : '₹ 0.00', cellStyle: (params: any) => { if (params.value > 0) { return { backgroundColor: '#ffe0b3', color: '#d35400', fontWeight: 'bold' }; } if (params.value === 0) { return { backgroundColor: '#ccffcc', color: '#006400', fontWeight: 'bold' }; } return {}; },
-      },
-      {
-        field: 'creditLimit', headerName: 'Credit Limit', sortable: true, filter: 'agNumberColumnFilter', resizable: true, valueFormatter: (params: any) => (typeof params.value === 'number') ? `₹ ${params.value.toFixed(2)}` : '₹ 0.00',
-      },
-      {
-        field: 'openingBalance', headerName: 'Opening Balance', sortable: true, filter: 'agNumberColumnFilter', resizable: true, valueFormatter: (params: any) => (typeof params.value === 'number') ? `₹ ${params.value.toFixed(2)}` : '₹ 0.00',
-      },
-      {
-        field: 'billingAddress.city', headerName: 'City', sortable: true, filter: true, resizable: true, valueGetter: (params: any) => params.data.billingAddress?.city,
-      },
-      {
-        field: 'billingAddress.state', headerName: 'State', sortable: true, filter: true, resizable: true, valueGetter: (params: any) => params.data.billingAddress?.state,
-      },
-      {
-        field: 'gstNumber', headerName: 'GST', sortable: true, filter: true, resizable: true, tooltipField: 'gstNumber',
-      },
-      {
-        field: 'tags', headerName: 'Tags', sortable: false, filter: true, resizable: true, valueFormatter: (params: any) => Array.isArray(params.value) ? params.value.join(', ') : '',
-      },
-      {
-        field: 'createdAt', headerName: 'Created On', sortable: true, filter: 'agDateColumnFilter', resizable: true, valueFormatter: (params: any) => params.value ? new Date(params.value).toLocaleString() : '',
-      },
-    ];
-    this.cdr.detectChanges();
-  }
+        {
+          field: 'isActive',
+          headerName: 'Status',
+          width: 120,
+          cellRenderer: (params: any) => {
+            const status = params.value ? 'Active' : 'Inactive';
+            const color = params.value ? '#28a745' : '#dc3545';
+            const bgColor = params.value ? '#e6f4ea' : '#fce8e8';
+            return `<span style="padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; background-color: ${bgColor}; color: ${color};">${status}</span>`;
+          }
+        },
+      ]
+    },
+    {
+      headerName: 'Contact Details',
+      children: [
+        { field: 'email', headerName: 'Email', minWidth: 200, tooltipField: 'email' },
+        { field: 'phone', headerName: 'Phone', width: 130 },
+        { field: 'billingAddress.city', headerName: 'City', width: 120, valueGetter: (p: any) => p.data.billingAddress?.city },
+      ]
+    },
+    {
+      headerName: 'Financials',
+      children: [
+        {
+          field: 'outstandingBalance',
+          headerName: 'Outstanding',
+          width: 150,
+          type: 'numericColumn', // Aligns text to the right
+          valueFormatter: (params: any) => this.currencyFormatter(params.value),
+          cellStyle: (params: any) => {
+            if (params.value > 0) return { color: '#e67e22', fontWeight: 'bold' };
+            return { color: '#2ecc71' };
+          }
+        },
+        {
+          field: 'creditLimit',
+          headerName: 'Credit Limit',
+          width: 140,
+          type: 'numericColumn',
+          valueFormatter: (params: any) => this.currencyFormatter(params.value),
+        }
+      ]
+    },
+    {
+      headerName: 'System Info',
+      children: [
+        {
+          field: 'type',
+          headerName: 'Type',
+          width: 110,
+          valueFormatter: (p: any) => p.value ? p.value.toUpperCase() : ''
+        },
+        {
+          field: 'createdAt',
+          headerName: 'Created On',
+          width: 160,
+          valueFormatter: (params: any) => params.value ? new Date(params.value).toLocaleDateString() : '',
+          filter: 'agDateColumnFilter'
+        }
+      ]
+    }
+  ];
+  this.cdr.detectChanges();
+}
+
+// Helper for currency
+currencyFormatter(value: number) {
+  if (value === undefined || value === null) return '₹ 0.00';
+  return '₹ ' + value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
 }
