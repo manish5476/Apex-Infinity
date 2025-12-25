@@ -78,7 +78,7 @@ export class ItemTooltipComponent implements ITooltipAngularComp {
     ToastModule,
     DatePickerModule,
     AgShareGrid,
-    ItemTooltipComponent // Import the tooltip component here
+    // ItemTooltipComponent // Import the tooltip component here
   ],
   templateUrl: './invoice-list.html',
   styleUrl: './invoice-list.scss',
