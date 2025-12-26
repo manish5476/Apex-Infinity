@@ -1,290 +1,70 @@
-/* ==============================================
-   INVOICE DETAILS STYLE
-   Theme: Enterprise Glass / Canonical Tokens
-   ============================================== */
 
+/* Define primary colors matching your Tailwind theme if needed */
 :host {
-  display: block;
-  width: 100%;
-  height: 100%;
+  --primary-color: var(--primary-500); 
 }
 
-.page-container {
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  background: var(--bg-primary);
-  padding: 0; /* Full width */
-}
-
-/* === 1. HEADER (Sticky) === */
-.details-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-lg) var(--spacing-2xl);
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-primary);
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  backdrop-filter: blur(12px);
-  /* Added a subtle top accent to indicate "Active View" */
-  border-top: 4px solid var(--accent-primary); 
-
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-lg);
-
-    .back-btn {
-      color: var(--text-secondary);
-      &:hover { color: var(--text-primary); background: var(--bg-ternary); }
-    }
-
-    .title-group {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-
-      h1 {
-        margin: 0;
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        font-family: var(--font-heading);
-      }
-
-      .subtitle {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        font-size: 0.85rem;
-        color: var(--text-secondary);
-        
-        .separator { opacity: 0.3; }
-      }
-    }
-  }
-
-  .header-actions {
-    display: flex;
-    gap: 0.5rem;
-  }
-}
-
-/* === 2. LAYOUT === */
-.invoice-body {
-  padding: var(--spacing-2xl);
-  max-width: 1400px; /* Constrain content width for readability */
-  width: 100%;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2xl);
-
-  @media (max-width: 768px) {
-    padding: var(--spacing-lg);
-    gap: var(--spacing-lg);
-  }
-}
-
-/* === 3. INFO GRID (Billing/Shipping/Meta) === */
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--spacing-xl);
-
-  @media (max-width: 1024px) { grid-template-columns: 1fr 1fr; }
-  @media (max-width: 640px) { grid-template-columns: 1fr; }
-}
-
-.glass-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius-lg);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-  height: 100%; /* Equal height columns */
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-  &:hover {
-    box-shadow: var(--shadow-md);
-    border-color: color-mix(in srgb, var(--accent-primary) 30%, var(--border-primary));
-  }
-
-  .card-header {
-    padding: var(--spacing-md) var(--spacing-lg);
-    border-bottom: 1px solid var(--border-primary);
-    background: var(--bg-ternary);
-    /* Added left border to make headers pop */
-    border-left: 4px solid var(--accent-primary);
-    
-    h3 {
-      margin: 0; font-size: 0.9rem; font-weight: 700; 
-      color: var(--text-primary); /* Darker text for readability */
-      text-transform: uppercase; letter-spacing: 0.5px;
-      display: flex; align-items: center; gap: 0.5rem;
-      i { color: var(--accent-primary); }
-    }
-  }
-
-  .card-body {
-    padding: var(--spacing-lg);
-    display: flex; flex-direction: column; gap: 0.5rem;
-    
-    .name { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem; }
-    .text { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.5; }
-    .address { 
-      margin-top: 0.5rem; font-style: normal; color: var(--text-secondary); 
-      white-space: pre-line; line-height: 1.5;
-    }
-  }
-
-  /* Meta Grid inside card */
-  .meta-list {
-    display: flex; flex-direction: column;
-    .meta-item {
-      display: flex; justify-content: space-between; padding: 0.75rem 0;
-      border-bottom: 1px solid var(--border-secondary);
-      &:last-child { border-bottom: none; padding-bottom: 0; }
-      &:first-child { padding-top: 0; }
-      
-      label { font-size: 0.85rem; color: var(--text-secondary); }
-      span { font-weight: 600; color: var(--text-primary); }
-    }
-  }
-}
-
-/* === 4. ITEMS TABLE === */
-.items-section {
-  @extend .glass-card; /* Inherit base card styles */
-  
-  .table-header {
-    padding: var(--spacing-lg);
-    border-bottom: 1px solid var(--border-primary);
-    background: var(--bg-ternary);
-    border-left: 4px solid var(--accent-secondary, #3b82f6); /* Distinct color for items */
-
-    h3 { margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
-  }
-}
-
-/* === 5. FOOTER (Notes & Totals) === */
-.footer-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: var(--spacing-xl);
-
-  @media (max-width: 900px) { grid-template-columns: 1fr; }
-}
-
-.notes-box {
-  @extend .glass-card;
-  
-  .card-header {
-     border-left-color: var(--accent-ternary, #10b981); /* Greenish for notes */
-  }
-
-  .card-body p {
-    font-size: 0.95rem; color: var(--text-secondary); font-style: italic; line-height: 1.6;
-  }
-}
-
-.totals-box {
-  @extend .glass-card;
-  border-color: var(--border-primary);
-  
-  .card-header {
-    background: var(--bg-primary); /* Make totals header distinct */
-    border-left: none; /* No side accent for totals, keep it clean */
-    border-bottom: 1px solid var(--border-primary);
-    h3 { color: var(--text-primary); font-size: 1rem; }
-  }
-  
-  .card-body {
-    padding: 0; /* Reset padding for rows */
-  }
-
-  .total-row {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 0.75rem var(--spacing-lg);
-    border-bottom: 1px solid var(--border-secondary);
-    
-    label { font-size: 0.9rem; color: var(--text-secondary); font-weight: 500; }
-    span { font-size: 1rem; font-weight: 600; color: var(--text-primary); }
-
-    &.grand-total {
-      background: color-mix(in srgb, var(--accent-primary) 10%, transparent); /* Light accent background */
-      padding: 1rem var(--spacing-lg);
-      margin-top: -1px; /* Overlap border */
-      
-      label { font-size: 1.1rem; font-weight: 700; color: var(--accent-primary); }
-      span { font-size: 1.35rem; font-weight: 800; color: var(--accent-primary); }
-    }
-
-    &.balance {
-      padding: 1rem var(--spacing-lg);
-      background: #fff5f5; /* Light red background for dues */
-      
-      label { color: #c53030; font-weight: 700; }
-      span { color: #c53030; font-size: 1.2rem; font-weight: 800; }
-    }
-  }
-}
-
-/* === PRIME NG OVERRIDES === */
+/* Custom Table Overrides to remove PrimeNG bulk */
 :host ::ng-deep {
-  .p-datatable {
-    .p-datatable-header { background: transparent; border: none; }
-    
-    .p-datatable-thead > tr > th {
-      background: color-mix(in srgb, var(--bg-ternary) 50%, var(--bg-secondary));
-      color: var(--text-secondary);
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      font-weight: 700;
-      padding: var(--spacing-md) var(--spacing-lg);
-      border: none;
-      border-bottom: 2px solid var(--border-primary); /* Stronger separator */
-    }
-
-    .p-datatable-tbody > tr {
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-      transition: background-color 0.2s;
-      
-      td {
-        padding: var(--spacing-lg);
-        border-bottom: 1px solid var(--border-secondary);
-        vertical-align: middle;
-      }
-      
-      &:last-child td { border-bottom: none; }
-      &:hover { background-color: var(--bg-ternary) !important; }
-    }
+  .custom-table .p-datatable-thead > tr > th {
+    background: transparent !important;
+    border: none;
   }
   
-  .p-tag { font-weight: 600; letter-spacing: 0.5px; border-radius: 4px; }
-}
+  .custom-table .p-datatable-tbody > tr > td {
+    border: none;
+  }
 
-/* === UTILITIES === */
-.text-right { text-align: right; }
-.text-secondary { color: var(--text-secondary); }
-.font-bold { font-weight: 700; }
-
-/* Loading */
-.loading-container {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  height: 100vh; gap: 1rem; padding: 2rem;
+  /* Make tags look cleaner */
+  .p-tag {
+    font-weight: 600;
+    border-radius: 6px;
+  }
+  
+  /* Fix button icon spacing */
+  .p-button .p-button-icon-left {
+    margin-right: 0.5rem;
+  }
 }
 
 /* Animation */
-.animate-fadeIn { animation: fadeIn 0.4s ease-out; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-// /* ==============================================
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* PRINT STYLES - Crucial for Invoices */
+@media print {
+  .animate-fadeIn {
+    background: white;
+    padding: 0;
+  }
+  
+  /* Hide buttons, toasts, navigation */
+  header button, 
+  .p-button,
+  p-toast, 
+  p-confirmDialog {
+    display: none !important;
+  }
+
+  /* Expand container */
+  .max-w-5xl {
+    max-width: 100% !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Ensure background colors print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}// /* ==============================================
 //    INVOICE DETAILS STYLE
 //    Theme: Enterprise Glass / Canonical Tokens
 //    ============================================== */
@@ -317,6 +97,8 @@
 //   top: 0;
 //   z-index: 20;
 //   backdrop-filter: blur(12px);
+//   /* Added a subtle top accent to indicate "Active View" */
+//   border-top: 4px solid var(--accent-primary); 
 
 //   .header-left {
 //     display: flex;
@@ -392,15 +174,24 @@
 //   box-shadow: var(--shadow-sm);
 //   overflow: hidden;
 //   height: 100%; /* Equal height columns */
+//   transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+//   &:hover {
+//     box-shadow: var(--shadow-md);
+//     border-color: color-mix(in srgb, var(--accent-primary) 30%, var(--border-primary));
+//   }
 
 //   .card-header {
 //     padding: var(--spacing-md) var(--spacing-lg);
 //     border-bottom: 1px solid var(--border-primary);
 //     background: var(--bg-ternary);
+//     /* Added left border to make headers pop */
+//     border-left: 4px solid var(--accent-primary);
     
 //     h3 {
 //       margin: 0; font-size: 0.9rem; font-weight: 700; 
-//       color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;
+//       color: var(--text-primary); /* Darker text for readability */
+//       text-transform: uppercase; letter-spacing: 0.5px;
 //       display: flex; align-items: center; gap: 0.5rem;
 //       i { color: var(--accent-primary); }
 //     }
@@ -440,6 +231,9 @@
 //   .table-header {
 //     padding: var(--spacing-lg);
 //     border-bottom: 1px solid var(--border-primary);
+//     background: var(--bg-ternary);
+//     border-left: 4px solid var(--accent-secondary, #3b82f6); /* Distinct color for items */
+
 //     h3 { margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
 //   }
 // }
@@ -456,6 +250,10 @@
 // .notes-box {
 //   @extend .glass-card;
   
+//   .card-header {
+//      border-left-color: var(--accent-ternary, #10b981); /* Greenish for notes */
+//   }
+
 //   .card-body p {
 //     font-size: 0.95rem; color: var(--text-secondary); font-style: italic; line-height: 1.6;
 //   }
@@ -463,6 +261,14 @@
 
 // .totals-box {
 //   @extend .glass-card;
+//   border-color: var(--border-primary);
+  
+//   .card-header {
+//     background: var(--bg-primary); /* Make totals header distinct */
+//     border-left: none; /* No side accent for totals, keep it clean */
+//     border-bottom: 1px solid var(--border-primary);
+//     h3 { color: var(--text-primary); font-size: 1rem; }
+//   }
   
 //   .card-body {
 //     padding: 0; /* Reset padding for rows */
@@ -477,15 +283,20 @@
 //     span { font-size: 1rem; font-weight: 600; color: var(--text-primary); }
 
 //     &.grand-total {
-//       background: var(--bg-ternary);
-//       label { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
-//       span { font-size: 1.25rem; font-weight: 800; color: var(--accent-primary); }
+//       background: color-mix(in srgb, var(--accent-primary) 10%, transparent); /* Light accent background */
+//       padding: 1rem var(--spacing-lg);
+//       margin-top: -1px; /* Overlap border */
+      
+//       label { font-size: 1.1rem; font-weight: 700; color: var(--accent-primary); }
+//       span { font-size: 1.35rem; font-weight: 800; color: var(--accent-primary); }
 //     }
 
 //     &.balance {
 //       padding: 1rem var(--spacing-lg);
-//       label { color: var(--text-primary); }
-//       span { color: var(--color-error); font-size: 1.1rem; }
+//       background: #fff5f5; /* Light red background for dues */
+      
+//       label { color: #c53030; font-weight: 700; }
+//       span { color: #c53030; font-size: 1.2rem; font-weight: 800; }
 //     }
 //   }
 // }
@@ -496,19 +307,20 @@
 //     .p-datatable-header { background: transparent; border: none; }
     
 //     .p-datatable-thead > tr > th {
-//       background: var(--bg-ternary);
-//       color: var(--text-label);
+//       background: color-mix(in srgb, var(--bg-ternary) 50%, var(--bg-secondary));
+//       color: var(--text-secondary);
 //       font-size: 0.8rem;
 //       text-transform: uppercase;
 //       font-weight: 700;
 //       padding: var(--spacing-md) var(--spacing-lg);
 //       border: none;
-//       border-bottom: 1px solid var(--border-primary);
+//       border-bottom: 2px solid var(--border-primary); /* Stronger separator */
 //     }
 
 //     .p-datatable-tbody > tr {
 //       background: var(--bg-secondary);
 //       color: var(--text-primary);
+//       transition: background-color 0.2s;
       
 //       td {
 //         padding: var(--spacing-lg);
@@ -517,11 +329,11 @@
 //       }
       
 //       &:last-child td { border-bottom: none; }
-//       &:hover { background-color: var(--component-bg-hover) !important; }
+//       &:hover { background-color: var(--bg-ternary) !important; }
 //     }
 //   }
   
-//   .p-tag { font-weight: 600; letter-spacing: 0.5px; }
+//   .p-tag { font-weight: 600; letter-spacing: 0.5px; border-radius: 4px; }
 // }
 
 // /* === UTILITIES === */
@@ -538,3 +350,257 @@
 // /* Animation */
 // .animate-fadeIn { animation: fadeIn 0.4s ease-out; }
 // @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+// // /* ==============================================
+// //    INVOICE DETAILS STYLE
+// //    Theme: Enterprise Glass / Canonical Tokens
+// //    ============================================== */
+
+// // :host {
+// //   display: block;
+// //   width: 100%;
+// //   height: 100%;
+// // }
+
+// // .page-container {
+// //   width: 100%;
+// //   height: 100%;
+// //   overflow-y: auto;
+// //   display: flex;
+// //   flex-direction: column;
+// //   background: var(--bg-primary);
+// //   padding: 0; /* Full width */
+// // }
+
+// // /* === 1. HEADER (Sticky) === */
+// // .details-header {
+// //   display: flex;
+// //   justify-content: space-between;
+// //   align-items: center;
+// //   padding: var(--spacing-lg) var(--spacing-2xl);
+// //   background: var(--bg-secondary);
+// //   border-bottom: 1px solid var(--border-primary);
+// //   position: sticky;
+// //   top: 0;
+// //   z-index: 20;
+// //   backdrop-filter: blur(12px);
+
+// //   .header-left {
+// //     display: flex;
+// //     align-items: center;
+// //     gap: var(--spacing-lg);
+
+// //     .back-btn {
+// //       color: var(--text-secondary);
+// //       &:hover { color: var(--text-primary); background: var(--bg-ternary); }
+// //     }
+
+// //     .title-group {
+// //       display: flex;
+// //       flex-direction: column;
+// //       gap: 2px;
+
+// //       h1 {
+// //         margin: 0;
+// //         font-size: 1.5rem;
+// //         font-weight: 700;
+// //         color: var(--text-primary);
+// //         font-family: var(--font-heading);
+// //       }
+
+// //       .subtitle {
+// //         display: flex;
+// //         align-items: center;
+// //         gap: 0.75rem;
+// //         font-size: 0.85rem;
+// //         color: var(--text-secondary);
+        
+// //         .separator { opacity: 0.3; }
+// //       }
+// //     }
+// //   }
+
+// //   .header-actions {
+// //     display: flex;
+// //     gap: 0.5rem;
+// //   }
+// // }
+
+// // /* === 2. LAYOUT === */
+// // .invoice-body {
+// //   padding: var(--spacing-2xl);
+// //   max-width: 1400px; /* Constrain content width for readability */
+// //   width: 100%;
+// //   margin: 0 auto;
+// //   display: flex;
+// //   flex-direction: column;
+// //   gap: var(--spacing-2xl);
+
+// //   @media (max-width: 768px) {
+// //     padding: var(--spacing-lg);
+// //     gap: var(--spacing-lg);
+// //   }
+// // }
+
+// // /* === 3. INFO GRID (Billing/Shipping/Meta) === */
+// // .info-grid {
+// //   display: grid;
+// //   grid-template-columns: repeat(3, 1fr);
+// //   gap: var(--spacing-xl);
+
+// //   @media (max-width: 1024px) { grid-template-columns: 1fr 1fr; }
+// //   @media (max-width: 640px) { grid-template-columns: 1fr; }
+// // }
+
+// // .glass-card {
+// //   background: var(--bg-secondary);
+// //   border: 1px solid var(--border-primary);
+// //   border-radius: var(--ui-border-radius-lg);
+// //   box-shadow: var(--shadow-sm);
+// //   overflow: hidden;
+// //   height: 100%; /* Equal height columns */
+
+// //   .card-header {
+// //     padding: var(--spacing-md) var(--spacing-lg);
+// //     border-bottom: 1px solid var(--border-primary);
+// //     background: var(--bg-ternary);
+    
+// //     h3 {
+// //       margin: 0; font-size: 0.9rem; font-weight: 700; 
+// //       color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;
+// //       display: flex; align-items: center; gap: 0.5rem;
+// //       i { color: var(--accent-primary); }
+// //     }
+// //   }
+
+// //   .card-body {
+// //     padding: var(--spacing-lg);
+// //     display: flex; flex-direction: column; gap: 0.5rem;
+    
+// //     .name { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem; }
+// //     .text { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.5; }
+// //     .address { 
+// //       margin-top: 0.5rem; font-style: normal; color: var(--text-secondary); 
+// //       white-space: pre-line; line-height: 1.5;
+// //     }
+// //   }
+
+// //   /* Meta Grid inside card */
+// //   .meta-list {
+// //     display: flex; flex-direction: column;
+// //     .meta-item {
+// //       display: flex; justify-content: space-between; padding: 0.75rem 0;
+// //       border-bottom: 1px solid var(--border-secondary);
+// //       &:last-child { border-bottom: none; padding-bottom: 0; }
+// //       &:first-child { padding-top: 0; }
+      
+// //       label { font-size: 0.85rem; color: var(--text-secondary); }
+// //       span { font-weight: 600; color: var(--text-primary); }
+// //     }
+// //   }
+// // }
+
+// // /* === 4. ITEMS TABLE === */
+// // .items-section {
+// //   @extend .glass-card; /* Inherit base card styles */
+  
+// //   .table-header {
+// //     padding: var(--spacing-lg);
+// //     border-bottom: 1px solid var(--border-primary);
+// //     h3 { margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+// //   }
+// // }
+
+// // /* === 5. FOOTER (Notes & Totals) === */
+// // .footer-grid {
+// //   display: grid;
+// //   grid-template-columns: 2fr 1fr;
+// //   gap: var(--spacing-xl);
+
+// //   @media (max-width: 900px) { grid-template-columns: 1fr; }
+// // }
+
+// // .notes-box {
+// //   @extend .glass-card;
+  
+// //   .card-body p {
+// //     font-size: 0.95rem; color: var(--text-secondary); font-style: italic; line-height: 1.6;
+// //   }
+// // }
+
+// // .totals-box {
+// //   @extend .glass-card;
+  
+// //   .card-body {
+// //     padding: 0; /* Reset padding for rows */
+// //   }
+
+// //   .total-row {
+// //     display: flex; justify-content: space-between; align-items: center;
+// //     padding: 0.75rem var(--spacing-lg);
+// //     border-bottom: 1px solid var(--border-secondary);
+    
+// //     label { font-size: 0.9rem; color: var(--text-secondary); font-weight: 500; }
+// //     span { font-size: 1rem; font-weight: 600; color: var(--text-primary); }
+
+// //     &.grand-total {
+// //       background: var(--bg-ternary);
+// //       label { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+// //       span { font-size: 1.25rem; font-weight: 800; color: var(--accent-primary); }
+// //     }
+
+// //     &.balance {
+// //       padding: 1rem var(--spacing-lg);
+// //       label { color: var(--text-primary); }
+// //       span { color: var(--color-error); font-size: 1.1rem; }
+// //     }
+// //   }
+// // }
+
+// // /* === PRIME NG OVERRIDES === */
+// // :host ::ng-deep {
+// //   .p-datatable {
+// //     .p-datatable-header { background: transparent; border: none; }
+    
+// //     .p-datatable-thead > tr > th {
+// //       background: var(--bg-ternary);
+// //       color: var(--text-label);
+// //       font-size: 0.8rem;
+// //       text-transform: uppercase;
+// //       font-weight: 700;
+// //       padding: var(--spacing-md) var(--spacing-lg);
+// //       border: none;
+// //       border-bottom: 1px solid var(--border-primary);
+// //     }
+
+// //     .p-datatable-tbody > tr {
+// //       background: var(--bg-secondary);
+// //       color: var(--text-primary);
+      
+// //       td {
+// //         padding: var(--spacing-lg);
+// //         border-bottom: 1px solid var(--border-secondary);
+// //         vertical-align: middle;
+// //       }
+      
+// //       &:last-child td { border-bottom: none; }
+// //       &:hover { background-color: var(--component-bg-hover) !important; }
+// //     }
+// //   }
+  
+// //   .p-tag { font-weight: 600; letter-spacing: 0.5px; }
+// // }
+
+// // /* === UTILITIES === */
+// // .text-right { text-align: right; }
+// // .text-secondary { color: var(--text-secondary); }
+// // .font-bold { font-weight: 700; }
+
+// // /* Loading */
+// // .loading-container {
+// //   display: flex; flex-direction: column; align-items: center; justify-content: center;
+// //   height: 100vh; gap: 1rem; padding: 2rem;
+// // }
+
+// // /* Animation */
+// // .animate-fadeIn { animation: fadeIn 0.4s ease-out; }
+// // @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
