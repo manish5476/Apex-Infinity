@@ -1,6 +1,211 @@
 <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
 
+<div class="page-container animate-fadeIn">
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="skeleton-header">
+        <div class="left-group">
+          <p-skeleton shape="circle" size="3rem"></p-skeleton>
+          <div class="text-group">
+            <p-skeleton width="12rem" height="1.5rem"></p-skeleton>
+            <p-skeleton width="8rem" height="1rem"></p-skeleton>
+          </div>
+        </div>
+        <p-skeleton width="8rem" height="2.5rem"></p-skeleton>
+      </div>
+      <div class="skeleton-grid">
+        <p-skeleton height="8rem" styleClass="w-full"></p-skeleton>
+        <p-skeleton height="8rem" styleClass="w-full"></p-skeleton>
+        <p-skeleton height="8rem" styleClass="w-full"></p-skeleton>
+      </div>
+      <p-skeleton height="20rem" styleClass="w-full"></p-skeleton>
+    </div>
+  } @else if (invoice(); as inv) {
+
+    <header class="details-header">
+      <div class="header-left">
+        <button pButton icon="pi pi-arrow-left" class="p-button-text p-button-rounded back-btn" routerLink="/invoices"></button>
+        
+        <div class="title-group">
+          <div class="title-row">
+            <h1>Invoice #{{ inv.invoiceNumber }}</h1>
+            <p-tag [value]="inv.status" [severity]="common.mapStatusToSeverity(inv.status)"></p-tag>
+          </div>
+          <div class="meta-row">
+            <span class="label">Issued:</span>
+            <span class="value">{{ common.formatDate(inv.invoiceDate) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        @if (existingEmiId()) {
+          <p-button label="View EMI Plan" icon="pi pi-percentage" styleClass="p-button-outlined p-button-help btn-sm"
+            [routerLink]="['/emis', existingEmiId()]"></p-button>
+        } @else {
+          <p-button label="Create EMI" icon="pi pi-calculator" styleClass="p-button-outlined p-button-secondary btn-sm"
+            (onClick)="onCreateEmi()"></p-button>
+        }
+
+        <p-button icon="pi pi-send" label="Email" styleClass="p-button-text btn-sm" 
+          [loading]="isProcessing()" (onClick)="onEmail()"></p-button>
+        
+        <p-button icon="pi pi-download" label="PDF" styleClass="p-button-outlined btn-sm" 
+          [loading]="isProcessing()" (onClick)="onDownload()"></p-button>
+        
+        <p-button icon="pi pi-pencil" styleClass="p-button-outlined p-button-secondary btn-sm icon-only" 
+          [routerLink]="['/invoices', inv._id, 'edit']" pTooltip="Edit"></p-button>
+        
+        <p-button icon="pi pi-trash" styleClass="p-button-outlined p-button-danger btn-sm icon-only" 
+          (onClick)="onDelete()" pTooltip="Delete"></p-button>
+      </div>
+    </header>
+
+    <main class="invoice-body">
+      
+      <section class="info-grid">
+        
+        <div class="info-card">
+          <div class="card-header">
+            <i class="pi pi-user"></i>
+            <h3>Billed To</h3>
+          </div>
+          <div class="card-content">
+            <span class="customer-name">{{ inv.customerId?.name || 'Unknown Customer' }}</span>
+            <div class="contact-details">
+              <span>{{ inv.customerId?.email }}</span>
+              <span>{{ inv.customerId?.phone }}</span>
+            </div>
+            <p class="address">{{ inv.billingAddress || 'No billing address provided.' }}</p>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="card-header">
+            <i class="pi pi-truck"></i>
+            <h3>Shipped To</h3>
+          </div>
+          <div class="card-content">
+            <span class="customer-name">{{ inv.customerId?.name }}</span>
+            <p class="address">{{ inv.shippingAddress || inv.billingAddress || 'Same as billing address.' }}</p>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="card-header">
+            <i class="pi pi-info-circle"></i>
+            <h3>Payment Details</h3>
+          </div>
+          <div class="meta-list">
+            <div class="meta-item">
+              <label>Due Date</label>
+              <span>{{ common.formatDate(inv.dueDate) }}</span>
+            </div>
+            <div class="meta-item">
+              <label>Payment Status</label>
+              <p-tag [value]="inv.paymentStatus" [severity]="common.mapStatusToSeverity(inv.paymentStatus)"></p-tag>
+            </div>
+            <div class="meta-item highlight">
+              <label>Amount Paid</label>
+              <span class="success-text">{{ common.formatCurrency(inv.paidAmount) }}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="items-container">
+        <p-table [value]="inv.items || []" styleClass="compact-table" responsiveLayout="scroll">
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 40%">Item Description</th>
+              <th class="text-right">Qty</th>
+              <th class="text-right">Price</th>
+              <th class="text-right">Disc.</th>
+              <th class="text-right">Tax</th>
+              <th class="text-right">Total</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item>
+            <tr>
+              <td>
+                <div class="item-name">{{ item.name }}</div>
+                @if(item.hsnCode) { <span class="item-hsn">HSN: {{ item.hsnCode }}</span> }
+              </td>
+              <td class="text-right">
+                {{ item.quantity }} <span class="unit">{{ item.unit }}</span>
+              </td>
+              <td class="text-right">{{ common.formatCurrency(item.price) }}</td>
+              <td class="text-right discount-text">-{{ common.formatCurrency(item.discount) }}</td>
+              <td class="text-right text-muted">{{ item.taxRate }}%</td>
+              <td class="text-right font-medium">{{ common.formatCurrency(item.totalAmount) }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </section>
+
+      <section class="footer-summary">
+        
+        <div class="notes-panel">
+          <label class="section-label">Notes & Terms</label>
+          <div class="notes-content">
+            {{ inv.notes || 'No additional notes provided.' }}
+          </div>
+
+          @if(inv.attachedFiles?.length > 0) {
+            <div class="attachments-area">
+              <label class="section-label">Attachments</label>
+              <div class="file-list">
+                <div *ngFor="let file of inv.attachedFiles" class="file-chip">
+                  <i class="pi pi-file"></i>
+                  <span>Attachment</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="totals-panel">
+          <div class="calc-row">
+            <label>Subtotal</label>
+            <span>{{ common.formatCurrency(inv.subTotal) }}</span>
+          </div>
+          <div class="calc-row">
+            <label>Discount</label>
+            <span class="discount-text">- {{ common.formatCurrency(inv.totalDiscount) }}</span>
+          </div>
+          <div class="calc-row">
+            <label>Tax</label>
+            <span>+ {{ common.formatCurrency(inv.totalTax) }}</span>
+          </div>
+          @if (inv.roundOff) {
+            <div class="calc-row">
+              <label>Round Off</label>
+              <span>{{ common.formatCurrency(inv.roundOff) }}</span>
+            </div>
+          }
+          
+          <div class="divider"></div>
+          
+          <div class="calc-row grand-total">
+            <label>Grand Total</label>
+            <span>{{ common.formatCurrency(inv.grandTotal) }}</span>
+          </div>
+
+          <div class="balance-badge">
+            <label>Balance Due</label>
+            <span>{{ common.formatCurrency(inv.balanceAmount) }}</span>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  }
+</div>
+<!-- <p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
 <div class="w-full min-h-screen bg-gray-50/50 flex flex-col items-center p-6 animate-fadeIn">
 
   @if (isLoading()) {
@@ -203,4 +408,4 @@
 
     </div>
   }
-</div>
+</div> -->
