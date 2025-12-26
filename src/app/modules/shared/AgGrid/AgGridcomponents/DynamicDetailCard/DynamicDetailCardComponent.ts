@@ -172,7 +172,7 @@ import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
         </div>
       }
       @else if (prop.type === 'status') {
-        <p-tag [value]="prop.value" [severity]="getStatusSeverity(prop.value)"></p-tag>
+        <p-tag [value]="prop.value" ></p-tag>
       }
       @else if (prop.type === 'boolean') {
         <span class="bool-pill" [class.true]="prop.value" [class.false]="!prop.value">
