@@ -1,39 +1,65 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { TooltipModule } from 'primeng/tooltip'; // Required for pTooltip
+import { DialogService } from 'primeng/dynamicdialog';
 import { ICellRendererAngularComp } from 'ag-grid-angular';
 import { ICellRendererParams } from 'ag-grid-community';
-import { DialogService } from 'primeng/dynamicdialog';
-import { DynamicDetailTableComponent } from './dynamic-detail-table.component'; // Ensure correct path
+// Update this path to match your actual file structure
+import { DynamicDetailTableComponent } from './dynamic-detail-table.component'; 
 
 @Component({
   standalone: true,
+  // ✅ FIX: Import TooltipModule so pTooltip works
+  imports: [CommonModule, TooltipModule], 
+  providers: [DialogService],
   template: `
-    <button class="action-btn" (click)="viewDetails()" pTooltip="View Full Details" tooltipPosition="left">
+    <button class="action-btn" (click)="viewDetails()" 
+            pTooltip="Expand Details" tooltipPosition="left" [showDelay]="300">
       <i class="pi pi-expand"></i>
     </button>
   `,
   styles: [`
+    :host {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
+
     .action-btn {
-      width: 28px;
-      height: 28px;
-      border-radius: var(--ui-border-radius);
-      border: 1px solid var(--border-secondary);
-      background: var(--bg-ternary);
-      color: var(--text-secondary);
+      width: 32px;
+      height: 32px;
+      border-radius: var(--ui-border-radius, 6px);
+      border: 1px solid var(--border-secondary, #e2e8f0);
+      background: var(--bg-secondary, #ffffff);
+      color: var(--text-secondary, #64748b);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: var(--transition-fast);
+      transition: all 0.2s ease;
+      
+      /* Subtle Shadow */
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
+
     .action-btn:hover {
-      background: var(--accent-primary);
-      color: white;
-      border-color: var(--accent-primary);
-      box-shadow: var(--shadow-sm);
+      background: var(--accent-primary, #3b82f6);
+      color: #ffffff;
+      border-color: var(--accent-primary, #3b82f6);
+      box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+      transform: translateY(-1px);
     }
-    .action-btn i { font-size: 0.8rem; }
-  `],
-  providers: [DialogService]
+
+    .action-btn:active {
+      transform: translateY(0);
+    }
+
+    .action-btn i {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+  `]
 })
 export class ActionViewRenderer implements ICellRendererAngularComp {
   params!: ICellRendererParams;
@@ -49,13 +75,14 @@ export class ActionViewRenderer implements ICellRendererAngularComp {
   viewDetails() {
     this.dialogService.open(DynamicDetailTableComponent, {
       data: this.params.data,
-      header: 'Record Details', // PrimeNG header (optional, we use custom inside)
-      width: '90vw',           // Much wider
-      height: '92vh',          // Much taller
+      header: 'Record Details',
+      width: '90vw',           // Big Width
+      height: '92vh',          // Big Height
       maximizable: true,
       closeOnEscape: true,
+      dismissableMask: true,   // Click outside to close
       baseZIndex: 10000,
-      styleClass: 'dynamic-detail-dialog', // Add global CSS if needed to remove default padding
+      styleClass: 'dynamic-detail-dialog', // Global class for padding overrides
       contentStyle: { padding: '0', overflow: 'hidden' } // Remove default padding
     });
   }
