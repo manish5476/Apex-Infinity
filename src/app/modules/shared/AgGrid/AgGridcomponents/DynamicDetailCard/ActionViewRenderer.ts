@@ -5,8 +5,7 @@ import { DialogService } from 'primeng/dynamicdialog';
 import { ICellRendererAngularComp } from 'ag-grid-angular';
 import { ICellRendererParams } from 'ag-grid-community';
 // Update this path to match your actual file structure
-import { DynamicDetailTableComponent } from './dynamic-detail-table.component'; 
-
+import { DynamicDetailTableComponent } from './DynamicDetailCardComponent';
 @Component({
   standalone: true,
   // ✅ FIX: Import TooltipModule so pTooltip works
