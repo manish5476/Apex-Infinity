@@ -45,9 +45,11 @@
         <div class="identity-group">
           <div class="name-row">
             <h1>{{ p.name }}</h1>
-            <p-tag [value]="p.isActive ? 'Active' : 'Inactive'" [severity]="p.isActive ? 'success' : 'secondary'" styleClass="status-tag"></p-tag>
+            <!-- [severity]="p.isActive ? 'success' : 'secondary'" -->
+            <p-tag [value]="p.isActive ? 'Active' : 'Inactive'"  styleClass="status-tag"></p-tag>
             @if(p.totalStock < 10 && p.isActive) {
-              <p-tag value="Low Stock" severity="warning" icon="pi pi-exclamation-triangle"></p-tag>
+              <!-- severity="warning" -->
+              <p-tag value="Low Stock"  icon="pi pi-exclamation-triangle"></p-tag>
             }
           </div>
           <div class="meta-row">
