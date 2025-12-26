@@ -19,52 +19,7 @@ import { AppMessageService } from '../../../../core/services/message.service';
 import { InvoiceService } from '../../services/invoice-service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
 import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
-
-// -------------------------------------------------------------------------
-// 1. Tooltip Component (Helper for hovering over products)
-// -------------------------------------------------------------------------
-@Component({
-  selector: 'item-tooltip',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
-    <div class="custom-tooltip-card">
-      <div class="tooltip-header">Invoice Items</div>
-      <div class="tooltip-list">
-        <div *ngFor="let item of items" class="tooltip-item">
-          <span class="item-name">{{ item.name }}</span>
-          <span class="item-details">Qty: {{ item.quantity }} | {{ formatCurrency(item.price) }}</span>
-        </div>
-        <div *ngIf="items.length === 0" class="tooltip-item">No items found</div>
-      </div>
-      <div class="tooltip-footer">Grand Total: {{ formatCurrency(params.data.grandTotal) }}</div>
-    </div>
-  `,
-  styles: [`
-    .custom-tooltip-card {
-      background: white; border: 1px solid #ddd; border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 12px; width: 250px; pointer-events: none; z-index: 9999;
-    }
-    .tooltip-header { font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 8px; color: #333; }
-    .tooltip-item { margin-bottom: 6px; display: flex; flex-direction: column; }
-    .item-name { font-size: 13px; font-weight: 500; color: #1a73e8; }
-    .item-details { font-size: 11px; color: #666; }
-    .tooltip-footer { margin-top: 8px; border-top: 1px dashed #ccc; padding-top: 5px; font-weight: bold; font-size: 12px; text-align: right; }
-  `]
-})
-export class ItemTooltipComponent implements ITooltipAngularComp {
-  params!: ITooltipParams;
-  items: any[] = [];
-
-  agInit(params: ITooltipParams): void {
-    this.params = params;
-    this.items = params.data.items || [];
-  }
-
-  formatCurrency(value: number) {
-    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(value || 0);
-  }
-}
+import { ActionViewRenderer } from '../../../shared/AgGrid/AgGridcomponents/DynamicDetailCard/ActionViewRenderer';
 
 // -------------------------------------------------------------------------
 // 2. Main Invoice List Component
@@ -238,9 +193,13 @@ export class InvoiceListComponent implements OnInit {
   }
 
   eventFromGrid(event: any) {
+    console.log(event);
     if (event.type === 'cellClicked') {
+
       const invoiceId = event.row._id;
-      if (invoiceId) {
+      if(event.field==='_id'){
+        
+      }else{
         this.router.navigate([invoiceId], { relativeTo: this.route });
       }
     } 
@@ -263,19 +222,25 @@ export class InvoiceListComponent implements OnInit {
             // Removed 'agGroupCellRenderer' to fix Community Edition Error
           },
           {
-            field: 'items',
-            headerName: 'Products',
-            width: 220,
-            tooltipField: 'items',
-            tooltipComponent: ItemTooltipComponent, // Works in Community
-            valueGetter: (params: any) => {
-              const items = params.data.items || [];
-              if (items.length === 0) return 'No items';
-              return items.length === 1 
-                ? items[0].name 
-                : `${items[0].name} (+${items.length - 1} more)`;
-            },
-          }
+  headerName: 'Actions',
+  field: '_id',
+  width: 150,
+  cellRenderer: ActionViewRenderer, // Reference the renderer here
+}
+          // {
+          //   field: 'items',
+          //   headerName: 'Products',
+          //   width: 220,
+          //   tooltipField: 'items',
+          //   tooltipComponent: ItemTooltipComponent, // Works in Community
+          //   valueGetter: (params: any) => {
+          //     const items = params.data.items || [];
+          //     if (items.length === 0) return 'No items';
+          //     return items.length === 1 
+          //       ? items[0].name 
+          //       : `${items[0].name} (+${items.length - 1} more)`;
+          //   },
+          // }
         ]
       },
       {
@@ -348,6 +313,7 @@ export class InvoiceListComponent implements OnInit {
     return `<span style="background:${theme.bg}; color:${theme.text}; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">${val}</span>`;
   }
 }
+
 // import { ChangeDetectorRef, Component, OnInit, effect, inject, signal } from '@angular/core';
 // import { CommonModule } from '@angular/common';
 // import { GridApi, GridReadyEvent, ITooltipParams } from 'ag-grid-community';
