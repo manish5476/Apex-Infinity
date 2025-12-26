@@ -27,8 +27,8 @@ import { ImageViewerDirective } from '../../../shared/directives/image-viewer.di
     SkeletonModule, TableModule, CarouselModule, TooltipModule,
     ImageViewerDirective
   ],
-  templateUrl: './product-details.component.html',
-  styleUrls: ['./product-details.component.scss'],
+  templateUrl: './product-details.html',
+  styleUrls: ['./product-details.scss'],
 })
 export class ProductDetailsComponent implements OnInit {
   private route = inject(ActivatedRoute);
@@ -100,7 +100,7 @@ export class ProductDetailsComponent implements OnInit {
   // --- Actions ---
 
   openStockAdjustment() {
-    this.messageService.showInfoGrowlMessage('Stock adjustment module coming soon');
+    // this.messageService.showInfoGrowlMessage('Stock adjustment module coming soon');
   }
 
   onFileSelected(event: any) {
