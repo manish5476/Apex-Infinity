@@ -164,6 +164,18 @@ $active-border-width: 3px;
   justify-content: center;
   align-items: center;
   margin-right: 0.75rem;
+}.menu-title {
+  padding: 0.5rem 0.75rem; // Tighter vertical spacing
+  font-size: 0.85rem;      // ERP Standard size
+  
+  .menu-icon {
+    font-size: 1rem;       // Smaller icons
+  }
+}
+
+.submenu-link {
+  padding: 0.4rem 1rem;    // Very tight for sub-items
+  font-size: 0.8rem;
 }
 // /* ========================
 //   SIDEBAR (REFACTORED DESIGN)
