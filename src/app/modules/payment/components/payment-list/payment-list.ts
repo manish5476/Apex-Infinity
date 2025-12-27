@@ -14,6 +14,7 @@ import { MasterListService } from '../../../../core/services/master-list.service
 import { AppMessageService } from '../../../../core/services/message.service';
 import { PaymentService } from '../../services/payment-service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
+import { ActionViewRenderer } from '../../../shared/AgGrid/AgGridcomponents/DynamicDetailCard/ActionViewRenderer';
 
 @Component({
   selector: 'app-payment-list',
@@ -168,6 +169,12 @@ export class PaymentListComponent implements OnInit {
 
   getColumn(): void {
     this.column = [
+      {
+        headerName: 'Actions',
+        field: '_id',
+        width: 150,
+        cellRenderer: ActionViewRenderer, 
+      },
       {
         field: 'type',
         headerName: 'Type',

@@ -1,253 +1,254 @@
-/* ==============================================
-   BRANCH DETAILS COMPONENT
-   - Re-using customer-details.scss styles
-   ============================================== */
+/* =========================================================
+   BRANCH DETAILS STYLES (Token-Based)
+   ========================================================= */
 
 :host {
   display: block;
-  width: 100%;
   height: 100%;
+  width: 100%;
 }
 
-.customer-page-container {
-  width: 100%;
+.page-container {
   height: 100%;
-  overflow: hidden; // Prevents whole page scroll
+  width: 100%;
+  background-color: var(--bg-primary);
   display: flex;
   flex-direction: column;
-  background: var(--bg-primary);
-}
+  overflow-y: auto;
+  padding: var(--spacing-xl);
+  gap: var(--spacing-xl);
 
-/* === Card Layout === */
-.customer-details-card {
-  display: flex;
-  flex-direction: column;
-  flex: 1; // Grow to fill container
-  background: var(--bg-primary);
-  border-radius: var(--ui-border-radius-lg);
-  box-shadow: var(--shadow-md);
-  overflow: hidden; // Important for body scrolling
-  margin: var(--spacing-xl); // Add some margin
+  @media (max-width: 768px) { padding: var(--spacing-md); gap: var(--spacing-lg); }
 }
 
 /* === HEADER === */
-.details-header {
+.dashboard-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-lg) var(--spacing-xl);
-  background: var(--bg-secondary);
-  border-bottom: var(--ui-border-width) solid var(--border-primary);
-  flex-shrink: 0; // Prevent header from shrinking
+  align-items: flex-start;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
 
   .header-left {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-lg);
+    display: flex; gap: var(--spacing-md); align-items: flex-start;
+    flex: 1; min-width: 0;
 
-    .header-info {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-md);
-      .form-title {
-        font-size: var(--font-size-2xl); // Larger title
-        font-weight: 600;
-        color: var(--text-primary);
-        margin: 0; // Remove default margin
+    .back-btn {
+      color: var(--text-secondary); margin-top: 6px; flex-shrink: 0;
+      &:hover { background: var(--bg-ternary); color: var(--text-primary); }
+    }
+
+    .identity-group {
+      display: flex; flex-direction: column; gap: 4px; min-width: 0;
+
+      .name-row {
+        display: flex; align-items: center; gap: var(--spacing-md); flex-wrap: wrap;
+        h1 {
+          font-family: var(--font-heading);
+          font-size: var(--font-size-2xl);
+          font-weight: var(--font-weight-bold);
+          color: var(--text-primary);
+          margin: 0;
+          line-height: 1.2;
+        }
+      }
+
+      .meta-row {
+        display: flex; align-items: center; gap: var(--spacing-sm); flex-wrap: wrap;
+        
+        .id-badge {
+          font-family: var(--font-mono);
+          font-size: var(--font-size-xs);
+          color: var(--text-secondary);
+          background: var(--bg-ternary);
+          padding: 2px 8px;
+          border-radius: 4px;
+          border: 1px solid var(--border-secondary);
+        }
+
+        .category-badge {
+          font-size: 10px; font-weight: 700; text-transform: uppercase;
+          color: var(--text-tertiary); background: var(--bg-ternary);
+          padding: 2px 6px; border-radius: 4px; letter-spacing: 0.5px;
+        }
       }
     }
   }
 
   .header-actions {
-    display: flex;
-    gap: var(--spacing-sm);
+    display: flex; gap: var(--spacing-sm);
+    ::ng-deep .p-button.btn-sm { padding: var(--spacing-xs) var(--spacing-md); font-size: var(--font-size-sm); }
   }
 }
 
-/* === BODY === */
-.details-body {
-  display: flex;
+/* === LAYOUT GRID === */
+.layout-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
   gap: var(--spacing-xl);
-  padding: var(--spacing-xl);
-  overflow-y: auto; // Allow this section to scroll
-  flex: 1; // Grow to fill space
-  background-color: var(--bg-primary);
-  
+  align-items: start;
+
   @media (max-width: 1024px) {
-    flex-direction: column;
+    display: flex; flex-direction: column; gap: var(--spacing-lg);
   }
 }
 
 /* === SIDEBAR === */
-.profile-sidebar {
-  width: 24%;
-  min-width: 250px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: var(--bg-secondary);
-  border-radius: var(--ui-border-radius-lg);
-  padding: var(--spacing-xl);
-  border: var(--ui-border-width) solid var(--border-primary);
-  box-shadow: var(--shadow-sm);
-  align-self: flex-start; // Stick to top
-  gap: var(--spacing-md);
-  
+.sidebar-column {
+  display: flex; flex-direction: column; gap: var(--spacing-lg);
+
+  @media (min-width: 1025px) {
+    position: sticky; top: 0; z-index: 10;
+  }
   @media (max-width: 1024px) {
-    width: 100%; // Go full width on mobile
+    position: static !important; width: 100%; height: auto;
+  }
+}
+
+/* Profile Card */
+.profile-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--ui-border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+
+  .card-banner {
+    height: 100px;
+    background: linear-gradient(135deg, var(--bg-ternary), var(--bg-secondary));
+    border-bottom: 1px solid var(--border-secondary);
   }
 
-  :host ::ng-deep .profile-avatar {
-    width: 80px;
-    height: 80px;
-    font-size: var(--font-size-4xl);
-    background: var(--accent-primary);
-    color: #fff; // Fixed: Use white for text on accent bg
-  }
-
-  .profile-name {
-    font-size: var(--font-size-xl);
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0;
+  .profile-content {
+    padding: 0 var(--spacing-lg) var(--spacing-xl);
+    margin-top: -50px;
     text-align: center;
+    display: flex; flex-direction: column; align-items: center;
+
+    .avatar-wrapper {
+      position: relative; margin-bottom: var(--spacing-md);
+      
+      ::ng-deep .user-avatar {
+        background: var(--accent-primary);
+        border: 4px solid var(--bg-secondary);
+        width: 100px; height: 100px;
+        font-size: 3rem; color: #fff;
+      }
+
+      .status-dot {
+        position: absolute; bottom: 8px; right: 8px;
+        width: 16px; height: 16px; border-radius: 50%;
+        background: var(--color-disabled); border: 3px solid var(--bg-secondary);
+        &.active { background: var(--color-success); }
+      }
+    }
+
+    .contact-name {
+      margin: 0 0 4px 0; font-size: var(--font-size-lg); font-weight: 700; color: var(--text-primary);
+    }
+    .contact-email { font-size: var(--font-size-sm); color: var(--text-secondary); }
+
+    .info-list {
+      margin-top: var(--spacing-xl); width: 100%; display: flex; flex-direction: column; gap: var(--spacing-md);
+
+      .info-item {
+        display: flex; align-items: center; gap: var(--spacing-md);
+        padding: var(--spacing-md); background: var(--bg-ternary);
+        border-radius: var(--ui-border-radius); text-align: left;
+
+        .icon-box {
+          width: 32px; height: 32px; background: var(--bg-secondary);
+          border-radius: 50%; display: flex; align-items: center; justify-content: center;
+          color: var(--text-tertiary); border: 1px solid var(--border-secondary); flex-shrink: 0;
+        }
+
+        .info-text {
+          display: flex; flex-direction: column;
+          label { font-size: 10px; text-transform: uppercase; font-weight: 700; color: var(--text-tertiary); }
+          span, a { font-size: var(--font-size-sm); color: var(--text-primary); font-weight: 500; }
+        }
+      }
+    }
+  }
+}
+
+/* Glass Card Utility */
+.glass-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--ui-border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+
+  .card-header {
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--bg-ternary);
+    border-bottom: 1px solid var(--border-secondary);
+    display: flex; align-items: center; gap: var(--spacing-md);
+    color: var(--text-secondary); font-size: var(--font-size-sm); text-transform: uppercase; font-weight: 700;
+    i { color: var(--accent-primary); }
+  }
+  .card-body { padding: var(--spacing-lg); }
+}
+
+.meta-row {
+  display: flex; justify-content: space-between; font-size: var(--font-size-sm);
+  padding: 4px 0; border-bottom: 1px solid var(--border-secondary);
+  &:last-child { border-bottom: none; }
+  label { color: var(--text-secondary); }
+  span { color: var(--text-primary); font-weight: 500; }
+}
+
+/* === MAIN COLUMN === */
+.main-column {
+  display: flex; flex-direction: column; gap: var(--spacing-xl);
+  min-width: 0;
+}
+
+/* Address Styling */
+.address-panel {
+  .full-address-box {
+    background: var(--bg-primary); padding: var(--spacing-lg);
+    border-radius: var(--ui-border-radius); border: 1px solid var(--border-primary);
+    margin-bottom: var(--spacing-lg);
+    label { font-size: 10px; text-transform: uppercase; font-weight: 700; color: var(--text-tertiary); display: block; margin-bottom: 4px; }
+    p { font-size: var(--font-size-base); color: var(--text-primary); line-height: 1.6; margin: 0; }
   }
 
-  .profile-type {
+  .address-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--spacing-lg);
+    
+    .grid-item {
+      display: flex; flex-direction: column; gap: 4px;
+      label { font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--text-tertiary); }
+      span { font-size: var(--font-size-sm); color: var(--text-primary); font-weight: 600; }
+    }
+  }
+}
+
+.org-panel {
+  .info-row {
+    display: flex; justify-content: space-between; padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--border-secondary);
     font-size: var(--font-size-sm);
-    color: var(--text-secondary);
-    text-align: center;
-  }
-
-  .profile-contact {
-    width: 100%;
-    margin-top: var(--spacing-lg);
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-md);
-
-    .contact-card {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-lg);
-      background: var(--bg-primary); // Use primary bg
-      border: var(--ui-border-width) solid var(--border-primary);
-      border-radius: var(--ui-border-radius);
-      padding: var(--spacing-md) var(--spacing-lg);
-      transition: var(--transition-fast);
-
-      &:hover {
-        background: var(--bg-ternary);
-        transform: translateY(-2px);
-        border-color: var(--border-secondary);
-      }
-
-      .contact-icon {
-        color: var(--accent-primary);
-        font-size: 1rem;
-      }
-
-      .contact-content {
-        display: flex;
-        flex-direction: column;
-        overflow: hidden; // For text truncation
-        label {
-          font-size: var(--font-size-xs);
-          color: var(--text-label);
-          text-transform: uppercase;
-        }
-        span {
-          font-size: var(--font-size-sm);
-          font-weight: 500;
-          color: var(--text-primary);
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-      }
-    }
+    &:last-child { border-bottom: none; }
+    
+    label { color: var(--text-secondary); }
+    span { font-weight: 500; color: var(--text-primary); }
+    span.highlight { color: var(--accent-primary); font-weight: 700; }
   }
 }
 
-/* === MAIN DETAILS === */
-.main-details {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xl);
-  min-width: 0; // Prevent flex overflow
-
-  .info-section {
-    background: var(--bg-secondary);
-    border: var(--ui-border-width) solid var(--border-primary);
-    border-radius: var(--ui-border-radius-lg);
-    padding: var(--spacing-xl);
-
-    .section-title {
-      font-size: var(--font-size-lg);
-      font-weight: 600;
-      color: var(--text-primary);
-      margin: 0 0 var(--spacing-lg) 0;
-      border-left: 4px solid var(--accent-primary);
-      padding-left: var(--spacing-md);
-    }
-    
-    .info-card {
-      background: var(--bg-primary);
-      border-radius: var(--ui-border-radius);
-      padding: var(--spacing-md) var(--spacing-lg);
-      border: var(--ui-border-width) solid var(--border-primary);
-      display: flex;
-      flex-direction: column;
-      gap: var(--spacing-xs);
-
-      label {
-        font-size: var(--font-size-xs);
-        color: var(--text-label);
-        text-transform: uppercase;
-        font-weight: 500;
-      }
-
-      span {
-        font-weight: 600;
-        font-size: var(--font-size-md);
-        color: var(--text-primary);
-      }
-    }
-    
-    .address-full {
-      background: var(--bg-primary);
-      border-radius: var(--ui-border-radius);
-      padding: var(--spacing-lg);
-      border: var(--ui-border-width) solid var(--border-primary);
-      margin-bottom: var(--spacing-lg);
-      
-      label {
-        font-size: var(--font-size-xs);
-        color: var(--text-label);
-        text-transform: uppercase;
-        font-weight: 500;
-      }
-      
-      p {
-        font-size: var(--font-size-sm);
-        color: var(--text-secondary);
-        margin: var(--spacing-xs) 0 0 0;
-        line-height: var(--line-height-relaxed);
-      }
-    }
-
-    .address-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: var(--spacing-lg);
-    }
-  }
+/* === LOADING & ERROR === */
+.loading-state {
+  display: flex; flex-direction: column; gap: var(--spacing-xl);
+  .skeleton-header { margin-bottom: var(--spacing-lg); }
+  .skeleton-sidebar { width: 320px; flex-shrink: 0; }
+  .skeleton-main { flex: 1; display: flex; flex-direction: column; gap: var(--spacing-lg); }
 }
 
-/* === UTILITY === */
-:host ::ng-deep .p-button.p-button-rounded {
-  border-radius: 50%;
-  width: 2.5rem;  // Standard PrimeNG size
-  height: 2.5rem;
+.error-state {
+  height: 60vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--spacing-md); color: var(--text-secondary);
+  .error-icon { font-size: 3rem; color: var(--color-error); background: rgba(239,68,68,0.1); padding: 1rem; border-radius: 50%; }
 }

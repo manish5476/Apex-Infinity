@@ -1,44 +1,37 @@
-<div class="layout-container">
+<div class="layout-container" 
+     [class.sidebar-expanded]="layout.isExpanded()"
+     [class.is-mobile]="layout.isMobile()">
   
-  <!-- 
-    The header component is now 'app-mainscreen-header' 
-    based on the .ts file you provided for it.
-  -->
-  <app-mainscreen-header 
-    (toggleSidebar)="toggleSidebar()" 
-    (mobileMenuToggle)="toggleMobileMenu()">
-  </app-mainscreen-header>
+  <app-mainscreen-header />
 
   <div class="main-content-area">
-    
-    <!-- 
-      The sidebar component is 'app-mainscreen-sidebar' 
-      based on the .ts file you provided for it.
-    -->
-    <app-mainscreen-sidebar 
-      [isPinned]="isSidebarPinned" 
-      [isHovered]="isSidebarHovered" 
-      (pinToggle)="togglePin()"
-      (mouseEnter)="onMouseEnter()" 
-      (mouseEnterTriggerZone)="onMouseEnterTriggerZone()" 
-      (mouseLeave)="onMouseLeave()">
-    </app-mainscreen-sidebar>
+    <app-mainscreen-sidebar />
 
-    <!-- 
-      Main content area.
-      The [class.ml-64] logic is now handled in SCSS for consistency.
-    -->
-    <main class="main-content" 
-      [class.content-expanded]="isSidebarPinned || isSidebarHovered" 
-      (mouseenter)="onMouseEnterMainContent()">
-      
-      <!-- 
-        The content-card and content-inner styles have been removed.
-        Those styles are now correctly defined on the list/details 
-        pages themselves (e.g., customer-list, product-details).
-      -->
-      <router-outlet></router-outlet>
-      
+    <main class="main-content" (mouseenter)="layout.isHovered.set(false)">
+      <div class="content-wrapper">
+        <router-outlet />
+      </div>
     </main>
   </div>
+
+  @if (layout.isMobile() && layout.isMobileMenuOpen()) {
+    <div class="mobile-backdrop" (click)="layout.toggleMobile()"></div>
+  }
 </div>
+
+<!-- <div class="layout-container">
+  <app-mainscreen-header (toggleSidebar)="toggleSidebar()" (mobileMenuToggle)="toggleMobileMenu()">
+  </app-mainscreen-header>
+  <div class="main-content-area">
+    <app-mainscreen-sidebar [isPinned]="isSidebarPinned" [isHovered]="isSidebarHovered" (pinToggle)="togglePin()"
+      (mouseEnter)="onMouseEnter()" (mouseEnterTriggerZone)="onMouseEnterTriggerZone()" (mouseLeave)="onMouseLeave()">
+    </app-mainscreen-sidebar>
+
+    <main class="main-content" [class.content-expanded]="isSidebarPinned || isSidebarHovered"
+      (mouseenter)="onMouseEnterMainContent()">
+
+      <router-outlet></router-outlet>
+
+    </main>
+  </div>
+</div> -->

@@ -1,250 +1,187 @@
-<div class="customer-page-container">
-  <!-- === Branch Data === -->
-  <div class="customer-details-card" *ngIf="branch(); else loadingOrError">
-    
-    <!-- === HEADER === -->
-    <header class="details-header">
-      <div class="header-left">
-        <p-button 
-          icon="pi pi-arrow-left" 
-          styleClass="p-button-text p-button-rounded"
-          routerLink="/branches">
-        </p-button>
-        <div class="header-info">
-          <h2 class="form-title">{{ branch()?.name }}</h2>
-          <p-tag 
-            *ngIf="branch()?.isMainBranch"
-            value="Main Branch" 
-            severity="info">
-          </p-tag>
-          <p-tag 
-            [value]="branch()?.isActive ? 'Active' : 'Inactive'" 
-            [severity]="branch()?.isActive ? 'success' : 'danger'">
-          </p-tag>
+<div class="page-container animate-fadeIn">
+
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="skeleton-header">
+        <div class="left-group">
+          <p-skeleton shape="circle" size="4rem"></p-skeleton>
+          <div class="text-group">
+            <p-skeleton width="12rem" height="1.5rem"></p-skeleton>
+            <p-skeleton width="8rem" height="1rem"></p-skeleton>
+          </div>
         </div>
       </div>
+      <div class="layout-grid">
+        <aside class="skeleton-sidebar">
+          <p-skeleton height="400px" styleClass="w-full"></p-skeleton>
+        </aside>
+        <main class="skeleton-main">
+          <p-skeleton height="200px" styleClass="w-full"></p-skeleton>
+          <p-skeleton height="200px" styleClass="w-full"></p-skeleton>
+        </main>
+      </div>
+    </div>
+  }
+
+  @else if (isError()) {
+    <div class="error-state">
+      <div class="error-icon"><i class="pi pi-building"></i></div>
+      <h2>Branch Not Found</h2>
+      <button pButton label="Back to Branches" icon="pi pi-arrow-left" class="p-button-outlined" routerLink="/branches"></button>
+    </div>
+  }
+
+  @else if (branch(); as b) {
+
+    <header class="dashboard-header">
+      <div class="header-left">
+        <button pButton icon="pi pi-arrow-left" class="p-button-text p-button-rounded back-btn" routerLink="/branches"></button>
+        
+        <div class="identity-group">
+          <div class="name-row">
+            <h1>{{ b.name }}</h1>
+            <p-tag [value]="b.isActive ? 'Active' : 'Inactive'" [severity]="b.isActive ? 'success' : 'danger'" styleClass="status-tag"></p-tag>
+            @if (b.isMainBranch) {
+              <p-tag value="Main Branch" severity="info" icon="pi pi-star-fill"></p-tag>
+            }
+          </div>
+          <div class="meta-row">
+            <span class="id-badge">
+              <i class="pi pi-hashtag"></i> {{ b.branchCode || b._id | uppercase }}
+            </span>
+            <span class="category-badge">Organization ID: {{ b.organizationId?._id || 'N/A' }}</span>
+          </div>
+        </div>
+      </div>
+
       <div class="header-actions">
-        <p-button 
-          label="Edit Branch" 
-          icon="pi pi-pencil" 
-          styleClass="p-button-outlined"
-          [routerLink]="['/branches', branch()?._id, 'edit']">
-        </p-button>
+        <button pButton label="Edit" icon="pi pi-pencil" class="p-button-outlined p-button-secondary btn-sm"
+          [routerLink]="['/branches', b._id, 'edit']"></button>
       </div>
     </header>
 
-    <p-divider></p-divider>
+    <div class="layout-grid">
 
-    <!-- === BODY === -->
-    <div class="details-body">
-
-      <!-- Sidebar -->
-      <aside class="profile-sidebar">
-        <p-avatar 
-          icon="pi pi-building" 
-          styleClass="profile-avatar"
-          shape="circle">
-        </p-avatar>
-
-        <h3 class="profile-name">{{ branch()?.name }}</h3>
-        <span class="profile-type">{{ branch()?.branchCode || 'No Code' }}</span>
+      <aside class="sidebar-column">
         
-        <p-divider></p-divider>
+        <div class="profile-card">
+          <div class="card-banner"></div>
+          
+          <div class="profile-content">
+            <div class="avatar-wrapper">
+              <p-avatar icon="pi pi-building" size="xlarge" shape="circle" styleClass="user-avatar"></p-avatar>
+              <div class="status-dot" [class.active]="b.isActive"></div>
+            </div>
 
-        <div class="profile-contact">
-          <div class="contact-card">
-            <i class="pi pi-user contact-icon"></i>
-            <div class="contact-content">
-              <label>Manager</label>
-              <span>{{ managerName() }}</span>
-            </div>
-          </div>
-          <div class="contact-card">
-            <i class="pi pi-phone contact-icon"></i>
-            <div class="contact-content">
-              <label>Phone</label>
-              <span>{{ branch()?.phoneNumber || 'N/A' }}</span>
-            </div>
-          </div>
-           <div class="contact-card">
-            <i class="pi pi-calendar contact-icon"></i>
-            <div class="contact-content">
-              <label>Created On</label>
-              <!-- Using Common Service for Date Formatting -->
-              <span>{{ common.formatDate(branch()?.createdAt) }}</span>
+            <h3 class="contact-name">{{ b.name }}</h3>
+            <span class="contact-email">{{ b.isMainBranch ? 'Headquarters' : 'Branch Office' }}</span>
+
+            <div class="info-list">
+              <div class="info-item">
+                <div class="icon-box"><i class="pi pi-user"></i></div>
+                <div class="info-text">
+                  <label>Manager</label>
+                  <span>{{ managerName() }}</span>
+                </div>
+              </div>
+
+              <div class="info-item">
+                <div class="icon-box"><i class="pi pi-phone"></i></div>
+                <div class="info-text">
+                  <label>Phone</label>
+                  @if (b.phoneNumber) {
+                    <a [href]="'tel:' + b.phoneNumber">{{ b.phoneNumber }}</a>
+                  } @else {
+                    <span>N/A</span>
+                  }
+                </div>
+              </div>
+
+              <div class="info-item">
+                <div class="icon-box"><i class="pi pi-calendar"></i></div>
+                <div class="info-text">
+                  <label>Established</label>
+                  <span>{{ common.formatDate(b.createdAt) }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
+        <div class="glass-card meta-card">
+          <div class="card-header">
+            <i class="pi pi-info-circle"></i> <span>System Info</span>
+          </div>
+          <div class="card-body">
+            <div class="meta-row">
+              <label>Last Updated</label>
+              <span>{{ common.formatDate(b.updatedAt) }}</span>
+            </div>
+            <div class="meta-row">
+              <label>Database ID</label>
+              <span class="font-mono text-xs">{{ b._id }}</span>
+            </div>
+          </div>
+        </div>
+
       </aside>
 
-      <!-- Main Details -->
-      <section class="main-details">
-        <div class="info-section">
-          <h4 class="section-title">Address Information</h4>
-          <div class="info-card address-full">
-              <label>Full Address</label>
-              <p>{{ formatAddress(branch()?.address) }}</p>
+      <main class="main-column">
+
+        <section class="glass-card address-panel">
+          <div class="card-header">
+            <i class="pi pi-map-marker"></i> <span>Location Details</span>
           </div>
-          <div class="address-grid">
-            <div class="info-card address" *ngFor="let item of [
-              { label: 'City', value: branch()?.address?.city },
-              { label: 'State', value: branch()?.address?.state },
-              { label: 'Zip Code', value: branch()?.address?.zipCode },
-              { label: 'Country', value: branch()?.address?.country }
-            ]">
-              <label>{{ item.label }}</label>
-              <span>{{ item.value || 'N/A' }}</span>
+          <div class="card-body">
+            
+            <div class="full-address-box">
+              <label>Formatted Address</label>
+              <p>{{ formatAddress(b.address) }}</p>
+            </div>
+
+            <div class="address-grid">
+              <div class="grid-item">
+                <label>Street</label>
+                <span>{{ b.address?.street || '—' }}</span>
+              </div>
+              <div class="grid-item">
+                <label>City</label>
+                <span>{{ b.address?.city || '—' }}</span>
+              </div>
+              <div class="grid-item">
+                <label>State</label>
+                <span>{{ b.address?.state || '—' }}</span>
+              </div>
+              <div class="grid-item">
+                <label>Zip Code</label>
+                <span>{{ b.address?.zipCode || '—' }}</span>
+              </div>
+              <div class="grid-item">
+                <label>Country</label>
+                <span>{{ b.address?.country || '—' }}</span>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <section class="glass-card org-panel">
+          <div class="card-header">
+            <i class="pi pi-sitemap"></i> <span>Organization Context</span>
+          </div>
+          <div class="card-body">
+            <div class="info-row">
+              <label>Parent Organization</label>
+              <span class="highlight">{{ b.organizationId?.name || 'Unknown Org' }}</span>
+            </div>
+            <div class="info-row">
+              <label>Hierarchy Level</label>
+              <span>{{ b.isMainBranch ? 'Level 1 (Top)' : 'Level 2 (Sub)' }}</span>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+      </main>
     </div>
-
-  </div>
+  }
 </div>
-
-<!-- Loading / Error Template -->
-<ng-template #loadingOrError>
-  <div class="customer-details-card">
-     <div class="details-header">
-        <div class="header-left">
-           <p-button 
-            icon="pi pi-arrow-left" 
-            styleClass="p-button-text p-button-rounded"
-            routerLink="/branches">
-          </p-button>
-           <h2 class="form-title">Loading...</h2>
-        </div>
-     </div>
-     <p-divider></p-divider>
-     <div class="details-body">
-        <p>Loading branch details or branch not found.</p>
-     </div>
-  </div>
-</ng-template>
-
-
-<!-- <div class="customer-page-container">
-  === Branch Data ===
-  <div class="customer-details-card" *ngIf="branch(); else loadingOrError">
-    
-    === HEADER ===
-    <header class="details-header">
-      <div class="header-left">
-        <p-button 
-          icon="pi pi-arrow-left" 
-          styleClass="p-button-text p-button-rounded"
-          routerLink="/branches">
-        </p-button>
-        <div class="header-info">
-          <h2 class="form-title">{{ branch()?.name }}</h2>
-          <p-tag 
-            *ngIf="branch()?.isMainBranch"
-            value="Main Branch" 
-            severity="info">
-          </p-tag>
-          <p-tag 
-            [value]="branch()?.isActive ? 'Active' : 'Inactive'" 
-            [severity]="branch()?.isActive ? 'success' : 'danger'">
-          </p-tag>
-        </div>
-      </div>
-      <div class="header-actions">
-        <p-button 
-          label="Edit Branch" 
-          icon="pi pi-pencil" 
-          styleClass="p-button-outlined"
-          [routerLink]="['/branches', branch()?._id, 'edit']">
-        </p-button>
-      </div>
-    </header>
-
-    <p-divider></p-divider>
-
-    === BODY ===
-    <div class="details-body">
-
-      Sidebar
-      <aside class="profile-sidebar">
-        <p-avatar 
-          icon="pi pi-building" 
-          styleClass="profile-avatar"
-          shape="circle">
-        </p-avatar>
-
-        <h3 class="profile-name">{{ branch()?.name }}</h3>
-        <span class="profile-type">{{ branch()?.branchCode || 'No Code' }}</span>
-        
-        <p-divider></p-divider>
-
-        Re-using contact-card style from customer-details
-        <div class="profile-contact">
-          <div class="contact-card">
-            <i class="pi pi-user contact-icon"></i>
-            <div class="contact-content">
-              <label>Manager</label>
-              <span>{{ managerName() }}</span>
-            </div>
-          </div>
-          <div class="contact-card">
-            <i class="pi pi-phone contact-icon"></i>
-            <div class="contact-content">
-              <label>Phone</label>
-              <span>{{ branch()?.phoneNumber || 'N/A' }}</span>
-            </div>
-          </div>
-           <div class="contact-card">
-            <i class="pi pi-calendar contact-icon"></i>
-            <div class="contact-content">
-              <label>Created On</label>
-              <span>{{ formatDate(branch()?.createdAt) }}</span>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      Main Details
-      <section class="main-details">
-        <div class="info-section">
-          <h4 class="section-title">Address Information</h4>
-          <div class="info-card address-full">
-              <label>Full Address</label>
-              <p>{{ formatAddress(branch()?.address) }}</p>
-          </div>
-          <div class="address-grid">
-            <div class="info-card address" *ngFor="let item of [
-              { label: 'City', value: branch()?.address?.city },
-              { label: 'State', value: branch()?.address?.state },
-              { label: 'Zip Code', value: branch()?.address?.zipCode },
-              { label: 'Country', value: branch()?.address?.country }
-            ]">
-              <label>{{ item.label }}</label>
-              <span>{{ item.value || 'N/A' }}</span>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-
-  </div>
-</div>
-
-Loading / Error Template
-<ng-template #loadingOrError>
-  <div class="customer-details-card">
-     <div class="details-header">
-        <div class="header-left">
-           <p-button 
-            icon="pi pi-arrow-left" 
-            styleClass="p-button-text p-button-rounded"
-            routerLink="/branches">
-          </p-button>
-           <h2 class="form-title">Loading...</h2>
-        </div>
-     </div>
-     <p-divider></p-divider>
-     <div class="details-body">
-        <p>Loading branch details or branch not found.</p>
-     </div>
-  </div>
-</ng-template> -->

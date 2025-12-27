@@ -1,52 +1,55 @@
-<p-toast></p-toast>
+<div class="transaction-layout">
 
-<div class="list-page-container">
+  <div class="filter-header">
+    <div class="filter-group">
 
-  <div class="themed-card list-content-area">
+      <div class="filter-item search-item">
+        <div class="p-input-icon-left w-full">
+          <!-- <i class="pi pi-search"></i> -->
+          <input type="text" pInputText [(ngModel)]="filterParams.search" (keydown.enter)="applyFilters()"
+            (blur)="applyFilters()" placeholder="Search Ref # or Description" class="w-full" />
+        </div>
+      </div>
 
-    <div class="se-filter-bar">
-
-      <div class="se-filter-field">
-        <label for="dateRange">Date Range</label>
-        <p-datepicker id="dateRange" [(ngModel)]="rangeDates" selectionMode="range" [readonlyInput]="true"
-          placeholder="Start - End" [showIcon]="true" appendTo="body" (onClose)="applyFilters()">
+      <div class="filter-item">
+        <p-datepicker [(ngModel)]="rangeDates" selectionMode="range" [readonlyInput]="true" placeholder="Filter by Date"
+          [showIcon]="true" appendTo="body" styleClass="w-full" (onClose)="applyFilters()">
         </p-datepicker>
       </div>
 
-      <div class="se-filter-field">
-        <label for="type">Type</label>
-        <p-select appendTo="body" (onChange)="applyFilters()" id="type" [options]="transactionTypes" [(ngModel)]="filterParams.type"
-          [showClear]="true" placeholder="All Types" appendTo="body">
+      <div class="filter-item">
+        <p-select [options]="transactionTypes" [(ngModel)]="filterParams.type" (onChange)="applyFilters()"
+          optionLabel="label" optionValue="value" [showClear]="true" placeholder="Type" appendTo="body"
+          styleClass="w-full">
         </p-select>
       </div>
 
-      <div class="se-filter-field">
-        <label for="effect">Effect</label>
-        <p-select appendTo="body" (onChange)="applyFilters()" id="effect" [options]="transactionEffects"
-          [(ngModel)]="filterParams.effect" [showClear]="true" placeholder="All" appendTo="body">
+      <div class="filter-item">
+        <p-select [options]="transactionEffects" [(ngModel)]="filterParams.effect" (onChange)="applyFilters()"
+          optionLabel="label" optionValue="value" [showClear]="true" placeholder="Effect" appendTo="body"
+          styleClass="w-full">
         </p-select>
       </div>
 
-      <div class="se-filter-field">
-        <label for="search">Search</label>
-        <input (keydown.enter)="applyFilters()" (blur)="applyFilters()" id="search" type="text" pInputText
-          [(ngModel)]="filterParams.search" placeholder="Desc or Ref #" />
-      </div>
-
-      <div class="se-filter-actions">
-        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined" (onClick)="resetFilters()">
-        </p-button>
-      </div>
     </div>
 
-    <div class="list-grid-wrapper">
-      
+    <div class="action-group">
+      <button pButton label="Reset" icon="pi pi-refresh" class="p-button-text p-button-secondary"
+        (click)="resetFilters()">
+      </button>
+      <button pButton label="Export" icon="pi pi-download" class="p-button-outlined" (click)="exportData()">
+      </button>
+    </div>
+  </div>
+
+  <div class="grid-container">
     <app-ag-share-grid [columns]="column" [data]="data" [showActions]="false" selectionMode="multiple"
-      (gridEvent)="eventFromGrid($event)" style="height: 210px; width: 100%; display: block;"></app-ag-share-grid>
-      <!-- <app-shared-grid [data]="data" [gridHeight]="'210px'" [headerFilter]="false" [GridName]="'Supplier History'"
-        [column]="column" (gridReady)="onGridReady($event)" (scrolledToBottom)="onScrolledToBottom($event)">
-      </app-shared-grid> -->
-    </div>
+      (gridEvent)="eventFromGrid($event)" class="full-height-grid">
+    </app-ag-share-grid>
+  </div>
 
+  <div class="footer-stats">
+    <span>Total Records: <strong>{{ totalCount }}</strong></span>
   </div>
 </div>
+<p-toast></p-toast>

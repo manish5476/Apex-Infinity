@@ -1,4 +1,412 @@
-<div class="customer-page-container">
+<div class="page-container animate-fadeIn">
+
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="skeleton-header">
+        <div class="left-group">
+          <p-skeleton shape="circle" size="4rem"></p-skeleton>
+          <div class="text-group">
+            <p-skeleton width="12rem" height="1.5rem"></p-skeleton>
+            <p-skeleton width="8rem" height="1rem"></p-skeleton>
+          </div>
+        </div>
+      </div>
+      <div class="layout-grid">
+        <aside class="skeleton-sidebar">
+          <p-skeleton height="400px" styleClass="w-full"></p-skeleton>
+        </aside>
+        <main class="skeleton-main">
+          <div class="metrics-row">
+            <p-skeleton height="100px" styleClass="w-full"></p-skeleton>
+            <p-skeleton height="100px" styleClass="w-full"></p-skeleton>
+            <p-skeleton height="100px" styleClass="w-full"></p-skeleton>
+          </div>
+          <p-skeleton height="400px" styleClass="w-full"></p-skeleton>
+        </main>
+      </div>
+    </div>
+  }
+
+  @else if (isError()) {
+    <div class="error-state">
+      <div class="error-icon"><i class="pi pi-truck"></i></div>
+      <h2>Supplier Not Found</h2>
+      <button pButton label="Back to Suppliers" icon="pi pi-arrow-left" class="p-button-outlined" routerLink="/suppliers"></button>
+    </div>
+  }
+
+  @else if (supplier(); as s) {
+
+    <header class="dashboard-header">
+      <div class="header-left">
+        <button pButton icon="pi pi-arrow-left" class="p-button-text p-button-rounded back-btn" routerLink="/suppliers"></button>
+        
+        <div class="identity-group">
+          <div class="name-row">
+            <h1>{{ s.companyName }}</h1>
+            <p-tag [value]="s.isActive ? 'Active' : 'Inactive'" [severity]="s.isActive ? 'success' : 'danger'" styleClass="status-tag"></p-tag>
+          </div>
+          <div class="meta-row">
+            <span class="id-badge">
+              <i class="pi pi-hashtag"></i> {{ s.code || s._id | uppercase }}
+            </span>
+            <span class="category-badge">{{ s.category || 'Standard Vendor' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button pButton label="Edit" icon="pi pi-pencil" class="p-button-outlined p-button-secondary btn-sm"
+          [routerLink]="['/suppliers', s._id, 'edit']"></button>
+
+        <button pButton label="New PO" icon="pi pi-plus" class="p-button-primary btn-sm"
+          [routerLink]="['/purchase-orders/create']" [queryParams]="{supplierId: s._id}"></button>
+      </div>
+    </header>
+
+    <div class="layout-grid">
+
+      <aside class="sidebar-column">
+        
+        <div class="profile-card">
+          <div class="card-banner"></div>
+          
+          <div class="profile-content">
+            <div class="avatar-wrapper">
+              <p-avatar icon="pi pi-truck" size="xlarge" shape="circle" styleClass="user-avatar"></p-avatar>
+              <div class="status-dot" [class.active]="s.isActive"></div>
+            </div>
+
+            <h3 class="contact-name">{{ s.contactPerson || 'No Contact Person' }}</h3>
+            <a [href]="'mailto:' + s.email" class="contact-email">{{ s.email || 'No email' }}</a>
+
+            <div class="info-list">
+              <div class="info-item">
+                <div class="icon-box"><i class="pi pi-phone"></i></div>
+                <div class="info-text">
+                  <label>Phone</label>
+                  <a [href]="'tel:' + s.phone">{{ s.phone || '—' }}</a>
+                  @if(s.altPhone) { <span class="sub-text">Alt: {{ s.altPhone }}</span> }
+                </div>
+              </div>
+
+              <div class="info-item">
+                <div class="icon-box"><i class="pi pi-id-card"></i></div>
+                <div class="info-text">
+                  <label>Tax ID / GST</label>
+                  <span class="mono-text">{{ s.gstNumber || '—' }}</span>
+                  @if(s.panNumber) { <span class="sub-text">PAN: {{ s.panNumber }}</span> }
+                </div>
+              </div>
+
+              <div class="info-item">
+                <div class="icon-box"><i class="pi pi-map-marker"></i></div>
+                <div class="info-text">
+                  <label>Address</label>
+                  <p class="address-block">{{ formatAddress(s.address) }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card meta-card">
+          <div class="card-header">
+            <i class="pi pi-info-circle"></i> <span>System Info</span>
+          </div>
+          <div class="card-body">
+            <div class="meta-row">
+              <label>Created On</label>
+              <span>{{ formatDate(s.createdAt) }}</span>
+            </div>
+            <div class="meta-row">
+              <label>Updated On</label>
+              <span>{{ formatDate(s.updatedAt) }}</span>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+
+      <main class="main-column">
+
+        <section class="metrics-grid">
+          
+          <div class="metric-card outstanding">
+            <div class="icon-box"><i class="pi pi-wallet"></i></div>
+            <div class="data-box">
+              <label>Outstanding Balance</label>
+              <span class="value">{{ formatCurrency(s.outstandingBalance) }}</span>
+            </div>
+          </div>
+
+          <div class="metric-card opening">
+            <div class="icon-box"><i class="pi pi-history"></i></div>
+            <div class="data-box">
+              <label>Opening Balance</label>
+              <span class="value">{{ formatCurrency(s.openingBalance) }}</span>
+            </div>
+          </div>
+
+          <div class="metric-card terms">
+            <div class="icon-box"><i class="pi pi-calendar-times"></i></div>
+            <div class="data-box">
+              <label>Payment Terms</label>
+              <span class="value text-base">{{ s.paymentTerms || 'Standard' }}</span>
+            </div>
+          </div>
+
+        </section>
+
+        <section class="glass-card supply-panel">
+          <div class="card-header">
+            <i class="pi pi-sitemap"></i> <span>Supply Chain</span>
+          </div>
+          <div class="card-body">
+            <h4 class="section-subtitle">Supplies to Branches</h4>
+            <div class="branch-chips">
+              @if (branchNames() && branchNames() !== 'N/A') {
+                @for (branch of branchNames().split(', '); track $index) {
+                  <span class="chip">{{ branch }}</span>
+                }
+              } @else {
+                <span class="text-muted">No specific branches assigned.</span>
+              }
+            </div>
+          </div>
+        </section>
+
+        <section class="activity-panel">
+          <div class="tabs-header">
+            <button class="tab-btn active">
+              <i class="pi pi-list"></i> Transaction History
+            </button>
+          </div>
+          <div class="grid-container" style="height: 600px; padding: 0;">
+             <app-supplier-transactions [inputSupplierId]="s._id"></app-supplier-transactions>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  }
+</div>
+
+<!-- <div class="page-container animate-fadeIn">
+
+  @if (loading()) {
+  <div class="loading-state">
+    <div class="skeleton-header">
+      <div class="left-group">
+        <p-skeleton shape="circle" size="4rem"></p-skeleton>
+        <div class="text-group">
+          <p-skeleton width="12rem" height="1.5rem"></p-skeleton>
+          <p-skeleton width="8rem" height="1rem"></p-skeleton>
+        </div>
+      </div>
+    </div>
+    <div class="layout-grid">
+      <aside class="skeleton-sidebar">
+        <p-skeleton height="400px" styleClass="w-full"></p-skeleton>
+      </aside>
+      <main class="skeleton-main">
+        <div class="metrics-row">
+          <p-skeleton height="100px" styleClass="w-full"></p-skeleton>
+          <p-skeleton height="100px" styleClass="w-full"></p-skeleton>
+          <p-skeleton height="100px" styleClass="w-full"></p-skeleton>
+        </div>
+        <p-skeleton height="300px" styleClass="w-full"></p-skeleton>
+      </main>
+    </div>
+  </div>
+  }
+
+  @else if (isError()) {
+  <div class="error-state">
+    <div class="error-icon"><i class="pi pi-truck"></i></div>
+    <h2>Supplier Not Found</h2>
+    <button pButton label="Back to Suppliers" icon="pi pi-arrow-left" class="p-button-outlined"
+      routerLink="/suppliers"></button>
+  </div>
+  }
+
+  @else if (supplier(); as s) {
+
+  <header class="dashboard-header">
+    <div class="header-left">
+      <button pButton icon="pi pi-arrow-left" class="p-button-text p-button-rounded back-btn"
+        routerLink="/suppliers"></button>
+
+      <div class="identity-group">
+        <div class="name-row">
+          <h1>{{ s.companyName }}</h1>
+          <p-tag [value]="s.isActive ? 'Active' : 'Inactive'" [severity]="s.isActive ? 'success' : 'danger'"
+            styleClass="status-tag"></p-tag>
+        </div>
+        <div class="meta-row">
+          <span class="id-badge">
+            <i class="pi pi-hashtag"></i> {{ s.code || s._id | uppercase }}
+          </span>
+          <span class="category-badge">{{ s.category || 'Standard Vendor' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button pButton label="Transactions" icon="pi pi-list" class="p-button-outlined p-button-secondary btn-sm"
+        (click)="showTransactionsDialog = true"></button>
+
+      <button pButton label="Edit" icon="pi pi-pencil" class="p-button-outlined p-button-secondary btn-sm"
+        [routerLink]="['/suppliers', s._id, 'edit']"></button>
+
+      <button pButton label="New PO" icon="pi pi-plus" class="p-button-primary btn-sm"
+        [routerLink]="['/purchase-orders/create']" [queryParams]="{supplierId: s._id}"></button>
+    </div>
+  </header>
+
+  <div class="layout-grid">
+
+    <aside class="sidebar-column">
+
+      <div class="profile-card">
+        <div class="card-banner"></div>
+
+        <div class="profile-content">
+          <div class="avatar-wrapper">
+            <p-avatar icon="pi pi-truck" size="xlarge" shape="circle" styleClass="user-avatar"></p-avatar>
+            <div class="status-dot" [class.active]="s.isActive"></div>
+          </div>
+
+          <h3 class="contact-name">{{ s.contactPerson || 'No Contact Person' }}</h3>
+          <a [href]="'mailto:' + s.email" class="contact-email">{{ s.email || 'No email' }}</a>
+
+          <div class="info-list">
+            <div class="info-item">
+              <div class="icon-box"><i class="pi pi-phone"></i></div>
+              <div class="info-text">
+                <label>Phone</label>
+                <a [href]="'tel:' + s.phone">{{ s.phone || '—' }}</a>
+                @if(s.altPhone) { <span class="sub-text">Alt: {{ s.altPhone }}</span> }
+              </div>
+            </div>
+
+            <div class="info-item">
+              <div class="icon-box"><i class="pi pi-id-card"></i></div>
+              <div class="info-text">
+                <label>Tax ID / GST</label>
+                <span class="mono-text">{{ s.gstNumber || '—' }}</span>
+                @if(s.panNumber) { <span class="sub-text">PAN: {{ s.panNumber }}</span> }
+              </div>
+            </div>
+
+            <div class="info-item">
+              <div class="icon-box"><i class="pi pi-map-marker"></i></div>
+              <div class="info-text">
+                <label>Address</label>
+                <p class="address-block">{{ formatAddress(s.address) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card meta-card">
+        <div class="card-header">
+          <i class="pi pi-info-circle"></i> <span>System Info</span>
+        </div>
+        <div class="card-body">
+          <div class="meta-row">
+            <label>Created On</label>
+            <span>{{ formatDate(s.createdAt) }}</span>
+          </div>
+          <div class="meta-row">
+            <label>Updated On</label>
+            <span>{{ formatDate(s.updatedAt) }}</span>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <main class="main-column">
+
+      <section class="metrics-grid">
+
+        <div class="metric-card outstanding">
+          <div class="icon-box"><i class="pi pi-wallet"></i></div>
+          <div class="data-box">
+            <label>Outstanding Balance</label>
+            <span class="value">{{ formatCurrency(s.outstandingBalance) }}</span>
+          </div>
+        </div>
+
+        <div class="metric-card opening">
+          <div class="icon-box"><i class="pi pi-history"></i></div>
+          <div class="data-box">
+            <label>Opening Balance</label>
+            <span class="value">{{ formatCurrency(s.openingBalance) }}</span>
+          </div>
+        </div>
+
+        <div class="metric-card terms">
+          <div class="icon-box"><i class="pi pi-calendar-times"></i></div>
+          <div class="data-box">
+            <label>Payment Terms</label>
+            <span class="value text-base">{{ s.paymentTerms || 'Standard' }}</span>
+          </div>
+        </div>
+
+      </section>
+
+      <section class="glass-card supply-panel">
+        <div class="card-header">
+          <i class="pi pi-sitemap"></i> <span>Supply Chain</span>
+        </div>
+        <div class="card-body">
+          <h4 class="section-subtitle">Supplies to Branches</h4>
+          <div class="branch-chips">
+            @if (branchNames() && branchNames() !== 'N/A') {
+            @for (branch of branchNames().split(', '); track $index) {
+            <span class="chip">{{ branch }}</span>
+            }
+            } @else {
+            <span class="text-muted">No specific branches assigned.</span>
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="activity-panel">
+        <div class="tabs-header">
+          <button class="tab-btn active">
+            <i class="pi pi-list"></i> Recent Transactions
+          </button>
+        </div>
+        <div class="grid-container">
+          <div class="empty-placeholder">
+            <i class="pi pi-receipt"></i>
+            <p>Click "Transactions" above to view full history.</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+  }
+</div>
+
+<p-dialog [(visible)]="showTransactionsDialog" [modal]="true"
+  [style]="{ width: '90vw', height: '90vh', maxWidth: '1600px' }" [maximizable]="true" [draggable]="false"
+  [resizable]="false" header="Transaction History" styleClass="transaction-dialog-glass"
+  contentStyleClass="p-0 overflow-hidden" appendTo="body">
+
+  @if (showTransactionsDialog) {
+  <app-supplier-transactions [inputSupplierId]="supplier()?._id"></app-supplier-transactions>
+  }
+</p-dialog> -->
+
+
+<!-- <div class="customer-page-container">
   <div class="customer-details-card" *ngIf="supplier(); else loadingOrError">
     <header class="details-header">
       <div class="header-left">
@@ -154,4 +562,4 @@
       <p>Loading supplier details or supplier not found.</p>
     </div>
   </div>
-</ng-template>
+</ng-template> -->

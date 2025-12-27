@@ -1,60 +1,96 @@
-/* ==============================================
-   SUPPLIER DETAILS COMPONENT
-   - Re-using branch-details.scss styles
-   - Adds supplier-specific cards
-   ============================================== */
+/* =========================================================
+   SUPPLIER DETAILS - RESPONSIVE & FIXED SIDEBAR
+   ========================================================= */
 
 :host {
   display: block;
-  width: 100%;
   height: 100%;
+  width: 100%;
 }
 
-.customer-page-container {
-  width: 100%;
+.page-container {
   height: 100%;
-  overflow: hidden; // Prevents whole page scroll
+  width: 100%;
+  background-color: var(--bg-primary);
   display: flex;
   flex-direction: column;
-  background: var(--bg-primary);
-}
+  overflow-y: auto; /* Main scroll container */
+  padding: var(--spacing-xl);
+  gap: var(--spacing-xl);
 
-/* === Card Layout === */
-.customer-details-card {
-  display: flex;
-  flex-direction: column;
-  flex: 1; // Grow to fill container
-  background: var(--bg-primary);
-  border-radius: var(--ui-border-radius-lg);
-  box-shadow: var(--shadow-md);
-  overflow: hidden; // Important for body scrolling
-  margin: var(--spacing-xl); // Add some margin
+  /* MOBILE TWEAK: Less padding on small screens */
+  @media (max-width: 768px) {
+    padding: var(--spacing-md);
+    gap: var(--spacing-lg);
+  }
 }
 
 /* === HEADER === */
-.details-header {
+.dashboard-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-lg) var(--spacing-xl);
-  background: var(--bg-secondary);
-  border-bottom: var(--ui-border-width) solid var(--border-primary);
-  flex-shrink: 0; // Prevent header from shrinking
+  align-items: flex-start;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap; /* Allows wrapping on very small phones */
 
   .header-left {
     display: flex;
-    align-items: center;
-    gap: var(--spacing-lg);
+    gap: var(--spacing-md);
+    align-items: flex-start;
+    flex: 1; 
+    min-width: 0; /* Critical for text truncation flex issues */
 
-    .header-info {
+    .back-btn {
+      color: var(--text-secondary);
+      margin-top: 6px;
+      flex-shrink: 0;
+      &:hover { background: var(--bg-ternary); color: var(--text-primary); }
+    }
+
+    .identity-group {
       display: flex;
-      align-items: center;
-      gap: var(--spacing-md);
-      .form-title {
-        font-size: var(--font-size-2xl); // Larger title
-        font-weight: 600;
-        color: var(--text-primary);
-        margin: 0; // Remove default margin
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+
+      .name-row {
+        display: flex; align-items: center; gap: var(--spacing-md); flex-wrap: wrap;
+        h1 {
+          font-family: var(--font-heading);
+          font-size: var(--font-size-2xl); /* 24px */
+          font-weight: var(--font-weight-bold);
+          color: var(--text-primary);
+          margin: 0;
+          line-height: 1.2;
+          word-break: break-word; /* Prevents long names from breaking layout */
+        }
+      }
+
+      .meta-row {
+        display: flex; align-items: center; gap: var(--spacing-sm); flex-wrap: wrap;
+        
+        .id-badge {
+          font-family: var(--font-mono);
+          font-size: var(--font-size-xs);
+          color: var(--text-secondary);
+          background: var(--bg-ternary);
+          padding: 2px 8px;
+          border-radius: 4px;
+          border: 1px solid var(--border-secondary);
+          white-space: nowrap;
+        }
+
+        .category-badge {
+          font-size: 10px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          color: var(--text-tertiary);
+          background: var(--bg-ternary);
+          padding: 2px 6px;
+          border-radius: 4px;
+          white-space: nowrap;
+        }
       }
     }
   }
@@ -62,220 +98,584 @@
   .header-actions {
     display: flex;
     gap: var(--spacing-sm);
+    /* Mobile: Scroll actions horizontally if they don't fit */
+    @media (max-width: 600px) {
+      width: 100%;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      .p-button { flex-shrink: 0; }
+    }
+    ::ng-deep .p-button.btn-sm { padding: var(--spacing-xs) var(--spacing-md); font-size: var(--font-size-sm); }
   }
 }
 
-/* === BODY === */
-.details-body {
-  display: flex;
+/* === LAYOUT GRID (The Core Layout Logic) === */
+.layout-grid {
+  display: grid;
+  /* DESKTOP: 320px Sidebar + Remaining space for Main */
+  grid-template-columns: 320px 1fr; 
   gap: var(--spacing-xl);
-  padding: var(--spacing-xl);
-  overflow-y: auto; // Allow this section to scroll
-  flex: 1; // Grow to fill space
-  background-color: var(--bg-primary);
-  
+  align-items: start; /* Aligns items to top */
+
+  /* MOBILE / TABLET: Stack vertically */
   @media (max-width: 1024px) {
-    flex-direction: column;
+    grid-template-columns: 1fr; 
+    gap: var(--spacing-lg);
   }
 }
 
-/* === SIDEBAR === */
-.profile-sidebar {
-  width: 24%;
-  min-width: 250px;
+/* === SIDEBAR COLUMN === */
+.sidebar-column {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  background: var(--bg-secondary);
-  border-radius: var(--ui-border-radius-lg);
-  padding: var(--spacing-xl);
-  border: var(--ui-border-width) solid var(--border-primary);
-  box-shadow: var(--shadow-sm);
-  align-self: flex-start; // Stick to top
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
   
+  /* DESKTOP: Sticky Sidebar */
+  @media (min-width: 1025px) {
+    position: sticky;
+    top: 0; 
+    /* If you have a top-navbar, increase this (e.g., top: 70px) */
+    z-index: 10;
+  }
+
+  /* MOBILE: Normal flow (not sticky) */
   @media (max-width: 1024px) {
-    width: 100%; // Go full width on mobile
-  }
-
-  :host ::ng-deep .profile-avatar {
-    width: 80px;
-    height: 80px;
-    font-size: var(--font-size-4xl);
-    background: var(--accent-primary);
-    color: #fff; // Fixed: Use white for text on accent bg
-  }
-
-  .profile-name {
-    font-size: var(--font-size-xl);
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0;
-    text-align: center;
-  }
-
-  .profile-type {
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary);
-    text-align: center;
-  }
-
-  .profile-contact {
+    position: relative;
+    top: auto;
     width: 100%;
-    margin-top: var(--spacing-lg);
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-md);
+  }
+}
 
-    .contact-card {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-lg);
-      background: var(--bg-primary); // Use primary bg
-      border: var(--ui-border-width) solid var(--border-primary);
-      border-radius: var(--ui-border-radius);
-      padding: var(--spacing-md) var(--spacing-lg);
-      transition: var(--transition-fast);
+/* === PROFILE CARD === */
+.profile-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--ui-border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
 
-      &:hover {
+  .card-banner {
+    height: 100px;
+    background: linear-gradient(135deg, var(--bg-ternary), var(--bg-secondary));
+    border-bottom: 1px solid var(--border-secondary);
+  }
+
+  .profile-content {
+    padding: 0 var(--spacing-lg) var(--spacing-xl);
+    margin-top: -50px;
+    text-align: center;
+    display: flex; flex-direction: column; align-items: center;
+
+    .avatar-wrapper {
+      position: relative; margin-bottom: var(--spacing-md);
+      
+      ::ng-deep .user-avatar {
         background: var(--bg-ternary);
-        transform: translateY(-2px);
-        border-color: var(--border-secondary);
+        border: 4px solid var(--bg-secondary);
+        width: 100px; height: 100px;
+        font-size: 3rem; color: var(--text-secondary);
       }
 
-      .contact-icon {
-        color: var(--accent-primary);
-        font-size: 1rem;
+      .status-dot {
+        position: absolute; bottom: 8px; right: 8px;
+        width: 16px; height: 16px; border-radius: 50%;
+        background: var(--color-disabled); border: 3px solid var(--bg-secondary);
+        &.active { background: var(--color-success); }
       }
+    }
 
-      .contact-content {
-        display: flex;
-        flex-direction: column;
-        overflow: hidden; // For text truncation
-        label {
-          font-size: var(--font-size-xs);
-          color: var(--text-label);
-          text-transform: uppercase;
+    .contact-name {
+      margin: 0 0 4px 0; font-size: var(--font-size-lg); font-weight: 700; color: var(--text-primary);
+    }
+    .contact-email {
+      font-size: var(--font-size-sm); color: var(--text-secondary); text-decoration: none;
+      word-break: break-all; /* Ensure long emails don't break layout */
+      &:hover { color: var(--accent-primary); text-decoration: underline; }
+    }
+
+    .info-list {
+      margin-top: var(--spacing-xl); width: 100%; display: flex; flex-direction: column; gap: var(--spacing-md);
+
+      .info-item {
+        display: flex; align-items: flex-start; gap: var(--spacing-md);
+        padding: var(--spacing-md); background: var(--bg-ternary);
+        border-radius: var(--ui-border-radius); text-align: left;
+
+        .icon-box {
+          width: 32px; height: 32px; background: var(--bg-secondary);
+          border-radius: 50%; display: flex; align-items: center; justify-content: center;
+          color: var(--text-tertiary); border: 1px solid var(--border-secondary);
+          flex-shrink: 0;
         }
-        span {
-          font-size: var(--font-size-sm);
-          font-weight: 500;
-          color: var(--text-primary);
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
+
+        .info-text {
+          display: flex; flex-direction: column; min-width: 0; /* Flex fix */
+          label { font-size: 10px; text-transform: uppercase; font-weight: 700; color: var(--text-tertiary); }
+          span, a, p { font-size: var(--font-size-sm); color: var(--text-primary); font-weight: 500; margin: 0; }
+          .mono-text { font-family: var(--font-mono); letter-spacing: 0.5px; }
+          .sub-text { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+          .address-block { line-height: 1.5; white-space: pre-line; }
         }
       }
     }
   }
 }
 
-/* === MAIN DETAILS === */
-.main-details {
-  flex: 1;
+/* === SHARED GLASS CARD === */
+.glass-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--ui-border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  
+  /* Remove top margin as the sidebar container handles spacing */
+  margin-top: 0; 
+
+  .card-header {
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--bg-ternary);
+    border-bottom: 1px solid var(--border-secondary);
+    display: flex; align-items: center; gap: var(--spacing-md);
+    color: var(--text-secondary); font-size: var(--font-size-sm); text-transform: uppercase; font-weight: 700;
+    i { color: var(--accent-primary); }
+  }
+  .card-body { padding: var(--spacing-lg); }
+}
+
+.meta-row {
+  display: flex; justify-content: space-between; font-size: var(--font-size-sm);
+  padding: 4px 0; border-bottom: 1px solid var(--border-secondary);
+  &:last-child { border-bottom: none; }
+  label { color: var(--text-secondary); }
+  span { color: var(--text-primary); font-weight: 500; }
+}
+
+/* === MAIN CONTENT (RIGHT) === */
+.main-column {
+  display: flex; flex-direction: column; gap: var(--spacing-xl);
+  min-width: 0; /* Prevents grid blowouts */
+}
+
+/* Metrics Grid */
+.metrics-grid {
+  display: grid;
+  /* Adaptive: Fits as many columns as possible, min width 160px */
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
+  gap: var(--spacing-lg);
+
+  /* Mobile: Make metrics swipeable or stacked 2x2 */
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr 1fr; /* 2 cols on mobile */
+  }
+
+  .metric-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--ui-border-radius-lg);
+    padding: var(--spacing-lg);
+    display: flex; align-items: center; gap: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+    min-height: 90px;
+
+    .icon-box {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: var(--bg-ternary); color: var(--text-secondary);
+      display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .data-box {
+      display: flex; flex-direction: column; min-width: 0;
+      label { 
+        font-size: 10px; text-transform: uppercase; font-weight: 700; color: var(--text-tertiary); 
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+      .value { 
+        font-size: 1.2rem; font-weight: 700; color: var(--text-primary); font-family: var(--font-heading); 
+        white-space: nowrap;
+      }
+    }
+
+    &.outstanding { 
+      .icon-box { background: rgba(239, 68, 68, 0.1); color: var(--color-error); }
+      .value { color: var(--color-error); } 
+    }
+  }
+}
+
+.supply-panel {
+  .section-subtitle { font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: var(--spacing-md); }
+  .branch-chips {
+    display: flex; flex-wrap: wrap; gap: var(--spacing-sm);
+    .chip { 
+      font-size: 12px; padding: 4px 10px; background: var(--bg-ternary); 
+      border: 1px solid var(--border-secondary); border-radius: 16px; color: var(--text-primary); 
+    }
+  }
+}
+
+.activity-panel {
+  @extend .glass-card; min-height: 250px;
+  .tabs-header {
+    background: var(--bg-ternary); border-bottom: 1px solid var(--border-primary); padding: 0 var(--spacing-md);
+    .tab-btn {
+      background: transparent; border: none; padding: var(--spacing-md) var(--spacing-lg);
+      font-weight: 600; color: var(--text-secondary); border-bottom: 2px solid transparent;
+      display: flex; align-items: center; gap: 6px;
+      &.active { color: var(--accent-primary); border-color: var(--accent-primary); background: var(--bg-secondary); }
+    }
+  }
+  .grid-container {
+    /* Height handled by inline style in HTML, but ensure container doesn't collapse */
+    display: block; 
+    width: 100%;
+    
+    .empty-placeholder { 
+        padding: var(--spacing-2xl); 
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        text-align: center; color: var(--text-tertiary); 
+        i { font-size: 2rem; margin-bottom: 8px; } 
+    }
+  }
+}
+
+/* === LOADING & ERROR === */
+.loading-state {
+  display: flex; flex-direction: column; gap: var(--spacing-xl);
+  .skeleton-header { margin-bottom: var(--spacing-lg); }
+  
+  .layout-grid {
+     /* Replicate main grid behavior for skeleton */
+     display: grid; grid-template-columns: 320px 1fr; gap: var(--spacing-xl);
+     @media (max-width: 1024px) { grid-template-columns: 1fr; }
+  }
+  
+  .skeleton-sidebar { width: 100%; }
+  .skeleton-main { flex: 1; display: flex; flex-direction: column; gap: var(--spacing-lg); }
+  .metrics-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-lg); }
+}
+
+.error-state {
+  height: 60vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--spacing-md); color: var(--text-secondary);
+  .error-icon { font-size: 3rem; color: var(--color-error); background: rgba(239,68,68,0.1); padding: 1rem; border-radius: 50%; }
+}/* === LAYOUT GRID === */
+.layout-grid {
+  display: grid;
+  /* DESKTOP: Fixed 320px Sidebar | Fluid Main Content */
+  grid-template-columns: 320px 1fr;
+  gap: var(--spacing-xl);
+  align-items: start;
+
+  /* MOBILE/TABLET FIX: Stack them vertically */
+  @media (max-width: 1024px) {
+    display: flex;          /* Use Flexbox for cleaner vertical stacking */
+    flex-direction: column; 
+    gap: var(--spacing-lg);
+  }
+}
+
+/* === SIDEBAR COLUMN === */
+.sidebar-column {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xl);
-  min-width: 0; // Prevent flex overflow
+  gap: var(--spacing-lg);
 
-  .info-section {
-    background: var(--bg-secondary);
-    border: var(--ui-border-width) solid var(--border-primary);
-    border-radius: var(--ui-border-radius-lg);
-    padding: var(--spacing-xl);
+  /* DESKTOP ONLY (Screens wider than 1024px) */
+  @media (min-width: 1025px) {
+    position: sticky;       /* Make it sticky ONLY on desktop */
+    top: 0;                 /* Stick to the top of the scroll container */
+    z-index: 10;
+    height: fit-content;    /* Critical: Ensures it doesn't stretch to full height */
+  }
 
-    .section-title {
-      font-size: var(--font-size-lg);
-      font-weight: 600;
-      color: var(--text-primary);
-      margin: 0 0 var(--spacing-lg) 0;
-      border-left: 4px solid var(--accent-primary);
-      padding-left: var(--spacing-md);
-    }
-    
-    /* Base info card style */
-    .info-card {
-      background: var(--bg-primary);
-      border-radius: var(--ui-border-radius);
-      padding: var(--spacing-md) var(--spacing-lg);
-      border: var(--ui-border-width) solid var(--border-primary);
-      display: flex;
-      flex-direction: column;
-      gap: var(--spacing-xs);
-
-      label {
-        font-size: var(--font-size-xs);
-        color: var(--text-label);
-        text-transform: uppercase;
-        font-weight: 500;
-      }
-
-      span {
-        font-weight: 600;
-        font-size: var(--font-size-md);
-        color: var(--text-primary);
-      }
-      
-      p {
-        font-size: var(--font-size-sm);
-        color: var(--text-secondary);
-        margin: var(--spacing-xs) 0 0 0;
-        line-height: var(--line-height-relaxed);
-      }
-      
-      &.notes {
-         grid-column: 1 / -1; // Span full width
-      }
-    }
-    
-    /* Specific to this component */
-    .financial-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: var(--spacing-lg);
-    }
-
-    .stat-card {
-      // Inherits from .info-card, but we override padding and gap
-      padding: var(--spacing-md) var(--spacing-lg);
-      gap: var(--spacing-xs);
-      
-      .stat-value {
-        font-size: var(--font-size-3xl);
-        font-weight: 700;
-        color: var(--text-primary);
-        display: block;
-
-        &.outstanding-supplier {
-          color: var(--color-error); // Money we owe
-        }
-        
-        &.terms {
-          font-size: var(--font-size-lg);
-          font-weight: 500;
-          color: var(--text-secondary);
-        }
-      }
-    }
-
-    .address-full {
-      background: var(--bg-primary);
-      border-radius: var(--ui-border-radius);
-      padding: var(--spacing-lg);
-      border: var(--ui-border-width) solid var(--border-primary);
-    }
-
-    .other-details-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: var(--spacing-lg);
-    }
+  /* MOBILE FIX (Screens 1024px and smaller) */
+  @media (max-width: 1024px) {
+    position: static !important; /* Force normal scrolling behavior */
+    top: auto !important;
+    width: 100%;                 /* Take full width */
+    height: auto;
   }
 }
+// /* ==============================================
+//    SUPPLIER DETAILS COMPONENT
+//    - Re-using branch-details.scss styles
+//    - Adds supplier-specific cards
+//    ============================================== */
 
-/* === UTILITY === */
-:host ::ng-deep .p-button.p-button-rounded {
-  border-radius: 50%;
-  width: 2.5rem;  // Standard PrimeNG size
-  height: 2.5rem;
-}
+// :host {
+//   display: block;
+//   width: 100%;
+//   height: 100%;
+// }
+
+// .customer-page-container {
+//   width: 100%;
+//   height: 100%;
+//   overflow: hidden; // Prevents whole page scroll
+//   display: flex;
+//   flex-direction: column;
+//   background: var(--bg-primary);
+// }
+
+// /* === Card Layout === */
+// .customer-details-card {
+//   display: flex;
+//   flex-direction: column;
+//   flex: 1; // Grow to fill container
+//   background: var(--bg-primary);
+//   border-radius: var(--ui-border-radius-lg);
+//   box-shadow: var(--shadow-md);
+//   overflow: hidden; // Important for body scrolling
+//   margin: var(--spacing-xl); // Add some margin
+// }
+
+// /* === HEADER === */
+// .details-header {
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   padding: var(--spacing-lg) var(--spacing-xl);
+//   background: var(--bg-secondary);
+//   border-bottom: var(--ui-border-width) solid var(--border-primary);
+//   flex-shrink: 0; // Prevent header from shrinking
+
+//   .header-left {
+//     display: flex;
+//     align-items: center;
+//     gap: var(--spacing-lg);
+
+//     .header-info {
+//       display: flex;
+//       align-items: center;
+//       gap: var(--spacing-md);
+//       .form-title {
+//         font-size: var(--font-size-2xl); // Larger title
+//         font-weight: 600;
+//         color: var(--text-primary);
+//         margin: 0; // Remove default margin
+//       }
+//     }
+//   }
+
+//   .header-actions {
+//     display: flex;
+//     gap: var(--spacing-sm);
+//   }
+// }
+
+// /* === BODY === */
+// .details-body {
+//   display: flex;
+//   gap: var(--spacing-xl);
+//   padding: var(--spacing-xl);
+//   overflow-y: auto; // Allow this section to scroll
+//   flex: 1; // Grow to fill space
+//   background-color: var(--bg-primary);
+  
+//   @media (max-width: 1024px) {
+//     flex-direction: column;
+//   }
+// }
+
+// /* === SIDEBAR === */
+// .profile-sidebar {
+//   width: 24%;
+//   min-width: 250px;
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   background: var(--bg-secondary);
+//   border-radius: var(--ui-border-radius-lg);
+//   padding: var(--spacing-xl);
+//   border: var(--ui-border-width) solid var(--border-primary);
+//   box-shadow: var(--shadow-sm);
+//   align-self: flex-start; // Stick to top
+//   gap: var(--spacing-md);
+  
+//   @media (max-width: 1024px) {
+//     width: 100%; // Go full width on mobile
+//   }
+
+//   :host ::ng-deep .profile-avatar {
+//     width: 80px;
+//     height: 80px;
+//     font-size: var(--font-size-4xl);
+//     background: var(--accent-primary);
+//     color: #fff; // Fixed: Use white for text on accent bg
+//   }
+
+//   .profile-name {
+//     font-size: var(--font-size-xl);
+//     font-weight: 600;
+//     color: var(--text-primary);
+//     margin: 0;
+//     text-align: center;
+//   }
+
+//   .profile-type {
+//     font-size: var(--font-size-sm);
+//     color: var(--text-secondary);
+//     text-align: center;
+//   }
+
+//   .profile-contact {
+//     width: 100%;
+//     margin-top: var(--spacing-lg);
+//     display: flex;
+//     flex-direction: column;
+//     gap: var(--spacing-md);
+
+//     .contact-card {
+//       display: flex;
+//       align-items: center;
+//       gap: var(--spacing-lg);
+//       background: var(--bg-primary); // Use primary bg
+//       border: var(--ui-border-width) solid var(--border-primary);
+//       border-radius: var(--ui-border-radius);
+//       padding: var(--spacing-md) var(--spacing-lg);
+//       transition: var(--transition-fast);
+
+//       &:hover {
+//         background: var(--bg-ternary);
+//         transform: translateY(-2px);
+//         border-color: var(--border-secondary);
+//       }
+
+//       .contact-icon {
+//         color: var(--accent-primary);
+//         font-size: 1rem;
+//       }
+
+//       .contact-content {
+//         display: flex;
+//         flex-direction: column;
+//         overflow: hidden; // For text truncation
+//         label {
+//           font-size: var(--font-size-xs);
+//           color: var(--text-label);
+//           text-transform: uppercase;
+//         }
+//         span {
+//           font-size: var(--font-size-sm);
+//           font-weight: 500;
+//           color: var(--text-primary);
+//           white-space: nowrap;
+//           overflow: hidden;
+//           text-overflow: ellipsis;
+//         }
+//       }
+//     }
+//   }
+// }
+
+// /* === MAIN DETAILS === */
+// .main-details {
+//   flex: 1;
+//   display: flex;
+//   flex-direction: column;
+//   gap: var(--spacing-xl);
+//   min-width: 0; // Prevent flex overflow
+
+//   .info-section {
+//     background: var(--bg-secondary);
+//     border: var(--ui-border-width) solid var(--border-primary);
+//     border-radius: var(--ui-border-radius-lg);
+//     padding: var(--spacing-xl);
+
+//     .section-title {
+//       font-size: var(--font-size-lg);
+//       font-weight: 600;
+//       color: var(--text-primary);
+//       margin: 0 0 var(--spacing-lg) 0;
+//       border-left: 4px solid var(--accent-primary);
+//       padding-left: var(--spacing-md);
+//     }
+    
+//     /* Base info card style */
+//     .info-card {
+//       background: var(--bg-primary);
+//       border-radius: var(--ui-border-radius);
+//       padding: var(--spacing-md) var(--spacing-lg);
+//       border: var(--ui-border-width) solid var(--border-primary);
+//       display: flex;
+//       flex-direction: column;
+//       gap: var(--spacing-xs);
+
+//       label {
+//         font-size: var(--font-size-xs);
+//         color: var(--text-label);
+//         text-transform: uppercase;
+//         font-weight: 500;
+//       }
+
+//       span {
+//         font-weight: 600;
+//         font-size: var(--font-size-md);
+//         color: var(--text-primary);
+//       }
+      
+//       p {
+//         font-size: var(--font-size-sm);
+//         color: var(--text-secondary);
+//         margin: var(--spacing-xs) 0 0 0;
+//         line-height: var(--line-height-relaxed);
+//       }
+      
+//       &.notes {
+//          grid-column: 1 / -1; // Span full width
+//       }
+//     }
+    
+//     /* Specific to this component */
+//     .financial-grid {
+//       display: grid;
+//       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+//       gap: var(--spacing-lg);
+//     }
+
+//     .stat-card {
+//       // Inherits from .info-card, but we override padding and gap
+//       padding: var(--spacing-md) var(--spacing-lg);
+//       gap: var(--spacing-xs);
+      
+//       .stat-value {
+//         font-size: var(--font-size-3xl);
+//         font-weight: 700;
+//         color: var(--text-primary);
+//         display: block;
+
+//         &.outstanding-supplier {
+//           color: var(--color-error); // Money we owe
+//         }
+        
+//         &.terms {
+//           font-size: var(--font-size-lg);
+//           font-weight: 500;
+//           color: var(--text-secondary);
+//         }
+//       }
+//     }
+
+//     .address-full {
+//       background: var(--bg-primary);
+//       border-radius: var(--ui-border-radius);
+//       padding: var(--spacing-lg);
+//       border: var(--ui-border-width) solid var(--border-primary);
+//     }
+
+//     .other-details-grid {
+//       display: grid;
+//       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+//       gap: var(--spacing-lg);
+//     }
+//   }
+// }
+
+// /* === UTILITY === */
+// :host ::ng-deep .p-button.p-button-rounded {
+//   border-radius: 50%;
+//   width: 2.5rem;  // Standard PrimeNG size
+//   height: 2.5rem;
+// }

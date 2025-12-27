@@ -1,155 +1,183 @@
-@if (currentUser(); as user) {
-  <div class="profile-wrapper fade-in">
-    
-    <!-- 1. HERO SECTION -->
-    <div class="hero-card">
-      <div class="hero-cover"></div>
-      
-      <div class="hero-content">
-        <div class="avatar-wrapper">
-          
-          <div class="avatar-circle">
-            @if (user.avatar) {
-              <img [src]="user.avatar" [alt]="user.name" class="profile-image">
-            } @else {
-              {{ getInitials(user.name) }}
-            }
-          </div>
+<div class="page-container animate-fadeIn">
 
-          <div class="status-indicator" [class.active]="user.isActive"></div>
-
-          <button class="upload-btn" (click)="triggerFileInput()" [disabled]="uploading()">
-            @if (uploading()) {
-              <div class="spinner"></div> 
-            } @else {
-              <span class="upload-icon">📸</span>
-            }
-          </button>
-
-          <input 
-            type="file" 
-            #fileInput 
-            (change)="onFileSelected($event)" 
-            accept="image/*" 
-            style="display: none;">
-
-        </div>
-
-        <div class="identity-section">
-          <div class="name-block">
-            <h1 class="user-name">{{ user.name }}</h1>
-            <p class="user-role">{{ user.role.name }} • {{ user.organizationId }}</p>
-          </div>
-          
-          <div class="action-buttons">
-             <div class="id-badge">
-              <span class="label">UID</span>
-              <span class="value">{{ user._id | slice:0:8 }}...</span>
-            </div>
-            <button class="btn btn-primary">Edit Profile</button>
-            <button class="btn btn-secondary">Activity Log</button>
+  @if (!currentUser()) {
+    <div class="loading-state">
+      <div class="skeleton-header">
+        <div class="left-group">
+          <p-skeleton shape="circle" size="4rem"></p-skeleton>
+          <div class="text-group">
+            <p-skeleton width="12rem" height="1.5rem"></p-skeleton>
+            <p-skeleton width="8rem" height="1rem"></p-skeleton>
           </div>
         </div>
+      </div>
+      <div class="layout-grid">
+        <aside class="skeleton-sidebar">
+          <p-skeleton height="400px" styleClass="w-full"></p-skeleton>
+        </aside>
+        <main class="skeleton-main">
+          <p-skeleton height="200px" styleClass="w-full"></p-skeleton>
+          <p-skeleton height="300px" styleClass="w-full"></p-skeleton>
+        </main>
       </div>
     </div>
-    
-    <!-- Error Alert -->
-    @if (uploadError(); as error) {
-      <div class="alert-error">
-        <span class="icon">⚠️</span>
-        {{ error }}
+  }
+
+  @else if (currentUser(); as user) {
+
+    <header class="dashboard-header">
+      <div class="header-left">
+        <div class="identity-group">
+          <div class="name-row">
+            <h1>{{ user.name }}</h1>
+            <p-tag [value]="user.isActive ? 'Active' : 'Inactive'" [severity]="user.isActive ? 'success' : 'danger'" styleClass="status-tag"></p-tag>
+          </div>
+          <div class="meta-row">
+            <span class="role-badge">
+              <i class="pi" [ngClass]="user.role.name === 'all access' ? 'pi-shield' : 'pi-user'"></i>
+              {{ user.role.name | uppercase }}
+            </span>
+            <span class="org-badge">{{ user.organizationId }}</span>
+          </div>
+        </div>
       </div>
-    }
 
-    <!-- 2. CONTENT GRID -->
-    <div class="content-grid">
-      
-      <!-- LEFT COLUMN -->
-      <aside class="side-column">
+      <div class="header-actions">
+        <button pButton label="Edit Profile" icon="pi pi-user-edit" class="p-button-outlined p-button-secondary btn-sm"></button>
+      </div>
+    </header>
+
+    <div class="layout-grid">
+
+      <aside class="sidebar-column">
         
-        <section class="card detail-card">
-          <h3 class="section-heading">Contact Info</h3>
-          <ul class="info-list">
-            <li class="info-item">
-              <span class="icon">📧</span>
-              <div class="info-data">
-                <span class="label">Email</span>
-                <span class="value">{{ user.email }}</span>
-              </div>
-            </li>
-            <li class="info-item">
-              <span class="icon">📅</span>
-              <div class="info-data">
-                <span class="label">Joined</span>
-                <span class="value">{{ user.createdAt | date:'mediumDate' }}</span>
-              </div>
-            </li>
-          </ul>
-        </section>
-
-        @if (user.branchId; as branch) {
-          <section class="card detail-card branch-card">
-            <h3 class="section-heading">Location</h3>
-            <div class="location-preview">
-              <div class="map-placeholder">
-                <span class="map-icon">📍</span>
-              </div>
-              <div class="location-details">
-                <h4>{{ branch.name | titlecase }}</h4>
-                <p>{{ branch.address.city }}, {{ branch.address.country }}</p>
-              </div>
-            </div>
-          </section>
-        }
-
-        <section class="card detail-card">
-          <h3 class="section-heading">Preferences</h3>
-          <div class="pref-toggles">
-            <div class="toggle-row">
-              <span>Dark Mode</span>
-              <div class="pill-toggle" [class.on]="user.preferences.theme === 'dark'"></div>
-            </div>
-            <div class="toggle-row">
-              <span>Dense Mode</span>
-              <div class="pill-toggle" [class.on]="user.preferences.denseMode"></div>
-            </div>
-            <div class="notification-pills">
-              <span class="pill" [class.active]="user.preferences.notifications.email">Email</span>
-              <span class="pill" [class.active]="user.preferences.notifications.push">Push</span>
-              <span class="pill" [class.active]="user.preferences.notifications.sms">SMS</span>
-            </div>
-          </div>
-        </section>
-      </aside>
-
-      <!-- MAIN COLUMN -->
-      <main class="main-column">
-        
-        <section class="card large-card">
-          <div class="card-header">
-            <h3 class="section-heading">Permissions & Access Control</h3>
-            <span class="counter">{{ user.role.permissions.length }}</span>
-          </div>
+        <div class="profile-card">
+          <div class="card-banner"></div>
           
-          <div class="permissions-grid">
-            @for (perm of user.role.permissions; track perm) {
-              <div class="permission-chip">
-                <span class="check">✓</span>
-                {{ formatPermission(perm) }}
+          <div class="profile-content">
+            
+            <div class="avatar-wrapper" (click)="!uploading() && triggerFileInput()">
+              <div class="avatar-circle">
+                @if (user.avatar) {
+                  <img [src]="user.avatar" [alt]="user.name" class="profile-image">
+                } @else {
+                  <span class="initials">{{ getInitials(user.name) }}</span>
+                }
+                
+                <div class="avatar-overlay">
+                  <i class="pi pi-camera"></i>
+                </div>
+
+                @if (uploading()) {
+                  <div class="avatar-loader"><i class="pi pi-spin pi-spinner"></i></div>
+                }
+              </div>
+              <div class="status-dot" [class.active]="user.isActive"></div>
+            </div>
+            
+            <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none;">
+
+            <h3 class="contact-name">{{ user.name }}</h3>
+            <span class="contact-email">{{ user.email }}</span>
+
+            <div class="info-list">
+              <div class="info-item">
+                <div class="icon-box"><i class="pi pi-calendar"></i></div>
+                <div class="info-text">
+                  <label>Joined</label>
+                  <span>{{ user.createdAt | date:'mediumDate' }}</span>
+                </div>
+              </div>
+              
+              <div class="info-item">
+                <div class="icon-box"><i class="pi pi-id-card"></i></div>
+                <div class="info-text">
+                  <label>User ID</label>
+                  <span class="font-mono text-xs">{{ user._id | slice:0:8 }}...</span>
+                </div>
+              </div>
+            </div>
+
+            @if (uploadError()) {
+              <div class="error-alert">
+                <i class="pi pi-exclamation-circle"></i> {{ uploadError() }}
               </div>
             }
           </div>
+        </div>
+
+        @if (user.branchId; as branch) {
+          <div class="glass-card branch-card">
+            <div class="card-header">
+              <i class="pi pi-building"></i> <span>Assigned Branch</span>
+            </div>
+            <div class="card-body">
+              <h4 class="branch-name">{{ branch.name }}</h4>
+              <p class="branch-address">
+                {{ branch.address.city }}, {{ branch.address.state }}<br>
+                <span class="text-xs text-muted">{{ branch.address.country }} - {{ branch.address.zipCode }}</span>
+              </p>
+            </div>
+          </div>
+        }
+
+        <div class="glass-card pref-card">
+          <div class="card-header">
+            <i class="pi pi-cog"></i> <span>Preferences</span>
+          </div>
+          <div class="card-body">
+            <div class="pref-row">
+              <span>Dark Mode</span>
+              <div class="status-indicator" [class.on]="user.preferences.theme === 'dark'"></div>
+            </div>
+            <div class="pref-row">
+              <span>Dense Mode</span>
+              <div class="status-indicator" [class.on]="user.preferences.denseMode"></div>
+            </div>
+            <div class="tags-row">
+              <span class="pref-tag" [class.active]="user.preferences.notifications.email">Email</span>
+              <span class="pref-tag" [class.active]="user.preferences.notifications.push">Push</span>
+              <span class="pref-tag" [class.active]="user.preferences.notifications.sms">SMS</span>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+
+      <main class="main-column">
+        
+        <section class="glass-card permissions-panel">
+          <div class="card-header">
+            <div class="flex items-center gap-2">
+              <i class="pi pi-lock"></i> 
+              <span>Access & Permissions</span>
+            </div>
+            <span class="count-badge">{{ user.role.permissions?user.role.permissions.length:0 }} Perms</span>
+          </div>
+
+          <div class="card-body">
+            <div class="permissions-grid">
+              @for (perm of user.role.permissions; track perm) {
+                <div class="perm-chip">
+                  <i class="pi pi-check-circle"></i>
+                  <span>{{ formatPermission(perm) }}</span>
+                </div>
+              }
+            </div>
+          </div>
         </section>
 
-        <section class="card large-card">
-          <h3 class="section-heading">System Metadata</h3>
-          <div class="meta-grid">
+        <section class="glass-card meta-panel">
+          <div class="card-header">
+            <i class="pi pi-server"></i> <span>System Metadata</span>
+          </div>
+          <div class="card-body grid-2">
             <div class="meta-box">
-              <span class="label">Last Updated</span>
+              <label>Last Updated</label>
               <span class="val">{{ user.updatedAt | date:'medium' }}</span>
             </div>
             <div class="meta-box">
-              <span class="label">Status</span>
+              <label>Account Status</label>
               <span class="val status-text" [class.active]="user.isActive">
                 {{ user.isActive ? 'Operational' : 'Suspended' }}
               </span>
@@ -158,166 +186,7 @@
         </section>
 
       </main>
+
     </div>
-  </div>
-} @else {
-  <div class="loading-container">
-    <div class="spinner-large"></div>
-    <p>Loading Profile...</p>
-  </div>
-}<!-- @if (currentUser(); as user) {
-  <div class="profile-wrapper fade-in">
-    
-    <div class="hero-card">
-      <div class="hero-cover"></div>
-      
-      <div class="hero-content">
-        <div class="avatar-wrapper">
-          
-          <div class="avatar-circle">
-            @if (user.avatar) {
-              <img [src]="user.avatar" [alt]="user.name" class="profile-image">
-            } @else {
-              {{ getInitials(user.name) }}
-            }
-          </div>
-
-          <div class="status-indicator" [class.active]="user.isActive"></div>
-
-          <button class="upload-btn" (click)="triggerFileInput()" [disabled]="uploading()">
-            @if (uploading()) {
-              <div class="spinner"></div> } @else {
-              <span class="upload-icon">📸</span>
-            }
-          </button>
-
-          <input 
-            type="file" 
-            #fileInput 
-            (change)="onFileSelected($event)" 
-            accept="image/*" 
-            style="display: none;">
-
-        </div>
-
-        <div class="identity-section">
-          <div class="name-block">
-            <h1 class="user-name">{{ user.name }}</h1>
-            <p class="user-role">{{ user.role.name }} • {{ user.organizationId }}</p>
-          </div>
-          
-          <div class="action-buttons">
-             <div class="id-badge">
-              <span class="label">UID</span>
-              <span class="value">{{ user._id | slice:0:8 }}...</span>
-            </div>
-            <button class="btn btn-primary">Edit Profile</button>
-            <button class="btn btn-secondary">Activity Log</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    @if (uploadError(); as error) {
-      <div class="alert-error">{{ error }}</div>
-    }
-
-    <div class="content-grid">
-      
-      <aside class="side-column">
-        
-        <section class="card detail-card">
-          <h3 class="section-heading">Contact Info</h3>
-          <ul class="info-list">
-            <li class="info-item">
-              <span class="icon">📧</span>
-              <div class="info-data">
-                <span class="label">Email</span>
-                <span class="value">{{ user.email }}</span>
-              </div>
-            </li>
-            <li class="info-item">
-              <span class="icon">📅</span>
-              <div class="info-data">
-                <span class="label">Joined</span>
-                <span class="value">{{ user.createdAt | date:'mediumDate' }}</span>
-              </div>
-            </li>
-          </ul>
-        </section>
-
-        @if (user.branchId; as branch) {
-          <section class="card detail-card branch-card">
-            <h3 class="section-heading">Location</h3>
-            <div class="location-preview">
-              <div class="map-placeholder">
-                <span class="map-icon">📍</span>
-              </div>
-              <div class="location-details">
-                <h4>{{ branch.name | titlecase }}</h4>
-                <p>{{ branch.address.city }}, {{ branch.address.country }}</p>
-              </div>
-            </div>
-          </section>
-        }
-
-        <section class="card detail-card">
-          <h3 class="section-heading">Preferences</h3>
-          <div class="pref-toggles">
-            <div class="toggle-row">
-              <span>Dark Mode</span>
-              <div class="pill-toggle" [class.on]="user.preferences.theme === 'dark'"></div>
-            </div>
-            <div class="toggle-row">
-              <span>Dense Mode</span>
-              <div class="pill-toggle" [class.on]="user.preferences.denseMode"></div>
-            </div>
-            <div class="notification-pills">
-              <span class="pill" [class.active]="user.preferences.notifications.email">Email</span>
-              <span class="pill" [class.active]="user.preferences.notifications.push">Push</span>
-              <span class="pill" [class.active]="user.preferences.notifications.sms">SMS</span>
-            </div>
-          </div>
-        </section>
-      </aside>
-
-      <main class="main-column">
-        
-        <section class="card large-card">
-          <div class="card-header">
-            <h3 class="section-heading">Permissions & Access Control</h3>
-            <span class="counter">{{ user.role.permissions.length }}</span>
-          </div>
-          
-          <div class="permissions-grid">
-            @for (perm of user.role.permissions; track perm) {
-              <div class="permission-chip">
-                <span class="check">✓</span>
-                {{ formatPermission(perm) }}
-              </div>
-            }
-          </div>
-        </section>
-
-        <section class="card large-card">
-          <h3 class="section-heading">System Metadata</h3>
-          <div class="meta-grid">
-            <div class="meta-box">
-              <span class="label">Last Updated</span>
-              <span class="val">{{ user.updatedAt | date:'medium' }}</span>
-            </div>
-            <div class="meta-box">
-              <span class="label">Status</span>
-              <span class="val status-text" [class.active]="user.isActive">
-                {{ user.isActive ? 'Operational' : 'Suspended' }}
-              </span>
-            </div>
-          </div>
-        </section>
-
-      </main>
-    </div>
-  </div>
-} @else {
-  <div class="loading-skeleton">Loading...</div>
-} -->
+  }
+</div>

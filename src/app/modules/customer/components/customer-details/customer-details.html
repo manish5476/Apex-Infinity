@@ -1,248 +1,43 @@
 <div class="page-container animate-fadeIn">
 
   @if (loadingProfile()) {
-    <div class="loading-state">
-      <div class="skeleton-header">
-        <div class="left-group">
-          <p-skeleton shape="circle" size="4rem"></p-skeleton>
-          <div class="text-group">
-            <p-skeleton width="12rem" height="1.5rem"></p-skeleton>
-            <p-skeleton width="8rem" height="1rem"></p-skeleton>
-          </div>
+  <div class="loading-state">
+    <div class="skeleton-header">
+      <div class="left-group">
+        <p-skeleton shape="circle" size="4rem"></p-skeleton>
+        <div class="text-group">
+          <p-skeleton width="12rem" height="1.5rem"></p-skeleton>
+          <p-skeleton width="8rem" height="1rem"></p-skeleton>
         </div>
       </div>
-      <div class="layout-grid">
-        <aside class="skeleton-sidebar">
-          <p-skeleton height="400px" styleClass="w-full"></p-skeleton>
-        </aside>
-        <main class="skeleton-main">
-          <div class="metrics-row">
-            <p-skeleton height="100px" styleClass="w-full"></p-skeleton>
-            <p-skeleton height="100px" styleClass="w-full"></p-skeleton>
-            <p-skeleton height="100px" styleClass="w-full"></p-skeleton>
-          </div>
-          <p-skeleton height="400px" styleClass="w-full"></p-skeleton>
-        </main>
-      </div>
     </div>
-  }
-
-  @else if (isError()) {
-    <div class="error-state">
-      <div class="error-icon">
-        <i class="pi pi-exclamation-triangle"></i>
-      </div>
-      <h2>Unable to load profile</h2>
-      <div class="actions">
-        <button pButton label="Go Back" icon="pi pi-arrow-left" class="p-button-outlined btn-sm" routerLink="/customer"></button>
-        <button pButton label="Retry" icon="pi pi-refresh" class="p-button-text btn-sm" (click)="retryLoad()"></button>
-      </div>
-    </div>
-  }
-
-  @else if (customer(); as c) {
-
-    <header class="dashboard-header">
-      <div class="header-left">
-        <button pButton icon="pi pi-arrow-left" class="p-button-text p-button-rounded back-btn" routerLink="/customer"></button>
-        
-        <div class="identity-group">
-          <div class="name-row">
-            <h1>{{ c.name }}</h1>
-            <p-tag [value]="c.isActive ? 'Active' : 'Inactive'" [severity]="c.isActive ? 'success' : 'danger'" styleClass="status-tag"></p-tag>
-          </div>
-          <div class="meta-row">
-            <span class="id-badge">
-              <i class="pi pi-hashtag"></i> {{ c.code || c._id | uppercase }}
-            </span>
-            <span class="type-badge">{{ c.type }} CUSTOMER</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="header-actions">
-        <button pButton label="Transactions" icon="pi pi-list" class="p-button-outlined p-button-secondary btn-sm"
-          (click)="showTransactionsDialog = true"></button>
-
-        <button pButton label="Edit" icon="pi pi-user-edit" class="p-button-outlined p-button-secondary btn-sm"
-          [routerLink]="['../../customer/create']" [queryParams]="{id: c._id}"></button>
-
-        <button pButton label="New Invoice" icon="pi pi-plus" class="p-button-primary btn-sm"
-          routerLink="/invoices/create" [queryParams]="{customerId: c._id}"></button>
-      </div>
-    </header>
-
     <div class="layout-grid">
-
-      <aside class="profile-card">
-        <div class="card-banner"></div>
-        
-        <div class="profile-content">
-          <div class="avatar-wrapper">
-            <p-avatar [appImageViewer]="c.avatar" [image]="c.avatar" [label]="c.avatar ? '' : common.getInitials(c.name)"
-              size="xlarge" shape="circle" styleClass="user-avatar">
-            </p-avatar>
-            
-            <button class="edit-avatar-btn" (click)="fileInput.click(); $event.stopPropagation()" title="Change Photo">
-              <i class="pi pi-camera"></i>
-            </button>
-            <input #fileInput type="file" accept="image/*" style="display: none" (change)="onFileSelected($event)">
-            
-            <div class="status-dot" [class.active]="c.isActive"></div>
-          </div>
-
-          <h3 class="contact-name">{{ c.contactPerson || c.name }}</h3>
-          <a [href]="'mailto:' + c.email" class="contact-email">{{ c.email || 'No email provided' }}</a>
-
-          <div class="info-list">
-            <div class="info-item">
-              <div class="icon-box"><i class="pi pi-phone"></i></div>
-              <div class="info-text">
-                <label>Phone</label>
-                <a [href]="'tel:' + c.phone">{{ c.phone || '—' }}</a>
-              </div>
-            </div>
-
-            <div class="info-item">
-              <div class="icon-box"><i class="pi pi-id-card"></i></div>
-              <div class="info-text">
-                <label>GSTIN</label>
-                <span class="mono-text">{{ c.gstNumber || '—' }}</span>
-              </div>
-            </div>
-
-            <div class="info-item">
-              <div class="icon-box"><i class="pi pi-map-marker"></i></div>
-              <div class="info-text">
-                <label>Address</label>
-                <span class="address-text">{{ c.billingAddress?.city || '—' }}</span>
-                <span class="sub-text">{{ c.billingAddress?.street }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+      <aside class="skeleton-sidebar">
+        <p-skeleton height="400px" styleClass="w-full"></p-skeleton>
       </aside>
-
-      <main class="main-content">
-        
-        <section class="metrics-grid">
-          <div class="metric-card outstanding">
-            <div class="metric-icon"><i class="pi pi-wallet"></i></div>
-            <div class="metric-data">
-              <label>Outstanding</label>
-              <span class="value">{{ common.formatCurrency(closingBalance()) }}</span>
-            </div>
-          </div>
-
-          <div class="metric-card invoiced">
-            <div class="metric-icon"><i class="pi pi-receipt"></i></div>
-            <div class="metric-data">
-              <label>Total Invoiced</label>
-              <span class="value">{{ common.formatCurrency(totalInvoiced()) }}</span>
-            </div>
-          </div>
-
-          <div class="metric-card received">
-            <div class="metric-icon"><i class="pi pi-check-circle"></i></div>
-            <div class="metric-data">
-              <label>Total Received</label>
-              <span class="value">{{ common.formatCurrency(totalPaid()) }}</span>
-            </div>
-          </div>
-
-          <div class="metric-card limit">
-            <div class="metric-icon"><i class="pi pi-shield"></i></div>
-            <div class="metric-data">
-              <label>Credit Limit</label>
-              <span class="value">{{ common.formatCurrency(c.creditLimit) }}</span>
-            </div>
-          </div>
-        </section>
-
-        <section class="activity-panel">
-          <div class="tabs-header">
-            <button class="tab-btn" [class.active]="activeTab() === 'ledger'" (click)="switchTab('ledger')">
-              <i class="pi pi-list"></i> Ledger
-            </button>
-            <button class="tab-btn" [class.active]="activeTab() === 'invoices'" (click)="switchTab('invoices')">
-              <i class="pi pi-file"></i> Invoices
-            </button>
-            <button class="tab-btn" [class.active]="activeTab() === 'payments'" (click)="switchTab('payments')">
-              <i class="pi pi-wallet"></i> Payments
-            </button>
-          </div>
-
-          <div class="grid-container">
-            @if (activeTab() === 'ledger') {
-              <app-ag-share-grid [columns]="ledgerColumns" [data]="ledgerHistory()" [showActions]="false"
-                selectionMode="multiple" style="height: 100%; width: 100%; display: block;">
-              </app-ag-share-grid>
-            }
-
-            @if (activeTab() === 'invoices') {
-              <app-ag-share-grid [columns]="invoiceColumns" [data]="invoices()" [showActions]="false"
-                selectionMode="multiple" (gridEvent)="onGridEvent($event, 'invoices')"
-                style="height: 100%; width: 100%; display: block;">
-              </app-ag-share-grid>
-            }
-
-            @if (activeTab() === 'payments') {
-              <app-ag-share-grid [columns]="paymentColumns" [data]="payments()" [showActions]="false"
-                selectionMode="multiple" (gridEvent)="onGridEvent($event, 'payments')"
-                style="height: 100%; width: 100%; display: block;">
-              </app-ag-share-grid>
-            }
-          </div>
-        </section>
-
+      <main class="skeleton-main">
+        <div class="metrics-row">
+          <p-skeleton height="100px" styleClass="w-full"></p-skeleton>
+          <p-skeleton height="100px" styleClass="w-full"></p-skeleton>
+          <p-skeleton height="100px" styleClass="w-full"></p-skeleton>
+        </div>
+        <p-skeleton height="400px" styleClass="w-full"></p-skeleton>
       </main>
-    </div>
-  }
-</div>
-
-<p-dialog header="Transaction History" [(visible)]="showTransactionsDialog" [modal]="true"
-  [style]="{ width: '90vw', height: '90vh' }" [maximizable]="true" [draggable]="false" [resizable]="false" 
-  styleClass="theme-dialog" appendTo="body">
-  <ng-container>
-    <app-customer-transactions [inputCustomerId]="customer()?._id"></app-customer-transactions>
-  </ng-container>
-</p-dialog>
-
-<p-toast></p-toast><!-- <div class="dashboard-container animate-fadeInDown">
-
-  @if (loadingProfile()) {
-  <div class="dashboard-header mb-md">
-    <div class="flex gap-md items-center">
-      <p-skeleton shape="circle" size="4rem"></p-skeleton>
-      <div class="flex flex-col gap-sm">
-        <p-skeleton width="12rem" height="1.5rem"></p-skeleton>
-        <p-skeleton width="6rem" height="1rem"></p-skeleton>
-      </div>
-    </div>
-  </div>
-  <div class="layout-grid">
-    <div class="w-full">
-      <p-skeleton height="300px" styleClass="rounded-xl"></p-skeleton>
-    </div>
-    <div class="w-full flex flex-col gap-md">
-      <div class="flex gap-md overflow-hidden">
-        <p-skeleton width="100px" height="80px" styleClass="rounded-xl"></p-skeleton>
-        <p-skeleton width="100px" height="80px" styleClass="rounded-xl"></p-skeleton>
-        <p-skeleton width="100px" height="80px" styleClass="rounded-xl"></p-skeleton>
-      </div>
-      <p-skeleton height="300px" styleClass="rounded-xl"></p-skeleton>
     </div>
   </div>
   }
 
   @else if (isError()) {
   <div class="error-state">
-    <div class="error-icon-wrapper">
+    <div class="error-icon">
       <i class="pi pi-exclamation-triangle"></i>
     </div>
-    <h2>Unable to load customer profile</h2>
-    <button pButton label="Go Back" icon="pi pi-arrow-left" class="p-button-outlined" routerLink="/customer"></button>
-    <button pButton label="Retry" icon="pi pi-refresh" class="p-button-text mt-2" (click)="retryLoad()"></button>
+    <h2>Unable to load profile</h2>
+    <div class="actions">
+      <button pButton label="Go Back" icon="pi pi-arrow-left" class="p-button-outlined btn-sm"
+        routerLink="/customer"></button>
+      <button pButton label="Retry" icon="pi pi-refresh" class="p-button-text btn-sm" (click)="retryLoad()"></button>
+    </div>
   </div>
   }
 
@@ -253,161 +48,167 @@
       <button pButton icon="pi pi-arrow-left" class="p-button-text p-button-rounded back-btn"
         routerLink="/customer"></button>
 
-      <div class="customer-identity">
+      <div class="identity-group">
         <div class="name-row">
-          <h1 class="truncate">{{ c.name }}</h1>
+          <h1>{{ c.name }}</h1>
           <p-tag [value]="c.isActive ? 'Active' : 'Inactive'" [severity]="c.isActive ? 'success' : 'danger'"
-            styleClass="text-xs font-bold"></p-tag>
+            styleClass="status-tag"></p-tag>
         </div>
-
-        <div class="badges">
-          <span class="id-pill">
-            <i class="pi pi-hashtag text-xs mr-1"></i>
-            {{ c.code || c._id | uppercase }}
+        <div class="meta-row">
+          <span class="id-badge">
+            <i class="pi pi-hashtag"></i> {{ c.code || c._id | uppercase }}
           </span>
-          <span class="type-label">{{ c.type }} CUSTOMER</span>
+          <span class="type-badge">{{ c.type }} CUSTOMER</span>
         </div>
       </div>
     </div>
 
     <div class="header-actions">
-      <button pButton label="Transactions" icon="pi pi-list"
-        class="p-button-outlined p-button-secondary p-button-sm action-btn"
+      <button pButton label="Transactions" icon="pi pi-list" class="p-button-outlined p-button-secondary btn-sm"
         (click)="showTransactionsDialog = true"></button>
 
-      <button pButton label="Edit" icon="pi pi-user-edit"
-        class="p-button-outlined p-button-secondary p-button-sm action-btn" [routerLink]="['../../customer/create']"
-        [queryParams]="{id: c._id}"></button>
+      <button pButton label="Edit" icon="pi pi-user-edit" class="p-button-outlined p-button-secondary btn-sm"
+        [routerLink]="['../../customer/create']" [queryParams]="{id: c._id}"></button>
 
-      <button pButton label="New Invoice" icon="pi pi-plus" class="p-button-primary p-button-sm action-btn"
+      <button pButton label="New Invoice" icon="pi pi-plus" class="p-button-primary btn-sm"
         routerLink="/invoices/create" [queryParams]="{customerId: c._id}"></button>
     </div>
   </header>
 
   <div class="layout-grid">
 
-    <aside class="profile-card glass-card">
+    <aside class="profile-card">
       <div class="card-banner"></div>
 
-      <div class="identity-section">
+      <div class="profile-content">
         <div class="avatar-wrapper">
           <p-avatar [appImageViewer]="c.avatar" [image]="c.avatar" [label]="c.avatar ? '' : common.getInitials(c.name)"
-            size="xlarge" shape="circle" styleClass="user-avatar shadow-lg">
+            size="xlarge" shape="circle" styleClass="user-avatar">
           </p-avatar>
 
-          <button pButton type="button" icon="pi pi-pencil"
-            class="p-button-rounded p-button-secondary p-button-sm edit-btn" pTooltip="Change Photo"
-            (click)="fileInput.click(); $event.stopPropagation()">
+          <button class="edit-avatar-btn" (click)="fileInput.click(); $event.stopPropagation()" title="Change Photo">
+            <i class="pi pi-camera"></i>
           </button>
           <input #fileInput type="file" accept="image/*" style="display: none" (change)="onFileSelected($event)">
 
-          <div class="status-indicator" [class.active]="c.isActive"></div>
+          <div class="status-dot" [class.active]="c.isActive"></div>
         </div>
 
-        <h3 class="truncate">{{ c.contactPerson || c.name }}</h3>
-        <span class="email truncate">{{ c.email }}</span>
-      </div>
+        <h3 class="contact-name">{{ c.contactPerson || c.name }}</h3>
+        <a [href]="'mailto:' + c.email" class="contact-email">{{ c.email || 'No email provided' }}</a>
 
-      <div class="details-list">
-        <div class="detail-item">
-          <div class="icon-circle"><i class="pi pi-phone"></i></div>
-          <div class="meta">
-            <label>Phone</label>
-            <a [href]="'tel:' + c.phone" class="link-text">{{ c.phone || 'N/A' }}</a>
+        <div class="info-list">
+          <div class="info-item">
+            <div class="icon-box"><i class="pi pi-phone"></i></div>
+            <div class="info-text">
+              <label>Phone</label>
+              <a [href]="'tel:' + c.phone">{{ c.phone || '—' }}</a>
+            </div>
           </div>
-        </div>
 
-        <div class="detail-item">
-          <div class="icon-circle"><i class="pi pi-id-card"></i></div>
-          <div class="meta">
-            <label>GSTIN</label>
-            <span class="font-mono select-all">{{ c.gstNumber || 'N/A' }}</span>
+          <div class="info-item">
+            <div class="icon-box"><i class="pi pi-id-card"></i></div>
+            <div class="info-text">
+              <label>GSTIN</label>
+              <span class="mono-text">{{ c.gstNumber || '—' }}</span>
+            </div>
           </div>
-        </div>
 
-        <div class="detail-item">
-          <div class="icon-circle"><i class="pi pi-map-marker"></i></div>
-          <div class="meta">
-            <label>Address</label>
-            <span class="truncate">{{ c.billingAddress?.city || 'City not set' }}</span>
-            <span class="text-muted text-xs truncate">{{ c.billingAddress?.street }}</span>
+          <div class="info-item">
+            <div class="icon-box"><i class="pi pi-map-marker"></i></div>
+            <div class="info-text">
+              <label>Address</label>
+              <span class="address-text">{{ c.billingAddress?.city || '—' }}</span>
+              <span class="sub-text">{{ c.billingAddress?.street }}</span>
+            </div>
           </div>
         </div>
       </div>
     </aside>
 
-    <main class="right-content">
-
-      <section class="metrics-scroll-container">
-        <div class="metric-card glass-card outstanding">
-          <div class="icon-box"><i class="pi pi-wallet"></i></div>
-          <div class="data-box">
+    <main class="main-content">
+      <section class="metrics-grid">
+        <div class="metric-card outstanding">
+          <div class="metric-top-row">
+            <div class="metric-icon"><i class="pi pi-wallet"></i></div>
             <label>Outstanding</label>
+          </div>
+          <div class="metric-data">
             <span class="value">{{ common.formatCurrency(closingBalance()) }}</span>
           </div>
         </div>
 
-        <div class="metric-card glass-card invoiced">
-          <div class="icon-box"><i class="pi pi-receipt"></i></div>
-          <div class="data-box">
-            <label>Invoiced</label>
+        <div class="metric-card invoiced">
+          <div class="metric-top-row">
+            <div class="metric-icon"><i class="pi pi-receipt"></i></div>
+            <label>Total Invoiced</label>
+          </div>
+          <div class="metric-data">
             <span class="value">{{ common.formatCurrency(totalInvoiced()) }}</span>
           </div>
         </div>
 
-        <div class="metric-card glass-card received">
-          <div class="icon-box"><i class="pi pi-check-circle"></i></div>
-          <div class="data-box">
-            <label>Received</label>
+        <div class="metric-card received">
+          <div class="metric-top-row">
+            <div class="metric-icon"><i class="pi pi-check-circle"></i></div>
+            <label>Total Received</label>
+          </div>
+          <div class="metric-data">
             <span class="value">{{ common.formatCurrency(totalPaid()) }}</span>
           </div>
         </div>
 
-        <div class="metric-card glass-card limit">
-          <div class="icon-box"><i class="pi pi-shield"></i></div>
-          <div class="data-box">
+        <div class="metric-card limit">
+          <div class="metric-top-row">
+            <div class="metric-icon"><i class="pi pi-shield"></i></div>
             <label>Credit Limit</label>
-            <span class="value">{{ common.formatCurrency(c.creditLimit) }}</span>
+          </div>
+          <div class="metric-data">
+            <span class="value">{{ common.formatCurrency(customer()?.creditLimit) }}</span>
           </div>
         </div>
       </section>
+      <section class="activity-panel">
 
-      <div class="activity-panel glass-card">
-        <div class="custom-tabs-scroll">
-          <div class="custom-tabs">
-            <button class="tab-btn" [class.active]="activeTab() === 'ledger'" (click)="switchTab('ledger')">
-              <i class="pi pi-list"></i> Ledger
-            </button>
-            <button class="tab-btn" [class.active]="activeTab() === 'invoices'" (click)="switchTab('invoices')">
-              <i class="pi pi-file"></i> Invoices
-            </button>
-            <button class="tab-btn" [class.active]="activeTab() === 'payments'" (click)="switchTab('payments')">
-              <i class="pi pi-wallet"></i> Payments
-            </button>
-          </div>
+        <div class="tabs-header">
+          <button class="tab-btn" [class.active]="activeTab() === 'ledger'" (click)="switchTab('ledger')">
+            Ledger
+          </button>
+
+          <button class="tab-btn" [class.active]="activeTab() === 'invoices'" (click)="switchTab('invoices')">
+            Invoices
+          </button>
+
+          <button class="tab-btn" [class.active]="activeTab() === 'payments'" (click)="switchTab('payments')">
+            Payments
+          </button>
         </div>
-        <div class="grid-wrapper">
+
+        <div class="grid-container">
+
           @if (activeTab() === 'ledger') {
-          <app-ag-share-grid [columns]="ledgerColumns" [data]="ledgerHistory()" [showActions]="false"
-            selectionMode="multiple" style="height: 400px; width: 100%; display: block;">
+          <app-ag-share-grid [columns]="ledgerColumns" [data]="ledgerHistory()" (gridEvent)="eventFromGrid($event)"
+            style="height: 100%; width: 100%; display: block;">
           </app-ag-share-grid>
           }
 
           @if (activeTab() === 'invoices') {
           <app-ag-share-grid [columns]="invoiceColumns" [data]="invoices()" [showActions]="false"
             selectionMode="multiple" (gridEvent)="onGridEvent($event, 'invoices')"
-            style="height: 400px; width: 100%; display: block;">
+            style="height: 100%; width: 100%; display: block;">
           </app-ag-share-grid>
           }
 
           @if (activeTab() === 'payments') {
           <app-ag-share-grid [columns]="paymentColumns" [data]="payments()" [showActions]="false"
             selectionMode="multiple" (gridEvent)="onGridEvent($event, 'payments')"
-            style="height: 400px; width: 100%; display: block;">
+            style="height: 100%; width: 100%; display: block;">
           </app-ag-share-grid>
           }
+
         </div>
-      </div>
+      </section>
+
 
     </main>
   </div>
@@ -415,10 +216,11 @@
 </div>
 
 <p-dialog header="Transaction History" [(visible)]="showTransactionsDialog" [modal]="true"
-  [style]="{ width: '95vw', maxWidth: '1200px', height: '90vh' }" [maximizable]="true" [draggable]="false"
-  [resizable]="false" appendTo="body">
+  [style]="{ width: '90vw', height: '90vh' }" [maximizable]="true" [draggable]="false" [resizable]="false"
+  styleClass="theme-dialog" appendTo="body">
   <ng-container>
     <app-customer-transactions [inputCustomerId]="customer()?._id"></app-customer-transactions>
   </ng-container>
 </p-dialog>
-<p-toast></p-toast> -->
+
+<p-toast></p-toast>

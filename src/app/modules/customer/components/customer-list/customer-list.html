@@ -2,7 +2,7 @@
 
 <div class="list-page-container">
   <div class="themed-card list-content-area">
-    
+
     <div class="se-filter-bar">
       <div class="se-filter-field">
         <label for="customer">Customer</label>
@@ -27,7 +27,8 @@
       </div>
 
       <div class="se-filter-actions">
-        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary" (onClick)="resetFilters()">
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary"
+          (onClick)="resetFilters()">
         </p-button>
       </div>
 
@@ -35,16 +36,10 @@
         <p-button label="New Customer" icon="pi pi-plus" routerLink="create" styleClass="p-button-primary"></p-button>
       </div>
     </div>
-
     <div class="list-grid-wrapper">
-      <app-ag-share-grid 
-        [columns]="column" 
-        [data]="data" 
-        [showActions]="false" 
-        selectionMode="multiple"
+      <app-ag-share-grid [columns]="column" [data]="data" [showActions]="false" selectionMode="multiple"
         (gridEvent)="eventFromGrid($event)">
       </app-ag-share-grid>
     </div>
-
   </div>
 </div>
