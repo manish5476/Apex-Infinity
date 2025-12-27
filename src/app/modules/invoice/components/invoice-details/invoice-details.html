@@ -4,142 +4,125 @@
 <div class="page-container animate-fadeIn">
 
   @if (isLoading()) {
-    <div class="loading-container">
-      <div class="w-full flex justify-between mb-8">
-         <div class="flex gap-4">
-            <p-skeleton shape="circle" size="3rem"></p-skeleton>
-            <div class="flex flex-col gap-2">
-               <p-skeleton width="15rem" height="2rem"></p-skeleton>
-               <p-skeleton width="10rem" height="1rem"></p-skeleton>
-            </div>
-         </div>
-         <div class="flex gap-2">
-            <p-skeleton width="8rem" height="2.5rem"></p-skeleton>
-            <p-skeleton width="3rem" height="2.5rem"></p-skeleton>
-         </div>
+    <div class="loading-state">
+      <div class="skeleton-header">
+        <div class="left-group">
+          <p-skeleton shape="circle" size="3rem"></p-skeleton>
+          <div class="text-group">
+            <p-skeleton width="12rem" height="1.5rem"></p-skeleton>
+            <p-skeleton width="8rem" height="1rem"></p-skeleton>
+          </div>
+        </div>
+        <p-skeleton width="8rem" height="2.5rem"></p-skeleton>
       </div>
-      <div class="grid grid-cols-3 gap-6 w-full mb-8">
-         <p-skeleton height="12rem" styleClass="w-full"></p-skeleton>
-         <p-skeleton height="12rem" styleClass="w-full"></p-skeleton>
-         <p-skeleton height="12rem" styleClass="w-full"></p-skeleton>
+      <div class="skeleton-grid">
+        <p-skeleton height="8rem" styleClass="w-full"></p-skeleton>
+        <p-skeleton height="8rem" styleClass="w-full"></p-skeleton>
+        <p-skeleton height="8rem" styleClass="w-full"></p-skeleton>
       </div>
       <p-skeleton height="20rem" styleClass="w-full"></p-skeleton>
     </div>
   } @else if (invoice(); as inv) {
 
-    <!-- 1. HEADER -->
-    <header class="details-header" style="max-width: 100%">
+    <header class="details-header">
       <div class="header-left">
-        <p-button icon="pi pi-arrow-left" styleClass="p-button-text p-button-rounded back-btn" 
-                  routerLink="/invoices"></p-button>
+        <button pButton icon="pi pi-arrow-left" class="p-button-text p-button-rounded back-btn" routerLink="/invoices"></button>
         
         <div class="title-group">
-          <h1>Invoice #{{ inv.invoiceNumber }}</h1>
-          <div class="subtitle">
-            <span>Issued: {{ common.formatDate(inv.invoiceDate) }}</span>
-            <span class="separator">•</span>
-            <!-- Status Tags -->
-            <p-tag [value]="inv.status | titlecase" [severity]="common.mapStatusToSeverity(inv.status ?? '')"></p-tag>
-            <p-tag [value]="inv.paymentStatus | titlecase" [severity]="common.mapStatusToSeverity(inv.paymentStatus || '')"></p-tag>
+          <div class="title-row">
+            <h1>Invoice #{{ inv.invoiceNumber }}</h1>
+            <p-tag [value]="inv.status" [severity]="common.mapStatusToSeverity(inv.status)"></p-tag>
+          </div>
+          <div class="meta-row">
+            <span class="label">Issued:</span>
+            <span class="value">{{ common.formatDate(inv.invoiceDate) }}</span>
           </div>
         </div>
       </div>
 
       <div class="header-actions">
-        
-        <!-- EMI Button Logic -->
         @if (existingEmiId()) {
-          <p-button label="View EMI Plan" icon="pi pi-percentage" styleClass="p-button-outlined p-button-help"
-            [routerLink]="['/emis', existingEmiId()]" pTooltip="View active EMI Plan">
-          </p-button>
+          <p-button label="View EMI Plan" icon="pi pi-percentage" styleClass="p-button-outlined p-button-help btn-sm"
+            [routerLink]="['/emis', existingEmiId()]"></p-button>
         } @else {
-          <p-button label="Create EMI" icon="pi pi-calculator" styleClass="p-button-outlined p-button-secondary"
-            (onClick)="onCreateEmi()" pTooltip="Convert to EMI">
-          </p-button>
+          <p-button label="Create EMI" icon="pi pi-calculator" styleClass="p-button-outlined p-button-secondary btn-sm"
+            (onClick)="onCreateEmi()"></p-button>
         }
 
-        <p-button label="Email" icon="pi pi-send" styleClass="p-button-text" [loading]="isProcessing()"
-          (onClick)="onEmail()"></p-button>
+        <p-button icon="pi pi-send" label="Email" styleClass="p-button-text btn-sm" 
+          [loading]="isProcessing()" (onClick)="onEmail()"></p-button>
         
-        <p-button label="Download" icon="pi pi-download" styleClass="p-button-text" [loading]="isProcessing()"
-          (onClick)="onDownload()"></p-button>
+        <p-button icon="pi pi-download" label="PDF" styleClass="p-button-outlined btn-sm" 
+          [loading]="isProcessing()" (onClick)="onDownload()"></p-button>
         
-        <p-button label="Edit" icon="pi pi-pencil" styleClass="p-button-outlined"
-          [routerLink]="['/invoices', inv._id, 'edit']"></p-button>
+        <p-button icon="pi pi-pencil" styleClass="p-button-outlined p-button-secondary btn-sm icon-only" 
+          [routerLink]="['/invoices', inv._id, 'edit']" pTooltip="Edit"></p-button>
         
-        <p-button icon="pi pi-trash" styleClass="p-button-danger p-button-outlined" (onClick)="onDelete()"
-          pTooltip="Delete Invoice"></p-button>
+        <p-button icon="pi pi-trash" styleClass="p-button-outlined p-button-danger btn-sm icon-only" 
+          (onClick)="onDelete()" pTooltip="Delete"></p-button>
       </div>
     </header>
 
-    <!-- 2. BODY (Full Width) -->
-    <div class="invoice-body" style="max-width: 100%">
-
-      <!-- INFO GRID -->
+    <main class="invoice-body">
+      
       <section class="info-grid">
         
-        <!-- Billed To -->
-        <div class="glass-card">
+        <div class="info-card">
           <div class="card-header">
-            <h3><i class="pi pi-user"></i> Billed To</h3>
+            <i class="pi pi-user"></i>
+            <h3>Billed To</h3>
           </div>
-          <div class="card-body">
-            <div class="name">{{ inv.customerId?.name || 'Unknown Customer' }}</div>
-            <div class="text">{{ inv.customerId?.email }}</div>
-            <div class="text">{{ inv.customerId?.phone }}</div>
-            <div class="address">{{ inv.billingAddress || 'No billing address' }}</div>
+          <div class="card-content">
+            <span class="customer-name">{{ inv.customerId?.name || 'Unknown Customer' }}</span>
+            <div class="contact-details">
+              <span>{{ inv.customerId?.email }}</span>
+              <span>{{ inv.customerId?.phone }}</span>
+            </div>
+            <p class="address">{{ inv.billingAddress || 'No billing address provided.' }}</p>
           </div>
         </div>
 
-        <!-- Shipped To -->
-        <div class="glass-card">
+        <div class="info-card">
           <div class="card-header">
-            <h3><i class="pi pi-truck"></i> Shipped To</h3>
+            <i class="pi pi-truck"></i>
+            <h3>Shipped To</h3>
           </div>
-          <div class="card-body">
-            <!-- FIXED: 'inv.customer' does not exist in JSON, used 'inv.customerId' -->
-            <div class="name">{{ inv.customerId?.name || 'Same as Billing' }}</div>
-            <div class="address">{{ inv.shippingAddress || 'Same as billing address' }}</div>
+          <div class="card-content">
+            <span class="customer-name">{{ inv.customerId?.name }}</span>
+            <p class="address">{{ inv.shippingAddress || inv.billingAddress || 'Same as billing address.' }}</p>
           </div>
         </div>
 
-        <!-- Meta Details -->
-        <div class="glass-card">
+        <div class="info-card">
           <div class="card-header">
-            <h3><i class="pi pi-info-circle"></i> Details</h3>
+            <i class="pi pi-info-circle"></i>
+            <h3>Payment Details</h3>
           </div>
-          <div class="card-body">
-            <div class="meta-list">
-              <div class="meta-item">
-                <label>Invoice Date</label>
-                <span>{{ common.formatDate(inv.invoiceDate) }}</span>
-              </div>
-              <div class="meta-item">
-                <label>Due Date</label>
-                <span>{{ common.formatDate(inv.dueDate) }}</span>
-              </div>
-              <div class="meta-item">
-                <label>Amount Paid</label>
-                <span class="text-green-500">{{ common.formatCurrency(inv.paidAmount) }}</span>
-              </div>
+          <div class="meta-list">
+            <div class="meta-item">
+              <label>Due Date</label>
+              <span>{{ common.formatDate(inv.dueDate) }}</span>
+            </div>
+            <div class="meta-item">
+              <label>Payment Status</label>
+              <p-tag [value]="inv.paymentStatus" [severity]="common.mapStatusToSeverity(inv.paymentStatus)"></p-tag>
+            </div>
+            <div class="meta-item highlight">
+              <label>Amount Paid</label>
+              <span class="success-text">{{ common.formatCurrency(inv.paidAmount) }}</span>
             </div>
           </div>
         </div>
-
       </section>
 
-      <!-- ITEMS TABLE -->
-      <section class="items-section">
-        <div class="table-header">
-          <h3>Line Items</h3>
-        </div>
-        <p-table [value]="inv.items || []" styleClass="p-datatable-sm" responsiveLayout="scroll">
+      <section class="items-container">
+        <p-table [value]="inv.items || []" styleClass="compact-table" responsiveLayout="scroll">
           <ng-template pTemplate="header">
             <tr>
-              <th>Item Description</th>
+              <th style="width: 40%">Item Description</th>
               <th class="text-right">Qty</th>
               <th class="text-right">Price</th>
-              <th class="text-right">Discount</th>
+              <th class="text-right">Disc.</th>
               <th class="text-right">Tax</th>
               <th class="text-right">Total</th>
             </tr>
@@ -147,295 +130,282 @@
           <ng-template pTemplate="body" let-item>
             <tr>
               <td>
-                <div class="font-bold">{{ item.name }}</div>
-                @if(item.hsnCode) { <div class="text-xs text-secondary">HSN: {{ item.hsnCode }}</div> }
+                <div class="item-name">{{ item.name }}</div>
+                @if(item.hsnCode) { <span class="item-hsn">HSN: {{ item.hsnCode }}</span> }
               </td>
-              <td class="text-right">{{ item.quantity }} {{ item.unit }}</td>
+              <td class="text-right">
+                {{ item.quantity }} <span class="unit">{{ item.unit }}</span>
+              </td>
               <td class="text-right">{{ common.formatCurrency(item.price) }}</td>
-              <td class="text-right text-red-400">- {{ common.formatCurrency(item.discount) }}</td>
-              <td class="text-right text-secondary">{{ item.taxRate }}%</td>
-              <td class="text-right font-bold">{{ common.formatCurrency(item.totalAmount) }}</td>
+              <td class="text-right discount-text">-{{ common.formatCurrency(item.discount) }}</td>
+              <td class="text-right text-muted">{{ item.taxRate }}%</td>
+              <td class="text-right font-medium">{{ common.formatCurrency(item.totalAmount) }}</td>
             </tr>
           </ng-template>
         </p-table>
       </section>
 
-      <!-- FOOTER (Notes & Totals) -->
-      <section class="footer-grid">
+      <section class="footer-summary">
         
-        <!-- Notes & Attachments -->
-        <div class="notes-box">
-          <div class="card-header">
-            <h3><i class="pi pi-comment"></i> Notes & Files</h3>
+        <div class="notes-panel">
+          <label class="section-label">Notes & Terms</label>
+          <div class="notes-content">
+            {{ inv.notes || 'No additional notes provided.' }}
           </div>
-          <div class="card-body">
-            <p>{{ inv.notes || 'No additional notes provided.' }}</p>
-            
-            <!-- Added Attachments Section -->
-            @if(inv.attachedFiles?.length > 0) {
-              <p-divider></p-divider>
-              <div class="flex flex-col gap-2">
-                <label class="text-xs font-bold text-gray-500 uppercase">Attachments</label>
-                <div class="flex gap-2 flex-wrap">
-                  <p-tag *ngFor="let file of inv.attachedFiles" icon="pi pi-file" [value]="'File'" severity="info"></p-tag>
+
+          @if(inv.attachedFiles?.length > 0) {
+            <div class="attachments-area">
+              <label class="section-label">Attachments</label>
+              <div class="file-list">
+                <div *ngFor="let file of inv.attachedFiles" class="file-chip">
+                  <i class="pi pi-file"></i>
+                  <span>Attachment</span>
                 </div>
               </div>
-            }
-          </div>
-        </div>
-
-        <!-- Totals -->
-        <div class="totals-box">
-          <div class="card-header">
-            <h3>Summary</h3>
-          </div>
-          <div class="card-body">
-            <div class="total-row">
-              <label>Subtotal</label>
-              <span>{{ common.formatCurrency(inv.subTotal) }}</span>
             </div>
-            <div class="total-row">
-              <label>Discount</label>
-              <span class="text-red-400">- {{ common.formatCurrency(inv.totalDiscount) }}</span>
-            </div>
-            <div class="total-row">
-              <label>Tax</label>
-              <span>+ {{ common.formatCurrency(inv.totalTax) }}</span>
-            </div>
-            @if (inv.roundOff) {
-              <div class="total-row">
-                <label>Round Off</label>
-                <span>{{ common.formatCurrency(inv.roundOff) }}</span>
-              </div>
-            }
-            <div class="total-row grand-total">
-              <label>Grand Total</label>
-              <span>{{ common.formatCurrency(inv.grandTotal) }}</span>
-            </div>
-            <div class="total-row balance">
-              <label>Balance Due</label>
-              <span>{{ common.formatCurrency(inv.balanceAmount) }}</span>
-            </div>
-          </div>
+          }
         </div>
 
-      </section>
-
-    </div>
-
-  }
-</div>
-
-<!-- <p-toast></p-toast>
-<p-confirmDialog></p-confirmDialog>
-
-<div class="page-container animate-fadeIn">
-
-  @if (isLoading()) {
-  <div class="loading-container">
-    <div class="w-full flex justify-between mb-8">
-      <div class="flex gap-4">
-        <p-skeleton shape="circle" size="3rem"></p-skeleton>
-        <div class="flex flex-col gap-2">
-          <p-skeleton width="15rem" height="2rem"></p-skeleton>
-          <p-skeleton width="10rem" height="1rem"></p-skeleton>
-        </div>
-      </div>
-      <div class="flex gap-2">
-        <p-skeleton width="8rem" height="2.5rem"></p-skeleton>
-        <p-skeleton width="3rem" height="2.5rem"></p-skeleton>
-      </div>
-    </div>
-    <div class="grid grid-cols-3 gap-6 w-full mb-8">
-      <p-skeleton height="12rem" styleClass="w-full"></p-skeleton>
-      <p-skeleton height="12rem" styleClass="w-full"></p-skeleton>
-      <p-skeleton height="12rem" styleClass="w-full"></p-skeleton>
-    </div>
-    <p-skeleton height="20rem" styleClass="w-full"></p-skeleton>
-  </div>
-  } @else if (invoice(); as inv) {
-
-  1. HEADER
-  <header class="details-header" style="max-width: 100%">
-    <div class="header-left">
-      <p-button icon="pi pi-arrow-left" styleClass="p-button-text p-button-rounded back-btn"
-        routerLink="/invoices"></p-button>
-
-      <div class="title-group">
-        <h1>Invoice #{{ inv.invoiceNumber }}</h1>
-        <div class="subtitle">
-          <span>Issued: {{ common.formatDate(inv.invoiceDate) }}</span>
-          <span class="separator">•</span>
-          Status Tags
-          <p-tag [value]="inv.status | titlecase" [severity]="common.mapStatusToSeverity(inv.status ?? '')"></p-tag>
-          <p-tag [value]="inv.paymentStatus | titlecase"
-            [severity]="common.mapStatusToSeverity(inv.paymentStatus || '')"></p-tag>
-        </div>
-      </div>
-    </div>
-
-    <div class="header-actions">
-
-      EMI Button Logic
-      @if (existingEmiId()) {
-      <p-button label="View EMI Plan" icon="pi pi-percentage" styleClass="p-button-outlined p-button-help"
-        [routerLink]="['/emis', existingEmiId()]" pTooltip="View active EMI Plan">
-      </p-button>
-      } @else {
-      <p-button label="Create EMI" icon="pi pi-calculator" styleClass="p-button-outlined p-button-secondary"
-        (onClick)="onCreateEmi()" pTooltip="Convert to EMI">
-      </p-button>
-      }
-
-      <p-button label="Email" icon="pi pi-send" styleClass="p-button-text" [loading]="isProcessing()"
-        (onClick)="onEmail()"></p-button>
-
-      <p-button label="Download" icon="pi pi-download" styleClass="p-button-text" [loading]="isProcessing()"
-        (onClick)="onDownload()"></p-button>
-
-      <p-button label="Edit" icon="pi pi-pencil" styleClass="p-button-outlined"
-        [routerLink]="['/invoices', inv._id, 'edit']"></p-button>
-
-      <p-button icon="pi pi-trash" styleClass="p-button-danger p-button-outlined" (onClick)="onDelete()"
-        pTooltip="Delete Invoice"></p-button>
-    </div>
-  </header>
-
-  2. BODY (Full Width)
-  <div class="invoice-body" style="max-width: 100%">
-
-    INFO GRID
-    <section class="info-grid">
-
-      Billed To
-      <div class="glass-card">
-        <div class="card-header">
-          <h3><i class="pi pi-user"></i> Billed To</h3>
-        </div>
-        <div class="card-body">
-          <div class="name">{{ inv.customerId?.name || 'Unknown customerId' }}</div>
-          <div class="text">{{ inv.customerId?.email }}</div>
-          <div class="text">{{ inv.customerId?.phone }}</div>
-          <div class="address">{{ inv.billingAddress || 'No billing address' }}</div>
-        </div>
-      </div>
-
-      Shipped To
-      <div class="glass-card">
-        <div class="card-header">
-          <h3><i class="pi pi-truck"></i> Shipped To</h3>
-        </div>
-        <div class="card-body">
-          <div class="name">{{ inv.customer?.contactPerson || 'Same as Billing' }}</div>
-          <div class="address">{{ inv.shippingAddress || 'Same as billing address' }}</div>
-        </div>
-      </div>
-
-      Meta Details
-      <div class="glass-card">
-        <div class="card-header">
-          <h3><i class="pi pi-info-circle"></i> Details</h3>
-        </div>
-        <div class="card-body">
-          <div class="meta-list">
-            <div class="meta-item">
-              <label>Invoice Date</label>
-              <span>{{ common.formatDate(inv.invoiceDate) }}</span>
-            </div>
-            <div class="meta-item">
-              <label>Due Date</label>
-              <span>{{ common.formatDate(inv.dueDate) }}</span>
-            </div>
-            <div class="meta-item">
-              <label>Amount Paid</label>
-              <span class="text-green-500">{{ common.formatCurrency(inv.paidAmount) }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </section>
-
-    ITEMS TABLE
-    <section class="items-section">
-      <div class="table-header">
-        <h3>Line Items</h3>
-      </div>
-      <p-table [value]="inv.items || []" styleClass="p-datatable-sm" responsiveLayout="scroll">
-        <ng-template pTemplate="header">
-          <tr>
-            <th>Item Description</th>
-            <th class="text-right">Qty</th>
-            <th class="text-right">Price</th>
-            <th class="text-right">Discount</th>
-            <th class="text-right">Tax</th>
-            <th class="text-right">Total</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-item>
-          <tr>
-            <td>
-              <div class="font-bold">{{ item.name }}</div>
-              @if(item.hsnCode) { <div class="text-xs text-secondary">HSN: {{ item.hsnCode }}</div> }
-            </td>
-            <td class="text-right">{{ item.quantity }} {{ item.unit }}</td>
-            <td class="text-right">{{ common.formatCurrency(item.price) }}</td>
-            <td class="text-right text-red-400">- {{ common.formatCurrency(item.discount) }}</td>
-            <td class="text-right text-secondary">{{ item.taxRate }}%</td>
-            <td class="text-right font-bold">{{ common.formatCurrency(item.totalAmount) }}</td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </section>
-
-    FOOTER (Notes & Totals)
-    <section class="footer-grid">
-
-      Notes
-      <div class="notes-box">
-        <div class="card-header">
-          <h3><i class="pi pi-comment"></i> Notes</h3>
-        </div>
-        <div class="card-body">
-          <p>{{ inv.notes || 'No additional notes provided.' }}</p>
-        </div>
-      </div>
-
-      Totals
-      <div class="totals-box">
-        <div class="card-header">
-          <h3>Summary</h3>
-        </div>
-        <div class="card-body">
-          <div class="total-row">
+        <div class="totals-panel">
+          <div class="calc-row">
             <label>Subtotal</label>
             <span>{{ common.formatCurrency(inv.subTotal) }}</span>
           </div>
-          <div class="total-row">
+          <div class="calc-row">
             <label>Discount</label>
-            <span class="text-red-400">- {{ common.formatCurrency(inv.totalDiscount) }}</span>
+            <span class="discount-text">- {{ common.formatCurrency(inv.totalDiscount) }}</span>
           </div>
-          <div class="total-row">
+          <div class="calc-row">
             <label>Tax</label>
             <span>+ {{ common.formatCurrency(inv.totalTax) }}</span>
           </div>
           @if (inv.roundOff) {
-          <div class="total-row">
-            <label>Round Off</label>
-            <span>{{ common.formatCurrency(inv.roundOff) }}</span>
-          </div>
+            <div class="calc-row">
+              <label>Round Off</label>
+              <span>{{ common.formatCurrency(inv.roundOff) }}</span>
+            </div>
           }
-          <div class="total-row grand-total">
+          
+          <div class="divider"></div>
+          
+          <div class="calc-row grand-total">
             <label>Grand Total</label>
             <span>{{ common.formatCurrency(inv.grandTotal) }}</span>
           </div>
-          <div class="total-row balance">
+
+          <div class="balance-badge">
             <label>Balance Due</label>
             <span>{{ common.formatCurrency(inv.balanceAmount) }}</span>
           </div>
         </div>
+      </section>
+
+    </main>
+  }
+</div>
+<!-- <p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="w-full min-h-screen bg-gray-50/50 flex flex-col items-center p-6 animate-fadeIn">
+
+  @if (isLoading()) {
+    <div class="w-full max-w-5xl bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+      <div class="flex justify-between items-start mb-8">
+        <div class="flex gap-4">
+          <p-skeleton shape="circle" size="3rem"></p-skeleton>
+          <div class="flex flex-col gap-2">
+            <p-skeleton width="12rem" height="1.5rem"></p-skeleton>
+            <p-skeleton width="8rem" height="1rem"></p-skeleton>
+          </div>
+        </div>
+        <p-skeleton width="10rem" height="2.5rem"></p-skeleton>
       </div>
-    </section>
-  </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <p-skeleton height="8rem" styleClass="w-full"></p-skeleton>
+        <p-skeleton height="8rem" styleClass="w-full"></p-skeleton>
+        <p-skeleton height="8rem" styleClass="w-full"></p-skeleton>
+      </div>
+      <p-skeleton height="20rem" styleClass="w-full"></p-skeleton>
+    </div>
+  } @else if (invoice(); as inv) {
+
+    <header class="w-full max-w-5xl mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div class="flex items-center gap-4">
+        <button pButton icon="pi pi-arrow-left" 
+                class="p-button-text p-button-rounded p-button-secondary !w-10 !h-10" 
+                routerLink="/invoices"></button>
+        
+        <div>
+          <div class="flex items-center gap-3">
+            <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Invoice #{{ inv.invoiceNumber }}</h1>
+            <p-tag [value]="inv.status | titlecase" [severity]="common.mapStatusToSeverity(inv.status)" styleClass="!text-xs uppercase tracking-wider"></p-tag>
+          </div>
+          <p class="text-sm text-gray-500 mt-1">
+            Issued on <span class="font-medium text-gray-700">{{ common.formatDate(inv.invoiceDate) }}</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        @if (existingEmiId()) {
+          <p-button label="View EMI" icon="pi pi-percentage" styleClass="p-button-sm p-button-outlined p-button-help"
+            [routerLink]="['/emis', existingEmiId()]"></p-button>
+        } @else {
+          <p-button label="Create EMI" icon="pi pi-calculator" styleClass="p-button-sm p-button-outlined p-button-secondary"
+            (onClick)="onCreateEmi()"></p-button>
+        }
+
+        <p-button icon="pi pi-send" label="Email" styleClass="p-button-sm p-button-text" 
+          [loading]="isProcessing()" (onClick)="onEmail()"></p-button>
+        
+        <p-button icon="pi pi-download" label="PDF" styleClass="p-button-sm p-button-outlined" 
+          [loading]="isProcessing()" (onClick)="onDownload()"></p-button>
+        
+        <p-button icon="pi pi-pencil" styleClass="p-button-sm p-button-outlined p-button-secondary" 
+          [routerLink]="['/invoices', inv._id, 'edit']" pTooltip="Edit Invoice"></p-button>
+        
+        <p-button icon="pi pi-trash" styleClass="p-button-sm p-button-outlined p-button-danger" 
+          (onClick)="onDelete()" pTooltip="Delete"></p-button>
+      </div>
+    </header>
+
+    <div class="w-full max-w-5xl bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100 bg-gray-50/30">
+        
+        <div class="p-6">
+          <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <i class="pi pi-user text-primary-500"></i> Billed To
+          </h3>
+          <div class="flex flex-col gap-1">
+            <span class="text-base font-semibold text-gray-900">{{ inv.customerId?.name || 'Unknown' }}</span>
+            <span class="text-sm text-gray-500">{{ inv.customerId?.email }}</span>
+            <span class="text-sm text-gray-500">{{ inv.customerId?.phone }}</span>
+            <div class="text-sm text-gray-600 mt-2 whitespace-pre-line leading-relaxed">
+              {{ inv.billingAddress || 'No billing address' }}
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6">
+          <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <i class="pi pi-truck text-primary-500"></i> Shipped To
+          </h3>
+          <div class="flex flex-col gap-1">
+            <span class="text-base font-semibold text-gray-900">{{ inv.customerId?.name }}</span>
+            <div class="text-sm text-gray-600 mt-2 whitespace-pre-line leading-relaxed">
+              {{ inv.shippingAddress || inv.billingAddress || 'Same as billing' }}
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6">
+          <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <i class="pi pi-info-circle text-primary-500"></i> Details
+          </h3>
+          <div class="flex flex-col gap-3">
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-500">Due Date</span>
+              <span class="font-medium text-gray-900">{{ common.formatDate(inv.dueDate) }}</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-500">Payment Status</span>
+              <p-tag [value]="inv.paymentStatus | titlecase" [severity]="common.mapStatusToSeverity(inv.paymentStatus)" styleClass="!text-xs"></p-tag>
+            </div>
+            <div class="flex justify-between text-sm pt-2 border-t border-gray-100">
+              <span class="text-gray-500">Amount Paid</span>
+              <span class="font-medium text-green-600">{{ common.formatCurrency(inv.paidAmount) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-0">
+        <p-table [value]="inv.items || []" styleClass="p-datatable-sm custom-table" responsiveLayout="scroll">
+          <ng-template pTemplate="header">
+            <tr class="bg-gray-50 border-y border-gray-100">
+              <th class="!pl-6 !py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Item Description</th>
+              <th class="!text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Qty</th>
+              <th class="!text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
+              <th class="!text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Disc.</th>
+              <th class="!text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Tax</th>
+              <th class="!pr-6 !text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Total</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item>
+            <tr class="hover:bg-gray-50/50 transition-colors border-b border-gray-50 last:border-0">
+              <td class="!pl-6 !py-4">
+                <div class="text-sm font-medium text-gray-900">{{ item.name }}</div>
+                @if(item.hsnCode) { <div class="text-xs text-gray-400 mt-0.5">HSN: {{ item.hsnCode }}</div> }
+              </td>
+              <td class="!text-right text-sm text-gray-600">{{ item.quantity }} <span class="text-xs text-gray-400">{{ item.unit }}</span></td>
+              <td class="!text-right text-sm text-gray-600">{{ common.formatCurrency(item.price) }}</td>
+              <td class="!text-right text-sm text-red-500">-{{ common.formatCurrency(item.discount) }}</td>
+              <td class="!text-right text-sm text-gray-600">{{ item.taxRate }}%</td>
+              <td class="!pr-6 !text-right text-sm font-semibold text-gray-900">{{ common.formatCurrency(item.totalAmount) }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+
+      <div class="bg-gray-50/30 p-6 border-t border-gray-200">
+        <div class="flex flex-col md:flex-row gap-8">
+          
+          <div class="flex-1">
+            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Notes</h4>
+            <p class="text-sm text-gray-600 italic bg-white p-3 rounded border border-gray-100">
+              {{ inv.notes || 'No additional notes provided for this invoice.' }}
+            </p>
+
+            @if(inv.attachedFiles?.length > 0) {
+              <div class="mt-4">
+                <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Attachments</h4>
+                <div class="flex gap-2 flex-wrap">
+                  <div *ngFor="let file of inv.attachedFiles" class="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs text-gray-600 hover:border-primary-300 cursor-pointer transition-colors">
+                    <i class="pi pi-file text-primary-500"></i>
+                    <span>File Attachment</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="w-full md:w-80 flex flex-col gap-3">
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-500">Subtotal</span>
+              <span class="font-medium text-gray-900">{{ common.formatCurrency(inv.subTotal) }}</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-500">Total Discount</span>
+              <span class="font-medium text-red-500">-{{ common.formatCurrency(inv.totalDiscount) }}</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-500">Total Tax</span>
+              <span class="font-medium text-gray-900">+{{ common.formatCurrency(inv.totalTax) }}</span>
+            </div>
+            @if (inv.roundOff) {
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-500">Round Off</span>
+                <span class="text-gray-900">{{ common.formatCurrency(inv.roundOff) }}</span>
+              </div>
+            }
+            
+            <div class="h-px bg-gray-200 my-1"></div>
+            
+            <div class="flex justify-between items-center">
+              <span class="text-base font-bold text-gray-900">Grand Total</span>
+              <span class="text-xl font-bold text-primary-600">{{ common.formatCurrency(inv.grandTotal) }}</span>
+            </div>
+
+            <div class="mt-2 p-3 bg-red-50 rounded-lg border border-red-100 flex justify-between items-center">
+              <span class="text-xs font-bold text-red-600 uppercase tracking-wide">Balance Due</span>
+              <span class="text-sm font-bold text-red-700">{{ common.formatCurrency(inv.balanceAmount) }}</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
   }
 </div> -->
