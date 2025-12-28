@@ -1,37 +1,19 @@
-<div class="layout-container" 
-     [class.sidebar-expanded]="layout.isExpanded()"
+<div class="layout-root"
      [class.is-mobile]="layout.isMobile()">
-  
-  <app-mainscreen-header />
 
-  <div class="main-content-area">
+  <app-mainscreen-header
+    (toggleSidebar)="onMenuToggle()" />
+
+  <div class="layout-body">
     <app-mainscreen-sidebar />
 
-    <main class="main-content" (mouseenter)="layout.isHovered.set(false)">
-      <div class="content-wrapper">
-        <router-outlet />
-      </div>
+    <main class="main-content">
+      <router-outlet />
     </main>
   </div>
 
   @if (layout.isMobile() && layout.isMobileMenuOpen()) {
-    <div class="mobile-backdrop" (click)="layout.toggleMobile()"></div>
+    <div class="mobile-backdrop"
+         (click)="layout.closeMobile()"></div>
   }
 </div>
-
-<!-- <div class="layout-container">
-  <app-mainscreen-header (toggleSidebar)="toggleSidebar()" (mobileMenuToggle)="toggleMobileMenu()">
-  </app-mainscreen-header>
-  <div class="main-content-area">
-    <app-mainscreen-sidebar [isPinned]="isSidebarPinned" [isHovered]="isSidebarHovered" (pinToggle)="togglePin()"
-      (mouseEnter)="onMouseEnter()" (mouseEnterTriggerZone)="onMouseEnterTriggerZone()" (mouseLeave)="onMouseLeave()">
-    </app-mainscreen-sidebar>
-
-    <main class="main-content" [class.content-expanded]="isSidebarPinned || isSidebarHovered"
-      (mouseenter)="onMouseEnterMainContent()">
-
-      <router-outlet></router-outlet>
-
-    </main>
-  </div>
-</div> -->

@@ -1,94 +1,79 @@
 import { Injectable, signal, computed, effect } from '@angular/core';
-
 @Injectable({ providedIn: 'root' })
 export class LayoutService {
-  // State Signals
   isPinned = signal(localStorage.getItem('sidebarPinned') === 'true');
   isHovered = signal(false);
   isMobileMenuOpen = signal(false);
-  screenWidth = signal(window.innerWidth);
+  screenWidth = signal(0);
 
-  // Derived State (Automatic)
-  isMobile = computed(() => this.screenWidth() < 1024);
-  
-  // The ultimate "is expanded" logic
+  isMobile = computed(() => this.screenWidth() < 768);
+  isTablet = computed(() =>
+    this.screenWidth() >= 768 && this.screenWidth() < 1024
+  );
+  isDesktop = computed(() => this.screenWidth() >= 1024);
+
   isExpanded = computed(() => {
-    if (this.isMobile()) return this.isMobileMenuOpen();
+    if (this.isMobile() || this.isTablet()) {
+      return this.isMobileMenuOpen();
+    }
     return this.isPinned() || this.isHovered();
   });
 
   constructor() {
-    window.addEventListener('resize', () => this.screenWidth.set(window.innerWidth));
-    // Persist pin state to browser memory
-    effect(() => localStorage.setItem('sidebarPinned', this.isPinned().toString()));
+    effect(() =>
+      localStorage.setItem('sidebarPinned', String(this.isPinned()))
+    );
   }
 
-  togglePin() { this.isPinned.update(v => !v); }
-  toggleMobile() { this.isMobileMenuOpen.update(v => !v); }
-}
+  togglePin() {
+    this.isPinned.update(v => !v);
+  }
 
-// import { Injectable, signal, computed, effect } from '@angular/core';
+  toggleMobile() {
+    this.isMobileMenuOpen.update(v => !v);
+  }
+
+  closeMobile() {
+    this.isMobileMenuOpen.set(false);
+  }
+}
 
 // @Injectable({ providedIn: 'root' })
 // export class LayoutService {
-//   // Signals for state management
+//   // --- State ---
 //   isPinned = signal(localStorage.getItem('sidebarPinned') === 'true');
 //   isHovered = signal(false);
 //   isMobileMenuOpen = signal(false);
 //   screenWidth = signal(window.innerWidth);
 
-//   // Derived state
+//   // --- Derived ---
 //   isMobile = computed(() => this.screenWidth() < 1024);
-  
-//   // The actual logic that determines if the sidebar is "visible"
+
 //   isExpanded = computed(() => {
 //     if (this.isMobile()) return this.isMobileMenuOpen();
 //     return this.isPinned() || this.isHovered();
 //   });
 
 //   constructor() {
-//     window.addEventListener('resize', () => this.screenWidth.set(window.innerWidth));
-//         effect(() => {
-//       localStorage.setItem('sidebarPinned', this.isPinned().toString());
+//     // Resize throttled via rAF (prevents layout thrash)
+//     let raf = 0;
+//     window.addEventListener('resize', () => {
+//       cancelAnimationFrame(raf);
+//       raf = requestAnimationFrame(() =>
+//         this.screenWidth.set(window.innerWidth)
+//       );
 //     });
+
+//     effect(() =>
+//       localStorage.setItem('sidebarPinned', this.isPinned().toString())
+//     );
 //   }
 
-//   togglePin() { this.isPinned.update(v => !v); }
-//   toggleMobile() { this.isMobileMenuOpen.update(v => !v); }
-//   closeAll() {
-//     this.isMobileMenuOpen.set(false);
-//     this.isHovered.set(false);
+//   togglePin() {
+//     this.isPinned.update(v => !v);
+//   }
+
+//   toggleMobile() {
+//     this.isMobileMenuOpen.update(v => !v);
 //   }
 // }
-
-// // import { Injectable, signal, computed, effect } from '@angular/core';
-
-// // @Injectable({ providedIn: 'root' })
-// // export class LayoutService {
-// //   // Core State Signals
-// //   isPinned = signal(localStorage.getItem('sidebarPinned') === 'true');
-// //   isHovered = signal(false);
-// //   isMobileMenuOpen = signal(false);
-// //   screenWidth = signal(window.innerWidth);
-
-// //   // Computed signals (derived state)
-// //   isMobile = computed(() => this.screenWidth() < 1024);
-  
-// //   // The "Truth" for Sidebar expansion
-// //   isExpanded = computed(() => {
-// //     if (this.isMobile()) return this.isMobileMenuOpen();
-// //     return this.isPinned() || this.isHovered();
-// //   });
-
-// //   constructor() {
-// //     window.addEventListener('resize', () => this.screenWidth.set(window.innerWidth));
-    
-// //     // Persist pin state
-// //     effect(() => {
-// //       localStorage.setItem('sidebarPinned', this.isPinned().toString());
-// //     });
-// //   }
-
-// //   togglePin() { this.isPinned.update(v => !v); }
-// //   toggleMobile() { this.isMobileMenuOpen.update(v => !v); }
-// // }

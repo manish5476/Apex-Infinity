@@ -1,93 +1,35 @@
-// --- Compact Layout Variables ---
-$header-height: 48px;        // Reduced from 64px
-$sidebar-width: 240px;       // Reduced from 256px (16rem)
-$sidebar-collapsed: 64px;    // For mini-mode if you use it
+$header-height: 48px;
 
-.layout-container {
+.layout-root {
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  background: var(--bg-primary);
-  
-  // Desktop Sidebar Space Logic
-  --sidebar-offset: 0px;
-
-  &.sidebar-expanded:not(.is-mobile) {
-    --sidebar-offset: #{$sidebar-width};
-  }
 }
 
 app-mainscreen-header {
   height: $header-height;
   flex-shrink: 0;
-  z-index: 110;
+  z-index: 100;
 }
 
-.main-content-area {
+.layout-body {
   display: flex;
   flex: 1;
+  min-height: 0;
   overflow: hidden;
-  position: relative;
 }
 
 .main-content {
   flex: 1;
+  min-width: 0;
   overflow-y: auto;
-  margin-left: var(--sidebar-offset);
-  transition: margin-left 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  background: var(--bg-body-secondary); // Slight contrast for the content well
-  
-  .content-wrapper {
-    max-width: 1440px;      // Reduced from 1600px for better focus
-    margin: 0 auto;
-    padding: 1rem;          // Reduced from 2rem (Smaller gutters)
-    container-type: inline-size;
-  }
+  background: var(--bg-body-secondary);
+  padding: 1rem;
 }
 
-// $header-height: 64px;
-// $sidebar-width: 16rem;
-
-// .layout-container {
-//   display: flex;
-//   flex-direction: column;
-//   height: 100vh;
-//   background: var(--bg-primary);
-  
-//   // Desktop Sidebar Space Logic
-//   --sidebar-offset: 0px;
-
-//   &.sidebar-expanded:not(.is-mobile) {
-//     --sidebar-offset: #{$sidebar-width};
-//   }
-// }
-
-// .main-content-area {
-//   display: flex;
-//   flex: 1;
-//   // padding-top: $header-height;
-//   overflow: hidden;
-//   position: relative;
-// }
-
-// .main-content {
-//   flex: 1;
-//   overflow-y: auto;
-//   margin-left: var(--sidebar-offset);
-//   transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  
-//   .content-wrapper {
-//     max-width: 1600px;
-//     margin: 0 auto;
-//     // padding: 2rem;
-//     container-type: inline-size;
-//   }
-// }
-
-// .mobile-backdrop {
-//   position: fixed;
-//   inset: 0;
-//   background: rgba(0, 0, 0, 0.4);
-//   backdrop-filter: blur(4px);
-//   z-index: 99;
-// }
+.mobile-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 150;
+}

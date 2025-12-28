@@ -12,9 +12,9 @@
 /* ::ng-deep required because p-popover is appended to body */
 :host ::ng-deep .premium-popover-override {
   /* Shell sizing & placement */
-  min-width: 360px;           /* same width you requested */
-  width: 360px;               /* force same width */
-  max-width: calc(95vw);      /* responsive fallback */
+  min-width: 360px; /* same width you requested */
+  width: 360px; /* force same width */
+  max-width: calc(95vw); /* responsive fallback */
   border: none !important;
   background: transparent !important;
   margin-top: 10px !important;
@@ -38,7 +38,7 @@
     color: var(--text-primary) !important;
 
     /* Rounded curve and border */
-    border-radius: 16px !important;              /* your rounded curve */
+    border-radius: 16px !important; /* your rounded curve */
     border: 1px solid var(--border-primary) !important;
 
     /* Depth consistent with tokens */
@@ -61,8 +61,8 @@
    HEADER (Main)
    ------------------------- */
 .header-inner {
-  height: 64px;
-  padding: 0 1.5rem;
+  height: 56px; /* ⬅️ perfect SaaS density */
+  padding: 0 var(--spacing-xl);
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-primary);
   display: flex;
@@ -111,6 +111,11 @@
     }
   }
 }
+.logo-link svg {
+  height: 32px; /* visual normalization */
+  width: auto;
+  display: block;
+}
 
 /* RIGHT */
 .header-right {
@@ -120,8 +125,8 @@
 
   .notification-btn {
     position: relative;
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     border: none;
     background: transparent;
@@ -149,7 +154,8 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 4px 12px 4px 4px;
+    padding: 2px 10px 2px 4px;
+    min-height: 34px;
     border-radius: 99px;
     border: 1px solid transparent;
     background: transparent;
@@ -309,7 +315,10 @@
         box-shadow: 0 0 0 2px var(--bg-secondary), 0 0 0 4px var(--accent-primary);
         border-color: transparent;
       }
-      i { color: #fff; font-size: 0.9rem; }
+      i {
+        color: #fff;
+        font-size: 0.9rem;
+      }
     }
   }
 }
@@ -347,15 +356,33 @@
       background: rgba(239, 68, 68, 0.08);
       color: var(--color-error);
     }
-    .item-text { display: flex; flex-direction: column;
-      .label { color: var(--text-primary); font-weight: 600; }
-      .sub-label { color: var(--text-secondary); font-size: 0.7rem; }
+    .item-text {
+      display: flex;
+      flex-direction: column;
+      .label {
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+      .sub-label {
+        color: var(--text-secondary);
+        font-size: 0.7rem;
+      }
     }
-    .arrow { margin-left: auto; color: var(--text-secondary); }
+    .arrow {
+      margin-left: auto;
+      color: var(--text-secondary);
+    }
     &:hover {
       background: var(--component-bg-hover);
-      .icon-box { background: #fff; color: var(--accent-primary); box-shadow: var(--shadow-sm); }
-      .icon-box.danger { background: var(--color-error); color: #fff; }
+      .icon-box {
+        background: #fff;
+        color: var(--accent-primary);
+        box-shadow: var(--shadow-sm);
+      }
+      .icon-box.danger {
+        background: var(--color-error);
+        color: #fff;
+      }
     }
   }
 }
@@ -365,9 +392,18 @@
   height: 400px;
   overflow-y: auto;
   ::ng-deep app-notification-bell {
-    .notification-panel { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
-    .panel-header { display: none !important; }
-    .panel-body { padding: 0 !important; }
+    .notification-panel {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+    }
+    .panel-header {
+      display: none !important;
+    }
+    .panel-body {
+      padding: 0 !important;
+    }
   }
 }
 
@@ -379,4 +415,11 @@
     left: 4vw !important;
     right: 4vw !important;
   }
+}
+:host ::ng-deep .premium-popover-override .p-popover-content {
+  max-height: min(80vh, 520px);
+}
+:host ::ng-deep .premium-notification-dialog .p-dialog {
+  width: min(720px, 94vw);
+  max-height: min(85vh, 720px);
 }

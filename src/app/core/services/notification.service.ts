@@ -23,7 +23,7 @@ export class NotificationService implements OnDestroy {
   private readonly serverUrl = environment.socketUrl;
 
   // Stores ALL notifications (History + New)
-  private notifications = new BehaviorSubject<NotificationData[]>([]);
+  public  notifications = new BehaviorSubject<NotificationData[]>([]);
   public notifications$ = this.notifications.asObservable();
 
   private messageService = inject(AppMessageService);

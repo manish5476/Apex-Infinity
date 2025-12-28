@@ -1,47 +1,54 @@
-<aside class="sidebar-container"
-       [class.expanded]="layout.isExpanded()"
-       [class.mobile-open]="layout.isMobile() && layout.isMobileMenuOpen()"
-       (mouseenter)="layout.isHovered.set(true)"
-       (mouseleave)="layout.isHovered.set(false)">
+<aside
+  class="sidebar-container"
+  [class.expanded]="layout.isExpanded()"
+  [class.mobile]="layout.isMobile()"
+  (mouseenter)="layout.isDesktop() && layout.isHovered.set(true)"
+  (mouseleave)="layout.isDesktop() && layout.isHovered.set(false)">
 
-  <div class="sidebar-inner">
-    <div class="menu-list custom-scrollbar">
-      
-      @for (item of menuItems; track item.label) {
+  <div class="sidebar-panel" (keydown)="onKeyNavigate($event)">
+    
+    <div class="menu-list" #menuList>
+      @for (item of menuItems; track item.label; let i = $index) {
         <div class="menu-item-wrapper" [class.active-parent]="isParentActive(item)">
           
           @if (!item.items) {
-            <a [routerLink]="item.routerLink"
-               routerLinkActive="active-link"
-               [routerLinkActiveOptions]="{ exact: true }"
-               class="menu-title">
+            <a 
+              [routerLink]="item.routerLink"
+              routerLinkActive="active-link"
+              class="menu-title"
+              tabindex="0">
               <i [class]="item.icon + ' menu-icon'"></i>
-              <span class="menu-label" [class.visible-text]="layout.isExpanded()">
+              <span class="menu-label" [class.visible]="layout.isExpanded()">
                 {{ item.label }}
               </span>
             </a>
           } 
           
           @else {
-            <div class="menu-title" (click)="toggleMenuItem(item.label)">
+            <div 
+              class="menu-title"
+              (click)="toggleMenuItem(item.label)"
+              tabindex="0"
+              [attr.aria-expanded]="expandedItems[item.label]">
               <i [class]="item.icon + ' menu-icon'"></i>
-              <span class="menu-label" [class.visible-text]="layout.isExpanded()">
+              <span class="menu-label" [class.visible]="layout.isExpanded()">
                 {{ item.label }}
               </span>
-              <i class="pi pi-angle-down menu-arrow"
-                 [class.rotate-180]="expandedItems[item.label]"
-                 [style.opacity]="layout.isExpanded() ? 1 : 0"></i>
+              <i class="pi pi-chevron-down menu-arrow" 
+                 *ngIf="layout.isExpanded()"
+                 [class.rotate]="expandedItems[item.label]"></i>
             </div>
 
-            <div class="submenu" 
-                 [class.submenu-expanded]="expandedItems[item.label] && layout.isExpanded()">
-              @for (subItem of item.items; track subItem.label) {
-                <a [routerLink]="subItem.routerLink"
-                   routerLinkActive="active-link"
-                   [routerLinkActiveOptions]="{ exact: true }"
-                   class="submenu-link">
-                  <i [class]="subItem.icon + ' submenu-icon'"></i>
-                  <span>{{ subItem.label }}</span>
+            <div 
+              class="submenu"
+              [style.maxHeight]="getSubmenuHeight(item)"
+              [class.open]="expandedItems[item.label] && layout.isExpanded()">
+              @for (sub of item.items; track sub.label) {
+                <a 
+                  [routerLink]="sub.routerLink"
+                  routerLinkActive="active-link"
+                  class="submenu-link">
+                  <span>{{ sub.label }}</span>
                 </a>
               }
             </div>
@@ -50,88 +57,12 @@
       }
     </div>
 
-    <div class="sidebar-footer" [class.visible-footer]="layout.isExpanded()">
-      <button class="logout-btn" (click)="logout()">
+    <footer class="sidebar-footer">
+      <button (click)="logout()">
         <i class="pi pi-sign-out"></i>
-        @if (layout.isExpanded()) { <span>Logout</span> }
+        <span *ngIf="layout.isExpanded()">Logout</span>
       </button>
-    </div>
+    </footer>
+
   </div>
 </aside>
-
-@if (!layout.isPinned() && !layout.isHovered() && !layout.isMobile()) {
-  <div class="hover-trigger" (mouseenter)="layout.isHovered.set(true)"></div>
-}
-<!-- 
-<div class="sidebar-container"
-  [ngClass]="{ 'collapsed': !isPinned && !isHovered, 'expanded': isPinned || isHovered }"
-  (mouseenter)="mouseEnter.emit()"
-  (mouseleave)="mouseLeave.emit()">
-
-  <div class="sidebar-inner">
-    <div class="menu-list">
-
-      <div *ngFor="let item of menuItems"
-        class="menu-item-wrapper"
-        [class.active-parent]="expandedItems[item.label]"
-        (mouseleave)="onMenuTitleLeave(item.label)">
-
-        Single-level link
-        <a *ngIf="!item.items; else multiItem"
-          [routerLink]="item.routerLink"
-          routerLinkActive="active-link"
-          [routerLinkActiveOptions]="{ exact: true }"
-          class="menu-title">
-
-          <i [class]="item.icon + ' menu-icon'"></i>
-          <span class="menu-label"
-            [ngClass]="{ 'hidden-text': !isPinned && !isHovered, 'visible-text': isPinned || isHovered }">
-            {{ item.label }}
-          </span>
-        </a>
-
-        Multi-level menu
-        <ng-template #multiItem>
-          <div class="menu-title"
-            (click)="toggleMenuItem(item.label)"
-            (mouseenter)="onMenuTitleEnter(item.label)">
-
-            <i [class]="item.icon + ' menu-icon'"></i>
-            <span class="menu-label"
-              [ngClass]="{ 'hidden-text': !isPinned && !isHovered, 'visible-text': isPinned || isHovered }">
-              {{ item.label }}
-            </span>
-
-            <i class="pi pi-angle-down menu-arrow"
-              [ngClass]="expandedItems[item.label] ? 'rotate-180' : 'rotate-0'"
-              [style.opacity]="(isPinned || isHovered) ? 1 : 0"></i>
-          </div>
-
-          <div class="submenu"
-            [ngClass]="expandedItems[item.label] ? 'submenu-expanded' : 'submenu-collapsed'">
-
-            <a *ngFor="let subItem of item.items"
-              [routerLink]="subItem.routerLink"
-              routerLinkActive="active-link"
-              [routerLinkActiveOptions]="{ exact: true }"
-              class="submenu-link">
-
-              <i [class]="subItem.icon + ' submenu-icon'"></i>
-              <span>{{ subItem.label }}</span>
-            </a>
-          </div>
-        </ng-template>
-      </div>
-    </div>
-
-    <div class="sidebar-footer"
-      [ngClass]="{ 'hidden-footer': !isPinned && !isHovered, 'visible-footer': isPinned || isHovered }">
-
-      <button pButton label="Logout" icon="pi pi-sign-out" class="logout-btn" (click)="logout()"></button>
-    </div>
-  </div>
-</div>
-
-<div class="hover-trigger"
-  (mouseenter)="mouseEnterTriggerZone.emit()"
-  *ngIf="!isPinned && !isHovered"></div> -->
