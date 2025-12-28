@@ -92,6 +92,10 @@ export const routes: Routes = [
         loadChildren: () => import('./modules/branch/branch.routes').then((m) => m.BRANCH_ROUTES),
       },
       {
+        path: 'accounts',
+        loadChildren: () => import('./modules/accounts/accounts.routes').then((m) => m.ACCOUNT_ROUTES),
+      },
+      {
         path: 'user',
         loadChildren: () => import('./modules/user/user.routes').then((m) => m.USER_ROUTES),
       },

@@ -5,25 +5,25 @@ export interface MenuItem {
   icon: string;
   routerLink?: string[];
   items?: MenuItem[];
-  badge?: string; 
+  badge?: string;
 }
 
 export const SIDEBAR_MENU: MenuItem[] = [
   // --- CORE MODULE ---
   {
-    label: 'Dashboard', 
+    label: 'Dashboard',
     icon: 'pi pi-home',
     items: [
       { label: 'Business Overview', icon: 'pi pi-chart-line', routerLink: ['/dashboard'] },
       { label: 'Real-time Chat', icon: 'pi pi-message', routerLink: ['/chat'] },
       { label: 'Internal Notes', icon: 'pi pi-pencil', routerLink: ['/notes'] },
-      { label: 'Active Sessions', icon: 'pi pi-history', routerLink: ['/sessions'] }
+      { label: 'Active Sessions', icon: 'pi pi-history', routerLink: ['/sessions'] },
+      { label: 'Acounts', icon: 'pi pi-history', routerLink: ['/accounts'] },
+      { label: 'Acounts tree', icon: 'pi pi-history', routerLink: ['/accounts/tree'] }
     ]
   },
-
-  // --- REVENUE & CRM CYCLE ---
   {
-    label: 'Sales & Customers', 
+    label: 'Sales & Customers',
     icon: 'pi pi-shopping-cart',
     items: [
       { label: 'All Invoices', icon: 'pi pi-file-pdf', routerLink: ['/invoices'] },
@@ -36,7 +36,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
 
   // --- SUPPLY CHAIN & EXPENDITURE ---
   {
-    label: 'Procurement', 
+    label: 'Procurement',
     icon: 'pi pi-box',
     items: [
       { label: 'Supplier List', icon: 'pi pi-truck', routerLink: ['/suppliers'] },
@@ -48,7 +48,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
 
   // --- FINANCIAL CONTROL ---
   {
-    label: 'Financials', 
+    label: 'Financials',
     icon: 'pi pi-money-bill',
     items: [
       { label: 'P&L Statement', icon: 'pi pi-calculator', routerLink: ['/financials'] },
@@ -59,7 +59,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
 
   // --- SYSTEM ADMINISTRATION ---
   {
-    label: 'Administration', 
+    label: 'Administration',
     icon: 'pi pi-cog',
     items: [
       { label: 'Organization', icon: 'pi pi-building', routerLink: ['/admin/organization'] },
@@ -71,7 +71,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
 
   // --- HUMAN CAPITAL ---
   {
-    label: 'User Management', 
+    label: 'User Management',
     icon: 'pi pi-users',
     items: [
       { label: 'Staff Directory', icon: 'pi pi-id-card', routerLink: ['/user/list'] },
@@ -93,8 +93,8 @@ export const SIDEBAR_MENU: MenuItem[] = [
 // //       { label: 'Overview', icon: 'pi pi-chart-line', routerLink: ['/dashboard'] },
 // //       { label: 'Chat', icon: 'pi pi-message', routerLink: ['/chat'] },
 // //       { label: 'Notes', icon: 'pi pi-pencil', routerLink: ['/notes'] },
-// //       { label: 'Organization', icon: 'pi pi-building', routerLink: ['/admin/organization'] }, 
-// //       { label: 'Sessions', icon: 'pi pi-clock', routerLink: ['/sessions'] } 
+// //       { label: 'Organization', icon: 'pi pi-building', routerLink: ['/admin/organization'] },
+// //       { label: 'Sessions', icon: 'pi pi-clock', routerLink: ['/sessions'] }
 // //     ]
 // //   },
 // //   {
@@ -169,8 +169,8 @@ export const SIDEBAR_MENU: MenuItem[] = [
 //       { label: 'Overview', icon: 'pi pi-chart-line', routerLink: ['/dashboard'] },
 //       { label: 'Chat', icon: 'pi pi-message', routerLink: ['/chat'] },
 //       { label: 'Notes', icon: 'pi pi-pencil', routerLink: ['/notes'] },
-//       { label: 'Organization', icon: 'pi pi-building', routerLink: ['/admin/organization'] }, 
-//       { label: 'Sessions', icon: 'pi pi-clock', routerLink: ['/sessions'] } 
+//       { label: 'Organization', icon: 'pi pi-building', routerLink: ['/admin/organization'] },
+//       { label: 'Sessions', icon: 'pi pi-clock', routerLink: ['/sessions'] }
 //     ]
 //   },
 //   {
