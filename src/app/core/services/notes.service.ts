@@ -1,53 +1,136 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
 import { BaseApiService } from './base-api.service';
-import { Note, NoteFilterParams, DailyNoteCount, NoteAttachment } from '../models/note.types';
+import { DailyNoteCount, Note, NoteAttachment, NoteFilterParams } from '../models/note.types';
 
 @Injectable({ providedIn: 'root' })
 export class NoteService extends BaseApiService {
-  // Only define the sub-path here. BaseApiService handles environment.apiUrl
   private endpoint = '/v1/notes';
 
-  // --- 1. GET FILTERED NOTES ---
-  getNotes(filterParams: NoteFilterParams): Observable<{ data: { notes: Note[] } }> {
-    // Your BaseApiService automatically converts filterParams object to HttpParams
-    return this.get(this.endpoint, filterParams, 'getNotes');
+  /** Fetch notes based on filters (date, search, etc.) */
+  getNotes(params: NoteFilterParams) {
+    return this.get<{ data: { notes: Note[] } }>(
+      this.endpoint,
+      params,
+      'getNotes'
+    );
   }
 
-  // --- 2. GET TIMELINE STATS ---
-  // Returns the array of { day: 5, count: 2 } for the calendar strip
-  getDailyNoteCounts(year: number, month: number): Observable<{ data: DailyNoteCount[] }> {
-    return this.get(`${this.endpoint}/daily-count`, { year, month }, 'getDailyNoteCounts');
+  /** Fetch counts of notes per day for the calendar view */
+  getDailyNoteCounts(year: number, month: number) {
+    return this.get<{ data: DailyNoteCount[] }>(
+      `${this.endpoint}/calendar`,
+      { year, month },
+      'calendar'
+    );
   }
 
-  // --- 3. GET SINGLE NOTE ---
-  getNoteById(id: string): Observable<{ data: { note: Note } }> {
-    return this.get(`${this.endpoint}/${id}`, {}, 'getNoteById');
+  getNoteById(id: string) {
+    return this.get<{ data: Note }>(
+      `${this.endpoint}/${id}`,
+      {},
+      'getNoteById'
+    );
   }
 
-  // --- 4. CREATE NOTE (Step 2 of flow) ---
-  createNote(data: Partial<Note>): Observable<{ data: { note: Note } }> {
-    return this.post(this.endpoint, data, 'createNote');
+  createNote(data: Partial<Note>) {
+    return this.post<{ data: Note }>(
+      this.endpoint,
+      data,
+      'createNote'
+    );
   }
 
-  // --- 5. UPDATE NOTE ---
-  updateNote(id: string, data: Partial<Note>): Observable<{ data: { note: Note } }> {
-    return this.patch(`${this.endpoint}/${id}`, data, 'updateNote');
+  updateNote(id: string, data: Partial<Note>) {
+    return this.patch<{ data: Note }>(
+      `${this.endpoint}/${id}`,
+      data,
+      'updateNote'
+    );
   }
 
-  // --- 6. DELETE NOTE ---
-  deleteNote(id: string): Observable<void> {
-    return this.delete(`${this.endpoint}/${id}`,null, 'deleteNote');
+  deleteNote(id: string) {
+    return this.delete<void>(
+      `${this.endpoint}/${id}`,
+      null,
+      'deleteNote'
+    );
   }
 
-  // --- 7. UPLOAD MEDIA (Step 1 of flow) ---
-  // This bypasses the generic 'post' JSON behavior because we need FormData
-  uploadMedia(files: File[]): Observable<{ data: NoteAttachment[] }> {
+  /** Uploads files and returns NoteAttachment objects with URLs and IDs */
+  uploadMedia(files: File[]) {
     const formData = new FormData();
-    files.forEach(file => {
-      // 'files' must match the backend multer.array('files')
-      formData.append('files', file);
-    });
+    files.forEach(f => formData.append('attachments', f));
+    return this.post<{ data: NoteAttachment[] }>(
+      `${this.endpoint}/upload`,
+      formData,
+      'uploadMedia'
+    );
+  }
+}
 
-    return this.post(`${this.endpoint}/upload-media`, formData, 'uploadMedia');
-  }}
+// import { Injectable } from '@angular/core';
+// import { Observable } from 'rxjs';
+// import { BaseApiService } from './base-api.service';
+// import { DailyNoteCount, Note, NoteAttachment, NoteFilterParams } from '../models/note.types';
+// @Injectable({ providedIn: 'root' })
+// export class NoteService extends BaseApiService {
+//   private endpoint = '/v1/notes';
+
+//   getNotes(params: NoteFilterParams) {
+//     return this.get<{ data: { notes: Note[] } }>(
+//       this.endpoint,
+//       params,
+//       'getNotes'
+//     );
+//   }
+
+//   getDailyNoteCounts(year: number, month: number) {
+//     return this.get<{ data: DailyNoteCount[] }>(
+//       `${this.endpoint}/calendar`,
+//       { year, month },
+//       'calendar'
+//     );
+//   }
+
+//   getNoteById(id: string) {
+//     return this.get<{ data: Note }>(
+//       `${this.endpoint}/${id}`,
+//       {},
+//       'getNoteById'
+//     );
+//   }
+
+//   createNote(data: Partial<Note>) {
+//     return this.post<{ data: Note }>(
+//       this.endpoint,
+//       data,
+//       'createNote'
+//     );
+//   }
+
+//   updateNote(id: string, data: Partial<Note>) {
+//     return this.patch<{ data: Note }>(
+//       `${this.endpoint}/${id}`,
+//       data,
+//       'updateNote'
+//     );
+//   }
+
+//   deleteNote(id: string) {
+//     return this.delete<void>(
+//       `${this.endpoint}/${id}`,
+//       null,
+//       'deleteNote'
+//     );
+//   }
+
+//   uploadMedia(files: File[]) {
+//     const formData = new FormData();
+//     files.forEach(f => formData.append('attachments', f));
+//     return this.post<{ data: NoteAttachment[] }>(
+//       `${this.endpoint}/upload`,
+//       formData,
+//       'uploadMedia'
+//     );
+//   }
+// }

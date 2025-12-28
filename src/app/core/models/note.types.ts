@@ -1,42 +1,64 @@
-// src/app/core/models/note.types.ts
+/* ---------------- ATTACHMENTS ---------------- */
 
 export interface NoteAttachment {
   url: string;
-  publicId: string; // Critical for deleting images later
+  publicId: string;
   fileType: 'image' | 'video' | 'file';
 }
 
+/* ---------------- USER (POPULATED) ---------------- */
+
+export interface NoteOwner {
+  _id: string;
+  name: string;
+  avatar?: string;
+  role?: string;
+}
+
+/* ---------------- NOTE ---------------- */
+
 export interface Note {
   _id?: string;
-  title: string;
+
+  title?: string;
   content: string;
-  tags: string[];
-  
-  // Updated to store objects, not just strings
-  attachments: NoteAttachment[]; 
-  
+  tags?: string[];
+
+  attachments: NoteAttachment[];
+
   // Relationships
   organizationId?: string;
   branchId?: string;
-  owner?: string; // User ID
-  
+  owner?: NoteOwner;
+
+  // Dates
+  noteDate: string;      // 🔥 ACTUAL note date (calendar, filters)
+  createdAt?: string;    // audit only
+  updatedAt?: string;
+
   // Logic
-  isPinned: boolean;
-  createdAt: string; // ISO Date String
-  updatedAt: string;
+  visibility?: 'public' | 'private' | 'team';
+  importance?: 'low' | 'normal' | 'high';
+  isPinned?: boolean;
 }
 
-// For the Timeline Dashboard
+/* ---------------- CALENDAR ---------------- */
+
 export interface DailyNoteCount {
-  day: number;   // e.g., 5
-  count: number; // e.g., 3 notes
+  day: number;
+  count: number;
+  hasHighPriority?: boolean;
 }
 
-// For Filtering
+/* ---------------- FILTERING ---------------- */
+
 export interface NoteFilterParams {
-  date?: string;  // 'YYYY-MM-DD'
-  week?: string;  // 'YYYY-MM-DD'
-  month?: number; // 1-12
-  year?: number;  // YYYY
+  date?: string;   // YYYY-MM-DD
+  week?: string;   // YYYY-MM-DD
+  month?: number;  // 1–12
+  year?: number;   // YYYY
   search?: string;
+
+  relatedTo?: 'customer' | 'product' | 'invoice' | 'purchase' | 'other';
+  relatedId?: string;
 }
