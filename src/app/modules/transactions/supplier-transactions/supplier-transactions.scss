@@ -1,9 +1,134 @@
-:host { display: block; height: 100%; width: 100%; }
-.list-page-container { display: flex; flex-direction: column; gap: 1rem; height: 100%; padding: 0.5rem; }
-.themed-card { background: var(--surface-card, #fff); border-radius: 12px; padding: 1rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); display: flex; flex-direction: column; gap: 1rem; flex: 1; overflow: hidden; }
-.se-filter-bar { display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap; margin-bottom: 0.5rem;
-    .se-filter-field { display: flex; flex-direction: column; gap: 0.5rem; min-width: 150px;
-        label { font-weight: 500; color: var(--text-secondary, #6c757d); font-size: 0.85rem; }
-    }
+:host {
+  display: block;
+  height: 100%;
+  width: 100%;
 }
-.list-grid-wrapper { flex: 1; min-height: 0; ::ng-deep app-shared-grid { height: 100%; display: block; } }
+
+.transaction-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--bg-primary);
+}
+
+/* === FILTER HEADER === */
+.filter-header {
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-primary);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-lg);
+
+  .filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    flex: 1;
+
+    .filter-item {
+      min-width: 160px;
+      
+      &.search-item {
+        min-width: 240px;
+      }
+    }
+  }
+
+  .action-group {
+    display: flex;
+    gap: var(--spacing-sm);
+  }
+}
+
+/* === GRID CONTAINER === */
+.grid-container {
+  flex: 1; /* Takes all remaining height */
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-primary);
+  padding: 0;
+
+  /* Force grid component to fill space */
+  .full-height-grid {
+    display: block;
+    height: 100%;
+    width: 100%;
+  }
+  
+  /* Ensure AG Grid internal container fills height */
+  ::ng-deep app-ag-share-grid {
+    height: 100% !important;
+    display: block;
+  }
+}
+
+/* === FOOTER STATS === */
+.footer-stats {
+  padding: var(--spacing-sm) var(--spacing-xl);
+  background: var(--bg-ternary);
+  border-top: 1px solid var(--border-primary);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* === PRIME NG OVERRIDES === */
+:host ::ng-deep {
+  .p-inputtext {
+    font-size: var(--font-size-sm);
+    padding: 0.6rem 0.75rem;
+  }
+  
+  .p-select {
+    font-size: var(--font-size-sm);
+    width: 100%;
+  }
+  
+  .p-datepicker {
+    width: 100%;
+    input { width: 100%; }
+  }
+}
+
+:host {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.transaction-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Important: Fill the Dialog body */
+  background-color: var(--bg-primary);
+}
+
+/* ... Filter Header styles remain same ... */
+
+/* === GRID CONTAINER (UPDATED) === */
+.grid-container {
+  flex: 1;          /* Grow to fill all remaining space */
+  min-height: 0;    /* CRITICAL: Allows scrolling inside a flex child */
+  position: relative;
+  background: var(--bg-primary);
+  padding: 0;
+  display: flex;    /* Make this a flex container too */
+  flex-direction: column;
+
+  /* Force the Angular component to fill the parent */
+  app-ag-share-grid {
+    flex: 1;
+    width: 100%;
+    height: 100%; /* Ensure it hits the bottom */
+    display: block;
+  }
+
+  /* Deep selector to force AG Grid internals to fill height */
+  ::ng-deep .ag-root-wrapper {
+    height: 100% !important;
+  }
+}

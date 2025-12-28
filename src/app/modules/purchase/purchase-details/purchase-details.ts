@@ -46,7 +46,6 @@ export class PurchaseDetailsComponent implements OnInit {
       switchMap(params => {
         const id = params.get('id');
         if (id) {
-           // this.isLoading.set(true);
           return this.purchaseService.getPurchaseById(id);
         }
         return [];
@@ -54,8 +53,8 @@ export class PurchaseDetailsComponent implements OnInit {
       finalize(() => this.isLoading.set(false))
     ).subscribe({
       next: (res: any) => {
-        if (res && res.data.purchase) {
-          this.purchase.set(res.data.purchase);
+        if (res && res.data.data) {
+          this.purchase.set(res.data.data);
         }
       },
       error: (err) => {

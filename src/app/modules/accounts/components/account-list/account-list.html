@@ -1,0 +1,43 @@
+<p-table
+  [value]="accounts"
+  [loading]="loading"
+  dataKey="_id"
+  responsiveLayout="scroll"
+>
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Code</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th class="text-right">Debit</th>
+      <th class="text-right">Credit</th>
+      <th class="text-right">Balance</th>
+      <th>Actions</th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-a>
+    <tr>
+      <td>{{ a.code }}</td>
+      <td>{{ a.name }}</td>
+      <td class="text-capitalize">{{ a.type }}</td>
+
+      <td class="text-right">
+        {{ a.debitTotal | number:'1.2-2' }}
+      </td>
+
+      <td class="text-right">
+        {{ a.creditTotal | number:'1.2-2' }}
+      </td>
+
+      <td class="text-right font-bold">
+        {{ a.balance | number:'1.2-2' }}
+      </td>
+
+      <td>
+        <button pButton icon="pi pi-pencil" class="p-button-text"></button>
+        <button pButton icon="pi pi-trash" class="p-button-text p-button-danger"></button>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

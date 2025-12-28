@@ -12,6 +12,7 @@ import { AppMessageService } from '../../../../core/services/message.service';
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { EmiService } from '../../services/emi-service';
 import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
+import { ActionViewRenderer } from '../../../shared/AgGrid/AgGridcomponents/DynamicDetailCard/ActionViewRenderer';
 
 @Component({
   selector: 'app-emi-list',
@@ -143,6 +144,12 @@ export class EmiList implements OnInit {
 
   getColumn(): void {
     this.column = [
+      {
+        headerName: 'Actions',
+        field: '_id',
+        width: 150,
+        cellRenderer: ActionViewRenderer,
+      },
       {
         headerName: '#',
         valueGetter: 'node.rowIndex + 1',

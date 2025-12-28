@@ -299,4 +299,44 @@ public generateSku(name: string): string {
 
   return `${shortCode}-${uniqueId}`.toUpperCase();
 }
+
+
+/**
+ * Returns an HTML badge for status/paymentStatus
+ * Safe to use inside AG Grid cellRenderer
+ */
+public statusBadgeHtml(status: string): string {
+  if (!status) return '';
+
+  const colors: Record<string, { bg: string; text: string }> = {
+    draft:     { bg: '#f3f4f6', text: '#374151' },
+    issued:   { bg: '#e0f2fe', text: '#0369a1' },
+    paid:     { bg: '#dcfce7', text: '#15803d' },
+    unpaid:   { bg: '#fee2e2', text: '#b91c1c' },
+    partial:  { bg: '#fef9c3', text: '#854d0e' },
+    cancelled:{ bg: '#f1f5f9', text: '#64748b' },
+    completed:{ bg: '#dcfce7', text: '#15803d' }
+  };
+
+  const key = status.toLowerCase();
+  const theme = colors[key] || colors['draft'];
+
+  return `
+    <span style="
+      background:${theme.bg};
+      color:${theme.text};
+      padding:4px 10px;
+      border-radius:6px;
+      font-size:11px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:0.4px;
+      display:inline-block;
+    ">
+      ${status}
+    </span>
+  `;
+}
+
+
 }

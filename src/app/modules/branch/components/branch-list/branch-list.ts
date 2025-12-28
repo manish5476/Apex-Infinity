@@ -116,7 +116,8 @@ export class BranchListComponent implements OnInit {
   }
 
   eventFromGrid(event: any) {
-    if (event.type === 'cellClicked' && event.colDef.field === 'name') {
+    console.log(event);
+    if (event.type === 'cellClicked' && event.field === 'name') {
       const branchId = event.row._id;
       if (branchId) {
         this.router.navigate([branchId], { relativeTo: this.route });

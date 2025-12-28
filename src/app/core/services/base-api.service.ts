@@ -69,10 +69,20 @@ export class BaseApiService {
   // DELETE
   // -------------------------------
   protected delete<T>(url: string, body?: any, _context?: string): Observable<T> {
-  return this.http.delete<T>(`${this.baseUrl}${url}`, {
-    body: body,             
-    withCredentials: true,
-  });
-}
-  
+    return this.http.delete<T>(`${this.baseUrl}${url}`, {
+      body: body,
+      withCredentials: true,
+    });
+  }
+
+  // -------------------------------
+  // PUT
+  // -------------------------------
+  protected put<T>(url: string, body: any, _context?: string): Observable<T> {
+    return this.http.put<T>(`${this.baseUrl}${url}`, body, {
+      withCredentials: true,   // <-- REQUIRED (same as others)
+    });
+  }
+
+
 }
