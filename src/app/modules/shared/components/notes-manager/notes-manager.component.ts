@@ -46,6 +46,7 @@ export class NotesManagerComponent implements OnInit {
   private elementRef = inject(ElementRef); // Injected for 3D effect
 
   @ViewChild('fileInput') fileInput!: ElementRef;
+  particles = signal<Array<{ style: string }>>([]);
 
   // --- 3D TILT STATE (New UI Feature) ---
   rotateX = signal(0);
@@ -134,6 +135,7 @@ export class NotesManagerComponent implements OnInit {
 
   ngOnInit() {
     this.refreshAll();
+    this.generateParticles();
   }
 
   // --- 3D TILT LOGIC (New UI Feature) ---
@@ -145,9 +147,9 @@ export class NotesManagerComponent implements OnInit {
     const rect = card.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
-    
+
     if (x < 0 || y < 0 || x > rect.width || y > rect.height) {
-        this.rotateX.set(0); this.rotateY.set(0); return;
+      this.rotateX.set(0); this.rotateY.set(0); return;
     }
 
     const centerX = rect.width / 2;
@@ -204,7 +206,7 @@ export class NotesManagerComponent implements OnInit {
       }
       // Current month
       for (let i = 1; i <= daysInMonth; i++) {
-        const count = stats.find((s:any) => s.day === i)?.count || 0;
+        const count = stats.find((s: any) => s.day === i)?.count || 0;
         grid.push(this.createDayObj(new Date(year, month - 1, i), true, count));
       }
       // Next month padding
@@ -275,8 +277,8 @@ export class NotesManagerComponent implements OnInit {
     if (this.noteForm.invalid || this.isSaving) return;
     this.isSaving = true;
 
-    const upload$ = this.selectedFiles.length > 0 
-      ? this.noteService.uploadMedia(this.selectedFiles) 
+    const upload$ = this.selectedFiles.length > 0
+      ? this.noteService.uploadMedia(this.selectedFiles)
       : of({ data: [] });
 
     upload$.pipe(
@@ -284,7 +286,7 @@ export class NotesManagerComponent implements OnInit {
         const finalAttachments = [...(this.noteForm.value.attachments || []), ...res.data];
         const payload = { ...this.noteForm.value, attachments: finalAttachments };
 
-        return this.selectedNote?._id 
+        return this.selectedNote?._id
           ? this.noteService.updateNote(this.selectedNote._id, payload)
           : this.noteService.createNote(payload);
       }),
@@ -351,4 +353,109 @@ export class NotesManagerComponent implements OnInit {
   switchView(v: 'calendar' | 'archive') { this.activeView.set(v); }
   toggleViewMode() { this.viewMode.set(this.viewMode() === 'grid' ? 'list' : 'grid'); }
   toggleEditMode() { this.isPreviewMode = !this.isPreviewMode; }
+
+
+  // // Add these methods to your component class:
+
+  // getMonthlyNoteCount(): number {
+  //   const currentMonth = this.currentDate().getMonth();
+  //   const currentYear = this.currentDate().getFullYear();
+
+  //   return this.allNotes().filter(note => {
+  //     const noteDate = new Date(note.noteDate);
+  //     return noteDate.getMonth() === currentMonth &&
+  //       noteDate.getFullYear() === currentYear;
+  //   }).length;
+  // }
+
+  // getDayOfYear(): number {
+  //   const now = this.selectedDate();
+  //   const start = new Date(now.getFullYear(), 0, 0);
+  //   const diff = now.getTime() - start.getTime();
+  //   const oneDay = 1000 * 60 * 60 * 24;
+  //   return Math.floor(diff / oneDay);
+  // }
+
+  // getPinnedCount(): number {
+  //   return this.allNotes().filter(note => note.isPinned).length;
+  // }
+
+  // getHighPriorityCount(): number {
+  //   return this.allNotes().filter(note => note.importance === 'high').length;
+  // }
+  // Add to your existing methods
+  getMonthlyNoteCount(): number {
+    const currentMonth = this.currentDate().getMonth();
+    const currentYear = this.currentDate().getFullYear();
+    
+    return this.allNotes().filter(note => {
+      const noteDate = new Date(note.noteDate);
+      return noteDate.getMonth() === currentMonth && 
+             noteDate.getFullYear() === currentYear;
+    }).length;
+  }
+
+  getDayOfYear(): number {
+    const now = this.selectedDate();
+    const start = new Date(now.getFullYear(), 0, 0);
+    const diff = now.getTime() - start.getTime();
+    const oneDay = 1000 * 60 * 60 * 24;
+    return Math.floor(diff / oneDay);
+  }
+
+  getPinnedCount(): number {
+    return this.allNotes().filter(note => note.isPinned).length;
+  }
+
+  getHighPriorityCount(): number {
+    return this.allNotes().filter(note => note.importance === 'high').length;
+  }
+  
+
+  getUpcomingNotes(): Note[] {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    return this.allNotes().filter(note => {
+      const noteDate = new Date(note.noteDate);
+      noteDate.setHours(0, 0, 0, 0);
+      return noteDate >= today && noteDate < tomorrow && note.importance === 'high';
+    }).slice(0, 3);
+  }
+
+  generateParticles() {
+    const particles = [];
+    const particleCount = 20;
+    
+    for (let i = 0; i < particleCount; i++) {
+      const size = Math.random() * 100 + 50; // 50-150px
+      const x = Math.random() * 100; // 0-100%
+      const y = Math.random() * 100; // 0-100%
+      const blur = Math.random() * 20 + 10; // 10-30px
+      const opacity = Math.random() * 0.1 + 0.05; // 0.05-0.15
+      const animationDuration = Math.random() * 30 + 20; // 20-50s
+      const animationDelay = Math.random() * 10; // 0-10s
+      
+      particles.push({
+        style: `
+          width: ${size}px;
+          height: ${size}px;
+          left: ${x}%;
+          top: ${y}%;
+          filter: blur(${blur}px);
+          opacity: ${opacity};
+          animation-duration: ${animationDuration}s;
+          animation-delay: ${animationDelay}s;
+        `
+      });
+    }
+    
+    this.particles.set(particles);
+  }
+  
+  
+
 }
