@@ -1,14 +1,3 @@
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-supplier-list',
-//   imports: [],
-//   templateUrl: './supplier-list.html',
-//   styleUrl: './supplier-list.scss',
-// })
-// export class SupplierList {
-
-// }
 import { ChangeDetectorRef, Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
