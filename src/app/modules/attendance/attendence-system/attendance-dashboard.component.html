@@ -1,0 +1,94 @@
+<div class="attendance-container">
+  
+  <div class="action-card">
+    <h2>👋 Hello, Employee</h2>
+    <p>Current Status: <span [class]="todayStatus === 'Punched In' ? 'status-active' : 'status-inactive'">{{ todayStatus }}</span></p>
+    
+    <div class="punch-buttons">
+      <button class="btn-punch in" (click)="handlePunch('in')" [disabled]="isLoading">
+        📍 PUNCH IN
+      </button>
+      <button class="btn-punch out" (click)="handlePunch('out')" [disabled]="isLoading">
+        🛑 PUNCH OUT
+      </button>
+    </div>
+    
+    <p class="error-text" *ngIf="locationError">{{ locationError }}</p>
+  </div>
+
+  <div class="history-card">
+    <div class="card-header">
+      <h3>Attendance Log (This Month)</h3>
+      <button class="btn-secondary" (click)="showRegularizeModal = true">Fix Attendance</button>
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Status</th>
+          <th>In Time</th>
+          <th>Out Time</th>
+          <th>Work Hours</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let log of attendanceHistory">
+          <td>{{ log.date | date:'mediumDate' }}</td>
+          <td>
+            <span class="badge" [ngClass]="log.status">{{ log.status | uppercase }}</span>
+            <span *ngIf="log.isLate" class="badge late">LATE</span>
+          </td>
+          <td>{{ log.firstIn ? (log.firstIn | date:'shortTime') : '-' }}</td>
+          <td>{{ log.lastOut ? (log.lastOut | date:'shortTime') : '-' }}</td>
+          <td>{{ log.totalWorkHours || 0 }} hrs</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="modal-overlay" *ngIf="showRegularizeModal">
+    <div class="modal-content">
+      <h3>Regularize Attendance</h3>
+      <form [formGroup]="regularizeForm" (ngSubmit)="submitRegularization()">
+        
+        <div class="form-group">
+          <label>Date to Fix</label>
+          <input type="date" formControlName="targetDate">
+        </div>
+
+        <div class="form-group">
+          <label>Request Type</label>
+          <select formControlName="type">
+            <option value="missed_punch">Missed Punch</option>
+            <option value="work_from_home">Work From Home</option>
+            <option value="on_duty">On Duty (Field Work)</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <div class="form-group half">
+            <label>Correct In Time</label>
+            <input type="time" formControlName="newFirstIn">
+          </div>
+          <div class="form-group half">
+            <label>Correct Out Time</label>
+            <input type="time" formControlName="newLastOut">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Reason</label>
+          <textarea formControlName="reason" placeholder="Why are you changing this?"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" (click)="showRegularizeModal = false">Cancel</button>
+          <button type="submit" [disabled]="regularizeForm.invalid" class="btn-primary">Submit Request</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+</div>
