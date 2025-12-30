@@ -37,8 +37,8 @@ interface CalendarDay {
     TooltipModule, ChipModule
   ],
   providers: [MessageService],
-  templateUrl: './dashboard-notes.component.html',
-  styleUrls: ['./dashboard-notes.component.scss']
+  templateUrl: './notes-manager.component.html',
+  styleUrls: ['./notes-manager.component.scss']
 })
 export class NotesManagerComponent  implements OnInit {
   private noteService = inject(NoteService);
