@@ -40,7 +40,7 @@ interface CalendarDay {
   templateUrl: './dashboard-notes.component.html',
   styleUrls: ['./dashboard-notes.component.scss']
 })
-export class DashboardNotesComponent implements OnInit {
+export class NotesManagerComponent  implements OnInit {
   private noteService = inject(NoteService);
   private fb = inject(FormBuilder);
   private messageService = inject(MessageService);
