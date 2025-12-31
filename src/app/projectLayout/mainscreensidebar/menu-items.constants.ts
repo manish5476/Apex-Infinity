@@ -19,7 +19,10 @@ export const SIDEBAR_MENU: MenuItem[] = [
       { label: 'Internal Notes', icon: 'pi pi-pencil', routerLink: ['/notes'] },
       { label: 'Active Sessions', icon: 'pi pi-history', routerLink: ['/sessions'] },
       { label: 'Acounts', icon: 'pi pi-history', routerLink: ['/accounts'] },
-      { label: 'Acounts tree', icon: 'pi pi-history', routerLink: ['/accounts/tree'] }
+      { label: 'Acounts tree', icon: 'pi pi-history', routerLink: ['/accounts/tree'] },
+      { label: 'attendence', icon: 'pi pi-history', routerLink: ['/attendence'] },
+      { label: 'shift', icon: 'pi pi-history', routerLink: ['/shift'] },
+      { label: 'holiday', icon: 'pi pi-history', routerLink: ['/holiday'] },
     ]
   },
   {

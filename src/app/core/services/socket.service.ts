@@ -22,6 +22,7 @@ export interface Message {
   attachments?: Attachment[];
   createdAt?: string;
   deleted?: boolean;
+  read:boolean
 }
 
 // Alias for components requesting "ChatMessage"

@@ -1,0 +1,150 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="list-page-container">
+  <div class="themed-card list-content-area">
+    
+    <div class="se-filter-bar mb-4">
+      
+      <div class="se-filter-field">
+        <label>Year</label>
+        <p-select 
+          [options]="yearOptions" 
+          [(ngModel)]="filter.year" 
+          optionLabel="label" optionValue="value"
+          (onChange)="onYearChange()"
+          styleClass="w-full">
+        </p-select>
+      </div>
+
+      <div class="se-filter-field">
+        <label>Type</label>
+        <p-select 
+          [options]="typeOptions" 
+          [(ngModel)]="filter.type" 
+          optionLabel="label" optionValue="value"
+          (onChange)="applyLocalFilters()"
+          styleClass="w-full">
+        </p-select>
+      </div>
+
+      <div class="se-filter-field">
+        <label>Search</label>
+        <input 
+          pInputText 
+          [(ngModel)]="filter.search" 
+          (input)="applyLocalFilters()" 
+          placeholder="Search holidays..." 
+          class="w-full" />
+      </div>
+
+      <div class="se-filter-actions">
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary" (onClick)="resetFilters()"></p-button>
+      </div>
+
+      <div class="se-filter-right">
+        <p-button label="Add Holiday" icon="pi pi-plus" (onClick)="openCreate()" styleClass="p-button-primary"></p-button>
+      </div>
+    </div>
+
+    <div class="list-grid-wrapper h-[600px]">
+      <app-ag-share-grid 
+        [columns]="column" 
+        [data]="filteredData" 
+        [showActions]="false"
+        (gridEvent)="handleGridEvent($event)">
+      </app-ag-share-grid>
+    </div>
+
+  </div>
+</div>
+
+<p-dialog [(visible)]="showDialog" [header]="isEditMode ? 'Edit Holiday' : 'New Holiday'" [modal]="true" [style]="{width: '450px'}">
+  <form [formGroup]="holidayForm" class="flex flex-col gap-4 pt-2">
+    <div class="flex flex-col gap-2">
+      <label class="font-medium text-sm">Holiday Name <span class="text-red-500">*</span></label>
+      <input pInputText formControlName="name" />
+    </div>
+    <div class="flex flex-col gap-2">
+      <label class="font-medium text-sm">Date <span class="text-red-500">*</span></label>
+      <p-datepicker formControlName="date" dateFormat="yy-mm-dd" appendTo="body" [showIcon]="true" styleClass="w-full"></p-datepicker>
+    </div>
+    <div class="flex flex-col gap-2">
+      <label class="font-medium text-sm">Description</label>
+      <input pInputText formControlName="description" />
+    </div>
+    <div class="flex items-center justify-between border p-3 rounded-md bg-gray-50">
+      <span class="text-sm font-medium">Restricted / Optional?</span>
+      <p-toggleswitch formControlName="isOptional"></p-toggleswitch>
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" class="p-button-text" (click)="showDialog = false"></button>
+    <button pButton label="Save" class="p-button-primary" (click)="onSubmit()" [disabled]="holidayForm.invalid"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- <p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="list-page-container">
+  <div class="themed-card list-content-area">
+    
+    <div class="flex justify-between items-center mb-4 p-4 border-b border-gray-100">
+      <div>
+        <h2 class="text-xl font-bold text-gray-800">Holiday Master</h2>
+        <p class="text-sm text-gray-500">Manage annual holiday calendar</p>
+      </div>
+      <p-button label="Add Holiday" icon="pi pi-plus" (onClick)="openCreate()"></p-button>
+    </div>
+
+    <div class="list-grid-wrapper h-[600px]">
+      <app-ag-share-grid 
+        [columns]="column" 
+        [data]="data" 
+        [showActions]="false"
+        (gridEvent)="handleGridEvent($event)">
+      </app-ag-share-grid>
+    </div>
+
+  </div>
+</div>
+
+<p-dialog 
+  [(visible)]="showDialog" 
+  [header]="isEditMode ? 'Edit Holiday' : 'New Holiday'" 
+  [modal]="true" 
+  [style]="{width: '450px'}"
+  [draggable]="false" 
+  [resizable]="false">
+
+  <form [formGroup]="holidayForm" class="flex flex-col gap-4 pt-2">
+    
+    <div class="flex flex-col gap-2">
+      <label class="font-medium text-sm">Holiday Name <span class="text-red-500">*</span></label>
+      <input pInputText formControlName="name" placeholder="e.g. Diwali" />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label class="font-medium text-sm">Date <span class="text-red-500">*</span></label>
+      <p-datepicker formControlName="date" dateFormat="yy-mm-dd" appendTo="body" [showIcon]="true" styleClass="w-full"></p-datepicker>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label class="font-medium text-sm">Description</label>
+      <input pInputText formControlName="description" placeholder="Optional notes" />
+    </div>
+
+    <div class="flex items-center justify-between border p-3 rounded-md bg-gray-50">
+      <span class="text-sm font-medium">Restricted / Optional Holiday?</span>
+      <p-toggleswitch formControlName="isOptional"></p-toggleswitch>
+    </div>
+
+  </form>
+
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" class="p-button-text" (click)="showDialog = false"></button>
+    <button pButton label="Save" class="p-button-primary" (click)="onSubmit()" [disabled]="holidayForm.invalid"></button>
+  </ng-template>
+
+</p-dialog> -->

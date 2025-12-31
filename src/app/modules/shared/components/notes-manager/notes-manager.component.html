@@ -1,255 +1,499 @@
 <p-toast position="bottom-right" zIndex="2000"></p-toast>
 
-<div class="erp-glass-widget" 
-     [style.transform]="'perspective(1000px) rotateX(' + rotateX() + 'deg) rotateY(' + rotateY() + 'deg)'">
-  
-  <div class="noise-overlay"></div>
+<!-- Dashboard Header with Glassmorphism -->
+<div class="dashboard-header glass-header">
+    <div class="header-content">
+        <div class="header-left">
+            <div class="logo-container">
+                <div class="logo-circle">
+                    <i class="pi pi-bookmark"></i>
+                </div>
+                <div class="logo-text">
+                    <h1 class="text-gradient-primary">Daily Planner</h1>
+                    <div class="subtitle">Organize your thoughts, plan your days</div>
+                </div>
+            </div>
+        </div>
 
-  <header class="widget-header">
-    <div class="header-left">
-      <div class="icon-box">
-        <i class="pi pi-book"></i>
-      </div>
-      <div>
-        <h2>My Journal</h2>
-        <span class="subtitle">Daily Overview</span>
-      </div>
+        <div class="header-right">
+            <div class="date-display glass-date-display">
+                <div class="current-date">{{ selectedDate() | date:'EEEE, MMMM d' }}</div>
+                <div class="date-meta">
+                    <span class="week-info">Week {{ selectedDate() | date:'w' }}</span>
+                    <span class="year-info">{{ selectedDate() | date:'yyyy' }}</span>
+                    <span class="day-of-year">Day {{ getDayOfYear() }}</span>
+                </div>
+            </div>
+
+            <button class="theme-toggle" pTooltip="Switch theme">
+                <i class="pi pi-palette"></i>
+            </button>
+        </div>
     </div>
 
-    <div class="nav-pills">
-      <button class="nav-item" [class.active]="activeView() === 'calendar'" (click)="switchView('calendar')">
-        <i class="pi pi-calendar"></i> Calendar
-      </button>
-      <button class="nav-item" [class.active]="activeView() === 'archive'" (click)="switchView('archive')">
-        <i class="pi pi-database"></i> Archive
-      </button>
-    </div>
-
-    <button class="btn-add-mini" (click)="openNewNote()" pTooltip="Create New Entry">
-      <i class="pi pi-plus"></i>
-    </button>
-  </header>
-
-  <div class="widget-body custom-scrollbar">
-
-    @if (activeView() === 'calendar') {
-      <div class="split-layout animate-fade-up">
-        
-        <div class="calendar-section">
-            <div class="cal-controls">
-                <button class="btn-text" (click)="changeMonth(-1)"><i class="pi pi-chevron-left"></i></button>
-                <span class="current-month">{{ currentMonthName() }}</span>
-                <button class="btn-text" (click)="changeMonth(1)"><i class="pi pi-chevron-right"></i></button>
-                <button class="btn-today" (click)="jumpToToday()">Today</button>
-            </div>
-
-            <div class="cal-grid-header">
-                @for (day of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; track day) {
-                    <span>{{ day }}</span>
-                }
-            </div>
-
-            <div class="cal-grid">
-                @for (day of calendarDays(); track $index) {
-                    <div class="cal-day" 
-                         [class.faded]="!day.isCurrentMonth"
-                         [class.today]="day.isToday"
-                         [class.selected]="day.isSelected"
-                         (click)="selectDay(day)">
-                        
-                        <span>{{ day.dayNum }}</span>
-                        
-                        @if(day.noteCount > 0) {
-                            <div class="dot-container">
-                                @for (item of getIndicators(day.noteCount); track $index) {
-                                    <span class="dot-indicator"></span>
-                                }
-                            </div>
-                        }
-                    </div>
-                }
-            </div>
-
-            <div class="stats-mini">
-                <div class="stats-icon"><i class="pi pi-bolt"></i></div>
-                <div class="stats-text">
-                    <strong>Daily Momentum</strong>
-                    <span>{{ dailyNotes().length }} thoughts today</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="notes-section custom-scrollbar">
-            <div class="notes-header">
-                <span class="day-label">{{ selectedDate() | date:'EEEE, MMM d' }}</span>
-                <span class="count-label">{{ dailyNotes().length }} Entries</span>
-            </div>
-
-            @if (dailyNotes().length === 0) {
-                <div class="empty-state-mini">
-                    <i class="pi pi-pencil"></i>
-                    <p>Quiet day. Capture a thought?</p>
-                    <button class="btn-link" (click)="openNewNote()">New Entry</button>
-                </div>
-            } @else {
-                <div class="notes-list">
-                    @for (note of dailyNotes(); track note._id) {
-                        <div class="note-item" [class.pinned]="note.isPinned" (click)="viewNote(note)">
-                            <div class="note-top">
-                                <span class="time">{{ note.noteDate | date:'shortTime' }}</span>
-                                <div class="badges">
-                                    @if(note.isPinned) { <i class="pi pi-bookmark-fill pin"></i> }
-                                    @if(note.importance === 'high') { <span class="badge-high">High</span> }
-                                </div>
-                            </div>
-                            <h4>{{ note.title || 'Untitled' }}</h4>
-                            <p>{{ note.content }}</p>
-                            @if(note.tags?.length) {
-                                <div class="tags-row">
-                                    @for(tag of note.tags; track tag) { <span>#{{tag}}</span> }
-                                </div>
-                            }
-                        </div>
-                    }
-                </div>
-            }
-        </div>
-      </div>
-    }
-
-    @if (activeView() === 'archive') {
-        <div class="archive-layout animate-fade-up">
-            
-            <div class="archive-controls">
-                <div class="search-input">
-                    <i class="pi pi-search"></i>
-                    <input type="text" placeholder="Search notes..." 
-                           [value]="searchQuery()" (input)="searchQuery.set($any($event.target).value)">
-                </div>
-
-                <div class="filter-select">
-                    <select [value]="filterTag()" (change)="filterTag.set($any($event.target).value)">
-                        <option value="all">All Tags</option>
-                        @for (tag of allTags(); track tag) { <option [value]="tag">{{ tag }}</option> }
-                    </select>
-                </div>
-
-                <button class="btn-icon" (click)="toggleViewMode()">
-                    <i class="pi" [class.pi-th-large]="viewMode() === 'list'" [class.pi-list]="viewMode() === 'grid'"></i>
-                </button>
-            </div>
-            
-            <div class="archive-content custom-scrollbar">
-                @for (group of notesGroupedByMonth(); track group.monthKey) {
-                    <section class="month-group">
-                        <h3 class="month-header">
-                            {{ group.monthName }}
-                            <span class="count">{{ group.notes.length }} notes</span>
-                        </h3>
-
-                        <div class="archive-grid" [class.list-mode]="viewMode() === 'list'">
-                            @for (note of group.notes; track note._id) {
-                                <div class="archive-card" (click)="viewNote(note)">
-                                    <div class="card-top">
-                                        <span class="date">{{ note.noteDate | date:'MMM d' }}</span>
-                                        <div class="actions">
-                                            <button (click)="editNote(note); $event.stopPropagation()"><i class="pi pi-pencil"></i></button>
-                                            <button class="danger" (click)="deleteNote(note); $event.stopPropagation()"><i class="pi pi-trash"></i></button>
-                                        </div>
-                                    </div>
-                                    <h4>{{ note.title }}</h4>
-                                    <p>{{ note.content }}</p>
-                                    @if(note.attachments.length) {
-                                        <div class="attach-badge"><i class="pi pi-paperclip"></i> {{note.attachments.length}}</div>
-                                    }
-                                </div>
-                            }
-                        </div>
-                    </section>
-                } @empty {
-                    <div class="empty-state-mini">
-                        <p>No notes found matching your filters.</p>
-                    </div>
-                }
-            </div>
-        </div>
-    }
-  </div>
+    <!-- Animated gradient border -->
+    <div class="header-border-animation"></div>
 </div>
 
-<p-dialog [(visible)]="isEditorVisible" [modal]="true" [style]="{width: '600px'}" 
-          styleClass="erp-dialog" [draggable]="false" [resizable]="false">
-    
+<!-- Main Calendar Widget with Advanced Glassmorphism -->
+<div class="calendar-dashboard-widget glass-effect-3d"
+    [style.transform]="'perspective(1000px) rotateX(' + rotateX() + 'deg) rotateY(' + rotateY() + 'deg)'">
+
+    <!-- Frosted glass effect -->
+    <div class="frosted-glass-overlay"></div>
+
+    <!-- Animated background particles -->
+    <div class="particles-container">
+        @for (particle of particles(); track $index) {
+        <div class="particle" [style]="particle"></div>
+        }
+    </div>
+
+    <!-- Noise texture for depth -->
+    <div class="noise-overlay"></div>
+
+    <!-- Widget Header with Glass Tabs -->
+    <header class="widget-header glass-header-inner">
+        <div class="header-left">
+            <div class="icon-box glass-icon-box">
+                <i class="pi pi-calendar-clock"></i>
+            </div>
+            <div class="header-text">
+                <h2 class="text-lucent">My Journal</h2>
+                <span class="subtitle glass-subtitle">Daily Overview & Planning</span>
+            </div>
+        </div>
+
+        <!-- Glass Navigation Pills -->
+        <div class="nav-pills glass-pills">
+            <button class="nav-item glass-pill" [class.active]="activeView() === 'calendar'"
+                (click)="switchView('calendar')">
+                <div class="pill-icon">
+                    <i class="pi pi-calendar"></i>
+                </div>
+                <span>Calendar View</span>
+                <div class="pill-glow"></div>
+            </button>
+            <button class="nav-item glass-pill" [class.active]="activeView() === 'archive'"
+                (click)="switchView('archive')">
+                <div class="pill-icon">
+                    <i class="pi pi-archive"></i>
+                </div>
+                <span>Notes Archive</span>
+                <div class="pill-glow"></div>
+            </button>
+        </div>
+
+        <!-- Floating Add Button -->
+        <button class="btn-add-floating" (click)="openNewNote()" pTooltip="Create New Entry" pTooltipPosition="left">
+            <div class="btn-inner">
+                <i class="pi pi-plus"></i>
+                <div class="btn-glow"></div>
+            </div>
+            <div class="btn-ripple"></div>
+        </button>
+    </header>
+
+    <div class="widget-body glass-body">
+        @if (activeView() === 'calendar') {
+        <div class="split-layout animate-fade-up">
+
+            <!-- Calendar Section - Enhanced Glass Design -->
+            <div class="calendar-section glass-calendar">
+                <div class="cal-controls glass-controls">
+                    <div class="month-nav">
+                        <button class="btn-nav glass-btn" (click)="changeMonth(-1)" pTooltip="Previous Month">
+                            <i class="pi pi-chevron-left"></i>
+                        </button>
+                        <span class="current-month text-lucent">{{ currentMonthName() | uppercase }}</span>
+                        <button class="btn-nav glass-btn" (click)="changeMonth(1)" pTooltip="Next Month">
+                            <i class="pi pi-chevron-right"></i>
+                        </button>
+                    </div>
+                    <button class="btn-today glass-btn-primary" (click)="jumpToToday()">
+                        <i class="pi pi-calendar"></i>
+                        <span>Today</span>
+                    </button>
+                </div>
+
+                <!-- Weekday Headers -->
+                <div class="cal-grid-header glass-grid-header">
+                    @for (day of ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']; track day) {
+                    <span class="weekday-label">{{ day }}</span>
+                    }
+                </div>
+
+                <!-- Calendar Grid - Glassmorphism Days -->
+                <div class="cal-grid glass-grid">
+                    @for (day of calendarDays(); track $index) {
+                    <div class="cal-day glass-day" [class.faded]="!day.isCurrentMonth" [class.today]="day.isToday"
+                        [class.selected]="day.isSelected" (click)="selectDay(day)"
+                        pTooltip="{{ day.date | date:'fullDate' }} - {{ day.noteCount }} notes">
+
+                        <!-- Day number with lucent effect -->
+                        <div class="day-number-container">
+                            <span class="day-number-lucent">{{ day.dayNum }}</span>
+                            <span class="day-number-solid">{{ day.dayNum }}</span>
+                        </div>
+
+                        <!-- Note indicators -->
+                        @if(day.noteCount > 0) {
+                        <div class="dot-container glass-dots">
+                            @for (item of getIndicators(day.noteCount); track $index) {
+                            <span class="dot-indicator glass-dot"></span>
+                            }
+                        </div>
+                        }
+
+                        <!-- Today badge -->
+                        @if(day.isToday) {
+                        <div class="today-badge glass-badge">
+                            <div class="today-glow"></div>
+                        </div>
+                        }
+
+                        <!-- Hover effect -->
+                        <div class="day-hover-effect"></div>
+
+                        <!-- Selection ring -->
+                        @if(day.isSelected) {
+                        <div class="selection-ring"></div>
+                        }
+                    </div>
+                    }
+                </div>
+
+                <!-- Monthly Stats with Glass Effect -->
+                <div class="stats-mini glass-stats">
+                    <div class="stats-icon glass-icon">
+                        <i class="pi pi-chart-line"></i>
+                    </div>
+                    <div class="stats-text">
+                        <strong>Monthly Activity</strong>
+                        <span>{{ getMonthlyNoteCount() }} notes this month</span>
+                    </div>
+                    <div class="stats-glow"></div>
+                </div>
+            </div>
+
+            <!-- Notes Section with Glass Design -->
+            <div class="notes-section glass-notes">
+                <div class="notes-header glass-header">
+                    <div class="date-info">
+                        <span class="day-label text-lucent">{{ selectedDate() | date:'EEEE, MMMM d' }}</span>
+                        <div class="date-meta">
+                            <span class="day-of-year">Day {{ getDayOfYear() }}</span>
+                            <span class="year">{{ selectedDate() | date:'yyyy' }}</span>
+                        </div>
+                    </div>
+                    <span class="count-label glass-badge">{{ dailyNotes().length }} entries</span>
+                </div>
+
+                @if (dailyNotes().length === 0) {
+                <div class="empty-state-mini glass-empty">
+                    <div class="empty-icon">
+                        <i class="pi pi-inbox"></i>
+                    </div>
+                    <p>No notes for today. Start by capturing your thoughts</p>
+                    <button class="btn-link glass-btn-link" (click)="openNewNote()">
+                        <i class="pi pi-plus"></i> Create First Note
+                    </button>
+                </div>
+                } @else {
+                <div class="notes-list glass-scroll">
+                    @for (note of dailyNotes(); track note._id) {
+                    <div class="note-item glass-note" [class.pinned]="note.isPinned" (click)="viewNote(note)">
+
+                        <!-- Note header with glass effect -->
+                        <div class="note-top glass-note-header">
+                            <span class="time">{{ note.noteDate | date:'h:mm a' }}</span>
+                            <div class="badges">
+                                @if(note.isPinned) {
+                                <span class="badge-pin glass-badge">
+                                    <i class="pi pi-bookmark-fill"></i>
+                                </span>
+                                }
+                                @if(note.importance === 'high') {
+                                <span class="badge-high glass-badge">High</span>
+                                }
+                                @if(note.visibility === 'private') {
+                                <span class="badge-private glass-badge">
+                                    <i class="pi pi-lock"></i>
+                                </span>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Note content -->
+                        <h4 class="text-lucent">{{ note.title || 'Untitled Note' }}</h4>
+                        <p class="note-preview">{{ note.content | slice:0:120 }}{{ note.content.length > 120 ? '...' :
+                            '' }}</p>
+
+                        <!-- Tags -->
+                        @if(note.tags?.length) {
+                        <div class="tags-row glass-tags">
+                            @for(tag of note.tags; track tag) {
+                            <span class="tag glass-tag">#{{tag}}</span>
+                            }
+                        </div>
+                        }
+
+                        <!-- Hover overlay -->
+                        <div class="note-hover-overlay"></div>
+                    </div>
+                    }
+                </div>
+                }
+            </div>
+        </div>
+        }
+
+        @if (activeView() === 'archive') {
+        <div class="archive-layout glass-archive animate-fade-up">
+            <!-- Archive Controls with Glass Design -->
+            <div class="archive-controls glass-controls">
+                <div class="search-input glass-search">
+                    <i class="pi pi-search"></i>
+                    <input type="text" placeholder="Search notes..." [value]="searchQuery()"
+                        (input)="searchQuery.set($any($event.target).value)">
+                    <div class="search-glow"></div>
+                </div>
+
+                <div class="filter-select glass-select">
+                    <select [value]="filterTag()" (change)="filterTag.set($any($event.target).value)">
+                        <option value="all">All Categories</option>
+                        @for (tag of allTags(); track tag) {
+                        <option [value]="tag">{{ tag }}</option>
+                        }
+                    </select>
+                    <div class="select-arrow">
+                        <i class="pi pi-chevron-down"></i>
+                    </div>
+                </div>
+
+                <button class="btn-icon glass-btn-icon" (click)="toggleViewMode()" pTooltip="Toggle View Mode">
+                    <i class="pi" [class.pi-list]="viewMode() === 'grid'"
+                        [class.pi-th-large]="viewMode() === 'list'"></i>
+                </button>
+            </div>
+
+            <!-- Archive Content -->
+            <div class="archive-content glass-scroll">
+                @if (notesGroupedByMonth().length === 0) {
+                <div class="empty-state-archive glass-empty">
+                    <div class="empty-icon">
+                        <i class="pi pi-search"></i>
+                    </div>
+                    <h3>No notes found</h3>
+                    <p>Try adjusting your search or create a new note</p>
+                </div>
+                } @else {
+                @for (group of notesGroupedByMonth(); track group.monthKey) {
+                <section class="month-group glass-month-group">
+                    <h3 class="month-header glass-header">
+                        {{ group.monthName }}
+                        <span class="count glass-badge">{{ group.notes.length }} notes</span>
+                    </h3>
+
+                    <div class="archive-grid" [class.list-mode]="viewMode() === 'list'">
+                        @for (note of group.notes; track note._id) {
+                        <div class="archive-card glass-card" (click)="viewNote(note)">
+                            <!-- Card header -->
+                            <div class="card-top glass-card-header">
+                                <span class="date">{{ note.noteDate | date:'EEE, MMM d' }}</span>
+                                <div class="actions glass-actions">
+                                    <button (click)="editNote(note); $event.stopPropagation()" pTooltip="Edit"
+                                        class="glass-action-btn">
+                                        <i class="pi pi-pencil"></i>
+                                    </button>
+                                    <button class="danger glass-action-btn"
+                                        (click)="deleteNote(note); $event.stopPropagation()" pTooltip="Delete">
+                                        <i class="pi pi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Card content -->
+                            <h4 class="text-lucent">{{ note.title || 'Untitled' }}</h4>
+                            <p class="card-preview">{{ note.content | slice:0:150 }}{{ note.content.length > 150 ? '...'
+                                : '' }}</p>
+
+                         <div class="card-footer glass-footer">
+                                @if ((note.tags?.length ?? 0) > 0) {
+                                <div class="tags-row">
+                                    @for (tag of (note.tags ?? []).slice(0, 2); track tag) {
+                                    <span class="tag glass-tag">#{{ tag }}</span>
+                                    }
+                                    @if ((note.tags?.length ?? 0) > 2) {
+                                    <span class="tag-more glass-tag">
+                                        +{{ (note.tags?.length ?? 0) - 2 }} more
+                                    </span>
+                                    }
+                                </div>
+                                }
+                                @if (note.attachments.length > 0) {
+                                <div class="attach-badge glass-badge">
+                                    <i class="pi pi-paperclip"></i> {{ note.attachments.length }}
+                                </div>
+                                }
+                            </div>
+                            <!-- Card hover effect -->
+                            <div class="card-hover-effect"></div>
+                        </div>
+                        }
+                    </div>
+                </section>
+                }
+                }
+            </div>
+        </div>
+        }
+    </div>
+</div>
+
+<!-- Quick Stats Footer with Glass Effect -->
+<div class="dashboard-footer glass-footer">
+    <div class="stats-grid">
+        <div class="stat-card glass-stat">
+            <div class="stat-icon glass-stat-icon">
+                <i class="pi pi-file"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-value text-lucent">{{ allNotes().length }}</div>
+                <div class="stat-label">Total Notes</div>
+            </div>
+            <div class="stat-glow"></div>
+        </div>
+        <div class="stat-card glass-stat">
+            <div class="stat-icon glass-stat-icon">
+                <i class="pi pi-bookmark"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-value text-lucent">{{ getPinnedCount() }}</div>
+                <div class="stat-label">Pinned</div>
+            </div>
+            <div class="stat-glow"></div>
+        </div>
+        <div class="stat-card glass-stat">
+            <div class="stat-icon glass-stat-icon">
+                <i class="pi pi-hashtag"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-value text-lucent">{{ allTags().length }}</div>
+                <div class="stat-label">Categories</div>
+            </div>
+            <div class="stat-glow"></div>
+        </div>
+        <div class="stat-card glass-stat">
+            <div class="stat-icon glass-stat-icon">
+                <i class="pi pi-star"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-value text-lucent">{{ getHighPriorityCount() }}</div>
+                <div class="stat-label">High Priority</div>
+            </div>
+            <div class="stat-glow"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Enhanced Dialog Component -->
+<p-dialog [(visible)]="isEditorVisible" [modal]="true" [style]="{width: '700px'}" styleClass="glass-dialog"
+    [draggable]="false" [resizable]="false">
+
+    <!-- Dialog Header -->
     <ng-template pTemplate="header">
-        <div class="dialog-header-custom">
-            <div class="date-badge">{{ selectedDate() | date:'fullDate' }}</div>
-            <button class="btn-icon-soft" (click)="toggleEditMode()">
+        <div class="dialog-header-glass">
+            <div class="date-badge-glass">
+                <i class="pi pi-calendar"></i>
+                {{ selectedDate() | date:'fullDate' }}
+            </div>
+            <button class="btn-icon-glass" (click)="toggleEditMode()">
                 <i class="pi" [class.pi-pencil]="isPreviewMode" [class.pi-eye]="!isPreviewMode"></i>
             </button>
         </div>
     </ng-template>
 
-    <div class="dialog-body">
+    <!-- Dialog Body -->
+    <div class="dialog-body-glass">
         <form [formGroup]="noteForm">
             @if(!isPreviewMode) {
-                <input class="modern-input title-input" formControlName="title" placeholder="Title your thought...">
-                
-                <div class="toolbar">
-                     <div class="tag-input-wrapper">
-                        <p-autoComplete formControlName="tags" [multiple]="true" placeholder="+ Add tags" styleClass="w-full"></p-autoComplete>
-                     </div>
-                     
-                     <button type="button" class="btn-media" (click)="triggerFileUpload()">
+            <!-- Edit Mode -->
+            <div class="editor-container glass-editor">
+                <!-- Title -->
+                <input class="title-input-glass" formControlName="title" placeholder="Title your thought...">
+
+                <!-- Toolbar -->
+                <div class="toolbar-glass">
+                    <div class="tag-input-glass">
+                        <p-autoComplete formControlName="tags" [multiple]="true" placeholder="+ Add tags"
+                            styleClass="w-full glass-autocomplete">
+                        </p-autoComplete>
+                    </div>
+
+                    <button type="button" class="btn-media-glass" (click)="triggerFileUpload()">
                         <i class="pi pi-image"></i> Media
-                     </button>
-                     <input #fileInput type="file" (change)="onFileSelect($event)" multiple accept="image/*" style="display: none;">
+                    </button>
                 </div>
 
+                <!-- Image Previews -->
                 @if (imagePreviews.length) {
-                    <div class="image-strip custom-scrollbar">
-                        @for (img of imagePreviews; track $index) {
-                            <div class="thumb">
-                                <img [src]="img.url">
-                                <button (click)="removeAttachment($index)">x</button>
-                            </div>
-                        }
+                <div class="image-strip-glass">
+                    @for (img of imagePreviews; track $index) {
+                    <div class="thumb-glass">
+                        <img [src]="img.url">
+                        <button class="thumb-remove-glass" (click)="removeAttachment($index)">
+                            <i class="pi pi-times"></i>
+                        </button>
                     </div>
+                    }
+                </div>
                 }
 
-                <textarea class="modern-input body-input" formControlName="content" placeholder="Start writing..."></textarea>
+                <!-- Content -->
+                <textarea class="body-input-glass" formControlName="content" placeholder="Start writing..."></textarea>
+            </div>
             } @else {
-                <h2 class="preview-title">{{ noteForm.get('title')?.value || 'Untitled' }}</h2>
-                
+            <!-- Preview Mode -->
+            <div class="preview-container glass-preview">
+                <h2 class="preview-title-glass">{{ noteForm.get('title')?.value || 'Untitled' }}</h2>
+
                 @if (noteForm.get('tags')?.value?.length) {
-                    <div class="preview-tags">
-                        @for (tag of noteForm.get('tags')?.value; track tag) { <span class="ptag">#{{tag}}</span> }
-                    </div>
+                <div class="preview-tags-glass">
+                    @for (tag of noteForm.get('tags')?.value; track tag) {
+                    <span class="tag-glass">#{{tag}}</span>
+                    }
+                </div>
                 }
 
                 @if (imagePreviews.length) {
-                    <div class="preview-gallery">
-                        @for (img of imagePreviews; track $index) {
-                            <img [src]="img.url">
-                        }
-                    </div>
+                <div class="preview-gallery-glass">
+                    @for (img of imagePreviews; track $index) {
+                    <img [src]="img.url">
+                    }
+                </div>
                 }
 
-                <p class="preview-body">{{ noteForm.get('content')?.value }}</p>
+                <div class="preview-body-glass">
+                    {{ noteForm.get('content')?.value }}
+                </div>
+            </div>
             }
         </form>
     </div>
 
+    <!-- Dialog Footer -->
     <ng-template pTemplate="footer">
-        <div class="footer-actions">
-            <button class="btn-cancel" (click)="isEditorVisible=false">
+        <div class="footer-actions-glass">
+            <button class="btn-cancel-glass" (click)="isEditorVisible=false">
                 {{ isPreviewMode ? 'Close' : 'Discard' }}
             </button>
 
             @if (!isPreviewMode) {
-                <button class="btn-save" (click)="saveNote()" [disabled]="isSaving">
-                    @if(isSaving){ <i class="pi pi-spin pi-spinner"></i> }
-                    {{ isSaving ? 'Saving...' : 'Save Entry' }}
-                </button>
+            <button class="btn-save-glass" (click)="saveNote()" [disabled]="isSaving">
+                @if(isSaving){ <i class="pi pi-spin pi-spinner"></i> }
+                {{ isSaving ? 'Saving...' : 'Save Entry' }}
+            </button>
             }
         </div>
     </ng-template>

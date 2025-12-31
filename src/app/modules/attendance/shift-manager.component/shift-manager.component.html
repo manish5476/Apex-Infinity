@@ -1,0 +1,118 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="list-page-container">
+  <div class="themed-card list-content-area">
+    
+    <div class="se-filter-bar mb-4">
+      
+      <div class="se-filter-field">
+        <label>Shift Type</label>
+        <p-select 
+          [options]="typeOptions" 
+          [(ngModel)]="filter.type" 
+          optionLabel="label" optionValue="value"
+          (onChange)="applyLocalFilters()"
+          styleClass="w-full">
+        </p-select>
+      </div>
+
+      <div class="se-filter-field">
+        <label>Search</label>
+        <input 
+          pInputText 
+          [(ngModel)]="filter.search" 
+          (input)="applyLocalFilters()" 
+          placeholder="Search Shift Name..." 
+          class="w-full" />
+      </div>
+
+      <div class="se-filter-actions">
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary" (onClick)="resetFilters()"></p-button>
+      </div>
+
+      <div class="se-filter-right">
+        <p-button label="Create Shift" icon="pi pi-plus" (onClick)="openCreate()" styleClass="p-button-primary"></p-button>
+      </div>
+    </div>
+
+    <div class="list-grid-wrapper h-[600px]">
+      <app-ag-share-grid 
+        [columns]="column" 
+        [data]="filteredData" 
+        [showActions]="false"
+        (gridEvent)="handleGridEvent($event)">
+      </app-ag-share-grid>
+    </div>
+
+  </div>
+</div>
+
+<p-dialog [(visible)]="showDialog" [header]="isEditMode ? 'Edit Shift' : 'New Shift'" [modal]="true" [style]="{width: '550px'}">
+  </p-dialog>
+<!-- <p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="list-page-container">
+  <div class="themed-card list-content-area">
+    
+    <div class="flex justify-between items-center mb-4 p-4 border-b border-gray-100">
+      <div>
+        <h2 class="text-xl font-bold text-gray-800">Shift Configuration</h2>
+        <p class="text-sm text-gray-500">Define working hours and week-offs</p>
+      </div>
+      <p-button label="Create Shift" icon="pi pi-plus" (onClick)="openCreate()"></p-button>
+    </div>
+
+    <div class="list-grid-wrapper h-[600px]">
+      <app-ag-share-grid [columns]="column" [data]="data" (gridEvent)="handleGridEvent($event)"></app-ag-share-grid>
+    </div>
+
+  </div>
+</div>
+
+<p-dialog [(visible)]="showDialog" [header]="isEditMode ? 'Edit Shift' : 'New Shift'" [modal]="true" [style]="{width: '550px'}">
+  <form [formGroup]="shiftForm" class="grid grid-cols-2 gap-4 pt-2">
+    
+    <div class="col-span-2 flex flex-col gap-2">
+      <label class="font-medium text-sm">Shift Name</label>
+      <input pInputText formControlName="name" placeholder="e.g. Morning Shift" />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label class="font-medium text-sm">Start Time</label>
+      <input type="time" pInputText formControlName="startTime" />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label class="font-medium text-sm">End Time</label>
+      <input type="time" pInputText formControlName="endTime" />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label class="font-medium text-sm">Grace Period (Min)</label>
+      <p-inputNumber formControlName="gracePeriodMins" suffix=" min"></p-inputNumber>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label class="font-medium text-sm">Min Hours (Full Day)</label>
+      <p-inputNumber formControlName="minFullDayHrs" suffix=" hrs"></p-inputNumber>
+    </div>
+
+    <div class="col-span-2 flex flex-col gap-2">
+      <label class="font-medium text-sm">Weekly Offs</label>
+      <p-multiSelect [options]="weekDays" formControlName="weeklyOffs" optionLabel="name" optionValue="value" display="chip"></p-multiSelect>
+    </div>
+
+    <div class="col-span-2 flex items-center justify-between border p-3 rounded bg-gray-50">
+      <span class="text-sm">Is Night Shift? (Ends next day)</span>
+      <p-toggleswitch formControlName="isNightShift"></p-toggleswitch>
+    </div>
+
+  </form>
+
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" class="p-button-text" (click)="showDialog = false"></button>
+    <button pButton label="Save Shift" (click)="onSubmit()" [disabled]="shiftForm.invalid"></button>
+  </ng-template>
+</p-dialog> -->

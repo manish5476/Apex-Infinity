@@ -10,6 +10,184 @@
       </div>
       <p-button icon="pi pi-times" styleClass="p-button-rounded p-button-text p-button-secondary" (onClick)="onCancel()"></p-button>
     </div>
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-8">
+      <section class="form-section">
+        <div class="section-info">
+          <h3>Identity</h3>
+          <p>Personal details and contact information.</p>
+        </div>
+        <div class="section-fields glass-card">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="form-group">
+              <label>Full Name <span class="req">*</span></label>
+              <div class="input-icon-wrapper">
+                <i class="pi pi-user"></i>
+                <input pInputText formControlName="name" placeholder="John Doe" class="w-full" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Email Address <span class="req">*</span></label>
+              <div class="input-icon-wrapper">
+                <i class="pi pi-envelope"></i>
+                <input pInputText formControlName="email" placeholder="john@company.com" class="w-full" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <div class="input-icon-wrapper">
+                <i class="pi pi-phone"></i>
+                <input pInputText formControlName="phone" placeholder="+1..." class="w-full" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Status</label>
+              <div class="flex items-center gap-3 mt-2">
+                <p-toggleswitch formControlName="isActive"></p-toggleswitch>
+                <span class="font-medium text-sm">{{ userForm.get('isActive')?.value ? 'Active Account' : 'Suspended' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <div class="section-info">
+          <h3>Access Control</h3>
+          <p>Define role and branch assignment.</p>
+        </div>
+        <div class="section-fields glass-card">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="form-group">
+              <label>System Role <span class="req">*</span></label>
+              <p-select [options]="roles()" formControlName="role" optionLabel="name" optionValue="_id" 
+                placeholder="Select Role" styleClass="w-full" appendTo="body"></p-select>
+            </div>
+            <div class="form-group">
+              <label>Primary Branch</label>
+              <p-select [options]="branches()" formControlName="branchId" optionLabel="name" optionValue="_id" 
+                placeholder="Select Branch" [showClear]="true" styleClass="w-full" appendTo="body"></p-select>
+              <small class="opacity-50 mt-1 italic">Optional: Leave empty for global access.</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <div class="section-info">
+          <h3>Attendance & Shift</h3>
+          <p>Configure shift timing, biometric ID, and punching rules.</p>
+        </div>
+        
+        <div class="section-fields glass-card" formGroupName="attendanceConfig">
+          
+          <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+            <div>
+              <label class="font-bold text-gray-800">Enable Attendance Tracking</label>
+              <p class="text-xs text-gray-500 mt-1">If disabled, this user will be ignored in daily logs.</p>
+            </div>
+            <p-toggleswitch formControlName="isAttendanceEnabled"></p-toggleswitch>
+          </div>
+
+          @if (userForm.get('attendanceConfig.isAttendanceEnabled')?.value) {
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeIn">
+              
+              <div class="form-group">
+                <label>Assigned Shift <span class="req">*</span></label>
+                <p-select [options]="shifts()" formControlName="shiftId" optionLabel="name" optionValue="_id" 
+                  placeholder="Select Shift Pattern" styleClass="w-full" appendTo="body"></p-select>
+              </div>
+
+              <div class="form-group">
+                <label>Biometric Machine ID</label>
+                <div class="input-icon-wrapper">
+                  <i class="pi pi-id-card"></i>
+                  <input pInputText formControlName="machineUserId" placeholder="e.g. 1001" class="w-full" />
+                </div>
+              </div>
+
+              <div class="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+                <div class="p-4 border rounded-lg bg-gray-50 flex items-center justify-between">
+                  <span class="text-sm font-medium">Allow Web Punch</span>
+                  <p-toggleswitch formControlName="allowWebPunch"></p-toggleswitch>
+                </div>
+                <div class="p-4 border rounded-lg bg-gray-50 flex items-center justify-between">
+                  <span class="text-sm font-medium">Allow Mobile Punch</span>
+                  <p-toggleswitch formControlName="allowMobilePunch"></p-toggleswitch>
+                </div>
+                <div class="p-4 border rounded-lg bg-gray-50 flex items-center justify-between">
+                  <span class="text-sm font-medium">Enforce Geo-Fence</span>
+                  <p-toggleswitch formControlName="enforceGeoFence"></p-toggleswitch>
+                </div>
+              </div>
+
+              @if (userForm.get('attendanceConfig.enforceGeoFence')?.value) {
+                <div class="form-group col-span-1 md:col-span-2">
+                  <label>Geo-Fence Radius (Meters)</label>
+                  <p-inputNumber formControlName="geoFenceRadius" [showButtons]="true" suffix=" m" [min]="10" [max]="5000" styleClass="w-full"></p-inputNumber>
+                  <small class="text-xs text-gray-500">User must be within this distance from Branch to punch in.</small>
+                </div>
+              }
+
+            </div>
+          }
+        </div>
+      </section>
+
+      <section class="form-section">
+        <div class="section-info">
+          <h3>Security</h3>
+          <p>Manage account credentials.</p>
+          @if (editMode()) {
+            <p-button [label]="showPasswordFields() ? 'Cancel Change' : 'Change Password'" 
+                      [icon]="showPasswordFields() ? 'pi pi-times' : 'pi pi-key'"
+                      styleClass="p-button-text p-button-sm mt-3"
+                      (onClick)="togglePasswordChange()"></p-button>
+          }
+        </div>
+        
+        @if (showPasswordFields()) {
+          <div class="section-fields glass-card highlight-section animate-fadeIn">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="form-group">
+                <label>New Password <span class="req">*</span></label>
+                <p-password formControlName="password" [toggleMask]="true" styleClass="w-full" inputStyleClass="w-full"></p-password>
+              </div>
+              <div class="form-group">
+                <label>Confirm Password <span class="req">*</span></label>
+                <p-password formControlName="passwordConfirm" [toggleMask]="true" [feedback]="false" styleClass="w-full" inputStyleClass="w-full"></p-password>
+                @if (userForm.errors?.['mismatch'] && userForm.get('passwordConfirm')?.touched) {
+                  <small class="text-red-500 text-xs mt-1 font-bold">Passwords do not match</small>
+                }
+              </div>
+            </div>
+          </div>
+        } @else {
+          <div class="section-fields py-4 px-6 border-dashed border-2 border-gray-200 rounded-xl text-center opacity-50">
+            <span class="text-sm">Password is hidden. Click "Change Password" to update.</span>
+          </div>
+        }
+      </section>
+
+      <div class="form-actions flex justify-end gap-3 mt-4">
+        <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="onCancel()"></p-button>
+        <p-button [label]="editMode() ? 'Save Changes' : 'Create User'" icon="pi pi-check" type="submit" [loading]="isSubmitting()"></p-button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- <p-toast></p-toast>
+
+<div class="page-container animate-fadeIn">
+  <div class="form-wrapper max-w-5xl mx-auto">
+    
+    <div class="form-header flex justify-between items-center mb-8">
+      <div class="header-content">
+        <h1 class="text-3xl font-bold">{{ editMode() ? 'Update Profile' : 'New Employee' }}</h1>
+        <p class="text-secondary">{{ editMode() ? 'Modify user permissions and account status.' : 'Onboard a new member to your organization.' }}</p>
+      </div>
+      <p-button icon="pi pi-times" styleClass="p-button-rounded p-button-text p-button-secondary" (onClick)="onCancel()"></p-button>
+    </div>
 
     <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-8">
       
@@ -115,4 +293,4 @@
       </div>
     </form>
   </div>
-</div>
+</div> -->

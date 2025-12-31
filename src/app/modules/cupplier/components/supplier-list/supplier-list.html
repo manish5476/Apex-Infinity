@@ -41,22 +41,10 @@
   </div>
 
   <!-- GRID AREA -->
-  <div class="themed-card list-grid-area">
+  <div class="list-grid-wrapper">
     <app-ag-share-grid [columns]="column" [data]="data" [showActions]="false" selectionMode="multiple"
-      (gridEvent)="eventFromGrid($event)" style="height: 210px; width: 100%; display: block;">
+      (gridEvent)="eventFromGrid($event)" style="height: 100%; width: 100%; display: block;">
     </app-ag-share-grid>
-
-    <!-- <app-shared-grid 
-      [data]="data" 
-      [gridHeight]="'210px'" 
-      [headerFilter]="false" 
-      [rowSelectionMode]="rowSelectionMode"
-      [GridName]="'Suppliers'" 
-      [column]="column" 
-      (eventFromGrid)="eventFromGrid($event)"
-      (gridReady)="onGridReady($event)" 
-      (scrolledToBottom)="onScrolledToBottom($event)">
-    </app-shared-grid> -->
   </div>
 
 </div>

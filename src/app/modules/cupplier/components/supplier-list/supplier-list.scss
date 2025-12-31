@@ -92,6 +92,22 @@
   }
 }
 
+/* === MAXIMIZED GRID WRAPPER === */
+.list-grid-wrapper {
+  flex: 1;
+  min-height: 0;
+  border-radius: var(--ui-border-radius);
+  overflow: hidden;
+  border: 1px solid var(--border-secondary);
+
+  app-ag-share-grid {
+    height: 100%;
+    width: 100%;
+    display: block;
+  }
+}
+
+
 /* === AG-GRID THEMING === */
 :host ::ng-deep {
   /* Style the grid cells based on our theme */
