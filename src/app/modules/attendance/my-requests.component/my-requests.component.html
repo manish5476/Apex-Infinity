@@ -1,0 +1,204 @@
+<!-- my-requests.component.html -->
+<p-toast></p-toast>
+
+<div class="min-h-screen bg-gray-50 p-6">
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">My Regularization Requests</h1>
+    <p class="text-gray-500">Track the status of your attendance requests</p>
+  </div>
+
+  <!-- Requests Table -->
+  <div class="bg-white rounded-lg shadow border">
+    @if (isLoading()) {
+    <div class="flex items-center justify-center p-8">
+      <p-progressSpinner></p-progressSpinner>
+    </div>
+    } @else {
+    <p-table [value]="myRequests()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]"
+      styleClass="p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Date</th>
+          <th>Type</th>
+          <th>Requested On</th>
+          <th>Status</th>
+          <th>Urgency</th>
+          <th>Action</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-request>
+        <tr class="hover:bg-gray-50">
+          <td class="font-medium">
+            {{ request.targetDate | date:'mediumDate' }}
+          </td>
+
+          <td>
+            <span class="font-medium text-gray-800">
+              {{ request.type?.replace('_', ' ') | titlecase }}
+            </span>
+          </td>
+
+          <td class="text-gray-500">
+            {{ request.createdAt | date:'shortDate' }}
+          </td>
+
+          <td>
+            <p-tag [value]="request.status | titlecase" [severity]="getStatusSeverity(request.status)"></p-tag>
+
+            @if (request.approvedBy) {
+            <p class="text-xs text-gray-500 mt-1">
+              By: {{ request.approvedBy }}
+            </p>
+            }
+          </td>
+
+          <td>
+            @if (request.urgency === 'high') {
+            <span class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium">
+              High
+            </span>
+            } @else if (request.urgency === 'medium') {
+            <span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium">
+              Medium
+            </span>
+            } @else {
+            <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+              Low
+            </span>
+            }
+          </td>
+
+          <td>
+            <div class="flex gap-2">
+              <p-button icon="pi pi-eye" [text]="true" [rounded]="true" (onClick)="viewDetails(request)"
+                tooltip="View Details"></p-button>
+
+              @if (request.status === 'pending') {
+              <p-button icon="pi pi-times" [text]="true" [rounded]="true" severity="danger"
+                (onClick)="cancelRequest(request._id)" tooltip="Cancel Request"></p-button>
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="text-center py-8 text-gray-500">
+            <i class="pi pi-inbox text-3xl mb-2"></i>
+            <p>No requests found</p>
+            <p class="text-sm mt-1">Submit a regularization request to see it here</p>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+    }
+  </div>
+</div>
+
+<!-- Request Details Dialog -->
+<p-dialog [visible]="showDetailsDialog()" header="Request Details" [modal]="true" [style]="{ width: '500px' }">
+  @if (selectedRequest()) {
+  <div class="space-y-4">
+    <!-- Basic Info -->
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <p class="text-sm text-gray-500">Request Date</p>
+        <p class="font-medium">{{ selectedRequest()?.targetDate | date:'fullDate' }}</p>
+      </div>
+
+      <div>
+        <p class="text-sm text-gray-500">Type</p>
+        <p class="font-medium">
+          {{ selectedRequest()?.type?.replace('_', ' ') | titlecase }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Time Corrections -->
+    @if (selectedRequest()?.newFirstIn || selectedRequest()?.newLastOut) {
+    <div class="border-t pt-4">
+      <h4 class="font-medium text-gray-700 mb-2">Time Corrections</h4>
+      <div class="grid grid-cols-2 gap-4">
+        @if (selectedRequest()?.newFirstIn) {
+        <div>
+          <p class="text-sm text-gray-500">New In Time</p>
+          <p class="font-medium">
+            {{ attendanceService.formatPunchTime(selectedRequest()?.newFirstIn) }}
+          </p>
+        </div>
+        }
+
+        @if (selectedRequest()?.newLastOut) {
+        <div>
+          <p class="text-sm text-gray-500">New Out Time</p>
+          <p class="font-medium">
+            {{ attendanceService.formatPunchTime(selectedRequest()?.newLastOut) }}
+          </p>
+        </div>
+        }
+      </div>
+    </div>
+    }
+
+    <!-- Reason -->
+    <div class="border-t pt-4">
+      <h4 class="font-medium text-gray-700 mb-2">Reason</h4>
+      <p class="text-gray-600">{{ selectedRequest()?.reason }}</p>
+    </div>
+
+    <!-- Status & Timeline -->
+    <div class="border-t pt-4">
+      <h4 class="font-medium text-gray-700 mb-2">Status Timeline</h4>
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-600">Submitted</span>
+          <span class="text-sm font-medium">
+            {{ selectedRequest()?.createdAt | date:'short' }}
+          </span>
+        </div>
+
+        @if (selectedRequest()?.status !== 'pending') {
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-600">{{ selectedRequest()?.status | titlecase }}</span>
+          <span class="text-sm font-medium">
+            {{ selectedRequest()?.updatedAt | date:'short' }}
+          </span>
+        </div>
+
+        @if (selectedRequest()?.comments) {
+        <div class="mt-2 p-3 bg-gray-50 rounded-lg">
+          <p class="text-sm text-gray-500">Comments</p>
+          <p class="text-gray-700">{{ selectedRequest()?.comments }}</p>
+        </div>
+        }
+        }
+      </div>
+    </div>
+
+    <!-- Supporting Docs -->
+    @if (selectedRequest()?.supportingDocs?.length) {
+    <div class="border-t pt-4">
+      <h4 class="font-medium text-gray-700 mb-2">Supporting Documents</h4>
+      <div class="space-y-2">
+        @for (doc of selectedRequest()?.supportingDocs; track doc) {
+        <div class="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+          <div class="flex items-center gap-2">
+            <i class="pi pi-file text-gray-500"></i>
+            <span class="text-sm text-gray-700">document_{{ $index + 1 }}.pdf</span>
+          </div>
+          <p-button icon="pi pi-download" [text]="true" size="small"></p-button>
+        </div>
+        }
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <button pButton label="Close" class="p-button-text" (click)="showDetailsDialog.set(false)"></button>
+  </ng-template>
+</p-dialog>

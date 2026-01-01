@@ -1,4 +1,3 @@
-import { AttendanceService } from './modules/attendance/services/attendance.service';
 import { User } from './modules/auth/services/auth-service';
 import { Routes } from '@angular/router';
 import { MainScreen } from './projectLayout/main-screen/main-screen';
@@ -14,10 +13,6 @@ import { NotesManagerComponent } from './modules/shared/components/notes-manager
 import { ChatComponent } from './chat/chat.component/chat.component';
 import { LandingComponent } from './landingPage/landing.component';
 import { AcceptOwnershipComponent } from './modules/organization/components/AcceptOwnershipComponent';
-import { AttendanceDashboardComponent } from './modules/attendance/attendence-system/attendance-dashboard.component';
-import { ShiftManagerComponent } from './modules/attendance/shift-manager.component/shift-manager.component';
-import { HolidayManagerComponent } from './modules/attendance/holiday-manager.component/holiday-manager.component';
-
 export const routes: Routes = [
   // ==========================================================
   //  1. PUBLIC LANDING PAGE (Root)
@@ -89,10 +84,11 @@ export const routes: Routes = [
       { path: 'sessions', component: Sessions },
       { path: 'logs', component: LogsComponent },
       { path: 'sales', component: SalesListComponent },
-      { path: 'attendence', component: AttendanceDashboardComponent },
-      { path: 'shift', component: ShiftManagerComponent },
-      { path: 'holiday', component: HolidayManagerComponent },
-
+      // { path: 'attendence', component: AttendanceDashboardComponent },
+      {
+        path: 'attendence',
+        loadChildren: () => import('./modules/attendance/attendance.routes').then((m) => m.ATTENDANCE_ROUTES),
+      },
       // --- LAZY LOADED MODULES ---
       {
         path: 'branches',
@@ -135,7 +131,7 @@ export const routes: Routes = [
         component: AcceptOwnershipComponent,
         canActivate: [authGuard] // Ensure they are logged in to accept
       }
-,
+      ,
       {
         path: 'emis',
         loadChildren: () => import('./modules/emi/emi.routes').then((m) => m.EMI_ROUTES),

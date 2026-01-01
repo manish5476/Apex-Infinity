@@ -1,0 +1,459 @@
+<!-- attendance-punching.component.html -->
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4 md:p-6">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="mb-6 text-center">
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Time Attendance System</h1>
+      <p class="text-gray-600">Record your attendance punches and manage your work hours</p>
+    </div>
+
+    <!-- Main Punching Card -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Left Column: Punch Controls -->
+      <div class="lg:col-span-2">
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+          <!-- Employee Info -->
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                <span class="text-white text-xl font-bold">
+                  {{ currentUser()?.name?.charAt(0) || 'U' }}
+                </span>
+              </div>
+              <div>
+                <h2 class="text-lg font-bold text-gray-800">{{ currentUser()?.name || 'Employee' }}</h2>
+                <p class="text-sm text-gray-500">{{ currentUser()?.employeeId || 'ID: N/A' }} • {{ currentUser()?.department || 'Department' }}</p>
+              </div>
+            </div>
+            
+            <div class="text-right">
+              <div class="text-2xl font-bold text-gray-800" [ngClass]="{
+                'text-green-600': getCurrentStatus() === 'working',
+                'text-orange-600': getCurrentStatus() === 'break',
+                'text-gray-600': getCurrentStatus() === 'out'
+              }">
+                {{ getCurrentStatusText() }}
+              </div>
+              <div class="text-sm text-gray-500">Current Status</div>
+            </div>
+          </div>
+
+          <!-- Current Time & Date -->
+          <div class="text-center mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
+            <div class="text-5xl md:text-6xl font-bold text-gray-800 mb-2">
+              {{ currentTime() }}
+            </div>
+            <div class="text-lg text-gray-600">
+              {{ currentDate() }}
+            </div>
+          </div>
+
+          <!-- Punch Buttons -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <!-- Check In Button -->
+            <button 
+              pButton 
+              [disabled]="!canCheckIn()"
+              (click)="handlePunch('checkin')"
+              class="w-full h-24 flex flex-col items-center justify-center gap-2"
+              [ngClass]="{
+                'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700': canCheckIn(),
+                'bg-gray-300 cursor-not-allowed': !canCheckIn()
+              }"
+              severity="success"
+            >
+              <i class="pi pi-sign-in text-3xl"></i>
+              <div>
+                <div class="text-lg font-bold">Check In</div>
+                <div class="text-sm opacity-90">Start your work day</div>
+              </div>
+            </button>
+
+            <!-- Check Out Button -->
+            <button 
+              pButton 
+              [disabled]="!canCheckOut()"
+              (click)="handlePunch('checkout')"
+              class="w-full h-24 flex flex-col items-center justify-center gap-2"
+              [ngClass]="{
+                'bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700': canCheckOut(),
+                'bg-gray-300 cursor-not-allowed': !canCheckOut()
+              }"
+              severity="danger"
+            >
+              <i class="pi pi-sign-out text-3xl"></i>
+              <div>
+                <div class="text-lg font-bold">Check Out</div>
+                <div class="text-sm opacity-90">End your work day</div>
+              </div>
+            </button>
+
+            <!-- Break Start Button -->
+            <button 
+              pButton 
+              [disabled]="!canStartBreak()"
+              (click)="handlePunch('breakstart')"
+              class="w-full h-24 flex flex-col items-center justify-center gap-2"
+              [ngClass]="{
+                'bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700': canStartBreak(),
+                'bg-gray-300 cursor-not-allowed': !canStartBreak()
+              }"
+              severity="warn"
+            >
+              <i class="pi pi-coffee text-3xl"></i>
+              <div>
+                <div class="text-lg font-bold">Start Break</div>
+                <div class="text-sm opacity-90">Take a break</div>
+              </div>
+            </button>
+
+            <!-- Break End Button -->
+            <button 
+              pButton 
+              [disabled]="!canEndBreak()"
+              (click)="handlePunch('breakend')"
+              class="w-full h-24 flex flex-col items-center justify-center gap-2"
+              [ngClass]="{
+                'bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700': canEndBreak(),
+                'bg-gray-300 cursor-not-allowed': !canEndBreak()
+              }"
+            >
+              <i class="pi pi-play text-3xl"></i>
+              <div>
+                <div class="text-lg font-bold">End Break</div>
+                <div class="text-sm opacity-90">Resume work</div>
+              </div>
+            </button>
+          </div>
+
+          <!-- Location Info -->
+          <div class="p-4 bg-blue-50 rounded-xl mb-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i class="pi pi-map-marker text-blue-600"></i>
+                <span class="text-sm text-gray-700">
+                  {{ locationDetected() ? 'Location: ' + locationDetected() : 'Location not detected' }}
+                </span>
+              </div>
+              <p-button 
+                label="Detect Location" 
+                icon="pi pi-refresh" 
+                size="small" 
+                [text]="true"
+                (onClick)="detectLocation()"
+              ></p-button>
+            </div>
+          </div>
+
+          <!-- Punch Type Selection -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Punch Type</label>
+            <div class="flex flex-wrap gap-2">
+              @for (type of punchTypes(); track type.value) {
+                <button 
+                  pButton
+                  type="button"
+                  [outlined]="selectedPunchType() !== type.value"
+                  (click)="selectedPunchType.set(type.value)"
+                  class="px-4 py-2 rounded-lg"
+                  >
+                  <i [ngClass]="type.icon"></i>
+                  {{ type.label }}
+                </button>
+              }
+              <!-- [severity]="getPunchTypeSeverity(type.value)" -->
+            </div>
+          </div>
+
+          <!-- Notes Input -->
+          <div class="mb-6">
+            <label for="punchNotes" class="block text-sm font-medium text-gray-700 mb-2">
+              Notes (Optional)
+            </label>
+            <textarea
+              id="punchNotes"
+              pInputTextarea
+              rows="2"
+              [(ngModel)]="punchNotes"
+              placeholder="Add any notes about this punch..."
+              class="w-full"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Today's Summary -->
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">Today's Summary</h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="text-center p-4 bg-blue-50 rounded-xl">
+              <div class="text-2xl font-bold text-blue-600">{{ todaySummary().totalHours || '0.0' }}</div>
+              <div class="text-sm text-gray-600">Hours Worked</div>
+            </div>
+            <div class="text-center p-4 bg-green-50 rounded-xl">
+              <div class="text-2xl font-bold text-green-600">{{ todaySummary().breakHours || '0.0' }}</div>
+              <div class="text-sm text-gray-600">Break Hours</div>
+            </div>
+            <div class="text-center p-4 bg-purple-50 rounded-xl">
+              <div class="text-2xl font-bold text-purple-600">{{ todaySummary().overtimeHours || '0.0' }}</div>
+              <div class="text-sm text-gray-600">Overtime</div>
+            </div>
+            <div class="text-center p-4 bg-orange-50 rounded-xl">
+              <div class="text-2xl font-bold text-orange-600">{{ todaySummary().lateMinutes || '0' }}</div>
+              <div class="text-sm text-gray-600">Late Minutes</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Today's Activity -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-2xl shadow-lg p-6 h-full">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-bold text-gray-800">Today's Activity</h3>
+            <div class="flex items-center gap-2">
+              <p-button 
+                icon="pi pi-refresh" 
+                [rounded]="true" 
+                [text]="true"
+                (onClick)="loadTodayActivity()"
+              ></p-button>
+              <p-button 
+                icon="pi pi-history" 
+                [rounded]="true" 
+                [text]="true"
+                (onClick)="viewHistory()"
+              ></p-button>
+            </div>
+          </div>
+
+          <!-- Activity Timeline -->
+          <div class="space-y-4">
+            @if (todayActivity().length > 0) {
+              @for (activity of todayActivity(); track activity.id; let i = $index) {
+                <div class="flex gap-3">
+                  <!-- Timeline Line -->
+                  <div class="flex flex-col items-center">
+                    <!-- <div class="w-8 h-8 rounded-full flex items-center justify-center"
+                      [ngClass]="{
+                        'bg-green-100': activity.type === 'checkin',
+                        'bg-red-100': activity.type === 'checkout',
+                        'bg-orange-100': activity.type === 'breakstart',
+                        'bg-purple-100': activity.type === 'breakend'
+                      }">
+                      <i [ngClass]="getActivityIcon(activity.type)" 
+                         [ngClass]="{
+                           'text-green-600': activity.type === 'checkin',
+                           'text-red-600': activity.type === 'checkout',
+                           'text-orange-600': activity.type === 'breakstart',
+                           'text-purple-600': activity.type === 'breakend'
+                         }"></i>
+                    </div> -->
+                    @if (i < todayActivity().length - 1) {
+                      <div class="w-0.5 h-full bg-gray-200 mt-2"></div>
+                    }
+                  </div>
+                  
+                  <!-- Activity Details -->
+                  <div class="flex-1 pb-4">
+                    <div class="flex justify-between items-start">
+                      <div>
+                        <p class="font-medium text-gray-800">{{ getActivityLabel(activity.type) }}</p>
+                        @if (activity.notes) {
+                          <p class="text-sm text-gray-500 mt-1">{{ activity.notes }}</p>
+                        }
+                      </div>
+                      <div class="text-right">
+                        <p class="font-mono text-gray-700">{{ activity.time }}</p>
+                        <p class="text-xs text-gray-400">{{ activity.location || 'Office' }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            } @else {
+              <div class="text-center py-8 text-gray-400">
+                <i class="pi pi-clock text-3xl mb-2"></i>
+                <p>No activity recorded today</p>
+              </div>
+            }
+          </div>
+
+          <!-- Quick Stats -->
+          <div class="mt-6 pt-6 border-t">
+            <h4 class="font-medium text-gray-700 mb-3">Quick Stats</h4>
+            <div class="space-y-3">
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-600">Shift Start</span>
+                <span class="font-medium">{{ todaySummary().shiftStart || '--:--' }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-600">Last Punch</span>
+                <span class="font-medium">{{ todaySummary().lastPunch || '--:--' }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-600">Next Break In</span>
+                <span class="font-medium">{{ todaySummary().nextBreakIn || '--:--' }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-600">Status</span>
+                <span class="font-medium" [ngClass]="{
+                  'text-green-600': getCurrentStatus() === 'working',
+                  'text-orange-600': getCurrentStatus() === 'break',
+                  'text-gray-600': getCurrentStatus() === 'out'
+                }">
+                  {{ getCurrentStatusText() }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Emergency Button -->
+          <div class="mt-6">
+            <button 
+              pButton
+              severity="danger"
+              [outlined]="true"
+              class="w-full"
+              (click)="showEmergencyDialog = true"
+            >
+              <i class="pi pi-exclamation-triangle mr-2"></i>
+              Report Issue
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent History -->
+    <div class="mt-6">
+      <div class="bg-white rounded-2xl shadow-lg p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold text-gray-800">Recent Punch History</h3>
+          <p-select 
+            [(ngModel)]="historyRange" 
+            [options]="historyRangeOptions"
+            styleClass="w-40"
+          ></p-select>
+        </div>
+        
+        <p-table 
+          [value]="punchHistory()" 
+          [loading]="isLoading()"
+          styleClass="p-datatable-sm"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Date</th>
+              <th>Check In</th>
+              <th>Check Out</th>
+              <th>Breaks</th>
+              <th>Total Hours</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </ng-template>
+          
+          <ng-template pTemplate="body" let-record>
+            <tr>
+              <td class="font-medium">{{ record.date | date:'mediumDate' }}</td>
+              <td class="font-mono">{{ record.checkIn || '--:--' }}</td>
+              <td class="font-mono">{{ record.checkOut || '--:--' }}</td>
+              <td>
+                <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">
+                  {{ record.breakCount || 0 }}
+                </span>
+              </td>
+              <td class="font-bold">{{ record.totalHours || 0 }} hrs</td>
+              <td>
+                <span class="px-2 py-1 rounded-full text-xs font-medium"
+                  [ngClass]="getStatusClass(record.status)">
+                  {{ record.status }}
+                </span>
+              </td>
+              <td>
+                <p-button 
+                  icon="pi pi-eye" 
+                  [text]="true" 
+                  size="small"
+                  (onClick)="viewPunchDetails(record)"
+                ></p-button>
+              </td>
+            </tr>
+          </ng-template>
+          
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="7" class="text-center py-8 text-gray-400">
+                <i class="pi pi-history text-3xl mb-2"></i>
+                <p>No punch history available</p>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Emergency Dialog -->
+<p-dialog 
+  header="Report Issue" 
+  [(visible)]="showEmergencyDialog"
+  [modal]="true"
+  [style]="{ width: '450px' }"
+>
+  <div class="space-y-4">
+    <p class="text-gray-600">
+      Please describe the issue you're experiencing with the punching system.
+    </p>
+    
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Issue Type</label>
+      <p-select 
+        [(ngModel)]="emergencyIssueType"
+        [options]="emergencyIssueTypes"
+        placeholder="Select issue type"
+        class="w-full"
+      ></p-select>
+    </div>
+    
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+      <textarea
+        pInputTextarea
+        rows="3"
+        [(ngModel)]="emergencyDescription"
+        placeholder="Describe the issue in detail..."
+        class="w-full"
+      ></textarea>
+    </div>
+    
+    <div>
+      <label class="flex items-center gap-2">
+        <p-checkbox 
+          [(ngModel)]="urgentRequest"
+          binary="true"
+          inputId="urgent"
+        ></p-checkbox>
+        <span class="text-sm text-gray-700">This is urgent</span>
+      </label>
+    </div>
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <p-button 
+      label="Cancel" 
+      severity="secondary" 
+      (onClick)="showEmergencyDialog = false"
+      [text]="true"
+    ></p-button>
+    <p-button 
+      label="Submit" 
+      severity="danger"
+      (onClick)="submitEmergencyRequest()"
+    ></p-button>
+  </ng-template>
+</p-dialog>
+
+<!-- Success Toast -->
+<p-toast></p-toast>

@@ -1,0 +1,661 @@
+<!-- attendance-reports.component.html -->
+<div class="min-h-screen bg-gray-50 p-6">
+  <!-- Header -->
+  <div class="mb-6">
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-800">Attendance Reports</h1>
+        <p class="text-gray-500">Analytics, insights, and detailed reports</p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <div class="flex items-center gap-2">
+          <label class="text-sm text-gray-600">From</label>
+          <input 
+            pInputText 
+            type="date" 
+            [(ngModel)]="filters().startDate" 
+            class="w-40"
+          >
+        </div>
+        
+        <div class="flex items-center gap-2">
+          <label class="text-sm text-gray-600">To</label>
+          <input 
+            pInputText 
+            type="date" 
+            [(ngModel)]="filters().endDate" 
+            class="w-40"
+          >
+        </div>
+
+        <p-button 
+          label="Apply" 
+          icon="pi pi-filter" 
+          (onClick)="applyFilters()" 
+          severity="secondary"
+        ></p-button>
+
+        <p-button 
+          label="Export" 
+          icon="pi pi-download" 
+          (onClick)="exportReport()"
+        ></p-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report Tabs using latest PrimeNG Tabs -->
+  <div class="card">
+    <p-tabs [value]="activeTabIndex()" (valueChange)="onTabChange($event)" >
+      <!-- [(value)]="activeTabIndex()" -->
+      <p-tablist>
+        <p-tab value="0">
+          <div class="flex items-center gap-2">
+            <i class="pi pi-chart-bar"></i>
+            <span>Summary</span>
+          </div>
+        </p-tab>
+        <p-tab value="1">
+          <div class="flex items-center gap-2">
+            <i class="pi pi-chart-line"></i>
+            <span>Analytics</span>
+          </div>
+        </p-tab>
+        <p-tab value="2">
+          <div class="flex items-center gap-2">
+            <i class="pi pi-calendar"></i>
+            <span>Monthly Report</span>
+          </div>
+        </p-tab>
+        <p-tab value="3">
+          <div class="flex items-center gap-2">
+            <i class="pi pi-desktop"></i>
+            <span>Dashboard</span>
+          </div>
+        </p-tab>
+      </p-tablist>
+      
+      <p-tabpanels>
+        <!-- Summary Tab -->
+        <p-tabpanel value="0">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <!-- Stats Cards -->
+            <div class="bg-white p-6 rounded-lg shadow border">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-gray-500">Present Days</p>
+                  <p class="text-2xl font-bold text-green-600">
+                    {{ summaryData()?.presentDays || 0 }}
+                  </p>
+                  <p class="text-xs text-gray-400">
+                    {{ getPresentPercentage() | number:'1.0-0' }}% of period
+                  </p>
+                </div>
+                <i class="pi pi-check-circle text-3xl text-green-500"></i>
+              </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow border">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-gray-500">Absent Days</p>
+                  <p class="text-2xl font-bold text-red-600">
+                    {{ summaryData()?.absentDays || 0 }}
+                  </p>
+                  <p class="text-xs text-gray-400">
+                    {{ getAbsentPercentage() | number:'1.0-0' }}% of period
+                  </p>
+                </div>
+                <i class="pi pi-times-circle text-3xl text-red-500"></i>
+              </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow border">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-gray-500">Average Work Hours</p>
+                  <p class="text-2xl font-bold text-blue-600">
+                    {{ summaryData()?.averageWorkHours || 0 | number:'1.1-1' }} hrs
+                  </p>
+                  <p class="text-xs text-gray-400">Per working day</p>
+                </div>
+                <i class="pi pi-clock text-3xl text-blue-500"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Pie Chart -->
+            <div class="bg-white p-6 rounded-lg shadow border">
+              <h3 class="font-semibold text-gray-800 mb-4">Attendance Distribution</h3>
+              <div class="h-80">
+                <p-chart type="doughnut" [data]="summaryChartData()" [options]="chartOptions"></p-chart>
+              </div>
+            </div>
+
+            <!-- Trend Chart -->
+            <div class="bg-white p-6 rounded-lg shadow border">
+              <h3 class="font-semibold text-gray-800 mb-4">Weekly Trend</h3>
+              <div class="h-80">
+                <p-chart type="line" [data]="attendanceTrendData()" [options]="chartOptions"></p-chart>
+              </div>
+            </div>
+          </div>
+        </p-tabpanel>
+
+        <!-- Analytics Tab -->
+        <p-tabpanel value="1">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+            <!-- Metric Cards -->
+            @for (metric of analyticsMetrics(); track metric.label) {
+            <div class="bg-white p-6 rounded-lg shadow border text-center">
+              <p class="text-sm text-gray-500 mb-2">{{ metric.label }}</p>
+              <p class="text-2xl font-bold" [ngClass]="metric.colorClass">
+                {{ metric.value }}
+              </p>
+            </div>
+            }
+          </div>
+
+          <!-- Department Comparison -->
+          <div class="bg-white p-6 rounded-lg shadow border mb-6">
+            <h3 class="font-semibold text-gray-800 mb-4">Department Performance</h3>
+            <div class="space-y-4">
+              @for (dept of departmentStats(); track dept.name) {
+              <div class="border-l-4 border-blue-500 pl-4 py-2">
+                <div class="flex justify-between items-center mb-1">
+                  <span class="font-medium text-gray-800">{{ dept.name }}</span>
+                  <span class="text-sm font-semibold text-green-600">{{ dept.attendance }}%</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500">
+                  <span>Late: {{ dept.late }}%</span>
+                  <span class="text-gray-300">•</span>
+                  <span>Overtime: {{ dept.overtime }} hrs</span>
+                </div>
+              </div>
+              }
+            </div>
+          </div>
+        </p-tabpanel>
+
+        <!-- Monthly Report Tab -->
+        <p-tabpanel value="2">
+          <div class="bg-white p-6 rounded-lg shadow border">
+            <h3 class="font-semibold text-gray-800 mb-4">Monthly Attendance Summary</h3>
+            @if (monthlyReportData() && monthlyReportData().length > 0) {
+            <div class="overflow-x-auto">
+              <p-table 
+                [value]="monthlyReportData()" 
+                styleClass="p-datatable-sm"
+              >
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th>Employee</th>
+                    <th class="text-center">Present</th>
+                    <th class="text-center">Absent</th>
+                    <th class="text-center">Late</th>
+                    <th class="text-center">Half Days</th>
+                    <th class="text-center">Total Hours</th>
+                    <th class="text-center">Overtime</th>
+                  </tr>
+                </ng-template>
+                
+                <ng-template pTemplate="body" let-record>
+                  <tr>
+                    <td>
+                      <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                          <span class="text-blue-600 font-semibold">
+                            {{ record.employee?.name?.charAt(0) || 'U' }}
+                          </span>
+                        </div>
+                        <div>
+                          <p class="font-medium text-gray-800">{{ record.employee?.name }}</p>
+                          <p class="text-xs text-gray-500">{{ record.employee?.department }}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="text-center font-medium text-green-600">
+                      {{ record.presentDays || 0 }}
+                    </td>
+                    <td class="text-center font-medium text-red-600">
+                      {{ record.absentDays || 0 }}
+                    </td>
+                    <td class="text-center font-medium text-yellow-600">
+                      {{ record.lateDays || 0 }}
+                    </td>
+                    <td class="text-center font-medium text-blue-600">
+                      {{ record.halfDays || 0 }}
+                    </td>
+                    <td class="text-center font-medium text-gray-800">
+                      {{ record.totalHours || 0 | number:'1.1-1' }}
+                    </td>
+                    <td class="text-center font-medium text-purple-600">
+                      {{ record.overtimeHours || 0 | number:'1.1-1' }}
+                    </td>
+                  </tr>
+                </ng-template>
+                
+                <ng-template pTemplate="emptymessage">
+                  <tr>
+                    <td colspan="7" class="text-center py-8 text-gray-500">
+                      <i class="pi pi-chart-bar text-3xl mb-2"></i>
+                      <p>No monthly report data available</p>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+            } @else {
+            <div class="text-center py-8 text-gray-500">
+              <i class="pi pi-chart-bar text-3xl mb-2"></i>
+              <p>No monthly report data available</p>
+            </div>
+            }
+          </div>
+        </p-tabpanel>
+
+        <!-- Dashboard Tab -->
+        <p-tabpanel value="3">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Real-time Stats -->
+            <div class="bg-white p-6 rounded-lg shadow border">
+              <h3 class="font-semibold text-gray-800 mb-4">Today's Snapshot</h3>
+              <div class="space-y-4">
+                @for (stat of dashboardStats(); track stat.label) {
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div class="flex items-center gap-3">
+                    <i class="pi" [ngClass]="stat.icon" [ngClass]="stat.iconClass"></i>
+                    <span class="text-sm text-gray-600">{{ stat.label }}</span>
+                  </div>
+                  <span class="text-lg font-bold text-gray-800">{{ stat.value }}</span>
+                </div>
+                }
+              </div>
+            </div>
+
+            <!-- Top Performers -->
+            <div class="bg-white p-6 rounded-lg shadow border">
+              <h3 class="font-semibold text-gray-800 mb-4">Top Performers</h3>
+              <div class="space-y-3">
+                @for (performer of topPerformers(); track performer.name) {
+                <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span class="text-blue-600 font-semibold">
+                        {{ performer.name.charAt(0) }}
+                      </span>
+                    </div>
+                    <div>
+                      <p class="font-medium text-gray-800">{{ performer.name }}</p>
+                      <p class="text-xs text-gray-500">{{ performer.department }}</p>
+                    </div>
+                  </div>
+                  <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                    {{ performer.attendance }}
+                  </span>
+                </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Late Arrivals -->
+          <div class="bg-white p-6 rounded-lg shadow border mt-6">
+            <h3 class="font-semibold text-gray-800 mb-4">Late Arrivals (This Week)</h3>
+            <div class="overflow-x-auto">
+              <p-table [value]="lateArrivals()" styleClass="p-datatable-sm">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th>Employee</th>
+                    <th>Department</th>
+                    <th>Late Days</th>
+                    <th>Avg Delay</th>
+                    <th>Action</th>
+                  </tr>
+                </ng-template>
+                
+                <ng-template pTemplate="body" let-record>
+                  <tr>
+                    <td class="font-medium">{{ record.name }}</td>
+                    <td class="text-gray-500">{{ record.department }}</td>
+                    <td>
+                      <span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium">
+                        {{ record.lateDays }} days
+                      </span>
+                    </td>
+                    <td class="font-medium text-yellow-600">{{ record.avgDelay }}</td>
+                    <td>
+                      <p-button 
+                        label="Send Alert" 
+                        icon="pi pi-bell" 
+                        size="small" 
+                        severity="warn"
+                        [text]="true"
+                      ></p-button>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+          </div>
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  </div>
+</div>
+
+<!-- attendance-reports.component.html
+<div class="min-h-screen bg-gray-50 p-6">
+  Header
+  <div class="mb-6">
+    <div class="flex justify-between items-start">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-800">Attendance Reports</h1>
+        <p class="text-gray-500">Analytics, insights, and detailed reports</p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <p-calendar [(ngModel)]="filters().startDate" placeholder="Start Date" dateFormat="yy-mm-dd" [showIcon]="true"
+          styleClass="w-40"></p-calendar>
+
+        <span class="text-gray-400">to</span>
+
+        <p-calendar [(ngModel)]="filters().endDate" placeholder="End Date" dateFormat="yy-mm-dd" [showIcon]="true"
+          styleClass="w-40"></p-calendar>
+
+        <p-button label="Apply" icon="pi pi-filter" (onClick)="applyFilters()" severity="secondary"></p-button>
+
+        <p-button label="Export" icon="pi pi-download" (onClick)="exportReport()"></p-button>
+      </div>
+    </div>
+  </div>
+
+  Report Tabs
+  <p-tabView [(activeIndex)]="activeReport()" class="custom-tabs">
+    Summary Tab
+    <p-tabPanel header="Summary">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        Stats Cards
+        <p-card class="shadow border-0">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500">Present Days</p>
+              <p class="text-2xl font-bold text-green-600">
+                {{ summaryData()?.presentDays || 0 }}
+              </p>
+              <p class="text-xs text-gray-400">
+                {{ (summaryData()?.presentDays || 0) / (summaryData()?.totalDays || 1) * 100 | number:'1.0-0' }}% of
+                period
+              </p>
+            </div>
+            <i class="pi pi-check-circle text-3xl text-green-500"></i>
+          </div>
+        </p-card>
+
+        <p-card class="shadow border-0">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500">Absent Days</p>
+              <p class="text-2xl font-bold text-red-600">
+                {{ summaryData()?.absentDays || 0 }}
+              </p>
+              <p class="text-xs text-gray-400">
+                {{ (summaryData()?.absentDays || 0) / (summaryData()?.totalDays || 1) * 100 | number:'1.0-0' }}% of
+                period
+              </p>
+            </div>
+            <i class="pi pi-times-circle text-3xl text-red-500"></i>
+          </div>
+        </p-card>
+
+        <p-card class="shadow border-0">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500">Average Work Hours</p>
+              <p class="text-2xl font-bold text-blue-600">
+                {{ summaryData()?.averageWorkHours || 0 | number:'1.1-1' }} hrs
+              </p>
+              <p class="text-xs text-gray-400">Per working day</p>
+            </div>
+            <i class="pi pi-clock text-3xl text-blue-500"></i>
+          </div>
+        </p-card>
+      </div>
+
+      Charts
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        Pie Chart
+        <p-card header="Attendance Distribution" class="shadow border-0">
+          <div class="h-80">
+            <p-chart type="doughnut" [data]="summaryChartData()" [options]="chartOptions"></p-chart>
+          </div>
+        </p-card>
+
+        Trend Chart
+        <p-card header="Weekly Trend" class="shadow border-0">
+          <div class="h-80">
+            <p-chart type="line" [data]="attendanceTrendData()" [options]="chartOptions"></p-chart>
+          </div>
+        </p-card>
+      </div>
+    </p-tabPanel>
+
+    Analytics Tab
+    <p-tabPanel header="Analytics">
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+        Metric Cards
+        @for (metric of [
+        {label: 'Punctuality Rate', value: '92.5%', color: 'green'},
+        {label: 'Early Departures', value: '4', color: 'red'},
+        {label: 'Avg Overtime', value: '1.2 hrs', color: 'purple'},
+        {label: 'WFH Days', value: '8', color: 'blue'}
+        ]; track metric.label) {
+        <p-card class="shadow border-0">
+          <div class="text-center">
+            <p class="text-sm text-gray-500 mb-2">{{ metric.label }}</p>
+            <p class="text-2xl font-bold" [ngClass]="{
+                'text-green-600': metric.color === 'green',
+                'text-red-600': metric.color === 'red',
+                'text-purple-600': metric.color === 'purple',
+                'text-blue-600': metric.color === 'blue'
+              }">
+              {{ metric.value }}
+            </p>
+          </div>
+        </p-card>
+        }
+      </div>
+
+      Department Comparison
+      <p-card header="Department Performance" class="shadow border-0 mb-6">
+        <div class="space-y-4">
+          @for (dept of [
+          {name: 'Engineering', attendance: 95, late: 2, overtime: 12},
+          {name: 'Sales', attendance: 88, late: 8, overtime: 5},
+          {name: 'Marketing', attendance: 92, late: 5, overtime: 8},
+          {name: 'HR', attendance: 96, late: 1, overtime: 3},
+          {name: 'Operations', attendance: 90, late: 7, overtime: 15}
+          ]; track dept.name) {
+          <div class="border-l-4 border-blue-500 pl-4 py-2">
+            <div class="flex justify-between items-center mb-1">
+              <span class="font-medium text-gray-800">{{ dept.name }}</span>
+              <span class="text-sm font-semibold text-green-600">{{ dept.attendance }}%</span>
+            </div>
+            <div class="flex items-center gap-4 text-xs text-gray-500">
+              <span>Late: {{ dept.late }}%</span>
+              <span>•</span>
+              <span>Overtime: {{ dept.overtime }} hrs</span>
+            </div>
+          </div>
+          }
+        </div>
+      </p-card>
+    </p-tabPanel>
+
+    Monthly Report Tab
+    <p-tabPanel header="Monthly Report">
+      <p-card header="Monthly Attendance Summary" class="shadow border-0">
+        @if (monthlyReportData()) {
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 font-medium text-gray-700">Employee</th>
+                <th class="px-4 py-3 font-medium text-gray-700 text-center">Present</th>
+                <th class="px-4 py-3 font-medium text-gray-700 text-center">Absent</th>
+                <th class="px-4 py-3 font-medium text-gray-700 text-center">Late</th>
+                <th class="px-4 py-3 font-medium text-gray-700 text-center">Half Days</th>
+                <th class="px-4 py-3 font-medium text-gray-700 text-center">Total Hours</th>
+                <th class="px-4 py-3 font-medium text-gray-700 text-center">Overtime</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              @for (record of monthlyReportData(); track record._id) {
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span class="text-blue-600 font-semibold">
+                        {{ record.employee?.name?.charAt(0) || 'U' }}
+                      </span>
+                    </div>
+                    <div>
+                      <p class="font-medium text-gray-800">{{ record.employee?.name }}</p>
+                      <p class="text-xs text-gray-500">{{ record.employee?.department }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-center font-medium text-green-600">
+                  {{ record.presentDays || 0 }}
+                </td>
+                <td class="px-4 py-3 text-center font-medium text-red-600">
+                  {{ record.absentDays || 0 }}
+                </td>
+                <td class="px-4 py-3 text-center font-medium text-yellow-600">
+                  {{ record.lateDays || 0 }}
+                </td>
+                <td class="px-4 py-3 text-center font-medium text-blue-600">
+                  {{ record.halfDays || 0 }}
+                </td>
+                <td class="px-4 py-3 text-center font-medium text-gray-800">
+                  {{ record.totalHours || 0 }}
+                </td>
+                <td class="px-4 py-3 text-center font-medium text-purple-600">
+                  {{ record.overtimeHours || 0 }}
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        } @else {
+        <div class="text-center py-8 text-gray-500">
+          <i class="pi pi-chart-bar text-3xl mb-2"></i>
+          <p>No monthly report data available</p>
+        </div>
+        }
+      </p-card>
+    </p-tabPanel>
+
+    Dashboard Tab
+    <p-tabPanel header="Dashboard">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        Real-time Stats
+        <p-card header="Today's Snapshot" class="shadow border-0">
+          <div class="space-y-4">
+            @for (stat of [
+            {label: 'Employees Present', value: '142', icon: 'pi-users', color: 'green'},
+            {label: 'Currently Working', value: '128', icon: 'pi-desktop', color: 'blue'},
+            {label: 'On Break', value: '14', icon: 'pi-coffee', color: 'orange'},
+            {label: 'Work From Home', value: '24', icon: 'pi-home', color: 'purple'}
+            ]; track stat.label) {
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div class="flex items-center gap-3">
+                <i class="pi" [ngClass]="stat.icon" [ngClass]="{
+                       'text-green-500': stat.color === 'green',
+                       'text-blue-500': stat.color === 'blue',
+                       'text-orange-500': stat.color === 'orange',
+                       'text-purple-500': stat.color === 'purple'
+                     }"></i>
+                <span class="text-sm text-gray-600">{{ stat.label }}</span>
+              </div>
+              <span class="text-lg font-bold text-gray-800">{{ stat.value }}</span>
+            </div>
+            }
+          </div>
+        </p-card>
+
+        Top Performers
+        <p-card header="Top Performers" class="shadow border-0">
+          <div class="space-y-3">
+            @for (performer of [
+            {name: 'Alex Johnson', department: 'Engineering', attendance: '100%'},
+            {name: 'Sarah Miller', department: 'Sales', attendance: '98%'},
+            {name: 'David Chen', department: 'Marketing', attendance: '96%'},
+            {name: 'Maria Garcia', department: 'HR', attendance: '95%'}
+            ]; track performer.name) {
+            <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span class="text-blue-600 font-semibold">
+                    {{ performer.name.charAt(0) }}
+                  </span>
+                </div>
+                <div>
+                  <p class="font-medium text-gray-800">{{ performer.name }}</p>
+                  <p class="text-xs text-gray-500">{{ performer.department }}</p>
+                </div>
+              </div>
+              <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                {{ performer.attendance }}
+              </span>
+            </div>
+            }
+          </div>
+        </p-card>
+      </div>
+
+      Late Arrivals
+      <p-card header="Late Arrivals (This Week)" class="shadow border-0 mt-6">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 text-left font-medium text-gray-700">Employee</th>
+                <th class="px-4 py-3 text-left font-medium text-gray-700">Department</th>
+                <th class="px-4 py-3 text-left font-medium text-gray-700">Late Days</th>
+                <th class="px-4 py-3 text-left font-medium text-gray-700">Avg Delay</th>
+                <th class="px-4 py-3 text-left font-medium text-gray-700">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              @for (record of [
+              {name: 'John Doe', department: 'Engineering', lateDays: 3, avgDelay: '15min'},
+              {name: 'Jane Smith', department: 'Sales', lateDays: 2, avgDelay: '8min'},
+              {name: 'Bob Wilson', department: 'Marketing', lateDays: 4, avgDelay: '22min'}
+              ]; track record.name) {
+              <tr>
+                <td class="px-4 py-3 font-medium">{{ record.name }}</td>
+                <td class="px-4 py-3 text-gray-500">{{ record.department }}</td>
+                <td class="px-4 py-3">
+                  <span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium">
+                    {{ record.lateDays }} days
+                  </span>
+                </td>
+                <td class="px-4 py-3 font-medium text-yellow-600">{{ record.avgDelay }}</td>
+                <td class="px-4 py-3">
+                  <p-button label="Send Alert" icon="pi pi-bell" size="small" severity="warning"
+                    [text]="true"></p-button>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </p-card>
+    </p-tabPanel>
+  </p-tabView>
+</div> -->

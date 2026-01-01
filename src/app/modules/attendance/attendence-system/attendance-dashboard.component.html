@@ -1,4 +1,338 @@
-<div class="attendance-container">
+<!-- attendance-dashboard.component.html -->
+<p-toast></p-toast>
+
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <div class="sticky top-0 z-10 bg-white border-b border-gray-200 px-6 py-4">
+    <div class="flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-800">Attendance Dashboard</h1>
+        <p class="text-sm text-gray-500">{{ todayDate }}</p>
+      </div>
+      <div class="flex items-center gap-3">
+        @if (currentLocation()) {
+        <div class="flex items-center gap-2 px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm">
+          <i class="pi pi-map-marker"></i>
+          <span>Location Active</span>
+        </div>
+        }
+        <p-button label="Export" icon="pi pi-download" severity="secondary" (onClick)="exportAttendance()"
+          [outlined]="true"></p-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Left Column -->
+    <div class="lg:col-span-2 space-y-6">
+      <!-- Punch Card -->
+      <p-card class="shadow-lg border-0">
+        <ng-template pTemplate="header">
+          <div class="flex items-center justify-between p-4">
+            <h2 class="text-xl font-semibold text-gray-800">Today's Attendance</h2>
+            @if (todayStatus()?.firstIn && !todayStatus()?.lastOut) {
+            <div class="flex items-center gap-2">
+              <i class="pi pi-clock text-blue-500 animate-pulse"></i>
+              <span class="font-mono text-lg font-bold text-gray-700">{{ workDuration() }}</span>
+            </div>
+            }
+          </div>
+        </ng-template>
+
+        <div class="p-4">
+          @if (todayStatus()) {
+          <div class="grid grid-cols-2 gap-6">
+            <div class="space-y-4">
+              <div>
+                <p class="text-sm text-gray-500">Status</p>
+                <div class="flex items-center gap-2 mt-1">
+                  <span class="text-lg font-semibold" [ngClass]="{
+                            'text-green-600': todayStatus().status === 'present',
+                            'text-red-600': todayStatus().status === 'absent',
+                            'text-yellow-600': todayStatus().status === 'late'
+                          }">
+                    {{ attendanceService.getStatusDisplayText(todayStatus().status) }}
+                  </span>
+                  @if (todayStatus().isLate) {
+                  <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Late</span>
+                  }
+                </div>
+              </div>
+
+              <div>
+                <p class="text-sm text-gray-500">First In</p>
+                <p class="text-lg font-semibold text-gray-800">
+                  {{ todayStatus().firstIn ? (todayStatus().firstIn | date:'shortTime') : '--:--' }}
+                </p>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div>
+                <p class="text-sm text-gray-500">Last Out</p>
+                <p class="text-lg font-semibold text-gray-800">
+                  {{ todayStatus().lastOut ? (todayStatus().lastOut | date:'shortTime') : '--:--' }}
+                </p>
+              </div>
+
+              <div>
+                <p class="text-sm text-gray-500">Work Hours</p>
+                <p class="text-lg font-semibold text-gray-800">
+                  {{ todayStatus().workHours || '0.00' }} hrs
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-6 border-t border-gray-200">
+            <div class="flex gap-3">
+              <p-button label="Punch In" icon="pi pi-sign-in" severity="success"
+                [disabled]="todayStatus().firstIn && !todayStatus().lastOut"
+                (onClick)="showPunchModal.set(true); punchForm.patchValue({type: 'in'})" class="flex-1"></p-button>
+
+              <p-button label="Punch Out" icon="pi pi-sign-out" severity="danger"
+                [disabled]="!todayStatus().firstIn || todayStatus().lastOut"
+                (onClick)="showPunchModal.set(true); punchForm.patchValue({type: 'out'})" class="flex-1"></p-button>
+
+              <p-button label="Break" icon="pi pi-coffee" severity="info" [outlined]="true"
+                (onClick)="showPunchModal.set(true); punchForm.patchValue({type: 'break_start'})"></p-button>
+            </div>
+          </div>
+          } @else {
+          <div class="text-center py-8">
+            <i class="pi pi-spin pi-spinner text-3xl text-gray-400 mb-3"></i>
+            <p class="text-gray-500">Loading attendance data...</p>
+          </div>
+          }
+        </div>
+      </p-card>
+
+      <!-- Weekly Stats Card -->
+      <p-card header="This Week's Summary" class="shadow-lg border-0">
+        <div class="p-4">
+          @if (weeklyData().length > 0) {
+          <div class="grid grid-cols-7 gap-2">
+            @for (day of weeklyData(); track day.day) {
+            <div class="text-center">
+              <p class="text-xs text-gray-500 mb-1">{{ day.day }}</p>
+              <div class="relative">
+                <div class="w-10 h-10 mx-auto rounded-lg flex items-center justify-center text-sm font-semibold"
+                  [ngClass]="{
+                        'bg-green-100 text-green-700': day.status === 'present',
+                        'bg-red-100 text-red-700': day.status === 'absent',
+                        'bg-gray-100 text-gray-500': !day.status
+                      }">
+                  {{ day.hours > 0 ? day.hours.toFixed(1) : '-' }}
+                </div>
+                @if (day.status) {
+                <div class="absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-white" [ngClass]="{
+                          'bg-green-500': day.status === 'present',
+                          'bg-red-500': day.status === 'absent',
+                          'bg-yellow-500': day.status === 'late'
+                        }"></div>
+                }
+              </div>
+            </div>
+            }
+          </div>
+          }
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Right Column -->
+    <div class="space-y-6">
+      <!-- Quick Actions -->
+      <p-card header="Quick Actions" class="shadow-lg border-0">
+        <div class="space-y-3">
+          <p-button label="Request Regularization" icon="pi pi-pencil" severity="help" [outlined]="true"
+            (onClick)="showRegularizeModal.set(true)" class="w-full justify-start"></p-button>
+
+          <p-button label="View Attendance History" icon="pi pi-history" severity="secondary" [outlined]="true"
+            (onClick)="showHistoryModal.set(true)" class="w-full justify-start"></p-button>
+
+          <p-button label="My Requests" icon="pi pi-inbox" severity="info" [outlined]="true"
+            class="w-full justify-start"></p-button>
+        </div>
+      </p-card>
+
+      <!-- Recent Punches -->
+      <p-card header="Recent Activity" class="shadow-lg border-0">
+        <div class="space-y-3">
+          @for (punch of recentPunches(); track punch._id) {
+          <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors">
+            <div>
+              <p class="font-medium text-gray-800">{{ punch.type | titlecase }}</p>
+              <p class="text-xs text-gray-500">{{ punch.createdAt | date:'medium' }}</p>
+            </div>
+            <div>
+              <span class="px-2 py-1 rounded-full text-xs font-medium" [ngClass]="{
+                    'bg-green-100 text-green-700': punch.type === 'in',
+                    'bg-red-100 text-red-700': punch.type === 'out',
+                    'bg-blue-100 text-blue-700': punch.type.includes('break')
+                  }">
+                {{ punch.type | uppercase }}
+              </span>
+            </div>
+          </div>
+          } @empty {
+          <div class="text-center py-4 text-gray-500">
+            <i class="pi pi-clock text-2xl mb-2"></i>
+            <p>No recent activity</p>
+          </div>
+          }
+        </div>
+      </p-card>
+
+      <!-- Monthly Stats -->
+      @if (attendanceSummary()) {
+      <p-card header="Monthly Overview" class="shadow-lg border-0">
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <span class="text-sm text-gray-600">Presents</span>
+            <span class="font-semibold text-green-600">{{ attendanceSummary().presentDays || 0 }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-sm text-gray-600">Absents</span>
+            <span class="font-semibold text-red-600">{{ attendanceSummary().absentDays || 0 }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-sm text-gray-600">Late Days</span>
+            <span class="font-semibold text-yellow-600">{{ attendanceSummary().lateDays || 0 }}</span>
+          </div>
+          <div class="flex justify-between items-center pt-4 border-t border-gray-200">
+            <span class="text-sm text-gray-600">Total Work Hours</span>
+            <span class="font-semibold text-blue-600">{{ attendanceSummary().totalWorkHours || 0 }}</span>
+          </div>
+        </div>
+      </p-card>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Punch Modal -->
+<p-dialog [visible]="showPunchModal()" header="Record Attendance" [modal]="true" [style]="{ width: '450px' }"
+  (onHide)="punchForm.reset({ type: 'in', deviceId: 'web' })">
+  <form [formGroup]="punchForm" class="space-y-4">
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Punch Type</label>
+      <div class="grid grid-cols-2 gap-2">
+        @for (type of ['in', 'out', 'break_start', 'break_end']; track type) {
+        <button type="button" (click)="punchForm.patchValue({type: type})"
+          class="p-3 border rounded-lg text-center transition-colors" [ngClass]="{
+              'border-blue-500 bg-blue-50 text-blue-700': punchForm.value.type === type,
+              'border-gray-200 hover:border-gray-300': punchForm.value.type !== type
+            }">
+          <i class="pi" [ngClass]="{
+              'pi-sign-in': type === 'in',
+              'pi-sign-out': type === 'out',
+              'pi-coffee': type.includes('break')
+            }"></i>
+          <p class="mt-1 text-sm font-medium">{{ type.replace('_', ' ') | titlecase }}</p>
+        </button>
+        }
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
+      <textarea pInputTextarea formControlName="notes" rows="3" placeholder="Add any remarks..."
+        class="w-full"></textarea>
+    </div>
+
+    @if (currentLocation()) {
+    <div class="p-3 bg-green-50 border border-green-200 rounded-lg">
+      <div class="flex items-center gap-2 text-green-700">
+        <i class="pi pi-check-circle"></i>
+        <span class="text-sm">Location detected successfully</span>
+      </div>
+      <p class="text-xs text-green-600 mt-1">
+        Accuracy: {{ currentLocation()?.accuracy?.toFixed(1) }} meters
+      </p>
+    </div>
+    }
+  </form>
+
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" class="p-button-text" (click)="showPunchModal.set(false)"></button>
+    <button pButton label="Submit Punch" class="p-button-primary" (click)="handlePunch()"
+      [disabled]="!punchForm.valid || !currentLocation() || isLoading()"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Regularization Modal -->
+<p-dialog [visible]="showRegularizeModal()" header="Request Regularization" [modal]="true" [style]="{ width: '500px' }">
+  <form [formGroup]="regularizeForm" class="space-y-4">
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+        <p-datepicker formControlName="targetDate" [showIcon]="true" dateFormat="yy-mm-dd"
+          styleClass="w-full"></p-datepicker>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+        <p-select formControlName="type" [options]="[
+            {label: 'Missed Punch', value: 'missed_punch'},
+            {label: 'Time Correction', value: 'correction'},
+            {label: 'Work From Home', value: 'work_from_home'},
+            {label: 'On Duty', value: 'on_duty'},
+            {label: 'Leave Reversal', value: 'leave_reversal'},
+            {label: 'Others', value: 'others'}
+          ]" styleClass="w-full"></p-select>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Correct In Time</label>
+        <input type="time" formControlName="newFirstIn" class="w-full p-2 border rounded-lg">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Correct Out Time</label>
+        <input type="time" formControlName="newLastOut" class="w-full p-2 border rounded-lg">
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Reason</label>
+      <textarea formControlName="reason" rows="4" placeholder="Provide detailed reason for regularization..."
+        class="w-full p-2 border rounded-lg"></textarea>
+      @if (regularizeForm.get('reason')?.touched && regularizeForm.get('reason')?.errors) {
+      <p class="text-red-500 text-xs mt-1">Minimum 20 characters required</p>
+      }
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Urgency</label>
+      <div class="flex gap-2">
+        @for (urgency of ['low', 'medium', 'high']; track urgency) {
+        <button type="button" (click)="regularizeForm.patchValue({urgency: urgency})"
+          class="flex-1 p-2 border rounded-lg text-center text-sm" [ngClass]="{
+              'border-blue-500 bg-blue-50 text-blue-700': regularizeForm.value.urgency === urgency,
+              'border-gray-200': regularizeForm.value.urgency !== urgency
+            }">
+          {{ urgency | titlecase }}
+        </button>
+        }
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" class="p-button-text" (click)="showRegularizeModal.set(false)"></button>
+    <button pButton label="Submit Request" class="p-button-primary" (click)="submitRegularization()"
+      [disabled]="regularizeForm.invalid || isLoading()"></button>
+  </ng-template>
+</p-dialog>
+
+
+
+
+<!-- <div class="attendance-container">
   
   <div class="action-card">
     <h2>👋 Hello, Employee</h2>
@@ -91,4 +425,4 @@
     </div>
   </div>
 
-</div>
+</div> -->
