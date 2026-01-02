@@ -277,30 +277,33 @@
 
   </main>
 </div> --><div class="landing-root">
+  <!-- Background Particles -->
+  <div class="particles-container"></div>
+
   <!-- Navigation -->
   <nav class="glass-nav" [class.scrolled]="scrollY > 50">
     <div class="nav-container">
       <!-- Logo -->
       <a routerLink="/" class="logo">
         <div class="logo-icon">AI</div>
-        <span>Apex<span style="color: #3b82f6">Infinity</span></span>
+        <div class="logo-text">Apex<span style="color: #3b82f6">Infinity</span></div>
       </a>
 
       <!-- Desktop Navigation -->
       <div class="nav-links">
-        <a href="#features">Features</a>
-        <a href="#dashboard">Dashboard</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#testimonials">Testimonials</a>
+        <a href="#features" (click)="scrollToElement('features')">Features</a>
+        <a href="#dashboard" (click)="scrollToElement('dashboard')">Dashboard</a>
+        <a href="#pricing" (click)="scrollToElement('pricing')">Pricing</a>
+        <a href="#testimonials" (click)="scrollToElement('testimonials')">Testimonials</a>
       </div>
 
       <!-- Actions -->
-      <div class="nav-buttons">
+      <div class="nav-actions">
         <button class="btn btn-ghost" routerLink="/auth/login">Sign In</button>
         <button class="btn btn-primary" routerLink="/auth/org">Get Started</button>
         
-        <!-- Mobile Menu Toggle -->
-        <button class="mobile-menu-toggle" (click)="toggleMobileMenu()">
+        <!-- Mobile Toggle -->
+        <button class="mobile-toggle" (click)="toggleMobileMenu()">
           <i class="fas fa-bars"></i>
         </button>
       </div>
@@ -309,74 +312,83 @@
     <!-- Mobile Menu -->
     @if (showMobileMenu) {
       <div class="mobile-menu">
-        <a href="#features" (click)="toggleMobileMenu()">Features</a>
-        <a href="#dashboard" (click)="toggleMobileMenu()">Dashboard</a>
-        <a href="#pricing" (click)="toggleMobileMenu()">Pricing</a>
-        <a href="#testimonials" (click)="toggleMobileMenu()">Testimonials</a>
+        <a href="#features" (click)="toggleMobileMenu(); scrollToElement('features')">Features</a>
+        <a href="#dashboard" (click)="toggleMobileMenu(); scrollToElement('dashboard')">Dashboard</a>
+        <a href="#pricing" (click)="toggleMobileMenu(); scrollToElement('pricing')">Pricing</a>
+        <a href="#testimonials" (click)="toggleMobileMenu(); scrollToElement('testimonials')">Testimonials</a>
+        <a routerLink="/auth/login" (click)="toggleMobileMenu()">Sign In</a>
+        <a routerLink="/auth/org" (click)="toggleMobileMenu()">Get Started</a>
       </div>
     }
   </nav>
 
   <!-- Hero Section -->
   <section class="hero-section">
-    <div class="container">
-      <div class="hero-content animate-on-scroll">
-        <!-- Badge -->
-        <div class="hero-badge float-animation">
-          <span class="badge-dot"></span>
-          <span>Trusted by 5,000+ Businesses</span>
-        </div>
+    <!-- Animated Background Shapes -->
+    <div class="hero-background">
+      <div class="floating-shape shape-1 parallax-layer"></div>
+      <div class="floating-shape shape-2 parallax-layer"></div>
+    </div>
 
-        <!-- Title -->
-        <h1 class="hero-title">
-          Run Your Entire Business<br>
-          <span class="gradient-text">From One Platform</span>
-        </h1>
+    <div class="hero-content">
+      <!-- Badge -->
+      <div class="hero-badge observe">
+        <span class="badge-dot"></span>
+        <span>Trusted by 5,000+ Businesses Worldwide</span>
+      </div>
 
-        <!-- Subtitle -->
-        <p class="hero-subtitle">
-          Apex Infinity combines accounting, inventory, CRM, attendance, and team communication 
-          into one intelligent platform. Make smarter decisions with real-time data.
-        </p>
+      <!-- Main Title -->
+      <h1 class="hero-title observe">
+        The Complete<br>
+        <span class="gradient-text">Business Operating System</span>
+      </h1>
 
-        <!-- CTA Buttons -->
-        <div class="hero-buttons">
-          <button class="btn btn-primary btn-lg" routerLink="/auth/org">
-            <i class="fas fa-rocket"></i> Start Free Trial
-          </button>
-          <button class="btn btn-secondary btn-lg" (click)="scrollToElement('features')">
-            <i class="fas fa-play-circle"></i> See Features
-          </button>
-        </div>
+      <!-- Subtitle -->
+      <p class="hero-subtitle observe">
+        Apex Infinity combines accounting, inventory, CRM, attendance, payroll, and team communication 
+        into one intelligent platform. Make data-driven decisions with real-time insights.
+      </p>
 
-        <!-- Stats -->
-        <div id="stats-section" class="stats-section animate-on-scroll">
-          <div class="stats-grid">
-            @for (stat of animatedStats(); track stat.label) {
-              <div class="stat-item">
-                <div class="stat-number">{{ getCounterValue(stat) }}</div>
-                <div class="stat-label">{{ stat.label }}</div>
+      <!-- CTA Buttons -->
+      <div class="hero-buttons">
+        <button class="btn btn-primary btn-lg float-element" routerLink="/auth/org">
+          <i class="fas fa-rocket"></i> Start 14-Day Free Trial
+        </button>
+        <button class="btn btn-secondary btn-lg float-element" (click)="scrollToElement('features')">
+          <i class="fas fa-play-circle"></i> See Platform in Action
+        </button>
+      </div>
+
+      <!-- Stats Section -->
+      <div id="stats-section" class="stats-section observe">
+        <div class="stats-grid">
+          @for (stat of animatedStats(); track stat.label) {
+            <div class="stat-card">
+              <div class="stat-icon" [style.background]="stat.color">
+                <i [class]="stat.icon"></i>
               </div>
-            }
-          </div>
+              <div class="stat-number">{{ getCounterValue(stat) }}</div>
+              <div class="stat-label">{{ stat.label }}</div>
+            </div>
+          }
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Features Section -->
+  <!-- Features Bento Grid -->
   <section id="features" class="features-section">
     <div class="container">
       <!-- Header -->
-      <div class="section-header animate-on-scroll">
-        <h2 class="section-title">Everything You Need in One Place</h2>
+      <div class="section-header observe">
+        <h2 class="section-title">Everything Your Business Needs</h2>
         <p class="section-subtitle">
-          From ledger entries to team chat, we've built the complete toolkit for modern businesses.
+          From ledger entries to team chat, we've built the complete toolkit for modern enterprises.
         </p>
       </div>
 
       <!-- Category Filters -->
-      <div class="category-filters animate-on-scroll">
+      <div class="category-filters observe">
         @for (category of categories; track category) {
           <button class="category-filter" 
                   [class.active]="activeCategory === category"
@@ -386,83 +398,101 @@
         }
       </div>
 
-      <!-- Features Grid -->
-      <div class="features-grid">
+      <!-- Bento Grid -->
+      <div class="bento-grid">
         @for (feature of filteredFeatures(); track feature.title) {
-          <div class="feature-card animate-on-scroll">
+          <div class="bento-card observe" 
+               [ngStyle]="getFeatureGridStyle(feature)"
+               [style.background]="feature.gradient"
+               [class]="feature.animation">
+            <div class="feature-badge">{{ feature.group }}</div>
             <div class="feature-icon" [class]="feature.color">
               <i [class]="feature.icon"></i>
             </div>
-            <div class="feature-category">{{ feature.group }}</div>
-            <h3 class="feature-title">{{ feature.title }}</h3>
-            <p class="feature-desc">{{ feature.desc }}</p>
+            <div class="feature-content">
+              <h3>{{ feature.title }}</h3>
+              <p>{{ feature.desc }}</p>
+            </div>
           </div>
         }
       </div>
     </div>
   </section>
 
-  <!-- Dashboard Preview -->
+  <!-- Dashboard Showcase -->
   <section id="dashboard" class="dashboard-section">
-    <div class="container">
-      <div class="section-header animate-on-scroll mb-16">
-        <h2 class="section-title text-center">Real-Time Business Intelligence</h2>
-        <p class="section-subtitle text-center">
+    <div class="dashboard-container">
+      <div class="section-header observe">
+        <h2 class="section-title">Real-Time Business Intelligence</h2>
+        <p class="section-subtitle">
           Monitor your entire business from a single, beautiful dashboard.
         </p>
       </div>
 
-      <div class="dashboard-preview animate-on-scroll">
-        <!-- Window Header -->
+      <div class="dashboard-frame observe">
+        <!-- Window Controls -->
         <div class="dashboard-header">
           <div class="window-controls">
             <div class="control close"></div>
             <div class="control minimize"></div>
             <div class="control maximize"></div>
           </div>
-          <div class="dashboard-url">https://dashboard.apexinfinity.ai</div>
+          <div class="dashboard-url">dashboard.apexinfinity.ai</div>
         </div>
 
         <!-- Dashboard Content -->
         <div class="dashboard-content">
           <!-- Metrics Row -->
           <div class="metrics-row">
-            <div class="metric-box">
+            <div class="metric-widget">
               <div class="metric-header">
                 <div class="metric-label">Monthly Revenue</div>
-                <div class="metric-icon revenue">
+                <div class="metric-icon" style="background: linear-gradient(135deg, #10b981, #34d399);">
                   <i class="fas fa-rupee-sign"></i>
                 </div>
               </div>
               <div class="metric-value">₹4.2M</div>
-              <div class="metric-change positive">
-                <i class="fas fa-arrow-up"></i> +12.5%
+              <div class="metric-trend up">
+                <i class="fas fa-arrow-up"></i> 12.5%
               </div>
             </div>
 
-            <div class="metric-box">
+            <div class="metric-widget">
               <div class="metric-header">
                 <div class="metric-label">Active Customers</div>
-                <div class="metric-icon customers">
+                <div class="metric-icon" style="background: linear-gradient(135deg, #3b82f6, #60a5fa);">
                   <i class="fas fa-users"></i>
                 </div>
               </div>
               <div class="metric-value">2,842</div>
-              <div class="metric-change positive">
-                <i class="fas fa-arrow-up"></i> +8.2%
+              <div class="metric-trend up">
+                <i class="fas fa-arrow-up"></i> 8.2%
               </div>
             </div>
 
-            <div class="metric-box">
+            <div class="metric-widget">
               <div class="metric-header">
                 <div class="metric-label">Inventory Value</div>
-                <div class="metric-icon inventory">
+                <div class="metric-icon" style="background: linear-gradient(135deg, #f59e0b, #fbbf24);">
                   <i class="fas fa-box"></i>
                 </div>
               </div>
               <div class="metric-value">₹8.7M</div>
-              <div class="metric-change positive">
-                <i class="fas fa-arrow-up"></i> +5.4%
+              <div class="metric-trend up">
+                <i class="fas fa-arrow-up"></i> 5.4%
+              </div>
+            </div>
+
+            <div class="metric-widget">
+              <div class="metric-header">
+                <div class="metric-label">Team Activity</div>
+                <div class="metric-icon" style="background: linear-gradient(135deg, #8b5cf6, #a78bfa);">
+                  <i class="fas fa-chart-bar"></i>
+                </div>
+              </div>
+              <div class="metric-value">94%</div>
+              <div class="metric-trend up">
+                <i class="fas fa-arrow-up"></i> 3.1%
               </div>
             </div>
           </div>
@@ -470,17 +500,76 @@
           <!-- Chart -->
           <div class="chart-container">
             <div class="chart-header">
-              <h4>Revenue Trend (Last 7 Days)</h4>
-              <div class="chart-period">This Week</div>
+              <h3>Revenue Trend (Last 7 Days)</h3>
+              <div class="chart-controls">
+                <button class="active">Week</button>
+                <button>Month</button>
+                <button>Quarter</button>
+              </div>
             </div>
-            <div class="chart-bars">
-              <div class="chart-bar bar-1"></div>
-              <div class="chart-bar bar-2"></div>
-              <div class="chart-bar bar-3"></div>
-              <div class="chart-bar bar-4"></div>
-              <div class="chart-bar bar-5"></div>
-              <div class="chart-bar bar-6"></div>
-              <div class="chart-bar bar-7"></div>
+            <div class="chart-area">
+              <div class="chart-bar bar-1" data-value="₹420K"></div>
+              <div class="chart-bar bar-2" data-value="₹525K"></div>
+              <div class="chart-bar bar-3" data-value="₹630K"></div>
+              <div class="chart-bar bar-4" data-value="₹595K"></div>
+              <div class="chart-bar bar-5" data-value="₹665K"></div>
+              <div class="chart-bar bar-6" data-value="₹560K"></div>
+              <div class="chart-bar bar-7" data-value="₹490K"></div>
+            </div>
+          </div>
+
+          <!-- Quick Stats -->
+          <div class="metrics-row">
+            <div class="metric-widget">
+              <div class="metric-header">
+                <div class="metric-label">Pending Invoices</div>
+                <div class="metric-icon" style="background: linear-gradient(135deg, #ec4899, #f472b6);">
+                  <i class="fas fa-file-invoice"></i>
+                </div>
+              </div>
+              <div class="metric-value">42</div>
+              <div class="metric-trend down">
+                <i class="fas fa-arrow-down"></i> 15%
+              </div>
+            </div>
+
+            <div class="metric-widget">
+              <div class="metric-header">
+                <div class="metric-label">Stock Alerts</div>
+                <div class="metric-icon" style="background: linear-gradient(135deg, #06b6d4, #22d3ee);">
+                  <i class="fas fa-exclamation-triangle"></i>
+                </div>
+              </div>
+              <div class="metric-value">8</div>
+              <div class="metric-trend up">
+                <i class="fas fa-arrow-up"></i> 2
+              </div>
+            </div>
+
+            <div class="metric-widget">
+              <div class="metric-header">
+                <div class="metric-label">Attendance Today</div>
+                <div class="metric-icon" style="background: linear-gradient(135deg, #f59e0b, #fbbf24);">
+                  <i class="fas fa-user-check"></i>
+                </div>
+              </div>
+              <div class="metric-value">92%</div>
+              <div class="metric-trend up">
+                <i class="fas fa-arrow-up"></i> 4%
+              </div>
+            </div>
+
+            <div class="metric-widget">
+              <div class="metric-header">
+                <div class="metric-label">Team Messages</div>
+                <div class="metric-icon" style="background: linear-gradient(135deg, #8b5cf6, #a78bfa);">
+                  <i class="fas fa-comments"></i>
+                </div>
+              </div>
+              <div class="metric-value">156</div>
+              <div class="metric-trend up">
+                <i class="fas fa-arrow-up"></i> 32%
+              </div>
             </div>
           </div>
         </div>
@@ -488,19 +577,42 @@
     </div>
   </section>
 
+  <!-- Integrations -->
+  <section class="integrations-section">
+    <div class="container">
+      <div class="section-header observe">
+        <h2 class="section-title">Seamless Integrations</h2>
+        <p class="section-subtitle">
+          Connect with the tools your business already uses.
+        </p>
+      </div>
+
+      <div class="integrations-grid">
+        @for (integration of integrations; track integration.name) {
+          <div class="integration-card observe">
+            <div class="integration-icon" [style.background]="integration.color">
+              <i [class]="integration.icon"></i>
+            </div>
+            <div class="integration-name">{{ integration.name }}</div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
   <!-- Testimonials -->
   <section id="testimonials" class="testimonials-section">
-    <div class="container">
-      <div class="section-header animate-on-scroll mb-16">
-        <h2 class="section-title text-center">Trusted by Industry Leaders</h2>
-        <p class="section-subtitle text-center">
+    <div class="testimonials-container">
+      <div class="section-header observe">
+        <h2 class="section-title">Trusted by Industry Leaders</h2>
+        <p class="section-subtitle">
           See what businesses like yours are saying about Apex Infinity.
         </p>
       </div>
 
-      <div class="testimonials-grid">
+      <div class="testimonials-slider">
         @for (testimonial of testimonials; track testimonial.name) {
-          <div class="testimonial-card animate-on-scroll">
+          <div class="testimonial-card observe">
             <div class="testimonial-header">
               <div class="avatar">{{ testimonial.name.charAt(0) }}</div>
               <div class="user-info">
@@ -512,9 +624,9 @@
             <div class="stars">
               @for (star of getStars(testimonial.rating); track $index) {
                 @if (star === 1) {
-                  <i class="fas fa-star star"></i>
+                  <i class="fas fa-star"></i>
                 } @else {
-                  <i class="far fa-star star"></i>
+                  <i class="far fa-star"></i>
                 }
               }
             </div>
@@ -527,40 +639,41 @@
   <!-- Pricing -->
   <section id="pricing" class="pricing-section">
     <div class="container">
-      <div class="section-header animate-on-scroll mb-16">
-        <h2 class="section-title text-center">Simple, Transparent Pricing</h2>
-        <p class="section-subtitle text-center">
+      <div class="pricing-header observe">
+        <h2 class="section-title">Simple, Transparent Pricing</h2>
+        <p class="section-subtitle">
           Start free. Upgrade when you're ready. No hidden fees.
         </p>
+        
+        <div class="toggle-container">
+          <button class="toggle-btn" [class.active]="!isYearly()" (click)="togglePricing()">
+            Monthly Billing
+          </button>
+          <button class="toggle-btn" [class.active]="isYearly()" (click)="togglePricing()">
+            Yearly Billing
+            <span class="discount-badge">Save 20%</span>
+          </button>
+        </div>
       </div>
 
-      <!-- Billing Toggle -->
-      <div class="pricing-toggle animate-on-scroll">
-        <button class="toggle-btn" [class.active]="!isYearly()" (click)="togglePricing()">
-          Monthly Billing
-        </button>
-        <button class="toggle-btn" [class.active]="isYearly()" (click)="togglePricing()">
-          Yearly Billing <span style="color: var(--color-success); margin-left: 4px;">Save 20%</span>
-        </button>
-      </div>
-
-      <!-- Pricing Cards -->
       <div class="pricing-grid">
         @for (plan of plans; track plan.name; let i = $index) {
-          <div class="pricing-card animate-on-scroll" [class.popular]="plan.popular" [style.animation-delay]="i * 0.1 + 's'">
+          <div class="pricing-card observe" [class.popular]="plan.popular" [style.background]="plan.gradient">
             @if (plan.popular) {
               <div class="popular-badge">Most Popular</div>
             }
             
-            <h3 class="plan-name">{{ plan.name }}</h3>
-            <div class="plan-price">
-              {{ plan.price }}
-              @if (plan.price !== 'Free' && plan.price !== 'Custom') {
-                <span class="period">/{{ isYearly() ? 'year' : 'month' }}</span>
-              }
+            <div class="plan-header">
+              <h3>{{ plan.name }}</h3>
+              <div class="plan-price">
+                {{ plan.price }}
+                @if (plan.price !== 'Free' && plan.price !== 'Custom') {
+                  <span class="period">/{{ isYearly() ? 'year' : 'month' }}</span>
+                }
+              </div>
+              <p class="plan-desc">{{ plan.desc }}</p>
             </div>
-            <p class="plan-desc">{{ plan.desc }}</p>
-            
+
             <ul class="plan-features">
               @for (feature of plan.features; track feature) {
                 <li>
@@ -569,8 +682,8 @@
                 </li>
               }
             </ul>
-            
-            <button class="btn w-full" [ngClass]="plan.popular ? 'btn-primary' : 'btn-secondary'">
+
+            <button class="plan-button" [class]="plan.popular ? 'primary' : 'secondary'">
               {{ plan.cta }}
             </button>
           </div>
@@ -579,10 +692,15 @@
     </div>
   </section>
 
-  <!-- CTA Section -->
+  <!-- Final CTA -->
   <section class="cta-section">
-    <div class="container">
-      <div class="cta-card animate-on-scroll">
+    <div class="cta-background">
+      <div class="floating-element"></div>
+      <div class="floating-element"></div>
+    </div>
+    
+    <div class="cta-container">
+      <div class="cta-card observe">
         <h2>Ready to Transform Your Business?</h2>
         <p>
           Join thousands of businesses that have streamlined their operations with Apex Infinity. 
@@ -598,22 +716,23 @@
           </button>
         </div>
         
-        <p style="font-size: 14px; margin-top: 24px; color: var(--color-text-secondary);">
-          No credit card required • 14-day free trial • Cancel anytime
-        </p>
+        <div class="cta-note">
+          <i class="fas fa-check-circle"></i>
+          <span>No credit card required • 14-day free trial • Cancel anytime</span>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- Footer -->
   <footer class="footer">
-    <div class="footer-content">
-      <div class="footer-main">
+    <div class="footer-container">
+      <div class="footer-grid">
         <!-- Brand -->
         <div class="footer-brand">
           <div class="logo">
             <div class="logo-icon">AI</div>
-            <span>Apex<span style="color: #3b82f6">Infinity</span></span>
+            <div>Apex<span style="color: #60a5fa">Infinity</span></div>
           </div>
           <p>
             The complete business intelligence platform for modern enterprises. 
@@ -627,17 +746,18 @@
           </div>
         </div>
 
-        <!-- Links -->
+        <!-- Product -->
         <div class="footer-links">
           <h4>Product</h4>
           <ul>
-            <li><a href="#features">Features</a></li>
-            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="#features" (click)="scrollToElement('features')">Features</a></li>
+            <li><a href="#pricing" (click)="scrollToElement('pricing')">Pricing</a></li>
             <li><a href="#">API Documentation</a></li>
             <li><a href="#">Changelog</a></li>
           </ul>
         </div>
 
+        <!-- Company -->
         <div class="footer-links">
           <h4>Company</h4>
           <ul>
@@ -648,6 +768,7 @@
           </ul>
         </div>
 
+        <!-- Legal -->
         <div class="footer-links">
           <h4>Legal</h4>
           <ul>
@@ -661,6 +782,7 @@
 
       <div class="footer-bottom">
         <p>&copy; 2024 Apex Infinity Inc. All rights reserved.</p>
+        <p>Made with <i class="fas fa-heart" style="color: #ef4444;"></i> for businesses worldwide</p>
       </div>
     </div>
   </footer>
