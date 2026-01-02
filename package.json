@@ -65,7 +65,7 @@
     "@types/node": "^20.17.19",
     "jasmine-core": "~5.9.0",
     "karma": "~6.4.0",
-    "ngx-countup": "^21.0.0",
+    "ngx-countup": "20.0.2",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
