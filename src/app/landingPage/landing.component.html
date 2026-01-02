@@ -276,210 +276,109 @@
     </footer>
 
   </main>
-</div> -->
-<div class="landing-root">
-  <!-- Animated Background -->
-  <div class="fixed inset-0 z-background overflow-hidden pointer-events-none">
-    <!-- Gradient Orbs -->
-    <div class="absolute top-1/4 left-1/4 w-600 h-600 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full blur-120 animate-pulse-slow"></div>
-    <div class="absolute bottom-1/4 right-1/4 w-500 h-500 bg-gradient-to-r from-purple-500/15 to-pink-500/15 rounded-full blur-100 float-animation" style="animation-delay: 2s"></div>
-    
-    <!-- Grid Overlay -->
-    <div class="absolute inset-0 bg-grid opacity-30"></div>
-    
-    <!-- Noise Texture -->
-    <div class="absolute inset-0 bg-noise opacity-5"></div>
-  </div>
-
+</div> --><div class="landing-root">
   <!-- Navigation -->
   <nav class="glass-nav" [class.scrolled]="scrollY > 50">
-    <div class="max-w-container w-full flex items-center justify-between">
+    <div class="nav-container">
       <!-- Logo -->
-      <a routerLink="/" class="flex items-center gap-3 cursor-pointer">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center shadow-glow">
-            <span class="text-white font-bold text-sm">AI</span>
-          </div>
-          <span class="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-            Apex<span class="text-primary">Infinity</span>
-          </span>
-        </div>
+      <a routerLink="/" class="logo">
+        <div class="logo-icon">AI</div>
+        <span>Apex<span style="color: #3b82f6">Infinity</span></span>
       </a>
 
-      <!-- Desktop Menu -->
-      <div class="hidden lg:flex items-center gap-8">
-        @for (item of navItems; track item.label) {
-          <a [href]="item.href" 
-             class="text-sm font-medium text-gray-300 hover:text-white transition-colors relative group">
-            {{ item.label }}
-            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
-          </a>
-        }
+      <!-- Desktop Navigation -->
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#dashboard">Dashboard</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#testimonials">Testimonials</a>
       </div>
 
-      <!-- CTA Buttons -->
-      <div class="flex items-center gap-3">
-        <button class="btn btn-ghost text-sm" routerLink="/auth/login">
-          Sign In
-        </button>
-        <button class="btn btn-primary shadow-glow" routerLink="/auth/org">
-          Start Free <i class="fas fa-arrow-right ml-2 text-xs"></i>
-        </button>
+      <!-- Actions -->
+      <div class="nav-buttons">
+        <button class="btn btn-ghost" routerLink="/auth/login">Sign In</button>
+        <button class="btn btn-primary" routerLink="/auth/org">Get Started</button>
         
         <!-- Mobile Menu Toggle -->
-        <button class="lg:hidden p-2" (click)="toggleMobileMenu()">
-          <i class="fas fa-bars text-xl text-white"></i>
+        <button class="mobile-menu-toggle" (click)="toggleMobileMenu()">
+          <i class="fas fa-bars"></i>
         </button>
       </div>
     </div>
 
     <!-- Mobile Menu -->
     @if (showMobileMenu) {
-      <div class="lg:hidden absolute top-full left-0 right-0 bg-surface border-b border-border backdrop-blur-xl">
-        <div class="max-w-container py-4">
-          @for (item of navItems; track item.label) {
-            <a [href]="item.href" 
-               (click)="toggleMobileMenu()"
-               class="block py-3 text-gray-300 hover:text-white hover:bg-surface-light px-4 rounded-lg transition-colors">
-              {{ item.label }}
-            </a>
-          }
-        </div>
+      <div class="mobile-menu">
+        <a href="#features" (click)="toggleMobileMenu()">Features</a>
+        <a href="#dashboard" (click)="toggleMobileMenu()">Dashboard</a>
+        <a href="#pricing" (click)="toggleMobileMenu()">Pricing</a>
+        <a href="#testimonials" (click)="toggleMobileMenu()">Testimonials</a>
       </div>
     }
   </nav>
 
   <!-- Hero Section -->
-  <section class="relative overflow-hidden pt-32 pb-20">
-    <div class="max-w-container text-center">
-      <!-- Animated Badge -->
-      <div class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-full border border-primary/20 mb-8 animate-pulse">
-        <span class="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
-        <span class="text-sm font-medium text-primary">NEW: Real-time AI Analytics</span>
-      </div>
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-content animate-on-scroll">
+        <!-- Badge -->
+        <div class="hero-badge float-animation">
+          <span class="badge-dot"></span>
+          <span>Trusted by 5,000+ Businesses</span>
+        </div>
 
-      <!-- Main Headline -->
-      <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-        <span class="block text-white">Business Intelligence</span>
-        <span class="text-gradient">Powered by AI</span>
-      </h1>
+        <!-- Title -->
+        <h1 class="hero-title">
+          Run Your Entire Business<br>
+          <span class="gradient-text">From One Platform</span>
+        </h1>
 
-      <!-- Subheadline -->
-      <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-        The only ERP platform that combines Finance, Inventory, CRM, and Team Communication with predictive AI. 
-        Stop guessing. Start knowing.
-      </p>
+        <!-- Subtitle -->
+        <p class="hero-subtitle">
+          Apex Infinity combines accounting, inventory, CRM, attendance, and team communication 
+          into one intelligent platform. Make smarter decisions with real-time data.
+        </p>
 
-      <!-- CTA Buttons -->
-      <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-        <button class="btn btn-primary btn-lg shadow-glow hover:shadow-xl transition-shadow" routerLink="/auth/org">
-          Start 14-Day Free Trial
-          <i class="fas fa-rocket ml-2"></i>
-        </button>
-        <button class="btn btn-glass btn-lg group" (click)="playDemo()">
-          <i class="fas fa-play-circle text-primary mr-2 group-hover:scale-110 transition-transform"></i>
-          Watch Demo
-        </button>
-      </div>
+        <!-- CTA Buttons -->
+        <div class="hero-buttons">
+          <button class="btn btn-primary btn-lg" routerLink="/auth/org">
+            <i class="fas fa-rocket"></i> Start Free Trial
+          </button>
+          <button class="btn btn-secondary btn-lg" (click)="scrollToElement('features')">
+            <i class="fas fa-play-circle"></i> See Features
+          </button>
+        </div>
 
-      <!-- Stats -->
-      <div id="stats-section" class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto reveal-item">
-        @for (stat of animatedStats(); track stat.label; let i = $index) {
-          <div class="text-center">
-            <div class="text-3xl md:text-4xl font-bold text-white mb-1">
-              <span class="counter-display">{{ getCounterValue(stat) }}</span>
-            </div>
-            <div class="text-sm text-gray-400">{{ stat.label }}</div>
-          </div>
-        }
-      </div>
-    </div>
-
-    <!-- Floating Dashboard -->
-    <div class="relative mt-20 max-w-6xl mx-auto px-4">
-      <div class="relative rounded-2xl overflow-hidden border border-border shadow-2xl">
-        <!-- Glass Effect -->
-        <div class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent backdrop-blur-sm"></div>
-        
-        <!-- Dashboard Content -->
-        <div class="relative p-2 bg-surface/80">
-          <div class="flex items-center justify-between p-4 border-b border-border">
-            <div class="flex items-center gap-2">
-              <div class="flex gap-1.5">
-                <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+        <!-- Stats -->
+        <div id="stats-section" class="stats-section animate-on-scroll">
+          <div class="stats-grid">
+            @for (stat of animatedStats(); track stat.label) {
+              <div class="stat-item">
+                <div class="stat-number">{{ getCounterValue(stat) }}</div>
+                <div class="stat-label">{{ stat.label }}</div>
               </div>
-              <div class="text-xs text-gray-500 ml-4">dashboard.apexinfinity.ai</div>
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-secondary"></div>
-              <div class="w-8 h-8 rounded-full bg-surface-light border border-border"></div>
-            </div>
-          </div>
-
-          <div class="p-6">
-            <!-- Live Data Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              @for (metric of dashboardMetrics; track metric.title) {
-                <div class="metric-card group">
-                  <div class="flex items-center justify-between mb-4">
-                    <div class="text-sm text-gray-400">{{ metric.title }}</div>
-                    <i [class]="metric.icon" [ngClass]="getColorClass(metric.color)"></i>
-                  </div>
-                  <div class="text-2xl font-bold text-white mb-2">{{ metric.value }}</div>
-                  <div class="text-xs font-medium" [ngClass]="getColorClass(metric.color)">
-                    {{ metric.change }} <i class="fas fa-arrow-up ml-1"></i>
-                  </div>
-                </div>
-              }
-            </div>
-
-            <!-- Live Chart -->
-            <div class="chart-container">
-              <div class="flex items-center justify-between mb-4">
-                <div class="text-lg font-semibold text-white">Revenue Trend</div>
-                <div class="flex gap-2">
-                  <div class="px-3 py-1 text-xs bg-surface-light rounded-full">Last 30 days</div>
-                </div>
-              </div>
-              <div class="chart-grid">
-                @for (bar of chartData; track bar.label; let i = $index) {
-                  <div class="chart-bar-wrapper" style="height: 100px">
-                    <div class="chart-bar animate-grow" 
-                         [style.height]="bar.height"
-                         [style.background]="bar.gradient"
-                         [style.animation-delay]="i * 0.1 + 's'">
-                    </div>
-                    <div class="chart-label">{{ bar.label }}</div>
-                  </div>
-                }
-              </div>
-            </div>
+            }
           </div>
         </div>
       </div>
-
-      <!-- Floating Elements -->
-      <div class="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full blur-xl float-animation"></div>
-      <div class="absolute -bottom-6 -left-6 w-32 h-32 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-full blur-xl float-animation" style="animation-delay: 1s"></div>
     </div>
   </section>
 
   <!-- Features Section -->
-  <section id="features" class="py-20 bg-gradient-to-b from-transparent to-surface">
-    <div class="max-w-container">
-      <div class="text-center mb-16 reveal-item">
-        <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">Everything you need to scale</h2>
-        <p class="text-xl text-gray-400 max-w-2xl mx-auto">
-          From finance to team communication, we've built the complete toolkit for modern businesses.
+  <section id="features" class="features-section">
+    <div class="container">
+      <!-- Header -->
+      <div class="section-header animate-on-scroll">
+        <h2 class="section-title">Everything You Need in One Place</h2>
+        <p class="section-subtitle">
+          From ledger entries to team chat, we've built the complete toolkit for modern businesses.
         </p>
       </div>
 
-      <!-- Feature Categories -->
-      <div class="flex flex-wrap justify-center gap-3 mb-12 reveal-item">
+      <!-- Category Filters -->
+      <div class="category-filters animate-on-scroll">
         @for (category of categories; track category) {
-          <button class="category-pill" 
+          <button class="category-filter" 
                   [class.active]="activeCategory === category"
                   (click)="setActiveCategory(category)">
             {{ category }}
@@ -488,58 +387,136 @@
       </div>
 
       <!-- Features Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="features-grid">
         @for (feature of filteredFeatures(); track feature.title) {
-          <div class="feature-card reveal-item group" #featureCard>
-            <div class="flex items-start justify-between mb-4">
-              <div class="feature-icon">
-                <i [class]="feature.icon"></i>
-              </div>
-              <span class="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded-full">
-                {{ feature.group }}
-              </span>
+          <div class="feature-card animate-on-scroll">
+            <div class="feature-icon" [class]="feature.color">
+              <i [class]="feature.icon"></i>
             </div>
-            <h3 class="text-xl font-semibold text-white mb-3 group-hover:text-primary transition-colors">
-              {{ feature.title }}
-            </h3>
-            <p class="text-gray-400 mb-4">{{ feature.desc }}</p>
-            <div class="mt-auto">
-              <div class="text-xs text-gray-500 mb-2">Key capabilities:</div>
-              <div class="flex flex-wrap gap-2">
-                @if (feature.tags) {
-                  @for (tag of feature.tags.split(' '); track tag) {
-                    <span class="text-xs bg-surface-light text-gray-300 px-2 py-1 rounded">
-                      {{ tag }}
-                    </span>
-                  }
-                }
-              </div>
-            </div>
+            <div class="feature-category">{{ feature.group }}</div>
+            <h3 class="feature-title">{{ feature.title }}</h3>
+            <p class="feature-desc">{{ feature.desc }}</p>
           </div>
         }
       </div>
     </div>
   </section>
 
-  <!-- Integration Showcase -->
-  <section id="integrations" class="py-20 bg-gradient-to-b from-surface to-bg">
-    <div class="max-w-container">
-      <div class="text-center mb-16 reveal-item">
-        <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">Seamless Integrations</h2>
-        <p class="text-xl text-gray-400 max-w-2xl mx-auto">
-          Connect with the tools you already use and love.
+  <!-- Dashboard Preview -->
+  <section id="dashboard" class="dashboard-section">
+    <div class="container">
+      <div class="section-header animate-on-scroll mb-16">
+        <h2 class="section-title text-center">Real-Time Business Intelligence</h2>
+        <p class="section-subtitle text-center">
+          Monitor your entire business from a single, beautiful dashboard.
         </p>
       </div>
 
-      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
-        @for (integration of integrations; track integration.name) {
-          <div class="integration-card group reveal-item">
-            <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-white/5 to-white/0 border border-white/10 flex items-center justify-center group-hover:border-primary/30 transition-colors">
-              <i [class]="integration.icon + ' text-2xl text-gray-300 group-hover:text-white'"></i>
+      <div class="dashboard-preview animate-on-scroll">
+        <!-- Window Header -->
+        <div class="dashboard-header">
+          <div class="window-controls">
+            <div class="control close"></div>
+            <div class="control minimize"></div>
+            <div class="control maximize"></div>
+          </div>
+          <div class="dashboard-url">https://dashboard.apexinfinity.ai</div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+          <!-- Metrics Row -->
+          <div class="metrics-row">
+            <div class="metric-box">
+              <div class="metric-header">
+                <div class="metric-label">Monthly Revenue</div>
+                <div class="metric-icon revenue">
+                  <i class="fas fa-rupee-sign"></i>
+                </div>
+              </div>
+              <div class="metric-value">₹4.2M</div>
+              <div class="metric-change positive">
+                <i class="fas fa-arrow-up"></i> +12.5%
+              </div>
             </div>
-            <div class="text-center">
-              <div class="font-medium text-white mb-1">{{ integration.name }}</div>
-              <div class="text-sm text-gray-400">{{ integration.type }}</div>
+
+            <div class="metric-box">
+              <div class="metric-header">
+                <div class="metric-label">Active Customers</div>
+                <div class="metric-icon customers">
+                  <i class="fas fa-users"></i>
+                </div>
+              </div>
+              <div class="metric-value">2,842</div>
+              <div class="metric-change positive">
+                <i class="fas fa-arrow-up"></i> +8.2%
+              </div>
+            </div>
+
+            <div class="metric-box">
+              <div class="metric-header">
+                <div class="metric-label">Inventory Value</div>
+                <div class="metric-icon inventory">
+                  <i class="fas fa-box"></i>
+                </div>
+              </div>
+              <div class="metric-value">₹8.7M</div>
+              <div class="metric-change positive">
+                <i class="fas fa-arrow-up"></i> +5.4%
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart -->
+          <div class="chart-container">
+            <div class="chart-header">
+              <h4>Revenue Trend (Last 7 Days)</h4>
+              <div class="chart-period">This Week</div>
+            </div>
+            <div class="chart-bars">
+              <div class="chart-bar bar-1"></div>
+              <div class="chart-bar bar-2"></div>
+              <div class="chart-bar bar-3"></div>
+              <div class="chart-bar bar-4"></div>
+              <div class="chart-bar bar-5"></div>
+              <div class="chart-bar bar-6"></div>
+              <div class="chart-bar bar-7"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section id="testimonials" class="testimonials-section">
+    <div class="container">
+      <div class="section-header animate-on-scroll mb-16">
+        <h2 class="section-title text-center">Trusted by Industry Leaders</h2>
+        <p class="section-subtitle text-center">
+          See what businesses like yours are saying about Apex Infinity.
+        </p>
+      </div>
+
+      <div class="testimonials-grid">
+        @for (testimonial of testimonials; track testimonial.name) {
+          <div class="testimonial-card animate-on-scroll">
+            <div class="testimonial-header">
+              <div class="avatar">{{ testimonial.name.charAt(0) }}</div>
+              <div class="user-info">
+                <h4>{{ testimonial.name }}</h4>
+                <p>{{ testimonial.role }}, {{ testimonial.company }}</p>
+              </div>
+            </div>
+            <p class="testimonial-content">"{{ testimonial.content }}"</p>
+            <div class="stars">
+              @for (star of getStars(testimonial.rating); track $index) {
+                @if (star === 1) {
+                  <i class="fas fa-star star"></i>
+                } @else {
+                  <i class="far fa-star star"></i>
+                }
+              }
             </div>
           </div>
         }
@@ -547,64 +524,55 @@
     </div>
   </section>
 
-  <!-- Pricing Section -->
-  <section id="pricing" class="py-20">
-    <div class="max-w-container">
-      <div class="text-center mb-16">
-        <div class="reveal-item">
-          <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">Simple, transparent pricing</h2>
-          <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-8">
-            Start free. Upgrade when you're ready.
-          </p>
-        </div>
-        
-        <!-- Billing Toggle -->
-        <div class="inline-flex items-center bg-surface-light p-1 rounded-full mb-12 reveal-item">
-          <button class="billing-toggle" [class.active]="!isYearly()" (click)="togglePricing()">
-            Monthly billing
-          </button>
-          <button class="billing-toggle" [class.active]="isYearly()" (click)="togglePricing()">
-            Yearly billing
-            <span class="discount-badge">Save 20%</span>
-          </button>
-        </div>
+  <!-- Pricing -->
+  <section id="pricing" class="pricing-section">
+    <div class="container">
+      <div class="section-header animate-on-scroll mb-16">
+        <h2 class="section-title text-center">Simple, Transparent Pricing</h2>
+        <p class="section-subtitle text-center">
+          Start free. Upgrade when you're ready. No hidden fees.
+        </p>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+      <!-- Billing Toggle -->
+      <div class="pricing-toggle animate-on-scroll">
+        <button class="toggle-btn" [class.active]="!isYearly()" (click)="togglePricing()">
+          Monthly Billing
+        </button>
+        <button class="toggle-btn" [class.active]="isYearly()" (click)="togglePricing()">
+          Yearly Billing <span style="color: var(--color-success); margin-left: 4px;">Save 20%</span>
+        </button>
+      </div>
+
+      <!-- Pricing Cards -->
+      <div class="pricing-grid">
         @for (plan of plans; track plan.name; let i = $index) {
-          <div class="pricing-card reveal-item" [class.popular]="plan.isPopular" [style.animation-delay]="i * 0.1 + 's'">
-            @if (plan.isPopular) {
+          <div class="pricing-card animate-on-scroll" [class.popular]="plan.popular" [style.animation-delay]="i * 0.1 + 's'">
+            @if (plan.popular) {
               <div class="popular-badge">Most Popular</div>
             }
             
-            <div class="pricing-header">
-              <h3 class="text-2xl font-bold text-white mb-2">{{ plan.name }}</h3>
-              <div class="flex items-baseline mb-4">
-                <span class="text-5xl font-bold text-white">{{ plan.price }}</span>
-                @if (plan.price !== 'Free' && plan.price !== 'Custom') {
-                  <span class="text-gray-400 ml-2">/{{ isYearly() ? 'year' : 'month' }}</span>
-                }
-              </div>
-              <p class="text-gray-400 mb-6">{{ plan.desc }}</p>
+            <h3 class="plan-name">{{ plan.name }}</h3>
+            <div class="plan-price">
+              {{ plan.price }}
+              @if (plan.price !== 'Free' && plan.price !== 'Custom') {
+                <span class="period">/{{ isYearly() ? 'year' : 'month' }}</span>
+              }
             </div>
-
-            <div class="pricing-features">
-              <ul class="space-y-4">
-                @for (feature of plan.features; track feature) {
-                  <li class="flex items-start gap-3">
-                    <i class="fas fa-check text-success mt-1"></i>
-                    <span class="text-gray-300">{{ feature }}</span>
-                  </li>
-                }
-              </ul>
-            </div>
-
-            <div class="pricing-footer mt-auto">
-              <button class="btn w-full" 
-                      [ngClass]="plan.isPopular ? 'btn-primary' : 'btn-glass'">
-                {{ plan.cta }}
-              </button>
-            </div>
+            <p class="plan-desc">{{ plan.desc }}</p>
+            
+            <ul class="plan-features">
+              @for (feature of plan.features; track feature) {
+                <li>
+                  <i class="fas fa-check"></i>
+                  <span>{{ feature }}</span>
+                </li>
+              }
+            </ul>
+            
+            <button class="btn w-full" [ngClass]="plan.popular ? 'btn-primary' : 'btn-secondary'">
+              {{ plan.cta }}
+            </button>
           </div>
         }
       </div>
@@ -612,79 +580,87 @@
   </section>
 
   <!-- CTA Section -->
-  <section class="py-20">
-    <div class="max-w-container">
-      <div class="cta-card reveal-item">
-        <div class="text-center max-w-3xl mx-auto">
-          <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">Ready to transform your business?</h2>
-          <p class="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
-            Join thousands of businesses already using Apex Infinity to make smarter decisions.
-          </p>
-          
-          <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <button class="btn btn-primary btn-lg shadow-glow" routerLink="/auth/org">
-              Start Free Trial
-              <i class="fas fa-arrow-right ml-2"></i>
-            </button>
-            <button class="btn btn-glass btn-lg" (click)="scheduleDemo()">
-              <i class="fas fa-calendar mr-2"></i>
-              Schedule Demo
-            </button>
-          </div>
-          
-          <div class="mt-8 text-sm text-gray-400">
-            No credit card required • 14-day free trial • Cancel anytime
-          </div>
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-card animate-on-scroll">
+        <h2>Ready to Transform Your Business?</h2>
+        <p>
+          Join thousands of businesses that have streamlined their operations with Apex Infinity. 
+          Get started with our 14-day free trial - no credit card required.
+        </p>
+        
+        <div class="cta-buttons">
+          <button class="btn btn-primary btn-lg" routerLink="/auth/org">
+            <i class="fas fa-rocket"></i> Start Free Trial
+          </button>
+          <button class="btn btn-secondary btn-lg" (click)="scrollToElement('features')">
+            <i class="fas fa-book"></i> View Documentation
+          </button>
         </div>
+        
+        <p style="font-size: 14px; margin-top: 24px; color: var(--color-text-secondary);">
+          No credit card required • 14-day free trial • Cancel anytime
+        </p>
       </div>
     </div>
   </section>
 
   <!-- Footer -->
-  <footer class="pt-20 pb-10 border-t border-border bg-surface">
-    <div class="max-w-container">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
-        <div>
-          <div class="flex items-center gap-2 mb-6">
-            <div class="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg"></div>
-            <span class="text-xl font-bold text-white">ApexInfinity</span>
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-main">
+        <!-- Brand -->
+        <div class="footer-brand">
+          <div class="logo">
+            <div class="logo-icon">AI</div>
+            <span>Apex<span style="color: #3b82f6">Infinity</span></span>
           </div>
-          <p class="text-gray-400 text-sm mb-6">
-            The complete business intelligence platform for modern enterprises.
+          <p>
+            The complete business intelligence platform for modern enterprises. 
+            Streamline your operations with our all-in-one ERP solution.
           </p>
-          <div class="flex gap-4">
-            <a href="#" class="social-icon">
-              <i class="fab fa-twitter"></i>
-            </a>
-            <a href="#" class="social-icon">
-              <i class="fab fa-linkedin"></i>
-            </a>
-            <a href="#" class="social-icon">
-              <i class="fab fa-github"></i>
-            </a>
+          <div class="social-links">
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-github"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
           </div>
         </div>
 
-        @for (column of footerLinks; track column.title) {
-          <div>
-            <h4 class="text-white font-semibold mb-4">{{ column.title }}</h4>
-            <ul class="space-y-3">
-              @for (link of column.links; track link.label) {
-                <li>
-                  <a [href]="link.href" class="text-gray-400 hover:text-white transition-colors text-sm">
-                    {{ link.label }}
-                  </a>
-                </li>
-              }
-            </ul>
-          </div>
-        }
+        <!-- Links -->
+        <div class="footer-links">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="#">API Documentation</a></li>
+            <li><a href="#">Changelog</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Security</a></li>
+            <li><a href="#">GDPR</a></li>
+          </ul>
+        </div>
       </div>
 
-      <div class="border-t border-border pt-8 text-center">
-        <div class="text-gray-500 text-sm">
-          © 2024 Apex Infinity Inc. All rights reserved.
-        </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 Apex Infinity Inc. All rights reserved.</p>
       </div>
     </div>
   </footer>
