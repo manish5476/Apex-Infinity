@@ -765,14 +765,26 @@
   background-image: linear-gradient(to right, var(--tw-gradient-stops));
 }
 
-.from-\[var\\(--accent-primary\\)\] {
-  --tw-gradient-from: var(--accent-primary);
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(99, 102, 241, 0));
+// Replace lines 768-773 with:
+.bg-gradient-from-primary {
+  --gradient-from: var(--accent-primary);
+  background-image: linear-gradient(to right, var(--gradient-from), var(--accent-secondary));
 }
 
-.to-\[var\\(--accent-secondary\\)\] {
+.bg-gradient-to-br {
+  background-image: linear-gradient(to bottom right, var(--tw-gradient-from), var(--tw-gradient-to));
+}
+
+// Remove or fix any other problematic lines:
+// Instead of .from-\[var\\(--accent-primary\\)\] etc., use:
+.from-primary {
+  --tw-gradient-from: var(--accent-primary);
+}
+
+.to-secondary {
   --tw-gradient-to: var(--accent-secondary);
 }
+
 
 /* Color Utilities for Chart */
 .text-green-400 { color: #34d399; }
