@@ -11,7 +11,7 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
 import { CommonMethodService } from '../../core/utils/common-method.service';
 
 @Component({
-  selector: 'app-admin-dashboard',
+  selector: 'app-admin-dashboard-Ui',
   standalone: true,
   imports: [
     CommonModule, FormsModule, ButtonModule, TableModule, 

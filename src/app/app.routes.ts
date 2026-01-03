@@ -45,8 +45,22 @@ export const routes: Routes = [
     component: MainScreen,
     canActivate: [authGuard],
     children: [
+      // Default to dashboard if a logged-in user tries to go to a non-existent root child
+      // (Optional: You can remove this if you want strict control)
+      // { path: '', redirectTo: 'dashboard', pathMatch: 'full' }, 
+
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./admin/admin-analytics-hub.component').then(
+            (m) => m.AdminMasterHubComponent
+          ),
+        title: 'Dashboard'
+      },
       { path: 'notes', component: NotesManagerComponent, title: 'My Notes' },
       { path: 'financials', component: LedgerComponent, title: 'Financial Ledger' },
+
+      // --- Admin & Settings ---
       {
         path: 'admin/organization',
         loadComponent: () =>
