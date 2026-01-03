@@ -86,7 +86,7 @@ export class ThemeService {
   setLightTheme(themeClass: string) {
     const newSettings: ThemeSettings = {
       lightThemeClass: themeClass,
-      isDarkMode: false, // Switching theme turns off dark mode in this logic
+      isDarkMode: false,
     };
     this.updateSettings(newSettings);
   }

@@ -1,23 +1,27 @@
-// attendance-dashboard.component.ts
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, DestroyRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Subject, takeUntil, interval, Subscription } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-// PrimeNG
+// PrimeNG Components
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
-import { ProgressBarModule } from 'primeng/progressbar';
 import { ToastModule } from 'primeng/toast';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { SelectModule } from 'primeng/select';
-import { MessageService } from 'primeng/api';
+import { TabsModule } from 'primeng/tabs';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 // Services
 import { AttendanceService } from '../services/attendance.service';
-import { DatePicker } from 'primeng/datepicker';
+
+import { AuthService } from '../../auth/services/auth-service';
+import { LoadingService } from '../../../core/services/loading.service';
+import { AppMessageService } from '../../../core/services/message.service';
+import { CommonMethodService, Severity } from '../../../core/utils/common-method.service';
+import { TableModule } from "primeng/table";
 
 @Component({
   selector: 'app-attendance-dashboard',
@@ -28,63 +32,113 @@ import { DatePicker } from 'primeng/datepicker';
     FormsModule,
     ButtonModule,
     CardModule,
-    ProgressBarModule,
     ToastModule,
     DialogModule,
-    DatePicker,
     InputTextModule,
     TextareaModule,
-    SelectModule
+    SelectModule,
+    TabsModule,
+    ProgressSpinnerModule,
+    TableModule
   ],
   templateUrl: './attendance-dashboard.component.html',
-  styleUrls: ['./attendance-dashboard.component.scss'],
-  providers: [DatePipe, MessageService]
+  providers: [DatePipe]
 })
-export class AttendanceDashboardComponent implements OnInit, OnDestroy {
-  public attendanceService = inject(AttendanceService);
-  private messageService = inject(MessageService);
+export class AttendanceDashboardComponent implements OnInit {
+  // Services
+  private attendanceService = inject(AttendanceService);
+  public commonService = inject(CommonMethodService);
+  private authService = inject(AuthService);
+  private loadingService = inject(LoadingService);
+  private appMessageService = inject(AppMessageService);
   private fb = inject(FormBuilder);
-  public datePipe = inject(DatePipe);
-  private destroy$ = new Subject<void>();
+  private datePipe = inject(DatePipe);
+  private destroyRef = inject(DestroyRef);
+  today = new Date();
 
   // State
   isLoading = signal(false);
+  activeTab: any = signal(0);
+  currentUser = signal<any>(null);
+
+  // Data
   todayStatus = signal<any>(null);
-  currentLocation = signal<{lat: number, lng: number, accuracy: number} | null>(null);
   attendanceSummary = signal<any>(null);
   recentPunches = signal<any[]>([]);
-  
+  weeklyData = signal<any[]>([]);
+  monthlyStats = signal<any>({});
+  teamAttendance = signal<any[]>([]);
+  liveAttendance = signal<any[]>([]);
+
+  // Location
+  currentLocation = signal<{ lat: number, lng: number, accuracy: number } | null>(null);
+
   // Modals
   showPunchModal = signal(false);
   showRegularizeModal = signal(false);
   showHistoryModal = signal(false);
-  
+  showTeamAttendanceModal = signal(false);
+
   // Forms
   punchForm!: FormGroup;
   regularizeForm!: FormGroup;
-  
-  // Live timer
+  filterForm!: FormGroup;
+
+  // Timer
   workDuration = signal('00:00:00');
-  private timerSub?: Subscription;
-  
-  // Charts data
-  weeklyData = signal<any[]>([]);
-  monthlyStats = signal<any>({});
-  todayDate:any
+  private timerInterval: any;
+
+  // Computed properties
+  todayDate = computed(() => {
+    return this.commonService.formatDate(new Date(), 'fullDate');
+  });
+
+  canPunchIn = computed(() => {
+    const status = this.todayStatus();
+    return !status?.firstIn;
+  });
+
+  canPunchOut = computed(() => {
+    const status = this.todayStatus();
+    return status?.firstIn && !status?.lastOut;
+  });
+
+  workHoursPercentage = computed(() => {
+    const status = this.todayStatus();
+    const workHours = status?.totalWorkHours || 0;
+    return Math.min((workHours / 8) * 100, 100); // Assuming 8-hour work day
+  });
+
+  currentStatusSeverity = computed((): Severity => {
+    const status = this.todayStatus()?.status;
+    return this.commonService.mapAttendanceStatusToSeverity(status);
+  });
+
+  currentStatusText = computed(() => {
+    const status = this.todayStatus()?.status;
+    return this.commonService.getAttendanceStatusText(status);
+  });
 
   ngOnInit() {
-        this.todayDate = this.datePipe.transform(new Date(), 'fullDate');
-
     this.initForms();
-    this.fetchDashboardData();
+    this.loadCurrentUser();
+    this.loadDashboardData();
     this.startWorkTimer();
     this.trackLocation();
   }
 
   ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
-    this.timerSub?.unsubscribe();
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+    }
+  }
+
+  private loadCurrentUser() {
+    this.authService.currentUser$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(user => {
+        this.currentUser.set(user);
+      });
   }
 
   private initForms() {
@@ -100,53 +154,133 @@ export class AttendanceDashboardComponent implements OnInit, OnDestroy {
       newFirstIn: [''],
       newLastOut: [''],
       reason: ['', [Validators.required, Validators.minLength(20)]],
-      supportingDocs: [[]],
       urgency: ['medium']
+    });
+
+    this.filterForm = this.fb.group({
+      startDate: [new Date(new Date().setDate(new Date().getDate() - 7))],
+      endDate: [new Date()],
+      department: [''],
+      status: [[]]
     });
   }
 
-  private fetchDashboardData() {
-    this.isLoading.set(true);
-    
-    // Fetch today's status
-    // this.attendanceService.getCurrentStatus()
-    //   .pipe(takeUntil(this.destroy$))
-    //   .subscribe({
-    //     next: (res) => {
-    //       this.todayStatus.set(res.data);
-    //       this.updateWorkTimer(res.data?.firstIn);
-    //     },
-    //     error: (err) => console.error(err)
-    //   });
+  private loadDashboardData() {
+    // Load today's status
+    this.loadTodayStatus();
 
-    // Fetch summary
-    this.attendanceService.getAttendanceSummary({ month: this.getCurrentMonth() })
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (res) => {
-          this.attendanceSummary.set(res.data);
-          this.processWeeklyData(res.data?.weeklyStats || []);
+    // Load attendance summary
+    this.loadAttendanceSummary();
+
+    // Load recent punches
+    this.loadRecentPunches();
+
+    // Load weekly data
+    this.loadWeeklyData();
+  }
+
+  private loadTodayStatus() {
+    const today = new Date().toISOString().split('T')[0];
+
+    this.commonService.apiCall(
+      this.attendanceService.getMyAttendance({
+        startDate: today,
+        endDate: today,
+        limit: 1
+      }),
+      (response) => {
+        if (response.data && response.data.length > 0) {
+          this.todayStatus.set(response.data[0]);
+          this.updateWorkTimer(response.data[0]?.firstIn);
         }
-      });
+      },
+      'Load Today Status'
+    );
+  }
 
-    // Fetch recent punches
-    this.attendanceService.getMyAttendance({ limit: 5 })
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (res) => this.recentPunches.set(res.data || []),
-        complete: () => this.isLoading.set(false)
-      });
+  private loadAttendanceSummary() {
+    const currentMonth = this.getCurrentMonth();
+
+    this.commonService.apiCall(
+      this.attendanceService.getAttendanceSummary({ month: currentMonth }),
+      (response) => {
+        this.attendanceSummary.set(response.data?.summary);
+        this.monthlyStats.set(response.data);
+      },
+      'Load Attendance Summary'
+    );
+  }
+
+  private loadRecentPunches() {
+    this.commonService.apiCall(
+      this.attendanceService.getMyAttendance({ limit: 5 }),
+      (response) => {
+        this.recentPunches.set(response.data || []);
+      },
+      'Load Recent Punches'
+    );
+  }
+
+  private loadWeeklyData() {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(endDate.getDate() - 7);
+
+    this.commonService.apiCall(
+      this.attendanceService.getMyAttendance({
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0],
+        limit: 7
+      }),
+      (response) => {
+        if (response.data) {
+          const weeklyStats = response.data.map((day: any) => ({
+            day: this.commonService.formatDate(day.date, 'EEE'),
+            hours: day.totalWorkHours || 0,
+            status: day.status,
+            date: day.date
+          }));
+          this.weeklyData.set(weeklyStats);
+        }
+      },
+      'Load Weekly Data'
+    );
+  }
+
+  loadTeamAttendance() {
+    const filters = {
+      date: new Date().toISOString().split('T')[0],
+      includeSubordinates: true
+    };
+
+    this.commonService.apiCall(
+      this.attendanceService.getTeamAttendance(filters),
+      (response) => {
+        this.teamAttendance.set(response.data || []);
+      },
+      'Load Team Attendance'
+    );
+  }
+
+  private loadLiveAttendance() {
+    this.commonService.apiCall(
+      this.attendanceService.getLiveAttendance({}),
+      (response) => {
+        this.liveAttendance.set(response.data || []);
+      },
+      'Load Live Attendance'
+    );
   }
 
   private startWorkTimer() {
-    this.timerSub = interval(1000).subscribe(() => {
+    this.timerInterval = setInterval(() => {
       if (this.todayStatus()?.firstIn && !this.todayStatus()?.lastOut) {
         const startTime = new Date(this.todayStatus().firstIn).getTime();
         const now = Date.now();
         const diff = now - startTime;
         this.workDuration.set(this.formatDuration(diff));
       }
-    });
+    }, 1000);
   }
 
   private formatDuration(ms: number): string {
@@ -164,16 +298,6 @@ export class AttendanceDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  private processWeeklyData(weeklyStats: any[]) {
-    this.weeklyData.set(
-      weeklyStats.map(day => ({
-        day: new Date(day.date).toLocaleDateString('en', { weekday: 'short' }),
-        hours: day.workHours || 0,
-        status: day.status
-      }))
-    );
-  }
-
   private getCurrentMonth(): string {
     const now = new Date();
     return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
@@ -189,22 +313,37 @@ export class AttendanceDashboardComponent implements OnInit, OnDestroy {
             accuracy: position.coords.accuracy
           });
         },
-        (error) => console.warn('Location permission denied')
+        (error) => {
+          console.warn('Location permission denied:', error);
+          this.appMessageService.showWarn(
+            'Location Access',
+            'Location services are required for attendance marking'
+          );
+        }
       );
     }
   }
 
-  // =========================================================
-  // PUBLIC METHODS
-  // =========================================================
+  // Public Methods
+  onTabChange(event: any) {
+    this.activeTab.set(event.index);
+
+    switch (event.index) {
+      case 1: // Team tab
+        this.loadTeamAttendance();
+        break;
+      case 2: // Live tab
+        this.loadLiveAttendance();
+        break;
+    }
+  }
 
   handlePunch() {
     if (!this.currentLocation()) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Location Required',
-        detail: 'Please enable location services to punch'
-      });
+      this.appMessageService.showWarn(
+        'Location Required',
+        'Please enable location services to record attendance'
+      );
       return;
     }
 
@@ -215,85 +354,72 @@ export class AttendanceDashboardComponent implements OnInit, OnDestroy {
       longitude: this.currentLocation()!.lng,
       accuracy: this.currentLocation()!.accuracy,
       notes: formValue.notes,
-      deviceId: formValue.deviceId
+      deviceId: 'web'
     };
 
-    this.isLoading.set(true);
-    this.attendanceService.markAttendance(payload)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (res) => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: `Punched ${formValue.type === 'in' ? 'IN' : 'OUT'} successfully`
-          });
-          this.showPunchModal.set(false);
-          this.punchForm.reset({ type: 'in', deviceId: 'web' });
-          this.fetchDashboardData();
-        },
-        error: (err) => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: err.error?.message || 'Punch failed'
-          });
-          this.isLoading.set(false);
-        }
-      });
+    this.commonService.apiCall(
+      this.attendanceService.markAttendance(payload),
+      () => {
+        this.appMessageService.showSuccess(
+          'Success',
+          `Punched ${formValue.type === 'in' ? 'IN' : 'OUT'} successfully`
+        );
+        this.showPunchModal.set(false);
+        this.punchForm.reset({ type: 'in', deviceId: 'web' });
+        this.loadTodayStatus();
+        this.loadRecentPunches();
+      },
+      'Record Punch'
+    );
   }
 
   submitRegularization() {
     if (this.regularizeForm.invalid) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Validation',
-        detail: 'Please fill all required fields'
-      });
+      this.commonService.markFormGroupTouched(this.regularizeForm);
+      this.appMessageService.showWarn(
+        'Validation',
+        'Please fill all required fields correctly'
+      );
       return;
     }
 
     const formValue = this.regularizeForm.value;
     const payload = {
-      targetDate: this.datePipe.transform(formValue.targetDate, 'yyyy-MM-dd'),
+      targetDate: this.commonService.formatDate(formValue.targetDate, 'yyyy-MM-dd'),
       type: formValue.type,
-      newFirstIn: formValue.newFirstIn ? this.combineDateTime(formValue.targetDate, formValue.newFirstIn) : undefined,
-      newLastOut: formValue.newLastOut ? this.combineDateTime(formValue.targetDate, formValue.newLastOut) : undefined,
+      newFirstIn: formValue.newFirstIn ?
+        `${this.commonService.formatDate(formValue.targetDate, 'yyyy-MM-dd')}T${formValue.newFirstIn}:00` :
+        undefined,
+      newLastOut: formValue.newLastOut ?
+        `${this.commonService.formatDate(formValue.targetDate, 'yyyy-MM-dd')}T${formValue.newLastOut}:00` :
+        undefined,
       reason: formValue.reason,
-      supportingDocs: formValue.supportingDocs,
       urgency: formValue.urgency
     };
 
-    this.isLoading.set(true);
-    this.attendanceService.submitRegularization(payload)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Submitted',
-            detail: 'Regularization request submitted for approval'
-          });
-          this.showRegularizeModal.set(false);
-          this.regularizeForm.reset({
-            type: 'missed_punch',
-            urgency: 'medium'
-          });
-        },
-        error: (err) => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: err.error?.message || 'Submission failed'
-          });
-          this.isLoading.set(false);
-        }
-      });
-  }
+    // Validate the request
+    const validation = this.commonService.validateRegularizationRequest(payload);
+    if (!validation.valid) {
+      this.appMessageService.showWarn('Validation', validation.errors.join(', '));
+      return;
+    }
 
-  private combineDateTime(date: Date, time: string): string {
-    const dateStr = this.datePipe.transform(date, 'yyyy-MM-dd');
-    return `${dateStr}T${time}:00`;
+    this.commonService.apiCall(
+      this.attendanceService.submitRegularization(payload),
+      () => {
+        this.appMessageService.showSuccess(
+          'Submitted',
+          'Regularization request submitted for approval'
+        );
+        this.showRegularizeModal.set(false);
+        this.regularizeForm.reset({
+          targetDate: new Date(),
+          type: 'missed_punch',
+          urgency: 'medium'
+        });
+      },
+      'Submit Regularization'
+    );
   }
 
   exportAttendance() {
@@ -302,161 +428,88 @@ export class AttendanceDashboardComponent implements OnInit, OnDestroy {
     const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
     const options = {
-      startDate: this.datePipe.transform(firstDay, 'yyyy-MM-dd')!,
-      endDate: this.datePipe.transform(lastDay, 'yyyy-MM-dd')!,
+      startDate: this.commonService.formatDate(firstDay, 'yyyy-MM-dd')!,
+      endDate: this.commonService.formatDate(lastDay, 'yyyy-MM-dd')!,
       format: 'excel' as const
     };
 
-    this.attendanceService.exportAttendance(options)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (res) => {
-          // Handle file download
-          const blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `attendance_${options.startDate}_to_${options.endDate}.xlsx`;
-          a.click();
-          window.URL.revokeObjectURL(url);
-        }
-      });
+    this.commonService.apiCall(
+      this.attendanceService.exportAttendance(options),
+      (blob) => {
+        const filename = `attendance_export_${options.startDate}_to_${options.endDate}.xlsx`;
+        this.commonService.downloadBlob(blob, filename);
+        this.appMessageService.showSuccess(
+          'Exported',
+          'Attendance data exported successfully'
+        );
+      },
+      'Export Attendance'
+    );
+  }
+
+  // Helper Methods
+  formatTime(time: string | undefined): string {
+    return this.commonService.formatPunchTime(time);
+  }
+
+  formatDate(date: string | Date): string {
+    return this.commonService.formatDate(date, 'mediumDate');
+  }
+
+  getStatusClass(status: string): string {
+    return this.commonService.getAttendanceStatusClass(status);
+  }
+
+  getStatusText(status: string): string {
+    return this.commonService.getAttendanceStatusText(status);
+  }
+
+  getStatusSeverity(status: string): Severity {
+    return this.commonService.mapAttendanceStatusToSeverity(status);
+  }
+
+  getEmployeeInitials(name: string): string {
+    return this.commonService.getInitials(name);
+  }
+
+  getEmployeeColor(name: string): string {
+    return this.commonService.stringToColor(name);
+  }
+
+  refreshData() {
+    this.loadDashboardData();
+    this.appMessageService.showSuccess('Refreshed', 'Dashboard data updated');
+  }
+
+  applyFilters() {
+    const filters = this.filterForm.value;
+    console.log('Applying filters:', filters);
+    // Implement filter logic
+  }
+
+  // Computed properties for UI
+  get currentlyWorkingCount() {
+    return this.liveAttendance().filter(a =>
+      a.firstIn && !a.lastOut && !a.isOnBreak
+    ).length;
+  }
+
+  get onBreakCount() {
+    return this.liveAttendance().filter(a =>
+      a.isOnBreak || (a.breakStart && !a.breakEnd)
+    ).length;
+  }
+
+  get notCheckedInCount() {
+    const currentHour = new Date().getHours();
+    return this.liveAttendance().filter(a =>
+      !a.firstIn && currentHour >= 9
+    ).length;
+  }
+
+  get wfhCount() {
+    return this.liveAttendance().filter(a =>
+      a.workType === 'wfh'
+    ).length;
   }
 }
-
-
-// import { Component, OnInit } from '@angular/core';
-// import { FormBuilder, FormGroup, FormsModule, NgModel, ReactiveFormsModule, Validators } from '@angular/forms';
-// import { CommonModule, DatePipe } from '@angular/common';
-// import { AttendanceService } from '../services/attendance.service';
-
-// @Component({
-//   selector: 'app-attendance-dashboard',
-//   imports: [CommonModule,FormsModule,ReactiveFormsModule   ],
-//   templateUrl: './attendance-dashboard.component.html',
-//   styleUrls: ['./attendance-dashboard.component.scss'],
-//   providers: [DatePipe]
-// })
-// export class AttendanceDashboardComponent implements OnInit {
-//   attendanceHistory: any[] = [];
-//   todayStatus: string = 'Not Punched';
-//   isLoading = false;
-//   locationError: string = '';
-//   regularizeForm: FormGroup;
-//   showRegularizeModal = false;
-//   constructor(
-//     private attendanceService: AttendanceService,
-//     private fb: FormBuilder,
-//     private datePipe: DatePipe
-//   ) {
-//     // Initialize Regularization Form
-//     this.regularizeForm = this.fb.group({
-//       targetDate: ['', Validators.required],
-//       type: ['missed_punch', Validators.required],
-//       newFirstIn: [''],
-//       newLastOut: [''],
-//       reason: ['', [Validators.required, Validators.minLength(10)]]
-//     });
-//   }
-
-//   ngOnInit(): void {
-//     this.fetchHistory();
-//   }
-
-//   // ==========================================================
-//   // 🟢 PUNCH IN / OUT LOGIC
-//   // ==========================================================
-//   handlePunch(type: 'in' | 'out') {
-//     this.isLoading = true;
-//     this.locationError = '';
-
-//     if (!navigator.geolocation) {
-//       this.locationError = 'Geolocation is not supported by your browser';
-//       this.isLoading = false;
-//       return;
-//     }
-
-//     navigator.geolocation.getCurrentPosition(
-//       (position) => {
-//         const payload = {
-//           type: type,
-//           latitude: position.coords.latitude,
-//           longitude: position.coords.longitude,
-//           accuracy: position.coords.accuracy
-//         };
-
-//         this.attendanceService.markAttendance(payload).subscribe({
-//           next: (res) => {
-//             alert(`Success: Punched ${type.toUpperCase()} at ${this.datePipe.transform(new Date(), 'shortTime')}`);
-//             this.fetchHistory(); // Refresh table
-//             this.isLoading = false;
-//           },
-//           error: (err) => {
-//             alert(`Error: ${err.error.message || 'Punch failed'}`);
-//             this.isLoading = false;
-//           }
-//         });
-//       },
-//       (err) => {
-//         this.locationError = 'Location access denied. Please enable GPS.';
-//         this.isLoading = false;
-//       },
-//       { enableHighAccuracy: true, timeout: 10000 }
-//     );
-//   }
-
-//   // ==========================================================
-//   // 📅 HISTORY & DATA
-//   // ==========================================================
-//   fetchHistory() {
-//     // Get current month by default
-//     const currentMonth = new Date().toISOString().slice(0, 7); // "2023-10"
-
-//     this.attendanceService.getMyAttendance({ month: currentMonth }).subscribe({
-//       next: (res) => {
-//         this.attendanceHistory = res.data;
-//         // Simple logic to check today's status from logs
-//         const todayStr = new Date().toISOString().split('T')[0];
-//         const todayRecord = this.attendanceHistory.find(r => r.date === todayStr);
-//         if (todayRecord) {
-//           this.todayStatus = todayRecord.lastOut ? 'Punched Out' : 'Punched In';
-//         }
-//       }
-//     });
-//   }
-
-//   // ==========================================================
-//   // 📝 REGULARIZATION SUBMISSION
-//   // ==========================================================
-//   submitRegularization() {
-//     if (this.regularizeForm.invalid) return;
-
-//     const formVal = this.regularizeForm.value;
-
-//     // Construct Payload for Backend
-//     const payload = {
-//       targetDate: formVal.targetDate,
-//       type: formVal.type,
-//       correction: {
-//         reason: formVal.reason,
-//         // Convert time string "09:30" to Full Date Object if needed, or send time string based on backend expectation
-//         newFirstIn: formVal.newFirstIn ? this.combineDateAndTime(formVal.targetDate, formVal.newFirstIn) : undefined,
-//         newLastOut: formVal.newLastOut ? this.combineDateAndTime(formVal.targetDate, formVal.newLastOut) : undefined
-//       }
-//     };
-
-//     this.attendanceService.submitRegularization(payload).subscribe({
-//       next: () => {
-//         alert('Request Submitted for Approval');
-//         this.showRegularizeModal = false;
-//         this.regularizeForm.reset();
-//       },
-//       error: (err) => alert(err.error.message)
-//     });
-//   }
-
-//   // Helper: Combine "2023-10-25" and "09:00" into ISO String
-//   private combineDateAndTime(date: string, time: string): string {
-//     return new Date(`${date}T${time}:00`).toISOString();
-//   }
-// }

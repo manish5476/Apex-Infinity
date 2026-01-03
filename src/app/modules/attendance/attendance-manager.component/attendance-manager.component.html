@@ -1,450 +1,304 @@
-<!-- attendance-manager.component.html -->
 <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
 
-<div class="min-h-screen bg-gray-50 p-6">
-  <!-- Header -->
+<div class="min-h-screen p-4 md:p-6 transition-colors duration-300" [style.background]="'var(--theme-bg-primary)'"
+  [style.font-family]="'var(--font-body)'">
+
   <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Attendance Management</h1>
-    <p class="text-gray-500">Manage team attendance, approvals, and monitoring</p>
+    <div class="flex justify-between items-start">
+      <div>
+        <h1 class="font-bold mb-1 transition-colors" [style.color]="'var(--theme-text-primary)'"
+          [style.font-family]="'var(--font-heading)'" [style.font-size]="'var(--font-size-3xl)'">Attendance Management
+        </h1>
+        <p [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-base)'">Manage team
+          attendance, approvals, and monitoring</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="text-right hidden md:block">
+          <p class="uppercase font-bold tracking-tighter" [style.color]="'var(--theme-text-label)'"
+            [style.font-size]="'var(--font-size-xs)'">Welcome,</p>
+          <p class="font-bold" [style.color]="'var(--theme-text-primary)'">{{ currentUser()?.name || 'Manager' }}</p>
+        </div>
+        <div class="w-10 h-10 rounded-full flex items-center justify-center shadow-md"
+          [style.background]="'var(--theme-accent-gradient)'">
+          <span class="text-white font-bold" [style.font-size]="'var(--font-size-md)'">
+            {{ commonService.getInitials(currentUser()?.name || 'M') }}
+          </span>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Tabs using latest PrimeNG Tabs -->
-  <div class="card">
-    <!-- [(value)]="activeTab()" -->
-    <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)" >
-      <p-tablist>
-        <p-tab value="0">
-          <div class="flex items-center gap-2">
-            <i class="pi pi-clock"></i>
-            <span>Pending Requests</span>
+  <div class="card p-1 border transition-colors" [style.background]="'var(--theme-bg-secondary)'"
+    [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'"
+    [style.box-shadow]="'var(--shadow-lg)'">
+
+    <p-tabs [value]="activeTab().toString()" (valueChange)="onTabChange($event)">
+      <p-tablist [style.background]="'transparent'" [style.border-bottom]="'1px solid var(--theme-border-primary)'">
+        <p-tab value="0" class="transition-all">
+          <div class="flex items-center gap-2 px-2 py-1">
+            <i class="pi pi-clock" [style.font-size]="'var(--font-size-sm)'"></i>
+            <span class="font-bold" [style.font-size]="'var(--font-size-sm)'">Pending Requests</span>
           </div>
         </p-tab>
-        <p-tab value="1">
-          <div class="flex items-center gap-2">
-            <i class="pi pi-users"></i>
-            <span>Team Attendance</span>
+        <p-tab value="1" class="transition-all">
+          <div class="flex items-center gap-2 px-2 py-1">
+            <i class="pi pi-users" [style.font-size]="'var(--font-size-sm)'"></i>
+            <span class="font-bold" [style.font-size]="'var(--font-size-sm)'">Team Attendance</span>
           </div>
         </p-tab>
-        <p-tab value="2">
-          <div class="flex items-center gap-2">
-            <i class="pi pi-eye"></i>
-            <span>Live Monitoring</span>
+        <p-tab value="2" class="transition-all">
+          <div class="flex items-center gap-2 px-2 py-1">
+            <i class="pi pi-eye" [style.font-size]="'var(--font-size-sm)'"></i>
+            <span class="font-bold" [style.font-size]="'var(--font-size-sm)'">Live Monitoring</span>
           </div>
         </p-tab>
       </p-tablist>
-      
-      <p-tabpanels>
-        <!-- Tab 1: Pending Requests -->
+
+      <p-tabpanels class="pt-4 transition-colors" [style.background]="'transparent'">
+
         <p-tabpanel value="0">
-          <div class="mb-4">
-            <div class="flex justify-between items-center">
-              <p-toolbar class="p-0 border-0 bg-transparent">
-                <ng-template pTemplate="start">
-                  <div class="flex flex-wrap items-center gap-3">
-                    <!-- Date Inputs instead of DatePicker -->
-                    <div class="flex items-center gap-2">
-                      <label class="text-sm text-gray-600">From</label>
-                      <input 
-                        pInputText 
-                        type="date" 
-                        [(ngModel)]="filters().startDate" 
-                        class="w-40"
-                      >
-                    </div>
-                    
-                    <div class="flex items-center gap-2">
-                      <label class="text-sm text-gray-600">To</label>
-                      <input 
-                        pInputText 
-                        type="date" 
-                        [(ngModel)]="filters().endDate" 
-                        class="w-40"
-                      >
-                    </div>
-                    
-                    <p-select 
-                      [(ngModel)]="filters().department" 
-                      [options]="departments()"
-                      placeholder="Department"
-                      styleClass="w-48"
-                    ></p-select>
-                    
-                    <p-button 
-                      label="Apply" 
-                      icon="pi pi-filter" 
-                      (onClick)="applyFilters()"
-                      severity="secondary"
-                    ></p-button>
-                    
-                    <p-button 
-                      label="Reset" 
-                      icon="pi pi-refresh" 
-                      (onClick)="resetFilters()"
-                      [text]="true"
-                    ></p-button>
-                  </div>
-                </ng-template>
-              </p-toolbar>
+          <div class="mb-4 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex flex-wrap items-center gap-3">
+              <div class="flex items-center gap-2 p-1 px-3 border" [style.border-radius]="'var(--ui-border-radius)'"
+                [style.border-color]="'var(--theme-border-secondary)'" [style.background]="'var(--theme-bg-ternary)'">
+                <label class="font-bold uppercase" [style.color]="'var(--theme-text-label)'"
+                  [style.font-size]="'var(--font-size-xs)'">From</label>
+                <input type="date" [(ngModel)]="filters().startDate" (change)="applyFilters()"
+                  class="bg-transparent border-none focus:ring-0" [style.color]="'var(--theme-text-primary)'"
+                  [style.font-size]="'var(--font-size-sm)'">
+              </div>
+              <div class="flex items-center gap-2 p-1 px-3 border" [style.border-radius]="'var(--ui-border-radius)'"
+                [style.border-color]="'var(--theme-border-secondary)'" [style.background]="'var(--theme-bg-ternary)'">
+                <label class="font-bold uppercase" [style.color]="'var(--theme-text-label)'"
+                  [style.font-size]="'var(--font-size-xs)'">To</label>
+                <input type="date" [(ngModel)]="filters().endDate" (change)="applyFilters()"
+                  class="bg-transparent border-none focus:ring-0" [style.color]="'var(--theme-text-primary)'"
+                  [style.font-size]="'var(--font-size-sm)'">
+              </div>
+
+              <p-select [(ngModel)]="filters().department" [options]="departments()" placeholder="Department"
+                (onChange)="applyFilters()" styleClass="w-48"></p-select>
+              <p-button label="Reset" icon="pi pi-refresh" (onClick)="resetFilters()" [text]="true"
+                size="small"></p-button>
             </div>
           </div>
 
-          <!-- Requests Table -->
-          <p-table 
-            [value]="pendingRequests()" 
-            [loading]="isLoading()"
-            [paginator]="true" 
-            [rows]="10"
-            [rowsPerPageOptions]="[10, 25, 50]"
-            styleClass="p-datatable-sm"
-          >
+          <p-table [value]="pendingRequests()" [loading]="isLoading()" [paginator]="true" [rows]="10"
+            styleClass="p-datatable-sm custom-themed-table">
             <ng-template pTemplate="header">
               <tr>
-                <th>Employee</th>
-                <th>Date</th>
-                <th>Type</th>
-                <th>Request Details</th>
-                <th>Reason</th>
-                <th>Submitted</th>
-                <th>Actions</th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Employee
+                </th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Date</th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Type</th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Details
+                </th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Reason</th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Submitted
+                </th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Actions
+                </th>
               </tr>
             </ng-template>
-            
             <ng-template pTemplate="body" let-request>
-              <tr>
+              <tr [style.color]="'var(--theme-text-secondary)'" [style.border-color]="'var(--theme-border-primary)'">
                 <td>
                   <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span class="text-blue-600 font-semibold">
-                        {{ request.employee?.name?.charAt(0) || 'U' }}
-                      </span>
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-[10px] text-white"
+                      [style.background]="'var(--theme-accent-gradient)'">
+                      {{ commonService.getInitials(request.user?.name || 'U') }}
                     </div>
-                    <div>
-                      <p class="font-medium text-gray-800">{{ request.employee?.name || 'Unknown' }}</p>
-                      <p class="text-xs text-gray-500">{{ request.employee?.department || '-' }}</p>
+                    <div class="flex flex-col">
+                      <span class="font-bold" [style.color]="'var(--theme-text-primary)'"
+                        [style.font-size]="'var(--font-size-sm)'">{{ request.user?.name }}</span>
+                      <span [style.font-size]="'var(--font-size-xs)'" [style.color]="'var(--theme-text-label)'">{{
+                        request.user?.employeeId }}</span>
                     </div>
                   </div>
                 </td>
-                
-                <td class="font-medium">{{ request.targetDate | date:'mediumDate' }}</td>
-                
+                <td class="font-medium">{{ formatDate(request.targetDate) }}</td>
                 <td>
-                  <span class="px-2 py-1 rounded-full text-xs font-medium"
-                    [ngClass]="{
-                      'bg-purple-100 text-purple-700': request.type === 'missed_punch',
-                      'bg-blue-100 text-blue-700': request.type === 'correction',
-                      'bg-green-100 text-green-700': request.type === 'work_from_home',
-                      'bg-orange-100 text-orange-700': request.type === 'on_duty'
-                    }">
-                    {{ request.type?.replace('_', ' ') | titlecase }}
+                  <span class="px-2 py-0.5 rounded-full font-bold" [style.font-size]="'var(--font-size-xs)'"
+                    [ngClass]="getStatusClass(request.type)">
+                    {{ getRequestTypeText(request.type) }}
                   </span>
                 </td>
-                
                 <td>
-                  <div class="text-sm">
-                    <p>In: {{ formatTime(request.newFirstIn) }}</p>
-                    <p>Out: {{ formatTime(request.newLastOut) }}</p>
+                  <div class="text-[10px] font-mono leading-tight">
+                    <span [style.color]="'var(--theme-success)'">IN: {{ formatTime(request.newFirstIn) }}</span><br>
+                    <span [style.color]="'var(--theme-error)'">OUT: {{ formatTime(request.newLastOut) }}</span>
                   </div>
                 </td>
-                
-                <td class="max-w-xs">
-                  <p class="text-sm text-gray-600 truncate">{{ request.reason }}</p>
+                <td class="max-w-[150px] truncate" [style.font-size]="'var(--font-size-xs)'"
+                  [pTooltip]="request.reason">
+                  {{ request.reason }}
                 </td>
-                
                 <td>
-                  <p class="text-sm">{{ request.createdAt | date:'shortDate' }}</p>
-                </td>
-                
-                <td>
-                  <div class="flex gap-2">
-                    <p-button 
-                      icon="pi pi-check" 
-                      severity="success" 
-                      [rounded]="true"
-                      [text]="true"
-                      [outlined]="true"
-                      (onClick)="handleRequest(request._id, 'approved')"
-                      [pTooltip]="'Approve'"
-                    ></p-button>
-                    
-                    <p-button 
-                      icon="pi pi-times" 
-                      severity="danger" 
-                      [rounded]="true"
-                      [text]="true"
-                      [outlined]="true"
-                      (onClick)="handleRequest(request._id, 'rejected')"
-                      [pTooltip]="'Reject'"
-                    ></p-button>
-                    
-                    <p-button 
-                      icon="pi pi-eye" 
-                      severity="info" 
-                      [rounded]="true"
-                      [text]="true"
-                      [outlined]="true"
-                      [pTooltip]="'View Details'"
-                    ></p-button>
+                  <div class="flex flex-col text-[10px]">
+                    <span class="font-bold">{{ formatDate(request.createdAt) }}</span>
+                    <span [style.color]="'var(--theme-text-label)'">{{ formatTime(request.createdAt) }}</span>
                   </div>
                 </td>
-              </tr>
-            </ng-template>
-            
-            <ng-template pTemplate="emptymessage">
-              <tr>
-                <td colspan="7" class="text-center py-8 text-gray-500">
-                  <i class="pi pi-inbox text-3xl mb-2"></i>
-                  <p>No pending requests found</p>
+                <td>
+                  <div class="flex gap-1">
+                    <p-button icon="pi pi-check" severity="success" [text]="true" [rounded]="true" size="small"
+                      (onClick)="handleRequest(request._id, 'approved')"></p-button>
+                    <p-button icon="pi pi-times" severity="danger" [text]="true" [rounded]="true" size="small"
+                      (onClick)="handleRequest(request._id, 'rejected')"></p-button>
+                    <p-button icon="pi pi-eye" severity="info" [text]="true" [rounded]="true" size="small"></p-button>
+                  </div>
                 </td>
               </tr>
             </ng-template>
           </p-table>
         </p-tabpanel>
 
-        <!-- Tab 2: Team Attendance -->
         <p-tabpanel value="1">
-          <div class="mb-4">
-            <div class="flex justify-between items-center">
-              <div class="flex flex-wrap items-center gap-3">
-                <p-multiSelect 
-                  [options]="statusOptions()" 
-                  [(ngModel)]="filters().status"
-                  placeholder="Filter by Status"
-                  styleClass="w-64"
-                ></p-multiSelect>
-                
-                <p-select 
-                  [(ngModel)]="filters().department" 
-                  [options]="departments()"
-                  placeholder="Department"
-                  styleClass="w-48"
-                ></p-select>
-                
-                <div class="flex items-center gap-2">
-                  <p-checkbox 
-                    [(ngModel)]="filters().includeSubordinates" 
-                    binary="true"
-                    inputId="includeSub"
-                  ></p-checkbox>
-                  <label for="includeSub" class="text-sm text-gray-600">Include Subordinates</label>
-                </div>
+          <div class="mb-4 flex flex-wrap justify-between items-center gap-3">
+            <div class="flex flex-wrap gap-2">
+              <p-multiSelect [options]="statusOptions()" [(ngModel)]="filters().status" placeholder="Status"
+                (onChange)="applyFilters()" styleClass="w-56"></p-multiSelect>
+              <div class="flex items-center gap-2 ml-2">
+                <p-checkbox [(ngModel)]="filters().includeSubordinates" binary="true" inputId="includeSub"
+                  (onChange)="applyFilters()"></p-checkbox>
+                <label for="includeSub" [style.color]="'var(--theme-text-secondary)'"
+                  [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase tracking-tight">Include
+                  Team</label>
               </div>
-              
-              <div class="flex gap-2">
-                <p-button 
-                  label="Export" 
-                  icon="pi pi-download" 
-                  (onClick)="exportData()"
-                  severity="secondary"
-                ></p-button>
-                
-                <p-button 
-                  label="Refresh" 
-                  icon="pi pi-refresh" 
-                  (onClick)="loadTeamAttendance()"
-                ></p-button>
-              </div>
+            </div>
+            <div class="flex gap-2">
+              <p-button label="Export" icon="pi pi-download" severity="secondary" size="small"
+                (onClick)="exportData()"></p-button>
+              <p-button icon="pi pi-refresh" (onClick)="loadTeamAttendance()" size="small"></p-button>
             </div>
           </div>
 
-          <!-- Team Attendance Table -->
-          <p-table 
-            [value]="teamAttendance()" 
-            [loading]="isLoading()"
-            [paginator]="true" 
-            [rows]="15"
-            [rowsPerPageOptions]="[10, 25, 50]"
-            styleClass="p-datatable-sm"
-          >
+          <p-table [value]="teamAttendance()" [loading]="isLoading()" [paginator]="true" [rows]="15"
+            styleClass="p-datatable-sm custom-themed-table">
             <ng-template pTemplate="header">
               <tr>
-                <th>Employee</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>In Time</th>
-                <th>Out Time</th>
-                <th>Work Hours</th>
-                <th>Late By</th>
-                <th>Overtime</th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Employee
+                </th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Date</th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Status</th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Times</th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Hours</th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Late/OT
+                </th>
               </tr>
             </ng-template>
-            
             <ng-template pTemplate="body" let-record>
-              <tr>
+              <tr [style.color]="'var(--theme-text-secondary)'" [style.border-color]="'var(--theme-border-primary)'">
                 <td>
                   <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span class="text-blue-600 font-semibold">
-                        {{ record.employee?.name?.charAt(0) || 'U' }}
-                      </span>
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-[10px] text-white"
+                      [style.background]="getEmployeeColor(record.user?.name || '')">
+                      {{ commonService.getInitials(record.user?.name || 'U') }}
                     </div>
-                    <div>
-                      <p class="font-medium text-gray-800">{{ record.employee?.name || 'Unknown' }}</p>
-                      <p class="text-xs text-gray-500">{{ record.employee?.employeeId || '-' }}</p>
-                    </div>
+                    <span class="font-bold" [style.color]="'var(--theme-text-primary)'"
+                      [style.font-size]="'var(--font-size-sm)'">{{ record.user?.name }}</span>
                   </div>
                 </td>
-                
-                <td class="font-medium">{{ record.date | date:'mediumDate' }}</td>
-                
-                <td>
-                  <span class="px-2 py-1 rounded-full text-xs font-medium"
-                    [ngClass]="getStatusClass(record.status)">
-                    {{ attendanceService.getStatusDisplayText(record.status) }}
-                  </span>
+                <td>{{ formatDate(record.date) }}</td>
+                <td><span [innerHTML]="getStatusBadgeHtml(record.status)"></span></td>
+                <td class="font-mono text-[10px]">{{ formatTime(record.firstIn) }} - {{ formatTime(record.lastOut) }}
                 </td>
-                
-                <td class="font-mono">{{ formatTime(record.firstIn) }}</td>
-                <td class="font-mono">{{ formatTime(record.lastOut) }}</td>
-                <td class="font-semibold">{{ record.workHours || 0 }} hrs</td>
+                <td class="font-bold" [style.color]="'var(--theme-text-primary)'">{{ record.totalWorkHours || 0 }}h</td>
                 <td>
-                  @if (record.lateMinutes && record.lateMinutes > 0) {
-                    <span class="text-yellow-600 font-medium">{{ record.lateMinutes }} min</span>
-                  } @else {
-                    <span class="text-green-500">On Time</span>
-                  }
-                </td>
-                <td>
-                  @if (record.overtimeHours && record.overtimeHours > 0) {
-                    <span class="text-purple-600 font-medium">+{{ record.overtimeHours }} hrs</span>
-                  } @else {
-                    <span>-</span>
-                  }
+                  <div class="flex flex-col text-[10px] gap-0.5">
+                    @if (record.isLate) { <span [style.color]="'var(--theme-warning)'" class="font-bold">LATE:
+                      {{record.lateMinutes}}m</span> }
+                    @if (record.overtimeHours > 0) { <span [style.color]="'var(--theme-success)'" class="font-bold">OT:
+                      +{{record.overtimeHours}}h</span> }
+                  </div>
                 </td>
               </tr>
             </ng-template>
           </p-table>
         </p-tabpanel>
 
-        <!-- Tab 3: Live Monitoring -->
         <p-tabpanel value="2">
-          <div class="mb-4">
+          <div class="mb-6 flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <div class="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full">
-                <i class="pi pi-circle-fill animate-pulse"></i>
-                <span class="text-sm font-medium">Live Updates</span>
+              <div class="flex items-center gap-2 px-3 py-1 rounded-full border"
+                [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-success)'">
+                <i class="pi pi-circle-fill animate-pulse" [style.color]="'var(--theme-success)'"></i>
+                <span class="font-bold uppercase tracking-widest" [style.color]="'var(--theme-success)'"
+                  [style.font-size]="'var(--font-size-xs)'">Syncing Live</span>
               </div>
-              <p class="text-sm text-gray-500">Auto-refreshes every 30 seconds</p>
+              @if (isLiveUpdating()) { <i class="pi pi-spin pi-spinner" [style.color]="'var(--theme-info)'"></i> }
             </div>
           </div>
 
-          <!-- Live Cards Grid - Fixed filter issue -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div class="bg-white p-4 rounded-lg shadow border">
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="text-sm text-gray-500">Currently Working</p>
-                  <p class="text-2xl font-bold text-gray-800">
-                    {{ getCurrentlyWorking() }}
-                  </p>
-                </div>
-                <i class="pi pi-users text-2xl text-blue-500"></i>
-              </div>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="p-4 border transition-colors" [style.background]="'var(--theme-bg-ternary)'"
+              [style.border-radius]="'var(--ui-border-radius-lg)'"
+              [style.border-color]="'var(--theme-border-secondary)'">
+              <p class="uppercase font-bold mb-1" [style.color]="'var(--theme-text-label)'"
+                [style.font-size]="'var(--font-size-xs)'">Active Now</p>
+              <p class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'">{{
+                getCurrentlyWorking() }}</p>
             </div>
-            
-            <div class="bg-white p-4 rounded-lg shadow border">
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="text-sm text-gray-500">On Break</p>
-                  <p class="text-2xl font-bold text-gray-800">
-                    {{ getOnBreak() }}
-                  </p>
-                </div>
-                <i class="pi pi-coffee text-2xl text-orange-500"></i>
-              </div>
+            <div class="p-4 border transition-colors" [style.background]="'var(--theme-bg-ternary)'"
+              [style.border-radius]="'var(--ui-border-radius-lg)'"
+              [style.border-color]="'var(--theme-border-secondary)'">
+              <p class="uppercase font-bold mb-1" [style.color]="'var(--theme-text-label)'"
+                [style.font-size]="'var(--font-size-xs)'">On Break</p>
+              <p class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-warning)'">{{ getOnBreak() }}</p>
             </div>
-            
-            <div class="bg-white p-4 rounded-lg shadow border">
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="text-sm text-gray-500">Not Checked In</p>
-                  <p class="text-2xl font-bold text-gray-800">
-                    {{ getNotCheckedIn() }}
-                  </p>
-                </div>
-                <i class="pi pi-clock text-2xl text-red-500"></i>
-              </div>
+            <div class="p-4 border transition-colors" [style.background]="'var(--theme-bg-ternary)'"
+              [style.border-radius]="'var(--ui-border-radius-lg)'"
+              [style.border-color]="'var(--theme-border-secondary)'">
+              <p class="uppercase font-bold mb-1" [style.color]="'var(--theme-text-label)'"
+                [style.font-size]="'var(--font-size-xs)'">Not In Yet</p>
+              <p class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-error)'">{{ getNotCheckedIn() }}
+              </p>
             </div>
-            
-            <div class="bg-white p-4 rounded-lg shadow border">
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="text-sm text-gray-500">Work From Home</p>
-                  <p class="text-2xl font-bold text-gray-800">
-                    {{ getWFHCount() }}
-                  </p>
-                </div>
-                <i class="pi pi-home text-2xl text-green-500"></i>
-              </div>
+            <div class="p-4 border transition-colors" [style.background]="'var(--theme-bg-ternary)'"
+              [style.border-radius]="'var(--ui-border-radius-lg)'"
+              [style.border-color]="'var(--theme-border-secondary)'">
+              <p class="uppercase font-bold mb-1" [style.color]="'var(--theme-text-label)'"
+                [style.font-size]="'var(--font-size-xs)'">Remote/WFH</p>
+              <p class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-info)'">{{ getWFHCount() }}</p>
             </div>
           </div>
 
-          <!-- Live Activity Feed -->
-          <div class="bg-white rounded-lg shadow border">
-            <div class="p-4 border-b">
-              <h3 class="font-semibold text-gray-800">Recent Activity</h3>
+          <div class="border" [style.background]="'var(--theme-bg-secondary)'"
+            [style.border-radius]="'var(--ui-border-radius-lg)'" [style.border-color]="'var(--theme-border-primary)'">
+            <div class="p-3 border-b flex justify-between items-center"
+              [style.border-color]="'var(--theme-border-primary)'" [style.background]="'var(--theme-bg-ternary)'">
+              <h4 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'"
+                [style.font-size]="'var(--font-size-xs)'">Recent Events</h4>
+              <p-button icon="pi pi-refresh" [text]="true" size="small" (onClick)="loadLiveAttendance()"></p-button>
             </div>
-            
-            <div class="divide-y">
+            <div class="divide-y" [style.border-color]="'var(--theme-border-primary)'">
               @for (activity of liveAttendance().slice(0, 10); track activity._id) {
-                <div class="p-4 hover:bg-gray-50 transition-colors">
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                      <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span class="text-blue-600 font-semibold">
-                          {{ activity.employee?.name?.charAt(0) || 'U' }}
-                        </span>
-                      </div>
-                      
-                      <div>
-                        <p class="font-medium text-gray-800">{{ activity.employee?.name || 'Unknown' }}</p>
-                        <div class="flex items-center gap-3 text-sm text-gray-500">
-                          <span>{{ activity.employee?.department || '-' }}</span>
-                          <span>•</span>
-                          @if (activity.lastPunch) {
-                            <span>
-                              {{ attendanceService.getStatusDisplayText(activity.lastPunch.type) }} 
-                              at {{ formatTime(activity.lastPunch.time) }}
-                            </span>
-                          }
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div class="flex items-center gap-4">
-                      @if (activity.firstIn && !activity.lastOut) {
-                        <div class="flex items-center gap-2">
-                          <i class="pi pi-circle-fill text-green-500 animate-pulse"></i>
-                          <span class="text-sm font-medium text-green-600">Working</span>
-                        </div>
-                      } @else if (activity.breakStart && !activity.breakEnd) {
-                        <div class="flex items-center gap-2">
-                          <i class="pi pi-circle-fill text-orange-500"></i>
-                          <span class="text-sm font-medium text-orange-600">On Break</span>
-                        </div>
-                      } @else if (!activity.firstIn) {
-                        <div class="flex items-center gap-2">
-                          <i class="pi pi-circle-fill text-gray-400"></i>
-                          <span class="text-sm font-medium text-gray-500">Not Started</span>
-                        </div>
-                      }
-                      
-                      <p-button 
-                        icon="pi pi-eye" 
-                        [text]="true" 
-                        [rounded]="true"
-                        size="small"
-                      ></p-button>
-                    </div>
+              <div class="p-3 flex items-center justify-between hover:bg-white/5 transition-colors">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-[10px]"
+                    [style.background]="getEmployeeColor(activity.user?.name)">
+                    {{ commonService.getInitials(activity.user?.name) }}
+                  </div>
+                  <div>
+                    <p class="font-bold leading-none" [style.color]="'var(--theme-text-primary)'"
+                      [style.font-size]="'var(--font-size-sm)'">{{ activity.user?.name }}</p>
+                    <p [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="mt-1">
+                      {{ activity.user?.department }}</p>
                   </div>
                 </div>
-              }
-              
-              @if (liveAttendance().length === 0) {
-                <div class="p-8 text-center text-gray-500">
-                  <i class="pi pi-users text-3xl mb-2"></i>
-                  <p>No live activity data available</p>
+                <div class="flex items-center gap-4 text-right">
+                  <div>
+                    <p class="font-bold tabular-nums" [style.color]="'var(--theme-text-secondary)'"
+                      [style.font-size]="'var(--font-size-xs)'">{{ formatTime(activity.lastPunch?.time) }}</p>
+                    <p [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'"
+                      class="mt-0.5">{{ getRequestTypeText(activity.lastPunch?.type) }}</p>
+                  </div>
+                  <div class="w-2 h-2 rounded-full"
+                    [style.background]="activity.firstIn && !activity.lastOut ? 'var(--theme-success)' : 'var(--theme-warning)'">
+                  </div>
                 </div>
+              </div>
               }
             </div>
           </div>
@@ -453,428 +307,3 @@
     </p-tabs>
   </div>
 </div>
-
-<!-- attendance-manager.component.html
-<p-toast></p-toast>
-<p-confirmDialog></p-confirmDialog>
-
-<div class="min-h-screen bg-gray-50 p-6">
-  Header
-  <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Attendance Management</h1>
-    <p class="text-gray-500">Manage team attendance, approvals, and monitoring</p>
-  </div>
-
-  Tabs
-  <p-tabView [(activeIndex)]="activeTab()" class="custom-tabs">
-    Tab 1: Pending Requests
-    <p-tabPanel header="Pending Requests">
-      <div class="mb-4">
-        <div class="flex justify-between items-center">
-          <p-toolbar class="p-0 border-0 bg-transparent">
-            <ng-template pTemplate="left">
-              <div class="flex items-center gap-3">
-                <p-datepicker 
-                  [(ngModel)]="filters().startDate" 
-                  placeholder="Start Date" 
-                  dateFormat="yy-mm-dd"
-                  [showIcon]="true"
-                  styleClass="w-40"
-                ></p-datepicker>
-                <span class="text-gray-400">to</span>
-                <p-datepicker 
-                  [(ngModel)]="filters().endDate" 
-                  placeholder="End Date" 
-                  dateFormat="yy-mm-dd"
-                  [showIcon]="true"
-                  styleClass="w-40"
-                ></p-datepicker>
-                
-                <p-select 
-                  [(ngModel)]="filters().department" 
-                  [options]="departments()"
-                  placeholder="Department"
-                  styleClass="w-48"
-                ></p-select>
-                
-                <p-button 
-                  label="Apply" 
-                  icon="pi pi-filter" 
-                  (onClick)="applyFilters()"
-                  severity="secondary"
-                ></p-button>
-                
-                <p-button 
-                  label="Reset" 
-                  icon="pi pi-refresh" 
-                  (onClick)="resetFilters()"
-                  [text]="true"
-                ></p-button>
-              </div>
-            </ng-template>
-          </p-toolbar>
-        </div>
-      </div>
-
-      Requests Table
-      <p-table 
-        [value]="pendingRequests()" 
-        [loading]="isLoading()"
-        [paginator]="true" 
-        [rows]="10"
-        [rowsPerPageOptions]="[10, 25, 50]"
-        styleClass="p-datatable-sm"
-      >
-        <ng-template pTemplate="header">
-          <tr>
-            <th>Employee</th>
-            <th>Date</th>
-            <th>Type</th>
-            <th>Request Details</th>
-            <th>Reason</th>
-            <th>Submitted</th>
-            <th>Actions</th>
-          </tr>
-        </ng-template>
-        
-        <ng-template pTemplate="body" let-request>
-          <tr>
-            <td>
-              <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span class="text-blue-600 font-semibold">
-                    {{ request.employee?.name?.charAt(0) || 'U' }}
-                  </span>
-                </div>
-                <div>
-                  <p class="font-medium text-gray-800">{{ request.employee?.name || 'Unknown' }}</p>
-                  <p class="text-xs text-gray-500">{{ request.employee?.department || '-' }}</p>
-                </div>
-              </div>
-            </td>
-            
-            <td class="font-medium">{{ request.targetDate | date:'mediumDate' }}</td>
-            
-            <td>
-              <span class="px-2 py-1 rounded-full text-xs font-medium"
-                [ngClass]="{
-                  'bg-purple-100 text-purple-700': request.type === 'missed_punch',
-                  'bg-blue-100 text-blue-700': request.type === 'correction',
-                  'bg-green-100 text-green-700': request.type === 'work_from_home',
-                  'bg-orange-100 text-orange-700': request.type === 'on_duty'
-                }">
-                {{ request.type?.replace('_', ' ') | titlecase }}
-              </span>
-            </td>
-            
-            <td>
-              <div class="text-sm">
-                <p>In: {{ formatTime(request.newFirstIn) }}</p>
-                <p>Out: {{ formatTime(request.newLastOut) }}</p>
-              </div>
-            </td>
-            
-            <td class="max-w-xs">
-              <p class="text-sm text-gray-600 truncate">{{ request.reason }}</p>
-            </td>
-            
-            <td>
-              <p class="text-sm">{{ request.createdAt | date:'shortDate' }}</p>
-            </td>
-            
-            <td>
-              <div class="flex gap-2">
-                <p-button 
-                  icon="pi pi-check" 
-                  severity="success" 
-                  [rounded]="true"
-                  [text]="true"
-                  [outlined]="true"
-                  (onClick)="handleRequest(request._id, 'approved')"
-                  tooltip="Approve"
-                ></p-button>
-                
-                <p-button 
-                  icon="pi pi-times" 
-                  severity="danger" 
-                  [rounded]="true"
-                  [text]="true"
-                  [outlined]="true"
-                  (onClick)="handleRequest(request._id, 'rejected')"
-                  tooltip="Reject"
-                ></p-button>
-                
-                <p-button 
-                  icon="pi pi-eye" 
-                  severity="info" 
-                  [rounded]="true"
-                  [text]="true"
-                  [outlined]="true"
-                  tooltip="View Details"
-                ></p-button>
-              </div>
-            </td>
-          </tr>
-        </ng-template>
-        
-        <ng-template pTemplate="emptymessage">
-          <tr>
-            <td colspan="7" class="text-center py-8 text-gray-500">
-              <i class="pi pi-inbox text-3xl mb-2"></i>
-              <p>No pending requests found</p>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </p-tabPanel>
-
-    Tab 2: Team Attendance
-    <p-tabPanel header="Team Attendance">
-      <div class="mb-4">
-        <div class="flex justify-between items-center">
-          <div class="flex items-center gap-3">
-            <p-multiSelect 
-              [options]="statusOptions()" 
-              [(ngModel)]="filters().status"
-              placeholder="Filter by Status"
-              styleClass="w-64"
-            ></p-multiSelect>
-            
-            <p-select 
-              [(ngModel)]="filters().department" 
-              [options]="departments()"
-              placeholder="Department"
-              styleClass="w-48"
-            ></p-select>
-            
-            <div class="flex items-center gap-2">
-              <p-checkbox 
-                [(ngModel)]="filters().includeSubordinates" 
-                binary="true"
-                inputId="includeSub"
-              ></p-checkbox>
-              <label for="includeSub" class="text-sm text-gray-600">Include Subordinates</label>
-            </div>
-          </div>
-          
-          <div class="flex gap-2">
-            <p-button 
-              label="Export" 
-              icon="pi pi-download" 
-              (onClick)="exportData()"
-              severity="secondary"
-            ></p-button>
-            
-            <p-button 
-              label="Refresh" 
-              icon="pi pi-refresh" 
-              (onClick)="loadTeamAttendance()"
-            ></p-button>
-          </div>
-        </div>
-      </div>
-
-      Team Attendance Table
-      <p-table 
-        [value]="teamAttendance()" 
-        [loading]="isLoading()"
-        [paginator]="true" 
-        [rows]="15"
-        [rowsPerPageOptions]="[10, 25, 50]"
-        styleClass="p-datatable-sm"
-      >
-        <ng-template pTemplate="header">
-          <tr>
-            <th>Employee</th>
-            <th>Date</th>
-            <th>Status</th>
-            <th>In Time</th>
-            <th>Out Time</th>
-            <th>Work Hours</th>
-            <th>Late By</th>
-            <th>Overtime</th>
-          </tr>
-        </ng-template>
-        
-        <ng-template pTemplate="body" let-record>
-          <tr>
-            <td>
-              <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span class="text-blue-600 font-semibold">
-                    {{ record.employee?.name?.charAt(0) || 'U' }}
-                  </span>
-                </div>
-                <div>
-                  <p class="font-medium text-gray-800">{{ record.employee?.name || 'Unknown' }}</p>
-                  <p class="text-xs text-gray-500">{{ record.employee?.employeeId || '-' }}</p>
-                </div>
-              </div>
-            </td>
-            
-            <td class="font-medium">{{ record.date | date:'mediumDate' }}</td>
-            
-            <td>
-              <span class="px-2 py-1 rounded-full text-xs font-medium"
-                [ngClass]="getStatusClass(record.status)">
-                {{ attendanceService.getStatusDisplayText(record.status) }}
-              </span>
-            </td>
-            
-            <td class="font-mono">{{ formatTime(record.firstIn) }}</td>
-            <td class="font-mono">{{ formatTime(record.lastOut) }}</td>
-            <td class="font-semibold">{{ record.workHours || 0 }} hrs</td>
-            <td>
-              @if (record.lateMinutes && record.lateMinutes > 0) {
-                <span class="text-yellow-600 font-medium">{{ record.lateMinutes }} min</span>
-              } @else {
-                <span class="text-green-500">On Time</span>
-              }
-            </td>
-            <td>
-              @if (record.overtimeHours && record.overtimeHours > 0) {
-                <span class="text-purple-600 font-medium">+{{ record.overtimeHours }} hrs</span>
-              } @else {
-                <span>-</span>
-              }
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </p-tabPanel>
-
-    Tab 3: Live Monitoring
-    <p-tabPanel header="Live Monitoring">
-      <div class="mb-4">
-        <div class="flex items-center gap-3">
-          <div class="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full">
-            <i class="pi pi-circle-fill animate-pulse"></i>
-            <span class="text-sm font-medium">Live Updates</span>
-          </div>
-          <p class="text-sm text-gray-500">Auto-refreshes every 30 seconds</p>
-        </div>
-      </div>
-
-      Live Cards Grid
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div class="bg-white p-4 rounded-lg shadow border">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-gray-500">Currently Working</p>
-              <p class="text-2xl font-bold text-gray-800">
-                {{ liveAttendance().filter(a => a.firstIn && !a.lastOut).length }}
-              </p>
-            </div>
-            <i class="pi pi-users text-2xl text-blue-500"></i>
-          </div>
-        </div>
-        
-        <div class="bg-white p-4 rounded-lg shadow border">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-gray-500">On Break</p>
-              <p class="text-2xl font-bold text-gray-800">
-                {{ liveAttendance().filter(a => a.breakStart && !a.breakEnd).length }}
-              </p>
-            </div>
-            <i class="pi pi-coffee text-2xl text-orange-500"></i>
-          </div>
-        </div>
-        
-        <div class="bg-white p-4 rounded-lg shadow border">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-gray-500">Not Checked In</p>
-              <p class="text-2xl font-bold text-gray-800">
-                {{ liveAttendance().filter(a => !a.firstIn).length }}
-              </p>
-            </div>
-            <i class="pi pi-clock text-2xl text-red-500"></i>
-          </div>
-        </div>
-        
-        <div class="bg-white p-4 rounded-lg shadow border">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-gray-500">Work From Home</p>
-              <p class="text-2xl font-bold text-gray-800">
-                {{ liveAttendance().filter(a => a.isWFH).length }}
-              </p>
-            </div>
-            <i class="pi pi-home text-2xl text-green-500"></i>
-          </div>
-        </div>
-      </div>
-
-      Live Activity Feed
-      <div class="bg-white rounded-lg shadow border">
-        <div class="p-4 border-b">
-          <h3 class="font-semibold text-gray-800">Recent Activity</h3>
-        </div>
-        
-        <div class="divide-y">
-          @for (activity of liveAttendance().slice(0, 10); track activity._id) {
-            <div class="p-4 hover:bg-gray-50 transition-colors">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span class="text-blue-600 font-semibold">
-                      {{ activity.employee?.name?.charAt(0) || 'U' }}
-                    </span>
-                  </div>
-                  
-                  <div>
-                    <p class="font-medium text-gray-800">{{ activity.employee?.name || 'Unknown' }}</p>
-                    <div class="flex items-center gap-3 text-sm text-gray-500">
-                      <span>{{ activity.employee?.department || '-' }}</span>
-                      <span>•</span>
-                      @if (activity.lastPunch) {
-                        <span>
-                          {{ attendanceService.getStatusDisplayText(activity.lastPunch.type) }} 
-                          at {{ formatTime(activity.lastPunch.time) }}
-                        </span>
-                      }
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="flex items-center gap-4">
-                  @if (activity.firstIn && !activity.lastOut) {
-                    <div class="flex items-center gap-2">
-                      <i class="pi pi-circle-fill text-green-500 animate-pulse"></i>
-                      <span class="text-sm font-medium text-green-600">Working</span>
-                    </div>
-                  } @else if (activity.breakStart && !activity.breakEnd) {
-                    <div class="flex items-center gap-2">
-                      <i class="pi pi-circle-fill text-orange-500"></i>
-                      <span class="text-sm font-medium text-orange-600">On Break</span>
-                    </div>
-                  } @else if (!activity.firstIn) {
-                    <div class="flex items-center gap-2">
-                      <i class="pi pi-circle-fill text-gray-400"></i>
-                      <span class="text-sm font-medium text-gray-500">Not Started</span>
-                    </div>
-                  }
-                  
-                  <p-button 
-                    icon="pi pi-eye" 
-                    [text]="true" 
-                    [rounded]="true"
-                    size="small"
-                  ></p-button>
-                </div>
-              </div>
-            </div>
-          }
-          
-          @if (liveAttendance().length === 0) {
-            <div class="p-8 text-center text-gray-500">
-              <i class="pi pi-users text-3xl mb-2"></i>
-              <p>No live activity data available</p>
-            </div>
-          }
-        </div>
-      </div>
-    </p-tabPanel>
-  </p-tabView>
-</div> -->

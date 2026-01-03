@@ -1,10 +1,3 @@
-/* ==========================================================================
-   GLOBAL DESIGN TOKENS & THEME ENGINE (Angular v20)
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. GLOBAL PRIMITIVES (Constant across all themes)
-   -------------------------------------------------------------------------- */
 :root {
   /* ===== TYPOGRAPHY (Refined Compact Scale) ===== */
   --font-body: 'Inter', -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -231,43 +224,95 @@
   @include apply-canonical-mapping;
 }
 
-/* THEME 3: DARK */
-.theme-dark {
-  --theme-bg-primary: #050f1f;
-  --theme-bg-secondary: #0a1c34;
-  --theme-bg-ternary: #111827;
-  --theme-text-primary: #f8fafc;
-  --theme-text-secondary: #cbd5e1;
-  --theme-text-tertiary: #94a3b8;
-  --theme-text-label: #64748b;
-  --theme-border-primary: #1e293b;
-  --theme-border-secondary: #334155;
-  --theme-accent-primary: #8b5cf6;
-  --theme-accent-secondary: #06b6d4;
-  --theme-accent-tertiary: #ec4899;
-  --theme-accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
-  --theme-accent-focus: rgba(139, 92, 246, 0.2);
-  --theme-accent-hover: #a78bfa;
-  --theme-success: #34d399;
-  --theme-warning: #fbbf24;
-  --theme-error: #f87171;
-  --theme-info: #60a5fa;
-  --theme-disabled: rgba(107, 114, 128, 0.3);
-  --theme-disabled-text: #6b7280;
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-blur: 12px;
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --scroll-thumb: #334155;
-  --scroll-track: #0b1421;
-  --component-bg-hover: rgba(139, 92, 246, 0.1);
-  --component-bg-active: rgba(139, 92, 246, 0.15);
-  --component-border-focus: #a78bfa;
-  --component-surface-raised: #1f2937;
-  --component-divider: #2d3748;
+// /* THEME 3: DARK */
+// .theme-dark {
+//   --theme-bg-primary: #050f1f;
+//   --theme-bg-secondary: #0a1c34;
+//   --theme-bg-ternary: #111827;
+//   --theme-text-primary: #f8fafc;
+//   --theme-text-secondary: #cbd5e1;
+//   --theme-text-tertiary: #94a3b8;
+//   --theme-text-label: #64748b;
+//   --theme-border-primary: #1e293b;
+//   --theme-border-secondary: #334155;
+//   --theme-accent-primary: #8b5cf6;
+//   --theme-accent-secondary: #06b6d4;
+//   --theme-accent-tertiary: #ec4899;
+//   --theme-accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+//   --theme-accent-focus: rgba(139, 92, 246, 0.2);
+//   --theme-accent-hover: #a78bfa;
+//   --theme-success: #34d399;
+//   --theme-warning: #fbbf24;
+//   --theme-error: #f87171;
+//   --theme-info: #60a5fa;
+//   --theme-disabled: rgba(107, 114, 128, 0.3);
+//   --theme-disabled-text: #6b7280;
+//   --glass-bg: rgba(255, 255, 255, 0.05);
+//   --glass-blur: 12px;
+//   --glass-border: rgba(255, 255, 255, 0.1);
+//   --scroll-thumb: #334155;
+//   --scroll-track: #0b1421;
+//   --component-bg-hover: rgba(139, 92, 246, 0.1);
+//   --component-bg-active: rgba(139, 92, 246, 0.15);
+//   --component-border-focus: #a78bfa;
+//   --component-surface-raised: #1f2937;
+//   --component-divider: #2d3748;
 
+//   @include apply-canonical-mapping;
+// }
+/* THEME 3: DARK (Refined for Apex-Infinity) */
+.theme-dark {
+  /* ===== SURFACE COLORS (Layered Depth) ===== */
+  --theme-bg-primary: #020617;     /* Deepest Navy (Slate 950) */
+  --theme-bg-secondary: #0f172a;   /* Cards/Surfaces (Slate 900) */
+  --theme-bg-ternary: #1e293b;     /* Popovers/Modals (Slate 800) */
+  
+  /* ===== TEXT TOKENS (High Contrast) ===== */
+  --theme-text-primary: #f8fafc;   /* Pure White-Gray (Slate 50) */
+  --theme-text-secondary: #e2e8f0; /* Soft White (Slate 200) */
+  --theme-text-tertiary: #94a3b8;  /* Muted Text (Slate 400) */
+  --theme-text-label: #64748b;     /* Metadata/Sub-labels (Slate 500) */
+  
+  /* ===== BORDERS & DIVIDERS ===== */
+  --theme-border-primary: #1e293b;   /* Subtle Border */
+  --theme-border-secondary: #334155; /* Interactive Border */
+  
+  /* ===== ACCENTS (Vibrant Purple/Cyan) ===== */
+  --theme-accent-primary: #a78bfa;   /* Lighter Purple for Dark Mode */
+  --theme-accent-secondary: #22d3ee; /* Bright Cyan */
+  --theme-accent-tertiary: #f472b6;  /* Soft Pink */
+  --theme-accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+  --theme-accent-focus: rgba(167, 139, 250, 0.2);
+  --theme-accent-hover: #c4b5fd;
+  
+  /* ===== SEMANTIC STATES ===== */
+  --theme-success: #10b981; /* Emerald 500 */
+  --theme-warning: #f59e0b; /* Amber 500 */
+  --theme-error: #ef4444;   /* Red 500 */
+  --theme-info: #3b82f6;    /* Blue 500 */
+  
+  /* ===== INTERACTIVE STATES ===== */
+  --theme-disabled: rgba(30, 41, 59, 0.7);
+  --theme-disabled-text: #475569;
+  --component-bg-hover: rgba(139, 92, 246, 0.08);
+  --component-bg-active: rgba(139, 92, 246, 0.12);
+  --component-border-focus: var(--theme-accent-primary);
+  --component-surface-raised: #1e293b;
+  --component-divider: rgba(255, 255, 255, 0.06);
+
+  /* ===== GLASSMORPHISM (Enhanced) ===== */
+  --glass-bg: rgba(15, 23, 42, 0.6);
+  --glass-blur: 16px;
+  --glass-border: rgba(255, 255, 255, 0.08);
+
+  /* ===== SCROLLBAR ===== */
+  --scroll-thumb: #334155;
+  --scroll-track: #020617;
+
+  /* Canonical mapping ensures these variables inject into 
+     your generic component styles (e.g., card-bg uses --theme-bg-secondary) */
   @include apply-canonical-mapping;
 }
-
 /* THEME 4: PREMIUM */
 .theme-premium {
   --theme-bg-primary: linear-gradient(180deg, #f5f7fb 0%, #eef2fb 100%);

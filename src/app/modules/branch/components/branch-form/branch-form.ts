@@ -60,10 +60,20 @@ export class BranchFormComponent implements OnInit {
     this.managerOptions.set(this.masterList.users()); // Assuming users are loaded in master list
   }
 
+  // ngOnInit(): void {
+  //   this.buildForm();
+  //   this.checkRouteForEditMode();
+  // }
   ngOnInit(): void {
     this.buildForm();
     this.checkRouteForEditMode();
+
+    // 📍 Default current location for CREATE only
+    if (!this.branchId) {
+      this.setCurrentLocationIfEmpty();
+    }
   }
+
 
   private checkRouteForEditMode(): void {
     this.route.paramMap.pipe(
@@ -90,12 +100,62 @@ export class BranchFormComponent implements OnInit {
     });
   }
 
+  private setCurrentLocationIfEmpty(): void {
+    if (!navigator.geolocation) {
+      console.warn('Geolocation not supported');
+      return;
+    }
+
+    const locationGroup = this.branchForm.get('location');
+
+    // ✅ Do not override existing location (important for edit mode)
+    if (locationGroup?.value?.lat && locationGroup?.value?.lng) {
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        locationGroup?.patchValue({
+          lat: Number(position.coords.latitude.toFixed(6)),
+          lng: Number(position.coords.longitude.toFixed(6))
+        });
+      },
+      (error) => {
+        console.warn('Location permission denied or unavailable', error);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000
+      }
+    );
+  }
+
+  // private buildForm(): void {
+  //   this.branchForm = this.fb.group({
+  //     name: ['', Validators.required],
+  //     branchCode: [''],
+  //     phoneNumber: [''],
+  //     managerId: [null],
+  //     address: this.fb.group({
+  //       street: [''],
+  //       city: [''],
+  //       state: [''],
+  //       zipCode: [''],
+  //       country: ['India', Validators.required]
+  //     }),
+  //     isMainBranch: [false],
+  //     isActive: [true]
+  //   });
+  // }
   private buildForm(): void {
     this.branchForm = this.fb.group({
       name: ['', Validators.required],
       branchCode: [''],
-      phoneNumber: [''],
+      phoneNumber: ['', [
+        Validators.pattern(/^[0-9+\-()\s]{6,20}$/)
+      ]],
       managerId: [null],
+
       address: this.fb.group({
         street: [''],
         city: [''],
@@ -103,10 +163,50 @@ export class BranchFormComponent implements OnInit {
         zipCode: [''],
         country: ['India', Validators.required]
       }),
+
+      location: this.fb.group({
+        lat: [null],
+        lng: [null]
+      }),
+
       isMainBranch: [false],
       isActive: [true]
     });
   }
+
+  onLocationFieldFocus(): void {
+  const location = this.branchForm.get('location')?.value;
+
+  // ✅ Only fetch if empty
+  if (location?.lat != null && location?.lng != null) {
+    return;
+  }
+
+  if (!navigator.geolocation) {
+    this.messageService.showWarn(
+      'Location not supported',
+      'Geolocation is not available in this browser.'
+    );
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      this.branchForm.get('location')?.patchValue({
+        lat: Number(position.coords.latitude.toFixed(6)),
+        lng: Number(position.coords.longitude.toFixed(6))
+      });
+    },
+    () => {
+      this.messageService.showWarn(
+        'Permission denied',
+        'Unable to fetch current location.'
+      );
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+
 
   private patchForm(branch: any): void {
     // patchValue is robust and will match the form structure,
@@ -134,7 +234,7 @@ export class BranchFormComponent implements OnInit {
       next: (res) => {
         this.messageService.showSuccess('Success', `Branch ${this.editMode() ? 'updated' : 'created'} successfully.`);
         // Notify master list that branches have changed
-        this.masterList.refresh(); 
+        this.masterList.refresh();
         // this.masterList.notifyDataChange('branches'); 
         this.router.navigate(['/branches']); // Navigate back to list
       },

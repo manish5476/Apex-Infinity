@@ -35,6 +35,11 @@ export const SIDEBAR_MENU: MenuItem[] = [
         routerLink: ['/attendence/dashboard']
       },
       {
+        label: 'punching',
+        icon: 'pi pi-home',
+        routerLink: ['/attendence/punching']
+      },
+      {
         label: 'Management',
         icon: 'pi pi-users',
         routerLink: ['/attendence/manager']
