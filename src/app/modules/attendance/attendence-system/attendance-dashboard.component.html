@@ -1,94 +1,908 @@
-<div class="attendance-container">
-  
-  <div class="action-card">
-    <h2>👋 Hello, Employee</h2>
-    <p>Current Status: <span [class]="todayStatus === 'Punched In' ? 'status-active' : 'status-inactive'">{{ todayStatus }}</span></p>
-    
-    <div class="punch-buttons">
-      <button class="btn-punch in" (click)="handlePunch('in')" [disabled]="isLoading">
-        📍 PUNCH IN
-      </button>
-      <button class="btn-punch out" (click)="handlePunch('out')" [disabled]="isLoading">
-        🛑 PUNCH OUT
-      </button>
-    </div>
-    
-    <p class="error-text" *ngIf="locationError">{{ locationError }}</p>
-  </div>
+<!-- attendance-dashboard.component.html -->
+<p-toast></p-toast>
 
-  <div class="history-card">
-    <div class="card-header">
-      <h3>Attendance Log (This Month)</h3>
-      <button class="btn-secondary" (click)="showRegularizeModal = true">Fix Attendance</button>
-    </div>
-
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Status</th>
-          <th>In Time</th>
-          <th>Out Time</th>
-          <th>Work Hours</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let log of attendanceHistory">
-          <td>{{ log.date | date:'mediumDate' }}</td>
-          <td>
-            <span class="badge" [ngClass]="log.status">{{ log.status | uppercase }}</span>
-            <span *ngIf="log.isLate" class="badge late">LATE</span>
-          </td>
-          <td>{{ log.firstIn ? (log.firstIn | date:'shortTime') : '-' }}</td>
-          <td>{{ log.lastOut ? (log.lastOut | date:'shortTime') : '-' }}</td>
-          <td>{{ log.totalWorkHours || 0 }} hrs</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="modal-overlay" *ngIf="showRegularizeModal">
-    <div class="modal-content">
-      <h3>Regularize Attendance</h3>
-      <form [formGroup]="regularizeForm" (ngSubmit)="submitRegularization()">
-        
-        <div class="form-group">
-          <label>Date to Fix</label>
-          <input type="date" formControlName="targetDate">
+<div class="min-h-screen" [style.background-color]="'var(--theme-bg-secondary)'">
+  <!-- Header -->
+  <div class="sticky top-0 z-10 border-b" [style.background-color]="'var(--theme-bg-primary)'"
+    [style.border-color]="'var(--theme-border-primary)'" [style.padding]="'var(--spacing-xl) var(--spacing-3xl)'">
+    <div class="flex justify-between items-center">
+      <div>
+        <h1 [style.font-family]="'var(--font-heading)'" [style.font-size]="'var(--font-size-3xl)'"
+          [style.font-weight]="'var(--font-weight-bold)'" [style.color]="'var(--theme-text-primary)'">
+          Attendance Dashboard
+        </h1>
+        <p [style.font-size]="'var(--font-size-sm)'" [style.color]="'var(--theme-text-secondary)'"
+          [style.margin-top]="'var(--spacing-xs)'">
+          {{ todayDate() }}
+        </p>
+      </div>
+      <div class="flex items-center" [style.gap]="'var(--spacing-md)'">
+        @if (currentLocation()) {
+        <div class="flex items-center rounded-full" [style.gap]="'var(--spacing-sm)'"
+          [style.padding]="'var(--spacing-sm) var(--spacing-lg)'" [style.background-color]="'var(--color-success-50)'"
+          [style.color]="'var(--color-success-700)'" [style.font-size]="'var(--font-size-xs)'">
+          <i class="pi pi-map-marker"></i>
+          <span>Location Active</span>
         </div>
-
-        <div class="form-group">
-          <label>Request Type</label>
-          <select formControlName="type">
-            <option value="missed_punch">Missed Punch</option>
-            <option value="work_from_home">Work From Home</option>
-            <option value="on_duty">On Duty (Field Work)</option>
-          </select>
-        </div>
-
-        <div class="row">
-          <div class="form-group half">
-            <label>Correct In Time</label>
-            <input type="time" formControlName="newFirstIn">
-          </div>
-          <div class="form-group half">
-            <label>Correct Out Time</label>
-            <input type="time" formControlName="newLastOut">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Reason</label>
-          <textarea formControlName="reason" placeholder="Why are you changing this?"></textarea>
-        </div>
-
-        <div class="modal-actions">
-          <button type="button" (click)="showRegularizeModal = false">Cancel</button>
-          <button type="submit" [disabled]="regularizeForm.invalid" class="btn-primary">Submit Request</button>
-        </div>
-
-      </form>
+        }
+        <p-button label="Refresh" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="refreshData()"
+          [style.font-size]="'var(--font-size-sm)'"></p-button>
+        <p-button label="Export" icon="pi pi-download" severity="secondary" [outlined]="true"
+          (onClick)="exportAttendance()" [style.font-size]="'var(--font-size-sm)'"></p-button>
+      </div>
     </div>
   </div>
 
+  <!-- Main Content with Tabs -->
+  <div [style.padding]="'var(--spacing-2xl)'">
+    <div class="border-0 shadow-md" [style.border-radius]="'var(--ui-border-radius-lg)'"
+      [style.box-shadow]="'var(--shadow-md)'" [style.background-color]="'var(--theme-bg-primary)'">
+
+      <p-tabs [value]="activeTab().toString()" (activeIndexChange)="onTabChange({index: $event})">
+        <p-tablist class="border-b" [style.border-color]="'var(--theme-border-primary)'"
+          [style.border-bottom-width]="'var(--ui-border-width)'">
+          @for (tab of [
+          { icon: 'pi-chart-bar', label: 'Overview' },
+          { icon: 'pi-users', label: 'Team' },
+          { icon: 'pi-eye', label: 'Live' },
+          { icon: 'pi-history', label: 'History' }
+          ]; track $index) {
+          <p-tab>
+            <div class="flex items-center transition-colors" [style.gap]="'var(--spacing-sm)'"
+              [style.padding]="'var(--spacing-lg) var(--spacing-2xl)'" [style.font-size]="'var(--font-size-base)'"
+              [ngClass]="{ 
+                   'text-blue-600 border-b-2 border-blue-600': activeTab() === $index.toString() 
+                 }"
+              [style.color]="activeTab() === $index.toString() ? 'var(--color-primary-600)' : 'var(--theme-text-secondary)'"
+              [style.border-bottom-color]="activeTab() === $index.toString() ? 'var(--color-primary-600)' : 'transparent'"
+              [style.border-bottom-width]="'2px'">
+              <i class="pi" [ngClass]="tab.icon"></i>
+              <span [style.font-weight]="'var(--font-weight-medium)'">{{ tab.label }}</span>
+            </div>
+          </p-tab>
+          }
+        </p-tablist>
+
+        <p-tabpanels [style.padding]="'var(--spacing-2xl)'">
+          <!-- Tab 1: Overview -->
+          <p-tabpanel>
+            <div class="grid grid-cols-1 lg:grid-cols-3" [style.gap]="'var(--spacing-2xl)'">
+              <!-- Left Column -->
+              <div class="lg:col-span-2" [style.display]="'flex'" [style.flex-direction]="'column'"
+                [style.gap]="'var(--spacing-2xl)'">
+                <!-- Punch Card -->
+                <div class="border rounded-lg shadow-sm" [style.background-color]="'var(--theme-bg-primary)'"
+                  [style.border-color]="'var(--theme-border-secondary)'"
+                  [style.border-radius]="'var(--ui-border-radius-lg)'" [style.box-shadow]="'var(--shadow-sm)'">
+                  <div class="border-b" [style.padding]="'var(--spacing-xl)'"
+                    [style.border-color]="'var(--theme-border-primary)'">
+                    <div class="flex items-center justify-between">
+                      <h2 [style.font-family]="'var(--font-heading)'" [style.font-size]="'var(--font-size-xl)'"
+                        [style.font-weight]="'var(--font-weight-semibold)'" [style.color]="'var(--theme-text-primary)'">
+                        Today's Attendance
+                      </h2>
+                      @if (todayStatus()?.firstIn && !todayStatus()?.lastOut) {
+                      <div class="flex items-center" [style.gap]="'var(--spacing-sm)'">
+                        <i class="pi pi-clock animate-pulse" [style.color]="'var(--color-primary-500)'"></i>
+                        <span [style.font-family]="'var(--font-mono)'" [style.font-size]="'var(--font-size-lg)'"
+                          [style.font-weight]="'var(--font-weight-bold)'" [style.color]="'var(--theme-text-primary)'">
+                          {{ workDuration() }}
+                        </span>
+                      </div>
+                      }
+                    </div>
+                  </div>
+
+                  <div [style.padding]="'var(--spacing-xl)'">
+                    @if (todayStatus()) {
+                    <div class="grid grid-cols-2 mb-4" [style.gap]="'var(--spacing-2xl)'">
+                      <div [style.display]="'flex'" [style.flex-direction]="'column'" [style.gap]="'var(--spacing-lg)'">
+                        <div>
+                          <p [style.font-size]="'var(--font-size-xs)'" [style.color]="'var(--theme-text-tertiary)'"
+                            [style.margin-bottom]="'var(--spacing-xs)'">
+                            Status
+                          </p>
+                          <div class="flex items-center" [style.gap]="'var(--spacing-sm)'">
+                            <span [style.font-size]="'var(--font-size-lg)'"
+                              [style.font-weight]="'var(--font-weight-semibold)'"
+                             >
+                              <!-- [style.color]="commonService.getStatusColor(todayStatus().status)" -->
+                              {{ getStatusText(todayStatus().status) }}
+                            </span>
+                            @if (todayStatus().isLate) {
+                            <span class="rounded-full" [style.padding]="'var(--spacing-xs) var(--spacing-md)'"
+                              [style.background-color]="'var(--color-warning-100)'"
+                              [style.color]="'var(--color-warning-800)'" [style.font-size]="'var(--font-size-xs)'">
+                              Late
+                            </span>
+                            }
+                          </div>
+                        </div>
+
+                        <div>
+                          <p [style.font-size]="'var(--font-size-xs)'" [style.color]="'var(--theme-text-tertiary)'"
+                            [style.margin-bottom]="'var(--spacing-xs)'">
+                            First In
+                          </p>
+                          <p [style.font-size]="'var(--font-size-lg)'"
+                            [style.font-weight]="'var(--font-weight-semibold)'"
+                            [style.color]="'var(--theme-text-primary)'">
+                            {{ formatTime(todayStatus().firstIn) }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div [style.display]="'flex'" [style.flex-direction]="'column'" [style.gap]="'var(--spacing-lg)'">
+                        <div>
+                          <p [style.font-size]="'var(--font-size-xs)'" [style.color]="'var(--theme-text-tertiary)'"
+                            [style.margin-bottom]="'var(--spacing-xs)'">
+                            Last Out
+                          </p>
+                          <p [style.font-size]="'var(--font-size-lg)'"
+                            [style.font-weight]="'var(--font-weight-semibold)'"
+                            [style.color]="'var(--theme-text-primary)'">
+                            {{ formatTime(todayStatus().lastOut) }}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p [style.font-size]="'var(--font-size-xs)'" [style.color]="'var(--theme-text-tertiary)'"
+                            [style.margin-bottom]="'var(--spacing-xs)'">
+                            Work Hours
+                          </p>
+                          <p [style.font-size]="'var(--font-size-lg)'"
+                            [style.font-weight]="'var(--font-weight-semibold)'"
+                            [style.color]="'var(--theme-text-primary)'">
+                            {{ todayStatus().totalWorkHours || '0.00' }} hrs
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="border-t mt-4 pt-4" [style.border-color]="'var(--theme-border-primary)'"
+                      [style.padding-top]="'var(--spacing-lg)'" [style.margin-top]="'var(--spacing-lg)'">
+                      <div class="flex" [style.gap]="'var(--spacing-sm)'">
+                        <p-button label="Punch In" icon="pi pi-sign-in" severity="success" [disabled]="!canPunchIn()"
+                          (onClick)="showPunchModal.set(true); punchForm.patchValue({type: 'in'})" styleClass="flex-1"
+                          [style.font-size]="'var(--font-size-sm)'"></p-button>
+
+                        <p-button label="Punch Out" icon="pi pi-sign-out" severity="danger" [disabled]="!canPunchOut()"
+                          (onClick)="showPunchModal.set(true); punchForm.patchValue({type: 'out'})" styleClass="flex-1"
+                          [style.font-size]="'var(--font-size-sm)'"></p-button>
+
+                        <p-button label="Break" icon="pi pi-coffee" severity="info" [outlined]="true"
+                          (onClick)="showPunchModal.set(true); punchForm.patchValue({type: 'break_start'})"
+                          [style.font-size]="'var(--font-size-sm)'"></p-button>
+                      </div>
+                    </div>
+                    } @else {
+                    <div class="text-center" [style.padding]="'var(--spacing-3xl) 0'">
+                      <p-progressSpinner></p-progressSpinner>
+                      <p [style.margin-top]="'var(--spacing-lg)'" [style.font-size]="'var(--font-size-sm)'"
+                        [style.color]="'var(--theme-text-tertiary)'">
+                        Loading attendance data...
+                      </p>
+                    </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Weekly Stats Card -->
+                <div class="border rounded-lg shadow-sm" [style.background-color]="'var(--theme-bg-primary)'"
+                  [style.border-color]="'var(--theme-border-secondary)'"
+                  [style.border-radius]="'var(--ui-border-radius-lg)'" [style.box-shadow]="'var(--shadow-sm)'">
+                  <div class="border-b" [style.padding]="'var(--spacing-xl)'"
+                    [style.border-color]="'var(--theme-border-primary)'">
+                    <h2 [style.font-family]="'var(--font-heading)'" [style.font-size]="'var(--font-size-xl)'"
+                      [style.font-weight]="'var(--font-weight-semibold)'" [style.color]="'var(--theme-text-primary)'">
+                      This Week's Summary
+                    </h2>
+                  </div>
+                  <div [style.padding]="'var(--spacing-xl)'">
+                    @if (weeklyData().length > 0) {
+                    <div class="grid grid-cols-7" [style.gap]="'var(--spacing-xs)'">
+                      @for (day of weeklyData(); track day.day) {
+                      <div class="text-center">
+                        <p [style.font-size]="'var(--font-size-xs)'" [style.color]="'var(--theme-text-tertiary)'"
+                          [style.margin-bottom]="'var(--spacing-xs)'">
+                          {{ day.day }}
+                        </p>
+                        <div class="relative">
+                          <div class="w-8 h-8 mx-auto rounded-lg flex items-center justify-center"
+                            [style.font-size]="'var(--font-size-xs)'"
+                            [style.font-weight]="'var(--font-weight-semibold)'" [ngClass]="getStatusClass(day.status)">
+                            {{ day.hours > 0 ? day.hours.toFixed(1) : '-' }}
+                          </div>
+                          @if (day.status) {
+                          <div class="absolute -top-1 -right-1 w-2 h-2 rounded-full border"
+                            [style.border-color]="'var(--theme-bg-primary)'"
+                            [style.border-width]="'var(--ui-border-width)'"
+                          >
+                            <!-- [style.background-color]="getStatusDotColor(day.status)" -->
+                          </div>
+                          }
+                        </div>
+                      </div>
+                      }
+                    </div>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Column -->
+              <div [style.display]="'flex'" [style.flex-direction]="'column'" [style.gap]="'var(--spacing-2xl)'">
+                <!-- Quick Actions -->
+                <div class="border rounded-lg shadow-sm" [style.background-color]="'var(--theme-bg-primary)'"
+                  [style.border-color]="'var(--theme-border-secondary)'"
+                  [style.border-radius]="'var(--ui-border-radius-lg)'" [style.box-shadow]="'var(--shadow-sm)'">
+                  <div class="border-b" [style.padding]="'var(--spacing-xl)'"
+                    [style.border-color]="'var(--theme-border-primary)'">
+                    <h2 [style.font-family]="'var(--font-heading)'" [style.font-size]="'var(--font-size-lg)'"
+                      [style.font-weight]="'var(--font-weight-semibold)'" [style.color]="'var(--theme-text-primary)'">
+                      Quick Actions
+                    </h2>
+                  </div>
+                  <div [style.padding]="'var(--spacing-xl)'">
+                    <div [style.display]="'flex'" [style.flex-direction]="'column'" [style.gap]="'var(--spacing-lg)'">
+                      <p-button label="Request Regularization" icon="pi pi-pencil" severity="help" [outlined]="true"
+                        (onClick)="showRegularizeModal.set(true)" styleClass="justify-start w-full"
+                        [style.font-size]="'var(--font-size-sm)'"></p-button>
+
+                      <p-button label="View Attendance History" icon="pi pi-history" severity="secondary"
+                        [outlined]="true" (onClick)="showHistoryModal.set(true)" styleClass="justify-start w-full"
+                        [style.font-size]="'var(--font-size-sm)'"></p-button>
+
+                      <p-button label="My Requests" icon="pi pi-inbox" severity="info" [outlined]="true"
+                        (onClick)="activeTab.set(3)" styleClass="justify-start w-full"
+                        [style.font-size]="'var(--font-size-sm)'"></p-button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Recent Punches -->
+                <div class="border rounded-lg shadow-sm" [style.background-color]="'var(--theme-bg-primary)'"
+                  [style.border-color]="'var(--theme-border-secondary)'"
+                  [style.border-radius]="'var(--ui-border-radius-lg)'" [style.box-shadow]="'var(--shadow-sm)'">
+                  <div class="border-b" [style.padding]="'var(--spacing-xl)'"
+                    [style.border-color]="'var(--theme-border-primary)'">
+                    <h2 [style.font-family]="'var(--font-heading)'" [style.font-size]="'var(--font-size-lg)'"
+                      [style.font-weight]="'var(--font-weight-semibold)'" [style.color]="'var(--theme-text-primary)'">
+                      Recent Activity
+                    </h2>
+                  </div>
+                  <div [style.padding]="'var(--spacing-xl)'">
+                    <div [style.display]="'flex'" [style.flex-direction]="'column'" [style.gap]="'var(--spacing-lg)'">
+                      @for (punch of recentPunches(); track punch._id) {
+                      <div class="hover:bg-gray-50 rounded-lg transition-colors" [style.padding]="'var(--spacing-lg)'"
+                        [style.transition]="'var(--transition-colors)'"
+                        [style.border-radius]="'var(--ui-border-radius)'">
+                        <div class="flex items-center justify-between">
+                          <div>
+                            <p [style.font-size]="'var(--font-size-base)'"
+                              [style.font-weight]="'var(--font-weight-medium)'"
+                              [style.color]="'var(--theme-text-primary)'">
+                              {{ commonService.getPunchTypeText(punch.type) }}
+                            </p>
+                            <p [style.font-size]="'var(--font-size-xs)'" [style.color]="'var(--theme-text-tertiary)'">
+                              {{ formatDate(punch.date) }}
+                            </p>
+                          </div>
+                          <div>
+                            <span class="rounded-full" [style.padding]="'var(--spacing-xs) var(--spacing-md)'"
+                              [style.font-size]="'var(--font-size-xs)'"
+                              [style.font-weight]="'var(--font-weight-medium)'" [ngClass]="getStatusClass(punch.type)">
+                              {{ punch.type | uppercase }}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      } @empty {
+                      <div class="text-center" [style.padding]="'var(--spacing-xl) 0'">
+                        <i class="pi pi-clock" [style.font-size]="'var(--font-size-3xl)'"
+                          [style.color]="'var(--theme-text-tertiary)'" [style.margin-bottom]="'var(--spacing-sm)'"></i>
+                        <p [style.font-size]="'var(--font-size-sm)'" [style.color]="'var(--theme-text-tertiary)'">
+                          No recent activity
+                        </p>
+                      </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Monthly Stats -->
+                @if (attendanceSummary()) {
+                <div class="border rounded-lg shadow-sm" [style.background-color]="'var(--theme-bg-primary)'"
+                  [style.border-color]="'var(--theme-border-secondary)'"
+                  [style.border-radius]="'var(--ui-border-radius-lg)'" [style.box-shadow]="'var(--shadow-sm)'">
+                  <div class="border-b" [style.padding]="'var(--spacing-xl)'"
+                    [style.border-color]="'var(--theme-border-primary)'">
+                    <h2 [style.font-family]="'var(--font-heading)'" [style.font-size]="'var(--font-size-lg)'"
+                      [style.font-weight]="'var(--font-weight-semibold)'" [style.color]="'var(--theme-text-primary)'">
+                      Monthly Overview
+                    </h2>
+                  </div>
+                  <div [style.padding]="'var(--spacing-xl)'">
+                    <div [style.display]="'flex'" [style.flex-direction]="'column'" [style.gap]="'var(--spacing-lg)'">
+                      <div class="flex justify-between items-center">
+                        <span [style.font-size]="'var(--font-size-sm)'" [style.color]="'var(--theme-text-secondary)'">
+                          Presents
+                        </span>
+                        <span [style.font-size]="'var(--font-size-base)'"
+                          [style.font-weight]="'var(--font-weight-semibold)'"
+                          [style.color]="'var(--color-success-600)'">
+                          {{ attendanceSummary().presentDays || 0 }}
+                        </span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                        <span [style.font-size]="'var(--font-size-sm)'" [style.color]="'var(--theme-text-secondary)'">
+                          Absents
+                        </span>
+                        <span [style.font-size]="'var(--font-size-base)'"
+                          [style.font-weight]="'var(--font-weight-semibold)'" [style.color]="'var(--color-error-600)'">
+                          {{ attendanceSummary().absentDays || 0 }}
+                        </span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                        <span [style.font-size]="'var(--font-size-sm)'" [style.color]="'var(--theme-text-secondary)'">
+                          Late Days
+                        </span>
+                        <span [style.font-size]="'var(--font-size-base)'"
+                          [style.font-weight]="'var(--font-weight-semibold)'"
+                          [style.color]="'var(--color-warning-600)'">
+                          {{ attendanceSummary().lateDays || 0 }}
+                        </span>
+                      </div>
+                      <div class="flex justify-between items-center pt-4 border-t"
+                        [style.padding-top]="'var(--spacing-lg)'" [style.border-color]="'var(--theme-border-primary)'">
+                        <span [style.font-size]="'var(--font-size-sm)'" [style.color]="'var(--theme-text-secondary)'">
+                          Total Work Hours
+                        </span>
+                        <span [style.font-size]="'var(--font-size-base)'"
+                          [style.font-weight]="'var(--font-weight-semibold)'"
+                          [style.color]="'var(--color-primary-600)'">
+                          {{ attendanceSummary().totalWorkHours || 0 }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                }
+              </div>
+            </div>
+          </p-tabpanel>
+
+          <!-- Tab 2: Team -->
+          <p-tabpanel>
+            <div class="mb-4">
+              <div class="flex justify-between items-center">
+                <h2 [style.font-family]="'var(--font-heading)'" [style.font-size]="'var(--font-size-xl)'"
+                  [style.font-weight]="'var(--font-weight-semibold)'" [style.color]="'var(--theme-text-primary)'">
+                  Team Attendance
+                </h2>
+                <p-button label="Refresh" icon="pi pi-refresh" (onClick)="loadTeamAttendance()"></p-button>
+              </div>
+            </div>
+
+            <p-table [value]="teamAttendance()" [loading]="isLoading()" styleClass="p-datatable-sm">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th [style.font-size]="'var(--font-size-sm)'" [style.font-weight]="'var(--font-weight-semibold)'"
+                    [style.color]="'var(--theme-text-primary)'">
+                    Employee
+                  </th>
+                  <th [style.font-size]="'var(--font-size-sm)'" [style.font-weight]="'var(--font-weight-semibold)'"
+                    [style.color]="'var(--theme-text-primary)'">
+                    Date
+                  </th>
+                  <th [style.font-size]="'var(--font-size-sm)'" [style.font-weight]="'var(--font-weight-semibold)'"
+                    [style.color]="'var(--theme-text-primary)'">
+                    Status
+                  </th>
+                  <th [style.font-size]="'var(--font-size-sm)'" [style.font-weight]="'var(--font-weight-semibold)'"
+                    [style.color]="'var(--theme-text-primary)'">
+                    In Time
+                  </th>
+                  <th [style.font-size]="'var(--font-size-sm)'" [style.font-weight]="'var(--font-weight-semibold)'"
+                    [style.color]="'var(--theme-text-primary)'">
+                    Out Time
+                  </th>
+                  <th [style.font-size]="'var(--font-size-sm)'" [style.font-weight]="'var(--font-weight-semibold)'"
+                    [style.color]="'var(--theme-text-primary)'">
+                    Work Hours
+                  </th>
+                  <th [style.font-size]="'var(--font-size-sm)'" [style.font-weight]="'var(--font-weight-semibold)'"
+                    [style.color]="'var(--theme-text-primary)'">
+                    Late By
+                  </th>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="body" let-record>
+                <tr>
+                  <td>
+                    <div class="flex items-center" [style.gap]="'var(--spacing-sm)'">
+                      <div class="rounded-full flex items-center justify-center" [style.width]="'var(--spacing-4xl)'"
+                        [style.height]="'var(--spacing-4xl)'"
+                        [style.background-color]="getEmployeeColor(record.user?.name || '')">
+                        <span [style.font-size]="'var(--font-size-xs)'"
+                          [style.font-weight]="'var(--font-weight-semibold)'"
+                          [style.color]="'var(--theme-text-inverse)'">
+                          {{ getEmployeeInitials(record.user?.name || 'U') }}
+                        </span>
+                      </div>
+                      <div>
+                        <p [style.font-size]="'var(--font-size-base)'" [style.font-weight]="'var(--font-weight-medium)'"
+                          [style.color]="'var(--theme-text-primary)'">
+                          {{ record.user?.name || 'Unknown' }}
+                        </p>
+                        <p [style.font-size]="'var(--font-size-xs)'" [style.color]="'var(--theme-text-tertiary)'">
+                          {{ record.user?.department || '-' }}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td [style.font-size]="'var(--font-size-base)'" [style.font-weight]="'var(--font-weight-medium)'"
+                    [style.color]="'var(--theme-text-primary)'">
+                    {{ formatDate(record.date) }}
+                  </td>
+
+                  <td>
+                    <span [innerHTML]="commonService.attendanceStatusBadgeHtml(record.status)"></span>
+                  </td>
+
+                  <td [style.font-family]="'var(--font-mono)'" [style.font-size]="'var(--font-size-base)'"
+                    [style.color]="'var(--theme-text-primary)'">
+                    {{ formatTime(record.firstIn) }}
+                  </td>
+                  <td [style.font-family]="'var(--font-mono)'" [style.font-size]="'var(--font-size-base)'"
+                    [style.color]="'var(--theme-text-primary)'">
+                    {{ formatTime(record.lastOut) }}
+                  </td>
+
+                  <td>
+                    <div [style.font-size]="'var(--font-size-base)'" [style.font-weight]="'var(--font-weight-semibold)'"
+                      [style.color]="'var(--theme-text-primary)'">
+                      {{ record.totalWorkHours || 0 }} hrs
+                    </div>
+                  </td>
+
+                  <td>
+                    @if (record.isLate) {
+                    <span class="flex items-center" [style.gap]="'var(--spacing-xs)'"
+                      [style.font-size]="'var(--font-size-sm)'" [style.font-weight]="'var(--font-weight-medium)'"
+                      [style.color]="'var(--color-warning-600)'">
+                      <i class="pi pi-clock"></i>
+                      {{ record.lateMinutes || 0 }} min
+                    </span>
+                    } @else {
+                    <span class="flex items-center" [style.gap]="'var(--spacing-xs)'"
+                      [style.font-size]="'var(--font-size-sm)'" [style.color]="'var(--color-success-500)'">
+                      <i class="pi pi-check"></i>
+                      On Time
+                    </span>
+                    }
+                  </td>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="7" class="text-center" [style.padding]="'var(--spacing-3xl) 0'"
+                    [style.color]="'var(--theme-text-tertiary)'">
+                    <i class="pi pi-users" [style.font-size]="'var(--font-size-3xl)'"
+                      [style.margin-bottom]="'var(--spacing-sm)'"></i>
+                    <p [style.font-size]="'var(--font-size-sm)'">
+                      No team attendance records found
+                    </p>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </p-tabpanel>
+
+          <!-- Tab 3: Live -->
+          <p-tabpanel>
+            <div class="mb-4">
+              <div class="flex items-center" [style.gap]="'var(--spacing-lg)'">
+                <div class="flex items-center rounded-full" [style.gap]="'var(--spacing-sm)'"
+                  [style.padding]="'var(--spacing-xs) var(--spacing-lg)'"
+                  [style.background-color]="'var(--color-success-100)'" [style.color]="'var(--color-success-700)'">
+                  <i class="pi pi-circle-fill animate-pulse"></i>
+                  <span [style.font-size]="'var(--font-size-sm)'" [style.font-weight]="'var(--font-weight-medium)'">
+                    Live Updates
+                  </span>
+                </div>
+                <p [style.font-size]="'var(--font-size-sm)'" [style.color]="'var(--theme-text-tertiary)'">
+                  Auto-refreshes every 30 seconds
+                </p>
+              </div>
+            </div>
+
+            <!-- Live Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 mb-6" [style.gap]="'var(--spacing-lg)'">
+              <div class="border rounded-lg shadow-sm p-4" [style.background-color]="'var(--theme-bg-primary)'"
+                [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius)'"
+                [style.box-shadow]="'var(--shadow-sm)'" [style.padding]="'var(--spacing-xl)'">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p [style.font-size]="'var(--font-size-sm)'" [style.color]="'var(--theme-text-tertiary)'">
+                      Currently Working
+                    </p>
+                    <p [style.font-family]="'var(--font-heading)'" [style.font-size]="'var(--font-size-2xl)'"
+                      [style.font-weight]="'var(--font-weight-bold)'" [style.color]="'var(--theme-text-primary)'">
+                      {{ currentlyWorkingCount }}
+                    </p>
+                  </div>
+                  <i class="pi pi-users" [style.font-size]="'var(--font-size-2xl)'"
+                    [style.color]="'var(--color-primary-500)'"></i>
+                </div>
+              </div>
+
+              <div class="border rounded-lg shadow-sm p-4" [style.background-color]="'var(--theme-bg-primary)'"
+                [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius)'"
+                [style.box-shadow]="'var(--shadow-sm)'" [style.padding]="'var(--spacing-xl)'">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p [style.font-size]="'var(--font-size-sm)'" [style.color]="'var(--theme-text-tertiary)'">
+                      On Break
+                    </p>
+                    <p [style.font-family]="'var(--font-heading)'" [style.font-size]="'var(--font-size-2xl)'"
+                      [style.font-weight]="'var(--font-weight-bold)'" [style.color]="'var(--theme-text-primary)'">
+                      {{ onBreakCount }}
+                    </p>
+                  </div>
+                  <i class="pi pi-coffee" [style.font-size]="'var(--font-size-2xl)'"
+                    [style.color]="'var(--color-warning-500)'"></i>
+                </div>
+              </div>
+
+              <div class="border rounded-lg shadow-sm p-4" [style.background-color]="'var(--theme-bg-primary)'"
+                [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius)'"
+                [style.box-shadow]="'var(--shadow-sm)'" [style.padding]="'var(--spacing-xl)'">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p [style.font-size]="'var(--font-size-sm)'" [style.color]="'var(--theme-text-tertiary)'">
+                      Not Checked In
+                    </p>
+                    <p [style.font-family]="'var(--font-heading)'" [style.font-size]="'var(--font-size-2xl)'"
+                      [style.font-weight]="'var(--font-weight-bold)'" [style.color]="'var(--theme-text-primary)'">
+                      {{ notCheckedInCount }}
+                    </p>
+                  </div>
+                  <i class="pi pi-clock" [style.font-size]="'var(--font-size-2xl)'"
+                    [style.color]="'var(--color-error-500)'"></i>
+                </div>
+              </div>
+
+              <div class="border rounded-lg shadow-sm p-4" [style.background-color]="'var(--theme-bg-primary)'"
+                [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius)'"
+                [style.box-shadow]="'var(--shadow-sm)'" [style.padding]="'var(--spacing-xl)'">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p [style.font-size]="'var(--font-size-sm)'" [style.color]="'var(--theme-text-tertiary)'">
+                      Work From Home
+                    </p>
+                    <p [style.font-family]="'var(--font-heading)'" [style.font-size]="'var(--font-size-2xl)'"
+                      [style.font-weight]="'var(--font-weight-bold)'" [style.color]="'var(--theme-text-primary)'">
+                      {{ wfhCount }}
+                    </p>
+                  </div>
+                  <i class="pi pi-home" [style.font-size]="'var(--font-size-2xl)'"
+                    [style.color]="'var(--color-success-500)'"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Live Activity Feed -->
+            <div class="border rounded-lg shadow-sm" [style.background-color]="'var(--theme-bg-primary)'"
+              [style.border-color]="'var(--theme-border-secondary)'"
+              [style.border-radius]="'var(--ui-border-radius-lg)'" [style.box-shadow]="'var(--shadow-sm)'">
+              <div class="border-b p-4" [style.padding]="'var(--spacing-xl)'"
+                [style.border-color]="'var(--theme-border-primary)'">
+                <h3 [style.font-size]="'var(--font-size-lg)'" [style.font-weight]="'var(--font-weight-semibold)'"
+                  [style.color]="'var(--theme-text-primary)'">
+                  Live Activity Feed
+                </h3>
+              </div>
+
+              <div class="divide-y">
+                @for (activity of liveAttendance().slice(0, 10); track activity._id) {
+                <div class="p-4 hover:bg-gray-50 transition-colors" [style.padding]="'var(--spacing-xl)'"
+                  [style.transition]="'var(--transition-colors)'">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center" [style.gap]="'var(--spacing-lg)'">
+                      <div class="rounded-full flex items-center justify-center" [style.width]="'var(--spacing-5xl)'"
+                        [style.height]="'var(--spacing-5xl)'"
+                        [style.background-color]="getEmployeeColor(activity.user?.name || '')">
+                        <span [style.font-size]="'var(--font-size-sm)'"
+                          [style.font-weight]="'var(--font-weight-semibold)'"
+                          [style.color]="'var(--theme-text-inverse)'">
+                          {{ getEmployeeInitials(activity.user?.name || 'U') }}
+                        </span>
+                      </div>
+
+                      <div>
+                        <p [style.font-size]="'var(--font-size-base)'" [style.font-weight]="'var(--font-weight-medium)'"
+                          [style.color]="'var(--theme-text-primary)'">
+                          {{ activity.user?.name || 'Unknown' }}
+                        </p>
+                        <div class="flex items-center" [style.gap]="'var(--spacing-lg)'">
+                          <span [style.font-size]="'var(--font-size-sm)'" [style.color]="'var(--theme-text-tertiary)'">
+                            {{ activity.user?.department || '-' }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center" [style.gap]="'var(--spacing-xl)'">
+                      @if (activity.firstIn && !activity.lastOut) {
+                      <div class="flex items-center" [style.gap]="'var(--spacing-sm)'">
+                        <i class="pi pi-circle-fill animate-pulse" [style.color]="'var(--color-success-500)'"></i>
+                        <span [style.font-size]="'var(--font-size-sm)'"
+                          [style.font-weight]="'var(--font-weight-medium)'" [style.color]="'var(--color-success-600)'">
+                          Working
+                        </span>
+                      </div>
+                      } @else if (activity.workType === 'wfh') {
+                      <div class="flex items-center" [style.gap]="'var(--spacing-sm)'">
+                        <i class="pi pi-circle-fill" [style.color]="'var(--color-primary-500)'"></i>
+                        <span [style.font-size]="'var(--font-size-sm)'"
+                          [style.font-weight]="'var(--font-weight-medium)'" [style.color]="'var(--color-primary-600)'">
+                          WFH
+                        </span>
+                      </div>
+                      } @else if (!activity.firstIn) {
+                      <div class="flex items-center" [style.gap]="'var(--spacing-sm)'">
+                        <i class="pi pi-circle-fill" [style.color]="'var(--color-gray-400)'"></i>
+                        <span [style.font-size]="'var(--font-size-sm)'"
+                          [style.font-weight]="'var(--font-weight-medium)'" [style.color]="'var(--color-gray-500)'">
+                          Not Started
+                        </span>
+                      </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+                }
+
+                @if (liveAttendance().length === 0) {
+                <div class="text-center" [style.padding]="'var(--spacing-4xl) 0'">
+                  <i class="pi pi-users" [style.font-size]="'var(--font-size-3xl)'"
+                    [style.color]="'var(--theme-text-tertiary)'" [style.margin-bottom]="'var(--spacing-sm)'"></i>
+                  <p [style.font-size]="'var(--font-size-sm)'" [style.color]="'var(--theme-text-tertiary)'">
+                    No live activity data available
+                  </p>
+                </div>
+                }
+              </div>
+            </div>
+          </p-tabpanel>
+
+          <!-- Tab 4: History -->
+          <p-tabpanel>
+            <div class="mb-4">
+              <h2 [style.font-family]="'var(--font-heading)'" [style.font-size]="'var(--font-size-xl)'"
+                [style.font-weight]="'var(--font-weight-semibold)'" [style.color]="'var(--theme-text-primary)'"
+                [style.margin-bottom]="'var(--spacing-lg)'">
+                Attendance History
+              </h2>
+
+              <div class="flex flex-wrap items-center mb-4" [style.gap]="'var(--spacing-lg)'">
+                <div class="flex items-center" [style.gap]="'var(--spacing-sm)'">
+                  <label [style.font-size]="'var(--font-size-sm)'" [style.color]="'var(--theme-text-secondary)'">
+                    From
+                  </label>
+                  <input pInputText type="date" formControlName="startDate" [style.width]="'10rem'"
+                    [style.font-size]="'var(--font-size-sm)'">
+                </div>
+
+                <div class="flex items-center" [style.gap]="'var(--spacing-sm)'">
+                  <label [style.font-size]="'var(--font-size-sm)'" [style.color]="'var(--theme-text-secondary)'">
+                    To
+                  </label>
+                  <input pInputText type="date" formControlName="endDate" [style.width]="'10rem'"
+                    [style.font-size]="'var(--font-size-sm)'">
+                </div>
+
+                <p-button label="Apply Filters" icon="pi pi-filter" (onClick)="applyFilters()" severity="secondary"
+                  [style.font-size]="'var(--font-size-sm)'"></p-button>
+              </div>
+            </div>
+
+            <div class="border rounded-lg shadow-sm" [style.background-color]="'var(--theme-bg-primary)'"
+              [style.border-color]="'var(--theme-border-secondary)'"
+              [style.border-radius]="'var(--ui-border-radius-lg)'" [style.box-shadow]="'var(--shadow-md)'"
+              [style.padding]="'var(--spacing-2xl)'">
+              <p [style.font-size]="'var(--font-size-base)'" [style.color]="'var(--theme-text-primary)'">
+                Attendance history content goes here...
+              </p>
+            </div>
+          </p-tabpanel>
+        </p-tabpanels>
+      </p-tabs>
+    </div>
+  </div>
 </div>
+
+<!-- Punch Modal -->
+<p-dialog [visible]="showPunchModal()" header="Record Attendance" [modal]="true" [style]="{ width: '28rem' }"
+  (onHide)="punchForm.reset({ type: 'in', deviceId: 'web' })">
+  <form [formGroup]="punchForm">
+    <div [style.display]="'flex'" [style.flex-direction]="'column'" [style.gap]="'var(--spacing-lg)'">
+      <div>
+        <label [style.display]="'block'" [style.font-size]="'var(--font-size-sm)'"
+          [style.font-weight]="'var(--font-weight-medium)'" [style.color]="'var(--theme-text-primary)'"
+          [style.margin-bottom]="'var(--spacing-sm)'">
+          Punch Type
+        </label>
+        <div class="grid grid-cols-2" [style.gap]="'var(--spacing-sm)'">
+          @for (type of ['in', 'out', 'break_start', 'break_end']; track type) {
+          <button type="button" (click)="punchForm.patchValue({type: type})"
+            class="border rounded-lg text-center transition-colors" [style.padding]="'var(--spacing-lg)'"
+            [style.border-radius]="'var(--ui-border-radius)'" [style.transition]="'var(--transition-colors)'"
+            [style.border-color]="punchForm.value.type === type ? 'var(--color-primary-500)' : 'var(--theme-border-secondary)'"
+            [style.background-color]="punchForm.value.type === type ? 'var(--color-primary-50)' : 'var(--theme-bg-primary)'"
+            [style.color]="punchForm.value.type === type ? 'var(--color-primary-700)' : 'var(--theme-text-primary)'">
+            <i class="pi" [ngClass]="{
+                'pi-sign-in': type === 'in',
+                'pi-sign-out': type === 'out',
+                'pi-coffee': type.includes('break')
+              }"></i>
+            <p [style.margin-top]="'var(--spacing-xs)'" [style.font-size]="'var(--font-size-sm)'"
+              [style.font-weight]="'var(--font-weight-medium)'">
+              {{ commonService.getPunchTypeText(type) }}
+            </p>
+          </button>
+          }
+        </div>
+      </div>
+
+      <div>
+        <label [style.display]="'block'" [style.font-size]="'var(--font-size-sm)'"
+          [style.font-weight]="'var(--font-weight-medium)'" [style.color]="'var(--theme-text-primary)'"
+          [style.margin-bottom]="'var(--spacing-sm)'">
+          Notes (Optional)
+        </label>
+        <textarea pInputTextarea formControlName="notes" rows="3" placeholder="Add any remarks..."
+          [style.font-size]="'var(--font-size-sm)'" [style.width]="'100%'"></textarea>
+      </div>
+
+      @if (currentLocation()) {
+      <div class="border rounded-lg" [style.padding]="'var(--spacing-lg)'"
+        [style.background-color]="'var(--color-success-50)'" [style.border-color]="'var(--color-success-200)'"
+        [style.border-radius]="'var(--ui-border-radius)'">
+        <div class="flex items-center" [style.gap]="'var(--spacing-sm)'" [style.color]="'var(--color-success-700)'">
+          <i class="pi pi-check-circle"></i>
+          <span [style.font-size]="'var(--font-size-sm)'">Location detected successfully</span>
+        </div>
+        <p [style.font-size]="'var(--font-size-xs)'" [style.color]="'var(--color-success-600)'"
+          [style.margin-top]="'var(--spacing-xs)'">
+          Accuracy: {{ currentLocation()?.accuracy?.toFixed(1) }} meters
+        </p>
+      </div>
+      } @else {
+      <div class="border rounded-lg" [style.padding]="'var(--spacing-lg)'"
+        [style.background-color]="'var(--color-warning-50)'" [style.border-color]="'var(--color-warning-200)'"
+        [style.border-radius]="'var(--ui-border-radius)'">
+        <div class="flex items-center" [style.gap]="'var(--spacing-sm)'" [style.color]="'var(--color-warning-700)'">
+          <i class="pi pi-exclamation-triangle"></i>
+          <span [style.font-size]="'var(--font-size-sm)'">Location access required</span>
+        </div>
+      </div>
+      }
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancel" class="p-button-text" (onClick)="showPunchModal.set(false)"
+      [style.font-size]="'var(--font-size-sm)'"></p-button>
+    <p-button label="Submit Punch" class="p-button-primary" (onClick)="handlePunch()"
+      [disabled]="!punchForm.valid || !currentLocation() || isLoading()"
+      [style.font-size]="'var(--font-size-sm)'"></p-button>
+  </ng-template>
+</p-dialog>
+
+<!-- Regularization Modal -->
+<p-dialog [visible]="showRegularizeModal()" header="Request Regularization" [modal]="true" [style]="{ width: '32rem' }"
+  (onHide)="regularizeForm.reset()">
+  <form [formGroup]="regularizeForm">
+    <div [style.display]="'flex'" [style.flex-direction]="'column'" [style.gap]="'var(--spacing-lg)'">
+      <div class="grid grid-cols-2" [style.gap]="'var(--spacing-lg)'">
+        <div>
+          <label [style.display]="'block'" [style.font-size]="'var(--font-size-sm)'"
+            [style.font-weight]="'var(--font-weight-medium)'" [style.color]="'var(--theme-text-primary)'"
+            [style.margin-bottom]="'var(--spacing-sm)'">
+            Date
+          </label>
+          <input type="date" formControlName="targetDate" [max]="commonService.formatDate(today, 'yyyy-MM-dd')"
+            [style.width]="'100%'" [style.padding]="'var(--spacing-sm)'"
+            [style.border-radius]="'var(--ui-border-radius)'" [style.font-size]="'var(--font-size-sm)'">
+        </div>
+
+        <div>
+          <label [style.display]="'block'" [style.font-size]="'var(--font-size-sm)'"
+            [style.font-weight]="'var(--font-weight-medium)'" [style.color]="'var(--theme-text-primary)'"
+            [style.margin-bottom]="'var(--spacing-sm)'">
+            Type
+          </label>
+          <p-select formControlName="type" [options]="[
+                      {label: 'Missed Punch', value: 'missed_punch'},
+                      {label: 'Time Correction', value: 'correction'},
+                      {label: 'Work From Home', value: 'work_from_home'},
+                      {label: 'On Duty', value: 'on_duty'},
+                      {label: 'Leave Reversal', value: 'leave_reversal'},
+                      {label: 'Others', value: 'others'}
+                    ]" styleClass="w-full" [style.font-size]="'var(--font-size-sm)'"></p-select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2" [style.gap]="'var(--spacing-lg)'">
+        <div>
+          <label [style.display]="'block'" [style.font-size]="'var(--font-size-sm)'"
+            [style.font-weight]="'var(--font-weight-medium)'" [style.color]="'var(--theme-text-primary)'"
+            [style.margin-bottom]="'var(--spacing-sm)'">
+            Correct In Time
+          </label>
+          <input type="time" formControlName="newFirstIn" [style.width]="'100%'" [style.padding]="'var(--spacing-sm)'"
+            [style.border-radius]="'var(--ui-border-radius)'" [style.font-size]="'var(--font-size-sm)'">
+        </div>
+
+        <div>
+          <label [style.display]="'block'" [style.font-size]="'var(--font-size-sm)'"
+            [style.font-weight]="'var(--font-weight-medium)'" [style.color]="'var(--theme-text-primary)'"
+            [style.margin-bottom]="'var(--spacing-sm)'">
+            Correct Out Time
+          </label>
+          <input type="time" formControlName="newLastOut" [style.width]="'100%'" [style.padding]="'var(--spacing-sm)'"
+            [style.border-radius]="'var(--ui-border-radius)'" [style.font-size]="'var(--font-size-sm)'">
+        </div>
+      </div>
+
+      <div>
+        <label [style.display]="'block'" [style.font-size]="'var(--font-size-sm)'"
+          [style.font-weight]="'var(--font-weight-medium)'" [style.color]="'var(--theme-text-primary)'"
+          [style.margin-bottom]="'var(--spacing-sm)'">
+          Reason
+        </label>
+        <textarea formControlName="reason" rows="4" placeholder="Provide detailed reason for regularization..."
+          [style.width]="'100%'" [style.padding]="'var(--spacing-sm)'" [style.border-radius]="'var(--ui-border-radius)'"
+          [style.font-size]="'var(--font-size-sm)'"></textarea>
+        @if (regularizeForm.get('reason')?.touched && regularizeForm.get('reason')?.errors) {
+        <p [style.color]="'var(--color-error-500)'" [style.font-size]="'var(--font-size-xs)'"
+          [style.margin-top]="'var(--spacing-xs)'">
+          Minimum 20 characters required
+        </p>
+        }
+      </div>
+
+      <div>
+        <label [style.display]="'block'" [style.font-size]="'var(--font-size-sm)'"
+          [style.font-weight]="'var(--font-weight-medium)'" [style.color]="'var(--theme-text-primary)'"
+          [style.margin-bottom]="'var(--spacing-sm)'">
+          Urgency
+        </label>
+        <div class="flex" [style.gap]="'var(--spacing-sm)'">
+          @for (urgency of ['low', 'medium', 'high']; track urgency) {
+          <button type="button" (click)="regularizeForm.patchValue({urgency: urgency})"
+            class="flex-1 text-center border rounded-lg" [style.padding]="'var(--spacing-sm)'"
+            [style.font-size]="'var(--font-size-sm)'" [style.border-radius]="'var(--ui-border-radius)'"
+            [style.border-color]="regularizeForm.value.urgency === urgency ? 'var(--color-primary-500)' : 'var(--theme-border-secondary)'"
+            [style.background-color]="regularizeForm.value.urgency === urgency ? 'var(--color-primary-50)' : 'var(--theme-bg-primary)'"
+            [style.color]="regularizeForm.value.urgency === urgency ? 'var(--color-primary-700)' : 'var(--theme-text-primary)'">
+            {{ urgency | titlecase }}
+          </button>
+          }
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancel" class="p-button-text" (onClick)="showRegularizeModal.set(false)"
+      [style.font-size]="'var(--font-size-sm)'"></p-button>
+    <p-button label="Submit Request" class="p-button-primary" (onClick)="submitRegularization()"
+      [disabled]="regularizeForm.invalid || isLoading()" [style.font-size]="'var(--font-size-sm)'"></p-button>
+  </ng-template>
+</p-dialog>

@@ -1,0 +1,309 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="min-h-screen p-4 md:p-6 transition-colors duration-300" [style.background]="'var(--theme-bg-primary)'"
+  [style.font-family]="'var(--font-body)'">
+
+  <div class="mb-6">
+    <div class="flex justify-between items-start">
+      <div>
+        <h1 class="font-bold mb-1 transition-colors" [style.color]="'var(--theme-text-primary)'"
+          [style.font-family]="'var(--font-heading)'" [style.font-size]="'var(--font-size-3xl)'">Attendance Management
+        </h1>
+        <p [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-base)'">Manage team
+          attendance, approvals, and monitoring</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="text-right hidden md:block">
+          <p class="uppercase font-bold tracking-tighter" [style.color]="'var(--theme-text-label)'"
+            [style.font-size]="'var(--font-size-xs)'">Welcome,</p>
+          <p class="font-bold" [style.color]="'var(--theme-text-primary)'">{{ currentUser()?.name || 'Manager' }}</p>
+        </div>
+        <div class="w-10 h-10 rounded-full flex items-center justify-center shadow-md"
+          [style.background]="'var(--theme-accent-gradient)'">
+          <span class="text-white font-bold" [style.font-size]="'var(--font-size-md)'">
+            {{ commonService.getInitials(currentUser()?.name || 'M') }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card p-1 border transition-colors" [style.background]="'var(--theme-bg-secondary)'"
+    [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'"
+    [style.box-shadow]="'var(--shadow-lg)'">
+
+    <p-tabs [value]="activeTab().toString()" (valueChange)="onTabChange($event)">
+      <p-tablist [style.background]="'transparent'" [style.border-bottom]="'1px solid var(--theme-border-primary)'">
+        <p-tab value="0" class="transition-all">
+          <div class="flex items-center gap-2 px-2 py-1">
+            <i class="pi pi-clock" [style.font-size]="'var(--font-size-sm)'"></i>
+            <span class="font-bold" [style.font-size]="'var(--font-size-sm)'">Pending Requests</span>
+          </div>
+        </p-tab>
+        <p-tab value="1" class="transition-all">
+          <div class="flex items-center gap-2 px-2 py-1">
+            <i class="pi pi-users" [style.font-size]="'var(--font-size-sm)'"></i>
+            <span class="font-bold" [style.font-size]="'var(--font-size-sm)'">Team Attendance</span>
+          </div>
+        </p-tab>
+        <p-tab value="2" class="transition-all">
+          <div class="flex items-center gap-2 px-2 py-1">
+            <i class="pi pi-eye" [style.font-size]="'var(--font-size-sm)'"></i>
+            <span class="font-bold" [style.font-size]="'var(--font-size-sm)'">Live Monitoring</span>
+          </div>
+        </p-tab>
+      </p-tablist>
+
+      <p-tabpanels class="pt-4 transition-colors" [style.background]="'transparent'">
+
+        <p-tabpanel value="0">
+          <div class="mb-4 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex flex-wrap items-center gap-3">
+              <div class="flex items-center gap-2 p-1 px-3 border" [style.border-radius]="'var(--ui-border-radius)'"
+                [style.border-color]="'var(--theme-border-secondary)'" [style.background]="'var(--theme-bg-ternary)'">
+                <label class="font-bold uppercase" [style.color]="'var(--theme-text-label)'"
+                  [style.font-size]="'var(--font-size-xs)'">From</label>
+                <input type="date" [(ngModel)]="filters().startDate" (change)="applyFilters()"
+                  class="bg-transparent border-none focus:ring-0" [style.color]="'var(--theme-text-primary)'"
+                  [style.font-size]="'var(--font-size-sm)'">
+              </div>
+              <div class="flex items-center gap-2 p-1 px-3 border" [style.border-radius]="'var(--ui-border-radius)'"
+                [style.border-color]="'var(--theme-border-secondary)'" [style.background]="'var(--theme-bg-ternary)'">
+                <label class="font-bold uppercase" [style.color]="'var(--theme-text-label)'"
+                  [style.font-size]="'var(--font-size-xs)'">To</label>
+                <input type="date" [(ngModel)]="filters().endDate" (change)="applyFilters()"
+                  class="bg-transparent border-none focus:ring-0" [style.color]="'var(--theme-text-primary)'"
+                  [style.font-size]="'var(--font-size-sm)'">
+              </div>
+
+              <p-select [(ngModel)]="filters().department" [options]="departments()" placeholder="Department"
+                (onChange)="applyFilters()" styleClass="w-48"></p-select>
+              <p-button label="Reset" icon="pi pi-refresh" (onClick)="resetFilters()" [text]="true"
+                size="small"></p-button>
+            </div>
+          </div>
+
+          <p-table [value]="pendingRequests()" [loading]="isLoading()" [paginator]="true" [rows]="10"
+            styleClass="p-datatable-sm custom-themed-table">
+            <ng-template pTemplate="header">
+              <tr>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Employee
+                </th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Date</th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Type</th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Details
+                </th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Reason</th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Submitted
+                </th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Actions
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-request>
+              <tr [style.color]="'var(--theme-text-secondary)'" [style.border-color]="'var(--theme-border-primary)'">
+                <td>
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-[10px] text-white"
+                      [style.background]="'var(--theme-accent-gradient)'">
+                      {{ commonService.getInitials(request.user?.name || 'U') }}
+                    </div>
+                    <div class="flex flex-col">
+                      <span class="font-bold" [style.color]="'var(--theme-text-primary)'"
+                        [style.font-size]="'var(--font-size-sm)'">{{ request.user?.name }}</span>
+                      <span [style.font-size]="'var(--font-size-xs)'" [style.color]="'var(--theme-text-label)'">{{
+                        request.user?.employeeId }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td class="font-medium">{{ formatDate(request.targetDate) }}</td>
+                <td>
+                  <span class="px-2 py-0.5 rounded-full font-bold" [style.font-size]="'var(--font-size-xs)'"
+                    [ngClass]="getStatusClass(request.type)">
+                    {{ getRequestTypeText(request.type) }}
+                  </span>
+                </td>
+                <td>
+                  <div class="text-[10px] font-mono leading-tight">
+                    <span [style.color]="'var(--theme-success)'">IN: {{ formatTime(request.newFirstIn) }}</span><br>
+                    <span [style.color]="'var(--theme-error)'">OUT: {{ formatTime(request.newLastOut) }}</span>
+                  </div>
+                </td>
+                <td class="max-w-[150px] truncate" [style.font-size]="'var(--font-size-xs)'"
+                  [pTooltip]="request.reason">
+                  {{ request.reason }}
+                </td>
+                <td>
+                  <div class="flex flex-col text-[10px]">
+                    <span class="font-bold">{{ formatDate(request.createdAt) }}</span>
+                    <span [style.color]="'var(--theme-text-label)'">{{ formatTime(request.createdAt) }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="flex gap-1">
+                    <p-button icon="pi pi-check" severity="success" [text]="true" [rounded]="true" size="small"
+                      (onClick)="handleRequest(request._id, 'approved')"></p-button>
+                    <p-button icon="pi pi-times" severity="danger" [text]="true" [rounded]="true" size="small"
+                      (onClick)="handleRequest(request._id, 'rejected')"></p-button>
+                    <p-button icon="pi pi-eye" severity="info" [text]="true" [rounded]="true" size="small"></p-button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </p-tabpanel>
+
+        <p-tabpanel value="1">
+          <div class="mb-4 flex flex-wrap justify-between items-center gap-3">
+            <div class="flex flex-wrap gap-2">
+              <p-multiSelect [options]="statusOptions()" [(ngModel)]="filters().status" placeholder="Status"
+                (onChange)="applyFilters()" styleClass="w-56"></p-multiSelect>
+              <div class="flex items-center gap-2 ml-2">
+                <p-checkbox [(ngModel)]="filters().includeSubordinates" binary="true" inputId="includeSub"
+                  (onChange)="applyFilters()"></p-checkbox>
+                <label for="includeSub" [style.color]="'var(--theme-text-secondary)'"
+                  [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase tracking-tight">Include
+                  Team</label>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <p-button label="Export" icon="pi pi-download" severity="secondary" size="small"
+                (onClick)="exportData()"></p-button>
+              <p-button icon="pi pi-refresh" (onClick)="loadTeamAttendance()" size="small"></p-button>
+            </div>
+          </div>
+
+          <p-table [value]="teamAttendance()" [loading]="isLoading()" [paginator]="true" [rows]="15"
+            styleClass="p-datatable-sm custom-themed-table">
+            <ng-template pTemplate="header">
+              <tr>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Employee
+                </th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Date</th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Status</th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Times</th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Hours</th>
+                <th [style.background]="'var(--theme-bg-ternary)'" [style.color]="'var(--theme-text-label)'">Late/OT
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-record>
+              <tr [style.color]="'var(--theme-text-secondary)'" [style.border-color]="'var(--theme-border-primary)'">
+                <td>
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-[10px] text-white"
+                      [style.background]="getEmployeeColor(record.user?.name || '')">
+                      {{ commonService.getInitials(record.user?.name || 'U') }}
+                    </div>
+                    <span class="font-bold" [style.color]="'var(--theme-text-primary)'"
+                      [style.font-size]="'var(--font-size-sm)'">{{ record.user?.name }}</span>
+                  </div>
+                </td>
+                <td>{{ formatDate(record.date) }}</td>
+                <td><span [innerHTML]="getStatusBadgeHtml(record.status)"></span></td>
+                <td class="font-mono text-[10px]">{{ formatTime(record.firstIn) }} - {{ formatTime(record.lastOut) }}
+                </td>
+                <td class="font-bold" [style.color]="'var(--theme-text-primary)'">{{ record.totalWorkHours || 0 }}h</td>
+                <td>
+                  <div class="flex flex-col text-[10px] gap-0.5">
+                    @if (record.isLate) { <span [style.color]="'var(--theme-warning)'" class="font-bold">LATE:
+                      {{record.lateMinutes}}m</span> }
+                    @if (record.overtimeHours > 0) { <span [style.color]="'var(--theme-success)'" class="font-bold">OT:
+                      +{{record.overtimeHours}}h</span> }
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </p-tabpanel>
+
+        <p-tabpanel value="2">
+          <div class="mb-6 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="flex items-center gap-2 px-3 py-1 rounded-full border"
+                [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-success)'">
+                <i class="pi pi-circle-fill animate-pulse" [style.color]="'var(--theme-success)'"></i>
+                <span class="font-bold uppercase tracking-widest" [style.color]="'var(--theme-success)'"
+                  [style.font-size]="'var(--font-size-xs)'">Syncing Live</span>
+              </div>
+              @if (isLiveUpdating()) { <i class="pi pi-spin pi-spinner" [style.color]="'var(--theme-info)'"></i> }
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="p-4 border transition-colors" [style.background]="'var(--theme-bg-ternary)'"
+              [style.border-radius]="'var(--ui-border-radius-lg)'"
+              [style.border-color]="'var(--theme-border-secondary)'">
+              <p class="uppercase font-bold mb-1" [style.color]="'var(--theme-text-label)'"
+                [style.font-size]="'var(--font-size-xs)'">Active Now</p>
+              <p class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'">{{
+                getCurrentlyWorking() }}</p>
+            </div>
+            <div class="p-4 border transition-colors" [style.background]="'var(--theme-bg-ternary)'"
+              [style.border-radius]="'var(--ui-border-radius-lg)'"
+              [style.border-color]="'var(--theme-border-secondary)'">
+              <p class="uppercase font-bold mb-1" [style.color]="'var(--theme-text-label)'"
+                [style.font-size]="'var(--font-size-xs)'">On Break</p>
+              <p class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-warning)'">{{ getOnBreak() }}</p>
+            </div>
+            <div class="p-4 border transition-colors" [style.background]="'var(--theme-bg-ternary)'"
+              [style.border-radius]="'var(--ui-border-radius-lg)'"
+              [style.border-color]="'var(--theme-border-secondary)'">
+              <p class="uppercase font-bold mb-1" [style.color]="'var(--theme-text-label)'"
+                [style.font-size]="'var(--font-size-xs)'">Not In Yet</p>
+              <p class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-error)'">{{ getNotCheckedIn() }}
+              </p>
+            </div>
+            <div class="p-4 border transition-colors" [style.background]="'var(--theme-bg-ternary)'"
+              [style.border-radius]="'var(--ui-border-radius-lg)'"
+              [style.border-color]="'var(--theme-border-secondary)'">
+              <p class="uppercase font-bold mb-1" [style.color]="'var(--theme-text-label)'"
+                [style.font-size]="'var(--font-size-xs)'">Remote/WFH</p>
+              <p class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-info)'">{{ getWFHCount() }}</p>
+            </div>
+          </div>
+
+          <div class="border" [style.background]="'var(--theme-bg-secondary)'"
+            [style.border-radius]="'var(--ui-border-radius-lg)'" [style.border-color]="'var(--theme-border-primary)'">
+            <div class="p-3 border-b flex justify-between items-center"
+              [style.border-color]="'var(--theme-border-primary)'" [style.background]="'var(--theme-bg-ternary)'">
+              <h4 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'"
+                [style.font-size]="'var(--font-size-xs)'">Recent Events</h4>
+              <p-button icon="pi pi-refresh" [text]="true" size="small" (onClick)="loadLiveAttendance()"></p-button>
+            </div>
+            <div class="divide-y" [style.border-color]="'var(--theme-border-primary)'">
+              @for (activity of liveAttendance().slice(0, 10); track activity._id) {
+              <div class="p-3 flex items-center justify-between hover:bg-white/5 transition-colors">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-[10px]"
+                    [style.background]="getEmployeeColor(activity.user?.name)">
+                    {{ commonService.getInitials(activity.user?.name) }}
+                  </div>
+                  <div>
+                    <p class="font-bold leading-none" [style.color]="'var(--theme-text-primary)'"
+                      [style.font-size]="'var(--font-size-sm)'">{{ activity.user?.name }}</p>
+                    <p [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="mt-1">
+                      {{ activity.user?.department }}</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-4 text-right">
+                  <div>
+                    <p class="font-bold tabular-nums" [style.color]="'var(--theme-text-secondary)'"
+                      [style.font-size]="'var(--font-size-xs)'">{{ formatTime(activity.lastPunch?.time) }}</p>
+                    <p [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'"
+                      class="mt-0.5">{{ getRequestTypeText(activity.lastPunch?.type) }}</p>
+                  </div>
+                  <div class="w-2 h-2 rounded-full"
+                    [style.background]="activity.firstIn && !activity.lastOut ? 'var(--theme-success)' : 'var(--theme-warning)'">
+                  </div>
+                </div>
+              </div>
+              }
+            </div>
+          </div>
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  </div>
+</div>

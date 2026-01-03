@@ -122,7 +122,7 @@ export class InvoiceDetailsComponent implements OnInit {
 
     this.isProcessing.set(true); 
     this.common.apiCall(
-      this.invoiceService.downloadInvoice(id),
+      this.invoiceService.downloadInvoicePDF(id),
       (res: any) => {
         if (!res || !res.body) {
           this.messageService.showError('Download Failed', 'File empty.');
@@ -149,7 +149,7 @@ export class InvoiceDetailsComponent implements OnInit {
         if (!id) return;
 
         this.common.apiCall(
-            this.invoiceService.deleteInvoiceById(id),
+            this.invoiceService.deleteInvoice(id),
             () => {
                 this.messageService.showSuccess('Deleted', 'Invoice removed.');
                 this.router.navigate(['/invoices']);

@@ -1,21 +1,178 @@
-<p-toast></p-toast> 
+<p-toast></p-toast>
+
+<div class="customer-wrapper">
+  <section class="customer-container">
+    <div class="customer-form-panel">
+
+      <form [formGroup]="branchForm" (ngSubmit)="onSubmit()" class="customer-form-layout">
+
+        <!-- HEADER -->
+        <div class="customer-form-header">
+          <h1 class="form-title">{{ formTitle() }}</h1>
+          <p class="form-subtitle">
+            Fill in branch details. <span class="req">*</span> required
+          </p>
+        </div>
+
+        <div class="customer-form-body">
+
+          <!-- MAIN DETAILS -->
+          <section class="form-section">
+            <h4 class="section-title">Main Details</h4>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Branch Name <span class="req">*</span></label>
+                <input pInputText formControlName="name" />
+              </div>
+
+              <div class="form-group">
+                <label>Branch Code</label>
+                <input pInputText formControlName="branchCode" placeholder="S-001" />
+              </div>
+
+              <div class="form-group">
+                <label>Phone Number</label>
+                <input pInputText formControlName="phoneNumber" placeholder="+91 9876543210" />
+              </div>
+
+              <div class="form-group">
+                <label>Manager</label>
+                <p-select appendTo="body" formControlName="managerId" [options]="managerOptions()" optionLabel="name"
+                  optionValue="_id" placeholder="Select Manager" [filter]="true">
+                </p-select>
+              </div>
+            </div>
+          </section>
+
+          <!-- ADDRESS -->
+          <section class="form-section" formGroupName="address">
+            <h4 class="section-title">Address</h4>
+
+            <div class="form-grid">
+              <div class="form-group col-span-2">
+                <label>Street</label>
+                <input pInputText formControlName="street" />
+              </div>
+
+              <div class="form-group">
+                <label>City</label>
+                <input pInputText formControlName="city" />
+              </div>
+
+              <div class="form-group">
+                <label>State</label>
+                <input pInputText formControlName="state" />
+              </div>
+
+              <div class="form-group">
+                <label>Zip Code</label>
+                <input pInputText formControlName="zipCode" />
+              </div>
+
+              <div class="form-group">
+                <label>Country</label>
+                <input pInputText formControlName="country" />
+              </div>
+            </div>
+          </section>
+
+          <!-- LOCATION -->
+          <!-- <section class="form-section" formGroupName="location">
+            <h4 class="section-title">Location (Optional)</h4>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Latitude</label>
+                <p-inputNumber formControlName="lat" [useGrouping]="false" mode="decimal">
+                </p-inputNumber>
+
+                <p-inputNumber formControlName="lng" [useGrouping]="false" mode="decimal">
+                </p-inputNumber>
+
+              </div>
+
+              <div class="form-group">
+                <label>Longitude</label>
+                <p-inputNumber formControlName="lat" [useGrouping]="false" mode="decimal">
+                </p-inputNumber>
+
+                <p-inputNumber formControlName="lng" [useGrouping]="false" mode="decimal">
+                </p-inputNumber>
+
+              </div>
+            </div>
+          </section> -->
+          <section class="form-section" formGroupName="location">
+            <h4 class="section-title">Location</h4>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Latitude</label>
+                <p-inputNumber formControlName="lat" mode="decimal" [useGrouping]="false"
+                  (onFocus)="onLocationFieldFocus()">
+                </p-inputNumber>
+              </div>
+
+              <div class="form-group">
+                <label>Longitude</label>
+                <p-inputNumber formControlName="lng" mode="decimal" [useGrouping]="false"
+                  (onFocus)="onLocationFieldFocus()">
+                </p-inputNumber>
+              </div>
+            </div>
+          </section>
+
+          <!-- SETTINGS -->
+          <section class="form-section">
+            <h4 class="section-title">Settings</h4>
+
+            <div class="flex flex-col gap-3">
+              <div class="flex items-center gap-2">
+                <p-checkbox inputId="main" formControlName="isMainBranch" [binary]="true"></p-checkbox>
+                <label for="main">Main Branch</label>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <p-checkbox inputId="active" formControlName="isActive" [binary]="true"></p-checkbox>
+                <label for="active">Active</label>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- FOOTER -->
+        <div class="customer-form-footer">
+          <p-button type="submit" icon="pi pi-check" [label]="editMode() ? 'Save Changes' : 'Create Branch'"
+            [loading]="isSubmitting()" styleClass="w-full">
+          </p-button>
+        </div>
+
+      </form>
+    </div>
+  </section>
+</div>
+
+
+<!-- <p-toast></p-toast> 
 
 <div class="customer-wrapper">
   <section class="customer-container">
     
-    <!-- BANNER REMOVED FOR CLEANER UI -->
+    BANNER REMOVED FOR CLEANER UI
     
-    <!-- FORM PANEL -->
+    FORM PANEL
     <div class="customer-form-panel">
       <form [formGroup]="branchForm" (ngSubmit)="onSubmit()" class="customer-form-layout">
 
-        <!--_ 1. STICKY HEADER _-->
+        _ 1. STICKY HEADER _
         <div class="customer-form-header">
           <h1 class="form-title">{{ formTitle() }}</h1>
           <p class="form-subtitle">Fill in the branch details below. <span class="req">*</span> = required</p>
         </div>
         <div class="customer-form-body">
-          <!-- Main Details -->
+          Main Details
           <section class="form-section">
             <h4 class="section-title">Main Details</h4>
             <div class="form-grid">
@@ -45,7 +202,7 @@
             </div>
           </section>
           
-          <!-- Address -->
+          Address
           <section class="form-section" formGroupName="address">
             <h4 class="section-title">Branch Address</h4>
             <div class="form-grid">
@@ -72,7 +229,7 @@
             </div>
           </section>
 
-          <!-- Settings -->
+          Settings
           <section class="form-section">
             <h4 class="section-title">Settings</h4>
             <div class="flex flex-col gap-4">
@@ -89,7 +246,7 @@
 
         </div>
 
-        <!--_ 3. STICKY FOOTER _-->
+        _ 3. STICKY FOOTER _
         <div class="customer-form-footer">
           <div class="form-actions">
             <p-button 
@@ -105,4 +262,4 @@
       </form>
     </div>
   </section>
-</div>
+</div> -->

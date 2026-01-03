@@ -20,9 +20,50 @@ export const SIDEBAR_MENU: MenuItem[] = [
       { label: 'Active Sessions', icon: 'pi pi-history', routerLink: ['/sessions'] },
       { label: 'Acounts', icon: 'pi pi-history', routerLink: ['/accounts'] },
       { label: 'Acounts tree', icon: 'pi pi-history', routerLink: ['/accounts/tree'] },
-      { label: 'attendence', icon: 'pi pi-history', routerLink: ['/attendence'] },
-      { label: 'shift', icon: 'pi pi-history', routerLink: ['/shift'] },
-      { label: 'holiday', icon: 'pi pi-history', routerLink: ['/holiday'] },
+      // { label: 'attendence', icon: 'pi pi-history', routerLink: ['/attendence'] },
+      // { label: 'shift', icon: 'pi pi-history', routerLink: ['/shift'] },
+      // { label: 'holiday', icon: 'pi pi-history', routerLink: ['/holiday'] },
+    ]
+  },
+  {
+    label: 'Attendance',
+    icon: 'pi pi-calendar',
+    items: [
+      {
+        label: 'Dashboard',
+        icon: 'pi pi-home',
+        routerLink: ['/attendence/dashboard']
+      },
+      {
+        label: 'punching',
+        icon: 'pi pi-home',
+        routerLink: ['/attendence/punching']
+      },
+      {
+        label: 'Management',
+        icon: 'pi pi-users',
+        routerLink: ['/attendence/manager']
+      },
+      {
+        label: 'Reports',
+        icon: 'pi pi-chart-bar',
+        routerLink: ['/attendence/reports']
+      },
+      {
+        label: 'Shifts',
+        icon: 'pi pi-clock',
+        routerLink: ['/attendence/shifts']
+      },
+      {
+        label: 'Holidays',
+        icon: 'pi pi-calendar-times',
+        routerLink: ['/attendence/holidays']
+      },
+      {
+        label: 'My Requests',
+        icon: 'pi pi-inbox',
+        routerLink: ['/attendence/my-requests']
+      }
     ]
   },
   {
