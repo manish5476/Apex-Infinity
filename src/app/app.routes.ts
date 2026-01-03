@@ -53,7 +53,7 @@ export const routes: Routes = [
         path: 'dashboard',
         loadComponent: () =>
           import('./admin/admin-analytics-hub.component').then(
-            (m) => m.AdminMasterHubComponent
+            (m) => m.AdminDashboardComponent
           ),
         title: 'Dashboard'
       },

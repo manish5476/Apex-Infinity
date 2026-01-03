@@ -343,7 +343,7 @@
               <input type="checkbox" 
                      [checked]="selectedMembers.has(user._id)"
                      (change)="toggleMemberSelection(user._id)" />
-              <div class="avatar">{{ user.name?.charAt(0) }}</div>
+              <div class="avatar">{{ user.name}}</div>
               <span>{{ user.name }}</span>
             </label>
             }
