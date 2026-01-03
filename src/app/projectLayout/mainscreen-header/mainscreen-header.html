@@ -199,10 +199,23 @@
 
   </div>
 </div>
+<!-- // maxWidth: '700px', -->
 
 <p-dialog [(visible)]="showNotificationdialog" [modal]="true" [draggable]="false" [resizable]="false"
+  [dismissableMask]="true" [showHeader]="false" styleClass="notification-dialog" [style]="{ 
+    width: '80%', 
+    height: '85vh',
+    maxHeight: '85vh',
+    borderRadius: '16px', 
+    overflow: 'hidden'
+  }" maskStyleClass="backdrop-blur-sm bg-black/40" (onHide)="showNotificationdialog = false">
+
+  <app-notification-bell (close)="showNotificationdialog = false"></app-notification-bell>
+</p-dialog>
+
+<!-- <p-dialog [(visible)]="showNotificationdialog" [modal]="true" [draggable]="false" [resizable]="false"
   [dismissableMask]="true" [showHeader]="false" styleClass="premium-notification-dialog"
   [style]="{ width: '80%', maxHeight: '85vh', borderRadius: '16px', overflow: 'hidden' }"
   maskStyleClass="backdrop-blur-sm bg-black/40">
   <app-notification-bell></app-notification-bell>
-</p-dialog>
+</p-dialog> -->

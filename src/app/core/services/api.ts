@@ -61,9 +61,9 @@ export class ApiService extends BaseApiService {
     return this.patch<LoginResponse>(`/v1/auth/resetPassword/${token}`, data, 'resetPassword');
   }
 
-  getAllNotifications(): Observable<LoginResponse> {
-    return this.get<LoginResponse>('/v1/notifications/my-notifications', {}, 'getAllNotifications');
-  }
+  // getAllNotifications(): Observable<LoginResponse> {
+  //   return this.get<LoginResponse>('/v1/notifications/my-notifications', {}, 'getAllNotifications');
+  // }
   // ======================== AUTH EXTRA ROUTES ========================
 
   // Refresh JWT Token
