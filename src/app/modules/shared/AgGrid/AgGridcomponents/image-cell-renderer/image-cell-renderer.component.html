@@ -1,23 +1,114 @@
-<p-avatar *ngIf="imageUrl" [image]="imageUrl" size="large" shape="circle" (click)="onImageClick()"
-  pTooltip="Click to enlarge image" tooltipPosition="top"
-  styleClass="cursor-pointer hover:shadow-lg transition-transform duration-300 ease-in-out" />
-<p-dialog header="Image Preview" [(visible)]="displayDialog" [modal]="true" appendTo="body"
-  [style]="{ width: '90vw', maxWidth: '800px', minHeight: '90vh' }" [draggable]="false" [resizable]="false"
-  [dismissableMask]="true">
-  <div class="image-container">
-    <p-skeleton *ngIf="loading" shape="rectangle" width="100%" height="300px"></p-skeleton>
-    <img [src]="imageUrl" alt="Image preview" class="preview-image" [style.transform]="'scale(' + zoomLevel + ')' "
-      (load)="onImageLoad()" (dblclick)="resetZoom()" />
+<div class="image-renderer-container">
+  @if (imageUrls.length > 0) {
+  <div class="avatar-wrapper" (click)="onImageClick()" pRipple>
+    <p-avatar [image]="imageUrls[0]" [size]="avatarSize" shape="circle"
+      pTooltip="Click to preview {{ imageUrls.length > 1 ? '(' + imageUrls.length + ' images)' : '' }}"
+      tooltipPosition="top" styleClass="image-avatar">
+    </p-avatar>
+
+    @if (imageUrls.length > 1 && showGallery) {
+    <div class="badge">
+      {{ imageUrls.length }}
+    </div>
+    }
+  </div>
+  } @else {
+  <div class="placeholder-avatar">
+    <p-avatar icon="pi pi-image" [size]="avatarSize" shape="circle" styleClass="placeholder">
+    </p-avatar>
+  </div>
+  }
+</div>
+
+<p-dialog header="Image Preview" [(visible)]="displayDialog" appendTo="body" [modal]="true" [style]="{ 
+    width: '88vw',
+    maxWidth: '98vw',
+    height: '88vh',
+    maxHeight: '98vh'
+  }" [contentStyle]="{
+    'padding': '0',
+    'overflow': 'hidden',
+    'height': 'calc(100% - 100px)'
+  }" [draggable]="false" [resizable]="false" [closable]="true" [closeOnEscape]="true" [dismissableMask]="true">
+
+  <div class="dialog-content">
+    @if (showGallery && imageUrls.length > 1) {
+    <div class="gallery-controls">
+      <p-button icon="pi pi-chevron-left" [disabled]="currentImageIndex === 0" (click)="navigateImage('prev')"
+        styleClass="p-button-text p-button-rounded gallery-nav-btn">
+      </p-button>
+
+      <span class="image-counter">
+        {{ currentImageIndex + 1 }} / {{ imageUrls.length }}
+      </span>
+
+      <p-button icon="pi pi-chevron-right" [disabled]="currentImageIndex === imageUrls.length - 1"
+        (click)="navigateImage('next')" styleClass="p-button-text p-button-rounded gallery-nav-btn">
+      </p-button>
+    </div>
+    }
+
+    <div #imageContainer class="image-preview-container" (wheel)="onWheel($event)" (mousedown)="onMouseDown($event)"
+      (mousemove)="onMouseMove($event)" (mouseup)="onMouseUp()" (mouseleave)="onMouseUp()"
+      (touchstart)="onTouchStart($event)" (touchmove)="onTouchMove($event)" (touchend)="onTouchEnd($event)"
+      (dblclick)="onDoubleClick($event)">
+
+      @if (loading) {
+      <div class="loading-container">
+        <p-skeleton shape="rectangle" width="100%" height="100%" styleClass="skeleton-loader">
+        </p-skeleton>
+        <div class="loading-text">Loading image...</div>
+      </div>
+      }
+
+      <img #previewImage [src]="imageUrls[currentImageIndex]"
+        [style.transform]="'scale(' + zoomLevel + ') translate(' + translateX + 'px, ' + translateY + 'px)'"
+        [style.cursor]="zoomLevel > 1 ? (isDragging ? 'grabbing' : 'grab') : 'zoom-in'" (load)="onImageLoad()"
+        alt="Preview" class="preview-image" [class.draggable]="zoomLevel > 1">
+    </div>
+
+    <div class="zoom-controls-panel">
+      <div class="zoom-slider-container">
+        <span class="zoom-label">Zoom:</span>
+        <!-- [model]="getZoomPercentage()" -->
+        <!-- <p-slider (onChange)="onZoomSliderChange($event.value)" [min]="minZoom * 100" [max]="maxZoom * 100" [step]="10"
+          styleClass="zoom-slider">
+        </p-slider> -->
+        <p-slider [ngModel]="zoomLevel * 100" (ngModelChange)="onZoomSliderChange($event)" [min]="minZoom * 100"
+          [max]="maxZoom * 100" [step]="10" styleClass="zoom-slider">
+        </p-slider>
+
+        <span class="zoom-percentage">{{ getZoomPercentage() }}%</span>
+      </div>
+    </div>
   </div>
 
   <ng-template pTemplate="footer">
-    <div class="flex items-center justify-between w-full">
-      <div class="flex items-center gap-2">
-        <p-button icon="pi pi-plus" (click)="zoomIn()" styleClass="p-button-text" pTooltip="Zoom In" />
-        <p-button icon="pi pi-search" (click)="resetZoom()" styleClass="p-button-text" pTooltip="Reset Zoom" />
-        <p-button icon="pi pi-minus" (click)="zoomOut()" styleClass="p-button-text" pTooltip="Zoom Out" />
+    <div class="footer-controls">
+      <div class="zoom-buttons">
+        <p-button icon="pi pi-search-minus" (click)="zoomOut()" [disabled]="zoomLevel <= minZoom"
+          styleClass="p-button-text p-button-sm zoom-btn" pTooltip="Zoom Out (Ctrl + - or Scroll down)">
+        </p-button>
+
+        <p-button icon="pi pi-refresh" (click)="resetZoom()" styleClass="p-button-text p-button-sm zoom-btn"
+          pTooltip="Reset Zoom (Ctrl + 0 or Space)">
+        </p-button>
+
+        <p-button icon="pi pi-search-plus" (click)="zoomIn()" [disabled]="zoomLevel >= maxZoom"
+          styleClass="p-button-text p-button-sm zoom-btn" pTooltip="Zoom In (Ctrl + + or Scroll up)">
+        </p-button>
+
+        <div class="zoom-hint">
+          <i class="pi pi-info-circle" style="font-size: 0.9rem"></i>
+          <span>Scroll to zoom • Drag to pan • Double click to toggle</span>
+        </div>
       </div>
-      <p-button icon="pi pi-times" (click)="displayDialog=false" label="Close" styleClass="p-button-text" />
+
+      <div class="dialog-actions">
+        <p-button icon="pi pi-times" (click)="displayDialog = false" label="Close"
+          styleClass="p-button-text p-button-sm close-btn">
+        </p-button>
+      </div>
     </div>
   </ng-template>
 </p-dialog>

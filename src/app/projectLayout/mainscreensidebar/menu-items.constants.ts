@@ -91,16 +91,28 @@ export const SIDEBAR_MENU: MenuItem[] = [
   },
 
   // --- FINANCIAL CONTROL ---
+  // {
+  //   label: 'Financials',
+  //   icon: 'pi pi-money-bill',
+  //   items: [
+  //     { label: 'P&L Statement', icon: 'pi pi-calculator', routerLink: ['/financials'] },
+  //     { label: 'Sales Reports', icon: 'pi pi-chart-bar', routerLink: ['/sales'] },
+  //     { label: 'Transaction Logs', icon: 'pi pi-receipt', routerLink: ['/transactions'] }
+  //   ]
+  // },
   {
     label: 'Financials',
     icon: 'pi pi-money-bill',
     items: [
       { label: 'P&L Statement', icon: 'pi pi-calculator', routerLink: ['/financials'] },
       { label: 'Sales Reports', icon: 'pi pi-chart-bar', routerLink: ['/sales'] },
-      { label: 'Transaction Logs', icon: 'pi pi-receipt', routerLink: ['/transactions'] }
+      { label: 'Transaction Logs', icon: 'pi pi-receipt', routerLink: ['/transactions'] },
+
+      // 💳 PAYMENTS (restored)
+      { label: 'Payment History', icon: 'pi pi-wallet', routerLink: ['/payments'] },
+      { label: 'Record Payment', icon: 'pi pi-plus-circle', routerLink: ['/payments/create'] }
     ]
   },
-
   // --- SYSTEM ADMINISTRATION ---
   {
     label: 'Administration',
@@ -110,6 +122,13 @@ export const SIDEBAR_MENU: MenuItem[] = [
       { label: 'Branch Management', icon: 'pi pi-map-marker', routerLink: ['/branches'] },
       { label: 'Roles & Permissions', icon: 'pi pi-key', routerLink: ['/admin/roles'] },
       { label: 'System Master List', icon: 'pi pi-database', routerLink: ['/masterList'] }
+    ]
+  },
+  {
+    label: 'purchase', icon: 'pi pi-box',
+    items: [
+      { label: 'Inventory buy', icon: 'pi pi-list', routerLink: ['/purchase'] },
+      { label: 'Add purchase', icon: 'pi pi-plus', routerLink: ['/purchase/create'] },
     ]
   },
 

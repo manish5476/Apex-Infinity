@@ -1,295 +1,247 @@
-<!-- <div class="landing-root">
+<div
+  class="relative min-h-screen overflow-x-hidden bg-[var(--color-bg)] text-[color:var(--color-text)] font-[family-name:var(--font-body)]">
 
-  <div class="fixed inset-0 z-[-1] pointer-events-none">
-    <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[var(--accent-primary)] rounded-full blur-[150px] opacity-20 animate-float"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[var(--accent-secondary)] rounded-full blur-[150px] opacity-20" style="animation-delay: 2s"></div>
-    <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
-  </div>
+  <nav [class.shadow-[var(--shadow-lg)]]="scrollY > 20" [class.bg-[var(--color-surface-light)]]="scrollY > 20"
+    class="fixed top-0 left-0 right-0 h-[80px] z-[var(--z-fixed)] bg-[var(--color-surface-light)] backdrop-blur-[20px] border-b border-[width:var(--ui-border-width)] border-[color:var(--color-border)] transition-[var(--transition-base)]">
 
-  <nav class="glass-nav">
-    <div class="max-w-container w-full flex items-center justify-between">
-      
-      Logo Section
-      <div class="flex items-center gap-3 cursor-pointer" routerLink="/">
-        Your SVG Logo Scaled Down for Nav
-        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" class="h-10 w-auto">
-          <defs>
-            <linearGradient id="nav-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" style="stop-color:var(--accent-primary)"/>
-              <stop offset="100%" style="stop-color:var(--accent-secondary)"/>
-            </linearGradient>
-          </defs>
-          <g transform="translate(500, 380)">
-             Simplified Path for Small Sizes
-             <text x="0" y="50" text-anchor="middle" font-family="serif" font-weight="bold" font-size="68px" fill="white">APEX</text>
-             <text x="0" y="100" text-anchor="middle" font-family="sans-serif" font-size="20px" letter-spacing="4px" fill="var(--text-secondary)">INFINITY</text>
-          </g>
-        </svg>
-      </div>
-
-      Links
-      <div class="hidden md:flex items-center gap-8 text-[var(--font-size-sm)] font-medium text-[var(--text-secondary)]">
-        <a href="#features" class="hover:text-white transition-colors">Features</a>
-        <a href="#pricing" class="hover:text-white transition-colors">Pricing</a>
-        <a href="#testimonials" class="hover:text-white transition-colors">Stories</a>
-      </div>
-
-      Actions
-      <div class="flex items-center gap-4">
-        Theme Selector
-        <div class="relative group hidden sm:block">
-          <button class="btn btn-glass text-[var(--font-size-xs)] py-2 px-3">
-            <i class="pi pi-palette"></i> Theme
-          </button>
-          <div class="absolute right-0 top-full mt-2 w-40 bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-[var(--ui-border-radius)] shadow-xl overflow-hidden hidden group-hover:block z-50">
-            @for(theme of availableThemes; track theme.name) {
-              <button (click)="selectTheme(theme.class)" class="w-full text-left px-4 py-2 text-[var(--font-size-sm)] text-[var(--text-secondary)] hover:bg-[var(--bg-ternary)] hover:text-white">
-                {{ theme.name }}
-              </button>
-            }
-          </div>
+    <div class="max-w-[1400px] mx-auto px-[var(--spacing-3xl)] h-full flex items-center justify-between">
+      <a routerLink="/" class="flex items-center gap-[var(--spacing-md)] no-underline group">
+        <div
+          class="w-[40px] h-[40px] rounded-[var(--ui-border-radius-lg)] bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)] flex items-center justify-center text-[color:var(--color-text-inverse)] font-[var(--font-weight-bold)] overflow-hidden relative shadow-[var(--shadow-md)]">
+          AI
         </div>
+        <div class="text-[length:var(--font-size-2xl)] font-[var(--font-weight-bold)] text-[color:var(--color-text)]">
+          Apex<span class="text-[color:var(--color-primary)]">Infinity</span>
+        </div>
+      </a>
 
-        <button class="btn btn-glass" routerLink="/auth/login">Log in</button>
-        <button class="btn btn-primary" routerLink="/auth/org">Start Free Trial</button>
+      <div class="hidden lg:flex gap-[var(--spacing-3xl)]">
+        <a *ngFor="let item of ['Features', 'Dashboard', 'Pricing']" [href]="'#' + item.toLowerCase()"
+          (click)="scrollToElement(item.toLowerCase())"
+          class="text-[length:var(--font-size-md)] font-[var(--font-weight-medium)] text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-primary)] transition-[var(--transition-colors)] py-[var(--spacing-xs)]">
+          {{ item }}
+        </a>
+      </div>
+
+      <div class="flex items-center gap-[var(--spacing-lg)]">
+        <button
+          class="px-[var(--spacing-xl)] py-[var(--spacing-md)] rounded-[var(--ui-border-radius-lg)] font-[var(--font-weight-semibold)] text-[length:var(--font-size-sm)] text-[color:var(--color-text)] hover:bg-[rgba(59,130,246,0.1)] transition-[var(--transition-base)]"
+          routerLink="/auth/login">
+          Sign In
+        </button>
+        <button
+          class="px-[var(--spacing-xl)] py-[var(--spacing-md)] rounded-[var(--ui-border-radius-lg)] font-[var(--font-weight-semibold)] text-[length:var(--font-size-sm)] text-[color:var(--color-text-inverse)] bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)] shadow-[var(--shadow-md)] hover:shadow-[var(--shadow-lg)] hover:-translate-y-[2px] transition-[var(--transition-base)]"
+          routerLink="/auth/org">
+          Get Started
+        </button>
       </div>
     </div>
   </nav>
 
-  <main>
-    HERO SECTION
-    <section class="section-spacing pt-40 text-center max-w-container">
-      <div #revealItem class="reveal-item">
-        Badge
-        <div class="hero-pill animate-float">
-          <span class="w-2 h-2 rounded-full bg-[var(--accent-primary)] animate-pulse"></span>
-          New: Real-time Chat & Broadcast Live!
-        </div>
+  <section class="pt-[140px] pb-[100px] relative">
+    <div class="max-w-[1200px] mx-auto px-[var(--spacing-3xl)] text-center">
 
-        Headline
-        <h1 class="hero-title text-balance text-white">
-          Run your business with <br />
-          <span class="text-gradient-accent">Pure Intelligence.</span>
-        </h1>
-
-        Subhead
-        <p class="text-[var(--font-size-lg)] text-[var(--text-secondary)] mb-[var(--spacing-3xl)] max-w-2xl mx-auto leading-relaxed text-pretty">
-          Stop guessing. Start knowing. The only ERP that combines Finance, Inventory, CRM, and <span class="text-[var(--accent-primary)] font-bold">Team Communication</span> with predictive AI.
-        </p>
-
-        CTA
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-[var(--spacing-md)]">
-          <button routerLink="/auth/org" class="btn btn-primary shadow-glow">
-            Start Free Trial <i class="pi pi-arrow-right"></i>
-          </button>
-          <button class="btn btn-glass">
-            <i class="pi pi-play-circle text-[var(--accent-primary)]"></i> Watch Demo
-          </button>
-        </div>
+      <div
+        class="inline-flex items-center gap-[var(--spacing-sm)] px-[var(--spacing-lg)] py-[var(--spacing-xs)] rounded-[var(--ui-border-radius-xl)] bg-[rgba(59,130,246,0.1)] border border-[width:var(--ui-border-width)] border-[color:var(--color-primary-light)] text-[length:var(--font-size-xs)] font-[var(--font-weight-semibold)] text-[color:var(--color-primary)] mb-[var(--spacing-2xl)] animate-fade-in-up">
+        <span class="w-[6px] h-[6px] rounded-full bg-[var(--color-primary)] animate-pulse-glow"></span>
+        <span>v2.0 Now Available</span>
       </div>
 
-      3D Dashboard Preview
-      <div #revealItem class="reveal-item mt-[var(--spacing-5xl)]">
-        <div class="border border-[var(--border-primary)] rounded-[var(--ui-border-radius-xl)] bg-[var(--bg-secondary)] overflow-hidden shadow-2xl relative">
-          Window Controls
-          <div class="h-10 bg-[var(--bg-ternary)] border-b border-[var(--border-primary)] flex items-center px-4 gap-2">
-             <div class="flex gap-2">
-               <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
-               <div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
-               <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
-             </div>
-             <div class="ml-4 px-3 py-1 bg-[var(--bg-primary)] rounded-md text-[10px] text-[var(--text-tertiary)] font-mono border border-[var(--border-secondary)]">apex-infinity.app/dashboard</div>
+      <h1
+        class="text-[length:var(--font-size-5xl)] font-[var(--font-weight-bold)] leading-[var(--line-height-tight)] text-[color:var(--color-text)] mb-[var(--spacing-xl)] font-[family-name:var(--font-heading)] animate-fade-in-up delay-100">
+        The Operating System <br>
+        <span
+          class="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)]">For
+          Modern Business</span>
+      </h1>
+
+      <p
+        class="!text-[color:var(--color-text-secondary)] !text-[length:var(--font-size-lg)] !leading-[var(--line-height-relaxed)] max-w-[600px] mx-auto mb-[var(--spacing-4xl)] animate-fade-in-up delay-200">
+        Streamline accounting, inventory, and team collaboration in one refined, compact platform.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-[var(--spacing-lg)] justify-center animate-fade-in-up delay-300">
+        <button
+          class="px-[var(--spacing-3xl)] py-[var(--spacing-lg)] rounded-[var(--ui-border-radius-lg)] font-[var(--font-weight-bold)] text-[length:var(--font-size-md)] text-[color:var(--color-text-inverse)] bg-[var(--color-text)] shadow-[var(--shadow-lg)] hover:shadow-[var(--shadow-xl)] hover:-translate-y-[2px] transition-[var(--transition-base)]">
+          Start Free Trial
+        </button>
+        <button
+          class="px-[var(--spacing-3xl)] py-[var(--spacing-lg)] rounded-[var(--ui-border-radius-lg)] font-[var(--font-weight-bold)] text-[length:var(--font-size-md)] text-[color:var(--color-text)] bg-[var(--color-surface)] border border-[width:var(--ui-border-width)] border-[color:var(--color-border)] hover:border-[color:var(--color-primary)] transition-[var(--transition-base)]">
+          View Demo
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="features" class="py-[100px] bg-[var(--color-surface)]">
+    <div class="max-w-[1200px] mx-auto px-[var(--spacing-3xl)]">
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-[var(--spacing-xl)]">
+        @for (feature of filteredFeatures(); track feature.title) {
+        <div
+          class="group relative p-[var(--spacing-2xl)] rounded-[var(--ui-border-radius-xl)] bg-[var(--color-bg)] border border-[width:var(--ui-border-width)] border-[color:var(--color-border)] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-xl)] transition-[var(--transition-slow)] overflow-hidden cursor-pointer">
+
+          <div
+            class="absolute inset-0 bg-gradient-to-br from-[var(--color-primary-light)] to-[var(--color-secondary)] opacity-0 group-hover:opacity-5 transition-[var(--transition-base)]">
           </div>
-          
-          Detailed Mock Dashboard
-          <div class="relative bg-[var(--bg-secondary)] aspect-video flex flex-col overflow-hidden group">
-            <div class="flex h-full">
-              
-              Mock Sidebar
-              <div class="w-16 md:w-48 bg-[var(--bg-ternary)] border-r border-[var(--border-primary)] flex flex-col p-4 gap-4 hidden sm:flex">
-                 <div class="h-8 w-8 md:w-24 bg-[var(--bg-primary)] rounded opacity-50 mb-4"></div>
-                 Sidebar Items
-                 <div class="space-y-3">
-                   <div class="h-3 w-12 md:w-32 bg-[var(--accent-primary)]/20 rounded"></div>
-                   <div class="h-3 w-10 md:w-24 bg-[var(--text-tertiary)]/10 rounded"></div>
-                   <div class="h-3 w-8 md:w-28 bg-[var(--text-tertiary)]/10 rounded"></div>
-                   <div class="h-3 w-10 md:w-20 bg-[var(--text-tertiary)]/10 rounded"></div>
-                   <div class="h-3 w-12 md:w-32 bg-[var(--text-tertiary)]/10 rounded"></div>
-                 </div>
-                 Bottom Sidebar
-                 <div class="mt-auto space-y-3">
-                    <div class="h-3 w-full bg-[var(--text-tertiary)]/10 rounded"></div>
-                 </div>
-              </div>
 
-              Main Area
-              <div class="flex-1 flex flex-col bg-[var(--bg-primary)]/50 relative">
-                Header
-                <div class="h-14 border-b border-[var(--border-primary)] flex items-center justify-between px-6 bg-[var(--bg-secondary)]/50">
-                  <div class="h-3 w-32 bg-[var(--text-tertiary)]/20 rounded"></div>
-                  <div class="flex gap-3">
-                    <div class="h-8 w-8 rounded-full bg-[var(--bg-ternary)] border border-[var(--border-primary)]"></div>
-                    <div class="h-8 w-8 rounded-full bg-[var(--accent-secondary)]/20"></div>
-                  </div>
-                </div>
-
-                Dashboard Content Grid
-                <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-4 h-full overflow-hidden">
-                   
-                   Card 1: Revenue
-                   <div class="col-span-1 h-28 rounded-[var(--ui-border-radius)] bg-[var(--bg-ternary)] border border-[var(--border-primary)] p-5 flex flex-col justify-between shadow-lg shadow-[var(--accent-primary)]/5 relative overflow-hidden group/card">
-                      <div class="absolute inset-0 bg-gradient-to-br from-[var(--accent-primary)]/5 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity"></div>
-                      <div class="flex justify-between items-start">
-                        <div class="h-2 w-16 bg-[var(--text-tertiary)]/30 rounded"></div>
-                        <i class="pi pi-arrow-up-right text-[var(--color-success)] text-xs"></i>
-                      </div>
-                      <div class="text-[var(--font-size-3xl)] font-bold text-white relative z-10">₹{{ stats.revenue }}M</div>
-                   </div>
-
-                   Card 2: Users
-                   <div class="col-span-1 h-28 rounded-[var(--ui-border-radius)] bg-[var(--bg-ternary)] border border-[var(--border-primary)] p-5 flex flex-col justify-between">
-                      <div class="h-2 w-12 bg-[var(--text-tertiary)]/30 rounded"></div>
-                      <div class="text-[var(--font-size-3xl)] font-bold text-[var(--color-success)] flex items-center gap-2">
-                        +{{ stats.users | number }} <span class="text-[var(--font-size-xs)] text-[var(--text-tertiary)] font-normal">users</span>
-                      </div>
-                   </div>
-
-                   Card 3: Static
-                   <div class="col-span-1 h-28 rounded-[var(--ui-border-radius)] bg-[var(--bg-ternary)] border border-[var(--border-primary)] p-5 flex flex-col justify-between">
-                      <div class="h-2 w-20 bg-[var(--text-tertiary)]/30 rounded"></div>
-                      <div class="h-6 w-1/2 bg-[var(--bg-primary)] rounded"></div>
-                   </div>
-
-                   Main Chart Area
-                   <div class="col-span-3 flex-1 rounded-[var(--ui-border-radius)] bg-[var(--bg-ternary)] border border-[var(--border-primary)] relative overflow-hidden flex items-end px-8 pb-0 gap-4 mt-2 min-h-[160px]">
-                      Grid Lines Background
-                      <div class="absolute inset-0 border-t border-[var(--border-secondary)] top-1/4 opacity-30"></div>
-                      <div class="absolute inset-0 border-t border-[var(--border-secondary)] top-2/4 opacity-30"></div>
-                      <div class="absolute inset-0 border-t border-[var(--border-secondary)] top-3/4 opacity-30"></div>
-
-                      Animated Bars
-                      <div class="w-full bg-[var(--accent-primary)]/20 h-[40%] rounded-t-sm transition-all duration-1000 group-hover:h-[60%]"></div>
-                      <div class="w-full bg-[var(--accent-primary)]/40 h-[60%] rounded-t-sm transition-all duration-1000 delay-75 group-hover:h-[80%]"></div>
-                      <div class="w-full bg-[var(--accent-primary)]/60 h-[30%] rounded-t-sm transition-all duration-1000 delay-100 group-hover:h-[50%]"></div>
-                      <div class="w-full bg-gradient-to-t from-[var(--accent-primary)] to-[var(--accent-secondary)] h-[75%] rounded-t-sm transition-all duration-1000 delay-150 group-hover:h-[90%] shadow-[0_0_20px_var(--accent-primary)] relative z-10"></div>
-                      <div class="w-full bg-[var(--accent-primary)]/50 h-[50%] rounded-t-sm transition-all duration-1000 delay-200 group-hover:h-[70%]"></div>
-                      <div class="w-full bg-[var(--accent-primary)]/30 h-[45%] rounded-t-sm transition-all duration-1000 delay-300 group-hover:h-[65%]"></div>
-                   </div>
-                </div>
-              </div>
-            </div>
-
-            Floating Notification / Toast
-            <div class="absolute bottom-6 right-6 bg-[var(--bg-secondary)] border border-[var(--border-primary)] p-3 rounded-[var(--ui-border-radius)] shadow-xl animate-float flex items-center gap-3 z-20 backdrop-blur-md">
-               <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 border border-green-500/30">
-                 <i class="pi pi-check text-xs"></i>
-               </div>
-               <div>
-                 <div class="text-[10px] text-[var(--text-tertiary)] uppercase tracking-wider">System Status</div>
-                 <div class="text-[var(--font-size-sm)] font-bold text-white">99.9% Uptime</div>
-               </div>
-            </div>
-
+          <div
+            class="w-[48px] h-[48px] rounded-[var(--ui-border-radius-lg)] bg-[var(--color-surface)] shadow-[var(--shadow-md)] flex items-center justify-center text-[length:var(--font-size-xl)] mb-[var(--spacing-xl)] text-[color:var(--color-primary)] transition-[var(--transition-transform)] group-hover:scale-110">
+            <i [class]="feature.icon"></i>
           </div>
+
+          <h3
+            class="text-[length:var(--font-size-xl)] font-[var(--font-weight-bold)] text-[color:var(--color-text)] mb-[var(--spacing-sm)] relative z-10">
+            {{ feature.title }}</h3>
+          <p
+            class="!text-[length:var(--font-size-md)] !text-[color:var(--color-text-secondary)] !leading-[var(--line-height-normal)] relative z-10">
+            {{ feature.desc }}
+          </p>
         </div>
-      </div>
-    </section>
-
-    FEATURES (Bento Grid)
-    <section id="features" class="section-spacing max-w-container">
-      <div class="text-center mb-[var(--spacing-3xl)] reveal-item" #revealItem>
-        <h2 class="text-[var(--font-size-4xl)] font-bold text-white mb-2">The Complete Feature Suite</h2>
-        <p class="text-[var(--text-secondary)]">Search through our comprehensive module list.</p>
-      </div>
-
-      Search & Filter
-     
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[var(--spacing-lg)]">
-        @for (f of filteredFeatures(); track f.title) {
-          <div class="bento-card reveal-item group cursor-default" #revealItem>
-             <div class="flex justify-between items-start mb-4">
-                <div class="w-10 h-10 rounded-[var(--ui-border-radius)] bg-[var(--bg-ternary)] flex items-center justify-center text-[var(--accent-primary)] group-hover:bg-[var(--accent-primary)] group-hover:text-white transition-colors shadow-sm">
-                  <i class="pi" [ngClass]="f.icon"></i>
-                </div>
-                <span class="text-[10px] uppercase font-bold tracking-wider text-[var(--text-tertiary)] border border-[var(--border-primary)] px-2 py-1 rounded bg-[var(--bg-primary)]">{{ f.group }}</span>
-             </div>
-             <h3 class="text-white font-bold text-[var(--font-size-md)] mb-2 group-hover:text-[var(--accent-secondary)] transition-colors">{{ f.title }}</h3>
-             <p class="text-[var(--text-secondary)] text-[var(--font-size-sm)] leading-relaxed">{{ f.desc }}</p>
-          </div>
-        } @empty {
-          <div class="col-span-full text-center py-20 text-[var(--text-tertiary)]">
-            <i class="pi pi-search text-2xl mb-2"></i>
-            <p>No features found matching your search.</p>
-          </div>
         }
       </div>
-    </section>
 
-    <section id="pricing" class="section-spacing max-w-container">
-      <div class="text-center mb-[var(--spacing-4xl)] reveal-item" #revealItem>
-        <h2 class="text-[var(--font-size-4xl)] font-bold text-white mb-4">Simple, Transparent Pricing</h2>
-        <div class="inline-flex bg-[var(--bg-secondary)] p-1 rounded-full border border-[var(--border-primary)]">
-          <button (click)="togglePricing()" [class.bg-[var(--bg-ternary)]]="!isYearly()" [class.text-white]="!isYearly()" class="px-6 py-2 rounded-full text-[var(--font-size-sm)] font-medium text-[var(--text-tertiary)] transition-all">Monthly</button>
-          <button (click)="togglePricing()" [class.bg-[var(--bg-ternary)]]="isYearly()" [class.text-white]="isYearly()" class="px-6 py-2 rounded-full text-[var(--font-size-sm)] font-medium text-[var(--text-tertiary)] transition-all">Yearly <span class="text-[var(--accent-secondary)] text-xs ml-1 font-bold">-20%</span></button>
+    </div>
+  </section>
+
+  <section id="dashboard" class="py-[100px] bg-[var(--color-bg)] overflow-hidden">
+    <div class="max-w-[1200px] mx-auto px-[var(--spacing-3xl)]">
+
+      <div
+        class="relative rounded-[var(--ui-border-radius-xl)] bg-[var(--color-surface)] border border-[width:var(--ui-border-width)] border-[color:var(--color-border)] shadow-[var(--shadow-2xl)] p-[var(--spacing-xl)] animate-float">
+        <div
+          class="flex items-center gap-[var(--spacing-sm)] mb-[var(--spacing-lg)] border-b border-[width:var(--ui-border-width)] border-[color:var(--color-border)] pb-[var(--spacing-md)]">
+          <div class="flex gap-[6px]">
+            <div class="w-[10px] h-[10px] rounded-full bg-[var(--color-danger)]"></div>
+            <div class="w-[10px] h-[10px] rounded-full bg-[var(--color-warning)]"></div>
+            <div class="w-[10px] h-[10px] rounded-full bg-[var(--color-success)]"></div>
+          </div>
+          <div
+            class="ml-[var(--spacing-lg)] px-[var(--spacing-md)] py-[2px] rounded-[var(--ui-border-radius-sm)] bg-[var(--color-bg)] text-[length:var(--font-size-xs)] text-[color:var(--color-text-secondary)] font-[family-name:var(--font-mono)]">
+            app.apexinfinity.ai
+          </div>
+        </div>
+
+        <div class="grid grid-cols-4 gap-[var(--spacing-lg)]">
+          <div
+            class="p-[var(--spacing-lg)] rounded-[var(--ui-border-radius-lg)] bg-[var(--color-bg)] border border-[width:var(--ui-border-width)] border-[color:var(--color-border)]">
+            <div
+              class="text-[length:var(--font-size-xs)] text-[color:var(--color-text-secondary)] uppercase font-[var(--font-weight-semibold)]">
+              Revenue</div>
+            <div
+              class="text-[length:var(--font-size-2xl)] font-[var(--font-weight-bold)] text-[color:var(--color-text)] mt-[var(--spacing-xs)]">
+              ₹4.2M</div>
+          </div>
+          <div
+            class="p-[var(--spacing-lg)] rounded-[var(--ui-border-radius-lg)] bg-[var(--color-bg)] border border-[width:var(--ui-border-width)] border-[color:var(--color-border)]">
+            <div
+              class="text-[length:var(--font-size-xs)] text-[color:var(--color-text-secondary)] uppercase font-[var(--font-weight-semibold)]">
+              Users</div>
+            <div
+              class="text-[length:var(--font-size-2xl)] font-[var(--font-weight-bold)] text-[color:var(--color-text)] mt-[var(--spacing-xs)]">
+              842</div>
+          </div>
+          <div
+            class="col-span-2 p-[var(--spacing-lg)] rounded-[var(--ui-border-radius-lg)] bg-[var(--color-bg)] border border-[width:var(--ui-border-width)] border-[color:var(--color-border)] flex items-end gap-[var(--spacing-xs)] h-[100px]">
+            <div class="w-full bg-[var(--color-primary-light)] h-[40%] rounded-t-[var(--ui-border-radius-sm)]"></div>
+            <div class="w-full bg-[var(--color-primary)] h-[70%] rounded-t-[var(--ui-border-radius-sm)]"></div>
+            <div class="w-full bg-[var(--color-primary-light)] h-[50%] rounded-t-[var(--ui-border-radius-sm)]"></div>
+            <div class="w-full bg-[var(--color-secondary)] h-[85%] rounded-t-[var(--ui-border-radius-sm)]"></div>
+          </div>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-[var(--spacing-xl)] items-start">
+    </div>
+  </section>
+
+  <section id="pricing" class="py-[100px] bg-[var(--color-surface)]">
+    <div class="max-w-[1200px] mx-auto px-[var(--spacing-3xl)]">
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-[var(--spacing-xl)]">
         @for (plan of plans; track plan.name) {
-          <div class="pricing-card reveal-item" [class.popular]="plan.isPopular" #revealItem>
-            
-            @if (plan.isPopular) {
-              <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-white text-[10px] font-bold uppercase tracking-wide shadow-lg">Most Popular</div>
-            }
+        <div
+          class="relative p-[var(--spacing-2xl)] rounded-[var(--ui-border-radius-xl)] bg-[var(--color-bg)] border border-[width:var(--ui-border-width)] shadow-[var(--shadow-lg)] hover:-translate-y-[4px] transition-[var(--transition-base)]"
+          [class.border-[color:var(--color-primary)]]="plan.popular"
+          [class.border-[color:var(--color-border)]]="!plan.popular">
 
-            <h3 class="text-[var(--font-size-lg)] font-bold text-[var(--text-secondary)] mb-2">{{ plan.name }}</h3>
-            <div class="flex items-baseline gap-1 mb-2">
-              <span class="text-[var(--font-size-4xl)] font-bold text-white">{{ plan.price }}</span>
-              @if (plan.price !== 'Custom' && plan.price !== 'Free') {
-                <span class="text-[var(--font-size-sm)] text-[var(--text-tertiary)]">/ {{ isYearly() ? 'yr' : 'mo' }}</span>
-              }
-            </div>
-            <p class="text-[var(--font-size-sm)] text-[var(--text-tertiary)] mb-8 pb-8 border-b border-[var(--border-secondary)]">{{ plan.desc }}</p>
-
-            <ul class="space-y-4 mb-8">
-              @for (feat of plan.features; track feat) {
-                <li class="flex items-center gap-3 text-[var(--font-size-sm)] text-[var(--text-secondary)]">
-                  <i class="pi pi-check text-[var(--accent-secondary)]"></i> {{ feat }}
-                </li>
-              }
-            </ul>
-
-            <button class="w-full btn"
-                    [ngClass]="plan.isPopular ? 'btn-primary' : 'btn-glass'">
-              {{ plan.cta }}
-            </button>
+          <h3 class="text-[length:var(--font-size-xl)] font-[var(--font-weight-bold)] text-[color:var(--color-text)]">{{
+            plan.name }}</h3>
+          <div
+            class="my-[var(--spacing-lg)] text-[length:var(--font-size-4xl)] font-[var(--font-weight-bold)] text-[color:var(--color-text)]">
+            {{ plan.price }}<span
+              class="text-[length:var(--font-size-base)] text-[color:var(--color-text-secondary)] font-[var(--font-weight-normal)]">/mo</span>
           </div>
+
+          <ul class="space-y-[var(--spacing-md)] mb-[var(--spacing-2xl)]">
+            @for (feature of plan.features; track feature) {
+            <li
+              class="flex items-center gap-[var(--spacing-sm)] text-[length:var(--font-size-sm)] text-[color:var(--color-text)]">
+              <i class="fas fa-check text-[color:var(--color-success)]"></i> {{ feature }}
+            </li>
+            }
+          </ul>
+
+          <button
+            class="w-full py-[var(--spacing-lg)] rounded-[var(--ui-border-radius-lg)] font-[var(--font-weight-bold)] text-[length:var(--font-size-sm)] transition-[var(--transition-base)]"
+            [class]="plan.popular ? 'bg-[var(--color-primary)] text-[color:var(--color-text-inverse)] shadow-[var(--shadow-md)]' : 'bg-[var(--color-surface)] text-[color:var(--color-text)] border border-[width:var(--ui-border-width)] border-[color:var(--color-border)]'">
+            {{ plan.cta }}
+          </button>
+        </div>
         }
       </div>
-    </section>
 
-    <footer class="border-t border-[var(--border-primary)] bg-[var(--bg-ternary)] py-[var(--spacing-3xl)] text-center">
-      <div class="mb-4">
-        <span class="text-xl font-bold font-heading tracking-tight text-white">Apex<span class="text-[var(--accent-primary)]">Infinity</span></span>
+    </div>
+  </section>
+
+  <footer class="py-[var(--spacing-4xl)] bg-[var(--color-text)] text-[color:var(--color-text-secondary)]">
+    <div
+      class="max-w-[1200px] mx-auto px-[var(--spacing-3xl)] grid grid-cols-1 md:grid-cols-4 gap-[var(--spacing-2xl)]">
+
+      <div class="col-span-1">
+        <div
+          class="text-[color:var(--color-text-inverse)] font-[var(--font-weight-bold)] text-[length:var(--font-size-xl)] mb-[var(--spacing-lg)]">
+          ApexInfinity</div>
+        <p
+          class="!text-[length:var(--font-size-sm)] !leading-[var(--line-height-normal)] !text-[color:var(--color-text-secondary)]">
+          Empowering businesses with intelligent tools.
+        </p>
       </div>
-      <p class="text-[var(--text-tertiary)] text-[var(--font-size-sm)]">&copy; 2025 Apex Infinity Inc. Built for hyper-growth.</p>
-    </footer>
 
-  </main>
-</div> --><div class="landing-root">
-  <!-- Background Particles -->
+      <div>
+        <h4
+          class="text-[color:var(--color-text-inverse)] font-[var(--font-weight-semibold)] text-[length:var(--font-size-md)] mb-[var(--spacing-md)]">
+          Product</h4>
+        <ul class="space-y-[var(--spacing-sm)] text-[length:var(--font-size-sm)]">
+          <li><a href="#"
+              class="hover:text-[color:var(--color-text-inverse)] transition-[var(--transition-colors)]">Features</a>
+          </li>
+          <li><a href="#"
+              class="hover:text-[color:var(--color-text-inverse)] transition-[var(--transition-colors)]">Pricing</a>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </footer>
+
+</div>
+
+<!-- 
+<div class="landing-root">
+  Background Particles
   <div class="particles-container"></div>
 
-  <!-- Navigation -->
+  Navigation
   <nav class="glass-nav" [class.scrolled]="scrollY > 50">
     <div class="nav-container">
-      <!-- Logo -->
+      Logo
       <a routerLink="/" class="logo">
         <div class="logo-icon">AI</div>
         <div class="logo-text">Apex<span style="color: #3b82f6">Infinity</span></div>
       </a>
 
-      <!-- Desktop Navigation -->
+      Desktop Navigation
       <div class="nav-links">
         <a href="#features" (click)="scrollToElement('features')">Features</a>
         <a href="#dashboard" (click)="scrollToElement('dashboard')">Dashboard</a>
@@ -297,19 +249,19 @@
         <a href="#testimonials" (click)="scrollToElement('testimonials')">Testimonials</a>
       </div>
 
-      <!-- Actions -->
+      Actions
       <div class="nav-actions">
         <button class="btn btn-ghost" routerLink="/auth/login">Sign In</button>
         <button class="btn btn-primary" routerLink="/auth/org">Get Started</button>
         
-        <!-- Mobile Toggle -->
+        Mobile Toggle
         <button class="mobile-toggle" (click)="toggleMobileMenu()">
           <i class="fas fa-bars"></i>
         </button>
       </div>
     </div>
 
-    <!-- Mobile Menu -->
+    Mobile Menu
     @if (showMobileMenu) {
       <div class="mobile-menu">
         <a href="#features" (click)="toggleMobileMenu(); scrollToElement('features')">Features</a>
@@ -322,34 +274,34 @@
     }
   </nav>
 
-  <!-- Hero Section -->
+  Hero Section
   <section class="hero-section">
-    <!-- Animated Background Shapes -->
+    Animated Background Shapes
     <div class="hero-background">
       <div class="floating-shape shape-1 parallax-layer"></div>
       <div class="floating-shape shape-2 parallax-layer"></div>
     </div>
 
     <div class="hero-content">
-      <!-- Badge -->
+      Badge
       <div class="hero-badge observe">
         <span class="badge-dot"></span>
         <span>Trusted by 5,000+ Businesses Worldwide</span>
       </div>
 
-      <!-- Main Title -->
+      Main Title
       <h1 class="hero-title observe">
         The Complete<br>
         <span class="gradient-text">Business Operating System</span>
       </h1>
 
-      <!-- Subtitle -->
+      Subtitle
       <p class="hero-subtitle observe">
         Apex Infinity combines accounting, inventory, CRM, attendance, payroll, and team communication 
         into one intelligent platform. Make data-driven decisions with real-time insights.
       </p>
 
-      <!-- CTA Buttons -->
+      CTA Buttons
       <div class="hero-buttons">
         <button class="btn btn-primary btn-lg float-element" routerLink="/auth/org">
           <i class="fas fa-rocket"></i> Start 14-Day Free Trial
@@ -359,7 +311,7 @@
         </button>
       </div>
 
-      <!-- Stats Section -->
+      Stats Section
       <div id="stats-section" class="stats-section observe">
         <div class="stats-grid">
           @for (stat of animatedStats(); track stat.label) {
@@ -376,10 +328,10 @@
     </div>
   </section>
 
-  <!-- Features Bento Grid -->
+  Features Bento Grid
   <section id="features" class="features-section">
     <div class="container">
-      <!-- Header -->
+      Header
       <div class="section-header observe">
         <h2 class="section-title">Everything Your Business Needs</h2>
         <p class="section-subtitle">
@@ -387,7 +339,7 @@
         </p>
       </div>
 
-      <!-- Category Filters -->
+      Category Filters
       <div class="category-filters observe">
         @for (category of categories; track category) {
           <button class="category-filter" 
@@ -398,7 +350,7 @@
         }
       </div>
 
-      <!-- Bento Grid -->
+      Bento Grid
       <div class="bento-grid">
         @for (feature of filteredFeatures(); track feature.title) {
           <div class="bento-card observe" 
@@ -419,7 +371,7 @@
     </div>
   </section>
 
-  <!-- Dashboard Showcase -->
+  Dashboard Showcase
   <section id="dashboard" class="dashboard-section">
     <div class="dashboard-container">
       <div class="section-header observe">
@@ -430,7 +382,7 @@
       </div>
 
       <div class="dashboard-frame observe">
-        <!-- Window Controls -->
+        Window Controls
         <div class="dashboard-header">
           <div class="window-controls">
             <div class="control close"></div>
@@ -440,9 +392,9 @@
           <div class="dashboard-url">dashboard.apexinfinity.ai</div>
         </div>
 
-        <!-- Dashboard Content -->
+        Dashboard Content
         <div class="dashboard-content">
-          <!-- Metrics Row -->
+          Metrics Row
           <div class="metrics-row">
             <div class="metric-widget">
               <div class="metric-header">
@@ -497,7 +449,7 @@
             </div>
           </div>
 
-          <!-- Chart -->
+          Chart
           <div class="chart-container">
             <div class="chart-header">
               <h3>Revenue Trend (Last 7 Days)</h3>
@@ -518,7 +470,7 @@
             </div>
           </div>
 
-          <!-- Quick Stats -->
+          Quick Stats
           <div class="metrics-row">
             <div class="metric-widget">
               <div class="metric-header">
@@ -577,7 +529,7 @@
     </div>
   </section>
 
-  <!-- Integrations -->
+  Integrations
   <section class="integrations-section">
     <div class="container">
       <div class="section-header observe">
@@ -600,7 +552,7 @@
     </div>
   </section>
 
-  <!-- Testimonials -->
+  Testimonials
   <section id="testimonials" class="testimonials-section">
     <div class="testimonials-container">
       <div class="section-header observe">
@@ -636,7 +588,7 @@
     </div>
   </section>
 
-  <!-- Pricing -->
+  Pricing
   <section id="pricing" class="pricing-section">
     <div class="container">
       <div class="pricing-header observe">
@@ -692,7 +644,7 @@
     </div>
   </section>
 
-  <!-- Final CTA -->
+  Final CTA
   <section class="cta-section">
     <div class="cta-background">
       <div class="floating-element"></div>
@@ -724,11 +676,11 @@
     </div>
   </section>
 
-  <!-- Footer -->
+  Footer
   <footer class="footer">
     <div class="footer-container">
       <div class="footer-grid">
-        <!-- Brand -->
+        Brand
         <div class="footer-brand">
           <div class="logo">
             <div class="logo-icon">AI</div>
@@ -746,7 +698,7 @@
           </div>
         </div>
 
-        <!-- Product -->
+        Product
         <div class="footer-links">
           <h4>Product</h4>
           <ul>
@@ -757,7 +709,7 @@
           </ul>
         </div>
 
-        <!-- Company -->
+        Company
         <div class="footer-links">
           <h4>Company</h4>
           <ul>
@@ -768,7 +720,7 @@
           </ul>
         </div>
 
-        <!-- Legal -->
+        Legal
         <div class="footer-links">
           <h4>Legal</h4>
           <ul>
@@ -786,4 +738,4 @@
       </div>
     </div>
   </footer>
-</div>
+</div> -->
