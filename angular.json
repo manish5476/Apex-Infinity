@@ -21,10 +21,7 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
+              "src/assets"
             ],
             "styles": [
               "src/styles/styles.scss",
@@ -94,7 +91,9 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "options": {
-            "allowedHosts": ["all"],
+            "allowedHosts": [
+              "all"
+            ],
             "host": "0.0.0.0",
             "port": 5000
           },

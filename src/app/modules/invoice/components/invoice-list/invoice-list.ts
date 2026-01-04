@@ -150,13 +150,21 @@ export class InvoiceListComponent implements OnInit {
       limit: this.pageSize,
     };
 
+    // if (this.dateRange && this.dateRange[0]) {
+    //   filterParams.start = this.dateRange[0].toISOString();
+    // }
+    // if (this.dateRange && this.dateRange[1]) {
+    //   filterParams.end = this.dateRange[1].toISOString();
+    // }
+    // --- CHANGE STARTS HERE ---
     if (this.dateRange && this.dateRange[0]) {
-      filterParams.start = this.dateRange[0].toISOString();
-    }
-    if (this.dateRange && this.dateRange[1]) {
-      filterParams.end = this.dateRange[1].toISOString();
+      filterParams['invoiceDate[gte]'] = this.dateRange[0].toISOString();
     }
 
+    if (this.dateRange && this.dateRange[1]) {
+      const endDate = new Date(this.dateRange[1]);
+      filterParams['invoiceDate[lte]'] = endDate.toISOString();
+    }
     this.invoiceService.getAllInvoices(filterParams).subscribe({
       next: (res: any) => {
         let newData: any[] = [];

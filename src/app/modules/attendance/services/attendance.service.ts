@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { SocketService } from './../../../core/services/socket.service';
+import { Inject, Injectable } from '@angular/core';
 import { catchError, Observable, switchMap } from 'rxjs';
 import { BaseApiService } from '../../../core/services/base-api.service';
 import { HttpHeaders } from '@angular/common/http';
@@ -45,6 +46,7 @@ export interface ExportOptions {
 @Injectable({ providedIn: 'root' })
 export class AttendanceService extends BaseApiService {
   // 🔗 Matches your Backend Route prefix
+  private socketService = Inject(SocketService)
   private endpoint = '/v1/attendance';
 
   // =========================================================
@@ -478,13 +480,13 @@ export class AttendanceService extends BaseApiService {
   connectToAttendanceSocket(userId: string): void {
     // This would integrate with your SocketService
     // Example implementation:
-    /*
+
     this.socketService.connect('attendance');
-    this.socketService.emit('attendance:subscribe', { 
+    this.socketService.emit('attendance:subscribe', {
       userId,
-      subscriptionType: 'my_attendance' 
+      subscriptionType: 'my_attendance'
     });
-    */
+
   }
 
   /**
@@ -493,11 +495,11 @@ export class AttendanceService extends BaseApiService {
   onAttendanceUpdate(): Observable<any> {
     return new Observable(observer => {
       // This would integrate with your SocketService
-      /*
-      this.socketService.on('attendance:punch').subscribe(data => {
+
+      this.socketService.on('attendance:punch').subscribe((data:any) => {
         observer.next(data);
       });
-      */
+
     });
   }
 
@@ -507,11 +509,11 @@ export class AttendanceService extends BaseApiService {
   onRequestUpdate(): Observable<any> {
     return new Observable(observer => {
       // This would integrate with your SocketService
-      /*
-      this.socketService.on('attendance:request:updated').subscribe(data => {
+      
+      this.socketService.on('attendance:request:updated').subscribe((data:any) => {
         observer.next(data);
       });
-      */
+      
     });
   }
 

@@ -1,22 +1,314 @@
 <p-toast></p-toast>
+<p-confirmDialog [style]="{width: '400px'}" rejectButtonStyleClass="p-button-text"></p-confirmDialog>
+
+<!-- Wrapper with Zoom Effect -->
+<div class="invoice-wrapper">
+
+  <form [formGroup]="invoiceForm" class="invoice-panel">
+
+    <!-- 1. OUTSTANDING HEADER -->
+    <header class="panel-header">
+      <div class="flex items-center gap-4">
+        <button pButton icon="pi pi-arrow-left" class="p-button-text p-button-rounded p-button-secondary"
+          routerLink="/invoices"></button>
+        <div>
+          <h1>{{ formTitle() }}</h1>
+          <div class="meta-text flex gap-2 items-center">
+            <i class="pi pi-calendar"></i> {{ invoiceForm.get('invoiceDate')?.value | date:'mediumDate' }}
+            <span class="mx-1">•</span>
+            <span>{{ editMode() ? 'Updating Record' : 'Drafting New Invoice' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        @if (editMode()) {
+        <p-tag [value]="invoiceForm.get('status')?.value | uppercase"
+          [severity]="invoiceForm.get('status')?.value === 'paid' ? 'success' : 'warn'"
+          styleClass="text-xs px-3 py-1 font-bold"></p-tag>
+        }
+        <div class="text-right pl-4 border-l border-[var(--border-primary)]">
+          <div class="text-[var(--text-secondary)] text-[10px] uppercase font-bold tracking-wider">Total Value</div>
+          <div class="text-2xl font-bold text-[var(--accent-primary)] font-mono tracking-tight">
+            {{ grandTotal() | currency:'INR' }}
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. SCROLLABLE CONTENT -->
+    <div class="panel-body">
+
+      <!-- SECTION A: Core Details -->
+      <section class="section-card grid grid-cols-12 gap-6">
+
+        <!-- Customer Selection -->
+        <div class="col-span-12 lg:col-span-3">
+          <label>Customer <span class="text-red-500">*</span></label>
+          <p-select appendTo="body" formControlName="customerId" [options]="customerOptions()" optionLabel="name"
+            optionValue="_id" [filter]="true" filterBy="name" placeholder="Search Customer..."
+            (onChange)="onCustomerSelect($event)" styleClass="w-full" >
+            <!-- [virtualScroll]="true"  -->
+            <ng-template pTemplate="selectedItem" let-selected>
+              <div class="flex items-center gap-2" *ngIf="selected">
+                <i class="pi pi-user text-[var(--accent-primary)]"></i>
+                <span class="font-semibold">{{ selected.name }}</span>
+              </div>
+            </ng-template>
+          </p-select>
+        </div>
+
+        <!-- Meta Data Grid -->
+        <div class="col-span-12 lg:col-span-9 grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div>
+            <label>Invoice #</label>
+            <input pInputText formControlName="invoiceNumber" placeholder="INV-..." class="w-full font-mono" />
+          </div>
+          <div>
+            <label>Date</label>
+            <p-datepicker formControlName="invoiceDate" dateFormat="dd/mm/yy" styleClass="w-full"
+              [showIcon]="true"></p-datepicker>
+          </div>
+          <div>
+            <label>Due Date</label>
+            <p-datepicker formControlName="dueDate" dateFormat="dd/mm/yy" styleClass="w-full"
+              [showIcon]="true"></p-datepicker>
+          </div>
+          <div>
+            <label>Branch</label>
+            <p-select appendTo="body" formControlName="branchId" [options]="branchOptions()" optionLabel="name"
+              optionValue="_id" styleClass="w-full"></p-select>
+          </div>
+          <div>
+            <label>GST Type</label>
+            <p-select appendTo="body" formControlName="gstType" [options]="gstTypeOptions"
+              styleClass="w-full"></p-select>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION B: Line Items -->
+      <section class="section-card p-0 overflow-hidden">
+        <div
+          class="p-2 border-b border-[var(--border-secondary)] flex justify-between items-center bg-[var(--bg-secondary)]">
+          <!-- <h3 class="font-bold text-[var(--text-primary)] text-sm m-0">ITEMIZATION</h3> -->
+          <button pButton label="Add Item" icon="pi pi-plus" class="p-button-sm p-button-outlined"
+            (click)="addItem()"></button>
+        </div>
+
+        <div formArrayName="items">
+          <table class="invoice-table">
+            <thead>
+              <tr>
+                <th style="width: 3%">#</th>
+                <th style="width: 30%">Product / Service</th>
+                <th style="width: 8%" class="text-center">Stock</th>
+                <th style="width: 10%">Qty</th>
+                <th style="width: 12%" class="text-right">Price</th>
+                <th style="width: 10%" class="text-right">Disc.</th>
+                <th style="width: 10%" class="text-center">Tax %</th>
+                <th style="width: 12%" class="text-right">Total</th>
+                <th style="width: 5%"></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of items.controls; track item; let i = $index) {
+              <tr [formGroupName]="i">
+                <td class="text-center text-[var(--text-ternary)]">{{ i + 1 }}</td>
+
+                <!-- Product -->
+                <td>
+                  <p-select appendTo="body" formControlName="productId" [options]="productOptions()" optionLabel="name"
+                    optionValue="_id" [filter]="true" filterBy="name" placeholder="Select Item"
+                    (onChange)="onProductSelect($event, i)" styleClass="w-full border-0 bg-transparent p-0 shadow-none">
+                  </p-select>
+                  @if (items.at(i).get('name')?.value) {
+                  <div class="text-[10px] text-[var(--text-ternary)] mt-1 font-mono">
+                    HSN: {{ items.at(i).get('hsnCode')?.value || 'N/A' }}
+                  </div>
+                  }
+                </td>
+
+                <!-- Stock Status -->
+                <td class="text-center">
+                  @if (items.at(i).get('isCheckingStock')?.value) {
+                  <i class="pi pi-spin pi-spinner text-[var(--accent-primary)]"></i>
+                  } @else {
+                  <div class="stock-badge" [ngClass]="items.at(i).get('isLowStock')?.value ? 'low-stock' : 'in-stock'">
+                    {{ items.at(i).get('currentStock')?.value }}
+                  </div>
+                  }
+                </td>
+
+                <!-- Inputs -->
+                <td>
+                  <p-inputNumber formControlName="quantity" [min]="1"
+                    [max]="items.at(i).get('currentStock')?.value || 99999" styleClass="w-full"
+                    inputStyleClass="text-center font-bold"></p-inputNumber>
+                </td>
+                <td>
+                  <p-inputNumber formControlName="price" mode="decimal" [minFractionDigits]="2" styleClass="w-full"
+                    inputStyleClass="text-right"></p-inputNumber>
+                </td>
+                <td>
+                  <p-inputNumber formControlName="discount" mode="decimal" [minFractionDigits]="2" styleClass="w-full"
+                    inputStyleClass="text-right text-red-500"></p-inputNumber>
+                </td>
+                <td>
+                  <p-inputNumber formControlName="taxRate" suffix="%" [min]="0" [max]="100" styleClass="w-full"
+                    inputStyleClass="text-center text-blue-600"></p-inputNumber>
+                </td>
+
+                <!-- Row Total -->
+                <td class="text-right font-semibold text-[var(--text-primary)]">
+                  {{
+                  (((items.at(i).get('quantity')?.value || 0) * (items.at(i).get('price')?.value || 0)) -
+                  (items.at(i).get('discount')?.value || 0)) * (1 + ((items.at(i).get('taxRate')?.value || 0) / 100)) |
+                  currency:'INR'
+                  }}
+                </td>
+
+                <!-- Remove -->
+                <td class="text-center">
+                  <button pButton icon="pi pi-times" class="p-button-text p-button-danger p-button-rounded p-button-sm"
+                    (click)="removeItem(i)"></button>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (items.controls.length === 0) {
+        <div class="p-8 text-center text-[var(--text-secondary)] bg-[var(--bg-ternary)]">
+          <i class="pi pi-shopping-cart text-4xl mb-2 text-[var(--text-ternary)]"></i>
+          <p>No items added yet. Click "Add Item" to begin.</p>
+        </div>
+        }
+      </section>
+
+      <!-- SECTION C: Footer Grid -->
+      <div class="grid grid-cols-12 gap-6">
+
+        <!-- Left: Terms & Quick Pay -->
+        <div class="col-span-12 lg:col-span-7 flex flex-col gap-6">
+          <div class="section-card">
+            <label>Notes / Terms & Conditions</label>
+            <textarea pInputTextarea formControlName="notes" rows="4" class="w-full mt-2"
+              placeholder="Enter payment terms, bank details, or delivery notes..."></textarea>
+          </div>
+
+          <div class="section-card flex items-center gap-4 bg-[var(--bg-ternary)]">
+            <div class="p-3 bg-white rounded-full shadow-sm">
+              <i class="pi pi-wallet text-xl text-[var(--text-primary)]"></i>
+            </div>
+            <div class="flex-1">
+              <label class="mb-1">Quick Payment Received</label>
+              <div class="flex gap-2">
+                <p-inputNumber formControlName="paidAmount" mode="currency" currency="INR" locale="en-IN"
+                  placeholder="0.00" styleClass="w-full"></p-inputNumber>
+                <p-select appendTo="body" formControlName="paymentMethod" [options]="paymentMethodOptions"
+                  class="w-[180px]"></p-select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Totals Summary -->
+        <div class="col-span-12 lg:col-span-5">
+          <div class="totals-section">
+            <h4
+              class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-4 border-b border-[var(--border-secondary)] pb-2">
+              Financial Summary</h4>
+
+            <div class="total-row">
+              <span>Subtotal</span>
+              <span class="font-medium text-[var(--text-primary)]">{{ subTotal() | currency:'INR' }}</span>
+            </div>
+
+            <div class="total-row">
+              <span>Total Discount</span>
+              <span class="font-medium text-red-500">- {{ totalDiscount() | currency:'INR' }}</span>
+            </div>
+
+            <div class="total-row">
+              <span>Total Tax</span>
+              <span class="font-medium text-green-600">+ {{ totalTax() | currency:'INR' }}</span>
+            </div>
+
+            @if (invoiceForm.get('roundOff')?.value) {
+            <div class="total-row items-center">
+              <span>Round Off</span>
+              <p-inputNumber formControlName="roundOff" mode="decimal" [minFractionDigits]="2" class="w-[80px]"
+                inputStyleClass="text-right p-1 text-xs"></p-inputNumber>
+            </div>
+            }
+
+            <div class="total-row grand-total">
+              <span>Grand Total</span>
+              <span class="amount">{{ grandTotal() | currency:'INR' }}</span>
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-[var(--border-secondary)] flex justify-between items-center">
+              <span class="text-sm font-semibold"
+                [ngClass]="balanceAmount() > 0 ? 'text-orange-600' : 'text-green-600'">
+                {{ balanceAmount() > 0 ? 'Balance Due' : 'Fully Paid' }}
+              </span>
+              <span class="text-lg font-bold">{{ balanceAmount() | currency:'INR' }}</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- 3. STICKY ACTION FOOTER -->
+    <footer class="panel-footer">
+      <div class="text-xs text-[var(--text-ternary)]">
+        <i class="pi pi-info-circle mr-1"></i>
+        Stock reduction applies only when status is <strong>Issued</strong>.
+      </div>
+
+      <div class="flex gap-3">
+        <button pButton type="button" label="Cancel" class="p-button-text p-button-secondary"
+          routerLink="/invoices"></button>
+
+        @if (!editMode() || invoiceForm.get('status')?.value === 'draft') {
+        <button pButton type="button" label="Save as Draft" icon="pi pi-save"
+          class="p-button-outlined p-button-secondary" (click)="handleSubmit('draft')"
+          [loading]="isSubmitting()"></button>
+        }
+
+        <button pButton type="submit"
+          [label]="editMode() && invoiceForm.get('status')?.value !== 'draft' ? 'Update & Save' : 'Issue Invoice'"
+          icon="pi pi-check" class="p-button-primary shadow-lg hover:shadow-xl transition-shadow"
+          (click)="handleSubmit('issued')" [loading]="isSubmitting()"></button>
+      </div>
+    </footer>
+
+  </form>
+</div>
+
+<!-- <p-toast></p-toast>
 
 <div class="customer-wrapper">
   <section class="customer-container invoice-form-container">
 
-    <!-- FORM PANEL (Full Width) -->
+    FORM PANEL (Full Width)
     <div class="customer-form-panel">
       <form [formGroup]="invoiceForm" (ngSubmit)="onSubmit()" class="customer-form-layout">
 
-        <!-- 1. STICKY HEADER -->
+        1. STICKY HEADER
         <div class="customer-form-header">
           <h1 class="form-title">{{ formTitle() }}</h1>
           <p class="form-subtitle">All fields marked with <span class="req">*</span> are required.</p>
         </div>
 
-        <!-- 2. SCROLLABLE BODY -->
+        2. SCROLLABLE BODY
         <div class="customer-form-body">
 
-          <!-- Main Details Grid (Single Row Layout) -->
+          Main Details Grid (Single Row Layout)
           <div class="flex flex-wrap gap-4 items-end mb-2 p-4 bg-[var(--bg-ternary)] rounded-lg border border-[var(--border-primary)]">
             
             <div class="form-group flex-1 min-w-[200px]">
@@ -62,7 +354,7 @@
 
           </div>
 
-          <!-- Item Details -->
+          Item Details
           <p-divider align="center" type="dashed"><b>Line Items</b></p-divider>
 
           <div formArrayName="items" class="items-container">
@@ -83,7 +375,7 @@
               <tbody>
                 <tr *ngFor="let item of items.controls; let i = index" [formGroupName]="i" class="border-b border-[var(--border-secondary)] hover:bg-[var(--bg-ternary)] transition-colors">
 
-                  <!-- Product -->
+                  Product
                   <td class="p-2 col-product">
                     <p-select appendTo="body" appendTo="body" formControlName="productId" [options]="productOptions()"
                       optionLabel="name" optionValue="_id" [filter]="true" filterBy="name" placeholder="Select Product"
@@ -91,32 +383,32 @@
                     </p-select>
                   </td>
 
-                  <!-- HSN -->
+                  HSN
                   <td class="p-2">
                     <input pInputText formControlName="hsnCode" class="w-full border-none bg-transparent" />
                   </td>
 
-                  <!-- Qty -->
+                  Qty
                   <td class="p-2">
                     <p-inputNumber formControlName="quantity" mode="decimal" [min]="1" styleClass="w-full" inputStyleClass="w-full text-right border-none bg-transparent"></p-inputNumber>
                   </td>
 
-                  <!-- Price -->
+                  Price
                   <td class="p-2">
                     <p-inputNumber formControlName="price" mode="decimal" prefix="₹ " [minFractionDigits]="2" styleClass="w-full" inputStyleClass="w-full text-right border-none bg-transparent"></p-inputNumber>
                   </td>
 
-                  <!-- Discount -->
+                  Discount
                   <td class="p-2">
                     <p-inputNumber formControlName="discount" mode="decimal" prefix="₹ " [minFractionDigits]="2" styleClass="w-full" inputStyleClass="w-full text-right border-none bg-transparent"></p-inputNumber>
                   </td>
 
-                  <!-- Tax -->
+                  Tax
                   <td class="p-2">
                     <p-inputNumber formControlName="taxRate" mode="decimal" suffix=" %" styleClass="w-full" inputStyleClass="w-full text-right border-none bg-transparent"></p-inputNumber>
                   </td>
 
-                  <!-- Total -->
+                  Total
                   <td class="p-2 text-right font-bold text-[var(--text-primary)]">
                     {{
                     (
@@ -127,7 +419,7 @@
                     }}
                   </td>
 
-                  <!-- Delete -->
+                  Delete
                   <td class="p-2 text-center">
                     <button pButton icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-text p-button-sm"
                       type="button" pTooltip="Remove" (click)="removeItem(i)">
@@ -137,7 +429,7 @@
               </tbody>
             </table>
 
-            <!-- Add Button -->
+            Add Button
             <div class="flex justify-start mt-1">
               <button pButton label="Add Line Item" icon="pi pi-plus" class="p-button-text" type="button"
                 (click)="addItem()">
@@ -149,10 +441,10 @@
             </div>
           </div>
 
-          <!-- Footer Section: Split Layout (Form vs Summary) -->
+          Footer Section: Split Layout (Form vs Summary)
           <div class="totals-notes-grid grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
 
-            <!-- Left: Notes & Payment Details Form -->
+            Left: Notes & Payment Details Form
             <div class="flex flex-col gap-6">
               
               <div class="form-group">
@@ -183,7 +475,7 @@
 
             </div>
 
-            <!-- Right: Calculation Summary -->
+            Right: Calculation Summary
             <div class="totals-card bg-[var(--bg-secondary)] p-6 rounded-lg border border-[var(--border-primary)] h-fit shadow-sm">
               <h3 class="text-lg font-bold text-[var(--text-primary)] mb-4 border-b border-[var(--border-secondary)] pb-2">Invoice Summary</h3>
               
@@ -226,7 +518,7 @@
           </div>
         </div>
 
-        <!-- 3. STICKY FOOTER -->
+        3. STICKY FOOTER
         <div class="customer-form-footer">
           <div class="form-actions flex gap-3">
              <button pButton type="button" label="Cancel" class="p-button-text p-button-secondary" routerLink="/invoices"></button>
@@ -239,4 +531,4 @@
       </form>
     </div>
   </section>
-</div>
+</div> -->

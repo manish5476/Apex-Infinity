@@ -160,7 +160,7 @@
 
 /* --- DIALOG STYLES --- */
 ::ng-deep .glass-dialog {
-    width: 550px !important;
+    // width: 550px !important;
     max-width: 95vw !important;
     
     .p-dialog-content {
@@ -309,18 +309,18 @@
   line-height: 1.4;
 }
 
-.dialog-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-lg) var(--spacing-xl);
-  background: var(--bg-ternary);
-  border-top: 1px solid var(--border-primary);
-  border-bottom-left-radius: var(--ui-border-radius-xl);
-  border-bottom-right-radius: var(--ui-border-radius-xl);
+// .dialog-footer {
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   padding: var(--spacing-lg) var(--spacing-xl);
+//   background: var(--bg-ternary);
+//   border-top: 1px solid var(--border-primary);
+//   border-bottom-left-radius: var(--ui-border-radius-xl);
+//   border-bottom-right-radius: var(--ui-border-radius-xl);
   
-  .right-actions {
-    display: flex;
-    gap: var(--spacing-md);
-  }
-}
+//   .right-actions {
+//     display: flex;
+//     gap: var(--spacing-md);
+//   }
+// }
