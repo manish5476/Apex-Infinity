@@ -1,0 +1,65 @@
+   :host {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      /* Enforces a minimum height on PC */
+      min-height: 400px; 
+      box-sizing: border-box;
+    }
+
+    .shared-grid-root {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius-lg);
+      overflow: hidden;
+
+      ag-grid-angular {
+        flex: 1;
+        width: 100%;
+        height: 100% !important;
+      }
+    }
+
+    /* Mobile Adjustment */
+    @media (max-width: 768px) {
+      :host {
+        /* On small screens, we allow a smaller floor to prevent overflow */
+        min-height: 300px; 
+        height: auto;
+      }
+      
+      .shared-grid-root {
+        height: 450px; 
+      }
+    }
+
+    /* ag-share-grid.component.scss */
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%; /* Take full height of parent container */
+  min-height: 400px; /* Force a floor so it can't be 0px */
+}
+
+.shared-grid-root {
+  flex: 1; /* Grow to fill the :host */
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  ag-grid-angular {
+    flex: 1;
+    width: 100%;
+    height: 100% !important; /* Force AG Grid to fill the div */
+  }
+}

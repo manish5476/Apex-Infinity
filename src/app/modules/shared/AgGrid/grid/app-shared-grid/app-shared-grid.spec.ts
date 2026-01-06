@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DynamicCellComponent } from './dynamic-cell.component';
+import { AppSharedGrid } from './app-shared-grid';
 
-describe('DynamicCellComponent', () => {
-  let component: DynamicCellComponent;
-  let fixture: ComponentFixture<DynamicCellComponent>;
+describe('AppSharedGrid', () => {
+  let component: AppSharedGrid;
+  let fixture: ComponentFixture<AppSharedGrid>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DynamicCellComponent]
+      imports: [AppSharedGrid]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(DynamicCellComponent);
+    fixture = TestBed.createComponent(AppSharedGrid);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
