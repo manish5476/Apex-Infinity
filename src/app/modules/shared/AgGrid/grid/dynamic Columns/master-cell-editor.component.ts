@@ -1,5 +1,5 @@
 import {
-  Component, ViewChild, ElementRef, AfterViewInit
+  Component, ViewChild, ElementRef, AfterViewInit, Input
 } from '@angular/core';
 import { ICellEditorAngularComp } from 'ag-grid-angular';
 import { CommonModule } from '@angular/common';
@@ -89,18 +89,25 @@ import { CellConfig, MasterEditorParams } from '../grid.types';
 
         @default {
           <input pInputText [(ngModel)]="value"
-            class="w-full"
+          (keydown.enter)="onEnterKey()" 
+            class="w-full" (ngModelChange)="onValueChange($event)"
             [placeholder]="config.placeholder || ''" />
         }
       }
     </div>
   `
 })
-export class MasterCellEditorComponent
-  implements ICellEditorAngularComp, AfterViewInit {
-
+export class MasterCellEditorComponent implements ICellEditorAngularComp, AfterViewInit {
+  @Input() set cellParams(params: MasterEditorParams) {
+    this.agInit(params);
+  }
   @ViewChild('input') input?: ElementRef;
-
+  // --- NEW: Handle Enter Key ---
+  onEnterKey() {
+    // We use the context action we defined in AppSharedGrid
+    // This triggers the EXACT same logic as clicking the Save button
+    this.params.context.onAction('save', this.params.data);
+  }
   params!: MasterEditorParams;
   config!: CellConfig;
   value: any;
@@ -113,6 +120,15 @@ export class MasterCellEditorComponent
 
   getValue(): any {
     return this.value;
+  }
+
+  onValueChange(newValue: any) {
+    this.value = newValue;
+    // Immediately update the Grid Row Node
+    // This ensures "Save All" sees the new data
+    if (this.params && this.params.node) {
+      this.params.node.setDataValue(this.params.colDef.field!, newValue);
+    }
   }
 
   isPopup(): boolean {

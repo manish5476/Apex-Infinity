@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component ,Input} from '@angular/core';
 import { ICellRendererAngularComp } from 'ag-grid-angular';
 import { CommonModule } from '@angular/common';
 import { TagModule } from 'primeng/tag';
@@ -40,8 +40,10 @@ import { CellConfig, MasterRendererParams } from '../grid.types';
     </div>
   `
 })
-export class MasterCellRendererComponent
-  implements ICellRendererAngularComp {
+export class MasterCellRendererComponent implements ICellRendererAngularComp {
+  @Input() set cellParams(params: MasterRendererParams) {
+    this.refresh(params);
+  }
 
   params!: MasterRendererParams;
   config!: CellConfig;
