@@ -71,38 +71,13 @@ export interface Master {
         </p-toolbar>
 
         <div class="master-grid-wrapper" style="height: calc(100vh - 200px);">
-          <div class="toolbar flex gap-2 mb-4">
-
-            <!-- [disabled]="selectedRows().length === 0" -->
-  <p-button 
-    label="Edit Selected" 
-    icon="pi pi-pencil" 
-    (click)="grid.enableBulkEdit()">
-  </p-button>
-
-  <p-button 
-    label="Save Updates" 
-    severity="success" 
-    icon="pi pi-save" 
-    (click)="grid.saveBulkEdit()">
-  </p-button>
-
-</div>
-
-<app-shared-grid #grid
-  [columns]="columns" 
-  [data]="masters()" 
-              [selectionMode]="'multiple'"
-              [showActions]="true"
-  (gridEvent)="onGridEvent($event)">
-</app-shared-grid>
-          <!-- <app-shared-grid
+          <app-shared-grid
             [columns]="columns"
             [data]="masters()"
             [selectionMode]="'multiple'"
             [showActions]="true"
             (gridEvent)="onGridEvent($event)">
-          </app-shared-grid> -->
+          </app-shared-grid>
         </div>
 
       </div>
