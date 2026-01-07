@@ -1,881 +1,935 @@
-/* ============================================================
-   PRIMENG V21 GLOBAL OVERRIDES (Angular 20+)
-   Consuming: Canonical Theme Tokens
-   Compatible with PrimeNG v21.0.1+ (Dec 2024)
-   ============================================================ */
-
-/* --- 1. GENERAL COMPONENT RESET --- */
-.p-component {
-  font-family: var(--font-body);
-  font-size: var(--font-size-base); /* Using base size from theme */
-  color: var(--text-primary) !important;
-  line-height: var(--line-height-normal);
-}
-
-/* --- 2. BUTTONS (.p-button) --- */
-.p-button {
-  background: var(--accent-gradient);
-  border: var(--ui-border-width) solid transparent;
-  color: #ffffff !important;
-  border-radius: var(--ui-border-radius);
-  padding: var(--spacing-md) var(--spacing-xl);
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-sm);
-  transition: var(--transition-base);
-  box-shadow: var(--shadow-sm);
-  cursor: pointer;
-}
-
-.p-button:enabled:hover {
-  background: var(--accent-hover);
-  color: #ffffff !important;
-  border-color: transparent;
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.p-button:enabled:active {
-  transform: translateY(0);
-  box-shadow: var(--shadow-xs);
-}
-
-.p-button:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus);
-}
-
-.p-button:disabled {
-  opacity: var(--state-disabled-opacity);
-  cursor: not-allowed;
-  background: var(--color-disabled) !important;
-  color: var(--color-disabled-text) !important;
-}
-
-/* Button Variants */
-.p-button.p-button-outlined {
-  background: transparent;
-  border: var(--ui-border-width) solid var(--border-primary);
-  color: var(--text-secondary) !important;
-}
-
-.p-button.p-button-outlined:enabled:hover {
-  background: var(--component-bg-hover);
-  color: var(--text-primary) !important;
-  border-color: var(--accent-primary);
-}
-
-.p-button.p-button-text {
-  background: transparent;
-  border-color: transparent;
-  color: var(--text-secondary) !important;
-}
-
-.p-button.p-button-text:enabled:hover {
-  background: var(--component-bg-hover);
-  color: var(--accent-primary) !important;
-}
-
-/* Button Sizes */
-.p-button.p-button-sm {
-  font-size: var(--font-size-xs);
-  padding: var(--spacing-sm) var(--spacing-lg);
-}
-
-.p-button.p-button-lg {
-  font-size: var(--font-size-md);
-  padding: var(--spacing-lg) var(--spacing-2xl);
-}
-
-/* --- 3. INPUTS & FORM ELEMENTS --- */
-.p-inputtext,
-.p-inputnumber-input,
-.p-textarea,
-.p-calendar .p-inputtext,
-.p-password-input {
-  background: var(--bg-ternary) !important;
-  border: var(--ui-border-width) solid var(--border-secondary) !important;
-  color: var(--text-primary) !important;
-  border-radius: var(--ui-border-radius);
-  padding: var(--spacing-md) var(--spacing-lg);
-  font-size: var(--font-size-sm);
-  font-family: var(--font-body);
-  transition: var(--transition-colors);
-  line-height: var(--line-height-normal);
-}
-
-/* Focus State */
-.p-inputtext:enabled:focus,
-.p-inputnumber-input:enabled:focus,
-.p-textarea:enabled:focus,
-.p-calendar .p-inputtext:enabled:focus,
-.p-password-input:enabled:focus {
-  border-color: var(--accent-primary) !important;
-  box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
-  background: var(--bg-secondary) !important;
-  outline: none;
-}
-
-/* Disabled State */
-.p-inputtext:disabled,
-.p-inputnumber-input:disabled,
-.p-textarea:disabled {
-  background: var(--color-disabled) !important;
-  color: var(--color-disabled-text) !important;
-  opacity: var(--state-disabled-opacity);
-  cursor: not-allowed;
-}
-
-/* Placeholder */
-.p-inputtext::placeholder,
-.p-inputnumber-input::placeholder,
-.p-textarea::placeholder {
-  color: var(--text-label);
-  opacity: 1;
-}
-
-/* Input Groups */
-.p-inputgroup {
-  display: flex;
-}
-
-.p-inputgroup-addon {
-  background: var(--bg-ternary);
-  border: var(--ui-border-width) solid var(--border-secondary);
-  color: var(--text-secondary);
-  padding: var(--spacing-md) var(--spacing-lg);
-  font-size: var(--font-size-sm);
-}
-
-/* =================================================================
-   --- 3.1 SELECTS & DROPDOWNS (p-select / p-dropdown / p-multiSelect) ---
-   V21 Compatible with Native CSS Animations
-   ================================================================= */
-
-/* 1. THE TRIGGER (Input Box) */
-.p-select,
-.p-dropdown,
-.p-multiselect {
-  background: var(--bg-ternary) !important;
-  border: var(--ui-border-width) solid var(--border-secondary) !important;
-  color: var(--text-primary) !important;
-  border-radius: var(--ui-border-radius);
-  transition: var(--transition-colors);
-  display: flex;
-  align-items: center;
-  min-height: 2.5rem;
-}
-
-/* Hover State */
-.p-select:not(.p-disabled):hover,
-.p-dropdown:not(.p-disabled):hover,
-.p-multiselect:not(.p-disabled):hover {
-  border-color: var(--accent-primary) !important;
-  background: var(--bg-ternary) !important;
-}
-
-/* Focus State - V21 uses native CSS animations */
-.p-select:focus-within,
-.p-select.p-focus,
-.p-dropdown:focus-within,
-.p-dropdown.p-focus,
-.p-multiselect:focus-within,
-.p-multiselect.p-focus {
-  border-color: var(--accent-primary) !important;
-  box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
-  outline: none;
-}
-
-/* Disabled State */
-.p-select.p-disabled,
-.p-dropdown.p-disabled,
-.p-multiselect.p-disabled {
-  opacity: var(--state-disabled-opacity);
-  background: var(--color-disabled) !important;
-  cursor: not-allowed;
-}
-
-/* Text Label inside */
-.p-select-label,
-.p-dropdown-label,
-.p-multiselect-label {
-  color: var(--text-primary) !important;
-  background: transparent !important;
-  padding: 0 !important;
-  font-size: var(--font-size-sm);
-  flex: 1;
-}
-
-/* Placeholder */
-.p-select .p-placeholder,
-.p-dropdown .p-placeholder,
-.p-multiselect .p-placeholder {
-  color: var(--text-label) !important;
-}
-
-/* Dropdown Trigger */
-.p-select-dropdown,
-.p-dropdown-trigger,
-.p-multiselect-dropdown,
-.p-multiselect-trigger {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  color: var(--text-secondary);
-}
-
-/* Clear Icon */
-.p-select-clear-icon,
-.p-dropdown-clear-icon,
-.p-multiselect-clear-icon {
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: var(--transition-colors);
-}
-
-.p-select-clear-icon:hover,
-.p-dropdown-clear-icon:hover,
-.p-multiselect-clear-icon:hover {
-  color: var(--text-primary);
-}
-
-/* ---------------------------------------------------------------
-   2. THE OVERLAY PANEL (Popup List) - V21 Native CSS Animation
-   --------------------------------------------------------------- */
-.p-select-overlay,
-.p-select-panel,
-.p-dropdown-panel,
-.p-multiselect-panel {
-  background: var(--bg-secondary) !important;
-  border: var(--ui-border-width) solid var(--border-primary) !important;
-  border-radius: var(--ui-border-radius-lg) !important;
-  box-shadow: var(--shadow-xl) !important;
-  color: var(--text-primary) !important;
-  backdrop-filter: blur(var(--glass-blur-c));
-  -webkit-backdrop-filter: blur(var(--glass-blur-c));
-  z-index: var(--z-dropdown) !important;
-  margin-top: var(--spacing-xs);
-}
-
-/* V21: Native CSS Animation (replaces showTransitionOptions/hideTransitionOptions) */
-.p-select-overlay,
-.p-select-panel,
-.p-dropdown-panel,
-.p-multiselect-panel {
-  animation: p-overlay-enter 0.15s cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-@keyframes p-overlay-enter {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
+@layer themes {
+  /* --- 1. GLOBAL COMPONENT RESET --- */
+  .p-component {
+    font-family: var(--font-body);
+    font-size: var(--font-size-base); /* 13px Compact Scale */
+    color: var(--theme-text-primary);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  /* --- 2. FORMS (Targets all Form components provided in your list) --- */
+  /* This uses your input logic: bg-ternary, border-secondary, and accent-primary */
+  .p-inputtext, .p-textarea, .p-select, .p-multiselect, .p-datepicker-input {
+    background: var(--theme-bg-ternary);
+    border: 1px solid var(--theme-border-secondary);
+    border-radius: var(--ui-border-radius);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    font-size: var(--font-size-sm);
+    transition: var(--transition-base);
+
+    &:enabled:focus, &:focus-within {
+      border-color: var(--theme-accent-primary);
+      box-shadow: 0 0 0 4px var(--theme-accent-focus);
+      background: var(--theme-bg-secondary);
+    }
+  }
+
+  /* --- 3. BUTTONS (.btn logic applied to .p-button) --- */
+  .p-button {
+    background: var(--theme-accent-gradient);
+    border-radius: 999px; // Matches your .btn pill style
+    padding: var(--spacing-sm) var(--spacing-lg);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    transition: var(--transition-base);
+
+    &:enabled:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    &.p-button-outlined {
+      background: transparent;
+      border: 1px solid var(--theme-border-primary);
+      color: var(--theme-text-primary);
+    }
+  }
+
+  /* --- 4. CARDS & DIALOGS --- */
+  .p-card, .p-dialog {
+    background: var(--theme-bg-secondary);
+    border-radius: var(--ui-border-radius-lg);
+    border: 1px solid var(--theme-border-primary);
+    box-shadow: var(--shadow-md);
   }
 }
-
-/* Filter/Search Header */
-.p-select-header,
-.p-dropdown-header,
-.p-multiselect-header {
-  background: transparent !important;
-  border-bottom: var(--ui-border-width) solid var(--border-primary) !important;
-  padding: var(--spacing-md) !important;
-  color: var(--text-primary) !important;
-}
-
-/* MultiSelect Header Checkbox */
-.p-multiselect-header .p-checkbox .p-checkbox-box {
-  background: var(--bg-ternary);
-  border-color: var(--border-secondary);
-}
-
-.p-multiselect-header .p-checkbox .p-checkbox-box.p-highlight {
-  background: var(--accent-primary);
-  border-color: var(--accent-primary);
-}
-
-/* Filter Input */
-.p-select-filter,
-.p-dropdown-filter,
-.p-multiselect-filter {
-  background: var(--bg-ternary) !important;
-  border: var(--ui-border-width) solid var(--border-secondary) !important;
-  color: var(--text-primary) !important;
-  padding: var(--spacing-sm) var(--spacing-md) !important;
-  border-radius: var(--ui-border-radius-sm);
-  font-size: var(--font-size-sm);
-}
-
-.p-select-filter:focus,
-.p-dropdown-filter:focus,
-.p-multiselect-filter:focus {
-  border-color: var(--accent-primary) !important;
-  outline: none;
-}
-
-/* ---------------------------------------------------------------
-   3. THE ITEMS LIST
-   --------------------------------------------------------------- */
-.p-select-list,
-.p-dropdown-list,
-.p-dropdown-items,
-.p-multiselect-list,
-.p-multiselect-items,
-.p-multiselect-items-wrapper {
-  background: transparent !important;
-  padding: var(--spacing-xs) !important;
-  list-style: none;
-  margin: 0;
-}
-
-/* ---------------------------------------------------------------
-   4. INDIVIDUAL OPTIONS (Items)
-   --------------------------------------------------------------- */
-.p-select-option,
-.p-dropdown-option,
-.p-dropdown-item,
-.p-multiselect-option,
-.p-multiselect-item {
-  background: transparent !important;
-  border: none !important;
-  color: var(--text-primary) !important;
-  border-radius: var(--ui-border-radius-sm);
-  padding: var(--spacing-md) var(--spacing-lg) !important;
-  margin: var(--spacing-xs) 0 !important;
-  transition: var(--transition-fast);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  cursor: pointer;
-  font-size: var(--font-size-sm);
-}
-
-/* Hover State */
-.p-select-option:not(.p-disabled):hover,
-.p-dropdown-option:not(.p-disabled):hover,
-.p-dropdown-item:not(.p-highlight):not(.p-disabled):hover,
-.p-multiselect-option:not(.p-disabled):hover,
-.p-multiselect-item:not(.p-highlight):not(.p-disabled):hover {
-  background: var(--component-bg-hover) !important;
-  color: var(--text-primary) !important;
-}
-
-/* Focused State (Keyboard Navigation) */
-.p-select-option.p-focus,
-.p-dropdown-option.p-focus,
-.p-dropdown-item.p-focus,
-.p-multiselect-option.p-focus,
-.p-multiselect-item.p-focus {
-  background: var(--component-bg-hover) !important;
-  color: var(--text-primary) !important;
-  outline: none !important;
-}
-
-/* Selected/Highlighted State */
-.p-select-option.p-selected,
-.p-dropdown-option.p-selected,
-.p-dropdown-item.p-highlight,
-.p-multiselect-option.p-selected,
-.p-multiselect-item.p-highlight {
-  background: var(--component-bg-active) !important;
-  color: var(--accent-primary) !important;
-  font-weight: var(--font-weight-semibold);
-}
-
-/* Disabled State */
-.p-select-option.p-disabled,
-.p-dropdown-option.p-disabled,
-.p-dropdown-item.p-disabled,
-.p-multiselect-option.p-disabled,
-.p-multiselect-item.p-disabled {
-  color: var(--text-muted) !important;
-  opacity: var(--opacity-disabled);
-  cursor: not-allowed;
-}
-
-/* Empty Message */
-.p-select-empty-message,
-.p-dropdown-empty-message,
-.p-multiselect-empty-message {
-  color: var(--text-secondary) !important;
-  padding: var(--spacing-xl) !important;
-  background: transparent !important;
-  text-align: center;
-  font-size: var(--font-size-sm);
-}
-
-/* --- CHECKBOX STYLING (MultiSelect) --- */
-.p-multiselect-option .p-checkbox,
-.p-multiselect-item .p-checkbox {
-  display: flex;
-  align-items: center;
-}
-
-.p-checkbox .p-checkbox-box {
-  background: var(--bg-ternary) !important;
-  border: var(--ui-border-width) solid var(--border-secondary) !important;
-  color: var(--text-primary) !important;
-  width: 1.125rem;
-  height: 1.125rem;
-  border-radius: var(--ui-border-radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--transition-colors);
-}
-
-.p-checkbox .p-checkbox-box.p-highlight {
-  background: var(--accent-primary) !important;
-  border-color: var(--accent-primary) !important;
-  color: #ffffff !important;
-}
-
-.p-checkbox .p-checkbox-box:hover {
-  border-color: var(--accent-primary);
-}
-
-.p-checkbox-icon {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-}
-
-/* --- 4. CARDS, DIALOGS & PANELS --- */
-.p-card,
-.p-panel,
-.p-fieldset,
-.p-accordion .p-accordion-content {
-  background: var(--bg-secondary) !important;
-  color: var(--text-primary) !important;
-  border-radius: var(--ui-border-radius-lg);
-  border: var(--ui-border-width) solid var(--border-primary);
-  box-shadow: var(--shadow-md);
-  backdrop-filter: blur(var(--glass-blur-c));
-  -webkit-backdrop-filter: blur(var(--glass-blur-c));
-}
-
-/* Card Header */
-.p-card .p-card-header {
-  background: transparent;
-  padding: var(--spacing-xl);
-  border-bottom: var(--ui-border-width) solid var(--border-primary);
-}
-
-/* Card Body */
-.p-card .p-card-body {
-  padding: 0;
-}
-
-.p-card .p-card-content {
-  padding: var(--spacing-xl);
-  color: var(--text-primary);
-}
-
-/* Card Title */
-.p-card .p-card-title {
-  font-family: var(--font-heading);
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--text-primary);
-  margin: 0 0 var(--spacing-sm) 0;
-}
-
-/* Card Subtitle */
-.p-card .p-card-subtitle {
-  font-size: var(--font-size-sm);
-  color: var(--text-secondary);
-  margin: 0 0 var(--spacing-lg) 0;
-}
-
-/* Card Footer */
-.p-card .p-card-footer {
-  padding: var(--spacing-xl);
-  border-top: var(--ui-border-width) solid var(--border-primary);
-  background: transparent;
-}
-
-/* --- DIALOG SPECIFICS (V21 Native Animations) --- */
-.p-dialog {
-  background: var(--bg-secondary) !important;
-  border-radius: var(--ui-border-radius-xl);
-  box-shadow: var(--shadow-2xl);
-  border: var(--ui-border-width) solid var(--border-primary);
-  backdrop-filter: blur(var(--glass-blur-c));
-  -webkit-backdrop-filter: blur(var(--glass-blur-c));
-}
-
-/* V21: Native CSS Animation for Dialog */
-.p-dialog {
-  animation: p-dialog-enter 0.2s cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-@keyframes p-dialog-enter {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-/* Dialog Mask/Backdrop */
-.p-dialog-mask {
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  animation: p-dialog-mask-enter 0.15s ease-out;
-}
-
-@keyframes p-dialog-mask-enter {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* Dialog Header */
-.p-dialog .p-dialog-header {
-  background: transparent !important;
-  border-bottom: var(--ui-border-width) solid var(--border-primary);
-  padding: var(--spacing-xl) var(--spacing-2xl);
-  color: var(--text-primary) !important;
-  border-top-left-radius: var(--ui-border-radius-xl);
-  border-top-right-radius: var(--ui-border-radius-xl);
-}
-
-.p-dialog .p-dialog-title {
-  font-family: var(--font-heading);
-  font-weight: var(--font-weight-bold);
-  font-size: var(--font-size-2xl);
-  color: var(--text-primary);
-  line-height: var(--line-height-tight);
-}
-
-/* Dialog Header Icons */
-.p-dialog .p-dialog-header-icons {
-  display: flex;
-  gap: var(--spacing-sm);
-}
-
-.p-dialog .p-dialog-header-icon {
-  color: var(--text-secondary);
-  width: 2rem;
-  height: 2rem;
-  border-radius: var(--ui-border-radius);
-  transition: var(--transition-fast);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.p-dialog .p-dialog-header-icon:hover {
-  background: var(--component-bg-hover) !important;
-  color: var(--text-primary) !important;
-}
-
-.p-dialog .p-dialog-header-icon:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus);
-}
-
-/* Dialog Content */
-.p-dialog .p-dialog-content {
-  background: transparent !important;
-  color: var(--text-primary) !important;
-  padding: var(--spacing-2xl);
-  max-height: 70vh;
-  overflow-y: auto;
-}
-
-/* Modern Scrollbar */
-.p-dialog .p-dialog-content::-webkit-scrollbar {
-  width: 8px;
-}
-
-.p-dialog .p-dialog-content::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.p-dialog .p-dialog-content::-webkit-scrollbar-thumb {
-  background: var(--border-secondary);
-  border-radius: var(--ui-border-radius-sm);
-}
-
-.p-dialog .p-dialog-content::-webkit-scrollbar-thumb:hover {
-  background: var(--text-tertiary);
-}
-
-/* Dialog Footer */
-.p-dialog .p-dialog-footer {
-  background: transparent !important;
-  border-top: var(--ui-border-width) solid var(--border-primary);
-  padding: var(--spacing-xl) var(--spacing-2xl);
-  color: var(--text-primary) !important;
-  border-bottom-left-radius: var(--ui-border-radius-xl);
-  border-bottom-right-radius: var(--ui-border-radius-xl);
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-md);
-}
-
-/* --- 5. DATATABLE (Modern & Seamless) --- */
-.p-datatable {
-  background: var(--bg-secondary);
-  border-radius: var(--ui-border-radius-lg);
-  border: var(--ui-border-width) solid var(--border-primary);
-  overflow: hidden;
-}
-
-.p-datatable .p-datatable-header {
-  background: var(--bg-ternary);
-  padding: var(--spacing-lg) var(--spacing-xl);
-  border-bottom: var(--ui-border-width) solid var(--border-primary);
-  color: var(--text-primary);
-}
-
-.p-datatable .p-datatable-wrapper {
-  background: transparent;
-}
-
-/* Table Header */
-.p-datatable .p-datatable-thead > tr > th {
-  background: var(--bg-ternary) !important;
-  color: var(--text-label);
-  font-size: var(--font-size-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: var(--font-weight-bold);
-  padding: var(--spacing-lg) var(--spacing-xl);
-  border: none;
-  border-bottom: var(--ui-border-width) solid var(--border-primary);
-  white-space: nowrap;
-}
-
-/* Table Body */
-.p-datatable .p-datatable-tbody > tr {
-  background: transparent !important;
-  color: var(--text-primary);
-  transition: var(--transition-fast);
-  border-bottom: var(--ui-border-width) solid var(--border-secondary);
-}
-
-.p-datatable .p-datatable-tbody > tr > td {
-  padding: var(--spacing-lg) var(--spacing-xl);
-  border: none;
-  font-size: var(--font-size-sm);
-  color: var(--text-primary);
-}
-
-/* Hover Effect */
-.p-datatable .p-datatable-tbody > tr:hover {
-  background: var(--component-bg-hover) !important;
-}
-
-/* Selected Row */
-.p-datatable .p-datatable-tbody > tr.p-highlight {
-  background: var(--component-bg-active) !important;
-  color: var(--accent-primary) !important;
-}
-
-/* Striped Rows */
-.p-datatable.p-datatable-striped .p-datatable-tbody > tr:nth-child(even) {
-  background: var(--bg-ternary);
-}
-
-/* Footer */
-.p-datatable .p-datatable-footer {
-  background: var(--bg-ternary);
-  padding: var(--spacing-lg) var(--spacing-xl);
-  border-top: var(--ui-border-width) solid var(--border-primary);
-  color: var(--text-primary);
-}
-
-/* --- PAGINATOR --- */
-.p-paginator {
-  background: transparent;
-  border-top: var(--ui-border-width) solid var(--border-primary);
-  padding: var(--spacing-md) var(--spacing-lg);
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: var(--spacing-md);
-}
-
-.p-paginator .p-paginator-element,
-.p-paginator .p-paginator-page,
-.p-paginator .p-paginator-next,
-.p-paginator .p-paginator-prev,
-.p-paginator .p-paginator-first,
-.p-paginator .p-paginator-last {
-  color: var(--text-secondary);
-  background: transparent;
-  border: var(--ui-border-width) solid transparent;
-  min-width: 2rem;
-  height: 2rem;
-  border-radius: var(--ui-border-radius);
-  transition: var(--transition-fast);
-  font-size: var(--font-size-sm);
-}
-
-.p-paginator .p-paginator-element:not(.p-disabled):hover {
-  background: var(--component-bg-hover);
-  color: var(--text-primary);
-}
-
-.p-paginator .p-paginator-element.p-highlight {
-  background: var(--component-bg-active);
-  color: var(--accent-primary);
-  font-weight: var(--font-weight-semibold);
-}
-
-/* --- 6. TABS (V21 Compatible) --- */
-
-/* Legacy TabView */
-.p-tabview .p-tabview-nav {
-  background: transparent;
-  border-bottom: var(--ui-border-width) solid var(--border-primary);
-  display: flex;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.p-tabview .p-tabview-nav li {
-  margin: 0;
-}
-
-.p-tabview .p-tabview-nav li .p-tabview-nav-link {
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: var(--text-secondary);
-  padding: var(--spacing-lg) var(--spacing-xl);
-  font-weight: var(--font-weight-medium);
-  font-size: var(--font-size-sm);
-  transition: var(--transition-colors);
-  margin-bottom: -1px;
-  cursor: pointer;
-  text-decoration: none;
-  display: block;
-}
-
-.p-tabview .p-tabview-nav li:not(.p-highlight):not(.p-disabled):hover .p-tabview-nav-link {
-  color: var(--text-primary);
-  background: var(--component-bg-hover);
-}
-
-.p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
-  color: var(--accent-primary);
-  border-bottom-color: var(--accent-primary);
-  font-weight: var(--font-weight-semibold);
-}
-
-/* TabView Panels */
-.p-tabview .p-tabview-panels {
-  background: transparent;
-  padding: var(--spacing-xl);
-  color: var(--text-primary);
-}
-
-/* Modern Tabs (p-tablist/p-tab) */
-.p-tablist {
-  background: var(--bg-ternary) !important;
-  border-bottom: var(--ui-border-width) solid var(--border-primary);
-  padding: var(--spacing-sm) var(--spacing-sm) 0;
-  border-radius: var(--ui-border-radius-lg) var(--ui-border-radius-lg) 0 0;
-  display: flex;
-  gap: var(--spacing-xs);
-}
-
-.p-tab {
-  background: transparent !important;
-  border: var(--ui-border-width) solid transparent;
-  border-bottom: none;
-  color: var(--text-secondary) !important;
-  padding: var(--spacing-md) var(--spacing-xl) !important;
-  font-weight: var(--font-weight-medium);
-  font-size: var(--font-size-sm);
-  border-radius: var(--ui-border-radius) var(--ui-border-radius) 0 0;
-  transition: var(--transition-fast);
-  cursor: pointer;
-  position: relative;
-  margin-bottom: -1px;
-  opacity: 0.85;
-}
-
-.p-tab:not(.p-tab-active):not(.p-disabled):hover {
-  background: var(--component-bg-hover) !important;
-  color: var(--text-primary) !important;
-  opacity: 1;
-}
-
-.p-tab.p-tab-active {
-  background: var(--bg-secondary) !important;
-  color: var(--accent-primary) !important;
-  border-color: var(--border-primary) !important;
-  border-bottom-color: var(--bg-secondary) !important;
-  font-weight: var(--font-weight-semibold);
-  opacity: 1;
-  z-index: 2;
-  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.p-tab:focus-visible {
-  outline: none;
-  box-shadow: inset 0 0 0 var(--focus-ring-width) var(--accent-focus);
-}
-
-/* Tab Panels */
-.p-tabpanels {
-  background: var(--bg-secondary);
-  padding: var(--spacing-xl);
-  color: var(--text-primary);
-}
-
-/* --- 7. ACCORDION --- */
-.p-accordion .p-accordion-header .p-accordion-header-link {
-  background: var(--bg-ternary);
-  border: var(--ui-border-width) solid var(--border-primary);
-  color: var(--text-primary);
-  padding: var(--spacing-lg) var(--spacing-xl);
-  font-weight: var(--font-weight-medium);
-  font-size: var(--font-size-sm);
-  transition: var(--transition-colors);
-}
-
-.p-accordion .p-accordion-header:not(.p-disabled) .p-accordion-header-link:hover {
-  background: var(--component-bg-hover);
-  color: var(--text-primary);
-}
-
-.p-accordion .p-accordion-header.p-highlight .p-accordion-header-link {
-  background: var(--component-bg-active);
-  color: var(--accent-primary);
-  font-weight: var(--font-weight-semibold);
-}
-
-.p-accordion .p-accordion-content {
-  border: var(--ui-border-width) solid var(--border-primary);
-  border-top: none;
-  padding: var(--spacing-xl);
-  color: var(--text-primary);
-}
-
-/* --- 8. MENU & NAVIGATION --- */
-.p-menu,
-.p-tieredmenu,
-.p-menubar,
-.p-contextmenu {
-  background: var(--bg-secondary);
-  border: var(--ui-border-width) solid var(--border-primary);
-}
+// /* ============================================================
+//    PRIMENG V21 GLOBAL OVERRIDES (Angular 20+)
+//    Consuming: Canonical Theme Tokens
+//    Compatible with PrimeNG v21.0.1+ (Dec 2024)
+//    ============================================================ */
+
+// /* --- 1. GENERAL COMPONENT RESET --- */
+// .p-component {
+//   font-family: var(--font-body);
+//   font-size: var(--font-size-base); /* Using base size from theme */
+//   color: var(--text-primary) !important;
+//   line-height: var(--line-height-normal);
+// }
+
+// /* --- 2. BUTTONS (.p-button) --- */
+// .p-button {
+//   background: var(--accent-gradient);
+//   border: var(--ui-border-width) solid transparent;
+//   color: #ffffff !important;
+//   border-radius: var(--ui-border-radius);
+//   padding: var(--spacing-md) var(--spacing-xl);
+//   font-weight: var(--font-weight-semibold);
+//   font-size: var(--font-size-sm);
+//   transition: var(--transition-base);
+//   box-shadow: var(--shadow-sm);
+//   cursor: pointer;
+// }
+
+// .p-button:enabled:hover {
+//   background: var(--accent-hover);
+//   color: #ffffff !important;
+//   border-color: transparent;
+//   transform: translateY(-1px);
+//   box-shadow: var(--shadow-md);
+// }
+
+// .p-button:enabled:active {
+//   transform: translateY(0);
+//   box-shadow: var(--shadow-xs);
+// }
+
+// .p-button:focus-visible {
+//   outline: none;
+//   box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus);
+// }
+
+// .p-button:disabled {
+//   opacity: var(--state-disabled-opacity);
+//   cursor: not-allowed;
+//   background: var(--color-disabled) !important;
+//   color: var(--color-disabled-text) !important;
+// }
+
+// /* Button Variants */
+// .p-button.p-button-outlined {
+//   background: transparent;
+//   border: var(--ui-border-width) solid var(--border-primary);
+//   color: var(--text-secondary) !important;
+// }
+
+// .p-button.p-button-outlined:enabled:hover {
+//   background: var(--component-bg-hover);
+//   color: var(--text-primary) !important;
+//   border-color: var(--accent-primary);
+// }
+
+// .p-button.p-button-text {
+//   background: transparent;
+//   border-color: transparent;
+//   color: var(--text-secondary) !important;
+// }
+
+// .p-button.p-button-text:enabled:hover {
+//   background: var(--component-bg-hover);
+//   color: var(--accent-primary) !important;
+// }
+
+// /* Button Sizes */
+// .p-button.p-button-sm {
+//   font-size: var(--font-size-xs);
+//   padding: var(--spacing-sm) var(--spacing-lg);
+// }
+
+// .p-button.p-button-lg {
+//   font-size: var(--font-size-md);
+//   padding: var(--spacing-lg) var(--spacing-2xl);
+// }
+
+// /* --- 3. INPUTS & FORM ELEMENTS --- */
+// .p-inputtext,
+// .p-inputnumber-input,
+// .p-textarea,
+// .p-calendar .p-inputtext,
+// .p-password-input {
+//   background: var(--bg-ternary) !important;
+//   border: var(--ui-border-width) solid var(--border-secondary) !important;
+//   color: var(--text-primary) !important;
+//   border-radius: var(--ui-border-radius);
+//   padding: var(--spacing-md) var(--spacing-lg);
+//   font-size: var(--font-size-sm);
+//   font-family: var(--font-body);
+//   transition: var(--transition-colors);
+//   line-height: var(--line-height-normal);
+// }
+
+// /* Focus State */
+// .p-inputtext:enabled:focus,
+// .p-inputnumber-input:enabled:focus,
+// .p-textarea:enabled:focus,
+// .p-calendar .p-inputtext:enabled:focus,
+// .p-password-input:enabled:focus {
+//   border-color: var(--accent-primary) !important;
+//   box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
+//   background: var(--bg-secondary) !important;
+//   outline: none;
+// }
+
+// /* Disabled State */
+// .p-inputtext:disabled,
+// .p-inputnumber-input:disabled,
+// .p-textarea:disabled {
+//   background: var(--color-disabled) !important;
+//   color: var(--color-disabled-text) !important;
+//   opacity: var(--state-disabled-opacity);
+//   cursor: not-allowed;
+// }
+
+// /* Placeholder */
+// .p-inputtext::placeholder,
+// .p-inputnumber-input::placeholder,
+// .p-textarea::placeholder {
+//   color: var(--text-label);
+//   opacity: 1;
+// }
+
+// /* Input Groups */
+// .p-inputgroup {
+//   display: flex;
+// }
+
+// .p-inputgroup-addon {
+//   background: var(--bg-ternary);
+//   border: var(--ui-border-width) solid var(--border-secondary);
+//   color: var(--text-secondary);
+//   padding: var(--spacing-md) var(--spacing-lg);
+//   font-size: var(--font-size-sm);
+// }
+
+// /* =================================================================
+//    --- 3.1 SELECTS & DROPDOWNS (p-select / p-dropdown / p-multiSelect) ---
+//    V21 Compatible with Native CSS Animations
+//    ================================================================= */
+
+// /* 1. THE TRIGGER (Input Box) */
+// .p-select,
+// .p-dropdown,
+// .p-multiselect {
+//   background: var(--bg-ternary) !important;
+//   border: var(--ui-border-width) solid var(--border-secondary) !important;
+//   color: var(--text-primary) !important;
+//   border-radius: var(--ui-border-radius);
+//   transition: var(--transition-colors);
+//   display: flex;
+//   align-items: center;
+//   min-height: 2.5rem;
+// }
+
+// /* Hover State */
+// .p-select:not(.p-disabled):hover,
+// .p-dropdown:not(.p-disabled):hover,
+// .p-multiselect:not(.p-disabled):hover {
+//   border-color: var(--accent-primary) !important;
+//   background: var(--bg-ternary) !important;
+// }
+
+// /* Focus State - V21 uses native CSS animations */
+// .p-select:focus-within,
+// .p-select.p-focus,
+// .p-dropdown:focus-within,
+// .p-dropdown.p-focus,
+// .p-multiselect:focus-within,
+// .p-multiselect.p-focus {
+//   border-color: var(--accent-primary) !important;
+//   box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
+//   outline: none;
+// }
+
+// /* Disabled State */
+// .p-select.p-disabled,
+// .p-dropdown.p-disabled,
+// .p-multiselect.p-disabled {
+//   opacity: var(--state-disabled-opacity);
+//   background: var(--color-disabled) !important;
+//   cursor: not-allowed;
+// }
+
+// /* Text Label inside */
+// .p-select-label,
+// .p-dropdown-label,
+// .p-multiselect-label {
+//   color: var(--text-primary) !important;
+//   background: transparent !important;
+//   padding: 0 !important;
+//   font-size: var(--font-size-sm);
+//   flex: 1;
+// }
+
+// /* Placeholder */
+// .p-select .p-placeholder,
+// .p-dropdown .p-placeholder,
+// .p-multiselect .p-placeholder {
+//   color: var(--text-label) !important;
+// }
+
+// /* Dropdown Trigger */
+// .p-select-dropdown,
+// .p-dropdown-trigger,
+// .p-multiselect-dropdown,
+// .p-multiselect-trigger {
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   width: 2.5rem;
+//   color: var(--text-secondary);
+// }
+
+// /* Clear Icon */
+// .p-select-clear-icon,
+// .p-dropdown-clear-icon,
+// .p-multiselect-clear-icon {
+//   color: var(--text-secondary);
+//   cursor: pointer;
+//   transition: var(--transition-colors);
+// }
+
+// .p-select-clear-icon:hover,
+// .p-dropdown-clear-icon:hover,
+// .p-multiselect-clear-icon:hover {
+//   color: var(--text-primary);
+// }
+
+// /* ---------------------------------------------------------------
+//    2. THE OVERLAY PANEL (Popup List) - V21 Native CSS Animation
+//    --------------------------------------------------------------- */
+// .p-select-overlay,
+// .p-select-panel,
+// .p-dropdown-panel,
+// .p-multiselect-panel {
+//   background: var(--bg-secondary) !important;
+//   border: var(--ui-border-width) solid var(--border-primary) !important;
+//   border-radius: var(--ui-border-radius-lg) !important;
+//   box-shadow: var(--shadow-xl) !important;
+//   color: var(--text-primary) !important;
+//   backdrop-filter: blur(var(--glass-blur-c));
+//   -webkit-backdrop-filter: blur(var(--glass-blur-c));
+//   z-index: var(--z-dropdown) !important;
+//   margin-top: var(--spacing-xs);
+// }
+
+// /* V21: Native CSS Animation (replaces showTransitionOptions/hideTransitionOptions) */
+// .p-select-overlay,
+// .p-select-panel,
+// .p-dropdown-panel,
+// .p-multiselect-panel {
+//   animation: p-overlay-enter 0.15s cubic-bezier(0.23, 1, 0.32, 1);
+// }
+
+// @keyframes p-overlay-enter {
+//   from {
+//     opacity: 0;
+//     transform: translateY(-8px);
+//   }
+//   to {
+//     opacity: 1;
+//     transform: translateY(0);
+//   }
+// }
+
+// /* Filter/Search Header */
+// .p-select-header,
+// .p-dropdown-header,
+// .p-multiselect-header {
+//   background: transparent !important;
+//   border-bottom: var(--ui-border-width) solid var(--border-primary) !important;
+//   padding: var(--spacing-md) !important;
+//   color: var(--text-primary) !important;
+// }
+
+// /* MultiSelect Header Checkbox */
+// .p-multiselect-header .p-checkbox .p-checkbox-box {
+//   background: var(--bg-ternary);
+//   border-color: var(--border-secondary);
+// }
+
+// .p-multiselect-header .p-checkbox .p-checkbox-box.p-highlight {
+//   background: var(--accent-primary);
+//   border-color: var(--accent-primary);
+// }
+
+// /* Filter Input */
+// .p-select-filter,
+// .p-dropdown-filter,
+// .p-multiselect-filter {
+//   background: var(--bg-ternary) !important;
+//   border: var(--ui-border-width) solid var(--border-secondary) !important;
+//   color: var(--text-primary) !important;
+//   padding: var(--spacing-sm) var(--spacing-md) !important;
+//   border-radius: var(--ui-border-radius-sm);
+//   font-size: var(--font-size-sm);
+// }
+
+// .p-select-filter:focus,
+// .p-dropdown-filter:focus,
+// .p-multiselect-filter:focus {
+//   border-color: var(--accent-primary) !important;
+//   outline: none;
+// }
+
+// /* ---------------------------------------------------------------
+//    3. THE ITEMS LIST
+//    --------------------------------------------------------------- */
+// .p-select-list,
+// .p-dropdown-list,
+// .p-dropdown-items,
+// .p-multiselect-list,
+// .p-multiselect-items,
+// .p-multiselect-items-wrapper {
+//   background: transparent !important;
+//   padding: var(--spacing-xs) !important;
+//   list-style: none;
+//   margin: 0;
+// }
+
+// /* ---------------------------------------------------------------
+//    4. INDIVIDUAL OPTIONS (Items)
+//    --------------------------------------------------------------- */
+// .p-select-option,
+// .p-dropdown-option,
+// .p-dropdown-item,
+// .p-multiselect-option,
+// .p-multiselect-item {
+//   background: transparent !important;
+//   border: none !important;
+//   color: var(--text-primary) !important;
+//   border-radius: var(--ui-border-radius-sm);
+//   padding: var(--spacing-md) var(--spacing-lg) !important;
+//   margin: var(--spacing-xs) 0 !important;
+//   transition: var(--transition-fast);
+//   display: flex;
+//   align-items: center;
+//   gap: var(--spacing-md);
+//   cursor: pointer;
+//   font-size: var(--font-size-sm);
+// }
+
+// /* Hover State */
+// .p-select-option:not(.p-disabled):hover,
+// .p-dropdown-option:not(.p-disabled):hover,
+// .p-dropdown-item:not(.p-highlight):not(.p-disabled):hover,
+// .p-multiselect-option:not(.p-disabled):hover,
+// .p-multiselect-item:not(.p-highlight):not(.p-disabled):hover {
+//   background: var(--component-bg-hover) !important;
+//   color: var(--text-primary) !important;
+// }
+
+// /* Focused State (Keyboard Navigation) */
+// .p-select-option.p-focus,
+// .p-dropdown-option.p-focus,
+// .p-dropdown-item.p-focus,
+// .p-multiselect-option.p-focus,
+// .p-multiselect-item.p-focus {
+//   background: var(--component-bg-hover) !important;
+//   color: var(--text-primary) !important;
+//   outline: none !important;
+// }
+
+// /* Selected/Highlighted State */
+// .p-select-option.p-selected,
+// .p-dropdown-option.p-selected,
+// .p-dropdown-item.p-highlight,
+// .p-multiselect-option.p-selected,
+// .p-multiselect-item.p-highlight {
+//   background: var(--component-bg-active) !important;
+//   color: var(--accent-primary) !important;
+//   font-weight: var(--font-weight-semibold);
+// }
+
+// /* Disabled State */
+// .p-select-option.p-disabled,
+// .p-dropdown-option.p-disabled,
+// .p-dropdown-item.p-disabled,
+// .p-multiselect-option.p-disabled,
+// .p-multiselect-item.p-disabled {
+//   color: var(--text-muted) !important;
+//   opacity: var(--opacity-disabled);
+//   cursor: not-allowed;
+// }
+
+// /* Empty Message */
+// .p-select-empty-message,
+// .p-dropdown-empty-message,
+// .p-multiselect-empty-message {
+//   color: var(--text-secondary) !important;
+//   padding: var(--spacing-xl) !important;
+//   background: transparent !important;
+//   text-align: center;
+//   font-size: var(--font-size-sm);
+// }
+
+// /* --- CHECKBOX STYLING (MultiSelect) --- */
+// .p-multiselect-option .p-checkbox,
+// .p-multiselect-item .p-checkbox {
+//   display: flex;
+//   align-items: center;
+// }
+
+// .p-checkbox .p-checkbox-box {
+//   background: var(--bg-ternary) !important;
+//   border: var(--ui-border-width) solid var(--border-secondary) !important;
+//   color: var(--text-primary) !important;
+//   width: 1.125rem;
+//   height: 1.125rem;
+//   border-radius: var(--ui-border-radius-sm);
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   transition: var(--transition-colors);
+// }
+
+// .p-checkbox .p-checkbox-box.p-highlight {
+//   background: var(--accent-primary) !important;
+//   border-color: var(--accent-primary) !important;
+//   color: #ffffff !important;
+// }
+
+// .p-checkbox .p-checkbox-box:hover {
+//   border-color: var(--accent-primary);
+// }
+
+// .p-checkbox-icon {
+//   font-size: var(--font-size-xs);
+//   font-weight: var(--font-weight-bold);
+// }
+
+// /* --- 4. CARDS, DIALOGS & PANELS --- */
+// .p-card,
+// .p-panel,
+// .p-fieldset,
+// .p-accordion .p-accordion-content {
+//   background: var(--bg-secondary) !important;
+//   color: var(--text-primary) !important;
+//   border-radius: var(--ui-border-radius-lg);
+//   border: var(--ui-border-width) solid var(--border-primary);
+//   box-shadow: var(--shadow-md);
+//   backdrop-filter: blur(var(--glass-blur-c));
+//   -webkit-backdrop-filter: blur(var(--glass-blur-c));
+// }
+
+// /* Card Header */
+// .p-card .p-card-header {
+//   background: transparent;
+//   padding: var(--spacing-xl);
+//   border-bottom: var(--ui-border-width) solid var(--border-primary);
+// }
+
+// /* Card Body */
+// .p-card .p-card-body {
+//   padding: 0;
+// }
+
+// .p-card .p-card-content {
+//   padding: var(--spacing-xl);
+//   color: var(--text-primary);
+// }
+
+// /* Card Title */
+// .p-card .p-card-title {
+//   font-family: var(--font-heading);
+//   font-size: var(--font-size-xl);
+//   font-weight: var(--font-weight-bold);
+//   color: var(--text-primary);
+//   margin: 0 0 var(--spacing-sm) 0;
+// }
+
+// /* Card Subtitle */
+// .p-card .p-card-subtitle {
+//   font-size: var(--font-size-sm);
+//   color: var(--text-secondary);
+//   margin: 0 0 var(--spacing-lg) 0;
+// }
+
+// /* Card Footer */
+// .p-card .p-card-footer {
+//   padding: var(--spacing-xl);
+//   border-top: var(--ui-border-width) solid var(--border-primary);
+//   background: transparent;
+// }
+
+// /* --- DIALOG SPECIFICS (V21 Native Animations) --- */
+// .p-dialog {
+//   background: var(--bg-secondary) !important;
+//   border-radius: var(--ui-border-radius-xl);
+//   box-shadow: var(--shadow-2xl);
+//   border: var(--ui-border-width) solid var(--border-primary);
+//   backdrop-filter: blur(var(--glass-blur-c));
+//   -webkit-backdrop-filter: blur(var(--glass-blur-c));
+// }
+
+// /* V21: Native CSS Animation for Dialog */
+// .p-dialog {
+//   animation: p-dialog-enter 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+// }
+
+// @keyframes p-dialog-enter {
+//   from {
+//     opacity: 0;
+//     transform: scale(0.95) translateY(-20px);
+//   }
+//   to {
+//     opacity: 1;
+//     transform: scale(1) translateY(0);
+//   }
+// }
+
+// /* Dialog Mask/Backdrop */
+// .p-dialog-mask {
+//   background: rgba(0, 0, 0, 0.5);
+//   backdrop-filter: blur(4px);
+//   animation: p-dialog-mask-enter 0.15s ease-out;
+// }
+
+// @keyframes p-dialog-mask-enter {
+//   from {
+//     opacity: 0;
+//   }
+//   to {
+//     opacity: 1;
+//   }
+// }
+
+// /* Dialog Header */
+// .p-dialog .p-dialog-header {
+//   background: transparent !important;
+//   border-bottom: var(--ui-border-width) solid var(--border-primary);
+//   padding: var(--spacing-xl) var(--spacing-2xl);
+//   color: var(--text-primary) !important;
+//   border-top-left-radius: var(--ui-border-radius-xl);
+//   border-top-right-radius: var(--ui-border-radius-xl);
+// }
+
+// .p-dialog .p-dialog-title {
+//   font-family: var(--font-heading);
+//   font-weight: var(--font-weight-bold);
+//   font-size: var(--font-size-2xl);
+//   color: var(--text-primary);
+//   line-height: var(--line-height-tight);
+// }
+
+// /* Dialog Header Icons */
+// .p-dialog .p-dialog-header-icons {
+//   display: flex;
+//   gap: var(--spacing-sm);
+// }
+
+// .p-dialog .p-dialog-header-icon {
+//   color: var(--text-secondary);
+//   width: 2rem;
+//   height: 2rem;
+//   border-radius: var(--ui-border-radius);
+//   transition: var(--transition-fast);
+//   background: transparent;
+//   border: none;
+//   cursor: pointer;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+// }
+
+// .p-dialog .p-dialog-header-icon:hover {
+//   background: var(--component-bg-hover) !important;
+//   color: var(--text-primary) !important;
+// }
+
+// .p-dialog .p-dialog-header-icon:focus-visible {
+//   outline: none;
+//   box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus);
+// }
+
+// /* Dialog Content */
+// .p-dialog .p-dialog-content {
+//   background: transparent !important;
+//   color: var(--text-primary) !important;
+//   padding: var(--spacing-2xl);
+//   max-height: 70vh;
+//   overflow-y: auto;
+// }
+
+// /* Modern Scrollbar */
+// .p-dialog .p-dialog-content::-webkit-scrollbar {
+//   width: 8px;
+// }
+
+// .p-dialog .p-dialog-content::-webkit-scrollbar-track {
+//   background: transparent;
+// }
+
+// .p-dialog .p-dialog-content::-webkit-scrollbar-thumb {
+//   background: var(--border-secondary);
+//   border-radius: var(--ui-border-radius-sm);
+// }
+
+// .p-dialog .p-dialog-content::-webkit-scrollbar-thumb:hover {
+//   background: var(--text-tertiary);
+// }
+
+// /* Dialog Footer */
+// .p-dialog .p-dialog-footer {
+//   background: transparent !important;
+//   border-top: var(--ui-border-width) solid var(--border-primary);
+//   padding: var(--spacing-xl) var(--spacing-2xl);
+//   color: var(--text-primary) !important;
+//   border-bottom-left-radius: var(--ui-border-radius-xl);
+//   border-bottom-right-radius: var(--ui-border-radius-xl);
+//   display: flex;
+//   justify-content: flex-end;
+//   gap: var(--spacing-md);
+// }
+
+// /* --- 5. DATATABLE (Modern & Seamless) --- */
+// .p-datatable {
+//   background: var(--bg-secondary);
+//   border-radius: var(--ui-border-radius-lg);
+//   border: var(--ui-border-width) solid var(--border-primary);
+//   overflow: hidden;
+// }
+
+// .p-datatable .p-datatable-header {
+//   background: var(--bg-ternary);
+//   padding: var(--spacing-lg) var(--spacing-xl);
+//   border-bottom: var(--ui-border-width) solid var(--border-primary);
+//   color: var(--text-primary);
+// }
+
+// .p-datatable .p-datatable-wrapper {
+//   background: transparent;
+// }
+
+// /* Table Header */
+// .p-datatable .p-datatable-thead > tr > th {
+//   background: var(--bg-ternary) !important;
+//   color: var(--text-label);
+//   font-size: var(--font-size-xs);
+//   text-transform: uppercase;
+//   letter-spacing: 0.05em;
+//   font-weight: var(--font-weight-bold);
+//   padding: var(--spacing-lg) var(--spacing-xl);
+//   border: none;
+//   border-bottom: var(--ui-border-width) solid var(--border-primary);
+//   white-space: nowrap;
+// }
+
+// /* Table Body */
+// .p-datatable .p-datatable-tbody > tr {
+//   background: transparent !important;
+//   color: var(--text-primary);
+//   transition: var(--transition-fast);
+//   border-bottom: var(--ui-border-width) solid var(--border-secondary);
+// }
+
+// .p-datatable .p-datatable-tbody > tr > td {
+//   padding: var(--spacing-lg) var(--spacing-xl);
+//   border: none;
+//   font-size: var(--font-size-sm);
+//   color: var(--text-primary);
+// }
+
+// /* Hover Effect */
+// .p-datatable .p-datatable-tbody > tr:hover {
+//   background: var(--component-bg-hover) !important;
+// }
+
+// /* Selected Row */
+// .p-datatable .p-datatable-tbody > tr.p-highlight {
+//   background: var(--component-bg-active) !important;
+//   color: var(--accent-primary) !important;
+// }
+
+// /* Striped Rows */
+// .p-datatable.p-datatable-striped .p-datatable-tbody > tr:nth-child(even) {
+//   background: var(--bg-ternary);
+// }
+
+// /* Footer */
+// .p-datatable .p-datatable-footer {
+//   background: var(--bg-ternary);
+//   padding: var(--spacing-lg) var(--spacing-xl);
+//   border-top: var(--ui-border-width) solid var(--border-primary);
+//   color: var(--text-primary);
+// }
+
+// /* --- PAGINATOR --- */
+// .p-paginator {
+//   background: transparent;
+//   border-top: var(--ui-border-width) solid var(--border-primary);
+//   padding: var(--spacing-md) var(--spacing-lg);
+//   color: var(--text-secondary);
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-between;
+//   flex-wrap: wrap;
+//   gap: var(--spacing-md);
+// }
+
+// .p-paginator .p-paginator-element,
+// .p-paginator .p-paginator-page,
+// .p-paginator .p-paginator-next,
+// .p-paginator .p-paginator-prev,
+// .p-paginator .p-paginator-first,
+// .p-paginator .p-paginator-last {
+//   color: var(--text-secondary);
+//   background: transparent;
+//   border: var(--ui-border-width) solid transparent;
+//   min-width: 2rem;
+//   height: 2rem;
+//   border-radius: var(--ui-border-radius);
+//   transition: var(--transition-fast);
+//   font-size: var(--font-size-sm);
+// }
+
+// .p-paginator .p-paginator-element:not(.p-disabled):hover {
+//   background: var(--component-bg-hover);
+//   color: var(--text-primary);
+// }
+
+// .p-paginator .p-paginator-element.p-highlight {
+//   background: var(--component-bg-active);
+//   color: var(--accent-primary);
+//   font-weight: var(--font-weight-semibold);
+// }
+
+// /* --- 6. TABS (V21 Compatible) --- */
+
+// /* Legacy TabView */
+// .p-tabview .p-tabview-nav {
+//   background: transparent;
+//   border-bottom: var(--ui-border-width) solid var(--border-primary);
+//   display: flex;
+//   list-style: none;
+//   padding: 0;
+//   margin: 0;
+// }
+
+// .p-tabview .p-tabview-nav li {
+//   margin: 0;
+// }
+
+// .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+//   background: transparent;
+//   border: none;
+//   border-bottom: 2px solid transparent;
+//   color: var(--text-secondary);
+//   padding: var(--spacing-lg) var(--spacing-xl);
+//   font-weight: var(--font-weight-medium);
+//   font-size: var(--font-size-sm);
+//   transition: var(--transition-colors);
+//   margin-bottom: -1px;
+//   cursor: pointer;
+//   text-decoration: none;
+//   display: block;
+// }
+
+// .p-tabview .p-tabview-nav li:not(.p-highlight):not(.p-disabled):hover .p-tabview-nav-link {
+//   color: var(--text-primary);
+//   background: var(--component-bg-hover);
+// }
+
+// .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+//   color: var(--accent-primary);
+//   border-bottom-color: var(--accent-primary);
+//   font-weight: var(--font-weight-semibold);
+// }
+
+// /* TabView Panels */
+// .p-tabview .p-tabview-panels {
+//   background: transparent;
+//   padding: var(--spacing-xl);
+//   color: var(--text-primary);
+// }
+
+// /* Modern Tabs (p-tablist/p-tab) */
+// .p-tablist {
+//   background: var(--bg-ternary) !important;
+//   border-bottom: var(--ui-border-width) solid var(--border-primary);
+//   padding: var(--spacing-sm) var(--spacing-sm) 0;
+//   border-radius: var(--ui-border-radius-lg) var(--ui-border-radius-lg) 0 0;
+//   display: flex;
+//   gap: var(--spacing-xs);
+// }
+
+// .p-tab {
+//   background: transparent !important;
+//   border: var(--ui-border-width) solid transparent;
+//   border-bottom: none;
+//   color: var(--text-secondary) !important;
+//   padding: var(--spacing-md) var(--spacing-xl) !important;
+//   font-weight: var(--font-weight-medium);
+//   font-size: var(--font-size-sm);
+//   border-radius: var(--ui-border-radius) var(--ui-border-radius) 0 0;
+//   transition: var(--transition-fast);
+//   cursor: pointer;
+//   position: relative;
+//   margin-bottom: -1px;
+//   opacity: 0.85;
+// }
+
+// .p-tab:not(.p-tab-active):not(.p-disabled):hover {
+//   background: var(--component-bg-hover) !important;
+//   color: var(--text-primary) !important;
+//   opacity: 1;
+// }
+
+// .p-tab.p-tab-active {
+//   background: var(--bg-secondary) !important;
+//   color: var(--accent-primary) !important;
+//   border-color: var(--border-primary) !important;
+//   border-bottom-color: var(--bg-secondary) !important;
+//   font-weight: var(--font-weight-semibold);
+//   opacity: 1;
+//   z-index: 2;
+//   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+// }
+
+// .p-tab:focus-visible {
+//   outline: none;
+//   box-shadow: inset 0 0 0 var(--focus-ring-width) var(--accent-focus);
+// }
+
+// /* Tab Panels */
+// .p-tabpanels {
+//   background: var(--bg-secondary);
+//   padding: var(--spacing-xl);
+//   color: var(--text-primary);
+// }
+
+// /* --- 7. ACCORDION --- */
+// .p-accordion .p-accordion-header .p-accordion-header-link {
+//   background: var(--bg-ternary);
+//   border: var(--ui-border-width) solid var(--border-primary);
+//   color: var(--text-primary);
+//   padding: var(--spacing-lg) var(--spacing-xl);
+//   font-weight: var(--font-weight-medium);
+//   font-size: var(--font-size-sm);
+//   transition: var(--transition-colors);
+// }
+
+// .p-accordion .p-accordion-header:not(.p-disabled) .p-accordion-header-link:hover {
+//   background: var(--component-bg-hover);
+//   color: var(--text-primary);
+// }
+
+// .p-accordion .p-accordion-header.p-highlight .p-accordion-header-link {
+//   background: var(--component-bg-active);
+//   color: var(--accent-primary);
+//   font-weight: var(--font-weight-semibold);
+// }
+
+// .p-accordion .p-accordion-content {
+//   border: var(--ui-border-width) solid var(--border-primary);
+//   border-top: none;
+//   padding: var(--spacing-xl);
+//   color: var(--text-primary);
+// }
+
+// /* --- 8. MENU & NAVIGATION --- */
+// .p-menu,
+// .p-tieredmenu,
+// .p-menubar,
+// .p-contextmenu {
+//   background: var(--bg-secondary);
+//   border: var(--ui-border-width) solid var(--border-primary);
+// }
