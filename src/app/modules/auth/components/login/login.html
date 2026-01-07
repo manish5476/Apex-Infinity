@@ -1,4 +1,4 @@
-<!-- Wallpaper Background -->
+<!-- Light Wallpaper Background -->
 <div class="auth-wallpaper">
   <div class="wallpaper-blob blob-1"></div>
   <div class="wallpaper-blob blob-2"></div>
@@ -7,39 +7,49 @@
 
 <!-- Doodle Art -->
 <div class="doodle-container">
-  <svg class="doodle-element doodle-1" viewBox="0 0 100 100">
-    <path d="M20,50 Q50,10 80,50 T140,50" />
-    <circle cx="50" cy="50" r="20" />
-    <polygon points="50,10 65,45 35,45" />
-  </svg>
-  
-  <svg class="doodle-element doodle-2" viewBox="0 0 80 80">
-    <rect x="15" y="15" width="50" height="50" rx="10" />
-    <path d="M15,15 L65,65 M65,15 L15,65" />
-  </svg>
-  
-  <svg class="doodle-element doodle-3" viewBox="0 0 120 120">
-    <path d="M60,10 A50,50 0 1,1 60,110 A50,50 0 1,1 60,10" />
+  <svg class="doodle-element doodle-1" viewBox="0 0 120 120">
+    <path d="M20,60 Q60,20 100,60 T180,60" />
     <circle cx="60" cy="60" r="25" />
+    <polygon points="60,20 75,55 45,55" />
   </svg>
   
-  <div class="floating-icon"></div>
-  <div class="floating-icon"></div>
-  <div class="floating-icon"></div>
-  <div class="floating-icon"></div>
-  <div class="floating-icon"></div>
-  <div class="floating-icon"></div>
+  <svg class="doodle-element doodle-2" viewBox="0 0 100 100">
+    <rect x="20" y="20" width="60" height="60" rx="12" />
+    <path d="M20,20 L80,80 M80,20 L20,80" />
+  </svg>
+  
+  <svg class="doodle-element doodle-3" viewBox="0 0 140 140">
+    <path d="M70,20 A50,50 0 1,1 70,120 A50,50 0 1,1 70,20" />
+    <circle cx="70" cy="70" r="30" />
+  </svg>
+  
+  <div class="floating-shape shape-1"></div>
+  <div class="floating-shape shape-2"></div>
+  <div class="floating-shape shape-3"></div>
+  
+  <div class="connection-line line-1"></div>
+  <div class="connection-line line-2"></div>
 </div>
 
 <div class="auth-wrapper">
   <section class="auth-container">
-    <!-- Creative Banner Section -->
+    <!-- Light Banner Section -->
     <div class="auth-banner">
       <div class="pattern-overlay"></div>
       
-      <div class="floating-3d cube-1"></div>
-      <div class="floating-3d cube-2"></div>
-      <div class="floating-3d cube-3"></div>
+      <div class="floating-card card-1">
+        <div class="card-icon">
+          <i class="pi pi-shield"></i>
+        </div>
+        <div class="card-text">Secure & Reliable</div>
+      </div>
+      
+      <div class="floating-card card-2">
+        <div class="card-icon">
+          <i class="pi pi-bolt"></i>
+        </div>
+        <div class="card-text">Lightning Fast</div>
+      </div>
       
       <div class="banner-content">
         <h1>Apex Infinity</h1>
@@ -47,25 +57,20 @@
         
         <ul class="feature-list">
           <li>Enterprise-grade security</li>
-          <li>Real-time collaboration tools</li>
+          <li>Real-time collaboration</li>
           <li>AI-powered insights</li>
           <li>Scalable infrastructure</li>
         </ul>
       </div>
     </div>
 
-    <!-- Creative Form Section -->
+    <!-- Light Form Section -->
     <div class="auth-form-panel">
       <div class="auth-content">
         <!-- Loading Animation -->
         @if (isLoading()) {
           <div class="loading-overlay">
-            <div class="loading-wave">
-              <div class="wave-dot"></div>
-              <div class="wave-dot"></div>
-              <div class="wave-dot"></div>
-              <div class="wave-dot"></div>
-            </div>
+            <div class="loading-spinner"></div>
           </div>
         }
 
@@ -74,7 +79,7 @@
             <i class="pi pi-bolt"></i>
           </div>
           <h1>Welcome Back</h1>
-          <p>Access your workspace and continue your journey</p>
+          <p>Sign in to your account to continue</p>
         </div>
 
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
@@ -82,7 +87,7 @@
           <div class="form-group">
             <label>Email <span class="req">*</span></label>
             <div class="input-wrapper">
-              <span class="input-icon pi pi-user"></span>
+              <span class="input-icon pi pi-envelope"></span>
               <input 
                 pInputText 
                 id="email" 
@@ -94,7 +99,7 @@
             </div>
             @if (form['email'].invalid && form['email'].touched) {
             <small class="text-red-500">
-              {{ form['email'].errors?.['required'] ? 'Email is required' : 'Please enter a valid email' }}
+              {{ form['email'].errors?.['required'] ? 'Email is required' : 'Please enter a valid email address' }}
             </small>
             }
           </div>
@@ -129,7 +134,7 @@
                 inputId="remember"
                 [aria-label]="'Remember me'">
               </p-checkbox>
-              <label for="remember">Keep me signed in</label>
+              <label for="remember">Remember me</label>
             </div>
             <a routerLink="/auth/forgot-password" class="forgot-link">Forgot Password?</a>
           </div>
@@ -139,10 +144,12 @@
             <button 
               type="submit" 
               [disabled]="loginForm.invalid || isLoading()">
-              <i class="pi pi-sign-in"></i>
-              {{ isLoading() ? 'Signing In...' : 'Sign In' }}
+              <div class="button-content">
+                <i class="pi pi-sign-in"></i>
+                <span>{{ isLoading() ? 'Signing In...' : 'Sign In' }}</span>
+              </div>
+              <div class="button-shine"></div>
             </button>
-            <div class="button-shine"></div>
           </div>
 
           <!-- Footer Links -->
