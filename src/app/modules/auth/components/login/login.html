@@ -1,160 +1,163 @@
-<!-- Animated Background Circles -->
-<div class="background-elements">
-  <div class="circle"></div>
-  <div class="circle"></div>
-  <div class="circle"></div>
-</div>
-
 <div class="auth-wrapper">
+  <!-- Animated Background Elements -->
+  <div class="animated-bg">
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+    <div class="bg-shape shape-3"></div>
+    <div class="bg-shape shape-4"></div>
+    <div class="bg-shape shape-5"></div>
+    <div class="bg-shape shape-6"></div>
+    <div class="bg-shape shape-7"></div>
+    <div class="bg-shape shape-8"></div>
+    <div class="particle particle-1"></div>
+    <div class="particle particle-2"></div>
+    <div class="particle particle-3"></div>
+    <div class="particle particle-4"></div>
+  </div>
+
   <section class="auth-container">
-    <!-- Left Banner - VISIBLE BLUE/PURPLE GRADIENT -->
+    <!-- === LEFT IMAGE SECTION === -->
     <div class="auth-banner">
-      <div class="auth-banner-text">
-        <h2>
-          Welcome to
+      <div class="banner-image-container">
+        <img
+          src="https://images.unsplash.com/photo-1627037558426-c2d07beda3af?q=80&w=1275&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          alt="Professional workspace background" />
+        <div class="image-overlay"></div>
+      </div>
+      <div class="banner-content">
+        <div class="banner-logo">
+          <i class="pi pi-bolt"></i>
           <span>Apex Infinity</span>
-        </h2>
-        <p>
-          Empowering your organization's innovation with cutting-edge solutions 
-          and collaborative tools designed for modern enterprises.
-        </p>
-        
-        <div class="feature-list">
-          <div class="feature-item">
-            <div class="feature-icon">
-              <i class="pi pi-shield"></i>
-            </div>
-            <div class="feature-text">Enterprise-grade security</div>
+        </div>
+        <div class="auth-banner-text">
+          <h2>Welcome to <span class="gradient-text">Apex Infinity</span></h2>
+          <p>Empowering your organization's innovation every day. Secure, efficient, and intelligent.</p>
+        </div>
+        <div class="banner-features">
+          <div class="feature">
+            <i class="pi pi-shield-check"></i>
+            <span>Enterprise Security</span>
           </div>
-          <div class="feature-item">
-            <div class="feature-icon">
-              <i class="pi pi-users"></i>
-            </div>
-            <div class="feature-text">Real-time collaboration tools</div>
+          <div class="feature">
+            <i class="pi pi-chart-line"></i>
+            <span>Real-time Analytics</span>
           </div>
-          <div class="feature-item">
-            <div class="feature-icon">
-              <i class="pi pi-bolt"></i>
-            </div>
-            <div class="feature-text">AI-powered insights</div>
-          </div>
-          <div class="feature-item">
-            <div class="feature-icon">
-              <i class="pi pi-chart-line"></i>
-            </div>
-            <div class="feature-text">Scalable infrastructure</div>
+          <div class="feature">
+            <i class="pi pi-bolt"></i>
+            <span>Lightning Fast</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Right Form - CLEAR WHITE BACKGROUND -->
+    <!-- === RIGHT FORM SECTION === -->
     <div class="auth-form-panel">
+      <div class="form-decoration">
+        <div class="decoration-circle"></div>
+        <div class="decoration-line"></div>
+      </div>
+      
       <div class="auth-content">
-        <!-- Loading Overlay -->
-        @if (isLoading()) {
-          <div class="loading-overlay">
-            <div class="loading-spinner"></div>
-          </div>
-        }
-
-        <!-- Form Header -->
         <div class="auth-header">
-          <div class="logo-wrapper">
+          <div class="logo-pulse">
             <i class="pi pi-bolt"></i>
           </div>
-          <h1>Welcome Back</h1>
-          <p>Log in to your organization's dashboard to access your workspace</p>
+          <h1 class="auth-title">Welcome Back</h1>
+          <p class="auth-subtitle">
+            Log in to access your organization's dashboard
+          </p>
         </div>
 
-        <!-- Login Form -->
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
-          <!-- Email Field -->
-          <div class="form-group">
-            <label>Email <span class="required">*</span></label>
-            <div class="input-wrapper">
-              <span class="input-icon pi pi-envelope"></span>
-              <input 
-                pInputText 
-                id="email" 
-                type="email" 
-                formControlName="email" 
-                placeholder="you@company.com"
-                autocomplete="email"
-                [attr.aria-invalid]="form['email'].invalid && form['email'].touched" />
+          <!-- Email -->
+          <div class="form-group floating-label">
+            <input pInputText id="email" type="email" formControlName="email" placeholder=" " />
+            <label for="email">Email Address <span class="req">*</span></label>
+            <div class="form-icon">
+              <i class="pi pi-envelope"></i>
             </div>
             @if (form['email'].invalid && form['email'].touched) {
-              <small class="error-message">
-                {{ form['email'].errors?.['required'] ? 'Email is required' : 'Please enter a valid email address' }}
-              </small>
-            }
-          </div>
-
-          <!-- Password Field -->
-          <div class="form-group">
-            <label>Password <span class="required">*</span></label>
-            <div class="input-wrapper">
-              <span class="input-icon pi pi-lock"></span>
-              <p-password 
-                id="password" 
-                formControlName="password" 
-                [toggleMask]="true" 
-                placeholder="••••••••"
-                styleClass="w-full" 
-                inputStyleClass="w-full"
-                [feedback]="false"
-                autocomplete="current-password">
-              </p-password>
+            <div class="error-message">
+              <i class="pi pi-exclamation-circle"></i>
+              Please enter a valid email address
             </div>
-            @if (form['password'].invalid && form['password'].touched) {
-              <small class="error-message">Password is required</small>
             }
           </div>
 
-          <!-- Remember Me & Forgot Password -->
+          <!-- Password -->
+          <div class="form-group floating-label">
+            <p-password id="password" formControlName="password" [toggleMask]="true" placeholder=" "
+              styleClass="w-full" inputStyleClass="w-full">
+              <ng-template pTemplate="header">
+                <div class="password-header">
+                  <h6>Password Requirements</h6>
+                  <p>Must be at least 8 characters long</p>
+                </div>
+              </ng-template>
+            </p-password>
+            <label for="password">Password <span class="req">*</span></label>
+            <div class="form-icon">
+              <i class="pi pi-lock"></i>
+            </div>
+            <a routerLink="/auth/forgot-password" class="forgot-link">
+              Forgot Password?
+            </a>
+          </div>
+
+          <!-- Remember me -->
           <div class="form-options">
             <div class="remember-me">
-              <p-checkbox 
-                formControlName="remember" 
-                [binary]="true" 
-                inputId="remember"
-                [aria-label]="'Remember me'">
-              </p-checkbox>
-              <label for="remember">Remember me</label>
+              <p-checkbox formControlName="remember" [binary]="true" inputId="remember"></p-checkbox>
+              <label for="remember">
+                Keep me signed in
+              </label>
             </div>
-            <a routerLink="/auth/forgot-password" class="forgot-link">Forgot Password?</a>
+            <div class="secure-info">
+              <i class="pi pi-shield"></i>
+              <span>Secure Connection</span>
+            </div>
           </div>
 
-          <!-- Submit Button -->
-          <div class="submit-button">
-            <button 
-              type="submit" 
-              [disabled]="loginForm.invalid || isLoading()">
-              <div class="button-content">
-                <i class="pi pi-sign-in"></i>
-                <span>{{ isLoading() ? 'Signing In...' : 'Sign In' }}</span>
-              </div>
-              <div class="loading-shimmer"></div>
-            </button>
-          </div>
-
-          <!-- Footer Links -->
-          <div class="auth-footer">
+          <!-- Login Button -->
+          <div class="form-actions">
+            <p-button label="Sign In" icon="pi pi-sign-in" type="submit" [loading]="isLoading()"
+              [disabled]="loginForm.invalid || isLoading()" styleClass="auth-btn-primary">
+            </p-button>
+            
             <div class="divider">
-              <span>New here?</span>
+              <span>or continue with</span>
             </div>
             
-            <p class="signup-prompt">
+            <div class="social-login">
+              <button type="button" class="social-btn google">
+                <i class="pi pi-google"></i>
+                <span>Google</span>
+              </button>
+              <button type="button" class="social-btn microsoft">
+                <i class="pi pi-microsoft"></i>
+                <span>Microsoft</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="auth-footer">
+            <p class="auth-footer-text">
               Don't have an account?
-              <a routerLink="/auth/signup">Create Account</a>
-            </p>
-            
-            <div class="org-registration">
-              <p>Want to start your own company?</p>
-              <a routerLink="/auth/org">
-                <i class="pi pi-building"></i>
-                Register Organization
+              <a routerLink="/auth/signup" class="auth-link">
+                <span>Create Account</span>
+                <i class="pi pi-arrow-right"></i>
               </a>
+            </p>
+
+            <div class="organization-cta">
+              <i class="pi pi-building"></i>
+              <p>
+                Want to start your own company?
+                <a routerLink="/auth/org" class="org-link">
+                  Register Organization
+                </a>
+              </p>
             </div>
           </div>
         </form>
