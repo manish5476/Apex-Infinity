@@ -1,322 +1,94 @@
 <div class="auth-wrapper">
-  <!-- Animated Background with Gradient Mesh -->
-  <div class="animated-bg">
-    <div class="gradient-mesh"></div>
-    <div class="floating-orb orb-1"></div>
-    <div class="floating-orb orb-2"></div>
-    <div class="floating-orb orb-3"></div>
-    <div class="grid-overlay"></div>
-    <div class="particle-field"></div>
-  </div>
-
-  <!-- Animated Glow Effects -->
-  <div class="glow-effects">
-    <div class="glow glow-1"></div>
-    <div class="glow glow-2"></div>
-    <div class="glow glow-3"></div>
-  </div>
-
   <section class="auth-container">
-    <!-- === LEFT BANNER SECTION === -->
+    <!-- === LEFT IMAGE SECTION === -->
     <div class="auth-banner">
-      <div class="banner-background">
-        <div class="banner-gradient"></div>
-        <div class="banner-pattern">
-          <div class="pattern-circle"></div>
-          <div class="pattern-circle"></div>
-          <div class="pattern-circle"></div>
-        </div>
-      </div>
-      
-      <div class="banner-content">
-        <div class="brand-header">
-          <div class="brand-logo">
-            <i class="pi pi-bolt"></i>
-            <span class="brand-name">Apex Infinity</span>
-            <div class="brand-badge">PRO</div>
-          </div>
-          <div class="brand-tagline">Enterprise Platform</div>
-        </div>
-
-        <div class="banner-hero">
-          <div class="hero-icon">
-            <i class="pi pi-shield-check"></i>
-          </div>
-          <h1 class="hero-title">
-            Secure Access to Your
-            <span class="hero-highlight">Digital Workspace</span>
-          </h1>
-          <p class="hero-description">
-            Connect to your organization's ecosystem with enterprise-grade security, 
-            real-time collaboration, and intelligent automation.
-          </p>
-        </div>
-
-        <div class="banner-features">
-          <div class="feature-card">
-            <div class="feature-icon">
-              <i class="pi pi-lock"></i>
-            </div>
-            <div class="feature-content">
-              <h4>Military-Grade Security</h4>
-              <p>End-to-end encryption & 2FA</p>
-            </div>
-          </div>
-          
-          <div class="feature-card">
-            <div class="feature-icon">
-              <i class="pi pi-rocket"></i>
-            </div>
-            <div class="feature-content">
-              <h4>Lightning Fast</h4>
-              <p>Optimized for performance</p>
-            </div>
-          </div>
-          
-          <div class="feature-card">
-            <div class="feature-icon">
-              <i class="pi pi-chart-line"></i>
-            </div>
-            <div class="feature-content">
-              <h4>Real-time Analytics</h4>
-              <p>Insights at your fingertips</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="banner-stats">
-          <div class="stat">
-            <div class="stat-value">99.9%</div>
-            <div class="stat-label">Uptime</div>
-          </div>
-          <div class="stat">
-            <div class="stat-value">10K+</div>
-            <div class="stat-label">Organizations</div>
-          </div>
-          <div class="stat">
-            <div class="stat-value">24/7</div>
-            <div class="stat-label">Support</div>
-          </div>
-        </div>
+      <img
+        src="https://images.unsplash.com/photo-1627037558426-c2d07beda3af?q=80&w=1275&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        alt="Professional workspace background" />
+      <div class="auth-overlay"></div>
+      <div class="auth-banner-text">
+        <h2>Welcome to <span>Apex Infinity</span></h2>
+        <p>Empowering your organization's innovation every day.</p>
       </div>
     </div>
 
     <!-- === RIGHT FORM SECTION === -->
     <div class="auth-form-panel">
-      <!-- Form Decorative Elements -->
-      <div class="form-decoration">
-        <div class="decoration-ring ring-1"></div>
-        <div class="decoration-ring ring-2"></div>
-        <div class="decoration-dot dot-1"></div>
-        <div class="decoration-dot dot-2"></div>
-        <div class="decoration-dot dot-3"></div>
-      </div>
-
       <div class="auth-content">
-        <!-- Form Header -->
-        <div class="form-header">
-          <div class="form-logo">
-            <div class="logo-outer">
-              <div class="logo-inner">
-                <i class="pi pi-sign-in"></i>
-              </div>
-            </div>
-          </div>
-          <div class="header-text">
-            <h1 class="form-title">Welcome Back</h1>
-            <p class="form-subtitle">Sign in to continue your journey</p>
-          </div>
+        <div class="auth-header text-center">
+          <i class="pi pi-bolt text-4xl text-[var(--theme-accent-primary)]"></i>
+          <h1 class="auth-title">Welcome Back</h1>
+          <p class="auth-subtitle">
+            Log in to your organization's dashboard
+          </p>
         </div>
 
-        <!-- Login Form -->
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
-          <!-- Email Input (Fixed to match password style) -->
+          <!-- Email - Fixed to match password -->
           <div class="form-group">
+            <label>Email <span class="req">*</span></label>
             <div class="input-wrapper">
               <input 
                 pInputText 
                 id="email" 
                 type="email" 
                 formControlName="email" 
-                placeholder=" "
-                autocomplete="email"
+                placeholder="you@company.com" 
                 class="form-input"
               />
-              <label for="email" class="input-label">
-                <i class="pi pi-envelope label-icon"></i>
-                <span>Email Address</span>
-                <span class="required">*</span>
-              </label>
-              <div class="input-icons">
-                <i class="pi pi-check-circle valid-icon" *ngIf="form['email'].valid && form['email'].touched"></i>
-                <i class="pi pi-exclamation-circle invalid-icon" *ngIf="form['email'].invalid && form['email'].touched"></i>
-              </div>
             </div>
             @if (form['email'].invalid && form['email'].touched) {
-              <div class="error-message">
-                <i class="pi pi-info-circle"></i>
-                <span>{{ getEmailErrorMessage() }}</span>
-              </div>
+            <small class="text-red-500">Please enter a valid email.</small>
             }
           </div>
 
-          <!-- Password Input -->
+          <!-- Password -->
           <div class="form-group">
-            <div class="input-wrapper">
-              <p-password 
-                id="password" 
-                formControlName="password" 
-                [toggleMask]="true" 
-                placeholder=" "
-                inputStyleClass="form-input"
-                [feedback]="false"
-                [promptLabel]="null"
-                [weakLabel]="null"
-                [mediumLabel]="null"
-                [strongLabel]="null"
-              >
-                <ng-template pTemplate="content">
-                  <input 
-                    type="password" 
-                    pPassword 
-                    formControlName="password" 
-                    placeholder=" "
-                    autocomplete="current-password"
-                    class="form-input"
-                  />
-                </ng-template>
-              </p-password>
-              <label for="password" class="input-label">
-                <i class="pi pi-lock label-icon"></i>
-                <span>Password</span>
-                <span class="required">*</span>
-              </label>
-              <div class="input-icons">
-                <i class="pi pi-eye-slash password-toggle"></i>
-              </div>
-            </div>
-            <div class="password-options">
-              <a routerLink="/auth/forgot-password" class="forgot-password">
-                <i class="pi pi-question-circle"></i>
-                <span>Forgot Password?</span>
+            <div class="flex justify-between items-center">
+              <label>Password <span class="req">*</span></label>
+              <a routerLink="/auth/forgot-password" class="auth-link text-sm">
+                Forgot?
               </a>
             </div>
+            <p-password 
+              id="password" 
+              formControlName="password" 
+              [toggleMask]="true" 
+              placeholder="••••••••"
+              styleClass="w-full" 
+              inputStyleClass="w-full form-input"
+            ></p-password>
           </div>
 
-          <!-- Remember Me & Options -->
-          <div class="form-options">
-            <div class="checkbox-group">
-              <p-checkbox 
-                formControlName="remember" 
-                [binary]="true" 
-                inputId="remember"
-                [style]="{'padding': '0'}"
-              >
-                <ng-template pTemplate="checkboxicon">
-                  <span class="custom-checkbox"></span>
-                </ng-template>
-              </p-checkbox>
-              <label for="remember" class="checkbox-label">
-                <span class="label-text">Keep me signed in</span>
-                <span class="label-hint">(on this device)</span>
-              </label>
-            </div>
-            
-            <div class="security-indicator">
-              <i class="pi pi-shield-check"></i>
-              <span>Secure Connection</span>
-              <div class="security-dot"></div>
-            </div>
+          <!-- Remember me -->
+          <div class="flex items-center gap-2 mt-1">
+            <p-checkbox formControlName="remember" [binary]="true" inputId="remember"></p-checkbox>
+            <label for="remember" class="text-sm text-[var(--theme-text-secondary)] cursor-pointer">
+              Remember me
+            </label>
           </div>
 
-          <!-- Submit Button -->
-          <div class="form-submit">
-            <p-button 
-              label="Sign In" 
-              icon="pi pi-arrow-right" 
-              iconPos="right"
-              type="submit" 
-              [loading]="isLoading()"
-              [disabled]="loginForm.invalid || isLoading()"
-              styleClass="submit-button"
-              [raised]="true"
-              severity="primary"
-            >
-              <ng-template pTemplate="loadingicon">
-                <i class="pi pi-spin pi-spinner"></i>
-              </ng-template>
+          <!-- Footer -->
+          <div class="auth-footer">
+            <p-button label="Login" icon="pi pi-sign-in" type="submit" [loading]="isLoading()"
+              [disabled]="loginForm.invalid || isLoading()" styleClass="auth-btn-primary w-full justify-center">
             </p-button>
-            
-            <div class="divider">
-              <span class="divider-text">or continue with</span>
-            </div>
-            
-            <div class="social-login">
-              <button type="button" class="social-button google" aria-label="Sign in with Google">
-                <div class="social-icon">
-                  <svg class="google-icon" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/>
-                  </svg>
-                </div>
-                <span class="social-text">Google</span>
-              </button>
-              
-              <button type="button" class="social-button microsoft" aria-label="Sign in with Microsoft">
-                <div class="social-icon">
-                  <i class="pi pi-microsoft"></i>
-                </div>
-                <span class="social-text">Microsoft</span>
-              </button>
-              
-              <button type="button" class="social-button sso" aria-label="Sign in with SSO">
-                <div class="social-icon">
-                  <i class="pi pi-key"></i>
-                </div>
-                <span class="social-text">SSO</span>
-              </button>
-            </div>
-          </div>
 
-          <!-- Form Footer -->
-          <div class="form-footer">
-            <div class="signup-prompt">
-              <span class="prompt-text">New to Apex Infinity?</span>
-              <a routerLink="/auth/signup" class="signup-link">
-                <span>Create Account</span>
-                <i class="pi pi-arrow-up-right"></i>
-              </a>
-            </div>
-            
-            <div class="organization-cta">
-              <div class="cta-content">
-                <div class="cta-icon">
-                  <i class="pi pi-building"></i>
-                </div>
-                <div class="cta-text">
-                  <p class="cta-title">For Organizations</p>
-                  <p class="cta-description">
-                    Start your company journey with our enterprise solutions
-                    <a routerLink="/auth/org" class="cta-link">
-                      Register Organization →
-                    </a>
-                  </p>
-                </div>
-              </div>
+            <p class="auth-footer-text">
+              Don't have an account?
+              <a routerLink="/auth/signup" class="auth-link">Create one</a>
+            </p>
+
+            <div class="text-center mt-4">
+              <p class="text-secondary text-sm">
+                Want to start your own company?
+                <a routerLink="/auth/org" class="text-primary font-bold hover:underline cursor-pointer">
+                  Register Organization
+                </a>
+              </p>
             </div>
           </div>
         </form>
-
-        <!-- Footer Notes -->
-        <div class="footer-notes">
-          <p class="copyright">© 2024 Apex Infinity. All rights reserved.</p>
-          <div class="footer-links">
-            <a href="#" class="footer-link">Privacy Policy</a>
-            <span class="link-separator">•</span>
-            <a href="#" class="footer-link">Terms of Service</a>
-            <span class="link-separator">•</span>
-            <a href="#" class="footer-link">Support</a>
-          </div>
-        </div>
       </div>
     </div>
   </section>
