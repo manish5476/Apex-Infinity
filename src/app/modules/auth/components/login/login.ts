@@ -62,6 +62,19 @@ export class Login implements OnInit {
   get form() {
     return this.loginForm.controls;
   }
+  getEmailErrorMessage(): string {
+  const emailControl = this.form['email'];
+  
+  if (emailControl.hasError('required')) {
+    return 'Email is required';
+  }
+  
+  if (emailControl.hasError('email')) {
+    return 'Please enter a valid email address';
+  }
+  
+  return 'Invalid email';
+}
 
   onSubmit(): void {
     if (this.loginForm.invalid) {
