@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { InvoiceDetailsComponent } from './components/invoice-details/invoice-details';
 import { InvoiceFormComponent } from './components/invoice-form/invoice-form';
 import { InvoiceListComponent } from './components/invoice-list/invoice-list';
+import { InvoiceAnalyticsComponent } from './analytics/invoice-analytics.component';
 // These routes will be lazy-loaded under a '/invoices' path (defined in app.routes.ts)
 export const INVOICE_ROUTES: Routes = [
   {
@@ -19,5 +20,9 @@ export const INVOICE_ROUTES: Routes = [
   {
     path: ':id/edit',
     component: InvoiceFormComponent,
+  },
+  {
+    path: 'analytics',
+    component: InvoiceAnalyticsComponent,
   },
 ];

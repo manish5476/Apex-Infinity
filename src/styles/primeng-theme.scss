@@ -1,151 +1,1285 @@
-@layer themes {
-  /* --- 1. GLOBAL COMPONENT RESET --- */
-  .p-component {
-    font-family: var(--font-body);
-    font-size: var(--font-size-base); /* 13px Compact Scale */
-    color: var(--theme-text-primary);
+/* ============================================================
+   PRIMENG V21 MODERN OVERRIDES - MEDIUM SLIM DESIGN
+   Optimized component sizing for balanced aesthetics
+   ============================================================ */
+
+// ===== VARIABLES FOR MEDIUM SLIM DESIGN =====
+:root {
+  --input-height: 2.25rem; /* Medium slim height */
+  --button-height: 2.25rem;
+  --border-radius: 4px; /* Slightly smaller radius */
+  --font-size-input: 0.8125rem; /* 13px - balanced readability */
+  --spacing-input-horizontal: 0.75rem;
+  --spacing-input-vertical: 0.5rem;
+}
+
+// ===== 1. BASE COMPONENT RESET =====
+.p-component {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  line-height: 1.4; /* Tighter line height */
+  box-sizing: border-box;
+}
+
+*:where(.p-component) {
+  box-sizing: border-box;
+}
+
+// ===== 2. BUTTONS - Medium Slim =====
+.p-button {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  border: var(--ui-border-width) solid transparent;
+  color: white !important;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-input-vertical) var(--spacing-input-horizontal);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-input);
+  transition: var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  min-height: var(--button-height);
+  line-height: 1;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+    opacity: 0;
+    transition: var(--transition-fast);
   }
 
-  /* --- 2. FORMS (Targets all Form components provided in your list) --- */
-  /* This uses your input logic: bg-ternary, border-secondary, and accent-primary */
-  .p-inputtext, .p-textarea, .p-select, .p-multiselect, .p-datepicker-input {
-    background: var(--theme-bg-ternary);
-    border: 1px solid var(--theme-border-secondary);
-    border-radius: var(--ui-border-radius);
-    padding: var(--spacing-sm) var(--spacing-lg);
-    font-size: var(--font-size-sm);
-    transition: var(--transition-base);
+  &:enabled {
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+      
+      &::after {
+        opacity: 1;
+      }
+    }
 
-    &:enabled:focus, &:focus-within {
-      border-color: var(--theme-accent-primary);
-      box-shadow: 0 0 0 4px var(--theme-accent-focus);
-      background: var(--theme-bg-secondary);
+    &:active {
+      transform: translateY(0);
+      box-shadow: var(--shadow-xs);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus), var(--shadow-sm);
     }
   }
 
-  /* --- 3. BUTTONS (.btn logic applied to .p-button) --- */
-  .p-button {
-    background: var(--theme-accent-gradient);
-    border-radius: 999px; // Matches your .btn pill style
-    padding: var(--spacing-sm) var(--spacing-lg);
-    font-weight: 600;
-    font-size: var(--font-size-sm);
-    transition: var(--transition-base);
+  &:disabled {
+    opacity: var(--state-disabled-opacity);
+    cursor: not-allowed;
+    background: var(--color-disabled) !important;
+    color: var(--color-disabled-text) !important;
+    transform: none;
+    box-shadow: none;
+  }
+
+  // Variants
+  &.p-button-outlined {
+    background: transparent;
+    border-color: var(--border-primary);
+    color: var(--text-secondary) !important;
+    box-shadow: none;
 
     &:enabled:hover {
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    &.p-button-outlined {
-      background: transparent;
-      border: 1px solid var(--theme-border-primary);
-      color: var(--theme-text-primary);
+      background: var(--component-bg-hover);
+      border-color: var(--accent-primary);
+      color: var(--text-primary) !important;
     }
   }
 
-  /* --- 4. CARDS & DIALOGS --- */
-  .p-card, .p-dialog {
-    background: var(--theme-bg-secondary);
-    border-radius: var(--ui-border-radius-lg);
-    border: 1px solid var(--theme-border-primary);
-    box-shadow: var(--shadow-md);
+  &.p-button-text {
+    background: transparent;
+    border-color: transparent;
+    color: var(--text-secondary) !important;
+    box-shadow: none;
+
+    &:enabled:hover {
+      background: var(--component-bg-hover);
+      color: var(--accent-primary) !important;
+    }
+  }
+
+  // Sizes
+  &.p-button-sm {
+    font-size: var(--font-size-xs);
+    padding: calc(var(--spacing-input-vertical) * 0.75) calc(var(--spacing-input-horizontal) * 0.75);
+    min-height: calc(var(--button-height) * 0.875);
+    gap: var(--spacing-xs);
+  }
+
+  &.p-button-lg {
+    font-size: var(--font-size-md);
+    padding: calc(var(--spacing-input-vertical) * 1.25) calc(var(--spacing-input-horizontal) * 1.25);
+    min-height: calc(var(--button-height) * 1.25);
+    gap: var(--spacing-md);
+  }
+}
+
+// ===== 3. BASE INPUT STYLES - Medium Slim =====
+.p-inputtext,
+.p-inputnumber-input,
+.p-textarea,
+.p-password-input,
+.p-inputmask-input {
+  background: var(--bg-ternary) !important;
+  border: var(--ui-border-width) solid var(--border-secondary) !important;
+  color: var(--text-primary) !important;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-input-vertical) var(--spacing-input-horizontal);
+  font-size: var(--font-size-input);
+  font-family: var(--font-body);
+  transition: var(--transition-fast);
+  line-height: 1.4;
+  min-height: var(--input-height);
+  width: 100%;
+
+  &:enabled {
+    &:focus {
+      border-color: var(--accent-primary) !important;
+      box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
+      background: var(--bg-secondary) !important;
+      outline: none;
+    }
+
+    &:hover:not(:focus):not(.p-invalid) {
+      border-color: var(--border-primary) !important;
+      background: var(--bg-ternary) !important;
+    }
+  }
+
+  &:disabled {
+    background: var(--color-disabled) !important;
+    color: var(--color-disabled-text) !important;
+    opacity: var(--state-disabled-opacity);
+    cursor: not-allowed;
+  }
+
+  &::placeholder {
+    color: var(--text-label);
+    opacity: 1;
+    font-size: var(--font-size-input);
+  }
+
+  &.p-invalid {
+    border-color: var(--color-error) !important;
+    
+    &:focus {
+      box-shadow: 0 0 0 var(--focus-ring-width) var(--color-error-focus) !important;
+    }
+  }
+}
+
+// Textarea specific
+.p-textarea {
+  min-height: calc(var(--input-height) * 2);
+  line-height: 1.5;
+  padding: var(--spacing-md) var(--spacing-input-horizontal);
+}
+
+// ===== 4. SELECT COMPONENT - Medium Slim =====
+.p-select {
+  // Trigger/Input
+  background: var(--bg-ternary) !important;
+  border: var(--ui-border-width) solid var(--border-secondary) !important;
+  color: var(--text-primary) !important;
+  border-radius: var(--border-radius);
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--input-height);
+  position: relative;
+  cursor: pointer;
+  padding: 0;
+
+  &:not(.p-disabled) {
+    &:hover {
+      border-color: var(--accent-primary) !important;
+    }
+
+    &.p-focus,
+    &:focus-within {
+      border-color: var(--accent-primary) !important;
+      box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
+      outline: none;
+    }
+  }
+
+  &.p-disabled {
+    opacity: var(--state-disabled-opacity);
+    background: var(--color-disabled) !important;
+    cursor: not-allowed;
+  }
+
+  // Label container
+  .p-select-label {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-input-vertical) var(--spacing-input-horizontal);
+    min-height: var(--input-height);
+    font-size: var(--font-size-input);
+    line-height: 1.4;
+  }
+
+  // Text label
+  .p-select-label-text {
+    color: var(--text-primary) !important;
+    background: transparent !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+
+    &.p-placeholder {
+      color: var(--text-label) !important;
+    }
+  }
+
+  // Clear icon
+  .p-select-clear-icon {
+    color: var(--text-tertiary);
+    font-size: var(--font-size-sm);
+    width: 1.25rem;
+    height: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+    flex-shrink: 0;
+    
+    &:hover {
+      color: var(--text-secondary);
+      background: var(--component-bg-hover);
+      border-radius: 50%;
+    }
+  }
+
+  // Trigger icon
+  .p-select-trigger {
+    display: flex;
+    align-items: center;
+    padding: 0 var(--spacing-md);
+    border-left: var(--ui-border-width) solid var(--border-secondary);
+    height: 100%;
+    min-width: 2.25rem;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .p-select-trigger-icon {
+    color: var(--text-tertiary);
+    transition: var(--transition-fast);
+    font-size: var(--font-size-sm);
+  }
+
+  &.p-focus .p-select-trigger-icon {
+    transform: rotate(180deg);
+  }
+}
+
+// Select Panel/Overlay
+.p-select-overlay,
+.p-select-panel {
+  background: var(--bg-secondary) !important;
+  border: var(--ui-border-width) solid var(--border-primary) !important;
+  border-radius: 6px !important;
+  box-shadow: var(--shadow-lg) !important;
+  color: var(--text-primary) !important;
+  backdrop-filter: blur(var(--glass-blur-c));
+  -webkit-backdrop-filter: blur(var(--glass-blur-c));
+  z-index: var(--z-dropdown) !important;
+  margin-top: var(--spacing-xs);
+  animation: p-overlay-enter 0.15s cubic-bezier(0.23, 1, 0.32, 1);
+  overflow: hidden;
+  min-width: 200px;
+
+  .p-select-list {
+    padding: var(--spacing-xs) !important;
+    max-height: 18rem;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--border-secondary);
+      border-radius: 2px;
+      
+      &:hover {
+        background: var(--text-tertiary);
+      }
+    }
+  }
+
+  .p-select-option {
+    background: transparent !important;
+    border: none !important;
+    color: var(--text-primary) !important;
+    border-radius: 4px;
+    padding: var(--spacing-md) var(--spacing-input-horizontal) !important;
+    margin: 1px 0 !important;
+    transition: var(--transition-fast);
+    cursor: pointer;
+    font-size: var(--font-size-input);
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    min-height: 2rem;
+
+    &:not(.p-disabled) {
+      &:hover {
+        background: var(--component-bg-hover) !important;
+      }
+
+      &.p-focus {
+        background: var(--component-bg-hover) !important;
+        outline: none;
+      }
+
+      &.p-selected {
+        background: var(--component-bg-active) !important;
+        color: var(--accent-primary) !important;
+        font-weight: var(--font-weight-medium);
+      }
+    }
+
+    &.p-disabled {
+      color: var(--text-muted) !important;
+      opacity: var(--opacity-disabled);
+      cursor: not-allowed;
+    }
+  }
+
+  .p-select-empty-message {
+    color: var(--text-secondary) !important;
+    padding: var(--spacing-lg) !important;
+    text-align: center;
+    font-size: var(--font-size-input);
+    line-height: 1.4;
+  }
+}
+
+@keyframes p-overlay-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ===== 5. MULTISELECT COMPONENT - Medium Slim =====
+.p-multiselect {
+  @extend .p-select;
+
+  .p-multiselect-label-container {
+    flex: 1;
+    padding: calc(var(--spacing-input-vertical) * 0.75) var(--spacing-input-horizontal);
+    min-height: var(--input-height);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    line-height: 1.4;
+  }
+
+  .p-multiselect-label {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    align-items: center;
+    min-height: 1.5rem;
+  }
+
+  .p-multiselect-token {
+    background: var(--component-bg-active) !important;
+    color: var(--accent-primary) !important;
+    border-radius: 3px;
+    padding: 1px var(--spacing-sm);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    animation: token-enter 0.2s ease-out;
+    line-height: 1.2;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    .p-multiselect-token-icon {
+      color: inherit;
+      opacity: 0.7;
+      font-size: var(--font-size-xs);
+      transition: var(--transition-fast);
+      flex-shrink: 0;
+      
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  .p-multiselect-trigger {
+    margin-left: auto;
+    border-left: var(--ui-border-width) solid var(--border-secondary);
+    padding: 0 var(--spacing-md);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.25rem;
+  }
+}
+
+@keyframes token-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// MultiSelect Panel
+.p-multiselect-panel {
+  @extend .p-select-panel;
+
+  .p-multiselect-header {
+    padding: var(--spacing-md) !important;
+    border-bottom: var(--ui-border-width) solid var(--border-primary) !important;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    min-height: 2.5rem;
+
+    .p-checkbox {
+      margin-right: var(--spacing-sm);
+    }
+
+    .p-multiselect-filter-container {
+      flex: 1;
+      
+      .p-inputtext {
+        width: 100%;
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: var(--font-size-input);
+        min-height: 2rem;
+      }
+    }
+  }
+
+  .p-multiselect-items {
+    .p-multiselect-item {
+      @extend .p-select-option;
+      padding-left: var(--spacing-md) !important;
+      min-height: 2rem;
+
+      .p-checkbox {
+        margin-right: var(--spacing-sm);
+        flex-shrink: 0;
+      }
+    }
+  }
+}
+
+// ===== 6. DATEPICKER COMPONENT - Medium Slim =====
+.p-datepicker {
+  // Input
+  .p-inputtext {
+    width: 100%;
+    min-height: var(--input-height);
+  }
+
+  // Panel
+  &.p-datepicker-panel {
+    background: var(--bg-secondary) !important;
+    border: var(--ui-border-width) solid var(--border-primary) !important;
+    border-radius: 8px !important;
+    box-shadow: var(--shadow-lg) !important;
+    color: var(--text-primary) !important;
+    backdrop-filter: blur(var(--glass-blur-c));
+    -webkit-backdrop-filter: blur(var(--glass-blur-c));
+    z-index: var(--z-dropdown) !important;
+    padding: var(--spacing-md);
+    animation: p-overlay-enter 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+    min-width: 280px;
+
+    .p-datepicker-header {
+      padding: var(--spacing-sm) 0;
+      border-bottom: var(--ui-border-width) solid var(--border-secondary);
+      margin-bottom: var(--spacing-sm);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 2rem;
+
+      .p-datepicker-title {
+        font-weight: var(--font-weight-semibold);
+        font-size: var(--font-size-md);
+        color: var(--text-primary);
+      }
+
+      .p-datepicker-prev,
+      .p-datepicker-next {
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        width: 1.75rem;
+        height: 1.75rem;
+        border-radius: 3px;
+        transition: var(--transition-fast);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: var(--font-size-sm);
+
+        &:hover:not(:disabled) {
+          background: var(--component-bg-hover);
+          color: var(--text-primary);
+        }
+
+        &:disabled {
+          opacity: var(--state-disabled-opacity);
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+
+      th {
+        color: var(--text-secondary);
+        font-weight: var(--font-weight-medium);
+        font-size: var(--font-size-xs);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: var(--spacing-xs);
+        text-align: center;
+        height: 1.75rem;
+      }
+
+      td {
+        padding: 1px;
+        text-align: center;
+
+        & > span {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 1.875rem;
+          width: 1.875rem;
+          border-radius: 3px;
+          transition: var(--transition-fast);
+          cursor: pointer;
+          color: var(--text-primary);
+          font-size: var(--font-size-sm);
+          line-height: 1;
+
+          &:not(.p-disabled) {
+            &:hover {
+              background: var(--component-bg-hover);
+              color: var(--text-primary);
+            }
+
+            &.p-highlight {
+              background: var(--accent-primary) !important;
+              color: white !important;
+              font-weight: var(--font-weight-semibold);
+            }
+
+            &.p-today {
+              background: var(--component-bg-active);
+              color: var(--accent-primary);
+              border: var(--ui-border-width) solid var(--accent-primary);
+            }
+          }
+
+          &.p-disabled {
+            color: var(--text-muted);
+            opacity: var(--state-disabled-opacity);
+            cursor: not-allowed;
+          }
+        }
+      }
+    }
+
+    .p-datepicker-month,
+    .p-datepicker-year {
+      background: var(--bg-ternary);
+      border: var(--ui-border-width) solid var(--border-secondary);
+      color: var(--text-primary);
+      border-radius: 3px;
+      padding: var(--spacing-xs) var(--spacing-sm);
+      font-size: var(--font-size-sm);
+      margin: 0 var(--spacing-xs);
+      transition: var(--transition-fast);
+      height: 1.75rem;
+      min-width: 60px;
+
+      &:focus {
+        border-color: var(--accent-primary);
+        outline: none;
+      }
+    }
+
+    .p-timepicker {
+      border-top: var(--ui-border-width) solid var(--border-secondary);
+      padding-top: var(--spacing-md);
+      margin-top: var(--spacing-md);
+
+      div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--spacing-sm);
+
+        .p-hour-picker,
+        .p-minute-picker,
+        .p-second-picker,
+        .p-ampm-picker {
+          background: var(--bg-ternary);
+          border: var(--ui-border-width) solid var(--border-secondary);
+          color: var(--text-primary);
+          border-radius: 3px;
+          padding: var(--spacing-xs);
+          font-size: var(--font-size-sm);
+          text-align: center;
+          transition: var(--transition-fast);
+          width: 3rem;
+          height: 1.75rem;
+          line-height: 1;
+
+          &:focus {
+            border-color: var(--accent-primary);
+            outline: none;
+          }
+        }
+
+        .p-separator {
+          color: var(--text-tertiary);
+          width: 0.5rem;
+          text-align: center;
+        }
+      }
+    }
+
+    .p-datepicker-buttonbar {
+      border-top: var(--ui-border-width) solid var(--border-secondary);
+      padding-top: var(--spacing-md);
+      margin-top: var(--spacing-md);
+      display: flex;
+      justify-content: space-between;
+      gap: var(--spacing-sm);
+      
+      .p-button {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        min-height: 1.75rem;
+        font-size: var(--font-size-sm);
+      }
+    }
+  }
+}
+
+// ===== 7. INPUT GROUP - Medium Slim =====
+.p-inputgroup {
+  display: flex;
+  align-items: stretch;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+
+  .p-inputgroup-addon {
+    background: var(--bg-ternary);
+    border: var(--ui-border-width) solid var(--border-secondary);
+    color: var(--text-secondary);
+    padding: var(--spacing-input-vertical) var(--spacing-input-horizontal);
+    font-size: var(--font-size-input);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.25rem;
+    transition: var(--transition-fast);
+    line-height: 1.4;
+
+    &:first-child {
+      border-right: 0;
+      border-top-left-radius: var(--border-radius);
+      border-bottom-left-radius: var(--border-radius);
+    }
+
+    &:last-child {
+      border-left: 0;
+      border-top-right-radius: var(--border-radius);
+      border-bottom-right-radius: var(--border-radius);
+    }
+  }
+
+  .p-inputtext,
+  .p-select {
+    border-radius: 0;
+    flex: 1;
+
+    &:first-child {
+      border-top-left-radius: var(--border-radius);
+      border-bottom-left-radius: var(--border-radius);
+    }
+
+    &:last-child {
+      border-top-right-radius: var(--border-radius);
+      border-bottom-right-radius: var(--border-radius);
+    }
+  }
+
+  &:has(.p-inputtext:enabled:focus) {
+    .p-inputgroup-addon {
+      border-color: var(--accent-primary);
+    }
+  }
+}
+
+// ===== 8. CHECKBOX & RADIO - Medium Slim =====
+.p-checkbox,
+.p-radiobutton {
+  .p-checkbox-box,
+  .p-radiobutton-box {
+    background: var(--bg-ternary) !important;
+    border: var(--ui-border-width) solid var(--border-secondary) !important;
+    color: var(--text-primary) !important;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+
+    &.p-highlight {
+      background: var(--accent-primary) !important;
+      border-color: var(--accent-primary) !important;
+      color: white !important;
+    }
+
+    &:hover:not(.p-disabled) {
+      border-color: var(--accent-primary);
+    }
+
+    &.p-focus {
+      box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus);
+    }
+
+    &.p-disabled {
+      opacity: var(--state-disabled-opacity);
+      cursor: not-allowed;
+    }
+  }
+
+  .p-checkbox-icon,
+  .p-radiobutton-icon {
+    font-size: 0.625rem;
+    font-weight: var(--font-weight-bold);
+  }
+}
+
+.p-radiobutton .p-radiobutton-box {
+  border-radius: 50%;
+}
+
+// ===== 9. VALIDATION STATES =====
+.p-invalid {
+  border-color: var(--color-error) !important;
+
+  &:focus {
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--color-error-focus) !important;
+  }
+}
+
+.p-error {
+  color: var(--color-error);
+  font-size: var(--font-size-xs);
+  margin-top: 2px;
+  display: block;
+}
+
+// ===== 10. UTILITY CLASSES =====
+.p-fluid {
+  width: 100%;
+
+  .p-inputtext,
+  .p-select,
+  .p-multiselect,
+  .p-button {
+    width: 100%;
+  }
+}
+
+.p-field {
+  margin-bottom: var(--spacing-lg);
+  
+  label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-label);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.4;
+  }
+}
+
+// ===== 11. RESPONSIVE ADJUSTMENTS =====
+@media (max-width: 768px) {
+  :root {
+    --input-height: 2.5rem; /* Slightly taller on mobile */
+    --font-size-input: var(--font-size-base);
+  }
+
+  .p-select-panel,
+  .p-multiselect-panel,
+  .p-datepicker-panel {
+    width: 100% !important;
+    max-width: 100vw !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .p-datepicker-panel {
+    padding: var(--spacing-sm);
+    
+    table td > span {
+      height: 2.25rem;
+      width: 2.25rem;
+    }
+  }
+}
+/* ============================================================
+   MULTISELECT COMPONENT - SIMPLE & CLEAN
+   Medium slim design with theme tokens
+   ============================================================ */
+
+// ===== MULTISELECT TRIGGER (Input Box) =====
+.p-multiselect {
+  background: var(--bg-ternary) !important;
+  border: var(--ui-border-width) solid var(--border-secondary) !important;
+  color: var(--text-primary) !important;
+  border-radius: var(--ui-border-radius);
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  min-height: 2.375rem; /* Better height */
+  width: 100%;
+  cursor: pointer;
+  position: relative;
+
+  &:not(.p-disabled) {
+    &:hover {
+      border-color: var(--border-primary) !important;
+    }
+
+    &.p-focus {
+      border-color: var(--accent-primary) !important;
+      box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
+      outline: none;
+    }
+  }
+
+  &.p-disabled {
+    opacity: var(--state-disabled-opacity);
+    background: var(--color-disabled) !important;
+    cursor: not-allowed;
+  }
+}
+
+// ===== MULTISELECT LABEL =====
+.p-multiselect-label-container {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+  min-height: 2.25rem;
+}
+
+.p-multiselect-label {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  align-items: center;
+}
+
+// ===== MULTISELECT TOKENS (Selected Items) =====
+.p-multiselect-token {
+  background: var(--component-bg-active) !important;
+  color: var(--accent-primary) !important;
+  border-radius: 3px;
+  padding: 0.125rem 0.5rem;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  line-height: 1.2;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  .p-multiselect-token-icon {
+    color: inherit;
+    opacity: 0.7;
+    font-size: 0.625rem;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+// ===== MULTISELECT TRIGGER ICON =====
+.p-multiselect-trigger {
+  display: flex;
+  align-items: center;
+  padding: 0 0.75rem;
+  color: var(--text-tertiary);
+  transition: var(--transition-fast);
+  flex-shrink: 0;
+
+  .p-multiselect-trigger-icon {
+    font-size: var(--font-size-sm);
+  }
+
+  .p-multiselect-clear-icon {
+    margin-right: 0.5rem;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    
+    &:hover {
+      color: var(--text-secondary);
+    }
+  }
+}
+
+// ===== MULTISELECT PANEL (Dropdown) =====
+.p-multiselect-panel {
+  background: var(--bg-secondary) !important;
+  border: var(--ui-border-width) solid var(--border-primary) !important;
+  border-radius: 6px !important;
+  box-shadow: var(--shadow-lg) !important;
+  color: var(--text-primary) !important;
+  z-index: var(--z-dropdown) !important;
+  margin-top: 0.25rem;
+  animation: panel-enter 0.15s ease-out;
+  min-width: 200px;
+}
+
+@keyframes panel-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ===== MULTISELECT HEADER =====
+.p-multiselect-header {
+  padding: 0.75rem !important;
+  border-bottom: var(--ui-border-width) solid var(--border-secondary) !important;
+  background: var(--bg-ternary) !important;
+  
+  .p-checkbox {
+    margin-right: 0.5rem;
+    
+    .p-checkbox-box {
+      width: 1rem;
+      height: 1rem;
+      border-radius: 3px;
+    }
+  }
+  
+  .p-multiselect-filter-container {
+    .p-inputtext {
+      width: 100%;
+      padding: 0.375rem 0.75rem !important;
+      font-size: var(--font-size-sm);
+      min-height: 1.875rem;
+    }
+  }
+}
+
+// ===== MULTISELECT LIST CONTAINER =====
+.p-multiselect-items-wrapper,
+.p-multiselect-list {
+  max-height: 16rem; /* Better height */
+  overflow-y: auto;
+  padding: 0.25rem !important;
+  
+  /* Custom scrollbar */
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+    border-radius: 2px;
+  }
+}
+
+// ===== MULTISELECT ITEMS =====
+.p-multiselect-items {
+  background: transparent !important;
+}
+
+.p-multiselect-item {
+  background: transparent !important;
+  border: none !important;
+  color: var(--text-primary) !important;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem !important;
+  margin: 1px 0 !important;
+  transition: var(--transition-fast);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  line-height: 1.3;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2rem; /* Better item height */
+
+  .p-checkbox {
+    margin: 0;
+    flex-shrink: 0;
+    
+    .p-checkbox-box {
+      width: 1rem;
+      height: 1rem;
+      border-radius: 3px;
+    }
+  }
+  
+  .p-multiselect-item-label {
+    flex: 1;
+  }
+
+  /* Hover State */
+  &:not(.p-disabled):not(.p-highlight):hover {
+    background: var(--component-bg-hover) !important;
+  }
+
+  /* Selected State */
+  &.p-highlight {
+    background: var(--component-bg-active) !important;
+    color: var(--accent-primary) !important;
+    font-weight: var(--font-weight-medium);
+    
+    .p-checkbox-box {
+      background: var(--accent-primary) !important;
+      border-color: var(--accent-primary) !important;
+    }
+  }
+
+  /* Focus State */
+  &.p-focus {
+    background: var(--component-bg-hover) !important;
+    outline: none;
+  }
+
+  /* Disabled State */
+  &.p-disabled {
+    color: var(--text-muted) !important;
+    opacity: var(--state-disabled-opacity);
+    cursor: not-allowed;
+  }
+}
+
+// ===== MULTISELECT EMPTY MESSAGE =====
+.p-multiselect-empty-message {
+  color: var(--text-secondary) !important;
+  padding: 2rem 1rem !important;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  background: transparent !important;
+}
+
+// ===== RESPONSIVE =====
+@media (max-width: 768px) {
+  .p-multiselect {
+    min-height: 2.5rem;
+  }
+  
+  .p-multiselect-label-container {
+    min-height: 2.375rem;
+  }
+  
+  .p-multiselect-items-wrapper,
+  .p-multiselect-list {
+    max-height: 14rem;
+  }
+  
+  .p-multiselect-item {
+    min-height: 2.25rem;
+    font-size: var(--font-size-base);
   }
 }
 // /* ============================================================
-//    PRIMENG V21 GLOBAL OVERRIDES (Angular 20+)
-//    Consuming: Canonical Theme Tokens
-//    Compatible with PrimeNG v21.0.1+ (Dec 2024)
+//    PRIMENG V21 MODERN OVERRIDES (Angular 20+)
+//    SCSS Structure with Theme Tokens
+//    Supports: p-select (new dropdown), p-datepicker, p-multiselect
 //    ============================================================ */
 
-// /* --- 1. GENERAL COMPONENT RESET --- */
+// // ===== 1. BASE COMPONENT RESET =====
 // .p-component {
 //   font-family: var(--font-body);
-//   font-size: var(--font-size-base); /* Using base size from theme */
-//   color: var(--text-primary) !important;
+//   font-size: var(--font-size-base);
+//   color: var(--text-primary);
 //   line-height: var(--line-height-normal);
+//   box-sizing: border-box;
 // }
 
-// /* --- 2. BUTTONS (.p-button) --- */
+// *:where(.p-component) {
+//   box-sizing: border-box;
+// }
+
+// // ===== 2. BUTTONS =====
 // .p-button {
-//   background: var(--accent-gradient);
+//   background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
 //   border: var(--ui-border-width) solid transparent;
-//   color: #ffffff !important;
+//   color: white !important;
 //   border-radius: var(--ui-border-radius);
 //   padding: var(--spacing-md) var(--spacing-xl);
 //   font-weight: var(--font-weight-semibold);
 //   font-size: var(--font-size-sm);
-//   transition: var(--transition-base);
+//   transition: var(--transition-fast);
 //   box-shadow: var(--shadow-sm);
 //   cursor: pointer;
+//   position: relative;
+//   overflow: hidden;
+//   display: inline-flex;
+//   align-items: center;
+//   justify-content: center;
+//   gap: var(--spacing-sm);
+//   min-height: 2.5rem;
+
+//   &::after {
+//     content: '';
+//     position: absolute;
+//     inset: 0;
+//     background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+//     opacity: 0;
+//     transition: var(--transition-fast);
+//   }
+
+//   &:enabled {
+//     &:hover {
+//       transform: translateY(-1px);
+//       box-shadow: var(--shadow-md);
+      
+//       &::after {
+//         opacity: 1;
+//       }
+//     }
+
+//     &:active {
+//       transform: translateY(0);
+//       box-shadow: var(--shadow-xs);
+//     }
+
+//     &:focus-visible {
+//       outline: none;
+//       box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus), var(--shadow-sm);
+//     }
+//   }
+
+//   &:disabled {
+//     opacity: var(--state-disabled-opacity);
+//     cursor: not-allowed;
+//     background: var(--color-disabled) !important;
+//     color: var(--color-disabled-text) !important;
+//     transform: none;
+//     box-shadow: none;
+//   }
+
+//   // Variants
+//   &.p-button-outlined {
+//     background: transparent;
+//     border-color: var(--border-primary);
+//     color: var(--text-secondary) !important;
+//     box-shadow: none;
+
+//     &:enabled:hover {
+//       background: var(--component-bg-hover);
+//       border-color: var(--accent-primary);
+//       color: var(--text-primary) !important;
+//     }
+//   }
+
+//   &.p-button-text {
+//     background: transparent;
+//     border-color: transparent;
+//     color: var(--text-secondary) !important;
+//     box-shadow: none;
+
+//     &:enabled:hover {
+//       background: var(--component-bg-hover);
+//       color: var(--accent-primary) !important;
+//     }
+//   }
+
+//   // Sizes
+//   &.p-button-sm {
+//     font-size: var(--font-size-xs);
+//     padding: var(--spacing-sm) var(--spacing-lg);
+//     min-height: 2rem;
+//   }
+
+//   &.p-button-lg {
+//     font-size: var(--font-size-md);
+//     padding: var(--spacing-lg) var(--spacing-2xl);
+//     min-height: 3rem;
+//   }
 // }
 
-// .p-button:enabled:hover {
-//   background: var(--accent-hover);
-//   color: #ffffff !important;
-//   border-color: transparent;
-//   transform: translateY(-1px);
-//   box-shadow: var(--shadow-md);
-// }
-
-// .p-button:enabled:active {
-//   transform: translateY(0);
-//   box-shadow: var(--shadow-xs);
-// }
-
-// .p-button:focus-visible {
-//   outline: none;
-//   box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus);
-// }
-
-// .p-button:disabled {
-//   opacity: var(--state-disabled-opacity);
-//   cursor: not-allowed;
-//   background: var(--color-disabled) !important;
-//   color: var(--color-disabled-text) !important;
-// }
-
-// /* Button Variants */
-// .p-button.p-button-outlined {
-//   background: transparent;
-//   border: var(--ui-border-width) solid var(--border-primary);
-//   color: var(--text-secondary) !important;
-// }
-
-// .p-button.p-button-outlined:enabled:hover {
-//   background: var(--component-bg-hover);
-//   color: var(--text-primary) !important;
-//   border-color: var(--accent-primary);
-// }
-
-// .p-button.p-button-text {
-//   background: transparent;
-//   border-color: transparent;
-//   color: var(--text-secondary) !important;
-// }
-
-// .p-button.p-button-text:enabled:hover {
-//   background: var(--component-bg-hover);
-//   color: var(--accent-primary) !important;
-// }
-
-// /* Button Sizes */
-// .p-button.p-button-sm {
-//   font-size: var(--font-size-xs);
-//   padding: var(--spacing-sm) var(--spacing-lg);
-// }
-
-// .p-button.p-button-lg {
-//   font-size: var(--font-size-md);
-//   padding: var(--spacing-lg) var(--spacing-2xl);
-// }
-
-// /* --- 3. INPUTS & FORM ELEMENTS --- */
+// // ===== 3. BASE INPUT STYLES =====
 // .p-inputtext,
 // .p-inputnumber-input,
 // .p-textarea,
-// .p-calendar .p-inputtext,
-// .p-password-input {
+// .p-password-input,
+// .p-inputmask-input {
 //   background: var(--bg-ternary) !important;
 //   border: var(--ui-border-width) solid var(--border-secondary) !important;
 //   color: var(--text-primary) !important;
@@ -153,153 +1287,122 @@
 //   padding: var(--spacing-md) var(--spacing-lg);
 //   font-size: var(--font-size-sm);
 //   font-family: var(--font-body);
-//   transition: var(--transition-colors);
+//   transition: var(--transition-fast);
 //   line-height: var(--line-height-normal);
+//   min-height: 2.5rem;
+//   width: 100%;
+
+//   &:enabled {
+//     &:focus {
+//       border-color: var(--accent-primary) !important;
+//       box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
+//       background: var(--bg-secondary) !important;
+//       outline: none;
+//     }
+
+//     &:hover:not(:focus):not(.p-invalid) {
+//       border-color: var(--border-primary) !important;
+//       background: var(--bg-ternary) !important;
+//     }
+//   }
+
+//   &:disabled {
+//     background: var(--color-disabled) !important;
+//     color: var(--color-disabled-text) !important;
+//     opacity: var(--state-disabled-opacity);
+//     cursor: not-allowed;
+//   }
+
+//   &::placeholder {
+//     color: var(--text-label);
+//     opacity: 1;
+//   }
+
+//   &.p-invalid {
+//     border-color: var(--color-error) !important;
+    
+//     &:focus {
+//       box-shadow: 0 0 0 var(--focus-ring-width) var(--color-error-focus) !important;
+//     }
+//   }
 // }
 
-// /* Focus State */
-// .p-inputtext:enabled:focus,
-// .p-inputnumber-input:enabled:focus,
-// .p-textarea:enabled:focus,
-// .p-calendar .p-inputtext:enabled:focus,
-// .p-password-input:enabled:focus {
-//   border-color: var(--accent-primary) !important;
-//   box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
-//   background: var(--bg-secondary) !important;
-//   outline: none;
-// }
-
-// /* Disabled State */
-// .p-inputtext:disabled,
-// .p-inputnumber-input:disabled,
-// .p-textarea:disabled {
-//   background: var(--color-disabled) !important;
-//   color: var(--color-disabled-text) !important;
-//   opacity: var(--state-disabled-opacity);
-//   cursor: not-allowed;
-// }
-
-// /* Placeholder */
-// .p-inputtext::placeholder,
-// .p-inputnumber-input::placeholder,
-// .p-textarea::placeholder {
-//   color: var(--text-label);
-//   opacity: 1;
-// }
-
-// /* Input Groups */
-// .p-inputgroup {
-//   display: flex;
-// }
-
-// .p-inputgroup-addon {
-//   background: var(--bg-ternary);
-//   border: var(--ui-border-width) solid var(--border-secondary);
-//   color: var(--text-secondary);
-//   padding: var(--spacing-md) var(--spacing-lg);
-//   font-size: var(--font-size-sm);
-// }
-
-// /* =================================================================
-//    --- 3.1 SELECTS & DROPDOWNS (p-select / p-dropdown / p-multiSelect) ---
-//    V21 Compatible with Native CSS Animations
-//    ================================================================= */
-
-// /* 1. THE TRIGGER (Input Box) */
-// .p-select,
-// .p-dropdown,
-// .p-multiselect {
+// // ===== 4. SELECT COMPONENT (REPLACES DROPDOWN) =====
+// .p-select {
+//   // Trigger/Input
 //   background: var(--bg-ternary) !important;
 //   border: var(--ui-border-width) solid var(--border-secondary) !important;
 //   color: var(--text-primary) !important;
 //   border-radius: var(--ui-border-radius);
-//   transition: var(--transition-colors);
+//   transition: var(--transition-fast);
 //   display: flex;
 //   align-items: center;
+//   justify-content: space-between;
 //   min-height: 2.5rem;
-// }
-
-// /* Hover State */
-// .p-select:not(.p-disabled):hover,
-// .p-dropdown:not(.p-disabled):hover,
-// .p-multiselect:not(.p-disabled):hover {
-//   border-color: var(--accent-primary) !important;
-//   background: var(--bg-ternary) !important;
-// }
-
-// /* Focus State - V21 uses native CSS animations */
-// .p-select:focus-within,
-// .p-select.p-focus,
-// .p-dropdown:focus-within,
-// .p-dropdown.p-focus,
-// .p-multiselect:focus-within,
-// .p-multiselect.p-focus {
-//   border-color: var(--accent-primary) !important;
-//   box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
-//   outline: none;
-// }
-
-// /* Disabled State */
-// .p-select.p-disabled,
-// .p-dropdown.p-disabled,
-// .p-multiselect.p-disabled {
-//   opacity: var(--state-disabled-opacity);
-//   background: var(--color-disabled) !important;
-//   cursor: not-allowed;
-// }
-
-// /* Text Label inside */
-// .p-select-label,
-// .p-dropdown-label,
-// .p-multiselect-label {
-//   color: var(--text-primary) !important;
-//   background: transparent !important;
-//   padding: 0 !important;
-//   font-size: var(--font-size-sm);
-//   flex: 1;
-// }
-
-// /* Placeholder */
-// .p-select .p-placeholder,
-// .p-dropdown .p-placeholder,
-// .p-multiselect .p-placeholder {
-//   color: var(--text-label) !important;
-// }
-
-// /* Dropdown Trigger */
-// .p-select-dropdown,
-// .p-dropdown-trigger,
-// .p-multiselect-dropdown,
-// .p-multiselect-trigger {
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   width: 2.5rem;
-//   color: var(--text-secondary);
-// }
-
-// /* Clear Icon */
-// .p-select-clear-icon,
-// .p-dropdown-clear-icon,
-// .p-multiselect-clear-icon {
-//   color: var(--text-secondary);
+//   position: relative;
 //   cursor: pointer;
-//   transition: var(--transition-colors);
+
+//   &:not(.p-disabled) {
+//     &:hover {
+//       border-color: var(--accent-primary) !important;
+//     }
+
+//     &.p-focus,
+//     &:focus-within {
+//       border-color: var(--accent-primary) !important;
+//       box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
+//       outline: none;
+//     }
+//   }
+
+//   &.p-disabled {
+//     opacity: var(--state-disabled-opacity);
+//     background: var(--color-disabled) !important;
+//     cursor: not-allowed;
+//   }
+
+//   // Label
+//   .p-select-label {
+//     color: var(--text-primary) !important;
+//     background: transparent !important;
+//     padding: var(--spacing-md) var(--spacing-lg);
+//     font-size: var(--font-size-sm);
+//     flex: 1;
+//     white-space: nowrap;
+//     overflow: hidden;
+//     text-overflow: ellipsis;
+
+//     &.p-placeholder {
+//       color: var(--text-label) !important;
+//     }
+//   }
+
+//   // Clear icon
+//   .p-select-clear-icon {
+//     color: var(--text-tertiary);
+//     margin-right: var(--spacing-sm);
+//     transition: var(--transition-fast);
+    
+//     &:hover {
+//       color: var(--text-secondary);
+//     }
+//   }
+
+//   // Trigger icon
+//   .p-select-trigger-icon {
+//     color: var(--text-tertiary);
+//     transition: var(--transition-fast);
+//     margin-right: var(--spacing-md);
+//   }
+
+//   &.p-focus .p-select-trigger-icon {
+//     transform: rotate(180deg);
+//   }
 // }
 
-// .p-select-clear-icon:hover,
-// .p-dropdown-clear-icon:hover,
-// .p-multiselect-clear-icon:hover {
-//   color: var(--text-primary);
-// }
-
-// /* ---------------------------------------------------------------
-//    2. THE OVERLAY PANEL (Popup List) - V21 Native CSS Animation
-//    --------------------------------------------------------------- */
+// // Select Panel/Overlay
 // .p-select-overlay,
-// .p-select-panel,
-// .p-dropdown-panel,
-// .p-multiselect-panel {
+// .p-select-panel {
 //   background: var(--bg-secondary) !important;
 //   border: var(--ui-border-width) solid var(--border-primary) !important;
 //   border-radius: var(--ui-border-radius-lg) !important;
@@ -309,14 +1412,76 @@
 //   -webkit-backdrop-filter: blur(var(--glass-blur-c));
 //   z-index: var(--z-dropdown) !important;
 //   margin-top: var(--spacing-xs);
-// }
-
-// /* V21: Native CSS Animation (replaces showTransitionOptions/hideTransitionOptions) */
-// .p-select-overlay,
-// .p-select-panel,
-// .p-dropdown-panel,
-// .p-multiselect-panel {
 //   animation: p-overlay-enter 0.15s cubic-bezier(0.23, 1, 0.32, 1);
+//   overflow: hidden;
+
+//   .p-select-list {
+//     padding: var(--spacing-xs) !important;
+//     max-height: 20rem;
+//     overflow-y: auto;
+
+//     &::-webkit-scrollbar {
+//       width: 6px;
+//     }
+
+//     &::-webkit-scrollbar-track {
+//       background: transparent;
+//     }
+
+//     &::-webkit-scrollbar-thumb {
+//       background: var(--border-secondary);
+//       border-radius: var(--ui-border-radius-sm);
+      
+//       &:hover {
+//         background: var(--text-tertiary);
+//       }
+//     }
+//   }
+
+//   .p-select-option {
+//     background: transparent !important;
+//     border: none !important;
+//     color: var(--text-primary) !important;
+//     border-radius: var(--ui-border-radius-sm);
+//     padding: var(--spacing-md) var(--spacing-lg) !important;
+//     margin: var(--spacing-xs) 0 !important;
+//     transition: var(--transition-fast);
+//     cursor: pointer;
+//     font-size: var(--font-size-sm);
+//     display: flex;
+//     align-items: center;
+//     gap: var(--spacing-md);
+
+//     &:not(.p-disabled) {
+//       &:hover {
+//         background: var(--component-bg-hover) !important;
+//       }
+
+//       &.p-focus {
+//         background: var(--component-bg-hover) !important;
+//         outline: none;
+//       }
+
+//       &.p-selected {
+//         background: var(--component-bg-active) !important;
+//         color: var(--accent-primary) !important;
+//         font-weight: var(--font-weight-semibold);
+//       }
+//     }
+
+//     &.p-disabled {
+//       color: var(--text-muted) !important;
+//       opacity: var(--opacity-disabled);
+//       cursor: not-allowed;
+//     }
+//   }
+
+//   .p-select-empty-message {
+//     color: var(--text-secondary) !important;
+//     padding: var(--spacing-xl) !important;
+//     text-align: center;
+//     font-size: var(--font-size-sm);
+//   }
 // }
 
 // @keyframes p-overlay-enter {
@@ -330,606 +1495,1343 @@
 //   }
 // }
 
-// /* Filter/Search Header */
-// .p-select-header,
-// .p-dropdown-header,
-// .p-multiselect-header {
-//   background: transparent !important;
-//   border-bottom: var(--ui-border-width) solid var(--border-primary) !important;
-//   padding: var(--spacing-md) !important;
-//   color: var(--text-primary) !important;
+// // ===== 5. MULTISELECT COMPONENT =====
+// .p-multiselect {
+//   @extend .p-select;
+
+//   .p-multiselect-label-container {
+//     flex: 1;
+//     padding: var(--spacing-sm) var(--spacing-md);
+//     min-height: 2.5rem;
+//     display: flex;
+//     align-items: center;
+//     flex-wrap: wrap;
+//     gap: var(--spacing-xs);
+//   }
+
+//   .p-multiselect-label {
+//     display: flex;
+//     flex-wrap: wrap;
+//     gap: var(--spacing-xs);
+//     align-items: center;
+//   }
+
+//   .p-multiselect-token {
+//     background: var(--component-bg-active) !important;
+//     color: var(--accent-primary) !important;
+//     border-radius: var(--ui-border-radius-sm);
+//     padding: var(--spacing-xs) var(--spacing-sm);
+//     font-size: var(--font-size-xs);
+//     font-weight: var(--font-weight-medium);
+//     display: inline-flex;
+//     align-items: center;
+//     gap: var(--spacing-xs);
+//     animation: token-enter 0.2s ease-out;
+
+//     .p-multiselect-token-icon {
+//       color: inherit;
+//       opacity: 0.7;
+//       transition: var(--transition-fast);
+      
+//       &:hover {
+//         opacity: 1;
+//       }
+//     }
+//   }
+
+//   .p-multiselect-trigger {
+//     margin-left: auto;
+//   }
 // }
 
-// /* MultiSelect Header Checkbox */
-// .p-multiselect-header .p-checkbox .p-checkbox-box {
-//   background: var(--bg-ternary);
-//   border-color: var(--border-secondary);
-// }
-
-// .p-multiselect-header .p-checkbox .p-checkbox-box.p-highlight {
-//   background: var(--accent-primary);
-//   border-color: var(--accent-primary);
-// }
-
-// /* Filter Input */
-// .p-select-filter,
-// .p-dropdown-filter,
-// .p-multiselect-filter {
-//   background: var(--bg-ternary) !important;
-//   border: var(--ui-border-width) solid var(--border-secondary) !important;
-//   color: var(--text-primary) !important;
-//   padding: var(--spacing-sm) var(--spacing-md) !important;
-//   border-radius: var(--ui-border-radius-sm);
-//   font-size: var(--font-size-sm);
-// }
-
-// .p-select-filter:focus,
-// .p-dropdown-filter:focus,
-// .p-multiselect-filter:focus {
-//   border-color: var(--accent-primary) !important;
-//   outline: none;
-// }
-
-// /* ---------------------------------------------------------------
-//    3. THE ITEMS LIST
-//    --------------------------------------------------------------- */
-// .p-select-list,
-// .p-dropdown-list,
-// .p-dropdown-items,
-// .p-multiselect-list,
-// .p-multiselect-items,
-// .p-multiselect-items-wrapper {
-//   background: transparent !important;
-//   padding: var(--spacing-xs) !important;
-//   list-style: none;
-//   margin: 0;
-// }
-
-// /* ---------------------------------------------------------------
-//    4. INDIVIDUAL OPTIONS (Items)
-//    --------------------------------------------------------------- */
-// .p-select-option,
-// .p-dropdown-option,
-// .p-dropdown-item,
-// .p-multiselect-option,
-// .p-multiselect-item {
-//   background: transparent !important;
-//   border: none !important;
-//   color: var(--text-primary) !important;
-//   border-radius: var(--ui-border-radius-sm);
-//   padding: var(--spacing-md) var(--spacing-lg) !important;
-//   margin: var(--spacing-xs) 0 !important;
-//   transition: var(--transition-fast);
-//   display: flex;
-//   align-items: center;
-//   gap: var(--spacing-md);
-//   cursor: pointer;
-//   font-size: var(--font-size-sm);
-// }
-
-// /* Hover State */
-// .p-select-option:not(.p-disabled):hover,
-// .p-dropdown-option:not(.p-disabled):hover,
-// .p-dropdown-item:not(.p-highlight):not(.p-disabled):hover,
-// .p-multiselect-option:not(.p-disabled):hover,
-// .p-multiselect-item:not(.p-highlight):not(.p-disabled):hover {
-//   background: var(--component-bg-hover) !important;
-//   color: var(--text-primary) !important;
-// }
-
-// /* Focused State (Keyboard Navigation) */
-// .p-select-option.p-focus,
-// .p-dropdown-option.p-focus,
-// .p-dropdown-item.p-focus,
-// .p-multiselect-option.p-focus,
-// .p-multiselect-item.p-focus {
-//   background: var(--component-bg-hover) !important;
-//   color: var(--text-primary) !important;
-//   outline: none !important;
-// }
-
-// /* Selected/Highlighted State */
-// .p-select-option.p-selected,
-// .p-dropdown-option.p-selected,
-// .p-dropdown-item.p-highlight,
-// .p-multiselect-option.p-selected,
-// .p-multiselect-item.p-highlight {
-//   background: var(--component-bg-active) !important;
-//   color: var(--accent-primary) !important;
-//   font-weight: var(--font-weight-semibold);
-// }
-
-// /* Disabled State */
-// .p-select-option.p-disabled,
-// .p-dropdown-option.p-disabled,
-// .p-dropdown-item.p-disabled,
-// .p-multiselect-option.p-disabled,
-// .p-multiselect-item.p-disabled {
-//   color: var(--text-muted) !important;
-//   opacity: var(--opacity-disabled);
-//   cursor: not-allowed;
-// }
-
-// /* Empty Message */
-// .p-select-empty-message,
-// .p-dropdown-empty-message,
-// .p-multiselect-empty-message {
-//   color: var(--text-secondary) !important;
-//   padding: var(--spacing-xl) !important;
-//   background: transparent !important;
-//   text-align: center;
-//   font-size: var(--font-size-sm);
-// }
-
-// /* --- CHECKBOX STYLING (MultiSelect) --- */
-// .p-multiselect-option .p-checkbox,
-// .p-multiselect-item .p-checkbox {
-//   display: flex;
-//   align-items: center;
-// }
-
-// .p-checkbox .p-checkbox-box {
-//   background: var(--bg-ternary) !important;
-//   border: var(--ui-border-width) solid var(--border-secondary) !important;
-//   color: var(--text-primary) !important;
-//   width: 1.125rem;
-//   height: 1.125rem;
-//   border-radius: var(--ui-border-radius-sm);
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   transition: var(--transition-colors);
-// }
-
-// .p-checkbox .p-checkbox-box.p-highlight {
-//   background: var(--accent-primary) !important;
-//   border-color: var(--accent-primary) !important;
-//   color: #ffffff !important;
-// }
-
-// .p-checkbox .p-checkbox-box:hover {
-//   border-color: var(--accent-primary);
-// }
-
-// .p-checkbox-icon {
-//   font-size: var(--font-size-xs);
-//   font-weight: var(--font-weight-bold);
-// }
-
-// /* --- 4. CARDS, DIALOGS & PANELS --- */
-// .p-card,
-// .p-panel,
-// .p-fieldset,
-// .p-accordion .p-accordion-content {
-//   background: var(--bg-secondary) !important;
-//   color: var(--text-primary) !important;
-//   border-radius: var(--ui-border-radius-lg);
-//   border: var(--ui-border-width) solid var(--border-primary);
-//   box-shadow: var(--shadow-md);
-//   backdrop-filter: blur(var(--glass-blur-c));
-//   -webkit-backdrop-filter: blur(var(--glass-blur-c));
-// }
-
-// /* Card Header */
-// .p-card .p-card-header {
-//   background: transparent;
-//   padding: var(--spacing-xl);
-//   border-bottom: var(--ui-border-width) solid var(--border-primary);
-// }
-
-// /* Card Body */
-// .p-card .p-card-body {
-//   padding: 0;
-// }
-
-// .p-card .p-card-content {
-//   padding: var(--spacing-xl);
-//   color: var(--text-primary);
-// }
-
-// /* Card Title */
-// .p-card .p-card-title {
-//   font-family: var(--font-heading);
-//   font-size: var(--font-size-xl);
-//   font-weight: var(--font-weight-bold);
-//   color: var(--text-primary);
-//   margin: 0 0 var(--spacing-sm) 0;
-// }
-
-// /* Card Subtitle */
-// .p-card .p-card-subtitle {
-//   font-size: var(--font-size-sm);
-//   color: var(--text-secondary);
-//   margin: 0 0 var(--spacing-lg) 0;
-// }
-
-// /* Card Footer */
-// .p-card .p-card-footer {
-//   padding: var(--spacing-xl);
-//   border-top: var(--ui-border-width) solid var(--border-primary);
-//   background: transparent;
-// }
-
-// /* --- DIALOG SPECIFICS (V21 Native Animations) --- */
-// .p-dialog {
-//   background: var(--bg-secondary) !important;
-//   border-radius: var(--ui-border-radius-xl);
-//   box-shadow: var(--shadow-2xl);
-//   border: var(--ui-border-width) solid var(--border-primary);
-//   backdrop-filter: blur(var(--glass-blur-c));
-//   -webkit-backdrop-filter: blur(var(--glass-blur-c));
-// }
-
-// /* V21: Native CSS Animation for Dialog */
-// .p-dialog {
-//   animation: p-dialog-enter 0.2s cubic-bezier(0.23, 1, 0.32, 1);
-// }
-
-// @keyframes p-dialog-enter {
+// @keyframes token-enter {
 //   from {
 //     opacity: 0;
-//     transform: scale(0.95) translateY(-20px);
+//     transform: scale(0.9);
 //   }
 //   to {
 //     opacity: 1;
-//     transform: scale(1) translateY(0);
+//     transform: scale(1);
 //   }
 // }
 
-// /* Dialog Mask/Backdrop */
-// .p-dialog-mask {
-//   background: rgba(0, 0, 0, 0.5);
-//   backdrop-filter: blur(4px);
-//   animation: p-dialog-mask-enter 0.15s ease-out;
-// }
+// // MultiSelect Panel
+// .p-multiselect-panel {
+//   @extend .p-select-panel;
 
-// @keyframes p-dialog-mask-enter {
-//   from {
-//     opacity: 0;
+//   .p-multiselect-header {
+//     padding: var(--spacing-md) !important;
+//     border-bottom: var(--ui-border-width) solid var(--border-primary) !important;
+//     display: flex;
+//     align-items: center;
+//     gap: var(--spacing-md);
+
+//     .p-checkbox {
+//       margin-right: var(--spacing-sm);
+//     }
+
+//     .p-multiselect-filter-container {
+//       flex: 1;
+      
+//       .p-inputtext {
+//         width: 100%;
+//         padding: var(--spacing-sm) var(--spacing-md);
+//         font-size: var(--font-size-sm);
+//       }
+//     }
 //   }
-//   to {
-//     opacity: 1;
+
+//   .p-multiselect-items {
+//     .p-multiselect-item {
+//       @extend .p-select-option;
+//       padding-left: var(--spacing-md) !important;
+
+//       .p-checkbox {
+//         margin-right: var(--spacing-sm);
+//       }
+//     }
 //   }
 // }
 
-// /* Dialog Header */
-// .p-dialog .p-dialog-header {
-//   background: transparent !important;
-//   border-bottom: var(--ui-border-width) solid var(--border-primary);
-//   padding: var(--spacing-xl) var(--spacing-2xl);
-//   color: var(--text-primary) !important;
-//   border-top-left-radius: var(--ui-border-radius-xl);
-//   border-top-right-radius: var(--ui-border-radius-xl);
+// // ===== 6. DATEPICKER COMPONENT =====
+// .p-datepicker {
+//   // Input
+//   .p-inputtext {
+//     width: 100%;
+//   }
+
+//   // Panel
+//   &.p-datepicker-panel {
+//     background: var(--bg-secondary) !important;
+//     border: var(--ui-border-width) solid var(--border-primary) !important;
+//     border-radius: var(--ui-border-radius-lg) !important;
+//     box-shadow: var(--shadow-xl) !important;
+//     color: var(--text-primary) !important;
+//     backdrop-filter: blur(var(--glass-blur-c));
+//     -webkit-backdrop-filter: blur(var(--glass-blur-c));
+//     z-index: var(--z-dropdown) !important;
+//     padding: var(--spacing-lg);
+//     animation: p-overlay-enter 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+
+//     .p-datepicker-header {
+//       padding: var(--spacing-md) 0;
+//       border-bottom: var(--ui-border-width) solid var(--border-secondary);
+//       margin-bottom: var(--spacing-md);
+//       display: flex;
+//       align-items: center;
+//       justify-content: space-between;
+
+//       .p-datepicker-title {
+//         font-weight: var(--font-weight-semibold);
+//         font-size: var(--font-size-md);
+//         color: var(--text-primary);
+//       }
+
+//       .p-datepicker-prev,
+//       .p-datepicker-next {
+//         background: transparent;
+//         border: none;
+//         color: var(--text-secondary);
+//         width: 2rem;
+//         height: 2rem;
+//         border-radius: var(--ui-border-radius-sm);
+//         transition: var(--transition-fast);
+//         cursor: pointer;
+//         display: flex;
+//         align-items: center;
+//         justify-content: center;
+
+//         &:hover:not(:disabled) {
+//           background: var(--component-bg-hover);
+//           color: var(--text-primary);
+//         }
+
+//         &:disabled {
+//           opacity: var(--state-disabled-opacity);
+//           cursor: not-allowed;
+//         }
+//       }
+//     }
+
+//     table {
+//       width: 100%;
+//       border-collapse: collapse;
+
+//       th {
+//         color: var(--text-secondary);
+//         font-weight: var(--font-weight-medium);
+//         font-size: var(--font-size-xs);
+//         text-transform: uppercase;
+//         letter-spacing: 0.05em;
+//         padding: var(--spacing-sm);
+//         text-align: center;
+//       }
+
+//       td {
+//         padding: var(--spacing-xs);
+//         text-align: center;
+
+//         & > span {
+//           display: flex;
+//           align-items: center;
+//           justify-content: center;
+//           height: 2.25rem;
+//           width: 2.25rem;
+//           border-radius: var(--ui-border-radius-sm);
+//           transition: var(--transition-fast);
+//           cursor: pointer;
+//           color: var(--text-primary);
+//           font-size: var(--font-size-sm);
+
+//           &:not(.p-disabled) {
+//             &:hover {
+//               background: var(--component-bg-hover);
+//               color: var(--text-primary);
+//             }
+
+//             &.p-highlight {
+//               background: var(--accent-primary) !important;
+//               color: white !important;
+//               font-weight: var(--font-weight-semibold);
+//             }
+
+//             &.p-today {
+//               background: var(--component-bg-active);
+//               color: var(--accent-primary);
+//               border: var(--ui-border-width) solid var(--accent-primary);
+//             }
+//           }
+
+//           &.p-disabled {
+//             color: var(--text-muted);
+//             opacity: var(--state-disabled-opacity);
+//             cursor: not-allowed;
+//           }
+//         }
+//       }
+//     }
+
+//     .p-datepicker-month,
+//     .p-datepicker-year {
+//       background: var(--bg-ternary);
+//       border: var(--ui-border-width) solid var(--border-secondary);
+//       color: var(--text-primary);
+//       border-radius: var(--ui-border-radius-sm);
+//       padding: var(--spacing-sm) var(--spacing-md);
+//       font-size: var(--font-size-sm);
+//       margin: 0 var(--spacing-xs);
+//       transition: var(--transition-fast);
+
+//       &:focus {
+//         border-color: var(--accent-primary);
+//         outline: none;
+//       }
+//     }
+
+//     .p-timepicker {
+//       border-top: var(--ui-border-width) solid var(--border-secondary);
+//       padding-top: var(--spacing-lg);
+//       margin-top: var(--spacing-lg);
+
+//       div {
+//         display: flex;
+//         align-items: center;
+//         justify-content: center;
+//         gap: var(--spacing-md);
+
+//         .p-hour-picker,
+//         .p-minute-picker,
+//         .p-second-picker,
+//         .p-ampm-picker {
+//           background: var(--bg-ternary);
+//           border: var(--ui-border-width) solid var(--border-secondary);
+//           color: var(--text-primary);
+//           border-radius: var(--ui-border-radius-sm);
+//           padding: var(--spacing-sm);
+//           font-size: var(--font-size-sm);
+//           text-align: center;
+//           transition: var(--transition-fast);
+
+//           &:focus {
+//             border-color: var(--accent-primary);
+//             outline: none;
+//           }
+//         }
+
+//         .p-separator {
+//           color: var(--text-tertiary);
+//         }
+//       }
+//     }
+
+//     .p-datepicker-buttonbar {
+//       border-top: var(--ui-border-width) solid var(--border-secondary);
+//       padding-top: var(--spacing-lg);
+//       margin-top: var(--spacing-lg);
+//       display: flex;
+//       justify-content: space-between;
+//       gap: var(--spacing-md);
+//     }
+//   }
 // }
 
-// .p-dialog .p-dialog-title {
-//   font-family: var(--font-heading);
-//   font-weight: var(--font-weight-bold);
-//   font-size: var(--font-size-2xl);
-//   color: var(--text-primary);
-//   line-height: var(--line-height-tight);
-// }
-
-// /* Dialog Header Icons */
-// .p-dialog .p-dialog-header-icons {
+// // ===== 7. INPUT GROUP =====
+// .p-inputgroup {
 //   display: flex;
-//   gap: var(--spacing-sm);
-// }
-
-// .p-dialog .p-dialog-header-icon {
-//   color: var(--text-secondary);
-//   width: 2rem;
-//   height: 2rem;
+//   align-items: stretch;
 //   border-radius: var(--ui-border-radius);
-//   transition: var(--transition-fast);
-//   background: transparent;
-//   border: none;
-//   cursor: pointer;
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-// }
-
-// .p-dialog .p-dialog-header-icon:hover {
-//   background: var(--component-bg-hover) !important;
-//   color: var(--text-primary) !important;
-// }
-
-// .p-dialog .p-dialog-header-icon:focus-visible {
-//   outline: none;
-//   box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus);
-// }
-
-// /* Dialog Content */
-// .p-dialog .p-dialog-content {
-//   background: transparent !important;
-//   color: var(--text-primary) !important;
-//   padding: var(--spacing-2xl);
-//   max-height: 70vh;
-//   overflow-y: auto;
-// }
-
-// /* Modern Scrollbar */
-// .p-dialog .p-dialog-content::-webkit-scrollbar {
-//   width: 8px;
-// }
-
-// .p-dialog .p-dialog-content::-webkit-scrollbar-track {
-//   background: transparent;
-// }
-
-// .p-dialog .p-dialog-content::-webkit-scrollbar-thumb {
-//   background: var(--border-secondary);
-//   border-radius: var(--ui-border-radius-sm);
-// }
-
-// .p-dialog .p-dialog-content::-webkit-scrollbar-thumb:hover {
-//   background: var(--text-tertiary);
-// }
-
-// /* Dialog Footer */
-// .p-dialog .p-dialog-footer {
-//   background: transparent !important;
-//   border-top: var(--ui-border-width) solid var(--border-primary);
-//   padding: var(--spacing-xl) var(--spacing-2xl);
-//   color: var(--text-primary) !important;
-//   border-bottom-left-radius: var(--ui-border-radius-xl);
-//   border-bottom-right-radius: var(--ui-border-radius-xl);
-//   display: flex;
-//   justify-content: flex-end;
-//   gap: var(--spacing-md);
-// }
-
-// /* --- 5. DATATABLE (Modern & Seamless) --- */
-// .p-datatable {
-//   background: var(--bg-secondary);
-//   border-radius: var(--ui-border-radius-lg);
-//   border: var(--ui-border-width) solid var(--border-primary);
 //   overflow: hidden;
+
+//   .p-inputgroup-addon {
+//     background: var(--bg-ternary);
+//     border: var(--ui-border-width) solid var(--border-secondary);
+//     color: var(--text-secondary);
+//     padding: var(--spacing-md) var(--spacing-lg);
+//     font-size: var(--font-size-sm);
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     min-width: 2.5rem;
+//     transition: var(--transition-fast);
+
+//     &:first-child {
+//       border-right: 0;
+//       border-top-left-radius: var(--ui-border-radius);
+//       border-bottom-left-radius: var(--ui-border-radius);
+//     }
+
+//     &:last-child {
+//       border-left: 0;
+//       border-top-right-radius: var(--ui-border-radius);
+//       border-bottom-right-radius: var(--ui-border-radius);
+//     }
+//   }
+
+//   .p-inputtext,
+//   .p-select {
+//     border-radius: 0;
+//     flex: 1;
+
+//     &:first-child {
+//       border-top-left-radius: var(--ui-border-radius);
+//       border-bottom-left-radius: var(--ui-border-radius);
+//     }
+
+//     &:last-child {
+//       border-top-right-radius: var(--ui-border-radius);
+//       border-bottom-right-radius: var(--ui-border-radius);
+//     }
+//   }
+
+//   &:has(.p-inputtext:enabled:focus) {
+//     .p-inputgroup-addon {
+//       border-color: var(--accent-primary);
+//     }
+//   }
 // }
 
-// .p-datatable .p-datatable-header {
-//   background: var(--bg-ternary);
-//   padding: var(--spacing-lg) var(--spacing-xl);
-//   border-bottom: var(--ui-border-width) solid var(--border-primary);
-//   color: var(--text-primary);
+// // ===== 8. CHECKBOX & RADIO =====
+// .p-checkbox,
+// .p-radiobutton {
+//   .p-checkbox-box,
+//   .p-radiobutton-box {
+//     background: var(--bg-ternary) !important;
+//     border: var(--ui-border-width) solid var(--border-secondary) !important;
+//     color: var(--text-primary) !important;
+//     width: 1.125rem;
+//     height: 1.125rem;
+//     border-radius: var(--ui-border-radius-sm);
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     transition: var(--transition-fast);
+
+//     &.p-highlight {
+//       background: var(--accent-primary) !important;
+//       border-color: var(--accent-primary) !important;
+//       color: white !important;
+//     }
+
+//     &:hover:not(.p-disabled) {
+//       border-color: var(--accent-primary);
+//     }
+
+//     &.p-focus {
+//       box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus);
+//     }
+
+//     &.p-disabled {
+//       opacity: var(--state-disabled-opacity);
+//       cursor: not-allowed;
+//     }
+//   }
+
+//   .p-checkbox-icon,
+//   .p-radiobutton-icon {
+//     font-size: var(--font-size-xs);
+//     font-weight: var(--font-weight-bold);
+//   }
 // }
 
-// .p-datatable .p-datatable-wrapper {
-//   background: transparent;
+// .p-radiobutton .p-radiobutton-box {
+//   border-radius: 50%;
 // }
 
-// /* Table Header */
-// .p-datatable .p-datatable-thead > tr > th {
-//   background: var(--bg-ternary) !important;
-//   color: var(--text-label);
+// // ===== 9. VALIDATION STATES =====
+// .p-invalid {
+//   border-color: var(--color-error) !important;
+
+//   &:focus {
+//     box-shadow: 0 0 0 var(--focus-ring-width) var(--color-error-focus) !important;
+//   }
+// }
+
+// .p-error {
+//   color: var(--color-error);
 //   font-size: var(--font-size-xs);
-//   text-transform: uppercase;
-//   letter-spacing: 0.05em;
-//   font-weight: var(--font-weight-bold);
-//   padding: var(--spacing-lg) var(--spacing-xl);
-//   border: none;
-//   border-bottom: var(--ui-border-width) solid var(--border-primary);
-//   white-space: nowrap;
-// }
-
-// /* Table Body */
-// .p-datatable .p-datatable-tbody > tr {
-//   background: transparent !important;
-//   color: var(--text-primary);
-//   transition: var(--transition-fast);
-//   border-bottom: var(--ui-border-width) solid var(--border-secondary);
-// }
-
-// .p-datatable .p-datatable-tbody > tr > td {
-//   padding: var(--spacing-lg) var(--spacing-xl);
-//   border: none;
-//   font-size: var(--font-size-sm);
-//   color: var(--text-primary);
-// }
-
-// /* Hover Effect */
-// .p-datatable .p-datatable-tbody > tr:hover {
-//   background: var(--component-bg-hover) !important;
-// }
-
-// /* Selected Row */
-// .p-datatable .p-datatable-tbody > tr.p-highlight {
-//   background: var(--component-bg-active) !important;
-//   color: var(--accent-primary) !important;
-// }
-
-// /* Striped Rows */
-// .p-datatable.p-datatable-striped .p-datatable-tbody > tr:nth-child(even) {
-//   background: var(--bg-ternary);
-// }
-
-// /* Footer */
-// .p-datatable .p-datatable-footer {
-//   background: var(--bg-ternary);
-//   padding: var(--spacing-lg) var(--spacing-xl);
-//   border-top: var(--ui-border-width) solid var(--border-primary);
-//   color: var(--text-primary);
-// }
-
-// /* --- PAGINATOR --- */
-// .p-paginator {
-//   background: transparent;
-//   border-top: var(--ui-border-width) solid var(--border-primary);
-//   padding: var(--spacing-md) var(--spacing-lg);
-//   color: var(--text-secondary);
-//   display: flex;
-//   align-items: center;
-//   justify-content: space-between;
-//   flex-wrap: wrap;
-//   gap: var(--spacing-md);
-// }
-
-// .p-paginator .p-paginator-element,
-// .p-paginator .p-paginator-page,
-// .p-paginator .p-paginator-next,
-// .p-paginator .p-paginator-prev,
-// .p-paginator .p-paginator-first,
-// .p-paginator .p-paginator-last {
-//   color: var(--text-secondary);
-//   background: transparent;
-//   border: var(--ui-border-width) solid transparent;
-//   min-width: 2rem;
-//   height: 2rem;
-//   border-radius: var(--ui-border-radius);
-//   transition: var(--transition-fast);
-//   font-size: var(--font-size-sm);
-// }
-
-// .p-paginator .p-paginator-element:not(.p-disabled):hover {
-//   background: var(--component-bg-hover);
-//   color: var(--text-primary);
-// }
-
-// .p-paginator .p-paginator-element.p-highlight {
-//   background: var(--component-bg-active);
-//   color: var(--accent-primary);
-//   font-weight: var(--font-weight-semibold);
-// }
-
-// /* --- 6. TABS (V21 Compatible) --- */
-
-// /* Legacy TabView */
-// .p-tabview .p-tabview-nav {
-//   background: transparent;
-//   border-bottom: var(--ui-border-width) solid var(--border-primary);
-//   display: flex;
-//   list-style: none;
-//   padding: 0;
-//   margin: 0;
-// }
-
-// .p-tabview .p-tabview-nav li {
-//   margin: 0;
-// }
-
-// .p-tabview .p-tabview-nav li .p-tabview-nav-link {
-//   background: transparent;
-//   border: none;
-//   border-bottom: 2px solid transparent;
-//   color: var(--text-secondary);
-//   padding: var(--spacing-lg) var(--spacing-xl);
-//   font-weight: var(--font-weight-medium);
-//   font-size: var(--font-size-sm);
-//   transition: var(--transition-colors);
-//   margin-bottom: -1px;
-//   cursor: pointer;
-//   text-decoration: none;
+//   margin-top: var(--spacing-xs);
 //   display: block;
 // }
 
-// .p-tabview .p-tabview-nav li:not(.p-highlight):not(.p-disabled):hover .p-tabview-nav-link {
-//   color: var(--text-primary);
-//   background: var(--component-bg-hover);
+// // ===== 10. UTILITY CLASSES =====
+// .p-fluid {
+//   width: 100%;
+
+//   .p-inputtext,
+//   .p-select,
+//   .p-multiselect,
+//   .p-button {
+//     width: 100%;
+//   }
 // }
 
-// .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
-//   color: var(--accent-primary);
-//   border-bottom-color: var(--accent-primary);
-//   font-weight: var(--font-weight-semibold);
+// .p-field {
+//   margin-bottom: var(--spacing-lg);
+  
+//   label {
+//     display: block;
+//     margin-bottom: var(--spacing-sm);
+//     color: var(--text-label);
+//     font-size: var(--font-size-sm);
+//     font-weight: var(--font-weight-medium);
+//   }
 // }
 
-// /* TabView Panels */
-// .p-tabview .p-tabview-panels {
-//   background: transparent;
-//   padding: var(--spacing-xl);
-//   color: var(--text-primary);
+// // ===== 11. RESPONSIVE ADJUSTMENTS =====
+// @media (max-width: 768px) {
+//   .p-select-panel,
+//   .p-multiselect-panel,
+//   .p-datepicker-panel {
+//     width: 100% !important;
+//     max-width: 100vw !important;
+//     margin-left: 0 !important;
+//     margin-right: 0 !important;
+//   }
+
+//   .p-datepicker-panel {
+//     padding: var(--spacing-md);
+    
+//     table td > span {
+//       height: 2rem;
+//       width: 2rem;
+//     }
+//   }
 // }
 
-// /* Modern Tabs (p-tablist/p-tab) */
-// .p-tablist {
-//   background: var(--bg-ternary) !important;
-//   border-bottom: var(--ui-border-width) solid var(--border-primary);
-//   padding: var(--spacing-sm) var(--spacing-sm) 0;
-//   border-radius: var(--ui-border-radius-lg) var(--ui-border-radius-lg) 0 0;
-//   display: flex;
-//   gap: var(--spacing-xs);
+// // ===== 12. DARK MODE ADJUSTMENTS (Example) =====
+// @media (prefers-color-scheme: dark) {
+//   .p-component {
+//     --bg-ternary: rgba(255, 255, 255, 0.05);
+//     --border-secondary: rgba(255, 255, 255, 0.1);
+//   }
+
+//   .p-select-panel,
+//   .p-multiselect-panel,
+//   .p-datepicker-panel {
+//     backdrop-filter: blur(12px);
+//     -webkit-backdrop-filter: blur(12px);
+//     background: rgba(30, 30, 30, 0.95) !important;
+//   }
 // }
 
-// .p-tab {
-//   background: transparent !important;
-//   border: var(--ui-border-width) solid transparent;
-//   border-bottom: none;
-//   color: var(--text-secondary) !important;
-//   padding: var(--spacing-md) var(--spacing-xl) !important;
-//   font-weight: var(--font-weight-medium);
-//   font-size: var(--font-size-sm);
-//   border-radius: var(--ui-border-radius) var(--ui-border-radius) 0 0;
-//   transition: var(--transition-fast);
-//   cursor: pointer;
-//   position: relative;
-//   margin-bottom: -1px;
-//   opacity: 0.85;
-// }
+// // /* ============================================================
+// //    PRIMENG V21 GLOBAL OVERRIDES (Angular 20+)
+// //    Consuming: Canonical Theme Tokens
+// //    Compatible with PrimeNG v21.0.1+ (Dec 2024)
+// //    ============================================================ */
 
-// .p-tab:not(.p-tab-active):not(.p-disabled):hover {
-//   background: var(--component-bg-hover) !important;
-//   color: var(--text-primary) !important;
-//   opacity: 1;
-// }
+// // /* --- 1. GENERAL COMPONENT RESET --- */
+// // .p-component {
+// //   font-family: var(--font-body);
+// //   font-size: var(--font-size-base); /* Using base size from theme */
+// //   color: var(--text-primary) !important;
+// //   line-height: var(--line-height-normal);
+// // }
 
-// .p-tab.p-tab-active {
-//   background: var(--bg-secondary) !important;
-//   color: var(--accent-primary) !important;
-//   border-color: var(--border-primary) !important;
-//   border-bottom-color: var(--bg-secondary) !important;
-//   font-weight: var(--font-weight-semibold);
-//   opacity: 1;
-//   z-index: 2;
-//   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
-// }
+// // /* --- 2. BUTTONS (.p-button) --- */
+// // .p-button {
+// //   background: var(--accent-gradient);
+// //   border: var(--ui-border-width) solid transparent;
+// //   color: #ffffff !important;
+// //   border-radius: var(--ui-border-radius);
+// //   padding: var(--spacing-md) var(--spacing-xl);
+// //   font-weight: var(--font-weight-semibold);
+// //   font-size: var(--font-size-sm);
+// //   transition: var(--transition-base);
+// //   box-shadow: var(--shadow-sm);
+// //   cursor: pointer;
+// // }
 
-// .p-tab:focus-visible {
-//   outline: none;
-//   box-shadow: inset 0 0 0 var(--focus-ring-width) var(--accent-focus);
-// }
+// // .p-button:enabled:hover {
+// //   background: var(--accent-hover);
+// //   color: #ffffff !important;
+// //   border-color: transparent;
+// //   transform: translateY(-1px);
+// //   box-shadow: var(--shadow-md);
+// // }
 
-// /* Tab Panels */
-// .p-tabpanels {
-//   background: var(--bg-secondary);
-//   padding: var(--spacing-xl);
-//   color: var(--text-primary);
-// }
+// // .p-button:enabled:active {
+// //   transform: translateY(0);
+// //   box-shadow: var(--shadow-xs);
+// // }
 
-// /* --- 7. ACCORDION --- */
-// .p-accordion .p-accordion-header .p-accordion-header-link {
-//   background: var(--bg-ternary);
-//   border: var(--ui-border-width) solid var(--border-primary);
-//   color: var(--text-primary);
-//   padding: var(--spacing-lg) var(--spacing-xl);
-//   font-weight: var(--font-weight-medium);
-//   font-size: var(--font-size-sm);
-//   transition: var(--transition-colors);
-// }
+// // .p-button:focus-visible {
+// //   outline: none;
+// //   box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus);
+// // }
 
-// .p-accordion .p-accordion-header:not(.p-disabled) .p-accordion-header-link:hover {
-//   background: var(--component-bg-hover);
-//   color: var(--text-primary);
-// }
+// // .p-button:disabled {
+// //   opacity: var(--state-disabled-opacity);
+// //   cursor: not-allowed;
+// //   background: var(--color-disabled) !important;
+// //   color: var(--color-disabled-text) !important;
+// // }
 
-// .p-accordion .p-accordion-header.p-highlight .p-accordion-header-link {
-//   background: var(--component-bg-active);
-//   color: var(--accent-primary);
-//   font-weight: var(--font-weight-semibold);
-// }
+// // /* Button Variants */
+// // .p-button.p-button-outlined {
+// //   background: transparent;
+// //   border: var(--ui-border-width) solid var(--border-primary);
+// //   color: var(--text-secondary) !important;
+// // }
 
-// .p-accordion .p-accordion-content {
-//   border: var(--ui-border-width) solid var(--border-primary);
-//   border-top: none;
-//   padding: var(--spacing-xl);
-//   color: var(--text-primary);
-// }
+// // .p-button.p-button-outlined:enabled:hover {
+// //   background: var(--component-bg-hover);
+// //   color: var(--text-primary) !important;
+// //   border-color: var(--accent-primary);
+// // }
 
-// /* --- 8. MENU & NAVIGATION --- */
-// .p-menu,
-// .p-tieredmenu,
-// .p-menubar,
-// .p-contextmenu {
-//   background: var(--bg-secondary);
-//   border: var(--ui-border-width) solid var(--border-primary);
-// }
+// // .p-button.p-button-text {
+// //   background: transparent;
+// //   border-color: transparent;
+// //   color: var(--text-secondary) !important;
+// // }
+
+// // .p-button.p-button-text:enabled:hover {
+// //   background: var(--component-bg-hover);
+// //   color: var(--accent-primary) !important;
+// // }
+
+// // /* Button Sizes */
+// // .p-button.p-button-sm {
+// //   font-size: var(--font-size-xs);
+// //   padding: var(--spacing-sm) var(--spacing-lg);
+// // }
+
+// // .p-button.p-button-lg {
+// //   font-size: var(--font-size-md);
+// //   padding: var(--spacing-lg) var(--spacing-2xl);
+// // }
+
+// // /* --- 3. INPUTS & FORM ELEMENTS --- */
+// // .p-inputtext,
+// // .p-inputnumber-input,
+// // .p-textarea,
+// // .p-calendar .p-inputtext,
+// // .p-password-input {
+// //   background: var(--bg-ternary) !important;
+// //   border: var(--ui-border-width) solid var(--border-secondary) !important;
+// //   color: var(--text-primary) !important;
+// //   border-radius: var(--ui-border-radius);
+// //   padding: var(--spacing-md) var(--spacing-lg);
+// //   font-size: var(--font-size-sm);
+// //   font-family: var(--font-body);
+// //   transition: var(--transition-colors);
+// //   line-height: var(--line-height-normal);
+// // }
+
+// // /* Focus State */
+// // .p-inputtext:enabled:focus,
+// // .p-inputnumber-input:enabled:focus,
+// // .p-textarea:enabled:focus,
+// // .p-calendar .p-inputtext:enabled:focus,
+// // .p-password-input:enabled:focus {
+// //   border-color: var(--accent-primary) !important;
+// //   box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
+// //   background: var(--bg-secondary) !important;
+// //   outline: none;
+// // }
+
+// // /* Disabled State */
+// // .p-inputtext:disabled,
+// // .p-inputnumber-input:disabled,
+// // .p-textarea:disabled {
+// //   background: var(--color-disabled) !important;
+// //   color: var(--color-disabled-text) !important;
+// //   opacity: var(--state-disabled-opacity);
+// //   cursor: not-allowed;
+// // }
+
+// // /* Placeholder */
+// // .p-inputtext::placeholder,
+// // .p-inputnumber-input::placeholder,
+// // .p-textarea::placeholder {
+// //   color: var(--text-label);
+// //   opacity: 1;
+// // }
+
+// // /* Input Groups */
+// // .p-inputgroup {
+// //   display: flex;
+// // }
+
+// // .p-inputgroup-addon {
+// //   background: var(--bg-ternary);
+// //   border: var(--ui-border-width) solid var(--border-secondary);
+// //   color: var(--text-secondary);
+// //   padding: var(--spacing-md) var(--spacing-lg);
+// //   font-size: var(--font-size-sm);
+// // }
+
+// // /* =================================================================
+// //    --- 3.1 SELECTS & DROPDOWNS (p-select / p-dropdown / p-multiSelect) ---
+// //    V21 Compatible with Native CSS Animations
+// //    ================================================================= */
+
+// // /* 1. THE TRIGGER (Input Box) */
+// // .p-select,
+// // .p-dropdown,
+// // .p-multiselect {
+// //   background: var(--bg-ternary) !important;
+// //   border: var(--ui-border-width) solid var(--border-secondary) !important;
+// //   color: var(--text-primary) !important;
+// //   border-radius: var(--ui-border-radius);
+// //   transition: var(--transition-colors);
+// //   display: flex;
+// //   align-items: center;
+// //   min-height: 2.5rem;
+// // }
+
+// // /* Hover State */
+// // .p-select:not(.p-disabled):hover,
+// // .p-dropdown:not(.p-disabled):hover,
+// // .p-multiselect:not(.p-disabled):hover {
+// //   border-color: var(--accent-primary) !important;
+// //   background: var(--bg-ternary) !important;
+// // }
+
+// // /* Focus State - V21 uses native CSS animations */
+// // .p-select:focus-within,
+// // .p-select.p-focus,
+// // .p-dropdown:focus-within,
+// // .p-dropdown.p-focus,
+// // .p-multiselect:focus-within,
+// // .p-multiselect.p-focus {
+// //   border-color: var(--accent-primary) !important;
+// //   box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
+// //   outline: none;
+// // }
+
+// // /* Disabled State */
+// // .p-select.p-disabled,
+// // .p-dropdown.p-disabled,
+// // .p-multiselect.p-disabled {
+// //   opacity: var(--state-disabled-opacity);
+// //   background: var(--color-disabled) !important;
+// //   cursor: not-allowed;
+// // }
+
+// // /* Text Label inside */
+// // .p-select-label,
+// // .p-dropdown-label,
+// // .p-multiselect-label {
+// //   color: var(--text-primary) !important;
+// //   background: transparent !important;
+// //   padding: 0 !important;
+// //   font-size: var(--font-size-sm);
+// //   flex: 1;
+// // }
+
+// // /* Placeholder */
+// // .p-select .p-placeholder,
+// // .p-dropdown .p-placeholder,
+// // .p-multiselect .p-placeholder {
+// //   color: var(--text-label) !important;
+// // }
+
+// // /* Dropdown Trigger */
+// // .p-select-dropdown,
+// // .p-dropdown-trigger,
+// // .p-multiselect-dropdown,
+// // .p-multiselect-trigger {
+// //   display: flex;
+// //   align-items: center;
+// //   justify-content: center;
+// //   width: 2.5rem;
+// //   color: var(--text-secondary);
+// // }
+
+// // /* Clear Icon */
+// // .p-select-clear-icon,
+// // .p-dropdown-clear-icon,
+// // .p-multiselect-clear-icon {
+// //   color: var(--text-secondary);
+// //   cursor: pointer;
+// //   transition: var(--transition-colors);
+// // }
+
+// // .p-select-clear-icon:hover,
+// // .p-dropdown-clear-icon:hover,
+// // .p-multiselect-clear-icon:hover {
+// //   color: var(--text-primary);
+// // }
+
+// // /* ---------------------------------------------------------------
+// //    2. THE OVERLAY PANEL (Popup List) - V21 Native CSS Animation
+// //    --------------------------------------------------------------- */
+// // .p-select-overlay,
+// // .p-select-panel,
+// // .p-dropdown-panel,
+// // .p-multiselect-panel {
+// //   background: var(--bg-secondary) !important;
+// //   border: var(--ui-border-width) solid var(--border-primary) !important;
+// //   border-radius: var(--ui-border-radius-lg) !important;
+// //   box-shadow: var(--shadow-xl) !important;
+// //   color: var(--text-primary) !important;
+// //   backdrop-filter: blur(var(--glass-blur-c));
+// //   -webkit-backdrop-filter: blur(var(--glass-blur-c));
+// //   z-index: var(--z-dropdown) !important;
+// //   margin-top: var(--spacing-xs);
+// // }
+
+// // /* V21: Native CSS Animation (replaces showTransitionOptions/hideTransitionOptions) */
+// // .p-select-overlay,
+// // .p-select-panel,
+// // .p-dropdown-panel,
+// // .p-multiselect-panel {
+// //   animation: p-overlay-enter 0.15s cubic-bezier(0.23, 1, 0.32, 1);
+// // }
+
+// // @keyframes p-overlay-enter {
+// //   from {
+// //     opacity: 0;
+// //     transform: translateY(-8px);
+// //   }
+// //   to {
+// //     opacity: 1;
+// //     transform: translateY(0);
+// //   }
+// // }
+
+// // /* Filter/Search Header */
+// // .p-select-header,
+// // .p-dropdown-header,
+// // .p-multiselect-header {
+// //   background: transparent !important;
+// //   border-bottom: var(--ui-border-width) solid var(--border-primary) !important;
+// //   padding: var(--spacing-md) !important;
+// //   color: var(--text-primary) !important;
+// // }
+
+// // /* MultiSelect Header Checkbox */
+// // .p-multiselect-header .p-checkbox .p-checkbox-box {
+// //   background: var(--bg-ternary);
+// //   border-color: var(--border-secondary);
+// // }
+
+// // .p-multiselect-header .p-checkbox .p-checkbox-box.p-highlight {
+// //   background: var(--accent-primary);
+// //   border-color: var(--accent-primary);
+// // }
+
+// // /* Filter Input */
+// // .p-select-filter,
+// // .p-dropdown-filter,
+// // .p-multiselect-filter {
+// //   background: var(--bg-ternary) !important;
+// //   border: var(--ui-border-width) solid var(--border-secondary) !important;
+// //   color: var(--text-primary) !important;
+// //   padding: var(--spacing-sm) var(--spacing-md) !important;
+// //   border-radius: var(--ui-border-radius-sm);
+// //   font-size: var(--font-size-sm);
+// // }
+
+// // .p-select-filter:focus,
+// // .p-dropdown-filter:focus,
+// // .p-multiselect-filter:focus {
+// //   border-color: var(--accent-primary) !important;
+// //   outline: none;
+// // }
+
+// // /* ---------------------------------------------------------------
+// //    3. THE ITEMS LIST
+// //    --------------------------------------------------------------- */
+// // .p-select-list,
+// // .p-dropdown-list,
+// // .p-dropdown-items,
+// // .p-multiselect-list,
+// // .p-multiselect-items,
+// // .p-multiselect-items-wrapper {
+// //   background: transparent !important;
+// //   padding: var(--spacing-xs) !important;
+// //   list-style: none;
+// //   margin: 0;
+// // }
+
+// // /* ---------------------------------------------------------------
+// //    4. INDIVIDUAL OPTIONS (Items)
+// //    --------------------------------------------------------------- */
+// // .p-select-option,
+// // .p-dropdown-option,
+// // .p-dropdown-item,
+// // .p-multiselect-option,
+// // .p-multiselect-item {
+// //   background: transparent !important;
+// //   border: none !important;
+// //   color: var(--text-primary) !important;
+// //   border-radius: var(--ui-border-radius-sm);
+// //   padding: var(--spacing-md) var(--spacing-lg) !important;
+// //   margin: var(--spacing-xs) 0 !important;
+// //   transition: var(--transition-fast);
+// //   display: flex;
+// //   align-items: center;
+// //   gap: var(--spacing-md);
+// //   cursor: pointer;
+// //   font-size: var(--font-size-sm);
+// // }
+
+// // /* Hover State */
+// // .p-select-option:not(.p-disabled):hover,
+// // .p-dropdown-option:not(.p-disabled):hover,
+// // .p-dropdown-item:not(.p-highlight):not(.p-disabled):hover,
+// // .p-multiselect-option:not(.p-disabled):hover,
+// // .p-multiselect-item:not(.p-highlight):not(.p-disabled):hover {
+// //   background: var(--component-bg-hover) !important;
+// //   color: var(--text-primary) !important;
+// // }
+
+// // /* Focused State (Keyboard Navigation) */
+// // .p-select-option.p-focus,
+// // .p-dropdown-option.p-focus,
+// // .p-dropdown-item.p-focus,
+// // .p-multiselect-option.p-focus,
+// // .p-multiselect-item.p-focus {
+// //   background: var(--component-bg-hover) !important;
+// //   color: var(--text-primary) !important;
+// //   outline: none !important;
+// // }
+
+// // /* Selected/Highlighted State */
+// // .p-select-option.p-selected,
+// // .p-dropdown-option.p-selected,
+// // .p-dropdown-item.p-highlight,
+// // .p-multiselect-option.p-selected,
+// // .p-multiselect-item.p-highlight {
+// //   background: var(--component-bg-active) !important;
+// //   color: var(--accent-primary) !important;
+// //   font-weight: var(--font-weight-semibold);
+// // }
+
+// // /* Disabled State */
+// // .p-select-option.p-disabled,
+// // .p-dropdown-option.p-disabled,
+// // .p-dropdown-item.p-disabled,
+// // .p-multiselect-option.p-disabled,
+// // .p-multiselect-item.p-disabled {
+// //   color: var(--text-muted) !important;
+// //   opacity: var(--opacity-disabled);
+// //   cursor: not-allowed;
+// // }
+
+// // /* Empty Message */
+// // .p-select-empty-message,
+// // .p-dropdown-empty-message,
+// // .p-multiselect-empty-message {
+// //   color: var(--text-secondary) !important;
+// //   padding: var(--spacing-xl) !important;
+// //   background: transparent !important;
+// //   text-align: center;
+// //   font-size: var(--font-size-sm);
+// // }
+
+// // /* --- CHECKBOX STYLING (MultiSelect) --- */
+// // .p-multiselect-option .p-checkbox,
+// // .p-multiselect-item .p-checkbox {
+// //   display: flex;
+// //   align-items: center;
+// // }
+
+// // .p-checkbox .p-checkbox-box {
+// //   background: var(--bg-ternary) !important;
+// //   border: var(--ui-border-width) solid var(--border-secondary) !important;
+// //   color: var(--text-primary) !important;
+// //   width: 1.125rem;
+// //   height: 1.125rem;
+// //   border-radius: var(--ui-border-radius-sm);
+// //   display: flex;
+// //   align-items: center;
+// //   justify-content: center;
+// //   transition: var(--transition-colors);
+// // }
+
+// // .p-checkbox .p-checkbox-box.p-highlight {
+// //   background: var(--accent-primary) !important;
+// //   border-color: var(--accent-primary) !important;
+// //   color: #ffffff !important;
+// // }
+
+// // .p-checkbox .p-checkbox-box:hover {
+// //   border-color: var(--accent-primary);
+// // }
+
+// // .p-checkbox-icon {
+// //   font-size: var(--font-size-xs);
+// //   font-weight: var(--font-weight-bold);
+// // }
+
+// // /* --- 4. CARDS, DIALOGS & PANELS --- */
+// // .p-card,
+// // .p-panel,
+// // .p-fieldset,
+// // .p-accordion .p-accordion-content {
+// //   background: var(--bg-secondary) !important;
+// //   color: var(--text-primary) !important;
+// //   border-radius: var(--ui-border-radius-lg);
+// //   border: var(--ui-border-width) solid var(--border-primary);
+// //   box-shadow: var(--shadow-md);
+// //   backdrop-filter: blur(var(--glass-blur-c));
+// //   -webkit-backdrop-filter: blur(var(--glass-blur-c));
+// // }
+
+// // /* Card Header */
+// // .p-card .p-card-header {
+// //   background: transparent;
+// //   padding: var(--spacing-xl);
+// //   border-bottom: var(--ui-border-width) solid var(--border-primary);
+// // }
+
+// // /* Card Body */
+// // .p-card .p-card-body {
+// //   padding: 0;
+// // }
+
+// // .p-card .p-card-content {
+// //   padding: var(--spacing-xl);
+// //   color: var(--text-primary);
+// // }
+
+// // /* Card Title */
+// // .p-card .p-card-title {
+// //   font-family: var(--font-heading);
+// //   font-size: var(--font-size-xl);
+// //   font-weight: var(--font-weight-bold);
+// //   color: var(--text-primary);
+// //   margin: 0 0 var(--spacing-sm) 0;
+// // }
+
+// // /* Card Subtitle */
+// // .p-card .p-card-subtitle {
+// //   font-size: var(--font-size-sm);
+// //   color: var(--text-secondary);
+// //   margin: 0 0 var(--spacing-lg) 0;
+// // }
+
+// // /* Card Footer */
+// // .p-card .p-card-footer {
+// //   padding: var(--spacing-xl);
+// //   border-top: var(--ui-border-width) solid var(--border-primary);
+// //   background: transparent;
+// // }
+
+// // /* --- DIALOG SPECIFICS (V21 Native Animations) --- */
+// // .p-dialog {
+// //   background: var(--bg-secondary) !important;
+// //   border-radius: var(--ui-border-radius-xl);
+// //   box-shadow: var(--shadow-2xl);
+// //   border: var(--ui-border-width) solid var(--border-primary);
+// //   backdrop-filter: blur(var(--glass-blur-c));
+// //   -webkit-backdrop-filter: blur(var(--glass-blur-c));
+// // }
+
+// // /* V21: Native CSS Animation for Dialog */
+// // .p-dialog {
+// //   animation: p-dialog-enter 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+// // }
+
+// // @keyframes p-dialog-enter {
+// //   from {
+// //     opacity: 0;
+// //     transform: scale(0.95) translateY(-20px);
+// //   }
+// //   to {
+// //     opacity: 1;
+// //     transform: scale(1) translateY(0);
+// //   }
+// // }
+
+// // /* Dialog Mask/Backdrop */
+// // .p-dialog-mask {
+// //   background: rgba(0, 0, 0, 0.5);
+// //   backdrop-filter: blur(4px);
+// //   animation: p-dialog-mask-enter 0.15s ease-out;
+// // }
+
+// // @keyframes p-dialog-mask-enter {
+// //   from {
+// //     opacity: 0;
+// //   }
+// //   to {
+// //     opacity: 1;
+// //   }
+// // }
+
+// // /* Dialog Header */
+// // .p-dialog .p-dialog-header {
+// //   background: transparent !important;
+// //   border-bottom: var(--ui-border-width) solid var(--border-primary);
+// //   padding: var(--spacing-xl) var(--spacing-2xl);
+// //   color: var(--text-primary) !important;
+// //   border-top-left-radius: var(--ui-border-radius-xl);
+// //   border-top-right-radius: var(--ui-border-radius-xl);
+// // }
+
+// // .p-dialog .p-dialog-title {
+// //   font-family: var(--font-heading);
+// //   font-weight: var(--font-weight-bold);
+// //   font-size: var(--font-size-2xl);
+// //   color: var(--text-primary);
+// //   line-height: var(--line-height-tight);
+// // }
+
+// // /* Dialog Header Icons */
+// // .p-dialog .p-dialog-header-icons {
+// //   display: flex;
+// //   gap: var(--spacing-sm);
+// // }
+
+// // .p-dialog .p-dialog-header-icon {
+// //   color: var(--text-secondary);
+// //   width: 2rem;
+// //   height: 2rem;
+// //   border-radius: var(--ui-border-radius);
+// //   transition: var(--transition-fast);
+// //   background: transparent;
+// //   border: none;
+// //   cursor: pointer;
+// //   display: flex;
+// //   align-items: center;
+// //   justify-content: center;
+// // }
+
+// // .p-dialog .p-dialog-header-icon:hover {
+// //   background: var(--component-bg-hover) !important;
+// //   color: var(--text-primary) !important;
+// // }
+
+// // .p-dialog .p-dialog-header-icon:focus-visible {
+// //   outline: none;
+// //   box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus);
+// // }
+
+// // /* Dialog Content */
+// // .p-dialog .p-dialog-content {
+// //   background: transparent !important;
+// //   color: var(--text-primary) !important;
+// //   padding: var(--spacing-2xl);
+// //   max-height: 70vh;
+// //   overflow-y: auto;
+// // }
+
+// // /* Modern Scrollbar */
+// // .p-dialog .p-dialog-content::-webkit-scrollbar {
+// //   width: 8px;
+// // }
+
+// // .p-dialog .p-dialog-content::-webkit-scrollbar-track {
+// //   background: transparent;
+// // }
+
+// // .p-dialog .p-dialog-content::-webkit-scrollbar-thumb {
+// //   background: var(--border-secondary);
+// //   border-radius: var(--ui-border-radius-sm);
+// // }
+
+// // .p-dialog .p-dialog-content::-webkit-scrollbar-thumb:hover {
+// //   background: var(--text-tertiary);
+// // }
+
+// // /* Dialog Footer */
+// // .p-dialog .p-dialog-footer {
+// //   background: transparent !important;
+// //   border-top: var(--ui-border-width) solid var(--border-primary);
+// //   padding: var(--spacing-xl) var(--spacing-2xl);
+// //   color: var(--text-primary) !important;
+// //   border-bottom-left-radius: var(--ui-border-radius-xl);
+// //   border-bottom-right-radius: var(--ui-border-radius-xl);
+// //   display: flex;
+// //   justify-content: flex-end;
+// //   gap: var(--spacing-md);
+// // }
+
+// // /* --- 5. DATATABLE (Modern & Seamless) --- */
+// // .p-datatable {
+// //   background: var(--bg-secondary);
+// //   border-radius: var(--ui-border-radius-lg);
+// //   border: var(--ui-border-width) solid var(--border-primary);
+// //   overflow: hidden;
+// // }
+
+// // .p-datatable .p-datatable-header {
+// //   background: var(--bg-ternary);
+// //   padding: var(--spacing-lg) var(--spacing-xl);
+// //   border-bottom: var(--ui-border-width) solid var(--border-primary);
+// //   color: var(--text-primary);
+// // }
+
+// // .p-datatable .p-datatable-wrapper {
+// //   background: transparent;
+// // }
+
+// // /* Table Header */
+// // .p-datatable .p-datatable-thead > tr > th {
+// //   background: var(--bg-ternary) !important;
+// //   color: var(--text-label);
+// //   font-size: var(--font-size-xs);
+// //   text-transform: uppercase;
+// //   letter-spacing: 0.05em;
+// //   font-weight: var(--font-weight-bold);
+// //   padding: var(--spacing-lg) var(--spacing-xl);
+// //   border: none;
+// //   border-bottom: var(--ui-border-width) solid var(--border-primary);
+// //   white-space: nowrap;
+// // }
+
+// // /* Table Body */
+// // .p-datatable .p-datatable-tbody > tr {
+// //   background: transparent !important;
+// //   color: var(--text-primary);
+// //   transition: var(--transition-fast);
+// //   border-bottom: var(--ui-border-width) solid var(--border-secondary);
+// // }
+
+// // .p-datatable .p-datatable-tbody > tr > td {
+// //   padding: var(--spacing-lg) var(--spacing-xl);
+// //   border: none;
+// //   font-size: var(--font-size-sm);
+// //   color: var(--text-primary);
+// // }
+
+// // /* Hover Effect */
+// // .p-datatable .p-datatable-tbody > tr:hover {
+// //   background: var(--component-bg-hover) !important;
+// // }
+
+// // /* Selected Row */
+// // .p-datatable .p-datatable-tbody > tr.p-highlight {
+// //   background: var(--component-bg-active) !important;
+// //   color: var(--accent-primary) !important;
+// // }
+
+// // /* Striped Rows */
+// // .p-datatable.p-datatable-striped .p-datatable-tbody > tr:nth-child(even) {
+// //   background: var(--bg-ternary);
+// // }
+
+// // /* Footer */
+// // .p-datatable .p-datatable-footer {
+// //   background: var(--bg-ternary);
+// //   padding: var(--spacing-lg) var(--spacing-xl);
+// //   border-top: var(--ui-border-width) solid var(--border-primary);
+// //   color: var(--text-primary);
+// // }
+
+// // /* --- PAGINATOR --- */
+// // .p-paginator {
+// //   background: transparent;
+// //   border-top: var(--ui-border-width) solid var(--border-primary);
+// //   padding: var(--spacing-md) var(--spacing-lg);
+// //   color: var(--text-secondary);
+// //   display: flex;
+// //   align-items: center;
+// //   justify-content: space-between;
+// //   flex-wrap: wrap;
+// //   gap: var(--spacing-md);
+// // }
+
+// // .p-paginator .p-paginator-element,
+// // .p-paginator .p-paginator-page,
+// // .p-paginator .p-paginator-next,
+// // .p-paginator .p-paginator-prev,
+// // .p-paginator .p-paginator-first,
+// // .p-paginator .p-paginator-last {
+// //   color: var(--text-secondary);
+// //   background: transparent;
+// //   border: var(--ui-border-width) solid transparent;
+// //   min-width: 2rem;
+// //   height: 2rem;
+// //   border-radius: var(--ui-border-radius);
+// //   transition: var(--transition-fast);
+// //   font-size: var(--font-size-sm);
+// // }
+
+// // .p-paginator .p-paginator-element:not(.p-disabled):hover {
+// //   background: var(--component-bg-hover);
+// //   color: var(--text-primary);
+// // }
+
+// // .p-paginator .p-paginator-element.p-highlight {
+// //   background: var(--component-bg-active);
+// //   color: var(--accent-primary);
+// //   font-weight: var(--font-weight-semibold);
+// // }
+
+// // /* --- 6. TABS (V21 Compatible) --- */
+
+// // /* Legacy TabView */
+// // .p-tabview .p-tabview-nav {
+// //   background: transparent;
+// //   border-bottom: var(--ui-border-width) solid var(--border-primary);
+// //   display: flex;
+// //   list-style: none;
+// //   padding: 0;
+// //   margin: 0;
+// // }
+
+// // .p-tabview .p-tabview-nav li {
+// //   margin: 0;
+// // }
+
+// // .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+// //   background: transparent;
+// //   border: none;
+// //   border-bottom: 2px solid transparent;
+// //   color: var(--text-secondary);
+// //   padding: var(--spacing-lg) var(--spacing-xl);
+// //   font-weight: var(--font-weight-medium);
+// //   font-size: var(--font-size-sm);
+// //   transition: var(--transition-colors);
+// //   margin-bottom: -1px;
+// //   cursor: pointer;
+// //   text-decoration: none;
+// //   display: block;
+// // }
+
+// // .p-tabview .p-tabview-nav li:not(.p-highlight):not(.p-disabled):hover .p-tabview-nav-link {
+// //   color: var(--text-primary);
+// //   background: var(--component-bg-hover);
+// // }
+
+// // .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+// //   color: var(--accent-primary);
+// //   border-bottom-color: var(--accent-primary);
+// //   font-weight: var(--font-weight-semibold);
+// // }
+
+// // /* TabView Panels */
+// // .p-tabview .p-tabview-panels {
+// //   background: transparent;
+// //   padding: var(--spacing-xl);
+// //   color: var(--text-primary);
+// // }
+
+// // /* Modern Tabs (p-tablist/p-tab) */
+// // .p-tablist {
+// //   background: var(--bg-ternary) !important;
+// //   border-bottom: var(--ui-border-width) solid var(--border-primary);
+// //   padding: var(--spacing-sm) var(--spacing-sm) 0;
+// //   border-radius: var(--ui-border-radius-lg) var(--ui-border-radius-lg) 0 0;
+// //   display: flex;
+// //   gap: var(--spacing-xs);
+// // }
+
+// // .p-tab {
+// //   background: transparent !important;
+// //   border: var(--ui-border-width) solid transparent;
+// //   border-bottom: none;
+// //   color: var(--text-secondary) !important;
+// //   padding: var(--spacing-md) var(--spacing-xl) !important;
+// //   font-weight: var(--font-weight-medium);
+// //   font-size: var(--font-size-sm);
+// //   border-radius: var(--ui-border-radius) var(--ui-border-radius) 0 0;
+// //   transition: var(--transition-fast);
+// //   cursor: pointer;
+// //   position: relative;
+// //   margin-bottom: -1px;
+// //   opacity: 0.85;
+// // }
+
+// // .p-tab:not(.p-tab-active):not(.p-disabled):hover {
+// //   background: var(--component-bg-hover) !important;
+// //   color: var(--text-primary) !important;
+// //   opacity: 1;
+// // }
+
+// // .p-tab.p-tab-active {
+// //   background: var(--bg-secondary) !important;
+// //   color: var(--accent-primary) !important;
+// //   border-color: var(--border-primary) !important;
+// //   border-bottom-color: var(--bg-secondary) !important;
+// //   font-weight: var(--font-weight-semibold);
+// //   opacity: 1;
+// //   z-index: 2;
+// //   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+// // }
+
+// // .p-tab:focus-visible {
+// //   outline: none;
+// //   box-shadow: inset 0 0 0 var(--focus-ring-width) var(--accent-focus);
+// // }
+
+// // /* Tab Panels */
+// // .p-tabpanels {
+// //   background: var(--bg-secondary);
+// //   padding: var(--spacing-xl);
+// //   color: var(--text-primary);
+// // }
+
+// // /* --- 7. ACCORDION --- */
+// // .p-accordion .p-accordion-header .p-accordion-header-link {
+// //   background: var(--bg-ternary);
+// //   border: var(--ui-border-width) solid var(--border-primary);
+// //   color: var(--text-primary);
+// //   padding: var(--spacing-lg) var(--spacing-xl);
+// //   font-weight: var(--font-weight-medium);
+// //   font-size: var(--font-size-sm);
+// //   transition: var(--transition-colors);
+// // }
+
+// // .p-accordion .p-accordion-header:not(.p-disabled) .p-accordion-header-link:hover {
+// //   background: var(--component-bg-hover);
+// //   color: var(--text-primary);
+// // }
+
+// // .p-accordion .p-accordion-header.p-highlight .p-accordion-header-link {
+// //   background: var(--component-bg-active);
+// //   color: var(--accent-primary);
+// //   font-weight: var(--font-weight-semibold);
+// // }
+
+// // .p-accordion .p-accordion-content {
+// //   border: var(--ui-border-width) solid var(--border-primary);
+// //   border-top: none;
+// //   padding: var(--spacing-xl);
+// //   color: var(--text-primary);
+// // }
+
+// // /* --- 8. MENU & NAVIGATION --- */
+// // .p-menu,
+// // .p-tieredmenu,
+// // .p-menubar,
+// // .p-contextmenu {
+// //   background: var(--bg-secondary);
+// //   border: var(--ui-border-width) solid var(--border-primary);
+// // }

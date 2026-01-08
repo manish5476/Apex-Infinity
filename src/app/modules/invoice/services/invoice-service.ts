@@ -8,6 +8,38 @@ export class InvoiceService extends BaseApiService {
   private endpoint = '/v1/invoices';
 
   // ==============================================
+  // ANALYTICS ENDPOINTS
+  // ==============================================
+
+  /** Get profit summary */
+  getProfitSummarys(filters?: any): Observable<any> {
+    return this.get(`${this.endpoint}/analytics/profit-summary`, filters, 'getProfitSummary');
+  }
+
+  /** Get advanced profit analysis with filters */
+  getAdvancedProfitAnalysis(filters?: any): Observable<any> {
+    return this.get(`${this.endpoint}/analytics/advanced-profit`, filters, 'getAdvancedProfitAnalysis');
+  }
+
+  /** Get profit dashboard */
+  getProfitDashboard(period?: string, filters?: any): Observable<any> {
+    const params = { period, ...filters };
+    return this.get(`${this.endpoint}/analytics/profit-dashboard`, params, 'getProfitDashboard');
+  }
+
+  /** Get product-specific profit analysis */
+  getProductProfitAnalysis(productId: string, filters?: any): Observable<any> {
+    const params = { ...filters };
+    return this.get(`${this.endpoint}/analytics/product-profit/${productId}`, params, 'getProductProfitAnalysis');
+  }
+
+  /** Export profit data */
+  exportProfitData(filters?: any, format: string = 'csv'): Observable<Blob> {
+    return this.getBlob(`${this.endpoint}/analytics/export-profit`, { ...filters, format }, 'exportProfitData');
+  }
+
+
+  // ==============================================
   // STOCK MANAGEMENT ENDPOINTS
   // ==============================================
 
