@@ -1,13 +1,13 @@
 // components/product-profit-popup/product-profit-popup.component.ts
 import { Component, Input, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InvoiceService } from '../../services/invoice-service';
 
 @Component({
   selector: 'app-product-profit-popup',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule,CurrencyPipe, FormsModule],
   template: `
     <div class="product-profit-popup">
       <div class="popup-header">
@@ -587,9 +587,7 @@ import { InvoiceService } from '../../services/invoice-service';
 })
 export class ProductProfitPopupComponent implements OnInit {
   @Input() productId!: string;
-  
   private invoiceService = inject(InvoiceService);
-  
   loading = false;
   productData: any = null;
   maxMonthlyProfit = 0;

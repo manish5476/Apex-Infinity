@@ -72,7 +72,10 @@ export const SIDEBAR_MENU: MenuItem[] = [
     items: [
       { label: 'All Invoices', icon: 'pi pi-file-pdf', routerLink: ['/invoices'] },
       { label: 'Create Invoice', icon: 'pi pi-file-edit', routerLink: ['/invoices/create'] },
-      { label: 'Invoice analytics', icon: 'pi pi-file-edit', routerLink: ['/invoices/analytics'] },
+      { label: 'Invoice analytics', icon: 'pi pi-file-edit', routerLink: ['/invoices/invoicesanalytics'] },
+      { label: 'ProfitSummaryComponent analytics', icon: 'pi pi-file-edit', routerLink: ['/invoices/ProfitSummaryComponent'] },
+      { label: 'ProfitDashboardComponent analytics', icon: 'pi pi-file-edit', routerLink: ['/invoices/ProfitDashboardComponent'] },
+      { label: 'AdvancedProfitAnalysisComponent analytics', icon: 'pi pi-file-edit', routerLink: ['/invoices/AdvancedProfitAnalysisComponent'] },
       { label: 'EMI Manager', icon: 'pi pi-calendar-clock', routerLink: ['/emis'] },
       { label: 'Customer Directory', icon: 'pi pi-address-book', routerLink: ['/customer'] },
       { label: 'Add New Customer', icon: 'pi pi-user-plus', routerLink: ['/customer/create'] }

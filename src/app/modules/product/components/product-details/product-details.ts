@@ -18,6 +18,7 @@ import { MasterListService } from '../../../../core/services/master-list.service
 import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
 import { ImageViewerDirective } from '../../../shared/directives/image-viewer.directive';
+import { ProductAnalyticsDirective } from '../../../../core/interceptors/pProductAnalyticsDirective';
 
 @Component({
   selector: 'app-product-details',
@@ -25,7 +26,7 @@ import { ImageViewerDirective } from '../../../shared/directives/image-viewer.di
   imports: [
     CommonModule, RouterModule, ButtonModule, TagModule, 
     SkeletonModule, TableModule, CarouselModule, TooltipModule,
-    ImageViewerDirective
+    ImageViewerDirective,ProductAnalyticsDirective
   ],
   templateUrl: './product-details.html',
   styleUrls: ['./product-details.scss'],

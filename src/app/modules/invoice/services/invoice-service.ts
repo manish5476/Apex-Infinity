@@ -13,29 +13,29 @@ export class InvoiceService extends BaseApiService {
 
   /** Get profit summary */
   getProfitSummarys(filters?: any): Observable<any> {
-    return this.get(`${this.endpoint}/analytics/profit-summary`, filters, 'getProfitSummary');
+    return this.get(`${this.endpoint}/invoiceanalytics/profit-summary`, filters, 'getProfitSummary');
   }
 
   /** Get advanced profit analysis with filters */
   getAdvancedProfitAnalysis(filters?: any): Observable<any> {
-    return this.get(`${this.endpoint}/analytics/advanced-profit`, filters, 'getAdvancedProfitAnalysis');
+    return this.get(`${this.endpoint}/invoiceanalytics/advanced-profit`, filters, 'getAdvancedProfitAnalysis');
   }
 
   /** Get profit dashboard */
   getProfitDashboard(period?: string, filters?: any): Observable<any> {
     const params = { period, ...filters };
-    return this.get(`${this.endpoint}/analytics/profit-dashboard`, params, 'getProfitDashboard');
+    return this.get(`${this.endpoint}/invoiceanalytics/profit-dashboard`, params, 'getProfitDashboard');
   }
 
   /** Get product-specific profit analysis */
   getProductProfitAnalysis(productId: string, filters?: any): Observable<any> {
     const params = { ...filters };
-    return this.get(`${this.endpoint}/analytics/product-profit/${productId}`, params, 'getProductProfitAnalysis');
+    return this.get(`${this.endpoint}/invoiceanalytics/product-profit/${productId}`, params, 'getProductProfitAnalysis');
   }
 
   /** Export profit data */
   exportProfitData(filters?: any, format: string = 'csv'): Observable<Blob> {
-    return this.getBlob(`${this.endpoint}/analytics/export-profit`, { ...filters, format }, 'exportProfitData');
+    return this.getBlob(`${this.endpoint}/invoiceanalytics/export-profit`, { ...filters, format }, 'exportProfitData');
   }
 
 
@@ -140,6 +140,11 @@ export class InvoiceService extends BaseApiService {
     return this.get(`${this.endpoint}/reports/profit`, filterParams, 'getProfitSummary');
   }
 
+  /** Get standard profit analysis */
+  getProfitAnalysis(filters?: any): Observable<any> {
+    return this.get(`${this.endpoint}/invoiceanalytics/profit`, filters, 'getProfitAnalysis');
+  }
+  
   /** Get sales report by date range */
   getSalesReport(filterParams?: any): Observable<any> {
     return this.get(`${this.endpoint}/reports/sales`, filterParams, 'getSalesReport');
@@ -325,7 +330,7 @@ export class InvoiceService extends BaseApiService {
     const params: any = {};
     if (startDate) params.startDate = startDate;
     if (endDate) params.endDate = endDate;
-
+    
     return this.get(this.endpoint, params, 'getInvoiceStats');
   }
 
@@ -339,6 +344,8 @@ export class InvoiceService extends BaseApiService {
       notes: 'Payment received'
     });
   }
+
+  
 }
 
 // // Get filtered invoices

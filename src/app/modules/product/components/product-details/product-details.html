@@ -69,7 +69,7 @@
         <button pButton label="Edit" icon="pi pi-pencil" class="p-button-outlined p-button-secondary btn-sm"
           [routerLink]="['/product', p._id, 'edit']"></button>
 
-        <button pButton icon="pi pi-ellipsis-v" class="p-button-text p-button-secondary btn-sm icon-only"></button>
+        <button pButton [appProductAnalytics]="p._id" icon="pi pi-ellipsis-v" class="p-button-text p-button-secondary btn-sm icon-only"></button>
       </div>
     </header>
 
