@@ -1,234 +1,505 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { BaseApiService } from '../../../core/services/base-api.service';
-import { LoginResponse, User } from '../../modules/auth/services/auth-service';
 
-// Interfaces for type safety
-export interface ApiResponse<T> {
-  status: string;
-  data: T;
+@Injectable({ providedIn: 'root' })
+export class InvoiceService extends BaseApiService {
+  private endpoint = '/v1/invoices';
+
+  // ==============================================
+  // ANALYTICS ENDPOINTS
+  // ==============================================
+
+  /** Get profit summary */
+  getProfitSummarys(filters?: any): Observable<any> {
+    return this.get(`${this.endpoint}/analytics/profit-summary`, filters, 'getProfitSummary');
+  }
+
+  /** Get advanced profit analysis with filters */
+  getAdvancedProfitAnalysis(filters?: any): Observable<any> {
+    return this.get(`${this.endpoint}/analytics/advanced-profit`, filters, 'getAdvancedProfitAnalysis');
+  }
+
+  /** Get profit dashboard */
+  getProfitDashboard(period?: string, filters?: any): Observable<any> {
+    const params = { period, ...filters };
+    return this.get(`${this.endpoint}/analytics/profit-dashboard`, params, 'getProfitDashboard');
+  }
+
+  /** Get product-specific profit analysis */
+  getProductProfitAnalysis(productId: string, filters?: any): Observable<any> {
+    const params = { ...filters };
+    return this.get(`${this.endpoint}/analytics/product-profit/${productId}`, params, 'getProductProfitAnalysis');
+  }
+
+  /** Export profit data */
+  exportProfitData(filters?: any, format: string = 'csv'): Observable<Blob> {
+    return this.getBlob(`${this.endpoint}/analytics/export-profit`, { ...filters, format }, 'exportProfitData');
+  }
+
+
+  // ==============================================
+  // STOCK MANAGEMENT ENDPOINTS
+  // ==============================================
+
+  /** Check stock availability before creating invoice */
+  checkStock(items: any[]): Observable<any> {
+    return this.post(`${this.endpoint}/check-stock`, { items }, 'checkStock');
+  }
+
+  /** Get invoice with current stock information */
+  getInvoiceWithStock(id: string): Observable<any> {
+    return this.get(`${this.endpoint}/${id}/stock-info`, {}, 'getInvoiceWithStock');
+  }
+
+  /** Get low stock warnings for invoice items */
+  getLowStockWarnings(id: string): Observable<any> {
+    return this.get(`${this.endpoint}/${id}/low-stock-warnings`, {}, 'getLowStockWarnings');
+  }
+
+  /** Suggest alternative products if stock is low */
+  getAlternativeProducts(id: string): Observable<any> {
+    return this.get(`${this.endpoint}/${id}/alternatives`, {}, 'getAlternativeProducts');
+  }
+
+  // ==============================================
+  // INVOICE STATUS MANAGEMENT
+  // ==============================================
+
+  /** Cancel invoice (restores stock if restock=true) */
+  cancelInvoice(id: string, reason: string, restock: boolean = true): Observable<any> {
+    return this.post(`${this.endpoint}/${id}/cancel`, { reason, restock }, 'cancelInvoice');
+  }
+
+  /** Convert draft invoice to active (reduces stock) */
+  convertDraftToActive(id: string): Observable<any> {
+    return this.post(`${this.endpoint}/${id}/convert`, {}, 'convertDraftToActive');
+  }
+
+  /** Bulk update invoice status */
+  bulkUpdateStatus(ids: string[], status: string): Observable<any> {
+    return this.patch(`${this.endpoint}/bulk/status`, { ids, status }, 'bulkUpdateStatus');
+  }
+
+  // ==============================================
+  // PAYMENT MANAGEMENT
+  // ==============================================
+
+  /** Add payment to invoice */
+  addPayment(invoiceId: string, paymentData: any): Observable<any> {
+    return this.post(`${this.endpoint}/${invoiceId}/payments`, paymentData, 'addPayment');
+  }
+
+  /** Get all payments for an invoice */
+  getInvoicePayments(invoiceId: string): Observable<any> {
+    return this.get(`${this.endpoint}/${invoiceId}/payments`, {}, 'getInvoicePayments');
+  }
+
+  // ==============================================
+  // CUSTOMER-SPECIFIC ENDPOINTS
+  // ==============================================
+
+  /** Get all invoices for a customer */
+  getInvoicesByCustomer(customerId: string, filterParams?: any): Observable<any> {
+    return this.get(`${this.endpoint}/customer/${customerId}`, filterParams, 'getInvoicesByCustomer');
+  }
+
+  /** Get customer invoice summary */
+  getCustomerInvoiceSummary(customerId: string): Observable<any> {
+    return this.get(`${this.endpoint}/customer/${customerId}/summary`, {}, 'getCustomerInvoiceSummary');
+  }
+
+  // ==============================================
+  // DOCUMENT GENERATION & EMAIL
+  // ==============================================
+
+  /** Download invoice as PDF */
+  downloadInvoicePDF(id: string): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}${this.endpoint}/${id}/download`, {
+      responseType: 'blob'
+    });
+  }
+
+  /** Email invoice to customer */
+  emailInvoice(id: string): Observable<any> {
+    return this.post(`${this.endpoint}/${id}/email`, {}, 'emailInvoice');
+  }
+
+  /** Generate invoice QR code for e-invoicing */
+  generateQRCode(id: string): Observable<any> {
+    return this.get(`${this.endpoint}/${id}/qr-code`, {}, 'generateQRCode');
+  }
+
+  // ==============================================
+  // REPORTS & ANALYTICS
+  // ==============================================
+
+  /** Get profit summary report */
+  getProfitSummary(filterParams?: any): Observable<any> {
+    return this.get(`${this.endpoint}/reports/profit`, filterParams, 'getProfitSummary');
+  }
+
+  /** Get sales report by date range */
+  getSalesReport(filterParams?: any): Observable<any> {
+    return this.get(`${this.endpoint}/reports/sales`, filterParams, 'getSalesReport');
+  }
+
+  /** Get tax report */
+  getTaxReport(filterParams?: any): Observable<any> {
+    return this.get(`${this.endpoint}/reports/tax`, filterParams, 'getTaxReport');
+  }
+
+  /** Get outstanding invoices report */
+  getOutstandingInvoices(filterParams?: any): Observable<any> {
+    return this.get(`${this.endpoint}/reports/outstanding`, filterParams, 'getOutstandingInvoices');
+  }
+
+  // ==============================================
+  // UTILITIES & VALIDATION
+  // ==============================================
+
+  /** Validate if invoice number is available */
+  validateInvoiceNumber(number: string): Observable<any> {
+    return this.get(`${this.endpoint}/validate/number/${number}`, {}, 'validateInvoiceNumber');
+  }
+
+  /** Export invoices (CSV/Excel/JSON) */
+  exportInvoices(filterParams?: any): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}${this.endpoint}/export/all`, {
+      params: this.createHttpParams(filterParams),
+      responseType: 'blob'
+    });
+  }
+
+  /** Get invoice audit history */
+  getInvoiceHistory(id: string): Observable<any> {
+    return this.get(`${this.endpoint}/${id}/history`, {}, 'getInvoiceHistory');
+  }
+
+  /** Search invoices */
+  searchInvoices(query: string, limit: number = 20): Observable<any> {
+    return this.get(`${this.endpoint}/search/${query}`, { limit }, 'searchInvoices');
+  }
+
+  // ==============================================
+  // DRAFT INVOICE MANAGEMENT
+  // ==============================================
+
+  /** Get all draft invoices */
+  getAllDrafts(filterParams?: any): Observable<any> {
+    return this.get(`${this.endpoint}/drafts/all`, filterParams, 'getAllDrafts');
+  }
+
+  /** Bulk delete draft invoices */
+  bulkDeleteDrafts(ids: string[]): Observable<any> {
+    return this.delete(`${this.endpoint}/drafts/bulk`, { ids }, 'bulkDeleteDrafts');
+  }
+
+  // ==============================================
+  // RECURRING INVOICES
+  // ==============================================
+
+  /** Create recurring invoice template */
+  createRecurringInvoice(data: any): Observable<any> {
+    return this.post(`${this.endpoint}/recurring`, data, 'createRecurringInvoice');
+  }
+
+  /** Generate recurring invoices */
+  generateRecurringInvoices(date?: string): Observable<any> {
+    return this.post(`${this.endpoint}/recurring/generate`, { date }, 'generateRecurringInvoices');
+  }
+
+  // ==============================================
+  // SOFT DELETE & RESTORE
+  // ==============================================
+
+  /** Soft delete invoice */
+  deleteInvoice(id: string): Observable<any> {
+    return this.delete(`${this.endpoint}/${id}`, null, 'deleteInvoice');
+  }
+
+  /** Restore deleted invoice */
+  restoreInvoice(id: string): Observable<any> {
+    return this.post(`${this.endpoint}/${id}/restore`, {}, 'restoreInvoice');
+  }
+
+  /** Get all deleted invoices */
+  getDeletedInvoices(filterParams?: any): Observable<any> {
+    return this.get(`${this.endpoint}/trash/all`, filterParams, 'getDeletedInvoices');
+  }
+
+  // ==============================================
+  // BULK OPERATIONS
+  // ==============================================
+
+  /** Bulk create invoices */
+  bulkCreateInvoices(invoices: any[]): Observable<any> {
+    return this.post(`${this.endpoint}/bulk/create`, { invoices }, 'bulkCreateInvoices');
+  }
+
+  /** Bulk cancel invoices (restores stock) */
+  bulkCancelInvoices(ids: string[], reason: string, restock: boolean = true): Observable<any> {
+    return this.post(`${this.endpoint}/bulk/cancel`, { ids, reason, restock }, 'bulkCancelInvoices');
+  }
+
+  // ==============================================
+  // WEBHOOKS & INTEGRATIONS
+  // ==============================================
+
+  /** Trigger invoice webhook */
+  triggerWebhook(invoiceId: string, event: string, url: string): Observable<any> {
+    return this.post(`${this.endpoint}/${invoiceId}/webhook`, { event, url }, 'triggerWebhook');
+  }
+
+  /** Sync invoice with accounting software */
+  syncWithAccounting(invoiceId: string, software: string): Observable<any> {
+    return this.post(`${this.endpoint}/${invoiceId}/sync/accounting`, { software }, 'syncWithAccounting');
+  }
+
+  // ==============================================
+  // BASIC CRUD (KEEPING EXISTING)
+  // ==============================================
+
+  createInvoice(data: any): Observable<any> {
+    return this.post(this.endpoint, data, 'createInvoice');
+  }
+
+  getAllInvoices(filterParams?: any): Observable<any> {
+    return this.get(this.endpoint, filterParams, 'getAllInvoices');
+  }
+
+  getInvoiceById(id: string): Observable<any> {
+    return this.get(`${this.endpoint}/${id}`, {}, 'getInvoiceById');
+  }
+
+  updateInvoice(id: string, data: any): Observable<any> {
+    return this.patch(`${this.endpoint}/${id}`, data, 'updateInvoice');
+  }
+
+  // ==============================================
+  // HELPER METHODS
+  // ==============================================
+
+  /**
+   * Get invoice by ID with all related data
+   */
+  getInvoiceFullDetails(id: string): Observable<any> {
+    return this.getInvoiceById(id); // You can expand this to include more data if needed
+  }
+
+  /**
+   * Create invoice with stock validation
+   */
+  createInvoiceWithValidation(invoiceData: any): Observable<any> {
+    // First check stock
+    return new Observable(observer => {
+      this.checkStock(invoiceData.items).subscribe({
+        next: (stockCheck) => {
+          if (stockCheck.isValid) {
+            // Stock is available, create invoice
+            this.createInvoice(invoiceData).subscribe({
+              next: (invoice) => observer.next(invoice),
+              error: (err) => observer.error(err)
+            });
+          } else {
+            observer.error(new Error(`Stock validation failed: ${stockCheck.errors.join(', ')}`));
+          }
+        },
+        error: (err) => observer.error(err)
+      });
+    });
+  }
+
+  /**
+   * Quick cancel invoice with default reason
+   */
+  quickCancelInvoice(id: string, restock: boolean = true): Observable<any> {
+    return this.cancelInvoice(id, 'Cancelled by user', restock);
+  }
+
+  /**
+   * Get invoice statistics
+   */
+  getInvoiceStats(startDate?: string, endDate?: string): Observable<any> {
+    const params: any = {};
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+
+    return this.get(this.endpoint, params, 'getInvoiceStats');
+  }
+
+  /**
+   * Mark invoice as paid (shortcut method)
+   */
+  markAsPaid(invoiceId: string, amount: number, paymentMethod: string = 'cash'): Observable<any> {
+    return this.addPayment(invoiceId, {
+      amount,
+      paymentMethod,
+      notes: 'Payment received'
+    });
+  }
 }
 
-export interface ListResponse<T> {
-  status: string;
-  results: number;
-  type: string;
-  data: T[];
-}
+// // Get filtered invoices
+// const filters = {
+//   page: 1,
+//   limit: 20,
+//   status: 'issued',
+//   startDate: '2024-01-01',
+//   endDate: '2024-01-31',
+//   sort: 'invoiceDate',
+//   order: 'desc'
+// };
 
-@Injectable({
-  providedIn: 'root',
-})
-export class ApiService extends BaseApiService {
+// this.invoiceService.getAllInvoices(filters).subscribe(response => {
+//   console.log('Invoices:', response.data.invoices);
+//   console.log('Pagination:', response.data.pagination);
+// });
 
-  // getMasterList(): Observable<ApiResponse<any>> {
-  //   return this.get<ApiResponse<any>>('/v1/master-list', {}, 'getMasterList');
-  // }
-  
-  // permissions(): Observable<ApiResponse<any>> {
-  //   return this.get<ApiResponse<any>>('/v1/master-list/permissions', {}, 'getMasterList');
-  // }
- // ======================== MASTER LIST ROUTES ========================
 
-  getMasterList(filters?: any): Observable<ApiResponse<any>> {
-    return this.get<ApiResponse<any>>('/v1/master-list', filters || {}, 'getMasterList');
-  }
 
-  permissions(): Observable<ApiResponse<any>> {
-    return this.get<ApiResponse<any>>('/v1/master-list/permissions', {}, 'getMasterList');
-  }
+// // 1. Check stock before creating invoice
+// this.invoiceService.checkStock([
+//   { productId: '123', quantity: 5 }
+// ]).subscribe(result => {
+//   console.log('Stock available:', result.isValid);
+// });
 
-  /**
-   * Fetch specific list with advanced filters
+// // 2. Create invoice with stock validation
+// this.invoiceService.createInvoiceWithValidation(invoiceData)
+//   .subscribe(invoice => console.log('Invoice created:', invoice));
 
-   */
-  getSpecificList(typeName: string, filters?: any): Observable<ListResponse<any>> {
-    return this.get<ListResponse<any>>(
-      '/v1/master-list/list',
-      { type: typeName, ...filters },
-      `getSpecificList-${typeName}`
-    );
-  }
+// // 3. Cancel invoice (restores stock)
+// this.invoiceService.cancelInvoice('invoice123', 'Customer request', true)
+//   .subscribe(() => console.log('Invoice cancelled'));
 
-  /**
-   * Get filter options for a specific entity type
-   */
-  getFilterOptions(type: string): Observable<any> {
-    return this.get<any>(
-      '/v1/master-list/filter-options',
-      { type },
-      `getFilterOptions-${type}`
-    );
-  }
+// // 4. Add payment
+// this.invoiceService.addPayment('invoice123', {
+//   amount: 1000,
+//   paymentMethod: 'bank',
+//   referenceNumber: 'PAY001'
+// }).subscribe(() => console.log('Payment added'));
 
-  /**
-   * Get quick stats dashboard
-   */
-  getQuickStats(period?: string): Observable<any> {
-    return this.get<any>(
-      '/v1/master-list/quick-stats',
-      { period: period || 'month' },
-      'getQuickStats'
-    );
-  }
+// // 5. Get reports
+// this.invoiceService.getProfitSummary({
+//   startDate: '2024-01-01',
+//   endDate: '2024-01-31',
+//   groupBy: 'month'
+// }).subscribe(report => console.log('Profit report:', report));
 
-  /**
-   * Get entity details by type and ID
-   */
-  getEntityDetails(type: string, id: string): Observable<any> {
-    return this.get<any>(
-      `/v1/master-list/details/${type}/${id}`,
-      {},
-      `getEntityDetails-${type}-${id}`
-    );
-  }
+// // 6. Export invoices
+// this.invoiceService.exportInvoices({
+//   format: 'csv',
+//   startDate: '2024-01-01'
+// }).subscribe(blob => {
+//   // Download the blob
+//   const url = window.URL.createObjectURL(blob);
+//   const a = document.createElement('a');
+//   a.href = url;
+//   a.download = 'invoices.csv';
+//   a.click();
+// });
 
-  /**
-   * Export filtered data
-   */
-  exportFilteredData(params: any): Observable<Blob> {
-    return this.getBlob(
-      '/v1/master-list/export-filtered',
-      params,
-      `exportFilteredData-${params.type || 'all'}`
-    );
-  }
+// // 7. Bulk operations
+// this.invoiceService.bulkUpdateStatus(['id1', 'id2'], 'paid')
+//   .subscribe(() => console.log('Bulk update completed'));
 
-  /**
-   * Export master list
-   */
-  exportMasterList(format: string = 'json'): Observable<Blob> {
-    return this.getBlob(
-      '/v1/master-list/export',
-      { format },
-      'exportMasterList'
-    );
-  }
-  /**
-   * Fetch specific list (e.g. Invoice, Customer)
-   * We pass a simple object { type: typeName }, and BaseService handles the params conversion.
-   */
-  // getSpecificList(typeName: string): Observable<ListResponse<any>> {
-  //   return this.get<ListResponse<any>>(
-  //     '/v1/master-list/list',
-  //     { type: typeName },
-  //     `getSpecificList-${typeName}`
-  //   );
-  // }
 
-  login(credentials: any): Observable<LoginResponse> {
-    return this.post<LoginResponse>('/v1/auth/login', credentials, 'login');
-  }
 
-  logOut(): Observable<LoginResponse> {
-    return this.post<LoginResponse>('/v1/auth/logout', {}, 'logout');
-  }
 
-  employeeSignup(data: any): Observable<any> {
-    return this.post('/v1/auth/signup', data, 'employeeSignup');
-  }
 
-  forgotPassword(data: { email: string }): Observable<any> {
-    return this.post('/v1/auth/forgotPassword', data, 'forgotPassword');
-  }
 
-  resetPassword(token: string, data: any): Observable<LoginResponse> {
-    return this.patch<LoginResponse>(`/v1/auth/resetPassword/${token}`, data, 'resetPassword');
-  }
 
-  // getAllNotifications(): Observable<LoginResponse> {
-  //   return this.get<LoginResponse>('/v1/notifications/my-notifications', {}, 'getAllNotifications');
-  // }
-  // ======================== AUTH EXTRA ROUTES ========================
 
-  // Refresh JWT Token
-  refreshToken(): Observable<any> {
-    return this.post('/v1/auth/refresh-token', {}, 'refreshToken');
-  }
 
-  // Verify Token Validity (useful on app load)
-  verifyToken(): Observable<any> {
-    return this.get('/v1/auth/verify-token', {}, 'verifyToken');
-  }
 
-  // ======================== USER ========================
 
-  updateMyPassword(data: any): Observable<LoginResponse> {
-    return this.patch<LoginResponse>('/v1/users/updateMyPassword', data, 'updateMyPassword');
-  }
 
-  getMe(): Observable<User> {
-    return this.get<User>('/v1/users/me', {}, 'getMe');
-  }
-// ======================== USER SELF-MANAGEMENT (Missing) ========================
 
-  updateMyProfile(data: any): Observable<any> {
-    return this.patch('/v1/users/me', data, 'updateMyProfile');
-  }
 
-  uploadProfilePhoto(formData: FormData): Observable<any> {
-    // Note: formData must be passed directly, don't wrap it in {}
-    return this.patch('/v1/users/me/photo', formData, 'uploadProfilePhoto');
-  }
 
-  // ======================== ADMIN USER MANAGEMENT (Missing) ========================
 
-  getAllUsers(): Observable<any> {
-    return this.get('/v1/users', {}, 'getAllUsers');
-  }
 
-  createUser(data: any): Observable<any> {
-    return this.post('/v1/users', data, 'createUser');
-  }
 
-  searchUsers(query: string): Observable<any> {
-    return this.get('/v1/users/search', { q: query }, 'searchUsers');
-  }
 
-  getUser(id: string): Observable<any> {
-    return this.get(`/v1/users/${id}`, {}, 'getUser');
-  }
 
-  updateUser(id: string, data: any): Observable<any> {
-    return this.patch(`/v1/users/${id}`, data, 'updateUser');
-  }
 
-  deleteUser(id: string): Observable<any> {
-    return this.delete(`/v1/users/${id}`,null, 'deleteUser');
-  }
 
-  // --- Security & Status ---
 
-  deactivateUser(id: string): Observable<any> {
-    return this.patch(`/v1/users/${id}/deactivate`, {}, 'deactivateUser');
-  }
 
-  activateUser(id: string): Observable<any> {
-    return this.patch(`/v1/users/${id}/activate`, {}, 'activateUser');
-  }
 
-  adminUpdatePassword(id: string, password: string): Observable<any> {
-    return this.patch(`/v1/users/${id}/password`, { password }, 'adminUpdatePassword');
-  }
+// import { Injectable } from '@angular/core';
+// import { Observable } from 'rxjs';
+// import { catchError } from 'rxjs/operators';
+// import { BaseApiService } from '../../../core/services/base-api.service';
 
-  getUserActivity(id: string): Observable<any> {
-    return this.get(`/v1/users/${id}/activity`, {}, 'getUserActivity');
-  }
-  // ======================== ROLES ========================
+// @Injectable({ providedIn: 'root' })
+// export class InvoiceService extends BaseApiService {
+//   private endpoint = '/v1/invoices';
 
-  getRoles(): Observable<any> {
-    return this.get('/v1/roles', {}, 'getRoles');
-  }
+//   // --- EXISTING CRUD ---
+//   createInvoice(data: any): Observable<any> {
+//     return this.post(this.endpoint, data, 'createInvoice');
+//   }
 
-  createRole(data: { name: string; permissions: string[] }): Observable<any> {
-    return this.post('/v1/roles', data, 'createRole');
-  }
+//   getAllInvoices(filterParams?: any): Observable<any> {
+//     return this.get(this.endpoint, filterParams, 'getAllInvoices');
+//   }
 
-  updateRole(roleId: string, data: { name: string; permissions: string[] }): Observable<any> {
-    return this.patch(`/v1/roles/${roleId}`, data, 'updateRole');
-  }
+//   getInvoiceById(id: string): Observable<any> {
+//     return this.get(`${this.endpoint}/${id}`, {}, 'getInvoiceById');
+//   }
 
-  deleteRole(roleId: string): Observable<any> {
-    return this.delete(`/v1/roles/${roleId}`,null, 'deleteRole');
-  }
-}
+//   getInvoicesByCustomer(customerId: string): Observable<any> {
+//     return this.get(`${this.endpoint}/customer/${customerId}`, {}, 'getInvoicesByCustomer');
+//   }
+
+//   updateInvoice(id: string, data: any): Observable<any> {
+//     return this.patch(`${this.endpoint}/${id}`, data, 'updateInvoice');
+//   }
+
+//   deleteInvoiceById(id: string): Observable<any> {
+//     return this.delete(`${this.endpoint}/${id}`,null, 'deleteInvoiceById');
+//   }
+
+//   // --- 🌟 NEW: POWER FEATURES ---
+
+//   /** Check if invoice number is unique before submitting */
+//   validateInvoiceNumber(number: string): Observable<any> {
+//     return this.get(`${this.endpoint}/validate-number/${number}`, {}, 'validateInvoiceNumber');
+//   }
+
+//   /** Bulk update status (e.g., mark 10 invoices as Paid) */
+//   bulkUpdateStatus(ids: string[], status: string): Observable<any> {
+//     return this.patch(`${this.endpoint}/bulk-status`, { ids, status }, 'bulkUpdateStatus');
+//   }
+
+//   /** Download Export CSV/Excel */
+//   exportInvoices(filterParams?: any): Observable<Blob> {
+//     return this.http.get(`${this.baseUrl}${this.endpoint}/export`, {
+//       params: this.createHttpParams(filterParams),
+//       responseType: 'blob'
+//     });
+//   }
+
+//   /** Get Profit/Loss summary for invoices */
+//   getProfitSummary(filterParams?: any): Observable<any> {
+//     return this.get(`${this.endpoint}/profit-summary`, filterParams, 'getProfitSummary');
+//   }
+
+//   /** Get Audit History (Who changed what) */
+//   getInvoiceHistory(id: string): Observable<any> {
+//     return this.get(`${this.endpoint}/${id}/history`, {}, 'getInvoiceHistory');
+//   }
+//   // --- DOCUMENTS ---
+//   emailInvoice(id: string): Observable<any> {
+//     return this.post(`${this.endpoint}/pdf/${id}/email`, {}, 'emailInvoice');
+//   }
+
+//   downloadInvoice(id: string): Observable<Blob> {
+//     return this.http.get(`${this.baseUrl}${this.endpoint}/pdf/${id}/download`, {
+//       responseType: 'blob'
+//     });
+//   }
+// }
