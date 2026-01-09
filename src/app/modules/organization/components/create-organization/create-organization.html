@@ -1,139 +1,405 @@
-<p-toast></p-toast>
+ <!-- Custom Toast Notification -->
+    @if (toastMessage()) {
+      <div class="custom-toast" [class.success]="toastType() === 'success'" [class.error]="toastType() === 'error'">
+        <div class="toast-icon">
+          @if (toastType() === 'success') {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          } @else {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          }
+        </div>
+        <div class="toast-content">
+          <div class="toast-title">{{ toastTitle() }}</div>
+          <div class="toast-desc">{{ toastMessage() }}</div>
+        </div>
+        <button class="toast-close" (click)="clearToast()">×</button>
+      </div>
+    }
 
-<div class="page-container">
+    <!-- Main Background Wrapper -->
+    <div class="glass-background">
+      <div class="glass-overlay"></div>
+      
+      <div class="page-layout">
+        
+        <!-- 1. HEADER (Fixed/Sticky) -->
+        <header class="glass-header">
+          <div class="header-content">
+            <div class="icon-box">
+              <!-- Building Icon -->
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                <line x1="9" y1="22" x2="9" y2="22.01"></line>
+                <line x1="15" y1="22" x2="15" y2="22.01"></line>
+                <line x1="12" y1="22" x2="12" y2="22.01"></line>
+                <line x1="12" y1="2" x2="12" y2="22"></line>
+                <line x1="4" y1="10" x2="20" y2="10"></line>
+                <line x1="4" y1="18" x2="20" y2="18"></line>
+              </svg>
+            </div>
+            <div class="header-text">
+              <h1>Setup Organization</h1>
+              <p>Register your enterprise profile and administrative access.</p>
+            </div>
+          </div>
+        </header>
 
-  <!-- 1. HEADER -->
-  <header class="setup-header">
-    <div class="icon-box">
-      <i class="pi pi-building"></i>
+        <!-- 2. SCROLLABLE CONTENT AREA -->
+        <main class="scroll-container">
+          <div class="content-wrapper">
+            
+            <form [formGroup]="organizationForm" class="glass-form">
+
+              <!-- SECTION 1: ORGANIZATION DETAILS -->
+              <section class="glass-card">
+                <div class="card-header">
+                  <h3>
+                    <!-- ID Card Icon -->
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-400">
+                      <rect x="3" y="4" width="18" height="16" rx="3"></rect>
+                      <circle cx="9" cy="10" r="2"></circle>
+                      <line x1="15" y1="8" x2="17" y2="8"></line>
+                      <line x1="15" y1="12" x2="17" y2="12"></line>
+                      <line x1="7" y1="16" x2="17" y2="16"></line>
+                    </svg>
+                    Organization Profile
+                  </h3>
+                  <span class="card-desc">Basic identification and contact information.</span>
+                </div>
+
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Organization Name <span class="req">*</span></label>
+                    <input type="text" class="glass-input" formControlName="organizationName" placeholder="Ex: Apex Innovations" (blur)="generateShopId()" />
+                  </div>
+
+                  <div class="form-group">
+                    <label>Unique Shop ID <span class="req">*</span></label>
+                    <input type="text" class="glass-input" formControlName="uniqueShopId" placeholder="Ex: APEX-001" style="text-transform: uppercase" />
+                    <small class="hint">Auto-generated ID.</small>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Primary Email <span class="req">*</span></label>
+                    <input type="email" class="glass-input" formControlName="primaryEmail" placeholder="contact@company.com" />
+                  </div>
+
+                  <div class="form-group">
+                    <label>Primary Phone <span class="req">*</span></label>
+                    <input type="text" class="glass-input" formControlName="primaryPhone" placeholder="+91 98765 43210" />
+                  </div>
+
+                  <div class="form-group">
+                    <label>GST Number</label>
+                    <input type="text" class="glass-input" formControlName="gstNumber" placeholder="22AAAAA0000A1Z5" style="text-transform: uppercase" />
+                  </div>
+                </div>
+              </section>
+
+              <!-- SECTION 2: MAIN BRANCH -->
+              <section class="glass-card">
+                <div class="card-header">
+                  <h3>
+                    <!-- Map Pin Icon -->
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-400">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                      <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    Headquarters Location
+                  </h3>
+                  <span class="card-desc">Details for your primary operating branch.</span>
+                </div>
+
+                <div class="form-grid">
+                  <div class="form-group span-2">
+                    <label>Branch Name <span class="req">*</span></label>
+                    <input type="text" class="glass-input" formControlName="mainBranchName" placeholder="Ex: Head Office" />
+                  </div>
+
+                  <ng-container formGroupName="mainBranchAddress">
+                    <div class="form-group span-2">
+                      <label>Street Address <span class="req">*</span></label>
+                      <input type="text" class="glass-input" formControlName="street" placeholder="123 Business Park" />
+                    </div>
+                    <div class="form-group">
+                      <label>City <span class="req">*</span></label>
+                      <input type="text" class="glass-input" formControlName="city" placeholder="New York" />
+                    </div>
+                    <div class="form-group">
+                      <label>State <span class="req">*</span></label>
+                      <input type="text" class="glass-input" formControlName="state" placeholder="NY" />
+                    </div>
+                    <div class="form-group">
+                      <label>Zip Code <span class="req">*</span></label>
+                      <input type="text" class="glass-input" formControlName="zipCode" placeholder="10001" />
+                    </div>
+                  </ng-container>
+                </div>
+              </section>
+
+              <!-- SECTION 3: ADMIN ACCOUNT -->
+              <section class="glass-card highlight-card">
+                <div class="card-header">
+                  <h3>
+                    <!-- Shield Icon -->
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-400">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                    Super Admin Access
+                  </h3>
+                  <span class="card-desc">Credentials for the primary owner.</span>
+                </div>
+
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Owner Name <span class="req">*</span></label>
+                    <input type="text" class="glass-input" formControlName="ownerName" placeholder="Full Name" />
+                  </div>
+                  <div class="form-group">
+                    <label>Login Email <span class="req">*</span></label>
+                    <input type="email" class="glass-input" formControlName="ownerEmail" placeholder="admin@company.com" />
+                  </div>
+                  <div class="form-group">
+                    <label>Password <span class="req">*</span></label>
+                    <div class="password-wrapper">
+                        <input [type]="passwordVisible() ? 'text' : 'password'" class="glass-input password-input" formControlName="ownerPassword" placeholder="Strong Password" />
+                        <button type="button" class="password-toggle" (click)="togglePassword()">
+                            @if(passwordVisible()) {
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            } @else {
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                            }
+                        </button>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+            </form>
+          </div>
+        </main>
+
+        <!-- 3. FOOTER (Fixed/Sticky) -->
+        <footer class="glass-footer">
+          <div class="footer-content">
+            <button type="button" class="glass-button secondary">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+              Back
+            </button>
+            <button type="button" class="glass-button primary" (click)="onSubmit()" [disabled]="isLoading()">
+                @if(isLoading()) {
+                    <span class="spinner"></span> Processing...
+                } @else {
+                    Create Organization
+                }
+            </button>
+          </div>
+        </footer>
+
+      </div>
     </div>
-    <div class="header-text">
-      <h1>Setup Organization</h1>
-      <p>Register your enterprise profile, branch details, and administrative access.</p>
+<!-- <div class="immersive-setup">
+  
+  1. BACKGROUND LAYER
+  <div class="bg-visual" [style.background-image]="'url(https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1600&auto=format&fit=crop)'">
+    <div class="bg-overlay"></div>
+  </div>
+
+  2. MAIN LAYOUT GRID
+  <div class="layout-grid">
+    
+    LEFT: HERO PANEL (Branding & Context)
+    <div class="hero-panel">
+      
+      Brand
+      <div class="brand-header">
+        <div class="logo-mark">
+          <i class="pi pi-building"></i>
+        </div>
+        <span class="brand-name">Apex Infinity</span>
+      </div>
+
+      Content
+      <div class="hero-content">
+        <div class="badge-pill">
+          <i class="pi pi-check-circle text-green-400"></i> Enterprise Edition
+        </div>
+        <h1 class="display-title">
+          Establish Your <br>
+          <span class="text-gradient">Headquarters.</span>
+        </h1>
+        <p class="hero-desc">
+          Configure your enterprise identity, billing details, and primary administrative access control in one unified workflow.
+        </p>
+
+        Steps Visualizer
+        <div class="steps-visual">
+          <div class="step-item active">
+            <span class="step-num">1</span>
+            <span class="step-label">Profile</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step-item active">
+            <span class="step-num">2</span>
+            <span class="step-label">Location</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step-item active">
+            <span class="step-num">3</span>
+            <span class="step-label">Access</span>
+          </div>
+        </div>
+      </div>
+
+      Footer
+      <div class="hero-footer">
+        <span>© 2026 Apex Inc.</span>
+        <div class="footer-contact">
+          <i class="pi pi-envelope"></i> help@apex.com
+        </div>
+      </div>
     </div>
-  </header>
 
-  <!-- 2. FORM CONTENT -->
-  <main class="setup-content">
-    <!-- Added style="max-width: 100%" to force full width layout -->
-    <form [formGroup]="organizationForm" class="form-wrapper" style="max-width: 100%">
+    RIGHT: FORM PANEL (Glass Sidebar)
+    <div class="form-panel glass-sidebar">
+      
+      Scrollable Content Area
+      <div class="form-scroll-container">
+        <div class="form-content-wrapper">
+          
+          Header
+          <div class="auth-header">
+            <h2 class="auth-title">Setup Organization</h2>
+            <p class="auth-subtitle">Register your enterprise profile and branch details.</p>
+          </div>
 
-      <!-- SECTION 1: ORGANIZATION DETAILS -->
-      <section class="form-section">
-        <div class="section-header">
-          <h3><i class="pi pi-id-card"></i> Organization Profile</h3>
-          <span class="section-desc">Basic identification and contact information for your company.</span>
+          Main Form
+          <form [formGroup]="organizationForm" class="auth-form">
+
+            SECTION 1: PROFILE
+            <section class="glass-section">
+              <div class="section-head">
+                <i class="pi pi-id-card"></i>
+                <span>Organization Profile</span>
+              </div>
+              
+              <div class="form-group">
+                <label class="input-label">Organization Name <span class="req">*</span></label>
+                <div class="input-wrapper">
+                  <input pInputText formControlName="organizationName" placeholder="Ex: Apex Innovations" 
+                    (blur)="generateShopId()" class="w-full glass-input-field" />
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label class="input-label">Shop ID <span class="req">*</span></label>
+                  <input pInputText formControlName="uniqueShopId" placeholder="APEX-001" 
+                    class="w-full glass-input-field uppercase-input" readonly />
+                  <small class="hint-text">Auto-generated identifier</small>
+                </div>
+                <div class="form-group">
+                  <label class="input-label">GST Number</label>
+                  <input pInputText formControlName="gstNumber" placeholder="22AAAAA0000A1Z5" 
+                    class="w-full glass-input-field uppercase-input" />
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label class="input-label">Primary Email <span class="req">*</span></label>
+                  <input pInputText type="email" formControlName="primaryEmail" placeholder="contact@company.com" class="w-full glass-input-field" />
+                </div>
+                <div class="form-group">
+                  <label class="input-label">Phone <span class="req">*</span></label>
+                  <input pInputText formControlName="primaryPhone" placeholder="+1 (555) 000-0000" class="w-full glass-input-field" />
+                </div>
+              </div>
+            </section>
+
+            SECTION 2: HEADQUARTERS
+            <section class="glass-section">
+              <div class="section-head">
+                <i class="pi pi-map-marker"></i>
+                <span>Headquarters Location</span>
+              </div>
+
+              <div class="form-group">
+                <label class="input-label">Branch Name <span class="req">*</span></label>
+                <input pInputText formControlName="mainBranchName" placeholder="Ex: Corporate HQ" class="w-full glass-input-field" />
+              </div>
+
+              <ng-container formGroupName="mainBranchAddress">
+                <div class="form-group">
+                  <label class="input-label">Street Address <span class="req">*</span></label>
+                  <input pInputText formControlName="street" placeholder="123 Business Park" class="w-full glass-input-field" />
+                </div>
+
+                <div class="form-grid-3">
+                  <div class="form-group">
+                    <label class="input-label">City <span class="req">*</span></label>
+                    <input pInputText formControlName="city" placeholder="New York" class="w-full glass-input-field" />
+                  </div>
+                  <div class="form-group">
+                    <label class="input-label">State <span class="req">*</span></label>
+                    <input pInputText formControlName="state" placeholder="NY" class="w-full glass-input-field" />
+                  </div>
+                  <div class="form-group">
+                    <label class="input-label">Zip <span class="req">*</span></label>
+                    <input pInputText formControlName="zipCode" placeholder="10001" class="w-full glass-input-field" />
+                  </div>
+                </div>
+              </ng-container>
+            </section>
+
+            SECTION 3: ADMIN ACCESS
+            <section class="glass-section highlight">
+              <div class="section-head">
+                <i class="pi pi-shield"></i>
+                <span>Super Admin Access</span>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label class="input-label">Owner Name <span class="req">*</span></label>
+                  <input pInputText formControlName="ownerName" placeholder="Full Name" class="w-full glass-input-field" />
+                </div>
+                <div class="form-group">
+                  <label class="input-label">Login Email <span class="req">*</span></label>
+                  <input pInputText type="email" formControlName="ownerEmail" placeholder="admin@company.com" class="w-full glass-input-field" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="input-label">Password <span class="req">*</span></label>
+                <p-password formControlName="ownerPassword" [toggleMask]="true" [feedback]="true" 
+                  placeholder="Min 8 characters" styleClass="w-full" inputStyleClass="glass-input-field"></p-password>
+              </div>
+            </section>
+
+          </form>
         </div>
+      </div>
 
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Organization Name <span class="req">*</span></label>
-            <input pInputText formControlName="organizationName" placeholder="Ex: Apex Innovations"
-              (blur)="generateShopId()" />
-          </div>
+      Sticky Footer Actions
+      <div class="sidebar-footer">
+        <button pButton type="button" label="Back" icon="pi pi-arrow-left" 
+          class="p-button-text p-button-plain text-white/70 hover:text-white" routerLink="/auth/login"></button>
+        
+        <button pButton type="button" label="Complete Setup" icon="pi pi-check-circle" 
+          class="submit-btn" [loading]="isLoading()" (click)="onSubmit()"></button>
+      </div>
 
-          <div class="form-group">
-            <label>Unique Shop ID <span class="req">*</span></label>
-            <input pInputText formControlName="uniqueShopId" placeholder="Ex: APEX-001"
-              style="text-transform: uppercase" />
-            <small class="hint">Auto-generated ID for system referencing.</small>
-          </div>
-
-          <div class="form-group">
-            <label>Primary Email <span class="req">*</span></label>
-            <input pInputText type="email" formControlName="primaryEmail" placeholder="contact@company.com" />
-          </div>
-
-          <div class="form-group">
-            <label>Primary Phone <span class="req">*</span></label>
-            <input pInputText formControlName="primaryPhone" placeholder="+91 98765 43210" />
-          </div>
-
-          <div class="form-group">
-            <label>GST Number</label>
-            <input pInputText formControlName="gstNumber" placeholder="22AAAAA0000A1Z5"
-              style="text-transform: uppercase" />
-          </div>
-        </div>
-      </section>
-
-      <!-- SECTION 2: MAIN BRANCH -->
-      <section class="form-section">
-        <div class="section-header">
-          <h3><i class="pi pi-map-marker"></i> Headquarters Location</h3>
-          <span class="section-desc">Details for your primary operating branch.</span>
-        </div>
-
-        <div class="form-grid">
-          <div class="form-group span-2">
-            <label>Branch Name <span class="req">*</span></label>
-            <input pInputText formControlName="mainBranchName" placeholder="Ex: Head Office" />
-          </div>
-
-          <!-- Nested Address Group -->
-          <ng-container formGroupName="mainBranchAddress">
-            <div class="form-group span-2">
-              <label>Street Address <span class="req">*</span></label>
-              <input pInputText formControlName="street" placeholder="123 Business Park" />
-            </div>
-
-            <div class="form-group">
-              <label>City <span class="req">*</span></label>
-              <input pInputText formControlName="city" placeholder="New York" />
-            </div>
-
-            <div class="form-group">
-              <label>State <span class="req">*</span></label>
-              <input pInputText formControlName="state" placeholder="NY" />
-            </div>
-
-            <div class="form-group">
-              <label>Zip Code <span class="req">*</span></label>
-              <input pInputText formControlName="zipCode" placeholder="10001" />
-            </div>
-          </ng-container>
-        </div>
-      </section>
-
-      <!-- SECTION 3: ADMIN ACCOUNT -->
-      <section class="form-section highlight">
-        <div class="section-header">
-          <h3><i class="pi pi-shield"></i> Super Admin Access</h3>
-          <span class="section-desc">Credentials for the primary owner of this organization.</span>
-        </div>
-
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Owner Name <span class="req">*</span></label>
-            <input pInputText formControlName="ownerName" placeholder="Full Name" />
-          </div>
-
-          <div class="form-group">
-            <label>Login Email <span class="req">*</span></label>
-            <input pInputText type="email" formControlName="ownerEmail" placeholder="admin@company.com" />
-          </div>
-
-          <div class="form-group">
-            <label>Password <span class="req">*</span></label>
-            <p-password formControlName="ownerPassword" [toggleMask]="true" [feedback]="true"
-              promptLabel="Enter a strong password" weakLabel="Weak" mediumLabel="Medium" strongLabel="Strong"
-              placeholder="Min 8 characters">
-            </p-password>
-          </div>
-        </div>
-      </section>
-
-    </form>
-  </main>
-
-  <!-- 3. FOOTER -->
-  <footer class="setup-footer">
-    <!-- Added style="max-width: 100%" to ensure footer actions align with full width -->
-    <div class="footer-content" style="max-width: 100%">
-      <button pButton type="button" label="Back to Login" icon="pi pi-arrow-left"
-        class="p-button-text p-button-secondary" routerLink="/auth/login"></button>
-      <button pButton type="button" label="Create Organization" icon="pi pi-check" class="p-button-primary"
-        [loading]="isLoading()" (click)="onSubmit()"></button>
     </div>
-  </footer>
-</div>
+
+  </div>
+</div> -->

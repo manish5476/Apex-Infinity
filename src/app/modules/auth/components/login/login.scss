@@ -1,321 +1,334 @@
-/* VARIABLES */
-:root {
-  --primary-blue: #2980b9;
-  --accent-blue: #6dd5fa;
-  --glass-bg: rgba(255, 255, 255, 0.1);
-  --glass-border: rgba(255, 255, 255, 0.3);
+/* =========================================
+   IMMERSIVE LOGIN THEME
+   Full width/height split layout
+   ========================================= */
+
+:host {
+  display: block;
 }
 
-.auth-wrapper {
+// Variables specific to this dark/glass theme
+$glass-bg: rgba(20, 20, 20, 0.6);
+$glass-border: rgba(255, 255, 255, 0.1);
+$glass-blur: 40px;
+$text-primary: #ffffff;
+$text-secondary: rgba(255, 255, 255, 0.6);
+$accent-color: #38bdf8; // Sky blue
+$error-color: #f87171;
+
+.immersive-login {
+  position: relative;
+  width: 100vw;
   height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: hidden;
+  background-color: #0f172a; // Fallback
+}
+
+/* --- 1. Background Layer --- */
+.bg-visual {
+  position: absolute;
+  inset: 0;
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
-  padding: 20px;
-  position: relative;
-
-  &::before {
-    content: '';
+  z-index: 0;
+  
+  // Dark overlay to ensure text readability
+  .bg-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to right, rgba(41, 128, 185, 0.7), rgba(109, 213, 250, 0.5), rgba(255, 255, 255, 0.2));
-    z-index: 1;
+    background: linear-gradient(
+      90deg, 
+      rgba(15, 23, 42, 0.9) 0%,   // Darker on left for text
+      rgba(15, 23, 42, 0.4) 60%,  // Lighter in middle
+      rgba(15, 23, 42, 0.8) 100%  // Darker on right for form contrast
+    );
   }
 }
 
-.glass-container {
+/* --- 2. Layout Grid --- */
+.layout-grid {
   position: relative;
-  z-index: 2;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 480px; // Left fluid, Right fixed width (adjust as needed)
+  height: 100%;
   width: 100%;
-  max-width: 1100px;
-  height: 750px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(25px);
-  border-radius: 40px;
-  border: 1px solid var(--glass-border);
-  display: flex;
-  overflow: hidden;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
 
   @media (max-width: 1024px) {
-    flex-direction: column;
-    height: auto;
+    grid-template-columns: 1fr 400px;
+  }
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr; // Stack on mobile
   }
 }
 
-/* REUSABLE GLASS INPUT STYLE */
-::ng-deep .glass-input {
-  background: rgba(255, 255, 255, 0.1) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  color: #fff !important;
-  border-radius: 8px !important;
-  padding: 12px !important;
-  width: 100%;
+/* --- 3. Hero Panel (Left) --- */
+.hero-panel {
+  padding: 60px 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   
-  &::placeholder { color: rgba(255, 255, 255, 0.5) !important; }
-  &:focus {
-    border-color: #fff !important;
-    background: rgba(255, 255, 255, 0.15) !important;
+  // Animation entrance
+  animation: fadeIn 0.8s ease-out;
+
+  .brand-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    
+    .logo-mark {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, $accent-color, #818cf8);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 1.25rem;
+      box-shadow: 0 0 20px rgba($accent-color, 0.4);
+    }
+    .brand-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: $text-primary;
+      letter-spacing: -0.5px;
+    }
   }
-}
 
-/* AUTOCOMPLETE SPECIFIC OVERRIDES */
-::ng-deep {
-  .p-autocomplete { width: 100%; }
-  
-  .p-autocomplete-panel {
-    background: rgba(20, 20, 20, 0.9) !important;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 12px !important;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+  .hero-content {
+    max-width: 600px;
 
-    .p-autocomplete-items {
-      padding: 5px 0 !important;
-      .p-autocomplete-item {
-        color: #fff !important;
-        padding: 10px 15px !important;
-        font-size: 13px;
-        
-        &:hover, &.p-highlight {
-          background: rgba(255, 255, 255, 0.1) !important;
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      color: $text-primary;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 24px;
+      backdrop-filter: blur(4px);
+
+      .dot {
+        width: 8px; height: 8px; background: #4ade80; border-radius: 50%;
+        box-shadow: 0 0 8px #4ade80;
+      }
+    }
+
+    .display-title {
+      font-size: 4.5rem;
+      line-height: 1.1;
+      font-weight: 800;
+      color: $text-primary;
+      margin-bottom: 24px;
+      letter-spacing: -2px;
+
+      .text-gradient {
+        background: linear-gradient(to right, #38bdf8, #c084fc);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+    }
+
+    .hero-desc {
+      font-size: 1.25rem;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.6;
+      margin-bottom: 40px;
+    }
+
+    .social-proof {
+      display: flex; align-items: center; gap: 16px;
+      
+      .avatars {
+        display: flex;
+        span {
+          width: 36px; height: 36px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.2);
+          border: 2px solid rgba(255, 255, 255, 0.1);
+          display: flex; align-items: center; justify-content: center;
+          margin-left: -10px;
+          font-size: 0.75rem; color: white;
+          &:first-child { margin-left: 0; }
         }
+      }
+      .proof-text {
+        color: $text-secondary;
+        font-size: 0.875rem;
       }
     }
   }
 
-  /* Password toggle icon color */
-  .p-password-reveal { color: #fff !important; }
-  .p-checkbox .p-checkbox-box {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.3);
+  .hero-footer {
+    display: flex; justify-content: space-between;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.875rem;
+
+    .footer-links {
+      display: flex; gap: 24px;
+      a { color: inherit; text-decoration: none; transition: 0.2s; &:hover { color: white; } }
+    }
   }
 }
 
-/* ... keep the rest of your existing banner, badge, and title CSS here ... */
-
-.auth-banner {
-  flex: 1; padding: 60px; display: flex; flex-direction: column; justify-content: center;
-  .badge { background: rgba(255, 255, 255, 0.2); padding: 6px 12px; border-radius: 50px; font-size: 12px; color: #fff; border: 1px solid rgba(255, 255, 255, 0.3); }
-  h1 { font-size: 52px; color: #fff; font-weight: 800; margin: 20px 0; line-height: 1.1; }
-  .gradient-text { background: linear-gradient(90deg, #fff, #e0f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  p { color: rgba(255, 255, 255, 0.9); max-width: 400px; line-height: 1.6; }
-}
-
-.auth-form-panel { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; }
-.glass-card {
-  width: 100%; max-width: 420px; min-height: 550px; background: var(--glass-bg); backdrop-filter: blur(12px); border-radius: 20px; border: 1px solid var(--glass-border); padding: 40px; position: relative;
-}
-
-.auth-btn-primary {
-  background: #fff !important; color: var(--primary-blue) !important; border: none !important; border-radius: 10px !important; font-weight: 700 !important; padding: 12px !important; margin-top: 10px;
-}
-// /* VARIABLES */
-// :root {
-//   --primary-blue: #2980b9;
-//   --accent-blue: #6dd5fa;
-//   --glass-bg: rgba(255, 255, 255, 0.1);
-//   --glass-border: rgba(255, 255, 255, 0.3);
-// }
-
-// .auth-wrapper {
-//   height: 100vh;
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   /* Your Requested Gradient */
-//   background: linear-gradient(to right, #2980b9, #6dd5fa, #ffffff);
-//   padding: 20px;
-// }
-
-// .glass-container {
-//   width: 100%;
-//   max-width: 1100px;
-//   height: 750px;
-//   background: rgba(255, 255, 255, 0.2);
-//   backdrop-filter: blur(20px);
-//   border-radius: 40px;
-//   border: 1px solid var(--glass-border);
-//   display: flex;
-//   overflow: hidden;
-//   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-
-//   @media (max-width: 1024px) {
-//     flex-direction: column;
-//     height: auto;
-//   }
-// }
-
-// /* LEFT SIDE */
-// .auth-banner {
-//   flex: 1;
-//   padding: 60px;
-//   display: flex;
-//   flex-direction: column;
-//   justify-content: center;
-
-//   .badge {
-//     background: rgba(255, 255, 255, 0.2);
-//     padding: 6px 12px;
-//     border-radius: 50px;
-//     font-size: 12px;
-//     color: #fff;
-//     border: 1px solid rgba(255, 255, 255, 0.3);
-//   }
-
-//   h1 {
-//     font-size: 52px;
-//     color: #fff;
-//     font-weight: 800;
-//     margin: 20px 0;
-//     line-height: 1.1;
-//   }
-
-//   .gradient-text {
-//     background: linear-gradient(90deg, #fff, #e0f2fe);
-//     -webkit-background-clip: text;
-//     -webkit-text-fill-color: transparent;
-//   }
-
-//   p {
-//     color: rgba(255, 255, 255, 0.9);
-//     max-width: 400px;
-//     line-height: 1.6;
-//   }
-// }
-
-// .footer-nav {
-//   margin-top: auto;
-//   display: flex;
-//   gap: 20px;
-//   color: #fff;
-//   font-size: 14px;
+/* --- 4. Form Panel (Right - Glass Sidebar) --- */
+.form-panel {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   
-//   a { color: #fff; text-decoration: none; font-weight: 600; }
-// }
+  // The Magic Glass Effect
+  background: rgba(10, 10, 10, 0.5); // Dark tint
+  backdrop-filter: blur($glass-blur); // Heavy blur
+  -webkit-backdrop-filter: blur($glass-blur);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: -20px 0 40px rgba(0,0,0,0.3);
 
-// /* RIGHT SIDE - THE GLASS CARD */
-// .auth-form-panel {
-//   flex: 1;
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   padding: 40px;
-// }
+  .form-content-wrapper {
+    width: 100%;
+    max-width: 380px; // Compact form width
+    padding: 0 20px;
+    animation: slideIn 0.8s ease-out;
+  }
+}
 
-// .glass-card {
-//   width: 100%;
-//   max-width: 420px;
-//   min-height: 550px; /* Increased from your 360px to fit form content */
-//   background: var(--glass-bg);
-//   backdrop-filter: blur(12px);
-//   -webkit-backdrop-filter: blur(12px);
-//   border-radius: 20px;
-//   border: 1px solid var(--glass-border);
-//   padding: 40px;
-//   position: relative;
-//   overflow: hidden;
-//   box-shadow: 
-//     0 8px 32px rgba(0, 0, 0, 0.1),
-//     inset 0 1px 0 rgba(255, 255, 255, 0.5),
-//     inset 0 -1px 0 rgba(255, 255, 255, 0.1),
-//     inset 0 0 28px 14px rgba(255, 255, 255, 0.1); /* Adjusted intensity to see form better */
+.auth-header {
+  margin-bottom: 40px;
+  .auth-title { font-size: 2rem; font-weight: 700; color: white; margin-bottom: 8px; letter-spacing: -0.5px; }
+  .auth-subtitle { color: $text-secondary; font-size: 0.95rem; }
+}
 
-//   &::before {
-//     content: '';
-//     position: absolute;
-//     top: 0; left: 0; right: 0; height: 1px;
-//     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
-//   }
+/* --- 5. Form Styles --- */
+.auth-form {
+  display: flex; flex-direction: column; gap: 24px;
+}
 
-//   &::after {
-//     content: '';
-//     position: absolute;
-//     top: 0; left: 0; width: 1px; height: 100%;
-//     background: linear-gradient(180deg, rgba(255, 255, 255, 0.8), transparent, rgba(255, 255, 255, 0.3));
-//   }
-// }
+.form-group {
+  position: relative;
+  
+  .input-label {
+    display: block; font-size: 0.85rem; font-weight: 500; color: rgba(255, 255, 255, 0.8); margin-bottom: 8px;
+  }
+  
+  .label-row {
+    display: flex; justify-content: space-between; margin-bottom: 8px;
+    .link-text { color: $accent-color; font-size: 0.85rem; text-decoration: none; &:hover { text-decoration: underline; } }
+  }
 
-// /* FORM ELEMENTS */
-// .auth-header {
-//   text-align: center;
-//   margin-bottom: 30px;
-//   i { color: #fff; font-size: 2rem; margin-bottom: 10px; }
-//   .auth-title { color: #fff; font-size: 22px; margin: 0; }
-//   .auth-subtitle { color: rgba(255, 255, 255, 0.7); font-size: 13px; }
-// }
+  .input-wrapper {
+    position: relative;
+    .field-icon {
+      position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+      z-index: 2; color: rgba(255, 255, 255, 0.5); pointer-events: none;
+    }
+  }
 
-// .auth-form {
-//   display: flex;
-//   flex-direction: column;
-//   gap: 15px;
+  .error-msg { color: $error-color; font-size: 0.75rem; margin-top: 4px; display: block; }
+}
 
-//   .form-group {
-//     display: flex;
-//     flex-direction: column;
-//     gap: 5px;
+/* Custom Glass Inputs (Overrides PrimeNG) */
+::ng-deep .glass-input-field {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+  border-radius: 12px !important;
+  padding: 14px 14px 14px 44px !important; // Left padding for icon
+  font-size: 0.95rem !important;
+  height: 50px !important; // Taller inputs
+  transition: all 0.2s ease !important;
 
-//     label { color: #fff; font-size: 13px; font-weight: 500; }
-    
-//     input {
-//       background: rgba(255, 255, 255, 0.1) !important;
-//       border: 1px solid rgba(255, 255, 255, 0.2) !important;
-//       color: #fff !important;
-//       border-radius: 8px;
-      
-//       &::placeholder { color: rgba(255, 255, 255, 0.5); }
-//     }
-//   }
-// }
+  &::placeholder { color: rgba(255, 255, 255, 0.3) !important; }
 
-// .label-row {
-//   display: flex;
-//   justify-content: space-between;
-//   .forgot-link { color: #fff; font-size: 11px; text-decoration: none; opacity: 0.8; }
-// }
+  &:enabled:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+  }
+  
+  &:enabled:focus {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: $accent-color !important;
+    box-shadow: 0 0 0 2px rgba($accent-color, 0.25) !important;
+  }
+}
 
-// .remember-me {
-//   display: flex;
-//   align-items: center;
-//   gap: 10px;
-//   color: #fff;
-//   font-size: 13px;
-// }
+/* AutoComplete Panel */
+::ng-deep .glass-dropdown-panel {
+  background: #1e293b !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  
+  .p-autocomplete-item {
+    color: rgba(255, 255, 255, 0.9) !important;
+    &:hover { background: rgba(255, 255, 255, 0.1) !important; }
+  }
+}
 
-// .error-msg { color: #ff9494; font-size: 11px; }
+/* Checkbox */
+.remember-toggle {
+  display: flex; align-items: center; gap: 8px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;
+  
+  ::ng-deep .p-checkbox-box {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    &.p-highlight {
+      background: $accent-color !important; border-color: $accent-color !important;
+    }
+  }
+}
 
-// /* BUTTON */
-// ::ng-deep .auth-btn-primary {
-//   background: #fff !important;
-//   color: var(--primary-blue) !important;
-//   border: none !important;
-//   border-radius: 10px !important;
-//   font-weight: 700 !important;
-//   padding: 12px !important;
-//   margin-top: 10px;
-//   transition: transform 0.2s;
+/* Submit Button */
+.submit-btn {
+  width: 100%;
+  height: 50px;
+  border-radius: 12px !important;
+  background: linear-gradient(135deg, $accent-color, #3b82f6) !important;
+  border: none !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+  transition: transform 0.2s !important;
+  
+  &:enabled:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5); }
+}
 
-//   &:hover { transform: translateY(-2px); }
-// }
+/* Divider & Social */
+.divider {
+  display: flex; align-items: center; justify-content: center; margin: 10px 0;
+  span {
+    background: transparent; padding: 0 10px; color: rgba(255, 255, 255, 0.4); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;
+  }
+}
 
-// .footer-redirect {
-//   text-align: center;
-//   color: #fff;
-//   font-size: 13px;
-//   margin-top: 20px;
-//   a { font-weight: 700; color: #fff; text-decoration: underline; }
-// }
+.social-grid {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;
+  .social-btn {
+    height: 44px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.15); background: rgba(255, 255, 255, 0.05);
+    color: white; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center;
+    &:hover { background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.3); }
+  }
+}
 
-// .reg-org {
-//   display: block;
-//   text-align: center;
-//   margin-top: 10px;
-//   font-size: 12px;
-//   color: #fff;
-//   font-weight: 600;
-//   text-decoration: none;
-//   opacity: 0.9;
-// }
+.auth-footer-text {
+  margin-top: 32px; text-align: center; color: rgba(255, 255, 255, 0.6); font-size: 0.9rem;
+  .highlight-link { color: $accent-color; text-decoration: none; font-weight: 500; &:hover { text-decoration: underline; } }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  .hero-panel { padding: 40px; }
+  .display-title { font-size: 3.5rem !important; }
+}
+
+@media (max-width: 768px) {
+  .immersive-login { overflow-y: auto; } // Allow scroll on mobile
+  .layout-grid { grid-template-columns: 1fr; }
+  .hero-panel { display: none; } // Hide hero on mobile, or stack it
+  .form-panel { 
+    width: 100%; background: rgba(15, 23, 42, 0.9); border-left: none; padding: 40px 0;
+  }
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }

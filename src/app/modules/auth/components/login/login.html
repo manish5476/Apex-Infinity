@@ -1,139 +1,141 @@
-<div class="auth-wrapper" [style.background-image]="'url(https://images.unsplash.com/photo-1767719243883-5d6e8d61c403?q=80&w=1627&auto=format&fit=crop)'">
-  <section class="glass-container">
-    <div class="auth-banner">
-      <div class="hero-content">
-        <span class="badge">✨ Apex Infinity v2.0</span>
-        <h1>Empowering <br><span class="gradient-text">Innovation.</span></h1>
-        <p>A unified workspace for teams that want to ship high-quality products without the friction.</p>
-      </div>
-      <div class="footer-nav">
-        <div class="lang-selector"><span>🇺🇸 English</span></div>
-        <div class="nav-links"><a href="#">Terms</a> <a href="#">Plans</a></div>
-      </div>
-    </div>
+<div class="immersive-login">
+  
+  <!-- 1. BACKGROUND LAYER (Covers 100%) -->
+  <div class="bg-visual" [style.background-image]="'url(https://images.unsplash.com/photo-1767719243883-5d6e8d61c403?q=80&w=1627&auto=format&fit=crop)'">
+    <div class="bg-overlay"></div>
+  </div>
 
-    <div class="auth-form-panel">
-      <div class="glass-card">
-        <div class="auth-header">
-          <i class="pi pi-bolt"></i>
-          <h1 class="auth-title">Welcome Back</h1>
-          <p class="auth-subtitle">Log in to your dashboard</p>
-        </div>
-
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
-          <div class="form-group">
-            <label>Email</label>
-            <p-autoComplete 
-              formControlName="email" 
-              [suggestions]="filteredEmails" 
-              (completeMethod)="filterEmail($event)"
-              placeholder="you@company.com"
-              styleClass="w-full"
-              inputStyleClass="glass-input"
-              appendTo="body">
-              <ng-template let-email #item>
-                <div class="flex items-center gap-2">
-                  <i class="pi pi-at" style="font-size: 0.8rem; opacity: 0.7;"></i>
-                  <span>{{ email }}</span>
-                </div>
-              </ng-template>
-            </p-autoComplete>
-            @if (form['email'].invalid && form['email'].touched) {
-              <small class="error-msg">Please enter a valid email.</small>
-            }
-          </div>
-
-          <div class="form-group">
-            <div class="label-row">
-              <label>Password</label>
-              <a routerLink="/auth/forgot-password" class="forgot-link">Forgot?</a>
-            </div>
-            <p-password formControlName="password" [toggleMask]="true" placeholder="••••••••"
-              styleClass="w-full" inputStyleClass="glass-input"></p-password>
-          </div>
-
-          <div class="remember-me">
-            <p-checkbox formControlName="remember" [binary]="true" inputId="remember"></p-checkbox>
-            <label for="remember">Remember me</label>
-          </div>
-
-          <div class="auth-footer">
-            <p-button label="Login" icon="pi pi-sign-in" type="submit" [loading]="isLoading()"
-              [disabled]="loginForm.invalid || isLoading()" styleClass="auth-btn-primary w-full">
-            </p-button>
-            <p class="footer-redirect">Don’t have an account? <a routerLink="/auth/signup">Create one</a></p>
-            <a routerLink="/auth/org" class="reg-org">Register Organization</a>
-          </div>
-        </form>
-      </div>
-    </div>
-  </section>
-</div>
-<!-- <div class="auth-wrapper">
-  <section class="glass-container">
+  <!-- 2. MAIN LAYOUT GRID -->
+  <div class="layout-grid">
     
-    <div class="auth-banner">
-      <div class="hero-content">
-        <span class="badge">✨ Apex Infinity v2.0</span>
-        <h1>Empowering <br><span class="gradient-text">Innovation.</span></h1>
-        <p>A unified workspace for teams that want to ship high-quality products without the friction.</p>
-      </div>
+    <!-- LEFT: BRANDING & HERO TEXT (Takes remaining space) -->
+    <div class="hero-panel">
       
-      <div class="footer-nav">
-        <div class="lang-selector">
-          <span>🇺🇸 English</span>
+      <!-- Top Brand -->
+      <div class="brand-header">
+        <div class="logo-mark">
+          <i class="pi pi-infinity"></i>
         </div>
-        <div class="nav-links">
+        <span class="brand-name">Apex Infinity</span>
+      </div>
+
+      <!-- Center Hero -->
+      <div class="hero-content">
+        <div class="badge-pill">
+          <span class="dot"></span> v2.0 Released
+        </div>
+        <h1 class="display-title">
+          Empowering <br>
+          <span class="text-gradient">Innovation.</span>
+        </h1>
+        <p class="hero-desc">
+          The unified workspace for engineering teams who demand speed, precision, and clarity.
+        </p>
+        
+        <div class="social-proof">
+          <div class="avatars">
+            <span><i class="pi pi-user"></i></span>
+            <span><i class="pi pi-user"></i></span>
+            <span><i class="pi pi-user"></i></span>
+          </div>
+          <span class="proof-text">Trusted by 10,000+ engineers</span>
+        </div>
+      </div>
+
+      <!-- Bottom Footer -->
+      <div class="hero-footer">
+        <span>© 2026 Apex Inc.</span>
+        <div class="footer-links">
+          <a href="#">Privacy</a>
           <a href="#">Terms</a>
-          <a href="#">Plans</a>
         </div>
       </div>
     </div>
 
-    <div class="auth-form-panel">
-      <div class="glass-card">
+    <!-- RIGHT: LOGIN FORM (Fixed width or percentage) -->
+    <div class="form-panel glass-sidebar">
+      <div class="form-content-wrapper">
+        
         <div class="auth-header">
-          <i class="pi pi-bolt"></i>
-          <h1 class="auth-title">Welcome Back</h1>
-          <p class="auth-subtitle">Log in to your dashboard</p>
+          <h2 class="auth-title">Welcome Back</h2>
+          <p class="auth-subtitle">Enter your credentials to access the dashboard.</p>
         </div>
 
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+          
+          <!-- Email Field -->
           <div class="form-group">
-            <label>Email</label>
-            <input pInputText id="email" type="email" formControlName="email" placeholder="you@company.com" />
+            <label class="input-label">Email Address</label>
+            <div class="input-wrapper">
+              <i class="field-icon pi pi-envelope"></i>
+              <p-autoComplete 
+                formControlName="email" 
+                [suggestions]="filteredEmails" 
+                (completeMethod)="filterEmail($event)"
+                placeholder="name@company.com"
+                styleClass="w-full glass-autocomplete"
+                inputStyleClass="glass-input-field"
+                panelStyleClass="glass-dropdown-panel"
+                appendTo="body">
+              </p-autoComplete>
+            </div>
             @if (form['email'].invalid && form['email'].touched) {
-              <small class="error-msg">Please enter a valid email.</small>
+              <small class="error-msg">Valid email is required</small>
             }
           </div>
 
+          <!-- Password Field -->
           <div class="form-group">
             <div class="label-row">
-              <label>Password</label>
-              <a routerLink="/auth/forgot-password" class="forgot-link">Forgot?</a>
+              <label class="input-label">Password</label>
+              <a routerLink="/auth/forgot-password" class="link-text">Forgot password?</a>
             </div>
-            <p-password formControlName="password" [toggleMask]="true" placeholder="••••••••"
-              styleClass="w-full" inputStyleClass="w-full"></p-password>
+            <div class="input-wrapper">
+              <i class="field-icon pi pi-lock"></i>
+              <p-password 
+                formControlName="password" 
+                [toggleMask]="true" 
+                [feedback]="false"
+                placeholder="••••••••"
+                styleClass="w-full" 
+                inputStyleClass="glass-input-field">
+              </p-password>
+            </div>
           </div>
 
-          <div class="remember-me">
-            <p-checkbox formControlName="remember" [binary]="true" inputId="remember"></p-checkbox>
-            <label for="remember">Remember me</label>
+          <!-- Actions -->
+          <div class="actions-row">
+            <div class="remember-toggle">
+              <p-checkbox formControlName="remember" [binary]="true" inputId="remember" styleClass="glass-checkbox"></p-checkbox>
+              <label for="remember">Keep me logged in</label>
+            </div>
           </div>
 
-          <div class="auth-footer">
-            <p-button label="Login" icon="pi pi-sign-in" type="submit" [loading]="isLoading()"
-              [disabled]="loginForm.invalid || isLoading()" styleClass="auth-btn-primary w-full">
-            </p-button>
+          <!-- Submit -->
+          <button pButton label="Sign In" icon="pi pi-arrow-right" iconPos="right" 
+            class="submit-btn" [loading]="isLoading()" [disabled]="loginForm.invalid">
+          </button>
 
-            <p class="footer-redirect">
-              Don’t have an account? <a routerLink="/auth/signup">Create one</a>
-            </p>
-            
-            <a routerLink="/auth/org" class="reg-org">Register Organization</a>
+          <!-- Divider -->
+          <div class="divider">
+            <span>or continue with</span>
           </div>
+
+          <!-- Social Login (Optional Visual) -->
+          <div class="social-grid">
+            <button type="button" class="social-btn"><i class="pi pi-google"></i></button>
+            <button type="button" class="social-btn"><i class="pi pi-github"></i></button>
+            <button type="button" class="social-btn"><i class="pi pi-microsoft"></i></button>
+          </div>
+
         </form>
+
+        <div class="auth-footer-text">
+          Don't have an account? <a routerLink="/auth/signup" class="highlight-link">Start 14-day free trial</a>
+        </div>
+
       </div>
     </div>
-  </section>
-</div> -->
+
+  </div>
+</div>
