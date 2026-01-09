@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { BaseApiService } from './base-api.service';
+import { BaseApiService } from '../../../core/services/base-api.service';
 import { LoginResponse, User } from '../../modules/auth/services/auth-service';
 
 // Interfaces for type safety
