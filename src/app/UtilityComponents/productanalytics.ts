@@ -4,7 +4,7 @@ import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { finalize } from 'rxjs';
-import { InvoiceService } from '../../services/invoice-service';
+import { InvoiceService } from '../modules/invoice/services/invoice-service';
 import { TabsModule } from 'primeng/tabs';
 @Component({
   selector: 'app-product-analytics-dialog',

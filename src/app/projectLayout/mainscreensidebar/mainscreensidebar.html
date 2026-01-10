@@ -1,4 +1,91 @@
+<aside
+  class="sidebar-container"
+  [class.expanded]="layout.isExpanded()"
+  [class.mobile]="layout.isMobile()"
+  (mouseenter)="layout.isDesktop() && layout.isHovered.set(true)"
+  (mouseleave)="layout.isDesktop() && layout.isHovered.set(false)">
 
+  <div class="sidebar-panel mb-13 mt-3">
+    
+    <div class="menu-list">
+      @for (item of menuItems; track item.label) {
+        
+        <div class="menu-group">
+          <div 
+            class="menu-item level-1" 
+            [class.active-parent]="isActive(item)"
+            (click)="item.items ? toggleItem(item) : null"
+            [routerLink]="item.routerLink ? item.routerLink : null">
+
+            <i [class]="item.icon + ' item-icon'"></i>
+            
+            <span class="item-label" [class.visible]="layout.isExpanded()">
+              {{ item.label }}
+            </span>
+
+            @if (item.items && layout.isExpanded()) {
+              <i class="pi pi-chevron-down arrow-icon" 
+                 [class.rotate]="expandedState[item.label]"></i>
+            }
+          </div>
+
+          @if (item.items) {
+            <div class="submenu-wrapper" [class.open]="expandedState[item.label] && layout.isExpanded()">
+              <div class="submenu-inner">
+                @for (subItem of item.items; track subItem.label) {
+                  
+                  <div class="submenu-group">
+                    <div 
+                      class="menu-item level-2"
+                      [class.active-link]="!subItem.items && isActive(subItem)"
+                      (click)="subItem.items ? toggleItem(subItem) : null"
+                      [routerLink]="subItem.items ? null : subItem.routerLink">
+                      
+                      <i [class]="(subItem.icon) + ' item-icon-sm'"></i>
+                      <span style="flex: 1;">{{ subItem.label }}</span>
+                      
+                      @if (subItem.items) {
+                        <i class="pi pi-chevron-down arrow-icon" 
+                           [class.rotate]="expandedState[subItem.label]"></i>
+                      }
+                    </div>
+
+                    @if (subItem.items) {
+                      <div class="submenu-wrapper" [class.open]="expandedState[subItem.label]">
+                        <div class="submenu-inner level-3-container">
+                          @for (deepItem of subItem.items; track deepItem.label) {
+                            <a 
+                              class="menu-item level-3"
+                              [routerLink]="deepItem.routerLink"
+                              routerLinkActive="active-link">
+                              <i class="pi pi-circle-fill dot-icon"></i>
+                              <span>{{ deepItem.label }}</span>
+                            </a>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <footer class="sidebar-footer">
+      <button (click)="logout()">
+        <i class="pi pi-sign-out"></i>
+        <span *ngIf="layout.isExpanded()">Sign Out</span>
+      </button>
+    </footer>
+
+  </div>
+</aside>
+
+<!-- 
 <aside
   class="sidebar-container"
   [class.expanded]="layout.isExpanded()"
@@ -66,4 +153,4 @@
     </footer>
 
   </div>
-</aside>
+</aside> -->

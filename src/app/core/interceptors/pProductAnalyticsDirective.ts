@@ -1,6 +1,6 @@
 import { Directive, HostListener, Input, inject } from '@angular/core';
 import { DialogService } from 'primeng/dynamicdialog';
-import { ProductAnalyticsDialogComponent } from '../../modules/invoice/analytics/invoice-analytics/productanalytics';
+import { ProductAnalyticsDialogComponent } from '../../UtilityComponents/productanalytics';
 
 @Directive({
   selector: '[appProductAnalytics]',

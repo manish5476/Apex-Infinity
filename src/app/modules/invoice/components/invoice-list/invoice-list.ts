@@ -53,7 +53,7 @@ export class InvoiceListComponent implements OnInit {
 
   private gridApi!: GridApi;
   private currentPage = 1;
-  private pageSize = 20;
+  private pageSize = 50;
   isLoading = false;
   isExporting = false;
   totalCount = 0;
@@ -218,42 +218,98 @@ export class InvoiceListComponent implements OnInit {
 
   getColumn(): void {
     this.column = [
+      // GROUP 1: IDENTIFICATION
       {
-        headerName: 'Invoice Details',
+        headerName: 'Identity',
         children: [
+          // 1. Invoice Number (Pinned Left)
           {
             field: 'invoiceNumber',
-            headerName: 'INV #',
+            headerName: 'Invoice #',
             pinned: 'left',
-            width: 160,
-            cellStyle: { 'color': 'var(--accent-primary)', 'font-weight': '700', 'cursor': 'pointer' },
-            // Removed 'agGroupCellRenderer' to fix Community Edition Error
-          },
-          {
-            headerName: 'Actions',
-            field: '_id',
             width: 150,
-            cellRenderer: ActionViewRenderer, // Reference the renderer here
+            filter: 'agTextColumnFilter',
+            cellStyle: { 'display': 'flex', 'align-items': 'center' },
+            cellRenderer: (params: any) => {
+              return `<span style="color:var(--accent-primary); font-weight:700; font-family:var(--font-mono); cursor:pointer; letter-spacing:0.5px;">
+                      ${params.value}
+                    </span>`;
+            }
+          },
+          // 2. Branch (Context)
+          {
+            field: 'branchId.name',
+            headerName: 'Branch',
+            width: 110,
+            cellStyle: { 'display': 'flex', 'align-items': 'center', 'color': 'var(--text-secondary)' }
           }
-          // {
-          //   field: 'items',
-          //   headerName: 'Products',
-          //   width: 220,
-          //   tooltipField: 'items',
-          //   tooltipComponent: ItemTooltipComponent, // Works in Community
-          //   valueGetter: (params: any) => {
-          //     const items = params.data.items || [];
-          //     if (items.length === 0) return 'No items';
-          //     return items.length === 1 
-          //       ? items[0].name 
-          //       : `${items[0].name} (+${items.length - 1} more)`;
-          //   },
-          // }
         ]
       },
+
+      // GROUP 2: CUSTOMER DETAILS (New)
+      {
+        headerName: 'Customer Information',
+        children: [
+          {
+            headerName: 'Customer',
+            field: 'customerId.name', // For sorting/filtering
+            width: 200,
+            cellRenderer: (params: any) => {
+              const customer = params.data.customerId;
+              if (!customer) return '-';
+
+              const name = customer.name;
+              const contact = customer.phone || customer.email || '';
+
+              // Stacked Layout: Name on top, Contact info below
+              return `
+              <div style="display:flex; flex-direction:column; justify-content:center; height:100%; line-height:1.3;">
+                <span style="font-weight:600; color:var(--text-primary); font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                  ${name}
+                </span>
+                <span style="font-size:11px; color:var(--text-tertiary); display:flex; align-items:center; gap:4px;">
+                  ${contact ? `<i class="pi pi-user" style="font-size:9px"></i> ${contact}` : ''}
+                </span>
+              </div>`;
+            }
+          },
+          {
+            field: 'placeOfSupply',
+            headerName: 'Location',
+            width: 110,
+            cellStyle: { 'color': 'var(--text-secondary)', 'font-size': '12px', 'display': 'flex', 'align-items': 'center' }
+          }
+        ]
+      },
+
+      // GROUP 3: STATUS & DATES
       {
         headerName: 'Status & Timeline',
         children: [
+          {
+            field: 'invoiceDate',
+            headerName: 'Date',
+            width: 110,
+            valueFormatter: (p: any) => p.value ? new Date(p.value).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' }) : '',
+            cellStyle: { 'color': 'var(--text-secondary)', 'font-size': '12px', 'display': 'flex', 'align-items': 'center' }
+          },
+          {
+            field: 'dueDate',
+            headerName: 'Due Date',
+            width: 110,
+            valueFormatter: (p: any) => p.value ? new Date(p.value).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' }) : '',
+            cellStyle: (params: any) => {
+              // Highlight if overdue and not paid
+              const isOverdue = new Date(params.value) < new Date() && params.data.paymentStatus !== 'paid';
+              return {
+                'color': isOverdue ? 'var(--color-error)' : 'var(--text-secondary)',
+                'font-size': '12px',
+                'font-weight': isOverdue ? '600' : '400',
+                'display': 'flex',
+                'align-items': 'center'
+              };
+            }
+          },
           {
             field: 'status',
             headerName: 'Status',
@@ -265,39 +321,53 @@ export class InvoiceListComponent implements OnInit {
             headerName: 'Payment',
             width: 120,
             cellRenderer: (p: any) => this.statusBadgeRenderer(p.value, 'payment'),
-          },
-          {
-            field: 'invoiceDate',
-            headerName: 'Date',
-            width: 110,
-            valueFormatter: (p: any) => p.value ? new Date(p.value).toLocaleDateString('en-IN') : '',
           }
         ]
       },
+
+      // GROUP 4: FINANCIALS
       {
-        headerName: 'Financial Summary',
+        headerName: 'Financials',
         children: [
           {
             field: 'grandTotal',
-            headerName: 'Total Amount',
-            width: 140,
+            headerName: 'Total',
+            width: 130,
             type: 'rightAligned',
-            cellStyle: { 'font-weight': 'bold', 'font-family': 'monospace', 'font-size': '14px' },
-            valueFormatter: (p: any) => this.currencyFormatter(p.value)
+            valueFormatter: (p: any) => this.currencyFormatter(p.value),
+            cellStyle: {
+              'font-weight': '600',
+              'color': 'var(--text-primary)',
+              'font-family': 'var(--font-mono)',
+              'display': 'flex',
+              'align-items': 'center',
+              'justify-content': 'flex-end'
+            }
           },
           {
             field: 'balanceAmount',
             headerName: 'Balance',
-            width: 140,
+            width: 130,
             type: 'rightAligned',
             valueFormatter: (p: any) => this.currencyFormatter(p.value),
-            cellStyle: (params: any) => ({
-              'color': params.value > 0 ? '#e74c3c' : '#27ae60',
-              'font-weight': 'bold',
-              'font-family': 'monospace'
-            })
+            cellRenderer: (params: any) => {
+              const balance = params.value;
+              if (balance <= 0) {
+                return `<span style="color:#15803d; font-weight:700; font-size:11px; background:#ecfdf5; padding:2px 6px; border-radius:4px;">PAID</span>`;
+              }
+              return `<span style="color:#b91c1c; font-weight:700; font-family:var(--font-mono);">${this.currencyFormatter(balance)}</span>`;
+            },
+            cellStyle: { 'display': 'flex', 'align-items': 'center', 'justify-content': 'flex-end' }
           }
         ]
+      },
+  
+    // ACTIONS
+      {
+        headerName: 'Actions',
+        field: '_id',
+        width: 50,
+        cellRenderer: ActionViewRenderer, // Reference the renderer here
       }
     ];
     this.cdr.detectChanges();

@@ -41,7 +41,7 @@ export class ProductListComponent implements OnInit {
   private currentPage = 1;
   private isLoading = false;
   private totalCount = 0;
-  private pageSize = 20;
+  private pageSize = 50;
   
   data: any[] = [];
   column: any = [];
@@ -267,7 +267,7 @@ export class ProductListComponent implements OnInit {
 //   private currentPage = 1;
 //   private isLoading = false;
 //   private totalCount = 0;
-//   private pageSize = 20;
+//   private pageSize = 50;
 //   data: any[] = [];
 //   column: any = [];
 //   rowSelectionMode: any = 'single';

@@ -75,7 +75,7 @@ export class CustomerDetails implements OnInit {
 
   // --- Pagination & Tab State ---
   activeTab = signal<TabType>('ledger');
-  private pageSize = 20;
+  private pageSize = 50;
 
   tabStatus: Record<TabType, TabState> = {
     ledger: { loaded: false, loading: false, page: 1, total: 0 },
