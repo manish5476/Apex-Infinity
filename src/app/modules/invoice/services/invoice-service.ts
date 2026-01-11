@@ -344,8 +344,6 @@ export class InvoiceService extends BaseApiService {
       notes: 'Payment received'
     });
   }
-
-  
 }
 
 // // Get filtered invoices

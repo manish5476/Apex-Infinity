@@ -1,6 +1,6 @@
 <div class="header-inner">
   <div class="header-left">
-    <button class="menu-toggle-btn" (click)="onMenuToggle()">
+    <button class="menu-toggle-btn" (click)="onMenuToggle()" aria-label="Toggle Menu">
       <i class="pi pi-bars"></i>
     </button>
     <a routerLink="/dashboard" class="logo-link">
@@ -10,7 +10,14 @@
   </div>
 
   <div class="header-right">
-    <button (click)="showNotificationDialog = true" class="notification-btn"
+
+    <p-popover #notificationPopover styleClass="notification-popover" [appendTo]="'body'">
+      <div class="notification-popover-content">
+        <app-notification-bell (close)="notificationPopover.hide()"></app-notification-bell>
+      </div>
+    </p-popover>
+
+    <button #notificationBtn (click)="notificationPopover.toggle($event)" class="notification-btn"
       [class.has-new]="recentNotifications.length > 0" pTooltip="Notifications" tooltipPosition="bottom">
       <i class="pi pi-bell"></i>
       @if (recentNotifications.length > 0) {
@@ -19,7 +26,135 @@
     </button>
 
     @if (currentUser) {
-    <button class="user-profile-trigger" (click)="showProfileDialog = true" pTooltip="Profile & Settings"
+     <p-popover #profilePopover styleClass="profile-popover" [appendTo]="'body'">
+      <div class="profile-popover-content">
+
+        <div class="dialog-header">
+          <div class="user-profile-section">
+            <p-avatar [label]="getInitials(currentUser?.name)" shape="circle" size="xlarge"
+              [style]="{'background-color': 'transparent', 'color': '#fff', 'font-weight': '700'}">
+            </p-avatar>
+            <div class="user-info">
+              <h3 class="user-name">{{ currentUser?.name }}</h3>
+              <p class="user-email">{{ currentUser?.email }}</p>
+              <div class="user-badges">
+                <span class="badge role">
+                  <i class="pi pi-shield"></i> {{ currentUser?.role.name || 'Admin' }}
+                </span>
+                <span class="badge status">
+                  <i class="pi pi-circle-fill" style="color: #4ade80;"></i> Online
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="popover-tabs">
+          <div class="tabs-container">
+            <button class="tab-btn" [class.active]="activePopoverTab === 'settings'"
+              (click)="activePopoverTab = 'settings'">
+              <i class="pi pi-cog"></i> Settings
+            </button>
+            <button class="tab-btn" [class.active]="activePopoverTab === 'notifications'"
+              (click)="activePopoverTab = 'notifications'">
+              <i class="pi pi-bell"></i> Notifications
+            </button>
+          </div>
+        </div>
+
+        <div class="popover-content">
+          @if (activePopoverTab === 'settings') {
+          <div class="settings-content">
+
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title"><i class="pi pi-palette"></i> Appearance</span>
+                <p-toggleButton [(ngModel)]="isDarkMode" onIcon="pi-moon" offIcon="pi pi-sun"
+                  [style]="{'width': '3rem', 'height': '1.75rem'}" (onChange)="toggleDarkMode($event.checked)">
+                </p-toggleButton>
+              </div>
+
+              <div class="theme-section-wrapper">
+                <div class="theme-scroll-container">
+
+                  @for (group of themeGroups; track group.category) {
+                  <div class="theme-category-group">
+                    <span class="category-title">{{ group.category }}</span>
+
+                    <div class="theme-grid">
+                      @for (theme of group.themes; track theme.id) {
+                      <div class="theme-card" [class.active]="activeThemeId === theme.id"
+                        (click)="selectTheme(theme.id)" [pTooltip]="theme.description" tooltipPosition="top">
+
+                        <div class="theme-preview" [style.background]="theme.gradient">
+                          <div class="active-overlay">
+                            <i class="pi pi-check"></i>
+                          </div>
+                        </div>
+                        <span class="theme-name">{{ theme.name }}</span>
+                      </div>
+                      }
+                    </div>
+                  </div>
+                  }
+
+                </div>
+              </div>
+            </div>
+
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title"><i class="pi pi-bolt"></i> Quick Actions</span>
+              </div>
+              <div class="actions-grid">
+                <button class="action-item" (click)="randomTheme()">
+                  <div class="action-icon random-theme"><i class="pi pi-sparkles"></i></div>
+                  <span>Shuffle Theme</span>
+                </button>
+                <button class="action-item" (click)="resetToDefault()">
+                  <div class="action-icon reset-default"><i class="pi pi-refresh"></i></div>
+                  <span>Reset Default</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title"><i class="pi pi-user"></i> Account</span>
+              </div>
+              <div class="account-links">
+                <a routerLink="/profile" class="account-link" (click)="profilePopover.hide()">
+                  <div class="link-icon"><i class="pi pi-user-edit"></i></div>
+                  <div class="link-content">
+                    <span class="link-title">Profile Settings</span>
+                    <span class="link-subtitle">Personal info, bio</span>
+                  </div>
+                  <i class="pi pi-chevron-right link-arrow"></i>
+                </a>
+                <a routerLink="/security" class="account-link" (click)="profilePopover.hide()">
+                  <div class="link-icon"><i class="pi pi-lock"></i></div>
+                  <div class="link-content">
+                    <span class="link-title">Security</span>
+                    <span class="link-subtitle">Password, 2FA</span>
+                  </div>
+                  <i class="pi pi-chevron-right link-arrow"></i>
+                </a>
+              </div>
+            </div>
+
+            <button class="signout-btn" (click)="logout(); profilePopover.hide()">
+              <i class="pi pi-power-off"></i> Sign Out
+            </button>
+          </div>
+          }
+
+          @if (activePopoverTab === 'notifications') {
+          }
+
+        </div>
+      </div>
+    </p-popover>
+    <button #profileBtn (click)="profilePopover.toggle($event)" class="user-profile-trigger" pTooltip="Account"
       tooltipPosition="bottom">
       <p-avatar [label]="getInitials(currentUser?.name)" shape="circle" size="normal"
         [style]="{'background-color': 'var(--accent-primary)', 'color': '#fff', 'font-weight': '600'}">
@@ -28,280 +163,14 @@
         <span class="name">{{ currentUser?.name }}</span>
         <span class="role">{{ currentUser?.role.name || 'Admin' }}</span>
       </div>
-      <i class="pi pi-chevron-down text-xs ml-1"></i>
+      <i class="pi pi-chevron-down chevron-icon"></i>
     </button>
     }
     @else {
-    <a routerLink="/auth/login" class="login-btn">
-      <i class="pi pi-sign-in"></i>
-      <span>Login</span>
-    </a>
+    <a routerLink="/auth/login" class="login-btn">Login</a>
     }
-
   </div>
 </div>
-
-<!-- PROFILE & SETTINGS DIALOG -->
-<p-dialog [(visible)]="showProfileDialog" [modal]="true" [draggable]="false" [resizable]="false" appendTo="body"
-  [dismissableMask]="true" [showHeader]="false" styleClass="profile-dialog" [style]="{ 
-    width: '90vw', 
-    maxWidth: '89vw',
-    minHeight: '85vh',
-    maxHeight: '90vh',
-    borderRadius: '20px', 
-    overflow: 'hidden'
-  }" maskStyleClass="backdrop-blur-sm bg-black/40" (onHide)="showProfileDialog = false">
-
-  <div class="dialog-container">
-    <!-- User Profile Header -->
-    <div class="dialog-header">
-      <div class="user-profile-section">
-        <p-avatar [label]="getInitials(currentUser?.name)" shape="circle" size="xlarge"
-          [style]="{'background-color': 'var(--accent-primary)', 'color': '#fff', 'font-weight': '700'}">
-        </p-avatar>
-        <div class="user-info">
-          <h3 class="user-name">{{ currentUser?.name }}</h3>
-          <p class="user-email">{{ currentUser?.email }}</p>
-          <div class="user-badges">
-            <span class="role-badge">
-              <i class="pi pi-shield"></i>
-              {{ currentUser?.role.name || 'Admin' }}
-            </span>
-            <span class="status-badge">
-              <i class="pi pi-circle-fill"></i>
-              Online
-            </span>
-          </div>
-        </div>
-        <button class="close-dialog-btn" (click)="showProfileDialog = false">
-          <i class="pi pi-times"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- Dialog Tabs -->
-    <div class="dialog-tabs">
-      <div class="tabs-container">
-        <button class="tab-btn" [class.active]="activeDialogTab === 'settings'" (click)="activeDialogTab = 'settings'">
-          <i class="pi pi-cog"></i>
-          <span>Settings</span>
-        </button>
-        <button class="tab-btn" [class.active]="activeDialogTab === 'notifications'"
-          (click)="activeDialogTab = 'notifications'">
-          <i class="pi pi-bell"></i>
-          <span>Notifications</span>
-          @if (recentNotifications.length > 0) {
-          <span class="tab-badge">{{ recentNotifications.length }}</span>
-          }
-        </button>
-      </div>
-    </div>
-
-    <!-- Scrollable Content Area -->
-    <div class="dialog-content" #dialogContent>
-      @if (activeDialogTab === 'settings') {
-      <div class="settings-content">
-
-        <!-- Theme Section -->
-        <div class="section-card">
-          <div class="section-header">
-            <h5 class="section-title">
-              <i class="pi pi-palette"></i>
-              <span>Theme & Appearance</span>
-            </h5>
-            <div class="dark-mode-toggle">
-              <span class="toggle-label">Dark Mode</span>
-              <p-toggleButton [(ngModel)]="isDarkMode" onIcon="pi-moon" offIcon="pi pi-sun"
-                [style]="{'width': '3.5rem', 'height': '1.75rem'}" (onChange)="toggleDarkMode($event.checked)">
-              </p-toggleButton>
-            </div>
-          </div>
-
-          <!-- Theme Presets Grid -->
-          <div class="theme-presets-section">
-            <h6 class="section-subtitle">Quick Presets</h6>
-            <div class="theme-presets-grid">
-              @for (preset of themePresets; track preset.id) {
-              <div class="preset-card" [class.active]="activeThemeId === preset.id" (click)="selectTheme(preset.id)">
-                <div class="preset-preview" [style.background]="preset.gradient">
-                  <div class="preset-preview-content">
-                    <div class="preview-bar"></div>
-                    <div class="preview-bar short"></div>
-                    <div class="preview-bar medium"></div>
-                  </div>
-                  @if (activeThemeId === preset.id) {
-                  <div class="active-check">
-                    <i class="pi pi-check"></i>
-                  </div>
-                  }
-                </div>
-                <span class="preset-name">{{ preset.name }}</span>
-              </div>
-              }
-            </div>
-          </div>
-
-          <!-- Accent Colors -->
-          <div class="accent-colors-section">
-            <h6 class="section-subtitle">Accent Colors</h6>
-            <div class="accent-colors-grid">
-              @for (color of accentColors; track color.name) {
-              <div class="color-option" (click)="setAccentColor(color.value)">
-                <div class="color-circle" [style.background]="color.value"></div>
-                <span class="color-name">{{ color.name }}</span>
-              </div>
-              }
-            </div>
-          </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="section-card quick-actions-card">
-          <h5 class="section-title">
-            <i class="pi pi-bolt"></i>
-            <span>Quick Actions</span>
-          </h5>
-          <div class="actions-grid">
-            <button class="action-item" (click)="randomTheme()">
-              <div class="action-icon random-theme">
-                <i class="pi pi-random"></i>
-              </div>
-              <span>Random Theme</span>
-            </button>
-            <button class="action-item" (click)="resetToDefault()">
-              <div class="action-icon reset-default">
-                <i class="pi pi-replay"></i>
-              </div>
-              <span>Reset Default</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Account Management -->
-        <div class="section-card account-section">
-          <h5 class="section-title">
-            <i class="pi pi-user"></i>
-            <span>Account Management</span>
-          </h5>
-          <div class="account-links">
-            <a routerLink="/profile" class="account-link" (click)="showProfileDialog = false">
-              <div class="link-icon profile">
-                <i class="pi pi-user-edit"></i>
-              </div>
-              <div class="link-content">
-                <span class="link-title">Profile Settings</span>
-                <span class="link-subtitle">Update personal information</span>
-              </div>
-              <i class="pi pi-chevron-right link-arrow"></i>
-            </a>
-            <a routerLink="/security" class="account-link" (click)="showProfileDialog = false">
-              <div class="link-icon security">
-                <i class="pi pi-shield"></i>
-              </div>
-              <div class="link-content">
-                <span class="link-title">Security</span>
-                <span class="link-subtitle">Password & 2FA settings</span>
-              </div>
-              <i class="pi pi-chevron-right link-arrow"></i>
-            </a>
-            <a routerLink="/billing" class="account-link" (click)="showProfileDialog = false">
-              <div class="link-icon billing">
-                <i class="pi pi-credit-card"></i>
-              </div>
-              <div class="link-content">
-                <span class="link-title">Billing</span>
-                <span class="link-subtitle">Manage subscription</span>
-              </div>
-              <i class="pi pi-chevron-right link-arrow"></i>
-            </a>
-          </div>
-        </div>
-
-        <!-- Sign Out Button -->
-        <button class="signout-btn" (click)="logout(); showProfileDialog = false">
-          <i class="pi pi-power-off"></i>
-          <span>Sign Out</span>
-        </button>
-
-      </div>
-      }
-
-      @if (activeDialogTab === 'notifications') {
-      <div class="notifications-content">
-        <div class="notifications-header">
-          <h5>Recent Notifications</h5>
-          <div class="notifications-actions">
-            <button class="action-btn" (click)="markAllAsRead()">
-              <i class="pi pi-check-circle"></i>
-              <span>Mark all read</span>
-            </button>
-            <button class="action-btn" (click)="clearAllNotifications()">
-              <i class="pi pi-trash"></i>
-              <span>Clear all</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="notifications-list">
-          @for (notification of recentNotifications; track notification.id) {
-          <div class="notification-item" [class.unread]="!notification.read">
-            <div class="notification-icon" [ngClass]="getNotificationIcon(notification.type)">
-              <i [class]="getNotificationIconClass(notification.type)"></i>
-            </div>
-            <div class="notification-content">
-              <div class="notification-header">
-                <span class="notification-title">{{ notification.title }}</span>
-                <span class="notification-time">{{ notification.time }}</span>
-              </div>
-              <p class="notification-message">{{ notification.message }}</p>
-            </div>
-            @if (!notification.read) {
-            <div class="unread-indicator"></div>
-            }
-          </div>
-          }
-          @empty {
-          <div class="empty-notifications">
-            <i class="pi pi-bell-slash"></i>
-            <h6>No new notifications</h6>
-            <p>You're all caught up!</p>
-          </div>
-          }
-        </div>
-
-        <div class="notifications-footer">
-          <a routerLink="/notifications" class="view-all-link" (click)="showProfileDialog = false">
-            View all notifications
-            <i class="pi pi-arrow-right"></i>
-          </a>
-        </div>
-      </div>
-      }
-    </div>
-  </div>
-</p-dialog>
-
-<!-- NOTIFICATION BELL DIALOG -->
-<p-dialog [(visible)]="showNotificationDialog" [modal]="true" [draggable]="false" [resizable]="false" appendTo="body"
-  [dismissableMask]="true" [showHeader]="false" styleClass="notification-dialog" [style]="{ 
-      width: '90vw', 
-    maxWidth: '89vw',
-    minHeight: '85vh',
-    maxHeight: '90vh',
-    borderRadius: '20px', 
-    overflow: 'hidden'
-  }" maskStyleClass="backdrop-blur-sm bg-black/40" (onHide)="showNotificationDialog = false">
-
-  <div class="dialog-container">
-    <div class="notification-dialog-header">
-      <h3>Notifications</h3>
-      <button class="close-dialog-btn" (click)="showNotificationDialog = false">
-        <i class="pi pi-times"></i>
-      </button>
-    </div>
-    <app-notification-bell (close)="showNotificationDialog = false"></app-notification-bell>
-  </div>
-</p-dialog>
 
 <!-- <div class="header-inner">
   <div class="header-left">

@@ -1,5 +1,5 @@
-
-import { Component, EventEmitter, Input, Output, OnInit, OnDestroy, inject } from '@angular/core';
+// mainscreen-header.ts
+import { Component, EventEmitter, Input, Output, OnInit, OnDestroy, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -8,61 +8,88 @@ import { Subject, takeUntil } from 'rxjs';
 // PrimeNG
 import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { ToggleButtonModule } from 'primeng/togglebutton';
+import { PopoverModule, Popover } from 'primeng/popover';
 
+// Services & Components
 import { ThemeService, ThemeSettings } from '../../core/services/theme.service';
 import { AuthService } from '../../modules/auth/services/auth-service';
 import { NotificationService } from '../../core/services/notification.service';
 import { NotificationBellComponent } from '../../modules/organization/components/notification-bell-component/notification-bell-component';
 import { LayoutService } from '../layout.service';
 
+// Interfaces for Type Safety
+export interface Theme {
+  name: string;
+  id: string;
+  color: string;
+  gradient: string;
+  category: string;
+  description: string;
+}
+
+export interface ThemeGroup {
+  category: string;
+  themes: Theme[];
+}
+
 @Component({
   selector: 'app-mainscreen-header',
   standalone: true,
   imports: [
-    CommonModule, FormsModule, RouterModule,
-    AvatarModule, ButtonModule, DialogModule, TooltipModule, ToggleButtonModule,
+    CommonModule, 
+    FormsModule, 
+    RouterModule,
+    AvatarModule, 
+    ButtonModule, 
+    TooltipModule, 
+    ToggleButtonModule, 
+    PopoverModule,
     NotificationBellComponent
   ],
   templateUrl: './mainscreen-header.html',
   styleUrl: './mainscreen-header.scss',
 })
 export class MainscreenHeader implements OnInit, OnDestroy {
+  // Inputs & Outputs
   @Input() isMobileMenuOpen: boolean = false;
   @Output() toggleSidebar = new EventEmitter<void>();
 
+  @ViewChild('profilePopover') profilePopover!: Popover;
+  @ViewChild('notificationPopover') notificationPopover!: Popover;
+
+  // Dependency Injection
   private themeService = inject(ThemeService);
   private authService = inject(AuthService);
   private notificationService = inject(NotificationService);
-  private destroy$ = new Subject<void>();
   private layout = inject(LayoutService);
+  private destroy$ = new Subject<void>();
 
-  // Dialog states
-  showProfileDialog: boolean = false;
-  showNotificationDialog: boolean = false;
-  
-  // Dialog tab state
-  activeDialogTab: 'settings' | 'notifications' = 'settings';
-
+  // State
+  activePopoverTab: 'settings' | 'notifications' = 'settings';
   currentUser: any = null;
   recentNotifications: any[] = [];
-
+  
   // Theme State
   isDarkMode = false;
   activeThemeId: string = 'theme-light';
-  
-allThemes = [
+  themeGroups: ThemeGroup[] = [];
+
+  // Complete Theme Data Source (ALL themes from your tokens)
+  allThemes: Theme[] = [
     // Core Themes
-    { name: "Glass", id: "theme-glass", color: "#6366f1", gradient: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%)", category: "modern", description: "Modern glassmorphism design" },
+    { name: "Glass", id: "theme-glass", color: "#6366f1", gradient: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%)", category: "core", description: "Modern glassmorphism design" },
     { name: "Light", id: "theme-light", color: "#f1f5f9", gradient: "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)", category: "core", description: "Clean light mode" },
-    { name: "Dark (Default)", id: "theme-dark", color: "#0f172a", gradient: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)", category: "core", description: "Professional dark mode" },
+    { name: "Dark", id: "theme-dark", color: "#0f172a", gradient: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)", category: "core", description: "Professional dark mode" },
+    { name: "Auto", id: "auto-theme", color: "#2563eb", gradient: "linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%)", category: "core", description: "Auto-detects system preference" },
 
     // Professional Themes
     { name: "Premium", id: "theme-premium", color: "#0d9488", gradient: "linear-gradient(135deg, #0d9488 0%, #0891b2 100%)", category: "professional", description: "Premium teal theme" },
     { name: "Titanium", id: "theme-titanium", color: "#0e7490", gradient: "linear-gradient(135deg, #0e7490 0%, #06b6d4 100%)", category: "professional", description: "Metallic blue theme" },
     { name: "Slate", id: "theme-slate", color: "#475569", gradient: "linear-gradient(135deg, #475569 0%, #64748b 100%)", category: "professional", description: "Cool gray theme" },
+    { name: "Data Science", id: "theme-data-science", color: "#3b82f6", gradient: "linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)", category: "professional", description: "Analytics optimized" },
+    { name: "Cobalt Steel", id: "theme-cobalt-steel", color: "#0ea5e9", gradient: "linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)", category: "professional", description: "Professional blue theme" },
 
     // Minimal Themes
     { name: "Minimal", id: "theme-minimal", color: "#e5e5e5", gradient: "linear-gradient(135deg, #e5e5e5 0%, #d4d4d4 100%)", category: "minimal", description: "Clean monochrome" },
@@ -71,41 +98,21 @@ allThemes = [
     // Colorful Themes
     { name: "Rose", id: "theme-rose", color: "#ec6d8a", gradient: "linear-gradient(135deg, #ec6d8a 0%, #f472b6 100%)", category: "colorful", description: "Soft pink theme" },
     { name: "Sunset", id: "theme-sunset", color: "#f97316", gradient: "linear-gradient(135deg, #f97316 0%, #fb923c 100%)", category: "colorful", description: "Warm orange theme" },
-    { name: "Bold", id: "theme-bold", color: "#ff0080", gradient: "linear-gradient(135deg, #ff0080 0%, #00ffff 100%)", category: "colorful", description: "High contrast theme" },
+    { name: "Bold", id: "theme-bold", color: "#ff00ff", gradient: "linear-gradient(135deg, #ff00ff 0%, #00ffff 100%)", category: "colorful", description: "High contrast neon theme" },
 
     // Luxury Themes
     { name: "Luxury", id: "theme-luxury", color: "#d4af37", gradient: "linear-gradient(135deg, #d4af37 0%, #fbbf24 100%)", category: "luxury", description: "Gold luxury theme" },
-    { name: "Futuristic", id: "theme-futuristic", color: "#00d4ff", gradient: "linear-gradient(135deg, #00d4ff 0%, #a855f7 100%)", category: "luxury", description: "Cyberpunk theme" },
-
-    // New Trending Themes
-    { name: "Midnight Royal", id: "theme-midnight-royal", color: "#a78bfa", gradient: "linear-gradient(135deg, #a78bfa 0%, #c4b5fd 100%)", category: "luxury", description: "Purple luxury dark" },
+    { name: "Futuristic", id: "theme-futuristic", color: "#3b82f6", gradient: "linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%)", category: "luxury", description: "Cyberpunk theme" },
+    { name: "Midnight Royal", id: "theme-midnight-royal", color: "#a78bfa", gradient: "linear-gradient(135deg, #a78bfa 0%, #c4b5fd 50%, #8b5cf6 100%)", category: "luxury", description: "Purple luxury dark theme" },
     { name: "Emerald Regal", id: "theme-emerald-regal", color: "#10b981", gradient: "linear-gradient(135deg, #10b981 0%, #34d399 100%)", category: "luxury", description: "Green luxury theme" },
+
+    // Modern Themes
     { name: "Material You", id: "theme-material-you", color: "#db2777", gradient: "linear-gradient(135deg, #db2777 0%, #e879f9 100%)", category: "modern", description: "Android 12 design" },
-    { name: "Data Science", id: "theme-data-science", color: "#3b82f6", gradient: "linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)", category: "professional", description: "Analytics optimized" },
-    { name: "Neumorphic", id: "theme-neumorphic", color: "#6366f1", gradient: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)", category: "modern", description: "Soft UI design" }
+    { name: "Neumorphic", id: "theme-neumorphic", color: "#6366f1", gradient: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)", category: "modern", description: "Soft UI design" },
+    { name: "Deep Space", id: "theme-deep-space", color: "#60a5fa", gradient: "linear-gradient(135deg, #60a5fa 0%, #38bdf8 50%, #22d3ee 100%)", category: "modern", description: "Astronomy inspired dark theme" }
   ];
 
-  // Theme presets for quick selection
-  themePresets = [
-    { id: 'theme-light', name: 'Light', gradient: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)' },
-    { id: 'theme-dark', name: 'Dark', gradient: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' },
-    { id: 'theme-premium', name: 'Premium', gradient: 'linear-gradient(135deg, #0d9488 0%, #0891b2 100%)' },
-    { id: 'theme-glass', name: 'Glass', gradient: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%)' },
-    { id: 'theme-luxury', name: 'Luxury', gradient: 'linear-gradient(135deg, #d4af37 0%, #fbbf24 100%)' },
-    { id: 'theme-rose', name: 'Rose', gradient: 'linear-gradient(135deg, #ec6d8a 0%, #f472b6 100%)' },
-  ];
-
-  // Accent colors for customization
-  accentColors = [
-    { name: 'Indigo', value: '#6366f1' },
-    { name: 'Green', value: '#10b981' },
-    { name: 'Amber', value: '#f59e0b' },
-    { name: 'Violet', value: '#8b5cf6' },
-    { name: 'Rose', value: '#ef4444' },
-    { name: 'Blue', value: '#3b82f6' },
-  ];
-
-  // Mock notifications for demo
+  // Mock Data
   mockNotifications = [
     { id: 1, title: 'New Member Request', message: 'John Doe wants to join your organization', time: '2 min ago', read: false, type: 'info' },
     { id: 2, title: 'Task Completed', message: 'Project "Dashboard Redesign" has been completed', time: '1 hour ago', read: false, type: 'success' },
@@ -114,20 +121,44 @@ allThemes = [
   ];
 
   ngOnInit() {
+    this.organizeThemes();
     this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(u => this.currentUser = u);
-
     this.notificationService.notifications$.pipe(takeUntil(this.destroy$)).subscribe(n => {
       this.recentNotifications = n.filter(x => !x.isRead);
-      // If no real notifications, use mock data for demo
       if (this.recentNotifications.length === 0) {
         this.recentNotifications = this.mockNotifications.filter(n => !n.read);
       }
     });
 
+    // Subscribe to Theme Settings
     this.themeService.settings$.pipe(takeUntil(this.destroy$)).subscribe((s: ThemeSettings) => {
       this.isDarkMode = s.isDarkMode;
       this.activeThemeId = s.isDarkMode ? 'theme-dark' : s.lightThemeClass || 'theme-light';
     });
+  }
+
+  // Grouping Logic
+  organizeThemes() {
+    // Fix: Ensure all categories are properly defined
+    const categoryMapping: Record<string, string> = {
+      'core': 'Core',
+      'professional': 'Professional', 
+      'minimal': 'Minimal',
+      'colorful': 'Colorful',
+      'luxury': 'Luxury',
+      'modern': 'Modern',
+      'system': 'System',
+      'dark': 'Dark'
+    };
+
+    // Extract unique categories from actual themes
+    const categories = [...new Set(this.allThemes.map(t => t.category))];
+    
+    // Create the grouped structure with proper category names
+    this.themeGroups = categories.map(cat => ({
+      category: categoryMapping[cat] || cat.charAt(0).toUpperCase() + cat.slice(1),
+      themes: this.allThemes.filter(t => t.category === cat)
+    }));
   }
 
   onMenuToggle() {
@@ -146,32 +177,25 @@ allThemes = [
   selectTheme(id: string) {
     if (id === 'theme-dark') {
       this.themeService.setDarkMode(true);
+    } else if (id === 'auto-theme') {
+      // Handle auto theme - detect system preference
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      this.themeService.setDarkMode(prefersDark);
+      this.activeThemeId = prefersDark ? 'theme-dark' : 'theme-light';
     } else {
       this.themeService.setLightTheme(id);
       this.themeService.setDarkMode(false);
+      this.activeThemeId = id;
     }
-    this.activeThemeId = id;
   }
 
-  logout() { 
-    this.authService.logout(); 
-    this.showProfileDialog = false;
-  }
-
-  getInitials(name: string): string {
-    return name ? name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : 'U';
-  }
-
-  // === ENHANCED METHODS ===
-
+  // Randomize from the full list
   randomTheme() {
     const availableThemes = this.allThemes.filter(theme => theme.id !== this.activeThemeId);
-    
     if (availableThemes.length === 0) return;
     
     const randomIndex = Math.floor(Math.random() * availableThemes.length);
     const randomTheme = availableThemes[randomIndex];
-    
     this.selectTheme(randomTheme.id);
   }
 
@@ -180,14 +204,22 @@ allThemes = [
     this.themeService.setDarkMode(false);
   }
 
-  setAccentColor(color: string) {
-    console.log(`Setting accent color to: ${color}`);
-    document.documentElement.style.setProperty('--accent-primary', color);
+  logout() { 
+    this.authService.logout(); 
+    this.closeAllPopovers();
+  }
+
+  getInitials(name: string): string {
+    return name ? name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : 'U';
+  }
+
+  loadNotifications() {
+    // Refresh notifications if needed
+    // this.notificationService.refreshNotifications();
   }
 
   clearAllNotifications() {
     if (this.recentNotifications.length === 0) return;
-    
     this.notificationService.markAllAsRead();
     this.recentNotifications = [];
   }
@@ -217,10 +249,9 @@ allThemes = [
     }
   }
 
-  // Open profile dialog with specific tab
-  openProfileDialog(tab: 'settings' | 'notifications' = 'settings') {
-    this.activeDialogTab = tab;
-    this.showProfileDialog = true;
+  closeAllPopovers() {
+    if (this.profilePopover) this.profilePopover.hide();
+    if (this.notificationPopover) this.notificationPopover.hide();
   }
 
   ngOnDestroy() { 
@@ -228,7 +259,9 @@ allThemes = [
     this.destroy$.complete(); 
   }
 }
-// import { Component, EventEmitter, Input, Output, OnInit, ViewChild, OnDestroy, inject } from '@angular/core';
+
+// // mainscreen-header.ts
+// import { Component, EventEmitter, Input, Output, OnInit, OnDestroy, inject, ViewChild } from '@angular/core';
 // import { CommonModule } from '@angular/common';
 // import { FormsModule } from '@angular/forms';
 // import { RouterModule } from '@angular/router';
@@ -237,52 +270,76 @@ allThemes = [
 // // PrimeNG
 // import { AvatarModule } from 'primeng/avatar';
 // import { ButtonModule } from 'primeng/button';
-// import { Popover, PopoverModule } from 'primeng/popover';
 // import { TooltipModule } from 'primeng/tooltip';
 // import { ToggleButtonModule } from 'primeng/togglebutton';
-// import { Dialog } from "primeng/dialog";
+// import { PopoverModule, Popover } from 'primeng/popover'; // Added Popover type
 
+// // Services & Components
 // import { ThemeService, ThemeSettings } from '../../core/services/theme.service';
 // import { AuthService } from '../../modules/auth/services/auth-service';
 // import { NotificationService } from '../../core/services/notification.service';
 // import { NotificationBellComponent } from '../../modules/organization/components/notification-bell-component/notification-bell-component';
 // import { LayoutService } from '../layout.service';
 
+// // 1. Interfaces for Type Safety
+// export interface Theme {
+//   name: string;
+//   id: string;
+//   color: string;
+//   gradient: string;
+//   category: string;
+//   description: string;
+// }
+
+// export interface ThemeGroup {
+//   category: string;
+//   themes: Theme[];
+// }
+
 // @Component({
 //   selector: 'app-mainscreen-header',
 //   standalone: true,
 //   imports: [
-//     CommonModule, FormsModule, RouterModule,
-//     AvatarModule, ButtonModule, PopoverModule, TooltipModule, ToggleButtonModule,
-//     NotificationBellComponent,
-//     Dialog
+//     CommonModule, 
+//     FormsModule, 
+//     RouterModule,
+//     AvatarModule, 
+//     ButtonModule, 
+//     TooltipModule, 
+//     ToggleButtonModule, 
+//     PopoverModule,
+//     NotificationBellComponent
 //   ],
 //   templateUrl: './mainscreen-header.html',
 //   styleUrl: './mainscreen-header.scss',
 // })
 // export class MainscreenHeader implements OnInit, OnDestroy {
+//   // Inputs & Outputs
 //   @Input() isMobileMenuOpen: boolean = false;
 //   @Output() toggleSidebar = new EventEmitter<void>();
 
+//   @ViewChild('profilePopover') profilePopover!: Popover;
+//   @ViewChild('notificationPopover') notificationPopover!: Popover;
+
+//   // Dependency Injection (Modern Style)
 //   private themeService = inject(ThemeService);
 //   private authService = inject(AuthService);
 //   private notificationService = inject(NotificationService);
-//   private destroy$ = new Subject<void>();
 //   private layout = inject(LayoutService);
+//   private destroy$ = new Subject<void>();
 
-//   showNotificationdialog: boolean = false;
+//   // State
+//   activePopoverTab: 'settings' | 'notifications' = 'settings';
 //   currentUser: any = null;
 //   recentNotifications: any[] = [];
-
-//   // Popover State
-//   activeTab: 'settings' | 'notifications' = 'settings';
-
+  
 //   // Theme State
 //   isDarkMode = false;
 //   activeThemeId: string = 'theme-light';
-  
-//   // Enhanced Themes Array with Categories
-//   allThemes = [
+//   themeGroups: ThemeGroup[] = []; // Grouped data for the UI
+
+//   // 2. Full Theme Data Source
+//   allThemes: Theme[] = [
 //     // Core Themes
 //     { name: "Glass", id: "theme-glass", color: "#6366f1", gradient: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%)", category: "modern", description: "Modern glassmorphism design" },
 //     { name: "Light", id: "theme-light", color: "#f1f5f9", gradient: "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)", category: "core", description: "Clean light mode" },
@@ -314,31 +371,7 @@ allThemes = [
 //     { name: "Neumorphic", id: "theme-neumorphic", color: "#6366f1", gradient: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)", category: "modern", description: "Soft UI design" }
 //   ];
 
-//   // Theme presets for quick selection
-//   themePresets = [
-//     { id: 'theme-light', name: 'Light', gradient: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)' },
-//     { id: 'theme-dark', name: 'Dark', gradient: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' },
-//     { id: 'theme-premium', name: 'Premium', gradient: 'linear-gradient(135deg, #0d9488 0%, #0891b2 100%)' },
-//     { id: 'theme-glass', name: 'Glass', gradient: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%)' },
-//     { id: 'theme-luxury', name: 'Luxury', gradient: 'linear-gradient(135deg, #d4af37 0%, #fbbf24 100%)' },
-//     { id: 'theme-rose', name: 'Rose', gradient: 'linear-gradient(135deg, #ec6d8a 0%, #f472b6 100%)' },
-//     { id: 'theme-material-you', name: 'Material', gradient: 'linear-gradient(135deg, #db2777 0%, #e879f9 100%)' },
-//     { id: 'theme-futuristic', name: 'Futuristic', gradient: 'linear-gradient(135deg, #00d4ff 0%, #a855f7 100%)' },
-//   ];
-
-//   // Accent colors for customization
-//   accentColors = [
-//     { name: 'Indigo', value: '#6366f1' },
-//     { name: 'Green', value: '#10b981' },
-//     { name: 'Amber', value: '#f59e0b' },
-//     { name: 'Violet', value: '#8b5cf6' },
-//     { name: 'Rose', value: '#ef4444' },
-//     { name: 'Blue', value: '#3b82f6' },
-//     { name: 'Teal', value: '#0d9488' },
-//     { name: 'Purple', value: '#9333ea' },
-//   ];
-
-//   // Mock notifications for demo
+//   // Mock Data
 //   mockNotifications = [
 //     { id: 1, title: 'New Member Request', message: 'John Doe wants to join your organization', time: '2 min ago', read: false, type: 'info' },
 //     { id: 2, title: 'Task Completed', message: 'Project "Dashboard Redesign" has been completed', time: '1 hour ago', read: false, type: 'success' },
@@ -347,26 +380,32 @@ allThemes = [
 //   ];
 
 //   ngOnInit() {
+//     this.organizeThemes();
 //     this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(u => this.currentUser = u);
-
 //     this.notificationService.notifications$.pipe(takeUntil(this.destroy$)).subscribe(n => {
 //       this.recentNotifications = n.filter(x => !x.isRead);
-//       // If no real notifications, use mock data for demo
 //       if (this.recentNotifications.length === 0) {
 //         this.recentNotifications = this.mockNotifications.filter(n => !n.read);
 //       }
 //     });
 
+//     // Subscribe to Theme Settings
 //     this.themeService.settings$.pipe(takeUntil(this.destroy$)).subscribe((s: ThemeSettings) => {
 //       this.isDarkMode = s.isDarkMode;
 //       this.activeThemeId = s.isDarkMode ? 'theme-dark' : s.lightThemeClass || 'theme-light';
-      
-//       // Update theme preset selection
-//       this.updateThemePresetSelection();
 //     });
+//   }
 
-//     // Initialize with current theme
-//     this.updateThemePresetSelection();
+//   // 4. Grouping Logic
+//   organizeThemes() {
+//     // Extract unique categories
+//     const categories = [...new Set(this.allThemes.map(t => t.category))];
+    
+//     // Create the grouped structure
+//     this.themeGroups = categories.map(cat => ({
+//       category: cat.charAt(0).toUpperCase() + cat.slice(1), // Capitalize
+//       themes: this.allThemes.filter(t => t.category === cat)
+//     }));
 //   }
 
 //   onMenuToggle() {
@@ -376,16 +415,6 @@ allThemes = [
 //       this.layout.togglePin();
 //     }
 //     this.toggleSidebar.emit();
-//   }
-
-//   togglePopover(op: Popover, event: Event) {
-//     op.toggle(event);
-//   }
-
-//   // Optional: Open directly to notifications tab
-//   openNotifications(op: Popover, event: Event) {
-//     this.activeTab = 'notifications';
-//     op.toggle(event);
 //   }
 
 //   toggleDarkMode(isDark: boolean) { 
@@ -402,254 +431,47 @@ allThemes = [
 //     this.activeThemeId = id;
 //   }
 
+//   // Randomize from the full list
+//   randomTheme() {
+//     const availableThemes = this.allThemes.filter(theme => theme.id !== this.activeThemeId);
+//     if (availableThemes.length === 0) return;
+    
+//     const randomIndex = Math.floor(Math.random() * availableThemes.length);
+//     const randomTheme = availableThemes[randomIndex];
+//     this.selectTheme(randomTheme.id);
+//   }
+
+//   resetToDefault() {
+//     this.selectTheme('theme-light');
+//     this.themeService.setDarkMode(false);
+//   }
+
 //   logout() { 
 //     this.authService.logout(); 
+//     this.closeAllPopovers();
 //   }
 
 //   getInitials(name: string): string {
 //     return name ? name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : 'U';
 //   }
 
-//   // === ENHANCED THEME METHODS ===
-
-//   /**
-//    * Selects a random theme from all available themes
-//    */
-//   randomTheme() {
-//     const availableThemes = this.allThemes.filter(theme => theme.id !== this.activeThemeId);
-    
-//     if (availableThemes.length === 0) return;
-    
-//     const randomIndex = Math.floor(Math.random() * availableThemes.length);
-//     const randomTheme = availableThemes[randomIndex];
-    
-//     this.selectTheme(randomTheme.id);
-    
-//     // Optional: Show toast notification
-//     console.log(`🎨 Random theme selected: ${randomTheme.name}`);
+//   loadNotifications() {
+//     // Hook for refreshing API if needed
 //   }
 
-//   /**
-//    * Resets theme to system default (Light theme)
-//    */
-//   resetToDefault() {
-//     this.selectTheme('theme-light');
-//     this.themeService.setDarkMode(false);
-    
-//     // Optional: Show toast notification
-//     console.log('🔁 Theme reset to default: Light');
-//   }
-
-//   /**
-//    * Updates theme preset selection based on current theme
-//    */
-//   updateThemePresetSelection() {
-//     // Ensure activeThemeId matches a valid preset
-//     const validPreset = this.themePresets.find(preset => preset.id === this.activeThemeId);
-//     if (!validPreset && this.activeThemeId !== 'theme-dark') {
-//       // If current theme is not in presets, add it to the first position
-//       const currentTheme = this.allThemes.find(theme => theme.id === this.activeThemeId);
-//       if (currentTheme) {
-//         this.themePresets.unshift({
-//           id: currentTheme.id,
-//           name: currentTheme.name,
-//           gradient: currentTheme.gradient
-//         });
-//       }
-//     }
-//   }
-
-//   /**
-//    * Set accent color for the theme
-//    */
-//   setAccentColor(color: string) {
-//     // This would typically call a theme service method to update accent color
-//     console.log(`🎨 Setting accent color to: ${color}`);
-//     // this.themeService.setAccentColor(color);
-    
-//     // For demo purposes, we'll just log it
-//     // In a real implementation, you would update CSS custom properties
-//     document.documentElement.style.setProperty('--accent-primary', color);
-//     document.documentElement.style.setProperty('--accent-secondary', this.adjustColorBrightness(color, 20));
-//   }
-
-//   /**
-//    * Adjust color brightness
-//    */
-//   private adjustColorBrightness(color: string, percent: number): string {
-//     // Simple color brightness adjustment
-//     // This is a simplified version - in production use a proper color library
-//     return color;
-//   }
-
-//   /**
-//    * Clears all notifications
-//    */
 //   clearAllNotifications() {
 //     if (this.recentNotifications.length === 0) return;
-    
 //     this.notificationService.markAllAsRead();
 //     this.recentNotifications = [];
-    
-//     // Show visual feedback
-//     console.log('🗑️ All notifications cleared');
 //   }
 
-//   /**
-//    * Marks all notifications as read
-//    */
 //   markAllAsRead() {
 //     this.recentNotifications.forEach(notification => {
 //       notification.read = true;
 //     });
-    
-//     // In a real app, you would call notificationService.markAllAsRead()
-//     console.log('✅ All notifications marked as read');
+//     this.notificationService.markAllAsRead();
 //   }
 
-//   /**
-//    * Get themes organized by category
-//    */
-//   getThemesByCategory() {
-//     const categories = [
-//       {
-//         name: "Core Themes",
-//         themes: this.allThemes.filter(t => t.category === 'core')
-//       },
-//       {
-//         name: "Professional",
-//         themes: this.allThemes.filter(t => t.category === 'professional')
-//       },
-//       {
-//         name: "Modern",
-//         themes: this.allThemes.filter(t => t.category === 'modern')
-//       },
-//       {
-//         name: "Luxury",
-//         themes: this.allThemes.filter(t => t.category === 'luxury')
-//       },
-//       {
-//         name: "Colorful",
-//         themes: this.allThemes.filter(t => t.category === 'colorful')
-//       },
-//       {
-//         name: "Minimal",
-//         themes: this.allThemes.filter(t => t.category === 'minimal')
-//       }
-//     ];
-    
-//     // Filter out empty categories
-//     return categories.filter(category => category.themes.length > 0);
-//   }
-
-//   /**
-//    * Opens the notification dialog
-//    */
-//   openNotificationDialog() {
-//     this.showNotificationdialog = true;
-//   }
-
-//   /**
-//    * Closes the notification dialog
-//    */
-//   closeNotificationDialog() {
-//     this.showNotificationdialog = false;
-//   }
-
-//   /**
-//    * Toggles between dark and light mode
-//    */
-//   toggleDarkLightMode() {
-//     this.themeService.setDarkMode(!this.isDarkMode);
-//   }
-
-//   /**
-//    * Get theme by ID
-//    */
-//   getThemeById(id: string) {
-//     return this.allThemes.find(theme => theme.id === id);
-//   }
-
-//   /**
-//    * Get current theme name
-//    */
-//   getCurrentThemeName(): string {
-//     const theme = this.getThemeById(this.activeThemeId);
-//     return theme ? theme.name : 'Unknown Theme';
-//   }
-
-//   /**
-//    * Opens profile settings
-//    */
-//   openProfile() {
-//     // Navigate to profile page
-//     console.log('👤 Opening profile settings');
-//     // this.router.navigate(['/profile']);
-//   }
-
-//   /**
-//    * Export theme settings
-//    */
-//   exportSettings() {
-//     const settings = {
-//       themeId: this.activeThemeId,
-//       isDarkMode: this.isDarkMode,
-//       timestamp: new Date().toISOString()
-//     };
-    
-//     const dataStr = JSON.stringify(settings, null, 2);
-//     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    
-//     const exportFileDefaultName = `theme-settings-${new Date().toISOString().split('T')[0]}.json`;
-    
-//     const linkElement = document.createElement('a');
-//     linkElement.setAttribute('href', dataUri);
-//     linkElement.setAttribute('download', exportFileDefaultName);
-//     linkElement.click();
-    
-//     console.log('📤 Theme settings exported');
-//   }
-
-//   /**
-//    * Import theme settings
-//    */
-//   importSettings() {
-//     // Create a file input element
-//     const input = document.createElement('input');
-//     input.type = 'file';
-//     input.accept = '.json';
-    
-//     input.onchange = (event: any) => {
-//       const file = event.target.files[0];
-//       if (file) {
-//         const reader = new FileReader();
-//         reader.onload = (e: any) => {
-//           try {
-//             const settings = JSON.parse(e.target.result);
-            
-//             if (settings.themeId) {
-//               this.selectTheme(settings.themeId);
-//             }
-            
-//             if (settings.isDarkMode !== undefined) {
-//               this.toggleDarkMode(settings.isDarkMode);
-//             }
-            
-//             console.log('📥 Theme settings imported successfully');
-//           } catch (error) {
-//             console.error('❌ Error importing settings:', error);
-//           }
-//         };
-//         reader.readAsText(file);
-//       }
-//     };
-    
-//     input.click();
-//   }
-
-//   /**
-//    * Get notification icon class
-//    */
 //   getNotificationIconClass(type: string): string {
 //     switch(type) {
 //       case 'success': return 'pi pi-check-circle';
@@ -659,9 +481,6 @@ allThemes = [
 //     }
 //   }
 
-//   /**
-//    * Get notification icon color class
-//    */
 //   getNotificationIcon(type: string): string {
 //     switch(type) {
 //       case 'success': return 'success';
@@ -671,478 +490,150 @@ allThemes = [
 //     }
 //   }
 
+//   closeAllPopovers() {
+//     if (this.profilePopover) this.profilePopover.hide();
+//     if (this.notificationPopover) this.notificationPopover.hide();
+//   }
+
 //   ngOnDestroy() { 
 //     this.destroy$.next(); 
 //     this.destroy$.complete(); 
 //   }
 // }
 
-// // import { Component, EventEmitter, Input, Output, OnInit, ViewChild, OnDestroy, inject } from '@angular/core';
-// // import { CommonModule } from '@angular/common';
-// // import { FormsModule } from '@angular/forms';
-// // import { RouterModule } from '@angular/router';
-// // import { Subject, takeUntil } from 'rxjs';
 
-// // // PrimeNG
-// // import { AvatarModule } from 'primeng/avatar';
-// // import { ButtonModule } from 'primeng/button';
-// // import { Popover, PopoverModule } from 'primeng/popover';
-// // import { TooltipModule } from 'primeng/tooltip';
-// // import { ToggleButtonModule } from 'primeng/togglebutton';
 
-// // import { ThemeService, ThemeSettings } from '../../core/services/theme.service';
-// // import { AuthService } from '../../modules/auth/services/auth-service';
-// // import { NotificationService } from '../../core/services/notification.service';
-// // import { NotificationBellComponent } from '../../modules/organization/components/notification-bell-component/notification-bell-component';
-// // import { Dialog } from "primeng/dialog";
-// // import { LayoutService } from '../layout.service';
 
-// // @Component({
-// //   selector: 'app-mainscreen-header',
-// //   standalone: true,
-// //   imports: [
-// //     CommonModule, FormsModule, RouterModule,
-// //     AvatarModule, ButtonModule, PopoverModule, TooltipModule, ToggleButtonModule,
-// //     NotificationBellComponent // Import the bell component
-// //     ,
-// //     Dialog
-// //   ],
-// //   templateUrl: './mainscreen-header.html',
-// //   styleUrl: './mainscreen-header.scss',
-// // })
-// // export class MainscreenHeader implements OnInit, OnDestroy {
-// //   @Input() isMobileMenuOpen: boolean = false;
-// //   @Output() toggleSidebar = new EventEmitter<void>();
 
-// //   private themeService = inject(ThemeService);
-// //   private authService = inject(AuthService);
-// //   private notificationService = inject(NotificationService);
-// //   private destroy$ = new Subject<void>();
-// //   showNotificationdialog: boolean = false
-// //   currentUser: any = null;
-// //   recentNotifications: any[] = [];
-// //   layout = inject(LayoutService);
 
-// //   onMenuToggle() {
-// //     if (this.layout.isMobile()) {
-// //       this.layout.toggleMobile();
-// //     } else {
-// //       this.layout.togglePin();
-// //     }
-// //   }
-// //   // Popover State
-// //   activeTab: 'settings' | 'notifications' = 'settings';
 
-// //   // Theme State
-// //   isDarkMode = false;
-// //   activeThemeId: string = 'theme-light';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // allThemes: Theme[] = [
+// //   // Core Themes
+// //   { name: "Glass", id: "theme-glass", color: "#6366f1", gradient: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%)", category: "core", description: "Modern glassmorphism design" },
+// //   { name: "Light", id: "theme-light", color: "#f1f5f9", gradient: "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)", category: "core", description: "Clean light mode" },
+// //   { name: "Dark (Default)", id: "theme-dark", color: "#0f172a", gradient: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)", category: "core", description: "Professional dark mode" },
+// //   { name: "Auto", id: "auto-theme", color: "#2563eb", gradient: "linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%)", category: "core", description: "Auto-detects system preference" },
+
+// //   // Professional Themes
+// //   { name: "Premium", id: "theme-premium", color: "#0d9488", gradient: "linear-gradient(135deg, #0d9488 0%, #0891b2 100%)", category: "professional", description: "Premium teal theme" },
+// //   { name: "Titanium", id: "theme-titanium", color: "#0e7490", gradient: "linear-gradient(135deg, #0e7490 0%, #06b6d4 100%)", category: "professional", description: "Metallic blue theme" },
+// //   { name: "Slate", id: "theme-slate", color: "#475569", gradient: "linear-gradient(135deg, #475569 0%, #64748b 100%)", category: "professional", description: "Cool gray theme" },
+// //   { name: "Data Science", id: "theme-data-science", color: "#3b82f6", gradient: "linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)", category: "professional", description: "Analytics optimized" },
+// //   { name: "Cobalt Steel", id: "theme-cobalt-steel", color: "#0ea5e9", gradient: "linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)", category: "professional", description: "Professional blue theme" },
+
+// //   // Minimal Themes
+// //   { name: "Minimal", id: "theme-minimal", color: "#e5e5e5", gradient: "linear-gradient(135deg, #e5e5e5 0%, #d4d4d4 100%)", category: "minimal", description: "Clean monochrome" },
+// //   { name: "Monochrome", id: "theme-monochrome", color: "#52525b", gradient: "linear-gradient(135deg, #52525b 0%, #71717a 100%)", category: "minimal", description: "True black & white" },
+
+// //   // Colorful Themes
+// //   { name: "Rose", id: "theme-rose", color: "#ec6d8a", gradient: "linear-gradient(135deg, #ec6d8a 0%, #f472b6 100%)", category: "colorful", description: "Soft pink theme" },
+// //   { name: "Sunset", id: "theme-sunset", color: "#f97316", gradient: "linear-gradient(135deg, #f97316 0%, #fb923c 100%)", category: "colorful", description: "Warm orange theme" },
+// //   { name: "Bold", id: "theme-bold", color: "#ff00ff", gradient: "linear-gradient(135deg, #ff00ff 0%, #00ffff 100%)", category: "colorful", description: "High contrast neon theme" },
+
+// //   // Luxury Themes
+// //   { name: "Luxury", id: "theme-luxury", color: "#d4af37", gradient: "linear-gradient(135deg, #d4af37 0%, #fbbf24 100%)", category: "luxury", description: "Gold luxury theme" },
+// //   { name: "Futuristic", id: "theme-futuristic", color: "#00d4ff", gradient: "linear-gradient(135deg, #00d4ff 0%, #a855f7 100%)", category: "luxury", description: "Cyberpunk theme" },
+// //   { name: "Midnight Royal", id: "theme-midnight-royal", color: "#a78bfa", gradient: "linear-gradient(135deg, #a78bfa 0%, #c4b5fd 50%, #8b5cf6 100%)", category: "luxury", description: "Purple luxury dark" },
+// //   { name: "Emerald Regal", id: "theme-emerald-regal", color: "#10b981", gradient: "linear-gradient(135deg, #10b981 0%, #34d399 100%)", category: "luxury", description: "Green luxury theme" },
+
+// //   // Modern & Trending Themes
+// //   { name: "Material You", id: "theme-material-you", color: "#db2777", gradient: "linear-gradient(135deg, #db2777 0%, #e879f9 100%)", category: "modern", description: "Android 12 design" },
+// //   { name: "Neumorphic", id: "theme-neumorphic", color: "#6366f1", gradient: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)", category: "modern", description: "Soft UI design" },
+// //   { name: "Deep Space", id: "theme-deep-space", color: "#60a5fa", gradient: "linear-gradient(135deg, #60a5fa 0%, #38bdf8 50%, #22d3ee 100%)", category: "modern", description: "Astronomy inspired dark theme" },
+
+// //   // NEWLY ADDED THEMES FROM YOUR TOKENS
+// //   { name: "Auto Theme", id: "auto-theme", color: "#2563eb", gradient: "linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%)", category: "system", description: "Adapts to system preferences" },
+// //   { name: "Neumorphic Light", id: "theme-neumorphic", color: "#6366f1", gradient: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)", category: "modern", description: "Modern soft UI design" },
+// //   { name: "Material You Pink", id: "theme-material-you", color: "#db2777", gradient: "linear-gradient(135deg, #db2777 0%, #e879f9 100%)", category: "modern", description: "Android 12+ design language" },
+// //   { name: "Midnight Royal", id: "theme-midnight-royal", color: "#a78bfa", gradient: "linear-gradient(135deg, #c4b5fd 0%, #a78bfa 50%, #8b5cf6 100%)", category: "luxury", description: "Dark purple luxury theme" },
+// //   { name: "Data Science Pro", id: "theme-data-science", color: "#3b82f6", gradient: "linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)", category: "professional", description: "Optimized for data visualization" },
+// //   { name: "Deep Space Explorer", id: "theme-deep-space", color: "#60a5fa", gradient: "linear-gradient(135deg, #60a5fa 0%, #38bdf8 50%, #22d3ee 100%)", category: "dark", description: "Space-themed dark mode" },
+// //   { name: "Emerald Royal", id: "theme-emerald-regal", color: "#10b981", gradient: "linear-gradient(135deg, #10b981 0%, #34d399 100%)", category: "luxury", description: "Green luxury theme" },
+// //   { name: "Cobalt Professional", id: "theme-cobalt-steel", color: "#0ea5e9", gradient: "linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)", category: "professional", description: "Professional blue theme" },
   
-// //   // Enhanced Themes Array with Categories
-// //   allThemes = [
-// //     // Core Themes
-// //     { name: "Glass", id: "theme-glass", color: "#6366f1", gradient: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%)", category: "modern", description: "Modern glassmorphism design" },
-// //     { name: "Light", id: "theme-light", color: "#f1f5f9", gradient: "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)", category: "core", description: "Clean light mode" },
-// //     { name: "Dark (Default)", id: "theme-dark", color: "#0f172a", gradient: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)", category: "core", description: "Professional dark mode" },
-
-// //     // Professional Themes
-// //     { name: "Premium", id: "theme-premium", color: "#0d9488", gradient: "linear-gradient(135deg, #0d9488 0%, #0891b2 100%)", category: "professional", description: "Premium teal theme" },
-// //     { name: "Titanium", id: "theme-titanium", color: "#0e7490", gradient: "linear-gradient(135deg, #0e7490 0%, #06b6d4 100%)", category: "professional", description: "Metallic blue theme" },
-// //     { name: "Slate", id: "theme-slate", color: "#475569", gradient: "linear-gradient(135deg, #475569 0%, #64748b 100%)", category: "professional", description: "Cool gray theme" },
-
-// //     // Minimal Themes
-// //     { name: "Minimal", id: "theme-minimal", color: "#e5e5e5", gradient: "linear-gradient(135deg, #e5e5e5 0%, #d4d4d4 100%)", category: "minimal", description: "Clean monochrome" },
-// //     { name: "Monochrome", id: "theme-monochrome", color: "#52525b", gradient: "linear-gradient(135deg, #52525b 0%, #71717a 100%)", category: "minimal", description: "True black & white" },
-
-// //     // Colorful Themes
-// //     { name: "Rose", id: "theme-rose", color: "#ec6d8a", gradient: "linear-gradient(135deg, #ec6d8a 0%, #f472b6 100%)", category: "colorful", description: "Soft pink theme" },
-// //     { name: "Sunset", id: "theme-sunset", color: "#f97316", gradient: "linear-gradient(135deg, #f97316 0%, #fb923c 100%)", category: "colorful", description: "Warm orange theme" },
-// //     { name: "Bold", id: "theme-bold", color: "#ff0080", gradient: "linear-gradient(135deg, #ff0080 0%, #00ffff 100%)", category: "colorful", description: "High contrast theme" },
-
-// //     // Luxury Themes
-// //     { name: "Luxury", id: "theme-luxury", color: "#d4af37", gradient: "linear-gradient(135deg, #d4af37 0%, #fbbf24 100%)", category: "luxury", description: "Gold luxury theme" },
-// //     { name: "Futuristic", id: "theme-futuristic", color: "#00d4ff", gradient: "linear-gradient(135deg, #00d4ff 0%, #a855f7 100%)", category: "luxury", description: "Cyberpunk theme" },
-
-// //     // New Trending Themes
-// //     { name: "Midnight Royal", id: "theme-midnight-royal", color: "#a78bfa", gradient: "linear-gradient(135deg, #a78bfa 0%, #c4b5fd 100%)", category: "luxury", description: "Purple luxury dark" },
-// //     { name: "Emerald Regal", id: "theme-emerald-regal", color: "#10b981", gradient: "linear-gradient(135deg, #10b981 0%, #34d399 100%)", category: "luxury", description: "Green luxury theme" },
-// //     { name: "Material You", id: "theme-material-you", color: "#db2777", gradient: "linear-gradient(135deg, #db2777 0%, #e879f9 100%)", category: "modern", description: "Android 12 design" },
-// //     { name: "Data Science", id: "theme-data-science", color: "#3b82f6", gradient: "linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)", category: "professional", description: "Analytics optimized" },
-// //     { name: "Neumorphic", id: "theme-neumorphic", color: "#6366f1", gradient: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)", category: "modern", description: "Soft UI design" }
-// //   ];
-
-// //   ngOnInit() {
-// //     this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(u => this.currentUser = u);
-
-// //     this.notificationService.notifications$.pipe(takeUntil(this.destroy$)).subscribe(n => {
-// //       this.recentNotifications = n.filter(x => !x.isRead);
-// //     });
-
-// //     this.themeService.settings$.pipe(takeUntil(this.destroy$)).subscribe((s: ThemeSettings) => {
-// //       this.isDarkMode = s.isDarkMode;
-// //       this.activeThemeId = s.isDarkMode ? 'theme-dark' : s.lightThemeClass;
-// //     });
-// //   }
-
-// //   togglePopover(op: Popover, event: Event) {
-// //     op.toggle(event);
-// //   }
-
-// //   // Optional: Open directly to notifications tab
-// //   openNotifications(op: Popover, event: Event) {
-// //     this.activeTab = 'notifications';
-// //     op.toggle(event);
-// //   }
-
-// //   toggleDarkMode(isDark: boolean) { 
-// //     this.themeService.setDarkMode(isDark); 
-// //   }
-
-// //   selectTheme(id: string) {
-// //     if (id === 'theme-dark') {
-// //       this.themeService.setDarkMode(true);
-// //     } else {
-// //       this.themeService.setLightTheme(id);
-// //     }
-// //   }
-
-// //   logout() { 
-// //     this.authService.logout(); 
-// //   }
-
-// //   getInitials(name: string): string {
-// //     return name ? name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : 'U';
-// //   }
-
-// //   // === NEW METHODS FOR ENHANCED FUNCTIONALITY ===
-
-// //   /**
-// //    * Selects a random theme from all available themes
-// //    */
-// //   randomTheme() {
-// //     const availableThemes = this.allThemes.filter(theme => theme.id !== this.activeThemeId);
-    
-// //     if (availableThemes.length === 0) return;
-    
-// //     const randomIndex = Math.floor(Math.random() * availableThemes.length);
-// //     const randomTheme = availableThemes[randomIndex];
-    
-// //     this.selectTheme(randomTheme.id);
-    
-// //     // Show visual feedback (could be enhanced with a toast notification)
-// //     console.log(`Random theme selected: ${randomTheme.name}`);
-// //   }
-
-// //   /**
-// //    * Resets theme to system default (Light theme)
-// //    */
-// //   resetToDefault() {
-// //     const defaultTheme = this.allThemes.find(theme => theme.name === 'Light');
-// //     if (defaultTheme) {
-// //       this.selectTheme(defaultTheme.id);
-// //       this.themeService.setDarkMode(false);
-      
-// //       // Show visual feedback
-// //       console.log('Theme reset to default: Light');
-// //     }
-// //   }
-
-// //   /**
-// //    * Clears all notifications
-// //    */
-// //   clearAllNotifications() {
-// //     if (this.recentNotifications.length === 0) return;
-    
-// //     this.notificationService.markAllAsRead();
-// //     this.recentNotifications = [];
-    
-// //     // Show visual feedback
-// //     console.log('All notifications cleared');
-// //   }
-
-// //   /**
-// //    * Get themes organized by category
-// //    */
-// //   getThemesByCategory() {
-// //     const categories = [
-// //       {
-// //         name: "Core Themes",
-// //         themes: this.allThemes.filter(t => t.category === 'core')
-// //       },
-// //       {
-// //         name: "Professional",
-// //         themes: this.allThemes.filter(t => t.category === 'professional')
-// //       },
-// //       {
-// //         name: "Modern",
-// //         themes: this.allThemes.filter(t => t.category === 'modern')
-// //       },
-// //       {
-// //         name: "Luxury",
-// //         themes: this.allThemes.filter(t => t.category === 'luxury')
-// //       },
-// //       {
-// //         name: "Colorful",
-// //         themes: this.allThemes.filter(t => t.category === 'colorful')
-// //       },
-// //       {
-// //         name: "Minimal",
-// //         themes: this.allThemes.filter(t => t.category === 'minimal')
-// //       }
-// //     ];
-    
-// //     // Filter out empty categories
-// //     return categories.filter(category => category.themes.length > 0);
-// //   }
-
-// //   /**
-// //    * Opens the notification dialog
-// //    */
-// //   openNotificationDialog() {
-// //     this.showNotificationdialog = true;
-// //   }
-
-// //   /**
-// //    * Closes the notification dialog
-// //    */
-// //   closeNotificationDialog() {
-// //     this.showNotificationdialog = false;
-// //   }
-
-// //   /**
-// //    * Toggles between dark and light mode
-// //    */
-// //   toggleDarkLightMode() {
-// //     this.themeService.setDarkMode(!this.isDarkMode);
-// //   }
-
-// //   /**
-// //    * Get theme by ID
-// //    */
-// //   getThemeById(id: string) {
-// //     return this.allThemes.find(theme => theme.id === id);
-// //   }
-
-// //   /**
-// //    * Get current theme name
-// //    */
-// //   getCurrentThemeName(): string {
-// //     const theme = this.getThemeById(this.activeThemeId);
-// //     return theme ? theme.name : 'Unknown Theme';
-// //   }
-
-// //   ngOnDestroy() { 
-// //     this.destroy$.next(); 
-// //     this.destroy$.complete(); 
-// //   }
-// // }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // import { Component, EventEmitter, Input, Output, OnInit, ViewChild, OnDestroy, inject } from '@angular/core';
-// // import { CommonModule } from '@angular/common';
-// // import { FormsModule } from '@angular/forms';
-// // import { RouterModule } from '@angular/router';
-// // import { Subject, takeUntil } from 'rxjs';
-
-// // // PrimeNG
-// // import { AvatarModule } from 'primeng/avatar';
-// // import { ButtonModule } from 'primeng/button';
-// // import { Popover, PopoverModule } from 'primeng/popover';
-// // import { TooltipModule } from 'primeng/tooltip';
-// // import { ToggleButtonModule } from 'primeng/togglebutton';
-
-// // import { ThemeService, ThemeSettings } from '../../core/services/theme.service';
-// // import { AuthService } from '../../modules/auth/services/auth-service';
-// // import { NotificationService } from '../../core/services/notification.service';
-// // import { NotificationBellComponent } from '../../modules/organization/components/notification-bell-component/notification-bell-component';
-// // import { Dialog } from "primeng/dialog";
-// // import { LayoutService } from '../layout.service';
-
-// // @Component({
-// //   selector: 'app-mainscreen-header',
-// //   standalone: true,
-// //   imports: [
-// //     CommonModule, FormsModule, RouterModule,
-// //     AvatarModule, ButtonModule, PopoverModule, TooltipModule, ToggleButtonModule,
-// //     NotificationBellComponent // Import the bell component
-// //     ,
-// //     Dialog
-// //   ],
-// //   templateUrl: './mainscreen-header.html',
-// //   styleUrl: './mainscreen-header.scss',
-// // })
-// // export class MainscreenHeader implements OnInit, OnDestroy {
-// //   @Input() isMobileMenuOpen: boolean = false;
-// //   @Output() toggleSidebar = new EventEmitter<void>();
-
-// //   private themeService = inject(ThemeService);
-// //   private authService = inject(AuthService);
-// //   private notificationService = inject(NotificationService);
-// //   private destroy$ = new Subject<void>();
-// //   showNotificationdialog: boolean = false
-// //   currentUser: any = null;
-// //   recentNotifications: any[] = [];
-// //   layout = inject(LayoutService);
-
-// //   onMenuToggle() {
-// //     if (this.layout.isMobile()) {
-// //       this.layout.toggleMobile();
-// //     } else {
-// //       this.layout.togglePin();
-// //     }
-// //   }
-// //   // Popover State
-// //   activeTab: 'settings' | 'notifications' = 'settings';
-
-// //   // Theme State
-// //   isDarkMode = false;
-// //   activeThemeId: string = 'theme-light';
-// //   // allThemes = [
-// //   //   { name: "Glass", id: "theme-glass", color: "#3b82f6" },
-// //   //   { name: "Light", id: "theme-light", color: "#ffffff" },
-// //   //   { name: "Premium", id: "theme-premium", color: "#0d9488" },
-// //   //   { name: "Titanium", id: "theme-titanium", color: "#0e7490" },
-// //   //   { name: "Slate", id: "theme-slate", color: "#475569" },
-// //   //   { name: "Minimal", id: "theme-minimal", color: "#e5e5e5" },
-// //   //   { name: "Rose", id: "theme-rose", color: "#ec6d8a" },
-// //   //   { name: "Sunset", id: "theme-sunset", color: "#f97316" },
-// //   //   { name: "Luxury", id: "theme-luxury", color: "#d4af37" },
-// //   //   { name: "Monochrome", id: "theme-monochrome", color: "#52525b" },
-// //   //   { name: "Dark (Default)", id: "theme-dark", color: "#0f172a" },
-// //   //   { name: "Futuristic", id: "theme-futuristic", color: "#00d4ff" },
-// //   //   { name: "Bold", id: "theme-bold", color: "#ff0080" },
-// //   // ];
-// //   // theme.service.ts or component.ts
-// //   allThemes = [
-// //     // Core Themes
-// //     { name: "Glass", id: "theme-glass", color: "#6366f1", gradient: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%)", category: "modern", description: "Modern glassmorphism design" },
-// //     { name: "Light", id: "theme-light", color: "#f1f5f9", gradient: "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)", category: "core", description: "Clean light mode" },
-// //     { name: "Dark (Default)", id: "theme-dark", color: "#0f172a", gradient: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)", category: "core", description: "Professional dark mode" },
-
-// //     // Professional Themes
-// //     { name: "Premium", id: "theme-premium", color: "#0d9488", gradient: "linear-gradient(135deg, #0d9488 0%, #0891b2 100%)", category: "professional", description: "Premium teal theme" },
-// //     { name: "Titanium", id: "theme-titanium", color: "#0e7490", gradient: "linear-gradient(135deg, #0e7490 0%, #06b6d4 100%)", category: "professional", description: "Metallic blue theme" },
-// //     { name: "Slate", id: "theme-slate", color: "#475569", gradient: "linear-gradient(135deg, #475569 0%, #64748b 100%)", category: "professional", description: "Cool gray theme" },
-
-// //     // Minimal Themes
-// //     { name: "Minimal", id: "theme-minimal", color: "#e5e5e5", gradient: "linear-gradient(135deg, #e5e5e5 0%, #d4d4d4 100%)", category: "minimal", description: "Clean monochrome" },
-// //     { name: "Monochrome", id: "theme-monochrome", color: "#52525b", gradient: "linear-gradient(135deg, #52525b 0%, #71717a 100%)", category: "minimal", description: "True black & white" },
-
-// //     // Colorful Themes
-// //     { name: "Rose", id: "theme-rose", color: "#ec6d8a", gradient: "linear-gradient(135deg, #ec6d8a 0%, #f472b6 100%)", category: "colorful", description: "Soft pink theme" },
-// //     { name: "Sunset", id: "theme-sunset", color: "#f97316", gradient: "linear-gradient(135deg, #f97316 0%, #fb923c 100%)", category: "colorful", description: "Warm orange theme" },
-// //     { name: "Bold", id: "theme-bold", color: "#ff0080", gradient: "linear-gradient(135deg, #ff0080 0%, #00ffff 100%)", category: "colorful", description: "High contrast theme" },
-
-// //     // Luxury Themes
-// //     { name: "Luxury", id: "theme-luxury", color: "#d4af37", gradient: "linear-gradient(135deg, #d4af37 0%, #fbbf24 100%)", category: "luxury", description: "Gold luxury theme" },
-// //     { name: "Futuristic", id: "theme-futuristic", color: "#00d4ff", gradient: "linear-gradient(135deg, #00d4ff 0%, #a855f7 100%)", category: "luxury", description: "Cyberpunk theme" },
-
-// //     // New Trending Themes
-// //     { name: "Midnight Royal", id: "theme-midnight-royal", color: "#a78bfa", gradient: "linear-gradient(135deg, #a78bfa 0%, #c4b5fd 100%)", category: "luxury", description: "Purple luxury dark" },
-// //     { name: "Emerald Regal", id: "theme-emerald-regal", color: "#10b981", gradient: "linear-gradient(135deg, #10b981 0%, #34d399 100%)", category: "luxury", description: "Green luxury theme" },
-// //     { name: "Material You", id: "theme-material-you", color: "#db2777", gradient: "linear-gradient(135deg, #db2777 0%, #e879f9 100%)", category: "modern", description: "Android 12 design" },
-// //     { name: "Data Science", id: "theme-data-science", color: "#3b82f6", gradient: "linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)", category: "professional", description: "Analytics optimized" },
-// //     { name: "Neumorphic", id: "theme-neumorphic", color: "#6366f1", gradient: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)", category: "modern", description: "Soft UI design" }
-// //   ];
-
-// //   // Add this method to organize themes by category
-// //   getThemesByCategory() {
-// //     return [
-// //       {
-// //         name: "Core Themes",
-// //         themes: this.allThemes.filter(t => t.category === 'core')
-// //       },
-// //       {
-// //         name: "Professional",
-// //         themes: this.allThemes.filter(t => t.category === 'professional')
-// //       },
-// //       {
-// //         name: "Modern",
-// //         themes: this.allThemes.filter(t => t.category === 'modern')
-// //       },
-// //       {
-// //         name: "Luxury",
-// //         themes: this.allThemes.filter(t => t.category === 'luxury')
-// //       },
-// //       {
-// //         name: "Colorful",
-// //         themes: this.allThemes.filter(t => t.category === 'colorful')
-// //       },
-// //       {
-// //         name: "Minimal",
-// //         themes: this.allThemes.filter(t => t.category === 'minimal')
-// //       }
-// //     ];
-// //   }
-// //   ngOnInit() {
-// //     this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(u => this.currentUser = u);
-
-// //     this.notificationService.notifications$.pipe(takeUntil(this.destroy$)).subscribe(n => {
-// //       this.recentNotifications = n.filter(x => !x.isRead);
-// //     });
-
-// //     this.themeService.settings$.pipe(takeUntil(this.destroy$)).subscribe((s: ThemeSettings) => {
-// //       this.isDarkMode = s.isDarkMode;
-// //       this.activeThemeId = s.isDarkMode ? 'theme-dark' : s.lightThemeClass;
-// //     });
-// //   }
-
-// //   togglePopover(op: Popover, event: Event) {
-// //     op.toggle(event);
-// //   }
-
-// //   // Optional: Open directly to notifications tab
-// //   openNotifications(op: Popover, event: Event) {
-// //     this.activeTab = 'notifications';
-// //     op.toggle(event);
-// //   }
-
-// //   toggleDarkMode(isDark: boolean) { this.themeService.setDarkMode(isDark); }
-
-// //   selectTheme(id: string) {
-// //     if (id === 'theme-dark') this.themeService.setDarkMode(true);
-// //     else this.themeService.setLightTheme(id);
-// //   }
-
-// //   logout() { this.authService.logout(); }
-
-// //   getInitials(name: string): string {
-// //     return name ? name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : 'U';
-// //   }
-
-// //   ngOnDestroy() { this.destroy$.next(); this.destroy$.complete(); }
-// // }
+// //   // Additional Enhanced Themes
+// //   { name: "Glass Pro", id: "theme-glass", color: "#6366f1", gradient: "linear-gradient(145deg, rgba(248, 250, 252, 0.98) 0%, rgba(241, 245, 249, 0.96) 100%)", category: "modern", description: "Enhanced glassmorphism" },
+// //   { name: "Premium Teal", id: "theme-premium", color: "#0d9488", gradient: "linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%)", category: "professional", description: "Rich teal gradient" },
+// //   { name: "Luxury Gold", id: "theme-luxury", color: "#d4af37", gradient: "linear-gradient(180deg, #fefce8 0%, #fef3c7 100%)", category: "luxury", description: "Warm gold luxury" },
+// //   { name: "Slate Professional", id: "theme-slate", color: "#475569", gradient: "linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)", category: "professional", description: "Cool blue-gray professional" },
+// //   { name: "Titanium Cyan", id: "theme-titanium", color: "#0e7490", gradient: "linear-gradient(180deg, #ecfeff 0%, #cffafe 100%)", category: "professional", description: "Deep cyan metallic" },
+// //   { name: "Rose Petal", id: "theme-rose", color: "#db2777", gradient: "linear-gradient(180deg, #fff1f2 0%, #ffe4e6 100%)", category: "colorful", description: "Soft pink gradient" },
+// //   { name: "Sunset Glow", id: "theme-sunset", color: "#ea580c", gradient: "linear-gradient(180deg, #fffbeb 0%, #fed7aa 100%)", category: "colorful", description: "Warm orange sunset" },
+// //   { name: "Futuristic Blue", id: "theme-futuristic", color: "#3b82f6", gradient: "linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%)", category: "modern", description: "Cyberpunk blue theme" },
+// //   { name: "Bold Neon", id: "theme-bold", color: "#ff00ff", gradient: "linear-gradient(135deg, #ff00ff 0%, #00ffff 100%)", category: "colorful", description: "High contrast neon" },
+// //   { name: "Minimal White", id: "theme-minimal", color: "#fafafa", gradient: "linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)", category: "minimal", description: "Clean white minimal" },
+// //   { name: "Monochrome Gray", id: "theme-monochrome", color: "#404040", gradient: "linear-gradient(135deg, #404040 0%, #525252 100%)", category: "minimal", description: "True monochrome" }
+// // ];
+
+// // // Updated theme presets for quick selection
+// // themePresets = [
+// //   { id: 'theme-light', name: 'Light', gradient: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)' },
+// //   { id: 'theme-dark', name: 'Dark', gradient: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' },
+// //   { id: 'theme-premium', name: 'Premium', gradient: 'linear-gradient(135deg, #0d9488 0%, #0891b2 100%)' },
+// //   { id: 'theme-glass', name: 'Glass', gradient: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%)' },
+// //   { id: 'theme-luxury', name: 'Luxury', gradient: 'linear-gradient(135deg, #d4af37 0%, #fbbf24 100%)' },
+// //   { id: 'theme-rose', name: 'Rose', gradient: 'linear-gradient(135deg, #ec6d8a 0%, #f472b6 100%)' },
+// //   { id: 'auto-theme', name: 'Auto', gradient: 'linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%)' },
+// //   { id: 'theme-material-you', name: 'Material You', gradient: 'linear-gradient(135deg, #db2777 0%, #e879f9 100%)' },
+// //   { id: 'theme-data-science', name: 'Data Science', gradient: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)' },
+// //   { id: 'theme-neumorphic', name: 'Neumorphic', gradient: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)' },
+// //   { id: 'theme-midnight-royal', name: 'Midnight', gradient: 'linear-gradient(135deg, #a78bfa 0%, #c4b5fd 100%)' },
+// //   { id: 'theme-emerald-regal', name: 'Emerald', gradient: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)' },
+// //   { id: 'theme-deep-space', name: 'Deep Space', gradient: 'linear-gradient(135deg, #60a5fa 0%, #38bdf8 50%, #22d3ee 100%)' },
+// //   { id: 'theme-cobalt-steel', name: 'Cobalt', gradient: 'linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)' }
+// // ];
+
+// // // Updated accent colors for customization
+// // accentColors = [
+// //   { name: 'Indigo', value: '#6366f1' },
+// //   { name: 'Green', value: '#10b981' },
+// //   { name: 'Amber', value: '#f59e0b' },
+// //   { name: 'Violet', value: '#8b5cf6' },
+// //   { name: 'Rose', value: '#ef4444' },
+// //   { name: 'Blue', value: '#3b82f6' },
+// //   { name: 'Cyan', value: '#06b6d4' },
+// //   { name: 'Teal', value: '#0d9488' },
+// //   { name: 'Emerald', value: '#10b981' },
+// //   { name: 'Fuchsia', value: '#db2777' },
+// //   { name: 'Gold', value: '#d4af37' },
+// //   { name: 'Silver', value: '#94a3b8' }
+// // ];
