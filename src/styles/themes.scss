@@ -214,6 +214,191 @@
   --scroll-track: var(--scroll-track-c);
 }
 
+/* THEME 2: BIO-FROST (Matches the Green/White Image Style) */
+.theme-bio-frost {
+
+  /* --- 1. CORE PALETTE (High Contrast for Dark Backgrounds) --- */
+
+  /* Since the glass is translucent over a dark bg, text must be white */
+
+  --theme-bg-primary: transparent; /* Let the background image show through */
+
+  --theme-bg-secondary: rgba(255, 255, 255, 0.1);
+
+  --theme-bg-ternary: rgba(0, 0, 0, 0.2);
+
+
+
+  /* Typography - All White/Light */
+
+  --theme-text-primary: #ffffff;
+
+  --theme-text-secondary: rgba(255, 255, 255, 0.85);
+
+  --theme-text-tertiary: rgba(255, 255, 255, 0.65);
+
+  --theme-text-label: rgba(255, 255, 255, 0.5);
+
+
+
+  /* Borders - Subtle White */
+
+  --theme-border-primary: rgba(255, 255, 255, 0.3);
+
+  --theme-border-secondary: rgba(255, 255, 255, 0.15);
+
+
+
+  /* Accents - Green/Mint (Based on the image context) */
+
+  --theme-accent-primary: #34d399; /* Emerald 400 */
+
+  --theme-accent-secondary: #10b981; /* Emerald 500 */
+
+  --theme-accent-tertiary: #a7f3d0;
+
+  --theme-accent-gradient: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+
+  --theme-accent-focus: rgba(52, 211, 153, 0.25);
+
+  --theme-accent-hover: #6ee7b7;
+
+
+
+  /* States */
+
+  --theme-success: #34d399;
+
+  --theme-warning: #fbbf24;
+
+  --theme-error: #f87171;
+
+  --theme-info: #60a5fa;
+
+  --theme-disabled: rgba(255, 255, 255, 0.2);
+
+  --theme-disabled-text: rgba(255, 255, 255, 0.4);
+
+
+
+  /* --- 2. GLASS SETTINGS (The "Milky" Effect) --- */
+
+  /* A gradient from 40% white to 5% white creates that "fade" look */
+
+  --glass-bg: linear-gradient(
+
+    135deg, 
+
+    rgba(255, 255, 255, 0.40) 0%, 
+
+    rgba(255, 255, 255, 0.05) 100%
+
+  );
+
+  
+
+  --glass-blur: 32px; /* High blur for creamy look */
+
+  
+
+  /* A subtle white border is key to separation */
+
+  --glass-border: rgba(255, 255, 255, 0.35); 
+
+  
+
+  /* Deep shadow to lift it off the organic background */
+
+  --glass-shadow: 
+
+    0 24px 48px -12px rgba(0, 0, 0, 0.25), 
+
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+
+
+
+  /* Components */
+
+  --scroll-thumb: rgba(255, 255, 255, 0.3);
+
+  --scroll-track: rgba(0, 0, 0, 0.1);
+
+  --component-bg-hover: rgba(255, 255, 255, 0.15);
+
+  --component-bg-active: rgba(255, 255, 255, 0.25);
+
+  --component-border-focus: #ffffff;
+
+  --component-surface-raised: rgba(0, 0, 0, 0.2);
+
+  --component-divider: rgba(255, 255, 255, 0.15);
+
+
+
+  @include apply-canonical-mapping;
+
+}/* REUSABLE COMPONENT: GLASS CARD
+
+   Usage: <div class="glass-card">Content</div>
+
+*/
+
+.glass-card {
+
+  /* 1. Appearance - Pulls from the active Theme */
+
+  background: var(--glass-bg-c);
+
+  backdrop-filter: blur(var(--glass-blur-c));
+
+  -webkit-backdrop-filter: blur(var(--glass-blur-c)); /* Safari support */
+
+  border: 1px solid var(--glass-border-c);
+
+  box-shadow: var(--glass-shadow-c);
+
+  color: var(--text-primary);
+
+
+
+  /* 2. Shape & Layout - Pulls from your Root Variables */
+
+  border-radius: var(--ui-border-radius-xl); /* or use 24px for softer look */
+
+  padding: var(--spacing-2xl);
+
+  
+
+  /* 3. Transition for Hover Effects */
+
+  transition: var(--transition-base);
+
+  
+
+  /* Optional: Ensure content sits properly */
+
+  position: relative;
+
+  overflow: hidden; /* Keeps child elements inside rounded corners */
+
+}
+
+
+
+/* Optional: Hover State for Interactive Cards */
+
+.glass-card.interactive:hover {
+
+  transform: translateY(-4px);
+
+  background: var(--component-bg-hover);
+
+  border-color: var(--color-primary-light);
+
+  box-shadow: var(--shadow-2xl);
+
+}
+
 /* THEME 1: GLASS (Professional Glassmorphism) */
 .theme-glass {
   --theme-bg-primary: linear-gradient(145deg, rgba(248, 250, 252, 0.98) 0%, rgba(241, 245, 249, 0.96) 100%);
