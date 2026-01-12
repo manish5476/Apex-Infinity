@@ -83,7 +83,14 @@ export class MainscreenHeader implements OnInit, OnDestroy {
     { name: "Light", id: "theme-light", color: "#f1f5f9", gradient: "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)", category: "core", description: "Clean light mode" },
     { name: "Dark", id: "theme-dark", color: "#0f172a", gradient: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)", category: "core", description: "Professional dark mode" },
     { name: "Auto", id: "auto-theme", color: "#2563eb", gradient: "linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%)", category: "core", description: "Auto-detects system preference" },
-
+{ 
+  name: "Bio Frost", 
+  id: "theme-bio-frost", 
+  color: "#34d399", 
+  gradient: "linear-gradient(135deg, #34d399 0%, #10b981 100%)", 
+  category: "core", 
+  description: "Milky white glass with emerald organic accents" 
+},
     // Professional Themes
     { name: "Premium", id: "theme-premium", color: "#0d9488", gradient: "linear-gradient(135deg, #0d9488 0%, #0891b2 100%)", category: "professional", description: "Premium teal theme" },
     { name: "Titanium", id: "theme-titanium", color: "#0e7490", gradient: "linear-gradient(135deg, #0e7490 0%, #06b6d4 100%)", category: "professional", description: "Metallic blue theme" },
