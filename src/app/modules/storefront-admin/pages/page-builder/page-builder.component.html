@@ -1,0 +1,770 @@
+<div class="flex h-screen overflow-hidden font-sans ui-bg-app">
+
+  <aside class="w-80 flex flex-col ui-bg-surface ui-border-r ui-shadow-xl z-30">
+
+    <header class="p-4 ui-border-b">
+      <div class="flex items-center gap-3 mb-4">
+        <a routerLink="../../" class="ui-icon-btn" title="Back">
+          <i class="pi pi-arrow-left"></i>
+        </a>
+
+        <div class="min-w-0 flex-1">
+          <h2 class="text-sm font-bold truncate ui-text">
+            {{ page()?.name }}
+          </h2>
+
+          <p class="text-xs flex items-center gap-1 ui-text-muted">
+            <span class="w-2 h-2 rounded-full"
+                  [class.ui-bg-success]="page()?.isPublished"
+                  [class.ui-bg-warning]="!page()?.isPublished">
+            </span>
+            {{ page()?.isPublished ? 'Published' : 'Draft' }}
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        <button (click)="savePage()" class="ui-btn ui-btn-primary">
+          <i class="pi pi-save"></i> Save
+        </button>
+
+        <button (click)="togglePublish()"
+                class="ui-btn"
+                [class.ui-btn-danger]="page()?.isPublished"
+                [class.ui-btn-success]="!page()?.isPublished">
+          <i [class]="page()?.isPublished ? 'pi pi-eye-slash' : 'pi pi-upload'"></i>
+          {{ page()?.isPublished ? 'Unpublish' : 'Publish' }}
+        </button>
+      </div>
+    </header>
+
+    <nav class="flex ui-border-b ui-bg-subtle">
+      <button (click)="activeTab.set('sections')"
+              class="flex-1 ui-tab"
+              [class.ui-tab-active]="activeTab() === 'sections'">
+        Layout
+      </button>
+
+      <button (click)="activeTab.set('add')"
+              class="flex-1 ui-tab"
+              [class.ui-tab-active]="activeTab() === 'add'">
+        Components
+      </button>
+    </nav>
+
+    @if (activeTab() === 'add') {
+      <section class="flex-1 overflow-y-auto p-4 ui-bg-subtle">
+        <div class="grid grid-cols-2 gap-3">
+          @for (type of availableTypes; track type.id) {
+            <button (click)="addSection(type.id)"
+                    class="ui-card ui-card-hover flex flex-col items-center p-4 text-center h-24 justify-center">
+              <div class="mb-2 text-gray-500">
+                <i [class]="'pi pi-' + type.icon + ' text-xl'"></i>
+              </div>
+              <span class="text-xs font-semibold">{{ type.label }}</span>
+            </button>
+          }
+        </div>
+      </section>
+    }
+
+    @if (activeTab() === 'sections') {
+      <section class="flex-1 overflow-y-auto p-4 ui-bg-subtle"
+               cdkDropList
+               (cdkDropListDropped)="drop($event)">
+
+        @for (section of sections(); track section.id) {
+          <div cdkDrag
+               cdkDragLockAxis="y"
+               class="ui-card flex items-center gap-3 mb-2 p-3 cursor-move ui-card-hover group"
+               [class.ui-ring]="selectedSection()?.id === section.id"
+               (click)="selectSection(section)">
+
+            <span class="text-gray-300 group-hover:text-gray-500 transition-colors">
+              <i class="pi pi-bars"></i>
+            </span>
+
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-bold uppercase tracking-wide truncate text-gray-700">
+                {{ section.type.replace('_', ' ') }}
+              </div>
+              <div class="text-xs truncate ui-text-muted">
+                {{ section.config['title'] || 'Untitled' }}
+              </div>
+            </div>
+
+            <button (click)="deleteSection(section.id, $event)"
+                    class="ui-icon-btn ui-icon-btn-danger opacity-0 group-hover:opacity-100 transition-opacity">
+              <i class="pi pi-trash text-xs"></i>
+            </button>
+          </div>
+        }
+
+        @if (sections().length === 0) {
+          <div class="h-full flex flex-col items-center justify-center text-center ui-text-muted p-6">
+            <i class="pi pi-box text-3xl opacity-30 mb-3"></i>
+            <p class="text-sm">Page is empty</p>
+            <button (click)="activeTab.set('add')" class="ui-link mt-2">
+              Add a component
+            </button>
+          </div>
+        }
+      </section>
+    }
+
+    @if (selectedSection(); as section) {
+      <section class="border-t ui-bg-surface flex flex-col shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-20" 
+               style="max-height: 50%;">
+        
+        <header class="p-3 flex justify-between items-center ui-border-b ui-bg-subtle text-sm font-semibold">
+          <span class="truncate pr-2">{{ section.type | titlecase }} Settings</span>
+          <div class="flex gap-1">
+            <button class="ui-icon-btn ui-icon-btn-danger" 
+                    (click)="deleteSection(section.id, $event)" 
+                    title="Delete Section">
+              <i class="pi pi-trash"></i>
+            </button>
+            <button class="ui-icon-btn" (click)="selectedSection.set(null)">
+              <i class="pi pi-times"></i>
+            </button>
+          </div>
+        </header>
+
+        <div class="p-4 overflow-y-auto space-y-4">
+          
+          <div>
+            <label class="ui-label">Title</label>
+            <input class="ui-input"
+                   [value]="section.config['title'] || ''"
+                   (input)="updateConfig('title', $any($event.target).value)" />
+          </div>
+
+          <div>
+            <label class="ui-label">Subtitle</label>
+            <textarea rows="2" class="ui-input"
+                      [value]="section.config['subtitle'] || ''"
+                      (input)="updateConfig('subtitle', $any($event.target).value)"></textarea>
+          </div>
+
+          @if (section.type === 'hero_banner') {
+            <div>
+              <label class="ui-label">Image URL</label>
+              <input class="ui-input ui-input-mono"
+                     [value]="section.config['backgroundImage'] || ''"
+                     (input)="updateConfig('backgroundImage', $any($event.target).value)" />
+            </div>
+          }
+
+          @if (section.type === 'product_slider') {
+            <div class="space-y-4 pt-2 border-t border-dashed border-gray-200">
+              <h4 class="text-xs font-bold text-blue-600 uppercase">Data Source</h4>
+              
+              <div>
+                <label class="ui-label">Collection Rule</label>
+                <select class="ui-input"
+                        [value]="section.config['ruleType'] || 'new_arrivals'"
+                        (change)="updateConfig('ruleType', $any($event.target).value)">
+                  <option value="new_arrivals">New Arrivals</option>
+                  <option value="best_sellers">Best Sellers</option>
+                  <option value="trending">Trending Now</option>
+                  <option value="clearance_sale">Clearance Sale</option>
+                </select>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="ui-label">Total Items</label>
+                  <input type="number" class="ui-input" min="4" max="24"
+                         [value]="section.config['limit'] || 8"
+                         (input)="updateConfig('limit', $any($event.target).value)" />
+                </div>
+                <div>
+                  <label class="ui-label">Per Row</label>
+                  <input type="number" class="ui-input" min="2" max="5"
+                         [value]="section.config['itemsPerView'] || 4"
+                         (input)="updateConfig('itemsPerView', $any($event.target).value)" />
+                </div>
+              </div>
+            </div>
+          }
+
+        </div>
+      </section>
+    }
+  </aside>
+
+  <main class="flex-1 overflow-y-auto p-8 ui-bg-app flex justify-center perspective-1000">
+    
+    <div class="w-full max-w-6xl shadow-2xl rounded-xl overflow-hidden relative min-h-[800px] bg-white transition-all"
+         [style.--primary-color]="page()?.theme?.primaryColor || '#3B82F6'"
+         [style.--secondary-color]="page()?.theme?.secondaryColor || '#10B981'"
+         [style.font-family]="page()?.theme?.fontFamily || 'inherit'">
+
+      @for (section of sections(); track section.id) {
+        <div class="relative group ui-outline-hover transition-all duration-200"
+             [class.ui-outline-active]="selectedSection()?.id === section.id"
+             (click)="selectSection(section)">
+
+          @switch (section.type) {
+            @case ('hero_banner') {
+              <app-hero-banner [config]="section.config" />
+            }
+            @case ('product_slider') {
+              <app-product-slider [config]="section.config" />
+            }
+            @default {
+              <div class="p-12 text-center bg-gray-50 border-2 border-dashed border-gray-200 text-gray-400 m-4 rounded-lg">
+                <i class="pi pi-code text-2xl mb-2"></i>
+                <p>Preview for <strong>{{ section.type }}</strong> not available</p>
+              </div>
+            }
+          }
+
+          <div class="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-50 bg-white/90 backdrop-blur shadow-md rounded-lg p-1 border border-gray-100">
+            <button class="ui-icon-btn" (click)="moveUp(section, $event)">
+              <i class="pi pi-arrow-up"></i>
+            </button>
+            <button class="ui-icon-btn" (click)="moveDown(section, $event)">
+              <i class="pi pi-arrow-down"></i>
+            </button>
+            <div class="w-px bg-gray-300 mx-1 my-1"></div>
+            <button class="ui-icon-btn ui-icon-btn-danger" (click)="deleteSection(section.id, $event)">
+              <i class="pi pi-trash"></i>
+            </button>
+          </div>
+          
+        </div>
+      }
+
+      @if (sections().length === 0) {
+        <div class="absolute inset-0 flex flex-col items-center justify-center text-center ui-text-muted pointer-events-none">
+          <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+            <i class="pi pi-palette text-3xl opacity-20"></i>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900">Start Building</h3>
+          <p class="text-sm max-w-xs mx-auto mt-1">Select "Components" from the sidebar to add sections to your page.</p>
+        </div>
+      }
+
+    </div>
+  </main>
+
+</div>
+
+<!-- <div class="flex h-screen overflow-hidden font-sans ui-bg-app">
+
+  <aside class="w-80 flex flex-col ui-bg-surface ui-border-r ui-shadow-xl z-30">
+
+    <header class="p-4 ui-border-b">
+      <div class="flex items-center gap-3 mb-4">
+        <a routerLink="../../" class="ui-icon-btn" title="Back">
+          <i class="fas fa-arrow-left"></i>
+        </a>
+
+        <div class="min-w-0 flex-1">
+          <h2 class="text-sm font-bold truncate ui-text">
+            {{ page()?.name }}
+          </h2>
+
+          <p class="text-xs flex items-center gap-1 ui-text-muted">
+            <span class="w-2 h-2 rounded-full"
+                  [class.ui-bg-success]="page()?.isPublished"
+                  [class.ui-bg-warning]="!page()?.isPublished">
+            </span>
+            {{ page()?.isPublished ? 'Published' : 'Draft' }}
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        <button (click)="savePage()" class="ui-btn ui-btn-primary">
+          <i class="fas fa-save"></i> Save
+        </button>
+
+        <button (click)="togglePublish()"
+                class="ui-btn"
+                [class.ui-btn-danger]="page()?.isPublished"
+                [class.ui-btn-success]="!page()?.isPublished">
+          <i [class]="page()?.isPublished ? 'fas fa-eye-slash' : 'fas fa-rocket'"></i>
+          {{ page()?.isPublished ? 'Unpublish' : 'Publish' }}
+        </button>
+      </div>
+    </header>
+
+    <nav class="flex ui-border-b ui-bg-subtle">
+      <button (click)="activeTab.set('sections')"
+              class="flex-1 ui-tab"
+              [class.ui-tab-active]="activeTab() === 'sections'">
+        Layout
+      </button>
+
+      <button (click)="activeTab.set('add')"
+              class="flex-1 ui-tab"
+              [class.ui-tab-active]="activeTab() === 'add'">
+        Components
+      </button>
+    </nav>
+
+    @if (activeTab() === 'add') {
+      <section class="flex-1 overflow-y-auto p-4 ui-bg-subtle">
+        <div class="grid grid-cols-2 gap-3">
+          @for (type of availableTypes; track type.id) {
+            <button (click)="addSection(type.id)"
+                    class="ui-card ui-card-hover flex flex-col items-center p-4 text-center h-24 justify-center">
+              <div class="mb-2 text-gray-500">
+                <i [class]="'fas fa-' + type.icon + ' text-xl'"></i>
+              </div>
+              <span class="text-xs font-semibold">{{ type.label }}</span>
+            </button>
+          }
+        </div>
+      </section>
+    }
+
+    @if (activeTab() === 'sections') {
+      <section class="flex-1 overflow-y-auto p-4 ui-bg-subtle"
+               cdkDropList
+               (cdkDropListDropped)="drop($event)">
+
+        @for (section of sections(); track section.id) {
+          <div cdkDrag
+               class="ui-card flex items-center gap-3 mb-2 p-3 cursor-move ui-card-hover group"
+               [class.ui-ring]="selectedSection()?.id === section.id"
+               (click)="selectSection(section)">
+
+            <span class="text-gray-300 group-hover:text-gray-500 transition-colors">
+              <i class="fas fa-grip-vertical"></i>
+            </span>
+
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-bold uppercase tracking-wide truncate text-gray-700">
+                {{ section.type.replace('_', ' ') }}
+              </div>
+              <div class="text-xs truncate ui-text-muted">
+                {{ section.config['title'] || 'Untitled' }}
+              </div>
+            </div>
+
+            <button (click)="deleteSection(section.id, $event)"
+                    class="ui-icon-btn ui-icon-btn-danger opacity-0 group-hover:opacity-100 transition-opacity">
+              <i class="fas fa-trash-alt text-xs"></i>
+            </button>
+          </div>
+        }
+
+        @if (sections().length === 0) {
+          <div class="h-64 flex flex-col items-center justify-center text-center ui-text-muted">
+            <i class="fas fa-layer-group text-3xl opacity-20 mb-3"></i>
+            <p class="text-sm">Page is empty</p>
+            <button (click)="activeTab.set('add')" class="ui-link mt-2">
+              Add a component
+            </button>
+          </div>
+        }
+      </section>
+    }
+
+    @if (selectedSection(); as section) {
+      <section class="border-t ui-bg-surface flex flex-col shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-20" 
+               style="max-height: 50%;">
+        
+        <header class="p-3 flex justify-between items-center ui-border-b ui-bg-subtle text-sm font-semibold">
+          <span class="truncate pr-2">{{ section.type | titlecase }} Settings</span>
+          <div class="flex gap-1">
+            <button class="ui-icon-btn ui-icon-btn-danger" 
+                    (click)="deleteSection(section.id, $event)" 
+                    title="Delete Section">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+            <button class="ui-icon-btn" (click)="selectedSection.set(null)">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </header>
+
+        <div class="p-4 overflow-y-auto space-y-4">
+          
+          <div>
+            <label class="ui-label">Title</label>
+            <input class="ui-input"
+                   [value]="section.config['title'] || ''"
+                   (input)="updateConfig('title', $any($event.target).value)"
+                   placeholder="Section Heading" />
+          </div>
+
+          <div>
+            <label class="ui-label">Subtitle</label>
+            <textarea rows="2" class="ui-input"
+                      [value]="section.config['subtitle'] || ''"
+                      (input)="updateConfig('subtitle', $any($event.target).value)"
+                      placeholder="Optional description text"></textarea>
+          </div>
+
+          @if (section.type === 'hero_banner') {
+            <div>
+              <label class="ui-label">Image URL</label>
+              <input class="ui-input ui-input-mono"
+                     [value]="section.config['backgroundImage'] || ''"
+                     (input)="updateConfig('backgroundImage', $any($event.target).value)"
+                     placeholder="https://..." />
+            </div>
+          }
+
+          @if (section.type === 'product_slider') {
+            <div class="space-y-4 pt-2 border-t border-dashed border-gray-200">
+              <h4 class="text-xs font-bold text-blue-600 uppercase">Data Source</h4>
+              
+              <div>
+                <label class="ui-label">Collection Rule</label>
+                <select class="ui-input"
+                        [value]="section.config['ruleType'] || 'new_arrivals'"
+                        (change)="updateConfig('ruleType', $any($event.target).value)">
+                  <option value="new_arrivals">New Arrivals</option>
+                  <option value="best_sellers">Best Sellers</option>
+                  <option value="trending">Trending Now</option>
+                  <option value="clearance_sale">Clearance Sale</option>
+                </select>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="ui-label">Total Items</label>
+                  <input type="number" class="ui-input" min="4" max="24"
+                         [value]="section.config['limit'] || 8"
+                         (input)="updateConfig('limit', $any($event.target).value)" />
+                </div>
+                <div>
+                  <label class="ui-label">Per Row</label>
+                  <input type="number" class="ui-input" min="2" max="5"
+                         [value]="section.config['itemsPerView'] || 4"
+                         (input)="updateConfig('itemsPerView', $any($event.target).value)" />
+                </div>
+              </div>
+            </div>
+          }
+
+        </div>
+      </section>
+    }
+  </aside>
+
+  <main class="flex-1 overflow-y-auto p-8 ui-bg-app flex justify-center perspective-1000">
+    
+    <div class="w-full max-w-6xl shadow-2xl rounded-xl overflow-hidden relative min-h-[800px] bg-white transition-all"
+         [style.--primary-color]="page()?.theme?.primaryColor || '#3B82F6'"
+         [style.--secondary-color]="page()?.theme?.secondaryColor || '#10B981'"
+         [style.font-family]="page()?.theme?.fontFamily || 'inherit'">
+
+      @for (section of sections(); track section.id) {
+        <div class="relative group ui-outline-hover transition-all duration-200"
+             [class.ui-outline-active]="selectedSection()?.id === section.id"
+             (click)="selectSection(section)">
+
+          @switch (section.type) {
+            @case ('hero_banner') {
+              <app-hero-banner [config]="section.config" />
+            }
+            @case ('product_slider') {
+              <app-product-slider [config]="section.config" />
+            }
+            @default {
+              <div class="p-12 text-center bg-gray-50 border-2 border-dashed border-gray-200 text-gray-400 m-4 rounded-lg">
+                <i class="fas fa-code text-2xl mb-2"></i>
+                <p>Preview for <strong>{{ section.type }}</strong> not available</p>
+              </div>
+            }
+          }
+
+          <div class="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-50 bg-white/90 backdrop-blur shadow-md rounded-lg p-1 border border-gray-100">
+            <button class="ui-icon-btn" (click)="moveUp(section, $event)" title="Move Up">
+              <i class="fas fa-arrow-up"></i>
+            </button>
+            <button class="ui-icon-btn" (click)="moveDown(section, $event)" title="Move Down">
+              <i class="fas fa-arrow-down"></i>
+            </button>
+            <div class="w-px bg-gray-300 mx-1 my-1"></div>
+            <button class="ui-icon-btn ui-icon-btn-danger" (click)="deleteSection(section.id, $event)" title="Delete">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+          
+        </div>
+      }
+
+      @if (sections().length === 0) {
+        <div class="absolute inset-0 flex flex-col items-center justify-center text-center ui-text-muted pointer-events-none">
+          <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+            <i class="fas fa-paint-roller text-3xl opacity-20"></i>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900">Start Building</h3>
+          <p class="text-sm max-w-xs mx-auto mt-1">Select "Components" from the sidebar to add sections to your page.</p>
+        </div>
+      }
+
+    </div>
+  </main>
+
+</div> -->
+
+<!-- <div class="flex h-screen overflow-hidden font-sans ui-bg-app">
+
+  ================= SIDEBAR =================
+  <aside class="w-80 flex flex-col ui-bg-surface ui-border-r ui-shadow-xl z-30">
+
+    Header
+    <header class="p-4 ui-border-b">
+      <div class="flex items-center gap-3 mb-4">
+        <a
+          routerLink="../../"
+          class="ui-icon-btn"
+          title="Back">
+          <i class="fas fa-arrow-left"></i>
+        </a>
+
+        <div class="min-w-0">
+          <h2 class="text-sm font-bold truncate ui-text">
+            {{ page()?.name }}
+          </h2>
+
+          <p class="text-xs flex items-center gap-1 ui-text-muted">
+            <span
+              class="w-2 h-2 rounded-full"
+              [class.ui-bg-success]="page()?.isPublished"
+              [class.ui-bg-warning]="!page()?.isPublished">
+            </span>
+            {{ page()?.isPublished ? 'Published' : 'Draft' }}
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        <button
+          (click)="savePage()"
+          class="ui-btn ui-btn-primary">
+          <i class="fas fa-save"></i>
+          Save
+        </button>
+
+        <button
+          (click)="togglePublish()"
+          class="ui-btn"
+          [class.ui-btn-danger]="page()?.isPublished"
+          [class.ui-btn-success]="!page()?.isPublished">
+          <i
+            [class]="page()?.isPublished ? 'fas fa-eye-slash' : 'fas fa-rocket'">
+          </i>
+          {{ page()?.isPublished ? 'Unpublish' : 'Publish' }}
+        </button>
+      </div>
+    </header>
+
+    Tabs
+    <nav class="flex ui-border-b ui-bg-subtle">
+      <button
+        (click)="activeTab.set('sections')"
+        class="flex-1 ui-tab"
+        [class.ui-tab-active]="activeTab() === 'sections'">
+        Layout
+      </button>
+
+      <button
+        (click)="activeTab.set('add')"
+        class="flex-1 ui-tab"
+        [class.ui-tab-active]="activeTab() === 'add'">
+        Components
+      </button>
+    </nav>
+
+    ADD COMPONENTS
+    @if (activeTab() === 'add') {
+      <section class="flex-1 overflow-y-auto p-4 ui-bg-subtle">
+        <div class="grid grid-cols-2 gap-3">
+          @for (type of availableTypes; track type.id) {
+            <button
+              (click)="addSection(type.id)"
+              class="ui-card ui-card-hover flex flex-col items-center p-4">
+              <div class="w-10 h-10 rounded-full ui-bg-muted flex items-center justify-center mb-3">
+                <i [class]="'fas fa-' + type.icon"></i>
+              </div>
+              <span class="text-xs font-semibold">
+                {{ type.label }}
+              </span>
+            </button>
+          }
+        </div>
+      </section>
+    }
+
+    SECTIONS LIST
+    @if (activeTab() === 'sections') {
+      <section
+        class="flex-1 overflow-y-auto p-4 ui-bg-subtle"
+        cdkDropList
+        (cdkDropListDropped)="drop($event)">
+
+        @for (section of sections(); track section.id) {
+          <div
+            cdkDrag
+            cdkDragLockAxis="y"
+            class="ui-card flex items-center gap-3 mb-2 cursor-move ui-card-hover"
+            [class.ui-ring]="selectedSection()?.id === section.id"
+            (click)="selectSection(section)">
+
+            <span class="ui-text-muted">
+              <i class="fas fa-grip-vertical"></i>
+            </span>
+
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-bold uppercase tracking-wide truncate">
+                {{ section.type.replace('_', ' ') }}
+              </div>
+              <div class="text-xs truncate ui-text-muted">
+                {{ section.config['title'] || 'Untitled section' }}
+              </div>
+            </div>
+
+            <button
+              (click)="deleteSection(section.id, $event)"
+              class="ui-icon-btn ui-icon-btn-danger">
+              <i class="fas fa-trash text-xs"></i>
+            </button>
+          </div>
+        }
+
+        @if (sections().length === 0) {
+          <div class="h-full flex flex-col items-center justify-center text-center ui-text-muted p-6">
+            <i class="fas fa-layer-group text-3xl opacity-30 mb-3"></i>
+            <p class="text-sm">No sections added</p>
+            <button
+              (click)="activeTab.set('add')"
+              class="ui-link mt-2">
+              Add your first section
+            </button>
+          </div>
+        }
+      </section>
+    }
+
+    CONFIG PANEL
+     @if (selectedSection(); as section) {
+      <section class="border-t ui-bg-surface max-h-[45%] flex flex-col">
+        <header class="p-3 flex justify-between items-center ui-border-b ui-bg-subtle text-sm font-semibold">
+          <span>
+            {{ section.type | titlecase }} Settings
+          </span>
+          <button class="ui-icon-btn" (click)="selectedSection.set(null)">
+            <i class="fas fa-chevron-down"></i>
+          </button>
+        </header>
+
+        <div class="p-4 overflow-y-auto space-y-4">
+          <div>
+            <label class="ui-label">Title</label>
+            <input class="ui-input"
+                   [value]="section.config['title'] || ''"
+                   (input)="updateConfig('title', $any($event.target).value)" />
+          </div>
+          
+          <div>
+            <label class="ui-label">Subtitle</label>
+            <textarea rows="2" class="ui-input"
+                   [value]="section.config['subtitle'] || ''"
+                   (input)="updateConfig('subtitle', $any($event.target).value)">
+            </textarea>
+          </div>
+
+          @if (section.type === 'hero_banner') {
+            <div>
+              <label class="ui-label">Background Image URL</label>
+              <input class="ui-input ui-input-mono"
+                     [value]="section.config['backgroundImage'] || ''"
+                     (input)="updateConfig('backgroundImage', $any($event.target).value)" />
+            </div>
+          }
+
+          @if (section.type === 'product_slider') {
+            <div class="space-y-4 border-t pt-4 mt-2">
+              <h3 class="text-xs font-bold text-primary-600 uppercase">Data Source</h3>
+              
+              <div>
+                <label class="ui-label">Collection</label>
+                <select class="ui-input"
+                        [value]="section.config['ruleType'] || 'new_arrivals'"
+                        (change)="updateConfig('ruleType', $any($event.target).value)">
+                  <option value="new_arrivals">New Arrivals</option>
+                  <option value="best_sellers">Best Sellers</option>
+                  <option value="trending">Trending Now</option>
+                  <option value="clearance_sale">Clearance Sale</option>
+                </select>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="ui-label">Items to Show</label>
+                  <input type="number" class="ui-input" min="4" max="24"
+                         [value]="section.config['limit'] || 8"
+                         (input)="updateConfig('limit', $any($event.target).value)" />
+                </div>
+                <div>
+                  <label class="ui-label">Items Per Row</label>
+                  <input type="number" class="ui-input" min="2" max="5"
+                         [value]="section.config['itemsPerView'] || 4"
+                         (input)="updateConfig('itemsPerView', $any($event.target).value)" />
+                </div>
+              </div>
+            </div>
+          }
+
+        </div>
+      </section>
+    }
+  </aside>
+
+  ================= CANVAS =================
+  <main class="flex-1 overflow-y-auto p-8 ui-bg-app flex justify-center">
+    <div class="w-full max-w-6xl space-y-6">
+
+      @for (section of sections(); track section.id) {
+        <div
+          class="relative group rounded-xl overflow-hidden ui-outline-hover"
+          [class.ui-outline-active]="selectedSection()?.id === section.id"
+          (click)="selectSection(section)">
+
+          @switch (section.type) {
+            @case ('hero_banner') {
+              <app-hero-banner [config]="section.config" />
+            }
+            @case ('product_slider') {
+              <app-product-slider [config]="section.config" />
+            }
+            @default {
+              <div class="p-10 ui-bg-subtle text-center ui-text-muted rounded-lg">
+                Preview not available
+              </div>
+            }
+          }
+
+          Floating Toolbar
+          <div class="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition">
+            <button
+              class="ui-icon-btn"
+              (click)="moveUp(section, $event)">
+              <i class="fas fa-arrow-up"></i>
+            </button>
+            <button
+              class="ui-icon-btn"
+              (click)="moveDown(section, $event)">
+              <i class="fas fa-arrow-down"></i>
+            </button>
+            <button
+              class="ui-icon-btn ui-icon-btn-danger"
+              (click)="deleteSection(section.id, $event)">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </main>
+
+</div> -->

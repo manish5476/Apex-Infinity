@@ -134,6 +134,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
     icon: 'pi pi-cog',
     items: [
       { label: 'Organization', icon: 'pi pi-building', routerLink: ['/admin/organization'] },
+      { label: 'storefront', icon: 'pi pi-pages', routerLink: ['/storefront/pages'] },
       { label: 'Branches', icon: 'pi pi-map-marker', routerLink: ['/branches'] },
       { label: 'Roles & Permissions', icon: 'pi pi-lock', routerLink: ['/admin/roles'] },
       { label: 'Master Data', icon: 'pi pi-database', routerLink: ['/masterList'] },
