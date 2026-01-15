@@ -1,14 +1,9 @@
-import { Component, Input, HostBinding, ElementRef, OnInit } from '@angular/core';
+import { Component, Input, HostBinding } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 
 export type HeroHeight = 'small' | 'medium' | 'large' | 'full' | 'auto';
 export type TextAlign = 'left' | 'center' | 'right';
-export type ContentPosition = 'top-left' | 'top-center' | 'top-right' | 
-                              'center-left' | 'center' | 'center-right' | 
-                              'bottom-left' | 'bottom-center' | 'bottom-right';
-export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'gradient';
-export type OverlayType = 'solid' | 'gradient' | 'gradient-radial' | 'none';
+export type ButtonVariant = 'primary' | 'secondary' | 'outline';
 
 export interface CTAButton {
   text: string;
@@ -16,244 +11,129 @@ export interface CTAButton {
   variant: ButtonVariant;
   icon?: string;
   external?: boolean;
-  disabled?: boolean;
-  onClick?: () => void;
 }
 
 export interface HeroConfig {
-  // Layout & Dimensions
+  // Layout
   height: HeroHeight;
-  minHeight?: string;
-  maxHeight?: string;
   fullWidth?: boolean;
-  container?: boolean;
   
   // Background
   backgroundImage?: string;
   backgroundColor?: string;
-  backgroundSize?: 'cover' | 'contain' | 'auto';
   backgroundPosition?: string;
-  parallax?: boolean;
-  videoBackground?: string;
   
   // Overlay
-  overlayType: OverlayType;
   overlayColor?: string;
-  overlayGradient?: string;
   overlayOpacity: number;
-  blurOverlay?: boolean;
   
   // Content
   title: string;
   subtitle?: string;
-  tagline?: string;
   textAlign: TextAlign;
-  contentPosition: ContentPosition;
   maxContentWidth?: string;
-  textColor?: string;
   
-  // Typography
-  titleSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
-  subtitleSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-  titleWeight?: 'light' | 'normal' | 'medium' | 'semibold' | 'bold' | 'extrabold';
-  
-  // Call to Action
+  // CTA
   ctaButtons?: CTAButton[];
-  ctaButtonsAlignment?: 'start' | 'center' | 'end' | 'stretch';
-  
-  // Badge/Indicator
-  badge?: {
-    text: string;
-    color: string;
-    position: 'top-left' | 'top-right';
-  };
   
   // Animation
-  animateTitle?: boolean;
-  animateSubtitle?: boolean;
-  staggerButtons?: boolean;
-  
-  // Advanced
-  customClasses?: string;
-  contentPadding?: string;
-  borderRadius?: string;
-  shadow?: boolean;
-  glassEffect?: boolean;
+  animateContent?: boolean;
 }
 
 @Component({
   selector: 'app-hero-banner',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule],
   template: `
-    <section 
-      class="hero-banner relative overflow-hidden transition-all duration-300"
-      [ngClass]="[
-        config?.customClasses || '',
-        config?.shadow ? 'shadow-2xl' : '',
-        config?.glassEffect ? 'backdrop-blur-sm bg-white/5' : '',
-        config?.fullWidth ? 'w-full' : 'mx-auto',
-        config?.borderRadius || 'rounded-none'
-      ]"
-      [style.min-height]="config?.minHeight"
-      [style.max-height]="config?.maxHeight"
+    <div 
+      class="hero-banner relative overflow-hidden"
+      [ngClass]="{
+        'w-full': config?.fullWidth,
+        'container mx-auto': !config?.fullWidth
+      }"
     >
-      <!-- Badge -->
-      @if (config?.badge) {
-        <div class="absolute z-20 {{getBadgePosition(config.badge.position)}} m-4">
-          <span class="px-3 py-1 text-xs font-semibold rounded-full {{config.badge.color}}">
-            {{config.badge.text}}
-          </span>
-        </div>
-      }
-
-      <!-- Video Background -->
-      @if (config?.videoBackground) {
-        <div class="absolute inset-0 z-0 overflow-hidden">
-          <video 
-            class="w-full h-full object-cover"
-            [autoplay]="true"
-            [muted]="true"
-            [loop]="true"
-            [playsinline]="true"
-            [src]="config.videoBackground"
-          ></video>
-        </div>
-      }
-
-      <!-- Image Background -->
-      @if (config?.backgroundImage && !config.videoBackground) {
+      <!-- Background -->
+      @if (config?.backgroundImage) {
         <div 
-          class="absolute inset-0 z-0 bg-cover bg-center transition-transform duration-700"
-          [style.background-image]="'url(' + config.backgroundImage + ')'"
-          [style.background-size]="config.backgroundSize || 'cover'"
-          [style.background-position]="config.backgroundPosition || 'center'"
-          [class.parallax]="config.parallax"
+          class="absolute inset-0 bg-cover bg-center"
+          [style]="getBackgroundStyle()"
         ></div>
       }
-
-      <!-- Color Background -->
-      @if (config?.backgroundColor && !config.backgroundImage && !config.videoBackground) {
+      @if (config?.backgroundColor && !config?.backgroundImage) {
         <div 
-          class="absolute inset-0 z-0"
+          class="absolute inset-0"
           [style.background]="config.backgroundColor"
         ></div>
       }
 
       <!-- Overlay -->
-      @if (config?.overlayType !== 'none') {
-        <div 
-          class="absolute inset-0 z-1 transition-all duration-300"
-          [ngClass]="{
-            'backdrop-blur-xs': config.blurOverlay
-          }"
-          [style]="getOverlayStyle()"
-        ></div>
-      }
-
-      <!-- Content Container -->
       <div 
-        class="relative z-10 h-full w-full"
-        [ngClass]="{
-          'container mx-auto': config?.container !== false,
-          'px-4 sm:px-6 lg:px-8': config?.container !== false
-        }"
-        [style.padding]="config?.contentPadding || '2rem'"
+        class="absolute inset-0"
+        [style.background-color]="config?.overlayColor || 'var(--color-overlay)'"
+        [style.opacity]="config?.overlayOpacity || 0.5"
+      ></div>
+
+      <!-- Content -->
+      <div 
+        class="relative h-full px-var(--spacing-xl) flex flex-col"
+        [ngClass]="getContentClasses()"
+        [style.max-width]="config?.maxContentWidth"
       >
-        <div class="h-full flex {{getContentPositionClasses()}}">
-          <div 
-            class="{{getAnimationClasses()}}"
-            [style.max-width]="config?.maxContentWidth || '42rem'"
+        <!-- Title -->
+        <h1 
+          class="font-heading font-bold text-white mb-var(--spacing-lg) leading-tight"
+          [ngClass]="getTitleClasses()"
+          [class.animate-fade-in-up]="config?.animateContent"
+        >
+          {{ config?.title }}
+        </h1>
+
+        <!-- Subtitle -->
+        @if (config?.subtitle) {
+          <p 
+            class="font-body text-white/90 mb-var(--spacing-2xl) leading-relaxed"
+            [ngClass]="getSubtitleClasses()"
+            [class.animate-fade-in-up]="config?.animateContent"
+            [style.animation-delay]="'0.1s'"
           >
-            <!-- Tagline -->
-            @if (config?.tagline) {
-              <div class="mb-3">
-                <span class="inline-block px-3 py-1 text-sm font-semibold {{getTextColor('muted')}} bg-white/20 rounded-full backdrop-blur-sm">
-                  {{config.tagline}}
-                </span>
-              </div>
-            }
+            {{ config.subtitle }}
+          </p>
+        }
 
-            <!-- Title -->
-            <h1 
-              class="font-bold leading-tight tracking-tight {{getTitleSize()}} {{getTitleWeight()}} {{getTextColor()}} mb-4"
-              [class.animate-fade-in-up]="config?.animateTitle"
-            >
-              {{ config?.title }}
-            </h1>
-
-            <!-- Subtitle -->
-            @if (config?.subtitle) {
-              <p 
-                class="{{getSubtitleSize()}} {{getTextColor('muted')}} mb-8 leading-relaxed"
-                [class.animate-fade-in-up]="config?.animateSubtitle"
-                [style.animation-delay]="config?.animateTitle ? '0.2s' : '0s'"
+        <!-- CTA Buttons -->
+        @if (config?.ctaButtons?.length) {
+          <div 
+            class="flex flex-wrap gap-var(--spacing-lg)"
+            [ngClass]="getCTAAlignment()"
+          >
+            @for (btn of config.ctaButtons; track $index) {
+              <a 
+                [href]="btn.url"
+                [target]="btn.external ? '_blank' : '_self'"
+                [rel]="btn.external ? 'noopener noreferrer' : null"
+                class="inline-flex items-center gap-var(--spacing-sm) px-var(--spacing-2xl) py-var(--spacing-lg) rounded-var(--ui-border-radius) font-medium transition-colors"
+                [ngClass]="getButtonClasses(btn)"
               >
-                {{ config.subtitle }}
-              </p>
-            }
-
-            <!-- CTA Buttons -->
-            @if (config?.ctaButtons?.length) {
-              <div 
-                class="flex flex-wrap gap-3 {{getCTAAlignment()}}"
-                [class.stagger-animation]="config?.staggerButtons"
-              >
-                @for (btn of config.ctaButtons; track $index; let i = $index) {
-                  <button
-                    *ngIf="btn.onClick"
-                    type="button"
-                    (click)="btn.onClick?.()"
-                    [disabled]="btn.disabled"
-                    class="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed {{getButtonClasses(btn)}}"
-                    [style.animation-delay]="config?.staggerButtons ? (i * 0.1) + 's' : '0s'"
-                  >
-                    @if (btn.icon) {
-                      <i class="{{btn.icon}}"></i>
-                    }
-                    {{ btn.text }}
-                  </button>
-                  
-                  <a
-                    *ngIf="!btn.onClick"
-                    [href]="btn.url"
-                    [target]="btn.external ? '_blank' : '_self'"
-                    [rel]="btn.external ? 'noopener noreferrer' : null"
-                    [attr.aria-label]="btn.text"
-                    [disabled]="btn.disabled"
-                    class="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed {{getButtonClasses(btn)}}"
-                    [style.animation-delay]="config?.staggerButtons ? (i * 0.1) + 's' : '0s'"
-                  >
-                    @if (btn.icon) {
-                      <i class="{{btn.icon}}"></i>
-                    }
-                    {{ btn.text }}
-                    @if (btn.external) {
-                      <i class="fas fa-external-link-alt text-xs"></i>
-                    }
-                  </a>
+                @if (btn.icon) {
+                  <i [class]="btn.icon"></i>
                 }
-              </div>
+                {{ btn.text }}
+              </a>
             }
           </div>
-        </div>
+        }
       </div>
-    </section>
+    </div>
   `,
   styles: [`
     .hero-banner {
-      box-sizing: border-box;
-    }
-    
-    .parallax {
-      will-change: transform;
-      transform: translateZ(0);
+      font-family: var(--font-body);
     }
     
     @keyframes fadeInUp {
       from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(10px);
       }
       to {
         opacity: 1;
@@ -262,208 +142,92 @@ export interface HeroConfig {
     }
     
     .animate-fade-in-up {
-      animation: fadeInUp 0.6s ease-out forwards;
-    }
-    
-    .stagger-animation > * {
-      opacity: 0;
-      animation: fadeInUp 0.6s ease-out forwards;
-    }
-    
-    /* Button Variants */
-    .btn-primary {
-      @apply bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg hover:shadow-xl hover:from-primary-700 hover:to-primary-800;
-    }
-    
-    .btn-secondary {
-      @apply bg-white text-gray-900 shadow-lg hover:shadow-xl hover:bg-gray-50;
-    }
-    
-    .btn-outline {
-      @apply border-2 border-white text-white hover:bg-white/10;
-    }
-    
-    .btn-ghost {
-      @apply text-white hover:bg-white/10;
-    }
-    
-    .btn-gradient {
-      @apply bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg hover:shadow-xl hover:from-purple-700 hover:to-pink-700;
+      animation: fadeInUp var(--transition-base) forwards;
     }
   `]
 })
-export class HeroBannerComponent implements OnInit {
-  @Input() config: Partial<HeroConfig> = {
+export class HeroBannerComponent {
+  @Input() config: HeroConfig = {
     height: 'medium',
-    overlayType: 'solid',
     overlayOpacity: 0.5,
     textAlign: 'center',
-    contentPosition: 'center',
-    titleSize: '3xl',
-    subtitleSize: 'lg',
-    titleWeight: 'bold'
+    title: ''
   };
 
   @HostBinding('class') get hostClasses() {
     return `block ${this.getHeightClass()}`;
   }
 
-  constructor(private el: ElementRef) {}
-
-  ngOnInit() {
-    this.applyDefaultConfig();
-  }
-
-  private applyDefaultConfig() {
-    this.config = {
-      ...{
-        height: 'medium',
-        overlayType: 'solid',
-        overlayOpacity: 0.5,
-        textAlign: 'center',
-        contentPosition: 'center',
-        container: true,
-        backgroundSize: 'cover',
-        titleSize: '3xl',
-        subtitleSize: 'lg',
-        titleWeight: 'bold',
-        ctaButtonsAlignment: 'start'
-      },
-      ...this.config
-    };
-  }
-
-  getHeightClass(): string {
+  private getHeightClass(): string {
     const heights = {
-      small: 'h-[400px] md:h-[500px]',
-      medium: 'h-[500px] md:h-[600px] lg:h-[700px]',
-      large: 'h-[600px] md:h-[700px] lg:h-[800px]',
+      small: 'h-[300px]',
+      medium: 'h-[450px]',
+      large: 'h-[600px]',
       full: 'min-h-screen',
-      auto: 'min-h-[300px]'
+      auto: 'min-h-[250px]'
     };
     return heights[this.config.height || 'medium'];
   }
 
-  getOverlayStyle(): string {
-    if (!this.config.overlayType || this.config.overlayType === 'none') {
-      return '';
-    }
-
-    const opacity = this.config.overlayOpacity ?? 0.5;
-    
-    switch (this.config.overlayType) {
-      case 'gradient':
-        return `background: linear-gradient(to bottom, ${this.config.overlayColor || '#000000'}00 0%, ${this.config.overlayColor || '#000000'}${Math.round(opacity * 255).toString(16)} 100%); opacity: 1;`;
-      
-      case 'gradient-radial':
-        return `background: radial-gradient(circle at center, transparent 0%, ${this.config.overlayColor || '#000000'}${Math.round(opacity * 255).toString(16)} 100%); opacity: 1;`;
-      
-      case 'solid':
-      default:
-        return `background-color: ${this.config.overlayColor || '#000000'}; opacity: ${opacity};`;
-    }
+  getBackgroundStyle(): string {
+    const styles: string[] = [
+      `background-image: url(${this.config.backgroundImage})`,
+      `background-position: ${this.config.backgroundPosition || 'center'}`,
+      `background-size: cover`
+    ];
+    return styles.join('; ');
   }
 
-  getContentPositionClasses(): string {
-    const positions = {
-      'top-left': 'items-start justify-start',
-      'top-center': 'items-start justify-center',
-      'top-right': 'items-start justify-end',
-      'center-left': 'items-center justify-start',
-      'center': 'items-center justify-center',
-      'center-right': 'items-center justify-end',
-      'bottom-left': 'items-end justify-start',
-      'bottom-center': 'items-end justify-center',
-      'bottom-right': 'items-end justify-end',
+  getContentClasses(): string {
+    const alignments = {
+      left: 'items-start text-left',
+      center: 'items-center text-center',
+      right: 'items-end text-right'
     };
-    return positions[this.config.contentPosition || 'center'];
+    return `justify-center ${alignments[this.config.textAlign || 'center']}`;
   }
 
-  getTextColor(type: 'normal' | 'muted' = 'normal'): string {
-    const color = this.config.textColor || '#ffffff';
-    const isLight = this.isLightColor(color);
-    
-    if (type === 'muted') {
-      return isLight ? 'text-gray-800' : 'text-gray-200';
-    }
-    
-    return isLight ? 'text-gray-900' : 'text-white';
-  }
-
-  private isLightColor(color: string): boolean {
-    // Simple check - if overlay is light, use dark text
-    const opacity = this.config.overlayOpacity || 0.5;
-    return opacity < 0.3;
-  }
-
-  getTitleSize(): string {
+  getTitleClasses(): string {
     const sizes = {
-      xs: 'text-2xl md:text-3xl',
-      sm: 'text-3xl md:text-4xl',
-      md: 'text-4xl md:text-5xl',
-      lg: 'text-5xl md:text-6xl',
-      xl: 'text-6xl md:text-7xl',
-      '2xl': 'text-7xl md:text-8xl',
-      '3xl': 'text-8xl md:text-9xl',
-      '4xl': 'text-9xl md:text-10xl'
+      small: 'text-var(--font-size-4xl) md:text-var(--font-size-5xl)',
+      medium: 'text-var(--font-size-4xl) md:text-var(--font-size-5xl)',
+      large: 'text-var(--font-size-5xl) md:text-6xl',
+      full: 'text-var(--font-size-5xl) md:text-6xl',
+      auto: 'text-var(--font-size-4xl) md:text-var(--font-size-5xl)'
     };
-    return sizes[this.config.titleSize || '3xl'];
+    return sizes[this.config.height || 'medium'];
   }
 
-  getSubtitleSize(): string {
+  getSubtitleClasses(): string {
     const sizes = {
-      xs: 'text-sm',
-      sm: 'text-base',
-      md: 'text-lg',
-      lg: 'text-xl',
-      xl: 'text-2xl'
+      small: 'text-var(--font-size-lg)',
+      medium: 'text-var(--font-size-lg)',
+      large: 'text-var(--font-size-xl)',
+      full: 'text-var(--font-size-xl)',
+      auto: 'text-var(--font-size-lg)'
     };
-    return sizes[this.config.subtitleSize || 'lg'];
-  }
-
-  getTitleWeight(): string {
-    const weights = {
-      light: 'font-light',
-      normal: 'font-normal',
-      medium: 'font-medium',
-      semibold: 'font-semibold',
-      bold: 'font-bold',
-      extrabold: 'font-extrabold'
-    };
-    return weights[this.config.titleWeight || 'bold'];
+    return sizes[this.config.height || 'medium'];
   }
 
   getButtonClasses(btn: CTAButton): string {
-    const base = 'btn-';
+    const base = 'border-var(--ui-border-width) ';
+    
     const variants = {
-      primary: 'btn-primary',
-      secondary: 'btn-secondary',
-      outline: 'btn-outline',
-      ghost: 'btn-ghost',
-      gradient: 'btn-gradient'
+      primary: 'bg-primary-600 text-white border-primary-600 hover:bg-primary-700 hover:border-primary-700',
+      secondary: 'bg-white text-gray-900 border-white hover:bg-gray-100',
+      outline: 'bg-transparent text-white border-white hover:bg-white/10'
     };
-    return variants[btn.variant] || 'btn-primary';
+    
+    return base + (variants[btn.variant] || variants.primary);
   }
 
   getCTAAlignment(): string {
     const alignments = {
-      start: 'justify-start',
+      left: 'justify-start',
       center: 'justify-center',
-      end: 'justify-end',
-      stretch: 'justify-stretch'
+      right: 'justify-end'
     };
-    return alignments[this.config.ctaButtonsAlignment || 'start'];
-  }
-
-  getBadgePosition(position: 'top-left' | 'top-right'): string {
-    return position === 'top-right' ? 'top-0 right-0' : 'top-0 left-0';
-  }
-
-  getAnimationClasses(): string {
-    if (this.config.animateTitle || this.config.animateSubtitle) {
-      return 'will-change-transform';
-    }
-    return '';
+    return alignments[this.config.textAlign || 'center'];
   }
 }
 // import { Component, Input } from '@angular/core';
