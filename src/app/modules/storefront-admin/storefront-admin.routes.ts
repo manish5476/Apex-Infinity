@@ -17,5 +17,6 @@ export const STOREFRONT_ADMIN_ROUTES: Routes = [
     loadComponent: () => import('./pages/page-builder/page-builder.component')
       .then(m => m.PageBuilderComponent),
     title: 'Page Builder'
-  }
+  }, 
+ 
 ];

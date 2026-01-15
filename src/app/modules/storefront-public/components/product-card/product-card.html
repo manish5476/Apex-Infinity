@@ -1,1 +1,115 @@
-<p>product-card works!</p>
+<div class="card-root" (click)="viewDetails()" tabindex="0">
+
+  <img
+    [src]="displayImage"
+    [alt]="product.name"
+    class="card-image"
+    (error)="onImageError()"
+  />
+
+  <!-- Gradient scrim -->
+  <div class="card-scrim"></div>
+
+  <!-- TOP RIGHT ACTION -->
+  <div class="card-action">
+    <button
+      class="glass-pill-btn"
+      (click)="$event.stopPropagation(); viewDetails()">
+      View details
+    </button>
+  </div>
+
+  <!-- FOOTER (ALWAYS VISIBLE) -->
+  <div class="card-footer">
+    <h3 class="card-title" [title]="product.name">
+      {{ product.name }}
+    </h3>
+    <span class="card-subtitle">
+      {{ product.brand || 'Unknown brand' }}
+    </span>
+  </div>
+
+  <!-- HOVER REVEAL -->
+  <div class="card-reveal">
+    <p class="card-description">
+      {{ product.description || 'Explore the details of this product.' }}
+    </p>
+
+    <div class="stats-row">
+      <div class="stat-item">
+        <span class="stat-value">{{ product.stock?.stockLevel || 0 }}%</span>
+        <span class="stat-label">Stock</span>
+      </div>
+
+      <div class="stat-divider"></div>
+
+      <div class="stat-item">
+        <span class="stat-value">
+          {{ product.price.discounted || product.price.original }}
+        </span>
+        <span class="stat-label">Price</span>
+      </div>
+
+      <div class="stat-divider"></div>
+
+      <div class="stat-item">
+        <span class="stat-value">{{ product.rating || '4.8' }}</span>
+        <span class="stat-label">Rating</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- <div class="card-root" (click)="viewDetails()" tabindex="0">
+  
+  <img 
+    [src]="displayImage" 
+    [alt]="product.name" 
+    class="card-image"
+    (error)="onImageError()"
+  />
+
+  <div class="card-overlay">
+    
+    <div class="overlay-top">
+      <button class="glass-pill-btn" (click)="$event.stopPropagation(); viewDetails()">
+        View Details
+      </button>
+    </div>
+
+    <div class="overlay-bottom">
+      
+      <div class="visible-header">
+        <h3 class="card-title" [title]="product.name">{{ product.name }}</h3>
+        <span class="card-subtitle">by {{ product.brand || 'Unknown' }}</span>
+      </div>
+
+      <div class="reveal-info">
+        <p class="card-description">
+          {{ product.description || 'Explore the details of this amazing product. Discover its features and specifications.' }}
+        </p>
+
+        <div class="stats-row">
+          <div class="stat-item">
+            <span class="stat-value">{{ product.stock?.stockLevel || 0 }}%</span>
+            <span class="stat-label">Progress</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-value">
+              {{ product.price.currency === 'USD' ? '$' : '' }}{{ product.price.discounted || product.price.original }}
+            </span>
+            <span class="stat-label">Price</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-value">{{ product.rating || '4.8' }}</span>
+            <span class="stat-label">Rating</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div> -->

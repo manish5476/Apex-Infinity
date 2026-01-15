@@ -1,139 +1,339 @@
-<div class="min-h-screen ui-bg-app font-sans">
+<div class="page-container">
   
-  <div class="container mx-auto px-4 py-8">
-    
-    <div class="flex flex-col md:flex-row justify-between items-center mb-6 pb-4 border-b border-gray-200">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900">All Products</h1>
-        <p class="text-sm text-gray-500">Showing {{ products().length }} of {{ total() }} results</p>
-      </div>
-
-      <div class="flex items-center gap-3 mt-4 md:mt-0">
-        <label class="text-sm text-gray-600">Sort by:</label>
-        <select class="ui-input py-1.5 px-3 w-48 text-sm" 
-                [ngModel]="filters.sort" 
-                (ngModelChange)="applyFilter('sort', $event)">
-          <option value="createdAt">Newest Arrivals</option>
-          <option value="sellingPrice">Price: Low to High</option>
-          <option value="-sellingPrice">Price: High to Low</option>
-          <option value="name">Name (A-Z)</option>
-        </select>
-      </div>
+  <header class="controls-header">
+    <div class="header-left">
+      <h1 class="page-title">Shop All</h1>
+      <span class="result-count">{{ totalItems() }} items found</span>
     </div>
 
-    <div class="flex flex-col lg:flex-row gap-8">
-      
-      <aside class="w-full lg:w-64 flex-shrink-0 space-y-8">
-        
-        <div class="space-y-3">
-          <h3 class="font-bold text-gray-900 text-sm uppercase tracking-wide">Search</h3>
-          <input type="text" 
-                 class="ui-input" 
-                 placeholder="Search products..."
-                 [ngModel]="filters.search"
-                 (change)="applyFilter('search', $any($event.target).value)">
-        </div>
+    <div class="header-right">
+       <span class="p-input-icon-left search-wrapper">
+        <i class="pi pi-search"></i>
+        <input 
+          type="text" 
+          pInputText 
+          placeholder="Search..." 
+          [ngModel]="filters.search"
+          (change)="applyFilter('search', $any($event.target).value)"
+          class="custom-search" />
+      </span>
 
-        <div class="space-y-3">
-          <h3 class="font-bold text-gray-900 text-sm uppercase tracking-wide">Categories</h3>
-          <div class="space-y-2 max-h-60 overflow-y-auto">
-            <label class="flex items-center gap-2 cursor-pointer group">
-              <input type="radio" name="category" 
-                     [checked]="!filters.category"
-                     (change)="applyFilter('category', null)"
-                     class="text-primary-600 focus:ring-primary-500">
-              <span class="text-sm text-gray-600 group-hover:text-primary-600">All Categories</span>
-            </label>
-            
-            @for (cat of categories(); track cat._id) {
-              <label class="flex items-center gap-2 cursor-pointer group">
-                <input type="radio" name="category" 
-                       [value]="cat._id"
-                       [checked]="filters.category === cat._id"
-                       (change)="applyFilter('category', cat._id)"
-                       class="text-primary-600 focus:ring-primary-500">
-                <span class="text-sm text-gray-600 group-hover:text-primary-600 flex-1">
-                  {{ cat._id }}
-                </span>
-                <span class="text-xs text-gray-400">({{ cat.count }})</span>
-              </label>
+      <div class="sort-wrapper">
+        <span class="sort-label">Sort by</span>
+        <p-select 
+          [options]="sortOptions" 
+          [(ngModel)]="filters.sort" 
+          (onChange)="applyFilter('sort', $event.value)"
+          optionLabel="label" 
+          optionValue="value"
+          styleClass="custom-select">
+        </p-select>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout-wrapper">
+    
+    <aside class="filters-sidebar">
+      
+      <div class="filter-section">
+        <h3 class="filter-heading">Category</h3>
+        <ul class="category-list">
+          <li 
+            class="cat-item" 
+            [class.active]="!filters.category"
+            (click)="applyFilter('category', null)">
+            <span>All Categories</span>
+            <i class="pi pi-angle-right" *ngIf="!filters.category"></i>
+          </li>
+          
+          @for (cat of categories(); track cat._id) {
+            <li 
+              class="cat-item" 
+              [class.active]="filters.category === cat._id"
+              (click)="applyFilter('category', cat._id)">
+              <span class="truncate">{{ cat._id }}</span>
+              <span class="cat-count">{{ cat.count }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+
+      <div class="separator"></div>
+
+      <div class="filter-section">
+        <h3 class="filter-heading">Price Range</h3>
+        <div class="price-row">
+          <div class="price-field">
+            <span class="curr-symbol">$</span>
+            <input 
+              type="number" 
+              [ngModel]="filters.minPrice" 
+              (change)="applyFilter('minPrice', $any($event.target).value)"
+              placeholder="0" />
+          </div>
+          <span class="price-dash">–</span>
+          <div class="price-field">
+            <span class="curr-symbol">$</span>
+            <input 
+              type="number" 
+              [ngModel]="filters.maxPrice" 
+              (change)="applyFilter('maxPrice', $any($event.target).value)"
+              placeholder="Max" />
+          </div>
+        </div>
+      </div>
+
+      <div class="separator"></div>
+
+      <div class="filter-section">
+        <h3 class="filter-heading">Availability</h3>
+        <div class="checkbox-row">
+          <p-checkbox 
+            [(ngModel)]="filters.inStock" 
+            [binary]="true" 
+            inputId="inStock"
+            (onChange)="applyFilter('inStock', filters.inStock)">
+          </p-checkbox>
+          <label for="inStock">In Stock Only</label>
+        </div>
+      </div>
+
+      <div class="separator"></div>
+
+      @if (tags().length > 0) {
+        <div class="filter-section">
+          <h3 class="filter-heading">Tags</h3>
+          <div class="tags-cloud">
+            @for (tag of tags(); track tag) {
+              <button 
+                class="tag-btn" 
+                [class.selected]="filters.tags?.includes(tag)"
+                (click)="toggleTag(tag)">
+                {{ tag }}
+              </button>
             }
           </div>
         </div>
+      }
 
-        <div class="space-y-3">
-          <h3 class="font-bold text-gray-900 text-sm uppercase tracking-wide">Price Range</h3>
-          <div class="flex items-center gap-2">
-            <input type="number" placeholder="Min" class="ui-input w-full text-sm"
-                   [ngModel]="filters.minPrice" (change)="applyFilter('minPrice', $any($event.target).value)">
-            <span class="text-gray-400">-</span>
-            <input type="number" placeholder="Max" class="ui-input w-full text-sm"
-                   [ngModel]="filters.maxPrice" (change)="applyFilter('maxPrice', $any($event.target).value)">
-          </div>
+      <button class="reset-filters-btn" (click)="clearFilters()">
+        <i class="pi pi-refresh"></i> Reset Filters
+      </button>
+
+    </aside>
+
+    <main class="products-area">
+      
+      @if (loading()) {
+        <div class="grid-layout">
+          @for (i of [1,2,3,4,5,6]; track i) {
+            <div class="skeleton-card animate-pulse">
+              <div class="sk-img"></div>
+              <div class="sk-txt w-3/4"></div>
+              <div class="sk-txt w-1/2"></div>
+            </div>
+          }
         </div>
-
-        <div class="space-y-3">
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" 
-                   [checked]="filters.inStock === true || filters.inStock === 'true'"
-                   (change)="applyFilter('inStock', $any($event.target).checked ? 'true' : null)"
-                   class="rounded text-primary-600 focus:ring-primary-500">
-            <span class="text-sm font-medium text-gray-700">In Stock Only</span>
-          </label>
-        </div>
-
-        <button (click)="clearFilters()" class="w-full ui-btn text-xs py-2 text-gray-500 hover:text-gray-900">
-          Clear All Filters
-        </button>
-      </aside>
-
-      <main class="flex-1">
+      } @else {
         
-        @if (loading()) {
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            @for (i of [1,2,3,4,5,6]; track i) {
-              <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 h-80 animate-pulse">
-                <div class="bg-gray-200 h-48 rounded-lg mb-4"></div>
-                <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+        @if (products().length > 0) {
+          <div class="grid-layout">
+            @for (product of products(); track product.id) {
+               <app-product-card 
+                [product]="product" 
+                [orgSlug]="orgSlug">
+              </app-product-card>
+            }
+          </div>
+
+          <div class="pagination-container">
+            <p-paginator 
+              (onPageChange)="onPageChange($event)" 
+              [first]="first()" 
+              [rows]="rows()" 
+              [totalRecords]="totalItems()" 
+              [rowsPerPageOptions]="[12, 24, 48]"
+              styleClass="custom-paginator">
+            </p-paginator>
+          </div>
+
+        } @else {
+          <div class="no-results">
+            <div class="icon-circle">
+              <i class="pi pi-search"></i>
+            </div>
+            <h3>No products found</h3>
+            <p>Try adjusting your search or filters to find what you're looking for.</p>
+            <button pButton label="Clear Filters" class="p-button-outlined" (click)="clearFilters()"></button>
+          </div>
+        }
+      }
+    </main>
+
+  </div>
+</div>
+<!-- <div class="listing-container">
+  
+  <header class="page-header">
+    <div>
+      <h1 class="page-title">All Products</h1>
+      <p class="result-count">
+        Showing {{ products().length }} of {{ totalItems() }} results
+      </p>
+    </div>
+
+    <div class="sort-controls">
+      <label class="sort-label">Sort by:</label>
+      <p-select 
+        [options]="sortOptions" 
+        [(ngModel)]="filters.sort" 
+        (onChange)="applyFilter('sort', $event.value)"
+        optionLabel="label" 
+        optionValue="value"
+        placeholder="Sort Order">
+      </p-select>
+    </div>
+  </header>
+
+  <div class="layout-grid">
+    
+    <aside class="sidebar">
+      
+      <div class="filter-group">
+        <span class="filter-title">Search</span>
+        <p-iconfield iconPosition="left" class="w-full">
+            <p-inputicon styleClass="pi pi-search" />
+            <input 
+                pInputText 
+                type="text" 
+                placeholder="Search products..." 
+                [ngModel]="filters.search"
+                (change)="applyFilter('search', $any($event.target).value)"
+                class="w-full" />
+        </p-iconfield>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-title">Categories</span>
+        <div class="category-list">
+          <div 
+            class="cat-item" 
+            [class.active]="!filters.category"
+            (click)="applyFilter('category', null)">
+            <span>All Categories</span>
+          </div>
+          
+          @for (cat of categories(); track cat._id) {
+            <div 
+              class="cat-item" 
+              [class.active]="filters.category === cat._id"
+              (click)="applyFilter('category', cat._id)">
+              <span class="truncate">{{ cat._id }}</span>
+              <span class="cat-count">{{ cat.count }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-title">Price Range</span>
+        <div class="price-inputs">
+          <p-inputnumber 
+            [(ngModel)]="filters.minPrice" 
+            placeholder="Min" 
+            mode="currency" 
+            currency="USD" 
+            locale="en-US"
+            (onBlur)="applyFilter('minPrice', filters.minPrice)"
+            [inputStyle]="{'width': '100%'}"
+            styleClass="w-full">
+          </p-inputnumber>
+          <span class="price-separator">-</span>
+          <p-inputnumber 
+            [(ngModel)]="filters.maxPrice" 
+            placeholder="Max" 
+            mode="currency" 
+            currency="USD" 
+            locale="en-US"
+            (onBlur)="applyFilter('maxPrice', filters.maxPrice)"
+            [inputStyle]="{'width': '100%'}"
+            styleClass="w-full">
+          </p-inputnumber>
+        </div>
+      </div>
+
+      @if (tags().length > 0) {
+        <div class="filter-group">
+          <span class="filter-title">Tags</span>
+          <div class="tags-wrapper">
+            @for (tag of tags(); track tag) {
+              <div 
+                class="tag-chip" 
+                [class.selected]="filters.tags?.includes(tag)"
+                (click)="toggleTag(tag)">
+                {{ tag }}
               </div>
             }
           </div>
-        } @else {
-          
-          @if (products().length > 0) {
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              @for (product of products(); track product.id) {
-                <app-product-card [product]="product"></app-product-card>
-              }
-            </div>
+        </div>
+      }
 
-            <div class="mt-12 flex justify-center gap-2">
-              <button (click)="changePage(filters.page - 1)" 
-                      [disabled]="filters.page <= 1"
-                      class="ui-btn disabled:opacity-50">
-                Previous
-              </button>
-              <span class="px-4 py-2 text-sm text-gray-600 font-medium">Page {{ filters.page }}</span>
-              <button (click)="changePage(filters.page + 1)" 
-                      class="ui-btn">
-                Next
-              </button>
-            </div>
+      <div class="filter-group">
+        <div class="flex items-center gap-2">
+          <p-checkbox 
+            [(ngModel)]="filters.inStock" 
+            [binary]="true" 
+            inputId="inStock"
+            (onChange)="applyFilter('inStock', filters.inStock)">
+          </p-checkbox>
+          <label for="inStock" class="text-sm cursor-pointer select-none">In Stock Only</label>
+        </div>
+      </div>
 
-          } @else {
-            <div class="text-center py-20 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
-              <div class="text-4xl mb-4">🔍</div>
-              <h3 class="text-lg font-bold text-gray-900">No products found</h3>
-              <p class="text-gray-500 mb-6">Try adjusting your filters or search query.</p>
-              <button (click)="clearFilters()" class="ui-btn ui-btn-primary mx-auto">
-                Clear Filters
-              </button>
+      <button class="reset-btn" (click)="clearFilters()">Reset All Filters</button>
+    </aside>
+
+    <main>
+      @if (loading()) {
+        <div class="products-grid">
+          @for (i of [1,2,3,4,5,6]; track i) {
+            <div class="bg-white rounded-lg p-4 h-[350px] animate-pulse border border-gray-100">
+              <div class="bg-gray-200 h-48 rounded mb-4 w-full"></div>
+              <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+              <div class="h-4 bg-gray-200 rounded w-1/2"></div>
             </div>
           }
-        }
-      </main>
+        </div>
+      } @else {
+        
+        @if (products().length > 0) {
+          <div class="products-grid">
+            @for (product of products(); track product.id) {
+              <app-product-card [product]="product" [orgSlug]="this.orgSlug"></app-product-card>
+            }
+          </div>
 
-    </div>
+          <div class="pagination-wrapper">
+            <p-paginator 
+              (onPageChange)="onPageChange($event)" 
+              [first]="first()" 
+              [rows]="rows()" 
+              [totalRecords]="totalItems()" 
+              [rowsPerPageOptions]="[12, 24, 48]">
+            </p-paginator>
+          </div>
+
+        } @else {
+          <div class="empty-state">
+            <i class="pi pi-search empty-icon"></i>
+            <div class="empty-text">No products found</div>
+            <p class="empty-subtext">We couldn't find any products matching your current filters. Try adjusting your search criteria.</p>
+            <button class="reset-btn" style="width: auto; margin-top: 1rem;" (click)="clearFilters()">Clear Filters</button>
+          </div>
+        }
+      }
+    </main>
+
   </div>
-</div>
+</div> -->

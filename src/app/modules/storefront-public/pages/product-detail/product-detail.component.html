@@ -1,0 +1,153 @@
+<p-toast position="bottom-right"></p-toast>
+
+<div class="page-container">
+  
+  @if (loading()) {
+    <div class="loading-center">
+      <i class="pi pi-spin pi-spinner" style="font-size: 2.5rem; color: var(--color-text-muted)"></i>
+    </div>
+  } 
+  
+  @else if (product(); as p) {
+    <div class="detail-layout">
+
+      <div class="visuals-column">
+        <div class="main-image-stage">
+          <img [src]="selectedImage()" [alt]="p.name" class="hero-img" />
+          
+          @if (p.price.hasDiscount) {
+            <span class="sale-tag">Sale -{{ discountPercentage() }}%</span>
+          }
+        </div>
+
+        @if (p.images?.length > 1) {
+          <div class="thumb-track">
+            @for (img of p.images; track img) {
+              <button 
+                class="thumb-btn" 
+                [class.active]="selectedImage() === img"
+                (click)="changeImage(img)">
+                <img [src]="img" [alt]="p.name" />
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="info-column">
+        
+        <nav class="breadcrumbs">
+          <a [routerLink]="['/store', orgSlug()]" class="crumb-link">Home</a>
+          <span class="crumb-sep">/</span>
+          <a [routerLink]="['/store', orgSlug(), 'products']" class="crumb-link">Products</a>
+          <span class="crumb-sep">/</span>
+          <span class="crumb-active">{{ p.name }}</span>
+        </nav>
+
+        <h1 class="product-headline">{{ p.name }}</h1>
+
+        <div class="price-area">
+          @if (p.price.hasDiscount) {
+            <span class="price-new">
+              {{ p.price.currency === 'USD' ? '$' : '₹' }}{{ p.price.discounted }}
+            </span>
+            <span class="price-old">
+              {{ p.price.currency === 'USD' ? '$' : '₹' }}{{ p.price.original }}
+            </span>
+          } @else {
+            <span class="price-new">
+              {{ p.price.currency === 'USD' ? '$' : '₹' }}{{ p.price.original }}
+            </span>
+          }
+          <span class="tax-note">(Incl. of all taxes)</span>
+        </div>
+
+        <p class="short-desc">
+          {{ p.description.substring(0, 150) }}...
+        </p>
+
+        <div class="variant-section">
+          <span class="variant-label">Color: <span class="selected-val">{{ selectedVariant()?.name }}</span></span>
+          <div class="swatch-list">
+            @for (v of variants(); track v.code) {
+              <button 
+                class="color-swatch" 
+                [class.selected]="selectedVariant() === v"
+                [style.background-color]="v.colorCode"
+                [pTooltip]="v.name"
+                tooltipPosition="top"
+                (click)="selectVariant(v)">
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="actions-row">
+          <div class="qty-box">
+            <button (click)="updateQuantity(-1)" class="qty-btn minus" [disabled]="quantity() <= 1">−</button>
+            <input type="text" [value]="quantity()" readonly class="qty-input">
+            <button (click)="updateQuantity(1)" class="qty-btn plus">+</button>
+          </div>
+
+          <button 
+            class="add-cart-btn" 
+            [disabled]="!p.stock?.available"
+            (click)="addToCart()">
+            {{ p.stock?.available ? 'Add to Cart' : 'Out of Stock' }}
+          </button>
+        </div>
+
+        <div class="benefits-grid">
+          <div class="benefit-item">
+            <i class="pi pi-truck"></i>
+            <span>Free Shipping</span>
+          </div>
+          <div class="benefit-item">
+            <i class="pi pi-verified"></i>
+            <span>1 Year Warranty</span>
+          </div>
+           <div class="benefit-item">
+            <i class="pi pi-replay"></i>
+            <span>7 Day Returns</span>
+          </div>
+        </div>
+
+        <div class="accordion-group">
+          
+          <div class="accordion-item">
+            <button class="accordion-header" (click)="toggleAccordion('desc')">
+              <span>Description</span>
+              <i class="pi transition-transform duration-300" 
+                 [class.pi-minus]="openAccordion() === 'desc'" 
+                 [class.pi-plus]="openAccordion() !== 'desc'"></i>
+            </button>
+            @if (openAccordion() === 'desc') {
+              <div class="accordion-content fade-in">
+                <p>{{ p.description }}</p>
+                <div class="mt-4 grid grid-cols-2 gap-2 text-xs">
+                    <div><span class="text-gray-500">Brand:</span> {{ p.brand || 'Generic' }}</div>
+                    <div><span class="text-gray-500">SKU:</span> {{ p.sku }}</div>
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="accordion-item">
+            <button class="accordion-header" (click)="toggleAccordion('info')">
+              <span>Shipping & Returns</span>
+              <i class="pi transition-transform duration-300" 
+                 [class.pi-minus]="openAccordion() === 'info'" 
+                 [class.pi-plus]="openAccordion() !== 'info'"></i>
+            </button>
+            @if (openAccordion() === 'info') {
+              <div class="accordion-content fade-in">
+                <p>Free standard shipping on all orders. Returns are accepted within 7 days of delivery for a full refund.</p>
+              </div>
+            }
+          </div>
+
+        </div>
+
+      </div> </div>
+  }
+</div>
