@@ -19,7 +19,6 @@ import { AppMessageService } from './core/services/message.service';
 })
 export class App implements OnInit, OnDestroy {
   protected readonly title = signal('apex');
-
   private auth = inject(AuthService);
   private socketService = inject(SocketService);
   private notificationService = inject(NotificationService);
@@ -35,9 +34,6 @@ export class App implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.masterList.initFromCache();
-
-    // Load master data if needed
-    // this.masterList.load().pipe(take(1)).subscribe();
   }
 
   private setupAuthListener(): void {
@@ -45,17 +41,10 @@ export class App implements OnInit, OnDestroy {
       next: (user) => {
         if (user && user._id && user.organizationId) {
           const token = this.auth.authTokenData;
-
           if (token) {
-            // Connect Socket Service
             this.socketService.connect(token, user.organizationId, user._id);
-
-            // Connect Notification Service
             this.notificationService.connect(user._id, token, user.organizationId);
-
-            // Load notifications
             this.loadNotifications(user._id);
-
             console.log('Socket & Notification services connected for user:', user._id);
           } else {
             console.warn('No token available for socket connection');
