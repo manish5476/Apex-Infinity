@@ -1,0 +1,139 @@
+<div class="min-h-screen ui-bg-app font-sans">
+  
+  <div class="container mx-auto px-4 py-8">
+    
+    <div class="flex flex-col md:flex-row justify-between items-center mb-6 pb-4 border-b border-gray-200">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">All Products</h1>
+        <p class="text-sm text-gray-500">Showing {{ products().length }} of {{ total() }} results</p>
+      </div>
+
+      <div class="flex items-center gap-3 mt-4 md:mt-0">
+        <label class="text-sm text-gray-600">Sort by:</label>
+        <select class="ui-input py-1.5 px-3 w-48 text-sm" 
+                [ngModel]="filters.sort" 
+                (ngModelChange)="applyFilter('sort', $event)">
+          <option value="createdAt">Newest Arrivals</option>
+          <option value="sellingPrice">Price: Low to High</option>
+          <option value="-sellingPrice">Price: High to Low</option>
+          <option value="name">Name (A-Z)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+      
+      <aside class="w-full lg:w-64 flex-shrink-0 space-y-8">
+        
+        <div class="space-y-3">
+          <h3 class="font-bold text-gray-900 text-sm uppercase tracking-wide">Search</h3>
+          <input type="text" 
+                 class="ui-input" 
+                 placeholder="Search products..."
+                 [ngModel]="filters.search"
+                 (change)="applyFilter('search', $any($event.target).value)">
+        </div>
+
+        <div class="space-y-3">
+          <h3 class="font-bold text-gray-900 text-sm uppercase tracking-wide">Categories</h3>
+          <div class="space-y-2 max-h-60 overflow-y-auto">
+            <label class="flex items-center gap-2 cursor-pointer group">
+              <input type="radio" name="category" 
+                     [checked]="!filters.category"
+                     (change)="applyFilter('category', null)"
+                     class="text-primary-600 focus:ring-primary-500">
+              <span class="text-sm text-gray-600 group-hover:text-primary-600">All Categories</span>
+            </label>
+            
+            @for (cat of categories(); track cat._id) {
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="radio" name="category" 
+                       [value]="cat._id"
+                       [checked]="filters.category === cat._id"
+                       (change)="applyFilter('category', cat._id)"
+                       class="text-primary-600 focus:ring-primary-500">
+                <span class="text-sm text-gray-600 group-hover:text-primary-600 flex-1">
+                  {{ cat._id }}
+                </span>
+                <span class="text-xs text-gray-400">({{ cat.count }})</span>
+              </label>
+            }
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <h3 class="font-bold text-gray-900 text-sm uppercase tracking-wide">Price Range</h3>
+          <div class="flex items-center gap-2">
+            <input type="number" placeholder="Min" class="ui-input w-full text-sm"
+                   [ngModel]="filters.minPrice" (change)="applyFilter('minPrice', $any($event.target).value)">
+            <span class="text-gray-400">-</span>
+            <input type="number" placeholder="Max" class="ui-input w-full text-sm"
+                   [ngModel]="filters.maxPrice" (change)="applyFilter('maxPrice', $any($event.target).value)">
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" 
+                   [checked]="filters.inStock === true || filters.inStock === 'true'"
+                   (change)="applyFilter('inStock', $any($event.target).checked ? 'true' : null)"
+                   class="rounded text-primary-600 focus:ring-primary-500">
+            <span class="text-sm font-medium text-gray-700">In Stock Only</span>
+          </label>
+        </div>
+
+        <button (click)="clearFilters()" class="w-full ui-btn text-xs py-2 text-gray-500 hover:text-gray-900">
+          Clear All Filters
+        </button>
+      </aside>
+
+      <main class="flex-1">
+        
+        @if (loading()) {
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            @for (i of [1,2,3,4,5,6]; track i) {
+              <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 h-80 animate-pulse">
+                <div class="bg-gray-200 h-48 rounded-lg mb-4"></div>
+                <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            }
+          </div>
+        } @else {
+          
+          @if (products().length > 0) {
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              @for (product of products(); track product.id) {
+                <app-product-card [product]="product"></app-product-card>
+              }
+            </div>
+
+            <div class="mt-12 flex justify-center gap-2">
+              <button (click)="changePage(filters.page - 1)" 
+                      [disabled]="filters.page <= 1"
+                      class="ui-btn disabled:opacity-50">
+                Previous
+              </button>
+              <span class="px-4 py-2 text-sm text-gray-600 font-medium">Page {{ filters.page }}</span>
+              <button (click)="changePage(filters.page + 1)" 
+                      class="ui-btn">
+                Next
+              </button>
+            </div>
+
+          } @else {
+            <div class="text-center py-20 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+              <div class="text-4xl mb-4">🔍</div>
+              <h3 class="text-lg font-bold text-gray-900">No products found</h3>
+              <p class="text-gray-500 mb-6">Try adjusting your filters or search query.</p>
+              <button (click)="clearFilters()" class="ui-btn ui-btn-primary mx-auto">
+                Clear Filters
+              </button>
+            </div>
+          }
+        }
+      </main>
+
+    </div>
+  </div>
+</div>
