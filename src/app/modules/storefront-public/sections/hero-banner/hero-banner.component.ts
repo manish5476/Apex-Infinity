@@ -11,7 +11,7 @@ import { RouterModule } from '@angular/router';
 })
 export class HeroBannerComponent {
   @Input() config: HeroConfig = {
-    title?: 'Make Something Colorful',
+    title: 'Make Something Colorful',
     subtitle: 'Hover over the text to see the magic happen.',
     backgroundImage: 'assets/hero-placeholder.jpg',
     height: 'full',
