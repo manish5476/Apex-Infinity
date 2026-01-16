@@ -72,9 +72,9 @@ export class HeroBannerComponent {
   }
 }
 export interface HeroConfig {
-  title?: string;          // Changed from 'string' to 'string | undefined'
+  title?: string;            // Added '?'
   subtitle?: string;
-  backgroundImage: string;
+  backgroundImage?: string;   // Added '?' <--- This is the one failing now
   height?: 'small' | 'medium' | 'large' | 'full';
   textAlign?: 'left' | 'center' | 'right';
   overlayColor?: string;
