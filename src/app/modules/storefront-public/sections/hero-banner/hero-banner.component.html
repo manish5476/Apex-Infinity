@@ -1,0 +1,139 @@
+<section class="hero-root" [ngClass]="heightClass">
+  
+  <div 
+    class="hero-bg" 
+    [style.background-image]="'url(' + config.backgroundImage + ')'">
+  </div>
+
+  <div 
+    class="hero-overlay"
+    [style.background-color]="config.overlayColor || '#000'"
+    [style.opacity]="config.overlayOpacity ?? 0.5">
+  </div>
+
+  <div class="hero-container" [ngClass]="alignClass">
+    <div class="hero-content animate-entrance">
+      
+      <h1 class="hero-title" aria-label="config.title">
+        @for (char of titleChars; track $index) {
+          <span 
+            class="shallow-text" 
+            [class.char-space]="char === ' '"
+            [style.color]="activeColors[$index] || null"
+            [style.text-shadow]="activeColors[$index] ? '0 0 20px ' + activeColors[$index] : 'none'"
+            (mouseenter)="onHover($index)"
+            (mouseleave)="onLeave($index)">
+            {{ char }}
+          </span>
+        }
+      </h1>
+
+      @if (config.subtitle) {
+        <p class="hero-subtitle">
+          {{ config.subtitle }}
+        </p>
+      }
+
+      @if (config.ctaButtons?.length) {
+        <div class="hero-actions">
+          @for (btn of config.ctaButtons; track $index) {
+            <a 
+              [routerLink]="btn.url" 
+              class="hero-btn"
+              [ngClass]="btn.variant">
+              {{ btn.text }}
+            </a>
+          }
+        </div>
+      }
+
+    </div>
+  </div>
+</section>
+<!-- <section class="hero-root" [ngClass]="heightClass">
+  
+  <div 
+    class="hero-bg" 
+    [style.background-image]="'url(' + config.backgroundImage + ')'">
+  </div>
+
+  <div 
+    class="hero-overlay"
+    [style.background-color]="config.overlayColor || '#000'"
+    [style.opacity]="config.overlayOpacity ?? 0.5">
+  </div>
+
+  <div class="hero-container" [ngClass]="alignClass">
+    <div class="hero-content animate-entrance">
+      
+      <h1 class="hero-title" aria-label="config.title">
+        @for (char of titleChars; track $index) {
+          <span class="hover-char" [class.char-space]="char === ' '">{{ char }}</span>
+        }
+      </h1>
+
+      @if (config.subtitle) {
+        <p class="hero-subtitle">
+          {{ config.subtitle }}
+        </p>
+      }
+
+      @if (config.ctaButtons?.length) {
+        <div class="hero-actions">
+          @for (btn of config.ctaButtons; track $index) {
+            <a 
+              [routerLink]="btn.url" 
+              class="hero-btn"
+              [ngClass]="btn.variant">
+              {{ btn.text }}
+            </a>
+          }
+        </div>
+      }
+
+    </div>
+  </div>
+</section> -->
+
+<!-- <section class="hero-root" [ngClass]="heightClass">
+  
+  <div 
+    class="hero-bg" 
+    [style.background-image]="'url(' + config.backgroundImage + ')'">
+  </div>
+
+  <div 
+    class="hero-overlay"
+    [style.background-color]="config.overlayColor || '#000'"
+    [style.opacity]="config.overlayOpacity ?? 0.5">
+  </div>
+
+  <div class="hero-container" [ngClass]="alignClass">
+    <div class="hero-content animate-entrance">
+      
+      <h1 class="hero-title">
+        {{ config.title }}
+      </h1>
+
+      @if (config.subtitle) {
+        <p class="hero-subtitle">
+          {{ config.subtitle }}
+        </p>
+      }
+
+      @if (config.ctaButtons?.length) {
+        <div class="hero-actions">
+          @for (btn of config.ctaButtons; track $index) {
+            <a 
+              [routerLink]="btn.url" 
+              class="hero-btn"
+              [ngClass]="btn.variant">
+              {{ btn.text }}
+            </a>
+          }
+        </div>
+      }
+
+    </div>
+  </div>
+</section> -->

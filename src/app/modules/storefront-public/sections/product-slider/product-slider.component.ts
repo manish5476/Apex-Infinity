@@ -1,7 +1,8 @@
-import { Component, Input, signal } from '@angular/core';
+import { Component, inject, Input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductCardComponent } from '../../components/product-card/product-card';
 import { PublicProduct } from '../../../../core/models/storefront.model';
+import { ActivatedRoute, Router } from '@angular/router';
 
 
 @Component({
@@ -30,7 +31,7 @@ import { PublicProduct } from '../../../../core/models/storefront.model';
         @for (product of products; track product.id) {
           <app-product-card 
             [product]="product" 
-            (addToCart)="handleAddToCart($event)">
+            (addToCart)="handleAddToCart($event)" [orgSlug]="this.orgSlug ">
           </app-product-card>
         }
       </div>
@@ -46,6 +47,16 @@ import { PublicProduct } from '../../../../core/models/storefront.model';
 export class ProductSliderComponent {
   @Input() config: any;
   @Input() products: PublicProduct[] = [];
+  orgSlug: any;
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  ngOnInit(): void {
+    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
+    //Add 'implements OnInit' to the class.
+    this.route.paramMap.subscribe((params: any) => {
+      this.orgSlug = params.get('orgSlug') || '';
+    });
+  }
 
   handleAddToCart(product: PublicProduct) {
     console.log('Adding to cart:', product.name);

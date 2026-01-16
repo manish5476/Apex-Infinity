@@ -1,4 +1,162 @@
-<div class="flex h-screen overflow-hidden font-sans ui-bg-app">
+<div class="h-screen flex flex-col bg-white font-sans text-slate-800 overflow-hidden">
+
+  <header class="h-14 border-b border-gray-200 flex items-center justify-between px-4 bg-white z-40 shrink-0">
+    <div class="flex items-center gap-3">
+      <a routerLink="../../" class="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all">
+        <i class="pi pi-arrow-left"></i>
+      </a>
+      <div>
+        <h1 class="text-sm font-bold text-gray-900">{{ page()?.name || 'Loading...' }}</h1>
+        <p class="text-[10px] text-gray-500 uppercase tracking-wider">Page Builder</p>
+      </div>
+    </div>
+
+    <div class="flex gap-3">
+      <div class="text-xs text-gray-400 flex items-center mr-2" *ngIf="isSaving()">
+        <i class="pi pi-spin pi-spinner mr-1"></i> Saving...
+      </div>
+      <button (click)="savePage()" 
+              [disabled]="isSaving()"
+              class="px-4 py-1.5 bg-slate-900 text-white text-xs font-bold rounded hover:bg-slate-700 transition-colors flex items-center gap-2">
+        <i class="pi pi-save"></i> Save Changes
+      </button>
+    </div>
+  </header>
+
+  <div class="flex-1 flex overflow-hidden">
+
+    <aside class="w-[320px] border-r border-gray-200 bg-slate-50 flex flex-col z-30 shrink-0 shadow-lg">
+      
+      <div class="flex-1 overflow-y-auto p-3" cdkDropList (cdkDropListDropped)="drop($event)">
+        
+        <div class="flex items-center justify-between mb-3 px-1">
+          <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Layers</span>
+          <span class="text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded">{{ sections().length }}</span>
+        </div>
+
+        @for (section of sections(); track section.id) {
+          <div cdkDrag 
+               class="group relative flex items-center gap-3 p-3 mb-2 bg-white border border-gray-200 rounded-lg cursor-pointer transition-all hover:shadow-sm"
+               [class.ring-2]="selectedSection()?.id === section.id"
+               [class.ring-blue-500]="selectedSection()?.id === section.id"
+               [class.border-blue-500]="selectedSection()?.id === section.id"
+               (click)="selectSection(section)">
+            
+            <div class="text-gray-300 cursor-move hover:text-gray-600"><i class="pi pi-bars"></i></div>
+            
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-bold text-gray-800 truncate">{{ (sectionRegistry[section.type]?.name || section.type) }}</div>
+              <div class="text-[10px] text-gray-500 truncate">{{ section.config?.title || 'No Title' }}</div>
+            </div>
+
+            <button (click)="deleteSection(section.id, $event)" 
+                    class="w-6 h-6 flex items-center justify-center rounded text-gray-300 hover:bg-red-50 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
+              <i class="pi pi-trash text-xs"></i>
+            </button>
+          </div>
+        }
+
+        <button (click)="showAddMenu.set(true)" 
+                *ngIf="!showAddMenu()"
+                class="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-400 text-xs font-bold uppercase hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50 transition-all mt-2">
+          + Add Section
+        </button>
+
+      </div>
+
+      @if (selectedSection(); as section) {
+        <div class="h-[55%] border-t border-gray-200 bg-white flex flex-col shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+          <div class="p-3 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+            <span class="text-xs font-bold uppercase text-gray-600 flex items-center gap-2">
+              <i class="pi pi-cog"></i> Configure
+            </span>
+            <button (click)="selectedSection.set(null)" class="text-gray-400 hover:text-gray-600">
+              <i class="pi pi-times"></i>
+            </button>
+          </div>
+          
+          <div class="flex-1 overflow-y-auto p-4 custom-scrollbar">
+            <app-config-form 
+              [config]="section.config" 
+              [schema]="sectionRegistry[section.type]?.allowedConfig"
+              (configChange)="onConfigChange($event)">
+            </app-config-form>
+          </div>
+        </div>
+      }
+
+    </aside>
+
+    <main id="preview-container" class="flex-1 bg-gray-100 overflow-y-auto p-8 flex justify-center relative">
+      
+      @if (showAddMenu()) {
+        <div class="absolute inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm" (click)="showAddMenu.set(false)">
+          <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col" (click)="$event.stopPropagation()">
+            <div class="p-4 border-b border-gray-100 flex justify-between items-center">
+              <h3 class="font-bold text-gray-800">Select a Component</h3>
+              <button (click)="showAddMenu.set(false)"><i class="pi pi-times"></i></button>
+            </div>
+            
+            <div class="p-4 overflow-y-auto grid grid-cols-2 md:grid-cols-3 gap-3">
+              @for (item of availableTypes; track item.type) {
+                <button (click)="addSection(item.type)" 
+                        class="flex flex-col items-start p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:ring-1 hover:ring-blue-500 hover:bg-blue-50 transition-all text-left group">
+                  <div class="mb-2 p-2 bg-gray-100 rounded-md group-hover:bg-white text-gray-500 group-hover:text-blue-600 transition-colors">
+                    <i class="pi text-xl" [ngClass]="'pi-' + item.icon"></i>
+                  </div>
+                  <span class="font-bold text-sm text-gray-800 mb-1">{{ item.name }}</span>
+                  <span class="text-[10px] text-gray-500 leading-tight">{{ item.description }}</span>
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      <div class="w-full max-w-[1280px] bg-white min-h-[800px] shadow-2xl transition-all duration-300 origin-top">
+        
+        @for (section of sections(); track section.id) {
+          <div class="relative group" 
+               [class.ring-2]="selectedSection()?.id === section.id"
+               [class.ring-blue-500]="selectedSection()?.id === section.id"
+               [class.z-10]="selectedSection()?.id === section.id"
+               (click)="selectSection(section)">
+            
+            <div class="absolute inset-0 border-2 border-transparent group-hover:border-blue-400 pointer-events-none transition-colors z-20"></div>
+            
+            <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-50">
+              <span class="bg-blue-600 text-white text-[10px] px-2 py-1 rounded font-bold uppercase tracking-wider shadow-sm">
+                {{ (sectionRegistry[section.type]?.name || section.type) }}
+              </span>
+            </div>
+
+            @switch (section.type) {
+              @case ('hero_banner') { <app-hero-banner [config]="section.config" /> }
+              @case ('product_slider') { <app-product-slider [config]="section.config" /> }
+              @default {
+                <div class="p-12 text-center border border-dashed border-gray-300 m-4 bg-gray-50 rounded">
+                  <p class="text-gray-400 font-medium">Component Preview: {{ section.type }}</p>
+                </div>
+              }
+            }
+
+          </div>
+        }
+
+        @if (sections().length === 0) {
+          <div class="h-[600px] flex flex-col items-center justify-center text-gray-300">
+            <i class="pi pi-image text-6xl mb-4 opacity-50"></i>
+            <p class="text-lg font-medium">Your page is empty</p>
+            <button (click)="showAddMenu.set(true)" class="mt-4 text-blue-500 font-bold hover:underline">Start adding sections</button>
+          </div>
+        }
+
+      </div>
+    </main>
+
+  </div>
+</div>
+<!-- <div class="flex h-screen overflow-hidden font-sans ui-bg-app">
 
   <aside class="w-80 flex flex-col ui-bg-surface ui-border-r ui-shadow-xl z-30">
 
@@ -249,7 +407,7 @@
     </div>
   </main>
 
-</div>
+</div> -->
 
 <!-- <div class="flex h-screen overflow-hidden font-sans ui-bg-app">
 

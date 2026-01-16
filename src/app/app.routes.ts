@@ -42,13 +42,34 @@ export const routes: Routes = [
 
   // ==========================================================
   //  3. PUBLIC STOREFRONT (Customer View)
-  //  ⚠️ IMPORTANT: Placed BEFORE the protected routes
+  //  ⚠️ MUST be before protected routes.
   // ==========================================================
+  
+  // A. Store Root Redirect
   {
     path: 'store/:orgSlug',
     redirectTo: 'store/:orgSlug/home',
     pathMatch: 'full'
   },
+
+  // B. Product Listing Page (Specific)
+  {
+    path: 'store/:orgSlug/products',
+    loadComponent: () => import('./modules/storefront-public/pages/product-listing/product-listing.component')
+      .then(m => m.ProductListingComponent),
+    title: 'Shop All Products'
+  },
+
+  // C. Product Detail Page (Specific)
+  {
+    path: 'store/:orgSlug/products/:productSlug',
+    loadComponent: () => import('./modules/storefront-public/pages/product-detail/product-detail.component')
+      .then(m => m.ProductDetailComponent),
+    title: 'Product Details'
+  },
+
+  // D. Generic Dynamic Page (Wildcard - MUST BE LAST in Storefront group)
+  // Catches /home, /about, /contact, etc.
   {
     path: 'store/:orgSlug/:pageSlug',
     loadComponent: () => import('./modules/storefront-public/pages/dynamic-page/dynamic-page.component')
@@ -141,12 +162,14 @@ export const routes: Routes = [
         loadComponent: () => import('./modules/organization/components/role-management/role-management').then((m) => m.RoleManagementComponent),
         title: 'Role Management'
       },
-      // Inside your protected dashboard children:
+      
+      // Storefront Builder (Admin View)
       {
         path: 'storefront',
         loadChildren: () => import('./modules/storefront-admin/storefront-admin.routes')
           .then(m => m.STOREFRONT_ADMIN_ROUTES)
       },
+      
       { path: 'masterList', component: MasterList, title: 'System Masters' },
       { path: 'sessions', component: Sessions, title: 'Active Sessions' },
       { path: 'logs', component: LogsComponent, title: 'System Logs' },
@@ -165,12 +188,6 @@ export const routes: Routes = [
   // ==========================================================
   { path: '**', component: NotFoundComponent }
 ];
-
-
-
-
-
-
 
 
 
