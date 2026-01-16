@@ -72,17 +72,17 @@ export class HeroBannerComponent {
   }
 }
 export interface HeroConfig {
-  title?: string;            // Added '?'
+  title?: string;
   subtitle?: string;
-  backgroundImage?: string;   // Added '?' <--- This is the one failing now
-  height?: 'small' | 'medium' | 'large' | 'full';
-  textAlign?: 'left' | 'center' | 'right';
+  backgroundImage?: string;
+  height?: string;    // Widening this to string helps too
+  textAlign?: string; // Widening this to string helps too
   overlayColor?: string;
   overlayOpacity?: number;
   ctaButtons?: Array<{
     text: string;
     url: string;
-    variant: 'primary' | 'secondary' | 'outline' | 'glass';
+    variant: string; // <--- Change this from the union to just 'string'
   }>;
 }
 // export interface HeroConfig {
