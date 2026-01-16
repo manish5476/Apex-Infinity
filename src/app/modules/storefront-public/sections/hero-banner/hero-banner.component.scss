@@ -1,226 +1,91 @@
-/* Import Roboto (Thin, Light, Regular, Bold, Black) */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
 
 :host {
-    display: block;
-    width: 100%;
+  display: block;
+  font-family: 'Inter', sans-serif;
 }
 
-.hero-root {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    background-color: #000;
-    font-family: 'Roboto', sans-serif;
-}
-
-/* Height Classes */
-.h-small { height: 450px; }
-.h-medium { height: 650px; }
-.h-large { height: 850px; }
-.h-full-screen { height: 100vh; }
-
-@media (max-width: 768px) {
-    .h-medium, .h-large, .h-full-screen { height: 100vh; }
-}
-
-/* Background & Overlay */
-.hero-bg {
-    position: absolute;
-    inset: 0;
-    background-size: cover;
-    background-position: center;
-    z-index: 1;
-    animation: zoomDrift 20s infinite alternate;
-}
-
-@keyframes zoomDrift {
-    from { transform: scale(1); }
-    to { transform: scale(1.1); }
-}
-
-.hero-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-}
-
-/* Content */
-.hero-container {
-    position: relative;
-    z-index: 3;
-    width: 100%;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 2rem;
-    display: flex;
-    flex-direction: column;
-}
-
-.align-left { align-items: flex-start; text-align: left; }
-.align-center { align-items: center; text-align: center; }
-.align-right { align-items: flex-end; text-align: right; }
-
-/* --- THE SHALLOW TEXT EFFECT --- */
-.hero-title {
-    font-family: 'Roboto', sans-serif;
-    font-size: 7rem; /* Huge, impactful text */
-    font-weight: 900; /* Roboto Black */
-    line-height: 1;
-    margin: 0 0 1.5rem 0;
-    
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: inherit;
-    cursor: default;
-    
-    /* Optimize for text animation */
-    -webkit-font-smoothing: antialiased;
-}
-
-.shallow-text {
-    display: inline-block;
-    
-    /* 1. The "Shallow" Default State */
-    color: rgba(255, 255, 255, 0.25); /* Faded / Ghostly */
-    transform: scale(1);
-    filter: blur(0px);
-    
-    /* 2. The "Revert Back" Transition */
-    /* Transition color slowly back to gray (1.5s), but transform quickly */
-    transition: 
-        color 1.5s ease-out, 
-        text-shadow 1.5s ease-out, 
-        transform 0.5s ease-out;
-}
-
-.char-space { width: 0.3em; }
-
-/* 3. The Hover State (Applied via JS style binding, but CSS helps transition) */
-.shallow-text:hover {
-    /* When JS applies the color, these transitions make it snappy */
-    transition: 
-        color 0.1s ease-out, 
-        text-shadow 0.1s ease-out, 
-        transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    
-    /* Pop effect */
-    transform: scale(1.15) translateY(-10px);
-    
-    /* Remove any blur */
-    filter: blur(0);
-}
-
-/* Subtitle */
-.hero-subtitle {
-    font-size: 1.5rem;
-    font-weight: 300; /* Roboto Light */
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 3rem;
-    max-width: 700px;
-}
-
-@media (max-width: 1024px) {
-    .hero-title { font-size: 5rem; }
-}
-@media (max-width: 768px) {
-    .hero-title { font-size: 3.5rem; justify-content: center; }
-    .hero-subtitle { font-size: 1.2rem; }
-}
-
-/* Buttons */
-.hero-actions {
-    display: flex;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-}
-.align-center .hero-actions { justify-content: center; }
-
-.hero-btn {
-    padding: 16px 42px;
-    border-radius: 4px;
-    font-weight: 700;
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.hero-btn.primary {
-    background: #fff;
-    color: #000;
-}
-.hero-btn.primary:hover {
-    background: #e2e2e2;
-    transform: translateY(-2px);
+.font-serif {
+  font-family: 'Playfair Display', serif;
 }
 
 /* Animations */
-.animate-entrance {
-    animation: fadeUp 1s ease-out forwards;
-    opacity: 0;
-    transform: translateY(30px);
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  transform: translateY(20px);
 }
-@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-500 { animation-delay: 0.5s; }
+.delay-700 { animation-delay: 0.7s; }
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// /* Import Roboto (Thin, Light, Regular, Bold, Black) */
+// @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;700;900&display=swap');
+
 // :host {
 //     display: block;
 //     width: 100%;
 // }
 
-// /* --- ROOT CONTAINER --- */
 // .hero-root {
 //     position: relative;
 //     width: 100%;
 //     overflow: hidden;
 //     display: flex;
 //     align-items: center;
-//     background-color: var(--color-surface-hover, #f3f4f6);
+//     background-color: #000;
+//     font-family: 'Roboto', sans-serif;
 // }
 
-// /* Heights */
-// .h-small { height: 400px; }
-// .h-medium { height: 600px; }
-// .h-large { height: 800px; }
+// /* Height Classes */
+// .h-small { height: 450px; }
+// .h-medium { height: 650px; }
+// .h-large { height: 850px; }
 // .h-full-screen { height: 100vh; }
 
 // @media (max-width: 768px) {
-//     .h-medium, .h-large { height: 550px; }
+//     .h-medium, .h-large, .h-full-screen { height: 100vh; }
 // }
 
-// /* --- BACKGROUND --- */
+// /* Background & Overlay */
 // .hero-bg {
 //     position: absolute;
 //     inset: 0;
 //     background-size: cover;
 //     background-position: center;
 //     z-index: 1;
-//     animation: slowZoom 20s infinite alternate; /* Continuous subtle movement */
+//     animation: zoomDrift 20s infinite alternate;
 // }
 
-// @keyframes slowZoom {
+// @keyframes zoomDrift {
 //     from { transform: scale(1); }
 //     to { transform: scale(1.1); }
 // }
 
-// /* --- OVERLAY --- */
 // .hero-overlay {
 //     position: absolute;
 //     inset: 0;
 //     z-index: 2;
-//     background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.8));
 // }
 
-// /* --- CONTENT --- */
+// /* Content */
 // .hero-container {
 //     position: relative;
 //     z-index: 3;
 //     width: 100%;
 //     max-width: 1400px;
 //     margin: 0 auto;
-//     padding: 0 var(--spacing-xl);
+//     padding: 0 2rem;
 //     display: flex;
 //     flex-direction: column;
 // }
@@ -229,149 +94,108 @@
 // .align-center { align-items: center; text-align: center; }
 // .align-right { align-items: flex-end; text-align: right; }
 
-// .hero-content {
-//     max-width: 900px;
-// }
-
-// /* --- 3. ANIMATED TITLE STYLES --- */
+// /* --- THE SHALLOW TEXT EFFECT --- */
 // .hero-title {
-//     font-family: var(--font-heading);
-//     /* Massive Font Size */
-//     font-size: 5rem; 
-//     font-weight: 800;
-//     color: #ffffff;
-//     line-height: 1.1;
-//     margin: 0 0 var(--spacing-lg) 0;
-//     text-shadow: 0 4px 16px rgba(0,0,0,0.4);
+//     font-family: 'Roboto', sans-serif;
+//     font-size: 7rem; /* Huge, impactful text */
+//     font-weight: 900; /* Roboto Black */
+//     line-height: 1;
+//     margin: 0 0 1.5rem 0;
     
-//     /* Allow wrapping but keep inline-block behavior for spans */
 //     display: flex;
-//     flex-wrap: wrap; 
-//     /* Justify based on alignment */
-//     justify-content: inherit; 
-// }
-
-// /* The Individual Character */
-// .hover-char {
-//     display: inline-block;
-//     transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+//     flex-wrap: wrap;
+//     justify-content: inherit;
 //     cursor: default;
-//     /* Optional: vertical gradient text fill */
-//     background: linear-gradient(to bottom, #fff 50%, #e5e7eb 100%);
-//     -webkit-background-clip: text;
-//     background-clip: text;
-//     color: transparent; /* Fallback handled by background clip */
-// }
-
-// /* Handling Spaces */
-// .char-space {
-//     width: 0.3em; /* Preserve spacing width */
-// }
-
-// /* THE HOVER EFFECT */
-// .hover-char:hover {
-//     /* Dynamic Theme Color */
-//     color: var(--color-primary, #3b82f6);
-//     background: none; /* Remove gradient clip to show solid color */
     
-//     /* Animation: Pop up and glow */
-//     transform: translateY(-15px) scale(1.1);
-//     text-shadow: 0 0 20px var(--color-primary, #3b82f6);
+//     /* Optimize for text animation */
+//     -webkit-font-smoothing: antialiased;
 // }
 
-// /* Adjacent siblings animation (Ripple effect) */
-// .hover-char:hover + .hover-char,
-// .hover-char:has(+ .hover-char:hover) {
-//     transform: translateY(-5px) scale(1.05);
-//     color: #e0f2fe; /* Light tint */
+// .shallow-text {
+//     display: inline-block;
+    
+//     /* 1. The "Shallow" Default State */
+//     color: rgba(255, 255, 255, 0.25); /* Faded / Ghostly */
+//     transform: scale(1);
+//     filter: blur(0px);
+    
+//     /* 2. The "Revert Back" Transition */
+//     /* Transition color slowly back to gray (1.5s), but transform quickly */
+//     transition: 
+//         color 1.5s ease-out, 
+//         text-shadow 1.5s ease-out, 
+//         transform 0.5s ease-out;
 // }
 
+// .char-space { width: 0.3em; }
+
+// /* 3. The Hover State (Applied via JS style binding, but CSS helps transition) */
+// .shallow-text:hover {
+//     /* When JS applies the color, these transitions make it snappy */
+//     transition: 
+//         color 0.1s ease-out, 
+//         text-shadow 0.1s ease-out, 
+//         transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    
+//     /* Pop effect */
+//     transform: scale(1.15) translateY(-10px);
+    
+//     /* Remove any blur */
+//     filter: blur(0);
+// }
+
+// /* Subtitle */
 // .hero-subtitle {
-//     font-family: var(--font-body);
-//     font-size: 1.5rem; /* Larger Subtitle */
-//     color: rgba(255, 255, 255, 0.9);
-//     line-height: 1.6;
-//     margin: 0 0 var(--spacing-2xl) 0;
+//     font-size: 1.5rem;
+//     font-weight: 300; /* Roboto Light */
+//     color: rgba(255, 255, 255, 0.8);
+//     margin-bottom: 3rem;
 //     max-width: 700px;
-//     text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 // }
 
 // @media (max-width: 1024px) {
-//     .hero-title { font-size: 3.5rem; }
+//     .hero-title { font-size: 5rem; }
 // }
-
 // @media (max-width: 768px) {
-//     .hero-title { font-size: 2.75rem; justify-content: center; }
-//     .hero-subtitle { font-size: 1.125rem; }
-//     .hover-char:hover { transform: none; color: inherit; } /* Disable hover effect on touch */
+//     .hero-title { font-size: 3.5rem; justify-content: center; }
+//     .hero-subtitle { font-size: 1.2rem; }
 // }
 
-// /* --- BUTTONS --- */
+// /* Buttons */
 // .hero-actions {
 //     display: flex;
+//     gap: 1.5rem;
 //     flex-wrap: wrap;
-//     gap: var(--spacing-md);
 // }
-
 // .align-center .hero-actions { justify-content: center; }
-// .align-right .hero-actions { justify-content: flex-end; }
 
 // .hero-btn {
-//     display: inline-flex;
-//     align-items: center;
-//     justify-content: center;
-//     padding: 16px 40px; /* Larger click area */
-//     border-radius: 100px;
-//     font-family: var(--font-body);
+//     padding: 16px 42px;
+//     border-radius: 4px;
 //     font-weight: 700;
-//     font-size: 1.125rem;
+//     font-size: 1rem;
+//     text-transform: uppercase;
+//     letter-spacing: 0.05em;
 //     text-decoration: none;
-//     cursor: pointer;
 //     transition: all 0.3s ease;
-//     letter-spacing: 0.02em;
 // }
 
 // .hero-btn.primary {
-//     background-color: var(--color-primary, #ffffff);
-//     color: var(--color-text-inverted, #000000);
-//     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+//     background: #fff;
+//     color: #000;
 // }
 // .hero-btn.primary:hover {
-//     transform: translateY(-3px);
-//     box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+//     background: #e2e2e2;
+//     transform: translateY(-2px);
 // }
 
-// .hero-btn.secondary {
-//     background-color: var(--color-text-main, #000000);
-//     color: #ffffff;
-// }
-// .hero-btn.secondary:hover {
-//     transform: translateY(-3px);
-//     background-color: #222;
-// }
-
-// .hero-btn.glass {
-//     background: rgba(255, 255, 255, 0.1);
-//     backdrop-filter: blur(12px);
-//     border: 1px solid rgba(255, 255, 255, 0.4);
-//     color: #ffffff;
-// }
-// .hero-btn.glass:hover {
-//     background: rgba(255, 255, 255, 0.25);
-//     transform: translateY(-3px);
-// }
-
-// /* --- ENTRANCE ANIMATION --- */
+// /* Animations */
 // .animate-entrance {
-//     animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+//     animation: fadeUp 1s ease-out forwards;
 //     opacity: 0;
-//     transform: translateY(40px);
+//     transform: translateY(30px);
 // }
-
-// @keyframes fadeInUp {
-//     to { opacity: 1; transform: translateY(0); }
-// }
-
+// @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
 // // :host {
 // //     display: block;
 // //     width: 100%;
@@ -383,19 +207,18 @@
 // //     width: 100%;
 // //     overflow: hidden;
 // //     display: flex;
-// //     align-items: center; /* Vertically center content */
+// //     align-items: center;
 // //     background-color: var(--color-surface-hover, #f3f4f6);
 // // }
 
-// // /* Height Variants */
+// // /* Heights */
 // // .h-small { height: 400px; }
 // // .h-medium { height: 600px; }
 // // .h-large { height: 800px; }
 // // .h-full-screen { height: 100vh; }
 
 // // @media (max-width: 768px) {
-// //     /* Adjust heights for mobile */
-// //     .h-medium, .h-large { height: 500px; }
+// //     .h-medium, .h-large { height: 550px; }
 // // }
 
 // // /* --- BACKGROUND --- */
@@ -405,12 +228,12 @@
 // //     background-size: cover;
 // //     background-position: center;
 // //     z-index: 1;
-// //     transition: transform 10s ease; /* Subtle zoom effect */
+// //     animation: slowZoom 20s infinite alternate; /* Continuous subtle movement */
 // // }
 
-// // /* Parallax-like subtle movement on load */
-// // .hero-root:hover .hero-bg {
-// //     transform: scale(1.05);
+// // @keyframes slowZoom {
+// //     from { transform: scale(1); }
+// //     to { transform: scale(1.1); }
 // // }
 
 // // /* --- OVERLAY --- */
@@ -418,55 +241,100 @@
 // //     position: absolute;
 // //     inset: 0;
 // //     z-index: 2;
-// //     /* Use a gradient by default for depth if no color provided */
-// //     background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
+// //     background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.8));
 // // }
 
-// // /* --- CONTENT LAYOUT --- */
+// // /* --- CONTENT --- */
 // // .hero-container {
 // //     position: relative;
 // //     z-index: 3;
 // //     width: 100%;
-// //     max-width: 1400px; /* Match your other containers */
+// //     max-width: 1400px;
 // //     margin: 0 auto;
 // //     padding: 0 var(--spacing-xl);
 // //     display: flex;
 // //     flex-direction: column;
 // // }
 
-// // /* Alignments */
 // // .align-left { align-items: flex-start; text-align: left; }
 // // .align-center { align-items: center; text-align: center; }
 // // .align-right { align-items: flex-end; text-align: right; }
 
-// // /* --- TYPOGRAPHY --- */
 // // .hero-content {
-// //     max-width: 800px;
+// //     max-width: 900px;
 // // }
 
+// // /* --- 3. ANIMATED TITLE STYLES --- */
 // // .hero-title {
 // //     font-family: var(--font-heading);
-// //     font-size: 3.5rem; /* Large impact */
+// //     /* Massive Font Size */
+// //     font-size: 5rem; 
 // //     font-weight: 800;
 // //     color: #ffffff;
 // //     line-height: 1.1;
 // //     margin: 0 0 var(--spacing-lg) 0;
-// //     text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+// //     text-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    
+// //     /* Allow wrapping but keep inline-block behavior for spans */
+// //     display: flex;
+// //     flex-wrap: wrap; 
+// //     /* Justify based on alignment */
+// //     justify-content: inherit; 
+// // }
+
+// // /* The Individual Character */
+// // .hover-char {
+// //     display: inline-block;
+// //     transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+// //     cursor: default;
+// //     /* Optional: vertical gradient text fill */
+// //     background: linear-gradient(to bottom, #fff 50%, #e5e7eb 100%);
+// //     -webkit-background-clip: text;
+// //     background-clip: text;
+// //     color: transparent; /* Fallback handled by background clip */
+// // }
+
+// // /* Handling Spaces */
+// // .char-space {
+// //     width: 0.3em; /* Preserve spacing width */
+// // }
+
+// // /* THE HOVER EFFECT */
+// // .hover-char:hover {
+// //     /* Dynamic Theme Color */
+// //     color: var(--color-primary, #3b82f6);
+// //     background: none; /* Remove gradient clip to show solid color */
+    
+// //     /* Animation: Pop up and glow */
+// //     transform: translateY(-15px) scale(1.1);
+// //     text-shadow: 0 0 20px var(--color-primary, #3b82f6);
+// // }
+
+// // /* Adjacent siblings animation (Ripple effect) */
+// // .hover-char:hover + .hover-char,
+// // .hover-char:has(+ .hover-char:hover) {
+// //     transform: translateY(-5px) scale(1.05);
+// //     color: #e0f2fe; /* Light tint */
 // // }
 
 // // .hero-subtitle {
 // //     font-family: var(--font-body);
-// //     font-size: 1.25rem;
+// //     font-size: 1.5rem; /* Larger Subtitle */
 // //     color: rgba(255, 255, 255, 0.9);
 // //     line-height: 1.6;
 // //     margin: 0 0 var(--spacing-2xl) 0;
-// //     max-width: 600px;
-// //     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+// //     max-width: 700px;
+// //     text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+// // }
+
+// // @media (max-width: 1024px) {
+// //     .hero-title { font-size: 3.5rem; }
 // // }
 
 // // @media (max-width: 768px) {
-// //     .hero-title { font-size: 2.5rem; }
-// //     .hero-subtitle { font-size: 1rem; }
+// //     .hero-title { font-size: 2.75rem; justify-content: center; }
+// //     .hero-subtitle { font-size: 1.125rem; }
+// //     .hover-char:hover { transform: none; color: inherit; } /* Disable hover effect on touch */
 // // }
 
 // // /* --- BUTTONS --- */
@@ -476,7 +344,6 @@
 // //     gap: var(--spacing-md);
 // // }
 
-// // /* Align buttons based on parent text-align */
 // // .align-center .hero-actions { justify-content: center; }
 // // .align-right .hero-actions { justify-content: flex-end; }
 
@@ -484,74 +351,238 @@
 // //     display: inline-flex;
 // //     align-items: center;
 // //     justify-content: center;
-// //     padding: 12px 32px;
-// //     border-radius: 100px; /* Pill shape */
+// //     padding: 16px 40px; /* Larger click area */
+// //     border-radius: 100px;
 // //     font-family: var(--font-body);
-// //     font-weight: 600;
-// //     font-size: 1rem;
+// //     font-weight: 700;
+// //     font-size: 1.125rem;
 // //     text-decoration: none;
 // //     cursor: pointer;
-// //     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+// //     transition: all 0.3s ease;
 // //     letter-spacing: 0.02em;
 // // }
 
-// // /* Variant: Primary (Solid White/Brand) */
 // // .hero-btn.primary {
 // //     background-color: var(--color-primary, #ffffff);
-// //     color: var(--color-text-inverted, #000000); /* Inverted text */
-// //     border: 2px solid transparent;
-// //     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+// //     color: var(--color-text-inverted, #000000);
+// //     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 // // }
 // // .hero-btn.primary:hover {
-// //     transform: translateY(-2px);
-// //     box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+// //     transform: translateY(-3px);
+// //     box-shadow: 0 10px 25px rgba(0,0,0,0.4);
 // // }
 
-// // /* Variant: Secondary (Solid Black/Dark) */
 // // .hero-btn.secondary {
 // //     background-color: var(--color-text-main, #000000);
 // //     color: #ffffff;
-// //     border: 2px solid transparent;
 // // }
 // // .hero-btn.secondary:hover {
-// //     background-color: #333;
-// //     transform: translateY(-2px);
+// //     transform: translateY(-3px);
+// //     background-color: #222;
 // // }
 
-// // /* Variant: Outline (Bordered) */
-// // .hero-btn.outline {
-// //     background-color: transparent;
-// //     color: #ffffff;
-// //     border: 2px solid #ffffff;
-// // }
-// // .hero-btn.outline:hover {
-// //     background-color: #ffffff;
-// //     color: #000000;
-// // }
-
-// // /* Variant: Glass (Frosted) */
 // // .hero-btn.glass {
-// //     background: rgba(255, 255, 255, 0.15);
-// //     backdrop-filter: blur(10px);
-// //     -webkit-backdrop-filter: blur(10px);
-// //     border: 1px solid rgba(255, 255, 255, 0.3);
+// //     background: rgba(255, 255, 255, 0.1);
+// //     backdrop-filter: blur(12px);
+// //     border: 1px solid rgba(255, 255, 255, 0.4);
 // //     color: #ffffff;
 // // }
 // // .hero-btn.glass:hover {
-// //     background: rgba(255, 255, 255, 0.3);
-// //     transform: scale(1.05);
+// //     background: rgba(255, 255, 255, 0.25);
+// //     transform: translateY(-3px);
 // // }
 
-// // /* --- ANIMATIONS --- */
+// // /* --- ENTRANCE ANIMATION --- */
 // // .animate-entrance {
-// //     animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+// //     animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 // //     opacity: 0;
-// //     transform: translateY(30px);
+// //     transform: translateY(40px);
 // // }
 
 // // @keyframes fadeInUp {
-// //     to {
-// //         opacity: 1;
-// //         transform: translateY(0);
-// //     }
+// //     to { opacity: 1; transform: translateY(0); }
 // // }
+
+// // // :host {
+// // //     display: block;
+// // //     width: 100%;
+// // // }
+
+// // // /* --- ROOT CONTAINER --- */
+// // // .hero-root {
+// // //     position: relative;
+// // //     width: 100%;
+// // //     overflow: hidden;
+// // //     display: flex;
+// // //     align-items: center; /* Vertically center content */
+// // //     background-color: var(--color-surface-hover, #f3f4f6);
+// // // }
+
+// // // /* Height Variants */
+// // // .h-small { height: 400px; }
+// // // .h-medium { height: 600px; }
+// // // .h-large { height: 800px; }
+// // // .h-full-screen { height: 100vh; }
+
+// // // @media (max-width: 768px) {
+// // //     /* Adjust heights for mobile */
+// // //     .h-medium, .h-large { height: 500px; }
+// // // }
+
+// // // /* --- BACKGROUND --- */
+// // // .hero-bg {
+// // //     position: absolute;
+// // //     inset: 0;
+// // //     background-size: cover;
+// // //     background-position: center;
+// // //     z-index: 1;
+// // //     transition: transform 10s ease; /* Subtle zoom effect */
+// // // }
+
+// // // /* Parallax-like subtle movement on load */
+// // // .hero-root:hover .hero-bg {
+// // //     transform: scale(1.05);
+// // // }
+
+// // // /* --- OVERLAY --- */
+// // // .hero-overlay {
+// // //     position: absolute;
+// // //     inset: 0;
+// // //     z-index: 2;
+// // //     /* Use a gradient by default for depth if no color provided */
+// // //     background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
+// // // }
+
+// // // /* --- CONTENT LAYOUT --- */
+// // // .hero-container {
+// // //     position: relative;
+// // //     z-index: 3;
+// // //     width: 100%;
+// // //     max-width: 1400px; /* Match your other containers */
+// // //     margin: 0 auto;
+// // //     padding: 0 var(--spacing-xl);
+// // //     display: flex;
+// // //     flex-direction: column;
+// // // }
+
+// // // /* Alignments */
+// // // .align-left { align-items: flex-start; text-align: left; }
+// // // .align-center { align-items: center; text-align: center; }
+// // // .align-right { align-items: flex-end; text-align: right; }
+
+// // // /* --- TYPOGRAPHY --- */
+// // // .hero-content {
+// // //     max-width: 800px;
+// // // }
+
+// // // .hero-title {
+// // //     font-family: var(--font-heading);
+// // //     font-size: 3.5rem; /* Large impact */
+// // //     font-weight: 800;
+// // //     color: #ffffff;
+// // //     line-height: 1.1;
+// // //     margin: 0 0 var(--spacing-lg) 0;
+// // //     text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+// // // }
+
+// // // .hero-subtitle {
+// // //     font-family: var(--font-body);
+// // //     font-size: 1.25rem;
+// // //     color: rgba(255, 255, 255, 0.9);
+// // //     line-height: 1.6;
+// // //     margin: 0 0 var(--spacing-2xl) 0;
+// // //     max-width: 600px;
+// // //     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+// // // }
+
+// // // @media (max-width: 768px) {
+// // //     .hero-title { font-size: 2.5rem; }
+// // //     .hero-subtitle { font-size: 1rem; }
+// // // }
+
+// // // /* --- BUTTONS --- */
+// // // .hero-actions {
+// // //     display: flex;
+// // //     flex-wrap: wrap;
+// // //     gap: var(--spacing-md);
+// // // }
+
+// // // /* Align buttons based on parent text-align */
+// // // .align-center .hero-actions { justify-content: center; }
+// // // .align-right .hero-actions { justify-content: flex-end; }
+
+// // // .hero-btn {
+// // //     display: inline-flex;
+// // //     align-items: center;
+// // //     justify-content: center;
+// // //     padding: 12px 32px;
+// // //     border-radius: 100px; /* Pill shape */
+// // //     font-family: var(--font-body);
+// // //     font-weight: 600;
+// // //     font-size: 1rem;
+// // //     text-decoration: none;
+// // //     cursor: pointer;
+// // //     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+// // //     letter-spacing: 0.02em;
+// // // }
+
+// // // /* Variant: Primary (Solid White/Brand) */
+// // // .hero-btn.primary {
+// // //     background-color: var(--color-primary, #ffffff);
+// // //     color: var(--color-text-inverted, #000000); /* Inverted text */
+// // //     border: 2px solid transparent;
+// // //     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+// // // }
+// // // .hero-btn.primary:hover {
+// // //     transform: translateY(-2px);
+// // //     box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+// // // }
+
+// // // /* Variant: Secondary (Solid Black/Dark) */
+// // // .hero-btn.secondary {
+// // //     background-color: var(--color-text-main, #000000);
+// // //     color: #ffffff;
+// // //     border: 2px solid transparent;
+// // // }
+// // // .hero-btn.secondary:hover {
+// // //     background-color: #333;
+// // //     transform: translateY(-2px);
+// // // }
+
+// // // /* Variant: Outline (Bordered) */
+// // // .hero-btn.outline {
+// // //     background-color: transparent;
+// // //     color: #ffffff;
+// // //     border: 2px solid #ffffff;
+// // // }
+// // // .hero-btn.outline:hover {
+// // //     background-color: #ffffff;
+// // //     color: #000000;
+// // // }
+
+// // // /* Variant: Glass (Frosted) */
+// // // .hero-btn.glass {
+// // //     background: rgba(255, 255, 255, 0.15);
+// // //     backdrop-filter: blur(10px);
+// // //     -webkit-backdrop-filter: blur(10px);
+// // //     border: 1px solid rgba(255, 255, 255, 0.3);
+// // //     color: #ffffff;
+// // // }
+// // // .hero-btn.glass:hover {
+// // //     background: rgba(255, 255, 255, 0.3);
+// // //     transform: scale(1.05);
+// // // }
+
+// // // /* --- ANIMATIONS --- */
+// // // .animate-entrance {
+// // //     animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+// // //     opacity: 0;
+// // //     transform: translateY(30px);
+// // // }
+
+// // // @keyframes fadeInUp {
+// // //     to {
+// // //         opacity: 1;
+// // //         transform: translateY(0);
+// // //     }
+// // // }

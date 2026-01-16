@@ -1,291 +1,200 @@
 :host {
-    display: block;
-    /* Fixed size for the card based on the reference aspect ratio */
-    width: 320px; 
-    height: 380px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  display: block;
+  /* Adjust these to fit your grid, or keep as fixed defaults */
+  width: 100%; 
+  max-width: 320px; 
+  height: 380px;
+  font-family: var(--font-body);
 }
 
-/* --- CARD CONTAINER --- */
-.card-root {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    border-radius: 24px; /* Large rounded corners */
-    overflow: hidden;
-    cursor: pointer;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    /* Ensure transitions work for hover */
-    transform: translateZ(0); 
-}
-
-/* --- BACKGROUND IMAGE --- */
-.card-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-}
-
-/* Subtle zoom on hover */
-.card-root:hover .card-image,
-.card-root:focus-within .card-image {
-    transform: scale(1.05);
-}
-
-/* --- OVERLAY (The Reveal) --- */
-.card-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /* Dark gradient that becomes visible on hover */
-    background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.9) 100%);
-    opacity: 0; /* Hidden by default */
-    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    align-items: flex-end; /* Align content to the bottom */
-    padding: 24px;
-}
-
-/* Reveal overlay on hover or focus */
-.card-root:hover .card-overlay,
-.card-root:focus-within .card-overlay {
-    opacity: 1;
-}
-
-/* --- CONTENT INSIDE OVERLAY --- */
-.overlay-content {
-    width: 100%;
-    color: #ffffff;
-    /* Content slides up from the bottom */
-    transform: translateY(30px);
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-}
-
-/* Slide content up on hover */
-.card-root:hover .overlay-content,
-.card-root:focus-within .overlay-content {
-    transform: translateY(0);
-}
-
-/* --- TEXT & ELEMENTS --- */
-.top-action-btn {
-    position: absolute;
-    top: -60px; /* Positioned near the top right of the overlay area */
-    right: 0;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #ffffff;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s ease;
-}
-
-.top-action-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.card-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin: 0 0 4px 0;
-    line-height: 1.2;
-}
-
-.card-subtitle {
-    display: block;
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 16px;
-}
-
-.card-description {
-    font-size: 0.85rem;
-    line-height: 1.5;
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 24px;
-    /* Limit description to 3 lines */
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-/* Stats Row */
-.stats-row {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 16px;
-}
-
-.stat-item {
-    display: flex;
-    flex-direction: column;
-}
-
-.stat-value {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #ffffff;
-}
-
-.stat-label {
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.6);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.stat-divider {
-    width: 1px;
-    height: 24px;
-    background-color: rgba(255, 255, 255, 0.2);
-}
-
-/* Optional Bottom Button style */
-.bottom-action-btn {
-    width: 100%;
-    background: #ffffff;
-    color: #000000;
-    border: none;
-    padding: 12px;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-    margin-top: 20px;
-    transition: background-color 0.2s ease;
-}
-
-.bottom-action-btn:hover {
-    background-color: #f0f0f0;
-}
-
-// //////////////////////
 .card-root {
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 24px;
+  border-radius: var(--ui-border-radius-lg); // Using 24px token
   overflow: hidden;
   cursor: pointer;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-md);
+  background-color: #f8fafc; // Fallback background
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+
+  &:hover, &:focus-within {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
 }
+
+/* Background Image & Zoom Effect */
 .card-image {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.8s ease;
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
 }
 
-.card-root:hover .card-image,
-.card-root:focus-within .card-image {
-  transform: scale(1.06);
+.card-root:hover .card-image {
+  transform: scale(1.08);
 }
+
+/* Base Scrim for Text Legibility */
 .card-scrim {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(0,0,0,0.05),
-    rgba(0,0,0,0.65)
+    rgba(0,0,0,0) 0%,
+    rgba(0,0,0,0.2) 50%,
+    rgba(0,0,0,0.8) 100%
   );
+  z-index: 2;
+  transition: opacity var(--transition-base);
 }
-.card-footer {
+
+/* Container for all bottom-aligned text */
+.card-content-wrapper {
   position: absolute;
   bottom: 0;
+  left: 0;
   width: 100%;
-  padding: 20px;
-  z-index: 2;
-}
-
-.card-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin: 0;
-  color: #fff;
-  line-height: 1.2;
-}
-
-.card-subtitle {
-  font-size: 0.75rem;
-  opacity: 0.8;
-  color: #fff;
-}
-.card-reveal {
-  position: absolute;
-  inset: 0;
-  padding: 20px;
+  padding: var(--spacing-xl);
+  z-index: 4;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  gap: 16px;
+}
 
+/* Footer Section */
+.card-footer {
+  transition: transform 0.4s ease;
+
+  .card-title {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: #ffffff;
+    margin: 0;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-subtitle {
+    font-size: var(--font-size-xs);
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: var(--font-weight-medium);
+  }
+}
+
+/* Hover Reveal Content */
+.card-reveal {
+  max-height: 0;
   opacity: 0;
-  transform: translateY(12px);
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  overflow: hidden;
+  transform: translateY(10px);
+  transition: 
+    max-height 0.4s ease, 
+    opacity 0.4s ease, 
+    transform 0.4s ease;
+
+  .card-description {
+    font-size: var(--font-size-sm);
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.5;
+    margin: var(--spacing-md) 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 }
 
-.card-root:hover .card-reveal,
-.card-root:focus-within .card-reveal {
-  opacity: 1;
-  transform: translateY(0);
+/* Reveal Trigger */
+.card-root:hover {
+  .card-reveal {
+    max-height: 200px; // Sufficient space for text + stats
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .card-scrim {
+    background: linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.2) 0%,
+      rgba(0,0,0,0.7) 40%,
+      rgba(0,0,0,0.95) 100%
+    );
+  }
 }
-.glass-pill-btn {
-  align-self: flex-start;
-  padding: 8px 16px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: rgba(255,255,255,0.18);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.25);
-  color: #fff;
-}
+
+/* Glass Pill Button */
 .card-action {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 3;
-
+  top: var(--spacing-lg);
+  right: var(--spacing-lg);
+  z-index: 10;
   opacity: 0;
-  transform: translateY(-6px);
-  transition: opacity 0.35s ease, transform 0.35s ease;
+  transform: translateY(-10px);
+  transition: all var(--transition-base);
 }
 
-.card-root:hover .card-action,
-.card-root:focus-within .card-action {
+.card-root:hover .card-action {
   opacity: 1;
   transform: translateY(0);
 }
+
 .glass-pill-btn {
-  padding: 8px 16px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: var(--ui-border-radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
 
-  background: rgba(255,255,255,0.18);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.25);
-  color: #fff;
-
-  transition: background 0.2s ease, transform 0.2s ease;
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
 }
 
-.glass-pill-btn:hover {
-  transform: translateY(-1px);
-  background: rgba(255,255,255,0.28);
+/* Stats Row Styling */
+.stats-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  padding-top: var(--spacing-sm);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+
+  .stat-value {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    color: #ffffff;
+    font-family: var(--font-mono);
+  }
+
+  .stat-label {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    font-weight: var(--font-weight-bold);
+  }
+}
+
+.stat-divider {
+  width: 1px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.2);
 }
