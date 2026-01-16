@@ -101,11 +101,40 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators, For
   `,
   styles: [`
     .ui-input {
-      @apply w-full px-3 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all;
-    }
-    .ui-input-sm {
-      @apply px-2 py-1.5 bg-white border border-gray-200 rounded text-xs focus:outline-none focus:border-blue-500;
-    }
+  width: 100%;
+  padding-left: 0.75rem;   /* px-3 */
+  padding-right: 0.75rem;
+  padding-top: 0.625rem;   /* py-2.5 */
+  padding-bottom: 0.625rem;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb; /* gray-200 */
+  border-radius: 0.5rem;     /* rounded-lg */
+  font-size: 0.875rem;       /* text-sm */
+  color: #374151;            /* gray-700 */
+  outline: none;
+  transition: all 150ms ease-in-out;
+}
+
+.ui-input:focus {
+  border-color: #3b82f6;     /* blue-500 */
+  box-shadow: 0 0 0 1px #3b82f6; /* focus:ring-1 */
+}
+
+.ui-input-sm {
+  padding-left: 0.5rem;     /* px-2 */
+  padding-right: 0.5rem;
+  padding-top: 0.375rem;    /* py-1.5 */
+  padding-bottom: 0.375rem;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb; /* gray-200 */
+  border-radius: 0.25rem;   /* rounded */
+  font-size: 0.75rem;       /* text-xs */
+  outline: none;
+}
+
+.ui-input-sm:focus {
+  border-color: #3b82f6;     /* blue-500 */
+}
   `]
 })
 export class ConfigFormComponent implements OnChanges {
