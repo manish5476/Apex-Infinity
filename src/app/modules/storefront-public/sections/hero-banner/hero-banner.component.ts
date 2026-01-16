@@ -71,9 +71,8 @@ export class HeroBannerComponent {
     }
   }
 }
-
 export interface HeroConfig {
-  title: string;
+  title?: string;          // Changed from 'string' to 'string | undefined'
   subtitle?: string;
   backgroundImage: string;
   height?: 'small' | 'medium' | 'large' | 'full';
@@ -86,6 +85,20 @@ export interface HeroConfig {
     variant: 'primary' | 'secondary' | 'outline' | 'glass';
   }>;
 }
+// export interface HeroConfig {
+//   title: string;
+//   subtitle?: string;
+//   backgroundImage: string;
+//   height?: 'small' | 'medium' | 'large' | 'full';
+//   textAlign?: 'left' | 'center' | 'right';
+//   overlayColor?: string;
+//   overlayOpacity?: number;
+//   ctaButtons?: Array<{
+//     text: string;
+//     url: string;
+//     variant: 'primary' | 'secondary' | 'outline' | 'glass';
+//   }>;
+// }
 // import { Component, Input } from '@angular/core';
 // import { CommonModule } from '@angular/common';
 // import { RouterModule } from '@angular/router';
