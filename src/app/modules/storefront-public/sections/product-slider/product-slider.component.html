@@ -1,0 +1,63 @@
+<section class="section-root">
+  <div class="container">
+    
+    <div class="header-row">
+      <div class="title-group">
+        @if (config.subtitle) {
+          <span class="subtitle">{{ config.subtitle }}</span>
+        }
+        <h2 class="section-title">{{ config.title }}</h2>
+      </div>
+
+      @if (config.navigation && products.length > 4) {
+        <div class="nav-controls">
+          <button 
+            class="nav-btn prev" 
+            [disabled]="!canScrollLeft"
+            (click)="scroll('left')">
+            <i class="pi pi-chevron-left"></i>
+          </button>
+          <button 
+            class="nav-btn next" 
+            [disabled]="!canScrollRight" 
+            (click)="scroll('right')">
+            <i class="pi pi-chevron-right"></i>
+          </button>
+        </div>
+      }
+    </div>
+
+    <div class="slider-viewport" #sliderContainer (scroll)="checkScrollButtons()">
+      
+      @if (!products || products.length === 0) {
+        @for (i of [1,2,3,4]; track i) {
+          <div class="skeleton-card">
+            <p-skeleton height="300px" styleClass="mb-2"></p-skeleton>
+            <p-skeleton width="60%" styleClass="mb-1"></p-skeleton>
+            <p-skeleton width="40%"></p-skeleton>
+          </div>
+        }
+      } 
+      
+      @else {
+        @for (product of products; track product.id) {
+          <div class="slider-item" [style.min-width]="getItemWidth()">
+            <app-product-card 
+              [product]="product" 
+              [orgSlug]="orgSlug()"
+              (addToCart)="handleAddToCart($event)"
+              class="h-full block">
+            </app-product-card>
+          </div>
+        }
+      }
+
+    </div>
+
+    <div class="mobile-hint md:hidden">
+      <span>Swipe to explore</span>
+      <i class="pi pi-arrow-right text-xs"></i>
+    </div>
+
+  </div>
+</section>

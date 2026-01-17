@@ -1,680 +1,312 @@
-<p-toast position="bottom-right"></p-toast>
+<p-toast position="bottom-center" [showTransformOptions]="'translateY(100%)'" [showTransitionOptions]="'300ms ease-out'" [hideTransitionOptions]="'200ms ease-in'"></p-toast>
 
-<div class="page-root">
+@if (loading()) {
+  <div class="h-screen w-full flex items-center justify-center">
+    <div class="loader-pulse"></div>
+  </div>
+} 
+@else if (product(); as p) {
   
-  @if (loading()) {
-    <div class="loading-center">
-      <div class="loader-ring"></div>
-    </div>
-  } 
-  
-  @else if (product(); as p) {
-    <div class="ambient-glow"></div>
+  <div class="page-container font-sans text-slate-900 selection:bg-rose-200 selection:text-rose-900">
+    
+    <div class="ambient-backdrop" [style.background]="'radial-gradient(circle at 30% 40%, ' + ambientColor() + ' 0%, transparent 60%)'"></div>
+    <div class="noise-overlay"></div>
 
-    <div class="content-wrapper">
+    <div class="grid-layout">
       
-      <section class="cinematic-stage">
-        
-        <div class="image-viewport">
-          <img 
-            [src]="selectedImage()" 
-            [alt]="p.name" 
-            class="hero-image animate-enter"
-            [class.key-change]="selectedImage()" 
-          />
+      <div class="visual-col">
+        <div class="sticky-stage">
           
-          <div class="badge-layer">
-            @if (p.price.hasDiscount) {
-              <div class="glass-pill sale">-{{ discountPercentage() }}%</div>
-            }
-            @if (!p.stock?.available) {
-              <div class="glass-pill sold">Sold Out</div>
-            }
+          <nav class="md:hidden flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 mb-6">
+            <a [routerLink]="['/store', orgSlug()]" class="hover:text-slate-900 transition-colors">Home</a>
+            <span>/</span>
+            <span class="text-slate-900">{{ p.name }}</span>
+          </nav>
+
+          <div class="main-image-card" @fadeIn>
+            <img [src]="selectedImage()" [alt]="p.name" class="hero-img" />
+            
+            <div class="badges">
+              @if (p.price.hasDiscount) {
+                <span class="badge sale">-{{ discountPercentage() }}%</span>
+              }
+              @if (!p.stock?.available) {
+                <span class="badge sold">Sold Out</span>
+              }
+            </div>
+          </div>
+
+          @if (p.images?.length > 1) {
+            <div class="thumbnails-dock">
+              @for (img of p.images; track img) {
+                <button 
+                  class="thumb-btn" 
+                  [class.active]="selectedImage() === img"
+                  (click)="changeImage(img)">
+                  <img [src]="img" [alt]="p.name" />
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="details-col" @fadeUp>
+        
+        <nav class="hidden md:flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 mb-8">
+          <a [routerLink]="['/store', orgSlug()]" class="hover:text-slate-900 transition-colors">Home</a>
+          <span>/</span>
+          <span class="text-slate-900">{{ p.brand || 'Shop' }}</span>
+        </nav>
+
+        <div class="header-section">
+          <h1 class="product-title">{{ p.name }}</h1>
+          
+          <div class="meta-row">
+            <div class="price-wrapper">
+              <span class="current-price">{{ p.price.discounted || p.price.original | currency:p.price.currency }}</span>
+              @if (p.price.hasDiscount) {
+                <span class="original-price">{{ p.price.original | currency:p.price.currency }}</span>
+              }
+            </div>
+            <div class="rating-pill">
+              <i class="pi pi-star-fill text-yellow-500 text-xs"></i>
+              <span>4.9</span>
+              <span class="text-slate-400">/ 5</span>
+            </div>
           </div>
         </div>
 
-        @if (p.images?.length > 1) {
-          <div class="dock-container">
-            <div class="glass-dock">
-              @for (img of p.images; track img) {
+        <p class="description">{{ p.description }}</p>
+
+        <div class="configurator">
+          
+          <div class="config-group">
+            <span class="label">Finish: <strong class="text-slate-900">{{ selectedVariant().name }}</strong></span>
+            <div class="color-row">
+              @for (v of variants(); track v.code) {
                 <button 
-                  class="dock-item" 
-                  [class.active]="selectedImage() === img"
-                  (click)="changeImage(img)">
-                  <img [src]="img" />
-                  <div class="glow-dot"></div>
+                  class="color-circle" 
+                  [class.active]="selectedVariant() === v"
+                  [style.background-color]="v.colorCode"
+                  (click)="selectVariant(v)"
+                  pTooltip="{{v.name}}" tooltipPosition="top">
                 </button>
               }
             </div>
           </div>
-        }
-      </section>
 
-      <div class="info-column">
-        <div class="info-glass-panel">
-          
-          <nav class="breadcrumb-nav">
-            <a [routerLink]="['/store', orgSlug()]" class="home-icon"><i class="pi pi-home"></i></a>
-            <span class="sep">/</span>
-            <span class="current">{{ p.name }}</span>
-          </nav>
-
-          <div class="header-block">
-            <span class="brand-tag">{{ p.brand || 'Signature' }}</span>
-            <h1 class="product-title">{{ p.name }}</h1>
-            <div class="rating-row">
-              <i class="pi pi-star-fill text-yellow-400"></i>
-              <span>4.9 (128 Reviews)</span>
-            </div>
-          </div>
-
-          <div class="price-block">
-            <div class="current-price">
-              {{ p.price.discounted || p.price.original | currency:p.price.currency }}
-            </div>
-            @if (p.price.hasDiscount) {
-              <div class="original-price">
-                {{ p.price.original | currency:p.price.currency }}
-              </div>
-            }
-          </div>
-
-          <p class="description">{{ p.description }}</p>
-
-          <div class="config-zone">
-            
-            <div class="selector-group">
-              <span class="label">Finish</span>
-              <div class="color-options">
-                @for (v of variants(); track v.code) {
-                  <button 
-                    class="color-btn" 
-                    [class.selected]="selectedVariant() === v"
-                    [style.--variant-color]="v.colorCode"
-                    (click)="selectVariant(v)">
-                    <span class="sr-only">{{ v.name }}</span>
-                  </button>
-                }
-              </div>
-              <span class="selection-name">{{ selectedVariant().name }}</span>
+          <div class="actions-row">
+            <div class="qty-stepper">
+              <button (click)="updateQuantity(-1)" [disabled]="quantity() <= 1">−</button>
+              <span class="val">{{ quantity() }}</span>
+              <button (click)="updateQuantity(1)">+</button>
             </div>
 
-            <div class="selector-group">
-              <span class="label">Quantity</span>
-              <div class="stepper-glass">
-                <button (click)="updateQuantity(-1)" [disabled]="quantity() <= 1">
-                  <i class="pi pi-minus"></i>
-                </button>
-                <span class="qty-val">{{ quantity() }}</span>
-                <button (click)="updateQuantity(1)">
-                  <i class="pi pi-plus"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div class="action-zone">
-            <button 
-              class="cta-btn primary" 
-              [disabled]="!p.stock?.available"
-              (click)="addToCart()">
+            <button class="add-btn" 
+                    [disabled]="!p.stock?.available"
+                    (click)="addToCart()">
               <span>{{ p.stock?.available ? 'Add to Bag' : 'Out of Stock' }}</span>
-              <div class="shimmer"></div>
+              <span class="separator">|</span>
+              <span class="price-calc">{{ (p.price.discounted || p.price.original) * quantity() | currency:p.price.currency }}</span>
             </button>
-            
-            <button class="cta-btn secondary">
+
+            <button class="wishlist-btn">
               <i class="pi pi-heart"></i>
             </button>
           </div>
 
-          <div class="features-grid">
-            <div class="feature">
-              <i class="pi pi-box"></i>
-              <span>Free Shipping</span>
-            </div>
-            <div class="feature">
-              <i class="pi pi-shield"></i>
-              <span>2 Year Warranty</span>
-            </div>
-            <div class="feature">
-              <i class="pi pi-verified"></i>
-              <span>Authentic</span>
-            </div>
+          <div class="trust-badges">
+            <div class="item"><i class="pi pi-truck"></i> Free Shipping</div>
+            <div class="item"><i class="pi pi-check-circle"></i> 30-Day Returns</div>
+            <div class="item"><i class="pi pi-shield"></i> 2-Year Warranty</div>
           </div>
 
-        </div>
-      </div>
-
-    </div>
-  }
-</div>
-<!-- <p-toast position="bottom-right"></p-toast>
-
-<div class="page-root">
-  
-  @if (loading()) {
-    <div class="loading-center">
-      <div class="loader-ring"></div>
-    </div>
-  } 
-  
-  @else if (product(); as p) {
-    <div class="ambient-glow"></div>
-
-    <div class="content-wrapper">
-      
-      <section class="cinematic-stage">
-        
-        <div class="image-viewport">
-          <img 
-            [src]="selectedImage()" 
-            [alt]="p.name" 
-            class="hero-image animate-enter"
-            [class.key-change]="selectedImage()" 
-          />
-          
-          <div class="badge-layer">
-            @if (p.price.hasDiscount) {
-              <div class="glass-pill sale">-{{ discountPercentage() }}%</div>
-            }
-            @if (!p.stock?.available) {
-              <div class="glass-pill sold">Sold Out</div>
-            }
-          </div>
-        </div>
-
-        @if (p.images?.length > 1) {
-          <div class="dock-container">
-            <div class="glass-dock">
-              @for (img of p.images; track img) {
-                <button 
-                  class="dock-item" 
-                  [class.active]="selectedImage() === img"
-                  (click)="changeImage(img)">
-                  <img [src]="img" />
-                  <div class="glow-dot"></div>
-                </button>
-              }
-            </div>
-          </div>
-        }
-      </section>
-
-      <div class="info-column">
-        <div class="info-glass-panel">
-          
-          <nav class="breadcrumb-nav">
-            <a [routerLink]="['/store', orgSlug()]" class="home-icon"><i class="pi pi-home"></i></a>
-            <span class="sep">/</span>
-            <span class="current">{{ p.name }}</span>
-          </nav>
-
-          <div class="header-block">
-            <span class="brand-tag">{{ p.brand || 'Signature' }}</span>
-            <h1 class="product-title">{{ p.name }}</h1>
-            <div class="rating-row">
-              <i class="pi pi-star-fill text-yellow-400"></i>
-              <span>4.9 (128 Reviews)</span>
-            </div>
-          </div>
-
-          <div class="price-block">
-            <div class="current-price">
-              {{ p.price.discounted || p.price.original | currency:p.price.currency }}
-            </div>
-            @if (p.price.hasDiscount) {
-              <div class="original-price">
-                {{ p.price.original | currency:p.price.currency }}
-              </div>
-            }
-          </div>
-
-          <p class="description">{{ p.description }}</p>
-
-          <div class="config-zone">
-            
-            <div class="selector-group">
-              <span class="label">Finish</span>
-              <div class="color-options">
-                @for (v of variants(); track v.code) {
-                  <button 
-                    class="color-btn" 
-                    [class.selected]="selectedVariant() === v"
-                    [style.--variant-color]="v.colorCode"
-                    (click)="selectVariant(v)">
-                    <span class="sr-only">{{ v.name }}</span>
-                  </button>
-                }
-              </div>
-              <span class="selection-name">{{ selectedVariant().name }}</span>
-            </div>
-
-            <div class="selector-group">
-              <span class="label">Quantity</span>
-              <div class="stepper-glass">
-                <button (click)="updateQuantity(-1)" [disabled]="quantity() <= 1">
-                  <i class="pi pi-minus"></i>
-                </button>
-                <span class="qty-val">{{ quantity() }}</span>
-                <button (click)="updateQuantity(1)">
-                  <i class="pi pi-plus"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div class="action-zone">
-            <button 
-              class="cta-btn primary" 
-              [disabled]="!p.stock?.available"
-              (click)="addToCart()">
-              <span>{{ p.stock?.available ? 'Add to Bag' : 'Out of Stock' }}</span>
-              <div class="shimmer"></div>
-            </button>
-            
-            <button class="cta-btn secondary">
-              <i class="pi pi-heart"></i>
-            </button>
-          </div>
-
-          <div class="features-grid">
-            <div class="feature">
-              <i class="pi pi-box"></i>
-              <span>Free Shipping</span>
-            </div>
-            <div class="feature">
-              <i class="pi pi-shield"></i>
-              <span>2 Year Warranty</span>
-            </div>
-            <div class="feature">
-              <i class="pi pi-verified"></i>
-              <span>Authentic</span>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-  }
-</div> -->
-<!-- <p-toast position="bottom-right"></p-toast>
-
-<div class="page-root">
-  @if (loading()) {
-    <div class="loading-center">
-      <i class="pi pi-spin pi-spinner"></i>
-    </div>
-  } 
-  
-  @else if (product(); as p) {
-    <div class="ambient-glow"></div>
-
-    <div class="content-wrapper">
-      
-      <section class="carousel-container">
-        <div class="carousel-stage">
-          
-          <div class="image-inner">
-            <img [src]="selectedImage()" [alt]="p.name" class="hero-image" />
-            
-            @if (p.price.hasDiscount) {
-              <div class="glass-badge sale-tag">
-                -{{ discountPercentage() }}% OFF
-              </div>
-            }
-          </div>
-
-          @if (p.images?.length > 1) {
-            <div class="floating-thumbs">
-              @for (img of p.images; track img) {
-                <button 
-                  class="glass-thumb" 
-                  [class.active]="selectedImage() === img"
-                  (click)="changeImage(img)">
-                  <img [src]="img" />
-                </button>
-              }
-            </div>
-          }
-        </div>
-      </section>
-
-      <div class="info-glass-panel">
-        
-        <nav class="breadcrumb-nav">
-          <a [routerLink]="['/store', orgSlug()]">Home</a>
-          <i class="pi pi-chevron-right"></i>
-          <span class="current">{{ p.name }}</span>
-        </nav>
-
-        <div class="header-section">
-          <span class="brand-label">{{ p.brand || 'Signature Series' }}</span>
-          <h1 class="product-title">{{ p.name }}</h1>
-        </div>
-
-        <div class="price-glass-card">
-          <div class="price-stack">
-            @if (p.price.hasDiscount) {
-              <span class="price-discounted">{{ p.price.discounted | currency:p.price.currency }}</span>
-              <span class="price-original">{{ p.price.original | currency:p.price.currency }}</span>
-            } @else {
-              <span class="price-discounted">{{ p.price.original | currency:p.price.currency }}</span>
-            }
-          </div>
-          <span class="tax-info">Includes taxes & duties</span>
-        </div>
-
-        <p class="description-text">{{ p.description }}</p>
-
-        <div class="config-row">
-          <div class="variant-picker">
-            <span class="label">Finish</span>
-            <div class="swatch-group">
-              @for (v of variants(); track v.code) {
-                <button 
-                  class="swatch-btn" 
-                  [class.active]="selectedVariant() === v"
-                  [style.background-color]="v.colorCode"
-                  (click)="selectVariant(v)">
-                </button>
-              }
-            </div>
-          </div>
-
-          <div class="quantity-picker">
-            <span class="label">Quantity</span>
-            <div class="qty-control">
-              <button (click)="updateQuantity(-1)" [disabled]="quantity() <= 1">−</button>
-              <input type="text" [value]="quantity()" readonly>
-              <button (click)="updateQuantity(1)">+</button>
-            </div>
-          </div>
-        </div>
-
-        <button 
-          class="primary-buy-btn" 
-          [disabled]="!p.stock?.available"
-          (click)="addToCart()">
-          <span>{{ p.stock?.available ? 'Add to Bag' : 'Sold Out' }}</span>
-          <i class="pi pi-arrow-right"></i>
-        </button>
-
-        <div class="trust-footer">
-          <div class="trust-item"><i class="pi pi-shield"></i> 2-Year Warranty</div>
-          <div class="trust-item"><i class="pi pi-truck"></i> Free Shipping</div>
-          <div class="trust-item"><i class="pi pi-undo"></i> 30-Day Returns</div>
-        </div>
-
-      </div>
-
-    </div>
-  }
-</div> -->
-
-<!-- <p-toast position="bottom-right"></p-toast>
-
-<div class="page-root">
-  @if (loading()) {
-    <div class="loading-center">
-      <i class="pi pi-spin pi-spinner"></i>
-    </div>
-  } 
-  
-  @else if (product(); as p) {
-    <div class="ambient-glow"></div>
-
-    <div class="content-wrapper">
-      
-      <section class="carousel-container">
-        <div class="carousel-stage">
-          <div class="image-inner">
-            <img [src]="selectedImage()" [alt]="p.name" class="hero-image" />
-            
-            @if (p.price.hasDiscount) {
-              <div class="glass-badge sale-tag">
-                -{{ discountPercentage() }}% OFF
-              </div>
-            }
-          </div>
-
-          @if (p.images?.length > 1) {
-            <div class="floating-thumbs">
-              @for (img of p.images; track img) {
-                <button 
-                  class="glass-thumb" 
-                  [class.active]="selectedImage() === img"
-                  (click)="changeImage(img)">
-                  <img [src]="img" />
-                </button>
-              }
-            </div>
-          }
-        </div>
-      </section>
-
-      <div class="info-glass-panel">
-        <nav class="breadcrumb-nav">
-          <a [routerLink]="['/store', orgSlug()]">Home</a>
-          <i class="pi pi-chevron-right"></i>
-          <a [routerLink]="['/store', orgSlug(), 'products']">Products</a>
-          <i class="pi pi-chevron-right"></i>
-          <span class="current">{{ p.name }}</span>
-        </nav>
-
-        <div class="header-section">
-          <span class="brand-label">{{ p.brand || 'Premium Collection' }}</span>
-          <h1 class="product-title">{{ p.name }}</h1>
-        </div>
-
-        <div class="price-glass-card">
-          <div class="price-stack">
-            @if (p.price.hasDiscount) {
-              <span class="price-discounted">{{ p.price.currency === 'USD' ? '$' : '₹' }}{{ p.price.discounted }}</span>
-              <span class="price-original">{{ p.price.currency === 'USD' ? '$' : '₹' }}{{ p.price.original }}</span>
-            } @else {
-              <span class="price-discounted">{{ p.price.currency === 'USD' ? '$' : '₹' }}{{ p.price.original }}</span>
-            }
-          </div>
-          <span class="tax-info">Tax included • Free Shipping</span>
-        </div>
-
-        <p class="description-text">{{ p.description }}</p>
-
-        <div class="config-row">
-          <div class="variant-picker">
-            <span class="label">Finish</span>
-            <div class="swatch-group">
-              @for (v of variants(); track v.code) {
-                <button 
-                  class="swatch-btn" 
-                  [class.active]="selectedVariant() === v"
-                  [style.background-color]="v.colorCode"
-                  (click)="selectVariant(v)">
-                  <span class="swatch-inner"></span>
-                </button>
-              }
-            </div>
-          </div>
-
-          <div class="quantity-picker">
-            <span class="label">Quantity</span>
-            <div class="qty-control">
-              <button (click)="updateQuantity(-1)" [disabled]="quantity() <= 1">−</button>
-              <input type="text" [value]="quantity()" readonly>
-              <button (click)="updateQuantity(1)">+</button>
-            </div>
-          </div>
-        </div>
-
-        <button 
-          class="primary-buy-btn" 
-          [disabled]="!p.stock?.available"
-          (click)="addToCart()">
-          <i class="pi pi-shopping-bag"></i>
-          {{ p.stock?.available ? 'Add to Bag' : 'Sold Out' }}
-        </button>
-
-        <div class="trust-footer">
-          <div class="trust-item"><i class="pi pi-shield"></i> 1Y Warranty</div>
-          <div class="trust-item"><i class="pi pi-truck"></i> Fast Delivery</div>
-          <div class="trust-item"><i class="pi pi-history"></i> 7 Days Return</div>
-        </div>
-      </div>
-
-    </div>
-  }
-</div> -->
-<!-- <p-toast position="bottom-right"></p-toast>
-
-<div class="page-container">
-  
-  @if (loading()) {
-    <div class="loading-center">
-      <i class="pi pi-spin pi-spinner" style="font-size: 2.5rem; color: var(--color-text-muted)"></i>
-    </div>
-  } 
-  
-  @else if (product(); as p) {
-    <div class="detail-layout">
-
-      <div class="visuals-column">
-        <div class="main-image-stage">
-          <img [src]="selectedImage()" [alt]="p.name" class="hero-img" />
-          
-          @if (p.price.hasDiscount) {
-            <span class="sale-tag">Sale -{{ discountPercentage() }}%</span>
-          }
-        </div>
-
-        @if (p.images?.length > 1) {
-          <div class="thumb-track">
-            @for (img of p.images; track img) {
-              <button 
-                class="thumb-btn" 
-                [class.active]="selectedImage() === img"
-                (click)="changeImage(img)">
-                <img [src]="img" [alt]="p.name" />
-              </button>
-            }
-          </div>
-        }
-      </div>
-
-      <div class="info-column">
-        
-        <nav class="breadcrumbs">
-          <a [routerLink]="['/store', orgSlug()]" class="crumb-link">Home</a>
-          <span class="crumb-sep">/</span>
-          <a [routerLink]="['/store', orgSlug(), 'products']" class="crumb-link">Products</a>
-          <span class="crumb-sep">/</span>
-          <span class="crumb-active">{{ p.name }}</span>
-        </nav>
-
-        <h1 class="product-headline">{{ p.name }}</h1>
-
-        <div class="price-area">
-          @if (p.price.hasDiscount) {
-            <span class="price-new">
-              {{ p.price.currency === 'USD' ? '$' : '₹' }}{{ p.price.discounted }}
-            </span>
-            <span class="price-old">
-              {{ p.price.currency === 'USD' ? '$' : '₹' }}{{ p.price.original }}
-            </span>
-          } @else {
-            <span class="price-new">
-              {{ p.price.currency === 'USD' ? '$' : '₹' }}{{ p.price.original }}
-            </span>
-          }
-          <span class="tax-note">(Incl. of all taxes)</span>
-        </div>
-
-        <p class="short-desc">
-          {{ p.description.substring(0, 150) }}...
-        </p>
-
-        <div class="variant-section">
-          <span class="variant-label">Color: <span class="selected-val">{{ selectedVariant()?.name }}</span></span>
-          <div class="swatch-list">
-            @for (v of variants(); track v.code) {
-              <button 
-                class="color-swatch" 
-                [class.selected]="selectedVariant() === v"
-                [style.background-color]="v.colorCode"
-                [pTooltip]="v.name"
-                tooltipPosition="top"
-                (click)="selectVariant(v)">
-              </button>
-            }
-          </div>
-        </div>
-
-        <div class="actions-row">
-          <div class="qty-box">
-            <button (click)="updateQuantity(-1)" class="qty-btn minus" [disabled]="quantity() <= 1">−</button>
-            <input type="text" [value]="quantity()" readonly class="qty-input">
-            <button (click)="updateQuantity(1)" class="qty-btn plus">+</button>
-          </div>
-
-          <button 
-            class="add-cart-btn" 
-            [disabled]="!p.stock?.available"
-            (click)="addToCart()">
-            {{ p.stock?.available ? 'Add to Cart' : 'Out of Stock' }}
-          </button>
-        </div>
-
-        <div class="benefits-grid">
-          <div class="benefit-item">
-            <i class="pi pi-truck"></i>
-            <span>Free Shipping</span>
-          </div>
-          <div class="benefit-item">
-            <i class="pi pi-verified"></i>
-            <span>1 Year Warranty</span>
-          </div>
-           <div class="benefit-item">
-            <i class="pi pi-replay"></i>
-            <span>7 Day Returns</span>
-          </div>
         </div>
 
         <div class="accordion-group">
-          
-          <div class="accordion-item">
+          <div class="accordion-item" [class.open]="openAccordion() === 'desc'">
             <button class="accordion-header" (click)="toggleAccordion('desc')">
-              <span>Description</span>
-              <i class="pi transition-transform duration-300" 
-                 [class.pi-minus]="openAccordion() === 'desc'" 
-                 [class.pi-plus]="openAccordion() !== 'desc'"></i>
+              <span>Product Details</span>
+              <i class="pi pi-chevron-down indicator"></i>
             </button>
-            @if (openAccordion() === 'desc') {
-              <div class="accordion-content fade-in">
-                <p>{{ p.description }}</p>
-                <div class="mt-4 grid grid-cols-2 gap-2 text-xs">
-                    <div><span class="text-gray-500">Brand:</span> {{ p.brand || 'Generic' }}</div>
-                    <div><span class="text-gray-500">SKU:</span> {{ p.sku }}</div>
-                </div>
+            <div class="accordion-content">
+              <div class="inner">
+                <p>Crafted with precision and designed for the modern lifestyle. This product features premium materials sourced sustainably.</p>
+                <ul class="feature-list">
+                  <li>Premium aerospace-grade finish</li>
+                  <li>Hand-assembled components</li>
+                  <li>Eco-friendly packaging</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item" [class.open]="openAccordion() === 'ship'">
+            <button class="accordion-header" (click)="toggleAccordion('ship')">
+              <span>Shipping & Returns</span>
+              <i class="pi pi-chevron-down indicator"></i>
+            </button>
+            <div class="accordion-content">
+              <div class="inner">
+                <p>Free standard shipping on all orders over $100. Returns accepted within 30 days of delivery in original condition.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+}
+
+<!-- <p-toast position="bottom-right"></p-toast>
+
+<div class="page-root">
+  
+  @if (loading()) {
+    <div class="loading-center">
+      <div class="loader-ring"></div>
+    </div>
+  } 
+  
+  @else if (product(); as p) {
+    <div class="ambient-glow"></div>
+
+    <div class="content-wrapper">
+      
+      <section class="cinematic-stage">
+        
+        <div class="image-viewport">
+          <img 
+            [src]="selectedImage()" 
+            [alt]="p.name" 
+            class="hero-image animate-enter"
+            [class.key-change]="selectedImage()" 
+          />
+          
+          <div class="badge-layer">
+            @if (p.price.hasDiscount) {
+              <div class="glass-pill sale">-{{ discountPercentage() }}%</div>
+            }
+            @if (!p.stock?.available) {
+              <div class="glass-pill sold">Sold Out</div>
+            }
+          </div>
+        </div>
+
+        @if (p.images?.length > 1) {
+          <div class="dock-container">
+            <div class="glass-dock">
+              @for (img of p.images; track img) {
+                <button 
+                  class="dock-item" 
+                  [class.active]="selectedImage() === img"
+                  (click)="changeImage(img)">
+                  <img [src]="img" />
+                  <div class="glow-dot"></div>
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </section>
+
+      <div class="info-column">
+        <div class="info-glass-panel">
+          
+          <nav class="breadcrumb-nav">
+            <a [routerLink]="['/store', orgSlug()]" class="home-icon"><i class="pi pi-home"></i></a>
+            <span class="sep">/</span>
+            <span class="current">{{ p.name }}</span>
+          </nav>
+
+          <div class="header-block">
+            <span class="brand-tag">{{ p.brand || 'Signature' }}</span>
+            <h1 class="product-title">{{ p.name }}</h1>
+            <div class="rating-row">
+              <i class="pi pi-star-fill text-yellow-400"></i>
+              <span>4.9 (128 Reviews)</span>
+            </div>
+          </div>
+
+          <div class="price-block">
+            <div class="current-price">
+              {{ p.price.discounted || p.price.original | currency:p.price.currency }}
+            </div>
+            @if (p.price.hasDiscount) {
+              <div class="original-price">
+                {{ p.price.original | currency:p.price.currency }}
               </div>
             }
           </div>
 
-          <div class="accordion-item">
-            <button class="accordion-header" (click)="toggleAccordion('info')">
-              <span>Shipping & Returns</span>
-              <i class="pi transition-transform duration-300" 
-                 [class.pi-minus]="openAccordion() === 'info'" 
-                 [class.pi-plus]="openAccordion() !== 'info'"></i>
-            </button>
-            @if (openAccordion() === 'info') {
-              <div class="accordion-content fade-in">
-                <p>Free standard shipping on all orders. Returns are accepted within 7 days of delivery for a full refund.</p>
+          <p class="description">{{ p.description }}</p>
+
+          <div class="config-zone">
+            
+            <div class="selector-group">
+              <span class="label">Finish</span>
+              <div class="color-options">
+                @for (v of variants(); track v.code) {
+                  <button 
+                    class="color-btn" 
+                    [class.selected]="selectedVariant() === v"
+                    [style.--variant-color]="v.colorCode"
+                    (click)="selectVariant(v)">
+                    <span class="sr-only">{{ v.name }}</span>
+                  </button>
+                }
               </div>
-            }
+              <span class="selection-name">{{ selectedVariant().name }}</span>
+            </div>
+
+            <div class="selector-group">
+              <span class="label">Quantity</span>
+              <div class="stepper-glass">
+                <button (click)="updateQuantity(-1)" [disabled]="quantity() <= 1">
+                  <i class="pi pi-minus"></i>
+                </button>
+                <span class="qty-val">{{ quantity() }}</span>
+                <button (click)="updateQuantity(1)">
+                  <i class="pi pi-plus"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="action-zone">
+            <button 
+              class="cta-btn primary" 
+              [disabled]="!p.stock?.available"
+              (click)="addToCart()">
+              <span>{{ p.stock?.available ? 'Add to Bag' : 'Out of Stock' }}</span>
+              <div class="shimmer"></div>
+            </button>
+            
+            <button class="cta-btn secondary">
+              <i class="pi pi-heart"></i>
+            </button>
+          </div>
+
+          <div class="features-grid">
+            <div class="feature">
+              <i class="pi pi-box"></i>
+              <span>Free Shipping</span>
+            </div>
+            <div class="feature">
+              <i class="pi pi-shield"></i>
+              <span>2 Year Warranty</span>
+            </div>
+            <div class="feature">
+              <i class="pi pi-verified"></i>
+              <span>Authentic</span>
+            </div>
           </div>
 
         </div>
+      </div>
 
-      </div> </div>
+    </div>
   }
 </div> -->

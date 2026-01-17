@@ -1,72 +1,246 @@
-import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-
-// Ensure this model path is correct for your project
-import { PublicProduct } from '../../../../core/models/storefront.model';
+import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-product-card',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule, TagModule, TooltipModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './product-card.html',
-  styleUrls: ['./product-card.scss']
+  styleUrls: ['./product-card.scss'],
+  animations: [
+    trigger('modalFade', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('300ms cubic-bezier(0.4, 0, 0.2, 1)', style({ opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('200ms ease-in', style({ opacity: 0 }))
+      ])
+    ]),
+    trigger('modalScale', [
+      transition(':enter', [
+        style({ transform: 'scale(0.95) translateY(10px)', opacity: 0 }),
+        animate('400ms cubic-bezier(0.25, 0.8, 0.25, 1)', style({ transform: 'scale(1) translateY(0)', opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('200ms ease-in', style({ transform: 'scale(0.95) translateY(10px)', opacity: 0 }))
+      ])
+    ])
+  ]
 })
-export class ProductCardComponent {
+export class ProductCardComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-@Input() layout: string = 'grid'; // or 'list' based on your logic
-  // Inputs
-  @Input({ required: true }) product!: any; // Changed to 'any' temporarily to match your backend data structure, switch back to PublicProduct if strict
-  @Input({ required: true }) orgSlug!: string;
 
-  // Outputs
+  @Input() layout: string = 'grid';
+  @Input() product!: any;
+  @Input() orgSlug!: string; // Might be undefined if parent doesn't pass it
   @Output() addToCart = new EventEmitter<any>();
-  @Output() quickView = new EventEmitter<any>();
 
-  // State
-  readonly FALLBACK_IMAGE = 'https://images.pexels.com/photos/35209410/pexels-photo-35209410.jpeg';
+  // State for the "Best UI" Modal
+  showModal = signal(false);
   imageError = false;
 
-  /**
-   * Smart getter for image source.
-   * Returns fallback if the image array is empty OR if the image previously failed to load.
-   */
-  get displayImage(): string {
-    if (this.imageError || !this.product?.images?.length) {
-      return this.FALLBACK_IMAGE;
+  readonly FALLBACK_IMAGE = 'https://images.pexels.com/photos/35209410/pexels-photo-35209410.jpeg';
+
+  // ✅ RESTORED: This ensures we get the orgSlug from the URL 
+  // if the parent component (like Home Page Slider) didn't pass it explicitly.
+  ngOnInit() {
+    if (!this.orgSlug) {
+      // Try to get orgSlug from the current route or parent route
+      this.route.paramMap.subscribe(params => {
+        const slug = params.get('orgSlug');
+        if (slug) this.orgSlug = slug;
+      });
+
+      // Fallback: Check parent route (common in lazy loaded modules)
+      this.route.parent?.paramMap.subscribe(params => {
+        const slug = params.get('orgSlug');
+        if (slug && !this.orgSlug) this.orgSlug = slug;
+      });
     }
-    return this.product.images[0];
   }
 
-  ngOnInit() {
-    this.route.parent?.paramMap.subscribe(params => {
-      this.orgSlug = params.get('orgSlug') || '';
-    });
+  get displayImage(): string {
+    return (this.imageError || !this.product?.images?.length)
+      ? this.FALLBACK_IMAGE
+      : this.product.images[0];
+  }
+
+  // Open the "Masterpiece" Modal
+  openQuickView(e?: Event) {
+    e?.stopPropagation();
+    this.showModal.set(true);
+    document.body.style.overflow = 'hidden';
+  }
+
+  // Close Modal
+  closeQuickView(e?: Event) {
+    e?.stopPropagation();
+    this.showModal.set(false);
+    document.body.style.overflow = 'auto';
+  }
+
+  // Navigate to full page
+  goToFullDetails() {
+    this.closeQuickView();
+
+    // Safety Check: Log error if slug is still missing
+    if (!this.orgSlug || !this.product?.slug) {
+      console.error('Cannot navigate: Missing orgSlug or product slug', { 
+        org: this.orgSlug, 
+        product: this.product 
+      });
+      return;
+    }
+
+    this.router.navigate(['/store', this.orgSlug, 'products', this.product.slug]);
   }
 
   onImageError() {
     this.imageError = true;
   }
-
-  onAddToCart(event: Event) {
-    event.stopPropagation();
-    this.addToCart.emit(this.product);
-  }
-
-  onQuickView(event: Event) {
-    event.stopPropagation();
-    this.quickView.emit(this.product);
-  }
-
-  viewDetails() {
-    if (!this.orgSlug || !this.product?.slug) {
-      console.warn('Cannot navigate: Missing orgSlug or product slug', { org: this.orgSlug, slug: this.product?.slug });
-      return;
-    }
-    this.router.navigate(['/store', this.orgSlug, 'products', this.product.slug]);
-  }
 }
+
+// import { Component, Input, Output, EventEmitter, inject, signal } from '@angular/core';
+// import { CommonModule } from '@angular/common';
+// import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+// import { animate, style, transition, trigger } from '@angular/animations';
+
+// @Component({
+//   selector: 'app-product-card',
+//   standalone: true,
+//   imports: [CommonModule, RouterModule],
+//   templateUrl: './product-card.html',
+//   styleUrls: ['./product-card.scss'],
+//   animations: [
+//     trigger('modalFade', [
+//       transition(':enter', [
+//         style({ opacity: 0 }),
+//         animate('300ms cubic-bezier(0.4, 0, 0.2, 1)', style({ opacity: 1 }))
+//       ]),
+//       transition(':leave', [
+//         animate('200ms ease-in', style({ opacity: 0 }))
+//       ])
+//     ]),
+//     trigger('modalScale', [
+//       transition(':enter', [
+//         style({ transform: 'scale(0.95) translateY(10px)', opacity: 0 }),
+//         animate('400ms cubic-bezier(0.25, 0.8, 0.25, 1)', style({ transform: 'scale(1) translateY(0)', opacity: 1 }))
+//       ]),
+//       transition(':leave', [
+//         animate('200ms ease-in', style({ transform: 'scale(0.95) translateY(10px)', opacity: 0 }))
+//       ])
+//     ])
+//   ]
+// })
+// export class ProductCardComponent {
+//   private router = inject(Router);
+//   private route = inject(ActivatedRoute);
+//   @Input() layout: string = 'grid';
+//   @Input() product!: any;
+//   @Input() orgSlug!: string;
+//   @Output() addToCart = new EventEmitter<any>();
+
+//   // State for the "Best UI" Modal
+//   showModal = signal(false);
+//   imageError = false;
+
+//   readonly FALLBACK_IMAGE = 'https://images.pexels.com/photos/35209410/pexels-photo-35209410.jpeg';
+
+//   get displayImage(): string {
+//     return (this.imageError || !this.product?.images?.length)
+//       ? this.FALLBACK_IMAGE
+//       : this.product.images[0];
+//   }
+
+//   // Open the "Masterpiece" Modal
+//   openQuickView(e?: Event) {
+//     e?.stopPropagation();
+//     this.showModal.set(true);
+//     // Prevent background scrolling
+//     document.body.style.overflow = 'hidden';
+//   }
+
+//   // Close Modal
+//   closeQuickView(e?: Event) {
+//     e?.stopPropagation();
+//     this.showModal.set(false);
+//     document.body.style.overflow = 'auto';
+//   }
+
+//   // Navigate to full page
+//   goToFullDetails() {
+//     this.closeQuickView();
+//     this.router.navigate(['/store', this.orgSlug, 'products', this.product.slug]);
+//   }
+
+//   onImageError() {
+//     this.imageError = true;
+//   }
+// }
+
+// // import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
+// // import { CommonModule } from '@angular/common';
+// // import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+// // import { ButtonModule } from 'primeng/button';
+// // import { TagModule } from 'primeng/tag';
+// // import { TooltipModule } from 'primeng/tooltip';
+
+// // // Ensure this model path is correct for your project
+// // import { PublicProduct } from '../../../../core/models/storefront.model';
+
+// // @Component({
+// //   selector: 'app-product-card',
+// //   standalone: true,
+// //   imports: [CommonModule, RouterModule, ButtonModule, TagModule, TooltipModule],
+// //   templateUrl: './product-card.html',
+// //   styleUrls: ['./product-card.scss']
+// // })
+// // export class ProductCardComponent {
+// //   private router = inject(Router);
+// //   private route = inject(ActivatedRoute);
+// //   @Input() layout: string = 'grid';
+// //   @Input({ required: true }) product!: any;
+// //   @Input({ required: true }) orgSlug!: string;
+// //   @Output() addToCart = new EventEmitter<any>();
+// //   @Output() quickView = new EventEmitter<any>();
+// //   readonly FALLBACK_IMAGE = 'https://images.pexels.com/photos/35209410/pexels-photo-35209410.jpeg';
+// //   imageError = false;
+// //   get displayImage(): string {
+// //     if (this.imageError || !this.product?.images?.length) {
+// //       return this.FALLBACK_IMAGE;
+// //     }
+// //     return this.product.images[0];
+// //   }
+
+// //   ngOnInit() {
+// //     this.route.parent?.paramMap.subscribe(params => {
+// //       this.orgSlug = params.get('orgSlug') || '';
+// //     });
+// //   }
+
+// //   onImageError() {
+// //     this.imageError = true;
+// //   }
+
+// //   onAddToCart(event: Event) {
+// //     event.stopPropagation();
+// //     this.addToCart.emit(this.product);
+// //   }
+
+// //   onQuickView(event: Event) {
+// //     event.stopPropagation();
+// //     this.quickView.emit(this.product);
+// //   }
+
+// //   viewDetails() {
+// //     if (!this.orgSlug || !this.product?.slug) {
+// //       console.warn('Cannot navigate: Missing orgSlug or product slug', { org: this.orgSlug, slug: this.product?.slug });
+// //       return;
+// //     }
+// //     this.router.navigate(['/store', this.orgSlug, 'products', this.product.slug]);
+// //   }
+// // }
