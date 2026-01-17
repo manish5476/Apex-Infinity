@@ -16,7 +16,7 @@ export interface MapLocation {
 }
 
 export interface MapConfig {
-  title: string;
+  title?: string;
   clusterMarkers?: boolean;
   enableHeatmap?: boolean;
   mapStyle?: 'dark' | 'light' | 'satellite';
