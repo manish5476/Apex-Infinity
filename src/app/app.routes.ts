@@ -1,3 +1,18 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/authguard.guard';
 
@@ -39,43 +54,88 @@ export const routes: Routes = [
     path: 'auth',
     loadChildren: () => import('./modules/auth/auth.routes').then((m) => m.AUTH_ROUTES),
   },
-
-  // ==========================================================
+// ==========================================================
   //  3. PUBLIC STOREFRONT (Customer View)
-  //  ⚠️ MUST be before protected routes.
+  //  ⚠️ Implements Master Layout Pattern
   // ==========================================================
-  
-  // A. Store Root Redirect
   {
+    // PARENT ROUTE: Loads the Header/Footer Shell
     path: 'store/:orgSlug',
-    redirectTo: 'store/:orgSlug/home',
-    pathMatch: 'full'
-  },
+    loadComponent: () => import('./modules/storefront-public/layout/storefront-layout.component')
+      .then(m => m.StorefrontLayoutComponent),
+    
+    // CHILDREN: Load inside the <router-outlet> of the Layout
+    children: [
+      // A. Default Redirect (store/shivam -> store/shivam/home)
+      {
+        path: '',
+        redirectTo: 'home',
+        pathMatch: 'full'
+      },
 
-  // B. Product Listing Page (Specific)
-  {
-    path: 'store/:orgSlug/products',
-    loadComponent: () => import('./modules/storefront-public/pages/product-listing/product-listing.component')
-      .then(m => m.ProductListingComponent),
-    title: 'Shop All Products'
-  },
+      // B. Product Listing Page
+      {
+        path: 'products',
+        loadComponent: () => import('./modules/storefront-public/pages/product-listing/product-listing.component')
+          .then(m => m.ProductListingComponent),
+        title: 'Shop All Products'
+      },
 
-  // C. Product Detail Page (Specific)
-  {
-    path: 'store/:orgSlug/products/:productSlug',
-    loadComponent: () => import('./modules/storefront-public/pages/product-detail/product-detail.component')
-      .then(m => m.ProductDetailComponent),
-    title: 'Product Details'
-  },
+      // C. Product Detail Page
+      {
+        path: 'products/:productSlug',
+        loadComponent: () => import('./modules/storefront-public/pages/product-detail/product-detail.component')
+          .then(m => m.ProductDetailComponent),
+        title: 'Product Details'
+      },
 
-  // D. Generic Dynamic Page (Wildcard - MUST BE LAST in Storefront group)
-  // Catches /home, /about, /contact, etc.
-  {
-    path: 'store/:orgSlug/:pageSlug',
-    loadComponent: () => import('./modules/storefront-public/pages/dynamic-page/dynamic-page.component')
-      .then(m => m.DynamicPageComponent),
-    title: 'Storefront'
+      // D. Dynamic Page (Home, About, Contact) 
+      // ⚠️ MUST be last to act as a wildcard for this group
+      {
+        path: ':pageSlug',
+        loadComponent: () => import('./modules/storefront-public/pages/dynamic-page/dynamic-page.component')
+          .then(m => m.DynamicPageComponent),
+        title: 'Storefront'
+      }
+    ]
   },
+  
+  // // ==========================================================
+  // //  3. PUBLIC STOREFRONT (Customer View)
+  // //  ⚠️ MUST be before protected routes.
+  // // ==========================================================
+  
+  // // A. Store Root Redirect
+  // {
+  //   path: 'store/:orgSlug',
+  //   redirectTo: 'store/:orgSlug/home',
+  //   pathMatch: 'full'
+  // },
+
+  // // B. Product Listing Page (Specific)
+  // {
+  //   path: 'store/:orgSlug/products',
+  //   loadComponent: () => import('./modules/storefront-public/pages/product-listing/product-listing.component')
+  //     .then(m => m.ProductListingComponent),
+  //   title: 'Shop All Products'
+  // },
+
+  // // C. Product Detail Page (Specific)
+  // {
+  //   path: 'store/:orgSlug/products/:productSlug',
+  //   loadComponent: () => import('./modules/storefront-public/pages/product-detail/product-detail.component')
+  //     .then(m => m.ProductDetailComponent),
+  //   title: 'Product Details'
+  // },
+
+  // // D. Generic Dynamic Page (Wildcard - MUST BE LAST in Storefront group)
+  // // Catches /home, /about, /contact, etc.
+  // {
+  //   path: 'store/:orgSlug/:pageSlug',
+  //   loadComponent: () => import('./modules/storefront-public/pages/dynamic-page/dynamic-page.component')
+  //     .then(m => m.DynamicPageComponent),
+  //   title: 'Storefront'
+  // },
 
   // ==========================================================
   //  4. PROTECTED APPLICATION (ERP Dashboard)

@@ -3,14 +3,17 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
+import { combineLatest } from 'rxjs'; // ✅ Required for joining Parent/Child params
 
-// PrimeNG Imports (Minimal set for this design)
+// PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 
+// Services
 import { StorefrontPublicService } from '../../../../core/services/storefront-public.service';
+import { StorefrontStateService } from '../../../../core/services/storefront-state.service'; // ✅ Added
 
 @Component({
   selector: 'app-product-detail',
@@ -20,7 +23,7 @@ import { StorefrontPublicService } from '../../../../core/services/storefront-pu
     RouterModule, 
     FormsModule, 
     ButtonModule, 
-    TooltipModule,
+    TooltipModule, 
     ToastModule
   ],
   providers: [MessageService],
@@ -30,6 +33,7 @@ import { StorefrontPublicService } from '../../../../core/services/storefront-pu
 export class ProductDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private publicService = inject(StorefrontPublicService);
+  private stateService = inject(StorefrontStateService); // ✅ Inject State Service
   private titleService = inject(Title);
   private messageService = inject(MessageService);
 
@@ -44,7 +48,7 @@ export class ProductDetailComponent implements OnInit {
   quantity = signal(1);
   orgSlug = signal('');
   
-  // Mock Variants (Colors) - Mocking purely for UI demo as API data didn't have color codes
+  // Mock Variants (Colors)
   variants = signal([
     { name: 'Jet Black', code: 'BLK', colorCode: '#111111' },
     { name: 'Silver Grey', code: 'SLV', colorCode: '#C0C0C0' },
@@ -54,7 +58,7 @@ export class ProductDetailComponent implements OnInit {
   selectedVariant = signal<any>(null);
 
   // UI State
-  openAccordion = signal<string>('desc'); // Default open section
+  openAccordion = signal<string>('desc'); 
 
   // --- Computed ---
   discountPercentage = computed(() => {
@@ -67,39 +71,54 @@ export class ProductDetailComponent implements OnInit {
   });
 
   ngOnInit() {
-    this.route.paramMap.subscribe(params => {
-      const org = params.get('orgSlug') || '';
-      const slug = params.get('productSlug');
-      this.orgSlug.set(org);
+    // ✅ FIX: Use combineLatest to get Parent Params (orgSlug) AND Child Params (productSlug)
+    if (this.route.parent) {
+      combineLatest([
+        this.route.parent.paramMap, // Contains 'orgSlug'
+        this.route.paramMap         // Contains 'productSlug'
+      ]).subscribe(([parentParams, childParams]) => {
+        
+        const org = parentParams.get('orgSlug') || '';
+        const slug = childParams.get('productSlug') || '';
+        
+        this.orgSlug.set(org);
 
-      if (org && slug) {
-        this.loadProduct(org, slug);
-      }
-    });
+        if (org && slug) {
+          this.loadProduct(org, slug);
+        } else {
+          console.error("Missing URL Parameters", { org, slug });
+          this.loading.set(false);
+        }
+      });
+    }
   }
   
   loadProduct(orgSlug: string, slug: string) {
     this.loading.set(true);
+    
     this.publicService.getProductBySlug(orgSlug, slug).subscribe({
       next: (res: any) => {
+        // 1. Update Product State
         this.product.set(res.product);
         
-        // Set Default Image
+        // 2. ✅ Update Global Layout (Header/Footer)
+        this.stateService.setState(res);
+
+        // 3. Set Default Image
         if (res.product.images?.length) {
           this.selectedImage.set(res.product.images[0]);
         } else {
-            // Fallback if no images
-            this.selectedImage.set('assets/placeholder.png');
+          this.selectedImage.set('assets/placeholder.png'); // Ensure you have a placeholder
         }
 
-        // Set Default Variant
+        // 4. Set Defaults
         this.selectedVariant.set(this.variants()[0]);
 
-        // Set Page Title
+        // 5. SEO & Title
         if (res.seo) {
           this.titleService.setTitle(res.seo.title || res.product.name);
         } else {
-            this.titleService.setTitle(res.product.name);
+          this.titleService.setTitle(res.product.name);
         }
 
         this.loading.set(false);
@@ -129,7 +148,6 @@ export class ProductDetailComponent implements OnInit {
   }
 
   toggleAccordion(section: string) {
-    // If clicking the same section, close it. Otherwise open the new one.
     this.openAccordion.update(curr => curr === section ? '' : section);
   }
 
