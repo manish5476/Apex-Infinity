@@ -1,0 +1,32 @@
+.section-root {
+  padding: 4rem 0;
+  background-color: #ffffff;
+}
+
+.product-grid-layout {
+  display: grid;
+  gap: 24px;
+  
+  /* Mobile: 1 Column */
+  grid-template-columns: repeat(1, 1fr);
+
+  /* Tablet: 2 Columns */
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Desktop: Use the Variable from config */
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(var(--desktop-cols), 1fr);
+  }
+}
+
+.grid-item {
+  height: 100%;
+  
+  /* Ensure card fills height */
+  ::ng-deep app-product-card, 
+  ::ng-deep .card-root {
+    height: 100%;
+  }
+}

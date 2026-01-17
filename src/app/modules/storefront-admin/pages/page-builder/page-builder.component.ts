@@ -140,7 +140,6 @@ const newSection = {
         : (def.dataSource?.includes('dynamic') ? 'dynamic' : 'static')
       // 👆👆👆 END UPDATE 👆👆👆
     };
-    
     this.sections.update(s => [...s, newSection]);
     this.selectSection(newSection);
     this.showAddMenu.set(false);

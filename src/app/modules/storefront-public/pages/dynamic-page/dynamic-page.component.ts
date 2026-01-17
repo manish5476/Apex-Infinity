@@ -14,6 +14,7 @@ import { HeroBannerComponent } from '../../sections/hero-banner/hero-banner.comp
 import { ProductSliderComponent } from '../../sections/product-slider/product-slider.component';
 import { PublicPageResponse } from '../../../../core/models/storefront.model';
 import { MapLocationsComponent } from "../map-locations/map-locations.component";
+import { ProductGridComponent } from "../product-grid/product-grid.component";
 
 @Component({
   selector: 'app-dynamic-page',
@@ -23,7 +24,8 @@ import { MapLocationsComponent } from "../map-locations/map-locations.component"
     RouterModule,
     HeroBannerComponent,
     ProductSliderComponent,
-    MapLocationsComponent
+    MapLocationsComponent,
+    ProductGridComponent
   ],
   template: `
     @if (isLoading()) {
@@ -89,6 +91,13 @@ import { MapLocationsComponent } from "../map-locations/map-locations.component"
                     <p class="text-slate-500 text-sm tracking-wide">Component under construction</p>
                   </div>
                 }
+                @case ('product_grid') {
+    <app-product-grid 
+      [config]="section.config" 
+      [products]="section.data" 
+      [orgSlug]="orgSlug">
+    </app-product-grid>
+  }
                 @default {
                   @if (isDevMode) {
                     <div class="max-w-4xl mx-auto my-12 p-6 border border-dashed border-rose-300 bg-rose-50/50 rounded-2xl flex items-center justify-center gap-4 text-rose-800">
@@ -139,6 +148,7 @@ export class DynamicPageComponent implements OnInit {
 
   // Set to false in production
   isDevMode = true;
+  orgSlug: any;
 
   ngOnInit() {
     if (this.route.parent) {
@@ -149,7 +159,7 @@ export class DynamicPageComponent implements OnInit {
 
         const orgSlug = parentParams['orgSlug'];
         const pageSlug = childParams['pageSlug'];
-
+        this.orgSlug = orgSlug
         if (orgSlug) {
           this.loadPage(orgSlug, pageSlug || 'home');
         } else {
