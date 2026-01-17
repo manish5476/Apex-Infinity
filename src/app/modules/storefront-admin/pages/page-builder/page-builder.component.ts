@@ -2,16 +2,10 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
-
 import { StorefrontAdminService } from '../../../../core/services/storefront-admin.service';
-
-// Preview Components
 import { HeroBannerComponent } from '../../../storefront-public/sections/hero-banner/hero-banner.component';
 import { ProductSliderComponent } from '../../../storefront-public/sections/product-slider/product-slider.component';
 import { ConfigFormComponent } from '../config-form/config-form.component';
-
-// The New Professional Form
-// import { ConfigFormComponent } from './config-form/config-form.component';
 
 @Component({
   selector: 'app-page-builder',
@@ -125,15 +119,28 @@ export class PageBuilderComponent implements OnInit {
       });
     }
 
-    const newSection = {
+    // const newSection = {
+    //   id: crypto.randomUUID(),
+    //   type,
+    //   config,
+    //   position: this.sections().length,
+    //   isActive: true,
+    //   dataSource: def.dataSource?.includes('smart') ? 'smart' : 'static'
+    // };
+const newSection = {
       id: crypto.randomUUID(),
       type,
       config,
       position: this.sections().length,
       isActive: true,
-      dataSource: def.dataSource?.includes('smart') ? 'smart' : 'static'
+      
+      // 👇👇👇 UPDATE THIS SECTION 👇👇👇
+      dataSource: def.dataSource?.includes('smart') 
+        ? 'smart' 
+        : (def.dataSource?.includes('dynamic') ? 'dynamic' : 'static')
+      // 👆👆👆 END UPDATE 👆👆👆
     };
-
+    
     this.sections.update(s => [...s, newSection]);
     this.selectSection(newSection);
     this.showAddMenu.set(false);
