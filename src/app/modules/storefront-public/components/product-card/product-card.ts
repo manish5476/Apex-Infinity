@@ -18,7 +18,7 @@ import { PublicProduct } from '../../../../core/models/storefront.model';
 export class ProductCardComponent {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-
+@Input() layout: string = 'grid'; // or 'list' based on your logic
   // Inputs
   @Input({ required: true }) product!: any; // Changed to 'any' temporarily to match your backend data structure, switch back to PublicProduct if strict
   @Input({ required: true }) orgSlug!: string;

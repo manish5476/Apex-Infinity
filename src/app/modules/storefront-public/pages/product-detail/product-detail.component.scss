@@ -43,22 +43,25 @@
 }
 
 /* --- 1. CINEMATIC STAGE (Image) --- */
+/* --- 1. CINEMATIC STAGE (Image) --- */
 .cinematic-stage {
+  /* 1. Standard Properties (Must come first) */
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1; /* Default square */
+  border-radius: 40px;
+  background: white;
+  overflow: hidden;
   
+  box-shadow:
+    0 20px 40px -10px rgba(0, 0, 0, 0.05),
+    inset 0 0 0 1px white; /* Inner bezel */
+
+  /* 2. Nested Rules (Must come last) */
   @media (min-width: 768px) {
     aspect-ratio: 4 / 3; /* Taller landscape */
   }
-  
-  border-radius: 40px;
-  background: white;
-  box-shadow: 
-    0 20px 40px -10px rgba(0,0,0,0.05),
-    inset 0 0 0 1px white; /* Inner bezel */
-  overflow: hidden;
-  
+
   /* Subtle texture */
   &::before {
     content: '';
@@ -68,7 +71,6 @@
     z-index: 0;
   }
 }
-
 .image-viewport {
   position: absolute;
   inset: 20px;
