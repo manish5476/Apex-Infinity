@@ -568,7 +568,6 @@ export class DynamicPageComponent implements OnInit {
           this.isLoading.set(false);
           return;
         }
-
         this.pageData.set(res);
         this.stateService.setState(res);
         this.updateSeo(res);

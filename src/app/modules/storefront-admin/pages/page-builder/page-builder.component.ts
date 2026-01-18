@@ -3,13 +3,31 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { StorefrontAdminService } from '../../../../core/services/storefront-admin.service';
-import { HeroBannerComponent } from '../../../storefront-public/sections/hero-banner/hero-banner.component';
-import { ProductSliderComponent } from '../../../storefront-public/sections/product-slider/product-slider.component';
-import { ConfigFormComponent } from '../config-form/config-form.component';
 
-// Modules for View Management
+// --- UI Modules ---
 import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
+import { ConfigFormComponent } from '../config-form/config-form.component';
+
+// --- ALL Section Components ---
+import { HeroBannerComponent } from '../../../storefront-public/sections/hero-banner/hero-banner.component';
+import { ProductSliderComponent } from '../../../storefront-public/sections/product-slider/product-slider.component';
+import { BlogFeedComponent } from '../../../storefront-public/pages/blog-feed/blog-feed.component';
+import { CategoryGridComponent } from '../../../storefront-public/pages/category-grid/category-grid.component';
+import { ContactFormComponent } from '../../../storefront-public/pages/contact-form/contact-form.component';
+import { CountdownTimerComponent } from '../../../storefront-public/pages/countdown-timer/countdown-timer.component';
+import { FaqAccordionComponent } from '../../../storefront-public/pages/faq-accordion/faq-accordion.component';
+import { FeatureGridComponent } from '../../../storefront-public/pages/feature-grid/feature-grid.component';
+import { LogoCloudComponent } from '../../../storefront-public/pages/logo-cloud/logo-cloud.component';
+import { NewsletterSignupComponent } from '../../../storefront-public/pages/newsletter-signup/newsletter-signup.component';
+import { PricingTableComponent } from '../../../storefront-public/pages/pricing-table/pricing-table.component';
+import { ProductGridComponent } from '../../../storefront-public/pages/product-grid/product-grid.component';
+import { SplitContentComponent } from '../../../storefront-public/pages/split-content/split-content.component';
+import { StatsCounterComponent } from '../../../storefront-public/pages/stats-counter/stats-counter.component';
+import { TestimonialSliderComponent } from '../../../storefront-public/pages/testimonial-slider/testimonial-slider.component';
+import { TextContentComponent } from '../../../storefront-public/pages/text-content/text-content.component';
+import { VideoHeroComponent } from '../../../storefront-public/pages/video-hero/video-hero.component';
+
 
 @Component({
   selector: 'app-page-builder',
@@ -21,8 +39,25 @@ import { TooltipModule } from 'primeng/tooltip';
     DialogModule,
     TooltipModule,
     ConfigFormComponent,
+
+    // ✅ REGISTERED COMPONENTS
     HeroBannerComponent,
-    ProductSliderComponent
+    ProductSliderComponent,
+    ProductGridComponent,
+    CategoryGridComponent,
+    FeatureGridComponent,
+    TextContentComponent,
+    ContactFormComponent,
+    VideoHeroComponent,
+    SplitContentComponent,
+    TestimonialSliderComponent,
+    LogoCloudComponent,
+    NewsletterSignupComponent,
+    StatsCounterComponent,
+    PricingTableComponent,
+    FaqAccordionComponent,
+    CountdownTimerComponent,
+    BlogFeedComponent
   ],
   templateUrl: './page-builder.component.html',
   styleUrls: ['./page-builder.component.scss'],
@@ -54,7 +89,7 @@ export class PageBuilderComponent implements OnInit {
       next: (res: any) => {
         const types = Array.isArray(res) ? res : res.sectionTypes;
         
-        // Dynamic patching for specific types
+        // Dynamic patching for specific types (e.g. dropdowns for ruleType)
         const patchedTypes = types.map((t: any) => {
           if ((t.type === 'product_slider' || t.type === 'product_grid') && t.allowedConfig.ruleType) {
             t.allowedConfig.ruleType.type = 'select'; 
@@ -138,7 +173,7 @@ export class PageBuilderComponent implements OnInit {
   selectSection(section: any) {
     // If selecting new, ensure sidebar is ready
     if (this.viewMode() === 'sidebar' && this.sidebarState() === 'full') {
-        // Optional: Reset to split? 
+        // Optional: Reset to split view if fully expanded covers the preview
         // this.sidebarState.set('split');
     }
     
@@ -172,14 +207,14 @@ export class PageBuilderComponent implements OnInit {
     const reordered = list.map((s, i) => ({ ...s, position: i }));
     this.sections.set(reordered);
   }
-// In page-builder.component.ts
-savePage() {
+
+  savePage() {
     const pageId = this.page()?._id || this.page()?.id;
     if (!pageId) return;
     
     this.isSaving.set(true);
     
-    // ✅ FIX: Clean data before sending
+    // Clean data before sending
     const cleanPayload = {
       sections: this.sections().map((s, i) => {
         // Create a copy of config
@@ -193,9 +228,14 @@ savePage() {
           }
         });
 
-        // Ensure Product Grid columns are Numbers (not strings)
+        // Ensure numeric fields are numbers
         if (s.type === 'product_grid' && cleanConfig.columns) {
           cleanConfig.columns = Number(cleanConfig.columns);
+        }
+
+        // Ensure Date fields are strings (datetime-local usually binds as string anyway)
+        if (s.type === 'countdown_timer' && cleanConfig.targetDate) {
+           cleanConfig.targetDate = String(cleanConfig.targetDate);
         }
 
         return {
@@ -221,94 +261,7 @@ savePage() {
       }
     });
   }
-// savePage() {
-//   const pageId = this.page()?._id || this.page()?.id;
-//   if (!pageId) return;
-
-//   this.isSaving.set(true);
-
-//   // 1. Sanitize Config Data
-//   const cleanSections = this.sections().map((s, i) => {
-//     const cleanConfig = { ...s.config };
-
-//     // Fix: Convert empty strings to undefined so backend defaults apply
-//     Object.keys(cleanConfig).forEach(key => {
-//       if (cleanConfig[key] === '' || cleanConfig[key] === null) {
-//         delete cleanConfig[key]; // Remove key so backend applies default
-//       }
-//     });
-
-//     // Special Case: Product Grid Columns (ensure number)
-//     if (s.type === 'product_grid' && cleanConfig.columns) {
-//       cleanConfig.columns = Number(cleanConfig.columns);
-//     }
-    
-//     // Special Case: Hero Height (Legacy fix)
-//     if (s.type === 'hero_banner' && cleanConfig.height === 'full') {
-//       cleanConfig.height = 'full_screen';
-//     }
-
-//     return {
-//       type: s.type,
-//       config: cleanConfig,
-//       position: i,
-//       isActive: s.isActive,
-//       dataSource: s.dataSource
-//     };
-//   });
-
-//   const payload = { sections: cleanSections };
-
-//   this.adminService.updatePage(pageId, payload).subscribe({
-//     next: () => {
-//       this.isSaving.set(false);
-//       // Optional: Show success toast
-//     },
-//     error: (err) => { 
-//       this.isSaving.set(false); 
-//       console.error(err);
-//       alert('Save failed: ' + (err.error?.message || 'Unknown error')); 
-//     }
-//   });
-// }
-
-  // savePage() {
-  //   const pageId = this.page()?._id || this.page()?.id;
-  //   if (!pageId) return;
-  //   this.isSaving.set(true);
-  //   const payload = {
-  //     sections: this.sections().map((s, i) => ({
-  //       type: s.type,
-  //       config: s.config,
-  //       position: i,
-  //       isActive: s.isActive,
-  //       dataSource: s.dataSource
-  //     }))
-  //   };
-  //   this.adminService.updatePage(pageId, payload).subscribe({
-  //     next: () => this.isSaving.set(false),
-  //     error: () => { this.isSaving.set(false); alert('Save failed'); }
-  //   });
-  // }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // import { Component, OnInit, inject, signal, ViewEncapsulation } from '@angular/core';
 // import { CommonModule } from '@angular/common';
@@ -319,35 +272,36 @@ savePage() {
 // import { ProductSliderComponent } from '../../../storefront-public/sections/product-slider/product-slider.component';
 // import { ConfigFormComponent } from '../config-form/config-form.component';
 
+// // Modules for View Management
+// import { DialogModule } from 'primeng/dialog';
+// import { TooltipModule } from 'primeng/tooltip';
+
 // @Component({
 //   selector: 'app-page-builder',
 //   standalone: true,
-//   imports: [
-//     CommonModule,
-//     RouterModule,
-//     DragDropModule,
-//     ConfigFormComponent,
-//     HeroBannerComponent,
-//     ProductSliderComponent
-//   ],
+//   imports: [CommonModule,RouterModule,DragDropModule,DialogModule,TooltipModule,ConfigFormComponent,HeroBannerComponent,ProductSliderComponent],
 //   templateUrl: './page-builder.component.html',
-//   styleUrls: ['./page-builder.component.scss'], // Make sure to use the file above
-//   encapsulation: ViewEncapsulation.None // To apply styles to drag preview if needed
+//   styleUrls: ['./page-builder.component.scss'],
+//   encapsulation: ViewEncapsulation.None
 // })
 // export class PageBuilderComponent implements OnInit {
 //   private route = inject(ActivatedRoute);
 //   private adminService = inject(StorefrontAdminService);
 
-//   // Signals
+//   // Data Signals
 //   page = signal<any>(null);
 //   sections = signal<any[]>([]);
 //   selectedSection = signal<any>(null);
   
-//   // State
-//   sectionRegistry: any = {}; 
-//   availableTypes: any[] = [];
+//   // View State Signals
+//   viewMode = signal<'sidebar' | 'dialog'>('sidebar');
+//   sidebarState = signal<'split' | 'full'>('split');
 //   showAddMenu = signal(false);
 //   isSaving = signal(false);
+
+//   // Registry
+//   sectionRegistry: any = {}; 
+//   availableTypes: any[] = [];
 
 //   ngOnInit() {
 //     const pageId = this.route.snapshot.paramMap.get('id');
@@ -356,7 +310,7 @@ savePage() {
 //       next: (res: any) => {
 //         const types = Array.isArray(res) ? res : res.sectionTypes;
         
-//         // Dynamic patching for dropdowns (as previously established)
+//         // Dynamic patching for specific types
 //         const patchedTypes = types.map((t: any) => {
 //           if ((t.type === 'product_slider' || t.type === 'product_grid') && t.allowedConfig.ruleType) {
 //             t.allowedConfig.ruleType.type = 'select'; 
@@ -378,8 +332,7 @@ savePage() {
 //         }, {});
 
 //         if (pageId) this.loadPage(pageId);
-//       },
-//       error: (err) => console.error('Failed to load types', err)
+//       }
 //     });
 //   }
 
@@ -394,6 +347,16 @@ savePage() {
 //       },
 //       error: () => alert('Failed to load page.')
 //     });
+//   }
+
+//   // --- Actions ---
+
+//   toggleViewMode() {
+//     this.viewMode.update(mode => mode === 'sidebar' ? 'dialog' : 'sidebar');
+//   }
+
+//   toggleSidebarState() {
+//     this.sidebarState.update(state => state === 'split' ? 'full' : 'split');
 //   }
 
 //   addSection(type: string) {
@@ -415,16 +378,13 @@ savePage() {
 //       config,
 //       position: this.sections().length,
 //       isActive: true,
-//       dataSource: def.dataSource?.includes('smart') 
-//         ? 'smart' 
-//         : (def.dataSource?.includes('dynamic') ? 'dynamic' : 'static')
+//       dataSource: def.dataSource?.includes('smart') ? 'smart' : (def.dataSource?.includes('dynamic') ? 'dynamic' : 'static')
 //     };
 
 //     this.sections.update(s => [...s, newSection]);
 //     this.selectSection(newSection);
 //     this.showAddMenu.set(false);
     
-//     // Auto-scroll logic
 //     setTimeout(() => {
 //       const container = document.getElementById('preview-container');
 //       if(container) container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
@@ -432,11 +392,12 @@ savePage() {
 //   }
 
 //   selectSection(section: any) {
-//     if (this.selectedSection()?.id === section.id) {
-//        // Toggle off if clicking same one? Optional.
-//        // this.selectedSection.set(null); 
-//        return;
+//     // If selecting new, ensure sidebar is ready
+//     if (this.viewMode() === 'sidebar' && this.sidebarState() === 'full') {
+//         // Optional: Reset to split? 
+//         // this.sidebarState.set('split');
 //     }
+    
 //     try {
 //       this.selectedSection.set(JSON.parse(JSON.stringify(section)));
 //     } catch (e) {
@@ -447,9 +408,7 @@ savePage() {
 //   onConfigChange(newConfig: any) {
 //     const current = this.selectedSection();
 //     if (!current) return;
-
 //     const updated = { ...current, config: { ...current.config, ...newConfig } };
-    
 //     this.sections.update(list => list.map(s => s.id === updated.id ? updated : s));
 //     this.selectedSection.set(updated);
 //   }
@@ -469,252 +428,53 @@ savePage() {
 //     const reordered = list.map((s, i) => ({ ...s, position: i }));
 //     this.sections.set(reordered);
 //   }
-
-//   savePage() {
+// // In page-builder.component.ts
+// savePage() {
 //     const pageId = this.page()?._id || this.page()?.id;
 //     if (!pageId) return;
-
+    
 //     this.isSaving.set(true);
-//     const payload = {
-//       sections: this.sections().map((s, i) => ({
-//         type: s.type,
-//         config: s.config,
-//         position: i,
-//         isActive: s.isActive,
-//         dataSource: s.dataSource
-//       }))
+    
+//     // ✅ FIX: Clean data before sending
+//     const cleanPayload = {
+//       sections: this.sections().map((s, i) => {
+//         // Create a copy of config
+//         const cleanConfig = { ...s.config };
+        
+//         // Remove empty strings/nulls so Backend defaults take over
+//         Object.keys(cleanConfig).forEach(key => {
+//           const val = cleanConfig[key];
+//           if (val === '' || val === null) {
+//             delete cleanConfig[key];
+//           }
+//         });
+
+//         // Ensure Product Grid columns are Numbers (not strings)
+//         if (s.type === 'product_grid' && cleanConfig.columns) {
+//           cleanConfig.columns = Number(cleanConfig.columns);
+//         }
+
+//         return {
+//           type: s.type,
+//           config: cleanConfig,
+//           position: i,
+//           isActive: s.isActive,
+//           dataSource: s.dataSource
+//         };
+//       })
 //     };
 
-//     this.adminService.updatePage(pageId, payload).subscribe({
-//       next: () => this.isSaving.set(false),
-//       error: () => {
+//     this.adminService.updatePage(pageId, cleanPayload).subscribe({
+//       next: () => {
 //         this.isSaving.set(false);
-//         alert('Save failed');
+//         // Optional: Add a Toast Success message here
+//       },
+//       error: (err) => { 
+//         this.isSaving.set(false); 
+//         console.error(err);
+//         // Show the actual error message from backend
+//         alert('Save Error: ' + (err.error?.message || 'Something went wrong')); 
 //       }
 //     });
 //   }
 // }
-
-// // import { Component, OnInit, inject, signal } from '@angular/core';
-// // import { CommonModule } from '@angular/common';
-// // import { ActivatedRoute, RouterModule } from '@angular/router';
-// // import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
-// // import { StorefrontAdminService } from '../../../../core/services/storefront-admin.service';
-// // import { HeroBannerComponent } from '../../../storefront-public/sections/hero-banner/hero-banner.component';
-// // import { ProductSliderComponent } from '../../../storefront-public/sections/product-slider/product-slider.component';
-// // import { ConfigFormComponent } from '../config-form/config-form.component';
-
-// // @Component({
-// //   selector: 'app-page-builder',
-// //   standalone: true,
-// //   imports: [
-// //     CommonModule,
-// //     RouterModule,
-// //     DragDropModule,
-// //     ConfigFormComponent,
-// //     HeroBannerComponent,
-// //     ProductSliderComponent
-// //   ],
-// //   templateUrl: './page-builder.component.html',
-// //   styles: [`
-// //     :host { display: block; height: 100vh; overflow: hidden; }
-// //     .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-// //     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-// //     .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-// //     .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-// //   `]
-// // })
-// // export class PageBuilderComponent implements OnInit {
-// //   private route = inject(ActivatedRoute);
-// //   private adminService = inject(StorefrontAdminService);
-
-// //   // --- Signals ---
-// //   page = signal<any>(null);
-// //   sections = signal<any[]>([]);
-// //   selectedSection = signal<any>(null);
-  
-// //   // Registry & UI State
-// //   sectionRegistry: any = {}; 
-// //   availableTypes: any[] = [];
-// //   showAddMenu = signal(false);
-// //   isSaving = signal(false);
-
-// //   ngOnInit() {
-// //     const pageId = this.route.snapshot.paramMap.get('id');
-    
-// //     // 1. Fetch & Patch Section Definitions
-// //     this.adminService.getSectionTypes().subscribe({
-// //       next: (res: any) => {
-// //         const types = Array.isArray(res) ? res : res.sectionTypes;
-        
-// //         // 🔥 CRITICAL FIX: Manually patch the schema to force Dropdowns
-// //         // This ensures 'ruleType' shows a Select menu, not a Text Input
-// //         const patchedTypes = types.map((t: any) => {
-// //           if (t.type === 'product_slider' || t.type === 'product_grid') {
-// //             if (t.allowedConfig.ruleType) {
-// //               // We define specific options for the dropdown here
-// //               t.allowedConfig.ruleType.type = 'select'; 
-// //               t.allowedConfig.ruleType.options = [
-// //                 { label: '🔥 Best Sellers', value: 'best_sellers' },
-// //                 { label: '✨ New Arrivals', value: 'new_arrivals' },
-// //                 { label: '📈 Trending', value: 'trending' },
-// //                 { label: '🏷️ Clearance', value: 'clearance_sale' },
-// //                 { label: '🛠️ Custom', value: 'custom_query' }
-// //               ];
-// //             }
-// //           }
-// //           return t;
-// //         });
-
-// //         this.availableTypes = patchedTypes;
-        
-// //         // Build Registry Map
-// //         this.sectionRegistry = patchedTypes.reduce((acc: any, item: any) => {
-// //           acc[item.type] = item;
-// //           return acc;
-// //         }, {});
-
-// //         // 2. Load Page Data
-// //         if (pageId) this.loadPage(pageId);
-// //       },
-// //       error: (err) => console.error('Failed to load types', err)
-// //     });
-// //   }
-
-// //   loadPage(id: string) {
-// //     this.adminService.getPageById(id).subscribe({
-// //       next: (res) => {
-// //         this.page.set(res.page);
-        
-// //         // Sanitize sections to prevent crashes
-// //         const validSections = (res.page.sections || [])
-// //           .filter((s: any) => this.sectionRegistry[s.type]) // Remove unknown types
-// //           .map((s: any) => ({
-// //             ...s,
-// //             id: s.id || crypto.randomUUID() // Ensure ID exists
-// //           }));
-          
-// //         this.sections.set(validSections);
-// //       },
-// //       error: () => alert('Failed to load page.')
-// //     });
-// //   }
-
-// //   // --- Actions ---
-
-// //   addSection(type: string) {
-// //     const def = this.sectionRegistry[type];
-// //     if (!def) return;
-
-// //     // Generate Config with Defaults
-// //     const config: any = {};
-// //     if (def.allowedConfig) {
-// //       Object.keys(def.allowedConfig).forEach(key => {
-// //         if (def.allowedConfig[key].default !== undefined) {
-// //           config[key] = def.allowedConfig[key].default;
-// //         }
-// //       });
-// //     }
-
-// //     // const newSection = {
-// //     //   id: crypto.randomUUID(),
-// //     //   type,
-// //     //   config,
-// //     //   position: this.sections().length,
-// //     //   isActive: true,
-// //     //   dataSource: def.dataSource?.includes('smart') ? 'smart' : 'static'
-// //     // };
-// // const newSection = {
-// //       id: crypto.randomUUID(),
-// //       type,
-// //       config,
-// //       position: this.sections().length,
-// //       isActive: true,
-      
-// //       // 👇👇👇 UPDATE THIS SECTION 👇👇👇
-// //       dataSource: def.dataSource?.includes('smart') 
-// //         ? 'smart' 
-// //         : (def.dataSource?.includes('dynamic') ? 'dynamic' : 'static')
-// //       // 👆👆👆 END UPDATE 👆👆👆
-// //     };
-// //     this.sections.update(s => [...s, newSection]);
-// //     this.selectSection(newSection);
-// //     this.showAddMenu.set(false);
-    
-// //     // Smooth Scroll to bottom
-// //     setTimeout(() => {
-// //       const container = document.getElementById('preview-container');
-// //       if(container) container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
-// //     }, 100);
-// //   }
-
-// //   selectSection(section: any) {
-// //     // Deep clone to safely edit in form
-// //     try {
-// //       this.selectedSection.set(JSON.parse(JSON.stringify(section)));
-// //     } catch (e) {
-// //       console.error('Selection Error', e);
-// //     }
-// //   }
-
-// //   onConfigChange(newConfig: any) {
-// //     const current = this.selectedSection();
-// //     if (!current) return;
-
-// //     // Merge changes
-// //     const updated = { 
-// //       ...current, 
-// //       config: { ...current.config, ...newConfig } 
-// //     };
-    
-// //     // Update List (Re-renders Preview)
-// //     this.sections.update(list => 
-// //       list.map(s => s.id === updated.id ? updated : s)
-// //     );
-    
-// //     // Update Selection (Keeps form in sync)
-// //     this.selectedSection.set(updated);
-// //   }
-
-// //   deleteSection(id: string, event: Event) {
-// //     event.stopPropagation();
-// //     if(!confirm('Remove this section?')) return;
-
-// //     this.sections.update(list => list.filter(s => s.id !== id));
-// //     if (this.selectedSection()?.id === id) {
-// //       this.selectedSection.set(null);
-// //     }
-// //   }
-
-// //   drop(event: CdkDragDrop<any[]>) {
-// //     const list = [...this.sections()];
-// //     moveItemInArray(list, event.previousIndex, event.currentIndex);
-// //     const reordered = list.map((s, i) => ({ ...s, position: i }));
-// //     this.sections.set(reordered);
-// //   }
-
-// //   savePage() {
-// //     const pageId = this.page()?._id || this.page()?.id;
-// //     if (!pageId) return;
-
-// //     this.isSaving.set(true);
-    
-// //     const payload = {
-// //       sections: this.sections().map((s, i) => ({
-// //         type: s.type,
-// //         config: s.config,
-// //         position: i,
-// //         isActive: s.isActive,
-// //         dataSource: s.dataSource
-// //       }))
-// //     };
-
-// //     this.adminService.updatePage(pageId, payload).subscribe({
-// //       next: () => this.isSaving.set(false),
-// //       error: () => {
-// //         this.isSaving.set(false);
-// //         alert('Save failed');
-// //       }
-// //     });
-// //   }
-// // }

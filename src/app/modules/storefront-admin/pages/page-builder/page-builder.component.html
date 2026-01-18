@@ -119,9 +119,38 @@
               @switch (section.type) {
                 @case ('hero_banner') { <app-hero-banner [config]="section.config" /> }
                 @case ('product_slider') { <app-product-slider [config]="section.config" /> }
+                @case ('product_grid') { <app-product-grid [config]="section.config" /> }
+                @case ('category_grid') { <app-category-grid [config]="section.config" /> }
+                
+                @case ('feature_grid') { <app-feature-grid [config]="section.config" /> }
+                @case ('text_content') { <app-text-content [config]="section.config" /> }
+                @case ('video_hero') { <app-video-hero [config]="section.config" /> }
+                @case ('split_image_text') { <app-split-content [config]="section.config" /> }
+                
+                @case ('testimonial_slider') { <app-testimonial-slider [config]="section.config" /> }
+                @case ('logo_cloud') { <app-logo-cloud [config]="section.config" /> }
+                @case ('stats_counter') { <app-stats-counter [config]="section.config" /> }
+                
+                @case ('newsletter_signup') { <app-newsletter-signup [config]="section.config" /> }
+                @case ('contact_form') { <app-contact-form [config]="section.config" /> }
+                @case ('pricing_table') { <app-pricing-table [config]="section.config" /> }
+                @case ('faq_accordion') { <app-faq-accordion [config]="section.config" /> }
+                @case ('countdown_timer') { <app-countdown-timer [config]="section.config" /> }
+                @case ('blog_feed') { <app-blog-feed [config]="section.config" /> }
+                
+                @default { 
+                  <div class="p-12 text-center bg-slate-50 border border-dashed border-slate-300 rounded-lg m-4">
+                    <p class="text-slate-400 font-bold text-xs uppercase tracking-widest mb-2">Unknown Component Type</p>
+                    <p class="text-slate-900 font-mono text-sm bg-slate-200 inline-block px-2 py-1 rounded">{{ section.type }}</p>
+                  </div> 
+                }
+              }
+              <!-- @switch (section.type) {
+                @case ('hero_banner') { <app-hero-banner [config]="section.config" /> }
+                @case ('product_slider') { <app-product-slider [config]="section.config" /> }
                 @case ('map_locations') { <div class="h-64 bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-500">Map Component</div> }
                 @default { <div class="p-8 text-center bg-slate-50"><p class="text-slate-400 font-bold text-xs uppercase">{{ section.type }} Placeholder</p></div> }
-              }
+              } -->
             </div>
           }
         </div>

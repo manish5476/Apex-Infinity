@@ -1,4 +1,50 @@
-<section class="section-root" [ngStyle]="backgroundStyle()">
+<section class="section-root relative overflow-hidden" [ngStyle]="backgroundStyle()">
+  
+  <div class="bg-overlay" *ngIf="config.backgroundImage"></div>
+
+  <div class="container relative z-10 mx-auto px-6 md:px-12"
+       [class.max-w-7xl]="config.containerWidth === 'standard'"
+       [class.max-w-full]="config.containerWidth === 'full'">
+
+    <div class="text-center mb-14" *ngIf="config.title">
+      <h3 class="text-sm font-bold uppercase tracking-[0.25em] text-slate-500/80 mb-4">
+        {{ config.title }}
+      </h3>
+      <div class="w-12 h-0.5 bg-slate-400/30 mx-auto rounded-full"></div>
+    </div>
+
+    <div class="flex flex-wrap justify-center items-center gap-x-12 gap-y-12 md:gap-x-16 lg:gap-x-24">
+      
+      @for (logo of config.logos; track $index) {
+        
+        @if (logo.url) {
+          <a [attr.href]="isExternal(logo.url) ? logo.url : null"
+             [routerLink]="!isExternal(logo.url) ? getLink(logo.url) : undefined"
+             [attr.target]="isExternal(logo.url) ? '_blank' : null"
+             class="logo-item group"
+             [ngStyle]="logoStyle()">
+             
+             <img [src]="logo.image" 
+                  [alt]="logo.name" 
+                  loading="lazy">
+          </a>
+        } 
+        @else {
+          <div class="logo-item" [ngStyle]="logoStyle()">
+             <img [src]="logo.image" 
+                  [alt]="logo.name" 
+                  loading="lazy">
+          </div>
+        }
+
+      }
+
+    </div>
+
+  </div>
+</section>
+
+<!-- <section class="section-root" [ngStyle]="backgroundStyle()">
   
   <div class="bg-overlay" *ngIf="config.backgroundImage"></div>
 
@@ -43,4 +89,4 @@
     </div>
 
   </div>
-</section>
+</section> -->
