@@ -1,0 +1,24 @@
+<section class="section-root" [ngStyle]="backgroundStyle()">
+  <div class="container mx-auto px-6"
+       [class.max-w-7xl]="config.containerWidth === 'standard'">
+
+    <div #container class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+      
+      @for (stat of config.stats; track $index) {
+        <div #statItem class="text-center pt-8 md:pt-0 px-4 group">
+          
+          <div class="font-serif text-4xl md:text-6xl font-bold text-slate-900 mb-2 transition-transform duration-500 group-hover:scale-110">
+            {{ displayValues()[$index] }}<span class="text-rose-500">{{ stat.suffix }}</span>
+          </div>
+          
+          <p class="text-sm font-bold uppercase tracking-[0.15em] text-slate-400">
+            {{ stat.label }}
+          </p>
+
+        </div>
+      }
+
+    </div>
+
+  </div>
+</section>

@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Manrope:wght@400;600;700&display=swap');
+
+:host {
+  display: block;
+  font-family: 'Manrope', sans-serif;
+}
+
+.font-serif {
+  font-family: 'Playfair Display', serif;
+}
+
+.glass-card {
+  /* ✅ FIX: Increased min-height to prevent "short card" look */
+  min-height: 450px; 
+  
+  background: rgba(255, 255, 255, 0.08); /* Slightly more transparent */
+  backdrop-filter: blur(20px); /* Heavier blur */
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
+  
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), 
+              background 0.5s ease,
+              box-shadow 0.5s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-10px);
+    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.4);
+  }
+}
+
+// @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Manrope:wght@400;600;700&display=swap');
+
+// :host {
+//   display: block;
+//   font-family: 'Manrope', sans-serif;
+// }
+
+// .font-serif {
+//   font-family: 'Playfair Display', serif;
+// }
+
+// .cubic-bezier {
+//   transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+// }
+
+// .glass-card {
+//   background: rgba(255, 255, 255, 0.1);
+//   backdrop-filter: blur(16px);
+//   -webkit-backdrop-filter: blur(16px);
+//   border: 1px solid rgba(255, 255, 255, 0.15);
+//   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  
+//   /* Smooth Hover Lift */
+//   transition: transform 0.4s ease, background 0.4s ease;
+  
+//   &:hover {
+//     background: rgba(255, 255, 255, 0.15);
+//     transform: translateY(-5px);
+//   }
+// }
+
+// /* Animations */
+// .animate-fade-up {
+//   animation: fadeUp 0.8s ease-out forwards;
+// }
+
+// @keyframes fadeUp {
+//   from { opacity: 0; transform: translateY(20px); }
+//   to { opacity: 1; transform: translateY(0); }
+// }

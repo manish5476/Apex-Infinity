@@ -1,11 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap');
+
+:host {
+  display: block;
+}
+
 .section-root {
-  padding: 4rem 0;
-  background-color: #ffffff;
+  background-color: transparent;
+  transition: padding 0.3s ease;
 }
 
 .product-grid-layout {
   display: grid;
-  gap: 24px;
+  gap: var(--gap, 24px);
   
   /* Mobile: 1 Column */
   grid-template-columns: repeat(1, 1fr);
@@ -23,6 +29,8 @@
 
 .grid-item {
   height: 100%;
+  opacity: 0;
+  animation: fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
   
   /* Ensure card fills height */
   ::ng-deep app-product-card, 
@@ -30,3 +38,56 @@
     height: 100%;
   }
 }
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  opacity: 0;
+  animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+
+// .section-root {
+//   padding: 4rem 0;
+//   background-color: #ffffff;
+// }
+
+// .product-grid-layout {
+//   display: grid;
+//   gap: 24px;
+  
+//   /* Mobile: 1 Column */
+//   grid-template-columns: repeat(1, 1fr);
+
+//   /* Tablet: 2 Columns */
+//   @media (min-width: 640px) {
+//     grid-template-columns: repeat(2, 1fr);
+//   }
+
+//   /* Desktop: Use the Variable from config */
+//   @media (min-width: 1024px) {
+//     grid-template-columns: repeat(var(--desktop-cols), 1fr);
+//   }
+// }
+
+// .grid-item {
+//   height: 100%;
+  
+//   /* Ensure card fills height */
+//   ::ng-deep app-product-card, 
+//   ::ng-deep .card-root {
+//     height: 100%;
+//   }
+// }

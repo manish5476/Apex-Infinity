@@ -1,0 +1,172 @@
+<section class="section-root relative overflow-hidden" 
+         [ngStyle]="backgroundStyle()"
+         (mouseenter)="stopAutoplay()"
+         (mouseleave)="startAutoplay()">
+
+  <div class="absolute inset-0 bg-black/50 z-0"></div>
+  
+  <div class="container relative z-10 mx-auto px-6 md:px-12 max-w-6xl">
+
+    <div class="text-center mb-4">
+      <h2 class="font-serif text-3xl md:text-5xl font-bold text-white mb-4 animate-fade-up">
+        {{ config.title || 'What Our Clients Say' }}
+      </h2>
+      <div class="w-20 h-1 bg-white/30 mx-auto rounded-full"></div>
+    </div>
+
+    <div class="relative w-full overflow-hidden pt-24 pb-16">
+      
+      <div class="flex transition-transform duration-700 cubic-bezier items-stretch"
+           [style.transform]="'translateX(-' + (currentSlide() * 100) + '%)'">
+        
+        @for (item of config.testimonials; track $index) {
+          <div class="w-full flex-shrink-0 px-4 flex">
+            
+            <div class="glass-card w-full max-w-3xl mx-auto p-8 md:p-12 rounded-[2rem] text-center relative group h-full flex flex-col justify-center">
+              
+              <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-white text-slate-900 w-20 h-20 flex items-center justify-center rounded-full shadow-2xl text-3xl z-20">
+                <i class="pi pi-at"></i>
+              </div>
+
+              <div class="mt-8 flex flex-col items-center flex-grow justify-center">
+                
+                <div class="flex justify-center gap-1 mb-6">
+                  @for (star of getStars(item.rating); track $index) {
+                    <i class="pi pi-star-fill text-yellow-400 text-lg"></i>
+                  }
+                </div>
+
+                <p class="font-serif text-xl md:text-3xl text-white leading-relaxed mb-8 italic opacity-90">
+                  "{{ item.quote }}"
+                </p>
+
+                <div class="w-12 h-1 bg-white/20 rounded-full mb-8"></div>
+
+                <div class="flex flex-col items-center gap-3">
+                  <div class="w-16 h-16 rounded-full p-1 border-2 border-white/30 shadow-md">
+                    <img [src]="item.avatar || 'https://via.placeholder.com/150'" 
+                         [alt]="item.name"
+                         class="w-full h-full rounded-full object-cover">
+                  </div>
+                  <div>
+                    <h4 class="text-lg font-bold text-white uppercase tracking-widest">{{ item.name }}</h4>
+                    <p class="text-xs font-bold text-white/60 tracking-widest uppercase mt-1">{{ item.role }}</p>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+        }
+
+      </div>
+
+    </div>
+
+    <div class="flex justify-center items-center gap-8 -mt-4 pb-12">
+      <button (click)="prev()" class="w-12 h-12 rounded-full border border-white/20 text-white flex items-center justify-center hover:bg-white hover:text-black transition-all">
+        <i class="pi pi-arrow-left"></i>
+      </button>
+
+      <div class="flex gap-3">
+        @for (item of config.testimonials; track $index) {
+          <button (click)="goTo($index)" 
+                  class="h-2 rounded-full transition-all duration-300"
+                  [ngClass]="currentSlide() === $index ? 'w-8 bg-white' : 'w-2 bg-white/30 hover:bg-white/50'">
+          </button>
+        }
+      </div>
+
+      <button (click)="next()" class="w-12 h-12 rounded-full border border-white/20 text-white flex items-center justify-center hover:bg-white hover:text-black transition-all">
+        <i class="pi pi-arrow-right"></i>
+      </button>
+    </div>
+
+  </div>
+</section>
+
+<!-- <section class="section-root relative overflow-hidden" 
+         [ngStyle]="backgroundStyle()"
+         (mouseenter)="stopAutoplay()"
+         (mouseleave)="startAutoplay()">
+
+  <div class="absolute inset-0 bg-black/50 z-0"></div>
+  
+  <div class="container relative z-10 mx-auto px-6 md:px-12 max-w-6xl">
+
+    <div class="text-center mb-16">
+      <h2 class="font-serif text-3xl md:text-5xl font-bold text-white mb-4 animate-fade-up">
+        {{ config.title || 'What Our Clients Say' }}
+      </h2>
+      <div class="w-20 h-1 bg-white/30 mx-auto rounded-full"></div>
+    </div>
+
+    <div class="relative w-full overflow-hidden">
+      
+      <div class="flex transition-transform duration-700 cubic-bezier"
+           [style.transform]="'translateX(-' + (currentSlide() * 100) + '%)'">
+        
+        @for (item of config.testimonials; track $index) {
+          <div class="w-full flex-shrink-0 px-4">
+            
+            <div class="glass-card max-w-3xl mx-auto p-8 md:p-12 rounded-[2rem] text-center relative group">
+              
+              <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white text-slate-900 w-16 h-16 flex items-center justify-center rounded-full shadow-lg text-3xl">
+                <i class="pi pi-at"></i> </div>
+
+              <div class="flex justify-center gap-1 mb-6 mt-4">
+                @for (star of getStars(item.rating); track $index) {
+                  <i class="pi pi-star-fill text-yellow-400 text-lg"></i>
+                }
+              </div>
+
+              <p class="font-serif text-xl md:text-3xl text-white leading-relaxed mb-10 italic opacity-90">
+                "{{ item.quote }}"
+              </p>
+
+              <div class="flex flex-col items-center gap-4">
+                <div class="w-16 h-16 rounded-full p-1 border-2 border-white/30">
+                  <img [src]="item.avatar || 'https://via.placeholder.com/150'" 
+                       [alt]="item.name"
+                       class="w-full h-full rounded-full object-cover">
+                </div>
+                <div>
+                  <h4 class="text-lg font-bold text-white uppercase tracking-widest">{{ item.name }}</h4>
+                  <p class="text-sm text-white/60 font-medium">{{ item.role }}</p>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        }
+
+      </div>
+
+    </div>
+
+    <div class="flex justify-center items-center gap-8 mt-12">
+      
+      <button (click)="prev()" class="w-12 h-12 rounded-full border border-white/20 text-white flex items-center justify-center hover:bg-white hover:text-black transition-all">
+        <i class="pi pi-arrow-left"></i>
+      </button>
+
+      <div class="flex gap-3">
+        @for (item of config.testimonials; track $index) {
+          <button (click)="goTo($index)" 
+                  class="h-2 rounded-full transition-all duration-300"
+                  [ngClass]="currentSlide() === $index ? 'w-8 bg-white' : 'w-2 bg-white/30 hover:bg-white/50'">
+          </button>
+        }
+      </div>
+
+      <button (click)="next()" class="w-12 h-12 rounded-full border border-white/20 text-white flex items-center justify-center hover:bg-white hover:text-black transition-all">
+        <i class="pi pi-arrow-right"></i>
+      </button>
+
+    </div>
+
+  </div>
+</section> -->

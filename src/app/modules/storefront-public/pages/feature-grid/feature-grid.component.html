@@ -1,0 +1,67 @@
+<section class="section-root" [ngStyle]="backgroundStyle()">
+  
+  <div class="bg-overlay" *ngIf="config.backgroundImage"></div>
+
+  <div class="container relative z-10 mx-auto"
+       [class.max-w-7xl]="config.containerWidth === 'standard'"
+       [class.max-w-full]="config.containerWidth === 'full'"
+       [class.px-6]="true">
+
+    <div class="mb-16" 
+         [class.text-center]="config.textAlign === 'center'"
+         [class.text-left]="config.textAlign === 'left'">
+      
+      @if (config.subtitle) {
+        <span class="inline-block py-1 px-3 rounded-full bg-white/20 backdrop-blur-sm border border-white/10 text-xs font-bold uppercase tracking-[0.15em] text-white mb-4 animate-fade-up">
+          {{ config.subtitle }}
+        </span>
+      }
+      
+      @if (config.title) {
+        <h2 class="font-serif text-3xl md:text-5xl font-bold text-white leading-tight animate-fade-up delay-100">
+          {{ config.title }}
+        </h2>
+      }
+    </div>
+
+    <div class="feature-grid" [ngStyle]="gridStyle()">
+      
+      @for (feature of config.features; track $index) {
+        <div class="feature-card group" 
+             [ngClass]="'style-' + (config.cardStyle || 'minimal')"
+             [style.text-align]="config.textAlign || 'center'">
+          
+          <div class="media-wrapper mb-6">
+            @if (config.mediaType === 'image' && feature.image) {
+              <div class="image-frame">
+                <img [src]="feature.image" [alt]="feature.title" loading="lazy">
+              </div>
+            } @else if (feature.icon) {
+              <div class="icon-frame" [style.color]="config.iconColor || 'var(--primary-color)'">
+                <i [class]="'pi ' + feature.icon"></i>
+              </div>
+            }
+          </div>
+
+          <h3 class="text-xl font-bold text-white mb-3 group-hover:text-white/90 transition-colors">
+            {{ feature.title }}
+          </h3>
+          
+          <p class="text-white/70 leading-relaxed text-sm mb-6">
+            {{ feature.description }}
+          </p>
+
+          @if (feature.linkUrl) {
+            <a [routerLink]="getLink(feature.linkUrl)" 
+               class="inline-flex items-center text-xs font-bold uppercase tracking-widest text-white hover:text-white/80 transition-colors">
+              Learn More <i class="pi pi-arrow-right ml-2 text-[10px]"></i>
+            </a>
+          }
+
+        </div>
+      }
+
+    </div>
+
+  </div>
+</section>

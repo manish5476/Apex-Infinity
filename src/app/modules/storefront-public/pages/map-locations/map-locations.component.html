@@ -1,7 +1,7 @@
 <section class="relative w-full h-[90vh] bg-[#0a0a0f] rounded-2xl overflow-hidden group/luxury-map font-sans">
 
   <div #mapStage id="map-stage" class="absolute inset-0 z-0 fade-in-map"></div>
-  
+
   @if(!map && locations.length > 0){
   <div class="absolute inset-0 z-10 flex items-center justify-center bg-[#0a0a0f] z-[50]">
     <div class="flex flex-col items-center gap-4">
@@ -9,7 +9,7 @@
       <p class="text-xs text-gray-500 uppercase tracking-widest">Initializing Map...</p>
     </div>
   </div>
-}
+  }
 
   <div class="absolute top-6 right-6 z-[60] flex gap-2">
     <button (click)="setMapStyle('dark')"
@@ -169,8 +169,7 @@
 
   <div class="absolute top-6 left-6 md:left-12 z-20 w-full pr-12 pointer-events-none">
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pointer-events-auto">
-      
-      <div>
+            <div>
         <h2 class="font-serif text-3xl md:text-4xl font-bold tracking-tight transition-colors duration-500"
             [ngClass]="currentStyle === 'light' ? 'text-slate-900' : 'text-white'">
           {{ config.title || 'Global Presence' }}

@@ -3,14 +3,15 @@
 export type SectionType = 
   | 'navbar_simple' | 'footer_simple' // <-- New Layout Types
   | 'hero_banner' | 'feature_grid' | 'product_slider' | 'product_grid' 
-  | 'category_grid' | 'text_content' | 'testimonial_slider' | 'contact_form' 
-  | 'map_locations' | 'blog_feed' | 'video_section' | 'cta_banner' | 'faq_section';
+  | 'category_grid' | 'text_content' | 'testimonial_slider' | 'contact_form' |'split_image_text'
+  | 'map_locations' | 'faq_accordion'| 'blog_feed' |'countdown_timer'| 'pricing_table'| 'video_hero' | 'cta_banner'|'stats_counter' | 'faq_section'|'logo_cloud'|'newsletter_signup';
 
 export type DataSource = 'static' | 'smart' | 'manual' | 'dynamic' | 'category' | 'pages';
 
 // 2. Hydrated Product Data
 export interface PublicProduct {
   id: string;
+  _id: string;
   name: string;
   slug: string;
   description: string;
