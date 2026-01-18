@@ -3,44 +3,46 @@
 :host {
   display: block;
   font-family: 'Manrope', sans-serif;
-  --glass-bg: rgba(255, 255, 255, 0.85);
-  --glass-border: rgba(255, 255, 255, 0.6);
-  --modal-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  height: 100%;
 }
 
-/* --- 1. COMPACT CARD STYLES --- */
+/* ============================================================
+   1. SMART RESPONSIVE CARD (Container Queries)
+   ============================================================ */
 .card-root {
+  /* Define this as a container so text resizes based on CARD width */
+  container-type: inline-size;
+  container-name: product-card;
+
   position: relative;
   width: 100%;
-  aspect-ratio: 3 / 4; /* Portrait ratio */
-  border-radius: 24px;
+  height: 100%;
+  min-height: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 16px;
   overflow: hidden;
   cursor: pointer;
-  background: #f0f2f5;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+  background: #f1f5f9;
+  
+  /* Smooth Animations */
+  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s ease;
 
-  /* Hover Lift */
+  /* Hover Lift Effect */
   &:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.15);
 
-    .base-image {
-      transform: scale(1.1);
+    .base-image { transform: scale(1.08); }
+    .overlay-gradient { opacity: 0.6; }
+    
+    .info-float { 
+      transform: translateY(0); 
+      opacity: 1; 
     }
     
-    .overlay-gradient {
-      opacity: 0.8;
-    }
-
-    .quick-look-btn {
-      opacity: 1;
+    .quick-look-btn { 
+      opacity: 1; 
       transform: translate(-50%, -50%) scale(1);
-    }
-    
-    .info-float {
-      transform: translateY(0);
-      opacity: 1;
     }
   }
 }
@@ -55,113 +57,141 @@
     height: 100%;
     object-fit: cover;
     transition: transform 0.7s ease;
+    will-change: transform;
   }
 
   .overlay-gradient {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.1) 50%, transparent 100%);
     opacity: 0.3;
     transition: opacity 0.3s;
   }
 }
 
-/* Info floating at bottom of card */
+/* The 'cqi' unit refers to "Container Query Inline" size.
+   10cqi = 10% of the card's width. 
+   This ensures text never overflows, no matter how small the grid column is.
+*/
 .info-float {
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
-  padding: 20px;
+  padding: 6cqi; 
   color: white;
   z-index: 10;
-  /* Slightly hidden initially */
-  transform: translateY(10px); 
+  transform: translateY(10px);
   transition: all 0.4s ease;
 
   .brand-badge {
-    font-size: 10px;
+    display: block;
+    font-size: 3.5cqi; /* Responsive font size */
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     opacity: 0.8;
-    display: block;
-    margin-bottom: 4px;
+    margin-bottom: 1cqi;
   }
 
   .product-name {
     font-family: 'Playfair Display', serif;
-    font-size: 1.25rem;
-    margin: 0 0 4px 0;
+    font-size: 7cqi; 
     line-height: 1.1;
+    margin: 0 0 2cqi 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .price {
-    font-weight: 700;
-    font-size: 1rem;
+    font-weight: 600;
+    font-size: 5cqi;
   }
 }
 
-/* The Center Eye Button */
 .quick-look-btn {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) scale(0.9);
+  transform: translate(-50%, -50%) scale(0.8);
   opacity: 0;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  color: white;
+  z-index: 20;
+  
+  background: rgba(255, 255, 255, 0.95);
+  color: #0f172a;
+  border: none;
   padding: 12px 24px;
   border-radius: 100px;
-  font-weight: 600;
-  font-size: 0.9rem;
+  font-weight: 700;
+  font-size: 13px;
   display: flex;
   align-items: center;
   gap: 8px;
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
   &:hover {
     background: white;
-    color: black;
+    transform: translate(-50%, -50%) scale(1.1) !important;
   }
 }
 
-/* --- 2. MODAL STYLES (The "Best UI") --- */
+/* ============================================================
+   2. STABILIZED MODAL LAYOUT
+   ============================================================ */
 .modal-backdrop {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: rgba(15, 23, 42, 0.6); /* Dark tint */
-  backdrop-filter: blur(16px); /* Heavy Blur */
+  background: rgba(15, 23, 42, 0.65); /* Dark Slate Tint */
+  backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 16px;
 }
 
 .modal-glass-panel {
   width: 100%;
   max-width: 900px;
   background: white;
-  border-radius: 32px;
+  border-radius: 24px;
   overflow: hidden;
   position: relative;
-  box-shadow: 
-    0 0 0 1px rgba(255, 255, 255, 0.5),
-    0 50px 100px -20px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   
-  /* Layout Grid */
-  .modal-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    
-    @media (min-width: 768px) {
-      grid-template-columns: 1fr 1fr; /* 50% Image, 50% Text */
-      min-height: 500px;
-    }
+  /* Desktop Layout: Fixed height to prevent jumping */
+  @media (min-width: 768px) {
+    flex-direction: row;
+    height: 550px; 
+    max-height: 85vh;
+  }
+}
+
+.close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 50;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
+
+  &:hover {
+    background: #0f172a;
+    color: white;
+    transform: rotate(90deg);
   }
 }
 
@@ -169,145 +199,464 @@
 .modal-image-col {
   position: relative;
   background: #f8fafc;
-  overflow: hidden;
+  width: 100%;
+  height: 250px; /* Fixed height for Mobile */
+  flex-shrink: 0;
+
+  @media (min-width: 768px) {
+    width: 45%;
+    height: 100%; /* Full height for Desktop */
+  }
 
   .modal-img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    object-position: center;
+    object-fit: cover; /* Prevents image distortion */
+    display: block;
   }
 
   .badge-overlay {
     position: absolute;
-    top: 20px;
-    left: 20px;
+    top: 16px;
+    left: 16px;
     
     .stock-pill {
-      padding: 6px 12px;
+      padding: 4px 12px;
       border-radius: 100px;
-      font-size: 0.75rem;
+      font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      backdrop-filter: blur(4px);
       
-      &.in-stock { background: rgba(255, 255, 255, 0.9); color: #0f172a; }
-      &.out-stock { background: rgba(239, 68, 68, 0.9); color: white; }
+      &.in-stock { background: white; color: #15803d; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+      &.out-stock { background: #ef4444; color: white; }
     }
   }
 }
 
 /* Right Column: Content */
 .modal-content-col {
-  padding: 40px;
+  flex: 1;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   background: white;
-  
+  min-height: 0; /* Crucial for scrolling inside flex items */
+
+  @media (min-width: 768px) {
+    padding: 36px;
+  }
+
   .content-header {
-    margin-bottom: 24px;
+    flex-shrink: 0;
     
     .modal-brand {
-      font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
+      font-size: 11px;
+      font-weight: 800;
       color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 2px;
       margin-bottom: 8px;
     }
 
     .modal-title {
       font-family: 'Playfair Display', serif;
-      font-size: 2.5rem;
+      font-size: 28px;
       line-height: 1.1;
       color: #0f172a;
       margin-bottom: 12px;
+      
+      @media (min-width: 768px) { font-size: 32px; }
     }
 
     .rating-row {
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 0.9rem;
+      font-size: 13px;
       color: #64748b;
+      margin-bottom: 20px;
     }
   }
 
-  .modal-desc {
-    font-size: 1rem;
-    line-height: 1.7;
-    color: #475569;
-    margin-bottom: 32px;
+  /* Scrollable Text Area */
+  .modal-body-scroll {
+    flex: 1;
+    overflow-y: auto; /* Scroll description if long */
+    padding-right: 8px;
+    margin-bottom: 24px;
+
+    /* Custom Scrollbar */
+    &::-webkit-scrollbar { width: 4px; }
+    &::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+
+    .modal-desc {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #475569;
+    }
+  }
+
+  /* Fixed Footer inside Modal */
+  .modal-footer {
+    flex-shrink: 0;
+    padding-top: 20px;
+    border-top: 1px solid #f1f5f9;
   }
 
   .big-price {
-    display: block;
-    font-size: 2rem;
-    font-weight: 600;
-    color: #0f172a;
-    margin-bottom: 32px;
-  }
-}
-
-/* Action Buttons */
-.action-dock {
-  display: flex;
-  gap: 16px;
-  
-  button {
-    flex: 1;
-    height: 54px;
-    border-radius: 16px;
+    font-size: 24px;
     font-weight: 700;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: transform 0.2s;
-    
-    &:hover { transform: translateY(-2px); }
-  }
-
-  .add-cart-btn {
-    background: #0f172a;
-    color: white;
-    border: none;
-    box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.3);
-  }
-
-  .view-full-btn {
-    background: transparent;
-    border: 2px solid #e2e8f0;
     color: #0f172a;
+    display: block;
+    margin-bottom: 16px;
+  }
+
+  .action-dock {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    gap: 12px;
     
-    &:hover { border-color: #0f172a; }
+    button {
+      flex: 1;
+      height: 48px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+      transition: transform 0.1s;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:active { transform: scale(0.98); }
+    }
+
+    .add-cart-btn {
+      background: #0f172a;
+      color: white;
+      border: none;
+      &:hover { background: #1e293b; }
+    }
+
+    .view-full-btn {
+      background: white;
+      border: 1px solid #e2e8f0;
+      color: #0f172a;
+      &:hover { background: #f8fafc; border-color: #0f172a; }
+    }
   }
 }
 
-/* Close X */
-.close-btn {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  z-index: 10;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(0,0,0,0.05);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  transition: all 0.2s;
+// @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap');
 
-  &:hover {
-    background: white;
-    transform: rotate(90deg);
-  }
-}
+// :host {
+//   display: block;
+//   font-family: 'Manrope', sans-serif;
+//   --glass-bg: rgba(255, 255, 255, 0.85);
+//   --glass-border: rgba(255, 255, 255, 0.6);
+//   --modal-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+// }
+
+// /* --- 1. COMPACT CARD STYLES --- */
+// .card-root {
+//   position: relative;
+//   width: 100%;
+//   aspect-ratio: 3 / 4; /* Portrait ratio */
+//   border-radius: 24px;
+//   overflow: hidden;
+//   cursor: pointer;
+//   background: #f0f2f5;
+//   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+//   transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+//   /* Hover Lift */
+//   &:hover {
+//     transform: translateY(-8px);
+//     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+//     .base-image {
+//       transform: scale(1.1);
+//     }
+    
+//     .overlay-gradient {
+//       opacity: 0.8;
+//     }
+
+//     .quick-look-btn {
+//       opacity: 1;
+//       transform: translate(-50%, -50%) scale(1);
+//     }
+    
+//     .info-float {
+//       transform: translateY(0);
+//       opacity: 1;
+//     }
+//   }
+// }
+
+// .image-wrapper {
+//   width: 100%;
+//   height: 100%;
+//   position: relative;
+
+//   .base-image {
+//     width: 100%;
+//     height: 100%;
+//     object-fit: cover;
+//     transition: transform 0.7s ease;
+//   }
+
+//   .overlay-gradient {
+//     position: absolute;
+//     inset: 0;
+//     background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+//     opacity: 0.3;
+//     transition: opacity 0.3s;
+//   }
+// }
+
+// /* Info floating at bottom of card */
+// .info-float {
+//   position: absolute;
+//   bottom: 0;
+//   left: 0;
+//   width: 100%;
+//   padding: 20px;
+//   color: white;
+//   z-index: 10;
+//   /* Slightly hidden initially */
+//   transform: translateY(10px); 
+//   transition: all 0.4s ease;
+
+//   .brand-badge {
+//     font-size: 10px;
+//     text-transform: uppercase;
+//     letter-spacing: 0.1em;
+//     opacity: 0.8;
+//     display: block;
+//     margin-bottom: 4px;
+//   }
+
+//   .product-name {
+//     font-family: 'Playfair Display', serif;
+//     font-size: 1.25rem;
+//     margin: 0 0 4px 0;
+//     line-height: 1.1;
+//   }
+
+//   .price {
+//     font-weight: 700;
+//     font-size: 1rem;
+//   }
+// }
+
+// /* The Center Eye Button */
+// .quick-look-btn {
+//   position: absolute;
+//   top: 50%;
+//   left: 50%;
+//   transform: translate(-50%, -50%) scale(0.9);
+//   opacity: 0;
+//   background: rgba(255, 255, 255, 0.2);
+//   backdrop-filter: blur(10px);
+//   border: 1px solid rgba(255, 255, 255, 0.4);
+//   color: white;
+//   padding: 12px 24px;
+//   border-radius: 100px;
+//   font-weight: 600;
+//   font-size: 0.9rem;
+//   display: flex;
+//   align-items: center;
+//   gap: 8px;
+//   cursor: pointer;
+//   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+//   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+
+//   &:hover {
+//     background: white;
+//     color: black;
+//   }
+// }
+
+// /* --- 2. MODAL STYLES (The "Best UI") --- */
+// .modal-backdrop {
+//   position: fixed;
+//   inset: 0;
+//   z-index: 9999;
+//   background: rgba(15, 23, 42, 0.6); /* Dark tint */
+//   backdrop-filter: blur(16px); /* Heavy Blur */
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   padding: 20px;
+// }
+
+// .modal-glass-panel {
+//   width: 100%;
+//   max-width: 900px;
+//   background: white;
+//   border-radius: 32px;
+//   overflow: hidden;
+//   position: relative;
+//   box-shadow: 
+//     0 0 0 1px rgba(255, 255, 255, 0.5),
+//     0 50px 100px -20px rgba(0, 0, 0, 0.3);
+  
+//   /* Layout Grid */
+//   .modal-grid {
+//     display: grid;
+//     grid-template-columns: 1fr;
+    
+//     @media (min-width: 768px) {
+//       grid-template-columns: 1fr 1fr; /* 50% Image, 50% Text */
+//       min-height: 500px;
+//     }
+//   }
+// }
+
+// /* Left Column: Image */
+// .modal-image-col {
+//   position: relative;
+//   background: #f8fafc;
+//   overflow: hidden;
+
+//   .modal-img {
+//     width: 100%;
+//     height: 100%;
+//     object-fit: cover;
+//     object-position: center;
+//   }
+
+//   .badge-overlay {
+//     position: absolute;
+//     top: 20px;
+//     left: 20px;
+    
+//     .stock-pill {
+//       padding: 6px 12px;
+//       border-radius: 100px;
+//       font-size: 0.75rem;
+//       font-weight: 700;
+//       text-transform: uppercase;
+//       letter-spacing: 0.05em;
+//       backdrop-filter: blur(4px);
+      
+//       &.in-stock { background: rgba(255, 255, 255, 0.9); color: #0f172a; }
+//       &.out-stock { background: rgba(239, 68, 68, 0.9); color: white; }
+//     }
+//   }
+// }
+
+// /* Right Column: Content */
+// .modal-content-col {
+//   padding: 40px;
+//   display: flex;
+//   flex-direction: column;
+//   justify-content: center;
+//   background: white;
+  
+//   .content-header {
+//     margin-bottom: 24px;
+    
+//     .modal-brand {
+//       font-size: 0.85rem;
+//       font-weight: 700;
+//       letter-spacing: 0.15em;
+//       text-transform: uppercase;
+//       color: #94a3b8;
+//       margin-bottom: 8px;
+//     }
+
+//     .modal-title {
+//       font-family: 'Playfair Display', serif;
+//       font-size: 2.5rem;
+//       line-height: 1.1;
+//       color: #0f172a;
+//       margin-bottom: 12px;
+//     }
+
+//     .rating-row {
+//       display: flex;
+//       align-items: center;
+//       gap: 6px;
+//       font-size: 0.9rem;
+//       color: #64748b;
+//     }
+//   }
+
+//   .modal-desc {
+//     font-size: 1rem;
+//     line-height: 1.7;
+//     color: #475569;
+//     margin-bottom: 32px;
+//   }
+
+//   .big-price {
+//     display: block;
+//     font-size: 2rem;
+//     font-weight: 600;
+//     color: #0f172a;
+//     margin-bottom: 32px;
+//   }
+// }
+
+// /* Action Buttons */
+// .action-dock {
+//   display: flex;
+//   gap: 16px;
+  
+//   button {
+//     flex: 1;
+//     height: 54px;
+//     border-radius: 16px;
+//     font-weight: 700;
+//     font-size: 0.95rem;
+//     cursor: pointer;
+//     transition: transform 0.2s;
+    
+//     &:hover { transform: translateY(-2px); }
+//   }
+
+//   .add-cart-btn {
+//     background: #0f172a;
+//     color: white;
+//     border: none;
+//     box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.3);
+//   }
+
+//   .view-full-btn {
+//     background: transparent;
+//     border: 2px solid #e2e8f0;
+//     color: #0f172a;
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     gap: 8px;
+    
+//     &:hover { border-color: #0f172a; }
+//   }
+// }
+
+// /* Close X */
+// .close-btn {
+//   position: absolute;
+//   top: 20px;
+//   right: 20px;
+//   z-index: 10;
+//   width: 40px;
+//   height: 40px;
+//   border-radius: 50%;
+//   background: rgba(255, 255, 255, 0.5);
+//   border: 1px solid rgba(0,0,0,0.05);
+//   cursor: pointer;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   font-size: 1.2rem;
+//   transition: all 0.2s;
+
+//   &:hover {
+//     background: white;
+//     transform: rotate(90deg);
+//   }
+// }

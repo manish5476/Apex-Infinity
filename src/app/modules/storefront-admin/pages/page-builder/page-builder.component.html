@@ -1,91 +1,242 @@
-<!-- <div class="h-screen flex flex-col bg-white text-slate-800">
+<div class="h-full flex flex-col">
 
-  <header class="h-14 border-b border-gray-200 bg-white flex items-center justify-between px-4 z-50 shadow-sm shrink-0">
+  <header class="builder-header">
     <div class="flex items-center gap-4">
-      <a routerLink="../../" class="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-all">
-        <i class="pi pi-arrow-left"></i>
+      <a routerLink="../../" class="flex items-center justify-center w-8 h-8 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors">
+        <i class="pi pi-arrow-left text-sm"></i>
       </a>
       <div class="flex flex-col">
-        <h1 class="text-sm font-bold text-gray-900 leading-tight">{{ page()?.name || 'Loading...' }}</h1>
-        <div class="flex items-center gap-2">
-          <span class="w-1.5 h-1.5 rounded-full" [ngClass]="page()?.isPublished ? 'bg-green-500' : 'bg-amber-500'"></span>
-          <span class="text-[10px] text-gray-500 uppercase font-semibold tracking-wider">{{ page()?.status || 'Draft' }}</span>
+        <h1 class="text-sm font-bold text-slate-800 leading-none">{{ page()?.name || 'Untitled Page' }}</h1>
+        <div class="flex items-center gap-1.5 mt-1">
+          <span class="w-1.5 h-1.5 rounded-full" [ngClass]="page()?.isPublished ? 'bg-green-500' : 'bg-amber-400'"></span>
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ page()?.status || 'Draft' }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="flex gap-3">
+      <span *ngIf="isSaving()" class="text-[11px] text-slate-400 font-medium flex items-center animate-pulse"><i class="pi pi-sync pi-spin mr-2"></i> Auto-saving...</span>
+      <button (click)="savePage()" [disabled]="isSaving()" class="px-4 py-2 bg-slate-900 text-white text-[11px] font-bold uppercase tracking-wide rounded-md hover:bg-slate-800 transition-all flex items-center gap-2 disabled:opacity-50 shadow-sm">
+        <i class="pi pi-save"></i> Save Changes
+      </button>
+    </div>
+  </header>
+
+  <div class="flex-1 flex overflow-hidden relative">
+    
+    <aside class="builder-sidebar" [class.w-[360px]]="viewMode() === 'sidebar'">
+      
+      <div class="layers-panel custom-scrollbar" 
+           [class.hidden]="viewMode() === 'sidebar' && sidebarState() === 'full' && selectedSection()"
+           [class.flex-1]="!selectedSection() || viewMode() === 'dialog'">
+        
+        <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 sticky top-0 z-10 backdrop-blur-sm">
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Page Structure</span>
+          <span class="text-[10px] font-mono bg-white border border-gray-200 text-slate-600 px-1.5 py-0.5 rounded shadow-sm">{{ sections().length }} Items</span>
+        </div>
+
+        <div class="p-3 flex flex-col gap-2" cdkDropList (cdkDropListDropped)="drop($event)">
+          @for (section of sections(); track section.id) {
+            <div cdkDrag class="layer-card group" [class.active]="selectedSection()?.id === section.id" (click)="selectSection(section)">
+              <div class="drag-handle" cdkDragHandle><i class="pi pi-bars"></i></div>
+              <div class="flex-1 min-w-0 flex flex-col">
+                <span class="text-xs font-semibold text-slate-700 truncate layer-title">{{ sectionRegistry[section.type]?.name || section.type }}</span>
+                <span class="text-[10px] text-slate-400 truncate mt-0.5" *ngIf="section.config?.title">{{ section.config.title }}</span>
+              </div>
+              <button (click)="deleteSection(section.id, $event)" class="w-6 h-6 flex items-center justify-center rounded text-slate-300 hover:bg-red-50 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
+                <i class="pi pi-trash text-[10px]"></i>
+              </button>
+            </div>
+          }
+          <button (click)="showAddMenu.set(true)" class="btn-add-section mt-2"><i class="pi pi-plus-circle text-sm"></i> Add Component</button>
+        </div>
+      </div>
+
+      @if (selectedSection() && viewMode() === 'sidebar') {
+        <div class="settings-panel flex flex-col shadow-inner"
+             [class.h-full]="sidebarState() === 'full'"
+             [class.flex-1]="sidebarState() === 'split'"
+             [style.min-height]="sidebarState() === 'full' ? '100%' : '50%'">
+          
+          <div class="h-10 px-3 border-b border-gray-100 flex justify-between items-center bg-slate-50 select-none">
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-bold uppercase text-blue-600 tracking-wider">Edit {{ sectionRegistry[selectedSection().type]?.name }}</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <button (click)="toggleViewMode()" pTooltip="Pop Out" tooltipPosition="bottom" class="w-6 h-6 flex items-center justify-center rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"><i class="pi pi-external-link text-[10px]"></i></button>
+              <button (click)="toggleSidebarState()" pTooltip="Expand View" tooltipPosition="bottom" class="w-6 h-6 flex items-center justify-center rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"><i class="pi" [class.pi-window-maximize]="sidebarState() === 'split'" [class.pi-window-minimize]="sidebarState() === 'full'"></i></button>
+              <button (click)="selectedSection.set(null)" class="w-6 h-6 flex items-center justify-center rounded text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"><i class="pi pi-times"></i></button>
+            </div>
+          </div>
+          <div class="flex-1 overflow-y-auto custom-scrollbar bg-white">
+            <app-config-form [config]="selectedSection().config" [schema]="sectionRegistry[selectedSection().type]?.allowedConfig" (configChange)="onConfigChange($event)"></app-config-form>
+          </div>
+        </div>
+      }
+    </aside>
+
+    <main id="preview-container" class="flex-1 bg-gray-100/50 overflow-y-auto p-8 flex justify-center relative custom-scrollbar">
+      
+      @if (showAddMenu()) {
+        <div class="absolute inset-0 overlay-backdrop flex items-center justify-center p-4" (click)="showAddMenu.set(false)">
+          <div class="library-modal w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col animate-slide-up" (click)="$event.stopPropagation()">
+            <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-slate-50">
+              <h3 class="font-heading font-bold text-sm text-slate-800">Component Library</h3>
+              <button (click)="showAddMenu.set(false)" class="text-slate-400 hover:text-slate-600"><i class="pi pi-times"></i></button>
+            </div>
+            <div class="p-4 overflow-y-auto custom-scrollbar grid grid-cols-2 sm:grid-cols-3 gap-3 bg-white">
+              @for (item of availableTypes; track item.type) {
+                <button (click)="addSection(item.type)" class="flex flex-col items-start p-4 border border-gray-100 rounded-lg hover:border-blue-500 hover:bg-blue-50/30 transition-all text-left group">
+                  <div class="mb-3 p-2.5 bg-slate-50 rounded-md group-hover:bg-white group-hover:shadow-sm text-slate-400 group-hover:text-blue-600 transition-all"><i class="material-icons text-2xl">{{ item.icon || 'widgets' }}</i></div>
+                  <span class="font-bold text-xs text-slate-700 mb-1 group-hover:text-blue-700">{{ item.name }}</span>
+                  <span class="text-[10px] text-slate-400 leading-relaxed line-clamp-2">{{ item.description }}</span>
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      <div class="w-full max-w-[1024px] flex flex-col shadow-2xl bg-white min-h-[800px] transition-all duration-300 transform origin-top" [class.translate-x-4]="selectedSection() && viewMode() === 'sidebar'">
+        <div class="h-16 border-b border-gray-100 flex items-center px-8 justify-between opacity-50 grayscale hover:opacity-100 hover:grayscale-0 transition-all cursor-not-allowed bg-white">
+           <div class="w-24 h-6 bg-slate-200 rounded"></div>
+           <div class="flex gap-4"><div class="w-12 h-3 bg-slate-200 rounded"></div><div class="w-12 h-3 bg-slate-200 rounded"></div></div>
+        </div>
+
+        <div class="flex-1 bg-white relative min-h-[500px]">
+          @if (sections().length === 0) {
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-300">
+              <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-100"><i class="pi pi-box text-2xl opacity-40"></i></div>
+              <p class="text-xs font-bold uppercase tracking-widest opacity-60">Start Building</p>
+              <button (click)="showAddMenu.set(true)" class="mt-4 text-blue-600 font-bold hover:underline text-xs">Add First Section</button>
+            </div>
+          }
+          @for (section of sections(); track section.id) {
+            <div class="relative group border-2 border-transparent transition-all duration-200" [class.border-blue-500]="selectedSection()?.id === section.id" (click)="selectSection(section)">
+              <div class="absolute inset-0 border border-blue-300 border-dashed opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10" *ngIf="selectedSection()?.id !== section.id"></div>
+              <div class="absolute top-0 right-0 z-30 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity transform -translate-y-full" [class.opacity-100]="selectedSection()?.id === section.id">
+                <span class="bg-blue-600 text-white text-[10px] px-2 py-1 font-bold uppercase tracking-wider shadow-sm rounded-bl-md">{{ sectionRegistry[section.type]?.name || section.type }}</span>
+              </div>
+              @switch (section.type) {
+                @case ('hero_banner') { <app-hero-banner [config]="section.config" /> }
+                @case ('product_slider') { <app-product-slider [config]="section.config" /> }
+                @case ('map_locations') { <div class="h-64 bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-500">Map Component</div> }
+                @default { <div class="p-8 text-center bg-slate-50"><p class="text-slate-400 font-bold text-xs uppercase">{{ section.type }} Placeholder</p></div> }
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </main>
+
+    <p-dialog [visible]="viewMode() === 'dialog' && !!selectedSection()" 
+              [modal]="false" [resizable]="true" [draggable]="true" [maximizable]="true"
+              [style]="{width: '450px', maxHeight: '90vh'}" styleClass="builder-dialog"
+              (onHide)="viewMode.set('sidebar')">
+      <ng-template pTemplate="header">
+          <div class="flex items-center gap-2 w-full mr-4">
+              <span class="font-bold text-sm text-slate-700">Editing {{ sectionRegistry[selectedSection()?.type]?.name }}</span>
+              <button (click)="toggleViewMode()" class="ml-auto text-xs text-blue-600 hover:underline"><i class="pi pi-arrow-left text-[10px] mr-1"></i> Dock</button>
+          </div>
+      </ng-template>
+      <div class="h-full overflow-y-auto custom-scrollbar p-1">
+        @if (selectedSection()) {
+          <app-config-form [config]="selectedSection().config" [schema]="sectionRegistry[selectedSection().type]?.allowedConfig" (configChange)="onConfigChange($event)"></app-config-form>
+        }
+      </div>
+    </p-dialog>
+
+  </div>
+</div>
+
+<!-- <div class="h-full flex flex-col">
+
+  <header class="builder-header">
+    <div class="flex items-center gap-4">
+      <a routerLink="../../" class="flex items-center justify-center w-8 h-8 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors">
+        <i class="pi pi-arrow-left text-sm"></i>
+      </a>
+      <div class="flex flex-col">
+        <h1 class="text-sm font-bold text-slate-800 leading-none">{{ page()?.name || 'Untitled Page' }}</h1>
+        <div class="flex items-center gap-1.5 mt-1">
+          <span class="w-1.5 h-1.5 rounded-full" [ngClass]="page()?.isPublished ? 'bg-green-500' : 'bg-amber-400'"></span>
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ page()?.status || 'Draft' }}</span>
         </div>
       </div>
     </div>
 
     <div class="flex gap-3">
-      <span *ngIf="isSaving()" class="text-xs text-gray-400 flex items-center animate-pulse">
-        <i class="pi pi-sync pi-spin mr-2"></i> Saving changes...
+      <span *ngIf="isSaving()" class="text-[11px] text-slate-400 font-medium flex items-center animate-pulse">
+        <i class="pi pi-sync pi-spin mr-2"></i> Auto-saving...
       </span>
       <button (click)="savePage()" 
               [disabled]="isSaving()"
-              class="px-4 py-1.5 bg-slate-900 text-white text-xs font-bold rounded-md hover:bg-slate-700 transition-colors flex items-center gap-2 disabled:opacity-50">
-        <i class="pi pi-save"></i> Save Page
+              class="px-4 py-2 bg-slate-900 text-white text-[11px] font-bold uppercase tracking-wide rounded-md hover:bg-slate-800 transition-all flex items-center gap-2 disabled:opacity-50 shadow-sm">
+        <i class="pi pi-save"></i> Save Changes
       </button>
     </div>
   </header>
 
-  <div class="flex-1 flex overflow-hidden">
+  <div class="flex-1 flex overflow-hidden relative">
     
-    <aside class="w-[320px] border-r border-gray-200 bg-white flex flex-col z-40 shrink-0 shadow-lg relative">
+    <aside class="builder-sidebar">
       
-      <div class="p-3 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-        <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">Page Layers</span>
-        <span class="text-[10px] bg-white border border-gray-200 text-gray-600 px-2 py-0.5 rounded-full shadow-sm">{{ sections().length }}</span>
-      </div>
-
-      <div class="flex-1 overflow-y-auto p-3 custom-scrollbar" cdkDropList (cdkDropListDropped)="drop($event)">
+      <div class="layers-panel custom-scrollbar" [class.is-compressed]="selectedSection()">
         
-        @for (section of sections(); track section.id) {
-          <div cdkDrag 
-               class="group relative flex items-center gap-3 p-3 mb-2 bg-white border border-gray-200 rounded-lg cursor-pointer transition-all hover:border-blue-300 hover:shadow-md"
-               [class.ring-2]="selectedSection()?.id === section.id"
-               [class.ring-blue-500]="selectedSection()?.id === section.id"
-               [class.border-transparent]="selectedSection()?.id === section.id"
-               (click)="selectSection(section)">
-            
-            <div class="text-gray-300 cursor-grab active:cursor-grabbing hover:text-gray-600 cdk-drag-handle p-1">
-              <i class="pi pi-bars"></i>
-            </div>
-            
-            <div class="flex-1 min-w-0">
-              <div class="text-xs font-bold text-gray-800 truncate">
-                {{ sectionRegistry[section.type]?.name || section.type }}
-              </div>
-              <div class="text-[10px] text-gray-400 truncate" *ngIf="section.config?.title">
-                {{ section.config.title }}
-              </div>
-            </div>
+        <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 sticky top-0 z-10 backdrop-blur-sm">
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Page Structure</span>
+          <span class="text-[10px] font-mono bg-white border border-gray-200 text-slate-600 px-1.5 py-0.5 rounded shadow-sm">{{ sections().length }}</span>
+        </div>
 
-            <button (click)="deleteSection(section.id, $event)" 
-                    class="w-7 h-7 flex items-center justify-center rounded-full text-gray-300 hover:bg-red-50 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
-              <i class="pi pi-trash text-xs"></i>
-            </button>
-          </div>
-        }
+        <div class="p-3 flex flex-col gap-2" cdkDropList (cdkDropListDropped)="drop($event)">
+          
+          @for (section of sections(); track section.id) {
+            <div cdkDrag 
+                 class="layer-card group"
+                 [class.active]="selectedSection()?.id === section.id"
+                 (click)="selectSection(section)">
+              
+              <div class="drag-handle" cdkDragHandle>
+                <i class="pi pi-bars"></i>
+              </div>
+              
+              <div class="flex-1 min-w-0 flex flex-col">
+                <span class="text-xs font-semibold text-slate-700 truncate layer-title">
+                  {{ sectionRegistry[section.type]?.name || section.type }}
+                </span>
+                <span class="text-[10px] text-slate-400 truncate mt-0.5" *ngIf="section.config?.title">
+                  {{ section.config.title }}
+                </span>
+              </div>
 
-        <button (click)="showAddMenu.set(true)" 
-                *ngIf="!showAddMenu()"
-                class="w-full py-3 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 text-xs font-bold uppercase hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all mt-2 flex items-center justify-center gap-2 group">
-          <i class="pi pi-plus-circle group-hover:scale-110 transition-transform"></i> Add Section
-        </button>
+              <button (click)="deleteSection(section.id, $event)" 
+                      class="w-6 h-6 flex items-center justify-center rounded text-slate-300 hover:bg-red-50 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
+                <i class="pi pi-trash text-[10px]"></i>
+              </button>
+            </div>
+          }
+
+          <button (click)="showAddMenu.set(true)" class="btn-add-section mt-2">
+            <i class="pi pi-plus-circle text-sm"></i> Add Component
+          </button>
+        </div>
       </div>
 
       @if (selectedSection(); as section) {
-        <div class="absolute inset-x-0 bottom-0 top-[40%] bg-white border-t border-gray-200 shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.1)] flex flex-col z-50 animate-slide-up">
+        <div class="settings-panel">
           
-          <div class="p-3 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+          <div class="h-10 px-4 border-b border-gray-100 flex justify-between items-center bg-slate-50">
             <div class="flex items-center gap-2">
-              <span class="w-1.5 h-4 bg-blue-500 rounded-full"></span>
-              <span class="text-xs font-bold uppercase text-gray-700">Settings</span>
+              <div class="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+              <span class="text-[10px] font-bold uppercase text-slate-600 tracking-wider">
+                Editing {{ sectionRegistry[section.type]?.name }}
+              </span>
             </div>
-            <button (click)="selectedSection.set(null)" class="text-gray-400 hover:text-gray-600 p-1 rounded hover:bg-gray-200 transition-colors">
-              <i class="pi pi-times"></i>
+            <button (click)="selectedSection.set(null)" class="text-slate-400 hover:text-slate-700 transition-colors">
+              <i class="pi pi-angle-down"></i>
             </button>
           </div>
           
-          <div class="flex-1 overflow-y-auto p-4 custom-scrollbar bg-slate-50/50">
+          <div class="flex-1 overflow-y-auto custom-scrollbar bg-white">
             <app-config-form 
               [config]="section.config" 
               [schema]="sectionRegistry[section.type]?.allowedConfig"
@@ -97,25 +248,25 @@
 
     </aside>
 
-    <main id="preview-container" class="flex-1 bg-gray-100 overflow-y-auto p-8 flex justify-center relative custom-scrollbar">
+    <main id="preview-container" class="flex-1 bg-gray-100/50 overflow-y-auto p-8 flex justify-center relative custom-scrollbar">
       
       @if (showAddMenu()) {
-        <div class="absolute inset-0 bg-slate-900/20 z-50 flex items-center justify-center p-4 backdrop-blur-[2px]" (click)="showAddMenu.set(false)">
-          <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col scale-100 animate-fade-in" (click)="$event.stopPropagation()">
-            <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-              <h3 class="font-bold text-gray-800">Library</h3>
-              <button (click)="showAddMenu.set(false)" class="text-gray-400 hover:text-gray-600"><i class="pi pi-times"></i></button>
+        <div class="absolute inset-0 overlay-backdrop flex items-center justify-center p-4" (click)="showAddMenu.set(false)">
+          <div class="library-modal w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col animate-slide-up" (click)="$event.stopPropagation()">
+            <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-slate-50">
+              <h3 class="font-heading font-bold text-sm text-slate-800">Component Library</h3>
+              <button (click)="showAddMenu.set(false)" class="text-slate-400 hover:text-slate-600"><i class="pi pi-times"></i></button>
             </div>
             
-            <div class="p-4 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div class="p-4 overflow-y-auto custom-scrollbar grid grid-cols-2 sm:grid-cols-3 gap-3 bg-white">
               @for (item of availableTypes; track item.type) {
                 <button (click)="addSection(item.type)" 
-                        class="flex flex-col items-start p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:ring-1 hover:ring-blue-500 hover:bg-blue-50/50 transition-all text-left group">
-                  <div class="mb-3 p-2.5 bg-gray-100 rounded-lg group-hover:bg-white group-hover:shadow-sm text-gray-500 group-hover:text-blue-600 transition-all">
+                        class="flex flex-col items-start p-4 border border-gray-100 rounded-lg hover:border-blue-500 hover:bg-blue-50/30 transition-all text-left group">
+                  <div class="mb-3 p-2.5 bg-slate-50 rounded-md group-hover:bg-white group-hover:shadow-sm text-slate-400 group-hover:text-blue-600 transition-all">
                     <i class="material-icons text-2xl">{{ item.icon || 'widgets' }}</i>
                   </div>
-                  <span class="font-bold text-xs text-gray-800 mb-1">{{ item.name }}</span>
-                  <span class="text-[10px] text-gray-400 leading-tight line-clamp-2">{{ item.description }}</span>
+                  <span class="font-bold text-xs text-slate-700 mb-1 group-hover:text-blue-700">{{ item.name }}</span>
+                  <span class="text-[10px] text-slate-400 leading-relaxed line-clamp-2">{{ item.description }}</span>
                 </button>
               }
             </div>
@@ -123,45 +274,39 @@
         </div>
       }
 
-      <div class="w-full max-w-[1024px] flex flex-col gap-0 shadow-2xl min-h-[800px] transition-all duration-300">
-        
-        <div class="bg-white border-b border-gray-100 opacity-60 hover:opacity-100 transition-opacity relative group cursor-not-allowed">
-          <div class="h-16 flex items-center px-8 justify-between grayscale opacity-50">
-            <div class="w-24 h-6 bg-gray-200 rounded"></div>
-            <div class="flex gap-4">
-              <div class="w-12 h-3 bg-gray-200 rounded"></div>
-              <div class="w-12 h-3 bg-gray-200 rounded"></div>
-              <div class="w-12 h-3 bg-gray-200 rounded"></div>
-            </div>
-          </div>
-          <div class="absolute inset-0 flex items-center justify-center bg-gray-50/80 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-[1px]">
-            <div class="bg-slate-800 text-white text-[10px] px-3 py-1.5 rounded-full font-bold shadow-lg flex items-center gap-2">
-              <i class="pi pi-lock text-[10px]"></i> Global Header
-            </div>
-          </div>
+      <div class="w-full max-w-[1024px] flex flex-col shadow-2xl bg-white min-h-[800px] transition-all duration-300 transform origin-top"
+           [class.translate-x-4]="selectedSection()"> <div class="h-16 border-b border-gray-100 flex items-center px-8 justify-between opacity-50 grayscale hover:opacity-100 hover:grayscale-0 transition-all cursor-not-allowed bg-white">
+           <div class="w-24 h-6 bg-slate-200 rounded"></div>
+           <div class="flex gap-4">
+             <div class="w-12 h-3 bg-slate-200 rounded"></div>
+             <div class="w-12 h-3 bg-slate-200 rounded"></div>
+           </div>
         </div>
 
-        <div class="bg-white min-h-[600px] relative">
-          
+        <div class="flex-1 bg-white relative min-h-[500px]">
           @if (sections().length === 0) {
-            <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-300">
-              <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                <i class="pi pi-box text-3xl opacity-30"></i>
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-300">
+              <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-100">
+                <i class="pi pi-box text-2xl opacity-40"></i>
               </div>
-              <p class="text-sm font-medium text-gray-400">Page is empty</p>
-              <button (click)="showAddMenu.set(true)" class="mt-4 text-blue-600 font-bold hover:underline text-xs">Add Section</button>
+              <p class="text-xs font-bold uppercase tracking-widest opacity-60">Start Building</p>
+              <button (click)="showAddMenu.set(true)" class="mt-4 text-blue-600 font-bold hover:underline text-xs">Add First Section</button>
             </div>
           }
 
           @for (section of sections(); track section.id) {
-            <div class="relative group transition-all duration-200 border-l-4 border-transparent" 
-                 [class.border-l-blue-500]="selectedSection()?.id === section.id"
+            <div class="relative group border-2 border-transparent transition-all duration-200" 
+                 [class.border-blue-500]="selectedSection()?.id === section.id"
+                 [class.shadow-xl]="selectedSection()?.id === section.id"
+                 [class.z-20]="selectedSection()?.id === section.id"
                  (click)="selectSection(section)">
               
-              <div class="absolute inset-0 border-2 border-transparent group-hover:border-blue-400/50 pointer-events-none transition-colors z-20"></div>
+              <div class="absolute inset-0 border border-blue-300 border-dashed opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10"
+                   *ngIf="selectedSection()?.id !== section.id"></div>
               
-              <div class="absolute top-0 right-0 z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity transform -translate-y-full">
-                <span class="bg-blue-600 text-white text-[10px] px-2 py-1 rounded-t font-bold uppercase tracking-wider shadow-sm">
+              <div class="absolute top-0 right-0 z-30 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity transform -translate-y-full"
+                   [class.opacity-100]="selectedSection()?.id === section.id">
+                <span class="bg-blue-600 text-white text-[10px] px-2 py-1 font-bold uppercase tracking-wider shadow-sm rounded-bl-md">
                   {{ sectionRegistry[section.type]?.name || section.type }}
                 </span>
               </div>
@@ -169,37 +314,42 @@
               @switch (section.type) {
                 @case ('hero_banner') { <app-hero-banner [config]="section.config" /> }
                 @case ('product_slider') { <app-product-slider [config]="section.config" /> }
+                @case ('map_locations') {
+                  <div class="h-64 w-full bg-slate-100 flex items-center justify-center border-y border-slate-200 relative overflow-hidden">
+                    <div class="absolute inset-0 opacity-10 grayscale bg-[url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg')] bg-cover"></div>
+                    <div class="z-10 text-center">
+                      <div class="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-2 shadow-lg text-white animate-bounce">
+                        <i class="pi pi-map-marker text-lg"></i>
+                      </div>
+                      <h3 class="font-bold text-slate-700 text-sm">{{ section.config.title || 'Store Locator' }}</h3>
+                    </div>
+                  </div>
+                }
                 @default {
-                  <div class="p-12 text-center bg-gray-50 m-4 border border-dashed border-gray-300 rounded">
-                    <p class="text-gray-400 font-bold text-xs">{{ section.type }}</p>
+                  <div class="p-8 text-center bg-slate-50 border-y border-slate-100">
+                    <p class="text-slate-400 font-bold text-xs uppercase">{{ section.type }} Placeholder</p>
                   </div>
                 }
               }
-
             </div>
           }
         </div>
 
-        <div class="bg-slate-900 opacity-90 hover:opacity-100 transition-opacity relative group cursor-not-allowed mt-auto">
-          <div class="h-32 flex items-center justify-center flex-col gap-3 grayscale opacity-30">
-            <div class="w-32 h-4 bg-gray-600 rounded"></div>
-            <div class="flex gap-2 mt-2">
-              <div class="w-6 h-6 bg-gray-600 rounded-full"></div>
-              <div class="w-6 h-6 bg-gray-600 rounded-full"></div>
-            </div>
-          </div>
-          <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-[1px]">
-            <div class="bg-white text-slate-900 text-[10px] px-3 py-1.5 rounded-full font-bold shadow-lg flex items-center gap-2">
-              <i class="pi pi-lock text-[10px]"></i> Global Footer
-            </div>
-          </div>
+        <div class="bg-slate-900 h-40 flex items-center justify-center flex-col gap-3 opacity-90 hover:opacity-100 transition-opacity cursor-not-allowed">
+           <div class="w-32 h-4 bg-slate-700 rounded opacity-50"></div>
+           <div class="flex gap-3 mt-2 opacity-30">
+             <div class="w-8 h-8 bg-slate-600 rounded-full"></div>
+             <div class="w-8 h-8 bg-slate-600 rounded-full"></div>
+             <div class="w-8 h-8 bg-slate-600 rounded-full"></div>
+           </div>
         </div>
 
       </div>
     </main>
-
   </div>
 </div> -->
+
+<!-- 
 <div class="h-screen flex flex-col bg-white text-slate-800">
 
   <header class="h-14 border-b border-gray-200 bg-white flex items-center justify-between px-4 z-50 shadow-sm shrink-0">
@@ -414,952 +564,4 @@
       </div>
     </main>
   </div>
-</div>
-
-<!-- <div class="h-screen flex flex-col bg-white font-sans text-slate-800 overflow-hidden">
-
-  <header class="h-14 border-b border-gray-200 flex items-center justify-between px-4 bg-white z-40 shrink-0">
-    <div class="flex items-center gap-3">
-      <a routerLink="../../" class="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all">
-        <i class="pi pi-arrow-left"></i>
-      </a>
-      <div>
-        <h1 class="text-sm font-bold text-gray-900">{{ page()?.name || 'Loading...' }}</h1>
-        <p class="text-[10px] text-gray-500 uppercase tracking-wider">Page Builder</p>
-      </div>
-    </div>
-
-    <div class="flex gap-3">
-      <div class="text-xs text-gray-400 flex items-center mr-2" *ngIf="isSaving()">
-        <i class="pi pi-spin pi-spinner mr-1"></i> Saving...
-      </div>
-      <button (click)="savePage()" 
-              [disabled]="isSaving()"
-              class="px-4 py-1.5 bg-slate-900 text-white text-xs font-bold rounded hover:bg-slate-700 transition-colors flex items-center gap-2">
-        <i class="pi pi-save"></i> Save Changes
-      </button>
-    </div>
-  </header>
-
-  <div class="flex-1 flex overflow-hidden">
-    <aside class="w-[320px] border-r border-gray-200 bg-slate-50 flex flex-col z-30 shrink-0 shadow-lg">
-      <div class="flex-1 overflow-y-auto p-3" cdkDropList (cdkDropListDropped)="drop($event)">
-        
-        <div class="flex items-center justify-between mb-3 px-1">
-          <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Layers</span>
-          <span class="text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded">{{ sections().length }}</span>
-        </div>
-
-        @for (section of sections(); track section.id) {
-          <div cdkDrag 
-               class="group relative flex items-center gap-3 p-3 mb-2 bg-white border border-gray-200 rounded-lg cursor-pointer transition-all hover:shadow-sm"
-               [class.ring-2]="selectedSection()?.id === section.id"
-               [class.ring-blue-500]="selectedSection()?.id === section.id"
-               [class.border-blue-500]="selectedSection()?.id === section.id"
-               (click)="selectSection(section)">
-            
-            <div class="text-gray-300 cursor-move hover:text-gray-600"><i class="pi pi-bars"></i></div>
-            
-            <div class="flex-1 min-w-0">
-              <div class="text-xs font-bold text-gray-800 truncate">{{ (sectionRegistry[section.type]?.name || section.type) }}</div>
-              <div class="text-[10px] text-gray-500 truncate">{{ section.config?.title || 'No Title' }}</div>
-            </div>
-
-            <button (click)="deleteSection(section.id, $event)" 
-                    class="w-6 h-6 flex items-center justify-center rounded text-gray-300 hover:bg-red-50 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
-              <i class="pi pi-trash text-xs"></i>
-            </button>
-          </div>
-        }
-
-        <button (click)="showAddMenu.set(true)" 
-                *ngIf="!showAddMenu()"
-                class="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-400 text-xs font-bold uppercase hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50 transition-all mt-2">
-          + Add Section
-        </button>
-
-      </div>
-
-      @if (selectedSection(); as section) {
-        <div class="h-[55%] border-t border-gray-200 bg-white flex flex-col shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-          <div class="p-3 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-            <span class="text-xs font-bold uppercase text-gray-600 flex items-center gap-2">
-              <i class="pi pi-cog"></i> Configure
-            </span>
-            <button (click)="selectedSection.set(null)" class="text-gray-400 hover:text-gray-600">
-              <i class="pi pi-times"></i>
-            </button>
-          </div>
-          
-          <div class="flex-1 overflow-y-auto p-4 custom-scrollbar">
-            <app-config-form 
-              [config]="section.config" 
-              [schema]="sectionRegistry[section.type]?.allowedConfig"
-              (configChange)="onConfigChange($event)">
-            </app-config-form>
-          </div>
-        </div>
-      }
-
-    </aside>
-
-    <main id="preview-container" class="flex-1 bg-gray-100 overflow-y-auto p-8 flex justify-center relative">
-      
-      @if (showAddMenu()) {
-        <div class="absolute inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm" (click)="showAddMenu.set(false)">
-          <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col" (click)="$event.stopPropagation()">
-            <div class="p-4 border-b border-gray-100 flex justify-between items-center">
-              <h3 class="font-bold text-gray-800">Select a Component</h3>
-              <button (click)="showAddMenu.set(false)"><i class="pi pi-times"></i></button>
-            </div>
-            
-            <div class="p-4 overflow-y-auto grid grid-cols-2 md:grid-cols-3 gap-3">
-              @for (item of availableTypes; track item.type) {
-                <button (click)="addSection(item.type)" 
-                        class="flex flex-col items-start p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:ring-1 hover:ring-blue-500 hover:bg-blue-50 transition-all text-left group">
-                  <div class="mb-2 p-2 bg-gray-100 rounded-md group-hover:bg-white text-gray-500 group-hover:text-blue-600 transition-colors">
-                    <i class="pi text-xl" [ngClass]="'pi-' + item.icon"></i>
-                  </div>
-                  <span class="font-bold text-sm text-gray-800 mb-1">{{ item.name }}</span>
-                  <span class="text-[10px] text-gray-500 leading-tight">{{ item.description }}</span>
-                </button>
-              }
-            </div>
-          </div>
-        </div>
-      }
-
-      <div class="w-full max-w-[1280px] bg-white min-h-[800px] shadow-2xl transition-all duration-300 origin-top">
-        
-        @for (section of sections(); track section.id) {
-          <div class="relative group" 
-               [class.ring-2]="selectedSection()?.id === section.id"
-               [class.ring-blue-500]="selectedSection()?.id === section.id"
-               [class.z-10]="selectedSection()?.id === section.id"
-               (click)="selectSection(section)">
-            
-            <div class="absolute inset-0 border-2 border-transparent group-hover:border-blue-400 pointer-events-none transition-colors z-20"></div>
-            
-            <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-50">
-              <span class="bg-blue-600 text-white text-[10px] px-2 py-1 rounded font-bold uppercase tracking-wider shadow-sm">
-                {{ (sectionRegistry[section.type]?.name || section.type) }}
-              </span>
-            </div>
-
-            @switch (section.type) {
-              @case ('hero_banner') { <app-hero-banner [config]="section.config" /> }
-              @case ('product_slider') { <app-product-slider [config]="section.config" /> }
-              @default {
-                <div class="p-12 text-center border border-dashed border-gray-300 m-4 bg-gray-50 rounded">
-                  <p class="text-gray-400 font-medium">Component Preview: {{ section.type }}</p>
-                </div>
-              }
-            }
-
-          </div>
-        }
-
-        @if (sections().length === 0) {
-          <div class="h-[600px] flex flex-col items-center justify-center text-gray-300">
-            <i class="pi pi-image text-6xl mb-4 opacity-50"></i>
-            <p class="text-lg font-medium">Your page is empty</p>
-            <button (click)="showAddMenu.set(true)" class="mt-4 text-blue-500 font-bold hover:underline">Start adding sections</button>
-          </div>
-        }
-
-      </div>
-    </main>
-
-  </div>
-</div> -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- <div class="flex h-screen overflow-hidden font-sans ui-bg-app">
-
-  <aside class="w-80 flex flex-col ui-bg-surface ui-border-r ui-shadow-xl z-30">
-
-    <header class="p-4 ui-border-b">
-      <div class="flex items-center gap-3 mb-4">
-        <a routerLink="../../" class="ui-icon-btn" title="Back">
-          <i class="pi pi-arrow-left"></i>
-        </a>
-
-        <div class="min-w-0 flex-1">
-          <h2 class="text-sm font-bold truncate ui-text">
-            {{ page()?.name }}
-          </h2>
-
-          <p class="text-xs flex items-center gap-1 ui-text-muted">
-            <span class="w-2 h-2 rounded-full"
-                  [class.ui-bg-success]="page()?.isPublished"
-                  [class.ui-bg-warning]="!page()?.isPublished">
-            </span>
-            {{ page()?.isPublished ? 'Published' : 'Draft' }}
-          </p>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-2 gap-2">
-        <button (click)="savePage()" class="ui-btn ui-btn-primary">
-          <i class="pi pi-save"></i> Save
-        </button>
-
-        <button (click)="togglePublish()"
-                class="ui-btn"
-                [class.ui-btn-danger]="page()?.isPublished"
-                [class.ui-btn-success]="!page()?.isPublished">
-          <i [class]="page()?.isPublished ? 'pi pi-eye-slash' : 'pi pi-upload'"></i>
-          {{ page()?.isPublished ? 'Unpublish' : 'Publish' }}
-        </button>
-      </div>
-    </header>
-
-    <nav class="flex ui-border-b ui-bg-subtle">
-      <button (click)="activeTab.set('sections')"
-              class="flex-1 ui-tab"
-              [class.ui-tab-active]="activeTab() === 'sections'">
-        Layout
-      </button>
-
-      <button (click)="activeTab.set('add')"
-              class="flex-1 ui-tab"
-              [class.ui-tab-active]="activeTab() === 'add'">
-        Components
-      </button>
-    </nav>
-
-    @if (activeTab() === 'add') {
-      <section class="flex-1 overflow-y-auto p-4 ui-bg-subtle">
-        <div class="grid grid-cols-2 gap-3">
-          @for (type of availableTypes; track type.id) {
-            <button (click)="addSection(type.id)"
-                    class="ui-card ui-card-hover flex flex-col items-center p-4 text-center h-24 justify-center">
-              <div class="mb-2 text-gray-500">
-                <i [class]="'pi pi-' + type.icon + ' text-xl'"></i>
-              </div>
-              <span class="text-xs font-semibold">{{ type.label }}</span>
-            </button>
-          }
-        </div>
-      </section>
-    }
-
-    @if (activeTab() === 'sections') {
-      <section class="flex-1 overflow-y-auto p-4 ui-bg-subtle"
-               cdkDropList
-               (cdkDropListDropped)="drop($event)">
-
-        @for (section of sections(); track section.id) {
-          <div cdkDrag
-               cdkDragLockAxis="y"
-               class="ui-card flex items-center gap-3 mb-2 p-3 cursor-move ui-card-hover group"
-               [class.ui-ring]="selectedSection()?.id === section.id"
-               (click)="selectSection(section)">
-
-            <span class="text-gray-300 group-hover:text-gray-500 transition-colors">
-              <i class="pi pi-bars"></i>
-            </span>
-
-            <div class="flex-1 min-w-0">
-              <div class="text-xs font-bold uppercase tracking-wide truncate text-gray-700">
-                {{ section.type.replace('_', ' ') }}
-              </div>
-              <div class="text-xs truncate ui-text-muted">
-                {{ section.config['title'] || 'Untitled' }}
-              </div>
-            </div>
-
-            <button (click)="deleteSection(section.id, $event)"
-                    class="ui-icon-btn ui-icon-btn-danger opacity-0 group-hover:opacity-100 transition-opacity">
-              <i class="pi pi-trash text-xs"></i>
-            </button>
-          </div>
-        }
-
-        @if (sections().length === 0) {
-          <div class="h-full flex flex-col items-center justify-center text-center ui-text-muted p-6">
-            <i class="pi pi-box text-3xl opacity-30 mb-3"></i>
-            <p class="text-sm">Page is empty</p>
-            <button (click)="activeTab.set('add')" class="ui-link mt-2">
-              Add a component
-            </button>
-          </div>
-        }
-      </section>
-    }
-
-    @if (selectedSection(); as section) {
-      <section class="border-t ui-bg-surface flex flex-col shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-20" 
-               style="max-height: 50%;">
-        
-        <header class="p-3 flex justify-between items-center ui-border-b ui-bg-subtle text-sm font-semibold">
-          <span class="truncate pr-2">{{ section.type | titlecase }} Settings</span>
-          <div class="flex gap-1">
-            <button class="ui-icon-btn ui-icon-btn-danger" 
-                    (click)="deleteSection(section.id, $event)" 
-                    title="Delete Section">
-              <i class="pi pi-trash"></i>
-            </button>
-            <button class="ui-icon-btn" (click)="selectedSection.set(null)">
-              <i class="pi pi-times"></i>
-            </button>
-          </div>
-        </header>
-
-        <div class="p-4 overflow-y-auto space-y-4">
-          
-          <div>
-            <label class="ui-label">Title</label>
-            <input class="ui-input"
-                   [value]="section.config['title'] || ''"
-                   (input)="updateConfig('title', $any($event.target).value)" />
-          </div>
-
-          <div>
-            <label class="ui-label">Subtitle</label>
-            <textarea rows="2" class="ui-input"
-                      [value]="section.config['subtitle'] || ''"
-                      (input)="updateConfig('subtitle', $any($event.target).value)"></textarea>
-          </div>
-
-          @if (section.type === 'hero_banner') {
-            <div>
-              <label class="ui-label">Image URL</label>
-              <input class="ui-input ui-input-mono"
-                     [value]="section.config['backgroundImage'] || ''"
-                     (input)="updateConfig('backgroundImage', $any($event.target).value)" />
-            </div>
-          }
-
-          @if (section.type === 'product_slider') {
-            <div class="space-y-4 pt-2 border-t border-dashed border-gray-200">
-              <h4 class="text-xs font-bold text-blue-600 uppercase">Data Source</h4>
-              
-              <div>
-                <label class="ui-label">Collection Rule</label>
-                <select class="ui-input"
-                        [value]="section.config['ruleType'] || 'new_arrivals'"
-                        (change)="updateConfig('ruleType', $any($event.target).value)">
-                  <option value="new_arrivals">New Arrivals</option>
-                  <option value="best_sellers">Best Sellers</option>
-                  <option value="trending">Trending Now</option>
-                  <option value="clearance_sale">Clearance Sale</option>
-                </select>
-              </div>
-
-              <div class="grid grid-cols-2 gap-3">
-                <div>
-                  <label class="ui-label">Total Items</label>
-                  <input type="number" class="ui-input" min="4" max="24"
-                         [value]="section.config['limit'] || 8"
-                         (input)="updateConfig('limit', $any($event.target).value)" />
-                </div>
-                <div>
-                  <label class="ui-label">Per Row</label>
-                  <input type="number" class="ui-input" min="2" max="5"
-                         [value]="section.config['itemsPerView'] || 4"
-                         (input)="updateConfig('itemsPerView', $any($event.target).value)" />
-                </div>
-              </div>
-            </div>
-          }
-
-        </div>
-      </section>
-    }
-  </aside>
-
-  <main class="flex-1 overflow-y-auto p-8 ui-bg-app flex justify-center perspective-1000">
-    
-    <div class="w-full max-w-6xl shadow-2xl rounded-xl overflow-hidden relative min-h-[800px] bg-white transition-all"
-         [style.--primary-color]="page()?.theme?.primaryColor || '#3B82F6'"
-         [style.--secondary-color]="page()?.theme?.secondaryColor || '#10B981'"
-         [style.font-family]="page()?.theme?.fontFamily || 'inherit'">
-
-      @for (section of sections(); track section.id) {
-        <div class="relative group ui-outline-hover transition-all duration-200"
-             [class.ui-outline-active]="selectedSection()?.id === section.id"
-             (click)="selectSection(section)">
-
-          @switch (section.type) {
-            @case ('hero_banner') {
-              <app-hero-banner [config]="section.config" />
-            }
-            @case ('product_slider') {
-              <app-product-slider [config]="section.config" />
-            }
-            @default {
-              <div class="p-12 text-center bg-gray-50 border-2 border-dashed border-gray-200 text-gray-400 m-4 rounded-lg">
-                <i class="pi pi-code text-2xl mb-2"></i>
-                <p>Preview for <strong>{{ section.type }}</strong> not available</p>
-              </div>
-            }
-          }
-
-          <div class="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-50 bg-white/90 backdrop-blur shadow-md rounded-lg p-1 border border-gray-100">
-            <button class="ui-icon-btn" (click)="moveUp(section, $event)">
-              <i class="pi pi-arrow-up"></i>
-            </button>
-            <button class="ui-icon-btn" (click)="moveDown(section, $event)">
-              <i class="pi pi-arrow-down"></i>
-            </button>
-            <div class="w-px bg-gray-300 mx-1 my-1"></div>
-            <button class="ui-icon-btn ui-icon-btn-danger" (click)="deleteSection(section.id, $event)">
-              <i class="pi pi-trash"></i>
-            </button>
-          </div>
-          
-        </div>
-      }
-
-      @if (sections().length === 0) {
-        <div class="absolute inset-0 flex flex-col items-center justify-center text-center ui-text-muted pointer-events-none">
-          <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-            <i class="pi pi-palette text-3xl opacity-20"></i>
-          </div>
-          <h3 class="text-lg font-medium text-gray-900">Start Building</h3>
-          <p class="text-sm max-w-xs mx-auto mt-1">Select "Components" from the sidebar to add sections to your page.</p>
-        </div>
-      }
-
-    </div>
-  </main>
-
-</div> -->
-
-<!-- <div class="flex h-screen overflow-hidden font-sans ui-bg-app">
-
-  <aside class="w-80 flex flex-col ui-bg-surface ui-border-r ui-shadow-xl z-30">
-
-    <header class="p-4 ui-border-b">
-      <div class="flex items-center gap-3 mb-4">
-        <a routerLink="../../" class="ui-icon-btn" title="Back">
-          <i class="fas fa-arrow-left"></i>
-        </a>
-
-        <div class="min-w-0 flex-1">
-          <h2 class="text-sm font-bold truncate ui-text">
-            {{ page()?.name }}
-          </h2>
-
-          <p class="text-xs flex items-center gap-1 ui-text-muted">
-            <span class="w-2 h-2 rounded-full"
-                  [class.ui-bg-success]="page()?.isPublished"
-                  [class.ui-bg-warning]="!page()?.isPublished">
-            </span>
-            {{ page()?.isPublished ? 'Published' : 'Draft' }}
-          </p>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-2 gap-2">
-        <button (click)="savePage()" class="ui-btn ui-btn-primary">
-          <i class="fas fa-save"></i> Save
-        </button>
-
-        <button (click)="togglePublish()"
-                class="ui-btn"
-                [class.ui-btn-danger]="page()?.isPublished"
-                [class.ui-btn-success]="!page()?.isPublished">
-          <i [class]="page()?.isPublished ? 'fas fa-eye-slash' : 'fas fa-rocket'"></i>
-          {{ page()?.isPublished ? 'Unpublish' : 'Publish' }}
-        </button>
-      </div>
-    </header>
-
-    <nav class="flex ui-border-b ui-bg-subtle">
-      <button (click)="activeTab.set('sections')"
-              class="flex-1 ui-tab"
-              [class.ui-tab-active]="activeTab() === 'sections'">
-        Layout
-      </button>
-
-      <button (click)="activeTab.set('add')"
-              class="flex-1 ui-tab"
-              [class.ui-tab-active]="activeTab() === 'add'">
-        Components
-      </button>
-    </nav>
-
-    @if (activeTab() === 'add') {
-      <section class="flex-1 overflow-y-auto p-4 ui-bg-subtle">
-        <div class="grid grid-cols-2 gap-3">
-          @for (type of availableTypes; track type.id) {
-            <button (click)="addSection(type.id)"
-                    class="ui-card ui-card-hover flex flex-col items-center p-4 text-center h-24 justify-center">
-              <div class="mb-2 text-gray-500">
-                <i [class]="'fas fa-' + type.icon + ' text-xl'"></i>
-              </div>
-              <span class="text-xs font-semibold">{{ type.label }}</span>
-            </button>
-          }
-        </div>
-      </section>
-    }
-
-    @if (activeTab() === 'sections') {
-      <section class="flex-1 overflow-y-auto p-4 ui-bg-subtle"
-               cdkDropList
-               (cdkDropListDropped)="drop($event)">
-
-        @for (section of sections(); track section.id) {
-          <div cdkDrag
-               class="ui-card flex items-center gap-3 mb-2 p-3 cursor-move ui-card-hover group"
-               [class.ui-ring]="selectedSection()?.id === section.id"
-               (click)="selectSection(section)">
-
-            <span class="text-gray-300 group-hover:text-gray-500 transition-colors">
-              <i class="fas fa-grip-vertical"></i>
-            </span>
-
-            <div class="flex-1 min-w-0">
-              <div class="text-xs font-bold uppercase tracking-wide truncate text-gray-700">
-                {{ section.type.replace('_', ' ') }}
-              </div>
-              <div class="text-xs truncate ui-text-muted">
-                {{ section.config['title'] || 'Untitled' }}
-              </div>
-            </div>
-
-            <button (click)="deleteSection(section.id, $event)"
-                    class="ui-icon-btn ui-icon-btn-danger opacity-0 group-hover:opacity-100 transition-opacity">
-              <i class="fas fa-trash-alt text-xs"></i>
-            </button>
-          </div>
-        }
-
-        @if (sections().length === 0) {
-          <div class="h-64 flex flex-col items-center justify-center text-center ui-text-muted">
-            <i class="fas fa-layer-group text-3xl opacity-20 mb-3"></i>
-            <p class="text-sm">Page is empty</p>
-            <button (click)="activeTab.set('add')" class="ui-link mt-2">
-              Add a component
-            </button>
-          </div>
-        }
-      </section>
-    }
-
-    @if (selectedSection(); as section) {
-      <section class="border-t ui-bg-surface flex flex-col shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-20" 
-               style="max-height: 50%;">
-        
-        <header class="p-3 flex justify-between items-center ui-border-b ui-bg-subtle text-sm font-semibold">
-          <span class="truncate pr-2">{{ section.type | titlecase }} Settings</span>
-          <div class="flex gap-1">
-            <button class="ui-icon-btn ui-icon-btn-danger" 
-                    (click)="deleteSection(section.id, $event)" 
-                    title="Delete Section">
-              <i class="fas fa-trash-alt"></i>
-            </button>
-            <button class="ui-icon-btn" (click)="selectedSection.set(null)">
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
-        </header>
-
-        <div class="p-4 overflow-y-auto space-y-4">
-          
-          <div>
-            <label class="ui-label">Title</label>
-            <input class="ui-input"
-                   [value]="section.config['title'] || ''"
-                   (input)="updateConfig('title', $any($event.target).value)"
-                   placeholder="Section Heading" />
-          </div>
-
-          <div>
-            <label class="ui-label">Subtitle</label>
-            <textarea rows="2" class="ui-input"
-                      [value]="section.config['subtitle'] || ''"
-                      (input)="updateConfig('subtitle', $any($event.target).value)"
-                      placeholder="Optional description text"></textarea>
-          </div>
-
-          @if (section.type === 'hero_banner') {
-            <div>
-              <label class="ui-label">Image URL</label>
-              <input class="ui-input ui-input-mono"
-                     [value]="section.config['backgroundImage'] || ''"
-                     (input)="updateConfig('backgroundImage', $any($event.target).value)"
-                     placeholder="https://..." />
-            </div>
-          }
-
-          @if (section.type === 'product_slider') {
-            <div class="space-y-4 pt-2 border-t border-dashed border-gray-200">
-              <h4 class="text-xs font-bold text-blue-600 uppercase">Data Source</h4>
-              
-              <div>
-                <label class="ui-label">Collection Rule</label>
-                <select class="ui-input"
-                        [value]="section.config['ruleType'] || 'new_arrivals'"
-                        (change)="updateConfig('ruleType', $any($event.target).value)">
-                  <option value="new_arrivals">New Arrivals</option>
-                  <option value="best_sellers">Best Sellers</option>
-                  <option value="trending">Trending Now</option>
-                  <option value="clearance_sale">Clearance Sale</option>
-                </select>
-              </div>
-
-              <div class="grid grid-cols-2 gap-3">
-                <div>
-                  <label class="ui-label">Total Items</label>
-                  <input type="number" class="ui-input" min="4" max="24"
-                         [value]="section.config['limit'] || 8"
-                         (input)="updateConfig('limit', $any($event.target).value)" />
-                </div>
-                <div>
-                  <label class="ui-label">Per Row</label>
-                  <input type="number" class="ui-input" min="2" max="5"
-                         [value]="section.config['itemsPerView'] || 4"
-                         (input)="updateConfig('itemsPerView', $any($event.target).value)" />
-                </div>
-              </div>
-            </div>
-          }
-
-        </div>
-      </section>
-    }
-  </aside>
-
-  <main class="flex-1 overflow-y-auto p-8 ui-bg-app flex justify-center perspective-1000">
-    
-    <div class="w-full max-w-6xl shadow-2xl rounded-xl overflow-hidden relative min-h-[800px] bg-white transition-all"
-         [style.--primary-color]="page()?.theme?.primaryColor || '#3B82F6'"
-         [style.--secondary-color]="page()?.theme?.secondaryColor || '#10B981'"
-         [style.font-family]="page()?.theme?.fontFamily || 'inherit'">
-
-      @for (section of sections(); track section.id) {
-        <div class="relative group ui-outline-hover transition-all duration-200"
-             [class.ui-outline-active]="selectedSection()?.id === section.id"
-             (click)="selectSection(section)">
-
-          @switch (section.type) {
-            @case ('hero_banner') {
-              <app-hero-banner [config]="section.config" />
-            }
-            @case ('product_slider') {
-              <app-product-slider [config]="section.config" />
-            }
-            @default {
-              <div class="p-12 text-center bg-gray-50 border-2 border-dashed border-gray-200 text-gray-400 m-4 rounded-lg">
-                <i class="fas fa-code text-2xl mb-2"></i>
-                <p>Preview for <strong>{{ section.type }}</strong> not available</p>
-              </div>
-            }
-          }
-
-          <div class="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-50 bg-white/90 backdrop-blur shadow-md rounded-lg p-1 border border-gray-100">
-            <button class="ui-icon-btn" (click)="moveUp(section, $event)" title="Move Up">
-              <i class="fas fa-arrow-up"></i>
-            </button>
-            <button class="ui-icon-btn" (click)="moveDown(section, $event)" title="Move Down">
-              <i class="fas fa-arrow-down"></i>
-            </button>
-            <div class="w-px bg-gray-300 mx-1 my-1"></div>
-            <button class="ui-icon-btn ui-icon-btn-danger" (click)="deleteSection(section.id, $event)" title="Delete">
-              <i class="fas fa-trash-alt"></i>
-            </button>
-          </div>
-          
-        </div>
-      }
-
-      @if (sections().length === 0) {
-        <div class="absolute inset-0 flex flex-col items-center justify-center text-center ui-text-muted pointer-events-none">
-          <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-            <i class="fas fa-paint-roller text-3xl opacity-20"></i>
-          </div>
-          <h3 class="text-lg font-medium text-gray-900">Start Building</h3>
-          <p class="text-sm max-w-xs mx-auto mt-1">Select "Components" from the sidebar to add sections to your page.</p>
-        </div>
-      }
-
-    </div>
-  </main>
-
-</div> -->
-
-<!-- <div class="flex h-screen overflow-hidden font-sans ui-bg-app">
-
-  ================= SIDEBAR =================
-  <aside class="w-80 flex flex-col ui-bg-surface ui-border-r ui-shadow-xl z-30">
-
-    Header
-    <header class="p-4 ui-border-b">
-      <div class="flex items-center gap-3 mb-4">
-        <a
-          routerLink="../../"
-          class="ui-icon-btn"
-          title="Back">
-          <i class="fas fa-arrow-left"></i>
-        </a>
-
-        <div class="min-w-0">
-          <h2 class="text-sm font-bold truncate ui-text">
-            {{ page()?.name }}
-          </h2>
-
-          <p class="text-xs flex items-center gap-1 ui-text-muted">
-            <span
-              class="w-2 h-2 rounded-full"
-              [class.ui-bg-success]="page()?.isPublished"
-              [class.ui-bg-warning]="!page()?.isPublished">
-            </span>
-            {{ page()?.isPublished ? 'Published' : 'Draft' }}
-          </p>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-2 gap-2">
-        <button
-          (click)="savePage()"
-          class="ui-btn ui-btn-primary">
-          <i class="fas fa-save"></i>
-          Save
-        </button>
-
-        <button
-          (click)="togglePublish()"
-          class="ui-btn"
-          [class.ui-btn-danger]="page()?.isPublished"
-          [class.ui-btn-success]="!page()?.isPublished">
-          <i
-            [class]="page()?.isPublished ? 'fas fa-eye-slash' : 'fas fa-rocket'">
-          </i>
-          {{ page()?.isPublished ? 'Unpublish' : 'Publish' }}
-        </button>
-      </div>
-    </header>
-
-    Tabs
-    <nav class="flex ui-border-b ui-bg-subtle">
-      <button
-        (click)="activeTab.set('sections')"
-        class="flex-1 ui-tab"
-        [class.ui-tab-active]="activeTab() === 'sections'">
-        Layout
-      </button>
-
-      <button
-        (click)="activeTab.set('add')"
-        class="flex-1 ui-tab"
-        [class.ui-tab-active]="activeTab() === 'add'">
-        Components
-      </button>
-    </nav>
-
-    ADD COMPONENTS
-    @if (activeTab() === 'add') {
-      <section class="flex-1 overflow-y-auto p-4 ui-bg-subtle">
-        <div class="grid grid-cols-2 gap-3">
-          @for (type of availableTypes; track type.id) {
-            <button
-              (click)="addSection(type.id)"
-              class="ui-card ui-card-hover flex flex-col items-center p-4">
-              <div class="w-10 h-10 rounded-full ui-bg-muted flex items-center justify-center mb-3">
-                <i [class]="'fas fa-' + type.icon"></i>
-              </div>
-              <span class="text-xs font-semibold">
-                {{ type.label }}
-              </span>
-            </button>
-          }
-        </div>
-      </section>
-    }
-
-    SECTIONS LIST
-    @if (activeTab() === 'sections') {
-      <section
-        class="flex-1 overflow-y-auto p-4 ui-bg-subtle"
-        cdkDropList
-        (cdkDropListDropped)="drop($event)">
-
-        @for (section of sections(); track section.id) {
-          <div
-            cdkDrag
-            cdkDragLockAxis="y"
-            class="ui-card flex items-center gap-3 mb-2 cursor-move ui-card-hover"
-            [class.ui-ring]="selectedSection()?.id === section.id"
-            (click)="selectSection(section)">
-
-            <span class="ui-text-muted">
-              <i class="fas fa-grip-vertical"></i>
-            </span>
-
-            <div class="flex-1 min-w-0">
-              <div class="text-xs font-bold uppercase tracking-wide truncate">
-                {{ section.type.replace('_', ' ') }}
-              </div>
-              <div class="text-xs truncate ui-text-muted">
-                {{ section.config['title'] || 'Untitled section' }}
-              </div>
-            </div>
-
-            <button
-              (click)="deleteSection(section.id, $event)"
-              class="ui-icon-btn ui-icon-btn-danger">
-              <i class="fas fa-trash text-xs"></i>
-            </button>
-          </div>
-        }
-
-        @if (sections().length === 0) {
-          <div class="h-full flex flex-col items-center justify-center text-center ui-text-muted p-6">
-            <i class="fas fa-layer-group text-3xl opacity-30 mb-3"></i>
-            <p class="text-sm">No sections added</p>
-            <button
-              (click)="activeTab.set('add')"
-              class="ui-link mt-2">
-              Add your first section
-            </button>
-          </div>
-        }
-      </section>
-    }
-
-    CONFIG PANEL
-     @if (selectedSection(); as section) {
-      <section class="border-t ui-bg-surface max-h-[45%] flex flex-col">
-        <header class="p-3 flex justify-between items-center ui-border-b ui-bg-subtle text-sm font-semibold">
-          <span>
-            {{ section.type | titlecase }} Settings
-          </span>
-          <button class="ui-icon-btn" (click)="selectedSection.set(null)">
-            <i class="fas fa-chevron-down"></i>
-          </button>
-        </header>
-
-        <div class="p-4 overflow-y-auto space-y-4">
-          <div>
-            <label class="ui-label">Title</label>
-            <input class="ui-input"
-                   [value]="section.config['title'] || ''"
-                   (input)="updateConfig('title', $any($event.target).value)" />
-          </div>
-          
-          <div>
-            <label class="ui-label">Subtitle</label>
-            <textarea rows="2" class="ui-input"
-                   [value]="section.config['subtitle'] || ''"
-                   (input)="updateConfig('subtitle', $any($event.target).value)">
-            </textarea>
-          </div>
-
-          @if (section.type === 'hero_banner') {
-            <div>
-              <label class="ui-label">Background Image URL</label>
-              <input class="ui-input ui-input-mono"
-                     [value]="section.config['backgroundImage'] || ''"
-                     (input)="updateConfig('backgroundImage', $any($event.target).value)" />
-            </div>
-          }
-
-          @if (section.type === 'product_slider') {
-            <div class="space-y-4 border-t pt-4 mt-2">
-              <h3 class="text-xs font-bold text-primary-600 uppercase">Data Source</h3>
-              
-              <div>
-                <label class="ui-label">Collection</label>
-                <select class="ui-input"
-                        [value]="section.config['ruleType'] || 'new_arrivals'"
-                        (change)="updateConfig('ruleType', $any($event.target).value)">
-                  <option value="new_arrivals">New Arrivals</option>
-                  <option value="best_sellers">Best Sellers</option>
-                  <option value="trending">Trending Now</option>
-                  <option value="clearance_sale">Clearance Sale</option>
-                </select>
-              </div>
-
-              <div class="grid grid-cols-2 gap-3">
-                <div>
-                  <label class="ui-label">Items to Show</label>
-                  <input type="number" class="ui-input" min="4" max="24"
-                         [value]="section.config['limit'] || 8"
-                         (input)="updateConfig('limit', $any($event.target).value)" />
-                </div>
-                <div>
-                  <label class="ui-label">Items Per Row</label>
-                  <input type="number" class="ui-input" min="2" max="5"
-                         [value]="section.config['itemsPerView'] || 4"
-                         (input)="updateConfig('itemsPerView', $any($event.target).value)" />
-                </div>
-              </div>
-            </div>
-          }
-
-        </div>
-      </section>
-    }
-  </aside>
-
-  ================= CANVAS =================
-  <main class="flex-1 overflow-y-auto p-8 ui-bg-app flex justify-center">
-    <div class="w-full max-w-6xl space-y-6">
-
-      @for (section of sections(); track section.id) {
-        <div
-          class="relative group rounded-xl overflow-hidden ui-outline-hover"
-          [class.ui-outline-active]="selectedSection()?.id === section.id"
-          (click)="selectSection(section)">
-
-          @switch (section.type) {
-            @case ('hero_banner') {
-              <app-hero-banner [config]="section.config" />
-            }
-            @case ('product_slider') {
-              <app-product-slider [config]="section.config" />
-            }
-            @default {
-              <div class="p-10 ui-bg-subtle text-center ui-text-muted rounded-lg">
-                Preview not available
-              </div>
-            }
-          }
-
-          Floating Toolbar
-          <div class="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition">
-            <button
-              class="ui-icon-btn"
-              (click)="moveUp(section, $event)">
-              <i class="fas fa-arrow-up"></i>
-            </button>
-            <button
-              class="ui-icon-btn"
-              (click)="moveDown(section, $event)">
-              <i class="fas fa-arrow-down"></i>
-            </button>
-            <button
-              class="ui-icon-btn ui-icon-btn-danger"
-              (click)="deleteSection(section.id, $event)">
-              <i class="fas fa-trash-alt"></i>
-            </button>
-          </div>
-        </div>
-      }
-    </div>
-  </main>
-
 </div> -->

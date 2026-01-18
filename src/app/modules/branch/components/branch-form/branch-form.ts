@@ -74,13 +74,14 @@ export class BranchFormComponent implements OnInit {
     }
   }
 
-
   private checkRouteForEditMode(): void {
     this.route.paramMap.pipe(
       switchMap(params => {
         this.branchId = params.get('id');
         if (this.branchId) {
-          // this.editMode.set(true);
+          // 👇 THIS WAS COMMENTED OUT. UNCOMMENT IT!
+          this.editMode.set(true);
+
           this.formTitle.set('Edit Branch');
           this.loadingService.show();
           return this.branchService.getBranchById(this.branchId);
@@ -90,15 +91,39 @@ export class BranchFormComponent implements OnInit {
       finalize(() => this.loadingService.hide())
     ).subscribe({
       next: (response) => {
+        // ... rest of your code
         if (response && response.data && response.data.data) {
           this.patchForm(response.data.data);
-        } else if (response) {
-          this.messageService.showError('Error', 'Failed to load branch data');
         }
       },
       error: (err) => this.messageService.showError('Error', err.error?.message)
     });
   }
+
+  // private checkRouteForEditMode(): void {
+  //   this.route.paramMap.pipe(
+  //     switchMap(params => {
+  //       this.branchId = params.get('id');
+  //       if (this.branchId) {
+  //         // this.editMode.set(true);
+  //         this.formTitle.set('Edit Branch');
+  //         this.loadingService.show();
+  //         return this.branchService.getBranchById(this.branchId);
+  //       }
+  //       return of(null); // Create mode
+  //     }),
+  //     finalize(() => this.loadingService.hide())
+  //   ).subscribe({
+  //     next: (response) => {
+  //       if (response && response.data && response.data.data) {
+  //         this.patchForm(response.data.data);
+  //       } else if (response) {
+  //         this.messageService.showError('Error', 'Failed to load branch data');
+  //       }
+  //     },
+  //     error: (err) => this.messageService.showError('Error', err.error?.message)
+  //   });
+  // }
 
   private setCurrentLocationIfEmpty(): void {
     if (!navigator.geolocation) {
@@ -130,23 +155,6 @@ export class BranchFormComponent implements OnInit {
     );
   }
 
-  // private buildForm(): void {
-  //   this.branchForm = this.fb.group({
-  //     name: ['', Validators.required],
-  //     branchCode: [''],
-  //     phoneNumber: [''],
-  //     managerId: [null],
-  //     address: this.fb.group({
-  //       street: [''],
-  //       city: [''],
-  //       state: [''],
-  //       zipCode: [''],
-  //       country: ['India', Validators.required]
-  //     }),
-  //     isMainBranch: [false],
-  //     isActive: [true]
-  //   });
-  // }
   private buildForm(): void {
     this.branchForm = this.fb.group({
       name: ['', Validators.required],
@@ -175,37 +183,37 @@ export class BranchFormComponent implements OnInit {
   }
 
   onLocationFieldFocus(): void {
-  const location = this.branchForm.get('location')?.value;
+    const location = this.branchForm.get('location')?.value;
 
-  // ✅ Only fetch if empty
-  if (location?.lat != null && location?.lng != null) {
-    return;
-  }
+    // ✅ Only fetch if empty
+    if (location?.lat != null && location?.lng != null) {
+      return;
+    }
 
-  if (!navigator.geolocation) {
-    this.messageService.showWarn(
-      'Location not supported',
-      'Geolocation is not available in this browser.'
-    );
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      this.branchForm.get('location')?.patchValue({
-        lat: Number(position.coords.latitude.toFixed(6)),
-        lng: Number(position.coords.longitude.toFixed(6))
-      });
-    },
-    () => {
+    if (!navigator.geolocation) {
       this.messageService.showWarn(
-        'Permission denied',
-        'Unable to fetch current location.'
+        'Location not supported',
+        'Geolocation is not available in this browser.'
       );
-    },
-    { enableHighAccuracy: true, timeout: 10000 }
-  );
-}
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        this.branchForm.get('location')?.patchValue({
+          lat: Number(position.coords.latitude.toFixed(6)),
+          lng: Number(position.coords.longitude.toFixed(6))
+        });
+      },
+      () => {
+        this.messageService.showWarn(
+          'Permission denied',
+          'Unable to fetch current location.'
+        );
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }
 
 
   private patchForm(branch: any): void {
@@ -221,9 +229,12 @@ export class BranchFormComponent implements OnInit {
       return;
     }
 
-    // this.isSubmitting.set(true);
+    // 👇 UNCOMMENT THIS SO THE BUTTON DISABLES/SPINS
+    this.isSubmitting.set(true);
+
     const payload = this.branchForm.getRawValue();
 
+    // Now that editMode is set correctly in step 1, this logic will work:
     const saveObservable = this.editMode()
       ? this.branchService.updateBranch(this.branchId!, payload)
       : this.branchService.createBranch(payload);
@@ -233,14 +244,42 @@ export class BranchFormComponent implements OnInit {
     ).subscribe({
       next: (res) => {
         this.messageService.showSuccess('Success', `Branch ${this.editMode() ? 'updated' : 'created'} successfully.`);
-        // Notify master list that branches have changed
         this.masterList.refresh();
-        // this.masterList.notifyDataChange('branches'); 
-        this.router.navigate(['/branches']); // Navigate back to list
+        this.router.navigate(['/branches']);
       },
       error: (err) => {
         this.messageService.showError('Error', err.error?.message || 'Failed to save branch.');
       }
     });
   }
+
+  // onSubmit(): void {
+  //   if (this.branchForm.invalid) {
+  //     this.branchForm.markAllAsTouched();
+  //     this.messageService.showError('Invalid Form', 'Please check all required fields.');
+  //     return;
+  //   }
+
+  //   // this.isSubmitting.set(true);
+  //   const payload = this.branchForm.getRawValue();
+
+  //   const saveObservable = this.editMode()
+  //     ? this.branchService.updateBranch(this.branchId!, payload)
+  //     : this.branchService.createBranch(payload);
+
+  //   saveObservable.pipe(
+  //     finalize(() => this.isSubmitting.set(false))
+  //   ).subscribe({
+  //     next: (res) => {
+  //       this.messageService.showSuccess('Success', `Branch ${this.editMode() ? 'updated' : 'created'} successfully.`);
+  //       // Notify master list that branches have changed
+  //       this.masterList.refresh();
+  //       // this.masterList.notifyDataChange('branches'); 
+  //       this.router.navigate(['/branches']); // Navigate back to list
+  //     },
+  //     error: (err) => {
+  //       this.messageService.showError('Error', err.error?.message || 'Failed to save branch.');
+  //     }
+  //   });
+  // }
 }

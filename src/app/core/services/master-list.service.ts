@@ -31,7 +31,8 @@ export interface MasterList {
   // Flattened from 'masters' object:
   category?: MasterItem[];
   brand?: MasterItem[];
-  units?: MasterItem[];
+  department?: MasterItem[];
+  unit?: MasterItem[];
   taxes?: MasterItem[];
 }
 
@@ -85,7 +86,8 @@ export class MasterListService {
   // Dynamic Masters (Flattened)
   readonly categories = computed(() => this._data()?.category ?? []);
   readonly brands = computed(() => this._data()?.brand ?? []);
-  readonly units = computed(() => this._data()?.units ?? []);
+  readonly department = computed(() => this._data()?.department ?? []);
+  readonly units = computed(() => this._data()?.unit ?? []);
   readonly taxes = computed(() => this._data()?.taxes ?? []);
 
   // Enhanced entities with filtering
@@ -112,11 +114,10 @@ export class MasterListService {
       })
     ).subscribe((res: any) => {
       if (res?.data) {
-        // Flatten logic: Merge 'masters' (generic types) into the root object
         const genericMasters = res.data.masters || {};
         const finalData: MasterList = {
           ...res.data,
-          ...genericMasters // Spreads category, brand, units, etc. to top level
+          ...genericMasters 
         };
         this.updateState(finalData);
         
@@ -419,7 +420,6 @@ export class MasterListService {
   }
 
   refreshSpecific(type: string): void {
-    // Get current filters for this type
     const filters = this._activeFilters()[type] || {};
     this.loadSpecificList(type, filters).subscribe();
   }

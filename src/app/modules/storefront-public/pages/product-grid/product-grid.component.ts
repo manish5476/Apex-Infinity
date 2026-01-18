@@ -10,7 +10,7 @@ import { ProductCardComponent } from '../../components/product-card/product-card
   styleUrls: ['./product-grid.component.scss']
 })
 export class ProductGridComponent {
-  // Inputs matching your JSON structure
+// Inputs matching your JSON structure
   @Input() config: any = {}; 
   @Input() products: any[] = [];
   @Input() orgSlug: string = ''; // Needed for router links in card
