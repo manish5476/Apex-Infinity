@@ -158,6 +158,22 @@
     border-bottom-right-radius: 10px;
   }
 }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+/* Ensure PrimeNG Tabs look good in Sidebar */
+.p-tablist-tab-list {
+  background: transparent !important;
+  border-bottom: none !important;
+}
+.p-tabpanels {
+  background: transparent !important;
+}
 
 // /* =========================================
 //    THEME TOKENS (Scoped to Host)

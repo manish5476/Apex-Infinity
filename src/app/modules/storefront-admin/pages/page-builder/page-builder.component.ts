@@ -172,26 +172,144 @@ export class PageBuilderComponent implements OnInit {
     const reordered = list.map((s, i) => ({ ...s, position: i }));
     this.sections.set(reordered);
   }
-
-  savePage() {
+// In page-builder.component.ts
+savePage() {
     const pageId = this.page()?._id || this.page()?.id;
     if (!pageId) return;
+    
     this.isSaving.set(true);
-    const payload = {
-      sections: this.sections().map((s, i) => ({
-        type: s.type,
-        config: s.config,
-        position: i,
-        isActive: s.isActive,
-        dataSource: s.dataSource
-      }))
+    
+    // ✅ FIX: Clean data before sending
+    const cleanPayload = {
+      sections: this.sections().map((s, i) => {
+        // Create a copy of config
+        const cleanConfig = { ...s.config };
+        
+        // Remove empty strings/nulls so Backend defaults take over
+        Object.keys(cleanConfig).forEach(key => {
+          const val = cleanConfig[key];
+          if (val === '' || val === null) {
+            delete cleanConfig[key];
+          }
+        });
+
+        // Ensure Product Grid columns are Numbers (not strings)
+        if (s.type === 'product_grid' && cleanConfig.columns) {
+          cleanConfig.columns = Number(cleanConfig.columns);
+        }
+
+        return {
+          type: s.type,
+          config: cleanConfig,
+          position: i,
+          isActive: s.isActive,
+          dataSource: s.dataSource
+        };
+      })
     };
-    this.adminService.updatePage(pageId, payload).subscribe({
-      next: () => this.isSaving.set(false),
-      error: () => { this.isSaving.set(false); alert('Save failed'); }
+
+    this.adminService.updatePage(pageId, cleanPayload).subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        // Optional: Add a Toast Success message here
+      },
+      error: (err) => { 
+        this.isSaving.set(false); 
+        console.error(err);
+        // Show the actual error message from backend
+        alert('Save Error: ' + (err.error?.message || 'Something went wrong')); 
+      }
     });
   }
+// savePage() {
+//   const pageId = this.page()?._id || this.page()?.id;
+//   if (!pageId) return;
+
+//   this.isSaving.set(true);
+
+//   // 1. Sanitize Config Data
+//   const cleanSections = this.sections().map((s, i) => {
+//     const cleanConfig = { ...s.config };
+
+//     // Fix: Convert empty strings to undefined so backend defaults apply
+//     Object.keys(cleanConfig).forEach(key => {
+//       if (cleanConfig[key] === '' || cleanConfig[key] === null) {
+//         delete cleanConfig[key]; // Remove key so backend applies default
+//       }
+//     });
+
+//     // Special Case: Product Grid Columns (ensure number)
+//     if (s.type === 'product_grid' && cleanConfig.columns) {
+//       cleanConfig.columns = Number(cleanConfig.columns);
+//     }
+    
+//     // Special Case: Hero Height (Legacy fix)
+//     if (s.type === 'hero_banner' && cleanConfig.height === 'full') {
+//       cleanConfig.height = 'full_screen';
+//     }
+
+//     return {
+//       type: s.type,
+//       config: cleanConfig,
+//       position: i,
+//       isActive: s.isActive,
+//       dataSource: s.dataSource
+//     };
+//   });
+
+//   const payload = { sections: cleanSections };
+
+//   this.adminService.updatePage(pageId, payload).subscribe({
+//     next: () => {
+//       this.isSaving.set(false);
+//       // Optional: Show success toast
+//     },
+//     error: (err) => { 
+//       this.isSaving.set(false); 
+//       console.error(err);
+//       alert('Save failed: ' + (err.error?.message || 'Unknown error')); 
+//     }
+//   });
+// }
+
+  // savePage() {
+  //   const pageId = this.page()?._id || this.page()?.id;
+  //   if (!pageId) return;
+  //   this.isSaving.set(true);
+  //   const payload = {
+  //     sections: this.sections().map((s, i) => ({
+  //       type: s.type,
+  //       config: s.config,
+  //       position: i,
+  //       isActive: s.isActive,
+  //       dataSource: s.dataSource
+  //     }))
+  //   };
+  //   this.adminService.updatePage(pageId, payload).subscribe({
+  //     next: () => this.isSaving.set(false),
+  //     error: () => { this.isSaving.set(false); alert('Save failed'); }
+  //   });
+  // }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // import { Component, OnInit, inject, signal, ViewEncapsulation } from '@angular/core';
 // import { CommonModule } from '@angular/common';
 // import { ActivatedRoute, RouterModule } from '@angular/router';
