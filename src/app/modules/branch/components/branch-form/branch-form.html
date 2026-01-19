@@ -6,7 +6,6 @@
 
       <form [formGroup]="branchForm" (ngSubmit)="onSubmit()" class="customer-form-layout">
 
-        <!-- HEADER -->
         <div class="customer-form-header">
           <h1 class="form-title">{{ formTitle() }}</h1>
           <p class="form-subtitle">
@@ -14,9 +13,8 @@
           </p>
         </div>
 
-        <div class="customer-form-body">
+        <div class="customer-form-body custom-scrollbar">
 
-          <!-- MAIN DETAILS -->
           <section class="form-section">
             <h4 class="section-title">Main Details</h4>
 
@@ -45,7 +43,6 @@
             </div>
           </section>
 
-          <!-- ADDRESS -->
           <section class="form-section" formGroupName="address">
             <h4 class="section-title">Address</h4>
 
@@ -77,75 +74,67 @@
             </div>
           </section>
 
-          <!-- LOCATION -->
-          <!-- <section class="form-section" formGroupName="location">
-            <h4 class="section-title">Location (Optional)</h4>
-
-            <div class="form-grid">
-              <div class="form-group">
-                <label>Latitude</label>
-                <p-inputNumber formControlName="lat" [useGrouping]="false" mode="decimal">
-                </p-inputNumber>
-
-                <p-inputNumber formControlName="lng" [useGrouping]="false" mode="decimal">
-                </p-inputNumber>
-
-              </div>
-
-              <div class="form-group">
-                <label>Longitude</label>
-                <p-inputNumber formControlName="lat" [useGrouping]="false" mode="decimal">
-                </p-inputNumber>
-
-                <p-inputNumber formControlName="lng" [useGrouping]="false" mode="decimal">
-                </p-inputNumber>
-
-              </div>
-            </div>
-          </section> -->
           <section class="form-section" formGroupName="location">
-            <h4 class="section-title">Location</h4>
+            <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-2">
+              <h4 class="section-title mb-0 border-none p-0">Location</h4>
+              <button type="button" (click)="onLocationFieldFocus()" class="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                <i class="pi pi-map-marker"></i> Use Current Location
+              </button>
+            </div>
 
-            <div class="form-grid">
-              <div class="form-group">
-                <label>Latitude</label>
-                <p-inputNumber formControlName="lat" mode="decimal" [useGrouping]="false"
-                  (onFocus)="onLocationFieldFocus()">
-                </p-inputNumber>
-              </div>
+            <div class="flex flex-col gap-6">
+              
+              <app-location-picker 
+                [initialLocation]="initialMapLocation()"
+                (locationChange)="onMapLocationChange($event)">
+              </app-location-picker>
 
-              <div class="form-group">
-                <label>Longitude</label>
-                <p-inputNumber formControlName="lng" mode="decimal" [useGrouping]="false"
-                  (onFocus)="onLocationFieldFocus()">
-                </p-inputNumber>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Latitude</label>
+                  <p-inputNumber formControlName="lat" mode="decimal" [useGrouping]="false" 
+                    [minFractionDigits]="6" [maxFractionDigits]="6" placeholder="Select on map">
+                  </p-inputNumber>
+                </div>
+
+                <div class="form-group">
+                  <label>Longitude</label>
+                  <p-inputNumber formControlName="lng" mode="decimal" [useGrouping]="false" 
+                    [minFractionDigits]="6" [maxFractionDigits]="6" placeholder="Select on map">
+                  </p-inputNumber>
+                </div>
               </div>
             </div>
           </section>
 
-          <!-- SETTINGS -->
           <section class="form-section">
             <h4 class="section-title">Settings</h4>
 
-            <div class="flex flex-col gap-3">
-              <div class="flex items-center gap-2">
+            <div class="flex flex-col gap-4 mt-2">
+              <div class="flex items-center gap-3 p-3 border border-dashed border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                 <p-checkbox inputId="main" formControlName="isMainBranch" [binary]="true"></p-checkbox>
-                <label for="main">Main Branch</label>
+                <div class="flex flex-col">
+                  <label for="main" class="font-bold text-gray-700 cursor-pointer text-sm">Main Branch</label>
+                  <span class="text-xs text-gray-500">Is this the headquarters?</span>
+                </div>
               </div>
 
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-3 p-3 border border-dashed border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                 <p-checkbox inputId="active" formControlName="isActive" [binary]="true"></p-checkbox>
-                <label for="active">Active</label>
+                <div class="flex flex-col">
+                  <label for="active" class="font-bold text-gray-700 cursor-pointer text-sm">Active Status</label>
+                  <span class="text-xs text-gray-500">Disable to hide this branch temporarily</span>
+                </div>
               </div>
             </div>
           </section>
 
         </div>
 
-        <!-- FOOTER -->
         <div class="customer-form-footer">
-          <p-button type="submit" icon="pi pi-check" [label]="editMode() ? 'Save Changes' : 'Create Branch'"
-            [loading]="isSubmitting()" styleClass="w-full">
+          <p-button type="submit" icon="pi pi-check" 
+            [label]="editMode() ? 'Save Changes' : 'Create Branch'"
+            [loading]="isSubmitting()" styleClass="w-full md:w-auto">
           </p-button>
         </div>
 
@@ -153,4 +142,3 @@
     </div>
   </section>
 </div>
-
