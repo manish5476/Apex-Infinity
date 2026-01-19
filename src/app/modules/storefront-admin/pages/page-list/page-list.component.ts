@@ -18,7 +18,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
         </div>
 
         <button type="button" (click)="openCreateModal()" class="btn btn-primary">
-          <i class="fas fa-plus icon"></i>
+          <i class="pi pi-plus icon"></i>
           <span>Create New Page</span>
         </button>
       </header>
@@ -33,7 +33,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
 
           <button (click)="openCreateModal()" class="create-card">
             <div class="create-icon-wrapper">
-              <i class="fas fa-plus"></i>
+              <i class="pi pi-plus"></i>
             </div>
             <span class="create-label">Create New Page</span>
           </button>
@@ -47,7 +47,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
 
               <div class="card-header">
                 <div class="page-icon" [class.is-home]="page.isHomepage">
-                  <i class="fas" [class]="page.isHomepage ? 'fa-home' : 'fa-layer-group'"></i>
+                  <i class="pi" [class]="page.isHomepage ? 'pi-home' : 'pi-file'"></i>
                 </div>
 
                 <h3 class="card-title" [title]="page.name">{{ page.name }}</h3>
@@ -55,7 +55,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
                 <div class="slug-wrapper">
                   <code class="slug-code">/{{ page.slug }}</code>
                   <button (click)="viewLive(page.slug)" class="link-btn" title="View Live">
-                    <i class="fas fa-external-link-alt"></i>
+                    <i class="pi pi-external-link"></i>
                   </button>
                 </div>
               </div>
@@ -70,7 +70,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
 
                 <div class="action-grid">
                   <a [routerLink]="[page._id, 'builder']" class="btn btn-secondary btn-block">
-                    <i class="fas fa-pen icon"></i> Builder
+                    <i class="pi pi-pencil icon"></i> Builder
                   </a>
 
                   <div class="icon-actions">
@@ -78,10 +78,10 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
                             class="icon-btn" 
                             [title]="page.isPublished ? 'Unpublish' : 'Publish'"
                             [class.active]="page.isPublished">
-                       <i class="fas" [class]="page.isPublished ? 'fa-eye-slash' : 'fa-cloud-upload-alt'"></i>
+                       <i class="pi" [class]="page.isPublished ? 'pi-eye-slash' : 'pi-cloud-upload'"></i>
                     </button>
                     <button (click)="deletePage(page._id)" class="icon-btn danger" title="Delete">
-                      <i class="fas fa-trash"></i>
+                      <i class="pi pi-trash"></i>
                     </button>
                   </div>
                 </div>
@@ -92,7 +92,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
 
           @if (pages().length === 0) {
             <div class="empty-state">
-              <i class="fas fa-ghost empty-icon"></i>
+              <i class="pi pi-file empty-icon"></i>
               <p>No pages yet.</p>
             </div>
           }
@@ -106,7 +106,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
             <div class="modal-header">
               <h2 class="modal-title">New Page</h2>
               <button type="button" (click)="closeCreateModal()" class="close-btn">
-                <i class="fas fa-times"></i>
+                <i class="pi pi-times"></i>
               </button>
             </div>
             <form [formGroup]="createForm" (ngSubmit)="createPage()">
@@ -125,7 +125,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
               <div class="modal-footer">
                 <button type="button" (click)="closeCreateModal()" class="btn btn-text">Cancel</button>
                 <button type="submit" [disabled]="createForm.invalid || isSubmitting()" class="btn btn-primary">
-                  @if (isSubmitting()) { <i class="fas fa-spinner fa-spin icon"></i> }
+                  @if (isSubmitting()) { <i class="pi pi-spin pi-spinner icon"></i> }
                   Create Page
                 </button>
               </div>
@@ -142,7 +142,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
       background: var(--surface-ground);
       padding: var(--spacing-3xl);
       font-family: var(--font-body);
-      color: var(--text-primary);
+      color: var(--text-color);
     }
 
     /* --- HEADER --- */
@@ -165,7 +165,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
       font-family: var(--font-heading);
       font-size: var(--font-size-4xl);
       font-weight: var(--font-weight-bold);
-      color: var(--text-primary);
+      color: var(--text-color);
       margin: 0;
       line-height: var(--line-height-tight);
       letter-spacing: -0.02em;
@@ -173,7 +173,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
     
     .page-subtitle {
       margin-top: var(--spacing-xs);
-      color: var(--text-secondary);
+      color: var(--text-color-secondary);
       font-size: var(--font-size-sm);
     }
 
@@ -191,15 +191,18 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
       transition: var(--transition-base);
       gap: var(--spacing-md);
       line-height: 1;
+      position: relative;
+      z-index: 1;
     }
 
     .btn-primary {
-      background-color: var(--primary-color);
-      color: var(--primary-color-text);
+      /* Fallback black if var is missing to ensure visibility */
+      background-color: var(--primary-color, #000); 
+      color: var(--primary-color-text, #fff);
       box-shadow: var(--shadow-md);
     }
     .btn-primary:hover {
-      background-color: var(--primary-600); /* Assuming you have shades, or use opacity */
+      filter: brightness(1.1);
       transform: translateY(-1px);
       box-shadow: var(--shadow-lg);
     }
@@ -211,7 +214,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
 
     .btn-secondary {
       background-color: var(--surface-card);
-      color: var(--text-primary);
+      color: var(--text-color);
       border-color: var(--surface-border);
       box-shadow: var(--shadow-sm);
     }
@@ -223,10 +226,10 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
 
     .btn-text {
       background: transparent;
-      color: var(--text-secondary);
+      color: var(--text-color-secondary);
     }
     .btn-text:hover {
-      color: var(--text-primary);
+      color: var(--text-color);
       background: var(--surface-hover);
     }
 
@@ -244,13 +247,13 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
       border-radius: var(--ui-border-radius);
       border: var(--ui-border-width) solid transparent;
       background: transparent;
-      color: var(--text-secondary);
+      color: var(--text-color-secondary);
       cursor: pointer;
       transition: var(--transition-fast);
     }
     .icon-btn:hover {
       background: var(--surface-hover);
-      color: var(--text-primary);
+      color: var(--text-color);
       border-color: var(--surface-border);
     }
     .icon-btn.active {
@@ -258,7 +261,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
       background: var(--green-50);
     }
     .icon-btn.active:hover {
-      color: var(--red-500); /* Hovering active publish usually implies unpublish intention */
+      color: var(--red-500);
       background: var(--red-50);
     }
     .icon-btn.danger:hover {
@@ -270,7 +273,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
       background: none;
       border: none;
       cursor: pointer;
-      color: var(--text-secondary);
+      color: var(--text-color-secondary);
       font-size: var(--font-size-xs);
       padding: var(--spacing-xs);
       transition: var(--transition-colors);
@@ -286,7 +289,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
       gap: var(--spacing-2xl);
     }
 
-    /* --- CARDS (Base) --- */
+    /* --- CARDS --- */
     .page-card, .create-card {
       position: relative;
       display: flex;
@@ -295,7 +298,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
       transition: var(--transition-base);
     }
 
-    /* --- CREATE CARD --- */
+    /* Create Card */
     .create-card {
       background: var(--surface-ground);
       border: 2px dashed var(--surface-border);
@@ -318,8 +321,8 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
       align-items: center;
       justify-content: center;
       margin-bottom: var(--spacing-lg);
-      font-size: var(--font-size-xl);
-      color: var(--text-secondary);
+      font-size: var(--font-size-3xl);
+      color: var(--text-color-secondary);
       box-shadow: var(--shadow-sm);
       transition: var(--transition-transform);
     }
@@ -329,14 +332,14 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
     }
     .create-label {
       font-weight: var(--font-weight-bold);
-      color: var(--text-secondary);
+      color: var(--text-color-secondary);
       font-size: var(--font-size-md);
     }
     .create-card:hover .create-label {
-      color: var(--text-primary);
+      color: var(--text-color);
     }
 
-    /* --- PAGE CARD --- */
+    /* Page Card */
     .page-card {
       background: var(--surface-card);
       border: var(--ui-border-width) solid var(--surface-border);
@@ -348,10 +351,9 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
     .page-card:hover {
       box-shadow: var(--shadow-xl);
       transform: translateY(-4px);
-      border-color: var(--primary-100); /* subtle border highlight */
+      border-color: var(--primary-100);
     }
 
-    /* Status Dot */
     .status-badge-wrapper {
       position: absolute;
       top: var(--spacing-xl);
@@ -362,8 +364,8 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background-color: var(--yellow-400); /* Draft */
-      box-shadow: 0 0 0 4px var(--surface-card); /* fake border/gap */
+      background-color: var(--yellow-400);
+      box-shadow: 0 0 0 4px var(--surface-card);
     }
     .status-dot.published {
       background-color: var(--green-500);
@@ -385,7 +387,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
       justify-content: center;
       margin-bottom: var(--spacing-lg);
       background: var(--surface-ground);
-      color: var(--text-secondary);
+      color: var(--text-color-secondary);
       font-size: var(--font-size-lg);
     }
     .page-icon.is-home {
@@ -397,7 +399,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
       font-family: var(--font-heading);
       font-size: var(--font-size-lg);
       font-weight: var(--font-weight-bold);
-      color: var(--text-primary);
+      color: var(--text-color);
       margin: 0 0 var(--spacing-xs) 0;
       width: 100%;
       overflow: hidden;
@@ -413,7 +415,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
     .slug-code {
       font-family: var(--font-mono);
       font-size: var(--font-size-xs);
-      color: var(--text-secondary);
+      color: var(--text-color-secondary);
       background: var(--surface-ground);
       padding: 2px 6px;
       border-radius: var(--ui-border-radius-sm);
@@ -439,13 +441,13 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
     .meta-status {
       font-weight: var(--font-weight-bold);
       letter-spacing: 0.05em;
-      color: var(--text-secondary);
+      color: var(--text-color-secondary);
     }
     .meta-status.published {
       color: var(--green-600);
     }
     .meta-date {
-      color: var(--text-secondary);
+      color: var(--text-color-secondary);
     }
 
     .action-grid {
@@ -492,7 +494,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
       font-family: var(--font-heading);
       font-size: var(--font-size-2xl);
       font-weight: var(--font-weight-bold);
-      color: var(--text-primary);
+      color: var(--text-color);
       margin: 0;
     }
     .close-btn {
@@ -501,7 +503,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
       width: 32px;
       height: 32px;
       border-radius: 50%;
-      color: var(--text-secondary);
+      color: var(--text-color-secondary);
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -510,7 +512,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
     }
     .close-btn:hover {
       background: var(--surface-hover);
-      color: var(--text-primary);
+      color: var(--text-color);
     }
 
     /* --- FORMS --- */
@@ -522,7 +524,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
       font-size: var(--font-size-xs);
       font-weight: var(--font-weight-bold);
       text-transform: uppercase;
-      color: var(--text-secondary);
+      color: var(--text-color-secondary);
       margin-bottom: var(--spacing-sm);
       letter-spacing: 0.05em;
     }
@@ -532,7 +534,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
       padding: var(--spacing-lg);
       font-family: var(--font-body);
       font-size: var(--font-size-base);
-      color: var(--text-primary);
+      color: var(--text-color);
       background: var(--surface-ground);
       border: var(--ui-border-width) solid var(--surface-border);
       border-radius: var(--ui-border-radius-lg);
@@ -553,12 +555,12 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
       left: var(--spacing-lg);
       top: 50%;
       transform: translateY(-50%);
-      color: var(--text-secondary);
+      color: var(--text-color-secondary);
       font-family: var(--font-mono);
       font-size: var(--font-size-base);
     }
     .slug-input {
-      padding-left: var(--spacing-5xl); /* Space for / prefix */
+      padding-left: var(--spacing-5xl);
       font-family: var(--font-mono);
     }
 
@@ -592,7 +594,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
       align-items: center;
       justify-content: center;
       padding: var(--spacing-5xl);
-      color: var(--text-secondary);
+      color: var(--text-color-secondary);
     }
     .empty-icon {
       font-size: var(--font-size-5xl);
