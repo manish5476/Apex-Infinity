@@ -10,95 +10,93 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
   imports: [CommonModule, RouterModule, ReactiveFormsModule],
   template: `
     <div class="page-container">
-      
-      <header class="page-header">
-        <div class="header-content">
-          <h1 class="page-title">Storefront Pages</h1>
-          <p class="page-subtitle">Manage your landing pages and marketing campaigns.</p>
-        </div>
+      <div class="bg-overlay"></div> <div class="content-relative">
+        
+        <header class="page-header">
+          <div class="header-content">
+            <h1 class="page-title">Storefront Pages</h1>
+            <p class="page-subtitle">Design, publish, and manage your campaigns.</p>
+          </div>
 
-        <button type="button" (click)="openCreateModal()" class="btn btn-primary">
-          <i class="pi pi-plus icon"></i>
-          <span>Create New Page</span>
-        </button>
-      </header>
-
-      @if (isLoading()) {
-        <div class="loader-container">
-          <div class="spinner"></div>
-        </div>
-      } @else {
-
-        <div class="card-grid">
-
-          <button (click)="openCreateModal()" class="create-card">
-            <div class="create-icon-wrapper">
-              <i class="pi pi-plus"></i>
-            </div>
-            <span class="create-label">Create New Page</span>
+          <button type="button" (click)="openCreateModal()" class="btn btn-primary">
+            <i class="pi pi-plus icon"></i>
+            <span>New Page</span>
           </button>
+        </header>
 
-          @for (page of pages(); track page._id) {
-            <div class="page-card">
-              
-              <div class="status-badge-wrapper">
-                <span class="status-dot" [class.published]="page.isPublished"></span>
+        @if (isLoading()) {
+          <div class="loader-container">
+            <div class="spinner"></div>
+          </div>
+        } @else {
+
+          <div class="card-grid">
+
+            <button (click)="openCreateModal()" class="create-card">
+              <div class="create-icon-wrapper">
+                <i class="pi pi-plus"></i>
               </div>
+              <span class="create-label">Create New Page</span>
+            </button>
 
-              <div class="card-header">
-                <div class="page-icon" [class.is-home]="page.isHomepage">
-                  <i class="pi" [class]="page.isHomepage ? 'pi-home' : 'pi-file'"></i>
-                </div>
-
-                <h3 class="card-title" [title]="page.name">{{ page.name }}</h3>
+            @for (page of pages(); track page._id) {
+              <div class="page-card group">
                 
-                <div class="slug-wrapper">
-                  <code class="slug-code">/{{ page.slug }}</code>
-                  <button (click)="viewLive(page.slug)" class="link-btn" title="View Live">
-                    <i class="pi pi-external-link"></i>
-                  </button>
-                </div>
-              </div>
-
-              <div class="card-footer">
-                <div class="meta-row">
-                   <span class="meta-status" [class.published]="page.isPublished">
-                     {{ page.isPublished ? 'PUBLISHED' : 'DRAFT' }}
-                   </span>
-                   <span class="meta-date">{{ page.updatedAt | date:'MMM d' }}</span>
+                <div class="card-image-wrapper">
+                  <img src="https://images.unsplash.com/photo-1481487484168-9b995ecc168d?q=80&w=800&auto=format&fit=crop" 
+                       alt="Page Preview" 
+                       class="card-image">
+                  <div class="card-image-overlay"></div>
                 </div>
 
-                <div class="action-grid">
-                  <a [routerLink]="[page._id, 'builder']" class="btn btn-secondary btn-block">
-                    <i class="pi pi-pencil icon"></i> Builder
-                  </a>
+                <div class="status-badge" [class.published]="page.isPublished">
+                  <span class="status-dot"></span>
+                  {{ page.isPublished ? 'Live' : 'Draft' }}
+                </div>
 
-                  <div class="icon-actions">
-                    <button (click)="togglePublish(page)" 
-                            class="icon-btn" 
-                            [title]="page.isPublished ? 'Unpublish' : 'Publish'"
-                            [class.active]="page.isPublished">
-                       <i class="pi" [class]="page.isPublished ? 'pi-eye-slash' : 'pi-cloud-upload'"></i>
-                    </button>
-                    <button (click)="deletePage(page._id)" class="icon-btn danger" title="Delete">
-                      <i class="pi pi-trash"></i>
+                <div class="glass-pane">
+                  
+                  <div class="card-top-row">
+                    <h3 class="card-title" [title]="page.name">
+                      <i class="pi" [class]="page.isHomepage ? 'pi-home' : 'pi-file'" style="font-size: 0.8rem; opacity: 0.7; margin-right: 4px;"></i>
+                      {{ page.name }}
+                    </h3>
+                    <button (click)="viewLive(page.slug)" class="external-link-btn" title="View Live">
+                      <i class="pi pi-external-link"></i>
                     </button>
                   </div>
+
+                  <code class="slug-pill">/{{ page.slug }}</code>
+
+                  <div class="card-actions">
+                    <a [routerLink]="[page._id, 'builder']" class="btn btn-sm btn-primary btn-block">
+                      <i class="pi pi-pencil"></i> Edit
+                    </a>
+                    
+                    <div class="icon-group">
+                      <button (click)="togglePublish(page)" 
+                              class="icon-btn" 
+                              [class.active]="page.isPublished"
+                              [title]="page.isPublished ? 'Unpublish' : 'Publish'">
+                        <i class="pi" [class]="page.isPublished ? 'pi-eye' : 'pi-eye-slash'"></i>
+                      </button>
+                      <button (click)="deletePage(page._id)" class="icon-btn danger" title="Delete">
+                        <i class="pi pi-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="meta-info">
+                    Updated {{ page.updatedAt | date:'MMM d' }}
+                  </div>
+
                 </div>
               </div>
+            }
 
-            </div>
-          }
-
-          @if (pages().length === 0) {
-            <div class="empty-state">
-              <i class="pi pi-file empty-icon"></i>
-              <p>No pages yet.</p>
-            </div>
-          }
-
-        </div>
-      }
+          </div>
+        }
+      </div>
 
       @if (showCreateModal()) {
         <div class="modal-backdrop">
@@ -136,48 +134,62 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
     </div>
   `,
   styles: [`
-    /* --- CONTAINER --- */
+    /* ===== PAGE BACKGROUND ===== */
     .page-container {
       min-height: 100vh;
-      background: var(--surface-ground);
+      position: relative;
+      /* The Canyon Image provided */
+      background-image: url('https://images.unsplash.com/photo-1474552226712-ac0f0961a954?q=80&w=2071&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
       padding: var(--spacing-3xl);
       font-family: var(--font-body);
       color: var(--text-color);
     }
 
-    /* --- HEADER --- */
+    .bg-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+      z-index: 0;
+    }
+
+    .content-relative {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== HEADER (Glass) ===== */
     .page-header {
       display: flex;
-      flex-direction: column;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       margin-bottom: var(--spacing-4xl);
-      gap: var(--spacing-xl);
-    }
-    @media(min-width: 768px) {
-      .page-header {
-        flex-direction: row;
-        align-items: center;
-      }
+      padding: var(--spacing-xl) var(--spacing-2xl);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--ui-border-radius-xl);
+      box-shadow: var(--shadow-lg);
     }
     
     .page-title {
       font-family: var(--font-heading);
-      font-size: var(--font-size-4xl);
+      font-size: var(--font-size-3xl);
       font-weight: var(--font-weight-bold);
-      color: var(--text-color);
+      color: #ffffff; /* White text on dark img */
       margin: 0;
-      line-height: var(--line-height-tight);
-      letter-spacing: -0.02em;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
     
     .page-subtitle {
       margin-top: var(--spacing-xs);
-      color: var(--text-color-secondary);
+      color: rgba(255, 255, 255, 0.7);
       font-size: var(--font-size-sm);
     }
 
-    /* --- BUTTONS --- */
+    /* ===== BUTTONS ===== */
     .btn {
       display: inline-flex;
       align-items: center;
@@ -187,422 +199,263 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
       font-size: var(--font-size-base);
       font-weight: var(--font-weight-semibold);
       cursor: pointer;
-      border: var(--ui-border-width) solid transparent;
+      border: none;
       transition: var(--transition-base);
       gap: var(--spacing-md);
       line-height: 1;
-      position: relative;
-      z-index: 1;
+    }
+
+    .btn-sm {
+      padding: var(--spacing-sm) var(--spacing-md);
+      font-size: var(--font-size-sm);
     }
 
     .btn-primary {
-      /* Fallback black if var is missing to ensure visibility */
-      background-color: var(--primary-color, #000); 
-      color: var(--primary-color-text, #fff);
+      background-color: #ffffff;
+      color: #0f172a;
       box-shadow: var(--shadow-md);
     }
     .btn-primary:hover {
-      filter: brightness(1.1);
+      background-color: #f8fafc;
       transform: translateY(-1px);
       box-shadow: var(--shadow-lg);
     }
-    .btn-primary:disabled {
-      opacity: var(--state-disabled-opacity);
-      cursor: not-allowed;
-      transform: none;
-    }
 
-    .btn-secondary {
-      background-color: var(--surface-card);
-      color: var(--text-color);
-      border-color: var(--surface-border);
-      box-shadow: var(--shadow-sm);
-    }
-    .btn-secondary:hover {
-      background-color: var(--surface-hover);
-      border-color: var(--primary-color);
-      color: var(--primary-color);
-    }
+    .btn-block { width: 100%; }
 
-    .btn-text {
-      background: transparent;
-      color: var(--text-color-secondary);
-    }
-    .btn-text:hover {
-      color: var(--text-color);
-      background: var(--surface-hover);
-    }
-
-    .btn-block {
-      width: 100%;
-    }
-
-    /* --- ICON BUTTONS --- */
-    .icon-btn {
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: var(--ui-border-radius);
-      border: var(--ui-border-width) solid transparent;
-      background: transparent;
-      color: var(--text-color-secondary);
-      cursor: pointer;
-      transition: var(--transition-fast);
-    }
-    .icon-btn:hover {
-      background: var(--surface-hover);
-      color: var(--text-color);
-      border-color: var(--surface-border);
-    }
-    .icon-btn.active {
-      color: var(--green-600);
-      background: var(--green-50);
-    }
-    .icon-btn.active:hover {
-      color: var(--red-500);
-      background: var(--red-50);
-    }
-    .icon-btn.danger:hover {
-      color: var(--red-600);
-      background: var(--red-50);
-    }
-
-    .link-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--text-color-secondary);
-      font-size: var(--font-size-xs);
-      padding: var(--spacing-xs);
-      transition: var(--transition-colors);
-    }
-    .link-btn:hover {
-      color: var(--primary-color);
-    }
-
-    /* --- GRID --- */
+    /* ===== GRID ===== */
     .card-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: var(--spacing-2xl);
     }
 
-    /* --- CARDS --- */
-    .page-card, .create-card {
-      position: relative;
+    /* ===== CREATE CARD (Glass Dashed) ===== */
+    .create-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 2px dashed rgba(255, 255, 255, 0.3);
+      border-radius: var(--ui-border-radius-xl);
       display: flex;
       flex-direction: column;
-      border-radius: var(--ui-border-radius-xl);
+      align-items: center;
+      justify-content: center;
+      min-height: 320px;
+      cursor: pointer;
       transition: var(--transition-base);
     }
-
-    /* Create Card */
-    .create-card {
-      background: var(--surface-ground);
-      border: 2px dashed var(--surface-border);
-      align-items: center;
-      justify-content: center;
-      min-height: 240px;
-      cursor: pointer;
-    }
     .create-card:hover {
-      border-color: var(--primary-color);
-      background: var(--surface-card);
-      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.8);
+      transform: translateY(-4px);
     }
     .create-icon-wrapper {
-      width: 64px;
-      height: 64px;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
-      background: var(--surface-card);
+      background: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: var(--spacing-lg);
-      font-size: var(--font-size-3xl);
-      color: var(--text-color-secondary);
-      box-shadow: var(--shadow-sm);
-      transition: var(--transition-transform);
-    }
-    .create-card:hover .create-icon-wrapper {
-      transform: scale(1.1);
-      color: var(--primary-color);
+      margin-bottom: var(--spacing-md);
+      font-size: var(--font-size-2xl);
     }
     .create-label {
+      color: #ffffff;
       font-weight: var(--font-weight-bold);
-      color: var(--text-color-secondary);
-      font-size: var(--font-size-md);
-    }
-    .create-card:hover .create-label {
-      color: var(--text-color);
     }
 
-    /* Page Card */
+    /* ===== IMAGE PAGE CARD ===== */
     .page-card {
-      background: var(--surface-card);
-      border: var(--ui-border-width) solid var(--surface-border);
-      box-shadow: var(--shadow-sm);
-      padding: var(--spacing-2xl);
-      justify-content: space-between;
-      min-height: 240px;
+      position: relative;
+      height: 320px;
+      border-radius: var(--ui-border-radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-xl);
+      transition: var(--transition-base);
+      border: 1px solid rgba(255,255,255,0.2);
     }
     .page-card:hover {
-      box-shadow: var(--shadow-xl);
-      transform: translateY(-4px);
-      border-color: var(--primary-100);
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-2xl);
+      border-color: rgba(255,255,255,0.6);
     }
 
-    .status-badge-wrapper {
+    /* 1. Image Background */
+    .card-image-wrapper {
       position: absolute;
-      top: var(--spacing-xl);
-      right: var(--spacing-xl);
+      inset: 0;
+      z-index: 0;
+    }
+    .card-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .page-card:hover .card-image {
+      transform: scale(1.1); /* Zoom effect */
+    }
+    .card-image-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.1));
+    }
+
+    /* 2. Status Badge */
+    .status-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 2;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .status-badge.published {
+      background: rgba(34, 197, 94, 0.2); /* Green tint */
+      color: #86efac;
+      border-color: rgba(34, 197, 94, 0.4);
     }
     .status-dot {
-      display: block;
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
-      background-color: var(--yellow-400);
-      box-shadow: 0 0 0 4px var(--surface-card);
-    }
-    .status-dot.published {
-      background-color: var(--green-500);
+      background-color: currentColor;
     }
 
-    /* Content */
-    .card-header {
+    /* 3. Glass Content Pane */
+    .glass-pane {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 2;
+      background: rgba(255, 255, 255, 0.15); /* Frosted glass */
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      padding: var(--spacing-lg);
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
+      gap: var(--spacing-md);
+    }
+
+    .card-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-title {
+      font-family: var(--font-heading);
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-bold);
+      color: #ffffff;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     
-    .page-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: var(--ui-border-radius-lg);
+    .slug-pill {
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      color: rgba(255,255,255,0.7);
+      background: rgba(0,0,0,0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      align-self: flex-start;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: var(--spacing-sm);
+      margin-top: var(--spacing-xs);
+    }
+    .icon-group {
+      display: flex;
+      gap: 4px;
+    }
+    
+    .icon-btn, .external-link-btn {
+      width: 32px;
+      height: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: var(--spacing-lg);
-      background: var(--surface-ground);
-      color: var(--text-color-secondary);
-      font-size: var(--font-size-lg);
+      border-radius: 8px;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.8);
+      cursor: pointer;
+      transition: all 0.2s;
     }
-    .page-icon.is-home {
-      background: var(--primary-50);
-      color: var(--primary-color);
+    .icon-btn:hover, .external-link-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      color: #ffffff;
     }
-
-    .card-title {
-      font-family: var(--font-heading);
-      font-size: var(--font-size-lg);
-      font-weight: var(--font-weight-bold);
-      color: var(--text-color);
-      margin: 0 0 var(--spacing-xs) 0;
-      width: 100%;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
+    .icon-btn.active {
+      background: rgba(34, 197, 94, 0.4);
+      color: #ffffff;
+    }
+    .icon-btn.danger:hover {
+      background: rgba(239, 68, 68, 0.4);
+      color: #ffffff;
     }
 
-    .slug-wrapper {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-sm);
-    }
-    .slug-code {
-      font-family: var(--font-mono);
-      font-size: var(--font-size-xs);
-      color: var(--text-color-secondary);
-      background: var(--surface-ground);
-      padding: 2px 6px;
-      border-radius: var(--ui-border-radius-sm);
-      max-width: 140px;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .meta-info {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.4);
+      text-align: right;
+      margin-top: -4px;
     }
 
-    /* Footer */
-    .card-footer {
-      margin-top: var(--spacing-xl);
-      padding-top: var(--spacing-lg);
-      border-top: var(--ui-border-width) solid var(--surface-border);
-    }
-
-    .meta-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: var(--spacing-lg);
-      font-size: var(--font-size-xs);
-    }
-    .meta-status {
-      font-weight: var(--font-weight-bold);
-      letter-spacing: 0.05em;
-      color: var(--text-color-secondary);
-    }
-    .meta-status.published {
-      color: var(--green-600);
-    }
-    .meta-date {
-      color: var(--text-color-secondary);
-    }
-
-    .action-grid {
-      display: flex;
-      gap: var(--spacing-sm);
-    }
-    .icon-actions {
-      display: flex;
-      gap: var(--spacing-xs);
-      margin-left: auto;
-    }
-
-    /* --- MODAL --- */
+    /* ===== MODAL (Standard, not glass) ===== */
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(4px);
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
       z-index: var(--z-modal-backdrop);
       display: flex;
       align-items: center;
       justify-content: center;
       padding: var(--spacing-2xl);
     }
-    
     .modal-card {
-      background: var(--surface-card);
+      background: #ffffff; /* Modal remains clean white */
       width: 100%;
-      max-width: 480px;
+      max-width: 450px;
       border-radius: var(--ui-border-radius-xl);
-      box-shadow: var(--shadow-2xl);
       padding: var(--spacing-3xl);
-      z-index: var(--z-modal);
+      box-shadow: var(--shadow-2xl);
       animation: scaleIn 0.2s ease-out;
     }
+    /* Modal styles remain similar to previous iteration for readability */
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .modal-title { font-size: 1.25rem; font-weight: bold; color: #0f172a; }
+    .close-btn { background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748b; }
+    .form-group { margin-bottom: 16px; }
+    .label { display: block; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; color: #64748b; margin-bottom: 6px; }
+    .input { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; }
+    .input:focus { border-color: #0f172a; ring: 2px solid rgba(15,23,42,0.1); }
+    .slug-input-wrapper { position: relative; }
+    .slug-prefix { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+    .slug-input { padding-left: 24px; }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+    .btn-text { background: none; border: none; color: #64748b; font-weight: 600; cursor: pointer; }
 
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: var(--spacing-2xl);
-    }
-    .modal-title {
-      font-family: var(--font-heading);
-      font-size: var(--font-size-2xl);
-      font-weight: var(--font-weight-bold);
-      color: var(--text-color);
-      margin: 0;
-    }
-    .close-btn {
-      background: var(--surface-ground);
-      border: none;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      color: var(--text-color-secondary);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: var(--transition-colors);
-    }
-    .close-btn:hover {
-      background: var(--surface-hover);
-      color: var(--text-color);
-    }
-
-    /* --- FORMS --- */
-    .form-group {
-      margin-bottom: var(--spacing-xl);
-    }
-    .label {
-      display: block;
-      font-size: var(--font-size-xs);
-      font-weight: var(--font-weight-bold);
-      text-transform: uppercase;
-      color: var(--text-color-secondary);
-      margin-bottom: var(--spacing-sm);
-      letter-spacing: 0.05em;
-    }
-    
-    .input {
-      width: 100%;
-      padding: var(--spacing-lg);
-      font-family: var(--font-body);
-      font-size: var(--font-size-base);
-      color: var(--text-color);
-      background: var(--surface-ground);
-      border: var(--ui-border-width) solid var(--surface-border);
-      border-radius: var(--ui-border-radius-lg);
-      transition: var(--transition-colors);
-      outline: none;
-    }
-    .input:focus {
-      background: var(--surface-card);
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
-    }
-    
-    .slug-input-wrapper {
-      position: relative;
-    }
-    .slug-prefix {
-      position: absolute;
-      left: var(--spacing-lg);
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-color-secondary);
-      font-family: var(--font-mono);
-      font-size: var(--font-size-base);
-    }
-    .slug-input {
-      padding-left: var(--spacing-5xl);
-      font-family: var(--font-mono);
-    }
-
-    .modal-footer {
-      display: flex;
-      justify-content: flex-end;
-      gap: var(--spacing-md);
-      margin-top: var(--spacing-2xl);
-    }
-
-    /* --- LOADER --- */
-    .loader-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 300px;
-    }
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid var(--surface-border);
-      border-top-color: var(--primary-color);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    
-    .empty-state {
-      grid-column: 1 / -1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: var(--spacing-5xl);
-      color: var(--text-color-secondary);
-    }
-    .empty-icon {
-      font-size: var(--font-size-5xl);
-      margin-bottom: var(--spacing-md);
-      opacity: 0.3;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
   `]
 })
