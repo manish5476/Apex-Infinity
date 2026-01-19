@@ -1,6 +1,42 @@
 <div class="h-full flex flex-col">
+<header class="builder-header">
+    <div class="flex items-center gap-4">
+      <a routerLink="../../" class="flex items-center justify-center w-8 h-8 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors">
+        <i class="pi pi-arrow-left text-sm"></i>
+      </a>
+      <div class="flex flex-col">
+        <h1 class="text-sm font-bold text-slate-800 leading-none">{{ page()?.name || 'Untitled Page' }}</h1>
+        <div class="flex items-center gap-1.5 mt-1">
+          <span class="w-1.5 h-1.5 rounded-full" [ngClass]="page()?.isPublished ? 'bg-green-500' : 'bg-amber-400'"></span>
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ page()?.status || 'Draft' }}</span>
+        </div>
+      </div>
+    </div>
 
-  <header class="builder-header">
+    <div class="flex gap-3 items-center">
+      <span *ngIf="isSaving()" class="text-[11px] text-slate-400 font-medium flex items-center animate-pulse mr-2">
+        <i class="pi pi-sync pi-spin mr-2"></i> Saving...
+      </span>
+
+      <button (click)="deletePage()" [disabled]="isSaving()" 
+              class="w-8 h-8 flex items-center justify-center rounded text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+              pTooltip="Delete Page" tooltipPosition="bottom">
+        <i class="pi pi-trash"></i>
+      </button>
+
+      <button (click)="togglePublish()" [disabled]="isSaving()" 
+              class="px-3 py-2 border border-slate-200 text-slate-700 text-[11px] font-bold uppercase tracking-wide rounded-md hover:bg-slate-50 transition-all flex items-center gap-2">
+        <i class="pi" [ngClass]="page()?.isPublished ? 'pi-eye-slash' : 'pi-cloud-upload'"></i>
+        {{ page()?.isPublished ? 'Unpublish' : 'Publish' }}
+      </button>
+
+      <button (click)="savePage()" [disabled]="isSaving()" 
+              class="px-4 py-2 bg-slate-900 text-white text-[11px] font-bold uppercase tracking-wide rounded-md hover:bg-slate-800 transition-all flex items-center gap-2 disabled:opacity-50 shadow-sm">
+        <i class="pi pi-save"></i> Save
+      </button>
+    </div>
+  </header>
+  <!-- <header class="builder-header">
     <div class="flex items-center gap-4">
       <a routerLink="../../" class="flex items-center justify-center w-8 h-8 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors">
         <i class="pi pi-arrow-left text-sm"></i>
@@ -19,7 +55,7 @@
         <i class="pi pi-save"></i> Save Changes
       </button>
     </div>
-  </header>
+  </header> -->
 
   <div class="flex-1 flex overflow-hidden relative">
     
