@@ -9,88 +9,78 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
   standalone: true,
   imports: [CommonModule, RouterModule, ReactiveFormsModule],
   template: `
-    <div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-8 font-sans">
+    <div class="page-container">
       
-      <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
-        <div>
-          <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Pages</h1>
-          <p class="text-slate-500 mt-1 text-sm">
-            Manage your storefront landing pages.
-          </p>
+      <header class="page-header">
+        <div class="header-content">
+          <h1 class="page-title">Storefront Pages</h1>
+          <p class="page-subtitle">Manage your landing pages and marketing campaigns.</p>
         </div>
 
-        <button
-          type="button"
-          (click)="openCreateModal()"
-          class="group relative inline-flex items-center justify-center px-6 py-3 font-bold text-white transition-all duration-200 bg-slate-900 font-pj rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 hover:bg-slate-800 hover:shadow-lg hover:-translate-y-0.5">
-          <i class="fas fa-plus mr-2"></i> Create New Page
+        <button type="button" (click)="openCreateModal()" class="btn btn-primary">
+          <i class="fas fa-plus icon"></i>
+          <span>Create New Page</span>
         </button>
       </header>
 
       @if (isLoading()) {
-        <div class="flex justify-center items-center h-64">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-900"></div>
+        <div class="loader-container">
+          <div class="spinner"></div>
         </div>
       } @else {
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div class="card-grid">
 
-          <button (click)="openCreateModal()" class="group relative flex flex-col items-center justify-center h-full min-h-[240px] rounded-3xl border-2 border-dashed border-slate-300 bg-slate-50/50 hover:bg-white hover:border-slate-400 hover:shadow-xl transition-all duration-300">
-            <div class="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-              <i class="fas fa-plus text-2xl text-slate-400 group-hover:text-slate-900"></i>
+          <button (click)="openCreateModal()" class="create-card">
+            <div class="create-icon-wrapper">
+              <i class="fas fa-plus"></i>
             </div>
-            <span class="font-bold text-slate-500 group-hover:text-slate-900">Create New Page</span>
+            <span class="create-label">Create New Page</span>
           </button>
 
           @for (page of pages(); track page._id) {
-            <div class="group relative flex flex-col justify-between bg-white/60 backdrop-blur-xl border border-white/50 shadow-sm rounded-3xl p-6 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:bg-white/80">
+            <div class="page-card">
               
-              <div class="absolute top-6 right-6">
-                <span class="relative flex h-3 w-3">
-                  <span *ngIf="page.isPublished" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-3 w-3" [class.bg-green-500]="page.isPublished" [class.bg-amber-400]="!page.isPublished"></span>
-                </span>
+              <div class="status-badge-wrapper">
+                <span class="status-dot" [class.published]="page.isPublished"></span>
               </div>
 
-              <div>
-                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 shadow-sm transition-colors"
-                     [ngClass]="page.isHomepage ? 'bg-blue-600 text-white' : 'bg-white text-slate-700'">
-                  <i class="fas text-lg" [class]="page.isHomepage ? 'fa-home' : 'fa-layer-group'"></i>
+              <div class="card-header">
+                <div class="page-icon" [class.is-home]="page.isHomepage">
+                  <i class="fas" [class]="page.isHomepage ? 'fa-home' : 'fa-layer-group'"></i>
                 </div>
 
-                <h3 class="text-xl font-bold text-slate-900 mb-1 line-clamp-1" [title]="page.name">{{ page.name }}</h3>
+                <h3 class="card-title" [title]="page.name">{{ page.name }}</h3>
                 
-                <div class="flex items-center gap-2 mb-4">
-                  <code class="text-[10px] font-mono text-slate-500 bg-slate-100 px-2 py-1 rounded-md truncate max-w-[150px]">/{{ page.slug }}</code>
-                  <a (click)="viewLive(page.slug)" class="text-slate-400 hover:text-blue-600 cursor-pointer text-xs"><i class="fas fa-external-link-alt"></i></a>
+                <div class="slug-wrapper">
+                  <code class="slug-code">/{{ page.slug }}</code>
+                  <button (click)="viewLive(page.slug)" class="link-btn" title="View Live">
+                    <i class="fas fa-external-link-alt"></i>
+                  </button>
                 </div>
               </div>
 
-              <div class="mt-4 pt-4 border-t border-slate-100/50">
-                <div class="flex justify-between items-center mb-4">
-                   <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                     {{ page.isPublished ? 'Published' : 'Draft' }}
+              <div class="card-footer">
+                <div class="meta-row">
+                   <span class="meta-status" [class.published]="page.isPublished">
+                     {{ page.isPublished ? 'PUBLISHED' : 'DRAFT' }}
                    </span>
-                   <span class="text-[10px] text-slate-400">{{ page.updatedAt | date:'MMM d' }}</span>
+                   <span class="meta-date">{{ page.updatedAt | date:'MMM d' }}</span>
                 </div>
 
-                <div class="grid grid-cols-3 gap-2">
-                  <a [routerLink]="[page._id, 'builder']" 
-                     class="col-span-2 flex items-center justify-center gap-2 px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-xl hover:bg-slate-800 transition-colors shadow-lg shadow-slate-200">
-                    <i class="fas fa-pen"></i> Builder
+                <div class="action-grid">
+                  <a [routerLink]="[page._id, 'builder']" class="btn btn-secondary btn-block">
+                    <i class="fas fa-pen icon"></i> Builder
                   </a>
 
-                  <div class="flex gap-1 justify-end">
+                  <div class="icon-actions">
                     <button (click)="togglePublish(page)" 
+                            class="icon-btn" 
                             [title]="page.isPublished ? 'Unpublish' : 'Publish'"
-                            class="w-9 h-9 rounded-xl flex items-center justify-center transition-colors border border-transparent hover:border-slate-200 hover:bg-white hover:shadow-sm"
-                            [class.text-green-600]="!page.isPublished"
-                            [class.text-amber-500]="page.isPublished">
+                            [class.active]="page.isPublished">
                        <i class="fas" [class]="page.isPublished ? 'fa-eye-slash' : 'fa-cloud-upload-alt'"></i>
                     </button>
-                    <button (click)="deletePage(page._id)" 
-                            title="Delete"
-                            class="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 hover:border-red-100 border border-transparent transition-all">
+                    <button (click)="deletePage(page._id)" class="icon-btn danger" title="Delete">
                       <i class="fas fa-trash"></i>
                     </button>
                   </div>
@@ -101,8 +91,8 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
           }
 
           @if (pages().length === 0) {
-            <div class="col-span-full flex flex-col items-center justify-center p-12 text-slate-400">
-              <i class="fas fa-ghost text-4xl mb-4 opacity-50"></i>
+            <div class="empty-state">
+              <i class="fas fa-ghost empty-icon"></i>
               <p>No pages yet.</p>
             </div>
           }
@@ -111,32 +101,31 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
       }
 
       @if (showCreateModal()) {
-        <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl scale-100 animate-scale-up">
-            <div class="flex justify-between items-center mb-6">
-              <h2 class="text-2xl font-bold text-slate-900">New Page</h2>
-              <button type="button" (click)="closeCreateModal()" class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors">
+        <div class="modal-backdrop">
+          <div class="modal-card">
+            <div class="modal-header">
+              <h2 class="modal-title">New Page</h2>
+              <button type="button" (click)="closeCreateModal()" class="close-btn">
                 <i class="fas fa-times"></i>
               </button>
             </div>
             <form [formGroup]="createForm" (ngSubmit)="createPage()">
-              <div class="space-y-4">
-                <div>
-                  <label class="block text-xs font-bold text-slate-500 uppercase mb-1 ml-1">Page Name</label>
-                  <input formControlName="name" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:bg-white outline-none transition-all font-bold text-slate-900" placeholder="e.g. Summer Sale" />
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-500 uppercase mb-1 ml-1">URL Slug</label>
-                  <div class="relative">
-                    <span class="absolute left-3 top-3 text-slate-400 font-mono text-sm">/</span>
-                    <input formControlName="slug" class="w-full p-3 pl-6 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:bg-white outline-none transition-all font-mono text-sm text-slate-600" placeholder="summer-sale" />
-                  </div>
+              <div class="form-group">
+                <label class="label">Page Name</label>
+                <input formControlName="name" class="input" placeholder="e.g. Summer Sale" />
+              </div>
+              <div class="form-group">
+                <label class="label">URL Slug</label>
+                <div class="slug-input-wrapper">
+                  <span class="slug-prefix">/</span>
+                  <input formControlName="slug" class="input slug-input" placeholder="summer-sale" />
                 </div>
               </div>
-              <div class="flex justify-end gap-3 mt-8">
-                <button type="button" (click)="closeCreateModal()" class="px-5 py-3 text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors">Cancel</button>
-                <button type="submit" [disabled]="createForm.invalid || isSubmitting()" class="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold shadow-lg shadow-slate-200 hover:shadow-xl hover:bg-slate-800 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:transform-none">
-                  @if (isSubmitting()) { <i class="fas fa-spinner fa-spin mr-2"></i> }
+              
+              <div class="modal-footer">
+                <button type="button" (click)="closeCreateModal()" class="btn btn-text">Cancel</button>
+                <button type="submit" [disabled]="createForm.invalid || isSubmitting()" class="btn btn-primary">
+                  @if (isSubmitting()) { <i class="fas fa-spinner fa-spin icon"></i> }
                   Create Page
                 </button>
               </div>
@@ -144,9 +133,476 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
           </div>
         </div>
       }
-
     </div>
-  `
+  `,
+  styles: [`
+    /* --- CONTAINER --- */
+    .page-container {
+      min-height: 100vh;
+      background: var(--surface-ground);
+      padding: var(--spacing-3xl);
+      font-family: var(--font-body);
+      color: var(--text-primary);
+    }
+
+    /* --- HEADER --- */
+    .page-header {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--spacing-4xl);
+      gap: var(--spacing-xl);
+    }
+    @media(min-width: 768px) {
+      .page-header {
+        flex-direction: row;
+        align-items: center;
+      }
+    }
+    
+    .page-title {
+      font-family: var(--font-heading);
+      font-size: var(--font-size-4xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      margin: 0;
+      line-height: var(--line-height-tight);
+      letter-spacing: -0.02em;
+    }
+    
+    .page-subtitle {
+      margin-top: var(--spacing-xs);
+      color: var(--text-secondary);
+      font-size: var(--font-size-sm);
+    }
+
+    /* --- BUTTONS --- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-md) var(--spacing-xl);
+      border-radius: var(--ui-border-radius-lg);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      cursor: pointer;
+      border: var(--ui-border-width) solid transparent;
+      transition: var(--transition-base);
+      gap: var(--spacing-md);
+      line-height: 1;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: var(--primary-color-text);
+      box-shadow: var(--shadow-md);
+    }
+    .btn-primary:hover {
+      background-color: var(--primary-600); /* Assuming you have shades, or use opacity */
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-lg);
+    }
+    .btn-primary:disabled {
+      opacity: var(--state-disabled-opacity);
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background-color: var(--surface-card);
+      color: var(--text-primary);
+      border-color: var(--surface-border);
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-secondary:hover {
+      background-color: var(--surface-hover);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    .btn-text {
+      background: transparent;
+      color: var(--text-secondary);
+    }
+    .btn-text:hover {
+      color: var(--text-primary);
+      background: var(--surface-hover);
+    }
+
+    .btn-block {
+      width: 100%;
+    }
+
+    /* --- ICON BUTTONS --- */
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--ui-border-radius);
+      border: var(--ui-border-width) solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+    .icon-btn:hover {
+      background: var(--surface-hover);
+      color: var(--text-primary);
+      border-color: var(--surface-border);
+    }
+    .icon-btn.active {
+      color: var(--green-600);
+      background: var(--green-50);
+    }
+    .icon-btn.active:hover {
+      color: var(--red-500); /* Hovering active publish usually implies unpublish intention */
+      background: var(--red-50);
+    }
+    .icon-btn.danger:hover {
+      color: var(--red-600);
+      background: var(--red-50);
+    }
+
+    .link-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-size: var(--font-size-xs);
+      padding: var(--spacing-xs);
+      transition: var(--transition-colors);
+    }
+    .link-btn:hover {
+      color: var(--primary-color);
+    }
+
+    /* --- GRID --- */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--spacing-2xl);
+    }
+
+    /* --- CARDS (Base) --- */
+    .page-card, .create-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      border-radius: var(--ui-border-radius-xl);
+      transition: var(--transition-base);
+    }
+
+    /* --- CREATE CARD --- */
+    .create-card {
+      background: var(--surface-ground);
+      border: 2px dashed var(--surface-border);
+      align-items: center;
+      justify-content: center;
+      min-height: 240px;
+      cursor: pointer;
+    }
+    .create-card:hover {
+      border-color: var(--primary-color);
+      background: var(--surface-card);
+      transform: translateY(-2px);
+    }
+    .create-icon-wrapper {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--surface-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--spacing-lg);
+      font-size: var(--font-size-xl);
+      color: var(--text-secondary);
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition-transform);
+    }
+    .create-card:hover .create-icon-wrapper {
+      transform: scale(1.1);
+      color: var(--primary-color);
+    }
+    .create-label {
+      font-weight: var(--font-weight-bold);
+      color: var(--text-secondary);
+      font-size: var(--font-size-md);
+    }
+    .create-card:hover .create-label {
+      color: var(--text-primary);
+    }
+
+    /* --- PAGE CARD --- */
+    .page-card {
+      background: var(--surface-card);
+      border: var(--ui-border-width) solid var(--surface-border);
+      box-shadow: var(--shadow-sm);
+      padding: var(--spacing-2xl);
+      justify-content: space-between;
+      min-height: 240px;
+    }
+    .page-card:hover {
+      box-shadow: var(--shadow-xl);
+      transform: translateY(-4px);
+      border-color: var(--primary-100); /* subtle border highlight */
+    }
+
+    /* Status Dot */
+    .status-badge-wrapper {
+      position: absolute;
+      top: var(--spacing-xl);
+      right: var(--spacing-xl);
+    }
+    .status-dot {
+      display: block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--yellow-400); /* Draft */
+      box-shadow: 0 0 0 4px var(--surface-card); /* fake border/gap */
+    }
+    .status-dot.published {
+      background-color: var(--green-500);
+    }
+
+    /* Content */
+    .card-header {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .page-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--ui-border-radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--spacing-lg);
+      background: var(--surface-ground);
+      color: var(--text-secondary);
+      font-size: var(--font-size-lg);
+    }
+    .page-icon.is-home {
+      background: var(--primary-50);
+      color: var(--primary-color);
+    }
+
+    .card-title {
+      font-family: var(--font-heading);
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      margin: 0 0 var(--spacing-xs) 0;
+      width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .slug-wrapper {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+    .slug-code {
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      color: var(--text-secondary);
+      background: var(--surface-ground);
+      padding: 2px 6px;
+      border-radius: var(--ui-border-radius-sm);
+      max-width: 140px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Footer */
+    .card-footer {
+      margin-top: var(--spacing-xl);
+      padding-top: var(--spacing-lg);
+      border-top: var(--ui-border-width) solid var(--surface-border);
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-lg);
+      font-size: var(--font-size-xs);
+    }
+    .meta-status {
+      font-weight: var(--font-weight-bold);
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+    }
+    .meta-status.published {
+      color: var(--green-600);
+    }
+    .meta-date {
+      color: var(--text-secondary);
+    }
+
+    .action-grid {
+      display: flex;
+      gap: var(--spacing-sm);
+    }
+    .icon-actions {
+      display: flex;
+      gap: var(--spacing-xs);
+      margin-left: auto;
+    }
+
+    /* --- MODAL --- */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: var(--z-modal-backdrop);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-2xl);
+    }
+    
+    .modal-card {
+      background: var(--surface-card);
+      width: 100%;
+      max-width: 480px;
+      border-radius: var(--ui-border-radius-xl);
+      box-shadow: var(--shadow-2xl);
+      padding: var(--spacing-3xl);
+      z-index: var(--z-modal);
+      animation: scaleIn 0.2s ease-out;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-2xl);
+    }
+    .modal-title {
+      font-family: var(--font-heading);
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      margin: 0;
+    }
+    .close-btn {
+      background: var(--surface-ground);
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition-colors);
+    }
+    .close-btn:hover {
+      background: var(--surface-hover);
+      color: var(--text-primary);
+    }
+
+    /* --- FORMS --- */
+    .form-group {
+      margin-bottom: var(--spacing-xl);
+    }
+    .label {
+      display: block;
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: var(--spacing-sm);
+      letter-spacing: 0.05em;
+    }
+    
+    .input {
+      width: 100%;
+      padding: var(--spacing-lg);
+      font-family: var(--font-body);
+      font-size: var(--font-size-base);
+      color: var(--text-primary);
+      background: var(--surface-ground);
+      border: var(--ui-border-width) solid var(--surface-border);
+      border-radius: var(--ui-border-radius-lg);
+      transition: var(--transition-colors);
+      outline: none;
+    }
+    .input:focus {
+      background: var(--surface-card);
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+    }
+    
+    .slug-input-wrapper {
+      position: relative;
+    }
+    .slug-prefix {
+      position: absolute;
+      left: var(--spacing-lg);
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-base);
+    }
+    .slug-input {
+      padding-left: var(--spacing-5xl); /* Space for / prefix */
+      font-family: var(--font-mono);
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-2xl);
+    }
+
+    /* --- LOADER --- */
+    .loader-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 300px;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--surface-border);
+      border-top-color: var(--primary-color);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    .empty-state {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-5xl);
+      color: var(--text-secondary);
+    }
+    .empty-icon {
+      font-size: var(--font-size-5xl);
+      margin-bottom: var(--spacing-md);
+      opacity: 0.3;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  `]
 })
 export class PageListComponent implements OnInit {
   private adminService = inject(StorefrontAdminService);
@@ -210,7 +666,6 @@ export class PageListComponent implements OnInit {
   }
 
   togglePublish(page: any) {
-    // Stop propagation to prevent card click if any
     const action = page.isPublished ? 'unpublish' : 'publish';
     if (!confirm(`Are you sure you want to ${action} "${page.name}"?`)) return;
 
@@ -226,7 +681,7 @@ export class PageListComponent implements OnInit {
           )
         );
       },
-      error: (err) => alert(`Failed to ${action} page.`)
+      error: () => alert(`Failed to ${action} page.`)
     });
   }
 
