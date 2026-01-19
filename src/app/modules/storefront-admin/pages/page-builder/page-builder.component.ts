@@ -183,7 +183,55 @@ export class PageBuilderComponent implements OnInit {
       console.error('Selection Error', e);
     }
   }
+// ✅ ADDED: Publish/Unpublish Logic
+  togglePublish() {
+    const page = this.page();
+    if (!page || !page.id) return;
 
+    const action = page.isPublished ? 'unpublish' : 'publish';
+    if (!confirm(`Are you sure you want to ${action} this page?`)) return;
+
+    this.isSaving.set(true);
+
+    const request$ = page.isPublished 
+      ? this.adminService.unpublishPage(page.id)
+      : this.adminService.publishPage(page.id);
+
+    request$.subscribe({
+      next: (res: any) => {
+        this.page.set(res.page); // Update local state with new status
+        this.isSaving.set(false);
+        alert(`Page successfully ${action}ed!`);
+      },
+      error: (err) => {
+        this.isSaving.set(false);
+        alert(`Failed to ${action} page: ` + (err.error?.message || 'Unknown error'));
+      }
+    });
+  }
+
+  // ✅ ADDED: Delete Page Logic
+  deletePage() {
+    const page = this.page();
+    if (!page || !page.id) return;
+
+    if (!confirm('DANGER: This will permanently delete this page. This action cannot be undone.\n\nAre you sure?')) return;
+
+    this.isSaving.set(true);
+    this.adminService.deletePage(page.id).subscribe({
+      next: () => {
+        alert('Page deleted.');
+        // Navigate back to page list
+        // Assuming you have router injected
+        // this.router.navigate(['../../'], { relativeTo: this.route });
+        window.history.back(); 
+      },
+      error: (err) => {
+        this.isSaving.set(false);
+        alert('Failed to delete page: ' + (err.error?.message || 'Unknown error'));
+      }
+    });
+  }
   onConfigChange(newConfig: any) {
     const current = this.selectedSection();
     if (!current) return;
