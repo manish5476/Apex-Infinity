@@ -43,7 +43,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
               <div class="page-card group">
                 
                 <div class="card-image-wrapper">
-                  <img src="https://images.unsplash.com/photo-1481487484168-9b995ecc168d?q=80&w=800&auto=format&fit=crop" 
+                  <img src="https://images.unsplash.com/photo-1768409427465-01320d46963e?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
                        alt="Page Preview" 
                        class="card-image">
                   <div class="card-image-overlay"></div>
@@ -139,7 +139,7 @@ import { StorefrontAdminService } from '../../../../core/services/storefront-adm
       min-height: 100vh;
       position: relative;
       /* The Canyon Image provided */
-      background-image: url('https://images.unsplash.com/photo-1474552226712-ac0f0961a954?q=80&w=2071&auto=format&fit=crop');
+      background-image: url('https://images.unsplash.com/photo-1741153633519-f8af72ed1f0c?q=80&w=764&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
