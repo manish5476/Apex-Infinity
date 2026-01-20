@@ -5,16 +5,16 @@
   --font-mono: 'Fira Code', 'Courier New', monospace;
 
   /* Compact font sizes (smaller, more refined) */
-  --font-size-xs: 0.65rem; /* 10.4px */
-  --font-size-sm: 0.75rem; /* 12px */
-  --font-size-base: 0.8125rem; /* 13px - primary body text */
-  --font-size-md: 0.875rem; /* 14px */
-  --font-size-lg: 0.9375rem; /* 15px */
-  --font-size-xl: 1rem; /* 16px */
-  --font-size-2xl: 1.125rem; /* 18px */
-  --font-size-3xl: 1.375rem; /* 22px */
-  --font-size-4xl: 1.75rem; /* 28px */
-  --font-size-5xl: 2.25rem; /* 36px */
+  --font-size-xs: 0.65rem;
+  --font-size-sm: 0.75rem;
+  --font-size-base: 0.8125rem;
+  --font-size-md: 0.875rem;
+  --font-size-lg: 0.9375rem;
+  --font-size-xl: 1rem;
+  --font-size-2xl: 1.125rem;
+  --font-size-3xl: 1.375rem;
+  --font-size-4xl: 1.75rem;
+  --font-size-5xl: 2.25rem;
 
   /* Line height */
   --line-height-tight: 1.1;
@@ -29,15 +29,15 @@
   --font-weight-bold: 700;
 
   /* ===== SPACING (Compact Grid) ===== */
-  --spacing-xs: 0.25rem; /* 4px */
-  --spacing-sm: 0.375rem; /* 6px */
-  --spacing-md: 0.5rem; /* 8px */
-  --spacing-lg: 0.75rem; /* 12px */
-  --spacing-xl: 1rem; /* 16px */
-  --spacing-2xl: 1.5rem; /* 24px */
-  --spacing-3xl: 2rem; /* 32px */
-  --spacing-4xl: 2.75rem; /* 44px */
-  --spacing-5xl: 3.5rem; /* 56px */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.375rem;
+  --spacing-md: 0.5rem;
+  --spacing-lg: 0.75rem;
+  --spacing-xl: 1rem;
+  --spacing-2xl: 1.5rem;
+  --spacing-3xl: 2rem;
+  --spacing-4xl: 2.75rem;
+  --spacing-5xl: 3.5rem;
 
   /* ===== UI CONSTANTS ===== */
   --ui-border-radius: 5px;
@@ -64,9 +64,7 @@
   --transition-base: all 0.22s cubic-bezier(0.2, 0.9, 0.2, 1);
   --transition-slow: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-slower: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-colors: color 0.2s cubic-bezier(0.2, 0.9, 0.2, 1),
-    background-color 0.2s cubic-bezier(0.2, 0.9, 0.2, 1),
-    border-color 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
+  --transition-colors: color 0.2s cubic-bezier(0.2, 0.9, 0.2, 1), background-color 0.2s cubic-bezier(0.2, 0.9, 0.2, 1), border-color 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
   --transition-transform: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1);
 
   /* Focus States */
@@ -91,62 +89,40 @@
   --state-readonly-opacity: 0.6;
 }
 
-/* --------------------------------------------------------------------------
-   THEME ENGINE MIXIN
-   Maps theme-specific variables to canonical tokens automatically.
-   -------------------------------------------------------------------------- */
 @mixin apply-canonical-mapping {
-  /* Backgrounds */
   --bg-primary: var(--theme-bg-primary);
   --bg-secondary: var(--theme-bg-secondary);
   --bg-ternary: var(--theme-bg-ternary);
-
-  /* Text layers */
   --text-primary: var(--theme-text-primary);
   --text-secondary: var(--theme-text-secondary);
   --text-tertiary: var(--theme-text-tertiary);
   --text-label: var(--theme-text-label);
-
-  /* Borders */
   --border-primary: var(--theme-border-primary);
   --border-secondary: var(--theme-border-secondary);
-
-  /* Accents & interactions */
   --accent-primary: var(--theme-accent-primary);
   --accent-secondary: var(--theme-accent-secondary);
   --accent-tertiary: var(--theme-accent-tertiary);
   --accent-gradient: var(--theme-accent-gradient);
   --accent-focus: var(--theme-accent-focus);
   --accent-hover: var(--theme-accent-hover);
-
-  /* State colors */
   --color-success: var(--theme-success);
   --color-warning: var(--theme-warning);
   --color-error: var(--theme-error);
   --color-info: var(--theme-info);
-
-  /* Disabled State */
   --color-disabled: var(--theme-disabled);
   --color-disabled-text: var(--theme-disabled-text);
-
-  /* Glass effects */
   --glass-bg-c: var(--glass-bg);
   --glass-blur-c: var(--glass-blur);
   --glass-border-c: var(--glass-border);
   --glass-shadow-c: var(--glass-shadow, 0 8px 32px rgba(0, 0, 0, 0.1));
-
-  /* Component states */
   --component-bg-hover: var(--component-bg-hover);
   --component-bg-active: var(--component-bg-active);
   --component-border-focus: var(--component-border-focus);
   --component-surface-raised: var(--component-surface-raised);
   --component-divider: var(--component-divider);
-
-  /* Scroll */
   --scroll-thumb-c: var(--scroll-thumb);
   --scroll-track-c: var(--scroll-track);
   
-  /* SEMANTIC COLOR SYSTEM */
   --color-primary: var(--theme-accent-primary);
   --color-primary-dark: var(--theme-accent-hover);
   --color-primary-light: var(--theme-accent-secondary);
@@ -198,9 +174,7 @@
   --scroll-track: var(--scroll-track-c);
 }
 
-/* ============================================================================
-   THEME 1: GLASS (Professional Glassmorphism - Vercel Inspired)
-   ============================================================================ */
+/* THEME 1: GLASS - Professional Glassmorphism */
 .theme-glass {
   --theme-bg-primary: linear-gradient(145deg, rgba(248, 250, 252, 0.98) 0%, rgba(241, 245, 249, 0.96) 100%);
   --theme-bg-secondary: rgba(255, 255, 255, 0.85);
@@ -238,9 +212,7 @@
   @include apply-canonical-mapping;
 }
 
-/* ============================================================================
-   THEME 2: LIGHT (Clean Data-Focused - Modern Professional)
-   ============================================================================ */
+/* THEME 2: LIGHT - Modern Professional Light */
 .theme-light {
   --theme-bg-primary: #ffffff;
   --theme-bg-secondary: #f9fafb;
@@ -277,9 +249,7 @@
   @include apply-canonical-mapping;
 }
 
-/* ============================================================================
-   THEME 3: DARK (Elegant Dark Mode - Refined Indigo)
-   ============================================================================ */
+/* THEME 3: DARK - Sophisticated Dark Mode */
 .theme-dark {
   --theme-bg-primary: #030712;
   --theme-bg-secondary: #111827;
@@ -316,9 +286,7 @@
   @include apply-canonical-mapping;
 }
 
-/* ============================================================================
-   THEME 4: PREMIUM (Sophisticated Teal - Luxury Feel)
-   ============================================================================ */
+/* THEME 4: PREMIUM - Teal Elegance */
 .theme-premium {
   --theme-bg-primary: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%);
   --theme-bg-secondary: rgba(255, 255, 255, 0.96);
@@ -356,9 +324,7 @@
   @include apply-canonical-mapping;
 }
 
-/* ============================================================================
-   THEME 5: MINIMAL (Timeless Neutral - Vercel Minimalism)
-   ============================================================================ */
+/* THEME 5: MINIMAL - Neutral Sophistication */
 .theme-minimal {
   --theme-bg-primary: #fafafa;
   --theme-bg-secondary: #ffffff;
@@ -395,49 +361,44 @@
   @include apply-canonical-mapping;
 }
 
-/* ============================================================================
-   THEME 6: BOLD (Modern Dark - Professional Accent System)
-   ============================================================================ */
+/* THEME 6: BOLD - Modern Dark with Vibrant Accents */
 .theme-bold {
-  --theme-bg-primary: #0a0a0a;
-  --theme-bg-secondary: #131313;
-  --theme-bg-ternary: #1a1a1a;
+  --theme-bg-primary: #000000;
+  --theme-bg-secondary: #0a0a0a;
+  --theme-bg-ternary: #171717;
   --theme-text-primary: #ffffff;
-  --theme-text-secondary: #f2f2f2;
+  --theme-text-secondary: #f5f5f5;
   --theme-text-tertiary: #d4d4d4;
   --theme-text-label: #a3a3a3;
   --theme-border-primary: #262626;
-  --theme-border-secondary: #3a3a3a;
+  --theme-border-secondary: #404040;
   --theme-accent-primary: #ec4899;
   --theme-accent-secondary: #06b6d4;
   --theme-accent-tertiary: #8b5cf6;
-  --theme-accent-gradient: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%);
-  --theme-accent-focus: rgba(236, 72, 153, 0.2);
+  --theme-accent-gradient: linear-gradient(135deg, #ec4899 0%, #06b6d4 100%);
+  --theme-accent-focus: rgba(236, 72, 153, 0.25);
   --theme-accent-hover: #f472b6;
   --theme-success: #10b981;
   --theme-warning: #f59e0b;
   --theme-error: #ef4444;
-  --theme-info: #06b6d4;
+  --theme-info: #0ea5e9;
   --theme-disabled: rgba(64, 64, 64, 0.5);
   --theme-disabled-text: #737373;
-  --glass-bg: rgba(20, 20, 20, 0.6);
-  --glass-blur: 20px;
+  --glass-bg: rgba(10, 10, 10, 0.7);
+  --glass-blur: 15px;
   --glass-border: rgba(236, 72, 153, 0.15);
-  --glass-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-  --scroll-thumb: #3a3a3a;
-  --scroll-track: #0a0a0a;
-  --component-bg-hover: rgba(236, 72, 153, 0.1);
-  --component-bg-active: rgba(236, 72, 153, 0.15);
+  --scroll-thumb: #404040;
+  --scroll-track: #000000;
+  --component-bg-hover: rgba(236, 72, 153, 0.12);
+  --component-bg-active: rgba(236, 72, 153, 0.18);
   --component-border-focus: #ec4899;
-  --component-surface-raised: #1a1a1a;
+  --component-surface-raised: #171717;
   --component-divider: #262626;
 
   @include apply-canonical-mapping;
 }
 
-/* ============================================================================
-   THEME 7: LUXURY (Premium Gold - Elegant & Warm)
-   ============================================================================ */
+/* THEME 7: LUXURY - Premium Gold Warmth */
 .theme-luxury {
   --theme-bg-primary: linear-gradient(180deg, #fefce8 0%, #fef3c7 100%);
   --theme-bg-secondary: rgba(255, 255, 255, 0.98);
@@ -451,33 +412,31 @@
   --theme-accent-primary: #d4af37;
   --theme-accent-secondary: #b59a2f;
   --theme-accent-tertiary: #ca8a04;
-  --theme-accent-gradient: linear-gradient(135deg, #d4af37 0%, #b59a2f 100%);
+  --theme-accent-gradient: linear-gradient(135deg, #d4af37 0%, #fbbf24 100%);
   --theme-accent-focus: rgba(212, 175, 55, 0.25);
-  --theme-accent-hover: #dbb954;
-  --theme-success: #059669;
-  --theme-warning: #d97706;
+  --theme-accent-hover: #c9a530;
+  --theme-success: #16a34a;
+  --theme-warning: #ca8a04;
   --theme-error: #dc2626;
-  --theme-info: #0284c7;
-  --theme-disabled: rgba(212, 175, 55, 0.2);
-  --theme-disabled-text: #d4af37;
-  --glass-bg: rgba(255, 255, 255, 0.8);
+  --theme-info: #0d9488;
+  --theme-disabled: rgba(212, 175, 55, 0.25);
+  --theme-disabled-text: #d97706;
+  --glass-bg: rgba(255, 255, 255, 0.92);
   --glass-blur: 20px;
   --glass-border: rgba(212, 175, 55, 0.2);
-  --glass-shadow: 0 16px 48px rgba(66, 32, 6, 0.12);
+  --glass-shadow: 0 20px 60px rgba(212, 175, 55, 0.15);
   --scroll-thumb: #d4af37;
   --scroll-track: #fefce8;
   --component-bg-hover: rgba(212, 175, 55, 0.1);
   --component-bg-active: rgba(212, 175, 55, 0.15);
   --component-border-focus: #d4af37;
   --component-surface-raised: rgba(255, 255, 255, 0.98);
-  --component-divider: rgba(212, 175, 55, 0.15);
+  --component-divider: rgba(212, 175, 55, 0.2);
 
   @include apply-canonical-mapping;
 }
 
-/* ============================================================================
-   THEME 8: BIO-FROST (Organic Green Glassmorphism - Natural Beauty)
-   ============================================================================ */
+/* THEME 8: BIO-FROST - Organic Green Glass */
 .theme-bio-frost {
   --theme-bg-primary: transparent;
   --theme-bg-secondary: rgba(255, 255, 255, 0.1);
@@ -515,10 +474,500 @@
   @include apply-canonical-mapping;
 }
 
-/* ============================================================================
-   GLASS CARD COMPONENT
-   Usage: <div class="glass-card">Content</div>
-   ============================================================================ */
+/* THEME 9: SLATE - Professional Blue-Gray */
+.theme-slate {
+  --theme-bg-primary: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  --theme-bg-secondary: #ffffff;
+  --theme-bg-ternary: #f1f5f9;
+  --theme-text-primary: #0f172a;
+  --theme-text-secondary: #334155;
+  --theme-text-tertiary: #64748b;
+  --theme-text-label: #94a3b8;
+  --theme-border-primary: rgba(100, 116, 139, 0.2);
+  --theme-border-secondary: rgba(100, 116, 139, 0.1);
+  --theme-accent-primary: #475569;
+  --theme-accent-secondary: #64748b;
+  --theme-accent-tertiary: #94a3b8;
+  --theme-accent-gradient: linear-gradient(135deg, #475569 0%, #64748b 100%);
+  --theme-accent-focus: rgba(71, 85, 105, 0.2);
+  --theme-accent-hover: #334155;
+  --theme-success: #059669;
+  --theme-warning: #d97706;
+  --theme-error: #dc2626;
+  --theme-info: #0d9488;
+  --theme-disabled: rgba(148, 163, 184, 0.3);
+  --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.92);
+  --glass-blur: 16px;
+  --glass-border: rgba(100, 116, 139, 0.15);
+  --glass-shadow: 0 16px 48px rgba(15, 23, 42, 0.1);
+  --scroll-thumb: #94a3b8;
+  --scroll-track: #f1f5f9;
+  --component-bg-hover: rgba(71, 85, 105, 0.08);
+  --component-bg-active: rgba(71, 85, 105, 0.12);
+  --component-border-focus: #475569;
+  --component-surface-raised: #ffffff;
+  --component-divider: rgba(100, 116, 139, 0.12);
+
+  @include apply-canonical-mapping;
+}
+
+/* THEME 10: TITANIUM - Elegant Cyan */
+.theme-titanium {
+  --theme-bg-primary: linear-gradient(180deg, #ecfeff 0%, #cffafe 100%);
+  --theme-bg-secondary: rgba(255, 255, 255, 0.96);
+  --theme-bg-ternary: rgba(236, 254, 255, 0.98);
+  --theme-text-primary: #164e63;
+  --theme-text-secondary: #0e7490;
+  --theme-text-tertiary: #0891b2;
+  --theme-text-label: #06b6d4;
+  --theme-border-primary: rgba(6, 182, 212, 0.2);
+  --theme-border-secondary: rgba(6, 182, 212, 0.1);
+  --theme-accent-primary: #0e7490;
+  --theme-accent-secondary: #0891b2;
+  --theme-accent-tertiary: #06b6d4;
+  --theme-accent-gradient: linear-gradient(135deg, #0e7490 0%, #06b6d4 100%);
+  --theme-accent-focus: rgba(14, 116, 144, 0.25);
+  --theme-accent-hover: #0d5f7a;
+  --theme-success: #059669;
+  --theme-warning: #d97706;
+  --theme-error: #dc2626;
+  --theme-info: #0284c7;
+  --theme-disabled: rgba(6, 182, 212, 0.2);
+  --theme-disabled-text: #67e8f9;
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-blur: 18px;
+  --glass-border: rgba(6, 182, 212, 0.15);
+  --glass-shadow: 0 18px 56px rgba(6, 182, 212, 0.12);
+  --scroll-thumb: #22d3ee;
+  --scroll-track: #ecfeff;
+  --component-bg-hover: rgba(14, 116, 144, 0.1);
+  --component-bg-active: rgba(14, 116, 144, 0.15);
+  --component-border-focus: #0e7490;
+  --component-surface-raised: rgba(255, 255, 255, 0.98);
+  --component-divider: rgba(6, 182, 212, 0.12);
+
+  @include apply-canonical-mapping;
+}
+
+/* THEME 11: ROSE - Soft Pink Elegance */
+.theme-rose {
+  --theme-bg-primary: linear-gradient(180deg, #fff1f2 0%, #ffe4e6 100%);
+  --theme-bg-secondary: rgba(255, 255, 255, 0.96);
+  --theme-bg-ternary: rgba(255, 241, 242, 0.98);
+  --theme-text-primary: #881337;
+  --theme-text-secondary: #9f1239;
+  --theme-text-tertiary: #be123c;
+  --theme-text-label: #f472b6;
+  --theme-border-primary: rgba(244, 114, 182, 0.25);
+  --theme-border-secondary: rgba(244, 114, 182, 0.12);
+  --theme-accent-primary: #db2777;
+  --theme-accent-secondary: #be185d;
+  --theme-accent-tertiary: #f472b6;
+  --theme-accent-gradient: linear-gradient(135deg, #db2777 0%, #f472b6 100%);
+  --theme-accent-focus: rgba(219, 39, 119, 0.2);
+  --theme-accent-hover: #be185d;
+  --theme-success: #059669;
+  --theme-warning: #d97706;
+  --theme-error: #dc2626;
+  --theme-info: #c026d3;
+  --theme-disabled: rgba(244, 114, 182, 0.2);
+  --theme-disabled-text: #f9a8d4;
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-blur: 18px;
+  --glass-border: rgba(244, 114, 182, 0.18);
+  --glass-shadow: 0 16px 48px rgba(219, 39, 119, 0.1);
+  --scroll-thumb: #f9a8d4;
+  --scroll-track: #fff1f2;
+  --component-bg-hover: rgba(219, 39, 119, 0.08);
+  --component-bg-active: rgba(219, 39, 119, 0.12);
+  --component-border-focus: #db2777;
+  --component-surface-raised: rgba(255, 255, 255, 0.98);
+  --component-divider: rgba(244, 114, 182, 0.15);
+
+  @include apply-canonical-mapping;
+}
+
+/* THEME 12: MONOCHROME - Grayscale Professional */
+.theme-monochrome {
+  --theme-bg-primary: #fafafa;
+  --theme-bg-secondary: #ffffff;
+  --theme-bg-ternary: #f5f5f5;
+  --theme-text-primary: #171717;
+  --theme-text-secondary: #404040;
+  --theme-text-tertiary: #737373;
+  --theme-text-label: #a3a3a3;
+  --theme-border-primary: #e5e5e5;
+  --theme-border-secondary: #d4d4d4;
+  --theme-accent-primary: #404040;
+  --theme-accent-secondary: #525252;
+  --theme-accent-tertiary: #737373;
+  --theme-accent-gradient: linear-gradient(135deg, #404040 0%, #525252 100%);
+  --theme-accent-focus: rgba(64, 64, 64, 0.15);
+  --theme-accent-hover: #525252;
+  --theme-success: #059669;
+  --theme-warning: #d97706;
+  --theme-error: #dc2626;
+  --theme-info: #2563eb;
+  --theme-disabled: rgba(163, 163, 163, 0.4);
+  --theme-disabled-text: #a3a3a3;
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --glass-blur: 8px;
+  --glass-border: rgba(229, 229, 229, 0.9);
+  --scroll-thumb: #d4d4d4;
+  --scroll-track: #f5f5f5;
+  --component-bg-hover: rgba(64, 64, 64, 0.05);
+  --component-bg-active: rgba(64, 64, 64, 0.08);
+  --component-border-focus: #404040;
+  --component-surface-raised: #ffffff;
+  --component-divider: #e5e5e5;
+
+  @include apply-canonical-mapping;
+}
+
+/* THEME 13: SUNSET - Warm Orange Glow */
+.theme-sunset {
+  --theme-bg-primary: linear-gradient(180deg, #fffbeb 0%, #fed7aa 100%);
+  --theme-bg-secondary: rgba(255, 255, 255, 0.96);
+  --theme-bg-ternary: rgba(255, 251, 235, 0.98);
+  --theme-text-primary: #7c2d12;
+  --theme-text-secondary: #9a3412;
+  --theme-text-tertiary: #ea580c;
+  --theme-text-label: #fb923c;
+  --theme-border-primary: rgba(251, 146, 60, 0.25);
+  --theme-border-secondary: rgba(251, 146, 60, 0.12);
+  --theme-accent-primary: #ea580c;
+  --theme-accent-secondary: #c2410c;
+  --theme-accent-tertiary: #fb923c;
+  --theme-accent-gradient: linear-gradient(135deg, #ea580c 0%, #fb923c 100%);
+  --theme-accent-focus: rgba(234, 88, 12, 0.2);
+  --theme-accent-hover: #c2410c;
+  --theme-success: #16a34a;
+  --theme-warning: #ca8a04;
+  --theme-error: #dc2626;
+  --theme-info: #0d9488;
+  --theme-disabled: rgba(251, 146, 60, 0.2);
+  --theme-disabled-text: #fdba74;
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-blur: 18px;
+  --glass-border: rgba(251, 146, 60, 0.18);
+  --glass-shadow: 0 16px 48px rgba(234, 88, 12, 0.12);
+  --scroll-thumb: #fdba74;
+  --scroll-track: #fffbeb;
+  --component-bg-hover: rgba(234, 88, 12, 0.08);
+  --component-bg-active: rgba(234, 88, 12, 0.12);
+  --component-border-focus: #ea580c;
+  --component-surface-raised: rgba(255, 255, 255, 0.98);
+  --component-divider: rgba(251, 146, 60, 0.15);
+
+  @include apply-canonical-mapping;
+}
+
+/* THEME 14: FUTURISTIC - Modern Tech Blue */
+.theme-futuristic {
+  --theme-bg-primary: #030712;
+  --theme-bg-secondary: #111827;
+  --theme-bg-ternary: #1f2937;
+  --theme-text-primary: #dbeafe;
+  --theme-text-secondary: #93c5fd;
+  --theme-text-tertiary: #60a5fa;
+  --theme-text-label: #3b82f6;
+  --theme-border-primary: rgba(59, 130, 246, 0.3);
+  --theme-border-secondary: rgba(59, 130, 246, 0.15);
+  --theme-accent-primary: #3b82f6;
+  --theme-accent-secondary: #0ea5e9;
+  --theme-accent-tertiary: #8b5cf6;
+  --theme-accent-gradient: linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%);
+  --theme-accent-focus: rgba(59, 130, 246, 0.3);
+  --theme-accent-hover: #2563eb;
+  --theme-success: #10b981;
+  --theme-warning: #f59e0b;
+  --theme-error: #ef4444;
+  --theme-info: #3b82f6;
+  --theme-disabled: rgba(59, 130, 246, 0.2);
+  --theme-disabled-text: #60a5fa;
+  --glass-bg: rgba(17, 24, 39, 0.8);
+  --glass-blur: 24px;
+  --glass-border: rgba(59, 130, 246, 0.25);
+  --glass-shadow: 0 0 60px rgba(59, 130, 246, 0.25);
+  --scroll-thumb: #3b82f6;
+  --scroll-track: #030712;
+  --component-bg-hover: rgba(59, 130, 246, 0.15);
+  --component-bg-active: rgba(59, 130, 246, 0.2);
+  --component-border-focus: #3b82f6;
+  --component-surface-raised: #1f2937;
+  --component-divider: rgba(59, 130, 246, 0.2);
+
+  @include apply-canonical-mapping;
+}
+
+/* THEME 15: NEUMORPHIC - Soft UI Design */
+.theme-neumorphic {
+  --theme-bg-primary: #eef2f7;
+  --theme-bg-secondary: #ffffff;
+  --theme-bg-ternary: #f5f7fa;
+  --theme-text-primary: #1e293b;
+  --theme-text-secondary: #475569;
+  --theme-text-tertiary: #64748b;
+  --theme-text-label: #94a3b8;
+  --theme-border-primary: #e2e8f0;
+  --theme-border-secondary: #cbd5e1;
+  --theme-accent-primary: #6366f1;
+  --theme-accent-secondary: #8b5cf6;
+  --theme-accent-tertiary: #ec4899;
+  --theme-accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  --theme-accent-focus: rgba(99, 102, 241, 0.15);
+  --theme-accent-hover: #4f46e5;
+  --theme-success: #10b981;
+  --theme-warning: #f59e0b;
+  --theme-error: #ef4444;
+  --theme-info: #3b82f6;
+  --theme-disabled: rgba(226, 232, 240, 0.8);
+  --theme-disabled-text: #cbd5e1;
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-blur: 20px;
+  --glass-border: rgba(255, 255, 255, 0.9);
+  --glass-shadow: 10px 10px 20px #d1d9e6, -10px -10px 20px #ffffff;
+  --scroll-thumb: #cbd5e1;
+  --scroll-track: #eef2f7;
+  --component-bg-hover: rgba(99, 102, 241, 0.08);
+  --component-bg-active: rgba(99, 102, 241, 0.12);
+  --component-border-focus: #6366f1;
+  --component-surface-raised: #ffffff;
+  --component-divider: #e2e8f0;
+
+  @include apply-canonical-mapping;
+}
+
+/* THEME 16: MATERIAL YOU - Android Design */
+.theme-material-you {
+  --theme-bg-primary: #fce7f3;
+  --theme-bg-secondary: #ffffff;
+  --theme-bg-ternary: #fdf2f8;
+  --theme-text-primary: #1f2937;
+  --theme-text-secondary: #4b5563;
+  --theme-text-tertiary: #6b7280;
+  --theme-text-label: #9ca3af;
+  --theme-border-primary: #f3e8ff;
+  --theme-border-secondary: #e9d5ff;
+  --theme-accent-primary: #db2777;
+  --theme-accent-secondary: #e879f9;
+  --theme-accent-tertiary: #8b5cf6;
+  --theme-accent-gradient: linear-gradient(135deg, #db2777 0%, #e879f9 100%);
+  --theme-accent-focus: rgba(219, 39, 119, 0.12);
+  --theme-accent-hover: #be185d;
+  --theme-success: #10b981;
+  --theme-warning: #f59e0b;
+  --theme-error: #ef4444;
+  --theme-info: #3b82f6;
+  --theme-disabled: rgba(243, 232, 255, 0.6);
+  --theme-disabled-text: #d1d5db;
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-blur: 28px;
+  --glass-border: rgba(232, 121, 249, 0.2);
+  --glass-shadow: 0 4px 24px rgba(219, 39, 119, 0.08);
+  --scroll-thumb: #e9d5ff;
+  --scroll-track: #fdf2f8;
+  --component-bg-hover: rgba(219, 39, 119, 0.08);
+  --component-bg-active: rgba(219, 39, 119, 0.12);
+  --component-border-focus: #db2777;
+  --component-surface-raised: rgba(255, 255, 255, 0.95);
+  --component-divider: rgba(232, 121, 249, 0.3);
+
+  @include apply-canonical-mapping;
+}
+
+/* THEME 17: MIDNIGHT ROYAL - Dark Luxury */
+.theme-midnight-royal {
+  --theme-bg-primary: #0a0e17;
+  --theme-bg-secondary: #121826;
+  --theme-bg-ternary: #1a1f2e;
+  --theme-text-primary: #f1f5f9;
+  --theme-text-secondary: #cbd5e1;
+  --theme-text-tertiary: #94a3b8;
+  --theme-text-label: #64748b;
+  --theme-border-primary: #2d3748;
+  --theme-border-secondary: #4a5568;
+  --theme-accent-primary: #c4b5fd;
+  --theme-accent-secondary: #a78bfa;
+  --theme-accent-tertiary: #8b5cf6;
+  --theme-accent-gradient: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 50%, #8b5cf6 100%);
+  --theme-accent-focus: rgba(196, 181, 253, 0.25);
+  --theme-accent-hover: #ddd6fe;
+  --theme-success: #34d399;
+  --theme-warning: #fbbf24;
+  --theme-error: #f87171;
+  --theme-info: #60a5fa;
+  --theme-disabled: rgba(74, 85, 104, 0.4);
+  --theme-disabled-text: #718096;
+  --glass-bg: rgba(18, 24, 38, 0.8);
+  --glass-blur: 32px;
+  --glass-border: rgba(196, 181, 253, 0.2);
+  --glass-shadow: 0 8px 32px rgba(12, 16, 27, 0.4), 0 0 0 1px rgba(196, 181, 253, 0.1);
+  --scroll-thumb: #4a5568;
+  --scroll-track: #0a0e17;
+  --component-bg-hover: rgba(196, 181, 253, 0.15);
+  --component-bg-active: rgba(196, 181, 253, 0.2);
+  --component-border-focus: #c4b5fd;
+  --component-surface-raised: #1a1f2e;
+  --component-divider: rgba(196, 181, 253, 0.15);
+
+  @include apply-canonical-mapping;
+}
+
+/* THEME 18: DATA SCIENCE - Analytics Optimized */
+.theme-data-science {
+  --theme-bg-primary: #f8fafc;
+  --theme-bg-secondary: #ffffff;
+  --theme-bg-ternary: #f1f5f9;
+  --theme-text-primary: #1e293b;
+  --theme-text-secondary: #334155;
+  --theme-text-tertiary: #475569;
+  --theme-text-label: #64748b;
+  --theme-border-primary: #e2e8f0;
+  --theme-border-secondary: #cbd5e1;
+  --theme-accent-primary: #3b82f6;
+  --theme-accent-secondary: #06b6d4;
+  --theme-accent-tertiary: #10b981;
+  --theme-accent-gradient: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+  --theme-accent-focus: rgba(59, 130, 246, 0.1);
+  --theme-accent-hover: #2563eb;
+  --theme-success: #10b981;
+  --theme-warning: #f59e0b;
+  --theme-error: #ef4444;
+  --theme-info: #3b82f6;
+  --theme-disabled: rgba(203, 213, 225, 0.5);
+  --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-blur: 20px;
+  --glass-border: rgba(59, 130, 246, 0.15);
+  --glass-shadow: 0 12px 40px rgba(59, 130, 246, 0.08);
+  --scroll-thumb: #cbd5e1;
+  --scroll-track: #f1f5f9;
+  --component-bg-hover: rgba(59, 130, 246, 0.05);
+  --component-bg-active: rgba(59, 130, 246, 0.08);
+  --component-border-focus: #3b82f6;
+  --component-surface-raised: #ffffff;
+  --component-divider: #e2e8f0;
+
+  @include apply-canonical-mapping;
+}
+
+/* THEME 19: DEEP SPACE - Astronomy Inspired */
+.theme-deep-space {
+  --theme-bg-primary: #020617;
+  --theme-bg-secondary: #0c1a2e;
+  --theme-bg-ternary: #14213d;
+  --theme-text-primary: #e2e8f0;
+  --theme-text-secondary: #cbd5e1;
+  --theme-text-tertiary: #94a3b8;
+  --theme-text-label: #64748b;
+  --theme-border-primary: #1e293b;
+  --theme-border-secondary: #334155;
+  --theme-accent-primary: #60a5fa;
+  --theme-accent-secondary: #38bdf8;
+  --theme-accent-tertiary: #22d3ee;
+  --theme-accent-gradient: linear-gradient(135deg, #60a5fa 0%, #38bdf8 50%, #22d3ee 100%);
+  --theme-accent-focus: rgba(96, 165, 250, 0.25);
+  --theme-accent-hover: #93c5fd;
+  --theme-success: #34d399;
+  --theme-warning: #fbbf24;
+  --theme-error: #f87171;
+  --theme-info: #60a5fa;
+  --theme-disabled: rgba(51, 65, 85, 0.5);
+  --theme-disabled-text: #64748b;
+  --glass-bg: rgba(12, 26, 46, 0.85);
+  --glass-blur: 30px;
+  --glass-border: rgba(96, 165, 250, 0.2);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 32px rgba(56, 189, 248, 0.1);
+  --scroll-thumb: #334155;
+  --scroll-track: #020617;
+  --component-bg-hover: rgba(96, 165, 250, 0.12);
+  --component-bg-active: rgba(96, 165, 250, 0.18);
+  --component-border-focus: #60a5fa;
+  --component-surface-raised: #14213d;
+  --component-divider: rgba(56, 189, 248, 0.15);
+
+  @include apply-canonical-mapping;
+}
+
+/* THEME 20: EMERALD REGAL - Green Luxury */
+.theme-emerald-regal {
+  --theme-bg-primary: #ecfdf5;
+  --theme-bg-secondary: #ffffff;
+  --theme-bg-ternary: #d1fae5;
+  --theme-text-primary: #064e3b;
+  --theme-text-secondary: #065f46;
+  --theme-text-tertiary: #047857;
+  --theme-text-label: #059669;
+  --theme-border-primary: rgba(16, 185, 129, 0.3);
+  --theme-border-secondary: rgba(16, 185, 129, 0.15);
+  --theme-accent-primary: #10b981;
+  --theme-accent-secondary: #34d399;
+  --theme-accent-tertiary: #059669;
+  --theme-accent-gradient: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  --theme-accent-focus: rgba(16, 185, 129, 0.2);
+  --theme-accent-hover: #0d9488;
+  --theme-success: #059669;
+  --theme-warning: #d97706;
+  --theme-error: #dc2626;
+  --theme-info: #0d9488;
+  --theme-disabled: rgba(209, 250, 229, 0.6);
+  --theme-disabled-text: #34d399;
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-blur: 24px;
+  --glass-border: rgba(16, 185, 129, 0.2);
+  --glass-shadow: 0 16px 48px rgba(16, 185, 129, 0.1);
+  --scroll-thumb: #34d399;
+  --scroll-track: #ecfdf5;
+  --component-bg-hover: rgba(16, 185, 129, 0.1);
+  --component-bg-active: rgba(16, 185, 129, 0.15);
+  --component-border-focus: #10b981;
+  --component-surface-raised: rgba(255, 255, 255, 0.95);
+  --component-divider: rgba(16, 185, 129, 0.25);
+
+  @include apply-canonical-mapping;
+}
+
+/* THEME 21: COBALT STEEL - Professional Blue */
+.theme-cobalt-steel {
+  --theme-bg-primary: #f0f9ff;
+  --theme-bg-secondary: #ffffff;
+  --theme-bg-ternary: #e0f2fe;
+  --theme-text-primary: #0c4a6e;
+  --theme-text-secondary: #075985;
+  --theme-text-tertiary: #0369a1;
+  --theme-text-label: #0284c7;
+  --theme-border-primary: rgba(14, 165, 233, 0.3);
+  --theme-border-secondary: rgba(14, 165, 233, 0.15);
+  --theme-accent-primary: #0ea5e9;
+  --theme-accent-secondary: #38bdf8;
+  --theme-accent-tertiary: #0369a1;
+  --theme-accent-gradient: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
+  --theme-accent-focus: rgba(14, 165, 233, 0.2);
+  --theme-accent-hover: #0284c7;
+  --theme-success: #059669;
+  --theme-warning: #d97706;
+  --theme-error: #dc2626;
+  --theme-info: #0ea5e9;
+  --theme-disabled: rgba(224, 242, 254, 0.6);
+  --theme-disabled-text: #7dd3fc;
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-blur: 22px;
+  --glass-border: rgba(14, 165, 233, 0.2);
+  --glass-shadow: 0 16px 48px rgba(14, 165, 233, 0.1);
+  --scroll-thumb: #7dd3fc;
+  --scroll-track: #f0f9ff;
+  --component-bg-hover: rgba(14, 165, 233, 0.08);
+  --component-bg-active: rgba(14, 165, 233, 0.12);
+  --component-border-focus: #0ea5e9;
+  --component-surface-raised: rgba(255, 255, 255, 0.96);
+  --component-divider: rgba(14, 165, 233, 0.2);
+
+  @include apply-canonical-mapping;
+}
+
+/* ===== GLASS CARD COMPONENT ===== */
 .glass-card {
   background: var(--glass-bg-c);
   backdrop-filter: blur(var(--glass-blur-c));
@@ -539,6 +988,184 @@
   border-color: var(--color-primary-light);
   box-shadow: var(--shadow-2xl);
 }
+
+/* ===== GLASS SURFACE ENHANCEMENTS ===== */
+.glass-surface-layered {
+  background: 
+    linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.05) 100%
+    ),
+    var(--glass-bg-c);
+  backdrop-filter: 
+    blur(var(--glass-blur-c))
+    saturate(180%);
+  -webkit-backdrop-filter: 
+    blur(var(--glass-blur-c))
+    saturate(180%);
+  border-radius: var(--ui-border-radius-xl);
+  border: 1px solid var(--glass-border-c);
+  box-shadow: 
+    var(--glass-shadow-c),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ===== ANIMATIONS & UTILITIES ===== */
+.gradient-text {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+  animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.data-grid-cell {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.data-grid-cell:hover {
+  background: var(--component-bg-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.data-grid-cell.highlighted {
+  background: var(--accent-focus);
+  border-color: var(--accent-primary);
+}
+
+/* ===== ACCESSIBILITY ===== */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .theme-light,
+  .theme-glass,
+  .theme-data-science {
+    --theme-text-primary: #000000;
+    --theme-text-secondary: #1a1a1a;
+    --theme-border-primary: #000000;
+  }
+
+  .theme-dark,
+  .theme-midnight-royal,
+  .theme-deep-space {
+    --theme-text-primary: #ffffff;
+    --theme-text-secondary: #f0f0f0;
+    --theme-border-primary: #ffffff;
+  }
+}
+
+@media print {
+  * {
+    --theme-bg-primary: #ffffff !important;
+    --theme-bg-secondary: #ffffff !important;
+    --theme-text-primary: #000000 !important;
+    --theme-text-secondary: #333333 !important;
+    --accent-primary: #000000 !important;
+  }
+}
+
+/* ===== AUTO THEME ===== */
+.auto-theme {
+  --theme-bg-primary: #fafbfc;
+  --theme-bg-secondary: #ffffff;
+  --theme-bg-ternary: #f3f4f6;
+  --theme-text-primary: #0f172a;
+  --theme-text-secondary: #334155;
+  --theme-text-tertiary: #64748b;
+  --theme-text-label: #94a3b8;
+  --theme-border-primary: #e2e8f0;
+  --theme-border-secondary: #cbd5e1;
+  --theme-accent-primary: #2563eb;
+  --theme-accent-secondary: #0ea5e9;
+  --theme-accent-tertiary: #7c3aed;
+  --theme-accent-gradient: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%);
+  --theme-accent-focus: rgba(37, 99, 235, 0.12);
+  --theme-accent-hover: #1d4ed8;
+  --theme-success: #059669;
+  --theme-warning: #d97706;
+  --theme-error: #dc2626;
+  --theme-info: #2563eb;
+  --theme-disabled: rgba(209, 213, 219, 0.5);
+  --theme-disabled-text: #b4b8c2;
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-blur: 8px;
+  --glass-border: rgba(15, 23, 42, 0.06);
+  --scroll-thumb: #cbd5e1;
+  --scroll-track: #f1f5f9;
+  --component-bg-hover: rgba(37, 99, 235, 0.06);
+  --component-bg-active: rgba(37, 99, 235, 0.1);
+  --component-border-focus: #2563eb;
+  --component-surface-raised: #fafbfc;
+  --component-divider: #e5e7eb;
+
+  @include apply-canonical-mapping;
+}
+
+@media (prefers-color-scheme: dark) {
+  .auto-theme {
+    --theme-bg-primary: #020617;
+    --theme-bg-secondary: #0f172a;
+    --theme-bg-ternary: #1e293b;
+    --theme-text-primary: #f8fafc;
+    --theme-text-secondary: #e2e8f0;
+    --theme-text-tertiary: #94a3b8;
+    --theme-text-label: #64748b;
+    --theme-border-primary: #1e293b;
+    --theme-border-secondary: #334155;
+    --theme-accent-primary: #a78bfa;
+    --theme-accent-secondary: #22d3ee;
+    --theme-accent-tertiary: #f472b6;
+    --theme-accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+    --theme-accent-focus: rgba(167, 139, 250, 0.2);
+    --theme-accent-hover: #c4b5fd;
+    --theme-success: #10b981;
+    --theme-warning: #f59e0b;
+    --theme-error: #ef4444;
+    --theme-info: #3b82f6;
+    --theme-disabled: rgba(30, 41, 59, 0.7);
+    --theme-disabled-text: #475569;
+    --glass-bg: rgba(15, 23, 42, 0.6);
+    --glass-blur: 16px;
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --scroll-thumb: #334155;
+    --scroll-track: #020617;
+    --component-bg-hover: rgba(139, 92, 246, 0.08);
+    --component-bg-active: rgba(139, 92, 246, 0.12);
+    --component-border-focus: var(--theme-accent-primary);
+    --component-surface-raised: #1e293b;
+    --component-divider: rgba(255, 255, 255, 0.06);
+  }
+}
+
+/* ===== ELEVATION SYSTEM ===== */
+.elevation-0 { box-shadow: none; }
+.elevation-1 { box-shadow: var(--shadow-xs); }
+.elevation-2 { box-shadow: var(--shadow-sm); }
+.elevation-3 { box-shadow: var(--shadow-md); }
+.elevation-4 { box-shadow: var(--shadow-lg); }
+.elevation-5 { box-shadow: var(--shadow-xl); }
+.elevation-6 { box-shadow: var(--shadow-2xl); }
+.elevation-7 { box-shadow: var(--shadow-3xl); }
+.elevation-8 { box-shadow: var(--shadow-4xl); }
+.elevation-9 { box-shadow: var(--shadow-5xl); }
+.elevation-10 { box-shadow: var(--shadow-6xl); }
 
 
 
