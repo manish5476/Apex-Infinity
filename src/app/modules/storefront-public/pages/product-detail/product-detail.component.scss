@@ -286,7 +286,7 @@
     height: 56px;
     border-radius: 12px;
     border: 1px solid rgba(0,0,0,0.1);
-    background: transparent;
+      background: var(--bg-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -326,7 +326,7 @@
     font-size: 1.1rem;
     font-weight: 700;
     color: #0f172a;
-    background: transparent;
+      background: var(--bg-secondary);
     cursor: pointer;
     
     .indicator { transition: transform 0.3s; font-size: 0.9rem; }

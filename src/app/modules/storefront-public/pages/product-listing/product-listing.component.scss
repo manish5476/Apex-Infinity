@@ -109,7 +109,7 @@
   }
   .search-input {
     border: none;
-    background: transparent;
+      background: var(--bg-secondary);
     font-family: 'Manrope', sans-serif;
     font-size: 0.95rem;
     color: #0f172a;
@@ -288,7 +288,7 @@
     padding: 6px 14px;
     border-radius: 100px;
     border: 1px solid #e2e8f0;
-    background: transparent;
+      background: var(--bg-secondary);
     font-size: 0.8rem;
     color: #64748b;
     cursor: pointer;
@@ -510,7 +510,7 @@
 // }
 // :host ::ng-deep .custom-select .p-select {
 //     border: none;
-//     background: transparent;
+//       background: var(--bg-secondary);
 //     font-weight: 600;
 // }
 
@@ -593,7 +593,7 @@
 // .price-field input {
 //     width: 100%;
 //     border: none;
-//     background: transparent;
+//       background: var(--bg-secondary);
 //     padding: 8px 4px;
 //     font-size: var(--font-size-sm);
 //     outline: none;
@@ -635,7 +635,7 @@
 // /* Reset Button */
 // .reset-filters-btn {
 //     width: 100%;
-//     background: transparent;
+//       background: var(--bg-secondary);
 //     border: 1px solid var(--color-danger);
 //     color: var(--color-danger);
 //     padding: 10px;
@@ -698,6 +698,6 @@
 //     justify-content: center;
 // }
 // :host ::ng-deep .custom-paginator {
-//     background: transparent;
+//       background: var(--bg-secondary);
 //     border: none;
 // }

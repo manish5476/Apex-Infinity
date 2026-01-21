@@ -36,7 +36,7 @@ import { LoadingService } from '../../../core/services/loading.service';
       justify-content: center;
       
       /* Clean transparent background */
-      background: transparent;
+        background: var(--bg-secondary);
       
       /* Very subtle texture */
       &:before {

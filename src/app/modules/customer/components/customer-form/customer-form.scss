@@ -223,19 +223,19 @@
   }
 
   // 3. Dropdown Panel
-  .p-select-panel {
-    background: var(--bg-secondary) !important;
-    border: 1px solid var(--border-primary) !important;
+  // .p-select-panel {
+  //   background: var(--bg-secondary) !important;
+  //   border: 1px solid var(--border-primary) !important;
     
-    .p-select-item {
-      color: var(--text-secondary) !important;
-      &.p-focus { background: var(--bg-ternary) !important; }
-      &.p-highlight { 
-        background: var(--accent-focus) !important; 
-        color: var(--accent-primary) !important; 
-      }
-    }
-  }
+  //   .p-select-item {
+  //     color: var(--text-secondary) !important;
+  //     &.p-focus { background: var(--bg-ternary) !important; }
+  //     &.p-highlight { 
+  //       background: var(--accent-focus) !important; 
+  //       color: var(--accent-primary) !important; 
+  //     }
+  //   }
+  // }
 
   // 4. File Upload
   .p-fileupload-basic {
@@ -669,7 +669,7 @@
 // //     background: var(--bg-ternary);
 // //     color: var(--text-primary);
 // //     .p-select-label {
-// //       background: transparent;
+// //         background: var(--bg-secondary);
 // //       color: var(--text-primary);
 // //     }
 // //   }

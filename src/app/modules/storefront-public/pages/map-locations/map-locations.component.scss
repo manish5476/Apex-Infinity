@@ -25,7 +25,7 @@
 
 /* --- Markers --- */
 .luxury-marker {
-  background: transparent;
+    background: var(--bg-secondary);
   pointer-events: none;
   .marker-container {
     position: relative;
@@ -126,7 +126,7 @@
 
 // /* --- CUSTOM LUXURY MARKER --- */
 // .luxury-marker {
-//   background: transparent;
+//     background: var(--bg-secondary);
 //   pointer-events: none; /* Let clicks pass to the graphic elements */
 
 //   .marker-container {
@@ -249,7 +249,7 @@
 
 // // /* --- CUSTOM LUXURY MARKER --- */
 // // .luxury-marker {
-// //   background: transparent;
+// //     background: var(--bg-secondary);
 // //   pointer-events: none; /* Let clicks pass to the graphic elements */
 
 // //   .marker-container {
@@ -373,7 +373,7 @@
 
 // // // /* --- LUXURY MARKER STYLE --- */
 // // // .luxury-marker {
-// // //   background: transparent;
+// // //     background: var(--bg-secondary);
 // // //   display: flex !important;
 // // //   align-items: center;
 // // //   justify-content: center;

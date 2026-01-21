@@ -68,7 +68,7 @@
   width: 36px;
   height: 36px;
   border-radius: 8px;
-  background: transparent;
+    background: var(--bg-secondary);
   border: 1px solid transparent;
   color: var(--text-secondary);
   display: flex;
@@ -125,7 +125,7 @@
   button {
     position: relative;
     z-index: 2;
-    background: transparent;
+      background: var(--bg-secondary);
     border: none;
     padding: 0.625rem 0;
     font-size: 0.8125rem;
@@ -189,7 +189,7 @@
     width: 6px;
   }
   &::-webkit-scrollbar-track {
-    background: transparent;
+      background: var(--bg-secondary);
   }
   &::-webkit-scrollbar-thumb {
     background: var(--scroll-thumb-c);
@@ -472,61 +472,7 @@
    8. PRIMENG OVERRIDES
    ----------------------------------------------------------------------------- */
 ::ng-deep {
-  .p-inputtext,
-  .p-textarea,
-  .p-select,
-  .p-multiselect {
-    width: 100%;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-secondary);
-    color: var(--text-primary);
-    font-family: var(--font-body);
-    font-size: 0.875rem;
-    border-radius: 8px;
-    padding: 0.625rem 0.875rem;
-    transition: all 0.2s;
-
-    &:enabled:hover {
-      border-color: var(--border-primary);
-      background: var(--bg-primary);
-    }
-
-    &:enabled:focus {
-      outline: none;
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 3px var(--focus-ring-color);
-    }
-  }
-
-  .p-select-overlay,
-  .p-multiselect-overlay {
-    background: var(--bg-primary);
-    border: 1px solid var(--border-primary);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    border-radius: 12px;
-
-    .p-select-list-container,
-    .p-multiselect-list-container {
-      .p-select-option,
-      .p-multiselect-option {
-        color: var(--text-secondary);
-        padding: 0.625rem 0.875rem;
-        font-size: 0.875rem;
-        border-radius: 6px;
-        margin: 2px 0.5rem;
-
-        &:hover,
-        &.p-highlight {
-          background: var(--bg-secondary);
-          color: var(--text-primary);
-        }
-        &.p-highlight {
-          background: rgba(var(--accent-primary), 0.1);
-          color: var(--accent-primary);
-        }
-      }
-    }
-  }
+ 
 
   .approve-btn,
   .reject-btn {
@@ -562,7 +508,7 @@
   }
 
   .reject-btn {
-    background: transparent;
+      background: var(--bg-secondary);
     border: 1px solid var(--border-secondary);
     color: var(--text-secondary);
 
@@ -715,7 +661,7 @@
 //   width: 32px;
 //   height: 32px;
 //   border-radius: var(--ui-border-radius);
-//   background: transparent;
+//     background: var(--bg-secondary);
 //   border: 1px solid transparent;
 //   color: var(--text-secondary);
 //   display: flex;
@@ -771,7 +717,7 @@
 //   button {
 //     position: relative;
 //     z-index: 2;
-//     background: transparent;
+//       background: var(--bg-secondary);
 //     border: none;
 //     padding: var(--spacing-sm) 0;
 //     font-size: var(--font-size-xs);
@@ -827,7 +773,7 @@
 
 //   // Scrollbar customization
 //   &::-webkit-scrollbar { width: 5px; }
-//   &::-webkit-scrollbar-track { background: transparent; }
+//   &::-webkit-scrollbar-track {   background: var(--bg-secondary); }
 //   &::-webkit-scrollbar-thumb {
 //     background: var(--scroll-thumb-c);
 //     border-radius: 10px;
@@ -1176,7 +1122,7 @@
 //     }
 
 //     .reject-btn {
-//         background: transparent;
+//           background: var(--bg-secondary);
 //         border: 1px solid var(--border-secondary);
 //         color: var(--text-secondary);
 
@@ -1350,7 +1296,7 @@
 // //   width: 32px;
 // //   height: 32px;
 // //   border-radius: var(--ui-border-radius); // slightly more squared for modern look
-// //   background: transparent;
+// //     background: var(--bg-secondary);
 // //   border: 1px solid transparent;
 // //   color: var(--text-secondary);
 // //   display: flex;
@@ -1406,7 +1352,7 @@
 // //   button {
 // //     position: relative;
 // //     z-index: 2;
-// //     background: transparent;
+// //       background: var(--bg-secondary);
 // //     border: none;
 // //     padding: var(--spacing-sm) 0;
 // //     font-size: var(--font-size-xs);
@@ -1461,7 +1407,7 @@
 
 // //   // Scrollbar customization
 // //   &::-webkit-scrollbar { width: 5px; }
-// //   &::-webkit-scrollbar-track { background: transparent; }
+// //   &::-webkit-scrollbar-track {   background: var(--bg-secondary); }
 // //   &::-webkit-scrollbar-thumb {
 // //     background: var(--scroll-thumb-c);
 // //     border-radius: 10px;
@@ -1770,7 +1716,7 @@
 // //     }
 
 // //     .reject-btn {
-// //         background: transparent;
+// //           background: var(--bg-secondary);
 // //         border: 1px solid var(--border-secondary);
 // //         color: var(--text-secondary);
 
@@ -1856,7 +1802,7 @@
 // //         gap: 0.5rem;
 
 // //         .icon-btn {
-// //           background: transparent;
+// //             background: var(--bg-secondary);
 // //           border: none;
 // //           width: 32px;
 // //           height: 32px;
@@ -1905,7 +1851,7 @@
 // //       button {
 // //         flex: 1;
 // //         position: relative;
-// //         background: transparent;
+// //           background: var(--bg-secondary);
 // //         border: none;
 // //         padding: 0.5rem;
 // //         font-size: 0.875rem;

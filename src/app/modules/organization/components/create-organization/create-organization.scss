@@ -273,7 +273,7 @@
       }
 
       &.secondary {
-        background: transparent;
+          background: var(--bg-secondary);
         border: 1px solid rgba(255,255,255,0.2);
         color: rgba(255,255,255,0.8);
         
@@ -505,7 +505,7 @@
 //     /* Scrollbar styling */
 //     &::-webkit-scrollbar { width: 8px; }
 //     &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
-//     &::-webkit-scrollbar-track { background: transparent; }
+//     &::-webkit-scrollbar-track {   background: var(--bg-secondary); }
 //   }
 
 //   .form-content-wrapper {

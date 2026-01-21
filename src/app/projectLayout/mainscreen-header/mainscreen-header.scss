@@ -37,7 +37,7 @@
     height: 36px;
     border-radius: var(--ui-border-radius-lg);
     border: var(--ui-border-width) solid var(--border-primary);
-    background: transparent;
+      background: var(--bg-secondary);
     color: var(--text-secondary);
     cursor: pointer;
     display: flex;
@@ -96,7 +96,7 @@
     height: 36px;
     border-radius: var(--ui-border-radius-lg);
     border: var(--ui-border-width) solid transparent;
-    background: transparent;
+      background: var(--bg-secondary);
     color: var(--text-secondary);
     cursor: pointer;
     display: flex;
@@ -136,7 +136,7 @@
     align-items: center;
     gap: var(--spacing-md);
     padding: var(--spacing-xs) var(--spacing-md) var(--spacing-xs) var(--spacing-xs);
-    background: transparent;
+      background: var(--bg-secondary);
     border: var(--ui-border-width) solid transparent;
     border-radius: var(--ui-border-radius-xl);
     cursor: pointer;
@@ -183,31 +183,31 @@
    POPOVER CORE STYLES
    ------------------------- */
 :host ::ng-deep {
-  .profile-popover,
-  .notification-popover {
-    .p-popover {
-      background: var(--bg-primary) !important;
-      border: var(--ui-border-width) solid var(--border-primary) !important;
-      border-radius: var(--ui-border-radius-xl) !important;
-      /* ENHANCED SHADOW FROM TOKENS */
-      box-shadow: var(--shadow-2xl) !important;
+  // .profile-popover,
+  // .notification-popover {
+  //   .p-popover {
+  //     background: var(--bg-primary) !important;
+  //     border: var(--ui-border-width) solid var(--border-primary) !important;
+  //     border-radius: var(--ui-border-radius-xl) !important;
+  //     /* ENHANCED SHADOW FROM TOKENS */
+  //     box-shadow: var(--shadow-2xl) !important;
       
-      /* INCREASED WIDTH */
-      width: 480px !important;
-      max-width: 92vw;
+  //     /* INCREASED WIDTH */
+  //     width: 480px !important;
+  //     max-width: 92vw;
       
-      padding: 0 !important;
-      overflow: hidden;
-      animation: popoverFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  //     padding: 0 !important;
+  //     overflow: hidden;
+  //     animation: popoverFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 
-      .p-popover-content {
-        padding: 0 !important;
-      }
+  //     .p-popover-content {
+  //       padding: 0 !important;
+  //     }
       
-      /* Remove default arrow */
-      .p-popover-arrow { display: none !important; }
-    }
-  }
+  //     /* Remove default arrow */
+  //     .p-popover-arrow { display: none !important; }
+  //   }
+  // }
 
   .notification-popover .p-popover {
     width: 400px !important; /* Slightly smaller for notifications */
@@ -331,7 +331,7 @@
 
   /* Refined Scrollbar */
   &::-webkit-scrollbar { width: 5px; }
-  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-track {   background: var(--bg-secondary); }
   &::-webkit-scrollbar-thumb {
     background: var(--border-secondary);
     border-radius: 4px;

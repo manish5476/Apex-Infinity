@@ -609,7 +609,7 @@ import { DashboardUI } from "./components/dashboard.ui";
     .view-selected-button {
       font-size: var(--font-size-sm);
       color: var(--accent-primary);
-      background: transparent;
+        background: var(--bg-secondary);
       border: none;
       cursor: pointer;
       transition: var(--transition-colors);
@@ -627,73 +627,73 @@ import { DashboardUI } from "./components/dashboard.ui";
     }
 
     /* ===== PRIME NG CUSTOMIZATION ===== */
-    :host ::ng-deep .p-select,
-    :host ::ng-deep .p-multiselect {
-      background: var(--bg-secondary) !important;
-      border-radius: var(--ui-border-radius) !important;
-      border: var(--ui-border-width) solid var(--border-primary) !important;
-      transition: var(--transition-colors) !important;
-      width: 100% !important;
-    }
+    // :host ::ng-deep .p-select,
+    // :host ::ng-deep .p-multiselect {
+    //   background: var(--bg-secondary) !important;
+    //   border-radius: var(--ui-border-radius) !important;
+    //   border: var(--ui-border-width) solid var(--border-primary) !important;
+    //   transition: var(--transition-colors) !important;
+    //   width: 100% !important;
+    // }
 
-    :host ::ng-deep .p-select:hover,
-    :host ::ng-deep .p-multiselect:hover {
-      border-color: var(--accent-primary) !important;
-    }
+    // :host ::ng-deep .p-select:hover,
+    // :host ::ng-deep .p-multiselect:hover {
+    //   border-color: var(--accent-primary) !important;
+    // }
 
-    :host ::ng-deep .p-select:focus-within,
-    :host ::ng-deep .p-multiselect:focus-within {
-      border-color: var(--accent-primary) !important;
-      box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
-    }
+    // :host ::ng-deep .p-select:focus-within,
+    // :host ::ng-deep .p-multiselect:focus-within {
+    //   border-color: var(--accent-primary) !important;
+    //   box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
+    // }
 
-    :host ::ng-deep .p-select-label,
-    :host ::ng-deep .p-multiselect-label {
-      font-size: var(--font-size-sm) !important;
-      color: var(--text-primary) !important;
-      font-family: var(--font-body) !important;
-      font-weight: var(--font-weight-normal) !important;
-    }
+    // :host ::ng-deep .p-select-label,
+    // :host ::ng-deep .p-multiselect-label {
+    //   font-size: var(--font-size-sm) !important;
+    //   color: var(--text-primary) !important;
+    //   font-family: var(--font-body) !important;
+    //   font-weight: var(--font-weight-normal) !important;
+    // }
 
-    :host ::ng-deep .p-select-trigger,
-    :host ::ng-deep .p-multiselect-trigger {
-      color: var(--text-tertiary) !important;
-      transition: var(--transition-colors) !important;
-    }
+    // :host ::ng-deep .p-select-trigger,
+    // :host ::ng-deep .p-multiselect-trigger {
+    //   color: var(--text-tertiary) !important;
+    //   transition: var(--transition-colors) !important;
+    // }
 
-    :host ::ng-deep .p-select:hover .p-select-trigger,
-    :host ::ng-deep .p-multiselect:hover .p-multiselect-trigger {
-      color: var(--accent-primary) !important;
-    }
+    // :host ::ng-deep .p-select:hover .p-select-trigger,
+    // :host ::ng-deep .p-multiselect:hover .p-multiselect-trigger {
+    //   color: var(--accent-primary) !important;
+    // }
 
-    :host ::ng-deep .p-select-panel,
-    :host ::ng-deep .p-multiselect-panel {
-      background: var(--bg-secondary) !important;
-      border: var(--ui-border-width) solid var(--border-primary) !important;
-      border-radius: var(--ui-border-radius) !important;
-      box-shadow: var(--shadow-lg) !important;
-    }
+    // :host ::ng-deep .p-select-panel,
+    // :host ::ng-deep .p-multiselect-panel {
+    //   background: var(--bg-secondary) !important;
+    //   border: var(--ui-border-width) solid var(--border-primary) !important;
+    //   border-radius: var(--ui-border-radius) !important;
+    //   box-shadow: var(--shadow-lg) !important;
+    // }
 
-    :host ::ng-deep .p-select-item,
-    :host ::ng-deep .p-multiselect-item {
-      font-size: var(--font-size-sm) !important;
-      color: var(--text-primary) !important;
-      padding: var(--spacing-sm) var(--spacing-lg) !important;
-      font-family: var(--font-body) !important;
-      transition: var(--transition-colors) !important;
-    }
+    // :host ::ng-deep .p-select-item,
+    // :host ::ng-deep .p-multiselect-item {
+    //   font-size: var(--font-size-sm) !important;
+    //   color: var(--text-primary) !important;
+    //   padding: var(--spacing-sm) var(--spacing-lg) !important;
+    //   font-family: var(--font-body) !important;
+    //   transition: var(--transition-colors) !important;
+    // }
 
-    :host ::ng-deep .p-select-item:hover,
-    :host ::ng-deep .p-multiselect-item:hover {
-      background: var(--component-bg-hover) !important;
-      color: var(--text-primary) !important;
-    }
+    // :host ::ng-deep .p-select-item:hover,
+    // :host ::ng-deep .p-multiselect-item:hover {
+    //   background: var(--component-bg-hover) !important;
+    //   color: var(--text-primary) !important;
+    // }
 
-    :host ::ng-deep .p-select-item.p-highlight,
-    :host ::ng-deep .p-multiselect-item.p-highlight {
-      background: var(--component-bg-active) !important;
-      color: var(--text-primary) !important;
-    }
+    // :host ::ng-deep .p-select-item.p-highlight,
+    // :host ::ng-deep .p-multiselect-item.p-highlight {
+    //   background: var(--component-bg-active) !important;
+    //   color: var(--text-primary) !important;
+    // }
 
     :host ::ng-deep .p-multiselect-header {
       background: var(--bg-secondary) !important;
@@ -741,12 +741,12 @@ import { DashboardUI } from "./components/dashboard.ui";
     }
 
     /* ===== FOCUS STATES ===== */
-    button:focus-visible,
-    .p-select:focus-within,
-    .p-multiselect:focus-within {
-      outline: var(--focus-ring-width) solid var(--focus-ring-color);
-      outline-offset: var(--focus-ring-offset);
-    }
+    // button:focus-visible,
+    // .p-select:focus-within,
+    // .p-multiselect:focus-within {
+    //   outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    //   outline-offset: var(--focus-ring-offset);
+    // }
 
     /* ===== RESPONSIVE ADJUSTMENTS ===== */
     @media (max-width: 768px) {

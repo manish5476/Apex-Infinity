@@ -1157,7 +1157,7 @@
 
 // /* Glass channel item */
 // .glass-channel {
-//   background: transparent;
+//     background: var(--bg-secondary);
 //   border-radius: var(--ui-border-radius);
 //   transition: var(--transition-fast);
 // }
@@ -1193,7 +1193,7 @@
 
 // /* Glass user */
 // .glass-user {
-//   background: transparent;
+//     background: var(--bg-secondary);
 //   border-radius: var(--ui-border-radius);
 //   transition: var(--transition-fast);
 // }
@@ -2345,7 +2345,7 @@
 // .message-input {
 //   flex: 1;
 //   border: none;
-//   background: transparent;
+//     background: var(--bg-secondary);
 //   font-family: var(--font-body);
 //   font-size: var(--font-size-base);
 //   line-height: var(--line-height-relaxed);
@@ -2791,7 +2791,7 @@
 // .input-with-prefix input {
 //   flex: 1;
 //   border: none;
-//   background: transparent;
+//     background: var(--bg-secondary);
 //   padding: var(--spacing-md) var(--spacing-lg);
 //   font-family: var(--font-body);
 //   font-size: var(--font-size-base);
@@ -2890,7 +2890,7 @@
 // }
 
 // .custom-scrollbar::-webkit-scrollbar-track {
-//   background: transparent;
+//     background: var(--bg-secondary);
 // }
 
 // .custom-scrollbar::-webkit-scrollbar-thumb {
@@ -3074,7 +3074,7 @@
 
 // // /* Custom Scrollbar */
 // // ::-webkit-scrollbar { width: 6px; height: 6px; }
-// // ::-webkit-scrollbar-track { background: transparent; }
+// // ::-webkit-scrollbar-track {   background: var(--bg-secondary); }
 // // ::-webkit-scrollbar-thumb {
 // //   background: rgba(255, 255, 255, 0.1);
 // //   border-radius: var(--ui-border-radius);
@@ -3139,7 +3139,7 @@
 // //     }
 
 // //     .btn-icon {
-// //       background: transparent;
+// //         background: var(--bg-secondary);
 // //       border: 1px solid var(--c-border);
 // //       color: var(--c-text-secondary);
 // //       border-radius: var(--ui-border-radius-sm);
@@ -3475,7 +3475,7 @@
 // //   .composer {
 // //     padding: var(--spacing-xl);
 // //     padding-bottom: var(--spacing-2xl);
-// //     background: transparent;
+// //       background: var(--bg-secondary);
 
 // //     .typing-indicator {
 // //       font-size: var(--font-size-xs);
@@ -3504,7 +3504,7 @@
 // //       .btn-attachment {
 // //         padding: var(--spacing-sm);
 // //         color: var(--c-text-secondary);
-// //         background: transparent;
+// //           background: var(--bg-secondary);
 // //         border: none;
 // //         cursor: pointer;
 // //         border-radius: var(--ui-border-radius-sm);
@@ -3513,7 +3513,7 @@
 
 // //       textarea {
 // //         flex: 1;
-// //         background: transparent;
+// //           background: var(--bg-secondary);
 // //         border: none;
 // //         color: var(--c-text-primary);
 // //         resize: none;
@@ -3584,7 +3584,7 @@
 // //       h3 { margin: 0; font-size: var(--font-size-lg); font-weight: 600; }
       
 // //       button {
-// //         background: transparent;
+// //           background: var(--bg-secondary);
 // //         border: none;
 // //         color: var(--c-text-muted);
 // //         cursor: pointer;
@@ -3676,7 +3676,7 @@
 // //         cursor: pointer;
         
 // //         &.btn-cancel {
-// //           background: transparent;
+// //             background: var(--bg-secondary);
 // //           border: 1px solid var(--c-border);
 // //           color: var(--c-text-secondary);
 // //           &:hover { border-color: var(--c-text-primary); color: var(--c-text-primary); }
@@ -4768,7 +4768,7 @@
 // // //         min-height: 24px;
 // // //         max-height: 120px;
 // // //         border: none;
-// // //         background: transparent;
+// // //           background: var(--bg-secondary);
 // // //         font-family: var(--font-body);
 // // //         font-size: var(--font-size-base);
 // // //         color: var(--text-primary);
@@ -4784,7 +4784,7 @@
 // // //         .btn-clear-input {
 // // //           width: 28px;
 // // //           height: 28px;
-// // //           background: transparent;
+// // //             background: var(--bg-secondary);
 // // //           border: none;
 // // //           color: var(--text-tertiary);
 // // //           cursor: pointer;
@@ -5034,7 +5034,7 @@
 // // //             input {
 // // //               flex: 1;
 // // //               border: none;
-// // //               background: transparent;
+// // //                 background: var(--bg-secondary);
 // // //               font-size: var(--font-size-base);
 // // //               color: var(--text-primary);
 // // //               outline: none;

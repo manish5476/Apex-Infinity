@@ -165,7 +165,7 @@
   // Dropdown Specifics
   .p-select {
     .p-select-label {
-       background: transparent;
+         background: var(--bg-secondary);
        color: var(--text-primary);
     }
   }
@@ -366,7 +366,7 @@
 //     background: var(--bg-ternary);
 //     color: var(--text-primary);
 //     .p-select-label, .p-multiselect-label {
-//       background: transparent;
+//         background: var(--bg-secondary);
 //       color: var(--text-primary);
 //     }
 //   }

@@ -1,6 +1,6 @@
 /* Custom Scrollbar */
 .custom-scrollbar::-webkit-scrollbar { width: 5px; }
-.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-track {   background: var(--bg-secondary); }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
@@ -18,7 +18,7 @@
 
 /* PrimeNG Overrides */
 :host ::ng-deep {
-  .p-tablist-tab-list { background: transparent; border: none; }
+  .p-tablist-tab-list {   background: var(--bg-secondary); border: none; }
   .p-tab {
     padding: 1rem 1.2rem; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; transition: all 0.2s;
     &:hover { color: #334155; background: #f8fafc; }
@@ -36,7 +36,7 @@
 //   width: 5px;
 // }
 // .custom-scrollbar::-webkit-scrollbar-track {
-//   background: transparent;
+//     background: var(--bg-secondary);
 // }
 // .custom-scrollbar::-webkit-scrollbar-thumb {
 //   background: #cbd5e1;
@@ -81,7 +81,7 @@
 // /* PrimeNG Overrides for Dense UI */
 // :host ::ng-deep {
 //   .p-tablist-tab-list {
-//     background: transparent;
+//       background: var(--bg-secondary);
 //     border: none;
 //   }
   

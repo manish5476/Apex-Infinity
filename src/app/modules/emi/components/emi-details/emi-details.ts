@@ -188,7 +188,7 @@ export class EmiDetailsComponent implements OnInit {
           if (params.data.paymentStatus === 'paid') {
             return `<i class="pi pi-check-circle text-green-500" style="font-size: 1.2rem;"></i>`;
           }
-          return `<button class="action-pay-btn p-button-rounded p-button-text" style="cursor: pointer; background: transparent; border: none; color: #3b82f6;">
+          return `<button class="action-pay-btn p-button-rounded p-button-text" style="cursor: pointer;   background: var(--bg-secondary); border: none; color: #3b82f6;">
                      <i class="pi pi-wallet" style="font-size: 1.2rem;"></i>
                    </button>`;
         }

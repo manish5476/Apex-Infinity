@@ -105,7 +105,7 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
     }
     /* Custom Scrollbar for list */
     .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-track {   background: var(--bg-secondary); }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
     :host ::ng-deep .p-chart canvas {
       max-height: 320px; /* Ensure chart doesn't overflow */

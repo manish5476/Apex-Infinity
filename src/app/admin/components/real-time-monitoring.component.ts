@@ -154,7 +154,7 @@ import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
       width: 4px;
     }
     .custom-scrollbar::-webkit-scrollbar-track {
-      background: transparent;
+        background: var(--bg-secondary);
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
       background: var(--theme-border-secondary); 

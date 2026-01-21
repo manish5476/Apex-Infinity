@@ -165,40 +165,40 @@
     width: 100%;
   }
   
-  // p-select and p-multiSelect
-  :is(.p-select, .p-multiselect) {
-    background: var(--bg-ternary);
-    color: var(--text-primary);
-    .p-select-label, .p-multiselect-label {
-      background: transparent;
-      color: var(--text-primary);
-    }
-  }
+  // // p-select and p-multiSelect
+  // :is(.p-select, .p-multiselect) {
+  //   background: var(--bg-ternary);
+  //   color: var(--text-primary);
+  //   .p-select-label, .p-multiselect-label {
+  //       background: var(--bg-secondary);
+  //     color: var(--text-primary);
+  //   }
+  // }
 
   // Style invalid touched form fields
-  .ng-invalid.ng-touched {
-    :is(.p-inputtext, p-select, .p-inputnumber, .p-inputtextarea, p-multiSelect) {
-      border-color: var(--color-error);
-    }
-  }
+  // .ng-invalid.ng-touched {
+  //   :is(.p-inputtext, p-select, .p-inputnumber, .p-inputtextarea, p-multiSelect) {
+  //     border-color: var(--color-error);
+  //   }
+  // }
 
-  // Ensure dropdown panels match theme
-  :is(.p-select-panel, .p-multiselect-panel) {
-    background: var(--bg-secondary);
-    border: var(--ui-border-width) solid var(--border-primary);
+  // // Ensure dropdown panels match theme
+  // :is(.p-select-panel, .p-multiselect-panel) {
+  //   background: var(--bg-secondary);
+  //   border: var(--ui-border-width) solid var(--border-primary);
     
-    :is(.p-select-item, .p-multiselect-item) {
-      color: var(--text-secondary);
-      &:hover {
-        background: var(--bg-ternary);
-        color: var(--text-primary);
-      }
-    }
-    :is(.p-select-item.p-highlight, .p-multiselect-item.p-highlight) {
-      background: var(--accent-focus);
-      color: var(--accent-primary);
-    }
-  }
+  //   :is(.p-select-item, .p-multiselect-item) {
+  //     color: var(--text-secondary);
+  //     &:hover {
+  //       background: var(--bg-ternary);
+  //       color: var(--text-primary);
+  //     }
+  //   }
+  //   :is(.p-select-item.p-highlight, .p-multiselect-item.p-highlight) {
+  //     background: var(--accent-focus);
+  //     color: var(--accent-primary);
+  //   }
+  // }
   
   // MultiSelect header
   .p-multiselect-header {
@@ -212,5 +212,5 @@
       .p-multiselect-filter-icon, .p-multiselect-close {
         color: var(--text-secondary);
       }
-  }
+  } 
 }

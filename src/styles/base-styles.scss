@@ -113,7 +113,7 @@ p {
 }
 
 .btn.ghost {
-  background: transparent;
+    background: var(--bg-secondary);
   border: 1px solid var(--theme-border-primary);
   color: var(--theme-text-primary);
 }
@@ -253,164 +253,20 @@ a:hover {
 }
 
 
-// /* ============================
-//    BASE STYLE (global layout + utilities)
-//    - Loads AFTER theme.scss
-//    - Use only canonical tokens (bg-primary, text-primary, etc)
-// ============================ */
+/* The Universal Surface Card */
+.glass-panel {
+  background: var(--glass-bg-c);
+  backdrop-filter: blur(var(--glass-blur-c));
+  -webkit-backdrop-filter: blur(var(--glass-blur-c));
+  border: 1px solid var(--glass-border-c);
+  box-shadow: var(--glass-shadow-c);
+  border-radius: var(--ui-border-radius-xl);
+  transition: var(--transition-base);
+}
 
-// /* Import fonts (kept here so build order doesn't fail if theme loads first) */
-// @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap");
-
-// /* Root scaling */
-// :root {
-//   font-size: clamp(12px, 0.8vw + 0.35rem, 15px);
-//   --container-max: 1440px;
-//   --ui-radius: var(--ui-border-radius);
-//   --ui-radius-lg: var(--ui-border-radius-lg);
-// }
-
-// /* ---- Global reset and base ---- */
-// html, body, :host {
-//   height: 100%;
-//   margin: 0;
-//   font-family: var(--font-body);
-//   color: var(--text-primary);
-//   background: var(--bg-primary);
-//   -webkit-font-smoothing: antialiased;
-//   -moz-osx-font-smoothing: grayscale;
-// }
-
-// /* Smooth transitions (respect prefers-reduced-motion) */
-// @media (prefers-reduced-motion: reduce) {
-//   * { transition: none !important; animation: none !important; }
-// }
-
-// /* Scrollbar, based on theme */
-// * { box-sizing: border-box; }
-// *::-webkit-scrollbar { width: 8px; height: 8px; }
-// *::-webkit-scrollbar-thumb { background: var(--scroll-thumb-c); border-radius: 8px; }
-// *::-webkit-scrollbar-track { background: var(--scroll-track-c); }
-
-// /* ---- Headings & paragraphs ---- */
-// h1,h2,h3,h4 { font-family: var(--font-heading); margin: 0 0 calc(var(--spacing-md)); color: var(--text-primary); line-height: var(--line-height-tight); }
-// h1 { font-size: var(--font-size-3xl); }
-// h2 { font-size: var(--font-size-2xl); }
-// p { margin: 0 0 var(--spacing-md); color: var(--text-secondary); line-height: var(--line-height-normal); }
-
-// /* ---- Container / Responsive grid ---- */
-// .container {
-//   max-width: var(--container-max);
-//   margin: 0 auto;
-//   padding: calc(var(--spacing-lg) * 1) calc(var(--spacing-lg) * 1.25);
-//   display: flex;
-//   flex-direction: column;
-//   gap: var(--spacing-lg);
-//   width: 100%;
-// }
-
-// /* grid that collapses elegantly */
-// .responsive-grid {
-//   display: grid;
-//   grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
-//   gap: var(--spacing-lg);
-//   width: 100%;
-// }
-
-// /* ---- Card primitive ---- */
-// .card {
-//   background: var(--bg-secondary);
-//   border-radius: var(--ui-radius);
-//   padding: calc(var(--spacing-lg));
-//   border: var(--ui-border-width) solid var(--border-primary);
-//   box-shadow: var(--ui-shadow);
-//   transition: var(--ui-transition);
-//   color: var(--text-primary);
-// }
-// .card:hover { transform: translateY(-2px); box-shadow: var(--ui-shadow-md); }
-
-// /* ---- Glass utility (u-glass) for glassmorphism usage ---- */
-// .u-glass {
-//   background: var(--glass-bg-c);
-//   border-radius: var(--ui-radius-lg);
-//   border: 1px solid var(--glass-border-c);
-//   box-shadow: var(--glass-shadow, 0 8px 32px rgba(0,0,0,0.06));
-//   -webkit-backdrop-filter: blur(var(--glass-blur-c));
-//   backdrop-filter: blur(var(--glass-blur-c));
-//   color: var(--text-primary);
-// }
-
-// /* ---- Buttons ---- */
-// .btn {
-//   display: inline-flex;
-//   align-items: center;
-//   gap: 0.5rem;
-//   padding: calc(var(--spacing-sm)) calc(var(--spacing-md));
-//   font-weight: 600;
-//   font-size: var(--font-size-sm);
-//   border-radius: 999px;
-//   border: none;
-//   cursor: pointer;
-//   background: var(--accent-gradient);
-//   color: #fff;
-//   transition: var(--ui-transition);
-// }
-// .btn:focus { box-shadow: 0 0 0 4px var(--accent-focus); outline: none; }
-// .btn.ghost { background: transparent; border: var(--ui-border-width) solid var(--border-primary); color: var(--text-primary); }
-
-// /* ---- Form controls ---- */
-// .form-field { display:flex; flex-direction:column; gap: calc(var(--spacing-xs)); width:100%; }
-// input, textarea, select {
-//   background: var(--bg-ternary);
-//   color: var(--text-primary);
-//   border: var(--ui-border-width) solid var(--border-secondary);
-//   border-radius: var(--ui-radius);
-//   padding: calc(var(--spacing-sm)) calc(var(--spacing-md));
-//   font-size: var(--font-size-sm);
-//   transition: box-shadow 0.18s, border-color 0.18s;
-//   height: 2.25rem;
-// }
-// input:focus, textarea:focus, select:focus {
-//   outline: none;
-//   border-color: var(--accent-primary);
-//   box-shadow: 0 0 0 4px var(--accent-focus);
-// }
-
-// /* ---- Pills, badges, tiny utilities ---- */
-// .pill {
-//   display: inline-flex; align-items:center; gap: .5rem;
-//   padding: calc(var(--spacing-xs) * 1.5) calc(var(--spacing-sm) * 1.25);
-//   border-radius: 999px; font-size: .875rem; background: color-mix(in srgb, var(--accent-primary) 6%, transparent);
-//   border: 1px solid color-mix(in srgb, var(--text-primary) 6%, transparent);
-//   color: var(--text-primary);
-// }
-
-// /* ---- Modal sheet ---- */
-// .modal { position: fixed; inset:0; display:grid; place-items:center; z-index: 9999; padding: var(--spacing-lg); }
-// .modal .sheet {
-//   width:100%; max-width: 920px; border-radius: var(--ui-radius-lg); padding: var(--spacing-lg);
-//   background: var(--bg-secondary); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--ui-shadow-md);
-// }
-
-// /* ---- Utility helpers used across app ---- */
-// .flex { display:flex; }
-// .flex-center { display:flex; align-items:center; justify-content:center; }
-// .col-center { display:flex; flex-direction:column; align-items:center; }
-// .justify-between { justify-content:space-between; }
-// .truncate { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-// .visually-hidden { position:absolute !important; height:1px; width:1px; overflow:hidden; clip:rect(1px,1px,1px,1px); }
-
-// /* ---- Responsive fixes ---- */
-// @media (max-width: 1024px) {
-//   .container { padding: calc(var(--spacing-md)) calc(var(--spacing-lg)); }
-//   .card { padding: calc(var(--spacing-md)); }
-// }
-// @media (max-width: 640px) {
-//   .container { padding: calc(var(--spacing-sm)) calc(var(--spacing-md)); }
-//   .responsive-grid { grid-template-columns: 1fr; gap: var(--spacing-md); }
-//   input, select, textarea { height: 2.5rem; }
-// }
-
-// /* ---- Accessibility defaults ---- */
-// :focus { outline: none; }
-// a { color: inherit; text-decoration: none; }
+.glass-panel:hover {
+  background: var(--component-bg-hover);
+  border-color: var(--component-border-focus);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+}

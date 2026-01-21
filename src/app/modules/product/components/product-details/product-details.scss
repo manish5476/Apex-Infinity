@@ -31,7 +31,7 @@
       color: var(--text-secondary);
       width: 36px; height: 36px;
       border-radius: 50%;
-      background: transparent;
+        background: var(--bg-secondary);
       border: 1px solid transparent;
       transition: var(--transition-base);
       display: flex; align-items: center; justify-content: center;

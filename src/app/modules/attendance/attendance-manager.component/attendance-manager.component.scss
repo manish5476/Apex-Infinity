@@ -63,9 +63,9 @@
 /* --- TABS --- */
 ::ng-deep .p-tablist {
   border-bottom: 1px solid var(--border-secondary);
-  background: transparent;
+    background: var(--bg-secondary);
   .p-tab {
-    background: transparent; border: none; padding: var(--spacing-lg) var(--spacing-xl);
+      background: var(--bg-secondary); border: none; padding: var(--spacing-lg) var(--spacing-xl);
     transition: var(--transition-base);
     color: var(--text-secondary);
     
@@ -81,7 +81,7 @@
 }
 
 ::ng-deep .p-tabpanels {
-  background: transparent; padding: var(--spacing-lg);
+    background: var(--bg-secondary); padding: var(--spacing-lg);
 }
 
 /* --- FILTERS TOOLBAR --- */
@@ -100,7 +100,7 @@
     
     label { font-size: 10px; text-transform: uppercase; font-weight: 700; color: var(--text-tertiary); }
     input { 
-      background: transparent; border: none; color: var(--text-primary); outline: none; 
+        background: var(--bg-secondary); border: none; color: var(--text-primary); outline: none; 
       font-size: var(--font-size-sm); font-family: var(--font-body);
     }
   }

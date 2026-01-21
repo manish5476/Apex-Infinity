@@ -297,7 +297,7 @@ $error-color: #f87171;
 .divider {
   display: flex; align-items: center; justify-content: center; margin: 10px 0;
   span {
-    background: transparent; padding: 0 10px; color: rgba(255, 255, 255, 0.4); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;
+      background: var(--bg-secondary); padding: 0 10px; color: rgba(255, 255, 255, 0.4); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;
   }
 }
 

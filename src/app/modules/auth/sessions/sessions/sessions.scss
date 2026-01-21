@@ -83,7 +83,7 @@
     .p-button {
       font-size: var(--font-size-sm);
       border: none;
-      background: transparent;
+        background: var(--bg-secondary);
       padding: var(--spacing-sm) var(--spacing-lg);
       border-radius: var(--ui-border-radius-sm);
       transition: all var(--transition-fast);
