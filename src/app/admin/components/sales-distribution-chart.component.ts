@@ -10,60 +10,54 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
   standalone: true,
   imports: [CommonModule, ChartModule, ProgressSpinnerModule, ButtonModule],
   template: `
-    <div class="relative w-full p-1 md:p-2 overflow-hidden rounded-2xl transition-all duration-500" 
-         [style.font-family]="'var(--font-body)'">
+    <div class="distribution-container">
 
-      <div class="absolute top-[-50%] right-[-10%] w-[400px] h-[400px] rounded-full bg-indigo-500/10 blur-[90px] animate-pulse-slow pointer-events-none"></div>
-      <div class="absolute bottom-[-20%] left-[-10%] w-[300px] h-[300px] rounded-full bg-cyan-500/10 blur-[80px] animate-pulse-slow delay-700 pointer-events-none"></div>
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
 
-      <div class="relative z-10 p-6 border rounded-2xl transition-all"
-           style="background: rgba(15, 23, 42, 0.6); 
-                  backdrop-filter: blur(16px); 
-                  -webkit-backdrop-filter: blur(16px);
-                  border: 1px solid rgba(255, 255, 255, 0.08);
-                  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);">
+      <div class="chart-card">
 
-        <div class="flex justify-between items-start mb-6">
+        <div class="card-header">
           <div>
-            <h2 class="font-bold tracking-tight text-xl text-white flex items-center gap-2">
-              <i class="pi pi-chart-pie text-indigo-400"></i>
+            <h2 class="card-title">
+              <i class="pi pi-chart-pie header-icon"></i>
               Sales Distribution 
             </h2>
-            <p class="text-xs font-bold uppercase tracking-widest text-slate-400 mt-1">
+            <p class="card-subtitle">
               Revenue Share by Category & Segmentation
             </p>
           </div>
-          <div class="flex gap-2">
+          <div class="header-actions">
              <p-button icon="pi pi-filter" [text]="true" [rounded]="true" severity="secondary" size="small"></p-button>
              <p-button icon="pi pi-refresh" [text]="true" [rounded]="true" severity="secondary" size="small" (onClick)="loadDistribution()" [loading]="loading()"></p-button>
           </div>
         </div>
 
         <ng-container *ngIf="!loading(); else loader">
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+          <div class="content-grid">
             
-            <div class="md:col-span-7 relative flex justify-center items-center h-[320px]">
+            <div class="chart-wrapper">
               <p-chart type="doughnut" [data]="chartData()" [options]="chartOptions" height="100%" width="100%"></p-chart>
               
-              <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                 <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Total Volume</span>
-                 <span class="text-3xl font-black text-white tracking-tight drop-shadow-lg">₹{{ totalRevenue() | number }}</span>
+              <div class="center-content">
+                 <span class="center-label">Total Volume</span>
+                 <span class="center-value">₹{{ totalRevenue() | number }}</span>
               </div>
             </div>
 
-            <div class="md:col-span-5 flex flex-col gap-3 h-full justify-center">
-               <h4 class="font-bold uppercase text-[10px] text-slate-500 mb-2">Category Breakdown</h4>
+            <div class="breakdown-panel">
+               <h4 class="panel-title">Category Breakdown</h4>
                
-               <div class="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+               <div class="breakdown-list custom-scrollbar">
                  @for (label of chartData()?.labels; track label; let i = $index) {
-                   <div class="flex items-center justify-between p-3 rounded-xl border border-white/5 bg-white/5 transition-all hover:bg-white/10 group">
-                      <div class="flex items-center gap-3">
-                        <div class="w-3 h-3 rounded-full shadow-[0_0_8px_rgba(255,255,255,0.2)]" [style.background]="chartData()?.datasets[0].backgroundColor[i]"></div>
-                        <span class="font-bold text-slate-200 text-xs truncate w-28 group-hover:text-white transition-colors">{{ label }}</span>
+                   <div class="breakdown-item group">
+                      <div class="item-left">
+                        <div class="dot" [style.background]="chartData()?.datasets[0].backgroundColor[i]"></div>
+                        <span class="item-name">{{ label }}</span>
                       </div>
-                      <div class="text-right">
-                         <p class="font-bold tabular-nums text-white text-xs">₹{{ chartData()?.datasets[0].data[i] | number }}</p>
-                         <p class="text-[9px] font-bold opacity-60 uppercase text-indigo-300">
+                      <div class="item-right">
+                         <p class="item-value">₹{{ chartData()?.datasets[0].data[i] | number }}</p>
+                         <p class="item-share">
                            {{ (chartData()?.datasets[0].data[i] / (totalRevenue() || 1) * 100) | number:'1.0-1' }}% Share
                          </p>
                       </div>
@@ -75,20 +69,20 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
         </ng-container>
 
         <ng-template #loader>
-          <div class="h-[320px] flex flex-col items-center justify-center gap-3">
+          <div class="loader-container">
             <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-10 h-10"></p-progressSpinner>
-            <p class="text-xs font-bold uppercase tracking-widest text-slate-500">Slicing Sales Data...</p>
+            <p class="loader-text">Slicing Sales Data...</p>
           </div>
         </ng-template>
 
       </div>
 
-      <div class="mt-4 p-4 rounded-xl border border-dashed border-indigo-500/30 bg-indigo-500/5 flex items-center gap-4 relative z-10">
-         <div class="p-2 rounded-full bg-indigo-500/10 text-indigo-400">
+      <div class="insight-box">
+         <div class="insight-icon-box">
            <i class="pi pi-chart-pie"></i>
          </div>
-         <p class="text-xs text-slate-300 leading-relaxed">
-           The <strong>{{ chartData()?.labels[0] }}</strong> segment represents the majority of your current cycle revenue. 
+         <p class="insight-text">
+           The <span class="highlight">{{ chartData()?.labels[0] }}</span> segment represents the majority of your current cycle revenue. 
            Consider enriching customer profiles to move these transactions into identified categories.
          </p>
       </div>
@@ -96,20 +90,256 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
     </div>
   `,
   styles: [`
+    /* HOST & LAYOUT */
+    :host { display: block; width: 100%; }
+
+    .distribution-container {
+      position: relative;
+      width: 100%;
+      padding: var(--spacing-sm);
+      overflow: hidden;
+      border-radius: var(--ui-border-radius-xl);
+    }
+
+    /* AMBIENT BLOBS */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      z-index: 0;
+      opacity: 0.1;
+      pointer-events: none;
+    }
+    .blob-1 {
+      top: -50%; right: -10%; width: 400px; height: 400px;
+      background: var(--accent-primary);
+      animation: pulse-slow 8s infinite;
+    }
+    .blob-2 {
+      bottom: -20%; left: -10%; width: 300px; height: 300px;
+      background: var(--color-info); /* Cyan/Blue */
+      animation: pulse-slow 8s infinite 1s;
+    }
+
     @keyframes pulse-slow {
-      0%, 100% { opacity: 0.4; transform: scale(1); }
-      50% { opacity: 0.7; transform: scale(1.1); }
+      0%, 100% { transform: scale(1); opacity: 0.1; }
+      50% { transform: scale(1.1); opacity: 0.15; }
     }
-    .animate-pulse-slow {
-      animation: pulse-slow 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+    /* MAIN CARD */
+    .chart-card {
+      position: relative;
+      z-index: 1;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius-xl);
+      padding: var(--spacing-xl);
+      box-shadow: var(--shadow-sm);
+      backdrop-filter: blur(10px);
     }
-    /* Custom Scrollbar for list */
+
+    /* HEADER */
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .card-title {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      letter-spacing: -0.01em;
+    }
+
+    .header-icon { color: var(--accent-primary); }
+
+    .card-subtitle {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-tertiary);
+      margin: 4px 0 0 0;
+    }
+
+    .header-actions { display: flex; gap: var(--spacing-sm); }
+
+    /* CONTENT GRID */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--spacing-2xl);
+      align-items: center;
+    }
+    @media (min-width: 768px) {
+      .content-grid { grid-template-columns: 7fr 5fr; } /* Chart 7/12, Breakdown 5/12 */
+    }
+
+    /* CHART WRAPPER */
+    .chart-wrapper {
+      position: relative;
+      height: 320px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .center-content {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .center-label {
+      font-size: 10px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-tertiary);
+    }
+
+    .center-value {
+      font-size: var(--font-size-3xl);
+      font-weight: 900;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    /* BREAKDOWN PANEL */
+    .breakdown-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+    }
+
+    .panel-title {
+      font-size: 10px;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: var(--text-label);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .breakdown-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-xs);
+      max-height: 300px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .breakdown-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-radius: var(--ui-border-radius);
+      border: 1px solid var(--border-secondary);
+      background: var(--bg-ternary);
+      transition: background 0.2s;
+    }
+    .breakdown-item:hover { background: var(--component-bg-hover); }
+
+    .item-left { display: flex; align-items: center; gap: var(--spacing-sm); }
+    
+    .dot { width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 4px rgba(0,0,0,0.1); }
+    
+    .item-name {
+      font-size: var(--font-size-xs);
+      font-weight: bold;
+      color: var(--text-secondary);
+      max-width: 100px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color 0.2s;
+    }
+    .breakdown-item:hover .item-name { color: var(--text-primary); }
+
+    .item-right { text-align: right; }
+    
+    .item-value {
+      font-size: var(--font-size-xs);
+      font-weight: bold;
+      color: var(--text-primary);
+      margin: 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .item-share {
+      font-size: 9px;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: var(--accent-primary);
+      opacity: 0.8;
+      margin: 0;
+    }
+
+    /* INSIGHT BOX */
+    .insight-box {
+      margin-top: var(--spacing-lg);
+      padding: var(--spacing-md);
+      border-radius: var(--ui-border-radius-lg);
+      border: 1px dashed var(--accent-secondary);
+      background: var(--accent-focus); /* Low opacity accent bg */
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      position: relative;
+      z-index: 10;
+    }
+
+    .insight-icon-box {
+      padding: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      color: var(--accent-primary);
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .insight-text {
+      font-size: var(--font-size-xs);
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin: 0;
+    }
+    .highlight { font-weight: bold; color: var(--text-primary); }
+
+    /* LOADER */
+    .loader-container {
+      height: 320px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-md);
+    }
+    .loader-text {
+      font-size: var(--font-size-xs);
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-tertiary);
+    }
+
+    /* SCROLLBAR UTILS */
     .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-    .custom-scrollbar::-webkit-scrollbar-track {   background: var(--bg-secondary); }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
-    :host ::ng-deep .p-chart canvas {
-      max-height: 320px; /* Ensure chart doesn't overflow */
-    }
+    .custom-scrollbar::-webkit-scrollbar-track { background: var(--bg-ternary); }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
   `]
 })
 export class SalesDistributionChartComponent implements OnInit {
@@ -117,31 +347,38 @@ export class SalesDistributionChartComponent implements OnInit {
   loading = signal<boolean>(true);
   chartOptions: any;
 
-  // Computed Total Revenue for Center Text
+  // Cache document style for theme variable reading
+  private documentStyle = getComputedStyle(document.documentElement);
+
+  // Computed Total Revenue
   totalRevenue = computed(() => {
     const data = this.chartData();
     if (!data) return 0;
     return data.datasets[0].data.reduce((acc: number, val: number) => acc + val, 0);
   });
 
-  constructor(private analyticsService: AdminAnalyticsService) {
-    this.initOptions();
-  }
+  constructor(private analyticsService: AdminAnalyticsService) {}
 
   ngOnInit() {
+    this.initOptions(); // Init first for colors
     this.loadDistribution();
   }
 
   private initOptions() {
+    // Read theme colors
+    const tooltipBg = this.documentStyle.getPropertyValue('--bg-ternary').trim();
+    const tooltipText = this.documentStyle.getPropertyValue('--text-primary').trim();
+    const borderColor = this.documentStyle.getPropertyValue('--border-primary').trim();
+
     this.chartOptions = {
-      cutout: '75%', // Thinner ring for modern look
+      cutout: '75%',
       plugins: {
         legend: { display: false }, 
         tooltip: {
-          backgroundColor: 'rgba(15, 23, 42, 0.95)',
-          titleColor: '#fff',
-          bodyColor: '#cbd5e1',
-          borderColor: 'rgba(255,255,255,0.1)',
+          backgroundColor: tooltipBg,
+          titleColor: tooltipText,
+          bodyColor: this.documentStyle.getPropertyValue('--text-secondary').trim(),
+          borderColor: borderColor,
           borderWidth: 1,
           padding: 12,
           cornerRadius: 8,
@@ -165,13 +402,11 @@ export class SalesDistributionChartComponent implements OnInit {
         duration: 1000,
         easing: 'easeOutQuart'
       },
-      layout: {
-        padding: 20
-      },
+      layout: { padding: 20 },
       elements: {
         arc: {
-          borderWidth: 0, // Remove borders for cleaner look
-          hoverOffset: 15 // Pop out effect on hover
+          borderWidth: 0, 
+          hoverOffset: 15
         }
       }
     };
@@ -179,7 +414,10 @@ export class SalesDistributionChartComponent implements OnInit {
 
   loadDistribution() {
     this.loading.set(true);
-    // Simulated delay for UI feel
+    // Refresh theme styles in case of switch
+    this.documentStyle = getComputedStyle(document.documentElement);
+    this.initOptions();
+
     setTimeout(() => {
         this.analyticsService.getSalesDistribution().subscribe({
         next: (res) => {
@@ -194,180 +432,24 @@ export class SalesDistributionChartComponent implements OnInit {
   }
 
   private processData(data: any) {
-    // Custom vibrant palette for glassmorphism
-    const modernColors = [
-        '#6366f1', // Indigo
-        '#ec4899', // Pink
-        '#f59e0b', // Amber
-        '#10b981', // Emerald
-        '#06b6d4', // Cyan
-        '#8b5cf6'  // Violet
+    // Dynamic Theme Colors
+    const colors = [
+        this.documentStyle.getPropertyValue('--accent-primary').trim(), // Indigo
+        this.documentStyle.getPropertyValue('--color-success').trim(), // Emerald
+        this.documentStyle.getPropertyValue('--color-warning').trim(), // Amber
+        this.documentStyle.getPropertyValue('--color-error').trim(),   // Rose/Pink
+        this.documentStyle.getPropertyValue('--color-info').trim(),    // Cyan
+        '#8b5cf6'  // Violet (Static fallback for 6th item)
     ];
 
     this.chartData.set({
         labels: data.labels,
         datasets: [{
             data: data.datasets[0].data,
-            backgroundColor: modernColors,
-            hoverBackgroundColor: modernColors, // Keep same color on hover, let offset handle visual feedback
+            backgroundColor: colors,
+            hoverBackgroundColor: colors,
             borderWidth: 0
         }]
     });
   }
 }
-// import { Component, OnInit, signal, computed } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { ChartModule } from 'primeng/chart';
-// import { ProgressSpinnerModule } from 'primeng/progressspinner';
-// import { ButtonModule } from 'primeng/button';
-// import { AdminAnalyticsService } from '../admin-analytics.service';
-
-// @Component({
-//   selector: 'app-sales-distribution-chart',
-//   standalone: true,
-//   imports: [CommonModule, ChartModule, ProgressSpinnerModule, ButtonModule],
-//   template: `
-//     <div class="p-4 md:p-6 transition-colors duration-300" 
-//          [style.background]="'var(--theme-bg-primary)'"
-//          [style.font-family]="'var(--font-body)'">
-
-//       <div class="mb-6 flex justify-between items-center">
-//         <div>
-//           <h2 class="font-bold tracking-tight mb-1" 
-//               [style.color]="'var(--theme-text-primary)'"
-//               [style.font-family]="'var(--font-heading)'"
-//               [style.font-size]="'var(--font-size-xl)'">Sales Distribution</h2>
-//           <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'" class="uppercase font-bold tracking-widest">
-//             Revenue share by category and segmentation
-//           </p>
-//         </div>
-//         <div class="flex gap-2">
-//            <p-button icon="pi pi-filter" [text]="true" severity="secondary" size="small"></p-button>
-//            <p-button icon="pi pi-refresh" [text]="true" severity="info" size="small" (onClick)="loadDistribution()"></p-button>
-//         </div>
-//       </div>
-
-//       <div class="p-6 border relative transition-all" 
-//            [style.background]="'var(--theme-bg-secondary)'" 
-//            [style.border-color]="'var(--theme-border-primary)'" 
-//            [style.border-radius]="'var(--ui-border-radius-xl)'">
-        
-//         <ng-container *ngIf="!loading(); else loader">
-//           <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-            
-//             <div class="md:col-span-7 relative flex justify-center items-center">
-//               <div class="h-[300px] w-full">
-//                 <p-chart type="doughnut" [data]="chartData()" [options]="chartOptions" height="100%"></p-chart>
-//               </div>
-              
-//               <div class="absolute flex flex-col items-center justify-center text-center mt-[-10px]">
-//                  <span [style.color]="'var(--theme-text-label)'" class="text-[10px] font-bold uppercase tracking-tighter">Total Volume</span>
-//                  <span class="text-2xl font-black text-white tabular-nums">₹{{ totalRevenue() | number }}</span>
-//               </div>
-//             </div>
-
-//             <div class="md:col-span-5 space-y-4">
-//                <h4 class="font-bold uppercase text-[10px] mb-4" [style.color]="'var(--theme-text-label)'">Distribution Breakdown</h4>
-               
-//                @for (label of chartData()?.labels; track label; let i = $index) {
-//                  <div class="flex items-center justify-between p-3 border transition-colors hover:bg-white/5"
-//                       [style.background]="'var(--theme-bg-ternary)'"
-//                       [style.border-color]="'var(--theme-border-secondary)'"
-//                       [style.border-radius]="'var(--ui-border-radius-lg)'">
-//                     <div class="flex items-center gap-3">
-//                       <div class="w-3 h-3 rounded-full" [style.background]="chartData()?.datasets[0].backgroundColor[i]"></div>
-//                       <span class="font-bold text-white text-xs truncate w-24">{{ label }}</span>
-//                     </div>
-//                     <div class="text-right">
-//                        <p class="font-bold tabular-nums text-white text-xs">₹{{ chartData()?.datasets[0].data[i] | number }}</p>
-//                        <p class="text-[9px] font-bold opacity-50 uppercase" [style.color]="'var(--theme-text-label)'">
-//                          {{ (chartData()?.datasets[0].data[i] / totalRevenue() * 100) | number:'1.0-1' }}% Share
-//                        </p>
-//                     </div>
-//                  </div>
-//                }
-//             </div>
-//           </div>
-//         </ng-container>
-
-//         <ng-template #loader>
-//           <div class="h-[300px] flex flex-col items-center justify-center gap-3">
-//             <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-10 h-10"></p-progressSpinner>
-//             <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase tracking-widest">Slicing Sales Data...</p>
-//           </div>
-//         </ng-template>
-//       </div>
-
-//       <div class="mt-6 p-4 border border-dashed rounded-lg flex items-center gap-4"
-//            [style.border-color]="'var(--theme-border-secondary)'"
-//            [style.background]="'rgba(139, 92, 246, 0.03)'">
-//          <i class="pi pi-chart-pie text-indigo-400"></i>
-//          <p [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">
-//            The <strong>{{ chartData()?.labels[0] }}</strong> segment represents the majority of your current cycle revenue. 
-//            Consider enriching customer profiles to move these transactions into identified categories.
-//          </p>
-//       </div>
-//     </div>
-//   `,
-//   styles: [`
-//     :host ::ng-deep .p-chart {
-//       display: flex;
-//       justify-content: center;
-//       align-items: center;
-//     }
-//   `]
-// })
-// export class SalesDistributionChartComponent implements OnInit {
-//   chartData = signal<any>(null);
-//   loading = signal<boolean>(true);
-//   chartOptions: any;
-
-//   // Computed: Sum of all data points in the first dataset
-//   totalRevenue = computed(() => {
-//     const data = this.chartData();
-//     if (!data) return 0;
-//     return data.datasets[0].data.reduce((acc: number, val: number) => acc + val, 0);
-//   });
-
-//   constructor(private analyticsService: AdminAnalyticsService) {
-//     this.initOptions();
-//   }
-
-//   ngOnInit() {
-//     this.loadDistribution();
-//   }
-
-//   private initOptions() {
-//     this.chartOptions = {
-//       cutout: '75%', // Creates the doughnut effect
-//       plugins: {
-//         legend: { display: false }, // Using custom legend in HTML
-//         tooltip: {
-//           backgroundColor: '#0f172a',
-//           padding: 12,
-//           cornerRadius: 8,
-//           bodyFont: { size: 12, weight: 'bold' },
-//           callbacks: {
-//             label: (context: any) => {
-//               return ` ₹${context.raw.toLocaleString()}`;
-//             }
-//           }
-//         }
-//       },
-//       maintainAspectRatio: false
-//     };
-//   }
-
-//   loadDistribution() {
-//     this.loading.set(true);
-//     this.analyticsService.getSalesDistribution().subscribe({
-//       next: (res) => {
-//         if (res.status === 'success') {
-//           this.chartData.set(res.data);
-//         }
-//         this.loading.set(false);
-//       },
-//       error: () => this.loading.set(false)
-//     });
-//   }
-// }
