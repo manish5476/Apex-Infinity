@@ -1884,6 +1884,206 @@
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
 }
+/* ==========================================================================
+   GLOBAL COMPONENT: BUTTON (p-button)
+   Design System: Refined Compact
+   Context: Actions, Form submissions, Toolbars
+   ========================================================================== */
+
+/* 1. ROOT CONTAINER (The Button) */
+.p-button {
+  /* Layout & Alignment */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm); /* Space between icon and label */
+  position: relative;
+  
+  /* Sizing - Matches Inputs Exactly */
+  padding: var(--spacing-sm) var(--spacing-lg); /* Compact vertical, wider horizontal */
+  
+  /* Typography */
+  font-family: var(--font-body);
+  font-size: var(--font-size-base); /* 13px */
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  
+  /* Shape */
+  border-radius: var(--ui-border-radius);
+  border: 1px solid transparent; /* Prepare for border variants */
+  
+  /* Motion */
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  user-select: none;
+  overflow: hidden;
+
+  /* --- DEFAULT STATE (Primary) --- */
+  background: var(--accent-primary);
+  color: #ffffff;
+  border-color: var(--accent-primary);
+
+  /* Hover */
+  &:not(:disabled):hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* Active / Click */
+  &:not(:disabled):active {
+    background: var(--accent-focus);
+    border-color: var(--accent-focus);
+    transform: translateY(1px); /* Subtle press effect */
+  }
+
+  /* Focus */
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+    z-index: 1; /* Bring above neighbors */
+  }
+
+  /* Disabled */
+  &:disabled {
+    opacity: var(--state-disabled-opacity);
+    cursor: default;
+    background: var(--bg-ternary);
+    color: var(--text-disabled);
+    border-color: transparent;
+  }
+}
+
+/* 2. LABEL ELEMENT */
+.p-button-label {
+  flex: 1 1 auto;
+  font-weight: inherit;
+  /* Prevent label from breaking layout */
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* 3. ICON ELEMENT */
+.p-button-icon {
+  font-size: 1.1em; /* Slightly larger than text for visual balance */
+  line-height: inherit;
+}
+
+/* 4. LOADING STATE */
+.p-button-loading-icon {
+  font-size: 1em;
+  margin-right: var(--spacing-sm);
+}
+
+.p-button-loading-label-only .p-button-loading-icon {
+  margin-right: 0;
+}
+
+/* ==========================================================================
+   VARIANTS (Common PrimeNG Types)
+   ========================================================================== */
+
+/* VARIANT: OUTLINED (Ghost / Secondary Action) */
+.p-button.p-button-outlined {
+  background-color: transparent;
+  color: var(--accent-primary);
+  border: 1px solid var(--border-primary); /* Subtle border default */
+
+  &:not(:disabled):hover {
+    background: var(--component-bg-hover);
+    color: var(--accent-hover);
+    border-color: var(--accent-primary);
+  }
+}
+
+/* VARIANT: TEXT ONLY (Tertiary / Link) */
+.p-button.p-button-text {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--text-secondary); /* Less prominent */
+
+  &:not(:disabled):hover {
+    background: var(--component-bg-hover);
+    color: var(--text-primary);
+  }
+}
+
+/* VARIANT: ROUNDED (Pill shape) */
+.p-button.p-button-rounded {
+  border-radius: 2rem;
+  padding-left: var(--spacing-xl);
+  padding-right: var(--spacing-xl);
+}
+
+/* VARIANT: ICON ONLY (Square) */
+.p-button.p-button-icon-only {
+  width: 2.5rem; /* Force square ratio */
+  padding: var(--spacing-sm);
+  justify-content: center;
+  
+  .p-button-label {
+    display: none; /* Hide label structure */
+    width: 0;
+    flex: 0 0 auto;
+  }
+  
+  /* Fix alignment for icon only */
+  .p-button-icon {
+    margin: 0; 
+  }
+  
+  &.p-button-rounded {
+    border-radius: 50%; /* Perfect circle */
+  }
+}
+
+/* VARIANT: SIZES (Small/Large overrides) */
+.p-button.p-button-sm {
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-xs) var(--spacing-md);
+}
+
+.p-button.p-button-lg {
+  font-size: var(--font-size-md);
+  padding: var(--spacing-md) var(--spacing-xl);
+}
+
+/* VARIANT: SECONDARY (Gray) */
+.p-button.p-button-secondary {
+  background: var(--bg-ternary);
+  color: var(--text-primary);
+  border-color: var(--border-primary);
+
+  &:not(:disabled):hover {
+    background: var(--component-bg-hover);
+    border-color: var(--border-secondary);
+  }
+}
+
+/* VARIANT: DANGER (Error/Red) */
+.p-button.p-button-danger {
+  background: var(--color-error);
+  border-color: var(--color-error);
+  color: #fff;
+
+  &:not(:disabled):hover {
+    background: var(--color-error-dark);
+    border-color: var(--color-error-dark);
+  }
+  
+  /* Danger Outlined */
+  &.p-button-outlined {
+    background: transparent;
+    color: var(--color-error);
+    border-color: var(--color-error);
+    
+    &:not(:disabled):hover {
+      background: var(--color-error-bg);
+      color: var(--color-error-dark);
+    }
+  }
+}
 // /* ==========================================================================
 //    PRIMENG V18+ "HYPER-SLEEK" OVERRIDES (Global)
 //    Strictly mapped to your Theme Tokens
