@@ -65,7 +65,7 @@ export class MainscreenHeader implements OnInit, OnDestroy {
   private notificationService = inject(NotificationService);
   private layout = inject(LayoutService);
   private destroy$ = new Subject<void>();
-
+textScale: number = 100;
   // State
   activePopoverTab: 'settings' | 'notifications' = 'settings';
   currentUser: any = null;
