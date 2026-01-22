@@ -246,7 +246,7 @@
 
 .bulk-scroll-wrapper {
     &::-webkit-scrollbar { width: 8px; }
-    &::-webkit-scrollbar-track { background: transparent; }
+    &::-webkit-scrollbar-track {   background: var(--bg-secondary); }
     &::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 4px; }
 }
 

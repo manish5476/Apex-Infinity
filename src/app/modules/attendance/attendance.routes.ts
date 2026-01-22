@@ -1,3 +1,4 @@
+import { AttendancePunchingComponent } from './attendance-punching.component/attendance-punching.component';
 // attendance.routes.ts
 import { Routes } from '@angular/router';
 
@@ -60,6 +61,13 @@ export const ATTENDANCE_ROUTES: Routes = [
     loadComponent: () =>
       import('./holiday-manager.component/holiday-manager.component')
         .then(m => m.HolidayManagerComponent),
+    title: 'Holiday Management'
+  },
+  {
+    path: 'punching',
+    loadComponent: () =>
+      import('./attendance-punching.component/attendance-punching.component')
+        .then(m => m.AttendancePunchingComponent),
     title: 'Holiday Management'
   },
 

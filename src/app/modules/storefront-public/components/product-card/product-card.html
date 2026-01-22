@@ -1,0 +1,168 @@
+<div class="card-root group" (click)="openQuickView($event)" tabindex="0">
+  
+  <div class="image-wrapper">
+    <img [src]="displayImage" [alt]="product.name" (error)="onImageError()" class="base-image" />
+    <div class="overlay-gradient"></div>
+  </div>
+
+  <div class="info-float">
+    <span class="brand-badge">{{ product.brand || 'Collection' }}</span>
+    <h3 class="product-name">{{ product.name }}</h3>
+    <div class="price-row">
+      <span class="price">
+        {{ product.price?.discounted || product.price?.original | currency: product.price?.currency || 'USD' }}
+      </span>
+    </div>
+  </div>
+
+  <button class="quick-look-btn">
+    <i class="pi pi-eye"></i> Quick Look
+  </button>
+</div>
+
+<p-dialog 
+  [(visible)]="showModal" 
+  [modal]="true" 
+  appendTo="body" 
+  [dismissableMask]="true"
+  [showHeader]="false"
+  styleClass="glass-dialog"
+  [style]="{ width: '100%', maxWidth: '1000px', margin: '16px' }">
+
+  <div class="modal-glass-panel">
+      
+    <button class="close-btn" (click)="closeQuickView($event)">
+      <i class="pi pi-times"></i>
+    </button>
+
+    <div class="modal-image-col">
+      <img [src]="displayImage" [alt]="product.name" class="modal-img" />
+      
+      <div class="badge-overlay">
+        @if ((product.stock?.stockLevel ?? 0) > 0) {
+          <span class="stock-pill in-stock">In Stock</span>
+        } @else {
+          <span class="stock-pill out-stock">Sold Out</span>
+        }
+      </div>
+    </div>
+
+    <div class="modal-content-col">
+      
+      <div class="content-header">
+        <p class="modal-brand">{{ product.brand || 'Exclusive' }}</p>
+        <h2 class="modal-title">{{ product.name }}</h2>
+        
+        <div class="rating-row">
+          <i class="pi pi-star-fill text-yellow-400"></i>
+          <span>{{ product.rating || '4.8' }} (120 reviews)</span>
+        </div>
+      </div>
+
+      <div class="modal-body-scroll">
+        <p class="modal-desc">
+          {{ product.description || 'Experience the finest quality with our signature collection. Meticulously crafted for those who appreciate detail and design excellence.' }}
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <span class="big-price">
+          {{ product.price?.discounted || product.price?.original | currency: product.price?.currency || 'USD' }}
+        </span>
+        
+        <div class="action-dock">
+          <button class="add-cart-btn" (click)="addToCart.emit(product)">
+            Add to Cart
+          </button>
+          <button class="view-full-btn" (click)="goToFullDetails()">
+            View Details <i class="pi pi-arrow-right ml-1 text-xs"></i>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</p-dialog>
+
+<!-- <div class="card-root group" (click)="openQuickView($event)" tabindex="0">
+  
+  <div class="image-wrapper">
+    <img [src]="displayImage" [alt]="product.name" (error)="onImageError()" class="base-image" />
+    <div class="overlay-gradient"></div>
+  </div>
+
+  <div class="info-float">
+    <span class="brand-badge">{{ product.brand || 'Collection' }}</span>
+    <h3 class="product-name">{{ product.name }}</h3>
+    <div class="price-row">
+      <span class="price">
+        {{ product.price?.discounted || product.price?.original | currency: product.price?.currency || 'USD' }}
+      </span>
+    </div>
+  </div>
+
+  <button class="quick-look-btn">
+    <i class="pi pi-eye"></i> Quick Look
+  </button>
+</div>
+
+@if (showModal()) {
+  <div class="modal-backdrop" @modalFade (click)="closeQuickView($event)">
+    
+    <div class="modal-glass-panel" @modalScale (click)="$event.stopPropagation()">
+      
+      <button class="close-btn" (click)="closeQuickView($event)">
+        <i class="pi pi-times"></i>
+      </button>
+  
+      <div class="modal-image-col">
+        <img [src]="displayImage" [alt]="product.name" class="modal-img" />
+        
+        <div class="badge-overlay">
+          @if ((product.stock?.stockLevel ?? 0) > 0) {
+            <span class="stock-pill in-stock">In Stock</span>
+          } @else {
+            <span class="stock-pill out-stock">Sold Out</span>
+          }
+        </div>
+      </div>
+  
+      <div class="modal-content-col">
+        
+        <div class="content-header">
+          <p class="modal-brand">{{ product.brand || 'Exclusive' }}</p>
+          <h2 class="modal-title">{{ product.name }}</h2>
+          
+          <div class="rating-row">
+            <i class="pi pi-star-fill text-yellow-400"></i>
+            <span>{{ product.rating || '4.8' }} (120 reviews)</span>
+          </div>
+        </div>
+  
+        <div class="modal-body-scroll">
+          <p class="modal-desc">
+            {{ product.description || 'Experience the finest quality with our signature collection. Meticulously crafted for those who appreciate detail and design excellence. This product combines modern aesthetics with premium durability.' }}
+          </p>
+        </div>
+  
+        <div class="modal-footer">
+          <span class="big-price">
+            {{ product.price?.discounted || product.price?.original | currency: product.price?.currency || 'USD' }}
+          </span>
+          
+          <div class="action-dock">
+            <button class="add-cart-btn" (click)="addToCart.emit(product)">
+              Add to Cart
+            </button>
+            <button class="view-full-btn" (click)="goToFullDetails()">
+              View Details <i class="pi pi-arrow-right ml-1 text-xs"></i>
+            </button>
+          </div>
+        </div>
+  
+      </div>
+  
+    </div>
+  </div>
+} -->

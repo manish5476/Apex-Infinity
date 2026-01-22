@@ -158,7 +158,7 @@ $font-mono: var(--font-mono);
   padding-top: $spacing-sm;
   
   ::ng-deep .p-tablist {
-    background: transparent;
+      background: var(--bg-secondary);
     border: none;
   }
 }
@@ -491,7 +491,7 @@ $font-mono: var(--font-mono);
 
   // Buttons
   .glass-btn {
-    background: transparent;
+      background: var(--bg-secondary);
     border: var(--ui-border-width) solid $border-secondary;
     color: $text-secondary;
     border-radius: $radius-base;
@@ -524,7 +524,7 @@ $font-mono: var(--font-mono);
     }
     
     .p-tab {
-      background: transparent;
+        background: var(--bg-secondary);
       border: none;
       color: $text-secondary;
       font-weight: var(--font-weight-medium);

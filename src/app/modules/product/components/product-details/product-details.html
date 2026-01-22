@@ -1,446 +1,212 @@
 <div class="page-container animate-fadeIn">
 
   @if (loading()) {
-    <div class="loading-state">
-      <div class="skeleton-header">
-        <div class="left-group">
-          <p-skeleton width="6rem" height="6rem" styleClass="rounded-lg"></p-skeleton>
-          <div class="text-group">
-            <p-skeleton width="16rem" height="2rem"></p-skeleton>
-            <p-skeleton width="8rem" height="1rem"></p-skeleton>
-          </div>
+  <div class="loading-state">
+    <div class="skeleton-header">
+      <div class="left-group">
+        <p-skeleton width="6rem" height="6rem" styleClass="rounded-lg"></p-skeleton>
+        <div class="text-group">
+          <p-skeleton width="16rem" height="2rem" styleClass="mb-2"></p-skeleton>
+          <p-skeleton width="8rem" height="1rem"></p-skeleton>
         </div>
       </div>
-      <div class="layout-grid">
-        <aside class="skeleton-sidebar">
-          <p-skeleton height="400px" styleClass="w-full"></p-skeleton>
-        </aside>
-        <main class="skeleton-main">
-          <div class="metrics-row">
-            <p-skeleton height="100px" styleClass="w-full"></p-skeleton>
-            <p-skeleton height="100px" styleClass="w-full"></p-skeleton>
-            <p-skeleton height="100px" styleClass="w-full"></p-skeleton>
-          </div>
-          <p-skeleton height="300px" styleClass="w-full"></p-skeleton>
-        </main>
-      </div>
     </div>
+    <div class="layout-grid">
+      <aside class="skeleton-sidebar">
+        <p-skeleton height="400px" styleClass="w-full"></p-skeleton>
+      </aside>
+      <main class="skeleton-main">
+        <div class="metrics-row">
+          <p-skeleton height="100px" styleClass="w-full"></p-skeleton>
+          <p-skeleton height="100px" styleClass="w-full"></p-skeleton>
+          <p-skeleton height="100px" styleClass="w-full"></p-skeleton>
+        </div>
+        <p-skeleton height="300px" styleClass="w-full"></p-skeleton>
+      </main>
+    </div>
+  </div>
   }
 
   @else if (isError()) {
-    <div class="error-state">
-      <div class="error-icon"><i class="pi pi-box"></i></div>
-      <h2>Product Not Found</h2>
-      <p>The product you requested does not exist or has been removed.</p>
-      <button pButton label="Back to Inventory" icon="pi pi-arrow-left" class="p-button-outlined" routerLink="/products"></button>
-    </div>
+  <div class="error-state">
+    <div class="error-icon"><i class="pi pi-box"></i></div>
+    <h2>Product Not Found</h2>
+    <p>The product you requested does not exist or has been removed.</p>
+    <button pButton label="Back to Inventory" icon="pi pi-arrow-left" class="p-button-outlined"
+      routerLink="/product"></button>
+  </div>
   }
 
   @else if (product(); as p) {
 
-    <header class="dashboard-header">
-      <div class="header-left">
-        <button pButton icon="pi pi-arrow-left" class="p-button-text p-button-rounded back-btn" routerLink="/inventory"></button>
-        
-        <div class="identity-group">
-          <div class="name-row">
-            <h1>{{ p.name }}</h1>
-            <!-- [severity]="p.isActive ? 'success' : 'secondary'" -->
-            <p-tag [value]="p.isActive ? 'Active' : 'Inactive'"  styleClass="status-tag"></p-tag>
-            @if(p.totalStock < 10 && p.isActive) {
-              <!-- severity="warning" -->
-              <p-tag value="Low Stock"  icon="pi pi-exclamation-triangle"></p-tag>
-            }
+  <header class="dashboard-header">
+    <div class="header-left">
+      <button pButton icon="pi pi-arrow-left" class="back-btn" routerLink="/product"></button>
+
+      <div class="identity-group">
+        <div class="name-row">
+          <h1>{{ p.name }}</h1>
+
+          <div class="status-badge" [class.active]="p.isActive" [class.inactive]="!p.isActive">
+            {{ p.isActive ? 'Active' : 'Inactive' }}
           </div>
-          <div class="meta-row">
-            <span class="sku-badge">
-              <i class="pi pi-barcode"></i> SKU: {{ p.sku | uppercase }}
-            </span>
-            <span class="category-badge">{{ p.category || 'Uncategorized' }}</span>
-            @if (p.brand) { <span class="brand-badge">{{ p.brand }}</span> }
-          </div>
+
+          @if(p.totalStock < 10 && p.isActive) { <div class="status-badge warning">
+            <i class="pi pi-exclamation-triangle"></i> Low Stock
         </div>
+        }
       </div>
-
-      <div class="header-actions">
-        <button pButton label="Stock Adjustment" icon="pi pi-box" class="p-button-outlined p-button-secondary btn-sm"
-          (click)="openStockAdjustment()"></button>
-
-        <button pButton label="Edit" icon="pi pi-pencil" class="p-button-outlined p-button-secondary btn-sm"
-          [routerLink]="['/product', p._id, 'edit']"></button>
-
-        <button pButton icon="pi pi-ellipsis-v" class="p-button-text p-button-secondary btn-sm icon-only"></button>
+      <div class="meta-row">
+        <span class="sku-badge">
+          <i class="pi pi-barcode"></i> {{ p.sku | uppercase }}
+        </span>
+        <span class="meta-pill">{{ p.category || 'Uncategorized' }}</span>
+        @if (p.brand) { <span class="meta-pill">{{ p.brand }}</span> }
       </div>
-    </header>
-
-    <div class="layout-grid">
-
-      <aside class="sidebar-column">
-        
-        <div class="glass-card image-card">
-          <div class="image-stage">
-            @if (p.images && p.images.length > 0) {
-              <p-carousel [value]="p.images" [numVisible]="1" [numScroll]="1" [circular]="p.images.length > 1" 
-                styleClass="product-carousel">
-                <ng-template let-img pTemplate="item">
-                  <div class="image-wrapper">
-                    <img [src]="img" [appImageViewer]="img" class="main-img" alt="Product Image">
-                  </div>
-                </ng-template>
-              </p-carousel>
-            } @else {
-              <div class="placeholder-state">
-                <i class="pi pi-image"></i>
-                <span>No Image Available</span>
-              </div>
-            }
-
-            <button class="upload-fab" (click)="fileInput.click()" pTooltip="Upload Images" tooltipPosition="left">
-              <i class="pi pi-camera"></i>
-            </button>
-            <input #fileInput type="file" multiple accept="image/*" style="display:none" (change)="onFileSelected($event)">
-          </div>
-        </div>
-
-        <div class="glass-card specs-card">
-          <div class="card-header">
-            <i class="pi pi-sliders-h"></i> <span>Specifications</span>
-          </div>
-          <div class="card-body">
-            <div class="spec-row">
-              <span class="label">Unit</span>
-              <span class="value">{{ p.unit || 'Pieces' }}</span>
-            </div>
-            <div class="spec-row">
-              <span class="label">Tax Rate</span>
-              <span class="value">{{ p.taxRate || 0 }}% <small class="text-muted">({{ p.isTaxInclusive ? 'Inc' : 'Exc' }})</small></span>
-            </div>
-            <div class="spec-row">
-              <span class="label">HSN Code</span>
-              <span class="value font-mono">{{ p.hsnCode || '—' }}</span>
-            </div>
-            <div class="spec-row">
-              <span class="label">Created</span>
-              <span class="value">{{ formatDate(p.createdAt) }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="glass-card tags-card">
-          <div class="card-header">
-            <i class="pi pi-tags"></i> <span>Tags</span>
-          </div>
-          <div class="card-body">
-            <div class="tags-container">
-              @for (tag of getFilteredTags(); track $index) {
-                <span class="tag-chip">{{ tag }}</span>
-              } @empty {
-                <span class="text-muted text-sm italic">No tags assigned.</span>
-              }
-            </div>
-          </div>
-        </div>
-
-      </aside>
-
-      <main class="main-column">
-
-        <section class="metrics-grid">
-          
-          <div class="metric-card price">
-            <div class="icon-box"><i class="pi pi-tag"></i></div>
-            <div class="data-box">
-              <label>Selling Price</label>
-              <span class="value">{{ formatCurrency(p.sellingPrice) }}</span>
-            </div>
-          </div>
-
-          <div class="metric-card cost">
-            <div class="icon-box"><i class="pi pi-money-bill"></i></div>
-            <div class="data-box">
-              <label>Purchase Cost</label>
-              <span class="value">{{ formatCurrency(p.purchasePrice) }}</span>
-            </div>
-          </div>
-
-          <div class="metric-card stock" [class.low]="p.totalStock < 10">
-            <div class="icon-box"><i class="pi pi-box"></i></div>
-            <div class="data-box">
-              <label>Total Stock</label>
-              <span class="value">{{ p.totalStock }}</span>
-            </div>
-          </div>
-
-          <div class="metric-card profit">
-            <div class="icon-box"><i class="pi pi-chart-line"></i></div>
-            <div class="data-box">
-              <label>Est. Margin</label>
-              <span class="value highlight">{{ calculateMargin(p) }}%</span>
-            </div>
-          </div>
-
-        </section>
-
-        <section class="glass-card description-panel">
-          <div class="card-header">
-            <i class="pi pi-align-left"></i> <span>Description</span>
-          </div>
-          <div class="card-body">
-            <p class="desc-text">{{ p.description || 'No description provided.' }}</p>
-          </div>
-        </section>
-
-        <section class="glass-card inventory-panel">
-          <div class="card-header">
-            <i class="pi pi-sitemap"></i> <span>Branch Inventory</span>
-          </div>
-          
-          <div class="table-wrapper">
-            <p-table [value]="p.inventory" styleClass="p-datatable-sm glass-table">
-              <ng-template pTemplate="header">
-                <tr>
-                  <th>Branch</th>
-                  <th class="text-right">Current Stock</th>
-                  <th class="text-right">Re-order Level</th>
-                  <th class="text-center">Status</th>
-                </tr>
-              </ng-template>
-              <ng-template pTemplate="body" let-inv>
-                <tr>
-                  <td>
-                    <div class="font-bold">{{ getBranchName(inv.branchId) }}</div>
-                  </td>
-                  <td class="text-right font-mono font-bold">{{ inv.quantity }}</td>
-                  <td class="text-right text-muted">{{ inv.reorderLevel }}</td>
-                  <td class="text-center">
-                    @if (inv.quantity <= inv.reorderLevel) {
-                      <i class="pi pi-exclamation-circle text-warning" pTooltip="Low Stock"></i>
-                    } @else {
-                      <i class="pi pi-check-circle text-success"></i>
-                    }
-                  </td>
-                </tr>
-              </ng-template>
-              <ng-template pTemplate="emptymessage">
-                <tr>
-                  <td colspan="4" class="text-center p-4 text-muted">No inventory records found.</td>
-                </tr>
-              </ng-template>
-            </p-table>
-          </div>
-        </section>
-
-      </main>
     </div>
-  }
 </div>
-<!-- <div class="customer-page-container animate-fadeIn">
 
-  @if (product(); as p) {
-  <div class="themed-card product-details-card">
+<div class="header-actions">
+  <button pButton label="Stock Adjustment" icon="pi pi-box" class="p-button-outlined action-btn"
+    (click)="openStockAdjustment()"></button>
 
-    <div class="details-header">
-      <div class="header-left">
-        <p-button icon="pi pi-arrow-left" styleClass="p-button-text p-button-rounded p-button-secondary"
-          routerLink="/products">
-        </p-button>
+  <button pButton label="Edit" icon="pi pi-pencil" class="p-button-outlined action-btn"
+    [routerLink]="['/product', p._id, 'edit']"></button>
 
-        <div class="header-identity">
-          <div class="title-row">
-            <h2 class="product-title">{{ p.name }}</h2>
-            <p-tag [value]="p.isActive ? 'Active' : 'Inactive'" [severity]="p.isActive ? 'success' : 'danger'"
-              styleClass="status-tag">
-            </p-tag>
-          </div>
-          <div class="subtitle-row">
-            <span class="sku-badge"><i class="pi pi-hashtag"></i> {{ p.sku || 'No SKU' }}</span>
-            <span class="separator">•</span>
-            <span class="brand-text">{{ p.brand || 'No Brand' }}</span>
-          </div>
+  <button pButton [appProductAnalytics]="p._id" icon="pi pi-ellipsis-v" class="p-button-text icon-only"></button>
+</div>
+</header>
+
+<div class="layout-grid">
+
+  <aside class="sidebar-column">
+
+    <div class="glass-card image-card">
+      <div class="image-stage">
+        @if (p.images && p.images.length > 0) {
+        <p-carousel [value]="p.images" [numVisible]="1" [numScroll]="1" [circular]="p.images.length > 1"
+          styleClass="product-carousel">
+          <ng-template let-img pTemplate="item">
+            <div class="image-wrapper">
+              <img [src]="img" [appImageViewer]="img" class="main-img" alt="Product Image">
+            </div>
+          </ng-template>
+        </p-carousel>
+        } @else {
+        <div class="placeholder-state">
+          <i class="pi pi-image"></i>
+          <span>No Image Available</span>
+        </div>
+        }
+
+        <button class="upload-fab" (click)="fileInput.click()" pTooltip="Upload Images" tooltipPosition="left">
+          <i class="pi pi-camera"></i>
+        </button>
+        <input #fileInput type="file" multiple accept="image/*" style="display:none" (change)="onFileSelected($event)">
+      </div>
+    </div>
+
+    <div class="glass-card">
+      <div class="card-header">
+        <i class="pi pi-sliders-h"></i> <span>Specifications</span>
+      </div>
+      <div class="card-body">
+        <div class="spec-row">
+          <span class="label">Unit</span>
+          <span class="value">{{ p.unit || 'Pieces' }}</span>
+        </div>
+        <div class="spec-row">
+          <span class="label">Tax Rate</span>
+          <span class="value">{{ p.taxRate || 0 }}% <small>({{ p.isTaxInclusive ? 'Inc' : 'Exc' }})</small></span>
+        </div>
+        <div class="spec-row">
+          <span class="label">HSN Code</span>
+          <span class="value font-mono">{{ p.hsnCode || '—' }}</span>
+        </div>
+        <div class="spec-row">
+          <span class="label">Created</span>
+          <span class="value">{{ formatDate(p.createdAt) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass-card">
+      <div class="card-header">
+        <i class="pi pi-tags"></i> <span>Tags</span>
+      </div>
+      <div class="card-body">
+        <div class="tags-container">
+          @for (tag of getFilteredTags(); track $index) {
+          <span class="tag-chip">{{ tag }}</span>
+          } @empty {
+          <span class="no-data">No tags assigned.</span>
+          }
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <main class="main-column">
+
+    <section class="metrics-grid">
+
+      <div class="metric-card price">
+        <div class="icon-box"><i class="pi pi-tag"></i></div>
+        <div class="data-box">
+          <label>Selling Price</label>
+          <span class="value">{{ formatCurrency(p.sellingPrice) }}</span>
         </div>
       </div>
 
-      <div class="header-actions">
-        <p-button label="Edit Product" icon="pi pi-pencil" styleClass="p-button-outlined p-button-sm"
-          [routerLink]="['/product', p._id, 'edit']">
-        </p-button>
-        <p-button icon="pi pi-ellipsis-v" styleClass="p-button-text p-button-rounded p-button-secondary">
-        </p-button>
+      <div class="metric-card cost">
+        <div class="icon-box"><i class="pi pi-money-bill"></i></div>
+        <div class="data-box">
+          <label>Purchase Cost</label>
+          <span class="value">{{ formatCurrency(p.purchasePrice) }}</span>
+        </div>
       </div>
-    </div>
-    <div class="details-body">
-      <aside class="profile-sidebar animate-slideInUp">
-        <div class="product-image-wrapper">
-          <div class="product-image-container relative group">
 
-            @if (p.images && p.images.length > 0) {
-            <p-carousel [value]="p.images" [numVisible]="1" [numScroll]="1" [circular]="p.images.length > 1"
-              [showIndicators]="p.images.length > 1" [showNavigators]="p.images.length > 1"
-              styleClass="custom-carousel">
-
-              <ng-template let-img pTemplate="item">
-                <div class="image-slide-item">
-                  <img [src]="img" [appImageViewer]="img" alt="Product" class="product-image cursor-zoom-in" />
-                </div>
-              </ng-template>
-            </p-carousel>
-            } @else {
-            <div class="image-placeholder">
-              <i class="pi pi-image" style="font-size: 3rem; opacity: 0.3"></i>
-              <span>No Image</span>
-            </div>
-            }
-
-            <button pButton type="button" icon="pi pi-camera"
-              class="p-button-rounded p-button-secondary p-button-sm edit-btn" pTooltip="Add/Change Images"
-              tooltipPosition="left" (click)="fileInput.click(); $event.stopPropagation()">
-            </button>
-
-            <input #fileInput type="file" multiple accept="image/*" style="display: none"
-              (change)="onFileSelected($event)">
-          </div>
+      <div class="metric-card stock" [class.low]="p.totalStock < 10">
+        <div class="icon-box"><i class="pi pi-box"></i></div>
+        <div class="data-box">
+          <label>Total Stock</label>
+          <span class="value">{{ p.totalStock }}</span>
         </div>
+      </div>
 
-        <p-divider styleClass="w-full mb-4"></p-divider>
-
-        <div class="attributes-list">
-          <div class="attribute-item">
-            <div class="attr-icon"><i class="pi pi-truck"></i></div>
-            <div class="attr-data">
-              <label>Default Supplier</label>
-              <span>{{ p.defaultSupplierId?.companyName || 'None Assigned' }}</span>
-            </div>
-          </div>
-
-          <div class="attribute-item">
-            <div class="attr-icon"><i class="pi pi-folder"></i></div>
-            <div class="attr-data">
-              <label>Category</label>
-              <span>{{ p.category || 'Uncategorized' }}</span>
-            </div>
-          </div>
-
-          <div class="attribute-item">
-            <div class="attr-icon"><i class="pi pi-calendar"></i></div>
-            <div class="attr-data">
-              <label>Created On</label>
-              <span>{{ formatDate(p.createdAt) }}</span>
-            </div>
-          </div>
-
-          <div class="attribute-item">
-            <div class="attr-icon"><i class="pi pi-tags"></i></div>
-            <div class="attr-data">
-              <label>Tags</label>
-              <div class="tags-cloud">
-                @for (tag of p.tags; track $index) {
-                @if (tag && tag.trim()) {
-                <span class="mini-tag">{{tag}}</span>
-                }
-                } @empty {
-                <span class="text-muted text-xs">No Tags</span>
-                }
-              </div>
-            </div>
-          </div>
+      <div class="metric-card profit">
+        <div class="icon-box"><i class="pi pi-chart-line"></i></div>
+        <div class="data-box">
+          <label>Est. Margin</label>
+          <span class="value highlight">{{ calculateMargin(p) }}%</span>
         </div>
-      </aside>
-      <section class="main-details">
-        <div class="metrics-grid animate-slideInUp" style="animation-delay: 0.1s;">
-          <div class="metric-card primary-metric">
-            <div class="metric-content">
-              <label>Selling Price (MRP)</label>
-              <span class="value">{{ formatCurrency(p.sellingPrice) }}</span>
-            </div>
-            <div class="metric-icon">
-              <i class="pi pi-wallet"></i>
-            </div>
-          </div>
+      </div>
 
-          <div class="metric-card">
-            <div class="metric-content">
-              <label>Purchase Price</label>
-              <span class="value secondary">{{ formatCurrency(p.purchasePrice) }}</span>
-            </div>
-          </div>
+    </section>
 
-          <div class="metric-card">
-            <div class="metric-content">
-              <label>Tax Info</label>
-              <span class="value text-base">
-                {{ p.taxRate || 0 }}%
-                <small>({{ p.isTaxInclusive ? 'Inc.' : 'Exc.' }})</small>
-              </span>
-            </div>
-          </div>
+    <section class="glass-card">
+      <div class="card-header">
+        <i class="pi pi-align-left"></i> <span>Description</span>
+      </div>
+      <div class="card-body">
+        <p class="desc-text">{{ p.description || 'No description provided for this item.' }}</p>
+      </div>
+    </section>
 
-          <div class="metric-card">
-            <div class="metric-content">
-              <label>Total Stock</label>
-              <span class="value" [class.text-red-500]="(p.totalStock || 0) < 10">
-                {{ p.totalStock || 0 }}
-              </span>
-            </div>
-          </div>
-        </div>
+    <section class="glass-card inventory-panel">
+      <div class="card-header">
+        <i class="pi pi-sitemap"></i> <span>Branch Inventory</span>
+      </div>
 
-        <div class="content-section animate-slideInUp" style="animation-delay: 0.2s;">
-          <h4 class="section-heading"><i class="pi pi-align-left"></i> Description</h4>
-          <div class="description-box">
-            @if (p.description) {
-            <p>{{ p.description }}</p>
-            } @else {
-            <span class="text-placeholder">No description available for this product.</span>
-            }
-          </div>
-        </div>
+      <div class="grid-wrapper">
+        <app-ag-share-grid [columns]="inventoryColumns" [data]="inventoryData" [showActions]="false"
+          selectionMode="single" (gridEvent)="eventFromGrid($event)">
+        </app-ag-share-grid>
+      </div>
+    </section>
 
-        <div class="content-section animate-slideInUp" style="animation-delay: 0.3s;">
-          <div class="section-header-row">
-            <h4 class="section-heading"><i class="pi pi-box"></i> Branch Inventory</h4>
-            <p-button label="Adjust Stock" icon="pi pi-sort-alt" styleClass="p-button-text p-button-sm"></p-button>
-          </div>
-
-          <div class="table-wrapper">
-            <p-table [value]="p.inventory || []" styleClass="p-table-sm p-table-premium">
-              <ng-template pTemplate="header">
-                <tr>
-                  <th>Branch</th>
-                  <th class="text-right">Current Stock</th>
-                  <th class="text-right">Re-order Level</th>
-                  <th class="text-center">Status</th>
-                </tr>
-              </ng-template>
-              <ng-template pTemplate="body" let-item>
-                <tr>
-                  <td class="font-medium">{{ item.branchId?.name || 'N/A' }}</td>
-                  <td class="text-right font-bold">{{ item.quantity }}</td>
-                  <td class="text-right text-secondary">{{ item.reorderLevel }}</td>
-                  <td class="text-center">
-                    @if (item.quantity > item.reorderLevel) {
-                    <i class="pi pi-check-circle text-green-500"></i>
-                    }
-                    @if (item.quantity <= item.reorderLevel) { <i class="pi pi-exclamation-circle text-orange-500"></i>
-                      }
-                  </td>
-                </tr>
-              </ng-template>
-              <ng-template pTemplate="emptymessage">
-                <tr>
-                  <td colspan="4" class="text-center p-4 text-secondary">No inventory records found.</td>
-                </tr>
-              </ng-template>
-            </p-table>
-          </div>
-        </div>
-
-      </section>
-    </div>
-  </div>
-  } @else {
-  <div class="loading-state">
-    <i class="pi pi-spin pi-spinner"></i>
-    <p>Loading Product Details...</p>
-  </div>
-  }
-</div> -->
+  </main>
+</div>
+}
+</div>

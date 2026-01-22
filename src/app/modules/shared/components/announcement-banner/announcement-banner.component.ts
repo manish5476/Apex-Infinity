@@ -138,7 +138,7 @@ import { Subscription } from 'rxjs';
     }
 
     .close-btn {
-      background: transparent;
+        background: var(--bg-secondary);
       border: none;
       cursor: pointer;
       color: #94a3b8;

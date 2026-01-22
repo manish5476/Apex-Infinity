@@ -1,0 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Manrope:wght@400;700&display=swap');
+
+:host { display: block; font-family: 'Manrope', sans-serif; }
+
+.section-root {
+  background-color: white;
+}
+
+/* Optional: Add a subtle grid pattern if background is white */
+.section-root {
+  background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+  background-size: 20px 20px;
+} 

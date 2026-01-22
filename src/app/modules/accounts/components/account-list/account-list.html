@@ -1,43 +1,21 @@
-<p-table
-  [value]="accounts"
-  [loading]="loading"
-  dataKey="_id"
-  responsiveLayout="scroll"
->
-  <ng-template pTemplate="header">
-    <tr>
-      <th>Code</th>
-      <th>Name</th>
-      <th>Type</th>
-      <th class="text-right">Debit</th>
-      <th class="text-right">Credit</th>
-      <th class="text-right">Balance</th>
-      <th>Actions</th>
-    </tr>
-  </ng-template>
+<div class="list-page-container">
+  <div class="themed-card list-content-area">
+    
+    <div class="flex justify-between items-center mb-4 p-4 border-b border-gray-100">
+      <div>
+        <h2 class="text-xl font-bold text-gray-800">Chart of Accounts</h2>
+        <p class="text-sm text-gray-500">Manage financial ledgers and balances</p>
+      </div>
+      </div>
 
-  <ng-template pTemplate="body" let-a>
-    <tr>
-      <td>{{ a.code }}</td>
-      <td>{{ a.name }}</td>
-      <td class="text-capitalize">{{ a.type }}</td>
+    <div class="list-grid-wrapper h-[calc(100vh-220px)]">
+      <app-ag-share-grid 
+        [columns]="column" 
+        [data]="data" 
+        [showActions]="false"
+        (gridEvent)="handleGridEvent($event)">
+      </app-ag-share-grid>
+    </div>
 
-      <td class="text-right">
-        {{ a.debitTotal | number:'1.2-2' }}
-      </td>
-
-      <td class="text-right">
-        {{ a.creditTotal | number:'1.2-2' }}
-      </td>
-
-      <td class="text-right font-bold">
-        {{ a.balance | number:'1.2-2' }}
-      </td>
-
-      <td>
-        <button pButton icon="pi pi-pencil" class="p-button-text"></button>
-        <button pButton icon="pi pi-trash" class="p-button-text p-button-danger"></button>
-      </td>
-    </tr>
-  </ng-template>
-</p-table>
+  </div>
+</div>

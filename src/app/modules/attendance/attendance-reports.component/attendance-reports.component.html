@@ -4,50 +4,30 @@
   <div class="mb-6">
     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-gray-800">Attendance Reports</h1>
+        <h1 class="text-2xl font-bold " [style.color]="'var(--theme-text-primary)'">Attendance Reports</h1>
         <p class="text-gray-500">Analytics, insights, and detailed reports</p>
       </div>
 
       <div class="flex flex-wrap items-center gap-3">
         <div class="flex items-center gap-2">
           <label class="text-sm text-gray-600">From</label>
-          <input 
-            pInputText 
-            type="date" 
-            [(ngModel)]="filters().startDate" 
-            class="w-40"
-          >
+          <input pInputText type="date" [(ngModel)]="filters().startDate" class="w-40">
         </div>
-        
+
         <div class="flex items-center gap-2">
           <label class="text-sm text-gray-600">To</label>
-          <input 
-            pInputText 
-            type="date" 
-            [(ngModel)]="filters().endDate" 
-            class="w-40"
-          >
+          <input pInputText type="date" [(ngModel)]="filters().endDate" class="w-40">
         </div>
 
-        <p-button 
-          label="Apply" 
-          icon="pi pi-filter" 
-          (onClick)="applyFilters()" 
-          severity="secondary"
-        ></p-button>
+        <p-button label="Apply" icon="pi pi-filter" (onClick)="applyFilters()" severity="secondary"></p-button>
 
-        <p-button 
-          label="Export" 
-          icon="pi pi-download" 
-          (onClick)="exportReport()"
-        ></p-button>
+        <p-button label="Export" icon="pi pi-download" (onClick)="exportReport()"></p-button>
       </div>
     </div>
   </div>
-
   <!-- Report Tabs using latest PrimeNG Tabs -->
   <div class="card">
-    <p-tabs [value]="activeTabIndex()" (valueChange)="onTabChange($event)" >
+    <p-tabs [value]="activeTabIndex()" (valueChange)="onTabChange($event)">
       <!-- [(value)]="activeTabIndex()" -->
       <p-tablist>
         <p-tab value="0">
@@ -75,7 +55,7 @@
           </div>
         </p-tab>
       </p-tablist>
-      
+
       <p-tabpanels>
         <!-- Summary Tab -->
         <p-tabpanel value="0">
@@ -166,7 +146,7 @@
               @for (dept of departmentStats(); track dept.name) {
               <div class="border-l-4 border-blue-500 pl-4 py-2">
                 <div class="flex justify-between items-center mb-1">
-                  <span class="font-medium text-gray-800">{{ dept.name }}</span>
+                  <span class="font-medium " [style.color]="'var(--theme-text-primary)'">{{ dept.name }}</span>
                   <span class="text-sm font-semibold text-green-600">{{ dept.attendance }}%</span>
                 </div>
                 <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500">
@@ -186,10 +166,7 @@
             <h3 class="font-semibold text-gray-800 mb-4">Monthly Attendance Summary</h3>
             @if (monthlyReportData() && monthlyReportData().length > 0) {
             <div class="overflow-x-auto">
-              <p-table 
-                [value]="monthlyReportData()" 
-                styleClass="p-datatable-sm"
-              >
+              <p-table [value]="monthlyReportData()" styleClass="p-datatable-sm">
                 <ng-template pTemplate="header">
                   <tr>
                     <th>Employee</th>
@@ -201,7 +178,7 @@
                     <th class="text-center">Overtime</th>
                   </tr>
                 </ng-template>
-                
+
                 <ng-template pTemplate="body" let-record>
                   <tr>
                     <td>
@@ -212,7 +189,8 @@
                           </span>
                         </div>
                         <div>
-                          <p class="font-medium text-gray-800">{{ record.employee?.name }}</p>
+                          <p class="font-medium " [style.color]="'var(--theme-text-primary)'">{{ record.employee?.name
+                            }}</p>
                           <p class="text-xs text-gray-500">{{ record.employee?.department }}</p>
                         </div>
                       </div>
@@ -229,7 +207,7 @@
                     <td class="text-center font-medium text-blue-600">
                       {{ record.halfDays || 0 }}
                     </td>
-                    <td class="text-center font-medium text-gray-800">
+                    <td class="text-center font-medium " [style.color]="'var(--theme-text-primary)'">
                       {{ record.totalHours || 0 | number:'1.1-1' }}
                     </td>
                     <td class="text-center font-medium text-purple-600">
@@ -237,7 +215,7 @@
                     </td>
                   </tr>
                 </ng-template>
-                
+
                 <ng-template pTemplate="emptymessage">
                   <tr>
                     <td colspan="7" class="text-center py-8 text-gray-500">
@@ -270,7 +248,7 @@
                     <i class="pi" [ngClass]="stat.icon" [ngClass]="stat.iconClass"></i>
                     <span class="text-sm text-gray-600">{{ stat.label }}</span>
                   </div>
-                  <span class="text-lg font-bold text-gray-800">{{ stat.value }}</span>
+                  <span class="text-lg font-bold " [style.color]="'var(--theme-text-primary)'">{{ stat.value }}</span>
                 </div>
                 }
               </div>
@@ -289,7 +267,7 @@
                       </span>
                     </div>
                     <div>
-                      <p class="font-medium text-gray-800">{{ performer.name }}</p>
+                      <p class="font-medium " [style.color]="'var(--theme-text-primary)'">{{ performer.name }}</p>
                       <p class="text-xs text-gray-500">{{ performer.department }}</p>
                     </div>
                   </div>
@@ -316,7 +294,7 @@
                     <th>Action</th>
                   </tr>
                 </ng-template>
-                
+
                 <ng-template pTemplate="body" let-record>
                   <tr>
                     <td class="font-medium">{{ record.name }}</td>
@@ -328,13 +306,8 @@
                     </td>
                     <td class="font-medium text-yellow-600">{{ record.avgDelay }}</td>
                     <td>
-                      <p-button 
-                        label="Send Alert" 
-                        icon="pi pi-bell" 
-                        size="small" 
-                        severity="warn"
-                        [text]="true"
-                      ></p-button>
+                      <p-button label="Send Alert" icon="pi pi-bell" size="small" severity="warn"
+                        [text]="true"></p-button>
                     </td>
                   </tr>
                 </ng-template>
@@ -353,7 +326,7 @@
   <div class="mb-6">
     <div class="flex justify-between items-start">
       <div>
-        <h1 class="text-2xl font-bold text-gray-800">Attendance Reports</h1>
+        <h1 class="text-2xl font-bold "[style.color]="'var(--theme-text-primary)'">Attendance Reports</h1>
         <p class="text-gray-500">Analytics, insights, and detailed reports</p>
       </div>
 
@@ -481,7 +454,7 @@
           ]; track dept.name) {
           <div class="border-l-4 border-blue-500 pl-4 py-2">
             <div class="flex justify-between items-center mb-1">
-              <span class="font-medium text-gray-800">{{ dept.name }}</span>
+              <span class="font-medium "[style.color]="'var(--theme-text-primary)'">{{ dept.name }}</span>
               <span class="text-sm font-semibold text-green-600">{{ dept.attendance }}%</span>
             </div>
             <div class="flex items-center gap-4 text-xs text-gray-500">
@@ -523,7 +496,7 @@
                       </span>
                     </div>
                     <div>
-                      <p class="font-medium text-gray-800">{{ record.employee?.name }}</p>
+                      <p class="font-medium "[style.color]="'var(--theme-text-primary)'">{{ record.employee?.name }}</p>
                       <p class="text-xs text-gray-500">{{ record.employee?.department }}</p>
                     </div>
                   </div>
@@ -540,7 +513,7 @@
                 <td class="px-4 py-3 text-center font-medium text-blue-600">
                   {{ record.halfDays || 0 }}
                 </td>
-                <td class="px-4 py-3 text-center font-medium text-gray-800">
+                <td class="px-4 py-3 text-center font-medium "[style.color]="'var(--theme-text-primary)'">
                   {{ record.totalHours || 0 }}
                 </td>
                 <td class="px-4 py-3 text-center font-medium text-purple-600">
@@ -582,7 +555,7 @@
                      }"></i>
                 <span class="text-sm text-gray-600">{{ stat.label }}</span>
               </div>
-              <span class="text-lg font-bold text-gray-800">{{ stat.value }}</span>
+              <span class="text-lg font-bold "[style.color]="'var(--theme-text-primary)'">{{ stat.value }}</span>
             </div>
             }
           </div>
@@ -605,7 +578,7 @@
                   </span>
                 </div>
                 <div>
-                  <p class="font-medium text-gray-800">{{ performer.name }}</p>
+                  <p class="font-medium "[style.color]="'var(--theme-text-primary)'">{{ performer.name }}</p>
                   <p class="text-xs text-gray-500">{{ performer.department }}</p>
                 </div>
               </div>

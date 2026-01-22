@@ -74,7 +74,7 @@ import { NG_VALUE_ACCESSOR, ControlValueAccessor, FormsModule } from '@angular/f
   .chip-input {
     border: none;
     outline: none;
-    background: transparent;
+      background: var(--bg-secondary);
     padding: 5px;
     min-width: 120px;
     flex: 1;

@@ -1,0 +1,24 @@
+<div class="action-pill" (mousedown)="$event.stopPropagation()">
+
+  @if (editing) {
+  <p-button icon="pi pi-check" [rounded]="true" [text]="true" styleClass="action-btn save-btn" pTooltip="Save Changes"
+    tooltipPosition="top" (click)="emit('save')">
+  </p-button>
+
+  <p-button icon="pi pi-times" [rounded]="true" [text]="true" styleClass="action-btn cancel-btn" pTooltip="Discard"
+    tooltipPosition="top" (click)="emit('cancel')">
+  </p-button>
+
+  } @else {
+  <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" styleClass="action-btn edit-btn" pTooltip="Edit Record"
+    tooltipPosition="top" (click)="emit('edit')">
+  </p-button>
+
+  <div class="action-separator"></div>
+
+  <p-button icon="pi pi-trash" [rounded]="true" [text]="true" styleClass="action-btn delete-btn" pTooltip="Delete"
+    tooltipPosition="top" (click)="emit('delete')">
+  </p-button>
+  }
+
+</div>

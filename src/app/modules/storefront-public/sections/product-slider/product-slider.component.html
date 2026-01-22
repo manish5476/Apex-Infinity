@@ -1,0 +1,122 @@
+<section class="section-root" [style.background-color]="config.backgroundColor || 'transparent'">
+  <div class="container" [class.max-w-full]="config.containerWidth === 'full'">
+
+    <div class="header-row">
+      <div class="title-group">
+        @if (config.subtitle) {
+          <span class="subtitle">{{ config.subtitle }}</span>
+        }
+        <h2 class="section-title">{{ config.title }}</h2>
+      </div>
+
+      @if (config.navigation && products.length > (config.itemsPerView || 4)) {
+        <div class="nav-controls">
+          <button class="nav-btn prev" [disabled]="!canScrollLeft" (click)="scroll('left'); pauseAutoSlide()">
+            <i class="pi pi-arrow-left"></i>
+          </button>
+          <button class="nav-btn next" [disabled]="!canScrollRight" (click)="scroll('right'); pauseAutoSlide()">
+            <i class="pi pi-arrow-right"></i>
+          </button>
+        </div>
+      }
+    </div>
+
+    <div class="slider-viewport" 
+         #sliderContainer 
+         (scroll)="checkScrollButtons()"
+         (touchstart)="pauseAutoSlide()"
+         (mouseenter)="pauseAutoSlide()">
+
+      @if (!products || products.length === 0) {
+        @for (i of [1,2,3,4]; track i) {
+          <div class="slider-item skeleton-item">
+            <div class="aspect-[3/4] bg-slate-100 rounded-2xl animate-pulse mb-4"></div>
+            <div class="h-4 bg-slate-100 rounded w-3/4 mb-2 animate-pulse"></div>
+            <div class="h-4 bg-slate-100 rounded w-1/4 animate-pulse"></div>
+          </div>
+        }
+      }
+
+      @else {
+        @for (product of products; track product._id || $index) {
+          <div class="slider-item" 
+               [style.width]="'280px'" 
+               [style.flex-basis]="'280px'"
+               [class.md:w-auto]="true"
+               [class.md:flex-basis]="cardFlexBasis()">
+            
+            <app-product-card 
+              [product]="product" 
+              [orgSlug]="orgSlug()" 
+              (addToCart)="handleAddToCart($event)"
+              class="h-full block">
+            </app-product-card>
+          </div>
+        }
+      }
+
+    </div>
+
+    <div class="mobile-hint md:hidden" *ngIf="canScrollRight">
+      <div class="h-1 w-12 bg-slate-200 rounded-full overflow-hidden">
+        <div class="h-full w-1/3 bg-slate-400 rounded-full animate-slide-x"></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- <section class="section-root">
+  <div class="container">
+
+    <div class="header-row">
+      <div class="title-group">
+        @if (config.subtitle) {
+        <span class="subtitle">{{ config.subtitle }}</span>
+        }
+        <h2 class="section-title">{{ config.title }}</h2>
+      </div>
+
+      @if (config.navigation && products.length > 4) {
+      <div class="nav-controls">
+        <button class="nav-btn prev" [disabled]="!canScrollLeft" (click)="scroll('left')">
+          <i class="pi pi-chevron-left"></i>
+        </button>
+        <button class="nav-btn next" [disabled]="!canScrollRight" (click)="scroll('right')">
+          <i class="pi pi-chevron-right"></i>
+        </button>
+      </div>
+      }
+    </div>
+
+    <div class="slider-viewport" #sliderContainer (scroll)="checkScrollButtons()">
+
+      @if (!products || products.length === 0) {
+      @for (i of [1,2,3,4]; track i) {
+      <div class="skeleton-card">
+        <p-skeleton height="300px" styleClass="mb-2"></p-skeleton>
+        <p-skeleton width="60%" styleClass="mb-1"></p-skeleton>
+        <p-skeleton width="40%"></p-skeleton>
+      </div>
+      }
+      }
+
+      @else {
+      @for (product of products; track $index) {
+      <div class="slider-item" [style.min-width]="getItemWidth()">
+        <app-product-card [product]="product" [orgSlug]="orgSlug()" (addToCart)="handleAddToCart($event)"
+          class="h-full block">
+        </app-product-card>
+      </div>
+      }
+    }
+
+    </div>
+
+    <div class="mobile-hint md:hidden">
+      <span>Swipe to explore</span>
+      <i class="pi pi-arrow-right text-xs"></i>
+    </div>
+
+  </div>
+</section> -->

@@ -21,8 +21,17 @@ export interface ListResponse<T> {
 })
 export class ApiService extends BaseApiService {
 
-  getMasterList(): Observable<ApiResponse<any>> {
-    return this.get<ApiResponse<any>>('/v1/master-list', {}, 'getMasterList');
+  // getMasterList(): Observable<ApiResponse<any>> {
+  //   return this.get<ApiResponse<any>>('/v1/master-list', {}, 'getMasterList');
+  // }
+  
+  // permissions(): Observable<ApiResponse<any>> {
+  //   return this.get<ApiResponse<any>>('/v1/master-list/permissions', {}, 'getMasterList');
+  // }
+ // ======================== MASTER LIST ROUTES ========================
+
+  getMasterList(filters?: any): Observable<ApiResponse<any>> {
+    return this.get<ApiResponse<any>>('/v1/master-list', filters || {}, 'getMasterList');
   }
   
   permissions(): Observable<ApiResponse<any>> {
@@ -30,16 +39,81 @@ export class ApiService extends BaseApiService {
   }
 
   /**
-   * Fetch specific list (e.g. Invoice, Customer)
-   * We pass a simple object { type: typeName }, and BaseService handles the params conversion.
+   * Fetch specific list with advanced filters
    */
-  getSpecificList(typeName: string): Observable<ListResponse<any>> {
+  getSpecificList(typeName: string, filters?: any): Observable<ListResponse<any>> {
     return this.get<ListResponse<any>>(
       '/v1/master-list/list',
-      { type: typeName },
+      { type: typeName, ...filters },
       `getSpecificList-${typeName}`
     );
   }
+
+  /**
+   * Get filter options for a specific entity type
+   */
+  getFilterOptions(type: string): Observable<any> {
+    return this.get<any>(
+      '/v1/master-list/filter-options',
+      { type },
+      `getFilterOptions-${type}`
+    );
+  }
+
+  /**
+   * Get quick stats dashboard
+   */
+  getQuickStats(period?: string): Observable<any> {
+    return this.get<any>(
+      '/v1/master-list/quick-stats',
+      { period: period || 'month' },
+      'getQuickStats'
+    );
+  }
+
+  /**
+   * Get entity details by type and ID
+   */
+  getEntityDetails(type: string, id: string): Observable<any> {
+    return this.get<any>(
+      `/v1/master-list/details/${type}/${id}`,
+      {},
+      `getEntityDetails-${type}-${id}`
+    );
+  }
+
+  /**
+   * Export filtered data
+   */
+  exportFilteredData(params: any): Observable<Blob> {
+    return this.getBlob(
+      '/v1/master-list/export-filtered',
+      params,
+      `exportFilteredData-${params.type || 'all'}`
+    );
+  }
+
+  /**
+   * Export master list
+   */
+  exportMasterList(format: string = 'json'): Observable<Blob> {
+    return this.getBlob(
+      '/v1/master-list/export',
+      { format },
+      'exportMasterList'
+    );
+  }
+  /**
+   * Fetch specific list (e.g. Invoice, Customer)
+   * We pass a simple object { type: typeName }, and BaseService handles the params conversion.
+   */
+  // getSpecificList(typeName: string): Observable<ListResponse<any>> {
+  //   return this.get<ListResponse<any>>(
+  //     '/v1/master-list/list',
+  //     { type: typeName },
+  //     `getSpecificList-${typeName}`
+  //   );
+  // }
 
   login(credentials: any): Observable<LoginResponse> {
     return this.post<LoginResponse>('/v1/auth/login', credentials, 'login');
@@ -61,9 +135,9 @@ export class ApiService extends BaseApiService {
     return this.patch<LoginResponse>(`/v1/auth/resetPassword/${token}`, data, 'resetPassword');
   }
 
-  getAllNotifications(): Observable<LoginResponse> {
-    return this.get<LoginResponse>('/v1/notifications/my-notifications', {}, 'getAllNotifications');
-  }
+  // getAllNotifications(): Observable<LoginResponse> {
+  //   return this.get<LoginResponse>('/v1/notifications/my-notifications', {}, 'getAllNotifications');
+  // }
   // ======================== AUTH EXTRA ROUTES ========================
 
   // Refresh JWT Token

@@ -79,7 +79,6 @@
         </div>
         
         <div class="section-fields glass-card" formGroupName="attendanceConfig">
-          
           <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
             <div>
               <label class="font-bold text-gray-800">Enable Attendance Tracking</label>
@@ -87,7 +86,6 @@
             </div>
             <p-toggleswitch formControlName="isAttendanceEnabled"></p-toggleswitch>
           </div>
-
           @if (userForm.get('attendanceConfig.isAttendanceEnabled')?.value) {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeIn">
               
@@ -123,7 +121,7 @@
               @if (userForm.get('attendanceConfig.enforceGeoFence')?.value) {
                 <div class="form-group col-span-1 md:col-span-2">
                   <label>Geo-Fence Radius (Meters)</label>
-                  <p-inputNumber formControlName="geoFenceRadius" [showButtons]="true" suffix=" m" [min]="10" [max]="5000" styleClass="w-full"></p-inputNumber>
+                  <p-inputNumber formControlName="geoFenceRadius" [showButtons]="true" suffix=" m" [min]="10" [max]="99999999" styleClass="w-full"></p-inputNumber>
                   <small class="text-xs text-gray-500">User must be within this distance from Branch to punch in.</small>
                 </div>
               }

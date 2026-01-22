@@ -1,0 +1,150 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Manrope:wght@400;500;600;700&display=swap');
+
+:host {
+  display: block;
+  font-family: 'Manrope', sans-serif;
+}
+
+.section-root {
+  position: relative;
+  background-color: #1a1a1a;
+}
+
+.bg-overlay {
+  position: absolute;
+  inset: 0;
+  /* Premium Dark Gradient Overlay */
+  background: linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 100%);
+  z-index: 0;
+}
+
+/* Form Card (Glassmorphism) */
+.form-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  padding: 3rem;
+  border-radius: 2rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  min-height: 400px; /* Prevent jump on success */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Success State */
+.success-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Modern Inputs */
+.input-group {
+  position: relative;
+  margin-bottom: 0.5rem;
+  
+  input, textarea {
+    width: 100%;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.25rem 1rem 0.5rem; /* Top padding space for label */
+    font-size: 0.95rem;
+    color: #0f172a;
+    transition: all 0.2s;
+    outline: none;
+
+    &:focus {
+      background: white;
+      border-color: #0f172a; /* Focus Color (Dark) */
+      box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.05);
+    }
+    
+    /* Error State */
+    &.ng-invalid.ng-touched {
+      border-color: #ef4444;
+      background: #fef2f2;
+    }
+  }
+
+  textarea { resize: none; }
+}
+
+/* Floating Label Logic */
+.floating-label {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  font-size: 0.95rem;
+  color: #64748b;
+  pointer-events: none;
+  transition: all 0.2s ease-out;
+  font-weight: 500;
+}
+
+/* Move label up when input has focus or value */
+.peer:focus ~ .floating-label,
+.peer:not(:placeholder-shown) ~ .floating-label {
+  top: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+}
+
+.error-msg {
+  display: block;
+  font-size: 0.7rem;
+  color: #ef4444;
+  margin-top: 4px;
+  margin-left: 4px;
+}
+
+/* Submit Button */
+.submit-btn {
+  width: 100%;
+  margin-top: 1rem;
+  background: #0f172a; /* Slate 900 */
+  color: white;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.85rem;
+  padding: 1.25rem;
+  border-radius: 100px;
+  transition: all 0.3s;
+  
+  &:hover:not(:disabled) {
+    background: #1e293b;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -10px rgba(0,0,0,0.5);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+/* Animations */
+.animate-fade-up {
+  opacity: 0;
+  animation: fadeUp 0.8s ease-out forwards;
+}
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}

@@ -1,0 +1,420 @@
+/* --- Animations --- */
+.fade-in-map {
+  animation: fadeIn 1s ease-out forwards;
+  opacity: 0;
+}
+@keyframes fadeIn { to { opacity: 1; } }
+
+/* --- Scrollbar --- */
+.custom-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+/* --- Leaflet Control Override --- */
+.leaflet-bar {
+  border: none !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3) !important;
+  a {
+    background-color: rgba(30, 30, 35, 0.9) !important;
+    color: #fff !important;
+    border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+    &:hover { background-color: #e11d48 !important; }
+  }
+}
+
+/* --- Markers --- */
+.luxury-marker {
+    background: var(--bg-secondary);
+  pointer-events: none;
+  .marker-container {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+  }
+  .marker-dot {
+    width: 14px;
+    height: 14px;
+    background: #e11d48;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    z-index: 2;
+    transition: all 0.3s ease;
+    &.headquarters { background: #f59e0b; }
+  }
+  .pulse-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: rgba(225, 29, 72, 0.2);
+    border: 1px solid rgba(225, 29, 72, 0.4);
+    animation: pulse 2s infinite;
+    opacity: 0;
+    &.active { opacity: 1; }
+  }
+  .crown-icon {
+    position: absolute;
+    top: -10px;
+    font-size: 14px;
+    z-index: 3;
+    animation: float 3s infinite ease-in-out;
+  }
+  &.selected .marker-dot { transform: scale(1.4); border-width: 3px; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+
+// /* --- CSS Animation Replacement for GSAP --- */
+// .fade-in-map {
+//   animation: fadeIn 1.5s ease-out forwards;
+//   opacity: 0;
+// }
+
+// @keyframes fadeIn {
+//   from { opacity: 0; }
+//   to { opacity: 1; }
+// }
+
+// /* --- Hide Default Scrollbar but keep functionality --- */
+// .custom-scrollbar {
+//   scrollbar-width: none; /* Firefox */
+//   -ms-overflow-style: none; /* IE/Edge */
+  
+//   &::-webkit-scrollbar {
+//     display: none; /* Chrome/Safari */
+//   }
+// }
+
+// /* --- Leaflet Dark Mode Overrides --- */
+// .leaflet-bar {
+//   border: none !important;
+//   box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+  
+//   a {
+//     background-color: rgba(30, 30, 35, 0.9) !important;
+//     backdrop-filter: blur(8px);
+//     color: #fff !important;
+//     border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+//     width: 36px !important;
+//     height: 36px !important;
+//     line-height: 36px !important;
+//     transition: 0.2s;
+
+//     &:hover {
+//       background-color: #e11d48 !important; /* Rose-600 */
+//       color: #fff !important;
+//     }
+    
+//     &:first-child { border-top-left-radius: 8px; border-top-right-radius: 8px; }
+//     &:last-child { border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; border-bottom: none !important; }
+//   }
+// }
+
+// /* --- CUSTOM LUXURY MARKER --- */
+// .luxury-marker {
+//     background: var(--bg-secondary);
+//   pointer-events: none; /* Let clicks pass to the graphic elements */
+
+//   .marker-container {
+//     position: relative;
+//     width: 50px;
+//     height: 50px;
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     pointer-events: auto; /* Re-enable clicks */
+//   }
+
+//   /* Center Dot */
+//   .marker-dot {
+//     width: 14px;
+//     height: 14px;
+//     background: #e11d48;
+//     border: 2px solid #fff;
+//     border-radius: 50%;
+//     position: relative;
+//     z-index: 2;
+//     box-shadow: 0 0 15px rgba(225, 29, 72, 0.6);
+//     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+//     &.headquarters {
+//       background: #f59e0b;
+//       box-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
+//     }
+//   }
+
+//   /* Pulse Ring */
+//   .pulse-ring {
+//     position: absolute;
+//     width: 100%;
+//     height: 100%;
+//     border-radius: 50%;
+//     background: rgba(225, 29, 72, 0.15);
+//     border: 1px solid rgba(225, 29, 72, 0.3);
+//     z-index: 1;
+//     animation: pulse 3s infinite;
+//     opacity: 0;
+
+//     &.active {
+//       opacity: 1;
+//       background: rgba(225, 29, 72, 0.25);
+//       border-color: rgba(225, 29, 72, 0.6);
+//       animation: pulse-active 2s infinite;
+//     }
+//   }
+
+//   /* Crown Icon */
+//   .crown-icon {
+//     position: absolute;
+//     top: -8px;
+//     font-size: 14px;
+//     z-index: 3;
+//     animation: float 3s ease-in-out infinite;
+//     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+//   }
+
+//   /* Hover State */
+//   &.selected .marker-dot {
+//     transform: scale(1.5);
+//     border-width: 3px;
+//   }
+// }
+
+// /* --- Animations --- */
+// @keyframes pulse {
+//   0% { transform: scale(0.5); opacity: 0; }
+//   50% { opacity: 1; }
+//   100% { transform: scale(1.5); opacity: 0; }
+// }
+
+// @keyframes pulse-active {
+//   0% { transform: scale(0.8); }
+//   50% { transform: scale(1.1); }
+//   100% { transform: scale(0.8); }
+// }
+
+// @keyframes float {
+//   0%, 100% { transform: translateY(0); }
+//   50% { transform: translateY(-4px); }
+// }
+
+// // /* --- Hide Default Scrollbar but keep functionality --- */
+// // .custom-scrollbar {
+// //   scrollbar-width: none; /* Firefox */
+// //   -ms-overflow-style: none; /* IE/Edge */
+  
+// //   &::-webkit-scrollbar {
+// //     display: none; /* Chrome/Safari */
+// //   }
+// // }
+
+// // /* --- Leaflet Dark Mode Overrides --- */
+// // .leaflet-bar {
+// //   border: none !important;
+// //   box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+  
+// //   a {
+// //     background-color: rgba(30, 30, 35, 0.9) !important;
+// //     backdrop-filter: blur(8px);
+// //     color: #fff !important;
+// //     border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+// //     width: 36px !important;
+// //     height: 36px !important;
+// //     line-height: 36px !important;
+// //     transition: 0.2s;
+
+// //     &:hover {
+// //       background-color: #e11d48 !important; /* Rose-600 */
+// //       color: #fff !important;
+// //     }
+    
+// //     &:first-child { border-top-left-radius: 8px; border-top-right-radius: 8px; }
+// //     &:last-child { border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; border-bottom: none !important; }
+// //   }
+// // }
+
+// // /* --- CUSTOM LUXURY MARKER --- */
+// // .luxury-marker {
+// //     background: var(--bg-secondary);
+// //   pointer-events: none; /* Let clicks pass to the graphic elements */
+
+// //   .marker-container {
+// //     position: relative;
+// //     width: 50px;
+// //     height: 50px;
+// //     display: flex;
+// //     align-items: center;
+// //     justify-content: center;
+// //     pointer-events: auto; /* Re-enable clicks */
+// //   }
+
+// //   /* Center Dot */
+// //   .marker-dot {
+// //     width: 14px;
+// //     height: 14px;
+// //     background: #e11d48;
+// //     border: 2px solid #fff;
+// //     border-radius: 50%;
+// //     position: relative;
+// //     z-index: 2;
+// //     box-shadow: 0 0 15px rgba(225, 29, 72, 0.6);
+// //     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+// //     &.headquarters {
+// //       background: #f59e0b;
+// //       box-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
+// //     }
+// //   }
+
+// //   /* Pulse Ring */
+// //   .pulse-ring {
+// //     position: absolute;
+// //     width: 100%;
+// //     height: 100%;
+// //     border-radius: 50%;
+// //     background: rgba(225, 29, 72, 0.15);
+// //     border: 1px solid rgba(225, 29, 72, 0.3);
+// //     z-index: 1;
+// //     animation: pulse 3s infinite;
+// //     opacity: 0;
+
+// //     &.active {
+// //       opacity: 1;
+// //       background: rgba(225, 29, 72, 0.25);
+// //       border-color: rgba(225, 29, 72, 0.6);
+// //       animation: pulse-active 2s infinite;
+// //     }
+// //   }
+
+// //   /* Crown Icon */
+// //   .crown-icon {
+// //     position: absolute;
+// //     top: -8px;
+// //     font-size: 14px;
+// //     z-index: 3;
+// //     animation: float 3s ease-in-out infinite;
+// //     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+// //   }
+
+// //   /* Hover State */
+// //   &.selected .marker-dot {
+// //     transform: scale(1.5);
+// //     border-width: 3px;
+// //   }
+// // }
+
+// // /* --- Animations --- */
+// // @keyframes pulse {
+// //   0% { transform: scale(0.5); opacity: 0; }
+// //   50% { opacity: 1; }
+// //   100% { transform: scale(1.5); opacity: 0; }
+// // }
+
+// // @keyframes pulse-active {
+// //   0% { transform: scale(0.8); }
+// //   50% { transform: scale(1.1); }
+// //   100% { transform: scale(0.8); }
+// // }
+
+// // @keyframes float {
+// //   0%, 100% { transform: translateY(0); }
+// //   50% { transform: translateY(-4px); }
+// // }
+// // /* --- DARK MODE OSM FILTER --- */
+// // /* This targets the specific tile layer we named 'midnight-tiles' */
+// // :host ::ng-deep .midnight-tiles {
+// //   /* Invert colors: White becomes Black */
+// //   filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+// // }
+
+// // /* Fix for smooth zooming with CSS filters */
+// // :host ::ng-deep .leaflet-container {
+// //   background: #0a0a0f !important; /* Match your app background */
+// // }
+
+// // /* ✅ ADD THIS TO styles.scss */
+// // .leaflet-container img {
+// //   max-width: none !important;
+// //   display: inline !important;
+// // }
+// // // /* Fade In Animation for Map */
+// // // @import 'leaflet/dist/leaflet.css';
+
+
+// // // @keyframes fadeIn {
+// // //   to { opacity: 1; }
+// // // }
+// // // .animate-fade-in {
+// // //   animation: fadeIn 1s ease-out forwards;
+// // // }
+
+// // // /* Hide Scrollbars */
+// // // .no-scrollbar {
+// // //   -ms-overflow-style: none;  /* IE and Edge */
+// // //   scrollbar-width: none;  /* Firefox */
+// // // }
+// // // .no-scrollbar::-webkit-scrollbar {
+// // //   display: none;
+// // // }
+
+// // // /* --- LUXURY MARKER STYLE --- */
+// // // .luxury-marker {
+// // //     background: var(--bg-secondary);
+// // //   display: flex !important;
+// // //   align-items: center;
+// // //   justify-content: center;
+
+// // //   /* The Center Dot */
+// // //   .dot {
+// // //     width: 12px;
+// // //     height: 12px;
+// // //     background: #f43f5e; /* Rose 500 */
+// // //     border: 2px solid white;
+// // //     border-radius: 50%;
+// // //     z-index: 2;
+// // //     box-shadow: 0 0 10px rgba(244, 63, 94, 0.8);
+// // //   }
+
+// // //   /* The Pulse Ring */
+// // //   .glow {
+// // //     position: absolute;
+// // //     width: 100%;
+// // //     height: 100%;
+// // //     background: rgba(244, 63, 94, 0.4);
+// // //     border-radius: 50%;
+// // //     animation: markerPulse 2s infinite;
+// // //     z-index: 1;
+// // //   }
+// // // }
+
+// // // @keyframes markerPulse {
+// // //   0% { transform: scale(0.5); opacity: 1; }
+// // //   100% { transform: scale(2.5); opacity: 0; }
+// // // }
+
+// // // /* Override Leaflet Attribution to blend in */
+// // // .leaflet-control-attribution {
+// // //   background: transparent !important;
+// // //   color: rgba(255,255,255,0.3) !important;
+// // //   font-size: 10px;
+// // //   a { color: rgba(255,255,255,0.5) !important; }
+// // // }
+// // // #map-stage, .leaflet-container {
+// // //     height: 100%;
+// // //     width: 100%;
+// // //     background: #1a1a1a; /* Dark background matches theme while loading */
+// // // }

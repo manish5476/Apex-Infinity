@@ -1,385 +1,240 @@
-import {
-  Component,
-  ElementRef,
-  AfterViewInit,
-  OnDestroy,
-  HostListener,
-  signal,
-  computed,
-  Inject,
-  PLATFORM_ID,
-  ViewChildren,
-  QueryList,
-  inject,
-  ViewEncapsulation,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef
-} from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Component, OnInit, AfterViewInit, HostListener, signal, computed, OnDestroy, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { ThemeService } from '../core/services/theme.service';
 
 interface Feature {
   title: string;
   desc: string;
   group: string;
   icon: string;
-  tags?: string;
+  color: string; // CSS var string
+  position?: { row: number; column: number; span?: number };
 }
 
-interface Plan {
-  name: string;
-  price: string;
-  desc: string;
-  features: string[];
-  isPopular?: boolean;
-  cta: string;
+interface Stat {
+  label: string;
+  value: number;
+  suffix: string;
+  currentValue?: number;
+  icon: string;
+  color: string;
 }
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './landing.component.html',
-  styleUrls: ['./landing.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None
+  styles: [`
+    /* --- LANDING PAGE SPECIFIC ANIMATIONS --- */
+    
+    /* Floating Animation for Dashboard Preview */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+    }
+    .animate-float {
+      animation: float 6s ease-in-out infinite;
+    }
+
+    /* Slow Pulse for Background Blobs */
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.1); }
+    }
+    .animate-pulse-slow {
+      animation: pulse-slow 8s ease-in-out infinite;
+    }
+
+    /* Bento Grid Layout Logic */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    
+    @media (min-width: 768px) {
+      .bento-grid {
+        grid-template-columns: repeat(3, 1fr);
+        grid-auto-rows: minmax(180px, auto);
+      }
+    }
+  `]
 })
-export class LandingComponent implements AfterViewInit, OnDestroy {
+export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
+  // State
+  scrollY = signal(0);
+  activeCategory = signal('All');
+  isYearly = signal(false);
   
-  private themeService = inject(ThemeService);
-  private cdr = inject(ChangeDetectorRef);
+  // Parallax Mouse Tracking
+  mouseX = signal(0);
+  mouseY = signal(0);
+
   private observer: IntersectionObserver | null = null;
-  @ViewChildren('revealItem') revealItems!: QueryList<ElementRef>;
+  private countersAnimated = false;
 
-  // --- STATE ---
-  scrollY = 0;
-  isYearly = signal(true); 
-  emailInput = '';
-  isSubmitting = false;
-  isSuccess = false;
-  
-  // Stats Animation State
-  stats = { users: 0, revenue: 0, uptime: 0 };
-  private hasAnimatedStats = false;
+  // DATA: Stats (Using Theme Variables for Colors)
+  animatedStats = signal<Stat[]>([
+    { label: 'Businesses', value: 5000, suffix: '+', currentValue: 0, icon: 'pi pi-building', color: 'var(--accent-primary)' },
+    { label: 'Daily Invoices', value: 25000, suffix: '', currentValue: 0, icon: 'pi pi-receipt', color: 'var(--color-success)' },
+    { label: 'Uptime', value: 99.9, suffix: '%', currentValue: 0, icon: 'pi pi-server', color: 'var(--accent-secondary)' },
+    { label: 'Growth', value: 32, suffix: '%', currentValue: 0, icon: 'pi pi-chart-line', color: 'var(--color-warning)' }
+  ]);
 
-  // --- SIGNALS ---
-  searchQuery = signal('');
-  selectedCategory = signal('All');
+  // DATA: Categories
+  categories = ['All', 'Finance', 'Inventory', 'CRM', 'Communication'];
 
-  // Available Themes
-  availableThemes = [
-    { name: 'Glass', class: 'theme-glass' },
-    { name: 'Light', class: 'theme-light' },
-    { name: 'Dark', class: 'theme-dark' },
-    { name: 'Titanium', class: 'theme-titanium' },
-    { name: 'Ocean', class: 'theme-ocean' }
-  ];
-  
-  // --- DATA: FEATURES ---
+  // DATA: Bento Features
   features: Feature[] = [
-    { title: "Executive Dashboard", desc: "High-level strategic insights & KPI monitoring.", group: "Analytics", icon: "pi-th-large", tags: "view_executive" },
-    { title: "Branch Comparison", desc: "Benchmark performance across multiple locations.", group: "Analytics", icon: "pi-arrow-right-arrow-left", tags: "view_branch_comparison" },
-    { title: "AI Revenue Forecast", desc: "Predict sales & revenue using AI models.", group: "Analytics", icon: "pi-chart-line", tags: "view_forecast" },
-    { title: "Critical Alerts", desc: "Real-time risk & stock-out notifications.", group: "Analytics", icon: "pi-exclamation-triangle", tags: "view_alerts" },
-    { title: "Financial Summary", desc: "P&L, Revenue, and Expense overview.", group: "Analytics", icon: "pi-chart-pie", tags: "view_financial" },
-    { title: "Cash Flow Analysis", desc: "Track cash movement & payment modes.", group: "Analytics", icon: "pi-money-bill", tags: "view_cashflow" },
-    { title: "GST & Tax Reports", desc: "Input/Output tax analysis for compliance.", group: "Analytics", icon: "pi-file", tags: "view_tax" },
-    { title: "Debtor Aging", desc: "0-90+ days outstanding payment analysis.", group: "Analytics", icon: "pi-hourglass", tags: "view_debtor_aging" },
-    { title: "Profitability Matrix", desc: "Real Gross Profit & Margin tracking.", group: "Analytics", icon: "pi-percentage", tags: "view_profitability" },
-    { title: "Staff Leaderboard", desc: "Employee performance tracking & KPIs.", group: "Analytics", icon: "pi-star", tags: "view_staff_performance" },
-    { title: "Peak Hour Heatmap", desc: "Visualize busiest times & days.", group: "Analytics", icon: "pi-clock", tags: "view_peak_hours" },
-    { title: "Dead Stock Detector", desc: "Identify items non-moving > 90 days.", group: "Analytics", icon: "pi-box", tags: "view_dead_stock" },
-    { title: "Stock-out Prediction", desc: "AI run-rate analysis for restocking.", group: "Analytics", icon: "pi-bolt", tags: "view_stock_forecast" },
-    { title: "RFM Segmentation", desc: "Segment by Recency, Frequency, Money.", group: "Analytics", icon: "pi-users", tags: "view_customer_segmentation" },
-    { title: "Cohort Retention", desc: "Analyze customer loyalty over time.", group: "Analytics", icon: "pi-heart", tags: "view_customer_retention" },
-    { title: "Credit Limits", desc: "Set & manage customer credit limits.", group: "CRM", icon: "pi-credit-card", tags: "customer:credit_limit" },
-    { title: "Purchase Orders", desc: "Manage supplier purchasing lifecyle.", group: "Inventory", icon: "pi-shopping-cart", tags: "purchase:read create update delete" },
-    { title: "Invoice Engine", desc: "Create, Edit & Delete Invoices.", group: "Sales", icon: "pi-file-edit", tags: "invoice:read create update delete" },
-    { title: "EMI Management", desc: "Create EMI plans & collect payments.", group: "Finance", icon: "pi-calendar", tags: "emi:read create pay" },
-    { title: "RBAC Controls", desc: "Manage roles & granular permissions.", group: "System", icon: "pi-lock", tags: "role:manage" },
-    { title: "Audit Logs", desc: "View security logs & suspicious activity.", group: "System", icon: "pi-shield", tags: "logs:view analytics:view_security_audit" },
-    { title: "AI Assistant", desc: "Chat with your data using AI.", group: "Utilities", icon: "pi-android", tags: "ai:chat" },
-    { title: "Team Chat", desc: "Real-time messaging with channels & DMs.", group: "Communication", icon: "pi-comments", tags: "chat:read create" },
-    { title: "Broadcast Messages", desc: "Send announcements to entire teams instantly.", group: "Communication", icon: "pi-megaphone", tags: "broadcast:create send" },
-    { title: "File Sharing", desc: "Share documents & media in conversations.", group: "Communication", icon: "pi-paperclip", tags: "chat:attach" },
-    { title: "Notification Center", desc: "Centralized alerts for all activities.", group: "Communication", icon: "pi-bell", tags: "notifications:view" }
+    {
+      title: 'Double-Entry Accounting',
+      desc: 'Automated ledger entries with real-time GST compliance.',
+      group: 'Finance',
+      icon: 'pi pi-wallet',
+      color: 'var(--accent-primary)',
+      position: { row: 1, column: 1, span: 2 }
+    },
+    {
+      title: 'Smart Inventory',
+      desc: 'Multi-location tracking with AI reorder points.',
+      group: 'Inventory',
+      icon: 'pi pi-box',
+      color: 'var(--color-success)',
+      position: { row: 1, column: 3 }
+    },
+    {
+      title: 'Team Sync',
+      desc: 'Real-time chat & role-based access control.',
+      group: 'Communication',
+      icon: 'pi pi-users',
+      color: 'var(--accent-secondary)',
+      position: { row: 2, column: 1 }
+    },
+    {
+      title: 'Financial AI',
+      desc: 'Predictive cashflow analysis & automated reporting.',
+      group: 'Finance',
+      icon: 'pi pi-chart-pie',
+      color: 'var(--color-warning)',
+      position: { row: 2, column: 2, span: 2 }
+    }
   ];
 
-  // --- DATA: PLANS ---
-  plans: Plan[] = [
+  // DATA: Pricing
+  plans = [
     {
       name: 'Starter',
       price: 'Free',
-      desc: 'For solopreneurs just starting.',
-      features: ['5 Invoices/mo', 'Basic GST Reports', 'Email Support'],
-      cta: 'Start Free'
+      desc: 'Perfect for freelancers',
+      features: ['5 Users', '100 Invoices/mo', 'Basic Support'],
+      cta: 'Start Free',
+      popular: false
     },
     {
-      name: 'Growth',
+      name: 'Pro',
       price: '₹2,499',
-      desc: 'For scaling startups who value time.',
-      features: ['Unlimited Invoices', 'Inventory Sync', 'Priority Support', '3 Team Members'],
-      isPopular: true,
-      cta: 'Get Growth'
+      desc: 'For growing teams',
+      features: ['Unlimited Users', 'AI Insights', 'Priority Support', 'API Access'],
+      cta: 'Get Pro',
+      popular: true
     },
     {
-      name: 'Scale',
-      price: '₹5,999',
-      desc: 'For established enterprises.',
-      features: ['Everything in Growth', 'API Access', 'Dedicated Account Manager', 'Custom SLAs'],
-      cta: 'Contact Sales'
+      name: 'Enterprise',
+      price: 'Custom',
+      desc: 'For large organizations',
+      features: ['Dedicated Manager', 'Custom Integrations', 'On-Premise Deployment'],
+      cta: 'Contact Sales',
+      popular: false
     }
   ];
 
-  // --- COMPUTED ---
-  categories = computed(() => ['All', ...new Set(this.features.map(f => f.group))]);
-  
+  // Computed Features
   filteredFeatures = computed(() => {
-    const q = this.searchQuery().toLowerCase().trim();
-    const group = this.selectedCategory();
-
-    return this.features.filter(f => {
-      const matchesGroup = group === 'All' || f.group === group;
-      
-      const title = f.title ? f.title.toLowerCase() : '';
-      const desc = f.desc ? f.desc.toLowerCase() : '';
-      const tags = f.tags ? f.tags.toLowerCase() : '';
-
-      const matchesSearch = !q || title.includes(q) || desc.includes(q) || tags.includes(q);
-      
-      return matchesGroup && matchesSearch;
-    });
+    if (this.activeCategory() === 'All') return this.features;
+    return this.features.filter(f => f.group === this.activeCategory());
   });
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  ngOnInit() {}
 
   ngAfterViewInit() {
-    if (isPlatformBrowser(this.platformId)) {
-      setTimeout(() => this.initIntersectionObserver(), 100);
-      this.runCounter('revenue', 0, 45, 2000);
-      this.runCounter('users', 0, 15000, 2000);
-    }
+    this.initObservers();
   }
 
   ngOnDestroy() {
     this.observer?.disconnect();
   }
 
-  @HostListener('window:scroll', [])
+  // --- EVENTS ---
+  @HostListener('window:scroll')
   onWindowScroll() {
-    this.scrollY = window.scrollY;
-    this.checkStatsAnimation();
+    this.scrollY.set(window.scrollY);
   }
 
-  setCategory(cat: string) {
-    this.selectedCategory.set(cat);
+  @HostListener('mousemove', ['$event'])
+  onMouseMove(event: MouseEvent) {
+    // Normalize mouse position (-1 to 1) for parallax
+    const x = (event.clientX / window.innerWidth) * 2 - 1;
+    const y = (event.clientY / window.innerHeight) * 2 - 1;
+    this.mouseX.set(x * 15); // Movement intensity
+    this.mouseY.set(y * 15);
   }
 
-  togglePricing() {
-    this.isYearly.update(v => !v);
+  // --- METHODS ---
+  setActiveCategory(category: string) {
+    this.activeCategory.set(category);
   }
 
-  selectTheme(themeClass: string) {
-    this.themeService.setLightTheme(themeClass);
+  // Helper for Bento Grid Positioning (Desktop Only)
+  getFeatureGridStyle(feature: Feature): any {
+    if (typeof window !== 'undefined' && window.innerWidth >= 768 && feature.position) {
+      return {
+        'grid-row': `span ${1}`, 
+        'grid-column': `span ${feature.position.span || 1}`
+      };
+    }
+    return {};
   }
 
-  private initIntersectionObserver() {
-    const options = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+  // Animation Logic
+  private initObservers() {
     this.observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('active');
-          this.cdr.markForCheck(); // Ensure change detection runs
+        if (entry.isIntersecting && entry.target.id === 'stats-section' && !this.countersAnimated) {
+          this.countersAnimated = true;
+          this.animateCounters();
           this.observer?.unobserve(entry.target);
         }
       });
-    }, options);
+    }, { threshold: 0.2 });
 
-    this.revealItems.forEach(item => this.observer?.observe(item.nativeElement));
+    const stats = document.getElementById('stats-section');
+    if (stats) this.observer.observe(stats);
   }
 
-  private checkStatsAnimation() {
-    if (this.hasAnimatedStats) return;
-    if (this.scrollY > 300) {
-      this.hasAnimatedStats = true;
-      this.runCounter('uptime', 90, 99.9, 2000);
-    }
-  }
+  private animateCounters() {
+    this.animatedStats().forEach((stat, index) => {
+      const duration = 2000; 
+      const start = 0;
+      const end = stat.value;
+      const startTime = performance.now();
 
-  private runCounter(key: 'users' | 'revenue' | 'uptime', start: number, end: number, duration: number) {
-    let startTime: number | null = null;
-    const step = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-      const value = start + (end - start) * (1 - Math.pow(1 - progress, 3)); 
-      
-      if (key === 'uptime') this.stats[key] = parseFloat(value.toFixed(1));
-      else this.stats[key] = Math.floor(value);
-      
-      this.cdr.markForCheck(); // Trigger update for async change
+      const step = (currentTime: number) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3); // Cubic Ease Out
+        const current = Math.floor(start + (end - start) * ease);
 
-      if (progress < 1) window.requestAnimationFrame(step);
-    };
-    window.requestAnimationFrame(step);
+        // Update Signal Immutably
+        const currentStats = this.animatedStats();
+        const newStats = [...currentStats];
+        newStats[index] = { ...newStats[index], currentValue: current };
+        this.animatedStats.set(newStats);
+
+        if (progress < 1) requestAnimationFrame(step);
+      };
+      
+      requestAnimationFrame(step);
+    });
   }
 }
-
-// import {
-//   Component,
-//   ElementRef,
-//   AfterViewInit,
-//   signal,
-//   computed,
-//   Inject,
-//   PLATFORM_ID,
-//   ViewEncapsulation,
-//   ChangeDetectionStrategy,
-//   inject,
-//   ChangeDetectorRef,
-//   effect
-// } from '@angular/core';
-
-// import { CommonModule, isPlatformBrowser } from '@angular/common';
-// import { FormsModule } from '@angular/forms';
-// import { RouterModule } from '@angular/router';
-// import { ThemeService } from '../core/services/theme.service';
-
-// interface Feature {
-//   title: string;
-//   desc: string;
-//   group: string;
-//   icon: string;
-//   tags: string;
-// }
-
-// @Component({
-//   selector: 'app-landing',
-//   standalone: true,
-//   imports: [CommonModule, FormsModule, RouterModule],
-//   templateUrl: './landing.component.html',
-//   styleUrls: ['./landing.component.scss'],
-//   changeDetection: ChangeDetectionStrategy.OnPush,
-//   encapsulation: ViewEncapsulation.None
-// })
-// export class LandingComponent implements AfterViewInit {
-
-//   private el = inject(ElementRef);
-//   private cdr = inject(ChangeDetectorRef);
-//   private themeService = inject(ThemeService);
-
-//   /* ================= STATE ================= */
-
-//   searchQuery = signal('');
-//   selectedCategory = signal('All');
-//   isYearly = signal(true);
-
-//   /* ================= DATA ================= */
-
-// features: Feature[] = [
-//   { title: 'Executive Dashboard', desc: 'High-level strategic insights & KPI monitoring.', group: 'Analytics', icon: 'pi-th-large', tags: 'view_executive' },
-//   { title: 'Branch Comparison', desc: 'Benchmark performance across multiple locations.', group: 'Analytics', icon: 'pi-arrow-right-arrow-left', tags: 'view_branch_comparison' },
-//   { title: 'AI Revenue Forecast', desc: 'Predict sales & revenue using AI models.', group: 'Analytics', icon: 'pi-chart-line', tags: 'view_forecast' },
-//   { title: 'Critical Alerts', desc: 'Real-time risk & stock-out notifications.', group: 'Analytics', icon: 'pi-exclamation-triangle', tags: 'view_alerts' },
-//   { title: 'Financial Summary', desc: 'P&L, Revenue, and Expense overview.', group: 'Analytics', icon: 'pi-chart-pie', tags: 'view_financial' },
-//   { title: 'Cash Flow Analysis', desc: 'Track cash movement & payment modes.', group: 'Analytics', icon: 'pi-money-bill', tags: 'view_cashflow' },
-//   { title: 'GST & Tax Reports', desc: 'Input/Output tax analysis for compliance.', group: 'Analytics', icon: 'pi-file', tags: 'view_tax' },
-//   { title: 'Debtor Aging', desc: '0–90+ days outstanding payment analysis.', group: 'Analytics', icon: 'pi-hourglass', tags: 'view_debtor_aging' },
-//   { title: 'Profitability Matrix', desc: 'Real Gross Profit & Margin tracking.', group: 'Analytics', icon: 'pi-percentage', tags: 'view_profitability' },
-//   { title: 'Staff Leaderboard', desc: 'Employee performance tracking & KPIs.', group: 'Analytics', icon: 'pi-star', tags: 'view_staff_performance' },
-//   { title: 'Peak Hour Heatmap', desc: 'Visualize busiest times & days.', group: 'Analytics', icon: 'pi-clock', tags: 'view_peak_hours' },
-//   { title: 'Dead Stock Detector', desc: 'Identify items non-moving > 90 days.', group: 'Analytics', icon: 'pi-box', tags: 'view_dead_stock' },
-//   { title: 'Stock-out Prediction', desc: 'AI run-rate analysis for restocking.', group: 'Analytics', icon: 'pi-bolt', tags: 'view_stock_forecast' },
-//   { title: 'RFM Segmentation', desc: 'Segment by Recency, Frequency, Money.', group: 'Analytics', icon: 'pi-users', tags: 'view_customer_segmentation' },
-//   { title: 'Cohort Retention', desc: 'Analyze customer loyalty over time.', group: 'Analytics', icon: 'pi-heart', tags: 'view_customer_retention' },
-
-//   { title: 'Credit Limits', desc: 'Set & manage customer credit limits.', group: 'CRM', icon: 'pi-credit-card', tags: 'customer:credit_limit' },
-//   { title: 'Purchase Orders', desc: 'Manage supplier purchasing lifecycle.', group: 'Inventory', icon: 'pi-shopping-cart', tags: 'purchase:crud' },
-//   { title: 'Invoice Engine', desc: 'Create, edit & delete invoices.', group: 'Sales', icon: 'pi-file-edit', tags: 'invoice:crud' },
-//   { title: 'EMI Management', desc: 'Create EMI plans & collect payments.', group: 'Finance', icon: 'pi-calendar', tags: 'emi:manage' },
-
-//   { title: 'RBAC Controls', desc: 'Manage roles & granular permissions.', group: 'System', icon: 'pi-lock', tags: 'role:manage' },
-//   { title: 'Audit Logs', desc: 'View security logs & suspicious activity.', group: 'System', icon: 'pi-shield', tags: 'logs:view' },
-//   { title: 'AI Assistant', desc: 'Chat with your data using AI.', group: 'Utilities', icon: 'pi-android', tags: 'ai:chat' },
-
-//   { title: 'Team Chat', desc: 'Real-time messaging with channels & DMs.', group: 'Communication', icon: 'pi-comments', tags: 'chat:read create' },
-//   { title: 'Broadcast Messages', desc: 'Send announcements instantly.', group: 'Communication', icon: 'pi-megaphone', tags: 'broadcast:create' },
-//   { title: 'File Sharing', desc: 'Share documents & media.', group: 'Communication', icon: 'pi-paperclip', tags: 'chat:attach' },
-//   { title: 'Notification Center', desc: 'Centralized alerts.', group: 'Communication', icon: 'pi-bell', tags: 'notifications:view' }
-// ];
-
-//   /* ================= COMPUTED ================= */
-
-//   categories = computed(() => [
-//     'All',
-//     ...new Set(this.features.map(f => f.group))
-//   ]);
-
-//   filteredFeatures = computed(() => {
-//     const q = this.searchQuery().toLowerCase();
-//     const cat = this.selectedCategory();
-
-//     return this.features.filter(f =>
-//       (cat === 'All' || f.group === cat) &&
-//       (
-//         f.title.toLowerCase().includes(q) ||
-//         f.desc.toLowerCase().includes(q) ||
-//         f.tags.toLowerCase().includes(q)
-//       )
-//     );
-//   });
-
-//   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
-//     /* 🔴 CRITICAL: force view update when signals change */
-//     effect(() => {
-//       this.searchQuery();
-//       this.selectedCategory();
-//       this.cdr.markForCheck();
-//     });
-//   }
-
-//   ngAfterViewInit(): void {
-//     if (isPlatformBrowser(this.platformId)) {
-//       this.initRevealAnimations();
-//     }
-//   }
-
-//   /* ================= UI ACTIONS ================= */
-
-//   setCategory(cat: string) {
-//     this.selectedCategory.set(cat);
-//   }
-
-//   togglePricing() {
-//     this.isYearly.update(v => !v);
-//   }
-
-//   trackByTitle(_: number, f: Feature) {
-//     return f.title;
-//   }
-
-//   selectTheme(theme: string) {
-//     this.themeService.setLightTheme(theme);
-//   }
-
-//   /* ================= REVEAL (STATIC ONLY) ================= */
-
-//   private initRevealAnimations(): void {
-//     const observer = new IntersectionObserver(
-//       entries => {
-//         entries.forEach(entry => {
-//           if (entry.isIntersecting) {
-//             entry.target.classList.add('active');
-//             this.cdr.markForCheck();
-//           }
-//         });
-//       },
-//       { threshold: 0.15 }
-//     );
-
-//     this.el.nativeElement
-//       .querySelectorAll('.reveal')
-//       .forEach((el: Element) => observer.observe(el));
-//   }
-// }

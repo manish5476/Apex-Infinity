@@ -1,0 +1,375 @@
+<form [formGroup]="form" class="h-full flex flex-col bg-white">
+
+  <p-tabs value="0" class="flex-1 flex flex-col min-h-0">
+    <div class="px-4 pt-2 border-b border-gray-100 bg-white sticky top-0 z-10">
+      <p-tablist>
+        <p-tab value="0"><i class="pi pi-file-edit mr-2 text-sm"></i> Content</p-tab>
+        <p-tab value="1"><i class="pi pi-cog mr-2 text-sm"></i> Settings</p-tab>
+        <p-tab value="2"><i class="pi pi-palette mr-2 text-sm"></i> Design</p-tab>
+      </p-tablist>
+    </div>
+
+    <p-tabpanels class="p-0 flex-1 overflow-y-auto min-h-0 custom-scrollbar bg-slate-50/30">
+
+      <ng-template #inputRenderer let-field>
+        <div class="field-wrapper group">
+          <div class="flex justify-between items-baseline mb-1.5">
+            <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500">{{ field.label }}</label>
+            @if(field.required) { <span class="text-red-400 text-[10px]">*</span> }
+          </div>
+
+          @if (field.enum) {
+          <p-select [formControlName]="field.key" [options]="getEnumOptions(field)" optionLabel="label"
+            optionValue="value" appendTo="body" styleClass="w-full text-sm" placeholder="Select...">
+          </p-select>
+          } @else if (field.type === 'number') {
+          <p-inputNumber [formControlName]="field.key" [min]="field.min" [max]="field.max" [showButtons]="true"
+            buttonLayout="horizontal" decrementButtonClass="p-button-secondary p-button-text"
+            incrementButtonClass="p-button-secondary p-button-text"
+            inputStyleClass="text-center font-bold text-slate-700" styleClass="w-full">
+          </p-inputNumber>
+          }
+          @else if (field.type === 'datetime-local') {
+          <div class="relative">
+            <i class="pi pi-calendar absolute right-3 top-3 text-gray-400 text-xs pointer-events-none"></i>
+
+            <input type="datetime-local" [formControlName]="field.key"
+              class="w-full text-sm p-2.5 rounded-lg border border-gray-200 text-slate-700 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all bg-white shadow-sm"
+              step="1" />
+          </div>
+          }
+          @else if (field.format === 'color' || field.key.toLowerCase().includes('color')) {
+          <div
+            class="flex items-center gap-2 p-1.5 border border-gray-200 rounded-lg bg-white shadow-sm hover:border-blue-300 transition-colors">
+            <div class="relative w-8 h-8 rounded overflow-hidden shadow-inner border border-gray-100">
+              <p-colorPicker [formControlName]="field.key" appendTo="body"
+                styleClass="w-full h-full opacity-0 absolute inset-0"></p-colorPicker>
+              <div [style.background-color]="form.get(field.key)?.value" class="w-full h-full"></div>
+            </div>
+            <input pInputText [formControlName]="field.key"
+              class="border-0 focus:ring-0 text-xs font-mono text-slate-600 w-full bg-transparent" />
+          </div>
+          } @else if (field.maxLength > 100) {
+          <textarea pInputTextarea [formControlName]="field.key" rows="4"
+            class="w-full text-sm p-3 bg-white border-gray-200 focus:border-blue-500 focus:ring-blue-100 resize-none rounded-lg"></textarea>
+          } @else {
+          <div class="relative">
+            <i *ngIf="field.format === 'url'" class="pi pi-link absolute right-3 top-3 text-gray-400 text-xs"></i>
+            <input pInputText [formControlName]="field.key"
+              class="w-full text-sm p-2.5 rounded-lg border-gray-200 hover:border-gray-300 focus:border-blue-500" />
+          </div>
+          }
+          @if(field.description) { <p class="mt-1 text-[10px] text-gray-400 leading-tight">{{ field.description }}</p> }
+        </div>
+      </ng-template>
+
+      <p-tabpanel value="0">
+        <div class="flex flex-col gap-6 p-5">
+          <div class="flex flex-col gap-5">
+            @for (field of tabs.content; track field.key) {
+            @if(field.type !== 'array') { <ng-container
+              *ngTemplateOutlet="inputRenderer; context: {$implicit: field}"></ng-container> }
+            }
+          </div>
+
+          @for (field of tabs.content; track field.key) {
+          @if(field.type === 'array') {
+          <div class="bg-slate-50 border border-slate-200 rounded-xl overflow-hidden" [formArrayName]="field.key">
+            <div class="px-4 py-3 bg-white border-b border-slate-200 flex justify-between items-center">
+              <span class="text-xs font-bold uppercase text-slate-700 tracking-wider">{{ field.label }}</span>
+              <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-[10px] font-bold">{{
+                getFormArray(field.key).length }}</span>
+            </div>
+
+            <div cdkDropList (cdkDropListDropped)="drop($event, field.key)" class="p-2 flex flex-col gap-2">
+              @for (control of getFormArray(field.key).controls; track control; let i = $index) {
+              <div cdkDrag [formGroupName]="i"
+                class="bg-white border border-slate-200 rounded-lg shadow-sm group hover:shadow-md transition-all">
+                <div class="flex items-center p-2 cursor-pointer select-none" (click)="toggleExpanded(control)">
+                  <div class="cursor-move text-slate-300 hover:text-slate-600 px-2" cdkDragHandle
+                    (click)="$event.stopPropagation()">
+                    <i class="pi pi-bars"></i>
+                  </div>
+                  <div class="flex-1 min-w-0 px-2">
+                    <p class="text-sm font-semibold text-slate-700 truncate">{{ getItemTitle(control, field.schema) }}
+                    </p>
+                    <p class="text-[10px] text-slate-400 truncate"
+                      *ngIf="control.value.description || control.value.url">{{ control.value.description ||
+                      control.value.url }}</p>
+                  </div>
+                  <i class="pi text-slate-400 text-xs mr-2 transition-transform duration-200"
+                    [class.pi-chevron-down]="!isExpanded(control)" [class.pi-chevron-up]="isExpanded(control)"></i>
+                  <button type="button" (click)="removeArrayItem(field.key, i, $event)"
+                    class="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 rounded transition-colors">
+                    <i class="pi pi-trash text-sm"></i>
+                  </button>
+                </div>
+
+                <div class="border-t border-slate-100 bg-slate-50/50 p-4 grid gap-4 animate-fade-in"
+                  [class.hidden]="!isExpanded(control)" [class.block]="isExpanded(control)">
+                  @for (subField of getArraySchema(field); track subField.key) {
+                  <div>
+                    <label class="text-[10px] font-bold uppercase text-slate-400 mb-1 block">{{subField.label}}</label>
+                    @if(subField.enum) {
+                    <p-select [formControlName]="subField.key" [options]="getEnumOptions(subField)" optionLabel="label"
+                      optionValue="value" appendTo="body" styleClass="w-full p-inputtext-sm"></p-select>
+                    } @else {
+                    <input pInputText [formControlName]="subField.key"
+                      class="w-full text-sm p-2 rounded border-gray-200" [placeholder]="subField.label">
+                    }
+                  </div>
+                  }
+                </div>
+              </div>
+              }
+            </div>
+            <div class="p-2 border-t border-slate-200 bg-gray-50">
+              <button pButton label="Add Item" icon="pi pi-plus"
+                class="p-button-outlined p-button-sm w-full border-dashed border-gray-300 text-gray-500 hover:text-blue-600 hover:border-blue-400 hover:bg-blue-50"
+                (click)="addArrayItem(field)"></button>
+            </div>
+          </div>
+          }
+          }
+        </div>
+      </p-tabpanel>
+
+      <p-tabpanel value="1">
+        <div class="p-5 flex flex-col gap-6">
+          @if (booleanGroup.length > 0) {
+          <div class="grid grid-cols-2 gap-3">
+            @for (field of booleanGroup; track field.key) {
+            <div
+              class="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:border-blue-300 transition-colors shadow-sm cursor-pointer"
+              (click)="form.get(field.key)?.setValue(!form.get(field.key)?.value)">
+              <span class="text-xs font-medium text-slate-700 select-none">{{ field.label }}</span>
+              <p-toggleswitch [formControlName]="field.key" class="scale-75 origin-right"></p-toggleswitch>
+            </div>
+            }
+          </div>
+          <div class="h-px bg-gray-100 my-2"></div>
+          }
+          <div class="grid grid-cols-2 gap-x-4 gap-y-6">
+            @for (field of tabs.settings; track field.key) {
+            <div [class.col-span-2]="field.type === 'string' && field.maxLength > 50">
+              <ng-container *ngTemplateOutlet="inputRenderer; context: {$implicit: field}"></ng-container>
+            </div>
+            }
+          </div>
+        </div>
+      </p-tabpanel>
+
+      <p-tabpanel value="2">
+        <div class="p-5 grid grid-cols-2 gap-4">
+          @for (field of tabs.style; track field.key) {
+          <div class="col-span-2 sm:col-span-1"><ng-container
+              *ngTemplateOutlet="inputRenderer; context: {$implicit: field}"></ng-container></div>
+          }
+        </div>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</form>
+
+<!-- <form [formGroup]="form" class="h-full flex flex-col bg-white">
+
+  <p-tabs value="0" class="flex-1 flex flex-col min-h-0">
+    <div class="px-4 pt-2 border-b border-gray-100 bg-white sticky top-0 z-10">
+      <p-tablist>
+        <p-tab value="0">
+          <i class="pi pi-file-edit mr-2 text-sm"></i> Content
+        </p-tab>
+        <p-tab value="1">
+          <i class="pi pi-cog mr-2 text-sm"></i> Settings
+        </p-tab>
+        <p-tab value="2">
+          <i class="pi pi-palette mr-2 text-sm"></i> Design
+        </p-tab>
+      </p-tablist>
+    </div>
+
+    <p-tabpanels class="p-0 flex-1 overflow-y-auto min-h-0 custom-scrollbar bg-slate-50/30">
+
+      <ng-template #inputRenderer let-field>
+        <div class="field-wrapper group">
+          <div class="flex justify-between items-baseline mb-1.5">
+            <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500">{{ field.label }}</label>
+            @if(field.required) { <span class="text-red-400 text-[10px]">*</span> }
+          </div>
+
+          @if (field.enum) {
+          <p-select [formControlName]="field.key" [options]="getEnumOptions(field)" optionLabel="label"
+            optionValue="value" appendTo="body" styleClass="w-full text-sm" placeholder="Select...">
+          </p-select>
+          }
+          @else if (field.type === 'number') {
+          <p-inputNumber [formControlName]="field.key" [min]="field.min" [max]="field.max" [showButtons]="true"
+            buttonLayout="horizontal" decrementButtonClass="p-button-secondary p-button-text"
+            incrementButtonClass="p-button-secondary p-button-text"
+            inputStyleClass="text-center font-bold text-slate-700" styleClass="w-full">
+          </p-inputNumber>
+          }
+          @else if (field.format === 'color' || field.key.toLowerCase().includes('color')) {
+          <div
+            class="flex items-center gap-2 p-1.5 border border-gray-200 rounded-lg bg-white shadow-sm hover:border-blue-300 transition-colors">
+            <div class="relative w-8 h-8 rounded overflow-hidden shadow-inner border border-gray-100">
+              <p-colorPicker [formControlName]="field.key" appendTo="body"
+                styleClass="w-full h-full opacity-0 absolute inset-0"></p-colorPicker>
+              <div [style.background-color]="form.get(field.key)?.value" class="w-full h-full"></div>
+            </div>
+            <input pInputText [formControlName]="field.key"
+              class="border-0 focus:ring-0 text-xs font-mono text-slate-600 w-full bg-transparent" />
+          </div>
+          }
+          @else if (field.maxLength > 100) {
+          <textarea pInputTextarea [formControlName]="field.key" rows="4"
+            class="w-full text-sm p-3 bg-white border-gray-200 focus:border-blue-500 focus:ring-blue-100 resize-none rounded-lg"></textarea>
+          }
+          @else {
+          <div class="relative">
+            <i *ngIf="field.format === 'url'" class="pi pi-link absolute right-3 top-3 text-gray-400 text-xs"></i>
+            <input pInputText [formControlName]="field.key"
+              class="w-full text-sm p-2.5 rounded-lg border-gray-200 hover:border-gray-300 focus:border-blue-500" />
+          </div>
+          }
+
+          @if(field.description) {
+          <p class="mt-1 text-[10px] text-gray-400 leading-tight">{{ field.description }}</p>
+          }
+        </div>
+      </ng-template>
+
+
+      <p-tabpanel value="0">
+        <div class="flex flex-col gap-6 p-5">
+
+          <div class="flex flex-col gap-5">
+            @for (field of tabs.content; track field.key) {
+            @if(field.type !== 'array') {
+            <ng-container *ngTemplateOutlet="inputRenderer; context: {$implicit: field}"></ng-container>
+            }
+            }
+          </div>
+
+          @for (field of tabs.content; track field.key) {
+          @if(field.type === 'array') {
+          <div class="array-section bg-slate-50 border border-slate-200 rounded-xl overflow-hidden"
+            [formArrayName]="field.key">
+
+            <div class="px-4 py-3 bg-white border-b border-slate-200 flex justify-between items-center">
+              <span class="text-xs font-bold uppercase text-slate-700 tracking-wider">
+                {{ field.label }}
+              </span>
+              <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-[10px] font-bold">
+                {{ getFormArray(field.key).length }}
+              </span>
+            </div>
+
+            <div cdkDropList (cdkDropListDropped)="drop($event, field.key)" class="p-2 flex flex-col gap-2">
+
+              @for (control of getFormArray(field.key).controls; track control; let i = $index) {
+              <div cdkDrag [formGroupName]="i"
+                class="bg-white border border-slate-200 rounded-lg shadow-sm group hover:shadow-md transition-all">
+
+                <div class="flex items-center p-2 cursor-pointer select-none" (click)="toggleExpanded(control)">
+
+                  <div class="cursor-move text-slate-300 hover:text-slate-600 px-2" cdkDragHandle
+                    (click)="$event.stopPropagation()">
+                    <i class="pi pi-bars"></i>
+                  </div>
+
+                  <div class="flex-1 min-w-0 px-2">
+                    <p class="text-sm font-semibold text-slate-700 truncate">
+                      {{ getItemTitle(control, field.schema) }}
+                    </p>
+                    <p class="text-[10px] text-slate-400 truncate"
+                      *ngIf="control.value.description || control.value.url">
+                      {{ control.value.description || control.value.url }}
+                    </p>
+                  </div>
+
+                  <i class="pi text-slate-400 text-xs mr-2 transition-transform duration-200"
+                    [class.pi-chevron-down]="!isExpanded(control)" [class.pi-chevron-up]="isExpanded(control)"></i>
+
+                  <button type="button" (click)="removeArrayItem(field.key, i, $event)"
+                    class="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 rounded transition-colors">
+                    <i class="pi pi-trash text-sm"></i>
+                  </button>
+                </div>
+
+                <div class="border-t border-slate-100 bg-slate-50/50 p-4 grid gap-4 animate-fade-in"
+                  [class.hidden]="!isExpanded(control)" [class.block]="isExpanded(control)">
+
+                  @for (subField of getArraySchema(field); track subField.key) {
+                  <div>
+                    <label class="text-[10px] font-bold uppercase text-slate-400 mb-1 block">{{subField.label}}</label>
+                    @if(subField.enum) {
+                    <p-select [formControlName]="subField.key" [options]="getEnumOptions(subField)" optionLabel="label"
+                      optionValue="value" appendTo="body" styleClass="w-full p-inputtext-sm"></p-select>
+                    } @else {
+                    <input pInputText [formControlName]="subField.key"
+                      class="w-full text-sm p-2 rounded border-gray-200" [placeholder]="subField.label">
+                    }
+                  </div>
+                  }
+                </div>
+              </div>
+              }
+          </div>
+
+            <div class="p-2 border-t border-slate-200 bg-gray-50">
+              <button pButton label="Add Item" icon="pi pi-plus"
+                class="p-button-outlined p-button-sm w-full border-dashed border-gray-300 text-gray-500 hover:text-blue-600 hover:border-blue-400 hover:bg-blue-50"
+                (click)="addArrayItem(field)">
+              </button>
+            </div>
+
+          </div>
+          }
+          }
+        </div>
+      </p-tabpanel>
+
+
+      <p-tabpanel value="1">
+        <div class="p-5 flex flex-col gap-6">
+
+          @if (booleanGroup.length > 0) {
+          <div class="grid grid-cols-2 gap-3">
+            @for (field of booleanGroup; track field.key) {
+            <div
+              class="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:border-blue-300 transition-colors shadow-sm cursor-pointer"
+              (click)="form.get(field.key)?.setValue(!form.get(field.key)?.value)">
+              <span class="text-xs font-medium text-slate-700 select-none">{{ field.label }}</span>
+              <p-toggleswitch [formControlName]="field.key" class="scale-75 origin-right"></p-toggleswitch>
+            </div>
+            }
+          </div>
+          }
+
+          <div class="h-px bg-gray-100 my-2"></div>
+
+          <div class="grid grid-cols-2 gap-x-4 gap-y-6">
+            @for (field of tabs.settings; track field.key) {
+            <div [class.col-span-2]="field.type === 'string' && field.maxLength > 50">
+              <ng-container *ngTemplateOutlet="inputRenderer; context: {$implicit: field}"></ng-container>
+            </div>
+            }
+          </div>
+        </div>
+      </p-tabpanel>
+
+
+      <p-tabpanel value="2">
+        <div class="p-5 grid grid-cols-2 gap-4">
+          @for (field of tabs.style; track field.key) {
+          <div class="col-span-2 sm:col-span-1">
+            <ng-container *ngTemplateOutlet="inputRenderer; context: {$implicit: field}"></ng-container>
+          </div>
+          }
+        </div>
+      </p-tabpanel>
+
+    </p-tabpanels>
+  </p-tabs>
+</form> -->

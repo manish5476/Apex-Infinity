@@ -1,177 +1,307 @@
-// --- ERP Compact Constants ---
-$sidebar-expanded: 260px;
-$sidebar-collapsed: 68px;
-$header-height: 48px;
-$transition-speed: 280ms;
-$ease: cubic-bezier(0.4, 0, 0.2, 1);
-
 :host {
-  height: 100%;
+  /* =======================================
+     1. LOCAL VARIABLES & TOKEN MAPPING
+     ======================================= */
+  --sb-width-collapsed: 84px; /* Slightly wider for better touch targets */
+  --sb-width-expanded: 280px;
+  
+  /* Mapping to your provided Project Tokens */
+  --sb-bg: var(--bg-secondary);
+  --sb-border: var(--border-primary);
+  --sb-border-light: var(--border-secondary);
+  
+  --sb-text-main: var(--text-primary);
+  --sb-text-muted: var(--text-secondary);
+  --sb-accent: var(--accent-primary);
+  
+  --sb-hover: var(--bg-ternary);
+  --sb-active-bg: var(--bg-primary);
+
+  --glass-blur: 16px;
+
+  /* Layout Setup */
   display: block;
+  height: 100vh;
+  box-sizing: border-box;
+  
+  /* FLOATING MARGIN EFFECT: 
+     We apply padding to the host container. 
+     The inner .glass-panel will fill the remaining space. */
+  padding: var(--spacing-lg); 
 }
 
-.sidebar-container {
-  height: 100vh;
-  width: $sidebar-collapsed;
-  padding: 12px 0 12px 12px; // The floating gap
-  transition: width $transition-speed $ease;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  background: transparent;
+/* =============================================
+   2. LAYOUT CONTAINER
+   ============================================= */
+.sidebar-layout {
+  height: 100%;
+  width: var(--sb-width-collapsed);
+  transition: width var(--transition-base);
+  position: relative;
+  z-index: var(--z-fixed);
 
   &.expanded {
-    width: $sidebar-expanded;
+    width: var(--sb-width-expanded);
   }
 
+  /* Mobile Override: Remove floating margins */
   &.mobile {
     position: fixed;
     top: 0;
-    left: 0;
-    z-index: 1000;
-    transform: translateX(-100%);
-    &.expanded { transform: translateX(0); }
-  }
-}
-
-.sidebar-panel {
-  flex: 1;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: 16px; 
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden; 
-}
-
-.menu-list {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 8px 0;
-  scrollbar-width: none;
-  
-  &::-webkit-scrollbar { width: 0; }
-  
-  &:hover {
-    &::-webkit-scrollbar { width: 4px; }
-    &::-webkit-scrollbar-thumb { 
-      background: var(--border-primary); 
-      border-radius: 10px; 
+    left: calc(var(--sb-width-expanded) * -1);
+    height: 100%;
+    padding: 0; /* Reset host padding influence */
+    margin: 0;
+    
+    &.expanded {
+      left: 0;
+      width: 100%;
+      max-width: var(--sb-width-expanded);
+    }
+    
+    .glass-panel {
+      border-radius: 0;
+      border: none;
+      border-right: var(--ui-border-width) solid var(--sb-border);
     }
   }
 }
 
-.menu-item-wrapper {
+/* =============================================
+   3. GLASS PANEL (Visual Core)
+   ============================================= */
+.glass-panel {
+  height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  width: 100%;
-}
-
-.menu-title {
-  display: flex;
-  align-items: center;
-  height: 44px;
-  margin: 2px 8px;
-  border-radius: 10px;
-  cursor: pointer;
-  color: var(--text-secondary);
-  transition: all 0.2s ease;
-  text-decoration: none;
-  white-space: nowrap;
-  outline: none;
-
-  &:hover {
-    background: var(--bg-ternary);
-    color: var(--accent-primary);
-  }
-
-  &.active-link {
-    background: var(--accent-focus);
-    color: var(--accent-primary);
-    font-weight: 600;
-  }
-}
-
-.menu-icon {
-  width: calc(#{$sidebar-collapsed} - 28px);
-  flex-shrink: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.1rem;
-}
-
-.menu-label {
-  flex: 1;
-  font-size: 0.875rem;
-  font-weight: 500;
-  opacity: 0;
-  transform: translateX(-5px);
-  transition: opacity 0.2s, transform 0.2s;
-
-  &.visible {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.menu-arrow {
-  margin-right: 12px;
-  font-size: 0.75rem;
-  transition: transform 0.3s $ease;
-  &.rotate { transform: rotate(180deg); }
-}
-
-.submenu {
-  margin-left: 31px; // Aligns vertical line with icon center
-  border-left: 1px solid var(--border-primary);
   overflow: hidden;
-  transition: max-height $transition-speed $ease, opacity 0.2s ease;
-  opacity: 0;
+
+  /* Glassmorphism using tokens */
+  background: var(--sb-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   
-  &.open {
-    opacity: 1;
-    margin-bottom: 4px;
-  }
+  /* Floating Shape */
+  border: var(--ui-border-width) solid var(--sb-border);
+  border-radius: var(--ui-border-radius-xl);
+  box-shadow: var(--shadow-xl);
 }
 
-.submenu-link {
+/* =============================================
+   4. HEADER & FOOTER
+   ============================================= */
+.sidebar-header {
+  height: 64px;
   display: flex;
   align-items: center;
-  height: 34px;
-  padding-left: 18px;
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  text-decoration: none;
-  transition: color 0.2s ease;
+  padding: 0 var(--spacing-xl);
+  border-bottom: var(--ui-border-width) solid var(--sb-border-light);
   
-  &:hover { color: var(--accent-primary); }
-  &.active-link { 
-    color: var(--accent-primary); 
-    font-weight: 600;
+  .brand-text {
+    font-family: var(--font-heading);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-xl);
+    color: var(--sb-accent);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
   }
 }
 
-.sidebar-footer {
-  padding: 8px;
-  border-top: 1px solid var(--border-primary);
+.glass-footer {
+  padding: var(--spacing-md);
+  border-top: var(--ui-border-width) solid var(--sb-border-light);
+  background: var(--sb-hover); /* Subtle contrast */
 
-  button {
+  .logout-btn {
     width: 100%;
-    height: 44px;
-    border-radius: 10px;
-    border: none;
-    background: transparent;
+    height: 42px;
+    border: var(--ui-border-width) solid var(--sb-border-light);
+    background: var(--sb-bg);
+    border-radius: var(--ui-border-radius-lg);
+    
+    /* Text */
+    color: var(--color-error, #ef4444);
+    font-family: var(--font-heading);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    
+    cursor: pointer;
     display: flex;
     align-items: center;
-    color: var(--color-error, #ef4444);
-    cursor: pointer;
-    transition: background 0.2s;
-    
-    &:hover { background: var(--bg-ternary); }
-    i { width: calc(#{$sidebar-collapsed} - 28px); text-align: center; }
-    span { font-size: 0.875rem; font-weight: 500; }
+    justify-content: center;
+    gap: var(--spacing-md);
+    transition: var(--transition-fast);
+
+    &:hover {
+      background: var(--color-error, #ef4444);
+      border-color: var(--color-error, #ef4444);
+      color: #ffffff;
+      box-shadow: var(--shadow-md);
+    }
   }
+}
+
+/* =============================================
+   5. MENU SCROLL AREA
+   ============================================= */
+.menu-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--spacing-lg) var(--spacing-md);
+  
+  /* Scrollbar */
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb { 
+    background: var(--sb-border-light); 
+    border-radius: 4px; 
+  }
+}
+
+.menu-group {
+  margin-bottom: var(--spacing-xs);
+}
+
+/* =============================================
+   6. MENU ITEMS
+   ============================================= */
+.menu-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  text-decoration: none;
+  color: var(--sb-text-main);
+  transition: all var(--transition-fast);
+  border-radius: var(--ui-border-radius-lg);
+  border: 1px solid transparent; 
+}
+
+/* --- Level 1 (Categories) --- */
+.level-1 {
+  height: 48px;
+  padding: 0 var(--spacing-md);
+  margin-bottom: 2px;
+
+  &.collapsed {
+    justify-content: center;
+    padding: 0;
+    .label-text, .arrow-indicator { display: none; }
+  }
+
+  &:hover {
+    background: var(--sb-hover);
+    color: var(--sb-accent);
+  }
+
+  &.active-parent {
+    background: var(--sb-active-bg);
+    border-color: var(--sb-border-light);
+    color: var(--sb-accent);
+    font-weight: var(--font-weight-medium);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .icon-wrapper {
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+  }
+
+  .label-text {
+    margin-left: var(--spacing-lg);
+    font-family: var(--font-heading);
+    font-size: var(--font-size-base);
+    white-space: nowrap;
+    overflow: hidden;
+    flex: 1;
+  }
+}
+
+/* --- Level 2 (Submenu) --- */
+.level-2 {
+  height: 40px;
+  margin: var(--spacing-xs) 0;
+  padding-left: var(--spacing-xl);
+  color: var(--sb-text-muted);
+  font-size: var(--font-size-sm);
+
+  &:hover {
+    color: var(--sb-text-main);
+    background: var(--sb-hover);
+  }
+
+  &.active {
+    color: var(--sb-accent);
+    font-weight: var(--font-weight-semibold);
+    background: var(--sb-hover);
+    
+    .dot-indicator {
+      background: var(--sb-accent);
+      transform: scale(1.2);
+      opacity: 1;
+    }
+  }
+
+  .dot-indicator {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.4;
+    margin-right: var(--spacing-md);
+    transition: var(--transition-transform);
+  }
+}
+
+/* --- Level 3 (Deep Links) --- */
+.level-3-wrapper {
+  padding-left: 38px;
+  border-left: 1px dashed var(--sb-border-light);
+  margin-left: 23px;
+}
+
+.level-3 {
+  height: 34px;
+  font-size: var(--font-size-sm);
+  color: var(--sb-text-muted);
+  padding-left: var(--spacing-md);
+  
+  &:hover { 
+    color: var(--sb-text-main); 
+  }
+  
+  &.active-deep {
+    color: var(--sb-accent);
+    font-weight: var(--font-weight-semibold);
+  }
+}
+
+/* =============================================
+   7. ANIMATIONS
+   ============================================= */
+.submenu-accordion {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--transition-base);
+  
+  &.expanded {
+    grid-template-rows: 1fr;
+  }
+}
+
+.submenu-content { overflow: hidden; }
+
+.arrow-indicator {
+  font-size: 0.7rem;
+  opacity: 0.6;
+  transition: transform var(--transition-fast);
+  
+  &.rotated { transform: rotate(180deg); }
+  &.sm { font-size: 0.6rem; }
 }

@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Manrope:wght@400;500;700&display=swap');
+
+:host {
+  display: block;
+  font-family: 'Manrope', sans-serif;
+}
+
+.section-root {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background Overlay */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5); /* Darkens image by 50% */
+  z-index: 0;
+}
+
+/* Typography Engine (The "Prose" Class) */
+.prose {
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.75;
+  color: inherit;
+  opacity: 0.9;
+
+  /* Handle various HTML tags injected into config.content */
+  ::ng-deep {
+    p { margin-bottom: 1.5em; }
+    
+    strong { font-weight: 700; color: inherit; }
+    
+    a { 
+      color: #3b82f6; 
+      text-decoration: underline; 
+      text-underline-offset: 4px;
+      &:hover { color: #2563eb; }
+    }
+
+    ul { 
+      list-style-type: disc; 
+      padding-left: 1.5em; 
+      margin-bottom: 1.5em; 
+    }
+
+    ol { 
+      list-style-type: decimal; 
+      padding-left: 1.5em; 
+      margin-bottom: 1.5em; 
+    }
+
+    blockquote {
+      border-left: 4px solid currentColor;
+      padding-left: 1em;
+      font-style: italic;
+      opacity: 0.8;
+      margin: 2em 0;
+    }
+
+    h3, h4 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      margin-top: 2em;
+      margin-bottom: 0.5em;
+      line-height: 1.2;
+    }
+  }
+}
+
+/* Animations */
+.animate-fade-up {
+  opacity: 0;
+  animation: fadeUp 0.8s ease-out forwards;
+}
+
+.delay-100 { animation-delay: 100ms; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

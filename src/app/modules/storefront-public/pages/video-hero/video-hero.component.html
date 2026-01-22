@@ -1,0 +1,69 @@
+<section class="section-root relative w-full overflow-hidden bg-slate-900" 
+         [ngClass]="heightClass()">
+
+  <div class="absolute inset-0 z-0">
+    <video #videoPlayer 
+           class="absolute inset-0 w-full h-full object-cover"
+           [poster]="config.posterImage"
+           autoplay 
+           loop 
+           muted 
+           playsinline>
+      <source [src]="config.videoUrl" type="video/mp4">
+      <img [src]="config.posterImage" class="absolute inset-0 w-full h-full object-cover" alt="Hero Background">
+    </video>
+
+    <div class="absolute inset-0 bg-black transition-opacity duration-700"
+         [style.opacity]="config.overlayOpacity || 0.4">
+    </div>
+    
+    <div class="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-black/80 to-transparent"></div>
+  </div>
+
+  <div class="relative z-10 w-full h-full flex flex-col items-center justify-center text-center px-6">
+    
+    <div class="max-w-4xl mx-auto space-y-8 animate-fade-up">
+      
+      @if (config.title) {
+        <h1 class="font-serif text-5xl md:text-7xl lg:text-8xl font-bold text-white tracking-tight leading-none drop-shadow-lg">
+          {{ config.title }}
+        </h1>
+      }
+
+      @if (config.subtitle) {
+        @if (config.subtitle.includes('http')) {
+           <p class="text-lg md:text-xl text-white/90 font-light max-w-2xl mx-auto leading-relaxed drop-shadow-md">
+             {{ config.subtitle }}
+           </p>
+        } @else {
+          <p class="text-lg md:text-xl text-white/90 font-light max-w-2xl mx-auto leading-relaxed drop-shadow-md">
+            {{ config.subtitle }}
+          </p>
+        }
+      }
+
+      @if (validButtons.length > 0) {
+        <div class="flex flex-wrap justify-center gap-4 pt-4">
+          @for (btn of validButtons; track $index) {
+            <a [routerLink]="btn.url" 
+               class="px-8 py-4 rounded-full text-xs font-bold uppercase tracking-[0.15em] transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl border"
+               [ngClass]="{
+                 'bg-white text-slate-900 border-white hover:bg-slate-200': btn.variant === 'primary' || !btn.variant,
+                 'bg-transparent text-white border-white hover:bg-white hover:text-slate-900': btn.variant === 'outline',
+                 'bg-white/10 backdrop-blur-md text-white border-white/20 hover:bg-white/20': btn.variant === 'white'
+               }">
+               {{ btn.text }}
+            </a>
+          }
+        </div>
+      }
+
+    </div>
+
+  </div>
+
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/50 animate-bounce">
+    <i class="pi pi-angle-down text-2xl"></i>
+  </div>
+
+</section>

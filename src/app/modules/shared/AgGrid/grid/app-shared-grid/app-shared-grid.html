@@ -1,0 +1,137 @@
+<div class="shared-grid-container h-full flex flex-col">
+
+  @if(showActions() || selectionMode()){
+  <div class="grid-toolbar">
+
+    <div class="toolbar-context">
+      @if (selectedCount() > 0) {
+        <div class="selection-chip">
+          <i class="pi pi-check-circle"></i>
+          <span>{{ selectedCount() }} Selected</span>
+        </div>
+      }
+    </div>
+
+    <div class="toolbar-actions">
+
+      @if (!isBulkEditing()) {
+        <p-button 
+          label="Edit Selected" 
+          icon="pi pi-pencil" 
+          [text]="true"
+          [rounded]="true"
+          size="small"
+          styleClass="premium-btn btn-primary"
+          [disabled]="selectedCount() === 0"
+          (click)="enableBulkEdit()">
+        </p-button>
+
+        <div class="divider-vertical" *ngIf="selectedCount() > 0"></div>
+
+        <p-button 
+          label="Delete" 
+          icon="pi pi-trash" 
+          [text]="true" 
+          [rounded]="true"
+          size="small"
+          styleClass="premium-btn btn-danger"
+          [disabled]="selectedCount() === 0" 
+          (click)="deleteSelected()">
+        </p-button>
+      }
+
+      @else {
+        <span class="editing-indicator">
+          Editing {{ editingIds.size }} items
+        </span>
+
+        <p-button 
+          label="Cancel" 
+          icon="pi pi-times" 
+          [text]="true" 
+          [rounded]="true"
+          size="small"
+          styleClass="premium-btn btn-secondary"
+          (click)="cancelBulkEdit()">
+        </p-button>
+
+        <p-button 
+          label="Save All" 
+          icon="pi pi-check" 
+          [rounded]="true" 
+          size="small"
+          styleClass="premium-btn btn-success-filled"
+          (click)="saveBulkEdit()">
+        </p-button>
+      }
+    </div>
+  </div>
+  }
+
+  <div class="flex-1 overflow-hidden grid-wrapper">
+    <ag-grid-angular 
+      class="ag-theme-quartz" 
+      style="width:100%; height:100%;" 
+      [theme]="agTheme()"
+      [rowData]="data() ?? []" 
+      [columnDefs]="columnDefs()" 
+      [gridOptions]="gridOptions" 
+      [rowSelection]="selectionOptions"
+      (gridReady)="onGridReady($event)" 
+      (selectionChanged)="onSelectionChanged()">
+    </ag-grid-angular>
+  </div>
+
+</div>
+
+<!-- <div class="shared-grid-container h-full flex flex-col">
+
+  <div class="grid-toolbar flex items-center justify-between p-2 border-b bg-gray-50"
+    *ngIf="showActions() || selectionMode()">
+
+    <div class="flex items-center gap-2">
+      <span class="text-sm font-medium text-gray-600" *ngIf="selectedCount() > 0">
+        {{ selectedCount() }} selected
+      </span>
+    </div>
+
+    <div class="flex gap-2">
+
+      @if (!isBulkEditing()) {
+      <p-button label="Edit Selected" icon="pi pi-pencil" size="small" [disabled]="selectedCount() === 0"
+        (click)="enableBulkEdit()">
+      </p-button>
+
+      <p-button label="Delete" icon="pi pi-trash" severity="danger" size="small" [text]="true"
+        [disabled]="selectedCount() === 0" (click)="deleteSelected()">
+      </p-button>
+      }
+
+      @else {
+      <span class="text-sm text-blue-600 font-bold self-center mr-2">
+        Editing {{ editingIds.size }} rows...
+      </span>
+
+      <p-button label="Cancel" icon="pi pi-times" severity="secondary" size="small" (click)="cancelBulkEdit()">
+      </p-button>
+
+      <p-button label="Save All" icon="pi pi-check" severity="success" size="small" (click)="saveBulkEdit()">
+      </p-button>
+      }
+    </div>
+  </div>
+
+  <div class="flex-1 overflow-hidden">
+    <ag-grid-angular class="ag-theme-quartz" style="width:100%; height:100%;" [theme]="agTheme()"
+      [rowData]="data() ?? []" [columnDefs]="columnDefs()" [gridOptions]="gridOptions" [rowSelection]="selectionOptions"
+      (gridReady)="onGridReady($event)" (selectionChanged)="onSelectionChanged()">
+    </ag-grid-angular>
+  </div>
+
+</div> -->
+
+<!-- <ag-grid-angular class="ag-theme-quartz" style="width:100%; height:100%;" [theme]="agTheme()" [rowData]="data() ?? []"
+  [columnDefs]="columnDefs()" [gridOptions]="gridOptions" [rowSelection]="selectionOptions" 
+  (gridReady)="onGridReady($event)" (selectionChanged)="onSelectionChanged()">
+</ag-grid-angular> -->
+<!-- (rowEditingStopped)="onRowEditingStopped($event)" -->

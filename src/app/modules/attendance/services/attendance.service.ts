@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { SocketService } from './../../../core/services/socket.service';
+import { Inject, Injectable } from '@angular/core';
+import { catchError, Observable, switchMap } from 'rxjs';
 import { BaseApiService } from '../../../core/services/base-api.service';
 import { HttpHeaders } from '@angular/common/http';
 
@@ -45,6 +46,7 @@ export interface ExportOptions {
 @Injectable({ providedIn: 'root' })
 export class AttendanceService extends BaseApiService {
   // 🔗 Matches your Backend Route prefix
+  private socketService = Inject(SocketService)
   private endpoint = '/v1/attendance';
 
   // =========================================================
@@ -55,8 +57,58 @@ export class AttendanceService extends BaseApiService {
    * 👊 Web Punch (Check In / Check Out / Breaks)
    * @param data Attendance punch data
    */
+  // markAttendance(data: AttendancePunchData): Observable<any> {
+  //   return this.post(`${this.endpoint}/punch`, data, 'markAttendance');
+  // }
+  // attendance.service.ts - Updated markAttendance method
   markAttendance(data: AttendancePunchData): Observable<any> {
+    // Ensure location is included if required
+    if (!data.latitude || !data.longitude) {
+      return this.getCurrentPosition().pipe(
+        switchMap(position => {
+          const enhancedData = {
+            ...data,
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy
+          };
+          return this.post(`${this.endpoint}/punch`, enhancedData, 'markAttendance');
+        }),
+        catchError(error => {
+          // If location fails, still try with null values
+          const fallbackData = {
+            ...data,
+            latitude: null,
+            longitude: null,
+            accuracy: null
+          };
+          return this.post(`${this.endpoint}/punch`, fallbackData, 'markAttendance');
+        })
+      );
+    }
     return this.post(`${this.endpoint}/punch`, data, 'markAttendance');
+  }
+
+  /**
+   * Get current position with better error handling
+   */
+  private getCurrentPosition(): Observable<GeolocationPosition> {
+    return new Observable(observer => {
+      if (!navigator.geolocation) {
+        observer.error(new Error('Geolocation not supported'));
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        position => observer.next(position),
+        error => observer.error(error),
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    });
   }
 
   /**
@@ -74,7 +126,7 @@ export class AttendanceService extends BaseApiService {
   getMyRequests(filterParams?: AttendanceFilter): Observable<any> {
     return this.get(`${this.endpoint}/my-requests`, filterParams, 'getMyRequests');
   }
-  
+
 
   /**
    * 📝 Submit Regularization Request
@@ -117,10 +169,10 @@ export class AttendanceService extends BaseApiService {
    * @param requestId The ID of the Regularization Request
    * @param data Decision data
    */
-  decideRegularization(requestId: string, data: { 
-    status: 'approved' | 'rejected'; 
-    comments?: string; 
-    rejectionReason?: string; 
+  decideRegularization(requestId: string, data: {
+    status: 'approved' | 'rejected';
+    comments?: string;
+    rejectionReason?: string;
   }): Observable<any> {
     return this.patch(`${this.endpoint}/regularize/${requestId}`, data, 'decideRegularization');
   }
@@ -311,7 +363,7 @@ export class AttendanceService extends BaseApiService {
           if (response.data && response.data.length > 0) {
             const today = new Date().toISOString().split('T')[0];
             const todayRecord = response.data.find((record: any) => record.date === today);
-            
+
             if (todayRecord && todayRecord.firstIn) {
               observer.next({ hasPunchedIn: true, lastPunch: todayRecord.firstIn });
             } else {
@@ -357,10 +409,10 @@ export class AttendanceService extends BaseApiService {
   formatAttendanceDate(dateStr: string): string {
     if (!dateStr) return '';
     const date = new Date(dateStr);
-    return date.toLocaleDateString('en-IN', { 
-      weekday: 'short', 
-      day: '2-digit', 
-      month: 'short' 
+    return date.toLocaleDateString('en-IN', {
+      weekday: 'short',
+      day: '2-digit',
+      month: 'short'
     });
   }
 
@@ -428,13 +480,13 @@ export class AttendanceService extends BaseApiService {
   connectToAttendanceSocket(userId: string): void {
     // This would integrate with your SocketService
     // Example implementation:
-    /*
+
     this.socketService.connect('attendance');
-    this.socketService.emit('attendance:subscribe', { 
+    this.socketService.emit('attendance:subscribe', {
       userId,
-      subscriptionType: 'my_attendance' 
+      subscriptionType: 'my_attendance'
     });
-    */
+
   }
 
   /**
@@ -443,11 +495,11 @@ export class AttendanceService extends BaseApiService {
   onAttendanceUpdate(): Observable<any> {
     return new Observable(observer => {
       // This would integrate with your SocketService
-      /*
-      this.socketService.on('attendance:punch').subscribe(data => {
+
+      this.socketService.on('attendance:punch').subscribe((data:any) => {
         observer.next(data);
       });
-      */
+
     });
   }
 
@@ -457,11 +509,11 @@ export class AttendanceService extends BaseApiService {
   onRequestUpdate(): Observable<any> {
     return new Observable(observer => {
       // This would integrate with your SocketService
-      /*
-      this.socketService.on('attendance:request:updated').subscribe(data => {
+      
+      this.socketService.on('attendance:request:updated').subscribe((data:any) => {
         observer.next(data);
       });
-      */
+      
     });
   }
 
@@ -476,11 +528,11 @@ export class AttendanceService extends BaseApiService {
   importAttendance(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
-    
+
     // Create HTTP headers for file upload
     const headers = new HttpHeaders();
     // Note: Don't set Content-Type for FormData - browser will set it automatically with boundary
-    
+
     return this.http.post(`${this.baseUrl}${this.endpoint}/import`, formData, {
       headers,
       withCredentials: true,
@@ -499,7 +551,7 @@ export class AttendanceService extends BaseApiService {
   // 🔧 ADDITIONAL METHODS TO FIX THE ERRORS
   // =========================================================
 
-  
+
   /**
    * POST with custom headers (for machine-push with API key)
    * @param url API endpoint

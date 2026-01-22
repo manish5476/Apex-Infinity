@@ -1,0 +1,60 @@
+<form [formGroup]="form" class="flex flex-col gap-6">
+
+  <ng-container *ngFor="let field of schema | keyvalue">
+
+    <ng-container [ngSwitch]="field.value.type">
+
+      <!-- STRING -->
+      <div *ngSwitchCase="'string'" class="flex flex-col gap-1">
+        <label>{{ label(field.key) }}</label>
+        @if(field.value.enum){
+        <p-select [options]="options(field.value.enum)" [formControlName]="field.key">
+        </p-select>
+        }
+
+
+        <p-colorPicker *ngIf="field.value.format === 'color'" [formControlName]="field.key">
+        </p-colorPicker>
+
+        <textarea *ngIf="field.value.maxLength > 300" pInputTextarea [formControlName]="field.key">
+        </textarea>
+
+        <input *ngIf="!field.value.enum && !field.value.format" pInputText [formControlName]="field.key" />
+      </div>
+
+      <!-- NUMBER -->
+      <div *ngSwitchCase="'number'" class="flex flex-col gap-1">
+        <label>{{ label(field.key) }}</label>
+        <p-inputNumber [min]="field.value.min" [max]="field.value.max" [formControlName]="field.key">
+        </p-inputNumber>
+      </div>
+
+      <!-- BOOLEAN -->
+      <div *ngSwitchCase="'boolean'" class="flex justify-between items-center">
+        <label>{{ label(field.key) }}</label>
+        <p-toggleswitch [formControlName]="field.key"></p-toggleswitch>
+      </div>
+
+      <!-- ARRAY -->
+      <div *ngSwitchCase="'array'" class="border p-4 rounded">
+        <div class="flex justify-between mb-2">
+          <strong>{{ label(field.key) }}</strong>
+          <button pButton size="small" (click)="addItem(field.key)">Add</button>
+        </div>
+
+        <div formArrayName="{{ field.key }}">
+          <div *ngFor="let g of array(field.key).controls; let i = index" [formGroupName]="i"
+            class="border p-3 mb-3 rounded">
+
+            <app-schema-form [schema]="field.value.schema" [value]="g.value" (valueChange)="null">
+            </app-schema-form>
+
+            <button pButton size="small" severity="danger" (click)="removeItem(field.key, i)">
+              Remove
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+</form>

@@ -103,7 +103,7 @@ $space-scale: (
   justify-content: space-between;
   padding: calc(var(--spacing-sm) / 2) var(--spacing-md);
   gap: var(--spacing-md);
-  background: transparent;
+    background: var(--bg-secondary);
   border-bottom: 1px solid color-mix(in srgb, var(--text-color) 8%, transparent);
 }
 

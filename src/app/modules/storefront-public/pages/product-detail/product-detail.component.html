@@ -1,0 +1,161 @@
+<p-toast position="bottom-center" [showTransformOptions]="'translateY(100%)'" [showTransitionOptions]="'300ms ease-out'" [hideTransitionOptions]="'200ms ease-in'"></p-toast>
+
+@if (loading()) {
+  <div class="h-screen w-full flex items-center justify-center">
+    <div class="loader-pulse"></div>
+  </div>
+} 
+@else if (product(); as p) {
+  
+  <div class="page-container font-sans text-slate-900 selection:bg-rose-200 selection:text-rose-900">
+    
+    <div class="ambient-backdrop" [style.background]="'radial-gradient(circle at 30% 40%, ' + ambientColor() + ' 0%, transparent 60%)'"></div>
+    <div class="noise-overlay"></div>
+
+    <div class="grid-layout">
+      
+      <div class="visual-col">
+        <div class="sticky-stage">
+          
+          <nav class="md:hidden flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 mb-6">
+            <a [routerLink]="['/store', orgSlug()]" class="hover:text-slate-900 transition-colors">Home</a>
+            <span>/</span>
+            <span class="text-slate-900">{{ p.name }}</span>
+          </nav>
+
+          <div class="main-image-card" @fadeIn>
+            <img [src]="selectedImage()" [alt]="p.name" class="hero-img" />
+            
+            <div class="badges">
+              @if (p.price.hasDiscount) {
+                <span class="badge sale">-{{ discountPercentage() }}%</span>
+              }
+              @if (!p.stock?.available) {
+                <span class="badge sold">Sold Out</span>
+              }
+            </div>
+          </div>
+
+          @if (p.images?.length > 1) {
+            <div class="thumbnails-dock">
+              @for (img of p.images; track img) {
+                <button 
+                  class="thumb-btn" 
+                  [class.active]="selectedImage() === img"
+                  (click)="changeImage(img)">
+                  <img [src]="img" [alt]="p.name" />
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="details-col" @fadeUp>
+        
+        <nav class="hidden md:flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 mb-8">
+          <a [routerLink]="['/store', orgSlug()]" class="hover:text-slate-900 transition-colors">Home</a>
+          <span>/</span>
+          <span class="text-slate-900">{{ p.brand || 'Shop' }}</span>
+        </nav>
+
+        <div class="header-section">
+          <h1 class="product-title">{{ p.name }}</h1>
+          
+          <div class="meta-row">
+            <div class="price-wrapper">
+              <span class="current-price">{{ p.price.discounted || p.price.original | currency:p.price.currency }}</span>
+              @if (p.price.hasDiscount) {
+                <span class="original-price">{{ p.price.original | currency:p.price.currency }}</span>
+              }
+            </div>
+            <div class="rating-pill">
+              <i class="pi pi-star-fill text-yellow-500 text-xs"></i>
+              <span>4.9</span>
+              <span class="text-slate-400">/ 5</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="description">{{ p.description }}</p>
+
+        <div class="configurator">
+          
+          <div class="config-group">
+            <span class="label">Finish: <strong class="text-slate-900">{{ selectedVariant().name }}</strong></span>
+            <div class="color-row">
+              @for (v of variants(); track v.code) {
+                <button 
+                  class="color-circle" 
+                  [class.active]="selectedVariant() === v"
+                  [style.background-color]="v.colorCode"
+                  (click)="selectVariant(v)"
+                  pTooltip="{{v.name}}" tooltipPosition="top">
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="actions-row">
+            <div class="qty-stepper">
+              <button (click)="updateQuantity(-1)" [disabled]="quantity() <= 1">−</button>
+              <span class="val">{{ quantity() }}</span>
+              <button (click)="updateQuantity(1)">+</button>
+            </div>
+
+            <button class="add-btn" 
+                    [disabled]="!p.stock?.available"
+                    (click)="addToCart()">
+              <span>{{ p.stock?.available ? 'Add to Bag' : 'Out of Stock' }}</span>
+              <span class="separator">|</span>
+              <span class="price-calc">{{ (p.price.discounted || p.price.original) * quantity() | currency:p.price.currency }}</span>
+            </button>
+
+            <button class="wishlist-btn">
+              <i class="pi pi-heart"></i>
+            </button>
+          </div>
+
+          <div class="trust-badges">
+            <div class="item"><i class="pi pi-truck"></i> Free Shipping</div>
+            <div class="item"><i class="pi pi-check-circle"></i> 30-Day Returns</div>
+            <div class="item"><i class="pi pi-shield"></i> 2-Year Warranty</div>
+          </div>
+
+        </div>
+
+        <div class="accordion-group">
+          <div class="accordion-item" [class.open]="openAccordion() === 'desc'">
+            <button class="accordion-header" (click)="toggleAccordion('desc')">
+              <span>Product Details</span>
+              <i class="pi pi-chevron-down indicator"></i>
+            </button>
+            <div class="accordion-content">
+              <div class="inner">
+                <p>Crafted with precision and designed for the modern lifestyle. This product features premium materials sourced sustainably.</p>
+                <ul class="feature-list">
+                  <li>Premium aerospace-grade finish</li>
+                  <li>Hand-assembled components</li>
+                  <li>Eco-friendly packaging</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item" [class.open]="openAccordion() === 'ship'">
+            <button class="accordion-header" (click)="toggleAccordion('ship')">
+              <span>Shipping & Returns</span>
+              <i class="pi pi-chevron-down indicator"></i>
+            </button>
+            <div class="accordion-content">
+              <div class="inner">
+                <p>Free standard shipping on all orders over $100. Returns accepted within 30 days of delivery in original condition.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+}

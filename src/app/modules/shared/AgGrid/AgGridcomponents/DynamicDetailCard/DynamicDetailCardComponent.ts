@@ -315,7 +315,7 @@ import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
   height: 32px;
   border-radius: var(--ui-border-radius);
   border: none;
-  background: transparent;
+    background: var(--bg-secondary);
   color: var(--text-secondary);
   display: grid;
   place-items: center;

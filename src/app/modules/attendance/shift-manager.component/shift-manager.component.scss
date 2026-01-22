@@ -45,11 +45,11 @@
       letter-spacing: 0.5px;
     }
 
-    /* Force PrimeNG inputs to fill width of wrapper */
-    ::ng-deep .p-inputtext, 
-    ::ng-deep .p-select {
-      width: 100%;
-    }
+    // /* Force PrimeNG inputs to fill width of wrapper */
+    // ::ng-deep .p-inputtext, 
+    // ::ng-deep .p-select {
+    //   width: 100%;
+    // }
   }
 
   /* Search Bar Specifics - Give it a bit more space */

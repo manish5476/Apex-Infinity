@@ -44,6 +44,7 @@ export type SharedGridEvent<T> =
         class="ag-theme-quartz"
         style="width:100%; height:100%;"
         [theme]="agTheme()"
+         [tooltipShowDelay]="tooltipShowDelay"
         [components]="components"
         [rowData]="data() ?? []"
         [columnDefs]="resolvedColumns()"
@@ -57,7 +58,7 @@ export type SharedGridEvent<T> =
       </ag-grid-angular>
     </div>
   `,
-styles: [`
+  styles: [`
     :host {
       display: flex;
       flex-direction: column;
@@ -100,44 +101,10 @@ styles: [`
       }
     }
   `]
-//   styles: [`
-//     // :host {
-//     //   display: block;
-//     //   width: 100%;
-//     //   height: 100%;
-//     // }
-
-//     // .shared-grid-root {
-//     //   width: 100%;
-//     //   height: 100%;
-//     //   min-height: 350px;
-//     //   border: 1px solid var(--border-primary);
-//     //   border-radius: var(--ui-border-radius-lg);
-//     //   overflow: hidden;
-//     //   background: var(--bg-primary);
-//     // }
-//     :host {
-//   display: flex;
-//   flex-direction: column;
-//   flex: 1;
-//   height: 100%;
-//   min-height:200px;
-// }
-
-// .shared-grid-root {
-//   flex: 1;
-//   height: 100%;
-//   width: 100%;
-//   display: flex;
-//   flex-direction: column;
-//   ag-grid-angular {
-//     flex: 1;
-//     height: 100% !important;
-//   }
-// }
-//   `]
 })
 export class AgShareGrid<T = any> {
+  tooltipShowDelay = 500;
+  tooltipShowMode: "standard" | "whenTruncated" = "whenTruncated";
 
   /* --------------------------------------------------
      INPUTS
@@ -214,6 +181,7 @@ export class AgShareGrid<T = any> {
       minWidth: 120,
       sortable: true,
       filter: true,
+      
       resizable: true,
       editable: params =>
         this.editingRowId === this.getRowId(params.data)

@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Manrope:wght@400;600&display=swap');
+
+:host {
+  display: block;
+  font-family: 'Manrope', sans-serif;
+}
+
+.font-serif {
+  font-family: 'Playfair Display', serif;
+}
+
+/* Ensure video covers exactly like object-cover */
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none; /* User can't pause/click it */
+}
+
+/* Animations */
+.animate-fade-up {
+  animation: fadeUp 1s ease-out forwards;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

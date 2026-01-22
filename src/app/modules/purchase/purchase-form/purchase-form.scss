@@ -264,7 +264,7 @@
 
 /* Adjust File Upload styles to fit theme */
 :host ::ng-deep .p-fileupload-content {
-  background: transparent;
+    background: var(--bg-secondary);
   border: none;
   padding: 0;
 }

@@ -1,0 +1,194 @@
+<div class="relative w-full overflow-hidden group isolate" 
+     [ngClass]="minHeightClass()"
+     @heroAnim>
+
+  <div class="absolute inset-0 z-0 select-none">
+    <img [src]="config.backgroundImage" 
+         alt="Hero Background"
+         class="absolute inset-0 w-full h-full object-cover transition-transform duration-[20s] ease-linear group-hover:scale-105"
+         [class.hidden]="config.mobileBackgroundImage"
+         [class.md:block]="config.mobileBackgroundImage">
+    
+    <img *ngIf="config.mobileBackgroundImage"
+         [src]="config.mobileBackgroundImage" 
+         alt="Hero Background Mobile"
+         class="absolute inset-0 w-full h-full object-cover md:hidden">
+         
+    <div class="absolute inset-0 bg-black transition-opacity duration-700"
+         [style.opacity]="config.overlayOpacity || 0.4">
+    </div>
+    
+    <div class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
+  </div>
+
+  <div class="relative z-10 w-full h-full flex flex-col justify-center py-20"
+       [ngClass]="[minHeightClass(), alignmentClasses()]">
+    
+    <div class="w-full mx-auto" [ngClass]="containerClass()">
+      
+      <h1 class="anim-target font-serif text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tight leading-[1.1] mb-6 drop-shadow-sm">
+        {{ config.title }}
+      </h1>
+
+      <p *ngIf="config.subtitle" 
+         class="anim-target text-lg md:text-xl text-white/90 font-light leading-relaxed max-w-2xl drop-shadow-sm mb-10"
+         [class.mx-auto]="config.textAlign === 'center'"
+         [class.ml-auto]="config.textAlign === 'right'">
+        {{ config.subtitle }}
+      </p>
+
+      <div *ngIf="hasButtons" 
+           class="anim-target flex flex-wrap gap-4"
+           [class.justify-center]="config.textAlign === 'center'"
+           [class.justify-end]="config.textAlign === 'right'">
+        
+        <ng-container *ngFor="let btn of config.ctaButtons">
+          <a [routerLink]="btn.url"
+             class="px-8 py-4 rounded-full text-xs font-bold uppercase tracking-[0.15em] transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg"
+             [ngClass]="{
+               'bg-white text-slate-900 hover:bg-slate-100': btn.variant === 'primary' || !btn.variant,
+               'bg-transparent border border-white text-white hover:bg-white hover:text-slate-900': btn.variant === 'outline',
+               'bg-[var(--primary-color)] text-white border-transparent hover:brightness-110': btn.variant === 'secondary'
+             }">
+             <i *ngIf="btn.icon" [class]="'pi ' + btn.icon + ' mr-2 text-sm'"></i>
+             {{ btn.text }}
+          </a>
+        </ng-container>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- <div class="relative w-full overflow-hidden group isolate" 
+     [ngClass]="minHeightClass()"
+     @heroAnim>
+
+  <div class="absolute inset-0 z-0 select-none">
+    <img [src]="config.backgroundImage" 
+         alt="Hero Background"
+         class="absolute inset-0 w-full h-full object-cover transition-transform duration-[20s] ease-linear group-hover:scale-105"
+         [class.hidden]="config.mobileBackgroundImage"
+         [class.md:block]="config.mobileBackgroundImage">
+    
+    <img *ngIf="config.mobileBackgroundImage"
+         [src]="config.mobileBackgroundImage" 
+         alt="Hero Background Mobile"
+         class="absolute inset-0 w-full h-full object-cover md:hidden">
+         
+    <div class="absolute inset-0 bg-black transition-opacity duration-700"
+         [style.opacity]="config.overlayOpacity || 0.4">
+    </div>
+    
+    <div class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
+  </div>
+
+  <div class="relative z-10 w-full h-full flex flex-col justify-center py-20"
+       [ngClass]="[minHeightClass(), alignmentClasses()]">
+    
+    <div class="w-full mx-auto" [ngClass]="containerClass()">
+      
+      <h1 class="anim-target font-serif text-4xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight leading-[1.1] mb-6 drop-shadow-sm">
+        {{ config.title }}
+      </h1>
+
+      <p *ngIf="config.subtitle" 
+         class="anim-target text-lg md:text-xl text-white/90 font-light leading-relaxed max-w-2xl drop-shadow-sm mb-10"
+         [class.mx-auto]="config.textAlign === 'center'"
+         [class.ml-auto]="config.textAlign === 'right'">
+        {{ config.subtitle }}
+      </p>
+
+      <div *ngIf="hasButtons" 
+           class="anim-target flex flex-wrap gap-4"
+           [class.justify-center]="config.textAlign === 'center'"
+           [class.justify-end]="config.textAlign === 'right'">
+        
+        <ng-container *ngFor="let btn of config.ctaButtons">
+          <a [routerLink]="btn.url"
+             class="px-8 py-4 rounded-full text-xs font-bold uppercase tracking-[0.15em] transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg"
+             [ngClass]="{
+               'bg-white text-slate-900 hover:bg-slate-100': btn.variant === 'primary' || !btn.variant,
+               'bg-transparent border border-white text-white hover:bg-white hover:text-slate-900': btn.variant === 'outline',
+               'bg-[var(--primary-color)] text-white border-transparent hover:brightness-110': btn.variant === 'secondary'
+             }">
+             <i *ngIf="btn.icon" [class]="'pi ' + btn.icon + ' mr-2 text-sm'"></i>
+             {{ btn.text }}
+          </a>
+        </ng-container>
+
+      </div>
+
+    </div>
+  </div>
+
+</div> -->
+<!-- <section 
+  class="relative w-full overflow-hidden flex"
+  [ngClass]="[heightClass(), alignClass()]"
+  @heroEntrance>
+
+  <div class="absolute inset-0 z-0">
+    
+    <div class="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-[20s] ease-linear scale-100 hover:scale-105"
+         [style.background-image]="'url(' + (config.backgroundImage || 'assets/placeholder-hero.jpg') + ')'">
+    </div>
+
+    <div class="absolute inset-0 transition-opacity duration-700"
+         [style.background-color]="config.overlayColor || '#000'"
+         [style.opacity]="config.overlayOpacity || 0.4">
+    </div>
+
+    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 mix-blend-multiply"></div>
+    
+    <div class="absolute inset-0 opacity-[0.15] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+  </div>
+
+  <div class="relative z-10 container mx-auto px-6 py-20 flex flex-col justify-center h-full"
+       [ngClass]="alignClass()">
+    
+    <div class="hero-anim mb-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span class="text-xs font-bold uppercase tracking-[0.2em] text-white/90">New Collection</span>
+    </div>
+
+    <h1 class="hero-anim text-5xl md:text-7xl lg:text-8xl font-serif text-white leading-[1.1] mb-6 drop-shadow-sm max-w-4xl">
+      {{ config.title }}
+    </h1>
+
+    @if (config.subtitle) {
+      <p class="hero-anim text-lg md:text-2xl text-white/80 font-light leading-relaxed max-w-2xl mb-10 text-shadow-sm">
+        {{ config.subtitle }}
+      </p>
+    }
+
+    @if (validButtons.length > 0) {
+      <div class="hero-anim flex flex-wrap gap-4" [ngClass]="{'justify-center': config.textAlign === 'center', 'justify-end': config.textAlign === 'right'}">
+        @for (btn of validButtons; track btn.text) {
+          <a [routerLink]="btn.url" 
+             class="group relative px-8 py-4 bg-white text-slate-900 rounded-full font-bold uppercase tracking-widest text-xs overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)]">
+            <span class="relative z-10 flex items-center gap-2">
+              {{ btn.text }}
+              <i class="pi pi-arrow-right group-hover:translate-x-1 transition-transform"></i>
+            </span>
+          </a>
+        }
+      </div>
+    } 
+    @else {
+      <div class="hero-anim">
+        <button class="group px-8 py-4 bg-white/10 backdrop-blur-md border border-white/30 text-white rounded-full font-bold uppercase tracking-widest text-xs hover:bg-white hover:text-slate-900 transition-all duration-300">
+          Explore Now
+        </button>
+      </div>
+    }
+
+  </div>
+
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 animate-bounce text-white/50">
+    <i class="pi pi-arrow-down text-xl"></i>
+  </div>
+
+</section> -->

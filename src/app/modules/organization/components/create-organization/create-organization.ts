@@ -139,4 +139,30 @@ export class CreateOrganizationComponent implements OnInit {
         }
       });
   }
+
+    
+  // Simple toast state
+  toastMessage = signal('');
+  toastTitle = signal('');
+  toastType = signal<'success' | 'error'>('success');
+  passwordVisible = signal(false);
+
+
+  showToast(type: 'success' | 'error', title: string, message: string) {
+      this.toastType.set(type);
+      this.toastTitle.set(title);
+      this.toastMessage.set(message);
+      
+      // Auto hide after 3 seconds
+      setTimeout(() => {
+          this.clearToast();
+      }, 3000);
+  }
+    clearToast() {
+      this.toastMessage.set('');
+  }
+
+   togglePassword() {
+      this.passwordVisible.update(v => !v);
+  }
 }

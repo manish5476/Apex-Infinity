@@ -8,6 +8,38 @@ export class InvoiceService extends BaseApiService {
   private endpoint = '/v1/invoices';
 
   // ==============================================
+  // ANALYTICS ENDPOINTS
+  // ==============================================
+
+  /** Get profit summary */
+  getProfitSummarys(filters?: any): Observable<any> {
+    return this.get(`${this.endpoint}/invoiceanalytics/profit-summary`, filters, 'getProfitSummary');
+  }
+
+  /** Get advanced profit analysis with filters */
+  getAdvancedProfitAnalysis(filters?: any): Observable<any> {
+    return this.get(`${this.endpoint}/invoiceanalytics/advanced-profit`, filters, 'getAdvancedProfitAnalysis');
+  }
+
+  /** Get profit dashboard */
+  getProfitDashboard(period?: string, filters?: any): Observable<any> {
+    const params = { period, ...filters };
+    return this.get(`${this.endpoint}/invoiceanalytics/profit-dashboard`, params, 'getProfitDashboard');
+  }
+
+  /** Get product-specific profit analysis */
+  getProductProfitAnalysis(productId: string, filters?: any): Observable<any> {
+    const params = { ...filters };
+    return this.get(`${this.endpoint}/invoiceanalytics/product-profit/${productId}`, params, 'getProductProfitAnalysis');
+  }
+
+  /** Export profit data */
+  exportProfitData(filters?: any, format: string = 'csv'): Observable<Blob> {
+    return this.getBlob(`${this.endpoint}/invoiceanalytics/export-profit`, { ...filters, format }, 'exportProfitData');
+  }
+
+
+  // ==============================================
   // STOCK MANAGEMENT ENDPOINTS
   // ==============================================
 
@@ -108,6 +140,11 @@ export class InvoiceService extends BaseApiService {
     return this.get(`${this.endpoint}/reports/profit`, filterParams, 'getProfitSummary');
   }
 
+  /** Get standard profit analysis */
+  getProfitAnalysis(filters?: any): Observable<any> {
+    return this.get(`${this.endpoint}/invoiceanalytics/profit`, filters, 'getProfitAnalysis');
+  }
+  
   /** Get sales report by date range */
   getSalesReport(filterParams?: any): Observable<any> {
     return this.get(`${this.endpoint}/reports/sales`, filterParams, 'getSalesReport');
