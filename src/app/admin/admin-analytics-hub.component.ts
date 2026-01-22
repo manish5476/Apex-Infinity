@@ -59,7 +59,7 @@ import { DashboardUI } from "./components/dashboard.ui";
                     <i [class]="'pi ' + comp.icon"></i>
                     <span>{{comp.label}}</span>
                     @if (selectedComponent?.value === comp.value) {
-                      <span class="active-indicator" [layoutId]="'indicator'"></span>
+                      <span class="active-indicator" ></span>
                     }
                   </button>
                 }
