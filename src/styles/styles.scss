@@ -877,3 +877,932 @@
     font-weight: var(--font-weight-semibold);
   }
 }
+/* ==========================================================================
+   GLOBAL COMPONENT: PASSWORD (p-password)
+   Design System: Refined Compact
+   Context: Authentication, Security Inputs
+   ========================================================================== */
+
+/* 1. ROOT CONTAINER */
+.p-password {
+  display: inline-flex;
+  position: relative;
+  width: 100%; /* Ensure it adapts to containers */
+  font-family: var(--font-body);
+}
+
+/* 2. THE INPUT FIELD (Matching AutoComplete/Datepicker) */
+.p-password-input {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base); /* 13px */
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--ui-border-radius);
+  
+  /* Compact Padding - leaving room on right for the eye icon */
+  padding: var(--spacing-sm) 2.5rem var(--spacing-sm) var(--spacing-md);
+  
+  width: 100%;
+  
+  transition: var(--transition-colors), 
+              border-color 0.2s cubic-bezier(0.2, 0.9, 0.2, 1), 
+              box-shadow 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
+
+  /* Placeholder */
+  &::placeholder {
+    color: var(--text-muted);
+  }
+
+  /* Hover */
+  &:hover:not(:disabled) {
+    border-color: var(--border-secondary);
+    background: var(--component-bg-hover);
+  }
+
+  /* Focus */
+  &:focus-visible {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+  }
+
+  /* Disabled */
+  &:disabled {
+    opacity: var(--state-disabled-opacity);
+    background: var(--bg-ternary);
+    cursor: default;
+  }
+}
+
+/* 3. MASK/UNMASK ICON (The "Eye") */
+/* PrimeNG usually positions this absolutely within the wrapper */
+.p-password-mask-icon,
+.p-password-unmask-icon {
+  position: absolute;
+  top: 50%;
+  right: var(--spacing-md);
+  transform: translateY(-50%);
+  cursor: pointer;
+  
+  /* Styling */
+  color: var(--text-secondary);
+  font-size: var(--font-size-md); /* 14px icon */
+  transition: color 0.2s;
+  z-index: 2;
+
+  &:hover {
+    color: var(--text-primary);
+  }
+}
+
+/* 4. THE OVERLAY (Strength Meter Popup) */
+.p-password-overlay {
+  background: var(--component-bg); /* Surface color */
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--ui-border-radius-lg);
+  box-shadow: var(--shadow-lg); /* Floating effect */
+  
+  padding: var(--spacing-md);
+  margin-top: var(--spacing-xs);
+  min-width: 12rem; /* Ensure specific width for meter */
+  
+  /* Typography inside overlay */
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+}
+
+/* 5. STRENGTH METER (The Bar) */
+.p-password-meter {
+  height: 4px; /* Sleek, thin line */
+  background: var(--bg-ternary); /* Track color */
+  border-radius: var(--ui-border-radius-sm);
+  margin-bottom: var(--spacing-sm);
+  position: relative;
+  overflow: hidden;
+  
+  /* The animated fill logic is handled by PrimeNG inline styles usually, 
+     but we can smooth the transitions */
+  div {
+    transition: width 0.3s cubic-bezier(0.23, 1, 0.32, 1), background-color 0.3s;
+    height: 100%;
+    border-radius: var(--ui-border-radius-sm);
+  }
+}
+
+/* Color overrides for specific strengths (If styling via class) */
+/* PrimeNG maps colors inline, but if they add classes like .p-password-strength-weak */
+.p-password-strength-weak { background-color: var(--color-error); }
+.p-password-strength-medium { background-color: var(--color-warning); }
+.p-password-strength-strong { background-color: var(--color-success); }
+
+
+/* 6. METER TEXT (e.g., "Medium") */
+.p-password-info {
+  font-size: var(--font-size-sm); /* 12px */
+  font-weight: var(--font-weight-medium);
+  margin-top: var(--spacing-xs);
+  color: var(--text-primary);
+  text-align: center; /* Center align looks better in popup */
+}/* ==========================================================================
+   GLOBAL COMPONENT: SELECT / DROPDOWN (p-select)
+   Design System: Refined Compact
+   Context: Selection Inputs, Menus
+   ========================================================================== */
+
+/* 1. ROOT CONTAINER (The Input Box) */
+.p-select {
+  display: inline-flex;
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+  font-family: var(--font-body);
+  
+  /* Match Standard Input Styling */
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--ui-border-radius);
+  transition: var(--transition-colors), 
+              border-color 0.2s cubic-bezier(0.2, 0.9, 0.2, 1), 
+              box-shadow 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
+  
+  width: 100%; /* Adapt to container */
+
+  /* Hover State */
+  &:not(.p-disabled):hover {
+    border-color: var(--border-secondary);
+    background: var(--component-bg-hover);
+  }
+
+  /* Focus State (Active) */
+  &.p-focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+  }
+
+  /* Disabled State */
+  &.p-disabled {
+    opacity: var(--state-disabled-opacity);
+    background: var(--bg-ternary);
+    cursor: default;
+  }
+}
+
+/* 2. THE LABEL (Selected Value or Placeholder) */
+.p-select-label {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  
+  /* Typography & Spacing */
+  font-size: var(--font-size-base); /* 13px */
+  color: var(--text-primary);
+  padding: var(--spacing-sm) var(--spacing-md); /* Matches text inputs */
+  
+  &.p-placeholder {
+    color: var(--text-muted);
+  }
+}
+
+/* 3. DROPDOWN ICON (The Chevron) */
+.p-select-dropdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem; /* Icon area width */
+  background: transparent;
+  color: var(--text-secondary);
+  border-top-right-radius: var(--ui-border-radius);
+  border-bottom-right-radius: var(--ui-border-radius);
+}
+
+.p-select-dropdown-icon {
+  font-size: var(--font-size-sm); /* Keep icon subtle */
+  transition: transform 0.2s;
+}
+
+/* Rotate icon when open (Optional, if not handled by PrimeNG default) */
+.p-select.p-select-open .p-select-dropdown-icon {
+  transform: rotate(180deg);
+}
+
+/* 4. CLEAR ICON (If showClear is enabled) */
+.p-select-clear-icon {
+  position: absolute;
+  top: 50%;
+  right: 2.5rem; /* Sit to the left of the dropdown arrow */
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text-primary);
+  }
+}
+
+/* 5. THE OVERLAY (The Popup Menu) */
+.p-select-overlay {
+  background: var(--component-bg); /* Surface Color */
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--ui-border-radius-lg);
+  box-shadow: var(--shadow-lg); /* Floating elevation */
+  margin-top: var(--spacing-xs);
+  
+  /* Typography inheritance */
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+}
+
+/* 6. HEADER (Filter Input Area) */
+.p-select-header {
+  padding: var(--spacing-sm);
+  border-bottom: 1px solid var(--bg-ternary);
+  background: var(--bg-secondary);
+  border-radius: var(--ui-border-radius-lg) var(--ui-border-radius-lg) 0 0;
+}
+
+/* The Filter Input Box inside Header */
+.p-select-filter {
+  width: 100%;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--ui-border-radius-sm);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+
+  &:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+  }
+}
+
+/* 7. LIST CONTAINER */
+.p-select-list-container {
+  overflow: auto;
+  max-height: 200px; /* Limit height */
+}
+
+.p-select-list {
+  padding: var(--spacing-xs); /* Padding around the list items */
+  margin: 0;
+  list-style-type: none;
+}
+
+/* 8. OPTION ITEMS */
+.p-select-option {
+  margin: 2px 0;
+  padding: var(--spacing-sm) var(--spacing-md); /* Compact Item Padding */
+  border: 0;
+  border-radius: var(--ui-border-radius-sm);
+  color: var(--text-primary);
+  transition: background-color 0.15s ease;
+  cursor: pointer;
+  
+  /* Hover State */
+  &:not(.p-disabled):not(.p-select-option-selected):hover {
+    background-color: var(--component-bg-hover);
+    color: var(--text-primary);
+  }
+
+  /* Selected State */
+  &.p-select-option-selected {
+    background-color: var(--accent-focus); /* Light accent bg */
+    color: var(--accent-primary);
+    font-weight: var(--font-weight-medium);
+  }
+  
+  /* Check Icon (if visible) */
+  .p-select-option-check-icon {
+    font-size: var(--font-size-sm);
+    margin-right: var(--spacing-sm);
+  }
+}
+
+/* 9. OPTION GROUPS */
+.p-select-option-group {
+  margin: 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-ternary);
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xs); /* Smaller, distinct label */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* 10. EMPTY MESSAGE */
+.p-select-empty-message {
+  padding: var(--spacing-md);
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+/* ==========================================================================
+   GLOBAL COMPONENT: SELECT BUTTON (p-selectbutton)
+   Design System: Refined Compact
+   Context: Toggles, Segmented Controls, Boolean Choices
+   ========================================================================== */
+
+/* 1. ROOT CONTAINER */
+.p-selectbutton {
+  display: inline-flex;
+  vertical-align: bottom;
+  border-radius: var(--ui-border-radius);
+  font-family: var(--font-body);
+  
+  /* Optional: Standardize shadow for the whole group */
+  box-shadow: var(--shadow-sm);
+  
+  /* Ensure children don't overflow the rounded corners */
+  overflow: hidden; 
+}
+
+/* 2. THE BUTTONS (Individual Segments) */
+.p-selectbutton .p-button {
+  /* Typography & Sizing (Matches Inputs) */
+  font-family: var(--font-body);
+  font-size: var(--font-size-base); /* 13px */
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-sm) var(--spacing-md); /* Compact Padding */
+  
+  /* Default Colors (Inactive) */
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-primary);
+  border-right-width: 0; /* Prevent double borders */
+  
+  /* Shape overrides (handled by container, but safety first) */
+  border-radius: 0;
+  
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  
+  /* --- HOVER STATE --- */
+  &:not(.p-highlight):not(:disabled):hover {
+    background: var(--component-bg-hover);
+    color: var(--text-primary);
+    z-index: 1; /* Bring borders to top */
+  }
+
+  /* --- FOCUS STATE --- */
+  &:focus-visible {
+    z-index: 2; /* Ensure ring sits on top of neighbors */
+    outline: none;
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color), inset 0 0 0 1px var(--accent-primary);
+  }
+
+  /* --- FIRST & LAST CHILD CORNERS --- */
+  &:first-child {
+    border-top-left-radius: var(--ui-border-radius);
+    border-bottom-left-radius: var(--ui-border-radius);
+  }
+
+  &:last-child {
+    border-right-width: 1px; /* Restore right border */
+    border-top-right-radius: var(--ui-border-radius);
+    border-bottom-right-radius: var(--ui-border-radius);
+  }
+}
+
+/* 3. ACTIVE STATE (The Selected Segment) */
+.p-selectbutton .p-button.p-highlight {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: #ffffff; /* Always white for contrast on primary */
+  
+  /* Ensure the active border covers neighbors */
+  z-index: 1; 
+}
+
+/* 4. DISABLED STATE */
+.p-selectbutton .p-button:disabled {
+  opacity: var(--state-disabled-opacity);
+  background: var(--bg-ternary);
+  color: var(--text-disabled);
+  cursor: default;
+}
+
+/* 5. INVALID STATE (Optional Validation Support) */
+.ng-invalid.ng-dirty > .p-selectbutton .p-button {
+  border-color: var(--color-error);
+}
+/* ==========================================================================
+   GLOBAL COMPONENT: DATA TABLE (p-datatable)
+   Design System: Refined Compact
+   Context: Data Grids, Lists, Spreadsheets
+   ========================================================================== */
+
+/* 1. ROOT CONTAINER */
+.p-datatable {
+  font-family: var(--font-body);
+  position: relative;
+  
+  /* Container Shadow/Border (Optional - depending on if you put it in a card) */
+  /* border: 1px solid var(--border-secondary); */
+  /* border-radius: var(--ui-border-radius-lg); */
+}
+
+/* 2. THE TABLE HEADER (Thead) */
+.p-datatable-thead > tr > th {
+  background-color: var(--bg-ternary); /* Subtle contrast header */
+  color: var(--text-secondary);
+  padding: var(--spacing-md) var(--spacing-xl); /* Compact: 0.5rem 1rem */
+  border-bottom: 1px solid var(--border-secondary);
+  text-align: left;
+  
+  /* Typography */
+  font-size: var(--font-size-sm); /* 12px for headers */
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  
+  transition: background-color 0.2s, color 0.2s;
+  position: sticky; /* Standard sticky behavior */
+  top: 0;
+  z-index: 100;
+
+  /* Sorting Hover Effect */
+  &.p-datatable-sortable-column:hover {
+    background-color: var(--component-bg-hover);
+    color: var(--text-primary);
+  }
+
+  /* Active Sort State */
+  &.p-highlight {
+    background-color: var(--component-bg-hover); /* Or subtle accent tint */
+    color: var(--accent-primary);
+  }
+}
+
+/* Header Content Wrapper (Flex for Sort Icons) */
+.p-datatable-column-header-content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* Sort Icon */
+.p-datatable-sort-icon {
+  font-size: var(--font-size-xs);
+  color: var(--text-disabled);
+  transition: color 0.2s;
+}
+
+/* Active Sort Icon Color */
+.p-datatable-sortable-column[aria-sort="ascending"] .p-datatable-sort-icon,
+.p-datatable-sortable-column[aria-sort="descending"] .p-datatable-sort-icon {
+  color: var(--accent-primary);
+}
+
+/* 3. THE TABLE BODY (Tbody) */
+.p-datatable-tbody > tr {
+  background: var(--bg-secondary); /* Default row bg */
+  color: var(--text-primary);
+  transition: background-color 0.15s cubic-bezier(0.2, 0.9, 0.2, 1);
+  outline: none;
+
+  /* Row Borders */
+  > td {
+    border-bottom: 1px solid var(--border-secondary);
+    padding: var(--spacing-md) var(--spacing-xl); /* Match header padding */
+    font-size: var(--font-size-base); /* 13px */
+    font-weight: var(--font-weight-normal);
+  }
+  
+  /* Last row border removal (optional) */
+  &:last-child > td {
+    border-bottom: none;
+  }
+}
+
+/* --- ROW STATES --- */
+
+/* Hover State */
+.p-datatable-tbody > tr:not(.p-highlight):hover {
+  background-color: var(--component-bg-hover);
+}
+
+/* Selected State (Single or Multiple) */
+.p-datatable-tbody > tr.p-highlight {
+  background-color: var(--accent-focus); /* Light accent background */
+  color: var(--accent-primary);
+  
+  > td {
+    border-bottom-color: var(--accent-secondary);
+  }
+}
+
+/* Context Menu / Focus State */
+.p-datatable-tbody > tr:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: -2px;
+}
+
+/* 4. FROZEN COLUMNS (Sticky Left/Right) */
+.p-datatable-frozen-column {
+  position: sticky;
+  background: inherit; /* Inherit row color so hover works */
+  z-index: 10;
+  
+  /* Separator Border */
+  border-right: 1px solid var(--border-secondary); 
+}
+
+/* 5. COLUMN RESIZER */
+.p-datatable-column-resizer {
+  width: 0.5rem;
+  right: 0;
+  cursor: col-resize;
+}
+
+.p-datatable-column-resize-indicator {
+  width: 1px;
+  background-color: var(--accent-primary);
+  z-index: 1000;
+}
+
+/* 6. FILTERING UI */
+/* Filter Icon in Header */
+.p-datatable-column-filter-button {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-left: auto;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  transition: var(--transition-base);
+
+  &:hover {
+    background: var(--component-bg-active);
+    color: var(--text-primary);
+  }
+
+  &.p-highlight {
+    color: var(--accent-primary);
+  }
+}
+
+/* Filter Overlay Popup */
+.p-datatable-filter-overlay {
+  background: var(--component-bg);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--ui-border-radius-lg);
+  box-shadow: var(--shadow-xl);
+  min-width: 12rem;
+  padding: var(--spacing-md);
+  margin-top: var(--spacing-xs);
+
+  /* Inner elements need spacing */
+  .p-datatable-filter-constraint {
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--border-primary);
+    margin-bottom: var(--spacing-md);
+    
+    &:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 0;
+    }
+  }
+}
+
+/* 7. LOADING STATE */
+.p-datatable-mask {
+  background-color: rgba(255, 255, 255, 0.6); /* Glassy white */
+  z-index: 500;
+  backdrop-filter: blur(2px); /* Blur content behind */
+  
+  /* Loading Icon */
+  .p-datatable-loading-icon {
+    font-size: 2rem;
+    color: var(--accent-primary);
+  }
+}
+
+/* 8. PAGINATOR (Often embedded in tables) */
+.p-paginator {
+  background: transparent;
+  border-top: 1px solid var(--border-secondary);
+  padding: var(--spacing-md);
+  justify-content: flex-end; /* Align right standard */
+  
+  .p-paginator-pages .p-paginator-page,
+  .p-paginator-first,
+  .p-paginator-prev,
+  .p-paginator-next,
+  .p-paginator-last {
+    min-width: 2rem;
+    height: 2rem;
+    margin: 0 var(--spacing-xs);
+    border-radius: var(--ui-border-radius);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    transition: var(--transition-base);
+    
+    &:hover:not(.p-disabled) {
+      background-color: var(--component-bg-hover);
+      color: var(--text-primary);
+    }
+    
+    &.p-highlight {
+      background-color: var(--accent-primary);
+      color: #ffffff;
+    }
+  }
+}
+
+/* 9. EMPTY MESSAGE */
+.p-datatable-empty-message {
+  td {
+    text-align: center;
+    padding: var(--spacing-3xl);
+    color: var(--text-muted);
+    font-style: italic;
+  }
+}
+
+/* ==========================================================================
+   OPTIONAL VARIANTS (Controlled by adding classes to p-table)
+   ========================================================================== */
+
+/* Variant: Striped Rows */
+.p-datatable-striped .p-datatable-tbody > tr:nth-child(even) {
+  background-color: var(--bg-ternary);
+}
+
+/* Variant: Gridlines (Vertical Borders) */
+.p-datatable-gridlines .p-datatable-tbody > tr > td {
+  border-right: 1px solid var(--border-secondary);
+}
+
+.p-datatable-gridlines .p-datatable-thead > tr > th {
+  border-right: 1px solid var(--border-secondary);
+}
+
+/* ==========================================================================
+   GLOBAL COMPONENT: ACCORDION (p-accordion)
+   Design System: Refined Compact
+   Context: Collapsible Sections, FAQs, Settings Groups
+   ========================================================================== */
+
+/* 1. ROOT CONTAINER */
+.p-accordion {
+  font-family: var(--font-body);
+  width: 100%;
+  
+  /* Optional: Add outer border if you want it contained */
+  /* border: 1px solid var(--border-secondary); */
+  /* border-radius: var(--ui-border-radius); */
+}
+
+/* 2. PANEL WRAPPER (The individual section) */
+.p-accordionpanel {
+  background: transparent;
+  border-bottom: 1px solid var(--border-secondary);
+  transition: background-color 0.2s ease;
+
+  /* Remove border from the very last item for a clean flush look */
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  /* Active Panel Styling (Optional background highlight) */
+  &.p-accordionpanel-active {
+    background-color: var(--bg-secondary); /* Subtle highlight when open */
+  }
+}
+
+/* 3. THE HEADER (The Clickable Toggle) */
+.p-accordionheader {
+  /* Layout */
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Pushes icon to right, or text to left */
+  width: 100%;
+  
+  /* Spacing */
+  padding: var(--spacing-md) var(--spacing-xl); /* Compact: 0.5rem 1rem */
+  margin: 0;
+  
+  /* Typography */
+  font-family: var(--font-body);
+  font-size: var(--font-size-base); /* 13px */
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  
+  /* Appearance */
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-colors);
+  outline: none;
+
+  /* Hover State */
+  &:hover {
+    background-color: var(--component-bg-hover);
+    color: var(--accent-primary); /* Highlight text on hover */
+  }
+
+  /* Focus State */
+  &:focus-visible {
+    background-color: var(--component-bg-hover);
+    box-shadow: inset 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+  }
+}
+
+/* 4. HEADER STATE: ACTIVE */
+/* When the panel is open, the header usually gets a specific state class or attribute */
+.p-accordionpanel-active > .p-accordionheader {
+  font-weight: var(--font-weight-semibold);
+  color: var(--accent-primary);
+}
+
+/* 5. TOGGLE ICON (The Chevron) */
+.p-accordionheader-toggle-icon {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1), color 0.2s;
+  
+  /* Order: If you want icon on the left, use order: -1; */
+  /* order: -1; margin-right: var(--spacing-sm); */
+}
+
+/* Rotate Icon when Active */
+.p-accordionpanel-active .p-accordionheader-toggle-icon {
+  transform: rotate(180deg);
+  color: var(--accent-primary);
+}
+
+/* 6. CONTENT WRAPPER (The Expandable Area) */
+.p-accordioncontent {
+  overflow: hidden;
+  background: transparent;
+  transition: height 0.3s cubic-bezier(0.23, 1, 0.32, 1); /* Smooth slide */
+}
+
+/* 7. CONTENT BODY (The Actual Text) */
+.p-accordioncontent-content {
+  padding: 0 var(--spacing-xl) var(--spacing-xl) var(--spacing-xl); /* Left/Right/Bottom padding */
+  padding-top: var(--spacing-xs); /* Slight top gap so text doesn't hit header */
+  
+  color: var(--text-secondary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+}
+
+/* ==========================================================================
+   OPTIONAL VARIANT: "Card Style" (Separated Boxes)
+   Usage: <p-accordion styleClass="accordion-cards">
+   ========================================================================== */
+.p-accordion.accordion-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  
+  .p-accordionpanel {
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--ui-border-radius);
+    background: var(--bg-secondary);
+    overflow: hidden;
+  }
+  
+  .p-accordionpanel-active {
+    background: var(--component-bg); /* White/Lighter on open */
+    border-color: var(--accent-primary); /* Highlight border on open */
+  }
+}
+/* ==========================================================================
+   GLOBAL COMPONENT: ACCORDION (p-accordion)
+   Design System: Refined Compact
+   Context: Collapsible Sections, FAQs, Settings Groups
+   ========================================================================== */
+
+/* 1. ROOT CONTAINER */
+.p-accordion {
+  font-family: var(--font-body);
+  width: 100%;
+  
+  /* Optional: Add outer border if you want it contained */
+  /* border: 1px solid var(--border-secondary); */
+  /* border-radius: var(--ui-border-radius); */
+}
+
+/* 2. PANEL WRAPPER (The individual section) */
+.p-accordionpanel {
+  background: transparent;
+  border-bottom: 1px solid var(--border-secondary);
+  transition: background-color 0.2s ease;
+
+  /* Remove border from the very last item for a clean flush look */
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  /* Active Panel Styling (Optional background highlight) */
+  &.p-accordionpanel-active {
+    background-color: var(--bg-secondary); /* Subtle highlight when open */
+  }
+}
+
+/* 3. THE HEADER (The Clickable Toggle) */
+.p-accordionheader {
+  /* Layout */
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Pushes icon to right, or text to left */
+  width: 100%;
+  
+  /* Spacing */
+  padding: var(--spacing-md) var(--spacing-xl); /* Compact: 0.5rem 1rem */
+  margin: 0;
+  
+  /* Typography */
+  font-family: var(--font-body);
+  font-size: var(--font-size-base); /* 13px */
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  
+  /* Appearance */
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-colors);
+  outline: none;
+
+  /* Hover State */
+  &:hover {
+    background-color: var(--component-bg-hover);
+    color: var(--accent-primary); /* Highlight text on hover */
+  }
+
+  /* Focus State */
+  &:focus-visible {
+    background-color: var(--component-bg-hover);
+    box-shadow: inset 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+  }
+}
+
+/* 4. HEADER STATE: ACTIVE */
+/* When the panel is open, the header usually gets a specific state class or attribute */
+.p-accordionpanel-active > .p-accordionheader {
+  font-weight: var(--font-weight-semibold);
+  color: var(--accent-primary);
+}
+
+/* 5. TOGGLE ICON (The Chevron) */
+.p-accordionheader-toggle-icon {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1), color 0.2s;
+  
+  /* Order: If you want icon on the left, use order: -1; */
+  /* order: -1; margin-right: var(--spacing-sm); */
+}
+
+/* Rotate Icon when Active */
+.p-accordionpanel-active .p-accordionheader-toggle-icon {
+  transform: rotate(180deg);
+  color: var(--accent-primary);
+}
+
+/* 6. CONTENT WRAPPER (The Expandable Area) */
+.p-accordioncontent {
+  overflow: hidden;
+  background: transparent;
+  transition: height 0.3s cubic-bezier(0.23, 1, 0.32, 1); /* Smooth slide */
+}
+
+/* 7. CONTENT BODY (The Actual Text) */
+.p-accordioncontent-content {
+  padding: 0 var(--spacing-xl) var(--spacing-xl) var(--spacing-xl); /* Left/Right/Bottom padding */
+  padding-top: var(--spacing-xs); /* Slight top gap so text doesn't hit header */
+  
+  color: var(--text-secondary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+}
+
+/* ==========================================================================
+   OPTIONAL VARIANT: "Card Style" (Separated Boxes)
+   Usage: <p-accordion styleClass="accordion-cards">
+   ========================================================================== */
+.p-accordion.accordion-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  
+  .p-accordionpanel {
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--ui-border-radius);
+    background: var(--bg-secondary);
+    overflow: hidden;
+  }
+  
+  .p-accordionpanel-active {
+    background: var(--component-bg); /* White/Lighter on open */
+    border-color: var(--accent-primary); /* Highlight border on open */
+  }
+}
