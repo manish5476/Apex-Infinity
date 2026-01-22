@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChartModule } from 'primeng/chart';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -9,28 +9,25 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
 @Component({
   selector: 'app-branch-radar-chart',
   standalone: true,
-  imports: [CommonModule, ChartModule, ProgressSpinnerModule, ButtonModule, TooltipModule],
+  imports: [
+    CommonModule, 
+    ChartModule, 
+    ProgressSpinnerModule, 
+    ButtonModule, 
+    TooltipModule
+  ],
   template: `
-    <div class="relative w-full p-1 md:p-2 overflow-hidden rounded-2xl transition-all duration-500" 
-         [style.font-family]="'var(--font-body)'">
+    <div class="radar-container">
 
-      <div class="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-sky-500/10 blur-[100px] animate-pulse-slow pointer-events-none"></div>
-      <div class="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] rounded-full bg-violet-500/10 blur-[90px] animate-pulse-slow delay-1000 pointer-events-none"></div>
+      <div class="chart-card">
 
-      <div class="relative z-10 p-6 border rounded-2xl transition-all"
-           style="background: rgba(15, 23, 42, 0.6); 
-                  backdrop-filter: blur(16px); 
-                  -webkit-backdrop-filter: blur(16px);
-                  border: 1px solid rgba(255, 255, 255, 0.08);
-                  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);">
-
-        <div class="flex justify-between items-start mb-4">
+        <div class="card-header">
           <div>
-            <h2 class="font-bold tracking-tight text-xl text-white flex items-center gap-2">
-              <i class="pi pi-compass text-sky-400"></i>
+            <h2 class="card-title">
+              <i class="pi pi-compass header-icon"></i>
               Operational Radar 
             </h2>
-            <p class="text-xs font-bold uppercase tracking-widest text-slate-400 mt-1">
+            <p class="card-subtitle">
               Multidimensional Efficiency Metrics
             </p>
           </div>
@@ -39,38 +36,39 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
 
         <ng-container *ngIf="!loading(); else loader">
           
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-            <div class="md:col-span-8 h-[400px] flex justify-center relative">
+          <div class="content-grid">
+            
+            <div class="chart-wrapper">
                <p-chart type="radar" [data]="chartData()" [options]="chartOptions" height="100%" width="100%"></p-chart>
                
-               <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-20">
-                 <i class="pi pi-crosshairs text-6xl text-white"></i>
+               <div class="center-marker">
+                 <i class="pi pi-crosshairs"></i>
                </div>
             </div>
 
-            <div class="md:col-span-4 flex flex-col justify-center gap-4">
-               <div class="space-y-3">
-                 <h4 class="font-bold uppercase text-[10px] text-slate-500 mb-2">Metric Breakdown</h4>
+            <div class="metrics-panel">
+               <div class="metrics-list">
+                 <h4 class="section-label">Metric Breakdown</h4>
                  
                  @for (label of chartData()?.labels; track label; let i = $index) {
-                   <div class="flex justify-between items-center p-3 rounded-lg border border-white/5 bg-white/5 transition-all hover:bg-white/10 group">
-                      <span class="text-xs font-bold text-slate-300 group-hover:text-white transition-colors">{{ label }}</span>
-                      <span class="font-black tabular-nums text-sm" 
-                            [ngClass]="getScoreColor(chartData()?.datasets[0].data[i])">
+                   <div class="metric-row group">
+                      <span class="metric-name">{{ label }}</span>
+                      <span class="metric-score" 
+                            [ngClass]="getScoreClass(chartData()?.datasets[0].data[i])">
                         {{ chartData()?.datasets[0].data[i] }}%
                       </span>
                    </div>
                  }
                </div>
 
-               <div class="mt-4 p-4 border border-dashed rounded-lg border-sky-500/30 bg-sky-500/5">
-                 <div class="flex gap-3">
-                   <i class="pi pi-info-circle text-sky-400 mt-0.5"></i>
+               <div class="insight-box">
+                 <div class="insight-content">
+                   <i class="pi pi-info-circle insight-icon"></i>
                    <div>
-                     <p class="font-bold text-sky-400 text-xs mb-1">Efficiency Profile: {{ chartData()?.datasets[0].label }}</p>
-                     <p class="text-xs text-slate-300 leading-relaxed">
-                       Revenue & Volume are peaking at <span class="text-white font-bold">100%</span>. 
-                       <br>Zero discounts/cancellations indicate extremely strong pricing power.
+                     <p class="insight-title">Efficiency Profile: {{ chartData()?.datasets[0].label }}</p>
+                     <p class="insight-text">
+                       Revenue & Volume are peaking at <span class="highlight">100%</span>. 
+                       <br>Zero discounts indicate strong pricing power.
                      </p>
                    </div>
                  </div>
@@ -81,9 +79,9 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
         </ng-container>
 
         <ng-template #loader>
-          <div class="h-[400px] flex flex-col items-center justify-center gap-3">
+          <div class="loader-container">
             <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-10 h-10"></p-progressSpinner>
-            <p class="text-xs font-bold uppercase tracking-widest text-slate-500">Calibrating Performance Matrix...</p>
+            <p class="loader-text">Calibrating Performance Matrix...</p>
           </div>
         </ng-template>
 
@@ -91,12 +89,184 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
     </div>
   `,
   styles: [`
-    @keyframes pulse-slow {
-      0%, 100% { opacity: 0.4; transform: scale(1); }
-      50% { opacity: 0.7; transform: scale(1.1); }
+    /* HOST & LAYOUT */
+    :host { display: block; width: 100%; }
+
+    .radar-container {
+      padding: var(--spacing-sm);
+      font-family: var(--font-body);
+      /* Optional: subtle background glow using theme color */
+      background: radial-gradient(circle at top right, var(--bg-ternary), transparent 70%);
+      border-radius: var(--ui-border-radius-xl);
     }
-    .animate-pulse-slow {
-      animation: pulse-slow 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+    /* CARD STYLES */
+    .chart-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius-xl);
+      padding: var(--spacing-xl);
+      position: relative;
+      /* Glass effect base */
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* HEADER */
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .card-title {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      letter-spacing: -0.01em;
+    }
+
+    .header-icon { color: var(--accent-primary); }
+
+    .card-subtitle {
+      font-size: 10px;
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-tertiary);
+      margin-top: 4px;
+    }
+
+    /* CONTENT GRID */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--spacing-2xl);
+    }
+    @media (min-width: 768px) {
+      .content-grid { grid-template-columns: 2fr 1fr; } /* Chart takes 2/3 */
+    }
+
+    /* CHART SECTION */
+    .chart-wrapper {
+      height: 400px;
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+
+    .center-marker {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      opacity: 0.1;
+      font-size: 4rem;
+      color: var(--text-primary);
+    }
+
+    /* METRICS PANEL */
+    .metrics-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: var(--spacing-lg);
+    }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      color: var(--text-label);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .metrics-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-sm);
+    }
+
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--spacing-md);
+      border-radius: var(--ui-border-radius);
+      border: 1px solid var(--border-secondary);
+      background: var(--bg-ternary);
+      transition: background 0.2s;
+    }
+    .metric-row:hover {
+      background: var(--component-bg-hover);
+    }
+
+    .metric-name {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-secondary);
+      transition: color 0.2s;
+    }
+    .metric-row:hover .metric-name { color: var(--text-primary); }
+
+    .metric-score {
+      font-family: var(--font-mono);
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-sm);
+    }
+    /* Dynamic Score Colors handled by ngClass */
+    .score-high { color: var(--color-success); }
+    .score-mid { color: var(--color-info); }
+    .score-low { color: var(--color-error); }
+
+    /* INSIGHT BOX */
+    .insight-box {
+      margin-top: var(--spacing-md);
+      padding: var(--spacing-md);
+      border: 1px dashed var(--accent-primary);
+      border-radius: var(--ui-border-radius);
+      background: var(--color-primary-bg); /* Mix token */
+    }
+
+    .insight-content { display: flex; gap: var(--spacing-sm); }
+    .insight-icon { color: var(--accent-primary); margin-top: 2px; }
+
+    .insight-title {
+      font-weight: var(--font-weight-bold);
+      color: var(--accent-primary);
+      font-size: var(--font-size-xs);
+      margin: 0 0 4px 0;
+    }
+
+    .insight-text {
+      font-size: var(--font-size-xs);
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin: 0;
+    }
+    .highlight { color: var(--text-primary); font-weight: bold; }
+
+    /* LOADER */
+    .loader-container {
+      height: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-md);
+    }
+    .loader-text {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-tertiary);
     }
   `]
 })
@@ -105,32 +275,37 @@ export class BranchRadarChartComponent implements OnInit {
   loading = signal<boolean>(true);
   chartOptions: any;
 
-  constructor(private analyticsService: AdminAnalyticsService) {
-    this.initOptions();
-  }
+  // Cache theme colors for canvas
+  private documentStyle = getComputedStyle(document.documentElement);
+
+  constructor(private analyticsService: AdminAnalyticsService) {}
 
   ngOnInit() {
+    this.initOptions();
     this.loadRadar();
   }
 
-  // Helper for text colors based on score
-  getScoreColor(score: number): string {
-    if (score >= 80) return 'text-emerald-400';
-    if (score >= 50) return 'text-sky-400';
-    return 'text-rose-400';
+  // Use CSS classes instead of hardcoded tailwind classes
+  getScoreClass(score: number): string {
+    if (score >= 80) return 'score-high';
+    if (score >= 50) return 'score-mid';
+    return 'score-low';
   }
 
   private initOptions() {
-    const gridColor = 'rgba(255, 255, 255, 0.08)';
-    const textColor = '#cbd5e1'; // slate-300
+    // Read CSS Variables for Chart Config
+    const textColor = this.documentStyle.getPropertyValue('--text-secondary');
+    const gridColor = this.documentStyle.getPropertyValue('--border-secondary');
 
     this.chartOptions = {
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: 'rgba(15, 23, 42, 0.9)',
-          titleColor: '#fff',
-          bodyColor: '#cbd5e1',
+          backgroundColor: this.documentStyle.getPropertyValue('--bg-ternary'),
+          titleColor: this.documentStyle.getPropertyValue('--text-primary'),
+          bodyColor: this.documentStyle.getPropertyValue('--text-secondary'),
+          borderColor: this.documentStyle.getPropertyValue('--border-primary'),
+          borderWidth: 1,
           padding: 10,
           cornerRadius: 8,
           displayColors: false,
@@ -148,9 +323,8 @@ export class BranchRadarChartComponent implements OnInit {
             font: { size: 11, weight: '700', family: 'var(--font-body)' }
           },
           ticks: {
-            display: false, // Cleaner look without concentric numbers
+            display: false,
             stepSize: 20,
-            color: 'rgba(255,255,255,0.3)',
             backdropColor: 'transparent'
           },
           suggestedMin: 0,
@@ -163,7 +337,6 @@ export class BranchRadarChartComponent implements OnInit {
 
   loadRadar() {
     this.loading.set(true);
-    // Simulate slight delay for smoothness
     setTimeout(() => {
         this.analyticsService.getBranchPerformanceRadar().subscribe({
         next: (res) => {
@@ -178,32 +351,40 @@ export class BranchRadarChartComponent implements OnInit {
   }
 
   private processData(rawData: any) {
-    // Apply Gradient Fill
+    // Dynamic Theme Coloring for Canvas
+    // We re-fetch computed style in case theme changed
+    const style = getComputedStyle(document.documentElement);
+    const accentColor = style.getPropertyValue('--accent-primary').trim(); 
+    
+    // Create Gradient Helper
     const gradientFill = (context: any) => {
         const ctx = context.chart.ctx;
-        const gradient = ctx.createRadialGradient(
-            context.chart.width / 2, 
-            context.chart.height / 2, 
-            0, 
-            context.chart.width / 2, 
-            context.chart.height / 2, 
-            context.chart.width / 2
-        );
-        // Sky blue to transparent center
-        gradient.addColorStop(0, 'rgba(14, 165, 233, 0.5)'); // Sky-500
-        gradient.addColorStop(1, 'rgba(14, 165, 233, 0.1)');
+        const width = context.chart.width;
+        const height = context.chart.height;
+        
+        const gradient = ctx.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, width / 2);
+        
+        // Use CSS Variable Color with Opacity
+        // Note: For canvas, we usually need hex/rgb. 
+        // If var is #hex, we can't easily add opacity without conversion.
+        // For simplicity/robustness, we assume a fallback or usage of a known utility.
+        // However, a safe visual trick is to use the Accent Color for stroke 
+        // and a low opacity generic fill, OR use canvas `globalAlpha`.
+        
+        gradient.addColorStop(0, this.hexToRgba(accentColor, 0.5)); 
+        gradient.addColorStop(1, this.hexToRgba(accentColor, 0.05));
         return gradient;
     };
 
     const dataset = {
         ...rawData.datasets[0],
         backgroundColor: gradientFill,
-        borderColor: '#38bdf8', // Sky-400
+        borderColor: accentColor, 
         borderWidth: 2,
-        pointBackgroundColor: '#0ea5e9', // Sky-500
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: '#0ea5e9',
+        pointBackgroundColor: accentColor,
+        pointBorderColor: style.getPropertyValue('--bg-secondary'),
+        pointHoverBackgroundColor: style.getPropertyValue('--text-primary'),
+        pointHoverBorderColor: accentColor,
         pointRadius: 4,
         pointHoverRadius: 6
     };
@@ -213,134 +394,19 @@ export class BranchRadarChartComponent implements OnInit {
         datasets: [dataset]
     });
   }
+
+  // Simple Helper to convert Hex to RGBA for canvas opacity
+  private hexToRgba(hex: string, alpha: number) {
+    let c: any;
+    if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
+        c= hex.substring(1).split('');
+        if(c.length== 3){
+            c= [c[0], c[0], c[1], c[1], c[2], c[2]];
+        }
+        c= '0x'+c.join('');
+        return 'rgba('+[(c>>16)&255, (c>>8)&255, c&255].join(',')+','+alpha+')';
+    }
+    // Fallback if var isn't hex (e.g. named color)
+    return `rgba(56, 189, 248, ${alpha})`; 
+  }
 }
-
-// import { Component, OnInit, signal } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { ChartModule } from 'primeng/chart';
-// import { ProgressSpinnerModule } from 'primeng/progressspinner';
-// import { ButtonModule } from 'primeng/button';
-// import { AdminAnalyticsService } from '../admin-analytics.service';
-
-// @Component({
-//   selector: 'app-branch-radar-chart',
-//   standalone: true,
-//   imports: [CommonModule, ChartModule, ProgressSpinnerModule, ButtonModule],
-//   template: `
-//     <div class="p-4 md:p-6 transition-colors duration-300" 
-//          [style.background]="'var(--theme-bg-primary)'"
-//          [style.font-family]="'var(--font-body)'">
-
-//       <div class="mb-6 flex justify-between items-center">
-//         <div>
-//           <h2 class="font-bold tracking-tight mb-1" 
-//               [style.color]="'var(--theme-text-primary)'"
-//               [style.font-family]="'var(--font-heading)'"
-//               [style.font-size]="'var(--font-size-xl)'">Operational Radar</h2>
-//           <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'" class="uppercase font-bold tracking-widest">
-//             Multidimensional Branch Efficiency Metrics
-//           </p>
-//         </div>
-//         <p-button icon="pi pi-sync" [text]="true" severity="info" size="small" (onClick)="loadRadar()"></p-button>
-//       </div>
-
-//       <div class="p-6 border relative transition-all" 
-//            [style.background]="'var(--theme-bg-secondary)'" 
-//            [style.border-color]="'var(--theme-border-primary)'" 
-//            [style.border-radius]="'var(--ui-border-radius-xl)'">
-        
-//         <ng-container *ngIf="!loading(); else loader">
-//           <div class="h-[400px] w-full flex justify-center">
-//             <p-chart type="radar" [data]="chartData()" [options]="chartOptions" height="100%" width="100%"></p-chart>
-//           </div>
-
-//           <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-//              @for (label of chartData()?.labels; track label; let i = $index) {
-//                <div class="p-3 border rounded-lg" [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'">
-//                   <p class="uppercase font-bold text-[9px] mb-1" [style.color]="'var(--theme-text-label)'">{{ label }}</p>
-//                   <p class="text-lg font-bold tabular-nums text-white">{{ chartData()?.datasets[0].data[i] }}%</p>
-//                </div>
-//              }
-//           </div>
-//         </ng-container>
-
-//         <ng-template #loader>
-//           <div class="h-[400px] flex flex-col items-center justify-center gap-3">
-//             <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-10 h-10"></p-progressSpinner>
-//             <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase tracking-widest">Calibrating Performance Matrix...</p>
-//           </div>
-//         </ng-template>
-//       </div>
-
-//       <div class="mt-6 p-4 border border-dashed rounded-lg flex items-start gap-4"
-//            [style.border-color]="'var(--theme-border-secondary)'"
-//            [style.background]="'rgba(66, 165, 245, 0.05)'">
-//          <i class="pi pi-compass text-blue-400 mt-1"></i>
-//          <div class="space-y-1">
-//             <p class="font-bold text-blue-400" [style.font-size]="'var(--font-size-sm)'">Efficiency Profile: {{ chartData()?.datasets[0].label }}</p>
-//             <p [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">
-//               Revenue and Volume scores are at 100%, indicating peak sales performance. Low discount usage suggests strong pricing power for this branch.
-//             </p>
-//          </div>
-//       </div>
-//     </div>
-//   `
-// })
-// export class BranchRadarChartComponent implements OnInit {
-//   chartData = signal<any>(null);
-//   loading = signal<boolean>(true);
-//   chartOptions: any;
-
-//   constructor(private analyticsService: AdminAnalyticsService) {
-//     this.initOptions();
-//   }
-
-//   ngOnInit() {
-//     this.loadRadar();
-//   }
-
-//   private initOptions() {
-//     // Styling the radar grid to match Dark Theme
-//     const gridColor = 'rgba(255, 255, 255, 0.05)';
-//     const labelColor = '#94a3b8';
-
-//     this.chartOptions = {
-//       plugins: {
-//         legend: { display: false }
-//       },
-//       scales: {
-//         r: {
-//           grid: { color: gridColor },
-//           angleLines: { color: gridColor },
-//           pointLabels: {
-//             color: labelColor,
-//             font: { size: 10, weight: '600' }
-//           },
-//           ticks: {
-//             display: false, // Cleaner look
-//             stepSize: 20
-//           },
-//           suggestedMin: 0,
-//           suggestedMax: 100
-//         }
-//       },
-//       maintainAspectRatio: false
-//     };
-//   }
-
-//   loadRadar() {
-//     this.loading.set(true);
-//     this.analyticsService.getBranchPerformanceRadar().subscribe({
-//       next: (res) => {
-//         if (res.status === 'success') {
-//           const data = res.data;
-//           // Apply theme-specific fill transparency
-//           data.datasets[0].backgroundColor = 'rgba(66, 165, 245, 0.2)';
-//           this.chartData.set(data);
-//         }
-//         this.loading.set(false);
-//       },
-//       error: () => this.loading.set(false)
-//     });
-//   }
-// }
