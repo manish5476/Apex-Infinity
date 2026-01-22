@@ -578,3 +578,302 @@
     font-size: var(--p-comp-font-size);
 }
 
+/* ==========================================================================
+   GLOBAL COMPONENT: DATEPICKER (p-datepicker)
+   Design System: Refined Compact
+   Context: Calendar, Time Selection, Date Ranges
+   ========================================================================== */
+
+/* 1. ROOT CONTAINER */
+.p-datepicker {
+  display: inline-flex;
+  position: relative;
+  font-family: var(--font-body);
+}
+
+/* 2. INPUT FIELD (Matches AutoComplete/Input Styles) */
+.p-datepicker-input {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base); /* 13px */
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--ui-border-radius);
+  
+  /* Compact Padding */
+  padding: var(--spacing-sm) var(--spacing-md);
+  
+  transition: var(--transition-colors), 
+              border-color 0.2s cubic-bezier(0.2, 0.9, 0.2, 1), 
+              box-shadow 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
+  
+  width: 100%;
+
+  /* Placeholder */
+  &::placeholder {
+    color: var(--text-muted);
+  }
+
+  /* Hover */
+  &:hover:not(:disabled) {
+    border-color: var(--border-secondary);
+    background: var(--component-bg-hover);
+  }
+
+  /* Focus */
+  &:focus-visible {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+  }
+}
+
+/* 3. INPUT ICON (If 'showIcon' is true) */
+.p-datepicker-input-icon-container {
+  /* Positioned inside the input group */
+  .p-datepicker-input-icon {
+    color: var(--text-secondary);
+    font-size: var(--font-size-md);
+  }
+}
+
+/* 4. THE POPUP PANEL (The Calendar Card) */
+.p-datepicker-panel {
+  background: var(--component-bg); /* Surface color */
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--ui-border-radius-lg);
+  box-shadow: var(--shadow-xl); /* Higher elevation for popups */
+  
+  /* Layout */
+  width: 18rem; /* Fixed compact width */
+  padding: var(--spacing-md);
+  margin-top: var(--spacing-xs);
+  
+  /* Ensure it sits on top */
+  z-index: var(--z-dropdown);
+  
+  /* Animation origin */
+  transform-origin: center top;
+}
+
+/* 5. HEADER (Month/Year Navigation) */
+.p-datepicker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 var(--spacing-md) 0;
+  border-bottom: 1px solid var(--border-secondary); /* Subtle divider */
+  background: transparent;
+  color: var(--text-primary);
+}
+
+/* Header Buttons (Prev/Next) */
+.p-datepicker-prev-button,
+.p-datepicker-next-button {
+  width: 2rem;
+  height: 2rem;
+  color: var(--text-secondary);
+  border-radius: var(--ui-border-radius);
+  transition: var(--transition-base);
+  background: transparent;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--component-bg-hover);
+    color: var(--text-primary);
+  }
+
+  &:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  }
+}
+
+/* Header Title (Month Year) */
+.p-datepicker-title {
+  display: flex;
+  gap: var(--spacing-xs);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-md);
+}
+
+/* Clickable Month/Year Selectors */
+.p-datepicker-select-month,
+.p-datepicker-select-year {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--ui-border-radius-sm);
+  cursor: pointer;
+  transition: var(--transition-base);
+  color: var(--text-primary);
+  border: none;
+  background: transparent;
+  font-weight: inherit;
+
+  &:hover {
+    background: var(--component-bg-hover);
+    color: var(--accent-primary);
+  }
+}
+
+/* 6. CALENDAR GRID (The Days) */
+.p-datepicker-calendar-container {
+  margin-top: var(--spacing-sm);
+}
+
+.p-datepicker-calendar {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-base);
+
+  /* Weekday Headers (Mo, Tu, We...) */
+  th {
+    padding: var(--spacing-xs);
+    color: var(--text-secondary);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-xs); /* Smaller labels */
+    text-align: center;
+  }
+
+  /* Day Cells */
+  td {
+    padding: var(--spacing-xs) 0;
+  }
+}
+
+/* The Day Span */
+.p-datepicker-day {
+  width: 2rem;
+  height: 2rem;
+  margin: 0 auto;
+  border-radius: 50%; /* Circles look best for dates */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: background-color 0.2s, color 0.2s;
+  border: 1px solid transparent; /* Prevents layout shift on active border */
+
+  /* Normal Hover */
+  &:hover:not(.p-datepicker-day-selected):not(.p-disabled) {
+    background: var(--component-bg-hover);
+    color: var(--text-primary);
+  }
+
+  /* Selected State (Active) */
+  &[aria-selected="true"] {
+    background: var(--accent-primary);
+    color: white; /* Always white on primary */
+    font-weight: var(--font-weight-semibold);
+  }
+
+  /* Today's Date (Highlighted but not selected) */
+  &.p-datepicker-today > span {
+     /* Usually PrimeNG wraps today content or applies class directly */
+  }
+  /* If the class is on the element itself */
+  &.p-datepicker-today {
+     color: var(--accent-primary);
+     font-weight: var(--font-weight-bold);
+     background: var(--accent-focus); /* Very light accent bg */
+  }
+}
+
+/* 7. TIME PICKER (Footer) */
+.p-datepicker-time-picker {
+  border-top: 1px solid var(--border-secondary);
+  padding-top: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.p-datepicker-hour-picker,
+.p-datepicker-minute-picker,
+.p-datepicker-second-picker,
+.p-datepicker-ampm-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  span {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-medium);
+  }
+}
+
+/* Time Increment Buttons */
+.p-datepicker-increment-button,
+.p-datepicker-decrement-button {
+  width: 1.5rem;
+  height: 1.5rem;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  
+  &:hover {
+    background: var(--component-bg-hover);
+    color: var(--text-primary);
+  }
+}
+
+/* Separator (:) */
+.p-datepicker-separator {
+  margin: 0 var(--spacing-xs);
+  font-size: var(--font-size-lg);
+  color: var(--text-muted);
+}
+
+/* 8. BUTTON BAR (Today / Clear) */
+.p-datepicker-buttonbar {
+  border-top: 1px solid var(--border-secondary);
+  padding-top: var(--spacing-md);
+  margin-top: var(--spacing-md);
+  display: flex;
+  justify-content: space-between;
+  
+  .p-button {
+    /* Assuming you have p-button styled, but enforcing compact here */
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: var(--font-size-sm);
+    width: 48%; /* Split width */
+  }
+}
+
+/* 9. MONTH/YEAR VIEW (The specific picker grids) */
+.p-datepicker-month-view,
+.p-datepicker-year-view {
+  margin: var(--spacing-md) 0;
+}
+
+.p-datepicker-month,
+.p-datepicker-year {
+  width: 33.3%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-sm);
+  border-radius: var(--ui-border-radius);
+  cursor: pointer;
+  transition: var(--transition-base);
+  color: var(--text-primary);
+
+  &:hover {
+    background: var(--component-bg-hover);
+  }
+
+  &.p-highlight {
+    color: var(--accent-primary);
+    background: var(--accent-focus);
+    font-weight: var(--font-weight-semibold);
+  }
+}
