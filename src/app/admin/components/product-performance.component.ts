@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
@@ -12,64 +12,52 @@ import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
   selector: 'app-product-performance',
   standalone: true,
   imports: [
-    CommonModule, ButtonModule, 
-    TooltipModule, ProgressSpinnerModule, TagModule,
+    CommonModule, 
+    ButtonModule, 
+    TooltipModule, 
+    ProgressSpinnerModule, 
+    TagModule,
     AgShareGrid
   ],
   template: `
-    <div class="p-4 md:p-6 transition-colors duration-300" 
-         [style.background]="'var(--theme-bg-primary)'"
-         [style.font-family]="'var(--font-body)'">
+    <div class="performance-container">
 
       <ng-container *ngIf="!loading(); else loader">
         
-        <div class="mb-8">
-          <div class="flex justify-between items-end mb-4">
+        <div class="top-section">
+          <div class="section-header">
             <div>
-              <h2 class="font-bold tracking-tight mb-1" 
-                  [style.color]="'var(--theme-text-primary)'"
-                  [style.font-family]="'var(--font-heading)'"
-                  [style.font-size]="'var(--font-size-xl)'">Profitability Champions</h2>
-              <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">
+              <h2 class="page-title">Profitability Champions</h2>
+              <p class="page-subtitle">
                 Products delivering the highest net margin per unit
               </p>
             </div>
-            <div class="flex gap-2">
-               <span class="text-[10px] opacity-50 self-center hidden md:block">SCROLL FOR MORE &rarr;</span>
-               <p-button label="Export CSV" icon="pi pi-file-excel" [text]="true" size="small"></p-button>
+            <div class="header-actions">
+               <span class="scroll-hint">SCROLL FOR MORE &rarr;</span>
+               <p-button label="Export CSV" icon="pi pi-file-excel" [text]="true" size="small" severity="secondary"></p-button>
             </div>
           </div>
 
-          <div class="flex overflow-x-auto gap-4 pb-4 snap-x custom-scrollbar">
+          <div class="cards-scroller custom-scrollbar">
             @for (prod of performanceData()?.highMargin; track prod._id) {
-              <div class="min-w-[280px] p-4 border transition-all hover:translate-y-[-2px] snap-start" 
-                   [style.background]="'var(--theme-bg-secondary)'" 
-                   [style.border-color]="'var(--theme-border-primary)'" 
-                   [style.border-radius]="'var(--ui-border-radius-xl)'">
-                <div class="flex justify-between items-start mb-3">
-                  <span class="px-2 py-0.5 rounded font-black text-[9px] bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 uppercase">
-                    High Margin
-                  </span>
-                  <i class="pi pi-arrow-up-right text-emerald-500 text-xs"></i>
+              <div class="margin-card">
+                <div class="card-top">
+                  <span class="badge success">High Margin</span>
+                  <i class="pi pi-arrow-up-right trend-icon"></i>
                 </div>
                 
-                <h3 class="font-bold truncate mb-1 w-full" 
-                    [style.color]="'var(--theme-text-primary)'" 
-                    [style.font-size]="'var(--font-size-sm)'"
-                    [title]="prod.name">
-                    {{ prod.name }}
-                </h3>
-                <p class="mb-4 tabular-nums" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">{{ prod.sku }}</p>
+                <h3 class="prod-name" [title]="prod.name">{{ prod.name }}</h3>
+                <p class="prod-sku">{{ prod.sku }}</p>
                 
-                <div class="flex justify-between items-end">
+                <div class="card-stats">
                   <div>
-                    <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Margin/Unit</p>
-                    <p class="text-lg font-bold tabular-nums text-emerald-500">₹{{ prod.margin | number }}</p>
+                    <p class="stat-label">Margin/Unit</p>
+                    <p class="stat-value success">₹{{ prod.margin | number }}</p>
                   </div>
-                  <div class="text-right">
-                    <p class="font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'">{{ prod.marginPercent | number:'1.1-1' }}%</p>
-                    <div class="w-12 h-1 rounded-full bg-white/5 mt-1 overflow-hidden">
-                       <div class="h-full bg-emerald-500" [style.width]="(prod.marginPercent > 100 ? 100 : prod.marginPercent) + '%'"></div>
+                  <div class="stat-right">
+                    <p class="percent-value">{{ prod.marginPercent | number:'1.1-1' }}%</p>
+                    <div class="progress-track">
+                       <div class="progress-fill success" [style.width]="(prod.marginPercent > 100 ? 100 : prod.marginPercent) + '%'"></div>
                     </div>
                   </div>
                 </div>
@@ -78,50 +66,49 @@ import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
           </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="content-grid">
           
-          <div class="lg:col-span-8">
-            <div class="border overflow-hidden shadow-sm h-full flex flex-col" 
-                 [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-              <div class="p-4 border-b flex justify-between items-center shrink-0" [style.border-color]="'var(--theme-border-primary)'" [style.background]="'var(--theme-bg-ternary)'">
+          <div class="main-column">
+            <div class="grid-card">
+              <div class="grid-header">
                 <div>
-                   <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-xs)'">Dead Stock Inventory</h3>
-                   <p class="text-[10px]" [style.color]="'var(--theme-text-tertiary)'">Items with zero movement in the last 30+ days</p>
+                   <h3 class="grid-title">Dead Stock Inventory</h3>
+                   <p class="grid-sub">Items with zero movement in the last 30+ days</p>
                 </div>
-                <span class="px-2 py-0.5 rounded bg-rose-500/10 text-rose-500 font-bold text-[10px]">LIQUIDATION CANDIDATES</span>
+                <span class="badge error">LIQUIDATION CANDIDATES</span>
               </div>
               
-              <div class="grid-wrapper flex-1 relative min-h-[400px]">
+              <div class="grid-container">
                  <app-ag-share-grid 
                    [columns]="deadStockColumns" 
                    [data]="performanceData()?.deadStock || []" 
                    [showActions]="true" 
                    (gridEvent)="handleGridAction($event)"
-                   style="width: 100%; height: 100%; display: block; position: absolute; inset: 0;">
+                   class="full-size-grid">
                  </app-ag-share-grid>
               </div>
             </div>
           </div>
 
-          <div class="lg:col-span-4 space-y-6">
-            <div class="p-6 border" [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-               <h4 class="font-bold mb-4 uppercase tracking-tighter" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Asset Efficiency</h4>
-               <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'" class="mb-4">Total capital locked in non-moving stock:</p>
-               <div class="mb-6">
-                 <p class="text-3xl font-bold tabular-nums text-rose-500">₹2.8M</p>
-                 <p class="text-[10px] font-bold text-rose-400/60 uppercase">High Risk Exposure</p>
+          <div class="side-column">
+            
+            <div class="side-card">
+               <h4 class="side-title">Asset Efficiency</h4>
+               <p class="side-text mb-md">Total capital locked in non-moving stock:</p>
+               <div class="mb-lg">
+                 <p class="locked-value">₹2.8M</p>
+                 <p class="risk-label">High Risk Exposure</p>
                </div>
                <p-button label="Liquidate Strategy" severity="danger" [fluid]="true" size="small"></p-button>
             </div>
 
-            <div class="p-5 border border-dashed" 
-                 [style.background]="'rgba(96, 165, 250, 0.05)'" [style.border-color]="'var(--theme-info)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-              <div class="flex gap-3">
-                <i class="pi pi-info-circle text-blue-400 mt-1"></i>
+            <div class="side-card tip-card">
+              <div class="tip-content">
+                <i class="pi pi-info-circle tip-icon"></i>
                 <div>
-                  <p class="font-bold" [style.color]="'var(--theme-info)'" [style.font-size]="'var(--font-size-sm)'">Stock Rotation Tip</p>
-                  <p class="mt-1 leading-relaxed" [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">
-                    <span class="text-white font-bold">MI Smart TV 32 Inch</span> has 150 units in dead stock. Consider a bundle offer with high-margin Soundbars to clear space.
+                  <p class="tip-title">Stock Rotation Tip</p>
+                  <p class="tip-text">
+                    <span class="highlight">MI Smart TV 32 Inch</span> has 150 units in dead stock. Consider a bundle offer with high-margin Soundbars to clear space.
                   </p>
                 </div>
               </div>
@@ -132,35 +119,273 @@ import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
       </ng-container>
 
       <ng-template #loader>
-        <div class="h-[50vh] flex flex-col items-center justify-center gap-4">
+        <div class="loader-container">
           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-10 h-10"></p-progressSpinner>
-          <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">Auditing product performance...</p>
+          <p class="loader-text">Auditing product performance...</p>
         </div>
       </ng-template>
 
     </div>
   `,
   styles: [`
-    /* Horizontal Scrollbar Styling */
-    .custom-scrollbar::-webkit-scrollbar {
-      height: 6px;
+    /* HOST & LAYOUT */
+    :host { display: block; width: 100%; }
+
+    .performance-container {
+      padding: var(--spacing-lg) var(--spacing-xl);
+      background: var(--bg-primary);
+      font-family: var(--font-body);
+      min-height: 100%;
     }
-    .custom-scrollbar::-webkit-scrollbar-track {
-        background: var(--bg-secondary);
+
+    /* TOP SECTION */
+    .top-section { margin-bottom: var(--spacing-2xl); }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: var(--spacing-lg);
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: var(--theme-border-primary); 
+
+    .page-title {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      font-family: var(--font-heading);
+      letter-spacing: -0.01em;
+      margin: 0 0 4px 0;
+    }
+
+    .page-subtitle {
+      font-size: var(--font-size-sm);
+      color: var(--text-tertiary);
+      margin: 0;
+    }
+
+    .header-actions { display: flex; gap: var(--spacing-sm); align-items: center; }
+    
+    .scroll-hint {
+      font-size: 10px;
+      opacity: 0.6;
+      font-weight: bold;
+      color: var(--text-tertiary);
+      display: none;
+    }
+    @media(min-width: 768px) { .scroll-hint { display: block; } }
+
+    /* CARDS SCROLLER */
+    .cards-scroller {
+      display: flex;
+      gap: var(--spacing-lg);
+      overflow-x: auto;
+      padding-bottom: var(--spacing-md);
+      scroll-snap-type: x mandatory;
+    }
+
+    .margin-card {
+      min-width: 280px;
+      padding: var(--spacing-lg);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius-xl);
+      transition: var(--transition-base);
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+    }
+    .margin-card:hover { transform: translateY(-2px); border-color: var(--border-secondary); box-shadow: var(--shadow-sm); }
+
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--spacing-md); }
+    
+    .badge {
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 2px 6px;
       border-radius: 4px;
+      border: 1px solid transparent;
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: var(--theme-text-tertiary);
+    .badge.success { 
+      background: var(--color-success-bg); 
+      color: var(--color-success); 
+      border-color: var(--color-success-border); 
+    }
+    .badge.error { 
+      background: var(--color-error-bg); 
+      color: var(--color-error); 
+      border-color: var(--color-error-border); 
+    }
+
+    .trend-icon { color: var(--color-success); font-size: var(--font-size-xs); }
+
+    .prod-name {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      margin: 0 0 2px 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .prod-sku {
+      font-size: var(--font-size-xs);
+      color: var(--text-label);
+      font-family: var(--font-mono);
+      margin: 0 0 var(--spacing-lg) 0;
+    }
+
+    .card-stats { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; }
+
+    .stat-label { font-size: var(--font-size-xs); color: var(--text-tertiary); margin: 0; }
+    
+    .stat-value { font-size: var(--font-size-lg); font-weight: bold; margin: 0; }
+    .stat-value.success { color: var(--color-success); }
+
+    .stat-right { text-align: right; }
+    .percent-value { font-weight: bold; color: var(--text-primary); font-size: var(--font-size-sm); margin: 0; }
+
+    .progress-track {
+      width: 3rem; height: 4px;
+      background: var(--bg-ternary);
+      border-radius: 99px;
+      margin-top: 4px;
+      overflow: hidden;
+    }
+    .progress-fill.success { background: var(--color-success); height: 100%; }
+
+    /* CONTENT GRID */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--spacing-lg);
+    }
+    @media(min-width: 1024px) {
+      .content-grid { grid-template-columns: 2fr 1fr; }
+    }
+
+    /* GRID CARD (Table) */
+    .grid-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius-xl);
+      overflow: hidden;
+      height: 100%;
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .grid-header {
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-bottom: 1px solid var(--border-primary);
+      background: var(--bg-ternary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .grid-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    .grid-sub { font-size: 10px; color: var(--text-tertiary); margin: 2px 0 0 0; }
+
+    .grid-container { flex: 1; position: relative; }
+    .full-size-grid { width: 100%; height: 100%; display: block; }
+
+    /* SIDE COLUMN */
+    .side-column { display: flex; flex-direction: column; gap: var(--spacing-lg); }
+
+    .side-card {
+      background: var(--bg-ternary);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--ui-border-radius-xl);
+      padding: var(--spacing-lg);
+    }
+
+    .side-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      color: var(--text-label);
+      margin: 0 0 var(--spacing-sm) 0;
+    }
+
+    .side-text { font-size: var(--font-size-xs); color: var(--text-tertiary); margin: 0; }
+    .mb-md { margin-bottom: var(--spacing-md); }
+    .mb-lg { margin-bottom: var(--spacing-lg); }
+
+    .locked-value {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-error);
+      margin: 0;
+      line-height: 1;
+    }
+
+    .risk-label {
+      font-size: 10px;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: var(--color-error);
+      opacity: 0.8;
+      margin-top: 4px;
+    }
+
+    /* TIP CARD */
+    .tip-card {
+      background: var(--color-info-bg); /* Use mix token */
+      border: 1px dashed var(--color-info);
+    }
+
+    .tip-content { display: flex; gap: var(--spacing-sm); }
+    .tip-icon { color: var(--color-info); margin-top: 2px; }
+
+    .tip-title {
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-sm);
+      color: var(--color-info);
+      margin: 0 0 4px 0;
+    }
+
+    .tip-text {
+      font-size: var(--font-size-xs);
+      color: var(--text-secondary);
+      line-height: 1.4;
+      margin: 0;
+    }
+    .highlight { font-weight: bold; color: var(--text-primary); }
+
+    /* SCROLLBAR UTILS */
+    .custom-scrollbar::-webkit-scrollbar { height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: var(--bg-secondary); }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border-primary); border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+    /* LOADER */
+    .loader-container {
+      height: 50vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-md);
+    }
+    .loader-text {
+      font-size: var(--font-size-sm);
+      color: var(--text-tertiary);
     }
   `]
 })
 export class ProductPerformanceComponent implements OnInit {
   performanceData = signal<any>(null);
   loading = signal<boolean>(true);
-  
   deadStockColumns: any[] = [];
 
   constructor(
@@ -175,6 +400,7 @@ export class ProductPerformanceComponent implements OnInit {
   }
 
   setupColumns(): void {
+    // Grid columns using Theme Tokens
     this.deadStockColumns = [
       {
         field: 'name', 
@@ -184,8 +410,8 @@ export class ProductPerformanceComponent implements OnInit {
         minWidth: 200,
         cellRenderer: (params: any) => {
           return `<div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
-                    <span style="font-weight: 700; color: var(--theme-text-primary);">${params.value}</span>
-                    <span style="font-size: 10px; color: var(--theme-text-label);">${params.data.sku}</span>
+                    <span style="font-weight: 700; color: var(--text-primary); font-size: var(--font-size-sm);">${params.value}</span>
+                    <span style="font-size: 10px; color: var(--text-label); font-family: var(--font-mono); margin-top: 2px;">${params.data.sku}</span>
                   </div>`;
         }
       },
@@ -195,7 +421,7 @@ export class ProductPerformanceComponent implements OnInit {
         sortable: true, 
         width: 100,
         type: 'rightAligned',
-        cellStyle: { 'font-family': 'monospace', 'font-weight': '700', 'text-align': 'right' }
+        cellStyle: { 'font-family': 'var(--font-mono)', 'font-weight': '700', 'text-align': 'right', 'color': 'var(--text-secondary)' }
       },
       {
         field: 'value', 
@@ -204,14 +430,13 @@ export class ProductPerformanceComponent implements OnInit {
         width: 140,
         type: 'rightAligned',
         valueFormatter: (params: any) => this.commonService.formatCurrency(params.value),
-        cellStyle: { 'font-weight': '700', 'color': '#fb7185', 'text-align': 'right' }
+        cellStyle: { 'font-weight': '700', 'color': 'var(--color-error)', 'text-align': 'right' }
       },
      {
         headerName: 'Action',
         width: 100,
         cellRenderer: (params: any) => {
-           // Reduced padding and added line-height:1 to fit compact rows
-           return `<button style="background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.2); color: #fb7185; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; cursor: pointer; line-height: 1; display: inline-flex; align-items: center; height: 20px;">LIQUIDATE</button>`;
+           return `<button style="background: var(--color-error-bg); border: 1px solid var(--color-error-border); color: var(--color-error); padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; cursor: pointer; line-height: 1; display: inline-flex; align-items: center; height: 20px;">LIQUIDATE</button>`;
         },
         cellStyle: { 'display': 'flex', 'align-items': 'center', 'justify-content': 'center' }
       }
@@ -236,401 +461,3 @@ export class ProductPerformanceComponent implements OnInit {
     });
   }
 }
-// import { Component, OnInit, signal, inject, ChangeDetectorRef } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { ButtonModule } from 'primeng/button';
-// import { TooltipModule } from 'primeng/tooltip';
-// import { ProgressSpinnerModule } from 'primeng/progressspinner';
-// import { TagModule } from 'primeng/tag';
-// import { AdminAnalyticsService } from '../admin-analytics.service';
-// import { CommonMethodService } from '../../core/utils/common-method.service'; // Added CommonMethodService
-// import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
-
-// @Component({
-//   selector: 'app-product-performance',
-//   standalone: true,
-//   imports: [
-//     CommonModule, ButtonModule, 
-//     TooltipModule, ProgressSpinnerModule, TagModule,
-//     AgShareGrid // Added Custom Grid
-//   ],
-//   template: `
-//     <div class="p-4 md:p-6 transition-colors duration-300" 
-//          [style.background]="'var(--theme-bg-primary)'"
-//          [style.font-family]="'var(--font-body)'">
-
-//       <ng-container *ngIf="!loading(); else loader">
-        
-//         <div class="mb-8">
-//           <div class="flex justify-between items-end mb-6">
-//             <div>
-//               <h2 class="font-bold tracking-tight mb-1" 
-//                   [style.color]="'var(--theme-text-primary)'"
-//                   [style.font-family]="'var(--font-heading)'"
-//                   [style.font-size]="'var(--font-size-xl)'">Profitability Champions</h2>
-//               <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">
-//                 Products delivering the highest net margin per unit
-//               </p>
-//             </div>
-//             <p-button label="Export CSV" icon="pi pi-file-excel" [text]="true" size="small"></p-button>
-//           </div>
-
-//           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-//             @for (prod of performanceData()?.highMargin?.slice(0, 4); track prod._id) {
-//               <div class="p-4 border transition-all hover:translate-y-[-2px]" 
-//                    [style.background]="'var(--theme-bg-secondary)'" 
-//                    [style.border-color]="'var(--theme-border-primary)'" 
-//                    [style.border-radius]="'var(--ui-border-radius-xl)'">
-//                 <div class="flex justify-between items-start mb-3">
-//                   <span class="px-2 py-0.5 rounded font-black text-[9px] bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 uppercase">
-//                     High Margin
-//                   </span>
-//                   <i class="pi pi-arrow-up-right text-emerald-500 text-xs"></i>
-//                 </div>
-//                 <h3 class="font-bold truncate mb-1" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">{{ prod.name }}</h3>
-//                 <p class="mb-4 tabular-nums" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">{{ prod.sku }}</p>
-                
-//                 <div class="flex justify-between items-end">
-//                   <div>
-//                     <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Margin/Unit</p>
-//                     <p class="text-lg font-bold tabular-nums text-emerald-500">₹{{ prod.margin | number }}</p>
-//                   </div>
-//                   <div class="text-right">
-//                     <p class="font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'">{{ prod.marginPercent | number:'1.1-1' }}%</p>
-//                     <div class="w-12 h-1 rounded-full bg-white/5 mt-1 overflow-hidden">
-//                        <div class="h-full bg-emerald-500" [style.width]="prod.marginPercent + '%'"></div>
-//                     </div>
-//                   </div>
-//                 </div>
-//               </div>
-//             }
-//           </div>
-//         </div>
-
-//         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-//           <div class="lg:col-span-8">
-//             <div class="border overflow-hidden shadow-sm h-full flex flex-col" 
-//                  [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//               <div class="p-4 border-b flex justify-between items-center shrink-0" [style.border-color]="'var(--theme-border-primary)'" [style.background]="'var(--theme-bg-ternary)'">
-//                 <div>
-//                    <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-xs)'">Dead Stock Inventory</h3>
-//                    <p class="text-[10px]" [style.color]="'var(--theme-text-tertiary)'">Items with zero movement in the last 30+ days</p>
-//                 </div>
-//                 <span class="px-2 py-0.5 rounded bg-rose-500/10 text-rose-500 font-bold text-[10px]">LIQUIDATION CANDIDATES</span>
-//               </div>
-              
-//               <div class="grid-wrapper flex-1 relative min-h-[400px]">
-//                  <app-ag-share-grid 
-//                    [columns]="deadStockColumns" 
-//                    [data]="performanceData()?.deadStock || []" 
-//                    [showActions]="true" 
-//                    (gridEvent)="handleGridAction($event)"
-//                    style="width: 100%; height: 100%; display: block; position: absolute; inset: 0;">
-//                  </app-ag-share-grid>
-//               </div>
-//             </div>
-//           </div>
-
-//           <div class="lg:col-span-4 space-y-6">
-//             <div class="p-6 border" [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//                <h4 class="font-bold mb-4 uppercase tracking-tighter" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Asset Efficiency 
-
-// [Image of pareto chart inventory analysis]
-// </h4>
-//                <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'" class="mb-4">Total capital locked in non-moving stock:</p>
-//                <div class="mb-6">
-//                  <p class="text-3xl font-bold tabular-nums text-rose-500">₹2.8M</p>
-//                  <p class="text-[10px] font-bold text-rose-400/60 uppercase">High Risk Exposure</p>
-//                </div>
-//                <p-button label="Liquidate Strategy" severity="danger" [fluid]="true" size="small"></p-button>
-//             </div>
-
-//             <div class="p-5 border border-dashed" 
-//                  [style.background]="'rgba(96, 165, 250, 0.05)'" [style.border-color]="'var(--theme-info)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//               <div class="flex gap-3">
-//                 <i class="pi pi-info-circle text-blue-400 mt-1"></i>
-//                 <div>
-//                   <p class="font-bold" [style.color]="'var(--theme-info)'" [style.font-size]="'var(--font-size-sm)'">Stock Rotation Tip</p>
-//                   <p class="mt-1 leading-relaxed" [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">
-//                     <span class="text-white font-bold">MI Smart TV 32 Inch</span> has 150 units in dead stock. Consider a bundle offer with high-margin Soundbars to clear space.
-//                   </p>
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-
-//       </ng-container>
-
-//       <ng-template #loader>
-//         <div class="h-[50vh] flex flex-col items-center justify-center gap-4">
-//           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-10 h-10"></p-progressSpinner>
-//           <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">Auditing product performance...</p>
-//         </div>
-//       </ng-template>
-
-//     </div>
-//   `,
-//   styles: []
-// })
-// export class ProductPerformanceComponent implements OnInit {
-//   performanceData = signal<any>(null);
-//   loading = signal<boolean>(true);
-  
-//   deadStockColumns: any[] = [];
-
-//   constructor(
-//     private analyticsService: AdminAnalyticsService,
-//     public commonService: CommonMethodService, // Injected for currency formatting
-//     private cdr: ChangeDetectorRef
-//   ) {}
-
-//   ngOnInit() {
-//     this.setupColumns();
-//     this.loadData();
-//   }
-
-//   setupColumns(): void {
-//     this.deadStockColumns = [
-//       {
-//         field: 'name', 
-//         headerName: 'Product Detail', 
-//         sortable: true, 
-//         flex: 1,
-//         minWidth: 200,
-//         cellRenderer: (params: any) => {
-//           return `<div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
-//                     <span style="font-weight: 700; color: var(--theme-text-primary);">${params.value}</span>
-//                     <span style="font-size: 10px; color: var(--theme-text-label);">${params.data.sku}</span>
-//                   </div>`;
-//         }
-//       },
-//       {
-//         field: 'stockQuantity', 
-//         headerName: 'Qty', 
-//         sortable: true, 
-//         width: 100,
-//         type: 'rightAligned',
-//         cellStyle: { 'font-family': 'monospace', 'font-weight': '700', 'text-align': 'right' }
-//       },
-//       {
-//         field: 'value', 
-//         headerName: 'Tied Capital', 
-//         sortable: true, 
-//         width: 140,
-//         type: 'rightAligned',
-//         valueFormatter: (params: any) => this.commonService.formatCurrency(params.value),
-//         cellStyle: { 'font-weight': '700', 'color': '#fb7185', 'text-align': 'right' } // Rose-400
-//       },
-//       {
-//         headerName: 'Action',
-//         width: 100,
-//         cellRenderer: (params: any) => {
-//            return `<button class="p-button-text p-button-sm p-button-danger" style="background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.2); color: #fb7185; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; cursor: pointer;">LIQUIDATE</button>`;
-//         },
-//         cellStyle: { 'display': 'flex', 'align-items': 'center', 'justify-content': 'center' }
-//       }
-//     ];
-//     this.cdr.detectChanges();
-//   }
-
-//   handleGridAction(event: any) {
-//     // Handle action button clicks if needed
-//     console.log('Grid Action:', event);
-//   }
-
-//   loadData() {
-//     this.loading.set(true);
-//     this.analyticsService.getProductPerformance().subscribe({
-//       next: (res) => {
-//         if (res.status === 'success') {
-//           this.performanceData.set(res.data);
-//         }
-//         this.loading.set(false);
-//       },
-//       error: () => this.loading.set(false)
-//     });
-//   }
-// }
-// // import { Component, OnInit, signal } from '@angular/core';
-// // import { CommonModule } from '@angular/common';
-// // import { TableModule } from 'primeng/table';
-// // import { ButtonModule } from 'primeng/button';
-// // import { TooltipModule } from 'primeng/tooltip';
-// // import { ProgressSpinnerModule } from 'primeng/progressspinner';
-// // import { TagModule } from 'primeng/tag';
-// // import { AdminAnalyticsService } from '../admin-analytics.service';
-
-// // @Component({
-// //   selector: 'app-product-performance',
-// //   standalone: true,
-// //   imports: [CommonModule, TableModule, ButtonModule, TooltipModule, ProgressSpinnerModule, TagModule],
-// //   template: `
-// //     <div class="p-4 md:p-6 transition-colors duration-300" 
-// //          [style.background]="'var(--theme-bg-primary)'"
-// //          [style.font-family]="'var(--font-body)'">
-
-// //       <ng-container *ngIf="!loading(); else loader">
-        
-// //         <div class="mb-8">
-// //           <div class="flex justify-between items-end mb-6">
-// //             <div>
-// //               <h2 class="font-bold tracking-tight mb-1" 
-// //                   [style.color]="'var(--theme-text-primary)'"
-// //                   [style.font-family]="'var(--font-heading)'"
-// //                   [style.font-size]="'var(--font-size-xl)'">Profitability Champions</h2>
-// //               <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">
-// //                 Products delivering the highest net margin per unit
-// //               </p>
-// //             </div>
-// //             <p-button label="Export CSV" icon="pi pi-file-excel" [text]="true" size="small"></p-button>
-// //           </div>
-
-// //           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-// //             @for (prod of performanceData()?.highMargin?.slice(0, 4); track prod._id) {
-// //               <div class="p-4 border transition-all hover:translate-y-[-2px]" 
-// //                    [style.background]="'var(--theme-bg-secondary)'" 
-// //                    [style.border-color]="'var(--theme-border-primary)'" 
-// //                    [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //                 <div class="flex justify-between items-start mb-3">
-// //                   <span class="px-2 py-0.5 rounded font-black text-[9px] bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 uppercase">
-// //                     High Margin
-// //                   </span>
-// //                   <i class="pi pi-arrow-up-right text-emerald-500 text-xs"></i>
-// //                 </div>
-// //                 <h3 class="font-bold truncate mb-1" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">{{ prod.name }}</h3>
-// //                 <p class="mb-4 tabular-nums" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">{{ prod.sku }}</p>
-                
-// //                 <div class="flex justify-between items-end">
-// //                   <div>
-// //                     <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Margin/Unit</p>
-// //                     <p class="text-lg font-bold tabular-nums text-emerald-500">₹{{ prod.margin | number }}</p>
-// //                   </div>
-// //                   <div class="text-right">
-// //                     <p class="font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'">{{ prod.marginPercent | number:'1.1-1' }}%</p>
-// //                     <div class="w-12 h-1 rounded-full bg-white/5 mt-1 overflow-hidden">
-// //                        <div class="h-full bg-emerald-500" [style.width]="prod.marginPercent + '%'"></div>
-// //                     </div>
-// //                   </div>
-// //                 </div>
-// //               </div>
-// //             }
-// //           </div>
-// //         </div>
-
-// //         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-// //           <div class="lg:col-span-8">
-// //             <div class="border overflow-hidden shadow-sm" 
-// //                  [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //               <div class="p-4 border-b flex justify-between items-center" [style.border-color]="'var(--theme-border-primary)'" [style.background]="'var(--theme-bg-ternary)'">
-// //                 <div>
-// //                    <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-xs)'">Dead Stock Inventory</h3>
-// //                    <p class="text-[10px]" [style.color]="'var(--theme-text-tertiary)'">Items with zero movement in the last 30+ days</p>
-// //                 </div>
-// //                 <span class="px-2 py-0.5 rounded bg-rose-500/10 text-rose-500 font-bold text-[10px]">LIQUIDATION CANDIDATES</span>
-// //               </div>
-              
-// //               <p-table [value]="performanceData()?.deadStock" [paginator]="true" [rows]="5" styleClass="p-datatable-sm">
-// //                 <ng-template pTemplate="header">
-// //                   <tr>
-// //                     <th [style.background]="'transparent'" [style.color]="'var(--theme-text-label)'">Product Detail</th>
-// //                     <th [style.background]="'transparent'" [style.color]="'var(--theme-text-label)'" class="text-right">Qty</th>
-// //                     <th [style.background]="'transparent'" [style.color]="'var(--theme-text-label)'" class="text-right">Tied Capital</th>
-// //                     <th [style.background]="'transparent'" [style.color]="'var(--theme-text-label)'" class="text-center">Action</th>
-// //                   </tr>
-// //                 </ng-template>
-// //                 <ng-template pTemplate="body" let-stock>
-// //                   <tr [style.color]="'var(--theme-text-secondary)'" [style.border-color]="'var(--theme-border-primary)'">
-// //                     <td>
-// //                       <div class="flex flex-col">
-// //                         <span class="font-bold" [style.color]="'var(--theme-text-primary)'">{{ stock.name }}</span>
-// //                         <span class="text-[10px]" [style.color]="'var(--theme-text-label)'">{{ stock.sku }}</span>
-// //                       </div>
-// //                     </td>
-// //                     <td class="text-right font-mono font-bold">{{ stock.stockQuantity }}</td>
-// //                     <td class="text-right font-bold tabular-nums text-rose-400">₹{{ stock.value | number }}</td>
-// //                     <td class="text-center">
-// //                       <p-button icon="pi pi-percentage" [text]="true" severity="danger" pTooltip="Mark for Sale" size="small"></p-button>
-// //                     </td>
-// //                   </tr>
-// //                 </ng-template>
-// //               </p-table>
-// //             </div>
-// //           </div>
-
-// //           <div class="lg:col-span-4 space-y-6">
-// //             <div class="p-6 border" [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //                <h4 class="font-bold mb-4 uppercase tracking-tighter" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Asset Efficiency</h4>
-// //                <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'" class="mb-4">Total capital locked in non-moving stock:</p>
-// //                <div class="mb-6">
-// //                  <p class="text-3xl font-bold tabular-nums text-rose-500">₹2.8M</p>
-// //                  <p class="text-[10px] font-bold text-rose-400/60 uppercase">High Risk Exposure</p>
-// //                </div>
-// //                <p-button label="Liquidate Strategy" severity="danger" [fluid]="true" size="small"></p-button>
-// //             </div>
-
-// //             <div class="p-5 border border-dashed" 
-// //                  [style.background]="'rgba(96, 165, 250, 0.05)'" [style.border-color]="'var(--theme-info)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //               <div class="flex gap-3">
-// //                 <i class="pi pi-info-circle text-blue-400 mt-1"></i>
-// //                 <div>
-// //                   <p class="font-bold" [style.color]="'var(--theme-info)'" [style.font-size]="'var(--font-size-sm)'">Stock Rotation Tip</p>
-// //                   <p class="mt-1 leading-relaxed" [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">
-// //                     <span class="text-white font-bold">MI Smart TV 32 Inch</span> has 150 units in dead stock. Consider a bundle offer with high-margin Soundbars to clear space.
-// //                   </p>
-// //                 </div>
-// //               </div>
-// //             </div>
-// //           </div>
-// //         </div>
-
-// //       </ng-container>
-
-// //       <ng-template #loader>
-// //         <div class="h-[50vh] flex flex-col items-center justify-center gap-4">
-// //           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-10 h-10"></p-progressSpinner>
-// //           <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">Auditing product performance...</p>
-// //         </div>
-// //       </ng-template>
-
-// //     </div>
-// //   `,
-// //   styles: [`
-// //     :host ::ng-deep .p-datatable .p-datatable-tbody > tr {
-// //       background: transparent !important;
-// //       border-bottom: 1px solid var(--theme-border-primary) !important;
-// //     }
-// //     :host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
-// //       padding: 0.85rem 1rem;
-// //       font-size: 10px;
-// //       font-weight: 700;
-// //       text-transform: uppercase;
-// //       border: none !important;
-// //     }
-// //   `]
-// // })
-// // export class ProductPerformanceComponent implements OnInit {
-// //   performanceData = signal<any>(null);
-// //   loading = signal<boolean>(true);
-
-// //   constructor(private analyticsService: AdminAnalyticsService) {}
-
-// //   ngOnInit() {
-// //     this.loadData();
-// //   }
-
-// //   loadData() {
-// //     this.loading.set(true);
-// //     this.analyticsService.getProductPerformance().subscribe({
-// //       next: (res) => {
-// //         if (res.status === 'success') {
-// //           this.performanceData.set(res.data);
-// //         }
-// //         this.loading.set(false);
-// //       },
-// //       error: () => this.loading.set(false)
-// //     });
-// //   }
-// // }
