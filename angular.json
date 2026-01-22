@@ -27,6 +27,7 @@
               "src/styles/styles.scss",
               "src/styles/animation.scss",
               "src/styles/common.scss",
+              "src/styles/themes.scss",
               "src/styles/base-styles.scss",
               "src/styles/primeng-theme.scss",
               "node_modules/primeicons/primeicons.css",
@@ -94,7 +95,7 @@
               "all"
             ],
             "host": "0.0.0.0",
-            "port": 4200
+            "port": 5000
           },
           "configurations": {
             "production": {
@@ -127,7 +128,6 @@
               "src/styles/themes.scss",
               "src/styles/base-styles.scss",
               "src/styles/common.scss",
-                            "src/styles/themes.scss",
               "src/styles/primeng-theme.scss",
               "src/styles/styles.scss",
               "node_modules/primeicons/primeicons.css",
