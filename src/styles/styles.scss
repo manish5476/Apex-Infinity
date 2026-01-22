@@ -341,3 +341,232 @@
   font-size: var(--font-size-md);
   line-height: var(--line-height-relaxed);
 }
+/* ==========================================================================
+   GLOBAL COMPONENT: AUTOCOMPLETE (p-autocomplete)
+   Design System: Refined Compact
+   Context: Input Fields, Search, Multi-Select Chips
+   ========================================================================== */
+
+/* 1. ROOT CONTAINER */
+.p-autocomplete {
+  display: inline-flex;
+  position: relative;
+  font-family: var(--font-body);
+}
+
+/* 2. THE INPUT FIELD (Single Mode) */
+/* Shared input styles used across your app */
+.p-autocomplete-input {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base); /* 13px */
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--ui-border-radius);
+  
+  /* Compact Padding: ~32-34px height target */
+  padding: var(--spacing-sm) var(--spacing-md); 
+  
+  transition: var(--transition-colors), 
+              border-color 0.2s cubic-bezier(0.2, 0.9, 0.2, 1), 
+              box-shadow 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
+  
+  width: 100%;
+
+  /* Placeholder Text */
+  &::placeholder {
+    color: var(--text-muted);
+    opacity: 1;
+  }
+
+  /* Hover State */
+  &:hover:not(:disabled) {
+    border-color: var(--border-secondary); /* Slightly darker border */
+    background: var(--component-bg-hover);
+  }
+
+  /* Focus State */
+  &:focus-visible {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+  }
+
+  /* Disabled State */
+  &:disabled {
+    opacity: var(--state-disabled-opacity);
+    background: var(--bg-ternary);
+    cursor: default;
+  }
+}
+
+/* 3. MULTIPLE SELECTION MODE (The Container) */
+.p-autocomplete-input-multiple {
+  margin: 0;
+  padding: var(--spacing-xs) var(--spacing-sm); /* Tighter padding to fit chips */
+  gap: var(--spacing-xs);
+  list-style-type: none;
+  cursor: text;
+  
+  /* Inherit standard input look */
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--ui-border-radius);
+  color: var(--text-primary);
+  transition: var(--transition-colors), box-shadow 0.2s;
+  
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  /* Focus State (Wrapper acts as the input border) */
+  &:focus-within {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+  }
+  
+  /* The actual typing input inside the multiple container */
+  .p-autocomplete-input-chip {
+    flex: 1 1 auto;
+    border: 0;
+    padding: var(--spacing-xs);
+    margin: 0;
+    background: transparent;
+    color: inherit;
+    font-size: var(--font-size-base);
+    font-family: var(--font-body);
+    min-width: 4rem;
+    
+    &:focus-visible {
+      outline: none;
+    }
+  }
+}
+
+/* 4. CHIPS (Selected Items in Multiple Mode) */
+.p-autocomplete-chip-item {
+  /* The LI wrapper for the chip */
+  display: flex; 
+}
+
+.p-autocomplete-chip {
+  display: inline-flex;
+  align-items: center;
+  background: var(--accent-tertiary); /* Subtle accent bg */
+  color: var(--text-primary);
+  border-radius: var(--ui-border-radius-sm); /* Slightly tighter radius for chips */
+  padding: 2px var(--spacing-sm);
+  font-size: var(--font-size-sm); /* 12px - slightly smaller than input text */
+  font-weight: var(--font-weight-medium);
+  gap: var(--spacing-xs);
+}
+
+/* Chip Remove Icon */
+.p-autocomplete-chip-icon {
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: color 0.2s;
+  
+  &:hover {
+    color: var(--color-error); /* Red on hover */
+  }
+}
+
+/* 5. DROPDOWN BUTTON (Optional side button) */
+.p-autocomplete-dropdown {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  margin-left: -1px; /* Merge borders */
+  background: var(--bg-ternary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-primary);
+  width: 2.5rem;
+  
+  &:hover {
+    background: var(--component-bg-hover);
+    color: var(--text-primary);
+  }
+  
+  &:focus-visible {
+    z-index: 2;
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+  }
+}
+
+/* 6. LOADER (Spinner) */
+.p-autocomplete-loader {
+  right: var(--spacing-md);
+  color: var(--accent-primary);
+  font-size: var(--font-size-md);
+}
+
+/* 7. THE OVERLAY PANEL (Dropdown Results) */
+.p-autocomplete-overlay {
+  background: var(--component-bg); /* Use your component surface */
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--ui-border-radius-lg);
+  box-shadow: var(--shadow-lg); /* Nice floaty depth */
+  margin-top: var(--spacing-xs);
+  
+  /* Glassmorphism support if your theme enables it */
+  /* backdrop-filter: blur(var(--glass-blur-c)); */
+}
+
+/* 8. LIST CONTAINER */
+.p-autocomplete-list {
+  padding: var(--spacing-xs);
+  margin: 0;
+  list-style: none;
+  max-height: 200px;
+  overflow: auto;
+  
+  /* Custom Scrollbar for the list */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--scroll-thumb-c);
+    border-radius: 3px;
+  }
+}
+
+/* 9. LIST OPTIONS (Individual Items) */
+.p-autocomplete-option {
+  padding: var(--spacing-sm) var(--spacing-md); /* Compact list items */
+  margin: 2px 0;
+  border-radius: var(--ui-border-radius-sm);
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  
+  /* Hover State */
+  &:hover:not([aria-selected="true"]) {
+    background-color: var(--component-bg-hover);
+  }
+  
+  /* Selected State */
+  &[aria-selected="true"] {
+    background-color: var(--accent-focus); /* Light accent bg */
+    color: var(--accent-primary); /* Accent text */
+    font-weight: var(--font-weight-medium);
+  }
+}
+
+/* 10. OPTION GROUPS */
+.p-autocomplete-option-group {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  padding: var(--spacing-md) var(--spacing-md) var(--spacing-xs);
+  background: var(--bg-ternary);
+}
+
+/* 11. EMPTY MESSAGE */
+.p-autocomplete-empty-message {
+  padding: var(--spacing-md);
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
