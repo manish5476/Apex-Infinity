@@ -13,14 +13,15 @@
    HEADER STRIP
    ------------------------- */
 .header-inner {
-  height: 64px; /* Standard hit target height */
+  height: 64px;
   padding: 0 var(--spacing-xl);
-  background: rgba(var(--bg-primary-rgb), 0.85); /* Assumes you have RGB vars, otherwise use hex */
   background: var(--bg-primary); 
   border-bottom: var(--ui-border-width) solid var(--border-primary);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  
+  /* Glass Effect if supported by theme vars */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow: var(--shadow-sm);
@@ -37,7 +38,7 @@
     height: 36px;
     border-radius: var(--ui-border-radius-lg);
     border: var(--ui-border-width) solid var(--border-primary);
-      background: var(--bg-secondary);
+    background: var(--bg-secondary);
     color: var(--text-secondary);
     cursor: pointer;
     display: flex;
@@ -48,7 +49,7 @@
     i { font-size: 1rem; }
 
     &:hover {
-      background: var(--bg-secondary);
+      background: var(--bg-ternary);
       color: var(--text-primary);
       border-color: var(--border-secondary);
       box-shadow: var(--shadow-sm);
@@ -76,6 +77,8 @@
       font-size: var(--font-size-lg);
       font-weight: var(--font-weight-bold);
       letter-spacing: -0.02em;
+      
+      /* Gradient Text */
       background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -96,7 +99,7 @@
     height: 36px;
     border-radius: var(--ui-border-radius-lg);
     border: var(--ui-border-width) solid transparent;
-      background: var(--bg-secondary);
+    background: var(--bg-secondary);
     color: var(--text-secondary);
     cursor: pointer;
     display: flex;
@@ -107,14 +110,15 @@
     i { font-size: 1.1rem; }
 
     &:hover {
-      background: var(--bg-secondary);
+      background: var(--bg-ternary);
       color: var(--accent-primary);
     }
 
+    /* Badge */
     &.has-new .notification-count {
       position: absolute;
-      top: 2px;
-      right: 2px;
+      top: -2px;
+      right: -2px;
       background: var(--color-error);
       color: white;
       font-size: 0.6rem;
@@ -135,16 +139,20 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
-    padding: var(--spacing-xs) var(--spacing-md) var(--spacing-xs) var(--spacing-xs);
-      background: var(--bg-secondary);
+    padding: 4px;
+    padding-right: var(--spacing-md); /* Extra space for text */
+    background: var(--bg-secondary);
     border: var(--ui-border-width) solid transparent;
-    border-radius: var(--ui-border-radius-xl);
+    border-radius: 99px; /* Pill Shape */
     cursor: pointer;
     transition: var(--transition-base);
-    height: 42px;
+    height: 40px;
+
+    /* Avatar styling handled by PrimeNG global theme mostly, layout here */
+    p-avatar { margin-right: 4px; }
 
     &:hover, &:focus-visible {
-      background: var(--bg-secondary);
+      background: var(--bg-ternary);
       border-color: var(--border-primary);
       box-shadow: var(--shadow-sm);
     }
@@ -153,7 +161,8 @@
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      line-height: var(--line-height-tight);
+      line-height: 1.1;
+      margin-left: 4px;
 
       .name {
         font-family: var(--font-heading);
@@ -163,369 +172,263 @@
       }
 
       .role {
-        font-size: var(--font-size-xs);
+        font-size: 10px;
         color: var(--text-tertiary);
-        margin-top: 2px;
+        text-transform: uppercase;
+        font-weight: bold;
       }
     }
     
     .chevron-icon {
-      font-size: 0.6rem;
+      font-size: 0.7rem;
       color: var(--text-tertiary);
-      transition: var(--transition-transform);
+      margin-left: var(--spacing-xs);
     }
-
-    &:hover .chevron-icon { color: var(--text-secondary); }
   }
 }
 
 /* -------------------------
-   POPOVER CORE STYLES
+   SHARED POPOVER STYLES (Floating Effect)
    ------------------------- */
 :host ::ng-deep {
-  // .profile-popover,
-  // .notification-popover {
-  //   .p-popover {
-  //     background: var(--bg-primary) !important;
-  //     border: var(--ui-border-width) solid var(--border-primary) !important;
-  //     border-radius: var(--ui-border-radius-xl) !important;
-  //     /* ENHANCED SHADOW FROM TOKENS */
-  //     box-shadow: var(--shadow-2xl) !important;
+  .profile-popover,
+  .notification-popover {
+    .p-popover {
+      /* Reset & Base */
+      background: var(--bg-primary) !important;
+      border: 1px solid var(--border-primary) !important;
+      border-radius: var(--ui-border-radius-xl) !important;
+      padding: 0 !important;
       
-  //     /* INCREASED WIDTH */
-  //     width: 480px !important;
-  //     max-width: 92vw;
+      /* Floating Effect Logic */
+      margin-top: 12px !important; /* Detach from button */
+      box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0,0,0,0.02) !important; /* Deep shadow */
       
-  //     padding: 0 !important;
-  //     overflow: hidden;
-  //     animation: popoverFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      /* Animation */
+      transform-origin: top center;
+      animation: popoverFloatIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 
-  //     .p-popover-content {
-  //       padding: 0 !important;
-  //     }
-      
-  //     /* Remove default arrow */
-  //     .p-popover-arrow { display: none !important; }
-  //   }
-  // }
+      /* Hide Default Arrow for "Detached" look */
+      &:after, &:before { display: none !important; }
 
-  .notification-popover .p-popover {
-    width: 400px !important; /* Slightly smaller for notifications */
+      /* Content Wrapper */
+      .p-popover-content { padding: 0 !important; }
+    }
   }
+
+  /* Specific Widths */
+  .profile-popover .p-popover { width: 360px !important; }
+  .notification-popover .p-popover { width: 400px !important; }
+}
+
+@keyframes popoverFloatIn {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 /* -------------------------
-   PROFILE POPOVER INTERNALS
+   POPOVER INTERNAL LAYOUT (Profile)
    ------------------------- */
 
-/* 1. Header with Gradient */
+/* Header with Gradient Background */
 .dialog-header {
-  padding: var(--spacing-xl) var(--spacing-xl) var(--spacing-2xl);
+  padding: var(--spacing-xl);
   background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
   color: white;
+  border-radius: var(--ui-border-radius-xl) var(--ui-border-radius-xl) 0 0; /* Top corners match popover */
 
   .user-profile-section {
     display: flex;
-    gap: var(--spacing-lg);
+    gap: var(--spacing-md);
     align-items: center;
 
+    /* Avatar Override for Header */
     ::ng-deep .p-avatar {
-      width: 64px !important;
-      height: 64px !important;
-      font-size: 1.5rem !important;
-      font-family: var(--font-heading);
-      border: 3px solid rgba(255, 255, 255, 0.25);
-      box-shadow: var(--shadow-lg);
-      background: rgba(255, 255, 255, 0.1) !important;
-      backdrop-filter: blur(4px);
+      width: 56px !important;
+      height: 56px !important;
+      font-size: 1.25rem !important;
+      border: 2px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.1) !important;
     }
 
     .user-info {
       flex: 1;
-
       .user-name {
-        font-family: var(--font-heading);
-        font-size: var(--font-size-xl);
-        font-weight: var(--font-weight-bold);
+        font-size: var(--font-size-lg);
+        font-weight: bold;
         margin: 0;
-        letter-spacing: -0.01em;
       }
-
       .user-email {
         font-size: var(--font-size-sm);
-        opacity: 0.9;
-        margin: var(--spacing-xs) 0 var(--spacing-md);
+        opacity: 0.8;
+        margin: 2px 0 8px;
       }
-
       .user-badges {
         display: flex;
-        gap: var(--spacing-sm);
-
+        gap: 8px;
         .badge {
-          display: inline-flex;
+          font-size: 10px;
+          font-weight: bold;
+          background: rgba(0,0,0,0.2);
+          padding: 2px 8px;
+          border-radius: 99px;
+          display: flex;
           align-items: center;
-          gap: var(--spacing-xs);
-          padding: 2px var(--spacing-md);
-          border-radius: var(--ui-border-radius-lg);
-          font-size: var(--font-size-xs);
-          font-weight: var(--font-weight-semibold);
-          background: rgba(255, 255, 255, 0.2);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          backdrop-filter: blur(4px);
-
-          i { font-size: 0.65rem; }
+          gap: 4px;
         }
       }
     }
   }
 }
 
-/* 2. Sticky Navigation Tabs */
+/* Tabs inside Popover */
 .popover-tabs {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: rgba(var(--bg-primary-rgb), 0.95); /* Using RGB var for translucency */
-  background: var(--bg-primary); /* Fallback */
-  backdrop-filter: blur(8px);
-  border-bottom: var(--ui-border-width) solid var(--border-primary);
-  padding: 0 var(--spacing-xl);
-  margin-top: calc(var(--spacing-xl) * -1); /* Pull up into header space */
-  border-radius: var(--ui-border-radius-xl) var(--ui-border-radius-xl) 0 0;
-
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-primary);
+  padding: 0 var(--spacing-lg);
+  
   .tabs-container {
     display: flex;
-    gap: var(--spacing-xl);
-
+    gap: var(--spacing-lg);
+    
     .tab-btn {
-      padding: var(--spacing-lg) 0;
       background: none;
       border: none;
-      border-bottom: 2px solid transparent;
-      color: var(--text-secondary);
+      padding: var(--spacing-md) 0;
       font-size: var(--font-size-sm);
-      font-weight: var(--font-weight-medium);
+      color: var(--text-secondary);
+      font-weight: 500;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-sm);
-      transition: var(--transition-colors);
-
-      &:hover { color: var(--text-primary); }
-
+      position: relative;
+      
       &.active {
         color: var(--accent-primary);
-        border-bottom-color: var(--accent-primary);
-        font-weight: var(--font-weight-semibold);
+        font-weight: bold;
+        &:after {
+          content: '';
+          position: absolute;
+          bottom: -1px;
+          left: 0;
+          width: 100%;
+          height: 2px;
+          background: var(--accent-primary);
+        }
       }
+      
+      &:hover:not(.active) { color: var(--text-primary); }
     }
   }
 }
 
-/* 3. Content Area */
+/* Scrollable Content Area */
 .popover-content {
-  padding: var(--spacing-xl);
-  max-height: 450px;
+  padding: var(--spacing-lg);
+  max-height: 400px;
   overflow-y: auto;
   overscroll-behavior: contain;
-
-  /* Refined Scrollbar */
-  &::-webkit-scrollbar { width: 5px; }
-  &::-webkit-scrollbar-track {   background: var(--bg-secondary); }
-  &::-webkit-scrollbar-thumb {
-    background: var(--border-secondary);
-    border-radius: 4px;
-    &:hover { background: var(--text-tertiary); }
-  }
+  background: var(--bg-secondary); /* Subtle contrast against white header if needed */
 }
 
-/* -------------------------
-   SETTINGS SECTIONS
-   ------------------------- */
+/* --- SECTIONS INSIDE POPOVER --- */
 .section-card {
-  margin-bottom: var(--spacing-xl);
-  
+  background: var(--bg-primary);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--ui-border-radius);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+
   .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: var(--spacing-md);
-
+    
     .section-title {
-      font-family: var(--font-heading);
-      font-size: var(--font-size-sm);
-      font-weight: var(--font-weight-bold);
-      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: bold;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      color: var(--text-tertiary);
+      letter-spacing: 0.5px;
       display: flex;
       align-items: center;
-      gap: var(--spacing-sm);
+      gap: 6px;
     }
   }
 }
 
-/* Theme Presets */
-.theme-presets-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--spacing-md);
-
-  .preset-card {
-    cursor: pointer;
-    
-    .preset-preview {
-      height: 48px;
-      border-radius: var(--ui-border-radius-lg);
-      border: var(--ui-border-width) solid var(--border-primary);
-      position: relative;
-      overflow: hidden;
-      transition: var(--transition-base);
-      margin-bottom: var(--spacing-xs);
-
-      .active-check {
-        position: absolute;
-        inset: 0;
-        background: rgba(0,0,0,0.3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 1rem;
-        backdrop-filter: blur(2px);
-      }
-    }
-
-    .preset-name {
-      display: block;
-      text-align: center;
-      font-size: var(--font-size-xs);
-      color: var(--text-secondary);
-    }
-
-    &:hover .preset-preview {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-      border-color: var(--accent-primary);
-    }
-    
-    &.active {
-      .preset-preview { border-color: var(--accent-primary); }
-      .preset-name { color: var(--text-primary); font-weight: var(--font-weight-semibold); }
-    }
-  }
-}
-
-/* Quick Actions Grid */
+/* Actions Grid (Themes/Reset) */
 .actions-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
 
   .action-item {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: var(--spacing-md);
+    justify-content: center;
+    gap: 8px;
     padding: var(--spacing-md);
-    background: var(--bg-secondary);
-    border: var(--ui-border-width) solid transparent;
-    border-radius: var(--ui-border-radius-lg);
+    background: var(--bg-ternary);
+    border: 1px solid transparent;
+    border-radius: var(--ui-border-radius);
     cursor: pointer;
-    transition: var(--transition-base);
-
-    .action-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: var(--ui-border-radius);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.9rem;
-      
-      &.random-theme { background: rgba(var(--accent-primary-rgb), 0.1); color: var(--accent-primary); }
-      &.reset-default { background: rgba(var(--text-secondary-rgb), 0.1); color: var(--text-secondary); }
-    }
-
-    span {
-      font-size: var(--font-size-sm);
-      font-weight: var(--font-weight-medium);
-      color: var(--text-primary);
-    }
+    transition: all 0.2s;
 
     &:hover {
       background: var(--component-bg-hover);
       border-color: var(--border-secondary);
       transform: translateY(-1px);
-      box-shadow: var(--shadow-sm);
     }
+
+    .action-icon {
+      font-size: 1.2rem;
+      &.random-theme { color: var(--accent-primary); }
+      &.reset-default { color: var(--text-secondary); }
+    }
+    
+    span { font-size: 11px; font-weight: 500; color: var(--text-primary); }
   }
 }
 
-/* Account Links */
+/* Account Link List */
 .account-links {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
-
+  
   .account-link {
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
-    padding: var(--spacing-md);
-    border-radius: var(--ui-border-radius-lg);
+    padding: var(--spacing-sm);
     text-decoration: none;
-    transition: var(--transition-base);
-
+    border-radius: var(--ui-border-radius);
+    transition: background 0.2s;
+    
     .link-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: var(--ui-border-radius-lg);
-      background: var(--bg-tertiary);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--bg-ternary);
       color: var(--text-secondary);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1rem;
-      transition: var(--transition-base);
+      margin-right: var(--spacing-md);
     }
-
+    
     .link-content {
       flex: 1;
       display: flex;
       flex-direction: column;
-      
-      .link-title {
-        font-size: var(--font-size-sm);
-        font-weight: var(--font-weight-semibold);
-        color: var(--text-primary);
-      }
-      .link-subtitle {
-        font-size: var(--font-size-xs);
-        color: var(--text-tertiary);
-      }
+      .link-title { font-size: var(--font-size-sm); font-weight: 500; color: var(--text-primary); }
+      .link-subtitle { font-size: 11px; color: var(--text-tertiary); }
     }
-
-    .link-arrow {
-      font-size: 0.75rem;
-      color: var(--text-tertiary);
-      opacity: 0;
-      transform: translateX(-5px);
-      transition: var(--transition-base);
-    }
+    
+    .link-arrow { font-size: 12px; color: var(--text-tertiary); }
 
     &:hover {
-      background: var(--bg-secondary);
-      
-      .link-icon {
-        background: var(--accent-primary);
-        color: white;
-        box-shadow: var(--shadow-md);
-      }
-      
-      .link-arrow {
-        opacity: 1;
-        transform: translateX(0);
-      }
+      background: var(--bg-ternary);
+      .link-icon { background: var(--accent-primary); color: white; }
     }
   }
 }
@@ -534,208 +437,110 @@
 .signout-btn {
   width: 100%;
   margin-top: var(--spacing-md);
-  padding: var(--spacing-md);
-  background: rgba(var(--color-error-rgb), 0.05);
+  padding: 10px;
+  background: rgba(var(--color-error-rgb), 0.08);
   color: var(--color-error);
-  border: 1px dashed rgba(var(--color-error-rgb), 0.2);
-  border-radius: var(--ui-border-radius-lg);
+  border: none;
+  border-radius: var(--ui-border-radius);
+  font-weight: 600;
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-sm);
-  cursor: pointer;
-  transition: var(--transition-base);
-
+  gap: 8px;
+  
   &:hover {
     background: var(--color-error);
     color: white;
-    border-style: solid;
-    box-shadow: var(--shadow-md);
   }
 }
 
-/* Animations */
-@keyframes popoverFadeIn {
-  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
 /* -------------------------
-   RESPONSIVE ADJUSTMENTS
+   RESPONSIVE
    ------------------------- */
 @media (max-width: 768px) {
   .header-inner { padding: 0 var(--spacing-md); }
   .logo-text, .user-meta { display: none; }
   
   :host ::ng-deep .p-popover {
-    width: calc(100vw - 32px) !important;
-    left: 16px !important;
+    width: calc(100vw - 24px) !important;
+    left: 12px !important;
     max-width: none !important;
   }
-  
-  .theme-presets-grid { grid-template-columns: repeat(3, 1fr); }
 }
-/* ... Keep your existing CSS variables and header styles ... */
+/* ==========================================================================
+   POPOVER INTERNAL CONTENT STYLING
+   ========================================================================== */
 
-/* NEW: Scrollable Theme Container Styles */
-.theme-section-wrapper {
-  margin-top: var(--spacing-sm);
-  border: var(--ui-border-width) solid var(--border-primary);
-  border-radius: var(--ui-border-radius-lg);
-  background: rgba(var(--bg-secondary-rgb), 0.3); /* Subtle background */
-  overflow: hidden; /* Contains the scrollbar corners */
-}
-
-.theme-scroll-container {
-  /* THIS IS THE KEY: Limits height and enables internal scrolling */
-  max-height: 240px; 
+/* 1. MAIN SCROLLABLE AREA */
+.popover-content {
+  padding: var(--spacing-lg); /* 1.5rem padding */
+  max-height: calc(100vh - 200px); /* Smart height calculation */
   overflow-y: auto;
-  padding: var(--spacing-md);
+  background: var(--bg-primary); /* Solid background to prevent see-through mess */
   
-  /* Smooth Scroll behavior */
-  scroll-behavior: smooth;
-
-  /* Custom Slim Scrollbar for this section */
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-  &::-webkit-scrollbar-track {
-    background: rgba(0,0,0,0.02);
-  }
+  /* Smooth Scrollbar */
+  &::-webkit-scrollbar { width: 5px; }
+  &::-webkit-scrollbar-track { background: transparent; }
   &::-webkit-scrollbar-thumb {
     background: var(--border-secondary);
-    border-radius: 2px;
+    border-radius: 99px;
+    &:hover { background: var(--text-tertiary); }
   }
 }
 
-.theme-category-group {
-  margin-bottom: var(--spacing-lg);
+/* 2. SECTION CARDS (The grouping boxes) */
+.section-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--ui-border-radius);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg); /* Good separation between sections */
+  
+  /* Header inside the card */
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid var(--border-secondary); /* Subtle divider */
 
-  &:last-child {
-    margin-bottom: 0;
-  }
-
-  .category-title {
-    font-family: var(--font-heading);
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-bold);
-    color: var(--text-tertiary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: var(--spacing-sm);
-    display: block;
-    position: sticky;
-    top: -8px; /* Stick title to top when scrolling */
-    background: var(--bg-primary); /* Needs bg to cover items behind it */
-    padding: 4px 0;
-    z-index: 2;
-    margin-top: -4px;
-  }
-}
-
-/* Updated Grid for the scroll container */
-.theme-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 per row fits the 480px width perfectly */
-  gap: var(--spacing-md);
-
-  .theme-card {
-    cursor: pointer;
-    position: relative;
-
-    .theme-preview {
-      height: 40px;
-      border-radius: var(--ui-border-radius);
-      border: var(--ui-border-width) solid var(--border-primary);
-      position: relative;
-      overflow: hidden;
-      transition: var(--transition-base);
-      margin-bottom: 4px;
-
-      /* The Checkmark Overlay */
-      .active-overlay {
-        position: absolute;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.4);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        transition: var(--transition-fast);
-        backdrop-filter: blur(1px);
-
-        i {
-          color: white;
-          font-weight: bold;
-          font-size: 0.9rem;
-          transform: scale(0.5);
-          transition: var(--transition-transform);
-        }
-      }
-    }
-
-    .theme-name {
-      display: block;
-      text-align: center;
-      font-size: var(--font-size-xs);
-      color: var(--text-secondary);
-      font-weight: var(--font-weight-medium);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* Hover State */
-    &:hover .theme-preview {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-sm);
-      border-color: var(--border-secondary);
-    }
-
-    /* Active State */
-    &.active {
-      .theme-preview {
-        border-color: var(--accent-primary);
-        box-shadow: 0 0 0 2px rgba(var(--accent-primary-rgb), 0.2);
-        
-        .active-overlay {
-          opacity: 1;
-          i { transform: scale(1); }
-        }
-      }
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
       
-      .theme-name {
-        color: var(--accent-primary);
-        font-weight: var(--font-weight-semibold);
-      }
+      i { font-size: 1rem; color: var(--accent-primary); }
+    }
+
+    .value-badge {
+      font-size: 10px;
+      font-weight: bold;
+      background: var(--bg-ternary);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--text-primary);
     }
   }
 }
-/* Add to mainscreen-header.scss */
 
-.value-badge {
-  background: var(--bg-ternary);
-  color: var(--text-primary);
-  font-size: var(--font-size-xs);
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 99px;
-  border: 1px solid var(--border-secondary);
-}
-
+/* 3. RANGE SLIDER (Display Size) */
 .scale-control-wrapper {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
-  padding: var(--spacing-sm) 0;
-  
+  padding: var(--spacing-xs) 0;
+
   .scale-icon {
+    font-weight: bold;
     color: var(--text-secondary);
-    font-weight: 600;
-    user-select: none;
-    
     &.small { font-size: 0.75rem; }
     &.large { font-size: 1.25rem; }
   }
@@ -743,79 +548,263 @@
   .range-wrapper {
     flex: 1;
     position: relative;
+    height: 24px; /* Touch target height */
+    display: flex;
+    align-items: center;
+
+    /* Custom Range Input */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 4px;
+      background: var(--bg-ternary);
+      border-radius: 2px;
+      outline: none;
+      
+      /* Thumb Styling */
+      &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 16px;
+        height: 16px;
+        background: var(--accent-primary);
+        border: 2px solid var(--bg-primary);
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.1s;
+      }
+
+      &:active::-webkit-slider-thumb {
+        transform: scale(1.2);
+      }
+    }
+
+    /* Little ticks below slider */
+    .range-ticks {
+      position: absolute;
+      bottom: -6px;
+      left: 0; 
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 6px; /* Align with thumb center */
+      pointer-events: none;
+
+      .tick {
+        width: 1px;
+        height: 3px;
+        background: var(--border-secondary);
+      }
+    }
+  }
+}
+
+/* 4. THEME SELECTION SCROLL AREA */
+.theme-section-wrapper {
+  background: var(--bg-ternary); /* Darker/Lighter inset background */
+  border-radius: var(--ui-border-radius);
+  border: 1px solid var(--border-secondary);
+  overflow: hidden;
+}
+
+.theme-scroll-container {
+  max-height: 180px; /* Limit height */
+  overflow-y: auto;
+  padding: var(--spacing-md);
+  
+  /* Internal scrollbar */
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 2px; }
+}
+
+.theme-category-group {
+  margin-bottom: var(--spacing-md);
+  &:last-child { margin-bottom: 0; }
+
+  .category-title {
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 6px;
+    display: block;
+    position: sticky;
+    top: 0;
+    background: var(--bg-ternary); /* Match container bg */
+    z-index: 2;
+  }
+}
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 Columns */
+  gap: 8px;
+
+  .theme-card {
+    cursor: pointer;
+    
+    .theme-preview {
+      height: 32px;
+      border-radius: var(--ui-border-radius-sm);
+      border: 1px solid var(--border-primary);
+      position: relative;
+      margin-bottom: 4px;
+      transition: all 0.2s;
+
+      /* Active Checkmark */
+      .active-overlay {
+        position: absolute; inset: 0;
+        background: rgba(0,0,0,0.3);
+        display: flex; align-items: center; justify-content: center;
+        opacity: 0; transition: opacity 0.2s;
+        i { color: white; font-size: 0.8rem; }
+      }
+    }
+
+    .theme-name {
+      display: block;
+      text-align: center;
+      font-size: 10px;
+      color: var(--text-secondary);
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis;
+    }
+
+    /* Interaction States */
+    &:hover .theme-preview {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+      border-color: var(--border-secondary);
+    }
+
+    &.active {
+      .theme-preview {
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 2px var(--accent-focus);
+        .active-overlay { opacity: 1; }
+      }
+      .theme-name { color: var(--accent-primary); font-weight: bold; }
+    }
+  }
+}
+
+/* 5. QUICK ACTIONS GRID */
+.actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+
+  .action-item {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    padding: var(--spacing-md);
+    background: var(--bg-primary); /* Contrast against section card */
+    border: 1px solid var(--border-primary);
+    border-radius: var(--ui-border-radius);
+    cursor: pointer;
+    transition: all 0.2s;
+
+    .action-icon {
+      font-size: 1.1rem;
+      &.random-theme { color: var(--accent-primary); }
+      &.reset-default { color: var(--text-tertiary); }
+    }
+
+    span { font-size: 11px; font-weight: 500; color: var(--text-primary); }
+
+    &:hover {
+      background: var(--component-bg-hover);
+      border-color: var(--border-secondary);
+      transform: translateY(-1px);
+    }
   }
 }
 
-/* Custom Range Slider Styling */
-.custom-range-slider {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 6px;
-  background: var(--bg-ternary);
-  border-radius: 99px;
-  outline: none;
-  cursor: pointer;
-  position: relative;
-  z-index: 2;
-
-  /* Slider Thumb (Handle) - Webkit */
-  &::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: var(--accent-primary);
-    border: 2px solid var(--bg-secondary);
-    box-shadow: var(--shadow-sm);
-    cursor: pointer;
-    transition: transform 0.1s;
-    margin-top: -6px; /* center thumb on track */
-  }
-
-  &::-webkit-slider-runnable-track {
-    width: 100%;
-    height: 6px;
-    cursor: pointer;
-    background: var(--bg-ternary);
-    border-radius: 99px;
-  }
-
-  &:active::-webkit-slider-thumb {
-    transform: scale(1.2);
-  }
-
-  /* Firefox Support */
-  &::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: var(--accent-primary);
-    border: 2px solid var(--bg-secondary);
-    cursor: pointer;
-  }
-  
-  &::-moz-range-track {
-    width: 100%;
-    height: 6px;
-    cursor: pointer;
-    background: var(--bg-ternary);
-    border-radius: 99px;
-  }
-}
-
-.range-ticks {
+/* 6. ACCOUNT LINKS (Vertical Menu) */
+.account-links {
   display: flex;
-  justify-content: space-between;
-  padding: 0 4px; /* Align with thumb center */
+  flex-direction: column;
+  gap: 4px;
+
+  .account-link {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-sm);
+    text-decoration: none;
+    border-radius: var(--ui-border-radius);
+    transition: all 0.2s;
+    border: 1px solid transparent; /* Prepare for border on hover */
+
+    .link-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--bg-ternary);
+      color: var(--text-secondary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      margin-right: var(--spacing-md);
+      transition: all 0.2s;
+    }
+
+    .link-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      .link-title { font-size: 13px; font-weight: 600; color: var(--text-primary); line-height: 1.2; }
+      .link-subtitle { font-size: 11px; color: var(--text-tertiary); }
+    }
+
+    .link-arrow { 
+      font-size: 10px; 
+      color: var(--text-tertiary); 
+      transform: translateX(-4px); 
+      opacity: 0;
+      transition: all 0.2s;
+    }
+
+    /* Hover Effect */
+    &:hover {
+      background: var(--bg-primary);
+      border-color: var(--border-primary);
+      box-shadow: var(--shadow-sm);
+
+      .link-icon {
+        background: var(--accent-primary);
+        color: white;
+      }
+      .link-arrow {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+  }
+}
+
+/* 7. SIGN OUT BUTTON */
+.signout-btn {
+  width: 100%;
+  padding: 12px;
   margin-top: 4px;
-  
-  .tick {
-    width: 1px;
-    height: 4px;
-    background: var(--border-secondary);
+  background: transparent;
+  color: var(--color-error);
+  border: 1px dashed var(--border-secondary);
+  border-radius: var(--ui-border-radius);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+
+  &:hover {
+    background: var(--color-error-bg);
+    border-color: var(--color-error);
+    border-style: solid;
   }
 }

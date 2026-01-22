@@ -13,12 +13,13 @@ import { ImageModule } from 'primeng/image';
 import { RippleModule } from 'primeng/ripple';
 import { SliderModule } from 'primeng/slider';
 import { FormsModule } from '@angular/forms';
+import { ImageViewerDirective } from '../../../directives/image-viewer.directive';
 
 @Component({
   selector: 'app-image-cell-renderer',
   standalone: true,
   imports: [
-    CommonModule, 
+    CommonModule, ImageViewerDirective,
     AvatarModule, FormsModule,
     TooltipModule, 
     DialogModule, 

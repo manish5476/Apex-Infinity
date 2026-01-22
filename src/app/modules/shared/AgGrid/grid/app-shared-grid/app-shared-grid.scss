@@ -1,9 +1,22 @@
-/* --- CONTAINER --- */
+/* ==========================================================================
+   AG SHARED GRID CONTAINER
+   Design System: Refined Compact
+   ========================================================================== */
+
+/* --- CONTAINER SHELL --- */
 .shared-grid-container {
-  background-color: var(--bg-surface, #ffffff);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  
+  /* Theme Surfaces */
+  background-color: var(--theme-bg-primary);
+  border: 1px solid var(--theme-border-primary);
   border-radius: var(--ui-border-radius-lg);
-  border: var(--ui-border-width) solid var(--border-primary, #e2e8f0);
-  overflow: hidden; /* Ensures rounded corners clip content */
+  
+  /* Clip content for rounded corners */
+  overflow: hidden; 
   box-shadow: var(--shadow-sm);
 }
 
@@ -17,34 +30,34 @@
   min-height: 48px; 
   padding: var(--spacing-xs) var(--spacing-md);
   
-  /* Styling */
-  background: var(--bg-primary);
-  border-bottom: var(--ui-border-width) solid var(--border-primary, #e2e8f0);
+  /* Visuals: Slightly different bg to distinguish from grid */
+  background: var(--theme-bg-secondary);
+  border-bottom: 1px solid var(--theme-border-primary);
   
-  /* Sticky behavior if needed */
   position: relative;
   z-index: 10;
 }
 
-/* --- SELECTION CHIP --- */
+/* --- SELECTION CHIP (Number of rows selected) --- */
 .selection-chip {
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-xs);
   
   padding: 4px 10px;
-  border-radius: var(--ui-border-radius-xl); /* Pill shape */
+  border-radius: 99px; /* Pill shape */
   
-  background-color: rgba(59, 130, 246, 0.08); /* Brand tint */
-  color: var(--color-primary, #3b82f6);
+  /* Use RGB vars for transparency if available, else standard vars */
+  background-color: rgba(var(--accent-primary-rgb), 0.08); 
+  color: var(--theme-accent-primary);
+  border: 1px solid rgba(var(--accent-primary-rgb), 0.2);
   
-  font-family: var(--font-heading);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
   
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  
-  animation: fadeIn var(--transition-base);
+  animation: fadeIn 0.2s ease-out;
 
   i { font-size: 0.7rem; }
 }
@@ -63,63 +76,94 @@
 
 .divider-vertical {
   width: 1px;
-  height: 16px;
-  background-color: var(--border-primary, #e2e8f0);
-  margin: 0 2px;
+  height: 20px;
+  background-color: var(--theme-border-secondary);
+  margin: 0 4px;
 }
 
 .editing-indicator {
-  font-family: var(--font-body);
   font-size: var(--font-size-sm);
-  color: var(--text-tertiary, #64748b);
+  color: var(--theme-text-tertiary);
   font-style: italic;
   margin-right: var(--spacing-sm);
+  font-weight: 500;
 }
 
-/* --- PREMIUM BUTTON OVERRIDES --- */
+/* --- PREMIUM BUTTON OVERRIDES (Contextual) --- */
 ::ng-deep .premium-btn {
   &.p-button {
-    font-family: var(--font-heading);
+    font-family: var(--font-body);
     font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
+    font-weight: 600;
     padding: var(--spacing-xs) var(--spacing-md);
-    transition: var(--transition-base);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     
-    /* Base Hover for Text Buttons */
+    /* Common Hover Effect */
     &:not(:disabled):hover {
       transform: translateY(-1px);
     }
 
-    /* Primary Text Button */
+    /* 1. Primary Text Button (Edit) */
     &.btn-primary {
-      color: var(--color-primary, #3b82f6);
-      &:hover { background: rgba(59, 130, 246, 0.08); }
-    }
-
-    /* Danger Text Button */
-    &.btn-danger {
-      color: var(--color-danger, #ef4444);
-      &:hover { background: rgba(239, 68, 68, 0.08); }
-    }
-
-    /* Secondary Text Button */
-    &.btn-secondary {
-      color: var(--text-secondary, #64748b);
+      color: var(--theme-accent-primary);
+      background: transparent;
+      
       &:hover { 
-        color: var(--text-primary, #1e293b);
-        background: rgba(0,0,0,0.04); 
+        background: rgba(var(--accent-primary-rgb), 0.08); 
+      }
+      
+      &:disabled {
+        color: var(--theme-text-tertiary);
+        background: transparent;
       }
     }
 
-    /* Success Filled Button (Save) */
+    /* 2. Danger Text Button (Delete) */
+    &.btn-danger {
+      color: var(--color-error);
+      background: transparent;
+      
+      &:hover { 
+        background: var(--color-error-bg); 
+      }
+      
+      &:disabled {
+        color: var(--theme-text-tertiary);
+      }
+    }
+
+    /* 3. Secondary Text Button (Cancel) */
+    &.btn-secondary {
+      color: var(--theme-text-secondary);
+      background: transparent;
+      
+      &:hover { 
+        color: var(--theme-text-primary);
+        background: var(--theme-bg-ternary); 
+      }
+    }
+
+    /* 4. Success Filled Button (Save) */
     &.btn-success-filled {
-      background-color: var(--color-success, #10b981);
-      border: 1px solid var(--color-success, #10b981);
-      color: #fff;
+      background-color: var(--color-success);
+      border: 1px solid var(--color-success);
+      color: #ffffff; /* Always white on success green */
       box-shadow: var(--shadow-sm);
 
       &:hover {
-          }
+        /* Darken slightly on hover */
+        background-color: color-mix(in srgb, var(--color-success), black 10%);
+        border-color: color-mix(in srgb, var(--color-success), black 10%);
+        box-shadow: var(--shadow-md);
+      }
     }
   }
+}
+
+/* --- GRID WRAPPER --- */
+.grid-wrapper {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  background: var(--theme-bg-primary); /* Ensure background behind grid matches theme */
 }

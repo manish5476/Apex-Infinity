@@ -31,39 +31,3 @@ export class MainScreen {
     }
   }
 }
-
-
-// @Component({
-//   selector: 'app-main-screen',
-//   standalone: true,
-//   imports: [
-//     CommonModule,
-//     RouterOutlet,
-//     MainscreenHeader,
-//     Mainscreensidebar
-//   ],
-//   template: `
-//     <div class="layout-root"
-//          [class.mobile]="layout.isMobile()">
-
-//       <app-mainscreen-header />
-
-//       <div class="layout-body">
-//         <app-mainscreen-sidebar />
-
-//         <main class="main-content">
-//           <router-outlet />
-//         </main>
-//       </div>
-
-//       @if (layout.isMobile() && layout.isMobileMenuOpen()) {
-//         <div class="mobile-backdrop"
-//              (click)="layout.toggleMobile()"></div>
-//       }
-//     </div>
-//   `,
-//   styleUrl: './main-screen.scss'
-// })
-// export class MainScreen {
-//   layout = inject(LayoutService);
-// }

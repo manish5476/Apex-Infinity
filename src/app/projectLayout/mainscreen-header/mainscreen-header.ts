@@ -18,7 +18,8 @@ import { AuthService } from '../../modules/auth/services/auth-service';
 import { NotificationService } from '../../core/services/notification.service';
 import { NotificationBellComponent } from '../../modules/organization/components/notification-bell-component/notification-bell-component';
 import { LayoutService } from '../layout.service';
-
+import { SIDEBAR_MENU } from '../mainscreensidebar/menu-items.constants';
+import { TieredMenuModule } from 'primeng/tieredmenu';
 // Interfaces for Type Safety
 export interface Theme {
   name: string;
@@ -38,7 +39,7 @@ export interface ThemeGroup {
   selector: 'app-mainscreen-header',
   standalone: true,
   imports: [
-    CommonModule,
+    CommonModule,TieredMenuModule,
     FormsModule,
     RouterModule,
     AvatarModule,
@@ -81,9 +82,10 @@ textScale: number = 100;
     { id: 3, title: 'System Update', message: 'Scheduled maintenance in 30 minutes', time: '3 hours ago', read: true, type: 'warning' },
     { id: 4, title: 'New Message', message: 'You have a new message from Sarah', time: '5 hours ago', read: true, type: 'info' },
   ];
-
+  mobileMenuItems: any
   ngOnInit() {
     this.organizeThemes();
+    this.mobileMenuItems = SIDEBAR_MENU;
     this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(u => this.currentUser = u);
     this.notificationService.notifications$.pipe(takeUntil(this.destroy$)).subscribe(n => {
       this.recentNotifications = n.filter(x => !x.isRead);

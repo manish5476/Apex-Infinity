@@ -458,26 +458,26 @@ export class RealTimeMonitoringComponent implements OnInit {
                   </div>`;
         }
       },
-      {
-        field: 'action', 
-        headerName: 'Action Performed', 
-        sortable: true, 
-        width: 150,
-        cellRenderer: (params: any) => {
-          const fullAction = params.value || '';
-          const parts = fullAction.split(':');
-          const category = parts[0] ? parts[0].trim() : '';
-          const actionName = parts[1] ? parts[1].trim() : fullAction;
+ {
+      field: 'action', 
+      headerName: 'Action Performed', 
+      sortable: true, 
+      width: 160,
+      cellRenderer: (params: any) => {
+        const fullAction = params.value || '';
+        const parts = fullAction.split(':');
+        const category = parts[0] ? parts[0].trim() : '';
+        const actionName = parts[1] ? parts[1].trim() : fullAction;
 
-          // Using Accent Variables for Badge
-          return `<div style="display: flex; flex-direction: column; gap: 2px;">
-                    <span style="padding: 2px 6px; width: fit-content; border-radius: 4px; font-weight: 700; font-size: 9px; background: var(--bg-ternary); border: 1px solid var(--border-secondary); text-transform: uppercase; color: var(--accent-primary);">
-                      ${actionName}
-                    </span>
-                    <span style="font-size: 9px; opacity: 0.6; font-style: italic; color: var(--text-tertiary);">${category}</span>
-                  </div>`;
-        }
-      },
+        // Added 'justify-content: center' and 'height: 100%' to center it vertically
+        return `<div style="display: flex; flex-direction: column; justify-content: center; height: 100%; gap: 3px;">
+                  <span style="padding: 3px 8px; width: fit-content; border-radius: 4px; font-weight: 700; font-size: 10px; background: var(--bg-ternary); border: 1px solid var(--border-secondary); text-transform: uppercase; color: var(--accent-primary); line-height: 1;">
+                    ${actionName}
+                  </span>
+                  <span style="font-size: 10px; opacity: 0.7; color: var(--text-tertiary); line-height: 1;">${category}</span>
+                </div>`;
+      }
+    },
       {
         field: 'ip', 
         headerName: 'Network Details', 

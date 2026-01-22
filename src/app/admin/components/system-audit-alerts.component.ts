@@ -428,77 +428,91 @@ export class SystemAuditAlertsComponent implements OnInit {
   }
 
   setupColumns(): void {
-    // Grid columns using Theme Tokens via CSS Variables
-    this.auditColumns = [
-      {
-        field: 'userId.name', 
-        headerName: 'Administrator', 
-        sortable: true, 
-        flex: 1,
-        minWidth: 180,
-        cellRenderer: (params: any) => {
-          const user = params.data?.userId || {};
-          const name = user.name || 'Unknown';
-          const email = user.email || '';
-          const initials = this.commonService.getInitials(name);
+  this.auditColumns = [
+    // 1. ADMINISTRATOR (Compact Profile)
+    {
+      field: 'userId.name',
+      headerName: 'Administrator',
+      sortable: true,
+      flex: 1.5,
+      minWidth: 200,
+      cellRenderer: (params: any) => {
+        const user = params.data?.userId || {};
+        const name = user.name || 'Unknown';
+        const email = user.email || '';
+        const initials = this.commonService.getInitials(name);
 
-          // Use accent color tokens for badge
-          return `<div style="display: flex; align-items: center; gap: 8px; height: 100%;">
-                    <div style="width: 24px; height: 24px; border-radius: 4px; background: var(--accent-focus); color: var(--accent-primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 9px;">
-                      ${initials}
-                    </div>
-                    <div style="display: flex; flex-direction: column;">
-                      <span style="font-weight: 700; color: var(--text-primary); line-height: 1; font-size: 11px;">${name}</span>
-                      <span style="font-size: 9px; opacity: 0.5; margin-top: 1px; color: var(--text-secondary);">${email}</span>
-                    </div>
-                  </div>`;
-        }
-      },
-      {
-        field: 'action', 
-        headerName: 'Action performed', 
-        sortable: true, 
-        width: 160,
-        cellRenderer: (params: any) => {
-          const fullAction = params.value || '';
-          const parts = fullAction.split(':');
-          const category = parts[0] ? parts[0].trim() : '';
-          const actionName = parts[1] ? parts[1].trim() : fullAction;
-          const entity = params.data?.entityType || 'system';
-
-          return `<div style="display: flex; flex-direction: column; gap: 2px;">
-                    <span style="padding: 1px 4px; width: fit-content; border-radius: 3px; font-weight: 700; font-size: 8px; background: var(--accent-focus); border: 1px solid var(--accent-secondary); color: var(--accent-primary); text-transform: uppercase;">
-                      ${actionName}
-                    </span>
-                    <span style="font-size: 9px; color: var(--text-label);">Entity: ${entity}</span>
-                  </div>`;
-        }
-      },
-      {
-        field: 'ip', 
-        headerName: 'Trace (IP)', 
-        sortable: true, 
-        width: 120,
-        cellRenderer: (params: any) => {
-          const ip = params.value === '::1' ? 'Localhost' : params.value;
-          return `<span style="font-family: var(--font-mono); font-size: 9px; background: var(--bg-secondary); padding: 1px 4px; border-radius: 3px; border: 1px solid var(--border-secondary); color: var(--text-tertiary);">
-                    ${ip}
-                  </span>`;
-        }
-      },
-      {
-        field: 'createdAt', 
-        headerName: 'Timestamp', 
-        sortable: true, 
-        width: 110,
-        type: 'rightAligned',
-        valueFormatter: (params: any) => this.commonService.formatDate(params.value, 'dd MMM, HH:mm'),
-        cellStyle: { 'font-family': 'var(--font-mono)', 'font-weight': '700', 'font-size': '10px', 'color': 'var(--text-primary)', 'text-align': 'right' }
+        // Adjusted: Avatar 28px, tighter text spacing
+        return `<div style="display: flex; align-items: center; gap: 10px; height: 100%;">
+                  <div style="width: 28px; height: 28px; flex-shrink: 0; border-radius: 50%; background: var(--accent-focus); color: var(--accent-primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 10px; border: 1px solid var(--accent-secondary);">
+                    ${initials}
+                  </div>
+                  <div style="display: flex; flex-direction: column; justify-content: center; line-height: 1.1;">
+                    <span style="font-weight: 700; color: var(--text-primary); font-size: 12px; margin-bottom: 2px;">${name}</span>
+                    <span style="font-size: 10px; color: var(--text-tertiary);">${email}</span>
+                  </div>
+                </div>`;
       }
-    ];
-    this.cdr.detectChanges();
-  }
+    },
 
+  // 2. ACTION (Vertically Stacked & Centered)
+    {
+      field: 'action',
+      headerName: 'Action',
+      sortable: true,
+      flex: 1,
+      minWidth: 160,
+      cellRenderer: (params: any) => {
+        const fullAction = params.value || '';
+        const parts = fullAction.split(':');
+        // Fallback to 'System' if no category exists
+        const category = parts[0] ? parts[0].trim() : 'System'; 
+        const actionName = parts[1] ? parts[1].trim() : fullAction;
+
+        // Key Fix: 'justify-content: center' pushes the stack to the vertical middle
+        return `<div style="display: flex; flex-direction: column; justify-content: center; height: 100%; gap: 4px;">
+                  <span style="width: fit-content; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 9px; background: var(--bg-ternary); border: 1px solid var(--border-secondary); color: var(--accent-primary); text-transform: uppercase; line-height: 1;">
+                    ${category}
+                  </span>
+                  <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">
+                    ${actionName}
+                  </span>
+                </div>`;
+      }
+    },
+
+    // 3. IP ADDRESS (Vertically Centered Pill)
+    {
+      field: 'ip',
+      headerName: 'IP Address',
+      sortable: true,
+      width: 140,
+      cellRenderer: (params: any) => {
+        const ip = params.value === '::1' ? 'Localhost' : (params.value || 'Unknown');
+
+        // Key Fix: 'align-items: center' ensures the pill sits exactly in the middle of 60px
+        return `<div style="display: flex; align-items: center; height: 100%;">
+                  <span style="font-family: var(--font-mono); font-size: 10px; background: var(--bg-secondary); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-primary); color: var(--text-secondary); display: flex; gap: 6px; align-items: center; line-height: 1;">
+                     <i class="pi pi-globe" style="font-size: 9px; opacity: 0.6;"></i> ${ip}
+                  </span>
+                </div>`;
+      }
+    },
+
+    // 4. TIME (Simple Right Align)
+    {
+      field: 'createdAt',
+      headerName: 'Time',
+      sortable: true,
+      width: 120,
+      type: 'rightAligned',
+      valueFormatter: (params: any) => this.commonService.formatDate(params.value, 'dd MMM, HH:mm'),
+      cellStyle: { 'display': 'flex', 'align-items': 'center', 'justify-content': 'flex-end', 'height': '100%', 'font-family': 'var(--font-mono)', 'font-size': '11px', 'color': 'var(--text-tertiary)' }
+    }
+  ];
+  this.cdr.detectChanges();
+} 
+ 
   refreshAll() {
     this.loading.set(true);
     forkJoin({

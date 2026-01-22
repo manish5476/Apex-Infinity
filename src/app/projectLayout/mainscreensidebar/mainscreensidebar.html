@@ -1,56 +1,47 @@
-<aside
-  class="sidebar-layout"
-  [class.expanded]="layout.isExpanded()"
-  [class.mobile]="layout.isMobile()"
-  (mouseenter)="layout.isDesktop() && layout.isHovered.set(true)"
-  (mouseleave)="layout.isDesktop() && layout.isHovered.set(false)">
-
-  <div class="glass-panel pb-13 mt-3">
+<aside class="sidebar-layout">
+  <div class="glass-panel">
     
-    <div class="sidebar-header" *ngIf="layout.isExpanded()">
-      <span class="brand-text">Admin Panel</span>
+    <div class="sidebar-header">
+      <span class="brand-text">Apex Infinity</span>
+      
+      @if (!layout.isMobile()) {
+        <button class="pin-btn" 
+                [class.active]="layout.isPinned()" 
+                (click)="togglePin()"
+                title="Pin Sidebar">
+          <i class="pi pi-thumbtack"></i>
+        </button>
+      }
     </div>
 
     <div class="menu-scroll-area">
       @for (item of menuItems; track item.label) {
-
+        
         <div class="menu-group">
-          
           <div 
             class="menu-item level-1" 
-            [class.active-parent]="isActive(item)"
-            [class.collapsed]="!layout.isExpanded()"
-            (click)="item.items ? toggleItem(item) : null"
-            [routerLink]="item.routerLink ? item.routerLink : null">
-
-            <div class="icon-wrapper">
-              <i [class]="item.icon"></i>
-            </div>
+            [class.active-parent]="hasActiveChild(item)"
+            (click)="handleItemClick(item)">
             
-            <span class="label-text">
-              {{ item.label }}
-            </span>
-
-            @if (item.items && layout.isExpanded()) {
+            <div class="icon-wrapper"><i [class]="item.icon"></i></div>
+            <span class="label-text">{{ item.label }}</span>
+            
+            @if (item.items) {
               <i class="pi pi-chevron-down arrow-indicator" 
                  [class.rotated]="expandedState[item.label]"></i>
             }
           </div>
 
           @if (item.items) {
-            <div class="submenu-accordion" [class.expanded]="expandedState[item.label] && layout.isExpanded()">
+            <div class="submenu-accordion" [class.expanded]="expandedState[item.label]">
               <div class="submenu-content">
                 @for (subItem of item.items; track subItem.label) {
                   
-                  <div class="submenu-group">
-                    
+                  <div class="submenu-wrapper">
                     <div 
                       class="menu-item level-2"
-                      [class.active]="!subItem.items && isActive(subItem)"
-                      (click)="subItem.items ? toggleItem(subItem) : null"
-                      [routerLink]="subItem.items ? null : subItem.routerLink">
-                      
-                      <span class="dot-indicator"></span>
+                      [class.active-link]="isActiveLink(subItem)"
+                      (click)="handleItemClick(subItem)">
                       <span class="label-text">{{ subItem.label }}</span>
                       
                       @if (subItem.items) {
@@ -65,16 +56,16 @@
                           @for (deepItem of subItem.items; track deepItem.label) {
                             <a 
                               class="menu-item level-3"
-                              [routerLink]="deepItem.routerLink"
-                              routerLinkActive="active-deep">
+                              [class.active-link]="isActiveLink(deepItem)"
+                              (click)="handleItemClick(deepItem)">
                               <span class="label-text">{{ deepItem.label }}</span>
                             </a>
                           }
                         </div>
                       </div>
                     }
-                  </div>
 
+                  </div>
                 }
               </div>
             </div>
@@ -85,10 +76,180 @@
 
     <footer class="glass-footer">
       <button class="logout-btn" (click)="logout()">
-        <i class="pi pi-power-off"></i>
-        <span *ngIf="layout.isExpanded()">Sign Out</span>
+        <i class="pi pi-power-off"></i> <span>Sign Out</span>
       </button>
     </footer>
 
   </div>
 </aside>
+
+
+<!-- <aside class="sidebar-layout">
+  <div class="glass-panel">
+    
+    <div class="sidebar-header">
+      <span class="brand-text">Apex Infinity</span>
+      
+      @if (!layout.isMobile()) {
+        <button class="pin-btn" 
+                [class.active]="layout.isPinned()" 
+                (click)="togglePin()"
+                title="Pin Sidebar">
+          <i class="pi pi-thumbtack"></i>
+        </button>
+      }
+    </div>
+
+    <div class="menu-scroll-area">
+      @for (item of menuItems; track item.label) {
+        
+        <div class="menu-group">
+          <div 
+            class="menu-item level-1" 
+            [class.active-parent]="hasActiveChild(item)"
+            (click)="handleItemClick(item)">
+            
+            <div class="icon-wrapper"><i [class]="item.icon"></i></div>
+            <span class="label-text">{{ item.label }}</span>
+            
+            @if (item.items) {
+              <i class="pi pi-chevron-down arrow-indicator" 
+                 [class.rotated]="expandedState[item.label]"></i>
+            }
+          </div>
+
+          @if (item.items) {
+            <div class="submenu-accordion" [class.expanded]="expandedState[item.label]">
+              <div class="submenu-content">
+                @for (subItem of item.items; track subItem.label) {
+                  
+                  <div class="submenu-wrapper">
+                    
+                    <div 
+                      class="menu-item level-2"
+                      [class.active-link]="isActiveLink(subItem)"
+                      (click)="handleItemClick(subItem)">
+                      <span class="label-text">{{ subItem.label }}</span>
+                      
+                      @if (subItem.items) {
+                        <i class="pi pi-chevron-down arrow-indicator sm" 
+                           [class.rotated]="expandedState[subItem.label]"></i>
+                      }
+                    </div>
+
+                    @if (subItem.items) {
+                      <div class="submenu-accordion" [class.expanded]="expandedState[subItem.label]">
+                        <div class="submenu-content level-3-wrapper">
+                          @for (deepItem of subItem.items; track deepItem.label) {
+                            <a 
+                              class="menu-item level-3"
+                              [class.active-link]="isActiveLink(deepItem)"
+                              (click)="handleItemClick(deepItem)">
+                              <span class="label-text">{{ deepItem.label }}</span>
+                            </a>
+                          }
+                        </div>
+                      </div>
+                    }
+
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <footer class="glass-footer">
+      <button class="logout-btn" (click)="logout()">
+        <i class="pi pi-power-off"></i> <span>Sign Out</span>
+      </button>
+    </footer>
+
+  </div>
+</aside> -->
+
+<!-- <aside class="sidebar-layout">
+  <div class="glass-panel">
+    
+    <div class="sidebar-header">
+      <span class="brand-text">Apex Infinity</span>
+    </div>
+
+    <div class="menu-scroll-area">
+      @for (item of menuItems; track item.label) {
+        
+        <div class="menu-group">
+          
+          <div 
+            class="menu-item level-1" 
+            [class.active-parent]="hasActiveChild(item)"
+            (click)="handleItemClick(item)">
+            
+            <div class="icon-wrapper"><i [class]="item.icon"></i></div>
+            <span class="label-text">{{ item.label }}</span>
+            
+            @if (item.items) {
+              <i class="pi pi-chevron-down arrow-indicator" 
+                 [class.rotated]="expandedState[item.label]"></i>
+            }
+          </div>
+
+          @if (item.items) {
+            <div class="submenu-accordion" [class.expanded]="expandedState[item.label]">
+              <div class="submenu-content">
+                @for (subItem of item.items; track subItem.label) {
+                  
+                  <div class="submenu-wrapper">
+                    
+                    <div 
+                      class="menu-item level-2"
+                      [class.active-link]="isActiveLink(subItem)"
+                      (click)="handleItemClick(subItem)">
+                      
+                      <span class="label-text">{{ subItem.label }}</span>
+                      
+                      @if (subItem.items) {
+                        <i class="pi pi-chevron-down arrow-indicator sm" 
+                           [class.rotated]="expandedState[subItem.label]"></i>
+                      }
+                    </div>
+
+                    @if (subItem.items) {
+                      <div class="submenu-accordion" [class.expanded]="expandedState[subItem.label]">
+                        <div class="submenu-content">
+                          @for (deepItem of subItem.items; track deepItem.label) {
+                            
+                            <a 
+                              class="menu-item level-3"
+                              [class.active-deep]="isActiveLink(deepItem)"
+                              (click)="handleItemClick(deepItem)">
+                              <i [class]="deepItem.icon" style="margin-right: 8px; font-size: 0.9rem;"></i>
+                              <span class="label-text">{{ deepItem.label }}</span>
+                            </a>
+
+                          }
+                        </div>
+                      </div>
+                    }
+
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <footer class="glass-footer">
+      <button class="logout-btn" (click)="logout()">
+        <i class="pi pi-power-off"></i> <span>Sign Out</span>
+      </button>
+    </footer>
+
+    <div class="sidebar-hint-line"></div>
+
+  </div>
+</aside> -->

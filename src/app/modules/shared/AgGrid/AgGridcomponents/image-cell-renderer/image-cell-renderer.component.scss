@@ -1,404 +1,103 @@
+/* ==========================================================================
+   COMPONENT: IMAGE RENDERER (Grid Cell Version)
+   Context: Fits inside AG Grid Rows (Height ~40px)
+   ========================================================================== */
+
 :host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* Flex centering to align it vertically in the cell */
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100%;
-  min-height: 50px;
 }
 
 .image-renderer-container {
   position: relative;
-  display: inline-block;
+  /* Allow the container to shrink to fit the content */
+  width: fit-content;
+  line-height: 0; /* Removes phantom text spacing */
 }
 
+/* --- THE AVATAR WRAPPER --- */
 .avatar-wrapper {
   position: relative;
   cursor: pointer;
-  display: inline-block;
+  border-radius: 50%;
+  
+  /* FIXED DIMENSIONS FOR GRID ROW */
+  width: 32px; 
+  height: 32px;
+  
   transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* PrimeNG Override */
+  ::ng-deep .image-avatar {
+    width: 100% !important;
+    height: 100% !important;
+    
+    background-color: var(--bg-surface-secondary, #f1f5f9);
+    border: 1px solid var(--border-color, #e2e8f0);
+    
+    /* Ensure the image inside covers the area perfectly */
+    img {
+      object-fit: cover; 
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    z-index: 10; /* Pop above other cells */
+    
+    ::ng-deep .image-avatar {
+      border-color: var(--primary-color, #3b82f6);
+    }
+  }
 }
 
-.avatar-wrapper:hover {
-  transform: scale(1.08);
-}
-
-.avatar-wrapper:active {
-  transform: scale(0.95);
-}
-
-::ng-deep .image-avatar.p-avatar {
-  border: 2px solid var(--surface-border, #e0e0e0);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
-  transition: all 0.3s ease;
-  background: linear-gradient(135deg, var(--surface-card), var(--surface-ground));
-}
-
-::ng-deep .image-avatar.p-avatar:hover {
-  border-color: var(--primary-color, #3b82f6);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.25);
-}
-
+/* --- THE BADGE (Tiny Counter) --- */
 .badge {
   position: absolute;
-  top: -6px;
-  right: -6px;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-600));
-  color: white;
-  font-size: 11px;
+  bottom: -2px;
+  right: -4px;
+  
+  background-color: var(--primary-color, #3b82f6);
+  color: #ffffff;
+  border: 1px solid #ffffff;
+  
+  /* Super compact font for small badge */
+  font-size: 9px;
   font-weight: 700;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
+  min-width: 14px;
+  height: 14px;
+  border-radius: 99px;
+  
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid var(--surface-card);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  z-index: 10;
+  padding: 0 2px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  
+  pointer-events: none;
 }
 
+/* --- PLACEHOLDER STATE --- */
 .placeholder-avatar {
+  width: 32px;
+  height: 32px;
   opacity: 0.5;
-  transition: opacity 0.3s ease;
-}
-
-::ng-deep .placeholder.p-avatar {
-  background: var(--surface-ground);
-  color: var(--text-color-secondary);
-  border: 2px dashed var(--surface-border);
-}
-
-/* Dialog Styles - Maximized */
-.dialog-content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-  gap: 0.75rem;
-  padding: 0.5rem;
-  background: var(--surface-ground);
-}
-
-.gallery-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1.5rem;
-  padding: 0.75rem;
-  background: var(--surface-card);
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  margin: 0 auto;
-  max-width: 300px;
-}
-
-::ng-deep .gallery-nav-btn.p-button {
-  width: 36px;
-  height: 36px;
-  transition: all 0.2s ease;
-}
-
-::ng-deep .gallery-nav-btn.p-button:hover:not([disabled]) {
-  transform: scale(1.1);
-  background: var(--primary-color);
-  color: white;
-}
-
-.image-counter {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text-color);
-  min-width: 70px;
-  text-align: center;
-  padding: 0.25rem 0.75rem;
-  background: var(--surface-ground);
-  border-radius: 20px;
-  border: 1px solid var(--surface-border);
-}
-
-/* Image Preview Container - Larger */
-.image-preview-container {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border-radius: 12px;
-  background: var(--surface-card);
-  position: relative;
-  cursor: default;
-  user-select: none;
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.05);
-  border: 1px solid var(--surface-border);
-}
-
-.image-preview-container:active {
-  cursor: grabbing;
-}
-
-.loading-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: var(--surface-card);
-  z-index: 10;
-}
-
-.loading-text {
-  margin-top: 1rem;
-  color: var(--text-color-secondary);
-  font-size: 0.9rem;
-  animation: fadeInOut 1.5s ease-in-out infinite;
-}
-
-@keyframes fadeInOut {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
-}
-
-::ng-deep .skeleton-loader.p-skeleton {
-  border-radius: 8px;
-  animation: skeletonPulse 1.5s ease-in-out infinite;
-  width: 80%;
-  max-width: 600px;
-  height: 60%;
-}
-
-@keyframes skeletonPulse {
-  0%, 100% { 
-    opacity: 0.6;
-    background: var(--surface-ground);
-  }
-  50% { 
-    opacity: 0.8;
-    background: var(--surface-border);
-  }
-}
-
-/* Preview Image - Optimized for large view */
-.preview-image {
-  max-width: none;
-  max-height: none;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  transition: transform 0.1s ease-out;
-  transform-origin: center center;
-  will-change: transform;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
-}
-
-.preview-image.draggable {
-  cursor: grab;
-}
-
-.preview-image:active {
-  cursor: grabbing;
-}
-
-/* Zoom Controls Panel */
-.zoom-controls-panel {
-  background: var(--surface-card);
-  border-radius: 12px;
-  padding: 0.75rem 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  margin: 0 auto;
-  max-width: 600px;
-  width: 100%;
-}
-
-.zoom-slider-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.zoom-label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-color);
-  min-width: 50px;
-}
-
-::ng-deep .zoom-slider.p-slider {
-  flex: 1;
-  min-width: 200px;
-}
-
-::ng-deep .zoom-slider .p-slider-handle {
-  width: 20px;
-  height: 20px;
-  background: var(--primary-color);
-  border: 2px solid white;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s ease;
-}
-
-::ng-deep .zoom-slider .p-slider-handle:hover {
-  transform: scale(1.2);
-  background: var(--primary-600);
-}
-
-.zoom-percentage {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--primary-color);
-  min-width: 50px;
-  text-align: right;
-}
-
-/* Footer Controls */
-.footer-controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 0.75rem 0;
-  gap: 1rem;
-}
-
-.zoom-buttons {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-::ng-deep .zoom-btn.p-button {
-  min-width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
-
-::ng-deep .zoom-btn.p-button:hover:not([disabled]) {
-  background: var(--primary-color);
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.zoom-hint {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--text-color-secondary);
-  font-size: 0.85rem;
-  padding: 0.5rem 0.75rem;
-  background: var(--surface-ground);
-  border-radius: 6px;
-  margin-left: 1rem;
-}
-
-.dialog-actions {
-  margin-left: auto;
-}
-
-::ng-deep .close-btn.p-button {
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
-
-::ng-deep .close-btn.p-button:hover {
-  background: var(--surface-hover);
-  transform: translateY(-1px);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .dialog-content {
-    padding: 0.25rem;
-    gap: 0.5rem;
-  }
   
-  .gallery-controls {
-    padding: 0.5rem;
-    gap: 1rem;
-    max-width: 250px;
+  ::ng-deep .placeholder {
+    width: 100% !important;
+    height: 100% !important;
+    background-color: transparent;
+    color: var(--text-color-secondary, #94a3b8);
+    border: 1px dashed var(--border-color, #cbd5e1);
+    
+    .p-avatar-icon { font-size: 14px; }
   }
-  
-  .zoom-controls-panel {
-    padding: 0.5rem;
-  }
-  
-  .zoom-slider-container {
-    gap: 0.5rem;
-  }
-  
-  ::ng-deep .zoom-slider.p-slider {
-    min-width: 150px;
-  }
-  
-  .footer-controls {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  
-  .zoom-buttons {
-    justify-content: center;
-    width: 100%;
-  }
-  
-  .zoom-hint {
-    margin-left: 0;
-    margin-top: 0.5rem;
-    width: 100%;
-    justify-content: center;
-    text-align: center;
-    font-size: 0.8rem;
-  }
-  
-  .dialog-actions {
-    margin-left: 0;
-    width: 100%;
-    text-align: center;
-  }
-}
-
-/* Dark mode support */
-:host-context(.p-dark) {
-  ::ng-deep .image-avatar.p-avatar {
-    border-color: var(--surface-border, #424242);
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-  }
-  
-  .badge {
-    border-color: var(--surface-800);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-  }
-  
-  .image-preview-container {
-    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
-  }
-}
-
-/* Scrollbar styling */
-.image-preview-container::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.image-preview-container::-webkit-scrollbar-track {
-  background: var(--surface-ground);
-  border-radius: 4px;
-}
-
-.image-preview-container::-webkit-scrollbar-thumb {
-  background: var(--surface-border);
-  border-radius: 4px;
-}
-
-.image-preview-container::-webkit-scrollbar-thumb:hover {
-  background: var(--text-color-secondary);
 }

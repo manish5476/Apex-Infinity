@@ -1,19 +1,14 @@
-<div class="layout-root"
-     [class.is-mobile]="layout.isMobile()">
-
-  <app-mainscreen-header
-    (toggleSidebar)="onMenuToggle()" />
-
+<div class="layout-root" 
+     [class.is-mobile]="layout.isMobile()"
+     [class.is-pinned]="layout.isPinned() && !layout.isMobile()">
+  <app-mainscreen-header (toggleSidebar)="onMenuToggle()" />
   <div class="layout-body">
     <app-mainscreen-sidebar />
-
     <main class="main-content">
       <router-outlet />
     </main>
   </div>
-
   @if (layout.isMobile() && layout.isMobileMenuOpen()) {
-    <div class="mobile-backdrop"
-         (click)="layout.closeMobile()"></div>
+    <div class="mobile-backdrop" (click)="layout.closeMobile()"></div>
   }
 </div>

@@ -1,24 +1,22 @@
-<div class="action-pill" (mousedown)="$event.stopPropagation()">
+<div class="action-tiles" (mousedown)="$event.stopPropagation()">
 
   @if (editing) {
-  <p-button icon="pi pi-check" [rounded]="true" [text]="true" styleClass="action-btn save-btn" pTooltip="Save Changes"
-    tooltipPosition="top" (click)="emit('save')">
-  </p-button>
+    <button pButton class="tile-btn save" pTooltip="Save" tooltipPosition="top" (click)="emit('save')">
+      <i class="pi pi-check"></i>
+    </button>
 
-  <p-button icon="pi pi-times" [rounded]="true" [text]="true" styleClass="action-btn cancel-btn" pTooltip="Discard"
-    tooltipPosition="top" (click)="emit('cancel')">
-  </p-button>
+    <button pButton class="tile-btn cancel" pTooltip="Cancel" tooltipPosition="top" (click)="emit('cancel')">
+      <i class="pi pi-times"></i>
+    </button>
 
   } @else {
-  <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" styleClass="action-btn edit-btn" pTooltip="Edit Record"
-    tooltipPosition="top" (click)="emit('edit')">
-  </p-button>
+    <button pButton class="tile-btn edit" pTooltip="Edit" tooltipPosition="top" (click)="emit('edit')">
+      <i class="pi pi-pencil"></i>
+    </button>
 
-  <div class="action-separator"></div>
-
-  <p-button icon="pi pi-trash" [rounded]="true" [text]="true" styleClass="action-btn delete-btn" pTooltip="Delete"
-    tooltipPosition="top" (click)="emit('delete')">
-  </p-button>
+    <button pButton class="tile-btn delete" pTooltip="Delete" tooltipPosition="top" (click)="emit('delete')">
+      <i class="pi pi-trash"></i>
+    </button>
   }
 
 </div>

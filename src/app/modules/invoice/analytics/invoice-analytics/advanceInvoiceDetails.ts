@@ -7,6 +7,7 @@ import { finalize } from 'rxjs';
 import { SelectModule } from 'primeng/select';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { DrawerModule } from 'primeng/drawer';
@@ -80,6 +81,7 @@ export interface ProfitAnalysisReport {
     SelectModule,
     MultiSelectModule,
     InputNumberModule,
+    InputTextModule,
     ButtonModule,
     TableModule,
     TabsModule,
@@ -358,4 +360,214 @@ export interface ProfitAnalysisReport {
           <label class="text-xs font-bold text-secondary uppercase tracking-wider">Revenue Range</label>
           <div class="flex gap-2">
             <p-inputNumber [(ngModel)]="filters.minAmount" placeholder="Min ₹" mode="currency" currency="INR" locale="en-IN" 
-              styleClass="w-full" inputStyleCl
+              styleClass="w-full" inputStyleClass="!text-sm"></p-inputNumber>
+            <div class="flex items-center text-tertiary">-</div>
+            <p-inputNumber [(ngModel)]="filters.maxAmount" placeholder="Max ₹" mode="currency" currency="INR" locale="en-IN" 
+              styleClass="w-full" inputStyleClass="!text-sm"></p-inputNumber>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-3 pt-4 border-t border-primary">
+           <div class="flex flex-col gap-2">
+             <label class="text-xs font-bold text-secondary">Product ID / SKU</label>
+             <input type="text" pInputText [(ngModel)]="filters.productId" class="p-inputtext-sm w-full bg-surface-ternary border-secondary text-primary rounded-md p-2" placeholder="Search product...">
+           </div>
+           
+           <div class="flex flex-col gap-2">
+             <label class="text-xs font-bold text-secondary">Customer ID</label>
+             <input type="text" pInputText [(ngModel)]="filters.customerId" class="p-inputtext-sm w-full bg-surface-ternary border-secondary text-primary rounded-md p-2" placeholder="Search customer...">
+           </div>
+        </div>
+
+        <div class="mt-auto flex gap-3 pt-4 border-t border-primary">
+          <button pButton label="Reset All" class="p-button-outlined p-button-secondary w-1/2 !text-xs !font-bold" (click)="resetFilters()"></button>
+          <button pButton label="Apply Filters" class="w-1/2 !text-xs !font-bold !bg-[var(--accent-primary)] !border-[var(--accent-primary)]" (click)="fetchReport(); showFilters.set(false)"></button>
+        </div>
+      </div>
+    </p-drawer>
+  `,
+  styles: [`
+    :host ::ng-deep {
+      /* PrimeNG Tab Tweaks for Glass/Compact Look */
+      .p-tablist-tab-list {
+        background: transparent !important;
+        border-bottom: 1px solid var(--border-primary) !important;
+        padding: 0 8px !important;
+      }
+      .p-tab {
+        padding: 14px 20px !important;
+        color: var(--text-secondary) !important;
+        transition: color 0.2s;
+      }
+      .p-tab:hover {
+        color: var(--text-primary) !important;
+      }
+      .p-tab-active {
+        border-bottom-width: 2px !important;
+        border-color: var(--accent-primary) !important;
+        color: var(--accent-primary) !important;
+      }
+      .p-tabpanels {
+        background: transparent !important;
+        padding: 0 !important;
+      }
+
+      /* Table Tweaks */
+      .p-datatable-tbody > tr > td {
+        padding: 0.75rem 1rem !important;
+        border-color: var(--border-secondary) !important;
+        background: transparent !important;
+      }
+      .p-datatable-thead > tr > th {
+        background: rgba(255,255,255,0.03) !important;
+        color: var(--text-secondary) !important;
+        border-bottom: 1px solid var(--border-primary) !important;
+      }
+      .p-paginator {
+        background: transparent !important;
+        border-top: 1px solid var(--border-secondary) !important;
+        color: var(--text-secondary) !important;
+      }
+      .p-paginator-page.p-highlight {
+        background: var(--accent-focus) !important;
+        color: var(--accent-primary) !important;
+      }
+
+      /* Drawer Tweaks */
+      .p-drawer-header {
+        background: var(--bg-secondary) !important;
+        border-bottom: 1px solid var(--border-primary) !important;
+        color: var(--text-primary) !important;
+        padding: 1rem !important;
+      }
+      .p-drawer-content {
+        background: var(--bg-secondary) !important;
+        padding: 1rem !important;
+      }
+    }
+  `]
+})
+export class AdvancedProfitAnalysisComponent implements OnInit {
+  private invoiceService = inject(InvoiceService);
+
+  // State Signals
+  data = signal<ProfitAnalysisReport | null>(null);
+  loading = signal(false);
+  showFilters = signal(false);
+
+  // Filter Model
+  filters = {
+    groupBy: 'day',
+    compareWith: 'previous_period',
+    startDate: '',
+    endDate: '',
+    status: [] as string[],
+    minAmount: null as number | null,
+    maxAmount: null as number | null,
+    productId: '',
+    customerId: '',
+    category: ''
+  };
+
+  // Dropdown Options
+  groupByOptions = [
+    { label: 'Daily', value: 'day' },
+    { label: 'Weekly', value: 'week' },
+    { label: 'Monthly', value: 'month' }
+  ];
+
+  compareOptions = [
+    { label: 'Previous Period', value: 'previous_period' },
+    { label: 'Last Year', value: 'same_period_last_year' },
+    { label: 'None', value: 'none' }
+  ];
+
+  statusOptions = [
+    { label: 'Paid', value: 'paid' },
+    { label: 'Issued', value: 'issued' },
+    { label: 'Overdue', value: 'overdue' }
+  ];
+
+  ngOnInit() {
+    this.fetchReport();
+  }
+
+  onDateChange(event: any) {
+    this.filters.startDate = event.startDate;
+    this.filters.endDate = event.endDate;
+    this.fetchReport();
+  }
+
+  fetchReport() {
+    this.loading.set(true);
+
+    // Deep copy and clean payload
+    const payload: any = { ...this.filters };
+
+    if (Array.isArray(payload.status) && payload.status.length > 0) {
+      payload.status = payload.status.join(',');
+    } else {
+      delete payload.status;
+    }
+
+    // Remove empty/null filters to keep API request clean
+    if (!payload.minAmount) delete payload.minAmount;
+    if (!payload.maxAmount) delete payload.maxAmount;
+    if (!payload.productId) delete payload.productId;
+    if (!payload.customerId) delete payload.customerId;
+    if (!payload.category) delete payload.category;
+
+    this.invoiceService.getAdvancedProfitAnalysis(payload)
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: (res) => {
+          if (res.status === 'success') {
+            this.data.set(res.data as ProfitAnalysisReport);
+          }
+        },
+        error: (err) => console.error('Profit Report Error:', err)
+      });
+  }
+
+  resetFilters() {
+    this.filters.status = [];
+    this.filters.minAmount = null;
+    this.filters.maxAmount = null;
+    this.filters.productId = '';
+    this.filters.customerId = '';
+    this.filters.category = '';
+    // Optional: Reset dates if needed, but usually users want to keep the date range
+    this.fetchReport();
+  }
+
+  filterCount(): number {
+    let count = 0;
+    if (this.filters.status.length) count++;
+    if (this.filters.minAmount || this.filters.maxAmount) count++;
+    if (this.filters.productId) count++;
+    if (this.filters.customerId) count++;
+    if (this.filters.category) count++;
+    return count;
+  }
+
+  // --- Helper Methods for Template ---
+
+  getBarHeight(val: number, max: number): number {
+    if (!max || max === 0) return 0;
+    // Calculate percentage, max cap at 100%, min cap at 2% for visibility
+    const percentage = (val / max) * 100;
+    return Math.max(2, Math.min(percentage, 100));
+  }
+
+  getGrowthClass(value: number): string {
+    return value > 0 
+      ? 'bg-[var(--color-success-bg)] text-success border-success/30' 
+      : 'bg-[var(--color-error-bg)] text-error border-error/30';
+  }
+
+  getCompareLabel(): string {
+    if (this.filters.compareWith === 'previous_period') return 'prev. period';
+    if (this.filters.compareWith === 'same_period_last_year') return 'last year';
+    return 'baseline';
+  }
+}

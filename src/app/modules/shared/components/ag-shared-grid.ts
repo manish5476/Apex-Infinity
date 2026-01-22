@@ -133,45 +133,88 @@ export class AgShareGrid<T = any> {
     ActionbuttonsComponent
   };
 
-  readonly agTheme = computed<Theme>(() =>
-    themeQuartz.withParams({
-      /* Typography */
-      fontFamily: 'var(--font-body)',
-      fontSize: 'var(--font-size-base)',
+  // readonly agTheme = computed<Theme>(() =>
+  //   themeQuartz.withParams({
+  //     /* Typography */
+  //     fontFamily: 'var(--font-body)',
+  //     fontSize: 'var(--font-size-base)',
 
-      /* Backgrounds */
-      backgroundColor: 'var(--bg-primary)',
-      headerBackgroundColor: 'var(--bg-secondary)',
+  //     /* Backgrounds */
+  //     backgroundColor: 'var(--bg-primary)',
+  //     headerBackgroundColor: 'var(--bg-secondary)',
 
-      /* Text */
-      foregroundColor: 'var(--text-primary)',
-      headerTextColor: 'var(--text-label)',
+  //     /* Text */
+  //     foregroundColor: 'var(--text-primary)',
+  //     headerTextColor: 'var(--text-label)',
 
-      /* Borders */
-      borderColor: 'var(--border-primary)',
+  //     /* Borders */
+  //     borderColor: 'var(--border-primary)',
 
-      /* Interaction */
-      rowHoverColor: 'var(--component-bg-hover)',
-      selectedRowBackgroundColor: 'var(--accent-focus)',
-      rangeSelectionBackgroundColor: 'var(--accent-focus)',
-      rangeSelectionBorderColor: 'var(--accent-primary)',
+  //     /* Interaction */
+  //     rowHoverColor: 'var(--component-bg-hover)',
+  //     selectedRowBackgroundColor: 'var(--accent-focus)',
+  //     rangeSelectionBackgroundColor: 'var(--accent-focus)',
+  //     rangeSelectionBorderColor: 'var(--accent-primary)',
 
-      /* Inputs */
-      inputBackgroundColor: 'var(--bg-ternary)',
-      inputBorder: 'var(--component-border-focus)',
-      inputPlaceholderTextColor: 'var(--text-tertiary)',
+  //     /* Inputs */
+  //     inputBackgroundColor: 'var(--bg-ternary)',
+  //     inputBorder: 'var(--component-border-focus)',
+  //     inputPlaceholderTextColor: 'var(--text-tertiary)',
 
-      /* Scrollbars */
-      // scrollbarThumbColor: 'var(--scroll-thumb-c)',
-      // scrollbarTrackColor: 'var(--scroll-track-c)',
+  //     /* Scrollbars */
+  //     // scrollbarThumbColor: 'var(--scroll-thumb-c)',
+  //     // scrollbarTrackColor: 'var(--scroll-track-c)',
 
-      /* Density */
-      rowHeight: 44,
-      headerHeight: 44,
-      spacing: 6
-    })
-  );
+  //     /* Density */
+  //     rowHeight: 44,
+  //     headerHeight: 44,
+  //     spacing: 6
+  //   })
+  // );
+readonly agTheme = computed<Theme>(() =>
+  themeQuartz.withParams({
+    /* Typography */
+    fontFamily: 'var(--font-body)',
+    fontSize: '13px', // Slightly smaller for dense data, or use var(--font-size-sm)
 
+    /* Backgrounds */
+    backgroundColor: 'var(--theme-bg-primary)',
+    headerBackgroundColor: 'var(--theme-bg-secondary)',
+    
+    /* Text */
+    foregroundColor: 'var(--theme-text-primary)',
+    headerTextColor: 'var(--theme-text-tertiary)', // Muted headers
+    // secondaryForegroundColor: 'var(--theme-text-secondary)', // For disabled/secondary text
+
+    /* Borders */
+    borderColor: 'var(--theme-border-primary)',
+    headerColumnResizeHandleColor: 'var(--theme-border-secondary)',
+
+    /* Interaction & Selection */
+    rowHoverColor: 'var(--component-bg-hover)', // Subtle hover
+    selectedRowBackgroundColor: 'rgba(var(--accent-primary-rgb), 0.08)', // Tinted selection
+    rangeSelectionBackgroundColor: 'rgba(var(--accent-primary-rgb), 0.15)',
+    rangeSelectionBorderColor: 'var(--theme-accent-primary)',
+    
+    /* Inputs (Editors) */
+    inputBackgroundColor: 'var(--theme-bg-primary)',
+    inputBorder: '1px solid var(--theme-border-primary)',
+    // inputFocusBorderColor: 'var(--theme-accent-primary)',
+    inputPlaceholderTextColor: 'var(--theme-text-tertiary)',
+
+    /* Icons & UI Controls */
+    checkboxCheckedBackgroundColor: 'var(--theme-accent-primary)',
+    checkboxCheckedBorderColor: 'var(--theme-accent-primary)',
+    checkboxUncheckedBackgroundColor: 'var(--theme-bg-ternary)',
+    checkboxUncheckedBorderColor: 'var(--theme-border-secondary)',
+
+    /* Density & Spacing */
+    rowHeight: 40,       // Compact rows (Standard is usually 48-50)
+    headerHeight: 42,    // Slightly taller header for clarity
+    spacing: 4,          // Tighter cell padding
+    cellHorizontalPaddingScale: 0.8, // Reduces left/right padding inside cells
+  })
+);
   /* --------------------------------------------------
      GRID OPTIONS (CLIENT SIDE SAFE)
   --------------------------------------------------- */

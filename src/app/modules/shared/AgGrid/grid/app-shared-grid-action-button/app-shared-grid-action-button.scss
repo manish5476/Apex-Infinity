@@ -1,99 +1,87 @@
-/* Color Fallbacks (if not defined elsewhere) */
-:root {
-  --color-success: #10b981;
-  --color-danger: #ef4444;
-  --color-primary: #3b82f6;
-  --color-text-subtle: #64748b;
-  --bg-surface: #ffffff;
-}
+/* ==========================================================================
+   COMPONENT: ACTION TILES (Rectangular & Separated)
+   Context: Grid Row Actions
+   Fit: 40px Row Height
+   ========================================================================== */
 
-.action-pill {
-  /* Layout & Sizing */
-  display: inline-flex;
+.action-tiles {
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-xs); /* 4px gap */
-  padding: var(--spacing-xs) var(--spacing-sm);
+  gap: 8px; /* Distinct gap between buttons */
+  height: 100%;
+}
+
+/* --- BASE TILE STYLE --- */
+.tile-btn {
+  /* Dimensions */
+  width: 28px;
+  height: 28px;
+  padding: 0;
   
-  /* Appearance */
-  background-color: var(--bg-surface);
-  border: var(--ui-border-width) solid rgba(0,0,0,0.06);
-  border-radius: var(--ui-border-radius-xl); /* 16px - Fully rounded pill */
+  /* Flex Center for Icon */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   
-  /* Shadow & Depth */
+  /* Rectangular Shape with soft corners */
+  border-radius: 6px; 
+  border: 1px solid var(--theme-border-primary);
+  background-color: var(--theme-bg-primary);
+  
+  /* Icon Style */
+  color: var(--theme-text-secondary);
+  font-size: 0.8rem;
+  
+  /* Interaction */
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
   box-shadow: var(--shadow-sm);
-  
-  /* Animation */
-  transition: var(--transition-base);
 
-  /* Hover State for the whole pill */
+  /* Icon itself */
+  i { font-size: 0.8rem; pointer-events: none; }
+
+  /* --- HOVER EFFECT (Lift & Color) --- */
   &:hover {
-    box-shadow: var(--shadow-md); /* Elevate on hover */
-    transform: translateY(-1px); /* Subtle lift */
-    border-color: rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--theme-border-secondary);
   }
-}
 
-/* The Separator Line between Edit and Delete */
-.action-separator {
-  width: 1px;
-  height: 12px;
-  background-color: rgba(0,0,0,0.1);
-  margin: 0 2px;
-}
+  &:active {
+    transform: scale(0.95);
+  }
 
-/* Global Button Styles in this Context */
-::ng-deep .action-btn {
-  &.p-button.p-button-icon-only.p-button-rounded {
-    width: 28px;  /* Compact touch target */
-    height: 28px;
-    padding: 0;
-    font-size: var(--font-size-base) !important; /* 13px icon */
-    transition: var(--transition-fast);
+  /* --- VARIANTS --- */
+
+  /* Edit: Subtle Blue tint on hover */
+  &.edit:hover {
+    color: var(--theme-accent-primary);
+    border-color: var(--theme-accent-primary);
+    background-color: rgba(var(--accent-primary-rgb), 0.05);
+  }
+
+  /* Delete: Subtle Red tint on hover */
+  &.delete:hover {
+    color: var(--color-error);
+    border-color: var(--color-error);
+    background-color: rgba(239, 68, 68, 0.05);
+  }
+
+  /* Save: Solid Green (Primary Action) */
+  &.save {
+    background-color: var(--color-success);
+    border-color: var(--color-success);
+    color: #ffffff;
     
-    /* Default State: Subtle Grey */
-    color: var(--color-text-subtle); 
-      background: var(--bg-secondary);
-    border: none;
-
-    /* Generic Hover */
     &:hover {
-      background-color: rgba(0,0,0,0.04);
-      transform: scale(1.05); /* Micro zoom */
+      background-color: color-mix(in srgb, var(--color-success), black 10%);
     }
+  }
 
-    &:active {
-      transform: scale(0.95); /* Click press effect */
-    }
-
-    /* --- Variant: Edit --- */
-    &.edit-btn:hover {
-      color: var(--color-primary, #3b82f6);
-      background-color: rgba(59, 130, 246, 0.1);
-    }
-
-    /* --- Variant: Delete --- */
-    &.delete-btn:hover {
-      color: var(--color-danger, #ef4444);
-      background-color: rgba(239, 68, 68, 0.1);
-    }
-
-    /* --- Variant: Save --- */
-    &.save-btn {
-      color: var(--color-success, #10b981); /* Green by default in edit mode */
-      &:hover {
-        background-color: rgba(16, 185, 129, 0.1);
-       // color: darken(#10b981, 10%);
-      }
-    }
-
-    /* --- Variant: Cancel --- */
-    &.cancel-btn {
-      color: var(--color-text-subtle);
-      &:hover {
-        color: var(--color-danger);
-        background-color: rgba(0,0,0,0.05);
-      }
-    }
+  /* Cancel: Standard Grey */
+  &.cancel:hover {
+    color: var(--theme-text-primary);
+    background-color: var(--theme-bg-ternary);
   }
 }
