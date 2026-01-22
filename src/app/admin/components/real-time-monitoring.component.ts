@@ -12,32 +12,30 @@ import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
   selector: 'app-real-time-monitoring',
   standalone: true,
   imports: [
-    CommonModule, ButtonModule, TagModule, 
-    ProgressSpinnerModule, TooltipModule,
+    CommonModule, 
+    ButtonModule, 
+    TagModule, 
+    ProgressSpinnerModule, 
+    TooltipModule,
     AgShareGrid
   ],
   template: `
-    <div class="h-screen w-full flex flex-col p-4 md:p-6 transition-colors duration-300 overflow-y-auto md:overflow-hidden" 
-         [style.background]="'var(--theme-bg-primary)'"
-         [style.font-family]="'var(--font-body)'">
+    <div class="monitoring-container">
 
-      <div class="shrink-0 mb-6 flex flex-wrap justify-between items-center gap-4">
-        <div class="flex items-center gap-3">
-          <div class="relative flex h-3 w-3">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" [style.background]="'var(--theme-success)'"></span>
-            <span class="relative inline-flex rounded-full h-3 w-3" [style.background]="'var(--theme-success)'"></span>
+      <div class="header-section">
+        <div class="header-title-row">
+          <div class="pulse-indicator">
+            <span class="pulse-ring"></span>
+            <span class="pulse-dot"></span>
           </div>
           <div>
-            <h2 class="font-bold tracking-tight" 
-                [style.color]="'var(--theme-text-primary)'"
-                [style.font-family]="'var(--font-heading)'"
-                [style.font-size]="'var(--font-size-2xl)'">Live System Monitor</h2>
-            <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'" class="uppercase font-bold tracking-widest">
+            <h2 class="page-title">Live System Monitor</h2>
+            <p class="page-subtitle">
               Last Pulse: {{ monitorData()?.monitoring?.lastUpdated | date:'mediumTime' }}
             </p>
           </div>
         </div>
-        <div class="flex gap-2">
+        <div class="header-actions">
           <p-button label="Audit Logs" icon="pi pi-shield" [text]="true" severity="secondary" size="small"></p-button>
           <p-button icon="pi pi-refresh" severity="info" size="small" (onClick)="loadData()"></p-button>
         </div>
@@ -45,91 +43,87 @@ import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
 
       <ng-container *ngIf="!loading(); else loader">
         
-        <div class="shrink-0 grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div class="p-4 border transition-all" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-            <p class="uppercase font-bold text-[10px] mb-1" [style.color]="'var(--theme-text-label)'">Total Alerts</p>
-            <h3 class="text-2xl font-bold text-white tabular-nums">{{ monitorData()?.alerts?.total || 0 }}</h3>
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <p class="kpi-label">Total Alerts</p>
+            <h3 class="kpi-value">{{ monitorData()?.alerts?.total || 0 }}</h3>
           </div>
-          <div class="p-4 border transition-all border-l-4" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-left-color]="'var(--theme-error)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-            <p class="uppercase font-bold text-[10px] mb-1" [style.color]="'var(--theme-text-label)'">Critical Risk</p>
-            <h3 class="text-2xl font-bold tabular-nums text-rose-500">{{ monitorData()?.alerts?.critical?.length || 0 }}</h3>
+          
+          <div class="kpi-card error-border">
+            <p class="kpi-label">Critical Risk</p>
+            <h3 class="kpi-value error">{{ monitorData()?.alerts?.critical?.length || 0 }}</h3>
           </div>
-          <div class="p-4 border transition-all border-l-4" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-left-color]="'var(--theme-warning)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-            <p class="uppercase font-bold text-[10px] mb-1" [style.color]="'var(--theme-text-label)'">Warnings</p>
-            <h3 class="text-2xl font-bold tabular-nums text-amber-500">{{ monitorData()?.alerts?.warning?.length || 0 }}</h3>
+          
+          <div class="kpi-card warning-border">
+            <p class="kpi-label">Warnings</p>
+            <h3 class="kpi-value warning">{{ monitorData()?.alerts?.warning?.length || 0 }}</h3>
           </div>
-          <div class="p-4 border transition-all" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-            <p class="uppercase font-bold text-[10px] mb-1" [style.color]="'var(--theme-text-label)'">Risky Actions</p>
-            <h3 class="text-2xl font-bold tabular-nums" [style.color]="monitorData()?.security?.riskyActions > 0 ? 'var(--theme-error)' : 'var(--theme-success)'">
+          
+          <div class="kpi-card">
+            <p class="kpi-label">Risky Actions</p>
+            <h3 class="kpi-value" 
+                [ngClass]="monitorData()?.security?.riskyActions > 0 ? 'error' : 'success'">
               {{ monitorData()?.security?.riskyActions || 0 }}
             </h3>
           </div>
         </div>
 
-        <div class="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="content-layout">
           
-          <div class="lg:col-span-5 flex flex-col gap-6 h-full overflow-hidden">
+          <div class="side-column">
             
-            <div class="flex-1 flex flex-col p-6 border min-h-0" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-               <h3 class="shrink-0 font-bold uppercase tracking-tight mb-4" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">Priority Intervention</h3>
+            <div class="alert-panel">
+               <h3 class="panel-title">Priority Intervention</h3>
                
-               <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-3">
+               <div class="alert-list custom-scrollbar">
                  <ng-container *ngIf="allAlerts().length > 0; else noAlerts">
                    @for (alert of allAlerts(); track alert.timestamp) {
-                     <div class="p-3 border flex items-start gap-3 transition-colors hover:bg-white/5" 
-                          [style.background]="'var(--theme-bg-ternary)'" 
-                          [style.border-color]="'var(--theme-border-secondary)'"
-                          [style.border-radius]="'var(--ui-border-radius-lg)'">
-                       <i class="pi mt-1" 
-                          [ngClass]="alert.severity === 'critical' ? 'pi-exclamation-triangle' : 'pi-info-circle'"
-                          [style.color]="alert.severity === 'critical' ? 'var(--theme-error)' : 'var(--theme-warning)'"></i>
-                       <div class="flex-1">
-                          <p class="font-bold" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-xs)'">{{ alert.message }}</p>
-                          <p class="text-[10px] uppercase font-bold mt-1" [style.color]="'var(--theme-text-label)'">{{ alert.type }} • {{ alert.timestamp | date:'shortTime' }}</p>
+                     <div class="alert-item">
+                       <i class="pi alert-icon" 
+                          [ngClass]="alert.severity === 'critical' ? 'pi-exclamation-triangle error' : 'pi-info-circle warning'"></i>
+                       <div class="alert-content">
+                          <p class="alert-msg">{{ alert.message }}</p>
+                          <p class="alert-meta">{{ alert.type }} • {{ alert.timestamp | date:'shortTime' }}</p>
                        </div>
-                       <p-button icon="pi pi-arrow-right" [text]="true" size="small"></p-button>
+                       <i class="pi pi-arrow-right action-icon"></i>
                      </div>
                    }
                  </ng-container>
                  <ng-template #noAlerts>
-                   <div class="p-4 text-center border border-dashed rounded opacity-60">
-                     <p class="text-xs" [style.color]="'var(--theme-text-secondary)'">No active alerts requiring intervention.</p>
+                   <div class="empty-state">
+                     <p class="empty-text">No active alerts requiring intervention.</p>
                    </div>
                  </ng-template>
                </div>
             </div>
 
-            <div class="shrink-0 p-5 border border-dashed flex items-start gap-4"
-                 [style.border-color]="'var(--theme-border-secondary)'"
-                 [style.background]="'rgba(16, 185, 129, 0.03)'"
-                 [style.border-radius]="'var(--ui-border-radius-lg)'">
-               <div class="w-10 h-10 rounded-full flex items-center justify-center bg-emerald-500/10 text-emerald-500 shrink-0">
+            <div class="security-card">
+               <div class="security-icon-box">
                  <i class="pi pi-lock"></i>
                </div>
                <div>
-                 <p class="font-bold" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">Security Posture: Secure</p>
-                 <p class="mt-1 leading-relaxed" [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">
+                 <p class="security-title">Security Posture: Secure</p>
+                 <p class="security-desc">
                    No risky actions detected in current session.
                  </p>
                </div>
             </div>
           </div>
 
-          <div class="lg:col-span-7 h-full min-h-0">
-            <div class="border overflow-hidden shadow-sm h-full flex flex-col" 
-                 [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
+          <div class="main-column">
+            <div class="grid-card">
               
-              <div class="shrink-0 p-4 border-b flex justify-between items-center" [style.border-color]="'var(--theme-border-primary)'" [style.background]="'var(--theme-bg-ternary)'">
-                <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-xs)'">Real-time Access Logs</h3>
-                <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 font-bold text-[10px]">LIVE STREAM</span>
+              <div class="grid-header">
+                <h3 class="grid-title">Real-time Access Logs</h3>
+                <span class="live-badge">LIVE STREAM</span>
               </div>
 
-              <div class="flex-1 w-full relative">
+              <div class="grid-container">
                  <app-ag-share-grid 
                    [columns]="logColumns" 
                    [data]="monitorData()?.security?.recentEvents || []" 
                    [showActions]="false" 
-                   style="height: 100%; width: 100%; display: block; position: absolute; inset: 0;">
+                   class="full-size-grid">
                  </app-ag-share-grid>
               </div>
 
@@ -140,35 +134,289 @@ import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
       </ng-container>
 
       <ng-template #loader>
-        <div class="h-full flex flex-col items-center justify-center gap-4">
+        <div class="loader-container">
           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-12 h-12"></p-progressSpinner>
-          <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'" class="font-bold uppercase tracking-widest">Scanning System Integrity...</p>
+          <p class="loader-text">Scanning System Integrity...</p>
         </div>
       </ng-template>
 
     </div>
   `,
   styles: [`
-    /* Optional: Custom scrollbar for the alerts list */
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 4px;
+    /* HOST & LAYOUT */
+    :host { display: block; width: 100%; height: 100vh; overflow: hidden; }
+
+    .monitoring-container {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: var(--spacing-lg) var(--spacing-xl);
+      background: var(--bg-primary);
+      font-family: var(--font-body);
+      overflow-y: auto; /* Allow scrolling if content overflows vertically on small screens */
     }
-    .custom-scrollbar::-webkit-scrollbar-track {
-        background: var(--bg-secondary);
+
+    /* HEADER */
+    .header-section {
+      flex-shrink: 0;
+      margin-bottom: var(--spacing-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: var(--theme-border-secondary); 
+
+    .header-title-row { display: flex; align-items: center; gap: var(--spacing-md); }
+
+    /* Pulse Animation */
+    .pulse-indicator { position: relative; display: flex; height: 12px; width: 12px; }
+    .pulse-ring {
+      position: absolute; display: inline-flex; height: 100%; width: 100%;
+      border-radius: 50%; opacity: 0.75;
+      background-color: var(--color-success);
+      animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+    .pulse-dot {
+      position: relative; display: inline-flex; border-radius: 50%; height: 12px; width: 12px;
+      background-color: var(--color-success);
+    }
+    @keyframes ping {
+      75%, 100% { transform: scale(2); opacity: 0; }
+    }
+
+    .page-title {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .page-subtitle {
+      font-size: var(--font-size-xs);
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-tertiary);
+      margin: 0;
+    }
+
+    .header-actions { display: flex; gap: var(--spacing-sm); }
+
+    /* KPI GRID */
+    .kpi-grid {
+      flex-shrink: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .kpi-card {
+      padding: var(--spacing-md);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius-xl);
+      transition: var(--transition-base);
+    }
+    .kpi-card.error-border { border-left: 4px solid var(--color-error); }
+    .kpi-card.warning-border { border-left: 4px solid var(--color-warning); }
+
+    .kpi-label {
+      font-size: 10px;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: var(--text-label);
+      margin: 0 0 4px 0;
+    }
+
+    .kpi-value {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      margin: 0;
+      font-family: var(--font-mono);
+    }
+    .kpi-value.error { color: var(--color-error); }
+    .kpi-value.warning { color: var(--color-warning); }
+    .kpi-value.success { color: var(--color-success); }
+
+    /* CONTENT LAYOUT */
+    .content-layout {
+      flex: 1;
+      min-height: 0; /* Important for flex child scrolling */
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--spacing-lg);
+    }
+    @media (min-width: 1024px) {
+      .content-layout { grid-template-columns: 5fr 7fr; }
+    }
+
+    /* LEFT COLUMN */
+    .side-column {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-lg);
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* Alert Panel */
+    .alert-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius-xl);
+      padding: var(--spacing-lg);
+    }
+
+    .panel-title {
+      flex-shrink: 0;
+      font-size: var(--font-size-sm);
+      font-weight: bold;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin: 0 0 var(--spacing-md) 0;
+    }
+
+    .alert-list {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-sm);
+      padding-right: 4px;
+    }
+
+    .alert-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--spacing-md);
+      padding: var(--spacing-md);
+      background: var(--bg-ternary);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--ui-border-radius-lg);
+      transition: background 0.2s;
+      cursor: default;
+    }
+    .alert-item:hover { background: var(--component-bg-hover); }
+
+    .alert-icon { margin-top: 2px; font-size: 1rem; }
+    .alert-icon.error { color: var(--color-error); }
+    .alert-icon.warning { color: var(--color-warning); }
+
+    .alert-content { flex: 1; }
+    .alert-msg { font-size: var(--font-size-xs); font-weight: bold; color: var(--text-primary); margin: 0; }
+    .alert-meta { font-size: 10px; font-weight: bold; text-transform: uppercase; color: var(--text-label); margin-top: 2px; }
+
+    .action-icon { font-size: 0.8rem; color: var(--text-tertiary); opacity: 0; transition: opacity 0.2s; }
+    .alert-item:hover .action-icon { opacity: 1; }
+
+    .empty-state {
+      padding: var(--spacing-lg);
+      border: 1px dashed var(--border-secondary);
+      border-radius: var(--ui-border-radius);
+      text-align: center;
+      opacity: 0.6;
+    }
+    .empty-text { font-size: var(--font-size-xs); color: var(--text-secondary); margin: 0; }
+
+    /* Security Card */
+    .security-card {
+      flex-shrink: 0;
+      padding: var(--spacing-lg);
+      border: 1px dashed var(--color-success-border);
+      background: var(--color-success-bg);
+      border-radius: var(--ui-border-radius-lg);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--spacing-md);
+    }
+
+    .security-icon-box {
+      width: 2.5rem; height: 2.5rem;
+      border-radius: 50%;
+      background: rgba(16, 185, 129, 0.1); /* Emerald 10% */
+      color: var(--color-success);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .security-title { font-size: var(--font-size-sm); font-weight: bold; color: var(--text-primary); margin: 0; }
+    .security-desc { font-size: var(--font-size-xs); color: var(--text-secondary); margin-top: 4px; line-height: 1.4; }
+
+    /* RIGHT COLUMN (Logs Grid) */
+    .main-column {
+      height: 100%;
+      min-height: 0;
+    }
+
+    .grid-card {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius-xl);
+      overflow: hidden;
+    }
+
+    .grid-header {
+      flex-shrink: 0;
+      padding: var(--spacing-md);
+      border-bottom: 1px solid var(--border-primary);
+      background: var(--bg-ternary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .grid-title { font-size: var(--font-size-xs); font-weight: bold; text-transform: uppercase; color: var(--text-primary); margin: 0; }
+    
+    .live-badge {
+      padding: 2px 6px;
       border-radius: 4px;
+      font-size: 10px;
+      font-weight: bold;
+      background: var(--accent-focus);
+      color: var(--accent-primary);
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: var(--theme-text-tertiary);
+
+    .grid-container { flex: 1; position: relative; width: 100%; }
+    .full-size-grid { width: 100%; height: 100%; display: block; position: absolute; inset: 0; }
+
+    /* SCROLLBAR UTILITY */
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: var(--bg-ternary); }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+    /* LOADER */
+    .loader-container {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-md);
+    }
+    .loader-text {
+      font-size: var(--font-size-sm);
+      color: var(--text-tertiary);
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
   `]
 })
 export class RealTimeMonitoringComponent implements OnInit {
   monitorData = signal<any>(null);
   loading = signal<boolean>(true);
-  
   logColumns: any[] = [];
 
   allAlerts = computed(() => {
@@ -191,6 +439,7 @@ export class RealTimeMonitoringComponent implements OnInit {
   }
 
   setupColumns(): void {
+    // Grid Columns using CSS Variables
     this.logColumns = [
       {
         field: 'userId.name', 
@@ -202,10 +451,10 @@ export class RealTimeMonitoringComponent implements OnInit {
           const user = params.data?.userId || {}; 
           const name = user.name || 'Unknown';
           const email = user.email || 'No Email';
-          
+
           return `<div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
-                    <span style="font-weight: 700; color: #fff;">${name}</span>
-                    <span style="font-size: 10px; color: var(--theme-text-label); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${email}</span>
+                    <span style="font-weight: 700; color: var(--text-primary);">${name}</span>
+                    <span style="font-size: 10px; color: var(--text-label); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${email}</span>
                   </div>`;
         }
       },
@@ -219,12 +468,13 @@ export class RealTimeMonitoringComponent implements OnInit {
           const parts = fullAction.split(':');
           const category = parts[0] ? parts[0].trim() : '';
           const actionName = parts[1] ? parts[1].trim() : fullAction;
-          
+
+          // Using Accent Variables for Badge
           return `<div style="display: flex; flex-direction: column; gap: 2px;">
-                    <span style="padding: 2px 6px; width: fit-content; border-radius: 4px; font-weight: 700; font-size: 9px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); text-transform: uppercase; color: #a5b4fc;">
+                    <span style="padding: 2px 6px; width: fit-content; border-radius: 4px; font-weight: 700; font-size: 9px; background: var(--bg-ternary); border: 1px solid var(--border-secondary); text-transform: uppercase; color: var(--accent-primary);">
                       ${actionName}
                     </span>
-                    <span style="font-size: 9px; opacity: 0.6; font-style: italic;">${category}</span>
+                    <span style="font-size: 9px; opacity: 0.6; font-style: italic; color: var(--text-tertiary);">${category}</span>
                   </div>`;
         }
       },
@@ -235,8 +485,8 @@ export class RealTimeMonitoringComponent implements OnInit {
         width: 140,
         cellRenderer: (params: any) => {
           return `<div style="display: flex; flex-direction: column; font-size: 10px;">
-                    <span style="font-family: monospace; color: var(--theme-text-secondary);">${params.value || '-'}</span>
-                    <span style="opacity: 0.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">${params.data?.userAgent || '-'}</span>
+                    <span style="font-family: var(--font-mono); color: var(--text-secondary);">${params.value || '-'}</span>
+                    <span style="opacity: 0.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; color: var(--text-tertiary);">${params.data?.userAgent || '-'}</span>
                   </div>`;
         }
       },
@@ -250,7 +500,7 @@ export class RealTimeMonitoringComponent implements OnInit {
           if (!params.value) return '-';
           return this.commonService.formatDate(params.value, 'HH:mm:ss');
         },
-        cellStyle: { 'font-family': 'monospace', 'font-weight': '700', 'font-size': '11px', 'color': '#fff' }
+        cellStyle: { 'font-family': 'var(--font-mono)', 'font-weight': '700', 'font-size': '11px', 'color': 'var(--text-primary)', 'text-align': 'right' }
       }
     ];
     this.cdr.detectChanges();
@@ -269,493 +519,3 @@ export class RealTimeMonitoringComponent implements OnInit {
     });
   }
 }
-
-// import { Component, OnInit, signal, computed, ChangeDetectorRef } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { ButtonModule } from 'primeng/button';
-// import { TagModule } from 'primeng/tag';
-// import { ProgressSpinnerModule } from 'primeng/progressspinner';
-// import { TooltipModule } from 'primeng/tooltip';
-// import { CommonMethodService } from '../../core/utils/common-method.service';
-// import { AdminAnalyticsService } from '../admin-analytics.service';
-// import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
-
-// @Component({
-//   selector: 'app-real-time-monitoring',
-//   standalone: true,
-//   imports: [
-//     CommonModule, ButtonModule, TagModule, 
-//     ProgressSpinnerModule, TooltipModule,
-//     AgShareGrid
-//   ],
-//   template: `
-//     <div class="p-4 md:p-6 transition-colors duration-300" 
-//          [style.background]="'var(--theme-bg-primary)'"
-//          [style.font-family]="'var(--font-body)'">
-
-//       <div class="mb-8 flex flex-wrap justify-between items-center gap-4">
-//         <div class="flex items-center gap-3">
-//           <div class="relative flex h-3 w-3">
-//             <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" [style.background]="'var(--theme-success)'"></span>
-//             <span class="relative inline-flex rounded-full h-3 w-3" [style.background]="'var(--theme-success)'"></span>
-//           </div>
-//           <div>
-//             <h2 class="font-bold tracking-tight" 
-//                 [style.color]="'var(--theme-text-primary)'"
-//                 [style.font-family]="'var(--font-heading)'"
-//                 [style.font-size]="'var(--font-size-2xl)'">Live System Monitor</h2>
-//             <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'" class="uppercase font-bold tracking-widest">
-//               Last Pulse: {{ monitorData()?.monitoring?.lastUpdated | date:'mediumTime' }}
-//             </p>
-//           </div>
-//         </div>
-//         <div class="flex gap-2">
-//           <p-button label="Audit Logs" icon="pi pi-shield" [text]="true" severity="secondary" size="small"></p-button>
-//           <p-button icon="pi pi-refresh" severity="info" size="small" (onClick)="loadData()"></p-button>
-//         </div>
-//       </div>
-
-//       <ng-container *ngIf="!loading(); else loader">
-        
-//         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-//           <div class="p-4 border transition-all" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//             <p class="uppercase font-bold text-[10px] mb-1" [style.color]="'var(--theme-text-label)'">Total Alerts</p>
-//             <h3 class="text-2xl font-bold text-white tabular-nums">{{ monitorData()?.alerts?.total || 0 }}</h3>
-//           </div>
-//           <div class="p-4 border transition-all border-l-4" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-left-color]="'var(--theme-error)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//             <p class="uppercase font-bold text-[10px] mb-1" [style.color]="'var(--theme-text-label)'">Critical Risk</p>
-//             <h3 class="text-2xl font-bold tabular-nums text-rose-500">{{ monitorData()?.alerts?.critical?.length || 0 }}</h3>
-//           </div>
-//           <div class="p-4 border transition-all border-l-4" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-left-color]="'var(--theme-warning)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//             <p class="uppercase font-bold text-[10px] mb-1" [style.color]="'var(--theme-text-label)'">Warnings</p>
-//             <h3 class="text-2xl font-bold tabular-nums text-amber-500">{{ monitorData()?.alerts?.warning?.length || 0 }}</h3>
-//           </div>
-//           <div class="p-4 border transition-all" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//             <p class="uppercase font-bold text-[10px] mb-1" [style.color]="'var(--theme-text-label)'">Risky Actions</p>
-//             <h3 class="text-2xl font-bold tabular-nums" [style.color]="monitorData()?.security?.riskyActions > 0 ? 'var(--theme-error)' : 'var(--theme-success)'">
-//               {{ monitorData()?.security?.riskyActions || 0 }}
-//             </h3>
-//           </div>
-//         </div>
-
-//         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-//           <div class="lg:col-span-5 space-y-6">
-//             <div class="p-6 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//                <h3 class="font-bold uppercase tracking-tight mb-6" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">Priority Intervention</h3>
-               
-//                <div class="space-y-3">
-//                  <ng-container *ngIf="allAlerts().length > 0; else noAlerts">
-//                    @for (alert of allAlerts(); track alert.timestamp) {
-//                      <div class="p-3 border flex items-start gap-3 transition-colors hover:bg-white/5" 
-//                           [style.background]="'var(--theme-bg-ternary)'" 
-//                           [style.border-color]="'var(--theme-border-secondary)'"
-//                           [style.border-radius]="'var(--ui-border-radius-lg)'">
-//                        <i class="pi mt-1" 
-//                           [ngClass]="alert.severity === 'critical' ? 'pi-exclamation-triangle' : 'pi-info-circle'"
-//                           [style.color]="alert.severity === 'critical' ? 'var(--theme-error)' : 'var(--theme-warning)'"></i>
-//                        <div class="flex-1">
-//                           <p class="font-bold" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-xs)'">{{ alert.message }}</p>
-//                           <p class="text-[10px] uppercase font-bold mt-1" [style.color]="'var(--theme-text-label)'">{{ alert.type }} • {{ alert.timestamp | date:'shortTime' }}</p>
-//                        </div>
-//                        <p-button icon="pi pi-arrow-right" [text]="true" size="small"></p-button>
-//                      </div>
-//                    }
-//                  </ng-container>
-//                  <ng-template #noAlerts>
-//                    <div class="p-4 text-center border border-dashed rounded opacity-60">
-//                      <p class="text-xs" [style.color]="'var(--theme-text-secondary)'">No active alerts requiring intervention.</p>
-//                    </div>
-//                  </ng-template>
-//                </div>
-//             </div>
-
-//             <div class="p-5 border border-dashed flex items-start gap-4"
-//                  [style.border-color]="'var(--theme-border-secondary)'"
-//                  [style.background]="'rgba(16, 185, 129, 0.03)'"
-//                  [style.border-radius]="'var(--ui-border-radius-lg)'">
-//                <div class="w-10 h-10 rounded-full flex items-center justify-center bg-emerald-500/10 text-emerald-500 shrink-0">
-//                  <i class="pi pi-lock"></i>
-//                </div>
-//                <div>
-//                  <p class="font-bold" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">Security Posture: Secure</p>
-//                  <p class="mt-1 leading-relaxed" [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">
-//                    No risky actions detected in current session. All customer and supplier data access aligns with role-based permissions.
-//                  </p>
-//                </div>
-//             </div>
-//           </div>
-
-//           <div class="lg:col-span-7">
-//             <div class="border overflow-hidden shadow-sm h-full flex flex-col" 
-//                  [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//               <div class="p-4 border-b flex justify-between items-center shrink-0" [style.border-color]="'var(--theme-border-primary)'" [style.background]="'var(--theme-bg-ternary)'">
-//                 <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-xs)'">Real-time Access Logs</h3>
-//                 <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 font-bold text-[10px]">LIVE STREAM</span>
-//               </div>
-
-//               <div class="flex-1 relative w-full" style="min-height: 500px;">
-//                  <app-ag-share-grid 
-//                    [columns]="logColumns" 
-//                    [data]="monitorData()?.security?.recentEvents || []" 
-//                    [showActions]="false" 
-//                    style="height: 100%; width: 100%; display: block; position: absolute; inset: 0;">
-//                  </app-ag-share-grid>
-//               </div>
-
-//             </div>
-//           </div>
-//         </div>
-
-//       </ng-container>
-
-//       <ng-template #loader>
-//         <div class="h-[60vh] flex flex-col items-center justify-center gap-4">
-//           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-12 h-12"></p-progressSpinner>
-//           <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'" class="font-bold uppercase tracking-widest">Scanning System Integrity...</p>
-//         </div>
-//       </ng-template>
-
-//     </div>
-//   `,
-//   styles: []
-// })
-// export class RealTimeMonitoringComponent implements OnInit {
-//   monitorData = signal<any>(null);
-//   loading = signal<boolean>(true);
-  
-//   logColumns: any[] = [];
-
-//   // Combine critical and warning alerts
-//   allAlerts = computed(() => {
-//     const data = this.monitorData();
-//     if (!data || !data.alerts) return [];
-//     return [...(data.alerts.critical || []), ...(data.alerts.warning || [])].sort(
-//       (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-//     );
-//   });
-
-//   constructor(
-//     private analyticsService: AdminAnalyticsService,
-//     public commonService: CommonMethodService,
-//     private cdr: ChangeDetectorRef
-//   ) {}
-
-//   ngOnInit() {
-//     this.setupColumns();
-//     this.loadData();
-//   }
-
-//   setupColumns(): void {
-//     this.logColumns = [
-//       {
-//         field: 'userId.name', // Point to a string property to avoid object rendering issues
-//         headerName: 'Admin Associate', 
-//         sortable: true, 
-//         flex: 1,
-//         minWidth: 160,
-//         cellRenderer: (params: any) => {
-//           // SAFE ACCESS: Use params.data to access the full row object
-//           const user = params.data?.userId || {}; 
-//           const name = user.name || 'Unknown';
-//           const email = user.email || 'No Email';
-          
-//           return `<div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
-//                     <span style="font-weight: 700; color: #fff;">${name}</span>
-//                     <span style="font-size: 10px; color: var(--theme-text-label); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${email}</span>
-//                   </div>`;
-//         }
-//       },
-//       {
-//         field: 'action', 
-//         headerName: 'Action Performed', 
-//         sortable: true, 
-//         width: 150,
-//         cellRenderer: (params: any) => {
-//           const fullAction = params.value || '';
-//           const parts = fullAction.split(':');
-//           const category = parts[0] ? parts[0].trim() : '';
-//           const actionName = parts[1] ? parts[1].trim() : fullAction;
-          
-//           return `<div style="display: flex; flex-direction: column; gap: 2px;">
-//                     <span style="padding: 2px 6px; width: fit-content; border-radius: 4px; font-weight: 700; font-size: 9px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); text-transform: uppercase; color: #a5b4fc;">
-//                       ${actionName}
-//                     </span>
-//                     <span style="font-size: 9px; opacity: 0.6; font-style: italic;">${category}</span>
-//                   </div>`;
-//         }
-//       },
-//       {
-//         field: 'ip', 
-//         headerName: 'Network Details', 
-//         sortable: true, 
-//         width: 140,
-//         cellRenderer: (params: any) => {
-//           return `<div style="display: flex; flex-direction: column; font-size: 10px;">
-//                     <span style="font-family: monospace; color: var(--theme-text-secondary);">${params.value || '-'}</span>
-//                     <span style="opacity: 0.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">${params.data?.userAgent || '-'}</span>
-//                   </div>`;
-//         }
-//       },
-//       {
-//         field: 'createdAt', 
-//         headerName: 'Time', 
-//         sortable: true, 
-//         width: 100,
-//         type: 'rightAligned',
-//         valueFormatter: (params: any) => {
-//           // Safety check for date
-//           if (!params.value) return '-';
-//           return this.commonService.formatDate(params.value, 'HH:mm:ss');
-//         },
-//         cellStyle: { 'font-family': 'monospace', 'font-weight': '700', 'font-size': '11px', 'color': '#fff' }
-//       }
-//     ];
-//     this.cdr.detectChanges();
-//   }
-
-//   loadData() {
-//     this.loading.set(true);
-//     this.analyticsService.getRealTimeMonitoring().subscribe({
-//       next: (res) => {
-//         if (res.status === 'success') {
-//           this.monitorData.set(res.data);
-//         }
-//         this.loading.set(false);
-//       },
-//       error: () => this.loading.set(false)
-//     });
-//   }
-// }
-
-// // import { Component, OnInit, signal, computed } from '@angular/core';
-// // import { CommonModule } from '@angular/common';
-// // import { TableModule } from 'primeng/table';
-// // import { ButtonModule } from 'primeng/button';
-// // import { TagModule } from 'primeng/tag';
-// // import { ProgressSpinnerModule } from 'primeng/progressspinner';
-// // import { TooltipModule } from 'primeng/tooltip';
-// // import { CommonMethodService } from '../../core/utils/common-method.service';
-// // import { AdminAnalyticsService } from '../admin-analytics.service';
-
-// // interface SystemAlert {
-// //   type: string;
-// //   severity: 'critical' | 'warning' | 'info';
-// //   message: string;
-// //   timestamp: string;
-// // }
-
-// // interface SecurityEvent {
-// //   _id: string;
-// //   userId: { name: string; email: string };
-// //   action: string;
-// //   entityType: string;
-// //   ip: string;
-// //   userAgent: string;
-// //   createdAt: string;
-// // }
-
-// // @Component({
-// //   selector: 'app-real-time-monitoring',
-// //   standalone: true,
-// //   imports: [CommonModule, TableModule, ButtonModule, TagModule, ProgressSpinnerModule, TooltipModule],
-// //   template: `
-// //     <div class="p-4 md:p-6 transition-colors duration-300" 
-// //          [style.background]="'var(--theme-bg-primary)'"
-// //          [style.font-family]="'var(--font-body)'">
-
-// //       <div class="mb-8 flex flex-wrap justify-between items-center gap-4">
-// //         <div class="flex items-center gap-3">
-// //           <div class="relative flex h-3 w-3">
-// //             <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" [style.background]="'var(--theme-success)'"></span>
-// //             <span class="relative inline-flex rounded-full h-3 w-3" [style.background]="'var(--theme-success)'"></span>
-// //           </div>
-// //           <div>
-// //             <h2 class="font-bold tracking-tight" 
-// //                 [style.color]="'var(--theme-text-primary)'"
-// //                 [style.font-family]="'var(--font-heading)'"
-// //                 [style.font-size]="'var(--font-size-2xl)'">Live System Monitor</h2>
-// //             <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'" class="uppercase font-bold tracking-widest">
-// //               Last Pulse: {{ monitorData()?.monitoring?.lastUpdated | date:'mediumTime' }}
-// //             </p>
-// //           </div>
-// //         </div>
-// //         <div class="flex gap-2">
-// //           <p-button label="Audit Logs" icon="pi pi-shield" [text]="true" severity="secondary" size="small"></p-button>
-// //           <p-button icon="pi pi-refresh" severity="info" size="small" (onClick)="loadData()"></p-button>
-// //         </div>
-// //       </div>
-
-// //       <ng-container *ngIf="!loading(); else loader">
-        
-// //         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-// //           <div class="p-4 border transition-all" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //             <p class="uppercase font-bold text-[10px] mb-1" [style.color]="'var(--theme-text-label)'">Total Alerts</p>
-// //             <h3 class="text-2xl font-bold text-white tabular-nums">{{ monitorData()?.alerts?.total }}</h3>
-// //           </div>
-// //           <div class="p-4 border transition-all border-l-4" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-left-color]="'var(--theme-error)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //             <p class="uppercase font-bold text-[10px] mb-1" [style.color]="'var(--theme-text-label)'">Critical Risk</p>
-// //             <h3 class="text-2xl font-bold tabular-nums text-rose-500">{{ monitorData()?.alerts?.critical?.length }}</h3>
-// //           </div>
-// //           <div class="p-4 border transition-all border-l-4" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-left-color]="'var(--theme-warning)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //             <p class="uppercase font-bold text-[10px] mb-1" [style.color]="'var(--theme-text-label)'">Warnings</p>
-// //             <h3 class="text-2xl font-bold tabular-nums text-amber-500">{{ monitorData()?.alerts?.warning?.length }}</h3>
-// //           </div>
-// //           <div class="p-4 border transition-all" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //             <p class="uppercase font-bold text-[10px] mb-1" [style.color]="'var(--theme-text-label)'">Risky Actions</p>
-// //             <h3 class="text-2xl font-bold tabular-nums" [style.color]="monitorData()?.security?.riskyActions > 0 ? 'var(--theme-error)' : 'var(--theme-success)'">
-// //               {{ monitorData()?.security?.riskyActions }}
-// //             </h3>
-// //           </div>
-// //         </div>
-
-// //         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-// //           <div class="lg:col-span-5 space-y-6">
-// //             <div class="p-6 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //                <h3 class="font-bold uppercase tracking-tight mb-6" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">Priority Intervention</h3>
-               
-// //                <div class="space-y-3">
-// //                  @for (alert of allAlerts(); track alert.timestamp) {
-// //                    <div class="p-3 border flex items-start gap-3 transition-colors hover:bg-white/5" 
-// //                         [style.background]="'var(--theme-bg-ternary)'" 
-// //                         [style.border-color]="'var(--theme-border-secondary)'"
-// //                         [style.border-radius]="'var(--ui-border-radius-lg)'">
-// //                      <i class="pi mt-1" 
-// //                         [ngClass]="alert.severity === 'critical' ? 'pi-exclamation-triangle' : 'pi-info-circle'"
-// //                         [style.color]="alert.severity === 'critical' ? 'var(--theme-error)' : 'var(--theme-warning)'"></i>
-// //                      <div class="flex-1">
-// //                         <p class="font-bold" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-xs)'">{{ alert.message }}</p>
-// //                         <p class="text-[10px] uppercase font-bold mt-1" [style.color]="'var(--theme-text-label)'">{{ alert.type }} • {{ alert.timestamp | date:'shortTime' }}</p>
-// //                      </div>
-// //                      <p-button icon="pi pi-arrow-right" [text]="true" size="small"></p-button>
-// //                    </div>
-// //                  }
-// //                </div>
-// //             </div>
-
-// //             <div class="p-5 border border-dashed flex items-start gap-4"
-// //                  [style.border-color]="'var(--theme-border-secondary)'"
-// //                  [style.background]="'rgba(16, 185, 129, 0.03)'"
-// //                  [style.border-radius]="'var(--ui-border-radius-lg)'">
-// //                <div class="w-10 h-10 rounded-full flex items-center justify-center bg-emerald-500/10 text-emerald-500 shrink-0">
-// //                  <i class="pi pi-lock"></i>
-// //                </div>
-// //                <div>
-// //                  <p class="font-bold" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">Security Posture: Secure</p>
-// //                  <p class="mt-1 leading-relaxed" [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">
-// //                    No risky actions detected in current session. All customer and supplier data access aligns with role-based permissions.
-// //                  </p>
-// //                </div>
-// //             </div>
-// //           </div>
-
-// //           <div class="lg:col-span-7">
-// //             <div class="border overflow-hidden shadow-sm" 
-// //                  [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //               <div class="p-4 border-b flex justify-between items-center" [style.border-color]="'var(--theme-border-primary)'" [style.background]="'var(--theme-bg-ternary)'">
-// //                 <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-xs)'">Real-time Access Logs</h3>
-// //                 <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 font-bold text-[10px]">LIVE STREAM</span>
-// //               </div>
-
-// //               <p-table [value]="monitorData()?.security?.recentEvents" [scrollable]="true" scrollHeight="450px" styleClass="p-datatable-sm no-border-table">
-// //                 <ng-template pTemplate="header">
-// //                   <tr>
-// //                     <th [style.color]="'var(--theme-text-label)'">Admin Associate</th>
-// //                     <th [style.color]="'var(--theme-text-label)'">Action performed</th>
-// //                     <th [style.color]="'var(--theme-text-label)'">Network Details</th>
-// //                     <th [style.color]="'var(--theme-text-label)'" class="text-right">Time</th>
-// //                   </tr>
-// //                 </ng-template>
-// //                 <ng-template pTemplate="body" let-event>
-// //                   <tr [style.color]="'var(--theme-text-secondary)'">
-// //                     <td>
-// //                       <div class="flex flex-col">
-// //                         <span class="font-bold text-white">{{ event.userId?.name }}</span>
-// //                         <span class="text-[9px] truncate w-32" [style.color]="'var(--theme-text-label)'">{{ event.userId?.email }}</span>
-// //                       </div>
-// //                     </td>
-// //                     <td>
-// //                       <div class="flex flex-col gap-1">
-// //                         <span class="px-2 py-0.5 w-fit rounded font-bold text-[9px] bg-white/5 border border-white/10 uppercase text-indigo-300">
-// //                           {{ event.action.split(':')[1] || event.action }}
-// //                         </span>
-// //                         <span class="text-[9px] opacity-60 italic">{{ event.action.split(':')[0] }}</span>
-// //                       </div>
-// //                     </td>
-// //                     <td>
-// //                       <div class="flex flex-col text-[10px]">
-// //                         <span class="font-mono">{{ event.ip }}</span>
-// //                         <span class="truncate w-32 opacity-40">{{ event.userAgent }}</span>
-// //                       </div>
-// //                     </td>
-// //                     <td class="text-right font-mono text-[11px] font-bold text-white tabular-nums">
-// //                       {{ event.createdAt | date:'HH:mm:ss' }}
-// //                     </td>
-// //                   </tr>
-// //                 </ng-template>
-// //               </p-table>
-// //             </div>
-// //           </div>
-// //         </div>
-
-// //       </ng-container>
-
-// //       <ng-template #loader>
-// //         <div class="h-[60vh] flex flex-col items-center justify-center gap-4">
-// //           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-12 h-12"></p-progressSpinner>
-// //           <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'" class="font-bold uppercase tracking-widest">Scanning System Integrity...</p>
-// //         </div>
-// //       </ng-template>
-
-// //     </div>
-// //   `,
-// //   styles: [`
-// //     :host ::ng-deep .no-border-table .p-datatable-tbody > tr {
-// //       background: transparent !important;
-// //       border-bottom: 1px solid var(--theme-border-primary) !important;
-// //     }
-// //     :host ::ng-deep .no-border-table .p-datatable-thead > tr > th {
-// //       background: transparent !important;
-// //       padding: 1rem;
-// //       font-size: 10px;
-// //       font-weight: 700;
-// //       text-transform: uppercase;
-// //       border: none !important;
-// //     }
-// //   `]
-// // })
-// // export class RealTimeMonitoringComponent implements OnInit {
-// //   monitorData = signal<any>(null);
-// //   loading = signal<boolean>(true);
-
-// //   // Combine critical and warning alerts for a unified list
-// //   allAlerts = computed(() => {
-// //     const data = this.monitorData();
-// //     if (!data) return [];
-// //     return [...data.alerts.critical, ...data.alerts.warning].sort(
-// //       (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-// //     );
-// //   });
-// //   constructor(
-// //     private analyticsService: AdminAnalyticsService,
-// //     public commonService: CommonMethodService
-// //   ) {}
-
-// //   ngOnInit() {
-// //     this.loadData();
-// //   }
-
-// //   loadData() {
-// //     this.loading.set(true);
-// //     this.analyticsService.getRealTimeMonitoring().subscribe({
-// //       next: (res) => {
-// //         if (res.status === 'success') {
-// //           this.monitorData.set(res.data);
-// //         }
-// //         this.loading.set(false);
-// //       },
-// //       error: () => this.loading.set(false)
-// //     });
-// //   }
-// // }
