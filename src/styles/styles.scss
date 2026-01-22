@@ -202,3 +202,20 @@
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+.popover-content{
+    max-height: 450px;
+    overflow-y: auto;
+        background: var(--theme-bg-secondary);
+    padding: var(--spacing-xl);
+    overscroll-behavior: contain;
+}
+
+.theme-scroll-container{
+    max-height: 240px;
+    overflow-y: auto;
+    padding: var(--spacing-md);
+    background: var(--theme-bg-secondary);
+    scroll-behavior: smooth;
+}
+
