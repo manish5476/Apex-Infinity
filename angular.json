@@ -127,6 +127,7 @@
               "src/styles/themes.scss",
               "src/styles/base-styles.scss",
               "src/styles/common.scss",
+                            "src/styles/themes.scss",
               "src/styles/primeng-theme.scss",
               "src/styles/styles.scss",
               "node_modules/primeicons/primeicons.css",
