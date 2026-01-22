@@ -26,26 +26,23 @@ interface EMIData {
   selector: 'app-emi-analytics',
   standalone: true,
   imports: [
-    CommonModule, ButtonModule, 
-    ProgressSpinnerModule, TooltipModule,
-    AgShareGrid // Added Custom Grid
+    CommonModule, 
+    ButtonModule, 
+    ProgressSpinnerModule, 
+    TooltipModule,
+    AgShareGrid
   ],
   template: `
-    <div class="p-4 md:p-6 transition-colors duration-300" 
-         [style.background]="'var(--theme-bg-primary)'"
-         [style.font-family]="'var(--font-body)'">
+    <div class="emi-container">
 
-      <div class="mb-8 flex flex-wrap justify-between items-end gap-4">
+      <div class="header-section">
         <div>
-          <h2 class="font-bold tracking-tight mb-1" 
-              [style.color]="'var(--theme-text-primary)'"
-              [style.font-family]="'var(--font-heading)'"
-              [style.font-size]="'var(--font-size-2xl)'">Credit & EMI Intelligence</h2>
-          <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">
+          <h2 class="page-title">Credit & EMI Intelligence</h2>
+          <p class="page-subtitle">
             Monitoring credit exposure, repayment health, and interest yield
           </p>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="action-group">
            <p-button label="Credit Limits" icon="pi pi-shield" [text]="true" severity="secondary" size="small"></p-button>
            <p-button label="Sync Portfolio" icon="pi pi-refresh" severity="info" size="small" (onClick)="loadData()"></p-button>
         </div>
@@ -53,97 +50,93 @@ interface EMIData {
 
       <ng-container *ngIf="!loading(); else loader">
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div class="p-6 border relative overflow-hidden" 
-               [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-            <p class="uppercase font-bold tracking-widest mb-1" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Total Credit Exposure</p>
-            <h2 class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'">₹{{ emiSummary()?.totalAmount | number }}</h2>
-            <p class="mt-2" [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Across {{ emiSummary()?.activeEMIs }} active plans</p>
-            <i class="pi pi-credit-card absolute right-[-10px] bottom-[-10px] text-6xl opacity-5"></i>
+        <div class="kpi-grid">
+          
+          <div class="kpi-card exposure-card">
+            <p class="kpi-label">Total Credit Exposure</p>
+            <h2 class="kpi-value primary">₹{{ emiSummary()?.totalAmount | number }}</h2>
+            <p class="kpi-subtext">Across {{ emiSummary()?.activeEMIs }} active plans</p>
+            <i class="pi pi-credit-card kpi-bg-icon"></i>
           </div>
 
-          <div class="p-6 border" 
-               [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-            <p class="uppercase font-bold tracking-widest mb-1" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Interest Revenue</p>
-            <h2 class="text-3xl font-bold tabular-nums text-emerald-500">₹{{ emiSummary()?.totalInterestEarned | number }}</h2>
-            <div class="flex items-center gap-2 mt-2">
-               <span class="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold text-[10px]">Realized Gain</span>
+          <div class="kpi-card revenue-card">
+            <p class="kpi-label">Interest Revenue</p>
+            <h2 class="kpi-value success">₹{{ emiSummary()?.totalInterestEarned | number }}</h2>
+            <div class="kpi-badge-row">
+               <span class="badge success">Realized Gain</span>
             </div>
           </div>
 
-          <div class="p-6 border text-white" 
-               [style.background]="'var(--theme-accent-gradient)'" [style.border-radius]="'var(--ui-border-radius-xl)'" [style.box-shadow]="'var(--shadow-lg)'">
-            <p class="uppercase font-black tracking-tighter opacity-80 mb-1" [style.font-size]="'var(--font-size-xs)'">Portfolio Health</p>
-            <h2 class="text-3xl font-bold tabular-nums">{{ 100 - (emiSummary()?.defaultRate || 0) | number:'1.0-1' }}%</h2>
-            <p class="mt-2 font-bold opacity-90" [style.font-size]="'var(--font-size-xs)'">Default Rate: {{ emiSummary()?.defaultRate | number:'1.1-2' }}%</p>
+          <div class="kpi-card health-card">
+            <p class="kpi-label dark">Portfolio Health</p>
+            <h2 class="kpi-value dark">{{ 100 - (emiSummary()?.defaultRate || 0) | number:'1.0-1' }}%</h2>
+            <p class="kpi-subtext dark">Default Rate: {{ emiSummary()?.defaultRate | number:'1.1-2' }}%</p>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="content-grid">
           
-          <div class="lg:col-span-7 space-y-6">
-            <div class="border overflow-hidden flex flex-col h-full" 
-                 [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-               <div class="p-4 border-b flex justify-between items-center" [style.border-color]="'var(--theme-border-primary)'" [style.background]="'var(--theme-bg-ternary)'">
-                 <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">Portfolio Segments</h3>
-                 <span class="text-[10px] font-bold" [style.color]="'var(--theme-text-label)'">DATA VIEW</span>
+          <div class="main-column">
+            <div class="grid-card">
+               <div class="grid-header">
+                 <h3 class="grid-title">Portfolio Segments</h3>
+                 <span class="grid-tag">DATA VIEW</span>
                </div>
 
-               <div class="grid-wrapper relative flex-1 min-h-[350px]">
+               <div class="grid-container">
                   <app-ag-share-grid 
                     [columns]="emiColumns" 
                     [data]="emiRawData()" 
                     [showActions]="false" 
-                    style="width: 100%; height: 100%; display: block;">
+                    class="full-size-grid">
                   </app-ag-share-grid>
                </div>
             </div>
           </div>
 
-          <div class="lg:col-span-5 space-y-6">
-            <div class="p-6 border h-full flex flex-col" 
-                 [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-              <div class="flex justify-between items-center mb-8">
-                <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">Repayment Pipeline </h3>
-                <span class="text-[10px] font-bold" [style.color]="'var(--theme-text-label)'">SYNCED: LIVE</span>
+          <div class="side-column">
+            <div class="pipeline-card">
+              <div class="pipeline-header">
+                <h3 class="card-title">Repayment Pipeline</h3>
+                <span class="status-indicator">SYNCED: LIVE</span>
               </div>
 
-              <div class="mb-10">
-                <div class="flex justify-between items-end mb-3">
+              <div class="progress-section">
+                <div class="progress-labels">
                   <div>
-                    <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase mb-1">Cycle Completion</p>
-                    <p class="text-4xl font-black tabular-nums text-indigo-400">{{ emiSummary()?.completionRate | number:'1.1-1' }}%</p>
+                    <p class="mini-label">Cycle Completion</p>
+                    <p class="completion-value">{{ emiSummary()?.completionRate | number:'1.1-1' }}%</p>
                   </div>
                   <div class="text-right">
-                    <p [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase mb-1">Installments Paid</p>
-                    <p class="font-bold tabular-nums text-white">{{ emiSummary()?.paidInstallments }} / {{ emiSummary()?.totalInstallments }}</p>
+                    <p class="mini-label">Installments Paid</p>
+                    <p class="installments-value">{{ emiSummary()?.paidInstallments }} / {{ emiSummary()?.totalInstallments }}</p>
                   </div>
                 </div>
-                <div class="w-full h-4 rounded-full bg-white/5 border overflow-hidden p-1" [style.border-color]="'var(--theme-border-primary)'">
-                  <div class="h-full rounded-full transition-all duration-1000" 
-                       [style.background]="'var(--theme-accent-gradient)'" 
-                       [style.width]="emiSummary()?.completionRate + '%'"></div>
+                <div class="progress-track">
+                  <div class="progress-fill gradient" [style.width]="emiSummary()?.completionRate + '%'"></div>
                 </div>
               </div>
 
-              <div class="grid grid-cols-2 gap-4 mt-auto">
-                <div class="p-3 border text-center" [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius-lg)'">
-                  <p [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold mb-1 uppercase">Overdue</p>
-                  <p class="font-bold tabular-nums" [style.color]="emiSummary()?.overdueInstallments > 0 ? 'var(--theme-error)' : 'var(--theme-text-label)'">{{ emiSummary()?.overdueInstallments }}</p>
+              <div class="stats-box-grid">
+                <div class="stat-box">
+                  <p class="stat-label">Overdue</p>
+                  <p class="stat-value" [class.error]="emiSummary()?.overdueInstallments > 0">
+                    {{ emiSummary()?.overdueInstallments }}
+                  </p>
                 </div>
-                <div class="p-3 border text-center" [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius-lg)'">
-                  <p [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold mb-1 uppercase">Defaults</p>
-                  <p class="font-bold tabular-nums text-rose-500">{{ emiSummary()?.defaultedEMIs }}</p>
+                <div class="stat-box">
+                  <p class="stat-label">Defaults</p>
+                  <p class="stat-value error">{{ emiSummary()?.defaultedEMIs }}</p>
                 </div>
               </div>
 
-              <div class="mt-6 p-4 border border-dashed rounded-lg" [style.border-color]="'var(--theme-success)'" [style.background]="'rgba(16, 185, 129, 0.05)'">
-                  <div class="flex gap-3">
-                    <i class="pi pi-shield-check text-emerald-500 mt-1"></i>
+              <div class="risk-box">
+                  <div class="risk-content">
+                    <i class="pi pi-shield-check risk-icon"></i>
                     <div>
-                      <p class="font-bold text-emerald-500" [style.font-size]="'var(--font-size-xs)'">Credit Risk Observation</p>
-                      <p class="mt-1 leading-relaxed" [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">
-                        Default rate is maintaining a healthy <span class="text-white font-bold">{{ emiSummary()?.defaultRate | number:'1.1-2' }}%</span>. 
+                      <p class="risk-title">Credit Risk Observation</p>
+                      <p class="risk-desc">
+                        Default rate is maintaining a healthy <span class="highlight">{{ emiSummary()?.defaultRate | number:'1.1-2' }}%</span>. 
                       </p>
                     </div>
                   </div>
@@ -155,22 +148,337 @@ interface EMIData {
       </ng-container>
 
       <ng-template #loader>
-        <div class="h-[60vh] flex flex-col items-center justify-center gap-4">
+        <div class="loader-container">
           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-12 h-12"></p-progressSpinner>
-          <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'" class="font-bold uppercase tracking-widest">Auditing Credit Portfolio...</p>
+          <p class="loader-text">Auditing Credit Portfolio...</p>
         </div>
       </ng-template>
 
     </div>
-  `
+  `,
+  styles: [`
+    /* HOST & LAYOUT */
+    :host { display: block; width: 100%; }
+
+    .emi-container {
+      padding: var(--spacing-lg) var(--spacing-xl);
+      background: var(--bg-primary);
+      font-family: var(--font-body);
+      min-height: 100%;
+    }
+
+    /* HEADER */
+    .header-section {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .page-title {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      font-family: var(--font-heading);
+      letter-spacing: -0.01em;
+      margin: 0 0 4px 0;
+    }
+
+    .page-subtitle {
+      color: var(--text-tertiary);
+      font-size: var(--font-size-sm);
+      margin: 0;
+    }
+
+    .action-group { display: flex; align-items: center; gap: var(--spacing-sm); }
+
+    /* KPI GRID */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    /* KPI CARDS */
+    .kpi-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius-xl);
+      padding: var(--spacing-lg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-label {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-label);
+      margin: 0 0 4px 0;
+    }
+    .kpi-label.dark { color: rgba(255,255,255,0.8); }
+
+    .kpi-value {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      font-family: var(--font-heading);
+      margin: 0;
+      color: var(--text-primary);
+    }
+    .kpi-value.success { color: var(--color-success); }
+    .kpi-value.primary { color: var(--text-primary); } /* Default text color */
+    .kpi-value.dark { color: #ffffff; }
+
+    .kpi-subtext {
+      margin-top: var(--spacing-sm);
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+    }
+    .kpi-subtext.dark { color: rgba(255,255,255,0.9); font-weight: bold; }
+
+    .kpi-bg-icon {
+      position: absolute;
+      right: -10px;
+      bottom: -10px;
+      font-size: 4rem;
+      opacity: 0.05;
+      color: var(--text-primary);
+      pointer-events: none;
+    }
+
+    .kpi-badge-row {
+      display: flex;
+      gap: var(--spacing-sm);
+      margin-top: var(--spacing-sm);
+    }
+
+    .badge {
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .badge.success { background: var(--color-success-bg); color: var(--color-success); }
+
+    /* HEALTH CARD (Gradient) */
+    .health-card {
+      background: var(--accent-gradient);
+      border: none;
+      color: #ffffff;
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* LAYOUT GRID */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--spacing-lg);
+    }
+    @media (min-width: 1024px) {
+      .content-grid { grid-template-columns: 7fr 5fr; }
+    }
+
+    /* GRID CARD */
+    .grid-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius-xl);
+      overflow: hidden;
+      height: 100%;
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .grid-header {
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-bottom: 1px solid var(--border-primary);
+      background: var(--bg-ternary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .grid-title {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .grid-tag { font-size: 10px; font-weight: bold; color: var(--text-label); }
+
+    .grid-container { flex: 1; position: relative; }
+    .full-size-grid { width: 100%; height: 100%; display: block; }
+
+    /* PIPELINE CARD */
+    .pipeline-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius-xl);
+      padding: var(--spacing-lg);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pipeline-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .card-title {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .status-indicator { font-size: 10px; font-weight: bold; color: var(--text-label); }
+
+    /* PROGRESS SECTION */
+    .progress-section { margin-bottom: var(--spacing-2xl); }
+
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .mini-label {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin: 0 0 2px 0;
+    }
+
+    .completion-value {
+      font-size: var(--font-size-3xl);
+      font-weight: 900;
+      color: var(--accent-primary);
+      margin: 0;
+      font-family: var(--font-mono);
+    }
+
+    .installments-value {
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      margin: 0;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 1rem;
+      border-radius: 99px;
+      background: var(--bg-ternary);
+      border: 1px solid var(--border-primary);
+      padding: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill.gradient {
+      height: 100%;
+      border-radius: 99px;
+      background: var(--accent-gradient);
+      transition: width 1s ease-out;
+    }
+
+    /* STATS BOX GRID */
+    .stats-box-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-md);
+      margin-top: auto;
+    }
+
+    .stat-box {
+      padding: var(--spacing-sm);
+      background: var(--bg-ternary);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--ui-border-radius-lg);
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      color: var(--text-label);
+      margin: 0 0 2px 0;
+    }
+
+    .stat-value {
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-lg);
+      color: var(--text-label);
+      margin: 0;
+    }
+    .stat-value.error { color: var(--color-error); }
+
+    /* RISK BOX */
+    .risk-box {
+      margin-top: var(--spacing-lg);
+      padding: var(--spacing-md);
+      border: 1px dashed var(--color-success);
+      border-radius: var(--ui-border-radius-lg);
+      background: var(--color-success-bg);
+    }
+
+    .risk-content { display: flex; gap: var(--spacing-sm); }
+    .risk-icon { color: var(--color-success); margin-top: 2px; }
+
+    .risk-title {
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-xs);
+      color: var(--color-success);
+      margin: 0 0 4px 0;
+    }
+
+    .risk-desc {
+      font-size: var(--font-size-xs);
+      color: var(--text-secondary);
+      line-height: 1.4;
+      margin: 0;
+    }
+    
+    .highlight { font-weight: bold; color: var(--text-primary); }
+
+    /* LOADER */
+    .loader-container {
+      height: 60vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-md);
+    }
+    .loader-text {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-tertiary);
+    }
+  `]
 })
 export class EmiAnalyticsComponent implements OnInit {
   emiRawData = signal<EMIData[]>([]);
   loading = signal<boolean>(true);
-  
   emiColumns: any[] = [];
 
-  // Computed helper for the single active plan summary
+  // Computed Summary
   emiSummary: any = computed(() => this.emiRawData().length ? this.emiRawData()[0] : null);
 
   constructor(
@@ -185,6 +493,7 @@ export class EmiAnalyticsComponent implements OnInit {
   }
 
   setupColumns(): void {
+    // Grid columns using Theme Tokens
     this.emiColumns = [
       {
         field: '_id', 
@@ -193,8 +502,17 @@ export class EmiAnalyticsComponent implements OnInit {
         width: 120,
         cellRenderer: (params: any) => {
           const status = params.value || 'Unknown';
-          const colorClass = status === 'active' ? 'text-emerald-400 bg-emerald-500/10' : 'text-slate-400 bg-slate-500/10';
-          return `<span class="uppercase text-[10px] font-bold px-2 py-1 rounded ${colorClass}">${status}</span>`;
+          // Using style attributes for dynamic pills, but colors map to theme variables
+          // Ideally move this logic to a shared utility or CSS class mapping
+          let colorStyle = 'color: var(--text-secondary); background: var(--bg-ternary);';
+          
+          if(status === 'active') {
+             colorStyle = 'color: var(--color-success); background: var(--color-success-bg);';
+          }
+          
+          return `<span style="font-size: 10px; font-weight: 700; text-transform: uppercase; px: 8px; py: 2px; border-radius: 4px; ${colorStyle} padding: 2px 8px;">
+                    ${status}
+                  </span>`;
         }
       },
       {
@@ -204,14 +522,15 @@ export class EmiAnalyticsComponent implements OnInit {
         flex: 1,
         type: 'rightAligned',
         valueFormatter: (params: any) => this.commonService.formatCurrency(params.value),
-        cellStyle: { 'font-weight': '700', 'color': 'var(--theme-text-primary)' }
+        cellStyle: { 'font-weight': '700', 'color': 'var(--text-primary)' }
       },
       {
         field: 'activeEMIs', 
         headerName: 'Plans', 
         sortable: true, 
         width: 80,
-        type: 'rightAligned'
+        type: 'rightAligned',
+        cellStyle: { 'color': 'var(--text-secondary)' }
       },
       {
         field: 'completionRate', 
@@ -221,10 +540,10 @@ export class EmiAnalyticsComponent implements OnInit {
         cellRenderer: (params: any) => {
            const val = params.value || 0;
            return `<div style="display: flex; align-items: center; gap: 8px; height: 100%;">
-                    <div style="flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px;">
-                       <div style="width: ${val}%; height: 100%; background: #818cf8; border-radius: 2px;"></div>
+                    <div style="flex: 1; height: 4px; background: var(--bg-ternary); border-radius: 2px;">
+                       <div style="width: ${val}%; height: 100%; background: var(--accent-primary); border-radius: 2px;"></div>
                     </div>
-                    <span style="font-size: 10px; width: 30px;">${val.toFixed(0)}%</span>
+                    <span style="font-size: 10px; width: 30px; font-family: var(--font-mono); color: var(--text-secondary);">${val.toFixed(0)}%</span>
                    </div>`;
         }
       },
@@ -235,7 +554,7 @@ export class EmiAnalyticsComponent implements OnInit {
         width: 120,
         type: 'rightAligned',
         valueFormatter: (params: any) => this.commonService.formatCurrency(params.value),
-        cellStyle: { 'font-weight': '700', 'color': 'var(--theme-success)' }
+        cellStyle: { 'font-weight': '700', 'color': 'var(--color-success)' }
       }
     ];
     this.cdr.detectChanges();
@@ -254,210 +573,3 @@ export class EmiAnalyticsComponent implements OnInit {
     });
   }
 }
-
-// import { Component, OnInit, signal, computed } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { TableModule } from 'primeng/table';
-// import { ButtonModule } from 'primeng/button';
-// import { ProgressSpinnerModule } from 'primeng/progressspinner';
-// import { TooltipModule } from 'primeng/tooltip';
-// import { CommonMethodService } from '../../core/utils/common-method.service';
-// import { AdminAnalyticsService } from '../admin-analytics.service';
-
-// interface EMIData {
-//   _id: string;
-//   totalAmount: number;
-//   activeEMIs: number;
-//   completedEMIs: number;
-//   defaultedEMIs: number;
-//   totalInstallments: number;
-//   paidInstallments: number;
-//   overdueInstallments: number;
-//   totalInterestEarned: number;
-//   status: string;
-//   completionRate: number;
-//   defaultRate: number;
-// }
-
-// @Component({
-//   selector: 'app-emi-analytics',
-//   standalone: true,
-//   imports: [CommonModule, TableModule, ButtonModule, ProgressSpinnerModule, TooltipModule],
-//   template: `
-//     <div class="p-4 md:p-6 transition-colors duration-300" 
-//          [style.background]="'var(--theme-bg-primary)'"
-//          [style.font-family]="'var(--font-body)'">
-
-//       <div class="mb-8 flex flex-wrap justify-between items-end gap-4">
-//         <div>
-//           <h2 class="font-bold tracking-tight mb-1" 
-//               [style.color]="'var(--theme-text-primary)'"
-//               [style.font-family]="'var(--font-heading)'"
-//               [style.font-size]="'var(--font-size-2xl)'">Credit & EMI Intelligence</h2>
-//           <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">
-//             Monitoring credit exposure, repayment health, and interest yield
-//           </p>
-//         </div>
-//         <div class="flex items-center gap-2">
-//            <p-button label="Credit Limits" icon="pi pi-shield" [text]="true" severity="secondary" size="small"></p-button>
-//            <p-button label="Sync Portfolio" icon="pi pi-refresh" severity="info" size="small" (onClick)="loadData()"></p-button>
-//         </div>
-//       </div>
-
-//       <ng-container *ngIf="!loading(); else loader">
-        
-//         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-//           <div class="p-6 border relative overflow-hidden" 
-//                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//             <p class="uppercase font-bold tracking-widest mb-1" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Total Credit Exposure</p>
-//             <h2 class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'">₹{{ emiSummary()?.totalAmount | number }}</h2>
-//             <p class="mt-2" [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Across {{ emiSummary()?.activeEMIs }} active plans</p>
-//             <i class="pi pi-credit-card absolute right-[-10px] bottom-[-10px] text-6xl opacity-5"></i>
-//           </div>
-
-//           <div class="p-6 border" 
-//                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//             <p class="uppercase font-bold tracking-widest mb-1" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Interest Revenue</p>
-//             <h2 class="text-3xl font-bold tabular-nums text-emerald-500">₹{{ emiSummary()?.totalInterestEarned | number }}</h2>
-//             <div class="flex items-center gap-2 mt-2">
-//                <span class="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold text-[10px]">Realized Gain</span>
-//             </div>
-//           </div>
-
-//           <div class="p-6 border text-white" 
-//                [style.background]="'var(--theme-accent-gradient)'" [style.border-radius]="'var(--ui-border-radius-xl)'" [style.box-shadow]="'var(--shadow-lg)'">
-//             <p class="uppercase font-black tracking-tighter opacity-80 mb-1" [style.font-size]="'var(--font-size-xs)'">Portfolio Health</p>
-//             <h2 class="text-3xl font-bold tabular-nums">{{ 100 - (emiSummary()?.defaultRate || 0) }}%</h2>
-//             <p class="mt-2 font-bold opacity-90" [style.font-size]="'var(--font-size-xs)'">Default Rate: {{ emiSummary()?.defaultRate }}%</p>
-//           </div>
-//         </div>
-
-//         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-//           <div class="lg:col-span-7 space-y-6">
-//             <div class="p-6 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//                <div class="flex justify-between items-center mb-8">
-//                  <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">Repayment Pipeline</h3>
-//                  <span class="text-[10px] font-bold" [style.color]="'var(--theme-text-label)'">SYNCED: LIVE</span>
-//                </div>
-
-//                <div class="mb-10">
-//                  <div class="flex justify-between items-end mb-3">
-//                    <div>
-//                      <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase mb-1">Cycle Completion</p>
-//                      <p class="text-4xl font-black tabular-nums text-indigo-400">{{ emiSummary()?.completionRate | number:'1.1-1' }}%</p>
-//                    </div>
-//                    <div class="text-right">
-//                      <p [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase mb-1">Installments Paid</p>
-//                      <p class="font-bold tabular-nums text-white">{{ emiSummary()?.paidInstallments }} / {{ emiSummary()?.totalInstallments }}</p>
-//                    </div>
-//                  </div>
-//                  <div class="w-full h-4 rounded-full bg-white/5 border overflow-hidden p-1" [style.border-color]="'var(--theme-border-primary)'">
-//                    <div class="h-full rounded-full transition-all duration-1000" 
-//                         [style.background]="'var(--theme-accent-gradient)'" 
-//                         [style.width]="emiSummary()?.completionRate + '%'"></div>
-//                  </div>
-//                </div>
-
-//                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-//                  <div class="p-3 border text-center" [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius-lg)'">
-//                    <p [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold mb-1 uppercase">Active</p>
-//                    <p class="font-bold text-white tabular-nums">{{ emiSummary()?.activeEMIs }}</p>
-//                  </div>
-//                  <div class="p-3 border text-center" [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius-lg)'">
-//                    <p [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold mb-1 uppercase">Overdue</p>
-//                    <p class="font-bold tabular-nums" [style.color]="emiSummary()?.overdueInstallments > 0 ? 'var(--theme-error)' : 'var(--theme-text-label)'">{{ emiSummary()?.overdueInstallments }}</p>
-//                  </div>
-//                  <div class="p-3 border text-center" [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius-lg)'">
-//                    <p [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold mb-1 uppercase">Done</p>
-//                    <p class="font-bold text-white tabular-nums">{{ emiSummary()?.completedEMIs }}</p>
-//                  </div>
-//                  <div class="p-3 border text-center" [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius-lg)'">
-//                    <p [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold mb-1 uppercase">Defaults</p>
-//                    <p class="font-bold tabular-nums text-rose-500">{{ emiSummary()?.defaultedEMIs }}</p>
-//                  </div>
-//                </div>
-//             </div>
-//           </div>
-
-//           <div class="lg:col-span-5 space-y-6">
-//             <div class="p-6 border h-full flex flex-col" 
-//                  [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//               <h4 class="font-bold mb-6 uppercase tracking-tighter" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Portfolio Management</h4>
-              
-//               <div class="space-y-3 mb-8">
-//                 <button class="w-full p-4 border flex items-center justify-between transition-colors hover:bg-white/5" 
-//                         [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius-lg)'">
-//                   <div class="flex items-center gap-3">
-//                     <i class="pi pi-bell text-amber-400"></i>
-//                     <span class="font-bold text-white" [style.font-size]="'var(--font-size-sm)'">Send Payment Reminders</span>
-//                   </div>
-//                   <i class="pi pi-chevron-right text-[10px] text-slate-500"></i>
-//                 </button>
-//                 <button class="w-full p-4 border flex items-center justify-between transition-colors hover:bg-white/5" 
-//                         [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius-lg)'">
-//                   <div class="flex items-center gap-3">
-//                     <i class="pi pi-file-edit text-indigo-400"></i>
-//                     <span class="font-bold text-white" [style.font-size]="'var(--font-size-sm)'">Restructure Active Plans</span>
-//                   </div>
-//                   <i class="pi pi-chevron-right text-[10px] text-slate-500"></i>
-//                 </button>
-//               </div>
-
-//               <div class="mt-auto p-4 border border-dashed rounded-lg" [style.border-color]="'var(--theme-success)'" [style.background]="'rgba(16, 185, 129, 0.05)'">
-//                  <div class="flex gap-3">
-//                    <i class="pi pi-shield-check text-emerald-500 mt-1"></i>
-//                    <div>
-//                      <p class="font-bold text-emerald-500" [style.font-size]="'var(--font-size-xs)'">Credit Risk Observation</p>
-//                      <p class="mt-1 leading-relaxed" [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">
-//                        Default rate is maintaining a healthy <span class="text-white font-bold">0%</span>. 
-//                        Current cycle completion is at <span class="text-white font-bold">27%</span>. Consider increasing high-ticket credit limits for "Platinum" customers.
-//                      </p>
-//                    </div>
-//                  </div>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-
-//       </ng-container>
-
-//       <ng-template #loader>
-//         <div class="h-[60vh] flex flex-col items-center justify-center gap-4">
-//           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-12 h-12"></p-progressSpinner>
-//           <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'" class="font-bold uppercase tracking-widest">Auditing Credit Portfolio...</p>
-//         </div>
-//       </ng-template>
-
-//     </div>
-//   `
-// })
-// export class EmiAnalyticsComponent implements OnInit {
-//   emiRawData = signal<EMIData[]>([]);
-//   loading = signal<boolean>(true);
-
-//   // Computed helper for the single active plan summary
-//   emiSummary:any = computed(() => this.emiRawData().length ? this.emiRawData()[0] : null);
-
-//   constructor(
-//     private analyticsService: AdminAnalyticsService,
-//     public commonService: CommonMethodService
-//   ) {}
-
-//   ngOnInit() {
-//     this.loadData();
-//   }
-
-//   loadData() {
-//     this.loading.set(true);
-//     this.analyticsService.getEMIAnalytics().subscribe({
-//       next: (res) => {
-//         if (res.status === 'success') {
-//           this.emiRawData.set(res.data);
-//         }
-//         this.loading.set(false);
-//       },
-//       error: () => this.loading.set(false)
-//     });
-//   }
-// }
