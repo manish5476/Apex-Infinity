@@ -1792,7 +1792,98 @@
     border-color: var(--accent-primary); /* Highlight border on open */
   }
 }
+/* ==========================================================================
+   FIX: SELECT / DROPDOWN HEIGHT (p-select)
+   Issue: Height mismatch with standard inputs
+   Fix: Enforce Flex centering & explicit line-height
+   ========================================================================== */
 
+.p-select {
+  /* 1. Structure */
+  display: inline-flex;
+  align-items: center; /* Vertically center content */
+  position: relative;
+  
+  /* 2. Sizing - Match Input Text exactly */
+  /* If your inputs are ~36px tall (standard compact), this ensures the wrapper matches */
+  min-height: calc(
+    (var(--font-size-base) * var(--line-height-normal)) + 
+    (var(--spacing-sm) * 2) + 
+    2px /* Borders */
+  ); 
+
+  /* 3. Appearance */
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--ui-border-radius);
+  transition: all 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
+  width: 100%;
+
+  /* Focus & Hover */
+  &:not(.p-disabled):hover {
+    border-color: var(--border-secondary);
+    background: var(--component-bg-hover);
+  }
+  
+  &.p-focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+  }
+
+  &.p-disabled {
+    opacity: var(--state-disabled-opacity);
+    background: var(--bg-ternary);
+  }
+}
+
+/* THE LABEL (Selected Value) */
+.p-select-label {
+  flex: 1 1 auto;
+  width: 1%; /* Fixes flex overflow issues */
+  
+  /* Critical: Padding must match p-inputtext padding exactly */
+  padding: var(--spacing-sm) var(--spacing-md); 
+  
+  /* Critical: Typography must match input exactly */
+  font-family: var(--font-body);
+  font-size: var(--font-size-base); /* 13px */
+  line-height: var(--line-height-normal); /* 1.3 */
+  color: var(--text-primary);
+  
+  /* Layout */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  
+  &.p-placeholder {
+    color: var(--text-muted);
+  }
+}
+
+/* THE DROPDOWN ICON CONTAINER */
+.p-select-dropdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  
+  width: 2.5rem; 
+  height: 100%; /* Stretch to fill height of the input */
+  
+  background: transparent;
+  color: var(--text-secondary);
+  border-left: 1px solid transparent; /* Optional divider */
+}
+
+/* THE CLEAR ICON (If visible) */
+.p-select-clear-icon {
+  position: absolute;
+  top: 50%;
+  right: 2.5rem; /* Left of the chevron */
+  margin-top: -0.5em; /* Perfect center offset */
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
 // /* ==========================================================================
 //    PRIMENG V18+ "HYPER-SLEEK" OVERRIDES (Global)
 //    Strictly mapped to your Theme Tokens
