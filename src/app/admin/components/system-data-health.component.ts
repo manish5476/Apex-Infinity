@@ -10,17 +10,12 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
   standalone: true,
   imports: [CommonModule, ButtonModule, TooltipModule, ProgressSpinnerModule],
   template: `
-    <div class="p-4 md:p-6 transition-colors duration-300" 
-         [style.background]="'var(--theme-bg-primary)'"
-         [style.font-family]="'var(--font-body)'">
+    <div class="health-container">
 
-      <div class="mb-8 flex flex-wrap justify-between items-end gap-4">
+      <div class="header-section">
         <div>
-          <h2 class="font-bold tracking-tight mb-1" 
-              [style.color]="'var(--theme-text-primary)'"
-              [style.font-family]="'var(--font-heading)'"
-              [style.font-size]="'var(--font-size-2xl)'">Data Health Diagnostics</h2>
-          <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">
+          <h2 class="page-title">Data Health Diagnostics</h2>
+          <p class="page-subtitle">
             Real-time monitoring of database consistency and synchronization integrity
           </p>
         </div>
@@ -29,104 +24,84 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
 
       <ng-container *ngIf="!loading(); else loader">
         
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="content-grid">
           
-          <div class="lg:col-span-4 space-y-6">
-            <div class="p-8 border flex flex-col items-center justify-center text-center" 
-                 [style.background]="'var(--theme-bg-secondary)'" 
-                 [style.border-color]="'var(--theme-border-primary)'" 
-                 [style.border-radius]="'var(--ui-border-radius-xl)'">
+          <div class="side-column">
+            
+            <div class="score-card">
+              <p class="score-label">Overall Integrity</p>
               
-              <p class="uppercase font-bold tracking-widest mb-6" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Overall Integrity</p>
-              
-              <div class="relative flex items-center justify-center mb-6">
-                 <svg class="w-40 h-40 transform -rotate-90">
-                   <circle cx="80" cy="80" r="72" stroke="currentColor" stroke-width="10" fill="transparent" [style.color]="'var(--theme-bg-ternary)'" />
-                   <circle cx="80" cy="80" r="72" stroke="currentColor" stroke-width="10" fill="transparent"
-                     [style.color]="getScoreColor()"
+              <div class="score-circle">
+                 <svg class="progress-ring" viewBox="0 0 160 160">
+                   <circle cx="80" cy="80" r="72" class="ring-track" />
+                   <circle cx="80" cy="80" r="72" 
+                     class="ring-value"
+                     [ngClass]="getScoreClass()"
                      stroke-dasharray="452.3"
                      [attr.stroke-dashoffset]="452.3 - (452.3 * healthData()?.score / 100)"
-                     stroke-linecap="round"
-                     class="transition-all duration-1000" />
+                   />
                  </svg>
-                 <div class="absolute flex flex-col items-center">
-                    <span class="text-4xl font-black text-white tabular-nums">{{ healthData()?.score }}%</span>
-                    <span class="text-[10px] font-bold uppercase" [style.color]="getScoreColor()">{{ getScoreStatus() }}</span>
+                 <div class="score-text">
+                    <span class="score-number">{{ healthData()?.score }}%</span>
+                    <span class="score-status" [ngClass]="getScoreClass()">{{ getScoreStatus() }}</span>
                  </div>
               </div>
 
-              <div class="w-full p-4 rounded-lg" [style.background]="'var(--theme-bg-ternary)'">
-                 <div class="flex justify-between items-center mb-2">
-                    <span [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Checks Passed</span>
-                    <span class="font-bold text-white tabular-nums">1/{{ healthData()?.checks?.length }}</span>
+              <div class="checks-bar-container">
+                 <div class="checks-header">
+                    <span class="checks-label">Checks Passed</span>
+                    <span class="checks-value">1/{{ healthData()?.checks?.length }}</span>
                  </div>
-                 <div class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                    <div class="h-full bg-amber-500" [style.width]="'50%'"></div>
+                 <div class="progress-track">
+                    <div class="progress-fill warning" style="width: 50%"></div>
                  </div>
               </div>
             </div>
 
-            <div class="p-5 border transition-colors shadow-inner" 
-                 [style.background]="'var(--theme-accent-gradient)'" 
-                 [style.border-radius]="'var(--ui-border-radius-xl)'">
-               <div class="text-white">
-                 <p class="font-black uppercase tracking-tighter opacity-80" [style.font-size]="'var(--font-size-xs)'">Last Log Audit</p>
-                 <h3 class="font-bold mt-1">{{ meta()?.timestamp | date:'medium' }}</h3>
-                 <p class="mt-4 text-[10px] leading-relaxed opacity-90">
+            <div class="log-card">
+               <div class="log-content">
+                 <p class="log-label">Last Log Audit</p>
+                 <h3 class="log-time">{{ meta()?.timestamp | date:'medium' }}</h3>
+                 <p class="log-desc">
                    System response time optimized at <strong>{{ meta()?.responseTime }}</strong>.
                  </p>
                </div>
             </div>
           </div>
 
-          <div class="lg:col-span-8 space-y-6">
+          <div class="main-column">
             
-            <div class="p-6 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-               <h3 class="font-bold uppercase tracking-tight mb-6" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">Consistency Diagnostics</h3>
+            <div class="diagnostics-card">
+               <h3 class="card-title mb-md">Consistency Diagnostics</h3>
                
-               <div class="space-y-4">
+               <div class="diagnostics-list">
                  @for (item of healthData()?.checks; track item.check) {
-                   <div class="p-4 border transition-all flex items-start justify-between" 
-                        [style.background]="'var(--theme-bg-ternary)'" 
-                        [style.border-color]="'var(--theme-border-secondary)'"
-                        [style.border-radius]="'var(--ui-border-radius-lg)'">
-                      <div class="flex gap-4">
-                        <div class="w-10 h-10 rounded flex items-center justify-center shrink-0"
-                             [style.background]="item.status === 'healthy' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(251, 191, 36, 0.1)'">
-                          <i class="pi" [ngClass]="item.status === 'healthy' ? 'pi-check-circle text-emerald-500' : 'pi-exclamation-circle text-amber-500'"></i>
+                   <div class="diagnostic-item" [ngClass]="item.status">
+                      <div class="item-left">
+                        <div class="status-icon-box">
+                          <i class="pi" [ngClass]="item.status === 'healthy' ? 'pi-check-circle' : 'pi-exclamation-circle'"></i>
                         </div>
                         <div>
-                          <p class="font-bold text-white mb-1" [style.font-size]="'var(--font-size-sm)'">{{ item.check }}</p>
-                          <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">{{ item.details }}</p>
+                          <p class="check-name">{{ item.check }}</p>
+                          <p class="check-detail">{{ item.details }}</p>
                         </div>
                       </div>
-                      <span class="font-black uppercase text-[9px] px-2 py-1 rounded"
-                            [style.background]="item.status === 'healthy' ? 'var(--theme-success)' : 'var(--theme-warning)'"
-                            [style.color]="'#000'">
-                        {{ item.status }}
-                      </span>
+                      <span class="status-badge">{{ item.status }}</span>
                    </div>
                  }
                </div>
             </div>
 
-            <div class="p-6 border border-dashed" 
-                 [style.background]="'rgba(139, 92, 246, 0.03)'" 
-                 [style.border-color]="'var(--theme-accent-primary)'" 
-                 [style.border-radius]="'var(--ui-border-radius-xl)'">
-              <div class="flex items-center gap-2 mb-6">
-                <i class="pi pi-sparkles text-indigo-400"></i>
-                <h4 class="font-bold uppercase tracking-widest text-indigo-300" [style.font-size]="'var(--font-size-xs)'">Optimization Roadmap</h4>
+            <div class="roadmap-card">
+              <div class="roadmap-header mb-md">
+                <i class="pi pi-sparkles roadmap-icon"></i>
+                <h4 class="roadmap-title">Optimization Roadmap</h4>
               </div>
               
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="roadmap-grid">
                 @for (rec of healthData()?.recommendations; track rec) {
-                  <div class="p-3 border rounded-lg hover:bg-white/5 cursor-default transition-colors" 
-                       [style.border-color]="'var(--theme-border-primary)'"
-                       [style.background]="'var(--theme-bg-secondary)'">
-                    <p [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'" class="leading-relaxed">
-                      {{ rec }}
-                    </p>
+                  <div class="roadmap-item">
+                    <p class="rec-text">{{ rec }}</p>
                   </div>
                 }
               </div>
@@ -138,14 +113,291 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
       </ng-container>
 
       <ng-template #loader>
-        <div class="h-[60vh] flex flex-col items-center justify-center gap-4">
+        <div class="loader-container">
           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-12 h-12"></p-progressSpinner>
-          <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'" class="font-bold uppercase tracking-widest">Running System Diagnostics...</p>
+          <p class="loader-text">Running System Diagnostics...</p>
         </div>
       </ng-template>
 
     </div>
-  `
+  `,
+  styles: [`
+    /* HOST & LAYOUT */
+    :host { display: block; width: 100%; }
+
+    .health-container {
+      padding: var(--spacing-lg) var(--spacing-xl);
+      background: var(--bg-primary);
+      font-family: var(--font-body);
+      min-height: 100%;
+    }
+
+    /* HEADER */
+    .header-section {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .page-title {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      font-family: var(--font-heading);
+      letter-spacing: -0.01em;
+      margin: 0 0 4px 0;
+    }
+
+    .page-subtitle {
+      color: var(--text-tertiary);
+      font-size: var(--font-size-sm);
+      margin: 0;
+    }
+
+    /* CONTENT GRID */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--spacing-lg);
+    }
+    @media(min-width: 1024px) {
+      .content-grid { grid-template-columns: 1fr 2fr; }
+    }
+
+    /* SIDE COLUMN */
+    .side-column { display: flex; flex-direction: column; gap: var(--spacing-lg); }
+
+    /* SCORE CARD */
+    .score-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius-xl);
+      padding: var(--spacing-xl);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .score-label {
+      font-size: var(--font-size-xs);
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-label);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .score-circle { position: relative; width: 160px; height: 160px; margin-bottom: var(--spacing-xl); }
+
+    .progress-ring { transform: rotate(-90deg); width: 100%; height: 100%; }
+    
+    .ring-track {
+      fill: transparent;
+      stroke: var(--bg-ternary);
+      stroke-width: 10;
+    }
+
+    .ring-value {
+      fill: transparent;
+      stroke-width: 10;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1s ease-in-out;
+    }
+    /* Dynamic stroke colors based on class */
+    .ring-value.success { stroke: var(--color-success); }
+    .ring-value.warning { stroke: var(--color-warning); }
+    .ring-value.error { stroke: var(--color-error); }
+
+    .score-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .score-number {
+      font-size: var(--font-size-4xl);
+      font-weight: 900;
+      color: var(--text-primary);
+      font-family: var(--font-heading);
+      line-height: 1;
+    }
+
+    .score-status {
+      font-size: 10px;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+    .score-status.success { color: var(--color-success); }
+    .score-status.warning { color: var(--color-warning); }
+    .score-status.error { color: var(--color-error); }
+
+    .checks-bar-container {
+      width: 100%;
+      padding: var(--spacing-md);
+      background: var(--bg-ternary);
+      border-radius: var(--ui-border-radius);
+    }
+
+    .checks-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .checks-label { font-size: var(--font-size-xs); color: var(--text-tertiary); }
+    .checks-value { font-weight: bold; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-fill.warning { background: var(--color-warning); height: 100%; }
+
+    /* LOG CARD (Gradient) */
+    .log-card {
+      background: var(--accent-gradient);
+      border-radius: var(--ui-border-radius-xl);
+      padding: var(--spacing-lg);
+      box-shadow: var(--shadow-sm);
+      color: #ffffff;
+    }
+
+    .log-label {
+      font-size: var(--font-size-xs);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      opacity: 0.8;
+      margin: 0 0 4px 0;
+    }
+
+    .log-time { font-size: var(--font-size-md); font-weight: bold; margin: 0; }
+
+    .log-desc {
+      font-size: 10px;
+      margin-top: var(--spacing-md);
+      opacity: 0.9;
+      line-height: 1.4;
+    }
+
+    /* MAIN COLUMN */
+    .main-column { display: flex; flex-direction: column; gap: var(--spacing-lg); }
+
+    /* DIAGNOSTICS CARD */
+    .diagnostics-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius-xl);
+      padding: var(--spacing-xl);
+    }
+
+    .card-title {
+      font-size: var(--font-size-sm);
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    .mb-md { margin-bottom: var(--spacing-md); }
+
+    .diagnostics-list { display: flex; flex-direction: column; gap: var(--spacing-md); }
+
+    .diagnostic-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: var(--spacing-md);
+      background: var(--bg-ternary);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--ui-border-radius-lg);
+      transition: background 0.2s;
+    }
+    .diagnostic-item:hover { background: var(--component-bg-hover); }
+
+    .item-left { display: flex; gap: var(--spacing-md); }
+
+    .status-icon-box {
+      width: 2.5rem; height: 2.5rem;
+      border-radius: var(--ui-border-radius);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    /* Dynamic Icon Colors */
+    .diagnostic-item.healthy .status-icon-box { background: var(--color-success-bg); color: var(--color-success); }
+    .diagnostic-item.warning .status-icon-box { background: var(--color-warning-bg); color: var(--color-warning); }
+    .diagnostic-item.error .status-icon-box { background: var(--color-error-bg); color: var(--color-error); }
+
+    .check-name { font-weight: bold; font-size: var(--font-size-sm); color: var(--text-primary); margin: 0 0 2px 0; }
+    .check-detail { font-size: var(--font-size-xs); color: var(--text-tertiary); margin: 0; }
+
+    .status-badge {
+      font-size: 9px;
+      font-weight: 900;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #000; /* Contrast against colored badge */
+    }
+    .diagnostic-item.healthy .status-badge { background: var(--color-success); }
+    .diagnostic-item.warning .status-badge { background: var(--color-warning); }
+    .diagnostic-item.error .status-badge { background: var(--color-error); color: #fff; }
+
+    /* ROADMAP CARD */
+    .roadmap-card {
+      padding: var(--spacing-xl);
+      border: 1px dashed var(--accent-secondary);
+      background: var(--accent-focus); /* Low opacity accent bg */
+      border-radius: var(--ui-border-radius-xl);
+    }
+
+    .roadmap-header { display: flex; items-align: center; gap: var(--spacing-sm); }
+    .roadmap-icon { color: var(--accent-primary); }
+    .roadmap-title { font-size: var(--font-size-xs); font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-primary); margin: 0; }
+
+    .roadmap-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--spacing-md);
+    }
+    @media(min-width: 768px) { .roadmap-grid { grid-template-columns: 1fr 1fr; } }
+
+    .roadmap-item {
+      padding: var(--spacing-sm);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius);
+      cursor: default;
+      transition: border-color 0.2s;
+    }
+    .roadmap-item:hover { border-color: var(--accent-secondary); }
+
+    .rec-text { font-size: var(--font-size-xs); color: var(--text-secondary); line-height: 1.4; margin: 0; }
+
+    /* LOADER */
+    .loader-container {
+      height: 60vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-md);
+    }
+    .loader-text {
+      font-size: var(--font-size-sm);
+      color: var(--text-tertiary);
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  `]
 })
 export class SystemDataHealthComponent implements OnInit {
   healthData = signal<any>(null);
@@ -172,12 +424,12 @@ export class SystemDataHealthComponent implements OnInit {
     });
   }
 
-  // Visual Helpers
-  getScoreColor(): string {
+  // Returns CSS Class for styling (success, warning, error)
+  getScoreClass(): string {
     const score = this.healthData()?.score || 0;
-    if (score >= 90) return 'var(--theme-success)';
-    if (score >= 50) return 'var(--theme-warning)';
-    return 'var(--theme-error)';
+    if (score >= 90) return 'success';
+    if (score >= 50) return 'warning';
+    return 'error';
   }
 
   getScoreStatus(): string {
