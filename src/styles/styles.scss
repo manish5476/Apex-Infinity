@@ -219,3 +219,125 @@
     scroll-behavior: smooth;
 }
 
+/* ==========================================================================
+   GLOBAL COMPONENT OVERRIDE: TABS (p-tabs)
+   Design System: Refined Compact
+   Behavior: Applies automatically to ALL <p-tabs>
+   ========================================================================== */
+
+/* 1. ROOT CONTAINER */
+.p-tabs {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base); /* 13px */
+  color: var(--text-primary);
+  
+  /* OPTIONAL: If you want tabs to always fill width */
+  display: flex;
+  flex-direction: column;
+}
+
+/* 2. THE LIST WRAPPER (The Header Bar) */
+.p-tablist {
+  background: transparent;
+  /* Uses your theme border for a subtle divider */
+  border-bottom: 1px solid var(--border-secondary); 
+  position: relative;
+  /* Spacing between tabs and content */
+  margin-bottom: var(--spacing-md); 
+}
+
+/* 3. INDIVIDUAL TABS */
+.p-tab {
+  /* Layout & Spacing (Compact Grid) */
+  padding: var(--spacing-md) var(--spacing-xl); /* 0.5rem 1rem */
+  margin: 0; /* Remove default margins */
+  gap: var(--spacing-sm); /* Space between icon & text */
+  
+  /* Typography */
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-base);
+  color: var(--text-secondary); /* Inactive tabs are muted */
+  
+  /* Structure */
+  background: transparent;
+  border: none;
+  border-radius: var(--ui-border-radius-sm) var(--ui-border-radius-sm) 0 0; /* Top rounded corners */
+  cursor: pointer;
+  user-select: none;
+  
+  /* Smooth Transitions (Using your custom bezier) */
+  transition: color 0.2s cubic-bezier(0.2, 0.9, 0.2, 1), 
+              background-color 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
+
+  /* --- STATE: HOVER --- */
+  &:hover:not([aria-selected="true"]) {
+    background-color: var(--component-bg-hover);
+    color: var(--text-primary);
+  }
+
+  /* --- STATE: ACTIVE --- */
+  &[aria-selected="true"] {
+    color: var(--accent-primary); /* Highlights with your primary accent */
+    background-color: transparent;
+    font-weight: var(--font-weight-semibold); /* Semibold for readability */
+  }
+
+  /* --- STATE: FOCUS --- */
+  &:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: -2px;
+    z-index: 2; /* Bring focused tab above others */
+  }
+}
+
+/* 4. THE INK BAR (The sliding underline) */
+.p-tablist-active-bar {
+  height: 2px; /* Sleek line */
+  background-color: var(--accent-primary); /* Syncs with active text */
+  bottom: -1px; /* Sits exactly on top of the bottom border */
+  z-index: 10;
+  
+  /* Smooth Slide Animation */
+  transition: width 0.25s cubic-bezier(0.23, 1, 0.32, 1), 
+              left 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* 5. NAVIGATION BUTTONS (Arrows when tabs overflow) */
+.p-tablist-nav-button {
+  background: transparent;
+  width: 2.5rem; /* Standard touch target size */
+  height: auto;
+  color: var(--text-secondary);
+  border-radius: var(--ui-border-radius);
+  transition: var(--transition-base);
+
+  /* Center icons */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background-color: var(--component-bg-hover);
+    color: var(--text-primary);
+  }
+
+  &:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: -2px;
+  }
+}
+
+/* 6. CONTENT PANELS WRAPPER */
+.p-tabpanels {
+  background: transparent;
+  padding: 0;
+  border: none;
+}
+
+/* 7. INDIVIDUAL CONTENT PANEL */
+.p-tabs-panel {
+  padding: var(--spacing-xl) 0; /* Vertical breathing room only */
+  color: var(--text-primary);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-relaxed);
+}
