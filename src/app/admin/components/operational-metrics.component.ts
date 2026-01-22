@@ -358,59 +358,89 @@ export class OperationalMetricsComponent implements OnInit {
     this.loadData();
   }
 
-  setupColumns(): void {
-    // Columns using CSS Variables for Theming
-    this.staffColumns = [
-      {
-        field: 'name', 
-        headerName: 'Sales Associate', 
-        sortable: true, 
-        flex: 1,
-        minWidth: 200,
-        cellRenderer: (params: any) => {
-          const name = params.value || 'Unknown';
-          const initials = this.commonService.getInitials(name);
+setupColumns(): void {
+  this.staffColumns = [
+    {
+      field: 'name', 
+      headerName: 'Sales Associate', 
+      sortable: true, 
+      flex: 1, 
+      minWidth: 240,
+      // Custom Renderer: Avatar + Name + Email stacked tightly
+      cellRenderer: (params: any) => {
+        const name = params.value || 'Unknown';
+        const initials = this.commonService.getInitials(name);
+        const email = params.data.email || '';
 
-          return `<div style="display: flex; align-items: center; gap: 12px; height: 100%;">
-                    <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent-gradient); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 10px;">
-                      ${initials}
-                    </div>
-                    <div style="display: flex; flex-direction: column;">
-                      <span style="font-weight: 700; color: var(--text-primary); font-size: var(--font-size-sm);">${name}</span>
-                      <span style="font-size: 10px; color: var(--text-tertiary); margin-top: 2px;">${params.data.email || ''}</span>
-                    </div>
-                  </div>`;
-        }
-      },
-      {
-        field: 'invoiceCount', 
-        headerName: 'Invoices', 
-        sortable: true, 
-        width: 100,
-        type: 'rightAligned',
-        cellStyle: { 'font-family': 'var(--font-mono)', 'font-weight': '700', 'text-align': 'right', 'color': 'var(--text-secondary)' }
-      },
-      {
-        field: 'avgTicketSize', 
-        headerName: 'Avg Ticket', 
-        sortable: true, 
-        width: 130,
-        type: 'rightAligned',
-        valueFormatter: (params: any) => this.commonService.formatCurrency(params.value),
-        cellStyle: { 'font-weight': '700', 'color': 'var(--text-primary)', 'text-align': 'right' }
-      },
-      {
-        field: 'totalSales', 
-        headerName: 'Total Contribution', 
-        sortable: true, 
-        width: 150,
-        type: 'rightAligned',
-        valueFormatter: (params: any) => this.commonService.formatCurrency(params.value),
-        cellStyle: { 'font-weight': '700', 'color': 'var(--color-success)', 'text-align': 'right' }
+        return `
+          <div style="display: flex; align-items: center; gap: 10px; height: 100%; padding: 0 4px;">
+            <div style="
+              width: 28px; 
+              height: 28px; 
+              border-radius: 50%; 
+              background: linear-gradient(135deg, var(--theme-accent-primary), var(--theme-accent-secondary)); 
+              color: #ffffff; 
+              display: flex; 
+              align-items: center; 
+              justify-content: center; 
+              font-weight: 700; 
+              font-size: 10px;
+              box-shadow: var(--shadow-sm);
+              flex-shrink: 0;">
+              ${initials}
+            </div>
+            
+            <div style="display: flex; flex-direction: column; justify-content: center; line-height: 1.2; overflow: hidden;">
+              <span style="font-weight: 600; color: var(--theme-text-primary); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${name}</span>
+              ${email ? `<span style="font-size: 10px; color: var(--theme-text-tertiary);">${email}</span>` : ''}
+            </div>
+          </div>`;
       }
-    ];
-    this.cdr.detectChanges();
-  }
+    },
+    {
+      field: 'invoiceCount', 
+      headerName: 'Invoices', 
+      sortable: true, 
+      width: 110, 
+      type: 'rightAligned',
+      cellStyle: { 
+        'font-family': 'var(--font-mono)', 
+        'font-weight': '600', 
+        'color': 'var(--theme-text-secondary)',
+        'display': 'flex', 'align-items': 'center', 'justify-content': 'flex-end'
+      }
+    },
+    {
+      field: 'avgTicketSize', 
+      headerName: 'Avg Ticket', 
+      sortable: true, 
+      width: 140, 
+      type: 'rightAligned',
+      valueFormatter: (params: any) => this.commonService.formatCurrency(params.value),
+      cellStyle: { 
+        'font-family': 'var(--font-mono)',
+        'font-weight': '600', 
+        'color': 'var(--theme-text-primary)', 
+        'display': 'flex', 'align-items': 'center', 'justify-content': 'flex-end'
+      }
+    },
+    {
+      field: 'totalSales', 
+      headerName: 'Total Contribution', 
+      sortable: true, 
+      width: 160, 
+      type: 'rightAligned',
+      valueFormatter: (params: any) => this.commonService.formatCurrency(params.value),
+      cellStyle: { 
+        'font-family': 'var(--font-mono)',
+        'font-weight': '700', 
+        'color': 'var(--color-success)', 
+        'display': 'flex', 'align-items': 'center', 'justify-content': 'flex-end'
+      }
+    }
+  ];
+  this.cdr.detectChanges();
+}
 
   loadData() {
     this.loading.set(true);
