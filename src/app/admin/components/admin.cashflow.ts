@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
@@ -11,77 +11,75 @@ import { CommonMethodService } from '../../core/utils/common-method.service';
   standalone: true,
   imports: [CommonModule, ButtonModule, TooltipModule, ProgressSpinnerModule],
   template: `
-    <div class="p-4 md:p-6 transition-colors duration-300" 
-         [style.background]="'var(--theme-bg-primary)'"
-         [style.font-family]="'var(--font-body)'">
+    <div class="cashflow-container">
 
       <ng-container *ngIf="!loading(); else loader">
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div class="p-5 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-            <p class="uppercase font-bold tracking-widest mb-1" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Available Liquidity</p>
-            <h2 class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-success)'">₹{{ cashData()?.summary?.profit?.value | number }}</h2>
-            <p class="mt-2" [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Net Cash Position</p>
+        <div class="kpi-grid">
+          
+          <div class="kpi-card">
+            <p class="kpi-label">Available Liquidity</p>
+            <h2 class="kpi-value success">₹{{ cashData()?.summary?.profit?.value | number }}</h2>
+            <p class="kpi-subtext">Net Cash Position</p>
           </div>
 
-          <div class="p-5 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-            <p class="uppercase font-bold tracking-widest mb-1" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Receivables (0-30d)</p>
-            <h2 class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-warning)'">₹{{ cashData()?.receivables?.aging[0]?.amount | number }}</h2>
-            <p class="mt-2" [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Inbound flow pending</p>
+          <div class="kpi-card">
+            <p class="kpi-label">Receivables (0-30d)</p>
+            <h2 class="kpi-value warning">₹{{ cashData()?.receivables?.aging[0]?.amount | number }}</h2>
+            <p class="kpi-subtext">Inbound flow pending</p>
           </div>
 
-          <div class="p-5 border" [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-            <p class="uppercase font-bold tracking-widest mb-1" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Cash-to-Debt Ratio</p>
-            <h2 class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'">1:2.4</h2>
-            <div class="w-full h-1.5 bg-white/5 rounded-full mt-3 overflow-hidden">
-               <div class="h-full bg-indigo-500" [style.width]="'40%'"></div>
+          <div class="kpi-card ratio-card">
+            <p class="kpi-label">Cash-to-Debt Ratio</p>
+            <h2 class="kpi-value">1:2.4</h2>
+            <div class="progress-track">
+               <div class="progress-fill" [style.width]="'40%'"></div>
             </div>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="analysis-grid">
           
-          <div class="lg:col-span-7 space-y-6">
-            <div class="p-6 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-              <div class="flex justify-between items-center mb-6">
-                <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-md)'">Inbound Aging Report </h3>
-                <p-button icon="pi pi-print" [text]="true" size="small"></p-button>
+          <div class="analysis-column main">
+            <div class="content-card">
+              <div class="card-header">
+                <h3 class="card-title">Inbound Aging Report</h3>
+                <p-button icon="pi pi-print" [text]="true" size="small" severity="secondary"></p-button>
               </div>
 
-              <div class="space-y-3">
+              <div class="aging-list">
                 @for (aging of cashData()?.receivables?.aging; track aging.range) {
-                  <div class="p-4 border flex items-center justify-between transition-colors hover:bg-white/5" 
-                       [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius-lg)'">
-                    <div class="flex items-center gap-4">
-                      <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-rose-500/10 text-rose-500">
+                  <div class="aging-item">
+                    <div class="aging-info">
+                      <div class="aging-icon-box">
                          <i class="pi pi-history"></i>
                       </div>
                       <div>
-                        <p class="font-bold" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">{{ aging.range }}</p>
-                        <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">{{ aging.count }} Pending Invoices</p>
+                        <p class="item-title">{{ aging.range }}</p>
+                        <p class="item-subtitle">{{ aging.count }} Pending Invoices</p>
                       </div>
                     </div>
-                    <div class="text-right">
-                      <p class="text-lg font-bold tabular-nums" [style.color]="'var(--theme-error)'">₹{{ aging.amount | number }}</p>
-                      <span class="text-[10px] font-bold uppercase p-1 rounded bg-rose-500/10 text-rose-500">High Priority</span>
+                    <div class="aging-value-box">
+                      <p class="item-amount">₹{{ aging.amount | number }}</p>
+                      <span class="status-badge high-priority">High Priority</span>
                     </div>
                   </div>
                 }
                 @if (!cashData()?.receivables?.aging?.length) {
-                   <div class="p-8 border border-dashed rounded-lg flex flex-col items-center justify-center opacity-60">
-                      <i class="pi pi-check-circle text-4xl text-emerald-500 mb-2"></i>
-                      <p class="font-bold text-sm">All Clear</p>
-                      <p class="text-xs">No overdue receivables at this time.</p>
+                   <div class="empty-state">
+                      <i class="pi pi-check-circle empty-icon"></i>
+                      <p class="empty-title">All Clear</p>
+                      <p class="empty-text">No overdue receivables at this time.</p>
                    </div>
                 }
               </div>
 
-              <div class="mt-6 p-4 border border-dashed rounded-lg" [style.border-color]="'var(--theme-accent-primary)'" [style.background]="'rgba(139, 92, 246, 0.05)'">
-                <div class="flex gap-3">
-                  <i class="pi pi-lightbulb text-indigo-400 mt-1"></i>
+              <div class="advisory-box">
+                <div class="advisory-content">
+                  <i class="pi pi-lightbulb advisory-icon"></i>
                   <div>
-                    <p class="font-bold" [style.color]="'var(--theme-accent-primary)'" [style.font-size]="'var(--font-size-sm)'">Cash Flow Advisory</p>
-                    <p class="mt-1" [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">
+                    <p class="advisory-title">Cash Flow Advisory</p>
+                    <p class="advisory-text">
                       <ng-container *ngIf="cashData()?.recommendations?.recommendations?.length > 0; else noRecs">
                         {{ cashData()?.recommendations?.recommendations[0]?.reason }}. Target action: <strong>{{ cashData()?.recommendations?.recommendations[0]?.action }}</strong>.
                       </ng-container>
@@ -95,73 +93,73 @@ import { CommonMethodService } from '../../core/utils/common-method.service';
             </div>
           </div>
 
-          <div class="lg:col-span-5 space-y-6">
+          <div class="analysis-column side">
             
-            <div class="p-6 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-               <h3 class="font-bold uppercase tracking-tight mb-4" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-md)'">Tax Liability</h3>
-               <div class="space-y-3">
-                 <div class="flex justify-between">
-                   <span [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Input GST</span>
-                   <span class="font-bold" [style.color]="'var(--theme-text-primary)'">₹{{ cashData()?.tax?.inputTax | number }}</span>
+            <div class="content-card">
+               <h3 class="card-title mb-lg">Tax Liability</h3>
+               <div class="liability-list">
+                 <div class="liability-row">
+                   <span class="row-label">Input GST</span>
+                   <span class="row-value">₹{{ cashData()?.tax?.inputTax | number }}</span>
                  </div>
-                 <div class="flex justify-between">
-                   <span [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Output GST</span>
-                   <span class="font-bold" [style.color]="'var(--theme-text-primary)'">₹{{ cashData()?.tax?.outputTax | number }}</span>
+                 <div class="liability-row">
+                   <span class="row-label">Output GST</span>
+                   <span class="row-value">₹{{ cashData()?.tax?.outputTax | number }}</span>
                  </div>
-                 <div class="flex justify-between pt-2 border-t" [style.border-color]="'var(--theme-border-primary)'">
-                   <span class="font-bold" [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">Net Payable</span>
-                   <span class="font-bold tabular-nums text-rose-400">₹{{ cashData()?.tax?.netPayable | number }}</span>
+                 <div class="liability-row border-top">
+                   <span class="row-label strong">Net Payable</span>
+                   <span class="row-value error">₹{{ cashData()?.tax?.netPayable | number }}</span>
                  </div>
                </div>
             </div>
 
-            <div class="p-6 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-              <h3 class="font-bold uppercase tracking-tight mb-6" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-md)'">Active Credit Exposure</h3>
+            <div class="content-card">
+              <h3 class="card-title mb-lg">Active Credit Exposure</h3>
 
               @for (emi of cashData()?.credit?.emiAnalytics; track emi._id) {
-                <div class="space-y-6">
-                  <div class="flex justify-between items-end">
+                <div class="credit-group">
+                  <div class="credit-header">
                     <div>
-                      <p [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase mb-1">Total Outstanding</p>
-                      <p class="text-2xl font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'">₹{{ emi.totalAmount | number }}</p>
+                      <p class="mini-label">Total Outstanding</p>
+                      <p class="large-value">₹{{ emi.totalAmount | number }}</p>
                     </div>
                     <div class="text-right">
-                      <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Active EMIs</p>
-                      <p class="font-bold tabular-nums" [style.color]="'var(--theme-info)'">{{ emi.activeEMIs }} Plans</p>
+                      <p class="mini-label">Active EMIs</p>
+                      <p class="highlight-value">{{ emi.activeEMIs }} Plans</p>
                     </div>
                   </div>
 
-                  <div class="p-4 border" [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius-lg)'">
-                    <div class="flex justify-between items-center mb-3">
-                      <span class="font-bold uppercase text-[10px]" [style.color]="'var(--theme-text-label)'">Repayment Health</span>
-                      <span class="font-bold" [style.color]="'var(--theme-success)'" [style.font-size]="'var(--font-size-sm)'">{{ emi.completionRate | number:'1.0-0' }}%</span>
+                  <div class="repayment-box">
+                    <div class="repayment-header">
+                      <span class="mini-label">Repayment Health</span>
+                      <span class="percent-value">{{ emi.completionRate | number:'1.0-0' }}%</span>
                     </div>
-                    <div class="w-full h-2 rounded-full bg-white/5 overflow-hidden">
-                      <div class="h-full bg-emerald-500 transition-all duration-1000" [style.width]="emi.completionRate + '%'"></div>
+                    <div class="progress-track">
+                      <div class="progress-fill success" [style.width]="emi.completionRate + '%'"></div>
                     </div>
-                    <div class="flex justify-between mt-3 text-[10px] font-bold uppercase">
-                      <span [style.color]="'var(--theme-text-tertiary)'">Paid: {{ emi.paidInstallments }}</span>
-                      <span [style.color]="'var(--theme-text-tertiary)'">Total: {{ emi.totalInstallments }}</span>
+                    <div class="repayment-footer">
+                      <span>Paid: {{ emi.paidInstallments }}</span>
+                      <span>Total: {{ emi.totalInstallments }}</span>
                     </div>
                   </div>
 
-                  <div class="grid grid-cols-2 gap-4">
-                    <div class="p-3 border text-center" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius)'">
-                      <p [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold mb-1">DEFAULTS</p>
-                      <p class="font-bold" [style.color]="emi.defaultedEMIs > 0 ? 'var(--theme-error)' : 'var(--theme-text-tertiary)'">{{ emi.defaultedEMIs }}</p>
+                  <div class="mini-stats-grid">
+                    <div class="mini-stat">
+                      <p class="mini-label">DEFAULTS</p>
+                      <p class="stat-value" [class.error]="emi.defaultedEMIs > 0">{{ emi.defaultedEMIs }}</p>
                     </div>
-                    <div class="p-3 border text-center" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius)'">
-                      <p [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold mb-1">INTEREST</p>
-                      <p class="font-bold text-emerald-500">₹{{ emi.totalInterestEarned | number }}</p>
+                    <div class="mini-stat">
+                      <p class="mini-label">INTEREST</p>
+                      <p class="stat-value success">₹{{ emi.totalInterestEarned | number }}</p>
                     </div>
                   </div>
                 </div>
               }
               
               @if (!cashData()?.credit?.emiAnalytics?.length) {
-                 <div class="flex flex-col items-center justify-center h-[200px] text-center opacity-60">
-                    <i class="pi pi-wallet text-3xl mb-2 text-indigo-400"></i>
-                    <p class="text-sm font-bold">No Active Credit Lines</p>
+                 <div class="empty-state">
+                    <i class="pi pi-wallet empty-icon"></i>
+                    <p class="empty-text">No Active Credit Lines</p>
                  </div>
               }
             </div>
@@ -171,14 +169,400 @@ import { CommonMethodService } from '../../core/utils/common-method.service';
       </ng-container>
 
       <ng-template #loader>
-        <div class="h-[50vh] flex flex-col items-center justify-center gap-4">
+        <div class="loader-container">
           <p-progressSpinner strokeWidth="4" styleClass="w-10 h-10"></p-progressSpinner>
-          <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">Generating cash flow statement...</p>
+          <p class="loader-text">Generating cash flow statement...</p>
         </div>
       </ng-template>
 
     </div>
-  `
+  `,
+  styles: [`
+    /* HOST & LAYOUT */
+    :host {
+      display: block;
+      width: 100%;
+    }
+
+    .cashflow-container {
+      padding: var(--spacing-lg) var(--spacing-xl);
+      background: var(--bg-primary);
+      font-family: var(--font-body);
+      min-height: 100%;
+    }
+
+    /* KPI GRID */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    /* KPI CARDS */
+    .kpi-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius-lg);
+      padding: var(--spacing-lg);
+      transition: var(--transition-base);
+    }
+    
+    .kpi-card.ratio-card {
+      background: var(--bg-ternary);
+      border-color: var(--border-secondary);
+    }
+
+    .kpi-label {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-tertiary); /* Muted label */
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .kpi-value {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      font-family: var(--font-heading);
+      color: var(--text-primary);
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+
+    .kpi-value.success { color: var(--color-success); }
+    .kpi-value.warning { color: var(--color-warning); }
+
+    .kpi-subtext {
+      margin-top: var(--spacing-xs);
+      color: var(--text-tertiary);
+      font-size: var(--font-size-xs);
+    }
+
+    /* PROGRESS BARS */
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      background: var(--bg-ternary);
+      border-radius: 99px;
+      margin-top: var(--spacing-md);
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: var(--accent-primary);
+      border-radius: 99px;
+    }
+    .progress-fill.success { background: var(--color-success); }
+
+    /* ANALYSIS GRID */
+    .analysis-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--spacing-lg);
+    }
+
+    @media (min-width: 1024px) {
+      .analysis-grid {
+        grid-template-columns: 7fr 5fr; /* 7/12 and 5/12 ratio */
+      }
+    }
+
+    /* CONTENT CARDS */
+    .content-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius-lg);
+      padding: var(--spacing-lg);
+      height: 100%;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .card-title {
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin: 0;
+      letter-spacing: -0.01em;
+    }
+    .card-title.mb-lg { margin-bottom: var(--spacing-lg); }
+
+    /* AGING LIST */
+    .aging-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-sm);
+    }
+
+    .aging-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--spacing-md);
+      background: var(--bg-ternary);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--ui-border-radius);
+      transition: background-color 0.2s;
+    }
+
+    .aging-item:hover {
+      background: var(--component-bg-hover);
+    }
+
+    .aging-info {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+
+    .aging-icon-box {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: var(--ui-border-radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-error-bg); /* Use mix token */
+      color: var(--color-error);
+    }
+
+    .item-title {
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-sm);
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .item-subtitle {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+      margin: 0;
+    }
+
+    .aging-value-box {
+      text-align: right;
+    }
+
+    .item-amount {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-error);
+      margin: 0 0 2px 0;
+    }
+
+    .status-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: var(--ui-border-radius-sm);
+      background: var(--color-error-bg);
+      color: var(--color-error);
+    }
+
+    /* ADVISORY BOX */
+    .advisory-box {
+      margin-top: var(--spacing-lg);
+      padding: var(--spacing-md);
+      border: 1px dashed var(--accent-primary);
+      background: var(--color-primary-bg); /* Use mix token */
+      border-radius: var(--ui-border-radius);
+    }
+
+    .advisory-content {
+      display: flex;
+      gap: var(--spacing-sm);
+    }
+
+    .advisory-icon {
+      color: var(--accent-primary);
+      margin-top: 2px;
+    }
+
+    .advisory-title {
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-sm);
+      color: var(--accent-primary);
+      margin: 0 0 var(--spacing-xs) 0;
+    }
+
+    .advisory-text {
+      font-size: var(--font-size-xs);
+      color: var(--text-secondary);
+      line-height: var(--line-height-relaxed);
+      margin: 0;
+    }
+
+    /* LIABILITY LIST */
+    .liability-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-sm);
+    }
+
+    .liability-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .liability-row.border-top {
+      border-top: 1px solid var(--border-primary);
+      padding-top: var(--spacing-sm);
+      margin-top: var(--spacing-sm);
+    }
+
+    .row-label {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+    }
+    .row-label.strong {
+      font-weight: var(--font-weight-bold);
+      color: var(--text-secondary);
+    }
+
+    .row-value {
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      font-size: var(--font-size-base);
+    }
+    .row-value.error { color: var(--color-error); }
+
+    /* CREDIT EXPOSURE */
+    .credit-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-lg);
+    }
+
+    .credit-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .mini-label {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      color: var(--text-label);
+      margin: 0 0 2px 0;
+    }
+
+    .large-value {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .highlight-value {
+      font-weight: var(--font-weight-bold);
+      color: var(--color-info);
+      margin: 0;
+    }
+
+    /* REPAYMENT BOX */
+    .repayment-box {
+      padding: var(--spacing-md);
+      background: var(--bg-ternary);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--ui-border-radius);
+    }
+
+    .repayment-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .percent-value {
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-sm);
+      color: var(--color-success);
+    }
+
+    .repayment-footer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: var(--spacing-xs);
+      font-size: 10px;
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+    }
+
+    /* MINI STATS */
+    .mini-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-md);
+    }
+
+    .mini-stat {
+      padding: var(--spacing-sm);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius);
+      text-align: center;
+    }
+
+    .stat-value {
+      font-weight: var(--font-weight-bold);
+      color: var(--text-tertiary);
+      margin: 0;
+    }
+    .stat-value.error { color: var(--color-error); }
+    .stat-value.success { color: var(--color-success); }
+
+    /* EMPTY STATES & LOADERS */
+    .empty-state {
+      padding: var(--spacing-xl);
+      border: 1px dashed var(--border-secondary);
+      border-radius: var(--ui-border-radius);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.7;
+    }
+
+    .empty-icon {
+      font-size: 2rem;
+      margin-bottom: var(--spacing-sm);
+      color: var(--color-success);
+    }
+    
+    .empty-text, .empty-title {
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      margin: 0;
+    }
+    .empty-title { font-weight: bold; }
+
+    .loader-container {
+      height: 50vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-md);
+    }
+
+    .loader-text {
+      font-size: var(--font-size-sm);
+      color: var(--text-tertiary);
+    }
+  `]
 })
 export class CashFlowAnalysisComponent implements OnInit {
   cashData = signal<any>(null);
@@ -206,172 +590,3 @@ export class CashFlowAnalysisComponent implements OnInit {
     });
   }
 }
-
-// import { Component, OnInit, signal } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { ButtonModule } from 'primeng/button';
-// import { TooltipModule } from 'primeng/tooltip';
-// import { ProgressSpinnerModule } from 'primeng/progressspinner';
-// import { AdminAnalyticsService } from '../admin-analytics.service';
-// import { CommonMethodService } from '../../core/utils/common-method.service';
-
-// @Component({
-//   selector: 'app-cash-flow-analysis',
-//   standalone: true,
-//   imports: [CommonModule, ButtonModule, TooltipModule, ProgressSpinnerModule],
-//   template: `
-//     <div class="p-4 md:p-6 transition-colors duration-300" 
-//          [style.background]="'var(--theme-bg-primary)'"
-//          [style.font-family]="'var(--font-body)'">
-
-//       <ng-container *ngIf="!loading(); else loader">
-        
-//         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-//           <div class="p-5 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//             <p class="uppercase font-bold tracking-widest mb-1" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Available Liquidity</p>
-//             <h2 class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-success)'">₹{{ cashData()?.summary?.profit?.value | number }}</h2>
-//             <p class="mt-2" [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Net Cash Position</p>
-//           </div>
-
-//           <div class="p-5 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//             <p class="uppercase font-bold tracking-widest mb-1" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Receivables (0-30d)</p>
-//             <h2 class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-warning)'">₹{{ cashData()?.receivables?.aging[0]?.amount | number }}</h2>
-//             <p class="mt-2" [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Inbound flow pending</p>
-//           </div>
-
-//           <div class="p-5 border" [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//             <p class="uppercase font-bold tracking-widest mb-1" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Cash-to-Debt Ratio</p>
-//             <h2 class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'">1:2.4</h2>
-//             <div class="w-full h-1.5 bg-white/5 rounded-full mt-3 overflow-hidden">
-//                <div class="h-full bg-indigo-500" [style.width]="'40%'"></div>
-//             </div>
-//           </div>
-//         </div>
-
-//         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-//           <div class="lg:col-span-7 space-y-6">
-//             <div class="p-6 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//               <div class="flex justify-between items-center mb-6">
-//                 <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-md)'">Inbound Aging Report</h3>
-//                 <p-button icon="pi pi-print" [text]="true" size="small"></p-button>
-//               </div>
-
-//               @for (aging of cashData()?.receivables?.aging; track aging.range) {
-//                 <div class="p-4 border mb-3 flex items-center justify-between" 
-//                      [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius-lg)'">
-//                   <div class="flex items-center gap-4">
-//                     <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-rose-500/10 text-rose-500">
-//                        <i class="pi pi-history"></i>
-//                     </div>
-//                     <div>
-//                       <p class="font-bold" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">{{ aging.range }}</p>
-//                       <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">{{ aging.count }} Pending Invoices</p>
-//                     </div>
-//                   </div>
-//                   <div class="text-right">
-//                     <p class="text-lg font-bold tabular-nums" [style.color]="'var(--theme-error)'">₹{{ aging.amount | number }}</p>
-//                     <span class="text-[10px] font-bold uppercase p-1 rounded bg-rose-500/10 text-rose-500">High Priority</span>
-//                   </div>
-//                 </div>
-//               }
-
-//               <div class="mt-6 p-4 border border-dashed rounded-lg" [style.border-color]="'var(--theme-accent-primary)'" [style.background]="'rgba(139, 92, 246, 0.05)'">
-//                 <div class="flex gap-3">
-//                   <i class="pi pi-lightbulb text-indigo-400 mt-1"></i>
-//                   <div>
-//                     <p class="font-bold" [style.color]="'var(--theme-accent-primary)'" [style.font-size]="'var(--font-size-sm)'">Cash Flow Advisory</p>
-//                     <p class="mt-1" [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">
-//                       {{ cashData()?.recommendations?.recommendations[0]?.reason }}. Target action: <strong>{{ cashData()?.recommendations?.recommendations[0]?.action }}</strong>.
-//                     </p>
-//                   </div>
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-
-//           <div class="lg:col-span-5 space-y-6">
-//             <div class="p-6 border h-full" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//               <h3 class="font-bold uppercase tracking-tight mb-6" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-md)'">Active Credit Exposure</h3>
-
-//               @for (emi of cashData()?.credit?.emiAnalytics; track emi._id) {
-//                 <div class="space-y-6">
-//                   <div class="flex justify-between items-end">
-//                     <div>
-//                       <p [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase mb-1">Total Outstanding Credit</p>
-//                       <p class="text-2xl font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'">₹{{ emi.totalAmount | number }}</p>
-//                     </div>
-//                     <div class="text-right">
-//                       <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Active EMIs</p>
-//                       <p class="font-bold tabular-nums" [style.color]="'var(--theme-info)'">{{ emi.activeEMIs }} Plans</p>
-//                     </div>
-//                   </div>
-
-//                   <div class="p-4 border" [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius-lg)'">
-//                     <div class="flex justify-between items-center mb-3">
-//                       <span class="font-bold uppercase text-[10px]" [style.color]="'var(--theme-text-label)'">Repayment Health</span>
-//                       <span class="font-bold" [style.color]="'var(--theme-success)'" [style.font-size]="'var(--font-size-sm)'">{{ emi.completionRate | number:'1.0-0' }}%</span>
-//                     </div>
-//                     <div class="w-full h-2 rounded-full bg-white/5 overflow-hidden">
-//                       <div class="h-full bg-emerald-500 transition-all duration-1000" [style.width]="emi.completionRate + '%'"></div>
-//                     </div>
-//                     <div class="flex justify-between mt-3 text-[10px] font-bold uppercase">
-//                       <span [style.color]="'var(--theme-text-tertiary)'">Paid: {{ emi.paidInstallments }}</span>
-//                       <span [style.color]="'var(--theme-text-tertiary)'">Total: {{ emi.totalInstallments }}</span>
-//                     </div>
-//                   </div>
-
-//                   <div class="grid grid-cols-2 gap-4">
-//                     <div class="p-3 border text-center" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius)'">
-//                       <p [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold mb-1">DEFAULTS</p>
-//                       <p class="font-bold" [style.color]="emi.defaultedEMIs > 0 ? 'var(--theme-error)' : 'var(--theme-text-tertiary)'">{{ emi.defaultedEMIs }}</p>
-//                     </div>
-//                     <div class="p-3 border text-center" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius)'">
-//                       <p [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold mb-1">INTEREST</p>
-//                       <p class="font-bold text-emerald-500">₹{{ emi.totalInterestEarned | number }}</p>
-//                     </div>
-//                   </div>
-//                 </div>
-//               }
-//             </div>
-//           </div>
-//         </div>
-
-//       </ng-container>
-
-//       <ng-template #loader>
-//         <div class="h-[50vh] flex flex-col items-center justify-center gap-4">
-//           <p-progressSpinner strokeWidth="4" styleClass="w-10 h-10"></p-progressSpinner>
-//           <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">Generating cash flow statement...</p>
-//         </div>
-//       </ng-template>
-
-//     </div>
-//   `
-// })
-// export class CashFlowAnalysisComponent implements OnInit {
-//   cashData = signal<any>(null);
-//   loading = signal<boolean>(true);
-
-//   constructor(
-//     private analyticsService: AdminAnalyticsService,
-//     public commonService: CommonMethodService
-//   ) {}
-
-//   ngOnInit() {
-//     this.loadData();
-//   }
-
-//   loadData() {
-//     this.loading.set(true);
-//     this.analyticsService.getCashFlowAnalysis().subscribe({
-//       next: (res) => {
-//         if (res.status === 'success') {
-//           this.cashData.set(res.data);
-//         }
-//         this.loading.set(false);
-//       },
-//       error: () => this.loading.set(false)
-//     });
-//   }
-// }
