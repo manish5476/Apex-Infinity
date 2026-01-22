@@ -1,641 +1,242 @@
-<div
-  class="relative min-h-screen overflow-x-hidden bg-[var(--color-bg)] text-[color:var(--color-text)] font-[family-name:var(--font-body)]">
+<div class="relative min-h-screen w-full bg-surface-ternary text-primary font-body overflow-x-hidden selection:bg-[var(--accent-primary)] selection:text-white">
 
-  <nav [class.shadow-[var(--shadow-lg)]]="scrollY > 20" [class.bg-[var(--color-surface-light)]]="scrollY > 20"
-    class="fixed top-0 left-0 right-0 h-[80px] z-[var(--z-fixed)] bg-[var(--color-surface-light)] backdrop-blur-[20px] border-b border-[width:var(--ui-border-width)] border-[color:var(--color-border)] transition-[var(--transition-base)]">
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div class="absolute top-[-10%] left-[-10%] w-[800px] h-[800px] bg-[var(--accent-primary)] opacity-10 blur-[120px] rounded-full transition-transform duration-100 ease-out will-change-transform"
+         [style.transform]="'translate(' + mouseX() + 'px, ' + mouseY() + 'px)'"></div>
+    
+    <div class="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-[var(--accent-secondary)] opacity-10 blur-[100px] rounded-full transition-transform duration-100 ease-out will-change-transform"
+         [style.transform]="'translate(' + -mouseX() + 'px, ' + -mouseY() + 'px)'"></div>
+  </div>
 
-    <div class="max-w-[1400px] mx-auto px-[var(--spacing-3xl)] h-full flex items-center justify-between">
-      <a routerLink="/" class="flex items-center gap-[var(--spacing-md)] no-underline group">
-        <div
-          class="w-[40px] h-[40px] rounded-[var(--ui-border-radius-lg)] bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)] flex items-center justify-center text-[color:var(--color-text-inverse)] font-[var(--font-weight-bold)] overflow-hidden relative shadow-[var(--shadow-md)]">
-          AI
+  <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b"
+       [class.bg-surface-alpha]="scrollY() > 20"
+       [class.backdrop-blur-xl]="scrollY() > 20"
+       [class.h-20]="scrollY() <= 20"
+       [class.h-16]="scrollY() > 20"
+       [class.border-transparent]="scrollY() <= 20"
+       [class.border-primary]="scrollY() > 20"
+       [class.shadow-lg]="scrollY() > 20">
+    
+    <div class="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
+      <a routerLink="/" class="flex items-center gap-3 group no-underline">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform">
+          <i class="pi pi-bolt text-xl"></i>
         </div>
-        <div class="text-[length:var(--font-size-2xl)] font-[var(--font-weight-bold)] text-[color:var(--color-text)]">
-          Apex<span class="text-[color:var(--color-primary)]">Infinity</span>
+        <div class="font-heading text-xl font-bold tracking-tight text-primary">
+          Apex<span class="text-[var(--accent-primary)]">Infinity</span>
         </div>
       </a>
 
-      <div class="hidden lg:flex gap-[var(--spacing-3xl)]">
-        <a *ngFor="let item of ['Features', 'Dashboard', 'Pricing']" [href]="'#' + item.toLowerCase()"
-          (click)="scrollToElement(item.toLowerCase())"
-          class="text-[length:var(--font-size-md)] font-[var(--font-weight-medium)] text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-primary)] transition-[var(--transition-colors)] py-[var(--spacing-xs)]">
+      <div class="hidden md:flex items-center gap-8">
+        <a *ngFor="let item of ['Features', 'Dashboard', 'Pricing']" 
+           class="text-sm font-medium text-secondary hover:text-primary transition-colors cursor-pointer relative group/link">
           {{ item }}
+          <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-[var(--accent-primary)] transition-all duration-300 group-hover/link:w-full"></span>
         </a>
       </div>
 
-      <div class="flex items-center gap-[var(--spacing-lg)]">
-        <button
-          class="px-[var(--spacing-xl)] py-[var(--spacing-md)] rounded-[var(--ui-border-radius-lg)] font-[var(--font-weight-semibold)] text-[length:var(--font-size-sm)] text-[color:var(--color-text)] hover:bg-[rgba(59,130,246,0.1)] transition-[var(--transition-base)]"
-          routerLink="/auth/login">
-          Sign In
-        </button>
-        <button
-          class="px-[var(--spacing-xl)] py-[var(--spacing-md)] rounded-[var(--ui-border-radius-lg)] font-[var(--font-weight-semibold)] text-[length:var(--font-size-sm)] text-[color:var(--color-text-inverse)] bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)] shadow-[var(--shadow-md)] hover:shadow-[var(--shadow-lg)] hover:-translate-y-[2px] transition-[var(--transition-base)]"
-          routerLink="/auth/org">
+      <div class="flex items-center gap-3">
+        <button routerLink="/auth/login" class="px-4 py-2 text-sm font-semibold text-secondary hover:text-primary transition-colors">Sign In</button>
+        <button routerLink="/auth/org" class="px-5 py-2 rounded-lg bg-[var(--accent-primary)] text-white text-sm font-bold shadow-lg shadow-[var(--accent-focus)] hover:bg-[var(--accent-hover)] hover:-translate-y-0.5 transition-all">
           Get Started
         </button>
       </div>
     </div>
   </nav>
 
-  <section class="pt-[140px] pb-[100px] relative">
-    <div class="max-w-[1200px] mx-auto px-[var(--spacing-3xl)] text-center">
-
-      <div
-        class="inline-flex items-center gap-[var(--spacing-sm)] px-[var(--spacing-lg)] py-[var(--spacing-xs)] rounded-[var(--ui-border-radius-xl)] bg-[rgba(59,130,246,0.1)] border border-[width:var(--ui-border-width)] border-[color:var(--color-primary-light)] text-[length:var(--font-size-xs)] font-[var(--font-weight-semibold)] text-[color:var(--color-primary)] mb-[var(--spacing-2xl)] animate-fade-in-up">
-        <span class="w-[6px] h-[6px] rounded-full bg-[var(--color-primary)] animate-pulse-glow"></span>
-        <span>v2.0 Now Available</span>
+  <section class="relative pt-40 pb-20 px-6 z-10 text-center">
+    <div class="max-w-5xl mx-auto">
+      
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-surface border border-[var(--accent-primary)] mb-8 cursor-pointer hover:bg-surface-secondary transition-colors animate-float">
+        <span class="w-2 h-2 rounded-full bg-[var(--accent-primary)] animate-pulse"></span>
+        <span class="text-xs font-bold text-[var(--accent-primary)] tracking-wide uppercase">v2.0 Released</span>
+        <span class="text-xs text-secondary ml-1">Read the changelog <i class="pi pi-arrow-right text-[10px]"></i></span>
       </div>
 
-      <h1
-        class="text-[length:var(--font-size-5xl)] font-[var(--font-weight-bold)] leading-[var(--line-height-tight)] text-[color:var(--color-text)] mb-[var(--spacing-xl)] font-[family-name:var(--font-heading)] animate-fade-in-up delay-100">
-        The Operating System <br>
-        <span
-          class="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)]">For
-          Modern Business</span>
+      <h1 class="font-heading text-5xl md:text-7xl font-bold leading-[1.1] mb-6 tracking-tight text-primary">
+        The Operating System <br/>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] drop-shadow-sm">
+          For Modern Business
+        </span>
       </h1>
 
-      <p
-        class="!text-[color:var(--color-text-secondary)] !text-[length:var(--font-size-lg)] !leading-[var(--line-height-relaxed)] max-w-[600px] mx-auto mb-[var(--spacing-4xl)] animate-fade-in-up delay-200">
-        Streamline accounting, inventory, and team collaboration in one refined, compact platform.
+      <p class="text-lg md:text-xl text-secondary max-w-2xl mx-auto mb-10 leading-relaxed">
+        Streamline accounting, inventory, and team collaboration in one refined, 
+        <span class="text-primary font-semibold">artist-grade</span> platform designed for speed.
       </p>
 
-      <div class="flex flex-col sm:flex-row gap-[var(--spacing-lg)] justify-center animate-fade-in-up delay-300">
-        <button
-          class="px-[var(--spacing-3xl)] py-[var(--spacing-lg)] rounded-[var(--ui-border-radius-lg)] font-[var(--font-weight-bold)] text-[length:var(--font-size-md)] text-[color:var(--color-text-inverse)] bg-[var(--color-text)] shadow-[var(--shadow-lg)] hover:shadow-[var(--shadow-xl)] hover:-translate-y-[2px] transition-[var(--transition-base)]">
-          Start Free Trial
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <button class="h-12 px-8 rounded-xl bg-primary text-surface-0 font-bold text-lg shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex items-center gap-2">
+          Start Free Trial <i class="pi pi-arrow-right text-sm"></i>
         </button>
-        <button
-          class="px-[var(--spacing-3xl)] py-[var(--spacing-lg)] rounded-[var(--ui-border-radius-lg)] font-[var(--font-weight-bold)] text-[length:var(--font-size-md)] text-[color:var(--color-text)] bg-[var(--color-surface)] border border-[width:var(--ui-border-width)] border-[color:var(--color-border)] hover:border-[color:var(--color-primary)] transition-[var(--transition-base)]">
-          View Demo
+        <button class="h-12 px-8 rounded-xl glass-surface border border-primary text-primary font-bold text-lg hover:bg-surface transition-all duration-300 flex items-center gap-2">
+          <i class="pi pi-play-circle text-xl"></i> Watch Demo
         </button>
       </div>
-
     </div>
   </section>
 
-  <section id="features" class="py-[100px] bg-[var(--color-surface)]">
-    <div class="max-w-[1200px] mx-auto px-[var(--spacing-3xl)]">
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-[var(--spacing-xl)]">
-        @for (feature of filteredFeatures(); track feature.title) {
-        <div
-          class="group relative p-[var(--spacing-2xl)] rounded-[var(--ui-border-radius-xl)] bg-[var(--color-bg)] border border-[width:var(--ui-border-width)] border-[color:var(--color-border)] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-xl)] transition-[var(--transition-slow)] overflow-hidden cursor-pointer">
-
-          <div
-            class="absolute inset-0 bg-gradient-to-br from-[var(--color-primary-light)] to-[var(--color-secondary)] opacity-0 group-hover:opacity-5 transition-[var(--transition-base)]">
+  <section id="stats-section" class="py-10 px-4 relative z-20">
+    <div class="max-w-6xl mx-auto">
+      <div class="glass-surface p-8 rounded-2xl border border-primary grid grid-cols-2 md:grid-cols-4 gap-8 shadow-2xl backdrop-blur-md">
+        @for (stat of animatedStats(); track stat.label) {
+          <div class="flex flex-col items-center text-center group">
+            <div class="w-12 h-12 rounded-full bg-surface-secondary flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300 border border-secondary"
+                 [style.color]="stat.color">
+              <i [class]="stat.icon" class="text-xl"></i>
+            </div>
+            <div class="text-3xl font-heading font-bold text-primary mb-1">
+              {{ stat.currentValue }}{{ stat.suffix }}
+            </div>
+            <div class="text-xs font-semibold text-secondary uppercase tracking-wider">{{ stat.label }}</div>
           </div>
-
-          <div
-            class="w-[48px] h-[48px] rounded-[var(--ui-border-radius-lg)] bg-[var(--color-surface)] shadow-[var(--shadow-md)] flex items-center justify-center text-[length:var(--font-size-xl)] mb-[var(--spacing-xl)] text-[color:var(--color-primary)] transition-[var(--transition-transform)] group-hover:scale-110">
-            <i [class]="feature.icon"></i>
-          </div>
-
-          <h3
-            class="text-[length:var(--font-size-xl)] font-[var(--font-weight-bold)] text-[color:var(--color-text)] mb-[var(--spacing-sm)] relative z-10">
-            {{ feature.title }}</h3>
-          <p
-            class="!text-[length:var(--font-size-md)] !text-[color:var(--color-text-secondary)] !leading-[var(--line-height-normal)] relative z-10">
-            {{ feature.desc }}
-          </p>
-        </div>
         }
       </div>
-
     </div>
   </section>
 
-  <section id="dashboard" class="py-[100px] bg-[var(--color-bg)] overflow-hidden">
-    <div class="max-w-[1200px] mx-auto px-[var(--spacing-3xl)]">
+  <section id="features" class="py-24 relative z-10">
+    <div class="max-w-7xl mx-auto px-6">
+      
+      <div class="text-center mb-12">
+        <h2 class="font-heading text-3xl md:text-4xl font-bold mb-4 text-primary">Everything You Need</h2>
+        <div class="flex flex-wrap justify-center gap-2 mt-6">
+          @for (cat of categories; track cat) {
+            <button (click)="setActiveCategory(cat)"
+              class="px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 border"
+              [class]="activeCategory() === cat 
+                ? 'bg-[var(--accent-primary)] text-white border-[var(--accent-primary)] shadow-lg' 
+                : 'glass-surface text-secondary border-transparent hover:border-primary hover:text-primary'">
+              {{ cat }}
+            </button>
+          }
+        </div>
+      </div>
 
-      <div
-        class="relative rounded-[var(--ui-border-radius-xl)] bg-[var(--color-surface)] border border-[width:var(--ui-border-width)] border-[color:var(--color-border)] shadow-[var(--shadow-2xl)] p-[var(--spacing-xl)] animate-float">
-        <div
-          class="flex items-center gap-[var(--spacing-sm)] mb-[var(--spacing-lg)] border-b border-[width:var(--ui-border-width)] border-[color:var(--color-border)] pb-[var(--spacing-md)]">
-          <div class="flex gap-[6px]">
-            <div class="w-[10px] h-[10px] rounded-full bg-[var(--color-danger)]"></div>
-            <div class="w-[10px] h-[10px] rounded-full bg-[var(--color-warning)]"></div>
-            <div class="w-[10px] h-[10px] rounded-full bg-[var(--color-success)]"></div>
+      <div class="bento-grid">
+        @for (feature of filteredFeatures(); track feature.title) {
+          <div class="glass-surface surface-interactive p-8 rounded-2xl border border-primary relative overflow-hidden group flex flex-col justify-between"
+               [ngStyle]="getFeatureGridStyle(feature)">
+            
+            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                 [style.background]="'linear-gradient(135deg, color-mix(in srgb, ' + feature.color + ', transparent 90%), transparent)'"></div>
+
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-surface border border-secondary flex items-center justify-center text-xl mb-6 shadow-sm relative z-10 group-hover:scale-110 transition-transform duration-300"
+                   [style.color]="feature.color">
+                <i [class]="feature.icon"></i>
+              </div>
+
+              <h3 class="font-heading text-xl font-bold text-primary mb-3 relative z-10">{{ feature.title }}</h3>
+              <p class="text-secondary text-sm leading-relaxed relative z-10">{{ feature.desc }}</p>
+            </div>
+
+            <div class="mt-6 flex justify-end relative z-10 opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-2 group-hover:translate-x-0">
+              <i class="pi pi-arrow-right" [style.color]="feature.color"></i>
+            </div>
           </div>
-          <div
-            class="ml-[var(--spacing-lg)] px-[var(--spacing-md)] py-[2px] rounded-[var(--ui-border-radius-sm)] bg-[var(--color-bg)] text-[length:var(--font-size-xs)] text-[color:var(--color-text-secondary)] font-[family-name:var(--font-mono)]">
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 px-6 relative z-10 bg-surface-secondary/20">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="font-heading text-3xl font-bold text-primary">A Dashboard That Breathes</h2>
+        <p class="text-secondary mt-2">See your financial health at a glance.</p>
+      </div>
+
+      <div class="glass-surface border border-primary rounded-2xl shadow-2xl overflow-hidden animate-float backdrop-blur-xl">
+        
+        <div class="h-10 border-b border-primary bg-surface-secondary flex items-center px-4 gap-2">
+          <div class="w-3 h-3 rounded-full bg-red-500"></div>
+          <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+          <div class="w-3 h-3 rounded-full bg-green-500"></div>
+          <div class="ml-auto px-3 py-1 rounded bg-surface-ternary text-[10px] text-tertiary font-mono border border-secondary">
             app.apexinfinity.ai
           </div>
         </div>
 
-        <div class="grid grid-cols-4 gap-[var(--spacing-lg)]">
-          <div
-            class="p-[var(--spacing-lg)] rounded-[var(--ui-border-radius-lg)] bg-[var(--color-bg)] border border-[width:var(--ui-border-width)] border-[color:var(--color-border)]">
-            <div
-              class="text-[length:var(--font-size-xs)] text-[color:var(--color-text-secondary)] uppercase font-[var(--font-weight-semibold)]">
-              Revenue</div>
-            <div
-              class="text-[length:var(--font-size-2xl)] font-[var(--font-weight-bold)] text-[color:var(--color-text)] mt-[var(--spacing-xs)]">
-              ₹4.2M</div>
+        <div class="p-8 grid grid-cols-1 md:grid-cols-4 gap-6 bg-surface-ternary/50">
+          <div class="hidden md:flex flex-col gap-3 col-span-1">
+            <div class="h-8 w-3/4 bg-surface rounded animate-pulse opacity-50"></div>
+            <div class="h-4 w-full bg-surface-secondary rounded opacity-30"></div>
+            <div class="h-4 w-5/6 bg-surface-secondary rounded opacity-30"></div>
+            <div class="h-4 w-4/5 bg-surface-secondary rounded opacity-30"></div>
           </div>
-          <div
-            class="p-[var(--spacing-lg)] rounded-[var(--ui-border-radius-lg)] bg-[var(--color-bg)] border border-[width:var(--ui-border-width)] border-[color:var(--color-border)]">
-            <div
-              class="text-[length:var(--font-size-xs)] text-[color:var(--color-text-secondary)] uppercase font-[var(--font-weight-semibold)]">
-              Users</div>
-            <div
-              class="text-[length:var(--font-size-2xl)] font-[var(--font-weight-bold)] text-[color:var(--color-text)] mt-[var(--spacing-xs)]">
-              842</div>
-          </div>
-          <div
-            class="col-span-2 p-[var(--spacing-lg)] rounded-[var(--ui-border-radius-lg)] bg-[var(--color-bg)] border border-[width:var(--ui-border-width)] border-[color:var(--color-border)] flex items-end gap-[var(--spacing-xs)] h-[100px]">
-            <div class="w-full bg-[var(--color-primary-light)] h-[40%] rounded-t-[var(--ui-border-radius-sm)]"></div>
-            <div class="w-full bg-[var(--color-primary)] h-[70%] rounded-t-[var(--ui-border-radius-sm)]"></div>
-            <div class="w-full bg-[var(--color-primary-light)] h-[50%] rounded-t-[var(--ui-border-radius-sm)]"></div>
-            <div class="w-full bg-[var(--color-secondary)] h-[85%] rounded-t-[var(--ui-border-radius-sm)]"></div>
+
+          <div class="col-span-1 md:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="glass-surface p-5 rounded-xl border border-secondary">
+              <div class="text-[10px] uppercase font-bold text-secondary tracking-wider">Revenue</div>
+              <div class="text-2xl font-bold text-primary mt-1">₹4.2M</div>
+            </div>
+            <div class="glass-surface p-5 rounded-xl border border-secondary">
+              <div class="text-[10px] uppercase font-bold text-secondary tracking-wider">Users</div>
+              <div class="text-2xl font-bold text-primary mt-1">842</div>
+            </div>
+            <div class="glass-surface p-5 rounded-xl border border-secondary flex items-end justify-between gap-1 h-32 relative overflow-hidden">
+               <div class="w-full bg-[var(--accent-primary)] h-[40%] rounded-t-sm opacity-50"></div>
+               <div class="w-full bg-[var(--accent-primary)] h-[70%] rounded-t-sm opacity-70"></div>
+               <div class="w-full bg-[var(--accent-primary)] h-[50%] rounded-t-sm opacity-60"></div>
+               <div class="w-full bg-[var(--accent-primary)] h-[85%] rounded-t-sm"></div>
+            </div>
           </div>
         </div>
       </div>
-
     </div>
   </section>
 
-  <section id="pricing" class="py-[100px] bg-[var(--color-surface)]">
-    <div class="max-w-[1200px] mx-auto px-[var(--spacing-3xl)]">
+  <section id="pricing" class="py-24 relative z-10">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="font-heading text-3xl md:text-4xl font-bold mb-4 text-primary">Simple Pricing</h2>
+        
+        <div class="flex items-center justify-center gap-4 mt-6">
+          <span class="text-sm font-medium" [class.text-primary]="!isYearly()" [class.text-secondary]="isYearly()">Monthly</span>
+          <button (click)="isYearly.set(!isYearly())" class="w-12 h-6 rounded-full bg-surface-secondary border border-primary relative transition-colors">
+            <div class="w-4 h-4 rounded-full bg-[var(--accent-primary)] absolute top-1 left-1 transition-transform duration-300"
+                 [class.translate-x-6]="isYearly()"></div>
+          </button>
+          <span class="text-sm font-medium" [class.text-primary]="isYearly()" [class.text-secondary]="!isYearly()">
+            Yearly <span class="text-[var(--accent-primary)] text-xs font-bold">-20%</span>
+          </span>
+        </div>
+      </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-[var(--spacing-xl)]">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         @for (plan of plans; track plan.name) {
-        <div
-          class="relative p-[var(--spacing-2xl)] rounded-[var(--ui-border-radius-xl)] bg-[var(--color-bg)] border border-[width:var(--ui-border-width)] shadow-[var(--shadow-lg)] hover:-translate-y-[4px] transition-[var(--transition-base)]"
-          [class.border-[color:var(--color-primary)]]="plan.popular"
-          [class.border-[color:var(--color-border)]]="!plan.popular">
-
-          <h3 class="text-[length:var(--font-size-xl)] font-[var(--font-weight-bold)] text-[color:var(--color-text)]">{{
-            plan.name }}</h3>
-          <div
-            class="my-[var(--spacing-lg)] text-[length:var(--font-size-4xl)] font-[var(--font-weight-bold)] text-[color:var(--color-text)]">
-            {{ plan.price }}<span
-              class="text-[length:var(--font-size-base)] text-[color:var(--color-text-secondary)] font-[var(--font-weight-normal)]">/mo</span>
-          </div>
-
-          <ul class="space-y-[var(--spacing-md)] mb-[var(--spacing-2xl)]">
-            @for (feature of plan.features; track feature) {
-            <li
-              class="flex items-center gap-[var(--spacing-sm)] text-[length:var(--font-size-sm)] text-[color:var(--color-text)]">
-              <i class="fas fa-check text-[color:var(--color-success)]"></i> {{ feature }}
-            </li>
-            }
-          </ul>
-
-          <button
-            class="w-full py-[var(--spacing-lg)] rounded-[var(--ui-border-radius-lg)] font-[var(--font-weight-bold)] text-[length:var(--font-size-sm)] transition-[var(--transition-base)]"
-            [class]="plan.popular ? 'bg-[var(--color-primary)] text-[color:var(--color-text-inverse)] shadow-[var(--shadow-md)]' : 'bg-[var(--color-surface)] text-[color:var(--color-text)] border border-[width:var(--ui-border-width)] border-[color:var(--color-border)]'">
-            {{ plan.cta }}
-          </button>
-        </div>
-        }
-      </div>
-
-    </div>
-  </section>
-
-  <footer class="py-[var(--spacing-4xl)] bg-[var(--color-text)] text-[color:var(--color-text-secondary)]">
-    <div
-      class="max-w-[1200px] mx-auto px-[var(--spacing-3xl)] grid grid-cols-1 md:grid-cols-4 gap-[var(--spacing-2xl)]">
-
-      <div class="col-span-1">
-        <div
-          class="text-[color:var(--color-text-inverse)] font-[var(--font-weight-bold)] text-[length:var(--font-size-xl)] mb-[var(--spacing-lg)]">
-          ApexInfinity</div>
-        <p
-          class="!text-[length:var(--font-size-sm)] !leading-[var(--line-height-normal)] !text-[color:var(--color-text-secondary)]">
-          Empowering businesses with intelligent tools.
-        </p>
-      </div>
-
-      <div>
-        <h4
-          class="text-[color:var(--color-text-inverse)] font-[var(--font-weight-semibold)] text-[length:var(--font-size-md)] mb-[var(--spacing-md)]">
-          Product</h4>
-        <ul class="space-y-[var(--spacing-sm)] text-[length:var(--font-size-sm)]">
-          <li><a href="#"
-              class="hover:text-[color:var(--color-text-inverse)] transition-[var(--transition-colors)]">Features</a>
-          </li>
-          <li><a href="#"
-              class="hover:text-[color:var(--color-text-inverse)] transition-[var(--transition-colors)]">Pricing</a>
-          </li>
-        </ul>
-      </div>
-
-    </div>
-  </footer>
-
-</div>
-
-<!-- 
-<div class="landing-root">
-  Background Particles
-  <div class="particles-container"></div>
-
-  Navigation
-  <nav class="glass-nav" [class.scrolled]="scrollY > 50">
-    <div class="nav-container">
-      Logo
-      <a routerLink="/" class="logo">
-        <div class="logo-icon">AI</div>
-        <div class="logo-text">Apex<span style="color: #3b82f6">Infinity</span></div>
-      </a>
-
-      Desktop Navigation
-      <div class="nav-links">
-        <a href="#features" (click)="scrollToElement('features')">Features</a>
-        <a href="#dashboard" (click)="scrollToElement('dashboard')">Dashboard</a>
-        <a href="#pricing" (click)="scrollToElement('pricing')">Pricing</a>
-        <a href="#testimonials" (click)="scrollToElement('testimonials')">Testimonials</a>
-      </div>
-
-      Actions
-      <div class="nav-actions">
-        <button class="btn btn-ghost" routerLink="/auth/login">Sign In</button>
-        <button class="btn btn-primary" routerLink="/auth/org">Get Started</button>
-        
-        Mobile Toggle
-        <button class="mobile-toggle" (click)="toggleMobileMenu()">
-          <i class="fas fa-bars"></i>
-        </button>
-      </div>
-    </div>
-
-    Mobile Menu
-    @if (showMobileMenu) {
-      <div class="mobile-menu">
-        <a href="#features" (click)="toggleMobileMenu(); scrollToElement('features')">Features</a>
-        <a href="#dashboard" (click)="toggleMobileMenu(); scrollToElement('dashboard')">Dashboard</a>
-        <a href="#pricing" (click)="toggleMobileMenu(); scrollToElement('pricing')">Pricing</a>
-        <a href="#testimonials" (click)="toggleMobileMenu(); scrollToElement('testimonials')">Testimonials</a>
-        <a routerLink="/auth/login" (click)="toggleMobileMenu()">Sign In</a>
-        <a routerLink="/auth/org" (click)="toggleMobileMenu()">Get Started</a>
-      </div>
-    }
-  </nav>
-
-  Hero Section
-  <section class="hero-section">
-    Animated Background Shapes
-    <div class="hero-background">
-      <div class="floating-shape shape-1 parallax-layer"></div>
-      <div class="floating-shape shape-2 parallax-layer"></div>
-    </div>
-
-    <div class="hero-content">
-      Badge
-      <div class="hero-badge observe">
-        <span class="badge-dot"></span>
-        <span>Trusted by 5,000+ Businesses Worldwide</span>
-      </div>
-
-      Main Title
-      <h1 class="hero-title observe">
-        The Complete<br>
-        <span class="gradient-text">Business Operating System</span>
-      </h1>
-
-      Subtitle
-      <p class="hero-subtitle observe">
-        Apex Infinity combines accounting, inventory, CRM, attendance, payroll, and team communication 
-        into one intelligent platform. Make data-driven decisions with real-time insights.
-      </p>
-
-      CTA Buttons
-      <div class="hero-buttons">
-        <button class="btn btn-primary btn-lg float-element" routerLink="/auth/org">
-          <i class="fas fa-rocket"></i> Start 14-Day Free Trial
-        </button>
-        <button class="btn btn-secondary btn-lg float-element" (click)="scrollToElement('features')">
-          <i class="fas fa-play-circle"></i> See Platform in Action
-        </button>
-      </div>
-
-      Stats Section
-      <div id="stats-section" class="stats-section observe">
-        <div class="stats-grid">
-          @for (stat of animatedStats(); track stat.label) {
-            <div class="stat-card">
-              <div class="stat-icon" [style.background]="stat.color">
-                <i [class]="stat.icon"></i>
-              </div>
-              <div class="stat-number">{{ getCounterValue(stat) }}</div>
-              <div class="stat-label">{{ stat.label }}</div>
-            </div>
-          }
-        </div>
-      </div>
-    </div>
-  </section>
-
-  Features Bento Grid
-  <section id="features" class="features-section">
-    <div class="container">
-      Header
-      <div class="section-header observe">
-        <h2 class="section-title">Everything Your Business Needs</h2>
-        <p class="section-subtitle">
-          From ledger entries to team chat, we've built the complete toolkit for modern enterprises.
-        </p>
-      </div>
-
-      Category Filters
-      <div class="category-filters observe">
-        @for (category of categories; track category) {
-          <button class="category-filter" 
-                  [class.active]="activeCategory === category"
-                  (click)="setActiveCategory(category)">
-            {{ category }}
-          </button>
-        }
-      </div>
-
-      Bento Grid
-      <div class="bento-grid">
-        @for (feature of filteredFeatures(); track feature.title) {
-          <div class="bento-card observe" 
-               [ngStyle]="getFeatureGridStyle(feature)"
-               [style.background]="feature.gradient"
-               [class]="feature.animation">
-            <div class="feature-badge">{{ feature.group }}</div>
-            <div class="feature-icon" [class]="feature.color">
-              <i [class]="feature.icon"></i>
-            </div>
-            <div class="feature-content">
-              <h3>{{ feature.title }}</h3>
-              <p>{{ feature.desc }}</p>
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-  </section>
-
-  Dashboard Showcase
-  <section id="dashboard" class="dashboard-section">
-    <div class="dashboard-container">
-      <div class="section-header observe">
-        <h2 class="section-title">Real-Time Business Intelligence</h2>
-        <p class="section-subtitle">
-          Monitor your entire business from a single, beautiful dashboard.
-        </p>
-      </div>
-
-      <div class="dashboard-frame observe">
-        Window Controls
-        <div class="dashboard-header">
-          <div class="window-controls">
-            <div class="control close"></div>
-            <div class="control minimize"></div>
-            <div class="control maximize"></div>
-          </div>
-          <div class="dashboard-url">dashboard.apexinfinity.ai</div>
-        </div>
-
-        Dashboard Content
-        <div class="dashboard-content">
-          Metrics Row
-          <div class="metrics-row">
-            <div class="metric-widget">
-              <div class="metric-header">
-                <div class="metric-label">Monthly Revenue</div>
-                <div class="metric-icon" style="background: linear-gradient(135deg, #10b981, #34d399);">
-                  <i class="fas fa-rupee-sign"></i>
-                </div>
-              </div>
-              <div class="metric-value">₹4.2M</div>
-              <div class="metric-trend up">
-                <i class="fas fa-arrow-up"></i> 12.5%
-              </div>
-            </div>
-
-            <div class="metric-widget">
-              <div class="metric-header">
-                <div class="metric-label">Active Customers</div>
-                <div class="metric-icon" style="background: linear-gradient(135deg, #3b82f6, #60a5fa);">
-                  <i class="fas fa-users"></i>
-                </div>
-              </div>
-              <div class="metric-value">2,842</div>
-              <div class="metric-trend up">
-                <i class="fas fa-arrow-up"></i> 8.2%
-              </div>
-            </div>
-
-            <div class="metric-widget">
-              <div class="metric-header">
-                <div class="metric-label">Inventory Value</div>
-                <div class="metric-icon" style="background: linear-gradient(135deg, #f59e0b, #fbbf24);">
-                  <i class="fas fa-box"></i>
-                </div>
-              </div>
-              <div class="metric-value">₹8.7M</div>
-              <div class="metric-trend up">
-                <i class="fas fa-arrow-up"></i> 5.4%
-              </div>
-            </div>
-
-            <div class="metric-widget">
-              <div class="metric-header">
-                <div class="metric-label">Team Activity</div>
-                <div class="metric-icon" style="background: linear-gradient(135deg, #8b5cf6, #a78bfa);">
-                  <i class="fas fa-chart-bar"></i>
-                </div>
-              </div>
-              <div class="metric-value">94%</div>
-              <div class="metric-trend up">
-                <i class="fas fa-arrow-up"></i> 3.1%
-              </div>
-            </div>
-          </div>
-
-          Chart
-          <div class="chart-container">
-            <div class="chart-header">
-              <h3>Revenue Trend (Last 7 Days)</h3>
-              <div class="chart-controls">
-                <button class="active">Week</button>
-                <button>Month</button>
-                <button>Quarter</button>
-              </div>
-            </div>
-            <div class="chart-area">
-              <div class="chart-bar bar-1" data-value="₹420K"></div>
-              <div class="chart-bar bar-2" data-value="₹525K"></div>
-              <div class="chart-bar bar-3" data-value="₹630K"></div>
-              <div class="chart-bar bar-4" data-value="₹595K"></div>
-              <div class="chart-bar bar-5" data-value="₹665K"></div>
-              <div class="chart-bar bar-6" data-value="₹560K"></div>
-              <div class="chart-bar bar-7" data-value="₹490K"></div>
-            </div>
-          </div>
-
-          Quick Stats
-          <div class="metrics-row">
-            <div class="metric-widget">
-              <div class="metric-header">
-                <div class="metric-label">Pending Invoices</div>
-                <div class="metric-icon" style="background: linear-gradient(135deg, #ec4899, #f472b6);">
-                  <i class="fas fa-file-invoice"></i>
-                </div>
-              </div>
-              <div class="metric-value">42</div>
-              <div class="metric-trend down">
-                <i class="fas fa-arrow-down"></i> 15%
-              </div>
-            </div>
-
-            <div class="metric-widget">
-              <div class="metric-header">
-                <div class="metric-label">Stock Alerts</div>
-                <div class="metric-icon" style="background: linear-gradient(135deg, #06b6d4, #22d3ee);">
-                  <i class="fas fa-exclamation-triangle"></i>
-                </div>
-              </div>
-              <div class="metric-value">8</div>
-              <div class="metric-trend up">
-                <i class="fas fa-arrow-up"></i> 2
-              </div>
-            </div>
-
-            <div class="metric-widget">
-              <div class="metric-header">
-                <div class="metric-label">Attendance Today</div>
-                <div class="metric-icon" style="background: linear-gradient(135deg, #f59e0b, #fbbf24);">
-                  <i class="fas fa-user-check"></i>
-                </div>
-              </div>
-              <div class="metric-value">92%</div>
-              <div class="metric-trend up">
-                <i class="fas fa-arrow-up"></i> 4%
-              </div>
-            </div>
-
-            <div class="metric-widget">
-              <div class="metric-header">
-                <div class="metric-label">Team Messages</div>
-                <div class="metric-icon" style="background: linear-gradient(135deg, #8b5cf6, #a78bfa);">
-                  <i class="fas fa-comments"></i>
-                </div>
-              </div>
-              <div class="metric-value">156</div>
-              <div class="metric-trend up">
-                <i class="fas fa-arrow-up"></i> 32%
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  Integrations
-  <section class="integrations-section">
-    <div class="container">
-      <div class="section-header observe">
-        <h2 class="section-title">Seamless Integrations</h2>
-        <p class="section-subtitle">
-          Connect with the tools your business already uses.
-        </p>
-      </div>
-
-      <div class="integrations-grid">
-        @for (integration of integrations; track integration.name) {
-          <div class="integration-card observe">
-            <div class="integration-icon" [style.background]="integration.color">
-              <i [class]="integration.icon"></i>
-            </div>
-            <div class="integration-name">{{ integration.name }}</div>
-          </div>
-        }
-      </div>
-    </div>
-  </section>
-
-  Testimonials
-  <section id="testimonials" class="testimonials-section">
-    <div class="testimonials-container">
-      <div class="section-header observe">
-        <h2 class="section-title">Trusted by Industry Leaders</h2>
-        <p class="section-subtitle">
-          See what businesses like yours are saying about Apex Infinity.
-        </p>
-      </div>
-
-      <div class="testimonials-slider">
-        @for (testimonial of testimonials; track testimonial.name) {
-          <div class="testimonial-card observe">
-            <div class="testimonial-header">
-              <div class="avatar">{{ testimonial.name.charAt(0) }}</div>
-              <div class="user-info">
-                <h4>{{ testimonial.name }}</h4>
-                <p>{{ testimonial.role }}, {{ testimonial.company }}</p>
-              </div>
-            </div>
-            <p class="testimonial-content">"{{ testimonial.content }}"</p>
-            <div class="stars">
-              @for (star of getStars(testimonial.rating); track $index) {
-                @if (star === 1) {
-                  <i class="fas fa-star"></i>
-                } @else {
-                  <i class="far fa-star"></i>
-                }
-              }
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-  </section>
-
-  Pricing
-  <section id="pricing" class="pricing-section">
-    <div class="container">
-      <div class="pricing-header observe">
-        <h2 class="section-title">Simple, Transparent Pricing</h2>
-        <p class="section-subtitle">
-          Start free. Upgrade when you're ready. No hidden fees.
-        </p>
-        
-        <div class="toggle-container">
-          <button class="toggle-btn" [class.active]="!isYearly()" (click)="togglePricing()">
-            Monthly Billing
-          </button>
-          <button class="toggle-btn" [class.active]="isYearly()" (click)="togglePricing()">
-            Yearly Billing
-            <span class="discount-badge">Save 20%</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="pricing-grid">
-        @for (plan of plans; track plan.name; let i = $index) {
-          <div class="pricing-card observe" [class.popular]="plan.popular" [style.background]="plan.gradient">
-            @if (plan.popular) {
-              <div class="popular-badge">Most Popular</div>
-            }
+          <div class="glass-surface p-8 rounded-2xl border transition-all duration-300 hover:-translate-y-2 relative flex flex-col"
+               [class.border-[var(--accent-primary)]]="plan.popular"
+               [class.border-primary]="!plan.popular"
+               [class.shadow-2xl]="plan.popular"
+               [class.shadow-lg]="!plan.popular">
             
-            <div class="plan-header">
-              <h3>{{ plan.name }}</h3>
-              <div class="plan-price">
-                {{ plan.price }}
-                @if (plan.price !== 'Free' && plan.price !== 'Custom') {
-                  <span class="period">/{{ isYearly() ? 'year' : 'month' }}</span>
-                }
+            @if (plan.popular) {
+              <div class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[var(--accent-primary)] text-white text-xs font-bold uppercase tracking-wider shadow-lg">
+                Most Popular
               </div>
-              <p class="plan-desc">{{ plan.desc }}</p>
+            }
+
+            <h3 class="text-lg font-bold text-secondary uppercase tracking-wider mb-2">{{ plan.name }}</h3>
+            <div class="flex items-baseline gap-1 mb-6">
+              <span class="text-4xl font-heading font-bold text-primary">{{ plan.price }}</span>
+              <span class="text-secondary text-sm">/mo</span>
             </div>
 
-            <ul class="plan-features">
-              @for (feature of plan.features; track feature) {
-                <li>
-                  <i class="fas fa-check"></i>
-                  <span>{{ feature }}</span>
+            <ul class="space-y-4 mb-8 flex-1">
+              @for (feat of plan.features; track feat) {
+                <li class="flex items-center gap-3 text-sm text-primary">
+                  <i class="pi pi-check text-[var(--color-success)] font-bold text-xs"></i>
+                  {{ feat }}
                 </li>
               }
             </ul>
 
-            <button class="plan-button" [class]="plan.popular ? 'primary' : 'secondary'">
+            <button class="w-full py-3 rounded-lg font-bold text-sm transition-all duration-200"
+              [class]="plan.popular 
+                ? 'bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-hover)] shadow-lg' 
+                : 'bg-surface text-primary border border-secondary hover:border-primary'">
               {{ plan.cta }}
             </button>
           </div>
@@ -644,98 +245,19 @@
     </div>
   </section>
 
-  Final CTA
-  <section class="cta-section">
-    <div class="cta-background">
-      <div class="floating-element"></div>
-      <div class="floating-element"></div>
-    </div>
-    
-    <div class="cta-container">
-      <div class="cta-card observe">
-        <h2>Ready to Transform Your Business?</h2>
-        <p>
-          Join thousands of businesses that have streamlined their operations with Apex Infinity. 
-          Get started with our 14-day free trial - no credit card required.
-        </p>
-        
-        <div class="cta-buttons">
-          <button class="btn btn-primary btn-lg" routerLink="/auth/org">
-            <i class="fas fa-rocket"></i> Start Free Trial
-          </button>
-          <button class="btn btn-secondary btn-lg" (click)="scrollToElement('features')">
-            <i class="fas fa-book"></i> View Documentation
-          </button>
-        </div>
-        
-        <div class="cta-note">
-          <i class="fas fa-check-circle"></i>
-          <span>No credit card required • 14-day free trial • Cancel anytime</span>
-        </div>
+  <footer class="py-12 border-t border-primary bg-surface relative z-10">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+      <div class="text-center md:text-left">
+        <div class="font-heading text-xl font-bold text-primary mb-1">ApexInfinity</div>
+        <p class="text-xs text-tertiary">© 2026 Apex Inc. All rights reserved.</p>
       </div>
-    </div>
-  </section>
-
-  Footer
-  <footer class="footer">
-    <div class="footer-container">
-      <div class="footer-grid">
-        Brand
-        <div class="footer-brand">
-          <div class="logo">
-            <div class="logo-icon">AI</div>
-            <div>Apex<span style="color: #60a5fa">Infinity</span></div>
-          </div>
-          <p>
-            The complete business intelligence platform for modern enterprises. 
-            Streamline your operations with our all-in-one ERP solution.
-          </p>
-          <div class="social-links">
-            <a href="#"><i class="fab fa-twitter"></i></a>
-            <a href="#"><i class="fab fa-linkedin"></i></a>
-            <a href="#"><i class="fab fa-github"></i></a>
-            <a href="#"><i class="fab fa-youtube"></i></a>
-          </div>
-        </div>
-
-        Product
-        <div class="footer-links">
-          <h4>Product</h4>
-          <ul>
-            <li><a href="#features" (click)="scrollToElement('features')">Features</a></li>
-            <li><a href="#pricing" (click)="scrollToElement('pricing')">Pricing</a></li>
-            <li><a href="#">API Documentation</a></li>
-            <li><a href="#">Changelog</a></li>
-          </ul>
-        </div>
-
-        Company
-        <div class="footer-links">
-          <h4>Company</h4>
-          <ul>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Careers</a></li>
-            <li><a href="#">Blog</a></li>
-            <li><a href="#">Contact</a></li>
-          </ul>
-        </div>
-
-        Legal
-        <div class="footer-links">
-          <h4>Legal</h4>
-          <ul>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Terms of Service</a></li>
-            <li><a href="#">Security</a></li>
-            <li><a href="#">GDPR</a></li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="footer-bottom">
-        <p>&copy; 2024 Apex Infinity Inc. All rights reserved.</p>
-        <p>Made with <i class="fas fa-heart" style="color: #ef4444;"></i> for businesses worldwide</p>
+      
+      <div class="flex gap-6">
+        <a href="#" class="text-secondary hover:text-primary text-sm transition-colors">Privacy</a>
+        <a href="#" class="text-secondary hover:text-primary text-sm transition-colors">Terms</a>
+        <a href="#" class="text-secondary hover:text-primary text-sm transition-colors">Contact</a>
       </div>
     </div>
   </footer>
-</div> -->
+
+</div>
