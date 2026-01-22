@@ -713,3 +713,109 @@
     }
   }
 }
+/* Add to mainscreen-header.scss */
+
+.value-badge {
+  background: var(--bg-ternary);
+  color: var(--text-primary);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 99px;
+  border: 1px solid var(--border-secondary);
+}
+
+.scale-control-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) 0;
+  
+  .scale-icon {
+    color: var(--text-secondary);
+    font-weight: 600;
+    user-select: none;
+    
+    &.small { font-size: 0.75rem; }
+    &.large { font-size: 1.25rem; }
+  }
+
+  .range-wrapper {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+/* Custom Range Slider Styling */
+.custom-range-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  background: var(--bg-ternary);
+  border-radius: 99px;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+
+  /* Slider Thumb (Handle) - Webkit */
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent-primary);
+    border: 2px solid var(--bg-secondary);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition: transform 0.1s;
+    margin-top: -6px; /* center thumb on track */
+  }
+
+  &::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 6px;
+    cursor: pointer;
+    background: var(--bg-ternary);
+    border-radius: 99px;
+  }
+
+  &:active::-webkit-slider-thumb {
+    transform: scale(1.2);
+  }
+
+  /* Firefox Support */
+  &::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent-primary);
+    border: 2px solid var(--bg-secondary);
+    cursor: pointer;
+  }
+  
+  &::-moz-range-track {
+    width: 100%;
+    height: 6px;
+    cursor: pointer;
+    background: var(--bg-ternary);
+    border-radius: 99px;
+  }
+}
+
+.range-ticks {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 4px; /* Align with thumb center */
+  margin-top: 4px;
+  
+  .tick {
+    width: 1px;
+    height: 4px;
+    background: var(--border-secondary);
+  }
+}
