@@ -570,3 +570,11 @@
   font-size: var(--font-size-sm);
   text-align: center;
 }
+.p-dropdown .p-dropdown-label, .p-dropdown .p-multiselect-label, .p-dropdown .p-select-label, .p-multiselect .p-dropdown-label, .p-multiselect .p-multiselect-label, .p-multiselect .p-select-label, .p-select .p-dropdown-label, .p-select .p-multiselect-label, .p-select .p-select-label {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: 0 var(--p-comp-padding-x);
+    /* line-height: var(--p-comp-height); */
+    font-size: var(--p-comp-font-size);
+}
+
