@@ -75,51 +75,6 @@ export class MainscreenHeader implements OnInit, OnDestroy {
   isDarkMode = false;
   activeThemeId: string = 'theme-light';
   themeGroups: ThemeGroup[] = [];
-
-  // Complete Theme Data Source (ALL themes from your tokens)
-  //   allThemes: Theme[] = [
-  //     // Core Themes
-  //     { name: "Glass", id: "theme-glass", color: "#6366f1", gradient: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%)", category: "core", description: "Modern glassmorphism design" },
-  //     { name: "Light", id: "theme-light", color: "#f1f5f9", gradient: "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)", category: "core", description: "Clean light mode" },
-  //     { name: "Dark", id: "theme-dark", color: "#0f172a", gradient: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)", category: "core", description: "Professional dark mode" },
-  //     { name: "Auto", id: "auto-theme", color: "#2563eb", gradient: "linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%)", category: "core", description: "Auto-detects system preference" },
-  // { 
-  //   name: "Bio Frost", 
-  //   id: "theme-bio-frost", 
-  //   color: "#34d399", 
-  //   gradient: "linear-gradient(135deg, #34d399 0%, #10b981 100%)", 
-  //   category: "core", 
-  //   description: "Milky white glass with emerald organic accents" 
-  // },
-  //     // Professional Themes
-  //     { name: "Premium", id: "theme-premium", color: "#0d9488", gradient: "linear-gradient(135deg, #0d9488 0%, #0891b2 100%)", category: "professional", description: "Premium teal theme" },
-  //     { name: "Titanium", id: "theme-titanium", color: "#0e7490", gradient: "linear-gradient(135deg, #0e7490 0%, #06b6d4 100%)", category: "professional", description: "Metallic blue theme" },
-  //     { name: "Slate", id: "theme-slate", color: "#475569", gradient: "linear-gradient(135deg, #475569 0%, #64748b 100%)", category: "professional", description: "Cool gray theme" },
-  //     { name: "Data Science", id: "theme-data-science", color: "#3b82f6", gradient: "linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)", category: "professional", description: "Analytics optimized" },
-  //     { name: "Cobalt Steel", id: "theme-cobalt-steel", color: "#0ea5e9", gradient: "linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)", category: "professional", description: "Professional blue theme" },
-
-  //     // Minimal Themes
-  //     { name: "Minimal", id: "theme-minimal", color: "#e5e5e5", gradient: "linear-gradient(135deg, #e5e5e5 0%, #d4d4d4 100%)", category: "minimal", description: "Clean monochrome" },
-  //     { name: "Monochrome", id: "theme-monochrome", color: "#52525b", gradient: "linear-gradient(135deg, #52525b 0%, #71717a 100%)", category: "minimal", description: "True black & white" },
-
-  //     // Colorful Themes
-  //     { name: "Rose", id: "theme-rose", color: "#ec6d8a", gradient: "linear-gradient(135deg, #ec6d8a 0%, #f472b6 100%)", category: "colorful", description: "Soft pink theme" },
-  //     { name: "Sunset", id: "theme-sunset", color: "#f97316", gradient: "linear-gradient(135deg, #f97316 0%, #fb923c 100%)", category: "colorful", description: "Warm orange theme" },
-  //     { name: "Bold", id: "theme-bold", color: "#ff00ff", gradient: "linear-gradient(135deg, #ff00ff 0%, #00ffff 100%)", category: "colorful", description: "High contrast neon theme" },
-
-  //     // Luxury Themes
-  //     { name: "Luxury", id: "theme-luxury", color: "#d4af37", gradient: "linear-gradient(135deg, #d4af37 0%, #fbbf24 100%)", category: "luxury", description: "Gold luxury theme" },
-  //     { name: "Futuristic", id: "theme-futuristic", color: "#3b82f6", gradient: "linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%)", category: "luxury", description: "Cyberpunk theme" },
-  //     { name: "Midnight Royal", id: "theme-midnight-royal", color: "#a78bfa", gradient: "linear-gradient(135deg, #a78bfa 0%, #c4b5fd 50%, #8b5cf6 100%)", category: "luxury", description: "Purple luxury dark theme" },
-  //     { name: "Emerald Regal", id: "theme-emerald-regal", color: "#10b981", gradient: "linear-gradient(135deg, #10b981 0%, #34d399 100%)", category: "luxury", description: "Green luxury theme" },
-
-  //     // Modern Themes
-  //     { name: "Material You", id: "theme-material-you", color: "#db2777", gradient: "linear-gradient(135deg, #db2777 0%, #e879f9 100%)", category: "modern", description: "Android 12 design" },
-  //     { name: "Neumorphic", id: "theme-neumorphic", color: "#6366f1", gradient: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)", category: "modern", description: "Soft UI design" },
-  //     { name: "Deep Space", id: "theme-deep-space", color: "#60a5fa", gradient: "linear-gradient(135deg, #60a5fa 0%, #38bdf8 50%, #22d3ee 100%)", category: "modern", description: "Astronomy inspired dark theme" }
-  //   ];
-
-  // Mock Data
   mockNotifications = [
     { id: 1, title: 'New Member Request', message: 'John Doe wants to join your organization', time: '2 min ago', read: false, type: 'info' },
     { id: 2, title: 'Task Completed', message: 'Project "Dashboard Redesign" has been completed', time: '1 hour ago', read: false, type: 'success' },
@@ -518,3 +473,47 @@ export class MainscreenHeader implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 }
+  // Complete Theme Data Source (ALL themes from your tokens)
+  //   allThemes: Theme[] = [
+  //     // Core Themes
+  //     { name: "Glass", id: "theme-glass", color: "#6366f1", gradient: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%)", category: "core", description: "Modern glassmorphism design" },
+  //     { name: "Light", id: "theme-light", color: "#f1f5f9", gradient: "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)", category: "core", description: "Clean light mode" },
+  //     { name: "Dark", id: "theme-dark", color: "#0f172a", gradient: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)", category: "core", description: "Professional dark mode" },
+  //     { name: "Auto", id: "auto-theme", color: "#2563eb", gradient: "linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%)", category: "core", description: "Auto-detects system preference" },
+  // { 
+  //   name: "Bio Frost", 
+  //   id: "theme-bio-frost", 
+  //   color: "#34d399", 
+  //   gradient: "linear-gradient(135deg, #34d399 0%, #10b981 100%)", 
+  //   category: "core", 
+  //   description: "Milky white glass with emerald organic accents" 
+  // },
+  //     // Professional Themes
+  //     { name: "Premium", id: "theme-premium", color: "#0d9488", gradient: "linear-gradient(135deg, #0d9488 0%, #0891b2 100%)", category: "professional", description: "Premium teal theme" },
+  //     { name: "Titanium", id: "theme-titanium", color: "#0e7490", gradient: "linear-gradient(135deg, #0e7490 0%, #06b6d4 100%)", category: "professional", description: "Metallic blue theme" },
+  //     { name: "Slate", id: "theme-slate", color: "#475569", gradient: "linear-gradient(135deg, #475569 0%, #64748b 100%)", category: "professional", description: "Cool gray theme" },
+  //     { name: "Data Science", id: "theme-data-science", color: "#3b82f6", gradient: "linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)", category: "professional", description: "Analytics optimized" },
+  //     { name: "Cobalt Steel", id: "theme-cobalt-steel", color: "#0ea5e9", gradient: "linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)", category: "professional", description: "Professional blue theme" },
+
+  //     // Minimal Themes
+  //     { name: "Minimal", id: "theme-minimal", color: "#e5e5e5", gradient: "linear-gradient(135deg, #e5e5e5 0%, #d4d4d4 100%)", category: "minimal", description: "Clean monochrome" },
+  //     { name: "Monochrome", id: "theme-monochrome", color: "#52525b", gradient: "linear-gradient(135deg, #52525b 0%, #71717a 100%)", category: "minimal", description: "True black & white" },
+
+  //     // Colorful Themes
+  //     { name: "Rose", id: "theme-rose", color: "#ec6d8a", gradient: "linear-gradient(135deg, #ec6d8a 0%, #f472b6 100%)", category: "colorful", description: "Soft pink theme" },
+  //     { name: "Sunset", id: "theme-sunset", color: "#f97316", gradient: "linear-gradient(135deg, #f97316 0%, #fb923c 100%)", category: "colorful", description: "Warm orange theme" },
+  //     { name: "Bold", id: "theme-bold", color: "#ff00ff", gradient: "linear-gradient(135deg, #ff00ff 0%, #00ffff 100%)", category: "colorful", description: "High contrast neon theme" },
+
+  //     // Luxury Themes
+  //     { name: "Luxury", id: "theme-luxury", color: "#d4af37", gradient: "linear-gradient(135deg, #d4af37 0%, #fbbf24 100%)", category: "luxury", description: "Gold luxury theme" },
+  //     { name: "Futuristic", id: "theme-futuristic", color: "#3b82f6", gradient: "linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%)", category: "luxury", description: "Cyberpunk theme" },
+  //     { name: "Midnight Royal", id: "theme-midnight-royal", color: "#a78bfa", gradient: "linear-gradient(135deg, #a78bfa 0%, #c4b5fd 50%, #8b5cf6 100%)", category: "luxury", description: "Purple luxury dark theme" },
+  //     { name: "Emerald Regal", id: "theme-emerald-regal", color: "#10b981", gradient: "linear-gradient(135deg, #10b981 0%, #34d399 100%)", category: "luxury", description: "Green luxury theme" },
+
+  //     // Modern Themes
+  //     { name: "Material You", id: "theme-material-you", color: "#db2777", gradient: "linear-gradient(135deg, #db2777 0%, #e879f9 100%)", category: "modern", description: "Android 12 design" },
+  //     { name: "Neumorphic", id: "theme-neumorphic", color: "#6366f1", gradient: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)", category: "modern", description: "Soft UI design" },
+  //     { name: "Deep Space", id: "theme-deep-space", color: "#60a5fa", gradient: "linear-gradient(135deg, #60a5fa 0%, #38bdf8 50%, #22d3ee 100%)", category: "modern", description: "Astronomy inspired dark theme" }
+  //   ];
+
+  // Mock Data
