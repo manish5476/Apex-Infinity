@@ -96,9 +96,18 @@ export class MainscreenHeader implements OnInit, OnDestroy {
     this.themeService.settings$.pipe(takeUntil(this.destroy$)).subscribe((s: ThemeSettings) => {
       this.isDarkMode = s.isDarkMode;
       this.activeThemeId = s.isDarkMode ? 'theme-dark' : s.lightThemeClass || 'theme-light';
+      // ✅ Sync local state with service state
+      if (s.textScale) {
+        this.textScale = s.textScale;
+      }
     });
   }
 
+  updateTextScale(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const value = parseInt(input.value, 10);
+    this.themeService.setTextScale(value);
+  }
   // Grouping Logic
   organizeThemes() {
     // Fix: Ensure all categories are properly defined
