@@ -2506,6 +2506,115 @@
 
 
 
+/* ==========================================================================
+   COMPONENT: DIALOG / MODAL (Refined Compact)
+   ========================================================================== */
+
+::ng-deep .p-dialog-mask {
+  /* 1. THE BACKDROP */
+  background-color: rgba(0, 0, 0, 0.45); /* Darker dim */
+  backdrop-filter: blur(4px); /* Modern frosted glass effect on the background */
+  transition-duration: 0.2s;
+}
+
+::ng-deep .p-dialog {
+  /* 2. THE DIALOG WINDOW */
+  background: transparent; /* Let internal sections handle bg */
+  border: none;
+  box-shadow: var(--shadow-lg); /* Deep shadow for elevation */
+  border-radius: var(--ui-border-radius-xl); /* 16px usually looks best for modals */
+  overflow: hidden; /* Clip content to corners */
+  margin: 1rem;
+
+  /* --- HEADER --- */
+  .p-dialog-header {
+    background-color: var(--theme-bg-secondary);
+    color: var(--theme-text-primary);
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--theme-border-primary);
+    border-top-left-radius: var(--ui-border-radius-xl);
+    border-top-right-radius: var(--ui-border-radius-xl);
+
+    .p-dialog-title {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: -0.01em;
+    }
+
+    /* Header Actions (Close/Maximize) */
+    .p-dialog-header-icons {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .p-dialog-header-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%; /* Circle buttons */
+      color: var(--theme-text-secondary);
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+
+      &:hover {
+        background-color: var(--theme-bg-ternary); // or rgba(0,0,0,0.05)
+        color: var(--theme-text-primary);
+        border-color: var(--theme-border-secondary);
+        transform: rotate(90deg); /* Subtle spin for close icon */
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 2px rgba(var(--accent-primary-rgb), 0.2);
+      }
+    }
+  }
+
+  /* --- CONTENT --- */
+  .p-dialog-content {
+    background-color: var(--theme-bg-primary);
+    color: var(--theme-text-primary);
+    padding: 1.5rem;
+    
+    /* Scrollbar styling for long content */
+    &::-webkit-scrollbar { width: 6px; }
+    &::-webkit-scrollbar-thumb { background-color: var(--theme-border-secondary); border-radius: 4px; }
+    
+    &:last-child {
+      border-bottom-left-radius: var(--ui-border-radius-xl);
+      border-bottom-right-radius: var(--ui-border-radius-xl);
+    }
+  }
+
+  /* --- FOOTER --- */
+  .p-dialog-footer {
+    background-color: var(--theme-bg-primary);
+    border-top: 1px solid var(--theme-border-primary);
+    padding: 1rem 1.5rem;
+    border-bottom-left-radius: var(--ui-border-radius-xl);
+    border-bottom-right-radius: var(--ui-border-radius-xl);
+    
+    /* Layout */
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+
+    button {
+      margin: 0; /* Reset default margins */
+    }
+  }
+}
+
+/* --- RESPONSIVE FULLSCREEN ADJUSTMENT --- */
+@media screen and (max-width: 768px) {
+  ::ng-deep .p-dialog.p-dialog-maximized {
+    border-radius: 0;
+    .p-dialog-header, .p-dialog-content, .p-dialog-footer {
+      border-radius: 0;
+    }
+  }
+}
 
 
 
