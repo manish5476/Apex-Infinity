@@ -1,64 +1,217 @@
-/* ---------------- ATTACHMENTS ---------------- */
+// src/app/core/models/note.types.ts
+
+export type NoteType = 'note' | 'task' | 'meeting' | 'idea' | 'journal' | 'project';
+export type Priority = 'low' | 'medium' | 'high' | 'urgent';
+export type NoteStatus = 'draft' | 'active' | 'completed' | 'archived' | 'deferred';
+export type Permission = 'viewer' | 'contributor' | 'admin';
 
 export interface NoteAttachment {
   url: string;
   publicId: string;
-  fileType: 'image' | 'video' | 'file';
+  fileType: 'image' | 'file';
+  fileName: string;
+  size: number;
+  uploadedAt?: Date;
 }
 
-/* ---------------- USER (POPULATED) ---------------- */
-
-export interface NoteOwner {
-  _id: string;
-  name: string;
-  avatar?: string;
-  role?: string;
+export interface MeetingDetails {
+  agenda?: string;
+  minutes?: string;
+  location?: string;
+  meetingType?: 'in-person' | 'virtual' | 'hybrid';
+  videoLink?: string;
+  recurrence?: 'none' | 'daily' | 'weekly' | 'monthly' | 'yearly';
+  recurrenceEndDate?: Date;
 }
 
-/* ---------------- NOTE ---------------- */
+export interface Subtask {
+  title: string;
+  _id:string;
+  completed: boolean;
+  completedAt?: Date;
+}
 
+export interface ActivityLog {
+  action: string;
+  user: any
+  timestamp: string | Date;
+}
+
+export interface Participant {
+  user: {
+    _id: string;
+    name: string;
+    email: string;
+    avatar?: string;
+  };
+  role: 'organizer' | 'attendee' | 'contributor' | 'viewer';
+  rsvp: 'pending' | 'accepted' | 'declined' | 'tentative';
+  responseAt?: Date;
+}
+
+// The Main Entity
 export interface Note {
-  _id?: string;
-
-  title?: string;
+  _id: string;
+  id: string;
+  organizationId: string;
+  owner: {
+    _id: string;
+    name: string;
+    email: string;
+    avatar?: string;
+  };
+  title: string;
   content: string;
+  summary?: string;
+  
+  noteType: NoteType;
+  status: NoteStatus;
+  priority: Priority;
+  
+  startDate?: string | Date;
+  dueDate?: string | Date;
+  completedAt?: string | Date;
+  duration?: number; // minutes
+
+  category?: string;
   tags?: string[];
-
+  
+  // Feature flags
+  isMeeting: boolean;
+  isPinned: boolean;
+  isTemplate: boolean;
+  isDeleted: boolean; // Soft delete flag
+  
+  // Complex nested objects
+  meetingDetails?: MeetingDetails;
+  meetingId?: string; 
+  participants: Participant[];
   attachments: NoteAttachment[];
+  
+  // Progress & Subtasks
+  progress?: number; // 0-100
+  subtasks?: Subtask[];
 
-  // Relationships
-  organizationId?: string;
-  branchId?: string;
-  owner?: NoteOwner;
+  // Linking & History
+  relatedNotes?: string[] | Note[]; // IDs or Populated objects
+  projectId?: string; // Reference ID
+  activityLog?: ActivityLog[];
 
-  // Dates
-  noteDate: string;      // 🔥 ACTUAL note date (calendar, filters)
-  createdAt?: string;    // audit only
-  updatedAt?: string;
+  // Sharing
+  visibility: 'private' | 'team' | 'department' | 'organization';
+  sharedWith: string[] | { _id: string; name: string }[]; // IDs or Populated users
 
-  // Logic
-  visibility?: 'public' | 'private' | 'team';
-  importance?: 'low' | 'normal' | 'high';
-  isPinned?: boolean;
+  // Timestamps
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string;
 }
 
-/* ---------------- CALENDAR ---------------- */
+// // For Calendar View
+// export interface CalendarEvent {
+//   id: string;
+//   title: string;
+//   start: string | Date;
+//   end?: string | Date;
+//   allDay: boolean;
+//   color?: string;
+//   textColor?: string;
+//   extendedProps?: {
+//     noteType: NoteType;
+//     status: NoteStatus;
+//     priority: Priority;
+//     isMeeting: boolean;
+//     type?: string; 
+//     participants?: string[]; // Names of participants
+//     meetingId?: string;
+//   };
+// }
 
-export interface DailyNoteCount {
-  day: number;
-  count: number;
-  hasHighPriority?: boolean;
-}
-
-/* ---------------- FILTERING ---------------- */
-
+// For API Requests
 export interface NoteFilterParams {
-  date?: string;   // YYYY-MM-DD
-  week?: string;   // YYYY-MM-DD
-  month?: number;  // 1–12
-  year?: number;   // YYYY
+  type?: NoteType;
+  status?: NoteStatus;
+  priority?: Priority;
   search?: string;
+  category?: string;
+  tag?: string;
+  startDate?: string;
+  endDate?: string;
+  date?: string; // Specific date filter
+  page?: number;
+  limit?: number;
+  sort?: string;
+}
 
-  relatedTo?: 'customer' | 'product' | 'invoice' | 'purchase' | 'other';
-  relatedId?: string;
+// Analytics Interfaces
+export interface DailyNoteCount {
+  date: string;
+  count: number;
+  notes: string[]; // IDs
+}
+
+export interface HeatMapData {
+  [date: string]: {
+    count: number;
+    intensity: number; // 0 to 1
+  };
+}
+
+export interface NoteStatistics {
+  totalNotes: number;
+  byType: { _id: NoteType; count: number }[];
+  byStatus: { _id: NoteStatus; count: number }[];
+  byPriority: { _id: Priority; count: number }[];
+  recentActivity: Partial<Note>[];
+}
+
+export interface AnalyticsSummary {
+  byType: { _id: NoteType; count: number }[];
+  byStatus: { _id: NoteStatus; count: number }[];
+  byPriority: { _id: Priority; count: number }[];
+  dailyActivity: { _id: string; count: number }[];
+  completionRate: { total: number; completed: number };
+  topTags: { _id: string; count: number }[];
+  period: 'week' | 'month' | 'quarter' | 'year';
+}
+
+// Separate Meeting Interface
+export interface Meeting {
+  _id: string;
+  organizationId: string;
+  title: string;
+  description: string;
+  agenda?: string;
+  startTime: string | Date;
+  endTime: string | Date;
+  organizer: string | { _id: string; name: string; avatar?: string };
+  status: 'scheduled' | 'cancelled' | 'completed' | 'rescheduled';
+  locationType?: 'in-person' | 'virtual' | 'hybrid';
+  virtualLink?: string;
+  participants?: Participant[];
+  minutes?: string;
+  actionItems?: any[];
+}
+// src/app/core/models/note.types.ts
+
+// ... other interfaces ...
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  start: string | Date;
+  end?: string | Date;
+  allDay: boolean;
+  color?: string;
+  textColor?: string;
+  
+  // FIX: define the shape explicitly so the template knows what 'isMeeting' is
+   extendedProps: {
+    noteType?: string;
+    status?: string;
+    priority?: string;
+    isMeeting?: boolean; // This is what the template is looking for
+    participants?: string[];
+    meetingId?: string;
+  }; 
 }

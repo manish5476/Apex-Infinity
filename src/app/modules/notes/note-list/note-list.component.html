@@ -1,0 +1,46 @@
+<div class="dashboard-container">
+  
+  <header class="dashboard-header">
+    <div class="header-content">
+      <h1 class="page-title">My Notes</h1>
+      <span class="count-badge" *ngIf="!isLoading()">{{ totalNotes() }}</span>
+    </div>
+
+    <div class="toolbar-actions">
+      <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input 
+          [formControl]="searchControl" 
+          type="text" 
+          placeholder="Search notes, tags, meetings..." 
+          class="search-input"
+        >
+      </div>
+
+      <button class="btn-create" (click)="createNew()">
+        <span class="icon">+</span> New Note
+      </button>
+    </div>
+  </header>
+
+  <div class="loading-state" *ngIf="isLoading()">
+    <div class="spinner"></div>
+    <p>Loading your workspace...</p>
+  </div>
+
+  <div class="empty-state" *ngIf="!isLoading() && notes().length === 0">
+    <div class="empty-icon">📝</div>
+    <h3>No notes found</h3>
+    <p>Create your first note to get started.</p>
+  </div>
+
+  <div class="notes-grid" *ngIf="!isLoading() && notes().length > 0">
+    <app-note-card
+      *ngFor="let note of notes()"
+      [note]="note"
+      (pin)="onPin($event)"
+      (edit)="onEdit($event)"
+      (delete)="onDelete($event)"
+    ></app-note-card>
+  </div>
+</div>

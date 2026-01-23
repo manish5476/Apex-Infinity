@@ -1,0 +1,153 @@
+<div class="note-card" 
+     [class.is-pinned]="note.isPinned" 
+     [class.is-deleted]="note.isDeleted"
+     [class.is-archived]="note.status === 'archived'"
+     [ngClass]="'priority-' + note.priority"
+     (click)="onCardClick()">
+  
+  <div class="card-header">
+    <div class="meta-badges">
+      <span class="type-badge" [ngClass]="note.noteType" [title]="note.noteType | titlecase">
+        <span *ngIf="note.noteType === 'note'">📝</span>
+        <span *ngIf="note.noteType === 'meeting'">📅</span>
+        <span *ngIf="note.noteType === 'task'">✅</span>
+        <span *ngIf="note.noteType === 'idea'">💡</span>
+        <span *ngIf="note.noteType === 'project'">🚀</span>
+      </span>
+      
+      <span *ngIf="isOverdue" class="status-badge overdue">Overdue</span>
+      <span *ngIf="note.status === 'completed'" class="status-badge completed">Done</span>
+    </div>
+    
+    <button class="btn-icon pin-btn" 
+            (click)="$event.stopPropagation(); pin.emit(note._id)" 
+            [class.active]="note.isPinned"
+            title="Pin Note">
+      📌
+    </button>
+  </div>
+
+  <div class="card-body">
+    <h3 class="card-title">{{ note.title }}</h3>
+    
+    <div *ngIf="note.noteType === 'meeting'" class="meeting-details">
+      <div class="meeting-row">
+        <span>⏰ {{ meetingTimeDisplay }}</span>
+      </div>
+      <div class="meeting-row" *ngIf="note.meetingDetails?.location">
+        <span>📍 {{ note.meetingDetails?.location }}</span>
+      </div>
+      <div class="meeting-row" *ngIf="note.meetingDetails?.videoLink">
+        <span>📹 Virtual Meeting</span>
+      </div>
+    </div>
+
+    <p class="card-excerpt">{{ note.summary || (note.content | slice:0:120) }}...</p>
+    
+    <div class="progress-section" *ngIf="progress !== null">
+      <div class="progress-bar">
+        <div class="fill" [style.width.%]="progress"></div>
+      </div>
+      <span class="progress-text">{{ progress }}%</span>
+    </div>
+
+    <div class="tags-list" *ngIf="note.tags?.length">
+      <span class="tag" *ngFor="let tag of note.tags | slice:0:3">#{{ tag }}</span>
+      <span class="tag-more" *ngIf="note.tags && note.tags.length > 3">+{{ note.tags.length - 3 }}</span>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    <div class="footer-left">
+      <div class="avatar-stack" *ngIf="note.participants && note.participants.length">
+        <div class="avatar" 
+             *ngFor="let p of note.participants | slice:0:3" 
+             [title]="p.user.name">
+          {{ p.user.name.charAt(0) }}
+        </div>
+        <div class="avatar more" *ngIf="note.participants.length > 3">
+          +{{ note.participants.length - 3 }}
+        </div>
+      </div>
+
+      <span *ngIf="note.attachments.length" class="attachment-indicator" title="Attachments">
+        📎 {{ note.attachments.length }}
+      </span>
+      <span class="date">{{ note.updatedAt | date:'MMM d' }}</span>
+    </div>
+
+    <div class="actions" (click)="$event.stopPropagation()">
+      <button *ngIf="note.isDeleted || note.status === 'archived'" 
+              class="btn-icon restore" 
+              (click)="restore.emit(note._id)" 
+              title="Restore">
+        ♻️
+      </button>
+
+      <button *ngIf="!note.isDeleted && note.status !== 'archived'" 
+              class="btn-icon" 
+              (click)="archive.emit(note._id)" 
+              title="Archive">
+        🗄️
+      </button>
+
+      <button class="btn-icon" (click)="share.emit(note._id)" title="Share">📤</button>
+      
+      <button class="btn-icon danger" (click)="delete.emit(note._id)" title="Delete">🗑️</button>
+    </div>
+  </div>
+</div>
+
+<!-- <div class="note-card" 
+     [class.is-pinned]="note.isPinned" 
+     [ngClass]="'priority-' + note.priority">
+  
+  <div class="card-header">
+    <div class="meta-badges">
+      <span class="type-badge" [ngClass]="note.noteType">
+        <span *ngIf="note.noteType === 'note'">📝</span>
+        <span *ngIf="note.noteType === 'meeting'">📅</span>
+        <span *ngIf="note.noteType === 'task'">✅</span>
+        <span *ngIf="note.noteType === 'idea'">💡</span>
+      </span>
+      <span *ngIf="isOverdue" class="status-badge overdue">Overdue</span>
+    </div>
+    
+    <button class="btn-icon pin-btn" (click)="pin.emit(note._id)" [class.active]="note.isPinned">
+      📌
+    </button>
+  </div>
+
+  <div class="card-body" (click)="edit.emit(note._id)">
+    <h3 class="card-title">{{ note.title }}</h3>
+    
+    <div *ngIf="note.noteType === 'meeting'" class="meeting-details">
+      <div class="meeting-row">
+        <span>⏰ {{ meetingTimeDisplay }}</span>
+      </div>
+      <div class="meeting-row" *ngIf="note.meetingDetails?.location">
+        <span>📍 {{ note.meetingDetails?.location }}</span>
+      </div>
+    </div>
+
+    <p class="card-excerpt">{{ note.summary || (note.content | slice:0:120) }}...</p>
+    
+    <div class="tags-list" *ngIf="note.tags?.length">
+      <span class="tag" *ngFor="let tag of note.tags">#{{ tag }}</span>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    <div class="footer-left">
+      <span *ngIf="note.attachments.length" class="attachment-indicator" title="Has attachments">
+        📎 {{ note.attachments.length }}
+      </span>
+      <span class="date">{{ note.updatedAt | date:'MMM d' }}</span>
+    </div>
+
+    <div class="actions">
+      <button class="btn-icon" (click)="share.emit(note._id)" title="Share">📤</button>
+      <button class="btn-icon danger" (click)="delete.emit(note._id)" title="Delete">🗑️</button>
+    </div>
+  </div>
+</div> -->

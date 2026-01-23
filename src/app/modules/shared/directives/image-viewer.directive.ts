@@ -4,6 +4,7 @@ import { Directive, HostListener, Input, Renderer2, Inject, DOCUMENT } from '@an
   selector: '[appImageViewer]',
   standalone: true
 })
+
 export class ImageViewerDirective {
   @Input('appImageViewer') imageSrc: string | undefined;
 

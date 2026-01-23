@@ -45,7 +45,30 @@ export const SIDEBAR_MENU: MenuItem[] = [
       { label: 'EMI Management', icon: 'pi pi-calendar-clock', routerLink: ['/emis'] },
     ]
   },
+ {
+    label: 'Notes',
+    icon: 'pi pi-book',
+    items: [
 
+      {
+        label: 'Notes List',
+        icon: 'pi pi-list',
+        routerLink: ['/notes']
+      },
+
+      {
+        label: 'Create Note',
+        icon: 'pi pi-plus',
+        routerLink: ['/notes/create']
+      },
+
+      {
+        label: 'Calendar',
+        icon: 'pi pi-calendar',
+        routerLink: ['/notes/calendar']
+      },
+    ]
+  },
   // ==========================
   // 3. INVENTORY & SUPPLY (SCM)
   // ==========================
@@ -141,7 +164,8 @@ export const SIDEBAR_MENU: MenuItem[] = [
       { label: 'System Logs', icon: 'pi pi-exclamation-circle', routerLink: ['/logs'] },
       { label: 'Active Sessions', icon: 'pi pi-wifi', routerLink: ['/sessions'] },
     ]
-  }
+  },
+ 
 ];
 
 
