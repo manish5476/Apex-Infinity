@@ -1,5 +1,5 @@
 <div class="create-container">
-  
+
   <header class="page-header">
     <h1 class="page-title">Create New Note</h1>
     <div class="actions">
@@ -8,23 +8,14 @@
   </header>
 
   <form [formGroup]="noteForm" (ngSubmit)="onSubmit()" class="glass-panel">
-    
     <div class="main-editor">
-      
       <div class="form-group">
-        <input 
-          type="text" 
-          formControlName="title" 
-          placeholder="Untitled Note..." 
-          class="input-title"
-          [class.error]="noteForm.get('title')?.invalid && noteForm.get('title')?.touched"
-        >
+        <input type="text" formControlName="title" placeholder="Untitled Note..." class="input-title"
+          [class.error]="noteForm.get('title')?.invalid && noteForm.get('title')?.touched">
       </div>
 
       <div class="type-tabs">
-        <label 
-          *ngFor="let type of noteTypes" 
-          class="type-tab" 
+        <label *ngFor="let type of noteTypes" class="type-tab"
           [class.active]="noteForm.get('noteType')?.value === type.value">
           <input type="radio" formControlName="noteType" [value]="type.value" hidden>
           {{ type.label }}
@@ -32,11 +23,8 @@
       </div>
 
       <div class="form-group content-wrapper">
-        <textarea 
-          formControlName="content" 
-          placeholder="Start typing your thoughts here..." 
-          class="input-content"
-        ></textarea>
+        <textarea formControlName="content" placeholder="Start typing your thoughts here..."
+          class="input-content"></textarea>
       </div>
 
       <div class="attachments-area" *ngIf="uploadedAttachments().length > 0">
@@ -49,15 +37,12 @@
     </div>
 
     <div class="sidebar">
-      
+
       <div class="sidebar-section">
         <label class="section-label">Priority</label>
         <div class="priority-grid">
-          <label 
-            *ngFor="let p of priorities" 
-            class="priority-option"
-            [class.selected]="noteForm.get('priority')?.value === p"
-            [class]="p">
+          <label *ngFor="let p of priorities" class="priority-option"
+            [class.selected]="noteForm.get('priority')?.value === p" [class]="p">
             <input type="radio" formControlName="priority" [value]="p" hidden>
             <span class="dot"></span> {{ p | titlecase }}
           </label>
@@ -80,12 +65,7 @@
 
       <div class="sidebar-section">
         <label class="section-label">Tags</label>
-        <input 
-          type="text" 
-          formControlName="tags" 
-          placeholder="frontend, bug, v2 (comma separated)" 
-          class="input-std"
-        >
+        <input type="text" formControlName="tags" placeholder="frontend, bug, v2 (comma separated)" class="input-std">
       </div>
 
       <div class="sidebar-section" *ngIf="noteForm.get('noteType')?.value === 'meeting'" formGroupName="meetingDetails">

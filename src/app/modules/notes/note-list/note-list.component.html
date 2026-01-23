@@ -1,46 +1,112 @@
 <div class="dashboard-container">
   
-  <header class="dashboard-header">
-    <div class="header-content">
-      <h1 class="page-title">My Notes</h1>
-      <span class="count-badge" *ngIf="!isLoading()">{{ totalNotes() }}</span>
+  <aside class="filters-sidebar glass-panel">
+    <div class="compose-btn-wrapper">
+      <button class="btn-compose" routerLink="/notes/create">
+        <span class="icon">+</span> New Note
+      </button>
     </div>
 
-    <div class="toolbar-actions">
+    <nav class="nav-menu">
+      <button class="nav-item" 
+              [class.active]="activeFilter() === 'all'"
+              (click)="setFilter('all')">
+        <span class="icon">📝</span> All Notes
+        <span class="count">{{ stats()?.totalNotes || 0 }}</span>
+      </button>
+      
+      <button class="nav-item" 
+              [class.active]="activeFilter() === 'favorites'"
+              (click)="setFilter('favorites')">
+        <span class="icon">⭐</span> Favorites
+      </button>
+      
+      <button class="nav-item" 
+              [class.active]="activeFilter() === 'shared'"
+              (click)="setFilter('shared')">
+        <span class="icon">👥</span> Shared with me
+      </button>
+      
+      <div class="divider"></div>
+      
+      <button class="nav-item" 
+              [class.active]="activeFilter() === 'archived'"
+              (click)="setFilter('archived')">
+        <span class="icon">🗄️</span> Archived
+      </button>
+      
+      <button class="nav-item danger" 
+              [class.active]="activeFilter() === 'trash'"
+              (click)="setFilter('trash')">
+        <span class="icon">🗑️</span> Trash
+      </button>
+    </nav>
+
+    <div class="stats-widget" *ngIf="stats()">
+      <h3>Progress</h3>
+      <div class="stat-row">
+        <span>Completed</span>
+        <span class="val success">{{ stats()?.byStatus | json }}%</span> 
+        </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    
+    <header class="top-bar glass-panel">
       <div class="search-wrapper">
         <span class="search-icon">🔍</span>
         <input 
-          [formControl]="searchControl" 
           type="text" 
-          placeholder="Search notes, tags, meetings..." 
+          [formControl]="searchControl" 
+          placeholder="Search notes, meetings, tags..."
           class="search-input"
         >
       </div>
 
-      <button class="btn-create" (click)="createNew()">
-        <span class="icon">+</span> New Note
-      </button>
+      <div class="view-controls">
+        <button class="btn-icon" [class.active]="viewMode() === 'grid'" (click)="viewMode.set('grid')">
+          ⊞
+        </button>
+        <button class="btn-icon" [class.active]="viewMode() === 'list'" (click)="viewMode.set('list')">
+          ☰
+        </button>
+      </div>
+    </header>
+
+    <div class="content-area">
+      
+      <div class="loading-state" *ngIf="isLoading()">
+        <div class="spinner"></div>
+      </div>
+
+      <div class="empty-state" *ngIf="!isLoading() && notes().length === 0">
+        <div class="illustration">🍃</div>
+        <h3>No notes found</h3>
+        <p>Create your first note or check your filters.</p>
+        <button class="btn-primary" routerLink="/notes/create">Create Note</button>
+      </div>
+
+      <div class="notes-grid" *ngIf="!isLoading() && notes().length > 0" [class.list-layout]="viewMode() === 'list'">
+        @for (note of notes(); track note._id) {
+          <app-note-card 
+            [note]="note"
+            (edit)="onEditNote($event)"
+            (pin)="onPinNote($event)"
+            (delete)="onDeleteNote($event)"
+            (archive)="onArchiveNote($event)"
+            (restore)="onRestoreNote($event)"
+            (share)="onShareNote($event)"
+          ></app-note-card>
+        }
+      </div>
+
+      <div class="pagination" *ngIf="totalPages() > 1">
+        <button (click)="changePage(-1)" [disabled]="currentPage() === 1">Prev</button>
+        <span>Page {{ currentPage() }} of {{ totalPages() }}</span>
+        <button (click)="changePage(1)" [disabled]="currentPage() === totalPages()">Next</button>
+      </div>
+      
     </div>
-  </header>
-
-  <div class="loading-state" *ngIf="isLoading()">
-    <div class="spinner"></div>
-    <p>Loading your workspace...</p>
-  </div>
-
-  <div class="empty-state" *ngIf="!isLoading() && notes().length === 0">
-    <div class="empty-icon">📝</div>
-    <h3>No notes found</h3>
-    <p>Create your first note to get started.</p>
-  </div>
-
-  <div class="notes-grid" *ngIf="!isLoading() && notes().length > 0">
-    <app-note-card
-      *ngFor="let note of notes()"
-      [note]="note"
-      (pin)="onPin($event)"
-      (edit)="onEdit($event)"
-      (delete)="onDelete($event)"
-    ></app-note-card>
-  </div>
+  </main>
 </div>
