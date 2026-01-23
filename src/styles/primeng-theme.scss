@@ -2325,6 +2325,181 @@
   box-shadow: var(--shadow-xl);
 }
 
+/* ==========================================================================
+   COMPONENT: AUTOCOMPLETE (Refined Compact)
+   ========================================================================== */
+
+::ng-deep .p-autocomplete {
+  width: 100%;
+  display: flex; /* Ensures input fills width */
+
+  /* --- 1. THE INPUT FIELD (Single Mode) --- */
+  .p-inputtext {
+    width: 100%;
+    height: 40px; /* Standardize Height */
+    background-color: var(--theme-bg-primary); /* Surface */
+    border: 1px solid var(--theme-border-primary);
+    border-radius: var(--ui-border-radius);
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--theme-text-primary);
+    transition: all 0.2s ease;
+    padding-left: 12px;
+
+    /* Placeholder Styling */
+    &::placeholder {
+      color: var(--theme-text-tertiary);
+      opacity: 0.8;
+    }
+
+    /* States */
+    &:enabled:hover {
+      border-color: var(--theme-border-secondary);
+      background-color: var(--theme-bg-secondary);
+    }
+
+    &:enabled:focus {
+      border-color: var(--theme-accent-primary);
+      background-color: var(--theme-bg-primary);
+      box-shadow: 0 0 0 2px rgba(var(--accent-primary-rgb), 0.15); /* Soft Ring */
+    }
+  }
+
+  /* --- 2. DROPDOWN BUTTON (Optional) --- */
+  .p-autocomplete-dropdown {
+    width: 40px;
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border-primary);
+    border-left: none; /* Merge with input */
+    color: var(--theme-text-secondary);
+    
+    &:enabled:hover {
+      background: var(--component-bg-hover);
+      color: var(--theme-text-primary);
+    }
+    
+    &:enabled:active {
+      background: var(--theme-bg-ternary);
+    }
+  }
+
+  /* --- 3. MULTIPLE SELECTION CONTAINER (Chips) --- */
+  .p-autocomplete-multiple-container {
+    width: 100%;
+    min-height: 40px;
+    padding: 2px 4px;
+    background-color: var(--theme-bg-primary);
+    border: 1px solid var(--theme-border-primary);
+    border-radius: var(--ui-border-radius);
+    gap: 4px;
+    
+    &:not(.p-disabled):hover {
+      border-color: var(--theme-border-secondary);
+    }
+    
+    &.p-focus {
+      border-color: var(--theme-accent-primary);
+      box-shadow: 0 0 0 2px rgba(var(--accent-primary-rgb), 0.15);
+    }
+
+    /* The "Chip" Token */
+    .p-autocomplete-token {
+      margin: 2px;
+      padding: 2px 8px;
+      border-radius: 6px; /* Soft rect, not pill */
+      
+      /* Gradient Badge Look */
+      background: linear-gradient(135deg, var(--theme-accent-primary), var(--theme-accent-secondary));
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+      border: none;
+
+      .p-autocomplete-token-icon {
+        color: rgba(255,255,255,0.8);
+        font-size: 10px;
+        margin-left: 6px;
+        &:hover { color: #fff; cursor: pointer; }
+      }
+    }
+
+    /* The Input inside the container */
+    .p-autocomplete-input-token input {
+      font-family: var(--font-body);
+      font-size: 13px;
+      color: var(--theme-text-primary);
+      padding: 4px;
+      margin: 2px;
+      
+      &::placeholder { color: var(--theme-text-tertiary); }
+    }
+  }
+
+  /* --- 4. LOADING STATE --- */
+  .p-autocomplete-loader {
+    right: 12px;
+    color: var(--theme-accent-primary);
+  }
+}
+
+/* ==========================================================================
+   THE DROPDOWN PANEL (Floating Results)
+   ========================================================================== */
+::ng-deep .p-autocomplete-panel {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border-primary);
+  border-radius: var(--ui-border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  margin-top: 4px;
+  overflow: hidden; /* Clip corners */
+
+  /* The List */
+  .p-autocomplete-items {
+    padding: 4px;
+    
+    .p-autocomplete-item {
+      margin: 2px 0;
+      padding: 8px 12px;
+      border-radius: var(--ui-border-radius);
+      color: var(--theme-text-primary);
+      font-size: 13px;
+      transition: all 0.1s ease;
+      
+      /* Item Hover */
+      &:hover {
+        background-color: var(--component-bg-hover);
+        color: var(--theme-text-primary);
+      }
+
+      /* Item Selected (Highlight) */
+      &.p-highlight {
+        background-color: rgba(var(--accent-primary-rgb), 0.1);
+        color: var(--theme-accent-primary);
+        font-weight: 600;
+      }
+    }
+    
+    /* Group Headers */
+    .p-autocomplete-item-group {
+      background: var(--theme-bg-primary);
+      color: var(--theme-text-tertiary);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 8px 12px;
+    }
+  }
+  
+  /* Empty Message */
+  .p-autocomplete-empty-message {
+    padding: 12px;
+    color: var(--theme-text-tertiary);
+    font-size: 13px;
+    font-style: italic;
+    text-align: center;
+  }
+}
 
 
 
