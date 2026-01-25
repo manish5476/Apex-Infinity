@@ -213,10 +213,8 @@ export class CustomerIntelligenceComponent implements OnInit {
   private analyticsService = inject(AdminAnalyticsService);
   private commonService = inject(CommonMethodService);
   private cdr = inject(ChangeDetectorRef);
-
   intelligenceData = signal<any>(null);
   loading = signal<boolean>(true);
-  
   // Filter state
   selectedBranch = '';
   dateRange: Date[] | undefined;
