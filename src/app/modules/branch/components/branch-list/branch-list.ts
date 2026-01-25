@@ -35,7 +35,6 @@ export class BranchListComponent implements OnInit {
   private messageService = inject(AppMessageService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-
   private gridApi!: GridApi;
   private currentPage = 1;
   private isLoading = false;

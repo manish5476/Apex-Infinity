@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MasterListService } from '../../../../core/services/master-list.service';
 
 @Component({
   selector: 'app-date-filter',
@@ -157,6 +158,7 @@ export class DateFilterComponent {
   @Input() startDate?: string;
   @Input() endDate?: string;
   @Output() dateChange = new EventEmitter<any>();
+  public  masterList = inject(MasterListService);
 
   onDateChange(): void {
     this.dateChange.emit({
