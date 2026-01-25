@@ -28,7 +28,7 @@
   flex-direction: column;
   width: 100%;
   height: 100%;
-  background: var(--bg-secondary);
+  background: var(--bg-primary);
   border-radius: var(--ui-border-radius-lg);
   box-shadow: var(--shadow-md);
   overflow: hidden;
@@ -49,7 +49,7 @@
 /* === HEADER === */
 .customer-form-header {
   padding: var(--spacing-lg) var(--spacing-xl);
-  background: var(--bg-secondary);
+  background: var(--bg-primary);
   border-bottom: var(--ui-border-width) solid var(--border-primary);
   flex-shrink: 0;
 
@@ -82,7 +82,7 @@
 
 /* === SECTIONS === */
 .form-section {
-  background: var(--bg-secondary);
+  background: var(--bg-primary);
   border: var(--ui-border-width) solid var(--border-primary);
   border-radius: var(--ui-border-radius-lg);
   padding: var(--spacing-xl);
@@ -189,7 +189,7 @@
 
 /* === FOOTER === */
 .customer-form-footer {
-  background: var(--bg-secondary);
+  background: var(--bg-primary);
   border-top: var(--ui-border-width) solid var(--border-primary);
   padding: var(--spacing-lg) var(--spacing-xl);
   display: flex;
@@ -198,41 +198,41 @@
   flex-shrink: 0;
 }
 
-/* === NG-DEEP OVERRIDES === */
-:host ::ng-deep {
-  // Inputs full width
-  .p-inputtext,
-  .p-inputnumber,
-  .p-select,
-  .p-textarea,
-  .p-chips,
-  .p-chips-multiple-container {
-    width: 100%;
-  }
+// /* === NG-DEEP OVERRIDES === */
+// :host ::ng-deep {
+//   // Inputs full width
+//   .p-inputtext,
+//   .p-inputnumber,
+//   .p-select,
+//   .p-textarea,
+//   .p-chips,
+//   .p-chips-multiple-container {
+//     width: 100%;
+//   }
 
-  // Theme Consistency
-  .p-inputtext,
-  .p-select,
-  .p-textarea,
-  .p-chips-multiple-container {
-    background: var(--bg-primary); // Input bg is primary (on secondary section)
-    color: var(--text-primary);
-    border-color: var(--border-secondary);
-  }
+//   // Theme Consistency
+//   .p-inputtext,
+//   .p-select,
+//   .p-textarea,
+//   .p-chips-multiple-container {
+//     background: var(--bg-primary); // Input bg is primary (on secondary section)
+//     color: var(--text-primary);
+//     border-color: var(--border-secondary);
+//   }
 
-  .p-inputnumber-button {
-    background: var(--bg-ternary);
-    color: var(--text-secondary);
-    border-color: var(--border-secondary);
-  }
+//   .p-inputnumber-button {
+//     background: var(--bg-ternary);
+//     color: var(--text-secondary);
+//     border-color: var(--border-secondary);
+//   }
 
-  // Error States
-  .ng-invalid.ng-touched {
-    :is(.p-inputtext, .p-select, .p-textarea) {
-      border-color: var(--color-error);
-    }
-  }
-}
+//   // Error States
+//   .ng-invalid.ng-touched {
+//     :is(.p-inputtext, .p-select, .p-textarea) {
+//       border-color: var(--color-error);
+//     }
+//   }
+// }
 
 /* Helper */
 .align-bottom {
@@ -256,15 +256,15 @@
   }
 }
 
-/* Make read-only inputs look slightly different */
-:host ::ng-deep .p-input-filled .p-inputtext {
-  background-color: var(--bg-ternary);
-  font-weight: 600;
-}
+// /* Make read-only inputs look slightly different */
+// :host ::ng-deep .p-input-filled .p-inputtext {
+//   background-color: var(--bg-ternary);
+//   font-weight: 600;
+// }
 
-/* Adjust File Upload styles to fit theme */
-:host ::ng-deep .p-fileupload-content {
-    background: var(--bg-secondary);
-  border: none;
-  padding: 0;
-}
+// /* Adjust File Upload styles to fit theme */
+// :host ::ng-deep .p-fileupload-content {
+//     background: var(--bg-primary);
+//   border: none;
+//   padding: 0;
+// }

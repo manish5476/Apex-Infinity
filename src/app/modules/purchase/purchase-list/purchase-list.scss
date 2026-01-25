@@ -22,7 +22,7 @@
 
 /* --- FILTER CARD --- */
 .themed-card {
-  background: var(--bg-secondary);
+  background: var(--bg-primary);
   border: 1px solid var(--border-primary);
   border-radius: var(--ui-border-radius-lg);
   box-shadow: var(--shadow-sm);
@@ -75,7 +75,7 @@
   
   &.themed-card {
     padding: 0; // Flush grid for better look
-    background: var(--bg-secondary);
+    background: var(--bg-primary);
     border: 1px solid var(--border-primary);
     border-radius: var(--ui-border-radius-lg);
   }
@@ -87,28 +87,3 @@
   }
 }
 
-/* --- GLOBAL THEME OVERRIDES --- */
-:host ::ng-deep {
-  .p-inputtext, .p-select, .p-datepicker {
-    background: var(--bg-ternary);
-    border-color: var(--border-secondary);
-    color: var(--text-primary);
-    border-radius: var(--ui-border-radius);
-    font-size: var(--font-size-sm);
-    
-    &:enabled:focus {
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 1px var(--accent-primary);
-    }
-  }
-
-  .p-input-icon-left i {
-    color: var(--text-tertiary);
-  }
-
-  /* Grid Header Token Sync */
-  .ag-header {
-    background-color: var(--bg-ternary) !important;
-    border-bottom: 1px solid var(--border-primary) !important;
-  }
-}

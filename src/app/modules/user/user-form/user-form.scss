@@ -71,13 +71,13 @@
   padding-top: var(--spacing-2xl);
 }
 
-:host ::ng-deep {
-  .p-inputtext, .p-select, .p-password input {
-    width: 100%;
-    border-radius: var(--ui-border-radius);
-    background: var(--bg-primary);
-    border-color: var(--border-secondary);
+// :host ::ng-deep {
+//   .p-inputtext, .p-select, .p-password input {
+//     width: 100%;
+//     border-radius: var(--ui-border-radius);
+//     background: var(--bg-primary);
+//     border-color: var(--border-secondary);
     
-    &:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 2px var(--accent-focus); }
-  }
-}
+//     &:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 2px var(--accent-focus); }
+//   }
+// }

@@ -287,29 +287,6 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
       overflow: hidden;
     }
 
-    /* Tab Overrides */
-    :host ::ng-deep .p-tablist {
-      background: var(--bg-ternary) !important;
-      border-bottom: 1px solid var(--border-secondary);
-    }
-    :host ::ng-deep .p-tab {
-      color: var(--text-tertiary) !important;
-      border-color: transparent !important;
-      transition: all 0.3s;
-      padding: 1rem 1.5rem;
-    }
-    :host ::ng-deep .p-tab:hover { color: var(--text-primary) !important; }
-    
-    :host ::ng-deep .p-tab-active {
-      color: var(--text-primary) !important;
-      border-bottom-color: var(--accent-primary) !important;
-      font-weight: bold;
-    }
-    :host ::ng-deep .p-tabpanels {
-      padding: 0 !important;
-      background: transparent !important;
-    }
-
     .tab-icon { margin-right: 8px; font-size: 0.9rem; }
     .tab-label { font-size: var(--font-size-sm); font-weight: bold; }
 

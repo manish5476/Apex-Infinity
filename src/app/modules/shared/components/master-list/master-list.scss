@@ -74,100 +74,100 @@
   }
 }
 
-/* ==============================================
-   4. SHARP COMPONENT OVERRIDES
-   ============================================== */
-:host ::ng-deep {
+// /* ==============================================
+//    4. SHARP COMPONENT OVERRIDES
+//    ============================================== */
+// :host ::ng-deep {
     
-    /* --- Buttons: Sharp & Flat --- */
-    .p-button {
-        border-radius: var(--radius-sharp) !important;
-        font-weight: 600;
+//     /* --- Buttons: Sharp & Flat --- */
+//     .p-button {
+//         border-radius: var(--radius-sharp) !important;
+//         font-weight: 600;
         
-        &.p-button-outlined {
-            border-width: 1px;
-        }
-    }
+//         &.p-button-outlined {
+//             border-width: 1px;
+//         }
+//     }
 
-    /* --- Inputs: Rectangular --- */
-    .p-inputtext, .p-inputtextarea, .p-select {
-        border-radius: var(--radius-sharp) !important;
-        background: var(--bg-ternary);
-        border: 1px solid var(--border-secondary);
-        color: var(--text-primary);
-        transition: border-color 0.2s, box-shadow 0.2s;
+//     /* --- Inputs: Rectangular --- */
+//     .p-inputtext, .p-inputtextarea, .p-select {
+//         border-radius: var(--radius-sharp) !important;
+//         background: var(--bg-ternary);
+//         border: 1px solid var(--border-secondary);
+//         color: var(--text-primary);
+//         transition: border-color 0.2s, box-shadow 0.2s;
 
-        &:enabled:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 1px var(--primary-color);
-        }
+//         &:enabled:focus {
+//             border-color: var(--primary-color);
+//             box-shadow: 0 0 0 1px var(--primary-color);
+//         }
         
-        &::placeholder {
-            color: var(--text-secondary);
-            opacity: 0.7;
-        }
-    }
+//         &::placeholder {
+//             color: var(--text-secondary);
+//             opacity: 0.7;
+//         }
+//     }
     
-    /* --- Tags: Rectangular --- */
-    .p-tag {
-        border-radius: var(--radius-sharp) !important;
-        font-weight: 600;
-        letter-spacing: 0.05em;
-    }
+//     /* --- Tags: Rectangular --- */
+//     .p-tag {
+//         border-radius: var(--radius-sharp) !important;
+//         font-weight: 600;
+//         letter-spacing: 0.05em;
+//     }
 
-    /* ==============================================
-       5. RECTANGULAR DIALOGS
-       ============================================== */
-    .master-dialog, .bulk-dialog {
-        .p-dialog {
-            border-radius: var(--radius-sharp) !important;
-            box-shadow: var(--shadow-deep);
-            border: 1px solid var(--border-primary);
-            overflow: hidden;
-        }
+//     /* ==============================================
+//        5. RECTANGULAR DIALOGS
+//        ============================================== */
+//     .master-dialog, .bulk-dialog {
+//         .p-dialog {
+//             border-radius: var(--radius-sharp) !important;
+//             box-shadow: var(--shadow-deep);
+//             border: 1px solid var(--border-primary);
+//             overflow: hidden;
+//         }
 
-        .p-dialog-header {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            border-bottom: 1px solid var(--border-primary);
-            padding: 1.25rem 1.5rem;
-            border-radius: 0;
+//         .p-dialog-header {
+//             background: var(--bg-secondary);
+//             color: var(--text-primary);
+//             border-bottom: 1px solid var(--border-primary);
+//             padding: 1.25rem 1.5rem;
+//             border-radius: 0;
             
-            .p-dialog-title {
-                font-weight: 700;
-                font-size: 1.1rem;
-            }
-        }
+//             .p-dialog-title {
+//                 font-weight: 700;
+//                 font-size: 1.1rem;
+//             }
+//         }
 
-        .p-dialog-content {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            padding: 1.5rem;
+//         .p-dialog-content {
+//             background: var(--bg-secondary);
+//             color: var(--text-primary);
+//             padding: 1.5rem;
             
-            &::-webkit-scrollbar { width: 6px; }
-            &::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 3px; }
-        }
+//             &::-webkit-scrollbar { width: 6px; }
+//             &::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 3px; }
+//         }
 
-        .p-dialog-footer {
-            background: var(--bg-ternary);
-            border-top: 1px solid var(--border-primary);
-            padding: 1rem 1.5rem;
-            border-radius: 0;
-        }
+//         .p-dialog-footer {
+//             background: var(--bg-ternary);
+//             border-top: 1px solid var(--border-primary);
+//             padding: 1rem 1.5rem;
+//             border-radius: 0;
+//         }
 
-        .form-group {
-            margin-bottom: 0.5rem;
+//         .form-group {
+//             margin-bottom: 0.5rem;
             
-            label {
-                color: var(--text-label);
-                font-size: 0.85rem;
-                font-weight: 600;
-                margin-bottom: 0.4rem;
-                display: block;
-            }
-        }
-    }
-}
+//             label {
+//                 color: var(--text-label);
+//                 font-size: 0.85rem;
+//                 font-weight: 600;
+//                 margin-bottom: 0.4rem;
+//                 display: block;
+//             }
+//         }
+//     }
+// }
 
 /* ==============================================
    6. BULK EDITOR - SPREADSHEET LOOK

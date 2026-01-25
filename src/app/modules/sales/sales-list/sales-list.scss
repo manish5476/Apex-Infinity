@@ -109,52 +109,52 @@
   }
 }
 
-/* --- GLOBAL OVERRIDES --- */
-:host ::ng-deep {
+// /* --- GLOBAL OVERRIDES --- */
+// :host ::ng-deep {
   
-  /* Inputs */
-  .p-inputtext, .p-select {
-    background: var(--bg-ternary);
-    border-color: var(--border-secondary);
-    color: var(--text-primary);
-    border-radius: var(--ui-border-radius);
+//   /* Inputs */
+//   .p-inputtext, .p-select {
+//     background: var(--bg-ternary);
+//     border-color: var(--border-secondary);
+//     color: var(--text-primary);
+//     border-radius: var(--ui-border-radius);
     
-    &:enabled:focus {
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 1px var(--accent-primary);
-    }
+//     &:enabled:focus {
+//       border-color: var(--accent-primary);
+//       box-shadow: 0 0 0 1px var(--accent-primary);
+//     }
     
-    &:enabled:hover {
-      border-color: var(--text-tertiary);
-    }
-  }
+//     &:enabled:hover {
+//       border-color: var(--text-tertiary);
+//     }
+//   }
   
-  /* Status Badges */
-  .status-badge {
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    display: inline-block;
-    line-height: 1;
+//   /* Status Badges */
+//   .status-badge {
+//     padding: 4px 10px;
+//     border-radius: 20px;
+//     font-size: 0.75rem;
+//     font-weight: 700;
+//     text-transform: uppercase;
+//     display: inline-block;
+//     line-height: 1;
     
-    &.status-active, &.status-paid {
-      background: color-mix(in srgb, var(--color-success) 15%, transparent);
-      color: var(--color-success);
-      border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent);
-    }
+//     &.status-active, &.status-paid {
+//       background: color-mix(in srgb, var(--color-success) 15%, transparent);
+//       color: var(--color-success);
+//       border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent);
+//     }
     
-    &.status-unpaid, &.status-pending {
-      background: color-mix(in srgb, var(--color-error) 15%, transparent);
-      color: var(--color-error);
-      border: 1px solid color-mix(in srgb, var(--color-error) 30%, transparent);
-    }
+//     &.status-unpaid, &.status-pending {
+//       background: color-mix(in srgb, var(--color-error) 15%, transparent);
+//       color: var(--color-error);
+//       border: 1px solid color-mix(in srgb, var(--color-error) 30%, transparent);
+//     }
 
-    &.status-partial {
-        background: color-mix(in srgb, var(--color-warning) 15%, transparent);
-        color: var(--color-warning);
-        border: 1px solid color-mix(in srgb, var(--color-warning) 30%, transparent);
-    }
-  }
-}
+//     &.status-partial {
+//         background: color-mix(in srgb, var(--color-warning) 15%, transparent);
+//         color: var(--color-warning);
+//         border: 1px solid color-mix(in srgb, var(--color-warning) 30%, transparent);
+//     }
+//   }
+// }

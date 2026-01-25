@@ -16,20 +16,20 @@
 .animate-fade-in { animation: fadeIn 0.2s ease-in-out; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
-/* PrimeNG Overrides */
-:host ::ng-deep {
-  .p-tablist-tab-list {   background: var(--bg-secondary); border: none; }
-  .p-tab {
-    padding: 1rem 1.2rem; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; transition: all 0.2s;
-    &:hover { color: #334155; background: #f8fafc; }
-    &[aria-selected="true"] { color: #3b82f6; border-color: #3b82f6; }
-  }
-  .p-inputtext, .p-inputnumber-input, .p-select {
-    border-radius: 0.5rem; border-color: #e2e8f0;
-    &:hover { border-color: #cbd5e1; }
-    &:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1); }
-  }
-}
+// /* PrimeNG Overrides */
+// :host ::ng-deep {
+//   .p-tablist-tab-list {   background: var(--bg-secondary); border: none; }
+//   .p-tab {
+//     padding: 1rem 1.2rem; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; transition: all 0.2s;
+//     &:hover { color: #334155; background: #f8fafc; }
+//     &[aria-selected="true"] { color: #3b82f6; border-color: #3b82f6; }
+//   }
+//   .p-inputtext, .p-inputnumber-input, .p-select {
+//     border-radius: 0.5rem; border-color: #e2e8f0;
+//     &:hover { border-color: #cbd5e1; }
+//     &:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1); }
+//   }
+// }
 
 // /* Custom Scrollbar for the Panel */
 // .custom-scrollbar::-webkit-scrollbar {

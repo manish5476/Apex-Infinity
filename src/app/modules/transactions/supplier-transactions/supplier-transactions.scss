@@ -76,23 +76,23 @@
   justify-content: flex-end;
 }
 
-/* === PRIME NG OVERRIDES === */
-:host ::ng-deep {
-  .p-inputtext {
-    font-size: var(--font-size-sm);
-    padding: 0.6rem 0.75rem;
-  }
+// /* === PRIME NG OVERRIDES === */
+// :host ::ng-deep {
+//   .p-inputtext {
+//     font-size: var(--font-size-sm);
+//     padding: 0.6rem 0.75rem;
+//   }
   
-  .p-select {
-    font-size: var(--font-size-sm);
-    width: 100%;
-  }
+//   .p-select {
+//     font-size: var(--font-size-sm);
+//     width: 100%;
+//   }
   
-  .p-datepicker {
-    width: 100%;
-    input { width: 100%; }
-  }
-}
+//   .p-datepicker {
+//     width: 100%;
+//     input { width: 100%; }
+//   }
+// }
 
 :host {
   display: block;

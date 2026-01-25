@@ -224,26 +224,6 @@
   }
 }
 
-/* === PRIME NG OVERRIDES === */
-:host ::ng-deep {
-  
-  /* Progress Bar */
-  .p-progressbar {
-    height: 0.75rem;
-    background: var(--bg-ternary);
-    border-radius: 99px;
-    .p-progressbar-value { background: var(--accent-gradient); }
-  }
-
-  /* Dialog */
-  .p-dialog .p-dialog-content {
-    background: var(--bg-secondary);
-    padding: var(--spacing-xl);
-  }
-  
-  .p-inputnumber, .p-select, .p-inputtext { width: 100%; }
-}
-
 /* === UTILITIES === */
 .text-success { color: var(--color-success) !important; }
 .text-danger { color: var(--color-error) !important; }

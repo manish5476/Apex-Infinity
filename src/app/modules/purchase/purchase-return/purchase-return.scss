@@ -80,40 +80,6 @@
   overflow: hidden;
 }
 
-:host ::ng-deep .p-table-premium {
-  .p-table-thead > tr > th {
-    background: var(--bg-ternary);
-    color: var(--text-label);
-    font-size: var(--font-size-xs);
-    text-transform: uppercase;
-    padding: var(--spacing-md);
-    border-bottom: 1px solid var(--border-primary);
-  }
-
-  .p-table-tbody > tr {
-    background: var(--bg-secondary);
-    transition: background-color 0.2s;
-
-    > td {
-      padding: var(--spacing-md);
-      border-bottom: 1px solid var(--border-secondary);
-      color: var(--text-primary);
-      vertical-align: middle;
-    }
-
-    &:hover {
-      background-color: var(--bg-ternary);
-    }
-
-    &.row-selected {
-      background-color: color-mix(in srgb, var(--accent-primary) 5%, var(--bg-secondary));
-      
-      > td {
-        color: var(--text-primary);
-      }
-    }
-  }
-}
 
 /* === Sidebar Summary === */
 .summary-card {

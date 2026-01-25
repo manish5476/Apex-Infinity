@@ -153,43 +153,6 @@
   }
 }
 
-/* === Validation & Component Overrides === */
-:host ::ng-deep {
-  // Ensure all form components take full width
-  :is(p-select, .p-inputnumber, .p-inputtextarea, .p-fileupload, p-datepicker, p-multiSelect) {
-    width: 100%;
-  }
-
-  // Set input backgrounds to contrast
-  :is(.p-inputtext, .p-inputnumber-input, .p-textarea) {
-    background: var(--bg-ternary);
-    color: var(--text-primary);
-    width: 100%;
-  }
-  
-  // Select and MultiSelect styling
-  :is(.p-select, .p-multiselect) {
-    background: var(--bg-ternary);
-    color: var(--text-primary);
-    .p-select-label, .p-multiselect-label {
-        background: var(--bg-secondary);
-      color: var(--text-primary);
-    }
-  }
-
-  // Error States
-  .ng-invalid.ng-touched {
-    :is(.p-inputtext, p-select, .p-inputnumber, .p-inputtextarea, p-multiSelect) {
-      border-color: var(--color-error);
-    }
-  }
-
-  // Ensure dropdown panels match theme
-  :is(.p-select-panel, .p-multiselect-panel) {
-    background: var(--bg-secondary);
-    border: var(--ui-border-width) solid var(--border-primary);
-  }
-}
 
 // /* ==============================================
 //    SUPPLIER FORM COMPONENT
@@ -347,69 +310,5 @@
 //   grid-column: span 2;
 //   @media (max-width: 600px) {
 //     grid-column: span 1;
-//   }
-// }
-
-// /* === Validation & Component Overrides (from invoice form) === */
-// :host ::ng-deep {
-//   // Ensure all form components take full width
-//   :is(p-select, .p-inputnumber, .p-inputtextarea, .p-fileupload, p-datepicker, p-multiSelect) {
-//     width: 100%;
-//   }
-
-//   // Set input backgrounds to contrast
-//   :is(.p-inputtext, .p-inputnumber-input, .p-textarea) {
-//     background: var(--bg-ternary);
-//     color: var(--text-primary);
-//     width: 100%;
-//   }
-  
-//   // p-select and p-multiSelect
-//   :is(.p-select, .p-multiselect) {
-//     background: var(--bg-ternary);
-//     color: var(--text-primary);
-//     .p-select-label, .p-multiselect-label {
-//         background: var(--bg-secondary);
-//       color: var(--text-primary);
-//     }
-//   }
-
-//   // Style invalid touched form fields
-//   .ng-invalid.ng-touched {
-//     :is(.p-inputtext, p-select, .p-inputnumber, .p-inputtextarea, p-multiSelect) {
-//       border-color: var(--color-error);
-//     }
-//   }
-
-//   // Ensure dropdown panels match theme
-//   :is(.p-select-panel, .p-multiselect-panel) {
-//     background: var(--bg-secondary);
-//     border: var(--ui-border-width) solid var(--border-primary);
-    
-//     :is(.p-select-item, .p-multiselect-item) {
-//       color: var(--text-secondary);
-//       &:hover {
-//         background: var(--bg-ternary);
-//         color: var(--text-primary);
-//       }
-//     }
-//     :is(.p-select-item.p-highlight, .p-multiselect-item.p-highlight) {
-//       background: var(--accent-focus);
-//       color: var(--accent-primary);
-//     }
-//   }
-  
-//   // MultiSelect header
-//   .p-multiselect-header {
-//       background: var(--bg-ternary);
-//       border-bottom-color: var(--border-primary);
-      
-//       .p-checkbox {
-//          background: var(--bg-primary);
-//          border-color: var(--border-secondary);
-//       }
-//       .p-multiselect-filter-icon, .p-multiselect-close {
-//         color: var(--text-secondary);
-//       }
 //   }
 // }

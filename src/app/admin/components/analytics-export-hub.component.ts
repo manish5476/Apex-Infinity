@@ -299,18 +299,6 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
       margin-top: var(--spacing-lg);
     }
     
-    /* Deep selector for PrimeNG button customization */
-    :host ::ng-deep .export-btn {
-      background: var(--accent-gradient) !important;
-      border: none !important;
-      padding: var(--spacing-md) var(--spacing-xl) !important;
-      box-shadow: var(--shadow-lg);
-    }
-    :host ::ng-deep .export-btn:hover {
-      box-shadow: var(--shadow-xl);
-      transform: translateY(-1px);
-    }
-
     /* RIGHT COLUMN SPECS */
     .side-column { height: 100%; }
 
