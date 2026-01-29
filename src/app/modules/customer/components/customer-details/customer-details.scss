@@ -97,10 +97,10 @@
     gap: var(--spacing-sm);
     
     /* PrimeNG Button Overrides */
-    ::ng-deep .p-button.btn-sm {
-      padding: var(--spacing-xs) var(--spacing-md);
-      font-size: var(--font-size-sm);
-    }
+    // ::ng-deep .p-button.btn-sm {
+    //   padding: var(--spacing-xs) var(--spacing-md);
+    //   font-size: var(--font-size-sm);
+    // }
   }
 }
 
@@ -145,15 +145,15 @@
       position: relative;
       margin-bottom: var(--spacing-md);
       
-      /* PrimeNG Avatar Override */
-      ::ng-deep .user-avatar {
-        background: var(--bg-ternary);
-        border: 4px solid var(--bg-secondary);
-        width: 100px;
-        height: 100px;
-        font-size: var(--font-size-2xl);
-        color: var(--text-secondary);
-      }
+      // /* PrimeNG Avatar Override */
+      // ::ng-deep .user-avatar {
+      //   background: var(--bg-ternary);
+      //   border: 4px solid var(--bg-secondary);
+      //   width: 100px;
+      //   height: 100px;
+      //   font-size: var(--font-size-2xl);
+      //   color: var(--text-secondary);
+      // }
 
       .edit-avatar-btn {
         position: absolute;

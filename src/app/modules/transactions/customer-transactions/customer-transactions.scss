@@ -64,16 +64,16 @@
     }
 
     /* Force PrimeNG inputs to fill width */
-    ::ng-deep .p-inputtext,
-    ::ng-deep .p-select,
-    ::ng-deep .p-datepicker,
-    input {
-      width: 100%;
-    }
+    // ::ng-deep .p-inputtext,
+    // ::ng-deep .p-select,
+    // ::ng-deep .p-datepicker,
+    // input {
+    //   width: 100%;
+    // }
     
-    ::ng-deep .p-select {
-        min-width: 100%; /* Ensures dropdown arrow doesn't shift */
-    }
+    // ::ng-deep .p-select {
+    //     min-width: 100%; /* Ensures dropdown arrow doesn't shift */
+    // }
   }
 
   .se-filter-actions {
@@ -98,17 +98,17 @@
   flex-direction: column;
   position: relative;
 
-  /* Force the shared grid component to fill this container */
-  ::ng-deep app-shared-grid {
-    height: 100%;
-    width: 100%;
-    display: block;
+  // /* Force the shared grid component to fill this container */
+  // ::ng-deep app-shared-grid {
+  //   height: 100%;
+  //   width: 100%;
+  //   display: block;
     
-    /* Override the passed [gridHeight] if needed to force full height 
-       when inside a flex container like this */
-    .ag-theme-alpine, 
-    .ag-theme-balham {
-        height: 100% !important;
-    }
-  }
+  //   /* Override the passed [gridHeight] if needed to force full height 
+  //      when inside a flex container like this */
+  //   .ag-theme-alpine, 
+  //   .ag-theme-balham {
+  //       height: 100% !important;
+  //   }
+  // }
 }

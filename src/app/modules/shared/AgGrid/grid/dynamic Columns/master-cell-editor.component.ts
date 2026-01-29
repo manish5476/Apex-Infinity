@@ -40,70 +40,70 @@ import { CellConfig, MasterEditorParams } from '../grid.types';
     }
 
     /* --- GLOBAL FULL-WIDTH OVERRIDES --- */
-    ::ng-deep .cell-editor-input {
-      width: 100% !important; /* Force component to fill cell */
-      display: flex !important;
-      align-items: center;
+    // ::ng-deep .cell-editor-input {
+    //   width: 100% !important; /* Force component to fill cell */
+    //   display: flex !important;
+    //   align-items: center;
 
-      /* 1. INPUT TEXT & NUMBER */
-      .p-inputtext {
-        width: 100% !important; /* The actual input element */
-        height: 28px !important;
-        padding: 2px 6px !important;
-        font-size: 13px !important;
-        border: 1px solid transparent;
-        background: transparent;
-        border-radius: 4px;
-        box-shadow: none !important;
+    //   /* 1. INPUT TEXT & NUMBER */
+    //   .p-inputtext {
+    //     width: 100% !important; /* The actual input element */
+    //     height: 28px !important;
+    //     padding: 2px 6px !important;
+    //     font-size: 13px !important;
+    //     border: 1px solid transparent;
+    //     background: transparent;
+    //     border-radius: 4px;
+    //     box-shadow: none !important;
 
-        &:hover { background: var(--component-bg-hover); }
-        &:focus { 
-          background: var(--theme-bg-primary); 
-          border-color: var(--theme-accent-primary);
-        }
-      }
+    //     &:hover { background: var(--component-bg-hover); }
+    //     &:focus { 
+    //       background: var(--theme-bg-primary); 
+    //       border-color: var(--theme-accent-primary);
+    //     }
+    //   }
 
-      /* 2. INPUT NUMBER WRAPPER FIX */
-      &.p-inputnumber {
-        width: 100% !important;
-        .p-inputtext { width: 100% !important; }
-      }
+    //   /* 2. INPUT NUMBER WRAPPER FIX */
+    //   &.p-inputnumber {
+    //     width: 100% !important;
+    //     .p-inputtext { width: 100% !important; }
+    //   }
 
-      /* 3. SELECT & MULTISELECT (Dropdowns) */
-      &.p-select, &.p-multiselect {
-        width: 100% !important;
-        height: 28px !important;
-        border: 1px solid transparent;
-        background: transparent;
+    //   /* 3. SELECT & MULTISELECT (Dropdowns) */
+    //   &.p-select, &.p-multiselect {
+    //     width: 100% !important;
+    //     height: 28px !important;
+    //     border: 1px solid transparent;
+    //     background: transparent;
         
-        /* Label fills available space */
-        .p-select-label, .p-multiselect-label {
-          flex: 1; 
-          padding: 2px 6px !important;
-          font-size: 13px;
-          line-height: 22px;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
+    //     /* Label fills available space */
+    //     .p-select-label, .p-multiselect-label {
+    //       flex: 1; 
+    //       padding: 2px 6px !important;
+    //       font-size: 13px;
+    //       line-height: 22px;
+    //       white-space: nowrap;
+    //       overflow: hidden;
+    //       text-overflow: ellipsis;
+    //     }
 
-        /* Trigger sticks to right */
-        .p-select-dropdown, .p-multiselect-trigger {
-          width: 24px;
-          flex-shrink: 0;
-        }
+    //     /* Trigger sticks to right */
+    //     .p-select-dropdown, .p-multiselect-trigger {
+    //       width: 24px;
+    //       flex-shrink: 0;
+    //     }
 
-        &:hover { background: var(--component-bg-hover); }
-        &.p-focus { border-color: var(--theme-accent-primary); }
-      }
+    //     &:hover { background: var(--component-bg-hover); }
+    //     &.p-focus { border-color: var(--theme-accent-primary); }
+    //   }
 
-      /* 4. DATEPICKER */
-      &.p-datepicker {
-        width: 100% !important;
-        padding: 0;
-        input { width: 100% !important; height: 28px !important; }
-      }
-    }
+    //   /* 4. DATEPICKER */
+    //   &.p-datepicker {
+    //     width: 100% !important;
+    //     padding: 0;
+    //     input { width: 100% !important; height: 28px !important; }
+    //   }
+    // }
   `],
   template: `
     <div class="editor-wrapper">

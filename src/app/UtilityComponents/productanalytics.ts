@@ -208,13 +208,13 @@ import { TabsModule } from 'primeng/tabs';
     .kpi-value { font-family: var(--font-heading); font-weight: 700; font-size: var(--font-size-lg); color: #0f172a; }
     .kpi-sub { font-size: 10px; margin-top: 4px; font-weight: 600; color: #15803d; }
 
-    /* Tables */
-    ::ng-deep .p-datatable-sm .p-datatable-thead > tr > th {
-      background: #f8fafc; font-size: 11px; padding: 0.5rem; color: #64748b;
-    }
-    ::ng-deep .p-datatable-sm .p-datatable-tbody > tr > td {
-      padding: 0.5rem; font-size: 12px; border-bottom: 1px solid #f1f5f9;
-    }
+    // /* Tables */
+    // ::ng-deep .p-datatable-sm .p-datatable-thead > tr > th {
+    //   background: #f8fafc; font-size: 11px; padding: 0.5rem; color: #64748b;
+    // }
+    // ::ng-deep .p-datatable-sm .p-datatable-tbody > tr > td {
+    //   padding: 0.5rem; font-size: 12px; border-bottom: 1px solid #f1f5f9;
+    // }
 
     /* Chart */
     .chart-container { display: flex; flex-direction: column; gap: 12px; padding: 10px; }

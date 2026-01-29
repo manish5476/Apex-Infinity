@@ -1764,38 +1764,38 @@
   }
 }
 
-/* Dialog Styles (Using your existing dialog but enhanced) */
-::ng-deep .glass-dialog {
-  .p-dialog {
-    border-radius: var(--ui-border-radius-xl);
-    overflow: hidden;
-    box-shadow: var(--shadow-5xl), 0 0 60px rgba(var(--accent-primary-rgb, 59, 130, 246), 0.1);
+// /* Dialog Styles (Using your existing dialog but enhanced) */
+// ::ng-deep .glass-dialog {
+//   .p-dialog {
+//     border-radius: var(--ui-border-radius-xl);
+//     overflow: hidden;
+//     box-shadow: var(--shadow-5xl), 0 0 60px rgba(var(--accent-primary-rgb, 59, 130, 246), 0.1);
 
-    .p-dialog-header {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      padding: var(--spacing-xl) var(--spacing-2xl);
-      position: relative;
+//     .p-dialog-header {
+//       background: rgba(255, 255, 255, 0.05);
+//       backdrop-filter: blur(20px);
+//       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+//       padding: var(--spacing-xl) var(--spacing-2xl);
+//       position: relative;
 
-      &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background: linear-gradient(90deg, var(--accent-primary), var(--accent-tertiary));
-      }
-    }
+//       &::before {
+//         content: '';
+//         position: absolute;
+//         top: 0;
+//         left: 0;
+//         right: 0;
+//         height: 2px;
+//         background: linear-gradient(90deg, var(--accent-primary), var(--accent-tertiary));
+//       }
+//     }
 
-    .p-dialog-content {
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(20px);
-      padding: 0;
-    }
-  }
-}
+//     .p-dialog-content {
+//       background: rgba(255, 255, 255, 0.03);
+//       backdrop-filter: blur(20px);
+//       padding: 0;
+//     }
+//   }
+// }
 
 .dialog-header-glass {
   display: flex;

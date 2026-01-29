@@ -260,44 +260,44 @@
   height: 100%;
 
   /* Modern Tabs (Compact) */
-  ::ng-deep .p-tablist {
-    border-bottom: 1px solid var(--border-primary);
-    margin-bottom: 1rem;
-    overflow-x: auto;
-    white-space: nowrap;
-    &::-webkit-scrollbar {
-      display: none;
-    }
-  }
+  // ::ng-deep .p-tablist {
+  //   border-bottom: 1px solid var(--border-primary);
+  //   margin-bottom: 1rem;
+  //   overflow-x: auto;
+  //   white-space: nowrap;
+  //   &::-webkit-scrollbar {
+  //     display: none;
+  //   }
+  // }
 
-  ::ng-deep .p-tab {
-    padding: 0.65rem 1rem; /* Smaller tabs */
-    font-weight: 600;
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    border-bottom: 2px solid transparent;
-    transition: var(--transition-base);
+  // ::ng-deep .p-tab {
+  //   padding: 0.65rem 1rem; /* Smaller tabs */
+  //   font-weight: 600;
+  //   font-size: 0.85rem;
+  //   color: var(--text-secondary);
+  //   border-bottom: 2px solid transparent;
+  //   transition: var(--transition-base);
 
-    &:hover {
-      color: var(--text-primary);
-        background: var(--bg-secondary);
-    }
+  //   &:hover {
+  //     color: var(--text-primary);
+  //       background: var(--bg-secondary);
+  //   }
 
-    &.p-tab-active {
-      color: var(--accent-primary);
-      border-bottom-color: var(--accent-primary);
-    }
-  }
+  //   &.p-tab-active {
+  //     color: var(--accent-primary);
+  //     border-bottom-color: var(--accent-primary);
+  //   }
+  // }
 
-  ::ng-deep .p-tabpanels {
-    flex: 1;
-    padding: 0;
-      background: var(--bg-secondary);
-    overflow: hidden;
-    @media (max-width: 900px) {
-      overflow: visible;
-    }
-  }
+  // ::ng-deep .p-tabpanels {
+  //   flex: 1;
+  //   padding: 0;
+  //     background: var(--bg-secondary);
+  //   overflow: hidden;
+  //   @media (max-width: 900px) {
+  //     overflow: visible;
+  //   }
+  // }
 }
 
 /* Panel Card Styling */
@@ -353,12 +353,12 @@
     height: 60vh;
   }
 
-  ::ng-deep app-ag-share-grid {
-    flex: 1;
-    height: 100%;
-    width: 100%;
-    display: block;
-  }
+  // ::ng-deep app-ag-share-grid {
+  //   flex: 1;
+  //   height: 100%;
+  //   width: 100%;
+  //   display: block;
+  // }
 }
 
 /* ============================================

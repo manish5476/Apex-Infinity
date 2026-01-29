@@ -202,30 +202,30 @@ $error-color: #f87171;
   @media (max-width: 400px) { grid-template-columns: 1fr; }
 }
 
-/* Custom Glass Inputs */
-::ng-deep .glass-input-field {
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  color: white !important;
-  border-radius: 12px !important;
-  padding: 12px 12px 12px 44px !important;
-  font-size: 0.95rem !important;
-  height: 48px !important;
-  transition: all 0.2s ease !important;
+// /* Custom Glass Inputs */
+// ::ng-deep .glass-input-field {
+//   background: rgba(255, 255, 255, 0.05) !important;
+//   border: 1px solid rgba(255, 255, 255, 0.12) !important;
+//   color: white !important;
+//   border-radius: 12px !important;
+//   padding: 12px 12px 12px 44px !important;
+//   font-size: 0.95rem !important;
+//   height: 48px !important;
+//   transition: all 0.2s ease !important;
 
-  &::placeholder { color: rgba(255, 255, 255, 0.3) !important; }
+//   &::placeholder { color: rgba(255, 255, 255, 0.3) !important; }
 
-  &:enabled:hover {
-    background: rgba(255, 255, 255, 0.08) !important;
-    border-color: rgba(255, 255, 255, 0.25) !important;
-  }
+//   &:enabled:hover {
+//     background: rgba(255, 255, 255, 0.08) !important;
+//     border-color: rgba(255, 255, 255, 0.25) !important;
+//   }
   
-  &:enabled:focus {
-    background: rgba(255, 255, 255, 0.1) !important;
-    border-color: $accent-color !important;
-    box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.25) !important;
-  }
-}
+//   &:enabled:focus {
+//     background: rgba(255, 255, 255, 0.1) !important;
+//     border-color: $accent-color !important;
+//     box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.25) !important;
+//   }
+// }
 
 .uppercase-input { text-transform: uppercase; }
 

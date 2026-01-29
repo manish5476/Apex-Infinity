@@ -48,66 +48,7 @@
           <p class="auth-subtitle">Enter your credentials to access the dashboard.</p>
         </div>
 
-        <!-- <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
-          <div class="form-group">
-            <label class="input-label">Email Address</label>
-            <div class="input-wrapper">
-              <i class="field-icon pi pi-envelope"></i>
-              <p-autoComplete formControlName="email" [suggestions]="filteredEmails"
-                (completeMethod)="filterEmail($event)" placeholder="name@company.com"
-                styleClass="w-full glass-autocomplete" inputStyleClass="glass-input-field"
-                panelStyleClass="glass-dropdown-panel" appendTo="body">
-              </p-autoComplete>
-            </div>
-            @if (form['email'].invalid && form['email'].touched) {
-            <small class="error-msg">Valid email is required</small>
-            }
-          </div>
-          <div class="form-group">
-            <div class="label-row">
-              <label class="input-label">shopId</label>
-              <a routerLink="/auth/forgot-password" class="link-text">Forgot password?</a>
-            </div>
-            <div class="input-wrapper">
-              <i class="field-icon pi pi-lock"></i>
-              <p-password formControlName="uniqueShopId" [toggleMask]="true" [feedback]="false" placeholder="••••••••"
-                styleClass="w-full" inputStyleClass="glass-input-field">
-              </p-password>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="label-row">
-              <label class="input-label">Password</label>
-              <a routerLink="/auth/forgot-password" class="link-text">Forgot password?</a>
-            </div>
-            <div class="input-wrapper">
-              <i class="field-icon pi pi-lock"></i>
-              <p-password formControlName="password" [toggleMask]="true" [feedback]="false" placeholder="••••••••"
-                styleClass="w-full" inputStyleClass="glass-input-field">
-              </p-password>
-            </div>
-          </div>
-          <div class="actions-row">
-            <div class="remember-toggle">
-              <p-checkbox formControlName="remember" [binary]="true" inputId="remember"
-                styleClass="glass-checkbox"></p-checkbox>
-              <label for="remember">Keep me logged in</label>
-            </div>
-          </div>
-          <button pButton label="Sign In" icon="pi pi-arrow-right" iconPos="right" class="submit-btn"
-            [loading]="isLoading()" [disabled]="loginForm.invalid">
-          </button>
-          <div class="divider">
-            <span>or continue with</span>
-          </div>
-          <div class="social-grid">
-            <button type="button" class="social-btn"><i class="pi pi-google"></i></button>
-            <button type="button" class="social-btn"><i class="pi pi-github"></i></button>
-            <button type="button" class="social-btn"><i class="pi pi-microsoft"></i></button>
-          </div>
-
-        </form> -->
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
 
           <!-- Email -->
           <div class="form-group">

@@ -60,30 +60,6 @@
   padding: var(--spacing-xs); // Padding for tabs container
 }
 
-/* --- TABS --- */
-::ng-deep .p-tablist {
-  border-bottom: 1px solid var(--border-secondary);
-    background: var(--bg-secondary);
-  .p-tab {
-      background: var(--bg-secondary); border: none; padding: var(--spacing-lg) var(--spacing-xl);
-    transition: var(--transition-base);
-    color: var(--text-secondary);
-    
-    &[aria-selected="true"] {
-      color: var(--accent-primary);
-      border-bottom: 2px solid var(--accent-primary);
-      .tab-label { font-weight: 700; }
-    }
-    .tab-label {
-      display: flex; align-items: center; gap: var(--spacing-sm); font-size: var(--font-size-sm);
-    }
-  }
-}
-
-::ng-deep .p-tabpanels {
-    background: var(--bg-secondary); padding: var(--spacing-lg);
-}
-
 /* --- FILTERS TOOLBAR --- */
 .filters-bar {
   display: flex; flex-wrap: wrap; gap: var(--spacing-lg); align-items: center;
@@ -117,7 +93,6 @@
 .grid-wrapper {
   height: 500px; /* Fixed height for scroll */
   width: 100%;
-  ::ng-deep app-ag-share-grid { height: 100%; display: block; }
 }
 
 /* --- LIVE MONITORING STYLES --- */

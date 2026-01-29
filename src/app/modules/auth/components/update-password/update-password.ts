@@ -86,7 +86,7 @@ import { AuthService } from '../../services/auth-service';
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     .form-group label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; }
     .auth-footer { display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem; }
-    ::ng-deep .submit-btn { width: 100%; height: 50px; border-radius: 99px; font-weight: 600; background: var(--accent-gradient); border: none; }
+    // ::ng-deep .submit-btn { width: 100%; height: 50px; border-radius: 99px; font-weight: 600; background: var(--accent-gradient); border: none; }
     .auth-footer-text { text-align: center; font-size: 0.9rem; color: var(--text-secondary); }
     .auth-link { color: var(--accent-primary); font-weight: 600; cursor: pointer; margin-left: 4px; }
     @media (max-width: 1024px) { .auth-container { flex-direction: column; height: auto; min-height: 100vh; } .auth-banner { width: 100%; height: 200px; } .auth-banner-text { display: none; } }

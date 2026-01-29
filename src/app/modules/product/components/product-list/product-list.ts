@@ -173,13 +173,13 @@ export class ProductListComponent implements OnInit {
         width: 150,
       },
       {
-        field: 'brand',
+        field: 'brandId.name',
         headerName: 'Brand',
         sortable: true,
         width: 150,
       },
       {
-        field: 'category',
+        field: 'categoryId.name ',
         headerName: 'Category',
         sortable: true,
         width: 150,

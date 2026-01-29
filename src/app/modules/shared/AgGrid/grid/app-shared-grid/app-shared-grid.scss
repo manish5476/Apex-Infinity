@@ -89,76 +89,76 @@
   font-weight: 500;
 }
 
-/* --- PREMIUM BUTTON OVERRIDES (Contextual) --- */
-::ng-deep .premium-btn {
-  &.p-button {
-    font-family: var(--font-body);
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    padding: var(--spacing-xs) var(--spacing-md);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+// /* --- PREMIUM BUTTON OVERRIDES (Contextual) --- */
+// ::ng-deep .premium-btn {
+//   &.p-button {
+//     font-family: var(--font-body);
+//     font-size: var(--font-size-sm);
+//     font-weight: 600;
+//     padding: var(--spacing-xs) var(--spacing-md);
+//     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     
-    /* Common Hover Effect */
-    &:not(:disabled):hover {
-      transform: translateY(-1px);
-    }
+//     /* Common Hover Effect */
+//     &:not(:disabled):hover {
+//       transform: translateY(-1px);
+//     }
 
-    /* 1. Primary Text Button (Edit) */
-    &.btn-primary {
-      color: var(--theme-accent-primary);
-      background: transparent;
+//     /* 1. Primary Text Button (Edit) */
+//     &.btn-primary {
+//       color: var(--theme-accent-primary);
+//       background: transparent;
       
-      &:hover { 
-        background: rgba(var(--accent-primary-rgb), 0.08); 
-      }
+//       &:hover { 
+//         background: rgba(var(--accent-primary-rgb), 0.08); 
+//       }
       
-      &:disabled {
-        color: var(--theme-text-tertiary);
-        background: transparent;
-      }
-    }
+//       &:disabled {
+//         color: var(--theme-text-tertiary);
+//         background: transparent;
+//       }
+//     }
 
-    /* 2. Danger Text Button (Delete) */
-    &.btn-danger {
-      color: var(--color-error);
-      background: transparent;
+//     /* 2. Danger Text Button (Delete) */
+//     &.btn-danger {
+//       color: var(--color-error);
+//       background: transparent;
       
-      &:hover { 
-        background: var(--color-error-bg); 
-      }
+//       &:hover { 
+//         background: var(--color-error-bg); 
+//       }
       
-      &:disabled {
-        color: var(--theme-text-tertiary);
-      }
-    }
+//       &:disabled {
+//         color: var(--theme-text-tertiary);
+//       }
+//     }
 
-    /* 3. Secondary Text Button (Cancel) */
-    &.btn-secondary {
-      color: var(--theme-text-secondary);
-      background: transparent;
+//     /* 3. Secondary Text Button (Cancel) */
+//     &.btn-secondary {
+//       color: var(--theme-text-secondary);
+//       background: transparent;
       
-      &:hover { 
-        color: var(--theme-text-primary);
-        background: var(--theme-bg-ternary); 
-      }
-    }
+//       &:hover { 
+//         color: var(--theme-text-primary);
+//         background: var(--theme-bg-ternary); 
+//       }
+//     }
 
-    /* 4. Success Filled Button (Save) */
-    &.btn-success-filled {
-      background-color: var(--color-success);
-      border: 1px solid var(--color-success);
-      color: #ffffff; /* Always white on success green */
-      box-shadow: var(--shadow-sm);
+//     /* 4. Success Filled Button (Save) */
+//     &.btn-success-filled {
+//       background-color: var(--color-success);
+//       border: 1px solid var(--color-success);
+//       color: #ffffff; /* Always white on success green */
+//       box-shadow: var(--shadow-sm);
 
-      &:hover {
-        /* Darken slightly on hover */
-        background-color: color-mix(in srgb, var(--color-success), black 10%);
-        border-color: color-mix(in srgb, var(--color-success), black 10%);
-        box-shadow: var(--shadow-md);
-      }
-    }
-  }
-}
+//       &:hover {
+//         /* Darken slightly on hover */
+//         background-color: color-mix(in srgb, var(--color-success), black 10%);
+//         border-color: color-mix(in srgb, var(--color-success), black 10%);
+//         box-shadow: var(--shadow-md);
+//       }
+//     }
+//   }
+// }
 
 /* --- GRID WRAPPER --- */
 .grid-wrapper {

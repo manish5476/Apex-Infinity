@@ -174,62 +174,62 @@
 }
 
 /* === GRID CELL BADGES === */
-::ng-deep {
-  .cell-type {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
-    i { font-size: 1rem; }
-    &.type-invoice { color: var(--accent-secondary); } 
-    &.type-payment { color: var(--color-success); }    
-    &.type-ledger { color: var(--text-tertiary); }     
-  }
+// ::ng-deep {
+//   .cell-type {
+//     display: flex;
+//     align-items: center;
+//     gap: 8px;
+//     font-weight: 600;
+//     i { font-size: 1rem; }
+//     &.type-invoice { color: var(--accent-secondary); } 
+//     &.type-payment { color: var(--color-success); }    
+//     &.type-ledger { color: var(--text-tertiary); }     
+//   }
 
-  .status-badge {
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    display: inline-block;
-    line-height: 1;
+//   .status-badge {
+//     padding: 4px 10px;
+//     border-radius: 20px;
+//     font-size: 0.75rem;
+//     font-weight: 700;
+//     text-transform: uppercase;
+//     display: inline-block;
+//     line-height: 1;
     
-    &.status-paid, &.status-success {
-      background: color-mix(in srgb, var(--color-success) 15%, transparent);
-      color: var(--color-success);
-      border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent);
-    }
-    &.status-pending, &.status-due {
-      background: color-mix(in srgb, var(--color-warning) 15%, transparent);
-      color: var(--color-warning);
-      border: 1px solid color-mix(in srgb, var(--color-warning) 30%, transparent);
-    }
-    &.status-failed, &.status-cancelled {
-      background: color-mix(in srgb, var(--color-error) 15%, transparent);
-      color: var(--color-error);
-      border: 1px solid color-mix(in srgb, var(--color-error) 30%, transparent);
-    }
-  }
+//     &.status-paid, &.status-success {
+//       background: color-mix(in srgb, var(--color-success) 15%, transparent);
+//       color: var(--color-success);
+//       border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent);
+//     }
+//     &.status-pending, &.status-due {
+//       background: color-mix(in srgb, var(--color-warning) 15%, transparent);
+//       color: var(--color-warning);
+//       border: 1px solid color-mix(in srgb, var(--color-warning) 30%, transparent);
+//     }
+//     &.status-failed, &.status-cancelled {
+//       background: color-mix(in srgb, var(--color-error) 15%, transparent);
+//       color: var(--color-error);
+//       border: 1px solid color-mix(in srgb, var(--color-error) 30%, transparent);
+//     }
+//   }
 
-  .amount-credit { color: var(--color-success) !important; font-weight: 700; }
-  .amount-debit { color: var(--color-error) !important; font-weight: 700; }
+//   .amount-credit { color: var(--color-success) !important; font-weight: 700; }
+//   .amount-debit { color: var(--color-error) !important; font-weight: 700; }
 
-  /* PrimeNG Overrides */
-  .p-inputtext, .p-dropdown, .p-calendar-input {
-    background: var(--bg-ternary);
-    border-color: var(--border-secondary);
-    color: var(--text-primary);
-    border-radius: var(--ui-border-radius);
-    padding-top: 0.65rem;
-    padding-bottom: 0.65rem;
+//   /* PrimeNG Overrides */
+//   .p-inputtext, .p-dropdown, .p-calendar-input {
+//     background: var(--bg-ternary);
+//     border-color: var(--border-secondary);
+//     color: var(--text-primary);
+//     border-radius: var(--ui-border-radius);
+//     padding-top: 0.65rem;
+//     padding-bottom: 0.65rem;
     
-    &:enabled:focus {
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 1px var(--accent-primary);
-    }
-    &:enabled:hover {
-      border-color: var(--text-tertiary);
-    }
-  }
-}
+//     &:enabled:focus {
+//       border-color: var(--accent-primary);
+//       box-shadow: 0 0 0 1px var(--accent-primary);
+//     }
+//     &:enabled:hover {
+//       border-color: var(--text-tertiary);
+//     }
+//   }
+// }

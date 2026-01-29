@@ -77,11 +77,11 @@ import { OrganizationService } from '../organization.service';
       background-color: var(--surface-ground);
       padding: 1rem;
     }
-    ::ng-deep .accept-card {
-      width: 100%;
-      max-width: 450px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    }
+    // ::ng-deep .accept-card {
+    //   width: 100%;
+    //   max-width: 450px;
+    //   box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    // }
     .content-wrapper {
       display: flex;
       flex-direction: column;

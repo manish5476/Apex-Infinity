@@ -61,7 +61,7 @@
 
   .header-actions {
     display: flex; gap: var(--spacing-sm);
-    ::ng-deep .p-button.btn-sm { padding: var(--spacing-xs) var(--spacing-md); font-size: var(--font-size-sm); }
+    // ::ng-deep .p-button.btn-sm { padding: var(--spacing-xs) var(--spacing-md); font-size: var(--font-size-sm); }
   }
 }
 

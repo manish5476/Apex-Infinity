@@ -143,19 +143,19 @@
     white-space: nowrap;
   }
 }
-/* Overriding PrimeNG Select styles to look transparent */
-::ng-deep .transparent-select {
-  .p-select {
-    border: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
-  }
-  .p-select-label {
-    font-weight: 700;
-    color: #0f172a;
-    padding: 0;
-  }
-}
+// /* Overriding PrimeNG Select styles to look transparent */
+// ::ng-deep .transparent-select {
+//   .p-select {
+//     border: none !important;
+//     background: transparent !important;
+//     box-shadow: none !important;
+//   }
+//   .p-select-label {
+//     font-weight: 700;
+//     color: #0f172a;
+//     padding: 0;
+//   }
+// }
 
 /* --- 3. LAYOUT GRID (Sidebar + Content) --- */
 .layout-grid {
@@ -403,19 +403,19 @@
   display: flex;
   justify-content: center;
 }
-::ng-deep .transparent-paginator {
-  background: transparent !important;
-  .p-paginator-element {
-    border-radius: 50%;
-    min-width: 40px;
-    height: 40px;
-    font-weight: 700;
-  }
-  .p-highlight {
-    background: #0f172a !important;
-    color: white !important;
-  }
-}
+// ::ng-deep .transparent-paginator {
+//   background: transparent !important;
+//   .p-paginator-element {
+//     border-radius: 50%;
+//     min-width: 40px;
+//     height: 40px;
+//     font-weight: 700;
+//   }
+//   .p-highlight {
+//     background: #0f172a !important;
+//     color: white !important;
+//   }
+// }
 
 /* Skeleton */
 .skeleton-card {
@@ -436,268 +436,3 @@
     margin-bottom: 8px;
   }
 }
-
-// :host {
-//     display: block;
-//     min-height: 100vh;
-//     background-color: var(--color-surface-app);
-//     color: var(--color-text-main);
-//     padding-bottom: var(--spacing-5xl);
-// }
-
-// .page-container {
-//     max-width: 1400px;
-//     margin: 0 auto;
-//     padding: var(--spacing-2xl);
-// }
-
-// /* --- HEADER CONTROLS --- */
-// .controls-header {
-//     display: flex;
-//     flex-wrap: wrap;
-//     justify-content: space-between;
-//     align-items: center;
-//     gap: var(--spacing-lg);
-//     margin-bottom: var(--spacing-3xl);
-//     padding-bottom: var(--spacing-lg);
-//     border-bottom: 1px solid var(--color-border);
-// }
-
-// .page-title {
-//     font-family: var(--font-heading);
-//     font-size: var(--font-size-3xl);
-//     font-weight: 700;
-//     margin: 0;
-//     color: var(--color-text-main);
-// }
-
-// .result-count {
-//     color: var(--color-text-muted);
-//     font-size: var(--font-size-sm);
-// }
-
-// .header-right {
-//     display: flex;
-//     align-items: center;
-//     gap: var(--spacing-lg);
-// }
-
-// /* Custom Search Input */
-// .search-wrapper i { color: var(--color-text-muted); }
-// .custom-search {
-//     background: var(--color-surface-card);
-//     border: 1px solid var(--color-border);
-//     border-radius: var(--ui-border-radius);
-//     padding: 0.5rem 0.5rem 0.5rem 2.5rem; /* Space for icon */
-//     font-size: var(--font-size-sm);
-//     width: 240px;
-//     transition: all 0.2s;
-// }
-// .custom-search:focus {
-//     border-color: var(--color-primary);
-//     box-shadow: 0 0 0 2px var(--color-primary-soft);
-// }
-
-// /* Sort Select */
-// .sort-wrapper {
-//     display: flex;
-//     align-items: center;
-//     gap: var(--spacing-sm);
-// }
-// .sort-label {
-//     font-size: var(--font-size-sm);
-//     color: var(--color-text-muted);
-// }
-// :host ::ng-deep .custom-select .p-select {
-//     border: none;
-//       background: var(--bg-secondary);
-//     font-weight: 600;
-// }
-
-// /* --- MAIN LAYOUT --- */
-// .layout-wrapper {
-//     display: grid;
-//     grid-template-columns: 260px 1fr;
-//     gap: var(--spacing-4xl);
-//     align-items: start;
-// }
-
-// @media (max-width: 1024px) {
-//     .layout-wrapper { grid-template-columns: 1fr; }
-//     .filters-sidebar { display: none; /* Or move to a modal for mobile */ }
-// }
-
-// /* --- SIDEBAR --- */
-// .filters-sidebar {
-//     position: sticky;
-//     top: 20px;
-// }
-
-// .filter-section { margin-bottom: var(--spacing-xl); }
-
-// .filter-heading {
-//     font-size: var(--font-size-xs);
-//     font-weight: 700;
-//     text-transform: uppercase;
-//     letter-spacing: 0.05em;
-//     color: var(--color-text-main);
-//     margin-bottom: var(--spacing-md);
-// }
-
-// .separator {
-//     height: 1px;
-//     background: var(--color-border);
-//     margin: var(--spacing-lg) 0;
-// }
-
-// /* Category List */
-// .category-list {
-//     list-style: none;
-//     padding: 0;
-//     margin: 0;
-// }
-
-// .cat-item {
-//     display: flex;
-//     justify-content: space-between;
-//     align-items: center;
-//     padding: 6px 0;
-//     font-size: var(--font-size-sm);
-//     color: var(--color-text-muted);
-//     cursor: pointer;
-//     transition: color 0.2s;
-// }
-
-// .cat-item:hover { color: var(--color-primary); }
-// .cat-item.active {
-//     color: var(--color-primary);
-//     font-weight: 600;
-// }
-// .cat-count { font-size: 0.8em; opacity: 0.7; }
-
-// /* Price Inputs */
-// .price-row {
-//     display: flex;
-//     align-items: center;
-//     gap: var(--spacing-sm);
-// }
-// .price-field {
-//     display: flex;
-//     align-items: center;
-//     border: 1px solid var(--color-border);
-//     border-radius: var(--ui-border-radius);
-//     padding: 0 var(--spacing-sm);
-//     background: var(--color-surface-card);
-// }
-// .curr-symbol { font-size: var(--font-size-sm); color: var(--color-text-muted); }
-// .price-field input {
-//     width: 100%;
-//     border: none;
-//       background: var(--bg-secondary);
-//     padding: 8px 4px;
-//     font-size: var(--font-size-sm);
-//     outline: none;
-// }
-// .price-dash { color: var(--color-text-muted); }
-
-// /* Checkbox */
-// .checkbox-row {
-//     display: flex;
-//     align-items: center;
-//     gap: var(--spacing-sm);
-//     font-size: var(--font-size-sm);
-//     color: var(--color-text-main);
-// }
-
-// /* Tags Cloud */
-// .tags-cloud {
-//     display: flex;
-//     flex-wrap: wrap;
-//     gap: 6px;
-// }
-// .tag-btn {
-//     background: var(--color-surface-app);
-//     border: 1px solid var(--color-border);
-//     padding: 4px 10px;
-//     border-radius: 100px;
-//     font-size: var(--font-size-xs);
-//     color: var(--color-text-muted);
-//     cursor: pointer;
-//     transition: all 0.2s;
-// }
-// .tag-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
-// .tag-btn.selected {
-//     background: var(--color-primary);
-//     border-color: var(--color-primary);
-//     color: #fff;
-// }
-
-// /* Reset Button */
-// .reset-filters-btn {
-//     width: 100%;
-//       background: var(--bg-secondary);
-//     border: 1px solid var(--color-danger);
-//     color: var(--color-danger);
-//     padding: 10px;
-//     border-radius: var(--ui-border-radius);
-//     font-size: var(--font-size-sm);
-//     font-weight: 600;
-//     cursor: pointer;
-//     transition: all 0.2s;
-//     display: flex;
-//     align-items: center;
-//     justify-content: center;
-//     gap: 8px;
-// }
-// .reset-filters-btn:hover {
-//     background: var(--color-danger);
-//     color: #fff;
-// }
-
-// /* --- GRID & EMPTY STATE --- */
-// .grid-layout {
-//     display: grid;
-//     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-//     gap: var(--spacing-xl);
-// }
-
-// /* Skeleton */
-// .skeleton-card {
-//     background: var(--color-surface-card);
-//     border-radius: var(--ui-border-radius-lg);
-//     border: 1px solid var(--color-border);
-//     padding: var(--spacing-md);
-//     height: 380px;
-// }
-// .sk-img { background: #e5e7eb; height: 60%; width: 100%; border-radius: var(--ui-border-radius); margin-bottom: 1rem; }
-// .sk-txt { background: #e5e7eb; height: 16px; margin-bottom: 8px; border-radius: 4px; }
-
-// /* No Results */
-// .no-results {
-//     text-align: center;
-//     padding: var(--spacing-5xl) 0;
-// }
-// .icon-circle {
-//     width: 80px;
-//     height: 80px;
-//     background: var(--color-surface-hover);
-//     border-radius: 50%;
-//     display: flex;
-//     align-items: center;
-//     justify-content: center;
-//     margin: 0 auto var(--spacing-lg);
-// }
-// .icon-circle i { font-size: 2rem; color: var(--color-text-muted); }
-// .no-results h3 { font-size: var(--font-size-xl); margin-bottom: var(--spacing-sm); }
-// .no-results p { color: var(--color-text-muted); margin-bottom: var(--spacing-xl); }
-
-// /* Paginator */
-// .pagination-container {
-//     margin-top: var(--spacing-4xl);
-//     display: flex;
-//     justify-content: center;
-// }
-// :host ::ng-deep .custom-paginator {
-//       background: var(--bg-secondary);
-//     border: none;
-// }

@@ -58,11 +58,11 @@
     width: 100%;
   }
   
-  /* Ensure AG Grid internal container fills height */
-  ::ng-deep app-ag-share-grid {
-    height: 100% !important;
-    display: block;
-  }
+  // /* Ensure AG Grid internal container fills height */
+  // ::ng-deep app-ag-share-grid {
+  //   height: 100% !important;
+  //   display: block;
+  // }
 }
 
 /* === FOOTER STATS === */
@@ -127,8 +127,8 @@
     display: block;
   }
 
-  /* Deep selector to force AG Grid internals to fill height */
-  ::ng-deep .ag-root-wrapper {
-    height: 100% !important;
-  }
+  // /* Deep selector to force AG Grid internals to fill height */
+  // ::ng-deep .ag-root-wrapper {
+  //   height: 100% !important;
+  // }
 }

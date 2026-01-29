@@ -105,7 +105,7 @@
       padding-bottom: 4px;
       .p-button { flex-shrink: 0; }
     }
-    ::ng-deep .p-button.btn-sm { padding: var(--spacing-xs) var(--spacing-md); font-size: var(--font-size-sm); }
+    // ::ng-deep .p-button.btn-sm { padding: var(--spacing-xs) var(--spacing-md); font-size: var(--font-size-sm); }
   }
 }
 

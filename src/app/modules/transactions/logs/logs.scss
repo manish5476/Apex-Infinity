@@ -72,9 +72,9 @@
     flex: 1;
     min-height: 0; /* Important for grid scrolling */
     
-    /* Ensure the grid takes full height */
-    ::ng-deep app-shared-grid {
-        height: 100%;
-        display: block;
-    }
+    // /* Ensure the grid takes full height */
+    // ::ng-deep app-shared-grid {
+    //     height: 100%;
+    //     display: block;
+    // }
 }
