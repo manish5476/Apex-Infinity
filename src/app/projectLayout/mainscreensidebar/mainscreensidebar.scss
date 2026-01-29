@@ -230,6 +230,204 @@
     }
   }
 }
+/* ... Your existing host & sidebar styles ... */
+
+/* --- SEARCH BUTTON IN HEADER --- */
+.search-trigger {
+  margin-right: 8px; /* Space between search and pin */
+}
+
+/* ============================
+   SPOTLIGHT SEARCH STYLES
+   ============================ */
+
+.spotlight-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4); /* Dark dim backdrop */
+  backdrop-filter: blur(4px); /* Blur the content behind */
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 10vh; /* Modal sits near top */
+  animation: fadeIn 0.2s ease-out;
+}
+
+.spotlight-modal {
+  width: 600px;
+  max-width: 90%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  
+  /* Glassmorphism to match sidebar */
+  background: var(--sb-glass-bg); 
+  border: var(--sb-glass-border);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border-radius: 12px;
+  overflow: hidden;
+  animation: slideDown 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* HEADER & INPUT */
+.spotlight-header {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  .search-icon {
+    font-size: 1.2rem;
+    color: var(--text-tertiary, #888);
+    margin-right: 16px;
+  }
+
+  .spotlight-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-primary, #fff);
+    font-size: 1.1rem;
+    outline: none;
+    
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+  }
+
+  .esc-badge {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+}
+
+/* RESULTS LIST */
+.spotlight-results {
+  overflow-y: auto;
+  max-height: 400px;
+  padding: 8px;
+  
+  /* Scrollbar styling from your sidebar */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.2) transparent;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { 
+    background: rgba(255,255,255,0.2); 
+    border-radius: 10px; 
+  }
+}
+
+.result-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  margin-bottom: 2px;
+  color: var(--text-secondary, #ccc);
+
+  &.focused, &:hover {
+    background: rgba(255, 255, 255, 0.1); /* Highlight */
+    color: var(--text-primary, #fff);
+
+    .result-icon i { color: var(--accent-primary, #fff); }
+    .enter-icon { opacity: 1; transform: translateX(0); }
+  }
+
+  .result-icon {
+    width: 30px;
+    display: flex;
+    justify-content: center;
+    margin-right: 12px;
+    i { font-size: 1.1rem; opacity: 0.7; }
+  }
+
+  .result-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .result-label {
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+
+  .result-breadcrumb {
+    font-size: 0.75rem;
+    opacity: 0.5;
+    margin-top: 2px;
+  }
+
+  .enter-icon {
+    opacity: 0;
+    transform: translateX(-5px);
+    transition: all 0.2s;
+    font-size: 0.9rem;
+    color: var(--text-tertiary, #888);
+  }
+}
+
+.no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: rgba(255, 255, 255, 0.3);
+  gap: 10px;
+  
+  i { font-size: 2rem; opacity: 0.5; }
+}
+
+/* FOOTER */
+.spotlight-footer {
+  padding: 8px 20px;
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  gap: 16px;
+  
+  .key-hint {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    
+    span {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2px 5px;
+      border-radius: 3px;
+      min-width: 16px;
+      text-align: center;
+    }
+  }
+}
+
+/* ANIMATIONS */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
 
 // :host {
 //   /* --- GHOST TOKENS --- */
