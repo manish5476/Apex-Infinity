@@ -29,6 +29,7 @@
               "src/styles/common.scss",
               "src/styles/themes.scss",
               "src/styles/base-styles.scss",
+              "src/styles/primeng-theme.scss",
               "node_modules/primeicons/primeicons.css",
               "@angular/material/prebuilt-themes/azure-blue.css"
             ],
