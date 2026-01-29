@@ -3452,9 +3452,154 @@
   }
 }
 
+.p-message {
+  /* 1. Global Scale & Structure */
+  --p-message-border-radius: var(--ui-border-radius);
+  --p-message-border-width: var(--ui-border-width);
+  --p-message-transition-duration: var(--transition-base);
+  --p-message-content-padding: var(--spacing-sm) var(--spacing-md);
+  --p-message-content-gap: var(--spacing-sm);
+  
+  /* 2. Compact Typography Sync */
+  --p-message-text-font-size: var(--font-size-base);
+  --p-message-text-font-weight: var(--font-weight-medium);
+  --p-message-icon-size: var(--font-size-md);
+  
+  /* 3. Close Button System */
+  --p-message-close-button-width: 1.5rem;
+  --p-message-close-button-height: 1.5rem;
+  --p-message-close-button-border-radius: var(--ui-border-radius-sm);
+  --p-message-close-icon-size: var(--font-size-xs);
+  --p-message-close-button-focus-ring-width: var(--focus-ring-width);
+
+  /* --- Severity Mapping (Canonical Derivation) --- */
+
+  /* Success Message */
+  --p-message-success-background: var(--color-success-bg);
+  --p-message-success-border-color: var(--color-success-border);
+  --p-message-success-color: var(--color-success);
+  --p-message-success-shadow: var(--shadow-xs);
+
+  /* Info Message */
+  --p-message-info-background: var(--color-info-bg);
+  --p-message-info-border-color: var(--color-info-border);
+  --p-message-info-color: var(--color-info);
+
+  /* Warning Message */
+  --p-message-warn-background: var(--color-warning-bg);
+  --p-message-warn-border-color: var(--color-warning-border);
+  --p-message-warn-color: var(--theme-warning);
+
+  /* Error Message */
+  --p-message-error-background: var(--color-error-bg);
+  --p-message-error-border-color: var(--color-error-border);
+  --p-message-error-color: var(--color-error);
+
+  /* Secondary / Neutral Message */
+  --p-message-secondary-background: var(--bg-ternary);
+  --p-message-secondary-border-color: var(--border-primary);
+  --p-message-secondary-color: var(--text-secondary);
+
+  /* 4. Technical Corrections for Visual Integrity */
+  &.p-message-inline {
+    margin: var(--spacing-xs) 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .p-message-content {
+    /* Enforce Glass Effect if used on light/dark backgrounds */
+    backdrop-filter: blur(var(--glass-blur-c));
+    -webkit-backdrop-filter: blur(var(--glass-blur-c));
+    border-radius: inherit;
+  }
+
+  .p-message-text {
+    line-height: var(--line-height-normal);
+    font-family: var(--font-body);
+  }
+
+  .p-message-close-button {
+    transition: var(--transition-fast);
+    
+    &:hover {
+      background: rgba(0, 0, 0, 0.05) !important;
+      opacity: 0.8;
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+    }
+  }
+}
+
+/* 5. Variant: Outlined (Strict Token Preservance) */
+.p-message-outlined {
+  --p-message-outlined-border-width: var(--ui-border-width-lg);
+  background: transparent !important;
+  backdrop-filter: none;
+}
 
 
+.p-tag {
+  /* 1. Global Scale & Density Control */
+  --p-tag-font-size: var(--font-size-xs); /* 10.4px - Optimized for compact data */
+  --p-tag-font-weight: var(--font-weight-bold);
+  --p-tag-padding: 0.125rem var(--spacing-sm); /* High density padding */
+  --p-tag-gap: var(--spacing-xs);
+  --p-tag-border-radius: var(--ui-border-radius-sm);
+  --p-tag-rounded-border-radius: 9999px; /* For 'rounded' variant */
+  --p-tag-icon-size: 0.65rem;
 
+  /* 2. Semantic Severity Mapping (Using Canonical Mixes) */
+
+  /* Primary Tag */
+  --p-tag-primary-background: var(--color-primary-bg);
+  --p-tag-primary-color: var(--accent-primary);
+
+  /* Success Tag */
+  --p-tag-success-background: var(--color-success-bg);
+  --p-tag-success-color: var(--color-success);
+
+  /* Info Tag */
+  --p-tag-info-background: var(--color-info-bg);
+  --p-tag-info-color: var(--color-info);
+
+  /* Warning Tag */
+  --p-tag-warn-background: var(--color-warning-bg);
+  --p-tag-warn-color: var(--theme-warning);
+
+  /* Danger/Error Tag */
+  --p-tag-danger-background: var(--color-error-bg);
+  --p-tag-danger-color: var(--color-error);
+
+  /* Secondary Tag */
+  --p-tag-secondary-background: var(--color-gray-200);
+  --p-tag-secondary-color: var(--color-gray-700);
+
+  /* Contrast Tag */
+  --p-tag-contrast-background: var(--color-gray-900);
+  --p-tag-contrast-color: var(--text-inverse);
+
+  /* 3. Technical Precision Overrides */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1; /* Prevent layout shift in tables */
+  text-transform: uppercase; /* Standard for professional metadata */
+  letter-spacing: 0.025em;
+  white-space: nowrap;
+
+  .p-tag-label {
+    font-family: var(--font-body);
+  }
+
+  /* Ensure icons align with the baseline of the compact text */
+  .p-tag-icon {
+    margin-bottom: 1px;
+  }
+}
 
 
 
