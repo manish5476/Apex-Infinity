@@ -2848,7 +2848,236 @@
   }
 }
 
+/* ==========================================================================
+   COMPONENT: PRIMENG TABS
+   Refined for: Angular 20 | Glass Themes | Compact Grid
+   ========================================================================== */
 
+/* 1. Global Token Mapping 
+   (Connecting PrimeNG's specific Tabs tokens to Core Design System)
+*/
+:root {
+  /* --- ROOT & HEADER --- */
+  --p-tabs-transition-duration: 0.2s;
+  
+  /* Tab List (The Header Bar) */
+  --p-tabs-tablist-background: transparent;
+  --p-tabs-tablist-border-color: var(--border-primary);
+  --p-tabs-tablist-border-width: 0 0 1px 0; /* Bottom border only */
+
+  /* --- INDIVIDUAL TABS (Buttons) --- */
+  --p-tabs-tab-background: transparent;
+  --p-tabs-tab-hover-background: var(--component-bg-hover);
+  --p-tabs-tab-active-background: transparent; /* Keep transparent, let inkbar do the work */
+  
+  --p-tabs-tab-color: var(--text-secondary);
+  --p-tabs-tab-hover-color: var(--text-primary);
+  --p-tabs-tab-active-color: var(--accent-primary);
+  
+  --p-tabs-tab-border-width: 0;
+  --p-tabs-tab-border-color: transparent;
+  
+  --p-tabs-tab-padding: var(--spacing-md) var(--spacing-lg); /* Compact: 0.5rem top/bottom */
+  --p-tabs-tab-font-weight: var(--font-weight-medium);
+  --p-tabs-tab-gap: var(--spacing-md);
+  --p-tabs-tab-margin: 0;
+
+  /* Focus Ring */
+  --p-tabs-tab-focus-ring-width: var(--focus-ring-width);
+  --p-tabs-tab-focus-ring-style: solid;
+  --p-tabs-tab-focus-ring-color: var(--focus-ring-color);
+  --p-tabs-tab-focus-ring-offset: -2px; /* Inset focus ring */
+
+  /* --- ACTIVE BAR (Inkbar) --- */
+  --p-tabs-active-bar-height: 2px;
+  --p-tabs-active-bar-bottom: -1px; /* Overlap the border */
+  --p-tabs-active-bar-background: var(--accent-primary);
+
+  /* --- NAVIGATION BUTTONS (Scroll) --- */
+  --p-tabs-nav-button-background: var(--bg-ternary);
+  --p-tabs-nav-button-color: var(--text-secondary);
+  --p-tabs-nav-button-hover-color: var(--text-primary);
+  --p-tabs-nav-button-width: 2.5rem;
+  --p-tabs-nav-button-shadow: var(--shadow-sm);
+
+  /* --- CONTENT PANELS --- */
+  --p-tabs-tabpanel-background: var(--bg-secondary); /* Adapts to Glass automatically */
+  --p-tabs-tabpanel-color: var(--text-primary);
+  --p-tabs-tabpanel-padding: var(--spacing-lg); /* Standard breathing room */
+}
+
+/* 2. Component Overrides */
+.p-tabs {
+  display: flex;
+  flex-direction: column;
+  
+  /* --- 1. TAB LIST (Header Wrapper) --- */
+  .p-tablist {
+    position: relative;
+    display: flex;
+    background: var(--p-tabs-tablist-background);
+    border-style: solid;
+    border-color: var(--p-tabs-tablist-border-color);
+    border-width: var(--p-tabs-tablist-border-width);
+    
+    /* Scroll Container for Tabs */
+    .p-tablist-content {
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-behavior: smooth;
+      scrollbar-width: none; /* Hide scrollbar for cleaner UI */
+      
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
+    .p-tablist-tab-list {
+      display: flex;
+      position: relative;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* --- 2. THE TAB ITSELF --- */
+    .p-tab {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      user-select: none;
+      white-space: nowrap;
+      
+      font-family: var(--font-body);
+      font-size: var(--font-size-md);
+      font-weight: var(--p-tabs-tab-font-weight);
+      
+      background: var(--p-tabs-tab-background);
+      color: var(--p-tabs-tab-color);
+      padding: var(--p-tabs-tab-padding);
+      margin: var(--p-tabs-tab-margin);
+      transition: color var(--transition-base), background-color var(--transition-base);
+      border-radius: var(--ui-border-radius-sm) var(--ui-border-radius-sm) 0 0;
+
+      /* Hover */
+      &:not(.p-disabled):hover {
+        background: var(--p-tabs-tab-hover-background);
+        color: var(--p-tabs-tab-hover-color);
+      }
+
+      /* Active State */
+      &.p-tab-active {
+        background: var(--p-tabs-tab-active-background);
+        color: var(--p-tabs-tab-active-color);
+      }
+
+      /* Disabled */
+      &.p-disabled {
+        opacity: var(--state-disabled-opacity);
+        cursor: default;
+      }
+
+      /* Focus */
+      &:focus-visible {
+        outline: none;
+        box-shadow: inset 0 0 0 var(--p-tabs-tab-focus-ring-width) var(--p-tabs-tab-focus-ring-color);
+      }
+    }
+
+    /* --- 3. ACTIVE INK BAR --- */
+    .p-tablist-active-bar {
+      position: absolute;
+      bottom: var(--p-tabs-active-bar-bottom);
+      height: var(--p-tabs-active-bar-height);
+      background-color: var(--p-tabs-active-bar-background);
+      transition: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1; /* Sit above the bottom border */
+    }
+
+    /* --- 4. NAV BUTTONS (Next/Prev) --- */
+    .p-tablist-nav-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: var(--p-tabs-nav-button-width);
+      background: var(--p-tabs-nav-button-background);
+      color: var(--p-tabs-nav-button-color);
+      border: none;
+      cursor: pointer;
+      z-index: 2;
+      box-shadow: var(--p-tabs-nav-button-shadow);
+      
+      &:hover {
+        color: var(--p-tabs-nav-button-hover-color);
+        background: var(--component-bg-hover);
+      }
+    }
+  }
+
+  /* --- 5. CONTENT PANELS WRAPPER --- */
+  .p-tabpanels {
+    background: var(--p-tabs-tabpanel-background);
+    color: var(--p-tabs-tabpanel-color);
+    padding: var(--p-tabs-tabpanel-padding);
+    
+    /* GLASS EFFECT APPLICATION */
+    /* If the theme defines glass-bg-c as translucent, this applies. 
+       If solid, it applies solid. */
+    backdrop-filter: blur(var(--glass-blur-c, 0px)); 
+    -webkit-backdrop-filter: blur(var(--glass-blur-c, 0px));
+    
+    /* Optional: Rounded corners for the content block */
+    border-bottom-left-radius: var(--ui-border-radius-lg);
+    border-bottom-right-radius: var(--ui-border-radius-lg);
+    
+    /* In glass themes, we often want a border around the content 
+       that matches the header border */
+    border: 1px solid var(--p-tabs-tablist-border-color);
+    border-top: 0 none;
+  }
+
+  /* Individual Panel */
+  .p-tabs-panel {
+    outline: 0 none;
+    
+    &:focus-visible {
+        /* Inner focus logic handled by content */
+    }
+  }
+}
+
+/* ==========================================================================
+   THEME SPECIFIC OVERRIDES (Bio-Frost / Solar Flare)
+   ========================================================================== */
+.theme-bio-frost .p-tabs,
+.theme-solar-flare .p-tabs {
+  
+  .p-tablist {
+    /* Use a very faint glass for the header to separate it from the page bg */
+    background: rgba(255, 255, 255, 0.03);
+    border-color: var(--glass-border-c);
+  }
+
+  .p-tabpanels {
+    /* Stronger glass for content */
+    background: var(--glass-bg-c);
+    border-color: var(--glass-border-c);
+    box-shadow: var(--glass-shadow-c);
+  }
+  
+  /* Make inactive tabs slightly more faded for contrast */
+  .p-tab:not(.p-tab-active) {
+    color: var(--text-muted);
+    
+    &:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.05);
+    }
+  }
+}
 
 
 // /* 3. The Popups (Overlays) - FIXED FOR GLASS THEMES */
