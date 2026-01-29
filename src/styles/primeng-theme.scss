@@ -3602,14 +3602,226 @@
 }
 
 
+.p-autocomplete-overlay {
+  /* 1. Root Overlay - Enforce Glassmorphism */
+  background: var(--glass-bg-c) !important;
+  backdrop-filter: blur(var(--glass-blur-c)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-c)) !important;
+  border: 1px solid var(--glass-border-c) !important;
+  box-shadow: var(--shadow-xl) !important;
+  border-radius: var(--ui-border-radius-lg) !important;
+  padding: var(--spacing-xs) 0 !important;
+
+  .p-autocomplete-list-container {
+    /* Compact Scroll Strategy */
+    scrollbar-width: thin;
+    scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+    
+    &::-webkit-scrollbar { width: 4px; }
+  }
+
+  .p-autocomplete-list {
+    padding: 0 var(--spacing-xs);
+    gap: 2px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* 2. Individual Option Correction */
+  .p-autocomplete-option {
+    position: relative;
+    overflow: hidden; /* Fixes the massive p-ink ripple issue */
+    padding: var(--spacing-sm) var(--spacing-md) !important;
+    font-size: var(--font-size-base);
+    font-family: var(--font-body);
+    color: var(--text-secondary);
+    border-radius: var(--ui-border-radius-sm);
+    transition: var(--transition-fast);
+    cursor: pointer;
+    margin: 0;
+
+    /* Highlight matching text if applicable */
+    span {
+      line-height: var(--line-height-normal);
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    /* 3. States Correction (The "Not looking good" Fix) */
+    
+    /* Focused State (Keyboard navigation/Hover) */
+    &.p-focus, &[data-p-focused="true"] {
+      background: var(--bg-hover) !important;
+      color: var(--text-primary) !important;
+      box-shadow: inset 2px 0 0 0 var(--accent-primary) !important; /* Left "active" bar */
+    }
+
+    /* Selected State */
+    &.p-highlight, &[aria-selected="true"] {
+      background: var(--color-primary-bg) !important;
+      color: var(--accent-primary) !important;
+      font-weight: var(--font-weight-medium);
+    }
+
+    /* Active/Press State */
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  /* 4. Empty Message / Loading Correction */
+  .p-autocomplete-empty-message,
+  .p-autocomplete-loader {
+    padding: var(--spacing-md);
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    text-align: center;
+  }
+}
+
+/* Fix for the Ripple Color inside the Glass Menu */
+.p-autocomplete-option .p-ink {
+  background: rgba(var(--accent-primary-rgb, 59, 130, 246), 0.1) !important;
+}
 
 
 
 
 
 
+/* ==========================================================================
+   COMPONENT: PRIMENG SELECT & MULTISELECT (Perfectly Aligned)
+   Refined for: Angular 20 | Refined Compact | High Density
+   ========================================================================== */
 
+:root {
+  /* Trigger Baseline - Forced to match exactly */
+  --p-select-min-height: 2.25rem;
+  --p-multiselect-min-height: 2.25rem;
+  
+  /* Typography */
+  --p-select-font-size: var(--font-size-base);
+  
+  /* Overlay - Elevation Increase for Dark Mode */
+  --p-select-overlay-bg: color-mix(in srgb, var(--bg-primary), transparent 15%);
+  --p-select-overlay-shadow: var(--shadow-xl);
+}
 
+/* 1. Standardizing the Trigger (The Box) */
+.p-select, .p-multiselect {
+  min-height: var(--p-select-min-height) !important;
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-primary) !important;
+  border-radius: var(--ui-border-radius) !important;
+  transition: var(--transition-base) !important;
+  display: flex;
+  align-items: center;
+
+  .p-select-label, .p-multiselect-label-container {
+    padding: 0 var(--spacing-md) !important;
+    display: flex;
+    align-items: center;
+    color: var(--text-primary);
+    font-size: var(--p-select-font-size);
+  }
+
+  /* Vertical Alignment for Icons */
+  .p-select-dropdown, .p-multiselect-trigger {
+    width: 2rem;
+    color: var(--text-secondary);
+    transition: var(--transition-fast);
+  }
+
+  &:not(.p-disabled):hover {
+    border-color: var(--accent-primary) !important;
+    background: var(--bg-hover) !important;
+  }
+
+  &.p-focus {
+    border-color: var(--accent-primary) !important;
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color) !important;
+  }
+}
+
+/* 2. Standardizing the Overlay (The Menu) */
+/* Targets both .p-select-overlay and .p-multiselect-panel */
+.p-select-overlay, .p-multiselect-panel {
+  /* FIX: Explicit background with opacity for Dark Mode legibility */
+  background: var(--p-select-overlay-bg) !important;
+  backdrop-filter: blur(var(--glass-blur-c, 16px)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-c, 16px)) !important;
+  border: 1px solid var(--glass-border-c) !important;
+  box-shadow: var(--p-select-overlay-shadow) !important;
+  margin-top: 4px !important;
+  border-radius: var(--ui-border-radius-lg) !important;
+  z-index: var(--z-dropdown) !important;
+
+  /* Search/Header Area */
+  .p-select-header, .p-multiselect-header {
+    background: rgba(0, 0, 0, 0.1) !important;
+    padding: var(--spacing-sm) !important;
+    border-bottom: 1px solid var(--border-subtle) !important;
+    
+    .p-inputtext {
+      font-size: var(--font-size-sm);
+      padding: var(--spacing-xs) var(--spacing-sm);
+    }
+  }
+
+  /* 3. List Item Perfection (The LI fix) */
+  .p-select-option, .p-multiselect-item {
+    margin: 2px var(--spacing-xs) !important;
+    padding: var(--spacing-sm) var(--spacing-md) !important;
+    border-radius: var(--ui-border-radius-sm) !important;
+    font-size: var(--font-size-base) !important;
+    color: var(--text-primary) !important; /* Forces light text in dark mode */
+    transition: var(--transition-fast) !important;
+    display: flex;
+    align-items: center;
+
+    /* Unselected Hover */
+    &:not(.p-highlight):not(.p-disabled):hover {
+      background: var(--bg-hover) !important;
+      color: var(--text-primary) !important;
+    }
+
+    /* Selected State - Using Project Accent */
+    &.p-highlight {
+      background: var(--accent-primary) !important;
+      color: var(--text-inverse) !important;
+      font-weight: var(--font-weight-medium);
+      
+      // Fix for sub-icons inside selected items
+      .p-checkbox-box {
+        border-color: var(--text-inverse);
+      }
+    }
+
+    /* MultiSelect Specific Checkbox Alignment */
+    .p-checkbox {
+      margin-right: var(--spacing-md);
+    }
+  }
+
+  /* Empty Message Alignment */
+  .p-select-empty-message {
+    padding: var(--spacing-lg) !important;
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+  }
+}
+
+/* 4. MultiSelect Token (Chips) Correction */
+.p-multiselect-token {
+  background: var(--color-primary-bg) !important;
+  color: var(--accent-primary) !important;
+  padding: 1px 6px !important;
+  border-radius: var(--ui-border-radius-sm) !important;
+  border: 1px solid var(--color-primary-border) !important;
+  font-size: var(--font-size-xs) !important;
+  height: 1.5rem; /* Ensures chip doesn't stretch the box */
+}
 
 
 
