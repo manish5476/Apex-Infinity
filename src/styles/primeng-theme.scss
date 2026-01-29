@@ -3282,6 +3282,93 @@
     }
   }
 }
+
+.p-checkbox {
+  /* Root Dimensions & Transitions */
+  --p-checkbox-width: 16px;
+  --p-checkbox-height: 16px;
+  --p-checkbox-transition-duration: 0.2s;
+  
+  /* Standard State */
+  --p-checkbox-background: var(--bg-secondary);
+  --p-checkbox-border-color: var(--border-primary);
+  --p-checkbox-border-radius: var(--ui-border-radius-sm);
+  --p-checkbox-shadow: var(--shadow-xs);
+
+  /* Checked State */
+  --p-checkbox-checked-background: var(--accent-primary);
+  --p-checkbox-checked-border-color: var(--accent-primary);
+  --p-checkbox-icon-checked-color: var(--text-inverse);
+
+  /* Hover & Focus States */
+  --p-checkbox-hover-border-color: var(--accent-primary);
+  --p-checkbox-focus-border-color: var(--accent-primary);
+  --p-checkbox-focus-ring-color: var(--focus-ring-color);
+  --p-checkbox-focus-ring-width: var(--focus-ring-width);
+  
+  /* Small & Large Variants (Compact Scale) */
+  --p-checkbox-sm-width: 14px;
+  --p-checkbox-sm-height: 14px;
+  --p-checkbox-icon-sm-size: var(--font-size-xs);
+  
+  --p-checkbox-lg-width: 20px;
+  --p-checkbox-lg-height: 20px;
+  --p-checkbox-icon-lg-size: var(--font-size-lg);
+
+  /* Logic for High Density UI */
+  .p-checkbox-box {
+    transition: var(--transition-fast);
+    
+    &.p-highlight {
+      border-color: var(--p-checkbox-checked-border-color);
+      background: var(--p-checkbox-checked-background);
+    }
+  }
+}
+/* Target the specific MultiSelect Option from your snippet */
+.p-multiselect-option {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md) !important; /* Force compact spacing */
+  font-size: var(--font-size-base);
+  font-family: var(--font-body);
+  transition: var(--transition-fast);
+  cursor: pointer;
+  border-radius: var(--ui-border-radius-sm);
+  margin: 0 2px; // Small gap between items
+
+  /* Fix for the 'p-focus' / 'data-p-focused' state you mentioned */
+  &.p-focus, &[data-p-focused="true"] {
+    background: var(--bg-hover) !important;
+    color: var(--text-primary);
+    box-shadow: inset 0 0 0 1px var(--accent-primary) !important; /* Subtle internal focus ring */
+    outline: none !important;
+  }
+
+  /* Selected State */
+  &.p-highlight, &[aria-selected="true"] {
+    background: var(--color-primary-bg) !important; /* Using theme mixin derived semantic */
+    color: var(--accent-primary) !important;
+    font-weight: var(--font-weight-medium);
+  }
+
+  /* Ensure the label inside the LI is centered */
+  span {
+    line-height: var(--line-height-normal);
+  }
+  
+  /* Checkbox inside the MultiSelect Option */
+  .p-checkbox {
+    margin-right: var(--spacing-md);
+  }
+}
+
+/* Ensure the empty message also matches the theme */
+.p-multiselect-empty-message {
+  padding: var(--spacing-lg);
+  color: var(--text-muted);
+  font-style: italic;
+}
 // /* ==========================================================================
 //    COMPONENT: PRIMENG AUTOCOMPLETE
 //    Refined for: Angular 20 | Glass Themes | Compact Grid
