@@ -3193,6 +3193,95 @@
     }
   }
 }
+
+.p-multiselect {
+  /* Root Styles */
+  --p-multiselect-background: var(--bg-secondary);
+  --p-multiselect-border-color: var(--border-primary);
+  --p-multiselect-color: var(--text-primary);
+  --p-multiselect-border-radius: var(--ui-border-radius);
+  --p-multiselect-shadow: var(--shadow-sm);
+  --p-multiselect-transition-duration: 0.22s;
+  
+  /* Compact Typography & Spacing */
+  --p-multiselect-padding-x: var(--spacing-sm);
+  --p-multiselect-padding-y: var(--spacing-xs);
+  --p-multiselect-sm-font-size: var(--font-size-sm);
+
+  /* States */
+  --p-multiselect-hover-border-color: var(--accent-primary);
+  --p-multiselect-focus-border-color: var(--accent-primary);
+  --p-multiselect-focus-ring-color: var(--focus-ring-color);
+  --p-multiselect-invalid-border-color: var(--color-error);
+
+  /* Overlay / Dropdown Panel */
+  --p-multiselect-overlay-background: var(--glass-bg-c);
+  --p-multiselect-overlay-border-color: var(--glass-border-c);
+  --p-multiselect-overlay-shadow: var(--shadow-xl);
+  --p-multiselect-overlay-border-radius: var(--ui-border-radius-lg);
+
+  /* List & Options */
+  --p-multiselect-list-gap: 2px;
+  --p-multiselect-option-padding: var(--spacing-sm) var(--spacing-md);
+  --p-multiselect-option-focus-background: var(--bg-hover);
+  --p-multiselect-option-selected-background: var(--color-primary-bg);
+  --p-multiselect-option-selected-color: var(--accent-primary);
+  --p-multiselect-option-border-radius: var(--ui-border-radius-sm);
+
+  /* Chips */
+  --p-multiselect-chip-border-radius: var(--ui-border-radius-sm);
+  
+  // Custom Override for Glassmorphism alignment
+  .p-multiselect-overlay {
+    backdrop-filter: blur(var(--glass-blur-c));
+    -webkit-backdrop-filter: blur(var(--glass-blur-c));
+  }
+}
+.p-dialog {
+  /* Root & Layout */
+  --p-dialog-background: var(--bg-primary);
+  --p-dialog-border-color: var(--border-primary);
+  --p-dialog-color: var(--text-primary);
+  --p-dialog-border-radius: var(--ui-border-radius-xl);
+  --p-dialog-shadow: var(--shadow-3xl);
+  
+  /* Header Section */
+  --p-dialog-header-padding: var(--spacing-lg) var(--spacing-xl);
+  --p-dialog-header-gap: var(--spacing-md);
+  --p-dialog-title-font-size: var(--font-size-lg);
+  --p-dialog-title-font-weight: var(--font-weight-semibold);
+
+  /* Content Section */
+  --p-dialog-content-padding: 0 var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
+  
+  /* Footer Section */
+  --p-dialog-footer-padding: var(--spacing-lg) var(--spacing-xl);
+  --p-dialog-footer-gap: var(--spacing-md);
+
+  // Technical precision: Fix for Modal Backdrop
+  &.p-dialog-mask {
+    z-index: var(--z-modal-backdrop);
+    background-color: rgba(0, 0, 0, 0.4); // Standardized overlay dim
+    backdrop-filter: blur(4px);
+  }
+
+  // Header specific font alignment
+  .p-dialog-title {
+    font-family: var(--font-heading);
+    line-height: var(--line-height-tight);
+  }
+
+  // Close/Maximize Buttons
+  .p-dialog-header-actions .p-link {
+    transition: var(--transition-fast);
+    border-radius: var(--ui-border-radius);
+    
+    &:hover {
+      background: var(--bg-hover);
+      color: var(--accent-primary);
+    }
+  }
+}
 // /* ==========================================================================
 //    COMPONENT: PRIMENG AUTOCOMPLETE
 //    Refined for: Angular 20 | Glass Themes | Compact Grid
