@@ -1,92 +1,31 @@
 /* ============================================================
    BASE UTILITIES & HELPERS
-   System:      Refined Compact (Improved 2026 edition)
-   Purpose:     Safe root + helpers + PrimeNG-friendly overrides
-   Attention:   Minimize CLS → avoid height:100% abuse, reserve space
+   System: Refined Compact (13px Base)
+   Purpose: Synchronize native HTML with PrimeNG Upgrade
    ============================================================ */
 
-/* ---- Root & Typography Base ---- */
-:root {
-  --root-font-size: var(--font-size-base, 0.8125rem); /* 13px compact base */
-
-  /* Let you override easily in themes */
-  --font-body:    'Inter', system-ui, -apple-system, sans-serif;
-  --font-heading: 'Poppins', system-ui, -apple-system, sans-serif;
-  --font-mono:    'Fira Code', ui-monospace, monospace;
-
-  /* Your existing typography scale – kept compact */
-  --font-size-xs:   0.65rem;
-  --font-size-sm:   0.75rem;
-  --font-size-base: 0.8125rem;
-  --font-size-md:   0.875rem;
-  --font-size-lg:   0.9375rem;
-  --font-size-xl:   1rem;
-  --font-size-2xl:  1.125rem;
-  --font-size-3xl:  1.375rem;
-  --font-size-4xl:  1.75rem;
-  --font-size-5xl:  2.25rem;
-
-  --line-height-tight:   1.1;
-  --line-height-normal:  1.3;
-  --line-height-relaxed: 1.5;
-}
-
-/* Apply root font-size once */
-html {
-  font-size: var(--root-font-size);
-  scroll-behavior: smooth;     /* nice to have, disable if problematic */
-}
-
+/* ---- Global Reset & Root ---- */
 html, body, :host {
-  min-height: 100%;            /* ← safer than height:100% */
+  height: 100%;
   margin: 0;
-  padding: 0;
-
+  
+  /* Typography Root - Strictly Preserving Compact Scale */
   font-family: var(--font-body);
+  font-size: var(--font-size-base); /* 13px */
   color: var(--text-primary);
   background: var(--bg-primary);
   line-height: var(--line-height-normal);
-
+  
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
-/* Reduce motion – important for accessibility & performance */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    transition: none !important;
-    animation: none !important;
-    scroll-behavior: auto !important;
-  }
+*, *::before, *::after { 
+  box-sizing: border-box; 
 }
 
-/* ---- Box Model & Scrollbars ---- */
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
-/* Modern cross-browser scrollbar (thin & subtle) */
-:root {
-  scrollbar-width:  thin;
-  scrollbar-color: var(--scroll-thumb, #9ca3af) var(--scroll-track, transparent);
-}
-
-* {
-  &::-webkit-scrollbar {
-    width:  6px;
-    height: 6px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: var(--scroll-thumb, #9ca3af);
-    border-radius: 4px;
-  }
-  &::-webkit-scrollbar-track {
-    background: var(--scroll-track, transparent);
-  }
-}
-
-/* ---- Typography ---- */
+/* ---- Typography Hierarchy ---- */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   margin: 0 0 var(--spacing-md) 0;
@@ -100,8 +39,6 @@ h1 { font-size: var(--font-size-5xl); }
 h2 { font-size: var(--font-size-4xl); }
 h3 { font-size: var(--font-size-3xl); }
 h4 { font-size: var(--font-size-2xl); }
-h5 { font-size: var(--font-size-xl);  }
-h6 { font-size: var(--font-size-lg);  }
 
 p {
   margin: 0 0 var(--spacing-md) 0;
@@ -109,240 +46,217 @@ p {
   line-height: var(--line-height-relaxed);
 }
 
-small {
-  font-size: var(--font-size-sm);
-  color: var(--text-tertiary);
-}
+/* ---- UI TASK FORCE: NATIVE FORM SYNCHRONIZATION ---- */
+/* Fixes the "Bad UI" size issues after PrimeNG upgrade */
 
-/* ---- Layout Helpers ---- */
-.container {
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+select {
+  appearance: none;
   width: 100%;
-  max-width: 1440px;
-  margin-inline: auto;
-  padding-inline: var(--spacing-xl);
+  
+  /* Force Height Match with PrimeNG Compact Token */
+  height: var(--p-comp-height, 2rem) !important;
+  
+  /* Typography Synchronization */
+  font-family: var(--font-body);
+  font-size: var(--font-size-base) !important; /* Force 13px */
+  color: var(--text-primary);
+  
+  /* Visual Alignment */
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--ui-border-radius);
+  
+  /* Compact Internal Spacing */
+  padding: 0 var(--spacing-md); 
+  
+  transition: var(--transition-colors), box-shadow 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
 }
 
-.responsive-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: var(--spacing-lg);
+textarea {
   width: 100%;
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--ui-border-radius);
+  padding: var(--spacing-sm) var(--spacing-md);
 }
 
-/* ---- Card (safe hover – avoid transform if CLS sensitive) ---- */
-.card {
-  background:    var(--bg-secondary);
-  border:        1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius-lg);
-  padding:       var(--spacing-lg);
-  box-shadow:    var(--shadow-sm);
-  transition:    border-color var(--transition-base),
-                 box-shadow var(--transition-base);
+label {
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm); /* 12px Labels for Compact look */
+  margin-bottom: var(--spacing-xs);
 }
 
-.card:hover {
+/* Input States */
+input:hover, select:hover, textarea:hover {
   border-color: var(--border-secondary);
-  box-shadow:   var(--shadow-md);
-  /* transform: translateY(-2px); */ /* comment if causing jitter/CLS */
+  background: var(--component-bg-hover);
 }
 
-/* ---- Buttons (aligned with PrimeNG compact feeling) ---- */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+}
+
+/* ---- Button Standardization ---- */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-
-  padding:    var(--spacing-sm) var(--spacing-lg);
-  font-size:  var(--font-size-base);
+  
+  /* Sizing to match inputs exactly */
+  height: var(--p-comp-height, 2rem); 
+  padding: 0 var(--spacing-lg);
+  font-size: var(--font-size-base);
   font-weight: var(--font-weight-medium);
-
+  
   border-radius: var(--ui-border-radius);
-  border:        1px solid transparent;
-  cursor:        pointer;
-  white-space:   nowrap;
-
+  border: 1px solid transparent;
+  cursor: pointer;
   transition: var(--transition-base);
-  user-select: none;
 }
 
 .btn-primary {
   background: var(--accent-primary);
   color: #ffffff;
+  box-shadow: var(--shadow-sm);
 }
 
-.btn-primary:hover {
-  background: var(--accent-hover);
-}
-
-.btn-ghost {
-  background: transparent;
-  border-color: var(--border-primary);
-  color: var(--text-secondary);
-}
-
-.btn-ghost:hover {
-  background:    var(--component-bg-hover);
-  color:         var(--text-primary);
-  border-color:  var(--border-secondary);
-}
-
-.btn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
-}
-
-/* ---- Form Elements ---- */
-.form-field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-  width: 100%;
-  margin-bottom: var(--spacing-md);
-}
-
-label {
-  font-weight: var(--font-weight-medium);
-  color: var(--text-secondary);
-  font-size: var(--font-size-sm);
-}
-
-input, textarea, select {
-  appearance: none;
-  width: 100%;
-  font-family: var(--font-body);
-  font-size: var(--font-size-base);
-  padding: var(--spacing-sm) var(--spacing-md);
+/* ---- Layout & Utility Classes ---- */
+.card {
   background: var(--bg-secondary);
   border: 1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius);
-  color: var(--text-primary);
-  transition: border-color var(--transition-base),
-              box-shadow var(--transition-base),
-              background-color var(--transition-fast);
+  border-radius: var(--ui-border-radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-base);
+  position: relative;
+  overflow: hidden;
 }
 
-input:hover, textarea:hover, select:hover {
-  border-color: var(--border-secondary);
-  background: var(--component-bg-hover);
-}
-
-input:focus, textarea:focus, select:focus {
-  outline: none;
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
-  background: var(--bg-secondary);
-}
-
-input:disabled, textarea:disabled, select:disabled {
-  opacity: var(--state-disabled-opacity);
-  background: var(--bg-ternary);
-  cursor: not-allowed;
-}
-
-::placeholder {
-  color: var(--text-muted);
-}
-
-/* ---- Flex & Text Utilities (unchanged, good as-is) ---- */
-.flex        { display: flex; }
-.flex-col    { flex-direction: column; }
-.flex-wrap   { flex-wrap: wrap; }
-.flex-center { display: flex; align-items: center; justify-content: center; }
-.flex-between{ display: flex; align-items: center; justify-content: space-between; }
-.items-center{ align-items: center; }
-.justify-center { justify-content: center; }
-.gap-sm { gap: var(--spacing-sm); }
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
 .gap-md { gap: var(--spacing-md); }
-.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* ---- Accessibility ---- */
-.sr-only {
-  position: absolute;
-  width: 1px; height: 1px;
-  padding: 0; margin: -1px;
-  overflow: hidden; clip: rect(0,0,0,0);
-  white-space: nowrap; border: 0;
+.truncate { 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  white-space: nowrap;
 }
 
-/* ---- PrimeNG / Custom Theme Mapping (keep or move to separate file) ---- */
-@include apply-canonical-mapping;   /* ← your mixin – keep it! */
-
-/* Tip: If using PrimeNG ≥18 styled mode, prefer :root { --p-primary-... } overrides
-   or definePreset(Aura, { ... }) in code instead of fighting low-specificity rules.
-*/
-
-/* Responsive adjustments */
-@media (max-width: 1024px) {
-  .container { padding-inline: var(--spacing-lg); }
+/* Modern Scrollbar Strategy */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) var(--scroll-track);
 }
 
-@media (max-width: 640px) {
-  .container { padding-inline: var(--spacing-md); }
-  .responsive-grid {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-md);
-  }
-  h1 { font-size: var(--font-size-3xl); }
-  h2 { font-size: var(--font-size-2xl); }
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border-radius: 4px;
 }
 // /* ============================================================
 //    BASE UTILITIES & HELPERS
-//    System: Refined Compact
-//    Updated: To match PrimeNG Component Overrides
+//    System:      Refined Compact (Improved 2026 edition)
+//    Purpose:     Safe root + helpers + PrimeNG-friendly overrides
+//    Attention:   Minimize CLS → avoid height:100% abuse, reserve space
 //    ============================================================ */
 
-// /* ---- Global Reset & Root ---- */
+// /* ---- Root & Typography Base ---- */
+// :root {
+//   --root-font-size: var(--font-size-base, 0.8125rem); /* 13px compact base */
+
+//   /* Let you override easily in themes */
+//   --font-body:    'Inter', system-ui, -apple-system, sans-serif;
+//   --font-heading: 'Poppins', system-ui, -apple-system, sans-serif;
+//   --font-mono:    'Fira Code', ui-monospace, monospace;
+
+//   /* Your existing typography scale – kept compact */
+//   --font-size-xs:   0.65rem;
+//   --font-size-sm:   0.75rem;
+//   --font-size-base: 0.8125rem;
+//   --font-size-md:   0.875rem;
+//   --font-size-lg:   0.9375rem;
+//   --font-size-xl:   1rem;
+//   --font-size-2xl:  1.125rem;
+//   --font-size-3xl:  1.375rem;
+//   --font-size-4xl:  1.75rem;
+//   --font-size-5xl:  2.25rem;
+
+//   --line-height-tight:   1.1;
+//   --line-height-normal:  1.3;
+//   --line-height-relaxed: 1.5;
+// }
+
+// /* Apply root font-size once */
+// html {
+//   font-size: var(--root-font-size);
+//   scroll-behavior: smooth;     /* nice to have, disable if problematic */
+// }
+
 // html, body, :host {
-//   height: 100%;
+//   min-height: 100%;            /* ← safer than height:100% */
 //   margin: 0;
-  
-//   /* Typography Root */
+//   padding: 0;
+
 //   font-family: var(--font-body);
-//   font-size: var(--font-size-base); /* 13px - The Compact Base */
 //   color: var(--text-primary);
 //   background: var(--bg-primary);
 //   line-height: var(--line-height-normal);
-  
-//   /* Rendering */
+
 //   -webkit-font-smoothing: antialiased;
 //   -moz-osx-font-smoothing: grayscale;
 //   text-rendering: optimizeLegibility;
 // }
 
-// /* ---- Smooth Transitions ---- */
+// /* Reduce motion – important for accessibility & performance */
 // @media (prefers-reduced-motion: reduce) {
-//   *, ::before, ::after { 
-//     transition: none !important; 
-//     animation: none !important; 
+//   *, *::before, *::after {
+//     transition: none !important;
+//     animation: none !important;
 //     scroll-behavior: auto !important;
 //   }
 // }
 
-// /* ---- Box Model & Scrollbar ---- */
-// *, *::before, *::after { 
-//   box-sizing: border-box; 
+// /* ---- Box Model & Scrollbars ---- */
+// *, *::before, *::after {
+//   box-sizing: border-box;
 // }
 
-// /* Modern Scrollbar Strategy */
+// /* Modern cross-browser scrollbar (thin & subtle) */
+// :root {
+//   scrollbar-width:  thin;
+//   scrollbar-color: var(--scroll-thumb, #9ca3af) var(--scroll-track, transparent);
+// }
+
 // * {
-//   scrollbar-width: thin;
-//   scrollbar-color: var(--scroll-thumb) var(--scroll-track);
-// }
-
-// /* Webkit Scrollbar Fallback */
-// *::-webkit-scrollbar {
-//   width: 6px; /* Sleeker width */
-//   height: 6px;
-// }
-
-// *::-webkit-scrollbar-thumb {
-//   background: var(--scroll-thumb);
-//   border-radius: 4px;
-// }
-
-// *::-webkit-scrollbar-track {
-//   background: var(--scroll-track);
+//   &::-webkit-scrollbar {
+//     width:  6px;
+//     height: 6px;
+//   }
+//   &::-webkit-scrollbar-thumb {
+//     background: var(--scroll-thumb, #9ca3af);
+//     border-radius: 4px;
+//   }
+//   &::-webkit-scrollbar-track {
+//     background: var(--scroll-track, transparent);
+//   }
 // }
 
 // /* ---- Typography ---- */
@@ -352,20 +266,20 @@ input:disabled, textarea:disabled, select:disabled {
 //   color: var(--text-primary);
 //   line-height: var(--line-height-tight);
 //   font-weight: var(--font-weight-bold);
-//   letter-spacing: -0.02em; /* Tighter tracking for headings */
+//   letter-spacing: -0.02em;
 // }
 
 // h1 { font-size: var(--font-size-5xl); }
 // h2 { font-size: var(--font-size-4xl); }
 // h3 { font-size: var(--font-size-3xl); }
 // h4 { font-size: var(--font-size-2xl); }
-// h5 { font-size: var(--font-size-xl); }
-// h6 { font-size: var(--font-size-lg); }
+// h5 { font-size: var(--font-size-xl);  }
+// h6 { font-size: var(--font-size-lg);  }
 
 // p {
 //   margin: 0 0 var(--spacing-md) 0;
 //   color: var(--text-secondary);
-//   line-height: var(--line-height-relaxed); /* Better readability for blocks */
+//   line-height: var(--line-height-relaxed);
 // }
 
 // small {
@@ -373,7 +287,7 @@ input:disabled, textarea:disabled, select:disabled {
 //   color: var(--text-tertiary);
 // }
 
-// /* ---- Layout Containers ---- */
+// /* ---- Layout Helpers ---- */
 // .container {
 //   width: 100%;
 //   max-width: 1440px;
@@ -381,7 +295,6 @@ input:disabled, textarea:disabled, select:disabled {
 //   padding-inline: var(--spacing-xl);
 // }
 
-// /* ---- Responsive Grid (Auto-Fit) ---- */
 // .responsive-grid {
 //   display: grid;
 //   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -389,121 +302,99 @@ input:disabled, textarea:disabled, select:disabled {
 //   width: 100%;
 // }
 
-// /* ---- Card Primitive ---- */
+// /* ---- Card (safe hover – avoid transform if CLS sensitive) ---- */
 // .card {
-//   background: var(--bg-secondary);
-//   border: 1px solid var(--border-primary);
+//   background:    var(--bg-secondary);
+//   border:        1px solid var(--border-primary);
 //   border-radius: var(--ui-border-radius-lg);
-//   padding: var(--spacing-lg);
-//   box-shadow: var(--shadow-sm);
-//   transition: var(--transition-base);
-//   position: relative;
-//   overflow: hidden;
+//   padding:       var(--spacing-lg);
+//   box-shadow:    var(--shadow-sm);
+//   transition:    border-color var(--transition-base),
+//                  box-shadow var(--transition-base);
 // }
 
 // .card:hover {
 //   border-color: var(--border-secondary);
-//   box-shadow: var(--shadow-md);
-//   transform: translateY(-2px);
+//   box-shadow:   var(--shadow-md);
+//   /* transform: translateY(-2px); */ /* comment if causing jitter/CLS */
 // }
 
-// /* ---- Buttons (Native Matches PrimeNG) ---- */
+// /* ---- Buttons (aligned with PrimeNG compact feeling) ---- */
 // .btn {
 //   display: inline-flex;
 //   align-items: center;
 //   justify-content: center;
 //   gap: var(--spacing-sm);
-  
-//   /* Sizing to match inputs */
-//   padding: var(--spacing-sm) var(--spacing-lg);
-//   font-size: var(--font-size-base);
+
+//   padding:    var(--spacing-sm) var(--spacing-lg);
+//   font-size:  var(--font-size-base);
 //   font-weight: var(--font-weight-medium);
-  
-//   border-radius: var(--ui-border-radius); /* Rounded rect, not pill */
-//   border: 1px solid transparent;
-//   cursor: pointer;
-//   white-space: nowrap;
-  
+
+//   border-radius: var(--ui-border-radius);
+//   border:        1px solid transparent;
+//   cursor:        pointer;
+//   white-space:   nowrap;
+
 //   transition: var(--transition-base);
 //   user-select: none;
 // }
 
-// /* Primary Variant */
 // .btn-primary {
 //   background: var(--accent-primary);
 //   color: #ffffff;
-//   box-shadow: var(--shadow-sm);
-// }
-// .btn-primary:hover {
-//   background: var(--accent-hover);
-//   box-shadow: var(--shadow-md);
 // }
 
-// /* Secondary/Ghost Variant */
+// .btn-primary:hover {
+//   background: var(--accent-hover);
+// }
+
 // .btn-ghost {
 //   background: transparent;
 //   border-color: var(--border-primary);
 //   color: var(--text-secondary);
 // }
+
 // .btn-ghost:hover {
-//   background: var(--component-bg-hover);
-//   color: var(--text-primary);
-//   border-color: var(--border-secondary);
+//   background:    var(--component-bg-hover);
+//   color:         var(--text-primary);
+//   border-color:  var(--border-secondary);
 // }
 
-// /* Focus State */
 // .btn:focus-visible {
 //   outline: none;
 //   box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
 // }
 
-// /* ---- Form Fields (Native Matches PrimeNG) ---- */
-// /* Wrappers */
+// /* ---- Form Elements ---- */
 // .form-field {
 //   display: flex;
 //   flex-direction: column;
-//   gap: var(--spacing-xs); /* Tighter label gap */
+//   gap: var(--spacing-xs);
 //   width: 100%;
 //   margin-bottom: var(--spacing-md);
 // }
 
 // label {
-//   font-family: var(--font-body);
 //   font-weight: var(--font-weight-medium);
 //   color: var(--text-secondary);
-//   font-size: var(--font-size-sm); /* 12px Labels */
+//   font-size: var(--font-size-sm);
 // }
 
-// /* Inputs, Selects, Textareas */
-// input[type="text"],
-// input[type="email"],
-// input[type="password"],
-// input[type="number"],
-// input[type="search"],
-// textarea,
-// select {
+// input, textarea, select {
 //   appearance: none;
 //   width: 100%;
-  
-//   /* Typography */
 //   font-family: var(--font-body);
 //   font-size: var(--font-size-base);
-//   color: var(--text-primary);
-//   line-height: var(--line-height-normal);
-  
-//   /* Visuals */
+//   padding: var(--spacing-sm) var(--spacing-md);
 //   background: var(--bg-secondary);
 //   border: 1px solid var(--border-primary);
 //   border-radius: var(--ui-border-radius);
-  
-//   /* Exact Padding Match for Compact Theme */
-//   padding: var(--spacing-sm) var(--spacing-md); 
-  
-//   transition: var(--transition-colors), 
-//               box-shadow 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
+//   color: var(--text-primary);
+//   transition: border-color var(--transition-base),
+//               box-shadow var(--transition-base),
+//               background-color var(--transition-fast);
 // }
 
-// /* Input States */
 // input:hover, textarea:hover, select:hover {
 //   border-color: var(--border-secondary);
 //   background: var(--component-bg-hover);
@@ -519,158 +410,108 @@ input:disabled, textarea:disabled, select:disabled {
 // input:disabled, textarea:disabled, select:disabled {
 //   opacity: var(--state-disabled-opacity);
 //   background: var(--bg-ternary);
-//   cursor: default;
+//   cursor: not-allowed;
 // }
 
-// input::placeholder, textarea::placeholder {
+// ::placeholder {
 //   color: var(--text-muted);
 // }
 
-// /* ---- Flex & Grid Utilities ---- */
-// .flex { display: flex; }
-// .flex-col { flex-direction: column; }
-// .flex-wrap { flex-wrap: wrap; }
+// /* ---- Flex & Text Utilities (unchanged, good as-is) ---- */
+// .flex        { display: flex; }
+// .flex-col    { flex-direction: column; }
+// .flex-wrap   { flex-wrap: wrap; }
 // .flex-center { display: flex; align-items: center; justify-content: center; }
-// .flex-between { display: flex; align-items: center; justify-content: space-between; }
-// .flex-end { display: flex; align-items: center; justify-content: flex-end; }
-// .items-center { align-items: center; }
-// .items-start { align-items: flex-start; }
+// .flex-between{ display: flex; align-items: center; justify-content: space-between; }
+// .items-center{ align-items: center; }
 // .justify-center { justify-content: center; }
-// .justify-between { justify-content: space-between; }
-// .gap-xs { gap: var(--spacing-xs); }
 // .gap-sm { gap: var(--spacing-sm); }
 // .gap-md { gap: var(--spacing-md); }
-// .gap-lg { gap: var(--spacing-lg); }
+// .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-// /* ---- Text Utilities ---- */
-// .truncate { 
-//   overflow: hidden; 
-//   text-overflow: ellipsis; 
-//   white-space: nowrap; 
-// }
-// .text-center { text-align: center; }
-// .text-right { text-align: right; }
-// .text-primary { color: var(--text-primary); }
-// .text-secondary { color: var(--text-secondary); }
-// .text-muted { color: var(--text-tertiary); }
-// .font-bold { font-weight: var(--font-weight-bold); }
-// .font-medium { font-weight: var(--font-weight-medium); }
-
-// /* ---- Badges / Pills ---- */
-// .pill {
-//   display: inline-flex;
-//   align-items: center;
-//   gap: var(--spacing-xs);
-//   padding: 2px var(--spacing-md); /* Very compact vertical padding */
-  
-//   border-radius: 999px;
-//   border: 1px solid var(--border-secondary);
-  
-//   font-size: var(--font-size-xs);
-//   font-weight: var(--font-weight-medium);
-//   background: var(--bg-ternary);
-//   color: var(--text-secondary);
-// }
-
-// /* ---- Accessibility (Sr-Only) ---- */
+// /* ---- Accessibility ---- */
 // .sr-only {
 //   position: absolute;
-//   width: 1px;
-//   height: 1px;
-//   padding: 0;
-//   margin: -1px;
-//   overflow: hidden;
-//   clip: rect(0, 0, 0, 0);
-//   white-space: nowrap;
-//   border: 0;
+//   width: 1px; height: 1px;
+//   padding: 0; margin: -1px;
+//   overflow: hidden; clip: rect(0,0,0,0);
+//   white-space: nowrap; border: 0;
 // }
 
-// /* ---- Interactive Elements ---- */
-// a {
-//   color: var(--accent-primary);
-//   text-decoration: none;
-//   font-weight: var(--font-weight-medium);
-//   transition: color var(--transition-fast);
-//   cursor: pointer;
-// }
+// /* ---- PrimeNG / Custom Theme Mapping (keep or move to separate file) ---- */
+// @include apply-canonical-mapping;   /* ← your mixin – keep it! */
 
-// a:hover {
-//   color: var(--accent-hover);
-//   text-decoration: underline;
-// }
+// /* Tip: If using PrimeNG ≥18 styled mode, prefer :root { --p-primary-... } overrides
+//    or definePreset(Aura, { ... }) in code instead of fighting low-specificity rules.
+// */
 
-// /* ---- The "Glass" Utility (Refined) ---- */
-// .glass-panel {
-//   background: var(--glass-bg-c);
-//   backdrop-filter: blur(var(--glass-blur-c));
-//   -webkit-backdrop-filter: blur(var(--glass-blur-c));
-//   border: 1px solid var(--glass-border-c);
-//   box-shadow: var(--glass-shadow-c);
-//   border-radius: var(--ui-border-radius-lg);
-//   transition: var(--transition-base);
-// }
-
-// .glass-panel:hover {
-//   background: var(--component-bg-hover);
-//   border-color: var(--accent-primary);
-//   transform: translateY(-2px);
-//   box-shadow: var(--shadow-lg);
-// }
-
-// /* ---- Responsive Adjustments ---- */
+// /* Responsive adjustments */
 // @media (max-width: 1024px) {
-//   .container { 
-//     padding-inline: var(--spacing-lg); 
-//   }
+//   .container { padding-inline: var(--spacing-lg); }
 // }
 
 // @media (max-width: 640px) {
-//   .container { 
-//     padding-inline: var(--spacing-md); 
+//   .container { padding-inline: var(--spacing-md); }
+//   .responsive-grid {
+//     grid-template-columns: 1fr;
+//     gap: var(--spacing-md);
 //   }
-  
-//   .responsive-grid { 
-//     grid-template-columns: 1fr; 
-//     gap: var(--spacing-md); 
-//   }
-  
 //   h1 { font-size: var(--font-size-3xl); }
 //   h2 { font-size: var(--font-size-2xl); }
-// }// /* ============================================================
+// }
+// // /* ============================================================
 // //    BASE UTILITIES & HELPERS
-// //    Common layout, spacing, and utility classes
+// //    System: Refined Compact
+// //    Updated: To match PrimeNG Component Overrides
 // //    ============================================================ */
 
-// // /* ---- Global Reset ---- */
+// // /* ---- Global Reset & Root ---- */
 // // html, body, :host {
 // //   height: 100%;
 // //   margin: 0;
+  
+// //   /* Typography Root */
 // //   font-family: var(--font-body);
-// //   color: var(--theme-text-primary);
-// //   background: var(--theme-bg-primary);
+// //   font-size: var(--font-size-base); /* 13px - The Compact Base */
+// //   color: var(--text-primary);
+// //   background: var(--bg-primary);
+// //   line-height: var(--line-height-normal);
+  
+// //   /* Rendering */
 // //   -webkit-font-smoothing: antialiased;
 // //   -moz-osx-font-smoothing: grayscale;
+// //   text-rendering: optimizeLegibility;
 // // }
 
-// // /* ---- Smooth Transitions (respects prefers-reduced-motion) ---- */
+// // /* ---- Smooth Transitions ---- */
 // // @media (prefers-reduced-motion: reduce) {
-// //   * { 
+// //   *, ::before, ::after { 
 // //     transition: none !important; 
 // //     animation: none !important; 
+// //     scroll-behavior: auto !important;
 // //   }
 // // }
 
 // // /* ---- Box Model & Scrollbar ---- */
-// // * { box-sizing: border-box; }
+// // *, *::before, *::after { 
+// //   box-sizing: border-box; 
+// // }
 
+// // /* Modern Scrollbar Strategy */
+// // * {
+// //   scrollbar-width: thin;
+// //   scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+// // }
+
+// // /* Webkit Scrollbar Fallback */
 // // *::-webkit-scrollbar {
-// //   width: 8px;
-// //   height: 8px;
+// //   width: 6px; /* Sleeker width */
+// //   height: 6px;
 // // }
 
 // // *::-webkit-scrollbar-thumb {
 // //   background: var(--scroll-thumb);
-// //   border-radius: 8px;
+// //   border-radius: 4px;
 // // }
 
 // // *::-webkit-scrollbar-track {
@@ -678,168 +519,233 @@ input:disabled, textarea:disabled, select:disabled {
 // // }
 
 // // /* ---- Typography ---- */
-// // h1, h2, h3, h4 {
+// // h1, h2, h3, h4, h5, h6 {
 // //   font-family: var(--font-heading);
-// //   margin: 0 0 var(--spacing-md);
-// //   color: var(--theme-text-primary);
+// //   margin: 0 0 var(--spacing-md) 0;
+// //   color: var(--text-primary);
 // //   line-height: var(--line-height-tight);
 // //   font-weight: var(--font-weight-bold);
+// //   letter-spacing: -0.02em; /* Tighter tracking for headings */
 // // }
 
 // // h1 { font-size: var(--font-size-5xl); }
 // // h2 { font-size: var(--font-size-4xl); }
 // // h3 { font-size: var(--font-size-3xl); }
 // // h4 { font-size: var(--font-size-2xl); }
+// // h5 { font-size: var(--font-size-xl); }
+// // h6 { font-size: var(--font-size-lg); }
 
 // // p {
-// //   // margin: 0 0 var(--spacing-md);
-// //   color: var(--theme-text-secondary);
-// //   line-height: var(--line-height-normal);
+// //   margin: 0 0 var(--spacing-md) 0;
+// //   color: var(--text-secondary);
+// //   line-height: var(--line-height-relaxed); /* Better readability for blocks */
 // // }
 
-// // /* ---- Container ---- */
+// // small {
+// //   font-size: var(--font-size-sm);
+// //   color: var(--text-tertiary);
+// // }
+
+// // /* ---- Layout Containers ---- */
 // // .container {
-// //   max-width: 1440px;
-// //   margin: 0 auto;
-// //   padding: var(--spacing-lg);
 // //   width: 100%;
+// //   max-width: 1440px;
+// //   margin-inline: auto;
+// //   padding-inline: var(--spacing-xl);
 // // }
 
-// // /* ---- Responsive Grid ---- */
+// // /* ---- Responsive Grid (Auto-Fit) ---- */
 // // .responsive-grid {
 // //   display: grid;
-// //   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+// //   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 // //   gap: var(--spacing-lg);
 // //   width: 100%;
 // // }
 
 // // /* ---- Card Primitive ---- */
 // // .card {
-// //   background: var(--theme-bg-secondary);
+// //   background: var(--bg-secondary);
+// //   border: 1px solid var(--border-primary);
 // //   border-radius: var(--ui-border-radius-lg);
 // //   padding: var(--spacing-lg);
-// //   border: 1px solid var(--theme-border-primary);
-// //   box-shadow: var(--shadow-md);
+// //   box-shadow: var(--shadow-sm);
 // //   transition: var(--transition-base);
-// //   color: var(--theme-text-primary);
+// //   position: relative;
+// //   overflow: hidden;
 // // }
 
 // // .card:hover {
+// //   border-color: var(--border-secondary);
+// //   box-shadow: var(--shadow-md);
 // //   transform: translateY(-2px);
-// //   box-shadow: var(--shadow-lg);
 // // }
 
-// // /* ---- Buttons ---- */
+// // /* ---- Buttons (Native Matches PrimeNG) ---- */
 // // .btn {
 // //   display: inline-flex;
 // //   align-items: center;
-// //   gap: 0.5rem;
+// //   justify-content: center;
+// //   gap: var(--spacing-sm);
+  
+// //   /* Sizing to match inputs */
 // //   padding: var(--spacing-sm) var(--spacing-lg);
-// //   font-weight: 600;
-// //   font-size: var(--font-size-sm);
-// //   border-radius: 999px;
-// //   border: none;
+// //   font-size: var(--font-size-base);
+// //   font-weight: var(--font-weight-medium);
+  
+// //   border-radius: var(--ui-border-radius); /* Rounded rect, not pill */
+// //   border: 1px solid transparent;
 // //   cursor: pointer;
-// //   background: var(--theme-accent-gradient);
-// //   color: #fff;
+// //   white-space: nowrap;
+  
 // //   transition: var(--transition-base);
+// //   user-select: none;
 // // }
 
-// // .btn:focus {
-// //   outline: none;
-// //   box-shadow: 0 0 0 4px var(--theme-accent-focus);
+// // /* Primary Variant */
+// // .btn-primary {
+// //   background: var(--accent-primary);
+// //   color: #ffffff;
+// //   box-shadow: var(--shadow-sm);
+// // }
+// // .btn-primary:hover {
+// //   background: var(--accent-hover);
+// //   box-shadow: var(--shadow-md);
 // // }
 
-// // .btn.ghost {
-// //     background: var(--bg-secondary);
-// //   border: 1px solid var(--theme-border-primary);
-// //   color: var(--theme-text-primary);
+// // /* Secondary/Ghost Variant */
+// // .btn-ghost {
+// //   background: transparent;
+// //   border-color: var(--border-primary);
+// //   color: var(--text-secondary);
 // // }
-
-// // .btn.ghost:hover {
+// // .btn-ghost:hover {
 // //   background: var(--component-bg-hover);
-// //   border-color: var(--theme-accent-primary);
+// //   color: var(--text-primary);
+// //   border-color: var(--border-secondary);
 // // }
 
-// // /* ---- Form Fields ---- */
+// // /* Focus State */
+// // .btn:focus-visible {
+// //   outline: none;
+// //   box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+// // }
+
+// // /* ---- Form Fields (Native Matches PrimeNG) ---- */
+// // /* Wrappers */
 // // .form-field {
 // //   display: flex;
 // //   flex-direction: column;
-// //   gap: var(--spacing-sm);
+// //   gap: var(--spacing-xs); /* Tighter label gap */
 // //   width: 100%;
+// //   margin-bottom: var(--spacing-md);
 // // }
 
-// // input, textarea, select {
-// //   background: var(--theme-bg-ternary);
-// //   color: var(--theme-text-primary);
-// //   border: 1px solid var(--theme-border-secondary);
-// //   border-radius: var(--ui-border-radius);
-// //   padding: var(--spacing-sm) var(--spacing-lg);
-// //   font-size: var(--font-size-sm);
+// // label {
 // //   font-family: var(--font-body);
-// //   transition: box-shadow 0.18s, border-color 0.18s;
+// //   font-weight: var(--font-weight-medium);
+// //   color: var(--text-secondary);
+// //   font-size: var(--font-size-sm); /* 12px Labels */
+// // }
+
+// // /* Inputs, Selects, Textareas */
+// // input[type="text"],
+// // input[type="email"],
+// // input[type="password"],
+// // input[type="number"],
+// // input[type="search"],
+// // textarea,
+// // select {
+// //   appearance: none;
+// //   width: 100%;
+  
+// //   /* Typography */
+// //   font-family: var(--font-body);
+// //   font-size: var(--font-size-base);
+// //   color: var(--text-primary);
+// //   line-height: var(--line-height-normal);
+  
+// //   /* Visuals */
+// //   background: var(--bg-secondary);
+// //   border: 1px solid var(--border-primary);
+// //   border-radius: var(--ui-border-radius);
+  
+// //   /* Exact Padding Match for Compact Theme */
+// //   padding: var(--spacing-sm) var(--spacing-md); 
+  
+// //   transition: var(--transition-colors), 
+// //               box-shadow 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
+// // }
+
+// // /* Input States */
+// // input:hover, textarea:hover, select:hover {
+// //   border-color: var(--border-secondary);
+// //   background: var(--component-bg-hover);
 // // }
 
 // // input:focus, textarea:focus, select:focus {
 // //   outline: none;
-// //   border-color: var(--theme-accent-primary);
-// //   box-shadow: 0 0 0 4px var(--theme-accent-focus);
-// //   background: var(--theme-bg-secondary);
+// //   border-color: var(--accent-primary);
+// //   box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+// //   background: var(--bg-secondary);
 // // }
 
-// // label {
-// //   font-weight: var(--font-weight-medium);
-// //   color: var(--theme-text-secondary);
-// //   font-size: var(--font-size-sm);
+// // input:disabled, textarea:disabled, select:disabled {
+// //   opacity: var(--state-disabled-opacity);
+// //   background: var(--bg-ternary);
+// //   cursor: default;
 // // }
 
-// // /* ---- Flex Utilities ---- */
+// // input::placeholder, textarea::placeholder {
+// //   color: var(--text-muted);
+// // }
+
+// // /* ---- Flex & Grid Utilities ---- */
 // // .flex { display: flex; }
+// // .flex-col { flex-direction: column; }
+// // .flex-wrap { flex-wrap: wrap; }
 // // .flex-center { display: flex; align-items: center; justify-content: center; }
 // // .flex-between { display: flex; align-items: center; justify-content: space-between; }
-// // .col-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-// // .justify-between { justify-content: space-between; }
-// // .justify-center { justify-content: center; }
-// // .justify-end { justify-content: flex-end; }
+// // .flex-end { display: flex; align-items: center; justify-content: flex-end; }
 // // .items-center { align-items: center; }
 // // .items-start { align-items: flex-start; }
-
-// // /* ---- Text Utilities ---- */
-// // .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-// // .text-center { text-align: center; }
-// // .text-primary { color: var(--theme-text-primary); }
-// // .text-secondary { color: var(--theme-text-secondary); }
-// // .text-muted { color: var(--theme-text-label); }
-
-// // /* ---- Spacing Helpers ---- */
+// // .justify-center { justify-content: center; }
+// // .justify-between { justify-content: space-between; }
+// // .gap-xs { gap: var(--spacing-xs); }
 // // .gap-sm { gap: var(--spacing-sm); }
 // // .gap-md { gap: var(--spacing-md); }
 // // .gap-lg { gap: var(--spacing-lg); }
-// // .gap-xl { gap: var(--spacing-xl); }
 
-// // /* ---- Pills & Badges ---- */
+// // /* ---- Text Utilities ---- */
+// // .truncate { 
+// //   overflow: hidden; 
+// //   text-overflow: ellipsis; 
+// //   white-space: nowrap; 
+// // }
+// // .text-center { text-align: center; }
+// // .text-right { text-align: right; }
+// // .text-primary { color: var(--text-primary); }
+// // .text-secondary { color: var(--text-secondary); }
+// // .text-muted { color: var(--text-tertiary); }
+// // .font-bold { font-weight: var(--font-weight-bold); }
+// // .font-medium { font-weight: var(--font-weight-medium); }
+
+// // /* ---- Badges / Pills ---- */
 // // .pill {
 // //   display: inline-flex;
 // //   align-items: center;
-// //   gap: var(--spacing-sm);
-// //   padding: calc(var(--spacing-sm) * 1.25) var(--spacing-md);
+// //   gap: var(--spacing-xs);
+// //   padding: 2px var(--spacing-md); /* Very compact vertical padding */
+  
 // //   border-radius: 999px;
+// //   border: 1px solid var(--border-secondary);
+  
 // //   font-size: var(--font-size-xs);
-// //   background: var(--component-bg-hover);
-// //   border: 1px solid var(--theme-border-primary);
-// //   color: var(--theme-text-primary);
+// //   font-weight: var(--font-weight-medium);
+// //   background: var(--bg-ternary);
+// //   color: var(--text-secondary);
 // // }
 
-// // /* ---- Accessibility ---- */
-// // .visually-hidden {
-// //   position: absolute !important;
-// //   height: 1px;
-// //   width: 1px;
-// //   overflow: hidden;
-// //   clip: rect(1px, 1px, 1px, 1px);
-// //   white-space: nowrap;
-// // }
-
+// // /* ---- Accessibility (Sr-Only) ---- */
 // // .sr-only {
 // //   position: absolute;
 // //   width: 1px;
@@ -852,58 +758,325 @@ input:disabled, textarea:disabled, select:disabled {
 // //   border: 0;
 // // }
 
-// // /* ---- Focus Styles ---- */
-// // :focus {
-// //   outline: none;
-// // }
-
+// // /* ---- Interactive Elements ---- */
 // // a {
-// //   color: var(--theme-accent-primary);
+// //   color: var(--accent-primary);
 // //   text-decoration: none;
+// //   font-weight: var(--font-weight-medium);
 // //   transition: color var(--transition-fast);
+// //   cursor: pointer;
 // // }
 
 // // a:hover {
-// //   color: var(--theme-accent-hover);
+// //   color: var(--accent-hover);
+// //   text-decoration: underline;
 // // }
 
-// // /* ---- Responsive Media ---- */
-// // @media (max-width: 1024px) {
-// //   .container { 
-// //     padding: var(--spacing-lg) var(--spacing-xl);
-// //   }
-// // }
-
-// // @media (max-width: 640px) {
-// //   .container { 
-// //     padding: var(--spacing-md);
-// //   }
-  
-// //   .responsive-grid { 
-// //     grid-template-columns: 1fr;
-// //     gap: var(--spacing-md);
-// //   }
-  
-// //   input, select, textarea { 
-// //     height: 2.5rem;
-// //   }
-// // }
-
-
-// // /* The Universal Surface Card */
+// // /* ---- The "Glass" Utility (Refined) ---- */
 // // .glass-panel {
 // //   background: var(--glass-bg-c);
 // //   backdrop-filter: blur(var(--glass-blur-c));
 // //   -webkit-backdrop-filter: blur(var(--glass-blur-c));
 // //   border: 1px solid var(--glass-border-c);
 // //   box-shadow: var(--glass-shadow-c);
-// //   border-radius: var(--ui-border-radius-xl);
+// //   border-radius: var(--ui-border-radius-lg);
 // //   transition: var(--transition-base);
 // // }
 
 // // .glass-panel:hover {
 // //   background: var(--component-bg-hover);
-// //   border-color: var(--component-border-focus);
+// //   border-color: var(--accent-primary);
 // //   transform: translateY(-2px);
-// //   box-shadow: var(--shadow-xl);
+// //   box-shadow: var(--shadow-lg);
 // // }
+
+// // /* ---- Responsive Adjustments ---- */
+// // @media (max-width: 1024px) {
+// //   .container { 
+// //     padding-inline: var(--spacing-lg); 
+// //   }
+// // }
+
+// // @media (max-width: 640px) {
+// //   .container { 
+// //     padding-inline: var(--spacing-md); 
+// //   }
+  
+// //   .responsive-grid { 
+// //     grid-template-columns: 1fr; 
+// //     gap: var(--spacing-md); 
+// //   }
+  
+// //   h1 { font-size: var(--font-size-3xl); }
+// //   h2 { font-size: var(--font-size-2xl); }
+// // }// /* ============================================================
+// // //    BASE UTILITIES & HELPERS
+// // //    Common layout, spacing, and utility classes
+// // //    ============================================================ */
+
+// // // /* ---- Global Reset ---- */
+// // // html, body, :host {
+// // //   height: 100%;
+// // //   margin: 0;
+// // //   font-family: var(--font-body);
+// // //   color: var(--theme-text-primary);
+// // //   background: var(--theme-bg-primary);
+// // //   -webkit-font-smoothing: antialiased;
+// // //   -moz-osx-font-smoothing: grayscale;
+// // // }
+
+// // // /* ---- Smooth Transitions (respects prefers-reduced-motion) ---- */
+// // // @media (prefers-reduced-motion: reduce) {
+// // //   * { 
+// // //     transition: none !important; 
+// // //     animation: none !important; 
+// // //   }
+// // // }
+
+// // // /* ---- Box Model & Scrollbar ---- */
+// // // * { box-sizing: border-box; }
+
+// // // *::-webkit-scrollbar {
+// // //   width: 8px;
+// // //   height: 8px;
+// // // }
+
+// // // *::-webkit-scrollbar-thumb {
+// // //   background: var(--scroll-thumb);
+// // //   border-radius: 8px;
+// // // }
+
+// // // *::-webkit-scrollbar-track {
+// // //   background: var(--scroll-track);
+// // // }
+
+// // // /* ---- Typography ---- */
+// // // h1, h2, h3, h4 {
+// // //   font-family: var(--font-heading);
+// // //   margin: 0 0 var(--spacing-md);
+// // //   color: var(--theme-text-primary);
+// // //   line-height: var(--line-height-tight);
+// // //   font-weight: var(--font-weight-bold);
+// // // }
+
+// // // h1 { font-size: var(--font-size-5xl); }
+// // // h2 { font-size: var(--font-size-4xl); }
+// // // h3 { font-size: var(--font-size-3xl); }
+// // // h4 { font-size: var(--font-size-2xl); }
+
+// // // p {
+// // //   // margin: 0 0 var(--spacing-md);
+// // //   color: var(--theme-text-secondary);
+// // //   line-height: var(--line-height-normal);
+// // // }
+
+// // // /* ---- Container ---- */
+// // // .container {
+// // //   max-width: 1440px;
+// // //   margin: 0 auto;
+// // //   padding: var(--spacing-lg);
+// // //   width: 100%;
+// // // }
+
+// // // /* ---- Responsive Grid ---- */
+// // // .responsive-grid {
+// // //   display: grid;
+// // //   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+// // //   gap: var(--spacing-lg);
+// // //   width: 100%;
+// // // }
+
+// // // /* ---- Card Primitive ---- */
+// // // .card {
+// // //   background: var(--theme-bg-secondary);
+// // //   border-radius: var(--ui-border-radius-lg);
+// // //   padding: var(--spacing-lg);
+// // //   border: 1px solid var(--theme-border-primary);
+// // //   box-shadow: var(--shadow-md);
+// // //   transition: var(--transition-base);
+// // //   color: var(--theme-text-primary);
+// // // }
+
+// // // .card:hover {
+// // //   transform: translateY(-2px);
+// // //   box-shadow: var(--shadow-lg);
+// // // }
+
+// // // /* ---- Buttons ---- */
+// // // .btn {
+// // //   display: inline-flex;
+// // //   align-items: center;
+// // //   gap: 0.5rem;
+// // //   padding: var(--spacing-sm) var(--spacing-lg);
+// // //   font-weight: 600;
+// // //   font-size: var(--font-size-sm);
+// // //   border-radius: 999px;
+// // //   border: none;
+// // //   cursor: pointer;
+// // //   background: var(--theme-accent-gradient);
+// // //   color: #fff;
+// // //   transition: var(--transition-base);
+// // // }
+
+// // // .btn:focus {
+// // //   outline: none;
+// // //   box-shadow: 0 0 0 4px var(--theme-accent-focus);
+// // // }
+
+// // // .btn.ghost {
+// // //     background: var(--bg-secondary);
+// // //   border: 1px solid var(--theme-border-primary);
+// // //   color: var(--theme-text-primary);
+// // // }
+
+// // // .btn.ghost:hover {
+// // //   background: var(--component-bg-hover);
+// // //   border-color: var(--theme-accent-primary);
+// // // }
+
+// // // /* ---- Form Fields ---- */
+// // // .form-field {
+// // //   display: flex;
+// // //   flex-direction: column;
+// // //   gap: var(--spacing-sm);
+// // //   width: 100%;
+// // // }
+
+// // // input, textarea, select {
+// // //   background: var(--theme-bg-ternary);
+// // //   color: var(--theme-text-primary);
+// // //   border: 1px solid var(--theme-border-secondary);
+// // //   border-radius: var(--ui-border-radius);
+// // //   padding: var(--spacing-sm) var(--spacing-lg);
+// // //   font-size: var(--font-size-sm);
+// // //   font-family: var(--font-body);
+// // //   transition: box-shadow 0.18s, border-color 0.18s;
+// // // }
+
+// // // input:focus, textarea:focus, select:focus {
+// // //   outline: none;
+// // //   border-color: var(--theme-accent-primary);
+// // //   box-shadow: 0 0 0 4px var(--theme-accent-focus);
+// // //   background: var(--theme-bg-secondary);
+// // // }
+
+// // // label {
+// // //   font-weight: var(--font-weight-medium);
+// // //   color: var(--theme-text-secondary);
+// // //   font-size: var(--font-size-sm);
+// // // }
+
+// // // /* ---- Flex Utilities ---- */
+// // // .flex { display: flex; }
+// // // .flex-center { display: flex; align-items: center; justify-content: center; }
+// // // .flex-between { display: flex; align-items: center; justify-content: space-between; }
+// // // .col-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+// // // .justify-between { justify-content: space-between; }
+// // // .justify-center { justify-content: center; }
+// // // .justify-end { justify-content: flex-end; }
+// // // .items-center { align-items: center; }
+// // // .items-start { align-items: flex-start; }
+
+// // // /* ---- Text Utilities ---- */
+// // // .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+// // // .text-center { text-align: center; }
+// // // .text-primary { color: var(--theme-text-primary); }
+// // // .text-secondary { color: var(--theme-text-secondary); }
+// // // .text-muted { color: var(--theme-text-label); }
+
+// // // /* ---- Spacing Helpers ---- */
+// // // .gap-sm { gap: var(--spacing-sm); }
+// // // .gap-md { gap: var(--spacing-md); }
+// // // .gap-lg { gap: var(--spacing-lg); }
+// // // .gap-xl { gap: var(--spacing-xl); }
+
+// // // /* ---- Pills & Badges ---- */
+// // // .pill {
+// // //   display: inline-flex;
+// // //   align-items: center;
+// // //   gap: var(--spacing-sm);
+// // //   padding: calc(var(--spacing-sm) * 1.25) var(--spacing-md);
+// // //   border-radius: 999px;
+// // //   font-size: var(--font-size-xs);
+// // //   background: var(--component-bg-hover);
+// // //   border: 1px solid var(--theme-border-primary);
+// // //   color: var(--theme-text-primary);
+// // // }
+
+// // // /* ---- Accessibility ---- */
+// // // .visually-hidden {
+// // //   position: absolute !important;
+// // //   height: 1px;
+// // //   width: 1px;
+// // //   overflow: hidden;
+// // //   clip: rect(1px, 1px, 1px, 1px);
+// // //   white-space: nowrap;
+// // // }
+
+// // // .sr-only {
+// // //   position: absolute;
+// // //   width: 1px;
+// // //   height: 1px;
+// // //   padding: 0;
+// // //   margin: -1px;
+// // //   overflow: hidden;
+// // //   clip: rect(0, 0, 0, 0);
+// // //   white-space: nowrap;
+// // //   border: 0;
+// // // }
+
+// // // /* ---- Focus Styles ---- */
+// // // :focus {
+// // //   outline: none;
+// // // }
+
+// // // a {
+// // //   color: var(--theme-accent-primary);
+// // //   text-decoration: none;
+// // //   transition: color var(--transition-fast);
+// // // }
+
+// // // a:hover {
+// // //   color: var(--theme-accent-hover);
+// // // }
+
+// // // /* ---- Responsive Media ---- */
+// // // @media (max-width: 1024px) {
+// // //   .container { 
+// // //     padding: var(--spacing-lg) var(--spacing-xl);
+// // //   }
+// // // }
+
+// // // @media (max-width: 640px) {
+// // //   .container { 
+// // //     padding: var(--spacing-md);
+// // //   }
+  
+// // //   .responsive-grid { 
+// // //     grid-template-columns: 1fr;
+// // //     gap: var(--spacing-md);
+// // //   }
+  
+// // //   input, select, textarea { 
+// // //     height: 2.5rem;
+// // //   }
+// // // }
+
+
+// // // /* The Universal Surface Card */
+// // // .glass-panel {
+// // //   background: var(--glass-bg-c);
+// // //   backdrop-filter: blur(var(--glass-blur-c));
+// // //   -webkit-backdrop-filter: blur(var(--glass-blur-c));
+// // //   border: 1px solid var(--glass-border-c);
+// // //   box-shadow: var(--glass-shadow-c);
+// // //   border-radius: var(--ui-border-radius-xl);
+// // //   transition: var(--transition-base);
+// // // }
+
+// // // .glass-panel:hover {
+// // //   background: var(--component-bg-hover);
+// // //   border-color: var(--component-border-focus);
+// // //   transform: translateY(-2px);
+// // //   box-shadow: var(--shadow-xl);
+// // // }
