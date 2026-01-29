@@ -1,3 +1,7 @@
+/* ==========================================================================
+   PRIME-NG MASTER DESIGN SYSTEM BRIDGE (primeng.theme.scss)
+   ========================================================================== */
+
 :root {
   /* ==========================================================================
      1. TYPOGRAPHY (Refined Compact Scale - STRICTLY PRESERVED)
@@ -100,7 +104,7 @@
   --state-readonly-opacity: 0.6;
 
   /* ==========================================================================
-     5. COLOR SYSTEM (Added to replace hardcoded hex codes)
+     5. COLOR SYSTEM
      ========================================================================== */
   /* Brand Colors (Blue) */
   --color-primary: #3b82f6;
@@ -144,9 +148,12 @@
 }
 
 /* =========================================
-   MIXIN: CANONICAL MAPPING
+   MIXIN: CANONICAL MAPPING (UPGRADED)
    ========================================= */
 @mixin apply-canonical-mapping {
+  /* =========================================
+     YOUR ORIGINAL CANONICAL MAPPING (PRESERVED)
+     ========================================= */
   /* Core Palette */
   --bg-primary: var(--theme-bg-primary);
   --bg-secondary: var(--theme-bg-secondary);
@@ -185,7 +192,7 @@
   --scroll-thumb-c: var(--scroll-thumb);
   --scroll-track-c: var(--scroll-track);
 
-  /* Add to your @mixin apply-canonical-mapping if needed */
+  /* Mapping focus/raised/divider */
   --component-border-focus: var(--accent-primary);
   --component-surface-raised: var(--bg-primary);
   --component-divider: var(--border-secondary);
@@ -224,11 +231,7 @@
   --border-tertiary: var(--component-divider);
 
   --color-bg-revenue: color-mix(in srgb, var(--theme-text-tertiary) 20%, var(--bg-secondary) 80%);
-  --color-bg-revenue-hover: color-mix(
-    in srgb,
-    var(--theme-text-tertiary) 40%,
-    var(--bg-secondary) 60%
-  );
+  --color-bg-revenue-hover: color-mix(in srgb, var(--theme-text-tertiary) 40%, var(--bg-secondary) 60%);
   --color-bg-profit: var(--theme-success);
   --color-bg-profit-hover: color-mix(in srgb, var(--theme-success) 90%, black 10%);
 
@@ -241,264 +244,655 @@
   --shadow-color-lg: rgba(0, 0, 0, 0.1);
   --scroll-thumb: var(--scroll-thumb-c);
   --scroll-track: var(--scroll-track-c);
+
+  /* ==========================================================================
+     PRIME-NG BRIDGE ADDITION
+     Forces PrimeNG v18+ to use your semantic theme variables
+     ========================================================================== */
+  
+  /* 1. Typography Bridge */
+  --p-font-family: var(--font-body);
+  --p-content-font-size: var(--font-size-base);
+
+  /* 2. Color Bridge (Maps PrimeNG to your Theme Accents) */
+  --p-primary-color: var(--theme-accent-primary);
+  --p-primary-hover-color: var(--theme-accent-hover);
+  --p-primary-active-color: var(--theme-accent-primary);
+  --p-primary-contrast-color: #ffffff;
+
+  /* 3. Surface Bridge (Maps PrimeNG Backgrounds to your Theme Backgrounds) */
+  --p-surface-0: var(--theme-bg-secondary);
+  --p-surface-50: var(--theme-bg-primary);
+  --p-surface-100: color-mix(in srgb, var(--theme-bg-primary) 90%, black 10%);
+  --p-surface-200: var(--theme-border-primary);
+  
+  /* 4. Spacing & Shape Bridge (Standardizes Curves and Compact Forms) */
+  --p-content-border-radius: var(--ui-border-radius);
+  --p-form-field-padding-y: var(--spacing-xs);
+  --p-form-field-padding-x: var(--spacing-sm);
+  --p-form-field-font-size: var(--font-size-base);
+
+  /* 5. Interaction & Overlay Bridge */
+  --p-focus-ring-color: var(--theme-accent-focus);
+  --p-transition-duration: 0.22s;
+  
+  /* 6. Z-Index Bridge */
+  --p-modal-zindex: var(--z-modal);
+  --p-overlay-zindex: var(--z-dropdown);
+  --p-tooltip-zindex: var(--z-tooltip);
+  --p-toast-zindex: var(--z-toast);
+
+  /* 7. DataTable/TreeTable cell density */
+  --p-datatable-header-cell-padding: var(--spacing-sm) var(--spacing-md);
+  --p-datatable-body-cell-padding: var(--spacing-xs) var(--spacing-md);
 }
 
 /* =========================================
-   THEME 1: LUMINOUS (Standard Professional Light)
-   Vibe: Clean, Executive, Trusted
+   YOUR THEMES (Preserved)
    ========================================= */
+
 .theme-luminous {
   --theme-bg-primary: #f8fafc;
   --theme-bg-secondary: #ffffff;
   --theme-bg-ternary: #f1f5f9;
-
   --theme-text-primary: #0f172a;
   --theme-text-secondary: #334155;
   --theme-text-tertiary: #64748b;
   --theme-text-label: #94a3b8;
-
   --theme-border-primary: #e2e8f0;
   --theme-border-secondary: #cbd5e1;
-
-  --theme-accent-primary: #4f46e5; /* Indigo 600 */
-  --theme-accent-secondary: #6366f1; /* Indigo 500 */
+  --theme-accent-primary: #4f46e5;
+  --theme-accent-secondary: #6366f1;
   --theme-accent-tertiary: #818cf8;
   --theme-accent-gradient: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
   --theme-accent-focus: rgba(79, 70, 229, 0.12);
   --theme-accent-hover: #4338ca;
-
   --theme-success: #10b981;
   --theme-warning: #f59e0b;
   --theme-error: #ef4444;
   --theme-info: #3b82f6;
-
   --theme-disabled: #f1f5f9;
   --theme-disabled-text: #94a3b8;
-
-  /* Clean Glass */
   --glass-bg: rgba(255, 255, 255, 0.7);
   --glass-blur: 20px;
   --glass-border: rgba(255, 255, 255, 0.8);
   --glass-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-
   --component-bg-hover: #f8fafc;
   --component-bg-active: #f1f5f9;
-  --component-border-focus: #4f46e5;
-  --component-surface-raised: #ffffff;
-  --component-divider: #e2e8f0;
-
   --scroll-thumb: #cbd5e1;
   --scroll-track: transparent;
 
   @include apply-canonical-mapping;
 }
 
-/* =========================================
-   THEME 2: MIDNIGHT PRO (Deep Developer Dark)
-   Vibe: Serious, High Contrast, Eye Comfort
-   ========================================= */
 .theme-midnight {
-  --theme-bg-primary: #0b1120; /* Deep Navy Black */
+  --theme-bg-primary: #0b1120;
   --theme-bg-secondary: #151e32;
   --theme-bg-ternary: #0f172a;
-
   --theme-text-primary: #f8fafc;
   --theme-text-secondary: #cbd5e1;
   --theme-text-tertiary: #94a3b8;
   --theme-text-label: #64748b;
-
   --theme-border-primary: #1e293b;
   --theme-border-secondary: #334155;
-
-  --theme-accent-primary: #38bdf8; /* Sky Blue */
+  --theme-accent-primary: #38bdf8;
   --theme-accent-secondary: #0ea5e9;
   --theme-accent-tertiary: #7dd3fc;
   --theme-accent-gradient: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
   --theme-accent-focus: rgba(56, 189, 248, 0.15);
   --theme-accent-hover: #0284c7;
-
   --theme-success: #22c55e;
   --theme-warning: #fbbf24;
   --theme-error: #f43f5e;
   --theme-info: #60a5fa;
-
   --theme-disabled: #1e293b;
   --theme-disabled-text: #475569;
-
-  /* Dark Glass */
   --glass-bg: rgba(15, 23, 42, 0.6);
   --glass-blur: 24px;
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-
   --component-bg-hover: rgba(255, 255, 255, 0.05);
   --component-bg-active: rgba(255, 255, 255, 0.08);
-  --component-border-focus: #38bdf8;
-  --component-surface-raised: #1e293b;
-  --component-divider: #1e293b;
-
   --scroll-thumb: #334155;
   --scroll-track: transparent;
 
   @include apply-canonical-mapping;
 }
 
-/* =========================================
-   THEME 3: BIO-FROST (Your Requested Nature Glass)
-   Vibe: Organic, Fresh, Minty
-   ========================================= */
-/* =========================================
-   THEME: BIO-FROST (Deep Cryo-Glass)
-   Vibe: High-Tech Nature, Thick Ice, Premium
-   ========================================= */
 .theme-bio-frost {
-  /* 1. THE BACKGROUND (Crucial for Glass Depth)
-     We use a radial gradient to create a "glow" behind the glass 
-     that fades into deep darkness at the edges.
-  */
-  --theme-bg-primary: radial-gradient(
-    circle at 50% 0%,
-    #047857 0%,
-    /* Emerald 700 (Top Glow) */ #064e3b 40%,
-    /* Emerald 900 (Mid) */ #022c22 100% /* Emerald 950 (Deep Dark Edges) */
-  );
-
-  --theme-bg-secondary: rgba(255, 255, 255, 0.05); /* Very subtle surface */
+  --theme-bg-primary: radial-gradient(circle at 50% 0%, #047857 0%, #064e3b 40%, #022c22 100%);
+  --theme-bg-secondary: rgba(255, 255, 255, 0.05);
   --theme-bg-ternary: rgba(0, 0, 0, 0.25);
-
-  /* 2. TEXT (Icy Contrast) */
   --theme-text-primary: #ffffff;
-  --theme-text-secondary: #d1fae5; /* Minty White */
-  --theme-text-tertiary: #6ee7b7; /* Bright Mint */
-  --theme-text-label: #34d399; /* Emerald Accent */
-
-  /* 3. BORDERS (Crystalline Edges) */
+  --theme-text-secondary: #d1fae5;
+  --theme-text-tertiary: #6ee7b7;
+  --theme-text-label: #34d399;
   --theme-border-primary: rgba(255, 255, 255, 0.2);
   --theme-border-secondary: rgba(255, 255, 255, 0.08);
-
-  /* 4. ACCENTS (Electric Mint) */
-  --theme-accent-primary: #34d399; /* Emerald 400 */
+  --theme-accent-primary: #34d399;
   --theme-accent-secondary: #6ee7b7;
   --theme-accent-tertiary: #10b981;
   --theme-accent-gradient: linear-gradient(135deg, #34d399 0%, #059669 100%);
   --theme-accent-focus: rgba(52, 211, 153, 0.3);
   --theme-accent-hover: #a7f3d0;
-
-  /* 5. THE "DEEP GLASS" EFFECT 
-     The magic happens here. Lower opacity + Higher Blur + Inset Highlights.
-  */
-  /* A gradient from 18% white to 2% white creates a "curved" glass look */
   --glass-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.02) 100%);
-
-  --glass-blur: 40px; /* Maximum "Frosted" Blur */
-
-  /* Sharp, icy rim */
+  --glass-blur: 40px;
   --glass-border: rgba(255, 255, 255, 0.3);
-
-  /* Shadow Stack:
-     1. Deep drop shadow for lift.
-     2. Top-inner white highlight (Inner Light).
-     3. Bottom-inner reflection.
-  */
-  --glass-shadow:
-    0 30px 60px -12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.1);
-
-  /* 6. STATUS COLORS */
+  --glass-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4), inset 0 -1px 0 rgba(255, 255, 255, 0.1);
   --theme-success: #34d399;
   --theme-warning: #facc15;
   --theme-error: #fb7185;
   --theme-info: #38bdf8;
-
   --theme-disabled: rgba(255, 255, 255, 0.1);
   --theme-disabled-text: rgba(255, 255, 255, 0.3);
-
-  /* Components */
   --component-bg-hover: rgba(255, 255, 255, 0.12);
   --component-bg-active: rgba(255, 255, 255, 0.2);
-  --component-border-focus: #34d399;
-  --component-surface-raised: rgba(0, 0, 0, 0.3);
-  --component-divider: rgba(255, 255, 255, 0.1);
-
   --scroll-thumb: rgba(52, 211, 153, 0.3);
   --scroll-track: rgba(0, 0, 0, 0.2);
 
   @include apply-canonical-mapping;
 }
+// :root {
+//   /* ==========================================================================
+//      1. TYPOGRAPHY (Refined Compact Scale - STRICTLY PRESERVED)
+//      ========================================================================== */
+//   --font-body: 'Inter', -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+//   --font-heading: 'Poppins', -apple-system, system-ui, sans-serif;
+//   --font-mono: 'Fira Code', 'Courier New', monospace;
 
-/* =========================================
-   THEME: SOLAR FLARE (Molten Amber Glass)
-   Vibe: Warm Energy, High-End Tech, Sunset
-   ========================================= */
-.theme-solar-flare {
-  /* 1. THE BACKGROUND (Deep Magma Glow) */
-  --theme-bg-primary: radial-gradient(
-    circle at 50% 0%,
-    #c2410c 0%,
-    /* Orange 700 (Top Glow - The Light Source) */ #7c2d12 40%,
-    /* Orange 900 (Mid) */ #431407 100% /* Warm Brown/Black (Deep Edges) */
-  );
+//   /* Compact font sizes */
+//   --font-size-xs: 0.65rem; /* 10.4px */
+//   --font-size-sm: 0.75rem; /* 12px */
+//   --font-size-base: 0.8125rem; /* 13px */
+//   --font-size-md: 0.875rem; /* 14px */
+//   --font-size-lg: 0.9375rem; /* 15px */
+//   --font-size-xl: 1rem; /* 16px */
+//   --font-size-2xl: 1.125rem; /* 18px */
+//   --font-size-3xl: 1.375rem; /* 22px */
+//   --font-size-4xl: 1.75rem; /* 28px */
+//   --font-size-5xl: 2.25rem; /* 36px */
 
-  --theme-bg-secondary: rgba(255, 255, 255, 0.05);
-  --theme-bg-ternary: rgba(0, 0, 0, 0.25);
+//   /* Line height */
+//   --line-height-tight: 1.1;
+//   --line-height-normal: 1.3;
+//   --line-height-relaxed: 1.5;
 
-  /* 2. TEXT (Warm Contrast) */
-  --theme-text-primary: #ffffff;
-  --theme-text-secondary: #ffedd5; /* Pale Orange White */
-  --theme-text-tertiary: #fdba74; /* Soft Orange */
-  --theme-text-label: #fb923c; /* Bright Orange Accent */
+//   /* Font weights */
+//   --font-weight-light: 300;
+//   --font-weight-normal: 400;
+//   --font-weight-medium: 500;
+//   --font-weight-semibold: 600;
+//   --font-weight-bold: 700;
 
-  /* 3. BORDERS (Glowing Rims) */
-  --theme-border-primary: rgba(255, 255, 255, 0.25);
-  --theme-border-secondary: rgba(251, 146, 60, 0.15); /* Subtle orange tint */
+//   /* ==========================================================================
+//      2. SPACING (Compact Grid)
+//      ========================================================================== */
+//   --spacing-xs: 0.25rem;
+//   --spacing-sm: 0.375rem;
+//   --spacing-md: 0.5rem;
+//   --spacing-lg: 0.75rem;
+//   --spacing-xl: 1rem;
+//   --spacing-2xl: 1.5rem;
+//   --spacing-3xl: 2rem;
+//   --spacing-4xl: 2.75rem;
+//   --spacing-5xl: 3.5rem;
 
-  /* 4. ACCENTS (Electric Amber) */
-  --theme-accent-primary: #fb923c; /* Orange 400 */
-  --theme-accent-secondary: #f97316; /* Orange 500 */
-  --theme-accent-tertiary: #ea580c;
-  --theme-accent-gradient: linear-gradient(
-    135deg,
-    #fb923c 0%,
-    #db2777 100%
-  ); /* Orange to Pink shift */
-  --theme-accent-focus: rgba(251, 146, 60, 0.3);
-  --theme-accent-hover: #fdba74;
+//   /* ==========================================================================
+//      3. UI CONSTANTS & SHADOWS
+//      ========================================================================== */
+//   --ui-border-radius: 5px;
+//   --ui-border-radius-lg: 10px;
+//   --ui-border-radius-xl: 16px;
+//   --ui-border-radius-sm: 3px;
+//   --ui-border-width: 1px;
+//   --ui-border-width-lg: 2px;
 
-  /* 5. THE "MOLTEN GLASS" EFFECT */
-  --glass-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.02) 100%);
+//   /* Enhanced Shadow System */
+//   --shadow-xs: 0 0.5px 1px rgba(0, 0, 0, 0.04);
+//   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+//   --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.08);
+//   --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.1);
+//   --shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.12);
+//   --shadow-2xl: 0 12px 32px rgba(0, 0, 0, 0.15);
+//   --shadow-3xl: 0 16px 40px rgba(0, 0, 0, 0.18);
+//   --shadow-4xl: 0 20px 48px rgba(0, 0, 0, 0.2);
+//   --shadow-5xl: 0 24px 56px rgba(0, 0, 0, 0.22);
+//   --shadow-6xl: 0 28px 64px rgba(0, 0, 0, 0.25);
 
-  --glass-blur: 40px; /* Max Blur */
+//   /* ==========================================================================
+//      4. ANIMATIONS & INTERACTION (Restored Missing Keys)
+//      ========================================================================== */
+//   /* Transitions */
+//   --transition-fast: all 0.12s cubic-bezier(0.23, 1, 0.32, 1);
+//   --transition-base: all 0.22s cubic-bezier(0.2, 0.9, 0.2, 1);
+//   --transition-slow: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+//   --transition-slower: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+//   --transition-colors:
+//     color 0.2s cubic-bezier(0.2, 0.9, 0.2, 1), background-color 0.2s cubic-bezier(0.2, 0.9, 0.2, 1),
+//     border-color 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
+//   --transition-transform: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1);
 
-  /* A slightly warmer white border */
-  --glass-border: rgba(255, 237, 213, 0.3);
+//   /* Focus States (Restored) */
+//   --focus-ring-width: 2px;
+//   --focus-ring-offset: 2px;
+//   --focus-ring-color: rgba(59, 130, 246, 0.3);
+//   --focus-ring-color-alt: rgba(139, 92, 246, 0.3);
+//   --focus-outline-width: 3px;
 
-  /* Shadow with a warm orange under-glow */
-  --glass-shadow:
-    0 30px 60px -12px rgba(67, 20, 7, 0.6),
-    /* Deep Brown/Orange shadow */ inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    /* White Top highlight */ inset 0 -1px 0 rgba(251, 146, 60, 0.2); /* Orange Bottom reflection */
+//   /* Z-Index Hierarchy (Restored) */
+//   --z-dropdown: 100;
+//   --z-sticky: 200;
+//   --z-fixed: 300;
+//   --z-modal-backdrop: 400;
+//   --z-modal: 500;
+//   --z-toast: 600;
+//   --z-tooltip: 700;
 
-  /* 6. STATUS COLORS */
-  --theme-success: #34d399;
-  --theme-warning: #facc15;
-  --theme-error: #f43f5e;
-  --theme-info: #38bdf8;
+//   /* State Opacities */
+//   --state-disabled-opacity: 0.5;
+//   --state-loading-opacity: 0.7;
+//   --state-readonly-opacity: 0.6;
 
-  --theme-disabled: rgba(255, 255, 255, 0.1);
-  --theme-disabled-text: rgba(255, 255, 255, 0.3);
+//   /* ==========================================================================
+//      5. COLOR SYSTEM (Added to replace hardcoded hex codes)
+//      ========================================================================== */
+//   /* Brand Colors (Blue) */
+//   --color-primary: #3b82f6;
+//   --color-primary-hover: #2563eb;
+//   --color-primary-active: #1d4ed8;
+//   --color-primary-subtle: #eff6ff;
+//   --color-primary-border: #dbeafe;
+//   --color-on-primary: #ffffff;
 
-  /* Components */
-  --component-bg-hover: rgba(251, 146, 60, 0.15);
-  --component-bg-active: rgba(251, 146, 60, 0.25);
-  --component-border-focus: #fb923c;
-  --component-surface-raised: rgba(67, 20, 7, 0.4);
-  --component-divider: rgba(255, 255, 255, 0.15);
+//   /* Neutral / Grays */
+//   --color-gray-50: #f9fafb;
+//   --color-gray-100: #f3f4f6;
+//   --color-gray-200: #e5e7eb;
+//   --color-gray-300: #d1d5db;
+//   --color-gray-400: #9ca3af;
+//   --color-gray-500: #6b7280;
+//   --color-gray-600: #4b5563;
+//   --color-gray-700: #374151;
+//   --color-gray-800: #1f2937;
+//   --color-gray-900: #111827;
 
-  --scroll-thumb: rgba(251, 146, 60, 0.4);
-  --scroll-track: rgba(0, 0, 0, 0.2);
+//   /* Semantic / Functional */
+//   --color-danger-bg: #fee2e2;
+//   --color-danger-text: #991b1b;
+  
+//   /* Backgrounds */
+//   --bg-app: var(--color-gray-100);
+//   --bg-surface: #ffffff;
+//   --bg-surface-glass: rgba(255, 255, 255, 0.8); /* For backdrop filters */
+  
+//   /* Borders */
+//   --border-subtle: var(--color-gray-200);
+//   --border-glass: rgba(255, 255, 255, 0.5);
 
-  @include apply-canonical-mapping;
-}
+//   /* Text */
+//   --text-primary: var(--color-gray-900);
+//   --text-secondary: var(--color-gray-600);
+//   --text-muted: var(--color-gray-500);
+//   --text-placeholder: var(--color-gray-400);
+//   --text-inverse: #ffffff;
+// }
+
+// /* =========================================
+//    MIXIN: CANONICAL MAPPING
+//    ========================================= */
+// @mixin apply-canonical-mapping {
+//   /* Core Palette */
+//   --bg-primary: var(--theme-bg-primary);
+//   --bg-secondary: var(--theme-bg-secondary);
+//   --bg-ternary: var(--theme-bg-ternary);
+//   --text-primary: var(--theme-text-primary);
+//   --text-secondary: var(--theme-text-secondary);
+//   --text-tertiary: var(--theme-text-tertiary);
+//   --text-label: var(--theme-text-label);
+//   --border-primary: var(--theme-border-primary);
+//   --border-secondary: var(--theme-border-secondary);
+//   --accent-primary: var(--theme-accent-primary);
+//   --accent-secondary: var(--theme-accent-secondary);
+//   --accent-tertiary: var(--theme-accent-tertiary);
+//   --accent-gradient: var(--theme-accent-gradient);
+//   --accent-focus: var(--theme-accent-focus);
+//   --accent-hover: var(--theme-accent-hover);
+//   --color-success: var(--theme-success);
+//   --color-warning: var(--theme-warning);
+//   --color-error: var(--theme-error);
+//   --color-info: var(--theme-info);
+//   --color-disabled: var(--theme-disabled);
+//   --color-disabled-text: var(--theme-disabled-text);
+
+//   /* Glass */
+//   --glass-bg-c: var(--glass-bg);
+//   --glass-blur-c: var(--glass-blur);
+//   --glass-border-c: var(--glass-border);
+//   --glass-shadow-c: var(--glass-shadow, 0 8px 32px rgba(0, 0, 0, 0.1));
+
+//   /* Components */
+//   --component-bg-hover: var(--component-bg-hover);
+//   --component-bg-active: var(--component-bg-active);
+//   --component-border-focus: var(--component-border-focus);
+//   --component-surface-raised: var(--component-surface-raised);
+//   --component-divider: var(--component-divider);
+//   --scroll-thumb-c: var(--scroll-thumb);
+//   --scroll-track-c: var(--scroll-track);
+
+//   /* Add to your @mixin apply-canonical-mapping if needed */
+//   --component-border-focus: var(--accent-primary);
+//   --component-surface-raised: var(--bg-primary);
+//   --component-divider: var(--border-secondary);
+
+//   /* Derived Semantics */
+//   --color-primary: var(--theme-accent-primary);
+//   --color-primary-dark: var(--theme-accent-hover);
+//   --color-primary-light: var(--theme-accent-secondary);
+//   --color-primary-bg: var(--accent-focus);
+//   --color-primary-border: var(--theme-border-secondary);
+
+//   --color-success-dark: color-mix(in srgb, var(--theme-success) 90%, black 10%);
+//   --color-success-light: color-mix(in srgb, var(--theme-success) 90%, white 10%);
+//   --color-success-bg: color-mix(in srgb, var(--theme-success) 10%, transparent 90%);
+//   --color-success-border: color-mix(in srgb, var(--theme-success) 30%, transparent 70%);
+
+//   --color-info-dark: color-mix(in srgb, var(--theme-info) 90%, black 10%);
+//   --color-info-light: color-mix(in srgb, var(--theme-info) 90%, white 10%);
+//   --color-info-bg: color-mix(in srgb, var(--theme-info) 10%, transparent 90%);
+//   --color-info-border: color-mix(in srgb, var(--theme-info) 30%, transparent 70%);
+
+//   --color-warning-dark: color-mix(in srgb, var(--theme-warning) 90%, black 10%);
+//   --color-warning-light: color-mix(in srgb, var(--theme-warning) 90%, white 10%);
+//   --color-warning-bg: color-mix(in srgb, var(--theme-warning) 10%, transparent 90%);
+//   --color-warning-border: color-mix(in srgb, var(--theme-warning) 30%, transparent 70%);
+
+//   --color-error-dark: color-mix(in srgb, var(--theme-error) 90%, black 10%);
+//   --color-error-light: color-mix(in srgb, var(--theme-error) 90%, white 10%);
+//   --color-error-bg: color-mix(in srgb, var(--theme-error) 10%, transparent 90%);
+//   --color-error-border: color-mix(in srgb, var(--theme-error) 30%, transparent 70%);
+
+//   --bg-hover: var(--component-bg-hover);
+//   --bg-active: var(--component-bg-active);
+//   --text-muted: var(--theme-text-tertiary);
+//   --text-disabled: var(--theme-disabled-text);
+//   --border-tertiary: var(--component-divider);
+
+//   --color-bg-revenue: color-mix(in srgb, var(--theme-text-tertiary) 20%, var(--bg-secondary) 80%);
+//   --color-bg-revenue-hover: color-mix(
+//     in srgb,
+//     var(--theme-text-tertiary) 40%,
+//     var(--bg-secondary) 60%
+//   );
+//   --color-bg-profit: var(--theme-success);
+//   --color-bg-profit-hover: color-mix(in srgb, var(--theme-success) 90%, black 10%);
+
+//   --tooltip-bg: color-mix(in srgb, var(--theme-text-primary) 15%, var(--bg-primary) 85%);
+//   --tooltip-color: var(--theme-text-primary);
+//   --component-bg: var(--bg-secondary);
+//   --component-border: var(--border-primary);
+
+//   --shadow-color: rgba(0, 0, 0, 0.05);
+//   --shadow-color-lg: rgba(0, 0, 0, 0.1);
+//   --scroll-thumb: var(--scroll-thumb-c);
+//   --scroll-track: var(--scroll-track-c);
+// }
+
+// /* =========================================
+//    THEME 1: LUMINOUS (Standard Professional Light)
+//    Vibe: Clean, Executive, Trusted
+//    ========================================= */
+// .theme-luminous {
+//   --theme-bg-primary: #f8fafc;
+//   --theme-bg-secondary: #ffffff;
+//   --theme-bg-ternary: #f1f5f9;
+
+//   --theme-text-primary: #0f172a;
+//   --theme-text-secondary: #334155;
+//   --theme-text-tertiary: #64748b;
+//   --theme-text-label: #94a3b8;
+
+//   --theme-border-primary: #e2e8f0;
+//   --theme-border-secondary: #cbd5e1;
+
+//   --theme-accent-primary: #4f46e5; /* Indigo 600 */
+//   --theme-accent-secondary: #6366f1; /* Indigo 500 */
+//   --theme-accent-tertiary: #818cf8;
+//   --theme-accent-gradient: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+//   --theme-accent-focus: rgba(79, 70, 229, 0.12);
+//   --theme-accent-hover: #4338ca;
+
+//   --theme-success: #10b981;
+//   --theme-warning: #f59e0b;
+//   --theme-error: #ef4444;
+//   --theme-info: #3b82f6;
+
+//   --theme-disabled: #f1f5f9;
+//   --theme-disabled-text: #94a3b8;
+
+//   /* Clean Glass */
+//   --glass-bg: rgba(255, 255, 255, 0.7);
+//   --glass-blur: 20px;
+//   --glass-border: rgba(255, 255, 255, 0.8);
+//   --glass-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+
+//   --component-bg-hover: #f8fafc;
+//   --component-bg-active: #f1f5f9;
+//   --component-border-focus: #4f46e5;
+//   --component-surface-raised: #ffffff;
+//   --component-divider: #e2e8f0;
+
+//   --scroll-thumb: #cbd5e1;
+//   --scroll-track: transparent;
+
+//   @include apply-canonical-mapping;
+// }
+
+// /* =========================================
+//    THEME 2: MIDNIGHT PRO (Deep Developer Dark)
+//    Vibe: Serious, High Contrast, Eye Comfort
+//    ========================================= */
+// .theme-midnight {
+//   --theme-bg-primary: #0b1120; /* Deep Navy Black */
+//   --theme-bg-secondary: #151e32;
+//   --theme-bg-ternary: #0f172a;
+
+//   --theme-text-primary: #f8fafc;
+//   --theme-text-secondary: #cbd5e1;
+//   --theme-text-tertiary: #94a3b8;
+//   --theme-text-label: #64748b;
+
+//   --theme-border-primary: #1e293b;
+//   --theme-border-secondary: #334155;
+
+//   --theme-accent-primary: #38bdf8; /* Sky Blue */
+//   --theme-accent-secondary: #0ea5e9;
+//   --theme-accent-tertiary: #7dd3fc;
+//   --theme-accent-gradient: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
+//   --theme-accent-focus: rgba(56, 189, 248, 0.15);
+//   --theme-accent-hover: #0284c7;
+
+//   --theme-success: #22c55e;
+//   --theme-warning: #fbbf24;
+//   --theme-error: #f43f5e;
+//   --theme-info: #60a5fa;
+
+//   --theme-disabled: #1e293b;
+//   --theme-disabled-text: #475569;
+
+//   /* Dark Glass */
+//   --glass-bg: rgba(15, 23, 42, 0.6);
+//   --glass-blur: 24px;
+//   --glass-border: rgba(255, 255, 255, 0.08);
+//   --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+
+//   --component-bg-hover: rgba(255, 255, 255, 0.05);
+//   --component-bg-active: rgba(255, 255, 255, 0.08);
+//   --component-border-focus: #38bdf8;
+//   --component-surface-raised: #1e293b;
+//   --component-divider: #1e293b;
+
+//   --scroll-thumb: #334155;
+//   --scroll-track: transparent;
+
+//   @include apply-canonical-mapping;
+// }
+
+// /* =========================================
+//    THEME 3: BIO-FROST (Your Requested Nature Glass)
+//    Vibe: Organic, Fresh, Minty
+//    ========================================= */
+// /* =========================================
+//    THEME: BIO-FROST (Deep Cryo-Glass)
+//    Vibe: High-Tech Nature, Thick Ice, Premium
+//    ========================================= */
+// .theme-bio-frost {
+//   /* 1. THE BACKGROUND (Crucial for Glass Depth)
+//      We use a radial gradient to create a "glow" behind the glass 
+//      that fades into deep darkness at the edges.
+//   */
+//   --theme-bg-primary: radial-gradient(
+//     circle at 50% 0%,
+//     #047857 0%,
+//     /* Emerald 700 (Top Glow) */ #064e3b 40%,
+//     /* Emerald 900 (Mid) */ #022c22 100% /* Emerald 950 (Deep Dark Edges) */
+//   );
+
+//   --theme-bg-secondary: rgba(255, 255, 255, 0.05); /* Very subtle surface */
+//   --theme-bg-ternary: rgba(0, 0, 0, 0.25);
+
+//   /* 2. TEXT (Icy Contrast) */
+//   --theme-text-primary: #ffffff;
+//   --theme-text-secondary: #d1fae5; /* Minty White */
+//   --theme-text-tertiary: #6ee7b7; /* Bright Mint */
+//   --theme-text-label: #34d399; /* Emerald Accent */
+
+//   /* 3. BORDERS (Crystalline Edges) */
+//   --theme-border-primary: rgba(255, 255, 255, 0.2);
+//   --theme-border-secondary: rgba(255, 255, 255, 0.08);
+
+//   /* 4. ACCENTS (Electric Mint) */
+//   --theme-accent-primary: #34d399; /* Emerald 400 */
+//   --theme-accent-secondary: #6ee7b7;
+//   --theme-accent-tertiary: #10b981;
+//   --theme-accent-gradient: linear-gradient(135deg, #34d399 0%, #059669 100%);
+//   --theme-accent-focus: rgba(52, 211, 153, 0.3);
+//   --theme-accent-hover: #a7f3d0;
+
+//   /* 5. THE "DEEP GLASS" EFFECT 
+//      The magic happens here. Lower opacity + Higher Blur + Inset Highlights.
+//   */
+//   /* A gradient from 18% white to 2% white creates a "curved" glass look */
+//   --glass-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.02) 100%);
+
+//   --glass-blur: 40px; /* Maximum "Frosted" Blur */
+
+//   /* Sharp, icy rim */
+//   --glass-border: rgba(255, 255, 255, 0.3);
+
+//   /* Shadow Stack:
+//      1. Deep drop shadow for lift.
+//      2. Top-inner white highlight (Inner Light).
+//      3. Bottom-inner reflection.
+//   */
+//   --glass-shadow:
+//     0 30px 60px -12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4),
+//     inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+
+//   /* 6. STATUS COLORS */
+//   --theme-success: #34d399;
+//   --theme-warning: #facc15;
+//   --theme-error: #fb7185;
+//   --theme-info: #38bdf8;
+
+//   --theme-disabled: rgba(255, 255, 255, 0.1);
+//   --theme-disabled-text: rgba(255, 255, 255, 0.3);
+
+//   /* Components */
+//   --component-bg-hover: rgba(255, 255, 255, 0.12);
+//   --component-bg-active: rgba(255, 255, 255, 0.2);
+//   --component-border-focus: #34d399;
+//   --component-surface-raised: rgba(0, 0, 0, 0.3);
+//   --component-divider: rgba(255, 255, 255, 0.1);
+
+//   --scroll-thumb: rgba(52, 211, 153, 0.3);
+//   --scroll-track: rgba(0, 0, 0, 0.2);
+
+//   @include apply-canonical-mapping;
+// }
+
+// /* =========================================
+//    THEME: SOLAR FLARE (Molten Amber Glass)
+//    Vibe: Warm Energy, High-End Tech, Sunset
+//    ========================================= */
+// .theme-solar-flare {
+//   /* 1. THE BACKGROUND (Deep Magma Glow) */
+//   --theme-bg-primary: radial-gradient(
+//     circle at 50% 0%,
+//     #c2410c 0%,
+//     /* Orange 700 (Top Glow - The Light Source) */ #7c2d12 40%,
+//     /* Orange 900 (Mid) */ #431407 100% /* Warm Brown/Black (Deep Edges) */
+//   );
+
+//   --theme-bg-secondary: rgba(255, 255, 255, 0.05);
+//   --theme-bg-ternary: rgba(0, 0, 0, 0.25);
+
+//   /* 2. TEXT (Warm Contrast) */
+//   --theme-text-primary: #ffffff;
+//   --theme-text-secondary: #ffedd5; /* Pale Orange White */
+//   --theme-text-tertiary: #fdba74; /* Soft Orange */
+//   --theme-text-label: #fb923c; /* Bright Orange Accent */
+
+//   /* 3. BORDERS (Glowing Rims) */
+//   --theme-border-primary: rgba(255, 255, 255, 0.25);
+//   --theme-border-secondary: rgba(251, 146, 60, 0.15); /* Subtle orange tint */
+
+//   /* 4. ACCENTS (Electric Amber) */
+//   --theme-accent-primary: #fb923c; /* Orange 400 */
+//   --theme-accent-secondary: #f97316; /* Orange 500 */
+//   --theme-accent-tertiary: #ea580c;
+//   --theme-accent-gradient: linear-gradient(
+//     135deg,
+//     #fb923c 0%,
+//     #db2777 100%
+//   ); /* Orange to Pink shift */
+//   --theme-accent-focus: rgba(251, 146, 60, 0.3);
+//   --theme-accent-hover: #fdba74;
+
+//   /* 5. THE "MOLTEN GLASS" EFFECT */
+//   --glass-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.02) 100%);
+
+//   --glass-blur: 40px; /* Max Blur */
+
+//   /* A slightly warmer white border */
+//   --glass-border: rgba(255, 237, 213, 0.3);
+
+//   /* Shadow with a warm orange under-glow */
+//   --glass-shadow:
+//     0 30px 60px -12px rgba(67, 20, 7, 0.6),
+//     /* Deep Brown/Orange shadow */ inset 0 1px 0 rgba(255, 255, 255, 0.4),
+//     /* White Top highlight */ inset 0 -1px 0 rgba(251, 146, 60, 0.2); /* Orange Bottom reflection */
+
+//   /* 6. STATUS COLORS */
+//   --theme-success: #34d399;
+//   --theme-warning: #facc15;
+//   --theme-error: #f43f5e;
+//   --theme-info: #38bdf8;
+
+//   --theme-disabled: rgba(255, 255, 255, 0.1);
+//   --theme-disabled-text: rgba(255, 255, 255, 0.3);
+
+//   /* Components */
+//   --component-bg-hover: rgba(251, 146, 60, 0.15);
+//   --component-bg-active: rgba(251, 146, 60, 0.25);
+//   --component-border-focus: #fb923c;
+//   --component-surface-raised: rgba(67, 20, 7, 0.4);
+//   --component-divider: rgba(255, 255, 255, 0.15);
+
+//   --scroll-thumb: rgba(251, 146, 60, 0.4);
+//   --scroll-track: rgba(0, 0, 0, 0.2);
+
+//   @include apply-canonical-mapping;
+// }
 
 /* =========================================
    THEME: HORIZON (Fire & Ice Gradient)
