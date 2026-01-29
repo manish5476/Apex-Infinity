@@ -3368,7 +3368,275 @@
   padding: var(--spacing-lg);
   color: var(--text-muted);
   font-style: italic;
+}.p-toast {
+  /* Positioning & Layering */
+  z-index: var(--z-toast) !important;
+  --p-toast-width: 25rem;
+  --p-toast-transition-duration: 0.35s; // Aligned with --transition-slow
+  
+  /* Global Message Constants */
+  --p-toast-border-radius: var(--ui-border-radius-lg);
+  --p-toast-border-width: var(--ui-border-width);
+  --p-toast-content-padding: var(--spacing-lg) var(--spacing-xl);
+  --p-toast-content-gap: var(--spacing-md);
+  --p-toast-blur: var(--glass-blur-c);
+
+  /* Typography Scale */
+  --p-toast-summary-font-size: var(--font-size-md);
+  --p-toast-summary-font-weight: var(--font-weight-semibold);
+  --p-toast-detail-font-size: var(--font-size-sm);
+  --p-toast-detail-font-weight: var(--font-weight-normal);
+
+  /* Close Button System */
+  --p-toast-close-button-width: 1.75rem;
+  --p-toast-close-button-height: 1.75rem;
+  --p-toast-close-button-border-radius: var(--ui-border-radius-sm);
+  --p-toast-close-icon-size: var(--font-size-xs);
+
+  .p-toast-message {
+    backdrop-filter: blur(var(--p-toast-blur));
+    -webkit-backdrop-filter: blur(var(--p-toast-blur));
+    box-shadow: var(--shadow-lg);
+    margin-bottom: var(--spacing-md);
+  }
+
+  /* --- Semantic Severity Mapping --- */
+
+  /* Success */
+  --p-toast-success-background: var(--color-success-bg);
+  --p-toast-success-border-color: var(--color-success-border);
+  --p-toast-success-color: var(--color-success);
+  --p-toast-success-detail-color: var(--text-secondary);
+  --p-toast-success-shadow: var(--shadow-md);
+
+  /* Info */
+  --p-toast-info-background: var(--color-info-bg);
+  --p-toast-info-border-color: var(--color-info-border);
+  --p-toast-info-color: var(--color-info);
+  --p-toast-info-detail-color: var(--text-secondary);
+
+  /* Warn */
+  --p-toast-warn-background: var(--color-warning-bg);
+  --p-toast-warn-border-color: var(--color-warning-border);
+  --p-toast-warn-color: var(--theme-warning);
+  --p-toast-warn-detail-color: var(--text-secondary);
+
+  /* Error */
+  --p-toast-error-background: var(--color-error-bg);
+  --p-toast-error-border-color: var(--color-error-border);
+  --p-toast-error-color: var(--color-error);
+  --p-toast-error-detail-color: var(--text-secondary);
+
+  /* Interaction Correction */
+  .p-toast-close-button {
+    transition: var(--transition-fast);
+    &:hover {
+      background: var(--bg-hover) !important;
+    }
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+    }
+  }
+
+  /* Typography Correction for Directives */
+  .p-toast-summary {
+    font-family: var(--font-heading);
+    line-height: var(--line-height-tight);
+  }
+  
+  .p-toast-detail {
+    font-family: var(--font-body);
+    line-height: var(--line-height-normal);
+    margin-top: var(--spacing-xs);
+  }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // /* ==========================================================================
 //    COMPONENT: PRIMENG AUTOCOMPLETE
 //    Refined for: Angular 20 | Glass Themes | Compact Grid
