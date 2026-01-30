@@ -3,7 +3,7 @@
      [class.is-pinned]="layout.isPinned() && !layout.isMobile()">
   <app-mainscreen-header (toggleSidebar)="onMenuToggle()" />
   <div class="layout-body">
-    <app-mainscreen-sidebar />
+    <app-mainscreen-sidebar appendTo="body" />
     <main class="main-content">
       <router-outlet />
     </main>

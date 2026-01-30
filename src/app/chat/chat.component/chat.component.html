@@ -1,4 +1,4 @@
-<p-toast position="bottom-right"></p-toast>
+<!-- <p-toast position="bottom-right"></p-toast>
 
 <div class="chat-system" [class.mobile-view]="mobileView()" [class.sidebar-open]="sidebarOpen()">
 
@@ -64,400 +64,111 @@
     (closeAddMembersModal)="closeAddMembersModal()" (submitCreateChannel)="submitCreateChannel()"
     (submitAddMembers)="submitAddMembers()" (toggleMemberSelection)="toggleMemberSelection($event)">
   </app-chat-modals>
-</div>
-
-<!-- <p-toast position="bottom-right"></p-toast>
+</div> -->
+<p-toast position="bottom-right"></p-toast>
 
 <div class="chat-system" [class.mobile-view]="mobileView()" [class.sidebar-open]="sidebarOpen()">
-  
-  @if (mobileView()) {
-  <div class="mobile-header">
-    <button class="sidebar-toggle" (click)="toggleSidebar()">
-      <i class="pi" [class.pi-bars]="!sidebarOpen()" [class.pi-times]="sidebarOpen()"></i>
-    </button>
-    @if (activeChannel()) {
-    <div class="channel-info">
-      <h3>#{{ activeChannel()?.name }}</h3>
-      <span class="online">{{ activeChannelUsers().length }} online</span>
-    </div>
-    }
-  </div>
-  }
 
-  
-  <aside class="sidebar" [class.open]="sidebarOpen()">
-    <div class="sidebar-header">
-      <div class="user-info">
-        <div class="avatar">{{ getInitials(currentUserId()) }}</div>
-        <div class="info">
-          <h4>{{ getUserName(currentUserId()) }}</h4>
-          <div class="status">
-            <span class="dot" 
-                  [class.connected]="(socketService.connectionStatus$ | async) === 'connected'"></span>
-            {{ (socketService.connectionStatus$ | async) }}
-          </div>
-        </div>
-      </div>
-      <button class="btn-create" (click)="openCreateModal()" title="Create channel">
-        <i class="pi pi-plus"></i>
-      </button>
-    </div>
+  <app-chat-sidebar 
+    [channels]="channels()" 
+    [activeChannelId]="activeChannelId()" 
+    [currentUserId]="currentUserId()"
+    [sidebarOpen]="sidebarOpen()" 
+    [mobileView]="mobileView()" 
+    [unreadCounts]="unreadCounts()"
+    [activeChannelUsers]="activeChannelUsers()" 
+    [onlineUsers]="onlineUsers()" 
+    (channelSelected)="selectChannel($event)"
+    (createChannel)="openCreateModal()">
+  </app-chat-sidebar>
 
-    <div class="sidebar-content">
-      <div class="section">
-        <div class="section-header">
-          <span>CHANNELS</span>
-          <span class="count">{{ channels().length }}</span>
-        </div>
-        <div class="channel-list">
-          @for (ch of channels(); track ch._id) {
-          <div class="channel-item" 
-               [class.active]="ch._id === activeChannelId()"
-               [class.disabled]="!ch.isActive"
-               (click)="selectChannel(ch)">
-            <div class="channel-icon">
-              <i class="pi" 
-                 [class.pi-hashtag]="ch.type === 'public'"
-                 [class.pi-lock]="ch.type === 'private'"
-                 [class.pi-user]="ch.type === 'dm'"></i>
-            </div>
-            <span class="name">{{ ch.name || 'Unnamed' }}</span>
-            @if (unreadCounts()[ch._id] > 0) {
-            <span class="badge">{{ unreadCounts()[ch._id] }}</span>
-            }
-            @if (!ch.isActive) {
-            <i class="pi pi-ban disabled-icon"></i>
-            }
-          </div>
-          } @empty {
-          <div class="empty">
-            <i class="pi pi-comment"></i>
-            <p>No channels yet</p>
-          </div>
-          }
-        </div>
-      </div>
-
-      @if (activeChannelId() && activeChannelUsers().length > 0) {
-      <div class="section">
-        <div class="section-header">
-          <span>ONLINE</span>
-          <span class="count">{{ activeChannelUsers().length }}</span>
-        </div>
-        <div class="user-list">
-          @for (userId of activeChannelUsers(); track userId) {
-          @if (userId !== currentUserId()) {
-          <div class="user-item">
-            <div class="avatar" [class.online]="isUserOnline(userId)">
-              {{ getInitials(userId) }}
-            </div>
-            <span class="name">{{ getUserName(userId) }}</span>
-          </div>
-          }
-          }
-        </div>
-      </div>
-      }
-    </div>
-  </aside>
-
-  
   <main class="chat-main">
-    @if (activeChannelId()) {
     
-    <div class="chat-header">
-      <div class="header-left">
-        @if (mobileView()) {
-        <button class="back" (click)="toggleSidebar()">
-          <i class="pi pi-arrow-left"></i>
+    @if (mobileView()) {
+      <div class="mobile-navigation-bar">
+        <button class="btn-sidebar-toggle" (click)="toggleSidebar()">
+          <i class="pi" [class.pi-bars]="!sidebarOpen()" [class.pi-times]="sidebarOpen()"></i>
         </button>
-        }
-        <div class="channel-info">
-          <h2>
-            <i class="pi pi-hashtag"></i>
-            {{ activeChannel()?.name }}
-            @if (activeChannel()?.type === 'private') {
-            <i class="pi pi-lock"></i>
-            } @else if (activeChannel()?.type === 'dm') {
-            <i class="pi pi-user"></i>
-            }
-          </h2>
-          <p>{{ activeChannelUsers().length }} members online</p>
-        </div>
-      </div>
-      <div class="header-actions">
-        <button class="btn-icon" title="Channel settings" (click)="openChannelSettings()">
-          <i class="pi pi-cog"></i>
-        </button>
-      </div>
-    </div>
-
-    
-    <div class="messages-container" #scrollContainer (scroll)="onScroll()">
-      @if (loadingMore) {
-      <div class="loading">
-        <i class="pi pi-spinner pi-spin"></i>
-        Loading...
-      </div>
-      }
-
-      @if (messages().length === 0 && !loadingMore) {
-      <div class="empty-chat">
-        <i class="pi pi-comment"></i>
-        <h3>No messages yet</h3>
-        <p>Start the conversation in #{{ activeChannel()?.name }}</p>
-      </div>
-      }
-
-      <div class="messages">
-        @for (msg of messages(); track msg._id; let i = $index) {
-        @if (showDateSeparator(i, msg)) {
-        <div class="date-divider">
-          {{ msg.createdAt | date:'fullDate' }}
-        </div>
-        }
-
-        <div class="message" [class.mine]="getSenderId(msg) === currentUserId()">
-          @if (getSenderId(msg) !== currentUserId()) {
-          <div class="avatar">{{ getSenderAvatar(msg) }}</div>
-          }
-          
-          <div class="content">
-            @if (getSenderId(msg) !== currentUserId()) {
-            <div class="sender">{{ getSenderName(msg) }}</div>
-            }
-            
-            <div class="bubble" [class.mine]="getSenderId(msg) === currentUserId()">
-              @if (msg.deleted) {
-              <div class="deleted">
-                <i class="pi pi-trash"></i>
-                Message deleted
-              </div>
-              } @else if (editingMessageId() === msg._id) {
-              <div class="editing">
-                <textarea [(ngModel)]="editMessageText" 
-                          (keydown.enter)="$event.preventDefault()"
-                          (keydown.enter.shift)="saveEditedMessage()"
-                          rows="3"></textarea>
-                <div class="edit-actions">
-                  <button (click)="saveEditedMessage()" class="btn-save">
-                    <i class="pi pi-check"></i> Save
-                  </button>
-                  <button (click)="cancelEditing()" class="btn-cancel">
-                    <i class="pi pi-times"></i> Cancel
-                  </button>
-                </div>
-              </div>
-              } @else {
-                @if (msg.body) {
-                <div class="text">{{ msg.body }}</div>
-                }
-                
-                @if (msg.attachments?.length) {
-                <div class="attachments">
-                  @for (f of msg.attachments; track f.url) {
-                  <div class="attachment">
-                    @if (isImage(f.url)) {
-                    <img [src]="f.url" alt="Attachment" loading="lazy" />
-                    } @else {
-                    <a [href]="f.url" target="_blank" class="file">
-                      <i class="pi" [ngClass]="getFileIconClass(f.url)"></i>
-                      <span>{{ f.name }}</span>
-                    </a>
-                    }
-                  </div>
-                  }
-                </div>
-                }
-                
-                @if (getSenderId(msg) === currentUserId()) {
-                <div class="actions">
-                  <button (click)="startEditingMessage(msg)" class="btn-action">
-                    <i class="pi pi-pencil"></i>
-                  </button>
-                  <button (click)="deleteMessage(msg)" class="btn-action">
-                    <i class="pi pi-trash"></i>
-                  </button>
-                </div>
-                }
-              }
-            </div>
-            
-            <div class="meta">
-              <span>{{ msg.createdAt | date:'h:mm a' }}</span>
-              @if (msg.editedAt) {
-              <span class="edited">(edited)</span>
-              }
-            </div>
+        @if (activeChannel()) {
+          <div class="active-info">
+            <h3>#{{ activeChannel()?.name }}</h3>
           </div>
-        </div>
         }
       </div>
-    </div>
-
-    
-    @if (typingIndicator()) {
-    <div class="typing">
-      <div class="dots">
-        <span></span><span></span><span></span>
-      </div>
-      {{ typingIndicator() }}
-    </div>
     }
 
-    
-    <div class="composer">
-      <button class="btn-attach" (click)="triggerFilePicker()" title="Attach file">
-        <i class="pi pi-paperclip"></i>
-      </button>
+    @if (activeChannelId()) {
       
-      <input #fileInput type="file" (change)="handleFileUpload($event)" hidden multiple />
-      
-      <div class="input-wrapper">
-       <textarea #messageInput
-          class="input"
-          [(ngModel)]="messageInput"
-          (input)="onTypingInput()"
-          (keydown.enter)="sendOnEnter($event)"
-          placeholder="Message #{{ activeChannel()?.name }}..."
-          rows="1"></textarea>
-        
-        @if (attachments.length > 0) {
-        <div class="attachments-preview">
-          @for (file of attachments; track file.name; let i = $index) {
-          <div class="attachment-preview">
-            <span>{{ file.name }}</span>
-            <button (click)="removeAttachment(i)" class="btn-remove">
-              <i class="pi pi-times"></i>
-            </button>
+      <app-chat-header 
+        [activeChannel]="activeChannel()" 
+        [activeChannelUsers]="activeChannelUsers()"
+        [mobileView]="mobileView()" 
+        (toggleSidebar)="toggleSidebar()" 
+        (openSettings)="openChannelSettings()"
+        (addMembers)="openAddMembersModal()">
+      </app-chat-header>
+
+      <app-chat-messages 
+        [messages]="messages()" 
+        [currentUserId]="currentUserId()" 
+        [activeChannel]="activeChannel()"
+        [loadingMore]="loadingMore" 
+        [typingIndicator]="typingIndicator()" 
+        [editingMessageId]="editingMessageId()"
+        [editMessageText]="editMessageText" 
+        (scroll)="onScroll($event)" 
+        (editMessage)="startEditingMessage($event)"
+        (deleteMessage)="deleteMessage($event)" 
+        (saveEditedMessage)="saveEditedMessage()"
+        (cancelEditing)="cancelEditing()">
+      </app-chat-messages>
+
+      <app-chat-composer 
+        [messageInput]="messageInput" 
+        [attachmentsInput]="attachments" 
+        [isUploading]="isUploading"
+        [activeChannel]="activeChannel()" 
+        [uploadProgress]="uploadProgress()" 
+        (sendMessage)="onMessageSend($event)"
+        (typingInput)="onTypingInput()" 
+        (clearAllInput)="messageInput = ''; attachments = []">
+      </app-chat-composer>
+
+    } 
+    @else {
+      <div class="welcome-surface">
+        <div class="welcome-card">
+          <div class="icon-circle">
+             <i class="pi pi-comments"></i>
           </div>
-          }
+          <h2>Apex Chat Workspace</h2>
+          <p>Select a channel from the sidebar or start a new conversation to get started.</p>
+          <button class="btn-welcome-action" (click)="openCreateModal()">
+            <i class="pi pi-plus"></i> Create Channel
+          </button>
         </div>
-        }
       </div>
-      
-      <button class="btn-send" 
-              (click)="sendMessage()" 
-              [disabled]="(attachments.length === 0) || isUploading">
-        @if (isUploading) {
-        <i class="pi pi-spinner pi-spin"></i>
-        } @else {
-        <i class="pi pi-send"></i>
-        }
-      </button>
-    </div>
-    } @else {
-    
-    <div class="welcome">
-      <div class="welcome-content">
-        <i class="pi pi-comments"></i>
-        <h2>Welcome to Chat</h2>
-        <p>Select a channel or create one to start chatting</p>
-        <button (click)="openCreateModal()" class="btn-create-channel">
-          <i class="pi pi-plus"></i> Create Channel
-        </button>
-      </div>
-    </div>
     }
   </main>
 
-  
-  @if (showCreateModal) {
-  <div class="modal-overlay">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>Create Channel</h3>
-        <button (click)="closeCreateModal()" class="btn-close">
-          <i class="pi pi-times"></i>
-        </button>
-      </div>
-      
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Channel Name</label>
-          <div class="input-with-prefix">
-            <span class="prefix">#</span>
-            <input type="text" [(ngModel)]="newChannelName" placeholder="general" />
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label>Channel Type</label>
-          <div class="type-options">
-            <label class="type-option">
-              <input type="radio" name="type" [(ngModel)]="channelType" value="public" />
-              <div class="option-content">
-                <i class="pi pi-hashtag"></i>
-                <span>Public</span>
-              </div>
-            </label>
-            <label class="type-option">
-              <input type="radio" name="type" [(ngModel)]="channelType" value="private" />
-              <div class="option-content">
-                <i class="pi pi-lock"></i>
-                <span>Private</span>
-              </div>
-            </label>
-          </div>
-        </div>
-        
-        @if (channelType === 'private') {
-        <div class="form-group">
-          <label>Add Members</label>
-          <div class="members-selector">
-            @for (user of masterList.users(); track user._id) {
-            @if (user._id !== currentUserId()) {
-            <label class="member-option">
-              <input type="checkbox" 
-                     [checked]="selectedMembers.has(user._id)"
-                     (change)="toggleMemberSelection(user._id)" />
-              <div class="avatar">{{ user.name}}</div>
-              <span>{{ user.name }}</span>
-            </label>
-            }
-            }
-          </div>
-        </div>
-        }
-      </div>
-      
-      <div class="modal-footer">
-        <button (click)="closeCreateModal()" class="btn-cancel">Cancel</button>
-        <button (click)="submitCreateChannel()" 
-                [disabled]="!newChannelName.trim()"
-                class="btn-primary">
-          Create Channel
-        </button>
-      </div>
-    </div>
-  </div>
-  }
+  <app-chat-modals 
+    [showCreateModal]="showCreateModal" 
+    [showChannelSettings]="showChannelSettings"
+    [showAddMembersModal]="showAddMembersModal" 
+    [newChannelName]="newChannelName" 
+    [channelType]="channelType"
+    [selectedMembers]="selectedMembers" 
+    [newMembers]="newMembers" 
+    [activeChannelUsers]="activeChannelUsers()"
+    [currentUserId]="currentUserId()" 
+    [activeChannel]="activeChannel()" 
+    [onlineUsers]="onlineUsers()"
+    (closeCreateModal)="closeCreateModal()" 
+    (closeChannelSettings)="closeChannelSettings()"
+    (closeAddMembersModal)="closeAddMembersModal()" 
+    (submitCreateChannel)="submitCreateChannel()"
+    (submitAddMembers)="submitAddMembers()" 
+    (toggleMemberSelection)="toggleMemberSelection($event)">
+  </app-chat-modals>
 
-  @if (showChannelSettings) {
-  <div class="modal-overlay">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>Channel Settings</h3>
-        <button (click)="closeChannelSettings()" class="btn-close">
-          <i class="pi pi-times"></i>
-        </button>
-      </div>
-      
-      <div class="modal-body">
-        <div class="members-list">
-          <h4>Members</h4>
-          @for (userId of activeChannelUsers(); track userId) {
-          <div class="member">
-            <div class="avatar">{{ getInitials(userId) }}</div>
-            <span>{{ getUserName(userId) }}</span>
-            @if (isUserOnline(userId)) {
-            <span class="online-badge">Online</span>
-            }
-          </div>
-          }
-        </div>
-      </div>
-    </div>
-  </div>
-  }
-</div> -->
+</div>

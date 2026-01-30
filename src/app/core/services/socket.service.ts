@@ -597,8 +597,8 @@ export class SocketService implements OnDestroy {
   // ==========================================================================
   // 🌍 HTTP ACTIONS (Fallback/Complementary)
   // ==========================================================================
-
-  createChannelHttp(name: string, type: 'public' | 'private' | 'dm', members: string[] = []) {
+// 'public' | 'private' | 'dm'
+  createChannelHttp(name: string, type: any, members: string[] = []) {
     return this.http.post<Channel>(`${environment.apiUrl}/v1/chat/channels`, { name, type, members });
   }
 

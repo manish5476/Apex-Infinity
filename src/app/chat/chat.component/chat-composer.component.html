@@ -1,0 +1,127 @@
+<div class="composer-wrapper" 
+     (dragover)="onDragOver($event)" 
+     (dragleave)="onDragLeave($event)" 
+     (drop)="onDrop($event)">
+
+  @if (isDragging) {
+    <div class="drop-zone-overlay">
+      <div class="drop-content">
+        <i class="pi pi-cloud-upload"></i>
+        <span>Drop files here to attach</span>
+      </div>
+    </div>
+  }
+
+  @if (internalAttachments().length > 0) {
+    <div class="attachment-reel custom-scrollbar">
+      <div class="reel-header">
+        <span class="count-label">{{ internalAttachments().length }} Files</span>
+        <button class="btn-text-danger" (click)="clearAttachments()">Clear All</button>
+      </div>
+      
+      <div class="reel-items">
+        @for (file of internalAttachments(); track $index) {
+          <div class="attachment-card" [class.is-image]="isImageFile(file)">
+            
+            <button class="btn-remove-attachment" (click)="onRemoveAttachment($index)" pTooltip="Remove" tooltipPosition="top">
+              <i class="pi pi-times"></i>
+            </button>
+
+            @if (isImageFile(file)) {
+              <img [src]="getFilePreviewUrl(file)" class="img-preview" alt="preview" />
+              <div class="file-overlay">
+                 <span class="file-size">{{ formatFileSize(file.size) }}</span>
+              </div>
+            } @else {
+              <div class="doc-icon">
+                <i class="pi" [ngClass]="getFileTypeIcon(file)"></i>
+              </div>
+              <div class="doc-info">
+                <span class="file-name" [title]="file.name">{{ truncateFileName(file.name, 15) }}</span>
+                <span class="file-size">{{ formatFileSize(file.size) }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <div class="composer-bar" [class.recording-active]="isVoiceRecording">
+
+    <div class="actions-left">
+      <button class="btn-tool" (click)="openFilePicker()" [disabled]="isUploading || isVoiceRecording" pTooltip="Attach File">
+        <i class="pi pi-paperclip"></i>
+      </button>
+    </div>
+
+    <div class="input-area">
+      
+      @if (isVoiceRecording) {
+        <div class="recording-ui">
+          <div class="recording-indicator">
+            <span class="pulse-dot"></span>
+            <span class="timer">{{ formatDuration(recordingDuration) }}</span>
+          </div>
+          <div class="audio-wave">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <span class="recording-text">Listening...</span>
+          <button class="btn-cancel-rec" (click)="cancelVoiceRecording()">Cancel</button>
+        </div>
+      }
+
+      <textarea #messageInputRef
+        class="chat-textarea custom-scrollbar"
+        [class.hidden]="isVoiceRecording"
+        [(ngModel)]="internalMessage"
+        (input)="onUserInput()"
+        (keydown)="handleKeydown($event)"
+        [placeholder]="getPlaceholder()"
+        rows="1"
+        [disabled]="isUploading || isVoiceRecording">
+      </textarea>
+    </div>
+
+    <div class="actions-right">
+      
+      @if (!isVoiceRecording && internalMessage.length > 0) {
+        <div class="formatting-tools">
+          <button class="btn-fmt" (click)="insertFormat('**')" pTooltip="Bold"><i class="pi pi-bold"></i></button>
+          <button class="btn-fmt" (click)="insertFormat('*')" pTooltip="Italic"><i class="pi pi-italic"></i></button>
+          <button class="btn-fmt" (click)="insertFormat('`')" pTooltip="Code"><i class="pi pi-code"></i></button>
+        </div>
+      }
+
+      <button class="btn-tool emoji-btn" (click)="toggleEmojiPicker()" [disabled]="isVoiceRecording">
+        <i class="pi pi-face-smile"></i>
+      </button>
+
+      @if (internalMessage.trim() || internalAttachments().length > 0) {
+        <button class="btn-send" (click)="onSendMessage()" [disabled]="isButtonDisabled()">
+          @if (isUploading) {
+            <i class="pi pi-spinner pi-spin"></i>
+          } @else {
+            <i class="pi pi-send"></i>
+          }
+        </button>
+      } @else {
+        <button class="btn-mic" 
+          (mousedown)="startVoiceRecording()" 
+          (mouseup)="stopVoiceRecording()"
+          [class.active]="isVoiceRecording">
+          <i class="pi" [class.pi-microphone]="!isVoiceRecording" [class.pi-check]="isVoiceRecording"></i>
+        </button>
+      }
+    </div>
+
+  </div>
+  
+  @if (isUploading) {
+    <div class="upload-progress-bar">
+      <div class="bar-fill" [style.width.%]="uploadProgress"></div>
+    </div>
+  }
+</div>
+
+<input #fileInputRef type="file" (change)="onFileSelect($event)" hidden multiple />

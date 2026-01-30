@@ -1,130 +1,571 @@
 /* ==========================================================================
-   APEX CONSOLIDATED CHAT ENGINE
+   APEX CHAT ENGINE (Full Screen Layout)
    ========================================================================== */
+
+:host {
+  display: block;
+  height: 100vh; 
+  width: 100vw;
+  background: var(--bg-app); 
+  overflow: hidden; /* STOP the main page from scrolling */
+}
 
 .chat-system {
   display: flex;
-  height: 100vh;
-  width: 100vw;
+  height: 95%;
+  width: 95%;
+  padding: 50px; 
+  gap: 2; 
+  box-sizing: border-box; 
   background: var(--bg-app);
-  overflow: hidden;
   position: relative;
-  font-family: var(--font-body);
-
-  /* Mobile Logic */
+  
+  /* =========================================================
+     MOBILE LOGIC (FIXED & PRIORITIZED)
+     ========================================================= */
   &.mobile-view {
     flex-direction: column;
 
-    .sidebar {
-      position: absolute;
-      left: -100%;
+    /* 1. Force the Sidebar to Float Above Everything */
+    app-chat-sidebar {
+      position: fixed !important; /* Force fixed positioning */
       top: 0;
+      left: 0;
       bottom: 0;
-      z-index: var(--z-fixed);
-      height: 100%;
       width: 280px;
-      &.open { left: 0; box-shadow: var(--shadow-xl); }
-    }
+      height: 100vh !important;
+      
+      /* 2. Layering: Higher than everything else */
+      z-index: 10000 !important; 
+      
+      /* 3. Animation: Use Transform (Smoother than 'left') */
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      
+      /* 4. Reset desktop styles */
+      box-shadow: none;
+      border-radius: 0;
+      border: none;
 
-    .mobile-navigation-bar {
-      height: 60px;
-      display: flex;
-      align-items: center;
-      padding: 0 var(--spacing-lg);
-      background: var(--bg-surface);
-      border-bottom: 1px solid var(--border-subtle);
-      gap: var(--spacing-md);
-
-      .btn-sidebar-toggle {
-        background: none; border: none; font-size: 1.25rem; color: var(--text-secondary);
+      /* 5. Open State */
+      &.sidebar-open { 
+        transform: translateX(0) !important;
+        box-shadow: 5px 0 50px rgba(0,0,0,0.5) !important;
       }
-
-      .active-info h3 { font-size: var(--font-size-md); margin: 0; }
-      .online-indicator { font-size: var(--font-size-xs); color: #10b981; }
+    }
+    
+    /* 6. The Dark Backdrop Overlay */
+    /* We attach this to the chat-system when sidebar is open */
+    &.sidebar-open::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(3px);
+      z-index: 9999; /* Just below sidebar (10000) */
+      pointer-events: all; /* Blocks clicks on chat */
+    }
+    
+    /* 7. Reset Main Chat for Mobile */
+    .chat-main {
+      border-radius: 0;
+      border: none;
+      width: 100%;
+      height: 100%;
     }
   }
 }
 
-/* SIDEBAR REFINEMENT */
+/* --- SIDEBAR COMPONENT (Desktop Defaults) --- */
 app-chat-sidebar {
-  width: 280px;
+  width: 300px;
   flex-shrink: 0;
-  border-right: var(--ui-border-width) solid var(--border-subtle);
-  background: var(--bg-surface);
+  height: 100%; 
+  border-right: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
+  position: relative; /* Default for desktop */
+  z-index: 1;
 }
 
-/* MAIN CONTENT AREA */
+/* --- MAIN CONTENT AREA --- */
 .chat-main {
-  flex: 1;
+  flex: 1; 
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100%; 
   position: relative;
   background: var(--bg-surface);
+  overflow: hidden; 
 
-  /* Welcome Screen Engine */
+  /* HEADER */
+  app-chat-header {
+    flex-shrink: 0; 
+    width: 100%;
+    z-index: 10;
+  }
+
+  /* MESSAGES VIEWPORT */
+  app-chat-messages {
+    flex: 1; 
+    min-height: 0; /* Allows scroll */
+    width: 100%;
+  }
+
+  /* COMPOSER */
+  app-chat-composer {
+    flex-shrink: 0; 
+    width: 100%;
+    z-index: 10;
+  }
+
+  /* WELCOME SCREEN */
   .welcome-surface {
     flex: 1; display: grid; place-items: center;
-    background: radial-gradient(circle at top right, var(--color-primary-subtle), transparent);
+    background: radial-gradient(circle at top right, var(--bg-ternary), var(--bg-surface));
     
     .welcome-card {
-      text-align: center; max-width: 400px; padding: var(--spacing-5xl);
-      background: var(--bg-surface-glass); backdrop-filter: blur(10px);
-      border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-lg);
+      text-align: center; max-width: 400px; padding: var(--spacing-3xl);
+      background: var(--bg-surface); 
+      border-radius: var(--ui-border-radius-xl); 
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-xl);
       
-      .welcome-icon { font-size: 4rem; color: var(--color-primary); margin-bottom: var(--spacing-xl); }
-      h2 { font-family: var(--font-heading); font-weight: var(--font-weight-bold); }
-      p { color: var(--text-muted); margin-bottom: var(--spacing-3xl); }
+      .icon-circle {
+        width: 80px; height: 80px; background: var(--bg-ternary);
+        border-radius: 50%; display: grid; place-items: center; margin: 0 auto var(--spacing-xl);
+        i { font-size: 2.5rem; color: var(--accent-primary); }
+      }
+      
+      h2 { font-family: var(--font-heading); font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-md); }
+      p { color: var(--text-secondary); margin-bottom: var(--spacing-2xl); line-height: 1.6; }
       
       .btn-welcome-action {
-        background: var(--color-primary); color: white; border: none;
-        padding: var(--spacing-md) var(--spacing-3xl); border-radius: var(--ui-border-radius);
-        cursor: pointer; font-weight: bold; transition: var(--transition-base);
-        &:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        background: var(--accent-primary); color: white; border: none;
+        padding: 0.8rem 1.5rem; border-radius: var(--ui-border-radius);
+        cursor: pointer; font-weight: 600; font-size: 1rem;
+        transition: var(--transition-base);
+        display: inline-flex; align-items: center; gap: 8px;
+        &:hover { transform: translateY(-2px); background: var(--accent-hover); }
       }
     }
   }
 }
 
-/* CHILD COMPONENT ALIGNMENT (FORCE COMPACTNESS) */
-app-chat-header { width: 100%; flex-shrink: 0; }
-app-chat-messages { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
-app-chat-composer { width: 100%; flex-shrink: 0; }
-
-/* SHARED MESSAGE BUBBLE LOGIC (Globally accessible to app-chat-messages) */
-.message-bubble-group {
-  display: flex; flex-direction: column;
-  .bubble {
-    max-width: 80%; padding: var(--spacing-md) var(--spacing-lg);
-    border-radius: var(--ui-border-radius-lg); font-size: var(--font-size-base);
-    box-shadow: var(--shadow-xs); transition: var(--transition-fast);
+/* Mobile Nav Bar */
+.mobile-navigation-bar {
+  height: 60px; flex-shrink: 0;
+  display: flex; align-items: center; padding: 0 var(--spacing-lg);
+  background: var(--bg-surface); border-bottom: 1px solid var(--border-subtle);
+  gap: var(--spacing-md);
+  
+  .btn-sidebar-toggle {
+    background: none; border: none; font-size: 1.25rem; color: var(--text-primary); cursor: pointer;
+  }
+  .active-info {
+    h3 { font-size: 1rem; margin: 0; font-weight: 600; color: var(--text-primary); }
+    .online-indicator { font-size: 0.75rem; color: #10b981; }
   }
 }
-/* chat.component.scss */
+// /* ==========================================================================
+//    APEX CHAT ENGINE (Layout & Shell)
+//    ========================================================================== */
 
-.chat-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  height: 100vh; /* 🟢 Force main container to exactly viewport height */
-  overflow: hidden; /* 🟢 Prevent the whole page from scrolling */
-  background: var(--bg-surface);
+// :host {
+//   display: block;
+//   /* Ensure host takes full viewport */
+//   height: 100vh; 
+//   width: 100vw;
+//   background: var(--bg-app); /* Outer background */
+//   overflow: hidden;
+// }
 
-  app-chat-header {
-    flex-shrink: 0; /* 🟢 Header stays at its natural height */
-    height: 64px;
-  }
+// .chat-system {
+//   display: flex;
+//   height: 100%;
+//   width: 100%;
+//   /* PADDING STRATEGY: Creates the 'floating' effect inside the window */
+//   padding: var(--spacing-md); 
+//   gap: var(--spacing-md);
+//   box-sizing: border-box; 
+//   background: var(--bg-app);
+  
+//   /* Mobile Logic */
+//   &.mobile-view {
+//     padding: 0; /* Full screen on mobile */
+//     gap: 0;
+//     flex-direction: column;
 
-  app-chat-messages {
-    flex: 1; /* 🟢 THIS IS THE KEY: Takes all REMAINING space only */
-    min-height: 0; /* 🟢 Crucial for flex containers to allow shrinking */
-    overflow-y: auto; /* 🟢 Scroll happens ONLY inside here */
-  }
+//     app-chat-sidebar {
+//       position: absolute; left: -100%; top: 0; bottom: 0; z-index: 100;
+//       width: 280px; transition: left 0.3s ease;
+//       &.sidebar-open { left: 0; box-shadow: var(--shadow-2xl); }
+//     }
+//   }
+// }
 
-  app-chat-composer {
-    flex-shrink: 0; /* 🟢 Composer stays at the bottom */
-    background: var(--bg-surface);
-    border-top: var(--ui-border-width) solid var(--border-subtle);
-    padding-bottom: env(safe-area-inset-bottom); /* Fix for mobile notches */
-  }
-}
+// /* --- SIDEBAR COMPONENT --- */
+// app-chat-sidebar {
+//   width: 280px;
+//   flex-shrink: 0;
+//   border-radius: var(--ui-border-radius-xl);
+//   overflow: hidden; /* Rounds the corners of the sidebar content */
+//   box-shadow: var(--shadow-sm);
+//   /* The component itself handles its internal background */
+// }
+
+// /* --- MAIN CONTENT AREA --- */
+// .chat-main {
+//   flex: 1;
+//   display: flex;
+//   flex-direction: column;
+//   height: 100%;
+//   position: relative;
+//   background: var(--bg-surface);
+//   border-radius: var(--ui-border-radius-xl);
+//   box-shadow: var(--shadow-md);
+//   overflow: hidden; /* Ensures messages don't bleed out of rounded corners */
+//   border: 1px solid var(--border-primary);
+
+//   /* HEADER */
+//   app-chat-header {
+//     flex-shrink: 0; /* Stays fixed at top */
+//     width: 100%;
+//   }
+
+//   /* MESSAGES VIEWPORT */
+//   app-chat-messages {
+//     flex: 1; /* Takes all available space */
+//     min-height: 0; /* Critical for scrolling */
+//     width: 100%;
+//     /* Scroll happens INSIDE this component */
+//   }
+
+//   /* COMPOSER */
+//   app-chat-composer {
+//     flex-shrink: 0; /* Stays fixed at bottom */
+//     width: 100%;
+//   }
+
+//   /* WELCOME SCREEN */
+//   .welcome-surface {
+//     flex: 1; display: grid; place-items: center;
+//     background: radial-gradient(circle at top right, var(--bg-ternary), var(--bg-surface));
+    
+//     .welcome-card {
+//       text-align: center; max-width: 400px; padding: var(--spacing-3xl);
+      
+//       .icon-circle {
+//         width: 80px; height: 80px; background: var(--bg-ternary);
+//         border-radius: 50%; display: grid; place-items: center; margin: 0 auto var(--spacing-xl);
+//         i { font-size: 2.5rem; color: var(--accent-primary); }
+//       }
+      
+//       h2 { font-family: var(--font-heading); font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-md); }
+//       p { color: var(--text-secondary); margin-bottom: var(--spacing-2xl); line-height: 1.6; }
+      
+//       .btn-welcome-action {
+//         background: var(--accent-primary); color: white; border: none;
+//         padding: 0.8rem 1.5rem; border-radius: var(--ui-border-radius);
+//         cursor: pointer; font-weight: 600; font-size: 1rem;
+//         box-shadow: var(--shadow-lg); transition: var(--transition-base);
+//         display: inline-flex; align-items: center; gap: 8px;
+        
+//         &:hover { transform: translateY(-2px); box-shadow: var(--shadow-xl); background: var(--accent-hover); }
+//       }
+//     }
+//   }
+// }
+
+// /* Mobile Nav Bar (Only visible in mobile view) */
+// .mobile-navigation-bar {
+//   height: 60px; flex-shrink: 0;
+//   display: flex; align-items: center; padding: 0 var(--spacing-lg);
+//   background: var(--bg-surface); border-bottom: 1px solid var(--border-subtle);
+//   gap: var(--spacing-md);
+  
+//   .btn-sidebar-toggle {
+//     background: none; border: none; font-size: 1.25rem; color: var(--text-primary); cursor: pointer;
+//   }
+//   .active-info h3 { font-size: 1rem; margin: 0; font-weight: 600; }
+// }
+
+// /* ==========================================================================
+//    APEX CHAT ENGINE (Layout & Shell)
+//    ========================================================================== */
+
+// :host {
+//   display: block;
+//   /* CRITICAL: Force the component to fit exactly the viewport height */
+//   height: 100vh; 
+//   width: 100vw;
+//   background: var(--bg-app); /* The background color behind the floating cards */
+//   overflow: hidden; /* STOP the main page from scrolling */
+// }
+
+// .chat-system {
+//   display: flex;
+//   height: 90%;
+//   width: 99%;
+  
+//   /* --- UPGRADED PADDING & GAP --- */
+//   /* This creates the large "frame" around your app */
+//   padding: 3rem; 
+//   gap: 1.5rem; 
+  
+//   box-sizing: border-box; 
+//   background: var(--bg-app);
+  
+//   /* Mobile Logic: Remove padding on small screens to use full space */
+//   &.mobile-view {
+//     padding: 0; 
+//     gap: 0;
+//     flex-direction: column;
+
+//     app-chat-sidebar {
+//       position: absolute; left: -100%; top: 0; bottom: 0; z-index: 100;
+//       width: 280px; transition: left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+//       border-radius: 0; /* No corners on mobile sidebar */
+      
+//       &.sidebar-open { 
+//         left: 0; 
+//         box-shadow: 0 0 100px rgba(0,0,0,0.5); /* Deep shadow overlay effect */
+//       }
+//     }
+    
+//     /* On mobile, main chat needs zero border radius */
+//     .chat-main {
+//       border-radius: 0;
+//       border: none;
+//     }
+//   }
+// }
+
+// /* --- SIDEBAR COMPONENT --- */
+// app-chat-sidebar {
+//   width: 300px; /* Slightly wider for better breathing room */
+//   flex-shrink: 0;
+//   height: 100%; /* Fill the vertical space defined by .chat-system padding */
+  
+//   /* Visuals */
+//   border-radius: var(--ui-border-radius-xl);
+//   overflow: hidden; /* Clips content to rounded corners */
+//   box-shadow: var(--shadow-lg);
+//   border: 1px solid var(--border-primary);
+//   background: var(--bg-secondary);
+// }
+
+// /* --- MAIN CONTENT AREA --- */
+// .chat-main {
+//   flex: 1; /* Take remaining width */
+//   display: flex;
+//   flex-direction: column;
+//   height: 100%; /* Fill vertical space */
+//   position: relative;
+  
+//   /* Visuals */
+//   background: var(--bg-surface);
+//   border-radius: var(--ui-border-radius-xl);
+//   box-shadow: var(--shadow-lg);
+//   overflow: hidden; /* Keeps header/footer inside the rounded corners */
+//   border: 1px solid var(--border-primary);
+
+//   /* HEADER (Fixed Height) */
+//   app-chat-header {
+//     flex-shrink: 0; 
+//     width: 100%;
+//     z-index: 10;
+//   }
+
+//   /* MESSAGES VIEWPORT (The only thing that grows) */
+//   app-chat-messages {
+//     flex: 1; 
+//     min-height: 0; /* CRITICAL: Allows flex container to shrink & scroll */
+//     width: 100%;
+//     /* Scroll happens INSIDE this component */
+//   }
+
+//   /* COMPOSER (Fixed Height) */
+//   app-chat-composer {
+//     flex-shrink: 0; 
+//     width: 100%;
+//     z-index: 10;
+//   }
+
+//   /* WELCOME SCREEN */
+//   .welcome-surface {
+//     flex: 1; display: grid; place-items: center;
+//     background: radial-gradient(circle at top right, var(--bg-ternary), var(--bg-surface));
+    
+//     .welcome-card {
+//       text-align: center; max-width: 400px; padding: var(--spacing-3xl);
+//       background: rgba(255,255,255,0.03); border-radius: 24px; border: 1px solid var(--border-subtle);
+      
+//       .icon-circle {
+//         width: 80px; height: 80px; background: var(--bg-ternary);
+//         border-radius: 50%; display: grid; place-items: center; margin: 0 auto var(--spacing-xl);
+//         box-shadow: var(--shadow-md);
+//         i { font-size: 2.5rem; color: var(--accent-primary); }
+//       }
+      
+//       h2 { font-family: var(--font-heading); font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-md); }
+//       p { color: var(--text-secondary); margin-bottom: var(--spacing-2xl); line-height: 1.6; }
+      
+//       .btn-welcome-action {
+//         background: var(--accent-primary); color: white; border: none;
+//         padding: 0.8rem 1.5rem; border-radius: var(--ui-border-radius);
+//         cursor: pointer; font-weight: 600; font-size: 1rem;
+//         box-shadow: var(--shadow-lg); transition: var(--transition-base);
+//         display: inline-flex; align-items: center; gap: 8px;
+        
+//         &:hover { transform: translateY(-2px); box-shadow: var(--shadow-xl); background: var(--accent-hover); }
+//       }
+//     }
+//   }
+// }
+
+// /* Mobile Nav Bar (Only visible in mobile view) */
+// .mobile-navigation-bar {
+//   height: 100px; flex-shrink: 0;
+//   display: flex; align-items: center; padding: 0 var(--spacing-lg);
+//   background: var(--bg-surface); border-bottom: 1px solid var(--border-subtle);
+//   gap: var(--spacing-md);
+  
+//   .btn-sidebar-toggle {
+//     background: none; border: none; font-size: 1.25rem; color: var(--text-primary); cursor: pointer;
+//   }
+//   .active-info {
+//     h3 { font-size: 1rem; margin: 0; font-weight: 600; color: var(--text-primary); }
+//     .online-indicator { font-size: 0.75rem; color: #10b981; }
+//   }
+// }
+
+// // /* ==========================================================================
+// //    APEX CONSOLIDATED CHAT ENGINE
+// //    ========================================================================== */
+
+// // .chat-system {
+// //   display: flex;
+// //   height: 100vh;
+// //   width: 100vw;
+// //   background: var(--bg-app);
+// //   overflow: hidden;
+// //   position: relative;
+// //   font-family: var(--font-body);
+
+// //   /* Mobile Logic */
+// //   &.mobile-view {
+// //     flex-direction: column;
+
+// //     .sidebar {
+// //       position: absolute;
+// //       left: -100%;
+// //       top: 0;
+// //       bottom: 0;
+// //       z-index: var(--z-fixed);
+// //       height: 100%;
+// //       width: 280px;
+// //       &.open { left: 0; box-shadow: var(--shadow-xl); }
+// //     }
+
+// //     .mobile-navigation-bar {
+// //       height: 60px;
+// //       display: flex;
+// //       align-items: center;
+// //       padding: 0 var(--spacing-lg);
+// //       background: var(--bg-surface);
+// //       border-bottom: 1px solid var(--border-subtle);
+// //       gap: var(--spacing-md);
+
+// //       .btn-sidebar-toggle {
+// //         background: none; border: none; font-size: 1.25rem; color: var(--text-secondary);
+// //       }
+
+// //       .active-info h3 { font-size: var(--font-size-md); margin: 0; }
+// //       .online-indicator { font-size: var(--font-size-xs); color: #10b981; }
+// //     }
+// //   }
+// // }
+
+// // /* SIDEBAR REFINEMENT */
+// // app-chat-sidebar {
+// //   width: 280px;
+// //   flex-shrink: 0;
+// //   border-right: var(--ui-border-width) solid var(--border-subtle);
+// //   background: var(--bg-surface);
+// // }
+
+// // /* MAIN CONTENT AREA */
+// // .chat-main {
+// //   flex: 1;
+// //   display: flex;
+// //   flex-direction: column;
+// //   height: 100%;
+// //   position: relative;
+// //   background: var(--bg-surface);
+
+// //   /* Welcome Screen Engine */
+// //   .welcome-surface {
+// //     flex: 1; display: grid; place-items: center;
+// //     background: radial-gradient(circle at top right, var(--color-primary-subtle), transparent);
+    
+// //     .welcome-card {
+// //       text-align: center; max-width: 400px; padding: var(--spacing-5xl);
+// //       background: var(--bg-surface-glass); backdrop-filter: blur(10px);
+// //       border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-lg);
+      
+// //       .welcome-icon { font-size: 4rem; color: var(--color-primary); margin-bottom: var(--spacing-xl); }
+// //       h2 { font-family: var(--font-heading); font-weight: var(--font-weight-bold); }
+// //       p { color: var(--text-muted); margin-bottom: var(--spacing-3xl); }
+      
+// //       .btn-welcome-action {
+// //         background: var(--color-primary); color: white; border: none;
+// //         padding: var(--spacing-md) var(--spacing-3xl); border-radius: var(--ui-border-radius);
+// //         cursor: pointer; font-weight: bold; transition: var(--transition-base);
+// //         &:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+// //       }
+// //     }
+// //   }
+// // }
+
+// // /* CHILD COMPONENT ALIGNMENT (FORCE COMPACTNESS) */
+// // app-chat-header { width: 100%; flex-shrink: 0; }
+// // app-chat-messages { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+// // app-chat-composer { width: 100%; flex-shrink: 0; }
+
+// // /* SHARED MESSAGE BUBBLE LOGIC (Globally accessible to app-chat-messages) */
+// // .message-bubble-group {
+// //   display: flex; flex-direction: column;
+// //   .bubble {
+// //     max-width: 80%; padding: var(--spacing-md) var(--spacing-lg);
+// //     border-radius: var(--ui-border-radius-lg); font-size: var(--font-size-base);
+// //     box-shadow: var(--shadow-xs); transition: var(--transition-fast);
+// //   }
+// // }
+// // /* chat.component.scss */
+
+// // .chat-main {
+// //   flex: 1;
+// //   display: flex;
+// //   flex-direction: column;
+// //   height: 100vh; /* 🟢 Force main container to exactly viewport height */
+// //   overflow: hidden; /* 🟢 Prevent the whole page from scrolling */
+// //   background: var(--bg-surface);
+
+// //   app-chat-header {
+// //     flex-shrink: 0; /* 🟢 Header stays at its natural height */
+// //     height: 64px;
+// //   }
+
+// //   app-chat-messages {
+// //     flex: 1; /* 🟢 THIS IS THE KEY: Takes all REMAINING space only */
+// //     min-height: 0; /* 🟢 Crucial for flex containers to allow shrinking */
+// //     overflow-y: auto; /* 🟢 Scroll happens ONLY inside here */
+// //   }
+
+// //   app-chat-composer {
+// //     flex-shrink: 0; /* 🟢 Composer stays at the bottom */
+// //     background: var(--bg-surface);
+// //     border-top: var(--ui-border-width) solid var(--border-subtle);
+// //     padding-bottom: env(safe-area-inset-bottom); /* Fix for mobile notches */
+// //   }
+// // }
