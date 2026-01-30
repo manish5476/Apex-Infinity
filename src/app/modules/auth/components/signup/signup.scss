@@ -273,3 +273,51 @@ $error-color: #f87171;
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+/* =========================================
+   PRIME NG OVERRIDES & GLASS INPUTS
+   ========================================= */
+
+/* 1. Force the Password Component Wrapper to be full width */
+::ng-deep .p-password {
+  width: 100%;
+  display: block; /* Ensures it takes up space */
+}
+
+/* 2. Target both standard Inputs and Password Inputs */
+::ng-deep {
+  /* Target the class you applied explicitly */
+  .glass-input-field,
+  /* Target the internal input of the password component specifically */
+  p-password.w-full .p-password-input { 
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+    border-radius: 12px !important;
+    /* Padding: Top Right Bottom Left (Left is 44px to make room for your icon) */
+    padding: 12px 12px 12px 44px !important; 
+    font-size: 0.95rem !important;
+    height: 48px !important;
+    width: 100% !important;
+    transition: all 0.2s ease !important;
+    
+    /* Remove default outline */
+    outline: none !important;
+    box-shadow: none !important;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    &:enabled:hover {
+      background: rgba(255, 255, 255, 0.08) !important;
+      border-color: rgba(255, 255, 255, 0.25) !important;
+    }
+
+    &:enabled:focus {
+      background: rgba(255, 255, 255, 0.1) !important;
+      border-color: #818cf8 !important; /* Your accent color */
+      box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.25) !important;
+    }
+  }
+}

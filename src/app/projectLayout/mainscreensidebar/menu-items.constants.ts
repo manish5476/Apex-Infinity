@@ -161,7 +161,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
       { label: 'Branches', icon: 'pi pi-map-marker', routerLink: ['/branches'] },
       { label: 'Roles & Permissions', icon: 'pi pi-lock', routerLink: ['/admin/roles'] },
       { label: 'Master Data', icon: 'pi pi-database', routerLink: ['/masterList'] },
-      { label: 'System Logs', icon: 'pi pi-exclamation-circle', routerLink: ['/logs'] },
+      // { label: 'System Logs', icon: 'pi pi-exclamation-circle', routerLink: ['/logs'] },
       { label: 'Active Sessions', icon: 'pi pi-wifi', routerLink: ['/sessions'] },
     ]
   },

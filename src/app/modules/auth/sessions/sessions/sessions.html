@@ -113,8 +113,9 @@
   </div>
 
   <div class="dialog-footer">
-    <button pButton label="Close" class="p-button-text p-button-secondary" (click)="displayDialog = false"></button>
-    <div class="right-actions">
+    <div class="right-actions flex">
+      <button pButton label="Close" class="p-button-text p-button-secondary" (click)="displayDialog = false"></button>
+
       <button pButton label="Delete" icon="pi pi-trash" class="p-button-outlined p-button-danger"
         [loading]="isDeleting()" (click)="deleteSession()"></button>
       @if (selectedSession.isValid) {

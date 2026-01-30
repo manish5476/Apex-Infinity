@@ -100,50 +100,8 @@
   --state-loading-opacity: 0.7;
   --state-readonly-opacity: 0.6;
 
-  /* ==========================================================================
-     5. COLOR SYSTEM (Added to replace hardcoded hex codes)
-     ========================================================================== */
-  /* Brand Colors (Blue) */
-  --color-primary: #3b82f6;
-  --color-primary-hover: #2563eb;
-  --color-primary-active: #1d4ed8;
-  --color-primary-subtle: #eff6ff;
-  --color-primary-border: #dbeafe;
-  --color-on-primary: #ffffff;
-
-  /* Neutral / Grays */
-  --color-gray-50: #f9fafb;
-  --color-gray-100: #f3f4f6;
-  --color-gray-200: #e5e7eb;
-  --color-gray-300: #d1d5db;
-  --color-gray-400: #9ca3af;
-  --color-gray-500: #6b7280;
-  --color-gray-600: #4b5563;
-  --color-gray-700: #374151;
-  --color-gray-800: #1f2937;
-  --color-gray-900: #111827;
-
-  /* Semantic / Functional */
-  --color-danger-bg: #fee2e2;
-  --color-danger-text: #991b1b;
   
-  /* Backgrounds */
-  --bg-app: var(--color-gray-100);
-  --bg-surface: #ffffff;
-  --bg-surface-glass: rgba(255, 255, 255, 0.8); /* For backdrop filters */
-  
-  /* Borders */
-  --border-subtle: var(--color-gray-200);
-  --border-glass: rgba(255, 255, 255, 0.5);
-
-  /* Text */
-  --text-primary: var(--color-gray-900);
-  --text-secondary: var(--color-gray-600);
-  --text-muted: var(--color-gray-500);
-  --text-placeholder: var(--color-gray-400);
-  --text-inverse: #ffffff;
 }
-
 /* =========================================
    MIXIN: CANONICAL MAPPING
    ========================================= */
@@ -243,6 +201,53 @@
   --scroll-thumb: var(--scroll-thumb-c);
   --scroll-track: var(--scroll-track-c);
 }
+
+
+
+
+///* ==========================================================================
+  //    5. COLOR SYSTEM (Added to replace hardcoded hex codes)
+  //    ========================================================================== */
+  // /* Brand Colors (Blue) */
+  // --color-primary: #3b82f6;
+  // --color-primary-hover: #2563eb;
+  // --color-primary-active: #1d4ed8;
+  // --color-primary-subtle: #eff6ff;
+  // --color-primary-border: #dbeafe;
+  // --color-on-primary: #ffffff;
+
+  // /* Neutral / Grays */
+  // --color-gray-50: #f9fafb;
+  // --color-gray-100: #f3f4f6;
+  // --color-gray-200: #e5e7eb;
+  // --color-gray-300: #d1d5db;
+  // --color-gray-400: #9ca3af;
+  // --color-gray-500: #6b7280;
+  // --color-gray-600: #4b5563;
+  // --color-gray-700: #374151;
+  // --color-gray-800: #1f2937;
+  // --color-gray-900: #111827;
+
+  // /* Semantic / Functional */
+  // --color-danger-bg: #fee2e2;
+  // --color-danger-text: #991b1b;
+  
+  // /* Backgrounds */
+  // --bg-app: var(--color-gray-100);
+  // --bg-surface: #ffffff;
+  // --bg-surface-glass: rgba(255, 255, 255, 0.8); /* For backdrop filters */
+  
+  // /* Borders */
+  // --border-subtle: var(--color-gray-200);
+  // --border-glass: rgba(255, 255, 255, 0.5);
+
+  // /* Text */
+  // --text-primary: var(--color-gray-900);
+  // --text-secondary: var(--color-gray-600);
+  // --text-muted: var(--color-gray-500);
+  // --text-placeholder: var(--color-gray-400);
+  // --text-inverse: #ffffff;
+
 
 /* =========================================
    THEME 1: LUMINOUS (Standard Professional Light)

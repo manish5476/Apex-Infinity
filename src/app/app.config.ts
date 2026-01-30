@@ -13,7 +13,7 @@ import { providePrimeNG } from 'primeng/config';
 import { MessageService } from 'primeng/api';
 
 // Import your custom preset
-import { MyPreset } from './core/config/my-preset';
+// import { MyPreset } from './core/config/my-preset';
 
 // Interceptors
 import { jwtInterceptor } from './core/interceptors/jwt.interceptor';
@@ -37,7 +37,7 @@ export const appConfig: ApplicationConfig = {
     providePrimeNG({ 
       ripple: true, 
       theme: { 
-        preset: MyPreset, 
+        // preset: MyPreset, 
         options: { 
           darkModeSelector: '.theme-dark', 
           cssLayer: {
