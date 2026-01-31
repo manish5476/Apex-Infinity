@@ -48,7 +48,7 @@
                <input type="date" [(ngModel)]="filters().endDate" (change)="applyFilters()">
             </div>
             
-            <p-select [(ngModel)]="filters().department" [options]="departments()" placeholder="Department"
+            <p-select appendTo="body" [(ngModel)]="filters().department" [options]="departments()" placeholder="Department"
                (onChange)="applyFilters()" styleClass="w-48 text-sm"></p-select>
             
             <p-button label="Reset" icon="pi pi-refresh" [text]="true" size="small" (onClick)="resetFilters()"></p-button>

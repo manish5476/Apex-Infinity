@@ -43,7 +43,7 @@
           
           <div class="form-group span-4">
             <label>Customer <span class="required">*</span></label>
-            <p-select appendTo="body" formControlName="customerId" [options]="customerOptions()" 
+            <p-select appendTo="body" appendTo="body" formControlName="customerId" [options]="customerOptions()" 
               optionLabel="name" optionValue="_id" [filter]="true" filterBy="name" 
               placeholder="Select Customer..." (onChange)="onCustomerSelect($event)" 
               styleClass="w-full theme-control">
@@ -63,7 +63,7 @@
 
           <div class="form-group span-2">
             <label>Branch</label>
-            <p-select appendTo="body" formControlName="branchId" [options]="branchOptions()" 
+            <p-select appendTo="body" appendTo="body" formControlName="branchId" [options]="branchOptions()" 
               optionLabel="name" optionValue="_id" styleClass="w-full theme-control" placeholder="Select Branch"></p-select>
           </div>
 
@@ -109,7 +109,7 @@
                 <td class="text-center index-col">{{ i + 1 }}</td>
                 
                 <td>
-                  <p-select appendTo="body" formControlName="productId" [options]="productOptions()" 
+                  <p-select appendTo="body" appendTo="body" formControlName="productId" [options]="productOptions()" 
                     optionLabel="name" optionValue="_id" [filter]="true" filterBy="name" placeholder="Select Item"
                     (onChange)="onProductSelect($event, i)" styleClass="w-full table-input">
                   </p-select>
@@ -187,7 +187,7 @@
               <div class="input-row">
                 <p-inputNumber formControlName="paidAmount" mode="currency" currency="INR" locale="en-IN" 
                   placeholder="0.00" styleClass="w-full theme-control"></p-inputNumber>
-                <p-select appendTo="body" formControlName="paymentMethod" [options]="paymentMethodOptions" 
+                <p-select appendTo="body" appendTo="body" formControlName="paymentMethod" [options]="paymentMethodOptions" 
                   placeholder="Mode" styleClass="w-full theme-control"></p-select>
               </div>
             </div>
@@ -296,7 +296,7 @@
           
           <div class="form-group span-4">
             <label>Customer <span class="required">*</span></label>
-            <p-select appendTo="body" formControlName="customerId" [options]="customerOptions()" 
+            <p-select appendTo="body" appendTo="body" formControlName="customerId" [options]="customerOptions()" 
               optionLabel="name" optionValue="_id" [filter]="true" filterBy="name" 
               placeholder="Select Customer..." (onChange)="onCustomerSelect($event)" 
               styleClass="w-full theme-control">
@@ -316,7 +316,7 @@
 
           <div class="form-group span-2">
             <label>Branch</label>
-            <p-select appendTo="body" formControlName="branchId" [options]="branchOptions()" 
+            <p-select appendTo="body" appendTo="body" formControlName="branchId" [options]="branchOptions()" 
               optionLabel="name" optionValue="_id" styleClass="w-full theme-control" placeholder="Select Branch"></p-select>
           </div>
 
@@ -362,7 +362,7 @@
                 <td class="text-center index-col">{{ i + 1 }}</td>
                 
                 <td>
-                  <p-select appendTo="body" formControlName="productId" [options]="productOptions()" 
+                  <p-select appendTo="body" appendTo="body" formControlName="productId" [options]="productOptions()" 
                     optionLabel="name" optionValue="_id" [filter]="true" filterBy="name" placeholder="Select Item"
                     (onChange)="onProductSelect($event, i)" styleClass="w-full table-input">
                   </p-select>
@@ -440,7 +440,7 @@
               <div class="input-row">
                 <p-inputNumber formControlName="paidAmount" mode="currency" currency="INR" locale="en-IN" 
                   placeholder="0.00" styleClass="w-full theme-control"></p-inputNumber>
-                <p-select appendTo="body" formControlName="paymentMethod" [options]="paymentMethodOptions" 
+                <p-select appendTo="body" appendTo="body" formControlName="paymentMethod" [options]="paymentMethodOptions" 
                   placeholder="Mode" styleClass="w-full theme-control"></p-select>
               </div>
             </div>
@@ -551,7 +551,7 @@ Wrapper with Zoom Effect
         Customer Selection
         <div class="col-span-12 lg:col-span-3">
           <label>Customer <span class="text-red-500">*</span></label>
-          <p-select appendTo="body" formControlName="customerId" [options]="customerOptions()" optionLabel="name"
+          <p-select appendTo="body" appendTo="body" formControlName="customerId" [options]="customerOptions()" optionLabel="name"
             optionValue="_id" [filter]="true" filterBy="name" placeholder="Search Customer..."
             (onChange)="onCustomerSelect($event)" styleClass="w-full" >
             [virtualScroll]="true" 
@@ -582,12 +582,12 @@ Wrapper with Zoom Effect
           </div>
           <div>
             <label>Branch</label>
-            <p-select appendTo="body" formControlName="branchId" [options]="branchOptions()" optionLabel="name"
+            <p-select appendTo="body" appendTo="body" formControlName="branchId" [options]="branchOptions()" optionLabel="name"
               optionValue="_id" styleClass="w-full"></p-select>
           </div>
           <div>
             <label>GST Type</label>
-            <p-select appendTo="body" formControlName="gstType" [options]="gstTypeOptions"
+            <p-select appendTo="body" appendTo="body" formControlName="gstType" [options]="gstTypeOptions"
               styleClass="w-full"></p-select>
           </div>
         </div>
@@ -624,7 +624,7 @@ Wrapper with Zoom Effect
 
                 Product
                 <td>
-                  <p-select appendTo="body" formControlName="productId" [options]="productOptions()" optionLabel="name"
+                  <p-select appendTo="body" appendTo="body" formControlName="productId" [options]="productOptions()" optionLabel="name"
                     optionValue="_id" [filter]="true" filterBy="name" placeholder="Select Item"
                     (onChange)="onProductSelect($event, i)" styleClass="w-full border-0 bg-transparent p-0 shadow-none">
                   </p-select>
@@ -713,7 +713,7 @@ Wrapper with Zoom Effect
               <div class="flex gap-2">
                 <p-inputNumber formControlName="paidAmount" mode="currency" currency="INR" locale="en-IN"
                   placeholder="0.00" styleClass="w-full"></p-inputNumber>
-                <p-select appendTo="body" formControlName="paymentMethod" [options]="paymentMethodOptions"
+                <p-select appendTo="body" appendTo="body" formControlName="paymentMethod" [options]="paymentMethodOptions"
                   class="w-[180px]"></p-select>
               </div>
             </div>

@@ -130,7 +130,7 @@
 
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">Shift Type</label>
-        <p-select formControlName="type" [options]="shiftTypes" styleClass="w-full"></p-select>
+        <p-select appendTo="body" formControlName="type" [options]="shiftTypes" styleClass="w-full"></p-select>
       </div>
     </div>
 
@@ -230,7 +230,7 @@
       
       <div class="se-filter-field">
         <label>Shift Type</label>
-        <p-select 
+        <p-select appendTo="body" 
           [options]="typeOptions" 
           [(ngModel)]="filter.type" 
           optionLabel="label" optionValue="value"

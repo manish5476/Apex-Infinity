@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TooltipModule } from 'primeng/tooltip';
-import { TagModule } from 'primeng/tag'; // Correct module import
+import { TagModule } from 'primeng/tag'; 
 import { AdminAnalyticsService } from '../admin-analytics.service';
 
 @Component({

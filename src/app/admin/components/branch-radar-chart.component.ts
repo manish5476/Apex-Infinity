@@ -59,7 +59,7 @@ import { FilterField } from '../../modules/shared/components/universal-filter/fi
             </div>
 
             <div class="metrics-panel">
-               <div class="metrics-list">
+               <div class="metrics-list custom-scrollbar">
                  <h4 class="section-label">Metric Breakdown</h4>
                  
                  @for (label of chartData()?.labels; track label; let i = $index) {
@@ -207,6 +207,8 @@ import { FilterField } from '../../modules/shared/components/universal-filter/fi
       display: flex;
       flex-direction: column;
       gap: var(--spacing-sm);
+      max-height: 250px;
+      overflow-y: auto;
     }
 
     .metric-row {
@@ -268,6 +270,11 @@ import { FilterField } from '../../modules/shared/components/universal-filter/fi
     }
     .highlight { color: var(--text-primary); font-weight: bold; }
 
+    /* SCROLLBAR */
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: var(--bg-ternary); }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 4px; }
+
     /* LOADER */
     .loader-container {
       height: 400px;
@@ -319,9 +326,7 @@ export class BranchRadarChartComponent implements OnInit {
   onFilterUpdate(filters: any) {
     this.currentFilters = filters;
     
-    // Optional: Extract name for display if needed, 
-    // though usually handled by looking up ID in master list.
-    // For now we rely on the chart subtitle logic.
+    // Optional: Extract name for display if needed
     if (!filters.branchId) {
        this.currentBranchName = '';
     } else {
@@ -452,7 +457,6 @@ export class BranchRadarChartComponent implements OnInit {
     return `rgba(56, 189, 248, ${alpha})`; 
   }
 }
-
 // import { Component, OnInit, signal, effect } from '@angular/core';
 // import { CommonModule } from '@angular/common';
 // import { ChartModule } from 'primeng/chart';

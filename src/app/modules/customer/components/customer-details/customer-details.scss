@@ -4,8 +4,9 @@
 
 :host {
   display: block;
-  height: 100%;
+  height: 100%; /* Force full viewport height */
   width: 100%;
+  overflow: hidden; /* Stop whole page scrolling */
 }
 
 .page-container {
@@ -14,13 +15,14 @@
   background-color: var(--bg-primary);
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
   padding: var(--spacing-xl);
   gap: var(--spacing-xl);
+  overflow: hidden; /* Internal elements (grid) will scroll, not this container */
 
   @media (max-width: 768px) {
     padding: var(--spacing-md);
     gap: var(--spacing-lg);
+    overflow-y: auto; /* On mobile, let the page scroll normally */
   }
 }
 
@@ -28,18 +30,18 @@
 .dashboard-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--spacing-lg);
   flex-wrap: wrap;
+  flex-shrink: 0; /* Prevent header from shrinking */
 
   .header-left {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: var(--spacing-md);
     
     .back-btn {
       color: var(--text-secondary);
-      margin-top: 4px;
       &:hover { background: var(--bg-ternary); color: var(--text-primary); }
     }
 
@@ -95,12 +97,6 @@
   .header-actions {
     display: flex;
     gap: var(--spacing-sm);
-    
-    /* PrimeNG Button Overrides */
-    // ::ng-deep .p-button.btn-sm {
-    //   padding: var(--spacing-xs) var(--spacing-md);
-    //   font-size: var(--font-size-sm);
-    // }
   }
 }
 
@@ -110,9 +106,14 @@
   grid-template-columns: 320px 1fr; /* Fixed Sidebar + Fluid Main */
   gap: var(--spacing-xl);
   align-items: start;
+  flex: 1;       /* Take remaining height */
+  min-height: 0; /* CRITICAL: Allows grid to fit in remaining space */
 
   @media (max-width: 1024px) {
-    grid-template-columns: 1fr; /* Stack on Tablet/Mobile */
+    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Allow scroll on tablet/mobile */
   }
 }
 
@@ -123,8 +124,10 @@
   border-radius: var(--ui-border-radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
+  /* Sticky behavior */
   position: sticky;
-  top: 0;
+  top: 0; 
+  flex-shrink: 0;
 
   .card-banner {
     height: 100px;
@@ -145,22 +148,19 @@
       position: relative;
       margin-bottom: var(--spacing-md);
       
-      // /* PrimeNG Avatar Override */
-      // ::ng-deep .user-avatar {
-      //   background: var(--bg-ternary);
-      //   border: 4px solid var(--bg-secondary);
-      //   width: 100px;
-      //   height: 100px;
-      //   font-size: var(--font-size-2xl);
-      //   color: var(--text-secondary);
-      // }
+      .user-avatar {
+        background-color: var(--bg-ternary);
+        color: var(--text-primary);
+        font-weight: 700;
+        font-size: 2rem;
+        border: 4px solid var(--bg-secondary);
+        width: 100px !important; 
+        height: 100px !important;
+      }
 
       .edit-avatar-btn {
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        width: 32px;
-        height: 32px;
+        position: absolute; bottom: 0; right: 0;
+        width: 32px; height: 32px;
         border-radius: 50%;
         background: var(--bg-primary);
         border: 1px solid var(--border-secondary);
@@ -169,20 +169,15 @@
         display: flex; align-items: center; justify-content: center;
         box-shadow: var(--shadow-sm);
         transition: var(--transition-fast);
-        
-        &:hover { background: var(--component-bg-hover); color: var(--text-primary); }
+        &:hover { background: var(--bg-ternary); color: var(--text-primary); }
       }
 
       .status-dot {
-        position: absolute;
-        bottom: 8px;
-        left: 0;
-        width: 16px;
-        height: 16px;
+        position: absolute; bottom: 8px; left: 0;
+        width: 16px; height: 16px;
         background: var(--color-disabled);
         border: 3px solid var(--bg-secondary);
         border-radius: 50%;
-        
         &.active { background: var(--color-success); }
       }
     }
@@ -219,13 +214,13 @@
         text-align: left;
 
         .icon-box {
-          width: 36px;
-          height: 36px;
+          width: 36px; height: 36px;
           background: var(--bg-secondary);
           border-radius: 50%;
           display: flex; align-items: center; justify-content: center;
           color: var(--text-tertiary);
           border: 1px solid var(--border-secondary);
+          flex-shrink: 0;
         }
 
         .info-text {
@@ -247,6 +242,9 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xl);
+  flex: 1;       /* Take remaining width/height */
+  min-height: 0; /* CRITICAL */
+  height: 100%;
 }
 
 /* Metrics Grid */
@@ -254,6 +252,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: var(--spacing-lg);
+  flex-shrink: 0; /* Don't shrink metrics */
 
   .metric-card {
     background: var(--bg-secondary);
@@ -266,45 +265,42 @@
     min-height: 110px;
     box-shadow: var(--shadow-sm);
 
+    .metric-top-row {
+      display: flex; align-items: center; gap: var(--spacing-sm);
+      label { font-size: var(--font-size-xs); text-transform: uppercase; font-weight: 700; color: var(--text-tertiary); }
+    }
+
     .metric-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
+      width: 32px; height: 32px; border-radius: 8px;
       background: var(--bg-ternary);
       display: flex; align-items: center; justify-content: center;
       color: var(--text-secondary);
-      margin-bottom: var(--spacing-md);
     }
 
-    .metric-data {
-      display: flex; flex-direction: column;
-      gap: 4px;
-      
-      label { font-size: var(--font-size-xs); text-transform: uppercase; font-weight: 700; color: var(--text-tertiary); }
-      .value { font-family: var(--font-heading); font-size: var(--font-size-xl); font-weight: 700; color: var(--text-primary); }
+    .metric-data .value {
+      font-family: var(--font-heading); font-size: var(--font-size-xl); font-weight: 700; color: var(--text-primary);
     }
-
-    /* Colors */
-    &.outstanding { 
-      .metric-icon { background: rgba(239, 68, 68, 0.1); color: var(--color-error); }
-      .value { color: var(--color-error); }
-    }
+    
+    &.outstanding { .metric-icon { background: rgba(239, 68, 68, 0.1); color: var(--color-error); } .value { color: var(--color-error); } }
     &.invoiced { .metric-icon { background: rgba(59, 130, 246, 0.1); color: var(--color-info); } }
     &.received { .metric-icon { background: rgba(16, 185, 129, 0.1); color: var(--color-success); } }
   }
 }
 
-/* Activity Panel */
+/* === ACTIVITY PANEL (The Grid Holder) === */
 .activity-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;       /* Grow to fill remaining vertical space */
+  min-height: 0; /* CRITICAL: Prevents overflow */
+  
   background: var(--bg-secondary);
   border: 1px solid var(--border-primary);
   border-radius: var(--ui-border-radius-lg);
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  min-height: 500px; /* Ensure space for grid */
 
   .tabs-header {
+    flex-shrink: 0; /* Header stays fixed size */
     display: flex;
     border-bottom: 1px solid var(--border-primary);
     background: var(--bg-ternary);
@@ -312,298 +308,652 @@
     gap: var(--spacing-sm);
 
     .tab-btn {
-        background: var(--bg-secondary);
-      border: none;
-      padding: var(--spacing-md) var(--spacing-lg);
-      font-size: var(--font-size-sm);
-      font-weight: var(--font-weight-semibold);
-      color: var(--text-secondary);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      display: flex; align-items: center; gap: 6px;
-      transition: var(--transition-fast);
+        background: transparent; border: none; padding: 14px 16px;
+        font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); color: var(--text-secondary);
+        cursor: pointer; border-bottom: 3px solid transparent;
+        display: flex; align-items: center; gap: 8px;
+        transition: var(--transition-fast);
 
-      &:hover { color: var(--text-primary); }
-      
-      &.active {
-        color: var(--accent-primary);
-        border-bottom-color: var(--accent-primary);
-        background: var(--bg-secondary);
-      }
+        &:hover { color: var(--text-primary); }
+        &.active { color: var(--accent-primary); border-bottom-color: var(--accent-primary); background: var(--bg-secondary); }
     }
   }
 
+  /* Grid Container - The direct parent of the component */
   .grid-container {
-    flex: 1;
+    flex: 1;       /* Take all remaining space */
+    min-height: 0; /* CRITICAL for grid virtualization */
     background: var(--bg-primary);
-    padding: 0; /* Grid handles padding usually */
+    display: flex;
+    flex-direction: column;
+    position: relative; 
+    
+    /* Target the Angular component */
+    .full-size-grid {
+      width: 100%;
+      height: 100%; /* Force component height */
+      flex: 1;
+      display: flex; 
+      flex-direction: column;
+      
+      /* Force internal AG Grid elements to take height */
+      ::ng-deep ag-grid-angular {
+        width: 100%;
+        height: 100%;
+        flex: 1;
+      }
+    }
   }
 }
 
-/* === STATES (Loading / Error) === */
+/* === LOADING & ERROR STATES === */
 .loading-state, .error-state {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
-
 .error-state {
-  gap: var(--spacing-lg);
-  color: var(--text-secondary);
-  
-  .error-icon {
-    font-size: 3rem;
-    color: var(--color-error);
-    background: rgba(239, 68, 68, 0.1);
-    padding: var(--spacing-lg);
-    border-radius: 50%;
-  }
-  
+  gap: var(--spacing-lg); color: var(--text-secondary);
+  .error-icon { font-size: 3rem; color: var(--color-error); background: rgba(239, 68, 68, 0.1); padding: var(--spacing-lg); border-radius: 50%; }
   .actions { display: flex; gap: var(--spacing-md); }
 }
 
-/* Skeleton Structure */
-.loading-state {
-  align-items: stretch;
-  
-  .skeleton-header { margin-bottom: var(--spacing-xl); }
-  
-  .skeleton-sidebar { width: 320px; flex-shrink: 0; }
-  .skeleton-main { flex: 1; display: flex; flex-direction: column; gap: var(--spacing-lg); }
-  
-  .metrics-row {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-lg);
-  }
-}
+.animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+// /* =========================================================
+//    CUSTOMER DASHBOARD STYLES (Global Tokens)
+//    ========================================================= */
 
-/* Animations */
-.animate-fadeIn {
-  animation: fadeIn var(--transition-base) ease-out forwards;
-}
+// :host {
+//   display: block;
+//   height: 100%;
+//   width: 100%;
+// }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+// .page-container {
+//   height: 100%;
+//   width: 100%;
+//   background-color: var(--bg-primary);
+//   display: flex;
+//   flex-direction: column;
+//   overflow-y: auto;
+//   padding: var(--spacing-xl);
+//   gap: var(--spacing-xl);
 
-.activity-panel {
-  display: flex;
-  flex-direction: column;
-  min-height: 500px;   // IMPORTANT
-}
-.grid-container {
-  flex: 1;             // TAKE REMAINING SPACE
-  min-height: 300px;   // SAFETY
-}
+//   @media (max-width: 768px) {
+//     padding: var(--spacing-md);
+//     gap: var(--spacing-lg);
+//   }
+// }
 
-:host {
-  display: block;
-  height: 100%;
-}
+// /* === HEADER SECTION === */
+// .dashboard-header {
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: flex-start;
+//   gap: var(--spacing-lg);
+//   flex-wrap: wrap;
 
-:host {
-  display: block;
-  height: 100%;
-  width: 100%;
-}
-
-/* PAGE */
-.page-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
-  background: var(--bg-primary);
-  padding: var(--spacing-xl);
-  gap: var(--spacing-xl);
-  overflow: hidden; // IMPORTANT: no scrolling here
-}
-
-/* GRID LAYOUT */
-.layout-grid {
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: var(--spacing-xl);
-  flex: 1;
-  min-height: 0; // 🔑
-}
-
-@media (max-width: 1024px) {
-  .layout-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* SIDEBAR */
-.profile-card {
-  background: var(--bg-secondary);
-  border-radius: var(--ui-border-radius-lg);
-  border: 1px solid var(--border-primary);
-  position: sticky;
-  top: 0;
-  align-self: flex-start;
-}
-
-/* MAIN CONTENT */
-.main-content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xl);
-  flex: 1;
-  min-height: 0; // 🔑
-}
-
-/* METRICS */
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--spacing-lg);
-}
-
-/* ACTIVITY PANEL */
-.activity-panel {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0; // 🔑
-  background: var(--bg-secondary);
-  border-radius: var(--ui-border-radius-lg);
-  border: 1px solid var(--border-primary);
-  overflow: hidden;
-}
-
-/* TABS */
-.tabs-header {
-  display: flex;
-  background: var(--bg-ternary);
-  border-bottom: 1px solid var(--border-primary);
-}
-
-.tab-btn {
-  padding: var(--spacing-md) var(--spacing-lg);
-  border: none;
-    background: var(--bg-secondary);
-  cursor: pointer;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
-.tab-btn.active {
-  color: var(--accent-primary);
-  border-bottom: 2px solid var(--accent-primary);
-}
-
-/* GRID CONTAINER */
-.grid-container {
-  flex: 1;
-  min-height: 0; // 🔥 MOST IMPORTANT LINE
-  background: var(--bg-primary);
-}
-
-/* 1. Ensure the component itself takes full height */
-:host {
-  display: block;
-  height: 100vh; 
-  overflow: hidden; 
-}
-
-/* 2. The main wrapper must be a flex column that doesn't scroll itself */
-.page-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: var(--spacing-xl);
-  overflow: hidden; /* We want the GRID to scroll, not the whole page */
-}
-
-/* 3. The layout grid needs to take remaining space */
-.layout-grid {
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: var(--spacing-xl);
-  flex: 1;      /* Grow to fill space */
-  min-height: 0; /* Key fix: allows child to be smaller than content */
-}
-
-/* 4. The Main content and Activity Panel path */
-.main-content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 0; 
-}
-
-.activity-panel {
-  display: flex;
-  flex-direction: column;
-  flex: 1;       /* Take all space below metrics */
-  min-height: 0; /* CRITICAL for Ag-Grid inside Flex */
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-primary);
-}
-
-/* 5. The actual container for the grid */
-.grid-container {
-  flex: 1;       /* Take all space below tabs */
-  position: relative;
-  min-height: 400px; /* Fallback height */
-}
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--spacing-lg);
-
-  .metric-card {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-primary);
-    border-radius: var(--ui-border-radius-lg);
-    padding: var(--spacing-lg);
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-md);
-    box-shadow: var(--shadow-sm);
-
-    .metric-top-row {
-      display: flex;
-      align-items: center; /* Vertical alignment */
-      gap: var(--spacing-sm); /* Gap between icon and label */
-
-      label {
-        font-size: var(--font-size-xs);
-        text-transform: uppercase;
-        font-weight: 700;
-        color: var(--text-tertiary);
-        margin: 0;
-        letter-spacing: 0.5px;
-      }
-    }
-
-    .metric-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-      background: var(--bg-ternary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-secondary);
-      font-size: 14px;
-    }
-
-    .metric-data {
-      .value {
-        font-family: var(--font-heading);
-        font-size: var(--font-size-xl);
-        font-weight: 700;
-        color: var(--text-primary);
-      }
-    }
+//   .header-left {
+//     display: flex;
+//     align-items: flex-start;
+//     gap: var(--spacing-md);
     
-    /* Specific Colors */
-    &.outstanding .metric-icon { background: rgba(239, 68, 68, 0.1); color: #dc2626; }
-    &.invoiced .metric-icon { background: rgba(59, 130, 246, 0.1); color: #2563eb; }
-    &.received .metric-icon { background: rgba(16, 185, 129, 0.1); color: #059669; }
-    &.limit .metric-icon { background: var(--bg-ternary); color: var(--text-secondary); }
-  }
-}
+//     .back-btn {
+//       color: var(--text-secondary);
+//       margin-top: 4px;
+//       &:hover { background: var(--bg-ternary); color: var(--text-primary); }
+//     }
+
+//     .identity-group {
+//       display: flex;
+//       flex-direction: column;
+//       gap: 4px;
+
+//       .name-row {
+//         display: flex;
+//         align-items: center;
+//         gap: var(--spacing-md);
+        
+//         h1 {
+//           font-family: var(--font-heading);
+//           font-size: var(--font-size-2xl);
+//           font-weight: var(--font-weight-bold);
+//           color: var(--text-primary);
+//           margin: 0;
+//           line-height: 1.2;
+//         }
+//       }
+
+//       .meta-row {
+//         display: flex;
+//         align-items: center;
+//         gap: var(--spacing-md);
+        
+//         .id-badge {
+//           font-family: var(--font-mono);
+//           font-size: var(--font-size-xs);
+//           background: var(--bg-ternary);
+//           padding: 2px 8px;
+//           border-radius: var(--ui-border-radius-sm);
+//           color: var(--text-secondary);
+//           border: 1px solid var(--border-secondary);
+//         }
+
+//         .type-badge {
+//           font-size: 10px;
+//           font-weight: var(--font-weight-bold);
+//           text-transform: uppercase;
+//           letter-spacing: 0.05em;
+//           color: var(--text-tertiary);
+//           background: var(--bg-ternary);
+//           padding: 2px 6px;
+//           border-radius: 4px;
+//         }
+//       }
+//     }
+//   }
+
+//   .header-actions {
+//     display: flex;
+//     gap: var(--spacing-sm);
+    
+//     /* PrimeNG Button Overrides */
+//     // ::ng-deep .p-button.btn-sm {
+//     //   padding: var(--spacing-xs) var(--spacing-md);
+//     //   font-size: var(--font-size-sm);
+//     // }
+//   }
+// }
+
+// /* === LAYOUT GRID === */
+// .layout-grid {
+//   display: grid;
+//   grid-template-columns: 320px 1fr; /* Fixed Sidebar + Fluid Main */
+//   gap: var(--spacing-xl);
+//   align-items: start;
+
+//   @media (max-width: 1024px) {
+//     grid-template-columns: 1fr; /* Stack on Tablet/Mobile */
+//   }
+// }
+
+// /* === PROFILE CARD (SIDEBAR) === */
+// .profile-card {
+//   background: var(--bg-secondary);
+//   border: 1px solid var(--border-primary);
+//   border-radius: var(--ui-border-radius-lg);
+//   overflow: hidden;
+//   box-shadow: var(--shadow-sm);
+//   position: sticky;
+//   top: 0;
+
+//   .card-banner {
+//     height: 100px;
+//     background: linear-gradient(135deg, var(--bg-ternary), var(--bg-secondary));
+//     border-bottom: 1px solid var(--border-secondary);
+//   }
+
+//   .profile-content {
+//     padding: 0 var(--spacing-lg) var(--spacing-xl);
+//     margin-top: -50px;
+//     text-align: center;
+//     display: flex;
+//     flex-direction: column;
+//     align-items: center;
+
+//     /* Avatar Stack */
+//     .avatar-wrapper {
+//       position: relative;
+//       margin-bottom: var(--spacing-md);
+      
+//       .edit-avatar-btn {
+//         position: absolute;
+//         bottom: 0;
+//         right: 0;
+//         width: 32px;
+//         height: 32px;
+//         border-radius: 50%;
+//         background: var(--bg-primary);
+//         border: 1px solid var(--border-secondary);
+//         color: var(--text-secondary);
+//         cursor: pointer;
+//         display: flex; align-items: center; justify-content: center;
+//         box-shadow: var(--shadow-sm);
+//         transition: var(--transition-fast);
+        
+//         &:hover { background: var(--component-bg-hover); color: var(--text-primary); }
+//       }
+
+//       .status-dot {
+//         position: absolute;
+//         bottom: 8px;
+//         left: 0;
+//         width: 16px;
+//         height: 16px;
+//         background: var(--color-disabled);
+//         border: 3px solid var(--bg-secondary);
+//         border-radius: 50%;
+        
+//         &.active { background: var(--color-success); }
+//       }
+//     }
+
+//     .contact-name {
+//       margin: 0 0 4px 0;
+//       font-size: var(--font-size-lg);
+//       font-weight: var(--font-weight-bold);
+//       color: var(--text-primary);
+//     }
+
+//     .contact-email {
+//       font-size: var(--font-size-sm);
+//       color: var(--text-secondary);
+//       text-decoration: none;
+//       &:hover { color: var(--accent-primary); text-decoration: underline; }
+//     }
+
+//     /* Info List */
+//     .info-list {
+//       margin-top: var(--spacing-xl);
+//       width: 100%;
+//       display: flex;
+//       flex-direction: column;
+//       gap: var(--spacing-md);
+
+//       .info-item {
+//         display: flex;
+//         align-items: center;
+//         gap: var(--spacing-md);
+//         padding: var(--spacing-md);
+//         background: var(--bg-ternary);
+//         border-radius: var(--ui-border-radius);
+//         text-align: left;
+
+//         .icon-box {
+//           width: 36px;
+//           height: 36px;
+//           background: var(--bg-secondary);
+//           border-radius: 50%;
+//           display: flex; align-items: center; justify-content: center;
+//           color: var(--text-tertiary);
+//           border: 1px solid var(--border-secondary);
+//         }
+
+//         .info-text {
+//           display: flex; flex-direction: column;
+          
+//           label { font-size: 10px; text-transform: uppercase; font-weight: 700; color: var(--text-tertiary); }
+//           span, a { font-size: var(--font-size-sm); color: var(--text-primary); font-weight: var(--font-weight-medium); }
+          
+//           .mono-text { font-family: var(--font-mono); letter-spacing: 0.5px; }
+//           .sub-text { font-size: var(--font-size-xs); color: var(--text-secondary); margin-top: 2px; }
+//         }
+//       }
+//     }
+//   }
+// }
+
+// /* === MAIN CONTENT (RIGHT) === */
+// .main-content {
+//   display: flex;
+//   flex-direction: column;
+//   gap: var(--spacing-xl);
+// }
+
+// /* Metrics Grid */
+// .metrics-grid {
+//   display: grid;
+//   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+//   gap: var(--spacing-lg);
+
+//   .metric-card {
+//     background: var(--bg-secondary);
+//     border: 1px solid var(--border-primary);
+//     border-radius: var(--ui-border-radius-lg);
+//     padding: var(--spacing-lg);
+//     display: flex;
+//     flex-direction: column;
+//     justify-content: space-between;
+//     min-height: 110px;
+//     box-shadow: var(--shadow-sm);
+
+//     .metric-icon {
+//       width: 32px;
+//       height: 32px;
+//       border-radius: 8px;
+//       background: var(--bg-ternary);
+//       display: flex; align-items: center; justify-content: center;
+//       color: var(--text-secondary);
+//       margin-bottom: var(--spacing-md);
+//     }
+
+//     .metric-data {
+//       display: flex; flex-direction: column;
+//       gap: 4px;
+      
+//       label { font-size: var(--font-size-xs); text-transform: uppercase; font-weight: 700; color: var(--text-tertiary); }
+//       .value { font-family: var(--font-heading); font-size: var(--font-size-xl); font-weight: 700; color: var(--text-primary); }
+//     }
+
+//     /* Colors */
+//     &.outstanding { 
+//       .metric-icon { background: rgba(239, 68, 68, 0.1); color: var(--color-error); }
+//       .value { color: var(--color-error); }
+//     }
+//     &.invoiced { .metric-icon { background: rgba(59, 130, 246, 0.1); color: var(--color-info); } }
+//     &.received { .metric-icon { background: rgba(16, 185, 129, 0.1); color: var(--color-success); } }
+//   }
+// }
+
+// /* Activity Panel */
+// .activity-panel {
+//   background: var(--bg-secondary);
+//   border: 1px solid var(--border-primary);
+//   border-radius: var(--ui-border-radius-lg);
+//   overflow: hidden;
+//   display: flex;
+//   flex-direction: column;
+//   min-height: 500px; /* Ensure space for grid */
+
+//   .tabs-header {
+//     display: flex;
+//     border-bottom: 1px solid var(--border-primary);
+//     background: var(--bg-ternary);
+//     padding: 0 var(--spacing-md);
+//     gap: var(--spacing-sm);
+
+//     .tab-btn {
+//         background: var(--bg-secondary);
+//       border: none;
+//       padding: var(--spacing-md) var(--spacing-lg);
+//       font-size: var(--font-size-sm);
+//       font-weight: var(--font-weight-semibold);
+//       color: var(--text-secondary);
+//       cursor: pointer;
+//       border-bottom: 2px solid transparent;
+//       display: flex; align-items: center; gap: 6px;
+//       transition: var(--transition-fast);
+
+//       &:hover { color: var(--text-primary); }
+      
+//       &.active {
+//         color: var(--accent-primary);
+//         border-bottom-color: var(--accent-primary);
+//         background: var(--bg-secondary);
+//       }
+//     }
+//   }
+
+//   .grid-container {
+//     flex: 1;
+//     background: var(--bg-primary);
+//     padding: 0; /* Grid handles padding usually */
+//   }
+// }
+
+// /* === STATES (Loading / Error) === */
+// .loading-state, .error-state {
+//   height: 100%;
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   justify-content: center;
+// }
+
+// .error-state {
+//   gap: var(--spacing-lg);
+//   color: var(--text-secondary);
+  
+//   .error-icon {
+//     font-size: 3rem;
+//     color: var(--color-error);
+//     background: rgba(239, 68, 68, 0.1);
+//     padding: var(--spacing-lg);
+//     border-radius: 50%;
+//   }
+  
+//   .actions { display: flex; gap: var(--spacing-md); }
+// }
+
+// /* Skeleton Structure */
+// .loading-state {
+//   align-items: stretch;
+  
+//   .skeleton-header { margin-bottom: var(--spacing-xl); }
+  
+//   .skeleton-sidebar { width: 320px; flex-shrink: 0; }
+//   .skeleton-main { flex: 1; display: flex; flex-direction: column; gap: var(--spacing-lg); }
+  
+//   .metrics-row {
+//     display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-lg);
+//   }
+// }
+
+// /* Animations */
+// .animate-fadeIn {
+//   animation: fadeIn var(--transition-base) ease-out forwards;
+// }
+
+// @keyframes fadeIn {
+//   from { opacity: 0; transform: translateY(10px); }
+//   to { opacity: 1; transform: translateY(0); }
+// }
+
+// .activity-panel {
+//   display: flex;
+//   flex-direction: column;
+//   min-height: 500px;   // IMPORTANT
+// }
+// .grid-container {
+//   flex: 1;             // TAKE REMAINING SPACE
+//   min-height: 300px;   // SAFETY
+// }
+
+// :host {
+//   display: block;
+//   height: 100%;
+// }
+
+// :host {
+//   display: block;
+//   height: 100%;
+//   width: 100%;
+// }
+
+// /* PAGE */
+// .page-container {
+//   display: flex;
+//   flex-direction: column;
+//   min-height: 100%;
+//   background: var(--bg-primary);
+//   padding: var(--spacing-xl);
+//   gap: var(--spacing-xl);
+//   overflow: hidden; // IMPORTANT: no scrolling here
+// }
+
+// /* GRID LAYOUT */
+// .layout-grid {
+//   display: grid;
+//   grid-template-columns: 320px 1fr;
+//   gap: var(--spacing-xl);
+//   flex: 1;
+//   min-height: 0; // 🔑
+// }
+
+// @media (max-width: 1024px) {
+//   .layout-grid {
+//     grid-template-columns: 1fr;
+//   }
+// }
+
+// /* SIDEBAR */
+// .profile-card {
+//   background: var(--bg-secondary);
+//   border-radius: var(--ui-border-radius-lg);
+//   border: 1px solid var(--border-primary);
+//   position: sticky;
+//   top: 0;
+//   align-self: flex-start;
+// }
+
+// /* MAIN CONTENT */
+// .main-content {
+//   display: flex;
+//   flex-direction: column;
+//   gap: var(--spacing-xl);
+//   flex: 1;
+//   min-height: 0; // 🔑
+// }
+
+// /* METRICS */
+// .metrics-grid {
+//   display: grid;
+//   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+//   gap: var(--spacing-lg);
+// }
+
+// /* ACTIVITY PANEL */
+// .activity-panel {
+//   display: flex;
+//   flex-direction: column;
+//   flex: 1;
+//   min-height: 0; // 🔑
+//   background: var(--bg-secondary);
+//   border-radius: var(--ui-border-radius-lg);
+//   border: 1px solid var(--border-primary);
+//   overflow: hidden;
+// }
+
+// /* TABS */
+// .tabs-header {
+//   display: flex;
+//   background: var(--bg-ternary);
+//   border-bottom: 1px solid var(--border-primary);
+// }
+
+// .tab-btn {
+//   padding: var(--spacing-md) var(--spacing-lg);
+//   border: none;
+//     background: var(--bg-secondary);
+//   cursor: pointer;
+//   font-weight: 600;
+//   color: var(--text-secondary);
+// }
+
+// .tab-btn.active {
+//   color: var(--accent-primary);
+//   border-bottom: 2px solid var(--accent-primary);
+// }
+
+// /* GRID CONTAINER */
+// .grid-container {
+//   flex: 1;
+//   min-height: 0; // 🔥 MOST IMPORTANT LINE
+//   background: var(--bg-primary);
+// }
+
+// /* 1. Ensure the component itself takes full height */
+// :host {
+//   display: block;
+//   height: 100vh; 
+//   overflow: hidden; 
+// }
+
+// /* 2. The main wrapper must be a flex column that doesn't scroll itself */
+// .page-container {
+//   display: flex;
+//   flex-direction: column;
+//   height: 100%;
+//   padding: var(--spacing-xl);
+//   overflow: hidden; /* We want the GRID to scroll, not the whole page */
+// }
+
+// /* 3. The layout grid needs to take remaining space */
+// .layout-grid {
+//   display: grid;
+//   grid-template-columns: 320px 1fr;
+//   gap: var(--spacing-xl);
+//   flex: 1;      /* Grow to fill space */
+//   min-height: 0; /* Key fix: allows child to be smaller than content */
+// }
+
+// /* 4. The Main content and Activity Panel path */
+// .main-content {
+//   display: flex;
+//   flex-direction: column;
+//   height: 100%;
+//   min-height: 0; 
+// }
+
+// .activity-panel {
+//   display: flex;
+//   flex-direction: column;
+//   flex: 1;       /* Take all space below metrics */
+//   min-height: 0; /* CRITICAL for Ag-Grid inside Flex */
+//   background: var(--bg-secondary);
+//   border: 1px solid var(--border-primary);
+// }
+
+// /* 5. The actual container for the grid */
+// .grid-container {
+//   flex: 1;       /* Take all space below tabs */
+//   position: relative;
+//   min-height: 400px; /* Fallback height */
+// }
+// .metrics-grid {
+//   display: grid;
+//   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+//   gap: var(--spacing-lg);
+
+//   .metric-card {
+//     background: var(--bg-secondary);
+//     border: 1px solid var(--border-primary);
+//     border-radius: var(--ui-border-radius-lg);
+//     padding: var(--spacing-lg);
+//     display: flex;
+//     flex-direction: column;
+//     gap: var(--spacing-md);
+//     box-shadow: var(--shadow-sm);
+
+//     .metric-top-row {
+//       display: flex;
+//       align-items: center; /* Vertical alignment */
+//       gap: var(--spacing-sm); /* Gap between icon and label */
+
+//       label {
+//         font-size: var(--font-size-xs);
+//         text-transform: uppercase;
+//         font-weight: 700;
+//         color: var(--text-tertiary);
+//         margin: 0;
+//         letter-spacing: 0.5px;
+//       }
+//     }
+
+//     .metric-icon {
+//       width: 28px;
+//       height: 28px;
+//       border-radius: 6px;
+//       background: var(--bg-ternary);
+//       display: flex;
+//       align-items: center;
+//       justify-content: center;
+//       color: var(--text-secondary);
+//       font-size: 14px;
+//     }
+
+//     .metric-data {
+//       .value {
+//         font-family: var(--font-heading);
+//         font-size: var(--font-size-xl);
+//         font-weight: 700;
+//         color: var(--text-primary);
+//       }
+//     }
+    
+//     /* Specific Colors */
+//     &.outstanding .metric-icon { background: rgba(239, 68, 68, 0.1); color: #dc2626; }
+//     &.invoiced .metric-icon { background: rgba(59, 130, 246, 0.1); color: #2563eb; }
+//     &.received .metric-icon { background: rgba(16, 185, 129, 0.1); color: #059669; }
+//     &.limit .metric-icon { background: var(--bg-ternary); color: var(--text-secondary); }
+//   }
+// }

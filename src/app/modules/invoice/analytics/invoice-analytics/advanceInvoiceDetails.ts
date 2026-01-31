@@ -687,14 +687,14 @@ export class AdvancedProfitAnalysisComponent implements OnInit {
 //         <div class="flex flex-wrap items-end gap-2 w-full md:w-auto">
 //           <div class="flex flex-col gap-1">
 //             <label class="text-[10px] uppercase tracking-wider font-bold text-secondary">Group By</label>
-//             <p-select [options]="groupByOptions" [(ngModel)]="filters.groupBy" (onChange)="fetchReport()" 
+//             <p-select appendTo="body" [options]="groupByOptions" [(ngModel)]="filters.groupBy" (onChange)="fetchReport()" 
 //               optionLabel="label" optionValue="value" styleClass="w-[110px] !bg-secondary !border-primary !text-xs !h-9 flex items-center">
 //             </p-select>
 //           </div>
 
 //           <div class="flex flex-col gap-1">
 //             <label class="text-[10px] uppercase tracking-wider font-bold text-secondary">Comparison</label>
-//             <p-select [options]="compareOptions" [(ngModel)]="filters.compareWith" (onChange)="fetchReport()" 
+//             <p-select appendTo="body" [options]="compareOptions" [(ngModel)]="filters.compareWith" (onChange)="fetchReport()" 
 //               optionLabel="label" optionValue="value" styleClass="w-[130px] !bg-secondary !border-primary !text-xs !h-9 flex items-center">
 //             </p-select>
 //           </div>

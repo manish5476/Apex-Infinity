@@ -109,11 +109,11 @@
         </div>
 
         <div class="action-grid">
-          <p-select [options]="roles" [(ngModel)]="selectedRoles[member._id]" 
+          <p-select appendTo="body" [options]="roles" [(ngModel)]="selectedRoles[member._id]" 
             optionLabel="name" optionValue="_id" placeholder="Select Role" appendTo="body"
             [style]="{ width: '100%' }">
           </p-select>
-          <p-select [options]="branches" [(ngModel)]="selectedBranches[member._id]" 
+          <p-select appendTo="body" [options]="branches" [(ngModel)]="selectedBranches[member._id]" 
             optionLabel="name" optionValue="_id" placeholder="Select Branch" appendTo="body"
             [style]="{ width: '100%' }">
           </p-select>
@@ -191,7 +191,7 @@
 
       <div class="form-group">
         <label>Target Audience</label>
-        <p-select [options]="audienceOptions" [(ngModel)]="announcement.targetAudience" (onChange)="onAudienceChange()"
+        <p-select appendTo="body" [options]="audienceOptions" [(ngModel)]="announcement.targetAudience" (onChange)="onAudienceChange()"
           optionLabel="label" optionValue="value" appendTo="body" [style]="{ width: '100%' }">
         </p-select>
       </div>
@@ -216,7 +216,7 @@
 
       <div class="form-group">
         <label>Notification Type</label>
-        <p-select [options]="typeOptions" [(ngModel)]="announcement.type" optionLabel="label" optionValue="value"
+        <p-select appendTo="body" [options]="typeOptions" [(ngModel)]="announcement.type" optionLabel="label" optionValue="value"
           appendTo="body" [style]="{ width: '100%' }">
           <ng-template pTemplate="selectedItem" let-selectedOption>
             <div class="flex align-items-center gap-2" *ngIf="selectedOption">
@@ -361,11 +361,11 @@
         </div>
 
         <div class="action-grid">
-          <p-select [options]="roles" [(ngModel)]="selectedRoles[member._id]" 
+          <p-select appendTo="body" [options]="roles" [(ngModel)]="selectedRoles[member._id]" 
             optionLabel="name" optionValue="_id" placeholder="Select Role" appendTo="body"
             [style]="{ width: '100%' }">
           </p-select>
-          <p-select [options]="branches" [(ngModel)]="selectedBranches[member._id]" 
+          <p-select appendTo="body" [options]="branches" [(ngModel)]="selectedBranches[member._id]" 
             optionLabel="name" optionValue="_id" placeholder="Select Branch" appendTo="body"
             [style]="{ width: '100%' }">
           </p-select>
@@ -443,7 +443,7 @@
 
       <div class="form-group">
         <label>Target Audience</label>
-        <p-select [options]="audienceOptions" [(ngModel)]="announcement.targetAudience" (onChange)="onAudienceChange()"
+        <p-select appendTo="body" [options]="audienceOptions" [(ngModel)]="announcement.targetAudience" (onChange)="onAudienceChange()"
           optionLabel="label" optionValue="value" appendTo="body" [style]="{ width: '100%' }">
         </p-select>
       </div>
@@ -468,7 +468,7 @@
 
       <div class="form-group">
         <label>Notification Type</label>
-        <p-select [options]="typeOptions" [(ngModel)]="announcement.type" optionLabel="label" optionValue="value"
+        <p-select appendTo="body" [options]="typeOptions" [(ngModel)]="announcement.type" optionLabel="label" optionValue="value"
           appendTo="body" [style]="{ width: '100%' }">
           <ng-template pTemplate="selectedItem" let-selectedOption>
             <div class="flex align-items-center gap-2" *ngIf="selectedOption">
@@ -615,11 +615,11 @@
         </div>
 
         <div class="action-grid">
-          <p-select [options]="roles" [(ngModel)]="selectedRoles[member._id]" 
+          <p-select appendTo="body" [options]="roles" [(ngModel)]="selectedRoles[member._id]" 
             optionLabel="name" optionValue="_id" placeholder="Select Role" appendTo="body"
             [style]="{ width: '100%' }">
           </p-select>
-          <p-select [options]="branches" [(ngModel)]="selectedBranches[member._id]" 
+          <p-select appendTo="body" [options]="branches" [(ngModel)]="selectedBranches[member._id]" 
             optionLabel="name" optionValue="_id" placeholder="Select Branch" appendTo="body"
             [style]="{ width: '100%' }">
           </p-select>
@@ -697,7 +697,7 @@
 
       <div class="form-group">
         <label>Target Audience</label>
-        <p-select [options]="audienceOptions" [(ngModel)]="announcement.targetAudience" (onChange)="onAudienceChange()"
+        <p-select appendTo="body" [options]="audienceOptions" [(ngModel)]="announcement.targetAudience" (onChange)="onAudienceChange()"
           optionLabel="label" optionValue="value" appendTo="body" [style]="{ width: '100%' }">
         </p-select>
       </div>
@@ -722,7 +722,7 @@
 
       <div class="form-group">
         <label>Notification Type</label>
-        <p-select [options]="typeOptions" [(ngModel)]="announcement.type" optionLabel="label" optionValue="value"
+        <p-select appendTo="body" [options]="typeOptions" [(ngModel)]="announcement.type" optionLabel="label" optionValue="value"
           appendTo="body" [style]="{ width: '100%' }">
           <ng-template pTemplate="selectedItem" let-selectedOption>
             <div class="flex align-items-center gap-2" *ngIf="selectedOption">
@@ -843,10 +843,10 @@
         </div>
 
         <div class="action-grid">
-          <p-select [options]="roles" [(ngModel)]="selectedRoles[member._id]" optionLabel="name" optionValue="_id"
+          <p-select appendTo="body" [options]="roles" [(ngModel)]="selectedRoles[member._id]" optionLabel="name" optionValue="_id"
             placeholder="Select Role" appendTo="body">
           </p-select>
-          <p-select [options]="branches" [(ngModel)]="selectedBranches[member._id]" optionLabel="name" optionValue="_id"
+          <p-select appendTo="body" [options]="branches" [(ngModel)]="selectedBranches[member._id]" optionLabel="name" optionValue="_id"
             placeholder="Select Branch" appendTo="body">
           </p-select>
         </div>
@@ -907,7 +907,7 @@
 
       <div class="form-group">
         <label>Target Audience</label>
-        <p-select [options]="audienceOptions" [(ngModel)]="announcement.targetAudience" (onChange)="onAudienceChange()"
+        <p-select appendTo="body" [options]="audienceOptions" [(ngModel)]="announcement.targetAudience" (onChange)="onAudienceChange()"
           optionLabel="label" optionValue="value" appendTo="body">
         </p-select>
       </div>
@@ -932,7 +932,7 @@
 
       <div class="form-group">
         <label>Notification Type</label>
-        <p-select [options]="typeOptions" [(ngModel)]="announcement.type" optionLabel="label" optionValue="value"
+        <p-select appendTo="body" [options]="typeOptions" [(ngModel)]="announcement.type" optionLabel="label" optionValue="value"
           appendTo="body">
           <ng-template pTemplate="selectedItem" let-selectedOption>
             <div class="flex align-items-center gap-2" *ngIf="selectedOption">

@@ -347,7 +347,7 @@
           [style.font-weight]="'var(--font-weight-semibold)'">
           Recent Punch History
         </h3>
-        <p-select [(ngModel)]="historyRange" [options]="historyRangeOptions()" styleClass="w-40"
+        <p-select appendTo="body" [(ngModel)]="historyRange" [options]="historyRangeOptions()" styleClass="w-40"
           (onChange)="loadPunchHistoryGrid()"></p-select>
       </div>
 
@@ -376,7 +376,7 @@
         [style.font-size]="'var(--font-size-xs)'" [style.font-weight]="'var(--font-weight-bold)'">
         Issue Type
       </label>
-      <p-select [ngModel]="emergencyIssueType()" (ngModelChange)="emergencyIssueType.set($event)"
+      <p-select appendTo="body" [ngModel]="emergencyIssueType()" (ngModelChange)="emergencyIssueType.set($event)"
         [options]="emergencyIssueTypes()" placeholder="Select type" class="w-full"></p-select>
     </div>
 
@@ -722,7 +722,7 @@
         
         <div class="flex items-center justify-between mb-4">
           <h3 class="font-bold" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-md)'">Recent Punch History</h3>
-          <p-select [(ngModel)]="historyRange" [options]="historyRangeOptions()" styleClass="w-40" (onChange)="loadPunchHistory()"></p-select>
+          <p-select appendTo="body" [(ngModel)]="historyRange" [options]="historyRangeOptions()" styleClass="w-40" (onChange)="loadPunchHistory()"></p-select>
         </div>
 
         <p-table [value]="punchHistory()" [loading]="isLoading()" styleClass="p-datatable-sm custom-table">
@@ -781,7 +781,7 @@
       <label class="block font-bold mb-1 uppercase tracking-tighter" 
              [style.color]="'var(--theme-text-label)'" 
              [style.font-size]="'var(--font-size-xs)'">Issue Type</label>
-      <p-select [(ngModel)]="emergencyIssueType" [options]="emergencyIssueTypes()" placeholder="Select type" class="w-full"></p-select>
+      <p-select appendTo="body" [(ngModel)]="emergencyIssueType" [options]="emergencyIssueTypes()" placeholder="Select type" class="w-full"></p-select>
     </div>
 
     <div>

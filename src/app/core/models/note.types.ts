@@ -38,6 +38,7 @@ export interface ActivityLog {
 }
 
 export interface Participant {
+_id: any;
   user: {
     _id: string;
     name: string;
@@ -74,7 +75,7 @@ export interface Note {
   duration?: number; // minutes
 
   category?: string;
-  tags?: string[];
+  tags: any;
   
   // Feature flags
   isMeeting: boolean;

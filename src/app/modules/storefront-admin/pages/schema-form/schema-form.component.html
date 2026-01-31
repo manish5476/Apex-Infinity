@@ -8,7 +8,7 @@
       <div *ngSwitchCase="'string'" class="flex flex-col gap-1">
         <label>{{ label(field.key) }}</label>
         @if(field.value.enum){
-        <p-select [options]="options(field.value.enum)" [formControlName]="field.key">
+        <p-select appendTo="body" [options]="options(field.value.enum)" [formControlName]="field.key">
         </p-select>
         }
 

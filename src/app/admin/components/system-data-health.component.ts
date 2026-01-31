@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
@@ -38,7 +38,7 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
                      class="ring-value"
                      [ngClass]="getScoreClass()"
                      stroke-dasharray="452.3"
-                     [attr.stroke-dashoffset]="452.3 - (452.3 * healthData()?.score / 100)"
+                     [attr.stroke-dashoffset]="452.3 - (452.3 * (healthData()?.score || 0) / 100)"
                    />
                  </svg>
                  <div class="score-text">
@@ -50,20 +50,22 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
               <div class="checks-bar-container">
                  <div class="checks-header">
                     <span class="checks-label">Checks Passed</span>
-                    <span class="checks-value">1/{{ healthData()?.checks?.length }}</span>
+                    <span class="checks-value">{{ getHealthyCount() }}/{{ healthData()?.checks?.length }}</span>
                  </div>
                  <div class="progress-track">
-                    <div class="progress-fill warning" style="width: 50%"></div>
+                    <div class="progress-fill" 
+                         [ngClass]="getScoreClass()"
+                         [style.width.%]="(getHealthyCount() / (healthData()?.checks?.length || 1)) * 100"></div>
                  </div>
               </div>
             </div>
 
             <div class="log-card">
                <div class="log-content">
-                 <p class="log-label">Last Log Audit</p>
+                 <p class="log-label">Audit Timestamp</p>
                  <h3 class="log-time">{{ meta()?.timestamp | date:'medium' }}</h3>
                  <p class="log-desc">
-                   System response time optimized at <strong>{{ meta()?.responseTime }}</strong>.
+                   Response Latency: <strong>{{ meta()?.responseTime || '0ms' }}</strong>
                  </p>
                </div>
             </div>
@@ -79,7 +81,8 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
                    <div class="diagnostic-item" [ngClass]="item.status">
                       <div class="item-left">
                         <div class="status-icon-box">
-                          <i class="pi" [ngClass]="item.status === 'healthy' ? 'pi-check-circle' : 'pi-exclamation-circle'"></i>
+                          <i class="pi" 
+                             [ngClass]="item.status === 'healthy' ? 'pi-check-circle' : 'pi-exclamation-triangle'"></i>
                         </div>
                         <div>
                           <p class="check-name">{{ item.check }}</p>
@@ -93,18 +96,19 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
             </div>
 
             <div class="roadmap-card">
-              <div class="roadmap-header mb-md">
-                <i class="pi pi-sparkles roadmap-icon"></i>
-                <h4 class="roadmap-title">Optimization Roadmap</h4>
-              </div>
-              
-              <div class="roadmap-grid">
-                @for (rec of healthData()?.recommendations; track rec) {
-                  <div class="roadmap-item">
-                    <p class="rec-text">{{ rec }}</p>
-                  </div>
-                }
-              </div>
+               <div class="roadmap-header mb-md">
+                 <i class="pi pi-sparkles roadmap-icon"></i>
+                 <h4 class="roadmap-title">Optimization Roadmap</h4>
+               </div>
+               
+               <div class="roadmap-grid">
+                 @for (rec of healthData()?.recommendations; track rec) {
+                   <div class="roadmap-item">
+                     <i class="pi pi-arrow-right rec-arrow"></i>
+                     <p class="rec-text">{{ rec }}</p>
+                   </div>
+                 }
+               </div>
             </div>
 
           </div>
@@ -115,7 +119,7 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
       <ng-template #loader>
         <div class="loader-container">
           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-12 h-12"></p-progressSpinner>
-          <p class="loader-text">Running System Diagnostics...</p>
+          <p class="loader-text">Running Data Integrity Checks...</p>
         </div>
       </ng-template>
 
@@ -257,7 +261,9 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
       border-radius: 99px;
       overflow: hidden;
     }
+    .progress-fill.success { background: var(--color-success); height: 100%; }
     .progress-fill.warning { background: var(--color-warning); height: 100%; }
+    .progress-fill.error { background: var(--color-error); height: 100%; }
 
     /* LOG CARD (Gradient) */
     .log-card {
@@ -346,8 +352,8 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
       border-radius: 4px;
       color: #000; /* Contrast against colored badge */
     }
-    .diagnostic-item.healthy .status-badge { background: var(--color-success); }
-    .diagnostic-item.warning .status-badge { background: var(--color-warning); }
+    .diagnostic-item.healthy .status-badge { background: var(--color-success); color: var(--color-success-dark); }
+    .diagnostic-item.warning .status-badge { background: var(--color-warning); color: var(--text-primary); }
     .diagnostic-item.error .status-badge { background: var(--color-error); color: #fff; }
 
     /* ROADMAP CARD */
@@ -367,10 +373,10 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
       grid-template-columns: 1fr;
       gap: var(--spacing-md);
     }
-    @media(min-width: 768px) { .roadmap-grid { grid-template-columns: 1fr 1fr; } }
-
+    
     .roadmap-item {
-      padding: var(--spacing-sm);
+      display: flex; align-items: center; gap: var(--spacing-md);
+      padding: var(--spacing-sm) var(--spacing-md);
       background: var(--bg-secondary);
       border: 1px solid var(--border-primary);
       border-radius: var(--ui-border-radius);
@@ -379,6 +385,7 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
     }
     .roadmap-item:hover { border-color: var(--accent-secondary); }
 
+    .rec-arrow { font-size: 10px; color: var(--accent-primary); }
     .rec-text { font-size: var(--font-size-xs); color: var(--text-secondary); line-height: 1.4; margin: 0; }
 
     /* LOADER */
@@ -422,6 +429,11 @@ export class SystemDataHealthComponent implements OnInit {
       },
       error: () => this.loading.set(false)
     });
+  }
+
+  getHealthyCount(): number {
+    const checks = this.healthData()?.checks || [];
+    return checks.filter((c: any) => c.status === 'healthy').length;
   }
 
   // Returns CSS Class for styling (success, warning, error)

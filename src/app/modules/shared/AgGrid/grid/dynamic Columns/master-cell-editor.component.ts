@@ -117,7 +117,7 @@ import { CellConfig, MasterEditorParams } from '../grid.types';
         }
 
         @case ('select') {
-          <p-select [(ngModel)]="value" 
+          <p-select appendTo="body" [(ngModel)]="value" 
             [options]="config.options ?? []"
             [optionLabel]="config.optionLabel || 'label'"
             [optionValue]="config.optionValue || 'value'"
@@ -297,7 +297,7 @@ export class MasterCellEditorComponent implements ICellEditorAngularComp, AfterV
 //         }
 
 //         @case ('select') {
-//           <p-select [(ngModel)]="value" 
+//           <p-select appendTo="body" [(ngModel)]="value" 
 //             [options]="config.options ?? []"
 //             [optionLabel]="config.optionLabel || 'label'"
 //             [optionValue]="config.optionValue || 'value'"
@@ -460,7 +460,7 @@ export class MasterCellEditorComponent implements ICellEditorAngularComp, AfterV
 // //         }
 
 // //         @case ('select') {
-// //           <p-select [(ngModel)]="value" 
+// //           <p-select appendTo="body" [(ngModel)]="value" 
 // //             [options]="config.options ?? []"
 // //             [optionLabel]="config.optionLabel || 'label'"
 // //             [optionValue]="config.optionValue || 'value'"
@@ -605,7 +605,7 @@ export class MasterCellEditorComponent implements ICellEditorAngularComp, AfterV
 // // //         }
 
 // // //         @case ('select') {
-// // //           <p-select [(ngModel)]="value"
+// // //           <p-select appendTo="body" [(ngModel)]="value"
 // // //             [options]="config.options ?? []"
 // // //             [optionLabel]="config.optionLabel || 'label'"
 // // //             [optionValue]="config.optionValue || 'value'"

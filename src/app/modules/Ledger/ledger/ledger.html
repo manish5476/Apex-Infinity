@@ -17,7 +17,7 @@
       <div class="filters-row" [formGroup]="filterForm">
 
         <!-- Branch Selector -->
-        <p-select [options]="branchOptions()" formControlName="branchId" placeholder="All Branches" [showClear]="true"
+        <p-select appendTo="body" [options]="branchOptions()" formControlName="branchId" placeholder="All Branches" [showClear]="true"
           appendTo="body" styleClass="glass-input filter-branch" (onChange)="applyFilters()">
         </p-select>
 
@@ -36,9 +36,9 @@
           <input pInputText formControlName="search" placeholder="Search..." (keyup.enter)="applyFilters()"
             class="glass-input-sm filter-search" />
         </span>
-        <p-select [options]="accountOptions()" formControlName="accountId" placeholder="Account" [showClear]="true"
+        <p-select appendTo="body" [options]="accountOptions()" formControlName="accountId" placeholder="Account" [showClear]="true"
           appendTo="body" styleClass="glass-input-sm filter-account" (onChange)="applyFilters()"></p-select>
-        <p-select formControlName="txnType"
+        <p-select appendTo="body" formControlName="txnType"
           [options]="[{label:'Debit', value:'debit'}, {label:'Credit', value:'credit'}]" placeholder="Type"
           [showClear]="true" appendTo="body" styleClass="glass-input-sm filter-type"
           (onChange)="applyFilters()"></p-select>
@@ -46,12 +46,12 @@
 
         <!-- Entity Selectors -->
         @if (currentTab() === 'customer') {
-        <p-select [options]="customerOptions()" formControlName="customerId" placeholder="Select Customer"
+        <p-select appendTo="body" [options]="customerOptions()" formControlName="customerId" placeholder="Select Customer"
           [filter]="true" [showClear]="true" appendTo="body" styleClass="glass-input filter-entity"
           (onChange)="applyFilters()"></p-select>
         }
         @if (currentTab() === 'supplier') {
-        <p-select [options]="supplierOptions()" formControlName="supplierId" placeholder="Select Supplier"
+        <p-select appendTo="body" [options]="supplierOptions()" formControlName="supplierId" placeholder="Select Supplier"
           [filter]="true" [showClear]="true" appendTo="body" styleClass="glass-input filter-entity"
           (onChange)="applyFilters()"></p-select>
         }

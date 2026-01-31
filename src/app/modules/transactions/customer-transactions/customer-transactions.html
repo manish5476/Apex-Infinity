@@ -9,12 +9,12 @@
       </div>
       <div class="se-filter-field">
         <label>Type</label>
-        <p-select appendTo="body" (onChange)="applyFilters()" [options]="transactionTypes"
+        <p-select appendTo="body" appendTo="body" (onChange)="applyFilters()" [options]="transactionTypes"
           [(ngModel)]="filterParams.type" [showClear]="true" placeholder="All" appendTo="body"></p-select>
       </div>
       <div class="se-filter-field">
         <label>Effect</label>
-        <p-select appendTo="body" (onChange)="applyFilters()" [options]="transactionEffects"
+        <p-select appendTo="body" appendTo="body" (onChange)="applyFilters()" [options]="transactionEffects"
           [(ngModel)]="filterParams.effect" [showClear]="true" placeholder="All" appendTo="body"></p-select>
       </div>
       <div class="se-filter-field">

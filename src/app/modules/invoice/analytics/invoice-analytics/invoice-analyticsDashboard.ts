@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
 
 // PrimeNG Imports
-import { SelectModule } from 'primeng/select'; // v18+ <p-select>
+import { SelectModule } from 'primeng/select'; // v18+ <p-select appendTo="body">
 // If using older PrimeNG, use DropdownModule and <p-dropdown>
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
@@ -72,7 +72,7 @@ interface DashboardData {
       
       <div class="control-group">
         <label class="control-label">Time Period</label>
-        <p-select 
+        <p-select appendTo="body" 
           [options]="periodOptions" 
           [(ngModel)]="selectedPeriod" 
           optionLabel="label" 
@@ -85,7 +85,7 @@ interface DashboardData {
 
       <div class="control-group">
         <label class="control-label">Compare With</label>
-         <p-select 
+         <p-select appendTo="body" 
           [options]="compareOptions" 
           [(ngModel)]="selectedCompare" 
           optionLabel="label" 

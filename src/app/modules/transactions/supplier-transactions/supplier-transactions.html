@@ -18,14 +18,14 @@
       </div>
 
       <div class="filter-item">
-        <p-select [options]="transactionTypes" [(ngModel)]="filterParams.type" (onChange)="applyFilters()"
+        <p-select appendTo="body" [options]="transactionTypes" [(ngModel)]="filterParams.type" (onChange)="applyFilters()"
           optionLabel="label" optionValue="value" [showClear]="true" placeholder="Type" appendTo="body"
           styleClass="w-full">
         </p-select>
       </div>
 
       <div class="filter-item">
-        <p-select [options]="transactionEffects" [(ngModel)]="filterParams.effect" (onChange)="applyFilters()"
+        <p-select appendTo="body" [options]="transactionEffects" [(ngModel)]="filterParams.effect" (onChange)="applyFilters()"
           optionLabel="label" optionValue="value" [showClear]="true" placeholder="Effect" appendTo="body"
           styleClass="w-full">
         </p-select>

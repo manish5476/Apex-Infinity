@@ -8,6 +8,7 @@
   </header>
 
   <form [formGroup]="noteForm" (ngSubmit)="onSubmit()" class="glass-panel">
+    
     <div class="main-editor">
       <div class="form-group">
         <input type="text" formControlName="title" placeholder="Untitled Note..." class="input-title"
@@ -15,11 +16,12 @@
       </div>
 
       <div class="type-tabs">
-        <label *ngFor="let type of noteTypes" class="type-tab"
-          [class.active]="noteForm.get('noteType')?.value === type.value">
-          <input type="radio" formControlName="noteType" [value]="type.value" hidden>
-          {{ type.label }}
-        </label>
+        @for (type of noteTypes; track type.value) {
+          <label class="type-tab" [class.active]="noteForm.get('noteType')?.value === type.value">
+            <input type="radio" formControlName="noteType" [value]="type.value" hidden>
+            {{ type.label }}
+          </label>
+        }
       </div>
 
       <div class="form-group content-wrapper">
@@ -27,13 +29,17 @@
           class="input-content"></textarea>
       </div>
 
-      <div class="attachments-area" *ngIf="uploadedAttachments().length > 0">
-        <div class="attachment-pill" *ngFor="let file of uploadedAttachments(); let i = index">
-          <span class="file-icon">📎</span>
-          <span class="file-name">{{ file.fileName }}</span>
-          <button type="button" (click)="removeAttachment(i)" class="btn-remove">×</button>
+      @if (uploadedAttachments().length > 0) {
+        <div class="attachments-area">
+          @for (file of uploadedAttachments(); track file; let i = $index) {
+            <div class="attachment-pill">
+              <span class="file-icon">📎</span>
+              <span class="file-name">{{ file.fileName }}</span>
+              <button type="button" (click)="removeAttachment(i)" class="btn-remove">×</button>
+            </div>
+          }
         </div>
-      </div>
+      }
     </div>
 
     <div class="sidebar">
@@ -41,11 +47,12 @@
       <div class="sidebar-section">
         <label class="section-label">Priority</label>
         <div class="priority-grid">
-          <label *ngFor="let p of priorities" class="priority-option"
-            [class.selected]="noteForm.get('priority')?.value === p" [class]="p">
-            <input type="radio" formControlName="priority" [value]="p" hidden>
-            <span class="dot"></span> {{ p | titlecase }}
-          </label>
+          @for (p of priorities; track p) {
+            <label class="priority-option" [class.selected]="noteForm.get('priority')?.value === p" [class]="p">
+              <input type="radio" formControlName="priority" [value]="p" hidden>
+              <span class="dot"></span> {{ p | titlecase }}
+            </label>
+          }
         </div>
       </div>
 
@@ -68,17 +75,22 @@
         <input type="text" formControlName="tags" placeholder="frontend, bug, v2 (comma separated)" class="input-std">
       </div>
 
-      <div class="sidebar-section" *ngIf="noteForm.get('noteType')?.value === 'meeting'" formGroupName="meetingDetails">
-        <label class="section-label">Meeting Details</label>
-        <input type="text" formControlName="location" placeholder="📍 Location / Room" class="input-std mb-2">
-        <input type="text" formControlName="link" placeholder="🔗 Video Link" class="input-std">
-      </div>
+      @if (noteForm.get('noteType')?.value === 'meeting') {
+        <div class="sidebar-section" formGroupName="meetingDetails">
+          <label class="section-label">Meeting Details</label>
+          <input type="text" formControlName="location" placeholder="📍 Location / Room" class="input-std mb-2">
+          <input type="text" formControlName="link" placeholder="🔗 Video Link" class="input-std">
+        </div>
+      }
 
       <div class="sidebar-section upload-section">
         <label class="btn-upload" [class.loading]="isUploading()">
           <input type="file" multiple (change)="onFileSelected($event)" hidden>
-          <span *ngIf="!isUploading()">📎 Upload Files</span>
-          <span *ngIf="isUploading()">⏳ Uploading...</span>
+          @if (!isUploading()) {
+            <span>📎 Upload Files</span>
+          } @else {
+            <span>⏳ Uploading...</span>
+          }
         </label>
       </div>
 

@@ -827,7 +827,7 @@
             [style.margin-bottom]="'var(--spacing-sm)'">
             Type
           </label>
-          <p-select formControlName="type" [options]="[
+          <p-select appendTo="body" formControlName="type" [options]="[
                       {label: 'Missed Punch', value: 'missed_punch'},
                       {label: 'Time Correction', value: 'correction'},
                       {label: 'Work From Home', value: 'work_from_home'},

@@ -105,8 +105,8 @@
                             <div class="text-sm text-gray-500">{{ pending.email }}</div>
                           </div>
                           <div class="actions flex gap-2">
-                            <p-select appendTo="body" [options]="roles" [(ngModel)]="selectedRoles[pending._id]" optionLabel="name" optionValue="_id" placeholder="Role" styleClass="w-32" />
-                            <p-select appendTo="body" [options]="branches" [(ngModel)]="selectedBranches[pending._id]" optionLabel="name" optionValue="_id" placeholder="Branch" styleClass="w-32" />
+                            <p-select appendTo="body" appendTo="body" [options]="roles" [(ngModel)]="selectedRoles[pending._id]" optionLabel="name" optionValue="_id" placeholder="Role" styleClass="w-32" />
+                            <p-select appendTo="body" appendTo="body" [options]="branches" [(ngModel)]="selectedBranches[pending._id]" optionLabel="name" optionValue="_id" placeholder="Branch" styleClass="w-32" />
                             <button pButton icon="pi pi-check" class="p-button-success" (click)="approveMember(pending._id)"></button>
                           </div>
                         </div>

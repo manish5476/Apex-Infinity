@@ -30,7 +30,7 @@
 
         <div class="sort-group">
           <span class="label">Sort by:</span>
-          <p-select [options]="sortOptions" 
+          <p-select appendTo="body" [options]="sortOptions" 
                     [(ngModel)]="filters.sort" 
                     (onChange)="applyFilter('sort', $event.value)" 
                     optionLabel="label" 

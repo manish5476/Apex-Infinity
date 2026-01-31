@@ -42,12 +42,12 @@
             <div class="form-grid">
               <div class="form-group">
                 <label>System Role <span class="req">*</span></label>
-                <p-select [options]="roles()" formControlName="role" optionLabel="name" optionValue="_id" 
+                <p-select appendTo="body" [options]="roles()" formControlName="role" optionLabel="name" optionValue="_id" 
                   placeholder="Select Role" appendTo="body"></p-select>
               </div>
               <div class="form-group">
                 <label>Assigned Branch</label>
-                <p-select [options]="branches()" formControlName="branchId" optionLabel="name" optionValue="_id" 
+                <p-select appendTo="body" [options]="branches()" formControlName="branchId" optionLabel="name" optionValue="_id" 
                   placeholder="Global Access" [showClear]="true" appendTo="body"></p-select>
               </div>
             </div>
@@ -64,7 +64,7 @@
                 <div class="form-grid">
                   <div class="form-group">
                     <label>Shift Pattern <span class="req">*</span></label>
-                    <p-select [options]="shifts()" formControlName="shiftId" optionLabel="name" optionValue="_id" 
+                    <p-select appendTo="body" [options]="shifts()" formControlName="shiftId" optionLabel="name" optionValue="_id" 
                       placeholder="Select Shift" appendTo="body"></p-select>
                   </div>
                   <div class="form-group">
@@ -190,12 +190,12 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div class="form-group">
               <label>System Role <span class="req">*</span></label>
-              <p-select [options]="roles()" formControlName="role" optionLabel="name" optionValue="_id" 
+              <p-select appendTo="body" [options]="roles()" formControlName="role" optionLabel="name" optionValue="_id" 
                 placeholder="Select Role" styleClass="w-full" [style]="{'width':'100%'}" appendTo="body"></p-select>
             </div>
             <div class="form-group">
               <label>Assigned Branch</label>
-              <p-select [options]="branches()" formControlName="branchId" optionLabel="name" optionValue="_id" 
+              <p-select appendTo="body" [options]="branches()" formControlName="branchId" optionLabel="name" optionValue="_id" 
                 placeholder="Global Access" [showClear]="true" styleClass="w-full" [style]="{'width':'100%'}" appendTo="body"></p-select>
             </div>
           </div>
@@ -216,7 +216,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div class="form-group">
                 <label>Shift Pattern <span class="req">*</span></label>
-                <p-select [options]="shifts()" formControlName="shiftId" optionLabel="name" optionValue="_id" 
+                <p-select appendTo="body" [options]="shifts()" formControlName="shiftId" optionLabel="name" optionValue="_id" 
                   placeholder="Select Shift" styleClass="w-full" [style]="{'width':'100%'}" appendTo="body"></p-select>
               </div>
               <div class="form-group">
@@ -344,12 +344,12 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="form-group">
               <label>System Role <span class="req">*</span></label>
-              <p-select [options]="roles()" formControlName="role" optionLabel="name" optionValue="_id" 
+              <p-select appendTo="body" [options]="roles()" formControlName="role" optionLabel="name" optionValue="_id" 
                 placeholder="Select Role" styleClass="w-full" appendTo="body"></p-select>
             </div>
             <div class="form-group">
               <label>Primary Branch</label>
-              <p-select [options]="branches()" formControlName="branchId" optionLabel="name" optionValue="_id" 
+              <p-select appendTo="body" [options]="branches()" formControlName="branchId" optionLabel="name" optionValue="_id" 
                 placeholder="Select Branch" [showClear]="true" styleClass="w-full" appendTo="body"></p-select>
               <small class="opacity-50 mt-1 italic">Optional: Leave empty for global access.</small>
             </div>
@@ -376,7 +376,7 @@
               
               <div class="form-group">
                 <label>Assigned Shift <span class="req">*</span></label>
-                <p-select [options]="shifts()" formControlName="shiftId" optionLabel="name" optionValue="_id" 
+                <p-select appendTo="body" [options]="shifts()" formControlName="shiftId" optionLabel="name" optionValue="_id" 
                   placeholder="Select Shift Pattern" styleClass="w-full" appendTo="body"></p-select>
               </div>
 

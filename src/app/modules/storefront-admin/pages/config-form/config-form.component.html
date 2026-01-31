@@ -19,7 +19,7 @@
           </div>
 
           @if (field.enum) {
-          <p-select [formControlName]="field.key" [options]="getEnumOptions(field)" optionLabel="label"
+          <p-select appendTo="body" [formControlName]="field.key" [options]="getEnumOptions(field)" optionLabel="label"
             optionValue="value" appendTo="body" styleClass="w-full text-sm" placeholder="Select...">
           </p-select>
           } @else if (field.type === 'number') {
@@ -111,7 +111,7 @@
                   <div>
                     <label class="text-[10px] font-bold uppercase text-slate-400 mb-1 block">{{subField.label}}</label>
                     @if(subField.enum) {
-                    <p-select [formControlName]="subField.key" [options]="getEnumOptions(subField)" optionLabel="label"
+                    <p-select appendTo="body" [formControlName]="subField.key" [options]="getEnumOptions(subField)" optionLabel="label"
                       optionValue="value" appendTo="body" styleClass="w-full p-inputtext-sm"></p-select>
                     } @else {
                     <input pInputText [formControlName]="subField.key"
@@ -198,7 +198,7 @@
           </div>
 
           @if (field.enum) {
-          <p-select [formControlName]="field.key" [options]="getEnumOptions(field)" optionLabel="label"
+          <p-select appendTo="body" [formControlName]="field.key" [options]="getEnumOptions(field)" optionLabel="label"
             optionValue="value" appendTo="body" styleClass="w-full text-sm" placeholder="Select...">
           </p-select>
           }
@@ -304,7 +304,7 @@
                   <div>
                     <label class="text-[10px] font-bold uppercase text-slate-400 mb-1 block">{{subField.label}}</label>
                     @if(subField.enum) {
-                    <p-select [formControlName]="subField.key" [options]="getEnumOptions(subField)" optionLabel="label"
+                    <p-select appendTo="body" [formControlName]="subField.key" [options]="getEnumOptions(subField)" optionLabel="label"
                       optionValue="value" appendTo="body" styleClass="w-full p-inputtext-sm"></p-select>
                     } @else {
                     <input pInputText [formControlName]="subField.key"

@@ -7,6 +7,7 @@ import { TooltipModule } from 'primeng/tooltip';
 // Services
 import { AdminAnalyticsService } from '../admin-analytics.service';
 import { MasterListService } from '../../core/services/master-list.service'; // Ensure this is imported
+import { CommonMethodService } from '../../core/utils/common-method.service'; // Added CommonMethodService
 
 // Components
 import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
@@ -22,7 +23,7 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
     ProgressSpinnerModule, 
     TooltipModule,
     AgShareGrid,
-    UniversalFilterComponent // <--- Imported
+    UniversalFilterComponent
   ],
   template: `
     <div class="ltv-container">
@@ -41,18 +42,18 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
           
           <div class="kpi-card total-ltv">
             <p class="kpi-label">Total Network LTV</p>
-            <h2 class="kpi-value">₹{{ ltvData()?.summary?.totalLTV | number }}</h2>
+            <h2 class="kpi-value">{{ commonService.formatCurrency(calculateTotalLTV()) }}</h2>
           </div>
 
           <div class="kpi-card avg-value">
             <p class="kpi-label">Avg Customer Value</p>
-            <h2 class="kpi-value highlight">₹{{ ltvData()?.summary?.avgLTV | number:'1.0-0' }}</h2>
+            <h2 class="kpi-value highlight">{{ commonService.formatCurrency(ltvData()?.summary?.avgLTV) }}</h2>
           </div>
 
           <div class="kpi-card performer-card">
             <div class="performer-info">
               <p class="performer-label">Top Performer</p>
-              <h3 class="performer-name">{{ ltvData()?.summary?.topCustomer?.name }}</h3>
+              <h3 class="performer-name">{{ getTopCustomerName() }}</h3>
             </div>
             <div class="star-badge">
               <i class="pi pi-star-fill star-icon"></i>
@@ -82,29 +83,25 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
 
           <div class="side-column">
             
-            <div class="side-card profile-card">
+            <div class="side-card profile-card" *ngIf="getTopCustomer()">
               <h4 class="side-title mb-lg">Top Contributor Details</h4>
               
               <div class="profile-header">
                 <div class="avatar-circle">
-                  {{ ltvData()?.summary?.topCustomer?.name.charAt(0) }}
+                  {{ getTopCustomer().name.charAt(0) }}
                 </div>
-                <p class="profile-name">{{ ltvData()?.summary?.topCustomer?.name }}</p>
-                <span class="profile-badge">High-Ticket Buyer</span>
+                <p class="profile-name">{{ getTopCustomer().name }}</p>
+                <span class="profile-badge">{{ getTopCustomer().tier || 'VIP' }}</span>
               </div>
 
               <div class="stats-list">
                 <div class="stat-row">
                   <span class="stat-label">Avg Ticket Size</span>
-                  <span class="stat-value">₹{{ ltvData()?.summary?.topCustomer?.avgOrderValue | number }}</span>
+                  <span class="stat-value">{{ commonService.formatCurrency(getTopCustomer().avgOrder) }}</span>
                 </div>
                 <div class="stat-row">
-                  <span class="stat-label">Frequency</span>
-                  <span class="stat-value">{{ ltvData()?.summary?.topCustomer?.transactionCount }} Orders</span>
-                </div>
-                <div class="stat-row">
-                  <span class="stat-label">Account Lifespan</span>
-                  <span class="stat-value">{{ ltvData()?.summary?.topCustomer?.lifespanDays | number:'1.1-1' }} Days</span>
+                  <span class="stat-label">Total Contribution</span>
+                  <span class="stat-value">{{ commonService.formatCurrency(getTopCustomer().ltv) }}</span>
                 </div>
               </div>
             </div>
@@ -113,8 +110,8 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
               <h4 class="side-title success mb-sm">Retention Trigger</h4>
               <p class="retention-text">
                 <i class="pi pi-bolt retention-icon"></i>
-                High AOV detected for <span class="highlight-text">{{ ltvData()?.customers[0]?.name }}</span>. 
-                Triggering a VIP concierge invite could increase retention by 15%.
+                High value detected for <span class="highlight-text">{{ getTopCustomerName() }}</span>. 
+                Triggering a VIP concierge invite could increase retention.
               </p>
             </div>
           </div>
@@ -376,7 +373,8 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
 })
 export class CustomerLtvAnalysisComponent implements OnInit {
   // Injections
-  public masterList = inject(MasterListService); // Needed for branch dropdown
+  public masterList = inject(MasterListService); 
+  public commonService = inject(CommonMethodService); // Injected here
   private analyticsService = inject(AdminAnalyticsService);
   private cdr = inject(ChangeDetectorRef);
 
@@ -415,7 +413,6 @@ export class CustomerLtvAnalysisComponent implements OnInit {
   loadData() {
     this.loading.set(true);
     
-    // Pass branchId if selected, otherwise undefined for global
     const branchId = this.currentFilters.branchId;
 
     this.analyticsService.getCustomerLifetimeValue(branchId).subscribe({
@@ -427,6 +424,24 @@ export class CustomerLtvAnalysisComponent implements OnInit {
       },
       error: () => this.loading.set(false)
     });
+  }
+
+  // Helper Methods
+  calculateTotalLTV(): number {
+    const customers = this.ltvData()?.customers || [];
+    return customers.reduce((sum: number, c: any) => sum + (c.ltv || 0), 0);
+  }
+
+  getTopCustomer() {
+    const customers = this.ltvData()?.customers || [];
+    if (customers.length === 0) return null;
+    // Assuming the list is sorted by LTV descending, or we sort it
+    return customers.sort((a: any, b: any) => b.ltv - a.ltv)[0];
+  }
+
+  getTopCustomerName(): string {
+    const top = this.getTopCustomer();
+    return top ? top.name : '--';
   }
 
   setupColumns(): void {
@@ -467,17 +482,16 @@ export class CustomerLtvAnalysisComponent implements OnInit {
                         ${tier}
                       </span>
                     </div>
-                    <span style="font-size: 11px; color: var(--text-tertiary); margin-top: 3px; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${params.data.email || ''}">
-                      ${params.data.email || ''}
+                    <span style="font-size: 11px; color: var(--text-tertiary); margin-top: 3px; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${params.data._id}">
+                      ID: ...${params.data._id.slice(-6)}
                     </span>
                   </div>`;
         }
       },
       {
-        field: 'avgOrderValue', 
-        headerName: 'AOV', 
-        sortable: true, 
-        width: 100,
+        field: 'avgOrder', 
+        headerName: 'Avg Ticket', 
+        width: 120,
         type: 'rightAligned',
         valueFormatter: (params: any) => {
            if(params.value == null) return '-';
@@ -486,44 +500,35 @@ export class CustomerLtvAnalysisComponent implements OnInit {
         cellStyle: { 'font-family': 'var(--font-mono)', 'text-align': 'right', 'font-size': '11px', 'color': 'var(--text-secondary)' }
       },
       {
-        field: 'totalSpent', 
-        headerName: 'Total Spent', 
-        sortable: true, 
-        width: 120,
+        field: 'ltv', 
+        headerName: 'Lifetime Value', 
+        width: 140,
         type: 'rightAligned',
         valueFormatter: (params: any) => {
            if(params.value == null) return '-';
            return '₹' + params.value.toLocaleString();
         },
         cellStyle: { 'font-weight': '700', 'color': 'var(--color-success)', 'text-align': 'right' }
-      },
-      {
-        field: 'valueScore', 
-        headerName: 'Score', 
-        sortable: true, 
-        width: 100,
-        cellRenderer: (params: any) => {
-           const val = params.value || 0;
-           return `<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 2px;">
-                     <span style="font-size: 10px; font-weight: 700; color: var(--text-primary);">${val.toFixed(0)}%</span>
-                     <div style="width: 100%; height: 3px; background: var(--bg-ternary); border-radius: 2px; overflow: hidden;">
-                        <div style="width: ${val}%; height: 100%; background: var(--accent-primary);"></div>
-                     </div>
-                    </div>`;
-        }
       }
     ];
     this.cdr.detectChanges();
   }
 }
 
-// import { Component, OnInit, signal, ChangeDetectorRef } from '@angular/core';
+// import { Component, OnInit, signal, ChangeDetectorRef, inject } from '@angular/core';
 // import { CommonModule } from '@angular/common';
 // import { ButtonModule } from 'primeng/button';
 // import { ProgressSpinnerModule } from 'primeng/progressspinner';
 // import { TooltipModule } from 'primeng/tooltip';
+
+// // Services
 // import { AdminAnalyticsService } from '../admin-analytics.service';
+// import { MasterListService } from '../../core/services/master-list.service'; // Ensure this is imported
+
+// // Components
 // import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
+// import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
+// import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
 
 // @Component({
 //   selector: 'app-customer-ltv-analysis',
@@ -533,10 +538,19 @@ export class CustomerLtvAnalysisComponent implements OnInit {
 //     ButtonModule, 
 //     ProgressSpinnerModule, 
 //     TooltipModule,
-//     AgShareGrid
+//     AgShareGrid,
+//     UniversalFilterComponent // <--- Imported
 //   ],
 //   template: `
 //     <div class="ltv-container">
+
+//       <div class="filter-section">
+//         <app-universal-filter
+//           [entityType]="'ltv-analysis'"
+//           [config]="filterConfig"
+//           (filterChange)="onFilterUpdate($event)">
+//         </app-universal-filter>
+//       </div>
 
 //       <ng-container *ngIf="!loading(); else loader">
         
@@ -635,7 +649,6 @@ export class CustomerLtvAnalysisComponent implements OnInit {
 //     </div>
 //   `,
 //   styles: [`
-//     /* HOST & LAYOUT */
 //     :host { display: block; width: 100%; }
 
 //     .ltv-container {
@@ -644,6 +657,9 @@ export class CustomerLtvAnalysisComponent implements OnInit {
 //       font-family: var(--font-body);
 //       min-height: 100%;
 //     }
+
+//     /* Filter Section */
+//     .filter-section { margin-bottom: var(--spacing-lg); }
 
 //     /* KPI GRID */
 //     .kpi-grid {
@@ -876,18 +892,58 @@ export class CustomerLtvAnalysisComponent implements OnInit {
 //   `]
 // })
 // export class CustomerLtvAnalysisComponent implements OnInit {
+//   // Injections
+//   public masterList = inject(MasterListService); // Needed for branch dropdown
+//   private analyticsService = inject(AdminAnalyticsService);
+//   private cdr = inject(ChangeDetectorRef);
+
+//   // Signals
 //   ltvData = signal<any>(null);
-//   loading = signal<boolean>(true);
+//   loading = signal<boolean>(false);
 //   ltvColumns: any[] = [];
 
-//   constructor(
-//     private analyticsService: AdminAnalyticsService,
-//     private cdr: ChangeDetectorRef
-//   ) { }
+//   // Filter State
+//   private currentFilters: any = {};
+
+//   // 1. FILTER CONFIG
+//   filterConfig: FilterField[] = [
+//     {
+//       key: 'branchId',
+//       label: 'Branch Context',
+//       type: 'select',
+//       dataSourceKey: 'branches', // Binds to MasterListService.branches()
+//       optionLabel: 'name',
+//       optionValue: '_id',
+//       placeholder: 'Global Network Average'
+//     }
+//   ];
 
 //   ngOnInit() {
 //     this.setupColumns();
+//     // loadData triggers on filter init
+//   }
+
+//   // 2. FILTER HANDLER
+//   onFilterUpdate(filters: any) {
+//     this.currentFilters = filters;
 //     this.loadData();
+//   }
+
+//   loadData() {
+//     this.loading.set(true);
+    
+//     // Pass branchId if selected, otherwise undefined for global
+//     const branchId = this.currentFilters.branchId;
+
+//     this.analyticsService.getCustomerLifetimeValue(branchId).subscribe({
+//       next: (res) => {
+//         if (res.status === 'success') {
+//           this.ltvData.set(res.data);
+//         }
+//         this.loading.set(false);
+//       },
+//       error: () => this.loading.set(false)
+//     });
 //   }
 
 //   setupColumns(): void {
@@ -910,8 +966,6 @@ export class CustomerLtvAnalysisComponent implements OnInit {
 //         minWidth: 200,
 //         cellRenderer: (params: any) => {
 //           const tier = params.data.tier || 'Standard';
-//           // Using CSS variables for Tier styling
-//           let tierClass = 'tier-standard';
 //           let colorStyle = 'color: var(--text-secondary); background: var(--bg-ternary); border: 1px solid var(--border-secondary);';
 
 //           if(tier === 'Platinum') { 
@@ -968,27 +1022,14 @@ export class CustomerLtvAnalysisComponent implements OnInit {
 //         cellRenderer: (params: any) => {
 //            const val = params.value || 0;
 //            return `<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 2px;">
-//                     <span style="font-size: 10px; font-weight: 700; color: var(--text-primary);">${val.toFixed(0)}%</span>
-//                     <div style="width: 100%; height: 3px; background: var(--bg-ternary); border-radius: 2px; overflow: hidden;">
-//                        <div style="width: ${val}%; height: 100%; background: var(--accent-primary);"></div>
-//                     </div>
-//                    </div>`;
+//                      <span style="font-size: 10px; font-weight: 700; color: var(--text-primary);">${val.toFixed(0)}%</span>
+//                      <div style="width: 100%; height: 3px; background: var(--bg-ternary); border-radius: 2px; overflow: hidden;">
+//                         <div style="width: ${val}%; height: 100%; background: var(--accent-primary);"></div>
+//                      </div>
+//                     </div>`;
 //         }
 //       }
 //     ];
 //     this.cdr.detectChanges();
-//   }
-
-//   loadData() {
-//     this.loading.set(true);
-//     this.analyticsService.getCustomerLifetimeValue().subscribe({
-//       next: (res) => {
-//         if (res.status === 'success') {
-//           this.ltvData.set(res.data);
-//         }
-//         this.loading.set(false);
-//       },
-//       error: () => this.loading.set(false)
-//     });
 //   }
 // }

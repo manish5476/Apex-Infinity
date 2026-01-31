@@ -47,7 +47,7 @@
             <div class="form-grid">
               <div class="form-group">
                 <label>Department</label>
-                <p-select 
+                <p-select appendTo="body" 
                   appendTo="body" 
                   formControlName="departmentId" 
                   [options]="masterList.department()" 
@@ -60,7 +60,7 @@
 
               <div class="form-group">
                 <label>Category</label>
-                <p-select 
+                <p-select appendTo="body" 
                   appendTo="body" 
                   formControlName="categoryId" 
                   [options]="masterList.categories()" 
@@ -75,7 +75,7 @@
             <div class="form-grid mt-4">
               <div class="form-group">
                 <label>Sub Category</label>
-                 <p-select 
+                 <p-select appendTo="body" 
                   appendTo="body" 
                   formControlName="subCategoryId" 
                   [options]="masterList.categories()" 
@@ -88,7 +88,7 @@
 
               <div class="form-group">
                 <label>Brand</label>
-                <p-select 
+                <p-select appendTo="body" 
                   appendTo="body" 
                   formControlName="brandId" 
                   [options]="masterList.brands()" 
@@ -103,7 +103,7 @@
             <div class="form-grid mt-4">
                 <div class="form-group">
                     <label>Unit</label>
-                    <p-select 
+                    <p-select appendTo="body" 
                       appendTo="body" 
                       formControlName="unitId" 
                       [options]="masterList.units()" 
@@ -157,7 +157,7 @@
               <div [formGroupName]="i" class="inventory-item-grid animate-slideInUp">
                 <div class="form-group">
                   <label>Branch</label>
-                  <p-select appendTo="body" formControlName="branchId" [options]="branchOptions()" optionLabel="name"
+                  <p-select appendTo="body" appendTo="body" formControlName="branchId" [options]="branchOptions()" optionLabel="name"
                     optionValue="_id" placeholder="Select Branch"></p-select>
                 </div>
 
@@ -192,7 +192,7 @@
             <div class="form-grid">
               <div class="form-group">
                 <label>Default Supplier</label>
-                <p-select appendTo="body" formControlName="defaultSupplierId" [options]="masterList.suppliers()"
+                <p-select appendTo="body" appendTo="body" formControlName="defaultSupplierId" [options]="masterList.suppliers()"
                   optionLabel="companyName" optionValue="_id" placeholder="Select Supplier" [filter]="true"></p-select>
               </div>
               <div class="form-group">
@@ -262,12 +262,12 @@
             <div class="form-grid">
               <div class="form-group">
                 <label>Brand</label>
-                <p-select optionLabel="name" optionValue="value" appendTo="body" appendTo="body" formControlName="brand" [options]="this.masterList.brands()" placeholder="Select Brand"
+                <p-select appendTo="body" optionLabel="name" optionValue="value" appendTo="body" appendTo="body" formControlName="brand" [options]="this.masterList.brands()" placeholder="Select Brand"
                   [filter]="true"></p-select>
               </div>
               <div class="form-group">
                 <label>Category</label>
-                <p-select optionLabel="name" optionValue="value" appendTo="body" appendTo="body" formControlName="category" [options]="this.masterList.categories()"
+                <p-select appendTo="body" optionLabel="name" optionValue="value" appendTo="body" appendTo="body" formControlName="category" [options]="this.masterList.categories()"
                   placeholder="Select Category" [filter]="true"></p-select>
               </div>
             </div>
@@ -313,7 +313,7 @@
               <div [formGroupName]="i" class="inventory-item-grid animate-slideInUp">
                 <div class="form-group">
                   <label>Branch</label>
-                  <p-select appendTo="body" appendTo="body" formControlName="branchId" [options]="branchOptions()" optionLabel="name"
+                  <p-select appendTo="body" appendTo="body" appendTo="body" formControlName="branchId" [options]="branchOptions()" optionLabel="name"
                     optionValue="_id" placeholder="Select Branch"></p-select>
                 </div>
 
@@ -350,7 +350,7 @@
             <div class="form-grid">
               <div class="form-group">
                 <label>Default Supplier</label>
-                <p-select appendTo="body" appendTo="body" formControlName="defaultSupplierId" [options]="supplierOptions()"
+                <p-select appendTo="body" appendTo="body" appendTo="body" formControlName="defaultSupplierId" [options]="supplierOptions()"
                   optionLabel="companyName" optionValue="_id" placeholder="Select Supplier" [filter]="true"></p-select>
               </div>
               <div class="form-group">
