@@ -150,26 +150,62 @@ export class UserFormComponent implements OnInit {
       finalize(() => this.loadingService.hide())
     ).subscribe({
       next: (res: any) => {
-        const user = res.data?.user || res.data || res;
+        // FIX: Access the nested 'data' property based on your JSON structure
+        const user = res.data?.data || res.data?.user || res.data;
+
         if (user) {
-          // Flatten objects to IDs for PrimeNG Select
+          console.log('User Data to Patch:', user); // Debug log to ensure you have the clean object
+
           this.userForm.patchValue({
             ...user,
+            // Extract _id from populated objects if they exist, otherwise use the value as is
             role: user.role?._id || user.role,
             branchId: user.branchId?._id || user.branchId,
+            
+            // Handle the nested form group
             attendanceConfig: {
               ...user.attendanceConfig,
               shiftId: user.attendanceConfig?.shiftId?._id || user.attendanceConfig?.shiftId
             }
           });
+
+          // Optional: If you are using OnPush change detection or if values don't appear immediately
+          // this.userForm.updateValueAndValidity();
         }
       },
-      error: () => {
+      error: (err) => {
+        console.error(err);
         this.messageService.showError('Error', 'User record not found.');
         this.onCancel();
       }
     });
   }
+  // private loadUserData(id: string) {
+  //   // this.loadingService.show();
+  //   this.userService.getUser(id).pipe(
+  //     finalize(() => this.loadingService.hide())
+  //   ).subscribe({
+  //     next: (res: any) => {
+  //       const user = res.data?.user || res.data || res;
+  //       if (user) {
+  //         // Flatten objects to IDs for PrimeNG Select
+  //         this.userForm.patchValue({
+  //           ...user,
+  //           role: user.role?._id || user.role,
+  //           branchId: user.branchId?._id || user.branchId,
+  //           attendanceConfig: {
+  //             ...user.attendanceConfig,
+  //             shiftId: user.attendanceConfig?.shiftId?._id || user.attendanceConfig?.shiftId
+  //           }
+  //         });
+  //       }
+  //     },
+  //     error: () => {
+  //       this.messageService.showError('Error', 'User record not found.');
+  //       this.onCancel();
+  //     }
+  //   });
+  // }
 
   onSubmit() {
     if (this.userForm.invalid) {
