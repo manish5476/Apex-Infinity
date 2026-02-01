@@ -1,134 +1,102 @@
 :host {
   display: block;
-  height: 100%;
   width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
-.transaction-layout {
+// Main Container (matches User List)
+.list-page-container {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: var(--bg-primary);
+  padding: 0.75rem; 
+  background-color: var(--theme-bg-secondary);
 }
 
-/* === FILTER HEADER === */
-.filter-header {
-  padding: var(--spacing-lg) var(--spacing-xl);
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-primary);
+// Card Wrapper
+.themed-card {
+  background: var(--theme-bg-primary);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
   display: flex;
+  flex-direction: column;
+  flex: 1; // Grow to fill container
+  overflow: hidden;
+  padding: 1rem;
+  gap: 1rem;
+}
+
+// Filter Bar Styling
+.se-filter-bar {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+  flex-shrink: 0;
   flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-lg);
+  width: 100%;
 
-  .filter-group {
+  .se-filter-field {
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-md);
+    flex-direction: column;
+    gap: 0.25rem;
     flex: 1;
+    min-width: 160px; // Prevent squishing
 
-    .filter-item {
-      min-width: 160px;
-      
-      &.search-item {
-        min-width: 240px;
-      }
+    label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--theme-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
     }
   }
 
-  .action-group {
+  .se-filter-actions {
     display: flex;
-    gap: var(--spacing-sm);
+    gap: 0.5rem;
+    margin-left: auto; // Push to right if space permits
   }
 }
 
-/* === GRID CONTAINER === */
-.grid-container {
-  flex: 1; /* Takes all remaining height */
-  position: relative;
+// Grid Wrapper (CRITICAL FOR HEIGHT)
+.list-grid-wrapper {
+  flex: 1; // Take all remaining height
+  width: 100%;
+  min-height: 0; // Required for nested scrolling in Flexbox
+  border: 1px solid var(--border-secondary);
+  border-radius: 8px;
   overflow: hidden;
-  background: var(--bg-primary);
-  padding: 0;
 
-  /* Force grid component to fill space */
-  .full-height-grid {
-    display: block;
+  // Force Angular component to fill height
+  app-ag-share-grid {
     height: 100%;
     width: 100%;
-  }
-  
-  // /* Ensure AG Grid internal container fills height */
-  // ::ng-deep app-ag-share-grid {
-  //   height: 100% !important;
-  //   display: block;
-  // }
-}
-
-/* === FOOTER STATS === */
-.footer-stats {
-  padding: var(--spacing-sm) var(--spacing-xl);
-  background: var(--bg-ternary);
-  border-top: 1px solid var(--border-primary);
-  font-size: var(--font-size-sm);
-  color: var(--text-secondary);
-  display: flex;
-  justify-content: flex-end;
-}
-
-// /* === PRIME NG OVERRIDES === */
-// :host ::ng-deep {
-//   .p-inputtext {
-//     font-size: var(--font-size-sm);
-//     padding: 0.6rem 0.75rem;
-//   }
-  
-//   .p-select {
-//     font-size: var(--font-size-sm);
-//     width: 100%;
-//   }
-  
-//   .p-datepicker {
-//     width: 100%;
-//     input { width: 100%; }
-//   }
-// }
-
-:host {
-  display: block;
-  height: 100%;
-  width: 100%;
-}
-
-.transaction-layout {
-  display: flex;
-  flex-direction: column;
-  height: 100%; /* Important: Fill the Dialog body */
-  background-color: var(--bg-primary);
-}
-
-/* ... Filter Header styles remain same ... */
-
-/* === GRID CONTAINER (UPDATED) === */
-.grid-container {
-  flex: 1;          /* Grow to fill all remaining space */
-  min-height: 0;    /* CRITICAL: Allows scrolling inside a flex child */
-  position: relative;
-  background: var(--bg-primary);
-  padding: 0;
-  display: flex;    /* Make this a flex container too */
-  flex-direction: column;
-
-  /* Force the Angular component to fill the parent */
-  app-ag-share-grid {
-    flex: 1;
-    width: 100%;
-    height: 100%; /* Ensure it hits the bottom */
     display: block;
   }
+}
 
-  // /* Deep selector to force AG Grid internals to fill height */
-  // ::ng-deep .ag-root-wrapper {
-  //   height: 100% !important;
-  // }
+// Badge Styles for your TS Renderers
+::ng-deep .grid-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  text-transform: uppercase;
+  font-weight: 700;
+  border: 1px solid transparent;
+  display: inline-block;
+  line-height: 1.4;
+
+  &.badge-info { 
+    background: #e0f2fe; color: #0369a1; border-color: #bae6fd; 
+  }
+  &.badge-success { 
+    background: #dcfce7; color: #15803d; border-color: #bbf7d0; 
+  }
+  &.badge-warning { 
+    background: #fef9c3; color: #a16207; border-color: #fde047; 
+  }
+  &.badge-neutral { 
+    background: #f3f4f6; color: #4b5563; border-color: #e5e7eb; 
+  }
 }

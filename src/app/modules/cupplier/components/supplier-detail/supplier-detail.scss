@@ -375,403 +375,183 @@
   gap: var(--spacing-md); color: var(--text-secondary);
   .error-icon { font-size: 3rem; color: var(--color-error); background: rgba(239,68,68,0.1); padding: 1rem; border-radius: 50%; }
 }
-// /* =========================================================
-//    SUPPLIER DETAILS - RESPONSIVE & FIXED SIDEBAR
-//    ========================================================= */
+/* =========================================================
+   SUPPLIER DETAILS - FIXED LAYOUT
+   ========================================================= */
 
-// :host {
-//   display: block;
-//   height: 100%;
-//   width: 100%;
-// }
+:host {
+  display: block;
+  width: 100%;
+  /* REMOVED: height: 100% -> This was likely breaking the scroll */
+}
 
-// .page-container {
-//   height: 100%;
-//   width: 100%;
-//   background-color: var(--bg-primary);
-//   display: flex;
-//   flex-direction: column;
-//   overflow-y: auto; /* Main scroll container */
-//   padding: var(--spacing-xl);
-//   gap: var(--spacing-xl);
-
-//   /* MOBILE TWEAK: Less padding on small screens */
-//   @media (max-width: 768px) {
-//     padding: var(--spacing-md);
-//     gap: var(--spacing-lg);
-//   }
-// }
-
-// /* === HEADER === */
-// .dashboard-header {
-//   display: flex;
-//   justify-content: space-between;
-//   align-items: flex-start;
-//   gap: var(--spacing-lg);
-//   flex-wrap: wrap; /* Allows wrapping on very small phones */
-
-//   .header-left {
-//     display: flex;
-//     gap: var(--spacing-md);
-//     align-items: flex-start;
-//     flex: 1; 
-//     min-width: 0; /* Critical for text truncation flex issues */
-
-//     .back-btn {
-//       color: var(--text-secondary);
-//       margin-top: 6px;
-//       flex-shrink: 0;
-//       &:hover { background: var(--bg-ternary); color: var(--text-primary); }
-//     }
-
-//     .identity-group {
-//       display: flex;
-//       flex-direction: column;
-//       gap: 4px;
-//       min-width: 0;
-
-//       .name-row {
-//         display: flex; align-items: center; gap: var(--spacing-md); flex-wrap: wrap;
-//         h1 {
-//           font-family: var(--font-heading);
-//           font-size: var(--font-size-2xl); /* 24px */
-//           font-weight: var(--font-weight-bold);
-//           color: var(--text-primary);
-//           margin: 0;
-//           line-height: 1.2;
-//           word-break: break-word; /* Prevents long names from breaking layout */
-//         }
-//       }
-
-//       .meta-row {
-//         display: flex; align-items: center; gap: var(--spacing-sm); flex-wrap: wrap;
-        
-//         .id-badge {
-//           font-family: var(--font-mono);
-//           font-size: var(--font-size-xs);
-//           color: var(--text-secondary);
-//           background: var(--bg-ternary);
-//           padding: 2px 8px;
-//           border-radius: 4px;
-//           border: 1px solid var(--border-secondary);
-//           white-space: nowrap;
-//         }
-
-//         .category-badge {
-//           font-size: 10px;
-//           font-weight: 700;
-//           text-transform: uppercase;
-//           letter-spacing: 0.5px;
-//           color: var(--text-tertiary);
-//           background: var(--bg-ternary);
-//           padding: 2px 6px;
-//           border-radius: 4px;
-//           white-space: nowrap;
-//         }
-//       }
-//     }
-//   }
-
-//   .header-actions {
-//     display: flex;
-//     gap: var(--spacing-sm);
-//     /* Mobile: Scroll actions horizontally if they don't fit */
-//     @media (max-width: 600px) {
-//       width: 100%;
-//       overflow-x: auto;
-//       padding-bottom: 4px;
-//       .p-button { flex-shrink: 0; }
-//     }
-//     // ::ng-deep .p-button.btn-sm { padding: var(--spacing-xs) var(--spacing-md); font-size: var(--font-size-sm); }
-//   }
-// }
-
-// /* === LAYOUT GRID (The Core Layout Logic) === */
-// .layout-grid {
-//   display: grid;
-//   /* DESKTOP: 320px Sidebar + Remaining space for Main */
-//   grid-template-columns: 320px 1fr; 
-//   gap: var(--spacing-xl);
-//   align-items: start; /* Aligns items to top */
-
-//   /* MOBILE / TABLET: Stack vertically */
-//   @media (max-width: 1024px) {
-//     grid-template-columns: 1fr; 
-//     gap: var(--spacing-lg);
-//   }
-// }
-
-// /* === SIDEBAR COLUMN === */
-// .sidebar-column {
-//   display: flex;
-//   flex-direction: column;
-//   gap: var(--spacing-lg);
+.page-container {
+  width: 100%;
+  min-height: 100vh; /* Ensure full background coverage */
+  background-color: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-xl);
+  gap: var(--spacing-xl);
   
-//   /* DESKTOP: Sticky Sidebar */
-//   @media (min-width: 1025px) {
-//     position: sticky;
-//     top: 0; 
-//     /* If you have a top-navbar, increase this (e.g., top: 70px) */
-//     z-index: 10;
-//   }
+  /* Allow natural scrolling */
+  overflow-y: visible; 
 
-//   /* MOBILE: Normal flow (not sticky) */
-//   @media (max-width: 1024px) {
-//     position: relative;
-//     top: auto;
-//     width: 100%;
-//   }
-// }
+  @media (max-width: 768px) {
+    padding: var(--spacing-md);
+    gap: var(--spacing-lg);
+  }
+}
 
-// /* === PROFILE CARD === */
-// .profile-card {
-//   background: var(--bg-secondary);
-//   border: 1px solid var(--border-primary);
-//   border-radius: var(--ui-border-radius-lg);
-//   overflow: hidden;
-//   box-shadow: var(--shadow-sm);
+/* === HEADER (unchanged) === */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
 
-//   .card-banner {
-//     height: 100px;
-//     background: linear-gradient(135deg, var(--bg-ternary), var(--bg-secondary));
-//     border-bottom: 1px solid var(--border-secondary);
-//   }
+  .header-left {
+    display: flex; gap: var(--spacing-md); flex: 1; min-width: 0;
+    .back-btn { margin-top: 6px; }
+    h1 { font-size: 1.5rem; font-weight: 700; margin: 0; line-height: 1.2; }
+  }
+}
 
-//   .profile-content {
-//     padding: 0 var(--spacing-lg) var(--spacing-xl);
-//     margin-top: -50px;
-//     text-align: center;
-//     display: flex; flex-direction: column; align-items: center;
-
-//     .avatar-wrapper {
-//       position: relative; margin-bottom: var(--spacing-md);
-      
-//       ::ng-deep .user-avatar {
-//         background: var(--bg-ternary);
-//         border: 4px solid var(--bg-secondary);
-//         width: 100px; height: 100px;
-//         font-size: 3rem; color: var(--text-secondary);
-//       }
-
-//       .status-dot {
-//         position: absolute; bottom: 8px; right: 8px;
-//         width: 16px; height: 16px; border-radius: 50%;
-//         background: var(--color-disabled); border: 3px solid var(--bg-secondary);
-//         &.active { background: var(--color-success); }
-//       }
-//     }
-
-//     .contact-name {
-//       margin: 0 0 4px 0; font-size: var(--font-size-lg); font-weight: 700; color: var(--text-primary);
-//     }
-//     .contact-email {
-//       font-size: var(--font-size-sm); color: var(--text-secondary); text-decoration: none;
-//       word-break: break-all; /* Ensure long emails don't break layout */
-//       &:hover { color: var(--accent-primary); text-decoration: underline; }
-//     }
-
-//     .info-list {
-//       margin-top: var(--spacing-xl); width: 100%; display: flex; flex-direction: column; gap: var(--spacing-md);
-
-//       .info-item {
-//         display: flex; align-items: flex-start; gap: var(--spacing-md);
-//         padding: var(--spacing-md); background: var(--bg-ternary);
-//         border-radius: var(--ui-border-radius); text-align: left;
-
-//         .icon-box {
-//           width: 32px; height: 32px; background: var(--bg-secondary);
-//           border-radius: 50%; display: flex; align-items: center; justify-content: center;
-//           color: var(--text-tertiary); border: 1px solid var(--border-secondary);
-//           flex-shrink: 0;
-//         }
-
-//         .info-text {
-//           display: flex; flex-direction: column; min-width: 0; /* Flex fix */
-//           label { font-size: 10px; text-transform: uppercase; font-weight: 700; color: var(--text-tertiary); }
-//           span, a, p { font-size: var(--font-size-sm); color: var(--text-primary); font-weight: 500; margin: 0; }
-//           .mono-text { font-family: var(--font-mono); letter-spacing: 0.5px; }
-//           .sub-text { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
-//           .address-block { line-height: 1.5; white-space: pre-line; }
-//         }
-//       }
-//     }
-//   }
-// }
-
-// /* === SHARED GLASS CARD === */
-// .glass-card {
-//   background: var(--bg-secondary);
-//   border: 1px solid var(--border-primary);
-//   border-radius: var(--ui-border-radius-lg);
-//   box-shadow: var(--shadow-sm);
-//   overflow: hidden;
+/* === MAIN LAYOUT WRAPPER === */
+.layout-grid {
+  display: flex;
+  align-items: flex-start; /* Keeps sidebar at top */
+  gap: var(--spacing-xl);
+  width: 100%;
   
-//   /* Remove top margin as the sidebar container handles spacing */
-//   margin-top: 0; 
+  /* Mobile: Stack vertically */
+  @media (max-width: 1024px) {
+    flex-direction: column;
+  }
+}
 
-//   .card-header {
-//     padding: var(--spacing-md) var(--spacing-lg);
-//     background: var(--bg-ternary);
-//     border-bottom: 1px solid var(--border-secondary);
-//     display: flex; align-items: center; gap: var(--spacing-md);
-//     color: var(--text-secondary); font-size: var(--font-size-sm); text-transform: uppercase; font-weight: 700;
-//     i { color: var(--accent-primary); }
-//   }
-//   .card-body { padding: var(--spacing-lg); }
-// }
+/* === SIDEBAR (Left) === */
+.sidebar-column {
+  /* Fixed width for sidebar */
+  flex: 0 0 320px;
+  width: 320px;
+  
+  /* Sticky behavior: Scrolls with page until it hits top */
+  position: sticky;
+  top: 1rem;
+  z-index: 10;
+  
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
 
-// .meta-row {
-//   display: flex; justify-content: space-between; font-size: var(--font-size-sm);
-//   padding: 4px 0; border-bottom: 1px solid var(--border-secondary);
-//   &:last-child { border-bottom: none; }
-//   label { color: var(--text-secondary); }
-//   span { color: var(--text-primary); font-weight: 500; }
-// }
+  @media (max-width: 1024px) {
+    width: 100%;
+    position: relative;
+    top: 0;
+  }
+}
 
-// /* === MAIN CONTENT (RIGHT) === */
-// .main-column {
-//   display: flex; flex-direction: column; gap: var(--spacing-xl);
-//   min-width: 0; /* Prevents grid blowouts */
-// }
+/* === MAIN CONTENT (Right) === */
+.main-column {
+  flex: 1; /* Take remaining width */
+  min-width: 0; /* CSS Grid hack to prevent overflow */
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
 
-// /* Metrics Grid */
-// .metrics-grid {
-//   display: grid;
-//   /* Adaptive: Fits as many columns as possible, min width 160px */
-//   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
-//   gap: var(--spacing-lg);
-
-//   /* Mobile: Make metrics swipeable or stacked 2x2 */
-//   @media (max-width: 480px) {
-//     grid-template-columns: 1fr 1fr; /* 2 cols on mobile */
-//   }
-
-//   .metric-card {
-//     background: var(--bg-secondary);
-//     border: 1px solid var(--border-primary);
-//     border-radius: var(--ui-border-radius-lg);
-//     padding: var(--spacing-lg);
-//     display: flex; align-items: center; gap: var(--spacing-lg);
-//     box-shadow: var(--shadow-sm);
-//     min-height: 90px;
-
-//     .icon-box {
-//       width: 40px; height: 40px; border-radius: 10px;
-//       background: var(--bg-ternary); color: var(--text-secondary);
-//       display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
-//       flex-shrink: 0;
-//     }
-
-//     .data-box {
-//       display: flex; flex-direction: column; min-width: 0;
-//       label { 
-//         font-size: 10px; text-transform: uppercase; font-weight: 700; color: var(--text-tertiary); 
-//         white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-//       }
-//       .value { 
-//         font-size: 1.2rem; font-weight: 700; color: var(--text-primary); font-family: var(--font-heading); 
-//         white-space: nowrap;
-//       }
-//     }
-
-//     &.outstanding { 
-//       .icon-box { background: rgba(239, 68, 68, 0.1); color: var(--color-error); }
-//       .value { color: var(--color-error); } 
-//     }
-//   }
-// }
-
-// .supply-panel {
-//   .section-subtitle { font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: var(--spacing-md); }
-//   .branch-chips {
-//     display: flex; flex-wrap: wrap; gap: var(--spacing-sm);
-//     .chip { 
-//       font-size: 12px; padding: 4px 10px; background: var(--bg-ternary); 
-//       border: 1px solid var(--border-secondary); border-radius: 16px; color: var(--text-primary); 
-//     }
-//   }
-// }
-
-// .activity-panel {
-//   @extend .glass-card; min-height: 250px;
-//   .tabs-header {
-//     background: var(--bg-ternary); border-bottom: 1px solid var(--border-primary); padding: 0 var(--spacing-md);
-//     .tab-btn {
-//         background: var(--bg-secondary); border: none; padding: var(--spacing-md) var(--spacing-lg);
-//       font-weight: 600; color: var(--text-secondary); border-bottom: 2px solid transparent;
-//       display: flex; align-items: center; gap: 6px;
-//       &.active { color: var(--accent-primary); border-color: var(--accent-primary); background: var(--bg-secondary); }
-//     }
-//   }
-//   .grid-container {
-//     /* Height handled by inline style in HTML, but ensure container doesn't collapse */
-//     display: block; 
-//     width: 100%;
+/* === METRICS GRID (Top of Main) === */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-lg);
+  
+  .metric-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex; align-items: center; gap: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     
-//     .empty-placeholder { 
-//         padding: var(--spacing-2xl); 
-//         display: flex; flex-direction: column; align-items: center; justify-content: center;
-//         text-align: center; color: var(--text-tertiary); 
-//         i { font-size: 2rem; margin-bottom: 8px; } 
-//     }
-//   }
-// }
+    .icon-box { 
+       width: 48px; height: 48px; border-radius: 12px; 
+       background: var(--bg-ternary); display: flex; align-items: center; justify-content: center;
+    }
+    .value { font-size: 1.25rem; font-weight: 700; }
+  }
+}
 
-// /* === LOADING & ERROR === */
-// .loading-state {
-//   display: flex; flex-direction: column; gap: var(--spacing-xl);
-//   .skeleton-header { margin-bottom: var(--spacing-lg); }
+/* === ACTIVITY PANEL (The Grid Container) === */
+.activity-panel {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  /* === THE FIX IS HERE === */
+  /* We give this specific card a height so the grid works */
+  /* But we do NOT force the whole page to be this height */
+  height: 650px; 
+  min-height: 650px;
+
+  .se-filter-bar {
+    padding: 1rem;
+    background: var(--bg-ternary);
+    border-bottom: 1px solid var(--border-secondary);
+    display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;
+    
+    .se-filter-field { flex: 1; min-width: 140px; }
+  }
+
+  .grid-container {
+    flex: 1; /* Fill remaining height of the card */
+    width: 100%;
+    position: relative;
+    
+    /* Ensure child components fill this space */
+    app-ag-share-grid {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .panel-footer {
+    padding: 0.5rem 1rem;
+    background: var(--bg-ternary);
+    border-top: 1px solid var(--border-secondary);
+    font-size: 0.75rem;
+    text-align: right;
+    color: var(--text-secondary);
+  }
+}
+
+/* === PROFILE CARD STYLES (Keep your existing nice styles) === */
+.profile-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  overflow: hidden;
+  text-align: center;
   
-//   .layout-grid {
-//      /* Replicate main grid behavior for skeleton */
-//      display: grid; grid-template-columns: 320px 1fr; gap: var(--spacing-xl);
-//      @media (max-width: 1024px) { grid-template-columns: 1fr; }
-//   }
+  .card-banner { height: 80px; background: linear-gradient(to right, #e2e8f0, #f1f5f9); }
+  .profile-content { padding: 0 1.5rem 1.5rem; margin-top: -40px; }
+  .avatar-wrapper { margin-bottom: 1rem; display: inline-block; position: relative; }
   
-//   .skeleton-sidebar { width: 100%; }
-//   .skeleton-main { flex: 1; display: flex; flex-direction: column; gap: var(--spacing-lg); }
-//   .metrics-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-lg); }
-// }
-
-// .error-state {
-//   height: 60vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
-//   gap: var(--spacing-md); color: var(--text-secondary);
-//   .error-icon { font-size: 3rem; color: var(--color-error); background: rgba(239,68,68,0.1); padding: 1rem; border-radius: 50%; }
-// }/* === LAYOUT GRID === */
-// .layout-grid {
-//   display: grid;
-//   /* DESKTOP: Fixed 320px Sidebar | Fluid Main Content */
-//   grid-template-columns: 320px 1fr;
-//   gap: var(--spacing-xl);
-//   align-items: start;
-
-//   /* MOBILE/TABLET FIX: Stack them vertically */
-//   @media (max-width: 1024px) {
-//     display: flex;          /* Use Flexbox for cleaner vertical stacking */
-//     flex-direction: column; 
-//     gap: var(--spacing-lg);
-//   }
-// }
-
-// /* === SIDEBAR COLUMN === */
-// .sidebar-column {
-//   display: flex;
-//   flex-direction: column;
-//   gap: var(--spacing-lg);
-
-//   /* DESKTOP ONLY (Screens wider than 1024px) */
-//   @media (min-width: 1025px) {
-//     position: sticky;       /* Make it sticky ONLY on desktop */
-//     top: 0;                 /* Stick to the top of the scroll container */
-//     z-index: 10;
-//     height: fit-content;    /* Critical: Ensures it doesn't stretch to full height */
-//   }
-
-//   /* MOBILE FIX (Screens 1024px and smaller) */
-//   @media (max-width: 1024px) {
-//     position: static !important; /* Force normal scrolling behavior */
-//     top: auto !important;
-//     width: 100%;                 /* Take full width */
-//     height: auto;
-//   }
-// }
+  .info-list {
+    margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;
+    .info-item {
+      display: flex; align-items: flex-start; gap: 0.75rem; text-align: left;
+      padding: 0.75rem; background: var(--bg-ternary); border-radius: 8px;
+      .info-text { display: flex; flex-direction: column; }
+      label { font-size: 0.65rem; text-transform: uppercase; font-weight: 700; color: var(--text-tertiary); }
+      span, a, p { font-size: 0.85rem; font-weight: 500; color: var(--text-primary); margin: 0; }
+    }
+  }
+}

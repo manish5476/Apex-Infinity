@@ -1,45 +1,88 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+
+import { Component, OnInit, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { finalize, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { FormsModule } from '@angular/forms'; // Added
+
+// AG Grid
+import { GridApi, GridReadyEvent } from 'ag-grid-community';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
 import { AvatarModule } from 'primeng/avatar';
+import { InputTextModule } from 'primeng/inputtext';
+import { DatePickerModule } from 'primeng/datepicker';
+import { SelectModule } from 'primeng/select';
 
 // Services
 import { SupplierService } from '../../services/supplier-service';
+// import { TransactionService } from '../../services/transaction.service'; // Check path
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../core/services/message.service';
-import { SupplierTransactions } from '../../../transactions/supplier-transactions/supplier-transactions';
+import { CommonMethodService } from '../../../../core/utils/common-method.service';
+import { TransactionService } from '../../../transactions/transaction.service';
+import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
 
 @Component({
   selector: 'app-supplier-details',
   standalone: true,
   imports: [
-    CommonModule, RouterModule, ButtonModule, TagModule, 
-    SkeletonModule, AvatarModule, SupplierTransactions 
+    CommonModule, RouterModule, FormsModule,
+    ButtonModule, TagModule, SkeletonModule, AvatarModule,
+    InputTextModule, DatePickerModule, SelectModule,
+    AgShareGrid
   ],
   templateUrl: './supplier-detail.html',
   styleUrls: ['./supplier-detail.scss'],
 })
 export class SupplierDetailsComponent implements OnInit {
+  // Injections
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
   private supplierService = inject(SupplierService);
+  private transactionService = inject(TransactionService); // Added
   private messageService = inject(AppMessageService);
   private masterList = inject(MasterListService);
+  public common = inject(CommonMethodService);
 
-  // Signals
+  // --- Supplier State ---
   supplier = signal<any | null>(null);
   loading = signal(true);
   isError = signal(false);
   branchNames = signal('N/A');
+
+  // --- Transaction Grid State ---
+  gridApi!: GridApi;
+  txnData: any[] = [];
+  txnColumns: any[] = [];
+  txnLoading = false;
+  txnPage = 1;
+  txnTotal = 0;
+  txnLimit = 100;
+
+  // Filters
+  rangeDates: Date[] | undefined;
+  txnFilter = { type: null, effect: null, search: '' };
   
+  txnTypes = [
+    { label: 'Purchase', value: 'purchase' }, 
+    { label: 'Payment', value: 'payment' },
+    { label: 'Ledger', value: 'ledger' }
+  ];
+  
+  txnEffects = [
+    { label: 'Credit (+)', value: 'credit' }, 
+    { label: 'Debit (-)', value: 'debit' }
+  ];
+
   ngOnInit(): void {
+    this.initGridColumns(); // Setup columns immediately
+
     this.route.paramMap.pipe(
       switchMap(params => {
         const id = params.get('id');
@@ -56,9 +99,12 @@ export class SupplierDetailsComponent implements OnInit {
     ).subscribe({
       next: (res: any) => {
         if (res?.data?.data || res?.data) {
-          const s = res.data.data || res.data; // Handle potential API variations
+          const s = res.data.data || res.data;
           this.supplier.set(s);
           this.resolveBranchNames(s.branchesSupplied);
+          
+          // 👇 TRIGGER TRANSACTION FETCH NOW
+          this.getTransactions(true); 
         } else {
           this.isError.set(true);
         }
@@ -67,22 +113,121 @@ export class SupplierDetailsComponent implements OnInit {
     });
   }
 
-  // Helper Logic
-  private resolveBranchNames(branchIds: string[]) {
-    if (!branchIds?.length) return;
-    
-    // Ensure master list is loaded or handle async if needed (assuming sync for simplicity here)
-    const allBranches = this.masterList.branches(); 
-    if(!allBranches || allBranches.length === 0) {
-        // Fallback or retry logic if master list isn't ready
-        this.branchNames.set('Loading branches...');
-        return;
+  // --- Transaction Logic ---
+
+  getTransactions(isReset: boolean = false) {
+    const supplierId = this.supplier()?._id;
+    if (!supplierId || this.txnLoading) return;
+
+    this.txnLoading = true;
+
+    if (isReset) {
+      this.txnPage = 1;
+      this.txnData = [];
+      this.txnTotal = 0;
     }
 
-    const names = branchIds
-      .map(id => allBranches.find(b => b._id === id)?.name)
-      .filter(n => n)
-      .join(', ');
+    const queryParams: any = {
+      ...this.txnFilter,
+      page: this.txnPage,
+      limit: this.txnLimit
+    };
+
+    if (this.rangeDates && this.rangeDates.length > 0) {
+      if (this.rangeDates[0]) queryParams.startDate = this.formatDateForApi(this.rangeDates[0]);
+      if (this.rangeDates[1]) queryParams.endDate = this.formatDateForApi(this.rangeDates[1]);
+    }
+
+    this.transactionService.getSupplierTransactions(supplierId, queryParams).subscribe({
+      next: (res: any) => {
+        let newData = res.results || [];
+        this.txnTotal = res.total || this.txnTotal;
+        this.txnData = isReset ? newData : [...this.txnData, ...newData];
+        
+        if (newData.length > 0) this.txnPage++;
+        
+        this.txnLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.txnLoading = false;
+        console.error(err);
+      }
+    });
+  }
+
+  applyTxnFilters() { this.getTransactions(true); }
+  
+  resetTxnFilters() {
+    this.txnFilter = { type: null, effect: null, search: '' };
+    this.rangeDates = undefined;
+    this.getTransactions(true);
+  }
+
+  onGridReady(params: GridReadyEvent) {
+    this.gridApi = params.api;
+    this.gridApi.sizeColumnsToFit();
+  }
+
+  eventFromGrid(event: any) {
+    if (event.type === 'reachedBottom' && this.txnData.length < this.txnTotal) {
+      this.getTransactions(false);
+    }
+  }
+
+  initGridColumns(): void {
+    this.txnColumns = [
+      { 
+        field: 'date', headerName: 'Date', width: 140, pinned: 'left',
+        valueFormatter: (p:any) => this.common.formatDate(p.value, 'dd MMM yyyy'),
+        cellStyle: { 'display': 'flex', 'align-items': 'center', 'font-weight': '600' }
+      },
+      { 
+        field: 'type', headerName: 'Type', width: 120,
+        cellRenderer: (p:any) => {
+           const type = p.value?.toLowerCase() || '-';
+           let color = type === 'purchase' ? '#0ea5e9' : (type === 'payment' ? '#22c55e' : '#eab308');
+           return `<span style="color:${color}; font-weight:700; text-transform:uppercase; font-size:11px;">${type}</span>`;
+        }
+      },
+      { 
+        field: 'description', headerName: 'Description', minWidth: 200, flex: 1,
+        cellStyle: { 'display': 'flex', 'align-items': 'center' }
+      },
+      { 
+        field: 'effect', headerName: 'Effect', width: 110, 
+        cellRenderer: (p:any) => {
+          const isCredit = p.value?.toLowerCase() === 'credit';
+          const color = isCredit ? '#16a34a' : '#dc2626';
+          const icon = isCredit ? 'pi-arrow-down' : 'pi-arrow-up';
+          return `<span style="color:${color}; font-weight:700; font-size:11px; text-transform:uppercase;">
+                    <i class="pi ${icon}" style="font-size:10px;"></i> ${p.value}
+                  </span>`;
+        }
+      },
+      { 
+        field: 'amount', headerName: 'Amount', width: 140, type: 'rightAligned',
+        valueFormatter: (p:any) => this.common.formatCurrency(p.value),
+        cellStyle: (p:any) => ({ 
+            'color': p.data.effect === 'credit' ? '#16a34a' : '#dc2626', 
+            'font-weight': '700', 'text-align': 'right', 'display': 'flex', 'justify-content': 'flex-end', 'align-items': 'center' 
+        })
+      }
+    ];
+  }
+
+  private formatDateForApi(date: Date): string {
+    const offset = date.getTimezoneOffset();
+    const localDate = new Date(date.getTime() - (offset * 60 * 1000));
+    return localDate.toISOString().split('T')[0];
+  }
+
+  // --- Existing Helper Logic ---
+  private resolveBranchNames(branchIds: string[]) {
+    if (!branchIds?.length) return;
+    const allBranches = this.masterList.branches(); 
+    if(!allBranches) { this.branchNames.set('Loading branches...'); return; }
+    const names = branchIds.map(id => allBranches.find(b => b._id === id)?.name).filter(n => n).join(', ');
     this.branchNames.set(names || 'N/A');
   }
 
@@ -96,15 +241,13 @@ export class SupplierDetailsComponent implements OnInit {
   }
 
   formatAddress(addr: any): string {
-    if (!addr) return 'No address on file';
-    return [addr.street, addr.city, addr.state, addr.zipCode, addr.country]
-      .filter(p => p && p.trim()).join(',\n');
+    if (!addr) return 'No address';
+    return [addr.street, addr.city, addr.state].filter(p => p).join(', ');
   }
 }
-
 // import { Component, OnInit, inject, signal } from '@angular/core';
 // import { CommonModule } from '@angular/common';
-// import { ActivatedRoute, RouterModule } from '@angular/router';
+// import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 // import { finalize, switchMap } from 'rxjs/operators';
 // import { of } from 'rxjs';
 
@@ -113,7 +256,6 @@ export class SupplierDetailsComponent implements OnInit {
 // import { TagModule } from 'primeng/tag';
 // import { SkeletonModule } from 'primeng/skeleton';
 // import { AvatarModule } from 'primeng/avatar';
-// // Removed DialogModule
 
 // // Services
 // import { SupplierService } from '../../services/supplier-service';
@@ -126,13 +268,14 @@ export class SupplierDetailsComponent implements OnInit {
 //   standalone: true,
 //   imports: [
 //     CommonModule, RouterModule, ButtonModule, TagModule, 
-//     SkeletonModule, AvatarModule, SupplierTransactions // Imported directly
+//     SkeletonModule, AvatarModule, SupplierTransactions 
 //   ],
 //   templateUrl: './supplier-detail.html',
 //   styleUrls: ['./supplier-detail.scss'],
 // })
 // export class SupplierDetailsComponent implements OnInit {
 //   private route = inject(ActivatedRoute);
+//   private router = inject(Router);
 //   private supplierService = inject(SupplierService);
 //   private messageService = inject(AppMessageService);
 //   private masterList = inject(MasterListService);
@@ -143,13 +286,14 @@ export class SupplierDetailsComponent implements OnInit {
 //   isError = signal(false);
 //   branchNames = signal('N/A');
   
-//   // showTransactionsDialog = false; // REMOVED
-
 //   ngOnInit(): void {
 //     this.route.paramMap.pipe(
 //       switchMap(params => {
 //         const id = params.get('id');
-//         if (!id) return of(null);
+//         if (!id) {
+//             this.router.navigate(['/suppliers']);
+//             return of(null);
+//         }
 //         this.loading.set(true);
 //         this.isError.set(false);
 //         return this.supplierService.getSupplierById(id).pipe(
@@ -158,8 +302,8 @@ export class SupplierDetailsComponent implements OnInit {
 //       })
 //     ).subscribe({
 //       next: (res: any) => {
-//         if (res?.data?.data) {
-//           const s = res.data.data;
+//         if (res?.data?.data || res?.data) {
+//           const s = res.data.data || res.data; // Handle potential API variations
 //           this.supplier.set(s);
 //           this.resolveBranchNames(s.branchesSupplied);
 //         } else {
@@ -173,7 +317,15 @@ export class SupplierDetailsComponent implements OnInit {
 //   // Helper Logic
 //   private resolveBranchNames(branchIds: string[]) {
 //     if (!branchIds?.length) return;
-//     const allBranches = this.masterList.branches();
+    
+//     // Ensure master list is loaded or handle async if needed (assuming sync for simplicity here)
+//     const allBranches = this.masterList.branches(); 
+//     if(!allBranches || allBranches.length === 0) {
+//         // Fallback or retry logic if master list isn't ready
+//         this.branchNames.set('Loading branches...');
+//         return;
+//     }
+
 //     const names = branchIds
 //       .map(id => allBranches.find(b => b._id === id)?.name)
 //       .filter(n => n)
