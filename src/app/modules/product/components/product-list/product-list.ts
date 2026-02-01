@@ -42,7 +42,7 @@ export class ProductListComponent implements OnInit {
   private isLoading = false;
   private totalCount = 0;
   private pageSize = 50;
-  
+
   data: any[] = [];
   column: any = [];
   rowSelectionMode: any = 'single';
@@ -59,9 +59,9 @@ export class ProductListComponent implements OnInit {
 
   constructor() {
     effect(() => {
-        // Load master data logic here if needed
-        this.brandOptions.set(this.masterList.brands());
-        this.categoryOptions.set(this.masterList.categories());
+      // Load master data logic here if needed
+      this.brandOptions.set(this.masterList.brands());
+      this.categoryOptions.set(this.masterList.categories());
     });
   }
 
@@ -106,7 +106,7 @@ export class ProductListComponent implements OnInit {
         this.data = [...this.data, ...newData];
 
         if (this.gridApi && !isReset) {
-           this.gridApi.applyTransaction({ add: newData });
+          this.gridApi.applyTransaction({ add: newData });
         }
 
         this.currentPage++;
@@ -131,7 +131,7 @@ export class ProductListComponent implements OnInit {
   }
 
   eventFromGrid(event: any) {
-     if (event.type=== 'cellClicked' && event.field==='name') {
+    if (event.type === 'cellClicked' && event.field === 'name') {
       const productId = event.row._id;
       if (productId) {
         this.router.navigate([productId], { relativeTo: this.route });
@@ -144,79 +144,172 @@ export class ProductListComponent implements OnInit {
 
   getColumn(): void {
     this.column = [
+      // 1. IMAGE & IDENTITY
       {
         field: 'images',
-        headerName: 'Image',
+        headerName: '',
+        width: 60,
+        pinned: 'left',
         cellRenderer: ImageCellRendererComponent,
-        valueGetter: (params: any) => params.data.images?.[0], 
-        width: 80,
+        valueGetter: (params: any) => params.data.images?.[0] || null,
         filter: false,
         sortable: false,
+        suppressMenu: true
       },
       {
         field: 'name',
-        headerName: 'Name',
-        sortable: true,
-        filter: true,
-        flex: 1,
-        minWidth: 200,
+        headerName: 'Product Name',
+        pinned: 'left',
+        flex: 1.5,
+        minWidth: 220,
+        filter: 'agTextColumnFilter',
+        // Enable Text Editing
+        cellConfig: { type: 'text', placeholder: 'Product Name' },
         cellStyle: {
-          'color': 'var(--accent-primary)',
           'font-weight': '600',
-          'cursor': 'pointer'
+          'color': 'var(--text-primary)'
         }
       },
       {
         field: 'sku',
         headerName: 'SKU',
-        sortable: true,
-        width: 150,
+        width: 120,
+        pinned: 'left',
+        cellStyle: { 'font-family': 'var(--font-mono)', 'font-size': '12px' }
       },
+
+      // 2. CLASSIFICATION (Dropdown Editors)
       {
         field: 'brandId.name',
         headerName: 'Brand',
-        sortable: true,
-        width: 150,
-      },
-      {
-        field: 'categoryId.name ',
-        headerName: 'Category',
-        sortable: true,
-        width: 150,
-      },
-      {
-        field: 'sellingPrice',
-        headerName: 'Price',
-        sortable: true,
-        width: 120,
-        type: 'rightAligned',
-        valueFormatter: (params: any) => (typeof params.value === 'number') ? `₹ ${params.value.toFixed(2)}` : '-',
-        cellStyle: { 'font-weight': 'bold' }
-      },
-      {
-        field: 'totalStock',
-        headerName: 'Stock',
-        sortable: true,
-        width: 100,
-        type: 'rightAligned',
-        cellClass: (params: any) => {
-          if (params.value <= 10) return 'cell-status status-low-stock';
-          return null;
+        width: 130,
+        filter: 'agSetColumnFilter',
+        // Example: Using Select editor (You would populate options dynamically in real app)
+        cellConfig: {
+          type: 'select',
+          options: [{ label: 'Apple', value: 'Apple' }, { label: 'Samsung', value: 'Samsung' }]
         }
       },
       {
-        field: 'isActive',
-        headerName: 'Status',
-        sortable: true,
-        width: 120,
-        valueFormatter: (params: any) => params.value ? 'Active' : 'Inactive',
-        cellClass: (params: any) => {
-          return params.value ? 'cell-status status-active' : 'cell-status status-inactive';
-        },
+        field: 'categoryId.name',
+        headerName: 'Category',
+        width: 130,
+        filter: 'agSetColumnFilter'
       },
+      {
+        field: 'subCategoryId.name',
+        headerName: 'Sub-Category',
+        width: 130,
+        hide: true // Hidden by default, user can enable
+      },
+
+      // 3. PRICING & FINANCIALS (Numeric Editors)
+      {
+        field: 'purchasePrice',
+        headerName: 'Buy Price',
+        width: 110,
+        type: 'numericColumn',
+        valueFormatter: this.currencyFormatter,
+        cellConfig: { type: 'number', min: 0 }
+      },
+      {
+        field: 'sellingPrice',
+        headerName: 'Sell Price',
+        width: 110,
+        type: 'numericColumn',
+        valueFormatter: this.currencyFormatter,
+        cellConfig: { type: 'number', min: 0 },
+        cellStyle: { 'color': 'var(--text-primary)', 'font-weight': '600' }
+      },
+      {
+        headerName: 'Margin',
+        width: 100,
+        // Calculated Column: (Sell - Buy) / Sell %
+        valueGetter: (params: any) => {
+          const buy = params.data.purchasePrice || 0;
+          const sell = params.data.sellingPrice || 0;
+          if (sell === 0) return 0;
+          return ((sell - buy) / sell) * 100;
+        },
+        valueFormatter: (params: any) => params.value ? `${params.value.toFixed(1)}%` : '-',
+        cellStyle: (params: any) => {
+          if (params.value > 20) return { color: 'var(--color-success)' };
+          if (params.value < 10) return { color: 'var(--color-error)' };
+          return { color: 'var(--color-warning)' };
+        }
+      },
+      {
+        field: 'taxRate',
+        headerName: 'Tax %',
+        width: 90,
+        type: 'numericColumn',
+        cellConfig: { type: 'number', max: 100 }
+      },
+
+      // 4. INVENTORY & UNIT
+      {
+        headerName: 'Total Stock',
+        width: 110,
+        type: 'numericColumn',
+        // Aggregate inventory array: Sum of all branch quantities
+        valueGetter: (params: any) => {
+          if (!params.data.inventory || !Array.isArray(params.data.inventory)) return 0;
+          return params.data.inventory.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0);
+        },
+        cellClass: (params: any) => {
+          return params.value <= 10 ? 'text-danger font-bold' : '';
+        }
+      },
+      {
+        field: 'unitId.code',
+        headerName: 'Unit',
+        width: 80,
+        cellClass: 'text-muted text-xs'
+      },
+
+      // 5. SUPPLIER & LOGISTICS
+      {
+        field: 'defaultSupplierId.companyName',
+        headerName: 'Supplier',
+        width: 160,
+        tooltipField: 'defaultSupplierId.contactPerson'
+      },
+
+      // 6. STATUS & AUDIT
+      {
+        field: 'isActive',
+        headerName: 'Active',
+        width: 100,
+        cellClass: 'flex-center',
+        // Boolean Switch Editor
+        cellConfig: { type: 'boolean' },
+        cellRenderer: (params: any) => {
+          return params.value
+            ? `<span class="badge badge-success">Active</span>`
+            : `<span class="badge badge-danger">Inactive</span>`;
+        }
+      },
+      {
+        field: 'updatedAt',
+        headerName: 'Last Updated',
+        width: 140,
+        hide: true, // Optional
+        valueFormatter: (params: any) => {
+          return params.value ? new Date(params.value).toLocaleDateString() : '-';
+        },
+        cellConfig: { type: 'date' }
+      }
     ];
+
     this.cdr.detectChanges();
   }
+
+  // Helper for Currency
+  currencyFormatter(params: any) {
+    if (params.value === null || params.value === undefined) return '-';
+    return '₹ ' + params.value.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+  }
+  
 }
 
 // import { ChangeDetectorRef, Component, OnInit, effect, inject, signal } from '@angular/core';
