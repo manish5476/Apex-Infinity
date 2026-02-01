@@ -145,7 +145,7 @@ export class UserFormComponent implements OnInit {
   }
 
   private loadUserData(id: string) {
-    this.loadingService.show();
+    // this.loadingService.show();
     this.userService.getUser(id).pipe(
       finalize(() => this.loadingService.hide())
     ).subscribe({

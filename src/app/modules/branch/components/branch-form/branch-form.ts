@@ -112,12 +112,14 @@ export class BranchFormComponent implements OnInit {
         if (this.branchId) {
           this.editMode.set(true);
           this.formTitle.set('Edit Branch');
-          this.loadingService.show();
+          // this.loadingService.show();
           return this.branchService.getBranchById(this.branchId);
         }
         return of(null);
       }),
-      finalize(() => this.loadingService.hide())
+      finalize(() =>
+         this.loadingService.hide()
+    )
     ).subscribe({
       next: (response) => {
         if (response?.data?.data) {

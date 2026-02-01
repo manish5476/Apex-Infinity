@@ -83,7 +83,7 @@ export class ProductFormComponent implements OnInit {
         if (id) {
           this.productId.set(id);
           this.editMode.set(true);
-          this.loadingService.show();
+          // this.loadingService.show();
           return this.productService.getProductById(id);
         }
         return of(null);

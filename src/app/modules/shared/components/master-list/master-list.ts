@@ -54,7 +54,7 @@ export interface Master {
             <h2 class="section-heading m-0">Master Data</h2>
             
             <p-iconfield iconPosition="left">
-              <p-inputicon styleClass="pi pi-search"></p-inputicon>
+              <!-- <p-inputicon styleClass="pi pi-search"></p-inputicon> -->
               <input pInputText type="text" (input)="onQuickFilter($event)" 
                      placeholder="Search..." class="p-inputtext-sm w-64" />
             </p-iconfield>
@@ -197,6 +197,7 @@ export class MasterList implements OnInit {
         this.handleDelete(event.row);
         break;
       case 'editStart':
+        console.log(event.row);
         console.log('Editing started for:', event.row._id);
         break;
     }
@@ -207,17 +208,14 @@ export class MasterList implements OnInit {
   onAddNew() {
     // Create a temporary new row
     const newMaster: Master = {
-      _id: `new_${Date.now()}`, // Temporary ID
-      type: 'category', // Default value
+      _id: `new_${Date.now()}`,
+      type: 'category', 
       name: '',
       code: '',
       description: '',
       isNew: true
     };
-
-    // Update signal to add row to top
-    this.masters.update(current => [newMaster, ...current]);
-    
+    this.masters.update(current => [newMaster, ...current]);   
     this.messageService.add({severity:'info', summary:'New Row', detail:'Please fill details and click Save'});
   }
 
@@ -235,7 +233,7 @@ export class MasterList implements OnInit {
       description: row.description
     };
 
-    this.loadingService.show();
+    // this.loadingService.show();
 
     if (row.isNew || row._id.startsWith('new_')) {
       // --- CREATE ---
@@ -278,7 +276,7 @@ export class MasterList implements OnInit {
       acceptButtonStyleClass: 'p-button-danger p-button-text',
       rejectButtonStyleClass: 'p-button-text p-button-secondary',
       accept: () => {
-        this.loadingService.show();
+        // this.loadingService.show();
         this.masterService.deleteMaster(row._id).subscribe({
           next: () => {
             this.masters.update(users => users.filter(u => u._id !== row._id));

@@ -116,7 +116,7 @@ export class SupplierFormComponent implements OnInit {
         if (this.supplierId) {
           this.editMode.set(true);
           this.formTitle.set('Edit Supplier');
-          this.loadingService.show();
+          // this.loadingService.show();
           return this.supplierService.getSupplierById(this.supplierId);
         }
         return of(null); // Create mode

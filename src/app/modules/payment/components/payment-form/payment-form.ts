@@ -110,7 +110,7 @@ export class PaymentFormComponent implements OnInit, OnDestroy {
         if (this.paymentId) {
           // this.editMode.set(true);
           this.formTitle.set('Edit Payment');
-          this.loadingService.show();
+          // this.loadingService.show();
           return this.paymentService.getPaymentById(this.paymentId);
         }
         return of(null); // Create mode

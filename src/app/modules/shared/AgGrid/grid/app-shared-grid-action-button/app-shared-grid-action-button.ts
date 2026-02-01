@@ -1,168 +1,168 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { ICellRendererAngularComp } from 'ag-grid-angular';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
-  selector: 'app-shared-grid-action-button',
+  selector: 'app-shared-action-btn',
   standalone: true,
-  // 1. Use ButtonModule to ensure <p-button> works
   imports: [CommonModule, ButtonModule, TooltipModule],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './app-shared-grid-action-button.html',
-  styleUrl: './app-shared-grid-action-button.scss',
+  encapsulation: ViewEncapsulation.None, // Ensures tooltip styles work seamlessly
+  template: `
+    <div class="action-cell-wrapper" (mousedown)="$event.stopPropagation()">
+      
+      @if (isEditing) {
+        <button 
+          pButton 
+          icon="pi pi-check" 
+          class="action-btn btn-save"
+          pTooltip="Save Changes" 
+          tooltipPosition="top"
+          (click)="onAction('save')">
+        </button>
+
+        <button 
+          pButton 
+          icon="pi pi-times" 
+          class="action-btn btn-cancel"
+          pTooltip="Discard" 
+          tooltipPosition="top"
+          (click)="onAction('cancel')">
+        </button>
+
+      } @else {
+        <button 
+          pButton 
+          icon="pi pi-pencil" 
+          class="action-btn btn-edit"
+          pTooltip="Edit Row" 
+          tooltipPosition="top"
+          (click)="onAction('edit')">
+        </button>
+
+        <button 
+          pButton 
+          icon="pi pi-trash" 
+          class="action-btn btn-delete"
+          pTooltip="Delete Row" 
+          tooltipPosition="top"
+          (click)="onAction('delete')">
+        </button>
+      }
+
+    </div>
+  `,
+  styles: [`
+    /* ==========================================================================
+       ACTION CELL CONTAINER
+       ========================================================================== */
+    .action-cell-wrapper {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center; /* Center buttons in cell */
+      gap: var(--spacing-sm);  /* 0.375rem (6px) - Compact Gap */
+    }
+
+    /* ==========================================================================
+       BASE ACTION BUTTON
+       "Ghost" style: Transparent until hovered
+       ========================================================================== */
+    .action-btn.p-button {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: 1px solid transparent;
+      border-radius: var(--ui-border-radius); /* 5px */
+      background: transparent;
+      transition: var(--transition-fast); /* 0.12s snappy response */
+      
+      /* Default Icon Style */
+      color: var(--text-secondary);
+      
+      .p-button-icon {
+        font-size: 0.85rem; /* ~13-14px balanced icon */
+        font-weight: var(--font-weight-medium);
+      }
+
+      /* Hover: Slight background lift for generic state */
+      &:hover {
+        background: var(--component-bg-hover);
+        color: var(--text-primary);
+      }
+      
+      /* Focus: Accessibility Ring */
+      &:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+      }
+    }
+
+    /* ==========================================================================
+       SEMANTIC VARIANTS (Hover States)
+       Uses your color-mix tokens for perfect harmony
+       ========================================================================== */
+
+    /* 1. EDIT (Primary/Accent) */
+    .action-btn.btn-edit:hover {
+      background: var(--color-primary-bg); /* Tinted Background */
+      color: var(--accent-primary);        /* Bold Text */
+      border-color: rgba(var(--accent-primary-rgb), 0.2); /* Subtle Border */
+    }
+
+    /* 2. DELETE (Error) */
+    .action-btn.btn-delete:hover {
+      background: var(--color-error-bg);
+      color: var(--color-error);
+      border-color: var(--color-error-border);
+    }
+
+    /* 3. SAVE (Success) */
+    .action-btn.btn-save {
+      /* Save is special: It's often green even before hover to indicate "Safe" */
+      color: var(--color-success);
+      
+      &:hover {
+        background: var(--color-success);
+        color: white; /* Invert on hover for strong call to action */
+        box-shadow: var(--shadow-sm);
+      }
+    }
+
+    /* 4. CANCEL (Secondary/Muted) */
+    .action-btn.btn-cancel:hover {
+      background: var(--bg-ternary);
+      color: var(--text-primary);
+      border-color: var(--border-secondary);
+    }
+  `]
 })
 export class AppSharedGridActionButton implements ICellRendererAngularComp {
-  
-  private cdr = inject(ChangeDetectorRef);
   params: any;
-  editing = false;
+  isEditing = false;
 
   agInit(params: any): void {
     this.params = params;
-    this.updateState();
-    // 2. CRITICAL: Force view update immediately upon creation
-    this.cdr.detectChanges();
+    this.checkState();
   }
 
   refresh(params: any): boolean {
     this.params = params;
-    this.updateState();
-    // 3. CRITICAL: Force view update if the component is reused
-    this.cdr.detectChanges();
-    return true; 
+    this.checkState();
+    return true;
   }
 
-  private updateState() {
-    // 4. Debug: Check console to see if true/false is actually switching
-    // console.log('Action Button State Check:', this.params.context.isRowEditing(this.params.data));
-    this.editing = this.params.context.isRowEditing(this.params.data);
+  checkState() {
+    // Check Parent Signal for editing state
+    const parent = this.params.context.componentParent;
+    if (parent) {
+      this.isEditing = parent.editingIds().has(this.params.node.id);
+    }
   }
 
-  emit(action: string) {
-    this.params.context.onAction(action, this.params.data);
+  onAction(action: string) {
+    this.params.context.componentParent.handleRowAction(action, this.params.data);
   }
 }
-
-// import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
-// import { ICellRendererAngularComp } from 'ag-grid-angular';
-// // Use the PrimeNG button import or your directive approach
-// import { ButtonModule } from 'primeng/button'; 
-// import { TooltipModule } from 'primeng/tooltip';
-
-// @Component({
-//   selector: 'app-shared-grid-action-button',
-//   standalone: true,
-//   imports: [ButtonModule, TooltipModule], // Add imports here
-//   changeDetection: ChangeDetectionStrategy.OnPush, // Best practice for performance
-//   templateUrl: './app-shared-grid-action-button.html',
-//   styleUrl: './app-shared-grid-action-button.scss',
-// })
-// export class AppSharedGridActionButton implements ICellRendererAngularComp {
-  
-//   // 1. Inject ChangeDetectorRef
-//   private cdr = inject(ChangeDetectorRef);
-
-//   params: any;
-//   editing = false;
-
-//   agInit(params: any): void {
-//     this.params = params;
-//     this.updateState();
-//   }
-
-//   refresh(params: any): boolean {
-//     this.params = params;
-//     this.updateState();
-    
-//     // 2. FORCE the update. This makes it instant.
-//     this.cdr.detectChanges(); 
-    
-//     // 3. Return true so AG Grid recycles this component (High Performance)
-//     return true; 
-//   }
-
-//   // Helper to centralize logic
-//   private updateState() {
-//     // Check if THIS specific row is in editing mode based on your grid context logic
-//     this.editing = this.params.context.isRowEditing(this.params.data);
-//   }
-
-//   emit(action: string) {
-//     // Stop bubbling so clicking the button doesn't select the row (if you have row selection on)
-//     this.params.context.onAction(action, this.params.data);
-//   }
-// }
-
-
-// // import { Component, ChangeDetectorRef, inject } from '@angular/core'; // 1. Import ChangeDetectorRef
-// // import { ICellRendererAngularComp } from 'ag-grid-angular';
-// // import { Button } from 'primeng/button';
-
-// // @Component({
-// //   selector: 'app-shared-grid-action-button',
-// //   imports: [Button],
-// //   templateUrl: './app-shared-grid-action-button.html',
-// //   styleUrl: './app-shared-grid-action-button.scss',
-// // })
-// // export class AppSharedGridActionButton implements ICellRendererAngularComp {
-  
-// //   // 2. Inject ChangeDetectorRef
-// //   private cdr = inject(ChangeDetectorRef); 
-  
-// //   private params!: any;
-// //   editing = false;
-
-// //   agInit(params: any): void {
-// //     this.params = params;
-// //     this.editing = params.context.isRowEditing(params.data);
-// //   }
-
-// //   refresh(params: any): boolean {
-// //     this.params = params;
-// //     // Update the state
-// //     this.editing = params.context.isRowEditing(params.data);
-    
-// //     // 3. FORCE Angular to check the view and update the DOM
-// //     this.cdr.detectChanges(); 
-    
-// //     return true;
-// //   }
-
-// //   emit(action: string) {
-// //     // Stop propagation to prevent row selection conflicts if any
-// //     this.params.context.onAction(action, this.params.data);
-// //   }
-// // }
-// // // import { Component } from '@angular/core';
-// // // import { ICellRendererAngularComp } from 'ag-grid-angular';
-// // // import { ButtonModule, Button } from 'primeng/button';
-
-// // // @Component({
-// // //   selector: 'app-shared-grid-action-button',
-// // //   imports: [Button],
-// // //   templateUrl: './app-shared-grid-action-button.html',
-// // //   styleUrl: './app-shared-grid-action-button.scss',
-// // // })
-// // // export class AppSharedGridActionButton implements ICellRendererAngularComp {
-
-// // //   private params!: any;
-// // //   editing = false;
-
-// // //   agInit(params: any): void {
-// // //     this.params = params;
-// // //     this.editing = params.context.isRowEditing(params.data);
-// // //   }
-
-// // //   refresh(params: any): boolean {
-// // //     this.params = params;
-// // //     this.editing = params.context.isRowEditing(params.data);
-// // //     return true;
-// // //   }
-
-  
-// // //   emit(action: string) {
-// // //     this.params.context.onAction(action, this.params.data);
-// // //   }
-// // // }

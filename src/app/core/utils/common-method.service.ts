@@ -34,7 +34,7 @@ export class CommonMethodService {
     successFn: (response: T) => void,
     context: string = 'Operation'
   ): void {
-    this.loadingService.show();
+    // this.loadingService.show();
 
     observable$.pipe(
       finalize(() => this.loadingService.hide())

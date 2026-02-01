@@ -1961,6 +1961,147 @@
         text-align: center;
     }
 }
+
+/* ==========================================================================
+   TOAST (NOTIFICATION) COMPONENT
+   Style: Modern Glass / High Contrast / Top Layer
+   ========================================================================== */
+
+/* 1. Global Container Positioning */
+::ng-deep .p-toast {
+    opacity: 1; /* Don't fade the whole container, fade the messages */
+    position: fixed !important;
+    top: 20px !important;    /* Gap from top of screen */
+    right: 20px !important;  /* Gap from right of screen */
+    
+    /* NUCLEAR Z-INDEX: Ensures it sits above Headers, Modals, and Overlays */
+    z-index: 99999 !important; 
+    
+    width: 24rem; /* Slightly more compact than 25rem */
+    font-family: var(--font-body);
+
+    /* 2. The Message Card */
+    .p-toast-message {
+        margin-bottom: var(--spacing-md);
+        border-radius: var(--ui-border-radius-lg);
+        box-shadow: var(--shadow-2xl); /* Deep shadow to separate from header */
+        overflow: hidden;
+        backdrop-filter: blur(12px); /* Glass effect */
+        -webkit-backdrop-filter: blur(12px);
+        transform-origin: top center;
+        
+        /* Default Background (will be overridden by severities) */
+        background: rgba(255, 255, 255, 0.95); 
+        border: 1px solid var(--border-primary);
+
+        /* Animation for smooth entry */
+        animation: toastSlideIn 0.3s cubic-bezier(0.2, 0.9, 0.2, 1);
+
+        .p-toast-message-content {
+            padding: var(--spacing-md) var(--spacing-lg);
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+        }
+
+        /* 3. Icon Styling */
+        .p-toast-message-icon {
+            font-size: 1.25rem; /* Balanced size */
+            margin-right: 0;    /* Reset margin, handled by flex gap */
+            padding-top: 2px;   /* Optical alignment with text */
+        }
+
+        /* 4. Text Layout */
+        .p-toast-message-text {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .p-toast-summary {
+            font-family: var(--font-heading, var(--font-body));
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-md);
+            color: var(--text-primary);
+        }
+
+        .p-toast-detail {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            line-height: var(--line-height-relaxed);
+        }
+
+        /* 5. Close Icon */
+        .p-toast-icon-close {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: transparent;
+            color: var(--text-tertiary);
+            transition: var(--transition-fast);
+            
+            &:hover {
+                background: var(--bg-hover);
+                color: var(--text-primary);
+            }
+            
+            &:focus {
+                outline: none;
+                box-shadow: 0 0 0 2px var(--focus-ring-color);
+            }
+        }
+
+        /* 6. Semantic Themes (Severities) 
+           Using a subtle border-left accent instead of full colors for readability 
+        */
+        
+        /* INFO */
+        &.p-toast-message-info {
+            border-left: 4px solid var(--theme-info);
+            background: linear-gradient(to right, color-mix(in srgb, var(--theme-info) 5%, white), white);
+            .p-toast-message-icon { color: var(--theme-info); }
+        }
+
+        /* SUCCESS */
+        &.p-toast-message-success {
+            border-left: 4px solid var(--theme-success);
+            background: linear-gradient(to right, color-mix(in srgb, var(--theme-success) 5%, white), white);
+            .p-toast-message-icon { color: var(--theme-success); }
+        }
+
+        /* WARNING */
+        &.p-toast-message-warn {
+            border-left: 4px solid var(--theme-warning);
+            background: linear-gradient(to right, color-mix(in srgb, var(--theme-warning) 5%, white), white);
+            .p-toast-message-icon { color: var(--theme-warning); }
+        }
+
+        /* ERROR */
+        &.p-toast-message-error {
+            border-left: 4px solid var(--theme-error);
+            background: linear-gradient(to right, color-mix(in srgb, var(--theme-error) 5%, white), white);
+            .p-toast-message-icon { color: var(--theme-error); }
+        }
+    }
+}
+
+/* Dark Mode Support (If your app uses a .dark class) */
+.dark ::ng-deep .p-toast .p-toast-message {
+    background: rgba(30, 30, 30, 0.9);
+    border-color: rgba(255, 255, 255, 0.1);
+    
+    &.p-toast-message-info { background: linear-gradient(to right, color-mix(in srgb, var(--theme-info) 10%, #1e1e1e), #1e1e1e); }
+    &.p-toast-message-success { background: linear-gradient(to right, color-mix(in srgb, var(--theme-success) 10%, #1e1e1e), #1e1e1e); }
+    &.p-toast-message-warn { background: linear-gradient(to right, color-mix(in srgb, var(--theme-warning) 10%, #1e1e1e), #1e1e1e); }
+    &.p-toast-message-error { background: linear-gradient(to right, color-mix(in srgb, var(--theme-error) 10%, #1e1e1e), #1e1e1e); }
+}
+
+@keyframes toastSlideIn {
+    from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
   // /* ==========================================================================
   //   PRIMENG COMPONENT THEME OVERRIDES (Angular 20)
   //   System: Glass | Compact | High Density

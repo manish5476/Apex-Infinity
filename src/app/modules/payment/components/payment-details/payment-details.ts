@@ -43,7 +43,7 @@ export class PaymentDetailsComponent implements OnInit {
       switchMap(params => {
         const id = params.get('id');
         if (!id) return of(null);
-        this.loadingService.show();
+        // this.loadingService.show();
         return this.paymentService.getPaymentById(id).pipe(finalize(() => this.loadingService.hide()) ); })
     ).subscribe({
       next: (res: any) => {
