@@ -7,6 +7,8 @@ import { routes } from './app.routes';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { DatePipe } from '@angular/common';
+import { errorInterceptor } from './core/interceptors/error.interceptor';
+import { LoadingInterceptor } from './core/interceptors/loading.interceptor';
 
 // PrimeNG Imports
 import { providePrimeNG } from 'primeng/config';
@@ -24,8 +26,9 @@ import { AuthService } from './modules/auth/services/auth-service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    
     provideHttpClient(
-      withInterceptors([ jwtInterceptor, loggingInterceptor ]), 
+      withInterceptors([ jwtInterceptor, loggingInterceptor ,errorInterceptor,LoadingInterceptor]), 
       withFetch()
     ),
     provideRouter(routes),
@@ -141,7 +144,6 @@ export const appConfig: ApplicationConfig = {
 // // import { jwtInterceptor } from './core/interceptors/jwt.interceptor';
 // // import { loggingInterceptor } from './core/interceptors/logging.interceptor';
 // // import { ErrorInterceptor } from './core/interceptors/error.interceptor';
-// // import { LoadingInterceptor } from './core/interceptors/loading.interceptor';
 
 // // import { AuthService } from './modules/auth/services/auth-service';
 
