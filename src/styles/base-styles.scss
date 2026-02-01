@@ -38,8 +38,8 @@ html, body, :host {
 
 /* Modern Scrollbar Strategy */
 * {
-  scrollbar-width: thin;
-  scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+  // scrollbar-width: thin;
+  // scrollbar-color: var(--scroll-thumb) var(--scroll-track);
 }
 
 /* Webkit Scrollbar Fallback */

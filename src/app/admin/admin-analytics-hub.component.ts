@@ -246,7 +246,7 @@ import { DashboardUI } from "./components/dashboard.ui";
       justify-content: center;
       
       /* ADDED SIDE PADDING HERE (40px) to prevent edge touching */
-      padding: 104px 40px 24px 40px;
+      padding: 104px 0px 0px 0px;
       
       height: 100%;
       overflow: hidden; /* No scroll on outer viewport */
