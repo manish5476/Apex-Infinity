@@ -14,6 +14,66 @@
   <div class="themed-card">
     <div class="se-filter-bar">
 
+      <div class="se-filter-field search-field">
+        <label for="search">Search</label>
+        <span class="p-input-icon-left w-full">
+          <!-- <i class="pi pi-search"></i> -->
+          <input id="search" type="text" pInputText [formControl]="searchControl"
+            placeholder="Search Invoice # or Customer..." class="w-full" />
+        </span>
+      </div>
+
+      <div class="se-filter-field">
+        <label for="payStatus">Payment Status</label>
+        <p-select appendTo="body" id="payStatus" [options]="paymentStatusOptions"
+          [(ngModel)]="salesFilter.paymentStatus" [showClear]="true" placeholder="All Status" styleClass="w-full"
+          (onChange)="applyFilters()">
+        </p-select>
+      </div>
+
+      <div class="se-filter-field">
+        <label for="status">Order Status</label>
+        <p-select appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="salesFilter.status"
+          [showClear]="true" placeholder="All Orders" styleClass="w-full" (onChange)="applyFilters()">
+        </p-select>
+      </div>
+
+      <div class="se-filter-actions">
+        <p-button icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary" (onClick)="resetFilters()" pTooltip="Reset Filters"></p-button>
+        <p-button label="Apply" icon="pi pi-filter" (onClick)="applyFilters()"></p-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-grid-area themed-card">
+    <app-ag-share-grid 
+      [columns]="column" 
+      [data]="data" 
+      [showActions]="false" 
+      selectionMode="multiple"
+      (gridEvent)="eventFromGrid($event)" 
+      class="full-size-grid">
+    </app-ag-share-grid>
+  </div>
+
+</div>
+
+<!-- <p-toast></p-toast>
+
+<div class="list-page-container">
+
+  <div class="list-header">
+    <h2 class="list-title">
+      <i class="pi pi-chart-line text-[var(--accent-primary)]"></i>
+      Sales Register
+    </h2>
+    <p-button label="New Sale" icon="pi pi-plus" (onClick)="onCreateSales()">
+    </p-button>
+  </div>
+
+  <div class="themed-card">
+    <div class="se-filter-bar">
+
       <div class="se-filter-field" style="flex: 2">
         <label for="search">Search</label>
         <input id="search" type="text" pInputText [formControl]="searchControl"
@@ -54,4 +114,4 @@
     </app-ag-share-grid>
   </div>
 
-</div>
+</div> -->

@@ -4,6 +4,7 @@ import { io, Socket, ManagerOptions, SocketOptions } from 'socket.io-client';
 import { BehaviorSubject, Observable, map, distinctUntilChanged, shareReplay } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AppMessageService } from './message.service';
+import { AuthService } from '../../modules/auth/services/auth-service';
 
 export interface NotificationData {
   _id?: string;
@@ -29,6 +30,7 @@ export class NotificationService implements OnDestroy {
   private readonly apiUrl = environment.apiUrl;
   private token: string | null = null;
   private userId: string | null = null;
+  private authService = inject(AuthService); // Ensure AuthService is available
 
   // Stores ALL notifications (History + New)
   private notificationsSource = new BehaviorSubject<NotificationData[]>([]);
@@ -131,17 +133,92 @@ export class NotificationService implements OnDestroy {
     this.setupSocketListeners(organizationId);
   }
 
+  // private setupSocketListeners(organizationId?: string): void {
+  //   if (!this.socket) return;
+
+  //   this.socket.on('connect', () => {
+  //     console.log('🔔 Notification socket connected');
+  //     this.connectionStatus$.next('connected');
+
+  //     // Subscribe to notifications
+  //     this.socket?.emit('subscribeNotifications');
+
+  //     // Join organization room for announcements
+  //     if (organizationId) {
+  //       this.socket?.emit('joinOrg', { organizationId });
+  //     }
+  //   });
+
+  //   this.socket.on('disconnect', () => {
+  //     console.log('Notification socket disconnected');
+  //     this.connectionStatus$.next('disconnected');
+  //   });
+
+  //   this.socket.on('connect_error', (error) => {
+  //     console.error('Notification socket connection error:', error);
+  //     this.connectionStatus$.next('disconnected');
+  //   });
+
+  //   // Handle initial notifications from socket
+  //   this.socket.on('initialNotifications', (data: { notifications: NotificationData[] }) => {
+  //     console.log('Received initial notifications:', data.notifications.length);
+  //     this.setInitialNotifications(data.notifications);
+  //   });
+
+  //   // Handle new notification
+  //   this.socket.on('newNotification', (notification: NotificationData) => {
+  //     console.log('New notification received:', notification.title);
+
+  //     // Add new notification to the TOP of the list
+  //     const current = this.notificationsSource.value;
+  //     const updatedList = [notification, ...current];
+  //     this.notificationsSource.next(updatedList);
+
+  //     // Show toast if not read
+  //     if (!notification.isRead) {
+  //       this.showToast(notification);
+  //     }
+  //   });
+
+  //   // Handle notification read acknowledgment
+  //   this.socket.on('notificationRead', (data: { notificationId: string }) => {
+  //     console.log('Notification marked as read:', data.notificationId);
+  //     this.markAsReadLocal(data.notificationId);
+  //   });
+
+  //   // Handle announcements
+  //   this.socket.on('newAnnouncement', (payload: any) => {
+  //     if (payload?.data) {
+  //       const announcement = payload.data;
+  //       this.showAnnouncementToast(announcement);
+
+  //       // Optionally add announcements to notifications list
+  //       const notification: NotificationData = {
+  //         title: announcement.title,
+  //         message: announcement.message,
+  //         type: announcement.type || 'info',
+  //         createdAt: announcement.createdAt || new Date().toISOString(),
+  //         metadata: { isAnnouncement: true, ...announcement }
+  //       };
+
+  //       const current = this.notificationsSource.value;
+  //       this.notificationsSource.next([notification, ...current]);
+  //     }
+  //   });
+
+  //   // Handle errors
+  //   this.socket.on('error', (error: { code: string; message?: string }) => {
+  //     console.error('Notification socket error:', error);
+  //     this.messageService.showError('Notification Error', error.message || `Code: ${error.code}`);
+  //   });
+  // }
   private setupSocketListeners(organizationId?: string): void {
     if (!this.socket) return;
 
     this.socket.on('connect', () => {
       console.log('🔔 Notification socket connected');
       this.connectionStatus$.next('connected');
-
-      // Subscribe to notifications
       this.socket?.emit('subscribeNotifications');
-
-      // Join organization room for announcements
       if (organizationId) {
         this.socket?.emit('joinOrg', { organizationId });
       }
@@ -152,62 +229,47 @@ export class NotificationService implements OnDestroy {
       this.connectionStatus$.next('disconnected');
     });
 
-    this.socket.on('connect_error', (error) => {
-      console.error('Notification socket connection error:', error);
-      this.connectionStatus$.next('disconnected');
+    // 🟢 UPGRADED: Connect Error Handler with Silent Refresh
+    this.socket.on('connect_error', (error: any) => {
+      console.error('Notification socket error:', error.message);
+
+      if (error.data?.code === 'TOKEN_EXPIRED') {
+        console.warn('🔔 Token expired, attempting silent refresh...');
+
+        // This calls your API to get a new token via the refresh-token cookie
+        this.authService.refreshToken().subscribe({
+          next: (res: any) => {
+            this.token = res.token;
+            if (this.socket) {
+              // Update the socket's internal auth credentials
+              this.socket.auth = { token: res.token };
+              // Reconnect manually
+              this.socket.connect();
+            }
+          },
+          error: () => {
+            this.disconnect();
+            console.error('🔔 Silent refresh failed. User session ended.');
+          }
+        });
+      } else {
+        this.connectionStatus$.next('disconnected');
+      }
     });
 
-    // Handle initial notifications from socket
+    // Keep all your other existing listeners below (newNotification, initialNotifications, etc.)
     this.socket.on('initialNotifications', (data: { notifications: NotificationData[] }) => {
-      console.log('Received initial notifications:', data.notifications.length);
       this.setInitialNotifications(data.notifications);
     });
 
-    // Handle new notification
     this.socket.on('newNotification', (notification: NotificationData) => {
-      console.log('New notification received:', notification.title);
-
-      // Add new notification to the TOP of the list
       const current = this.notificationsSource.value;
-      const updatedList = [notification, ...current];
-      this.notificationsSource.next(updatedList);
-
-      // Show toast if not read
-      if (!notification.isRead) {
-        this.showToast(notification);
-      }
+      this.notificationsSource.next([notification, ...current]);
+      if (!notification.isRead) this.showToast(notification);
     });
 
-    // Handle notification read acknowledgment
     this.socket.on('notificationRead', (data: { notificationId: string }) => {
-      console.log('Notification marked as read:', data.notificationId);
       this.markAsReadLocal(data.notificationId);
-    });
-
-    // Handle announcements
-    this.socket.on('newAnnouncement', (payload: any) => {
-      if (payload?.data) {
-        const announcement = payload.data;
-        this.showAnnouncementToast(announcement);
-
-        // Optionally add announcements to notifications list
-        const notification: NotificationData = {
-          title: announcement.title,
-          message: announcement.message,
-          type: announcement.type || 'info',
-          createdAt: announcement.createdAt || new Date().toISOString(),
-          metadata: { isAnnouncement: true, ...announcement }
-        };
-
-        const current = this.notificationsSource.value;
-        this.notificationsSource.next([notification, ...current]);
-      }
-    });
-
-    // Handle errors
-    this.socket.on('error', (error: { code: string; message?: string }) => {
-      console.error('Notification socket error:', error);
-      this.messageService.showError('Notification Error', error.message || `Code: ${error.code}`);
     });
   }
 

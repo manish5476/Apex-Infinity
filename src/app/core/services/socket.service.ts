@@ -5,6 +5,7 @@ import { io, Socket, ManagerOptions, SocketOptions } from 'socket.io-client';
 import { BehaviorSubject, Subject, Observable, timer, Subscription, map, distinctUntilChanged, shareReplay } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AppMessageService } from './message.service';
+import { AuthService } from '../../modules/auth/services/auth-service';
 
 // --- INTERFACES ---
 
@@ -87,6 +88,8 @@ export interface SystemStats {
 export class SocketService implements OnDestroy {
   private http = inject(HttpClient);
   private zone = inject(NgZone);
+  private authService = inject(AuthService);
+
   private messageService = inject(AppMessageService);
 
   private socket: Socket | null = null;
@@ -192,26 +195,38 @@ export class SocketService implements OnDestroy {
       this.handleReconnect(orgId);
     }
   }
+   // if (!this.socket) return;
 
+    // this.socket.on('connect', () => {
+    //   console.log('✅ Socket Connected:', this.socket?.id);
+    //   this.zone.run(() => {
+    //     this.connectionStatus$.next('connected');
+    //     this.socketId$.next(this.socket?.id || null);
+    //     this.reconnectAttempts = 0;
+        
+    //     // Emit join events
+    //     this.socket?.emit('joinOrg', { organizationId: orgId });
+    //     this.socket?.emit('subscribeNotifications');
+        
+    //     // Load initial data
+    //     this.getInitialData();
+    //   });
+    // });
   private setupListeners(orgId: string) {
-    if (!this.socket) return;
+ 
+if (!this.socket) return;
 
     this.socket.on('connect', () => {
-      console.log('✅ Socket Connected:', this.socket?.id);
+      console.log('✅ Chat Socket Connected');
       this.zone.run(() => {
         this.connectionStatus$.next('connected');
-        this.socketId$.next(this.socket?.id || null);
         this.reconnectAttempts = 0;
-        
-        // Emit join events
         this.socket?.emit('joinOrg', { organizationId: orgId });
         this.socket?.emit('subscribeNotifications');
-        
-        // Load initial data
         this.getInitialData();
       });
     });
-
+     
     this.socket.on('connectionEstablished', (data: { userId: string; socketId: string; timestamp: string }) => {
       this.zone.run(() => {
         this.connectionEstablished$.next(data);
@@ -227,14 +242,50 @@ export class SocketService implements OnDestroy {
       });
     });
 
-    this.socket.on('connect_error', (error: Error) => {
-      console.error('Socket Connection Error:', error);
-      this.zone.run(() => {
-        this.connectionStatus$.next('disconnected');
-        this.handleReconnect(orgId);
-      });
+    // this.socket.on('connect_error', (error: Error) => {
+    //   console.error('Socket Connection Error:', error);
+    //   this.zone.run(() => {
+    //     this.connectionStatus$.next('disconnected');
+    //     this.handleReconnect(orgId);
+    //   });
+    // });
+// 🟢 UPGRADED: Connect Error Handler with Silent Refresh
+    this.socket.on('connect_error', (error: any) => {
+      console.error('💬 Chat Socket Error:', error.message);
+
+      if (error.data?.code === 'TOKEN_EXPIRED') {
+        this.zone.run(() => {
+          this.connectionStatus$.next('reconnecting');
+          
+          this.authService.refreshToken().subscribe({
+            next: (res: any) => {
+              this.token = res.token;
+              if (this.socket) {
+                this.socket.auth = { token: res.token };
+                this.socket.connect();
+              }
+            },
+            error: () => {
+              this.disconnect();
+              this.messageService.showError('Session Expired', 'Please login again.');
+            }
+          });
+        });
+      } else {
+        this.zone.run(() => {
+          this.connectionStatus$.next('disconnected');
+          this.handleReconnect(orgId);
+        });
+      }
     });
 
+    this.socket.on('disconnect', (reason: string) => {
+      this.zone.run(() => {
+        this.connectionStatus$.next('disconnected');
+        if (reason !== 'io client disconnect') this.handleReconnect(orgId);
+      });
+    });
+    
     // ==========================================================================
     // CHAT EVENTS
     // ==========================================================================

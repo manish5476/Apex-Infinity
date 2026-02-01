@@ -5,6 +5,82 @@
   <div class="txn-header">
     <div class="title-section">
       <div class="icon-box">
+        <i class="pi pi-arrow-right-arrow-left"></i>
+      </div>
+      <div class="text-content">
+        <h2>Transactions</h2>
+        <p>Real-time log of all financial movements.</p>
+      </div>
+    </div>
+
+    <div class="actions-section">
+      <div class="p-buttongroup mode-toggle">
+        <button pButton label="All" 
+          [ngClass]="viewMode() === 'all' ? 'active-mode' : 'p-button-text'"
+          (click)="toggleViewMode('all')"></button>
+        <button pButton label="My Entries" 
+          [ngClass]="viewMode() === 'mine' ? 'active-mode' : 'p-button-text'"
+          (click)="toggleViewMode('mine')"></button>
+      </div>
+
+      <button pButton label="Export" icon="pi pi-download" class="p-button-outlined p-button-secondary btn-sm" 
+        (click)="downloadCsv()">
+      </button>
+    </div>
+  </div>
+
+  <div class="txn-card">
+
+    <div class="filter-bar">
+      <div class="filter-field">
+        <label>Date Period</label>
+        <p-datepicker [(ngModel)]="rangeDates" selectionMode="range" [readonlyInput]="true" placeholder="Start - End"
+          [showIcon]="true" appendTo="body" styleClass="w-full" inputStyleClass="w-full" (onClose)="applyFilters()">
+        </p-datepicker>
+      </div>
+
+      <div class="filter-field">
+        <label>Transaction Type</label>
+        <p-select appendTo="body" [(ngModel)]="filterParams.type" [options]="transactionTypes" [showClear]="true"
+          placeholder="All Types" styleClass="w-full" (onChange)="applyFilters()">
+        </p-select>
+      </div>
+
+      <div class="filter-field search-field">
+        <label>Search</label>
+        <span class="p-input-icon-left w-full">
+          <i class="pi pi-search"></i>
+          <input type="text" placeholder="Party Name, Ref #..." [(ngModel)]="filterParams.search"
+            (keydown.enter)="applyFilters()" pInputText class="w-full" />
+        </span>
+      </div>
+
+      <div class="filter-actions">
+        <button pButton icon="pi pi-filter-slash" class="p-button-text p-button-rounded p-button-secondary" 
+          pTooltip="Reset Filters" (click)="resetFilters()"></button>
+      </div>
+    </div>
+
+    <div class="grid-wrapper">
+      <app-ag-share-grid 
+        [columns]="column" 
+        [data]="data" 
+        [showActions]="false" 
+        (gridEvent)="eventFromGrid($event)" 
+        style="height: 100%; width: 100%; display: block;">
+      </app-ag-share-grid>
+    </div>
+
+  </div>
+</div>
+
+<!-- <p-toast></p-toast>
+
+<div class="txn-container">
+
+  <div class="txn-header">
+    <div class="title-section">
+      <div class="icon-box">
         <i class="pi pi-receipt"></i>
       </div>
       <div class="text-content">
@@ -81,4 +157,4 @@
     </div>
 
   </div>
-</div>
+</div> -->

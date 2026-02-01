@@ -61,7 +61,12 @@
   flex-direction: column;
   gap: 6px;
   flex: 1;
-  min-width: 200px;
+  min-width: 180px;
+
+  &.search-field {
+    flex: 2;
+    min-width: 250px;
+  }
 
   label {
     font-size: 0.75rem;
@@ -74,7 +79,7 @@
 
 .se-filter-actions {
   display: flex;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
   margin-left: auto;
   padding-bottom: 2px;
   
@@ -90,71 +95,221 @@
 .list-grid-area {
   flex: 1;             /* Grow to fill space */
   min-height: 0;       /* CRITICAL: Allows shrinking below content size */
-  overflow: hidden;    /* Contain grid scroll */
   display: flex;
   flex-direction: column;
   padding: 0;          /* Remove padding for flush grid */
+  position: relative;
   
   /* Override default card styles for grid container */
   &.themed-card {
     padding: 0;
     border: 1px solid var(--border-primary);
     background: var(--bg-secondary);
+    overflow: hidden;
   }
 
-  app-ag-share-grid {
+  .full-size-grid {
     width: 100%;
     height: 100%;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+    /* Deep selector to force AG Grid height */
+    ::ng-deep ag-grid-angular,
+    ::ng-deep .ag-root-wrapper {
+        width: 100%;
+        height: 100%;
+        flex: 1;
+    }
   }
 }
 
-// /* --- GLOBAL OVERRIDES --- */
-// :host ::ng-deep {
+/* --- GLOBAL GRID STYLES (Optional) --- */
+/* These styles ensure the badges injected via innerHTML look correct */
+:host ::ng-deep {
   
-//   /* Inputs */
-//   .p-inputtext, .p-select {
-//     background: var(--bg-ternary);
-//     border-color: var(--border-secondary);
-//     color: var(--text-primary);
-//     border-radius: var(--ui-border-radius);
+  .status-badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-block;
+    line-height: 1;
+    letter-spacing: 0.5px;
     
-//     &:enabled:focus {
-//       border-color: var(--accent-primary);
-//       box-shadow: 0 0 0 1px var(--accent-primary);
-//     }
+    &.status-paid, &.status-active {
+      background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;
+    }
     
-//     &:enabled:hover {
-//       border-color: var(--text-tertiary);
-//     }
-//   }
-  
-//   /* Status Badges */
-//   .status-badge {
-//     padding: 4px 10px;
-//     border-radius: 20px;
-//     font-size: 0.75rem;
-//     font-weight: 700;
-//     text-transform: uppercase;
-//     display: inline-block;
-//     line-height: 1;
-    
-//     &.status-active, &.status-paid {
-//       background: color-mix(in srgb, var(--color-success) 15%, transparent);
-//       color: var(--color-success);
-//       border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent);
-//     }
-    
-//     &.status-unpaid, &.status-pending {
-//       background: color-mix(in srgb, var(--color-error) 15%, transparent);
-//       color: var(--color-error);
-//       border: 1px solid color-mix(in srgb, var(--color-error) 30%, transparent);
-//     }
+    &.status-unpaid, &.status-cancelled {
+      background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca;
+    }
 
-//     &.status-partial {
-//         background: color-mix(in srgb, var(--color-warning) 15%, transparent);
-//         color: var(--color-warning);
-//         border: 1px solid color-mix(in srgb, var(--color-warning) 30%, transparent);
-//     }
+    &.status-partial {
+        background: #fffbeb; color: #b45309; border: 1px solid #fde68a;
+    }
+  }
+}
+
+// /* ==========================================
+//    SALES LIST (Enterprise Full Height)
+//    ========================================== */
+
+// :host {
+//   display: block;
+//   width: 100%;
+//   height: 100%;
+//   overflow: hidden; /* Prevent host scrolling */
+// }
+
+// .list-page-container {
+//   display: flex;
+//   flex-direction: column;
+//   height: 100%;
+//   width: 100%;
+//   background: var(--bg-primary);
+//   padding: var(--spacing-xl);
+//   gap: var(--spacing-lg);
+//   overflow: hidden;
+// }
+
+// /* --- 1. HEADER --- */
+// .list-header {
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   flex-shrink: 0;
+
+//   .list-title {
+//     margin: 0;
+//     font-family: var(--font-heading);
+//     font-size: var(--font-size-2xl);
+//     font-weight: 700;
+//     color: var(--text-primary);
+//     display: flex;
+//     align-items: center;
+//     gap: 0.75rem;
 //   }
 // }
+
+// /* --- 2. FILTER BAR --- */
+// .themed-card {
+//   background: var(--bg-secondary);
+//   border: 1px solid var(--border-primary);
+//   border-radius: var(--ui-border-radius-lg);
+//   box-shadow: var(--shadow-sm);
+//   padding: var(--spacing-lg);
+//   flex-shrink: 0;
+// }
+
+// .se-filter-bar {
+//   display: flex;
+//   align-items: flex-end;
+//   gap: var(--spacing-lg);
+//   flex-wrap: wrap;
+// }
+
+// .se-filter-field {
+//   display: flex;
+//   flex-direction: column;
+//   gap: 6px;
+//   flex: 1;
+//   min-width: 200px;
+
+//   label {
+//     font-size: 0.75rem;
+//     font-weight: 600;
+//     text-transform: uppercase;
+//     color: var(--text-tertiary);
+//     letter-spacing: 0.5px;
+//   }
+// }
+
+// .se-filter-actions {
+//   display: flex;
+//   gap: var(--spacing-md);
+//   margin-left: auto;
+//   padding-bottom: 2px;
+  
+//   @media (max-width: 1024px) {
+//     width: 100%;
+//     margin-left: 0;
+//     justify-content: flex-end;
+//     margin-top: var(--spacing-md);
+//   }
+// }
+
+// /* --- 3. GRID AREA (The Flex Magic) --- */
+// .list-grid-area {
+//   flex: 1;             /* Grow to fill space */
+//   min-height: 0;       /* CRITICAL: Allows shrinking below content size */
+//   overflow: hidden;    /* Contain grid scroll */
+//   display: flex;
+//   flex-direction: column;
+//   padding: 0;          /* Remove padding for flush grid */
+  
+//   /* Override default card styles for grid container */
+//   &.themed-card {
+//     padding: 0;
+//     border: 1px solid var(--border-primary);
+//     background: var(--bg-secondary);
+//   }
+
+//   app-ag-share-grid {
+//     width: 100%;
+//     height: 100%;
+//     display: block;
+//   }
+// }
+
+// // /* --- GLOBAL OVERRIDES --- */
+// // :host ::ng-deep {
+  
+// //   /* Inputs */
+// //   .p-inputtext, .p-select {
+// //     background: var(--bg-ternary);
+// //     border-color: var(--border-secondary);
+// //     color: var(--text-primary);
+// //     border-radius: var(--ui-border-radius);
+    
+// //     &:enabled:focus {
+// //       border-color: var(--accent-primary);
+// //       box-shadow: 0 0 0 1px var(--accent-primary);
+// //     }
+    
+// //     &:enabled:hover {
+// //       border-color: var(--text-tertiary);
+// //     }
+// //   }
+  
+// //   /* Status Badges */
+// //   .status-badge {
+// //     padding: 4px 10px;
+// //     border-radius: 20px;
+// //     font-size: 0.75rem;
+// //     font-weight: 700;
+// //     text-transform: uppercase;
+// //     display: inline-block;
+// //     line-height: 1;
+    
+// //     &.status-active, &.status-paid {
+// //       background: color-mix(in srgb, var(--color-success) 15%, transparent);
+// //       color: var(--color-success);
+// //       border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent);
+// //     }
+    
+// //     &.status-unpaid, &.status-pending {
+// //       background: color-mix(in srgb, var(--color-error) 15%, transparent);
+// //       color: var(--color-error);
+// //       border: 1px solid color-mix(in srgb, var(--color-error) 30%, transparent);
+// //     }
+
+// //     &.status-partial {
+// //         background: color-mix(in srgb, var(--color-warning) 15%, transparent);
+// //         color: var(--color-warning);
+// //         border: 1px solid color-mix(in srgb, var(--color-warning) 30%, transparent);
+// //     }
+// //   }
+// // }
