@@ -187,39 +187,6 @@
   }
 }
 
-// /* -------------------------
-//    SHARED POPOVER STYLES (Floating Effect)
-//    ------------------------- */
-// :host ::ng-deep {
-//   .profile-popover,
-//   .notification-popover {
-//     .p-popover {
-//       /* Reset & Base */
-//       background: var(--bg-primary) !important;
-//       border: 1px solid var(--border-primary) !important;
-//       border-radius: var(--ui-border-radius-xl) !important;
-//       padding: 0 !important;
-      
-//       /* Floating Effect Logic */
-//       margin-top: 12px !important; /* Detach from button */
-//       box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0,0,0,0.02) !important; /* Deep shadow */
-      
-//       /* Animation */
-//       transform-origin: top center;
-//       animation: popoverFloatIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-
-//       /* Hide Default Arrow for "Detached" look */
-//       &:after, &:before { display: none !important; }
-
-//       /* Content Wrapper */
-//       .p-popover-content { padding: 0 !important; }
-//     }
-//   }
-
-//   /* Specific Widths */
-//   .profile-popover .p-popover { width: 360px !important; }
-//   .notification-popover .p-popover { width: 400px !important; }
-// }
 
 @keyframes popoverFloatIn {
   from { opacity: 0; transform: translateY(-8px) scale(0.98); }
