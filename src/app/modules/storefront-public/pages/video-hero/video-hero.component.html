@@ -1,4 +1,56 @@
-<section class="section-root relative w-full overflow-hidden bg-slate-900" 
+<section class="section-root" [ngClass]="heightClass()">
+
+  <div class="video-wrapper">
+    <img [src]="config.posterImage || 'https://via.placeholder.com/1920x1080'" 
+         class="poster-img" 
+         alt="Background">
+    
+    <video #videoPlayer 
+           [class.is-playing]="isPlaying()"
+           [poster]="config.posterImage"
+           autoplay loop muted playsinline>
+      <source [src]="config.videoUrl" type="video/mp4">
+    </video>
+  </div>
+
+  <div class="overlay-tint" [style.opacity]="config.overlayOpacity || 0.4"></div>
+  <div class="overlay-gradient"></div>
+
+  <div class="content-container">
+    
+    @if (config.title) {
+      <h1 class="hero-title animate-fade-up">
+        {{ config.title }}
+      </h1>
+    }
+
+    @if (config.subtitle) {
+      <p class="hero-subtitle animate-fade-up delay-1">
+        {{ config.subtitle }}
+      </p>
+    }
+
+    @if (validButtons.length > 0) {
+      <div class="btn-group animate-fade-up delay-2">
+        @for (btn of validButtons; track $index) {
+          <a [routerLink]="getLink(btn.url)" 
+             class="hero-btn"
+             [ngClass]="'variant-' + (btn.variant || 'primary')">
+            {{ btn.text }}
+          </a>
+        }
+      </div>
+    }
+
+  </div>
+
+  <div class="scroll-indicator">
+    <i class="pi pi-angle-down"></i>
+  </div>
+
+</section>
+
+<!-- <section class="section-root relative w-full overflow-hidden bg-slate-900" 
          [ngClass]="heightClass()">
 
   <div class="absolute inset-0 z-0">
@@ -66,4 +118,4 @@
     <i class="pi pi-angle-down text-2xl"></i>
   </div>
 
-</section>
+</section> -->

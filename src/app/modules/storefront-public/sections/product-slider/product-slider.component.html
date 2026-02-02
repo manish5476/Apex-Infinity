@@ -1,4 +1,77 @@
-<section class="section-root" [style.background-color]="config.backgroundColor || 'transparent'">
+<section class="section-root" 
+         [style.background-color]="config.backgroundColor || 'var(--bg-primary)'"
+         [style.padding-top]="paddingMap[config.paddingTop] || 'var(--spacing-5xl)'"
+         [style.padding-bottom]="paddingMap[config.paddingBottom] || 'var(--spacing-5xl)'">
+
+  <div class="container-wrapper" 
+       [class.standard]="config.containerWidth === 'standard'"
+       [class.full]="config.containerWidth === 'full'">
+
+    <div class="header-row">
+      <div class="title-group">
+        @if (config.subtitle) {
+          <span class="subtitle animate-fade-in">{{ config.subtitle }}</span>
+        }
+        <h2 class="section-title animate-fade-in delay-1">{{ config.title }}</h2>
+      </div>
+
+      @if (config.navigation && products.length > (config.itemsPerView || 4)) {
+        <div class="nav-controls animate-fade-in delay-1">
+          <button class="nav-btn prev" 
+                  [disabled]="!canScrollLeft" 
+                  (click)="scroll('left'); pauseAutoSlide()"
+                  aria-label="Previous Slide">
+            <i class="pi pi-arrow-left"></i>
+          </button>
+          <button class="nav-btn next" 
+                  [disabled]="!canScrollRight" 
+                  (click)="scroll('right'); pauseAutoSlide()"
+                  aria-label="Next Slide">
+            <i class="pi pi-arrow-right"></i>
+          </button>
+        </div>
+      }
+    </div>
+
+    <div class="slider-viewport animate-fade-in delay-2" 
+         #sliderContainer 
+         (scroll)="checkScrollButtons()"
+         (touchstart)="pauseAutoSlide()"
+         (mouseenter)="pauseAutoSlide()">
+
+      @if (!products || products.length === 0) {
+        @for (i of [1,2,3,4,5]; track i) {
+          <div class="slider-item">
+            <div class="skeleton-card"></div>
+          </div>
+        }
+      }
+
+      @else {
+        @for (product of products; track product.id || $index) {
+          <div class="slider-item" 
+               [style.flex-basis]="cardFlexBasis()">
+            
+            <app-product-card 
+              [product]="product" 
+              [orgSlug]="orgSlug()" 
+              (addToCart)="handleAddToCart($event)"
+              class="h-full block">
+            </app-product-card>
+          </div>
+        }
+      }
+
+    </div>
+
+    <div class="mobile-progress" *ngIf="canScrollRight && products.length > 2">
+      <div class="progress-bar"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- <section class="section-root" [style.background-color]="config.backgroundColor || 'transparent'">
   <div class="container" [class.max-w-full]="config.containerWidth === 'full'">
 
     <div class="header-row">
@@ -61,61 +134,6 @@
       <div class="h-1 w-12 bg-slate-200 rounded-full overflow-hidden">
         <div class="h-full w-1/3 bg-slate-400 rounded-full animate-slide-x"></div>
       </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- <section class="section-root">
-  <div class="container">
-
-    <div class="header-row">
-      <div class="title-group">
-        @if (config.subtitle) {
-        <span class="subtitle">{{ config.subtitle }}</span>
-        }
-        <h2 class="section-title">{{ config.title }}</h2>
-      </div>
-
-      @if (config.navigation && products.length > 4) {
-      <div class="nav-controls">
-        <button class="nav-btn prev" [disabled]="!canScrollLeft" (click)="scroll('left')">
-          <i class="pi pi-chevron-left"></i>
-        </button>
-        <button class="nav-btn next" [disabled]="!canScrollRight" (click)="scroll('right')">
-          <i class="pi pi-chevron-right"></i>
-        </button>
-      </div>
-      }
-    </div>
-
-    <div class="slider-viewport" #sliderContainer (scroll)="checkScrollButtons()">
-
-      @if (!products || products.length === 0) {
-      @for (i of [1,2,3,4]; track i) {
-      <div class="skeleton-card">
-        <p-skeleton height="300px" styleClass="mb-2"></p-skeleton>
-        <p-skeleton width="60%" styleClass="mb-1"></p-skeleton>
-        <p-skeleton width="40%"></p-skeleton>
-      </div>
-      }
-      }
-
-      @else {
-      @for (product of products; track $index) {
-      <div class="slider-item" [style.min-width]="getItemWidth()">
-        <app-product-card [product]="product" [orgSlug]="orgSlug()" (addToCart)="handleAddToCart($event)"
-          class="h-full block">
-        </app-product-card>
-      </div>
-      }
-    }
-
-    </div>
-
-    <div class="mobile-hint md:hidden">
-      <span>Swipe to explore</span>
-      <i class="pi pi-arrow-right text-xs"></i>
     </div>
 
   </div>

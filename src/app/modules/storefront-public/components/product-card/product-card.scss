@@ -1,817 +1,1406 @@
-/* ============================================================
-   IMPORTED FONTS
-   ============================================================ */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Manrope:wght@400;500;600;700;800&display=swap');
+/* ==========================================================================
+   COMPONENT: PREMIUM PRODUCT CARD
+   Strict usage of provided Theme Tokens + Fixed Layout System
+   ========================================================================== */
 
 :host {
   display: block;
-  height: 100%;
-  font-family: 'Manrope', sans-serif;
-  --card-radius: 20px;
-  --transition-smooth: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --glass-bg: rgba(255, 255, 255, 0.95);
-  --text-dark: #0f172a;
-  --text-light: #ffffff;
+  /* 1. FIXED HEIGHT ENFORCEMENT 
+     This ensures every card is exactly the same height, 
+     regardless of image size/aspect ratio.
+  */
+  --card-height: 28rem; /* ~450px */
 }
 
-/* ============================================================
-   1. THE CARD (CINEMATIC STYLE)
-   ============================================================ */
+/* --- THE CARD ROOT --- */
 .card-root {
-  /* Container Query: allows text to resize based on CARD size, not screen size */
-  container-type: inline-size; 
   position: relative;
-  width: 100%;
-  height: 100%;
-  /* Standard eCommerce Portrait Ratio */
-  aspect-ratio: 3 / 4.2; 
-  border-radius: var(--card-radius);
+  height: var(--card-height); 
+  background-color: var(--bg-secondary); /* Dark Mode Safe */
+  border: 1px solid var(--border-secondary); /* Theme Border */
+  border-radius: var(--ui-border-radius-xl);
   overflow: hidden;
   cursor: pointer;
-  background-color: #f1f5f9;
   
-  /* Optimization for 60fps animations */
-  transform: translateZ(0); 
-  will-change: transform, box-shadow;
-  transition: transform 0.5s var(--transition-smooth), box-shadow 0.5s var(--transition-smooth);
+  /* Layout stability */
+  display: flex;
+  flex-direction: column;
 
-  /* Subtle border for structure on white backgrounds */
-  border: 1px solid rgba(0,0,0,0.04);
+  /* Transitions using tokens */
+  transition: var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+  box-shadow: var(--shadow-sm);
 
+  /* HOVER STATE: Elevation & Lift */
   &:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0,0,0,0.05);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-2xl);
+    border-color: var(--color-primary-border); /* Highlight border on hover */
 
+    /* Trigger Image Zoom */
     .base-image {
       transform: scale(1.08);
     }
 
-    .overlay-gradient {
-      opacity: 0.8; /* Darken slightly to make text pop */
+    /* Trigger Info Slide-Up */
+    .info-section {
+      transform: translateY(0); /* Slides up to show button */
+      background-color: var(--bg-secondary); /* Solidifies bg on hover for readability */
     }
 
-    .info-float {
-      transform: translateY(0);
-      
-      .brand-badge {
-        background: rgba(255, 255, 255, 0.2);
-      }
-    }
-
-    .quick-look-btn {
+    .mini-icon-box {
       opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
+      transform: translate(0, 0);
     }
   }
 }
 
-/* ============================================================
-   2. IMAGE LAYER
-   ============================================================ */
+/* --- HERO SECTION (Image & Badges) --- */
+.hero-section {
+  position: relative;
+  width: 100%;
+  height: 100%; /* Fills the fixed card height */
+  overflow: hidden;
+  z-index: 0;
+  background-color: var(--bg-ternary); /* Placeholder color while loading */
+}
+
 .image-wrapper {
   width: 100%;
   height: 100%;
-  position: relative;
-  z-index: 0;
-
-  .base-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.8s var(--transition-smooth);
-    /* Prevents pixelation during scale */
-    backface-visibility: hidden; 
-  }
-
-  /* Cinematic Gradient: Only dark at the very bottom */
-  .overlay-gradient {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      to top, 
-      rgba(0, 0, 0, 0.8) 0%, 
-      rgba(0, 0, 0, 0.4) 30%, 
-      rgba(0, 0, 0, 0.05) 60%, 
-      transparent 100%
-    );
-    opacity: 0.5;
-    transition: opacity 0.5s ease;
-  }
 }
 
-/* ============================================================
-   3. FLOATING INFO (Modern Layout)
-   ============================================================ */
-.info-float {
+.base-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* CRITICAL: Crops image to fit fixed box */
+  object-position: center;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Gradient Overlay: Uses theme colors for dark mode blend */
+.overlay-gradient {
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
-  padding: 24px;
-  z-index: 10;
-  color: var(--text-light);
-  
-  /* Initial State: Sits slightly lower */
-  transform: translateY(6px);
-  transition: transform 0.5s var(--transition-smooth);
-
-  .brand-badge {
-    display: inline-flex;
-    align-items: center;
-    font-size: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    padding: 6px 12px;
-    border-radius: 100px;
-    /* Glass Effect */
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,0.2);
-    margin-bottom: 12px;
-    transition: background 0.3s;
-  }
-
-  .product-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.6rem;
-    font-weight: 500;
-    line-height: 1.1;
-    margin: 0 0 8px 0;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.15);
-    
-    /* Truncate text elegantly after 2 lines */
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .price-row {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-
-    .price {
-      font-size: 1.1rem;
-      font-weight: 600;
-      opacity: 0.95;
-      letter-spacing: -0.02em;
-    }
-  }
+  height: 50%;
+  /* Fades from transparent to the card background color */
+  background: linear-gradient(to top, var(--bg-secondary), transparent);
+  opacity: 0.6;
+  pointer-events: none;
 }
 
-/* ============================================================
-   4. QUICK LOOK BUTTON (The "Wow" Factor)
-   ============================================================ */
-.quick-look-btn {
+/* --- BADGES --- */
+.badge-stack {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 20;
-  
-  /* Initial State: Hidden and smaller */
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(0.9);
-  
-  /* Visuals */
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  color: var(--text-dark);
-  border: 1px solid rgba(255,255,255,0.5);
-  
-  /* Size */
-  height: 48px;
-  padding: 0 28px;
-  border-radius: 100px;
-  
-  /* Typography */
-  font-weight: 700;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-  
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy spring */
-
-  i { font-size: 14px; }
-
-  &:hover {
-    background: #ffffff;
-    transform: translate(-50%, -50%) scale(1.05) !important;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-  }
-  
-  &:active {
-    transform: translate(-50%, -50%) scale(0.95) !important;
-  }
-}
-
-/* ============================================================
-   5. MODAL / QUICK VIEW (Premium Layout)
-   ============================================================ */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(16px); /* Heavy blur for focus */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.modal-glass-panel {
-  width: 100%;
-  max-width: 1000px;
-  background: #ffffff;
-  border-radius: 30px;
-  overflow: hidden;
-  position: relative;
+  top: var(--spacing-md);
+  left: var(--spacing-md);
   display: flex;
   flex-direction: column;
-  box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255,255,255,0.5);
+  gap: var(--spacing-xs);
+  z-index: 10;
+}
 
-  /* Desktop Grid Layout */
-  @media (min-width: 768px) {
-    flex-direction: row;
-    height: 600px;
-    max-height: 90vh;
+.badge-pill {
+  padding: 4px 10px;
+  border-radius: var(--ui-border-radius-sm);
+  font-family: var(--font-body);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: var(--shadow-sm);
+  
+  /* Use Glass Tokens */
+  background: var(--glass-bg-c);
+  border: 1px solid var(--glass-border-c);
+  backdrop-filter: blur(var(--glass-blur-c, 8px));
+  color: var(--text-primary);
+
+  &.sale {
+    background: var(--color-error); 
+    color: var(--bg-primary); /* Contrast text */
+    border: none;
+  }
+  &.out {
+    background: var(--bg-ternary);
+    color: var(--text-muted);
+    border-color: var(--border-secondary);
   }
 }
 
-.close-btn {
+/* Quick View Icon */
+.mini-icon-box {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  z-index: 50;
-  width: 40px;
-  height: 40px;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  width: 36px;
+  height: 36px;
+  
+  /* Theme Colors */
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-secondary);
+  
   border-radius: 50%;
-  background: white;
-  border: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: var(--shadow-md);
+  
+  opacity: 0;
+  transform: translate(10px, -10px);
+  transition: var(--transition-base);
+  z-index: 10;
 
   &:hover {
-    background: var(--text-dark);
-    color: white;
+    background: var(--color-primary);
+    color: var(--color-primary-bg); /* Use contrast color if available, or white */
+    border-color: var(--color-primary);
+  }
+}
+
+/* --- INFO SECTION (The Animated Panel) --- */
+.info-section {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  
+  /* 2. DARK MODE FIX: GLASSMORPHISM
+     Uses specific glass tokens or fallback to semi-transparent theme bg 
+  */
+  background: var(--glass-bg-c, rgba(255, 255, 255, 0.8)); 
+  border-top: 1px solid var(--glass-border-c, var(--border-secondary));
+  backdrop-filter: blur(12px); 
+  
+  padding: var(--spacing-lg);
+  z-index: 20;
+  
+  /* Animation Logic */
+  /* Move down 60px (height of action button) to hide it */
+  transform: translateY(64px); 
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease;
+}
+
+.header-group {
+  margin-bottom: var(--spacing-xs);
+}
+
+.brand-label {
+  display: block;
+  font-family: var(--font-body);
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary); /* Muted text in dark mode */
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+}
+
+.product-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary); /* Primary text in dark mode */
+  line-height: var(--line-height-tight);
+  
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Price Row */
+.primary-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.price-block {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  font-size: var(--font-size-lg);
+}
+
+.old-price {
+  font-size: var(--font-size-sm);
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+/* --- ACTION BUTTON --- */
+.action-area {
+  height: 60px; /* Specific height for calculation */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-pill {
+  width: 100%;
+  border: none;
+  
+  /* Button Colors */
+  background: var(--text-primary); /* Usually White in Dark Mode, Black in Light */
+  color: var(--bg-primary);       /* Usually Black in Dark Mode, White in Light */
+  
+  padding: var(--spacing-md);
+  border-radius: var(--ui-border-radius);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  transition: background 0.2s ease, transform 0.1s ease;
+
+  &:hover {
+    background: var(--color-primary);
+    color: white; 
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  i { font-size: 0.9rem; }
+}
+
+/* ==========================================================================
+   MODAL: DARK MODE SUPPORT
+   ========================================================================== */
+::ng-deep .premium-product-modal {
+  .p-dialog-content {
+    padding: 0 !important;
+    border-radius: var(--ui-border-radius-xl);
+    overflow: hidden;
+    background: transparent !important; /* Let inner container handle bg */
+  }
+}
+
+.premium-modal-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  
+  background-color: var(--bg-primary); /* Main Modal BG */
+  color: var(--text-primary);
+  
+  height: 600px; 
+  position: relative;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    height: auto;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+/* Modal Close Button */
+.modal-close-btn {
+  position: absolute;
+  top: var(--spacing-lg);
+  right: var(--spacing-lg);
+  z-index: 50;
+  
+  background: var(--glass-bg-c);
+  border: 1px solid var(--glass-border-c);
+  color: var(--text-primary);
+  
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  transition: var(--transition-fast);
+
+  &:hover {
+    background: var(--color-error-bg);
+    color: var(--color-error);
+    border-color: var(--color-error);
     transform: rotate(90deg);
   }
 }
 
-/* Left: Image Area */
-.modal-image-col {
-  position: relative;
-  width: 100%;
-  height: 300px;
-  background: #f8fafc;
-  flex-shrink: 0;
+.modal-gallery {
+  background-color: var(--bg-ternary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 
-  @media (min-width: 768px) {
-    width: 50%; /* 50/50 Split */
-    height: 100%;
-  }
-
-  .modal-img {
+  .hero-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-
-  .badge-overlay {
-    position: absolute;
-    top: 24px;
-    left: 24px;
-    
-    .stock-pill {
-      padding: 6px 16px;
-      border-radius: 100px;
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      
-      &.in-stock { background: white; color: #15803d; }
-      &.out-stock { background: #ef4444; color: white; }
-    }
-  }
 }
 
-/* Right: Content Area */
-.modal-content-col {
-  flex: 1;
-  padding: 32px;
+.modal-details {
+  padding: var(--spacing-3xl);
   display: flex;
   flex-direction: column;
-  background: white;
+  justify-content: space-between;
+  background-color: var(--bg-primary);
+}
+
+.header-section {
+  margin-bottom: var(--spacing-xl);
+  
+  .modal-title {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .big-price {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-2xl);
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+}
+
+.description-section {
+  flex-grow: 1;
+  color: var(--text-secondary); /* Proper secondary text color */
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-relaxed);
+  overflow-y: auto;
+  padding-right: var(--spacing-sm);
+  
+  /* Scrollbar theming */
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb { 
+    background: var(--scroll-thumb-c); 
+    border-radius: 4px; 
+  }
+  &::-webkit-scrollbar-track {
+    background: var(--scroll-track-c);
+  }
+}
+
+.modal-footer-dock {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--component-divider);
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.add-btn {
+  flex: 1;
+  padding: var(--spacing-lg);
+  
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  
+  border: none;
+  border-radius: var(--ui-border-radius);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  transition: var(--transition-base);
+
+  &:hover {
+    background: var(--color-primary);
+    color: white;
+    box-shadow: var(--shadow-lg);
+  }
+  
+  &:disabled {
+    background: var(--color-disabled);
+    color: var(--color-disabled-text);
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+/* ==========================================================================
+   COMPONENT: PREMIUM PRODUCT CARD (UNIFORM FIX)
+   ========================================================================== */
+
+:host {
+  display: block;
+  /* 1. FORCE UNIFORMITY
+     We use a container query approach: width 100% of parent, 
+     but strictly enforce the height via aspect-ratio or fixed height.
+  */
+  width: 100%; 
+}
+
+.card-root {
   position: relative;
+  /* 2. STRICT DIMENSIONS
+     This ensures the Boat Airdopes card (right) is exactly 
+     the same size as the Tree card (left).
+  */
+  width: 100%;
+  height: 400px; /* Fixed height for consistency */
+  
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--ui-border-radius-xl);
+  overflow: hidden; /* Crops images that are too big */
+  cursor: pointer;
+  
+  /* Smooth Animation Base */
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+  box-shadow: var(--shadow-sm);
 
-  @media (min-width: 768px) { padding: 48px; }
+  /* FLEX LAYOUT: Ensures footer stays at bottom */
+  display: flex;
+  flex-direction: column;
 
-  .content-header {
-    .modal-brand {
-      font-size: 12px;
-      font-weight: 800;
-      color: #94a3b8;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      margin-bottom: 12px;
-    }
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-2xl);
+    border-color: var(--color-primary);
 
-    .modal-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 2rem;
-      line-height: 1.1;
-      color: var(--text-dark);
-      margin-bottom: 16px;
-      @media (min-width: 768px) { font-size: 2.5rem; }
-    }
-
-    .rating-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      color: #475569;
-      margin-bottom: 24px;
-      
-      i { color: #fbbf24; }
-    }
-  }
-
-  /* Description Scroll Area */
-  .modal-body-scroll {
-    flex: 1;
-    overflow-y: auto;
-    padding-right: 12px;
-    margin-bottom: 32px;
-    /* Fade mask at bottom to hint scrolling */
-    mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
-
-    .modal-desc {
-      font-size: 1rem;
-      line-height: 1.7;
-      color: #64748b;
+    /* Zoom Image */
+    .base-image {
+      transform: scale(1.1);
     }
     
-    &::-webkit-scrollbar { width: 4px; }
-    &::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-  }
-
-  /* Footer Actions */
-  .modal-footer {
-    margin-top: auto;
-    border-top: 1px solid #f1f5f9;
-    padding-top: 24px;
-
-    .big-price {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: var(--text-dark);
-      display: block;
-      margin-bottom: 20px;
-      letter-spacing: -0.02em;
-    }
-
-    .action-dock {
-      display: flex;
-      gap: 16px;
-
-      button {
-        flex: 1;
-        height: 56px;
-        border-radius: 14px;
-        font-weight: 700;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        cursor: pointer;
-        transition: all 0.2s;
-        
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        
-        &:active { transform: scale(0.98); }
-      }
-
-      .add-cart-btn {
-        background: var(--text-dark);
-        color: white;
-        border: none;
-        box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.3);
-        
-        &:hover { 
-          background: #1e293b; 
-          transform: translateY(-2px);
-        }
-      }
-
-      .view-full-btn {
-        background: white;
-        border: 2px solid #e2e8f0;
-        color: var(--text-dark);
-        
-        &:hover { 
-          border-color: var(--text-dark); 
-          background: #f8fafc;
-        }
-      }
+    /* Reveal Action Button */
+    .info-panel {
+      transform: translateY(0); /* Slide up */
     }
   }
 }
 
+/* --- IMAGE AREA --- */
+.hero-section {
+  position: relative;
+  width: 100%;
+  height: 100%; /* Fills the card */
+  z-index: 0;
+}
 
-/* Target the dialog when it is appended to body */
-::ng-deep .glass-dialog {
-  
-  /* Remove PrimeNG default box shadow and background */
-  .p-dialog-content {
-    padding: 0 !important;
-    border-radius: 30px !important;
-    background: transparent !important;
-    border: none !important;
-  }
+.image-wrapper {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-ternary); /* Loading placeholder */
+}
 
-  /* Make sure your custom panel fills the dialog */
-  .modal-glass-panel {
-    box-shadow: none !important; /* Let the dialog handle shadow or keep it */
-    margin: 0 !important;
-    height: 100%;
-    
-    /* Ensure the internal layout works */
-    @media (min-width: 768px) {
-      height: 600px;
-      flex-direction: row;
-    }
-  }
+.base-image {
+  width: 100%;
+  height: 100%;
   
-  /* Customize the backdrop */
-  &.p-dialog-mask {
-    background: rgba(15, 23, 42, 0.75); /* Dark Blur Tint */
-    backdrop-filter: blur(12px);
+  /* 3. MAGIC FIX FOR UGLY IMAGES
+     'cover' forces the image to fill the box without stretching.
+     It crops the sides of wide images (like the 3rd one) 
+     and tops of tall images (like the 1st one).
+  */
+  object-fit: cover; 
+  object-position: center;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* 4. CINEMATIC GRADIENT
+   This adds a permanent shadow at the bottom of the image.
+   It makes white text readable even on the white Xiaomi image.
+*/
+.overlay-gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 70%; /* Covers bottom 70% */
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.9) 0%,   /* Dark at bottom */
+    rgba(0, 0, 0, 0.5) 40%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* --- BADGES (Top Left) --- */
+.badge-stack {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 10;
+}
+
+.badge-pill {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(4px);
+
+  &.sale {
+    background: var(--color-error);
+    color: white;
+  }
+  &.out {
+    background: rgba(0,0,0,0.6);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.2);
   }
 }
-// @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap');
+
+/* --- INFO PANEL (The Sliding Content) --- */
+.info-panel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px;
+  z-index: 20; /* Above the gradient */
+  
+  /* Layout */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  
+  /* 5. SLIDE EFFECT LOGIC
+     We push it down by 50px so the 'Add to Cart' button is hidden.
+  */
+  transform: translateY(50px); 
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.text-content {
+  margin-bottom: 12px;
+}
+
+.brand-label {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7); /* Always light text */
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.product-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 600;
+  color: white; /* Always white text */
+  line-height: 1.2;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Text shadow for white backgrounds */
+  
+  /* Truncate if too long */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.current-price {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-primary); /* Your brand color */
+}
+
+.old-price {
+  font-size: 13px;
+  text-decoration: line-through;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* --- ACTION BUTTON (Hidden Initially) --- */
+.action-area {
+  height: 50px; /* The height we slide up by */
+  display: flex;
+  align-items: center;
+  opacity: 0; /* Fade in on hover */
+  transition: opacity 0.2s ease 0.1s; /* Slight delay */
+}
+
+.card-root:hover .action-area {
+  opacity: 1;
+}
+
+.add-btn {
+  width: 100%;
+  padding: 10px;
+  background: white;
+  color: black;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s;
+  
+  &:hover {
+    background: var(--color-primary);
+    color: white;
+  }
+}
+// /* ============================================================
+//    COMPONENT: PRODUCT CARD
+//    Uses Design System Tokens
+//    ============================================================ */
+
+// @use 'sass:color';
 
 // :host {
 //   display: block;
-//   font-family: 'Manrope', sans-serif;
 //   height: 100%;
+//   --card-aspect: 3 / 4.2;
 // }
 
-// /* ============================================================
-//    1. SMART RESPONSIVE CARD (Container Queries)
-//    ============================================================ */
+// /* 1. THE CARD CONTAINER */
 // .card-root {
-//   /* Define this as a container so text resizes based on CARD width */
 //   container-type: inline-size;
-//   container-name: product-card;
-
 //   position: relative;
 //   width: 100%;
 //   height: 100%;
-//   min-height: 100%;
-//   aspect-ratio: 3 / 4;
-//   border-radius: 16px;
+//   aspect-ratio: var(--card-aspect);
+//   border-radius: var(--ui-border-radius-xl);
 //   overflow: hidden;
 //   cursor: pointer;
-//   background: #f1f5f9;
   
-//   /* Smooth Animations */
-//   transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s ease;
+//   /* Tokens applied */
+//   background-color: var(--bg-secondary);
+//   border: var(--ui-border-width) solid var(--border-secondary);
 
-//   /* Hover Lift Effect */
+//   /* Performance */
+//   transform: translateZ(0);
+//   will-change: transform, box-shadow;
+//   transition: transform var(--transition-base), box-shadow var(--transition-base);
+
 //   &:hover {
-//     transform: translateY(-6px);
-//     box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.15);
+//     transform: translateY(-8px);
+//     box-shadow: var(--shadow-xl);
+//     border-color: var(--border-primary);
 
 //     .base-image { transform: scale(1.08); }
-//     .overlay-gradient { opacity: 0.6; }
+//     .overlay-gradient { opacity: 0.8; }
     
-//     .info-float { 
-//       transform: translateY(0); 
-//       opacity: 1; 
+//     .info-float {
+//       transform: translateY(0);
+//       .brand-badge {
+//         background: var(--glass-bg-c);
+//         border-color: var(--glass-border-c);
+//       }
 //     }
-    
-//     .quick-look-btn { 
-//       opacity: 1; 
+
+//     .quick-look-btn {
+//       opacity: 1;
 //       transform: translate(-50%, -50%) scale(1);
 //     }
 //   }
+
+//   /* Accessibility Focus */
+//   &:focus-visible {
+//     outline: var(--focus-ring-width) solid var(--focus-ring-color);
+//     outline-offset: var(--focus-ring-offset);
+//   }
 // }
 
+// /* 2. IMAGE LAYER */
 // .image-wrapper {
 //   width: 100%;
 //   height: 100%;
 //   position: relative;
+//   z-index: 0;
+//   background-color: var(--bg-ternary); // Skeleton placeholder color
 
 //   .base-image {
 //     width: 100%;
 //     height: 100%;
 //     object-fit: cover;
-//     transition: transform 0.7s ease;
-//     will-change: transform;
+//     transition: transform 0.8s var(--transition-smooth, cubic-bezier(0.2, 0.8, 0.2, 1));
 //   }
 
 //   .overlay-gradient {
 //     position: absolute;
 //     inset: 0;
-//     background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.1) 50%, transparent 100%);
-//     opacity: 0.3;
-//     transition: opacity 0.3s;
+//     /* Token-based gradient approximation or keep specific artistic direction */
+//     background: linear-gradient(
+//       to top, 
+//       color-mix(in srgb, var(--text-primary) 90%, black) 0%, 
+//       color-mix(in srgb, var(--text-primary) 40%, transparent) 30%, 
+//       transparent 100%
+//     );
+//     opacity: 0.5;
+//     transition: opacity var(--transition-base);
 //   }
 // }
 
-// /* The 'cqi' unit refers to "Container Query Inline" size.
-//    10cqi = 10% of the card's width. 
-//    This ensures text never overflows, no matter how small the grid column is.
-// */
+// /* 3. INFO FLOATING LAYER */
 // .info-float {
 //   position: absolute;
 //   bottom: 0;
 //   left: 0;
 //   width: 100%;
-//   padding: 6cqi; 
-//   color: white;
+//   padding: var(--spacing-xl);
 //   z-index: 10;
-//   transform: translateY(10px);
-//   transition: all 0.4s ease;
+//   color: white; /* Always white on dark gradient */
+  
+//   transform: translateY(6px);
+//   transition: transform var(--transition-base);
 
 //   .brand-badge {
-//     display: block;
-//     font-size: 3.5cqi; /* Responsive font size */
-//     font-weight: 800;
+//     display: inline-flex;
+//     align-items: center;
+//     font-size: var(--font-size-xs);
+//     font-weight: var(--font-weight-bold);
 //     text-transform: uppercase;
-//     letter-spacing: 0.1em;
-//     opacity: 0.8;
-//     margin-bottom: 1cqi;
+//     letter-spacing: 0.15em;
+//     padding: var(--spacing-xs) var(--spacing-md);
+//     border-radius: 100px;
+    
+//     background: rgba(255, 255, 255, 0.1);
+//     backdrop-filter: blur(8px);
+//     border: 1px solid rgba(255,255,255,0.2);
+//     margin-bottom: var(--spacing-md);
 //   }
 
 //   .product-name {
-//     font-family: 'Playfair Display', serif;
-//     font-size: 7cqi; 
-//     line-height: 1.1;
-//     margin: 0 0 2cqi 0;
+//     font-family: var(--font-heading);
+//     font-size: var(--font-size-2xl);
+//     font-weight: var(--font-weight-medium);
+//     line-height: var(--line-height-tight);
+//     margin: 0 0 var(--spacing-sm) 0;
+    
 //     display: -webkit-box;
 //     -webkit-line-clamp: 2;
 //     -webkit-box-orient: vertical;
 //     overflow: hidden;
 //   }
 
-//   .price {
-//     font-weight: 600;
-//     font-size: 5cqi;
+//   .price-row {
+//     display: flex;
+//     align-items: baseline;
+//     gap: var(--spacing-sm);
+
+//     .price {
+//       font-size: var(--font-size-lg);
+//       font-weight: var(--font-weight-semibold);
+//     }
+    
+//     .price-original {
+//       font-size: var(--font-size-sm);
+//       text-decoration: line-through;
+//       opacity: 0.7;
+//     }
 //   }
 // }
 
+// /* 4. BUTTONS */
 // .quick-look-btn {
 //   position: absolute;
 //   top: 50%;
 //   left: 50%;
-//   transform: translate(-50%, -50%) scale(0.8);
-//   opacity: 0;
 //   z-index: 20;
+//   opacity: 0;
+//   transform: translate(-50%, -50%) scale(0.9);
   
-//   background: rgba(255, 255, 255, 0.95);
-//   color: #0f172a;
-//   border: none;
-//   padding: 12px 24px;
+//   background: var(--glass-bg-c);
+//   backdrop-filter: blur(var(--glass-blur-c));
+//   color: var(--text-primary);
+//   border: 1px solid var(--glass-border-c);
+  
+//   height: 48px;
+//   padding: 0 var(--spacing-2xl);
 //   border-radius: 100px;
-//   font-weight: 700;
-//   font-size: 13px;
+  
+//   font-family: var(--font-body);
+//   font-weight: var(--font-weight-bold);
+//   font-size: var(--font-size-xs);
+//   text-transform: uppercase;
+//   letter-spacing: 0.1em;
+  
 //   display: flex;
 //   align-items: center;
-//   gap: 8px;
-//   box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-//   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+//   gap: var(--spacing-md);
+//   box-shadow: var(--shadow-xl);
+  
+//   cursor: pointer;
+//   transition: all var(--transition-base);
+
+//   i { font-size: var(--font-size-md); }
 
 //   &:hover {
-//     background: white;
-//     transform: translate(-50%, -50%) scale(1.1) !important;
+//     background: var(--bg-primary);
+//     transform: translate(-50%, -50%) scale(1.05) !important;
 //   }
 // }
 
 // /* ============================================================
-//    2. STABILIZED MODAL LAYOUT
+//    GLOBAL DIALOG OVERRIDES (ViewEncapsulation.None handles this)
 //    ============================================================ */
-// .modal-backdrop {
-//   position: fixed;
-//   inset: 0;
-//   z-index: 9999;
-//   background: rgba(15, 23, 42, 0.65); /* Dark Slate Tint */
-//   backdrop-filter: blur(12px);
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   padding: 16px;
+// .product-quickview-dialog {
+  
+//   .p-dialog-mask {
+//     background: rgba(0, 0, 0, 0.7);
+//     backdrop-filter: blur(8px);
+//     z-index: var(--z-modal-backdrop);
+//   }
+
+//   .p-dialog-content {
+//     padding: 0 !important;
+//     background: transparent !important;
+//     border: none !important;
+//   }
 // }
 
+// /* 5. MODAL INTERNALS */
 // .modal-glass-panel {
 //   width: 100%;
-//   max-width: 900px;
-//   background: white;
-//   border-radius: 24px;
+//   height: 100%;
+//   background: var(--bg-primary);
+//   border-radius: var(--ui-border-radius-xl);
 //   overflow: hidden;
-//   position: relative;
 //   display: flex;
 //   flex-direction: column;
-//   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  
-//   /* Desktop Layout: Fixed height to prevent jumping */
+//   box-shadow: var(--shadow-2xl);
+//   border: 1px solid var(--border-primary);
+
 //   @media (min-width: 768px) {
 //     flex-direction: row;
-//     height: 550px; 
-//     max-height: 85vh;
+//     height: 600px;
 //   }
 // }
 
 // .close-btn {
 //   position: absolute;
-//   top: 16px;
-//   right: 16px;
+//   top: var(--spacing-lg);
+//   right: var(--spacing-lg);
 //   z-index: 50;
-//   width: 36px;
-//   height: 36px;
+//   width: 40px;
+//   height: 40px;
 //   border-radius: 50%;
-//   background: rgba(255, 255, 255, 0.8);
-//   border: 1px solid rgba(0,0,0,0.05);
+//   background: var(--bg-primary);
+//   border: 1px solid var(--border-secondary);
+//   color: var(--text-secondary);
 //   display: flex;
 //   align-items: center;
 //   justify-content: center;
 //   cursor: pointer;
-//   transition: 0.2s;
+//   transition: var(--transition-fast);
 
 //   &:hover {
-//     background: #0f172a;
-//     color: white;
+//     background: var(--text-primary);
+//     color: var(--bg-primary);
 //     transform: rotate(90deg);
 //   }
 // }
 
-// /* Left Column: Image */
 // .modal-image-col {
 //   position: relative;
-//   background: #f8fafc;
 //   width: 100%;
-//   height: 250px; /* Fixed height for Mobile */
+//   height: 300px;
+//   background: var(--bg-secondary);
 //   flex-shrink: 0;
 
 //   @media (min-width: 768px) {
-//     width: 45%;
-//     height: 100%; /* Full height for Desktop */
+//     width: 50%;
+//     height: 100%;
 //   }
 
 //   .modal-img {
 //     width: 100%;
 //     height: 100%;
-//     object-fit: cover; /* Prevents image distortion */
-//     display: block;
+//     object-fit: cover;
 //   }
 
 //   .badge-overlay {
 //     position: absolute;
-//     top: 16px;
-//     left: 16px;
+//     top: var(--spacing-xl);
+//     left: var(--spacing-xl);
     
 //     .stock-pill {
-//       padding: 4px 12px;
+//       padding: var(--spacing-xs) var(--spacing-lg);
 //       border-radius: 100px;
-//       font-size: 11px;
-//       font-weight: 700;
+//       font-size: var(--font-size-xs);
+//       font-weight: var(--font-weight-bold);
 //       text-transform: uppercase;
-//       letter-spacing: 0.05em;
+//       box-shadow: var(--shadow-md);
       
-//       &.in-stock { background: white; color: #15803d; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-//       &.out-stock { background: #ef4444; color: white; }
+//       &.in-stock { 
+//         background: var(--bg-primary); 
+//         color: var(--color-success); 
+//       }
+//       &.out-stock { 
+//         background: var(--color-error); 
+//         color: white; 
+//       }
 //     }
 //   }
 // }
 
-// /* Right Column: Content */
 // .modal-content-col {
 //   flex: 1;
-//   padding: 24px;
+//   padding: var(--spacing-2xl);
 //   display: flex;
 //   flex-direction: column;
-//   background: white;
-//   min-height: 0; /* Crucial for scrolling inside flex items */
+//   background: var(--bg-primary);
 
-//   @media (min-width: 768px) {
-//     padding: 36px;
-//   }
+//   @media (min-width: 768px) { padding: var(--spacing-3xl); }
 
 //   .content-header {
-//     flex-shrink: 0;
-    
 //     .modal-brand {
-//       font-size: 11px;
-//       font-weight: 800;
-//       color: #94a3b8;
+//       font-size: var(--font-size-xs);
+//       font-weight: var(--font-weight-bold);
+//       color: var(--text-tertiary);
 //       text-transform: uppercase;
-//       letter-spacing: 2px;
-//       margin-bottom: 8px;
+//       letter-spacing: 0.2em;
+//       margin-bottom: var(--spacing-sm);
 //     }
 
 //     .modal-title {
-//       font-family: 'Playfair Display', serif;
-//       font-size: 28px;
-//       line-height: 1.1;
-//       color: #0f172a;
-//       margin-bottom: 12px;
+//       font-family: var(--font-heading);
+//       font-size: var(--font-size-3xl);
+//       color: var(--text-primary);
+//       margin-bottom: var(--spacing-md);
       
-//       @media (min-width: 768px) { font-size: 32px; }
+//       @media (min-width: 768px) { font-size: var(--font-size-4xl); }
 //     }
 
 //     .rating-row {
 //       display: flex;
 //       align-items: center;
-//       gap: 6px;
-//       font-size: 13px;
-//       color: #64748b;
-//       margin-bottom: 20px;
+//       gap: var(--spacing-sm);
+//       font-size: var(--font-size-sm);
+//       color: var(--text-secondary);
+//       margin-bottom: var(--spacing-xl);
+      
+//       .star-icon { color: var(--color-warning); }
 //     }
 //   }
 
-//   /* Scrollable Text Area */
 //   .modal-body-scroll {
 //     flex: 1;
-//     overflow-y: auto; /* Scroll description if long */
-//     padding-right: 8px;
-//     margin-bottom: 24px;
-
-//     /* Custom Scrollbar */
-//     &::-webkit-scrollbar { width: 4px; }
-//     &::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
-
-//     .modal-desc {
-//       font-size: 15px;
-//       line-height: 1.7;
-//       color: #475569;
-//     }
-//   }
-
-//   /* Fixed Footer inside Modal */
-//   .modal-footer {
-//     flex-shrink: 0;
-//     padding-top: 20px;
-//     border-top: 1px solid #f1f5f9;
-//   }
-
-//   .big-price {
-//     font-size: 24px;
-//     font-weight: 700;
-//     color: #0f172a;
-//     display: block;
-//     margin-bottom: 16px;
-//   }
-
-//   .action-dock {
-//     display: flex;
-//     gap: 12px;
+//     overflow-y: auto;
+//     padding-right: var(--spacing-md);
+//     margin-bottom: var(--spacing-xl);
+//     color: var(--text-secondary);
+//     line-height: var(--line-height-relaxed);
     
-//     button {
-//       flex: 1;
-//       height: 48px;
-//       border-radius: 12px;
-//       font-weight: 700;
-//       font-size: 14px;
-//       transition: transform 0.1s;
-//       cursor: pointer;
+//     /* Scrollbar Styling */
+//     &::-webkit-scrollbar { width: 4px; }
+//     &::-webkit-scrollbar-thumb { 
+//       background: var(--border-secondary); 
+//       border-radius: 10px; 
+//     }
+//   }
+
+//   .modal-footer {
+//     margin-top: auto;
+//     border-top: 1px solid var(--border-secondary);
+//     padding-top: var(--spacing-xl);
+
+//     .big-price {
+//       font-size: var(--font-size-3xl);
+//       font-weight: var(--font-weight-bold);
+//       color: var(--text-primary);
+//       display: block;
+//       margin-bottom: var(--spacing-lg);
+//     }
+
+//     .action-dock {
 //       display: flex;
-//       align-items: center;
-//       justify-content: center;
+//       gap: var(--spacing-lg);
 
-//       &:active { transform: scale(0.98); }
+//       button {
+//         flex: 1;
+//         height: 56px;
+//         border-radius: var(--ui-border-radius-lg);
+//         font-weight: var(--font-weight-bold);
+//         text-transform: uppercase;
+//         letter-spacing: 0.05em;
+//         cursor: pointer;
+//         transition: var(--transition-base);
+//         display: flex;
+//         align-items: center;
+//         justify-content: center;
+//         gap: var(--spacing-sm);
+        
+//         &:active { transform: scale(0.98); }
+//       }
+
+//       .btn-primary {
+//         background: var(--text-primary);
+//         color: var(--bg-primary);
+//         border: none;
+        
+//         &:hover { background: var(--text-secondary); }
+//       }
+
+//       .btn-secondary {
+//         background: transparent;
+//         border: 2px solid var(--border-secondary);
+//         color: var(--text-primary);
+        
+//         &:hover { 
+//           border-color: var(--text-primary);
+//           background: var(--bg-secondary);
+//         }
+//       }
+//     }
+//   }
+// }
+// /* ============================================================
+//    COMPONENT: PRODUCT CARD
+//    Updated: Solid Backgrounds for better contrast
+//    ============================================================ */
+
+// // @use 'sass:color';
+
+// :host {
+//   display: block;
+//   height: 100%;
+//   --card-aspect: 3 / 4.2;
+// }
+
+// /* 1. THE CARD CONTAINER */
+// .card-root {
+//   container-type: inline-size;
+//   position: relative;
+//   width: 100%;
+//   height: 100%;
+//   aspect-ratio: var(--card-aspect);
+//   border-radius: var(--ui-border-radius-xl);
+//   overflow: hidden;
+//   cursor: pointer;
+  
+//   /* ✅ FIXED: Use Ternary for a solid, distinct background */
+//   background-color: var(--bg-ternary);
+  
+//   /* Border is optional if the background provides enough contrast, 
+//      but keeping it subtle helps definition */
+//   border: var(--ui-border-width) solid var(--border-secondary);
+
+//   /* Performance & Physics */
+//   transform: translateZ(0);
+//   will-change: transform, box-shadow;
+//   transition: 
+//     transform var(--transition-base), 
+//     box-shadow var(--transition-base),
+//     background-color var(--transition-base),
+//     border-color var(--transition-base);
+
+//   /* HOVER STATE: Lift & Lighten */
+//   &:hover {
+//     transform: translateY(-8px);
+//     box-shadow: var(--shadow-xl);
+    
+//     /* Highlight effect: Shift to primary bg (usually lighter/white) on hover */
+//     background-color: var(--bg-primary); 
+//     border-color: var(--border-primary);
+
+//     .base-image { transform: scale(1.08); }
+//     .overlay-gradient { opacity: 0.8; }
+    
+//     .info-float {
+//       transform: translateY(0);
+//       .brand-badge {
+//         background: var(--glass-bg-c);
+//         border-color: var(--glass-border-c);
+//       }
 //     }
 
-//     .add-cart-btn {
-//       background: #0f172a;
-//       color: white;
-//       border: none;
-//       &:hover { background: #1e293b; }
+//     .quick-look-btn {
+//       opacity: 1;
+//       transform: translate(-50%, -50%) scale(1);
 //     }
+//   }
 
-//     .view-full-btn {
-//       background: white;
-//       border: 1px solid #e2e8f0;
-//       color: #0f172a;
-//       &:hover { background: #f8fafc; border-color: #0f172a; }
+//   /* Accessibility Focus */
+//   &:focus-visible {
+//     outline: var(--focus-ring-width) solid var(--focus-ring-color);
+//     outline-offset: var(--focus-ring-offset);
+//   }
+// }
+
+// /* 2. IMAGE LAYER */
+// .image-wrapper {
+//   width: 100%;
+//   height: 100%;
+//   position: relative;
+//   z-index: 0;
+  
+//   /* ✅ Ensuring the image area also has a solid backing before image loads */
+//   background-color: var(--bg-ternary); 
+
+//   .base-image {
+//     width: 100%;
+//     height: 100%;
+//     object-fit: cover;
+//     transition: transform 0.8s var(--transition-smooth, cubic-bezier(0.2, 0.8, 0.2, 1));
+//   }
+
+//   /* Cinematic overlay */
+//   .overlay-gradient {
+//     position: absolute;
+//     inset: 0;
+//     background: linear-gradient(
+//       to top, 
+//       color-mix(in srgb, var(--text-primary) 90%, black) 0%, 
+//       color-mix(in srgb, var(--text-primary) 40%, transparent) 30%, 
+//       transparent 100%
+//     );
+//     opacity: 0.5;
+//     transition: opacity var(--transition-base);
+//   }
+// }
+
+// /* 3. INFO FLOATING LAYER */
+// .info-float {
+//   position: absolute;
+//   bottom: 0;
+//   left: 0;
+//   width: 100%;
+//   padding: var(--spacing-xl);
+//   z-index: 10;
+//   color: white; /* Keep white for contrast against dark overlay */
+  
+//   transform: translateY(6px);
+//   transition: transform var(--transition-base);
+
+//   .brand-badge {
+//     display: inline-flex;
+//     align-items: center;
+//     font-size: var(--font-size-xs);
+//     font-weight: var(--font-weight-bold);
+//     text-transform: uppercase;
+//     letter-spacing: 0.15em;
+//     padding: var(--spacing-xs) var(--spacing-md);
+//     border-radius: 100px;
+    
+//     background: rgba(255, 255, 255, 0.1);
+//     backdrop-filter: blur(8px);
+//     border: 1px solid rgba(255,255,255,0.2);
+//     margin-bottom: var(--spacing-md);
+//   }
+
+//   .product-name {
+//     font-family: var(--font-heading);
+//     font-size: var(--font-size-2xl);
+//     font-weight: var(--font-weight-medium);
+//     line-height: var(--line-height-tight);
+//     margin: 0 0 var(--spacing-sm) 0;
+    
+//     display: -webkit-box;
+//     -webkit-line-clamp: 2;
+//     -webkit-box-orient: vertical;
+//     overflow: hidden;
+//   }
+
+//   .price-row {
+//     display: flex;
+//     align-items: baseline;
+//     gap: var(--spacing-sm);
+
+//     .price {
+//       font-size: var(--font-size-lg);
+//       font-weight: var(--font-weight-semibold);
+//     }
+    
+//     .price-original {
+//       font-size: var(--font-size-sm);
+//       text-decoration: line-through;
+//       opacity: 0.7;
 //     }
 //   }
 // }
 
+// /* 4. BUTTONS (Quick Look) */
+// .quick-look-btn {
+//   position: absolute;
+//   top: 50%;
+//   left: 50%;
+//   z-index: 20;
+//   opacity: 0;
+//   transform: translate(-50%, -50%) scale(0.9);
+  
+//   background: var(--glass-bg-c);
+//   backdrop-filter: blur(var(--glass-blur-c));
+//   color: var(--text-primary);
+//   border: 1px solid var(--glass-border-c);
+  
+//   height: 48px;
+//   padding: 0 var(--spacing-2xl);
+//   border-radius: 100px;
+  
+//   font-family: var(--font-body);
+//   font-weight: var(--font-weight-bold);
+//   font-size: var(--font-size-xs);
+//   text-transform: uppercase;
+//   letter-spacing: 0.1em;
+  
+//   display: flex;
+//   align-items: center;
+//   gap: var(--spacing-md);
+//   box-shadow: var(--shadow-xl);
+  
+//   cursor: pointer;
+//   transition: all var(--transition-base);
 
+//   i { font-size: var(--font-size-md); }
+
+//   &:hover {
+//     background: var(--bg-primary);
+//     transform: translate(-50%, -50%) scale(1.05) !important;
+//   }
+// }
+
+// /* ============================================================
+//    GLOBAL DIALOG OVERRIDES
+//    ============================================================ */
+// .product-quickview-dialog {
+//   .p-dialog-mask {
+//     background: rgba(0, 0, 0, 0.7);
+//     backdrop-filter: blur(8px);
+//     z-index: var(--z-modal-backdrop);
+//   }
+
+//   .p-dialog-content {
+//     padding: 0 !important;
+//     background: transparent !important;
+//     border: none !important;
+//   }
+// }
+
+// /* 5. MODAL INTERNALS */
+// .modal-glass-panel {
+//   width: 100%;
+//   height: 100%;
+//   background: var(--bg-primary); /* Modal remains primary (cleaner) */
+//   border-radius: var(--ui-border-radius-xl);
+//   overflow: hidden;
+//   display: flex;
+//   flex-direction: column;
+//   box-shadow: var(--shadow-2xl);
+//   border: 1px solid var(--border-primary);
+
+//   @media (min-width: 768px) {
+//     flex-direction: row;
+//     height: 600px;
+//   }}/* ============================================================
+//    🌊 LIST VIEW VARIANT (Horizontal Layout)
+//    ============================================================ */
+// :host-context(.list-mode) .card-root, /* Context awareness */
+// .card-root.list-layout {
+//   aspect-ratio: auto;
+//   height: auto;
+//   min-height: 220px;
+//   display: flex;
+//   flex-direction: row;
+//   align-items: stretch;
+  
+//   /* Reset Transform/Hover effects for List Mode to be more subtle */
+//   &:hover {
+//     transform: translateY(-4px);
+    
+//     .base-image { transform: scale(1.05); }
+    
+//     /* In list view, we don't move the info float */
+//     .info-float { transform: none; }
+//   }
+
+//   /* 1. ADJUST IMAGE (Left Side) */
+//   .image-wrapper {
+//     width: 240px; /* Fixed width for the image column */
+//     height: auto;
+//     flex-shrink: 0;
+    
+//     @media (max-width: 576px) {
+//       width: 140px; /* Smaller on mobile */
+//     }
+//   }
+
+//   /* 2. ADJUST CONTENT (Right Side) */
+//   .info-float {
+//     position: relative; /* No longer absolute */
+//     transform: none;
+//     inset: auto;
+//     width: auto;
+//     flex: 1;
+//     display: flex;
+//     flex-direction: column;
+//     justify-content: center;
+//     padding: var(--spacing-xl);
+    
+//     /* Invert colors for white background */
+//     background: transparent;
+//     color: var(--text-primary); 
+
+//     .brand-badge {
+//       align-self: flex-start;
+//       background: var(--bg-ternary); /* Solid background instead of glass */
+//       border: 1px solid var(--border-secondary);
+//       color: var(--text-secondary);
+//       margin-bottom: var(--spacing-sm);
+//     }
+
+//     .product-name {
+//       font-size: var(--font-size-3xl); /* Larger title in list view */
+//       margin-bottom: var(--spacing-md);
+//       color: var(--text-primary);
+//       -webkit-line-clamp: 1; /* Single line title */
+//     }
+
+//     .price-row {
+//       margin-top: auto; /* Push price to bottom if needed */
+      
+//       .price {
+//         font-size: var(--font-size-2xl);
+//         color: var(--primary); /* Use theme color for price */
+//       }
+      
+//       .price-original {
+//         color: var(--text-tertiary);
+//       }
+//     }
+//   }
+
+//   /* 3. QUICK LOOK BUTTON (Reposition) */
+//   .quick-look-btn {
+//     /* Hide the centered button in list view, or move it */
+//     display: none; 
+//   }
+  
+//   /* Optional: Show an arrow or action on the right side instead */
+//   &::after {
+//     content: '\e932'; /* PrimeIcons 'pi-arrow-right' equivalent or similar */
+//     font-family: 'primeicons';
+//     position: absolute;
+//     right: 24px;
+//     top: 50%;
+//     transform: translateY(-50%);
+//     font-size: 1.5rem;
+//     color: var(--border-secondary);
+//     transition: color 0.2s, transform 0.2s;
+//   }
+
+//   &:hover::after {
+//     color: var(--primary);
+//     transform: translateY(-50%) translateX(4px);
+//   }
+// }

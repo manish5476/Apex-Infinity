@@ -1,4 +1,35 @@
 <section class="section-root" [ngStyle]="backgroundStyle()">
+  
+  <div class="container-wrapper">
+
+    <div #container class="stats-grid">
+      
+      @for (stat of config.stats; track $index) {
+        <div class="stat-card animate-in" 
+             [style.animation-delay]="($index * 100) + 'ms'">
+          
+          @if (stat.icon) {
+            <i [class]="'pi ' + stat.icon + ' decorative-icon'"></i>
+          }
+
+          <div class="number-group">
+            <span class="value">{{ displayValues()[$index] }}</span>
+            <span class="suffix">{{ stat.suffix }}</span>
+          </div>
+          
+          <p class="label">
+            {{ stat.label }}
+          </p>
+
+        </div>
+      }
+
+    </div>
+
+  </div>
+</section>
+
+<!-- <section class="section-root" [ngStyle]="backgroundStyle()">
   <div class="container mx-auto px-6"
        [class.max-w-7xl]="config.containerWidth === 'standard'">
 
@@ -21,4 +52,4 @@
     </div>
 
   </div>
-</section>
+</section> -->

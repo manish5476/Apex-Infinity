@@ -1,4 +1,62 @@
-<section class="section-root relative overflow-hidden" [ngStyle]="backgroundStyle()">
+<section class="section-root" [ngStyle]="backgroundStyle()">
+  
+  <div class="bg-overlay" *ngIf="config.backgroundImage"></div>
+
+  <div class="container-wrapper">
+    
+    <div class="split-grid" [class.layout-right]="config.imagePosition === 'right'">
+      
+      <div class="text-col animate-fade-up"
+           [class.align-center]="config.textAlign === 'center'"
+           [class.align-right]="config.textAlign === 'right'"
+           [class.align-left]="config.textAlign !== 'center' && config.textAlign !== 'right'">
+        
+        @if (config.subtitle) {
+          <span class="subtitle">{{ config.subtitle }}</span>
+        }
+        
+        <h2 class="title">{{ config.title }}</h2>
+        
+        <div class="description" [innerHTML]="config.content"></div>
+
+        @if (config.features && config.features.length > 0) {
+          <ul class="feature-list">
+            @for (item of config.features; track $index) {
+              <li><i class="pi pi-check-circle"></i> {{ item }}</li>
+            }
+          </ul>
+        }
+
+        @if (config.ctaText && config.ctaUrl) {
+          <div class="cta-wrapper">
+            <a [attr.href]="isExternalLink(config.ctaUrl) ? config.ctaUrl : null"
+               [routerLink]="!isExternalLink(config.ctaUrl) ? getLink(config.ctaUrl) : null"
+               [target]="isExternalLink(config.ctaUrl) ? '_blank' : '_self'"
+               class="cta-btn">
+              {{ config.ctaText }} <i class="pi pi-arrow-right" style="font-size: 0.8em"></i>
+            </a>
+          </div>
+        }
+      </div>
+
+      <div class="media-col animate-fade-up delay-1">
+        
+        <div class="decoration-pattern"></div>
+        
+        <div class="image-wrapper">
+          <img [src]="config.image || 'https://via.placeholder.com/800x600'" 
+               [alt]="config.title" 
+               loading="lazy">
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- <section class="section-root relative overflow-hidden" [ngStyle]="backgroundStyle()">
   
   <div class="absolute inset-0 bg-black/20 z-0"></div>
 
@@ -66,4 +124,4 @@
     </div>
 
   </div>
-</section>
+</section> -->

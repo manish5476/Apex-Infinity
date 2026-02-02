@@ -1,4 +1,80 @@
-<section class="section-root relative overflow-hidden" 
+<section class="section-root" 
+         [ngStyle]="backgroundStyle()"
+         (mouseenter)="stopAutoplay()"
+         (mouseleave)="startAutoplay()">
+  
+  <div class="bg-overlay"></div>
+
+  <div class="container-wrapper">
+    
+    <div class="header-group" *ngIf="config.title">
+      <h2 class="section-title">{{ config.title }}</h2>
+      <div class="divider-line"></div>
+    </div>
+
+    <div class="slider-viewport">
+      <div class="slider-track"
+           [style.transform]="'translateX(-' + (currentSlide() * 100) + '%)'">
+        
+        @for (item of config.testimonials; track $index) {
+          <div class="slide-item">
+            
+            <div class="testimonial-card group">
+              <div class="quote-badge">
+                <i class="pi pi-at"></i> </div>
+
+              <div class="stars">
+                @for (star of getStars(item.rating); track $index) {
+                  <i class="pi pi-star-fill"></i>
+                }
+              </div>
+
+              <p class="quote-text">"{{ item.quote }}"</p>
+
+              <div class="divider-small"></div>
+
+              <div class="author-block">
+                <div class="avatar-frame">
+                  <img [src]="item.avatar || 'https://via.placeholder.com/150'" 
+                       [alt]="item.name" loading="lazy">
+                </div>
+                <div class="text-group">
+                  <h4>{{ item.name }}</h4>
+                  <p>{{ item.role }}</p>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        }
+
+      </div>
+    </div>
+
+    <div class="slider-controls">
+      <button class="nav-btn prev" (click)="prev()">
+        <i class="pi pi-arrow-left"></i>
+      </button>
+
+      <div class="dots">
+        @for (item of config.testimonials; track $index) {
+          <button class="dot" 
+                  [class.active]="currentSlide() === $index"
+                  (click)="goTo($index)">
+          </button>
+        }
+      </div>
+
+      <button class="nav-btn next" (click)="next()">
+        <i class="pi pi-arrow-right"></i>
+      </button>
+    </div>
+
+  </div>
+</section>
+
+<!-- <section class="section-root relative overflow-hidden" 
          [ngStyle]="backgroundStyle()"
          (mouseenter)="stopAutoplay()"
          (mouseleave)="startAutoplay()">
@@ -85,4 +161,4 @@
     </div>
 
   </div>
-</section>
+</section> -->

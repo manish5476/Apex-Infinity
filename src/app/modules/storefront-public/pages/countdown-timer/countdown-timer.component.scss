@@ -1,0 +1,208 @@
+/* ==========================================================================
+   COMPONENT: PREMIUM COUNTDOWN TIMER
+   Strict Token Usage
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Manrope:wght@400;600;800&display=swap');
+
+:host {
+  display: block;
+  font-family: 'Manrope', sans-serif;
+}
+
+.section-root {
+  position: relative;
+  overflow: hidden;
+  /* Default dark bg if image fails */
+  background-color: #0f172a; 
+  color: white;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- BACKGROUND LAYERS --- */
+.bg-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Parallax-like feel */
+  transform: scale(1.05); 
+  z-index: 0;
+}
+
+.overlay-gradient {
+  position: absolute;
+  inset: 0;
+  /* Cinematic dark fade */
+  background: radial-gradient(circle at center, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.8) 100%);
+  z-index: 1;
+}
+
+/* --- CONTAINER --- */
+.container-wrapper {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-2xl);
+  width: 100%;
+}
+
+/* --- TYPOGRAPHY --- */
+.badge {
+  display: inline-block;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 100px;
+  
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: #fff;
+  margin-bottom: var(--spacing-lg);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.main-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: var(--spacing-4xl);
+  text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+/* --- TIMER GRID --- */
+.timer-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-5xl);
+  
+  @media (min-width: 768px) { gap: var(--spacing-2xl); }
+}
+
+/* --- TIME BLOCK (Glassmorphism) --- */
+.time-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  
+  width: 80px;
+  height: 100px;
+  
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  
+  transition: transform 0.3s ease;
+  
+  @media (min-width: 768px) {
+    width: 140px;
+    height: 160px;
+    border-radius: 24px;
+  }
+  
+  &:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+}
+
+.number {
+  font-family: 'Manrope', sans-serif; /* Mono-like font for numbers works well too */
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #fff;
+  margin-bottom: 4px;
+  font-feature-settings: "tnum"; /* Tabular numbers preventing jitter */
+  
+  @media (min-width: 768px) { font-size: 4.5rem; }
+}
+
+.label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.7);
+  
+  @media (min-width: 768px) { font-size: 12px; }
+}
+
+/* Separator Dots */
+.separator {
+  display: none; /* Hidden on mobile for cleaner stack */
+  font-size: 3rem;
+  color: rgba(255, 255, 255, 0.3);
+  align-self: flex-start;
+  margin-top: 20px;
+  
+  @media (min-width: 768px) { 
+    display: block; 
+    font-size: 4rem; 
+    margin-top: 30px; 
+  }
+}
+
+/* --- CTA BUTTON --- */
+.cta-wrapper {
+  perspective: 1000px;
+}
+
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  
+  background: #ffffff;
+  color: #0f172a;
+  
+  padding: 16px 48px;
+  border-radius: 100px;
+  
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-decoration: none;
+  
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  
+  &:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 20px 50px rgba(255, 255, 255, 0.2);
+  }
+  
+  i { font-size: 14px; transition: transform 0.2s; }
+  &:hover i { transform: translateX(4px); }
+}
+
+/* --- ANIMATIONS --- */
+.animate-in {
+  opacity: 0;
+  animation: fadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.delay-1 { animation-delay: 200ms; }
+.delay-2 { animation-delay: 400ms; }
+.delay-3 { animation-delay: 600ms; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}

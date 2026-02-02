@@ -1,103 +1,172 @@
-import { Component, Input, Output, EventEmitter, inject, signal, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-// ✅ Import PrimeNG Dialog
+import { 
+  Component, 
+  input, 
+  output, 
+  signal, 
+  computed, 
+  inject, 
+  ChangeDetectionStrategy, 
+  ViewEncapsulation 
+} from '@angular/core';
+import { CommonModule, CurrencyPipe } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 import { DialogModule } from 'primeng/dialog';
+import { ButtonModule } from 'primeng/button';
+import { TagModule } from 'primeng/tag';
+
+// 1. Define specific Severity type for PrimeNG to prevent TS2322
+type TagSeverity = "success" | "secondary" | "info" | "warn" | "danger" | "contrast" | undefined;
+
+export interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  
+  // 2. FIX: Make 'image' and 'brand' optional (?) so 'PublicProduct' is accepted
+  image?: string | null;
+  brand?: string | null;
+  
+  images?: string[]; 
+  tags?: string[]; 
+  category?: string | null;
+  
+  price?: { 
+    original: number;
+    discounted: number;
+    currency: string;
+    hasDiscount: boolean;
+  };
+  
+  stock?: { 
+    available: boolean;
+    qty: number;
+  };
+  
+  sku?: string;
+  url?: string;
+  rating?: number;
+  reviewCount?: number;
+}
 
 @Component({
   selector: 'app-product-card',
   standalone: true,
-  imports: [CommonModule, RouterModule, DialogModule], // ✅ Add DialogModule
+  imports: [CommonModule, RouterModule, DialogModule, ButtonModule, TagModule, CurrencyPipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
   templateUrl: './product-card.html',
   styleUrls: ['./product-card.scss']
 })
-export class ProductCardComponent implements OnInit {
+export class ProductCardComponent {
   private router = inject(Router);
-  private route = inject(ActivatedRoute);
 
-  @Input() layout: string = 'grid';
-  @Input({ required: true }) product!: any;
-  @Input() orgSlug: string = '';
-  
-  @Output() addToCart = new EventEmitter<any>();
+  // Input now accepts objects missing 'image'/'brand' without crashing
+  readonly product = input.required<Product>();
+  readonly orgSlug = input<string>('');
+  readonly layout = input<'grid' | 'list'>('grid');
+  readonly addToCart = output<Product>();
 
-  // ✅ Changed to standard boolean for easy 2-way binding with PrimeNG
-  showModal: boolean = false;
-  
-  imageError = false;
-  readonly FALLBACK_IMAGE = 'https://images.pexels.com/photos/35209410/pexels-photo-35209410.jpeg';
+  readonly showModal = signal(false);
+  readonly imageError = signal(false);
 
-  ngOnInit() {
-    if (!this.orgSlug) {
-      this.route.paramMap.subscribe(params => {
-        this.orgSlug = params.get('orgSlug') || '';
-      });
-      if (!this.orgSlug && this.route.parent) {
-        this.route.parent.paramMap.subscribe(params => {
-          this.orgSlug = params.get('orgSlug') || '';
-        });
-      }
+  readonly displayImage = computed(() => {
+    const p = this.product();
+    if (this.imageError()) return 'https://images.pexels.com/photos/35209410/pexels-photo-35209410.jpeg'; 
+    
+    // Check array first, then single image field
+    if (p.images && p.images.length > 0) return p.images[0];
+    if (p.image) return p.image;
+    
+    return 'https://images.pexels.com/photos/35209410/pexels-photo-35209410.jpeg'; 
+  });
+
+  readonly priceDisplay = computed(() => {
+    const p = this.product().price;
+    if (!p) return { current: 0, original: 0, currency: 'INR', hasDiscount: false };
+
+    return {
+      current: p.discounted || p.original || 0,
+      original: p.original || 0,
+      currency: p.currency || 'INR',
+      hasDiscount: !!p.hasDiscount
+    };
+  });
+
+  // 3. FIX: Updated Stock Logic for Severity Types
+  readonly stockInfo = computed(() => {
+    const s = this.product().stock;
+    if (!s) return { isAvailable: false, qty: 0, label: 'Out of Stock', severity: 'danger' as TagSeverity };
+
+    const available = s.available && (s.qty > 0);
+    
+    // Correct PrimeNG severity mapping: 'warning' -> 'warn'
+    let severity: TagSeverity = 'danger';
+    
+    if (available) {
+        severity = s.qty < 10 ? 'warn' : 'success';
     }
-  }
 
-  get displayImage(): string {
-    return (this.imageError || !this.product?.images?.length)
-      ? this.FALLBACK_IMAGE
-      : this.product.images[0];
-  }
+    return {
+      isAvailable: available,
+      qty: s.qty,
+      label: available ? 'In Stock' : 'Out of Stock',
+      severity: severity
+    };
+  });
 
-  onImageError() {
-    this.imageError = true;
-  }
+  readonly discountPercent = computed(() => {
+    const p = this.priceDisplay();
+    if (!p.hasDiscount || !p.original) return 0;
+    return Math.round(((p.original - p.current) / p.original) * 100);
+  });
+
+  onImageError() { this.imageError.set(true); }
 
   openQuickView(e?: Event) {
     e?.stopPropagation();
-    this.showModal = true; // ✅ Open Dialog
+    this.showModal.set(true);
   }
 
   closeQuickView(e?: Event) {
     e?.stopPropagation();
-    this.showModal = false;
+    this.showModal.set(false);
+  }
+
+  handleAddToCart(e?: Event) {
+    e?.stopPropagation();
+    this.addToCart.emit(this.product());
+    this.showModal.set(false);
   }
 
   goToFullDetails() {
-    this.showModal = false;
-    if (!this.orgSlug || !this.product?.slug) return;
-    this.router.navigate(['/store', this.orgSlug, 'products', this.product.slug]);
+    this.showModal.set(false);
+    const p = this.product();
+    const org = this.orgSlug();
+
+    if (p.url) {
+      this.router.navigateByUrl(p.url);
+      return;
+    }
+
+    if (org && p.slug) {
+      this.router.navigate(['/store', org, 'products', p.slug]);
+    }
   }
 }
 
 // import { Component, Input, Output, EventEmitter, inject, signal, OnInit } from '@angular/core';
 // import { CommonModule } from '@angular/common';
 // import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-// import { animate, style, transition, trigger } from '@angular/animations';
+// // ✅ Import PrimeNG Dialog
+// import { DialogModule } from 'primeng/dialog';
 
 // @Component({
 //   selector: 'app-product-card',
 //   standalone: true,
-//   imports: [CommonModule, RouterModule],
+//   imports: [CommonModule, RouterModule, DialogModule], // ✅ Add DialogModule
 //   templateUrl: './product-card.html',
-//   styleUrls: ['./product-card.scss'],
-//   animations: [
-//     trigger('modalFade', [
-//       transition(':enter', [
-//         style({ opacity: 0 }),
-//         animate('300ms cubic-bezier(0.4, 0, 0.2, 1)', style({ opacity: 1 }))
-//       ]),
-//       transition(':leave', [
-//         animate('200ms ease-in', style({ opacity: 0 }))
-//       ])
-//     ]),
-//     trigger('modalScale', [
-//       transition(':enter', [
-//         style({ transform: 'scale(0.95) translateY(10px)', opacity: 0 }),
-//         animate('400ms cubic-bezier(0.25, 0.8, 0.25, 1)', style({ transform: 'scale(1) translateY(0)', opacity: 1 }))
-//       ]),
-//       transition(':leave', [
-//         animate('200ms ease-in', style({ transform: 'scale(0.95) translateY(10px)', opacity: 0 }))
-//       ])
-//     ])
-//   ]
+//   styleUrls: ['./product-card.scss']
 // })
 // export class ProductCardComponent implements OnInit {
 //   private router = inject(Router);
@@ -105,25 +174,21 @@ export class ProductCardComponent implements OnInit {
 
 //   @Input() layout: string = 'grid';
 //   @Input({ required: true }) product!: any;
-//   @Input() orgSlug: string = ''; // Optional input, falls back to route
+//   @Input() orgSlug: string = '';
   
 //   @Output() addToCart = new EventEmitter<any>();
 
-//   // Signals for Reactive State
-//   showModal = signal(false);
+//   // ✅ Changed to standard boolean for easy 2-way binding with PrimeNG
+//   showModal: boolean = false;
   
-//   // Local state
 //   imageError = false;
 //   readonly FALLBACK_IMAGE = 'https://images.pexels.com/photos/35209410/pexels-photo-35209410.jpeg';
 
 //   ngOnInit() {
-//     // robust fallback to get orgSlug if not passed by parent
 //     if (!this.orgSlug) {
 //       this.route.paramMap.subscribe(params => {
 //         this.orgSlug = params.get('orgSlug') || '';
 //       });
-      
-//       // Check parent route if current route is empty (common in child routes)
 //       if (!this.orgSlug && this.route.parent) {
 //         this.route.parent.paramMap.subscribe(params => {
 //           this.orgSlug = params.get('orgSlug') || '';
@@ -142,136 +207,19 @@ export class ProductCardComponent implements OnInit {
 //     this.imageError = true;
 //   }
 
-//   // --- Interaction Logic ---
-
 //   openQuickView(e?: Event) {
-//     e?.stopPropagation(); // Prevent navigation when clicking "Quick Look"
-//     this.showModal.set(true);
-//     // Lock body scroll
-//     document.body.style.overflow = 'hidden';
+//     e?.stopPropagation();
+//     this.showModal = true; // ✅ Open Dialog
 //   }
 
 //   closeQuickView(e?: Event) {
 //     e?.stopPropagation();
-//     this.showModal.set(false);
-//     // Restore body scroll
-//     document.body.style.overflow = 'auto';
+//     this.showModal = false;
 //   }
 
 //   goToFullDetails() {
-//     this.closeQuickView(); // Close modal first
-
-//     if (!this.orgSlug || !this.product?.slug) {
-//       console.warn('Navigation blocked: Missing slug data', { org: this.orgSlug, product: this.product });
-//       return;
-//     }
-
+//     this.showModal = false;
+//     if (!this.orgSlug || !this.product?.slug) return;
 //     this.router.navigate(['/store', this.orgSlug, 'products', this.product.slug]);
 //   }
 // }
-
-// // import { Component, Input, Output, EventEmitter, inject, signal, OnInit } from '@angular/core';
-// // import { CommonModule } from '@angular/common';
-// // import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-// // import { animate, style, transition, trigger } from '@angular/animations';
-
-// // @Component({
-// //   selector: 'app-product-card',
-// //   standalone: true,
-// //   imports: [CommonModule, RouterModule],
-// //   templateUrl: './product-card.html',
-// //   styleUrls: ['./product-card.scss'],
-// //   animations: [
-// //     trigger('modalFade', [
-// //       transition(':enter', [
-// //         style({ opacity: 0 }),
-// //         animate('300ms cubic-bezier(0.4, 0, 0.2, 1)', style({ opacity: 1 }))
-// //       ]),
-// //       transition(':leave', [
-// //         animate('200ms ease-in', style({ opacity: 0 }))
-// //       ])
-// //     ]),
-// //     trigger('modalScale', [
-// //       transition(':enter', [
-// //         style({ transform: 'scale(0.95) translateY(10px)', opacity: 0 }),
-// //         animate('400ms cubic-bezier(0.25, 0.8, 0.25, 1)', style({ transform: 'scale(1) translateY(0)', opacity: 1 }))
-// //       ]),
-// //       transition(':leave', [
-// //         animate('200ms ease-in', style({ transform: 'scale(0.95) translateY(10px)', opacity: 0 }))
-// //       ])
-// //     ])
-// //   ]
-// // })
-// // export class ProductCardComponent implements OnInit {
-// //   private router = inject(Router);
-// //   private route = inject(ActivatedRoute);
-
-// //   @Input() layout: string = 'grid';
-// //   @Input() product!: any;
-// //   @Input() orgSlug!: string; // Might be undefined if parent doesn't pass it
-// //   @Output() addToCart = new EventEmitter<any>();
-
-// //   // State for the "Best UI" Modal
-// //   showModal = signal(false);
-// //   imageError = false;
-
-// //   readonly FALLBACK_IMAGE = 'https://images.pexels.com/photos/35209410/pexels-photo-35209410.jpeg';
-
-// //   // ✅ RESTORED: This ensures we get the orgSlug from the URL 
-// //   // if the parent component (like Home Page Slider) didn't pass it explicitly.
-// //   ngOnInit() {
-// //     if (!this.orgSlug) {
-// //       // Try to get orgSlug from the current route or parent route
-// //       this.route.paramMap.subscribe(params => {
-// //         const slug = params.get('orgSlug');
-// //         if (slug) this.orgSlug = slug;
-// //       });
-
-// //       // Fallback: Check parent route (common in lazy loaded modules)
-// //       this.route.parent?.paramMap.subscribe(params => {
-// //         const slug = params.get('orgSlug');
-// //         if (slug && !this.orgSlug) this.orgSlug = slug;
-// //       });
-// //     }
-// //   }
-
-// //   get displayImage(): string {
-// //     return (this.imageError || !this.product?.images?.length)
-// //       ? this.FALLBACK_IMAGE
-// //       : this.product.images[0];
-// //   }
-
-// //   // Open the "Masterpiece" Modal
-// //   openQuickView(e?: Event) {
-// //     e?.stopPropagation();
-// //     this.showModal.set(true);
-// //     document.body.style.overflow = 'hidden';
-// //   }
-
-// //   // Close Modal
-// //   closeQuickView(e?: Event) {
-// //     e?.stopPropagation();
-// //     this.showModal.set(false);
-// //     document.body.style.overflow = 'auto';
-// //   }
-
-// //   // Navigate to full page
-// //   goToFullDetails() {
-// //     this.closeQuickView();
-
-// //     // Safety Check: Log error if slug is still missing
-// //     if (!this.orgSlug || !this.product?.slug) {
-// //       console.error('Cannot navigate: Missing orgSlug or product slug', { 
-// //         org: this.orgSlug, 
-// //         product: this.product 
-// //       });
-// //       return;
-// //     }
-
-// //     this.router.navigate(['/store', this.orgSlug, 'products', this.product.slug]);
-// //   }
-
-// //   onImageError() {
-// //     this.imageError = true;
-// //   }
-// // }

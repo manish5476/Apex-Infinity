@@ -1,134 +1,202 @@
-:host { display: block; }
+/* ==========================================================================
+   COMPONENT: PREMIUM PRODUCT SLIDER
+   Strict Token Usage
+   ========================================================================== */
+
+:host {
+  display: block;
+}
 
 .section-root {
-  padding: 60px 0;
-  @media(min-width: 768px) { padding: 100px 0; }
+  position: relative;
+  padding: var(--spacing-5xl) 0;
+  overflow: hidden;
+  background-color: var(--bg-primary); /* Default fallback */
 }
 
-.container {
-  max-width: 1400px;
+/* --- CONTAINER --- */
+.container-wrapper {
+  position: relative;
+  z-index: 10;
   margin: 0 auto;
-  padding: 0 24px;
-  &.max-w-full { max-width: 100%; padding: 0 40px; }
+  padding: 0 var(--spacing-2xl);
+  
+  &.standard { max-width: 1440px; }
+  &.full { max-width: 100%; padding: 0 var(--spacing-xl); }
 }
 
+/* --- HEADER --- */
 .header-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: 40px;
+  margin-bottom: var(--spacing-4xl);
 }
 
 .title-group {
   .subtitle {
     display: block;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
     font-weight: 700;
-    color: var(--secondary-color, #64748b);
-    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-sm);
   }
+
   .section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
+    font-family: var(--font-heading);
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    color: var(--text-primary);
     line-height: 1.1;
-    color: var(--primary-color, #0f172a);
-    @media(min-width: 768px) { font-size: 3rem; }
+    margin: 0;
+
+    @media (min-width: 768px) { font-size: var(--font-size-4xl); }
   }
 }
 
+/* --- CONTROLS --- */
 .nav-controls {
   display: none;
-  gap: 12px;
-  @media(min-width: 768px) { display: flex; }
+  gap: var(--spacing-sm);
+  
+  @media (min-width: 768px) { display: flex; }
 
   .nav-btn {
-    width: 56px;
-    height: 56px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
-    border: 1px solid #e2e8f0;
-      background: var(--bg-secondary);
-    color: var(--primary-color, #0f172a);
+    border: 1px solid var(--border-secondary);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    cursor: pointer;
+    transition: all 0.2s ease;
     
     &:hover:not(:disabled) {
-      border-color: var(--primary-color, #0f172a);
-      background: var(--primary-color, #0f172a);
+      border-color: var(--color-primary);
+      background: var(--color-primary);
       color: white;
       transform: scale(1.05);
     }
-    &:disabled { opacity: 0.3; cursor: not-allowed; }
+    
+    &:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      border-color: var(--border-secondary);
+    }
+    
+    i { font-size: 0.9rem; }
   }
 }
 
+/* --- SLIDER VIEWPORT --- */
 .slider-viewport {
   display: flex;
-  gap: 24px;
+  gap: var(--spacing-lg);
   overflow-x: auto;
   scroll-behavior: smooth;
-  padding: 10px 0 40px 0; /* Space for hover shadows */
+  padding: var(--spacing-sm) 0 var(--spacing-3xl) 0; /* Space for shadows */
+  
+  /* Scroll Snap Logic */
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
   
   /* Hide Scrollbar */
   scrollbar-width: none; 
   &::-webkit-scrollbar { display: none; }
-  
-  scroll-snap-type: x mandatory;
 }
 
 .slider-item {
   flex-shrink: 0;
   scroll-snap-align: start;
+  height: 100%;
   
-  /* Mobile Default: Fixed width cards look better on small screens */
+  /* Mobile Default: Fixed width for consistency */
   width: 280px; 
   
-  /* Desktop: Use the dynamic calculation from TS */
-  @media(min-width: 768px) {
+  /* Desktop: Use calculation passed via style binding */
+  @media (min-width: 768px) {
     width: auto; 
-    /* flex-basis applied inline via style binding */
   }
 }
 
-.skeleton-item {
+/* --- SKELETON LOADER --- */
+.skeleton-card {
   width: 280px;
-  @media(min-width: 768px) { width: 320px; }
+  height: 400px;
+  background: var(--bg-secondary);
+  border-radius: var(--ui-border-radius-lg);
+  position: relative;
+  overflow: hidden;
+  
+  /* Shimmer Effect */
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0,
+      rgba(255, 255, 255, 0.2) 20%,
+      rgba(255, 255, 255, 0.5) 60%,
+      rgba(255, 255, 255, 0)
+    );
+    animation: shimmer 2s infinite;
+  }
 }
 
-/* Mobile Scroll Animation */
-@keyframes slideX {
-  0% { transform: translateX(0); }
-  50% { transform: translateX(200%); }
-  100% { transform: translateX(0); }
-}
-.animate-slide-x {
-  animation: slideX 2s infinite ease-in-out;
-}
-.mobile-hint {
-  display: flex;
-  justify-content: center;
-  padding-top: 10px;
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
 }
 
-// :host {
-//   display: block;
-// }
+/* --- MOBILE PROGRESS BAR --- */
+.mobile-progress {
+  display: block;
+  width: 100%;
+  max-width: 200px;
+  height: 2px;
+  background: var(--border-secondary);
+  margin: 0 auto;
+  border-radius: 10px;
+  overflow: hidden;
+  
+  @media (min-width: 768px) { display: none; }
+  
+  .progress-bar {
+    height: 100%;
+    background: var(--color-primary);
+    width: 25%; /* Dynamic in TS later if needed, mostly visual hint */
+    border-radius: 10px;
+    animation: slideIndicate 2s infinite ease-in-out;
+  }
+}
+
+@keyframes slideIndicate {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(300%); }
+}
+
+// :host { display: block; }
 
 // .section-root {
-//   padding: 80px 0;
-//     background: var(--bg-secondary); /* Allows page background to show through */
+//   padding: 60px 0;
+//   @media(min-width: 768px) { padding: 100px 0; }
 // }
 
 // .container {
-//   max-width: 1440px;
+//   max-width: 1400px;
 //   margin: 0 auto;
 //   padding: 0 24px;
+//   &.max-w-full { max-width: 100%; padding: 0 40px; }
 // }
 
-// /* --- Header --- */
 // .header-row {
 //   display: flex;
 //   justify-content: space-between;
@@ -139,99 +207,93 @@
 // .title-group {
 //   .subtitle {
 //     display: block;
-//     font-size: 0.85rem;
+//     font-size: 0.75rem;
 //     text-transform: uppercase;
-//     letter-spacing: 0.15em;
-//     color: #94a3b8; /* Slate-400 */
-//     margin-bottom: 8px;
+//     letter-spacing: 0.2em;
 //     font-weight: 700;
+//     color: var(--secondary-color, #64748b);
+//     margin-bottom: 12px;
 //   }
-  
 //   .section-title {
 //     font-family: 'Playfair Display', serif;
-//     font-size: 2.5rem;
-//     color: #0f172a; /* Slate-900 */
+//     font-size: 2rem;
 //     line-height: 1.1;
-//     margin: 0;
+//     color: var(--primary-color, #0f172a);
+//     @media(min-width: 768px) { font-size: 3rem; }
 //   }
 // }
 
 // .nav-controls {
-//   display: none; /* Hidden on mobile */
+//   display: none;
 //   gap: 12px;
-  
-//   @media(min-width: 768px) {
-//     display: flex;
-//   }
+//   @media(min-width: 768px) { display: flex; }
 
 //   .nav-btn {
-//     width: 48px;
-//     height: 48px;
+//     width: 56px;
+//     height: 56px;
 //     border-radius: 50%;
 //     border: 1px solid #e2e8f0;
-//     background: white;
-//     color: #0f172a;
+//       background: var(--bg-secondary);
+//     color: var(--primary-color, #0f172a);
 //     display: flex;
 //     align-items: center;
 //     justify-content: center;
-//     cursor: pointer;
-//     transition: all 0.2s;
+//     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     
 //     &:hover:not(:disabled) {
-//       background: #0f172a;
+//       border-color: var(--primary-color, #0f172a);
+//       background: var(--primary-color, #0f172a);
 //       color: white;
-//       border-color: #0f172a;
+//       transform: scale(1.05);
 //     }
-    
-//     &:disabled {
-//       opacity: 0.5;
-//       cursor: not-allowed;
-//       background: #f8fafc;
-//     }
+//     &:disabled { opacity: 0.3; cursor: not-allowed; }
 //   }
 // }
 
-// /* --- Slider Viewport --- */
 // .slider-viewport {
 //   display: flex;
 //   gap: 24px;
 //   overflow-x: auto;
 //   scroll-behavior: smooth;
-//   padding-bottom: 24px; /* Space for shadow/hover effects */
+//   padding: 10px 0 40px 0; /* Space for hover shadows */
   
 //   /* Hide Scrollbar */
-//   scrollbar-width: none; /* Firefox */
-//   &::-webkit-scrollbar { display: none; } /* Chrome */
+//   scrollbar-width: none; 
+//   &::-webkit-scrollbar { display: none; }
   
-//   /* Snap logic for touch */
 //   scroll-snap-type: x mandatory;
 // }
 
 // .slider-item {
-//   flex: 0 0 auto;
+//   flex-shrink: 0;
 //   scroll-snap-align: start;
-//   width: 280px; /* Mobile Default */
-
-//   @media(min-width: 640px) { width: 300px; }
-//   @media(min-width: 1024px) { width: 320px; }
+  
+//   /* Mobile Default: Fixed width cards look better on small screens */
+//   width: 280px; 
+  
+//   /* Desktop: Use the dynamic calculation from TS */
+//   @media(min-width: 768px) {
+//     width: auto; 
+//     /* flex-basis applied inline via style binding */
+//   }
 // }
 
-// /* --- Skeleton --- */
-// .skeleton-card {
-//   min-width: 280px;
-//   background: white;
-//   border-radius: 16px;
-//   padding: 16px;
-//   border: 1px solid #f1f5f9;
+// .skeleton-item {
+//   width: 280px;
+//   @media(min-width: 768px) { width: 320px; }
 // }
 
+// /* Mobile Scroll Animation */
+// @keyframes slideX {
+//   0% { transform: translateX(0); }
+//   50% { transform: translateX(200%); }
+//   100% { transform: translateX(0); }
+// }
+// .animate-slide-x {
+//   animation: slideX 2s infinite ease-in-out;
+// }
 // .mobile-hint {
 //   display: flex;
 //   justify-content: center;
-//   align-items: center;
-//   gap: 8px;
-//   margin-top: 16px;
-//   font-size: 0.8rem;
-//   color: #94a3b8;
-//   opacity: 0.8;
+//   padding-top: 10px;
 // }

@@ -1,4 +1,62 @@
-<section class="section-root relative overflow-hidden" [ngStyle]="sectionStyle()">
+<section class="section-root" [ngStyle]="sectionStyles()">
+  
+  <div class="aurora-bg"></div>
+
+  <div class="container-wrapper">
+    
+    <div class="newsletter-card animate-fade-up">
+      
+      @if (subscribed()) {
+        <div class="success-msg">
+          <div class="check-icon">
+            <i class="pi pi-check"></i>
+          </div>
+          <h3>You're on the list!</h3>
+          <p>Thank you for subscribing. Keep an eye on your inbox for the latest updates.</p>
+        </div>
+      } 
+      
+      @else {
+        <div class="content-body">
+          <div class="icon-box">
+            <i class="pi pi-envelope"></i>
+          </div>
+
+          <h2 class="title">{{ config.title || 'Stay Updated' }}</h2>
+          <p class="subtitle">{{ config.subtitle || 'Join our community and get exclusive access to new products and deals.' }}</p>
+
+          <form [formGroup]="emailForm" (ngSubmit)="onSubmit()" class="form-wrapper">
+            
+            <div class="input-pill">
+              <input type="email" 
+                     formControlName="email"
+                     [placeholder]="config.placeholder || 'Enter your email address'"
+                     class="email-input"
+                     aria-label="Email Address">
+              
+              <button type="submit" 
+                      [disabled]="emailForm.invalid || isSubmitting()"
+                      class="submit-btn">
+                @if (isSubmitting()) {
+                  <span><i class="pi pi-spin pi-spinner"></i></span>
+                } @else {
+                  <span>{{ config.buttonText || 'Subscribe' }}</span>
+                }
+              </button>
+            </div>
+
+            <p class="disclaimer">
+              {{ config.disclaimer || 'No spam. Unsubscribe anytime.' }}
+            </p>
+
+          </form>
+        </div>
+      }
+
+    </div>
+  </div>
+</section>
+<!-- <section class="section-root relative overflow-hidden" [ngStyle]="sectionStyle()">
   
   <div class="absolute -top-24 -left-24 w-96 h-96 bg-gray-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
   <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-rose-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
@@ -54,4 +112,4 @@
     </div>
 
   </div>
-</section>
+</section> -->

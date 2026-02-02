@@ -1,4 +1,169 @@
-<p-toast position="bottom-center" [showTransformOptions]="'translateY(100%)'" [showTransitionOptions]="'300ms ease-out'" [hideTransitionOptions]="'200ms ease-in'"></p-toast>
+<p-toast position="bottom-center" key="pd" [showTransformOptions]="'translateY(100%)'"></p-toast>
+
+@if (loading()) {
+  <div class="loader-container">
+    <div class="loader-pulse"></div>
+  </div>
+} 
+
+@else if (product(); as p) {
+  
+  <div class="page-container">
+    
+    <div class="ambient-backdrop" [style.background]="'radial-gradient(circle at 20% 40%, ' + ambientColor() + ' 0%, transparent 50%)'"></div>
+
+    <div class="grid-layout">
+      
+      <div class="visual-col">
+        <div class="sticky-stage">
+          
+          <nav class="breadcrumb md:hidden">
+            <a [routerLink]="['/store', orgSlug()]">Home</a>
+            <span>/</span>
+            <span class="text-primary">{{ p.name }}</span>
+          </nav>
+
+          <div class="main-image-card" @fadeIn>
+            <img [src]="selectedImage()" [alt]="p.name" class="hero-img" />
+            
+            <div class="badges">
+              @if (discountPercentage() > 0) {
+                <span class="badge sale">-{{ discountPercentage() }}%</span>
+              }
+              @if (!p.stock?.available) {
+                <span class="badge sold">Sold Out</span>
+              }
+            </div>
+          </div>
+
+          @if (p.images?.length > 1) {
+            <div class="thumbnails-dock">
+              @for (img of p.images; track img) {
+                <button 
+                  class="thumb-btn" 
+                  [class.active]="selectedImage() === img"
+                  (click)="changeImage(img)">
+                  <img [src]="img" [alt]="p.name" />
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="details-col" @fadeUp>
+        
+        <nav class="breadcrumb hidden md:flex">
+          <a [routerLink]="['/store', orgSlug()]">Home</a>
+          <span>/</span>
+          <span>{{ p.category || 'Shop' }}</span>
+          <span>/</span>
+          <span style="color: var(--text-primary);">{{ p.brand || 'Product' }}</span>
+        </nav>
+
+        <div class="header-section">
+          <h1 class="product-title">{{ p.name }}</h1>
+          
+          <div class="meta-row">
+            <div class="price-wrapper">
+              <span class="current-price">{{ (p.price.discounted || p.price.original) | currency:p.price.currency }}</span>
+              @if (p.price.hasDiscount) {
+                <span class="original-price">{{ p.price.original | currency:p.price.currency }}</span>
+              }
+            </div>
+            
+            @if(p.rating) {
+              <div class="rating-pill">
+                <i class="pi pi-star-fill text-yellow-500"></i>
+                <span>{{ p.rating }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <p class="description">{{ p.description }}</p>
+
+        <div class="configurator">
+          
+          <div class="config-group">
+            <span class="label">Color: <strong style="color: var(--text-primary)">{{ selectedVariant().name }}</strong></span>
+            <div class="color-row">
+              @for (v of variants(); track v.code) {
+                <button 
+                  class="color-circle" 
+                  [class.active]="selectedVariant() === v"
+                  [style.background-color]="v.colorCode"
+                  (click)="selectVariant(v)"
+                  pTooltip="{{v.name}}" tooltipPosition="top">
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="actions-row">
+            <div class="qty-stepper">
+              <button (click)="updateQuantity(-1)" [disabled]="quantity() <= 1">−</button>
+              <span class="val">{{ quantity() }}</span>
+              <button (click)="updateQuantity(1)">+</button>
+            </div>
+
+            <button class="add-btn" 
+                    [disabled]="!p.stock?.available"
+                    (click)="addToCart()">
+              <span>{{ p.stock?.available ? 'Add to Bag' : 'Out of Stock' }}</span>
+              <span class="separator">|</span>
+              <span class="price-calc">{{ ((p.price.discounted || p.price.original) * quantity()) | currency:p.price.currency }}</span>
+            </button>
+
+            <button class="wishlist-btn" pTooltip="Save for Later">
+              <i class="pi pi-heart"></i>
+            </button>
+          </div>
+
+          <div class="trust-badges">
+            <div class="item"><i class="pi pi-truck"></i> Free Shipping</div>
+            <div class="item"><i class="pi pi-shield"></i> Secure Payment</div>
+            <div class="item"><i class="pi pi-replay"></i> Easy Returns</div>
+          </div>
+        </div>
+
+        <div class="accordion-group">
+          <div class="accordion-item" [class.open]="openAccordion() === 'desc'">
+            <button class="accordion-header" (click)="toggleAccordion('desc')">
+              <span>Features & Specs</span>
+              <i class="pi pi-chevron-down indicator"></i>
+            </button>
+            <div class="accordion-content">
+              <div class="inner">
+                <p>Designed for excellence, this product combines durability with aesthetic appeal. Perfect for daily use.</p>
+                <ul class="feature-list">
+                  <li>High-quality materials</li>
+                  <li>Modern ergonomic design</li>
+                  <li>Industry-leading warranty</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item" [class.open]="openAccordion() === 'ship'">
+            <button class="accordion-header" (click)="toggleAccordion('ship')">
+              <span>Shipping Information</span>
+              <i class="pi pi-chevron-down indicator"></i>
+            </button>
+            <div class="accordion-content">
+              <div class="inner">
+                <p>Orders placed before 2PM ship same-day. Free standard shipping on all orders over $50.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+}
+
+<!-- <p-toast position="bottom-center" [showTransformOptions]="'translateY(100%)'" [showTransitionOptions]="'300ms ease-out'" [hideTransitionOptions]="'200ms ease-in'"></p-toast>
 
 @if (loading()) {
   <div class="h-screen w-full flex items-center justify-center">
@@ -158,4 +323,4 @@
       </div>
     </div>
   </div>
-}
+} -->

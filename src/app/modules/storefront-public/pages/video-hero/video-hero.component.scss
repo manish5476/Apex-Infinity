@@ -1,32 +1,222 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Manrope:wght@400;600&display=swap');
+/* ==========================================================================
+   COMPONENT: PREMIUM VIDEO HERO
+   Strict Token Usage
+   ========================================================================== */
 
 :host {
   display: block;
-  font-family: 'Manrope', sans-serif;
 }
 
-.font-serif {
-  font-family: 'Playfair Display', serif;
-}
-
-/* Ensure video covers exactly like object-cover */
-video {
+.section-root {
+  position: relative;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  pointer-events: none; /* User can't pause/click it */
+  overflow: hidden;
+  background-color: #000; /* Deepest black for cinema feel */
+  
+  /* Height Variants */
+  &.h-medium { height: 60vh; min-height: 500px; }
+  &.h-large { height: 80vh; min-height: 600px; }
+  &.h-fullscreen { height: 100vh; }
 }
 
-/* Animations */
-.animate-fade-up {
-  animation: fadeUp 1s ease-out forwards;
-  opacity: 0;
-  transform: translateY(30px);
+/* --- VIDEO LAYER --- */
+.video-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0; /* Hidden until loaded */
+    transition: opacity 1s ease-in;
+    
+    &.is-playing { opacity: 1; }
+  }
+  
+  /* Fallback Image (Visible while video loads) */
+  .poster-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+  }
+}
+
+/* --- OVERLAY LAYERS --- */
+.overlay-tint {
+  position: absolute;
+  inset: 0;
+  background-color: #000;
+  transition: opacity 0.5s;
+  z-index: 1;
+}
+
+.overlay-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 40%),
+              linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 30%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* --- CONTENT --- */
+.content-container {
+  position: relative;
+  z-index: 10;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 0 var(--spacing-2xl);
+  
+  /* Max width constraint for readability */
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.hero-title {
+  font-family: var(--font-heading);
+  font-size: clamp(3rem, 8vw, 6rem); /* Responsive scaling */
+  font-weight: 700;
+  line-height: 1;
+  color: white;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  margin-bottom: var(--spacing-lg);
+  letter-spacing: -0.02em;
+}
+
+.hero-subtitle {
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 600px;
+  line-height: 1.6;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  margin-bottom: var(--spacing-4xl);
+}
+
+/* --- BUTTONS --- */
+.btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--spacing-lg);
+}
+
+.hero-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 40px;
+  border-radius: 100px;
+  text-decoration: none;
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  overflow: hidden;
+
+  /* Variant: Solid White */
+  &.variant-primary {
+    background: white;
+    color: #0f172a;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(255,255,255,0.2);
+    }
+  }
+
+  /* Variant: Glass / Outline */
+  &.variant-outline, &.variant-white {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: white;
+      transform: translateY(-4px);
+    }
+  }
+}
+
+/* --- SCROLL INDICATOR --- */
+.scroll-indicator {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  color: rgba(255, 255, 255, 0.5);
+  animation: bounce 2s infinite;
+  
+  i { font-size: 1.5rem; }
+}
+
+/* --- ANIMATIONS --- */
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translate(-50%, 0); }
+  40% { transform: translate(-50%, -10px); }
+  60% { transform: translate(-50%, -5px); }
 }
 
 @keyframes fadeUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
 }
+
+.animate-fade-up {
+  opacity: 0;
+  animation: fadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation-delay: 0.2s;
+}
+
+.delay-1 { animation-delay: 0.4s; }
+.delay-2 { animation-delay: 0.6s; }
+
+// @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Manrope:wght@400;600&display=swap');
+
+// :host {
+//   display: block;
+//   font-family: 'Manrope', sans-serif;
+// }
+
+// .font-serif {
+//   font-family: 'Playfair Display', serif;
+// }
+
+// /* Ensure video covers exactly like object-cover */
+// video {
+//   width: 100%;
+//   height: 100%;
+//   object-fit: cover;
+//   pointer-events: none; /* User can't pause/click it */
+// }
+
+// /* Animations */
+// .animate-fade-up {
+//   animation: fadeUp 1s ease-out forwards;
+//   opacity: 0;
+//   transform: translateY(30px);
+// }
+
+// @keyframes fadeUp {
+//   to {
+//     opacity: 1;
+//     transform: translateY(0);
+//   }
+// }
