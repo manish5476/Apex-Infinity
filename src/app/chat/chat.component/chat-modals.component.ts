@@ -272,7 +272,7 @@ export class ChatModalsComponent {
   // 🛑 SYNC EMITTERS
   @Output() newChannelNameChange = new EventEmitter<string>();
   @Output() channelTypeChange = new EventEmitter<string>();
-
+@Input() newMembers: Set<string> = new Set();
   @Output() closeCreateModal = new EventEmitter<void>();
   @Output() closeChannelSettings = new EventEmitter<void>();
   @Output() closeAddMembersModal = new EventEmitter<void>();
