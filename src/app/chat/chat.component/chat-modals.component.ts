@@ -259,7 +259,7 @@ export class ChatModalsComponent {
   @Input() showCreateModal: boolean = false;
   @Input() showChannelSettings: boolean = false;
   @Input() showAddMembersModal: boolean = false;
-  @Input() newMembers: Set<string> = new Set(); // 🛑 ADD THIS LINE
+  // @Input() newMembers: Set<string> = new Set(); // 🛑 ADD THIS LINE
   @Input() newChannelName: string = '';
   @Input() channelType: string = 'public';
   @Input() selectedMembers: Set<string> = new Set();
