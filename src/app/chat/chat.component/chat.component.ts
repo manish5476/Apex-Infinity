@@ -657,22 +657,43 @@ toggleMemberSelection(userId: string) {
   //   this.closeAddMembersModal(); 
   // }
 // Logic for adding members to an EXISTING channel
-submitAddMembers() {
+  submitAddMembers() {
   const channelId = this.activeChannelId();
   const membersToAdd = Array.from(this.newMembers);
 
   if (!channelId || membersToAdd.length === 0) return;
 
-  // Professional implementation: Use your SocketService to push updates
-  // Assuming you have an updateChannel method
+  // Merge existing users with new ones and remove duplicates using Set
+  const updatedMembersList = Array.from(new Set([
+    ...this.activeChannelUsers(), 
+    ...membersToAdd
+  ]));
+
+  // This call will no longer throw TS2353 because the service now knows 'members'
   this.socketService.updateChannel(channelId, { 
-    members: [...this.activeChannelUsers(), ...membersToAdd] 
+    members: updatedMembersList 
   });
 
   this.closeAddMembersModal();
-  this.newMembers.clear();
-  this.messageService.showSuccess('Success', 'Members added to channel.');
+  this.newMembers.clear(); 
+  this.messageService.showSuccess('Syncing...', 'Updating channel members');
 }
+// submitAddMembers() {
+//   const channelId = this.activeChannelId();
+//   const membersToAdd = Array.from(this.newMembers);
+
+//   if (!channelId || membersToAdd.length === 0) return;
+
+//   // Professional implementation: Use your SocketService to push updates
+//   // Assuming you have an updateChannel method
+//   this.socketService.updateChannel(channelId, { 
+//     members: [...this.activeChannelUsers(), ...membersToAdd] 
+//   });
+
+//   this.closeAddMembersModal();
+//   this.newMembers.clear();
+//   this.messageService.showSuccess('Success', 'Members added to channel.');
+// }
   // --- Message Operations (Edit/Delete) ---
 
   startEditingMessage(msg: ChatMessage) {
