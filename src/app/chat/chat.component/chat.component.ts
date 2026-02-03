@@ -572,26 +572,65 @@ getSenderId(msg: any): string {
   openCreateModal() { this.showCreateModal = true; this.newChannelName = ''; this.channelType = 'public'; }
   closeCreateModal() { this.showCreateModal = false; }
   
-  submitCreateChannel() {
-    if (!this.newChannelName.trim()) return;
+  // submitCreateChannel() {
+  //   if (!this.newChannelName.trim()) return;
     
-    const members = this.channelType === 'private' ? Array.from(this.selectedMembers) : [];
-    // Ensure current user is in private channel
-    if (this.channelType === 'private' && !members.includes(this.currentUserId())) {
-      members.push(this.currentUserId());
-    }
+  //   const members = this.channelType === 'private' ? Array.from(this.selectedMembers) : [];
+  //   // Ensure current user is in private channel
+  //   if (this.channelType === 'private' && !members.includes(this.currentUserId())) {
+  //     members.push(this.currentUserId());
+  //   }
 
-    this.socketService.createChannelHttp(this.newChannelName, this.channelType, members).subscribe({
-      next: (ch) => {
-        this.channels.update(c => [ch, ...c]);
-        this.selectChannel(ch);
-        this.closeCreateModal();
-        this.messageService.showSuccess('Created', `Channel #${ch.name} created.`);
-      },
-      error: (err) => this.messageService.handleHttpError(err, 'Creating channel')
-    });
+  //   this.socketService.createChannelHttp(this.newChannelName, this.channelType, members).subscribe({
+  //     next: (ch) => {
+  //       this.channels.update(c => [ch, ...c]);
+  //       this.selectChannel(ch);
+  //       this.closeCreateModal();
+  //       this.messageService.showSuccess('Created', `Channel #${ch.name} created.`);
+  //     },
+  //     error: (err) => this.messageService.handleHttpError(err, 'Creating channel')
+  //   });
+  // }
+  // inside ChatComponent class
+
+submitCreateChannel() {
+  // 1. Validation
+  const channelName = this.newChannelName?.trim();
+  if (!channelName) {
+    this.messageService.showWarn('Validation Error', 'Please enter a channel name.');
+    return;
   }
+
+  // 2. Prepare payload
+  const members = this.channelType === 'private' ? Array.from(this.selectedMembers) : [];
   
+  // Ensure the creator is always a member of their own private channel
+  if (this.channelType === 'private' && !members.includes(this.currentUserId())) {
+    members.push(this.currentUserId());
+  }
+
+  // 3. API Call
+  this.socketService.createChannelHttp(channelName, this.channelType, members).subscribe({
+    next: (newChannel: Channel) => {
+      // Update local state
+      this.channels.update(current => [newChannel, ...current]);
+      
+      // Auto-select the new channel
+      this.selectChannel(newChannel);
+      
+      // Reset Modal State
+      this.closeCreateModal();
+      this.newChannelName = '';
+      this.selectedMembers.clear();
+      
+      this.messageService.showSuccess('Success', `Channel #${newChannel.name} created!`);
+    },
+    error: (err) => {
+      console.error('Channel Creation Error:', err);
+      this.messageService.showError('Error', err.error?.message || 'Failed to create channel.');
+    }
+  });
+}
   toggleMemberSelection(id: string) {
     if (this.selectedMembers.has(id)) this.selectedMembers.delete(id);
     else this.selectedMembers.add(id);
