@@ -142,37 +142,84 @@ export class RoleManagementComponent implements OnInit {
     });
   }
 
-  setupColumns(): void {
-    this.column = [
-      { field: 'name', headerName: 'Role Name', flex: 1, cellStyle: { 'font-weight': '600' } },
-      {
-        headerName: 'Type', width: 130,
-        cellRenderer: (params: ICellRendererParams) => {
-          if (params.data.isSuperAdmin) return `<span class="ag-badge badge-danger">Super Admin</span>`;
-          if (params.data.isDefault) return `<span class="ag-badge badge-contrast">Default</span>`;
-          return `<span class="ag-badge badge-info">Custom</span>`;
-        }
-      },
-      {
-        field: 'permissions', headerName: 'Access Scope', flex: 2,
-        cellRenderer: (params: ICellRendererParams) => {
-           if (params.data.isSuperAdmin) return `<span class="text-gray-500 italic">Full System Access</span>`;
-           return `<span class="ag-tag">${params.value?.length || 0} permissions</span>`;
-        }
-      },
-      {
-        headerName: 'Actions', width: 100, pinned: 'right',
-        cellRenderer: (params: ICellRendererParams) => {
-           const disabled = params.data.isSuperAdmin ? 'disabled' : '';
-           return `<div class="flex gap-2 justify-center">
-             <button class="action-btn action-edit" ${disabled}><i class="pi pi-pencil"></i></button>
-             <button class="action-btn action-delete" ${disabled}><i class="pi pi-trash"></i></button>
-           </div>`;
-        }
+  // setupColumns(): void {
+  //   this.column = [
+  //     { field: 'name', headerName: 'Role Name', flex: 1, cellStyle: { 'font-weight': '600' } },
+  //     {
+  //       headerName: 'Type', width: 130,
+  //       cellRenderer: (params: ICellRendererParams) => {
+  //         if (params.data.isSuperAdmin) return `<span class="ag-badge badge-danger">Super Admin</span>`;
+  //         if (params.data.isDefault) return `<span class="ag-badge badge-contrast">Default</span>`;
+  //         return `<span class="ag-badge badge-info">Custom</span>`;
+  //       }
+  //     },
+  //     {
+  //       field: 'permissions', headerName: 'Access Scope', flex: 2,
+  //       cellRenderer: (params: ICellRendererParams) => {
+  //          if (params.data.isSuperAdmin) return `<span class="text-gray-500 italic">Full System Access</span>`;
+  //          return `<span class="ag-tag">${params.value?.length || 0} permissions</span>`;
+  //       }
+  //     },
+  //     {
+  //       headerName: 'Actions', width: 100, pinned: 'right',
+  //       cellRenderer: (params: ICellRendererParams) => {
+  //          const disabled = params.data.isSuperAdmin ? 'disabled' : '';
+  //          return `<div class="flex gap-2 justify-center">
+  //            <button class="action-btn action-edit" ${disabled}><i class="pi pi-pencil"></i></button>
+  //            <button class="action-btn action-delete" ${disabled}><i class="pi pi-trash"></i></button>
+  //          </div>`;
+  //       }
+  //     }
+  //   ];
+  // }
+setupColumns(): void {
+  this.column = [
+    { 
+      field: 'name', 
+      headerName: 'Role Name', 
+      flex: 1, 
+      // Use project class instead of inline style object
+      cellClass: 'font-semibold text-primary' 
+    },
+    {
+      headerName: 'Type', 
+      width: 130,
+      cellRenderer: (params: ICellRendererParams) => {
+        // Ensuring system badges follow global theme tokens
+        if (params.data.isSuperAdmin) return `<span class="ag-badge badge-danger">Super Admin</span>`;
+        if (params.data.isDefault) return `<span class="ag-badge badge-contrast">Default</span>`;
+        return `<span class="ag-badge badge-info">Custom</span>`;
       }
-    ];
-  }
-
+    },
+    {
+      field: 'permissions', 
+      headerName: 'Access Scope', 
+      flex: 2,
+      cellRenderer: (params: ICellRendererParams) => {
+         if (params.data.isSuperAdmin) return `<span class="text-tertiary italic">Full System Access</span>`;
+         return `<span class="ag-tag">${params.value?.length || 0} permissions</span>`;
+      }
+    },
+    {
+      headerName: 'Actions', 
+      colId: 'actions', // Added colId for exclusion logic
+      width: 100, 
+      pinned: 'right',
+      cellRenderer: (params: ICellRendererParams) => {
+         const disabled = params.data.isSuperAdmin ? 'disabled' : '';
+         return `
+           <div class="flex gap-2 justify-center py-1">
+             <button class="action-btn action-edit" ${disabled} title="Edit Role">
+                <i class="pi pi-pencil"></i>
+             </button>
+             <button class="action-btn action-delete" ${disabled} title="Delete Role">
+                <i class="pi pi-trash"></i>
+             </button>
+           </div>`;
+      }
+    }
+  ];
+}
   onGridReady(params: GridReadyEvent) { this.gridApi = params.api; }
 
   // --- IN ROLE-MANAGEMENT.TS ---
