@@ -177,18 +177,38 @@ export class RoleManagementComponent implements OnInit {
 
   // --- IN ROLE-MANAGEMENT.TS ---
 
-eventFromGrid(event: any) {
-  // Audit Check: event.event is the native MouseEvent provided by AG Grid
-  if (event.type === 'cellClicked') {
-    const mouseEvent = event.event; // Corrected path
-    const target = mouseEvent.target as HTMLElement;
+// --- UPDATED IN ROLE-MANAGEMENT.TS ---
 
-    if (target.closest('.action-edit')) {
-      this.openEditRoleDialog(event.data); // event.data contains the row object
+eventFromGrid(event: any) {
+  // Audit: Aligning with AgShareGrid's custom event emission structure
+  if (event.type === 'cellClicked') {
+    const rowData = event.row; // The key provided by your shared grid
+    const nativeEvent = event.event?.event; // Accessing the original MouseEvent
+    const target = nativeEvent?.target as HTMLElement;
+
+    if (!rowData) return;
+
+    // 1. Specific Button Click Detection (using closest for icon clicks)
+    if (target?.closest('.action-edit')) {
+      this.openEditRoleDialog(rowData);
+      return;
     }
-    if (target.closest('.action-delete')) {
-      this.deleteRole(event.data);
+
+    if (target?.closest('.action-delete')) {
+      this.deleteRole(rowData);
+      return;
     }
+
+    // 2. Default Fallback: Open Edit dialog on general cell click 
+    // (excluding the actions column to prevent double-triggering)
+    if (event.column?.getColId() !== 'actions') {
+      this.openEditRoleDialog(rowData);
+    }
+  }
+  
+  if (event.type === 'reachedBottom') {
+    // Logic for infinite scroll if implemented
+    // this.loadMoreRoles(); 
   }
 }
   // eventFromGrid(event: any) {
