@@ -1,150 +1,91 @@
-
 <div class="chat-system" [class.mobile-view]="mobileView()" [class.sidebar-open]="sidebarOpen()">
 
-  <app-chat-sidebar 
-    [channels]="channels()" 
-    [activeChannelId]="activeChannelId()" 
-    [currentUserId]="currentUserId()"
-    [sidebarOpen]="sidebarOpen()" 
-    [mobileView]="mobileView()" 
-    [unreadCounts]="unreadCounts()"
-    [activeChannelUsers]="activeChannelUsers()" 
-    [onlineUsers]="onlineUsers()" 
-    (channelSelected)="selectChannel($event)"
+  <app-chat-sidebar [channels]="channels()" [activeChannelId]="activeChannelId()" [currentUserId]="currentUserId()"
+    [sidebarOpen]="sidebarOpen()" [mobileView]="mobileView()" [unreadCounts]="unreadCounts()"
+    [activeChannelUsers]="activeChannelUsers()" [onlineUsers]="onlineUsers()" (channelSelected)="selectChannel($event)"
     (createChannel)="openCreateModal()">
   </app-chat-sidebar>
 
   <main class="chat-main">
-    
+
     @if (mobileView()) {
-      <div class="mobile-navigation-bar">
-        <button class="btn-sidebar-toggle" (click)="toggleSidebar()">
-          <i class="pi" [class.pi-bars]="!sidebarOpen()" [class.pi-times]="sidebarOpen()"></i>
-        </button>
-        @if (activeChannel()) {
-          <div class="active-info">
-            <h3>#{{ activeChannel()?.name }}</h3>
-          </div>
-        }
+    <div class="mobile-navigation-bar">
+      <button class="btn-sidebar-toggle" (click)="toggleSidebar()">
+        <i class="pi" [class.pi-bars]="!sidebarOpen()" [class.pi-times]="sidebarOpen()"></i>
+      </button>
+      @if (activeChannel()) {
+      <div class="active-info">
+        <h3>#{{ activeChannel()?.name }}</h3>
       </div>
+      }
+    </div>
     }
 
     @if (activeChannelId()) {
-      
-      <app-chat-header 
-        [activeChannel]="activeChannel()" 
-        [activeChannelUsers]="activeChannelUsers()"
-        [mobileView]="mobileView()" 
-        (toggleSidebar)="toggleSidebar()" 
-        (openSettings)="openChannelSettings()"
-        (addMembers)="openAddMembersModal()">
-      </app-chat-header>
-<app-chat-messages 
-    [messages]="messages()" 
-    [currentUserId]="currentUserId()" 
-    [activeChannel]="activeChannel()"
-    [loadingMore]="loadingMore" 
-    [typingIndicator]="typingIndicator()" 
-    [editingMessageId]="editingMessageId()"
-    [editMessageText]="editMessageText" 
-    (editMessageTextChange)="editMessageText = $event" 
-    (scroll)="onScroll($event)" 
-    (editMessage)="startEditingMessage($event)"
-    (deleteMessage)="deleteMessage($event)" 
-    (saveEditedMessage)="saveEditedMessage()"
-    (cancelEditing)="cancelEditing()">
-</app-chat-messages>
-      <!-- <app-chat-messages 
-        [messages]="messages()" 
-        [currentUserId]="currentUserId()" 
-        [activeChannel]="activeChannel()"
-        [loadingMore]="loadingMore" 
-        [typingIndicator]="typingIndicator()" 
-        [editingMessageId]="editingMessageId()"
-        [editMessageText]="editMessageText" 
-        (scroll)="onScroll($event)" 
-        (editMessage)="startEditingMessage($event)"
-        (deleteMessage)="deleteMessage($event)" 
-        (saveEditedMessage)="saveEditedMessage()"
-        (cancelEditing)="cancelEditing()">
-      </app-chat-messages> -->
 
-      <app-chat-composer 
-        [messageInput]="messageInput" 
-        [attachmentsInput]="attachments" 
-        [isUploading]="isUploading"
-        [activeChannel]="activeChannel()" 
-        [uploadProgress]="uploadProgress()" 
-        (sendMessage)="onMessageSend($event)"
-        (typingInput)="onTypingInput()" 
-        (clearAllInput)="messageInput = ''; attachments = []">
-      </app-chat-composer>
+    <app-chat-header [activeChannel]="activeChannel()" [activeChannelUsers]="activeChannelUsers()"
+      [mobileView]="mobileView()" (toggleSidebar)="toggleSidebar()" (openSettings)="openChannelSettings()"
+      (addMembers)="openAddMembersModal()">
+    </app-chat-header>
+    <app-chat-messages [messages]="messages()" [currentUserId]="currentUserId()" [activeChannel]="activeChannel()"
+      [loadingMore]="loadingMore" [typingIndicator]="typingIndicator()" [editingMessageId]="editingMessageId()"
+      [editMessageText]="editMessageText" (editMessageTextChange)="editMessageText = $event" (scroll)="onScroll($event)"
+      (editMessage)="startEditingMessage($event)" (deleteMessage)="deleteMessage($event)"
+      (saveEditedMessage)="saveEditedMessage()" (cancelEditing)="cancelEditing()">
+    </app-chat-messages>
+    <app-chat-composer [messageInput]="messageInput" [attachmentsInput]="attachments" [isUploading]="isUploading"
+      [activeChannel]="activeChannel()" [uploadProgress]="uploadProgress()" (sendMessage)="onMessageSend($event)"
+      (typingInput)="onTypingInput()" (clearAllInput)="messageInput = ''; attachments = []">
+    </app-chat-composer>
 
-    } 
+    }
     @else {
-      <div class="welcome-surface">
-        <div class="welcome-card">
-          <div class="icon-circle">
-             <i class="pi pi-comments"></i>
-          </div>
-          <h2>Apex Chat Workspace</h2>
-          <p>Select a channel from the sidebar or start a new conversation to get started.</p>
-          <button class="btn-welcome-action" (click)="openCreateModal()">
-            <i class="pi pi-plus"></i> Create Channel
-          </button>
+    <div class="welcome-surface">
+      <div class="welcome-card">
+        <div class="icon-circle">
+          <i class="pi pi-comments"></i>
         </div>
+        <h2>Apex Chat Workspace</h2>
+        <p>Select a channel from the sidebar or start a new conversation to get started.</p>
+        <button class="btn-welcome-action" (click)="openCreateModal()">
+          <i class="pi pi-plus"></i> Create Channel
+        </button>
       </div>
+    </div>
     }
   </main>
 
-<!-- <app-chat-modals 
-    [showCreateModal]="showCreateModal" 
-    [showChannelSettings]="showChannelSettings"
-    [showAddMembersModal]="showAddMembersModal" 
-    
-    [newChannelName]="newChannelName" 
-    (newChannelNameChange)="newChannelName = $event" 
-    [channelType]="channelType"
-    (channelTypeChange)="channelType = $event"
-    
-    [selectedMembers]="selectedMembers" 
-    [newMembers]="newMembers" 
-    [activeChannelUsers]="activeChannelUsers()"
-    [currentUserId]="currentUserId()" 
-    [activeChannel]="activeChannel()" 
-    [onlineUsers]="onlineUsers()"
-    
-    (closeCreateModal)="closeCreateModal()" 
-    (closeChannelSettings)="closeChannelSettings()"
-    (closeAddMembersModal)="closeAddMembersModal()" 
-    (submitCreateChannel)="submitCreateChannel()"
-    (submitAddMembers)="submitAddMembers()" 
-    (toggleMemberSelection)="toggleMemberSelection($event)">
-</app-chat-modals> -->
-<app-chat-modals 
-    [showCreateModal]="showCreateModal" 
-    [showChannelSettings]="showChannelSettings"
-    [showAddMembersModal]="showAddMembersModal" 
-    
-    [newChannelName]="newChannelName" 
-    (newChannelNameChange)="newChannelName = $event" 
-    
-    [channelType]="channelType"
-    (channelTypeChange)="channelType = $event"
-    
-    [selectedMembers]="selectedMembers" 
-    [newMembers]="newMembers" 
-    (toggleMemberSelection)="toggleMemberSelection($event)"
-    
-    [activeChannelUsers]="activeChannelUsers()"
-    [currentUserId]="currentUserId()" 
-    [activeChannel]="activeChannel()" 
-    [onlineUsers]="onlineUsers()"
-    
-    (closeCreateModal)="closeCreateModal()" 
-    (closeChannelSettings)="closeChannelSettings()"
-    (closeAddMembersModal)="closeAddMembersModal()" 
-    (submitCreateChannel)="submitCreateChannel()"
-    (submitAddMembers)="submitAddMembers()">
-</app-chat-modals>
+  <app-chat-modals [showCreateModal]="showCreateModal" [showChannelSettings]="showChannelSettings"
+    [showAddMembersModal]="showAddMembersModal" [newChannelName]="newChannelName"
+    (newChannelNameChange)="newChannelName = $event" [channelType]="channelType"
+    (channelTypeChange)="channelType = $event" [selectedMembers]="selectedMembers" [newMembers]="newMembers"
+    (toggleMemberSelection)="toggleMemberSelection($event)" [activeChannelUsers]="activeChannelUsers()"
+    [currentUserId]="currentUserId()" [activeChannel]="activeChannel()" [onlineUsers]="onlineUsers()"
+    (closeCreateModal)="closeCreateModal()" (closeChannelSettings)="closeChannelSettings()"
+    (closeAddMembersModal)="closeAddMembersModal()" (submitCreateChannel)="submitCreateChannel()"
+    (submitAddMembers)="submitAddMembers()" (leaveChannel)="onLeaveChannel()" (removeMember)="onRemoveMember($event)"
+    (openAddMembersModal)="openAddMembersModal()"
+    (toggleNewMemberSelection)="toggleNewMemberSelection($event)">
+  </app-chat-modals>
 </div>
+<!-- <app-chat-modals [showCreateModal]="showCreateModal" [showChannelSettings]="showChannelSettings"
+    [showAddMembersModal]="showAddMembersModal" [newChannelName]="newChannelName"
+    (newChannelNameChange)="newChannelName = $event" [channelType]="channelType"
+    (channelTypeChange)="channelType = $event" [selectedMembers]="selectedMembers" [newMembers]="newMembers"
+    (toggleMemberSelection)="toggleMemberSelection($event)" [activeChannelUsers]="activeChannelUsers()"
+    [currentUserId]="currentUserId()" [activeChannel]="activeChannel()" [onlineUsers]="onlineUsers()"
+    (closeCreateModal)="closeCreateModal()" (closeChannelSettings)="closeChannelSettings()"
+    (closeAddMembersModal)="closeAddMembersModal()" (submitCreateChannel)="submitCreateChannel()"
+    (submitAddMembers)="submitAddMembers()" (leaveChannel)="onLeaveChannel()" (removeMember)="onRemoveMember($event)">
+  </app-chat-modals> -->
+
+<!-- <app-chat-modals [showCreateModal]="showCreateModal" [showChannelSettings]="showChannelSettings"
+    [showAddMembersModal]="showAddMembersModal" [newChannelName]="newChannelName"
+    (newChannelNameChange)="newChannelName = $event" [channelType]="channelType"
+    (channelTypeChange)="channelType = $event" [selectedMembers]="selectedMembers" [newMembers]="newMembers"
+    (toggleMemberSelection)="toggleMemberSelection($event)" [activeChannelUsers]="activeChannelUsers()"
+    [currentUserId]="currentUserId()" [activeChannel]="activeChannel()" [onlineUsers]="onlineUsers()"
+    (closeCreateModal)="closeCreateModal()" (closeChannelSettings)="closeChannelSettings()"
+    (closeAddMembersModal)="closeAddMembersModal()" (submitCreateChannel)="submitCreateChannel()"
+    (submitAddMembers)="submitAddMembers()">
+  </app-chat-modals> -->

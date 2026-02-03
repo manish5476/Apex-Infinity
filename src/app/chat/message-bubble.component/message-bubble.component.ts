@@ -1,7 +1,8 @@
+import { SocketService } from './../../core/services/socket.service';
 // src/app/chat/whatsapp/message-bubble.component.ts
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Message } from '../services/chat.service';
+import { Message } from '../../core/services/socket.service';
 
 @Component({
   selector: 'app-message-bubble',

@@ -84,26 +84,58 @@ private initForm(): void {
     }
   }
 
-  onSubmit(): void {
-    if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
-      this.messageService.showWarn('Invalid Form', 'Please enter a valid email and password.');
-      return;
-    }
+  // Add a variable to store the error message
+errorMessage = signal<string | null>(null);
 
-    this.isLoading.set(true);
-
-    this.authService.login(this.loginForm.value).subscribe({
-      next: (response: any) => {
-        this.authService.handleLoginSuccess(response);
-        this.masterListService.load();
-        this.isLoading.set(false);
-      },
-      error: (err) => {
-        this.isLoading.set(false);
-      }
-    });
+onSubmit(): void {
+  if (this.loginForm.invalid) {
+    this.loginForm.markAllAsTouched();
+    this.messageService.showWarn('Invalid Form', 'Please enter a valid email and password.');
+    return;
   }
+
+  this.isLoading.set(true);
+  this.errorMessage.set(null); // Clear previous errors
+
+  this.authService.login(this.loginForm.value).subscribe({
+    next: (response: any) => {
+      this.authService.handleLoginSuccess(response);
+      this.masterListService.load();
+      this.isLoading.set(false);
+    },
+    error: (err) => {
+      this.isLoading.set(false);
+      
+      // Access the "message" property from your JSON error object
+      const message = err.error?.message || 'An unexpected error occurred';
+      this.errorMessage.set(message);
+      
+      // Also show as toast if you prefer
+      this.messageService.showError('Login Failed', message);
+    }
+  });
+}
+
+  // onSubmit(): void {
+  //   if (this.loginForm.invalid) {
+  //     this.loginForm.markAllAsTouched();
+  //     this.messageService.showWarn('Invalid Form', 'Please enter a valid email and password.');
+  //     return;
+  //   }
+
+  //   this.isLoading.set(true);
+
+  //   this.authService.login(this.loginForm.value).subscribe({
+  //     next: (response: any) => {
+  //       this.authService.handleLoginSuccess(response);
+  //       this.masterListService.load();
+  //       this.isLoading.set(false);
+  //     },
+  //     error: (err) => {
+  //       this.isLoading.set(false);
+  //     }
+  //   });
+  // }
 
 
   
