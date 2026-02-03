@@ -249,14 +249,29 @@ export class ChatComponent implements OnInit, OnDestroy {
     })
   );
 
-    // inside setupSocketListeners()
+    // Inside setupSocketListeners() in chat.component.ts
 this.subs.push(
   this.socketService.messageEdited$.subscribe((updatedMsg: ChatMessage) => {
+    // Log this to see if the event is actually arriving from the socket
+    console.log('Socket Edit Received:', updatedMsg);
+
     this.messages.update(current => 
-      current.map(m => m._id === updatedMsg._id ? updatedMsg : m)
+      current.map(m => {
+        // Use a safe string comparison
+        const isTarget = String(m._id) === String(updatedMsg._id);
+        return isTarget ? updatedMsg : m;
+      })
     );
   })
 );
+    // inside setupSocketListeners()
+// this.subs.push(
+//   this.socketService.messageEdited$.subscribe((updatedMsg: ChatMessage) => {
+//     this.messages.update(current => 
+//       current.map(m => m._id === updatedMsg._id ? updatedMsg : m)
+//     );
+//   })
+// );
     // // 3. Message Edited
     // this.subs.push(
     //   this.socketService.messageEdited$.subscribe((msg: ChatMessage) => {
