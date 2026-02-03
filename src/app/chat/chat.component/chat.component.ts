@@ -204,24 +204,50 @@ export class ChatComponent implements OnInit, OnDestroy {
     );
 
     // 2. Messages
+    // this.subs.push(
+    //   this.socketService.messages$.subscribe((msg: ChatMessage) => {
+    //     if (msg.channelId === this.activeChannelId()) {
+    //       // Add to list if not duplicate
+    //       this.messages.update(current => {
+    //         if (current.some(m => m._id === msg._id)) return current;
+    //         return [...current, msg];
+    //       });
+    //       this.markMessagesAsRead();
+    //     } else {
+    //       // Increment unread count
+    //       if (msg.channelId) {
+    //         const current = this.unreadCounts();
+    //         this.unreadCounts.set({ ...current, [msg.channelId]: (current[msg.channelId] || 0) + 1 });
+    //       }
+    //     }
+    //   })
+    // );
     this.subs.push(
-      this.socketService.messages$.subscribe((msg: ChatMessage) => {
-        if (msg.channelId === this.activeChannelId()) {
-          // Add to list if not duplicate
-          this.messages.update(current => {
-            if (current.some(m => m._id === msg._id)) return current;
-            return [...current, msg];
-          });
-          this.markMessagesAsRead();
-        } else {
-          // Increment unread count
-          if (msg.channelId) {
-            const current = this.unreadCounts();
-            this.unreadCounts.set({ ...current, [msg.channelId]: (current[msg.channelId] || 0) + 1 });
+    this.socketService.messages$.subscribe((msg: ChatMessage) => {
+      if (msg.channelId === this.activeChannelId()) {
+        this.messages.update(current => {
+          // 1. Prevent exact ID duplicates
+          if (current.some(m => m._id === msg._id)) return current;
+
+          // 2. Match server message with our local temp message
+          const tempIndex = current.findIndex(m => 
+            m._id?.startsWith('temp_') && 
+            m.body === msg.body && 
+            this.getSenderId(m) === this.getSenderId(msg)
+          );
+
+          if (tempIndex > -1) {
+            const updated = [...current];
+            updated[tempIndex] = msg; // Replace temp with real
+            return updated;
           }
-        }
-      })
-    );
+
+          return [...current, msg];
+        });
+        this.markMessagesAsRead();
+      }
+    })
+  );
 
     // 3. Message Edited
     this.subs.push(
@@ -358,33 +384,57 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.sendMessageViaSocket(body, []);
     }
   }
+// Helper to handle senderId regardless of populated state
+getSenderId(msg: any): string {
+  if (!msg || !msg.senderId) return '';
+  return typeof msg.senderId === 'string' ? msg.senderId : (msg.senderId._id || msg.senderId.id || '');
+}
 
   sendMessageViaSocket(body: string, attachments: Attachment[]) {
-    const channelId = this.activeChannelId();
-    if (!channelId) return;
+  const channelId = this.activeChannelId();
+  if (!channelId) return;
 
-    // Optimistic Update
-    const tempId = `temp_${Date.now()}`;
-    const optimisticMsg: ChatMessage = {
-      _id: tempId,
-      channelId,
-      senderId: this.currentUserId(), // or full user object if needed by UI
-      body,
-      attachments,
-      createdAt: new Date().toISOString(),
-      read: false
-    };
-    
-    this.messages.update(msgs => [...msgs, optimisticMsg]);
-    
-    // Clear Composer State via Bindings
-    this.messageInput = '';
-    this.attachments = [];
-    this.uploadProgress.set(0);
+  const tempId = `temp_${Date.now()}`;
+  const optimisticMsg: ChatMessage = {
+    _id: tempId,
+    channelId,
+    senderId: this.currentUserId(), 
+    body,
+    attachments,
+    createdAt: new Date().toISOString()
+  };
+  
+  // Show in UI immediately
+  this.messages.update(msgs => [...msgs, optimisticMsg]);
+  this.socketService.sendMessage({ channelId, body, attachments });
+}
+  
+  // sendMessageViaSocket(body: string, attachments: Attachment[]) {
+  //   const channelId = this.activeChannelId();
+  //   if (!channelId) return;
 
-    // Send
-    this.socketService.sendMessage({ channelId, body, attachments });
-  }
+  //   // Optimistic Update
+  //   const tempId = `temp_${Date.now()}`;
+  //   const optimisticMsg: ChatMessage = {
+  //     _id: tempId,
+  //     channelId,
+  //     senderId: this.currentUserId(), // or full user object if needed by UI
+  //     body,
+  //     attachments,
+  //     createdAt: new Date().toISOString(),
+  //     read: false
+  //   };
+    
+  //   this.messages.update(msgs => [...msgs, optimisticMsg]);
+    
+  //   // Clear Composer State via Bindings
+  //   this.messageInput = '';
+  //   this.attachments = [];
+  //   this.uploadProgress.set(0);
+
+  //   // Send
+  //   this.socketService.sendMessage({ channelId, body, attachments });
+  // }
 
   uploadAttachmentsAndSendMessage(body: string, files: File[]) {
     this.isUploading = true;
@@ -540,17 +590,28 @@ export class ChatComponent implements OnInit, OnDestroy {
     });
   }
 
-  deleteMessage(msg: ChatMessage) {
-    if (!confirm('Delete this message?')) return;
+  // UPDATED: Use Socket for real-time delete
+deleteMessage(msg: ChatMessage) {
+  if (!msg._id || msg._id.startsWith('temp_')) return;
+  if (!confirm('Permanently delete this message?')) return;
+
+  // We emit via socket so EVERYONE hears it immediately
+  this.socketService.deleteMessage(msg._id);
+  
+  // No need to manually update signals; the 'messageDeleted' 
+  // socket listener above handles the UI update.
+}
+  // deleteMessage(msg: ChatMessage) {
+  //   if (!confirm('Delete this message?')) return;
     
-    this.socketService.deleteMessageHttp(msg._id!).subscribe({
-      next: () => {
-        this.messages.update(curr => curr.map(m => 
-          m._id === msg._id ? { ...m, deleted: true, body: '', attachments: [] } : m
-        ));
-      }
-    });
-  }
+  //   this.socketService.deleteMessageHttp(msg._id!).subscribe({
+  //     next: () => {
+  //       this.messages.update(curr => curr.map(m => 
+  //         m._id === msg._id ? { ...m, deleted: true, body: '', attachments: [] } : m
+  //       ));
+  //     }
+  //   });
+  // }
 
   // --- File Handlers passed to Composer ---
   
