@@ -631,11 +631,20 @@ submitCreateChannel() {
     }
   });
 }
-  toggleMemberSelection(id: string) {
-    if (this.selectedMembers.has(id)) this.selectedMembers.delete(id);
-    else this.selectedMembers.add(id);
-  }
+  // toggleMemberSelection(id: string) {
+  //   if (this.selectedMembers.has(id)) this.selectedMembers.delete(id);
+  //   else this.selectedMembers.add(id);
+  // }
 
+  // Toggle for creating NEW channels
+toggleMemberSelection(userId: string) {
+  if (this.selectedMembers.has(userId)) {
+    this.selectedMembers.delete(userId);
+  } else {
+    this.selectedMembers.add(userId);
+  }
+}
+  
   // Settings
   openChannelSettings() { this.showChannelSettings = true; }
   closeChannelSettings() { this.showChannelSettings = false; }
@@ -643,11 +652,27 @@ submitCreateChannel() {
   // Add Members
   openAddMembersModal() { this.showAddMembersModal = true; this.newMembers.clear(); }
   closeAddMembersModal() { this.showAddMembersModal = false; }
-  submitAddMembers() { 
-    // Logic to add members via API
-    this.closeAddMembersModal(); 
-  }
+  // submitAddMembers() { 
+  //   // Logic to add members via API
+  //   this.closeAddMembersModal(); 
+  // }
+// Logic for adding members to an EXISTING channel
+submitAddMembers() {
+  const channelId = this.activeChannelId();
+  const membersToAdd = Array.from(this.newMembers);
 
+  if (!channelId || membersToAdd.length === 0) return;
+
+  // Professional implementation: Use your SocketService to push updates
+  // Assuming you have an updateChannel method
+  this.socketService.updateChannel(channelId, { 
+    members: [...this.activeChannelUsers(), ...membersToAdd] 
+  });
+
+  this.closeAddMembersModal();
+  this.newMembers.clear();
+  this.messageService.showSuccess('Success', 'Members added to channel.');
+}
   // --- Message Operations (Edit/Delete) ---
 
   startEditingMessage(msg: ChatMessage) {
