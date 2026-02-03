@@ -43,7 +43,14 @@
               } 
               @else if (editingMessageId === msg._id) {
                 <div class="edit-mode">
-                  <textarea [(ngModel)]="editMessageText" (keydown.enter)="handleEditEnter($event)" rows="2"></textarea>
+                  <textarea 
+                    [ngModel]="editMessageText" 
+                    (ngModelChange)="onTextChange($event)"
+                    (keydown.enter)="handleEditEnter($event)" 
+                    rows="2"
+                    placeholder="Edit your message..."
+                    #editInput
+                  ></textarea>
                   <div class="edit-btns">
                     <button class="btn-cancel" (click)="cancelEditing.emit()">Cancel</button>
                     <button class="btn-save" (click)="saveEditedMessage.emit()">Save</button>
@@ -97,3 +104,103 @@
     </div>
   }
 </div>
+
+<!-- <div class="messages-viewport custom-scrollbar" #scrollContainer (scroll)="onScroll($event)">
+  
+  @if (loadingMore) {
+    <div class="system-loader">
+      <i class="pi pi-spin pi-spinner"></i>
+    </div>
+  }
+
+  <div class="message-feed">
+    @for (msg of messages; track msg._id; let i = $index) {
+      
+      @if (showDateSeparator(i, msg)) {
+        <div class="date-row">
+          <span class="date-label">{{ msg.createdAt | date:'MMMM d, y' }}</span>
+        </div>
+      }
+
+      <div class="message-group" 
+           [class.mine]="isMine(msg)" 
+           [class.consecutive]="isConsecutive(i, msg)">
+        
+        @if (!isConsecutive(i, msg) && !isMine(msg)) {
+          <div class="user-avatar" [title]="getSenderName(msg)">
+            {{ getSenderAvatar(msg) }}
+          </div>
+        } @else if (!isMine(msg)) {
+          <div class="avatar-spacer"></div>
+        }
+
+        <div class="message-body">
+          
+          @if (!isConsecutive(i, msg) && !isMine(msg)) {
+            <span class="sender-name">{{ getSenderName(msg) }}</span>
+          }
+
+          <div class="bubble-wrapper">
+            <div class="bubble" [class.deleted]="msg.deleted">
+              
+              @if (msg.deleted) {
+                <span class="deleted-text">
+                  <i class="pi pi-ban"></i> This message was deleted
+                </span>
+              } 
+              @else if (editingMessageId === msg._id) {
+                <div class="edit-mode">
+                  <textarea [(ngModel)]="editMessageText" (keydown.enter)="handleEditEnter($event)" rows="2"></textarea>
+                  <div class="edit-btns">
+                    <button class="btn-cancel" (click)="cancelEditing.emit()">Cancel</button>
+                    <button class="btn-save" (click)="saveEditedMessage.emit()">Save</button>
+                  </div>
+                </div>
+              } 
+              @else {
+                <div class="text-content">{{ msg.body }}</div>
+                
+                @if (msg.attachments?.length) {
+                  <div class="attachment-grid">
+                    @for (f of msg.attachments; track f.url) {
+                      <div class="attachment-card">
+                        @if (isImage(f.url)) {
+                          <img [src]="f.url" alt="Attachment" class="img-preview" loading="lazy" />
+                        } @else {
+                          <a [href]="f.url" target="_blank" class="file-link">
+                            <div class="file-icon">
+                              <i class="pi" [ngClass]="getFileIconClass(f.url)"></i>
+                            </div>
+                            <span class="file-name">{{ f.name }}</span>
+                          </a>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+              }
+            </div>
+
+            @if (!msg.deleted && isMine(msg) && editingMessageId !== msg._id) {
+              <div class="message-actions">
+                <button (click)="editMessage.emit(msg)" title="Edit"><i class="pi pi-pencil"></i></button>
+                <button (click)="deleteMessage.emit(msg)" title="Delete" class="danger"><i class="pi pi-trash"></i></button>
+              </div>
+            }
+            
+            <span class="timestamp">{{ msg.createdAt | date:'h:mm a' }}</span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (typingIndicator) {
+    <div class="typing-area">
+      <div class="typing-bubble">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      </div>
+      <small>{{ typingIndicator }}</small>
+    </div>
+  }
+</div> -->
