@@ -249,14 +249,22 @@ export class ChatComponent implements OnInit, OnDestroy {
     })
   );
 
-    // 3. Message Edited
-    this.subs.push(
-      this.socketService.messageEdited$.subscribe((msg: ChatMessage) => {
-        if (msg.channelId === this.activeChannelId()) {
-          this.messages.update(current => current.map(m => m._id === msg._id ? msg : m));
-        }
-      })
+    // inside setupSocketListeners()
+this.subs.push(
+  this.socketService.messageEdited$.subscribe((updatedMsg: ChatMessage) => {
+    this.messages.update(current => 
+      current.map(m => m._id === updatedMsg._id ? updatedMsg : m)
     );
+  })
+);
+    // // 3. Message Edited
+    // this.subs.push(
+    //   this.socketService.messageEdited$.subscribe((msg: ChatMessage) => {
+    //     if (msg.channelId === this.activeChannelId()) {
+    //       this.messages.update(current => current.map(m => m._id === msg._id ? msg : m));
+    //     }
+    //   })
+    // );
 
     // 4. Message Deleted
     this.subs.push(
@@ -579,16 +587,34 @@ getSenderId(msg: any): string {
   }
 
   saveEditedMessage() {
-    const id = this.editingMessageId();
-    if (!id || !this.editMessageText.trim()) return;
+  const id = this.editingMessageId();
+  const text = this.editMessageText.trim();
+  
+  if (!id || !text) return;
 
-    this.socketService.editMessageHttp(id, this.editMessageText).subscribe({
-      next: (updated) => {
-        this.messages.update(curr => curr.map(m => m._id === id ? updated : m));
-        this.cancelEditing();
-      }
-    });
-  }
+  // 1. Update UI Optimistically immediately
+  this.messages.update(curr => 
+    curr.map(m => m._id === id ? { ...m, body: text, editedAt: new Date().toISOString() } : m)
+  );
+
+  // 2. Send to Server (Socket is better for real-time reflection)
+  this.socketService.editMessage(id, text);
+  
+  // 3. Reset editing state
+  this.cancelEditing();
+}
+  
+  // saveEditedMessage() {
+  //   const id = this.editingMessageId();
+  //   if (!id || !this.editMessageText.trim()) return;
+
+  //   this.socketService.editMessageHttp(id, this.editMessageText).subscribe({
+  //     next: (updated) => {
+  //       this.messages.update(curr => curr.map(m => m._id === id ? updated : m));
+  //       this.cancelEditing();
+  //     }
+  //   });
+  // }
 
   // UPDATED: Use Socket for real-time delete
 deleteMessage(msg: ChatMessage) {
