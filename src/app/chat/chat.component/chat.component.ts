@@ -249,6 +249,34 @@ export class ChatComponent implements OnInit, OnDestroy {
     })
   );
 
+// ---------------------------------------------------------------------------------------
+    // --- 1. Connection Status Monitor ---
+  // Place this here to alert the user if the socket drops
+  this.subs.push(
+    this.socketService.connectionStatus$.subscribe(status => {
+      if (status === 'disconnected') {
+        this.messageService.showWarn('Connection Lost', 'Real-time updates are paused.');
+      } else if (status === 'connected') {
+        // Optional: toast when connection is restored
+        console.log('Socket connection active');
+      }
+    })
+  );
+
+  // --- 2. Global Socket Error Catcher ---
+  // This is the "Black Box" recorder. If the server sends an error (like FORBIDDEN), 
+  // this will catch it and show you a toast.
+  // Note: Ensure your SocketService has an 'error$' or similar Subject.
+  // Based on your previous code, we can listen to the generic socket error:
+  this.subs.push(
+    this.socketService.connectionEstablished$.subscribe(() => {
+       console.log('Handshake verified with server.');
+    })
+  );
+// ---------------------------------------------------------------------------------------
+
+    
+
     // Inside setupSocketListeners() in chat.component.ts
 this.subs.push(
   this.socketService.messageEdited$.subscribe((updatedMsg: ChatMessage) => {
@@ -264,14 +292,6 @@ this.subs.push(
     );
   })
 );
-    // inside setupSocketListeners()
-// this.subs.push(
-//   this.socketService.messageEdited$.subscribe((updatedMsg: ChatMessage) => {
-//     this.messages.update(current => 
-//       current.map(m => m._id === updatedMsg._id ? updatedMsg : m)
-//     );
-//   })
-// );
     // // 3. Message Edited
     // this.subs.push(
     //   this.socketService.messageEdited$.subscribe((msg: ChatMessage) => {
