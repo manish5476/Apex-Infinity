@@ -247,6 +247,15 @@ this.socket.on('error', (err: any) => {
     this.messageService.showError('Socket Error', err.message || err.code);
   });
 });
+
+    // socket.service.ts -> setupListeners()
+this.socket.on('initialData', (data: any) => {
+  this.zone.run(() => {
+    if (data.channels) this.channels$.next(data.channels);
+    // You can also sync unread counts here
+    console.log('📦 Initial Data Synced via Socket');
+  });
+});
     
 // 🟢 UPGRADED: Connect Error Handler with Silent Refresh
     this.socket.on('connect_error', (error: any) => {
