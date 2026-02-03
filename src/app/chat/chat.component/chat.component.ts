@@ -621,24 +621,46 @@ getSenderId(msg: any): string {
     this.editMessageText = '';
   }
 
+//   saveEditedMessage() {
+//   const id = this.editingMessageId();
+//   const text = this.editMessageText.trim();
+  
+//   if (!id || !text) return;
+
+//   // 1. Update UI Optimistically immediately
+//   this.messages.update(curr => 
+//     curr.map(m => m._id === id ? { ...m, body: text, editedAt: new Date().toISOString() } : m)
+//   );
+
+//   // 2. Send to Server (Socket is better for real-time reflection)
+//   this.socketService.editMessage(id, text);
+  
+//   // 3. Reset editing state
+//   this.cancelEditing();
+// }
   saveEditedMessage() {
   const id = this.editingMessageId();
-  const text = this.editMessageText.trim();
+  const text = this.editMessageText?.trim(); // Added optional chaining for safety
   
-  if (!id || !text) return;
+  // 🛑 Guard: Don't send if no ID, no text, or if it's still a temporary message
+  if (!id || !text || id.startsWith('temp_')) return;
 
   // 1. Update UI Optimistically immediately
   this.messages.update(curr => 
-    curr.map(m => m._id === id ? { ...m, body: text, editedAt: new Date().toISOString() } : m)
+    curr.map(m => {
+      // Use String comparison to be 100% safe with Mongo IDs
+      const isMatch = String(m._id) === String(id);
+      return isMatch ? { ...m, body: text, editedAt: new Date().toISOString() } : m;
+    })
   );
 
-  // 2. Send to Server (Socket is better for real-time reflection)
+  // 2. Send to Server via Socket
+  // This triggers the backend 'editMessage' listener we secured earlier
   this.socketService.editMessage(id, text);
   
-  // 3. Reset editing state
+  // 3. Reset UI state
   this.cancelEditing();
 }
-  
   // saveEditedMessage() {
   //   const id = this.editingMessageId();
   //   if (!id || !this.editMessageText.trim()) return;
