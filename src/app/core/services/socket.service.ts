@@ -681,14 +681,24 @@ this.socket.on('messageDeleted', (data: any) => {
   createChannel(name: string, type: 'public' | 'private' | 'dm', members: string[] = []) {
     this.socket?.emit('createChannel', { name, type, members });
   }
-updateChannel(channelId: string, updates: { 
+  updateChannel(channelId: string, updates: { 
   name?: string; 
   isActive?: boolean; 
   type?: string; 
-  members?: string[]; // 🛑 ADD THIS LINE
+  members?: string[]; // ✅ ADD THIS: Tells TypeScript members is allowed
 }) {
-  this.socket?.emit('updateChannel', { channelId, ...updates });
+  if (!this.socket) return;
+  this.socket.emit('updateChannel', { channelId, ...updates });
 }
+  
+// updateChannel(channelId: string, updates: { 
+//   name?: string; 
+//   isActive?: boolean; 
+//   type?: string; 
+//   members?: string[]; // 🛑 ADD THIS LINE
+// }) {
+//   this.socket?.emit('updateChannel', { channelId, ...updates });
+// }
   // updateChannel(channelId: string, updates: { name?: string; isActive?: boolean; type?: string }) {
   //   this.socket?.emit('updateChannel', { channelId, ...updates });
   // }
