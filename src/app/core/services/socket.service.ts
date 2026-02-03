@@ -291,12 +291,25 @@ if (!this.socket) return;
     // ==========================================================================
 
     this.socket.on('newMessage', (msg: Message) => {
-      this.zone.run(() => {
-        this.messages$.next(msg);
-        const batch = this.messagesBatch$.value;
-        this.messagesBatch$.next([...batch, msg]);
-      });
-    });
+  this.zone.run(() => {
+    this.messages$.next(msg);
+    const batch = this.messagesBatch$.value;
+    
+    // Check if message already exists in the local batch
+    const exists = batch.some(m => m._id === msg._id);
+    if (!exists) {
+      this.messagesBatch$.next([...batch, msg]);
+    }
+  });
+});
+    
+    // this.socket.on('newMessage', (msg: Message) => {
+    //   this.zone.run(() => {
+    //     this.messages$.next(msg);
+    //     const batch = this.messagesBatch$.value;
+    //     this.messagesBatch$.next([...batch, msg]);
+    //   });
+    // });
 
     this.socket.on('messageEdited', (msg: Message) => {
       this.zone.run(() => {
@@ -310,20 +323,34 @@ if (!this.socket) return;
     });
 
     this.socket.on('messageDeleted', (data: { messageId: string; channelId: string; deletedBy: string; timestamp: string }) => {
-      this.zone.run(() => {
-        this.messageDeleted$.next(data);
-        
-        // Update in batch (soft delete)
-        const batch = this.messagesBatch$.value;
-        const updatedBatch = batch.map(m => {
-          if (m._id === data.messageId) {
-            return { ...m, body: '', attachments: [], deleted: true };
-          }
-          return m;
-        });
-        this.messagesBatch$.next(updatedBatch);
-      });
+  this.zone.run(() => {
+    this.messageDeleted$.next(data);
+    
+    // Update the local batch to reflect the "Deleted" state
+    const updatedBatch = this.messagesBatch$.value.map(m => {
+      if (m._id === data.messageId) {
+        return { ...m, body: '', attachments: [], deleted: true };
+      }
+      return m;
     });
+    this.messagesBatch$.next(updatedBatch);
+  });
+});
+    // this.socket.on('messageDeleted', (data: { messageId: string; channelId: string; deletedBy: string; timestamp: string }) => {
+    //   this.zone.run(() => {
+    //     this.messageDeleted$.next(data);
+        
+    //     // Update in batch (soft delete)
+    //     const batch = this.messagesBatch$.value;
+    //     const updatedBatch = batch.map(m => {
+    //       if (m._id === data.messageId) {
+    //         return { ...m, body: '', attachments: [], deleted: true };
+    //       }
+    //       return m;
+    //     });
+    //     this.messagesBatch$.next(updatedBatch);
+    //   });
+    // });
 
     this.socket.on('messages', (payload: { channelId: string; messages: Message[] }) => {
       this.zone.run(() => {
