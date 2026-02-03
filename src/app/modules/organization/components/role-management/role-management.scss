@@ -230,4 +230,33 @@
     display: flex;
     gap: 0.5rem;
   }
+  /* --- ROLE-MANAGEMENT.SCSS --- */
+
+.action-btn {
+  @apply flex items-center justify-center transition-all duration-200;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--ui-border-radius-md);
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border-primary);
+  color: var(--theme-text-secondary);
+
+  &:hover:not([disabled]) {
+    background: var(--theme-accent-focus);
+    color: var(--theme-accent-primary);
+    border-color: var(--theme-accent-primary);
+    transform: translateY(-1px);
+  }
+
+  &[disabled] {
+    opacity: 0.4;
+    cursor: not-allowed;
+    filter: grayscale(1);
+  }
+}
+
+/* Ensure the Ag-Grid rows don't have layout shifts on click */
+::v-deep .ag-row-hover {
+  background-color: var(--theme-bg-secondary) !important;
+}
 }
