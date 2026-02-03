@@ -289,40 +289,40 @@ if (!this.socket) return;
     // ==========================================================================
     // CHAT EVENTS
     // ==========================================================================
-// socket.service.ts -> setupListeners()
-this.socket.on('newMessage', (msg: Message) => {
-  this.zone.run(() => {
-    const currentBatch = this.messagesBatch$.value;
-    
-    // 🛑 GATEKEEPER: Check if ID already exists
-    const isDuplicate = currentBatch.some(m => m._id === msg._id);
-    
-    if (!isDuplicate) {
-      this.messages$.next(msg);
-      this.messagesBatch$.next([...currentBatch, msg]);
-    }
-  });
-});
-//     this.socket.on('newMessage', (msg: Message) => {
+// // socket.service.ts -> setupListeners()
+// this.socket.on('newMessage', (msg: Message) => {
 //   this.zone.run(() => {
-//     this.messages$.next(msg);
-//     const batch = this.messagesBatch$.value;
+//     const currentBatch = this.messagesBatch$.value;
     
-//     // Check if message already exists in the local batch
-//     const exists = batch.some(m => m._id === msg._id);
-//     if (!exists) {
-//       this.messagesBatch$.next([...batch, msg]);
+//     // 🛑 GATEKEEPER: Check if ID already exists
+//     const isDuplicate = currentBatch.some(m => m._id === msg._id);
+    
+//     if (!isDuplicate) {
+//       this.messages$.next(msg);
+//       this.messagesBatch$.next([...currentBatch, msg]);
 //     }
 //   });
 // });
+// //     this.socket.on('newMessage', (msg: Message) => {
+// //   this.zone.run(() => {
+// //     this.messages$.next(msg);
+// //     const batch = this.messagesBatch$.value;
     
-    // this.socket.on('newMessage', (msg: Message) => {
-    //   this.zone.run(() => {
-    //     this.messages$.next(msg);
-    //     const batch = this.messagesBatch$.value;
-    //     this.messagesBatch$.next([...batch, msg]);
-    //   });
-    // });
+// //     // Check if message already exists in the local batch
+// //     const exists = batch.some(m => m._id === msg._id);
+// //     if (!exists) {
+// //       this.messagesBatch$.next([...batch, msg]);
+// //     }
+// //   });
+// // });
+    
+//     // this.socket.on('newMessage', (msg: Message) => {
+//     //   this.zone.run(() => {
+//     //     this.messages$.next(msg);
+//     //     const batch = this.messagesBatch$.value;
+//     //     this.messagesBatch$.next([...batch, msg]);
+//     //   });
+//     // });
 
     this.socket.on('messageEdited', (msg: Message) => {
       this.zone.run(() => {
@@ -335,20 +335,20 @@ this.socket.on('newMessage', (msg: Message) => {
       });
     });
 
-    this.socket.on('messageDeleted', (data: { messageId: string; channelId: string; deletedBy: string; timestamp: string }) => {
-  this.zone.run(() => {
-    this.messageDeleted$.next(data);
+//     this.socket.on('messageDeleted', (data: { messageId: string; channelId: string; deletedBy: string; timestamp: string }) => {
+//   this.zone.run(() => {
+//     this.messageDeleted$.next(data);
     
-    // Update the local batch to reflect the "Deleted" state
-    const updatedBatch = this.messagesBatch$.value.map(m => {
-      if (m._id === data.messageId) {
-        return { ...m, body: '', attachments: [], deleted: true };
-      }
-      return m;
-    });
-    this.messagesBatch$.next(updatedBatch);
-  });
-});
+//     // Update the local batch to reflect the "Deleted" state
+//     const updatedBatch = this.messagesBatch$.value.map(m => {
+//       if (m._id === data.messageId) {
+//         return { ...m, body: '', attachments: [], deleted: true };
+//       }
+//       return m;
+//     });
+//     this.messagesBatch$.next(updatedBatch);
+//   });
+// });
     // this.socket.on('messageDeleted', (data: { messageId: string; channelId: string; deletedBy: string; timestamp: string }) => {
     //   this.zone.run(() => {
     //     this.messageDeleted$.next(data);
@@ -365,6 +365,32 @@ this.socket.on('newMessage', (msg: Message) => {
     //   });
     // });
 
+    this.socket.on('newMessage', (msg: Message) => {
+  this.zone.run(() => {
+    // 🛑 CRITICAL: Stream the raw message
+    this.messages$.next(msg);
+
+    // 🛑 CRITICAL: Update batch only if it doesn't exist
+    const currentBatch = this.messagesBatch$.value;
+    const exists = currentBatch.some(m => m._id === msg._id);
+    
+    if (!exists) {
+      this.messagesBatch$.next([...currentBatch, msg]);
+    }
+  });
+});
+
+// Ensure delete listener updates the batch correctly
+this.socket.on('messageDeleted', (data: any) => {
+  this.zone.run(() => {
+    this.messageDeleted$.next(data);
+    const updated = this.messagesBatch$.value.map(m => 
+      m._id === data.messageId ? { ...m, body: '', attachments: [], deleted: true } : m
+    );
+    this.messagesBatch$.next(updated);
+  });
+});
+    
     this.socket.on('messages', (payload: { channelId: string; messages: Message[] }) => {
       this.zone.run(() => {
         const current = this.messagesBatch$.value;
