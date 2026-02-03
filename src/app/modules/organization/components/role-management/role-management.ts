@@ -174,15 +174,31 @@ export class RoleManagementComponent implements OnInit {
   }
 
   onGridReady(params: GridReadyEvent) { this.gridApi = params.api; }
-  
-  eventFromGrid(event: any) {
-    console.log(event);
-    if (event.type=== 'cellClicked') {
-      const target = event.event.event.target;
-      if (target.closest('.action-edit')) this.openEditRoleDialog(event.event.data);
-      if (target.closest('.action-delete')) this.deleteRole(event.event.data);
+
+  // --- IN ROLE-MANAGEMENT.TS ---
+
+eventFromGrid(event: any) {
+  // Audit Check: event.event is the native MouseEvent provided by AG Grid
+  if (event.type === 'cellClicked') {
+    const mouseEvent = event.event; // Corrected path
+    const target = mouseEvent.target as HTMLElement;
+
+    if (target.closest('.action-edit')) {
+      this.openEditRoleDialog(event.data); // event.data contains the row object
+    }
+    if (target.closest('.action-delete')) {
+      this.deleteRole(event.data);
     }
   }
+}
+  // eventFromGrid(event: any) {
+  //   console.log(event);
+  //   if (event.type=== 'cellClicked') {
+  //     const target = event.event.event.target;
+  //     if (target.closest('.action-edit')) this.openEditRoleDialog(event.event.data);
+  //     if (target.closest('.action-delete')) this.deleteRole(event.event.data);
+  //   }
+  // }
 
   // --- Actions ---
   applyFilters() { this.loadRoles(true); }
