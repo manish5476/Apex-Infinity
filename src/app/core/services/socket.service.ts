@@ -241,14 +241,13 @@ if (!this.socket) return;
         this.handleReconnect(orgId);
       });
     });
-
-    // this.socket.on('connect_error', (error: Error) => {
-    //   console.error('Socket Connection Error:', error);
-    //   this.zone.run(() => {
-    //     this.connectionStatus$.next('disconnected');
-    //     this.handleReconnect(orgId);
-    //   });
-    // });
+// socket.service.ts
+this.socket.on('error', (err: any) => {
+  this.zone.run(() => {
+    this.messageService.showError('Socket Error', err.message || err.code);
+  });
+});
+    
 // 🟢 UPGRADED: Connect Error Handler with Silent Refresh
     this.socket.on('connect_error', (error: any) => {
       console.error('💬 Chat Socket Error:', error.message);
