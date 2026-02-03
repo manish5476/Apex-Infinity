@@ -97,7 +97,7 @@
     }
   </main>
 
-<app-chat-modals 
+<!-- <app-chat-modals 
     [showCreateModal]="showCreateModal" 
     [showChannelSettings]="showChannelSettings"
     [showAddMembersModal]="showAddMembersModal" 
@@ -120,6 +120,31 @@
     (submitCreateChannel)="submitCreateChannel()"
     (submitAddMembers)="submitAddMembers()" 
     (toggleMemberSelection)="toggleMemberSelection($event)">
+</app-chat-modals> -->
+<app-chat-modals 
+    [showCreateModal]="showCreateModal" 
+    [showChannelSettings]="showChannelSettings"
+    [showAddMembersModal]="showAddMembersModal" 
+    
+    [newChannelName]="newChannelName" 
+    (newChannelNameChange)="newChannelName = $event" 
+    
+    [channelType]="channelType"
+    (channelTypeChange)="channelType = $event"
+    
+    [selectedMembers]="selectedMembers" 
+    [newMembers]="newMembers" 
+    (toggleMemberSelection)="toggleMemberSelection($event)"
+    
+    [activeChannelUsers]="activeChannelUsers()"
+    [currentUserId]="currentUserId()" 
+    [activeChannel]="activeChannel()" 
+    [onlineUsers]="onlineUsers()"
+    
+    (closeCreateModal)="closeCreateModal()" 
+    (closeChannelSettings)="closeChannelSettings()"
+    (closeAddMembersModal)="closeAddMembersModal()" 
+    (submitCreateChannel)="submitCreateChannel()"
+    (submitAddMembers)="submitAddMembers()">
 </app-chat-modals>
-
 </div>
