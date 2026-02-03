@@ -289,19 +289,32 @@ if (!this.socket) return;
     // ==========================================================================
     // CHAT EVENTS
     // ==========================================================================
-
-    this.socket.on('newMessage', (msg: Message) => {
+// socket.service.ts -> setupListeners()
+this.socket.on('newMessage', (msg: Message) => {
   this.zone.run(() => {
-    this.messages$.next(msg);
-    const batch = this.messagesBatch$.value;
+    const currentBatch = this.messagesBatch$.value;
     
-    // Check if message already exists in the local batch
-    const exists = batch.some(m => m._id === msg._id);
-    if (!exists) {
-      this.messagesBatch$.next([...batch, msg]);
+    // 🛑 GATEKEEPER: Check if ID already exists
+    const isDuplicate = currentBatch.some(m => m._id === msg._id);
+    
+    if (!isDuplicate) {
+      this.messages$.next(msg);
+      this.messagesBatch$.next([...currentBatch, msg]);
     }
   });
 });
+//     this.socket.on('newMessage', (msg: Message) => {
+//   this.zone.run(() => {
+//     this.messages$.next(msg);
+//     const batch = this.messagesBatch$.value;
+    
+//     // Check if message already exists in the local batch
+//     const exists = batch.some(m => m._id === msg._id);
+//     if (!exists) {
+//       this.messagesBatch$.next([...batch, msg]);
+//     }
+//   });
+// });
     
     // this.socket.on('newMessage', (msg: Message) => {
     //   this.zone.run(() => {
