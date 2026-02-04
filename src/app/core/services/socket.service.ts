@@ -106,7 +106,7 @@ export class SocketService implements OnDestroy {
   
   public channels$ = new BehaviorSubject<Channel[]>([]);
   public channelUsers$ = new BehaviorSubject<Record<string, string[]>>({});
-  
+  public themeChanged$ = new Subject<{ themeId: string }>();
   public onlineUsers$ = new BehaviorSubject<Set<string>>(new Set());
   public onlineUsersList$: Observable<OnlineUser[]> = this.onlineUsers$.pipe(
     map(users => Array.from(users).map(userId => ({ userId }))),
@@ -211,6 +211,7 @@ export class SocketService implements OnDestroy {
     }
   }
 
+
   private setupListeners(orgId: string) {
     if (!this.socket) return;
 
@@ -234,6 +235,12 @@ export class SocketService implements OnDestroy {
       });
     });
 
+    this.socket.on('themeChanged', (data: { themeId: string }) => {
+    this.zone.run(() => {
+      this.themeChanged$.next(data);
+    });
+  });
+  
     this.socket.on('connect_error', (error: any) => {
       console.error('💬 Chat Socket Error:', error.message);
 
@@ -503,6 +510,10 @@ export class SocketService implements OnDestroy {
     });
   }
 
+  updateTheme(themeId: string) {
+  this.socket?.emit('updateTheme', { themeId });
+}
+
   // ==========================================================================
   // 📤 PUBLIC API (ACTIONS)
   // ==========================================================================
@@ -566,6 +577,7 @@ export class SocketService implements OnDestroy {
     this.socket?.emit('typing', { channelId, typing: isTyping });
   }
 
+  
   markRead(channelId: string, messageIds?: string[]) {
     // We also support HTTP mark read, but socket is faster for batch updates
     this.socket?.emit('markRead', { channelId, messageIds });

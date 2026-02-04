@@ -27,6 +27,8 @@ import { StatsCounterComponent } from '../../../storefront-public/pages/stats-co
 import { TestimonialSliderComponent } from '../../../storefront-public/pages/testimonial-slider/testimonial-slider.component';
 import { TextContentComponent } from '../../../storefront-public/pages/text-content/text-content.component';
 import { VideoHeroComponent } from '../../../storefront-public/pages/video-hero/video-hero.component';
+import { ProductListComponent } from '../../../product/components/product-list/product-list';
+import { ProductListingComponent } from "../../../storefront-public/pages/product-listing/product-listing.component";
 
 
 @Component({
@@ -39,7 +41,6 @@ import { VideoHeroComponent } from '../../../storefront-public/pages/video-hero/
     DialogModule,
     TooltipModule,
     ConfigFormComponent,
-
     // ✅ REGISTERED COMPONENTS
     HeroBannerComponent,
     ProductSliderComponent,
@@ -57,8 +58,9 @@ import { VideoHeroComponent } from '../../../storefront-public/pages/video-hero/
     PricingTableComponent,
     FaqAccordionComponent,
     CountdownTimerComponent,
-    BlogFeedComponent
-  ],
+    BlogFeedComponent,
+      ProductListingComponent
+],
   templateUrl: './page-builder.component.html',
   styleUrls: ['./page-builder.component.scss'],
   encapsulation: ViewEncapsulation.None

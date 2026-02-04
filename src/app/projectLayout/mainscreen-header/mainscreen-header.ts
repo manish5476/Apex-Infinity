@@ -98,7 +98,6 @@ textScale: number = 100;
     this.themeService.settings$.pipe(takeUntil(this.destroy$)).subscribe((s: ThemeSettings) => {
       this.isDarkMode = s.isDarkMode;
       this.activeThemeId = s.isDarkMode ? 'theme-dark' : s.lightThemeClass || 'theme-light';
-      // ✅ Sync local state with service state
       if (s.textScale) {
         this.textScale = s.textScale;
       }

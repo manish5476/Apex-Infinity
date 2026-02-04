@@ -21,6 +21,7 @@ import { ToastModule } from "primeng/toast";
 
 // Import Models
 import { ChatMessage, Channel, Attachment } from './chat.models';
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-chat',
@@ -40,19 +41,21 @@ import { ChatMessage, Channel, Attachment } from './chat.models';
 })
 export class ChatComponent implements OnInit, OnDestroy {
   // --- Services ---
+    private themeService = inject(ThemeService);
+  
   private socketService = inject(SocketService);
   public masterList = inject(MasterListService); 
   private http = inject(HttpClient);
   private messageService = inject(AppMessageService);
   private authService = inject(AuthService);
-
+activeThemeId : any ='theme-glass'
   // --- UI Signals & State ---
   channels = signal<Channel[]>([]);
   messages = signal<ChatMessage[]>([]);
   activeChannelId = signal<string | null>(null);
   currentUserId = signal<string>('');
   currentUser = signal<any>(null);
-
+ 
   // Presence & Typing
   isTyping = signal<boolean>(false);
   typingUsers = signal<Map<string, { userId: string, timestamp: number }>>(new Map());
@@ -347,8 +350,32 @@ export class ChatComponent implements OnInit, OnDestroy {
         }
       })
     );
+
+    this.subs.push(
+    this.socketService.themeChanged$.subscribe(({ themeId }) => {
+      this.activeThemeId.set(themeId);
+      if (themeId === 'theme-dark') {
+      this.themeService.setDarkMode(true);
+    } else if (themeId === 'auto-theme') {
+      // Handle auto theme - detect system preference
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      this.themeService.setDarkMode(prefersDark);
+      this.activeThemeId = prefersDark ? 'theme-dark' : 'theme-light';
+    } else {
+      this.themeService.setLightTheme(themeId);
+      this.themeService.setDarkMode(false);
+      this.activeThemeId = themeId;
+    }
+
+      // this.applyThemeToDOM(themeId); // Helper to update CSS variables
+    })
+  );
+    
   }
 
+  changeTheme(newThemeId: string) {
+  this.socketService.updateTheme(newThemeId);
+}
   // --- Channel Management ---
 
   loadChannels() {
