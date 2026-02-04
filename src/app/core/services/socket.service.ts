@@ -305,13 +305,38 @@ export class SocketService implements OnDestroy {
       });
     });
 
-    this.socket.on('messageDeleted', (data: any) => {
+    // this.socket.on('messageDeleted', (data: any) => {
+    //   this.zone.run(() => {
+    //     this.messageDeleted$.next(data);
+    //     const updated = this.messagesBatch$.value.map(m => 
+    //       m._id === data.messageId ? { ...m, body: '', attachments: [], deleted: true } : m
+    //     );
+    //     this.messagesBatch$.next(updated);
+    //   });
+    // });
+    this.socket.on('messageDeleted', (data: { messageId: string }) => {
       this.zone.run(() => {
-        this.messageDeleted$.next(data);
-        const updated = this.messagesBatch$.value.map(m => 
-          m._id === data.messageId ? { ...m, body: '', attachments: [], deleted: true } : m
-        );
-        this.messagesBatch$.next(updated);
+        console.log('🗑️ Socket Event: Message Deleted', data.messageId); // Debug Log
+
+        // 1. Get current messages
+        const currentMessages = this.messagesBatch$.value;
+
+        // 2. Find and Update the specific message
+        const updatedMessages = currentMessages.map(m => {
+          if (m._id === data.messageId) {
+            // Return a NEW object with deleted properties
+            return { 
+                ...m, 
+                body: '', 
+                attachments: [], 
+                deleted: true 
+            }; 
+          }
+          return m;
+        });
+
+        // 3. Push the new list to the Subject
+        this.messagesBatch$.next(updatedMessages);
       });
     });
     
