@@ -654,15 +654,36 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   // UPDATED: Use Socket for real-time delete
+  // deleteMessage(msg: ChatMessage) {
+  //   if (!msg._id || msg._id.startsWith('temp_')) return;
+  //   if (!confirm('Permanently delete this message?')) return;
+
+  //   // We emit via socket so EVERYONE hears it immediately
+  //   this.socketService.deleteMessage(msg._id);
+
+  //   // No need to manually update signals; the 'messageDeleted' 
+  //   // socket listener above handles the UI update.
+  // }
+  // src/app/features/chat/chat.component.ts
+
   deleteMessage(msg: ChatMessage) {
+    // 1. Safety Checks
     if (!msg._id || msg._id.startsWith('temp_')) return;
     if (!confirm('Permanently delete this message?')) return;
 
-    // We emit via socket so EVERYONE hears it immediately
-    this.socketService.deleteMessage(msg._id);
-
-    // No need to manually update signals; the 'messageDeleted' 
-    // socket listener above handles the UI update.
+    // 2. ✅ FIX: Subscribe to the HTTP Observable
+    this.socketService.deleteMessage(msg._id).subscribe({
+      next: () => {
+        console.log('🗑️ Message deleted via API');
+        // You don't need to manually update the UI here.
+        // The server will send a 'messageDeleted' socket event, 
+        // which your SocketService is already listening for.
+      },
+      error: (err) => {
+        console.error('Delete failed:', err);
+        this.messageService.showError('Error', 'Could not delete message');
+      }
+    });
   }
   // --- File Handlers passed to Composer ---
   onFilesSelected(files: File[]) {
