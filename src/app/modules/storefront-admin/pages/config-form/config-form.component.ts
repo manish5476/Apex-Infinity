@@ -275,10 +275,23 @@ isStyleField(key: string, def: any): boolean {
     return key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
   }
 
-  getEnumOptions(def: any) {
-    if (!def.enum) return [];
-    return def.enum.map((opt: string) => ({ label: opt.toString().replace(/_/g, ' ').toUpperCase(), value: opt }));
-  }
+ getEnumOptions(def: any) {
+  if (!def.enum) return [];
+  
+  return def.enum.map((opt: string) => {
+    // Improve formatting: "dark-mode-v2" -> "DARK MODE V2"
+    const label = opt.toString()
+      .replace(/_/g, ' ')
+      .replace(/-/g, ' ') // Handle hyphens
+      .toUpperCase();
+      
+    return { label, value: opt };
+  });
+}
+  // getEnumOptions(def: any) {
+  //   if (!def.enum) return [];
+  //   return def.enum.map((opt: string) => ({ label: opt.toString().replace(/_/g, ' ').toUpperCase(), value: opt }));
+  // }
 
   getArraySchema(field: any) {
     return Object.keys(field.schema).map(k => ({ key: k, label: this.formatLabel(k), ...field.schema[k] }));
