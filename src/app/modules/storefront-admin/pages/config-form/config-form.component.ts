@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, injec
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, FormControl, Validators, AbstractControl } from '@angular/forms';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
-
+import { CheckboxModule } from 'primeng/checkbox';
 // PrimeNG
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -12,8 +12,9 @@ import { ButtonModule } from 'primeng/button';
 import { TabsModule } from 'primeng/tabs';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { SelectModule } from 'primeng/select';
+import { RadioButtonModule } from 'primeng/radiobutton';
 import { TooltipModule } from 'primeng/tooltip';
-
+import { SelectButtonModule } from 'primeng/selectbutton';
 @Component({
   selector: 'app-config-form',
   standalone: true,
@@ -27,9 +28,9 @@ import { TooltipModule } from 'primeng/tooltip';
     TextareaModule,
     ColorPickerModule,
     ButtonModule,
-    TabsModule,
+    TabsModule,RadioButtonModule,
     ToggleSwitchModule,
-    TooltipModule
+    TooltipModule,CheckboxModule,SelectButtonModule
   ],
   templateUrl: './config-form.component.html',
   styleUrls: ['./config-form.component.scss'],
