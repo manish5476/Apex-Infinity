@@ -255,6 +255,7 @@
           }
 
           @else if (field.format === 'color' || field.key.toLowerCase().includes('color')) {
+          @if (showCustomColors) {
             <div class="flex items-center gap-2 p-1.5 border border-gray-200 rounded-lg bg-white shadow-sm hover:border-blue-300 transition-colors">
               <div class="relative w-8 h-8 rounded overflow-hidden shadow-inner border border-gray-100">
                 <p-colorPicker [formControlName]="field.key" appendTo="body"
@@ -264,7 +265,7 @@
               <input pInputText [formControlName]="field.key"
                 class="border-0 focus:ring-0 text-xs font-mono text-slate-600 w-full bg-transparent" />
             </div>
-          }
+          }}
 
           @else if (field.maxLength > 100) {
             <textarea pInputTextarea [formControlName]="field.key" rows="4"
