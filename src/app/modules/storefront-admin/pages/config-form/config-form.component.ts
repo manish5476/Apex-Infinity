@@ -40,7 +40,7 @@ export class ConfigFormComponent implements OnChanges {
   @Input() config: any = {};
   @Input() schema: any = {};
   @Output() configChange = new EventEmitter<any>();
-
+showCustomColors = true;
   form: FormGroup;
   fb = inject(FormBuilder);
 
@@ -108,10 +108,25 @@ export class ConfigFormComponent implements OnChanges {
       }
     });
 
+    // AFTER the loop, listen for Theme Mode changes
+  if (this.form.get('themeMode')) {
+    // 1. Set initial state
+    this.checkThemeVisibility(this.form.get('themeMode')?.value);
+
+    // 2. Listen for changes
+    this.form.get('themeMode')?.valueChanges.subscribe(mode => {
+      this.checkThemeVisibility(mode);
+    });
+  }
+    
     this.form.valueChanges.subscribe(val => {
       if (this.form.valid) this.configChange.emit(val);
     });
   }
+  checkThemeVisibility(mode: string) {
+  // If mode is 'preset', we flag custom colors to be hidden
+  this.showCustomColors = mode !== 'preset';
+}
 
   // --- Array Logic ---
 
@@ -213,17 +228,49 @@ createArrayGroup(schemaDef: any, data: any = {}): FormGroup {
     return validators;
   }
 
-  isStyleField(key: string, def: any): boolean {
-    const k = key.toLowerCase();
-    return k.includes('color') || k.includes('background') || k.includes('gap') || k.includes('padding') || k.includes('margin') || def.format === 'color';
-  }
+  // isStyleField(key: string, def: any): boolean {
+  //   const k = key.toLowerCase();
+  //   return k.includes('color') || k.includes('background') || k.includes('gap') || k.includes('padding') || k.includes('margin') || def.format === 'color';
+  // }
 
+  // isSettingField(key: string, def: any): boolean {
+  //   if (def.type === 'number') return true;
+  //   if (def.enum && !['alignment', 'textAlign'].includes(key)) return true;
+  //   return false;
+  // }
+  
+isStyleField(key: string, def: any): boolean {
+    const k = key.toLowerCase();
+    
+    // 1. Common Design Tokens
+    const isToken = k.includes('color') || 
+                    k.includes('background') || 
+                    k.includes('gap') || 
+                    k.includes('padding') || 
+                    k.includes('margin') || 
+                    k.includes('border') || // Added: borderRadius, borderWidth
+                    k.includes('shadow');   // Added: boxShadow
+
+    // 2. Theme Specifics (Crucial for your SectionRegistry)
+    const isTheme = k.includes('theme') ||  // Catch themeMode, themeId, theme
+                    k === 'overlayopacity'; // Specific to video_hero
+                    
+    // 3. Format Check
+    return isToken || isTheme || def.format === 'color';
+  }
   isSettingField(key: string, def: any): boolean {
+    // If it's already a style field, don't put it in settings
+    if (this.isStyleField(key, def)) return false; 
+
     if (def.type === 'number') return true;
     if (def.enum && !['alignment', 'textAlign'].includes(key)) return true;
+    
+    // Boolean toggles (isActive, hideOnMobile) usually go to settings
+    if (def.type === 'boolean') return true; 
+
     return false;
   }
-
+  
   formatLabel(key: string): string {
     return key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
   }
