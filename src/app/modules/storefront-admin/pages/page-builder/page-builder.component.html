@@ -237,7 +237,7 @@
       </div>
     </main>
 
-    <p-dialog [visible]="viewMode() === 'dialog' && !!selectedSection()" [modal]="false" [resizable]="true"
+    <p-dialog [visible]="viewMode() === 'dialog' && !!selectedSection()" [modal]="false" [resizable]="true" appendTo="body"
       [draggable]="true" [maximizable]="true" [style]="{width: '450px', maxHeight: '90vh'}" styleClass="builder-dialog"
       (onHide)="viewMode.set('sidebar')">
       <ng-template pTemplate="header">
