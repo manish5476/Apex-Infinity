@@ -1,7 +1,6 @@
 /* Theme Tokens & Layout */
 :host {
-  display: flex;
-  flex-direction: column;
+  display: block; /* Changed from flex col to block as the h-full div takes over */
   height: 100vh;
   overflow: hidden;
   font-family: var(--font-body);
@@ -10,6 +9,30 @@
   background-color: #f8fafc;
   --scrollbar-width: 5px;
 }
+
+/* --- SPLITTER CUSTOMIZATION --- */
+:host ::ng-deep .custom-splitter {
+  .p-splitter {
+    border: none;
+    background: transparent;
+  }
+  
+  .p-splitter-gutter {
+    background: #e2e8f0; /* Color of the drag handle bar */
+    transition: background 0.2s;
+    z-index: 50;
+    
+    &:hover {
+      background: #3b82f6; /* Blue hover effect */
+    }
+  }
+
+  .p-splitter-gutter-handle {
+    background: #94a3b8; /* The little dots/grip icon color */
+    display: none; /* Optional: Hide the grip dots for a cleaner Apple-like look */
+  }
+}
+
 .custom-scrollbar {
   &::-webkit-scrollbar {
     width: var(--scrollbar-width);
@@ -35,53 +58,8 @@
   box-shadow: var(--shadow-sm);
   z-index: 200;
 }
-.builder-sidebar {
-  background: white;
-  border-right: 1px solid #e2e8f0;
-  display: flex;
-  flex-direction: column;
-  z-index: 100;
-  box-shadow: var(--shadow-lg);
-  transition: width 0.3s ease;
-  width: 320px;
-  position: relative;
-}
 
-.layers-panel {
-  flex: 1;
-  min-height: 0;      /* REQUIRED for flex scrolling */
-  overflow-y: auto;
-
-  display: flex;
-  flex-direction: column;
-  transition: flex 0.3s ease;
-
-  &.hidden {
-    display: none;
-  }
-}
-
-
-.settings-panel {
-  border-top: 1px solid #e2e8f0;
-  background: #fff;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  transition: min-height 0.3s ease;
-}
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
+/* Layer Card Styles */
 .layer-card {
   display: flex;
   align-items: center;
@@ -93,10 +71,12 @@
   margin-bottom: 4px;
   cursor: pointer;
   transition: all 0.2s;
+  
   &:hover {
     border-color: #cbd5e1;
     transform: translateY(-1px);
   }
+  
   &.active {
     background: #eff6ff;
     border-color: #3b82f6;
@@ -105,6 +85,7 @@
     }
   }
 }
+
 .drag-handle {
   cursor: grab;
   color: #cbd5e1;
@@ -112,6 +93,7 @@
     color: #64748b;
   }
 }
+
 .btn-add-section {
   width: 100%;
   padding: 12px;
@@ -121,23 +103,26 @@
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-    background: var(--bg-secondary);
+  background: var(--bg-secondary);
   transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
+  
   &:hover {
     border-color: #3b82f6;
     color: #3b82f6;
     background: #eff6ff;
   }
 }
+
 .overlay-backdrop {
   background: rgba(15, 23, 42, 0.4);
   backdrop-filter: blur(2px);
   z-index: 400;
 }
+
 .library-modal {
   background: white;
   border-radius: 12px;
@@ -145,246 +130,216 @@
   border: 1px solid #e2e8f0;
 }
 
-// :host ::ng-deep .builder-dialog {
-//   box-shadow: var(--shadow-2xl);
-//   border: 1px solid #e2e8f0;
-//   border-radius: 10px;
-//   .p-dialog-header {
-//     padding: 0.75rem 1rem;
-//     border-bottom: 1px solid #f1f5f9;
-//     background: #fff;
-//     border-top-left-radius: 10px;
-//     border-top-right-radius: 10px;
-//   }
-//   .p-dialog-content {
-//     padding: 0;
-//     background: #fff;
-//     border-bottom-left-radius: 10px;
-//     border-bottom-right-radius: 10px;
-//   }
-// }
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.animate-fade-in {
-  animation: fadeIn 0.2s ease-out forwards;
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
-/* Ensure PrimeNG Tabs look good in Sidebar */
-.p-tablist-tab-list {
-  background: transparent !important;
-  border-bottom: none !important;
-}
-.p-tabpanels {
-  background: transparent !important;
-}
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
+.animate-slide-up {
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 999px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-// /* =========================================
-//    THEME TOKENS (Scoped to Host)
-//    ========================================= */
+// /* Theme Tokens & Layout */
 // :host {
 //   display: flex;
 //   flex-direction: column;
 //   height: 100vh;
 //   overflow: hidden;
-
-//   /* Apply System Fonts */
 //   font-family: var(--font-body);
 //   font-size: var(--font-size-base);
-//   color: #1e293b; /* Slate 800 */
-//   background-color: #f8fafc; /* Slate 50 */
-
-//   /* Scrollbar Styling */
+//   color: #1e293b;
+//   background-color: #f8fafc;
 //   --scrollbar-width: 5px;
-//   --scrollbar-track: transparent;
-//   --scrollbar-thumb: #cbd5e1;
-//   --scrollbar-thumb-hover: #94a3b8;
 // }
-
-// /* Utilities */
 // .custom-scrollbar {
-//   &::-webkit-scrollbar { width: var(--scrollbar-width); height: var(--scrollbar-width); }
-//   &::-webkit-scrollbar-track { background: var(--scrollbar-track); }
-//   &::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: var(--ui-border-radius); }
-//   &::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
+//   &::-webkit-scrollbar {
+//     width: var(--scrollbar-width);
+//     height: var(--scrollbar-width);
+//   }
+//   &::-webkit-scrollbar-track {
+//       background: var(--bg-secondary);
+//   }
+//   &::-webkit-scrollbar-thumb {
+//     background: #cbd5e1;
+//     border-radius: 4px;
+//   }
 // }
 
-// .text-heading { font-family: var(--font-heading); }
-// .text-mono { font-family: var(--font-mono); }
-
-// /* =========================================
-//    LAYOUT COMPONENTS
-//    ========================================= */
-
-// /* Header */
 // .builder-header {
-//   height: 56px; /* Fixed height */
+//   height: 56px;
 //   background: white;
-//   border-bottom: var(--ui-border-width) solid #e2e8f0;
-//   padding: 0 var(--spacing-xl);
+//   border-bottom: 1px solid #e2e8f0;
+//   padding: 0 1rem;
 //   display: flex;
 //   align-items: center;
 //   justify-content: space-between;
 //   box-shadow: var(--shadow-sm);
-//   z-index: var(--z-fixed);
+//   z-index: 200;
 // }
-
-// /* Sidebar (The container for Layers + Settings) */
 // .builder-sidebar {
-//   width: 300px;
 //   background: white;
-//   border-right: var(--ui-border-width) solid #e2e8f0;
+//   border-right: 1px solid #e2e8f0;
 //   display: flex;
 //   flex-direction: column;
-//   z-index: var(--z-sticky);
+//   z-index: 100;
 //   box-shadow: var(--shadow-lg);
 //   transition: width 0.3s ease;
+//   width: 320px;
 //   position: relative;
 // }
 
-// /* Layers Panel (Top Half) */
 // .layers-panel {
-//   flex: 1; /* Takes available space */
+//   flex: 1;
+//   min-height: 0;      /* REQUIRED for flex scrolling */
+//   overflow-y: auto;
+
 //   display: flex;
 //   flex-direction: column;
-//   min-height: 0; /* Crucial for scrolling */
 //   transition: flex 0.3s ease;
 
-//   &.is-compressed {
-//     flex: 0 0 35%; /* Shrink when settings are open */
+//   &.hidden {
+//     display: none;
 //   }
 // }
 
-// /* Settings Panel (Bottom Half - Slide Up) */
+
 // .settings-panel {
-//   flex: 0 0 65%; /* Takes 65% height when active */
-//   border-top: var(--ui-border-width) solid #e2e8f0;
+//   border-top: 1px solid #e2e8f0;
 //   background: #fff;
 //   display: flex;
 //   flex-direction: column;
 //   min-height: 0;
-//   box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
 //   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-
-//   &.hidden { display: none; }
+//   transition: min-height 0.3s ease;
 // }
-
 // @keyframes slideUp {
-//   from { transform: translateY(20px); opacity: 0; }
-//   to { transform: translateY(0); opacity: 1; }
+//   from {
+//     transform: translateY(20px);
+//     opacity: 0;
+//   }
+//   to {
+//     transform: translateY(0);
+//     opacity: 1;
+//   }
 // }
 
-// /* =========================================
-//    UI ELEMENTS
-//    ========================================= */
-
-// /* Layer Item Card */
 // .layer-card {
 //   display: flex;
 //   align-items: center;
-//   gap: var(--spacing-md);
-//   padding: var(--spacing-md) var(--spacing-lg);
+//   gap: 8px;
+//   padding: 8px 12px;
 //   background: white;
-//   border: var(--ui-border-width) solid #f1f5f9;
-//   border-radius: var(--ui-border-radius);
-//   margin-bottom: var(--spacing-xs);
+//   border: 1px solid #f1f5f9;
+//   border-radius: 6px;
+//   margin-bottom: 4px;
 //   cursor: pointer;
-//   transition: var(--transition-base);
-
+//   transition: all 0.2s;
 //   &:hover {
 //     border-color: #cbd5e1;
 //     transform: translateY(-1px);
-//     box-shadow: var(--shadow-xs);
 //   }
-
 //   &.active {
-//     background: #eff6ff; /* Blue 50 */
-//     border-color: #3b82f6; /* Blue 500 */
-//     box-shadow: var(--shadow-sm);
-
-//     .layer-icon { color: #3b82f6; }
-//     .layer-title { color: #1e3a8a; font-weight: var(--font-weight-semibold); }
-//   }
-
-//   .drag-handle {
-//     cursor: grab;
-//     color: #cbd5e1;
-//     &:hover { color: #64748b; }
-//     &:active { cursor: grabbing; }
+//     background: #eff6ff;
+//     border-color: #3b82f6;
+//     .layer-title {
+//       color: #1e3a8a;
+//     }
 //   }
 // }
-
-// /* Add Button */
+// .drag-handle {
+//   cursor: grab;
+//   color: #cbd5e1;
+//   &:hover {
+//     color: #64748b;
+//   }
+// }
 // .btn-add-section {
 //   width: 100%;
-//   padding: var(--spacing-lg);
+//   padding: 12px;
 //   border: 1px dashed #cbd5e1;
-//   border-radius: var(--ui-border-radius-lg);
+//   border-radius: 8px;
 //   color: #64748b;
-//   font-size: var(--font-size-xs);
-//   font-weight: var(--font-weight-bold);
+//   font-size: 11px;
+//   font-weight: 700;
 //   text-transform: uppercase;
-//   letter-spacing: 0.05em;
 //     background: var(--bg-secondary);
-//   transition: var(--transition-base);
+//   transition: all 0.2s;
 //   display: flex;
 //   align-items: center;
 //   justify-content: center;
-//   gap: var(--spacing-sm);
-
+//   gap: 6px;
 //   &:hover {
 //     border-color: #3b82f6;
 //     color: #3b82f6;
 //     background: #eff6ff;
 //   }
 // }
-
-// /* Modals / Overlays */
 // .overlay-backdrop {
-//   background: rgba(15, 23, 42, 0.4); /* Slate 900 / 40% */
+//   background: rgba(15, 23, 42, 0.4);
 //   backdrop-filter: blur(2px);
-//   z-index: var(--z-modal-backdrop);
+//   z-index: 400;
 // }
-
 // .library-modal {
 //   background: white;
-//   border-radius: var(--ui-border-radius-xl);
+//   border-radius: 12px;
 //   box-shadow: var(--shadow-2xl);
-//   border: var(--ui-border-width) solid #e2e8f0;
+//   border: 1px solid #e2e8f0;
 // }
 
-// /* Custom scrollbar for settings panel */
+// // :host ::ng-deep .builder-dialog {
+// //   box-shadow: var(--shadow-2xl);
+// //   border: 1px solid #e2e8f0;
+// //   border-radius: 10px;
+// //   .p-dialog-header {
+// //     padding: 0.75rem 1rem;
+// //     border-bottom: 1px solid #f1f5f9;
+// //     background: #fff;
+// //     border-top-left-radius: 10px;
+// //     border-top-right-radius: 10px;
+// //   }
+// //   .p-dialog-content {
+// //     padding: 0;
+// //     background: #fff;
+// //     border-bottom-left-radius: 10px;
+// //     border-bottom-right-radius: 10px;
+// //   }
+// // }
+// @keyframes fadeIn {
+//   from { opacity: 0; transform: translateY(-5px); }
+//   to { opacity: 1; transform: translateY(0); }
+// }
+// .animate-fade-in {
+//   animation: fadeIn 0.2s ease-out forwards;
+// }
+
+// /* Ensure PrimeNG Tabs look good in Sidebar */
+// .p-tablist-tab-list {
+//   background: transparent !important;
+//   border-bottom: none !important;
+// }
+// .p-tabpanels {
+//   background: transparent !important;
+// }
+// .custom-scrollbar {
+//   scrollbar-width: thin;
+//   scrollbar-color: #cbd5e1 transparent;
+// }
+
 // .custom-scrollbar::-webkit-scrollbar {
 //   width: 6px;
 // }
-// .custom-scrollbar::-webkit-scrollbar-track {
-//   background: #f1f5f9;
-// }
+
 // .custom-scrollbar::-webkit-scrollbar-thumb {
 //   background: #cbd5e1;
-//   border-radius: 3px;
+//   border-radius: 999px;
 // }
+
 // .custom-scrollbar::-webkit-scrollbar-thumb:hover {
 //   background: #94a3b8;
 // }
-
-// /* Ensure PrimeIcons work */
-// @import "primeicons/primeicons.css";

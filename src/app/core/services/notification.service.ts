@@ -93,10 +93,10 @@ export class NotificationService implements OnDestroy {
    */
   setInitialNotifications(data: NotificationData[]): void {
     // Sort by createdAt descending (newest first)
-    const sorted = [...data].sort((a, b) =>
-      new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
-    );
-    this.notificationsSource.next(sorted);
+    // const sorted = [...data].sort((a, b) =>
+    //   new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+    // );
+    // this.notificationsSource.next(sorted);
   }
 
   /**

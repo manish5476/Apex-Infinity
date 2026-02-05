@@ -13,6 +13,7 @@ export interface User { _id: string; name: string; email: string; organizationId
 export interface LoginResponse {
   token: string;
   data: {
+    uniqueShopId?: string;
     user?: User;
     owner?: User;
     organization?: any;
@@ -26,7 +27,7 @@ export class AuthService {
   private readonly TOKEN_KEY = 'apex_auth_token';
   private readonly USER_KEY = 'apex_current_user';
   public authTokenData: any;
-  
+
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser$: Observable<User | null>;
   public isAuthenticated$: Observable<boolean>;
@@ -65,6 +66,7 @@ export class AuthService {
     this.authTokenData = response.token;
     this.setItem(this.TOKEN_KEY, response.token);
     this.setItem(this.USER_KEY, user);
+    this.setItem('orgSlug', response.data.uniqueShopId?.trim());
     this.currentUserSubject.next(user);
 
     // ✅ Socket will auto-connect via AppComponent subscription
@@ -120,8 +122,8 @@ export class AuthService {
     return this.apiService.refreshToken().pipe(
       tap((response: any) => {
         if (response?.token) {
-            this.setItem(this.TOKEN_KEY, response.token);
-            this.authTokenData = response.token;
+          this.setItem(this.TOKEN_KEY, response.token);
+          this.authTokenData = response.token;
         }
       }),
       catchError(err => throwError(() => err))

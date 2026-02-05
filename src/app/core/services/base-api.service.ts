@@ -33,9 +33,9 @@ export class BaseApiService {
   // -------------------------------
   protected get<T>(url: string, params?: any, _context?: string): Observable<T> {
      const fullUrl = `${this.baseUrl}${url}`;
-  console.log(`[BaseApiService] GET Request to: ${fullUrl}`);
-  console.log(`[BaseApiService] Base URL: ${this.baseUrl}`);
-  console.log(`[BaseApiService] Relative URL: ${url}`);
+  // console.log(`[BaseApiService] GET Request to: ${fullUrl}`);
+  // console.log(`[BaseApiService] Base URL: ${this.baseUrl}`);
+  // console.log(`[BaseApiService] Relative URL: ${url}`);
   
     let httpParams = new HttpParams();
     if (params) {

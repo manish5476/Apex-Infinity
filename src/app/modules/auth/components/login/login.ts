@@ -75,7 +75,6 @@ private initForm(): void {
     const query = event.query;
     if (query.includes('@')) {
       const [prefix, suffix] = query.split('@');
-      // Filter domains based on what user types after @
       this.filteredEmails = this.emailDomains
         .filter(domain => domain.toLowerCase().startsWith(suffix.toLowerCase()))
         .map(domain => `${prefix}@${domain}`);
@@ -86,7 +85,6 @@ private initForm(): void {
 
   // Add a variable to store the error message
 errorMessage = signal<string | null>(null);
-
 onSubmit(): void {
   if (this.loginForm.invalid) {
     this.loginForm.markAllAsTouched();
