@@ -22,6 +22,7 @@ export interface MasterList {
   users: MasterItem[];
   accounts: MasterItem[];
   emis: MasterItem[];
+  masterData: any;
   masters?: any; // Generic masters
   recentInvoices?: MasterItem[];
   recentPurchases?: MasterItem[];
@@ -72,6 +73,7 @@ export class MasterListService {
   readonly specificLists = computed(() => this._specificLists());
   
   // Core Entities
+  readonly masterData = computed(() => this._data()?.masterData ?? []);
   readonly branches = computed(() => this._data()?.branches ?? []);
   readonly roles = computed(() => this._data()?.roles ?? []);
   readonly users = computed(() => this._data()?.users ?? []);
@@ -106,7 +108,6 @@ export class MasterListService {
     if (filters) {
       this._activeFilters.set(filters);
     }
-
     this.api.getMasterList(filters).pipe(
       catchError(err => {
         console.error('Failed to load master list', err);

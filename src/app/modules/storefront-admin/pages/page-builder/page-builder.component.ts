@@ -11,7 +11,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { SplitterModule } from 'primeng/splitter';
 import { ConfigFormComponent } from '../config-form/config-form.component';
 
-// --- ALL Section Components ---
+// --- ALL Section Components (Keep your existing imports here) ---
 import { HeroBannerComponent } from '../../../storefront-public/sections/hero-banner/hero-banner.component';
 import { ProductSliderComponent } from '../../../storefront-public/sections/product-slider/product-slider.component';
 import { BlogFeedComponent } from '../../../storefront-public/pages/blog-feed/blog-feed.component';
@@ -30,6 +30,7 @@ import { TestimonialSliderComponent } from '../../../storefront-public/pages/tes
 import { TextContentComponent } from '../../../storefront-public/pages/text-content/text-content.component';
 import { VideoHeroComponent } from '../../../storefront-public/pages/video-hero/video-hero.component';
 import { ProductListingComponent } from "../../../storefront-public/pages/product-listing/product-listing.component";
+import { MasterListService } from '../../../../core/services/master-list.service';
 
 @Component({
   selector: 'app-page-builder',
@@ -63,13 +64,14 @@ import { ProductListingComponent } from "../../../storefront-public/pages/produc
     ProductListingComponent
   ],
   templateUrl: './page-builder.component.html',
-  encapsulation: ViewEncapsulation.None,
-  styleUrls:['./page-builder.component.scss']
+  styleUrls: ['./page-builder.component.scss'],
+  encapsulation: ViewEncapsulation.None // Required for PrimeNG styling overrides
 })
 export class PageBuilderComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private adminService = inject(StorefrontAdminService);
   private publicService = inject(StorefrontPublicService);
+  private masterListService = inject(MasterListService);
 
   // Data Signals
   page = signal<any>(null);
@@ -93,11 +95,8 @@ export class PageBuilderComponent implements OnInit {
     this.adminService.getSectionTypes().subscribe({
       next: (res: any) => {
         const types = res.data || (Array.isArray(res) ? res : []);
-        const patchedTypes = types.map((t: any) => {
-          if ((t.type === 'product_slider' || t.type === 'product_grid') && t.schema?.ruleType) {
-          }
-          return t;
-        });
+        // Patching specific logic for ruleTypes if needed
+        const patchedTypes = types.map((t: any) => t);
     
         this.availableTypes = patchedTypes;
         this.sectionRegistry = patchedTypes.reduce((acc: any, item: any) => {
@@ -127,7 +126,8 @@ export class PageBuilderComponent implements OnInit {
           categories: enums.categories || [],
           brands: enums.brands || [],
           tags: enums.tags || [],
-          products: [] 
+          masterData: this.masterListService.masterData(),
+          products: this.masterListService.products(),
         });
       }
     });
@@ -146,12 +146,19 @@ export class PageBuilderComponent implements OnInit {
     });
   }
 
+  // --- UI Actions ---
+
   toggleViewMode() {
+    // Switch between sidebar split view and dialog view
     this.viewMode.update(mode => mode === 'sidebar' ? 'dialog' : 'sidebar');
   }
 
   toggleSidebarState() {
     this.sidebarState.update(state => state === 'split' ? 'full' : 'split');
+  }
+
+  onDialogHide() {
+    this.viewMode.set('sidebar');
   }
 
   addSection(type: string) {
@@ -180,6 +187,7 @@ export class PageBuilderComponent implements OnInit {
     this.selectSection(newSection);
     this.showAddMenu.set(false);
     
+    // Auto scroll to bottom
     setTimeout(() => {
       const container = document.getElementById('preview-container');
       if(container) container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
@@ -187,15 +195,48 @@ export class PageBuilderComponent implements OnInit {
   }
 
   selectSection(section: any) {
+    // If in full sidebar mode, switch to split to show config
     if (this.viewMode() === 'sidebar' && this.sidebarState() === 'full') {
        this.sidebarState.set('split');
     }
+    
+    // Create deep copy to prevent direct mutation issues before save/update
     try {
       this.selectedSection.set(JSON.parse(JSON.stringify(section)));
     } catch (e) {
       console.error('Selection Error', e);
     }
   }
+
+  deleteSection(id: string, event: Event) {
+    event.stopPropagation();
+    if(!confirm('Remove this section?')) return;
+    this.sections.update(list => list.filter(s => s.id !== id));
+    if (this.selectedSection()?.id === id) {
+      this.selectedSection.set(null);
+    }
+  }
+
+  drop(event: CdkDragDrop<any[]>) {
+    const list = [...this.sections()];
+    moveItemInArray(list, event.previousIndex, event.currentIndex);
+    const reordered = list.map((s, i) => ({ ...s, position: i }));
+    this.sections.set(reordered);
+  }
+
+  onConfigChange(newConfig: any) {
+    const current = this.selectedSection();
+    if (!current) return;
+    
+    // Update the selected section signal immediately for UI responsiveness
+    const updated = { ...current, config: { ...current.config, ...newConfig } };
+    this.selectedSection.set(updated);
+
+    // Update the master list
+    this.sections.update(list => list.map(s => s.id === updated.id ? updated : s));
+  }
+
+  // --- API Actions ---
 
   togglePublish() {
     const page = this.page();
@@ -232,30 +273,6 @@ export class PageBuilderComponent implements OnInit {
     });
   }
 
-  onConfigChange(newConfig: any) {
-    const current = this.selectedSection();
-    if (!current) return;
-    const updated = { ...current, config: { ...current.config, ...newConfig } };
-    this.sections.update(list => list.map(s => s.id === updated.id ? updated : s));
-    this.selectedSection.set(updated);
-  }
-
-  deleteSection(id: string, event: Event) {
-    event.stopPropagation();
-    if(!confirm('Remove this section?')) return;
-    this.sections.update(list => list.filter(s => s.id !== id));
-    if (this.selectedSection()?.id === id) {
-      this.selectedSection.set(null);
-    }
-  }
-
-  drop(event: CdkDragDrop<any[]>) {
-    const list = [...this.sections()];
-    moveItemInArray(list, event.previousIndex, event.currentIndex);
-    const reordered = list.map((s, i) => ({ ...s, position: i }));
-    this.sections.set(reordered);
-  }
-
   savePage() {
     const pageId = this.page()?._id;
     if (!pageId) return;
@@ -265,6 +282,7 @@ export class PageBuilderComponent implements OnInit {
     const cleanPayload = {
       sections: this.sections().map((s, i) => {
         const cleanConfig = { ...s.config };
+        // Basic cleanup
         Object.keys(cleanConfig).forEach(key => {
           const val = cleanConfig[key];
           if (val === '' || val === null) {
@@ -272,12 +290,9 @@ export class PageBuilderComponent implements OnInit {
           }
         });
 
-        if (s.type === 'product_grid' && cleanConfig.columns) {
-          cleanConfig.columns = Number(cleanConfig.columns);
-        }
-        if (s.type === 'countdown_timer' && cleanConfig.targetDate) {
-           cleanConfig.targetDate = String(cleanConfig.targetDate);
-        }
+        // Type conversion if necessary based on your schema requirements
+        if (s.type === 'product_grid' && cleanConfig.columns) cleanConfig.columns = Number(cleanConfig.columns);
+        if (s.type === 'countdown_timer' && cleanConfig.targetDate) cleanConfig.targetDate = String(cleanConfig.targetDate);
 
         return {
           type: s.type,
@@ -301,396 +316,3 @@ export class PageBuilderComponent implements OnInit {
     });
   }
 }
-
-
-//  [`
-//     /* =========================================
-//        PAGE BUILDER THEME ENGINE
-//        ========================================= */
-//     :host {
-//       display: flex;
-//       flex-direction: column;
-//       height: 100vh;
-//       background-color: var(--bg-ternary);
-//       font-family: var(--font-body);
-//       color: var(--text-primary);
-//       overflow: hidden;
-//     }
-
-//     /* --- COMMON UTILS --- */
-//     .icon-btn {
-//       width: 2rem;
-//       height: 2rem;
-//       display: flex;
-//       align-items: center;
-//       justify-content: center;
-//       border-radius: var(--ui-border-radius);
-//       color: var(--text-secondary);
-//       transition: var(--transition-fast);
-//       cursor: pointer;
-//       border: none;
-//       background: transparent;
-
-//       &:hover {
-//         background-color: var(--bg-hover);
-//         color: var(--text-primary);
-//       }
-      
-//       &.danger:hover {
-//         background-color: var(--color-error-bg);
-//         color: var(--color-error);
-//       }
-//     }
-
-//     /* =========================================
-//        1. HEADER
-//        ========================================= */
-//     .builder-header {
-//       height: 4rem;
-//       background-color: var(--bg-primary);
-//       border-bottom: 1px solid var(--border-secondary);
-//       display: flex;
-//       align-items: center;
-//       justify-content: space-between;
-//       padding: 0 var(--spacing-xl);
-//       z-index: var(--z-sticky);
-//       box-shadow: var(--shadow-sm);
-//     }
-
-//     .header-title {
-//       font-family: var(--font-heading);
-//       font-weight: var(--font-weight-bold);
-//       font-size: var(--font-size-md);
-//       color: var(--text-primary);
-//     }
-
-//     .status-badge {
-//       font-size: var(--font-size-xs);
-//       font-weight: var(--font-weight-bold);
-//       text-transform: uppercase;
-//       letter-spacing: 0.05em;
-//       padding: 2px 8px;
-//       border-radius: 100px;
-      
-//       &.published { background: var(--color-success-bg); color: var(--color-success-dark); }
-//       &.draft { background: var(--color-warning-bg); color: var(--color-warning-dark); }
-//     }
-
-//     .btn-primary {
-//       background: var(--text-primary); /* Inverted for primary action */
-//       color: var(--bg-primary);
-//       padding: var(--spacing-sm) var(--spacing-lg);
-//       border-radius: var(--ui-border-radius);
-//       font-size: var(--font-size-sm);
-//       font-weight: var(--font-weight-semibold);
-//       display: flex;
-//       align-items: center;
-//       gap: var(--spacing-sm);
-//       transition: var(--transition-base);
-      
-//       &:hover {
-//         background: var(--text-secondary);
-//         transform: translateY(-1px);
-//       }
-//       &:disabled { opacity: 0.5; cursor: not-allowed; }
-//     }
-
-//     .btn-secondary {
-//       background: var(--bg-primary);
-//       border: 1px solid var(--border-secondary);
-//       color: var(--text-secondary);
-//       padding: var(--spacing-sm) var(--spacing-lg);
-//       border-radius: var(--ui-border-radius);
-//       font-size: var(--font-size-sm);
-//       font-weight: var(--font-weight-medium);
-//       display: flex;
-//       align-items: center;
-//       gap: var(--spacing-sm);
-//       transition: var(--transition-base);
-
-//       &:hover {
-//         background: var(--bg-secondary);
-//         color: var(--text-primary);
-//         border-color: var(--border-primary);
-//       }
-//     }
-
-//     /* =========================================
-//        2. SIDEBAR LAYERS
-//        ========================================= */
-//     .sidebar-panel {
-//       background: var(--bg-primary);
-//       height: 100%;
-//       display: flex;
-//       flex-direction: column;
-//     }
-
-//     .sidebar-header {
-//       padding: var(--spacing-md) var(--spacing-lg);
-//       border-bottom: 1px solid var(--border-secondary);
-//       background: var(--bg-secondary);
-//       display: flex;
-//       justify-content: space-between;
-//       align-items: center;
-//       font-size: var(--font-size-xs);
-//       font-weight: var(--font-weight-bold);
-//       text-transform: uppercase;
-//       letter-spacing: 0.1em;
-//       color: var(--text-tertiary);
-//     }
-
-//     /* LAYER CARD DESIGN */
-//     .layer-card {
-//       display: flex;
-//       align-items: center;
-//       gap: var(--spacing-md);
-//       padding: var(--spacing-sm) var(--spacing-md);
-//       margin-bottom: var(--spacing-xs);
-//       background: var(--bg-primary);
-//       border: 1px solid transparent;
-//       border-radius: var(--ui-border-radius);
-//       cursor: pointer;
-//       transition: var(--transition-fast);
-//       user-select: none;
-
-//       &:hover {
-//         background: var(--bg-hover);
-//       }
-
-//       &.active {
-//         background: var(--accent-focus);
-//         border-color: var(--accent-secondary);
-        
-//         .layer-title { color: var(--accent-primary); }
-//         .drag-handle { color: var(--accent-primary); }
-//       }
-//     }
-
-//     .drag-handle {
-//       color: var(--text-tertiary);
-//       cursor: grab;
-//       padding: var(--spacing-xs);
-//       border-radius: var(--ui-border-radius-sm);
-      
-//       &:hover { color: var(--text-primary); background: var(--bg-ternary); }
-//       &:active { cursor: grabbing; }
-//     }
-
-//     .layer-info {
-//       flex: 1;
-//       overflow: hidden;
-//       display: flex;
-//       flex-direction: column;
-//     }
-
-//     .layer-title {
-//       font-size: var(--font-size-sm);
-//       font-weight: var(--font-weight-medium);
-//       color: var(--text-secondary);
-//       white-space: nowrap;
-//       overflow: hidden;
-//       text-overflow: ellipsis;
-//     }
-
-//     .layer-subtitle {
-//       font-size: var(--font-size-xs);
-//       color: var(--text-tertiary);
-//     }
-
-//     .btn-add-section {
-//       width: 100%;
-//       margin-top: var(--spacing-md);
-//       padding: var(--spacing-md);
-//       background: transparent;
-//       border: 1px dashed var(--border-secondary);
-//       border-radius: var(--ui-border-radius);
-//       color: var(--text-secondary);
-//       font-size: var(--font-size-sm);
-//       font-weight: var(--font-weight-medium);
-//       transition: var(--transition-base);
-//       display: flex;
-//       align-items: center;
-//       justify-content: center;
-//       gap: var(--spacing-sm);
-
-//       &:hover {
-//         border-color: var(--accent-primary);
-//         color: var(--accent-primary);
-//         background: var(--accent-focus);
-//       }
-//     }
-
-//     /* =========================================
-//        3. PREVIEW CANVAS
-//        ========================================= */
-//     .preview-canvas {
-//       background-color: var(--bg-ternary);
-//       background-image: radial-gradient(var(--border-secondary) 1px, transparent 1px);
-//       background-size: 20px 20px;
-//       height: 100%;
-//       overflow-y: auto;
-//       padding: var(--spacing-4xl);
-//       position: relative;
-//     }
-
-//     .canvas-frame {
-//       max-width: 1200px;
-//       margin: 0 auto;
-//       background: white; /* Always white for preview accuracy */
-//       min-height: 800px;
-//       box-shadow: var(--shadow-2xl);
-//       transition: transform 0.3s ease, margin 0.3s ease;
-      
-//       /* Header simulation */
-//       .fake-browser-header {
-//         height: 2.5rem;
-//         background: #f1f5f9;
-//         border-bottom: 1px solid #e2e8f0;
-//         display: flex;
-//         align-items: center;
-//         padding: 0 1rem;
-//         gap: 0.5rem;
-        
-//         .dot { width: 0.75rem; height: 0.75rem; border-radius: 50%; background: #cbd5e1; }
-//       }
-//     }
-
-//     /* Section Wrapper on Canvas */
-//     .canvas-section-wrapper {
-//       position: relative;
-//       border: 2px solid transparent;
-//       transition: var(--transition-fast);
-
-//       &:hover {
-//         border-color: var(--accent-secondary); /* Hover hint */
-        
-//         .section-actions { opacity: 1; transform: translateY(0); }
-//       }
-
-//       &.selected {
-//         border-color: var(--accent-primary);
-//         z-index: 10;
-//         box-shadow: 0 0 0 4px var(--accent-focus);
-        
-//         .section-label { opacity: 1; }
-//       }
-//     }
-
-//     .section-label {
-//       position: absolute;
-//       top: 0; right: 0;
-//       transform: translateY(-100%);
-//       background: var(--accent-primary);
-//       color: white;
-//       font-size: var(--font-size-xs);
-//       font-weight: var(--font-weight-bold);
-//       padding: 2px 8px;
-//       border-radius: 4px 4px 0 0;
-//       opacity: 0;
-//       transition: var(--transition-fast);
-//       pointer-events: none;
-//     }
-
-//     /* =========================================
-//        4. COMPONENT LIBRARY MODAL
-//        ========================================= */
-//     .library-modal-backdrop {
-//       position: absolute;
-//       inset: 0;
-//       background: rgba(0, 0, 0, 0.4);
-//       backdrop-filter: blur(4px);
-//       z-index: var(--z-modal);
-//       display: flex;
-//       align-items: center;
-//       justify-content: center;
-//       padding: var(--spacing-xl);
-//     }
-
-//     .library-modal {
-//       background: var(--bg-primary);
-//       width: 100%;
-//       max-width: 800px;
-//       max-height: 85vh;
-//       border-radius: var(--ui-border-radius-xl);
-//       box-shadow: var(--shadow-2xl);
-//       display: flex;
-//       flex-direction: column;
-//       overflow: hidden;
-//       animation: slideUpFade 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-//     }
-
-//     @keyframes slideUpFade {
-//       from { opacity: 0; transform: translateY(20px); }
-//       to { opacity: 1; transform: translateY(0); }
-//     }
-
-//     .library-grid {
-//       display: grid;
-//       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-//       gap: var(--spacing-lg);
-//       padding: var(--spacing-xl);
-//       overflow-y: auto;
-//       background: var(--bg-secondary);
-//     }
-
-//     .component-card {
-//       background: var(--bg-primary);
-//       border: 1px solid var(--border-secondary);
-//       border-radius: var(--ui-border-radius-lg);
-//       padding: var(--spacing-lg);
-//       display: flex;
-//       flex-direction: column;
-//       gap: var(--spacing-md);
-//       transition: var(--transition-base);
-//       cursor: pointer;
-//       text-align: left;
-
-//       &:hover {
-//         border-color: var(--accent-primary);
-//         transform: translateY(-4px);
-//         box-shadow: var(--shadow-lg);
-        
-//         .comp-icon { 
-//           background: var(--accent-primary); 
-//           color: white;
-//         }
-//         .comp-title { color: var(--accent-primary); }
-//       }
-//     }
-
-//     .comp-icon {
-//       width: 40px; 
-//       height: 40px;
-//       border-radius: var(--ui-border-radius);
-//       background: var(--bg-secondary);
-//       color: var(--text-secondary);
-//       display: flex;
-//       align-items: center;
-//       justify-content: center;
-//       transition: var(--transition-colors);
-//       font-size: 1.5rem;
-//     }
-
-//     .comp-title {
-//       font-size: var(--font-size-sm);
-//       font-weight: var(--font-weight-bold);
-//       color: var(--text-primary);
-//       margin-bottom: var(--spacing-xs);
-//     }
-
-//     .comp-desc {
-//       font-size: var(--font-size-xs);
-//       color: var(--text-tertiary);
-//       line-height: var(--line-height-relaxed);
-//       display: -webkit-box;
-//       -webkit-line-clamp: 2;
-//       -webkit-box-orient: vertical;
-//       overflow: hidden;
-//     }
-
-//     /* Scrollbars */
-//     ::-webkit-scrollbar { width: 6px; height: 6px; }
-//     ::-webkit-scrollbar-track { background: transparent; }
-//     ::-webkit-scrollbar-thumb { background: var(--scroll-thumb-c); border-radius: 3px; }
-//     ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
-//   `]

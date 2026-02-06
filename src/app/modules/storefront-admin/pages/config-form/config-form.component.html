@@ -1,4 +1,363 @@
-<form [formGroup]="form" class="config-form-wrapper">
+<!-- <form [formGroup]="form" class="config-form-container">
+  <p-tabs value="0">
+    <p-tablist class="sticky top-0 z-20 bg-white">
+      <p-tab value="0"><i class="pi pi-pencil mr-2 text-[10px]"></i>Content</p-tab>
+      <p-tab value="1"><i class="pi pi-cog mr-2 text-[10px]"></i>Settings</p-tab>
+      <p-tab value="2"><i class="pi pi-palette mr-2 text-[10px]"></i>Design</p-tab>
+    </p-tablist>
+
+    <p-tabpanels class="p-0">
+      <p-tabpanel value="0">
+        <div class="p-4 flex flex-col gap-5">
+          @for (field of tabs.content; track field.key) {
+            <ng-container *ngTemplateOutlet="renderer; context: { $implicit: field, parentGroup: form }"></ng-container>
+          }
+        </div>
+      </p-tabpanel>
+
+      <p-tabpanel value="1">
+        <div class="p-4 flex flex-col gap-4">
+          @if (booleanGroup.length > 0) {
+            <div class="settings-grid">
+              @for (field of booleanGroup; track field.key) {
+                <div class="setting-toggle-card" (click)="form.get(field.key)?.setValue(!form.get(field.key)?.value)">
+                  <p-checkbox [formControlName]="field.key" [binary]="true" (click)="$event.stopPropagation()"></p-checkbox>
+                  <div class="flex flex-col">
+                    <span class="title">{{ field.label }}</span>
+                  </div>
+                  <i class="pi ml-auto" [ngClass]="form.get(field.key)?.value ? 'pi-eye text-blue-500' : 'pi-eye-slash text-slate-300'"></i>
+                </div>
+              }
+            </div>
+            <div class="divider"></div>
+          }
+          
+          @for (field of tabs.settings; track field.key) {
+            <ng-container *ngTemplateOutlet="renderer; context: { $implicit: field, parentGroup: form }"></ng-container>
+          }
+        </div>
+      </p-tabpanel>
+
+      <p-tabpanel value="2">
+        <div class="p-4 flex flex-col gap-5">
+          @for (field of tabs.style; track field.key) {
+            <ng-container *ngTemplateOutlet="renderer; context: { $implicit: field, parentGroup: form }"></ng-container>
+          }
+        </div>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+
+  <ng-template #renderer let-field let-parentGroup="parentGroup">
+    @if (field.type === 'object') {
+      <div class="field-group-box">
+        <label class="group-label">{{ field.label }}</label>
+        <div class="flex flex-col gap-4 mt-3" [formGroup]="parentGroup.get(field.key)">
+          @for (sub of getObjectFields(field); track sub.key) {
+            <ng-container *ngTemplateOutlet="renderer; context: { $implicit: sub, parentGroup: parentGroup.get(field.key) }"></ng-container>
+          }
+        </div>
+      </div>
+    }
+
+    @else if (field.type === 'array') {
+      <div class="field-group-box p-0 overflow-hidden">
+        <div class="px-4 py-2 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+          <span class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">{{ field.label }}</span>
+          <p-badge [value]="getFormArray(field.key).length" severity="secondary"></p-badge>
+        </div>
+
+        <div cdkDropList (cdkDropListDropped)="drop($event, field.key)" class="p-3 flex flex-col gap-2">
+          @for (ctrl of getFormArray(field.key).controls; track ctrl; let i = $index) {
+            <div cdkDrag class="array-card" [class.is-expanded]="expandedControls.get(ctrl)">
+              <div class="flex items-center p-2 cursor-pointer" (click)="toggleExpanded(ctrl)">
+                <div class="drag-handle" cdkDragHandle (click)="$event.stopPropagation()"><i class="pi pi-bars"></i></div>
+                <span class="flex-1 text-xs font-bold text-slate-700 truncate pl-2">{{ getItemTitle(ctrl) }}</span>
+                <button type="button" (click)="removeArrayItem(field.key, i); $event.stopPropagation()" class="btn-remove">
+                  <i class="pi pi-trash"></i>
+                </button>
+              </div>
+              
+              @if (expandedControls.get(ctrl)) {
+                <div class="p-4 border-t border-slate-100 bg-white flex flex-col gap-4">
+                  @for (sub of getArrayFields(field); track sub.key) {
+                    <ng-container *ngTemplateOutlet="renderer; context: { $implicit: sub, parentGroup: ctrl }"></ng-container>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+        <button pButton type="button" class="p-button-text p-button-sm w-full rounded-none" 
+                icon="pi pi-plus" label="Add New Item" (click)="addArrayItem(field)"></button>
+      </div>
+    }
+
+    @else {
+      <div class="field-wrapper" [formGroup]="parentGroup">
+        @if (field.type !== 'boolean') {
+          <label class="field-label">
+            {{ field.label }} 
+            @if (field.required) { <span class="text-red-500">*</span> }
+          </label>
+        }
+
+        <div class="p-fluid">
+          @if (field.type === 'reference-multi') {
+            <p-multiselect [options]="getEnumOptions(field)" [formControlName]="field.key" 
+                          optionLabel="label" optionValue="value" display="chip"
+                          placeholder="Select Multiple..." appendTo="body" [filter]="true"></p-multiselect>
+          }
+
+          @else if (field.enum || field.type === 'reference') {
+            <p-select [options]="getEnumOptions(field)" [formControlName]="field.key" 
+                      optionLabel="label" optionValue="value" 
+                      placeholder="Select Option..." appendTo="body" [filter]="getEnumOptions(field).length > 8"></p-select>
+          }
+
+          @else if (field.type === 'color') {
+            <p-inputgroup>
+              <p-inputgroup-addon [style.background]="parentGroup.get(field.key)?.value">
+                <p-colorpicker [formControlName]="field.key" appendTo="body"></p-colorpicker>
+              </p-inputgroup-addon>
+              <input type="text" pInputText [formControlName]="field.key" placeholder="#000000" />
+            </p-inputgroup>
+          }
+
+          @else if (field.type === 'image') {
+            <div class="image-uploader">
+              <input pInputText [formControlName]="field.key" placeholder="Image URL..." />
+              @if (parentGroup.get(field.key)?.value) {
+                <div class="preview-thumb">
+                  <img [src]="parentGroup.get(field.key)?.value" alt="Preview" />
+                </div>
+              }
+            </div>
+          }
+
+          @else if (field.type === 'icon') {
+            <p-inputgroup>
+              <p-inputgroup-addon><i class="pi" [ngClass]="parentGroup.get(field.key)?.value || 'pi-image'"></i></p-inputgroup-addon>
+              <input pInputText [formControlName]="field.key" placeholder="pi pi-..." />
+            </p-inputgroup>
+          }
+
+          @else if (field.type === 'datetime' || field.type === 'date') {
+            <p-datepicker [formControlName]="field.key" [showTime]="field.type === 'datetime'" 
+                         [showIcon]="true" appendTo="body" hourFormat="12"></p-datepicker>
+          }
+
+          @else if (field.type === 'boolean') {
+            <div class="boolean-card" (click)="parentGroup.get(field.key)?.setValue(!parentGroup.get(field.key)?.value)">
+              <p-checkbox [formControlName]="field.key" [binary]="true" (click)="$event.stopPropagation()"></p-checkbox>
+              <span class="label">{{ field.label }}</span>
+            </div>
+          }
+
+          @else if (field.type === 'textarea' || field.type === 'richtext') {
+            <textarea pTextarea [formControlName]="field.key" rows="4" [autoResize]="true"></textarea>
+          }
+
+          @else if (field.type === 'number') {
+            <p-inputnumber [formControlName]="field.key" [showButtons]="true" 
+                          [min]="field.min" [max]="field.max" buttonLayout="horizontal"
+                          incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"></p-inputnumber>
+          }
+
+          @else {
+            <input pInputText [formControlName]="field.key" [placeholder]="'Enter ' + field.label" />
+          }
+        </div>
+
+        @if (field.description) {
+          <small class="field-help">{{ field.description }}</small>
+        }
+      </div>
+    }
+  </ng-template>
+</form>
+ -->
+
+<form [formGroup]="form" class="config-form-container">
+  <p-tabs value="0">
+    <p-tablist class="sticky top-0 z-20 bg-white">
+      <p-tab value="0"><i class="pi pi-pencil mr-2 text-[10px]"></i>Content</p-tab>
+      <p-tab value="1"><i class="pi pi-cog mr-2 text-[10px]"></i>Settings</p-tab>
+      <p-tab value="2"><i class="pi pi-palette mr-2 text-[10px]"></i>Design</p-tab>
+    </p-tablist>
+
+    <p-tabpanels class="p-0">
+      <p-tabpanel value="0">
+        <div class="p-4 flex flex-col gap-5">
+          @for (field of tabs.content; track field.key) {
+            <ng-container *ngTemplateOutlet="renderer; context: { $implicit: field, parentGroup: form }"></ng-container>
+          }
+        </div>
+      </p-tabpanel>
+
+      <p-tabpanel value="1">
+        <div class="p-4 flex flex-col gap-4">
+          @if (booleanGroup.length > 0) {
+            <div class="settings-grid">
+              @for (field of booleanGroup; track field.key) {
+                <div class="setting-toggle-card" (click)="form.get(field.key)?.setValue(!form.get(field.key)?.value)">
+                  <p-checkbox [formControlName]="field.key" [binary]="true" (click)="$event.stopPropagation()"></p-checkbox>
+                  <div class="flex flex-col">
+                    <span class="title">{{ field.label }}</span>
+                  </div>
+                  <i class="pi ml-auto" [ngClass]="form.get(field.key)?.value ? 'pi-eye text-blue-500' : 'pi-eye-slash text-slate-300'"></i>
+                </div>
+              }
+            </div>
+            <div class="divider"></div>
+          }
+          
+          @for (field of tabs.settings; track field.key) {
+            <ng-container *ngTemplateOutlet="renderer; context: { $implicit: field, parentGroup: form }"></ng-container>
+          }
+        </div>
+      </p-tabpanel>
+
+      <p-tabpanel value="2">
+        <div class="p-4 flex flex-col gap-5">
+          @for (field of tabs.style; track field.key) {
+            <ng-container *ngTemplateOutlet="renderer; context: { $implicit: field, parentGroup: form }"></ng-container>
+          }
+        </div>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+
+  <ng-template #renderer let-field let-parentGroup="parentGroup">
+    @if (field.type === 'object') {
+      <div class="field-group-box">
+        <label class="group-label">{{ field.label }}</label>
+        <div class="flex flex-col gap-4 mt-3" [formGroup]="parentGroup.get(field.key)">
+          @for (sub of getObjectFields(field); track sub.key) {
+            <ng-container *ngTemplateOutlet="renderer; context: { $implicit: sub, parentGroup: parentGroup.get(field.key) }"></ng-container>
+          }
+        </div>
+      </div>
+    }
+
+    @else if (field.type === 'array') {
+      <div class="field-group-box p-0 overflow-hidden">
+        <div class="px-4 py-2 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+          <span class="text-[10px] font-bold uppercase text-slate-500 tracking-widest">{{ field.label }}</span>
+          <p-badge [value]="getFormArray(field.key).length" severity="secondary"></p-badge>
+        </div>
+
+        <div cdkDropList (cdkDropListDropped)="drop($event, field.key)" class="p-3 flex flex-col gap-2">
+          @for (ctrl of getFormArray(field.key).controls; track ctrl; let i = $index) {
+            <div cdkDrag class="array-card" [class.is-expanded]="expandedControls.get(ctrl)">
+              <div class="flex items-center p-2 cursor-pointer" (click)="toggleExpanded(ctrl)">
+                <div class="drag-handle" cdkDragHandle (click)="$event.stopPropagation()"><i class="pi pi-bars"></i></div>
+                <span class="flex-1 text-xs font-bold text-slate-700 truncate pl-2">{{ getItemTitle(ctrl) }}</span>
+                <button type="button" (click)="removeArrayItem(field.key, i); $event.stopPropagation()" class="btn-remove">
+                  <i class="pi pi-trash"></i>
+                </button>
+              </div>
+              
+              @if (expandedControls.get(ctrl)) {
+                <div class="p-4 border-t border-slate-100 bg-white flex flex-col gap-4">
+                  @for (sub of getArrayFields(field); track sub.key) {
+                    <ng-container *ngTemplateOutlet="renderer; context: { $implicit: sub, parentGroup: ctrl }"></ng-container>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+        <button pButton type="button" class="p-button-text p-button-sm w-full rounded-none" 
+                icon="pi pi-plus" label="Add New Item" (click)="addArrayItem(field)"></button>
+      </div>
+    }
+
+    @else {
+      <div class="field-wrapper" [formGroup]="parentGroup">
+        @if (field.type !== 'boolean') {
+          <label class="field-label">
+            {{ field.label }} 
+            @if (field.required) { <span class="text-red-500">*</span> }
+          </label>
+        }
+
+        <div class="p-fluid">
+          @if (field.type === 'reference-multi') {
+            <p-multiselect [options]="getEnumOptions(field)" [formControlName]="field.key" 
+                          optionLabel="label" optionValue="value" display="chip"
+                          placeholder="Select Multiple..." appendTo="body" [filter]="true"></p-multiselect>
+          }
+
+          @else if (field.enum || field.type === 'reference') {
+            <p-select [options]="getEnumOptions(field)" [formControlName]="field.key" 
+                      optionLabel="label" optionValue="value" 
+                      placeholder="Select Option..." appendTo="body" [filter]="getEnumOptions(field).length > 8"></p-select>
+          }
+
+          @else if (field.type === 'color') {
+            <p-inputgroup>
+              <p-inputgroup-addon [style.background]="parentGroup.get(field.key)?.value">
+                <p-colorpicker [formControlName]="field.key" appendTo="body"></p-colorpicker>
+              </p-inputgroup-addon>
+              <input type="text" pInputText [formControlName]="field.key" placeholder="#000000" />
+            </p-inputgroup>
+          }
+
+          @else if (field.type === 'image') {
+            <div class="image-uploader">
+              <input pInputText [formControlName]="field.key" placeholder="Image URL..." />
+              @if (parentGroup.get(field.key)?.value) {
+                <div class="preview-thumb">
+                  <img [src]="parentGroup.get(field.key)?.value" alt="Preview" />
+                </div>
+              }
+            </div>
+          }
+
+          @else if (field.type === 'icon') {
+            <p-inputgroup>
+              <p-inputgroup-addon><i class="pi" [ngClass]="parentGroup.get(field.key)?.value || 'pi-image'"></i></p-inputgroup-addon>
+              <input pInputText [formControlName]="field.key" placeholder="pi pi-..." />
+            </p-inputgroup>
+          }
+
+          @else if (field.type === 'datetime' || field.type === 'date') {
+            <p-datepicker [formControlName]="field.key" [showTime]="field.type === 'datetime'" 
+                         [showIcon]="true" appendTo="body" hourFormat="12"></p-datepicker>
+          }
+
+          @else if (field.type === 'boolean') {
+            <div class="boolean-card" (click)="parentGroup.get(field.key)?.setValue(!parentGroup.get(field.key)?.value)">
+              <p-checkbox [formControlName]="field.key" [binary]="true" (click)="$event.stopPropagation()"></p-checkbox>
+              <span class="label">{{ field.label }}</span>
+            </div>
+          }
+
+          @else if (field.type === 'textarea' || field.type === 'richtext') {
+            <textarea pTextarea [formControlName]="field.key" rows="4" [autoResize]="true"></textarea>
+          }
+
+          @else if (field.type === 'number') {
+            <p-inputnumber [formControlName]="field.key" [showButtons]="true" 
+                          [min]="field.min" [max]="field.max" buttonLayout="horizontal"
+                          incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"></p-inputnumber>
+          }
+
+          @else {
+            <input pInputText [formControlName]="field.key" [placeholder]="'Enter ' + field.label" />
+          }
+        </div>
+
+        @if (field.description) {
+          <small class="field-help">{{ field.description }}</small>
+        }
+      </div>
+    }
+  </ng-template>
+</form>
+
+<!-- <form [formGroup]="form" class="config-form-wrapper">
   <p-tabs value="0" class="flex flex-col h-full">
     <div class="sticky top-0 z-10 bg-white border-b border-gray-100">
       <p-tablist>
@@ -10,7 +369,7 @@
 
     <p-tabpanels class="flex-1 overflow-y-auto custom-scrollbar p-0">
       
-      <!-- TAB: CONTENT -->
+      TAB: CONTENT
       <p-tabpanel value="0">
         <div class="p-5 flex flex-col gap-6">
           @for (field of tabs.content; track field.key) {
@@ -19,10 +378,10 @@
         </div>
       </p-tabpanel>
 
-      <!-- TAB: SETTINGS -->
+      TAB: SETTINGS
       <p-tabpanel value="1">
         <div class="p-5 flex flex-col gap-5">
-          <!-- Top-Level Visibility & Display Toggles -->
+          Top-Level Visibility & Display Toggles
           @if (booleanGroup.length > 0) {
             <div class="grid grid-cols-1 gap-3">
               @for (field of booleanGroup; track field.key) {
@@ -32,7 +391,7 @@
                     <p-checkbox [formControlName]="field.key" [binary]="true" (click)="$event.stopPropagation()"></p-checkbox>
                     <span class="text-xs font-bold text-slate-700 uppercase tracking-tight">{{ field.label }}</span>
                   </div>
-                  <!-- Optional Toggle Switch fallback if needed -->
+                  Optional Toggle Switch fallback if needed
                   <i class="pi" [ngClass]="form.get(field.key)?.value ? 'pi-eye text-blue-500' : 'pi-eye-slash text-slate-300'"></i>
                 </div>
               }
@@ -40,14 +399,12 @@
             <div class="h-px bg-slate-100 my-2"></div>
           }
           
-          <!-- Other Setting Fields -->
+          Other Setting Fields
           @for (field of tabs.settings; track field.key) {
             <ng-container *ngTemplateOutlet="renderer; context: { $implicit: field, parentGroup: form }"></ng-container>
           }
         </div>
       </p-tabpanel>
-
-      <!-- TAB: DESIGN (Style) -->
       <p-tabpanel value="2">
         <div class="p-5 flex flex-col gap-6">
           @for (field of tabs.style; track field.key) {
@@ -58,11 +415,7 @@
 
     </p-tabpanels>
   </p-tabs>
-
-  <!-- DYNAMIC INPUT RENDERER -->
   <ng-template #renderer let-field let-parentGroup="parentGroup">
-    
-    <!-- 1. OBJECT RENDERER (e.g. ctaButton) -->
     @if (field.type === 'object') {
       <div class="nested-group-container">
         <label class="field-label">{{ field.label }}</label>
@@ -74,7 +427,6 @@
       </div>
     }
 
-    <!-- 2. ARRAY RENDERER (e.g. ctaButtons, items) -->
     @else if (field.type === 'array') {
       <div class="nested-group-container p-0 overflow-hidden" [formGroup]="parentGroup">
         <div class="px-4 py-2.5 bg-white border-b border-slate-200 flex justify-between items-center">
@@ -94,10 +446,8 @@
                   <i class="pi pi-trash text-[10px]"></i>
                 </button>
               </div>
-
               @if (expandedControls.get(ctrl)) {
                 <div class="p-4 border-t border-slate-50 bg-slate-50/20 flex flex-col gap-4">
-                  <!-- Use $any cast to access controls for dynamic rendering -->
                   @if ($any(ctrl).controls) {
                     @for (sub of getArrayFields(field); track sub.key) {
                       <ng-container *ngTemplateOutlet="renderer; context: { $implicit: sub, parentGroup: ctrl }"></ng-container>
@@ -116,16 +466,16 @@
       </div>
     }
 
-    <!-- 3. STANDARD CONTROLS -->
+    3. STANDARD CONTROLS
     @else {
       <div class="field-control-wrapper" [formGroup]="parentGroup">
-        <!-- Render Label for non-boolean fields -->
+        Render Label for non-boolean fields
         <label *ngIf="field.type !== 'boolean'" class="field-label">
           {{ field.label }} @if(field.required){<span class="text-red-500">*</span>}
         </label>
         
         <div class="p-fluid">
-          <!-- Color -->
+          Color
           @if (field.type === 'color') {
             <p-inputgroup>
               <p-inputgroup-addon [style.background]="parentGroup.get(field.key)?.value">
@@ -135,29 +485,29 @@
             </p-inputgroup>
           }
 
-          <!-- Dropdowns / References -->
+          Dropdowns / References
           @else if (field.enum || field.options || field.type?.startsWith('reference')) {
             <p-select [options]="getEnumOptions(field)" [formControlName]="field.key" optionLabel="label" optionValue="value" 
                       placeholder="Select Option..." appendTo="body" [filter]="getEnumOptions(field).length > 8"></p-select>
           }
 
-          <!-- Date / Time -->
+          Date / Time
           @else if (field.type === 'datetime' || field.type === 'date' || field.inputType === 'datetime-local') {
             <p-datepicker [formControlName]="field.key" [showTime]="true" [showIcon]="true" appendTo="body" hourFormat="12"></p-datepicker>
           }
 
-          <!-- Number -->
+          Number
           @else if (field.type === 'number') {
             <p-inputnumber [formControlName]="field.key" [showButtons]="true" [min]="field.min" [max]="field.max" buttonLayout="horizontal" 
                            incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"></p-inputnumber>
           }
 
-          <!-- Long Text / Rich Text -->
+          Long Text / Rich Text
           @else if (field.type === 'textarea' || field.type === 'richtext') {
             <textarea pTextarea [formControlName]="field.key" rows="3" [autoResize]="true"></textarea>
           }
 
-          <!-- BOOLEAN / CHECKBOX (Standard Flow) -->
+          BOOLEAN / CHECKBOX (Standard Flow)
           @else if (field.type === 'boolean') {
             <div class="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-lg hover:border-blue-400 cursor-pointer transition-all shadow-sm" 
                  (click)="parentGroup.get(field.key)?.setValue(!parentGroup.get(field.key)?.value)">
@@ -166,7 +516,7 @@
             </div>
           }
 
-          <!-- Standard Text Input -->
+          Standard Text Input
           @else {
             <input pInputText [formControlName]="field.key" [placeholder]="'Enter ' + field.label" />
           }
@@ -176,417 +526,4 @@
       </div>
     }
   </ng-template>
-</form>
-
-
-
-<!-- 
-<form [formGroup]="form" class="h-full flex flex-col bg-white">
-  <p-tabs value="0" class="flex-1 flex flex-col min-h-0">
-    <div class="px-4 pt-2 border-b border-gray-100 bg-white sticky top-0 z-10">
-      <p-tablist>
-        <p-tab value="0"><i class="pi pi-file-edit mr-2 text-sm"></i> Content</p-tab>
-        <p-tab value="1"><i class="pi pi-cog mr-2 text-sm"></i> Settings</p-tab>
-        <p-tab value="2"><i class="pi pi-palette mr-2 text-sm"></i> Design</p-tab>
-      </p-tablist>
-    </div>
-
-    <p-tabpanels class="p-0 flex-1 overflow-y-auto min-h-0 custom-scrollbar bg-slate-50/30">
-
-      <ng-template #inputRenderer let-field>
-        <div class="field-wrapper mb-5 last:mb-0">
-
-          @if (field.ui !== 'checkbox' && field.ui !== 'boolean') {
-          <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">
-            {{ field.label }} @if(field.required){<span class="text-red-500">*</span>}
-          </label>
-          }
-
-          <div class="p-fluid">
-
-            @if (field.ui === 'icon-group') {
-            <p-selectbutton [options]="getEnumOptions(field)" [formControlName]="field.key" optionLabel="label"
-              optionValue="value" aria-labelledby="basic">
-              <ng-template let-item pTemplate="item">
-                <i [class]="getIconForValue(item.value)" [title]="item.label"></i>
-              </ng-template>
-            </p-selectbutton>
-            }
-
-            @else if (field.ui === 'radio') {
-            <div class="flex flex-wrap gap-4 p-2 bg-white border border-slate-200 rounded-lg">
-              @for (opt of getEnumOptions(field); track opt.value) {
-              <div class="flex items-center">
-                <p-radiobutton [name]="field.key" [value]="opt.value" [formControlName]="field.key"
-                  [inputId]="field.key + opt.value">
-                </p-radiobutton>
-                <label [for]="field.key + opt.value" class="ml-2 text-xs font-medium text-slate-600 cursor-pointer">{{
-                  opt.label }}</label>
-              </div>
-              }
-            </div>
-            }
-
-            @else if (field.ui === 'checkbox') {
-            <div
-              class="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-lg hover:border-blue-400 transition-all cursor-pointer"
-              (click)="form.get(field.key)?.setValue(!form.get(field.key)?.value)"> <p-checkbox
-                [formControlName]="field.key" [binary]="true" [inputId]="field.key" (click)="$event.stopPropagation()">
-              </p-checkbox>
-
-              <label [for]="field.key"
-                class="text-xs font-bold text-slate-700 cursor-pointer select-none uppercase tracking-tight">
-                {{ field.label }}
-              </label>
-            </div>
-            }
-            @else if (field.inputType === 'datetime-local' || field.type === 'date') {
-            <p-datepicker [formControlName]="field.key" [showTime]="true" [showIcon]="true" appendTo="body"
-              hourFormat="12"></p-datepicker>
-            }
-
-            @else if (field.enum || field.type === 'select' || field.type === 'reference' || field.key.endsWith('Id')) {
-            <p-select [options]="getEnumOptions(field)" [formControlName]="field.key" optionLabel="label"
-              optionValue="value" placeholder="Choose Option..." [filter]="getEnumOptions(field).length > 8"
-              appendTo="body">
-            </p-select>
-            }
-
-            @else if (field.type === 'number') {
-            <p-inputnumber [formControlName]="field.key" [showButtons]="true" [min]="field.min" [max]="field.max"
-              buttonLayout="horizontal" decrementButtonClass="p-button-secondary"
-              incrementButtonClass="p-button-secondary" incrementButtonIcon="pi pi-plus"
-              decrementButtonIcon="pi pi-minus">
-            </p-inputnumber>
-            }
-
-            @else if (field.format === 'color' || field.type === 'color') {
-            <p-inputgroup>
-              <p-inputgroup-addon [style.background-color]="form.get(field.key)?.value">
-                <p-colorpicker [formControlName]="field.key" appendTo="body"></p-colorpicker>
-              </p-inputgroup-addon>
-              <input type="text" pInputText [formControlName]="field.key" placeholder="#000000"
-                class="font-mono text-xs" />
-            </p-inputgroup>
-            }
-
-            @else if (field.maxLength > 150 || field.type === 'textarea' || field.type === 'richtext') {
-            <textarea pTextarea [formControlName]="field.key" rows="4" autoResize="true"></textarea>
-            }
-
-            @else {
-            <input pInputText [formControlName]="field.key" [placeholder]="'Enter ' + field.label" />
-            }
-          </div>
-
-          @if(field.description){<p class="text-[10px] text-slate-400 mt-1.5 italic leading-tight">{{ field.description
-            }}</p>}
-        </div>
-      </ng-template>
-
-      <p-tabpanel value="0">
-        <div class="flex flex-col gap-6 p-5">
-          <div class="flex flex-col gap-4">
-            @for (field of tabs.content; track field.key) {
-            @if(field.type !== 'array') {
-            <ng-container *ngTemplateOutlet="inputRenderer; context: {$implicit: field}"></ng-container>
-            }
-            }
-          </div>
-
-          @for (field of tabs.content; track field.key) {
-          @if(field.type === 'array') {
-          <div class="bg-slate-100/50 border border-slate-200 rounded-xl overflow-hidden mt-2"
-            [formArrayName]="field.key">
-            <div class="px-4 py-3 bg-white border-b border-slate-200 flex justify-between items-center">
-              <span class="text-[10px] font-black uppercase text-slate-500 tracking-widest">{{ field.label }}</span>
-              <p-badge [value]="getFormArray(field.key).length" severity="info"></p-badge>
-            </div>
-
-            <div cdkDropList (cdkDropListDropped)="drop($event, field.key)" class="p-3 flex flex-col gap-3">
-              @for (control of getFormArray(field.key).controls; track control; let i = $index) {
-              <div cdkDrag [formGroupName]="i"
-                class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
-                <div class="flex items-center p-2 cursor-pointer hover:bg-slate-50 transition-colors"
-                  (click)="toggleExpanded(control)">
-                  <div class="drag-handle px-2 text-slate-300" cdkDragHandle (click)="$event.stopPropagation()">
-                    <i class="pi pi-bars"></i>
-                  </div>
-                  <span class="flex-1 text-xs font-bold text-slate-700 px-2 truncate">{{ getItemTitle(control) }}</span>
-                  <i class="pi text-[10px] text-slate-400 mr-2" [class.pi-chevron-down]="!isExpanded(control)"
-                    [class.pi-chevron-up]="isExpanded(control)"></i>
-                  <button type="button" (click)="removeArrayItem(field.key, i)"
-                    class="w-7 h-7 flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full">
-                    <i class="pi pi-trash text-[10px]"></i>
-                  </button>
-                </div>
-
-                <div class="p-4 border-t border-slate-100 bg-slate-50/30 grid gap-4"
-                  [class.hidden]="!isExpanded(control)">
-                  @for (sub of getArraySchema(field); track sub.key) {
-                  <ng-container *ngTemplateOutlet="inputRenderer; context: {$implicit: sub}"></ng-container>
-                  }
-                </div>
-              </div>
-              }
-            </div>
-
-            <div class="p-3 bg-white border-t border-slate-200">
-              <button pButton label="Add New Item" icon="pi pi-plus"
-                class="p-button-outlined p-button-sm w-full border-dashed" (click)="addArrayItem(field)"></button>
-            </div>
-          </div>
-          }
-          }
-        </div>
-      </p-tabpanel>
-
-      <p-tabpanel value="1">
-        <div class="p-5 flex flex-col gap-6">
-          @if (booleanGroup.length > 0) {
-          <div class="grid grid-cols-2 gap-3">
-            @for (field of booleanGroup; track field.key) {
-            <div
-              class="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg hover:border-blue-400 transition-all cursor-pointer"
-              (click)="form.get(field.key)?.setValue(!form.get(field.key)?.value)">
-              <span class="text-[10px] font-bold text-slate-600 uppercase tracking-tight">{{ field.label }}</span>
-              <p-toggleswitch [formControlName]="field.key" styleClass="scale-75 origin-right"></p-toggleswitch>
-            </div>
-            }
-          </div>
-          <div class="h-px bg-slate-200 my-2"></div>
-          }
-
-          <div class="grid grid-cols-1 gap-6">
-            @for (field of tabs.settings; track field.key) {
-            <ng-container *ngTemplateOutlet="inputRenderer; context: {$implicit: field}"></ng-container>
-            }
-          </div>
-        </div>
-      </p-tabpanel>
-
-      <p-tabpanel value="2">
-        <div class="p-5 flex flex-col gap-6">
-          @for (field of tabs.style; track field.key) {
-          <ng-container *ngTemplateOutlet="inputRenderer; context: {$implicit: field}"></ng-container>
-          }
-        </div>
-      </p-tabpanel>
-
-    </p-tabpanels>
-  </p-tabs>
-</form> -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- 
-<form [formGroup]="form" class="h-full flex flex-col bg-white">
-  <p-tabs value="0" class="flex-1 flex flex-col min-h-0">
-    <div class="px-4 pt-2 border-b border-gray-100 bg-white sticky top-0 z-10">
-      <p-tablist>
-        <p-tab value="0"><i class="pi pi-file-edit mr-2 text-sm"></i> Content</p-tab>
-        <p-tab value="1"><i class="pi pi-cog mr-2 text-sm"></i> Settings</p-tab>
-        <p-tab value="2"><i class="pi pi-palette mr-2 text-sm"></i> Design</p-tab>
-      </p-tablist>
-    </div>
-
-    <p-tabpanels class="p-0 flex-1 overflow-y-auto min-h-0 custom-scrollbar bg-slate-50/30">
-
-      <ng-template #inputRenderer let-field>
-        <div class="field-wrapper mb-5 last:mb-0">
-
-          @if (field.ui !== 'checkbox' && field.ui !== 'boolean') {
-          <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">
-            {{ field.label }} @if(field.required){<span class="text-red-500">*</span>}
-          </label>
-          }
-
-          <div class="p-fluid">
-
-            @if (field.ui === 'icon-group') {
-            <p-selectbutton [options]="getEnumOptions(field)" [formControlName]="field.key" optionLabel="label"
-              optionValue="value" aria-labelledby="basic">
-              <ng-template let-item pTemplate="item">
-                <i [class]="getIconForValue(item.value)" [title]="item.label"></i>
-              </ng-template>
-            </p-selectbutton>
-            }
-
-            @else if (field.ui === 'radio') {
-            <div class="flex flex-wrap gap-4 p-2 bg-white border border-slate-200 rounded-lg">
-              @for (opt of getEnumOptions(field); track opt.value) {
-              <div class="flex items-center">
-                <p-radiobutton [name]="field.key" [value]="opt.value" [formControlName]="field.key"
-                  [inputId]="field.key + opt.value">
-                </p-radiobutton>
-                <label [for]="field.key + opt.value" class="ml-2 text-xs font-medium text-slate-600 cursor-pointer">{{
-                  opt.label }}</label>
-              </div>
-              }
-            </div>
-            }
-
-            @else if (field.ui === 'checkbox') {
-            <div
-              class="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-lg hover:border-blue-400 transition-all cursor-pointer"
-              (click)="form.get(field.key)?.setValue(!form.get(field.key)?.value)"> <p-checkbox
-                [formControlName]="field.key" [binary]="true" [inputId]="field.key" (click)="$event.stopPropagation()">
-              </p-checkbox>
-
-              <label [for]="field.key"
-                class="text-xs font-bold text-slate-700 cursor-pointer select-none uppercase tracking-tight">
-                {{ field.label }}
-              </label>
-            </div>
-            }
-            @else if (field.inputType === 'datetime-local' || field.type === 'date') {
-            <p-datepicker [formControlName]="field.key" [showTime]="true" [showIcon]="true" appendTo="body"
-              hourFormat="12"></p-datepicker>
-            }
-
-            @else if (field.enum || field.type === 'select' || field.key.endsWith('Id')) {
-            <p-select [options]="getEnumOptions(field)" [formControlName]="field.key" optionLabel="label"
-              optionValue="value" placeholder="Choose Option..." [filter]="getEnumOptions(field).length > 8"
-              appendTo="body">
-            </p-select>
-            }
-
-            @else if (field.type === 'number') {
-            <p-inputnumber [formControlName]="field.key" [showButtons]="true" [min]="field.min" [max]="field.max"
-              buttonLayout="horizontal" decrementButtonClass="p-button-secondary"
-              incrementButtonClass="p-button-secondary" incrementButtonIcon="pi pi-plus"
-              decrementButtonIcon="pi pi-minus">
-            </p-inputnumber>
-            }
-
-            @else if (field.format === 'color') {
-            <p-inputgroup>
-              <p-inputgroup-addon [style.background-color]="form.get(field.key)?.value">
-                <p-colorpicker [formControlName]="field.key" appendTo="body"></p-colorpicker>
-              </p-inputgroup-addon>
-              <input type="text" pInputText [formControlName]="field.key" placeholder="#000000"
-                class="font-mono text-xs" />
-            </p-inputgroup>
-            }
-
-            @else if (field.maxLength > 150) {
-            <textarea pTextarea [formControlName]="field.key" rows="4" autoResize="true"></textarea>
-            }
-
-            @else {
-            <input pInputText [formControlName]="field.key" [placeholder]="'Enter ' + field.label" />
-            }
-          </div>
-
-          @if(field.description){<p class="text-[10px] text-slate-400 mt-1.5 italic leading-tight">{{ field.description
-            }}</p>}
-        </div>
-      </ng-template>
-
-      <p-tabpanel value="0">
-        <div class="flex flex-col gap-6 p-5">
-          <div class="flex flex-col gap-4">
-            @for (field of tabs.content; track field.key) {
-            @if(field.type !== 'array') {
-            <ng-container *ngTemplateOutlet="inputRenderer; context: {$implicit: field}"></ng-container>
-            }
-            }
-          </div>
-
-          @for (field of tabs.content; track field.key) {
-          @if(field.type === 'array') {
-          <div class="bg-slate-100/50 border border-slate-200 rounded-xl overflow-hidden mt-2"
-            [formArrayName]="field.key">
-            <div class="px-4 py-3 bg-white border-b border-slate-200 flex justify-between items-center">
-              <span class="text-[10px] font-black uppercase text-slate-500 tracking-widest">{{ field.label }}</span>
-              <p-badge [value]="getFormArray(field.key).length" severity="info"></p-badge>
-            </div>
-
-            <div cdkDropList (cdkDropListDropped)="drop($event, field.key)" class="p-3 flex flex-col gap-3">
-              @for (control of getFormArray(field.key).controls; track control; let i = $index) {
-              <div cdkDrag [formGroupName]="i"
-                class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
-                <div class="flex items-center p-2 cursor-pointer hover:bg-slate-50 transition-colors"
-                  (click)="toggleExpanded(control)">
-                  <div class="drag-handle px-2 text-slate-300" cdkDragHandle (click)="$event.stopPropagation()">
-                    <i class="pi pi-bars"></i>
-                  </div>
-                  <span class="flex-1 text-xs font-bold text-slate-700 px-2 truncate">{{ getItemTitle(control) }}</span>
-                  <i class="pi text-[10px] text-slate-400 mr-2" [class.pi-chevron-down]="!isExpanded(control)"
-                    [class.pi-chevron-up]="isExpanded(control)"></i>
-                  <button type="button" (click)="removeArrayItem(field.key, i)"
-                    class="w-7 h-7 flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full">
-                    <i class="pi pi-trash text-[10px]"></i>
-                  </button>
-                </div>
-
-                <div class="p-4 border-t border-slate-100 bg-slate-50/30 grid gap-4"
-                  [class.hidden]="!isExpanded(control)">
-                  @for (sub of getArraySchema(field); track sub.key) {
-                  <ng-container *ngTemplateOutlet="inputRenderer; context: {$implicit: sub}"></ng-container>
-                  }
-                </div>
-              </div>
-              }
-            </div>
-
-            <div class="p-3 bg-white border-t border-slate-200">
-              <button pButton label="Add New Item" icon="pi pi-plus"
-                class="p-button-outlined p-button-sm w-full border-dashed" (click)="addArrayItem(field)"></button>
-            </div>
-          </div>
-          }
-          }
-        </div>
-      </p-tabpanel>
-
-      <p-tabpanel value="1">
-        <div class="p-5 flex flex-col gap-6">
-          @if (booleanGroup.length > 0) {
-          <div class="grid grid-cols-2 gap-3">
-            @for (field of booleanGroup; track field.key) {
-            <div
-              class="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg hover:border-blue-400 transition-all cursor-pointer"
-              (click)="form.get(field.key)?.setValue(!form.get(field.key)?.value)">
-              <span class="text-[10px] font-bold text-slate-600 uppercase tracking-tight">{{ field.label }}</span>
-              <p-toggleswitch [formControlName]="field.key" styleClass="scale-75 origin-right"></p-toggleswitch>
-            </div>
-            }
-          </div>
-          <div class="h-px bg-slate-200 my-2"></div>
-          }
-
-          <div class="grid grid-cols-1 gap-6">
-            @for (field of tabs.settings; track field.key) {
-            <ng-container *ngTemplateOutlet="inputRenderer; context: {$implicit: field}"></ng-container>
-            }
-          </div>
-        </div>
-      </p-tabpanel>
-
-      <p-tabpanel value="2">
-        <div class="p-5 flex flex-col gap-6">
-          @for (field of tabs.style; track field.key) {
-          <ng-container *ngTemplateOutlet="inputRenderer; context: {$implicit: field}"></ng-container>
-          }
-        </div>
-      </p-tabpanel>
-
-    </p-tabpanels>
-  </p-tabs>
 </form> -->
