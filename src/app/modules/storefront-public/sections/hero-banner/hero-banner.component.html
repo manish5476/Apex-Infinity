@@ -1,41 +1,55 @@
 <div class="section-root" 
-     [ngClass]="[heightClass()]" 
-     [ngStyle]="inlineStyles"
+     [ngClass]="heightClass()" 
+     [ngStyle]="dynamicThemeStyles"
      @heroAnim>
 
-  <div class="bg-wrapper" [class.parallax-enabled]="config.imageParallax">
-    <img [src]="mediaSource" 
-         alt="Shivam Electronics Banner"
-         class="bg-image">
-    
-    <div class="overlay" 
-         [style.opacity]="config.overlayOpacity || 0.4">
-    </div>
+  <div class="bg-wrapper">
+    @if (isVideo) {
+      <video [src]="mediaSource" 
+             autoplay muted loop playsinline 
+             class="bg-image">
+      </video>
+    } @else {
+      <img [src]="mediaSource" 
+           alt="Banner Image" 
+           class="bg-image" 
+           [class.parallax]="config.imageParallax">
+    }
+
+    <div class="overlay" [style.opacity]="config.overlayOpacity || 0.4"></div>
+    <div class="gradient-bottom"></div>
   </div>
 
   <div class="content-wrapper" [ngClass]="alignmentClass()">
-    <div class="container" [ngClass]="containerClass()">
+    <div class="container" [class.w-standard]="true">
       
-      <ng-container [ngSwitch]="titleTag">
-        <h1 *ngSwitchCase="'h1'" class="hero-title on-overlay anim-target">{{ config.title }}</h1>
-        <h2 *ngSwitchCase="'h2'" class="hero-title on-overlay anim-target">{{ config.title }}</h2>
-        <h3 *ngSwitchCase="'h3'" class="hero-title on-overlay anim-target">{{ config.title }}</h3>
-        <h1 *ngSwitchDefault class="hero-title on-overlay anim-target">{{ config.title }}</h1>
-      </ng-container>
+      <header class="anim-target">
+        <ng-container [ngSwitch]="config.titleTag">
+          <h1 *ngSwitchCase="'h1'" class="hero-title">{{ config.title }}</h1>
+          <h2 *ngSwitchCase="'h2'" class="hero-title">{{ config.title }}</h2>
+          <h3 *ngSwitchCase="'h3'" class="hero-title">{{ config.title }}</h3>
+          <h1 *ngSwitchDefault class="hero-title">{{ config.title }}</h1>
+        </ng-container>
+      </header>
 
-      <p class="hero-subtitle anim-target" *ngIf="config.subtitle">
-        {{ config.subtitle }}
-      </p>
+      @if (config.subtitle) {
+        <p class="hero-subtitle anim-target">
+          {{ config.subtitle }}
+        </p>
+      }
 
-      <div class="btn-group anim-target" *ngIf="config.ctaButtons?.length">
-        <a *ngFor="let btn of config.ctaButtons"
-           [routerLink]="btn.url"
-           class="hero-btn"
-           [ngClass]="'variant-' + (btn.variant || 'primary')">
-          {{ btn.text }}
-        </a>
-      </div>
-
+      @if (config.ctaButtons && config.ctaButtons.length > 0) {
+        <div class="btn-group anim-target">
+          @for (btn of config.ctaButtons; track $index) {
+            <a [routerLink]="btn.url"
+               class="hero-btn"
+               [ngClass]="'variant-' + (btn.variant || 'primary')">
+              @if (btn.icon) { <i [class]="'pi ' + btn.icon"></i> }
+              {{ btn.text }}
+            </a>
+          }
+        </div>
+      }
     </div>
   </div>
 </div>
