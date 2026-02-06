@@ -1,7 +1,7 @@
 // @import 'your-root-token-file'; // Ensure mixins are available
 
 .section-root {
-  @include apply-canonical-mapping;
+  // @include apply-canonical-mapping;
   position: relative;
   width: 100%;
   overflow: hidden;
