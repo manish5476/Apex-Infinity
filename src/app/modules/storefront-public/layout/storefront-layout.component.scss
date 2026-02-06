@@ -1,145 +1,230 @@
-/* =========================================
-   STOREFRONT LAYOUT STYLES
-   ========================================= */
-
-/* 1. Glass Dock (Bottom Navigation) */
-.glass-dock {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: 
-    0 10px 40px -10px rgba(0,0,0,0.1),
-    0 0 0 1px rgba(255,255,255,0.3) inset;
-  
-  .dark-mode & {
-    background: rgba(15, 23, 42, 0.75);
-    border-color: rgba(255,255,255,0.1);
-  }
-}
-
-.dock-item {
-  color: #94a3b8;
-  transition: all 0.2s ease;
-  
-  &:hover, &.active {
-    color: var(--primary);
-    transform: translateY(-2px);
-  }
-}
-
-/* 2. Popover Customization */
-::ng-deep .glass-popover {
-  border: none !important;
-  border-radius: 16px !important;
-  background: transparent !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
-
-  .p-popover-content {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(24px);
-    border-radius: 16px;
-    padding: 0;
-    border: 1px solid rgba(0,0,0,0.05);
-
-    /* Dark Mode Support for Popover */
-    @media (prefers-color-scheme: dark) {
-      background: rgba(30, 41, 59, 0.95);
-      border-color: rgba(255,255,255,0.1);
-      color: #e2e8f0;
-    }
-  }
-
-  /* Hide the little arrow for cleaner look */
-  .p-popover-arrow { display: none; }
-}
-
-/* 3. Animations */
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-  100% { transform: translateY(0px); }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+:host {
+  display: block;
 }
 
 .animate-pulse-slow {
-  animation: pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: pulse-slow 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* 4. Scrollbar for Theme List */
-.custom-scrollbar {
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: rgba(0,0,0,0.1);
-    border-radius: 4px;
-  }
+.animate-float {
+  animation: float 10s ease-in-out infinite;
 }
 
-.glass-trigger {
-  /* Minimalist Base */
-  background: rgba(255, 255, 255, 0.6); /* More transparent */
-  backdrop-filter: blur(12px);          /* Heavy blur */
-  -webkit-backdrop-filter: blur(12px);
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.1; transform: scale(1); }
+  50% { opacity: 0.2; transform: scale(1.1); }
+}
+
+@keyframes float {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(20px, -20px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Glass Dock (Mobile) */
+.glass-dock {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.dock-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  color: #64748b;
   
-  /* Subtle Border */
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 
-    0 4px 6px -1px rgba(0, 0, 0, 0.05), 
-    0 2px 4px -1px rgba(0, 0, 0, 0.03);
-
-  /* Hover State */
-  &:hover {
-    background: rgba(255, 255, 255, 0.9);
-    border-color: var(--primary); /* Glows with theme color */
-    transform: translateY(-2px);
+  &.active-link {
+    color: var(--primary);
+    transform: scale(1.1);
   }
+}
 
-  /* Dark Mode Adaptation */
-  .dark-mode & {
-    background: rgba(30, 41, 59, 0.6);
+/* Settings Popover Glass */
+::ng-deep .glass-popover .p-popover {
+  background: rgba(255, 255, 255, 0.65) !important;
+  backdrop-filter: blur(30px) !important;
+  -webkit-backdrop-filter: blur(30px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  border-radius: 1.5rem !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
+  overflow: hidden;
+}
+
+::ng-deep .glass-trigger {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(12px);
+  &:hover {
+    background: rgba(255, 255, 255, 0.8);
+  }
+}
+
+/* Dark Mode Overrides */
+.dark-mode {
+  ::ng-deep .glass-popover .p-popover {
+    background: rgba(15, 23, 42, 0.65) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+  
+  ::ng-deep .glass-trigger {
+    background: rgba(30, 41, 59, 0.5);
     border-color: rgba(255, 255, 255, 0.1);
-    color: #94a3b8;
-
+    color: #cbd5e1;
     &:hover {
       background: rgba(30, 41, 59, 0.9);
-      color: var(--primary);
+      color: #fff;
     }
   }
-}
 
-@keyframes popoverFloatIn {
-  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-/* Scrollable Content Area */
-.popover-content {
-  padding: var(--spacing-lg);
-  max-height: 400px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  background: var(--bg-secondary); /* Subtle contrast against white header if needed */
-}
-
-/* 1. MAIN SCROLLABLE AREA */
-.popover-content {
-  padding: var(--spacing-lg); /* 1.5rem padding */
-  max-height: calc(100vh - 200px); /* Smart height calculation */
-  overflow-y: auto;
-  background: var(--bg-primary); /* Solid background to prevent see-through mess */
-  
-  /* Smooth Scrollbar */
-  &::-webkit-scrollbar { width: 5px; }
-  &::-webkit-scrollbar-track { background: transparent; }
-  &::-webkit-scrollbar-thumb {
-    background: var(--border-secondary);
-    border-radius: 99px;
-    &:hover { background: var(--text-tertiary); }
+  .glass-dock {
+    background: rgba(15, 23, 42, 0.6);
+    border-color: rgba(255, 255, 255, 0.1);
   }
 }
+
+// /* =========================================
+//    STOREFRONT LAYOUT STYLES
+//    ========================================= */
+
+// /* 1. Glass Dock (Bottom Navigation) */
+// .glass-dock {
+//   background: rgba(255, 255, 255, 0.75);
+//   backdrop-filter: blur(16px);
+//   -webkit-backdrop-filter: blur(16px);
+//   box-shadow: 
+//     0 10px 40px -10px rgba(0,0,0,0.1),
+//     0 0 0 1px rgba(255,255,255,0.3) inset;
+  
+//   .dark-mode & {
+//     background: rgba(15, 23, 42, 0.75);
+//     border-color: rgba(255,255,255,0.1);
+//   }
+// }
+
+// .dock-item {
+//   color: #94a3b8;
+//   transition: all 0.2s ease;
+  
+//   &:hover, &.active {
+//     color: var(--primary);
+//     transform: translateY(-2px);
+//   }
+// }
+
+// /* 2. Popover Customization */
+// ::ng-deep .glass-popover {
+//   border: none !important;
+//   border-radius: 16px !important;
+//   background: transparent !important;
+//   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+
+//   .p-popover-content {
+//     background: rgba(255, 255, 255, 0.95);
+//     backdrop-filter: blur(24px);
+//     border-radius: 16px;
+//     padding: 0;
+//     border: 1px solid rgba(0,0,0,0.05);
+
+//     /* Dark Mode Support for Popover */
+//     @media (prefers-color-scheme: dark) {
+//       background: rgba(30, 41, 59, 0.95);
+//       border-color: rgba(255,255,255,0.1);
+//       color: #e2e8f0;
+//     }
+//   }
+
+//   /* Hide the little arrow for cleaner look */
+//   .p-popover-arrow { display: none; }
+// }
+
+// /* 3. Animations */
+// @keyframes float {
+//   0% { transform: translateY(0px); }
+//   50% { transform: translateY(-20px); }
+//   100% { transform: translateY(0px); }
+// }
+
+// .animate-float {
+//   animation: float 6s ease-in-out infinite;
+// }
+
+// .animate-pulse-slow {
+//   animation: pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+// }
+
+// /* 4. Scrollbar for Theme List */
+// .custom-scrollbar {
+//   &::-webkit-scrollbar {
+//     width: 4px;
+//   }
+//   &::-webkit-scrollbar-track {
+//     background: transparent;
+//   }
+//   &::-webkit-scrollbar-thumb {
+//     background: rgba(0,0,0,0.1);
+//     border-radius: 4px;
+//   }
+// }
+
+// .glass-trigger {
+//   /* Minimalist Base */
+//   background: rgba(255, 255, 255, 0.6); /* More transparent */
+//   backdrop-filter: blur(12px);          /* Heavy blur */
+//   -webkit-backdrop-filter: blur(12px);
+  
+//   /* Subtle Border */
+//   border: 1px solid rgba(255, 255, 255, 0.4);
+//   box-shadow: 
+//     0 4px 6px -1px rgba(0, 0, 0, 0.05), 
+//     0 2px 4px -1px rgba(0, 0, 0, 0.03);
+
+//   /* Hover State */
+//   &:hover {
+//     background: rgba(255, 255, 255, 0.9);
+//     border-color: var(--primary); /* Glows with theme color */
+//     transform: translateY(-2px);
+//   }
+
+//   /* Dark Mode Adaptation */
+//   .dark-mode & {
+//     background: rgba(30, 41, 59, 0.6);
+//     border-color: rgba(255, 255, 255, 0.1);
+//     color: #94a3b8;
+
+//     &:hover {
+//       background: rgba(30, 41, 59, 0.9);
+//       color: var(--primary);
+//     }
+//   }
+// }
+
+// @keyframes popoverFloatIn {
+//   from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+//   to { opacity: 1; transform: translateY(0) scale(1); }
+// }
+// /* Scrollable Content Area */
+// .popover-content {
+//   padding: var(--spacing-lg);
+//   max-height: 400px;
+//   overflow-y: auto;
+//   overscroll-behavior: contain;
+//   background: var(--bg-secondary); /* Subtle contrast against white header if needed */
+// }
+
+// /* 1. MAIN SCROLLABLE AREA */
+// .popover-content {
+//   padding: var(--spacing-lg); /* 1.5rem padding */
+//   max-height: calc(100vh - 200px); /* Smart height calculation */
+//   overflow-y: auto;
+//   background: var(--bg-primary); /* Solid background to prevent see-through mess */
+  
+//   /* Smooth Scrollbar */
+//   &::-webkit-scrollbar { width: 5px; }
+//   &::-webkit-scrollbar-track { background: transparent; }
+//   &::-webkit-scrollbar-thumb {
+//     background: var(--border-secondary);
+//     border-radius: 99px;
+//     &:hover { background: var(--text-tertiary); }
+//   }
+// }

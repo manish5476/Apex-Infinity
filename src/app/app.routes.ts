@@ -8,7 +8,6 @@ import { NotFoundComponent } from './modules/shared/components/notfound/notfound
 import { ChatComponent } from './chat/chat.component/chat.component';
 
 // Shared / Core Components
-// import { NotesManagerComponent } from './modules/shared/components/notes-manager/notes-manager.component';
 import { MasterList } from './modules/shared/components/master-list/master-list';
 
 // Admin / Org Components
@@ -39,17 +38,16 @@ export const routes: Routes = [
     path: 'auth',
     loadChildren: () => import('./modules/auth/auth.routes').then((m) => m.AUTH_ROUTES),
   },
+
   // ==========================================================
   //  3. PUBLIC STOREFRONT (Customer View)
   //  ⚠️ Implements Master Layout Pattern
+  //  Accessed via: /store/:orgSlug (e.g., /store/nike)
   // ==========================================================
   {
-    // PARENT ROUTE: Loads the Header/Footer Shell
     path: 'store/:orgSlug',
     loadComponent: () => import('./modules/storefront-public/layout/storefront-layout.component')
       .then(m => m.StorefrontLayoutComponent),
-
-    // CHILDREN: Load inside the <router-outlet> of the Layout
     children: [
       // A. Default Redirect (store/shivam -> store/shivam/home)
       {
@@ -78,12 +76,16 @@ export const routes: Routes = [
       // ⚠️ MUST be last to act as a wildcard for this group
       {
         path: ':pageSlug',
-        loadComponent: () => import('./modules/storefront-public/pages/dynamic-page/dynamic-page.component')
+        loadComponent: () => import('./modules/storefront-public/dynamic-page/dynamic-page.component')
           .then(m => m.DynamicPageComponent),
         title: 'Storefront'
       }
     ]
   },
+
+  // ==========================================================
+  //  4. SECURE APP (Main ERP)
+  // ==========================================================
   {
     path: '',
     component: MainScreen,

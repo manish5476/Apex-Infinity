@@ -5,7 +5,7 @@
 
   <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-[var(--bg-page)] transition-colors duration-700">
     <div class="absolute inset-0 opacity-[0.04] mix-blend-overlay" 
-         style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise%22)%22 opacity=%221%22/%3E%3C/svg%3E')">
+          style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise%22)%22 opacity=%221%22/%3E%3C/svg%3E')">
     </div>
     
     <div class="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] rounded-full bg-[var(--primary)] opacity-10 blur-[120px] animate-pulse-slow"></div>
@@ -151,3 +151,157 @@
 
   </div>
 </p-popover>
+
+<!-- <div 
+  class="min-h-screen w-full flex flex-col font-sans relative transition-colors duration-700"
+  [class.dark-mode]="isDarkMode()"
+  [style]="activeThemeStyle()">
+
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-[var(--bg-page)] transition-colors duration-700">
+    <div class="absolute inset-0 opacity-[0.04] mix-blend-overlay" 
+         style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise%22)%22 opacity=%221%22/%3E%3C/svg%3E')">
+    </div>
+    
+    <div class="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] rounded-full bg-[var(--primary)] opacity-10 blur-[120px] animate-pulse-slow"></div>
+    <div class="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-[var(--secondary)] opacity-10 blur-[100px] animate-float"></div>
+  </div>
+
+  @if (state.layout(); as layout) {
+    @for (section of layout.header; track section.id) {
+      @if (section.type === 'navbar_simple') {
+        <app-navbar-simple 
+          [config]="section.config" 
+          [organization]="state.organization()"
+          [logo]="state.organization()?.logo"
+          [orgSlug]="state.organization()?.slug"> 
+        </app-navbar-simple>
+      }
+    }
+  }
+
+  <main class="relative z-10 flex-grow w-full flex flex-col transition-all duration-700">
+    
+    <div class="w-full transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]"
+         [ngClass]="{
+           'pt-24 px-0 pb-0': !isHomePage(), 
+           'pt-28 px-4 pb-4 md:px-6 md:pb-6': isHomePage()
+         }">
+         
+      <div class="w-full relative overflow-hidden bg-[var(--bg-page)]/50 backdrop-blur-sm shadow-sm transition-all duration-1000 border border-[var(--glass-border)]"
+           [ngClass]="{
+             'min-h-[90vh] rounded-[2.5rem] md:rounded-[3.5rem]': isHomePage(),
+             'min-h-screen': !isHomePage()
+           }">
+        
+        <router-outlet></router-outlet>
+
+        <div *ngIf="isHomePage()" class="absolute bottom-0 left-0 w-full h-16 md:h-24 bg-gradient-to-t from-[var(--bg-page)] to-transparent pointer-events-none"></div>
+      </div>
+    </div>
+  </main>
+
+  <div class="relative z-0 mt-auto">
+    @if (state.layout(); as layout) {
+      @for (section of layout.footer; track section.id) {
+        @if (section.type === 'footer_simple') {
+          <app-footer-simple [config]="section.config" [organization]="state.organization()"></app-footer-simple>
+        }
+      }
+    }
+  </div>
+
+  <div class="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-auto">
+    <div class="glass-dock px-6 py-3 rounded-full flex items-center gap-8 shadow-2xl border border-white/20">
+       <a [routerLink]="['/store', state.organization()?.slug]" routerLinkActive="text-[var(--primary)]" class="dock-item"><i class="pi pi-home text-xl"></i></a>
+       <a [routerLink]="['/store', state.organization()?.slug, 'products']" routerLinkActive="text-[var(--primary)]" class="dock-item"><i class="pi pi-search text-xl"></i></a>
+       <a [routerLink]="['/store', state.organization()?.slug, 'cart']" routerLinkActive="text-[var(--primary)]" class="dock-item relative">
+         <i class="pi pi-shopping-bag text-xl"></i>
+         <span class="absolute -top-1.5 -right-1.5 w-2.5 h-2.5 bg-[var(--primary)] rounded-full border-2 border-white"></span>
+       </a>
+       <button (click)="settingsPopover.toggle($event)" class="dock-item text-slate-400 hover:text-[var(--primary)]">
+         <i class="pi pi-cog text-xl"></i>
+       </button>
+    </div>
+  </div>
+
+  <div class="hidden md:flex fixed bottom-6 left-6 z-50 items-center gap-3 group">
+  
+  <button 
+    (click)="settingsPopover.toggle($event)" 
+    class="relative h-10 pl-3 pr-3 rounded-full glass-trigger flex items-center justify-center gap-0 overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] hover:pr-5 hover:gap-2 shadow-sm hover:shadow-xl border border-white/30 text-slate-500 hover:text-[var(--primary)] group-hover:w-auto"
+    aria-label="Theme Settings">
+    
+    <i class="pi pi-palette text-lg transition-transform duration-300 group-hover:rotate-90"></i>
+    
+    <span class="max-w-0 opacity-0 whitespace-nowrap group-hover:max-w-[100px] group-hover:opacity-100 transition-all duration-300 text-xs font-bold uppercase tracking-wider translate-y-[1px]">
+      Customize
+    </span>
+
+  </button>
+
+</div>
+
+</div>
+
+<p-popover #settingsPopover styleClass="glass-popover" [style]="{ width: '360px' }">
+  <div class="flex flex-col p-4">
+    
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-sm font-bold uppercase tracking-widest text-slate-500">Experience</h3>
+      <button (click)="resetToDefault()" class="text-xs text-[var(--primary)] hover:underline">Reset</button>
+    </div>
+
+    <div class="flex items-center justify-between mb-6 p-3 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+      <div class="flex items-center gap-3">
+        <i class="pi pi-moon text-lg"></i>
+        <span class="text-sm font-medium">Dark Mode</span>
+      </div>
+      <div class="relative inline-block w-10 h-6 transition duration-200 ease-in-out bg-slate-200 rounded-full cursor-pointer" 
+           [class.bg-slate-900]="isDarkMode()"
+           (click)="toggleDarkModeSwitch()">
+        <span class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-200"
+              [class.translate-x-4]="isDarkMode()"></span>
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <div class="flex justify-between mb-2">
+        <span class="text-xs font-bold text-slate-500 uppercase">Text Size</span>
+        <span class="text-xs font-mono">{{ textScale() }}%</span>
+      </div>
+      <p-slider [ngModel]="textScale()" (onChange)="updateTextScale($event)" [min]="80" [max]="130" [step]="5" styleClass="w-full"></p-slider>
+    </div>
+
+    <div class="mb-2">
+      <span class="text-xs font-bold text-slate-500 uppercase block mb-3">Theme Style</span>
+      
+      <div class="h-64 overflow-y-auto pr-2 custom-scrollbar">
+        @for (group of themeGroups(); track group.category) {
+          <div class="mb-4">
+            <h4 class="text-[10px] font-bold text-slate-400 mb-2 uppercase">{{ group.category }}</h4>
+            <div class="grid grid-cols-4 gap-2">
+              @for (theme of group.themes; track theme.id) {
+                <button 
+                  (click)="selectTheme(theme.id)"
+                  class="group relative w-full aspect-square rounded-xl border transition-all duration-200 flex items-center justify-center overflow-hidden"
+                  [ngClass]="{
+                    'border-[var(--primary)] ring-2 ring-[var(--primary)] ring-offset-2': activeThemeId() === theme.id,
+                    'border-transparent hover:scale-105': activeThemeId() !== theme.id
+                  }"
+                  [pTooltip]="theme.name" tooltipPosition="top">
+                  
+                  <div class="absolute inset-0 opacity-80 group-hover:opacity-100 transition-opacity" [style.background]="theme.gradient"></div>
+                  
+                  @if (activeThemeId() === theme.id) {
+                    <i class="pi pi-check text-white text-xs font-bold relative z-10 drop-shadow-md"></i>
+                  }
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+  </div>
+</p-popover> -->
