@@ -1,4 +1,4 @@
-@import 'your-root-token-file'; // Ensure mixins are available
+// @import 'your-root-token-file'; // Ensure mixins are available
 
 .section-root {
   @include apply-canonical-mapping;
