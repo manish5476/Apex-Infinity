@@ -1,57 +1,110 @@
-/* --- HERO BANNER UPGRADE --- */
+@import 'your-root-token-file'; // Ensure mixins are available
+
 .section-root {
+  @include apply-canonical-mapping;
   position: relative;
   width: 100%;
   overflow: hidden;
-  background-color: var(--bg-primary); 
-  @include apply-canonical-mapping; // Ensure tokens are active
+  background-color: var(--bg-primary);
+  color: #ffffff; // Force white for hero contrast
 }
 
+/* --- MEDIA HANDLING --- */
+.bg-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  .bg-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    
+    &.parallax {
+      background-attachment: fixed;
+    }
+  }
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: #000000;
+    z-index: 1;
+  }
+
+  .gradient-bottom {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 30%;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    z-index: 2;
+  }
+}
+
+/* --- CONTENT BOX --- */
+.content-wrapper {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--spacing-5xl) var(--spacing-xl);
+  
+  &.align-left { align-items: flex-start; text-align: left; }
+  &.align-center { align-items: center; text-align: center; }
+  &.align-right { align-items: flex-end; text-align: right; }
+}
+
+/* --- TYPOGRAPHY --- */
 .hero-title {
   font-family: var(--font-heading);
-  font-size: clamp(2.5rem, 5vw, 5rem);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-tight);
-  color: var(--text-primary); // Dynamic text color
   margin-bottom: var(--spacing-md);
+  text-shadow: var(--shadow-md);
   
-  /* If background is dark, we usually force white, or use text-primary */
-  &.on-overlay { color: #ffffff; text-shadow: var(--shadow-md); }
+  // Specific clamp for H3 as used in your JSON
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
 }
 
+.hero-subtitle {
+  font-family: var(--font-body);
+  font-size: var(--font-size-lg);
+  max-width: 700px;
+  opacity: 0.9;
+  margin-bottom: var(--spacing-3xl);
+}
+
+/* --- BUTTONS --- */
 .hero-btn {
-  /* Using your dynamic accent tokens */
+  padding: var(--spacing-md) var(--spacing-4xl);
+  border-radius: var(--ui-border-radius);
+  font-weight: var(--font-weight-bold);
+  transition: var(--transition-base);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+
   &.variant-primary {
-    background: var(--accent-primary);
+    background-color: var(--accent-primary);
     color: #ffffff;
     border: 1px solid var(--accent-primary);
-    
+
     &:hover {
-      background: var(--accent-hover);
-      transform: translateY(-2px);
+      background-color: var(--accent-hover);
+      transform: translateY(-3px);
       box-shadow: var(--shadow-lg);
     }
   }
-
-  &.variant-outline {
-    background: transparent;
-    color: var(--text-primary);
-    border: 1px solid var(--border-primary);
-    
-    &:hover {
-      background: var(--component-bg-hover);
-      border-color: var(--accent-primary);
-    }
-  }
 }
 
-/* Parallax Class from JSON */
-.parallax-enabled {
-  background-attachment: fixed;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-}
+/* --- HEIGHT VARIANTS --- */
+.h-small { min-height: 400px; }
+.h-medium { min-height: 600px; }
+.h-large { min-height: 85vh; }
 // 
 /* ==========================================================================
 //    COMPONENT: PREMIUM HERO BANNER
