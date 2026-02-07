@@ -47,6 +47,9 @@ export class ConfigFormComponent implements OnChanges  {
   form: FormGroup;
   fb = inject(FormBuilder);
   
+  // Track active tab to prevent visibility issues
+  activeTab: string = '0';
+
   tabs = { content: [] as any[], settings: [] as any[], style: [] as any[] };
   booleanGroup: any[] = [];
   expandedControls = new Map<AbstractControl, boolean>();
@@ -283,7 +286,7 @@ export class ConfigFormComponent implements OnChanges  {
 //   styleUrls: ['./config-form.component.scss'],
 //   encapsulation: ViewEncapsulation.None
 // })
-// export class ConfigFormComponent implements OnChanges {
+// export class ConfigFormComponent implements OnChanges  {
 //   @Input() config: any = {};
 //   @Input() schema: any = {};
 //   /**
@@ -390,7 +393,8 @@ export class ConfigFormComponent implements OnChanges  {
 //   }
 
 //   /**
-//    * Resolves options for Enums and Reference fields
+//    * Resolves options for Enums and Reference fields.
+//    * Maps Master data to { label: name, value: _id } as requested.
 //    */
 //   getEnumOptions(field: any) {
 //     if (field.options) return field.options;
@@ -405,22 +409,33 @@ export class ConfigFormComponent implements OnChanges  {
 
 //     // Reference Resolution from Masters
 //     if (field.type?.includes('reference')) {
-//       const ref = field.ref?.toLowerCase() || '';
-//       const key = field.key.toLowerCase();
+//       const ref = (field.ref || '').toLowerCase();
+//       const key = (field.key || '').toLowerCase();
 
-//       // Priority mapping based on 'ref' or 'key'
+//       let sourceArray: any[] = [];
+
+//       // Determine the correct master list based on ref or field key
 //       if (ref === 'product' || key.includes('product')) {
-//         return this.masters.products.map((p: any) => ({ label: p.name || p.title, value: p._id || p.id }));
+//         sourceArray = this.masters?.products || [];
+//       } else if (ref === 'brand' || key.includes('brand')) {
+//         sourceArray = this.masters?.brands || [];
+//       } else if (ref === 'master' || ref === 'category' || key.includes('category')) {
+//         sourceArray = this.masters?.categories || [];
+//       } else if (ref === 'tag' || key.includes('tag')) {
+//         sourceArray = this.masters?.tags || [];
 //       }
-//       if (ref === 'master' || ref === 'category' || key.includes('category')) {
-//         return this.masters.categories.map((c: any) => ({ label: c.name, value: c._id || c.id }));
-//       }
-//       if (ref === 'brand' || key.includes('brand')) {
-//         return this.masters.brands.map((b: any) => ({ label: b.name, value: b._id || b.id }));
-//       }
-//       if (ref === 'tag' || key.includes('tag')) {
-//         return this.masters.tags.map((t: any) => ({ label: t.name || t, value: t._id || t.id || t }));
-//       }
+
+//       // Map to standardized { label: name, value: _id }
+//       return sourceArray.map((item: any) => {
+//         // Handle both object items and primitive string items (like tags)
+//         if (typeof item === 'string') {
+//           return { label: item, value: item };
+//         }
+//         return {
+//           label: item.name || item.title || item.label || 'Unknown',
+//           value: item._id || item.id || item.value
+//         };
+//       });
 //     }
 //     return [];
 //   }
