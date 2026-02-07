@@ -229,7 +229,7 @@
   } 
 </div>
 
-<p-dialog 
+<p-dialog appendTo="body"   
   [(visible)]="showPaymentDialog" 
   header="Record Outgoing Payment" 
   [modal]="true" 
@@ -543,7 +543,7 @@
   }
 
   Payment Dialog
-  <p-dialog 
+  <p-dialog appendTo="body"   
     [(visible)]="showPaymentDialog" 
     header="Record Outgoing Payment" 
     [modal]="true" 

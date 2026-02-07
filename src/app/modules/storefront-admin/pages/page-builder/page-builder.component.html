@@ -274,7 +274,7 @@
       </ng-template>
     </p-splitter>
 
-    <p-dialog [visible]="viewMode() === 'dialog' && !!selectedSection()" [modal]="false" [resizable]="true"
+    <p-dialog appendTo="body"   [visible]="viewMode() === 'dialog' && !!selectedSection()" [modal]="false" [resizable]="true"
       appendTo="body" [draggable]="true" [maximizable]="true" header="Configuration"
       [style]="{width: '80%', height: '70%', position: 'fixed', right: '20px', top: '80px', margin: '0'}"
       styleClass="builder-floating-panel" (onHide)="onDialogHide()">

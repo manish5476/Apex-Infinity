@@ -59,7 +59,7 @@
   </div>
 </div>
 
-<p-dialog [(visible)]="showDialog" [header]="isEditMode ? 'Edit Holiday' : 'New Holiday'" [modal]="true" [style]="{width: '450px'}">
+<p-dialog appendTo="body"   [(visible)]="showDialog" [header]="isEditMode ? 'Edit Holiday' : 'New Holiday'" [modal]="true" [style]="{width: '450px'}">
   <form [formGroup]="holidayForm" class="flex flex-col gap-4 pt-2">
     <div class="flex flex-col gap-2">
       <label class="font-medium text-sm">Holiday Name <span class="text-red-500">*</span></label>

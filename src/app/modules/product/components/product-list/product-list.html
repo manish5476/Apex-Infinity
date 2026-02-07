@@ -11,6 +11,8 @@
       </div>
     </div>
     <p-button label="New Product" icon="pi pi-plus" routerLink="create" styleClass="p-button-primary"></p-button>
+    <p-button [label]="selectedRows && selectedRows.length>0?'Edit Product': 'New Product'"
+      (onClick)="bulkDialogVisible=true" styleClass="p-button-primary"> </p-button>
   </div>
 
   <div class="themed-card">
@@ -20,50 +22,51 @@
         <label for="name">Product Name</label>
         <div class="p-input-icon-left w-full">
           <!-- <i class="pi pi-search"></i> -->
-          <input id="name" type="text" pInputText [(ngModel)]="productFilter.name" 
-            placeholder="Search by name..." class="w-full"/>
+          <input id="name" type="text" pInputText [(ngModel)]="productFilter.name" placeholder="Search by name..."
+            class="w-full" />
         </div>
       </div>
 
       <div class="se-filter-field">
         <label for="sku">SKU</label>
-        <input id="sku" type="text" pInputText [(ngModel)]="productFilter.sku" 
-          placeholder="Search by SKU" class="w-full"/>
+        <input id="sku" type="text" pInputText [(ngModel)]="productFilter.sku" placeholder="Search by SKU"
+          class="w-full" />
       </div>
 
       <div class="se-filter-field">
         <label for="brand">Brand</label>
-        <p-select appendTo="body" appendTo="body" appendTo="body" id="brand" [options]="brandOptions()" [(ngModel)]="productFilter.brand"
-          [filter]="true" optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select Brand"
-          styleClass="w-full">
+        <p-select appendTo="body" appendTo="body" appendTo="body" id="brand" [options]="brandOptions()"
+          [(ngModel)]="productFilter.brand" [filter]="true" optionLabel="name" optionValue="_id" [showClear]="true"
+          placeholder="Select Brand" styleClass="w-full">
         </p-select>
       </div>
 
       <div class="se-filter-field">
         <label for="category">Category</label>
-        <p-select appendTo="body" appendTo="body" appendTo="body" id="category" [options]="categoryOptions()" [(ngModel)]="productFilter.category"
-          [filter]="true" optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select Category"
-          styleClass="w-full">
+        <p-select appendTo="body" appendTo="body" appendTo="body" id="category" [options]="categoryOptions()"
+          [(ngModel)]="productFilter.category" [filter]="true" optionLabel="name" optionValue="_id" [showClear]="true"
+          placeholder="Select Category" styleClass="w-full">
         </p-select>
       </div>
 
       <div class="se-filter-actions">
         <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()"></p-button>
-        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary" 
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary"
           (onClick)="resetFilters()"></p-button>
       </div>
     </div>
   </div>
 
   <div class="list-grid-area themed-card">
-    <app-ag-share-grid 
-      [columns]="column" 
-      [data]="data" 
-      [showActions]="false" 
-      selectionMode="multiple"
-      (gridEvent)="eventFromGrid($event)" 
-      style="height: 100%; width: 100%; display: block;">
+    <app-ag-share-grid [columns]="column" [data]="data" [showActions]="false" selectionMode="multiple"
+      (gridEvent)="eventFromGrid($event)" style="height: 100%; width: 100%; display: block;">
     </app-ag-share-grid>
   </div>
 
 </div>
+
+<p-dialog appendTo="body" [(visible)]="bulkDialogVisible" [modal]="true" [style]="{ width: '90%', height: '90%' }"
+  header="Bulk Product Editor" styleClass="bulk-dialog" [draggable]="false" [resizable]="false" [maximizable]="true">
+  <app-bulk-product-entry [selectedData]="selectedRows">
+  </app-bulk-product-entry>
+</p-dialog>

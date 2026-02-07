@@ -118,7 +118,7 @@
 </div>
 
 <!-- Shift Dialog -->
-<p-dialog [visible]="showDialog()" [header]="(isEditMode() ? 'Edit' : 'Create') + ' Shift'" [modal]="true"
+<p-dialog appendTo="body"   [visible]="showDialog()" [header]="(isEditMode() ? 'Edit' : 'Create') + ' Shift'" [modal]="true"
   [style]="{ width: '550px' }">
   <form [formGroup]="shiftForm" class="space-y-4">
     <!-- Basic Info -->
@@ -270,7 +270,7 @@
   </div>
 </div>
 
-<p-dialog [(visible)]="showDialog" [header]="isEditMode ? 'Edit Shift' : 'New Shift'" [modal]="true" [style]="{width: '550px'}">
+<p-dialog appendTo="body"   [(visible)]="showDialog" [header]="isEditMode ? 'Edit Shift' : 'New Shift'" [modal]="true" [style]="{width: '550px'}">
   </p-dialog>
 <!-- <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
@@ -293,7 +293,7 @@
   </div>
 </div>
 
-<p-dialog [(visible)]="showDialog" [header]="isEditMode ? 'Edit Shift' : 'New Shift'" [modal]="true" [style]="{width: '550px'}">
+<p-dialog appendTo="body"   [(visible)]="showDialog" [header]="isEditMode ? 'Edit Shift' : 'New Shift'" [modal]="true" [style]="{width: '550px'}">
   <form [formGroup]="shiftForm" class="grid grid-cols-2 gap-4 pt-2">
     
     <div class="col-span-2 flex flex-col gap-2">

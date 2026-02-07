@@ -26,12 +26,11 @@ import { LoadingService } from '../../../../core/services/loading.service';
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { ChipsComponent } from '../../../shared/components/chips.component';
-
 @Component({
   selector: 'app-product-form',
   standalone: true,
   imports: [
-    CommonModule,
+    CommonModule, 
     ReactiveFormsModule,
     RouterModule,
     ToastModule,
@@ -46,8 +45,8 @@ import { ChipsComponent } from '../../../shared/components/chips.component';
     TextareaModule,
     SelectModule,
     DividerModule,
-    TooltipModule
-  ],
+    TooltipModule,
+],
   templateUrl: './product-form.html',
   styleUrls: ['./product-form.scss']
 })
@@ -60,7 +59,7 @@ export class ProductFormComponent implements OnInit {
   private messageService = inject(AppMessageService);
   private loadingService = inject(LoadingService);
   public masterList = inject(MasterListService);
-
+public bulkDialogVisible:boolean=false
   // --- Form & State ---
   productForm!: FormGroup;
   isSubmitting = signal(false);

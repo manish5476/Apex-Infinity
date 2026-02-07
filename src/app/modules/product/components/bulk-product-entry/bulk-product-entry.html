@@ -1,0 +1,60 @@
+<div class="master-page-container">
+  <div class="themed-card master-card">
+
+    <p-toolbar styleClass="master-toolbar">
+
+      <div class="p-toolbar-group-start gap-3 flex-column align-items-start">
+        <div>
+          <h2 class="section-heading m-0">Bulk Product Editor</h2>
+          <span class="text-sm text-gray-500">Create new items or Search to update existing ones</span>
+        </div>
+      </div>
+
+      <div class="p-toolbar-group-center" style="flex: 1; max-width: 500px; margin: 0 1rem;">
+        <span class="p-input-icon-left w-full">
+          <i class="pi pi-search"></i>
+          <p-autoComplete [(ngModel)]="selectedProductsToAdd" [suggestions]="filteredProducts()"
+            (completeMethod)="searchProduct($event)" (onSelect)="addExistingProducts($event)" field="name"
+            placeholder="Search products to edit..." [multiple]="true" [dropdown]="false" styleClass="w-full"
+            inputStyleClass="w-full" [forceSelection]="true" appendTo="body">
+
+            <ng-template let-product pTemplate="item">
+              <div class="flex align-items-center gap-2">
+                <div class="flex flex-col">
+                  <span class="font-bold">{{ product.name }}</span>
+                  <span class="text-xs text-gray-500">SKU: {{ product.sku || 'N/A' }} | Stock: {{ product.currentStock
+                    || 0 }}</span>
+                </div>
+              </div>
+            </ng-template>
+
+          </p-autoComplete>
+        </span>
+      </div>
+
+      <div class="p-toolbar-group-end flex gap-2">
+
+        <div class="stats mr-4 align-content-center">
+          <span class="text-sm text-gray-500 font-semibold">Rows: {{ products().length }}</span>
+        </div>
+
+        <p-button label="Clear" icon="pi pi-trash" styleClass="p-button-text p-button-danger" (click)="onClearAll()"
+          [disabled]="products().length === 0" pTooltip="Remove all rows" tooltipPosition="bottom">
+        </p-button>
+        <p-button label="Save All" icon="pi pi-check" styleClass="p-button-success" (click)="onSaveAll()"
+          [loading]="loading()">
+        </p-button>
+      </div>
+
+    </p-toolbar>
+
+    <div class="master-grid-wrapper" style="height: calc(100vh - 200px);">
+      <app-shared-grid [columns]="columns" [data]="products()" [showActions]="true" [selectionMode]="'multiple'"
+        (gridEvent)="onGridEvent($event)">
+      </app-shared-grid>
+    </div>
+
+  </div>
+</div>
+
+<p-toast></p-toast>

@@ -727,7 +727,7 @@
 </div>
 
 <!-- Punch Modal -->
-<p-dialog [visible]="showPunchModal()" header="Record Attendance" [modal]="true" [style]="{ width: '28rem' }"
+<p-dialog appendTo="body"   [visible]="showPunchModal()" header="Record Attendance" [modal]="true" [style]="{ width: '28rem' }"
   (onHide)="punchForm.reset({ type: 'in', deviceId: 'web' })">
   <form [formGroup]="punchForm">
     <div [style.display]="'flex'" [style.flex-direction]="'column'" [style.gap]="'var(--spacing-lg)'">
@@ -805,7 +805,7 @@
 </p-dialog>
 
 <!-- Regularization Modal -->
-<p-dialog [visible]="showRegularizeModal()" header="Request Regularization" [modal]="true" [style]="{ width: '32rem' }"
+<p-dialog appendTo="body"   [visible]="showRegularizeModal()" header="Request Regularization" [modal]="true" [style]="{ width: '32rem' }"
   (onHide)="regularizeForm.reset()">
   <form [formGroup]="regularizeForm">
     <div [style.display]="'flex'" [style.flex-direction]="'column'" [style.gap]="'var(--spacing-lg)'">

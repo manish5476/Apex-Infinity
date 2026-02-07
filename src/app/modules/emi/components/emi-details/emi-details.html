@@ -166,7 +166,7 @@
   }
 </div>
 
-<p-dialog header="Record Payment" [(visible)]="showPaymentDialog" [modal]="true" [style]="{width: '400px'}" [draggable]="false" [resizable]="false" styleClass="modern-dialog">
+<p-dialog appendTo="body"   header="Record Payment" [(visible)]="showPaymentDialog" [modal]="true" [style]="{width: '400px'}" [draggable]="false" [resizable]="false" styleClass="modern-dialog">
   
   @if (selectedInstallment) {
     <div class="dialog-content" [formGroup]="paymentForm">

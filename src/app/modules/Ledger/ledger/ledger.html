@@ -252,7 +252,7 @@
   </main>
 </div>
 
-<p-dialog header="Export Data" [(visible)]="showExportDialog" [modal]="true" [style]="{width: '800px'}"
+<p-dialog appendTo="body"   header="Export Data" [(visible)]="showExportDialog" [modal]="true" [style]="{width: '800px'}"
   styleClass="glass-dialog">
 
   <div [formGroup]="exportForm" class="flex flex-column gap-4 py-2">
@@ -565,7 +565,7 @@
 </div>
 
 EXPORT DIALOG
-<p-dialog header="Export Data" [(visible)]="showExportDialog" [modal]="true" [style]="{width: '800px'}"
+<p-dialog appendTo="body"   header="Export Data" [(visible)]="showExportDialog" [modal]="true" [style]="{width: '800px'}"
   styleClass="glass-dialog">
 
   <div [formGroup]="exportForm" class="flex flex-column gap-4 py-2">

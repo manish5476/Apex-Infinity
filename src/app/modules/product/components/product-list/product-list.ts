@@ -13,6 +13,8 @@ import { AppMessageService } from '../../../../core/services/message.service';
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { ImageCellRendererComponent } from '../../../shared/AgGrid/AgGridcomponents/image-cell-renderer/image-cell-renderer.component';
 import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
+import { Dialog } from "primeng/dialog";
+import { BulkProductEntry } from "../bulk-product-entry/bulk-product-entry";
 
 @Component({
   selector: 'app-product-list',
@@ -24,7 +26,9 @@ import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
     ButtonModule,
     InputTextModule,
     RouterModule,
-    AgShareGrid
+    AgShareGrid,
+    Dialog,
+    BulkProductEntry
   ],
   templateUrl: './product-list.html',
   styleUrl: './product-list.scss',
@@ -36,13 +40,13 @@ export class ProductListComponent implements OnInit {
   private masterList = inject(MasterListService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-
+  public selectedRows: any
   private gridApi!: GridApi;
   private currentPage = 1;
   private isLoading = false;
   private totalCount = 0;
   private pageSize = 50;
-
+  public bulkDialogVisible: boolean = false
   data: any[] = [];
   column: any = [];
   rowSelectionMode: any = 'single';
@@ -127,6 +131,7 @@ export class ProductListComponent implements OnInit {
   }
 
   eventFromGrid(event: any) {
+    console.log(event);
     if (event.type === 'cellClicked' && event.field === 'name') {
       const productId = event.row._id;
       if (productId) {
@@ -135,6 +140,9 @@ export class ProductListComponent implements OnInit {
     }
     if (event.type === 'reachedBottom') {
       this.onScrolledToBottom(event)
+    }
+    if (event.type === 'selectionChanged') {
+      this.selectedRows = event.rows
     }
   }
 

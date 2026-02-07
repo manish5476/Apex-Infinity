@@ -40,7 +40,7 @@
   </div>
 </div>
 
-<p-dialog [(visible)]="showRoleDialog" [modal]="true"
+<p-dialog appendTo="body"   [(visible)]="showRoleDialog" [modal]="true"
   [style]="{width: '70vw', 'min-width': '600px', 'max-height': '90vh'}"
   [header]="isEditMode ? 'Edit Role Configuration' : 'Create New Role'" (onHide)="hideDialog()" [draggable]="false"
   [resizable]="false" styleClass="role-dialog" [contentStyle]="{'overflow': 'visible'}">

@@ -53,7 +53,7 @@
   </div>
 </div>
 
-<p-dialog [visible]="showModal()" (visibleChange)="showModal.set($event)" [modal]="true" appendTo="body"
+<p-dialog appendTo="body"   [visible]="showModal()" (visibleChange)="showModal.set($event)" [modal]="true" appendTo="body"
   [dismissableMask]="true" [showHeader]="false" styleClass="premium-product-modal"
   [style]="{ width: '90vw', maxWidth: '1000px', margin: '0' }">
 
@@ -123,7 +123,7 @@
   </button>
 </div>
 
-<p-dialog 
+<p-dialog appendTo="body"   
   [(visible)]="showModal" 
   [modal]="true" 
   appendTo="body" 

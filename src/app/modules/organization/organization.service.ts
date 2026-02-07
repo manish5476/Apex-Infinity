@@ -7,18 +7,24 @@ export class OrganizationService extends BaseApiService {
   private endpoint = '/v1/organization';
   private newEndpoint = '/v1/neworganization';
 
-  getMyOrganization(): Observable<any> {
-    return this.get(`${this.endpoint}/my-organization`, {}, 'getMyOrganization');
-  }
-
   createNewOrganization(data: any): Observable<any> {
     return this.post<any>('/v1/organization/create', data, 'createNewOrganization');
+  }
+
+  getMyOrganization(): Observable<any> {
+    return this.get(`${this.endpoint}/my-organization`, {}, 'getMyOrganization');
   }
 
   updateMyOrganization(data: any): Observable<any> {
     return this.patch(`${this.endpoint}/my-organization`, data, 'updateMyOrganization');
   }
 
+  deleteMyOrganization(data: any): Observable<any> {
+    return this.delete(`${this.endpoint}/my-organization`, {}, 'updateMyOrganization');
+  }
+
+
+  // user section       
   getPendingMembers(): Observable<any> {
     return this.get(`${this.endpoint}/pending-members`, {}, 'getPendingMembers');
   }
@@ -47,7 +53,7 @@ export class OrganizationService extends BaseApiService {
   }
 
   deleteOrganization(id: string): Observable<any> {
-    return this.delete(`${this.endpoint}/${id}`,null, 'deleteOrganization');
+    return this.delete(`${this.endpoint}/${id}`, null, 'deleteOrganization');
   }
 
   // ---------------------------------------------------
@@ -63,7 +69,7 @@ export class OrganizationService extends BaseApiService {
   }
 
   removeMember(memberId: string): Observable<any> {
-    return this.delete(`${this.newEndpoint}/members/${memberId}`,null, 'removeMember');
+    return this.delete(`${this.newEndpoint}/members/${memberId}`, null, 'removeMember');
   }
 
   getActivityLog(): Observable<any> {

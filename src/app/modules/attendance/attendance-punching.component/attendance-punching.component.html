@@ -363,7 +363,7 @@
 </div>
 
 <!-- Emergency Dialog -->
-<p-dialog header="Report Issue" [visible]="showEmergencyDialog()" [modal]="true" [style]="{ width: '450px' }"
+<p-dialog appendTo="body"   header="Report Issue" [visible]="showEmergencyDialog()" [modal]="true" [style]="{ width: '450px' }"
   [style.background]="'var(--bg-secondary)'" [style.box-shadow]="'var(--shadow-xl)'">
   <div class="space-y-4 pt-2">
     <p [style.color]="'var(--text-tertiary)'" [style.font-size]="'var(--font-size-sm)'"
@@ -771,7 +771,7 @@
   </div>
 </div>
 
-<p-dialog header="Report Issue" [visible]="showEmergencyDialog()" [modal]="true" [style]="{ width: '450px' }"
+<p-dialog appendTo="body"   header="Report Issue" [visible]="showEmergencyDialog()" [modal]="true" [style]="{ width: '450px' }"
           [style.background]="'var(--theme-bg-secondary)'"
           [style.box-shadow]="'var(--shadow-xl)'">
   <div class="space-y-4 pt-2">

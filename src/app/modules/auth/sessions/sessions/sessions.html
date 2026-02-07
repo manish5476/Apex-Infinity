@@ -39,7 +39,7 @@
 
 </div>
 
-<p-dialog header="Session Details" [(visible)]="displayDialog" [modal]="true" styleClass="glass-dialog"
+<p-dialog appendTo="body"   header="Session Details" [(visible)]="displayDialog" [modal]="true" styleClass="glass-dialog"
   [draggable]="false" [resizable]="false">
 
   @if (selectedSession) {

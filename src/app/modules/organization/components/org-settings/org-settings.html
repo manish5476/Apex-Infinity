@@ -173,7 +173,7 @@
   }
 </div>
 
-<p-dialog header="Invite Member" [(visible)]="showInviteDialog" [modal]="true" [style]="{width: '90vw', maxWidth: '450px'}">
+<p-dialog appendTo="body"   header="Invite Member" [(visible)]="showInviteDialog" [modal]="true" [style]="{width: '90vw', maxWidth: '450px'}">
   <form [formGroup]="inviteForm" class="flex flex-col gap-4 mt-3">
     <div class="field"><label>Name</label><input pInputText formControlName="name" class="w-full"/></div>
     <div class="field"><label>Email</label><input pInputText formControlName="email" class="w-full"/></div>
@@ -182,7 +182,7 @@
   <ng-template pTemplate="footer"><button pButton label="Send" (click)="inviteUser()" [loading]="isSaving()"></button></ng-template>
 </p-dialog>
 
-<p-dialog header="Transfer Ownership" [(visible)]="showTransferDialog" [modal]="true" [style]="{width: '90vw', maxWidth: '500px'}">
+<p-dialog appendTo="body"   header="Transfer Ownership" [(visible)]="showTransferDialog" [modal]="true" [style]="{width: '90vw', maxWidth: '500px'}">
   <form [formGroup]="transferForm" class="flex flex-col gap-4 mt-3">
     <div class="field"><label>New Owner</label><select formControlName="newOwnerId" class="w-full p-2 border rounded">@for (m of activeMembers(); track m._id) { @if(m._id !== organization().owner._id) { <option [value]="m._id">{{m.name}}</option> } }</select></div>
     <div class="field"><label>Type <b>CONFIRM</b></label><input pInputText formControlName="confirmName" class="w-full"/></div>

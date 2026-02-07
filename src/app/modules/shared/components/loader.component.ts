@@ -6,33 +6,27 @@ import { LoadingService } from '../../../core/services/loading.service';
   selector: 'app-loading',
   standalone: true,
   imports: [CommonModule],
-  encapsulation: ViewEncapsulation.None, 
+  encapsulation: ViewEncapsulation.None,
   template: `
     @if (loadingService.isLoading$ | async) {
       <div class="apex-loader-overlay">
-        
         <div class="apex-glass-card animate-enter">
-          
           <div class="stars-layer">
             <div class="star s1"></div><div class="star s2"></div>
             <div class="star s3"></div><div class="star s4"></div>
             <div class="star s5"></div><div class="star s6"></div>
           </div>
-
           <div class="spinner-container">
              <div class="wave-loader"></div>
           </div>
-
           <div class="content-section">
-            <h1 class="brand-title">Apex Infinity</h1>
+            <h1 class="brand-title">{{organination}}</h1>
             <p class="sub-message">{{ currentText }}</p>
           </div>
-
           <button class="dismiss-btn" (click)="forceClose()">
             <span>Dismiss</span>
           </button>
         </div>
-
       </div>
     }
   `,
@@ -191,13 +185,15 @@ import { LoadingService } from '../../../core/services/loading.service';
 })
 export class LoadingComponent implements OnInit, OnDestroy {
   public loadingService = inject(LoadingService);
-  
+
   loadingTexts = ["Synchronizing...", "Securing Data...", "Apex Infinity AI..."];
   currentText = '';
+  organination: any = "Welcome"
   private intervalId: any;
 
   ngOnInit() {
     this.rotateText();
+    this.organination = window.localStorage.getItem('orgSlug')
     this.intervalId = setInterval(() => this.rotateText(), 2000);
   }
 
