@@ -1,0 +1,124 @@
+@import './dialog-theme'; // Ensure this points to your shared mixin
+
+:host {
+  @include prime-dialog-theme;
+  display: block;
+}
+
+.dialog-body {
+  padding: var(--spacing-sm) 0;
+}
+
+.form-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xl);
+}
+
+/* =========================================
+   VISUAL TRANSFER INDICATOR (New)
+   ========================================= */
+.transfer-visual {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--ui-border-radius-lg);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  margin-bottom: var(--spacing-md);
+
+  .node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+    
+    .icon-circle {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition-base);
+    }
+
+    span {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+    }
+
+    &.active .icon-circle {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: white;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+    }
+  }
+
+  .flow-line {
+    flex: 1;
+    height: 2px;
+    background: var(--border-secondary);
+    margin: 0 var(--spacing-lg);
+    position: relative;
+    margin-bottom: 14px; // Align with icons
+
+    .moving-dot {
+      width: 6px; height: 6px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      animation: moveRight 1.5s infinite ease-in-out;
+    }
+  }
+}
+
+@keyframes moveRight {
+  0% { left: 0; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
+}
+
+/* =========================================
+   FORM GRID & LAYOUT
+   ========================================= */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-xl);
+
+  @media(min-width: 640px) {
+    grid-template-columns: 1fr 1fr; // Side-by-side on desktop
+  }
+}
+
+.helper-text {
+  margin-top: 6px;
+  font-size: var(--font-size-xs);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  
+  &.error {
+    color: var(--color-error);
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border-secondary);
+}

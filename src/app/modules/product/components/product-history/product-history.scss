@@ -1,0 +1,97 @@
+:host {
+  display: block;
+  background: var(--bg-primary);
+  border-radius: var(--ui-border-radius-lg);
+  border: 1px solid var(--border-secondary);
+  overflow: hidden;
+}
+
+.history-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Toolbar */
+.history-toolbar {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--border-secondary);
+  background: var(--bg-secondary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .date-filter {
+    width: 240px;
+    ::ng-deep input {
+      padding-left: 2.5rem; // Space for icon
+      font-size: var(--font-size-sm);
+    }
+  }
+}
+
+/* Table Wrapper */
+.table-wrapper {
+  padding: 0;
+  background: var(--bg-primary);
+}
+
+/* Modern Table Styles */
+::ng-deep .modern-table {
+  .p-datatable-header { display: none; }
+  
+  .p-datatable-thead > tr > th {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-bottom: 1px solid var(--border-secondary);
+  }
+
+  .p-datatable-tbody > tr > td {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border-primary);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    vertical-align: middle;
+  }
+
+  .p-datatable-tbody > tr:hover {
+    background: var(--bg-hover) !important;
+  }
+}
+
+/* Cell Specifics */
+.date-cell {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+  
+  .date { font-weight: 600; color: var(--text-primary); }
+  .time { font-size: 10px; color: var(--text-tertiary); }
+}
+
+.desc-cell {
+  display: flex;
+  flex-direction: column;
+  
+  .primary-text { font-weight: 500; }
+  .sub-text { font-size: 11px; color: var(--text-tertiary); font-style: italic;}
+}
+
+.font-mono { font-family: var(--font-mono); }
+.text-secondary { color: var(--text-secondary); }
+.text-right { text-align: right; }
+.text-red-500 { color: var(--color-error); }
+.text-green-600 { color: var(--color-success); }
+
+.empty-state {
+  padding: var(--spacing-3xl);
+  text-align: center;
+  color: var(--text-tertiary);
+  
+  i { font-size: 2rem; margin-bottom: var(--spacing-sm); opacity: 0.5; }
+  p { font-size: var(--font-size-sm); margin: 0; }
+}

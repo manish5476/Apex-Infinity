@@ -1,0 +1,103 @@
+@import './dialog-theme'; // Path to your mixin
+
+:host {
+  @include prime-dialog-theme; // Apply the global overrides
+  display: block;
+}
+
+.form-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xl); // Generous spacing between groups
+  padding-top: var(--spacing-md);
+}
+
+// A visual card to summarize the action
+.impact-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  border-radius: var(--ui-border-radius-lg);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  margin-bottom: var(--spacing-xl);
+
+  &.type-add {
+    background: var(--color-success-bg);
+    border-color: var(--color-success-border);
+    .icon-box { color: var(--color-success); background: var(--bg-primary); }
+    .text-content h4 { color: var(--color-success-dark); }
+  }
+
+  &.type-subtract {
+    background: var(--color-error-bg);
+    border-color: var(--color-error-border);
+    .icon-box { color: var(--color-error); background: var(--bg-primary); }
+    .text-content h4 { color: var(--color-error-dark); }
+  }
+
+  .icon-box {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--ui-border-radius);
+    box-shadow: var(--shadow-sm);
+    font-size: var(--font-size-xl);
+  }
+
+  .text-content {
+    h4 {
+      margin: 0;
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    p {
+      margin: 0;
+      font-size: var(--font-size-xs);
+      color: var(--text-secondary);
+    }
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-xl);
+  
+  @media (min-width: 640px) {
+    grid-template-columns: 1fr 1fr; // 2 columns on tablet+
+  }
+}
+
+.helper-text {
+  margin-top: var(--spacing-xs);
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  
+  &.error {
+    color: var(--color-error);
+    animation: fadeIn 0.3s ease;
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-2xl);
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--border-secondary);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
