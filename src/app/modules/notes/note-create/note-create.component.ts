@@ -4,11 +4,12 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NoteAttachment } from '../../../core/models/note.types';
 import { NoteService } from '../../../core/services/notes.service';
+import { DatePicker } from 'primeng/datepicker'; // Import DatePicker
 
 @Component({
   selector: 'app-note-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, DatePicker], // Add to imports
   templateUrl: './note-create.component.html',
   styleUrls: ['./note-create.component.scss']
 })
@@ -30,8 +31,9 @@ export class NoteCreateComponent {
     priority: ['medium'],
     category: [''],
     tags: [''],
-    startDate: [null as string | null],
-    dueDate: [null as string | null],
+    // DatePickers return Date objects, initialize as null
+    startDate: [null as Date | null],
+    dueDate: [null as Date | null],
     meetingDetails: this.fb.group({
       videoLink: [''],
       location: ['']
@@ -57,10 +59,9 @@ export class NoteCreateComponent {
 
     this.noteService.uploadMedia(files).subscribe({
       next: (response) => {
-        // Append new files to existing array
         this.uploadedAttachments.update(curr => [...curr, ...response.data]);
         this.isUploading.set(false);
-        input.value = ''; // Reset input so same file can be selected again if needed
+        input.value = ''; 
       },
       error: (err) => {
         console.error('Upload failed', err);
@@ -93,11 +94,14 @@ export class NoteCreateComponent {
       ...formVal,
       tags: tagArray,
       attachments: this.uploadedAttachments(),
-      // Auto-set meeting flag if type is meeting
       isMeeting: formVal.noteType === 'meeting'
     };
 
-    // 3. Clean Empty Dates (Backend will error on empty strings)
+    // 3. Clean Empty Dates & Convert if needed
+    // PrimeNG returns Date objects, ensure backend receives ISO string if required
+    if (payload.startDate instanceof Date) payload.startDate = payload.startDate.toISOString();
+    if (payload.dueDate instanceof Date) payload.dueDate = payload.dueDate.toISOString();
+    
     if (!payload.startDate) delete payload.startDate;
     if (!payload.dueDate) delete payload.dueDate;
 
@@ -116,7 +120,7 @@ export class NoteCreateComponent {
 
 // import { Component, inject, signal } from '@angular/core';
 // import { CommonModule } from '@angular/common';
-// import { FormBuilder, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
+// import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 // import { Router } from '@angular/router';
 // import { NoteAttachment } from '../../../core/models/note.types';
 // import { NoteService } from '../../../core/services/notes.service';
@@ -133,33 +137,29 @@ export class NoteCreateComponent {
 //   private noteService = inject(NoteService);
 //   private router = inject(Router);
 
-//   // Signals for UI State
+//   // Signals
 //   isSubmitting = signal(false);
 //   isUploading = signal(false);
 //   uploadedAttachments = signal<NoteAttachment[]>([]);
-//   activeTab = signal<'details' | 'meeting'>('details'); // Toggle for advanced fields
 
-//   // Main Form
+//   // Form
 //   noteForm = this.fb.group({
 //     title: ['', [Validators.required, Validators.maxLength(100)]],
 //     content: ['', [Validators.required]],
 //     noteType: ['note'],
 //     priority: ['medium'],
 //     category: [''],
-//     tags: [''], // Comma separated string for input
-//     startDate: [null],
-//     dueDate: [null],
-//     // Meeting specific fields (optional group)
+//     tags: [''],
+//     startDate: [null as string | null],
+//     dueDate: [null as string | null],
 //     meetingDetails: this.fb.group({
-//       link: [''],
+//       videoLink: [''],
 //       location: ['']
 //     })
 //   });
 
-//   // Priorities for dropdown
 //   priorities = ['low', 'medium', 'high', 'urgent'];
   
-//   // Note Types
 //   noteTypes = [
 //     { value: 'note', label: '📝 Note' },
 //     { value: 'task', label: '✅ Task' },
@@ -168,7 +168,6 @@ export class NoteCreateComponent {
 //     { value: 'project', label: '🚀 Project' }
 //   ];
 
-//   /** Handle File Selection & Immediate Upload */
 //   async onFileSelected(event: Event) {
 //     const input = event.target as HTMLInputElement;
 //     if (!input.files?.length) return;
@@ -176,29 +175,25 @@ export class NoteCreateComponent {
 //     this.isUploading.set(true);
 //     const files = Array.from(input.files);
 
-//     try {
-//       this.noteService.uploadMedia(files).subscribe({
-//         next: (response) => {
-//           // Add new uploads to existing list
-//           this.uploadedAttachments.update(current => [...current, ...response.data]);
-//           this.isUploading.set(false);
-//         },
-//         error: (err) => {
-//           console.error('Upload failed', err);
-//           this.isUploading.set(false);
-//         }
-//       });
-//     } catch (e) {
-//       this.isUploading.set(false);
-//     }
+//     this.noteService.uploadMedia(files).subscribe({
+//       next: (response) => {
+//         // Append new files to existing array
+//         this.uploadedAttachments.update(curr => [...curr, ...response.data]);
+//         this.isUploading.set(false);
+//         input.value = ''; // Reset input so same file can be selected again if needed
+//       },
+//       error: (err) => {
+//         console.error('Upload failed', err);
+//         this.isUploading.set(false);
+//         alert('Failed to upload file. Please try again.');
+//       }
+//     });
 //   }
 
-//   /** Remove an uploaded attachment */
 //   removeAttachment(index: number) {
 //     this.uploadedAttachments.update(files => files.filter((_, i) => i !== index));
 //   }
 
-//   /** Submit Form */
 //   onSubmit() {
 //     if (this.noteForm.invalid) {
 //       this.noteForm.markAllAsTouched();
@@ -208,30 +203,31 @@ export class NoteCreateComponent {
 //     this.isSubmitting.set(true);
 //     const formVal = this.noteForm.value;
 
-//     // Process Tags
+//     // 1. Handle Tags
 //     const tagArray = formVal.tags 
-//       ? formVal.tags.split(',').map(t => t.trim()).filter(t => t.length > 0) 
+//       ? formVal.tags.split(',').map(t => t.trim()).filter(Boolean) 
 //       : [];
 
-//     // Construct Payload
+//     // 2. Construct Payload
 //     const payload: any = {
 //       ...formVal,
 //       tags: tagArray,
-//       attachments: this.uploadedAttachments(), // Attach the uploaded file metadata
+//       attachments: this.uploadedAttachments(),
+//       // Auto-set meeting flag if type is meeting
 //       isMeeting: formVal.noteType === 'meeting'
 //     };
 
-//     // Clean up empty dates
+//     // 3. Clean Empty Dates (Backend will error on empty strings)
 //     if (!payload.startDate) delete payload.startDate;
 //     if (!payload.dueDate) delete payload.dueDate;
 
 //     this.noteService.createNote(payload).subscribe({
-//       next: (res) => {
+//       next: () => {
 //         this.isSubmitting.set(false);
-//         this.router.navigate(['/notes']); // Redirect to list
+//         this.router.navigate(['/notes']);
 //       },
 //       error: (err) => {
-//         console.error('Creation failed', err);
+//         console.error(err);
 //         this.isSubmitting.set(false);
 //       }
 //     });

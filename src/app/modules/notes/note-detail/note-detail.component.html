@@ -1,395 +1,214 @@
 <div class="detail-container">
-  
+
   @if (isLoading()) {
-    <div class="loading-overlay">
-      <div class="spinner"></div>
-    </div>
+  <div class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
   }
 
   @if (note(); as note) {
-    
-    @if (isTrash()) {
-      <div class="system-banner danger">
-        <span>🗑️ This note is in the trash.</span>
-        <button (click)="restoreNote()">Restore Note</button>
-      </div>
-    }
-    @if (isArchived()) {
-      <div class="system-banner warning">
-        <span>🗄️ This note is archived.</span>
-        <button (click)="restoreNote()">Unarchive</button>
-      </div>
-    }
 
-    <header class="detail-header">
-      <div class="left-nav">
-        <button class="btn-back" routerLink="/notes">← Back to Notes</button>
-      </div>
-      
-      <div class="actions">
-        <span class="status-badge" [ngClass]="note.status">{{ note.status | titlecase }}</span>
-
-        @if (!isEditing()) {
-          <button class="btn-icon" (click)="duplicateNote()" title="Duplicate">📑</button>
-          
-          @if (!isTrash() && !isArchived()) {
-            <button class="btn-icon" (click)="convertToTask()" title="Convert to Task">✅</button>
-            <button class="btn-icon" (click)="archiveNote()" title="Archive">🗄️</button>
-            <button class="btn-secondary" (click)="toggleEdit()">✏️ Edit Note</button>
-            <button class="btn-danger-icon" (click)="deleteNote()" title="Move to Trash">🗑️</button>
-          }
-
-          @if (isTrash()) {
-             <button class="btn-danger" (click)="deleteNote()">Permanent Delete</button>
-          }
-        }
-
-        @if (isEditing()) {
-          <button class="btn-ghost" (click)="toggleEdit()">Cancel</button>
-          <button class="btn-primary" (click)="saveChanges()" [disabled]="isSaving()">
-            {{ isSaving() ? 'Saving...' : 'Save Changes' }}
-          </button>
-        }
-      </div>
-    </header>
-
-    @if (note.noteType === 'meeting') {
-      <div class="meeting-banner glass-panel">
-         <div class="meeting-info">
-            <span class="meeting-pill">📅 Meeting Note</span>
-            @if (note.meetingDetails?.location) { <span>📍 {{ note.meetingDetails?.location }}</span> }
-         </div>
-      </div>
-    }
-
-    <div class="content-grid">
-      
-      <main class="main-panel glass-panel" [class.editing]="isEditing()">
-        
-        @if (!isEditing()) {
-          <h1 class="note-title">{{ note.title }}</h1>
-          
-          <div class="meta-row">
-            <span class="priority-tag" [ngClass]="note.priority">{{ note.priority }} Priority</span>
-            <span class="date-meta">Created on {{ note.createdAt | date:'mediumDate' }}</span>
-          </div>
-
-          <div class="note-body" [innerHTML]="note.content"></div>
-
-          <div class="subtasks-section">
-            <div class="section-header">
-              <h3>Subtasks</h3>
-              @if (note.subtasks?.length) {
-                <span class="progress-text">{{ progress() }}% Completed</span>
-              }
-            </div>
-            
-            @if (note.subtasks?.length) {
-              <div class="progress-track">
-                <div class="progress-fill" [style.width.%]="progress()"></div>
-              </div>
-            }
-
-            <div class="subtask-list">
-               @for (task of note.subtasks; track task._id) {
-                 <div class="subtask-item">
-                    <input type="checkbox" 
-                           [checked]="task.completed" 
-                           (change)="toggleSubtask(task)"
-                           [id]="task._id">
-                    <label [for]="task._id" [class.completed]="task.completed">
-                      {{ task.title }}
-                    </label>
-                    <button class="btn-remove-task" (click)="deleteSubtask(task._id!)">×</button>
-                 </div>
-               }
-            </div>
-
-            <div class="add-subtask-row">
-               <input #taskInput 
-                      type="text" 
-                      placeholder="+ Add a new subtask..." 
-                      (keyup.enter)="addSubtask(taskInput)">
-               <button (click)="addSubtask(taskInput)">Add</button>
-            </div>
-          </div>
-
-          @if (note.tags?.length) {
-            <div class="tags-row">
-              @for (tag of note.tags; track tag) {
-                <span class="tag">#{{ tag }}</span>
-              }
-            </div>
-          }
-        }
-
-        @if (isEditing()) {
-          <form [formGroup]="editForm" class="edit-form">
-            <label class="field-label">Title</label>
-            <input type="text" formControlName="title" class="input-lg">
-            
-            <div class="form-row">
-               <div class="field-group">
-                   <label class="field-label">Priority Level</label>
-                   <select formControlName="priority" class="input-std">
-                       <option value="low">Low</option>
-                       <option value="medium">Medium</option>
-                       <option value="high">High</option>
-                       <option value="urgent">Urgent</option>
-                   </select>
-               </div>
-               <div class="field-group">
-                   <label class="field-label">Start Date</label>
-                   <input type="date" formControlName="startDate" class="input-std">
-               </div>
-            </div>
-            
-            <label class="field-label">Content</label>
-            <textarea formControlName="content" class="textarea-lg"></textarea>
-          </form>
-        }
-
-      </main>
-
-      <aside class="sidebar-panel">
-        
-        <div class="widget glass-panel">
-          <h3>Attachments ({{ note.attachments.length || 0 }})</h3>
-          @if (note.attachments.length) {
-            <ul class="file-list">
-              @for (file of note.attachments; track file.fileName) {
-                <li (click)="downloadAttachment(file)">
-                  <span class="icon">📄</span>
-                  <div class="file-info">
-                    <span class="name">{{ file.fileName }}</span>
-                    <span class="size">{{ file.size / 1024 | number:'1.0-0' }} KB</span>
-                  </div>
-                </li>
-              }
-            </ul>
-          } @else {
-            <div class="empty-widget">No files attached</div>
-          }
-        </div>
-
-        <div class="widget glass-panel">
-          <h3>Collaborators</h3>
-          <div class="avatars">
-             <div class="avatar-row">
-               <div class="avatar owner" [title]="note.owner.name">👑</div>
-               <span>{{ note.owner.name || 'Unknown' }} <span class="role">(Owner)</span></span>
-             </div>
-             @for (p of note.participants; track p._id) {
-               <div class="avatar-row">
-                 <div class="avatar">{{ p.user.name.charAt(0) }}</div>
-                 <span>{{ p.user.name }}</span>
-               </div>
-             }
-          </div>
-        </div>
-
-        <div class="widget glass-panel history-widget">
-          <h3>Activity Log</h3>
-          <div class="activity-list">
-            @for (log of activityLog(); track log.timestamp) {
-              <div class="activity-item">
-                 <div class="dot"></div>
-                 <div class="log-content">
-                   <span class="log-action">{{ log.action }}</span>
-                   <span class="log-user">by {{ log.user?.name || 'System' }}</span>
-                   <span class="log-time">{{ log.timestamp | date:'short' }}</span>
-                 </div>
-              </div>
-            }
-            @if (activityLog().length === 0) {
-               <div class="empty-widget">No recent history</div>
-            }
-          </div>
-        </div>
-
-      </aside>
-    </div>
-  } 
-  @if (!isLoading() && !note()) {
-    <div class="empty-state">
-      <p>Note not found.</p>
-      <button class="btn-primary" routerLink="/notes">Back to Notes</button>
-    </div>
+  @if (isTrash()) {
+  <div class="system-banner danger">
+    <span>🗑️ This note is in the trash.</span>
+    <button (click)="restoreNote()">Restore Note</button>
+  </div>
   }
-
-</div><!-- <div class="detail-container" *ngIf="note() as note">
-  
-  <div class="loading-overlay" *ngIf="isLoading()">
-    <div class="spinner"></div>
-  </div>
-
-  <div class="system-banner danger" *ngIf="isTrash()">
-    🗑️ This note is in the trash.
-    <button (click)="restoreNote()">Restore</button>
-  </div>
-  <div class="system-banner warning" *ngIf="isArchived()">
-    🗄️ This note is archived.
+  @if (isArchived()) {
+  <div class="system-banner warning">
+    <span>🗄️ This note is archived.</span>
     <button (click)="restoreNote()">Unarchive</button>
   </div>
+  }
 
   <header class="detail-header">
     <div class="left-nav">
-      <button class="btn-back" routerLink="/notes">← Back</button>
+      <button class="btn-back" routerLink="/notes">← Back to Notes</button>
     </div>
-    
+
     <div class="actions">
       <span class="status-badge" [ngClass]="note.status">{{ note.status | titlecase }}</span>
 
-      <ng-container *ngIf="!isEditing()">
-        <button class="btn-icon" (click)="duplicateNote()" title="Duplicate">📑</button>
-        
-        <ng-container *ngIf="!isTrash() && !isArchived()">
-          <button class="btn-icon" (click)="convertToTask()" title="Convert to Task">✅</button>
-          <button class="btn-icon" (click)="archiveNote()" title="Archive">🗄️</button>
-          <button class="btn-secondary" (click)="toggleEdit()">✏️ Edit</button>
-          <button class="btn-danger-icon" (click)="deleteNote()" title="Move to Trash">🗑️</button>
-        </ng-container>
+      @if (!isEditing()) {
+      <button class="btn-icon" (click)="duplicateNote()" title="Duplicate">📑</button>
 
-        <ng-container *ngIf="isTrash()">
-           <button class="btn-danger" (click)="deleteNote()">Permanent Delete</button>
-        </ng-container>
-      </ng-container>
+      @if (!isTrash() && !isArchived()) {
+      <button class="btn-icon" (click)="convertToTask()" title="Convert to Task">✅</button>
+      <button class="btn-icon" (click)="archiveNote()" title="Archive">🗄️</button>
+      <button class="btn-secondary" (click)="toggleEdit()">✏️ Edit Note</button>
+      <button class="btn-danger-icon" (click)="deleteNote()" title="Move to Trash">🗑️</button>
+      }
 
-      <ng-container *ngIf="isEditing()">
-        <button class="btn-ghost" (click)="toggleEdit()">Cancel</button>
-        <button class="btn-primary" (click)="saveChanges()" [disabled]="isSaving()">
-          {{ isSaving() ? 'Saving...' : 'Save Changes' }}
-        </button>
-      </ng-container>
+      @if (isTrash()) {
+      <button class="btn-danger" (click)="deleteNote()">Permanent Delete</button>
+      }
+      }
+
+      @if (isEditing()) {
+      <button class="btn-ghost" (click)="toggleEdit()">Cancel</button>
+      <button class="btn-primary" (click)="saveChanges()" [disabled]="isSaving()">
+        {{ isSaving() ? 'Saving...' : 'Save Changes' }}
+      </button>
+      }
     </div>
   </header>
 
-  <div class="meeting-banner glass-panel" *ngIf="note.noteType === 'meeting'">
-     <div class="meeting-info">
-        </div>
+  @if (note.noteType === 'meeting') {
+  <div class="meeting-banner glass-panel">
+    <div class="meeting-info">
+      <span class="meeting-pill">📅 Meeting Note</span>
+      @if (note.meetingDetails?.location) { <span>📍 {{ note.meetingDetails?.location }}</span> }
+    </div>
   </div>
+  }
 
   <div class="content-grid">
-    
+
     <main class="main-panel glass-panel" [class.editing]="isEditing()">
-      
-      <ng-container *ngIf="!isEditing()">
-        <h1 class="note-title">{{ note.title }}</h1>
-        
-        <div class="meta-row">
-          <span class="priority-tag" [ngClass]="note.priority">{{ note.priority }}</span>
-          <span class="date-meta">Created {{ note.createdAt | date:'mediumDate' }}</span>
+
+      @if (!isEditing()) {
+      <h1 class="note-title">{{ note.title }}</h1>
+
+      <div class="meta-row">
+        <span class="priority-tag" [ngClass]="note.priority">{{ note.priority }} Priority</span>
+        <span class="date-meta">Created on {{ note.createdAt | date:'mediumDate' }}</span>
+      </div>
+
+      <div class="note-body" [innerHTML]="note.content"></div>
+
+      <div class="subtasks-section">
+        <div class="section-header">
+          <h3>Subtasks</h3>
+          @if (note.subtasks?.length) {
+          <span class="progress-text">{{ progress() }}% Completed</span>
+          }
         </div>
 
-        <div class="note-body" [innerHTML]="note.content"></div>
+        @if (note.subtasks?.length) {
+        <div class="progress-track">
+          <div class="progress-fill" [style.width.%]="progress()"></div>
+        </div>
+        }
 
-        <div class="subtasks-section">
-          <div class="section-header">
-            <h3>Subtasks</h3>
-            <span class="progress-text" *ngIf="note.subtasks?.length">
-                {{ progress() }}% Done
-            </span>
+        <div class="subtask-list">
+          @for (task of note.subtasks; track task._id) {
+          <div class="subtask-item">
+            <input type="checkbox" [checked]="task.completed" (change)="toggleSubtask(task)" [id]="task._id">
+            <label [for]="task._id" [class.completed]="task.completed">
+              {{ task.title }}
+            </label>
+            <button class="btn-remove-task" (click)="deleteSubtask(task._id!)">×</button>
           </div>
-          
-          <div class="progress-track" *ngIf="note.subtasks?.length">
-            <div class="progress-fill" [style.width.%]="progress()"></div>
-          </div>
-
-          <div class="subtask-list">
-             <div class="subtask-item" *ngFor="let task of note.subtasks">
-                <input type="checkbox" 
-                       [checked]="task.completed" 
-                       (change)="toggleSubtask(task)"
-                       [id]="task._id">
-                <label [for]="task._id" [class.completed]="task.completed">
-                  {{ task.title }}
-                </label>
-                <button class="btn-remove-task" (click)="deleteSubtask(task._id!)">×</button>
-             </div>
-          </div>
-
-          <div class="add-subtask-row">
-             <input #taskInput 
-                    type="text" 
-                    placeholder="+ Add a subtask..." 
-                    (keyup.enter)="addSubtask(taskInput)">
-             <button (click)="addSubtask(taskInput)">Add</button>
-          </div>
+          }
         </div>
 
-        <div class="tags-row" *ngIf="note.tags?.length">
-          <span class="tag" *ngFor="let tag of note.tags">#{{ tag }}</span>
+        <div class="add-subtask-row">
+          <input #taskInput type="text" placeholder="+ Add a new subtask..." (keyup.enter)="addSubtask(taskInput)">
+          <button (click)="addSubtask(taskInput)">Add</button>
         </div>
-      </ng-container>
+      </div>
 
-      <form [formGroup]="editForm" *ngIf="isEditing()" class="edit-form">
+      @if (note.tags?.length) {
+      <div class="tags-row">
+        @for (tag of note.tags; track tag) {
+        <span class="tag">#{{ tag }}</span>
+        }
+      </div>
+      }
+      }
+
+      @if (isEditing()) {
+      <form [formGroup]="editForm" class="edit-form">
         <label class="field-label">Title</label>
         <input type="text" formControlName="title" class="input-lg">
-        
+
         <div class="form-row">
-           <div class="field-group">
-               <label>Priority</label>
-               <select formControlName="priority" class="input-std">
-                   <option value="low">Low</option>
-                   <option value="medium">Medium</option>
-                   <option value="high">High</option>
-                   <option value="urgent">Urgent</option>
-               </select>
-           </div>
+          <div class="field-group">
+            <label class="field-label">Priority Level</label>
+            <select formControlName="priority" class="input-std">
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Start Date</label>
+            <input type="date" formControlName="startDate" class="input-std">
+          </div>
         </div>
-        
+
         <label class="field-label">Content</label>
         <textarea formControlName="content" class="textarea-lg"></textarea>
       </form>
+      }
 
     </main>
 
     <aside class="sidebar-panel">
-      
+
       <div class="widget glass-panel">
         <h3>Attachments ({{ note.attachments.length || 0 }})</h3>
-        <ul class="file-list" *ngIf="note.attachments.length">
-          <li *ngFor="let file of note.attachments" (click)="downloadAttachment(file)">
+        @if (note.attachments.length) {
+        <ul class="file-list">
+          @for (file of note.attachments; track file.fileName) {
+          <li (click)="downloadAttachment(file)">
             <span class="icon">📄</span>
             <div class="file-info">
               <span class="name">{{ file.fileName }}</span>
               <span class="size">{{ file.size / 1024 | number:'1.0-0' }} KB</span>
             </div>
           </li>
+          }
         </ul>
-        </div>
+        } @else {
+        <div class="empty-widget">No files attached</div>
+        }
+      </div>
 
       <div class="widget glass-panel">
-        <h3>Shared With</h3>
+        <h3>Collaborators</h3>
         <div class="avatars">
-           <div class="avatar-row">
-             <div class="avatar owner" [title]="note.owner.name">👑</div>
-             <span>{{ note.owner.name }}</span>
-           </div>
-           <div class="avatar-row" *ngFor="let p of note.participants">
-             <div class="avatar">{{ p.user.name.charAt(0) }}</div>
-             <span>{{ p.user.name }}</span>
-           </div>
+          <div class="avatar-row">
+            <div class="avatar owner" [title]="note.owner.name">👑</div>
+            <span>{{ note.owner.name || 'Unknown' }} <span class="role">(Owner)</span></span>
+          </div>
+          @for (p of note.participants; track p._id) {
+          <div class="avatar-row">
+            <div class="avatar">{{ p.user.name.charAt(0) }}</div>
+            <span>{{ p.user.name }}</span>
+          </div>
+          }
         </div>
       </div>
 
       <div class="widget glass-panel history-widget">
-        <h3>History</h3>
+        <h3>Activity Log</h3>
         <div class="activity-list">
-          <div class="activity-item" *ngFor="let log of activityLog()">
-             <div class="dot"></div>
-             <div class="log-content">
-               <span class="log-action">{{ log.action }}</span>
-               <span class="log-user">by {{ log.user.name || 'User' }}</span>
-               <span class="log-time">{{ log.timestamp | date:'short' }}</span>
-             </div>
+          @for (log of activityLog(); track log.timestamp) {
+          <div class="activity-item">
+            <div class="dot"></div>
+            <div class="log-content">
+              <span class="log-action">{{ log.action }}</span>
+              <span class="log-user">by {{ log.user?.name || 'System' }}</span>
+              <span class="log-time">{{ log.timestamp | date:'short' }}</span>
+            </div>
           </div>
-          <div class="empty-widget" *ngIf="activityLog().length === 0">
-             No recent history
-          </div>
+          }
+          @if (activityLog().length === 0) {
+          <div class="empty-widget">No recent history</div>
+          }
         </div>
       </div>
 
     </aside>
   </div>
-</div> -->
+  }
+  @if (!isLoading() && !note()) {
+  <div class="empty-state">
+    <p>Note not found.</p>
+    <button class="btn-primary" routerLink="/notes">Back to Notes</button>
+  </div>
+  }
+
+</div>

@@ -1,103 +1,219 @@
-@import './dialog-theme'; // Path to your mixin
+/* ==========================================================================
+   COMPONENT: STOCK ADJUSTMENT FORM
+   Strict adherence to Theme Tokens & Canonical Mapping
+   ========================================================================== */
 
 :host {
-  @include prime-dialog-theme; // Apply the global overrides
   display: block;
+  // Initialize Theme Context
+  // @include apply-canonical-mapping;
+}
+
+// 1. Layout Container
+.dialog-body {
+  padding: var(--spacing-lg) 0 0 0; // Top padding only
 }
 
 .form-layout {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-2xl); // Generous spacing between groups
-  padding-top: var(--spacing-md);
+  gap: var(--spacing-xl);
 }
 
-// A visual card to summarize the action
+/* --------------------------------------------------------------------------
+   2. IMPACT SUMMARY CARD (Dynamic Feedback)
+   -------------------------------------------------------------------------- */
 .impact-summary {
   display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
+  align-items: flex-start;
+  gap: var(--spacing-lg);
   padding: var(--spacing-lg);
   border-radius: var(--ui-border-radius-lg);
+  border: 1px solid transparent;
   background: var(--bg-secondary);
-  border: 1px solid var(--border-secondary);
-  margin-bottom: var(--spacing-xl);
+  transition: var(--transition-base);
 
-  &.type-add {
-    background: var(--color-success-bg);
-    border-color: var(--color-success-border);
-    .icon-box { color: var(--color-success); background: var(--bg-primary); }
-    .text-content h4 { color: var(--color-success-dark); }
-  }
-
-  &.type-subtract {
-    background: var(--color-error-bg);
-    border-color: var(--color-error-border);
-    .icon-box { color: var(--color-error); background: var(--bg-primary); }
-    .text-content h4 { color: var(--color-error-dark); }
-  }
-
+  // Icon Container
   .icon-box {
-    width: 40px;
-    height: 40px;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--ui-border-radius);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: var(--ui-border-radius);
+    font-size: var(--font-size-lg);
+    background: var(--bg-primary);
     box-shadow: var(--shadow-sm);
-    font-size: var(--font-size-xl);
   }
 
+  // Text Content
   .text-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
     h4 {
       margin: 0;
+      font-family: var(--font-heading);
       font-size: var(--font-size-sm);
       font-weight: var(--font-weight-bold);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.03em;
     }
+
     p {
       margin: 0;
       font-size: var(--font-size-xs);
       color: var(--text-secondary);
+      line-height: var(--line-height-relaxed);
+    }
+  }
+
+  // STATE: ADD (Gain)
+  &.type-add {
+    background: var(--color-success-bg); // Low opacity green
+    border-color: var(--color-success-border);
+
+    .icon-box {
+      color: var(--color-success);
+    }
+    .text-content h4 {
+      color: var(--color-success-dark);
+    }
+  }
+
+  // STATE: SUBTRACT (Loss)
+  &.type-subtract {
+    background: var(--color-error-bg); // Low opacity red
+    border-color: var(--color-error-border);
+
+    .icon-box {
+      color: var(--color-error);
+    }
+    .text-content h4 {
+      color: var(--color-error-dark);
     }
   }
 }
 
-.form-row {
+/* --------------------------------------------------------------------------
+   3. FORM GRID & INPUTS
+   -------------------------------------------------------------------------- */
+.form-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--spacing-xl);
-  
-  @media (min-width: 640px) {
-    grid-template-columns: 1fr 1fr; // 2 columns on tablet+
+
+  @media (min-width: 600px) {
+    grid-template-columns: 1fr 1fr;
   }
 }
 
+.field-group {
+  display: flex;
+  flex-direction: column;
+  position: relative; // For error positioning
+}
+
+// Validation Message
 .helper-text {
-  margin-top: var(--spacing-xs);
+  margin-top: 6px;
   font-size: var(--font-size-xs);
   color: var(--text-tertiary);
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
-  
+
   &.error {
     color: var(--color-error);
-    animation: fadeIn 0.3s ease;
+    font-weight: var(--font-weight-medium);
+    animation: fadeIn var(--transition-fast);
   }
 }
 
-.actions {
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --------------------------------------------------------------------------
+   4. PRIMENG OVERRIDES (Deep)
+   -------------------------------------------------------------------------- */
+// ::ng-deep {
+//   // Floating Label alignment
+//   .p-float-label {
+//     display: block; 
+    
+//     label {
+//       left: var(--spacing-sm);
+//       color: var(--text-tertiary);
+//       font-size: var(--font-size-sm);
+//     }
+
+//     // Input Focus State
+//     input:focus ~ label,
+//     textarea:focus ~ label,
+//     .p-inputwrapper-focus ~ label,
+//     .p-filled ~ label {
+//       top: -0.75rem;
+//       font-size: var(--font-size-xs);
+//       background: var(--bg-primary);
+//       padding: 0 var(--spacing-xs);
+//       color: var(--accent-primary);
+//     }
+//   }
+
+//   // Inputs & Selects
+//   .p-inputtext, 
+//   .p-select, 
+//   .p-dropdown,
+//   .p-inputnumber-input {
+//     width: 100%;
+//     background: var(--bg-primary);
+//     border: var(--ui-border-width) solid var(--border-secondary);
+//     border-radius: var(--ui-border-radius);
+//     padding: var(--spacing-md); // Comfortable touch target
+//     font-size: var(--font-size-sm);
+//     color: var(--text-primary);
+//     transition: var(--transition-colors);
+
+//     &:hover {
+//       border-color: var(--border-primary);
+//     }
+
+//     &:focus {
+//       border-color: var(--accent-primary);
+//       box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+//     }
+//   }
+
+//   // Select/Dropdown Specific
+//   .p-select, .p-dropdown {
+//     padding: 0; // Let internal padding handle it
+//     display: flex;
+//     align-items: center;
+    
+//     .p-dropdown-label, .p-select-label {
+//         padding: var(--spacing-md);
+//     }
+//   }
+
+//   // Textarea Specific
+//   textarea.p-inputtext {
+//     line-height: var(--line-height-relaxed);
+//   }
+// }
+
+/* --------------------------------------------------------------------------
+   5. ACTIONS FOOTER
+   -------------------------------------------------------------------------- */
+.dialog-footer {
+  margin-top: var(--spacing-3xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border-secondary);
   display: flex;
   justify-content: flex-end;
   gap: var(--spacing-md);
-  margin-top: var(--spacing-2xl);
-  padding-top: var(--spacing-xl);
-  border-top: 1px solid var(--border-secondary);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-2px); }
-  to { opacity: 1; transform: translateY(0); }
 }

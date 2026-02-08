@@ -1,5 +1,80 @@
 <div class="calendar-container">
 
+  <header class="calendar-header glass-effect">
+    <div class="header-left">
+      <h2 class="month-label">
+        {{ currentDate() | date: 'MMMM yyyy' }}
+        @if (isLoading()) { <span class="loader-dots"></span> }
+      </h2>
+      
+      <div class="nav-controls">
+        <button class="btn-icon" (click)="changeMonth(-1)">
+          <i class="pi pi-chevron-left">‹</i>
+        </button>
+        <button class="btn-text" (click)="jumpToToday()">Today</button>
+        <button class="btn-icon" (click)="changeMonth(1)">
+          <i class="pi pi-chevron-right">›</i>
+        </button>
+      </div>
+    </div>
+
+    <div class="legend-mini">
+      <div class="legend-item"><span class="dot activity"></span> Activity</div>
+      <div class="legend-item"><span class="dot urgent"></span> Urgent</div>
+    </div>
+  </header>
+
+  <div class="calendar-wrapper">
+    
+    <div class="weekday-row">
+      @for (day of weekDays; track day) {
+        <div class="weekday">{{ day }}</div>
+      }
+    </div>
+
+    <div class="days-grid">
+      @for (cell of calendarGrid(); track cell.dateStr) {
+        <div 
+          class="day-cell"
+          [class.other-month]="!cell.isCurrentMonth"
+          [class.is-today]="cell.isToday"
+          [class.intensity-1]="cell.intensity === 1"
+          [class.intensity-2]="cell.intensity === 2"
+          [class.intensity-3]="cell.intensity === 3"
+          (click)="onDateClick(cell.date)"
+        >
+          <div class="cell-top">
+            <span class="day-number">{{ cell.dayNum }}</span>
+            <button class="btn-add-mini" title="Add Note">+</button>
+          </div>
+
+          <div class="events-stack">
+            @for (event of cell.events | slice:0:4; track event.id) {
+              <div 
+                class="event-chip animate-pop"
+                [class.type-meeting]="event.extendedProps.isMeeting"
+                [class.type-task]="event.extendedProps.noteType === 'task'"
+                [class.priority-urgent]="event.extendedProps.priority === 'urgent'"
+                [class.status-done]="event.extendedProps.status === 'completed'"
+                (click)="onEventClick(event.id, $event)"
+              >
+                <span class="chip-dot" [style.background-color]="event.color"></span>
+                <span class="chip-title">{{ event.title }}</span>
+              </div>
+            }
+            
+            @if (cell.events.length > 4) {
+              <div class="more-indicator">+{{ cell.events.length - 4 }} more</div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- <div class="calendar-container">
+
   <header class="calendar-header">
     <div class="month-title">
       <h2>{{ currentDate() | date: 'MMMM yyyy' }}</h2>
@@ -89,4 +164,4 @@
     }
   </div>
 
-</div>
+</div> -->

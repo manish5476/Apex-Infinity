@@ -32,7 +32,6 @@
         <input id="sku" type="text" pInputText [(ngModel)]="productFilter.sku" placeholder="Search by SKU"
           class="w-full" />
       </div>
-
       <div class="se-filter-field">
         <label for="brand">Brand</label>
         <p-select appendTo="body" appendTo="body" appendTo="body" id="brand" [options]="brandOptions()"
@@ -40,7 +39,6 @@
           placeholder="Select Brand" styleClass="w-full">
         </p-select>
       </div>
-
       <div class="se-filter-field">
         <label for="category">Category</label>
         <p-select appendTo="body" appendTo="body" appendTo="body" id="category" [options]="categoryOptions()"
@@ -48,7 +46,6 @@
           placeholder="Select Category" styleClass="w-full">
         </p-select>
       </div>
-
       <div class="se-filter-actions">
         <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()"></p-button>
         <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary"

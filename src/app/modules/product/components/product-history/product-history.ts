@@ -5,10 +5,10 @@ import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
-import { finalize } from 'rxjs';
-import { ProductService } from '../../services/product-service'; // Adjust path
-import { DatePicker } from 'primeng/datepicker';
+import { DatePickerModule } from 'primeng/datepicker'; // Note: Ensure correct import based on your PrimeNG version
 import { DynamicDialogConfig } from 'primeng/dynamicdialog';
+import { finalize } from 'rxjs';
+import { ProductService } from '../../services/product-service';
 
 @Component({
   selector: 'app-product-history',
@@ -18,45 +18,42 @@ import { DynamicDialogConfig } from 'primeng/dynamicdialog';
     FormsModule,
     TableModule,
     ButtonModule,
-    DatePicker,
+    DatePickerModule,
     TagModule,
     TooltipModule
   ],
   templateUrl: './product-history.html',
   styleUrls: ['./product-history.scss']
 })
-export class ProductHistoryComponent implements OnInit, OnChanges {
-   productId!: string;
-
-  private productService = inject(ProductService);
-  public config = inject(DynamicDialogConfig);
-
+export class ProductHistoryComponent implements OnInit {
+  // Signals
   history = signal<any[]>([]);
   loading = signal(false);
-
-  // Filters
+  
+  // Injections
+  private productService = inject(ProductService);
+  public config = inject(DynamicDialogConfig);
+  
+  // State
+  productId!: string;
   dateRange: Date[] | undefined;
 
   ngOnInit() {
-    this.productId = this.config.data?.id;
-
-    if (this.productId) {
-      this.loadHistory();
-    }
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['productId'] && !changes['productId'].firstChange) {
+    // If used in Dialog
+    if (this.config?.data?.id) {
+      this.productId = this.config.data.id;
       this.loadHistory();
     }
   }
 
   loadHistory() {
-    this.loading.set(true);
+    if (!this.productId) return;
 
-    let start, end;
-    if (this.dateRange && this.dateRange[0]) start = this.dateRange[0];
-    if (this.dateRange && this.dateRange[1]) end = this.dateRange[1];
+    this.loading.set(true);
+    
+    // Defensive coding for dates
+    const start = this.dateRange?.[0] || undefined;
+    const end = this.dateRange?.[1] || undefined;
 
     this.productService.getProductHistory(this.productId, start, end)
       .pipe(finalize(() => this.loading.set(false)))
@@ -66,20 +63,22 @@ export class ProductHistoryComponent implements OnInit, OnChanges {
             this.history.set(res.data.history);
           }
         },
-        error: (err) => console.error(err)
+        error: (err) => console.error('History load failed', err)
       });
   }
 
   getSeverity(type: string): "success" | "secondary" | "info" | "warn" | "danger" | "contrast" | undefined {
     switch (type) {
-      case 'SALE': return 'info'; // Blue
-      case 'OPENING STOCK': return 'success'; // Green
-      case 'ADJUSTMENT': return 'warn'; // Orange
-      default: return 'secondary'; // Gray
+      case 'SALE': return 'info';
+      case 'OPENING STOCK': return 'success';
+      case 'PURCHASE': return 'success';
+      case 'ADJUSTMENT': return 'warn';
+      case 'RETURN': return 'danger';
+      default: return 'secondary';
     }
   }
 
   getTypeLabel(type: string): string {
-    return type.replace('_', ' ');
+    return type ? type.replace(/_/g, ' ') : '';
   }
 }

@@ -1,153 +1,214 @@
-<p-toast></p-toast>
+<div class="form-container">
+  
+  <header class="form-header">
+    <div class="header-left">
+      <div class="breadcrumbs">
+        <span>Inventory</span> <i class="pi pi-angle-right" style="font-size: 0.7rem"></i>
+        <span>Products</span> <i class="pi pi-angle-right" style="font-size: 0.7rem"></i>
+        <span class="current">{{ editMode() ? 'Edit Details' : 'New Product' }}</span>
+      </div>
+      <h1>{{ formTitle() }}</h1>
+    </div>
+    
+    <div class="header-actions">
+      <p-button 
+        label="Discard" 
+        severity="secondary" 
+        [text]="true" 
+        icon="pi pi-times"
+        routerLink="/inventory/products">
+      </p-button>
+      <p-button 
+        [label]="editMode() ? 'Update' : 'Save Product'" 
+        icon="pi pi-check" 
+        (onClick)="onSubmit()"
+        [loading]="isSubmitting()"
+        [disabled]="productForm.invalid">
+      </p-button>
+    </div>
+  </header>
 
-<div class="customer-wrapper">
-  <section class="customer-container">
-    <div class="customer-form-panel animate-fadeIn">
-      <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="customer-form-layout">
+  <div class="form-body">
+    <form [formGroup]="productForm" class="dashboard-grid animate-fadeIn">
+
+      <div class="col-main">
         
-        <div class="customer-form-header">
-          <div class="flex justify-between items-center">
-            <div>
-              <h1 class="form-title">{{ formTitle() }}</h1>
-              <p class="form-subtitle">Fill in the product details below. <span class="req">*</span> = required</p>
-            </div>
-            <div class="flex items-center gap-3">
-              <label for="isActive" class="text-xs uppercase font-bold text-[var(--text-secondary)]">Live Status</label>
-              <p-togglebutton formControlName="isActive" onLabel="Active" offLabel="Inactive" styleClass="w-32" />
+        <section class="panel">
+          <div class="panel-header">
+            <h4><i class="pi pi-id-card"></i> Product Identity</h4>
+          </div>
+          <div class="panel-body">
+            <div class="grid-2">
+              <div class="field-group" style="grid-column: span 2;">
+                <label>Product Name <span class="req">*</span></label>
+                <input pInputText formControlName="name" class="highlight-input" placeholder="e.g. Premium Wireless Headphones" />
+              </div>
+              
+              <div class="field-group">
+                <label>SKU / Barcode</label>
+                <div class="p-inputgroup">
+                  <span class="p-inputgroup-addon"><i class="pi pi-barcode"></i></span>
+                  <input pInputText formControlName="sku" placeholder="Auto-generated" />
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label>Product Type (Tags)</label>
+                <app-chips formControlName="tags"></app-chips>
+              </div>
+
+              <div class="field-group" style="grid-column: span 2;">
+                <label>Detailed Description</label>
+                <textarea pInputTextarea formControlName="description" rows="4" class="resize-none"></textarea>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div class="customer-form-body">
-
-          <section class="form-section">
-            <h4 class="section-title">Identity & Description</h4>
-            <div class="form-grid">
-              <div class="form-group col-span-2">
-                <label>Product Name <span class="req">*</span></label>
-                <input pInputText formControlName="name" placeholder="e.g., Apple iPhone 15 Pro" />
-              </div>
-              <div class="form-group">
-                <label>SKU / Barcode</label>
-                <input pInputText formControlName="sku" placeholder="e.g., IP15-PRO-256" />
-              </div>
+        @if (!editMode()) {
+          <section class="panel">
+            <div class="panel-header">
+              <h4><i class="pi pi-box"></i> Opening Stock</h4>
+              <p-button 
+                label="Add Branch" 
+                icon="pi pi-plus" 
+                size="small" 
+                [text]="true"
+                (onClick)="addInventoryItem()">
+              </p-button>
             </div>
-            <div class="form-group mt-4">
-              <label>Detailed Description</label>
-              <textarea pInputTextarea formControlName="description" rows="3" placeholder="Specs, features, and selling points..."></textarea>
+            
+            <div class="panel-body" style="padding: 0;">
+              <div class="p-4" *ngIf="inventory.controls.length > 0">
+                <div class="inventory-table-header">
+                  <span>Branch Location</span>
+                  <span>Quantity</span>
+                  <span>Re-Order Level</span>
+                  <span>Action</span>
+                </div>
+                
+                <div formArrayName="inventory">
+                  @for (item of inventory.controls; track i; let i = $index) {
+                    <div [formGroupName]="i" class="inventory-row animate-slideInRight">
+                      <div>
+                         <p-select 
+                          [options]="branchOptions()" 
+                          formControlName="branchId" 
+                          optionLabel="name" 
+                          optionValue="_id" 
+                          placeholder="Select Branch"
+                          appendTo="body"
+                          [style]="{'width':'100%'}">
+                        </p-select>
+                      </div>
+                      <div>
+                        <p-inputNumber formControlName="quantity" [min]="0" inputId="qty-{{i}}"></p-inputNumber>
+                      </div>
+                      <div>
+                        <p-inputNumber formControlName="reorderLevel" [min]="0" inputId="rol-{{i}}"></p-inputNumber>
+                      </div>
+                      <div class="text-center">
+                        <i class="pi pi-trash text-red-500 cursor-pointer hover:text-red-700" (click)="removeInventoryItem(i)"></i>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <div *ngIf="inventory.controls.length === 0" class="p-6 text-center text-secondary">
+                <i class="pi pi-warehouse text-2xl mb-2 opacity-50"></i>
+                <p class="text-sm m-0">No opening stock defined. Product will be created with 0 inventory.</p>
+              </div>
             </div>
           </section>
+        }
 
-          <section class="form-section">
-            <h4 class="section-title">Organization & Units</h4>
-            <div class="form-grid">
-              <div class="form-group">
-                <label>Department</label>
-                <p-select [options]="masterList.department()" formControlName="departmentId" optionLabel="name" optionValue="_id" 
-                          placeholder="Select Dept" [filter]="true" appendTo="body" />
-              </div>
-              <div class="form-group">
-                <label>Category</label>
-                <p-select [options]="masterList.categories()" formControlName="categoryId" optionLabel="name" optionValue="_id" 
-                          placeholder="Main Category" [filter]="true" appendTo="body" />
-              </div>
-            </div>
-            <div class="form-grid mt-4">
-              <div class="form-group">
-                <label>Brand</label>
-                <p-select [options]="masterList.brands()" formControlName="brandId" optionLabel="name" optionValue="_id" 
-                          placeholder="Select Brand" [filter]="true" appendTo="body" />
-              </div>
-              <div class="form-group">
-                <label>Base Unit</label>
-                <p-select [options]="masterList.units()" formControlName="unitId" optionLabel="name" optionValue="_id" 
-                          placeholder="e.g., Pieces, Box" [filter]="true" appendTo="body" />
-              </div>
-            </div>
-          </section>
+      </div> <div class="col-side">
+        
+        <section class="panel">
+           <div class="panel-body flex justify-between items-center">
+             <div>
+               <h5 class="m-0 text-sm font-bold">Product Status</h5>
+               <p class="m-0 text-xs text-secondary">Visibility in sales channels</p>
+             </div>
+             <p-toggleButton 
+                formControlName="isActive" 
+                onLabel="Active" 
+                offLabel="Archived"
+                onIcon="pi-check"
+                offIcon="pi pi-ban"
+                styleClass="w-32 text-xs font-bold">
+             </p-toggleButton>
+           </div>
+        </section>
 
-          <section class="form-section">
-            <h4 class="section-title">Financial Details</h4>
-            <div class="form-grid-4">
-              <div class="form-group">
-                <label>Selling Price (MRP) <span class="req">*</span></label>
-                <p-inputNumber formControlName="sellingPrice" mode="currency" currency="INR" locale="en-IN" />
+        <section class="panel">
+          <div class="panel-header">
+            <h4><i class="pi pi-tag"></i> Pricing & Costs</h4>
+          </div>
+          <div class="panel-body">
+            <div class="field-group mb-4">
+              <label>Selling Price (MRP) <span class="req">*</span></label>
+              <p-inputNumber 
+                formControlName="sellingPrice" 
+                mode="currency" 
+                currency="INR" 
+                locale="en-IN"
+                class="highlight-input"
+                [style]="{'font-size':'1.1rem'}">
+              </p-inputNumber>
+            </div>
+
+            <div class="grid-2 mb-4">
+              <div class="field-group">
+                <label>Cost Price</label>
+                <p-inputNumber formControlName="purchasePrice" mode="currency" currency="INR" locale="en-IN"></p-inputNumber>
               </div>
-              <div class="form-group">
-                <label>Purchase Cost</label>
-                <p-inputNumber formControlName="purchasePrice" mode="currency" currency="INR" locale="en-IN" />
-              </div>
-              <div class="form-group">
+              <div class="field-group">
                 <label>Tax Rate (%)</label>
-                <p-inputNumber formControlName="taxRate" suffix="%" />
-              </div>
-              <div class="form-group flex justify-center pt-6">
-                <div class="flex items-center gap-2 p-2 border border-[var(--border-primary)] rounded bg-[var(--bg-ternary)] w-full justify-center">
-                  <p-checkbox formControlName="isTaxInclusive" [binary]="true" inputId="taxInc" />
-                  <label for="taxInc" class="text-sm cursor-pointer">Tax Inclusive</label>
-                </div>
+                <p-inputNumber formControlName="taxRate" suffix="%"></p-inputNumber>
               </div>
             </div>
-          </section>
 
-          <section class="form-section" *ngIf="!editMode()">
-            <div class="flex justify-between items-center mb-4">
-              <h4 class="section-title m-0">Initial Opening Stock</h4>
-              <p-button label="Add Branch" icon="pi pi-plus" size="small" [text]="true" (onClick)="addInventoryItem()" />
+            <div class="compact-toggle">
+              <label for="taxInc">Tax Inclusive Price</label>
+              <p-checkbox formControlName="isTaxInclusive" [binary]="true" inputId="taxInc"></p-checkbox>
             </div>
+          </div>
+        </section>
 
-            <div formArrayName="inventory" class="inventory-container">
-              @for (item of inventory.controls; track i; let i = $index) {
-                <div [formGroupName]="i" class="inventory-item-grid animate-slideInUp">
-                  <div class="form-group">
-                    <label>Branch</label>
-                    <p-select [options]="branchOptions()" formControlName="branchId" optionLabel="name" optionValue="_id" 
-                              placeholder="Select Branch" appendTo="body" />
-                  </div>
-                  <div class="form-group text-center">
-                    <label>Qty</label>
-                    <p-inputNumber formControlName="quantity" [showButtons]="true" buttonLayout="horizontal" inputStyleClass="text-center w-24" />
-                  </div>
-                  <div class="form-group">
-                    <label>Re-order Level</label>
-                    <p-inputNumber formControlName="reorderLevel" />
-                  </div>
-                  <div class="form-group pt-6">
-                    <p-button icon="pi pi-times" [rounded]="true" severity="danger" [text]="true" (onClick)="removeInventoryItem(i)" />
-                  </div>
-                </div>
-              } @empty {
-                <div class="empty-state">
-                  <i class="pi pi-info-circle text-2xl mb-2"></i>
-                  <p>Stock will be zero. Add locations to set opening stock.</p>
-                </div>
-              }
-            </div>
-          </section>
+        <section class="panel">
+          <div class="panel-header">
+            <h4><i class="pi pi-sitemap"></i> Organization</h4>
+          </div>
+          <div class="panel-body">
+             <div class="field-group">
+               <label>Department</label>
+               <p-select [options]="masterList.department()" formControlName="departmentId" optionLabel="name" optionValue="_id" placeholder="Select..." [filter]="true"></p-select>
+             </div>
+             
+             <div class="field-group">
+               <label>Category</label>
+               <p-select [options]="masterList.categories()" formControlName="categoryId" optionLabel="name" optionValue="_id" placeholder="Select..." [filter]="true"></p-select>
+             </div>
 
-          <section class="form-section">
-            <h4 class="section-title">Supply & Search</h4>
-            <div class="form-grid">
-              <div class="form-group">
-                <label>Default Supplier</label>
-                <p-select [options]="masterList.suppliers()" formControlName="defaultSupplierId" optionLabel="companyName" 
-                          optionValue="_id" placeholder="Select Primary Supplier" [filter]="true" appendTo="body" />
-              </div>
-              <div class="form-group">
-                <label>Product Tags</label>
-                <app-chips formControlName="tags" />
-              </div>
-            </div>
-          </section>
+             <div class="field-group">
+               <label>Brand</label>
+               <p-select [options]="masterList.brands()" formControlName="brandId" optionLabel="name" optionValue="_id" placeholder="Select..." [filter]="true"></p-select>
+             </div>
 
-        </div>
+             <div class="field-group">
+                <label>Base Unit</label>
+                <p-select [options]="masterList.units()" formControlName="unitId" optionLabel="name" optionValue="_id" placeholder="e.g. Kg, Pcs"></p-select>
+             </div>
 
-        <div class="customer-form-footer">
-          <p-button label="Discard" severity="secondary" [text]="true" routerLink="/inventory/products" />
-          <p-button [label]="editMode() ? 'Update Product' : 'Save Product'" icon="pi pi-save" type="submit"
-                    [loading]="isSubmitting()" [disabled]="productForm.invalid || isSubmitting()" />
-        </div>
-      </form>
-    </div>
-  </section>
+             <div class="field-group">
+                <label>Primary Supplier</label>
+                <p-select [options]="masterList.suppliers()" formControlName="defaultSupplierId" optionLabel="companyName" optionValue="_id" placeholder="Select..." [filter]="true"></p-select>
+             </div>
+          </div>
+        </section>
+
+      </div> </form>
+  </div>
 </div>

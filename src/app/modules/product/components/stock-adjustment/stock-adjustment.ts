@@ -5,11 +5,10 @@ import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { FloatLabelModule } from 'primeng/floatlabel';
-
+import { SelectModule } from 'primeng/select'; // Or DropdownModule depending on version
 import { ProductService } from '../../services/product-service';
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../core/services/message.service';
-import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
@@ -19,7 +18,7 @@ import { InputTextModule } from 'primeng/inputtext';
     CommonModule,
     ReactiveFormsModule,
     ButtonModule,
-    SelectModule,
+    SelectModule, // Check if your version uses DropdownModule
     InputNumberModule,
     InputTextModule,
     FloatLabelModule
@@ -28,7 +27,8 @@ import { InputTextModule } from 'primeng/inputtext';
   styleUrls: ['./stock-adjustment.scss'],
 })
 export class StockAdjustmentComponent implements OnInit {
-  // Services
+  
+  // Dependency Injection
   private fb = inject(FormBuilder);
   private productService = inject(ProductService);
   private messageService = inject(AppMessageService);
@@ -36,7 +36,7 @@ export class StockAdjustmentComponent implements OnInit {
   public ref = inject(DynamicDialogRef);
   public config = inject(DynamicDialogConfig);
 
-  // Data & Form
+  // State
   adjustmentForm!: FormGroup;
   branches: any[] = [];
   isLoading = false;
@@ -47,6 +47,7 @@ export class StockAdjustmentComponent implements OnInit {
   ];
 
   ngOnInit(): void {
+    // 1. Load Data
     this.branches = this.masterList.branches() || [];
 
     // 2. Initialize Form
@@ -57,11 +58,17 @@ export class StockAdjustmentComponent implements OnInit {
       reason: ['', [Validators.required, Validators.minLength(3)]]
     });
 
-    // 3. Set default branch if available (Optional)
+    // 3. Set Defaults
     if (this.branches.length > 0) {
       this.adjustmentForm.patchValue({ branchId: this.branches[0]._id });
     }
   }
+
+  // Helper Getters for Template
+  get typeCtrl() { return this.adjustmentForm.get('type'); }
+  get branchCtrl() { return this.adjustmentForm.get('branchId'); }
+  get qtyCtrl() { return this.adjustmentForm.get('quantity'); }
+  get reasonCtrl() { return this.adjustmentForm.get('reason'); }
 
   onSubmit() {
     if (this.adjustmentForm.invalid) {
@@ -70,34 +77,28 @@ export class StockAdjustmentComponent implements OnInit {
     }
 
     this.isLoading = true;
-    const formValue = this.adjustmentForm.value;
+    const { branchId, type, quantity, reason } = this.adjustmentForm.value;
     const productId = this.config.data?.id;
 
     if (!productId) {
-      this.messageService.showError('Product ID is missing');
-      this.ref.close();
+      this.handleError('Product ID is missing');
       return;
     }
 
-    const payload = {
-      branchId: formValue.branchId,
-      type: formValue.type,
-      quantity: formValue.quantity,
-      reason: formValue.reason
-    };
+    const payload = { branchId, type, quantity, reason };
 
     this.productService.adjustProductStock(productId, payload).subscribe({
-      next: (res) => {
+      next: () => {
         this.messageService.showSuccess('Stock adjusted successfully');
-        this.ref.close(true); // Close dialog and pass 'true' to trigger refresh in parent
-        this.isLoading = false;
+        this.ref.close(true);
       },
-      error: (err) => {
-        // Error is handled by global interceptor usually, but safe to handle here too
-        this.messageService.showError(err.error?.message || 'Failed to adjust stock');
-        this.isLoading = false;
-      }
+      error: (err) => this.handleError(err.error?.message || 'Failed to adjust stock')
     });
+  }
+
+  private handleError(msg: string) {
+    this.messageService.showError(msg);
+    this.isLoading = false;
   }
 
   onCancel() {

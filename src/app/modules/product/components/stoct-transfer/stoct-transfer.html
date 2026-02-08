@@ -1,82 +1,124 @@
 <div class="dialog-body">
+
   <form [formGroup]="transferForm" (ngSubmit)="onSubmit()" class="form-layout">
 
     <div class="transfer-visual">
-      <div class="node" [class.active]="transferForm.get('fromBranchId')?.value">
-        <div class="icon-circle"><i class="pi pi-building"></i></div>
+      <div class="node" [class.active]="fromCtrl?.value">
+        <div class="icon-circle">
+          <i class="pi pi-building"></i>
+        </div>
         <span>Source</span>
       </div>
 
       <div class="flow-line">
-        <div class="moving-dot"></div>
+        <div class="moving-dot" *ngIf="fromCtrl?.value && toCtrl?.value"></div>
       </div>
 
-      <div class="node" [class.active]="transferForm.get('toBranchId')?.value">
-        <div class="icon-circle"><i class="pi pi-map-marker"></i></div>
-        <span>Target</span>
-      </div>
-    </div>
-
-    <div class="form-row">
-      <div class="field">
-        <span class="p-float-label">
-          <p-select formControlName="fromBranchId" [options]="branches" optionLabel="name" optionValue="_id"
-            [style]="{'width':'100%'}" placeholder="Select Source" appendTo="body" [filter]="true" filterBy="name">
-          </p-select>
-          <label>From Branch (Source)</label>
-        </span>
-
-        @if (transferForm.get('fromBranchId')?.invalid && transferForm.get('fromBranchId')?.touched) {
-        <small class="helper-text error">
-          <i class="pi pi-exclamation-circle"></i> Source branch is required.
-        </small>
-        }
-      </div>
-
-      <div class="field">
-        <span class="p-float-label">
-          <p-select formControlName="toBranchId" [options]="branches" optionLabel="name" optionValue="_id"
-            [style]="{'width':'100%'}" placeholder="Select Destination" appendTo="body" [filter]="true" filterBy="name">
-          </p-select>
-          <label>To Branch (Destination)</label>
-        </span>
-
-        @if (transferForm.get('toBranchId')?.errors?.['sameBranch']) {
-        <small class="helper-text error">
-          <i class="pi pi-times-circle"></i> Destination cannot be same as Source.
-        </small>
-        }
+      <div class="node" [class.active]="toCtrl?.value">
+        <div class="icon-circle">
+          <i class="pi pi-map-marker"></i>
+        </div>
+        <span>Destination</span>
       </div>
     </div>
 
-    <div class="form-row">
-      <div class="field">
+    <div class="form-grid">
+      <div class="field-group">
         <span class="p-float-label">
-          <p-inputNumber formControlName="quantity" mode="decimal" [min]="1" [showButtons]="true"
-            buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
-            styleClass="w-full" [style]="{'width':'100%'}">
+          <p-select 
+            formControlName="fromBranchId" 
+            [options]="branches" 
+            optionLabel="name" 
+            optionValue="_id"
+            [style]="{'width':'100%'}" 
+            appendTo="body" 
+            [filter]="true" 
+            filterBy="name"
+            inputId="from-branch">
+          </p-select>
+          <label for="from-branch">From Branch</label>
+        </span>
+        @if (fromCtrl?.invalid && fromCtrl?.touched) {
+          <small class="helper-text error">
+            <i class="pi pi-exclamation-circle"></i> Source required
+          </small>
+        }
+      </div>
+
+      <div class="field-group">
+        <span class="p-float-label">
+          <p-select 
+            formControlName="toBranchId" 
+            [options]="branches" 
+            optionLabel="name" 
+            optionValue="_id"
+            [style]="{'width':'100%'}" 
+            appendTo="body" 
+            [filter]="true" 
+            filterBy="name"
+            inputId="to-branch">
+          </p-select>
+          <label for="to-branch">To Branch</label>
+        </span>
+        @if (toCtrl?.touched && toCtrl?.errors?.['sameBranch']) {
+          <small class="helper-text error">
+            <i class="pi pi-times-circle"></i> Cannot transfer to same branch
+          </small>
+        } @else if (toCtrl?.invalid && toCtrl?.touched) {
+          <small class="helper-text error">Destination required</small>
+        }
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="field-group">
+        <span class="p-float-label">
+          <p-inputNumber 
+            formControlName="quantity" 
+            mode="decimal" 
+            [min]="1" 
+            [showButtons]="true"
+            buttonLayout="horizontal" 
+            incrementButtonIcon="pi pi-plus" 
+            decrementButtonIcon="pi pi-minus"
+            styleClass="w-full" 
+            [style]="{'width':'100%'}"
+            inputId="qty-input">
           </p-inputNumber>
-          <label>Quantity to Transfer</label>
+          <label for="qty-input">Transfer Quantity</label>
         </span>
-        @if (transferForm.get('quantity')?.invalid && transferForm.get('quantity')?.touched) {
-        <small class="helper-text error">Valid quantity required.</small>
+        @if (qtyCtrl?.invalid && qtyCtrl?.touched) {
+          <small class="helper-text error">Valid quantity > 0 required</small>
         }
+      </div>
+
+      <div class="field-group">
+        <span class="p-float-label">
+          <textarea 
+            pInputTextarea 
+            formControlName="description" 
+            rows="1" 
+            inputId="desc-input"
+            class="w-full"
+            style="width: 100%; resize: none; height: 46px;">
+          </textarea>
+          <label for="desc-input">Reference / Note</label>
+        </span>
       </div>
     </div>
 
-    <div class="field">
-      <span class="p-float-label">
-        <textarea pInputTextarea formControlName="description" rows="3" class="w-full"
-          style="width: 100%; resize: none;">
-        </textarea>
-        <label>Transfer Note / Reference</label>
-      </span>
-    </div>
-
-    <div class="actions">
-      <p-button label="Cancel" styleClass="p-button-secondary p-button-text" (onClick)="onCancel()">
+    <div class="dialog-footer">
+      <p-button 
+        label="Cancel" 
+        [text]="true" 
+        severity="secondary" 
+        (onClick)="onCancel()">
       </p-button>
-      <p-button label="Confirm Transfer" type="submit" [loading]="loading" [disabled]="transferForm.invalid"
+      <p-button 
+        label="Confirm Transfer" 
+        type="submit" 
+        [loading]="loading" 
+        [disabled]="transferForm.invalid"
         icon="pi pi-arrow-right-arrow-left">
       </p-button>
     </div>
