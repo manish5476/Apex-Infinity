@@ -26,7 +26,10 @@ import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
 import { TransactionService } from '../../../transactions/transaction.service';
 import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
-
+import { SupplierDashboardComponent } from '../supplier-dashboard/supplier-dashboard';
+// import { DialogService } from 'primeng/dynamicdialog';
+import { Dialog } from 'primeng/dialog';
+import { DialogService } from 'primeng/dynamicdialog';
 @Component({
   selector: 'app-supplier-details',
   standalone: true,
@@ -38,6 +41,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
   ],
   templateUrl: './supplier-detail.html',
   styleUrls: ['./supplier-detail.scss'],
+  providers: [DialogService]
 })
 export class SupplierDetailsComponent implements OnInit {
   // Injections
@@ -49,6 +53,7 @@ export class SupplierDetailsComponent implements OnInit {
   private messageService = inject(AppMessageService);
   private masterList = inject(MasterListService);
   public common = inject(CommonMethodService);
+  private dialogService = inject(DialogService);
 
   // --- Supplier State ---
   supplier = signal<any | null>(null);
@@ -244,6 +249,24 @@ export class SupplierDetailsComponent implements OnInit {
     if (!addr) return 'No address';
     return [addr.street, addr.city, addr.state].filter(p => p).join(', ');
   }
+
+   openSuplierDashboard(product: any) {
+      const ref: any = this.dialogService.open(SupplierDashboardComponent, {
+        header: `transfer Stock: ${product.name}`,
+        width: '90%',
+        height: '90%',
+        closable: true,
+        contentStyle: { overflow: 'visible' },
+        baseZIndex: 10000,
+        data: { productId: product._id }
+      });
+      ref.onClose.subscribe((success: boolean) => {
+        if (success) {
+          // this.loadProductData();
+        }
+      });
+    }
+
 }
 // import { Component, OnInit, inject, signal } from '@angular/core';
 // import { CommonModule } from '@angular/common';

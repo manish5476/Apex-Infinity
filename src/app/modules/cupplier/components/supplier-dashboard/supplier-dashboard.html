@@ -1,0 +1,204 @@
+<div class="dashboard-container">
+  
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="breadcrumb">
+        <span>Suppliers</span> / <span class="current">Dashboard</span>
+      </div>
+      <div class="title-row">
+        <h1>
+          {{ data()?.profile?.companyName }}
+          <span class="status-badge">Active</span>
+        </h1>
+        <div class="actions">
+          <!-- <button class="btn-secondary" (click)="downloadLedger()">
+            <i class="pi pi-download"></i> Ledger
+          </button>
+          <button class="btn-primary" (click)="openCreatePurchase()">
+            <i class="pi pi-plus"></i> New Purchase
+          </button> -->
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="kpi-section">
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="icon-wrapper primary">
+          <i class="pi pi-box"></i>
+        </div>
+        <div class="kpi-data">
+          <span class="label">Total Volume</span>
+          <span class="value">{{ data()?.financials?.totalVolume | currency:'INR' }}</span>
+          <span class="trend neutral">{{ data()?.financials?.totalInvoices }} Invoices</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="icon-wrapper success">
+          <i class="pi pi-check-circle"></i>
+        </div>
+        <div class="kpi-data">
+          <span class="label">Total Paid</span>
+          <span class="value">{{ data()?.financials?.totalPaid | currency:'INR' }}</span>
+          <span class="trend success">Lifetime</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="icon-wrapper warning">
+          <i class="pi pi-exclamation-circle"></i>
+        </div>
+        <div class="kpi-data">
+          <span class="label">Outstanding</span>
+          <span class="value" [class.text-error]="(data()?.financials?.outstanding || 0) > 0">
+            {{ data()?.financials?.outstanding | currency:'INR' }}
+          </span>
+          <span class="trend warning">Payable Now</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="icon-wrapper info">
+          <i class="pi pi-wallet"></i>
+        </div>
+        <div class="kpi-data">
+          <span class="label">Advance Balance</span>
+          <span class="value">{{ data()?.financials?.walletBalance | currency:'INR' }}</span>
+          <span class="trend info">Available Credit</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="content-wrapper">
+    
+    <main class="main-panel">
+      <div class="tabs-header">
+        <div class="tab-item" 
+             [class.active]="activeTab() === 'purchases'" 
+             (click)="activeTab.set('purchases')">
+          Recent Purchases
+        </div>
+        <div class="tab-item" 
+             [class.active]="activeTab() === 'payments'" 
+             (click)="activeTab.set('payments')">
+          Payment History
+        </div>
+      </div>
+
+      <div class="table-scroll-area custom-scrollbar">
+        @if (activeTab() === 'purchases') {
+          <p-table [value]="data()?.tables?.recentPurchases || []" 
+                   styleClass="p-datatable-sm p-datatable-gridlines"
+                   [rowHover]="true">
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 15%">Invoice #</th>
+                <th style="width: 15%">Date</th>
+                <th style="width: 15%">Due Date</th>
+                <th style="width: 15%">Status</th>
+                <th style="width: 20%" class="text-right">Total</th>
+                <th style="width: 20%" class="text-right">Balance</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-po>
+              <tr>
+                <td class="font-medium text-primary">#{{ po.invoiceNumber }}</td>
+                <td class="text-secondary">{{ po.purchaseDate | date:'dd MMM yyyy' }}</td>
+                <td class="text-secondary">{{ po.dueDate | date:'dd MMM yyyy' }}</td>
+                <td>
+                  <span class="status-pill" [ngClass]="po.paymentStatus">
+                    {{ po.paymentStatus }}
+                  </span>
+                </td>
+                <td class="text-right font-medium">{{ po.grandTotal | currency:'INR':'symbol':'1.0-0' }}</td>
+                <td class="text-right font-bold" [class.text-error]="po.balanceAmount > 0">
+                  {{ po.balanceAmount | currency:'INR':'symbol':'1.0-0' }}
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+               <tr><td colspan="6" class="empty-state">No recent purchases found.</td></tr>
+            </ng-template>
+          </p-table>
+        }
+
+        @if (activeTab() === 'payments') {
+          <p-table [value]="data()?.tables?.recentPayments || []" 
+                   styleClass="p-datatable-sm p-datatable-gridlines"
+                   [rowHover]="true">
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 20%">Ref #</th>
+                <th style="width: 20%">Date</th>
+                <th style="width: 20%">Method</th>
+                <th style="width: 20%">Status</th>
+                <th style="width: 20%" class="text-right">Amount</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-pay>
+              <tr>
+                <td class="font-mono text-secondary text-xs">{{ pay.referenceNumber || '-' }}</td>
+                <td class="text-secondary">{{ pay.paymentDate | date:'dd MMM yyyy' }}</td>
+                <td class="capitalize">{{ pay.paymentMethod }}</td>
+                <td>
+                  <span class="status-pill success">Completed</span>
+                </td>
+                <td class="text-right font-bold text-success">
+                  - {{ pay.amount | currency:'INR':'symbol':'1.0-0' }}
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+               <tr><td colspan="5" class="empty-state">No payments found.</td></tr>
+            </ng-template>
+          </p-table>
+        }
+      </div>
+    </main>
+
+    <aside class="side-panel">
+      <div class="profile-card">
+        <div class="profile-header">
+          <div class="avatar">
+            {{ getInitials(data()?.profile?.companyName) }}
+          </div>
+          <div class="profile-names">
+            <h2>{{ data()?.profile?.contactPerson }}</h2>
+            <span class="role">Primary Contact</span>
+          </div>
+        </div>
+        
+        <div class="divider"></div>
+
+        <div class="info-list">
+          <div class="info-item">
+            <label>Company</label>
+            <div class="val">{{ data()?.profile?.companyName }}</div>
+          </div>
+          <div class="info-item">
+            <label>Email</label>
+            <div class="val text-link">{{ data()?.profile?.email || '-' }}</div>
+          </div>
+          <div class="info-item">
+            <label>Phone</label>
+            <div class="val">{{ data()?.profile?.phone || '-' }}</div>
+          </div>
+          <div class="info-item">
+            <label>GSTIN</label>
+            <div class="val font-mono">{{ data()?.profile?.gstNumber || 'Unregistered' }}</div>
+          </div>
+        </div>
+
+        <div class="action-footer">
+          <button class="btn-outlined full-width">
+            <i class="pi pi-pencil"></i> Edit Profile
+          </button>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</div>

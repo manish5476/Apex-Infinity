@@ -41,7 +41,8 @@ export class ProductDetailsComponent implements OnInit {
   private masterList = inject(MasterListService);
   private messageService = inject(AppMessageService);
   public common = inject(CommonMethodService);
-  private cdr = inject(ChangeDetectorRef); private dialogService = inject(DialogService);
+  private cdr = inject(ChangeDetectorRef); 
+  private dialogService = inject(DialogService);
 
   product = signal<any | null>(null);
   loading = signal(true);
