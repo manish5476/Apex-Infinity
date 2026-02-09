@@ -142,95 +142,292 @@ export class EmiList implements OnInit {
     }
   }
 
+
+  private getInstallmentStats(row: any) {
+    const list = row.installments || [];
+
+    const paid = list.filter((i: any) => i.paymentStatus === 'paid').length;
+    const next = list.find((i: any) => i.paymentStatus !== 'paid');
+
+    return { paid, total: list.length, next };
+  }
+
+  private formatDate(d: any) {
+    return d ? new Date(d).toLocaleDateString() : '—';
+  }
+
+
   getColumn(): void {
+    // this.column = [
+    //   {
+    //     headerName: 'Actions',
+    //     field: '_id',
+    //     width: 150,
+    //     cellRenderer: ActionViewRenderer,
+    //   },
+    //   {
+    //     headerName: '#',
+    //     valueGetter: 'node.rowIndex + 1',
+    //     width: 60,
+    //     suppressMenu: true,
+    //     sortable: false,
+    //     filter: false,
+    //     pinned: 'left'
+    //   },
+    //   {
+    //     field: 'invoiceId.invoiceNumber',
+    //     headerName: 'Invoice #',
+    //     sortable: true,
+    //     filter: true,
+    //     resizable: true,
+    //     width: 140,
+    //     valueGetter: (params: any) => params.data.invoiceId?.invoiceNumber || 'N/A',
+    //     cellStyle: { 'font-weight': '600', 'color': 'var(--accent-primary)', 'cursor': 'pointer' }
+    //   },
+    //   {
+    //     field: 'customerId.name',
+    //     headerName: 'Customer',
+    //     sortable: true,
+    //     filter: true,
+    //     resizable: true,
+    //     width: 180,
+    //     valueGetter: (params: any) => params.data.customerId?.name || 'Unknown'
+    //   },
+    //   {
+    //     field: 'status',
+    //     headerName: 'Status',
+    //     width: 120,
+    //     sortable: true,
+    //     filter: true,
+    //     cellClass: (params: any) => params.value ? `cell-status status-${params.value}` : ''
+    //   },
+    //   {
+    //     field: 'totalAmount',
+    //     headerName: 'Total Loan',
+    //     sortable: true,
+    //     filter: 'agNumberColumnFilter',
+    //     width: 130,
+    //     type: 'rightAligned',
+    //     valueFormatter: (params: any) => this.formatCurrency(params.value)
+    //   },
+    //   {
+    //     field: 'downPayment',
+    //     headerName: 'Down Pay',
+    //     sortable: true,
+    //     filter: 'agNumberColumnFilter',
+    //     width: 130,
+    //     type: 'rightAligned',
+    //     valueFormatter: (params: any) => this.formatCurrency(params.value)
+    //   },
+    //   {
+    //     field: 'balanceAmount',
+    //     headerName: 'Balance',
+    //     sortable: true,
+    //     filter: 'agNumberColumnFilter',
+    //     width: 130,
+    //     type: 'rightAligned',
+    //     cellStyle: { 'color': 'var(--text-primary)', 'font-weight': 'bold' },
+    //     valueFormatter: (params: any) => this.formatCurrency(params.value)
+    //   },
+    //   {
+    //     field: 'numberOfInstallments',
+    //     headerName: 'Inst.',
+    //     sortable: true,
+    //     filter: 'agNumberColumnFilter',
+    //     width: 90,
+    //     type: 'rightAligned'
+    //   },
+    //   {
+    //     field: 'emiStartDate',
+    //     headerName: 'Start Date',
+    //     sortable: true,
+    //     filter: 'agDateColumnFilter',
+    //     width: 130,
+    //     valueFormatter: (params: any) => params.value ? new Date(params.value).toLocaleDateString() : '-'
+    //   }
+    // ];
     this.column = [
+
+      // ================= ACTIONS =================
       {
         headerName: 'Actions',
         field: '_id',
-        width: 150,
-        cellRenderer: ActionViewRenderer,
+        width: 30,
+        pinned: 'left',
+        cellRenderer: ActionViewRenderer
       },
+
+      // ================= ROW INDEX =================
       {
         headerName: '#',
         valueGetter: 'node.rowIndex + 1',
-        width: 60,
-        suppressMenu: true,
+        width: 30,
         sortable: false,
         filter: false,
+        suppressMenu: true,
         pinned: 'left'
       },
+
+      // ================= IDENTITY =================
       {
-        field: 'invoiceId.invoiceNumber',
-        headerName: 'Invoice #',
+        headerName: 'Invoice / Customer',
+        flex: 2.5,
+        width: 130,
         sortable: true,
         filter: true,
-        resizable: true,
+        valueGetter: (p: any) => p.data,
+        cellRenderer: (p: any) => {
+          const inv = p.value.invoiceId?.invoiceNumber || '—';
+          const cust = p.value.customerId?.name || '—';
+          const city = p.value.customerId?.billingAddress?.city || '';
+          return `
+        <div style="line-height:1.2">
+          <div style="
+            font-weight:600;
+            color:var(--accent-primary);
+          ">
+            ${inv}
+          </div>
+          <div style="font-size:12px;color:var(--text-secondary)">
+            ${cust}-${city}
+          </div>
+        </div>
+      `;
+        }
+      },
+
+      // ================= FINANCIAL SUMMARY =================
+      {
+        headerName: 'Loan',
+        width: 160,
+        sortable: true,
+        filter: 'agNumberColumnFilter',
+        valueGetter: (p: any) => ({
+          total: p.data.totalAmount,
+          down: p.data.downPayment
+        }),
+        cellRenderer: (p: any) => `
+      <div>
+        <div>${this.formatCurrency(p.value.total)}</div>
+        <div style="font-size:11px;color:var(--text-secondary)">
+          Down: ${this.formatCurrency(p.value.down)}
+        </div>
+      </div>
+    `
+      },
+
+      // ================= BALANCE =================
+      {
+        headerName: 'Balance',
+        field: 'balanceAmount',
         width: 140,
-        valueGetter: (params: any) => params.data.invoiceId?.invoiceNumber || 'N/A',
-        cellStyle: { 'font-weight': '600', 'color': 'var(--accent-primary)', 'cursor': 'pointer' }
-      },
-      {
-        field: 'customerId.name',
-        headerName: 'Customer',
         sortable: true,
-        filter: true,
-        resizable: true,
-        width: 180,
-        valueGetter: (params: any) => params.data.customerId?.name || 'Unknown'
+        filter: 'agNumberColumnFilter',
+        valueFormatter: (p: any) => this.formatCurrency(p.value),
+        cellStyle: (p: any) => ({
+          fontWeight: 'bold',
+          color: p.value > 0
+            ? 'var(--color-error)'
+            : 'var(--color-success)'
+        })
       },
+
+      // ================= INSTALLMENT PROGRESS =================
       {
-        field: 'status',
+        headerName: 'Progress',
+        width: 130,
+        valueGetter: (p: any) => this.getInstallmentStats(p.data),
+        cellRenderer: (p: any) => `
+      ${p.value.paid} / ${p.value.total}
+    `
+      },
+
+      // ================= NEXT DUE =================
+      {
+        headerName: 'Next Due',
+        width: 170,
+        valueGetter: (p: any) =>
+          this.getInstallmentStats(p.data).next,
+        cellRenderer: (p: any) => {
+          if (!p.value) return 'Completed';
+
+          return `
+        <div>
+          ${this.formatDate(p.value.dueDate)}
+          <div style="font-size:11px;color:var(--text-secondary)">
+            ${this.formatCurrency(p.value.totalAmount)}
+          </div>
+        </div>
+      `;
+        }
+      },
+
+      // ================= TENURE =================
+      {
+        headerName: 'Tenure',
+        width: 170,
+        cellRenderer: (p: any) => `
+      ${this.formatDate(p.data.emiStartDate)}
+      →
+      ${this.formatDate(p.data.emiEndDate)}
+    `
+      },
+
+      // ================= INSTALLMENT COUNT =================
+      {
+        headerName: 'Inst.',
+        field: 'numberOfInstallments',
+        width: 90,
+        type: 'rightAligned',
+        sortable: true,
+        filter: 'agNumberColumnFilter'
+      },
+
+      // ================= STATUS BADGE =================
+      {
         headerName: 'Status',
+        field: 'status',
         width: 120,
         sortable: true,
         filter: true,
-        cellClass: (params: any) => params.value ? `cell-status status-${params.value}` : ''
+        cellRenderer: (p: any) => {
+          const map: any = {
+            active: ['var(--color-success-bg)', 'var(--color-success-dark)'],
+            closed: ['var(--color-info-bg)', 'var(--color-info-dark)'],
+            overdue: ['var(--color-error-bg)', 'var(--color-error-dark)']
+          };
+
+          const [bg, color] =
+            map[p.value] || ['#eee', '#333'];
+
+          return `
+        <span style="
+          padding:2px 10px;
+          border-radius:12px;
+          font-size:11px;
+          font-weight:600;
+          background:${bg};
+          color:${color};
+        ">
+          ${p.value}
+        </span>
+      `;
+        }
       },
+
+      // ================= CREATED DATE =================
       {
-        field: 'totalAmount',
-        headerName: 'Total Loan',
-        sortable: true,
-        filter: 'agNumberColumnFilter',
+        headerName: 'Created',
+        field: 'createdAt',
         width: 130,
-        type: 'rightAligned',
-        valueFormatter: (params: any) => this.formatCurrency(params.value)
-      },
-      {
-        field: 'downPayment',
-        headerName: 'Down Pay',
         sortable: true,
-        filter: 'agNumberColumnFilter',
-        width: 130,
-        type: 'rightAligned',
-        valueFormatter: (params: any) => this.formatCurrency(params.value)
-      },
-      {
-        field: 'balanceAmount',
-        headerName: 'Balance',
-        sortable: true,
-        filter: 'agNumberColumnFilter',
-        width: 130,
-        type: 'rightAligned',
-        cellStyle: { 'color': 'var(--text-primary)', 'font-weight': 'bold' },
-        valueFormatter: (params: any) => this.formatCurrency(params.value)
-      },
-      {
-        field: 'numberOfInstallments',
-        headerName: 'Inst.',
-        sortable: true,
-        filter: 'agNumberColumnFilter',
-        width: 90,
-        type: 'rightAligned'
-      },
-      {
-        field: 'emiStartDate',
-        headerName: 'Start Date',
-        sortable: true,
-        filter: 'agDateColumnFilter',
-        width: 130,
-        valueFormatter: (params: any) => params.value ? new Date(params.value).toLocaleDateString() : '-'
+        valueFormatter: (p: any) => this.formatDate(p.value)
       }
+
     ];
+
+    this.cdr.detectChanges();
+
     this.cdr.detectChanges();
   }
 
