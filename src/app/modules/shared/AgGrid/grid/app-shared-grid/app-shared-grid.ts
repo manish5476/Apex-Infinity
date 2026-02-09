@@ -91,6 +91,7 @@ export class AppSharedGrid<T extends { _id?: string; id?: string }> {
 
       return {
         ...col,
+          editable: false, // 🔑 THIS IS CRITICAL
         // NATIVE AG GRID SELECTOR (High Performance)
         // Decides dynamically whether to show Editor or Renderer
         cellRendererSelector: (params: ICellRendererParams<T>) => {
