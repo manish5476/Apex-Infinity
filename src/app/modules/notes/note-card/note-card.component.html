@@ -62,7 +62,7 @@
 
     <p class="card-excerpt">
       {{ note.summary || (note.content | slice:0:120) }}
-      @if ((note.content?.length || 0) > 120) { ... }
+      @if ((note.content.length || 0) > 120) { ... }
     </p>
     
     <!-- Progress Bar (for Tasks/Projects) -->
