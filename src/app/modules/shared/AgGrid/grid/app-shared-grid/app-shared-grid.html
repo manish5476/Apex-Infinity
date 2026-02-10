@@ -4,13 +4,8 @@
   <div class="grid-toolbar">
 
     <div class="toolbar-context flex items-center gap-3">
-      
-      <p-button 
-        label="Add Row" 
-        icon="pi pi-plus" 
-        size="small" 
-        [rounded]="true" 
-        styleClass="premium-btn btn-primary"
+
+      <p-button label="Add Row" icon="pi pi-plus" size="small" [rounded]="true" styleClass="premium-btn btn-primary"
         (click)="addNewRow()">
       </p-button>
 
@@ -55,12 +50,8 @@
 
   <div class="flex-1 overflow-hidden grid-wrapper">
     <ag-grid-angular class="ag-theme-quartz" style="width:100%; height:100%;" [theme]="agTheme()"
-      [rowData]="data() ?? []" 
-      [columnDefs]="columnDefs()" 
-      [gridOptions]="gridOptions" 
-      [rowSelection]="selectionOptions"
-      (gridReady)="onGridReady($event)" 
-      (selectionChanged)="onSelectionChanged()">
+      [rowData]="data() ?? []" [columnDefs]="columnDefs()" [gridOptions]="gridOptions" [rowSelection]="selectionOptions"
+      (gridReady)="onGridReady($event)" (selectionChanged)="onSelectionChanged()">
     </ag-grid-angular>
   </div>
 

@@ -1,144 +1,156 @@
-<div class="return-page-container animate-fadeIn">
+<div class="return-page-container animate-fadeIn custom-scrollbar">
   
-  <div class="header-section">
-    <div class="header-content">
-      <p-button icon="pi pi-arrow-left" styleClass="p-button-text p-button-rounded p-button-secondary"
-        [routerLink]="['/purchase', purchaseId()]">
-      </p-button>
-      <div>
-        <h1 class="page-title">Create Purchase Return</h1>
-        <p class="page-subtitle">Debit Note for Invoice #{{ originalPurchase()?.invoiceNumber }}</p>
+  @if (isLoading()) {
+    <div class="loading-wrapper">
+      <div class="loading-state">
+        <i class="pi pi-spin pi-spinner text-4xl mb-4 text-[var(--accent-primary)]"></i>
+        <p>Preparing Return Form...</p>
       </div>
     </div>
-  </div>
-
-  @if (isLoading()) {
-    <div class="loading-state">
-      <i class="pi pi-spin pi-spinner text-3xl"></i>
-      <p>Loading purchase details...</p>
-    </div>
-  } @else {
-    <form [formGroup]="returnForm" (ngSubmit)="onSubmit()" class="form-layout">
-      
-      <!-- Left Column: Items -->
-      <div class="main-content">
-        <div class="themed-card">
-          <div class="card-header">
-            <h3>Select Items to Return</h3>
-            <span class="text-sm text-[var(--text-secondary)]">Enter the quantity you wish to return for each item.</span>
-          </div>
-
-          <div class="table-wrapper">
-            <p-table [value]="returnItems.controls" styleClass="p-table-premium">
-              <ng-template pTemplate="header">
-                <tr>
-                  <th style="width: 40%">Product</th>
-                  <th class="text-right">Unit Price</th>
-                  <th class="text-center">Purchased Qty</th>
-                  <th class="text-center" style="width: 150px">Return Qty</th>
-                  <th class="text-right">Refund Amount</th>
-                </tr>
-              </ng-template>
-              <ng-template pTemplate="body" let-control let-i="rowIndex">
-                <tr [formGroupName]="i" [class.row-selected]="control.get('returnQty').value > 0">
-                  <td>
-                    <div class="font-medium">{{ control.get('name').value }}</div>
-                  </td>
-                  <td class="text-right">
-                    {{ control.get('price').value | currency:'INR' }}
-                  </td>
-                  <td class="text-center">
-                    <p-tag [value]="control.get('purchasedQty').value" severity="secondary"></p-tag>
-                  </td>
-                  <td class="text-center p-2">
-                    <p-inputNumber 
-                      formControlName="returnQty" 
-                      [min]="0" 
-                      [max]="control.get('purchasedQty').value"
-                      [showButtons]="true"
-                      buttonLayout="horizontal"
-                      decrementButtonClass="p-button-secondary p-button-text"
-                      incrementButtonClass="p-button-secondary p-button-text"
-                      inputStyleClass="text-center font-bold w-16">
-                    </p-inputNumber>
-                    <small class="text-red-500 block" *ngIf="control.get('returnQty').hasError('max')">
-                      Max: {{ control.get('purchasedQty').value }}
-                    </small>
-                  </td>
-                  <td class="text-right font-bold" [class.text-[var(--text-primary)]]="control.get('returnQty').value > 0">
-                    {{ (control.get('returnQty').value * control.get('price').value) | currency:'INR' }}
-                  </td>
-                </tr>
-              </ng-template>
-            </p-table>
+  } 
+  
+  @else if (originalPurchase(); as p) {
+    <div class="page-header">
+      <div class="header-left">
+        <p-button icon="pi pi-arrow-left" styleClass="p-button-text p-button-rounded p-button-secondary back-btn"
+          [routerLink]="['/purchase', purchaseId()]">
+        </p-button>
+        <div>
+          <h1 class="page-title">Create Debit Note</h1>
+          <div class="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+            <span>Ref: <strong class="text-[var(--text-primary)]">{{ p.invoiceNumber }}</strong></span>
+            <span class="w-1 h-1 rounded-full bg-[var(--text-tertiary)]"></span>
+            <span>{{ p.purchaseDate | date:'mediumDate' }}</span>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Right Column: Summary & Actions -->
-      <aside class="sidebar">
-        
-        <!-- Summary Card -->
-        <div class="themed-card summary-card">
-          <h3>Return Summary</h3>
-          
-          <div class="summary-row">
-            <label>Supplier</label>
-            <span>{{ originalPurchase()?.supplierId?.companyName }}</span>
-          </div>
-          <div class="summary-row">
-            <label>Original Date</label>
-            <span>{{ originalPurchase()?.purchaseDate | date:'mediumDate' }}</span>
-          </div>
-
-          <p-divider></p-divider>
-
-          <div class="form-group mb-4">
-            <label class="block mb-2 font-semibold text-sm">Reason for Return <span class="text-red-500">*</span></label>
-            <textarea 
-              pInputTextarea 
-              formControlName="reason" 
-              rows="4" 
-              class="w-full" 
-              placeholder="e.g., Damaged goods, Incorrect item sent..."
-              [ngClass]="{'ng-invalid ng-dirty': returnForm.get('reason')?.invalid && returnForm.get('reason')?.touched}">
-            </textarea>
-            <small class="text-red-500" *ngIf="returnForm.get('reason')?.invalid && returnForm.get('reason')?.touched">
-              Reason is required (min 3 chars).
-            </small>
-          </div>
-
-          <div class="total-box">
-            <div class="flex justify-between items-center">
-              <span>Est. Refund Amount</span>
-              <span class="text-xl font-bold text-[var(--accent-primary)]">
-                {{ totalRefundAmount() | currency:'INR' }}
-              </span>
+    <form [formGroup]="returnForm" (ngSubmit)="onSubmit()" class="main-layout">
+      
+      <div class="content-column">
+        <div class="content-card">
+          <div class="card-header">
+            <div class="icon-box"><i class="pi pi-box"></i></div>
+            <div>
+              <h3>Select Items</h3>
+              <p>Set the quantity to return. Only items with quantity > 0 are shown.</p>
             </div>
-            <small class="text-xs text-[var(--text-secondary)] mt-1 block">
-              *Includes tax adjustments. Balance will be credited to supplier account.
-            </small>
           </div>
 
-          <div class="actions">
-            <p-button 
-              label="Confirm Return" 
-              icon="pi pi-check" 
-              styleClass="w-full" 
+          <div class="table-container">
+            
+            <div formArrayName="items"> 
+              <p-table [value]="returnItems.controls" styleClass="p-table-modern">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th style="width: 45%; padding-left: 24px;">Product Details</th>
+                    <th class="text-right">Unit Price</th>
+                    <th class="text-center">Purchased</th>
+                    <th class="text-center" style="width: 160px">Return Qty</th>
+                    <th class="text-right" style="padding-right: 24px;">Refund Value</th>
+                  </tr>
+                </ng-template>
+                
+                <ng-template pTemplate="body" let-control let-i="rowIndex">
+                  <tr [formGroupName]="i" [class.active-row]="control.get('returnQty').value > 0">
+                    
+                    <td style="padding-left: 24px;">
+                      <div class="product-info">
+                        <div class="product-name">{{ control.get('name').value }}</div>
+                        <div class="product-meta">
+                          <span *ngIf="control.get('taxRate').value > 0">Tax: {{ control.get('taxRate').value }}%</span>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td class="text-right font-medium text-[var(--text-secondary)]">
+                      {{ control.get('price').value | currency:'INR' }}
+                    </td>
+
+                    <td class="text-center">
+                      <span class="qty-badge">{{ control.get('purchasedQty').value }}</span>
+                    </td>
+
+                    <td class="text-center p-2">
+                      <div class="flex flex-col items-center justify-center">
+                        
+                        <p-inputNumber 
+                          formControlName="returnQty" 
+                          [min]="0" 
+                          [max]="control.get('purchasedQty').value" 
+                          [showButtons]="true"
+                          buttonLayout="horizontal"
+                          spinnerMode="horizontal"
+                          inputStyleClass="w-16 text-center font-bold text-[var(--accent-primary)] input-clean"
+                          decrementButtonClass="p-button-text p-button-secondary p-0 w-8 h-8"
+                          incrementButtonClass="p-button-text p-button-secondary p-0 w-8 h-8">
+                        </p-inputNumber>
+                        
+                        @if (control.get('returnQty').hasError('max')) {
+                          <div class="error-msg">Max: {{ control.get('purchasedQty').value }}</div>
+                        }
+                      </div>
+                    </td>
+
+                    <td class="text-right font-bold" style="padding-right: 24px;" 
+                        [class.text-[var(--text-primary)]]="control.get('returnQty').value > 0"
+                        [class.text-[var(--text-tertiary)]]="control.get('returnQty').value === 0">
+                      {{ getRowTotal(control) | currency:'INR' }}
+                    </td>
+
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div> </div>
+        </div>
+      </div>
+
+      <aside class="sidebar-column">
+        <div class="summary-card">
+          
+          <div class="supplier-info">
+            <label>Supplier</label>
+            <div class="supplier-name">{{ p.supplierId?.companyName }}</div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="form-section">
+            <label class="field-label">Reason <span class="required">*</span></label>
+            <textarea pInputTextarea formControlName="reason" rows="4" class="custom-textarea" 
+              placeholder="Why are you returning this?"></textarea>
+            @if (returnForm.get('reason')?.invalid && returnForm.get('reason')?.touched) {
+              <small class="error-text">Reason is required.</small>
+            }
+          </div>
+
+          <div class="totals-section">
+            <div class="total-row">
+              <span>Total Refund</span>
+              <span class="amount">{{ totalRefundAmount() | currency:'INR' }}</span>
+            </div>
+            <p class="info-note">
+              <i class="pi pi-info-circle"></i> Amount includes tax.
+            </p>
+          </div>
+
+          <div class="action-buttons">
+            <button pButton label="Confirm Return" icon="pi pi-check-circle" class="p-button-primary w-full" 
               type="submit"
               [loading]="isSubmitting()"
-              [disabled]="returnForm.invalid || totalRefundAmount() <= 0">
-            </p-button>
+              [disabled]="returnForm.invalid || totalRefundAmount() <= 0"
+              [pTooltip]="totalRefundAmount() <= 0 ? 'Select items to return' : ''">
+            </button>
             
-            <p-button 
-              label="Cancel" 
-              styleClass="p-button-outlined w-full p-button-secondary" 
-              [routerLink]="['/purchase', purchaseId()]">
-            </p-button>
+            <button pButton label="Cancel" class="p-button-outlined p-button-secondary w-full" 
+              type="button" [routerLink]="['/purchase', purchaseId()]">
+            </button>
           </div>
-        </div>
 
+        </div>
       </aside>
+
     </form>
   }
 </div>

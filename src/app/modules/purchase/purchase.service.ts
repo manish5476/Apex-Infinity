@@ -6,76 +6,166 @@ import { BaseApiService } from '../../core/services/base-api.service';
 export class PurchaseService extends BaseApiService {
   private endpoint = '/v1/purchases';
 
-  // ================= CREATE =================
-  createPurchase(formData: FormData): Observable<any> {
-    return this.post(this.endpoint, formData, 'createPurchase');
-  }
-
-  // ================= GET =================
+  // ================= STANDARD CRUD =================
   getAllPurchases(filterParams?: any): Observable<any> {
-    return this.get(this.endpoint, filterParams, 'getAllPurchases');
+    return this.get(this.endpoint, filterParams);
   }
 
   getPurchaseById(id: string): Observable<any> {
-    return this.get(`${this.endpoint}/${id}`, {}, 'getPurchaseById');
+    return this.get(`${this.endpoint}/${id}`);
   }
 
-  // ================= UPDATE =================
+  createPurchase(formData: FormData): Observable<any> {
+    return this.post(this.endpoint, formData);
+  }
+
   updatePurchase(id: string, formData: FormData): Observable<any> {
-    return this.patch(`${this.endpoint}/${id}`, formData, 'updatePurchase');
+    return this.patch(`${this.endpoint}/${id}`, formData);
   }
 
-  // ================= DELETE =================
   deletePurchase(id: string): Observable<any> {
-    return this.delete(`${this.endpoint}/${id}`, null, 'deletePurchase');
+    return this.delete(`${this.endpoint}/${id}`);
   }
 
-  // ================= ATTACHMENT OPERATIONS =================
-  // DELETE /v1/purchases/:id/attachments/:fileIndex
+  // ================= STATUS & BULK =================
+  updateStatus(id: string, status: string, notes?: string): Observable<any> {
+    return this.patch(`${this.endpoint}/${id}/status`, { status, notes });
+  }
+
+  bulkUpdate(ids: string[], updates: any): Observable<any> {
+    return this.patch(`${this.endpoint}/bulk-update`, { ids, updates });
+  }
+
+  // ================= ATTACHMENTS =================
+  addAttachments(id: string, files: File[]): Observable<any> {
+    const formData = new FormData();
+    files.forEach(file => formData.append('attachments', file));
+    return this.post(`${this.endpoint}/${id}/attachments`, formData);
+  }
+
   deleteAttachment(purchaseId: string, fileIndex: number): Observable<any> {
-    const url = `${this.endpoint}/${purchaseId}/attachments/${fileIndex}`;
-    return this.delete(url, null, 'deleteAttachment');
+    return this.delete(`${this.endpoint}/${purchaseId}/attachments/${fileIndex}`);
   }
 
-  // ================= NEW ACTIONS (Outflows & Returns) =================
+  // ================= PAYMENTS (Outflow) =================
+  recordPayment(id: string, paymentData: any): Observable<any> {
+    return this.post(`${this.endpoint}/${id}/payments`, paymentData);
+  }
 
-  /**
-   * Cancel a purchase (Full Reversal)
-   * POST /v1/purchases/:id/cancel
-   */
+  getPaymentHistory(id: string): Observable<any> {
+    return this.get(`${this.endpoint}/${id}/payments`);
+  }
+
+  deletePayment(purchaseId: string, paymentId: string): Observable<any> {
+    return this.delete(`${this.endpoint}/${purchaseId}/payments/${paymentId}`);
+  }
+
+  // ================= RETURNS & CANCELLATION =================
   cancelPurchase(id: string, reason: string): Observable<any> {
-    return this.post(`${this.endpoint}/${id}/cancel`, { reason }, 'cancelPurchase');
+    return this.post(`${this.endpoint}/${id}/cancel`, { reason });
   }
 
-  /**
-   * Record an outflow payment to the supplier
-   * POST /v1/purchases/:id/payments
-   * Body: { amount, paymentMethod, date, reference, notes }
-   */
-  recordPayment(id: string, paymentData: {
-    amount: number;
-    paymentMethod: string;
-    date?: Date;
-    reference?: string;
-    notes?: string
-  }): Observable<any> {
-    return this.post(`${this.endpoint}/${id}/payments`, paymentData, 'recordPayment');
+  partialReturn(id: string, returnData: any): Observable<any> {
+    return this.post(`${this.endpoint}/${id}/return`, returnData);
   }
 
-  /**
-   * Process a partial return (Debit Note)
-   * POST /v1/purchases/:id/return
-   * Body: { items: [{ productId, quantity }], reason }
-   */
-  partialReturn(id: string, returnData:any): Observable<any> {
-    return this.post(`${this.endpoint}/${id}/return`, returnData, 'partialReturn');
+  getAllReturns(filterParams?: any): Observable<any> {
+    // Note: Matches the 'returns' path in the new router
+    return this.get(`${this.endpoint}/returns`, filterParams);
   }
 
-  getPurchaseReturnById(id: string): Observable<any> {
-    return this.get(`${this.endpoint}/purchaseReturn/${id}`, {}, 'getPurchaseReturnById');
+  getReturnById(id: string): Observable<any> {
+    return this.get(`${this.endpoint}/returns/${id}`);
   }
 
-  getAllPurchaseReturn(filterParams?: any): Observable<any> {
-    return this.get(`${this.endpoint}/purchaseReturn`, filterParams, 'getAllPurchaseReturn');
+  // ================= ANALYTICS =================
+  getAnalytics(filterParams?: any): Observable<any> {
+    return this.get(`${this.endpoint}/analytics`, filterParams);
+  }
+
+  getPendingPayments(days: number = 30): Observable<any> {
+    return this.get(`${this.endpoint}/pending-payments`, { days });
   }
 }
+
+// import { Injectable } from '@angular/core';
+// import { Observable } from 'rxjs';
+// import { BaseApiService } from '../../core/services/base-api.service';
+
+// @Injectable({ providedIn: 'root' })
+// export class PurchaseService extends BaseApiService {
+//   private endpoint = '/v1/purchases';
+
+//   // ================= CREATE =================
+//   createPurchase(formData: FormData): Observable<any> {
+//     return this.post(this.endpoint, formData, 'createPurchase');
+//   }
+
+//   // ================= GET =================
+//   getAllPurchases(filterParams?: any): Observable<any> {
+//     return this.get(this.endpoint, filterParams, 'getAllPurchases');
+//   }
+
+//   getPurchaseById(id: string): Observable<any> {
+//     return this.get(`${this.endpoint}/${id}`, {}, 'getPurchaseById');
+//   }
+
+//   // ================= UPDATE =================
+//   updatePurchase(id: string, formData: FormData): Observable<any> {
+//     return this.patch(`${this.endpoint}/${id}`, formData, 'updatePurchase');
+//   }
+
+//   // ================= DELETE =================
+//   deletePurchase(id: string): Observable<any> {
+//     return this.delete(`${this.endpoint}/${id}`, null, 'deletePurchase');
+//   }
+
+//   // ================= ATTACHMENT OPERATIONS =================
+//   // DELETE /v1/purchases/:id/attachments/:fileIndex
+//   deleteAttachment(purchaseId: string, fileIndex: number): Observable<any> {
+//     const url = `${this.endpoint}/${purchaseId}/attachments/${fileIndex}`;
+//     return this.delete(url, null, 'deleteAttachment');
+//   }
+
+//   // ================= NEW ACTIONS (Outflows & Returns) =================
+
+//   /**
+//    * Cancel a purchase (Full Reversal)
+//    * POST /v1/purchases/:id/cancel
+//    */
+//   cancelPurchase(id: string, reason: string): Observable<any> {
+//     return this.post(`${this.endpoint}/${id}/cancel`, { reason }, 'cancelPurchase');
+//   }
+
+//   /**
+//    * Record an outflow payment to the supplier
+//    * POST /v1/purchases/:id/payments
+//    * Body: { amount, paymentMethod, date, reference, notes }
+//    */
+//   recordPayment(id: string, paymentData: {
+//     amount: number;
+//     paymentMethod: string;
+//     date?: Date;
+//     reference?: string;
+//     notes?: string
+//   }): Observable<any> {
+//     return this.post(`${this.endpoint}/${id}/payments`, paymentData, 'recordPayment');
+//   }
+
+//   /**
+//    * Process a partial return (Debit Note)
+//    * POST /v1/purchases/:id/return
+//    * Body: { items: [{ productId, quantity }], reason }
+//    */
+//   partialReturn(id: string, returnData:any): Observable<any> {
+//     return this.post(`${this.endpoint}/${id}/return`, returnData, 'partialReturn');
+//   }
+
+//   getPurchaseReturnById(id: string): Observable<any> {
+//     return this.get(`${this.endpoint}/purchaseReturn/${id}`, {}, 'getPurchaseReturnById');
+//   }
+
+//   getAllPurchaseReturn(filterParams?: any): Observable<any> {
+//     return this.get(`${this.endpoint}/purchaseReturn`, filterParams, 'getAllPurchaseReturn');
+//   }
+// }

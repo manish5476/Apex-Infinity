@@ -1,21 +1,11 @@
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-purchase-return',
-//   imports: [],
-//   templateUrl: './purchase-return.html',
-//   styleUrl: './purchase-return.scss',
-// })
-// export class PurchaseReturn {
-
-// }
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { finalize } from 'rxjs/operators';
+import { finalize, distinctUntilChanged } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
-// PrimeNG Imports
+// PrimeNG
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TableModule } from 'primeng/table';
@@ -23,65 +13,43 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { TagModule } from 'primeng/tag';
 import { DividerModule } from 'primeng/divider';
 import { MessageModule } from 'primeng/message';
+import { TooltipModule } from 'primeng/tooltip';
+
 import { AppMessageService } from '../../../core/services/message.service';
 import { PurchaseService } from '../purchase.service';
-
 
 @Component({
   selector: 'app-purchase-return',
   standalone: true,
   imports: [
-    CommonModule,
-    RouterLink,
-    ReactiveFormsModule,
-    FormsModule,
-    CurrencyPipe,
-    DatePipe,
-    // PrimeNG
-    ButtonModule,
-    CardModule,
-    TableModule,
-    InputNumberModule,
-    TagModule,
-    DividerModule,
-    MessageModule
+    CommonModule, RouterLink, ReactiveFormsModule, FormsModule,
+    CurrencyPipe, DatePipe, ButtonModule, CardModule, TableModule,
+    InputNumberModule, TagModule, DividerModule, MessageModule, 
+     TooltipModule
   ],
   templateUrl: './purchase-return.html',
-  styleUrl: './purchase-return.scss'
+  styleUrls: ['./purchase-return.scss']
 })
-export class PurchaseReturnComponent implements OnInit {
+export class PurchaseReturnComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private purchaseService = inject(PurchaseService);
   private messageService = inject(AppMessageService);
-
+  
   // State
   purchaseId = signal<string | null>(null);
   isLoading = signal<boolean>(true);
   isSubmitting = signal<boolean>(false);
   originalPurchase = signal<any>(null);
+  totalRefundAmount = signal<number>(0);
+
+  private formSub: Subscription | null = null;
 
   // Form
   returnForm: FormGroup = this.fb.group({
     reason: ['', [Validators.required, Validators.minLength(3)]],
-    items: this.fb.array([])
-  });
-
-  // Computed Values
-  totalRefundAmount = computed(() => {
-    const items = this.returnItems.controls;
-    let total = 0;
-    items.forEach(control => {
-      const qty = control.get('returnQty')?.value || 0;
-      const price = control.get('price')?.value || 0;
-      const tax = control.get('taxRate')?.value || 0;
-      
-      const lineTotal = qty * price;
-      const taxAmount = (lineTotal * tax) / 100;
-      total += lineTotal + taxAmount;
-    });
-    return total;
+    items: this.fb.array([]) // Will be populated dynamically
   });
 
   get returnItems() {
@@ -94,9 +62,52 @@ export class PurchaseReturnComponent implements OnInit {
     if (this.purchaseId()) {
       this.loadPurchase(this.purchaseId()!);
     } else {
-      this.messageService.showError('Error', 'Invalid Purchase ID');
       this.router.navigate(['/purchase']);
     }
+
+    // ✅ THE FIX: Subscribe to form changes globally
+    // This runs AFTER the form control updates, ensuring calculations are accurate
+    this.formSub = this.returnForm.valueChanges
+      .pipe(distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)))
+      .subscribe(() => {
+        this.recalculate();
+      });
+  }
+
+  ngOnDestroy() {
+    if (this.formSub) this.formSub.unsubscribe();
+  }
+
+  // ✅ Auto-calculation Logic
+  recalculate() {
+    // Get raw values to ensure we catch everything
+    const items = this.returnForm.getRawValue().items || [];
+    let total = 0;
+    
+    items.forEach((item: any) => {
+      const qty = Number(item.returnQty) || 0;
+      const price = Number(item.price) || 0;
+      const tax = Number(item.taxRate) || 0;
+      
+      if (qty > 0) {
+        // Formula: (Price * Qty) + Tax Portion
+        const base = qty * price;
+        const taxAmount = base * (tax / 100);
+        total += base + taxAmount;
+      }
+    });
+
+    this.totalRefundAmount.set(total);
+  }
+
+  // Helper for template display
+  getRowTotal(control: any): number {
+    const val = control.value; // Access reactive value directly
+    const qty = Number(val.returnQty) || 0;
+    const price = Number(val.price) || 0;
+    const tax = Number(val.taxRate) || 0;
+    const base = qty * price;
+    return base + (base * tax / 100);
   }
 
   loadPurchase(id: string) {
@@ -105,10 +116,10 @@ export class PurchaseReturnComponent implements OnInit {
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: (res: any) => {
-          if (res && res.data.data) {
-            const purchase = res.data.data;
-            this.originalPurchase.set(purchase);
-            this.initFormItems(purchase.items);
+          const data = res.data?.data || res.data;
+          if (data) {
+            this.originalPurchase.set(data);
+            this.initFormItems(data.items);
           }
         },
         error: () => {
@@ -120,19 +131,27 @@ export class PurchaseReturnComponent implements OnInit {
 
   initFormItems(items: any[]) {
     this.returnItems.clear();
+    
     items.forEach(item => {
-      // Only add items that have quantity > 0
       if (item.quantity > 0) {
+        // Handle populated object or string ID
+        const prodId = item.productId && item.productId._id ? item.productId._id : item.productId;
+        const prodName = item.productId && item.productId.name ? item.productId.name : item.name;
+
         this.returnItems.push(this.fb.group({
-          productId: [item.productId._id || item.productId],
-          name: [item.name],
+          productId: [prodId], 
+          name: [prodName],
           purchasedQty: [item.quantity],
           price: [item.purchasePrice],
           taxRate: [item.taxRate || 0],
-          returnQty: [0, [Validators.min(0), Validators.max(item.quantity)]]
+          // Min 0 required for typing, Max prevents over-return
+          returnQty: [0, [Validators.required, Validators.min(0), Validators.max(item.quantity)]]
         }));
       }
     });
+    
+    // Initial Calc
+    this.recalculate();
   }
 
   onSubmit() {
@@ -141,19 +160,18 @@ export class PurchaseReturnComponent implements OnInit {
       return;
     }
 
+    if (this.totalRefundAmount() <= 0) {
+      this.messageService.showError('Warning', 'Please select items to return.');
+      return;
+    }
+
     const formValue = this.returnForm.value;
-    
     const itemsToReturn = formValue.items
       .filter((item: any) => item.returnQty > 0)
       .map((item: any) => ({
         productId: item.productId,
         quantity: item.returnQty
       }));
-
-    if (itemsToReturn.length === 0) {
-      this.messageService.showError('Warning', 'Please specify at least one item to return');
-      return;
-    }
 
     const payload = {
       items: itemsToReturn,
@@ -165,12 +183,10 @@ export class PurchaseReturnComponent implements OnInit {
       .pipe(finalize(() => this.isSubmitting.set(false)))
       .subscribe({
         next: () => {
-          this.messageService.showSuccess('Success', 'Purchase return processed successfully');
+          this.messageService.showSuccess('Success', 'Debit Note Created');
           this.router.navigate(['/purchase', this.purchaseId()]);
         },
-        error: (err) => {
-          this.messageService.showError('Failed', err.error?.message || 'Return processing failed');
-        }
+        error: (err) => this.messageService.showError('Failed', err.error?.message || 'Error')
       });
   }
 }

@@ -1,0 +1,221 @@
+/* =========================================
+   DEBIT NOTE PREMIUM STYLES
+   ========================================= */
+
+:host {
+  display: block;
+  height: 100%;
+  background-color: var(--bg-primary);
+}
+
+.page-container {
+  height: 100%;
+  overflow-y: auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* === LOADING === */
+.loading-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh;
+  p { margin-top: 1rem; color: var(--text-secondary); }
+}
+
+/* === ACTION BAR === */
+.action-bar {
+  width: 100%;
+  max-width: 1100px; /* Wider layout */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  .left {
+    display: flex; align-items: center; gap: 8px;
+    .divider { color: var(--text-tertiary); }
+    .crumb { font-weight: 600; color: var(--text-primary); }
+  }
+}
+
+/* === DOCUMENT SHEET (Paper) === */
+.document-sheet {
+  width: 100%;
+  max-width: 1100px; /* Full width feel */
+  background: white;
+  border: 1px solid var(--border-secondary);
+  border-radius: 16px;
+  padding: 64px; /* Spacious padding */
+  box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+  position: relative;
+  overflow: hidden;
+  color: #333; /* Force readable text */
+
+  /* Dark mode screen support */
+  @media (prefers-color-scheme: dark) {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+  }
+}
+
+/* === WATERMARK === */
+.watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  font-size: 8rem;
+  font-weight: 900;
+  color: var(--color-success);
+  opacity: 0.05;
+  pointer-events: none;
+  border: 4px solid currentColor;
+  padding: 1rem 4rem;
+  border-radius: 1rem;
+}
+
+/* === HEADER === */
+.doc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 32px;
+
+  .brand-section {
+    .doc-type-label {
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .doc-number {
+      font-family: var(--font-heading);
+      font-size: 3rem; /* Large Impact */
+      font-weight: 800;
+      line-height: 1;
+      margin: 0 0 8px 0;
+      color: var(--text-primary);
+    }
+    .doc-date { font-size: 1rem; color: var(--text-secondary); }
+  }
+
+  .total-section {
+    text-align: right;
+    background: var(--bg-ternary);
+    padding: 16px 24px;
+    border-radius: 12px;
+    
+    label { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-tertiary); display: block; }
+    .amount { font-size: 2rem; font-weight: 800; color: var(--color-error); }
+  }
+}
+
+.divider-line { height: 2px; background: var(--border-secondary); margin-bottom: 40px; }
+
+/* === INFO GRID === */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 48px;
+  margin-bottom: 48px;
+
+  .section-label {
+    font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); display: block; margin-bottom: 12px;
+  }
+
+  .primary-text { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); line-height: 1.3; }
+  .secondary-text { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; }
+
+  .ref-item {
+    display: flex; justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--border-secondary);
+    font-size: 0.95rem;
+    span:first-child { color: var(--text-secondary); }
+    span:last-child { font-weight: 500; color: var(--text-primary); }
+    .link { color: var(--accent-primary); cursor: pointer; &:hover { text-decoration: underline; } }
+  }
+
+  .reason-box {
+    background: var(--bg-ternary);
+    padding: 16px;
+    border-radius: 8px;
+    font-style: italic;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    border-left: 3px solid var(--accent-primary);
+  }
+}
+
+/* === TABLE === */
+.p-table-clean {
+  ::ng-deep .p-datatable {
+    border: 1px solid var(--border-secondary);
+    border-radius: 12px;
+    overflow: hidden;
+    
+    .p-datatable-thead > tr > th {
+      background: var(--bg-ternary);
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 16px;
+      border-bottom: 1px solid var(--border-secondary);
+    }
+    .p-datatable-tbody > tr > td {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-secondary);
+      font-size: 0.95rem;
+      color: var(--text-primary);
+    }
+    .p-datatable-tbody > tr:last-child > td { border-bottom: none; }
+  }
+}
+
+/* === FOOTER === */
+.doc-footer {
+  margin-top: 64px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+
+  .notes {
+    max-width: 60%;
+    font-size: 0.85rem;
+    color: var(--text-tertiary);
+    line-height: 1.5;
+  }
+
+  .signature {
+    text-align: center;
+    width: 200px;
+    .line { border-top: 2px solid var(--border-secondary); margin-bottom: 8px; }
+    span { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--text-tertiary); }
+  }
+}
+
+/* === PRINT === */
+@media print {
+  @page { size: A4; margin: 1cm; }
+  body * { visibility: hidden; }
+  
+  .page-container { padding: 0; margin: 0; background: white; }
+  .no-print { display: none !important; }
+
+  .document-sheet, .document-sheet * { visibility: visible; }
+  
+  .document-sheet {
+    position: absolute; left: 0; top: 0;
+    width: 100%; max-width: 100%;
+    border: none; box-shadow: none; padding: 0; margin: 0;
+    background: white !important; color: black !important;
+  }
+
+  .watermark { opacity: 0.1 !important; border-color: #ddd !important; color: #ddd !important; }
+  .total-section { background: none !important; border: 1px solid #ddd; }
+  .amount { color: black !important; }
+}

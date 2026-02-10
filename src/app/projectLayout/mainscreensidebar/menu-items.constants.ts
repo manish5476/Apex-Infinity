@@ -45,7 +45,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
       { label: 'EMI Management', icon: 'pi pi-calendar-clock', routerLink: ['/emis'] },
     ]
   },
- {
+  {
     label: 'Notes',
     icon: 'pi pi-book',
     items: [
@@ -90,6 +90,8 @@ export const SIDEBAR_MENU: MenuItem[] = [
         items: [
           { label: 'Purchase Orders', icon: 'pi pi-list', routerLink: ['/purchase'] },
           { label: 'New Purchase', icon: 'pi pi-plus', routerLink: ['/purchase/create'] },
+          // ✅ ADDED: Returns / Debit Notes
+          { label: 'Debit Notes (Returns)', icon: 'pi pi-replay', routerLink: ['/purchase/returns'] }
         ]
       },
       { label: 'Suppliers', icon: 'pi pi-truck', routerLink: ['/suppliers'] },
@@ -165,7 +167,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
       { label: 'Active Sessions', icon: 'pi pi-wifi', routerLink: ['/sessions'] },
     ]
   },
- 
+
 ];
 
 

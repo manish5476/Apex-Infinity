@@ -1,0 +1,121 @@
+<div class="page-container animate-fadeIn custom-scrollbar">
+  
+  @if (loading()) {
+    <div class="loading-state">
+      <i class="pi pi-spin pi-spinner text-4xl mb-4 text-[var(--accent-primary)]"></i>
+      <p>Retrieving Debit Note...</p>
+    </div>
+  } 
+  
+  @else if (ret(); as r) {
+    
+    <div class="action-bar no-print">
+      <div class="left">
+        <p-button icon="pi pi-arrow-left" label="Back" styleClass="p-button-text p-button-secondary" (onClick)="goBack()"></p-button>
+        <span class="divider">/</span>
+        <span class="crumb">Debit Note #{{ formatId(r._id) }}</span>
+      </div>
+      <div class="right flex gap-2">
+        <p-button label="View Invoice" icon="pi pi-external-link" styleClass="p-button-outlined p-button-secondary" 
+          (onClick)="goToInvoice(r.purchaseId?._id)"></p-button>
+        <p-button label="Print PDF" icon="pi pi-print" styleClass="p-button-primary" (onClick)="print()"></p-button>
+      </div>
+    </div>
+
+    <div class="document-sheet">
+      
+      <div class="watermark">CREDITED</div>
+
+      <header class="doc-header">
+        <div class="brand-section">
+          <div class="doc-type-label">DEBIT NOTE</div>
+          <h1 class="doc-number">#{{ formatId(r._id) }}</h1> <div class="doc-date">Date: <strong>{{ r.returnDate | date:'mediumDate' }}</strong></div>
+        </div>
+
+        <div class="total-section">
+          <label>Total Refunded</label>
+          <div class="amount">{{ r.totalAmount | currency:'INR' }}</div>
+        </div>
+      </header>
+
+      <div class="divider-line"></div>
+
+      <div class="info-grid">
+        
+        <div class="info-col">
+          <label class="section-label">Issued To</label>
+          <div class="primary-text">{{ r.supplierId?.companyName }}</div>
+          <div class="secondary-text mt-1">
+            <div *ngIf="r.supplierId?.email"><i class="pi pi-envelope mr-1"></i> {{ r.supplierId.email }}</div>
+            <div *ngIf="r.supplierId?.phone"><i class="pi pi-phone mr-1"></i> {{ r.supplierId.phone }}</div>
+            <div class="mt-1 opacity-70" *ngIf="r.supplierId?.address as addr">
+              {{ addr.street }}, {{ addr.city }}
+            </div>
+          </div>
+        </div>
+
+        <div class="info-col">
+          <label class="section-label">Reference</label>
+          <div class="ref-item">
+            <span>Original Inv:</span>
+            <strong class="link" (click)="goToInvoice(r.purchaseId?._id)">{{ r.purchaseId?.invoiceNumber }}</strong>
+          </div>
+          <div class="ref-item">
+            <span>Purchase Date:</span>
+            <span>{{ r.purchaseId?.purchaseDate | date:'mediumDate' }}</span>
+          </div>
+          <div class="ref-item">
+            <span>Processed By:</span>
+            <span>{{ r.createdBy?.name }}</span>
+          </div>
+        </div>
+
+        <div class="info-col">
+          <label class="section-label">Reason</label>
+          <div class="reason-box">
+            {{ r.reason }}
+          </div>
+        </div>
+      </div>
+
+      <div class="items-section mt-8">
+        <p-table [value]="r.items" styleClass="p-table-clean">
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="padding-left: 1.5rem; width: 50%;">Item Description</th>
+              <th class="text-right">Return Price</th>
+              <th class="text-center">Qty</th>
+              <th class="text-right" style="padding-right: 1.5rem;">Total</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item>
+            <tr>
+              <td style="padding-left: 1.5rem;">
+                <div class="font-bold text-[var(--text-primary)]">{{ item.name }}</div>
+                <div class="text-xs text-[var(--text-secondary)] mt-0.5" *ngIf="item.productId?.sku">
+                  SKU: {{ item.productId.sku }}
+                </div>
+              </td>
+              <td class="text-right">{{ item.returnPrice | currency:'INR' }}</td>
+              <td class="text-center font-bold">{{ item.quantity }}</td>
+              <td class="text-right font-bold text-[var(--text-primary)]" style="padding-right: 1.5rem;">
+                {{ item.total | currency:'INR' }}
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+
+      <footer class="doc-footer">
+        <div class="notes">
+          <strong>Note:</strong> This debit note confirms the return of goods. The value has been credited to your account.
+        </div>
+        <div class="signature">
+          <div class="line"></div>
+          <span>Authorized Signature</span>
+        </div>
+      </footer>
+
+    </div>
+  }
+</div>

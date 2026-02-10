@@ -3,12 +3,358 @@
 <div class="customer-page-container animate-fadeIn custom-scrollbar">
 
   @if (isLoading()) {
-    <div class="loading-state">
-      <i class="pi pi-spin pi-spinner text-4xl mb-4"></i>
-      <p>Loading Purchase Details...</p>
+  <div class="loading-state">
+    <i class="pi pi-spin pi-spinner text-4xl mb-4"></i>
+    <p>Loading Purchase Details...</p>
+  </div>
+  }
+
+  @else if (purchase(); as p) {
+  <div class="product-details-card">
+    <div class="details-header">
+      <div class="header-left">
+        <p-button icon="pi pi-arrow-left" styleClass="p-button-text p-button-rounded p-button-secondary"
+          routerLink="/purchase">
+        </p-button>
+
+        <div class="header-identity">
+          <div class="title-row">
+            <h2 class="product-title">Invoice #{{ p.invoiceNumber }}</h2>
+            <p-tag [value]="p.status | titlecase" [severity]="getStatusSeverity(p.status)"
+              styleClass="status-tag px-3 uppercase">
+            </p-tag>
+          </div>
+          <div class="subtitle-row">
+            <span class="sku-badge"><i class="pi pi-calendar"></i> {{ formatDate(p.purchaseDate) }}</span>
+            <span class="separator">•</span>
+            <span class="brand-text">Created by {{ p.createdBy?.name || 'Unknown' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <p-button *ngIf="p.status !== 'cancelled' && p.paymentStatus !== 'paid'" label="Record Payment"
+          icon="pi pi-wallet" styleClass="p-button-outlined p-button-sm mr-2" (onClick)="openPaymentModal()">
+        </p-button>
+
+        <p-button label="Return / Debit Note" icon="pi pi-undo" styleClass="p-button-outlined p-button-sm mr-2"
+          [routerLink]="['/purchase', 'return', p._id]">
+        </p-button>
+
+        <p-button label="Edit Invoice" icon="pi pi-pencil" styleClass="p-button-outlined p-button-sm"
+          [routerLink]="['/purchase', p._id, 'edit']" [disabled]="p.status === 'cancelled'">
+        </p-button>
+        <div class="header-actions">
+
+          <p-button *ngIf="p.status === 'draft'" label="Mark as Received" icon="pi pi-check"
+            styleClass="p-button-success p-button-sm mr-2" (onClick)="updateStatus('received')">
+          </p-button>
+
+          <p-button *ngIf="p.status === 'received' && p.paymentStatus !== 'paid'" label="Cancel Order"
+            icon="pi pi-times" styleClass="p-button-danger p-button-outlined p-button-sm mr-2"
+            (onClick)="showCancelDialog.set(true)">
+          </p-button>
+
+          <p-button *ngIf="p.status !== 'cancelled'" label="Record Payment" icon="pi pi-wallet"
+            styleClass="p-button-outlined p-button-sm mr-2" (onClick)="openPaymentModal()">
+          </p-button>
+
+        </div>
+
+        <p-button label="Print" icon="pi pi-print" styleClass="p-button-text p-button-secondary"></p-button>
+      </div>
     </div>
-  } 
-  
+
+    <div class="details-body">
+
+      <aside class="profile-sidebar animate-slideInUp">
+
+        <div class="supplier-card-wrapper">
+          <div class="supplier-header">
+            <div class="supplier-icon"><i class="pi pi-building"></i></div>
+            <div>
+              <label class="text-xs uppercase text-[var(--text-label)] font-bold">Supplier</label>
+              <div class="text-lg font-bold text-[var(--text-primary)] leading-tight">{{ p.supplierId?.companyName }}
+              </div>
+            </div>
+          </div>
+          <div class="mt-3 text-sm text-[var(--text-secondary)]">
+            <div class="flex gap-2 items-center mb-1"><i class="pi pi-phone text-xs"></i> {{ p.supplierId?.phone ||
+              'N/A' }}</div>
+            <div class="flex gap-2 items-center"><i class="pi pi-map-marker text-xs"></i> {{ p.supplierId?.city || 'N/A'
+              }}</div>
+          </div>
+        </div>
+
+        <p-divider styleClass="w-full my-2"></p-divider>
+
+        <div class="attributes-list">
+          <div class="attribute-item">
+            <div class="attr-icon"><i class="pi pi-shop"></i></div>
+            <div class="attr-data">
+              <label>Receiving Branch</label>
+              <span>{{ p.branchId?.name || 'Head Office' }}</span>
+            </div>
+          </div>
+
+          <div class="attribute-item">
+            <div class="attr-icon"><i class="pi pi-clock"></i></div>
+            <div class="attr-data">
+              <label>Due Date</label>
+              <span>{{ p.dueDate ? formatDate(p.dueDate) : 'Immediate' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <p-divider styleClass="w-full my-2"></p-divider>
+
+        <div class="attachments-section">
+          <div class="flex justify-between items-center mb-3">
+            <label class="section-label mb-0">
+              <i class="pi pi-paperclip mr-1"></i> Attachments ({{ p.attachedFiles?.length || 0 }})
+            </label>
+
+            <p-fileUpload mode="basic" [auto]="true" chooseLabel="Add" chooseIcon="pi pi-plus" name="attachments" url=""
+              accept="image/*,application/pdf" maxFileSize="5000000"
+              (onSelect)="onFileSelect($event, $any($event).originalEvent?.target)" [customUpload]="true"
+              (uploadHandler)="onFileSelect($event, uploadComp)" #uploadComp
+              styleClass="p-button-xs p-button-text p-button-secondary">
+            </p-fileUpload>
+          </div>
+
+          <div class="files-gallery">
+            @for(file of p.attachedFiles; track $index) {
+            <div class="gallery-item group">
+
+              <button class="delete-btn" (click)="$event.stopPropagation(); deleteAttachment($index)" pTooltip="Remove"
+                tooltipPosition="top">
+                <i class="pi pi-trash"></i>
+              </button>
+
+              @if (isImage(file)) {
+              <div class="image-wrapper" appImageViewer>
+                <img [src]="file.url" [alt]="'Attachment ' + ($index + 1)" class="gallery-img" [appImageViewer]="file.url" >
+                <div class="hover-overlay">
+                  <i class="pi pi-eye"></i>
+                </div>
+              </div>
+              }
+
+              @else {
+              <div class="doc-wrapper" (click)="downloadAttachment(file)">
+                <div class="doc-icon">
+                  <i class="pi"
+                    [ngClass]="file.format === 'pdf' ? 'pi-file-pdf text-red-500' : 'pi-file text-blue-500'"></i>
+                </div>
+                <span class="doc-ext">{{ file.format || 'FILE' | uppercase }}</span>
+                <span class="doc-label">View</span>
+              </div>
+              }
+            </div>
+            }
+
+            @if (!p.attachedFiles?.length) {
+            <div class="empty-gallery">
+              <i class="pi pi-images text-3xl mb-2 opacity-30"></i>
+              <span class="text-xs text-[var(--text-tertiary)]">No attachments yet</span>
+            </div>
+            }
+          </div>
+        </div>
+
+        <!-- <div class="attachments-section">
+          <div class="flex justify-between items-center mb-2">
+            <label class="section-label mb-0">Attachments ({{ p.attachedFiles?.length || 0 }})</label>
+
+            <p-fileUpload mode="basic" [auto]="true" chooseLabel="Add" chooseIcon="pi pi-plus" name="attachments" url=""
+              accept="image/*,application/pdf" maxFileSize="5000000"
+              (onSelect)="onFileSelect($event, $any($event).originalEvent?.target)" [customUpload]="true"
+              (uploadHandler)="onFileSelect($event, uploadComp)" #uploadComp styleClass="p-button-xs p-button-text">
+            </p-fileUpload>
+          </div>
+
+          <div class="files-grid">
+            @for(file of p.attachedFiles; track $index) {
+            <div class="file-item group relative"> <button
+                class="absolute top-1 right-1 p-1 bg-white rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-10 text-red-500 hover:bg-red-50"
+                (click)="$event.stopPropagation(); deleteAttachment($index)">
+                <i class="pi pi-trash text-xs"></i>
+              </button>
+
+              <div class="file-item-content" (click)="downloadAttachment(file)">
+                <div class="file-icon"><i class="pi pi-file-pdf text-red-500 text-xl"></i></div>
+                <div class="file-info">
+                  <span class="file-name">Document {{$index + 1}}</span>
+                  <span class="file-action">Click to view</span>
+                </div>
+              </div>
+            </div>
+            }
+          </div>
+        </div> -->
+
+      </aside>
+
+      <section class="main-details">
+
+        <div class="metrics-grid animate-slideInUp" style="animation-delay: 0.1s;">
+          <div class="metric-card primary-metric">
+            <div class="metric-content">
+              <label>Grand Total</label>
+              <span class="value">{{ p.grandTotal | currency:'INR' }}</span>
+            </div>
+            <div class="metric-icon"><i class="pi pi-wallet"></i></div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-content">
+              <label>Amount Paid</label>
+              <span class="value text-green-600">{{ p.paidAmount | currency:'INR' }}</span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-content">
+              <label>Balance Due</label>
+              <span class="value" [class.text-red-500]="p.balanceAmount > 0"
+                [class.text-gray-400]="p.balanceAmount <= 0">
+                {{ p.balanceAmount | currency:'INR' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-content">
+              <label>Payment Status</label>
+              <p-tag [value]="p.paymentStatus | uppercase" [severity]="getPaymentSeverity(p.paymentStatus)"></p-tag>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-section animate-slideInUp" style="animation-delay: 0.2s;">
+          <div class="section-header-row">
+            <h4 class="section-heading"><i class="pi pi-list"></i> Purchased Items</h4>
+          </div>
+
+          <div class="grid-wrapper" style="height: 300px; width: 100%;">
+            <app-ag-share-grid [columns]="itemColumns" [data]="itemsData()" [showActions]="false"
+              paginationPageSize="100">
+            </app-ag-share-grid>
+          </div>
+
+          <div class="flex justify-end mt-4 px-4">
+            <div class="w-64 flex flex-col gap-2">
+              <div class="flex justify-between text-sm text-[var(--text-secondary)]">
+                <span>Subtotal</span><span>{{ p.subTotal | currency:'INR' }}</span>
+              </div>
+              <div class="flex justify-between text-sm text-[var(--text-secondary)]">
+                <span>Tax</span><span>+ {{ p.totalTax | currency:'INR' }}</span>
+              </div>
+              <div class="flex justify-between text-sm text-[var(--text-secondary)]">
+                <span>Discount</span><span>- {{ p.totalDiscount | currency:'INR' }}</span>
+              </div>
+              <p-divider styleClass="my-1"></p-divider>
+              <div class="flex justify-between text-lg font-bold text-[var(--text-primary)]">
+                <span>Total</span><span>{{ p.grandTotal | currency:'INR' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-section animate-slideInUp" style="animation-delay: 0.25s;"
+          *ngIf="paymentHistoryData().length > 0">
+          <div class="section-header-row">
+            <h4 class="section-heading"><i class="pi pi-history"></i> Payment History</h4>
+          </div>
+
+          <div class="grid-wrapper" style="height: 200px; width: 100%;">
+            <app-ag-share-grid [columns]="paymentColumns" [data]="paymentHistoryData()" [showActions]="false">
+            </app-ag-share-grid>
+          </div>
+        </div>
+
+        <div class="content-section animate-slideInUp" style="animation-delay: 0.3s;" *ngIf="p.notes">
+          <h4 class="section-heading"><i class="pi pi-align-left"></i> Notes</h4>
+          <div class="description-box bg-[var(--bg-ternary)] p-3 rounded border border-[var(--border-secondary)]">
+            <p>{{ p.notes }}</p>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </div>
+  }
+</div>
+
+<p-dialog appendTo="body" [(visible)]="showPaymentDialog" header="Record Outgoing Payment" [modal]="true"
+  styleClass="p-dialog-premium" [style]="{ width: '450px' }" [draggable]="false" [resizable]="false">
+
+  <form [formGroup]="paymentForm" class="payment-form-grid" (ngSubmit)="submitPayment()">
+    <div class="form-group">
+      <label>Amount <span class="text-red-500">*</span></label>
+      <p-inputNumber formControlName="amount" mode="currency" currency="INR" locale="en-IN"
+        [max]="purchase()?.balanceAmount" styleClass="w-full" class="w-full">
+      </p-inputNumber>
+      <small class="text-[var(--text-secondary)] mt-1">Balance Due: {{ purchase()?.balanceAmount | currency:'INR'
+        }}</small>
+    </div>
+    <div class="form-group">
+      <label>Payment Date <span class="text-red-500">*</span></label>
+      <p-datepicker formControlName="date" appendTo="body" [showIcon]="true" styleClass="w-full"
+        class="w-full"></p-datepicker>
+    </div>
+    <div class="form-group">
+      <label>Payment Method <span class="text-red-500">*</span></label>
+      <p-select appendTo="body" [options]="paymentMethods" formControlName="paymentMethod" optionLabel="label"
+        optionValue="value" styleClass="w-full" class="w-full"></p-select>
+    </div>
+    <div class="form-group">
+      <label>Reference No.</label>
+      <input pInputText formControlName="reference" class="w-full" placeholder="Cheque No / UPI Ref" />
+    </div>
+    <div class="form-group full-width">
+      <label>Notes</label>
+      <textarea pInputTextarea formControlName="notes" rows="2" class="w-full" placeholder="Details..."></textarea>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-2">
+      <p-button label="Cancel" styleClass="p-button-text p-button-secondary"
+        (onClick)="showPaymentDialog.set(false)"></p-button>
+      <p-button label="Save Payment" icon="pi pi-check" [loading]="isSubmittingPayment()" (onClick)="submitPayment()"
+        [disabled]="paymentForm.invalid"></p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="showCancelDialog" header="Cancel Purchase Order" [modal]="true" [style]="{width: '400px'}">
+  <div class="p-3">
+    <p class="text-sm text-gray-500 mb-3">
+      Are you sure? This will remove the items from inventory (if received) and reverse supplier balances.
+    </p>
+    <label class="block mb-2 font-bold text-sm">Reason for Cancellation</label>
+    <textarea pInputTextarea [(ngModel)]="cancelReason" rows="3" class="w-full"
+      placeholder="e.g. Wrong items sent..."></textarea>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button label="Abort" styleClass="p-button-text" (onClick)="showCancelDialog.set(false)"></p-button>
+    <p-button label="Confirm Cancel" styleClass="p-button-danger" (onClick)="confirmCancel()"
+      [disabled]="!cancelReason"></p-button>
+  </ng-template>
+</p-dialog>
+
+<!-- <p-toast position="top-right"></p-toast>
+
+<div class="customer-page-container animate-fadeIn custom-scrollbar">
+
+  @if (isLoading()) {
+  <div class="loading-state">
+    <i class="pi pi-spin pi-spinner text-4xl mb-4"></i>
+    <p>Loading Purchase Details...</p>
+  </div>
+  }
+
   @else if (purchase(); as p) {
   <div class="product-details-card">
 
@@ -34,18 +380,11 @@
       </div>
 
       <div class="header-actions">
-        <p-button 
-          *ngIf="p.status !== 'cancelled' && p.paymentStatus !== 'paid'"
-          label="Record Payment" 
-          icon="pi pi-wallet" 
-          styleClass="p-button-outlined p-button-sm mr-2"
-          (onClick)="openPaymentModal()">
+        <p-button *ngIf="p.status !== 'cancelled' && p.paymentStatus !== 'paid'" label="Record Payment"
+          icon="pi pi-wallet" styleClass="p-button-outlined p-button-sm mr-2" (onClick)="openPaymentModal()">
         </p-button>
 
-        <p-button 
-          label="Return / Debit Note" 
-          icon="pi pi-undo" 
-          styleClass="p-button-outlined p-button-sm mr-2"
+        <p-button label="Return / Debit Note" icon="pi pi-undo" styleClass="p-button-outlined p-button-sm mr-2"
           [routerLink]="['/purchase', 'return', p._id]">
         </p-button>
 
@@ -57,21 +396,24 @@
     </div>
 
     <div class="details-body">
-      
+
       <aside class="profile-sidebar animate-slideInUp">
-        
+
         <div class="supplier-card-wrapper">
-           <div class="supplier-header">
-              <div class="supplier-icon"><i class="pi pi-building"></i></div>
-              <div>
-                <label class="text-xs uppercase text-[var(--text-label)] font-bold">Supplier</label>
-                <div class="text-lg font-bold text-[var(--text-primary)] leading-tight">{{ p.supplierId?.companyName }}</div>
+          <div class="supplier-header">
+            <div class="supplier-icon"><i class="pi pi-building"></i></div>
+            <div>
+              <label class="text-xs uppercase text-[var(--text-label)] font-bold">Supplier</label>
+              <div class="text-lg font-bold text-[var(--text-primary)] leading-tight">{{ p.supplierId?.companyName }}
               </div>
-           </div>
-           <div class="mt-3 text-sm text-[var(--text-secondary)]">
-              <div class="flex gap-2 items-center mb-1"><i class="pi pi-phone text-xs"></i> {{ p.supplierId?.phone || 'N/A' }}</div>
-              <div class="flex gap-2 items-center"><i class="pi pi-map-marker text-xs"></i> {{ p.supplierId?.city || 'N/A' }}</div>
-           </div>
+            </div>
+          </div>
+          <div class="mt-3 text-sm text-[var(--text-secondary)]">
+            <div class="flex gap-2 items-center mb-1"><i class="pi pi-phone text-xs"></i> {{ p.supplierId?.phone ||
+              'N/A' }}</div>
+            <div class="flex gap-2 items-center"><i class="pi pi-map-marker text-xs"></i> {{ p.supplierId?.city || 'N/A'
+              }}</div>
+          </div>
         </div>
 
         <p-divider styleClass="w-full my-2"></p-divider>
@@ -98,23 +440,23 @@
 
         <div class="attachments-section">
           <label class="section-label">Attachments ({{ p.attachedFiles?.length || 0 }})</label>
-          
+
           <div class="files-grid">
             @for(file of p.attachedFiles; track $index) {
-              <div class="file-item" (click)="downloadAttachment(file)">
-                <div class="file-icon">
-                  <i class="pi pi-file-pdf text-red-500 text-xl"></i>
-                </div>
-                <div class="file-info">
-                   <span class="file-name">Invoice_Scan_{{$index + 1}}</span>
-                   <span class="file-action">Click to view</span>
-                </div>
+            <div class="file-item" (click)="downloadAttachment(file)">
+              <div class="file-icon">
+                <i class="pi pi-file-pdf text-red-500 text-xl"></i>
               </div>
+              <div class="file-info">
+                <span class="file-name">Invoice_Scan_{{$index + 1}}</span>
+                <span class="file-action">Click to view</span>
+              </div>
+            </div>
             } @empty {
-              <div class="no-files">
-                <i class="pi pi-file text-2xl mb-2 opacity-30"></i>
-                <span>No documents attached</span>
-              </div>
+            <div class="no-files">
+              <i class="pi pi-file text-2xl mb-2 opacity-30"></i>
+              <span>No documents attached</span>
+            </div>
             }
           </div>
         </div>
@@ -122,7 +464,7 @@
       </aside>
 
       <section class="main-details">
-        
+
         <div class="metrics-grid animate-slideInUp" style="animation-delay: 0.1s;">
           <div class="metric-card primary-metric">
             <div class="metric-content">
@@ -144,7 +486,8 @@
           <div class="metric-card">
             <div class="metric-content">
               <label>Balance Due</label>
-              <span class="value" [class.text-red-500]="p.balanceAmount > 0" [class.text-gray-400]="p.balanceAmount <= 0">
+              <span class="value" [class.text-red-500]="p.balanceAmount > 0"
+                [class.text-gray-400]="p.balanceAmount <= 0">
                 {{ p.balanceAmount | currency:'INR' }}
               </span>
             </div>
@@ -161,7 +504,7 @@
         <div class="content-section animate-slideInUp" style="animation-delay: 0.2s;">
           <div class="section-header-row">
             <h4 class="section-heading"><i class="pi pi-list"></i> Purchased Items</h4>
-            </div>
+          </div>
 
           <div class="table-wrapper">
             <p-table [value]="p.items" styleClass="p-table-premium">
@@ -179,14 +522,16 @@
                 <tr>
                   <td>
                     <div class="font-medium">{{ item.productId?.name || item.name }}</div>
-                    <div class="text-xs text-[var(--text-secondary)]" *ngIf="item.productId?.sku">SKU: {{ item.productId.sku }}</div>
+                    <div class="text-xs text-[var(--text-secondary)]" *ngIf="item.productId?.sku">SKU: {{
+                      item.productId.sku }}</div>
                   </td>
                   <td class="text-center font-bold">{{ item.quantity }}</td>
                   <td class="text-right">{{ item.purchasePrice | currency:'INR' }}</td>
                   <td class="text-right">{{ item.taxRate || 0 }}%</td>
                   <td class="text-right text-red-400">-{{ item.discount || 0 | currency:'INR' }}</td>
                   <td class="text-right font-bold text-[var(--text-primary)]">
-                    {{ ((item.purchasePrice * item.quantity) - (item.discount || 0)) * (1 + (item.taxRate/100)) | currency:'INR' }}
+                    {{ ((item.purchasePrice * item.quantity) - (item.discount || 0)) * (1 + (item.taxRate/100)) |
+                    currency:'INR' }}
                   </td>
                 </tr>
               </ng-template>
@@ -194,25 +539,58 @@
           </div>
 
           <div class="flex justify-end mt-4 px-4">
-             <div class="w-64 flex flex-col gap-2">
-                <div class="flex justify-between text-sm text-[var(--text-secondary)]">
-                   <span>Subtotal</span>
-                   <span>{{ p.subTotal | currency:'INR' }}</span>
-                </div>
-                <div class="flex justify-between text-sm text-[var(--text-secondary)]">
-                   <span>Tax</span>
-                   <span>+ {{ p.totalTax | currency:'INR' }}</span>
-                </div>
-                 <div class="flex justify-between text-sm text-[var(--text-secondary)]">
-                   <span>Discount</span>
-                   <span>- {{ p.totalDiscount | currency:'INR' }}</span>
-                </div>
-                <p-divider styleClass="my-1"></p-divider>
-                <div class="flex justify-between text-lg font-bold text-[var(--text-primary)]">
-                   <span>Total</span>
-                   <span>{{ p.grandTotal | currency:'INR' }}</span>
-                </div>
-             </div>
+            <div class="w-64 flex flex-col gap-2">
+              <div class="flex justify-between text-sm text-[var(--text-secondary)]">
+                <span>Subtotal</span>
+                <span>{{ p.subTotal | currency:'INR' }}</span>
+              </div>
+              <div class="flex justify-between text-sm text-[var(--text-secondary)]">
+                <span>Tax</span>
+                <span>+ {{ p.totalTax | currency:'INR' }}</span>
+              </div>
+              <div class="flex justify-between text-sm text-[var(--text-secondary)]">
+                <span>Discount</span>
+                <span>- {{ p.totalDiscount | currency:'INR' }}</span>
+              </div>
+              <p-divider styleClass="my-1"></p-divider>
+              <div class="flex justify-between text-lg font-bold text-[var(--text-primary)]">
+                <span>Total</span>
+                <span>{{ p.grandTotal | currency:'INR' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-section animate-slideInUp" style="animation-delay: 0.25s;"
+          *ngIf="purchase()?.paidAmount > 0">
+          <div class="section-header-row">
+            <h4 class="section-heading"><i class="pi pi-history"></i> Payment History</h4>
+          </div>
+
+          <div class="table-wrapper">
+            <p-table [value]="paymentHistory()" styleClass="p-table-premium">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Date</th>
+                  <th>Reference</th>
+                  <th>Method</th>
+                  <th class="text-right">Amount</th>
+                  <th>Action</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-pay>
+                <tr>
+                  <td>{{ formatDate(pay.paymentDate) }}</td>
+                  <td>{{ pay.referenceNumber || '-' }}</td>
+                  <td class="uppercase text-xs font-bold">{{ pay.paymentMethod }}</td>
+                  <td class="text-right text-green-600 font-bold">{{ pay.amount | currency:'INR' }}</td>
+                  <td>
+                    <button pButton icon="pi pi-trash" class="p-button-text p-button-danger p-button-sm"
+                      (click)="deletePayment(pay._id, pay.amount)"></button>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
           </div>
         </div>
 
@@ -226,54 +604,33 @@
       </section>
     </div>
   </div>
-  } 
+  }
 </div>
 
-<p-dialog appendTo="body"   
-  [(visible)]="showPaymentDialog" 
-  header="Record Outgoing Payment" 
-  [modal]="true" 
-  styleClass="p-dialog-premium" 
-  [style]="{ width: '450px' }"
-  [draggable]="false"
-  [resizable]="false">
-  
+<p-dialog appendTo="body" [(visible)]="showPaymentDialog" header="Record Outgoing Payment" [modal]="true"
+  styleClass="p-dialog-premium" [style]="{ width: '450px' }" [draggable]="false" [resizable]="false">
+
   <form [formGroup]="paymentForm" class="payment-form-grid" (ngSubmit)="submitPayment()">
-    
+
     <div class="form-group">
       <label>Amount <span class="text-red-500">*</span></label>
-      <p-inputNumber 
-        formControlName="amount" 
-        mode="currency" 
-        currency="INR" 
-        locale="en-IN"
-        [max]="purchase()?.balanceAmount"
-        styleClass="w-full" 
-        class="w-full">
+      <p-inputNumber formControlName="amount" mode="currency" currency="INR" locale="en-IN"
+        [max]="purchase()?.balanceAmount" styleClass="w-full" class="w-full">
       </p-inputNumber>
-      <small class="text-[var(--text-secondary)] mt-1">Balance Due: {{ purchase()?.balanceAmount | currency:'INR' }}</small>
+      <small class="text-[var(--text-secondary)] mt-1">Balance Due: {{ purchase()?.balanceAmount | currency:'INR'
+        }}</small>
     </div>
 
     <div class="form-group">
       <label>Payment Date <span class="text-red-500">*</span></label>
-      <p-datepicker 
-        formControlName="date" 
-        appendTo="body" 
-        [showIcon]="true" 
-        styleClass="w-full" 
-        class="w-full">
+      <p-datepicker formControlName="date" appendTo="body" [showIcon]="true" styleClass="w-full" class="w-full">
       </p-datepicker>
     </div>
 
     <div class="form-group">
       <label>Payment Method <span class="text-red-500">*</span></label>
-      <p-select appendTo="body" 
-        [options]="paymentMethods" 
-        formControlName="paymentMethod" 
-        optionLabel="label" 
-        optionValue="value"
-        styleClass="w-full" 
-        class="w-full">
+      <p-select appendTo="body" [options]="paymentMethods" formControlName="paymentMethod" optionLabel="label"
+        optionValue="value" styleClass="w-full" class="w-full">
       </p-select>
     </div>
 
@@ -284,341 +641,19 @@
 
     <div class="form-group full-width">
       <label>Notes</label>
-      <textarea pInputTextarea formControlName="notes" rows="2" class="w-full" placeholder="Additional details..."></textarea>
+      <textarea pInputTextarea formControlName="notes" rows="2" class="w-full"
+        placeholder="Additional details..."></textarea>
     </div>
 
   </form>
 
   <ng-template pTemplate="footer">
     <div class="flex justify-end gap-2">
-      <p-button label="Cancel" styleClass="p-button-text p-button-secondary" (onClick)="showPaymentDialog.set(false)"></p-button>
-      <p-button 
-        label="Save Payment" 
-        icon="pi pi-check" 
-        [loading]="isSubmittingPayment()" 
-        (onClick)="submitPayment()"
+      <p-button label="Cancel" styleClass="p-button-text p-button-secondary"
+        (onClick)="showPaymentDialog.set(false)"></p-button>
+      <p-button label="Save Payment" icon="pi pi-check" [loading]="isSubmittingPayment()" (onClick)="submitPayment()"
         [disabled]="paymentForm.invalid">
       </p-button>
     </div>
   </ng-template>
-</p-dialog>
-<!-- <div class="customer-page-container animate-fadeIn">
-
-  @if (purchase(); as p) {
-  <div class="themed-card product-details-card">
-
-    HEADER
-    <div class="details-header">
-      <div class="header-left">
-        <p-button icon="pi pi-arrow-left" styleClass="p-button-text p-button-rounded p-button-secondary"
-          routerLink="/purchase">
-        </p-button>
-
-        <div class="header-identity">
-          <div class="title-row">
-            <h2 class="product-title">Invoice #{{ p.invoiceNumber }}</h2>
-            <p-tag [value]="p.status | titlecase" [severity]="getStatusSeverity(p.status)"
-              styleClass="status-tag px-3 uppercase">
-            </p-tag>
-          </div>
-          <div class="subtitle-row">
-            <span class="sku-badge"><i class="pi pi-calendar"></i> {{ formatDate(p.purchaseDate) }}</span>
-            <span class="separator">•</span>
-            <span class="brand-text">Created by {{ p.createdBy?.name || 'Unknown' }}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="header-actions">
-        Record Payment Button
-        <p-button 
-          *ngIf="p.status !== 'cancelled' && p.paymentStatus !== 'paid'"
-          label="Record Payment" 
-          icon="pi pi-wallet" 
-          styleClass="p-button-outlined p-button-sm mr-2"
-          (onClick)="openPaymentDialog()">
-        </p-button>
-
-        ✅ ADDED: Return / Debit Note Button
-        *ngIf="p.status === 'received' || p.status === 'approved'"
-        <p-button 
-          label="Return / Debit Note" 
-          icon="pi pi-undo" 
-          styleClass="p-button-outlined p-button-sm mr-2"
-          [routerLink]="['/purchase', 'return', p._id]">
-        </p-button>
-
-        <p-button label="Edit Invoice" icon="pi pi-pencil" styleClass="p-button-outlined p-button-sm"
-          [routerLink]="['/purchase', p._id, 'edit']" [disabled]="p.status === 'cancelled'">
-        </p-button>
-        <p-button label="Print" icon="pi pi-print" styleClass="p-button-text p-button-secondary"></p-button>
-      </div>
-    </div>
-
-    BODY
-    <div class="details-body">
-      
-      SIDEBAR: Supplier & Attachments
-      <aside class="profile-sidebar animate-slideInUp">
-        
-        Supplier Card
-        <div class="supplier-card-wrapper">
-           <div class="supplier-header">
-              <div class="supplier-icon"><i class="pi pi-building"></i></div>
-              <div>
-                <label class="text-xs uppercase text-[var(--text-label)] font-bold">Supplier</label>
-                <div class="text-lg font-bold text-[var(--text-primary)] leading-tight">{{ p.supplierId?.companyName }}</div>
-              </div>
-           </div>
-           <div class="mt-3 text-sm text-[var(--text-secondary)]">
-              <div class="flex gap-2 items-center mb-1"><i class="pi pi-phone text-xs"></i> {{ p.supplierId?.phone || 'N/A' }}</div>
-              <div class="flex gap-2 items-center"><i class="pi pi-map-marker text-xs"></i> {{ p.supplierId?.city || 'N/A' }}</div>
-           </div>
-        </div>
-
-        <p-divider styleClass="w-full my-2"></p-divider>
-
-        <div class="attributes-list">
-          <div class="attribute-item">
-            <div class="attr-icon"><i class="pi pi-shop"></i></div>
-            <div class="attr-data">
-              <label>Receiving Branch</label>
-              <span>{{ p.branchId?.name || 'Head Office' }}</span>
-            </div>
-          </div>
-
-          <div class="attribute-item">
-            <div class="attr-icon"><i class="pi pi-clock"></i></div>
-            <div class="attr-data">
-              <label>Due Date</label>
-              <span>{{ p.dueDate ? formatDate(p.dueDate) : 'Immediate' }}</span>
-            </div>
-          </div>
-        </div>
-
-        <p-divider styleClass="w-full my-2"></p-divider>
-
-        Attachments Section
-        <div class="attachments-section">
-          <label class="section-label">Attachments ({{ p.attachedFiles?.length || 0 }})</label>
-          
-          <div class="files-grid">
-            @for(file of p.attachedFiles; track $index) {
-              <div class="file-item" (click)="downloadAttachment(file)">
-                <div class="file-icon">
-                  <i class="pi pi-file-pdf text-red-500 text-xl"></i>
-                </div>
-                <div class="file-info">
-                   <span class="file-name">Invoice_Scan_{{$index + 1}}</span>
-                   <span class="file-action">Click to view</span>
-                </div>
-              </div>
-            } @empty {
-              <div class="no-files">
-                <i class="pi pi-file text-2xl mb-2 opacity-30"></i>
-                <span>No documents attached</span>
-              </div>
-            }
-          </div>
-        </div>
-
-      </aside>
-
-      MAIN CONTENT
-      <section class="main-details">
-        
-        Financial Metrics
-        <div class="metrics-grid animate-slideInUp" style="animation-delay: 0.1s;">
-          <div class="metric-card primary-metric">
-            <div class="metric-content">
-              <label>Grand Total</label>
-              <span class="value">{{ p.grandTotal | currency:'INR' }}</span>
-            </div>
-            <div class="metric-icon">
-              <i class="pi pi-wallet"></i>
-            </div>
-          </div>
-
-          <div class="metric-card">
-            <div class="metric-content">
-              <label>Amount Paid</label>
-              <span class="value text-green-600">{{ p.paidAmount | currency:'INR' }}</span>
-            </div>
-          </div>
-
-          <div class="metric-card">
-            <div class="metric-content">
-              <label>Balance Due</label>
-              <span class="value" [class.text-red-500]="p.balanceAmount > 0" [class.text-gray-400]="p.balanceAmount <= 0">
-                {{ p.balanceAmount | currency:'INR' }}
-              </span>
-            </div>
-          </div>
-
-          <div class="metric-card">
-            <div class="metric-content">
-              <label>Payment Status</label>
-              <p-tag [value]="p.paymentStatus | uppercase" [severity]="getPaymentSeverity(p.paymentStatus)"></p-tag>
-            </div>
-          </div>
-        </div>
-
-        Items Table
-        <div class="content-section animate-slideInUp" style="animation-delay: 0.2s;">
-          <div class="section-header-row">
-            <h4 class="section-heading"><i class="pi pi-list"></i> Purchased Items</h4>
-            <div class="text-sm text-[var(--text-secondary)]">Total Qty: <span class="font-bold text-[var(--text-primary)]">{{ p.totalQuantity || 0 }}</span></div>
-          </div>
-
-          <div class="table-wrapper">
-            <p-table [value]="p.items" styleClass="p-table-premium">
-              <ng-template pTemplate="header">
-                <tr>
-                  <th>Product</th>
-                  <th class="text-center">Qty</th>
-                  <th class="text-right">Unit Price</th>
-                  <th class="text-right">Tax %</th>
-                  <th class="text-right">Discount</th>
-                  <th class="text-right">Total</th>
-                </tr>
-              </ng-template>
-              <ng-template pTemplate="body" let-item>
-                <tr>
-                  <td>
-                    <div class="font-medium">{{ item.name }}</div>
-                    <div class="text-xs text-[var(--text-secondary)]" *ngIf="item.productId?.sku">SKU: {{ item.productId.sku }}</div>
-                  </td>
-                  <td class="text-center font-bold">{{ item.quantity }}</td>
-                  <td class="text-right">{{ item.purchasePrice | currency:'INR' }}</td>
-                  <td class="text-right">{{ item.taxRate }}%</td>
-                  <td class="text-right text-red-400">-{{ item.discount | currency:'INR' }}</td>
-                  <td class="text-right font-bold text-[var(--text-primary)]">
-                    {{ ((item.purchasePrice * item.quantity) - (item.discount || 0)) * (1 + (item.taxRate/100)) | currency:'INR' }}
-                  </td>
-                </tr>
-              </ng-template>
-            </p-table>
-          </div>
-
-          Footer Summary
-          <div class="flex justify-end mt-4 px-4">
-             <div class="w-64 flex flex-col gap-2">
-                <div class="flex justify-between text-sm text-[var(--text-secondary)]">
-                   <span>Subtotal</span>
-                   <span>{{ p.subTotal | currency:'INR' }}</span>
-                </div>
-                <div class="flex justify-between text-sm text-[var(--text-secondary)]">
-                   <span>Tax</span>
-                   <span>+ {{ p.totalTax | currency:'INR' }}</span>
-                </div>
-                 <div class="flex justify-between text-sm text-[var(--text-secondary)]">
-                   <span>Discount</span>
-                   <span>- {{ p.totalDiscount | currency:'INR' }}</span>
-                </div>
-                <p-divider styleClass="my-1"></p-divider>
-                <div class="flex justify-between text-lg font-bold text-[var(--text-primary)]">
-                   <span>Total</span>
-                   <span>{{ p.grandTotal | currency:'INR' }}</span>
-                </div>
-             </div>
-          </div>
-        </div>
-
-        Notes
-        <div class="content-section animate-slideInUp" style="animation-delay: 0.3s;" *ngIf="p.notes">
-          <h4 class="section-heading"><i class="pi pi-align-left"></i> Notes</h4>
-          <div class="description-box bg-[var(--bg-ternary)] p-3 rounded border border-[var(--border-secondary)]">
-            <p>{{ p.notes }}</p>
-          </div>
-        </div>
-
-      </section>
-    </div>
-  </div>
-  } @else {
-  <div class="loading-state">
-    <i class="pi pi-spin pi-spinner"></i>
-    <p>Retrieving Invoice Details...</p>
-  </div>
-  }
-
-  Payment Dialog
-  <p-dialog appendTo="body"   
-    [(visible)]="showPaymentDialog" 
-    header="Record Outgoing Payment" 
-    [modal]="true" 
-    styleClass="p-dialog-premium" 
-    [style]="{ width: '450px' }"
-    [draggable]="false"
-    [resizable]="false">
-    
-    <form [formGroup]="paymentForm" class="payment-form-grid" (ngSubmit)="submitPayment()">
-      
-      Amount
-      <div class="form-group">
-        <label>Amount <span class="text-red-500">*</span></label>
-        <p-inputNumber 
-          formControlName="amount" 
-          mode="currency" 
-          currency="INR" 
-          locale="en-IN"
-          [max]="purchase()?.balanceAmount"
-          styleClass="w-full" 
-          class="w-full">
-        </p-inputNumber>
-        <small class="text-[var(--text-secondary)] mt-1">Balance Due: {{ purchase()?.balanceAmount | currency:'INR' }}</small>
-      </div>
-
-      Date
-      <div class="form-group">
-        <label>Payment Date <span class="text-red-500">*</span></label>
-        <p-datepicker 
-          formControlName="date" 
-          appendTo="body" 
-          [showIcon]="true" 
-          styleClass="w-full" 
-          class="w-full">
-        </p-datepicker>
-      </div>
-
-      Method
-      <div class="form-group">
-        <label>Payment Method <span class="text-red-500">*</span></label>
-        <p-select appendTo="body" 
-          [options]="paymentMethods" 
-          formControlName="paymentMethod" 
-          optionLabel="label" 
-          optionValue="value"
-          styleClass="w-full" 
-          class="w-full">
-        </p-select>
-      </div>
-
-      Reference
-      <div class="form-group">
-        <label>Reference No.</label>
-        <input pInputText formControlName="reference" class="w-full" placeholder="Cheque No / UPI Ref" />
-      </div>
-
-      Notes
-      <div class="form-group full-width">
-        <label>Notes</label>
-        <textarea pInputTextarea formControlName="notes" rows="2" class="w-full" placeholder="Additional details..."></textarea>
-      </div>
-
-    </form>
-
-    <ng-template pTemplate="footer">
-      <div class="flex justify-end gap-2">
-        <p-button label="Cancel" styleClass="p-button-text p-button-secondary" (onClick)="showPaymentDialog.set(false)"></p-button>
-        <p-button 
-          label="Save Payment" 
-          icon="pi pi-check" 
-          [loading]="isSubmittingPayment()" 
-          (onClick)="submitPayment()"
-          [disabled]="paymentForm.invalid">
-        </p-button>
-      </div>
-    </ng-template>
-  </p-dialog>
-</div> -->
+</p-dialog> -->
