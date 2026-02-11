@@ -1,12 +1,12 @@
-import { Component, Input, OnInit, inject, signal, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
-import { DatePickerModule } from 'primeng/datepicker'; // Note: Ensure correct import based on your PrimeNG version
-import { DynamicDialogConfig } from 'primeng/dynamicdialog';
+import { DatePickerModule } from 'primeng/datepicker'; 
+import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog'; // 🟢 Added DynamicDialogRef
 import { finalize } from 'rxjs';
 import { ProductService } from '../../services/product-service';
 
@@ -23,7 +23,7 @@ import { ProductService } from '../../services/product-service';
     TooltipModule
   ],
   templateUrl: './product-history.html',
-  styleUrls: ['./product-history.scss']
+  styleUrls: ['./product-history.scss'] // Assuming you will add SCSS next
 })
 export class ProductHistoryComponent implements OnInit {
   // Signals
@@ -33,15 +33,16 @@ export class ProductHistoryComponent implements OnInit {
   // Injections
   private productService = inject(ProductService);
   public config = inject(DynamicDialogConfig);
+  public ref = inject(DynamicDialogRef); // 🟢 For closing the dialog
   
   // State
   productId!: string;
   dateRange: Date[] | undefined;
 
   ngOnInit() {
-    // If used in Dialog
-    if (this.config?.data?.id) {
-      this.productId = this.config.data.id;
+    // 🟢 Read ID from config.data.productId (which we set in the dynamic-dialog.service.ts)
+    if (this.config?.data?.productId) {
+      this.productId = this.config.data.productId;
       this.loadHistory();
     }
   }
@@ -52,8 +53,8 @@ export class ProductHistoryComponent implements OnInit {
     this.loading.set(true);
     
     // Defensive coding for dates
-    const start = this.dateRange?.[0] || undefined;
-    const end = this.dateRange?.[1] || undefined;
+    const start = this.dateRange?.[0] ? this.formatDateForApi(this.dateRange[0]) : undefined;
+    const end = this.dateRange?.[1] ? this.formatDateForApi(this.dateRange[1]) : undefined;
 
     this.productService.getProductHistory(this.productId, start, end)
       .pipe(finalize(() => this.loading.set(false)))
@@ -67,18 +68,25 @@ export class ProductHistoryComponent implements OnInit {
       });
   }
 
+  // 🟢 Helper to format dates correctly for the backend
+  private formatDateForApi(date: Date): string {
+    const offset = date.getTimezoneOffset();
+    const localDate = new Date(date.getTime() - (offset * 60 * 1000));
+    return localDate.toISOString().split('T')[0];
+  }
+
   getSeverity(type: string): "success" | "secondary" | "info" | "warn" | "danger" | "contrast" | undefined {
-    switch (type) {
-      case 'SALE': return 'info';
-      case 'OPENING STOCK': return 'success';
-      case 'PURCHASE': return 'success';
-      case 'ADJUSTMENT': return 'warn';
-      case 'RETURN': return 'danger';
+    switch (type?.toUpperCase()) {
+      case 'SALE': return 'warn';           // Yellow for outbound
+      case 'OPENING STOCK': return 'info';  // Blue for initial
+      case 'PURCHASE': return 'success';    // Green for inbound
+      case 'PURCHASE_RETURN': return 'danger'; // Red for outbound return
+      case 'ADJUSTMENT': return 'secondary';// Grey for manual edits
       default: return 'secondary';
     }
   }
 
   getTypeLabel(type: string): string {
-    return type ? type.replace(/_/g, ' ') : '';
+    return type ? type.replace(/_/g, ' ') : 'UNKNOWN';
   }
 }

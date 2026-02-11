@@ -1,0 +1,127 @@
+<div class="ledger-container">
+
+  @if (loading()) {
+  <div class="loader-wrapper">
+    <p-progressSpinner strokeWidth="4"></p-progressSpinner>
+    <span class="loader-text">Loading Supplier Data...</span>
+  </div>
+  }
+
+  @else if (dashboardData(); as data) {
+  <header class="ledger-header">
+    <div class="profile-section">
+      <div class="avatar">
+        {{ data.profile.companyName.charAt(0) }}
+      </div>
+      <div class="info">
+        <h2 class="company-name">{{ data.profile.companyName }}</h2>
+        <div class="meta-tags">
+          <span *ngIf="data.profile.gstNumber"><i class="pi pi-receipt"></i> GST: {{ data.profile.gstNumber }}</span>
+          <span *ngIf="data.profile.phone"><i class="pi pi-phone"></i> {{ data.profile.phone }}</span>
+          <span *ngIf="data.profile.email"><i class="pi pi-envelope"></i> {{ data.profile.email }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="actions">
+      <p-button label="Export Excel" icon="pi pi-file-excel" [loading]="exporting()" (onClick)="exportLedger()"
+        styleClass="p-button-outlined">
+      </p-button>
+    </div>
+  </header>
+
+  <p-divider></p-divider>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <span class="kpi-label">Total Purchased Volume</span>
+      <span class="kpi-value primary">{{ data.financials.totalVolume | currency:'INR' }}</span>
+      <span class="kpi-sub">{{ data.financials.totalInvoices }} Invoices Generated</span>
+    </div>
+
+    <div class="kpi-card">
+      <span class="kpi-label">Total Amount Paid</span>
+      <span class="kpi-value success">{{ data.financials.totalPaid | currency:'INR' }}</span>
+      <span class="kpi-sub">Via Bank/Cash Outflow</span>
+    </div>
+
+    <div class="kpi-card">
+      <span class="kpi-label">Outstanding Payable</span>
+      <span class="kpi-value warning">{{ data.financials.outstanding | currency:'INR' }}</span>
+      <span class="kpi-sub">Pending against invoices</span>
+    </div>
+
+    <div class="kpi-card">
+      <span class="kpi-label">Defect / Return Rate</span>
+      <span class="kpi-value error">{{ data.performance.defectRatePercent }}%</span>
+      <span class="kpi-sub">{{ data.performance.totalReturnedValue | currency:'INR' }} Returned</span>
+    </div>
+  </div>
+
+  <div class="tables-container">
+
+    <div class="table-card">
+      <div class="table-header">
+        <h3>Recent Purchases</h3>
+      </div>
+      <p-table [value]="data.recentPurchases" styleClass="theme-table" [rows]="5">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Date</th>
+            <th>Invoice No</th>
+            <th class="text-right">Total</th>
+            <th class="text-right">Balance</th>
+            <th>Status</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-inv>
+          <tr>
+            <td>{{ inv.purchaseDate | date:'shortDate' }}</td>
+            <td class="font-medium">{{ inv.invoiceNumber }}</td>
+            <td class="text-right">{{ inv.grandTotal | currency:'INR' }}</td>
+            <td class="text-right">{{ inv.balanceAmount | currency:'INR' }}</td>
+            <td>
+              <p-tag [severity]="inv.paymentStatus === 'paid' ? 'success' : 'warn'"
+                [value]="inv.paymentStatus | uppercase"></p-tag>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5" class="empty-state">No recent purchases found.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <div class="table-card">
+      <div class="table-header">
+        <h3>Recent Payments</h3>
+      </div>
+      <p-table [value]="data.recentPayments" styleClass="theme-table" [rows]="5">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Date</th>
+            <th>Reference No</th>
+            <th>Method</th>
+            <th class="text-right">Amount</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-pay>
+          <tr>
+            <td>{{ pay.paymentDate | date:'shortDate' }}</td>
+            <td class="font-medium">{{ pay.referenceNumber || '-' }}</td>
+            <td class="capitalize">{{ pay.paymentMethod }}</td>
+            <td class="text-right font-bold text-[var(--color-success)]">{{ pay.amount | currency:'INR' }}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="4" class="empty-state">No recent payments found.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+  </div>
+  }
+</div>

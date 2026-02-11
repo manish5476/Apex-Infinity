@@ -152,163 +152,39 @@
     grid-column: span 1;
   }
 }
+/* Keep all your previous base CSS for wrappers, form-groups, grids etc. */
+/* Append the following for the new Contacts Dynamic Array UI */
 
+.contact-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-sm);
+}
 
-// /* ==============================================
-//    SUPPLIER FORM COMPONENT
-//    - Re-uses all theme styles from product-form
-//    ============================================== */
+.contact-card {
+  background: var(--bg-primary); /* Contrasts against the var(--bg-secondary) of the main section */
+  border: var(--ui-border-width) solid var(--border-secondary);
+  border-radius: var(--ui-border-radius);
+  padding: var(--spacing-lg);
+  position: relative;
+  transition: var(--transition-base);
 
-// :host {
-//   display: block;
-//   width: 100%;
-//   height: 100%;
-// }
+  &:hover {
+    border-color: var(--border-primary);
+    box-shadow: var(--shadow-xs);
+  }
 
-// /* === Main Wrapper (from invoice form) === */
-// .customer-wrapper {
-//   width: 100%;
-//   height: 100%;
-//   overflow: hidden; // This holds the layout
-//   display: flex;
-//   justify-content: center;
-//   background: var(--bg-primary);
-//   padding: var(--spacing-xl);
-// }
+  /* Padding adjustment so the absolute trash button doesn't overlap text */
+  padding-right: var(--spacing-4xl);
+}
 
-// .customer-container {
-//   width: 100%;
-// }
+.text-muted {
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+}
 
-// /* === Form Panel (from invoice form) === */
-// .customer-form-panel {
-//   display: flex;
-//   flex-direction: column;
-//   width: 100%;
-//   height: 100%;
-//   background: var(--bg-secondary);
-//   border-radius: var(--ui-border-radius-lg);
-//   box-shadow: var(--shadow-md);
-//   overflow: hidden;
-//   border: var(--ui-border-width) solid var(--border-primary);
-//   max-height: 100%; 
-// }
+.uppercase {
+  text-transform: uppercase;
+}
 
-// .customer-form-layout {
-//   display: flex;
-//   flex-direction: column;
-//   height: 100%;
-// }
-
-// /* === 1. Sticky Header (from invoice form) === */
-// .customer-form-header {
-//   padding: var(--spacing-lg) var(--spacing-xl);
-//   background: var(--bg-secondary);
-//   border-bottom: var(--ui-border-width) solid var(--border-primary);
-//   flex-shrink: 0;
-//   z-index: 10;
-
-//   .form-title {
-//     font-size: var(--font-size-2xl);
-//     font-weight: 600;
-//     color: var(--text-primary);
-//     margin: 0;
-//   }
-//   .form-subtitle {
-//     font-size: var(--font-size-sm);
-//     color: var(--text-secondary);
-//     margin: 0;
-//   }
-//   .req {
-//     color: var(--color-error);
-//   }
-// }
-
-// /* === 2. Scrollable Body (from invoice form) === */
-// .customer-form-body {
-//   flex: 1; // Grow to fill space
-//   overflow-y: auto; // This is the scrollable part
-//   padding: var(--spacing-xl);
-//   background: var(--bg-primary);
-//   display: flex;
-//   flex-direction: column;
-//   gap: var(--spacing-xl);
-// }
-
-// /* === 3. Sticky Footer (from invoice form) === */
-// .customer-form-footer {
-//   background: var(--bg-secondary);
-//   border-top: var(--ui-border-width) solid var(--border-primary);
-//   padding: var(--spacing-lg) var(--spacing-xl);
-//   display: flex;
-//   justify-content: flex-end;
-//   gap: var(--spacing-md);
-//   flex-shrink: 0;
-//   z-index: 10;
-// }
-
-// /* === NEW: Form Section (from customer-form) === */
-// .form-section {
-//   display: flex;
-//   flex-direction: column;
-//   gap: var(--spacing-lg);
-//   padding: var(--spacing-xl);
-//   background: var(--bg-secondary); // Use secondary bg for sections
-//   border-radius: var(--ui-border-radius-lg); // Make sections rounded
-//   border: var(--ui-border-width) solid var(--border-primary);
-//   box-shadow: var(--shadow-sm); // Add shadow to lift section
-
-//   .section-title {
-//     font-size: var(--font-size-lg);
-//     font-weight: 600;
-//     color: var(--text-primary);
-//     margin: 0 0 var(--spacing-sm) 0; // Add bottom margin
-//     border-left: 4px solid var(--accent-primary);
-//     padding-left: var(--spacing-md);
-//   }
-// }
-
-
-// /* === Form Group Styling (from invoice form) === */
-// .form-group {
-//   display: flex;
-//   flex-direction: column;
-//   gap: var(--spacing-sm);
-
-//   label {
-//     font-size: var(--font-size-xs);
-//     color: var(--text-label);
-//     text-transform: uppercase;
-//     font-weight: 500;
-//   }
-//   .req {
-//     color: var(--color-error);
-//   }
-//   // For checkboxes
-//   .checkbox-label {
-//     font-size: var(--font-size-sm);
-//     color: var(--text-primary);
-//     text-transform: none;
-//     font-weight: 400;
-//   }
-// }
-
-// /* === Grids (from invoice form) === */
-// .form-grid {
-//   display: grid;
-//   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-//   gap: var(--spacing-lg);
-// }
-
-// .form-grid-3 {
-//   display: grid;
-//   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-//   gap: var(--spacing-lg);
-// }
-
-// .col-span-2 {
-//   grid-column: span 2;
-//   @media (max-width: 600px) {
-//     grid-column: span 1;
-//   }
-// }

@@ -1,30 +1,30 @@
-<div class="history-container">
+<div class="history-container p-4">
 
-  <div class="history-toolbar">
-    <div class="filter-group">
-      <i class="pi pi-calendar"></i>
-      <p-datepicker [(ngModel)]="dateRange" selectionMode="range" [readonlyInput]="true" placeholder="Filter by Date"
+  <div class="flex justify-between items-center mb-4 bg-gray-50 p-3 rounded-lg border">
+    <div class="flex items-center gap-2 w-full max-w-sm">
+      <i class="pi pi-calendar text-gray-500"></i>
+      <p-datepicker [(ngModel)]="dateRange" selectionMode="range" [readonlyInput]="true" placeholder="Filter by Date Range"
         (onClose)="loadHistory()" [showClear]="true" [showIcon]="false" styleClass="w-full">
       </p-datepicker>
     </div>
 
-    <div class="action-group">
+    <div>
       <p-button icon="pi pi-refresh" [text]="true" [rounded]="true" severity="secondary" (onClick)="loadHistory()"
         pTooltip="Refresh Data" tooltipPosition="left">
       </p-button>
     </div>
   </div>
 
-  <div class="table-wrapper custom-scrollbar">
-    <p-table [value]="history()" [loading]="loading()" styleClass="modern-table" [scrollable]="true" scrollHeight="flex"
-      [rowHover]="true" [tableStyle]="{'min-width': '600px'}">
+  <div class="table-wrapper custom-scrollbar border rounded-lg overflow-hidden">
+    <p-table [value]="history()" [loading]="loading()" styleClass="p-datatable-sm p-datatable-gridlines" [scrollable]="true" scrollHeight="60vh"
+      [rowHover]="true">
 
       <ng-template pTemplate="header">
         <tr>
           <th style="width: 15%">Date / Time</th>
-          <th style="width: 12%">Type</th>
+          <th style="width: 15%">Type</th>
           <th style="width: 15%">Reference</th>
-          <th style="width: 38%">Details</th>
+          <th style="width: 35%">Details</th>
           <th style="width: 10%" class="text-right">Qty</th>
           <th style="width: 10%" class="text-right">Value</th>
         </tr>
@@ -33,43 +33,41 @@
       <ng-template pTemplate="body" let-row>
         <tr>
           <td>
-            <div class="date-cell">
-              <span class="date">{{ row.date | date:'dd MMM yy' }}</span>
-              <span class="time">{{ row.date | date:'HH:mm' }}</span>
+            <div class="flex flex-col">
+              <span class="font-medium text-gray-800">{{ row.date | date:'dd MMM yyyy' }}</span>
+              <span class="text-xs text-gray-500">{{ row.date | date:'hh:mm a' }}</span>
             </div>
           </td>
 
           <td>
-            <p-tag [value]="getTypeLabel(row.type)" [severity]="getSeverity(row.type)" [rounded]="true">
-            </p-tag>
+            <p-tag [value]="getTypeLabel(row.type)" [severity]="getSeverity(row.type)"></p-tag>
           </td>
 
           <td>
-            <span class="ref-text">{{ row.reference }}</span>
+            <span class="font-mono text-sm text-gray-600">{{ row.reference || '-' }}</span>
           </td>
 
           <td>
-            <div class="desc-cell">
-              <span class="primary-text">{{ row.party }}</span>
-              @if(row.description && row.description !== 'Invoice generated') {
-              <span class="sub-text">{{ row.description }}</span>
+            <div class="flex flex-col">
+              <span class="font-semibold text-gray-800">{{ row.party || 'System Admin' }}</span>
+              @if(row.description) {
+                <span class="text-xs text-gray-500">{{ row.description }}</span>
               }
             </div>
           </td>
 
           <td class="text-right">
             @if(row.quantity !== null && row.quantity !== undefined) {
-            <div class="qty-display" [class.positive]="row.quantity > 0" [class.negative]="row.quantity < 0">
-              {{ row.quantity > 0 ? '+' : '' }}{{ row.quantity }}
-              <span class="unit">{{ row.unit }}</span>
-            </div>
+              <div class="font-bold text-lg" [ngClass]="{'text-green-600': row.quantity > 0, 'text-red-600': row.quantity < 0}">
+                {{ row.quantity > 0 ? '+' : '' }}{{ row.quantity }}
+              </div>
             } @else {
-            <span class="text-secondary opacity-50">-</span>
+              <span class="text-gray-400">-</span>
             }
           </td>
 
           <td class="text-right">
-            <span class="value-display">
+            <span class="font-medium text-gray-800">
               {{ row.value | currency:'INR':'symbol':'1.0-0' }}
             </span>
           </td>
@@ -79,9 +77,9 @@
       <ng-template pTemplate="emptymessage">
         <tr>
           <td colspan="6">
-            <div class="empty-state">
-              <i class="pi pi-history"></i>
-              <p>No transaction history found.</p>
+            <div class="flex flex-col items-center justify-center p-12 text-gray-400">
+              <i class="pi pi-history text-4xl mb-4"></i>
+              <p>No transaction history found for this product.</p>
             </div>
           </td>
         </tr>

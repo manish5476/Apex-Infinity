@@ -43,58 +43,54 @@
 
   @else if (product(); as p) {
 
-    <header class="page-header glass-effect">
-      <div class="header-content">
-        <div class="header-left">
-          <button class="back-btn" routerLink="/product">
-            <i class="pi pi-arrow-left"></i>
-          </button>
+   <header class="dashboard-header glass-effect">
+  <div class="header-left">
+    <button pButton icon="pi pi-arrow-left" class="p-button-text p-button-rounded back-btn"
+      routerLink="/product"></button>
 
-          <div class="identity-group">
-            <div class="name-row">
-              <h1>{{ p.name }}</h1>
-              <span class="status-pill" [class.active]="p.isActive" [class.inactive]="!p.isActive">
-                {{ p.isActive ? 'Active' : 'Inactive' }}
-              </span>
-              @if(p.totalStock < 10 && p.isActive) { 
-                <span class="status-pill warning"><i class="pi pi-exclamation-triangle"></i> Low Stock</span>
-              }
-            </div>
-            <div class="meta-row">
-              <span class="meta-item"><i class="pi pi-barcode"></i> SKU: <strong>{{ p.sku | uppercase }}</strong></span>
-              <span class="divider"></span>
-              <span class="meta-item">{{ p.category || 'Uncategorized' }}</span>
-              @if (p.brand) { 
-                <span class="divider"></span>
-                <span class="meta-item">{{ p.brand }}</span> 
-              }
-            </div>
-          </div>
-        </div>
-
-        <div class="header-actions">
-          <button class="btn-primary" (click)="openStockAdjustment(p)">
-            <i class="pi pi-box"></i> <span>Stock Adjust</span>
-          </button>
-          <button class="btn-primary" (click)="openStockTransfer(p)">
-            <i class="pi pi-box"></i> <span>Stock Transfer</span>
-          </button>
-          <button class="btn-primary" (click)="openHistory(p)">
-            <i class="pi pi-box"></i> <span>Product History</span>
-          </button>
-
-          <div class="action-group">
-            <button class="btn-secondary" pTooltip="Edit Product" tooltipPosition="bottom" [routerLink]="['/product', p._id, 'edit']">
-              <i class="pi pi-pencil"></i>
-            </button>
-            <div class="divider-vertical"></div>
-            <button class="btn-secondary" [appProductAnalytics]="p._id" pTooltip="Analytics" tooltipPosition="bottom">
-              <i class="pi pi-chart-bar"></i>
-            </button>
-          </div>
-        </div>
+    <div class="identity-group">
+      <div class="name-row">
+        <h1>{{ p.name }}</h1>
+        <p-tag [value]="p.isActive ? 'Active' : 'Inactive'" 
+               [severity]="p.isActive ? 'success' : 'danger'"
+               styleClass="status-tag">
+        </p-tag>
+        
+        @if(p.totalStock < 10 && p.isActive) { 
+          <p-tag value="Low Stock" severity="warn" icon="pi pi-exclamation-triangle"></p-tag>
+        }
       </div>
-    </header>
+
+      <div class="meta-row">
+        <span class="id-badge">
+          <i class="pi pi-barcode"></i> SKU: {{ p.sku | uppercase }}
+        </span>
+        <span class="category-badge">{{ p.category || 'Uncategorized' }}</span>
+        
+        @if (p.brand) { 
+          <span class="category-badge"><i class="pi pi-tag text-[10px] mr-1"></i>{{ p.brand }}</span> 
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="header-actions">
+    <button pButton label="History" icon="pi pi-history" class="p-button-outlined p-button-secondary btn-sm"
+      (click)="openHistory(p)"></button>
+
+    <button pButton label="Transfer" icon="pi pi-sync" class="p-button-outlined p-button-secondary btn-sm"
+      (click)="openStockTransfer(p)"></button>
+
+    <button pButton label="Adjust" icon="pi pi-sliders-h" class="p-button-outlined p-button-secondary btn-sm"
+      (click)="openStockAdjustment(p)"></button>
+
+    <button pButton icon="pi pi-chart-bar" class="p-button-outlined p-button-secondary btn-sm"
+      [appProductAnalytics]="p._id" pTooltip="Analytics" tooltipPosition="bottom"></button>
+
+    <button pButton label="Edit" icon="pi pi-pencil" class="p-button-primary btn-sm"
+      [routerLink]="['/product', p._id, 'edit']"></button>
+  </div>
+</header>
 
     <main class="content-wrapper">
       <div class="grid-layout">

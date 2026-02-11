@@ -121,7 +121,7 @@ export class SupplierTransactions implements OnInit {
           newData = res.results; 
         }
         
-        this.totalCount = res.total || this.totalCount;
+        this.totalCount = res.pagination.totalResults 
         this.data = isReset ? newData : [...this.data, ...newData];
         
         if (newData.length > 0) {

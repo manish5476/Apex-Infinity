@@ -124,7 +124,7 @@ export class SalesListComponent implements OnInit {
         // --- UPGRADED PAGINATION LOGIC ---
         // Getting total from pagination object or total property
         if (res.pagination) {
-          this.totalCount = res.pagination.total;
+          this.totalCount = res.pagination.totalResults 
         } else {
           this.totalCount = res.results?.length || 0;
         }

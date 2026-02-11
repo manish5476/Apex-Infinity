@@ -23,6 +23,7 @@ import { loggingInterceptor } from './core/interceptors/logging.interceptor';
 
 // Services
 import { AuthService } from './modules/auth/services/auth-service';
+import { DialogService } from 'primeng/dynamicdialog';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -52,7 +53,7 @@ export const appConfig: ApplicationConfig = {
     }),
 
     MessageService,
-    DatePipe,
+    DatePipe,DialogService,
 
     // ✅ THE MODERN FIX: Using provideAppInitializer
     provideAppInitializer(() => {

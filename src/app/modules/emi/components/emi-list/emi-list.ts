@@ -106,7 +106,7 @@ export class EmiList implements OnInit {
           newData = res.data;
         }
 
-        this.totalCount = res.results || this.totalCount;
+        this.totalCount =  res.pagination.totalResults 
         this.data = [...this.data, ...newData];
 
         this.currentPage++;

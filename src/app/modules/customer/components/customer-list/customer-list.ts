@@ -122,7 +122,7 @@ export class CustomerList implements OnInit {
       (res: any) => {
         let newData: any[] = [];
         if (res.data && Array.isArray(res.data.data)) { newData = res.data.data; }
-        this.totalCount = res.results || this.totalCount;
+        this.totalCount = res.pagination.totalResults 
         this.data = [...this.data, ...newData]; if (this.gridApi) { }
         this.currentPage++; this.isLoading = false; this.cdr.markForCheck();
       },

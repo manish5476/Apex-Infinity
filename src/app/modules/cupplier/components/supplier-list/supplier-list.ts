@@ -99,7 +99,7 @@ export class SupplierListComponent implements OnInit {
           newData = res.data.data;
         }
 
-        this.totalCount = res.results || this.totalCount;
+        this.totalCount =  res.pagination.totalResults 
         this.data = [...this.data, ...newData];
 
         if (this.gridApi) {

@@ -23,6 +23,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
 import { StockAdjustmentComponent } from '../stock-adjustment/stock-adjustment';
 import { StockTransferComponent } from '../stoct-transfer/stoct-transfer';
 import { ProductHistoryComponent } from '../product-history/product-history';
+import { DynamicDialogServices } from '../../../../core/services/dynamic-dialog-services';
 
 // Import the dialog component (Ensure path is correct)
 
@@ -91,40 +92,7 @@ export class ProductDetailsComponent implements OnInit {
     });
   }
 
-  openStockAdjustment(product: any) {
-    const ref: any = this.dialogService.open(StockAdjustmentComponent, {
-      header: `Adjust Stock: ${product.name}`,
-      width: '80%',
-      closable: true,
-      contentStyle: { overflow: 'visible' },
-      baseZIndex: 10000,
-      data: {
-        id: product._id
-      }
-    });
-
-    ref.onClose.subscribe((success: boolean) => {
-      if (success) {
-        this.loadProductData();
-      }
-    });
-  }
-  openStockTransfer(product: any) {
-    const ref: any = this.dialogService.open(StockTransferComponent, {
-      header: `transfer Stock: ${product.name}`,
-      width: '80%',
-      closable: true,
-      contentStyle: { overflow: 'visible' },
-      baseZIndex: 10000,
-      data: { id: product._id }
-    });
-    ref.onClose.subscribe((success: boolean) => {
-      if (success) {
-        this.loadProductData();
-      }
-    });
-  }
-
+ 
   setupInventoryColumns() {
     this.inventoryColumns = [
       {
@@ -233,19 +201,32 @@ export class ProductDetailsComponent implements OnInit {
   eventFromGrid(event: any) {
   }
 
+  private dialogHelper = inject(DynamicDialogServices);
+
+  openStockAdjustment(product: any) {
+    const ref = this.dialogHelper.openStockAdjustment(product);
+    
+    if (ref) {
+      ref.onClose.subscribe((success: boolean) => {
+        if (success) {
+          this.loadProductData(); 
+        }
+      });
+    }
+  }
+
   openHistory(product: any) {
-    const ref: any = this.dialogService.open(ProductHistoryComponent, {
-      header: `transfer Stock: ${product.name}`,
-      width: '80%',
-      closable: true,
-      contentStyle: { overflow: 'visible' },
-      baseZIndex: 10000,
-      data: { productId: product._id }
-    });
-    ref.onClose.subscribe((success: boolean) => {
-      if (success) {
-        this.loadProductData();
-      }
-    });
+    const ref = this.dialogHelper.openProductHistory(product);
+    // You don't necessarily need to refresh data after viewing history, 
+    // but you can attach the subscriber here if you want.
+  }
+
+  openStockTransfer(product: any) {
+    const ref = this.dialogHelper.openStockTransfer(product);
+    if (ref) {
+      ref.onClose.subscribe((success: boolean) => {
+        if (success) this.loadProductData();
+      });
+    }
   }
 }

@@ -104,7 +104,7 @@ export class ProductListComponent implements OnInit {
         if (res.data && Array.isArray(res.data.data)) {
           newData = res.data.data;
         }
-        this.totalCount = res.results || this.totalCount;
+        this.totalCount = res.pagination.totalResults 
         this.data = [...this.data, ...newData];
         if (this.gridApi && !isReset) {
           this.gridApi.applyTransaction({ add: newData });
@@ -138,6 +138,7 @@ export class ProductListComponent implements OnInit {
         this.router.navigate([productId], { relativeTo: this.route });
       }
     }
+    console.log(event);
     if (event.type === 'reachedBottom') {
       this.onScrolledToBottom(event)
     }

@@ -130,7 +130,7 @@ getData(isReset: boolean = false) {
         const newData = res.data?.data || []; 
         
         // Results count often comes from res.pagination.total or res.results
-        this.totalCount = res.pagination?.total || res.results || 0;
+        this.totalCount = res.pagination.totalResults 
         
         if (isReset) {
           this.data = newData;
