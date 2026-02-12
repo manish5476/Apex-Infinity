@@ -166,29 +166,71 @@ export class InvoiceListComponent implements OnInit {
       filterParams['invoiceDate[lte]'] = endDate.toISOString();
     }
     this.invoiceService.getAllInvoices(filterParams).subscribe({
-      next: (res: any) => {
-        let newData: any[] = [];
-        if (res.data && Array.isArray(res.data.data)) {
-          newData = res.data.data;
-        }
+  next: (res: any) => {
+    let newData: any[] = [];
 
-        this.totalCount = res.results || this.totalCount;
-        this.data = [...this.data, ...newData];
+    // 1. Extract the invoice array
+    if (res?.data?.data && Array.isArray(res.data.data)) {
+      newData = res.data.data;
+    }
 
-        if (this.gridApi && !isReset) {
-          this.gridApi.applyTransaction({ add: newData });
-        }
+    // 2. Update counts from the pagination object
+    // Using res.pagination.totalResults (8) and tracking if more pages exist
+    if (res.pagination) {
+      this.totalCount = res.pagination.totalResults;
+      this.hasNextPage = res.pagination.hasNextPage; // Helpful for stopping the scroll
+    }
 
-        this.currentPage++;
-        this.isLoading = false;
-        this.cdr.markForCheck();
-      },
-      error: (err: any) => {
-        this.isLoading = false;
-        this.messageService.showError('Error', 'Failed to fetch invoices.');
+    // 3. Update local data store
+    this.data = isReset ? [...newData] : [...this.data, ...newData];
+
+    // 4. Update Ag-Grid
+    if (this.gridApi) {
+      if (isReset) {
+        this.gridApi.setRowData(this.data);
+      } else {
+        this.gridApi.applyTransaction({ add: newData });
       }
-    });
+    }
+
+    // 5. Increment page based on the API's current page
+    if (res.pagination?.page) {
+      this.currentPage = res.pagination.page + 1;
+    }
+
+    this.isLoading = false;
+    this.cdr.markForCheck();
+  },
+  error: (err) => {
+    this.isLoading = false;
+    this.cdr.markForCheck();
   }
+});
+    
+  //   this.invoiceService.getAllInvoices(filterParams).subscribe({
+  //     next: (res: any) => {
+  //       let newData: any[] = [];
+  //       if (res.data && Array.isArray(res.data.data)) {
+  //         newData = res.data.data;
+  //       }
+
+  //       this.totalCount = res.results || this.totalCount;
+  //       this.data = [...this.data, ...newData];
+
+  //       if (this.gridApi && !isReset) {
+  //         this.gridApi.applyTransaction({ add: newData });
+  //       }
+
+  //       this.currentPage++;
+  //       this.isLoading = false;
+  //       this.cdr.markForCheck();
+  //     },
+  //     error: (err: any) => {
+  //       this.isLoading = false;
+  //       this.messageService.showError('Error', 'Failed to fetch invoices.');
+  //     }
+  //   });
+  // }
 
   onScrolledToBottom(_: any) {
     if (!this.isLoading && this.data.length < this.totalCount) {
