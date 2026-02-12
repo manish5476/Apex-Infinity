@@ -293,7 +293,41 @@ export class NoteListComponent {
       });
     }
   }
+
+  onUnlinkNote(event: { sourceId: string, targetId: string }) {
+    // Optimistic update (optional) or wait for server
+    // For safety, let's wait for server response
+    
+    this.notesService.unlinkNote(event.sourceId, event.targetId).subscribe({
+      next: (res) => {
+        // The server should return the updated Source Note
+        const updatedNote = res.data.note;
+
+        this.notes.update(currentNotes => 
+          currentNotes.map(n => n._id === updatedNote._id ? updatedNote : n)
+        );
+
+        // Optional: Toast message "Link removed"
+      },
+      error: (err) => {
+        console.error('Failed to unlink note', err);
+        // Show error toast
+      }
+    });
+  }
+  
 }
+
+
+
+
+
+
+
+
+
+
+
 
 // import { DynamicDialogServices } from './../../../core/services/dynamic-dialog-services';
 // import { Dialog } from 'primeng/dialog';

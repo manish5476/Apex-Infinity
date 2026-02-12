@@ -47,6 +47,23 @@ export class NoteService extends BaseApiService {
     return this.get<any>(`${this.endpoint}/export/all`, { format }, 'exportAllUserNotes');
   }
 
+    // ==================== MISSING: LINKING NOTES ====================
+  linkNote(sourceNoteId: string, targetNoteId: string) {
+    return this.post<{ data: { note: Note } }>(
+      `${this.endpoint}/${sourceNoteId}/link`,
+      { targetNoteId },
+      'linkNote'
+    );
+  }
+  unlinkNote(sourceNoteId: string, targetNoteId: string) {
+    return this.delete<{ data: { note: Note } }>(
+      `${this.endpoint}/${sourceNoteId}/link/${targetNoteId}`,
+      null,
+      'unlinkNote'
+    );
+  }
+
+  
   // ==================== SHARING ====================
 
   shareNote(id: string, userIds: string[], permission: 'viewer' | 'contributor' | 'admin' = 'viewer') {
@@ -57,7 +74,7 @@ export class NoteService extends BaseApiService {
       'shareNote'
     );
   }
-  
+
   // ==================== MISSING: HARD DELETE & HISTORY ====================
   
   // FIXED: Added this method to fix "Property 'hardDeleteNote' does not exist"
@@ -105,21 +122,6 @@ export class NoteService extends BaseApiService {
     );
   }
 
-  // ==================== MISSING: LINKING NOTES ====================
-  linkNote(sourceNoteId: string, targetNoteId: string) {
-    return this.post<{ data: { note: Note } }>(
-      `${this.endpoint}/${sourceNoteId}/link`,
-      { targetNoteId },
-      'linkNote'
-    );
-  }
-  unlinkNote(sourceNoteId: string, targetNoteId: string) {
-    return this.delete<{ data: { note: Note } }>(
-      `${this.endpoint}/${sourceNoteId}/link/${targetNoteId}`,
-      null,
-      'unlinkNote'
-    );
-  }
 
   // ==================== MEDIA UPLOAD ====================
   

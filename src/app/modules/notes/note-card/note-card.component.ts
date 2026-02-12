@@ -1,10 +1,10 @@
-import { 
-  Component, 
-  Input, 
-  Output, 
-  EventEmitter, 
-  computed, 
-  inject, 
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  computed,
+  inject,
   signal,
   ViewChild,
   ElementRef
@@ -50,6 +50,18 @@ import { NoteService } from '../../../core/services/notes.service';
 
         <!-- Body: Content -->
         <div class="card-body">
+         <!-- <div *ngIf="note?.linkedNotes?.length" class="linked-notes-row">
+            <div *ngFor="let link of note?.linkedNotes" class="link-chip" 
+                 (click)="$event.stopPropagation(); linkClick.emit(link._id)">
+               <i class="pi pi-link"></i>
+               <span class="link-title">{{ link.title || 'Untitled' }}</span>
+               <button class="remove-link-btn" 
+                       (click)="$event.stopPropagation(); onUnlink(link._id)">
+                 ×
+               </button>
+            </div>
+         </div> -->
+
           <h3 class="note-title">{{ note.title || 'Untitled Note' }}</h3>
           
           <!-- Meeting Specifics -->
@@ -150,7 +162,12 @@ import { NoteService } from '../../../core/services/notes.service';
 
       <!-- ==================== SHARED TEMPLATES ==================== -->
       <ng-template #actionButtons>
+        
         <ng-container *ngIf="!note.isDeleted && note.status !== 'archived'">
+          <button class="action-btn" (click)="$event.stopPropagation(); link.emit(note._id)" title="Link to another note">
+             <i class="pi pi-link"></i>
+           </button>
+           
            <button class="action-btn" (click)="archive.emit(note._id)" title="Archive">
             <i class="pi pi-box"></i>
           </button>
@@ -619,6 +636,57 @@ import { NoteService } from '../../../core/services/notes.service';
           cursor: pointer;
           &:disabled { opacity: 0.5; cursor: not-allowed; }
         }
+        /* NEW STYLES FOR LINK CHIPS */
+    .linked-notes-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .link-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px;
+      background: var(--bg-ternary); /* or a slight purple tint */
+      border: 1px solid var(--border-secondary);
+      border-radius: 12px;
+      font-size: 11px;
+      color: var(--text-sub);
+      cursor: pointer;
+      max-width: 100%;
+    }
+
+    .link-chip:hover {
+      background: var(--bg-hover);
+      border-color: var(--accent-primary);
+      color: var(--text-main);
+    }
+
+    .link-title {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 80px; /* Limit width */
+    }
+
+    .remove-link-btn {
+      border: none;
+      background: none;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 0 2px;
+      line-height: 1;
+      border-radius: 50%;
+    }
+
+    .remove-link-btn:hover {
+      background: var(--color-error-bg);
+      color: var(--color-error);
+    }
+
       }
     }
 
@@ -644,6 +712,19 @@ export class NoteCardComponent {
   @Output() archive = new EventEmitter<string>();
   @Output() restore = new EventEmitter<string>();
   @Output() share = new EventEmitter<string>(); // Emits after successful share if needed
+  @Output() link = new EventEmitter<string>();
+  // NEW OUTPUTS
+  @Output() unlink = new EventEmitter<{ sourceId: string, targetId: string }>();
+  @Output() linkClick = new EventEmitter<string>(); // Optional: Navigate to linked note
+
+  // ...
+
+  onUnlink(targetNoteId: string) {
+    this.unlink.emit({ 
+      sourceId: this.note._id, 
+      targetId: targetNoteId 
+    });
+  }
 
   // Share Dialog State
   showShareDialog = false;
@@ -710,8 +791,8 @@ export class NoteCardComponent {
 
   filteredUsers() {
     const term = this.userSearch.toLowerCase();
-    return (this.users() || []).filter(u => 
-      u.name.toLowerCase().includes(term) || 
+    return (this.users() || []).filter(u =>
+      u.name.toLowerCase().includes(term) ||
       u['email'].toLowerCase().includes(term)
     );
   }
@@ -726,11 +807,11 @@ export class NoteCardComponent {
 
   submitShare() {
     if (this.selectedUserIds.size === 0) return;
-    
+
     this.isSharing = true;
     const userIds = Array.from(this.selectedUserIds);
-console.log(this.note);
-    this.noteService.shareNote(this.note._id, userIds, this.selectedPermission as 'viewer' | 'contributor' | 'admin'    ).subscribe({
+    console.log(this.note);
+    this.noteService.shareNote(this.note._id, userIds, this.selectedPermission as 'viewer' | 'contributor' | 'admin').subscribe({
       next: (res) => {
         // Update local note reference to reflect changes immediately
         this.note = res.data.note;
