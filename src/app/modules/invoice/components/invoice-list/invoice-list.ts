@@ -1,3 +1,4 @@
+
 import { ChangeDetectorRef, Component, OnInit, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GridApi, GridReadyEvent, ITooltipParams } from 'ag-grid-community';
@@ -37,7 +38,6 @@ import { ActionViewRenderer } from '../../../shared/AgGrid/AgGridcomponents/Dyna
     ToastModule,
     DatePickerModule,
     AgShareGrid
-    // Note: ItemTooltipComponent is NOT imported here to avoid NG8113 warning
   ],
   templateUrl: './invoice-list.html',
   styleUrl: './invoice-list.scss',
@@ -52,8 +52,11 @@ export class InvoiceListComponent implements OnInit {
   private common = inject(CommonMethodService);
 
   private gridApi!: GridApi;
+  
+  // Pagination State
   private currentPage = 1;
   private pageSize = 50;
+  hasNextPage = true; // Default true to allow initial load
   isLoading = false;
   isExporting = false;
   totalCount = 0;
@@ -135,14 +138,17 @@ export class InvoiceListComponent implements OnInit {
   }
 
   getData(isReset: boolean = false) {
-    if (this.isLoading) return;
-    this.isLoading = true;
-
     if (isReset) {
       this.currentPage = 1;
       this.data = [];
       this.totalCount = 0;
+      this.hasNextPage = true; // Reset flag so we can load again
     }
+
+    // STOP Check: If loading OR (not resetting AND no next page), stop here.
+    if (this.isLoading || (!isReset && !this.hasNextPage)) return;
+
+    this.isLoading = true;
 
     const filterParams: any = {
       ...this.invoiceFilter,
@@ -150,13 +156,6 @@ export class InvoiceListComponent implements OnInit {
       limit: this.pageSize,
     };
 
-    // if (this.dateRange && this.dateRange[0]) {
-    //   filterParams.start = this.dateRange[0].toISOString();
-    // }
-    // if (this.dateRange && this.dateRange[1]) {
-    //   filterParams.end = this.dateRange[1].toISOString();
-    // }
-    // --- CHANGE STARTS HERE ---
     if (this.dateRange && this.dateRange[0]) {
       filterParams['invoiceDate[gte]'] = this.dateRange[0].toISOString();
     }
@@ -165,75 +164,55 @@ export class InvoiceListComponent implements OnInit {
       const endDate = new Date(this.dateRange[1]);
       filterParams['invoiceDate[lte]'] = endDate.toISOString();
     }
+
     this.invoiceService.getAllInvoices(filterParams).subscribe({
-  next: (res: any) => {
-    let newData: any[] = [];
+      next: (res: any) => {
+        let newData: any[] = [];
+        
+        // 1. Extract Data
+        if (res.data && Array.isArray(res.data.data)) {
+          newData = res.data.data;
+        }
 
-    // 1. Extract the invoice array
-    if (res?.data?.data && Array.isArray(res.data.data)) {
-      newData = res.data.data;
-    }
+        // 2. Update Pagination State from Response
+        if (res.pagination) {
+            this.hasNextPage = res.pagination.hasNextPage;
+            this.totalCount = res.pagination.totalResults;
+        } else {
+            // Fallback if pagination object is missing (safety)
+            this.hasNextPage = newData.length >= this.pageSize;
+            this.totalCount = res.results || 0;
+        }
 
-    // 2. Update counts from the pagination object
-    // Using res.pagination.totalResults (8) and tracking if more pages exist
-    if (res.pagination) {
-      this.totalCount = res.pagination.totalResults;
-      this.hasNextPage = res.pagination.hasNextPage; // Helpful for stopping the scroll
-    }
+        // 3. Update Grid Data
+        if (isReset) {
+            this.data = newData;
+        } else {
+            this.data = [...this.data, ...newData];
+        }
 
-    // 3. Update local data store
-    this.data = isReset ? [...newData] : [...this.data, ...newData];
+        if (this.gridApi && !isReset && newData.length > 0) {
+          this.gridApi.applyTransaction({ add: newData });
+        }
 
-    // 4. Update Ag-Grid
-    if (this.gridApi) {
-      if (isReset) {
-        this.gridApi.setRowData(this.data);
-      } else {
-        this.gridApi.applyTransaction({ add: newData });
+        // 4. Prepare for next page
+        if (this.hasNextPage) {
+            this.currentPage++;
+        }
+
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: (err: any) => {
+        this.isLoading = false;
+        this.messageService.showError('Error', 'Failed to fetch invoices.');
       }
-    }
-
-    // 5. Increment page based on the API's current page
-    if (res.pagination?.page) {
-      this.currentPage = res.pagination.page + 1;
-    }
-
-    this.isLoading = false;
-    this.cdr.markForCheck();
-  },
-  error: (err) => {
-    this.isLoading = false;
-    this.cdr.markForCheck();
+    });
   }
-});
-    
-  //   this.invoiceService.getAllInvoices(filterParams).subscribe({
-  //     next: (res: any) => {
-  //       let newData: any[] = [];
-  //       if (res.data && Array.isArray(res.data.data)) {
-  //         newData = res.data.data;
-  //       }
-
-  //       this.totalCount = res.results || this.totalCount;
-  //       this.data = [...this.data, ...newData];
-
-  //       if (this.gridApi && !isReset) {
-  //         this.gridApi.applyTransaction({ add: newData });
-  //       }
-
-  //       this.currentPage++;
-  //       this.isLoading = false;
-  //       this.cdr.markForCheck();
-  //     },
-  //     error: (err: any) => {
-  //       this.isLoading = false;
-  //       this.messageService.showError('Error', 'Failed to fetch invoices.');
-  //     }
-  //   });
-  // }
 
   onScrolledToBottom(_: any) {
-    if (!this.isLoading && this.data.length < this.totalCount) {
+    // New Logic: strictly checks the flag from the backend
+    if (!this.isLoading && this.hasNextPage) {
       this.getData(false);
     }
   }
@@ -245,10 +224,9 @@ export class InvoiceListComponent implements OnInit {
   eventFromGrid(event: any) {
     console.log(event);
     if (event.type === 'cellClicked') {
-
       const invoiceId = event.row._id;
       if (event.field === '_id') {
-
+         // handle internal ID click if needed
       } else {
         this.router.navigate([invoiceId], { relativeTo: this.route });
       }
@@ -403,13 +381,13 @@ export class InvoiceListComponent implements OnInit {
           }
         ]
       },
-  
-    // ACTIONS
+
+      // ACTIONS
       {
         headerName: 'Actions',
         field: '_id',
         width: 50,
-        cellRenderer: ActionViewRenderer, // Reference the renderer here
+        cellRenderer: ActionViewRenderer, 
       }
     ];
     this.cdr.detectChanges();

@@ -83,7 +83,7 @@ export class ProductListComponent implements OnInit {
     this.getData(true);
   }
 
-  getData(isReset: boolean = false) {
+getData(isReset: boolean = false) {
     if (this.isLoading) return;
     this.isLoading = true;
 
@@ -98,28 +98,49 @@ export class ProductListComponent implements OnInit {
       page: this.currentPage,
       limit: this.pageSize,
     };
+
     this.productService.getAllProducts(filterParams).subscribe(
       (res: any) => {
         let newData: any[] = [];
+
+        // 1. EXTRACT DATA
+        // Structure is: root -> data -> data (array)
         if (res.data && Array.isArray(res.data.data)) {
           newData = res.data.data;
         }
-        this.totalCount = res.pagination.totalResults 
-        this.data = [...this.data, ...newData];
-        if (this.gridApi && !isReset) {
-          this.gridApi.applyTransaction({ add: newData });
+
+        // 2. EXTRACT PAGINATION
+        // Structure is: root -> pagination -> totalResults
+        if (res.pagination) {
+          this.totalCount = res.pagination.totalResults;
         }
+
+        // 3. UPDATE LOCAL STATE
+        this.data = [...this.data, ...newData];
+
+        // 4. UPDATE GRID
+        if (this.gridApi) {
+          if (isReset) {
+            // If resetting, replace all data
+            this.gridApi.setGridOption('rowData', this.data);
+          } else {
+            // If appending (scrolling), just add new rows
+            this.gridApi.applyTransaction({ add: newData });
+          }
+        }
+
         this.currentPage++;
         this.isLoading = false;
         this.cdr.markForCheck();
       },
       (err: any) => {
         this.isLoading = false;
+        console.error(err);
         this.messageService.showError('Error', 'Failed to fetch products.');
       }
     );
   }
-
+  
   onScrolledToBottom(event: any) {
     if (!this.isLoading && this.data.length < this.totalCount) {
       this.getData(false);
