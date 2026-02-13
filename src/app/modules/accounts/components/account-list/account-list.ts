@@ -1,3 +1,4 @@
+import { AppMessageService } from './../../../../core/services/message.service';
 import { Component, OnInit, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { Router } from '@angular/router';
@@ -21,6 +22,7 @@ import { ActionViewRenderer } from '../../../shared/AgGrid/AgGridcomponents/Dyna
 export class AccountListComponent implements OnInit {
   // Dependencies
   private accountService = inject(AccountService);
+  private messageService = inject(AppMessageService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private decimalPipe = inject(DecimalPipe);
@@ -123,12 +125,12 @@ export class AccountListComponent implements OnInit {
     this.isLoading = true;
     this.accountService.getAccounts().subscribe({
       next: (res: any) => {
-        // Handle response format variations (res.data or res directly)
         this.data = Array.isArray(res.data) ? res.data : (Array.isArray(res) ? res : []);
         this.isLoading = false;
         this.cdr.markForCheck();
       },
       error: (err) => {
+        this.messageService.showError(err)
         console.error('Failed to load accounts', err);
         this.isLoading = false;
       }

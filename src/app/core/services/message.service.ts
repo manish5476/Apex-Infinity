@@ -10,28 +10,28 @@ export class AppMessageService {
   /**
    * Show a success toast (Green)
    */
-  public showSuccess(summary: string = 'Success', detail: string = 'Operation completed successfully.', life = 3000) {
+  public showSuccess(detail: string = 'Operation completed successfully.' ,summary: string = 'Success',  life = 3000) {
     this.messageService.add({ severity: 'success', summary, detail, life });
   }
 
   /**
    * Show an error toast (Red)
    */
-  public showError(summary: string = 'Error', detail: string = 'Something went wrong.', life = 5000) {
+  public showError(detail: string = 'Something went wrong.',summary: string = 'Error',  life = 5000) {
     this.messageService.add({ severity: 'error', summary, detail, life });
   }
 
   /**
    * Show an info toast (Blue)
    */
-  public showInfo(summary: string, detail: string, life = 3000) {
+  public showInfo( detail: string,summary?: string, life = 3000) {
     this.messageService.add({ severity: 'info', summary, detail, life });
   }
 
   /**
    * Show a warning toast (Yellow)
    */
-  public showWarn(summary: string, detail: string, life = 4000) {
+  public showWarn(detail: string,summary: string,  life = 4000) {
     this.messageService.add({ severity: 'warn', summary, detail, life });
   }
 
