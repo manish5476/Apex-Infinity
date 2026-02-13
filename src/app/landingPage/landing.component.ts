@@ -16,7 +16,7 @@ interface FeatureDetail {
 }
 
 @Component({
-  selector: 'app-landing-page',
+  selector: 'app-landing',
   standalone: true,
   imports: [CommonModule, RouterModule],
   encapsulation: ViewEncapsulation.None,
@@ -877,7 +877,7 @@ interface FeatureDetail {
     }
   `]
 })
-export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
+export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   private scrollObserver: IntersectionObserver | null = null;
 
   readonly scrollY = signal(0);
@@ -1096,7 +1096,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
 // }
 
 // @Component({
-//   selector: 'app-landing',
+//   selector: '',
 //   standalone: true,
 //   imports: [CommonModule, RouterModule, ButtonModule, TooltipModule, AccordionModule],
 //   templateUrl: './landing.component.html',
