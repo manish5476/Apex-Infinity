@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal, effect, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { FormsModule } from '@angular/forms';
+import { ConfirmationService } from 'primeng/api';
 
 // PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
@@ -10,24 +11,34 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
+import { DialogModule } from 'primeng/dialog';
 
 // Services
 import { MasterService } from '../../../../core/services/master.service';
 import { LoadingService } from '../../../../core/services/loading.service';
 
 // Grid Components & Types
-// Assuming GridColDef is exported from your shared types
 import { AppSharedGrid } from "../../AgGrid/grid/app-shared-grid/app-shared-grid";
-import { GridColDef } from "../../AgGrid/grid/grid.types"; 
+import { GridColDef } from "../../AgGrid/grid/grid.types";
+import { SelectModule } from 'primeng/select';
+import { AppMessageService } from '../../../../core/services/message.service';
 
-// Define Interface for Master Data
+// --- Updated Interface based on Mongoose Schema ---
 export interface Master {
   _id: string;
   type: string;
   name: string;
-  code: string;
-  description: string;
-  isNew?: boolean; // Helper flag for new rows
+  code?: string;
+  slug?: string;
+  description?: string;
+  imageUrl?: string;
+  parentId?: string | null;
+  isActive: boolean;
+  metadata?: {
+    isFeatured: boolean;
+    sortOrder: number;
+  };
+  isNew?: boolean; // Frontend helper flag
 }
 
 @Component({
@@ -35,6 +46,7 @@ export interface Master {
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule, // Required for ngModel in Dialog
     ButtonModule,
     ToastModule,
     ConfirmDialogModule,
@@ -42,19 +54,21 @@ export interface Master {
     IconFieldModule,
     InputIconModule,
     InputTextModule,
-    AppSharedGrid
+    DialogModule,
+SelectModule,    AppSharedGrid
   ],
-  providers: [ConfirmationService, MessageService],
+  providers: [ConfirmationService],
   template: `
     <div class="master-page-container">
       <div class="themed-card master-card">
         
+        <!-- TOOLBAR -->
         <p-toolbar styleClass="master-toolbar">
           <div class="p-toolbar-group-start gap-3">
             <h2 class="section-heading m-0">Master Data</h2>
             
             <p-iconfield iconPosition="left">
-              <!-- <p-inputicon styleClass="pi pi-search"></p-inputicon> -->
+              <p-inputicon styleClass="pi pi-search"></p-inputicon>
               <input pInputText type="text" (input)="onQuickFilter($event)" 
                      placeholder="Search..." class="p-inputtext-sm w-64" />
             </p-iconfield>
@@ -64,12 +78,19 @@ export interface Master {
              <div class="stats mr-4 align-content-center">
               <span class="text-sm text-gray-500">Total: {{ masters().length }}</span>
             </div>
+            
+            <!-- Bulk Import Button -->
+            <p-button label="Bulk Import" icon="pi pi-upload" styleClass="p-button-outlined" 
+                      (click)="openBulkDialog()"></p-button>
+
             <p-button label="Refresh" icon="pi pi-refresh" styleClass="p-button-text" 
                       (click)="loadMasters()" [loading]="loading()"></p-button>
+            
             <p-button label="Add New" icon="pi pi-plus" (click)="onAddNew()"></p-button>
           </div>
         </p-toolbar>
 
+        <!-- MAIN DATA GRID -->
         <div class="master-grid-wrapper" style="height: calc(100vh - 200px);">
           <app-shared-grid
             [columns]="columns"
@@ -83,7 +104,37 @@ export interface Master {
       </div>
     </div>
 
-    <p-toast></p-toast>
+    <!-- BULK ENTRY DIALOG WITH GRID -->
+    <p-dialog header="Bulk Entry" [(visible)]="isBulkDialogVisible" [modal]="true" 
+              [style]="{ width: '90vw', height: '80vh' }" [draggable]="false" [resizable]="false"
+              [maximizable]="true">
+      
+      <div class="flex flex-col h-full gap-2">
+        <div class="bg-blue-50 p-3 rounded-md text-sm text-blue-700 mb-2 border border-blue-100 flex items-center">
+          <i class="pi pi-info-circle mr-2"></i>
+          <span>Click <b>"Add Row"</b> in the grid below to insert items. Click <b>"Create All"</b> to save.</span>
+        </div>
+
+        <!-- Reusing AppSharedGrid for Bulk Entry -->
+        <div class="flex-1 overflow-hidden border rounded-md">
+           <app-shared-grid
+            [columns]="columns"
+            [data]="bulkData()"
+            [selectionMode]="'multiple'"
+            [showActions]="true"
+            (gridEvent)="onBulkGridEvent($event)">
+          </app-shared-grid>
+        </div>
+      </div>
+      
+      <ng-template pTemplate="footer">
+        <p-button label="Cancel" icon="pi pi-times" [text]="true" (click)="isBulkDialogVisible = false"></p-button>
+        <p-button label="Create All" icon="pi pi-check" [loading]="isBulkSaving" 
+                  (click)="saveBulkEntry()"></p-button>
+      </ng-template>
+    </p-dialog>
+
+    <p-toast></p-toast> 
     <p-confirmDialog></p-confirmDialog>
   `,
   styleUrls: ['./master-list.scss'],
@@ -92,12 +143,31 @@ export interface Master {
 export class MasterList implements OnInit {
   // --- Services ---
   private masterService = inject(MasterService);
-  private messageService = inject(MessageService);
+  private appMessage = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
   private loadingService = inject(LoadingService);
+
+  // --- Signals ---
   masters = signal<Master[]>([]);
+  bulkData = signal<Master[]>([]); // Data for the bulk dialog
   loading = signal(false);
+
+  // --- Bulk Dialog State ---
+  isBulkDialogVisible = false;
+  isBulkSaving = false;
+
   gridApi: any;
+  bulkGridApi: any; // Separate API reference for the bulk grid
+
+  // --- Master Types Definition ---
+  readonly masterTypes = [
+    { label: 'Category', value: 'category' },
+    { label: 'Brand', value: 'brand' },
+    { label: 'Unit', value: 'unit' },
+    { label: 'Department', value: 'department' }
+  ];
+
+  // --- Grid Definition ---
   columns: GridColDef<Master>[] = [
     {
       field: 'type',
@@ -106,48 +176,46 @@ export class MasterList implements OnInit {
       cellConfig: {
         type: 'select',
         placeholder: 'Select Type',
-        // Mapping your masterTypes to the format the grid expects
-        options: [
-          { label: 'Category', value: 'category' },
-          { label: 'Brand', value: 'brand' },
-          { label: 'Unit', value: 'unit' },
-          { label: 'Department', value: 'department' }
-        ],
-        optionLabel: 'label' // Optional, depends on your grid implementation
+        options: this.masterTypes,
+        optionLabel: 'label',
+        optionValue: 'value'
       }
     },
     {
       field: 'name',
       headerName: 'Name',
       flex: 1,
-      cellConfig: { 
-        type: 'text', 
-        placeholder: 'Enter Name' 
-      }
+      cellConfig: { type: 'text', placeholder: 'Enter Name' }
     },
     {
       field: 'code',
       headerName: 'Code',
-      width: 150,
-      cellConfig: { 
-        type: 'text', 
-        placeholder: 'CODE' // You can handle uppercase in the grid or onSave
-      }
+      width: 120,
+      cellConfig: { type: 'text', placeholder: 'CODE' }
+    },
+    {
+      field: 'isActive',
+      headerName: 'Active',
+      width: 100,
+      cellConfig: { type: 'boolean' }
+    },
+    {
+      field: 'metadata.isFeatured', 
+      headerName: 'Featured',
+      width: 100,
+      valueGetter: (p) => p.data?.metadata?.isFeatured,
+      cellConfig: { type: 'boolean' } 
     },
     {
       field: 'description',
       headerName: 'Description',
       flex: 1.5,
-      cellConfig: { 
-        type: 'text', 
-        placeholder: 'Optional description' 
-      }
+      cellConfig: { type: 'text', placeholder: 'Optional description' }
     }
   ];
 
   constructor() {
-    effect(() => {
-    });
+    effect(() => {});
   }
 
   ngOnInit() {
@@ -163,101 +231,73 @@ export class MasterList implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load data' });
+        this.appMessage.handleHttpError(err, 'Loading Masters');
         this.loading.set(false);
       }
     });
   }
 
-  // --- Grid Event Handler (The Core Logic) ---
+  // --- Main Grid Event Handler ---
   onGridEvent(event: any) {
-    console.log(event);
     switch (event.type) {
       case 'init':
         this.gridApi = event.api;
         break;
-      case 'cellEdited':
-        console.log(`Field ${event.field} changed to ${event.value}`);
-        break;
       case 'save':
-        this.handleSave(event.row);
-        break;
       case 'Entersave':
         this.handleSave(event.row);
         break;
       case 'delete':
         this.handleDelete(event.row);
         break;
-      case 'editStart':
-        console.log(event.row);
-        console.log('Editing started for:', event.row._id);
+    }
+  }
+
+  // --- Bulk Grid Event Handler ---
+  onBulkGridEvent(event: any) {
+    switch (event.type) {
+      case 'init':
+        this.bulkGridApi = event.api;
         break;
     }
   }
 
-  // --- Action Handlers ---
+  // --- Single Row Actions ---
 
   onAddNew() {
-    // Create a temporary new row
-    const newMaster: Master = {
-      _id: `new_${Date.now()}`,
-      type: 'category', 
-      name: '',
-      code: '',
-      description: '',
-      isNew: true
-    };
-    this.masters.update(current => [newMaster, ...current]);   
-    this.messageService.add({severity:'info', summary:'New Row', detail:'Please fill details and click Save'});
+    const newMaster = this.createEmptyMaster();
+    this.masters.update(current => [newMaster, ...current]);    
+    this.appMessage.showInfo('Please fill details and click Save', 'New Row Added');
   }
 
   handleSave(row: Master) {
     if (!row.name || !row.type) {
-      this.messageService.add({ severity: 'warn', summary: 'Validation', detail: 'Name and Type are required' });
+      this.appMessage.showWarn('Name and Type are required', 'Validation Error');
       return;
     }
 
-    // Prepare payload
-    const payload = {
-      type: row.type,
-      name: row.name,
-      code: row.code ? row.code.toUpperCase() : null,
-      description: row.description
-    };
-
-    // this.loadingService.show();
+    const payload = this.preparePayload(row);
 
     if (row.isNew || row._id.startsWith('new_')) {
-      // --- CREATE ---
       this.masterService.createMaster(payload).subscribe({
-        next: (res) => {
-          this.messageService.add({ severity: 'success', summary: 'Created', detail: 'Master created successfully' });
-          this.loadMasters(); // Reload to get real ID
+        next: () => {
+          this.appMessage.showSuccess('Master created successfully');
+          this.loadMasters(); 
         },
-        error: (err) => {
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message || 'Create failed' });
-        },
-        complete: () => this.loadingService.hide()
+        error: (err) => this.appMessage.handleHttpError(err, 'Creation')
       });
     } else {
-      // --- UPDATE ---
       this.masterService.updateMaster(row._id, payload).subscribe({
-        next: (res) => {
-          this.messageService.add({ severity: 'success', summary: 'Updated', detail: 'Master updated successfully' });
-          // Optional: Update local signal if you don't want to reload the whole list
-        },
-        error: (err) => {
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message || 'Update failed' });
-        },
-        complete: () => this.loadingService.hide()
+        next: () => this.appMessage.showSuccess('Master updated successfully'),
+        error: (err) => this.appMessage.handleHttpError(err, 'Update')
       });
     }
   }
 
   handleDelete(row: Master) {
-    // If it's a local new row that hasn't been saved yet
     if (row.isNew || row._id.startsWith('new_')) {
       this.masters.update(current => current.filter(m => m._id !== row._id));
+      this.appMessage.showInfo('Unsaved row removed');
       return;
     }
 
@@ -268,16 +308,12 @@ export class MasterList implements OnInit {
       acceptButtonStyleClass: 'p-button-danger p-button-text',
       rejectButtonStyleClass: 'p-button-text p-button-secondary',
       accept: () => {
-        // this.loadingService.show();
         this.masterService.deleteMaster(row._id).subscribe({
           next: () => {
             this.masters.update(users => users.filter(u => u._id !== row._id));
-            this.messageService.add({ severity: 'success', summary: 'Deleted', detail: `${row.name} removed` });
+            this.appMessage.showSuccess(`${row.name} removed successfully`);
           },
-          error: (err) => {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Delete failed' });
-          },
-          complete: () => this.loadingService.hide()
+          error: (err) => this.appMessage.handleHttpError(err, 'Delete')
         });
       }
     });
@@ -288,4 +324,526 @@ export class MasterList implements OnInit {
       this.gridApi.setGridOption('quickFilterText', event.target.value);
     }
   }
+
+  // --- Bulk Entry Actions ---
+
+  openBulkDialog() {
+    this.bulkData.set([]); 
+    this.isBulkDialogVisible = true;
+  }
+
+  saveBulkEntry() {
+    if (!this.bulkGridApi) return;
+
+    // 1. Harvest Data from Grid
+    const validItems: any[] = [];
+    this.bulkGridApi.forEachNode((node: any) => {
+      // Filter out empty rows (at least name and type required)
+      if (node.data && node.data.name && node.data.type) {
+        // Strip out the temp ID and format payload
+        const payload = this.preparePayload(node.data);
+        
+        // Generate slug frontend-side to prevent "slug: null" duplicate errors on bulk insert
+        if (!payload.slug) {
+           payload['slug'] = this.generateSlug(payload.name);
+        }
+        
+        validItems.push(payload);
+      }
+    });
+
+    if (validItems.length === 0) {
+      this.appMessage.showWarn('Please enter valid details (Name & Type) for at least one item.', 'No Data');
+      return;
+    }
+
+    this.isBulkSaving = true;
+    
+    // 2. Send to API
+    this.masterService.createBulkMasters(validItems).subscribe({
+      next: (res) => {
+        // Handle Partial Success
+        if (res.status === 'partial_success' || (res.failedCount && res.failedCount > 0)) {
+           const inserted = res.insertedCount || 0;
+           const failed = res.failedCount || 0;
+           this.appMessage.showWarn(
+             `Imported: ${inserted}. Failed: ${failed}. Check duplicate names.`, 
+             'Partial Import'
+           );
+        } else {
+           this.appMessage.showSuccess(`${validItems.length} items imported successfully`, 'Bulk Import');
+        }
+
+        this.isBulkDialogVisible = false;
+        this.loadMasters(); 
+      },
+      error: (err) => {
+        this.appMessage.handleHttpError(err, 'Bulk Import');
+      },
+      complete: () => {
+        this.isBulkSaving = false;
+      }
+    });
+  }
+
+  // --- Helpers ---
+
+  private createEmptyMaster(): Master {
+    return {
+      _id: `new_${Date.now()}_${Math.random()}`,
+      type: 'category', // Default type
+      name: '',
+      code: '',
+      description: '',
+      isActive: true,
+      metadata: { isFeatured: false, sortOrder: 0 },
+      isNew: true
+    };
+  }
+
+  private preparePayload(row: Master): any {
+    return {
+      type: row.type,
+      name: row.name,
+      code: row.code ? row.code.toUpperCase() : null,
+      description: row.description,
+      isActive: row.isActive,
+      metadata: {
+        isFeatured: (row as any)['metadata.isFeatured'] ?? row.metadata?.isFeatured ?? false,
+        sortOrder: row.metadata?.sortOrder ?? 0
+      }
+    };
+  }
+
+  private generateSlug(text: string): string {
+    const slug = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    const random = Math.random().toString(36).substring(2, 8);
+    return `${slug}-${random}`;
+  }
 }
+
+// import { Component, OnInit, inject, signal, effect, ChangeDetectionStrategy } from '@angular/core';
+// import { CommonModule } from '@angular/common';
+// import { FormsModule } from '@angular/forms';
+// import { ConfirmationService } from 'primeng/api';
+
+// // PrimeNG Imports
+// import { ButtonModule } from 'primeng/button';
+// import { ToastModule } from 'primeng/toast';
+// import { ConfirmDialogModule } from 'primeng/confirmdialog';
+// import { ToolbarModule } from 'primeng/toolbar';
+// import { IconFieldModule } from 'primeng/iconfield';
+// import { InputIconModule } from 'primeng/inputicon';
+// import { InputTextModule } from 'primeng/inputtext';
+// import { DialogModule } from 'primeng/dialog';
+
+// // Services
+// import { MasterService } from '../../../../core/services/master.service';
+// import { LoadingService } from '../../../../core/services/loading.service';
+
+// // Grid Components & Types
+// import { AppSharedGrid } from "../../AgGrid/grid/app-shared-grid/app-shared-grid";
+// import { GridColDef } from "../../AgGrid/grid/grid.types";
+// import { SelectModule } from 'primeng/select';
+// import { AppMessageService } from '../../../../core/services/message.service';
+
+// // --- Updated Interface based on Mongoose Schema ---
+// export interface Master {
+//   _id: string;
+//   type: string;
+//   name: string;
+//   code?: string;
+//   slug?: string;
+//   description?: string;
+//   imageUrl?: string;
+//   parentId?: string | null;
+//   isActive: boolean;
+//   metadata?: {
+//     isFeatured: boolean;
+//     sortOrder: number;
+//   };
+//   isNew?: boolean; // Frontend helper flag
+// }
+
+// @Component({
+//   selector: 'app-master-list',
+//   standalone: true,
+//   imports: [
+//     CommonModule,
+//     FormsModule, // Required for ngModel in Dialog
+//     ButtonModule,
+//     ToastModule,
+//     ConfirmDialogModule,
+//     ToolbarModule,
+//     IconFieldModule,
+//     InputIconModule,
+//     InputTextModule,
+//     DialogModule,
+//     SelectModule,
+//     AppSharedGrid
+//   ],
+//   providers: [ConfirmationService],
+//   template: `
+//     <div class="master-page-container">
+//       <div class="themed-card master-card">
+        
+//         <!-- TOOLBAR -->
+//         <p-toolbar styleClass="master-toolbar">
+//           <div class="p-toolbar-group-start gap-3">
+//             <h2 class="section-heading m-0">Master Data</h2>
+            
+//             <p-iconfield iconPosition="left">
+//               <p-inputicon styleClass="pi pi-search"></p-inputicon>
+//               <input pInputText type="text" (input)="onQuickFilter($event)" 
+//                      placeholder="Search..." class="p-inputtext-sm w-64" />
+//             </p-iconfield>
+//           </div>
+
+//           <div class="p-toolbar-group-end flex gap-2">
+//              <div class="stats mr-4 align-content-center">
+//               <span class="text-sm text-gray-500">Total: {{ masters().length }}</span>
+//             </div>
+            
+//             <!-- Bulk Import Button -->
+//             <p-button label="Bulk Import" icon="pi pi-upload" styleClass="p-button-outlined" 
+//                       (click)="openBulkDialog()"></p-button>
+
+//             <p-button label="Refresh" icon="pi pi-refresh" styleClass="p-button-text" 
+//                       (click)="loadMasters()" [loading]="loading()"></p-button>
+            
+//             <p-button label="Add New" icon="pi pi-plus" (click)="onAddNew()"></p-button>
+//           </div>
+//         </p-toolbar>
+
+//         <!-- MAIN DATA GRID -->
+//         <div class="master-grid-wrapper" style="height: calc(100vh - 200px);">
+//           <app-shared-grid
+//             [columns]="columns"
+//             [data]="masters()"
+//             [selectionMode]="'multiple'"
+//             [showActions]="true"
+//             (gridEvent)="onGridEvent($event)">
+//           </app-shared-grid>
+//         </div>
+
+//       </div>
+//     </div>
+
+//     <!-- BULK ENTRY DIALOG WITH GRID -->
+//     <p-dialog header="Bulk Entry" [(visible)]="isBulkDialogVisible" [modal]="true" 
+//               [style]="{ width: '90vw', height: '80vh' }" [draggable]="false" [resizable]="false"
+//               [maximizable]="true">
+      
+//       <div class="flex flex-col h-full gap-2">
+//         <div class="bg-blue-50 p-3 rounded-md text-sm text-blue-700 mb-2 border border-blue-100 flex items-center">
+//           <i class="pi pi-info-circle mr-2"></i>
+//           <span>Click <b>"Add Row"</b> in the grid below to insert items. Click <b>"Create All"</b> to save.</span>
+//         </div>
+
+//         <!-- Reusing AppSharedGrid for Bulk Entry -->
+//         <div class="flex-1 overflow-hidden border rounded-md">
+//            <app-shared-grid
+//             [columns]="columns"
+//             [data]="bulkData()"
+//             [selectionMode]="'multiple'"
+//             [showActions]="false"
+//             (gridEvent)="onBulkGridEvent($event)">
+//           </app-shared-grid>
+//         </div>
+//       </div>
+      
+//       <ng-template pTemplate="footer">
+//         <p-button label="Cancel" icon="pi pi-times" [text]="true" (click)="isBulkDialogVisible = false"></p-button>
+//         <p-button label="Create All" icon="pi pi-check" [loading]="isBulkSaving" 
+//                   (click)="saveBulkEntry()"></p-button>
+//       </ng-template>
+//     </p-dialog>
+
+//     <p-toast></p-toast> 
+//     <p-confirmDialog></p-confirmDialog>
+//   `,
+//   styleUrls: ['./master-list.scss'],
+//   changeDetection: ChangeDetectionStrategy.OnPush
+// })
+// export class MasterList implements OnInit {
+//   // --- Services ---
+//   private masterService = inject(MasterService);
+//   private appMessage = inject(AppMessageService);
+//   private confirmationService = inject(ConfirmationService);
+//   private loadingService = inject(LoadingService);
+
+//   // --- Signals ---
+//   masters = signal<Master[]>([]);
+//   bulkData = signal<Master[]>([]); // Data for the bulk dialog
+//   loading = signal(false);
+
+//   // --- Bulk Dialog State ---
+//   isBulkDialogVisible = false;
+//   isBulkSaving = false;
+
+//   gridApi: any;
+//   bulkGridApi: any; // Separate API reference for the bulk grid
+
+//   // --- Master Types Definition ---
+//   readonly masterTypes = [
+//     { label: 'Category', value: 'category' },
+//     { label: 'Brand', value: 'brand' },
+//     { label: 'Unit', value: 'unit' },
+//     { label: 'Department', value: 'department' }
+//   ];
+
+//   // --- Grid Definition ---
+//   columns: GridColDef<Master>[] = [
+//     {
+//       field: 'type',
+//       headerName: 'Type',
+//       width: 150,
+//       cellConfig: {
+//         type: 'select',
+//         placeholder: 'Select Type',
+//         options: this.masterTypes,
+//         optionLabel: 'label',
+//         optionValue: 'value'
+//       }
+//     },
+//     {
+//       field: 'name',
+//       headerName: 'Name',
+//       flex: 1,
+//       cellConfig: { type: 'text', placeholder: 'Enter Name' }
+//     },
+//     {
+//       field: 'code',
+//       headerName: 'Code',
+//       width: 120,
+//       cellConfig: { type: 'text', placeholder: 'CODE' }
+//     },
+//     {
+//       field: 'isActive',
+//       headerName: 'Active',
+//       width: 100,
+//       cellConfig: { type: 'boolean' }
+//     },
+//     {
+//       field: 'metadata.isFeatured', 
+//       headerName: 'Featured',
+//       width: 100,
+//       valueGetter: (p) => p.data?.metadata?.isFeatured,
+//       cellConfig: { type: 'boolean' } 
+//     },
+//     {
+//       field: 'description',
+//       headerName: 'Description',
+//       flex: 1.5,
+//       cellConfig: { type: 'text', placeholder: 'Optional description' }
+//     },{
+//       field: 'imageUrl',
+//       headerName: 'imageUrl',
+//       flex: 1.5,
+//       cellConfig: { type: 'text', placeholder: 'imageUrl' }
+//     }
+//   ];
+
+//   constructor() {
+//     effect(() => {});
+//   }
+
+//   ngOnInit() {
+//     this.loadMasters();
+//   }
+
+//   // --- Load Data ---
+//   loadMasters() {
+//     this.loading.set(true);
+//     this.masterService.getMasters().subscribe({
+//       next: (res) => {
+//         this.masters.set(res.data.masters || []);
+//         this.loading.set(false);
+//       },
+//       error: (err) => {
+//         this.appMessage.handleHttpError(err, 'Loading Masters');
+//         this.loading.set(false);
+//       }
+//     });
+//   }
+
+//   // --- Main Grid Event Handler ---
+//   onGridEvent(event: any) {
+//     switch (event.type) {
+//       case 'init':
+//         this.gridApi = event.api;
+//         break;
+//       case 'save':
+//       case 'Entersave':
+//         this.handleSave(event.row);
+//         break;
+//       case 'delete':
+//         this.handleDelete(event.row);
+//         break;
+//     }
+//   }
+
+//   // --- Bulk Grid Event Handler ---
+//   onBulkGridEvent(event: any) {
+//     switch (event.type) {
+//       case 'init':
+//         this.bulkGridApi = event.api;
+//         break;
+//     }
+//   }
+
+//   // --- Single Row Actions ---
+
+//   onAddNew() {
+//     const newMaster = this.createEmptyMaster();
+//     this.masters.update(current => [newMaster, ...current]);    
+//     this.appMessage.showInfo('Please fill details and click Save', 'New Row Added');
+//   }
+
+//   handleSave(row: Master) {
+//     if (!row.name || !row.type) {
+//       this.appMessage.showWarn('Name and Type are required', 'Validation Error');
+//       return;
+//     }
+
+//     const payload = this.preparePayload(row);
+
+//     if (row.isNew || row._id.startsWith('new_')) {
+//       this.masterService.createMaster(payload).subscribe({
+//         next: () => {
+//           this.appMessage.showSuccess('Master created successfully');
+//           this.loadMasters(); 
+//         },
+//         error: (err) => this.appMessage.handleHttpError(err, 'Creation')
+//       });
+//     } else {
+//       this.masterService.updateMaster(row._id, payload).subscribe({
+//         next: () => this.appMessage.showSuccess('Master updated successfully'),
+//         error: (err) => this.appMessage.handleHttpError(err, 'Update')
+//       });
+//     }
+//   }
+
+//   handleDelete(row: Master) {
+//     if (row.isNew || row._id.startsWith('new_')) {
+//       this.masters.update(current => current.filter(m => m._id !== row._id));
+//       this.appMessage.showInfo('Unsaved row removed');
+//       return;
+//     }
+
+//     this.confirmationService.confirm({
+//       message: `Are you sure you want to delete <b>${row.name}</b>?`,
+//       header: 'Confirm Delete',
+//       icon: 'pi pi-exclamation-triangle',
+//       acceptButtonStyleClass: 'p-button-danger p-button-text',
+//       rejectButtonStyleClass: 'p-button-text p-button-secondary',
+//       accept: () => {
+//         this.masterService.deleteMaster(row._id).subscribe({
+//           next: () => {
+//             this.masters.update(users => users.filter(u => u._id !== row._id));
+//             this.appMessage.showSuccess(`${row.name} removed successfully`);
+//           },
+//           error: (err) => this.appMessage.handleHttpError(err, 'Delete')
+//         });
+//       }
+//     });
+//   }
+
+//   onQuickFilter(event: any) {
+//     if (this.gridApi) {
+//       this.gridApi.setGridOption('quickFilterText', event.target.value);
+//     }
+//   }
+
+//   // --- Bulk Entry Actions ---
+
+//   openBulkDialog() {
+//     this.bulkData.set([]); 
+//     this.isBulkDialogVisible = true;
+//   }
+
+//   saveBulkEntry() {
+//     if (!this.bulkGridApi) return;
+
+//     // 1. Harvest Data from Grid
+//     const validItems: any[] = [];
+//     this.bulkGridApi.forEachNode((node: any) => {
+//       if (node.data && node.data.name && node.data.type) {
+//         const payload = this.preparePayload(node.data);
+//                 if (!payload.slug) {
+//            payload['slug'] = this.generateSlug(payload.name);
+//         }
+        
+//         validItems.push(payload);
+//       }
+//     });
+
+//     if (validItems.length === 0) {
+//       this.appMessage.showWarn('Please enter valid details (Name & Type) for at least one item.', 'No Data');
+//       return;
+//     }
+
+//     this.isBulkSaving = true;
+    
+//     // 2. Send to API
+//     this.masterService.createBulkMasters(validItems).subscribe({
+//       next: (res) => {
+//         // Handle Partial Success
+//         if (res.status === 'partial_success' || (res.failedCount && res.failedCount > 0)) {
+//            const inserted = res.insertedCount || 0;
+//            const failed = res.failedCount || 0;
+//            this.appMessage.showWarn(
+//              `Imported: ${inserted}. Failed: ${failed}. Check duplicate names.`, 
+//              'Partial Import'
+//            );
+//         } else {
+//            this.appMessage.showSuccess(`${validItems.length} items imported successfully`, 'Bulk Import');
+//         }
+
+//         this.isBulkDialogVisible = false;
+//         this.loadMasters(); 
+//       },
+//       error: (err) => {
+//         this.appMessage.handleHttpError(err, 'Bulk Import');
+//       },
+//       complete: () => {
+//         this.isBulkSaving = false;
+//       }
+//     });
+//   }
+
+//   // --- Helpers ---
+
+//   private createEmptyMaster(): Master {
+//     return {
+//       _id: `new_${Date.now()}_${Math.random()}`,
+//       type: 'category', // Default type
+//       name: '',
+//       code: '',
+//       description: '',
+//       isActive: true,
+//       metadata: { isFeatured: false, sortOrder: 0 },
+//       isNew: true
+//     };
+//   }
+
+//   private preparePayload(row: Master): any {
+//     return {
+//       type: row.type,
+//       name: row.name,
+//       code: row.code ? row.code.toUpperCase() : null,
+//       description: row.description,
+//       isActive: row.isActive,
+//       metadata: {
+//         isFeatured: (row as any)['metadata.isFeatured'] ?? row.metadata?.isFeatured ?? false,
+//         sortOrder: row.metadata?.sortOrder ?? 0
+//       }
+//     };
+//   }
+
+//   private generateSlug(text: string): string {
+//     const slug = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+//     const random = Math.random().toString(36).substring(2, 8);
+//     return `${slug}-${random}`;
+//   }
+// }

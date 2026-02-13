@@ -7,51 +7,31 @@ export class AppMessageService {
   // Injecting via 'inject' is more modern than constructor
   private messageService = inject(MessageService);
 
-  /**
-   * Show a success toast (Green)
-   */
   public showSuccess(detail: string = 'Operation completed successfully.' ,summary: string = 'Success',  life = 3000) {
     this.messageService.add({ severity: 'success', summary, detail, life });
   }
 
-  /**
-   * Show an error toast (Red)
-   */
   public showError(detail: string = 'Something went wrong.',summary: string = 'Error',  life = 5000) {
     this.messageService.add({ severity: 'error', summary, detail, life });
   }
 
-  /**
-   * Show an info toast (Blue)
-   */
   public showInfo( detail: string,summary?: string, life = 3000) {
     this.messageService.add({ severity: 'info', summary, detail, life });
   }
 
-  /**
-   * Show a warning toast (Yellow)
-   */
-  public showWarn(detail: string,summary: string,  life = 4000) {
+  public showWarn(detail: string,summary?: string,  life = 4000) {
     this.messageService.add({ severity: 'warn', summary, detail, life });
   }
 
-  /**
-   * Clear all toasts
-   */
   public clear() {
     this.messageService.clear();
   }
 
-  /**
-   * 🛡️ Centralized HTTP Error Handler
-   * Extracts the most meaningful message from backend errors.
-   */
   public handleHttpError(error: HttpErrorResponse, context: string = 'Action') {
     let summary = `${context} Failed`;
     let detail = 'An unexpected error occurred.';
 
     if (error.error instanceof ErrorEvent) {
-      // Client-side network error
       summary = 'Network Error';
       detail = 'Please check your internet connection.';
     } else {
@@ -77,7 +57,7 @@ export class AppMessageService {
           summary = 'Not Found';
           detail = 'The requested resource could not be found.';
           break;
-        case 409: // Conflict
+        case 409: 
           summary = 'Conflict';
           detail = error.error?.message || 'This item already exists.';
           break;
