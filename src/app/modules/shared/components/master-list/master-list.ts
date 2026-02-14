@@ -288,6 +288,7 @@ export class MasterList implements OnInit {
 
   // --- Main Grid Event Handler (Using SharedGridEvent) ---
   onGridEvent(event: SharedGridEvent<Master>) {
+    console.log(event)
     switch (event.type) {
       case 'init':
         this.gridApi = event.api;
