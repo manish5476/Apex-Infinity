@@ -165,35 +165,29 @@ export class SupplierListComponent implements OnInit {
   };
 
   this.column = [
-
     // ========================
-    // COMPANY (Identity block)
+    // 1. COMPANY IDENTITY
     // ========================
     {
       headerName: 'Company',
       field: 'companyName',
       flex: 2,
-      sortable: true,
-      filter: true,
-      resizable: true,
+      minWidth: 220,
+      pinned: 'left',
       cellRenderer: (p: any) => {
-        const city = p.data.address?.city || '';
-        const phone = p.data.phone || '';
-
+        const category = p.data.category || 'General';
+        const avatar = p.data.avatar ? `<img src="${p.data.avatar}" style="width:20px; height:20px; border-radius:50%; margin-right:8px;">` : '';
+        
         return `
-          <div style="line-height:1.2">
-            <div style="
-              color:var(--accent-primary);
-              font-weight:var(--font-weight-semibold);
-              font-size:var(--font-size-md);
-            ">
-              ${p.value}
-            </div>
-            <div style="
-              color:var(--text-tertiary);
-              font-size:var(--font-size-xs);
-            ">
-              ${city} • ${phone}
+          <div style="display: flex; align-items: center; line-height: var(--line-height-tight); padding: var(--spacing-xs) 0;">
+            ${avatar}
+            <div>
+              <div style="color: var(--accent-primary); font-weight: var(--font-weight-semibold); font-size: var(--font-size-md);">
+                ${p.value}
+              </div>
+              <div style="color: var(--text-tertiary); font-size: var(--font-size-xs);">
+                ${category} • ${p.data.phone || 'No Phone'}
+              </div>
             </div>
           </div>
         `;
@@ -201,166 +195,373 @@ export class SupplierListComponent implements OnInit {
     },
 
     // ========================
-    // CONTACT
+    // 2. PRIMARY CONTACT (Array Extraction)
     // ========================
     {
-      headerName: 'Contact',
-      field: 'contactPerson',
-      flex: 1.4,
-      sortable: true,
-      filter: true,
-      resizable: true,
-      cellStyle: compactCell,
-      valueFormatter: (p: any) =>
-        `${p.value || '—'}`
-    },
-
-    // ========================
-    // EMAIL
-    // ========================
-    {
-      headerName: 'Email',
-      field: 'email',
-      flex: 1.8,
-      sortable: true,
-      filter: true,
-      resizable: true,
-      cellStyle: {
-        ...compactCell,
-        color: 'var(--text-secondary)'
-      }
-    },
-
-    // ========================
-    // LOCATION
-    // ========================
-    {
-      headerName: 'Location',
-      flex: 1.2,
-      sortable: true,
-      filter: true,
-      resizable: true,
-      valueGetter: (p: any) => {
-        const a = p.data.address || {};
-        return `${a.city || ''}, ${a.state || ''}`;
-      },
-      cellStyle: compactCell
-    },
-
-    // ========================
-    // OPENING BALANCE
-    // ========================
-    {
-      headerName: 'Opening',
-      field: 'openingBalance',
-      width: 130,
-      sortable: true,
-      filter: 'agNumberColumnFilter',
-      valueFormatter: (p: any) =>
-        typeof p.value === 'number'
-          ? `₹ ${p.value.toFixed(2)}`
-          : '—',
-      cellStyle: compactCell
-    },
-
-    // ========================
-    // OUTSTANDING
-    // ========================
-    {
-      headerName: 'Outstanding',
-      field: 'outstandingBalance',
-      width: 150,
-      sortable: true,
-      filter: 'agNumberColumnFilter',
-      valueFormatter: (p: any) =>
-        typeof p.value === 'number'
-          ? `₹ ${p.value.toFixed(2)}`
-          : '—',
-      cellStyle: (p: any) => ({
-        ...compactCell,
-        fontWeight: 'var(--font-weight-semibold)',
-        color:
-          p.value > 0
-            ? 'var(--color-error)'
-            : 'var(--color-success)'
-      })
-    },
-
-    // ========================
-    // PAYMENT TERMS
-    // ========================
-    {
-      headerName: 'Terms',
-      field: 'paymentTerms',
-      width: 100,
-      sortable: true,
-      filter: true,
-      cellRenderer: (p: any) =>
-        `<span style="
-          background:var(--color-info-bg);
-          color:var(--color-info-dark);
-          padding:2px 8px;
-          border-radius:var(--ui-border-radius);
-          font-size:var(--font-size-xs);
-        ">
-          ${p.value || 0} days
-        </span>`
-    },
-
-    // ========================
-    // STATUS BADGE
-    // ========================
-    {
-      headerName: 'Status',
-      field: 'isActive',
-      width: 110,
-      sortable: true,
-      filter: true,
+      headerName: 'Primary Contact',
+      field: 'contacts',
+      flex: 1.5,
       cellRenderer: (p: any) => {
-        const active = p.value;
-
+        // Find the primary contact object from the array
+        const primary = p.value?.find((c: any) => c.isPrimary) || (p.value ? p.value[0] : null);
+        if (!primary) return '<span style="color:var(--text-tertiary)">—</span>';
+        
         return `
-          <span style="
-            padding:2px 10px;
-            border-radius:var(--ui-border-radius);
-            font-size:var(--font-size-xs);
-            font-weight:var(--font-weight-medium);
-            background:${
-              active
-                ? 'var(--color-success-bg)'
-                : 'var(--color-error-bg)'
-            };
-            color:${
-              active
-                ? 'var(--color-success-dark)'
-                : 'var(--color-error-dark)'
-            };
-          ">
-            ${active ? 'Active' : 'Inactive'}
-          </span>
+          <div style="line-height: var(--line-height-tight)">
+            <div style="font-size: var(--font-size-sm); color: var(--text-primary); font-weight: var(--font-weight-medium);">
+              ${primary.name}
+            </div>
+            <div style="font-size: var(--font-size-xs); color: var(--accent-secondary);">
+              ${primary.email}
+            </div>
+          </div>
         `;
       }
     },
 
     // ========================
-    // CREATED DATE
+    // 3. FINANCIALS (Outstanding & Terms)
     // ========================
     {
-      headerName: 'Created',
-      field: 'createdAt',
-      width: 130,
+      headerName: 'Outstanding',
+      field: 'outstandingBalance',
+      width: 140,
       sortable: true,
-      valueFormatter: (p: any) =>
-        p.value
-          ? new Date(p.value).toLocaleDateString()
-          : '—',
-      cellStyle: compactCell
-    }
+      filter: 'agNumberColumnFilter',
+      headerClass: 'ag-right-aligned-header',
+      cellStyle: (p: any) => ({
+        ...compactCell,
+        justifyContent: 'flex-end',
+        fontWeight: 'var(--font-weight-bold)',
+        color: p.value > 0 ? 'var(--color-error)' : 'var(--color-success)'
+      }),
+      valueFormatter: (p: any) => p.value ? `₹${p.value.toLocaleString('en-IN')}` : '₹0'
+    },
+    {
+      headerName: 'Terms',
+      field: 'paymentTerms',
+      width: 100,
+      cellRenderer: (p: any) => `
+        <span style="
+          background: var(--color-info-bg);
+          color: var(--color-info-dark);
+          border: 1px solid var(--color-info-border);
+          padding: 1px 6px;
+          border-radius: var(--ui-border-radius-sm);
+          font-size: var(--font-size-xs);
+        ">
+          ${p.value || 'Net 0'}
+        </span>
+      `
+    },
 
+    // ========================
+    // 4. TAX & COMPLIANCE
+    // ========================
+    {
+      headerName: 'Tax Details',
+      width: 160,
+      cellRenderer: (p: any) => {
+        const gst = p.data.gstNumber || 'N/A';
+        const pan = p.data.panNumber || 'N/A';
+        return `
+          <div style="font-family: var(--font-mono); font-size: var(--font-size-xs); line-height: 1.1">
+            <div style="color: var(--text-secondary)">GST: <span style="color:var(--text-primary)">${gst}</span></div>
+            <div style="color: var(--text-tertiary)">PAN: ${pan}</div>
+          </div>
+        `;
+      }
+    },
+
+    // ========================
+    // 5. LOCATION (Nested Object)
+    // ========================
+    {
+      headerName: 'Location',
+      field: 'address',
+      flex: 1.2,
+      valueGetter: (p: any) => {
+        if (!p.data.address) return '—';
+        const { city, state } = p.data.address;
+        return city ? `${city}, ${state || ''}` : '—';
+      },
+      cellStyle: { ...compactCell, color: 'var(--text-tertiary)' }
+    },
+
+    // ========================
+    // 6. BANK INFO
+    // ========================
+    {
+      headerName: 'Bank',
+      field: 'bankDetails',
+      width: 150,
+      cellRenderer: (p: any) => {
+        if (!p.value) return '—';
+        return `
+          <div style="line-height: 1.1; font-size: var(--font-size-xs);">
+            <div style="color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis;">${p.value.bankName}</div>
+            <div style="color:var(--text-tertiary); font-family:var(--font-mono)">${p.value.ifscCode}</div>
+          </div>
+        `;
+      }
+    },
+
+    // ========================
+    // 7. STATUS & CREATION
+    // ========================
+    {
+      headerName: 'Status',
+      field: 'isActive',
+      width: 100,
+      cellRenderer: (p: any) => {
+        const active = p.value;
+        return `
+          <span style="
+            background: ${active ? 'var(--color-success-bg)' : 'var(--color-error-bg)'};
+            color: ${active ? 'var(--color-success-dark)' : 'var(--color-error-dark)'};
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-semibold);
+          ">
+            ${active ? 'ACTIVE' : 'INACTIVE'}
+          </span>
+        `;
+      }
+    },
+    {
+      headerName: 'Updated',
+      field: 'updatedAt',
+      width: 110,
+      valueFormatter: (p: any) => p.value ? new Date(p.value).toLocaleDateString() : '—',
+      cellStyle: { ...compactCell, color: 'var(--text-label)' }
+    },
+
+    // ========================
+    // 8. ACTIONS
+    // ========================
+    {
+      headerName: '',
+      field: '_id',
+      width: 80,
+      pinned: 'right',
+      sortable: false,
+      filter: false,
+      cellRenderer: ActionViewRenderer,
+      cellRendererParams: {
+        onClick: (id: string) => this.router.navigate([id], { relativeTo: this.route })
+      }
+    }
   ];
 
   this.cdr.detectChanges();
 }
+  
+//   getColumn(): void {
+//   const compactCell = {
+//     fontSize: 'var(--font-size-sm)',
+//     padding: '0 var(--spacing-md)',
+//     display: 'flex',
+//     alignItems: 'center'
+//   };
+
+//   this.column = [
+
+//     // ========================
+//     // COMPANY (Identity block)
+//     // ========================
+//     {
+//       headerName: 'Company',
+//       field: 'companyName',
+//       flex: 2,
+//       sortable: true,
+//       filter: true,
+//       resizable: true,
+//       cellRenderer: (p: any) => {
+//         const city = p.data.address?.city || '';
+//         const phone = p.data.phone || '';
+
+//         return `
+//           <div style="line-height:1.2">
+//             <div style="
+//               color:var(--accent-primary);
+//               font-weight:var(--font-weight-semibold);
+//               font-size:var(--font-size-md);
+//             ">
+//               ${p.value}
+//             </div>
+//             <div style="
+//               color:var(--text-tertiary);
+//               font-size:var(--font-size-xs);
+//             ">
+//               ${city} • ${phone}
+//             </div>
+//           </div>
+//         `;
+//       }
+//     },
+
+//     // ========================
+//     // CONTACT
+//     // ========================
+//     {
+//       headerName: 'Contact',
+//       field: 'contactPerson',
+//       flex: 1.4,
+//       sortable: true,
+//       filter: true,
+//       resizable: true,
+//       cellStyle: compactCell,
+//       valueFormatter: (p: any) =>
+//         `${p.value || '—'}`
+//     },
+
+//     // ========================
+//     // EMAIL
+//     // ========================
+//     {
+//       headerName: 'Email',
+//       field: 'email',
+//       flex: 1.8,
+//       sortable: true,
+//       filter: true,
+//       resizable: true,
+//       cellStyle: {
+//         ...compactCell,
+//         color: 'var(--text-secondary)'
+//       }
+//     },
+
+//     // ========================
+//     // LOCATION
+//     // ========================
+//     {
+//       headerName: 'Location',
+//       flex: 1.2,
+//       sortable: true,
+//       filter: true,
+//       resizable: true,
+//       valueGetter: (p: any) => {
+//         const a = p.data.address || {};
+//         return `${a.city || ''}, ${a.state || ''}`;
+//       },
+//       cellStyle: compactCell
+//     },
+
+//     // ========================
+//     // OPENING BALANCE
+//     // ========================
+//     {
+//       headerName: 'Opening',
+//       field: 'openingBalance',
+//       width: 130,
+//       sortable: true,
+//       filter: 'agNumberColumnFilter',
+//       valueFormatter: (p: any) =>
+//         typeof p.value === 'number'
+//           ? `₹ ${p.value.toFixed(2)}`
+//           : '—',
+//       cellStyle: compactCell
+//     },
+
+//     // ========================
+//     // OUTSTANDING
+//     // ========================
+//     {
+//       headerName: 'Outstanding',
+//       field: 'outstandingBalance',
+//       width: 150,
+//       sortable: true,
+//       filter: 'agNumberColumnFilter',
+//       valueFormatter: (p: any) =>
+//         typeof p.value === 'number'
+//           ? `₹ ${p.value.toFixed(2)}`
+//           : '—',
+//       cellStyle: (p: any) => ({
+//         ...compactCell,
+//         fontWeight: 'var(--font-weight-semibold)',
+//         color:
+//           p.value > 0
+//             ? 'var(--color-error)'
+//             : 'var(--color-success)'
+//       })
+//     },
+
+//     // ========================
+//     // PAYMENT TERMS
+//     // ========================
+//     {
+//       headerName: 'Terms',
+//       field: 'paymentTerms',
+//       width: 100,
+//       sortable: true,
+//       filter: true,
+//       cellRenderer: (p: any) =>
+//         `<span style="
+//           background:var(--color-info-bg);
+//           color:var(--color-info-dark);
+//           padding:2px 8px;
+//           border-radius:var(--ui-border-radius);
+//           font-size:var(--font-size-xs);
+//         ">
+//           ${p.value || 0} days
+//         </span>`
+//     },
+
+//     // ========================
+//     // STATUS BADGE
+//     // ========================
+//     {
+//       headerName: 'Status',
+//       field: 'isActive',
+//       width: 110,
+//       sortable: true,
+//       filter: true,
+//       cellRenderer: (p: any) => {
+//         const active = p.value;
+
+//         return `
+//           <span style="
+//             padding:2px 10px;
+//             border-radius:var(--ui-border-radius);
+//             font-size:var(--font-size-xs);
+//             font-weight:var(--font-weight-medium);
+//             background:${
+//               active
+//                 ? 'var(--color-success-bg)'
+//                 : 'var(--color-error-bg)'
+//             };
+//             color:${
+//               active
+//                 ? 'var(--color-success-dark)'
+//                 : 'var(--color-error-dark)'
+//             };
+//           ">
+//             ${active ? 'Active' : 'Inactive'}
+//           </span>
+//         `;
+//       }
+//     },
+
+//     // ========================
+//     // CREATED DATE
+//     // ========================
+//     {
+//       headerName: 'Created',
+//       field: 'createdAt',
+//       width: 130,
+//       sortable: true,
+//       valueFormatter: (p: any) =>
+//         p.value
+//           ? new Date(p.value).toLocaleDateString()
+//           : '—',
+//       cellStyle: compactCell
+//     }
+
+//   ];
+
+//   this.cdr.detectChanges();
+// }
 }
 
 // import { ChangeDetectorRef, Component, OnInit, inject, signal } from '@angular/core';
