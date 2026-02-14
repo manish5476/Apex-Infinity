@@ -282,7 +282,6 @@ export class NoteExportDialogComponent {
     
     const blob = new Blob([blobData], { type });
     const url = window.URL.createObjectURL(blob);
-    
     // Create Link
     const a = document.createElement('a');
     a.href = url;

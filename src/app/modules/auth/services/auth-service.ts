@@ -27,16 +27,13 @@ export class AuthService {
   private readonly TOKEN_KEY = 'apex_auth_token';
   private readonly USER_KEY = 'apex_current_user';
   public authTokenData: any;
-
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser$: Observable<User | null>;
   public isAuthenticated$: Observable<boolean>;
-
   private apiService = inject(ApiService);
   private OrganizationService = inject(OrganizationService);
   private messageService = inject(AppMessageService);
   private router = inject(Router);
-
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     this.currentUserSubject = new BehaviorSubject<User | null>(null);
     this.currentUser$ = this.currentUserSubject.asObservable();
@@ -62,22 +59,37 @@ export class AuthService {
   public handleLoginSuccess(response: LoginResponse): void {
     const user = response.data.user || response.data.owner;
     if (!response.token || !user) return;
-
     this.authTokenData = response.token;
     this.setItem(this.TOKEN_KEY, response.token);
     this.setItem(this.USER_KEY, user);
     this.setItem('orgSlug', response.data.uniqueShopId?.trim());
     this.currentUserSubject.next(user);
-
-    // ✅ Socket will auto-connect via AppComponent subscription
     this.router.navigate(['/dashboard']);
   }
 
-  logout(): void {
-    this.removeItem(this.TOKEN_KEY);
-    this.removeItem(this.USER_KEY);
+logout(): void {
+    const currentUrl = this.router.url;
+    this.apiService.logOut().subscribe({
+      next: () => console.log('Backend logout successful'),
+      error: (err) => console.warn('Backend logout failed', err),
+    });
+    this.performClientLogout(currentUrl);
+  }
+
+  private performClientLogout(returnUrl?: string): void {
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.clear(); 
+      sessionStorage.clear(); 
+    }
+    this.authTokenData = null;
     this.currentUserSubject.next(null);
-    this.router.navigate(['/auth/login']);
+    if (returnUrl && !returnUrl.includes('/auth/')) {
+      this.router.navigate(['/auth/login'], { 
+        queryParams: { returnUrl: returnUrl } 
+      });
+    } else {
+      this.router.navigate(['/auth/login']);
+    }
   }
 
   // --- API Methods (Keep existing) ---

@@ -86,11 +86,21 @@ export class EmiDetailsComponent implements OnInit {
     return data ? data.installments.reduce((acc: number, curr: any) => acc + (curr.paidAmount || 0), 0) : 0;
   });
 
+// ... inside EmiDetailsComponent
+
   remainingAmount = computed(() => {
     const data = this.emiData();
-    return data ? data.totalAmount - this.totalPaidAmount() : 0;
-  });
+    if (!data || !data.installments) return 0;
 
+    // 1. Calculate the Total Amount that NEEDS to be paid via installments
+    const totalInstallmentValue = data.installments.reduce((acc: number, curr: any) => acc + (curr.totalAmount || 0), 0);
+
+    // 2. Calculate what has actually been paid against those installments
+    const totalPaidAgainstInstallments = data.installments.reduce((acc: number, curr: any) => acc + (curr.paidAmount || 0), 0);
+
+    // 3. The true remaining balance is simply the difference
+    return totalInstallmentValue - totalPaidAgainstInstallments;
+  });
   paymentModes = [
     { label: 'Cash', value: 'cash' },
     { label: 'Bank Transfer', value: 'bank' },

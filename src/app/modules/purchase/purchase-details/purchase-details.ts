@@ -14,6 +14,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { DatePicker } from 'primeng/datepicker';
 import { Select } from 'primeng/select';
 import { Toast } from "primeng/toast";
+import { TabsModule } from 'primeng/tabs';
 
 // Shared Grid
 import { AgShareGrid } from "../../shared/components/ag-shared-grid";
@@ -24,6 +25,7 @@ import { PurchaseService } from '../purchase.service';
 import { ActionViewRenderer } from '../../shared/AgGrid/AgGridcomponents/DynamicDetailCard/ActionViewRenderer';
 import { FileUpload } from "primeng/fileupload";
 import { ImageViewerDirective } from '../../shared/directives/image-viewer.directive';
+import { Badge } from "primeng/badge";
 
 @Component({
   selector: 'app-purchase-details',
@@ -33,18 +35,19 @@ import { ImageViewerDirective } from '../../shared/directives/image-viewer.direc
     RouterLink,
     ReactiveFormsModule,
     CurrencyPipe,
-    TitleCasePipe,
+    TitleCasePipe, TabsModule,
     ButtonModule,
     TagModule,
     DividerModule,
     DialogModule,
     InputNumberModule,
-    DatePicker,FormsModule,
+    DatePicker, FormsModule,
     Select,
     InputTextModule,
     Toast,
     AgShareGrid,
-    FileUpload,ImageViewerDirective
+    FileUpload, ImageViewerDirective,
+    Badge
 ],
   templateUrl: './purchase-details.html',
   styleUrl: './purchase-details.scss',

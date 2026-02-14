@@ -2,7 +2,7 @@ import { ApiService } from './../../../../core/services/api';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { InputTextModule } from 'primeng/inputtext';
@@ -38,33 +38,38 @@ export class Login implements OnInit {
   // --- Injections ---
   private masterListService = inject(MasterListService);
   private fb = inject(FormBuilder);
-  private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private authService = inject(AuthService);
   private messageService = inject(AppMessageService);
   private ApiService = inject(ApiService);
   isLoading = signal(false);
   filteredEmails: string[] = [];
   emailDomains: string[] = ['gmail.com', 'outlook.com', 'yahoo.com', 'icloud.com', 'hotmail.com'];
   loginForm!: FormGroup;
+
+  returnUrl: string = '/dashboard';
+
   ngOnInit(): void {
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
     this.initForm();
   }
 
-private initForm(): void {
-  this.loginForm = this.fb.group({
-    email: [
-      '',
-      [
-        Validators.required,
-        Validators.email,
-        this.allowedEmailDomains(this.emailDomains) 
-      ]
-    ],
-    password: ['', Validators.required],
-    uniqueShopId: ['', Validators.required],
-    remember: [false]
-  });
-}
+  private initForm(): void {
+    this.loginForm = this.fb.group({
+      email: [
+        '',
+        [
+          Validators.required,
+          Validators.email,
+          this.allowedEmailDomains(this.emailDomains)
+        ]
+      ],
+      password: ['', Validators.required],
+      uniqueShopId: ['', Validators.required],
+      remember: [false]
+    });
+  }
 
   get form() {
     return this.loginForm.controls;
@@ -84,70 +89,38 @@ private initForm(): void {
   }
 
   // Add a variable to store the error message
-errorMessage = signal<string | null>(null);
-onSubmit(): void {
-  if (this.loginForm.invalid) {
-    this.loginForm.markAllAsTouched();
-    this.messageService.showWarn('Invalid Form', 'Please enter a valid email and password.');
-    return;
+  errorMessage = signal<string | null>(null);
+  onSubmit(): void {
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      this.messageService.showWarn('Invalid Form', 'Please enter a valid email and password.');
+      return;
+    }
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+    this.authService.login(this.loginForm.value).subscribe({
+      next: (response: any) => {
+        this.authService.handleLoginSuccess(response);
+        this.masterListService.load();
+        this.isLoading.set(false);
+        this.router.navigateByUrl(this.returnUrl);
+      },
+      error: (err) => {
+        this.isLoading.set(false);
+        const message = err.error?.message || 'An unexpected error occurred';
+        this.errorMessage.set(message);
+        this.messageService.showError('Login Failed', message);
+      }
+    });
   }
 
-  this.isLoading.set(true);
-  this.errorMessage.set(null); // Clear previous errors
-
-  this.authService.login(this.loginForm.value).subscribe({
-    next: (response: any) => {
-      this.authService.handleLoginSuccess(response);
-      this.masterListService.load();
-      this.isLoading.set(false);
-    },
-    error: (err) => {
-      this.isLoading.set(false);
-      
-      // Access the "message" property from your JSON error object
-      const message = err.error?.message || 'An unexpected error occurred';
-      this.errorMessage.set(message);
-      
-      // Also show as toast if you prefer
-      this.messageService.showError('Login Failed', message);
-    }
-  });
-}
-
-  // onSubmit(): void {
-  //   if (this.loginForm.invalid) {
-  //     this.loginForm.markAllAsTouched();
-  //     this.messageService.showWarn('Invalid Form', 'Please enter a valid email and password.');
-  //     return;
-  //   }
-
-  //   this.isLoading.set(true);
-
-  //   this.authService.login(this.loginForm.value).subscribe({
-  //     next: (response: any) => {
-  //       this.authService.handleLoginSuccess(response);
-  //       this.masterListService.load();
-  //       this.isLoading.set(false);
-  //     },
-  //     error: (err) => {
-  //       this.isLoading.set(false);
-  //     }
-  //   });
-  // }
-
-
-  
- allowedEmailDomains(domains: string[]): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors | null => {
-    const value = control.value;
-    if (!value || !value.includes('@')) return null;
-
-    const domain = value.split('@')[1]?.toLowerCase();
-    if (!domain) return null;
-
-    return domains.includes(domain)
-      ? null
-      : { domainNotAllowed: true };
-  };
-}
+  allowedEmailDomains(domains: string[]): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = control.value;
+      if (!value || !value.includes('@')) return null;
+      const domain = value.split('@')[1]?.toLowerCase();
+      if (!domain) return null;
+      return domains.includes(domain) ? null : { domainNotAllowed: true };
+    };
+  }
 }

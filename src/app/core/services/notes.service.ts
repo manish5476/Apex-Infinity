@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { BaseApiService } from './base-api.service';
-import { 
-  Note, 
-  Meeting, 
-  CalendarEvent, 
-  NoteStatistics, 
-  HeatMapData, 
+import {
+  Note,
+  Meeting,
+  CalendarEvent,
+  NoteStatistics,
+  HeatMapData,
   ActivityLog, // Ensure this is imported
   Subtask      // Ensure this is imported
 } from '../models/note.types';
@@ -20,6 +20,14 @@ export class NoteService extends BaseApiService {
     return this.get<{ data: { notes: Note[]; pagination: any } }>(this.endpoint, params, 'getNotes');
   }
 
+  getTrashBin() {
+    return this.get<{ data: { notes: Note[]; pagination: any } }>(`${this.endpoint}/trash/bin`, {}, 'getNotes');
+  }
+
+  emptyTrash() {
+    return this.delete<{ data: { notes: Note[]; pagination: any } }>(`${this.endpoint}/trash/empty`, {}, 'getNotes');
+  }
+
   getNoteById(id: string) {
     return this.get<{ data: { note: Note } }>(`${this.endpoint}/${id}`, {}, 'getNoteById');
   }
@@ -28,7 +36,16 @@ export class NoteService extends BaseApiService {
     return this.post<{ data: { note: Note; meeting?: Meeting } }>(this.endpoint, data, 'createNote');
   }
 
-  updateNote(id: string, data: Partial<Note>) {
+  createTemplate(data: any) {
+    return this.post<{ data: { note: Note; meeting?: Meeting } }>(`${this.endpoint}/templates`, data, 'createNote');
+  }
+
+
+  restoreFromTrash(id: string) {
+    return this.patch<{ data: { note: Note } }>(`${this.endpoint}/trash/${id}/restore`, {}, 'updateNote');
+  }
+
+  updateNote(id: string, data: any) {
     return this.patch<{ data: { note: Note } }>(`${this.endpoint}/${id}`, data, 'updateNote');
   }
 
@@ -37,7 +54,12 @@ export class NoteService extends BaseApiService {
     return this.delete<void>(`${this.endpoint}/${id}`, null, 'deleteNote');
   }
 
-    // ==================== EXPORT ====================
+  // -------------------------------------------- pending 
+  getTemplate() {
+    return this.get<{ data: { note: Note; meeting?: Meeting } }>(`${this.endpoint}/templates`, {}, 'createNote');
+  }
+
+  // ==================== EXPORT ====================
 
   exportNoteData(format: 'json' | 'csv' = 'json', startDate?: string, endDate?: string) {
     return this.get<any>(`${this.endpoint}/export/data`, { format, startDate, endDate }, 'exportNoteData');
@@ -47,7 +69,7 @@ export class NoteService extends BaseApiService {
     return this.get<any>(`${this.endpoint}/export/all`, { format }, 'exportAllUserNotes');
   }
 
-    // ==================== MISSING: LINKING NOTES ====================
+  // ==================== MISSING: LINKING NOTES ====================
   linkNote(sourceNoteId: string, targetNoteId: string) {
     return this.post<{ data: { note: Note } }>(
       `${this.endpoint}/${sourceNoteId}/link`,
@@ -63,11 +85,10 @@ export class NoteService extends BaseApiService {
     );
   }
 
-  
   // ==================== SHARING ====================
 
   shareNote(id: string, userIds: string[], permission: 'viewer' | 'contributor' | 'admin' = 'viewer') {
-   console.log(id);
+    console.log(id);
     return this.post<{ data: { note: Note } }>(
       `${this.endpoint}/${id}/share`,
       { userIds, permission },
@@ -76,12 +97,12 @@ export class NoteService extends BaseApiService {
   }
 
   // ==================== MISSING: HARD DELETE & HISTORY ====================
-  
+
   // FIXED: Added this method to fix "Property 'hardDeleteNote' does not exist"
   hardDeleteNote(id: string) {
     return this.delete<void>(
-      `${this.endpoint}/${id}/permanent`, 
-      null, 
+      `${this.endpoint}/${id}/permanent`,
+      null,
       'hardDeleteNote'
     );
   }
@@ -124,7 +145,7 @@ export class NoteService extends BaseApiService {
 
 
   // ==================== MEDIA UPLOAD ====================
-  
+
   uploadMedia(files: File[]) {
     const formData = new FormData();
     files.forEach((f) => formData.append('attachments', f));
@@ -135,16 +156,16 @@ export class NoteService extends BaseApiService {
 
   archiveNote(id: string) {
     return this.patch<{ data: { note: Note } }>(
-      `${this.endpoint}/${id}/archive`, 
-      {}, 
+      `${this.endpoint}/${id}/archive`,
+      {},
       'archiveNote'
     );
   }
 
   restoreNote(id: string) {
     return this.patch<{ data: { note: Note } }>(
-      `${this.endpoint}/${id}/restore`, 
-      {}, 
+      `${this.endpoint}/${id}/restore`,
+      {},
       'restoreNote'
     );
   }
@@ -153,8 +174,8 @@ export class NoteService extends BaseApiService {
 
   duplicateNote(id: string) {
     return this.post<{ data: { note: Note } }>(
-      `${this.endpoint}/${id}/duplicate`, 
-      {}, 
+      `${this.endpoint}/${id}/duplicate`,
+      {},
       'duplicateNote'
     );
   }
@@ -190,26 +211,8 @@ export class NoteService extends BaseApiService {
     );
   }
 
-  getNoteAnalytics(period: 'week' | 'month' | 'quarter' | 'year' = 'month') {
-    return this.get<{ data: any }>(`${this.endpoint}/analytics/summary`, { period }, 'getNoteAnalytics');
-  }
-
   getNoteStatistics() {
     return this.get<{ data: NoteStatistics }>(`${this.endpoint}/stats/summary`, {}, 'getNoteStatistics');
-  }
-
-  getRecentActivity(limit: number = 20) {
-    return this.get<{ data: { notes: Note[] } }>(
-      `${this.endpoint}/activity/recent`, 
-      { limit }, 
-      'getRecentActivity'
-    );
-  }
-
-
-
-  getSharedNotesWithMe() {
-    return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/shared/with-me`, {}, 'getSharedNotesWithMe');
   }
 
   getNotesSharedByMe() {
@@ -228,6 +231,24 @@ export class NoteService extends BaseApiService {
     return this.delete<void>(`${this.endpoint}/${id}/share/${userId}`, null, 'removeUserFromSharedNote');
   }
 
+  // --------
+
+  getNoteAnalytics(period: 'week' | 'month' | 'quarter' | 'year' = 'month') {
+    return this.get<{ data: any }>(`${this.endpoint}/analytics/summary`, { period }, 'getNoteAnalytics');
+  }
+
+  getRecentActivity(limit: number = 20) {
+    return this.get<{ data: { notes: Note[] } }>(
+      `${this.endpoint}/activity/recent`,
+      { limit },
+      'getRecentActivity'
+    );
+  }
+
+  getSharedNotesWithMe() {
+    return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/shared/with-me`, {}, 'getSharedNotesWithMe');
+  }
+
   // ==================== BULK OPERATIONS ====================
 
   bulkUpdateNotes(noteIds: string[], updates: Partial<Note>) {
@@ -241,7 +262,7 @@ export class NoteService extends BaseApiService {
   bulkDeleteNotes(noteIds: string[]) {
     return this.delete<{ message: string; data: any }>(
       `${this.endpoint}/bulk/delete`,
-      { body: { noteIds } }, 
+      { body: { noteIds } },
       'bulkDeleteNotes'
     );
   }
