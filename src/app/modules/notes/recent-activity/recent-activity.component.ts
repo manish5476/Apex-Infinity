@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, ViewEncapsulation, OnInit } from '@angular/core';
+import { Component,Input, inject, signal, computed, ViewEncapsulation, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NoteService } from '../../../core/services/notes.service'; // Adjust path if needed
@@ -253,8 +253,9 @@ interface FlattenedActivity {
   `]
 })
 export class RecentActivityComponent implements OnInit {
+  @Input() notesData:any
   private noteService = inject(NoteService);
-  
+
   rawNotes = signal<NoteActivity[]>([]);
   isLoading = signal(true);
 
