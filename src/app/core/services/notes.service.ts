@@ -215,21 +215,25 @@ export class NoteService extends BaseApiService {
     return this.get<{ data: NoteStatistics }>(`${this.endpoint}/stats/summary`, {}, 'getNoteStatistics');
   }
 
-  getNotesSharedByMe() {
-    return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/shared/by-me`, {}, 'getNotesSharedByMe');
-  }
-
   updateSharePermissions(id: string, userId: string, permission: string) {
-    return this.patch<void>(
-      `${this.endpoint}/${id}/share/permissions`,
-      { userId, permission },
-      'updateSharePermissions'
-    );
+    return this.patch<void>(`${this.endpoint}/${id}/share/permissions`, { userId, permission }, 'updateSharePermissions');
   }
 
   removeUserFromSharedNote(id: string, userId: string) {
     return this.delete<void>(`${this.endpoint}/${id}/share/${userId}`, null, 'removeUserFromSharedNote');
   }
+
+  getNotesSharedByMe() {
+    return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/shared/by-me`, {}, 'getNotesSharedByMe');
+  }
+
+  getSharedNotesWithMe() {
+    return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/shared/with-me`, {}, 'getSharedNotesWithMe');
+  }
+
+  getRecentActivity(limit: number = 20) {
+    return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/activity/recent`, { limit }, 'getRecentActivity');
+  } 
 
   // --------
 
@@ -237,17 +241,7 @@ export class NoteService extends BaseApiService {
     return this.get<{ data: any }>(`${this.endpoint}/analytics/summary`, { period }, 'getNoteAnalytics');
   }
 
-  getRecentActivity(limit: number = 20) {
-    return this.get<{ data: { notes: Note[] } }>(
-      `${this.endpoint}/activity/recent`,
-      { limit },
-      'getRecentActivity'
-    );
-  }
 
-  getSharedNotesWithMe() {
-    return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/shared/with-me`, {}, 'getSharedNotesWithMe');
-  }
 
   // ==================== BULK OPERATIONS ====================
 
@@ -283,7 +277,7 @@ export class NoteService extends BaseApiService {
 
   // ==================== MEETINGS ====================
 
-  createMeeting(data: Partial<Meeting>) {
+  createMeeting(data: any) {
     return this.post<{ data: { meeting: Meeting; note: Note } }>(`${this.endpoint}/meetings`, data, 'createMeeting');
   }
 

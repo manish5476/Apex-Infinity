@@ -1,3 +1,4 @@
+import { Meeting } from './../../core/models/note.types';
 export interface MenuItem {
   label: string;
   icon: string;
@@ -66,6 +67,11 @@ export const SIDEBAR_MENU: MenuItem[] = [
         label: 'Calendar',
         icon: 'pi pi-calendar',
         routerLink: ['/notes/calendar']
+      },
+      {
+        label: 'Meeting',
+        icon: 'pi pi-calendar',
+        routerLink: ['/notes/Meeting']
       },
     ]
   },

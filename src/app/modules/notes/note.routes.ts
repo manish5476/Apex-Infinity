@@ -1,3 +1,4 @@
+import { Meeting } from './../../core/models/note.types';
 import { Routes } from '@angular/router';
 
 export const NOTE_ROUTES: Routes = [
@@ -18,6 +19,12 @@ export const NOTE_ROUTES: Routes = [
     path: 'calendar',
     loadComponent: () => 
       import('./calendar-view/calendar-view.component').then(m => m.CalendarViewComponent),
+    title: 'Calendar'
+  },
+  {
+    path: 'Meeting',
+    loadComponent: () => 
+      import('./meeting-list.component').then(m => m.MeetingListComponent),
     title: 'Calendar'
   },
   {

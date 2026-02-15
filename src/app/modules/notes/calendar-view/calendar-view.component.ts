@@ -90,14 +90,15 @@ interface CalendarGridCell {
               <div class="events-stack">
                 @for (event of cell.events | slice:0:4; track event.id) {
                   <div 
-                    class="event-chip"
-                    [class.type-meeting]="event.extendedProps?.isMeeting || event.extendedProps?.noteType === 'meeting'"
-                    [class.type-task]="event.extendedProps?.noteType === 'task'"
-                    [class.type-note]="event.extendedProps?.noteType === 'note'"
-                    [class.status-done]="event.extendedProps?.status === 'completed'"
-                    [class.priority-urgent]="event.extendedProps?.priority === 'urgent'"
-                    (click)="onEventClick(event.id, $event)"
-                    [title]="event.title"
+                class="event-chip"
+[class.type-meeting]="event.extendedProps.isMeeting || event.extendedProps.noteType === 'meeting'"
+[class.type-task]="event.extendedProps.noteType === 'task'"
+[class.type-note]="event.extendedProps.noteType === 'note'"
+[class.status-done]="event.extendedProps.status === 'completed'"
+[class.priority-urgent]="event.extendedProps.priority === 'urgent'"
+(click)="onEventClick(event.id, $event)"
+[title]="event.title"
+
                   >
                     <span class="chip-dot"></span>
                     <span class="chip-title">{{ event.title }}</span>
