@@ -89,7 +89,7 @@ export interface Note {
   
   meetingDetails?: MeetingDetails;
   meetingId?: string; 
-  participants: Participant[];
+  participants: any[];
   attachments: NoteAttachment[];
   
   progress?: number;

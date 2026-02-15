@@ -24,7 +24,7 @@ export const NOTE_ROUTES: Routes = [
   {
     path: 'Meeting',
     loadComponent: () => 
-      import('./meeting-list.component').then(m => m.MeetingListComponent),
+      import('./meeting-list/meeting-list.component').then(m => m.MeetingListComponent),
     title: 'Calendar'
   },
   {

@@ -1,8 +1,6 @@
-import { Component, inject, Injectable } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { of } from 'rxjs';
-import { delay } from 'rxjs/operators';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { NoteService } from '../../core/services/notes.service';
 
@@ -19,7 +17,9 @@ import { NoteService } from '../../core/services/notes.service';
         <div class="radio-group">
           <div class="radio-item" [class.active]="scope === 'all'" (click)="scope = 'all'">
             <div class="radio-circle">
-                <div class="dot" *ngIf="scope === 'all'"></div>
+                @if (scope === 'all') {
+                  <div class="dot"></div>
+                }
             </div>
             <div class="radio-content">
               <span class="title">All Data</span>
@@ -29,7 +29,9 @@ import { NoteService } from '../../core/services/notes.service';
 
           <div class="radio-item" [class.active]="scope === 'filtered'" (click)="scope = 'filtered'">
             <div class="radio-circle">
-                <div class="dot" *ngIf="scope === 'filtered'"></div>
+                @if (scope === 'filtered') {
+                  <div class="dot"></div>
+                }
             </div>
             <div class="radio-content">
               <span class="title">Date Range</span>
@@ -40,15 +42,16 @@ import { NoteService } from '../../core/services/notes.service';
       </div>
 
       <!-- Date Picker (Simulating p-calendar) -->
-      <div class="form-group" *ngIf="scope === 'filtered'">
-        <label class="section-label">Select Period</label>
-        <div class="date-inputs">
-           <input type="date" [(ngModel)]="startDate" class="std-input" placeholder="Start">
-           <span class="separator">-</span>
-           <input type="date" [(ngModel)]="endDate" class="std-input" placeholder="End">
+      @if (scope === 'filtered') {
+        <div class="form-group">
+          <label class="section-label">Select Period</label>
+          <div class="date-inputs">
+             <input type="date" [(ngModel)]="startDate" class="std-input" placeholder="Start">
+             <span class="separator">-</span>
+             <input type="date" [(ngModel)]="endDate" class="std-input" placeholder="End">
+          </div>
         </div>
-        <!-- Note: In real app use: <p-calendar [(ngModel)]="dateRange" selectionMode="range" ...></p-calendar> -->
-      </div>
+      }
 
       <!-- Option 2: Format -->
       <div class="form-group">
@@ -69,9 +72,12 @@ import { NoteService } from '../../core/services/notes.service';
         <button class="btn-confirm" 
                 [disabled]="isLoading || (scope === 'filtered' && (!startDate || !endDate))"
                 (click)="onExport()">
-          <i class="pi pi-download" *ngIf="!isLoading"></i>
-          <!-- Simple Spinner CSS instead of pi-spinner for preview -->
-          <span class="spinner" *ngIf="isLoading"></span>
+          @if (!isLoading) {
+            <i class="pi pi-download"></i>
+          }
+          @if (isLoading) {
+            <span class="spinner"></span>
+          }
           {{ isLoading ? 'Exporting...' : 'Download Export' }}
         </button>
       </div>
@@ -143,7 +149,8 @@ import { NoteService } from '../../core/services/notes.service';
     }
 
     .radio-content {
-      display: flex; flex-direction: column;
+      display: flex;
+      flex-direction: column;
       .title { font-weight: 500; font-size: 0.875rem; color: var(--text); }
       .desc { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
     }
@@ -234,7 +241,6 @@ import { NoteService } from '../../core/services/notes.service';
   `]
 })
 export class NoteExportDialogComponent {
-  // Use the mocked classes/tokens
   ref = inject(DynamicDialogRef);
   config = inject(DynamicDialogConfig);
   noteService = inject(NoteService);
@@ -242,7 +248,6 @@ export class NoteExportDialogComponent {
   scope: 'all' | 'filtered' = 'all';
   format: 'json' | 'csv' = 'json';
   
-  // Using separate strings for native date input instead of Date[] for p-calendar
   startDate: string = '';
   endDate: string = '';
   
@@ -274,11 +279,6 @@ export class NoteExportDialogComponent {
     // Determine Blob Type
     const type = this.format === 'json' ? 'application/json' : 'text/csv';
     const blobData = this.format === 'json' ? JSON.stringify(data, null, 2) : data.mockData;
-    
-    // In a real browser environment, this triggers a download
-    // For this preview, we'll just log it and close
-    console.log('Downloading file:', filename, 'Type:', type);
-    console.log('Data:', blobData);
     
     const blob = new Blob([blobData], { type });
     const url = window.URL.createObjectURL(blob);

@@ -3,8 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { NoteService } from '../../core/services/notes.service';
 import { Note } from '../../core/models/note.types';
+import { NoteService } from '../../core/services/notes.service';
+
 
 @Component({
   selector: 'app-note-link-dialog',
@@ -24,36 +25,47 @@ import { Note } from '../../core/models/note.types';
 
       <div class="results-list custom-scrollbar">
         <!-- Loading State -->
-        <div *ngIf="isLoading" class="state-msg">
-          <i class="pi pi-spin pi-spinner"></i> Searching...
-        </div>
+        @if (isLoading) {
+          <div class="state-msg">
+            <i class="pi pi-spin pi-spinner"></i> Searching...
+          </div>
+        }
 
         <!-- Empty/Initial State -->
-        <div *ngIf="!isLoading && notes().length === 0" class="state-msg">
-          <span *ngIf="searchControl.value">No notes found.</span>
-          <span *ngIf="!searchControl.value">Type to search notes.</span>
-        </div>
+        @if (!isLoading && notes().length === 0) {
+          <div class="state-msg">
+            @if (searchControl.value) {
+              <span>No notes found.</span>
+            } @else {
+              <span>Type to search notes.</span>
+            }
+          </div>
+        }
 
         <!-- List -->
-        <div *ngFor="let note of notes()" 
-             class="note-item" 
-             (click)="selectNote(note)">
-          
-          <div class="note-icon" [ngClass]="note.noteType">
-            <i [class]="getTypeIcon(note.noteType)"></i>
-          </div>
-          
-          <div class="note-info">
-            <div class="note-title">{{ note.title || 'Untitled' }}</div>
-            <div class="note-meta">
-              <span>{{ note.updatedAt | date:'MMM d' }}</span>
-              <span *ngIf="note.tags?.length">•</span>
-              <span *ngFor="let tag of note.tags | slice:0:2">#{{tag}} </span>
+        @for (note of notes(); track note._id) {
+          <div class="note-item" (click)="selectNote(note)">
+            
+            <div class="note-icon" [ngClass]="note.noteType">
+              <i [class]="getTypeIcon(note.noteType)"></i>
             </div>
-          </div>
+            
+            <div class="note-info">
+              <div class="note-title">{{ note.title || 'Untitled' }}</div>
+              <div class="note-meta">
+                <span>{{ note.updatedAt | date:'MMM d' }}</span>
+                @if (note.tags.length) {
+                  <span>•</span>
+                  @for (tag of note.tags | slice:0:2; track tag) {
+                    <span>#{{tag}} </span>
+                  }
+                }
+              </div>
+            </div>
 
-          <i class="pi pi-link action-icon"></i>
-        </div>
+            <i class="pi pi-link action-icon"></i>
+          </div>
+        }
       </div>
 
       <div class="dialog-footer">
@@ -140,7 +152,9 @@ import { Note } from '../../core/models/note.types';
       .note-icon {
         width: 32px; height: 32px;
         border-radius: 6px;
-        display: flex; align-items: center; justify-content: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         background: rgba(0,0,0,0.05);
         color: var(--text-sub);
         &.meeting { color: #3b82f6; background: rgba(59,130,246,0.1); }

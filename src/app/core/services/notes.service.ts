@@ -236,14 +236,14 @@ export class NoteService extends BaseApiService {
   } 
 
   // --------
+// bad
+  // getNoteAnalytics(period: 'week' | 'month' | 'quarter' | 'year' = 'month') {
+  //   return this.get<{ data: any }>(`${this.endpoint}/analytics/summary`, { period }, 'getNoteAnalytics');
+  // }
 
-  getNoteAnalytics(period: 'week' | 'month' | 'quarter' | 'year' = 'month') {
-    return this.get<{ data: any }>(`${this.endpoint}/analytics/summary`, { period }, 'getNoteAnalytics');
-  }
 
 
-
-  // ==================== BULK OPERATIONS ====================
+  // ==================== BULK OPERATIONS ==================== notimplemented
 
   bulkUpdateNotes(noteIds: string[], updates: Partial<Note>) {
     return this.patch<{ message: string; data: any }>(

@@ -1,4 +1,224 @@
-<div class="create-container">
+ <div class="create-container">
+
+      <!-- Header -->
+      <header class="page-header">
+        <div class="header-content">
+          <h1 class="page-title">
+            {{ isTemplateMode() ? 'Create Template' : 'Create New Note' }}
+          </h1>
+          <p class="page-subtitle">
+            {{ isTemplateMode() ? 'Define a structure for future notes.' : 'Capture ideas, schedule meetings, or track tasks.' }}
+          </p>
+        </div>
+        <div class="actions">
+          <button class="btn-ghost" (click)="resetForm()">
+            <i class="pi pi-refresh"></i> Clear
+          </button>
+          <button class="btn-ghost danger" routerLink="/notes">
+            <i class="pi pi-times"></i> Cancel
+          </button>
+        </div>
+      </header>
+
+      <form [formGroup]="noteForm" (ngSubmit)="onSubmit()" class="glass-panel">
+        
+        <!-- LEFT COLUMN: EDITOR -->
+        <div class="main-editor">
+          
+          <!-- Title Input -->
+          <div class="form-group title-group">
+            <input type="text" formControlName="title" placeholder="Untitled Note..." class="input-title"
+              [class.error]="noteForm.get('title')?.invalid && noteForm.get('title')?.touched">
+            @if (noteForm.get('title')?.invalid && noteForm.get('title')?.touched) {
+              <span class="error-msg">Title is required</span>
+            }
+          </div>
+
+          <!-- Type Selector -->
+          <div class="type-tabs">
+            @for (type of noteTypes; track type.value) {
+              <label class="type-tab" [class.active]="noteForm.get('noteType')?.value === type.value">
+                <input type="radio" formControlName="noteType" [value]="type.value" hidden>
+                <span class="tab-icon">{{ type.icon }}</span>
+                <span class="tab-label">{{ type.label }}</span>
+              </label>
+            }
+          </div>
+
+          <!-- Rich Text Editor -->
+          <div class="form-group content-wrapper">
+            <p-editor formControlName="content" [style]="{ height: '320px' }" placeholder="Start typing details...">
+              <ng-template pTemplate="header">
+                <span class="ql-formats">
+                  <button type="button" class="ql-bold" aria-label="Bold"></button>
+                  <button type="button" class="ql-italic" aria-label="Italic"></button>
+                  <button type="button" class="ql-underline" aria-label="Underline"></button>
+                </span>
+                <span class="ql-formats">
+                  <button type="button" class="ql-list" value="ordered"></button>
+                  <button type="button" class="ql-list" value="bullet"></button>
+                </span>
+                <span class="ql-formats">
+                  <button type="button" class="ql-link"></button>
+                  <button type="button" class="ql-code-block"></button>
+                </span>
+              </ng-template>
+            </p-editor>
+          </div>
+
+          <!-- Subtasks Section -->
+          <div class="subtasks-section">
+            <div class="section-header">
+              <label class="section-label"><i class="pi pi-check-square"></i> Checklist / Subtasks</label>
+              <button type="button" class="btn-text-action" (click)="addSubtask()">+ Add Item</button>
+            </div>
+            
+            <div class="subtasks-list" formArrayName="subtasks">
+              @for (task of subtasks.controls; track i; let i = $index) {
+                <div class="subtask-row" [formGroupName]="i">
+                  <input type="checkbox" formControlName="completed" class="checkbox-std">
+                  <input type="text" formControlName="title" placeholder="Task item..." class="input-std small">
+                  <button type="button" class="btn-icon-remove" (click)="removeSubtask(i)">×</button>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Attachments List -->
+          @if (uploadedAttachments().length > 0) {
+            <div class="attachments-area">
+              <label class="section-label">Attachments</label>
+              <div class="file-grid">
+                @for (file of uploadedAttachments(); track file; let i = $index) {
+                  <div class="attachment-pill">
+                    <span class="file-icon">📎</span>
+                    <div class="file-info">
+                      <span class="file-name">{{ file.fileName }}</span>
+                      <span class="file-size">{{ (file.size / 1024).toFixed(1) }} KB</span>
+                    </div>
+                    <button type="button" (click)="removeAttachment(i)" class="btn-remove">×</button>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- RIGHT COLUMN: SIDEBAR -->
+        <div class="sidebar">
+
+          <!-- Template Toggle -->
+          <div class="sidebar-section">
+            <label class="checkbox-wrapper">
+              <input type="checkbox" formControlName="isTemplate">
+              <span class="label-text">Save as Template</span>
+            </label>
+          </div>
+
+          <!-- Priority -->
+          <div class="sidebar-section">
+            <label class="section-label">Priority</label>
+            <div class="priority-grid">
+              @for (p of priorities; track p) {
+                <label class="priority-option" [class.selected]="noteForm.get('priority')?.value === p" [class]="p">
+                  <input type="radio" formControlName="priority" [value]="p" hidden>
+                  <span class="dot"></span> {{ p | titlecase }}
+                </label>
+              }
+            </div>
+          </div>
+
+          <!-- Dates -->
+          <div class="sidebar-section">
+            <label class="section-label">Timeline</label>
+            <div class="date-group">
+              <div class="input-wrapper">
+                <label class="sub-label">Start Date</label>
+                <p-datepicker formControlName="startDate" 
+                              [showIcon]="true" 
+                              dateFormat="dd/mm/yy" 
+                              placeholder="Select date"
+                              styleClass="glass-date-picker"
+                              [showTime]="true">
+                </p-datepicker>
+              </div>
+              <div class="input-wrapper">
+                <label class="sub-label">Due Date</label>
+                <p-datepicker formControlName="dueDate" 
+                              [showIcon]="true" 
+                              dateFormat="dd/mm/yy" 
+                              placeholder="Select date"
+                              styleClass="glass-date-picker"
+                              [showTime]="true">
+                </p-datepicker>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tags -->
+          <div class="sidebar-section">
+            <label class="section-label">Tags</label>
+            <input type="text" formControlName="tags" placeholder="e.g. #marketing, #v2" class="input-std">
+            <p class="help-text">Separate with commas</p>
+          </div>
+
+          <!-- Participants / Sharing -->
+          <div class="sidebar-section">
+            <label class="section-label">Participants</label>
+            <div class="participants-input">
+              <input type="text" #participantInput placeholder="Add by email..." class="input-std" (keydown.enter)="$event.preventDefault(); addParticipant(participantInput)">
+              <button type="button" class="btn-icon-add" (click)="addParticipant(participantInput)">+</button>
+            </div>
+            <div class="participants-list">
+              @for (p of participantsList(); track p; let i = $index) {
+                <div class="participant-chip">
+                  <span>{{ p }}</span>
+                  <button type="button" (click)="removeParticipant(i)">×</button>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Conditional: Meeting Info -->
+          @if (noteForm.get('noteType')?.value === 'meeting') {
+            <div class="sidebar-section highlight-section" formGroupName="meetingDetails">
+              <label class="section-label">Meeting Details</label>
+              <div class="form-row">
+                <i class="pi pi-map-marker"></i>
+                <input type="text" formControlName="location" placeholder="Location / Room" class="input-std">
+              </div>
+              <div class="form-row">
+                <i class="pi pi-video"></i>
+                <input type="text" formControlName="videoLink" placeholder="Video Link (Zoom/Meet)" class="input-std">
+              </div>
+            </div>
+          }
+
+          <!-- Upload -->
+          <div class="sidebar-section">
+            <label class="section-label">Add Files</label>
+            <label class="btn-upload" [class.loading]="isUploading()">
+              <input type="file" multiple (change)="onFileSelected($event)" hidden>
+              <i class="pi" [class.pi-cloud-upload]="!isUploading()" [class.pi-spin]="isUploading()" [class.pi-spinner]="isUploading()"></i>
+              <span>{{ isUploading() ? 'Uploading...' : 'Upload Attachments' }}</span>
+            </label>
+          </div>
+
+          <!-- Footer Actions -->
+          <div class="sidebar-footer">
+            <button type="submit" class="btn-primary" [disabled]="noteForm.invalid || isSubmitting() || isUploading()">
+              <i class="pi pi-check" *ngIf="!isSubmitting()"></i>
+              <i class="pi pi-spin pi-spinner" *ngIf="isSubmitting()"></i>
+              {{ isSubmitting() ? 'Saving...' : (isTemplateMode() ? 'Save Template' : 'Create Note') }}
+            </button>
+          </div>
+
+        </div>
+      </form>
+    </div>
+
+    
+<!-- <div class="create-container">
 
   <header class="page-header">
     <h1 class="page-title">Create New Note</h1>
@@ -116,4 +336,4 @@
       </div>
     </div>
   </form>
-</div>
+</div> -->
