@@ -57,7 +57,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
         routerLink: ['/notes/admin/notes']
       },
       {
-        label: 'Notes List',
+        label: 'Notes Analytics',
         icon: 'pi pi-list',
         routerLink: ['/notes/analytics']
       },
