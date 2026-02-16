@@ -85,14 +85,14 @@ interface CalendarGridCell {
               <div class="cell-events">
                 @for (event of cell.events | slice:0:4; track event.id) {
                   <div class="event-pill"
-                       [class.meeting]="event.extendedProps?.noteType === 'meeting' || event.extendedProps?.isMeeting"
-                       [class.task]="event.extendedProps?.noteType === 'task'"
-                       [class.completed]="event.extendedProps?.status === 'completed'"
+                       [class.meeting]="event.extendedProps.noteType === 'meeting' || event.extendedProps.isMeeting"
+                       [class.task]="event.extendedProps.noteType === 'task'"
+                       [class.completed]="event.extendedProps.status === 'completed'"
                        [title]="event.title"
                        (click)="onEventClick(event.id, $event)">
                     <span class="pill-dot"></span>
                     <span class="pill-text">{{ event.title }}</span>
-                    @if (event.extendedProps?.noteType === 'meeting') {
+                    @if (event.extendedProps.noteType === 'meeting') {
                       <span class="pill-time">{{ event.start | date:'shortTime' }}</span>
                     }
                   </div>

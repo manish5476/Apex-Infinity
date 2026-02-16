@@ -52,6 +52,16 @@ export const SIDEBAR_MENU: MenuItem[] = [
     items: [
 
       {
+        label: 'Notes Admin List',
+        icon: 'pi pi-list',
+        routerLink: ['/notes/admin/notes']
+      },
+      {
+        label: 'Notes List',
+        icon: 'pi pi-list',
+        routerLink: ['/notes/analytics']
+      },
+      {
         label: 'Notes List',
         icon: 'pi pi-list',
         routerLink: ['/notes']

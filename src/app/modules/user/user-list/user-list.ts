@@ -142,43 +142,6 @@ getData(isReset: boolean = false) {
       }
     });
   }
-    // ... (Keep existing getData and onScrolledToBottom) ...
-  // getData(isReset: boolean = false) {
-  //   if (this.isLoading) return;
-  //   this.isLoading = true;
-
-  //   if (isReset) {
-  //     this.currentPage = 1;
-  //     this.data = [];
-  //     this.totalCount = 0;
-  //   }
-
-  //   const params = {
-  //     ...this.userFilter,
-  //     page: this.currentPage,
-  //     limit: this.pageSize
-  //   };
-
-  //   this.userService.getAllUsers(params).subscribe({
-  //     next: (res: any) => {
-  //       let newData = [];
-  //       if (res.data && Array.isArray(res.data.data)) {
-  //         newData = res.data.data;
-  //       }
-
-  //       this.totalCount = res.results || this.totalCount;
-  //       this.data = isReset ? newData : [...this.data, ...newData];
-
-  //       this.currentPage++;
-  //       this.isLoading = false;
-  //       this.cdr.markForCheck();
-  //     },
-  //     error: (err) => {
-  //       this.isLoading = false;
-  //       this.messageService.showError('Error', 'Failed to fetch users.');
-  //     }
-  //   });
-  // }
 
   onScrolledToBottom() {
     if (!this.isLoading && this.data.length < this.totalCount) {

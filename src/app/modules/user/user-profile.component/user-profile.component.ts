@@ -6,7 +6,6 @@ import { UserManagementService } from '../user-management.service';
 import { Skeleton } from 'primeng/skeleton';
 import { Tag } from 'primeng/tag';
 
-// Define the structure for the user object for type safety (Ensure this matches your actual data structure)
 interface User {_id: string;name: string;email: string;organizationId: string;isActive: boolean;createdAt: string;updatedAt: string;avatar?: string;preferences: { notifications: { email: boolean, sms: boolean, push: boolean }, theme: string, denseMode: boolean };branchId?: { _id: string; name: string; address: { street: string; city: string; state: string; zipCode: string; country: string } };role: { _id: string; name: string; permissions: string[] };
 }
 

@@ -10,6 +10,7 @@ import { SupplierDashboardComponent } from '../../modules/cupplier/components/su
 import { NoteExportDialogComponent } from '../../modules/notes/note-export.dialog';
 import { NoteLinkDialogComponent } from '../../modules/notes/note-link.dialog';
 import { AnalyticsDialogComponent } from '../../modules/notes/analytics-dialog.component';
+import { AnalyticsDashboardComponent } from '../../modules/notes/analytics/analytics-dashboard.component';
 // Import the new Dialog
 
 @Injectable({
@@ -53,7 +54,7 @@ export class DynamicDialogServices {
     });
   }
   openAnalyticsDialog(): DynamicDialogRef | null {
-    return this.dialogService.open(AnalyticsDialogComponent, {
+    return this.dialogService.open(AnalyticsDashboardComponent, {
       ...this.defaultConfig,
       width: '85%', // Wider for charts/graphs
       height: '80%',
@@ -61,6 +62,7 @@ export class DynamicDialogServices {
     });
   }
 
+  
   // openNoteExport(): DynamicDialogRef | null {
   //   return this.dialogService.open(NoteExportDialogComponent, {
   //     header: 'Export Data',
