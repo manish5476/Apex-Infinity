@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LoadingService } from '../../services/loading.service';
+import { LoadingService } from '../../../core/services/loading.service';
 
 @Component({
   selector: 'app-loading',
@@ -50,22 +50,22 @@ import { LoadingService } from '../../services/loading.service';
       position: fixed;
       inset: 0;
       z-index: 99999;
-      background: rgba(5, 5, 10, 0.75); /* Slightly darker for better focus */
+      background: rgba(5, 5, 10, 0.8); /* Darker for better focus */
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 20px;
       overflow: hidden;
-      backdrop-filter: blur(5px); /* Added backdrop blur to background */
+      backdrop-filter: blur(8px); /* Background blur */
     }
 
     /* Ambient background blobs */
     .ambient-glow {
       position: absolute;
-      width: 800px; /* Larger */
+      width: 800px;
       height: 800px;
       background: radial-gradient(circle, var(--accent-primary, #4f46e5) 0%, transparent 60%);
-      opacity: 0.12;
+      opacity: 0.15;
       filter: blur(100px);
       z-index: -1;
       animation: pulseGlow 5s ease-in-out infinite alternate;
@@ -78,13 +78,11 @@ import { LoadingService } from '../../services/loading.service';
       position: relative;
       width: 100%;
       height: 100%;
-      max-width: 100%;
-      max-height: 100%;
       border-radius: 24px;
       
       /* Enhanced Glass Effect */
-      background: rgba(255, 255, 255, 0.02);
-      backdrop-filter: blur(30px); /* Stronger blur */
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(30px);
       -webkit-backdrop-filter: blur(30px);
       border: 1px solid rgba(255, 255, 255, 0.08);
       box-shadow: 
@@ -122,11 +120,11 @@ import { LoadingService } from '../../services/loading.service';
 
     .wave-loader {
       position: absolute;
-      width: 220%; /* Slightly larger to ensure coverage during spin */
+      width: 220%;
       height: 220%;
       top: -110%; 
       left: -60%;
-      animation: fillUp 8s cubic-bezier(0.4, 0, 0.2, 1) forwards; /* Smoother fill */
+      animation: fillUp 8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
 
     .wave-surface {
@@ -134,7 +132,7 @@ import { LoadingService } from '../../services/loading.service';
       width: 100%;
       height: 100%;
       background: var(--accent-gradient, linear-gradient(180deg, rgba(99,102,241,1) 0%, rgba(6,182,212,1) 100%));
-      border-radius: 42%; /* Slightly irregular */
+      border-radius: 42%;
       opacity: 0.85;
       animation: spinWave 5s linear infinite;
     }
@@ -148,7 +146,7 @@ import { LoadingService } from '../../services/loading.service';
 
     .center-icon {
       z-index: 10;
-      font-size: 3rem; /* Larger icon */
+      font-size: 3rem;
       color: white;
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
       animation: floatIcon 3s ease-in-out infinite;
@@ -169,11 +167,12 @@ import { LoadingService } from '../../services/loading.service';
       font-family: var(--font-heading, sans-serif);
       font-size: 2.2rem;
       font-weight: 800;
-      letter-spacing: 6px; /* Wider spacing */
+      letter-spacing: 6px;
       color: white;
       margin: 0 0 1rem 0;
       text-transform: uppercase;
       text-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      /* Gradient Text */
       background: linear-gradient(to right, #fff, #94a3b8);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -184,7 +183,7 @@ import { LoadingService } from '../../services/loading.service';
       align-items: center;
       justify-content: center;
       gap: 4px;
-      min-height: 1.5rem; /* Reserve height to prevent layout shift */
+      min-height: 1.5rem;
     }
 
     .sub-message {
@@ -233,8 +232,8 @@ import { LoadingService } from '../../services/loading.service';
     }
 
     .dismiss-btn:hover {
-      background: rgba(239, 68, 68, 0.1);
-      border-color: rgba(239, 68, 68, 0.3);
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.4);
       color: #f87171;
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
@@ -291,7 +290,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
   ];
   currentText = '';
   organization: string | null = "Apex Infinity";
-  isTextVisible = false; // Controls fade transition
+  isTextVisible = false; // Added to control fade effect
   private intervalId: any;
 
   ngOnInit() {
@@ -315,12 +314,11 @@ export class LoadingComponent implements OnInit, OnDestroy {
       
       this.currentText = nextText;
       this.isTextVisible = true; // Fade in
-    }, 400); // Duration matches CSS transition
+    }, 400); // Matches CSS transition time
   }
 
   forceClose() { this.loadingService.hide(); }
 }
-
 // import { Component, inject, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core';
 // import { CommonModule } from '@angular/common';
 // import { LoadingService } from '../../../core/services/loading.service';
