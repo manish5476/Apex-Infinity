@@ -552,12 +552,9 @@ export class CalendarViewComponent implements OnInit {
   }
 
   onEventClick(id: string) {
-    // ID might be "meeting_XYZ", clean it if needed
     const cleanId = id.replace(/^(meeting_|task_)/, ''); 
     this.router.navigate(['/notes', cleanId]);
   }
-
-  // --- Date Utils ---
 
   private formatDateIso(d: Date): string {
     const pad = (n: number) => n < 10 ? '0'+n : n;
@@ -565,9 +562,7 @@ export class CalendarViewComponent implements OnInit {
   }
 
   private isSameDay(d1: Date, d2: Date) {
-    return d1.getFullYear() === d2.getFullYear() &&
-           d1.getMonth() === d2.getMonth() &&
-           d1.getDate() === d2.getDate();
+    return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
   }
 }
 
