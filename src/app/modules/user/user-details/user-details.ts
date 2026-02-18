@@ -81,7 +81,7 @@ export class UserDetailsComponent implements OnInit {
   // --- Data Loading ---
   loadUserDetails() {
     this.userService.getUser(this.userId).subscribe({
-      next: (res) => {
+      next: (res:any) => {
         const userData = res.data?.data || res.data?.user;
         if (userData) {
           this.user.set(userData);
@@ -126,7 +126,7 @@ export class UserDetailsComponent implements OnInit {
 
     // Call the specific ID upload method
     this.userService.uploadUserPhoto(this.userId, formData).pipe(
-      map(response => response.data?.user || response.data?.data),
+      map((response:any) => response.data?.user || response.data?.data),
       catchError(err => {
         this.uploading.set(false);
         this.messageService.add({ severity: 'error', summary: 'Upload Failed', detail: err.error?.message || 'Server error' });
@@ -179,7 +179,7 @@ export class UserDetailsComponent implements OnInit {
     }
 
     this.isSubmitting = true;
-    this.userService.adminResetPassword(this.userId, password).subscribe({
+    this.userService.adminResetPassword(this.userId, password,passwordConfirm).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Password reset.' });
         this.showPasswordDialog = false;
