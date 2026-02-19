@@ -1,18 +1,13 @@
-import { ChangeDetectorRef, Component, OnInit, effect, inject, signal, ChangeDetectionStrategy } from '@angular/core';
-
+import { ChangeDetectorRef, Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
-
-import { MasterListService } from '../../../../../core/services/master-list.service';
-import { AppMessageService } from '../../../../../core/services/message.service';
-import { HRMSService } from '../../../hrms.service';
-import { AgShareGrid } from '../../../../shared/components/ag-shared-grid';
-
+import { AppMessageService } from '../../../../core/services/message.service';
+import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
+import { HRMSService } from '../../hrms.service';
 @Component({
-  selector: 'app-department-list',
+  selector: 'app-designation-list',
   standalone: true,
   imports: [
     CommonModule,
@@ -25,24 +20,26 @@ import { AgShareGrid } from '../../../../shared/components/ag-shared-grid';
     <div class="list-page-container">
       <div class="themed-card list-content-area">
 
-        <!-- Filter Bar -->
         <div class="se-filter-bar">
           
           <div class="se-filter-field">
             <label for="search">Search</label>
-            <input id="search" type="text" [(ngModel)]="deptFilter.search" 
+            <input id="search" type="text" [(ngModel)]="desigFilter.search" 
               (keydown.enter)="applyFilters()" (blur)="applyFilters()" 
-              placeholder="Name or Code..." class="se-input w-full" />
+              placeholder="Title or Code..." class="se-input w-full" />
           </div>
 
           <div class="se-filter-field">
-            <label for="branch">Branch</label>
+            <label for="grade">Grade</label>
             <div class="select-wrapper w-full">
-              <select id="branch" [(ngModel)]="deptFilter.branchId" (change)="applyFilters()" class="se-input w-full">
-                <option [ngValue]="null">All Branches</option>
-                @for (branch of branchOptions(); track branch._id) {
-                  <option [value]="branch._id">{{ branch.name }}</option>
-                }
+              <select id="grade" [(ngModel)]="desigFilter.grade" (change)="applyFilters()" class="se-input w-full">
+                <option [ngValue]="null">All Grades</option>
+                <option value="A">Grade A</option>
+                <option value="B">Grade B</option>
+                <option value="C">Grade C</option>
+                <option value="D">Grade D</option>
+                <option value="E">Grade E</option>
+                <option value="F">Grade F</option>
               </select>
             </div>
           </div>
@@ -50,7 +47,7 @@ import { AgShareGrid } from '../../../../shared/components/ag-shared-grid';
           <div class="se-filter-field">
             <label for="status">Status</label>
             <div class="select-wrapper w-full">
-              <select id="status" [(ngModel)]="deptFilter.isActive" (change)="applyFilters()" class="se-input w-full">
+              <select id="status" [(ngModel)]="desigFilter.isActive" (change)="applyFilters()" class="se-input w-full">
                 <option [ngValue]="null">All Statuses</option>
                 <option [ngValue]="true">Active</option>
                 <option [ngValue]="false">Inactive</option>
@@ -68,12 +65,11 @@ import { AgShareGrid } from '../../../../shared/components/ag-shared-grid';
           <div class="se-filter-right">
             <button class="btn btn-primary" (click)="createNew()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              Add Department
+              Add Designation
             </button>
           </div>
         </div>
 
-        <!-- Grid Wrapper -->
         <div class="list-grid-wrapper">
           <app-ag-share-grid 
             [columns]="column" 
@@ -258,34 +254,26 @@ import { AgShareGrid } from '../../../../shared/components/ag-shared-grid';
     }
   `]
 })
-export class DepartmentListComponent implements OnInit {
+export class DesignationListComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
-  public masterList = inject(MasterListService);
-  
-  // Mock router for preview
-private router = inject(Router);
+  private router = inject(Router);
 
   private gridApi!: GridApi;
   private currentPage = 1;
   private isLoading = false;
   private totalCount = 0;
   private pageSize = 50;
+  
   data: any[] = [];
   column: any[] = [];
-  branchOptions = signal<any[]>([]);
-  deptFilter = {
+  
+  desigFilter = {
     search: '',
-    branchId: null,
+    grade: null,
     isActive: null
   };
-
-  constructor() {
-    effect(() => {
-      this.branchOptions.set(this.masterList.branches());
-    });
-  }
 
   ngOnInit(): void {
     this.setupColumns();
@@ -297,14 +285,13 @@ private router = inject(Router);
   }
 
   resetFilters() {
-    this.deptFilter = { search: '', branchId: null, isActive: null };
+    this.desigFilter = { search: '', grade: null, isActive: null };
     this.getData(true);
   }
 
-createNew() {
-  this.router.navigate(['/hrms/department/new']);
-}
-
+  createNew() {
+    this.router.navigate(['/hrms/designation/new']);
+  }
 
   getData(isReset: boolean = false) {
     if (this.isLoading) return;
@@ -317,20 +304,16 @@ createNew() {
     }
 
     const params = {
-      ...this.deptFilter,
+      ...this.desigFilter,
       page: this.currentPage,
       limit: this.pageSize
     };
 
-    this.hrmsService.getDepartments(params).subscribe({
+    this.hrmsService.getDesignations(params).subscribe({
       next: (res: any) => {
-        // UPDATED RESPONSE STRUCTURE HANDLING
-        // New API returns:
-        // {
-        //   status, results, pagination (top-level), data: { data: [...] }
-        // }
-        const newData = res.data?.data || [];           // departments array
-        const pagination = res.pagination;              // pagination object (top level)
+        // Handle nested response structures gracefully
+        const newData = res.data?.designations || res.data?.data || [];
+        const pagination = res.pagination; 
 
         if (pagination) {
           this.totalCount = pagination.totalResults;
@@ -347,7 +330,7 @@ createNew() {
       },
       error: (err: any) => {
         this.isLoading = false;
-        this.messageService.showError('Error', 'Failed to fetch departments.');
+        this.messageService.showError('Error', 'Failed to fetch designations.');
       }
     });
   }
@@ -362,50 +345,49 @@ createNew() {
     this.gridApi = params.api;
   }
 
-eventFromGrid(event: any) {
-  const deptId = event?.row?._id;
-  switch (event.type) {
-    case 'cellClicked':
-      this.router.navigate(['/hrms/department/details', deptId]);
-      break;
-    case 'editStart':
-      this.router.navigate(['/hrms/department/edit', deptId]);
-      break;
-    case 'delete':
-      const deptName = event.row.name;
-      if (window.confirm(
-        `Are you sure you want to delete the department ${deptName}?`
-      )) {
-        this.deleteDepartment(deptId);
-      }
-      break;
-
-    case 'reachedBottom':
-      this.onScrolledToBottom();
-      break;
+  eventFromGrid(event: any) {
+    const desigId = event?.row?._id;
+    switch (event.type) {
+      case 'cellClicked':
+        // Assuming you have a details route configured
+        this.router.navigate(['/hrms/designation/details', desigId]);
+        break;
+      case 'editStart':
+        this.router.navigate(['/hrms/designation/edit', desigId]);
+        break;
+      case 'delete':
+        const desigTitle = event.row.title;
+        if (window.confirm(
+          `Are you sure you want to delete the designation "${desigTitle}"?`
+        )) {
+          this.deleteDesignation(desigId);
+        }
+        break;
+      case 'reachedBottom':
+        this.onScrolledToBottom();
+        break;
+    }
   }
-}
 
-
-  private deleteDepartment(id: string) {
-    this.hrmsService.deleteDepartment(id).subscribe({
+  private deleteDesignation(id: string) {
+    this.hrmsService.deleteDesignation(id).subscribe({
       next: () => {
-        this.messageService.showSuccess('Deleted', 'Department removed successfully');
+        this.messageService.showSuccess('Deleted', 'Designation removed successfully');
         this.getData(true);
       },
       error: (err: any) => {
-        this.messageService.showError('Error', err.error?.message || 'Failed to delete department');
+        this.messageService.showError('Error', err.error?.message || 'Failed to delete designation');
       }
     });
   }
 
   setupColumns(): void {
     this.column = [
-      // 1. DEPARTMENT NAME
+      // 1. DESIGNATION TITLE
       {
-        field: 'name',
-        headerName: 'Department Name',
-        width: 220,
+        field: 'title',
+        headerName: 'Designation Title',
+        width: 250,
         pinned: 'left',
         sortable: true,
         filter: true,
@@ -420,9 +402,9 @@ eventFromGrid(event: any) {
 
       // 2. CODE (Badge Style)
       {
-        headerName: 'Code',
+        headerName: 'Job Code',
         field: 'code',
-        width: 100,
+        width: 120,
         filter: true,
         cellRenderer: (params: any) => {
           const code = params.value || '-';
@@ -444,44 +426,54 @@ eventFromGrid(event: any) {
         }
       },
 
-      // 3. BRANCH
+      // 3. LEVEL
       {
-        headerName: 'Branch',
-        field: 'branchId.name',
-        width: 150,
-        valueFormatter: (p: any) => p.value || 'Global / HQ',
-        cellStyle: { 'display': 'flex', 'align-items': 'center', 'color': 'var(--text-secondary)', 'font-size': '12px' }
-      },
-
-      // 4. HEAD OF DEPARTMENT
-      {
-        headerName: 'Head of Dept',
-        field: 'headOfDepartment.name',
-        width: 180,
-        cellRenderer: (params: any) => {
-          const hod = params.value;
-          if (hod) {
-            return `<div style="display:flex; align-items:center; height:100%; color:var(--text-primary); font-size:12px;">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2" style="margin-right:6px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> ${hod}
-                    </div>`;
-          }
-          return `<div style="display:flex; align-items:center; height:100%; color:var(--text-tertiary); font-style:italic; font-size:12px;">Unassigned</div>`;
-        }
-      },
-
-      // 5. EMPLOYEE COUNT
-      {
-        headerName: 'Employees',
-        field: 'employeeCount',
-        width: 120,
+        headerName: 'Level',
+        field: 'level',
+        width: 100,
         sortable: true,
         cellRenderer: (params: any) => {
-          const count = params.value || 0;
+          const level = params.value || 0;
           return `
             <div style="display:flex; align-items:center; height:100%;">
-              <span style="font-weight:600; color:var(--color-primary); font-size:13px;">${count}</span>
+              <span style="font-weight:600; color:var(--color-primary); font-size:13px;">Lvl ${level}</span>
             </div>`;
         }
+      },
+
+      // 4. GRADE
+      {
+        headerName: 'Grade',
+        field: 'grade',
+        width: 100,
+        sortable: true,
+        cellRenderer: (params: any) => {
+          const grade = params.value || '-';
+          return `
+            <div style="display:flex; align-items:center; height:100%;">
+              <span style="
+                background-color: transparent; 
+                color: var(--text-primary); 
+                padding: 2px 8px; 
+                border-radius: 999px; 
+                font-size: 11px; 
+                font-weight: 600;
+                border: 1px solid var(--border-primary);
+              ">
+                Grade ${grade}
+              </span>
+            </div>`;
+        }
+      },
+
+      // 5. JOB FAMILY
+      {
+        headerName: 'Job Family',
+        field: 'jobFamily',
+        width: 180,
+        filter: true,
+        valueFormatter: (p: any) => p.value || 'Unspecified',
+        cellStyle: { 'display': 'flex', 'align-items': 'center', 'color': 'var(--text-secondary)', 'font-size': '12px' }
       },
 
       // 6. STATUS (Refined Compact Style)

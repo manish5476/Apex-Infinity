@@ -139,10 +139,31 @@ export const SIDEBAR_MENU: MenuItem[] = [
   // ==========================
   // 5. WORKFORCE (HR)
   // ==========================
-  {
-    label: 'Human Resources',
-    icon: 'pi pi-id-card',
-    items: [
+ {
+  label: 'Human Resources',
+  icon: 'pi pi-id-card',
+  items: [
+    {
+      label: 'Department',
+      icon: 'pi pi-building',
+      items: [
+        {
+          label: 'Department Hub',
+          icon: 'pi pi-home',
+          routerLink: ['/hrms/department/hub']
+        },
+        {
+          label: 'Department List',
+          icon: 'pi pi-list',
+          routerLink: ['/hrms/department/list']
+        },
+        {
+          label: 'Add Department',
+          icon: 'pi pi-plus',
+          routerLink: ['/hrms/department/new']
+        }
+      ]
+      },
       {
         label: 'Staff Management',
         icon: 'pi pi-user',
