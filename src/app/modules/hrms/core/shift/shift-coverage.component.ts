@@ -3,9 +3,8 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
-
-import { AppMessageService } from '../../../../../core/services/message.service';
-import { HRMSService } from '../../../hrms.service';
+import { AppMessageService } from '../../../../core/services/message.service';
+import { HRMSService } from '../../hrms.service';
 
 @Component({
   selector: 'app-shift-coverage',
@@ -248,7 +247,7 @@ export class ShiftCoverageComponent implements OnInit {
     // Assumes getShiftTimeline exists in service returning the timeline JSON structure
     forkJoin({
       coverage: this.hrmsService.getShiftCoverage(targetDate),
-      timeline: this.hrmsService.get<any>('/v1/hrms/shifts/timeline', { date: this.selectedDateStr }) // Adjust path/method if needed
+      timeline: this.hrmsService.getShiftTimeline({ date: this.selectedDateStr }) // Adjust path/method if needed
     }).pipe(
       finalize(() => this.isLoading.set(false))
     ).subscribe({

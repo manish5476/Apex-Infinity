@@ -4,10 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
-
-import { AppMessageService } from '../../../../../core/services/message.service';
-import { HRMSService } from '../../../hrms.service';
-import { AgShareGrid } from '../../../../shared/components/ag-shared-grid';
+import { AppMessageService } from '../../../../core/services/message.service';
+import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
+import { HRMSService } from '../../hrms.service';
 
 @Component({
   selector: 'app-shift-list',
@@ -287,7 +286,7 @@ export class ShiftListComponent implements OnInit {
 
     // Using the generic get if getShifts isn't strictly defined in the service
     // Replace with `this.hrmsService.getShifts(params)` if you have that method.
-    this.hrmsService.get<any>('/v1/hrms/shifts', params).subscribe({
+    this.hrmsService.getShifts().subscribe({
       next: (res: any) => {
         // Handle nested response structures gracefully
         const newData = res.data?.shifts || res.data?.data || res.data || [];

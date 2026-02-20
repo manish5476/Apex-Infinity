@@ -2,10 +2,8 @@ import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@ang
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
-
-import { AppMessageService } from '../../../../../core/services/message.service';
-import { HRMSService } from '../../../hrms.service';
-
+import { AppMessageService } from '../../../../core/services/message.service';
+import { HRMSService } from '../../hrms.service';
 @Component({
   selector: 'app-designation-salary-bands',
   standalone: true,

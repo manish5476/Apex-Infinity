@@ -2,9 +2,8 @@ import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
-
-import { AppMessageService } from '../../../../../core/services/message.service';
-import { HRMSService } from '../../../hrms.service';
+import { AppMessageService } from '../../../../core/services/message.service';
+import { HRMSService } from '../../hrms.service';
 
 @Component({
   selector: 'app-shift-calculator',

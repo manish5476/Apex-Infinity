@@ -553,7 +553,7 @@ export class HRMSService extends BaseApiService {
   /**
    * Get shift timeline
    */
-  getShiftTimeline(date?: Date): Observable<{ status: string; data: { timeline: any[] } }> {
+  getShiftTimeline(date?: any): Observable<{ status: string; data: { timeline: any[] } }> {
     const params = date ? { date: date.toISOString().split('T')[0] } : {};
     return this.get<{ status: string; data: { timeline: any[] } }>('/v1/hrms/shifts/timeline', params);
   }
@@ -575,7 +575,7 @@ export class HRMSService extends BaseApiService {
   /**
    * Get single shift
    */
-  getShift(id: string): Observable<{ status: string; data: { shift: Shift } }> {
+  getShift(id: any): Observable<{ status: string; data: { shift: Shift } }> {
     return this.get<{ status: string; data: { shift: Shift } }>(`/v1/hrms/shifts/${id}`);
   }
 

@@ -2,9 +2,9 @@ import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@ang
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, catchError, map, finalize } from 'rxjs';
+import { AppMessageService } from '../../../../core/services/message.service';
+import { HRMSService } from '../../hrms.service';
 
-import { AppMessageService } from '../../../../../core/services/message.service';
-import { HRMSService } from '../../../hrms.service';
 
 @Component({
   selector: 'app-shift-details',
@@ -405,9 +405,8 @@ export class ShiftDetailsComponent implements OnInit {
 
   private loadShiftDetails() {
     this.isLoading.set(true);
-    
     // Using generic .get() based on previous component structure
-    this.hrmsService.get<any>(`/v1/hrms/shifts/${this.shiftId}`).pipe(
+    this.hrmsService.getShift(this.shiftId).pipe(
       map((res: any) => res?.data?.shift || res?.data?.data || res?.data || res),
       catchError(err => {
         this.messageService.showError('Error', 'Failed to load shift details.');

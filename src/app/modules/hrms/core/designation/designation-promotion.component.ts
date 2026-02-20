@@ -3,10 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
-
-import { AppMessageService } from '../../../../../core/services/message.service';
-import { HRMSService } from '../../../hrms.service';
-
+import { AppMessageService } from '../../../../core/services/message.service';
+import { HRMSService } from '../../hrms.service';
 @Component({
   selector: 'app-designation-promotion',
   standalone: true,

@@ -139,76 +139,76 @@ export const SIDEBAR_MENU: MenuItem[] = [
   // ==========================
   // 5. WORKFORCE (HR)
   // ==========================
- {
-  label: 'Human Resources',
-  icon: 'pi pi-id-card',
-  items: [
-    {
-      label: 'Department',
-      icon: 'pi pi-building',
-      items: [
-        {
-          label: 'Department Hub',
-          icon: 'pi pi-home',
-          routerLink: ['/hrms/department/hub']
-        },
-        {
-          label: 'Department List',
-          icon: 'pi pi-list',
-          routerLink: ['/hrms/department/list']
-        },
-        {
-          label: 'Add Department',
-          icon: 'pi pi-plus',
-          routerLink: ['/hrms/department/new']
-        }
-      ]
-      },
+  {
+    label: 'Human Resources',
+    icon: 'pi pi-id-card',
+    items: [
       {
-      label: 'Designation',
-      icon: 'pi pi-sitemap',
-      items: [
-        {
-          label: 'Designation Hub',
-          icon: 'pi pi-home',
-          routerLink: ['/hrms/designation/hub']
-        },
-        {
-          label: 'Designation List',
-          icon: 'pi pi-list',
-          routerLink: ['/hrms/designation/list']
-        },
-        {
-          label: 'Add Designation',
-          icon: 'pi pi-plus',
-          routerLink: ['/hrms/designation/new']
-        }
-      ]
-    }
-  ]},
-      {
-        label: 'Staff Management',
-        icon: 'pi pi-user',
+        label: 'Department',
+        icon: 'pi pi-building',
         items: [
-          { label: 'Employee List', icon: 'pi pi-users', routerLink: ['/user/list'] },
-          { label: 'Onboard User', icon: 'pi pi-user-plus', routerLink: ['/user/create'] },
+          {
+            label: 'Department Hub',
+            icon: 'pi pi-home',
+            routerLink: ['/hrms/department/hub']
+          },
+          {
+            label: 'Department List',
+            icon: 'pi pi-list',
+            routerLink: ['/hrms/department/list']
+          },
+          {
+            label: 'Add Department',
+            icon: 'pi pi-plus',
+            routerLink: ['/hrms/department/new']
+          }
         ]
       },
       {
-        label: 'Attendance',
-        icon: 'pi pi-clock',
+        label: 'Designation',
+        icon: 'pi pi-sitemap',
         items: [
-          { label: 'Dashboard', icon: 'pi pi-desktop', routerLink: ['/attendence/dashboard'] },
-          { label: 'Punch In/Out', icon: 'pi pi-check-circle', routerLink: ['/attendence/punching'] },
-          { label: 'My Requests', icon: 'pi pi-inbox', routerLink: ['/attendence/my-requests'] },
-          { label: 'Manager View', icon: 'pi pi-briefcase', routerLink: ['/attendence/manager'] },
-          { label: 'Shifts', icon: 'pi pi-calendar', routerLink: ['/attendence/shifts'] },
-          { label: 'Holidays', icon: 'pi pi-sun', routerLink: ['/attendence/holidays'] },
-          { label: 'Reports', icon: 'pi pi-file', routerLink: ['/attendence/reports'] },
+          {
+            label: 'Designation Hub',
+            icon: 'pi pi-home',
+            routerLink: ['/hrms/designation/hub']
+          },
+          {
+            label: 'Designation List',
+            icon: 'pi pi-list',
+            routerLink: ['/hrms/designation/list']
+          },
+          {
+            label: 'Add Designation',
+            icon: 'pi pi-plus',
+            routerLink: ['/hrms/designation/new']
+          }
         ]
       }
     ]
   },
+  {
+    label: 'Staff Management',
+    icon: 'pi pi-user',
+    items: [
+      { label: 'Employee List', icon: 'pi pi-users', routerLink: ['/user/list'] },
+      { label: 'Onboard User', icon: 'pi pi-user-plus', routerLink: ['/user/create'] },
+    ]
+  },
+  {
+    label: 'Attendance',
+    icon: 'pi pi-clock',
+    items: [
+      { label: 'Dashboard', icon: 'pi pi-desktop', routerLink: ['/attendence/dashboard'] },
+      { label: 'Punch In/Out', icon: 'pi pi-check-circle', routerLink: ['/attendence/punching'] },
+      { label: 'My Requests', icon: 'pi pi-inbox', routerLink: ['/attendence/my-requests'] },
+      { label: 'Manager View', icon: 'pi pi-briefcase', routerLink: ['/attendence/manager'] },
+      { label: 'Shifts', icon: 'pi pi-calendar', routerLink: ['/attendence/shifts'] },
+      { label: 'Holidays', icon: 'pi pi-sun', routerLink: ['/attendence/holidays'] },
+      { label: 'Reports', icon: 'pi pi-file', routerLink: ['/attendence/reports'] },
+    ]
+  }
+  ,
 
   // ==========================
   // 6. SYSTEM ADMINISTRATION

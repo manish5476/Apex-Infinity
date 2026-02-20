@@ -3,9 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, catchError, map } from 'rxjs';
-
-import { AppMessageService } from '../../../../../core/services/message.service';
-import { HRMSService } from '../../../hrms.service';
+import { AppMessageService } from '../../../../core/services/message.service';
+import { HRMSService } from '../../hrms.service';
 
 @Component({
   selector: 'app-shift-form',
@@ -463,7 +462,7 @@ export class ShiftFormComponent implements OnInit {
     
     // Using standard HTTP get pattern assumed in your service
     // Adjust mapping if your backend nests it differently (e.g. res.data.data)
-    this.hrmsService.get<any>(`/v1/hrms/shifts/${this.shiftId}`).pipe(
+    this.hrmsService.getShift(this.shiftId).pipe(
       map((res: any) => res?.data?.shift || res?.data?.data || res?.data || res),
       catchError(err => {
         this.isLoading.set(false);
