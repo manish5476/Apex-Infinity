@@ -8,6 +8,11 @@ import { DepartmentHubComponent } from './core/department/departmentHub/departme
 import { DesignationFormComponent } from './core/designation/designation-form.component';
 import { DesignationListComponent } from './core/designation/designation-list.component';
 import { DesignationDetailsComponent } from './core/designation/designation-details.component';
+import { ShiftFormComponent } from './core/shift/shift-form.component';
+import { ShiftListComponent } from './core/shift/shift-list.component';
+import { ShiftCoverageComponent } from './core/shift/shift-coverage.component';
+import { ShiftDetailsComponent } from './core/shift/shift-details.component';
+import { ShiftCalculatorComponent } from './core/shift/shift-calculator.component';
 
 export const HRMS_ROUTES: Routes = [
   {
@@ -30,6 +35,18 @@ export const HRMS_ROUTES: Routes = [
       { path: 'list', component: DesignationListComponent },
       { path: 'edit/:id', component: DesignationFormComponent },
       { path: 'details/:id', component: DesignationDetailsComponent },
+    ]
+  },
+  {
+    path: 'shifts',
+    children: [
+      { path: '', redirectTo: 'list', pathMatch: 'full' },
+      { path: 'new', component: ShiftFormComponent },
+      { path: 'coverage', component: ShiftCoverageComponent },
+      { path: 'calculator', component: ShiftCalculatorComponent },
+      { path: 'list', component: ShiftListComponent },
+      { path: 'edit/:id', component: ShiftFormComponent },
+      { path: 'details/:id', component: ShiftDetailsComponent },
     ]
   },
 ];

@@ -139,54 +139,80 @@ export const SIDEBAR_MENU: MenuItem[] = [
   // ==========================
   // 5. WORKFORCE (HR)
   // ==========================
-  {
-    label: 'Human Resources',
-    icon: 'pi pi-id-card',
-    items: [
-      {
-        label: 'Department',
-        icon: 'pi pi-building',
-        items: [
-          {
-            label: 'Department Hub',
-            icon: 'pi pi-home',
-            routerLink: ['/hrms/department/hub']
-          },
-          {
-            label: 'Department List',
-            icon: 'pi pi-list',
-            routerLink: ['/hrms/department/list']
-          },
-          {
-            label: 'Add Department',
-            icon: 'pi pi-plus',
-            routerLink: ['/hrms/department/new']
-          }
-        ]
-      },
-      {
-        label: 'Designation',
-        icon: 'pi pi-sitemap',
-        items: [
-          {
-            label: 'Designation Hub',
-            icon: 'pi pi-home',
-            routerLink: ['/hrms/designation/hub']
-          },
-          {
-            label: 'Designation List',
-            icon: 'pi pi-list',
-            routerLink: ['/hrms/designation/list']
-          },
-          {
-            label: 'Add Designation',
-            icon: 'pi pi-plus',
-            routerLink: ['/hrms/designation/new']
-          }
-        ]
-      }
-    ]
-  },
+ {
+  label: 'Human Resources',
+  icon: 'pi pi-id-card',
+  items: [
+    {
+      label: 'Department',
+      icon: 'pi pi-building',
+      items: [
+        {
+          label: 'Department Hub',
+          icon: 'pi pi-home',
+          routerLink: ['/hrms/department/hub']
+        },
+        {
+          label: 'Department List',
+          icon: 'pi pi-list',
+          routerLink: ['/hrms/department/list']
+        },
+        {
+          label: 'Add Department',
+          icon: 'pi pi-plus',
+          routerLink: ['/hrms/department/new']
+        }
+      ]
+    },
+    {
+      label: 'Designation',
+      icon: 'pi pi-sitemap',
+      items: [
+        {
+          label: 'Designation Hub',
+          icon: 'pi pi-home',
+          routerLink: ['/hrms/designation/hub']
+        },
+        {
+          label: 'Designation List',
+          icon: 'pi pi-list',
+          routerLink: ['/hrms/designation/list']
+        },
+        {
+          label: 'Add Designation',
+          icon: 'pi pi-plus',
+          routerLink: ['/hrms/designation/new']
+        }
+      ]
+    },
+    {
+      label: 'Shifts',
+      icon: 'pi pi-clock',
+      items: [
+        {
+          label: 'Shift List',
+          icon: 'pi pi-list',
+          routerLink: ['/hrms/shifts/list']
+        },
+        {
+          label: 'Add Shift',
+          icon: 'pi pi-plus',
+          routerLink: ['/hrms/shifts/new']
+        },
+        {
+          label: 'Shift Coverage',
+          icon: 'pi pi-users',
+          routerLink: ['/hrms/shifts/coverage']
+        },
+        {
+          label: 'Shift Calculator',
+          icon: 'pi pi-calculator',
+          routerLink: ['/hrms/shifts/calculator']
+        }
+      ]
+    }
+  ]
+},
   {
     label: 'Staff Management',
     icon: 'pi pi-user',
