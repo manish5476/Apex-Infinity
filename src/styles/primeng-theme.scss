@@ -509,7 +509,7 @@
        color: var(--text-primary);
        font-weight: var(--font-weight-semibold);
        
-       select, .p-dropdown {
+       select, .p-select {
           // Month/Year dropdowns
           margin: 0 var(--spacing-xs);
        }
@@ -1030,7 +1030,7 @@
       }
    }
    
-   .p-dropdown {
+   .p-select {
       margin-left: var(--spacing-md);
       height: 2.5rem;
       align-items: center;

@@ -1226,7 +1226,7 @@ export class MasterList implements OnInit {
 // //                 <p-button 
 // //                    label="Deactivate ({{selectedRows().length}})" 
 // //                    icon="pi pi-ban" 
-// //                    severity="warning" 
+// //                    severity="warn" 
 // //                    [outlined]="true"
 // //                    (click)="bulkUpdateStatus(false)">
 // //                 </p-button>

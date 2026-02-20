@@ -41,7 +41,7 @@ import { NoteService } from '../../core/services/notes.service';
         </div>
       </div>
 
-      <!-- Date Picker (Simulating p-calendar) -->
+      <!-- Date Picker (Simulating p-datepicker) -->
       @if (scope === 'filtered') {
         <div class="form-group">
           <label class="section-label">Select Period</label>
@@ -155,7 +155,7 @@ import { NoteService } from '../../core/services/notes.service';
       .desc { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
     }
 
-    /* Date Inputs (Replacement for p-calendar) */
+    /* Date Inputs (Replacement for p-datepicker) */
     .date-inputs {
       display: flex;
       align-items: center;

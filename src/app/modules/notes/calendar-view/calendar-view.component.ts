@@ -37,7 +37,7 @@ interface DayCell {
 }
 
 @Component({
-  selector: 'app-calendar-view',
+  selector: 'app-datepicker-view',
   standalone: true,
   imports: [CommonModule],
   providers: [DatePipe],
@@ -605,7 +605,7 @@ export class CalendarViewComponent implements OnInit {
 // }
 
 // @Component({
-//   selector: 'app-calendar-view',
+//   selector: 'app-datepicker-view',
 //   standalone: true,
 //   imports: [CommonModule],
 //   providers: [DatePipe],
@@ -1160,7 +1160,7 @@ export class CalendarViewComponent implements OnInit {
 // // }
 
 // // @Component({
-// //   selector: 'app-calendar-view',
+// //   selector: 'app-datepicker-view',
 // //   standalone: true,
 // //   imports: [CommonModule],
 // //   providers: [DatePipe],
@@ -1682,7 +1682,7 @@ export class CalendarViewComponent implements OnInit {
 // // // }
 
 // // // @Component({
-// // //   selector: 'app-calendar-view',
+// // //   selector: 'app-datepicker-view',
 // // //   standalone: true,
 // // //   imports: [CommonModule],
 // // //   encapsulation: ViewEncapsulation.None,
@@ -2285,7 +2285,7 @@ export class CalendarViewComponent implements OnInit {
 // // // // }
 
 // // // // @Component({
-// // // //   selector: 'app-calendar-view',
+// // // //   selector: 'app-datepicker-view',
 // // // //   standalone: true,
 // // // //   imports: [CommonModule],
 // // // //   template: `

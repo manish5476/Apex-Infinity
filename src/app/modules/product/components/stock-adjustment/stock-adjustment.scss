@@ -168,7 +168,7 @@
 //   // Inputs & Selects
 //   .p-inputtext, 
 //   .p-select, 
-//   .p-dropdown,
+//   .p-select,
 //   .p-inputnumber-input {
 //     width: 100%;
 //     background: var(--bg-primary);
@@ -190,12 +190,12 @@
 //   }
 
 //   // Select/Dropdown Specific
-//   .p-select, .p-dropdown {
+//   .p-select, .p-select {
 //     padding: 0; // Let internal padding handle it
 //     display: flex;
 //     align-items: center;
     
-//     .p-dropdown-label, .p-select-label {
+//     .p-select-label, .p-select-label {
 //         padding: var(--spacing-md);
 //     }
 //   }

@@ -331,13 +331,13 @@
       </div>
 
       <div class="flex items-center gap-3">
-        <p-calendar [(ngModel)]="filters().startDate" placeholder="Start Date" dateFormat="yy-mm-dd" [showIcon]="true"
-          styleClass="w-40"></p-calendar>
+        <p-datepicker [(ngModel)]="filters().startDate" placeholder="Start Date" dateFormat="yy-mm-dd" [showIcon]="true"
+          styleClass="w-40"></p-datepicker>
 
         <span class="text-gray-400">to</span>
 
-        <p-calendar [(ngModel)]="filters().endDate" placeholder="End Date" dateFormat="yy-mm-dd" [showIcon]="true"
-          styleClass="w-40"></p-calendar>
+        <p-datepicker [(ngModel)]="filters().endDate" placeholder="End Date" dateFormat="yy-mm-dd" [showIcon]="true"
+          styleClass="w-40"></p-datepicker>
 
         <p-button label="Apply" icon="pi pi-filter" (onClick)="applyFilters()" severity="secondary"></p-button>
 
@@ -620,7 +620,7 @@
                 </td>
                 <td class="px-4 py-3 font-medium text-yellow-600">{{ record.avgDelay }}</td>
                 <td class="px-4 py-3">
-                  <p-button label="Send Alert" icon="pi pi-bell" size="small" severity="warning"
+                  <p-button label="Send Alert" icon="pi pi-bell" size="small" severity="warn"
                     [text]="true"></p-button>
                 </td>
               </tr>

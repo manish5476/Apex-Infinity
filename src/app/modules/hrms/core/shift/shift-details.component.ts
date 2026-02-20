@@ -433,11 +433,11 @@ export class ShiftDetailsComponent implements OnInit {
 
   editShift() {
     if (this.shiftId) {
-      this.router.navigate(['/hrms/shift/edit', this.shiftId]);
+      this.router.navigate(['/hrms/shifts/edit', this.shiftId]);
     }
   }
 
   goBack() {
-    this.router.navigate(['/hrms/shift/list']);
+    this.router.navigate(['/hrms/shifts/list']);
   }
 }

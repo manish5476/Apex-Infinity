@@ -213,7 +213,7 @@ type FilterType = 'all' | 'favorites' | 'shared' | 'shared-by-me' | 'recent' | '
 
             <!-- 2. Calendar View -->
             @else if (activeFilter() === 'calendar') {
-              <app-calendar-view></app-calendar-view>
+              <app-datepicker-view></app-datepicker-view>
             }
             
             <!-- 3. Standard Grid/List View -->
@@ -1066,7 +1066,7 @@ export class NoteListComponent {
 
 //             <!-- 2. Calendar View -->
 //             @else if (activeFilter() === 'calendar') {
-//               <app-calendar-view></app-calendar-view>
+//               <app-datepicker-view></app-datepicker-view>
 //             }
             
 //             <!-- 3. Standard Grid/List View -->

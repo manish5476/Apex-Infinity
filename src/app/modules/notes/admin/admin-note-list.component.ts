@@ -243,7 +243,7 @@ import { DatePicker } from 'primeng/datepicker';
     .w-full { width: 100%; }
     
     /* PrimeNG Overrides for consistency */
-    ::ng-deep .p-calendar { width: 100%; }
+    ::ng-deep .p-datepicker { width: 100%; }
     ::ng-deep .p-inputtext { font-size: 0.9rem; padding: 0.6rem 0.75rem; }
     ::ng-deep .p-select { font-size: 0.9rem; }
   `]

@@ -496,6 +496,7 @@ export class HRMSService extends BaseApiService {
     return this.get<{ status: string; data: any }>(`/v1/hrms/designations/career-path/${id}`);
   }
 
+  // ---------------- pending
   /**
    * Get designation employees
    */
@@ -523,6 +524,7 @@ export class HRMSService extends BaseApiService {
   deleteDesignation(id: string): Observable<{ status: string; data: null }> {
     return this.delete<{ status: string; data: null }>(`/v1/hrms/designations/${id}`);
   }
+  // ---------------- pending
 
   /**
    * Bulk create designations
@@ -554,8 +556,8 @@ export class HRMSService extends BaseApiService {
    * Get shift timeline
    */
   getShiftTimeline(date?: any): Observable<{ status: string; data: { timeline: any[] } }> {
-    const params = date ? { date: date.toISOString().split('T')[0] } : {};
-    return this.get<{ status: string; data: { timeline: any[] } }>('/v1/hrms/shifts/timeline', params);
+    // const params = date ;
+    return this.get<{ status: string; data: { timeline: any[] } }>('/v1/hrms/shifts/timeline', date);
   }
 
   /**
@@ -565,6 +567,7 @@ export class HRMSService extends BaseApiService {
     return this.post<{ status: string; data: any }>('/v1/hrms/shifts/calculate-hours', data);
   }
 
+  // -------------- pending
   /**
    * Validate shift assignment
    */

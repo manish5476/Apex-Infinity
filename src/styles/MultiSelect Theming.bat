@@ -298,8 +298,8 @@ p-paginator-last-icon	Class name of the last icon element
 p-paginator-pages	Class name of the pages element
 p-paginator-page	Class name of the page element
 p-paginator-current	Class name of the current element
-p-paginator-rpp-dropdown	Class name of the row per page dropdown element
-p-paginator-jtp-dropdown	Class name of the jump to page dropdown element
+p-paginator-rpp-select	Class name of the row per page dropdown element
+p-paginator-jtp-select	Class name of the jump to page dropdown element
 p-paginator-jtp-input	Class name of the jump to page input element
 
 Table Theming

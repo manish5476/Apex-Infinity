@@ -293,6 +293,6 @@ export class ShiftCoverageComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/hrms/shift/list']);
+    this.router.navigate(['/hrms/shifts/list']);
   }
 }

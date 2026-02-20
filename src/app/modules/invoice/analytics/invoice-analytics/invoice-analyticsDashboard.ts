@@ -5,7 +5,7 @@ import { finalize } from 'rxjs';
 
 // PrimeNG Imports
 import { SelectModule } from 'primeng/select'; // v18+ <p-select appendTo="body">
-// If using older PrimeNG, use DropdownModule and <p-dropdown>
+// If using older PrimeNG, use DropdownModule and <p-select>
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 

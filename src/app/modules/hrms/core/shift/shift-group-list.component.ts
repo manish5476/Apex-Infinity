@@ -8,8 +8,9 @@ import { AppMessageService } from '../../../../core/services/message.service';
 import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
 import { HRMSService } from '../../hrms.service';
 
+
 @Component({
-  selector: 'app-shift-list',
+  selector: 'app-shift-group-list',
   standalone: true,
   imports: [
     CommonModule,
@@ -19,28 +20,27 @@ import { HRMSService } from '../../hrms.service';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="list-page-container">
+    <div class="list-page-container fade-in">
       <div class="themed-card list-content-area">
 
         <div class="se-filter-bar">
           
           <div class="se-filter-field">
             <label for="search">Search</label>
-            <input id="search" type="text" [(ngModel)]="shiftFilter.search" 
+            <input id="search" type="text" [(ngModel)]="filter.search" 
               (keydown.enter)="applyFilters()" (blur)="applyFilters()" 
-              placeholder="Shift Name or Code..." class="se-input w-full" />
+              placeholder="Name or Code..." class="se-input w-full" />
           </div>
 
           <div class="se-filter-field">
-            <label for="shiftType">Shift Type</label>
+            <label for="rotationType">Rotation Rule</label>
             <div class="select-wrapper w-full">
-              <select id="shiftType" [(ngModel)]="shiftFilter.shiftType" (change)="applyFilters()" class="se-input w-full">
-                <option [ngValue]="null">All Types</option>
-                <option value="fixed">Fixed</option>
-                <option value="rotating">Rotating</option>
-                <option value="flexi">Flexible</option>
-                <option value="split">Split</option>
-                <option value="night">Night</option>
+              <select id="rotationType" [(ngModel)]="filter.rotationType" (change)="applyFilters()" class="se-input w-full">
+                <option [ngValue]="null">All Rotations</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="custom">Custom</option>
               </select>
             </div>
           </div>
@@ -48,7 +48,7 @@ import { HRMSService } from '../../hrms.service';
           <div class="se-filter-field">
             <label for="status">Status</label>
             <div class="select-wrapper w-full">
-              <select id="status" [(ngModel)]="shiftFilter.isActive" (change)="applyFilters()" class="se-input w-full">
+              <select id="status" [(ngModel)]="filter.isActive" (change)="applyFilters()" class="se-input w-full">
                 <option [ngValue]="null">All Statuses</option>
                 <option [ngValue]="true">Active</option>
                 <option [ngValue]="false">Inactive</option>
@@ -66,7 +66,7 @@ import { HRMSService } from '../../hrms.service';
           <div class="se-filter-right">
             <button class="btn btn-primary" (click)="createNew()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              Add Shift
+              Create Shift Group
             </button>
           </div>
         </div>
@@ -146,18 +146,8 @@ import { HRMSService } from '../../hrms.service';
       letter-spacing: 0.05em;
     }
 
-    .se-filter-actions {
-      display: flex;
-      align-items: flex-end;
-      margin-bottom: 2px;
-    }
-
-    .se-filter-right {
-      margin-left: auto;
-      display: flex;
-      align-items: flex-end;
-      margin-bottom: 2px;
-    }
+    .se-filter-actions { display: flex; align-items: flex-end; margin-bottom: 2px; }
+    .se-filter-right { margin-left: auto; display: flex; align-items: flex-end; margin-bottom: 2px; }
 
     /* Inputs & Selects */
     .w-full { width: 100%; }
@@ -177,42 +167,22 @@ import { HRMSService } from '../../hrms.service';
       height: 38px;
     }
 
-    .se-input:focus {
-      border-color: var(--color-primary);
-      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-    }
+    .se-input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1); }
 
     .select-wrapper { position: relative; }
     select.se-input { appearance: none; padding-right: 2.5rem; cursor: pointer; }
-    
     .select-wrapper::after {
-      content: "";
-      position: absolute;
-      right: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 10px;
-      height: 6px;
+      content: ""; position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
+      width: 10px; height: 6px;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2364748b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      pointer-events: none;
+      background-repeat: no-repeat; pointer-events: none;
     }
 
     /* Buttons */
     .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 var(--spacing-xl);
-      height: 38px;
-      font-size: var(--font-size-sm);
-      font-weight: var(--font-weight-medium);
-      font-family: var(--font-body);
-      border-radius: var(--ui-border-radius);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border: 1px solid transparent;
-      outline: none;
+      display: inline-flex; align-items: center; justify-content: center; padding: 0 var(--spacing-xl); height: 38px;
+      font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); font-family: var(--font-body);
+      border-radius: var(--ui-border-radius); cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; outline: none;
     }
 
     .btn-outline { background: var(--bg-primary); border-color: var(--border-secondary); color: var(--text-primary); }
@@ -222,6 +192,9 @@ import { HRMSService } from '../../hrms.service';
 
     .list-grid-wrapper { flex: 1; height: 100%; min-height: 0; }
 
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .fade-in { animation: fadeIn 0.3s ease-out; }
+
     @media (max-width: 768px) {
       .se-filter-bar { flex-direction: column; align-items: stretch; }
       .se-filter-right { margin-left: 0; width: 100%; }
@@ -229,7 +202,7 @@ import { HRMSService } from '../../hrms.service';
     }
   `]
 })
-export class ShiftListComponent implements OnInit {
+export class ShiftGroupListComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
@@ -244,9 +217,9 @@ export class ShiftListComponent implements OnInit {
   data: any[] = [];
   column: any[] = [];
   
-  shiftFilter = {
+  filter = {
     search: '',
-    shiftType: null,
+    rotationType: null,
     isActive: null
   };
 
@@ -260,12 +233,12 @@ export class ShiftListComponent implements OnInit {
   }
 
   resetFilters() {
-    this.shiftFilter = { search: '', shiftType: null, isActive: null };
+    this.filter = { search: '', rotationType: null, isActive: null };
     this.getData(true);
   }
 
   createNew() {
-    this.router.navigate(['/hrms/shifts/new']);
+    this.router.navigate(['/shift-groups/create']);
   }
 
   getData(isReset: boolean = false) {
@@ -279,17 +252,16 @@ export class ShiftListComponent implements OnInit {
     }
 
     const params = {
-      ...this.shiftFilter,
+      ...this.filter,
       page: this.currentPage,
       limit: this.pageSize
     };
 
-    // Using the generic get if getShifts isn't strictly defined in the service
-    // Replace with `this.hrmsService.getShifts(params)` if you have that method.
-    this.hrmsService.getShifts().subscribe({
+    // Assumes getShiftGroups is updated to accept params if paginated
+    // Otherwise fallback to generic standard get: this.hrmsService.get('/v1/hrms/shift-groups', params)
+    this.hrmsService.getShiftGroups().subscribe({
       next: (res: any) => {
-        // Handle nested response structures gracefully
-        const newData = res.data?.shifts || res.data?.data || res.data || [];
+        const newData = res.data?.shiftGroups || res.data?.data || [];
         const pagination = res.pagination; 
 
         if (pagination) {
@@ -307,7 +279,7 @@ export class ShiftListComponent implements OnInit {
       },
       error: (err: any) => {
         this.isLoading = false;
-        this.messageService.showError('Error', 'Failed to fetch shifts.');
+        this.messageService.showError('Error', 'Failed to fetch shift groups.');
       }
     });
   }
@@ -323,20 +295,21 @@ export class ShiftListComponent implements OnInit {
   }
 
   eventFromGrid(event: any) {
-    const shiftId = event?.row?._id;
+    const groupId = event?.row?._id || event?.row?.id;
     switch (event.type) {
       case 'cellClicked':
-        this.router.navigate(['/hrms/shifts/details', shiftId]);
+        // Optional: Route to details page if you have one
+        // this.router.navigate(['/shift-groups/details', groupId]);
         break;
       case 'editStart':
-        this.router.navigate(['/hrms/shifts/edit', shiftId]);
+        this.router.navigate(['/shift-groups/edit', groupId]);
         break;
       case 'delete':
-        const shiftName = event.row.name;
+        const groupName = event.row.name;
         if (window.confirm(
-          `Are you sure you want to delete the shift "${shiftName}"?`
+          `Are you sure you want to delete the shift group "${groupName}"? This action cannot be undone.`
         )) {
-          this.deleteShift(shiftId);
+          this.deleteGroup(groupId);
         }
         break;
       case 'reachedBottom':
@@ -345,56 +318,45 @@ export class ShiftListComponent implements OnInit {
     }
   }
 
-  private deleteShift(id: string) {
-    this.hrmsService.deleteShift(id).subscribe({
+  private deleteGroup(id: string) {
+    this.hrmsService.deleteShiftGroup(id).subscribe({
       next: () => {
-        this.messageService.showSuccess('Deleted', 'Shift removed successfully');
+        this.messageService.showSuccess('Deleted', 'Shift group removed successfully');
         this.getData(true);
       },
       error: (err: any) => {
-        this.messageService.showError('Error', err.error?.message || 'Failed to delete shift');
+        this.messageService.showError('Error', err.error?.message || 'Failed to delete shift group');
       }
     });
   }
 
   setupColumns(): void {
     this.column = [
-      // 1. SHIFT NAME
+      // 1. GROUP DETAILS
       {
         field: 'name',
-        headerName: 'Shift Name',
+        headerName: 'Group Details',
         width: 250,
         pinned: 'left',
         sortable: true,
         filter: true,
-        cellStyle: {
-          'display': 'flex',
-          'align-items': 'center',
-          'font-weight': '600',
-          'color': 'var(--text-primary)',
-          'font-size': '13px'
-        }
-      },
-
-      // 2. CODE (Badge Style)
-      {
-        headerName: 'Code',
-        field: 'code',
-        width: 120,
-        filter: true,
         cellRenderer: (params: any) => {
-          const code = params.value || '-';
+          const name = params.value || '';
+          const code = params.data?.code || '-';
           return `
-            <div style="display:flex; align-items:center; height:100%;">
+            <div style="display:flex; flex-direction:column; justify-content:center; height:100%; gap:4px; padding: 4px 0;">
+              <span style="font-weight:700; color:var(--text-primary); font-size:13px; line-height:1;">${name}</span>
               <span style="
                 background-color: var(--bg-secondary); 
                 color: var(--text-secondary); 
-                padding: 2px 8px; 
+                padding: 2px 6px; 
                 border-radius: 4px; 
                 font-family: var(--font-mono, monospace);
-                font-size: 11px; 
+                font-size: 10px; 
                 border: 1px solid var(--border-secondary);
                 letter-spacing: 0.5px;
+                width: max-content;
+                line-height:1;
               ">
                 ${code}
               </span>
@@ -402,53 +364,79 @@ export class ShiftListComponent implements OnInit {
         }
       },
 
-      // 3. TIMING (Start - End)
+      // 2. ROTATION RULE
       {
-        headerName: 'Timing',
-        width: 180,
-        valueGetter: (params: any) => {
-          if (!params.data) return '';
-          return `${params.data.startTime} - ${params.data.endTime}`;
-        },
+        headerName: 'Rotation Rule',
+        field: 'rotationType',
+        width: 160,
+        sortable: true,
         cellRenderer: (params: any) => {
-          const data = params.data;
-          if (!data) return '';
-          const nightIcon = data.isNightShift 
-            ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" style="margin-right: 6px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>` 
-            : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" style="margin-right: 6px;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
+          const type = (params.value || 'weekly').toLowerCase();
+          
+          let bg = '#f3f4f6', color = '#6b7280', iconPath = '<circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>'; // custom default
+          
+          if (type === 'daily') { bg = '#fef2f2'; color = '#ef4444'; iconPath = '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><line x1="9" y1="16" x2="15" y2="16"></line>'; }
+          else if (type === 'weekly') { bg = '#eff6ff'; color = '#3b82f6'; iconPath = '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>'; }
+          else if (type === 'monthly') { bg = '#fdf4ff'; color = '#d946ef'; iconPath = '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><line x1="12" y1="14" x2="12" y2="18"></line><line x1="10" y1="16" x2="14" y2="16"></line>'; }
 
           return `
-            <div style="display:flex; align-items:center; height:100%; font-family: var(--font-mono, monospace); font-size:12px;">
-              ${nightIcon}
-              <span style="font-weight:600; color:var(--text-primary);">${data.startTime}</span>
-              <span style="color:var(--text-tertiary); margin: 0 4px;">to</span>
-              <span style="font-weight:600; color:var(--text-primary);">${data.endTime}</span>
+            <div style="display:flex; align-items:center; gap:8px; height:100%;">
+              <div style="width:28px; height:28px; border-radius:6px; background-color:${bg}; color:${color}; display:flex; align-items:center; justify-content:center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${iconPath}</svg>
+              </div>
+              <span style="font-weight:500; color:var(--text-secondary); text-transform:capitalize; font-size:12px;">${type}</span>
             </div>`;
         }
       },
 
-      // 4. SHIFT TYPE
+      // 3. INCLUDED SHIFTS (Visual Dots)
       {
-        headerName: 'Type',
-        field: 'shiftType',
-        width: 120,
-        sortable: true,
+        headerName: 'Included Shifts',
+        width: 150,
+        sortable: false,
         cellRenderer: (params: any) => {
-          const type = params.value || 'fixed';
+          const shifts = params.data?.shifts || [];
+          if (shifts.length === 0) {
+            return `<div style="display:flex; align-items:center; height:100%;"><span style="color:var(--text-tertiary); font-size:12px;">No shifts</span></div>`;
+          }
+
+          const visibleShifts = shifts.slice(0, 3);
+          const extra = shifts.length > 3 ? shifts.length - 3 : 0;
+
+          let dotsHtml = visibleShifts.map((s: any) => {
+            const color = s.color || 'var(--color-primary)';
+            return `<div style="width:12px; height:12px; border-radius:50%; background-color:${color}; box-shadow:0 0 0 1px var(--bg-primary); margin-left:-4px; border:1px solid rgba(0,0,0,0.1);" title="Shift Sequence"></div>`;
+          }).join('');
+
+          let extraHtml = extra > 0 ? `<span style="font-size:11px; color:var(--text-tertiary); margin-left:6px;">+${extra} more</span>` : '';
+
           return `
             <div style="display:flex; align-items:center; height:100%;">
-              <span style="
-                background-color: transparent; 
-                color: var(--text-primary); 
-                padding: 2px 8px; 
-                border-radius: 999px; 
-                font-size: 11px; 
-                font-weight: 600;
-                border: 1px solid var(--border-primary);
-                text-transform: capitalize;
-              ">
-                ${type}
-              </span>
+              <div style="display:flex; padding-left:4px;">${dotsHtml}</div>
+              ${extraHtml}
+            </div>`;
+        }
+      },
+
+      // 4. APPLICABILITY
+      {
+        headerName: 'Applicability',
+        width: 160,
+        sortable: false,
+        cellRenderer: (params: any) => {
+          const depts = params.data?.applicableDepartments?.length || 0;
+          const desigs = params.data?.applicableDesignations?.length || 0;
+          
+          return `
+            <div style="display:flex; flex-direction:column; justify-content:center; height:100%; gap:2px; padding: 4px 0;">
+              <div style="display:flex; align-items:center; gap:6px; color:var(--text-secondary); font-size:12px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><path d="M9 22v-4h6v4"></path><path d="M8 6h.01"></path><path d="M16 6h.01"></path><path d="M12 6h.01"></path><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path></svg>
+                <span>${depts} Depts</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:6px; color:var(--text-secondary); font-size:12px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                <span>${desigs} Desigs</span>
+              </div>
             </div>`;
         }
       },
@@ -461,7 +449,6 @@ export class ShiftListComponent implements OnInit {
         sortable: true,
         cellRenderer: (params: any) => {
           const isActive = params.value;
-          
           const bg = isActive ? '#ecfdf5' : '#fef2f2';
           const color = isActive ? '#15803d' : '#b91c1c';
           const border = isActive ? '#bbf7d0' : '#fecaca';
@@ -472,7 +459,7 @@ export class ShiftListComponent implements OnInit {
                 background-color: ${bg}; 
                 color: ${color}; 
                 border: 1px solid ${border}; 
-                padding: 1px 8px; 
+                padding: 2px 8px; 
                 border-radius: 4px; 
                 font-size: 10px; 
                 font-weight: 700; 
