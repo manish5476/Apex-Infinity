@@ -165,6 +165,28 @@ export const SIDEBAR_MENU: MenuItem[] = [
       ]
       },
       {
+      label: 'Designation',
+      icon: 'pi pi-sitemap',
+      items: [
+        {
+          label: 'Designation Hub',
+          icon: 'pi pi-home',
+          routerLink: ['/hrms/designation/hub']
+        },
+        {
+          label: 'Designation List',
+          icon: 'pi pi-list',
+          routerLink: ['/hrms/designation/list']
+        },
+        {
+          label: 'Add Designation',
+          icon: 'pi pi-plus',
+          routerLink: ['/hrms/designation/new']
+        }
+      ]
+    }
+  ]},
+      {
         label: 'Staff Management',
         icon: 'pi pi-user',
         items: [
