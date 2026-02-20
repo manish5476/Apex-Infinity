@@ -147,8 +147,7 @@ export class RoleManagementComponent implements OnInit {
 
   loadRoles(): void {
     this.isLoading.set(true);
-    this.apiService.getRoles().subscribe({
-      next: (res) => {
+    this.apiService.getRoles().subscribe({next: (res:any) => {
         this.roles.set(res.data.roles || []);
         this.isLoading.set(false);
         this.cdr.markForCheck();

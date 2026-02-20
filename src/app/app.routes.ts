@@ -162,6 +162,10 @@ export const routes: Routes = [
         loadChildren: () => import('./modules/branch/branch.routes').then((m) => m.BRANCH_ROUTES),
       },
       {
+        path: 'hrms',
+        loadChildren: () => import('./modules/hrms/hrms.routes').then((m) => m.HRMS_ROUTES),
+      },
+      {
         path: 'admin/organization',
         loadComponent: () => import('./modules/organization/components/org-settings/org-settings').then((m) => m.OrgSettingsComponent),
         title: 'Organization Settings'

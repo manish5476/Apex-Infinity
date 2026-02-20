@@ -26,7 +26,7 @@ export class UserProfileComponent {
   constructor() {
     toSignal(
       this.userService.getMe().pipe(
-        map(response => response.data.data as User),
+        map((response:any) => response.data.data as User),
         catchError(err => {
           console.error('Failed to load profile', err);
           return of(null);
@@ -34,7 +34,7 @@ export class UserProfileComponent {
       )
     );
     this.userService.getMe().pipe(
-      map(response => response.data.data as User),
+      map((response:any) => response.data.data as User),
       catchError(err => of(null))
     ).subscribe(user => {
       if (user) {
@@ -65,7 +65,7 @@ export class UserProfileComponent {
     formData.append('photo', file);
 
     this.userService.uploadProfilePhoto(formData).pipe(
-      map(response => response.data.user as User),
+      map((response:any) => response.data.user as User),
       catchError(err => {
         this.uploading.set(false);
         const errorMessage = err.error?.message || 'Upload failed due to a server error.';
