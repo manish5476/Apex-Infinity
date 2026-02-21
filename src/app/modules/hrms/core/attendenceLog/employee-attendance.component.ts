@@ -15,13 +15,14 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { HRMSService } from '../../hrms.service';
+import { Tooltip } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-employee-attendance',
   standalone: true,
   imports: [
     CommonModule, CardModule, ButtonModule, TimelineModule, 
-    SkeletonModule, TagModule, ToastModule
+    SkeletonModule, TagModule, ToastModule,Tooltip,
   ],
   providers: [MessageService],
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -324,7 +324,7 @@ export class UserAttendanceDetailsComponent implements OnInit {
 
   // --- UI Helpers ---
   onBack() {
-    this.router.navigate(['/attendance/admin']); // Adjust route as necessary
+    this.router.navigate(['hrms/attendance/admin']); // Adjust route as necessary
   }
 
   formatType(type: string): string {
