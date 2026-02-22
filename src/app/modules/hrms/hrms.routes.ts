@@ -168,7 +168,6 @@ export const HRMS_ROUTES: Routes = [
     ]
   },
   {
-    // 👇 FIXED: This is now 'attendance/machines' to match your URLs
     path: 'attendance/machines',
     children: [
       { path: '', redirectTo: 'hub', pathMatch: 'full' },
