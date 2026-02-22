@@ -21,7 +21,6 @@ import { CardModule } from 'primeng/card';
 // Mock Services (Replace with your actual imports)
 import { MasterListService } from '../../../core/services/master-list.service';
 import { UserManagementService } from '../user-management.service';
-import { ShiftService } from '../../attendance/services/shift.service';
 import { AppMessageService } from '../../../core/services/message.service';
 import { LoadingService } from '../../../core/services/loading.service';
 
@@ -541,7 +540,6 @@ import { LoadingService } from '../../../core/services/loading.service';
 export class UserFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private userService = inject(UserManagementService);
-  private shiftService = inject(ShiftService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private messageService = inject(AppMessageService);
@@ -666,10 +664,10 @@ export class UserFormComponent implements OnInit {
 
   private loadShifts() {
     // Replace with actual service call
-    this.shiftService.getAllShifts().subscribe({
-      next: (res: any) => this.shifts.set(res.data || []),
-      error: () => console.warn('Failed to load shifts, using fallback')
-    });
+    // this.shiftService.getAllShifts().subscribe({
+    //   next: (res: any) => this.shifts.set(res.data || []),
+    //   error: () => console.warn('Failed to load shifts, using fallback')
+    // });
   }
 
   private setupCreateMode() {

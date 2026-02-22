@@ -1,16 +1,24 @@
 import { Routes } from '@angular/router';
-import { AttendanceReportsComponent } from '../attendance/attendance-reports.component/attendance-reports.component';
+
+// --- Daily Attendance ---
 import { AdminDailyAttendanceComponent } from './core/attendence/admin-daily-attendance.component';
 import { MyDailyAttendanceComponent } from './core/attendence/my-daily-attendance.component';
+import { AttendanceReportsComponent } from './core/attendence/attendance-reports.component';
+
+// --- Raw Attendance (Logs) ---
 import { AdminAttendanceComponent } from './core/attendenceLog/admin-attendance.component';
 import { EmployeeAttendanceComponent } from './core/attendenceLog/employee-attendance.component';
 import { LiveAttendanceFeedComponent } from './core/attendenceLog/live-attendance-feed.component';
 import { UserAttendanceDetailsComponent } from './core/attendenceLog/user-attendance-details.component';
+
+// --- Departments ---
 import { DepartmentDetailsComponent } from './core/department/department-details/department-details';
 import { DepartmentFormComponent } from './core/department/department-form/department-form';
 import { DepartmentHeirachy } from './core/department/department-heirachy/department-heirachy';
 import { DepartmentListComponent } from './core/department/department-list/department-list';
 import { DepartmentHubComponent } from './core/department/departmentHub/department-hub';
+
+// --- Designations ---
 import { DesignationCareerPathComponent } from './core/designation/designation-career-path.component';
 import { DesignationDetailsComponent } from './core/designation/designation-details.component';
 import { DesignationFormComponent } from './core/designation/designation-form.component';
@@ -18,22 +26,34 @@ import { DesignationHierarchyComponent } from './core/designation/designation-hi
 import { DesignationListComponent } from './core/designation/designation-list.component';
 import { DesignationPromotionComponent } from './core/designation/designation-promotion.component';
 import { DesignationSalaryBandsComponent } from './core/designation/designation-salary-bands.component';
+
+// --- Geofencing ---
 import { GeofenceDetailsComponent } from './core/geoFencing/geofence-details.component';
 import { GeofenceFormComponent } from './core/geoFencing/geofence-form.component';
 import { GeofenceHubComponent } from './core/geoFencing/geofence-hub.component';
+
+// --- Holidays ---
 import { HolidayFormComponent } from './core/holiday/holiday-form.component';
 import { HolidayHubComponent } from './core/holiday/holiday-hub.component';
+
+// --- Leave Management ---
 import { LeaveAdminHubComponent } from './core/leave/leave-admin-hub.component';
 import { LeaveDetailsComponent } from './core/leave/leave-details.component';
 import { LeaveFormComponent } from './core/leave/leave-form.component';
 import { LeaveHubComponent } from './core/leave/leave-hub.component';
+
+// --- Leave Balances ---
 import { LeaveBalanceAdminComponent } from './core/leaveBalance/leave-balance-admin.component';
 import { LeaveBalanceDetailComponent } from './core/leaveBalance/leave-balance-detail.component';
+
+// --- Attendance Machines ---
 import { MachineAnalyticsComponent } from './core/machine/machine-analytics.component';
 import { MachineDetailsComponent } from './core/machine/machine-details.component';
 import { MachineFormComponent } from './core/machine/machine-form.component';
 import { MachineHubComponent } from './core/machine/machine-hub.component';
 import { MachineLogsComponent } from './core/machine/machine-logs.component';
+
+// --- Shifts & Groups ---
 import { ShiftAssignmentsComponent } from './core/shift/shift-assignments.component';
 import { ShiftCalculatorComponent } from './core/shift/shift-calculator.component';
 import { ShiftClonerComponent } from './core/shift/shift-cloner.component';
@@ -45,6 +65,7 @@ import { ShiftGroupFormComponent } from './core/shift/shift-group-form.component
 import { ShiftGroupListComponent } from './core/shift/shift-group-list.component';
 import { ShiftListComponent } from './core/shift/shift-list.component';
 import { ShiftValidatorComponent } from './core/shift/shift-validator.component';
+
 
 export const HRMS_ROUTES: Routes = [
   {
@@ -147,14 +168,15 @@ export const HRMS_ROUTES: Routes = [
     ]
   },
   {
-    path: 'machines',
+    // 👇 FIXED: This is now 'attendance/machines' to match your URLs
+    path: 'attendance/machines',
     children: [
       { path: '', redirectTo: 'hub', pathMatch: 'full' },
       { path: 'hub', component: MachineHubComponent },
       { path: 'new', component: MachineFormComponent },
       { path: 'edit/:id', component: MachineFormComponent },
       { path: 'details/:id', component: MachineDetailsComponent },
-      { path: 'logs', component: MachineLogsComponent },       // FIXED: Lowercase 'logs'
+      { path: 'logs', component: MachineLogsComponent },
       { path: 'analytics', component: MachineAnalyticsComponent },
     ]
   },
