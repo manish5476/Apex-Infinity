@@ -95,7 +95,13 @@ export interface Permission {
 
     <!-- IMPROVED ROLE DIALOG -->
     <p-dialog appendTo="body" [visible]="showRoleDialog()" (visibleChange)="showRoleDialog.set($event)" [modal]="true"
-      [style]="{width: '75vw', 'min-width': '700px', 'max-height': '95vh'}"
+[contentStyle]="{
+        'display': 'flex', 
+        'flex-direction': 'column', 
+        'height': '100%', 
+        'width':'89%',
+        'overflow': 'hidden' 
+    }"
       [header]="isEditMode() ? 'Edit Role Configuration' : 'Create New Role'" (onHide)="hideDialog()" [draggable]="false"
       [resizable]="false" styleClass="role-dialog" [contentStyle]="{'overflow': 'hidden', 'display': 'flex', 'flex-direction': 'column'}">
 
