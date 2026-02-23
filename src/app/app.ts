@@ -9,11 +9,11 @@ import { AuthService } from './modules/auth/services/auth-service';
 import { SocketService } from './core/services/socket.service';
 import { NotificationService } from './core/services/notification.service';
 import { AppMessageService } from './core/services/message.service';
-// import { AiAssistantComponent } from "./AIAgent/components/ai-assistant/ai-assistant";
+import { AiAssistantComponent } from "./AIAgent/components/ai-assistant/ai-assistant";
 
 @Component({
   selector: 'app-root',
-  imports: [ToastModule, RouterOutlet, LoadingComponent, AnnouncementListenerComponent],
+  imports: [ToastModule, RouterOutlet, LoadingComponent,AiAssistantComponent, AnnouncementListenerComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
