@@ -48,6 +48,7 @@ export class Signup implements OnInit {
     this.signupForm = this.fb.group({
       name: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
+      phone: ['', [Validators.required]],
       // ✅ FIX: Changed regex to /^[a-zA-Z0-9-]+$/ to allow lowercase while typing
       // The CSS handles the visual uppercase, and we handle the data uppercase in onSubmit
       uniqueShopId: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9-]+$/)]],
