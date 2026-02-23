@@ -636,6 +636,24 @@ export class AuthService {
       localStorage.removeItem(key);
     }
   }
+
+
+
+  /**
+   * The "Perfect" check logic: 
+   * Handles Wildcards (*), SuperAdmin status, and Category wildcards (invoice:*)
+   */
+  can(permission: string): boolean {
+    if (this.isSuperAdmin()) return true;
+    
+    const perms = this.userPermissions();
+    if (perms.includes('*')) return true;
+    if (perms.includes(permission)) return true;
+
+    // Support for category-level access (e.g., 'invoice:*')
+    const [category] = permission.split(':');
+    return perms.includes(`${category}:*`);
+  }
 }
 
 // import { Injectable, Inject, PLATFORM_ID, inject, Injector } from '@angular/core';
