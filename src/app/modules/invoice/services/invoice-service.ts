@@ -43,11 +43,13 @@ export class InvoiceService extends BaseApiService {
   // STOCK MANAGEMENT ENDPOINTS
   // ==============================================
 
-  /** Check stock availability before creating invoice */
-  checkStock(items: any[]): Observable<any> {
-    return this.post(`${this.endpoint}/check-stock`, { items }, 'checkStock');
+  // /** Check stock availability before creating invoice */
+  // checkStock(items: any[]): Observable<any> {
+  //   return this.post(`${this.endpoint}/check-stock`, { items }, 'checkStock');
+  // }
+checkStock(payload: { branchId: string, items: any[] }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/check-stock`, payload);
   }
-
   /** Get invoice with current stock information */
   getInvoiceWithStock(id: string): Observable<any> {
     return this.get(`${this.endpoint}/${id}/stock-info`, {}, 'getInvoiceWithStock');
