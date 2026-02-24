@@ -47,6 +47,13 @@
         <div class="icon-box blue"><i class="pi pi-money-bill"></i></div>
         <div class="stat-content">
           <label>Loan Amount</label>
+          <strong>{{ common.formatCurrency(emi.balanceAmount) }}</strong>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-box blue"><i class="pi pi-money-bill"></i></div>
+        <div class="stat-content">
+          <label>Total Amount</label>
           <strong>{{ common.formatCurrency(emi.totalAmount) }}</strong>
         </div>
       </div>
