@@ -235,28 +235,23 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
         unit: product['unit'] || 'pcs',
         isCheckingStock: true // Start loading indicator
       });
-
-      // 2. LIVE API CALL for Stock
+// 2. LIVE API CALL for Stock
       if (branchId) {
-        this.invoiceService.checkStock([{ productId: productId, quantity: 1 }]).subscribe({
+        // Send the proper object payload the backend expects
+        const checkPayload = {
+          branchId: branchId,
+          items: [{ productId: productId, quantity: 1 }]
+        };
+
+        this.invoiceService.checkStock(checkPayload).subscribe({
           next: (res: any) => {
             let availableQty = 0;
 
-            const itemsArr = res.data?.items || res.stock?.items || [];
-          
-            if (Array.isArray(itemsArr) && itemsArr.length > 0) {
-              const item = itemsArr[0];
-              // Support multiple naming conventions from backend
-              availableQty = item.availableStock ?? item.available ?? item.currentStock ?? 0;
-            } 
-            // Strategy 2: Check for direct stock object summary (success response structure you provided)
-            // { "stock": { "totalStock": 34 } }
-            else if (res.stock?.totalStock !== undefined) {
-              availableQty = res.stock.totalStock;
-            }
-            // Fallback: Check if data itself has stock info
-            else if (res.data?.stock?.totalStock !== undefined) {
-              availableQty = res.data.stock.totalStock;
+            // Map the exact structure from our new backend response
+            if (res.stock?.items && res.stock.items.length > 0) {
+              availableQty = res.stock.items[0].available;
+            } else if (res.stock?.summary?.totalStock !== undefined) {
+              availableQty = res.stock.summary.totalStock;
             }
 
             itemGroup.patchValue({
@@ -274,6 +269,44 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
         itemGroup.patchValue({ isCheckingStock: false });
         this.messageService.showWarn('Branch Required', 'Please select a branch to check stock.');
       }
+      // 2. LIVE API CALL for Stock
+      // if (branchId) {
+      //   this.invoiceService.checkStock([{ productId: productId, quantity: 1 }]).subscribe({
+      //     next: (res: any) => {
+      //       let availableQty = 0;
+
+      //       const itemsArr = res.data?.items || res.stock?.items || [];
+          
+      //       if (Array.isArray(itemsArr) && itemsArr.length > 0) {
+      //         const item = itemsArr[0];
+      //         // Support multiple naming conventions from backend
+      //         availableQty = item.availableStock ?? item.available ?? item.currentStock ?? 0;
+      //       } 
+      //       // Strategy 2: Check for direct stock object summary (success response structure you provided)
+      //       // { "stock": { "totalStock": 34 } }
+      //       else if (res.stock?.totalStock !== undefined) {
+      //         availableQty = res.stock.totalStock;
+      //       }
+      //       // Fallback: Check if data itself has stock info
+      //       else if (res.data?.stock?.totalStock !== undefined) {
+      //         availableQty = res.data.stock.totalStock;
+      //       }
+
+      //       itemGroup.patchValue({
+      //         currentStock: availableQty,
+      //         isLowStock: availableQty < 10,
+      //         isCheckingStock: false
+      //       });
+      //     },
+      //     error: (err) => {
+      //       console.error('Stock check failed', err);
+      //       itemGroup.patchValue({ isCheckingStock: false, currentStock: 0 });
+      //     }
+      //   });
+      // } else {
+      //   itemGroup.patchValue({ isCheckingStock: false });
+      //   this.messageService.showWarn('Branch Required', 'Please select a branch to check stock.');
+      // }
     }
   }
 
@@ -330,8 +363,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
       this.balanceAmount.set(Math.round(grand) - paid);
     });
   }
-
-  // === 5. Smart Submit Flow ===
+// === 5. Smart Submit Flow ===
   handleSubmit(status: 'draft' | 'issued'): void {
     if (this.invoiceForm.invalid) {
       this.invoiceForm.markAllAsTouched();
@@ -344,30 +376,86 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 
     if (status === 'issued') {
       this.isSubmitting.set(true);
-      this.invoiceService.checkStock(payload.items).subscribe({
-        next: (validation) => {
-          // Robust check: Support both standard valid boolean or inferred success status
-          const isValid = validation.data?.isValid || validation.status === 'success';
+
+      // Create the exact payload shape the backend expects
+      const checkPayload = {
+        branchId: payload.branchId,
+        items: payload.items
+      };
+
+      this.invoiceService.checkStock(checkPayload).subscribe({
+        next: (validation: any) => {
+          // We MUST check validation.isValid because status is always 'success' now
+          const isValid = validation.isValid;
           
           if (isValid) {
-            if (validation.data?.warnings?.length > 0 || validation.warnings?.length > 0) {
+            if (validation.warnings?.length > 0) {
               this.confirmSubmission(payload, 'Stock warnings detected. Continue?', 'pi pi-exclamation-triangle');
             } else {
               this.saveInvoice(payload);
             }
           } else {
-            // Extract error message from various possible locations
-            const msg = validation.data?.errors?.join('\n') || validation.message || 'Items out of stock';
+            // Build a clean error message from the backend's stock items array
+            let msg = 'Insufficient stock for the following items:\n';
+            if (validation.stock?.items && validation.stock.items.length > 0) {
+              const outOfStockItems = validation.stock.items.filter((i: any) => i.available < i.required);
+              msg += outOfStockItems
+                .map((i: any) => `- ${i.productName || 'Item'}: Need ${i.required}, but only have ${i.available}`)
+                .join('\n');
+            } else {
+              msg = validation.message || 'Items out of stock';
+            }
+
             this.messageService.showError('Stock Unavailable', msg);
             this.isSubmitting.set(false);
           }
         },
-        error: () => this.isSubmitting.set(false)
+        error: () => {
+          this.messageService.showError('Validation Error', 'Failed to communicate with stock service.');
+          this.isSubmitting.set(false);
+        }
       });
     } else {
       this.saveInvoice(payload);
     }
   }
+  // // === 5. Smart Submit Flow ===
+  // handleSubmit(status: 'draft' | 'issued'): void {
+  //   if (this.invoiceForm.invalid) {
+  //     this.invoiceForm.markAllAsTouched();
+  //     this.messageService.showWarn('Validation Error', 'Please complete all required fields.');
+  //     return;
+  //   }
+
+  //   this.invoiceForm.patchValue({ status });
+  //   const payload = this.preparePayload();
+
+  //   if (status === 'issued') {
+  //     this.isSubmitting.set(true);
+  //     this.invoiceService.checkStock(payload.items).subscribe({
+  //       next: (validation) => {
+  //         // Robust check: Support both standard valid boolean or inferred success status
+  //         const isValid = validation.data?.isValid || validation.status === 'success';
+          
+  //         if (isValid) {
+  //           if (validation.data?.warnings?.length > 0 || validation.warnings?.length > 0) {
+  //             this.confirmSubmission(payload, 'Stock warnings detected. Continue?', 'pi pi-exclamation-triangle');
+  //           } else {
+  //             this.saveInvoice(payload);
+  //           }
+  //         } else {
+  //           // Extract error message from various possible locations
+  //           const msg = validation.data?.errors?.join('\n') || validation.message || 'Items out of stock';
+  //           this.messageService.showError('Stock Unavailable', msg);
+  //           this.isSubmitting.set(false);
+  //         }
+  //       },
+  //       error: () => this.isSubmitting.set(false)
+  //     });
+  //   } else {
+  //     this.saveInvoice(payload);
+  //   }
+  // }
 
   private confirmSubmission(payload: any, message: string, icon: string): void {
     this.confirmationService.confirm({
