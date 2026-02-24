@@ -11,12 +11,15 @@ export class IfPermissionDirective {
   private templateRef = inject(TemplateRef);
   private viewContainer = inject(ViewContainerRef);
 
-  @Input() set ifPermission(permission: string | string[]) {
+  @Input() set ifPermission(input: string | string[]) {
     this.viewContainer.clear();
 
-    const hasAccess = Array.isArray(permission) 
-      ? this.auth.hasAnyPermission(permission) 
-      : this.auth.hasPermission(permission);
+    // Directly use the string tags since we don't have the PERMISSIONS config object
+    const check = (tag: string) => this.auth.hasPermission(tag);
+
+    const hasAccess = Array.isArray(input) 
+      ? input.some(check) 
+      : check(input);
 
     if (hasAccess) {
       this.viewContainer.createEmbeddedView(this.templateRef);

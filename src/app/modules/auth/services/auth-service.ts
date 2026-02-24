@@ -153,27 +153,50 @@ export class AuthService {
   // ======================================================
 
   initializeFromStorage(): Promise<void> {
-    return new Promise(resolve => {
-      const token = this.getToken();
-      this.authTokenData = token;
-      const user = this.getItem<User>(this.USER_KEY);
+  return new Promise(resolve => {
+    const token = this.getToken();
+    const user = this.getItem<User>(this.USER_KEY);
 
-      if (token && user) {
-        this.currentUserSubject.next(user);
-        // Verify token is still valid
-        this.verifyToken().subscribe({
-          next: () => resolve(),
-          error: () => {
-            // Token invalid, clear storage
-            this.performClientLogout();
-            resolve();
-          }
-        });
-      } else {
-        resolve();
-      }
-    });
-  }
+    if (token && user) {
+      this.currentUserSubject.next(user);
+      this.verifyToken().subscribe({
+        next: () => {
+          this.refreshPermissions(); // <--- Add this here
+          resolve();
+        },
+        error: () => {
+          this.performClientLogout();
+          resolve();
+        }
+      });
+    } else {
+      resolve();
+    }
+  });
+}
+
+  // initializeFromStorage(): Promise<void> {
+  //   return new Promise(resolve => {
+  //     const token = this.getToken();
+  //     this.authTokenData = token;
+  //     const user = this.getItem<User>(this.USER_KEY);
+
+  //     if (token && user) {
+  //       this.currentUserSubject.next(user);
+  //       // Verify token is still valid
+  //       this.verifyToken().subscribe({
+  //         next: () => resolve(),
+  //         error: () => {
+  //           // Token invalid, clear storage
+  //           this.performClientLogout();
+  //           resolve();
+  //         }
+  //       });
+  //     } else {
+  //       resolve();
+  //     }
+  //   });
+  // }
 
   // ======================================================
   // AUTHENTICATION HANDLERS
@@ -637,7 +660,29 @@ export class AuthService {
     }
   }
 
-
+  /**
+ * Fetch fresh permissions from the server and update local state
+ */
+refreshPermissions(): void {
+  this.apiService.getMyPermissions().subscribe({
+    next: (res) => {
+      const currentUser = this.currentUserValue;
+      if (currentUser && res.data) {
+        // We cast the object to 'User' to satisfy the Type check
+        const updatedUser: User = {
+          ...currentUser,
+          role: {
+            ...currentUser.role,
+            permissions: res.data // New permissions from API
+          }
+        } as User; 
+        
+        this.setItem(this.USER_KEY, updatedUser);
+        this.currentUserSubject.next(updatedUser);
+      }
+    }
+  });
+}
 
   // /**
   //  * The "Perfect" check logic: 
