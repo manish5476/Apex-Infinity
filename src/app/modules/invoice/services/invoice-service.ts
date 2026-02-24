@@ -48,7 +48,7 @@ export class InvoiceService extends BaseApiService {
   //   return this.post(`${this.endpoint}/check-stock`, { items }, 'checkStock');
   // }
 checkStock(payload: { branchId: string, items: any[] }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/check-stock`, payload);
+    return this.http.post(`${this.endpoint}/check-stock`, payload);
   }
   /** Get invoice with current stock information */
   getInvoiceWithStock(id: string): Observable<any> {
