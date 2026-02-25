@@ -194,6 +194,8 @@ export const SIDEBAR_MENU: MenuItem[] = [
     ]
   }
 ];
+
+
 // export interface MenuItem {
 //   label: string;
 //   icon: string;
