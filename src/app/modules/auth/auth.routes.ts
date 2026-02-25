@@ -8,17 +8,10 @@ import { CreateOrganizationComponent } from '../organization/components/create-o
 
 export const AUTH_ROUTES: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
-  // URL: /auth/login
   { path: 'login', component: Login, title: 'Login - Apex CRM' },
-  // URL: /auth/signup (Employee Signup)
-  { path: 'signup', component: Signup, title: 'Join Organization' },
-
-  { path: 'resetpassword', component: ResetPasswordComponent, title: 'Login - Apex CRM' },
-  // URL: /auth/signup (Employee Signup)
-  { path: 'update-password', component: UpdatePasswordComponent, title: 'Join Organization' },
-  
-  { path: 'forgot-password', component: ForgotPasswordComponent, title: 'Join Organization' },
-
-  // URL: /auth/org (New Organization Registration)
+  { path: 'signup', component: Signup, title: 'Signup - Apex CRM' },
+  { path: 'resetpassword/:token', component: ResetPasswordComponent, title: 'Reset Password - Apex CRM' },
+  { path: 'forgot-password', component: ForgotPasswordComponent, title: 'Forgot Password - Apex CRM' },
+  { path: 'update-password', component: UpdatePasswordComponent, title: 'Update Password - Apex CRM' },
   { path: 'org', component: CreateOrganizationComponent, title: 'Register Organization' }
 ];
