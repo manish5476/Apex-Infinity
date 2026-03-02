@@ -574,7 +574,7 @@ export class DepartmentDetailsComponent implements OnInit {
     if (this.deptId) {
       this.loadDepartmentData();
     } else {
-      this.router.navigate(['/departments/list']);
+      this.router.navigate(['/hrms/departments/list']);
     }
   }
 
@@ -612,7 +612,7 @@ export class DepartmentDetailsComponent implements OnInit {
   }
 
   onBack() {
-    this.router.navigate(['/departments/list']);
+    this.router.navigate(['/hrms/departments/list']);
   }
 
   // --- Actions ---
