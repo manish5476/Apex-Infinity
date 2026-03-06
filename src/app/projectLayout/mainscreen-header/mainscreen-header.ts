@@ -250,6 +250,165 @@ textScale: number = 100;
     gradient: "linear-gradient(135deg, #8c6a46 0%, #c99d66 100%)",
     category: "premium dark",
     description: "Classic high-contrast luxury combining sapphire depth with warm gold."
+  }, {
+    name: "Neon Eclipse",
+    id: "theme-neon-eclipse",
+    color: "#ff6600",
+    gradient: "linear-gradient(135deg, #ff6600 0%, #ff8533 100%)",
+    category: "glass dark",
+    description: "Deep space navy infused with vibrant neon orange glassmorphism."
+  },
+  {
+    name: "Naval Amber",
+    id: "theme-naval-amber",
+    color: "#ffbf00",
+    gradient: "linear-gradient(135deg, #ffbf00 0%, #ffcf40 100%)",
+    category: "glass dark",
+    description: "Rich traditional navy blue paired with golden amber accents."
+  },
+  {
+    name: "Abyssal Coral",
+    id: "theme-abyssal-coral",
+    color: "#ff7f50",
+    gradient: "linear-gradient(135deg, #ff7f50 0%, #ff9e7a 100%)",
+    category: "glass dark",
+    description: "Deepest ocean dark blue with bright, vibrant coral orange borders."
+  },
+  {
+    name: "Slate Rust",
+    id: "theme-slate-rust",
+    color: "#d97706",
+    gradient: "linear-gradient(135deg, #d97706 0%, #f59e0b 100%)",
+    category: "glass dark",
+    description: "Muted slate navy complemented by mature, rusty metallic orange."
+  },
+  {
+    name: "Indigo Tangerine",
+    id: "theme-indigo-tangerine",
+    color: "#f97316",
+    gradient: "linear-gradient(135deg, #f97316 0%, #fb923c 100%)",
+    category: "glass dark",
+    description: "A strong indigo foundation with popping tangerine orange glass."
+  },
+  {
+    name: "Solar Space",
+    id: "theme-solar-space",
+    color: "#ff4500",
+    gradient: "linear-gradient(135deg, #ff4500 0%, #ff632b 100%)",
+    category: "neon glass",
+    description: "Pitch black-blue void pierced by solar flare red-orange elements."
+  },
+  {
+    name: "Cobalt Mango",
+    id: "theme-cobalt-mango",
+    color: "#ff8c00",
+    gradient: "linear-gradient(135deg, #ff8c00 0%, #ffa633 100%)",
+    category: "glass dark",
+    description: "Slightly lighter cobalt dark blue with sweet mango orange touches."
+  },
+  {
+    name: "Sapphire Flame",
+    id: "theme-sapphire-flame",
+    color: "#ea580c",
+    gradient: "linear-gradient(135deg, #ea580c 0%, #f97316 100%)",
+    category: "premium dark",
+    description: "Luxurious sapphire blue heavily contrasted with aggressive flame orange."
+  },
+  {
+    name: "Oceanic Peach",
+    id: "theme-oceanic-peach",
+    color: "#ffb085",
+    gradient: "linear-gradient(135deg, #ffb085 0%, #ffc2a3 100%)",
+    category: "glass dark",
+    description: "A dark teal-tinted blue base paired with soft, glowing peach orange."
+  },
+  {
+    name: "Lapis Tiger",
+    id: "theme-lapis-tiger",
+    color: "#fd7e14",
+    gradient: "linear-gradient(135deg, #fd7e14 0%, #ff922b 100%)",
+    category: "neon glass",
+    description: "Lapis Lazuli structural blue featuring fierce tiger-orange glowing borders."
+  },
+  {
+    name: "Midnight Marigold",
+    id: "theme-midnight-marigold",
+    color: "#faa307",
+    gradient: "linear-gradient(135deg, #faa307 0%, #ffba08 100%)",
+    category: "glass dark",
+    description: "Pure midnight aesthetic warmed by bright marigold yellow-orange."
+  },
+  {
+    name: "Twilight Burnt",
+    id: "theme-twilight-burnt",
+    color: "#be4d25",
+    gradient: "linear-gradient(135deg, #be4d25 0%, #d6592f 100%)",
+    category: "premium dark",
+    description: "Elegant twilight dark blue paired with a grounded burnt orange tone."
+  },
+  {
+    name: "Void Electric",
+    id: "theme-void-electric",
+    color: "#ff5500",
+    gradient: "linear-gradient(135deg, #ff5500 0%, #ff7733 100%)",
+    category: "neon glass",
+    description: "Maximum contrast pure dark mode with electric neon orange UI elements."
+  },
+  {
+    name: "Storm Apricot",
+    id: "theme-storm-apricot",
+    color: "#fb923c",
+    gradient: "linear-gradient(135deg, #fb923c 0%, #fdba74 100%)",
+    category: "glass dark",
+    description: "Desaturated stormy dark blue lightened by gentle apricot orange glass."
+  },
+  {
+    name: "Marine Copper",
+    id: "theme-marine-copper",
+    color: "#b87333",
+    gradient: "linear-gradient(135deg, #b87333 0%, #c88951 100%)",
+    category: "premium dark",
+    description: "Professional marine blue base featuring high-end metallic copper borders."
+  },
+  {
+    name: "Royal Pumpkin",
+    id: "theme-royal-pumpkin",
+    color: "#ff7518",
+    gradient: "linear-gradient(135deg, #ff7518 0%, #ff8c3a 100%)",
+    category: "glass dark",
+    description: "Regal dark blue with a rich, autumnal pumpkin orange highlight."
+  },
+  {
+    name: "Eclipse Tangerine",
+    id: "theme-eclipse-tangerine",
+    color: "#ff8800",
+    gradient: "linear-gradient(135deg, #ff8800 0%, #ff9d33 100%)",
+    category: "glass dark",
+    description: "Near-black eclipse background driven by a pure, bright tangerine orange."
+  },
+  {
+    name: "Cyber Navy",
+    id: "theme-cyber-navy",
+    color: "#ff3c00",
+    gradient: "linear-gradient(135deg, #ff3c00 0%, #ff5f2e 100%)",
+    category: "neon glass",
+    description: "Sci-fi inspired dark navy with aggressive laser-orange glass borders."
+  },
+  {
+    name: "Midnight Gold",
+    id: "theme-midnight-gold",
+    color: "#f59e0b",
+    gradient: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
+    category: "premium dark",
+    description: "Deepest indigo luxury theme detailed with gold-leaning orange accents."
+  },
+  {
+    name: "Deep Supernova",
+    id: "theme-deep-supernova",
+    color: "#ff5e00",
+    gradient: "linear-gradient(135deg, #ff5e00 0%, #ff7d2e 100%)",
+    category: "glass dark",
+    description: "Infinite deep space blue disrupted by an intense supernova orange."
   },
   {
     name: "Ocean Mist",
