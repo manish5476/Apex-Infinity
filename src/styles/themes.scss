@@ -201,7 +201,370 @@
   --scroll-thumb: var(--scroll-thumb-c);
   --scroll-track: var(--scroll-track-c);
 }
+/* ==========================================================================
+   LIGHT GLASS THEMES: DARK BLUE TEXT & ORANGE ACCENTS (20 VARIATIONS)
+   ========================================================================== */
 
+/* 1. Daylight Orange */
+.theme-daylight-orange {
+  --font-heading: 'Space Grotesk', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #f8fafc; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #f1f5f9;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(249, 115, 22, 0.3); --theme-border-secondary: rgba(0, 11, 88, 0.1);
+  --theme-accent-primary: #f97316; --theme-accent-secondary: #fb923c; --theme-accent-tertiary: #fdba74;
+  --theme-accent-gradient: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+  --theme-accent-focus: rgba(249, 115, 22, 0.15); --theme-accent-hover: #ea580c;
+  --theme-success: #059669; --theme-warning: #d97706; --theme-error: #dc2626; --theme-info: #0284c7;
+  --theme-disabled: #e2e8f0; --theme-disabled-text: #94a3b8;
+  /* Light Glass */
+  --glass-bg: rgba(255, 255, 255, 0.7); --glass-blur: 24px; --glass-border: rgba(255, 255, 255, 0.8); --glass-shadow: 0 8px 32px rgba(0, 11, 88, 0.05);
+  --component-bg-hover: #ffffff; --component-bg-active: #f1f5f9;
+  --component-border-focus: #f97316; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.08);
+  --scroll-thumb: #f97316; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 2. Morning Tangerine */
+.theme-morning-tangerine {
+  --font-heading: 'Outfit', sans-serif; --font-body: 'Plus Jakarta Sans', sans-serif;
+  --theme-bg-primary: #fdfbf7; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #f5f2eb;
+  --theme-text-primary: #0a1128; --theme-text-secondary: #1e2a4f; --theme-text-tertiary: #4b5e82; --theme-text-label: #7487ab;
+  --theme-border-primary: rgba(255, 136, 0, 0.25); --theme-border-secondary: rgba(10, 17, 40, 0.08);
+  --theme-accent-primary: #ff8800; --theme-accent-secondary: #ff9d33; --theme-accent-tertiary: #ffb166;
+  --theme-accent-gradient: linear-gradient(135deg, #ff8800 0%, #ff9d33 100%);
+  --theme-accent-focus: rgba(255, 136, 0, 0.15); --theme-accent-hover: #cc6d00;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #e5e7eb; --theme-disabled-text: #9ca3af;
+  --glass-bg: rgba(255, 255, 255, 0.65); --glass-blur: 20px; --glass-border: rgba(255, 255, 255, 0.9); --glass-shadow: 0 4px 20px rgba(10, 17, 40, 0.06);
+  --component-bg-hover: #ffffff; --component-bg-active: #f5f2eb;
+  --component-border-focus: #ff8800; --component-surface-raised: #ffffff; --component-divider: rgba(10, 17, 40, 0.06);
+  --scroll-thumb: #ff8800; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 3. Crisp Apricot */
+.theme-crisp-apricot {
+  --font-heading: 'Inter', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #ffffff; --theme-bg-secondary: #fafafa; --theme-bg-ternary: #f4f4f5;
+  --theme-text-primary: #000B58; --theme-text-secondary: #27272a; --theme-text-tertiary: #52525b; --theme-text-label: #a1a1aa;
+  --theme-border-primary: rgba(251, 146, 60, 0.4); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #fb923c; --theme-accent-secondary: #fdba74; --theme-accent-tertiary: #fed7aa;
+  --theme-accent-gradient: linear-gradient(135deg, #fb923c 0%, #fdba74 100%);
+  --theme-accent-focus: rgba(251, 146, 60, 0.2); --theme-accent-hover: #f97316;
+  --theme-success: #059669; --theme-warning: #d97706; --theme-error: #dc2626; --theme-info: #0284c7;
+  --theme-disabled: #f4f4f5; --theme-disabled-text: #a1a1aa;
+  --glass-bg: rgba(255, 255, 255, 0.85); --glass-blur: 16px; --glass-border: rgba(0, 11, 88, 0.08); --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+  --component-bg-hover: #fafafa; --component-bg-active: #f4f4f5;
+  --component-border-focus: #fb923c; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.05);
+  --scroll-thumb: #fb923c; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 4. Naval Dawn */
+.theme-naval-dawn {
+  --font-heading: 'Playfair Display', serif; --font-body: 'Montserrat', sans-serif;
+  --theme-bg-primary: #f0f4f8; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #e1e8f0;
+  --theme-text-primary: #001b36; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(255, 191, 0, 0.35); --theme-border-secondary: rgba(0, 27, 54, 0.1);
+  --theme-accent-primary: #ffbf00; --theme-accent-secondary: #ffcf40; --theme-accent-tertiary: #ffe080;
+  --theme-accent-gradient: linear-gradient(135deg, #ffbf00 0%, #ffcf40 100%);
+  --theme-accent-focus: rgba(255, 191, 0, 0.15); --theme-accent-hover: #cc9900;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #cbd5e1; --theme-disabled-text: #64748b;
+  --glass-bg: rgba(255, 255, 255, 0.6); --glass-blur: 30px; --glass-border: rgba(255, 255, 255, 1); --glass-shadow: 0 4px 24px rgba(0, 27, 54, 0.08);
+  --component-bg-hover: #f8fafc; --component-bg-active: #e1e8f0;
+  --component-border-focus: #ffbf00; --component-surface-raised: #ffffff; --component-divider: rgba(0, 27, 54, 0.08);
+  --scroll-thumb: #ffbf00; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 5. Azure Sun */
+.theme-azure-sun {
+  --font-heading: 'Poppins', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #ffffff; --theme-bg-secondary: #f4f7fb; --theme-bg-ternary: #e9eff5;
+  --theme-text-primary: #001740; --theme-text-secondary: #334155; --theme-text-tertiary: #64748b; --theme-text-label: #94a3b8;
+  --theme-border-primary: rgba(234, 88, 12, 0.25); --theme-border-secondary: rgba(0, 23, 64, 0.06);
+  --theme-accent-primary: #ea580c; --theme-accent-secondary: #f97316; --theme-accent-tertiary: #fb923c;
+  --theme-accent-gradient: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+  --theme-accent-focus: rgba(234, 88, 12, 0.15); --theme-accent-hover: #c2410c;
+  --theme-success: #059669; --theme-warning: #ea580c; --theme-error: #dc2626; --theme-info: #0284c7;
+  --theme-disabled: #e2e8f0; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(244, 247, 251, 0.75); --glass-blur: 24px; --glass-border: rgba(255, 255, 255, 0.6); --glass-shadow: 0 8px 32px rgba(0, 23, 64, 0.04);
+  --component-bg-hover: #ffffff; --component-bg-active: #e9eff5;
+  --component-border-focus: #ea580c; --component-surface-raised: #ffffff; --component-divider: rgba(0, 23, 64, 0.06);
+  --scroll-thumb: #ea580c; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 6. Frosty Mango */
+.theme-frosty-mango {
+  --font-heading: 'Space Grotesk', sans-serif; --font-body: 'Plus Jakarta Sans', sans-serif;
+  --theme-bg-primary: #f0fdfa; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #ccfbf1;
+  --theme-text-primary: #0a1128; --theme-text-secondary: #0f172a; --theme-text-tertiary: #334155; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(255, 140, 0, 0.3); --theme-border-secondary: rgba(10, 17, 40, 0.05);
+  --theme-accent-primary: #ff8c00; --theme-accent-secondary: #ffa633; --theme-accent-tertiary: #ffbf66;
+  --theme-accent-gradient: linear-gradient(135deg, #ff8c00 0%, #ffa633 100%);
+  --theme-accent-focus: rgba(255, 140, 0, 0.15); --theme-accent-hover: #cc7000;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #e2e8f0; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.7); --glass-blur: 40px; --glass-border: rgba(255, 255, 255, 0.8); --glass-shadow: 0 4px 24px rgba(10, 17, 40, 0.05);
+  --component-bg-hover: #f8fafc; --component-bg-active: #e2e8f0;
+  --component-border-focus: #ff8c00; --component-surface-raised: #ffffff; --component-divider: rgba(10, 17, 40, 0.05);
+  --scroll-thumb: #ff8c00; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 7. Cloud Amber */
+.theme-cloud-amber {
+  --font-heading: 'Cinzel', serif; --font-body: 'Montserrat', sans-serif;
+  --theme-bg-primary: #faf8f5; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #f0eadd;
+  --theme-text-primary: #000B58; --theme-text-secondary: #334155; --theme-text-tertiary: #64748b; --theme-text-label: #94a3b8;
+  --theme-border-primary: rgba(217, 119, 6, 0.3); --theme-border-secondary: rgba(0, 11, 88, 0.08);
+  --theme-accent-primary: #d97706; --theme-accent-secondary: #f59e0b; --theme-accent-tertiary: #fbbf24;
+  --theme-accent-gradient: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+  --theme-accent-focus: rgba(217, 119, 6, 0.15); --theme-accent-hover: #b45309;
+  --theme-success: #059669; --theme-warning: #fbbf24; --theme-error: #dc2626; --theme-info: #2563eb;
+  --theme-disabled: #e2e8f0; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.65); --glass-blur: 16px; --glass-border: rgba(217, 119, 6, 0.1); --glass-shadow: 0 8px 32px rgba(0, 11, 88, 0.04);
+  --component-bg-hover: #faf8f5; --component-bg-active: #f0eadd;
+  --component-border-focus: #d97706; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.06);
+  --scroll-thumb: #d97706; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 8. Glazed Rust */
+.theme-glazed-rust {
+  --font-heading: 'Outfit', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #f1f5f9; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #e2e8f0;
+  --theme-text-primary: #0f172a; --theme-text-secondary: #334155; --theme-text-tertiary: #64748b; --theme-text-label: #94a3b8;
+  --theme-border-primary: rgba(190, 77, 37, 0.3); --theme-border-secondary: rgba(15, 23, 42, 0.08);
+  --theme-accent-primary: #be4d25; --theme-accent-secondary: #d6592f; --theme-accent-tertiary: #e0724e;
+  --theme-accent-gradient: linear-gradient(135deg, #be4d25 0%, #d6592f 100%);
+  --theme-accent-focus: rgba(190, 77, 37, 0.15); --theme-accent-hover: #9c3c1a;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #cbd5e1; --theme-disabled-text: #64748b;
+  --glass-bg: rgba(255, 255, 255, 0.55); --glass-blur: 24px; --glass-border: rgba(255, 255, 255, 0.8); --glass-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+  --component-bg-hover: #f8fafc; --component-bg-active: #e2e8f0;
+  --component-border-focus: #be4d25; --component-surface-raised: #ffffff; --component-divider: rgba(15, 23, 42, 0.08);
+  --scroll-thumb: #be4d25; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 9. Luminous Coral */
+.theme-luminous-coral {
+  --font-heading: 'Poppins', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #f0f7ff; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #e0f2fe;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e3a8a; --theme-text-tertiary: #3b82f6; --theme-text-label: #93c5fd;
+  --theme-border-primary: rgba(255, 127, 80, 0.35); --theme-border-secondary: rgba(0, 11, 88, 0.06);
+  --theme-accent-primary: #ff7f50; --theme-accent-secondary: #ff9e7a; --theme-accent-tertiary: #ffbc9e;
+  --theme-accent-gradient: linear-gradient(135deg, #ff7f50 0%, #ff9e7a 100%);
+  --theme-accent-focus: rgba(255, 127, 80, 0.15); --theme-accent-hover: #e66030;
+  --theme-success: #059669; --theme-warning: #ea580c; --theme-error: #dc2626; --theme-info: #0284c7;
+  --theme-disabled: #e0f2fe; --theme-disabled-text: #7dd3fc;
+  --glass-bg: rgba(255, 255, 255, 0.75); --glass-blur: 16px; --glass-border: rgba(255, 255, 255, 0.9); --glass-shadow: 0 8px 32px rgba(0, 11, 88, 0.06);
+  --component-bg-hover: #f0f7ff; --component-bg-active: #e0f2fe;
+  --component-border-focus: #ff7f50; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.05);
+  --scroll-thumb: #ff7f50; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 10. Clear Tiger */
+.theme-clear-tiger {
+  --font-heading: 'Space Grotesk', sans-serif; --font-body: 'Plus Jakarta Sans', sans-serif;
+  --theme-bg-primary: #ffffff; --theme-bg-secondary: #f8fafc; --theme-bg-ternary: #f1f5f9;
+  --theme-text-primary: #0a1128; --theme-text-secondary: #334155; --theme-text-tertiary: #64748b; --theme-text-label: #94a3b8;
+  --theme-border-primary: rgba(253, 126, 20, 0.25); --theme-border-secondary: rgba(10, 17, 40, 0.05);
+  --theme-accent-primary: #fd7e14; --theme-accent-secondary: #ff922b; --theme-accent-tertiary: #ffa94d;
+  --theme-accent-gradient: linear-gradient(135deg, #fd7e14 0%, #ff922b 100%);
+  --theme-accent-focus: rgba(253, 126, 20, 0.15); --theme-accent-hover: #e8590c;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.85); --glass-blur: 32px; --glass-border: rgba(10, 17, 40, 0.05); --glass-shadow: 0 4px 24px rgba(0, 0, 0, 0.02);
+  --component-bg-hover: #ffffff; --component-bg-active: #f1f5f9;
+  --component-border-focus: #fd7e14; --component-surface-raised: #ffffff; --component-divider: rgba(10, 17, 40, 0.04);
+  --scroll-thumb: #fd7e14; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 11. Airy Marigold */
+.theme-airy-marigold {
+  --font-heading: 'Inter', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #fffbeb; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #fef3c7;
+  --theme-text-primary: #020617; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(250, 163, 7, 0.3); --theme-border-secondary: rgba(2, 6, 23, 0.06);
+  --theme-accent-primary: #faa307; --theme-accent-secondary: #ffba08; --theme-accent-tertiary: #ffc300;
+  --theme-accent-gradient: linear-gradient(135deg, #faa307 0%, #ffba08 100%);
+  --theme-accent-focus: rgba(250, 163, 7, 0.15); --theme-accent-hover: #e85d04;
+  --theme-success: #059669; --theme-warning: #d97706; --theme-error: #dc2626; --theme-info: #2563eb;
+  --theme-disabled: #e2e8f0; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.7); --glass-blur: 24px; --glass-border: rgba(255, 255, 255, 0.9); --glass-shadow: 0 10px 30px rgba(2, 6, 23, 0.05);
+  --component-bg-hover: #fffbeb; --component-bg-active: #fef3c7;
+  --component-border-focus: #faa307; --component-surface-raised: #ffffff; --component-divider: rgba(2, 6, 23, 0.06);
+  --scroll-thumb: #faa307; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 12. Soft Flame */
+.theme-soft-flame {
+  --font-heading: 'Outfit', sans-serif; --font-body: 'Outfit', sans-serif;
+  --theme-bg-primary: #f8fafc; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #f1f5f9;
+  --theme-text-primary: #00040f; --theme-text-secondary: #0f172a; --theme-text-tertiary: #334155; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(255, 69, 0, 0.25); --theme-border-secondary: rgba(0, 4, 15, 0.08);
+  --theme-accent-primary: #ff4500; --theme-accent-secondary: #ff632b; --theme-accent-tertiary: #ff8c61;
+  --theme-accent-gradient: linear-gradient(135deg, #ff4500 0%, #ff632b 100%);
+  --theme-accent-focus: rgba(255, 69, 0, 0.15); --theme-accent-hover: #cc3700;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #e2e8f0; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.6); --glass-blur: 16px; --glass-border: rgba(255, 255, 255, 1); --glass-shadow: 0 4px 20px rgba(0, 4, 15, 0.05);
+  --component-bg-hover: #f8fafc; --component-bg-active: #f1f5f9;
+  --component-border-focus: #ff4500; --component-surface-raised: #ffffff; --component-divider: rgba(0, 4, 15, 0.08);
+  --scroll-thumb: #ff4500; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 13. Lucid Copper */
+.theme-lucid-copper {
+  --font-heading: 'Cinzel', serif; --font-body: 'Montserrat', sans-serif;
+  --theme-bg-primary: #f4f6f8; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #e9ecef;
+  --theme-text-primary: #041224; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(184, 115, 51, 0.35); --theme-border-secondary: rgba(4, 18, 36, 0.08);
+  --theme-accent-primary: #b87333; --theme-accent-secondary: #c88951; --theme-accent-tertiary: #d79f70;
+  --theme-accent-gradient: linear-gradient(135deg, #b87333 0%, #c88951 100%);
+  --theme-accent-focus: rgba(184, 115, 51, 0.15); --theme-accent-hover: #9c5c24;
+  --theme-success: #059669; --theme-warning: #ea580c; --theme-error: #dc2626; --theme-info: #2563eb;
+  --theme-disabled: #e2e8f0; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.8); --glass-blur: 24px; --glass-border: rgba(184, 115, 51, 0.15); --glass-shadow: 0 8px 32px rgba(4, 18, 36, 0.06);
+  --component-bg-hover: #f4f6f8; --component-bg-active: #e9ecef;
+  --component-border-focus: #b87333; --component-surface-raised: #ffffff; --component-divider: rgba(4, 18, 36, 0.08);
+  --scroll-thumb: #b87333; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 14. Mist Pumpkin */
+.theme-mist-pumpkin {
+  --font-heading: 'Poppins', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #ffffff; --theme-bg-secondary: #f8fafc; --theme-bg-ternary: #f1f5f9;
+  --theme-text-primary: #06092b; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(255, 117, 24, 0.3); --theme-border-secondary: rgba(6, 9, 43, 0.06);
+  --theme-accent-primary: #ff7518; --theme-accent-secondary: #ff8c3a; --theme-accent-tertiary: #ffa35c;
+  --theme-accent-gradient: linear-gradient(135deg, #ff7518 0%, #ff8c3a 100%);
+  --theme-accent-focus: rgba(255, 117, 24, 0.15); --theme-accent-hover: #e65c00;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(248, 250, 252, 0.75); --glass-blur: 30px; --glass-border: rgba(255, 255, 255, 0.9); --glass-shadow: 0 4px 24px rgba(6, 9, 43, 0.04);
+  --component-bg-hover: #ffffff; --component-bg-active: #f1f5f9;
+  --component-border-focus: #ff7518; --component-surface-raised: #ffffff; --component-divider: rgba(6, 9, 43, 0.06);
+  --scroll-thumb: #ff7518; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 15. Breeze Supernova */
+.theme-breeze-supernova {
+  --font-heading: 'Space Grotesk', sans-serif; --font-body: 'Plus Jakarta Sans', sans-serif;
+  --theme-bg-primary: #eef2f6; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #e3e8ef;
+  --theme-text-primary: #020412; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(255, 94, 0, 0.3); --theme-border-secondary: rgba(2, 4, 18, 0.08);
+  --theme-accent-primary: #ff5e00; --theme-accent-secondary: #ff7d2e; --theme-accent-tertiary: #ff9b5c;
+  --theme-accent-gradient: linear-gradient(135deg, #ff5e00 0%, #ff7d2e 100%);
+  --theme-accent-focus: rgba(255, 94, 0, 0.15); --theme-accent-hover: #cc4b00;
+  --theme-success: #059669; --theme-warning: #ea580c; --theme-error: #dc2626; --theme-info: #0284c7;
+  --theme-disabled: #cbd5e1; --theme-disabled-text: #64748b;
+  --glass-bg: rgba(255, 255, 255, 0.65); --glass-blur: 24px; --glass-border: rgba(255, 255, 255, 1); --glass-shadow: 0 10px 40px rgba(2, 4, 18, 0.05);
+  --component-bg-hover: #eef2f6; --component-bg-active: #e3e8ef;
+  --component-border-focus: #ff5e00; --component-surface-raised: #ffffff; --component-divider: rgba(2, 4, 18, 0.08);
+  --scroll-thumb: #ff5e00; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 16. Crystal Neon */
+.theme-crystal-neon {
+  --font-heading: 'Inter', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #ffffff; --theme-bg-secondary: #f8fafc; --theme-bg-ternary: #f1f5f9;
+  --theme-text-primary: #050b14; --theme-text-secondary: #334155; --theme-text-tertiary: #64748b; --theme-text-label: #94a3b8;
+  --theme-border-primary: rgba(255, 102, 0, 0.4); --theme-border-secondary: rgba(5, 11, 20, 0.05);
+  --theme-accent-primary: #ff6600; --theme-accent-secondary: #ff8533; --theme-accent-tertiary: #ff9933;
+  --theme-accent-gradient: linear-gradient(135deg, #ff6600 0%, #ff8533 100%);
+  --theme-accent-focus: rgba(255, 102, 0, 0.15); --theme-accent-hover: #cc5200;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #e2e8f0; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.85); --glass-blur: 40px; --glass-border: rgba(255, 102, 0, 0.15); --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  --component-bg-hover: #ffffff; --component-bg-active: #f1f5f9;
+  --component-border-focus: #ff6600; --component-surface-raised: #ffffff; --component-divider: rgba(5, 11, 20, 0.04);
+  --scroll-thumb: #ff6600; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 17. Sky Electric */
+.theme-sky-electric {
+  --font-heading: 'Outfit', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #f0fdfa; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #ccfbf1;
+  --theme-text-primary: #000B58; --theme-text-secondary: #0f172a; --theme-text-tertiary: #334155; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(255, 85, 0, 0.3); --theme-border-secondary: rgba(0, 11, 88, 0.06);
+  --theme-accent-primary: #ff5500; --theme-accent-secondary: #ff7733; --theme-accent-tertiary: #ff9966;
+  --theme-accent-gradient: linear-gradient(135deg, #ff5500 0%, #ff7733 100%);
+  --theme-accent-focus: rgba(255, 85, 0, 0.15); --theme-accent-hover: #cc4400;
+  --theme-success: #059669; --theme-warning: #d97706; --theme-error: #dc2626; --theme-info: #0284c7;
+  --theme-disabled: #e2e8f0; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.75); --glass-blur: 24px; --glass-border: rgba(255, 255, 255, 0.9); --glass-shadow: 0 8px 32px rgba(0, 11, 88, 0.05);
+  --component-bg-hover: #f0fdfa; --component-bg-active: #ccfbf1;
+  --component-border-focus: #ff5500; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.05);
+  --scroll-thumb: #ff5500; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 18. Pearl Sapphire */
+.theme-pearl-sapphire {
+  --font-heading: 'Playfair Display', serif; --font-body: 'Montserrat', sans-serif;
+  --theme-bg-primary: #f8fafc; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #f1f5f9;
+  --theme-text-primary: #001740; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(234, 88, 12, 0.35); --theme-border-secondary: rgba(0, 23, 64, 0.08);
+  --theme-accent-primary: #ff632b; --theme-accent-secondary: #ff8c61; --theme-accent-tertiary: #ffa380;
+  --theme-accent-gradient: linear-gradient(135deg, #ff632b 0%, #ff8c61 100%);
+  --theme-accent-focus: rgba(255, 99, 43, 0.15); --theme-accent-hover: #ea580c;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #e2e8f0; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.6); --glass-blur: 16px; --glass-border: rgba(255, 255, 255, 1); --glass-shadow: 0 4px 20px rgba(0, 23, 64, 0.06);
+  --component-bg-hover: #f8fafc; --component-bg-active: #f1f5f9;
+  --component-border-focus: #ff632b; --component-surface-raised: #ffffff; --component-divider: rgba(0, 23, 64, 0.08);
+  --scroll-thumb: #ff632b; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 19. Ivory Cobalt */
+.theme-ivory-cobalt {
+  --font-heading: 'Poppins', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #fffaec; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #fdf4d6;
+  --theme-text-primary: #0a1128; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(255, 166, 51, 0.4); --theme-border-secondary: rgba(10, 17, 40, 0.06);
+  --theme-accent-primary: #ffa633; --theme-accent-secondary: #ffbf66; --theme-accent-tertiary: #ffd999;
+  --theme-accent-gradient: linear-gradient(135deg, #ffa633 0%, #ffbf66 100%);
+  --theme-accent-focus: rgba(255, 166, 51, 0.2); --theme-accent-hover: #ff8c00;
+  --theme-success: #059669; --theme-warning: #ea580c; --theme-error: #dc2626; --theme-info: #0284c7;
+  --theme-disabled: #e2e8f0; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.8); --glass-blur: 20px; --glass-border: rgba(255, 166, 51, 0.2); --glass-shadow: 0 10px 40px rgba(10, 17, 40, 0.04);
+  --component-bg-hover: #fffaec; --component-bg-active: #fdf4d6;
+  --component-border-focus: #ffa633; --component-surface-raised: #ffffff; --component-divider: rgba(10, 17, 40, 0.06);
+  --scroll-thumb: #ffa633; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 20. White Eclipse */
+.theme-white-eclipse {
+  --font-heading: 'Space Grotesk', sans-serif; --font-body: 'Plus Jakarta Sans', sans-serif;
+  --theme-bg-primary: #ffffff; --theme-bg-secondary: #f8fafc; --theme-bg-ternary: #f1f5f9;
+  --theme-text-primary: #020617; --theme-text-secondary: #334155; --theme-text-tertiary: #64748b; --theme-text-label: #94a3b8;
+  --theme-border-primary: rgba(255, 157, 51, 0.4); --theme-border-secondary: rgba(2, 6, 23, 0.05);
+  --theme-accent-primary: #ff9d33; --theme-accent-secondary: #ffb166; --theme-accent-tertiary: #ffc699;
+  --theme-accent-gradient: linear-gradient(135deg, #ff9d33 0%, #ffb166 100%);
+  --theme-accent-focus: rgba(255, 157, 51, 0.2); --theme-accent-hover: #ff8800;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.9); --glass-blur: 32px; --glass-border: rgba(255, 157, 51, 0.15); --glass-shadow: 0 4px 24px rgba(0, 0, 0, 0.02);
+  --component-bg-hover: #ffffff; --component-bg-active: #f1f5f9;
+  --component-border-focus: #ff9d33; --component-surface-raised: #ffffff; --component-divider: rgba(2, 6, 23, 0.04);
+  --scroll-thumb: #ff9d33; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
 /* ==========================================================================
    DARK BLUE & ORANGE GLASS THEMES (20 VARIATIONS)
    ========================================================================== */
