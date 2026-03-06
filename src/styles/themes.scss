@@ -318,7 +318,165 @@
   @include apply-canonical-mapping;
 }
 
+.theme-crisp-structure {
+  /* Fonts: Clean and highly legible */
+  --font-heading: 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
 
+  /* Backgrounds: Pure Light */
+  --theme-bg-primary: #F9F5F6; /* Your Off-White as base */
+  --theme-bg-secondary: #ffffff; /* Pure white components/cards */
+  --theme-bg-ternary: #f0ebeb; /* Slightly darker for hovers */
+
+  /* Typography: Strict Deep Blue */
+  --theme-text-primary: #000B58; /* Your Deep Blue */
+  --theme-text-secondary: #2c366e; /* Softer deep blue */
+  --theme-text-tertiary: #5e6b8a;
+  --theme-text-label: #8190a6;
+
+  /* Borders: Highly Visible */
+  --theme-border-primary: #ADC4CE; /* Your Light Blue-Grey, solid and visible */
+  --theme-border-secondary: rgba(173, 196, 206, 0.5);
+
+  /* Accents: Deep Blue Power */
+  --theme-accent-primary: #000B58; /* Solid Deep Blue Buttons */
+  --theme-accent-secondary: #1a2780;
+  --theme-accent-tertiary: #ADC4CE;
+  --theme-accent-gradient: linear-gradient(135deg, #000B58 0%, #1a2780 100%);
+  --theme-accent-focus: rgba(0, 11, 88, 0.15); /* Strong blue focus ring */
+  --theme-accent-hover: #00042e; /* Even darker blue on hover */
+
+  /* Status Colors (Standardized for Light Mode) */
+  --theme-success: #059669;
+  --theme-warning: #d97706;
+  --theme-error: #dc2626;
+  --theme-info: #0284c7;
+
+  --theme-disabled: #f1f5f9;
+  --theme-disabled-text: #94a3b8;
+
+  /* Glass: Minimal blur, structural border */
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-blur: 12px;
+  --glass-border: #ADC4CE; /* Solid border for glass */
+  --glass-shadow: 0 1px 3px rgba(0, 11, 88, 0.05); /* Very flat shadow */
+
+  /* Components */
+  --component-bg-hover: #F9F5F6;
+  --component-bg-active: #f0ebeb;
+  --component-border-focus: #000B58;
+  --component-surface-raised: #ffffff;
+  --component-divider: #ADC4CE; /* Visible dividers */
+
+  --scroll-thumb: #ADC4CE;
+  --scroll-track: transparent;
+
+  @include apply-canonical-mapping;
+}
+
+.theme-blueprint-light {
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* Backgrounds: Hyper Pure */
+  --theme-bg-primary: #ffffff;
+  --theme-bg-secondary: #ffffff;
+  --theme-bg-ternary: #F9F5F6;
+
+  /* Typography */
+  --theme-text-primary: #000B58; /* Your Deep Blue */
+  --theme-text-secondary: #1a2780;
+  --theme-text-tertiary: #4a547a;
+  --theme-text-label: #ADC4CE; /* Light Blue-Grey for subtle labels */
+
+  /* Borders: High Contrast Deep Blue Tint */
+  --theme-border-primary: rgba(0, 11, 88, 0.2); /* Very sharp, visible border */
+  --theme-border-secondary: rgba(0, 11, 88, 0.1);
+
+  /* Accents */
+  --theme-accent-primary: #000B58;
+  --theme-accent-secondary: #202b75;
+  --theme-accent-tertiary: #ADC4CE;
+  --theme-accent-gradient: linear-gradient(135deg, #000B58 0%, #202b75 100%);
+  --theme-accent-focus: rgba(0, 11, 88, 0.2);
+  --theme-accent-hover: #00053b;
+
+  --theme-success: #16a34a;
+  --theme-warning: #ea580c;
+  --theme-error: #e11d48;
+  --theme-info: #2563eb;
+
+  --theme-disabled: rgba(173, 196, 206, 0.3);
+  --theme-disabled-text: #8190a6;
+
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --glass-blur: 8px;
+  --glass-border: rgba(0, 11, 88, 0.2);
+  --glass-shadow: none; /* Removed shadows to rely entirely on borders */
+
+  --component-bg-hover: #F9F5F6;
+  --component-bg-active: #ADC4CE;
+  --component-border-focus: #000B58;
+  --component-surface-raised: #ffffff;
+  --component-divider: rgba(0, 11, 88, 0.15);
+
+  --scroll-thumb: rgba(0, 11, 88, 0.2);
+  --scroll-track: transparent;
+
+  @include apply-canonical-mapping;
+}
+
+.theme-cloud-ivory {
+  --font-heading: 'Poppins', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* Backgrounds */
+  --theme-bg-primary: #ffffff;
+  --theme-bg-secondary: #F9F5F6; /* Off-white components to contrast white bg */
+  --theme-bg-ternary: #ADC4CE; /* Light Blue-Grey for secondary areas */
+
+  /* Typography */
+  --theme-text-primary: #000B58;
+  --theme-text-secondary: #3b4480;
+  --theme-text-tertiary: #6a74a6;
+  --theme-text-label: #8ba5b3;
+
+  /* Borders */
+  --theme-border-primary: #ADC4CE; /* Solid Light Blue-Grey borders */
+  --theme-border-secondary: #e0e9ed;
+
+  /* Accents */
+  --theme-accent-primary: #000B58;
+  --theme-accent-secondary: #151e5e;
+  --theme-accent-tertiary: #ADC4CE;
+  --theme-accent-gradient: linear-gradient(135deg, #000B58 0%, #151e5e 100%);
+  --theme-accent-focus: rgba(0, 11, 88, 0.15);
+  --theme-accent-hover: #00031f;
+
+  --theme-success: #059669;
+  --theme-warning: #d97706;
+  --theme-error: #dc2626;
+  --theme-info: #0284c7;
+
+  --theme-disabled: #f0ebeb;
+  --theme-disabled-text: #94a3b8;
+
+  --glass-bg: rgba(249, 245, 246, 0.85);
+  --glass-blur: 16px;
+  --glass-border: #ADC4CE;
+  --glass-shadow: 0 2px 8px rgba(0, 11, 88, 0.04);
+
+  --component-bg-hover: #ffffff;
+  --component-bg-active: #e6dfdf;
+  --component-border-focus: #000B58;
+  --component-surface-raised: #F9F5F6;
+  --component-divider: #ADC4CE;
+
+  --scroll-thumb: #ADC4CE;
+  --scroll-track: transparent;
+
+  @include apply-canonical-mapping;
+}
 
 .theme-royal-sapphire {
   /* Custom Fonts */
