@@ -226,6 +226,54 @@ textScale: number = 100;
     if (this.notificationPopover) this.notificationPopover.hide();
   }
   allThemes: Theme[] = [
+    {
+    name: "Midnight Bronze",
+    id: "theme-midnight-bronze",
+    color: "#b88645",
+    gradient: "linear-gradient(135deg, #b88645 0%, #d4a363 100%)",
+    category: "premium dark",
+    description: "Dark premium glass with deep blue base and rich bronze accents."
+  },
+  {
+    name: "Frosted Pearl",
+    id: "theme-frosted-pearl",
+    color: "#000B58",
+    gradient: "linear-gradient(135deg, #000B58 0%, #1a2780 100%)",
+    category: "premium light",
+    description: "Hyper-clean pure light glass with crisp off-white and deep blue."
+  },
+  {
+    name: "Royal Sapphire",
+    id: "theme-royal-sapphire",
+    color: "#c99d66",
+    gradient: "linear-gradient(135deg, #8c6a46 0%, #c99d66 100%)",
+    category: "premium dark",
+    description: "Classic high-contrast luxury combining sapphire depth with warm gold."
+  },
+  {
+    name: "Ocean Mist",
+    id: "theme-ocean-mist",
+    color: "#8a6a52",
+    gradient: "linear-gradient(135deg, #8a6a52 0%, #a3856d 100%)",
+    category: "premium light",
+    description: "Soft, airy, and calming light blue-grey interface with muted brown touches."
+  },
+  {
+    name: "Executive Velvet",
+    id: "theme-executive-velvet",
+    color: "#000B58",
+    gradient: "linear-gradient(135deg, #000B58 0%, #273385 100%)",
+    category: "premium light",
+    description: "Warm corporate off-white with sophisticated deep blue typography and accents."
+  },
+  {
+    name: "Obsidian Blue",
+    id: "theme-obsidian-blue",
+    color: "#ADC4CE",
+    gradient: "linear-gradient(135deg, #ADC4CE 0%, #ffffff 100%)",
+    category: "premium dark",
+    description: "Ultra-modern deep tech dark mode with stealth glass and light blue-grey highlights."
+  },
     // --- CORE THEMES ---
     {
       name: "Auto",
