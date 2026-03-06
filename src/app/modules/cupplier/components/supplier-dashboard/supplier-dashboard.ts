@@ -6,7 +6,6 @@ import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
@@ -24,7 +23,7 @@ export class SupplierDashboardComponent implements OnInit {
   // 🟢 Replaced ActivatedRoute with DynamicDialog tools
   private config = inject(DynamicDialogConfig);
   private ref = inject(DynamicDialogRef);
-  
+
   private cdr = inject(ChangeDetectorRef);
   private supplierService = inject(SupplierService);
   private transactionService = inject(TransactionService);
@@ -41,12 +40,12 @@ export class SupplierDashboardComponent implements OnInit {
   activeTab = signal<'purchases' | 'payments'>('purchases');
 
   ngOnInit(): void {
-    // 🟢 Get ID from the Dialog Config (Handling both naming conventions just in case)
     const id = this.config.data?.supplierId || this.config.data?.productId;
-    
+
     if (!id) {
       this.isError.set(true);
       this.loading.set(false);
+      this.messageService.showError('Invalid configuration: Supplier ID is missing.');
       return;
     }
 
@@ -57,12 +56,16 @@ export class SupplierDashboardComponent implements OnInit {
           this.data.set(s);
         } else {
           this.isError.set(true);
+
+          // Added feedback for when the API returns a 200 OK, but the data payload is empty
+          this.messageService.showError('Failed to load dashboard: Data is unavailable.');
         }
         this.loading.set(false);
       },
-      error: () => {
+      error: (err) => {
         this.isError.set(true);
         this.loading.set(false);
+        this.messageService.handleHttpError(err);
       }
     });
   }

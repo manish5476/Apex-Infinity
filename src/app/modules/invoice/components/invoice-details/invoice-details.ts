@@ -93,7 +93,23 @@ export class InvoiceDetailsComponent implements OnInit {
     this.loadInvoiceData();
   }
 
-  private loadInvoiceData(): void {
+   // === Actions: Cancel ===
+  openCancelModal(): void {
+    this.showCancelModal.set(true);
+    this.cancelForm.reset({ restock: true });
+  }
+
+  // === Actions: Payment ===
+  openPaymentModal(): void {
+    this.showPaymentModal.set(true);
+    this.paymentForm.patchValue({ 
+      amount: this.invoice().balanceAmount,
+      paymentMethod: 'cash',
+      notes: ''
+    });
+  }
+
+private loadInvoiceData(): void {
     this.route.paramMap.subscribe(params => {
       const invoiceId = params.get('id');
       if (!invoiceId) {
@@ -119,8 +135,8 @@ export class InvoiceDetailsComponent implements OnInit {
           this.paymentForm.patchValue({ amount: data.balanceAmount });
           
           this.isLoading.set(false);
-        },
-        'Fetch Invoice'
+        }
+        // Removed the redundant 'Fetch Invoice' context string here
       );
     });
   }
@@ -129,6 +145,10 @@ export class InvoiceDetailsComponent implements OnInit {
     this.invoiceService.getInvoicePayments(id).subscribe({
       next: (res: any) => {
         this.payments.set(res.data?.payments || res.data || []);
+      },
+      error: (err) => {
+        // Caught the silent failure so the user knows if payment history fails to load!
+        this.messageService.handleHttpError(err);
       }
     });
   }
@@ -140,22 +160,17 @@ export class InvoiceDetailsComponent implements OnInit {
           this.existingEmiId.set(res.data.emi._id);
         }
       },
-      error: () => this.existingEmiId.set(null)
-    });
-  }
-
-  // === Actions: Payment ===
-  openPaymentModal(): void {
-    this.showPaymentModal.set(true);
-    this.paymentForm.patchValue({ 
-      amount: this.invoice().balanceAmount,
-      paymentMethod: 'cash',
-      notes: ''
+      // Left this silent error alone, assuming a 404 (No EMI found) is expected behavior here!
+      error: () => this.existingEmiId.set(null) 
     });
   }
 
   submitPayment(): void {
-    if (this.paymentForm.invalid) return;
+    if (this.paymentForm.invalid) {
+      // Added user feedback for invalid forms
+      this.messageService.showWarn('Invalid Form: Please check your payment details.');
+      return;
+    }
 
     this.isProcessing.set(true);
     const payload = this.paymentForm.value;
@@ -166,23 +181,23 @@ export class InvoiceDetailsComponent implements OnInit {
         finalize(() => this.isProcessing.set(false))
       ),
       () => {
-        this.messageService.showSuccess('Payment Recorded', 'Balance updated successfully.');
+        // Simplified to a single string
+        this.messageService.showSuccess('Payment balance updated successfully.');
         this.showPaymentModal.set(false);
+        
         // Refresh data to reflect new status
         this.loadInvoiceData(); 
-      },
-      'Add Payment'
+      }
+      // Removed the redundant 'Add Payment' string
     );
   }
 
-  // === Actions: Cancel ===
-  openCancelModal(): void {
-    this.showCancelModal.set(true);
-    this.cancelForm.reset({ restock: true });
-  }
-
   submitCancel(): void {
-    if (this.cancelForm.invalid) return;
+    if (this.cancelForm.invalid) {
+      // Added user feedback for invalid forms
+      this.messageService.showWarn('Invalid Form: Please provide a cancellation reason.');
+      return;
+    }
 
     this.isProcessing.set(true);
     const { reason, restock } = this.cancelForm.value;
@@ -193,11 +208,12 @@ export class InvoiceDetailsComponent implements OnInit {
         finalize(() => this.isProcessing.set(false))
       ),
       () => {
-        this.messageService.showSuccess('Cancelled', 'Invoice cancelled and stock restored.');
+        // Simplified to a single string
+        this.messageService.showSuccess('Invoice cancelled and stock restored.');
         this.showCancelModal.set(false);
         this.loadInvoiceData();
-      },
-      'Cancel Invoice'
+      }
+      // Removed the redundant 'Cancel Invoice' string
     );
   }
 
@@ -211,8 +227,9 @@ export class InvoiceDetailsComponent implements OnInit {
         this.common.downloadBlob(blob, `INV-${this.invoice().invoiceNumber}.pdf`);
         this.isProcessing.set(false);
       },
-      error: () => {
-        this.messageService.showError('Download Failed', 'Could not generate PDF.');
+      error: (err) => {
+        // Replaced manual error extraction with your global HTTP handler
+        this.messageService.handleHttpError(err);
         this.isProcessing.set(false);
       }
     });
@@ -227,9 +244,10 @@ export class InvoiceDetailsComponent implements OnInit {
         finalize(() => this.isProcessing.set(false))
       ),
       () => {
-        this.messageService.showSuccess('Sent', 'Invoice emailed to customer.');
-      },
-      'Email Invoice'
+        // Simplified to a single string
+        this.messageService.showSuccess('Invoice emailed to customer successfully.');
+      }
+      // Removed the redundant 'Email Invoice' string
     );
   }
 

@@ -17,15 +17,7 @@ import { ActionViewRenderer } from '../../../shared/AgGrid/AgGridcomponents/Dyna
 @Component({
   selector: 'app-supplier-list',
   standalone: true,
-  imports: [
-    CommonModule,
-    SelectModule,
-    FormsModule,
-    ButtonModule,
-    InputTextModule,
-    RouterModule,
-    Toast,
-    AgShareGrid
+  imports: [CommonModule,SelectModule,FormsModule,ButtonModule,InputTextModule,RouterModule,Toast,AgShareGrid
   ],
   templateUrl: './supplier-list.html',
   styleUrl: './supplier-list.scss',
@@ -49,8 +41,7 @@ export class SupplierListComponent implements OnInit {
   rowSelectionMode: any = 'single';
 
   // --- Filters ---
-  supplierFilter = {
-    companyName: null,
+  supplierFilter = {companyName: null,
     phone: null,
   };
 
@@ -73,7 +64,7 @@ export class SupplierListComponent implements OnInit {
     this.getData(true);
   }
 
-  getData(isReset: boolean = false) {
+getData(isReset: boolean = false) {
     if (this.isLoading) return;
     this.isLoading = true;
 
@@ -127,12 +118,18 @@ export class SupplierListComponent implements OnInit {
       },
       error: (err: any) => {
         this.isLoading = false;
-        console.error(err);
-        this.messageService.showError('Error', 'Failed to fetch suppliers.');
+        
+        // I kept your console.error for debugging!
+        console.error('Failed to fetch suppliers', err);
+        
+        // Handed off the error formatting to the global HTTP error handler
+        this.messageService.handleHttpError(err);
+        
+        // Added markForCheck so your UI loading spinner correctly disappears on failure
+        this.cdr.markForCheck();
       }
     });
   }
-
   onScrolledToBottom(_?: any) {
     if (!this.isLoading && this.data.length < this.totalCount) {
       this.getData(false);

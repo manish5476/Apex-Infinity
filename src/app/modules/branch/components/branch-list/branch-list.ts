@@ -69,13 +69,11 @@ export class BranchListComponent implements OnInit {
       this.totalCount = 0;
     }
 
-    // Build params for the Backend ApiFeatures
     const params: any = {
       page: this.currentPage,
       limit: this.pageSize,
     };
 
-    // FIX: Map UI 'name' to Backend 'search' if text exists
     if (this.branchFilter.name.trim()) {
       params.search = this.branchFilter.name.trim();
     }
@@ -84,9 +82,9 @@ export class BranchListComponent implements OnInit {
       next: (res: any) => {
         // Correctly access nested data from Factory response
         const newData = res.data?.data || [];
-        
+
         // Correctly handle pagination totals
-        this.totalCount = res.pagination.totalResults 
+        this.totalCount = res.pagination.totalResults;
 
         this.data = isReset ? newData : [...this.data, ...newData];
 
@@ -97,9 +95,10 @@ export class BranchListComponent implements OnInit {
         this.isLoading = false;
         this.cdr.detectChanges(); // Vital for async updates
       },
-      error: () => {
+      error: (err) => {
         this.isLoading = false;
-        this.messageService.showError('Error', 'Failed to fetch branches.');
+        this.messageService.handleHttpError(err);
+        this.cdr.detectChanges();
       }
     });
   }

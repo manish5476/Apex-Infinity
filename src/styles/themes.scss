@@ -1889,6 +1889,7 @@
 
   @include apply-canonical-mapping;
 }
+
 /* =========================================
    THEME: MIDNIGHT CITY (Professional Dark Blue)
    Gradient: #243B55 -> #141E30
@@ -1993,109 +1994,6 @@
   @include apply-canonical-mapping;
 }
 
-/* =========================================
-   THEME: CRIMSON NIGHT (Deep Red to Purple)
-   Gradient: #6f0000 -> #200122
-   ========================================= */
-.theme-crimson-night {
-  --theme-bg-primary: linear-gradient(to right, #6f0000, #200122);
-
-  --theme-bg-secondary: rgba(0, 0, 0, 0.3);
-  --theme-bg-ternary: rgba(0, 0, 0, 0.5);
-
-  --theme-text-primary: #ffffff;
-  --theme-text-secondary: #fca5a5; /* Pale Red */
-  --theme-text-tertiary: #f87171;
-  --theme-text-label: #ef4444;
-
-  --theme-border-primary: rgba(239, 68, 68, 0.3);
-  --theme-border-secondary: rgba(239, 68, 68, 0.15);
-
-  /* Blood Red Accents */
-  --theme-accent-primary: #ef4444; /* Red 500 */
-  --theme-accent-secondary: #dc2626;
-  --theme-accent-tertiary: #b91c1c;
-  --theme-accent-gradient: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
-  --theme-accent-focus: rgba(239, 68, 68, 0.25);
-  --theme-accent-hover: #ffadad;
-
-  --theme-success: #10b981;
-  --theme-warning: #fbbf24;
-  --theme-error: #ff0000;
-  --theme-info: #60a5fa;
-
-  --theme-disabled: rgba(32, 1, 34, 0.5);
-  --theme-disabled-text: #991b1b;
-
-  /* Dark Vampire Glass */
-  --glass-bg: linear-gradient(145deg, rgba(111, 0, 0, 0.3) 0%, rgba(32, 1, 34, 0.6) 100%);
-  --glass-blur: 20px;
-  --glass-border: rgba(239, 68, 68, 0.2);
-  --glass-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
-
-  --scroll-thumb: #991b1b;
-  --scroll-track: rgba(0, 0, 0, 0.3);
-
-  --component-bg-hover: rgba(239, 68, 68, 0.1);
-  --component-bg-active: rgba(239, 68, 68, 0.2);
-  --component-border-focus: #ef4444;
-  --component-surface-raised: #200122;
-  --component-divider: rgba(239, 68, 68, 0.2);
-
-  @include apply-canonical-mapping;
-}
-
-/* =========================================
-   THEME: OCEANIC (Cyan to Deep Blue)
-   Gradient: #1CB5E0 -> #000046
-   ========================================= */
-.theme-oceanic {
-  --theme-bg-primary: linear-gradient(to right, #1cb5e0, #000046);
-
-  --theme-bg-secondary: rgba(255, 255, 255, 0.1);
-  --theme-bg-ternary: rgba(0, 0, 0, 0.3);
-
-  --theme-text-primary: #ffffff;
-  --theme-text-secondary: #bae6fd;
-  --theme-text-tertiary: #7dd3fc;
-  --theme-text-label: #38bdf8;
-
-  --theme-border-primary: rgba(56, 189, 248, 0.3);
-  --theme-border-secondary: rgba(56, 189, 248, 0.15);
-
-  /* Electric Cyan Accents */
-  --theme-accent-primary: #22d3ee; /* Cyan 400 */
-  --theme-accent-secondary: #06b6d4;
-  --theme-accent-tertiary: #0891b2;
-  --theme-accent-gradient: linear-gradient(135deg, #22d3ee 0%, #000046 100%);
-  --theme-accent-focus: rgba(34, 211, 238, 0.25);
-  --theme-accent-hover: #a5f3fc;
-
-  --theme-success: #34d399;
-  --theme-warning: #facc15;
-  --theme-error: #f43f5e;
-  --theme-info: #38bdf8;
-
-  --theme-disabled: rgba(0, 0, 70, 0.4);
-  --theme-disabled-text: #0e7490;
-
-  /* Ice Glass */
-  --glass-bg: rgba(255, 255, 255, 0.1);
-  --glass-blur: 25px;
-  --glass-border: rgba(34, 211, 238, 0.3);
-  --glass-shadow: 0 15px 40px rgba(0, 0, 70, 0.5);
-
-  --scroll-thumb: #0ea5e9;
-  --scroll-track: rgba(0, 0, 0, 0.2);
-
-  --component-bg-hover: rgba(34, 211, 238, 0.15);
-  --component-bg-active: rgba(34, 211, 238, 0.25);
-  --component-border-focus: #22d3ee;
-  --component-surface-raised: #000046;
-  --component-divider: rgba(56, 189, 248, 0.2);
-
-  @include apply-canonical-mapping;
-}
 /* =========================================
    THEME 4: ROYAL VELVET (Luxury Dark)
    Vibe: Expensive, SaaS, Gold/Purple
@@ -2816,107 +2714,7 @@
 }
 /* ===== ADDITIONAL ENHANCEMENTS ===== */
 
-/* ===== ADVANCED UTILITY ENHANCEMENTS ===== */
-/* =========================================
-   THEME 14: NEUMORPHIC (Clean Slate Tech)
-   Vibe: Soft UI, Modern SaaS, Airy
-   ========================================= */
-.theme-neumorphic {
-  --theme-bg-primary: #eef2f6; /* Cool Grey Base */
-  --theme-bg-secondary: #eef2f6; /* Same as base for blending */
-  --theme-bg-ternary: #e2e7ef;
 
-  --theme-text-primary: #334155;
-  --theme-text-secondary: #475569;
-  --theme-text-tertiary: #64748b;
-  --theme-text-label: #94a3b8;
-
-  --theme-border-primary: rgba(255, 255, 255, 0.4); /* Highlight Border */
-  --theme-border-secondary: rgba(203, 213, 225, 0.4);
-
-  --theme-accent-primary: #6366f1; /* Indigo */
-  --theme-accent-secondary: #8b5cf6;
-  --theme-accent-tertiary: #4f46e5;
-  --theme-accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  --theme-accent-focus: rgba(99, 102, 241, 0.2);
-  --theme-accent-hover: #4f46e5;
-
-  --theme-success: #10b981;
-  --theme-warning: #f59e0b;
-  --theme-error: #ef4444;
-  --theme-info: #3b82f6;
-
-  --theme-disabled: #e2e8f0;
-  --theme-disabled-text: #94a3b8;
-
-  /* Neumorphic "Extruded" Glass */
-  --glass-bg: #eef2f6;
-  --glass-blur: 0px;
-  --glass-border: rgba(255, 255, 255, 0.6);
-  /* The Classic Neumorphic Shadow Pair */
-  --glass-shadow: 8px 8px 16px rgba(166, 171, 189, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.8);
-
-  --scroll-thumb: #cbd5e1;
-  --scroll-track: #eef2f6;
-
-  --component-bg-hover: linear-gradient(145deg, #e6eaf0, #ffffff);
-  --component-bg-active: inset 4px 4px 8px rgba(166, 171, 189, 0.2);
-  --component-border-focus: #6366f1;
-  --component-surface-raised: #eef2f6;
-  --component-divider: #cbd5e1;
-
-  @include apply-canonical-mapping;
-}
-
-/* =========================================
-   THEME 15: MATERIAL YOU (Deep Orchid)
-   Vibe: Android 14, Playful but Bold
-   ========================================= */
-.theme-material-you {
-  --theme-bg-primary: #fdf4ff; /* Pale Fuchsia Tint */
-  --theme-bg-secondary: #ffffff;
-  --theme-bg-ternary: #fae8ff;
-
-  --theme-text-primary: #4a044e; /* Deep Purple text */
-  --theme-text-secondary: #701a75;
-  --theme-text-tertiary: #a21caf;
-  --theme-text-label: #c026d3;
-
-  --theme-border-primary: #f0abfc;
-  --theme-border-secondary: #e879f9;
-
-  --theme-accent-primary: #c026d3; /* Fuchsia 600 */
-  --theme-accent-secondary: #d946ef;
-  --theme-accent-tertiary: #a21caf;
-  --theme-accent-gradient: linear-gradient(135deg, #c026d3 0%, #a21caf 100%);
-  --theme-accent-focus: rgba(192, 38, 211, 0.15);
-  --theme-accent-hover: #a21caf;
-
-  --theme-success: #059669;
-  --theme-warning: #d97706;
-  --theme-error: #be123c;
-  --theme-info: #7c3aed;
-
-  --theme-disabled: #fdf4ff;
-  --theme-disabled-text: #e879f9;
-
-  /* Frosted Orchid Glass */
-  --glass-bg: rgba(255, 255, 255, 0.6);
-  --glass-blur: 40px; /* Heavy Blur */
-  --glass-border: rgba(232, 121, 249, 0.4);
-  --glass-shadow: 0 4px 20px rgba(192, 38, 211, 0.1);
-
-  --scroll-thumb: #e879f9;
-  --scroll-track: #fdf4ff;
-
-  --component-bg-hover: rgba(192, 38, 211, 0.08);
-  --component-bg-active: rgba(192, 38, 211, 0.12);
-  --component-border-focus: #c026d3;
-  --component-surface-raised: #ffffff;
-  --component-divider: #f5d0fe;
-
-  @include apply-canonical-mapping;
-}
 
 /* =========================================
    THEME 16: MIDNIGHT ROYAL (Deep Navy & Violet)
@@ -3020,56 +2818,7 @@
   @include apply-canonical-mapping;
 }
 
-/* =========================================
-   THEME 18: DEEP SPACE (Void Black & Cyan)
-   Vibe: Astronomy, NASA, High Contrast Dark
-   ========================================= */
-.theme-deep-space {
-  --theme-bg-primary: #000000; /* True Void */
-  --theme-bg-secondary: #0b0f19; /* Almost Black */
-  --theme-bg-ternary: #111827;
 
-  --theme-text-primary: #ffffff;
-  --theme-text-secondary: #e2e8f0;
-  --theme-text-tertiary: #94a3b8;
-  --theme-text-label: #64748b;
-
-  --theme-border-primary: #1e293b;
-  --theme-border-secondary: #334155;
-
-  /* Cyan & Star White */
-  --theme-accent-primary: #06b6d4; /* Cyan 500 */
-  --theme-accent-secondary: #22d3ee;
-  --theme-accent-tertiary: #0891b2;
-  --theme-accent-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
-  --theme-accent-focus: rgba(6, 182, 212, 0.25);
-  --theme-accent-hover: #0891b2;
-
-  --theme-success: #10b981;
-  --theme-warning: #facc15;
-  --theme-error: #f87171;
-  --theme-info: #38bdf8;
-
-  --theme-disabled: #111827;
-  --theme-disabled-text: #475569;
-
-  /* Starlight Glass */
-  --glass-bg: rgba(11, 15, 25, 0.85);
-  --glass-blur: 12px;
-  --glass-border: rgba(34, 211, 238, 0.2); /* Cyan Rim */
-  --glass-shadow: 0 0 40px rgba(6, 182, 212, 0.1);
-
-  --scroll-thumb: #1e293b;
-  --scroll-track: #000000;
-
-  --component-bg-hover: rgba(6, 182, 212, 0.15);
-  --component-bg-active: rgba(6, 182, 212, 0.2);
-  --component-border-focus: #22d3ee;
-  --component-surface-raised: #0b0f19;
-  --component-divider: #1e293b;
-
-  @include apply-canonical-mapping;
-}
 
 /* =========================================
    THEME 19: EMERALD REGAL (Executive Green)
@@ -3984,4 +3733,60 @@
 }
 .elevation-5 {
   box-shadow: var(--shadow-xl);
+}
+
+
+
+
+
+// 0000000000000000000
+/* =========================================
+   THEME 18: DEEP SPACE (Void Black & Cyan)
+   Vibe: Astronomy, NASA, High Contrast Dark
+   ========================================= */
+.theme-deep-space {
+  --theme-bg-primary: #000000; /* True Void */
+  --theme-bg-secondary: #0b0f19; /* Almost Black */
+  --theme-bg-ternary: #111827;
+
+  --theme-text-primary: #ffffff;
+  --theme-text-secondary: #e2e8f0;
+  --theme-text-tertiary: #94a3b8;
+  --theme-text-label: #64748b;
+
+  --theme-border-primary: #1e293b;
+  --theme-border-secondary: #334155;
+
+  /* Cyan & Star White */
+  --theme-accent-primary: #06b6d4; /* Cyan 500 */
+  --theme-accent-secondary: #22d3ee;
+  --theme-accent-tertiary: #0891b2;
+  --theme-accent-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+  --theme-accent-focus: rgba(6, 182, 212, 0.25);
+  --theme-accent-hover: #0891b2;
+
+  --theme-success: #10b981;
+  --theme-warning: #facc15;
+  --theme-error: #f87171;
+  --theme-info: #38bdf8;
+
+  --theme-disabled: #111827;
+  --theme-disabled-text: #475569;
+
+  /* Starlight Glass */
+  --glass-bg: rgba(11, 15, 25, 0.85);
+  --glass-blur: 12px;
+  --glass-border: rgba(34, 211, 238, 0.2); /* Cyan Rim */
+  --glass-shadow: 0 0 40px rgba(6, 182, 212, 0.1);
+
+  --scroll-thumb: #1e293b;
+  --scroll-track: #000000;
+
+  --component-bg-hover: rgba(6, 182, 212, 0.15);
+  --component-bg-active: rgba(6, 182, 212, 0.2);
+  --component-border-focus: #22d3ee;
+  --component-surface-raised: #0b0f19;
+  --component-divider: #1e293b;
+
+  @include apply-canonical-mapping;
 }

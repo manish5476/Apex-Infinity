@@ -103,8 +103,7 @@ export class CustomerList implements OnInit {
       ? []
       : this.domains.map(domain => query + domain);
   }
-
-  getData(isReset: boolean = false) {
+getData(isReset: boolean = false) {
     if (isReset) {
       this.currentPage = 1;
       this.data = [];
@@ -164,8 +163,13 @@ export class CustomerList implements OnInit {
       },
       error: (err: any) => {
         this.isLoading = false; 
-        this.messageService.showError('Error', 'Failed to fetch customer data.'); 
         console.error('❌ Error fetching data:', err);
+        
+        // Let the global handler parse the exact reason the API failed!
+        this.messageService.handleHttpError(err); 
+        
+        // Added this so your UI loading overlay accurately vanishes on failure
+        this.cdr.markForCheck();
       }
     });
   }

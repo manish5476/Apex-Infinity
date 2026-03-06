@@ -1,0 +1,47 @@
+    <div class="location-picker-wrapper">
+      <!-- Floating Details Card: Glass-morphism style using theme tokens -->
+      <div class="location-details-card" [class.visible]="selectedLocation()">
+        <div class="card-header">
+          <i class="pi pi-map-marker text-[var(--accent-primary)]"></i>
+          <span class="heading">Branch Location</span>
+        </div>
+        
+        <div class="card-body">
+          @if (loadingAddress()) {
+            <div class="loading-state">
+              <i class="pi pi-spin pi-spinner mr-2"></i>
+              <span>Resolving address...</span>
+            </div>
+          } @else {
+            <div class="address-text" [title]="currentAddress()">
+              {{ currentAddress() || 'Select a point on the map' }}
+            </div>
+          }
+
+          <div class="coords-badge">
+            <div class="coord-item">
+              <span class="label">LAT</span>
+              <span class="val">{{ selectedLocation()?.lat | number:'1.6-6' }}</span>
+            </div>
+            <div class="coord-divider"></div>
+            <div class="coord-item">
+              <span class="label">LNG</span>
+              <span class="val">{{ selectedLocation()?.lng | number:'1.6-6' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Map Element -->
+      <div id="map" class="map-frame"></div>
+
+      <!-- Action Hint Overlay -->
+      @if (!selectedLocation()) {
+        <div class="map-hint">
+          <div class="hint-content">
+            <i class="pi pi-directions-alt"></i>
+            <span>Click anywhere to pin branch location</span>
+          </div>
+        </div>
+      }
+    </div>

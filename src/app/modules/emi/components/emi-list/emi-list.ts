@@ -17,17 +17,7 @@ import { ActionViewRenderer } from '../../../shared/AgGrid/AgGridcomponents/Dyna
 @Component({
   selector: 'app-emi-list',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    RouterModule,
-    SelectModule,
-    AutoCompleteModule,
-    ButtonModule,
-    InputTextModule,
-    ToastModule,
-    AgShareGrid
-  ],
+  imports: [CommonModule,FormsModule,RouterModule,SelectModule,AutoCompleteModule,ButtonModule,InputTextModule,ToastModule,AgShareGrid  ],
   providers: [EmiService],
   templateUrl: './emi-list.html',
   styleUrl: './emi-list.scss',
@@ -38,9 +28,8 @@ export class EmiList implements OnInit {
   private messageService = inject(AppMessageService);
   public masterList = inject(MasterListService);
   private router = inject(Router);
-
   private gridApi!: GridApi;
-  
+
   // Pagination State
   private currentPage = 1;
   private pageSize = 50;
@@ -51,13 +40,8 @@ export class EmiList implements OnInit {
   data: any[] = [];
   column: any[] = [];
   rowSelectionMode: any = 'single';
-
   customerOptions = signal<any[]>([]);
-
-  emiFilter = {
-    customerId: null,
-    status: null,
-  };
+  emiFilter = {customerId: null,status: null,  };
 
   statusOptions = [
     { label: 'Active', value: 'active' },
@@ -85,7 +69,45 @@ export class EmiList implements OnInit {
     this.getData(true);
   }
 
-  getData(isReset: boolean = false) {
+
+
+  onScrolledToBottom(_?: any) {
+    // strict check using the flag
+    if (!this.isLoading && this.hasNextPage) {
+      this.getData(false);
+    }
+  }
+
+  onGridReady(params: GridReadyEvent) {
+    this.gridApi = params.api;
+  }
+
+  eventFromGrid(event: any) {
+    if (event.type === 'cellClicked') {
+      const emiId = event.row._id;
+      if (emiId) {
+        this.router.navigate(['/emis', emiId]);
+      }
+    }
+    if (event.type === 'reachedBottom') {
+      this.onScrolledToBottom();
+    }
+  }
+
+
+  private getInstallmentStats(row: any) {
+    const list = row.installments || [];
+
+    const paid = list.filter((i: any) => i.paymentStatus === 'paid').length;
+    const next = list.find((i: any) => i.paymentStatus !== 'paid');
+
+    return { paid, total: list.length, next };
+  }
+
+  private formatDate(d: any) {
+    return d ? new Date(d).toLocaleDateString() : '—';
+  }
+getData(isReset: boolean = false) {
     if (isReset) {
       this.currentPage = 1;
       this.data = [];
@@ -147,48 +169,16 @@ export class EmiList implements OnInit {
       },
       error: (err: any) => {
         this.isLoading = false;
-        this.messageService.showError('Error', 'Failed to fetch EMI data.');
+        
+        // Delegated to your global HTTP error handler
+        this.messageService.handleHttpError(err);
+        
+        // Added change detection trigger to ensure the loading overlay disappears
+        this.cdr.markForCheck();
       }
     });
   }
-
-  onScrolledToBottom(_?: any) {
-    // strict check using the flag
-    if (!this.isLoading && this.hasNextPage) {
-      this.getData(false);
-    }
-  }
-
-  onGridReady(params: GridReadyEvent) {
-    this.gridApi = params.api;
-  }
-
-  eventFromGrid(event: any) {
-    if (event.type === 'cellClicked') {
-      const emiId = event.row._id;
-      if (emiId) {
-        this.router.navigate(['/emis', emiId]);
-      }
-    }
-    if (event.type === 'reachedBottom') {
-      this.onScrolledToBottom();
-    }
-  }
-
-
-  private getInstallmentStats(row: any) {
-    const list = row.installments || [];
-
-    const paid = list.filter((i: any) => i.paymentStatus === 'paid').length;
-    const next = list.find((i: any) => i.paymentStatus !== 'paid');
-
-    return { paid, total: list.length, next };
-  }
-
-  private formatDate(d: any) {
-    return d ? new Date(d).toLocaleDateString() : '—';
-  }
-
+  
 
   getColumn(): void {
     this.column = [

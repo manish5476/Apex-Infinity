@@ -43,12 +43,13 @@ export class BranchDetailsComponent implements OnInit {
     this.loadBranchData();
   }
 
-  private loadBranchData(): void {
+private loadBranchData(): void {
     this.route.paramMap.subscribe(params => {
       const branchId = params.get('id');
 
       if (!branchId) {
-        this.messageService.showError('Navigation Error', 'No branch ID provided');
+        // Updated to pass a single formatted string instead of two parameters
+        this.messageService.showError('Navigation Error: No branch ID provided.');
         this.isError.set(true);
         this.loading.set(false);
         return;
@@ -71,6 +72,8 @@ export class BranchDetailsComponent implements OnInit {
             }
           } else {
             this.isError.set(true);
+            // Added user feedback instead of just silently setting the error state
+            this.messageService.showError('Failed to load branch details. Data is unavailable.');
           }
           this.loading.set(false);
         },
@@ -78,7 +81,6 @@ export class BranchDetailsComponent implements OnInit {
       );
     });
   }
-
   formatAddress(address: any): string {
     if (!address) return 'No address on file.';
     return [address.street, address.city, address.state, address.zipCode, address.country]

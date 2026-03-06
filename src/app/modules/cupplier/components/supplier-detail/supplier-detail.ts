@@ -122,46 +122,7 @@ export class SupplierDetailsComponent implements OnInit {
 
   // --- Transaction Logic ---
 
-  getTransactions(isReset: boolean = false) {
-    const supplierId = this.supplier()?._id;
-    if (!supplierId || this.txnLoading) return;
 
-    this.txnLoading = true;
-
-    if (isReset) {
-      this.txnPage = 1;
-      this.txnData = [];
-      this.txnTotal = 0;
-    }
-
-    const queryParams: any = {
-      ...this.txnFilter,
-      page: this.txnPage,
-      limit: this.txnLimit
-    };
-
-    if (this.rangeDates && this.rangeDates.length > 0) {
-      if (this.rangeDates[0]) queryParams.startDate = this.formatDateForApi(this.rangeDates[0]);
-      if (this.rangeDates[1]) queryParams.endDate = this.formatDateForApi(this.rangeDates[1]);
-    }
-
-    this.transactionService.getSupplierTransactions(supplierId, queryParams).subscribe({
-      next: (res: any) => {
-        let newData = res.results || [];
-        this.txnTotal = res.total || this.txnTotal;
-        this.txnData = isReset ? newData : [...this.txnData, ...newData];
-        
-        if (newData.length > 0) this.txnPage++;
-        
-        this.txnLoading = false;
-        this.cdr.markForCheck();
-      },
-      error: (err) => {
-        this.txnLoading = false;
-        console.error(err);
-      }
-    });
-  }
 
   applyTxnFilters() { this.getTransactions(true); }
   
@@ -252,17 +213,14 @@ export class SupplierDetailsComponent implements OnInit {
     return [addr.street, addr.city, addr.state].filter(p => p).join(', ');
   }
 
-  // ==========================================
-  // DIALOG TRIGGERS
-  // ==========================================
-
-  openSupplierDashboard(supplier: any) {
-    // Pass the supplier object. Make sure your dynamic dialog service expects a supplier!
-    const ref = this.dialogHelper.openSupplierDashboard(supplier);
+  openSupplierKyc(supplier: any) {
+    const ref = this.dialogHelper.openSupplierKyc(supplier._id);
     if (ref) {
-      ref.onClose.subscribe((success: boolean) => {
-        if (success) {
-          this.getTransactions(true); // Refresh if needed
+      ref.onClose.subscribe((result) => {
+        if (result === 'success') {
+          // Changed to showSuccess (since 'success' makes more sense here) 
+          // and simplified to a single clean string.
+          this.messageService.showSuccess('Supplier KYC updated successfully.');
         }
       });
     }
@@ -277,14 +235,138 @@ export class SupplierDetailsComponent implements OnInit {
     }
   }
 
-  openSupplierKyc(supplier: any) {
-    const ref = this.dialogHelper.openSupplierKyc(supplier._id);
+  openSupplierDashboard(supplier: any) {
+    // Pass the supplier object. Make sure your dynamic dialog service expects a supplier!
+    const ref = this.dialogHelper.openSupplierDashboard(supplier);
     if (ref) {
-      ref.onClose.subscribe((result) => {
-        if (result === 'success') {
-          this.messageService.showInfo('success',  'Updated', );
+      ref.onClose.subscribe((success: boolean) => {
+        if (success) {
+          this.getTransactions(true); // Refresh if needed
         }
       });
     }
   }
+
+  getTransactions(isReset: boolean = false) {
+    const supplierId = this.supplier()?._id;
+    if (!supplierId || this.txnLoading) return;
+
+    this.txnLoading = true;
+
+    if (isReset) {
+      this.txnPage = 1;
+      this.txnData = [];
+      this.txnTotal = 0;
+    }
+
+    const queryParams: any = {
+      ...this.txnFilter,
+      page: this.txnPage,
+      limit: this.txnLimit
+    };
+
+    if (this.rangeDates && this.rangeDates.length > 0) {
+      if (this.rangeDates[0]) queryParams.startDate = this.formatDateForApi(this.rangeDates[0]);
+      if (this.rangeDates[1]) queryParams.endDate = this.formatDateForApi(this.rangeDates[1]);
+    }
+
+    this.transactionService.getSupplierTransactions(supplierId, queryParams).subscribe({
+      next: (res: any) => {
+        let newData = res.results || [];
+        this.txnTotal = res.total || this.txnTotal;
+        this.txnData = isReset ? newData : [...this.txnData, ...newData];
+        
+        if (newData.length > 0) this.txnPage++;
+        
+        this.txnLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.txnLoading = false;
+        
+        // I kept your console.error for debugging, but added the toast service!
+        console.error(err);
+        this.messageService.handleHttpError(err);
+        
+        // Added this so the loading spinner accurately vanishes on failure
+        this.cdr.markForCheck(); 
+      }
+    });
+  }
+  
+  // ==========================================
+  // DIALOG TRIGGERS
+  // ==========================================
+
+  // openSupplierDashboard(supplier: any) {
+  //   // Pass the supplier object. Make sure your dynamic dialog service expects a supplier!
+  //   const ref = this.dialogHelper.openSupplierDashboard(supplier);
+  //   if (ref) {
+  //     ref.onClose.subscribe((success: boolean) => {
+  //       if (success) {
+  //         this.getTransactions(true); // Refresh if needed
+  //       }
+  //     });
+  //   }
+  // }
+
+  // openSupplierLedger(supplier: any) {
+  //   const ref = this.dialogHelper.openSupplierLedger(supplier._id);
+  //   if (ref) {
+  //     ref.onClose.subscribe(() => {
+  //       // Optional: refresh data if ledger interactions affected anything
+  //     });
+  //   }
+  // }
+
+  // openSupplierKyc(supplier: any) {
+  //   const ref = this.dialogHelper.openSupplierKyc(supplier._id);
+  //   if (ref) {
+  //     ref.onClose.subscribe((result) => {
+  //       if (result === 'success') {
+  //         this.messageService.showInfo('success',  'Updated', );
+  //       }
+  //     });
+  //   }
+  // }
+  //   getTransactions(isReset: boolean = false) {
+  //   const supplierId = this.supplier()?._id;
+  //   if (!supplierId || this.txnLoading) return;
+
+  //   this.txnLoading = true;
+
+  //   if (isReset) {
+  //     this.txnPage = 1;
+  //     this.txnData = [];
+  //     this.txnTotal = 0;
+  //   }
+
+  //   const queryParams: any = {
+  //     ...this.txnFilter,
+  //     page: this.txnPage,
+  //     limit: this.txnLimit
+  //   };
+
+  //   if (this.rangeDates && this.rangeDates.length > 0) {
+  //     if (this.rangeDates[0]) queryParams.startDate = this.formatDateForApi(this.rangeDates[0]);
+  //     if (this.rangeDates[1]) queryParams.endDate = this.formatDateForApi(this.rangeDates[1]);
+  //   }
+
+  //   this.transactionService.getSupplierTransactions(supplierId, queryParams).subscribe({
+  //     next: (res: any) => {
+  //       let newData = res.results || [];
+  //       this.txnTotal = res.total || this.txnTotal;
+  //       this.txnData = isReset ? newData : [...this.txnData, ...newData];
+        
+  //       if (newData.length > 0) this.txnPage++;
+        
+  //       this.txnLoading = false;
+  //       this.cdr.markForCheck();
+  //     },
+  //     error: (err) => {
+  //       this.txnLoading = false;
+  //       console.error(err);
+  //     }
+  //   });
+  // }
 }
