@@ -225,6 +225,7 @@ textScale: number = 100;
     if (this.profilePopover) this.profilePopover.hide();
     if (this.notificationPopover) this.notificationPopover.hide();
   }
+  
   allThemes: Theme[] = [
     {
     name: "Midnight Bronze",
