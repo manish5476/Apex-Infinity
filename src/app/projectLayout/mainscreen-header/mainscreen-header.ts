@@ -235,6 +235,245 @@ textScale: number = 100;
     category: "premium dark",
     description: "Dark premium glass with deep blue base and rich bronze accents."
   },  {
+    name: "Rose Glass",
+    id: "theme-rose-glass",
+    color: "#f43f5e",
+    gradient: "linear-gradient(135deg, #f43f5e 0%, #fb7185 100%)",
+    category: "glass light",
+    description: "Vibrant red-pink accents on a pristine white glass background."
+  },
+  {
+    name: "Fuchsia Glow",
+    id: "theme-fuchsia-glow",
+    color: "#d946ef",
+    gradient: "linear-gradient(135deg, #d946ef 0%, #e879f9 100%)",
+    category: "glass light",
+    description: "Bright pink-purple gradients illuminating a soft off-white canvas."
+  },
+  {
+    name: "Amethyst Pearl",
+    id: "theme-amethyst-pearl",
+    color: "#a855f7",
+    gradient: "linear-gradient(135deg, #a855f7 0%, #c084fc 100%)",
+    category: "premium light",
+    description: "Rich purple jewel tones paired with elegant dark blue typography."
+  },
+  {
+    name: "Violet Whisper",
+    id: "theme-violet-whisper",
+    color: "#8b5cf6",
+    gradient: "linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)",
+    category: "glass light",
+    description: "Deep violet accents floating over highly transparent white glass."
+  },
+  {
+    name: "Indigo Breeze",
+    id: "theme-indigo-breeze",
+    color: "#6366f1",
+    gradient: "linear-gradient(135deg, #6366f1 0%, #818cf8 100%)",
+    category: "glass light",
+    description: "Sophisticated indigo-blue accents providing a calm, professional interface."
+  },
+  {
+    name: "Royal Sky",
+    id: "theme-royal-sky",
+    color: "#3b82f6",
+    gradient: "linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)",
+    category: "glass light",
+    description: "Classic royal blue highlights bringing clarity and trust to light mode."
+  },
+  {
+    name: "Cerulean Day",
+    id: "theme-cerulean-day",
+    color: "#0ea5e9",
+    gradient: "linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)",
+    category: "glass light",
+    description: "Bright cerulean light-blue elements over clear structural lines."
+  },
+  {
+    name: "Cyan Crystal",
+    id: "theme-cyan-crystal",
+    color: "#06b6d4",
+    gradient: "linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%)",
+    category: "glass light",
+    description: "Vibrant and energetic cyan tones glowing through frosted panels."
+  },
+  {
+    name: "Teal Mist",
+    id: "theme-teal-mist",
+    color: "#14b8a6",
+    gradient: "linear-gradient(135deg, #14b8a6 0%, #2dd4bf 100%)",
+    category: "premium light",
+    description: "Sophisticated teal-green gradients offering a mature, high-end feel."
+  },
+  {
+    name: "Emerald Dawn",
+    id: "theme-emerald-dawn",
+    color: "#10b981",
+    gradient: "linear-gradient(135deg, #10b981 0%, #34d399 100%)",
+    category: "glass light",
+    description: "Fresh, bright emerald mint greens contrasting sharply with dark text."
+  },
+  {
+    name: "Fresh Green",
+    id: "theme-fresh-green",
+    color: "#22c55e",
+    gradient: "linear-gradient(135deg, #22c55e 0%, #4ade80 100%)",
+    category: "glass light",
+    description: "Pure, vibrant green accents evoking growth and natural light."
+  },
+  {
+    name: "Lime Light",
+    id: "theme-lime-light",
+    color: "#84cc16",
+    gradient: "linear-gradient(135deg, #84cc16 0%, #a3e635 100%)",
+    category: "glass light",
+    description: "Electric yellow-green bringing high energy to a clean white background."
+  },
+  {
+    name: "Olive Sun",
+    id: "theme-olive-sun",
+    color: "#65a30d",
+    gradient: "linear-gradient(135deg, #65a30d 0%, #84cc16 100%)",
+    category: "premium light",
+    description: "Earthy dark yellow-green paired with elegant serif typography."
+  },
+  {
+    name: "Lemon Yellow",
+    id: "theme-lemon-yellow",
+    color: "#eab308",
+    gradient: "linear-gradient(135deg, #eab308 0%, #facc15 100%)",
+    category: "glass light",
+    description: "Sunny, pure yellow highlights contrasting deeply with navy blue text."
+  },
+  {
+    name: "Mustard Clear",
+    id: "theme-mustard-clear",
+    color: "#ca8a04",
+    gradient: "linear-gradient(135deg, #ca8a04 0%, #eab308 100%)",
+    category: "glass light",
+    description: "Deep mustard yellow providing a grounded, professional highlight color."
+  },
+  {
+    name: "Amber Light",
+    id: "theme-amber-light",
+    color: "#f59e0b",
+    gradient: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
+    category: "glass light",
+    description: "Warm amber-orange gradients softening a highly structured layout."
+  },
+  {
+    name: "Rust Ivory",
+    id: "theme-rust-ivory",
+    color: "#b45309",
+    gradient: "linear-gradient(135deg, #b45309 0%, #d97706 100%)",
+    category: "premium light",
+    description: "Classic rust orange details bringing a tactile warmth to the UI."
+  },
+  {
+    name: "Sunset Glass",
+    id: "theme-sunset-glass",
+    color: "#ea580c",
+    gradient: "linear-gradient(135deg, #ea580c 0%, #f97316 100%)",
+    category: "glass light",
+    description: "Intense orange-red accents cutting perfectly through clear glass."
+  },
+  {
+    name: "Crimson Frost",
+    id: "theme-crimson-frost",
+    color: "#dc2626",
+    gradient: "linear-gradient(135deg, #dc2626 0%, #ef4444 100%)",
+    category: "glass light",
+    description: "A commanding pure red accent color over frosted light panels."
+  },
+  {
+    name: "Ruby Pearl",
+    id: "theme-ruby-pearl",
+    color: "#be123c",
+    gradient: "linear-gradient(135deg, #be123c 0%, #e11d48 100%)",
+    category: "premium light",
+    description: "Luxurious deep ruby red creating an executive, high-impact aesthetic."
+  },
+  {
+    name: "Magenta Cloud",
+    id: "theme-magenta-cloud",
+    color: "#c026d3",
+    gradient: "linear-gradient(135deg, #c026d3 0%, #d946ef 100%)",
+    category: "glass light",
+    description: "Deep red-purple magenta highlights bursting from an airy white interface."
+  },
+  {
+    name: "Lavender Light",
+    id: "theme-lavender-light",
+    color: "#a78bfa",
+    gradient: "linear-gradient(135deg, #a78bfa 0%, #c4b5fd 100%)",
+    category: "glass light",
+    description: "Very soft, calming purple hues wrapping around solid dark blue content."
+  },
+  {
+    name: "Sky Breeze",
+    id: "theme-sky-breeze",
+    color: "#38bdf8",
+    gradient: "linear-gradient(135deg, #38bdf8 0%, #7dd3fc 100%)",
+    category: "glass light",
+    description: "Cloudless sky-blue interactive elements providing ultimate clarity."
+  },
+  {
+    name: "Seafoam Ice",
+    id: "theme-seafoam-ice",
+    color: "#2dd4bf",
+    gradient: "linear-gradient(135deg, #2dd4bf 0%, #5eead4 100%)",
+    category: "glass light",
+    description: "Gentle seafoam teal adding a refreshing, icy touch to buttons and borders."
+  },
+  {
+    name: "Mint Glacier",
+    id: "theme-mint-glacier",
+    color: "#34d399",
+    gradient: "linear-gradient(135deg, #34d399 0%, #6ee7b7 100%)",
+    category: "glass light",
+    description: "Soft, icy mint green providing a subtle but effective pop of color."
+  },
+  {
+    name: "Lemon Drop",
+    id: "theme-lemon-drop",
+    color: "#facc15",
+    gradient: "linear-gradient(135deg, #facc15 0%, #fde047 100%)",
+    category: "glass light",
+    description: "Sweet, bright yellow tones layered beautifully over white glass."
+  },
+  {
+    name: "Peach Air",
+    id: "theme-peach-air",
+    color: "#fb923c",
+    gradient: "linear-gradient(135deg, #fb923c 0%, #fdba74 100%)",
+    category: "glass light",
+    description: "Airy, soft orange accents creating an inviting and warm experience."
+  },
+  {
+    name: "Salmon Pink",
+    id: "theme-salmon-pink",
+    color: "#fb7185",
+    gradient: "linear-gradient(135deg, #fb7185 0%, #fda4af 100%)",
+    category: "glass light",
+    description: "A gentle blend of pink and red bringing life to a pristine layout."
+  },
+  {
+    name: "Berry Juice",
+    id: "theme-berry-juice",
+    color: "#9f1239",
+    gradient: "linear-gradient(135deg, #9f1239 0%, #be123c 100%)",
+    category: "premium light",
+    description: "Intense, dark berry-pink providing profound contrast against off-white."
+  },
+  {
+    name: "Neon Pink",
+    id: "theme-neon-pink",
+    color: "#ff1493",
+    gradient: "linear-gradient(135deg, #ff1493 0%, #ff69b4 100%)",
+    category: "glass light",
+    description: "Unapologetically vibrant true neon pink for maximum visual flair."
+  }, {
     name: "Daylight Orange",
     id: "theme-daylight-orange",
     color: "#f97316",
