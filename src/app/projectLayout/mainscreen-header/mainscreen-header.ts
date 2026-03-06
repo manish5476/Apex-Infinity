@@ -266,6 +266,29 @@ textScale: number = 100;
     gradient: "linear-gradient(135deg, #000B58 0%, #273385 100%)",
     category: "premium light",
     description: "Warm corporate off-white with sophisticated deep blue typography and accents."
+  },{
+    name: "Crisp Structure",
+    id: "theme-crisp-structure",
+    color: "#000B58",
+    gradient: "linear-gradient(135deg, #000B58 0%, #1a2780 100%)",
+    category: "light",
+    description: "Pure light SaaS interface with strong borders and solid deep blue accents."
+  },
+  {
+    name: "Blueprint Light",
+    id: "theme-blueprint-light",
+    color: "#000B58",
+    gradient: "linear-gradient(135deg, #000B58 0%, #202b75 100%)",
+    category: "light",
+    description: "High-contrast structural theme relying heavily on borders instead of shadows."
+  },
+  {
+    name: "Cloud Ivory",
+    id: "theme-cloud-ivory",
+    color: "#ADC4CE",
+    gradient: "linear-gradient(135deg, #000B58 0%, #151e5e 100%)",
+    category: "light",
+    description: "Soft off-white framing with pure white content areas and deep blue text."
   },
   {
     name: "Obsidian Blue",
