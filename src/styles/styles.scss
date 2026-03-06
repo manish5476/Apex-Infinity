@@ -14,8 +14,18 @@
   --p-comp-padding-y: 0.3rem; 
 }
 
+/* Add this to your main CSS file */
 
+/* Option 1: For a very bold, vibrant gradient background using the accent colors */
+.bg-theme-gradient {
+  background-image: var(--theme-accent-gradient);
+  color: #ffffff; /* You might want white text if the background is a bold color */
+}
 
+/* Option 2: For a soft, subtle gradient using the light background colors (Recommended for main app background) */
+.bg-theme-soft-gradient {
+  background: linear-gradient(135deg, var(--theme-bg-primary) 0%, var(--theme-bg-ternary) 100%);
+}
 .meteor {
   position: absolute;
   inset: 0;
