@@ -234,6 +234,165 @@ textScale: number = 100;
     gradient: "linear-gradient(135deg, #b88645 0%, #d4a363 100%)",
     category: "premium dark",
     description: "Dark premium glass with deep blue base and rich bronze accents."
+  },  {
+    name: "Daylight Orange",
+    id: "theme-daylight-orange",
+    color: "#f97316",
+    gradient: "linear-gradient(135deg, #f97316 0%, #fb923c 100%)",
+    category: "glass light",
+    description: "Bright pure light glass with crisp dark blue text and vibrant orange accents."
+  },
+  {
+    name: "Morning Tangerine",
+    id: "theme-morning-tangerine",
+    color: "#ff8800",
+    gradient: "linear-gradient(135deg, #ff8800 0%, #ff9d33 100%)",
+    category: "glass light",
+    description: "Soft off-white glass paired with deep navy structure and bright tangerine buttons."
+  },
+  {
+    name: "Crisp Apricot",
+    id: "theme-crisp-apricot",
+    color: "#fb923c",
+    gradient: "linear-gradient(135deg, #fb923c 0%, #fdba74 100%)",
+    category: "glass light",
+    description: "Very light, airy interface with gentle apricot orange highlights and dark blue borders."
+  },
+  {
+    name: "Naval Dawn",
+    id: "theme-naval-dawn",
+    color: "#ffbf00",
+    gradient: "linear-gradient(135deg, #ffbf00 0%, #ffcf40 100%)",
+    category: "premium light",
+    description: "Professional white glass theme with bold navy headings and golden amber accents."
+  },
+  {
+    name: "Azure Sun",
+    id: "theme-azure-sun",
+    color: "#ea580c",
+    gradient: "linear-gradient(135deg, #ea580c 0%, #f97316 100%)",
+    category: "glass light",
+    description: "High-contrast light mode with rich sapphire text and aggressive sun-orange elements."
+  },
+  {
+    name: "Frosty Mango",
+    id: "theme-frosty-mango",
+    color: "#ff8c00",
+    gradient: "linear-gradient(135deg, #ff8c00 0%, #ffa633 100%)",
+    category: "glass light",
+    description: "Frosted white glass layered over pale blue with sweet mango orange interactive states."
+  },
+  {
+    name: "Cloud Amber",
+    id: "theme-cloud-amber",
+    color: "#d97706",
+    gradient: "linear-gradient(135deg, #d97706 0%, #f59e0b 100%)",
+    category: "premium light",
+    description: "Soft ivory background framing solid dark blue content and mature amber orange accents."
+  },
+  {
+    name: "Glazed Rust",
+    id: "theme-glazed-rust",
+    color: "#be4d25",
+    gradient: "linear-gradient(135deg, #be4d25 0%, #d6592f 100%)",
+    category: "premium light",
+    description: "Sophisticated light interface utilizing slate-navy text and refined rustic orange buttons."
+  },
+  {
+    name: "Luminous Coral",
+    id: "theme-luminous-coral",
+    color: "#ff7f50",
+    gradient: "linear-gradient(135deg, #ff7f50 0%, #ff9e7a 100%)",
+    category: "glass light",
+    description: "Radiant light blue-grey background with deep ocean text and vibrant coral highlights."
+  },
+  {
+    name: "Clear Tiger",
+    id: "theme-clear-tiger",
+    color: "#fd7e14",
+    gradient: "linear-gradient(135deg, #fd7e14 0%, #ff922b 100%)",
+    category: "glass light",
+    description: "Ultra-clear pure white glass with stealthy dark blue UI lines and fierce tiger orange."
+  },
+  {
+    name: "Airy Marigold",
+    id: "theme-airy-marigold",
+    color: "#faa307",
+    gradient: "linear-gradient(135deg, #faa307 0%, #ffba08 100%)",
+    category: "glass light",
+    description: "Breezy light theme warmed by marigold yellow-orange and grounded by midnight text."
+  },
+  {
+    name: "Soft Flame",
+    id: "theme-soft-flame",
+    color: "#ff4500",
+    gradient: "linear-gradient(135deg, #ff4500 0%, #ff632b 100%)",
+    category: "glass light",
+    description: "Clean, minimal light background pierced by striking solar flare red-orange accents."
+  },
+  {
+    name: "Lucid Copper",
+    id: "theme-lucid-copper",
+    color: "#b87333",
+    gradient: "linear-gradient(135deg, #b87333 0%, #c88951 100%)",
+    category: "premium light",
+    description: "Executive light theme featuring marine blue typography and metallic copper gradients."
+  },
+  {
+    name: "Mist Pumpkin",
+    id: "theme-mist-pumpkin",
+    color: "#ff7518",
+    gradient: "linear-gradient(135deg, #ff7518 0%, #ff8c3a 100%)",
+    category: "glass light",
+    description: "Foggy light-grey glass panels over pure white, featuring rich pumpkin orange calls-to-action."
+  },
+  {
+    name: "Breeze Supernova",
+    id: "theme-breeze-supernova",
+    color: "#ff5e00",
+    gradient: "linear-gradient(135deg, #ff5e00 0%, #ff7d2e 100%)",
+    category: "glass light",
+    description: "Refreshing light theme disrupted by an intense, energetic supernova orange."
+  },
+  {
+    name: "Crystal Neon",
+    id: "theme-crystal-neon",
+    color: "#ff6600",
+    gradient: "linear-gradient(135deg, #ff6600 0%, #ff8533 100%)",
+    category: "glass light",
+    description: "Crystalline white glass with high-tech navy text and highly saturated neon orange."
+  },
+  {
+    name: "Sky Electric",
+    id: "theme-sky-electric",
+    color: "#ff5500",
+    gradient: "linear-gradient(135deg, #ff5500 0%, #ff7733 100%)",
+    category: "glass light",
+    description: "Lightweight, cloud-like backgrounds heavily contrasted with electric orange focal points."
+  },
+  {
+    name: "Pearl Sapphire",
+    id: "theme-pearl-sapphire",
+    color: "#ff632b",
+    gradient: "linear-gradient(135deg, #ff632b 0%, #ff8c61 100%)",
+    category: "premium light",
+    description: "Luxurious pearlescent backgrounds framed by sapphire lines and bright orange buttons."
+  },
+  {
+    name: "Ivory Cobalt",
+    id: "theme-ivory-cobalt",
+    color: "#ffa633",
+    gradient: "linear-gradient(135deg, #ffa633 0%, #ffbf66 100%)",
+    category: "glass light",
+    description: "Warm ivory glass interfaces paired with cool cobalt text and soft orange glows."
+  },
+  {
+    name: "White Eclipse",
+    id: "theme-white-eclipse",
+    color: "#ff9d33",
+    gradient: "linear-gradient(135deg, #ff9d33 0%, #ffb166 100%)",
+    category: "glass light",
+    description: "A stark white theme utilizing deep space navy for readability and pure tangerine accents."
   },
   {
     name: "Frosted Pearl",
