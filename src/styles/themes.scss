@@ -1,4 +1,4 @@
-
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:wght@400;600&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&family=Outfit:wght@300;400;500;600&family=Playfair+Display:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600&family=Space+Grotesk:wght@400;500;600&display=swap');
 :root {
   /* ==========================================================================
      1. TYPOGRAPHY (Refined Compact Scale - STRICTLY PRESERVED)
@@ -205,50 +205,453 @@
 
 
 
-///* ==========================================================================
-  //    5. COLOR SYSTEM (Added to replace hardcoded hex codes)
-  //    ========================================================================== */
-  // /* Brand Colors (Blue) */
-  // --color-primary: #3b82f6;
-  // --color-primary-hover: #2563eb;
-  // --color-primary-active: #1d4ed8;
-  // --color-primary-subtle: #eff6ff;
-  // --color-primary-border: #dbeafe;
-  // --color-on-primary: #ffffff;
 
-  // /* Neutral / Grays */
-  // --color-gray-50: #f9fafb;
-  // --color-gray-100: #f3f4f6;
-  // --color-gray-200: #e5e7eb;
-  // --color-gray-300: #d1d5db;
-  // --color-gray-400: #9ca3af;
-  // --color-gray-500: #6b7280;
-  // --color-gray-600: #4b5563;
-  // --color-gray-700: #374151;
-  // --color-gray-800: #1f2937;
-  // --color-gray-900: #111827;
 
-  // /* Semantic / Functional */
-  // --color-danger-bg: #fee2e2;
-  // --color-danger-text: #991b1b;
+
+.theme-midnight-bronze {
+  /* Custom Fonts */
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+
+  /* Backgrounds */
+  --theme-bg-primary: #00073a; /* Slightly darker than base for depth */
+  --theme-bg-secondary: #000B58; /* Your Deep Blue */
+  --theme-bg-ternary: #04106b;
+
+  /* Typography */
+  --theme-text-primary: #F9F5F6; /* Your Off-White */
+  --theme-text-secondary: #ADC4CE; /* Your Light Blue-Grey */
+  --theme-text-tertiary: #7d96a6;
+  --theme-text-label: #5e7a8c;
+
+  /* Borders */
+  --theme-border-primary: rgba(173, 196, 206, 0.2);
+  --theme-border-secondary: rgba(173, 196, 206, 0.1);
+
+  /* Accents (The Brownish/Bronze Touch) */
+  --theme-accent-primary: #b88645; /* Bronze */
+  --theme-accent-secondary: #d4a363;
+  --theme-accent-tertiary: #e6b981;
+  --theme-accent-gradient: linear-gradient(135deg, #b88645 0%, #d4a363 100%);
+  --theme-accent-focus: rgba(184, 134, 69, 0.15);
+  --theme-accent-hover: #9e7033;
+
+  /* Status Colors */
+  --theme-success: #10b981;
+  --theme-warning: #f59e0b;
+  --theme-error: #ef4444;
+  --theme-info: #ADC4CE;
+
+  --theme-disabled: rgba(249, 245, 246, 0.05);
+  --theme-disabled-text: rgba(249, 245, 246, 0.3);
+
+  /* Dark Premium Glass */
+  --glass-bg: rgba(0, 11, 88, 0.55);
+  --glass-blur: 24px;
+  --glass-border: rgba(173, 196, 206, 0.15);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+  --component-bg-hover: rgba(173, 196, 206, 0.08);
+  --component-bg-active: rgba(173, 196, 206, 0.12);
+  --component-border-focus: #b88645;
+  --component-surface-raised: rgba(0, 11, 88, 0.8);
+  --component-divider: rgba(173, 196, 206, 0.1);
+
+  --scroll-thumb: #b88645;
+  --scroll-track: transparent;
+
+  @include apply-canonical-mapping;
+}
+
+.theme-frosted-pearl {
+  /* Custom Fonts */
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* Backgrounds */
+  --theme-bg-primary: #F9F5F6; /* Your Off-White */
+  --theme-bg-secondary: #ffffff;
+  --theme-bg-ternary: #f0ebeb;
+
+  /* Typography */
+  --theme-text-primary: #000B58; /* Your Deep Blue */
+  --theme-text-secondary: #3b4480;
+  --theme-text-tertiary: #6a74a6;
+  --theme-text-label: #929bc2;
+
+  /* Borders */
+  --theme-border-primary: #ADC4CE; /* Your Light Blue-Grey */
+  --theme-border-secondary: rgba(173, 196, 206, 0.5);
+
+  /* Accents */
+  --theme-accent-primary: #000B58;
+  --theme-accent-secondary: #1a2780;
+  --theme-accent-tertiary: #ADC4CE;
+  --theme-accent-gradient: linear-gradient(135deg, #000B58 0%, #1a2780 100%);
+  --theme-accent-focus: rgba(0, 11, 88, 0.08);
+  --theme-accent-hover: #00053b;
+
+  /* Status Colors */
+  --theme-success: #059669;
+  --theme-warning: #d97706;
+  --theme-error: #dc2626;
+  --theme-info: #0284c7;
+
+  --theme-disabled: #e2e8f0;
+  --theme-disabled-text: #94a3b8;
+
+  /* Pure Light Glass */
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-blur: 30px;
+  --glass-border: rgba(255, 255, 255, 1);
+  --glass-shadow: 0 4px 24px -1px rgba(0, 11, 88, 0.08);
+
+  --component-bg-hover: #f0ebeb;
+  --component-bg-active: #e6dfdf;
+  --component-border-focus: #000B58;
+  --component-surface-raised: #ffffff;
+  --component-divider: rgba(173, 196, 206, 0.4);
+
+  --scroll-thumb: #ADC4CE;
+  --scroll-track: transparent;
+
+  @include apply-canonical-mapping;
+}
+
+
+
+.theme-royal-sapphire {
+  /* Custom Fonts */
+  --font-heading: 'Cinzel', serif;
+  --font-body: 'Montserrat', sans-serif;
+
+  /* Backgrounds */
+  --theme-bg-primary: #000B58; /* Your Deep Blue */
+  --theme-bg-secondary: #000840;
+  --theme-bg-ternary: #00127a;
+
+  /* Typography */
+  --theme-text-primary: #F9F5F6; /* Your Off-White */
+  --theme-text-secondary: #e0d8d9;
+  --theme-text-tertiary: #ADC4CE; /* Your Light Blue-Grey */
+  --theme-text-label: #8ba5b3;
+
+  /* Borders */
+  --theme-border-primary: #8c6a46; /* Brownish touch */
+  --theme-border-secondary: rgba(140, 106, 70, 0.3);
+
+  /* Accents */
+  --theme-accent-primary: #c99d66; /* Warm Gold/Brown */
+  --theme-accent-secondary: #deb887;
+  --theme-accent-tertiary: #f0d5ab;
+  --theme-accent-gradient: linear-gradient(135deg, #8c6a46 0%, #c99d66 100%);
+  --theme-accent-focus: rgba(201, 157, 102, 0.2);
+  --theme-accent-hover: #a67c49;
+
+  /* Status Colors */
+  --theme-success: #34d399;
+  --theme-warning: #fbbf24;
+  --theme-error: #f87171;
+  --theme-info: #60a5fa;
+
+  --theme-disabled: rgba(249, 245, 246, 0.1);
+  --theme-disabled-text: rgba(249, 245, 246, 0.4);
+
+  /* Regal Glass */
+  --glass-bg: rgba(0, 8, 64, 0.7);
+  --glass-blur: 16px;
+  --glass-border: rgba(201, 157, 102, 0.3);
+  --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+
+  --component-bg-hover: rgba(201, 157, 102, 0.05);
+  --component-bg-active: rgba(201, 157, 102, 0.1);
+  --component-border-focus: #c99d66;
+  --component-surface-raised: #00127a;
+  --component-divider: rgba(201, 157, 102, 0.2);
+
+  --scroll-thumb: #c99d66;
+  --scroll-track: #000B58;
+
+  @include apply-canonical-mapping;
+}
+
+
+.theme-royal-sapphire {
+  /* Custom Fonts */
+  --font-heading: 'Cinzel', serif;
+  --font-body: 'Montserrat', sans-serif;
+
+  /* Backgrounds */
+  --theme-bg-primary: #000B58; /* Your Deep Blue */
+  --theme-bg-secondary: #000840;
+  --theme-bg-ternary: #00127a;
+
+  /* Typography */
+  --theme-text-primary: #F9F5F6; /* Your Off-White */
+  --theme-text-secondary: #e0d8d9;
+  --theme-text-tertiary: #ADC4CE; /* Your Light Blue-Grey */
+  --theme-text-label: #8ba5b3;
+
+  /* Borders */
+  --theme-border-primary: #8c6a46; /* Brownish touch */
+  --theme-border-secondary: rgba(140, 106, 70, 0.3);
+
+  /* Accents */
+  --theme-accent-primary: #c99d66; /* Warm Gold/Brown */
+  --theme-accent-secondary: #deb887;
+  --theme-accent-tertiary: #f0d5ab;
+  --theme-accent-gradient: linear-gradient(135deg, #8c6a46 0%, #c99d66 100%);
+  --theme-accent-focus: rgba(201, 157, 102, 0.2);
+  --theme-accent-hover: #a67c49;
+
+  /* Status Colors */
+  --theme-success: #34d399;
+  --theme-warning: #fbbf24;
+  --theme-error: #f87171;
+  --theme-info: #60a5fa;
+
+  --theme-disabled: rgba(249, 245, 246, 0.1);
+  --theme-disabled-text: rgba(249, 245, 246, 0.4);
+
+  /* Regal Glass */
+  --glass-bg: rgba(0, 8, 64, 0.7);
+  --glass-blur: 16px;
+  --glass-border: rgba(201, 157, 102, 0.3);
+  --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+
+  --component-bg-hover: rgba(201, 157, 102, 0.05);
+  --component-bg-active: rgba(201, 157, 102, 0.1);
+  --component-border-focus: #c99d66;
+  --component-surface-raised: #00127a;
+  --component-divider: rgba(201, 157, 102, 0.2);
+
+  --scroll-thumb: #c99d66;
+  --scroll-track: #000B58;
+
+  @include apply-canonical-mapping;
+}
+
+.theme-ocean-mist {
+  /* Custom Fonts */
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* Backgrounds */
+  --theme-bg-primary: #e6edf0; /* Lighter version of ADC4CE */
+  --theme-bg-secondary: #F9F5F6; /* Your Off-White */
+  --theme-bg-ternary: #ADC4CE; /* Your Light Blue-Grey */
+
+  /* Typography */
+  --theme-text-primary: #000B58; /* Your Deep Blue */
+  --theme-text-secondary: #2c356b;
+  --theme-text-tertiary: #5e6691;
+  --theme-text-label: #8b92b5;
+
+  /* Borders */
+  --theme-border-primary: #ADC4CE;
+  --theme-border-secondary: #d1dde3;
+
+  /* Accents */
+  --theme-accent-primary: #8a6a52; /* Soft muted brown */
+  --theme-accent-secondary: #a3856d;
+  --theme-accent-tertiary: #c4a995;
+  --theme-accent-gradient: linear-gradient(135deg, #8a6a52 0%, #a3856d 100%);
+  --theme-accent-focus: rgba(138, 106, 82, 0.15);
+  --theme-accent-hover: #6e523e;
+
+  /* Status Colors */
+  --theme-success: #059669;
+  --theme-warning: #ea580c;
+  --theme-error: #e11d48;
+  --theme-info: #0284c7;
+
+  --theme-disabled: #cbd5e1;
+  --theme-disabled-text: #64748b;
+
+  /* Soft Glass */
+  --glass-bg: rgba(249, 245, 246, 0.6);
+  --glass-blur: 12px;
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-shadow: 0 4px 16px rgba(173, 196, 206, 0.3);
+
+  --component-bg-hover: #ffffff;
+  --component-bg-active: #e6edf0;
+  --component-border-focus: #8a6a52;
+  --component-surface-raised: #ffffff;
+  --component-divider: #ADC4CE;
+
+  --scroll-thumb: #8a6a52;
+  --scroll-track: transparent;
+
+  @include apply-canonical-mapping;
+}
+
+.theme-executive-velvet {
+  /* Custom Fonts */
+  --font-heading: 'Cormorant Garamond', serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+
+  /* Backgrounds */
+  --theme-bg-primary: #F9F5F6; /* Your Off-White */
+  --theme-bg-secondary: #faf0eb; /* Warmer off-white */
+  --theme-bg-ternary: #f2e3db;
+
+  /* Typography */
+  --theme-text-primary: #2b1f1a; /* Very dark warm brown */
+  --theme-text-secondary: #5e493f;
+  --theme-text-tertiary: #8f7568;
+  --theme-text-label: #b39b8f;
+
+  /* Borders */
+  --theme-border-primary: #e3d1c8;
+  --theme-border-secondary: #f0e6e1;
+
+  /* Accents */
+  --theme-accent-primary: #000B58; /* Your Deep Blue */
+  --theme-accent-secondary: #273385;
+  --theme-accent-tertiary: #ADC4CE; /* Your Light Blue-Grey */
+  --theme-accent-gradient: linear-gradient(135deg, #000B58 0%, #273385 100%);
+  --theme-accent-focus: rgba(0, 11, 88, 0.1);
+  --theme-accent-hover: #000636;
+
+  /* Status Colors */
+  --theme-success: #16a34a;
+  --theme-warning: #d97706;
+  --theme-error: #dc2626;
+  --theme-info: #2563eb;
+
+  --theme-disabled: #e5e5e5;
+  --theme-disabled-text: #a3a3a3;
+
+  /* Warm Glass */
+  --glass-bg: rgba(249, 245, 246, 0.8);
+  --glass-blur: 20px;
+  --glass-border: rgba(255, 255, 255, 0.9);
+  --glass-shadow: 0 10px 30px rgba(43, 31, 26, 0.05);
+
+  --component-bg-hover: #ffffff;
+  --component-bg-active: #f2e3db;
+  --component-border-focus: #000B58;
+  --component-surface-raised: #ffffff;
+  --component-divider: #e3d1c8;
+
+  --scroll-thumb: #000B58;
+  --scroll-track: transparent;
+
+  @include apply-canonical-mapping;
+}.theme-obsidian-blue {
+  /* Custom Fonts */
+  --font-heading: 'Inter', sans-serif;
+  --font-body: 'Space Grotesk', sans-serif;
+
+  /* Backgrounds */
+  --theme-bg-primary: #020617; /* Near black */
+  --theme-bg-secondary: #000B58; /* Your Deep Blue */
+  --theme-bg-ternary: #06153b;
+
+  /* Typography */
+  --theme-text-primary: #F9F5F6; /* Your Off-White */
+  --theme-text-secondary: #ADC4CE; /* Your Light Blue-Grey */
+  --theme-text-tertiary: #6e8b99;
+  --theme-text-label: #4d6673;
+
+  /* Borders */
+  --theme-border-primary: rgba(173, 196, 206, 0.15);
+  --theme-border-secondary: rgba(173, 196, 206, 0.05);
+
+  /* Accents */
+  --theme-accent-primary: #ADC4CE; /* Your Light Blue-Grey */
+  --theme-accent-secondary: #d4e3e8;
+  --theme-accent-tertiary: #ffffff;
+  --theme-accent-gradient: linear-gradient(135deg, #ADC4CE 0%, #ffffff 100%);
+  --theme-accent-focus: rgba(173, 196, 206, 0.2);
+  --theme-accent-hover: #8ba8b5;
+
+  /* Status Colors */
+  --theme-success: #10b981;
+  --theme-warning: #b88645; /* The Brownish Touch used as a warning/highlight */
+  --theme-error: #ef4444;
+  --theme-info: #3b82f6;
+
+  --theme-disabled: #1e293b;
+  --theme-disabled-text: #475569;
+
+  /* Stealth Glass */
+  --glass-bg: rgba(2, 6, 23, 0.6);
+  --glass-blur: 40px;
+  --glass-border: rgba(173, 196, 206, 0.1);
+  --glass-shadow: inset 0 1px 0 0 rgba(173, 196, 206, 0.1);
+
+  --component-bg-hover: rgba(173, 196, 206, 0.05);
+  --component-bg-active: rgba(173, 196, 206, 0.1);
+  --component-border-focus: #ADC4CE;
+  --component-surface-raised: #000B58;
+  --component-divider: rgba(173, 196, 206, 0.1);
+
+  --scroll-thumb: #ADC4CE;
+  --scroll-track: transparent;
+
+  @include apply-canonical-mapping;
+}
+/* =========================================
+   THEME: MIDNIGHT SLATE (Premium Dark)
+   Vibe: Executive, Deep, Glassmorphic
+   Colors: #000B58 (Base), #ADC4CE (Glass), #F9F5F6 (Text)
+   ========================================= */
+.theme-midnight-slate {
+  /* Core Backgrounds - Deep Navy Base */
+  --theme-bg-primary: #000B58; 
+  --theme-bg-secondary: #050E62; /* Slightly lighter navy for cards */
+  --theme-bg-ternary: #0A1470;   /* Surface highlights */
+
+  /* Typography - Crisp Shell White */
+  --theme-text-primary: #F9F5F6;
+  --theme-text-secondary: #ADC4CE; /* Muted Blue-Grey for subtext */
+  --theme-text-tertiary: rgba(173, 196, 206, 0.6);
+  --theme-text-label: rgba(249, 245, 246, 0.4);
+
+  /* Borders & Dividers - The Muted Blue-Grey */
+  --theme-border-primary: rgba(173, 196, 206, 0.15);
+  --theme-border-secondary: rgba(173, 196, 206, 0.3);
+
+  /* Accents - The "Brownish Touch" & Gold-Tinted Blue */
+  --theme-accent-primary: #ADC4CE; 
+  --theme-accent-secondary: #8E9BA1; /* Darker variant of your grey */
+  --theme-accent-tertiary: #C4A484;  /* THE BROWNISH TOUCH: Deep Champagne/Bronze */
   
-  // /* Backgrounds */
-  // --bg-app: var(--color-gray-100);
-  // --bg-surface: #ffffff;
-  // --bg-surface-glass: rgba(255, 255, 255, 0.8); /* For backdrop filters */
-  
-  // /* Borders */
-  // --border-subtle: var(--color-gray-200);
-  // --border-glass: rgba(255, 255, 255, 0.5);
+  /* Gradient: Deep Navy to a subtle brownish-charcoal */
+  --theme-accent-gradient: linear-gradient(135deg, #000B58 0%, #1A1616 100%);
+  --theme-accent-focus: rgba(173, 196, 206, 0.2);
+  --theme-accent-hover: #F9F5F6;
 
-  // /* Text */
-  // --text-primary: var(--color-gray-900);
-  // --text-secondary: var(--color-gray-600);
-  // --text-muted: var(--color-gray-500);
-  // --text-placeholder: var(--color-gray-400);
-  // --text-inverse: #ffffff;
+  /* Semantic Colors - Muted for Premium Feel */
+  --theme-success: #82A098; /* Muted Sage */
+  --theme-warning: #D1B07D; /* Muted Gold/Brown */
+  --theme-error: #A36B6B;   /* Muted Rose */
+  --theme-info: #7D93D1;
 
+  --theme-disabled: rgba(173, 196, 206, 0.1);
+  --theme-disabled-text: rgba(173, 196, 206, 0.3);
 
+  /* Premium Glass - Using #ADC4CE for the frost effect */
+  --glass-bg: rgba(0, 11, 88, 0.7); /* Navy base with alpha */
+  --glass-blur: 16px;
+  --glass-border: rgba(173, 196, 206, 0.1);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+
+  /* Component Specifics */
+  --component-bg-hover: rgba(173, 196, 206, 0.08);
+  --component-bg-active: rgba(173, 196, 206, 0.12);
+  --component-border-focus: #ADC4CE;
+  --component-surface-raised: #08126B;
+  --component-divider: rgba(173, 196, 206, 0.1);
+
+  /* Scrollbar - Muted Blue */
+  --scroll-thumb: #34407A;
+  --scroll-track: #000B58;
+
+  @include apply-canonical-mapping;
+} 
 /* =========================================
    THEME 1: LUMINOUS (Standard Professional Light)
    Vibe: Clean, Executive, Trusted
