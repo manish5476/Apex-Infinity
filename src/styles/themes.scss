@@ -202,7 +202,405 @@
   --scroll-track: var(--scroll-track-c);
 }
 
+/* ==========================================================================
+   DARK BLUE & ORANGE GLASS THEMES (20 VARIATIONS)
+   ========================================================================== */
 
+/* 1. Neon Eclipse (Deep Navy & Neon Orange) */
+.theme-neon-eclipse {
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #020617;
+  --theme-bg-secondary: #0a0f24;
+  --theme-bg-ternary: #0f172a;
+  --theme-text-primary: #ffffff;
+  --theme-text-secondary: #94a3b8;
+  --theme-text-tertiary: #64748b;
+  --theme-text-label: #475569;
+  --theme-border-primary: rgba(255, 102, 0, 0.2);
+  --theme-border-secondary: rgba(255, 102, 0, 0.1);
+  --theme-accent-primary: #ff6600;
+  --theme-accent-secondary: #ff8533;
+  --theme-accent-tertiary: #ff9933;
+  --theme-accent-gradient: linear-gradient(135deg, #ff6600 0%, #ff8533 100%);
+  --theme-accent-focus: rgba(255, 102, 0, 0.2);
+  --theme-accent-hover: #cc5200;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: rgba(255, 255, 255, 0.05); --theme-disabled-text: rgba(255, 255, 255, 0.3);
+  /* Glass */
+  --glass-bg: rgba(10, 15, 36, 0.5);
+  --glass-blur: 24px;
+  --glass-border: rgba(255, 102, 0, 0.15);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --component-bg-hover: rgba(255, 102, 0, 0.05); --component-bg-active: rgba(255, 102, 0, 0.1);
+  --component-border-focus: #ff6600; --component-surface-raised: rgba(10, 15, 36, 0.8); --component-divider: rgba(255, 102, 0, 0.1);
+  --scroll-thumb: #ff6600; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 2. Naval Amber (Rich Navy & Golden Amber) */
+.theme-naval-amber {
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --theme-bg-primary: #001122; --theme-bg-secondary: #001b36; --theme-bg-ternary: #00264d;
+  --theme-text-primary: #f8fafc; --theme-text-secondary: #cbd5e1; --theme-text-tertiary: #64748b; --theme-text-label: #475569;
+  --theme-border-primary: rgba(255, 191, 0, 0.2); --theme-border-secondary: rgba(255, 255, 255, 0.05);
+  --theme-accent-primary: #ffbf00; --theme-accent-secondary: #ffcf40; --theme-accent-tertiary: #ffe080;
+  --theme-accent-gradient: linear-gradient(135deg, #ffbf00 0%, #ffcf40 100%);
+  --theme-accent-focus: rgba(255, 191, 0, 0.15); --theme-accent-hover: #cc9900;
+  --theme-success: #059669; --theme-warning: #ea580c; --theme-error: #dc2626; --theme-info: #0284c7;
+  --theme-disabled: rgba(255, 255, 255, 0.05); --theme-disabled-text: rgba(255, 255, 255, 0.3);
+  /* Glass */
+  --glass-bg: rgba(0, 27, 54, 0.65); --glass-blur: 20px; --glass-border: rgba(255, 191, 0, 0.2); --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  --component-bg-hover: rgba(255, 191, 0, 0.05); --component-bg-active: rgba(255, 191, 0, 0.1);
+  --component-border-focus: #ffbf00; --component-surface-raised: rgba(0, 27, 54, 0.85); --component-divider: rgba(255, 191, 0, 0.15);
+  --scroll-thumb: #ffbf00; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 3. Abyssal Coral (Deep Ocean & Vibrant Coral) */
+.theme-abyssal-coral {
+  --font-heading: 'Poppins', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #040814; --theme-bg-secondary: #0a1128; --theme-bg-ternary: #111d42;
+  --theme-text-primary: #ffffff; --theme-text-secondary: #a3b8cc; --theme-text-tertiary: #5c7799; --theme-text-label: #3d5270;
+  --theme-border-primary: rgba(255, 127, 80, 0.25); --theme-border-secondary: rgba(255, 127, 80, 0.1);
+  --theme-accent-primary: #ff7f50; --theme-accent-secondary: #ff9e7a; --theme-accent-tertiary: #ffbc9e;
+  --theme-accent-gradient: linear-gradient(135deg, #ff7f50 0%, #ff9e7a 100%);
+  --theme-accent-focus: rgba(255, 127, 80, 0.2); --theme-accent-hover: #e66030;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: rgba(255, 255, 255, 0.05); --theme-disabled-text: rgba(255, 255, 255, 0.3);
+  /* Glass */
+  --glass-bg: rgba(10, 17, 40, 0.55); --glass-blur: 30px; --glass-border: rgba(255, 127, 80, 0.2); --glass-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --component-bg-hover: rgba(255, 127, 80, 0.08); --component-bg-active: rgba(255, 127, 80, 0.15);
+  --component-border-focus: #ff7f50; --component-surface-raised: rgba(17, 29, 66, 0.8); --component-divider: rgba(255, 127, 80, 0.1);
+  --scroll-thumb: #ff7f50; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 4. Slate Rust (Muted Dark Blue & Rust Orange) */
+.theme-slate-rust {
+  --font-heading: 'Cinzel', serif; --font-body: 'Montserrat', sans-serif;
+  --theme-bg-primary: #0f172a; --theme-bg-secondary: #1e293b; --theme-bg-ternary: #334155;
+  --theme-text-primary: #f8fafc; --theme-text-secondary: #cbd5e1; --theme-text-tertiary: #94a3b8; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(217, 119, 6, 0.3); --theme-border-secondary: rgba(217, 119, 6, 0.15);
+  --theme-accent-primary: #d97706; --theme-accent-secondary: #f59e0b; --theme-accent-tertiary: #fbbf24;
+  --theme-accent-gradient: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+  --theme-accent-focus: rgba(217, 119, 6, 0.15); --theme-accent-hover: #b45309;
+  --theme-success: #059669; --theme-warning: #fbbf24; --theme-error: #dc2626; --theme-info: #2563eb;
+  --theme-disabled: rgba(255, 255, 255, 0.05); --theme-disabled-text: rgba(255, 255, 255, 0.3);
+  /* Glass */
+  --glass-bg: rgba(30, 41, 59, 0.7); --glass-blur: 16px; --glass-border: rgba(217, 119, 6, 0.25); --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --component-bg-hover: rgba(217, 119, 6, 0.05); --component-bg-active: rgba(217, 119, 6, 0.1);
+  --component-border-focus: #d97706; --component-surface-raised: rgba(51, 65, 85, 0.9); --component-divider: rgba(217, 119, 6, 0.15);
+  --scroll-thumb: #d97706; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 5. Indigo Tangerine (Deep Indigo & Bright Tangerine) */
+.theme-indigo-tangerine {
+  --font-heading: 'Inter', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #110e2d; --theme-bg-secondary: #1a1642; --theme-bg-ternary: #262061;
+  --theme-text-primary: #ffffff; --theme-text-secondary: #c7c4e6; --theme-text-tertiary: #8e8ab8; --theme-text-label: #64608f;
+  --theme-border-primary: rgba(249, 115, 22, 0.25); --theme-border-secondary: rgba(255, 255, 255, 0.05);
+  --theme-accent-primary: #f97316; --theme-accent-secondary: #fb923c; --theme-accent-tertiary: #fdba74;
+  --theme-accent-gradient: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+  --theme-accent-focus: rgba(249, 115, 22, 0.2); --theme-accent-hover: #ea580c;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: rgba(255, 255, 255, 0.05); --theme-disabled-text: rgba(255, 255, 255, 0.3);
+  /* Glass */
+  --glass-bg: rgba(26, 22, 66, 0.6); --glass-blur: 24px; --glass-border: rgba(249, 115, 22, 0.2); --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+  --component-bg-hover: rgba(249, 115, 22, 0.08); --component-bg-active: rgba(249, 115, 22, 0.12);
+  --component-border-focus: #f97316; --component-surface-raised: rgba(38, 32, 97, 0.85); --component-divider: rgba(249, 115, 22, 0.1);
+  --scroll-thumb: #f97316; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 6. Solar Space (Pitch Blue & Solar Flare) */
+.theme-solar-space {
+  --font-heading: 'Outfit', sans-serif; --font-body: 'Outfit', sans-serif;
+  --theme-bg-primary: #00040f; --theme-bg-secondary: #000a24; --theme-bg-ternary: #001340;
+  --theme-text-primary: #ffffff; --theme-text-secondary: #94a3b8; --theme-text-tertiary: #475569; --theme-text-label: #334155;
+  --theme-border-primary: rgba(255, 69, 0, 0.3); --theme-border-secondary: rgba(255, 69, 0, 0.1);
+  --theme-accent-primary: #ff4500; --theme-accent-secondary: #ff632b; --theme-accent-tertiary: #ff8c61;
+  --theme-accent-gradient: linear-gradient(135deg, #ff4500 0%, #ff632b 100%);
+  --theme-accent-focus: rgba(255, 69, 0, 0.25); --theme-accent-hover: #cc3700;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: rgba(255, 255, 255, 0.05); --theme-disabled-text: rgba(255, 255, 255, 0.3);
+  /* Glass */
+  --glass-bg: rgba(0, 10, 36, 0.45); --glass-blur: 32px; --glass-border: rgba(255, 69, 0, 0.25); --glass-shadow: 0 0 40px rgba(255, 69, 0, 0.1);
+  --component-bg-hover: rgba(255, 69, 0, 0.06); --component-bg-active: rgba(255, 69, 0, 0.12);
+  --component-border-focus: #ff4500; --component-surface-raised: rgba(0, 19, 64, 0.8); --component-divider: rgba(255, 69, 0, 0.15);
+  --scroll-thumb: #ff4500; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 7. Cobalt Mango (Cobalt Blue & Mango Orange) */
+.theme-cobalt-mango {
+  --font-heading: 'Space Grotesk', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #0a1128; --theme-bg-secondary: #10214a; --theme-bg-ternary: #19326e;
+  --theme-text-primary: #ffffff; --theme-text-secondary: #cce0ff; --theme-text-tertiary: #80aaff; --theme-text-label: #4d88ff;
+  --theme-border-primary: rgba(255, 140, 0, 0.25); --theme-border-secondary: rgba(255, 255, 255, 0.08);
+  --theme-accent-primary: #ff8c00; --theme-accent-secondary: #ffa633; --theme-accent-tertiary: #ffbf66;
+  --theme-accent-gradient: linear-gradient(135deg, #ff8c00 0%, #ffa633 100%);
+  --theme-accent-focus: rgba(255, 140, 0, 0.2); --theme-accent-hover: #cc7000;
+  --theme-success: #059669; --theme-warning: #ea580c; --theme-error: #dc2626; --theme-info: #0284c7;
+  --theme-disabled: rgba(255, 255, 255, 0.05); --theme-disabled-text: rgba(255, 255, 255, 0.3);
+  /* Glass */
+  --glass-bg: rgba(16, 33, 74, 0.55); --glass-blur: 16px; --glass-border: rgba(255, 140, 0, 0.15); --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --component-bg-hover: rgba(255, 140, 0, 0.08); --component-bg-active: rgba(255, 140, 0, 0.15);
+  --component-border-focus: #ff8c00; --component-surface-raised: rgba(25, 50, 110, 0.85); --component-divider: rgba(255, 140, 0, 0.1);
+  --scroll-thumb: #ff8c00; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 8. Sapphire Flame (Sapphire Blue & Flame Orange) */
+.theme-sapphire-flame {
+  --font-heading: 'Playfair Display', serif; --font-body: 'Plus Jakarta Sans', sans-serif;
+  --theme-bg-primary: #000c24; --theme-bg-secondary: #001740; --theme-bg-ternary: #002566;
+  --theme-text-primary: #f8fafc; --theme-text-secondary: #cbd5e1; --theme-text-tertiary: #64748b; --theme-text-label: #475569;
+  --theme-border-primary: rgba(220, 38, 38, 0.3); --theme-border-secondary: rgba(220, 38, 38, 0.1);
+  --theme-accent-primary: #ea580c; /* Orange-red Flame */
+  --theme-accent-secondary: #f97316; --theme-accent-tertiary: #fb923c;
+  --theme-accent-gradient: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+  --theme-accent-focus: rgba(234, 88, 12, 0.2); --theme-accent-hover: #c2410c;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: rgba(255, 255, 255, 0.05); --theme-disabled-text: rgba(255, 255, 255, 0.3);
+  /* Glass */
+  --glass-bg: rgba(0, 23, 64, 0.6); --glass-blur: 20px; --glass-border: rgba(234, 88, 12, 0.2); --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  --component-bg-hover: rgba(234, 88, 12, 0.05); --component-bg-active: rgba(234, 88, 12, 0.1);
+  --component-border-focus: #ea580c; --component-surface-raised: rgba(0, 37, 102, 0.85); --component-divider: rgba(234, 88, 12, 0.15);
+  --scroll-thumb: #ea580c; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 9. Oceanic Peach (Dark Teal Blue & Peach Orange) */
+.theme-oceanic-peach {
+  --font-heading: 'Poppins', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #05161e; --theme-bg-secondary: #0a2633; --theme-bg-ternary: #103c52;
+  --theme-text-primary: #ffffff; --theme-text-secondary: #b3d4e6; --theme-text-tertiary: #73a6bf; --theme-text-label: #4d8099;
+  --theme-border-primary: rgba(255, 160, 122, 0.25); --theme-border-secondary: rgba(255, 255, 255, 0.05);
+  --theme-accent-primary: #ffb085; --theme-accent-secondary: #ffc2a3; --theme-accent-tertiary: #ffd6c2;
+  --theme-accent-gradient: linear-gradient(135deg, #ffb085 0%, #ffc2a3 100%);
+  --theme-accent-focus: rgba(255, 176, 133, 0.2); --theme-accent-hover: #e69165;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: rgba(255, 255, 255, 0.05); --theme-disabled-text: rgba(255, 255, 255, 0.3);
+  /* Glass */
+  --glass-bg: rgba(10, 38, 51, 0.5); --glass-blur: 16px; --glass-border: rgba(255, 176, 133, 0.2); --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --component-bg-hover: rgba(255, 176, 133, 0.08); --component-bg-active: rgba(255, 176, 133, 0.15);
+  --component-border-focus: #ffb085; --component-surface-raised: rgba(16, 60, 82, 0.85); --component-divider: rgba(255, 176, 133, 0.1);
+  --scroll-thumb: #ffb085; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 10. Lapis Tiger (Lapis Lazuli Blue & Tiger Orange) */
+.theme-lapis-tiger {
+  --font-heading: 'Outfit', sans-serif; --font-body: 'Outfit', sans-serif;
+  --theme-bg-primary: #0a1128; --theme-bg-secondary: #111d42; --theme-bg-ternary: #192a61;
+  --theme-text-primary: #ffffff; --theme-text-secondary: #cce0ff; --theme-text-tertiary: #80aaff; --theme-text-label: #4d88ff;
+  --theme-border-primary: rgba(253, 126, 20, 0.3); --theme-border-secondary: rgba(253, 126, 20, 0.1);
+  --theme-accent-primary: #fd7e14; --theme-accent-secondary: #ff922b; --theme-accent-tertiary: #ffa94d;
+  --theme-accent-gradient: linear-gradient(135deg, #fd7e14 0%, #ff922b 100%);
+  --theme-accent-focus: rgba(253, 126, 20, 0.2); --theme-accent-hover: #e8590c;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: rgba(255, 255, 255, 0.05); --theme-disabled-text: rgba(255, 255, 255, 0.3);
+  /* Glass */
+  --glass-bg: rgba(17, 29, 66, 0.6); --glass-blur: 24px; --glass-border: rgba(253, 126, 20, 0.2); --glass-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --component-bg-hover: rgba(253, 126, 20, 0.08); --component-bg-active: rgba(253, 126, 20, 0.15);
+  --component-border-focus: #fd7e14; --component-surface-raised: rgba(25, 42, 97, 0.85); --component-divider: rgba(253, 126, 20, 0.15);
+  --scroll-thumb: #fd7e14; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 11. Midnight Marigold (Midnight Blue & Marigold Orange) */
+.theme-midnight-marigold {
+  --font-heading: 'Space Grotesk', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #020617; --theme-bg-secondary: #0f172a; --theme-bg-ternary: #1e293b;
+  --theme-text-primary: #ffffff; --theme-text-secondary: #cbd5e1; --theme-text-tertiary: #64748b; --theme-text-label: #475569;
+  --theme-border-primary: rgba(250, 163, 7, 0.25); --theme-border-secondary: rgba(255, 255, 255, 0.05);
+  --theme-accent-primary: #faa307; --theme-accent-secondary: #ffba08; --theme-accent-tertiary: #ffc300;
+  --theme-accent-gradient: linear-gradient(135deg, #faa307 0%, #ffba08 100%);
+  --theme-accent-focus: rgba(250, 163, 7, 0.15); --theme-accent-hover: #e85d04;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: rgba(255, 255, 255, 0.05); --theme-disabled-text: rgba(255, 255, 255, 0.3);
+  /* Glass */
+  --glass-bg: rgba(15, 23, 42, 0.65); --glass-blur: 20px; --glass-border: rgba(250, 163, 7, 0.2); --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  --component-bg-hover: rgba(250, 163, 7, 0.05); --component-bg-active: rgba(250, 163, 7, 0.1);
+  --component-border-focus: #faa307; --component-surface-raised: rgba(30, 41, 59, 0.85); --component-divider: rgba(250, 163, 7, 0.1);
+  --scroll-thumb: #faa307; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 12. Twilight Burnt (Twilight Navy & Burnt Orange) */
+.theme-twilight-burnt {
+  --font-heading: 'Cinzel', serif; --font-body: 'Montserrat', sans-serif;
+  --theme-bg-primary: #0a0b1a; --theme-bg-secondary: #131533; --theme-bg-ternary: #1e204c;
+  --theme-text-primary: #f8fafc; --theme-text-secondary: #cbd5e1; --theme-text-tertiary: #94a3b8; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(190, 77, 37, 0.3); --theme-border-secondary: rgba(190, 77, 37, 0.1);
+  --theme-accent-primary: #be4d25; --theme-accent-secondary: #d6592f; --theme-accent-tertiary: #e0724e;
+  --theme-accent-gradient: linear-gradient(135deg, #be4d25 0%, #d6592f 100%);
+  --theme-accent-focus: rgba(190, 77, 37, 0.2); --theme-accent-hover: #9c3c1a;
+  --theme-success: #059669; --theme-warning: #d97706; --theme-error: #dc2626; --theme-info: #2563eb;
+  --theme-disabled: rgba(255, 255, 255, 0.05); --theme-disabled-text: rgba(255, 255, 255, 0.3);
+  /* Glass */
+  --glass-bg: rgba(19, 21, 51, 0.7); --glass-blur: 16px; --glass-border: rgba(190, 77, 37, 0.25); --glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --component-bg-hover: rgba(190, 77, 37, 0.08); --component-bg-active: rgba(190, 77, 37, 0.15);
+  --component-border-focus: #be4d25; --component-surface-raised: rgba(30, 32, 76, 0.85); --component-divider: rgba(190, 77, 37, 0.15);
+  --scroll-thumb: #be4d25; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 13. Void Electric (Void Blue & Electric Orange) */
+.theme-void-electric {
+  --font-heading: 'Inter', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #000000; --theme-bg-secondary: #050b1a; --theme-bg-ternary: #0a1633;
+  --theme-text-primary: #ffffff; --theme-text-secondary: #94a3b8; --theme-text-tertiary: #475569; --theme-text-label: #334155;
+  --theme-border-primary: rgba(255, 85, 0, 0.35); --theme-border-secondary: rgba(255, 255, 255, 0.05);
+  --theme-accent-primary: #ff5500; --theme-accent-secondary: #ff7733; --theme-accent-tertiary: #ff9966;
+  --theme-accent-gradient: linear-gradient(135deg, #ff5500 0%, #ff7733 100%);
+  --theme-accent-focus: rgba(255, 85, 0, 0.25); --theme-accent-hover: #cc4400;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: rgba(255, 255, 255, 0.05); --theme-disabled-text: rgba(255, 255, 255, 0.3);
+  /* Glass */
+  --glass-bg: rgba(5, 11, 26, 0.6); --glass-blur: 40px; --glass-border: rgba(255, 85, 0, 0.2); --glass-shadow: inset 0 0 20px rgba(255, 85, 0, 0.1);
+  --component-bg-hover: rgba(255, 85, 0, 0.1); --component-bg-active: rgba(255, 85, 0, 0.2);
+  --component-border-focus: #ff5500; --component-surface-raised: rgba(10, 22, 51, 0.85); --component-divider: rgba(255, 85, 0, 0.15);
+  --scroll-thumb: #ff5500; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 14. Storm Apricot (Storm Blue & Soft Apricot) */
+.theme-storm-apricot {
+  --font-heading: 'Poppins', sans-serif; --font-body: 'Plus Jakarta Sans', sans-serif;
+  --theme-bg-primary: #1e2433; --theme-bg-secondary: #2a3245; --theme-bg-ternary: #3b465e;
+  --theme-text-primary: #ffffff; --theme-text-secondary: #cbd5e1; --theme-text-tertiary: #94a3b8; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(251, 146, 60, 0.25); --theme-border-secondary: rgba(255, 255, 255, 0.05);
+  --theme-accent-primary: #fb923c; --theme-accent-secondary: #fdba74; --theme-accent-tertiary: #fed7aa;
+  --theme-accent-gradient: linear-gradient(135deg, #fb923c 0%, #fdba74 100%);
+  --theme-accent-focus: rgba(251, 146, 60, 0.15); --theme-accent-hover: #f97316;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: rgba(255, 255, 255, 0.05); --theme-disabled-text: rgba(255, 255, 255, 0.3);
+  /* Glass */
+  --glass-bg: rgba(42, 50, 69, 0.5); --glass-blur: 16px; --glass-border: rgba(251, 146, 60, 0.2); --glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  --component-bg-hover: rgba(251, 146, 60, 0.08); --component-bg-active: rgba(251, 146, 60, 0.15);
+  --component-border-focus: #fb923c; --component-surface-raised: rgba(59, 70, 94, 0.85); --component-divider: rgba(251, 146, 60, 0.1);
+  --scroll-thumb: #fb923c; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 15. Marine Copper (Marine Blue & Metallic Copper) */
+.theme-marine-copper {
+  --font-heading: 'Cinzel', serif; --font-body: 'Montserrat', sans-serif;
+  --theme-bg-primary: #041224; --theme-bg-secondary: #0b2240; --theme-bg-ternary: #14355e;
+  --theme-text-primary: #ffffff; --theme-text-secondary: #9cb4cc; --theme-text-tertiary: #698ba6; --theme-text-label: #456680;
+  --theme-border-primary: rgba(184, 115, 51, 0.3); --theme-border-secondary: rgba(184, 115, 51, 0.1);
+  --theme-accent-primary: #b87333; /* Copper */
+  --theme-accent-secondary: #c88951; --theme-accent-tertiary: #d79f70;
+  --theme-accent-gradient: linear-gradient(135deg, #b87333 0%, #c88951 100%);
+  --theme-accent-focus: rgba(184, 115, 51, 0.2); --theme-accent-hover: #9c5c24;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: rgba(255, 255, 255, 0.05); --theme-disabled-text: rgba(255, 255, 255, 0.3);
+  /* Glass */
+  --glass-bg: rgba(11, 34, 64, 0.6); --glass-blur: 20px; --glass-border: rgba(184, 115, 51, 0.25); --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --component-bg-hover: rgba(184, 115, 51, 0.08); --component-bg-active: rgba(184, 115, 51, 0.15);
+  --component-border-focus: #b87333; --component-surface-raised: rgba(20, 53, 94, 0.85); --component-divider: rgba(184, 115, 51, 0.15);
+  --scroll-thumb: #b87333; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 16. Royal Pumpkin (Royal Dark Blue & Pumpkin Orange) */
+.theme-royal-pumpkin {
+  --font-heading: 'Outfit', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #06092b; --theme-bg-secondary: #0d1245; --theme-bg-ternary: #161c61;
+  --theme-text-primary: #ffffff; --theme-text-secondary: #c4c6e6; --theme-text-tertiary: #8b8fb8; --theme-text-label: #5e628a;
+  --theme-border-primary: rgba(255, 117, 24, 0.25); --theme-border-secondary: rgba(255, 255, 255, 0.05);
+  --theme-accent-primary: #ff7518; --theme-accent-secondary: #ff8c3a; --theme-accent-tertiary: #ffa35c;
+  --theme-accent-gradient: linear-gradient(135deg, #ff7518 0%, #ff8c3a 100%);
+  --theme-accent-focus: rgba(255, 117, 24, 0.2); --theme-accent-hover: #e65c00;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: rgba(255, 255, 255, 0.05); --theme-disabled-text: rgba(255, 255, 255, 0.3);
+  /* Glass */
+  --glass-bg: rgba(13, 18, 69, 0.55); --glass-blur: 24px; --glass-border: rgba(255, 117, 24, 0.2); --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  --component-bg-hover: rgba(255, 117, 24, 0.08); --component-bg-active: rgba(255, 117, 24, 0.15);
+  --component-border-focus: #ff7518; --component-surface-raised: rgba(22, 28, 97, 0.85); --component-divider: rgba(255, 117, 24, 0.1);
+  --scroll-thumb: #ff7518; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 17. Eclipse Tangerine (Eclipse Blue & Bright Tangerine) */
+.theme-eclipse-tangerine {
+  --font-heading: 'Space Grotesk', sans-serif; --font-body: 'Plus Jakarta Sans', sans-serif;
+  --theme-bg-primary: #01040a; --theme-bg-secondary: #051024; --theme-bg-ternary: #0c1d3d;
+  --theme-text-primary: #ffffff; --theme-text-secondary: #a0b1cc; --theme-text-tertiary: #637799; --theme-text-label: #3a4b66;
+  --theme-border-primary: rgba(255, 136, 0, 0.3); --theme-border-secondary: rgba(255, 136, 0, 0.1);
+  --theme-accent-primary: #ff8800; --theme-accent-secondary: #ff9d33; --theme-accent-tertiary: #ffb166;
+  --theme-accent-gradient: linear-gradient(135deg, #ff8800 0%, #ff9d33 100%);
+  --theme-accent-focus: rgba(255, 136, 0, 0.2); --theme-accent-hover: #cc6d00;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: rgba(255, 255, 255, 0.05); --theme-disabled-text: rgba(255, 255, 255, 0.3);
+  /* Glass */
+  --glass-bg: rgba(5, 16, 36, 0.6); --glass-blur: 28px; --glass-border: rgba(255, 136, 0, 0.2); --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  --component-bg-hover: rgba(255, 136, 0, 0.08); --component-bg-active: rgba(255, 136, 0, 0.15);
+  --component-border-focus: #ff8800; --component-surface-raised: rgba(12, 29, 61, 0.85); --component-divider: rgba(255, 136, 0, 0.15);
+  --scroll-thumb: #ff8800; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 18. Cyber Navy (High Tech Navy & Laser Orange) */
+.theme-cyber-navy {
+  --font-heading: 'Inter', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #050b14; --theme-bg-secondary: #0b1629; --theme-bg-ternary: #142442;
+  --theme-text-primary: #ffffff; --theme-text-secondary: #94a3b8; --theme-text-tertiary: #475569; --theme-text-label: #334155;
+  --theme-border-primary: rgba(255, 60, 0, 0.4); --theme-border-secondary: rgba(255, 255, 255, 0.05);
+  --theme-accent-primary: #ff3c00; --theme-accent-secondary: #ff5f2e; --theme-accent-tertiary: #ff815c;
+  --theme-accent-gradient: linear-gradient(135deg, #ff3c00 0%, #ff5f2e 100%);
+  --theme-accent-focus: rgba(255, 60, 0, 0.3); --theme-accent-hover: #cc3000;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: rgba(255, 255, 255, 0.05); --theme-disabled-text: rgba(255, 255, 255, 0.3);
+  /* Glass */
+  --glass-bg: rgba(11, 22, 41, 0.45); --glass-blur: 32px; --glass-border: rgba(255, 60, 0, 0.3); --glass-shadow: inset 0 0 15px rgba(255, 60, 0, 0.15);
+  --component-bg-hover: rgba(255, 60, 0, 0.1); --component-bg-active: rgba(255, 60, 0, 0.2);
+  --component-border-focus: #ff3c00; --component-surface-raised: rgba(20, 36, 66, 0.85); --component-divider: rgba(255, 60, 0, 0.2);
+  --scroll-thumb: #ff3c00; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 19. Midnight Gold (Deep Indigo & Golden Orange) */
+.theme-midnight-gold {
+  --font-heading: 'Playfair Display', serif; --font-body: 'Montserrat', sans-serif;
+  --theme-bg-primary: #0b0f19; --theme-bg-secondary: #141b2d; --theme-bg-ternary: #202b45;
+  --theme-text-primary: #ffffff; --theme-text-secondary: #cbd5e1; --theme-text-tertiary: #64748b; --theme-text-label: #475569;
+  --theme-border-primary: rgba(245, 158, 11, 0.3); --theme-border-secondary: rgba(245, 158, 11, 0.1);
+  --theme-accent-primary: #f59e0b; --theme-accent-secondary: #fbbf24; --theme-accent-tertiary: #fcd34d;
+  --theme-accent-gradient: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+  --theme-accent-focus: rgba(245, 158, 11, 0.15); --theme-accent-hover: #d97706;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: rgba(255, 255, 255, 0.05); --theme-disabled-text: rgba(255, 255, 255, 0.3);
+  /* Glass */
+  --glass-bg: rgba(20, 27, 45, 0.65); --glass-blur: 20px; --glass-border: rgba(245, 158, 11, 0.2); --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --component-bg-hover: rgba(245, 158, 11, 0.05); --component-bg-active: rgba(245, 158, 11, 0.1);
+  --component-border-focus: #f59e0b; --component-surface-raised: rgba(32, 43, 69, 0.85); --component-divider: rgba(245, 158, 11, 0.15);
+  --scroll-thumb: #f59e0b; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 20. Deep Supernova (Deep Space Blue & Supernova Orange) */
+.theme-deep-supernova {
+  --font-heading: 'Outfit', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #020412; --theme-bg-secondary: #070b26; --theme-bg-ternary: #0e143d;
+  --theme-text-primary: #ffffff; --theme-text-secondary: #a0a6d6; --theme-text-tertiary: #656c9e; --theme-text-label: #43486b;
+  --theme-border-primary: rgba(255, 94, 0, 0.3); --theme-border-secondary: rgba(255, 255, 255, 0.05);
+  --theme-accent-primary: #ff5e00; --theme-accent-secondary: #ff7d2e; --theme-accent-tertiary: #ff9b5c;
+  --theme-accent-gradient: linear-gradient(135deg, #ff5e00 0%, #ff7d2e 100%);
+  --theme-accent-focus: rgba(255, 94, 0, 0.25); --theme-accent-hover: #cc4b00;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: rgba(255, 255, 255, 0.05); --theme-disabled-text: rgba(255, 255, 255, 0.3);
+  /* Glass */
+  --glass-bg: rgba(7, 11, 38, 0.5); --glass-blur: 24px; --glass-border: rgba(255, 94, 0, 0.2); --glass-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+  --component-bg-hover: rgba(255, 94, 0, 0.08); --component-bg-active: rgba(255, 94, 0, 0.15);
+  --component-border-focus: #ff5e00; --component-surface-raised: rgba(14, 20, 61, 0.85); --component-divider: rgba(255, 94, 0, 0.15);
+  --scroll-thumb: #ff5e00; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
 
 
 
