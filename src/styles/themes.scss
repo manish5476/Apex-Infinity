@@ -3121,7 +3121,549 @@
 
   @include apply-canonical-mapping;
 }
+/* ==========================================================================
+   30 MULTI-COLOR LIGHT GLASS THEMES (DARK BLUE TEXT)
+   ========================================================================== */
 
+/* 1. Rose Glass (Vibrant Red-Pink) */
+.theme-rose-glass {
+  --font-heading: 'Space Grotesk', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #fff1f2; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #ffe4e6;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(244, 63, 94, 0.3); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #f43f5e; --theme-accent-secondary: #fb7185; --theme-accent-tertiary: #fda4af;
+  --theme-accent-gradient: linear-gradient(135deg, #f43f5e 0%, #fb7185 100%);
+  --theme-accent-focus: rgba(244, 63, 94, 0.15); --theme-accent-hover: #e11d48;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.75); --glass-blur: 24px; --glass-border: rgba(255, 255, 255, 0.9); --glass-shadow: 0 8px 32px rgba(0, 11, 88, 0.04);
+  --component-bg-hover: #ffffff; --component-bg-active: #ffe4e6;
+  --component-border-focus: #f43f5e; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.06);
+  --scroll-thumb: #f43f5e; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 2. Fuchsia Glow (Bright Pink-Purple) */
+.theme-fuchsia-glow {
+  --font-heading: 'Outfit', sans-serif; --font-body: 'Plus Jakarta Sans', sans-serif;
+  --theme-bg-primary: #fdf4ff; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #fae8ff;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(217, 70, 239, 0.3); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #d946ef; --theme-accent-secondary: #e879f9; --theme-accent-tertiary: #f0abfc;
+  --theme-accent-gradient: linear-gradient(135deg, #d946ef 0%, #e879f9 100%);
+  --theme-accent-focus: rgba(217, 70, 239, 0.15); --theme-accent-hover: #c026d3;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.8); --glass-blur: 20px; --glass-border: rgba(255, 255, 255, 0.8); --glass-shadow: 0 4px 24px rgba(0, 11, 88, 0.03);
+  --component-bg-hover: #ffffff; --component-bg-active: #fae8ff;
+  --component-border-focus: #d946ef; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.05);
+  --scroll-thumb: #d946ef; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 3. Amethyst Pearl (Rich Purple) */
+.theme-amethyst-pearl {
+  --font-heading: 'Playfair Display', serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #faf5ff; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #f3e8ff;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(168, 85, 247, 0.3); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #a855f7; --theme-accent-secondary: #c084fc; --theme-accent-tertiary: #d8b4fe;
+  --theme-accent-gradient: linear-gradient(135deg, #a855f7 0%, #c084fc 100%);
+  --theme-accent-focus: rgba(168, 85, 247, 0.15); --theme-accent-hover: #9333ea;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.7); --glass-blur: 32px; --glass-border: rgba(255, 255, 255, 0.9); --glass-shadow: 0 8px 32px rgba(0, 11, 88, 0.05);
+  --component-bg-hover: #ffffff; --component-bg-active: #f3e8ff;
+  --component-border-focus: #a855f7; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.06);
+  --scroll-thumb: #a855f7; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 4. Violet Whisper (Deep Violet) */
+.theme-violet-whisper {
+  --font-heading: 'Inter', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #ffffff; --theme-bg-secondary: #f5f3ff; --theme-bg-ternary: #ede9fe;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(139, 92, 246, 0.35); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #8b5cf6; --theme-accent-secondary: #a78bfa; --theme-accent-tertiary: #c4b5fd;
+  --theme-accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+  --theme-accent-focus: rgba(139, 92, 246, 0.15); --theme-accent-hover: #7c3aed;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.85); --glass-blur: 16px; --glass-border: rgba(0, 11, 88, 0.08); --glass-shadow: 0 4px 20px rgba(0, 11, 88, 0.04);
+  --component-bg-hover: #ffffff; --component-bg-active: #ede9fe;
+  --component-border-focus: #8b5cf6; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.05);
+  --scroll-thumb: #8b5cf6; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 5. Indigo Breeze (Soft Indigo) */
+.theme-indigo-breeze {
+  --font-heading: 'Poppins', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #eef2ff; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #e0e7ff;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(99, 102, 241, 0.3); --theme-border-secondary: rgba(0, 11, 88, 0.06);
+  --theme-accent-primary: #6366f1; --theme-accent-secondary: #818cf8; --theme-accent-tertiary: #a5b4fc;
+  --theme-accent-gradient: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+  --theme-accent-focus: rgba(99, 102, 241, 0.15); --theme-accent-hover: #4f46e5;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.7); --glass-blur: 24px; --glass-border: rgba(255, 255, 255, 1); --glass-shadow: 0 8px 32px rgba(0, 11, 88, 0.05);
+  --component-bg-hover: #ffffff; --component-bg-active: #e0e7ff;
+  --component-border-focus: #6366f1; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.06);
+  --scroll-thumb: #6366f1; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 6. Royal Sky (Classic Blue) */
+.theme-royal-sky {
+  --font-heading: 'Space Grotesk', sans-serif; --font-body: 'Plus Jakarta Sans', sans-serif;
+  --theme-bg-primary: #eff6ff; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #dbeafe;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(59, 130, 246, 0.3); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #3b82f6; --theme-accent-secondary: #60a5fa; --theme-accent-tertiary: #93c5fd;
+  --theme-accent-gradient: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  --theme-accent-focus: rgba(59, 130, 246, 0.15); --theme-accent-hover: #2563eb;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.75); --glass-blur: 20px; --glass-border: rgba(255, 255, 255, 0.9); --glass-shadow: 0 4px 24px rgba(0, 11, 88, 0.04);
+  --component-bg-hover: #ffffff; --component-bg-active: #dbeafe;
+  --component-border-focus: #3b82f6; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.05);
+  --scroll-thumb: #3b82f6; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 7. Cerulean Day (Light Blue) */
+.theme-cerulean-day {
+  --font-heading: 'Outfit', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #ffffff; --theme-bg-secondary: #f0f9ff; --theme-bg-ternary: #e0f2fe;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(14, 165, 233, 0.35); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #0ea5e9; --theme-accent-secondary: #38bdf8; --theme-accent-tertiary: #7dd3fc;
+  --theme-accent-gradient: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
+  --theme-accent-focus: rgba(14, 165, 233, 0.15); --theme-accent-hover: #0284c7;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.8); --glass-blur: 16px; --glass-border: rgba(0, 11, 88, 0.06); --glass-shadow: 0 8px 32px rgba(0, 11, 88, 0.03);
+  --component-bg-hover: #ffffff; --component-bg-active: #e0f2fe;
+  --component-border-focus: #0ea5e9; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.04);
+  --scroll-thumb: #0ea5e9; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 8. Cyan Crystal (Vibrant Cyan) */
+.theme-cyan-crystal {
+  --font-heading: 'Inter', sans-serif; --font-body: 'Plus Jakarta Sans', sans-serif;
+  --theme-bg-primary: #ecfeff; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #cffafe;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(6, 182, 212, 0.3); --theme-border-secondary: rgba(0, 11, 88, 0.06);
+  --theme-accent-primary: #06b6d4; --theme-accent-secondary: #22d3ee; --theme-accent-tertiary: #67e8f9;
+  --theme-accent-gradient: linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%);
+  --theme-accent-focus: rgba(6, 182, 212, 0.15); --theme-accent-hover: #0891b2;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.75); --glass-blur: 32px; --glass-border: rgba(255, 255, 255, 0.9); --glass-shadow: 0 4px 20px rgba(0, 11, 88, 0.05);
+  --component-bg-hover: #ffffff; --component-bg-active: #cffafe;
+  --component-border-focus: #06b6d4; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.05);
+  --scroll-thumb: #06b6d4; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 9. Teal Mist (Sophisticated Teal-Green) */
+.theme-teal-mist {
+  --font-heading: 'Cinzel', serif; --font-body: 'Montserrat', sans-serif;
+  --theme-bg-primary: #f0fdfa; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #ccfbf1;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(20, 184, 166, 0.3); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #14b8a6; --theme-accent-secondary: #2dd4bf; --theme-accent-tertiary: #5eead4;
+  --theme-accent-gradient: linear-gradient(135deg, #14b8a6 0%, #2dd4bf 100%);
+  --theme-accent-focus: rgba(20, 184, 166, 0.15); --theme-accent-hover: #0d9488;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.65); --glass-blur: 24px; --glass-border: rgba(255, 255, 255, 1); --glass-shadow: 0 8px 32px rgba(0, 11, 88, 0.04);
+  --component-bg-hover: #ffffff; --component-bg-active: #ccfbf1;
+  --component-border-focus: #14b8a6; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.05);
+  --scroll-thumb: #14b8a6; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 10. Emerald Dawn (Bright Mint/Emerald) */
+.theme-emerald-dawn {
+  --font-heading: 'Poppins', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #ffffff; --theme-bg-secondary: #f0fdf4; --theme-bg-ternary: #dcfce7;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(16, 185, 129, 0.35); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #10b981; --theme-accent-secondary: #34d399; --theme-accent-tertiary: #6ee7b7;
+  --theme-accent-gradient: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  --theme-accent-focus: rgba(16, 185, 129, 0.15); --theme-accent-hover: #059669;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.85); --glass-blur: 16px; --glass-border: rgba(0, 11, 88, 0.06); --glass-shadow: 0 4px 20px rgba(0, 11, 88, 0.03);
+  --component-bg-hover: #ffffff; --component-bg-active: #dcfce7;
+  --component-border-focus: #10b981; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.04);
+  --scroll-thumb: #10b981; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 11. Fresh Green (Pure Green) */
+.theme-fresh-green {
+  --font-heading: 'Space Grotesk', sans-serif; --font-body: 'Plus Jakarta Sans', sans-serif;
+  --theme-bg-primary: #f0fdf4; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #dcfce7;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(34, 197, 94, 0.3); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #22c55e; --theme-accent-secondary: #4ade80; --theme-accent-tertiary: #86efac;
+  --theme-accent-gradient: linear-gradient(135deg, #22c55e 0%, #4ade80 100%);
+  --theme-accent-focus: rgba(34, 197, 94, 0.15); --theme-accent-hover: #16a34a;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.7); --glass-blur: 32px; --glass-border: rgba(255, 255, 255, 0.9); --glass-shadow: 0 8px 32px rgba(0, 11, 88, 0.04);
+  --component-bg-hover: #ffffff; --component-bg-active: #dcfce7;
+  --component-border-focus: #22c55e; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.05);
+  --scroll-thumb: #22c55e; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 12. Lime Light (Vibrant Yellow-Green) */
+.theme-lime-light {
+  --font-heading: 'Outfit', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #ffffff; --theme-bg-secondary: #f7fee7; --theme-bg-ternary: #ecfccb;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(132, 204, 22, 0.35); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #84cc16; --theme-accent-secondary: #a3e635; --theme-accent-tertiary: #bef264;
+  --theme-accent-gradient: linear-gradient(135deg, #84cc16 0%, #a3e635 100%);
+  --theme-accent-focus: rgba(132, 204, 22, 0.15); --theme-accent-hover: #65a30d;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.8); --glass-blur: 20px; --glass-border: rgba(0, 11, 88, 0.06); --glass-shadow: 0 4px 20px rgba(0, 11, 88, 0.03);
+  --component-bg-hover: #ffffff; --component-bg-active: #ecfccb;
+  --component-border-focus: #84cc16; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.04);
+  --scroll-thumb: #84cc16; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 13. Olive Sun (Dark Yellow-Green) */
+.theme-olive-sun {
+  --font-heading: 'Playfair Display', serif; --font-body: 'Montserrat', sans-serif;
+  --theme-bg-primary: #f7fee7; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #ecfccb;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(101, 163, 13, 0.3); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #65a30d; --theme-accent-secondary: #84cc16; --theme-accent-tertiary: #a3e635;
+  --theme-accent-gradient: linear-gradient(135deg, #65a30d 0%, #84cc16 100%);
+  --theme-accent-focus: rgba(101, 163, 13, 0.15); --theme-accent-hover: #4d7c0f;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.65); --glass-blur: 24px; --glass-border: rgba(255, 255, 255, 1); --glass-shadow: 0 8px 32px rgba(0, 11, 88, 0.04);
+  --component-bg-hover: #ffffff; --component-bg-active: #ecfccb;
+  --component-border-focus: #65a30d; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.05);
+  --scroll-thumb: #65a30d; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 14. Lemon Yellow (Pure Yellow) */
+.theme-lemon-yellow {
+  --font-heading: 'Inter', sans-serif; --font-body: 'Plus Jakarta Sans', sans-serif;
+  --theme-bg-primary: #fefce8; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #fef9c3;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(234, 179, 8, 0.35); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #eab308; --theme-accent-secondary: #facc15; --theme-accent-tertiary: #fef08a;
+  --theme-accent-gradient: linear-gradient(135deg, #eab308 0%, #facc15 100%);
+  --theme-accent-focus: rgba(234, 179, 8, 0.15); --theme-accent-hover: #ca8a04;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.75); --glass-blur: 16px; --glass-border: rgba(255, 255, 255, 0.9); --glass-shadow: 0 4px 24px rgba(0, 11, 88, 0.03);
+  --component-bg-hover: #ffffff; --component-bg-active: #fef9c3;
+  --component-border-focus: #eab308; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.05);
+  --scroll-thumb: #eab308; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 15. Mustard Clear (Dark Yellow) */
+.theme-mustard-clear {
+  --font-heading: 'Poppins', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #ffffff; --theme-bg-secondary: #fefce8; --theme-bg-ternary: #fef9c3;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(202, 138, 4, 0.3); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #ca8a04; --theme-accent-secondary: #eab308; --theme-accent-tertiary: #facc15;
+  --theme-accent-gradient: linear-gradient(135deg, #ca8a04 0%, #eab308 100%);
+  --theme-accent-focus: rgba(202, 138, 4, 0.15); --theme-accent-hover: #a16207;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.85); --glass-blur: 32px; --glass-border: rgba(0, 11, 88, 0.06); --glass-shadow: 0 8px 32px rgba(0, 11, 88, 0.04);
+  --component-bg-hover: #ffffff; --component-bg-active: #fef9c3;
+  --component-border-focus: #ca8a04; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.04);
+  --scroll-thumb: #ca8a04; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 16. Amber Light (Yellow-Orange) */
+.theme-amber-light {
+  --font-heading: 'Space Grotesk', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #fffbeb; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #fef3c7;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(245, 158, 11, 0.3); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #f59e0b; --theme-accent-secondary: #fbbf24; --theme-accent-tertiary: #fcd34d;
+  --theme-accent-gradient: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+  --theme-accent-focus: rgba(245, 158, 11, 0.15); --theme-accent-hover: #d97706;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.7); --glass-blur: 24px; --glass-border: rgba(255, 255, 255, 0.9); --glass-shadow: 0 4px 20px rgba(0, 11, 88, 0.03);
+  --component-bg-hover: #ffffff; --component-bg-active: #fef3c7;
+  --component-border-focus: #f59e0b; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.05);
+  --scroll-thumb: #f59e0b; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 17. Rust Ivory (Dark Orange) */
+.theme-rust-ivory {
+  --font-heading: 'Cinzel', serif; --font-body: 'Montserrat', sans-serif;
+  --theme-bg-primary: #fff7ed; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #ffedd5;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(180, 83, 9, 0.35); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #b45309; --theme-accent-secondary: #d97706; --theme-accent-tertiary: #f59e0b;
+  --theme-accent-gradient: linear-gradient(135deg, #b45309 0%, #d97706 100%);
+  --theme-accent-focus: rgba(180, 83, 9, 0.15); --theme-accent-hover: #92400e;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.65); --glass-blur: 20px; --glass-border: rgba(255, 255, 255, 1); --glass-shadow: 0 8px 32px rgba(0, 11, 88, 0.04);
+  --component-bg-hover: #ffffff; --component-bg-active: #ffedd5;
+  --component-border-focus: #b45309; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.06);
+  --scroll-thumb: #b45309; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 18. Sunset Glass (Orange-Red) */
+.theme-sunset-glass {
+  --font-heading: 'Outfit', sans-serif; --font-body: 'Plus Jakarta Sans', sans-serif;
+  --theme-bg-primary: #ffffff; --theme-bg-secondary: #fff7ed; --theme-bg-ternary: #ffedd5;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(234, 88, 12, 0.3); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #ea580c; --theme-accent-secondary: #f97316; --theme-accent-tertiary: #fb923c;
+  --theme-accent-gradient: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+  --theme-accent-focus: rgba(234, 88, 12, 0.15); --theme-accent-hover: #c2410c;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.8); --glass-blur: 16px; --glass-border: rgba(0, 11, 88, 0.06); --glass-shadow: 0 4px 24px rgba(0, 11, 88, 0.03);
+  --component-bg-hover: #ffffff; --component-bg-active: #ffedd5;
+  --component-border-focus: #ea580c; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.04);
+  --scroll-thumb: #ea580c; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 19. Crimson Frost (Pure Red) */
+.theme-crimson-frost {
+  --font-heading: 'Poppins', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #fef2f2; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #fee2e2;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(220, 38, 38, 0.3); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #dc2626; --theme-accent-secondary: #ef4444; --theme-accent-tertiary: #f87171;
+  --theme-accent-gradient: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  --theme-accent-focus: rgba(220, 38, 38, 0.15); --theme-accent-hover: #b91c1c;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.75); --glass-blur: 32px; --glass-border: rgba(255, 255, 255, 0.9); --glass-shadow: 0 8px 32px rgba(0, 11, 88, 0.05);
+  --component-bg-hover: #ffffff; --component-bg-active: #fee2e2;
+  --component-border-focus: #dc2626; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.05);
+  --scroll-thumb: #dc2626; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 20. Ruby Pearl (Deep Red) */
+.theme-ruby-pearl {
+  --font-heading: 'Playfair Display', serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #fff1f2; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #ffe4e6;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(190, 18, 60, 0.3); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #be123c; --theme-accent-secondary: #e11d48; --theme-accent-tertiary: #f43f5e;
+  --theme-accent-gradient: linear-gradient(135deg, #be123c 0%, #e11d48 100%);
+  --theme-accent-focus: rgba(190, 18, 60, 0.15); --theme-accent-hover: #9f1239;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.65); --glass-blur: 24px; --glass-border: rgba(255, 255, 255, 1); --glass-shadow: 0 4px 20px rgba(0, 11, 88, 0.04);
+  --component-bg-hover: #ffffff; --component-bg-active: #ffe4e6;
+  --component-border-focus: #be123c; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.06);
+  --scroll-thumb: #be123c; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 21. Magenta Cloud (Red-Purple) */
+.theme-magenta-cloud {
+  --font-heading: 'Inter', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #ffffff; --theme-bg-secondary: #fdf4ff; --theme-bg-ternary: #fae8ff;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(192, 38, 211, 0.35); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #c026d3; --theme-accent-secondary: #d946ef; --theme-accent-tertiary: #e879f9;
+  --theme-accent-gradient: linear-gradient(135deg, #c026d3 0%, #d946ef 100%);
+  --theme-accent-focus: rgba(192, 38, 211, 0.15); --theme-accent-hover: #a21caf;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.85); --glass-blur: 16px; --glass-border: rgba(0, 11, 88, 0.06); --glass-shadow: 0 8px 32px rgba(0, 11, 88, 0.03);
+  --component-bg-hover: #ffffff; --component-bg-active: #fae8ff;
+  --component-border-focus: #c026d3; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.04);
+  --scroll-thumb: #c026d3; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 22. Lavender Light (Soft Purple) */
+.theme-lavender-light {
+  --font-heading: 'Outfit', sans-serif; --font-body: 'Plus Jakarta Sans', sans-serif;
+  --theme-bg-primary: #f5f3ff; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #ede9fe;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(167, 139, 250, 0.4); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #a78bfa; --theme-accent-secondary: #c4b5fd; --theme-accent-tertiary: #ddd6fe;
+  --theme-accent-gradient: linear-gradient(135deg, #a78bfa 0%, #c4b5fd 100%);
+  --theme-accent-focus: rgba(167, 139, 250, 0.2); --theme-accent-hover: #8b5cf6;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.7); --glass-blur: 24px; --glass-border: rgba(255, 255, 255, 0.9); --glass-shadow: 0 4px 24px rgba(0, 11, 88, 0.04);
+  --component-bg-hover: #ffffff; --component-bg-active: #ede9fe;
+  --component-border-focus: #a78bfa; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.05);
+  --scroll-thumb: #a78bfa; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 23. Sky Breeze (Soft Blue) */
+.theme-sky-breeze {
+  --font-heading: 'Space Grotesk', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #f0f9ff; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #e0f2fe;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(56, 189, 248, 0.4); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #38bdf8; --theme-accent-secondary: #7dd3fc; --theme-accent-tertiary: #bae6fd;
+  --theme-accent-gradient: linear-gradient(135deg, #38bdf8 0%, #7dd3fc 100%);
+  --theme-accent-focus: rgba(56, 189, 248, 0.2); --theme-accent-hover: #0ea5e9;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.75); --glass-blur: 20px; --glass-border: rgba(255, 255, 255, 1); --glass-shadow: 0 8px 32px rgba(0, 11, 88, 0.03);
+  --component-bg-hover: #ffffff; --component-bg-active: #e0f2fe;
+  --component-border-focus: #38bdf8; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.05);
+  --scroll-thumb: #38bdf8; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 24. Seafoam Ice (Soft Teal) */
+.theme-seafoam-ice {
+  --font-heading: 'Poppins', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #ffffff; --theme-bg-secondary: #f0fdfa; --theme-bg-ternary: #ccfbf1;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(45, 212, 191, 0.4); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #2dd4bf; --theme-accent-secondary: #5eead4; --theme-accent-tertiary: #99f6e4;
+  --theme-accent-gradient: linear-gradient(135deg, #2dd4bf 0%, #5eead4 100%);
+  --theme-accent-focus: rgba(45, 212, 191, 0.2); --theme-accent-hover: #14b8a6;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.85); --glass-blur: 32px; --glass-border: rgba(0, 11, 88, 0.06); --glass-shadow: 0 4px 20px rgba(0, 11, 88, 0.03);
+  --component-bg-hover: #ffffff; --component-bg-active: #ccfbf1;
+  --component-border-focus: #2dd4bf; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.04);
+  --scroll-thumb: #2dd4bf; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 25. Mint Glacier (Soft Green) */
+.theme-mint-glacier {
+  --font-heading: 'Inter', sans-serif; --font-body: 'Plus Jakarta Sans', sans-serif;
+  --theme-bg-primary: #ecfdf5; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #d1fae5;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(52, 211, 153, 0.4); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #34d399; --theme-accent-secondary: #6ee7b7; --theme-accent-tertiary: #a7f3d0;
+  --theme-accent-gradient: linear-gradient(135deg, #34d399 0%, #6ee7b7 100%);
+  --theme-accent-focus: rgba(52, 211, 153, 0.2); --theme-accent-hover: #10b981;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.65); --glass-blur: 16px; --glass-border: rgba(255, 255, 255, 0.9); --glass-shadow: 0 8px 32px rgba(0, 11, 88, 0.04);
+  --component-bg-hover: #ffffff; --component-bg-active: #d1fae5;
+  --component-border-focus: #34d399; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.05);
+  --scroll-thumb: #34d399; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 26. Lemon Drop (Bright Soft Yellow) */
+.theme-lemon-drop {
+  --font-heading: 'Outfit', sans-serif; --font-body: 'Montserrat', sans-serif;
+  --theme-bg-primary: #fefce8; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #fef9c3;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(250, 204, 21, 0.4); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #facc15; --theme-accent-secondary: #fde047; --theme-accent-tertiary: #fef08a;
+  --theme-accent-gradient: linear-gradient(135deg, #facc15 0%, #fde047 100%);
+  --theme-accent-focus: rgba(250, 204, 21, 0.2); --theme-accent-hover: #eab308;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.7); --glass-blur: 24px; --glass-border: rgba(255, 255, 255, 1); --glass-shadow: 0 4px 20px rgba(0, 11, 88, 0.03);
+  --component-bg-hover: #ffffff; --component-bg-active: #fef9c3;
+  --component-border-focus: #facc15; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.05);
+  --scroll-thumb: #facc15; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 27. Peach Air (Soft Orange) */
+.theme-peach-air {
+  --font-heading: 'Cinzel', serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #ffffff; --theme-bg-secondary: #fff7ed; --theme-bg-ternary: #ffedd5;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(251, 146, 60, 0.35); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #fb923c; --theme-accent-secondary: #fdba74; --theme-accent-tertiary: #fed7aa;
+  --theme-accent-gradient: linear-gradient(135deg, #fb923c 0%, #fdba74 100%);
+  --theme-accent-focus: rgba(251, 146, 60, 0.15); --theme-accent-hover: #f97316;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.85); --glass-blur: 32px; --glass-border: rgba(0, 11, 88, 0.06); --glass-shadow: 0 8px 32px rgba(0, 11, 88, 0.04);
+  --component-bg-hover: #ffffff; --component-bg-active: #ffedd5;
+  --component-border-focus: #fb923c; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.04);
+  --scroll-thumb: #fb923c; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 28. Salmon Pink (Soft Red/Pink) */
+.theme-salmon-pink {
+  --font-heading: 'Space Grotesk', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #fff1f2; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #ffe4e6;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(251, 113, 133, 0.4); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #fb7185; --theme-accent-secondary: #fda4af; --theme-accent-tertiary: #fecdd3;
+  --theme-accent-gradient: linear-gradient(135deg, #fb7185 0%, #fda4af 100%);
+  --theme-accent-focus: rgba(251, 113, 133, 0.2); --theme-accent-hover: #f43f5e;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.75); --glass-blur: 16px; --glass-border: rgba(255, 255, 255, 0.9); --glass-shadow: 0 4px 20px rgba(0, 11, 88, 0.03);
+  --component-bg-hover: #ffffff; --component-bg-active: #ffe4e6;
+  --component-border-focus: #fb7185; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.05);
+  --scroll-thumb: #fb7185; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 29. Berry Juice (Dark Pink) */
+.theme-berry-juice {
+  --font-heading: 'Playfair Display', serif; --font-body: 'Plus Jakarta Sans', sans-serif;
+  --theme-bg-primary: #ffffff; --theme-bg-secondary: #fff1f2; --theme-bg-ternary: #ffe4e6;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(159, 18, 57, 0.3); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #9f1239; --theme-accent-secondary: #be123c; --theme-accent-tertiary: #e11d48;
+  --theme-accent-gradient: linear-gradient(135deg, #9f1239 0%, #be123c 100%);
+  --theme-accent-focus: rgba(159, 18, 57, 0.15); --theme-accent-hover: #881337;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.85); --glass-blur: 24px; --glass-border: rgba(0, 11, 88, 0.06); --glass-shadow: 0 8px 32px rgba(0, 11, 88, 0.04);
+  --component-bg-hover: #ffffff; --component-bg-active: #ffe4e6;
+  --component-border-focus: #9f1239; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.04);
+  --scroll-thumb: #9f1239; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
+
+/* 30. Neon Pink (Vibrant True Pink) */
+.theme-neon-pink {
+  --font-heading: 'Inter', sans-serif; --font-body: 'Inter', sans-serif;
+  --theme-bg-primary: #fdf2f8; --theme-bg-secondary: #ffffff; --theme-bg-ternary: #fce7f3;
+  --theme-text-primary: #000B58; --theme-text-secondary: #1e293b; --theme-text-tertiary: #475569; --theme-text-label: #64748b;
+  --theme-border-primary: rgba(255, 20, 147, 0.3); --theme-border-secondary: rgba(0, 11, 88, 0.05);
+  --theme-accent-primary: #ff1493; --theme-accent-secondary: #ff69b4; --theme-accent-tertiary: #ffb6c1;
+  --theme-accent-gradient: linear-gradient(135deg, #ff1493 0%, #ff69b4 100%);
+  --theme-accent-focus: rgba(255, 20, 147, 0.15); --theme-accent-hover: #c71585;
+  --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #3b82f6;
+  --theme-disabled: #f1f5f9; --theme-disabled-text: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.65); --glass-blur: 32px; --glass-border: rgba(255, 255, 255, 1); --glass-shadow: 0 4px 20px rgba(0, 11, 88, 0.05);
+  --component-bg-hover: #ffffff; --component-bg-active: #fce7f3;
+  --component-border-focus: #ff1493; --component-surface-raised: #ffffff; --component-divider: rgba(0, 11, 88, 0.06);
+  --scroll-thumb: #ff1493; --scroll-track: transparent;
+  @include apply-canonical-mapping;
+}
 /* =========================================
    THEME 20: COBALT STEEL (Corporate Navy)
    Vibe: Banking, Trust, Enterprise
