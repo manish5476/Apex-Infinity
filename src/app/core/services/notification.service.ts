@@ -485,19 +485,19 @@ export class NotificationService implements OnDestroy {
 
     switch (notification.type) {
       case 'success':
-        this.messageService.showSuccess(notification.title, notification.message, options);
+        this.messageService.showSuccess(`${notification.title}, ${notification.message}`);
         break;
       case 'error':
-        this.messageService.showError(notification.title, notification.message, options);
+        this.messageService.showError(`${notification.title}, ${notification.message}`);
         break;
       case 'warning':
-        this.messageService.showWarn(notification.title, notification.message, options);
+        this.messageService.showWarn(`${notification.title}, ${notification.message}`);
         break;
       case 'urgent':
-        this.messageService.showError(notification.title, `URGENT: ${notification.message}`, 10000);
+        this.messageService.showError(`${notification.title}, ${notification.message}`);
         break;
       default:
-        this.messageService.showInfo(notification.title, notification.message, options);
+        this.messageService.showInfo(`${notification.title}, ${notification.message}`);
         break;
     }
   }
@@ -508,16 +508,16 @@ export class NotificationService implements OnDestroy {
 
     switch (announcement.type) {
       case 'success':
-        this.messageService.showSuccess('Announcement', message, options);
+        this.messageService.showSuccess(`${announcement.title}, ${announcement.message}`);
         break;
       case 'warning':
-        this.messageService.showWarn('Announcement', message, options);
+        this.messageService.showWarn(`${announcement.title}, ${announcement.message}`);
         break;
       case 'error':
-        this.messageService.showError('Announcement', message, options);
+        this.messageService.showError(`${announcement.title}, ${announcement.message}`);
         break;
       default:
-        this.messageService.showInfo('Announcement', message, options);
+        this.messageService.showInfo(`${announcement.title}, ${announcement.message}`);
         break;
     }
   }

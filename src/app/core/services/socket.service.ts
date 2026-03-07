@@ -257,9 +257,9 @@ export class SocketService implements OnDestroy {
                 this.socket.connect();
               }
             },
-            error: () => {
+            error: (err) => {
               this.disconnect();
-              this.messageService.showError('Session Expired', 'Please login again.');
+              this.messageService.handleHttpError(err)
             }
           });
         });
@@ -640,7 +640,7 @@ export class SocketService implements OnDestroy {
   private handleReconnect(orgId: string) {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       console.error('Max reconnection attempts reached');
-      this.messageService.showError('Connection Lost', 'Unable to reconnect to server');
+      this.messageService.showError('Unable to reconnect to server');
       return;
     }
     
@@ -729,21 +729,21 @@ export class SocketService implements OnDestroy {
 
   private showToast(notification: NotificationData) {
     switch (notification.type) {
-      case 'success': this.messageService.showSuccess(notification.title, notification.message); break;
-      case 'error': this.messageService.showError(notification.title, notification.message); break;
-      case 'warning': this.messageService.showWarn(notification.title, notification.message); break;
-      case 'urgent': this.messageService.showError(notification.title, notification.message, 1000); break;
-      default: this.messageService.showInfo(notification.title, notification.message); break;
+      case 'success': this.messageService.showSuccess(`${notification.title}, ${notification.message}`); break;
+      case 'error': this.messageService.showError(`${notification.title}, ${notification.message}`); break;
+      case 'warning': this.messageService.showWarn(`${notification.title}, ${notification.message}`); break;
+      case 'urgent': this.messageService.showError(`${notification.title}, ${notification.message}`); break;
+      default: this.messageService.showInfo(`${notification.title}, ${notification.message}`); break;
     }
   }
 
   private showAnnouncementToast(announcement: AnnouncementData) {
-    const message = `${announcement.title}: ${announcement.message}`;
+    // const message = `${announcement.title}: ${announcement.message}`;
     switch (announcement.type) {
-      case 'success': this.messageService.showSuccess('Announcement', message, 8000); break;
-      case 'warning': this.messageService.showWarn('Announcement', message, 8000); break;
-      case 'error': this.messageService.showError('Announcement', message, 8000); break;
-      default: this.messageService.showInfo('Announcement', message, 8000); break;
+      case 'success': this.messageService.showSuccess(`${announcement.title}, ${announcement.message}`); break;
+      case 'warning': this.messageService.showWarn(`${announcement.title}, ${announcement.message}`); break;
+      case 'error': this.messageService.showError(`${announcement.title}, ${announcement.message}`); break;
+      default: this.messageService.showInfo(`${announcement.title}, ${announcement.message}`); break;
     }
   }
 
@@ -1483,21 +1483,21 @@ export class SocketService implements OnDestroy {
 
 //   private showToast(notification: NotificationData) {
 //     switch (notification.type) {
-//       case 'success': this.messageService.showSuccess(notification.title, notification.message); break;
-//       case 'error': this.messageService.showError(notification.title, notification.message); break;
-//       case 'warning': this.messageService.showWarn(notification.title, notification.message); break;
-//       case 'urgent': this.messageService.showError(notification.title, notification.message, 1000); break;
-//       default: this.messageService.showInfo(notification.title, notification.message); break;
+//       case 'success': this.messageService.showSuccess(`${notification.title}, ${notification.message}`); break;
+//       case 'error': this.messageService.showError(`${notification.title}, ${notification.message}`); break;
+//       case 'warning': this.messageService.showWarn(`${notification.title}, ${notification.message}`); break;
+//       case 'urgent': this.messageService.showError(`${notification.title}, ${notification.message}`, 1000); break;
+//       default: this.messageService.showInfo(`${notification.title}, ${notification.message}`); break;
 //     }
 //   }
 
 //   private showAnnouncementToast(announcement: AnnouncementData) {
 //     const message = `${announcement.title}: ${announcement.message}`;
 //     switch (announcement.type) {
-//       case 'success': this.messageService.showSuccess('Announcement', message, 8000); break;
-//       case 'warning': this.messageService.showWarn('Announcement', message, 8000); break;
-//       case 'error': this.messageService.showError('Announcement', message, 8000); break;
-//       default: this.messageService.showInfo('Announcement', message, 8000); break;
+//       case 'success': this.messageService.showSuccess(`${notification.title}, ${notification.message}`); break;
+//       case 'warning': this.messageService.showWarn(`${notification.title}, ${notification.message}`); break;
+//       case 'error': this.messageService.showError(`${notification.title}, ${notification.message}`); break;
+//       default: this.messageService.showInfo(`${notification.title}, ${notification.message}`); break;
 //     }
 //   }
 
@@ -2278,19 +2278,19 @@ export class SocketService implements OnDestroy {
 // //   private showToast(notification: NotificationData) {
 // //     switch (notification.type) {
 // //       case 'success':
-// //         this.messageService.showSuccess(notification.title, notification.message);
+// //         this.messageService.showSuccess(`${notification.title}, ${notification.message}`);
 // //         break;
 // //       case 'error':
-// //         this.messageService.showError(notification.title, notification.message);
+// //         this.messageService.showError(`${notification.title}, ${notification.message}`);
 // //         break;
 // //       case 'warning':
-// //         this.messageService.showWarn(notification.title, notification.message);
+// //         this.messageService.showWarn(`${notification.title}, ${notification.message}`);
 // //         break;
 // //       case 'urgent':
-// //         this.messageService.showError(notification.title, notification.message, 1000);
+// //         this.messageService.showError(`${notification.title}, ${notification.message}`, 1000);
 // //         break;
 // //       default:
-// //         this.messageService.showInfo(notification.title, notification.message);
+// //         this.messageService.showInfo(`${notification.title}, ${notification.message}`);
 // //         break;
 // //     }
 // //   }
@@ -2298,10 +2298,10 @@ export class SocketService implements OnDestroy {
 // //   private showAnnouncementToast(announcement: AnnouncementData) {
 // //     const message = `${announcement.title}: ${announcement.message}`;
 // //     switch (announcement.type) {
-// //       case 'success': this.messageService.showSuccess('Announcement', message, 8000); break;
-// //       case 'warning': this.messageService.showWarn('Announcement', message, 8000); break;
-// //       case 'error': this.messageService.showError('Announcement', message, 8000); break;
-// //       default: this.messageService.showInfo('Announcement', message, 8000); break;
+// //       case 'success': this.messageService.showSuccess(`${notification.title}, ${notification.message}`); break;
+// //       case 'warning': this.messageService.showWarn(`${notification.title}, ${notification.message}`); break;
+// //       case 'error': this.messageService.showError(`${notification.title}, ${notification.message}`); break;
+// //       default: this.messageService.showInfo(`${notification.title}, ${notification.message}`); break;
 // //     }
 // //   }
 
@@ -3043,19 +3043,19 @@ export class SocketService implements OnDestroy {
 // // //   private showToast(notification: NotificationData) {
 // // //     switch (notification.type) {
 // // //       case 'success':
-// // //         this.messageService.showSuccess(notification.title, notification.message);
+// // //         this.messageService.showSuccess(`${notification.title}, ${notification.message}`);
 // // //         break;
 // // //       case 'error':
-// // //         this.messageService.showError(notification.title, notification.message);
+// // //         this.messageService.showError(`${notification.title}, ${notification.message}`);
 // // //         break;
 // // //       case 'warning':
-// // //         this.messageService.showWarn(notification.title, notification.message);
+// // //         this.messageService.showWarn(`${notification.title}, ${notification.message}`);
 // // //         break;
 // // //       case 'urgent':
-// // //         this.messageService.showError(notification.title, notification.message, 1000);
+// // //         this.messageService.showError(`${notification.title}, ${notification.message}`, 1000);
 // // //         break;
 // // //       default:
-// // //         this.messageService.showInfo(notification.title, notification.message);
+// // //         this.messageService.showInfo(`${notification.title}, ${notification.message}`);
 // // //         break;
 // // //     }
 // // //   }
@@ -3063,10 +3063,10 @@ export class SocketService implements OnDestroy {
 // // //   private showAnnouncementToast(announcement: AnnouncementData) {
 // // //     const message = `${announcement.title}: ${announcement.message}`;
 // // //     switch (announcement.type) {
-// // //       case 'success': this.messageService.showSuccess('Announcement', message, 8000); break;
-// // //       case 'warning': this.messageService.showWarn('Announcement', message, 8000); break;
-// // //       case 'error': this.messageService.showError('Announcement', message, 8000); break;
-// // //       default: this.messageService.showInfo('Announcement', message, 8000); break;
+// // //       case 'success': this.messageService.showSuccess(`${notification.title}, ${notification.message}`); break;
+// // //       case 'warning': this.messageService.showWarn(`${notification.title}, ${notification.message}`); break;
+// // //       case 'error': this.messageService.showError(`${notification.title}, ${notification.message}`); break;
+// // //       default: this.messageService.showInfo(`${notification.title}, ${notification.message}`); break;
 // // //     }
 // // //   }
 
@@ -3775,19 +3775,19 @@ export class SocketService implements OnDestroy {
 // // // //   private showToast(notification: NotificationData) {
 // // // //     switch (notification.type) {
 // // // //       case 'success':
-// // // //         this.messageService.showSuccess(notification.title, notification.message);
+// // // //         this.messageService.showSuccess(`${notification.title}, ${notification.message}`);
 // // // //         break;
 // // // //       case 'error':
-// // // //         this.messageService.showError(notification.title, notification.message);
+// // // //         this.messageService.showError(`${notification.title}, ${notification.message}`);
 // // // //         break;
 // // // //       case 'warning':
-// // // //         this.messageService.showWarn(notification.title, notification.message);
+// // // //         this.messageService.showWarn(`${notification.title}, ${notification.message}`);
 // // // //         break;
 // // // //       case 'urgent':
-// // // //         this.messageService.showError(notification.title, notification.message, 1000);
+// // // //         this.messageService.showError(`${notification.title}, ${notification.message}`, 1000);
 // // // //         break;
 // // // //       default:
-// // // //         this.messageService.showInfo(notification.title, notification.message);
+// // // //         this.messageService.showInfo(`${notification.title}, ${notification.message}`);
 // // // //         break;
 // // // //     }
 // // // //   }
@@ -3795,10 +3795,10 @@ export class SocketService implements OnDestroy {
 // // // //   private showAnnouncementToast(announcement: AnnouncementData) {
 // // // //     const message = `${announcement.title}: ${announcement.message}`;
 // // // //     switch (announcement.type) {
-// // // //       case 'success': this.messageService.showSuccess('Announcement', message, 8000); break;
-// // // //       case 'warning': this.messageService.showWarn('Announcement', message, 8000); break;
-// // // //       case 'error': this.messageService.showError('Announcement', message, 8000); break;
-// // // //       default: this.messageService.showInfo('Announcement', message, 8000); break;
+// // // //       case 'success': this.messageService.showSuccess(`${notification.title}, ${notification.message}`); break;
+// // // //       case 'warning': this.messageService.showWarn(`${notification.title}, ${notification.message}`); break;
+// // // //       case 'error': this.messageService.showError(`${notification.title}, ${notification.message}`); break;
+// // // //       default: this.messageService.showInfo(`${notification.title}, ${notification.message}`); break;
 // // // //     }
 // // // //   }
 
@@ -4508,19 +4508,19 @@ export class SocketService implements OnDestroy {
 // // // // //   private showToast(notification: NotificationData) {
 // // // // //     switch (notification.type) {
 // // // // //       case 'success':
-// // // // //         this.messageService.showSuccess(notification.title, notification.message);
+// // // // //         this.messageService.showSuccess(`${notification.title}, ${notification.message}`);
 // // // // //         break;
 // // // // //       case 'error':
-// // // // //         this.messageService.showError(notification.title, notification.message);
+// // // // //         this.messageService.showError(`${notification.title}, ${notification.message}`);
 // // // // //         break;
 // // // // //       case 'warning':
-// // // // //         this.messageService.showWarn(notification.title, notification.message);
+// // // // //         this.messageService.showWarn(`${notification.title}, ${notification.message}`);
 // // // // //         break;
 // // // // //       case 'urgent':
-// // // // //         this.messageService.showError(notification.title, notification.message, 1000);
+// // // // //         this.messageService.showError(`${notification.title}, ${notification.message}`, 1000);
 // // // // //         break;
 // // // // //       default:
-// // // // //         this.messageService.showInfo(notification.title, notification.message);
+// // // // //         this.messageService.showInfo(`${notification.title}, ${notification.message}`);
 // // // // //         break;
 // // // // //     }
 // // // // //   }
@@ -4528,10 +4528,10 @@ export class SocketService implements OnDestroy {
 // // // // //   private showAnnouncementToast(announcement: AnnouncementData) {
 // // // // //     const message = `${announcement.title}: ${announcement.message}`;
 // // // // //     switch (announcement.type) {
-// // // // //       case 'success': this.messageService.showSuccess('Announcement', message, 8000); break;
-// // // // //       case 'warning': this.messageService.showWarn('Announcement', message, 8000); break;
-// // // // //       case 'error': this.messageService.showError('Announcement', message, 8000); break;
-// // // // //       default: this.messageService.showInfo('Announcement', message, 8000); break;
+// // // // //       case 'success': this.messageService.showSuccess(`${notification.title}, ${notification.message}`); break;
+// // // // //       case 'warning': this.messageService.showWarn(`${notification.title}, ${notification.message}`); break;
+// // // // //       case 'error': this.messageService.showError(`${notification.title}, ${notification.message}`); break;
+// // // // //       default: this.messageService.showInfo(`${notification.title}, ${notification.message}`); break;
 // // // // //     }
 // // // // //   }
 
@@ -5452,19 +5452,19 @@ export class SocketService implements OnDestroy {
 // // // // // //   private showToast(notification: NotificationData) {
 // // // // // //     switch (notification.type) {
 // // // // // //       case 'success':
-// // // // // //         this.messageService.showSuccess(notification.title, notification.message);
+// // // // // //         this.messageService.showSuccess(`${notification.title}, ${notification.message}`);
 // // // // // //         break;
 // // // // // //       case 'error':
-// // // // // //         this.messageService.showError(notification.title, notification.message);
+// // // // // //         this.messageService.showError(`${notification.title}, ${notification.message}`);
 // // // // // //         break;
 // // // // // //       case 'warning':
-// // // // // //         this.messageService.showWarn(notification.title, notification.message);
+// // // // // //         this.messageService.showWarn(`${notification.title}, ${notification.message}`);
 // // // // // //         break;
 // // // // // //       case 'urgent':
-// // // // // //         this.messageService.showError(notification.title, notification.message, 1000);
+// // // // // //         this.messageService.showError(`${notification.title}, ${notification.message}`, 1000);
 // // // // // //         break;
 // // // // // //       default:
-// // // // // //         this.messageService.showInfo(notification.title, notification.message);
+// // // // // //         this.messageService.showInfo(`${notification.title}, ${notification.message}`);
 // // // // // //         break;
 // // // // // //     }
 // // // // // //   }
@@ -5473,16 +5473,16 @@ export class SocketService implements OnDestroy {
 // // // // // //     const message = `${announcement.title}: ${announcement.message}`;
 // // // // // //     switch (announcement.type) {
 // // // // // //       case 'success':
-// // // // // //         this.messageService.showSuccess('Announcement', message, 8000);
+// // // // // //         this.messageService.showSuccess(`${notification.title}, ${notification.message}`);
 // // // // // //         break;
 // // // // // //       case 'warning':
-// // // // // //         this.messageService.showWarn('Announcement', message, 8000);
+// // // // // //         this.messageService.showWarn(`${notification.title}, ${notification.message}`);
 // // // // // //         break;
 // // // // // //       case 'error':
-// // // // // //         this.messageService.showError('Announcement', message, 8000);
+// // // // // //         this.messageService.showError(`${notification.title}, ${notification.message}`);
 // // // // // //         break;
 // // // // // //       default:
-// // // // // //         this.messageService.showInfo('Announcement', message, 8000);
+// // // // // //         this.messageService.showInfo(`${notification.title}, ${notification.message}`);
 // // // // // //         break;
 // // // // // //     }
 // // // // // //   }

@@ -15,6 +15,7 @@ import { ImageCellRendererComponent } from '../../../shared/AgGrid/AgGridcompone
 import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
 import { Dialog } from "primeng/dialog";
 import { BulkProductEntry } from "../bulk-product-entry/bulk-product-entry";
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-product-list',
@@ -63,7 +64,6 @@ export class ProductListComponent implements OnInit {
 
   constructor() {
     effect(() => {
-      // Load master data logic here if needed
       this.brandOptions.set(this.masterList.brands());
       this.categoryOptions.set(this.masterList.categories());
     });
@@ -83,7 +83,7 @@ export class ProductListComponent implements OnInit {
     this.getData(true);
   }
 
-getData(isReset: boolean = false) {
+  getData(isReset: boolean = false) {
     if (this.isLoading) return;
     this.isLoading = true;
 
@@ -99,48 +99,52 @@ getData(isReset: boolean = false) {
       limit: this.pageSize,
     };
 
-    this.productService.getAllProducts(filterParams).subscribe(
-      (res: any) => {
-        let newData: any[] = [];
+    this.productService.getAllProducts(filterParams)
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: (res: any) => {
+          let newData: any[] = [];
 
-        // 1. EXTRACT DATA
-        // Structure is: root -> data -> data (array)
-        if (res.data && Array.isArray(res.data.data)) {
-          newData = res.data.data;
-        }
-
-        // 2. EXTRACT PAGINATION
-        // Structure is: root -> pagination -> totalResults
-        if (res.pagination) {
-          this.totalCount = res.pagination.totalResults;
-        }
-
-        // 3. UPDATE LOCAL STATE
-        this.data = [...this.data, ...newData];
-
-        // 4. UPDATE GRID
-        if (this.gridApi) {
-          if (isReset) {
-            // If resetting, replace all data
-            this.gridApi.setGridOption('rowData', this.data);
-          } else {
-            // If appending (scrolling), just add new rows
-            this.gridApi.applyTransaction({ add: newData });
+          // 1. EXTRACT DATA
+          // Structure is: root -> data -> data (array)
+          if (res.data && Array.isArray(res.data.data)) {
+            newData = res.data.data;
           }
-        }
 
-        this.currentPage++;
-        this.isLoading = false;
-        this.cdr.markForCheck();
-      },
-      (err: any) => {
-        this.isLoading = false;
-        console.error(err);
-        this.messageService.showError('Error', 'Failed to fetch products.');
-      }
-    );
+          // 2. EXTRACT PAGINATION
+          // Structure is: root -> pagination -> totalResults
+          if (res.pagination) {
+            this.totalCount = res.pagination.totalResults;
+          }
+
+          // 3. UPDATE LOCAL STATE
+          this.data = [...this.data, ...newData];
+
+          // 4. UPDATE GRID
+          if (this.gridApi) {
+            if (isReset) {
+              // If resetting, replace all data
+              this.gridApi.setGridOption('rowData', this.data);
+            } else {
+              // If appending (scrolling), just add new rows
+              this.gridApi.applyTransaction({ add: newData });
+            }
+          }
+
+          this.currentPage++;
+        },
+        error: (err: any) => {
+          // Replaced console.error and manual toast with global handler
+          this.messageService.handleHttpError(err);
+        }
+      });
   }
-  
+
   onScrolledToBottom(event: any) {
     if (!this.isLoading && this.data.length < this.totalCount) {
       this.getData(false);
@@ -170,7 +174,6 @@ getData(isReset: boolean = false) {
 
   getColumn(): void {
     this.column = [
-      // 1. IMAGE & IDENTITY
       {
         field: 'images',
         headerName: '',
@@ -189,12 +192,8 @@ getData(isReset: boolean = false) {
         flex: 1.5,
         minWidth: 220,
         filter: 'agTextColumnFilter',
-        // Enable Text Editing
         cellConfig: { type: 'text', placeholder: 'Product Name' },
-        cellStyle: {
-          'font-weight': '600',
-          'color': 'var(--text-primary)'
-        }
+        cellStyle: { 'font-weight': '600', 'color': 'var(--text-primary)' }
       },
       {
         field: 'sku',
@@ -204,17 +203,12 @@ getData(isReset: boolean = false) {
         cellStyle: { 'font-family': 'var(--font-mono)', 'font-size': '12px' }
       },
 
-      // 2. CLASSIFICATION (Dropdown Editors)
       {
         field: 'brandId.name',
         headerName: 'Brand',
         width: 130,
         filter: 'agSetColumnFilter',
-        // Example: Using Select editor (You would populate options dynamically in real app)
-        cellConfig: {
-          type: 'select',
-          options: [{ label: 'Apple', value: 'Apple' }, { label: 'Samsung', value: 'Samsung' }]
-        }
+        cellConfig: { type: 'select', options: [{ label: 'Apple', value: 'Apple' }, { label: 'Samsung', value: 'Samsung' }] }
       },
       {
         field: 'categoryId.name',
@@ -226,10 +220,9 @@ getData(isReset: boolean = false) {
         field: 'subCategoryId.name',
         headerName: 'Sub-Category',
         width: 130,
-        hide: true // Hidden by default, user can enable
+        hide: true
       },
 
-      // 3. PRICING & FINANCIALS (Numeric Editors)
       {
         field: 'purchasePrice',
         headerName: 'Buy Price',
@@ -250,7 +243,6 @@ getData(isReset: boolean = false) {
       {
         headerName: 'Margin',
         width: 100,
-        // Calculated Column: (Sell - Buy) / Sell %
         valueGetter: (params: any) => {
           const buy = params.data.purchasePrice || 0;
           const sell = params.data.sellingPrice || 0;
@@ -272,12 +264,10 @@ getData(isReset: boolean = false) {
         cellConfig: { type: 'number', max: 100 }
       },
 
-      // 4. INVENTORY & UNIT
       {
         headerName: 'Total Stock',
         width: 110,
         type: 'numericColumn',
-        // Aggregate inventory array: Sum of all branch quantities
         valueGetter: (params: any) => {
           if (!params.data.inventory || !Array.isArray(params.data.inventory)) return 0;
           return params.data.inventory.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0);
@@ -293,7 +283,6 @@ getData(isReset: boolean = false) {
         cellClass: 'text-muted text-xs'
       },
 
-      // 5. SUPPLIER & LOGISTICS
       {
         field: 'defaultSupplierId.companyName',
         headerName: 'Supplier',
@@ -301,13 +290,11 @@ getData(isReset: boolean = false) {
         tooltipField: 'defaultSupplierId.contactPerson'
       },
 
-      // 6. STATUS & AUDIT
       {
         field: 'isActive',
         headerName: 'Active',
         width: 100,
         cellClass: 'flex-center',
-        // Boolean Switch Editor
         cellConfig: { type: 'boolean' },
         cellRenderer: (params: any) => {
           return params.value
@@ -319,7 +306,7 @@ getData(isReset: boolean = false) {
         field: 'updatedAt',
         headerName: 'Last Updated',
         width: 140,
-        hide: true, // Optional
+        hide: true,
         valueFormatter: (params: any) => {
           return params.value ? new Date(params.value).toLocaleDateString() : '-';
         },
@@ -330,7 +317,6 @@ getData(isReset: boolean = false) {
     this.cdr.detectChanges();
   }
 
-  // Helper for Currency
   currencyFormatter(params: any) {
     if (params.value === null || params.value === undefined) return '-';
     return '₹ ' + params.value.toLocaleString('en-IN', { minimumFractionDigits: 2 });

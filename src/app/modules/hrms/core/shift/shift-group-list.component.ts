@@ -279,7 +279,7 @@ export class ShiftGroupListComponent implements OnInit {
       },
       error: (err: any) => {
         this.isLoading = false;
-        this.messageService.showError('Error', 'Failed to fetch shift groups.');
+        this.messageService.handleHttpError(err)
       }
     });
   }
@@ -321,11 +321,11 @@ export class ShiftGroupListComponent implements OnInit {
   private deleteGroup(id: string) {
     this.hrmsService.deleteShiftGroup(id).subscribe({
       next: () => {
-        this.messageService.showSuccess('Deleted', 'Shift group removed successfully');
+        this.messageService.showSuccess('Shift group removed successfully');
         this.getData(true);
       },
       error: (err: any) => {
-        this.messageService.showError('Error', err.error?.message || 'Failed to delete shift group');
+        this.messageService.handleHttpError(err);
       }
     });
   }

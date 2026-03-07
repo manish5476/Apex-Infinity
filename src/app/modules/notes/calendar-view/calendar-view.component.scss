@@ -1,350 +1,182 @@
-/* ==========================================================================
-   COMPONENT: CALENDAR VIEW
-   Strict adherence to Theme Tokens & Canonical Mapping
-   ========================================================================== */
+ :host {
+      display: block;
+      height: 100%;
+      --c-bg: var(--bg-primary);
+      --c-surface: var(--bg-secondary);
+      --c-border: var(--border-secondary);
+      --c-text: var(--text-primary);
+      --c-muted: var(--text-secondary);
+      --c-accent: var(--accent-primary);
+    }
 
-:host {
-  display: block;
-  height: 100%;
-  
-  // 1. Initialize Theme Context
-  // @include apply-canonical-mapping;
+    .calendar-layout {
+      display: flex;
+      height: 100%;
+      gap: 1rem;
+      background: var(--c-bg);
+      overflow: hidden;
+    }
 
-  // Local Component Variables (Derived from Tokens)
-  --grid-gap-color: var(--border-secondary);
-  --cell-bg-default: var(--bg-primary);
-  --cell-bg-hover: var(--bg-hover);
-  --cell-bg-other-month: var(--bg-secondary);
-}
+    /* === MAIN AREA === */
+    .calendar-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border-radius: 12px;
+      background: var(--c-bg);
+      border: 1px solid var(--c-border);
+      overflow: hidden;
+    }
 
-.calendar-container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  background: var(--bg-ternary); /* Subtle contrast against white cells */
-  font-family: var(--font-body);
-  color: var(--text-primary);
-}
+    /* HEADER */
+    .cal-header {
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--c-border);
+      background: var(--c-bg);
 
-/* --------------------------------------------------------------------------
-   1. HEADER AREA
-   -------------------------------------------------------------------------- */
-.calendar-header {
-  padding: var(--spacing-md) var(--spacing-xl);
-  background: var(--bg-primary);
-  border-bottom: 1px solid var(--border-secondary);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+      .cal-title-group {
+        display: flex; align-items: center; gap: 1.5rem;
+        .month-title { font-size: 1.5rem; font-weight: 800; color: var(--c-text); margin: 0; min-width: 200px; }
+        .cal-nav {
+          display: flex; align-items: center; gap: 4px;
+          .btn-icon {
+            width: 32px; height: 32px; border: 1px solid var(--c-border); background: transparent;
+            border-radius: 8px; color: var(--c-muted); cursor: pointer; display: flex; align-items: center; justify-content: center;
+            &:hover { background: var(--c-surface); color: var(--c-text); }
+          }
+          .btn-today {
+            padding: 0 12px; height: 32px; border: 1px solid var(--c-border); background: transparent;
+            border-radius: 8px; font-weight: 600; font-size: 0.85rem; color: var(--c-text); cursor: pointer;
+            &:hover { background: var(--c-surface); }
+          }
+        }
+      }
 
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xl);
-  }
-
-  .month-label {
-    font-family: var(--font-heading);
-    font-size: var(--font-size-xl);
-    font-weight: var(--font-weight-bold);
-    color: var(--text-primary);
-    margin: 0;
-    min-width: 200px;
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-  }
-
-  .nav-controls {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    background: var(--bg-secondary);
-    padding: 2px;
-    border-radius: var(--ui-border-radius);
-    border: 1px solid var(--border-secondary);
-
-    button {
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      color: var(--text-secondary);
-      padding: var(--spacing-xs) var(--spacing-md);
-      border-radius: var(--ui-border-radius-sm);
-      font-size: var(--font-size-sm);
-      transition: var(--transition-base);
-
-      &:hover { 
-        background: var(--bg-primary); 
-        color: var(--text-primary);
-        box-shadow: var(--shadow-xs); 
+      .scope-switch {
+        background: var(--c-surface); padding: 4px; border-radius: 10px; display: flex; gap: 2px;
+        button {
+          border: none; background: transparent; padding: 6px 16px; font-size: 0.85rem; font-weight: 600;
+          color: var(--c-muted); border-radius: 8px; cursor: pointer; transition: all 0.2s;
+          &.active { background: var(--c-bg); color: var(--c-text); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        }
       }
     }
-    
-    .btn-icon { 
-      font-size: 1.1rem; 
-      padding: 2px 8px; 
-      line-height: 1; 
-      display: flex; 
-      align-items: center; 
+
+    /* GRID */
+    .cal-grid-container {
+      flex: 1; display: flex; flex-direction: column; overflow: hidden;
     }
-    
-    .btn-text { font-weight: var(--font-weight-semibold); }
-  }
-}
-
-/* --------------------------------------------------------------------------
-   2. LEGEND
-   -------------------------------------------------------------------------- */
-.legend-mini {
-  display: flex;
-  gap: var(--spacing-md);
-  font-size: var(--font-size-xs);
-  color: var(--text-secondary);
-  font-weight: var(--font-weight-medium);
-  
-  .legend-item { display: flex; align-items: center; gap: 6px; }
-  
-  .dot { width: 8px; height: 8px; border-radius: 2px; }
-  
-  .activity { background: var(--color-primary-bg); }
-  .urgent { background: var(--color-error-bg); border: 1px solid var(--color-error-border); }
-}
-
-/* --------------------------------------------------------------------------
-   3. GRID WRAPPER & STRUCTURE
-   -------------------------------------------------------------------------- */
-.calendar-wrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  padding: var(--spacing-lg);
-}
-
-.weekday-row {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  padding-bottom: var(--spacing-sm);
-  
-  .weekday {
-    text-transform: uppercase;
-    font-size: 0.7rem; // Optical sizing
-    font-weight: var(--font-weight-bold);
-    color: var(--text-tertiary);
-    letter-spacing: 0.05em;
-    padding-left: var(--spacing-sm);
-  }
-}
-
-.days-grid {
-  flex: 1;
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  grid-template-rows: repeat(6, 1fr); /* Fixed 6 rows */
-  gap: 1px; /* The gap creates the grid lines */
-  background: var(--grid-gap-color);
-  border: 1px solid var(--grid-gap-color);
-  border-radius: var(--ui-border-radius-lg);
-  overflow: hidden;
-}
-
-/* --------------------------------------------------------------------------
-   4. DAY CELL STYLING
-   -------------------------------------------------------------------------- */
-.day-cell {
-  background: var(--cell-bg-default);
-  padding: 4px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  position: relative;
-  transition: background-color 0.2s;
-  min-height: 0; 
-
-  /* Heatmap Backgrounds (Dynamic based on Theme Accent) */
-  &.intensity-1 { background: color-mix(in srgb, var(--accent-primary) 5%, var(--bg-primary)); }
-  &.intensity-2 { background: color-mix(in srgb, var(--accent-primary) 12%, var(--bg-primary)); }
-  &.intensity-3 { background: color-mix(in srgb, var(--accent-primary) 25%, var(--bg-primary)); }
-
-  /* State: Other Month */
-  &.other-month {
-    background: var(--cell-bg-other-month);
-    .day-number { color: var(--text-muted); opacity: 0.7; }
-    .event-chip { opacity: 0.5; filter: grayscale(0.5); }
-  }
-
-  /* State: Hover */
-  &:hover {
-    background: var(--bg-primary); /* Reset intensity on hover for clarity */
-    z-index: 5;
-    box-shadow: var(--shadow-md);
-    
-    .btn-add-mini { opacity: 1; pointer-events: auto; }
-  }
-
-  /* State: Today */
-  &.is-today {
-    background: var(--bg-primary);
-    .day-number {
-      background: var(--accent-primary);
-      color: #ffffff; /* Always white on accent */
-      font-weight: var(--font-weight-bold);
-      box-shadow: 0 2px 4px var(--accent-focus);
+    .weekday-row {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      border-bottom: 1px solid var(--c-border); background: var(--c-surface);
+      .weekday { padding: 10px; text-align: center; font-size: 0.75rem; font-weight: 700; color: var(--c-muted); text-transform: uppercase; letter-spacing: 1px; }
     }
-  }
-}
+    .days-grid {
+      flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 1fr;
+      overflow-y: auto; position: relative;
+    }
+    .loader-overlay {
+      position: absolute; inset: 0; background: rgba(255,255,255,0.7); backdrop-filter: blur(2px);
+      z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--c-accent);
+    }
 
-/* Cell Header (Number + Add Button) */
-.cell-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 2px 4px;
-}
+    /* DAY CELL */
+    .day-cell {
+      border-right: 1px solid var(--c-border); border-bottom: 1px solid var(--c-border);
+      padding: 8px; display: flex; flex-direction: column; position: relative;
+      background: var(--c-bg); cursor: pointer; transition: background 0.15s;
+      min-height: 100px;
 
-.day-number {
-  font-size: var(--font-size-sm);
-  color: var(--text-primary);
-  width: 24px; height: 24px;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 50%;
-  font-family: var(--font-mono); /* Tabular figures */
-}
+      /* States */
+      &.inactive { background: repeating-linear-gradient(45deg, var(--c-surface), var(--c-surface) 10px, var(--c-bg) 10px, var(--c-bg) 20px); opacity: 0.6; }
+      &.selected { background: var(--c-surface) !important; box-shadow: inset 0 0 0 2px var(--c-accent); }
+      &:hover:not(.selected) { background: var(--c-surface); }
+      &.today .day-num { background: var(--c-accent); color: white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
 
-.btn-add-mini {
-  opacity: 0;
-  border: none;
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
-  width: 20px; height: 20px;
-  border-radius: var(--ui-border-radius-sm);
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1rem;
-  line-height: 1;
-  transition: all 0.2s;
+      /* Heatmap */
+      .heatmap-glow {
+        position: absolute; inset: 0; pointer-events: none;
+        background: radial-gradient(circle at center, var(--intensity-color), transparent 70%);
+        z-index: 0;
+      }
 
-  &:hover { 
-    background: var(--accent-primary); 
-    color: #fff; 
-  }
-}
+      .day-header {
+        display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; position: relative; z-index: 1;
+        .day-num { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: 600; font-size: 0.9rem; color: var(--c-text); }
+        .month-label { font-size: 0.75rem; font-weight: 700; color: var(--c-text); }
+        .activity-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--c-accent); opacity: 0.5; }
+      }
 
-/* --------------------------------------------------------------------------
-   5. EVENTS STYLING
-   -------------------------------------------------------------------------- */
-.events-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  overflow-y: auto;
-  
-  &::-webkit-scrollbar { display: none; }
-}
+      .events-stack {
+        display: flex; flex-direction: column; gap: 3px; position: relative; z-index: 1; flex: 1;
+        .evt-pill {
+          display: flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 4px;
+          background: color-mix(in srgb, var(--evt-color) 10%, transparent);
+          color: var(--evt-color); font-size: 0.7rem; font-weight: 600; border: 1px solid transparent;
+          
+          &.is-meeting { border-color: var(--evt-color); background: color-mix(in srgb, var(--evt-color) 15%, white); }
+          .evt-marker { width: 4px; height: 4px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+          .evt-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        }
+        .more-count { font-size: 0.7rem; color: var(--c-muted); padding-left: 4px; font-weight: 500; }
+      }
+    }
 
-.event-chip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 2px 6px;
-  border-radius: 4px;
-  
-  /* Default Style (Note) */
-  background: var(--bg-primary);
-  border: 1px solid var(--border-secondary);
-  font-size: 10px;
-  color: var(--text-secondary);
-  font-weight: var(--font-weight-medium);
-  
-  cursor: pointer;
-  transition: transform 0.1s, border-color 0.1s;
-  white-space: nowrap;
+    /* === SIDEBAR === */
+    .calendar-sidebar {
+      width: 320px;
+      display: flex; flex-direction: column;
+      border-left: 1px solid var(--c-border);
+      background: var(--c-bg);
+      border-radius: 12px;
+      padding: 1.5rem;
+      gap: 1.5rem;
+    }
 
-  &:hover {
-    border-color: var(--accent-primary);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-sm);
-    z-index: 2;
-    color: var(--text-primary);
-  }
+    .sidebar-header {
+      display: flex; justify-content: space-between; align-items: center;
+      h3 { font-size: 1.1rem; font-weight: 700; margin: 0; color: var(--c-text); }
+      .btn-add-mini {
+        width: 30px; height: 30px; border-radius: 50%; background: var(--c-accent); color: white; border: none; cursor: pointer;
+        display: flex; align-items: center; justify-content: center; transition: transform 0.2s;
+        &:hover { transform: rotate(90deg); }
+      }
+    }
 
-  /* Chip Dot */
-  .chip-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    flex-shrink: 0;
-    background: var(--text-tertiary);
-  }
+    .selected-day-events {
+      flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+      .empty-day-state {
+        text-align: center; padding: 2rem 0; color: var(--c-muted);
+        i { font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.5; }
+        p { font-size: 0.9rem; margin: 0 0 0.5rem 0; }
+        .btn-text { background: none; border: none; color: var(--c-accent); font-weight: 600; cursor: pointer; font-size: 0.85rem; }
+      }
+    }
 
-  .chip-title {
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+    .event-card {
+      background: var(--c-surface); border-radius: 8px; padding: 12px;
+      border-left: 3px solid transparent; cursor: pointer; transition: transform 0.1s;
+      &:hover { transform: translateX(2px); background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
 
-  /* --- SEMANTIC VARIANTS --- */
-  
-  /* Meeting (Info Theme) */
-  &.type-meeting {
-    background: var(--color-info-bg);
-    border-color: var(--color-info-border);
-    color: var(--color-info-dark);
-    .chip-dot { background: var(--color-info) !important; }
-  }
+      .evt-card-header {
+        display: flex; justify-content: space-between; margin-bottom: 6px;
+        .badge { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; }
+      }
+      .evt-card-title { margin: 0 0 6px 0; font-size: 0.9rem; font-weight: 600; color: var(--c-text); }
+      .evt-card-meta {
+        display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--c-muted);
+        .status.done { text-decoration: line-through; opacity: 0.7; }
+      }
+    }
 
-  /* Task Completed (Success Theme) */
-  &.status-done {
-    background: var(--color-success-bg);
-    border-color: var(--color-success-border);
-    color: var(--color-success-dark);
-    text-decoration: line-through;
-    opacity: 0.8;
-    .chip-dot { background: var(--color-success) !important; }
-  }
-
-  /* Task/Idea (Primary Theme) */
-  &.type-task {
-     /* Optional specific styling for tasks if not done */
-  }
-
-  /* Urgent (Error Theme) */
-  &.priority-urgent {
-    background: var(--color-error-bg);
-    border-color: var(--color-error-border);
-    color: var(--color-error-dark);
-    font-weight: var(--font-weight-bold);
-    .chip-dot { background: var(--color-error) !important; }
-  }
-}
-
-.more-indicator {
-  font-size: 10px;
-  color: var(--text-tertiary);
-  padding-left: 6px;
-  font-weight: 500;
-  margin-top: 2px;
-}
-
-/* --------------------------------------------------------------------------
-   6. UTILITIES & ANIMATION
-   -------------------------------------------------------------------------- */
-.loader-dots::after {
-  content: ' .';
-  animation: dots 1.5s steps(5, end) infinite;
-  color: var(--text-tertiary);
-}
-
-@keyframes dots {
-  0%, 20% { content: ' .'; }
-  40% { content: ' ..'; }
-  60% { content: ' ...'; }
-  80%, 100% { content: ''; }
-}
-
-.animate-pop {
-  animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes popIn {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
+    .mini-stats {
+      display: flex; gap: 1rem; padding-top: 1rem; border-top: 1px solid var(--c-border);
+      .stat-item {
+        flex: 1; display: flex; flex-direction: column;
+        .lbl { font-size: 0.7rem; text-transform: uppercase; color: var(--c-muted); font-weight: 600; }
+        .val { font-size: 1.1rem; font-weight: 700; color: var(--c-text); }
+      }
+    }

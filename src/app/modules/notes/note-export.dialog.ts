@@ -1,8 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { MessageService } from "primeng/api";
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { NoteService } from '../../core/services/notes.service';
+import { AppMessageService } from "../../core/services/message.service";
+import { finalize } from "rxjs";
 
 @Component({
   selector: 'app-note-export-dialog',
@@ -239,18 +242,19 @@ import { NoteService } from '../../core/services/notes.service';
     }
     @keyframes spin { to { transform: rotate(360deg); } }
   `]
-})
-export class NoteExportDialogComponent {
+})export class NoteExportDialogComponent {
   ref = inject(DynamicDialogRef);
   config = inject(DynamicDialogConfig);
   noteService = inject(NoteService);
+  messageService = inject(AppMessageService);
+  private cdr = inject(ChangeDetectorRef); // Essential for OnPush/Manual state updates
 
   scope: 'all' | 'filtered' = 'all';
   format: 'json' | 'csv' = 'json';
-  
+
   startDate: string = '';
   endDate: string = '';
-  
+
   isLoading = false;
 
   close() {
@@ -260,38 +264,54 @@ export class NoteExportDialogComponent {
   onExport() {
     this.isLoading = true;
 
-    if (this.scope === 'all') {
-      this.noteService.exportAllUserNotes(this.format).subscribe({
-        next: (response) => this.handleDownload(response, `all-notes-export`),
-        error: () => this.isLoading = false,
-        complete: () => this.isLoading = false
-      });
-    } else {
-      this.noteService.exportNoteData(this.format, this.startDate, this.endDate).subscribe({
-        next: (response) => this.handleDownload(response, `notes-export-${this.startDate}`),
-        error: () => this.isLoading = false,
-        complete: () => this.isLoading = false
-      });
-    }
+    const export$ = this.scope === 'all' 
+      ? this.noteService.exportAllUserNotes(this.format)
+      : this.noteService.exportNoteData(this.format, this.startDate, this.endDate);
+
+    export$.pipe(
+      finalize(() => {
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      })
+    ).subscribe({
+      next: (response) => {
+        const timestamp = new Date().toISOString().split('T')[0];
+        const filename = this.scope === 'all' ? `all-notes-${timestamp}` : `filtered-notes-${timestamp}`;
+        
+        this.messageService.showSuccess(`Notes exported successfully in ${this.format.toUpperCase()} format.`);
+        this.handleDownload(response, filename);
+      },
+      error: (err) => {
+        this.messageService.handleHttpError(err);
+      }
+    });
   }
 
   private handleDownload(data: any, filename: string) {
-    // Determine Blob Type
+    // If the service returns a Blob directly, use it. Otherwise, create one.
+    const isBlob = data instanceof Blob;
     const type = this.format === 'json' ? 'application/json' : 'text/csv';
-    const blobData = this.format === 'json' ? JSON.stringify(data, null, 2) : data.mockData;
     
-    const blob = new Blob([blobData], { type });
+    let blob: Blob;
+    if (isBlob) {
+      blob = data;
+    } else {
+      const blobData = this.format === 'json' ? JSON.stringify(data, null, 2) : (data.mockData || data);
+      blob = new Blob([blobData], { type });
+    }
+
     const url = window.URL.createObjectURL(blob);
-    // Create Link
     const a = document.createElement('a');
+    a.style.display = 'none';
     a.href = url;
     a.download = `${filename}.${this.format}`;
+    
     document.body.appendChild(a);
     a.click();
-    
+
     // Cleanup
-    document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
     this.ref.close();
   }
 }

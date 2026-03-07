@@ -328,7 +328,7 @@ export class DesignationPromotionComponent implements OnInit {
 
   loadEligibilityData() {
     if (!this.selectedDesignationId) {
-      this.messageService.showError('Required', 'Please select a designation first.');
+      this.messageService.showError( 'Please select a designation first.');
       return;
     }
 
@@ -343,8 +343,8 @@ export class DesignationPromotionComponent implements OnInit {
         const data = res?.data || null;
         this.currentData.set(data);
       },
-      error: () => {
-        this.messageService.showError('Error', 'Failed to calculate promotion eligibility.');
+      error: (err) => {
+        this.messageService.handleHttpError(err)
         this.currentData.set(null);
       }
     });

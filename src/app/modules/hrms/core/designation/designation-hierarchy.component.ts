@@ -189,8 +189,8 @@ export class DesignationHierarchyComponent implements OnInit {
         const tree = data?.reportingHierarchy || [];
         this.hierarchyTree.set(tree);
       },
-      error: () => {
-        this.messageService.showError('Error', 'Failed to load designation hierarchy.');
+      error: (err) => {
+        this.messageService.handleHttpError(err)
       }
     });
   }

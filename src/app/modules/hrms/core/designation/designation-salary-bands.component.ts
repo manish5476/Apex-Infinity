@@ -213,8 +213,8 @@ export class DesignationSalaryBandsComponent implements OnInit {
           this.marketRates.set(data.marketRates || {});
         }
       },
-      error: () => {
-        this.messageService.showError('Error', 'Failed to load salary bands.');
+      error: (err) => {
+        this.messageService.handleHttpError(err)
       }
     });
   }

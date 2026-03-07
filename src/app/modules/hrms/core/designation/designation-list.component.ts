@@ -330,7 +330,7 @@ export class DesignationListComponent implements OnInit {
       },
       error: (err: any) => {
         this.isLoading = false;
-        this.messageService.showError('Error', 'Failed to fetch designations.');
+        this.messageService.handleHttpError(err)
       }
     });
   }
@@ -372,11 +372,11 @@ export class DesignationListComponent implements OnInit {
   private deleteDesignation(id: string) {
     this.hrmsService.deleteDesignation(id).subscribe({
       next: () => {
-        this.messageService.showSuccess('Deleted', 'Designation removed successfully');
+        this.messageService.showSuccess( 'Designation removed successfully');
         this.getData(true);
       },
       error: (err: any) => {
-        this.messageService.showError('Error', err.error?.message || 'Failed to delete designation');
+        this.messageService.handleHttpError(err)
       }
     });
   }

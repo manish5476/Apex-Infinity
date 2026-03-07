@@ -138,8 +138,8 @@ export class GeofenceListComponent implements OnInit {
   deleteFence(id: string, name: string) {
     if(confirm(`Delete Geofence ${name}?`)) {
       this.hrmsService.deleteGeoFence(id).subscribe({
-        next: () => { this.messageService.showSuccess('Deleted', 'Geofence removed'); this.getData(); },
-        error: (err) => this.messageService.showError('Error', err.message)
+        next: () => { this.messageService.showSuccess( 'Geofence removed'); this.getData(); },
+        error: (err) => this.messageService.handleHttpError(err)
       });
     }
   }

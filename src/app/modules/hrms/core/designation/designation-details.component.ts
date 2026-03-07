@@ -321,7 +321,7 @@ export class DesignationDetailsComponent implements OnInit {
         this.loadDesignationDetails();
       } else {
         this.isLoading.set(false);
-        this.messageService.showError('Error', 'Invalid designation ID.');
+        this.messageService.showError('Invalid designation ID.');
         this.goBack();
       }
     });
@@ -333,7 +333,7 @@ export class DesignationDetailsComponent implements OnInit {
     this.hrmsService.getDesignation(this.desigId!).pipe(
       map((res: any) => res?.data?.designation || res?.data || res),
       catchError(err => {
-        this.messageService.showError('Error', 'Failed to load designation details.');
+        this.messageService.handleHttpError(err)
         return of(null);
       }),
       finalize(() => this.isLoading.set(false))

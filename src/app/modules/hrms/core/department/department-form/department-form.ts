@@ -366,8 +366,7 @@ export class DepartmentFormComponent implements OnInit {
       catchError(err => {
         this.isLoading.set(false);
         this.deptForm.enable();
-        // Assuming your message service has showError method 
-        this.messageService.showError('Error', 'Failed to load department details.');
+        this.messageService.handleHttpError(err)
         return of(null);
       })
     ).subscribe((data) => {
@@ -434,24 +433,24 @@ export class DepartmentFormComponent implements OnInit {
       // Assumes updateDepartment takes id and payload
       this.hrmsService.updateDepartment(this.deptId!, payload).subscribe({
         next: (res: any) => {
-          this.messageService.showSuccess('Success', 'Department updated successfully');
+          this.messageService.showSuccess( 'Department updated successfully');
           this.isSubmitting.set(false);
           this.goBack();
         },
         error: (err: any) => {
-          this.messageService.showError('Error', err.message || 'Failed to update department');
+          this.messageService.handleHttpError(err)
           this.isSubmitting.set(false);
         }
       });
     } else {
       this.hrmsService.createDepartment(payload).subscribe({
         next: (res: any) => {
-          this.messageService.showSuccess('Success', 'Department created successfully');
+          this.messageService.showSuccess('Department created successfully');
           this.isSubmitting.set(false);
           this.goBack();
         },
         error: (err: any) => {
-          this.messageService.showError('Error', err.message || 'Failed to create department');
+          this.messageService.handleHttpError(err)
           this.isSubmitting.set(false);
         }
       });

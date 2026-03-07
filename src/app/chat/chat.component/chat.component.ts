@@ -255,7 +255,6 @@ activeThemeId : any ='theme-glass'
           });
           this.markMessagesAsRead();
         } 
-        // Case B: Message is for another channel (Background)
         else {
           this.unreadCounts.update(counts => ({
             ...counts,
@@ -306,7 +305,7 @@ activeThemeId : any ='theme-glass'
     this.subs.push(
       this.socketService.connectionStatus$.subscribe(status => {
         if (status === 'disconnected') {
-          this.messageService.showWarn('Connection Lost', 'Real-time updates are paused.');
+          this.messageService.showWarn('Real-time updates are paused.');
         }
       }),
       this.socketService.connectionEstablished$.subscribe(() => {
@@ -509,7 +508,7 @@ activeThemeId : any ='theme-glass'
     }).then(() => {
         // Success handled by socket event or promise resolution
     }).catch(err => {
-        this.messageService.showError('Error', 'Message failed to send');
+        this.messageService.handleHttpError(err)
         // Remove temp message on failure
         this.messages.update(msgs => msgs.filter(m => m._id !== tempId));
     });
@@ -540,7 +539,7 @@ activeThemeId : any ='theme-glass'
       error: (err) => {
         console.error('Upload failed', err);
         this.isUploading = false;
-        this.messageService.showError('Error', 'Failed to upload attachments.');
+        this.messageService.handleHttpError(err)
       }
     });
   }
@@ -602,9 +601,9 @@ activeThemeId : any ='theme-glass'
         this.closeCreateModal();
         this.newChannelName = '';
         this.selectedMembers.clear();
-        this.messageService.showSuccess('Success', `Channel #${newChannel.name} created!`);
+        this.messageService.showSuccess(`Channel #${newChannel.name} created!`);
       },
-      error: (err) => this.messageService.showError('Error', 'Failed to create channel.')
+      error: (err) => this.messageService.handleHttpError(err)
     });
   }
 
@@ -649,7 +648,7 @@ activeThemeId : any ='theme-glass'
     // 2. Network Request
     this.socketService.editMessage(id, text).subscribe({
       next: () => this.cancelEditing(),
-      error: () => this.messageService.showError('Error', 'Failed to edit message')
+      error: (err) => this.messageService.handleHttpError(err)
     });
   }
 
@@ -666,9 +665,9 @@ activeThemeId : any ='theme-glass'
     // 2. Network Request
     this.socketService.deleteMessage(msg._id).subscribe({
       next: () => console.log('Deleted successfully on server'),
-      error: () => {
+      error: (err) => {
         // Rollback if failed (Optional, but good UX)
-        this.messageService.showError('Error', 'Could not delete message');
+        this.messageService.handleHttpError(err)
       }
     });
   }
@@ -702,13 +701,13 @@ activeThemeId : any ='theme-glass'
     if (confirm(`Are you sure you want to leave #${this.activeChannel()?.name}?`)) {
       this.socketService.leaveChannel(channelId).subscribe({
         next: () => {
-          this.messageService.showSuccess('Left Channel', 'You have left the channel.');
+          this.messageService.showSuccess( 'You have left the channel.');
           // Optimistic remove
           this.channels.update(ch => ch.filter(c => c._id !== channelId));
           this.selectChannel(this.channels()[0] || null);
           this.closeChannelSettings();
         },
-        error: (err) => this.messageService.showError('Error', 'Failed to leave.')
+        error: (err) => this.messageService.handleHttpError(err)
       });
     }
   }
@@ -727,9 +726,9 @@ activeThemeId : any ='theme-glass'
       }));
 
       this.socketService.removeMember(channelId, targetUserId).subscribe({
-        next: () => this.messageService.showSuccess('Removed', `${userName} was removed.`),
+        next: () => this.messageService.showSuccess( `${userName} was removed.`),
         error: (err) => {
-            this.messageService.showError('Error', 'Only Admins can remove members.');
+            this.messageService.handleHttpError(err)
             // Note: You could revert the UI change here if you wanted strict consistency
         }
       });
@@ -761,13 +760,13 @@ activeThemeId : any ='theme-glass'
           }));
 
           if (successCount === membersToAdd.length) {
-            this.messageService.showSuccess('Success', 'Members added');
+            this.messageService.showSuccess( 'Members added');
             this.newMembers.clear();
           }
         },
         error: (err) => {
             const name = this.getUserName(userId);
-            this.messageService.showError('Error', `Failed to add ${name}`);
+            this.messageService.handleHttpError(err)
         }
       });
     });
@@ -1257,7 +1256,7 @@ activeThemeId : any ='theme-glass'
 //     }).then(() => {
 //         // Success handled by socket event or promise resolution
 //     }).catch(err => {
-//         this.messageService.showError('Error', 'Message failed to send');
+//         this.messageService.handleHttpError(err)
 //         // Remove temp message on failure
 //         this.messages.update(msgs => msgs.filter(m => m._id !== tempId));
 //     });
@@ -1339,7 +1338,7 @@ activeThemeId : any ='theme-glass'
 //         this.selectedMembers.clear();
 //         this.messageService.showSuccess('Success', `Channel #${newChannel.name} created!`);
 //       },
-//       error: (err) => this.messageService.showError('Error', 'Failed to create channel.')
+//       error: (err) => this.messageService.handleHttpError(err)
 //     });
 //   }
 
@@ -1384,7 +1383,7 @@ activeThemeId : any ='theme-glass'
 //     // 2. Network Request
 //     this.socketService.editMessage(id, text).subscribe({
 //       next: () => this.cancelEditing(),
-//       error: () => this.messageService.showError('Error', 'Failed to edit message')
+//       error: () => this.messageService.handleHttpError(err)
 //     });
 //   }
 
@@ -1403,7 +1402,7 @@ activeThemeId : any ='theme-glass'
 //       next: () => console.log('Deleted successfully on server'),
 //       error: () => {
 //         // Rollback if failed (Optional, but good UX)
-//         this.messageService.showError('Error', 'Could not delete message');
+//         this.messageService.handleHttpError(err)
 //       }
 //     });
 //   }
@@ -1443,7 +1442,7 @@ activeThemeId : any ='theme-glass'
 //           this.selectChannel(this.channels()[0] || null);
 //           this.closeChannelSettings();
 //         },
-//         error: (err) => this.messageService.showError('Error', 'Failed to leave.')
+//         error: (err) => this.messageService.handleHttpError(err)
 //       });
 //     }
 //   }
@@ -1464,7 +1463,7 @@ activeThemeId : any ='theme-glass'
 //       this.socketService.removeMember(channelId, targetUserId).subscribe({
 //         next: () => this.messageService.showSuccess('Removed', `${userName} was removed.`),
 //         error: (err) => {
-//             this.messageService.showError('Error', 'Only Admins can remove members.');
+//             this.messageService.handleHttpError(err)
 //             // Note: You could revert the UI change here if you wanted strict consistency
 //         }
 //       });
@@ -1502,7 +1501,7 @@ activeThemeId : any ='theme-glass'
 //         },
 //         error: (err) => {
 //             const name = this.getUserName(userId);
-//             this.messageService.showError('Error', `Failed to add ${name}`);
+//             this.messageService.handleHttpError(err)
 //         }
 //       });
 //     });
@@ -1963,7 +1962,7 @@ activeThemeId : any ='theme-glass'
 // //     }).then(() => {
 // //         // Success handled by socket event or promise resolution
 // //     }).catch(err => {
-// //         this.messageService.showError('Error', 'Message failed to send');
+// //         this.messageService.handleHttpError(err)
 // //         // Remove temp message on failure
 // //         this.messages.update(msgs => msgs.filter(m => m._id !== tempId));
 // //     });
@@ -2045,7 +2044,7 @@ activeThemeId : any ='theme-glass'
 // //         this.selectedMembers.clear();
 // //         this.messageService.showSuccess('Success', `Channel #${newChannel.name} created!`);
 // //       },
-// //       error: (err) => this.messageService.showError('Error', 'Failed to create channel.')
+// //       error: (err) => this.messageService.handleHttpError(err)
 // //     });
 // //   }
 
@@ -2090,7 +2089,7 @@ activeThemeId : any ='theme-glass'
 // //     // 2. Network Request
 // //     this.socketService.editMessage(id, text).subscribe({
 // //       next: () => this.cancelEditing(),
-// //       error: () => this.messageService.showError('Error', 'Failed to edit message')
+// //       error: () => this.messageService.handleHttpError(err)
 // //     });
 // //   }
 
@@ -2109,7 +2108,7 @@ activeThemeId : any ='theme-glass'
 // //       next: () => console.log('Deleted successfully on server'),
 // //       error: () => {
 // //         // Rollback if failed (Optional, but good UX)
-// //         this.messageService.showError('Error', 'Could not delete message');
+// //         this.messageService.handleHttpError(err)
 // //       }
 // //     });
 // //   }
@@ -2149,7 +2148,7 @@ activeThemeId : any ='theme-glass'
 // //           this.selectChannel(this.channels()[0] || null);
 // //           this.closeChannelSettings();
 // //         },
-// //         error: (err) => this.messageService.showError('Error', 'Failed to leave.')
+// //         error: (err) => this.messageService.handleHttpError(err)
 // //       });
 // //     }
 // //   }
@@ -2170,7 +2169,7 @@ activeThemeId : any ='theme-glass'
 // //       this.socketService.removeMember(channelId, targetUserId).subscribe({
 // //         next: () => this.messageService.showSuccess('Removed', `${userName} was removed.`),
 // //         error: (err) => {
-// //             this.messageService.showError('Error', 'Only Admins can remove members.');
+// //             this.messageService.handleHttpError(err)
 // //             // Note: You could revert the UI change here if you wanted strict consistency
 // //         }
 // //       });
@@ -2208,7 +2207,7 @@ activeThemeId : any ='theme-glass'
 // //         },
 // //         error: (err) => {
 // //             const name = this.getUserName(userId);
-// //             this.messageService.showError('Error', `Failed to add ${name}`);
+// //             this.messageService.handleHttpError(err)
 // //         }
 // //       });
 // //     });
@@ -2644,7 +2643,7 @@ activeThemeId : any ='theme-glass'
 // // //     }).then(() => {
 // // //         // Success handled by socket event or promise resolution
 // // //     }).catch(err => {
-// // //         this.messageService.showError('Error', 'Message failed to send');
+// // //         this.messageService.handleHttpError(err)
 // // //         // Remove temp message on failure
 // // //         this.messages.update(msgs => msgs.filter(m => m._id !== tempId));
 // // //     });
@@ -2726,7 +2725,7 @@ activeThemeId : any ='theme-glass'
 // // //         this.selectedMembers.clear();
 // // //         this.messageService.showSuccess('Success', `Channel #${newChannel.name} created!`);
 // // //       },
-// // //       error: (err) => this.messageService.showError('Error', 'Failed to create channel.')
+// // //       error: (err) => this.messageService.handleHttpError(err)
 // // //     });
 // // //   }
 
@@ -2771,7 +2770,7 @@ activeThemeId : any ='theme-glass'
 // // //     // 2. Network Request
 // // //     this.socketService.editMessage(id, text).subscribe({
 // // //       next: () => this.cancelEditing(),
-// // //       error: () => this.messageService.showError('Error', 'Failed to edit message')
+// // //       error: () => this.messageService.handleHttpError(err)
 // // //     });
 // // //   }
 
@@ -2790,7 +2789,7 @@ activeThemeId : any ='theme-glass'
 // // //       next: () => console.log('Deleted successfully on server'),
 // // //       error: () => {
 // // //         // Rollback if failed (Optional, but good UX)
-// // //         this.messageService.showError('Error', 'Could not delete message');
+// // //         this.messageService.handleHttpError(err)
 // // //       }
 // // //     });
 // // //   }
@@ -2830,7 +2829,7 @@ activeThemeId : any ='theme-glass'
 // // //           this.selectChannel(this.channels()[0] || null);
 // // //           this.closeChannelSettings();
 // // //         },
-// // //         error: (err) => this.messageService.showError('Error', 'Failed to leave.')
+// // //         error: (err) => this.messageService.handleHttpError(err)
 // // //       });
 // // //     }
 // // //   }
@@ -2851,7 +2850,7 @@ activeThemeId : any ='theme-glass'
 // // //       this.socketService.removeMember(channelId, targetUserId).subscribe({
 // // //         next: () => this.messageService.showSuccess('Removed', `${userName} was removed.`),
 // // //         error: (err) => {
-// // //             this.messageService.showError('Error', 'Only Admins can remove members.');
+// // //             this.messageService.handleHttpError(err)
 // // //             // Note: You could revert the UI change here if you wanted strict consistency
 // // //         }
 // // //       });
@@ -2889,7 +2888,7 @@ activeThemeId : any ='theme-glass'
 // // //         },
 // // //         error: (err) => {
 // // //             const name = this.getUserName(userId);
-// // //             this.messageService.showError('Error', `Failed to add ${name}`);
+// // //             this.messageService.handleHttpError(err)
 // // //         }
 // // //       });
 // // //     });
@@ -3316,7 +3315,7 @@ activeThemeId : any ='theme-glass'
 // // // //     }).then(() => {
 // // // //         // Success handled by socket event or promise resolution
 // // // //     }).catch(err => {
-// // // //         this.messageService.showError('Error', 'Message failed to send');
+// // // //         this.messageService.handleHttpError(err)
 // // // //         // Remove temp message on failure
 // // // //         this.messages.update(msgs => msgs.filter(m => m._id !== tempId));
 // // // //     });
@@ -3398,7 +3397,7 @@ activeThemeId : any ='theme-glass'
 // // // //         this.selectedMembers.clear();
 // // // //         this.messageService.showSuccess('Success', `Channel #${newChannel.name} created!`);
 // // // //       },
-// // // //       error: (err) => this.messageService.showError('Error', 'Failed to create channel.')
+// // // //       error: (err) => this.messageService.handleHttpError(err)
 // // // //     });
 // // // //   }
 
@@ -3443,7 +3442,7 @@ activeThemeId : any ='theme-glass'
 // // // //     // 2. Network Request
 // // // //     this.socketService.editMessage(id, text).subscribe({
 // // // //       next: () => this.cancelEditing(),
-// // // //       error: () => this.messageService.showError('Error', 'Failed to edit message')
+// // // //       error: () => this.messageService.handleHttpError(err)
 // // // //     });
 // // // //   }
 
@@ -3462,7 +3461,7 @@ activeThemeId : any ='theme-glass'
 // // // //       next: () => console.log('Deleted successfully on server'),
 // // // //       error: () => {
 // // // //         // Rollback if failed (Optional, but good UX)
-// // // //         this.messageService.showError('Error', 'Could not delete message');
+// // // //         this.messageService.handleHttpError(err)
 // // // //       }
 // // // //     });
 // // // //   }
@@ -3502,7 +3501,7 @@ activeThemeId : any ='theme-glass'
 // // // //           this.selectChannel(this.channels()[0] || null);
 // // // //           this.closeChannelSettings();
 // // // //         },
-// // // //         error: (err) => this.messageService.showError('Error', 'Failed to leave.')
+// // // //         error: (err) => this.messageService.handleHttpError(err)
 // // // //       });
 // // // //     }
 // // // //   }
@@ -3522,7 +3521,7 @@ activeThemeId : any ='theme-glass'
 // // // //       this.socketService.removeMember(channelId, targetUserId).subscribe({
 // // // //         next: () => this.messageService.showSuccess('Removed', `${userName} was removed.`),
 // // // //         error: (err) => {
-// // // //             this.messageService.showError('Error', 'Only Admins can remove members.');
+// // // //             this.messageService.handleHttpError(err)
 // // // //             // Revert UI if needed (refresh list)
 // // // //         }
 // // // //       });
@@ -3549,7 +3548,7 @@ activeThemeId : any ='theme-glass'
 // // // //         },
 // // // //         error: (err) => {
 // // // //             const name = this.getUserName(userId);
-// // // //             this.messageService.showError('Error', `Failed to add ${name}`);
+// // // //             this.messageService.handleHttpError(err)
 // // // //         }
 // // // //       });
 // // // //     });
@@ -4130,7 +4129,7 @@ activeThemeId : any ='theme-glass'
 // // // // //       },
 // // // // //       error: (err) => {
 // // // // //         console.error('Channel Creation Error:', err);
-// // // // //         this.messageService.showError('Error', err.error?.message || 'Failed to create channel.');
+// // // // //         this.messageService.handleHttpError(err)
 // // // // //       }
 // // // // //     });
 // // // // //   }
@@ -4237,7 +4236,7 @@ activeThemeId : any ='theme-glass'
 // // // // //       },
 // // // // //       error: (err) => {
 // // // // //         console.error('Delete failed:', err);
-// // // // //         this.messageService.showError('Error', 'Could not delete message');
+// // // // //         this.messageService.handleHttpError(err)
 // // // // //       }
 // // // // //     });
 // // // // //   }
@@ -4276,7 +4275,7 @@ activeThemeId : any ='theme-glass'
 // // // // //           this.selectChannel(this.channels()[0] || null); // Select next available
 // // // // //           this.closeChannelSettings();
 // // // // //         },
-// // // // //         error: (err) => this.messageService.showError('Error', err.error?.message || 'Failed to leave.')
+// // // // //         error: (err) => this.messageService.handleHttpError(err)
 // // // // //       });
 // // // // //     }
 // // // // //   }
@@ -4293,7 +4292,7 @@ activeThemeId : any ='theme-glass'
 // // // // //         next: () => {
 // // // // //           this.messageService.showSuccess('Removed', `${userName} was removed.`);
 // // // // //         },
-// // // // //         error: (err) => this.messageService.showError('Permission Denied', 'Only Admins can remove members.')
+// // // // //         error: (err) => this.messageService.handleHttpError(err)
 // // // // //       });
 // // // // //     }
 // // // // //   }
@@ -4327,7 +4326,7 @@ activeThemeId : any ='theme-glass'
 // // // // //         },
 // // // // //         error: (err) => {
 // // // // //           const name = this.getUserName(userId);
-// // // // //           this.messageService.showError('Error', `Failed to add ${name}: ${err.error?.message}`);
+// // // // //           this.messageService.handleHttpError(err)
 // // // // //         }
 // // // // //       });
 // // // // //     });

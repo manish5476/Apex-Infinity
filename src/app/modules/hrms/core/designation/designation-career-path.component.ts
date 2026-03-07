@@ -367,8 +367,8 @@ export class DesignationCareerPathComponent implements OnInit {
         const data = res?.data || null;
         this.pathData.set(data);
       },
-      error: () => {
-        this.messageService.showError('Error', 'Failed to retrieve career path data.');
+      error: (err) => {
+        this.messageService.handleHttpError(err)
         this.pathData.set(null);
       }
     });

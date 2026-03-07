@@ -396,7 +396,7 @@ export class MachineFormComponent implements OnInit {
       catchError(err => {
         this.isLoading.set(false);
         this.machineForm.enable();
-        this.messageService.showError('Error', 'Failed to load machine details.');
+        this.messageService.handleHttpError(err)
         return of(null);
       })
     ).subscribe((data) => {
@@ -452,12 +452,12 @@ export class MachineFormComponent implements OnInit {
     if (this.isEditMode()) {
       this.hrmsService.updateMachine(this.machineId!, payload).subscribe({
         next: () => {
-          this.messageService.showSuccess('Success', 'Machine configuration updated');
+          this.messageService.showSuccess( 'Machine configuration updated');
           this.isSubmitting.set(false);
           this.goBack();
         },
         error: (err: any) => {
-          this.messageService.showError('Error', err.message || 'Failed to update machine');
+          this.messageService.handleHttpError(err)
           this.isSubmitting.set(false);
         }
       });
@@ -465,12 +465,12 @@ export class MachineFormComponent implements OnInit {
       this.hrmsService.createMachine(payload).subscribe({
         next: (res: any) => {
           // Note: response might contain the new apiKey, could show a modal here
-          this.messageService.showSuccess('Success', 'New machine registered successfully');
+          this.messageService.showSuccess( 'New machine registered successfully');
           this.isSubmitting.set(false);
           this.goBack();
         },
         error: (err: any) => {
-          this.messageService.showError('Error', err.message || 'Failed to create machine');
+          this.messageService.handleHttpError(err)
           this.isSubmitting.set(false);
         }
       });

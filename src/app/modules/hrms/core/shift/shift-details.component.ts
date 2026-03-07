@@ -397,7 +397,7 @@ export class ShiftDetailsComponent implements OnInit {
         this.loadShiftDetails();
       } else {
         this.isLoading.set(false);
-        this.messageService.showError('Error', 'Invalid shift ID.');
+        this.messageService.showError('Invalid shift ID.');
         this.goBack();
       }
     });
@@ -409,7 +409,7 @@ export class ShiftDetailsComponent implements OnInit {
     this.hrmsService.getShift(this.shiftId).pipe(
       map((res: any) => res?.data?.shift || res?.data?.data || res?.data || res),
       catchError(err => {
-        this.messageService.showError('Error', 'Failed to load shift details.');
+        this.messageService.handleHttpError(err)
         return of(null);
       }),
       finalize(() => this.isLoading.set(false))

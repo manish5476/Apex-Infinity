@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit, inject, signal, computed } from '
 import { CommonModule } from '@angular/common';
 import { FormsModule, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 
@@ -22,18 +22,7 @@ import { AgShareGrid } from "../../shared/components/ag-shared-grid";
 @Component({
   selector: 'app-sales-list',
   standalone: true,
-  imports: [
-    CommonModule,
-    SelectModule,
-    FormsModule,
-    ReactiveFormsModule,
-    ButtonModule,
-    InputTextModule,
-    RouterModule,
-    TooltipModule,
-    AgShareGrid,
-    ToastModule
-  ],
+  imports: [CommonModule, SelectModule, FormsModule, ReactiveFormsModule, ButtonModule, InputTextModule, RouterModule, TooltipModule, AgShareGrid, ToastModule],
   templateUrl: './sales-list.html',
   styleUrl: './sales-list.scss',
 })
@@ -43,20 +32,17 @@ export class SalesListComponent implements OnInit {
   private messageService = inject(AppMessageService);
   private router = inject(Router);
   public common = inject(CommonMethodService);
-
   private gridApi!: GridApi;
   private currentPage = 1;
   public isLoading = false;
   private totalCount = 0;
   private pageSize = 50;
-  
+
   data: any[] = [];
   column: any = [];
   rowSelectionMode: 'single' | 'multiple' = 'multiple';
-
   searchControl = new FormControl('');
   searchQuery = toSignal(this.searchControl.valueChanges.pipe(debounceTime(400), distinctUntilChanged()), { initialValue: '' });
-
   salesFilter: any = {
     status: null,
     paymentStatus: null,
@@ -75,7 +61,7 @@ export class SalesListComponent implements OnInit {
     { label: 'Partial', value: 'partial' }
   ];
 
-  constructor() {}
+  constructor() { }
 
   ngOnInit(): void {
     this.getColumn();
@@ -109,48 +95,51 @@ export class SalesListComponent implements OnInit {
       limit: this.pageSize,
     };
 
-    this.salesService.getAllSales(filterParams).subscribe({
-      next: (res: any) => {
-        // --- UPGRADED DATA PARSING ---
-        // Accessing res.data.data based on your shared JSON structure
-        let newData: any[] = [];
-        if (res.status === 'success' && res.data && Array.isArray(res.data.data)) {
-          newData = res.data.data;
-        } else if (res.results && Array.isArray(res.results)) {
-           // Fallback if structure is flat
-           newData = res.results;
-        }
-
-        // --- UPGRADED PAGINATION LOGIC ---
-        // Getting total from pagination object or total property
-        if (res.pagination) {
-          this.totalCount = res.pagination.totalResults 
-        } else {
-          this.totalCount = res.results?.length || 0;
-        }
-        
-        if (isReset) {
-          this.data = newData;
-        } else {
-          // Append data for infinite scroll
-          this.data = [...this.data, ...newData];
-        }
-
-        // Only increment page if we actually received data and haven't hit total
-        if (newData.length > 0 && this.data.length < this.totalCount) {
-          this.currentPage++;
-        }
-        
+    this.salesService.getAllSales(filterParams)
+      .pipe(finalize(() => {
         this.isLoading = false;
         this.cdr.markForCheck();
-      },
-      error: (err: any) => {
-        this.isLoading = false;
-        this.messageService.showError('Error', 'Failed to fetch sales records.');
-      }
-    });
+      })
+      )
+      .subscribe({
+        next: (res: any) => {
+          // --- UPGRADED DATA PARSING ---
+          // Accessing res.data.data based on your shared JSON structure
+          let newData: any[] = [];
+          if (res.status === 'success' && res.data && Array.isArray(res.data.data)) {
+            newData = res.data.data;
+          } else if (res.results && Array.isArray(res.results)) {
+            // Fallback if structure is flat
+            newData = res.results;
+          }
+
+          // --- UPGRADED PAGINATION LOGIC ---
+          // Getting total from pagination object or total property
+          if (res.pagination) {
+            this.totalCount = res.pagination.totalResults;
+          } else {
+            this.totalCount = res.results?.length || 0;
+          }
+
+          if (isReset) {
+            this.data = newData;
+          } else {
+            // Append data for infinite scroll
+            this.data = [...this.data, ...newData];
+          }
+
+          // Only increment page if we actually received data and haven't hit total
+          if (newData.length > 0 && this.data.length < this.totalCount) {
+            this.currentPage++;
+          }
+        },
+        error: (err: any) => {
+          // Delegated to global HTTP error handler
+          this.messageService.handleHttpError(err);
+        }
+      });
   }
- 
+
   onScrolledToBottom(event: any) {
     if (!this.isLoading && this.data.length < this.totalCount) {
       this.getData(false);
@@ -164,11 +153,11 @@ export class SalesListComponent implements OnInit {
   eventFromGrid(event: any) {
     if (event.type === 'cellClicked') {
       if (event.field === 'invoiceNumber') {
-         // Using invoiceId object from JSON or row ID if needed
-         const invoiceId = event.row.invoiceId?._id || event.row._id;
-         if (invoiceId) {
-           this.router.navigate(['/invoices', invoiceId]);
-         }
+        // Using invoiceId object from JSON or row ID if needed
+        const invoiceId = event.row.invoiceId?._id || event.row._id;
+        if (invoiceId) {
+          this.router.navigate(['/invoices', invoiceId]);
+        }
       }
     }
     if (event.type === 'reachedBottom') {
@@ -179,28 +168,13 @@ export class SalesListComponent implements OnInit {
   getColumn(): void {
     this.column = [
       {
-        field: 'createdAt',
-        headerName: 'Date',
-        sortable: true,
-        width: 140,
-        valueFormatter: (params: any) => this.common.formatDate(params.value, 'dd MMM yyyy'),
-        cellStyle: { 'color': 'var(--text-secondary)' }
+        field: 'createdAt', headerName: 'Date', sortable: true, width: 140, valueFormatter: (params: any) => this.common.formatDate(params.value, 'dd MMM yyyy'), cellStyle: { 'color': 'var(--text-secondary)' }
       },
       {
-        field: 'invoiceNumber',
-        headerName: 'Invoice #',
-        sortable: true,
-        width: 180,
-        // Keeps your specific blue-accent and pointer cursor
-        cellStyle: { 'font-weight': '600', 'color': 'var(--accent-primary)', 'cursor': 'pointer' }
+        field: 'invoiceNumber', headerName: 'Invoice #', sortable: true, width: 180, cellStyle: { 'font-weight': '600', 'color': 'var(--accent-primary)', 'cursor': 'pointer' }
       },
       {
-        field: 'customerId.name', 
-        headerName: 'Customer',
-        sortable: true,
-        flex: 1,
-        minWidth: 200,
-        // Safely access the populated customer object from the new response
+        field: 'customerId.name', headerName: 'Customer', sortable: true, flex: 1, minWidth: 200,
         valueGetter: (params: any) => params.data.customerId?.name || 'Walk-in Customer'
       },
       {
@@ -208,7 +182,6 @@ export class SalesListComponent implements OnInit {
         headerName: 'Branch',
         sortable: true,
         width: 150,
-        // Pulls the branch name from the populated branch object
         valueGetter: (params: any) => params.data.branchId?.name || '-'
       },
       {
@@ -216,7 +189,6 @@ export class SalesListComponent implements OnInit {
         headerName: 'Items',
         width: 100,
         type: 'rightAligned',
-        // Correctly counts items in the nested array
         valueGetter: (params: any) => params.data.items?.length || 0,
       },
       {
@@ -235,20 +207,15 @@ export class SalesListComponent implements OnInit {
         width: 130,
         type: 'rightAligned',
         valueFormatter: (params: any) => this.common.formatCurrency(params.value),
-        // Keeps your conditional logic for red/green colors
-        cellStyle: (params: any) => params.value > 0 
-          ? {'color': 'var(--color-error)'} 
-          : {'color': 'var(--color-success)'}
+        cellStyle: (params: any) => params.value > 0 ? { 'color': 'var(--color-error)' } : { 'color': 'var(--color-success)' }
       },
       {
         field: 'paymentStatus',
         headerName: 'Payment',
         sortable: true,
         width: 130,
-        // Maintains your custom badge HTML structure
         cellRenderer: (params: any) => {
-          const status = params.value?.toLowerCase() || 'unpaid';
-          return `<span class="status-badge status-${status}">${status}</span>`;
+          const status = params.value?.toLowerCase() || 'unpaid'; return `<span class="status-badge status-${status}">${status}</span>`;
         }
       },
       {
@@ -260,12 +227,11 @@ export class SalesListComponent implements OnInit {
         cellStyle: { 'font-size': '0.75rem', 'font-weight': '600', 'color': 'var(--text-secondary)' }
       }
     ];
-    
-    // Triggers change detection to ensure Ag-Grid picks up the column definitions
+
     this.cdr.detectChanges();
   }
-  
+
   onCreateSales() {
-      this.router.navigate(['/invoices/create']); 
+    this.router.navigate(['/invoices/create']);
   }
 }

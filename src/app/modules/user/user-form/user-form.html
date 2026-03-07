@@ -1,299 +1,282 @@
-<p-toast></p-toast>
-
-<div class="customer-wrapper">
-  <section class="customer-container animate-fadeIn">
-    <div class="customer-form-panel">
-      <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="customer-form-layout">
-        <div class="customer-form-header">
-          <h1 class="form-title">{{ editMode() ? 'Update Profile' : 'New Employee' }}</h1>
-          <p class="form-subtitle">
-            {{ editMode() ? 'System ID: ' + userId : 'Create a new user record.' }} <span class="req">*</span> required
-          </p>
-        </div>
-        <div class="customer-form-body custom-scrollbar">
-          <section class="form-section">
-            <div class="section-header">
-              <h4 class="section-title">Identity Information</h4>
-            </div>
-
-            <div class="form-grid">
-              <div class="form-group">
-                <label>Full Name <span class="req">*</span></label>
-                <input pInputText formControlName="name" placeholder="John Doe" />
-              </div>
-
-              <div class="form-group">
-                <label>Email Address <span class="req">*</span></label>
-                <input pInputText formControlName="email" placeholder="john@company.com" />
-              </div>
-
-              <div class="form-group">
-                <label>Phone Number</label>
-                <input pInputText formControlName="phone" placeholder="+91..." />
-              </div>
-
-              <div class="form-group" formGroupName="employeeProfile">
-                <label>Date of Birth</label>
-                <p-datepicker formControlName="dateOfBirth" [showIcon]="true" appendTo="body"></p-datepicker>
-              </div>
-            </div>
-          </section>
-
-          <section class="form-section" formGroupName="employeeProfile">
-            <h4 class="section-title">Employment Details</h4>
-            <div class="form-grid">
-              <div class="form-group">
-                <label>Employee ID</label>
-                <input pInputText formControlName="employeeId" placeholder="EMP-001" class="w-full" />
-              </div>
-              <div class="form-group">
-                <label>Department</label>
-                <p-select appendTo="body" [options]="departments()" formControlName="departmentId" optionLabel="name"
-                  optionValue="_id" placeholder="Select Department" [showClear]="true" styleClass="w-full"></p-select>
-              </div>
-              <div class="form-group">
-                <label>Designation</label>
-                <p-select appendTo="body" [options]="designations()" formControlName="designationId" optionLabel="name"
-                  optionValue="_id" placeholder="Select Designation" [showClear]="true" styleClass="w-full"></p-select>
-              </div>
-              <div class="form-group">
-                <label>Date of Joining</label>
-                <p-datepicker formControlName="dateOfJoining" [showIcon]="true" placeholder="Select DOJ"
-                  styleClass="w-full"></p-datepicker>
-              </div>
-            </div>
-          </section>
-
-          <section class="form-section">
-            <h4 class="section-title">Access & Additional Info</h4>
-            <div class="form-grid">
-              <div class="form-group">
-                <label>System Role <span class="req">*</span></label>
-                <p-select appendTo="body" [options]="roles()" formControlName="role" optionLabel="name"
-                  optionValue="_id" placeholder="Select Role" styleClass="w-full"></p-select>
-              </div>
-              <div class="form-group">
-                <label>Assigned Branch</label>
-                <p-select appendTo="body" [options]="branches()" formControlName="branchId" optionLabel="name"
-                  optionValue="_id" placeholder="Global Access" [showClear]="true" styleClass="w-full"></p-select>
-              </div>
-              <div class="form-group">
-                <label>UPI ID</label>
-                <input pInputText formControlName="upiId" placeholder="name@bank" class="w-full" />
-              </div>
-              <div class="form-group">
-                <label>Account Status</label>
-                <p-select appendTo="body" [options]="userStatuses()" formControlName="status" optionLabel="label"
-                  optionValue="value" styleClass="w-full"></p-select>
-              </div>
-              <div class="status-toggle-box sm:col-span-2">
-                <span class="label">{{ userForm.get('isActive')?.value ? 'User is Active (Can Login)' : 'User is
-                  Suspended' }}</span>
-                <p-toggleswitch formControlName="isActive"></p-toggleswitch>
-              </div>
-            </div>
-          </section>
-
-          <section class="form-section" formGroupName="attendanceConfig">
-            <div class="section-header">
-              <h4 class="section-title">Attendance Settings</h4>
-              <p-toggleswitch formControlName="isAttendanceEnabled"></p-toggleswitch>
-            </div>
-
-            @if (userForm.get('attendanceConfig.isAttendanceEnabled')?.value) {
-            <div class="flex flex-col gap-6 animate-fadeIn mt-4">
-              <div class="form-grid">
-                <div class="form-group">
-                  <label>Shift Pattern</label>
-                  <p-select [options]="shifts()" formControlName="shiftId" optionLabel="name" optionValue="_id"
-                    placeholder="Select Shift"></p-select>
-                </div>
-                <div class="form-group">
-                  <label>Biometric ID</label>
-                  <input pInputText formControlName="machineUserId" />
-                </div>
-
-                <div class="control-box">
-                  <span class="label">Web Punch</span>
-                  <p-toggleswitch formControlName="allowWebPunch"></p-toggleswitch>
-                </div>
-                <div class="control-box">
-                  <span class="label">App Punch</span>
-                  <p-toggleswitch formControlName="allowMobilePunch"></p-toggleswitch>
-                </div>
-              </div>
-            </div>
-            }
-          </section>
-
-          <section class="form-section">
-            <div class="flex justify-between items-center mb-4">
-              <h4 class="section-title border-none p-0 m-0">Security</h4>
-              @if (editMode()) {
-              <p-button [label]="showPasswordFields() ? 'Cancel' : 'Change Password'" [text]="true" size="small"
-                (onClick)="togglePasswordChange()"></p-button>
-              }
-            </div>
-
-            @if (showPasswordFields()) {
-            <div class="form-grid animate-fadeIn">
-              <div class="form-group">
-                <label>New Password <span class="req">*</span></label>
-                <p-password formControlName="password" [toggleMask]="true" styleClass="w-full"
-                  inputStyleClass="w-full"></p-password>
-              </div>
-              <div class="form-group">
-                <label>Confirm Password <span class="req">*</span></label>
-                <p-password formControlName="passwordConfirm" [toggleMask]="true" [feedback]="false" styleClass="w-full"
-                  inputStyleClass="w-full"></p-password>
-              </div>
-            </div>
-            }
-          </section>
-        </div>
-
-        <div class="customer-form-footer">
-          <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="onCancel()"></p-button>
-          <p-button type="submit" [label]="editMode() ? 'Save Changes' : 'Create User'" icon="pi pi-check"
-            [loading]="isSubmitting()"></p-button>
-        </div>
-      </form>
-    </div>
-  </section>
-</div>
-
-<!-- 
-<p-toast></p-toast>
-
-<div class="customer-wrapper">
-  <section class="customer-container animate-fadeIn">
-    <div class="customer-form-panel">
-
-      <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="customer-form-layout">
+    <p-toast></p-toast>
+    
+    <!-- Full Screen Layout -->
+    <div class="app-layout">
         
-        <div class="customer-form-header">
-          <h1 class="form-title">{{ editMode() ? 'Update Profile' : 'New Employee' }}</h1>
-          <p class="form-subtitle">
-            {{ editMode() ? 'System ID: ' + userId : 'Create a new user record.' }} <span class="req">*</span> required
-          </p>
-        </div>
-
-        <div class="customer-form-body custom-scrollbar">
+        <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="form-structure">
           
-          <section class="form-section">
-            <h4 class="section-title">Identity Information</h4>
-            <div class="form-grid">
-              <div class="form-group">
-                <label>Full Name <span class="req">*</span></label>
-                <input pInputText formControlName="name" placeholder="John Doe" class="w-full"/>
-              </div>
-              <div class="form-group">
-                <label>Email Address <span class="req">*</span></label>
-                <input pInputText formControlName="email" placeholder="john@company.com" class="w-full"/>
-              </div>
-              <div class="form-group">
-                <label>Phone Number</label>
-                <input pInputText formControlName="phone" placeholder="+91..." class="w-full"/>
-              </div>
-              <div class="status-toggle-box">
-                <span class="label">{{ userForm.get('isActive')?.value ? 'Active Account' : 'Suspended' }}</span>
-                <p-toggleswitch formControlName="isActive"></p-toggleswitch>
-              </div>
-            </div>
-          </section>
-
-          <section class="form-section">
-            <h4 class="section-title">Access Control</h4>
-            <div class="form-grid">
-              <div class="form-group">
-                <label>System Role <span class="req">*</span></label>
-                <p-select appendTo="body" [options]="roles()" formControlName="role" optionLabel="name" optionValue="_id" 
-                  placeholder="Select Role" styleClass="w-full"></p-select>
-              </div>
-              <div class="form-group">
-                <label>Assigned Branch</label>
-                <p-select appendTo="body" [options]="branches()" formControlName="branchId" optionLabel="name" optionValue="_id" 
-                  placeholder="Global Access" [showClear]="true" styleClass="w-full"></p-select>
-              </div>
-            </div>
-          </section>
-
-          <section class="form-section" formGroupName="attendanceConfig">
-            <div class="flex justify-between items-center mb-2">
-              <h4 class="section-title border-none p-0 m-0">Attendance Settings</h4>
-              <p-toggleswitch formControlName="isAttendanceEnabled"></p-toggleswitch>
-            </div>
-
-            @if (userForm.get('attendanceConfig.isAttendanceEnabled')?.value) {
-              <div class="flex flex-col gap-6 animate-fadeIn mt-4">
-                <div class="form-grid">
-                  <div class="form-group">
-                    <label>Shift Pattern <span class="req">*</span></label>
-                    <p-select appendTo="body" [options]="shifts()" formControlName="shiftId" optionLabel="name" optionValue="_id" 
-                      placeholder="Select Shift" styleClass="w-full"></p-select>
-                  </div>
-                  <div class="form-group">
-                    <label>Biometric ID</label>
-                    <input pInputText formControlName="machineUserId" placeholder="e.g. 1001" class="w-full"/>
-                  </div>
+          <!-- HEADER (Fixed Top) -->
+          <div class="form-header">
+            <div class="header-content">
+              <div class="title-section">
+                <h1 class="page-title">{{ editMode() ? 'Edit Employee' : 'New Employee' }}</h1>
+                <div class="meta-badges">
+                    <span class="id-badge" *ngIf="userId">{{ userId }}</span>
+                    <span class="status-badge" [ngClass]="userForm.get('status')?.value">
+                        {{ userForm.get('status')?.value || 'New' }}
+                    </span>
                 </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div class="control-box">
-                    <span class="label">Web Punch</span>
-                    <p-toggleswitch formControlName="allowWebPunch"></p-toggleswitch>
-                  </div>
-                  <div class="control-box">
-                    <span class="label">App Punch</span>
-                    <p-toggleswitch formControlName="allowMobilePunch"></p-toggleswitch>
-                  </div>
-                  <div class="control-box">
-                    <span class="label">Geo-Fence</span>
-                    <p-toggleswitch formControlName="enforceGeoFence"></p-toggleswitch>
-                  </div>
-                </div>
-
-                @if (userForm.get('attendanceConfig.enforceGeoFence')?.value) {
-                  <div class="form-group">
-                    <label>Geo-Fence Radius (meters)</label>
-                    <p-inputNumber formControlName="geoFenceRadius" [showButtons]="true" suffix=" m" styleClass="w-full"></p-inputNumber>
-                  </div>
-                }
               </div>
-            }
-          </section>
-
-          <section class="form-section">
-            <div class="flex justify-between items-center mb-4">
-              <h4 class="section-title border-none p-0 m-0">Security</h4>
-              @if (editMode()) {
-                <p-button [label]="showPasswordFields() ? 'Cancel' : 'Change Password'" 
-                  [text]="true" size="small" (onClick)="togglePasswordChange()"></p-button>
-              }
+              <p class="page-subtitle">
+                {{ editMode() ? 'Update user details, access control and permissions.' : 'Create a new employee record in the system.' }}
+              </p>
             </div>
+
+            <div class="header-actions">
+              <button pButton label="Cancel" class="p-button-text p-button-secondary" type="button" (click)="onCancel()"></button>
+              <button pButton type="submit" [label]="editMode() ? 'Save Changes' : 'Create User'" icon="pi pi-check" [loading]="isSubmitting()"></button>
+            </div>
+          </div>
+
+          <!-- BODY (Scrollable) -->
+          <div class="form-body custom-scrollbar">
             
-            @if (showPasswordFields()) {
-              <div class="form-grid animate-fadeIn">
-                <div class="form-group">
-                  <label>New Password <span class="req">*</span></label>
-                  <p-password formControlName="password" [toggleMask]="true" styleClass="w-full" inputStyleClass="w-full"></p-password>
+            <div class="content-container">
+            
+                <!-- 1. IDENTITY & ACCESS -->
+                <div class="section-panel">
+                <div class="section-header">
+                    <h3>Identity & Access</h3>
+                    <p>Basic login details and system role</p>
                 </div>
-                <div class="form-group">
-                  <label>Confirm Password <span class="req">*</span></label>
-                  <p-password formControlName="passwordConfirm" [toggleMask]="true" [feedback]="false" styleClass="w-full" inputStyleClass="w-full"></p-password>
+                
+                <div class="form-grid">
+                    <div class="field-group">
+                      <label>Full Name <span class="req">*</span></label>
+                      <input pInputText formControlName="name" placeholder="Ex: John Doe" class="full-width" />
+                    </div>
+                    
+                    <div class="field-group">
+                      <label>Email Address <span class="req">*</span></label>
+                      <input pInputText formControlName="email" placeholder="john@company.com" class="full-width" />
+                    </div>
+
+                    <div class="field-group">
+                      <label>Primary Phone <span class="req">*</span></label>
+                      <input pInputText formControlName="phone" placeholder="+91 98765 43210" class="full-width" />
+                    </div>
+
+                    <!-- 🟢 LIVE DATA: Roles -->
+                    <div class="field-group">
+                      <label>Role <span class="req">*</span></label>
+                      <app-master-dropdown endpoint="roles" formControlName="role" placeholder="Select Role"></app-master-dropdown>
+                    </div>
+
+                    <!-- 🟢 LIVE DATA: Branches -->
+                    <div class="field-group">
+                      <label>Branch</label>
+                      <app-master-dropdown endpoint="branches" formControlName="branchId" placeholder="Global / HQ"></app-master-dropdown>
+                    </div>
+
+                    <div class="field-group">
+                      <label>Account Status</label>
+                      <p-select [options]="userStatuses()" formControlName="status" optionLabel="label" optionValue="value" styleClass="full-width"></p-select>
+                    </div>
+
+                    <!-- Highlighted Toggle for Login Access -->
+                    <div class="control-item highlight">
+                      <div class="control-info">
+                          <span class="control-label">Login Access</span>
+                          <span class="control-sub">Enable or disable system access</span>
+                      </div>
+                      <p-toggleswitch formControlName="isActive"></p-toggleswitch>
+                    </div>
                 </div>
-              </div>
-            }
-          </section>
-        </div>
+                </div>
 
-        <div class="customer-form-footer">
-          <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="onCancel()"></p-button>
-          <p-button type="submit" [label]="editMode() ? 'Save Changes' : 'Create User'" 
-            icon="pi pi-check" [loading]="isSubmitting()"></p-button>
-        </div>
+                <!-- 2. EMPLOYMENT DETAILS -->
+                <div class="section-panel" formGroupName="employeeProfile">
+                <div class="section-header">
+                    <h3>Employment Profile</h3>
+                    <p>Official work details and department</p>
+                </div>
 
-      </form>
+                <div class="form-grid">
+                    <div class="field-group">
+                      <label>Employee ID</label>
+                      <input pInputText formControlName="employeeId" placeholder="EMP-001" class="full-width" />
+                    </div>
+                    
+                    <div class="field-group">
+                      <label>Type</label>
+                      <p-select [options]="employmentTypes()" formControlName="employmentType" optionLabel="label" optionValue="value" styleClass="full-width"></p-select>
+                    </div>
+
+                    <!-- 🟢 LIVE DATA: Departments -->
+                    <div class="field-group">
+                      <label>Department</label>
+                      <app-master-dropdown endpoint="departments" formControlName="departmentId" placeholder="Select Dept"></app-master-dropdown>
+                    </div>
+
+                    <!-- 🟢 LIVE DATA: Designations -->
+                    <div class="field-group">
+                      <label>Designation</label>
+                      <app-master-dropdown endpoint="designations" formControlName="designationId" placeholder="Select Designation"></app-master-dropdown>
+                    </div>
+
+                    <!-- 🟢 LIVE DATA: Managers -->
+                    <div class="field-group">
+                      <label>Reporting Manager</label>
+                      <app-master-dropdown endpoint="users" formControlName="reportingManagerId" placeholder="Select Manager"></app-master-dropdown>
+                    </div>
+
+                    <div class="field-group">
+                      <label>Work Location</label>
+                      <input pInputText formControlName="workLocation" placeholder="Ex: Surat Main Office" class="full-width" />
+                    </div>
+
+                    <div class="field-group">
+                      <label>Date of Joining</label>
+                      <p-datepicker formControlName="dateOfJoining" [showIcon]="true" styleClass="full-width" appendTo="body"></p-datepicker>
+                    </div>
+
+                    <div class="field-group">
+                      <label>Date of Birth</label>
+                      <p-datepicker formControlName="dateOfBirth" [showIcon]="true" styleClass="full-width" appendTo="body"></p-datepicker>
+                    </div>
+
+                    <div class="field-group">
+                      <label>Secondary Phone</label>
+                      <input pInputText formControlName="secondaryPhone" placeholder="Optional" class="full-width" />
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- Nested Sub-Sections -->
+                <div class="split-grid">
+                    <!-- Bank Info -->
+                    <div formGroupName="bankDetails" class="sub-panel">
+                    <h4 class="sub-header"><i class="pi pi-wallet"></i> Bank & Statutory</h4>
+                    <div class="form-grid-compact">
+                        <div class="field-group">
+                          <label>Bank Name</label>
+                          <input pInputText formControlName="bankName" class="full-width" />
+                        </div>
+                        <div class="field-group">
+                          <label>Account No.</label>
+                          <input pInputText formControlName="accountNumber" type="password" class="full-width" />
+                        </div>
+                        <div class="field-group">
+                          <label>IFSC Code</label>
+                          <input pInputText formControlName="ifscCode" class="uppercase full-width" />
+                        </div>
+                        <div class="field-group">
+                          <label>PAN Card</label>
+                          <input pInputText formControlName="panCard" class="uppercase full-width" />
+                        </div>
+                    </div>
+                    </div>
+
+                    <!-- Guarantor Info -->
+                    <div class="sub-panel">
+                    <div formGroupName="guarantorDetails">
+                        <h4 class="sub-header"><i class="pi pi-shield"></i> Emergency Contact</h4>
+                        <div class="form-grid-compact">
+                        <div class="field-group">
+                            <label>Name</label>
+                            <input pInputText formControlName="name" class="full-width" />
+                        </div>
+                        <div class="field-group">
+                            <label>Relationship</label>
+                            <input pInputText formControlName="relationship" placeholder="Father, Spouse..." class="full-width" />
+                        </div>
+                        <div class="field-group">
+                            <label>Phone</label>
+                            <input pInputText formControlName="phone" class="full-width" />
+                        </div>
+                        </div>
+                    </div>
+                    <!-- UPI ID is outside guarantor group -->
+                    <div class="field-group mt-4">
+                        <label>UPI ID (Reimbursement)</label>
+                        <input pInputText [formControl]="$any(userForm.get('upiId'))" placeholder="user@upi" class="full-width" />
+                    </div>
+                    </div>
+                </div>
+                </div>
+
+                <!-- 3. ATTENDANCE CONFIGURATION -->
+                <div class="section-panel" formGroupName="attendanceConfig">
+                <div class="section-header-row">
+                    <div>
+                      <h3>Attendance Settings</h3>
+                      <p>Shift rules and punch permissions</p>
+                    </div>
+                    <div class="toggle-wrapper">
+                      <span class="toggle-label">Enable Attendance</span>
+                      <p-toggleswitch formControlName="isAttendanceEnabled"></p-toggleswitch>
+                    </div>
+                </div>
+
+                <div *ngIf="userForm.get('attendanceConfig.isAttendanceEnabled')?.value" class="animate-content mt-6">
+                    <div class="form-grid mb-6">
+                      <div class="field-group">
+                          <label>Assigned Shift <span class="req">*</span></label>
+                          <!-- 🟢 LIVE DATA: Shifts -->
+                          <app-master-dropdown endpoint="shifts" formControlName="shiftId" placeholder="Select Shift"></app-master-dropdown>
+                      </div>
+                      <div class="field-group">
+                          <label>Biometric ID</label>
+                          <input pInputText formControlName="machineUserId" placeholder="Device ID" class="full-width" />
+                      </div>
+                      <div class="field-group">
+                          <label>GeoFence Zone</label>
+                          <!-- 🟢 LIVE DATA: GeoFences (Assuming 'masters' endpoint) -->
+                          <app-master-dropdown endpoint="geofencing" formControlName="geoFenceId" placeholder="Select Zone"></app-master-dropdown>
+                      </div>
+                      <div class="field-group">
+                          <label>Radius (Meters)</label>
+                          <p-inputnumber formControlName="geoFenceRadius" suffix=" m" [min]="10" styleClass="full-width"></p-inputnumber>
+                      </div>
+                    </div>
+
+                    <!-- Toggle Grid -->
+                    <div class="toggle-grid">
+                      <div class="control-item">
+                          <span class="control-label">Web Punch</span>
+                          <p-toggleswitch formControlName="allowWebPunch"></p-toggleswitch>
+                      </div>
+                      <div class="control-item">
+                          <span class="control-label">Mobile App Punch</span>
+                          <p-toggleswitch formControlName="allowMobilePunch"></p-toggleswitch>
+                      </div>
+                      <div class="control-item">
+                          <span class="control-label">Enforce GeoFence</span>
+                          <p-toggleswitch formControlName="enforceGeoFence"></p-toggleswitch>
+                      </div>
+                      <div class="control-item">
+                          <span class="control-label">Biometric Verified</span>
+                          <p-toggleswitch formControlName="biometricVerified"></p-toggleswitch>
+                      </div>
+                    </div>
+                </div>
+                </div>
+
+                <!-- 4. SECURITY -->
+                <div class="section-panel">
+                <div class="section-header-row">
+                    <div>
+                      <h3>Security</h3>
+                      <p>Manage password and credentials</p>
+                    </div>
+                    <button *ngIf="editMode()" pButton [label]="showPasswordFields() ? 'Cancel' : 'Change Password'" [text]="true" size="small" (click)="togglePasswordChange()"></button>
+                </div>
+
+                <div *ngIf="showPasswordFields()" class="form-grid animate-content mt-6">
+                    <div class="field-group">
+                      <label>New Password <span class="req">*</span></label>
+                      <p-password formControlName="password" [toggleMask]="true" styleClass="full-width" inputStyleClass="full-width"></p-password>
+                    </div>
+                    <div class="field-group">
+                      <label>Confirm Password <span class="req">*</span></label>
+                      <p-password formControlName="passwordConfirm" [toggleMask]="true" [feedback]="false" styleClass="full-width" inputStyleClass="full-width"></p-password>
+                    </div>
+                </div>
+                </div>
+            
+            </div> <!-- End Content Container -->
+          </div> <!-- End Body -->
+
+        </form>
     </div>
-  </section>
-</div> -->

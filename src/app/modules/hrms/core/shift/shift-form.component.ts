@@ -467,7 +467,7 @@ export class ShiftFormComponent implements OnInit {
       catchError(err => {
         this.isLoading.set(false);
         this.shiftForm.enable();
-        this.messageService.showError('Error', 'Failed to load shift details.');
+        this.messageService.handleHttpError(err);
         return of(null);
       })
     ).subscribe((data) => {
@@ -548,24 +548,24 @@ export class ShiftFormComponent implements OnInit {
     if (this.isEditMode()) {
       this.hrmsService.updateShift(this.shiftId!, payload).subscribe({
         next: () => {
-          this.messageService.showSuccess('Success', 'Shift updated successfully');
+          this.messageService.showSuccess('Shift updated successfully');
           this.isSubmitting.set(false);
           this.goBack();
         },
         error: (err: any) => {
-          this.messageService.showError('Error', err.message || 'Failed to update shift');
+          this.messageService.handleHttpError(err);
           this.isSubmitting.set(false);
         }
       });
     } else {
       this.hrmsService.createShift(payload).subscribe({
         next: () => {
-          this.messageService.showSuccess('Success', 'Shift created successfully');
+          this.messageService.showSuccess( 'Shift created successfully');
           this.isSubmitting.set(false);
           this.goBack();
         },
         error: (err: any) => {
-          this.messageService.showError('Error', err.message || 'Failed to create shift');
+          this.messageService.handleHttpError(err);
           this.isSubmitting.set(false);
         }
       });

@@ -380,7 +380,7 @@ export class DesignationFormComponent implements OnInit {
       catchError(err => {
         this.isLoading.set(false);
         this.desigForm.enable();
-        this.messageService.showError('Error', 'Failed to load designation details.');
+        this.messageService.handleHttpError(err)
         return of(null);
       })
     ).subscribe((data) => {
@@ -468,24 +468,24 @@ export class DesignationFormComponent implements OnInit {
     if (this.isEditMode()) {
       this.hrmsService.updateDesignation(this.desigId!, payload).subscribe({
         next: () => {
-          this.messageService.showSuccess('Success', 'Designation updated successfully');
+          this.messageService.showSuccess( 'Designation updated successfully');
           this.isSubmitting.set(false);
           this.goBack();
         },
         error: (err: any) => {
-          this.messageService.showError('Error', err.message || 'Failed to update designation');
+          this.messageService.handleHttpError(err)
           this.isSubmitting.set(false);
         }
       });
     } else {
       this.hrmsService.createDesignation(payload).subscribe({
         next: () => {
-          this.messageService.showSuccess('Success', 'Designation created successfully');
+          this.messageService.showSuccess('Designation created successfully');
           this.isSubmitting.set(false);
           this.goBack();
         },
         error: (err: any) => {
-          this.messageService.showError('Error', err.message || 'Failed to create designation');
+          this.messageService.handleHttpError(err)
           this.isSubmitting.set(false);
         }
       });

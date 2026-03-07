@@ -202,7 +202,7 @@ export class MachineAnalyticsComponent implements OnInit {
         // Unwraps JSON based on standard data object hierarchy
         this.analytics.set(res.data?.analytics || res.data || null);
       },
-      error: () => this.messageService.showError('Error', 'Failed to load machine analytics.')
+      error: (err) => this.messageService.handleHttpError(err)
     });
   }
 }

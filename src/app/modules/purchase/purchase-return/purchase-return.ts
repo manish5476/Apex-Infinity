@@ -24,8 +24,8 @@ import { PurchaseService } from '../purchase.service';
   imports: [
     CommonModule, RouterLink, ReactiveFormsModule, FormsModule,
     CurrencyPipe, DatePipe, ButtonModule, CardModule, TableModule,
-    InputNumberModule, TagModule, DividerModule, MessageModule, 
-     TooltipModule
+    InputNumberModule, TagModule, DividerModule, MessageModule,
+    TooltipModule
   ],
   templateUrl: './purchase-return.html',
   styleUrls: ['./purchase-return.scss']
@@ -36,7 +36,7 @@ export class PurchaseReturnComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private purchaseService = inject(PurchaseService);
   private messageService = inject(AppMessageService);
-  
+
   // State
   purchaseId = signal<string | null>(null);
   isLoading = signal<boolean>(true);
@@ -58,7 +58,7 @@ export class PurchaseReturnComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.purchaseId.set(this.route.snapshot.paramMap.get('id'));
-    
+
     if (this.purchaseId()) {
       this.loadPurchase(this.purchaseId()!);
     } else {
@@ -83,12 +83,12 @@ export class PurchaseReturnComponent implements OnInit, OnDestroy {
     // Get raw values to ensure we catch everything
     const items = this.returnForm.getRawValue().items || [];
     let total = 0;
-    
+
     items.forEach((item: any) => {
       const qty = Number(item.returnQty) || 0;
       const price = Number(item.price) || 0;
       const tax = Number(item.taxRate) || 0;
-      
+
       if (qty > 0) {
         // Formula: (Price * Qty) + Tax Portion
         const base = qty * price;
@@ -110,8 +110,35 @@ export class PurchaseReturnComponent implements OnInit, OnDestroy {
     return base + (base * tax / 100);
   }
 
+
+
+  initFormItems(items: any[]) {
+    this.returnItems.clear();
+
+    items.forEach(item => {
+      if (item.quantity > 0) {
+        // Handle populated object or string ID
+        const prodId = item.productId && item.productId._id ? item.productId._id : item.productId;
+        const prodName = item.productId && item.productId.name ? item.productId.name : item.name;
+
+        this.returnItems.push(this.fb.group({
+          productId: [prodId],
+          name: [prodName],
+          purchasedQty: [item.quantity],
+          price: [item.purchasePrice],
+          taxRate: [item.taxRate || 0],
+          // Min 0 required for typing, Max prevents over-return
+          returnQty: [0, [Validators.required, Validators.min(0), Validators.max(item.quantity)]]
+        }));
+      }
+    });
+
+    // Initial Calc
+    this.recalculate();
+  }
   loadPurchase(id: string) {
     this.isLoading.set(true);
+    
     this.purchaseService.getPurchaseById(id)
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
@@ -122,50 +149,31 @@ export class PurchaseReturnComponent implements OnInit, OnDestroy {
             this.initFormItems(data.items);
           }
         },
-        error: () => {
-          this.messageService.showError('Error', 'Could not load purchase details');
+        error: (err) => {
+          // Replaced manual error string with your global handler
+          this.messageService.handleHttpError(err);
           this.router.navigate(['/purchase']);
         }
       });
   }
 
-  initFormItems(items: any[]) {
-    this.returnItems.clear();
-    
-    items.forEach(item => {
-      if (item.quantity > 0) {
-        // Handle populated object or string ID
-        const prodId = item.productId && item.productId._id ? item.productId._id : item.productId;
-        const prodName = item.productId && item.productId.name ? item.productId.name : item.name;
-
-        this.returnItems.push(this.fb.group({
-          productId: [prodId], 
-          name: [prodName],
-          purchasedQty: [item.quantity],
-          price: [item.purchasePrice],
-          taxRate: [item.taxRate || 0],
-          // Min 0 required for typing, Max prevents over-return
-          returnQty: [0, [Validators.required, Validators.min(0), Validators.max(item.quantity)]]
-        }));
-      }
-    });
-    
-    // Initial Calc
-    this.recalculate();
-  }
-
   onSubmit() {
     if (this.returnForm.invalid) {
       this.returnForm.markAllAsTouched();
+      // Added warning feedback for general form validation
+      this.messageService.showWarn('Validation Error: Please check all required fields.');
       return;
     }
 
     if (this.totalRefundAmount() <= 0) {
-      this.messageService.showError('Warning', 'Please select items to return.');
+      // Converted to showWarn and standardized string
+      this.messageService.showWarn('Validation Error: Please select at least one item to return.');
       return;
     }
 
-    const formValue = this.returnForm.value;
+    // Safely extract all values, even if some form controls are disabled
+    const formValue = this.returnForm.getRawValue(); 
+    
     const itemsToReturn = formValue.items
       .filter((item: any) => item.returnQty > 0)
       .map((item: any) => ({
@@ -179,14 +187,73 @@ export class PurchaseReturnComponent implements OnInit, OnDestroy {
     };
 
     this.isSubmitting.set(true);
+    
     this.purchaseService.partialReturn(this.purchaseId()!, payload)
       .pipe(finalize(() => this.isSubmitting.set(false)))
       .subscribe({
         next: () => {
-          this.messageService.showSuccess('Success', 'Debit Note Created');
+          // Standardized success message punctuation
+          this.messageService.showSuccess('Debit Note created successfully.');
           this.router.navigate(['/purchase', this.purchaseId()]);
         },
-        error: (err) => this.messageService.showError('Failed', err.error?.message || 'Error')
+        error: (err) => {
+          // Delegated to global HTTP error handler
+          this.messageService.handleHttpError(err);
+        }
       });
   }
+
+//    loadPurchase(id: string) {
+//     this.isLoading.set(true);
+//     this.purchaseService.getPurchaseById(id)
+//       .pipe(finalize(() => this.isLoading.set(false)))
+//       .subscribe({
+//         next: (res: any) => {
+//           const data = res.data?.data || res.data;
+//           if (data) {
+//             this.originalPurchase.set(data);
+//             this.initFormItems(data.items);
+//           }
+//         },
+//         error: () => {
+//           this.messageService.showError('Could not load purchase details');
+//           this.router.navigate(['/purchase']);
+//         }
+//       });
+//   }
+//  onSubmit() {
+//     if (this.returnForm.invalid) {
+//       this.returnForm.markAllAsTouched();
+//       return;
+//     }
+
+//     if (this.totalRefundAmount() <= 0) {
+//       this.messageService.showError('Please select items to return.');
+//       return;
+//     }
+
+//     const formValue = this.returnForm.value;
+//     const itemsToReturn = formValue.items
+//       .filter((item: any) => item.returnQty > 0)
+//       .map((item: any) => ({
+//         productId: item.productId,
+//         quantity: item.returnQty
+//       }));
+
+//     const payload = {
+//       items: itemsToReturn,
+//       reason: formValue.reason
+//     };
+
+//     this.isSubmitting.set(true);
+//     this.purchaseService.partialReturn(this.purchaseId()!, payload)
+//       .pipe(finalize(() => this.isSubmitting.set(false)))
+//       .subscribe({
+//         next: () => {
+//           this.messageService.showSuccess('Debit Note Created');
+//           this.router.navigate(['/purchase', this.purchaseId()]);
+//         },
+//         error: (err) => this.messageService.showError(err.error?.message || 'Error')
+//       });
+//   }
 }

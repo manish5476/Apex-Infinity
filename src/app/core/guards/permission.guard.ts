@@ -21,7 +21,7 @@ export const permissionGuard = (requiredPermission: string): CanActivateFn => {
     }
 
     // 3. Handle Unauthorized
-    messageService.showError('Access Denied', 'You do not have permission to view this page.');
+    messageService.showError('You do not have permission to view this page.');
     return router.createUrlTree(['/dashboard']); 
   };
 };

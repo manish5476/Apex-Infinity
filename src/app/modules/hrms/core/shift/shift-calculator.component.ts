@@ -176,8 +176,8 @@ export class ShiftCalculatorComponent {
         const payloadData = res?.data || null;
         this.resultData.set(payloadData);
       },
-      error: () => {
-        this.messageService.showError('Error', 'Failed to calculate hours.');
+      error: (err) => {
+        this.messageService.handleHttpError(err)
       }
     });
   }

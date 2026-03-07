@@ -68,29 +68,7 @@ export class ProductDetailsComponent implements OnInit {
     });
   }
 
-  loadProductData() {
-    if (!this.productId) return;
 
-    this.loading.set(true);
-    this.isError.set(false);
-
-    this.productService.getProductById(this.productId).pipe(
-      finalize(() => this.loading.set(false))
-    ).subscribe({
-      next: (res: any) => {
-        if (res?.data?.data || res?.data) {
-          const p = res.data.data || res.data;
-          const calculatedStock = p.inventory?.reduce((acc: number, item: any) => acc + (item.quantity || 0), 0) || 0;
-          p.totalStock = calculatedStock;
-          this.product.set(p);
-          this.inventoryData = [...(p.inventory || [])];
-        } else {
-          this.isError.set(true);
-        }
-      },
-      error: () => this.isError.set(true)
-    });
-  }
 
  
   setupInventoryColumns() {
@@ -178,24 +156,67 @@ export class ProductDetailsComponent implements OnInit {
     return this.product()?.tags?.filter((t: string) => t && t.trim()) || [];
   }
 
+loadProductData() {
+    if (!this.productId) return;
+
+    this.loading.set(true);
+    this.isError.set(false);
+
+    this.productService.getProductById(this.productId).pipe(
+      finalize(() => this.loading.set(false))
+    ).subscribe({
+      next: (res: any) => {
+        if (res?.data?.data || res?.data) {
+          const p = res.data.data || res.data;
+          
+          // Safeguard the inventory calculation
+          const calculatedStock = p.inventory?.reduce((acc: number, item: any) => acc + (item.quantity || 0), 0) || 0;
+          p.totalStock = calculatedStock;
+          
+          this.product.set(p);
+          this.inventoryData = [...(p.inventory || [])];
+        } else {
+          this.isError.set(true);
+          this.messageService.showError('Product data not found.');
+        }
+      },
+      error: (err) => {
+        this.isError.set(true);
+        // Integrated global error handler for timeouts or 404s
+        this.messageService.handleHttpError(err);
+      }
+    });
+  }
+
   onFileSelected(event: any) {
     const files = event.target.files;
     const prod = this.product();
-    if (files?.length && prod?._id) {
-      const formData = new FormData();
-      for (let i = 0; i < files.length; i++) {
-        formData.append('photos', files[i]);
-      }
-      this.loading.set(true);
-      this.productService.uploadProductFile(prod._id, formData)
-        .pipe(finalize(() => this.loading.set(false)))
-        .subscribe((res: any) => {
+    
+    // Fast exit if no files or no product ID
+    if (!files?.length || !prod?._id) return; 
+
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      formData.append('photos', files[i]);
+    }
+    
+    this.loading.set(true);
+    
+    this.productService.uploadProductFile(prod._id, formData)
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: (res: any) => {
           if (res?.data?.product) {
             this.product.set(res.data.product);
-            this.messageService.showSuccess('Success', 'Images uploaded successfully');
+            // Updated to single string format
+            this.messageService.showSuccess('Images uploaded successfully.');
           }
-        });
-    }
+        },
+        error: (err) => {
+          // Previously missing! Now catches large file errors or network drops.
+          this.messageService.handleHttpError(err);
+        }
+      });
   }
 
   eventFromGrid(event: any) {
@@ -205,7 +226,6 @@ export class ProductDetailsComponent implements OnInit {
 
   openStockAdjustment(product: any) {
     const ref = this.dialogHelper.openStockAdjustment(product);
-    
     if (ref) {
       ref.onClose.subscribe((success: boolean) => {
         if (success) {
@@ -217,8 +237,6 @@ export class ProductDetailsComponent implements OnInit {
 
   openHistory(product: any) {
     const ref = this.dialogHelper.openProductHistory(product);
-    // You don't necessarily need to refresh data after viewing history, 
-    // but you can attach the subscriber here if you want.
   }
 
   openStockTransfer(product: any) {

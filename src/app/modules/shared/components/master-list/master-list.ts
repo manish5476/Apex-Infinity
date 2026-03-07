@@ -288,7 +288,7 @@ export class MasterList implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        this.appMessage.handleHttpError(err, 'Loading Masters');
+        this.appMessage.handleHttpError(err);
         this.loading.set(false);
       }
     });
@@ -347,7 +347,7 @@ export class MasterList implements OnInit {
 
   handleSingleSave(row: Master) {
     if (!row.name || !row.type) {
-      this.appMessage.showWarn('Name and Type are required', 'Validation Error');
+      this.appMessage.showWarn('Name and Type are required');
       return;
     }
 
@@ -360,12 +360,12 @@ export class MasterList implements OnInit {
           this.appMessage.showSuccess('Master created successfully');
           this.loadMasters(); 
         },
-        error: (err) => this.appMessage.handleHttpError(err, 'Creation')
+        error: (err) => this.appMessage.handleHttpError(err)
       });
     } else {
       this.masterService.updateMaster(row._id, payload).subscribe({
         next: () => this.appMessage.showSuccess('Master updated successfully'),
-        error: (err) => this.appMessage.handleHttpError(err, 'Update')
+        error: (err) => this.appMessage.handleHttpError(err)
       });
     }
   }
@@ -380,7 +380,7 @@ export class MasterList implements OnInit {
         // Grid already updated via transaction, but we can sync signal if needed
       },
       error: (err) => {
-        this.appMessage.handleHttpError(err, 'Delete');
+        this.appMessage.handleHttpError(err);
         this.loadMasters(); // Revert on error
       }
     });
@@ -419,7 +419,7 @@ export class MasterList implements OnInit {
         this.isBulkEditing.set(false);
       },
       error: (err) => {
-        this.appMessage.handleHttpError(err, 'Bulk Update');
+        this.appMessage.handleHttpError(err);
         this.loadMasters(); // Revert
       }
     });
@@ -457,7 +457,7 @@ export class MasterList implements OnInit {
         // UI is already updated by grid
       },
       error: (err) => {
-        this.appMessage.handleHttpError(err, 'Bulk Delete');
+        this.appMessage.handleHttpError(err);
         this.loadMasters(); // Revert
       }
     });
@@ -489,14 +489,9 @@ export class MasterList implements OnInit {
 
   saveBulkImport() {
     if (!this.bulkGrid) return;
-    
-    // Grid's stopEditing is handled internally, but for Import we need ALL data, 
-    // not just "updates". So we iterate the Grid API.
-    if (this.bulkGridApi) this.bulkGridApi.stopEditing();
-
+        if (this.bulkGridApi) this.bulkGridApi.stopEditing();
     const validItems: any[] = [];
     
-    // We iterate the grid nodes to get current values
     this.bulkGridApi.forEachNode((node: any) => {
       const data = node.data;
       if (!data) return;
@@ -514,7 +509,7 @@ export class MasterList implements OnInit {
     });
 
     if (validItems.length === 0) {
-      this.appMessage.showWarn('Please enter valid details (Name & Type) for at least one item.', 'No Data Found');
+      this.appMessage.showWarn('Please enter valid details (Name & Type) for at least one item.');
       return;
     }
 
@@ -523,14 +518,14 @@ export class MasterList implements OnInit {
     this.masterService.createBulkMasters(validItems).subscribe({
       next: (res) => {
         if (res.status === 'partial_success') {
-           this.appMessage.showWarn('Partial Import. Check duplicates.', 'Partial Import');
+           this.appMessage.showWarn('Partial Import. Check duplicates.');
         } else {
-           this.appMessage.showSuccess(`${validItems.length} items imported successfully`, 'Bulk Import');
+           this.appMessage.showSuccess(`${validItems.length} items imported successfully`);
         }
         this.isBulkDialogVisible = false;
         this.loadMasters(); 
       },
-      error: (err) => this.appMessage.handleHttpError(err, 'Bulk Import'),
+      error: (err) => this.appMessage.handleHttpError(err),
       complete: () => this.isBulkSaving = false
     });
   }

@@ -144,8 +144,8 @@ export class MachineListComponent implements OnInit {
   deleteMachine(id: string, name: string) {
     if(confirm(`Delete machine ${name}?`)) {
       this.hrmsService.deleteMachine(id).subscribe({
-        next: () => { this.messageService.showSuccess('Deleted', 'Machine removed'); this.getData(); },
-        error: (err) => this.messageService.showError('Error', err.message)
+        next: () => { this.messageService.showSuccess('Machine removed'); this.getData(); },
+        error: (err) => this.messageService.handleHttpError(err)
       });
     }
   }

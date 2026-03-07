@@ -1,6 +1,4 @@
    <div class="detail-container">
-
-      <!-- ==================== LOADING OVERLAY ==================== -->
       @if (isLoading()) {
         <div class="loading-overlay">
           <div class="spinner"></div>
@@ -8,8 +6,6 @@
       }
 
       @if (note(); as note) {
-
-        <!-- ==================== SYSTEM BANNERS ==================== -->
         @if (isTrash()) {
           <div class="system-banner danger">
             <div class="banner-content">

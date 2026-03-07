@@ -219,7 +219,7 @@ export class AuthService {
 
     // Show welcome message
     const statusMessage = user.status === 'approved' ? 'Welcome back!' : 'Account pending approval';
-    this.messageService.showSuccess('Login Successful', statusMessage);
+    this.messageService.showSuccess( statusMessage);
 
     // Redirect based on user status
     if (user.status === 'approved') {
@@ -231,7 +231,6 @@ export class AuthService {
 
   public handleSignupSuccess(response: SignupResponse): void {
     this.messageService.showSuccess(
-      'Signup Successful',
       response.message || 'Your account is pending admin approval.'
     );
     this.router.navigate(['/auth/login'], {
@@ -259,7 +258,6 @@ export class AuthService {
     this.apiService.logoutAll().subscribe({
       next: () => {
         this.messageService.showSuccess(
-          'Logged Out',
           'You have been logged out from all devices'
         );
         this.performClientLogout(currentUrl);
@@ -316,7 +314,7 @@ export class AuthService {
         } else if (err.status === 403 && err.error?.message?.includes('blocked')) {
           errorMessage = 'Account blocked. Please contact administrator.';
         }
-        this.messageService.showError('Login Failed', errorMessage);
+        this.messageService.handleHttpError(err)
         return throwError(() => err);
       })
     );
@@ -329,10 +327,10 @@ export class AuthService {
     return this.OrganizationService.createNewOrganization(data).pipe(
       tap((response: LoginResponse) => {
         this.handleLoginSuccess(response, true);
-        this.messageService.showSuccess('Organization Created', 'Welcome! Your organization is ready.');
+        this.messageService.showSuccess( 'Welcome! Your organization is ready.');
       }),
       catchError(err => {
-        this.messageService.showError('Creation Failed', err.error?.message || 'Failed to create organization');
+        this.messageService.handleHttpError(err)
         return throwError(() => err);
       })
     );
@@ -353,7 +351,7 @@ export class AuthService {
         } else if (err.error?.errors) {
           errorMessage = Object.values(err.error.errors).join(', ');
         }
-        this.messageService.showError('Signup Failed', errorMessage);
+        this.messageService.handleHttpError(err)
         return throwError(() => err);
       })
     );
@@ -408,12 +406,11 @@ export class AuthService {
     return this.apiService.forgotPassword({ email }).pipe(
       tap(() => {
         this.messageService.showSuccess(
-          'Check Your Email',
           'Password reset instructions sent if account exists.'
         );
       }),
       catchError(err => {
-        this.messageService.showError('Request Failed', err.error?.message || 'Failed to send reset email');
+        this.messageService.handleHttpError(err)
         return throwError(() => err);
       })
     );
@@ -427,10 +424,10 @@ export class AuthService {
     return this.apiService.resetPassword(resetToken, passwords).pipe(
       tap((response: LoginResponse) => {
         this.handleLoginSuccess(response);
-        this.messageService.showSuccess('Password Reset', 'Your password has been reset successfully.');
+        this.messageService.showSuccess( 'Your password has been reset successfully.');
       }),
       catchError(err => {
-        this.messageService.showError('Reset Failed', err.error?.message || 'Failed to reset password');
+        this.messageService.handleHttpError(err)
         return throwError(() => err);
       })
     );
@@ -446,10 +443,10 @@ export class AuthService {
           this.setItem(this.TOKEN_KEY, response.token);
           this.authTokenData = response.token;
         }
-        this.messageService.showSuccess('Password Updated', 'Your password has been changed successfully.');
+        this.messageService.showSuccess( 'Your password has been changed successfully.');
       }),
       catchError(err => {
-        this.messageService.showError('Update Failed', err.error?.message || 'Failed to update password');
+        this.messageService.handleHttpError(err)
         return throwError(() => err);
       })
     );
@@ -466,12 +463,11 @@ export class AuthService {
     return this.apiService.sendVerificationEmail().pipe(
       tap(() => {
         this.messageService.showSuccess(
-          'Verification Email Sent',
           'Please check your inbox to verify your email.'
         );
       }),
       catchError(err => {
-        this.messageService.showError('Failed', err.error?.message || 'Failed to send verification email');
+        this.messageService.handleHttpError(err)
         return throwError(() => err);
       })
     );
@@ -490,10 +486,10 @@ export class AuthService {
           this.setItem(this.USER_KEY, currentUser);
           this.currentUserSubject.next(currentUser);
         }
-        this.messageService.showSuccess('Email Verified', 'Your email has been verified successfully.');
+        this.messageService.showSuccess( 'Your email has been verified successfully.');
       }),
       catchError(err => {
-        this.messageService.showError('Verification Failed', err.error?.message || 'Invalid or expired token');
+        this.messageService.handleHttpError(err)
         return throwError(() => err);
       })
     );
@@ -521,10 +517,10 @@ export class AuthService {
   terminateSession(sessionId: string): Observable<any> {
     return this.apiService.terminateSession(sessionId).pipe(
       tap(() => {
-        this.messageService.showInfo('Session Terminated', 'Selected session has been logged out.');
+        this.messageService.showInfo( 'Selected session has been logged out.');
       }),
       catchError(err => {
-        this.messageService.showError('Failed', err.error?.message || 'Failed to terminate session');
+        this.messageService.handleHttpError(err)
         return throwError(() => err);
       })
     );
@@ -807,7 +803,7 @@ refreshPermissions(): void {
 //     return this.OrganizationService.createNewOrganization(data).pipe(
 //       tap(response => {
 //         this.handleLoginSuccess(response);
-//         this.messageService.showSuccess('Organization Created', 'Welcome!');
+//         this.messageService.showSuccess( 'Welcome!');
 //       }),
 //       catchError(err => throwError(() => err))
 //     );
@@ -816,7 +812,7 @@ refreshPermissions(): void {
 //   employeeSignup(data: any) {
 //     return this.apiService.employeeSignup(data).pipe(
 //       tap(() => {
-//         this.messageService.showSuccess('Signup Successful', 'Your account is pending admin approval.');
+//         this.messageService.showSuccess( 'Your account is pending admin approval.');
 //         this.router.navigate(['/auth/login']);
 //       }),
 //       catchError(err => throwError(() => err))
@@ -847,7 +843,7 @@ refreshPermissions(): void {
 
 //   forgotPassword(email: string) {
 //     return this.apiService.forgotPassword({ email }).pipe(
-//       tap(() => this.messageService.showSuccess('Check Your Email', 'Password reset instructions sent.')),
+//       tap(() => this.messageService.showSuccess(', 'Password reset instructions sent.')),
 //       catchError(err => throwError(() => err))
 //     );
 //   }
@@ -856,7 +852,7 @@ refreshPermissions(): void {
 //     return this.apiService.resetPassword(resetToken, passwords).pipe(
 //       tap(response => {
 //         this.handleLoginSuccess(response);
-//         this.messageService.showSuccess('Password Reset', 'You are now logged in.');
+//         this.messageService.showSuccess( 'You are now logged in.');
 //       }),
 //       catchError(err => throwError(() => err))
 //     );
@@ -866,7 +862,7 @@ refreshPermissions(): void {
 //     return this.apiService.updateMyPassword(data).pipe(
 //       tap((response: any) => {
 //         if (response?.token) this.setItem(this.TOKEN_KEY, response.token);
-//         this.messageService.showSuccess('Password Updated', 'Your password has been changed.');
+//         this.messageService.showSuccess( 'Your password has been changed.');
 //       }),
 //       catchError(err => throwError(() => err))
 //     );

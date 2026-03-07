@@ -100,12 +100,12 @@ export class CustomerTransactions implements OnInit {
         if (res.results && Array.isArray(res.results)) {
           newData = res.results;
         }
+
         this.totalCount = res.total || this.totalCount;
         this.data = [...this.data, ...newData];
         this.currentPage++;
         this.cdr.markForCheck();
-      },
-      'Fetch Customer Transactions'
+      }
     );
   }
 

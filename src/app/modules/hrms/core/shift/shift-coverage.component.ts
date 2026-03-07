@@ -260,8 +260,8 @@ export class ShiftCoverageComponent implements OnInit {
         const timeArray = res.timeline?.data?.timeline || [];
         this.timelineData.set(timeArray);
       },
-      error: () => {
-        this.messageService.showError('Error', 'Failed to load shift dashboard data.');
+      error: (err) => {
+        this.messageService.handleHttpError(err)
       }
     });
   }

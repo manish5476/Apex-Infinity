@@ -1,4 +1,143 @@
- <!-- Custom Toast Notification -->
+<div class="glass-background">
+  <div class="glass-overlay"></div>
+  
+  <div class="page-layout">
+    <header class="glass-header">
+      <div class="header-content">
+        <div class="icon-box">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+            <line x1="12" y1="2" x2="12" y2="22"></line>
+            <line x1="4" y1="10" x2="20" y2="10"></line>
+          </svg>
+        </div>
+        <div class="header-text">
+          <h1>Setup Organization</h1>
+          <p>Register your enterprise profile and administrative access.</p>
+        </div>
+      </div>
+    </header>
+
+    <main class="scroll-container">
+      <div class="content-wrapper">
+        <form [formGroup]="organizationForm" class="glass-form">
+
+          <section class="glass-card">
+            <div class="card-header">
+              <h3>Organization Profile</h3>
+              <span class="card-desc">Basic identification and contact information.</span>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Organization Name <span class="req">*</span></label>
+                <input type="text" class="glass-input" formControlName="organizationName" placeholder="Ex: Apex Innovations" (blur)="generateShopId()" />
+              </div>
+
+              <div class="form-group">
+                <label>Unique Shop ID <span class="req">*</span></label>
+                <input type="text" class="glass-input" formControlName="uniqueShopId" placeholder="Ex: APEX-001" style="text-transform: uppercase" />
+              </div>
+
+              <div class="form-group">
+                <label>Primary Email <span class="req">*</span></label>
+                <input type="email" class="glass-input" formControlName="primaryEmail" placeholder="contact@company.com" />
+              </div>
+
+              <div class="form-group">
+                <label>Primary Phone <span class="req">*</span></label>
+                <input type="text" class="glass-input" formControlName="primaryPhone" placeholder="+91 98765 43210" />
+              </div>
+
+              <div class="form-group">
+                <label>GST Number</label>
+                <input type="text" class="glass-input" formControlName="gstNumber" placeholder="22AAAAA0000A1Z5" style="text-transform: uppercase" />
+              </div>
+            </div>
+          </section>
+
+          <section class="glass-card">
+            <div class="card-header">
+              <h3>Headquarters Location</h3>
+              <span class="card-desc">Details for your primary operating branch.</span>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group span-2">
+                <label>Branch Name <span class="req">*</span></label>
+                <input type="text" class="glass-input" formControlName="mainBranchName" placeholder="Ex: Head Office" />
+              </div>
+
+              <ng-container formGroupName="mainBranchAddress">
+                <div class="form-group span-2">
+                  <label>Street Address <span class="req">*</span></label>
+                  <input type="text" class="glass-input" formControlName="street" placeholder="123 Business Park" />
+                </div>
+                <div class="form-group">
+                  <label>City <span class="req">*</span></label>
+                  <input type="text" class="glass-input" formControlName="city" placeholder="New York" />
+                </div>
+                <div class="form-group">
+                  <label>State <span class="req">*</span></label>
+                  <input type="text" class="glass-input" formControlName="state" placeholder="NY" />
+                </div>
+                <div class="form-group">
+                  <label>Zip Code <span class="req">*</span></label>
+                  <input type="text" class="glass-input" formControlName="zipCode" placeholder="10001" />
+                </div>
+              </ng-container>
+            </div>
+          </section>
+
+          <section class="glass-card highlight-card">
+            <div class="card-header">
+              <h3>Super Admin Access</h3>
+              <span class="card-desc">Credentials for the primary owner.</span>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Owner Name <span class="req">*</span></label>
+                <input type="text" class="glass-input" formControlName="ownerName" placeholder="Full Name" />
+              </div>
+              <div class="form-group">
+                <label>Login Email <span class="req">*</span></label>
+                <input type="email" class="glass-input" formControlName="ownerEmail" placeholder="admin@company.com" />
+              </div>
+              <div class="form-group">
+                <label>Password <span class="req">*</span></label>
+                <div class="password-wrapper">
+                  <input [type]="passwordVisible() ? 'text' : 'password'" class="glass-input" formControlName="ownerPassword" placeholder="Strong Password" />
+                  <button type="button" class="password-toggle" (click)="togglePassword()">
+                    <i class="pi" [ngClass]="passwordVisible() ? 'pi-eye' : 'pi-eye-slash'"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </form>
+      </div>
+    </main>
+
+    <footer class="glass-footer">
+      <div class="footer-content">
+        <button type="button" class="glass-button secondary" routerLink="/auth/login">Back</button>
+        <button type="button" class="glass-button primary" (click)="onSubmit()" [disabled]="isLoading()">
+          @if(isLoading()) {
+            <i class="pi pi-spin pi-spinner mr-2"></i> Processing...
+          } @else {
+            Create Organization
+          }
+        </button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+
+
+
+<!-- Custom Toast Notification
     @if (toastMessage()) {
       <div class="custom-toast" [class.success]="toastType() === 'success'" [class.error]="toastType() === 'error'">
         <div class="toast-icon">
@@ -22,17 +161,17 @@
       </div>
     }
 
-    <!-- Main Background Wrapper -->
+    Main Background Wrapper
     <div class="glass-background">
       <div class="glass-overlay"></div>
       
       <div class="page-layout">
         
-        <!-- 1. HEADER (Fixed/Sticky) -->
+        1. HEADER (Fixed/Sticky)
         <header class="glass-header">
           <div class="header-content">
             <div class="icon-box">
-              <!-- Building Icon -->
+              Building Icon
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
                 <line x1="9" y1="22" x2="9" y2="22.01"></line>
@@ -50,17 +189,17 @@
           </div>
         </header>
 
-        <!-- 2. SCROLLABLE CONTENT AREA -->
+        2. SCROLLABLE CONTENT AREA
         <main class="scroll-container">
           <div class="content-wrapper">
             
             <form [formGroup]="organizationForm" class="glass-form">
 
-              <!-- SECTION 1: ORGANIZATION DETAILS -->
+              SECTION 1: ORGANIZATION DETAILS
               <section class="glass-card">
                 <div class="card-header">
                   <h3>
-                    <!-- ID Card Icon -->
+                    ID Card Icon
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-400">
                       <rect x="3" y="4" width="18" height="16" rx="3"></rect>
                       <circle cx="9" cy="10" r="2"></circle>
@@ -102,11 +241,11 @@
                 </div>
               </section>
 
-              <!-- SECTION 2: MAIN BRANCH -->
+              SECTION 2: MAIN BRANCH
               <section class="glass-card">
                 <div class="card-header">
                   <h3>
-                    <!-- Map Pin Icon -->
+                    Map Pin Icon
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-400">
                       <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                       <circle cx="12" cy="10" r="3"></circle>
@@ -143,11 +282,11 @@
                 </div>
               </section>
 
-              <!-- SECTION 3: ADMIN ACCOUNT -->
+              SECTION 3: ADMIN ACCOUNT
               <section class="glass-card highlight-card">
                 <div class="card-header">
                   <h3>
-                    <!-- Shield Icon -->
+                    Shield Icon
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-400">
                       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                     </svg>
@@ -185,7 +324,7 @@
           </div>
         </main>
 
-        <!-- 3. FOOTER (Fixed/Sticky) -->
+        3. FOOTER (Fixed/Sticky)
         <footer class="glass-footer">
           <div class="footer-content">
             <button type="button" class="glass-button secondary">
@@ -206,4 +345,4 @@
         </footer>
 
       </div>
-    </div>
+    </div> -->

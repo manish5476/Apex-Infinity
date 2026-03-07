@@ -9,6 +9,8 @@ import { CardModule } from 'primeng/card';
 import { ToastModule } from 'primeng/toast';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { OrganizationService } from '../organization.service';
+import { AppMessageService } from '../../../core/services/message.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-accept-ownership',
@@ -110,7 +112,7 @@ export class AcceptOwnershipComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private orgService = inject(OrganizationService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
 
   token = signal('');
   isLoading = signal(false);
@@ -118,8 +120,9 @@ export class AcceptOwnershipComponent implements OnInit {
   isSuccess = signal(false);
 
   ngOnInit() {
-    // Capture token from URL
-    this.token.set(this.route.snapshot.queryParams['token']);
+    // Capture token from URL safely
+    const tokenParam = this.route.snapshot.queryParams['token'];
+    this.token.set(tokenParam || '');
 
     if (!this.token()) {
       this.errorMessage.set('Invalid or missing transfer token.');
@@ -134,27 +137,33 @@ export class AcceptOwnershipComponent implements OnInit {
       action: action
     };
 
-    this.orgService.finalizaTransfer(payload).subscribe({
-      next: (res) => {
-        this.isLoading.set(false);
-        if (action === 'accept') {
-          this.isSuccess.set(true);
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Ownership Transferred!' });
-          // Redirect to dashboard after delay to let them see success message
-          setTimeout(() => {
-            // Full reload to ensure user permissions (Super Admin) update in the app
-            window.location.href = '/dashboard'; 
-          }, 1500);
-        } else {
-          this.messageService.add({ severity: 'info', summary: 'Rejected', detail: 'You declined the transfer.' });
-          this.goToDashboard();
+    // Note: Kept 'finalizaTransfer' to match your service, but you might want to fix that typo!
+    this.orgService.finalizaTransfer(payload)
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: (res) => {
+          if (action === 'accept') {
+            this.isSuccess.set(true);
+            // Updated to single-string success format
+            this.messageService.showSuccess('Success: Ownership Transferred!');
+            
+            setTimeout(() => {
+              // Full reload is excellent here to completely reset auth states and guards
+              window.location.href = '/dashboard'; 
+            }, 1500);
+          } else {
+            // Updated to single-string info format
+            this.messageService.showInfo('Rejected: You declined the ownership transfer.');
+            this.goToDashboard();
+          }
+        },
+        error: (err) => {
+          // Toast notification for the specific backend error (e.g., 401 Unauthorized)
+          this.messageService.handleHttpError(err);
+          // UI fallback state so the page isn't blank
+          this.errorMessage.set('The transfer link is invalid or expired.');
         }
-      },
-      error: (err) => {
-        this.isLoading.set(false);
-        this.errorMessage.set(err.error?.message || 'The transfer link is invalid or expired.');
-      }
-    });
+      });
   }
 
   goToDashboard() {
@@ -162,78 +171,27 @@ export class AcceptOwnershipComponent implements OnInit {
   }
 }
 
-// import { Component, OnInit, inject, signal } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { ActivatedRoute, Router } from '@angular/router';
-// import { ButtonModule } from 'primeng/button';
-// import { CardModule } from 'primeng/card';
-// import { MessageService } from 'primeng/api';
-// import { ToastModule } from 'primeng/toast';
-// import { OrganizationService } from '../organization.service';
-
-// @Component({
-//   selector: 'app-accept-ownership',
-//   standalone: true,
-//   imports: [CommonModule, ButtonModule, CardModule, ToastModule],
-//   providers: [MessageService],
-//   template: `
-//     <div class="h-screen w-full flex items-center justify-center bg-gray-50 p-4">
-//       <p-toast></p-toast>
-      
-//       <p-card styleClass="w-full max-w-md shadow-lg text-center">
-//         <div class="flex flex-col items-center gap-4">
-//           <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
-//             <i class="pi pi-shield text-2xl"></i>
-//           </div>
-          
-//           <h2 class="text-xl font-bold m-0">Ownership Transfer Request</h2>
-//           <p class="text-gray-600 m-0">
-//             You have been nominated to become the new owner of the organization.
-//           </p>
-
-//           <div class="w-full h-px bg-gray-200 my-2"></div>
-
-//           <div class="flex flex-col gap-3 w-full">
-//             <button pButton 
-//                     label="Accept Ownership" 
-//                     class="p-button-success w-full" 
-//                     icon="pi pi-check" 
-//                     [loading]="isLoading()"
-//                     (click)="handleAction('accept')">
-//             </button>
-            
-//             <button pButton 
-//                     label="Decline" 
-//                     class="p-button-outlined p-button-secondary w-full" 
-//                     [loading]="isLoading()"
-//                     (click)="handleAction('reject')">
-//             </button>
-//           </div>
-//         </div>
-//       </p-card>
-//     </div>
-//   `
-// })
 // export class AcceptOwnershipComponent implements OnInit {
 //   private route = inject(ActivatedRoute);
 //   private router = inject(Router);
 //   private orgService = inject(OrganizationService);
-//   private messageService = inject(MessageService);
+//   private messageService = inject(AppMessageService);
 
-//   token = signal<string>('');
-//   isLoading = signal<boolean>(false);
+//   token = signal('');
+//   isLoading = signal(false);
+//   errorMessage = signal('');
+//   isSuccess = signal(false);
 
 //   ngOnInit() {
-//     // 1. Capture the token from the URL (?token=xyz)
+//     // Capture token from URL
 //     this.token.set(this.route.snapshot.queryParams['token']);
 
 //     if (!this.token()) {
-//       this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Invalid link' });
-//       setTimeout(() => this.router.navigate(['/']), 2000);
+//       this.errorMessage.set('Invalid or missing transfer token.');
 //     }
 //   }
 
-//   handleAction(action: 'accept' | 'reject') {
+//   handleTransfer(action: 'accept' | 'reject') {
 //     this.isLoading.set(true);
 
 //     const payload = {
@@ -243,19 +201,27 @@ export class AcceptOwnershipComponent implements OnInit {
 
 //     this.orgService.finalizaTransfer(payload).subscribe({
 //       next: (res) => {
+//         this.isLoading.set(false);
 //         if (action === 'accept') {
-//           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'You are now the Owner!' });
-//           // Force reload to update permissions/UI for the new owner
-//           setTimeout(() => window.location.href = '/admin/dashboard', 1500);
+//           this.isSuccess.set(true);
+//           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Ownership Transferred!' });
+//           setTimeout(() => {
+//             // Full reload to ensure user permissions (Super Admin) update in the app
+//             window.location.href = '/dashboard'; 
+//           }, 1500);
 //         } else {
-//           this.messageService.add({ severity: 'info', summary: 'Declined', detail: 'Request rejected.' });
-//           setTimeout(() => this.router.navigate(['/admin/dashboard']), 1500);
+//           this.messageService.add({ severity: 'info', summary: 'Rejected', detail: 'You declined the transfer.' });
+//           this.goToDashboard();
 //         }
 //       },
 //       error: (err) => {
 //         this.isLoading.set(false);
-//         this.messageService.add({ severity: 'error', summary: 'Failed', detail: err.error?.message || 'Action failed' });
+//         this.errorMessage.set(err.error?.message || 'The transfer link is invalid or expired.');
 //       }
 //     });
+//   }
+
+//   goToDashboard() {
+//     this.router.navigate(['/dashboard']);
 //   }
 // }

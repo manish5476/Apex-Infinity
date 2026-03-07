@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
@@ -18,6 +18,7 @@ import { LoadingService } from '../../../../core/services/loading.service';
 // Grid
 import { AppSharedGrid, SharedGridEvent } from "../../../shared/AgGrid/grid/app-shared-grid/app-shared-grid";
 import { GridColDef } from "../../../shared/AgGrid/grid/grid.types";
+import { AppMessageService } from '../../../../core/services/message.service';
 
 @Component({
   selector: 'app-bulk-product-entry',
@@ -31,40 +32,25 @@ import { GridColDef } from "../../../shared/AgGrid/grid/grid.types";
 export class BulkProductEntry implements OnInit, OnChanges {
   // Input from Parent
   @Input() selectedData: any[] = [];
-
   private productService = inject(ProductService);
   private masterList = inject(MasterListService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
   private loadingService = inject(LoadingService);
-
-  // --- State ---
   products = signal<any[]>([]);
   loading = signal(false);
   gridApi: any;
-
-  // Search
   selectedProductsToAdd: any[] = [];
   filteredProducts = signal<any[]>([]);
-
-  // --- Master Data ---
-  // Note: fixed 'department()' to 'departments()' based on standard naming, check your service
   departments = computed(() => this.masterList.department().map(m => ({ label: m.name, value: m._id })));
   categories = computed(() => this.masterList.categories().map(m => ({ label: m.name, value: m._id })));
   subCategories = computed(() => this.masterList.categories().map(m => ({ label: m.name, value: m._id })));
   brands = computed(() => this.masterList.brands().map(m => ({ label: m.name, value: m._id })));
   units = computed(() => this.masterList.units().map(m => ({ label: m.name, value: m._id })));
   suppliers = computed(() => this.masterList.suppliers().map(m => ({ label: m['companyName'] || m.name, value: m._id })));
-
   columns: GridColDef<any>[] = [];
-
-  constructor() { 
-    // We don't call onAddNew() here automatically if we expect Inputs, 
-    // let ngOnInit or ngOnChanges handle initialization 
-  }
-
+  constructor() { }
   ngOnInit() {
     this.initColumns();
-    // If no data passed, add one empty row
     if (this.products().length === 0) {
       this.onAddNew();
     }
@@ -72,28 +58,20 @@ export class BulkProductEntry implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedData'] && this.selectedData && this.selectedData.length > 0) {
-      
-      // 1. Process/Flatten the incoming data
       const processedRows = this.selectedData.map(item => this.mapToGridRow(item));
-      
-      // 2. Set the signal (Replace existing or Append? Usually Replace when opening dialog)
       this.products.set(processedRows);
     }
   }
 
-  // --- Helper: Flattens Objects to IDs for Dropdowns ---
   private mapToGridRow(item: any): any {
     return {
       ...item,
-      // Check if field is an object (populated), if so, extract ._id
       departmentId: item.departmentId?._id || item.departmentId,
       categoryId: item.categoryId?._id || item.categoryId,
       subCategoryId: item.subCategoryId?._id || item.subCategoryId,
       brandId: item.brandId?._id || item.brandId,
       unitId: item.unitId?._id || item.unitId,
       defaultSupplierId: item.defaultSupplierId?._id || item.defaultSupplierId,
-      // Ensure quantity is 0 for updates (stock adjustment logic), unless you want to show current stock
-      // quantity: 0 
     };
   }
 
@@ -102,13 +80,11 @@ export class BulkProductEntry implements OnInit, OnChanges {
       { field: '_id', headerName: 'ID', hide: true },
       { field: 'name', headerName: 'Product Name', width: 220, pinned: 'left', editable: true, cellConfig: { type: 'text', placeholder: 'Required' } },
       { field: 'sku', headerName: 'SKU', width: 120, editable: true, cellConfig: { type: 'text', placeholder: 'Unique Code' } },
-      
       { field: 'departmentId', headerName: 'Department', width: 140, editable: true, cellConfig: { type: 'select', options: this.departments(), optionLabel: 'label' } },
       { field: 'categoryId', headerName: 'Category', width: 140, editable: true, cellConfig: { type: 'select', options: this.categories(), optionLabel: 'label' } },
       { field: 'subCategoryId', headerName: 'Sub Cat', width: 140, editable: true, cellConfig: { type: 'select', options: this.subCategories(), optionLabel: 'label' } },
       { field: 'brandId', headerName: 'Brand', width: 140, editable: true, cellConfig: { type: 'select', options: this.brands(), optionLabel: 'label' } },
       { field: 'unitId', headerName: 'Unit', width: 100, editable: true, cellConfig: { type: 'select', options: this.units(), optionLabel: 'label' } },
-
       { field: 'purchasePrice', headerName: 'Cost Price', width: 110, editable: true, cellConfig: { type: 'number', min: 0 } },
       { field: 'sellingPrice', headerName: 'Sell Price', width: 110, editable: true, cellConfig: { type: 'number', min: 0 } },
       { field: 'discountedPrice', headerName: 'Disc. Price', width: 110, editable: true, cellConfig: { type: 'number' } },
@@ -116,7 +92,7 @@ export class BulkProductEntry implements OnInit, OnChanges {
       { field: 'isTaxInclusive', headerName: 'Tax Incl.', width: 90, editable: true, cellConfig: { type: 'boolean' } },
 
       {
-        field: 'quantity', headerName: 'Init/Add Qty', width: 120, editable: true, cellConfig: { type: 'number' }, 
+        field: 'quantity', headerName: 'Init/Add Qty', width: 120, editable: true, cellConfig: { type: 'number' },
         cellRenderer: (params: any) => {
           const id = params.data._id || '';
           if (!id.startsWith('temp_')) {
@@ -137,7 +113,7 @@ export class BulkProductEntry implements OnInit, OnChanges {
     if (event.type === 'init') this.gridApi = event.api;
     if (event.type === 'delete') { this.products.update(curr => curr.filter(p => p._id !== event.row._id)); }
     if (event.type === 'bulkDelete') {
-      const idsToRemove = event.rows.map(r => r._id); 
+      const idsToRemove = event.rows.map(r => r._id);
       this.products.update(curr => curr.filter(p => !idsToRemove.includes(p._id)));
     }
   }
@@ -156,7 +132,6 @@ export class BulkProductEntry implements OnInit, OnChanges {
 
     items.forEach((item: any) => {
       if (!currentData.find(p => p._id === item._id)) {
-        // REUSE HELPER HERE
         newRows.push(this.mapToGridRow(item));
       }
     });
@@ -166,24 +141,7 @@ export class BulkProductEntry implements OnInit, OnChanges {
   }
 
   onAddNew() {
-    const newProduct = {
-      _id: `temp_${Date.now()}`,
-      name: '',
-      sku: '',
-      isActive: true,
-      sellingPrice: 0,
-      purchasePrice: 0,
-      quantity: 0,
-      description: '',
-      departmentId: null,
-      categoryId: null,
-      subCategoryId: null,
-      brandId: null,
-      unitId: null,
-      defaultSupplierId: null,
-      isTaxInclusive: false,
-      taxRate: 0
-    };
+    const newProduct = { _id: `temp_${Date.now()}`, name: '', sku: '', isActive: true, sellingPrice: 0, purchasePrice: 0, quantity: 0, description: '', departmentId: null, categoryId: null, subCategoryId: null, brandId: null, unitId: null, defaultSupplierId: null, isTaxInclusive: false, taxRate: 0 };
     this.products.update(curr => [newProduct, ...curr]);
   }
 
@@ -191,11 +149,9 @@ export class BulkProductEntry implements OnInit, OnChanges {
     this.products.set([]);
     this.onAddNew();
   }
-// --- Save Logic ---
-  onSaveAll() {
+
+onSaveAll() {
     const rowsToSave: any[] = [];
-    
-    // 1. Extract Data
     if (this.gridApi) {
       this.gridApi.forEachNode((node: any) => rowsToSave.push(node.data));
     } else {
@@ -203,21 +159,19 @@ export class BulkProductEntry implements OnInit, OnChanges {
     }
 
     const validRows = rowsToSave.filter(r => r.name && r.name.trim() !== '');
-    if (validRows.length === 0) return;
+    
+    if (validRows.length === 0) {
+      // Replaced silent return with a user warning
+      this.messageService.showWarn('Validation Error: No valid products to save.');
+      return; 
+    }
 
-    // 2. Safety: Ensure IDs exist
-    validRows.forEach(r => {
-      if (!r._id) r._id = `temp_${Date.now()}_fallback`;
-    });
-
-    // 3. Split: Create vs Update
+    // Assign temporary IDs to distinguish new vs. existing rows
+    validRows.forEach(r => { if (!r._id) r._id = `temp_${Date.now()}_fallback`; });
+    
     const toCreate = validRows.filter(r => (r._id || '').startsWith('temp_'));
     const toUpdate = validRows.filter(r => !(r._id || '').startsWith('temp_'));
 
-    this.loading.set(true);
-    const tasks = [];
-
-    // --- Helper: Clean Data Types ---
     const cleanPayload = (r: any) => ({
       ...r,
       sellingPrice: Number(r.sellingPrice || 0),
@@ -228,63 +182,43 @@ export class BulkProductEntry implements OnInit, OnChanges {
       isTaxInclusive: !!r.isTaxInclusive
     });
 
-    // --- TASK 1: CREATE (Bulk Import) ---
-    // Backend expects array of objects
+    const tasks = [];
+
     if (toCreate.length > 0) {
       const createPayload = toCreate.map(r => {
-        const { _id, ...rest } = cleanPayload(r); // Remove temp ID
+        const { _id, ...rest } = cleanPayload(r); // Remove temp ID before creating
         return rest;
       });
       tasks.push(this.productService.bulkImportProducts(createPayload));
     }
-
-    // --- TASK 2: UPDATE (Bulk Update) ---
-    // Backend expects: [ { _id: "...", update: { ... } } ]
+    
     if (toUpdate.length > 0) {
       const updatePayload = toUpdate.map(r => {
         const cleaned = cleanPayload(r);
-        
-        // 1. Extract ID
         const id = cleaned._id;
-
-        // 2. Remove Forbidden Fields (quantity, purchasePrice, inventory)
-        //    and the _id itself from the update object
-        const { 
-          _id, 
-          quantity, 
-          purchasePrice, 
-          inventory, 
-          openingStock, 
-          costPrice, 
-          ...allowedFields 
-        } = cleaned;
-
-        // 3. Return Structure expected by Backend
-        return {
-          _id: id,
-          update: allowedFields // Only sends name, sku, sellingPrice, category, etc.
-        };
+        // Strip out fields that shouldn't be mutated during a generic product update
+        const { _id, quantity, purchasePrice, inventory, openingStock, costPrice, ...allowedFields } = cleaned;
+        return { _id: id, update: allowedFields };
       });
-
       tasks.push(this.productService.bulkUpdateProducts(updatePayload));
     }
 
-    if (tasks.length === 0) {
-      this.loading.set(false);
-      return;
-    }
+    if (tasks.length === 0) return;
 
-    forkJoin(tasks).subscribe({
+    this.loading.set(true);
+
+    forkJoin(tasks).pipe(
+      finalize(() => this.loading.set(false))
+    ).subscribe({
       next: () => {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Operations completed' });
+        // Updated to single-string success format
+        this.messageService.showSuccess('Bulk save completed successfully.');
         this.onClearAll();
-        // Optional: Close dialog or emit event to refresh parent grid
       },
       error: (err) => {
-        console.error(err);
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message || 'Save failed' });
-      },
-      complete: () => this.loading.set(false)
+        // Routed to global HTTP error handler
+        this.messageService.handleHttpError(err);
+      }
     });
   }
 }

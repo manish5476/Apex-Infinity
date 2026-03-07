@@ -193,11 +193,11 @@ export class MachineMappingComponent implements OnInit {
       finalize(() => this.isLoading.set(false))
     ).subscribe({
       next: () => {
-        this.messageService.showSuccess('Mapped', `${user.name} linked successfully.`);
+        this.messageService.showSuccess( `${user.name} linked successfully.`);
         // Remove mapped user from list
         this.unmappedUsers.update(users => users.filter(u => u._id !== user._id));
       },
-      error: (err) => this.messageService.showError('Error', err.message || 'Mapping failed.')
+      error: (err) => this.messageService.handleHttpError(err)
     });
   }
 
@@ -212,12 +212,12 @@ export class MachineMappingComponent implements OnInit {
       finalize(() => this.isLoading.set(false))
     ).subscribe({
       next: () => {
-        this.messageService.showSuccess('Bulk Mapped', `${mappings.length} users synced.`);
+        this.messageService.showSuccess( `${mappings.length} users synced.`);
         // Remove mapped users from list
         const mappedIds = mappings.map(m => m.userId);
         this.unmappedUsers.update(users => users.filter(u => !mappedIds.includes(u._id)));
       },
-      error: (err) => this.messageService.showError('Error', err.message || 'Bulk map failed.')
+      error: (err) => this.messageService.handleHttpError(err)
     });
   }
 

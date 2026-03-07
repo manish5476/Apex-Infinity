@@ -5,6 +5,8 @@ import { Router } from '@angular/router';
 // Components
 import { AgShareGrid } from "../../shared/components/ag-shared-grid";
 import { PurchaseService } from '../purchase.service';
+import { AppMessageService } from '../../../core/services/message.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-purchase-return-list',
@@ -39,6 +41,7 @@ import { PurchaseService } from '../purchase.service';
 export class PurchaseReturnListComponent implements OnInit {
   private purchaseService = inject(PurchaseService);
   private router = inject(Router);
+  private messageService = inject(AppMessageService);
   
   data = signal<any[]>([]);
 
@@ -83,13 +86,23 @@ export class PurchaseReturnListComponent implements OnInit {
       onCellClicked: (p: any) => this.router.navigate(['/purchase/returns', p.data._id])
     }
   ];
+  isLoading: any;
 
-  ngOnInit() {
-    this.purchaseService.getAllReturns().subscribe({
-      next: (res: any) => {
-        this.data.set(res.data?.returns || []);
-      }
-    });
+ngOnInit() {
+    this.isLoading.set(true);
+
+    this.purchaseService.getAllReturns()
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: (res: any) => {
+          // Safely extract the returns payload
+          this.data.set(res.data?.returns || []);
+        },
+        error: (err) => {
+          // Routed to your global HTTP error parser
+          this.messageService.handleHttpError(err);
+        }
+      });
   }
 
   onGridEvent(event: any) {

@@ -307,7 +307,7 @@ export class ShiftListComponent implements OnInit {
       },
       error: (err: any) => {
         this.isLoading = false;
-        this.messageService.showError('Error', 'Failed to fetch shifts.');
+        this.messageService.handleHttpError(err);
       }
     });
   }
@@ -348,11 +348,11 @@ export class ShiftListComponent implements OnInit {
   private deleteShift(id: string) {
     this.hrmsService.deleteShift(id).subscribe({
       next: () => {
-        this.messageService.showSuccess('Deleted', 'Shift removed successfully');
+        this.messageService.showSuccess( 'Shift removed successfully');
         this.getData(true);
       },
       error: (err: any) => {
-        this.messageService.showError('Error', err.error?.message || 'Failed to delete shift');
+        this.messageService.handleHttpError(err);
       }
     });
   }

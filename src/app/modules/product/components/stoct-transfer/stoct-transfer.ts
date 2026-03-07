@@ -14,15 +14,7 @@ import { InputTextModule } from 'primeng/inputtext';
 @Component({
   selector: 'app-stock-transfer',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    ButtonModule,
-    InputNumberModule,
-    FloatLabelModule,
-    SelectModule,
-    InputTextModule
-  ],
+  imports: [CommonModule, ReactiveFormsModule, ButtonModule, InputNumberModule, FloatLabelModule, SelectModule, InputTextModule],
   templateUrl: './stoct-transfer.html',
   styleUrls: ['./stoct-transfer.scss'],
 })
@@ -32,20 +24,16 @@ export class StockTransferComponent implements OnInit {
   private productService = inject(ProductService);
   private messageService = inject(AppMessageService);
   private masterList = inject(MasterListService);
-  
+
   public ref = inject(DynamicDialogRef);
   public config = inject(DynamicDialogConfig);
 
-  // State
   transferForm!: FormGroup;
   branches: any[] = [];
   loading = false;
 
   ngOnInit(): void {
-    // 1. Load Data
     this.branches = this.masterList.branches() || [];
-    
-    // 2. Init Form
     this.transferForm = this.fb.group({
       fromBranchId: [null, [Validators.required]],
       toBranchId: [null, [Validators.required]],
@@ -54,23 +42,16 @@ export class StockTransferComponent implements OnInit {
     }, { validators: this.branchConflictValidator });
   }
 
-  // Getters for cleaner HTML
   get fromCtrl() { return this.transferForm.get('fromBranchId'); }
   get toCtrl() { return this.transferForm.get('toBranchId'); }
   get qtyCtrl() { return this.transferForm.get('quantity'); }
-
-  // Custom Validator for same branch selection
   branchConflictValidator(group: AbstractControl) {
     const from = group.get('fromBranchId')?.value;
     const to = group.get('toBranchId')?.value;
-    
-    // If both are selected and same, set error on 'toBranchId'
     if (from && to && from === to) {
       group.get('toBranchId')?.setErrors({ sameBranch: true });
       return { sameBranch: true };
     }
-    
-    // Clear error if they are different (and if the only error was sameBranch)
     if (group.get('toBranchId')?.hasError('sameBranch')) {
       group.get('toBranchId')?.setErrors(null);
     }
@@ -87,13 +68,11 @@ export class StockTransferComponent implements OnInit {
     const productId = this.config.data?.id;
 
     if (!productId) {
-        this.messageService.showError('Product context missing');
-        this.loading = false;
-        return;
+      this.messageService.showError('Product context missing');
+      this.loading = false;
+      return;
     }
-
     const payload = this.transferForm.value;
-
     this.productService.transferProductStock(productId, payload).subscribe({
       next: () => {
         this.messageService.showSuccess('Transfer initiated successfully');

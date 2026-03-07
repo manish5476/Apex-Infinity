@@ -25,20 +25,7 @@ import { ChipsComponent } from '../../../shared/components/chips.component';
 @Component({
   selector: 'app-product-form',
   standalone: true,
-  imports: [
-    CommonModule, 
-    ReactiveFormsModule,
-    RouterModule,
-    ButtonModule,
-    ToggleButtonModule,
-    InputTextModule,
-    InputNumberModule,
-    CheckboxModule,
-    TextareaModule,
-    SelectModule,
-    DividerModule,
-    ChipsComponent
-  ],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, ButtonModule, ToggleButtonModule, InputTextModule, InputNumberModule, CheckboxModule, TextareaModule, SelectModule, DividerModule, ChipsComponent],
   templateUrl: './product-form.html',
   styleUrls: ['./product-form.scss']
 })
@@ -51,14 +38,10 @@ export class ProductFormComponent implements OnInit {
   private messageService = inject(AppMessageService);
   private loadingService = inject(LoadingService);
   public masterList = inject(MasterListService);
-
-  // State
   productForm!: FormGroup;
   isSubmitting = signal(false);
   editMode = signal(false);
   productId = signal<string | null>(null);
-  
-  // Computed
   formTitle = computed(() => this.editMode() ? 'Edit Product' : 'New Product Entry');
   branchOptions = computed(() => this.masterList.branches());
 
@@ -67,13 +50,10 @@ export class ProductFormComponent implements OnInit {
     this.initDataFetch();
   }
 
-  // ... (Rest of your Logic remains largely the same, it was already solid)
-  // Just ensure get inventory() returns FormArray properly typed
   get inventory(): FormArray {
     return this.productForm.get('inventory') as FormArray;
   }
-  
-  // ... buildForm, patchForm, submit logic ...
+
   private buildForm(): void {
     this.productForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
@@ -94,54 +74,24 @@ export class ProductFormComponent implements OnInit {
     });
   }
 
-  // ... Data Fetching logic ...
-  private initDataFetch(): void {
-    this.route.paramMap.pipe(
-      switchMap(params => {
-        const id = params.get('id');
-        if (id) {
-          this.productId.set(id);
-          this.editMode.set(true);
-          return this.productService.getProductById(id);
-        }
-        return of(null);
-      }),
-      finalize(() => this.loadingService.hide())
-    ).subscribe({
-      next: (response) => {
-        const productData = response?.data?.data || response?.data || response;
-        if (productData && this.editMode()) {
-          this.patchForm(productData);
-        }
-      },
-      error: (err) => {
-        this.messageService.showError('Fetch Error', 'Could not load product details');
-      }
-    });
-  }
-  
+
   private patchForm(product: any): void {
-     // ... Your existing patch logic ...
-     this.productForm.patchValue({
-         // ... simple fields
-         name: product.name,
-         sku: product.sku,
-         description: product.description,
-         sellingPrice: product.sellingPrice,
-         purchasePrice: product.purchasePrice,
-         taxRate: product.taxRate,
-         isTaxInclusive: product.isTaxInclusive,
-         tags: product.tags,
-         isActive: product.isActive,
-         // ... object ID fields
-         departmentId: product.departmentId?._id || product.departmentId,
-         categoryId: product.categoryId?._id || product.categoryId,
-         brandId: product.brandId?._id || product.brandId,
-         unitId: product.unitId?._id || product.unitId,
-         defaultSupplierId: product.defaultSupplierId?._id || product.defaultSupplierId,
-     });
-     
-     // Handle Inventory patch if needed (though usually we don't patch inventory in edit)
+    this.productForm.patchValue({
+      name: product.name,
+      sku: product.sku,
+      description: product.description,
+      sellingPrice: product.sellingPrice,
+      purchasePrice: product.purchasePrice,
+      taxRate: product.taxRate,
+      isTaxInclusive: product.isTaxInclusive,
+      tags: product.tags,
+      isActive: product.isActive,
+      departmentId: product.departmentId?._id || product.departmentId,
+      categoryId: product.categoryId?._id || product.categoryId,
+      brandId: product.brandId?._id || product.brandId,
+      unitId: product.unitId?._id || product.unitId,
+      defaultSupplierId: product.defaultSupplierId?._id || product.defaultSupplierId,
+    });
   }
 
   addInventoryItem(): void {
@@ -155,17 +105,52 @@ export class ProductFormComponent implements OnInit {
   removeInventoryItem(index: number): void {
     this.inventory.removeAt(index);
   }
+private initDataFetch(): void {
+    this.route.paramMap.pipe(
+      switchMap(params => {
+        const id = params.get('id');
+        if (id) {
+          this.productId.set(id);
+          this.editMode.set(true);
+          
+          // Attach finalize to the inner HTTP request which actually completes
+          return this.productService.getProductById(id).pipe(
+            finalize(() => this.loadingService.hide())
+          );
+        }
+        
+        // Ensure spinner hides if navigating directly to "Create New"
+        this.loadingService.hide();
+        return of(null);
+      })
+    ).subscribe({
+      next: (response) => {
+        if (!response) return; // Exit early if in create mode
 
+        const productData = response?.data?.data || response?.data || response;
+        if (productData && this.editMode()) {
+          this.patchForm(productData);
+        }
+      },
+      error: (err) => {
+        // Fallback safety to hide loading if the stream breaks entirely
+        this.loadingService.hide();
+        
+        // Routed to your global HTTP error handler
+        this.messageService.handleHttpError(err);
+      }
+    });
+  }
+   
   onSubmit(): void {
     if (this.productForm.invalid) {
       this.productForm.markAllAsTouched();
+      this.messageService.showWarn('Validation Error: Please check all required fields.');
       return;
     }
 
     this.isSubmitting.set(true);
     const rawData = this.productForm.getRawValue();
-
-    // Remove inventory from payload if editing
     const payload = { ...rawData };
     if (this.editMode()) {
       delete payload.inventory;
@@ -175,14 +160,18 @@ export class ProductFormComponent implements OnInit {
       ? this.productService.updateProduct(this.productId()!, payload)
       : this.productService.createProduct(payload);
 
-    request.pipe(finalize(() => this.isSubmitting.set(false))).subscribe({
+    request.pipe(
+      finalize(() => this.isSubmitting.set(false))
+    ).subscribe({
       next: () => {
-        this.messageService.showSuccess('Success', `Product ${this.editMode() ? 'updated' : 'created'} successfully`);
+        this.messageService.showSuccess(`Product ${this.editMode() ? 'updated' : 'created'} successfully.`);
         this.router.navigate(['/inventory/products']);
       },
       error: (err) => {
-        this.messageService.showError('Error', err.error?.message || 'Operation failed');
+        // Routed to global HTTP error handler
+        this.messageService.handleHttpError(err);
       }
     });
   }
+
 }

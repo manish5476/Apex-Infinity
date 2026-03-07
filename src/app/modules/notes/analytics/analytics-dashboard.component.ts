@@ -1,6 +1,7 @@
-import { Component, inject, signal, OnInit, ViewEncapsulation, ElementRef, ViewChild, computed } from '@angular/core';
+import { Component, inject, signal, OnInit, ViewEncapsulation, ElementRef, ViewChild, computed, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NoteService } from '../../../core/services/notes.service'; // Adjust path if needed
+import { AppMessageService } from '../../../core/services/message.service';
 
 @Component({
   selector: 'app-analytics-dashboard',
@@ -10,13 +11,11 @@ import { NoteService } from '../../../core/services/notes.service'; // Adjust pa
   template: `
     <div class="analytics-container custom-scrollbar">
       
-      <!-- Header -->
       <header class="analytics-header">
         <h1>Workspace Analytics</h1>
         <p>Insights into your team's productivity and knowledge network.</p>
       </header>
 
-      <!-- 1. Key Statistics Cards -->
       <section class="stats-grid">
         <div class="stat-card">
           <div class="icon-box blue"><i class="pi pi-file"></i></div>
@@ -48,7 +47,6 @@ import { NoteService } from '../../../core/services/notes.service'; // Adjust pa
         </div>
       </section>
 
-      <!-- 2. Heatmap Section -->
       <section class="chart-section glass-panel">
         <div class="section-header">
           <h3>Activity Heatmap</h3>
@@ -77,7 +75,6 @@ import { NoteService } from '../../../core/services/notes.service'; // Adjust pa
         </div>
       </section>
 
-      <!-- 3. Knowledge Graph Section -->
       <section class="chart-section glass-panel">
         <div class="section-header">
           <h3>Knowledge Graph</h3>
@@ -92,7 +89,7 @@ import { NoteService } from '../../../core/services/notes.service'; // Adjust pa
           }
           
           <svg class="network-svg" [attr.viewBox]="viewBox()">
-            <!-- Links -->
+    
             <g class="links">
               @for (link of graphData().links; track $index) {
                 <line [attr.x1]="link.source.x" [attr.y1]="link.source.y"
@@ -102,7 +99,7 @@ import { NoteService } from '../../../core/services/notes.service'; // Adjust pa
               }
             </g>
             
-            <!-- Nodes -->
+    
             <g class="nodes">
               @for (node of graphData().nodes; track node.id) {
                 <g class="node" [attr.transform]="'translate(' + node.x + ',' + node.y + ')'">
@@ -250,18 +247,16 @@ import { NoteService } from '../../../core/services/notes.service'; // Adjust pa
 })
 export class AnalyticsDashboardComponent implements OnInit {
   noteService = inject(NoteService);
-  
-  // Signals for Data
+  messageService = inject(AppMessageService);
   stats = signal<any>(null);
   heatmapData = signal<any[]>([]);
-  graphData = signal<{nodes: any[], links: any[]}>({ nodes: [], links: [] });
+  graphData = signal<{ nodes: any[], links: any[] }>({ nodes: [], links: [] });
   isGraphLoading = signal(false);
-
   viewBox = signal('0 0 800 400');
-  
-  // Dimensions for "Virtual" Graph
   width = 800;
   height = 400;
+  
+  constructor(private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.loadStats();
@@ -270,8 +265,14 @@ export class AnalyticsDashboardComponent implements OnInit {
   }
 
   loadStats() {
-    this.noteService.getNoteStatistics().subscribe(res => {
-      this.stats.set(res.data);
+    this.noteService.getNoteStatistics().subscribe({
+      next: (res) => {
+        this.stats.set(res.data);
+      },
+      error: (err) => {
+        // Handled silently or with a toast depending on how critical these stats are
+        this.messageService.handleHttpError(err);
+      }
     });
   }
 
@@ -279,30 +280,30 @@ export class AnalyticsDashboardComponent implements OnInit {
     this.isGraphLoading.set(true);
     this.noteService.getKnowledgeGraph().subscribe({
       next: (res) => {
-        // Map raw API nodes to visual nodes with coordinates
         const rawNodes = res.data.nodes || [];
         const rawLinks = res.data.links || [];
 
-        // 1. Assign random positions (simple distribution)
         const nodes = rawNodes.map((n: any) => ({
           ...n,
           x: Math.random() * (this.width - 100) + 50,
           y: Math.random() * (this.height - 100) + 50
         }));
 
-        // 2. Resolve Links (Connect objects, not just IDs)
         const links = rawLinks.map((l: any) => {
           const source = nodes.find((n: any) => n.id === l.source);
           const target = nodes.find((n: any) => n.id === l.target);
           return (source && target) ? { source, target } : null;
-        }).filter(Boolean); // Remove broken links
+        }).filter(Boolean);
 
         this.graphData.set({ nodes, links });
         this.isGraphLoading.set(false);
+        this.cdr.markForCheck();
       },
       error: (err) => {
-        console.error(err);
         this.isGraphLoading.set(false);
+        // Uses the global handler to show exactly why the graph failed to load
+        this.messageService.handleHttpError(err);
+        this.cdr.markForCheck();
       }
     });
   }
@@ -312,14 +313,13 @@ export class AnalyticsDashboardComponent implements OnInit {
       next: (res: any) => {
         const heatMap = res.data?.heatMap || {};
         const grid = [];
-        
-        // Setup Grid: 53 weeks (approx 1 year), aligned to start on a Sunday
+
         const today = new Date();
         const startDate = new Date(today);
         startDate.setDate(today.getDate() - 365);
-        const dayOfWeek = startDate.getDay(); // 0 is Sunday
-        startDate.setDate(startDate.getDate() - dayOfWeek); // Align to previous Sunday
-        
+        const dayOfWeek = startDate.getDay();
+        startDate.setDate(startDate.getDate() - dayOfWeek);
+
         let itrDate = new Date(startDate);
 
         for (let w = 0; w < 53; w++) {
@@ -327,10 +327,9 @@ export class AnalyticsDashboardComponent implements OnInit {
           for (let d = 0; d < 7; d++) {
             const dateStr = this.formatDate(itrDate);
             const entry = heatMap[dateStr];
-            
+
             let level = 0;
             if (entry) {
-              // Map intensity (0.0 - 1.0) to levels (1-4)
               if (entry.intensity > 0) level = 1;
               if (entry.intensity >= 0.25) level = 2;
               if (entry.intensity >= 0.5) level = 3;
@@ -342,20 +341,23 @@ export class AnalyticsDashboardComponent implements OnInit {
               count: entry ? entry.count : 0,
               level: level
             });
-            
-            // Next day
+
             itrDate.setDate(itrDate.getDate() + 1);
           }
           grid.push(week);
         }
-        
+
         this.heatmapData.set(grid);
+        this.cdr.markForCheck();
       },
       error: (err) => {
-        console.error('Failed to load heatmap data', err);
+        // Replaced console.error with global user feedback
+        this.messageService.handleHttpError(err);
+        this.cdr.markForCheck();
       }
     });
   }
+
 
   private formatDate(date: Date): string {
     const y = date.getFullYear();
@@ -396,14 +398,12 @@ export class AnalyticsDashboardComponent implements OnInit {
     return item ? item.count : 0;
   }
 
-  // --- Visual Helpers ---
-
   heatmapGrid() {
     return this.heatmapData();
   }
 
   getNodeColor(type: string) {
-    switch(type) {
+    switch (type) {
       case 'meeting': return '#3b82f6'; // Blue
       case 'task': return '#10b981';    // Green
       case 'note': return '#f59e0b';    // Orange

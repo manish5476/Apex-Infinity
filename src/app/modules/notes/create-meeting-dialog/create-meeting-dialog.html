@@ -1,103 +1,132 @@
-<div class="dialog-container">
-  
-  <div class="dialog-header">
-    <h3>Schedule Meeting</h3>
-    <button class="btn-close" (click)="close()">×</button>
-  </div>
+ <div class="create-meeting-container">
+      <form [formGroup]="meetingForm" (ngSubmit)="onSubmit()" class="meeting-form">
+        
+        <!-- ==================== MAIN FORM GRID ==================== -->
+        <div class="form-section main-details">
+          
+          <!-- Title -->
+          <div class="field full-width">
+            <label for="title" class="required">Meeting Title</label>
+            <input pInputText id="title" formControlName="title" placeholder="e.g., Q4 Roadmap Planning" [class.ng-invalid]="isFieldInvalid('title')" />
+            @if (isFieldInvalid('title')) {
+              <small class="error-text">Title is required</small>
+            }
+          </div>
 
-  <form [formGroup]="meetingForm" (ngSubmit)="onSubmit()" class="dialog-body custom-scrollbar">
-    
-    <!-- Title -->
-    <div class="form-group">
-      <label>Title</label>
-      <input type="text" formControlName="title" placeholder="e.g., Weekly Sync" class="input-std" autofocus>
-    </div>
-
-    <!-- Date & Time -->
-    <div class="form-row">
-      <div class="form-group">
-        <label>Start Time</label>
-        <input type="datetime-local" formControlName="startTime" class="input-std">
-      </div>
-      <div class="form-group">
-        <label>End Time</label>
-        <input type="datetime-local" formControlName="endTime" class="input-std">
-      </div>
-    </div>
-    @if (meetingForm.errors?.['invalidRange'] && (meetingForm.touched || meetingForm.dirty)) {
-      <div class="error-msg">End time must be after start time.</div>
-    }
-
-    <!-- Location -->
-    <div class="form-group">
-      <label>Location</label>
-      <div class="location-toggle">
-        <label class="radio-label">
-          <input type="radio" formControlName="locationType" value="virtual">
-          <span class="radio-btn"><i class="pi pi-video"></i> Virtual</span>
-        </label>
-        <label class="radio-label">
-          <input type="radio" formControlName="locationType" value="in-person">
-          <span class="radio-btn"><i class="pi pi-map-marker"></i> In-Person</span>
-        </label>
-      </div>
-    </div>
-
-    @if (meetingForm.get('locationType')?.value === 'virtual') {
-      <div class="form-group slide-in">
-        <input type="text" formControlName="virtualLink" placeholder="Zoom/Meet Link" class="input-std">
-      </div>
-    } @else {
-      <div class="form-group slide-in">
-        <input type="text" formControlName="location" placeholder="Conference Room / Address" class="input-std">
-      </div>
-    }
-
-    <!-- Agenda -->
-    <div class="form-group">
-      <label>Agenda / Description</label>
-      <textarea formControlName="agenda" rows="3" class="input-std" placeholder="What is this meeting about?"></textarea>
-    </div>
-
-    <!-- Participants -->
-    <div class="form-group">
-      <label>Participants</label>
-      <div class="search-box">
-        <i class="pi pi-search"></i>
-        <input type="text" placeholder="Search users..." 
-               [value]="searchQuery()" 
-               (input)="searchQuery.set($any($event.target).value)">
-      </div>
-      
-      <div class="user-list custom-scrollbar">
-        @for (user of filteredUsers(); track user._id) {
-          <div class="user-item" (click)="toggleUser(user._id)" [class.selected]="isSelected(user._id)">
-            <div class="avatar">{{ getInitials(user.name) }}</div>
-            <div class="info">
-              <span class="name">{{ user.name }}</span>
-              <span class="email">{{ user['email'] }}</span>
+          <!-- Date & Time Row -->
+          <div class="form-row">
+            <div class="field">
+              <label for="startTime" class="required">Start Time</label>
+              <p-datepicker 
+                id="startTime" 
+                formControlName="startTime" 
+                [showTime]="true" 
+                [showIcon]="true"
+                hourFormat="12" 
+                appendTo="body"
+                placeholder="Select start"
+                styleClass="w-full">
+              </p-datepicker>
             </div>
-            <div class="checkbox">
-              <i class="pi pi-check"></i>
+            <div class="field">
+              <label for="endTime" class="required">End Time</label>
+              <p-datepicker 
+                id="endTime" 
+                formControlName="endTime" 
+                [showTime]="true" 
+                [showIcon]="true" 
+                hourFormat="12"
+                appendTo="body" 
+                placeholder="Select end"
+                styleClass="w-full">
+              </p-datepicker>
             </div>
           </div>
-        }
-        @if (filteredUsers().length === 0) {
-          <div class="empty-list">No users found</div>
-        }
-      </div>
-      <div class="selection-summary" *ngIf="(meetingForm.value.participants?.length || 0) > 0">
-        {{ meetingForm.value.participants?.length }} selected
-      </div>
+          @if (meetingForm.errors?.['invalidRange'] && (meetingForm.touched || meetingForm.dirty)) {
+            <small class="error-text">End time must be after start time</small>
+          }
+
+          <!-- Location Row -->
+          <div class="form-row">
+            <div class="field">
+              <label for="locationType">Location Type</label>
+              <p-select 
+                id="locationType"
+                [options]="locationOptions"
+                formControlName="locationType"
+                optionLabel="label"
+                optionValue="value"
+                styleClass="w-full"
+                appendTo="body">
+              </p-select>
+            </div>
+
+            <!-- Conditional: Virtual Link -->
+            @if (meetingForm.get('locationType')?.value === 'virtual') {
+              <div class="field">
+                <label for="virtualLink">Video Link</label>
+                <div class="p-input-icon-left w-full">
+                  <i class="pi pi-link"></i>
+                  <input pInputText id="virtualLink" formControlName="virtualLink" placeholder="Zoom/Meet URL" class="w-full" />
+                </div>
+              </div>
+            }
+
+            <!-- Conditional: Physical Location -->
+            @if (meetingForm.get('locationType')?.value === 'physical') {
+              <div class="field">
+                <label for="location">Room / Address</label>
+                <div class="p-input-icon-left w-full">
+                  <i class="pi pi-map-marker"></i>
+                  <input pInputText id="location" formControlName="location" placeholder="Conference Room A" class="w-full" />
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Agenda -->
+          <div class="field full-width">
+            <label for="agenda">Agenda / Description</label>
+            <textarea pTextarea id="agenda" formControlName="agenda" rows="3" placeholder="What are we discussing?" class="w-full"></textarea>
+          </div>
+        </div>
+
+        <!-- ==================== PARTICIPANTS SECTION ==================== -->
+        <div class="form-section participants-section">
+          <div class="section-header">
+            <label>Invite Participants ({{ selectedCount() }})</label>
+            <span class="p-input-icon-left search-box">
+              <i class="pi pi-search"></i>
+              <input type="text" pInputText [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" [ngModelOptions]="{standalone: true}" placeholder="Search users..." class="p-inputtext-sm" />
+            </span>
+          </div>
+
+          <div class="participants-list custom-scrollbar">
+            @for (user of filteredUsers(); track user._id) {
+              <div class="user-item" [class.selected]="isSelected(user._id)" (click)="toggleUser(user._id)">
+                <div class="avatar" [style.background-color]="getAvatarColor(user.name)">
+                  {{ getInitials(user.name) }}
+                </div>
+                <div class="user-info">
+                  <span class="name">{{ user.name }}</span>
+                  <span class="email">{{ user['email'] }}</span>
+                </div>
+                <div class="checkbox">
+                  <i class="pi" [class.pi-check-circle]="isSelected(user._id)" [class.pi-circle]="!isSelected(user._id)"></i>
+                </div>
+              </div>
+            }
+            @if (filteredUsers().length === 0) {
+              <div class="empty-search">No users found</div>
+            }
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="dialog-footer">
+          <p-button label="Cancel" styleClass="p-button-text p-button-secondary" (onClick)="close()"></p-button>
+          <p-button label="Schedule Meeting" icon="pi pi-calendar-plus" [loading]="isSubmitting()" type="submit"></p-button>
+        </div>
+
+      </form>
     </div>
-
-  </form>
-
-  <div class="dialog-footer">
-    <button class="btn-ghost" (click)="close()">Cancel</button>
-    <button class="btn-primary" (click)="onSubmit()" [disabled]="meetingForm.invalid || isSubmitting()">
-      <i class="pi" [ngClass]="isSubmitting() ? 'pi-spin pi-spinner' : 'pi-check'"></i>
-      {{ isSubmitting() ? 'Scheduling...' : 'Schedule Meeting' }}
-    </button>
-  </div>
-</div>

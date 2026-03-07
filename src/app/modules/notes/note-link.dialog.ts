@@ -1,10 +1,12 @@
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { catchError, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { Note } from '../../core/models/note.types';
 import { NoteService } from '../../core/services/notes.service';
+import { AppMessageService } from '../../core/services/message.service';
+import { of } from 'rxjs';
 
 
 @Component({
@@ -193,25 +195,36 @@ export class NoteLinkDialogComponent {
   ref = inject(DynamicDialogRef);
   config = inject(DynamicDialogConfig);
   noteService = inject(NoteService);
-
+  messageService = inject(AppMessageService);
+  private cdr = inject(ChangeDetectorRef); // Essential for OnPush/Manual state updates
   searchControl = new FormControl('');
   notes = signal<Note[]>([]);
   isLoading = false;
   
   sourceNoteId: string = '';
 
-  constructor() {
+ constructor() {
     this.sourceNoteId = this.config.data?.sourceNoteId;
+
     this.searchControl.valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged(),
       switchMap(query => {
         if (!query || query.length < 2) {
           this.notes.set([]);
-          return [];
+          return of({ data: { notes: [] } }); // Return empty observable to keep stream alive
         }
+        
         this.isLoading = true;
-        return this.noteService.searchNotes(query);
+        this.cdr.markForCheck(); // Ensure spinner shows up on OnPush components
+        
+        return this.noteService.searchNotes(query).pipe(
+          catchError((err) => {
+            this.isLoading = false;
+            this.messageService.handleHttpError(err);
+            return of({ data: { notes: [] } }); // Gracefully handle search failure
+          })
+        );
       })
     ).subscribe({
       next: (res: any) => {
@@ -219,8 +232,8 @@ export class NoteLinkDialogComponent {
         const filtered = (res.data?.notes || []).filter((n: Note) => n._id !== this.sourceNoteId);
         this.notes.set(filtered);
         this.isLoading = false;
-      },
-      error: () => this.isLoading = false
+        this.cdr.markForCheck();
+      }
     });
   }
 

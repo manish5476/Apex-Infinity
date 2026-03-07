@@ -98,7 +98,7 @@ export class MachineLogsComponent implements OnInit {
         this.data = res.data?.logs || res.data || [];
         this.cdr.markForCheck();
       },
-      error: () => this.messageService.showError('Error', 'Failed to fetch logs.')
+      error: (err) => this.messageService.handleHttpError(err)
     });
   }
 

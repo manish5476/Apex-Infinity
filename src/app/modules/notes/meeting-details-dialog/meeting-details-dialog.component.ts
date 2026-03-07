@@ -10,15 +10,7 @@ import { TooltipModule } from 'primeng/tooltip';
 @Component({
   selector: 'app-meeting-details-dialog',
   standalone: true,
-  imports: [
-    CommonModule,
-    ButtonModule,
-    TagModule,
-    TabsModule,
-    AvatarModule,
-    TooltipModule,
-    DatePipe
-  ],
+  imports: [CommonModule, ButtonModule, TagModule, TabsModule, AvatarModule, TooltipModule, DatePipe],
   encapsulation: ViewEncapsulation.None,
   template: `
     <div class="meeting-details-container">
@@ -303,7 +295,7 @@ import { TooltipModule } from 'primeng/tooltip';
 export class MeetingDetailsDialogComponent {
   config = inject(DynamicDialogConfig);
   ref = inject(DynamicDialogRef);
-  
+
   meeting = this.config.data;
   activeTab = 0;
 
@@ -312,7 +304,7 @@ export class MeetingDetailsDialogComponent {
   }
 
   openLink(url: string) {
-    if(url) window.open(url, '_blank');
+    if (url) window.open(url, '_blank');
   }
 
   // --- Helpers ---
@@ -325,7 +317,7 @@ export class MeetingDetailsDialogComponent {
   }
 
   getStatusSeverity(status: string) {
-    switch(status) {
+    switch (status) {
       case 'confirmed': case 'completed': return 'success';
       case 'cancelled': return 'danger';
       case 'in-progress': return 'info';
@@ -334,7 +326,7 @@ export class MeetingDetailsDialogComponent {
   }
 
   getLocationIcon(type: string): string {
-    switch(type) {
+    switch (type) {
       case 'virtual': return 'pi pi-video';
       case 'physical': return 'pi pi-map-marker';
       default: return 'pi pi-globe';
@@ -342,7 +334,7 @@ export class MeetingDetailsDialogComponent {
   }
 
   getRsvpIcon(status: string): string {
-    switch(status) {
+    switch (status) {
       case 'accepted': return 'pi pi-check';
       case 'declined': return 'pi pi-times';
       case 'tentative': return 'pi pi-question';

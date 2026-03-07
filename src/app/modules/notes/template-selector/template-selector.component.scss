@@ -1,0 +1,137 @@
+   :host {
+      display: block;
+      /* Using your existing theme tokens */
+      --bg-hover: var(--bg-ternary);
+      --accent: var(--accent-primary);
+      --border: var(--border-secondary);
+    }
+
+    .template-selector-container {
+      padding: 0.5rem;
+      font-family: var(--font-body);
+    }
+
+    .selector-header {
+      margin-bottom: 1.5rem;
+      p { color: var(--text-secondary); font-size: 0.9rem; margin: 0; }
+    }
+
+    /* Grid Layout */
+    .templates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      max-height: 400px;
+      overflow-y: auto;
+      padding-bottom: 1rem;
+    }
+
+    /* Card Styling */
+    .template-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--ui-border-radius-lg);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--accent);
+
+        .card-preview { background: var(--bg-hover); }
+        .hover-overlay { opacity: 1; }
+      }
+    }
+
+    /* Preview Area (Top) */
+    .card-preview {
+      height: 120px;
+      background: var(--bg-secondary);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+
+      /* Abstract Lines */
+      .mini-lines {
+        width: 60%;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        opacity: 0.5;
+        
+        .line { height: 4px; background: var(--text-tertiary); border-radius: 2px; width: 100%; }
+        .title { height: 6px; width: 70%; background: var(--text-secondary); margin-bottom: 4px; }
+        .short { width: 40%; }
+      }
+
+      /* Hover Button */
+      .hover-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.2s;
+        backdrop-filter: blur(1px);
+
+        .btn-use {
+          background: var(--accent);
+          color: white;
+          border: none;
+          padding: 6px 16px;
+          border-radius: 20px;
+          font-size: 0.8rem;
+          font-weight: 600;
+          cursor: pointer;
+          box-shadow: var(--shadow-md);
+        }
+      }
+    }
+
+    /* Meta Info (Bottom) */
+    .card-meta {
+      padding: 12px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+
+      .type-icon {
+        width: 32px; height: 32px;
+        border-radius: 8px;
+        background: var(--bg-ternary);
+        color: var(--text-secondary);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1rem;
+        
+        &.meeting { color: #3b82f6; background: #eff6ff; }
+        &.task { color: #10b981; background: #f0fdf4; }
+      }
+
+      .info {
+        flex: 1;
+        min-width: 0;
+        .title { font-size: 0.9rem; font-weight: 600; margin: 0 0 2px 0; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .date { font-size: 0.75rem; color: var(--text-tertiary); display: block; }
+      }
+    }
+
+    /* States */
+    .loading-state, .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-secondary);
+      
+      .icon-circle { width: 48px; height: 48px; background: var(--bg-ternary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto; i { font-size: 1.5rem; } }
+      h3 { margin: 0 0 0.5rem 0; color: var(--text-primary); }
+      p { margin: 0 0 1rem 0; font-size: 0.9rem; }
+      .btn-text { background: none; border: none; color: var(--accent); font-weight: 600; cursor: pointer; &:hover { text-decoration: underline; } }
+    }

@@ -58,20 +58,17 @@ export class App implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Auth subscription error:', err);
-        this.messageService.showError('Authentication Error', 'Failed to authenticate user session');
+        this.messageService.handleHttpError(err)
       }
     });
-
-    // Listen for force logout events
     this.socketService.forceLogout$.subscribe({
       next: (data) => {
         console.warn('Force logout received:', data.reason);
-        this.messageService.showError('Session Terminated', 'Your session has been terminated by an administrator');
+        this.messageService.showError('Your session has been terminated by an administrator');
         this.auth.logout(); // Trigger logout
       }
     });
 
-    // Listen for connection status
     this.socketService.connectionStatus$.subscribe({
       next: (status) => {
         if (status === 'disconnected') {
