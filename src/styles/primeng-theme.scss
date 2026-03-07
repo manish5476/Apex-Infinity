@@ -1424,7 +1424,7 @@
   background: var(--bg-primary);
   color: var(--text-primary);
   line-height: var(--line-height-relaxed);
-  
+  border-radius:var(--ui-border-radius-xl);
   // Scrollbar styling (if browser supports)
   scrollbar-width: thin;
   scrollbar-color: var(--scroll-thumb) var(--scroll-track);

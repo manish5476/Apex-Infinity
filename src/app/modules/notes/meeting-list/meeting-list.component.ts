@@ -225,7 +225,6 @@ export class MeetingListComponent {
 
     ref.onClose.subscribe((meeting: Meeting) => {
       if (meeting) {
-        // Feedback for successful creation from the dialog
         this.messageService.showSuccess('Meeting scheduled successfully.');
         this.meetings.update(prev => [...prev, meeting]);
         this.activeFilter.set('upcoming');

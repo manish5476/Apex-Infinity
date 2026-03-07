@@ -2,7 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/app",
-    "rootDir": "src", // 👈 Add this line to explicitly set the source root
+    "rootDir": "src",
     "types": [
       "node"
     ]

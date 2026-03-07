@@ -28,7 +28,7 @@ import { AppMessageService } from '../../../core/services/message.service';
     CheckboxModule
   ],
   encapsulation: ViewEncapsulation.None,
-  template: './create-meeting-dialog.html',
+  templateUrl: './create-meeting-dialog.html',
   styleUrl:'./create-meeting-dialog.scss'
 })
 export class CreateMeetingDialogComponent {
