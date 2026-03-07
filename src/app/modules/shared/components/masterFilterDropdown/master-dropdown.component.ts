@@ -75,9 +75,7 @@ export class MasterDropdownComponent implements OnInit, OnDestroy, ControlValueA
   @Input() searchField?: string;
   @Input() labelField?: string;
 
-  // 🟢 Correct usage of the modern inject() function
   private dropdownService = inject(MasterDropdownService);
-
   options: DropdownOption[] = [];
   loading: boolean = false;
   value: any = null;
@@ -128,7 +126,6 @@ export class MasterDropdownComponent implements OnInit, OnDestroy, ControlValueA
           this.options = newData;
         } else {
           const existingIds = new Set(this.options.map(o => o.value));
-          // 🟢 Strict Typing: Changed (item:any) to (item: DropdownOption)
           const uniqueNewData = newData.filter((item: DropdownOption) => !existingIds.has(item.value));
           this.options = [...this.options, ...uniqueNewData];
         }

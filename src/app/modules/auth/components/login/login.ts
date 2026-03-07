@@ -45,7 +45,7 @@ export class Login implements OnInit {
   errorMessage = signal<string | null>(null);
 
   filteredEmails: string[] = [];
-  emailDomains: string[] = ['gmail.com', 'outlook.com', '@proton.me', '@protonmail.me', 'yahoo.com', 'icloud.com', 'hotmail.com'];
+  emailDomains: string[] = ['gmail.com', 'outlook.com', 'proton.me', 'protonmail.me', 'yahoo.com', 'icloud.com', 'hotmail.com'];
   loginForm!: FormGroup;
   returnUrl: string = '/dashboard';
 

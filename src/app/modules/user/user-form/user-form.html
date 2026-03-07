@@ -1,11 +1,11 @@
     <p-toast></p-toast>
     
-    <!-- Full Screen Layout -->
+    
     <div class="app-layout">
         
         <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="form-structure">
           
-          <!-- HEADER (Fixed Top) -->
+          
           <div class="form-header">
             <div class="header-content">
               <div class="title-section">
@@ -28,12 +28,12 @@
             </div>
           </div>
 
-          <!-- BODY (Scrollable) -->
+          
           <div class="form-body custom-scrollbar">
             
             <div class="content-container">
             
-                <!-- 1. IDENTITY & ACCESS -->
+                
                 <div class="section-panel">
                 <div class="section-header">
                     <h3>Identity & Access</h3>
@@ -56,13 +56,13 @@
                       <input pInputText formControlName="phone" placeholder="+91 98765 43210" class="full-width" />
                     </div>
 
-                    <!-- 🟢 LIVE DATA: Roles -->
+                    
                     <div class="field-group">
                       <label>Role <span class="req">*</span></label>
                       <app-master-dropdown endpoint="roles" formControlName="role" placeholder="Select Role"></app-master-dropdown>
                     </div>
 
-                    <!-- 🟢 LIVE DATA: Branches -->
+                    
                     <div class="field-group">
                       <label>Branch</label>
                       <app-master-dropdown endpoint="branches" formControlName="branchId" placeholder="Global / HQ"></app-master-dropdown>
@@ -73,7 +73,7 @@
                       <p-select [options]="userStatuses()" formControlName="status" optionLabel="label" optionValue="value" styleClass="full-width"></p-select>
                     </div>
 
-                    <!-- Highlighted Toggle for Login Access -->
+                    
                     <div class="control-item highlight">
                       <div class="control-info">
                           <span class="control-label">Login Access</span>
@@ -84,7 +84,7 @@
                 </div>
                 </div>
 
-                <!-- 2. EMPLOYMENT DETAILS -->
+                
                 <div class="section-panel" formGroupName="employeeProfile">
                 <div class="section-header">
                     <h3>Employment Profile</h3>
@@ -102,19 +102,19 @@
                       <p-select [options]="employmentTypes()" formControlName="employmentType" optionLabel="label" optionValue="value" styleClass="full-width"></p-select>
                     </div>
 
-                    <!-- 🟢 LIVE DATA: Departments -->
+                    
                     <div class="field-group">
                       <label>Department</label>
                       <app-master-dropdown endpoint="departments" formControlName="departmentId" placeholder="Select Dept"></app-master-dropdown>
                     </div>
 
-                    <!-- 🟢 LIVE DATA: Designations -->
+                    
                     <div class="field-group">
                       <label>Designation</label>
                       <app-master-dropdown endpoint="designations" formControlName="designationId" placeholder="Select Designation"></app-master-dropdown>
                     </div>
 
-                    <!-- 🟢 LIVE DATA: Managers -->
+                    
                     <div class="field-group">
                       <label>Reporting Manager</label>
                       <app-master-dropdown endpoint="users" formControlName="reportingManagerId" placeholder="Select Manager"></app-master-dropdown>
@@ -143,9 +143,9 @@
 
                 <div class="divider"></div>
 
-                <!-- Nested Sub-Sections -->
+                
                 <div class="split-grid">
-                    <!-- Bank Info -->
+                    
                     <div formGroupName="bankDetails" class="sub-panel">
                     <h4 class="sub-header"><i class="pi pi-wallet"></i> Bank & Statutory</h4>
                     <div class="form-grid-compact">
@@ -168,7 +168,7 @@
                     </div>
                     </div>
 
-                    <!-- Guarantor Info -->
+                    
                     <div class="sub-panel">
                     <div formGroupName="guarantorDetails">
                         <h4 class="sub-header"><i class="pi pi-shield"></i> Emergency Contact</h4>
@@ -187,7 +187,7 @@
                         </div>
                         </div>
                     </div>
-                    <!-- UPI ID is outside guarantor group -->
+                    
                     <div class="field-group mt-4">
                         <label>UPI ID (Reimbursement)</label>
                         <input pInputText [formControl]="$any(userForm.get('upiId'))" placeholder="user@upi" class="full-width" />
@@ -196,7 +196,7 @@
                 </div>
                 </div>
 
-                <!-- 3. ATTENDANCE CONFIGURATION -->
+                
                 <div class="section-panel" formGroupName="attendanceConfig">
                 <div class="section-header-row">
                     <div>
@@ -213,7 +213,7 @@
                     <div class="form-grid mb-6">
                       <div class="field-group">
                           <label>Assigned Shift <span class="req">*</span></label>
-                          <!-- 🟢 LIVE DATA: Shifts -->
+                          
                           <app-master-dropdown endpoint="shifts" formControlName="shiftId" placeholder="Select Shift"></app-master-dropdown>
                       </div>
                       <div class="field-group">
@@ -222,7 +222,7 @@
                       </div>
                       <div class="field-group">
                           <label>GeoFence Zone</label>
-                          <!-- 🟢 LIVE DATA: GeoFences (Assuming 'masters' endpoint) -->
+                          
                           <app-master-dropdown endpoint="geofencing" formControlName="geoFenceId" placeholder="Select Zone"></app-master-dropdown>
                       </div>
                       <div class="field-group">
@@ -231,7 +231,7 @@
                       </div>
                     </div>
 
-                    <!-- Toggle Grid -->
+                    
                     <div class="toggle-grid">
                       <div class="control-item">
                           <span class="control-label">Web Punch</span>
@@ -253,7 +253,7 @@
                 </div>
                 </div>
 
-                <!-- 4. SECURITY -->
+                
                 <div class="section-panel">
                 <div class="section-header-row">
                     <div>
@@ -275,8 +275,8 @@
                 </div>
                 </div>
             
-            </div> <!-- End Content Container -->
-          </div> <!-- End Body -->
+            </div> 
+          </div> 
 
         </form>
     </div>

@@ -165,7 +165,7 @@ private initDataFetch(): void {
     ).subscribe({
       next: () => {
         this.messageService.showSuccess(`Product ${this.editMode() ? 'updated' : 'created'} successfully.`);
-        this.router.navigate(['/inventory/products']);
+        this.router.navigate(['/product']);
       },
       error: (err) => {
         // Routed to global HTTP error handler

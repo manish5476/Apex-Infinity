@@ -56,24 +56,47 @@ export class CreateOrganizationComponent implements OnInit {
   }
 
   private initForm(): void {
-    this.organizationForm = this.fb.group({
-      organizationName: ['', [Validators.required, Validators.minLength(3)]],
-      uniqueShopId: ['', [Validators.required, Validators.pattern(/^[A-Z0-9-]+$/), Validators.minLength(3)]],
-      primaryEmail: ['', [Validators.required, Validators.email]],
-      primaryPhone: ['', [Validators.required, Validators.pattern(/^[0-9+\-\s]+$/)]],
-      gstNumber: ['', [Validators.pattern(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/)]],
-      mainBranchName: ['Head Office', [Validators.required]],
-      mainBranchAddress: this.fb.group({
-        street: ['', Validators.required],
-        city: ['', Validators.required],
-        state: ['', Validators.required],
-        zipCode: ['', Validators.required],
-      }),
-      ownerName: ['', [Validators.required]],
-      ownerEmail: ['', [Validators.required, Validators.email]],
-      ownerPassword: ['', [Validators.required, Validators.minLength(8)]]
-    });
-  }
+  this.organizationForm = this.fb.group({
+    organizationName: ['', [Validators.required, Validators.minLength(3)]],
+    // FIX 1: Add lowercase 'a-z' to the pattern
+    uniqueShopId: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9-]+$/), Validators.minLength(3)]],
+    primaryEmail: ['', [Validators.required, Validators.email]],
+    primaryPhone: ['', [Validators.required, Validators.pattern(/^[0-9+\-\s]+$/)]],
+    // FIX 2:  the 'i' flag at the end of the regex to make it case-insensitive
+    gstNumber: ['', [Validators.pattern(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i)]],
+    mainBranchName: ['Head Office', [Validators.required]],
+    mainBranchAddress: this.fb.group({
+      street: ['', Validators.required],
+      city: ['', Validators.required],
+      state: ['', Validators.required],
+      zipCode: ['', Validators.required],
+    }),
+    ownerName: ['', [Validators.required]],
+    ownerEmail: ['', [Validators.required, Validators.email]],
+    // NOTE: Keep in mind this requires exactly 8 or more characters!
+    ownerPassword: ['', [Validators.required, Validators.minLength(8)]]
+  });
+}
+
+  // private initForm(): void {
+  //   this.organizationForm = this.fb.group({
+  //     organizationName: ['', [Validators.required, Validators.minLength(3)]],
+  //     uniqueShopId: ['', [Validators.required, Validators.pattern(/^[A-Z0-9-]+$/), Validators.minLength(3)]],
+  //     primaryEmail: ['', [Validators.required, Validators.email]],
+  //     primaryPhone: ['', [Validators.required, Validators.pattern(/^[0-9+\-\s]+$/)]],
+  //     gstNumber: ['', [Validators.pattern(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/)]],
+  //     mainBranchName: ['Head Office', [Validators.required]],
+  //     mainBranchAddress: this.fb.group({
+  //       street: ['', Validators.required],
+  //       city: ['', Validators.required],
+  //       state: ['', Validators.required],
+  //       zipCode: ['', Validators.required],
+  //     }),
+  //     ownerName: ['', [Validators.required]],
+  //     ownerEmail: ['', [Validators.required, Validators.email]],
+  //     ownerPassword: ['', [Validators.required, Validators.minLength(8)]]
+  //   });
+  // }
 
   get f() { return this.organizationForm.controls; }
   get branch() { return (this.organizationForm.get('mainBranchAddress') as FormGroup).controls; }
@@ -122,6 +145,9 @@ export class CreateOrganizationComponent implements OnInit {
     this.passwordVisible.update(v => !v);
   }
 }
+
+
+
 // export class CreateOrganizationComponent implements OnInit {
 //   // --- Dependencies ---
 //   private fb = inject(FormBuilder);
