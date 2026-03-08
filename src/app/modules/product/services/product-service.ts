@@ -36,10 +36,10 @@ export class ProductService extends BaseApiService {
     return this.get(`${this.endpoint}/${id}`, {}, 'getProductById');
   }
 
-  scanProduct(code: string, branchId: string) {
-    return this.http.post<any>(`${this.endpoint}/scan`, { code, branchId });
+  scanProduct(code: string, branchId: string): Observable<any> {
+    return this.post(`${this.endpoint}/scan`, { code, branchId }, 'scanProduct');
   }
-
+  
   searchProducts(query: any): Observable<any> {
     return this.get(`${this.endpoint}/search`, query, 'searchProducts');
   }

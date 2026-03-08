@@ -168,37 +168,28 @@ export class CustomerForm implements OnInit {
     delete formValue.avatar;
 
     if (this.editMode()) {
-      // --- UPDATE FLOW ---
       this.handleUpdate(this.customerId()!, formValue, avatarFile);
     } else {
-      // --- CREATE FLOW (2-Step) ---
       this.handleCreate(formValue, avatarFile);
     }
   }
-
-  // Helper for Create Logic
   private handleCreate(jsonData: any, file: File | null) {
     this.customerService.createNewCustomer(jsonData).pipe(
       switchMap((response: any) => {
-        // Step 1 Success: We have the new ID
         const newCustomerId = response.data.customer._id;
-
-        // Step 2: Check if we need to upload an avatar
         if (file && file instanceof File) {
           return this.customerService.uploadCustomerPhoto(newCustomerId, file);
         } else {
-          // No file? Return the original response to finish the chain
           return of(response);
         }
       })
     ).subscribe({
       next: (res) => {
-        // Simplified to a clean single string
-        this.messageService.showSuccess('Customer created successfully.');
+        this.messageService.showSuccess(res.message);
         this.finishSubmit();
       },
       error: (err) => {
-        this.handleError(err);
+        this.messageService.handleHttpError(err);
       }
     });
   }

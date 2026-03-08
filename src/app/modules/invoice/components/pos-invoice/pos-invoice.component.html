@@ -1,134 +1,278 @@
+<p-toast></p-toast>
+<p-confirmDialog [style]="{width: '400px'}" rejectButtonStyleClass="p-button-text"></p-confirmDialog>
 
-<!-- <p-toast></p-toast>
-<p-confirmDialog [style]="{width: '400px'}"></p-confirmDialog>
+<div class="page-layout">
+  <form [formGroup]="invoiceForm" class="invoice-container">
 
-<div class="page-layout pos-layout">
-  <form [formGroup]="invoiceForm" class="invoice-container glass-panel">
-    
     <header class="invoice-header">
-      <div class="header-left gap-4">
-        <button pButton icon="pi pi-arrow-left" class="p-button-rounded p-button-secondary p-button-text" routerLink="/invoices"></button>
-        <div class="flex flex-col">
-          <h1 class="text-2xl font-bold text-primary">{{ formTitle() }}</h1>
-          <span class="text-sm text-gray-500">{{ invoiceForm.get('invoiceDate')?.value | date:'medium' }}</span>
+      <div class="header-left">
+        <button type="button" pButton icon="pi pi-arrow-left" class="back-btn" routerLink="/invoices"></button>
+        <div class="header-titles">
+          <div class="flex items-center gap-3">
+            <h1>{{ formTitle() }}</h1>
+            @if (editMode()) {
+            <span class="status-badge"
+              [ngClass]="invoiceForm.get('status')?.value === 'paid' ? 'status-success' : 'status-warn'">
+              {{ invoiceForm.get('status')?.value }}
+            </span>
+            }
+          </div>
+          <div class="meta-row">
+            <span class="meta-item">
+              <i class="pi pi-calendar"></i> {{ invoiceForm.get('invoiceDate')?.value | date:'mediumDate' }}
+            </span>
+            <span class="divider">•</span>
+            <span class="meta-item">{{ editMode() ? 'Revision Mode' : 'New Draft' }}</span>
+          </div>
         </div>
       </div>
-      
-      <div class="header-right flex gap-3">
-        <p-select formControlName="branchId" [options]="branchOptions()" optionLabel="name" optionValue="_id" placeholder="Select Branch" styleClass="w-48"></p-select>
-        <p-select formControlName="customerId" [options]="customerOptions()" optionLabel="name" optionValue="_id" [filter]="true" filterBy="name" placeholder="Walk-in Customer" styleClass="w-48"></p-select>
+      <div class="header-right">
+        <div class="value-box">
+          <span class="value-label">Grand Total</span>
+          <span class="value-amount">{{ grandTotal() | currency:'INR' }}</span>
+        </div>
       </div>
     </header>
 
-    <div class="scanner-section my-3 px-4">
-      <div class="p-inputgroup w-full shadow-lg rounded-xl overflow-hidden">
-        <span class="p-inputgroup-addon bg-blue-900 text-white border-none px-4">
-          <i class="pi pi-barcode text-2xl"></i>
-        </span>
-        <input #scannerInput pInputText type="text" 
-               placeholder="Scan Barcode or SKU here... (Press Enter)" 
-               (keyup.enter)="onProductScan($event)" 
-               [disabled]="isScanning()"
-               class="scanner-input text-xl font-bold py-3 border-none bg-blue-50/50" />
-        <span class="p-inputgroup-addon border-none bg-blue-50/50" *ngIf="isScanning()">
-          <p-progressSpinner [style]="{width: '24px', height: '24px'}"></p-progressSpinner>
-        </span>
-      </div>
-    </div>
+    <div class="invoice-body custom-scrollbar">
 
-    <div class="invoice-body px-4 custom-scrollbar" style="min-height: 40vh;">
-      <div formArrayName="items" class="table-wrapper">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="border-b-2 border-orange-500 text-gray-600">
-              <th class="py-3 px-2 w-1/3">Item Details</th>
-              <th class="py-3 px-2 text-center w-1/6">Qty</th>
-              <th class="py-3 px-2 text-right w-1/6">Price</th>
-              <th class="py-3 px-2 text-right w-1/6">Tax %</th>
-              <th class="py-3 px-2 text-right w-1/6">Total</th>
-              <th class="py-3 px-2 w-12"></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (item of items.controls; track $index; let i = $index) {
-            <tr [formGroupName]="i" class="border-b border-gray-200 hover:bg-gray-50/50 transition-colors">
-              
-              <td class="py-3 px-2">
-                <div class="font-bold text-lg text-blue-900">{{ items.at(i).get('name')?.value }}</div>
-                <div class="text-xs text-gray-500 flex gap-2">
-                  <span class="bg-gray-200 px-2 py-1 rounded">SKU: {{ items.at(i).get('sku')?.value }}</span>
-                  <span class="text-orange-600 font-semibold px-2 py-1">Stock: {{ items.at(i).get('currentStock')?.value }}</span>
+      <section class="form-section">
+        <div class="form-grid">
+          <div class="form-group span-4">
+            <label>Customer <span class="required">*</span></label>
+            <p-select appendTo="body" formControlName="customerId" [options]="customerOptions()" optionLabel="name"
+              optionValue="_id" [filter]="true" filterBy="name" placeholder="Select Customer..."
+              (onChange)="onCustomerSelect($event)" styleClass="w-full theme-control">
+              <ng-template pTemplate="selectedItem" let-selected>
+                <div class="flex items-center gap-2" *ngIf="selected">
+                  <i class="pi pi-user text-primary"></i>
+                  <span class="font-bold">{{ selected.name }}</span>
                 </div>
-              </td>
-
-              <td class="py-2 px-2 text-center">
-                <p-inputNumber formControlName="quantity" [showButtons]="true" [min]="1" 
-                  [max]="items.at(i).get('currentStock')?.value"
-                  buttonLayout="horizontal" spinnerMode="horizontal"
-                  decrementButtonClass="p-button-secondary" incrementButtonClass="p-button-secondary"
-                  incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
-                  styleClass="w-full max-w-[120px]" inputStyleClass="text-center font-bold text-lg">
-                </p-inputNumber>
-              </td>
-
-              <td class="py-2 px-2">
-                <p-inputNumber formControlName="price" mode="decimal" [minFractionDigits]="2" styleClass="w-full" inputStyleClass="text-right"></p-inputNumber>
-              </td>
-
-              <td class="py-2 px-2 text-center text-gray-500 font-semibold">
-                {{ items.at(i).get('taxRate')?.value }}%
-              </td>
-
-              <td class="py-2 px-2 text-right font-bold text-xl text-blue-900">
-                {{ (((items.at(i).get('quantity')?.value || 0) * (items.at(i).get('price')?.value || 0)) - 
-                    (items.at(i).get('discount')?.value || 0)) * (1 + ((items.at(i).get('taxRate')?.value || 0) / 100)) | currency:'INR' }}
-              </td>
-
-              <td class="py-2 px-2 text-center">
-                <button pButton icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" (click)="removeItem(i)"></button>
-              </td>
-            </tr>
-            }
-          </tbody>
-        </table>
-
-        @if (items.controls.length === 0) {
-          <div class="text-center py-12 text-gray-400">
-            <i class="pi pi-shopping-cart text-6xl mb-4 opacity-50"></i>
-            <h3 class="text-xl">Cart is empty</h3>
-            <p>Scan a product to begin billing</p>
+              </ng-template>
+            </p-select>
           </div>
-        }
+          <div class="form-group span-2">
+            <label>Invoice #</label>
+            <input pInputText formControlName="invoiceNumber" placeholder="Auto-gen"
+              class="w-full theme-control font-mono" />
+          </div>
+          <div class="form-group span-2">
+            <label>Branch</label>
+            <p-select appendTo="body" formControlName="branchId" [options]="branchOptions()" optionLabel="name"
+              optionValue="_id" styleClass="w-full theme-control" placeholder="Select Branch"></p-select>
+          </div>
+          <div class="form-group span-2">
+            <label>Invoice Date</label>
+            <p-datepicker formControlName="invoiceDate" dateFormat="dd/mm/yy" styleClass="w-full theme-control"
+              [showIcon]="true"></p-datepicker>
+          </div>
+          <div class="form-group span-2">
+            <label>Due Date</label>
+            <p-datepicker formControlName="dueDate" dateFormat="dd/mm/yy" styleClass="w-full theme-control"
+              [showIcon]="true"></p-datepicker>
+          </div>
+        </div>
+      </section>
+
+      <section class="form-section p-0">
+
+        <div class="section-toolbar flex justify-content-between align-items-center flex-wrap gap-3">
+
+          <div class="flex items-center gap-4">
+            <span class="toolbar-title">Itemization</span>
+
+            <div class="p-selectbutton-wrapper flex gap-2 bg-gray-100 p-1 border-round">
+              <button pButton type="button" label="Scan" icon="pi pi-barcode"
+                [class]="selectionMode() === 'scan' ? 'p-button-sm p-button-primary' : 'p-button-sm p-button-text p-button-secondary'"
+                (click)="toggleSelectionMode('scan')"></button>
+              <button pButton type="button" label="Search" icon="pi pi-search"
+                [class]="selectionMode() === 'manual' ? 'p-button-sm p-button-primary' : 'p-button-sm p-button-text p-button-secondary'"
+                (click)="toggleSelectionMode('manual')"></button>
+            </div>
+          </div>
+
+          <div class="selection-input-container" style="min-width: 350px;">
+            @if (selectionMode() === 'scan') {
+            <div class="flex items-center gap-2">
+              <span class="p-input-icon-right w-full">
+                <i class="pi pi-spin pi-spinner" *ngIf="isScanning()"></i>
+                <input #scannerInput pInputText type="text" placeholder="Scan barcode... (Press Enter)"
+                  class="w-full theme-control font-mono border-primary" (keydown.enter)="onScan($event, scannerInput)"
+                  [autofocus]="true" />
+              </span>
+            </div>
+            } @else {
+            <div>
+              <p-select appendTo="body" [options]="productOptions()" [formControl]="manualSearchControl"
+                optionLabel="name" optionValue="_id" [filter]="true" filterBy="name,sku"
+                placeholder="Search Product by Name or SKU..." styleClass="w-full theme-control border-primary"
+                (onChange)="onManualProductSelect($event)">
+                <ng-template pTemplate="item" let-product>
+                  <div class="flex justify-content-between w-full">
+                    <span>{{ product.name }}</span>
+                    <span class="text-xs text-500 font-mono ml-3">{{ product.sku }}</span>
+                  </div>
+                </ng-template>
+              </p-select>
+            </div>
+            }
+          </div>
+        </div>
+
+        <div formArrayName="items" class="table-wrapper">
+          <table class="theme-table">
+            <thead>
+              <tr>
+                <th width="5%">#</th>
+                <th width="30%">Product / Service</th>
+                <th width="10%" class="text-center">Stock</th>
+                <th width="10%">Qty</th>
+                <th width="12%" class="text-right">Price</th>
+                <th width="10%" class="text-right">Disc</th>
+                <th width="10%" class="text-center">Tax %</th>
+                <th width="13%" class="text-right">Total</th>
+                <th width="5%"></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of items.controls; track $index; let i = $index) {
+              <tr [formGroupName]="i">
+                <td class="text-center index-col">{{ i + 1 }}</td>
+
+                <td>
+                  <div class="font-bold text-primary text-sm">{{ items.at(i).get('name')?.value }}</div>
+                  @if (items.at(i).get('hsnCode')?.value) {
+                  <div class="item-meta">HSN/SKU: {{ items.at(i).get('hsnCode')?.value }}</div>
+                  }
+                </td>
+
+                <td class="text-center align-middle">
+                  @if (items.at(i).get('isCheckingStock')?.value) {
+                  <i class="pi pi-spin pi-spinner text-primary"></i>
+                  } @else {
+                  <span class="stock-pill" [ngClass]="items.at(i).get('isLowStock')?.value ? 'stock-low' : 'stock-ok'">
+                    {{ items.at(i).get('currentStock')?.value }}
+                  </span>
+                  }
+                </td>
+
+                <td>
+                  <p-inputNumber formControlName="quantity" [min]="1"
+                    [max]="items.at(i).get('currentStock')?.value || 99999" styleClass="w-full table-input"
+                    inputStyleClass="text-center font-bold w-full"></p-inputNumber>
+                </td>
+
+                <td>
+                  <p-inputNumber formControlName="price" mode="decimal" [minFractionDigits]="2"
+                    styleClass="w-full table-input" inputStyleClass="text-right w-full"></p-inputNumber>
+                </td>
+
+                <td>
+                  <p-inputNumber formControlName="discount" mode="decimal" [minFractionDigits]="2"
+                    styleClass="w-full table-input" inputStyleClass="text-right text-danger w-full"></p-inputNumber>
+                </td>
+
+                <td>
+                  <p-inputNumber formControlName="taxRate" suffix="%" [min]="0" [max]="100"
+                    styleClass="w-full table-input" inputStyleClass="text-center text-primary w-full"></p-inputNumber>
+                </td>
+
+                <td class="text-right font-bold text-primary align-middle">
+                  {{ (((items.at(i).get('quantity')?.value || 0) * (items.at(i).get('price')?.value || 0)) -
+                  (items.at(i).get('discount')?.value || 0)) * (1 + ((items.at(i).get('taxRate')?.value || 0) / 100)) |
+                  currency:'INR' }}
+                </td>
+
+                <td class="text-center align-middle">
+                  <button pButton icon="pi pi-trash" class="p-button-text p-button-danger p-button-rounded p-button-sm"
+                    (click)="removeItem(i)"></button>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+
+          @if (items.controls.length === 0) {
+          <div class="empty-state">
+            <i class="pi pi-barcode text-400" style="font-size: 2.5rem;"></i>
+            <p class="mt-2 text-600">Scan a barcode or search to add items.</p>
+          </div>
+          }
+        </div>
+      </section>
+
+      <div class="footer-grid">
+        <div class="left-panel">
+          <div class="form-section">
+            <label>Notes & Terms</label>
+            <textarea pInputTextarea formControlName="notes" rows="3" class="w-full theme-control"
+              placeholder="Payment terms, delivery notes..."></textarea>
+          </div>
+          <div class="quick-pay-card">
+            <div class="icon-circle"><i class="pi pi-wallet"></i></div>
+            <div class="pay-inputs">
+              <label>Quick Payment Received</label>
+              <div class="input-row">
+                <p-inputNumber formControlName="paidAmount" mode="currency" currency="INR" locale="en-IN"
+                  placeholder="0.00" styleClass="w-full theme-control"></p-inputNumber>
+                <p-select appendTo="body" formControlName="paymentMethod" [options]="paymentMethodOptions"
+                  placeholder="Mode" styleClass="w-full theme-control"></p-select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="right-panel">
+          <div class="totals-card">
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <span class="val">{{ subTotal() | currency:'INR' }}</span>
+            </div>
+            <div class="summary-row">
+              <span>Discount</span>
+              <span class="val text-danger">- {{ totalDiscount() | currency:'INR' }}</span>
+            </div>
+            <div class="summary-row">
+              <span>Tax (GST)</span>
+              <span class="val text-success">+ {{ totalTax() | currency:'INR' }}</span>
+            </div>
+
+            <div class="summary-divider"></div>
+
+            <div class="summary-row grand-total-row">
+              <span>Grand Total</span>
+              <span class="val">{{ grandTotal() | currency:'INR' }}</span>
+            </div>
+
+            <div class="balance-row" [ngClass]="balanceAmount() > 0 ? 'bg-warn' : 'bg-success'">
+              <span>{{ balanceAmount() > 0 ? 'Balance Due' : 'Paid in Full' }}</span>
+              <span>{{ balanceAmount() | currency:'INR' }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <footer class="invoice-footer bg-gray-50 border-t border-gray-200 p-4 mt-auto rounded-b-xl flex justify-between items-end">
-      
-      <div class="quick-pay flex gap-3 w-1/3">
-        <div class="w-full">
-          <label class="text-sm font-bold text-gray-600 block mb-1">Payment Received</label>
-          <div class="p-inputgroup">
-            <p-inputNumber formControlName="paidAmount" mode="currency" currency="INR" styleClass="w-full" inputStyleClass="text-xl font-bold text-green-700"></p-inputNumber>
-            <p-select formControlName="paymentMethod" [options]="paymentMethodOptions" styleClass="w-32"></p-select>
-          </div>
-        </div>
+    <footer class="invoice-footer">
+      <div class="footer-info">
+        <i class="pi pi-info-circle"></i>
+        <span>Stock is deducted only upon "Issue".</span>
       </div>
+      <div class="footer-buttons">
+        <button pButton type="button" label="Cancel" class="p-button-text p-button-secondary"
+          routerLink="/invoices"></button>
 
-      <div class="totals flex gap-8 items-center">
-        <div class="text-right">
-          <div class="text-sm text-gray-500">Subtotal: {{ subTotal() | currency:'INR' }}</div>
-          <div class="text-sm text-green-600">Tax: +{{ totalTax() | currency:'INR' }}</div>
-        </div>
-        
-        <div class="grand-total bg-blue-900 text-white px-6 py-3 rounded-xl text-right">
-          <div class="text-sm opacity-80 uppercase tracking-wider">Amount Due</div>
-          <div class="text-4xl font-black text-orange-400">{{ balanceAmount() | currency:'INR' }}</div>
-        </div>
+        @if (!editMode() || invoiceForm.get('status')?.value === 'draft') {
+        <button pButton type="button" label="Save Draft" icon="pi pi-save" class="p-button-outlined theme-btn-secondary"
+          (click)="handleSubmit('draft')" [loading]="isSubmitting()"></button>
+        }
 
-        <button pButton label="Complete Sale (Enter)" icon="pi pi-check-circle" 
-          class="p-button-lg p-button-success shadow-lg h-full" 
-          (click)="handleSubmit('issued')" [loading]="isSubmitting()"></button>
+        <button pButton type="submit"
+          [label]="editMode() && invoiceForm.get('status')?.value !== 'draft' ? 'Update Invoice' : 'Issue Invoice'"
+          icon="pi pi-check" class="p-button-primary" (click)="handleSubmit('issued')"
+          [loading]="isSubmitting()"></button>
       </div>
     </footer>
+
   </form>
-</div>   -->
+</div>

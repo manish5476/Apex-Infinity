@@ -33,7 +33,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
         icon: 'pi pi-receipt',
         items: [
           { label: 'All Invoices', icon: 'pi pi-list', routerLink: ['/invoices'] },
-          { label: 'Create Invoice', icon: 'pi pi-plus', routerLink: ['/invoices/PosInvoiceComponent'] },
+          { label: 'Scan Invoice', icon: 'pi pi-plus', routerLink: ['/invoices/PosInvoiceComponent'] },
           { label: 'Create Invoice', icon: 'pi pi-plus', routerLink: ['/invoices/create'] },
           { label: 'Profit Dashboard', icon: 'pi pi-chart-pie', routerLink: ['/invoices/ProfitDashboardComponent'] },
           { label: 'Profit Summary', icon: 'pi pi-file-excel', routerLink: ['/invoices/ProfitSummaryComponent'] },
