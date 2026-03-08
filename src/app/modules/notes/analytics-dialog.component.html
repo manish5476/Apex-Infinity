@@ -1,0 +1,128 @@
+<div class="analytics-container">
+  
+  <!-- Header -->
+  <div class="dialog-header">
+    <div class="header-title">
+      <i class="pi pi-chart-bar"></i>
+      <h3>Analytics Dashboard</h3>
+    </div>
+    <button class="btn-close" (click)="close()">×</button>
+  </div>
+
+  <!-- Body -->
+  <div class="dialog-body custom-scrollbar">
+    
+    <!-- Loading State -->
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Gathering insights...</p>
+      </div>
+    }
+
+    @if (!isLoading() && stats(); as data) {
+      
+      <!-- Key Metrics Cards -->
+      <div class="metrics-grid">
+        <div class="metric-card total">
+          <span class="label">Total Notes</span>
+          <span class="value">{{ totalCount() }}</span>
+          <div class="indicator neutral">All time</div>
+        </div>
+        
+        <div class="metric-card completed">
+          <span class="label">Completed</span>
+          <span class="value">{{ completedCount() }}</span>
+          <div class="indicator success">
+            {{ completionRate() }}% Rate
+          </div>
+        </div>
+        
+        <div class="metric-card active">
+          <span class="label">Active</span>
+          <span class="value">{{ activeCount() }}</span>
+          <div class="indicator warning">In Progress</div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        
+        <!-- Breakdown by Type -->
+        <div class="section type-section">
+          <h4>Content Breakdown</h4>
+          <div class="bars-list">
+            @for (item of data.byType; track item._id) {
+              <div class="bar-row">
+                <div class="info">
+                  <div class="cat-label">
+                    <span class="dot" [style.background-color]="getTypeColor(item._id)"></span>
+                    <span class="cat-name">{{ item._id | titlecase }}</span>
+                  </div>
+                  <span class="cat-val">{{ item.count }}</span>
+                </div>
+                <div class="track">
+                  <div class="fill" 
+                       [style.width.%]="(item.count / totalCount()) * 100"
+                       [style.background-color]="getTypeColor(item._id)">
+                  </div>
+                </div>
+              </div>
+            } @empty {
+              <p class="empty-msg">No content data yet.</p>
+            }
+          </div>
+        </div>
+
+        <!-- Breakdown by Priority -->
+        <div class="section priority-section">
+          <h4>Priority Distribution</h4>
+          <div class="pills-cloud">
+            @for (item of data.byPriority; track item._id) {
+              <div class="priority-pill" [ngClass]="item._id">
+                <span class="p-name">{{ item._id | titlecase }}</span>
+                <span class="p-count">{{ item.count }}</span>
+              </div>
+            } @empty {
+              <p class="empty-msg">No priority data set.</p>
+            }
+          </div>
+          
+          <!-- Visualizer Bar -->
+          @if (data.byPriority.length) {
+            <div class="priority-bar">
+              @for (item of data.byPriority; track item._id) {
+                <div class="segment" 
+                     [ngClass]="item._id"
+                     [style.flex-grow]="item.count"
+                     [title]="item._id + ': ' + item.count">
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+      </div>
+
+      <!-- Recent Activity Section (New) -->
+      @if (data.recentActivity && data.recentActivity.length) {
+        <div class="section recent-section">
+          <h4>Recent Activity</h4>
+          <div class="activity-list">
+            @for (note of data.recentActivity; track note._id) {
+              <div class="activity-item">
+                <div class="icon-box" [style.color]="getTypeColor(note.noteType)">
+                  <i [class]="getTypeIcon(note.noteType)"></i>
+                </div>
+                <div class="details">
+                  <span class="act-title">{{ note.title || 'Untitled' }}</span>
+                  <span class="act-time">Updated {{ note.updatedAt | date:'mediumDate' }}</span>
+                </div>
+                <span class="act-type">{{ note.noteType }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>

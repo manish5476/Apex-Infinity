@@ -36,7 +36,7 @@ export class ErrorhandlingService {
     }
 
     if ((error as any)?.status !== 401) {
-      this.messageService.showError(errorSummary, errorMessage);
+      this.messageService.showError(errorSummary);
     }
 
     console.error(`[ApiService] ${errorSummary}: ${errorMessage}`, error);

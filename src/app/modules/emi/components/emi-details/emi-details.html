@@ -1,214 +1,219 @@
-<p-toast></p-toast>
-<p-confirmDialog></p-confirmDialog>
+<p-toast position="top-right"></p-toast>
+<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
 
-<div class="page-container animate-fadeIn">
+<div class="page-container">
 
   @if (isLoading()) {
-  <div class="loading-container p-4">
-    <p-skeleton width="100%" height="4rem" class="mb-4"></p-skeleton>
-    <div class="flex gap-4 w-full">
-      <p-skeleton width="25%" height="8rem"></p-skeleton>
-      <p-skeleton width="25%" height="8rem"></p-skeleton>
-      <p-skeleton width="25%" height="8rem"></p-skeleton>
-      <p-skeleton width="25%" height="8rem"></p-skeleton>
-    </div>
-  </div>
-  } @else if (emiData(); as emi) {
-
-  <header class="details-header">
-    <div class="header-left">
-      <p-button icon="pi pi-arrow-left" styleClass="p-button-text p-button-rounded back-btn"
-        routerLink="/emis"></p-button>
-      <div class="title-group">
-        <h1>
-          EMI Plan #{{ emi._id.slice(-6).toUpperCase() }}
-          <p-tag [value]="emi.status" [severity]="common.mapStatusToSeverity(emi.status)"></p-tag>
-        </h1>
-        <span class="subtitle">Created on {{ common.formatDate(emi.createdAt) }}</span>
+    <div class="loading-wrapper">
+      <div class="header-skeleton">
+        <p-skeleton width="200px" height="40px"></p-skeleton>
+        <p-skeleton width="120px" height="40px"></p-skeleton>
+      </div>
+      <div class="stats-skeleton">
+        <p-skeleton height="100px" styleClass="w-full"></p-skeleton>
+      </div>
+      <div class="grid-skeleton">
+        <div class="col-side"><p-skeleton height="400px"></p-skeleton></div>
+        <div class="col-main"><p-skeleton height="400px"></p-skeleton></div>
       </div>
     </div>
+  } 
+  
+  @else if (emiData(); as emi) {
 
-    <div class="header-right flex gap-2">
-      <p-button label="View Invoice" icon="pi pi-file" styleClass="p-button-outlined p-button-secondary"
-        [routerLink]="['/invoices', emi.invoiceId?._id]"></p-button>
-    </div>
-  </header>
-
-  <section class="stats-bar">
-    <div class="stat-item">
-      <div class="icon-box blue"><i class="pi pi-money-bill"></i></div>
-      <div class="stat-content">
-        <label>Loan Amount</label>
-        <strong>{{ common.formatCurrency(emi.totalAmount) }}</strong>
-      </div>
-    </div>
-
-    <div class="stat-item">
-      <div class="icon-box green"><i class="pi pi-check-circle"></i></div>
-      <div class="stat-content">
-        <label>Total Paid</label>
-        <strong class="text-green-600">{{ common.formatCurrency(totalPaidAmount()) }}</strong>
-      </div>
-    </div>
-
-    <div class="stat-item">
-      <div class="icon-box orange"><i class="pi pi-info-circle"></i></div>
-      <div class="stat-content">
-        <label>Remaining</label>
-        <strong class="text-red-600">{{ common.formatCurrency(remainingAmount()) }}</strong>
-      </div>
-    </div>
-
-    <div class="stat-item">
-      <div class="icon-box purple"><i class="pi pi-chart-line"></i></div>
-      <div class="stat-content">
-        <label>Interest Rate</label>
-        <strong>{{ emi.interestRate }}%</strong>
-      </div>
-    </div>
-  </section>
-
-  <div class="layout-body">
-
-    <aside class="sidebar-col">
-
-      <div class="glass-card">
-        <div class="card-header">
-          <h3><i class="pi pi-user"></i> Customer</h3>
-          <p-button icon="pi pi-external-link" styleClass="p-button-text p-button-sm"
-            [routerLink]="['/customer', emi.customerId?._id]"></p-button>
-        </div>
-        <div class="card-content">
-          <div class="info-row">
-            <span class="label">Name</span>
-            <span class="val link font-bold text-primary cursor-pointer"
-              [routerLink]="['/customer', emi.customerId?._id]">
-              {{ emi.customerId?.name }}
-            </span>
+    <header class="details-header glass-effect">
+      <div class="header-left">
+        <button class="back-btn" routerLink="/emis">
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <div class="title-group">
+          <div class="flex items-center gap-3">
+            <h1>EMI Plan #{{ emi._id.slice(-6).toUpperCase() }}</h1>
+            <p-tag [value]="emi.status" [severity]="common.mapStatusToSeverity(emi.status)"></p-tag>
           </div>
-          <div class="info-row">
-            <span class="label">Email</span>
-            <span class="val">{{ emi.customerId?.email || '-' }}</span>
-          </div>
-          <div class="info-row">
-            <span class="label">Phone</span>
-            <span class="val">{{ emi.customerId?.phone }}</span>
-          </div>
+          <span class="subtitle">Created on {{ common.formatDate(emi.createdAt) }}</span>
         </div>
       </div>
 
-      <div class="glass-card">
-        <div class="card-header">
-          <h3><i class="pi pi-cog"></i> Terms</h3>
+      <div class="header-right">
+        <button class="btn-outlined" [routerLink]="['/invoices', emi.invoiceId?._id]">
+          <i class="pi pi-file"></i> View Invoice
+        </button>
+      </div>
+    </header>
+
+    <section class="stats-bar">
+      <div class="stat-card">
+        <div class="icon-box blue"><i class="pi pi-money-bill"></i></div>
+        <div class="stat-content">
+          <label>Loan Amount</label>
+          <strong>{{ common.formatCurrency(emi.balanceAmount) }}</strong>
         </div>
-        <div class="card-content">
-          <div class="info-row">
-            <span class="label">Invoice No</span>
-            <span class="val font-mono">#{{ emi.invoiceId?.invoiceNumber }}</span>
-          </div>
-          <p-divider styleClass="my-1"></p-divider>
-          <div class="info-row">
-            <span class="label">Down Payment</span>
-            <span class="val text-green-600">- {{ common.formatCurrency(emi.downPayment) }}</span>
-          </div>
-          <div class="info-row">
-            <span class="label">Principal</span>
-            <span class="val">{{ common.formatCurrency(emi.balanceAmount) }}</span>
-          </div>
-          <div class="info-row">
-            <span class="label">Installments</span>
-            <span class="val">{{ emi.numberOfInstallments }}</span>
-          </div>
-          <div class="info-row">
-            <span class="label">Start Date</span>
-            <span class="val">{{ common.formatDate(emi.emiStartDate) }}</span>
-          </div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-box blue"><i class="pi pi-money-bill"></i></div>
+        <div class="stat-content">
+          <label>Total Amount</label>
+          <strong>{{ common.formatCurrency(emi.totalAmount) }}</strong>
         </div>
       </div>
 
-    </aside>
-
-    <main class="main-col">
-
-      <div class="progress-widget">
-        <div class="widget-header">
-          <h4>Repayment Progress</h4>
-          <span>{{ progress() }}%</span>
-        </div>
-        <p-progressBar [value]="progress()" [showValue]="false" styleClass="h-2"></p-progressBar>
-      </div>
-
-      <div class="table-card">
-        <div class="table-header">
-          <h3>Installment Schedule</h3>
-        </div>
-
-        <div class="grid-wrapper">
-          <app-ag-share-grid [columns]="column" [data]="gridData" [showActions]="false"
-            (gridEvent)="eventFromGrid($event)">
-          </app-ag-share-grid>
+      <div class="stat-card">
+        <div class="icon-box green"><i class="pi pi-check-circle"></i></div>
+        <div class="stat-content">
+          <label>Total Paid</label>
+          <strong class="text-success">{{ common.formatCurrency(totalPaidAmount()) }}</strong>
         </div>
       </div>
 
-    </main>
+      <div class="stat-card">
+        <div class="icon-box orange"><i class="pi pi-info-circle"></i></div>
+        <div class="stat-content">
+          <label>Remaining</label>
+          <strong class="text-danger">{{ common.formatCurrency(remainingAmount()) }}</strong>
+        </div>
+      </div>
 
-  </div>
+      <div class="stat-card">
+        <div class="icon-box purple"><i class="pi pi-percentage"></i></div>
+        <div class="stat-content">
+          <label>Interest Rate</label>
+          <strong>{{ emi.interestRate }}%</strong>
+        </div>
+      </div>
+    </section>
 
+    <div class="layout-body custom-scrollbar">
+      
+      <aside class="sidebar-col">
+        
+        <div class="info-card">
+          <div class="card-header">
+            <h3><i class="pi pi-user"></i> Customer</h3>
+            <button class="icon-btn" [routerLink]="['/customer', emi.customerId?._id]">
+              <i class="pi pi-external-link"></i>
+            </button>
+          </div>
+          <div class="card-content">
+            <div class="info-row">
+              <span class="label">Name</span>
+              <span class="val link" [routerLink]="['/customer', emi.customerId?._id]">
+                {{ emi.customerId?.name }}
+              </span>
+            </div>
+            <div class="info-row">
+              <span class="label">Email</span>
+              <span class="val">{{ emi.customerId?.email || '-' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Phone</span>
+              <span class="val">{{ emi.customerId?.phone }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="card-header">
+            <h3><i class="pi pi-cog"></i> Terms</h3>
+          </div>
+          <div class="card-content">
+            <div class="info-row">
+              <span class="label">Invoice No</span>
+              <span class="val font-mono">#{{ emi.invoiceId?.invoiceNumber }}</span>
+            </div>
+            <div class="divider"></div>
+            <div class="info-row">
+              <span class="label">Down Payment</span>
+              <span class="val text-success">- {{ common.formatCurrency(emi.downPayment) }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Principal</span>
+              <span class="val">{{ common.formatCurrency(emi.balanceAmount) }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Installments</span>
+              <span class="val">{{ emi.numberOfInstallments }} Months</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Start Date</span>
+              <span class="val">{{ common.formatDate(emi.emiStartDate) }}</span>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+
+      <main class="main-col">
+
+        <div class="progress-widget">
+          <div class="widget-header">
+            <h4>Repayment Progress</h4>
+            <span class="percentage">{{ progress() }}%</span>
+          </div>
+          <p-progressBar [value]="progress()" [showValue]="false" styleClass="custom-progress"></p-progressBar>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <h3>Installment Schedule</h3>
+          </div>
+          <div class="grid-wrapper">
+            <app-ag-share-grid 
+              [columns]="column" 
+              [data]="gridData" 
+              [showActions]="false"
+              (gridEvent)="eventFromGrid($event)"
+              class="full-size-grid">
+            </app-ag-share-grid>
+          </div>
+        </div>
+
+      </main>
+    </div>
   }
 </div>
 
-<p-dialog header="Record Payment" [(visible)]="showPaymentDialog" [modal]="true" [style]="{width: '400px'}"
-  [draggable]="false" [resizable]="false" styleClass="custom-dialog">
-
+<p-dialog appendTo="body"   header="Record Payment" [(visible)]="showPaymentDialog" [modal]="true" [style]="{width: '400px'}" [draggable]="false" [resizable]="false" styleClass="modern-dialog">
+  
   @if (selectedInstallment) {
-  <div class="flex flex-col gap-4 pt-2" [formGroup]="paymentForm">
-
-    <div class="bg-gray-50 p-3 rounded border border-gray-200">
-      <div class="flex justify-between mb-1 text-sm text-gray-600">
-        <span>Installment #{{ selectedInstallment.installmentNumber }}</span>
-        <span>Due: {{ common.formatDate(selectedInstallment.dueDate) }}</span>
+    <div class="dialog-content" [formGroup]="paymentForm">
+      
+      <div class="installment-summary">
+        <div class="summary-row">
+          <span>Installment #{{ selectedInstallment.installmentNumber }}</span>
+          <span class="date">Due: {{ common.formatDate(selectedInstallment.dueDate) }}</span>
+        </div>
+        <div class="amount-row">
+          <span>Total Due</span>
+          <span class="amount">{{ common.formatCurrency(selectedInstallment.totalAmount - (selectedInstallment.paidAmount || 0)) }}</span>
+        </div>
       </div>
-      <div class="flex justify-between items-end mt-2">
-        <span class="text-sm font-medium">Total Due</span>
-        <span class="text-xl font-bold text-blue-600">
-          {{ common.formatCurrency(selectedInstallment.totalAmount - (selectedInstallment.paidAmount || 0)) }}
-        </span>
+
+      <div class="form-group">
+        <label>Amount Recieved</label>
+        <p-inputNumber formControlName="amount" mode="currency" currency="INR" locale="en-IN" styleClass="w-full"></p-inputNumber>
       </div>
-    </div>
 
-    <div class="flex flex-col gap-1">
-      <label class="text-xs uppercase font-bold text-gray-500">Amount</label>
-      <p-inputNumber formControlName="amount" mode="decimal" [minFractionDigits]="2" prefix="₹ "
-        styleClass="w-full"></p-inputNumber>
-    </div>
+      <div class="form-group">
+        <label>Payment Mode</label>
+        <p-select appendTo="body" formControlName="paymentMode" [options]="paymentModes" optionLabel="label" optionValue="value" styleClass="w-full"></p-select>
+      </div>
 
-    <div class="flex flex-col gap-1">
-      <label class="text-xs uppercase font-bold text-gray-500">Payment Mode</label>
-      <p-select appendTo="body" formControlName="paymentMode" [options]="paymentModes" optionLabel="label"
-        optionValue="value" styleClass="w-full" appendTo="body"></p-select>
-    </div>
+      <div class="form-group">
+        <label>Reference ID <span class="text-danger">*</span></label>
+        <input pInputText formControlName="paymentId" placeholder="e.g. UPI-123456" class="w-full" />
+      </div>
 
-    <div class="flex flex-col gap-1">
-      <label class="text-xs uppercase font-bold text-gray-500">
-        Reference ID <span class="text-red-500">*</span>
-      </label>
-      <input pInputText formControlName="paymentId" placeholder="e.g. TRX-123456" class="w-full" />
-    </div>
+      <div class="form-group">
+        <label>Notes (Optional)</label>
+        <input pInputText formControlName="notes" placeholder="Remarks" class="w-full" />
+      </div>
 
-    <div class="flex flex-col gap-1">
-      <label class="text-xs uppercase font-bold text-gray-500">Notes (Optional)</label>
-      <input pInputText formControlName="notes" placeholder="Any remarks" class="w-full" />
     </div>
-
-  </div>
   }
 
   <ng-template pTemplate="footer">
-    <div class="flex justify-end gap-2 mt-4">
-      <p-button label="Cancel" styleClass="p-button-text p-button-secondary"
-        (onClick)="showPaymentDialog = false"></p-button>
-      <p-button label="Confirm" icon="pi pi-check" (onClick)="submitPayment()"
-        [loading]="isSubmittingPayment()"></p-button>
-    </div>
+    <button pButton label="Cancel" class="p-button-text p-button-secondary" (click)="showPaymentDialog = false"></button>
+    <button pButton label="Confirm" class="p-button-primary" (click)="submitPayment()" [loading]="isSubmittingPayment()"></button>
   </ng-template>
 </p-dialog>

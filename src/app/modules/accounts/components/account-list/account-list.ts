@@ -1,3 +1,4 @@
+import { AppMessageService } from './../../../../core/services/message.service';
 import { Component, OnInit, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { Router } from '@angular/router';
@@ -21,6 +22,7 @@ import { ActionViewRenderer } from '../../../shared/AgGrid/AgGridcomponents/Dyna
 export class AccountListComponent implements OnInit {
   // Dependencies
   private accountService = inject(AccountService);
+  private messageService = inject(AppMessageService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private decimalPipe = inject(DecimalPipe);
@@ -37,82 +39,18 @@ export class AccountListComponent implements OnInit {
 
   setupColumns(): void {
     this.column = [
-      // 1. ACTIONS (Edit/Delete)
+      { headerName: 'Actions', field: '_id', width: 100, cellRenderer: ActionViewRenderer, pinned: 'left', suppressMenu: true },
+      { field: 'code', headerName: 'Code', width: 120, sortable: true, filter: true, pinned: 'left', cellStyle: { 'font-weight': '600', 'color': 'var(--text-primary)' } },
+      { field: 'name', headerName: 'Account Name', flex: 1, minWidth: 200, sortable: true, filter: true },
+      { field: 'type', headerName: 'Type', width: 150, sortable: true, filter: true, valueFormatter: (p: any) => p.value ? p.value.toUpperCase() : '', cellStyle: { 'text-transform': 'capitalize' } },
+      { field: 'debitTotal', headerName: 'Debit', width: 140, type: 'numericColumn', valueFormatter: (p: any) => this.formatCurrency(p.value), cellStyle: { 'color': 'var(--text-secondary)' } },
+      { field: 'creditTotal', headerName: 'Credit', width: 140, type: 'numericColumn', valueFormatter: (p: any) => this.formatCurrency(p.value), cellStyle: { 'color': 'var(--text-secondary)' } },
       {
-        headerName: 'Actions',
-        field: '_id',
-        width: 100,
-        cellRenderer: ActionViewRenderer,
-        pinned: 'left',
-        suppressMenu: true
-      },
-      
-      // 2. CODE
-      {
-        field: 'code',
-        headerName: 'Code',
-        width: 120,
-        sortable: true,
-        filter: true,
-        pinned: 'left',
-        cellStyle: { 'font-weight': '600', 'color': 'var(--text-primary)' }
-      },
-
-      // 3. NAME
-      {
-        field: 'name',
-        headerName: 'Account Name',
-        flex: 1, // Auto expand
-        minWidth: 200,
-        sortable: true,
-        filter: true
-      },
-
-      // 4. TYPE
-      {
-        field: 'type',
-        headerName: 'Type',
-        width: 150,
-        sortable: true,
-        filter: true,
-        valueFormatter: (p: any) => p.value ? p.value.toUpperCase() : '',
-        cellStyle: { 'text-transform': 'capitalize' }
-      },
-
-      // 5. DEBIT (Numeric)
-      {
-        field: 'debitTotal',
-        headerName: 'Debit',
-        width: 140,
-        type: 'numericColumn', // Right align
-        valueFormatter: (p: any) => this.formatCurrency(p.value),
-        cellStyle: { 'color': 'var(--text-secondary)' }
-      },
-
-      // 6. CREDIT (Numeric)
-      {
-        field: 'creditTotal',
-        headerName: 'Credit',
-        width: 140,
-        type: 'numericColumn',
-        valueFormatter: (p: any) => this.formatCurrency(p.value),
-        cellStyle: { 'color': 'var(--text-secondary)' }
-      },
-
-      // 7. BALANCE (Bold & Colored)
-      {
-        field: 'balance',
-        headerName: 'Balance',
-        width: 150,
-        type: 'numericColumn',
-        valueFormatter: (p: any) => this.formatCurrency(p.value),
-        cellStyle: (params: any) => {
+        field: 'balance', headerName: 'Balance', width: 150, type: 'numericColumn', valueFormatter: (p: any) => this.formatCurrency(p.value), cellStyle: (params: any) => {
           const bal = params.value || 0;
-          // Green for positive, Red for negative (standard accounting)
-          // Or just bold black if you prefer neutrality
-          return { 
-            'font-weight': '700', 
-            'color': bal < 0 ? '#dc2626' : 'var(--text-primary)' 
+          return {
+            'font-weight': '700',
+            'color': bal < 0 ? '#dc2626' : 'var(--text-primary)'
           };
         }
       }
@@ -123,14 +61,15 @@ export class AccountListComponent implements OnInit {
     this.isLoading = true;
     this.accountService.getAccounts().subscribe({
       next: (res: any) => {
-        // Handle response format variations (res.data or res directly)
         this.data = Array.isArray(res.data) ? res.data : (Array.isArray(res) ? res : []);
         this.isLoading = false;
         this.cdr.markForCheck();
       },
       error: (err) => {
-        console.error('Failed to load accounts', err);
         this.isLoading = false;
+        console.error('Failed to load accounts', err);
+        this.messageService.handleHttpError(err);
+        this.cdr.markForCheck();
       }
     });
   }
@@ -146,8 +85,6 @@ export class AccountListComponent implements OnInit {
   handleGridEvent(event: any) {
     if (event.type === 'cellClicked' && event.colDef.headerName === 'Actions') {
       const id = event.data._id;
-      // Navigate to Edit or Delete logic
-      // this.router.navigate(['/accounts/edit', id]); 
       console.log('Action clicked for:', id);
     }
   }

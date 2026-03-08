@@ -5,165 +5,192 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { forkJoin } from 'rxjs';
-import { CommonMethodService } from '../../core/utils/common-method.service';
+
+// Services
 import { AdminAnalyticsService } from '../admin-analytics.service';
+import { CommonMethodService } from '../../core/utils/common-method.service';
+
+// Components
 import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
+import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
+import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
 
 @Component({
   selector: 'app-system-audit-alerts',
   standalone: true,
   imports: [
-    CommonModule, ButtonModule, TagModule, 
-    TooltipModule, ProgressSpinnerModule,
-    AgShareGrid
+    CommonModule, 
+    ButtonModule, 
+    TagModule, 
+    TooltipModule, 
+    ProgressSpinnerModule,
+    AgShareGrid,
+    UniversalFilterComponent
   ],
   template: `
-    <div class="p-4 md:p-6 transition-colors duration-300" 
-         [style.background]="'var(--theme-bg-primary)'"
-         [style.font-family]="'var(--font-body)'">
+    <div class="audit-container">
 
-      <div class="mb-6 flex flex-wrap justify-between items-center gap-4">
+      <div class="header-section">
         <div>
-          <h2 class="font-bold tracking-tight mb-1" 
-              [style.color]="'var(--theme-text-primary)'"
-              [style.font-family]="'var(--font-heading)'"
-              [style.font-size]="'var(--font-size-2xl)'">System Integrity & Alerts</h2>
-          <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">
-            Monitoring administrative access and critical business bottlenecks
+          <h2 class="page-title">
+            <i class="pi pi-shield header-icon"></i>
+            System Integrity & Audit Log
+          </h2>
+          <p class="page-subtitle">
+            Live monitoring of {{ securityData()?.recentEvents?.length || 0 }} administrative events
           </p>
         </div>
-        <div class="flex items-center gap-3">
-          <div class="px-3 py-1 border rounded-lg flex items-center gap-2" 
-               [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'">
-            <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase">Security Status</span>
-            <span class="font-bold tabular-nums" [style.color]="securityData()?.riskyActions > 0 ? 'var(--theme-error)' : 'var(--theme-success)'">
-              {{ securityData()?.riskyActions > 0 ? 'Action Required' : 'Secure' }}
-            </span>
+        
+        <div class="header-actions">
+          <div class="status-badge" 
+               [class.secure]="(securityData()?.riskyActions || 0) === 0" 
+               [class.risk]="(securityData()?.riskyActions || 0) > 0">
+            <i class="pi" [ngClass]="(securityData()?.riskyActions || 0) === 0 ? 'pi-check-circle' : 'pi-exclamation-triangle'"></i>
+            <div class="badge-content">
+              <span class="status-label">Threat Level</span>
+              <span class="status-value">
+                {{ (securityData()?.riskyActions || 0) > 0 ? (securityData()?.riskyActions + ' Risky Actions') : 'System Secure' }}
+              </span>
+            </div>
           </div>
-          <p-button icon="pi pi-refresh" severity="info" size="small" (onClick)="refreshAll()"></p-button>
+          
+          <p-button icon="pi pi-refresh" severity="secondary" [outlined]="true" size="small" (onClick)="refreshAll()"></p-button>
         </div>
+      </div>
+
+      <div class="filter-section">
+        <app-universal-filter
+          [entityType]="'system-audit'"
+          [config]="filterConfig"
+          (filterChange)="onFilterUpdate($event)">
+        </app-universal-filter>
       </div>
 
       <ng-container *ngIf="!loading(); else loader">
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          
-          <div class="p-4 border transition-all hover:scale-[1.01]" 
-               [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-            <div class="flex justify-between items-start mb-2">
-              <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase tracking-widest">Inventory Health</span>
-              <i class="pi pi-box text-rose-400"></i>
+        <div class="grid-card">
+          <div class="grid-header">
+            <div class="header-left">
+              <h3 class="grid-title">Access Log Stream</h3>
+              <span class="grid-tag success">LIVE MONITORING</span>
             </div>
-            <div class="flex items-baseline gap-2">
-              <h2 class="text-2xl font-bold tabular-nums text-rose-500">{{ alertsData()?.lowStockCount }}</h2>
-              <span [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Low Stock Items</span>
-            </div>
-            <div class="mt-2 p-1.5 rounded bg-rose-500/5 border border-rose-500/10 flex items-center justify-between">
-               <span class="text-[10px] font-bold text-rose-400 uppercase">Top Priority:</span>
-               <span class="text-[10px] font-bold text-white truncate max-w-[120px]">{{ alertsData()?.itemsToReorder[0] || 'None' }}</span>
+            <div class="header-right">
+               <span class="meta-info" *ngIf="meta()">Response: {{ meta()?.responseTime }}</span>
             </div>
           </div>
 
-          <div class="p-4 border transition-all hover:scale-[1.01]" 
-               [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-            <div class="flex justify-between items-start mb-2">
-              <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase tracking-widest">Financial Exposure</span>
-              <i class="pi pi-exclamation-triangle text-amber-400"></i>
-            </div>
-            <div class="flex items-baseline gap-2">
-              <h2 class="text-2xl font-bold tabular-nums text-amber-500">{{ alertsData()?.highRiskDebtCount }}</h2>
-              <span [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">High Risk Debts</span>
-            </div>
-            <p class="mt-2 text-[10px] leading-tight opacity-70" [style.color]="'var(--theme-text-secondary)'">Action: Immediate payment follow-up recommended.</p>
-          </div>
-
-          <div class="p-4 border text-white shadow-lg flex flex-col justify-between" 
-               [style.background]="'var(--theme-accent-gradient)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-            <div>
-              <p class="uppercase font-black tracking-tighter opacity-80 mb-1" [style.font-size]="'var(--font-size-xs)'">Audit Trail</p>
-              <h2 class="text-2xl font-bold leading-none">{{ securityData()?.recentEvents?.length }} Events</h2>
-              <p class="text-[10px] font-bold opacity-90 uppercase italic mt-1">Logged in last 72 hours</p>
-            </div>
-            <div class="mt-2 flex gap-2">
-               <p-button label="Review Logs" severity="secondary" [text]="true" size="small" styleClass="bg-white/10 text-white border-white/20 py-1 text-xs"></p-button>
-            </div>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-          <div class="lg:col-span-8">
-            <div class="border overflow-hidden shadow-sm h-full flex flex-col" 
-                 [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-              <div class="shrink-0 p-3 border-b flex justify-between items-center" [style.border-color]="'var(--theme-border-primary)'" [style.background]="'var(--theme-bg-ternary)'">
-                <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-xs)'">Administrative Access Log</h3>
-                <span class="text-[9px] font-mono opacity-50" [style.color]="'var(--theme-text-label)'">IP TRAFFIC: MONITORING</span>
-              </div>
-
-              <div class="grid-wrapper flex-1 relative min-h-[350px]">
-                 <app-ag-share-grid 
-                   [columns]="auditColumns" 
-                   [data]="securityData()?.recentEvents || []" 
-                   [showActions]="false" 
-                   style="height: 100%; width: 100%; display: block; position: absolute; inset: 0;">
-                 </app-ag-share-grid>
-              </div>
-
-            </div>
-          </div>
-
-          <div class="lg:col-span-4 space-y-4">
-            
-            <div class="p-4 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-               <h4 class="font-bold mb-3 uppercase tracking-tighter" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Re-order Checklist</h4>
-               <div class="space-y-2">
-                 @for (item of alertsData()?.itemsToReorder; track item) {
-                   <div class="flex items-center justify-between p-2 border rounded-lg transition-colors hover:bg-white/5" 
-                        [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'">
-                     <span class="font-bold text-white truncate max-w-[150px]" [style.font-size]="'var(--font-size-xs)'">{{ item }}</span>
-                     <p-button icon="pi pi-shopping-cart" [text]="true" severity="info" size="small" styleClass="p-0 h-6 w-6"></p-button>
-                   </div>
-                 }
-                 @if (!alertsData()?.itemsToReorder?.length) {
-                   <p class="text-center py-2 text-[10px]" [style.color]="'var(--theme-text-tertiary)'">No immediate stock-outs detected.</p>
-                 }
-               </div>
-            </div>
-
-            <div class="p-4 border border-dashed flex flex-col items-center text-center" 
-                 [style.background]="'rgba(16, 185, 129, 0.03)'" 
-                 [style.border-color]="'var(--theme-success)'" 
-                 [style.border-radius]="'var(--ui-border-radius-xl)'">
-              <div class="w-8 h-8 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-2">
-                 <i class="pi pi-check-circle text-sm"></i>
-              </div>
-              <h4 class="font-bold text-white mb-0.5 text-sm">Environment Secure</h4>
-              <p class="text-[10px] leading-relaxed" [style.color]="'var(--theme-text-secondary)'">
-                Zero unauthorized requests. Checked at {{ securityData()?.recentEvents[0]?.createdAt | date:'shortTime' }}.
-              </p>
-            </div>
+          <div class="grid-container">
+             <app-ag-share-grid 
+               [columns]="auditColumns" 
+               [data]="securityData()?.recentEvents || []" 
+               [showActions]="false" 
+               class="full-size-grid">
+             </app-ag-share-grid>
           </div>
         </div>
 
       </ng-container>
 
       <ng-template #loader>
-        <div class="h-[60vh] flex flex-col items-center justify-center gap-4">
+        <div class="loader-container">
           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-12 h-12"></p-progressSpinner>
-          <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'" class="font-bold uppercase tracking-widest">Fetching Security Tokens...</p>
+          <p class="loader-text">Auditing Security Protocols...</p>
         </div>
       </ng-template>
 
     </div>
   `,
-  styles: []
+  styles: [`
+    :host { display: block; width: 100%; height: 100%; }
+
+    .audit-container {
+      padding: var(--spacing-lg) var(--spacing-xl);
+      background: var(--bg-primary);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+
+    /* HEADER */
+    .header-section {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: var(--spacing-lg); flex-wrap: wrap; gap: var(--spacing-md);
+    }
+
+    .page-title {
+      font-size: var(--font-size-2xl); font-weight: 800; color: var(--text-primary);
+      display: flex; align-items: center; gap: var(--spacing-sm); margin: 0 0 4px 0;
+    }
+    .header-icon { color: var(--accent-primary); }
+    .page-subtitle { font-size: var(--font-size-sm); color: var(--text-tertiary); margin: 0; font-weight: 500; }
+
+    .header-actions { display: flex; align-items: center; gap: var(--spacing-md); }
+
+    /* SECURITY BADGE */
+    .status-badge {
+      padding: 6px 16px; border-radius: var(--ui-border-radius-lg);
+      display: flex; align-items: center; gap: 12px;
+      background: var(--bg-secondary); border: 1px solid var(--border-primary);
+      transition: all 0.3s ease;
+    }
+    .status-badge.secure { border-color: var(--color-success); background: var(--color-success-bg); color: var(--color-success-dark); }
+    .status-badge.risk { border-color: var(--color-error); background: var(--color-error-bg); color: var(--color-error); animation: pulse-border 2s infinite; }
+    
+    .badge-content { display: flex; flex-direction: column; line-height: 1.1; }
+    .status-label { font-size: 9px; text-transform: uppercase; font-weight: 700; opacity: 0.8; }
+    .status-value { font-size: 13px; font-weight: 800; }
+
+    @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+
+    .filter-section { margin-bottom: var(--spacing-lg); }
+
+    /* GRID CARD */
+    .grid-card {
+      background: var(--bg-secondary); border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius-xl); overflow: hidden;
+      flex: 1; display: flex; flex-direction: column; min-height: 500px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .grid-header {
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-bottom: 1px solid var(--border-primary);
+      background: var(--bg-primary);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .grid-title { font-size: var(--font-size-md); font-weight: 800; color: var(--text-primary); margin: 0; letter-spacing: 0.5px; text-transform: uppercase; }
+    
+    .grid-tag { 
+      font-size: 9px; font-weight: 900; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.5px;
+      &.success { background: var(--color-success-bg); color: var(--color-success); border: 1px solid var(--color-success-border); } 
+    }
+
+    .meta-info { font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary); }
+
+    .grid-container { flex: 1; position: relative; background: var(--bg-primary); }
+    .full-size-grid { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+    /* LOADER */
+    .loader-container { height: 60vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--spacing-md); }
+    .loader-text { font-size: var(--font-size-sm); color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  `]
 })
 export class SystemAuditAlertsComponent implements OnInit {
-  alertsData = signal<any>(null);
+  alertsData = signal<any>(null); // Kept for future extension
   securityData = signal<any>(null);
-  loading = signal<boolean>(true);
-  
+  meta = signal<any>(null);
+  loading = signal<boolean>(false);
   auditColumns: any[] = [];
+
+  private currentFilters: any = {};
+
+  filterConfig: FilterField[] = [
+    { key: 'branchId', label: 'Branch Scope', type: 'select', dataSourceKey: 'branches', optionLabel: 'name', optionValue: '_id', placeholder: 'All Branches' },
+    { key: 'actionType', label: 'Action Type', type: 'select', placeholder: 'All Actions', staticOptions: [{label: 'Reads', value: 'read'}, {label: 'Writes', value: 'write'}] },
+    { key: 'date', label: 'Audit Period', type: 'date-range' }
+  ];
 
   constructor(
     private analyticsService: AdminAnalyticsService,
@@ -173,105 +200,143 @@ export class SystemAuditAlertsComponent implements OnInit {
 
   ngOnInit() {
     this.setupColumns();
+    // loadData calls triggered via filter init or manual
+  }
+
+  onFilterUpdate(filters: any) {
+    this.currentFilters = filters;
     this.refreshAll();
   }
 
-  setupColumns(): void {
+setupColumns(): void {
     this.auditColumns = [
+      // 1. USER NAME
       {
-        field: 'userId.name', 
-        headerName: 'Administrator', 
-        sortable: true, 
-        flex: 1,
-        minWidth: 180,
-        cellRenderer: (params: any) => {
-          const user = params.data?.userId || {};
-          const name = user.name || 'Unknown';
-          const email = user.email || '';
-          const initials = this.commonService.getInitials(name);
+        field: 'userId.name',
+        headerName: 'User Name',
+        width: 140,
+        filter: true,
+        cellStyle: { 'font-weight': '700', 'color': 'var(--text-primary)' }
+      },
 
-          return `<div style="display: flex; align-items: center; gap: 8px; height: 100%;">
-                    <div style="width: 24px; height: 24px; border-radius: 4px; background: rgba(99, 102, 241, 0.1); color: #818cf8; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 9px;">
-                      ${initials}
-                    </div>
-                    <div style="display: flex; flex-direction: column;">
-                      <span style="font-weight: 700; color: #fff; line-height: 1; font-size: 11px;">${name}</span>
-                    </div>
-                  </div>`;
-        }
-      },
+      // 2. EMAIL
       {
-        field: 'userId.name', 
-        headerName: 'Administrator', 
-        sortable: true, 
-        flex: 1,
-        minWidth: 180,
+        field: 'userId.email',
+        headerName: 'Email Address',
+        width: 200,
+        cellStyle: { 'color': 'var(--text-secondary)', 'font-size': '12px' }
+      },
+
+      // 3. ACTION TYPE (e.g., READ, WRITE) - Derived
+      {
+        headerName: 'Method',
+        width: 100,
+        valueGetter: (params: any) => {
+          const raw = params.data?.action || '';
+          return (raw.split(':')[0] || 'system').toUpperCase();
+        },
         cellRenderer: (params: any) => {
-          const user = params.data?.userId || {};
-          const name = user.name || 'Unknown';
-          const email = user.email || '';
-          const initials = this.commonService.getInitials(name);
-          return `<div style="display: flex; align-items: center; gap: 8px; height: 100%;">
-                    <div style="display: flex; flex-direction: column;">
-                      <span style="font-size: 9px; opacity: 0.5; margin-top: 1px;">${email}</span>
-                    </div>
-                  </div>`;
-        }
+          const val = params.value;
+          const isRead = val === 'READ';
+          // Inline styles for the badge look
+          const bg = isRead ? 'var(--accent-focus)' : 'var(--bg-ternary)';
+          const color = isRead ? 'var(--accent-primary)' : 'var(--color-warning)';
+          const border = isRead ? 'var(--accent-secondary)' : 'var(--border-secondary)';
+          
+          return `<span style="background: ${bg}; color: ${color}; border: 1px solid ${border}; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 800;">${val}</span>`;
+        },
+        cellStyle: { 'display': 'flex', 'align-items': 'center' }
       },
+
+      // 4. ACTION TARGET (e.g., TRANSACTIONS) - Derived
       {
-        field: 'action', 
-        headerName: 'Action performed', 
-        sortable: true, 
+        headerName: 'Resource',
         width: 160,
-        cellRenderer: (params: any) => {
-          const fullAction = params.value || '';
-          const parts = fullAction.split(':');
-          const category = parts[0] ? parts[0].trim() : '';
-          const actionName = parts[1] ? parts[1].trim() : fullAction;
-          const entity = params.data?.entityType || 'system';
-
-          return `<div style="display: flex; flex-direction: column; gap: 2px;">
-                    <span style="padding: 1px 4px; width: fit-content; border-radius: 3px; font-weight: 700; font-size: 8px; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); color: #a5b4fc; text-transform: uppercase;">
-                      ${actionName}
-                    </span>
-                    <span style="font-size: 9px; color: var(--theme-text-label);">Entity: ${entity}</span>
-                  </div>`;
-        }
+        valueGetter: (params: any) => {
+          const raw = params.data?.action || '';
+          return raw.split(':')[1] || raw;
+        },
+        cellStyle: { 'font-weight': '600', 'color': 'var(--text-primary)', 'text-transform': 'capitalize' }
       },
+
+      // 5. IP ADDRESS
       {
-        field: 'ip', 
-        headerName: 'Trace (IP)', 
-        sortable: true, 
+        field: 'ip',
+        headerName: 'IP Address',
         width: 120,
         cellRenderer: (params: any) => {
-          const ip = params.value === '::1' ? 'Localhost' : params.value;
-          return `<span style="font-family: monospace; font-size: 9px; background: rgba(30, 41, 59, 0.5); padding: 1px 4px; border-radius: 3px; border: 1px solid rgba(51, 65, 85, 0.5); color: var(--theme-text-tertiary);">
-                    ${ip}
-                  </span>`;
-        }
+          const val = params.value === '::1' ? '127.0.0.1' : params.value;
+          return val;
+        },
+        cellStyle: { 'font-family': 'var(--font-mono)', 'color': 'var(--text-secondary)', 'font-size': '11px' }
       },
+
+      // 6. OPERATING SYSTEM - Derived from UserAgent
       {
-        field: 'createdAt', 
-        headerName: 'Timestamp', 
-        sortable: true, 
+        headerName: 'OS',
+        width: 110,
+        valueGetter: (params: any) => {
+          const ua = params.data?.userAgent || '';
+          if (ua.includes('Windows')) return 'Windows';
+          if (ua.includes('Mac')) return 'MacOS';
+          if (ua.includes('Linux')) return 'Linux';
+          if (ua.includes('Android')) return 'Android';
+          if (ua.includes('iPhone') || ua.includes('iPad')) return 'iOS';
+          return 'Other';
+        },
+        cellRenderer: (params: any) => {
+           let icon = 'pi-desktop';
+           if (params.value === 'Android' || params.value === 'iOS') icon = 'pi-mobile';
+           return `<i class="pi ${icon}" style="font-size: 10px; margin-right: 6px; color: var(--text-tertiary);"></i>${params.value}`;
+        },
+        cellStyle: { 'color': 'var(--text-secondary)' }
+      },
+
+      // 7. BROWSER - Derived from UserAgent
+      {
+        headerName: 'Browser',
+        width: 110,
+        valueGetter: (params: any) => {
+          const ua = params.data?.userAgent || '';
+          if (ua.includes('Edg')) return 'Edge';
+          if (ua.includes('Chrome')) return 'Chrome';
+          if (ua.includes('Firefox')) return 'Firefox';
+          if (ua.includes('Safari')) return 'Safari';
+          return 'Other';
+        },
+        cellStyle: { 'color': 'var(--text-tertiary)', 'font-size': '12px' }
+      },
+
+      // 8. TIMESTAMP
+      {
+        field: 'createdAt',
+        headerName: 'Time',
         width: 110,
         type: 'rightAligned',
-        valueFormatter: (params: any) => this.commonService.formatDate(params.value, 'dd MMM, HH:mm'),
-        cellStyle: { 'font-family': 'monospace', 'font-weight': '700', 'font-size': '10px', 'color': '#fff' }
+        valueFormatter: (params: any) => this.commonService.formatDate(params.value, 'HH:mm:ss'),
+        cellStyle: { 'font-family': 'var(--font-mono)', 'font-weight': '700', 'text-align': 'right', 'color': 'var(--text-primary)' }
       }
     ];
     this.cdr.detectChanges();
   }
-
   refreshAll() {
     this.loading.set(true);
-    forkJoin({
-      alerts: this.analyticsService.getCriticalAlerts(),
-      security: this.analyticsService.getSecurityAuditLog()
-    }).subscribe({
-      next: (results) => {
-        if (results.alerts.status === 'success') this.alertsData.set(results.alerts.data);
-        if (results.security.status === 'success') this.securityData.set(results.security.data);
+    
+    // Using forkJoin if you still intend to fetch Inventory Alerts alongside this,
+    // otherwise just fetch the security logs directly.
+    // Based on your data snippet, we are simulating the security part here.
+    
+    this.analyticsService.getSecurityAuditLog(
+      this.currentFilters.date?.[0]?.toISOString(), 
+      this.currentFilters.date?.[1]?.toISOString(), 
+      this.currentFilters.branchId
+    ).subscribe({
+      next: (res) => {
+        // Mapping the provided JSON structure
+        if (res.status === 'success') {
+          this.securityData.set(res.data); // data contains { recentEvents: [], riskyActions: 0 }
+          this.meta.set(res.meta);
+        }
         this.loading.set(false);
       },
       error: () => this.loading.set(false)
@@ -286,38 +351,45 @@ export class SystemAuditAlertsComponent implements OnInit {
 // import { TooltipModule } from 'primeng/tooltip';
 // import { ProgressSpinnerModule } from 'primeng/progressspinner';
 // import { forkJoin } from 'rxjs';
-// import { CommonMethodService } from '../../core/utils/common-method.service';
+
+// // Services
 // import { AdminAnalyticsService } from '../admin-analytics.service';
+// import { CommonMethodService } from '../../core/utils/common-method.service';
+
+// // Components
 // import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
+// import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
+// import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
 
 // @Component({
 //   selector: 'app-system-audit-alerts',
 //   standalone: true,
 //   imports: [
-//     CommonModule, ButtonModule, TagModule, 
-//     TooltipModule, ProgressSpinnerModule,
-//     AgShareGrid // Added Custom Grid
+//     CommonModule, 
+//     ButtonModule, 
+//     TagModule, 
+//     TooltipModule, 
+//     ProgressSpinnerModule,
+//     AgShareGrid,
+//     UniversalFilterComponent // <--- Imported
 //   ],
 //   template: `
-//     <div class="p-4 md:p-6 transition-colors duration-300" 
-//          [style.background]="'var(--theme-bg-primary)'"
-//          [style.font-family]="'var(--font-body)'">
+//     <div class="audit-container">
 
-//       <div class="mb-8 flex flex-wrap justify-between items-center gap-4">
+//       <div class="header-section">
 //         <div>
-//           <h2 class="font-bold tracking-tight mb-1" 
-//               [style.color]="'var(--theme-text-primary)'"
-//               [style.font-family]="'var(--font-heading)'"
-//               [style.font-size]="'var(--font-size-2xl)'">System Integrity & Alerts</h2>
-//           <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">
+//           <h2 class="page-title">
+//             <i class="pi pi-shield header-icon"></i>
+//             System Integrity & Alerts
+//           </h2>
+//           <p class="page-subtitle">
 //             Monitoring administrative access and critical business bottlenecks
 //           </p>
 //         </div>
-//         <div class="flex items-center gap-3">
-//           <div class="px-3 py-1 border rounded-lg flex items-center gap-2" 
-//                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'">
-//             <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase">Security Status</span>
-//             <span class="font-bold tabular-nums" [style.color]="securityData()?.riskyActions > 0 ? 'var(--theme-error)' : 'var(--theme-success)'">
+//         <div class="header-actions">
+//           <div class="status-badge" [class.secure]="securityData()?.riskyActions === 0" [class.risk]="securityData()?.riskyActions > 0">
+//             <span class="status-label">Security Status</span>
+//             <span class="status-value">
 //               {{ securityData()?.riskyActions > 0 ? 'Action Required' : 'Secure' }}
 //             </span>
 //           </div>
@@ -325,100 +397,102 @@ export class SystemAuditAlertsComponent implements OnInit {
 //         </div>
 //       </div>
 
+//       <div class="filter-section">
+//         <app-universal-filter
+//           [entityType]="'system-audit'"
+//           [config]="filterConfig"
+//           (filterChange)="onFilterUpdate($event)">
+//         </app-universal-filter>
+//       </div>
+
 //       <ng-container *ngIf="!loading(); else loader">
         
-//         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-//           <div class="p-6 border transition-all hover:scale-[1.01]" 
-//                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//             <div class="flex justify-between items-start mb-4">
-//               <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase tracking-widest">Inventory Health</span>
-//               <i class="pi pi-box text-rose-400"></i>
+//         <div class="kpi-grid">
+          
+//           <div class="kpi-card inventory-card">
+//             <div class="card-header">
+//               <span class="kpi-label">Inventory Health</span>
+//               <i class="pi pi-box kpi-icon error"></i>
 //             </div>
-//             <div class="flex items-baseline gap-2">
-//               <h2 class="text-3xl font-bold tabular-nums text-rose-500">{{ alertsData()?.lowStockCount }}</h2>
-//               <span [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Low Stock Items</span>
+//             <div class="card-body">
+//               <h2 class="kpi-value error">{{ alertsData()?.lowStockCount }}</h2>
+//               <span class="kpi-sub">Low Stock Items</span>
 //             </div>
-//             <div class="mt-4 p-2 rounded bg-rose-500/5 border border-rose-500/10">
-//                <p class="text-[10px] font-bold text-rose-400 uppercase mb-1">To Reorder:</p>
-//                <p class="text-[11px] font-bold text-white truncate">{{ alertsData()?.itemsToReorder[0] }}</p>
+//             <div class="priority-box error">
+//                <span class="priority-label">Top Priority:</span>
+//                <span class="priority-value">{{ alertsData()?.itemsToReorder[0] || 'None' }}</span>
 //             </div>
 //           </div>
 
-//           <div class="p-6 border transition-all hover:scale-[1.01]" 
-//                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//             <div class="flex justify-between items-start mb-4">
-//               <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase tracking-widest">Financial Exposure</span>
-//               <i class="pi pi-exclamation-triangle text-amber-400"></i>
+//           <div class="kpi-card debt-card">
+//             <div class="card-header">
+//               <span class="kpi-label">Financial Exposure</span>
+//               <i class="pi pi-exclamation-triangle kpi-icon warning"></i>
 //             </div>
-//             <div class="flex items-baseline gap-2">
-//               <h2 class="text-3xl font-bold tabular-nums text-amber-500">{{ alertsData()?.highRiskDebtCount }}</h2>
-//               <span [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">High Risk Debts</span>
+//             <div class="card-body">
+//               <h2 class="kpi-value warning">{{ alertsData()?.highRiskDebtCount }}</h2>
+//               <span class="kpi-sub">High Risk Debts</span>
 //             </div>
-//             <p class="mt-4 text-[11px]" [style.color]="'var(--theme-text-secondary)'">Action: Immediate payment follow-up recommended for overdue segments.</p>
+//             <p class="action-text">Action: Immediate payment follow-up recommended.</p>
 //           </div>
 
-//           <div class="p-6 border text-white shadow-lg" 
-//                [style.background]="'var(--theme-accent-gradient)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//             <p class="uppercase font-black tracking-tighter opacity-80 mb-2" [style.font-size]="'var(--font-size-xs)'">Audit Trail</p>
-//             <h2 class="text-2xl font-bold mb-1">{{ securityData()?.recentEvents?.length }} Events</h2>
-//             <p class="text-[11px] font-bold opacity-90 uppercase italic">Logged in last 72 hours</p>
-//             <div class="mt-6 flex gap-2">
-//                <p-button label="Review Logs" severity="secondary" [text]="true" size="small" styleClass="bg-white/10 text-white border-white/20"></p-button>
+//           <div class="kpi-card audit-card">
+//             <div>
+//               <p class="audit-label">Audit Trail</p>
+//               <h2 class="audit-value">{{ securityData()?.recentEvents?.length }} Events</h2>
+//               <p class="audit-sub">Logged in selected period</p>
+//             </div>
+//             <div class="audit-actions">
+//                <p-button label="Review Logs" [text]="true" size="small" styleClass="light-btn"></p-button>
 //             </div>
 //           </div>
 //         </div>
 
-//         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+//         <div class="content-grid">
           
-//           <div class="lg:col-span-8">
-//             <div class="border overflow-hidden shadow-sm h-full flex flex-col" 
-//                  [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//               <div class="shrink-0 p-4 border-b flex justify-between items-center" [style.border-color]="'var(--theme-border-primary)'" [style.background]="'var(--theme-bg-ternary)'">
-//                 <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-xs)'">Administrative Access Log</h3>
-//                 <span class="text-[9px] font-mono opacity-50" [style.color]="'var(--theme-text-label)'">IP TRAFFIC: MONITORING</span>
+//           <div class="main-column">
+//             <div class="grid-card">
+//               <div class="grid-header">
+//                 <h3 class="grid-title">Administrative Access Log</h3>
+//                 <span class="grid-tag">IP TRAFFIC: MONITORING</span>
 //               </div>
 
-//               <div class="grid-wrapper flex-1 relative min-h-[400px]">
+//               <div class="grid-container">
 //                  <app-ag-share-grid 
 //                    [columns]="auditColumns" 
 //                    [data]="securityData()?.recentEvents || []" 
 //                    [showActions]="false" 
-//                    style="height: 100%; width: 100%; display: block; position: absolute; inset: 0;">
+//                    class="full-size-grid">
 //                  </app-ag-share-grid>
 //               </div>
-
 //             </div>
 //           </div>
 
-//           <div class="lg:col-span-4 space-y-6">
+//           <div class="side-column">
             
-//             <div class="p-5 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//                <h4 class="font-bold mb-4 uppercase tracking-tighter" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Re-order Checklist</h4>
-//                <div class="space-y-3">
+//             <div class="side-card checklist-card">
+//                <h4 class="side-title mb-sm">Re-order Checklist</h4>
+//                <div class="checklist">
 //                  @for (item of alertsData()?.itemsToReorder; track item) {
-//                    <div class="flex items-center justify-between p-3 border rounded-lg transition-colors hover:bg-white/5" 
-//                         [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'">
-//                      <span class="font-bold text-white" [style.font-size]="'var(--font-size-xs)'">{{ item }}</span>
-//                      <p-button icon="pi pi-shopping-cart" [text]="true" severity="info" size="small"></p-button>
+//                    <div class="check-item">
+//                      <span class="item-name" [title]="item">{{ item }}</span>
+//                      <p-button icon="pi pi-shopping-cart" [text]="true" severity="info" size="small" styleClass="icon-btn"></p-button>
 //                    </div>
 //                  }
 //                  @if (!alertsData()?.itemsToReorder?.length) {
-//                    <p class="text-center py-4 text-[11px]" [style.color]="'var(--theme-text-tertiary)'">No immediate stock-outs detected.</p>
+//                    <p class="empty-text">No immediate stock-outs detected.</p>
 //                  }
 //                </div>
 //             </div>
 
-//             <div class="p-5 border border-dashed flex flex-col items-center text-center" 
-//                  [style.background]="'rgba(16, 185, 129, 0.03)'" 
-//                  [style.border-color]="'var(--theme-success)'" 
-//                  [style.border-radius]="'var(--ui-border-radius-xl)'">
-//               <div class="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-3">
-//                  <i class="pi pi-check-circle text-xl"></i>
-//               </div>
-//               <h4 class="font-bold text-white mb-1">Environment Secure</h4>
-//               <p [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">
-//                 Audit logs show zero unauthorized requests. Last integrity check completed at {{ securityData()?.recentEvents[0]?.createdAt | date:'shortTime' }}.
-//               </p>
+//             <div class="side-card secure-card">
+//                <div class="secure-icon-box">
+//                   <i class="pi pi-check-circle secure-icon"></i>
+//                </div>
+//                <h4 class="secure-title">Environment Secure</h4>
+//                <p class="secure-text">
+//                  Zero unauthorized requests. Checked at {{ securityData()?.recentEvents[0]?.createdAt | date:'shortTime' }}.
+//                </p>
 //             </div>
 //           </div>
 //         </div>
@@ -426,22 +500,304 @@ export class SystemAuditAlertsComponent implements OnInit {
 //       </ng-container>
 
 //       <ng-template #loader>
-//         <div class="h-[60vh] flex flex-col items-center justify-center gap-4">
+//         <div class="loader-container">
 //           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-12 h-12"></p-progressSpinner>
-//           <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'" class="font-bold uppercase tracking-widest">Fetching Security Tokens...</p>
+//           <p class="loader-text">Fetching Security Tokens...</p>
 //         </div>
 //       </ng-template>
 
 //     </div>
 //   `,
-//   styles: []
+//   styles: [`
+//     :host { display: block; width: 100%; }
+
+//     .audit-container {
+//       padding: var(--spacing-lg) var(--spacing-xl);
+//       background: var(--bg-primary);
+//       font-family: var(--font-body);
+//       min-height: 100%;
+//     }
+
+//     /* HEADER */
+//     .header-section {
+//       display: flex;
+//       flex-wrap: wrap;
+//       justify-content: space-between;
+//       align-items: center;
+//       gap: var(--spacing-md);
+//       margin-bottom: var(--spacing-md);
+//     }
+    
+//     .filter-section { margin-bottom: var(--spacing-lg); }
+
+//     .page-title {
+//       font-size: var(--font-size-2xl);
+//       font-weight: var(--font-weight-bold);
+//       color: var(--text-primary);
+//       display: flex;
+//       align-items: center;
+//       gap: var(--spacing-sm);
+//       margin: 0 0 4px 0;
+//       letter-spacing: -0.01em;
+//     }
+
+//     .header-icon { color: var(--accent-primary); }
+
+//     .page-subtitle {
+//       font-size: var(--font-size-sm);
+//       color: var(--text-tertiary);
+//       margin: 0;
+//     }
+
+//     .header-actions { display: flex; align-items: center; gap: var(--spacing-sm); }
+
+//     .status-badge {
+//       padding: 4px 12px;
+//       border: 1px solid var(--border-primary);
+//       background: var(--bg-secondary);
+//       border-radius: var(--ui-border-radius);
+//       display: flex;
+//       align-items: center;
+//       gap: var(--spacing-sm);
+//     }
+//     .status-badge.secure .status-value { color: var(--color-success); }
+//     .status-badge.risk .status-value { color: var(--color-error); }
+
+//     .status-label { font-size: var(--font-size-xs); font-weight: bold; text-transform: uppercase; color: var(--text-label); }
+//     .status-value { font-weight: bold; font-variant-numeric: tabular-nums; }
+
+//     /* KPI GRID */
+//     .kpi-grid {
+//       display: grid;
+//       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+//       gap: var(--spacing-md);
+//       margin-bottom: var(--spacing-lg);
+//     }
+
+//     /* KPI CARDS */
+//     .kpi-card {
+//       background: var(--bg-secondary);
+//       border: 1px solid var(--border-primary);
+//       border-radius: var(--ui-border-radius-xl);
+//       padding: var(--spacing-lg);
+//       transition: var(--transition-base);
+//       display: flex;
+//       flex-direction: column;
+//     }
+//     .kpi-card:hover { transform: translateY(-2px); border-color: var(--border-secondary); box-shadow: var(--shadow-sm); }
+
+//     .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--spacing-xs); }
+    
+//     .kpi-label {
+//       font-size: var(--font-size-xs);
+//       font-weight: bold;
+//       text-transform: uppercase;
+//       letter-spacing: 0.05em;
+//       color: var(--text-label);
+//     }
+
+//     .kpi-icon { font-size: 1rem; }
+//     .kpi-icon.error { color: var(--color-error); }
+//     .kpi-icon.warning { color: var(--color-warning); }
+
+//     .card-body { display: flex; align-items: baseline; gap: var(--spacing-sm); }
+
+//     .kpi-value {
+//       font-size: var(--font-size-2xl);
+//       font-weight: bold;
+//       font-family: var(--font-heading);
+//       margin: 0;
+//       line-height: 1;
+//     }
+//     .kpi-value.error { color: var(--color-error); }
+//     .kpi-value.warning { color: var(--color-warning); }
+
+//     .kpi-sub { font-size: var(--font-size-xs); color: var(--text-tertiary); }
+
+//     .priority-box {
+//       margin-top: var(--spacing-sm);
+//       padding: 4px 8px;
+//       border-radius: 4px;
+//       display: flex;
+//       justify-content: space-between;
+//       align-items: center;
+//       font-size: 10px;
+//       font-weight: bold;
+//     }
+//     .priority-box.error { background: var(--color-error-bg); border: 1px solid var(--color-error-border); }
+//     .priority-label { color: var(--color-error); text-transform: uppercase; }
+//     .priority-value { color: var(--text-primary); max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+//     .action-text {
+//       font-size: 10px;
+//       color: var(--text-secondary);
+//       opacity: 0.8;
+//       margin-top: var(--spacing-sm);
+//       line-height: 1.2;
+//     }
+
+//     /* AUDIT CARD (Gradient) */
+//     .audit-card {
+//       background: var(--accent-gradient);
+//       border: none;
+//       color: #ffffff;
+//       justify-content: space-between;
+//     }
+
+//     .audit-label { font-size: var(--font-size-xs); font-weight: 900; text-transform: uppercase; opacity: 0.8; margin: 0 0 4px 0; }
+//     .audit-value { font-size: var(--font-size-2xl); font-weight: bold; margin: 0; line-height: 1; }
+//     .audit-sub { font-size: 10px; font-weight: bold; text-transform: uppercase; opacity: 0.9; font-style: italic; margin-top: 4px; }
+
+//     /* CONTENT GRID */
+//     .content-grid {
+//       display: grid;
+//       grid-template-columns: 1fr;
+//       gap: var(--spacing-lg);
+//     }
+//     @media(min-width: 1024px) {
+//       .content-grid { grid-template-columns: 2fr 1fr; }
+//     }
+
+//     /* GRID CARD (Table) */
+//     .grid-card {
+//       background: var(--bg-secondary);
+//       border: 1px solid var(--border-primary);
+//       border-radius: var(--ui-border-radius-xl);
+//       overflow: hidden;
+//       height: 100%;
+//       min-height: 350px;
+//       display: flex;
+//       flex-direction: column;
+//     }
+
+//     .grid-header {
+//       padding: var(--spacing-sm) var(--spacing-md);
+//       border-bottom: 1px solid var(--border-primary);
+//       background: var(--bg-ternary);
+//       display: flex;
+//       justify-content: space-between;
+//       align-items: center;
+//       flex-shrink: 0;
+//     }
+
+//     .grid-title { font-size: var(--font-size-xs); font-weight: bold; text-transform: uppercase; color: var(--text-primary); margin: 0; }
+//     .grid-tag { font-size: 9px; font-family: var(--font-mono); color: var(--text-label); opacity: 0.8; }
+
+//     .grid-container { flex: 1; position: relative; }
+//     .full-size-grid { width: 100%; height: 100%; display: block; }
+
+//     /* SIDE COLUMN */
+//     .side-column { display: flex; flex-direction: column; gap: var(--spacing-md); }
+
+//     .side-card {
+//       background: var(--bg-secondary);
+//       border: 1px solid var(--border-primary);
+//       border-radius: var(--ui-border-radius-xl);
+//       padding: var(--spacing-md);
+//     }
+
+//     .side-title {
+//       font-size: var(--font-size-xs);
+//       font-weight: bold;
+//       text-transform: uppercase;
+//       color: var(--text-label);
+//       margin: 0;
+//     }
+//     .mb-sm { margin-bottom: var(--spacing-sm); }
+
+//     .checklist { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+
+//     .check-item {
+//       display: flex;
+//       justify-content: space-between;
+//       align-items: center;
+//       padding: var(--spacing-xs) var(--spacing-sm);
+//       border-radius: var(--ui-border-radius);
+//       border: 1px solid var(--border-secondary);
+//       background: var(--bg-ternary);
+//       transition: background 0.2s;
+//     }
+//     .check-item:hover { background: var(--component-bg-hover); }
+
+//     .item-name {
+//       font-size: var(--font-size-xs);
+//       font-weight: bold;
+//       color: var(--text-primary);
+//       white-space: nowrap;
+//       overflow: hidden;
+//       text-overflow: ellipsis;
+//       max-width: 150px;
+//     }
+
+//     .empty-text { text-align: center; padding: var(--spacing-sm); font-size: 10px; color: var(--text-tertiary); }
+
+//     /* SECURE CARD */
+//     .secure-card {
+//       border: 1px dashed var(--color-success);
+//       background: var(--color-success-bg);
+//       text-align: center;
+//       display: flex;
+//       flex-direction: column;
+//       align-items: center;
+//     }
+
+//     .secure-icon-box {
+//       width: 2rem; height: 2rem;
+//       border-radius: 50%;
+//       background: rgba(16, 185, 129, 0.1);
+//       color: var(--color-success);
+//       display: flex; align-items: center; justify-content: center;
+//       margin-bottom: var(--spacing-xs);
+//     }
+//     .secure-icon { font-size: 0.9rem; }
+
+//     .secure-title { font-size: var(--font-size-sm); font-weight: bold; color: var(--text-primary); margin: 0 0 2px 0; }
+//     .secure-text { font-size: 10px; color: var(--text-secondary); line-height: 1.4; margin: 0; }
+
+//     /* LOADER */
+//     .loader-container {
+//       height: 60vh;
+//       display: flex;
+//       flex-direction: column;
+//       align-items: center;
+//       justify-content: center;
+//       gap: var(--spacing-md);
+//     }
+//     .loader-text {
+//       font-size: var(--font-size-sm);
+//       color: var(--text-tertiary);
+//       font-weight: bold;
+//       text-transform: uppercase;
+//       letter-spacing: 0.05em;
+//     }
+//   `]
 // })
 // export class SystemAuditAlertsComponent implements OnInit {
 //   alertsData = signal<any>(null);
 //   securityData = signal<any>(null);
-//   loading = signal<boolean>(true);
-  
+//   loading = signal<boolean>(false);
 //   auditColumns: any[] = [];
+
+//   // Filter State
+//   private currentFilters: any = {};
+
+//   // 1. FILTER CONFIG
+//   filterConfig: FilterField[] = [
+//     {
+//       key: 'branchId',
+//       label: 'Branch Scope',
+//       type: 'select',
+//       dataSourceKey: 'branches', // Binds to MasterListService
+//       optionLabel: 'name',
+//       optionValue: '_id',
+//       placeholder: 'Global System'
+//     },
+//     {
+//       key: 'date',
+//       label: 'Audit Period',
+//       type: 'date-range'
+//     }
+//   ];
 
 //   constructor(
 //     private analyticsService: AdminAnalyticsService,
@@ -451,16 +807,22 @@ export class SystemAuditAlertsComponent implements OnInit {
 
 //   ngOnInit() {
 //     this.setupColumns();
+//     // refreshAll triggered by filter init
+//   }
+
+//   // 2. FILTER HANDLER
+//   onFilterUpdate(filters: any) {
+//     this.currentFilters = filters;
 //     this.refreshAll();
 //   }
 
 //   setupColumns(): void {
 //     this.auditColumns = [
 //       {
-//         field: 'userId.name', 
-//         headerName: 'Administrator', 
-//         sortable: true, 
-//         flex: 1,
+//         field: 'userId.name',
+//         headerName: 'Administrator',
+//         sortable: true,
+//         flex: 1.5,
 //         minWidth: 200,
 //         cellRenderer: (params: any) => {
 //           const user = params.data?.userId || {};
@@ -468,67 +830,77 @@ export class SystemAuditAlertsComponent implements OnInit {
 //           const email = user.email || '';
 //           const initials = this.commonService.getInitials(name);
 
-//           return `<div style="display: flex; align-items: center; gap: 12px; height: 100%;">
-//                     <div style="width: 28px; height: 28px; border-radius: 4px; background: rgba(99, 102, 241, 0.1); color: #818cf8; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 10px;">
+//           return `<div style="display: flex; align-items: center; gap: 10px; height: 100%;">
+//                     <div style="width: 28px; height: 28px; flex-shrink: 0; border-radius: 50%; background: var(--accent-focus); color: var(--accent-primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 10px; border: 1px solid var(--accent-secondary);">
 //                       ${initials}
 //                     </div>
-//                     <div style="display: flex; flex-direction: column;">
-//                       <span style="font-weight: 700; color: #fff; line-height: 1;">${name}</span>
-//                       <span style="font-size: 10px; opacity: 0.5; margin-top: 2px;">${email}</span>
+//                     <div style="display: flex; flex-direction: column; justify-content: center; line-height: 1.1;">
+//                       <span style="font-weight: 700; color: var(--text-primary); font-size: 12px; margin-bottom: 2px;">${name}</span>
+//                       <span style="font-size: 10px; color: var(--text-tertiary);">${email}</span>
 //                     </div>
 //                   </div>`;
 //         }
 //       },
 //       {
-//         field: 'action', 
-//         headerName: 'Action performed', 
-//         sortable: true, 
-//         width: 180,
+//         field: 'action',
+//         headerName: 'Action',
+//         sortable: true,
+//         flex: 1,
+//         minWidth: 160,
 //         cellRenderer: (params: any) => {
 //           const fullAction = params.value || '';
 //           const parts = fullAction.split(':');
-//           const category = parts[0] ? parts[0].trim() : '';
+//           const category = parts[0] ? parts[0].trim() : 'System'; 
 //           const actionName = parts[1] ? parts[1].trim() : fullAction;
-//           const entity = params.data?.entityType || 'system';
 
-//           return `<div style="display: flex; flex-direction: column; gap: 4px;">
-//                     <span style="padding: 2px 6px; width: fit-content; border-radius: 4px; font-weight: 700; font-size: 9px; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); color: #a5b4fc; text-transform: uppercase;">
+//           return `<div style="display: flex; flex-direction: column; justify-content: center; height: 100%; gap: 4px;">
+//                     <span style="width: fit-content; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 9px; background: var(--bg-ternary); border: 1px solid var(--border-secondary); color: var(--accent-primary); text-transform: uppercase; line-height: 1;">
+//                       ${category}
+//                     </span>
+//                     <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">
 //                       ${actionName}
 //                     </span>
-//                     <span style="font-size: 9px; color: var(--theme-text-label);">Entity: ${entity}</span>
 //                   </div>`;
 //         }
 //       },
 //       {
-//         field: 'ip', 
-//         headerName: 'Trace (IP)', 
-//         sortable: true, 
+//         field: 'ip',
+//         headerName: 'IP Address',
+//         sortable: true,
 //         width: 140,
 //         cellRenderer: (params: any) => {
-//           const ip = params.value === '::1' ? 'Localhost' : params.value;
-//           return `<span style="font-family: monospace; font-size: 10px; background: rgba(30, 41, 59, 0.5); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(51, 65, 85, 0.5); color: var(--theme-text-tertiary);">
-//                     ${ip}
-//                   </span>`;
+//           const ip = params.value === '::1' ? 'Localhost' : (params.value || 'Unknown');
+//           return `<div style="display: flex; align-items: center; height: 100%;">
+//                     <span style="font-family: var(--font-mono); font-size: 10px; background: var(--bg-secondary); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-primary); color: var(--text-secondary); display: flex; gap: 6px; align-items: center; line-height: 1;">
+//                       <i class="pi pi-globe" style="font-size: 9px; opacity: 0.6;"></i> ${ip}
+//                     </span>
+//                   </div>`;
 //         }
 //       },
 //       {
-//         field: 'createdAt', 
-//         headerName: 'Timestamp', 
-//         sortable: true, 
+//         field: 'createdAt',
+//         headerName: 'Time',
+//         sortable: true,
 //         width: 120,
 //         type: 'rightAligned',
 //         valueFormatter: (params: any) => this.commonService.formatDate(params.value, 'dd MMM, HH:mm'),
-//         cellStyle: { 'font-family': 'monospace', 'font-weight': '700', 'font-size': '10px', 'color': '#fff' }
+//         cellStyle: { 'display': 'flex', 'align-items': 'center', 'justify-content': 'flex-end', 'height': '100%', 'font-family': 'var(--font-mono)', 'font-size': '11px', 'color': 'var(--text-tertiary)' }
 //       }
 //     ];
 //     this.cdr.detectChanges();
-//   }
-
+//   } 
+ 
 //   refreshAll() {
 //     this.loading.set(true);
+    
+//     // Filters applied
+//     const branchId = this.currentFilters.branchId;
+//     const startDate = this.currentFilters.startDate;
+//     const endDate = this.currentFilters.endDate;
+
 //     forkJoin({
-//       alerts: this.analyticsService.getCriticalAlerts(),
-//       security: this.analyticsService.getSecurityAuditLog()
+//       alerts: this.analyticsService.getCriticalAlerts(branchId),
+//       security: this.analyticsService.getSecurityAuditLog(startDate, endDate, branchId)
 //     }).subscribe({
 //       next: (results) => {
 //         if (results.alerts.status === 'success') this.alertsData.set(results.alerts.data);
@@ -539,9 +911,9 @@ export class SystemAuditAlertsComponent implements OnInit {
 //     });
 //   }
 // }
-// // import { Component, OnInit, signal, computed } from '@angular/core';
+
+// // import { Component, OnInit, signal, ChangeDetectorRef } from '@angular/core';
 // // import { CommonModule } from '@angular/common';
-// // import { TableModule } from 'primeng/table';
 // // import { ButtonModule } from 'primeng/button';
 // // import { TagModule } from 'primeng/tag';
 // // import { TooltipModule } from 'primeng/tooltip';
@@ -549,31 +921,36 @@ export class SystemAuditAlertsComponent implements OnInit {
 // // import { forkJoin } from 'rxjs';
 // // import { CommonMethodService } from '../../core/utils/common-method.service';
 // // import { AdminAnalyticsService } from '../admin-analytics.service';
+// // import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
 
 // // @Component({
 // //   selector: 'app-system-audit-alerts',
 // //   standalone: true,
-// //   imports: [CommonModule, TableModule, ButtonModule, TagModule, TooltipModule, ProgressSpinnerModule],
+// //   imports: [
+// //     CommonModule, 
+// //     ButtonModule, 
+// //     TagModule, 
+// //     TooltipModule, 
+// //     ProgressSpinnerModule,
+// //     AgShareGrid
+// //   ],
 // //   template: `
-// //     <div class="p-4 md:p-6 transition-colors duration-300" 
-// //          [style.background]="'var(--theme-bg-primary)'"
-// //          [style.font-family]="'var(--font-body)'">
+// //     <div class="audit-container">
 
-// //       <div class="mb-8 flex flex-wrap justify-between items-center gap-4">
+// //       <div class="header-section">
 // //         <div>
-// //           <h2 class="font-bold tracking-tight mb-1" 
-// //               [style.color]="'var(--theme-text-primary)'"
-// //               [style.font-family]="'var(--font-heading)'"
-// //               [style.font-size]="'var(--font-size-2xl)'">System Integrity & Alerts</h2>
-// //           <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">
+// //           <h2 class="page-title">
+// //             <i class="pi pi-shield header-icon"></i>
+// //             System Integrity & Alerts
+// //           </h2>
+// //           <p class="page-subtitle">
 // //             Monitoring administrative access and critical business bottlenecks
 // //           </p>
 // //         </div>
-// //         <div class="flex items-center gap-3">
-// //           <div class="px-3 py-1 border rounded-lg flex items-center gap-2" 
-// //                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'">
-// //             <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase">Security Status</span>
-// //             <span class="font-bold tabular-nums" [style.color]="securityData()?.riskyActions > 0 ? 'var(--theme-error)' : 'var(--theme-success)'">
+// //         <div class="header-actions">
+// //           <div class="status-badge" [class.secure]="securityData()?.riskyActions === 0" [class.risk]="securityData()?.riskyActions > 0">
+// //             <span class="status-label">Security Status</span>
+// //             <span class="status-value">
 // //               {{ securityData()?.riskyActions > 0 ? 'Action Required' : 'Secure' }}
 // //             </span>
 // //           </div>
@@ -583,129 +960,91 @@ export class SystemAuditAlertsComponent implements OnInit {
 
 // //       <ng-container *ngIf="!loading(); else loader">
         
-// //         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-// //           <div class="p-6 border transition-all hover:scale-[1.01]" 
-// //                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //             <div class="flex justify-between items-start mb-4">
-// //               <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase tracking-widest">Inventory Health</span>
-// //               <i class="pi pi-box text-rose-400"></i>
+// //         <div class="kpi-grid">
+          
+// //           <div class="kpi-card inventory-card">
+// //             <div class="card-header">
+// //               <span class="kpi-label">Inventory Health</span>
+// //               <i class="pi pi-box kpi-icon error"></i>
 // //             </div>
-// //             <div class="flex items-baseline gap-2">
-// //               <h2 class="text-3xl font-bold tabular-nums text-rose-500">{{ alertsData()?.lowStockCount }}</h2>
-// //               <span [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Low Stock Items</span>
+// //             <div class="card-body">
+// //               <h2 class="kpi-value error">{{ alertsData()?.lowStockCount }}</h2>
+// //               <span class="kpi-sub">Low Stock Items</span>
 // //             </div>
-// //             <div class="mt-4 p-2 rounded bg-rose-500/5 border border-rose-500/10">
-// //                <p class="text-[10px] font-bold text-rose-400 uppercase mb-1">To Reorder:</p>
-// //                <p class="text-[11px] font-bold text-white truncate">{{ alertsData()?.itemsToReorder[0] }}</p>
+// //             <div class="priority-box error">
+// //                <span class="priority-label">Top Priority:</span>
+// //                <span class="priority-value">{{ alertsData()?.itemsToReorder[0] || 'None' }}</span>
 // //             </div>
 // //           </div>
 
-// //           <div class="p-6 border transition-all hover:scale-[1.01]" 
-// //                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //             <div class="flex justify-between items-start mb-4">
-// //               <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase tracking-widest">Financial Exposure</span>
-// //               <i class="pi pi-exclamation-triangle text-amber-400"></i>
+// //           <div class="kpi-card debt-card">
+// //             <div class="card-header">
+// //               <span class="kpi-label">Financial Exposure</span>
+// //               <i class="pi pi-exclamation-triangle kpi-icon warning"></i>
 // //             </div>
-// //             <div class="flex items-baseline gap-2">
-// //               <h2 class="text-3xl font-bold tabular-nums text-amber-500">{{ alertsData()?.highRiskDebtCount }}</h2>
-// //               <span [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">High Risk Debts</span>
+// //             <div class="card-body">
+// //               <h2 class="kpi-value warning">{{ alertsData()?.highRiskDebtCount }}</h2>
+// //               <span class="kpi-sub">High Risk Debts</span>
 // //             </div>
-// //             <p class="mt-4 text-[11px]" [style.color]="'var(--theme-text-secondary)'">Action: Immediate payment follow-up recommended for overdue segments.</p>
+// //             <p class="action-text">Action: Immediate payment follow-up recommended.</p>
 // //           </div>
 
-// //           <div class="p-6 border text-white shadow-lg" 
-// //                [style.background]="'var(--theme-accent-gradient)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //             <p class="uppercase font-black tracking-tighter opacity-80 mb-2" [style.font-size]="'var(--font-size-xs)'">Audit Trail</p>
-// //             <h2 class="text-2xl font-bold mb-1">{{ securityData()?.recentEvents?.length }} Events</h2>
-// //             <p class="text-[11px] font-bold opacity-90 uppercase italic">Logged in last 72 hours</p>
-// //             <div class="mt-6 flex gap-2">
-// //                <p-button label="Review Logs" severity="secondary" [text]="true" size="small" styleClass="bg-white/10 text-white border-white/20"></p-button>
+// //           <div class="kpi-card audit-card">
+// //             <div>
+// //               <p class="audit-label">Audit Trail</p>
+// //               <h2 class="audit-value">{{ securityData()?.recentEvents?.length }} Events</h2>
+// //               <p class="audit-sub">Logged in last 72 hours</p>
+// //             </div>
+// //             <div class="audit-actions">
+// //                <p-button label="Review Logs" [text]="true" size="small" styleClass="light-btn"></p-button>
 // //             </div>
 // //           </div>
 // //         </div>
 
-// //         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+// //         <div class="content-grid">
           
-// //           <div class="lg:col-span-8">
-// //             <div class="border overflow-hidden shadow-sm" 
-// //                  [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //               <div class="p-4 border-b flex justify-between items-center" [style.border-color]="'var(--theme-border-primary)'" [style.background]="'var(--theme-bg-ternary)'">
-// //                 <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-xs)'">Administrative Access Log</h3>
-// //                 <span class="text-[9px] font-mono opacity-50" [style.color]="'var(--theme-text-label)'">IP TRAFFIC: MONITORING</span>
+// //           <div class="main-column">
+// //             <div class="grid-card">
+// //               <div class="grid-header">
+// //                 <h3 class="grid-title">Administrative Access Log</h3>
+// //                 <span class="grid-tag">IP TRAFFIC: MONITORING</span>
 // //               </div>
 
-// //               <p-table [value]="securityData()?.recentEvents" styleClass="p-datatable-sm no-border-table">
-// //                 <ng-template pTemplate="header">
-// //                   <tr>
-// //                     <th [style.color]="'var(--theme-text-label)'">Administrator</th>
-// //                     <th [style.color]="'var(--theme-text-label)'">Action performed</th>
-// //                     <th [style.color]="'var(--theme-text-label)'">Trace (IP)</th>
-// //                     <th [style.color]="'var(--theme-text-label)'" class="text-right">Timestamp</th>
-// //                   </tr>
-// //                 </ng-template>
-// //                 <ng-template pTemplate="body" let-event>
-// //                   <tr [style.color]="'var(--theme-text-secondary)'">
-// //                     <td>
-// //                       <div class="flex items-center gap-3">
-// //                         <div class="w-7 h-7 rounded bg-indigo-500/10 flex items-center justify-center text-indigo-400 font-bold text-[10px]">
-// //                           {{ commonService.getInitials(event.userId?.name) }}
-// //                         </div>
-// //                         <div class="flex flex-col">
-// //                           <span class="font-bold text-white leading-none mb-1">{{ event.userId?.name }}</span>
-// //                           <span class="text-[9px] opacity-50">{{ event.userId?.email }}</span>
-// //                         </div>
-// //                       </div>
-// //                     </td>
-// //                     <td>
-// //                       <div class="flex flex-col gap-1">
-// //                         <span class="px-2 py-0.5 w-fit rounded font-bold text-[9px] bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 uppercase tracking-tighter">
-// //                           {{ event.action.split(':')[1] || event.action }}
-// //                         </span>
-// //                         <span class="text-[9px]" [style.color]="'var(--theme-text-label)'">Entity: {{ event.entityType }}</span>
-// //                       </div>
-// //                     </td>
-// //                     <td>
-// //                       <span class="font-mono text-[10px] bg-slate-800/50 px-2 py-0.5 rounded border border-slate-700/50" [style.color]="'var(--theme-text-tertiary)'">
-// //                         {{ event.ip === '::1' ? 'Localhost' : event.ip }}
-// //                       </span>
-// //                     </td>
-// //                     <td class="text-right font-mono text-[10px] font-bold text-white tabular-nums">
-// //                       {{ event.createdAt | date:'dd MMM, HH:mm' }}
-// //                     </td>
-// //                   </tr>
-// //                 </ng-template>
-// //               </p-table>
+// //               <div class="grid-container">
+// //                  <app-ag-share-grid 
+// //                    [columns]="auditColumns" 
+// //                    [data]="securityData()?.recentEvents || []" 
+// //                    [showActions]="false" 
+// //                    class="full-size-grid">
+// //                  </app-ag-share-grid>
+// //               </div>
 // //             </div>
 // //           </div>
 
-// //           <div class="lg:col-span-4 space-y-6">
+// //           <div class="side-column">
             
-// //             <div class="p-5 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //                <h4 class="font-bold mb-4 uppercase tracking-tighter" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Re-order Checklist</h4>
-// //                <div class="space-y-3">
+// //             <div class="side-card checklist-card">
+// //                <h4 class="side-title mb-sm">Re-order Checklist</h4>
+// //                <div class="checklist">
 // //                  @for (item of alertsData()?.itemsToReorder; track item) {
-// //                    <div class="flex items-center justify-between p-3 border rounded-lg transition-colors hover:bg-white/5" 
-// //                         [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'">
-// //                      <span class="font-bold text-white" [style.font-size]="'var(--font-size-xs)'">{{ item }}</span>
-// //                      <p-button icon="pi pi-shopping-cart" [text]="true" severity="info" size="small"></p-button>
+// //                    <div class="check-item">
+// //                      <span class="item-name" [title]="item">{{ item }}</span>
+// //                      <p-button icon="pi pi-shopping-cart" [text]="true" severity="info" size="small" styleClass="icon-btn"></p-button>
 // //                    </div>
 // //                  }
 // //                  @if (!alertsData()?.itemsToReorder?.length) {
-// //                    <p class="text-center py-4 text-[11px]" [style.color]="'var(--theme-text-tertiary)'">No immediate stock-outs detected.</p>
+// //                    <p class="empty-text">No immediate stock-outs detected.</p>
 // //                  }
 // //                </div>
 // //             </div>
 
-// //             <div class="p-5 border border-dashed flex flex-col items-center text-center" 
-// //                  [style.background]="'rgba(16, 185, 129, 0.03)'" 
-// //                  [style.border-color]="'var(--theme-success)'" 
-// //                  [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //               <div class="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-3">
-// //                  <i class="pi pi-check-circle text-xl"></i>
+// //             <div class="side-card secure-card">
+// //               <div class="secure-icon-box">
+// //                  <i class="pi pi-check-circle secure-icon"></i>
 // //               </div>
-// //               <h4 class="font-bold text-white mb-1">Environment Secure</h4>
-// //               <p [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">
-// //                 Audit logs show zero unauthorized requests. Last integrity check completed at {{ securityData()?.recentEvents[0]?.createdAt | date:'shortTime' }}.
+// //               <h4 class="secure-title">Environment Secure</h4>
+// //               <p class="secure-text">
+// //                 Zero unauthorized requests. Checked at {{ securityData()?.recentEvents[0]?.createdAt | date:'shortTime' }}.
 // //               </p>
 // //             </div>
 // //           </div>
@@ -714,26 +1053,274 @@ export class SystemAuditAlertsComponent implements OnInit {
 // //       </ng-container>
 
 // //       <ng-template #loader>
-// //         <div class="h-[60vh] flex flex-col items-center justify-center gap-4">
+// //         <div class="loader-container">
 // //           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-12 h-12"></p-progressSpinner>
-// //           <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'" class="font-bold uppercase tracking-widest">Fetching Security Tokens...</p>
+// //           <p class="loader-text">Fetching Security Tokens...</p>
 // //         </div>
 // //       </ng-template>
 
 // //     </div>
 // //   `,
 // //   styles: [`
-// //     :host ::ng-deep .no-border-table .p-datatable-tbody > tr {
-// //       background: transparent !important;
-// //       border-bottom: 1px solid var(--theme-border-primary) !important;
+// //     /* HOST & LAYOUT */
+// //     :host { display: block; width: 100%; }
+
+// //     .audit-container {
+// //       padding: var(--spacing-lg) var(--spacing-xl);
+// //       background: var(--bg-primary);
+// //       font-family: var(--font-body);
+// //       min-height: 100%;
 // //     }
-// //     :host ::ng-deep .no-border-table .p-datatable-thead > tr > th {
-// //       background: transparent !important;
-// //       padding: 0.85rem 1rem;
-// //       font-size: 10px;
-// //       font-weight: 700;
+
+// //     /* HEADER */
+// //     .header-section {
+// //       display: flex;
+// //       flex-wrap: wrap;
+// //       justify-content: space-between;
+// //       align-items: center;
+// //       gap: var(--spacing-md);
+// //       margin-bottom: var(--spacing-xl);
+// //     }
+
+// //     .page-title {
+// //       font-size: var(--font-size-2xl);
+// //       font-weight: var(--font-weight-bold);
+// //       color: var(--text-primary);
+// //       display: flex;
+// //       align-items: center;
+// //       gap: var(--spacing-sm);
+// //       margin: 0 0 4px 0;
+// //       letter-spacing: -0.01em;
+// //     }
+
+// //     .header-icon { color: var(--accent-primary); }
+
+// //     .page-subtitle {
+// //       font-size: var(--font-size-sm);
+// //       color: var(--text-tertiary);
+// //       margin: 0;
+// //     }
+
+// //     .header-actions { display: flex; align-items: center; gap: var(--spacing-sm); }
+
+// //     .status-badge {
+// //       padding: 4px 12px;
+// //       border: 1px solid var(--border-primary);
+// //       background: var(--bg-secondary);
+// //       border-radius: var(--ui-border-radius);
+// //       display: flex;
+// //       align-items: center;
+// //       gap: var(--spacing-sm);
+// //     }
+// //     .status-badge.secure .status-value { color: var(--color-success); }
+// //     .status-badge.risk .status-value { color: var(--color-error); }
+
+// //     .status-label { font-size: var(--font-size-xs); font-weight: bold; text-transform: uppercase; color: var(--text-label); }
+// //     .status-value { font-weight: bold; font-variant-numeric: tabular-nums; }
+
+// //     /* KPI GRID */
+// //     .kpi-grid {
+// //       display: grid;
+// //       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+// //       gap: var(--spacing-md);
+// //       margin-bottom: var(--spacing-lg);
+// //     }
+
+// //     /* KPI CARDS */
+// //     .kpi-card {
+// //       background: var(--bg-secondary);
+// //       border: 1px solid var(--border-primary);
+// //       border-radius: var(--ui-border-radius-xl);
+// //       padding: var(--spacing-lg);
+// //       transition: var(--transition-base);
+// //       display: flex;
+// //       flex-direction: column;
+// //     }
+// //     .kpi-card:hover { transform: translateY(-2px); border-color: var(--border-secondary); box-shadow: var(--shadow-sm); }
+
+// //     .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--spacing-xs); }
+    
+// //     .kpi-label {
+// //       font-size: var(--font-size-xs);
+// //       font-weight: bold;
 // //       text-transform: uppercase;
-// //       border: none !important;
+// //       letter-spacing: 0.05em;
+// //       color: var(--text-label);
+// //     }
+
+// //     .kpi-icon { font-size: 1rem; }
+// //     .kpi-icon.error { color: var(--color-error); }
+// //     .kpi-icon.warning { color: var(--color-warning); }
+
+// //     .card-body { display: flex; align-items: baseline; gap: var(--spacing-sm); }
+
+// //     .kpi-value {
+// //       font-size: var(--font-size-2xl);
+// //       font-weight: bold;
+// //       font-family: var(--font-heading);
+// //       margin: 0;
+// //       line-height: 1;
+// //     }
+// //     .kpi-value.error { color: var(--color-error); }
+// //     .kpi-value.warning { color: var(--color-warning); }
+
+// //     .kpi-sub { font-size: var(--font-size-xs); color: var(--text-tertiary); }
+
+// //     .priority-box {
+// //       margin-top: var(--spacing-sm);
+// //       padding: 4px 8px;
+// //       border-radius: 4px;
+// //       display: flex;
+// //       justify-content: space-between;
+// //       align-items: center;
+// //       font-size: 10px;
+// //       font-weight: bold;
+// //     }
+// //     .priority-box.error { background: var(--color-error-bg); border: 1px solid var(--color-error-border); }
+// //     .priority-label { color: var(--color-error); text-transform: uppercase; }
+// //     .priority-value { color: var(--text-primary); max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+// //     .action-text {
+// //       font-size: 10px;
+// //       color: var(--text-secondary);
+// //       opacity: 0.8;
+// //       margin-top: var(--spacing-sm);
+// //       line-height: 1.2;
+// //     }
+
+// //     /* AUDIT CARD (Gradient) */
+// //     .audit-card {
+// //       background: var(--accent-gradient);
+// //       border: none;
+// //       color: #ffffff;
+// //       justify-content: space-between;
+// //     }
+
+// //     .audit-label { font-size: var(--font-size-xs); font-weight: 900; text-transform: uppercase; opacity: 0.8; margin: 0 0 4px 0; }
+// //     .audit-value { font-size: var(--font-size-2xl); font-weight: bold; margin: 0; line-height: 1; }
+// //     .audit-sub { font-size: 10px; font-weight: bold; text-transform: uppercase; opacity: 0.9; font-style: italic; margin-top: 4px; }
+
+// //     /* CONTENT GRID */
+// //     .content-grid {
+// //       display: grid;
+// //       grid-template-columns: 1fr;
+// //       gap: var(--spacing-lg);
+// //     }
+// //     @media(min-width: 1024px) {
+// //       .content-grid { grid-template-columns: 2fr 1fr; }
+// //     }
+
+// //     /* GRID CARD (Table) */
+// //     .grid-card {
+// //       background: var(--bg-secondary);
+// //       border: 1px solid var(--border-primary);
+// //       border-radius: var(--ui-border-radius-xl);
+// //       overflow: hidden;
+// //       height: 100%;
+// //       min-height: 350px;
+// //       display: flex;
+// //       flex-direction: column;
+// //     }
+
+// //     .grid-header {
+// //       padding: var(--spacing-sm) var(--spacing-md);
+// //       border-bottom: 1px solid var(--border-primary);
+// //       background: var(--bg-ternary);
+// //       display: flex;
+// //       justify-content: space-between;
+// //       align-items: center;
+// //       flex-shrink: 0;
+// //     }
+
+// //     .grid-title { font-size: var(--font-size-xs); font-weight: bold; text-transform: uppercase; color: var(--text-primary); margin: 0; }
+// //     .grid-tag { font-size: 9px; font-family: var(--font-mono); color: var(--text-label); opacity: 0.8; }
+
+// //     .grid-container { flex: 1; position: relative; }
+// //     .full-size-grid { width: 100%; height: 100%; display: block; }
+
+// //     /* SIDE COLUMN */
+// //     .side-column { display: flex; flex-direction: column; gap: var(--spacing-md); }
+
+// //     .side-card {
+// //       background: var(--bg-secondary);
+// //       border: 1px solid var(--border-primary);
+// //       border-radius: var(--ui-border-radius-xl);
+// //       padding: var(--spacing-md);
+// //     }
+
+// //     .side-title {
+// //       font-size: var(--font-size-xs);
+// //       font-weight: bold;
+// //       text-transform: uppercase;
+// //       color: var(--text-label);
+// //       margin: 0;
+// //     }
+// //     .mb-sm { margin-bottom: var(--spacing-sm); }
+
+// //     .checklist { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+
+// //     .check-item {
+// //       display: flex;
+// //       justify-content: space-between;
+// //       align-items: center;
+// //       padding: var(--spacing-xs) var(--spacing-sm);
+// //       border-radius: var(--ui-border-radius);
+// //       border: 1px solid var(--border-secondary);
+// //       background: var(--bg-ternary);
+// //       transition: background 0.2s;
+// //     }
+// //     .check-item:hover { background: var(--component-bg-hover); }
+
+// //     .item-name {
+// //       font-size: var(--font-size-xs);
+// //       font-weight: bold;
+// //       color: var(--text-primary);
+// //       white-space: nowrap;
+// //       overflow: hidden;
+// //       text-overflow: ellipsis;
+// //       max-width: 150px;
+// //     }
+
+// //     .empty-text { text-align: center; padding: var(--spacing-sm); font-size: 10px; color: var(--text-tertiary); }
+
+// //     /* SECURE CARD */
+// //     .secure-card {
+// //       border: 1px dashed var(--color-success);
+// //       background: var(--color-success-bg);
+// //       text-align: center;
+// //       display: flex;
+// //       flex-direction: column;
+// //       align-items: center;
+// //     }
+
+// //     .secure-icon-box {
+// //       width: 2rem; height: 2rem;
+// //       border-radius: 50%;
+// //       background: rgba(16, 185, 129, 0.1);
+// //       color: var(--color-success);
+// //       display: flex; align-items: center; justify-content: center;
+// //       margin-bottom: var(--spacing-xs);
+// //     }
+// //     .secure-icon { font-size: 0.9rem; }
+
+// //     .secure-title { font-size: var(--font-size-sm); font-weight: bold; color: var(--text-primary); margin: 0 0 2px 0; }
+// //     .secure-text { font-size: 10px; color: var(--text-secondary); line-height: 1.4; margin: 0; }
+
+// //     /* LOADER */
+// //     .loader-container {
+// //       height: 60vh;
+// //       display: flex;
+// //       flex-direction: column;
+// //       align-items: center;
+// //       justify-content: center;
+// //       gap: var(--spacing-md);
+// //     }
+// //     .loader-text {
+// //       font-size: var(--font-size-sm);
+// //       color: var(--text-tertiary);
+// //       font-weight: bold;
+// //       text-transform: uppercase;
+// //       letter-spacing: 0.05em;
 // //     }
 // //   `]
 // // })
@@ -741,19 +1328,107 @@ export class SystemAuditAlertsComponent implements OnInit {
 // //   alertsData = signal<any>(null);
 // //   securityData = signal<any>(null);
 // //   loading = signal<boolean>(true);
+// //   auditColumns: any[] = [];
 
 // //   constructor(
 // //     private analyticsService: AdminAnalyticsService,
-// //     public commonService: CommonMethodService
+// //     public commonService: CommonMethodService,
+// //     private cdr: ChangeDetectorRef
 // //   ) {}
 
 // //   ngOnInit() {
+// //     this.setupColumns();
 // //     this.refreshAll();
 // //   }
 
+// //   setupColumns(): void {
+// //   this.auditColumns = [
+// //     // 1. ADMINISTRATOR (Compact Profile)
+// //     {
+// //       field: 'userId.name',
+// //       headerName: 'Administrator',
+// //       sortable: true,
+// //       flex: 1.5,
+// //       minWidth: 200,
+// //       cellRenderer: (params: any) => {
+// //         const user = params.data?.userId || {};
+// //         const name = user.name || 'Unknown';
+// //         const email = user.email || '';
+// //         const initials = this.commonService.getInitials(name);
+
+// //         // Adjusted: Avatar 28px, tighter text spacing
+// //         return `<div style="display: flex; align-items: center; gap: 10px; height: 100%;">
+// //                   <div style="width: 28px; height: 28px; flex-shrink: 0; border-radius: 50%; background: var(--accent-focus); color: var(--accent-primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 10px; border: 1px solid var(--accent-secondary);">
+// //                     ${initials}
+// //                   </div>
+// //                   <div style="display: flex; flex-direction: column; justify-content: center; line-height: 1.1;">
+// //                     <span style="font-weight: 700; color: var(--text-primary); font-size: 12px; margin-bottom: 2px;">${name}</span>
+// //                     <span style="font-size: 10px; color: var(--text-tertiary);">${email}</span>
+// //                   </div>
+// //                 </div>`;
+// //       }
+// //     },
+
+// //   // 2. ACTION (Vertically Stacked & Centered)
+// //     {
+// //       field: 'action',
+// //       headerName: 'Action',
+// //       sortable: true,
+// //       flex: 1,
+// //       minWidth: 160,
+// //       cellRenderer: (params: any) => {
+// //         const fullAction = params.value || '';
+// //         const parts = fullAction.split(':');
+// //         // Fallback to 'System' if no category exists
+// //         const category = parts[0] ? parts[0].trim() : 'System'; 
+// //         const actionName = parts[1] ? parts[1].trim() : fullAction;
+
+// //         // Key Fix: 'justify-content: center' pushes the stack to the vertical middle
+// //         return `<div style="display: flex; flex-direction: column; justify-content: center; height: 100%; gap: 4px;">
+// //                   <span style="width: fit-content; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 9px; background: var(--bg-ternary); border: 1px solid var(--border-secondary); color: var(--accent-primary); text-transform: uppercase; line-height: 1;">
+// //                     ${category}
+// //                   </span>
+// //                   <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">
+// //                     ${actionName}
+// //                   </span>
+// //                 </div>`;
+// //       }
+// //     },
+
+// //     // 3. IP ADDRESS (Vertically Centered Pill)
+// //     {
+// //       field: 'ip',
+// //       headerName: 'IP Address',
+// //       sortable: true,
+// //       width: 140,
+// //       cellRenderer: (params: any) => {
+// //         const ip = params.value === '::1' ? 'Localhost' : (params.value || 'Unknown');
+
+// //         // Key Fix: 'align-items: center' ensures the pill sits exactly in the middle of 60px
+// //         return `<div style="display: flex; align-items: center; height: 100%;">
+// //                   <span style="font-family: var(--font-mono); font-size: 10px; background: var(--bg-secondary); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-primary); color: var(--text-secondary); display: flex; gap: 6px; align-items: center; line-height: 1;">
+// //                      <i class="pi pi-globe" style="font-size: 9px; opacity: 0.6;"></i> ${ip}
+// //                   </span>
+// //                 </div>`;
+// //       }
+// //     },
+
+// //     // 4. TIME (Simple Right Align)
+// //     {
+// //       field: 'createdAt',
+// //       headerName: 'Time',
+// //       sortable: true,
+// //       width: 120,
+// //       type: 'rightAligned',
+// //       valueFormatter: (params: any) => this.commonService.formatDate(params.value, 'dd MMM, HH:mm'),
+// //       cellStyle: { 'display': 'flex', 'align-items': 'center', 'justify-content': 'flex-end', 'height': '100%', 'font-family': 'var(--font-mono)', 'font-size': '11px', 'color': 'var(--text-tertiary)' }
+// //     }
+// //   ];
+// //   this.cdr.detectChanges();
+// // } 
+ 
 // //   refreshAll() {
 // //     this.loading.set(true);
-// //     // Fetch both API endpoints simultaneously
 // //     forkJoin({
 // //       alerts: this.analyticsService.getCriticalAlerts(),
 // //       security: this.analyticsService.getSecurityAuditLog()

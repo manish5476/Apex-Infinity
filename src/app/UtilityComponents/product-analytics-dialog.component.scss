@@ -1,0 +1,384 @@
+/* product-analytics-dialog.component.scss */
+
+:host {
+  display: block;
+  font-family: var(--font-body);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.analytics-container {
+  min-height: 400px;
+  position: relative;
+}
+
+/* =========================================
+   1. GLASS HEADER
+   ========================================= */
+.glass-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: rgba(255, 255, 255, 0.9); // Fallback
+  background: var(--glass-bg-c);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-secondary);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  margin: 0;
+
+  .header-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+  }
+
+  .product-identity {
+    .sku-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-tertiary);
+      background: var(--bg-secondary);
+      padding: 2px 6px;
+      border-radius: var(--ui-border-radius-sm);
+      margin-bottom: 4px;
+      font-family: var(--font-mono);
+    }
+
+    .product-title {
+      margin: 0;
+      font-family: var(--font-heading);
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      line-height: var(--line-height-tight);
+    }
+  }
+
+  /* Price Comparison Pills */
+  .price-comparison {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    background: var(--bg-secondary);
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--ui-border-radius-lg);
+    border: 1px solid var(--border-secondary);
+
+    .connector { color: var(--text-tertiary); font-size: var(--font-size-sm); }
+
+    .price-node {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      
+      .label { 
+        font-size: 9px; 
+        text-transform: uppercase; 
+        color: var(--text-tertiary); 
+        letter-spacing: 0.5px;
+      }
+      .value {
+        font-family: var(--font-mono);
+        font-weight: var(--font-weight-bold);
+        font-size: var(--font-size-md);
+      }
+
+      &.cost .value { color: var(--color-error); }
+      &.sell .value { color: var(--color-primary); }
+    }
+  }
+}
+
+.scrollable-content {
+  padding: var(--spacing-xl);
+}
+
+/* =========================================
+   2. KPI CARDS
+   ========================================= */
+.kpi-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.kpi-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--ui-border-radius-lg);
+  padding: var(--spacing-md);
+  display: flex;
+  gap: var(--spacing-md);
+  transition: var(--transition-base);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .icon-box {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--ui-border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-lg);
+  }
+
+  .kpi-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .kpi-label {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .kpi-value {
+    font-family: var(--font-heading);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-lg);
+    color: var(--text-primary);
+    
+    &.neutral { color: var(--text-secondary); }
+    small { font-size: 0.6em; color: var(--text-tertiary); font-weight: normal;}
+  }
+
+  /* Semantic Variants */
+  &.revenue {
+    .icon-box { background: var(--color-info-bg); color: var(--color-info); }
+  }
+
+  &.profit {
+    background: var(--color-success-bg); // Very subtle green bg
+    border-color: var(--color-success-border);
+    .icon-box { background: #fff; color: var(--color-success); }
+    .kpi-value { color: var(--color-success-dark); }
+    .kpi-badge {
+      margin-top: 4px;
+      font-size: 10px;
+      background: #fff;
+      color: var(--color-success);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: bold;
+      display: inline-block;
+    }
+  }
+
+  &.volume {
+    .icon-box { background: var(--bg-hover); color: var(--text-secondary); }
+    .kpi-sub { font-size: 10px; color: var(--text-tertiary); margin-top: 2px;}
+  }
+}
+
+/* =========================================
+   3. TABS & TABLES
+   ========================================= */
+.details-section {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--ui-border-radius-xl);
+  overflow: hidden;
+}
+
+/* Override PrimeNG Tabs to match theme */
+:host ::ng-deep {
+  .p-tablist-tab-list {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-secondary);
+  }
+  
+  .p-tab {
+    padding: var(--spacing-md) var(--spacing-lg);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    transition: var(--transition-base);
+
+    &:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+    
+    &.p-tab-active {
+      color: var(--accent-primary);
+      border-bottom: 2px solid var(--accent-primary);
+      background: var(--bg-primary);
+    }
+  }
+
+  .p-tabpanels {
+    padding: 0; // Remove default padding
+  }
+}
+
+.table-wrapper {
+  // PrimeNG Table Overrides
+  :host ::ng-deep .modern-table {
+    .p-datatable-header, .p-datatable-thead > tr > th {
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      font-size: var(--font-size-xs);
+      text-transform: uppercase;
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-bottom: 1px solid var(--border-secondary);
+    }
+
+    .p-datatable-tbody > tr > td {
+      padding: var(--spacing-md);
+      font-size: var(--font-size-sm);
+      border-bottom: 1px solid var(--border-primary);
+      color: var(--text-primary);
+    }
+    
+    .p-datatable-tbody > tr:last-child > td {
+      border-bottom: none;
+    }
+  }
+}
+
+/* =========================================
+   4. CHART (CSS Grid)
+   ========================================= */
+.chart-wrapper {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.chart-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+
+  .row-label {
+    width: 60px;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+  }
+
+  .row-bars {
+    flex: 1;
+    height: 28px;
+    background: var(--bg-secondary);
+    border-radius: var(--ui-border-radius-sm);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bar-revenue {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    background: var(--color-info-bg); // Light Blue
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+    
+    .bar-value {
+      font-size: 10px;
+      font-weight: bold;
+      color: var(--color-info-dark);
+      z-index: 2;
+    }
+  }
+
+  .bar-profit {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    background: var(--color-success); // Strong Green
+    opacity: 0.9;
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    border-radius: 0 var(--ui-border-radius-sm) var(--ui-border-radius-sm) 0;
+    
+    .bar-value-inner {
+      font-size: 10px;
+      font-weight: bold;
+      color: white;
+      white-space: nowrap;
+    }
+  }
+}
+
+/* Utilities */
+.text-right { text-align: right; }
+.text-success { color: var(--color-success); }
+.text-primary { color: var(--accent-primary); }
+.text-secondary { color: var(--text-secondary); }
+.font-bold { font-weight: var(--font-weight-bold); }
+.font-medium { font-weight: var(--font-weight-medium); }
+.mono-text { font-family: var(--font-mono); font-size: var(--font-size-xs); color: var(--text-tertiary); }
+
+/* Loading */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: var(--text-tertiary);
+  
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border-secondary);
+    border-top-color: var(--accent-primary);
+    border-radius: 50%;
+    animation: spin 1s infinite linear;
+    margin-bottom: var(--spacing-md);
+  }
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.glass-header {
+  /* ... existing styles ... */
+
+  .header-main {
+    /* Update to ensure space for button */
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; /* Align to top */
+  }
+
+  /* New Close Button Styles */
+  .header-actions {
+    margin-left: auto; /* Push to far right */
+    padding-left: var(--spacing-md);
+  }
+
+  .close-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+    transition: var(--transition-fast);
+    
+    i { font-size: 1rem; }
+
+    &:hover {
+      background: var(--color-error-bg); /* Light red background on hover */
+      color: var(--color-error);         /* Red icon */
+      transform: rotate(90deg);          /* Nice little interaction */
+    }
+  }
+}

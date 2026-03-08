@@ -1,0 +1,156 @@
+.activity-widget {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-secondary);
+      border-radius: var(--ui-border-radius-xl);
+      border: 1px solid var(--border-secondary);
+      overflow: hidden;
+      min-height: 400px;
+    }
+
+    .widget-header {
+      padding: var(--spacing-lg) var(--spacing-xl);
+      border-bottom: 1px solid var(--border-secondary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-primary);
+
+      h3 {
+        margin: 0;
+        font-family: var(--font-heading);
+        font-size: var(--font-size-md);
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .badge {
+        font-size: 10px;
+        padding: 2px 8px;
+        background: var(--bg-ternary);
+        border-radius: 10px;
+        color: var(--text-secondary);
+        font-weight: 600;
+      }
+    }
+
+    .timeline-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--spacing-lg);
+    }
+
+    .loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--text-tertiary);
+      gap: 8px;
+      font-size: var(--font-size-sm);
+    }
+
+    .timeline-item {
+      display: flex;
+      gap: var(--spacing-md);
+      position: relative;
+      padding-bottom: var(--spacing-lg);
+      cursor: pointer;
+      transition: transform 0.2s;
+
+      &:hover {
+        .timeline-content {
+          background: var(--bg-hover);
+          border-color: var(--accent-primary);
+        }
+      }
+
+      &:last-child {
+        padding-bottom: 0;
+        .timeline-left .line { display: none; }
+      }
+    }
+
+    /* Left Visuals */
+    .timeline-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 32px;
+
+      .icon-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        z-index: 2;
+        border: 2px solid var(--bg-secondary); /* Cutout effect */
+        
+        /* Type Colors */
+        &.task { background: #dbeafe; color: #2563eb; }
+        &.meeting { background: #fae8ff; color: #c026d3; }
+        &.note { background: #f3f4f6; color: #4b5563; }
+        &.project { background: #dcfce7; color: #16a34a; }
+      }
+
+      .line {
+        width: 2px;
+        flex: 1;
+        background: var(--border-secondary);
+        margin-top: 4px;
+        min-height: 20px;
+      }
+    }
+
+    /* Content Card */
+    .timeline-content {
+      flex: 1;
+      background: var(--bg-ternary);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--ui-border-radius);
+      padding: var(--spacing-md);
+      transition: all 0.2s;
+
+      .activity-header {
+        font-size: var(--font-size-sm);
+        margin-bottom: 4px;
+        line-height: 1.4;
+        
+        .user-name { font-weight: 700; color: var(--text-primary); margin-right: 4px; }
+        .action { color: var(--text-secondary); margin-right: 4px; }
+        .target-title { font-weight: 600; color: var(--accent-primary); }
+      }
+
+      .activity-meta {
+        display: flex;
+        align-items: center;
+        font-size: 11px;
+        color: var(--text-tertiary);
+        gap: 6px;
+
+        .priority-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          &.low { background: #10b981; }
+          &.medium { background: #3b82f6; }
+          &.high { background: #f59e0b; }
+          &.urgent { background: #ef4444; }
+        }
+        
+        .date-sep { opacity: 0.5; }
+      }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: var(--spacing-3xl);
+      color: var(--text-tertiary);
+      i { font-size: 2rem; margin-bottom: var(--spacing-md); opacity: 0.5; }
+      p { font-size: var(--font-size-sm); margin: 0; }
+    }

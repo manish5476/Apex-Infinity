@@ -66,7 +66,7 @@
 
 /* --- 2. FILTER BAR --- */
 .themed-card {
-  background: var(--bg-secondary);
+  background: var(--bg-primary);
   border: 1px solid var(--border-primary);
   border-radius: var(--ui-border-radius-lg);
   box-shadow: var(--shadow-sm);
@@ -116,7 +116,7 @@
   /* Override themed-card default */
   &.themed-card {
     padding: 0;
-    background: var(--bg-secondary);
+    background: var(--bg-primary);
     border: 1px solid var(--border-primary);
   }
 
@@ -127,52 +127,3 @@
   }
 }
 
-/* --- GLOBAL OVERRIDES --- */
-:host ::ng-deep {
-  
-  /* Inputs */
-  .p-inputtext, .p-select {
-    background: var(--bg-ternary);
-    border-color: var(--border-secondary);
-    color: var(--text-primary);
-    border-radius: var(--ui-border-radius);
-    
-    &:enabled:focus {
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 1px var(--accent-primary);
-    }
-    
-    &:enabled:hover {
-      border-color: var(--text-tertiary);
-    }
-  }
-
-  /* Icons inside inputs */
-  .p-input-icon-left {
-    width: 100%;
-    i { color: var(--text-tertiary); z-index: 1; top: 50%; margin-top: -0.5rem; }
-    .p-inputtext { padding-left: 2.5rem; }
-  }
-  
-  /* Grid Status Badges */
-  .cell-status {
-    display: flex;
-    align-items: center;
-    height: 100%;
-    font-weight: 700;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    
-    &.status-active { color: var(--color-success); }
-    &.status-inactive { color: var(--text-tertiary); }
-    
-    &.status-low-stock { 
-        color: var(--color-warning); 
-        background: color-mix(in srgb, var(--color-warning) 10%, transparent);
-        padding: 0 8px;
-        border-radius: 4px;
-        display: inline-flex;
-        height: 24px; /* Pill height */
-    }
-  }
-}

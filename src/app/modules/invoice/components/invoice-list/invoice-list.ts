@@ -1,3 +1,4 @@
+
 import { ChangeDetectorRef, Component, OnInit, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GridApi, GridReadyEvent, ITooltipParams } from 'ag-grid-community';
@@ -37,7 +38,6 @@ import { ActionViewRenderer } from '../../../shared/AgGrid/AgGridcomponents/Dyna
     ToastModule,
     DatePickerModule,
     AgShareGrid
-    // Note: ItemTooltipComponent is NOT imported here to avoid NG8113 warning
   ],
   templateUrl: './invoice-list.html',
   styleUrl: './invoice-list.scss',
@@ -52,8 +52,11 @@ export class InvoiceListComponent implements OnInit {
   private common = inject(CommonMethodService);
 
   private gridApi!: GridApi;
+
+
   private currentPage = 1;
   private pageSize = 50;
+  hasNextPage = true;
   isLoading = false;
   isExporting = false;
   totalCount = 0;
@@ -112,86 +115,10 @@ export class InvoiceListComponent implements OnInit {
     this.getData(true);
   }
 
-  exportReport() {
-    if (this.isExporting) return;
-    this.isExporting = true;
-    const params: any = { ...this.invoiceFilter, format: 'csv' };
-    if (this.dateRange && this.dateRange[0]) {
-      params.start = this.dateRange[0].toISOString();
-    }
-    if (this.dateRange && this.dateRange[1]) {
-      params.end = this.dateRange[1].toISOString();
-    }
-
-    this.invoiceService.exportInvoices(params)
-      .pipe(finalize(() => this.isExporting = false))
-      .subscribe({
-        next: (blob) => {
-          const filename = `Invoices_Export_${new Date().toISOString().slice(0, 10)}.csv`;
-          this.common.downloadBlob(blob, filename);
-        },
-        error: (err) => this.messageService.showError('Export Failed', 'Could not download report.')
-      });
-  }
-
-  getData(isReset: boolean = false) {
-    if (this.isLoading) return;
-    this.isLoading = true;
-
-    if (isReset) {
-      this.currentPage = 1;
-      this.data = [];
-      this.totalCount = 0;
-    }
-
-    const filterParams: any = {
-      ...this.invoiceFilter,
-      page: this.currentPage,
-      limit: this.pageSize,
-    };
-
-    // if (this.dateRange && this.dateRange[0]) {
-    //   filterParams.start = this.dateRange[0].toISOString();
-    // }
-    // if (this.dateRange && this.dateRange[1]) {
-    //   filterParams.end = this.dateRange[1].toISOString();
-    // }
-    // --- CHANGE STARTS HERE ---
-    if (this.dateRange && this.dateRange[0]) {
-      filterParams['invoiceDate[gte]'] = this.dateRange[0].toISOString();
-    }
-
-    if (this.dateRange && this.dateRange[1]) {
-      const endDate = new Date(this.dateRange[1]);
-      filterParams['invoiceDate[lte]'] = endDate.toISOString();
-    }
-    this.invoiceService.getAllInvoices(filterParams).subscribe({
-      next: (res: any) => {
-        let newData: any[] = [];
-        if (res.data && Array.isArray(res.data.data)) {
-          newData = res.data.data;
-        }
-
-        this.totalCount = res.results || this.totalCount;
-        this.data = [...this.data, ...newData];
-
-        if (this.gridApi && !isReset) {
-          this.gridApi.applyTransaction({ add: newData });
-        }
-
-        this.currentPage++;
-        this.isLoading = false;
-        this.cdr.markForCheck();
-      },
-      error: (err: any) => {
-        this.isLoading = false;
-        this.messageService.showError('Error', 'Failed to fetch invoices.');
-      }
-    });
-  }
 
   onScrolledToBottom(_: any) {
-    if (!this.isLoading && this.data.length < this.totalCount) {
+    //
+    if (!this.isLoading && this.hasNextPage) {
       this.getData(false);
     }
   }
@@ -203,7 +130,6 @@ export class InvoiceListComponent implements OnInit {
   eventFromGrid(event: any) {
     console.log(event);
     if (event.type === 'cellClicked') {
-
       const invoiceId = event.row._id;
       if (event.field === '_id') {
 
@@ -218,11 +144,11 @@ export class InvoiceListComponent implements OnInit {
 
   getColumn(): void {
     this.column = [
-      // GROUP 1: IDENTIFICATION
+
       {
         headerName: 'Identity',
         children: [
-          // 1. Invoice Number (Pinned Left)
+
           {
             field: 'invoiceNumber',
             headerName: 'Invoice #',
@@ -236,7 +162,7 @@ export class InvoiceListComponent implements OnInit {
                     </span>`;
             }
           },
-          // 2. Branch (Context)
+
           {
             field: 'branchId.name',
             headerName: 'Branch',
@@ -246,13 +172,13 @@ export class InvoiceListComponent implements OnInit {
         ]
       },
 
-      // GROUP 2: CUSTOMER DETAILS (New)
+
       {
         headerName: 'Customer Information',
         children: [
           {
             headerName: 'Customer',
-            field: 'customerId.name', // For sorting/filtering
+            field: 'customerId.name',
             width: 200,
             cellRenderer: (params: any) => {
               const customer = params.data.customerId;
@@ -261,7 +187,7 @@ export class InvoiceListComponent implements OnInit {
               const name = customer.name;
               const contact = customer.phone || customer.email || '';
 
-              // Stacked Layout: Name on top, Contact info below
+
               return `
               <div style="display:flex; flex-direction:column; justify-content:center; height:100%; line-height:1.3;">
                 <span style="font-weight:600; color:var(--text-primary); font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
@@ -282,7 +208,7 @@ export class InvoiceListComponent implements OnInit {
         ]
       },
 
-      // GROUP 3: STATUS & DATES
+
       {
         headerName: 'Status & Timeline',
         children: [
@@ -299,7 +225,7 @@ export class InvoiceListComponent implements OnInit {
             width: 110,
             valueFormatter: (p: any) => p.value ? new Date(p.value).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' }) : '',
             cellStyle: (params: any) => {
-              // Highlight if overdue and not paid
+
               const isOverdue = new Date(params.value) < new Date() && params.data.paymentStatus !== 'paid';
               return {
                 'color': isOverdue ? 'var(--color-error)' : 'var(--text-secondary)',
@@ -325,7 +251,7 @@ export class InvoiceListComponent implements OnInit {
         ]
       },
 
-      // GROUP 4: FINANCIALS
+
       {
         headerName: 'Financials',
         children: [
@@ -361,13 +287,13 @@ export class InvoiceListComponent implements OnInit {
           }
         ]
       },
-  
-    // ACTIONS
+
+
       {
         headerName: 'Actions',
         field: '_id',
         width: 50,
-        cellRenderer: ActionViewRenderer, // Reference the renderer here
+        cellRenderer: ActionViewRenderer,
       }
     ];
     this.cdr.detectChanges();
@@ -389,5 +315,106 @@ export class InvoiceListComponent implements OnInit {
     };
     const theme = colors[val.toLowerCase()] || colors.draft;
     return `<span style="background:${theme.bg}; color:${theme.text}; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">${val}</span>`;
+  }
+
+  exportReport() {
+    if (this.isExporting) return;
+    this.isExporting = true;
+    
+    const params: any = { ...this.invoiceFilter, format: 'csv' };
+    if (this.dateRange && this.dateRange[0]) {
+      params.start = this.dateRange[0].toISOString();
+    }
+    if (this.dateRange && this.dateRange[1]) {
+      params.end = this.dateRange[1].toISOString();
+    }
+
+    this.invoiceService.exportInvoices(params)
+      .pipe(finalize(() => this.isExporting = false))
+      .subscribe({
+        next: (blob) => {
+          const filename = `Invoices_Export_${new Date().toISOString().slice(0, 10)}.csv`;
+          this.common.downloadBlob(blob, filename);
+          
+          // Added a simple success notification
+          this.messageService.showSuccess('Invoice report exported successfully.');
+        },
+        error: (err) => {
+          // Replaced manual showError with the global HTTP error handler
+          this.messageService.handleHttpError(err);
+        }
+      });
+  }
+
+  getData(isReset: boolean = false) {
+    if (isReset) {
+      this.currentPage = 1;
+      this.data = [];
+      this.totalCount = 0;
+      this.hasNextPage = true; 
+    }
+
+    if (this.isLoading || (!isReset && !this.hasNextPage)) return;
+
+    this.isLoading = true;
+
+    const filterParams: any = {
+      ...this.invoiceFilter,
+      page: this.currentPage,
+      limit: this.pageSize,
+    };
+
+    if (this.dateRange && this.dateRange[0]) {
+      filterParams['invoiceDate[gte]'] = this.dateRange[0].toISOString();
+    }
+
+    if (this.dateRange && this.dateRange[1]) {
+      const endDate = new Date(this.dateRange[1]);
+      filterParams['invoiceDate[lte]'] = endDate.toISOString();
+    }
+
+    this.invoiceService.getAllInvoices(filterParams).subscribe({
+      next: (res: any) => {
+        let newData: any[] = [];
+        
+        if (res.data && Array.isArray(res.data.data)) {
+          newData = res.data.data;
+        }
+
+        if (res.pagination) {
+            this.hasNextPage = res.pagination.hasNextPage;
+            this.totalCount = res.pagination.totalResults;
+        } else {
+            this.hasNextPage = newData.length >= this.pageSize;
+            this.totalCount = res.results || 0;
+        }
+
+        if (isReset) {
+            this.data = newData;
+        } else {
+            this.data = [...this.data, ...newData];
+        }
+
+        if (this.gridApi && !isReset && newData.length > 0) {
+          this.gridApi.applyTransaction({ add: newData });
+        }
+
+        if (this.hasNextPage) {
+            this.currentPage++;
+        }
+
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: (err: any) => {
+        this.isLoading = false;
+        
+        // Replaced manual string with global handler for precise error reporting
+        this.messageService.handleHttpError(err);
+        
+        // Vital to ensure the UI updates if the request fails
+        this.cdr.markForCheck();
+      }
+    });
   }
 }

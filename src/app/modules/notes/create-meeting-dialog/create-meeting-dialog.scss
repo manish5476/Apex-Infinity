@@ -1,0 +1,188 @@
+ .create-meeting-container {
+      padding: 0.5rem;
+    }
+
+    .meeting-form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-2xl);
+    }
+
+    /* Grid Layout */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-lg);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      
+      &.full-width {
+        grid-column: 1 / -1;
+      }
+
+      label {
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-secondary);
+
+        &.required::after {
+          content: " *";
+          color: var(--color-error);
+        }
+      }
+    }
+
+    /* PrimeNG Overrides for Alignment */
+    .w-full { width: 100%; }
+    
+    .p-datepicker { 
+      width: 100%; 
+      .p-inputtext { width: 100%; }
+    }
+    
+    .p-select { width: 100%; }
+
+    /* Strict alignment for Input Icons */
+    .p-input-icon-left {
+      position: relative;
+      display: block;
+      width: 100%;
+    }
+    
+    .p-input-icon-left > i {
+      position: absolute;
+      top: 50%;
+      margin-top: -0.5rem; /* Exactly half of icon height (assuming 1rem icon) */
+      left: 0.75rem;
+      color: var(--text-tertiary);
+      z-index: 1;
+    }
+
+    .p-input-icon-left > input {
+      padding-left: 2.5rem;
+      width: 100%;
+    }
+
+    .error-text {
+      color: var(--color-error);
+      font-size: var(--font-size-xs);
+    }
+
+    /* Participants Section */
+    .participants-section {
+      border-top: 1px solid var(--border-secondary);
+      padding-top: var(--spacing-lg);
+      margin-top: var(--spacing-md);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-md);
+
+      label {
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-bold);
+        color: var(--text-secondary);
+        text-transform: uppercase;
+      }
+
+      .search-box {
+        position: relative;
+        display: block;
+      }
+      
+      .search-box i {
+        position: absolute;
+        top: 50%;
+        margin-top: -0.5rem;
+        left: 0.75rem;
+        color: var(--text-tertiary);
+        z-index: 1;
+      }
+
+      .search-box input {
+        width: 200px;
+        padding-left: 2.25rem;
+        padding-top: 6px;
+        padding-bottom: 6px;
+      }
+    }
+
+    .participants-list {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--ui-border-radius);
+      background: var(--bg-secondary);
+    }
+
+    .user-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      border-bottom: 1px solid var(--border-secondary);
+
+      &:last-child { border-bottom: none; }
+      &:hover { background-color: var(--bg-hover); }
+      &.selected { background-color: color-mix(in srgb, var(--accent-primary) 5%, transparent); }
+
+      .avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 600;
+        margin-right: 12px;
+        flex-shrink: 0;
+      }
+
+      .user-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        
+        .name { font-size: var(--font-size-sm); font-weight: 500; color: var(--text-primary); }
+        .email { font-size: var(--font-size-xs); color: var(--text-tertiary); }
+      }
+
+      .checkbox i {
+        color: var(--text-tertiary);
+        font-size: 1.2rem;
+        &.pi-check-circle { color: var(--accent-primary); }
+      }
+    }
+
+    .empty-search {
+      padding: 16px;
+      text-align: center;
+      color: var(--text-tertiary);
+      font-size: var(--font-size-sm);
+    }
+
+    /* Footer */
+    .dialog-footer {
+      margin-top: var(--spacing-xl);
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--spacing-md);
+      padding-top: var(--spacing-lg);
+      border-top: 1px solid var(--border-secondary);
+    }
+
+    /* Scrollbar */
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background-color: var(--border-secondary); border-radius: 3px; }
+  

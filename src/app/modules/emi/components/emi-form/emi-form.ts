@@ -29,7 +29,7 @@ import { EmiService } from '../../services/emi-service';
     InputTextModule,
     InputNumberModule,
     DatePicker,
-    DividerModule,RouterModule
+    DividerModule, RouterModule
   ],
   templateUrl: './emi-form.html',
   styleUrls: ['./emi-form.scss']
@@ -44,7 +44,6 @@ export class EmiFormComponent implements OnInit, OnDestroy {
   private messageService = inject(AppMessageService);
   private loadingService = inject(LoadingService);
 
-  // --- Form & State ---
   emiForm!: FormGroup;
   isSubmitting = signal(false);
   invoiceId: string | null = null;
@@ -53,12 +52,9 @@ export class EmiFormComponent implements OnInit, OnDestroy {
 
   // Store fetched invoice data
   public invoice: any = null;
-
-  constructor() { }
-
   ngOnInit(): void {
     this.buildForm();
-    this.setupBalanceCalculation(); // Setup listener before patching
+    this.setupBalanceCalculation();
     this.loadInvoiceData();
   }
 
@@ -68,7 +64,61 @@ export class EmiFormComponent implements OnInit, OnDestroy {
     }
   }
 
-  private loadInvoiceData(): void {
+  private buildForm(): void {
+    this.emiForm = this.fb.group({
+      invoiceId: [null, Validators.required],
+      customerId: [null, Validators.required],
+      branchId: [null, Validators.required],
+      totalAmount: [{ value: 0, disabled: true }, Validators.required],
+      alreadyPaid: [{ value: 0, disabled: true }], // New field for paidAmount
+      downPayment: [0, [Validators.required, Validators.min(0)]], // This is NEW down payment
+      balanceAmount: [{ value: 0, disabled: true }, Validators.required], // Calculated Loan Amount
+      numberOfInstallments: [null, [Validators.required, Validators.min(1)]],
+      interestRate: [0, [Validators.required, Validators.min(0)]],
+      emiStartDate: [new Date(), Validators.required],
+    });
+  }
+
+  private patchFormWithInvoiceData(): void {
+    if (!this.invoice) return;
+    const total = this.invoice.grandTotal || 0;
+    const paid = this.invoice.paidAmount || 0;
+    const initialBalance = this.invoice.balanceAmount || (total - paid);
+    this.emiForm.patchValue({
+      invoiceId: this.invoice._id,
+      customerId: this.invoice.customerId?._id || this.invoice.customerId,
+      branchId: this.invoice.branchId,
+      totalAmount: total,
+      alreadyPaid: paid,
+      downPayment: 0,
+      balanceAmount: initialBalance
+    });
+  }
+
+  private setupBalanceCalculation(): void {
+    const totalControl = this.emiForm.get('totalAmount');
+    const paidControl = this.emiForm.get('alreadyPaid');
+    const downPaymentControl = this.emiForm.get('downPayment');
+    const balanceControl = this.emiForm.get('balanceAmount');
+    if (!totalControl || !paidControl || !downPaymentControl || !balanceControl) return;
+    this.calcSub = downPaymentControl.valueChanges.pipe(startWith(downPaymentControl.value)    ).subscribe((newDownPayment) => {
+      const total = totalControl.value || 0;
+      const alreadyPaid = paidControl.value || 0;
+      const downPay = newDownPayment || 0;
+
+      // Logic: 
+      // Loan Amount = (Invoice Total) - (Already Paid on Invoice) - (New Down Payment for EMI)
+      const loanAmount = total - alreadyPaid - downPay;
+
+      // Ensure we don't go negative
+      const finalBalance = loanAmount > 0 ? loanAmount : 0;
+
+      balanceControl.setValue(finalBalance, { emitEvent: false });
+    });
+  }
+
+
+private loadInvoiceData(): void {
     this.route.queryParamMap.pipe(
       switchMap(params => {
         this.invoiceId = params.get('invoiceId');
@@ -78,12 +128,13 @@ export class EmiFormComponent implements OnInit, OnDestroy {
         }
         
         if (!this.invoiceId) {
-          this.messageService.showError('Error', 'No Invoice ID provided.');
+          // Simplified to a single string
+          this.messageService.showError('Navigation Error: No Invoice ID provided.');
           this.router.navigate(['/invoices']);
           return of(null);
         }
 
-        this.loadingService.show();
+        // this.loadingService.show();
         return this.invoiceService.getInvoiceById(this.invoiceId);
       }),
       finalize(() => this.loadingService.hide())
@@ -93,92 +144,25 @@ export class EmiFormComponent implements OnInit, OnDestroy {
           this.invoice = response.data.data;
           this.patchFormWithInvoiceData();
         } else if (response) {
-          this.messageService.showError('Error', 'Failed to load invoice data');
+          // Simplified to a single string
+          this.messageService.showError('Failed to load invoice data.');
           this.router.navigate(['/invoices']);
         }
       },
       error: (err) => {
-        this.messageService.showError('Error', err.error?.message || 'Could not load invoice');
+        // Handed off to the global error parser
+        this.messageService.handleHttpError(err);
         this.router.navigate(['/invoices']);
       }
     });
   }
 
-  private buildForm(): void {
-    this.emiForm = this.fb.group({
-      invoiceId: [null, Validators.required],
-      customerId: [null, Validators.required],
-      branchId: [null, Validators.required],
-      
-      // Financials
-      totalAmount: [{ value: 0, disabled: true }, Validators.required],
-      alreadyPaid: [{ value: 0, disabled: true }], // New field for paidAmount
-      downPayment: [0, [Validators.required, Validators.min(0)]], // This is NEW down payment
-      balanceAmount: [{ value: 0, disabled: true }, Validators.required], // Calculated Loan Amount
-      
-      // Plan Config
-      numberOfInstallments: [null, [Validators.required, Validators.min(1)]],
-      interestRate: [0, [Validators.required, Validators.min(0)]],
-      emiStartDate: [new Date(), Validators.required],
-    });
-  }
-
-  private patchFormWithInvoiceData(): void {
-    if (!this.invoice) return;
-
-    // Determine initial values
-    const total = this.invoice.grandTotal || 0;
-    const paid = this.invoice.paidAmount || 0;
-    // Initial balance is the invoice balance (Total - Paid)
-    // We assume 'downPayment' in the form starts at 0 (meaning no *additional* down payment yet)
-    const initialBalance = this.invoice.balanceAmount || (total - paid);
-
-    this.emiForm.patchValue({
-      invoiceId: this.invoice._id,
-      customerId: this.invoice.customerId?._id || this.invoice.customerId,
-      branchId: this.invoice.branchId,
-      totalAmount: total,
-      alreadyPaid: paid,
-      downPayment: 0, 
-      balanceAmount: initialBalance 
-    });
-  }
-
-  private setupBalanceCalculation(): void {
-    const totalControl = this.emiForm.get('totalAmount');
-    const paidControl = this.emiForm.get('alreadyPaid');
-    const downPaymentControl = this.emiForm.get('downPayment');
-    const balanceControl = this.emiForm.get('balanceAmount');
-
-    if (!totalControl || !paidControl || !downPaymentControl || !balanceControl) return;
-
-    // Listen to changes in Down Payment (User Input)
-    // We combineLatest if we expect total/paid to change dynamically, 
-    // but usually only downPayment changes by user. 
-    // However, safer to watch state.
-    
-    this.calcSub = downPaymentControl.valueChanges.pipe(
-      startWith(downPaymentControl.value)
-    ).subscribe((newDownPayment) => {
-      const total = totalControl.value || 0;
-      const alreadyPaid = paidControl.value || 0;
-      const downPay = newDownPayment || 0;
-
-      // Logic: 
-      // Loan Amount = (Invoice Total) - (Already Paid on Invoice) - (New Down Payment for EMI)
-      const loanAmount = total - alreadyPaid - downPay;
-      
-      // Ensure we don't go negative
-      const finalBalance = loanAmount > 0 ? loanAmount : 0;
-
-      balanceControl.setValue(finalBalance, { emitEvent: false });
-    });
-  }
-
+  
   onSubmit(): void {
     if (this.emiForm.invalid) {
       this.emiForm.markAllAsTouched();
-      this.messageService.showError('Invalid Form', 'Please check all required fields.');
+      // Changed to showWarn for validation and combined into one string
+      this.messageService.showWarn('Invalid Form: Please check all required fields.');
       return;
     }
 
@@ -196,11 +180,13 @@ export class EmiFormComponent implements OnInit, OnDestroy {
       finalize(() => this.isSubmitting.set(false))
     ).subscribe({
       next: (res) => {
-        this.messageService.showSuccess('Success', 'EMI Plan created successfully.');
+        // Simplified success message
+        this.messageService.showSuccess('EMI Plan created successfully.');
         this.router.navigate(['/invoices/', this.invoiceId]);
       },
       error: (err) => {
-        this.messageService.showError('Error', err.error?.message || 'Failed to create EMI plan.');
+        // Handed off to the global error parser
+        this.messageService.handleHttpError(err);
       }
     });
   }

@@ -1,0 +1,287 @@
+   <div [class]="viewMode === 'list' ? 'note-item-list' : 'note-card-grid'" [class.is-pinned]="note.isPinned"
+      [class.is-archived]="note.status === 'archived'" [class.is-deleted]="note.isDeleted"
+      [class.priority-high]="note.priority === 'high'" [class.priority-urgent]="note.priority === 'urgent'"
+      (click)="onCardClick()">
+
+      <!-- ==================== VIEW MODE: GRID (CARD) ==================== -->
+      @if (viewMode === 'grid') {
+      <!-- Header: Type, Status, Pin -->
+      <div class="card-header">
+        <div class="badges">
+          <span class="type-badge" [ngClass]="note.noteType">
+            <i [class]="getTypeIcon(note.noteType)"></i>
+            <span>{{ note.noteType | titlecase }}</span>
+          </span>
+
+          @if (isOverdue) {
+          <span class="status-badge overdue">
+            <i class="pi pi-exclamation-circle"></i> Due
+          </span>
+          }
+
+          <!-- Linked Notes Indicator -->
+          @if (note.relatedNotes?.length) {
+          <span class="status-badge linked" title="Has linked notes">
+            <i class="pi pi-link"></i> {{note.relatedNotes?.length}}
+          </span>
+          }
+        </div>
+
+        <button class="action-btn pin-btn" [class.active]="note.isPinned"
+          (click)="$event.stopPropagation(); pin.emit(note._id)">
+          <i class="pi pi-thumbtack" [style.transform]="note.isPinned ? 'rotate(-45deg)' : 'none'"></i>
+        </button>
+      </div>
+
+      <!-- Body: Content -->
+      <div class="card-body">
+        <h3 class="note-title" [title]="note.title">
+          {{ note.title || 'Untitled Note' }}
+        </h3>
+
+        <!-- Meeting Specifics -->
+        @if (note.noteType === 'meeting') {
+        <div class="meeting-meta">
+          <div class="meta-row highlight">
+            <i class="pi pi-clock"></i>
+            <span>{{ meetingDateDisplay }}</span>
+            <span class="separator">•</span>
+            <span>{{ meetingTimeDisplay }}</span>
+          </div>
+          @if (note.meetingDetails?.location) {
+          <div class="meta-row">
+            <i class="pi pi-map-marker"></i> {{ note.meetingDetails?.location }}
+          </div>
+          }
+        </div>
+        }
+
+        <!-- Content Excerpt -->
+        <p class="note-excerpt">{{ getExcerpt(100) }}</p>
+
+        <!-- Progress Bar (Dynamic) -->
+        @if (progress !== null) {
+        <div class="progress-container">
+          <div class="progress-info">
+            <span>Progress</span>
+            <span class="progress-val">{{ progress }}%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" [style.width.%]="progress" [class.complete]="progress === 100"
+              [class.started]="progress! > 0 && progress! < 100"></div>
+          </div>
+        </div>
+        }
+
+        <!-- Tags -->
+        @if (note.tags.length) {
+        <div class="tags-row">
+          @for (tag of note.tags | slice:0:3; track tag) {
+          <span class="tag">#{{ tag }}</span>
+          }
+          @if (note.tags.length > 3) {
+          <span class="tag more">+{{ note.tags.length - 3 }}</span>
+          }
+        </div>
+        }
+      </div>
+
+      <!-- Footer: Avatars & Actions -->
+      <div class="card-footer">
+        <div class="avatars">
+
+          <!-- Owner -->
+          <div class="avatar owner" [title]="'Owner: ' + getOwnerName()">
+            {{ getOwnerName().charAt(0) | uppercase }}
+          </div>
+
+          <!-- Participants -->
+          @for (p of note.participants | slice:0:2; track p._id) {
+          <div class="avatar" [title]="getParticipantName(p)">
+            {{ getParticipantName(p).charAt(0) | uppercase }}
+          </div>
+          }
+
+          @if (note.participants.length > 2) {
+          <div class="avatar counter">
+            +{{ note.participants.length - 2 }}
+          </div>
+          }
+
+        </div>
+
+
+        <div class="actions" (click)="$event.stopPropagation()">
+          <ng-container *ngTemplateOutlet="actionButtons"></ng-container>
+        </div>
+      </div>
+      }
+
+      <!-- ==================== VIEW MODE: LIST ==================== -->
+      @if (viewMode === 'list') {
+      <!-- Priority Strip -->
+      <div class="list-strip" [ngClass]="note.priority || 'medium'"></div>
+
+      <!-- Icon -->
+      <div class="list-icon" [ngClass]="note.noteType">
+        <i [class]="getTypeIcon(note.noteType)"></i>
+      </div>
+
+      <!-- Main Info -->
+      <div class="list-main">
+        <div class="list-header">
+          <h3 class="list-title">{{ note.title || 'Untitled' }}</h3>
+          @if (note.isPinned) {
+          <span class="icon-indicator"><i class="pi pi-thumbtack"></i></span>
+          }
+          @if (isOverdue) {
+          <span class="list-badge overdue">Due</span>
+          }
+          @if (note.relatedNotes?.length) {
+          <span class="list-badge linked"><i class="pi pi-link"></i> {{note.relatedNotes?.length}}</span>
+          }
+        </div>
+        <p class="list-excerpt">{{ getExcerpt(80) }}</p>
+      </div>
+
+      <!-- Meta Columns (Desktop) -->
+      <div class="list-meta desktop-only">
+        <div class="meta-item">
+          <i class="pi pi-calendar"></i> {{ note.updatedAt | date:'MMM d' }}
+        </div>
+        @if (note.participants && note.participants.length) {
+        <div class="meta-item users">
+          <i class="pi pi-users"></i> {{ note.participants.length }}
+        </div>
+        }
+        @if (progress !== null) {
+        <div class="meta-item progress">
+          <div class="mini-progress-circle" [style.--p]="progress"></div>
+          <span>{{progress}}%</span>
+        </div>
+        }
+      </div>
+
+      <!-- Actions -->
+      <div class="list-actions" (click)="$event.stopPropagation()">
+        <ng-container *ngTemplateOutlet="actionButtons"></ng-container>
+      </div>
+      }
+
+      <!-- ==================== SHARED TEMPLATES: ACTIONS ==================== -->
+      <ng-template #actionButtons>
+
+        <!-- Active Note Actions -->
+        @if (!note.isDeleted && note.status !== 'archived') {
+        @if (note.noteType === 'note') {
+        <button class="action-btn" (click)="convertToTask.emit(note._id)" title="Convert to Task">
+          <i class="pi pi-check-square"></i>
+        </button>
+        }
+
+        <button class="action-btn" (click)="$event.stopPropagation(); linkClick.emit(note._id)" title="Link Note">
+          <i class="pi pi-link"></i>
+        </button>
+
+        <button class="action-btn" (click)="openShareDialog()" title="Share">
+          <i class="pi pi-share-alt"></i>
+        </button>
+
+        <button class="action-btn" (click)="archive.emit(note._id)" title="Archive">
+          <i class="pi pi-box"></i>
+        </button>
+
+        <button class="action-btn delete" (click)="delete.emit(note._id)" title="Delete">
+          <i class="pi pi-trash"></i>
+        </button>
+        }
+
+        <!-- Trash/Archived Actions -->
+        @if (note.isDeleted || note.status === 'archived') {
+        <button class="action-btn restore" (click)="restore.emit(note._id)" title="Restore">
+          <i class="pi pi-refresh"></i>
+        </button>
+        @if (note.isDeleted) {
+        <button class="action-btn delete-hard" (click)="deleteHard.emit(note._id)" title="Permanently Delete">
+          <i class="pi pi-times"></i>
+        </button>
+        }
+        }
+      </ng-template>
+
+    </div>
+
+    <!-- ==================== SHARE DIALOG OVERLAY ==================== -->
+    @if (showShareDialog) {
+    <div class="share-overlay" (click)="closeShareDialog()">
+      <div class="share-dialog" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <div class="title-group">
+            <i class="pi pi-share-alt"></i>
+            <h4>Share Note</h4>
+          </div>
+          <button class="close-btn" (click)="closeShareDialog()">×</button>
+        </div>
+
+        <div class="dialog-body">
+          <p class="dialog-subtitle">Invite users to collaborate on <strong>{{note.title}}</strong></p>
+
+          <div class="search-box">
+            <i class="pi pi-search"></i>
+            <input type="text" placeholder="Search by name or email..." [(ngModel)]="userSearch">
+          </div>
+
+          <div class="user-list">
+            @for (user of filteredUsers(); track user._id) {
+            <div class="user-item" (click)="toggleUserSelection(user._id)" [class.selected]="selectedUserIds.has(user._id)">
+
+              <div class="user-info">
+                <div class="avatar-sm" [style.backgroundColor]="getAvatarColor(user.name)">
+                  {{ user.name.charAt(0) | uppercase }}
+                </div>
+                <div class="details">
+                  <span class="name">{{ user.name }}</span>
+                  <span class="email">{{ user.email }}</span>
+                </div>
+              </div>
+
+              <div class="checkbox">
+                <div class="check-circle" [class.checked]="selectedUserIds.has(user._id)">
+                  <i class="pi pi-check"></i>
+                </div>
+              </div>
+            </div>
+            }
+
+            @if (filteredUsers().length === 0) {
+            <div class="empty-state">
+              <span>No users found</span>
+            </div>
+            }
+          </div>
+        </div>
+
+        <div class="dialog-footer">
+          <div class="permissions-group">
+            <label>Access Level</label>
+            <div class="select-wrapper">
+              <select [(ngModel)]="selectedPermission">
+                <option value="viewer">Viewer (Read Only)</option>
+                <option value="contributor">Contributor (Edit)</option>
+                <option value="admin">Admin (Full Access)</option>
+              </select>
+              <i class="pi pi-chevron-down"></i>
+            </div>
+          </div>
+          <button class="btn-primary" [disabled]="selectedUserIds.size === 0 || isSharing" (click)="submitShare()">
+            @if (!isSharing) {
+            <i class="pi pi-send"></i>
+            } @else {
+            <i class="pi pi-spin pi-spinner"></i>
+            }
+            <span>{{ isSharing ? 'Sending...' : 'Invite Users' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    }

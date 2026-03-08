@@ -34,7 +34,7 @@ export class CommonMethodService {
     successFn: (response: T) => void,
     context: string = 'Operation'
   ): void {
-    this.loadingService.show();
+    // this.loadingService.show();
 
     observable$.pipe(
       finalize(() => this.loadingService.hide())
@@ -43,7 +43,7 @@ export class CommonMethodService {
         successFn(res);
       },
       error: (err) => {
-        this.messageService.handleHttpError(err, context);
+        this.messageService.handleHttpError(err);
       }
     });
   }
@@ -171,7 +171,7 @@ export class CommonMethodService {
    */
   public exportToCsv(data: any[], filename: string = 'export.csv'): void {
     if (!data || data.length === 0) {
-      this.messageService.showWarn('No Data', 'There is no data to export.');
+      this.messageService.showWarn( 'There is no data to export.');
       return;
     }
 
@@ -230,9 +230,9 @@ export class CommonMethodService {
   public async copyToClipboard(text: string): Promise<void> {
     try {
       await navigator.clipboard.writeText(text);
-      this.messageService.showSuccess('Copied', 'Text copied to clipboard');
+      this.messageService.showSuccess( 'Text copied to clipboard');
     } catch (err) {
-      this.messageService.showError('Failed', 'Could not copy text');
+      this.messageService.showError('Could not copy text');
     }
   }
 
@@ -275,7 +275,7 @@ export class CommonMethodService {
   public createErrorHandler(operation: string = 'Operation') {
     return (error: HttpErrorResponse): Observable<never> => {
       console.error(`${operation} failed:`, error);
-      this.messageService.handleHttpError(error, operation);
+      this.messageService.handleHttpError(error);
       return throwError(() => error);
     };
   }

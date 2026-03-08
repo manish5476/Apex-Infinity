@@ -23,7 +23,9 @@
             "assets": [
               "src/assets"
             ],
+            
             "styles": [
+              "node_modules/quill/dist/quill.snow.css",
               "src/styles/styles.scss",
               "src/styles/animation.scss",
               "src/styles/common.scss",
@@ -95,7 +97,7 @@
               "all"
             ],
             "host": "0.0.0.0",
-            "port": 5000
+            "port": 4200
           },
           "configurations": {
             "production": {

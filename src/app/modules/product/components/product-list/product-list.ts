@@ -13,6 +13,9 @@ import { AppMessageService } from '../../../../core/services/message.service';
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { ImageCellRendererComponent } from '../../../shared/AgGrid/AgGridcomponents/image-cell-renderer/image-cell-renderer.component';
 import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
+import { Dialog } from "primeng/dialog";
+import { BulkProductEntry } from "../bulk-product-entry/bulk-product-entry";
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-product-list',
@@ -24,7 +27,9 @@ import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
     ButtonModule,
     InputTextModule,
     RouterModule,
-    AgShareGrid
+    AgShareGrid,
+    Dialog,
+    BulkProductEntry
   ],
   templateUrl: './product-list.html',
   styleUrl: './product-list.scss',
@@ -36,13 +41,13 @@ export class ProductListComponent implements OnInit {
   private masterList = inject(MasterListService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-
+  public selectedRows: any
   private gridApi!: GridApi;
   private currentPage = 1;
   private isLoading = false;
   private totalCount = 0;
   private pageSize = 50;
-  
+  public bulkDialogVisible: boolean = false
   data: any[] = [];
   column: any = [];
   rowSelectionMode: any = 'single';
@@ -59,9 +64,8 @@ export class ProductListComponent implements OnInit {
 
   constructor() {
     effect(() => {
-        // Load master data logic here if needed
-        this.brandOptions.set(this.masterList.brands());
-        this.categoryOptions.set(this.masterList.categories());
+      this.brandOptions.set(this.masterList.brands());
+      this.categoryOptions.set(this.masterList.categories());
     });
   }
 
@@ -95,29 +99,50 @@ export class ProductListComponent implements OnInit {
       limit: this.pageSize,
     };
 
-    this.productService.getAllProducts(filterParams).subscribe(
-      (res: any) => {
-        let newData: any[] = [];
-        if (res.data && Array.isArray(res.data.data)) {
-          newData = res.data.data;
+    this.productService.getAllProducts(filterParams)
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: (res: any) => {
+          let newData: any[] = [];
+
+          // 1. EXTRACT DATA
+          // Structure is: root -> data -> data (array)
+          if (res.data && Array.isArray(res.data.data)) {
+            newData = res.data.data;
+          }
+
+          // 2. EXTRACT PAGINATION
+          // Structure is: root -> pagination -> totalResults
+          if (res.pagination) {
+            this.totalCount = res.pagination.totalResults;
+          }
+
+          // 3. UPDATE LOCAL STATE
+          this.data = [...this.data, ...newData];
+
+          // 4. UPDATE GRID
+          if (this.gridApi) {
+            if (isReset) {
+              // If resetting, replace all data
+              this.gridApi.setGridOption('rowData', this.data);
+            } else {
+              // If appending (scrolling), just add new rows
+              this.gridApi.applyTransaction({ add: newData });
+            }
+          }
+
+          this.currentPage++;
+        },
+        error: (err: any) => {
+          // Replaced console.error and manual toast with global handler
+          this.messageService.handleHttpError(err);
         }
-
-        this.totalCount = res.results || this.totalCount;
-        this.data = [...this.data, ...newData];
-
-        if (this.gridApi && !isReset) {
-           this.gridApi.applyTransaction({ add: newData });
-        }
-
-        this.currentPage++;
-        this.isLoading = false;
-        this.cdr.markForCheck();
-      },
-      (err: any) => {
-        this.isLoading = false;
-        this.messageService.showError('Error', 'Failed to fetch products.');
-      }
-    );
+      });
   }
 
   onScrolledToBottom(event: any) {
@@ -131,14 +156,19 @@ export class ProductListComponent implements OnInit {
   }
 
   eventFromGrid(event: any) {
-     if (event.type=== 'cellClicked' && event.field==='name') {
+    console.log(event);
+    if (event.type === 'cellClicked' && event.field === 'name') {
       const productId = event.row._id;
       if (productId) {
         this.router.navigate([productId], { relativeTo: this.route });
       }
     }
+    console.log(event);
     if (event.type === 'reachedBottom') {
       this.onScrolledToBottom(event)
+    }
+    if (event.type === 'selectionChanged') {
+      this.selectedRows = event.rows
     }
   }
 
@@ -146,318 +176,150 @@ export class ProductListComponent implements OnInit {
     this.column = [
       {
         field: 'images',
-        headerName: 'Image',
+        headerName: '',
+        width: 60,
+        pinned: 'left',
         cellRenderer: ImageCellRendererComponent,
-        valueGetter: (params: any) => params.data.images?.[0], 
-        width: 80,
+        valueGetter: (params: any) => params.data.images?.[0] || null,
         filter: false,
         sortable: false,
+        suppressMenu: true
       },
       {
         field: 'name',
-        headerName: 'Name',
-        sortable: true,
-        filter: true,
-        flex: 1,
-        minWidth: 200,
-        cellStyle: {
-          'color': 'var(--accent-primary)',
-          'font-weight': '600',
-          'cursor': 'pointer'
-        }
+        headerName: 'Product Name',
+        pinned: 'left',
+        flex: 1.5,
+        minWidth: 220,
+        filter: 'agTextColumnFilter',
+        cellConfig: { type: 'text', placeholder: 'Product Name' },
+        cellStyle: { 'font-weight': '600', 'color': 'var(--text-primary)' }
       },
       {
         field: 'sku',
         headerName: 'SKU',
-        sortable: true,
-        width: 150,
+        width: 120,
+        pinned: 'left',
+        cellStyle: { 'font-family': 'var(--font-mono)', 'font-size': '12px' }
       },
+
       {
-        field: 'brand',
+        field: 'brandId.name',
         headerName: 'Brand',
-        sortable: true,
-        width: 150,
+        width: 130,
+        filter: 'agSetColumnFilter',
+        cellConfig: { type: 'select', options: [{ label: 'Apple', value: 'Apple' }, { label: 'Samsung', value: 'Samsung' }] }
       },
       {
-        field: 'category',
+        field: 'categoryId.name',
         headerName: 'Category',
-        sortable: true,
-        width: 150,
+        width: 130,
+        filter: 'agSetColumnFilter'
+      },
+      {
+        field: 'subCategoryId.name',
+        headerName: 'Sub-Category',
+        width: 130,
+        hide: true
+      },
+
+      {
+        field: 'purchasePrice',
+        headerName: 'Buy Price',
+        width: 110,
+        type: 'numericColumn',
+        valueFormatter: this.currencyFormatter,
+        cellConfig: { type: 'number', min: 0 }
       },
       {
         field: 'sellingPrice',
-        headerName: 'Price',
-        sortable: true,
-        width: 120,
-        type: 'rightAligned',
-        valueFormatter: (params: any) => (typeof params.value === 'number') ? `₹ ${params.value.toFixed(2)}` : '-',
-        cellStyle: { 'font-weight': 'bold' }
+        headerName: 'Sell Price',
+        width: 110,
+        type: 'numericColumn',
+        valueFormatter: this.currencyFormatter,
+        cellConfig: { type: 'number', min: 0 },
+        cellStyle: { 'color': 'var(--text-primary)', 'font-weight': '600' }
       },
       {
-        field: 'totalStock',
-        headerName: 'Stock',
-        sortable: true,
+        headerName: 'Margin',
         width: 100,
-        type: 'rightAligned',
-        cellClass: (params: any) => {
-          if (params.value <= 10) return 'cell-status status-low-stock';
-          return null;
+        valueGetter: (params: any) => {
+          const buy = params.data.purchasePrice || 0;
+          const sell = params.data.sellingPrice || 0;
+          if (sell === 0) return 0;
+          return ((sell - buy) / sell) * 100;
+        },
+        valueFormatter: (params: any) => params.value ? `${params.value.toFixed(1)}%` : '-',
+        cellStyle: (params: any) => {
+          if (params.value > 20) return { color: 'var(--color-success)' };
+          if (params.value < 10) return { color: 'var(--color-error)' };
+          return { color: 'var(--color-warning)' };
         }
       },
       {
-        field: 'isActive',
-        headerName: 'Status',
-        sortable: true,
-        width: 120,
-        valueFormatter: (params: any) => params.value ? 'Active' : 'Inactive',
-        cellClass: (params: any) => {
-          return params.value ? 'cell-status status-active' : 'cell-status status-inactive';
-        },
+        field: 'taxRate',
+        headerName: 'Tax %',
+        width: 90,
+        type: 'numericColumn',
+        cellConfig: { type: 'number', max: 100 }
       },
+
+      {
+        headerName: 'Total Stock',
+        width: 110,
+        type: 'numericColumn',
+        valueGetter: (params: any) => {
+          if (!params.data.inventory || !Array.isArray(params.data.inventory)) return 0;
+          return params.data.inventory.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0);
+        },
+        cellClass: (params: any) => {
+          return params.value <= 10 ? 'text-danger font-bold' : '';
+        }
+      },
+      {
+        field: 'unitId.code',
+        headerName: 'Unit',
+        width: 80,
+        cellClass: 'text-muted text-xs'
+      },
+
+      {
+        field: 'defaultSupplierId.companyName',
+        headerName: 'Supplier',
+        width: 160,
+        tooltipField: 'defaultSupplierId.contactPerson'
+      },
+
+      {
+        field: 'isActive',
+        headerName: 'Active',
+        width: 100,
+        cellClass: 'flex-center',
+        cellConfig: { type: 'boolean' },
+        cellRenderer: (params: any) => {
+          return params.value
+            ? `<span class="badge badge-success">Active</span>`
+            : `<span class="badge badge-danger">Inactive</span>`;
+        }
+      },
+      {
+        field: 'updatedAt',
+        headerName: 'Last Updated',
+        width: 140,
+        hide: true,
+        valueFormatter: (params: any) => {
+          return params.value ? new Date(params.value).toLocaleDateString() : '-';
+        },
+        cellConfig: { type: 'date' }
+      }
     ];
+
     this.cdr.detectChanges();
   }
+
+  currencyFormatter(params: any) {
+    if (params.value === null || params.value === undefined) return '-';
+    return '₹ ' + params.value.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+  }
+
 }
-
-// import { ChangeDetectorRef, Component, OnInit, effect, inject, signal } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { GridApi, GridReadyEvent } from 'ag-grid-community';
-// import { FormsModule } from '@angular/forms';
-// import { Router, ActivatedRoute, RouterModule } from '@angular/router'; // Import RouterModule
-
-// // PrimeNG
-// import { ButtonModule } from 'primeng/button';
-// import { SelectModule } from 'primeng/select';
-// import { InputTextModule } from 'primeng/inputtext';
-// import { ProductService } from '../../services/product-service';
-// import { AppMessageService } from '../../../../core/services/message.service';
-// import { MasterListService } from '../../../../core/services/master-list.service';
-// import { ImageCellRendererComponent } from '../../../shared/AgGrid/AgGridcomponents/image-cell-renderer/image-cell-renderer.component';
-// import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
-
-
-// @Component({
-//   selector: 'app-product-list',
-//   standalone: true,
-//   imports: [
-//     CommonModule,
-
-//     SelectModule,
-//     FormsModule,
-//     ButtonModule,
-//     InputTextModule,
-//     RouterModule // Add RouterModule
-//     ,
-//     AgShareGrid
-// ],
-//   templateUrl: './product-list.html',
-//   styleUrl: './product-list.scss',
-// })
-// export class ProductListComponent implements OnInit {
-//   // --- Injected Services ---
-//   private cdr = inject(ChangeDetectorRef);
-//   private productService = inject(ProductService);
-//   private messageService = inject(AppMessageService);
-//   private masterList = inject(MasterListService);
-//   private router = inject(Router);
-//   private route = inject(ActivatedRoute);
-
-//   // --- Grid & Data ---
-//   private gridApi!: GridApi;
-//   private currentPage = 1;
-//   private isLoading = false;
-//   private totalCount = 0;
-//   private pageSize = 50;
-//   data: any[] = [];
-//   column: any = [];
-//   rowSelectionMode: any = 'single';
-
-//   // --- Master Data Signals ---
-//   brandOptions = signal<any[]>([]);
-//   categoryOptions = signal<any[]>([]);
-
-//   // --- Filters ---
-//   productFilter = {
-//     name: null,
-//     sku: null,
-//     brand: null,
-//     category: null,
-//   };
-
-//   constructor() {
-//     effect(() => {
-//       // Example: this.brandOptions.set(this.masterList.brands());
-//       // Example: this.categoryOptions.set(this.masterList.categories());
-//     });
-//   }
-
-//   ngOnInit(): void {
-//     this.getColumn();
-//     this.getData(true);
-//   }
-
-//   applyFilters() {
-//     this.getData(true);
-//   }
-
-//   resetFilters() {
-//     this.productFilter = {
-//       name: null,
-//       sku: null,
-//       brand: null,
-//       category: null,
-//     };
-//     this.getData(true);
-//   }
-
-//   getData(isReset: boolean = false) {
-//     if (this.isLoading) return;
-//     this.isLoading = true;
-
-//     if (isReset) {
-//       this.currentPage = 1;
-//       this.data = [];
-//       this.totalCount = 0;
-//     }
-
-//     const filterParams = {
-//       ...this.productFilter,
-//       page: this.currentPage,
-//       limit: this.pageSize,
-//     };
-
-//     this.productService.getAllProducts(filterParams).subscribe(
-//       (res: any) => {
-//         let newData: any[] = [];
-//         if (res.data && Array.isArray(res.data.data)) {
-//           newData = res.data.data;
-//         }
-
-//         this.totalCount = res.results || this.totalCount;
-//         this.data = [...this.data, ...newData];
-
-//         if (this.gridApi) {
-//           if (isReset) {
-//             // this.gridApi.setRowData(this.data);
-//           } else {
-//             this.gridApi.applyTransaction({ add: newData });
-//           }
-//         }
-
-//         this.currentPage++;
-//         this.isLoading = false;
-//         this.cdr.markForCheck();
-//       },
-//       (err: any) => {
-//         this.isLoading = false;
-//         this.messageService.showError('Error', 'Failed to fetch products.');
-//         console.error('❌ Error fetching products:', err);
-//       }
-//     );
-//   }
-
-//   onScrolledToBottom(_: any) {
-//     if (!this.isLoading && this.data.length < this.totalCount) {
-//       this.getData(false);
-//     }
-//   }
-
-//   onGridReady(params: GridReadyEvent) {
-//     this.gridApi = params.api;
-//   }
-
-//   eventFromGrid(event: any) {
-//     console.log(event);
-//     if (event.type=== 'cellClicked') {
-//       const productId = event.row._id;
-//       if (productId) {
-//         this.router.navigate([productId], { relativeTo: this.route });
-//       }
-//     }
-//     if (event.type === 'reachedBottom') {
-//       this.onScrolledToBottom(event)
-//     }
-//   }
-
-//   getColumn(): void {
-//     this.column = [
-//       {
-//         field: 'images',
-//         headerName: 'Image',
-//         cellRenderer: ImageCellRendererComponent,
-//         valueGetter: (params: any) => params.data.images?.[0], // Show first image
-//         width: 100,
-//         filter: false,
-//         sortable: false,
-//       },
-//       {
-//         field: 'name',
-//         headerName: 'Name',
-//         sortable: true,
-//         filter: true,
-//         resizable: true,
-//         cellStyle: {
-//           'color': 'var(--accent-primary)',
-//           'font-weight': '600',
-//           'cursor': 'pointer'
-//         }
-//       },
-//       {
-//         field: 'sku',
-//         headerName: 'SKU',
-//         sortable: true,
-//         filter: true,
-//         resizable: true,
-//       },
-//       {
-//         field: 'brand',
-//         headerName: 'Brand',
-//         sortable: true,
-//         filter: true,
-//         resizable: true,
-//       },
-//       {
-//         field: 'category',
-//         headerName: 'Category',
-//         sortable: true,
-//         filter: true,
-//         resizable: true,
-//       },
-//       {
-//         field: 'sellingPrice',
-//         headerName: 'Selling Price',
-//         sortable: true,
-//         filter: 'agNumberColumnFilter',
-//         resizable: true,
-//         valueFormatter: (params: any) => (typeof params.value === 'number') ? `₹ ${params.value.toFixed(2)}` : 'N/A',
-//       },
-//       {
-//         field: 'totalStock', // Uses the Mongoose Virtual
-//         headerName: 'Total Stock',
-//         sortable: true,
-//         filter: 'agNumberColumnFilter',
-//         resizable: true,
-//         // CORRECTED: Using theme-aware cellClass
-//         cellClass: (params: any) => {
-//           if (params.value <= 10) { // Assuming reorder level
-//             return 'cell-status status-low-stock';
-//           }
-//           return null;
-//         }
-//       },
-//       {
-//         field: 'isActive',
-//         headerName: 'Status',
-//         sortable: true,
-//         filter: true,
-//         resizable: true,
-//         valueFormatter: (params: any) => params.value ? 'Active' : 'Inactive',
-//         // CORRECTED: Using theme-aware cellClass
-//         cellClass: (params: any) => {
-//           return params.value ? 'cell-status status-active' : 'cell-status status-inactive';
-//         },
-//       },
-//     ];
-//     this.cdr.detectChanges();
-//   }
-// }

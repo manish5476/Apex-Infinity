@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, signal, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -6,220 +6,430 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ToastModule } from 'primeng/toast';
+import { SelectModule } from 'primeng/select';
+import { DatePicker } from 'primeng/datepicker';
+
+// Services & Shared
 import { AdminAnalyticsService } from '../admin-analytics.service';
 import { CommonMethodService } from '../../core/utils/common-method.service';
+import { MasterListService } from '../../core/services/master-list.service';
 import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
 
 @Component({
-  selector: 'app-admin-dashboard-Ui',
+  selector: 'app-admin-dashboard-Ui', // KEPT YOUR SELECTOR
   standalone: true,
   imports: [
-    CommonModule, FormsModule, ButtonModule, 
-    TagModule, TooltipModule, ProgressSpinnerModule, ToastModule,
-    AgShareGrid
+    CommonModule, FormsModule, ButtonModule, TagModule, TooltipModule, 
+    SelectModule, DatePicker, ProgressSpinnerModule, ToastModule, AgShareGrid
   ],
   template: `
-    <div class="min-h-screen p-4 md:p-6 transition-colors duration-300" 
-         [style.background]="'var(--theme-bg-primary)'"
-         [style.font-family]="'var(--font-body)'">
-         
-      <div class="mb-6 flex flex-wrap justify-between items-end gap-4">
-        <div>
-          <h1 class="font-bold tracking-tight" 
-              [style.color]="'var(--theme-text-primary)'"
-              [style.font-family]="'var(--font-heading)'"
-              [style.font-size]="'var(--font-size-3xl)'">Executive Overview</h1>
-          <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">
-            Analyzing {{ dashboard()?.period?.days }} days of performance for Shivam Electronics
-          </p>
+<div class="dashboard-container">
+  <div class="filter-wrapper glass-panel">
+    <div class="filter-group">
+      <div class="brand-indicator">
+        <span class="dot"></span>
+        <span class="brand-text">NexusBoard</span>
+      </div>
+      <div class="separator"></div>
+      <div class="filter-box">
+        <label>Operational Branch</label>
+        <p-select appendTo="body" [options]="masterList.branches()" optionLabel="name" optionValue="_id" 
+                  [(ngModel)]="selectedBranch" (onChange)="onFilterChange()"
+                  styleClass="dashboard-select" placeholder="Select Branch"></p-select>
+      </div>
+      <div class="filter-box">
+        <label>Analysis Period</label>
+        <p-datepicker [(ngModel)]="dateRange" selectionMode="range" [showIcon]="true" 
+                    (onSelect)="onFilterChange()" placeholder="Start - End Dates"
+                    styleClass="dashboard-datepicker"></p-datepicker>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="execution-time" *ngIf="dashboard()?.financial?.performance?.executionTime">
+        <i class="pi pi-bolt"></i> {{ dashboard()?.financial?.performance?.executionTime }}
+      </div>
+      <p-button icon="pi pi-refresh" [rounded]="true" [text]="true" severity="secondary" (onClick)="loadDashboard()"></p-button>
+    </div>
+  </div>
+
+  <div class="header-section">
+    <div class="title-group">
+      <h1 class="page-title">Executive Dashboard</h1>
+      <p class="page-subtitle">
+        <i class="pi pi-calendar"></i>
+        Period: {{ dashboard()?.period?.start | date:'mediumDate' }} - {{ dashboard()?.period?.end | date:'mediumDate' }} 
+        <span class="days-badge">({{ dashboard()?.period?.days }} Days)</span>
+      </p>
+    </div>
+    <div class="health-summary" *ngIf="dashboard()?.inventory">
+      <div class="health-stat">
+        <span class="label">System Health</span>
+        <div class="health-ring">
+           <svg viewBox="0 0 36 36" class="circular-chart">
+              <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <path class="circle" [attr.stroke-dasharray]="dashboard()?.inventory?.healthScore + ', 100'" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+           </svg>
+           <span class="value">{{ dashboard()?.inventory?.healthScore }}%</span>
         </div>
-        <div class="flex items-center gap-2">
-          <div class="px-3 py-1 border rounded-lg flex items-center gap-2" 
-               [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'">
-            <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold">HEALTH SCORE</span>
-            <span class="font-bold text-emerald-500" [style.font-size]="'var(--font-size-md)'">{{ dashboard()?.inventory?.healthScore }}%</span>
+      </div>
+    </div>
+  </div>
+
+  <ng-container *ngIf="!loading(); else loader">
+    
+    <div class="kpi-grid">
+      <div class="kpi-card glass-panel">
+        <div class="kpi-header">
+          <span class="kpi-label">Gross Revenue</span>
+          <span class="trend-pill positive"><i class="pi pi-arrow-up-right"></i> {{ dashboard()?.financial?.totalRevenue?.growth }}%</span>
+        </div>
+        <h2 class="kpi-value">₹{{ dashboard()?.financial?.totalRevenue?.value | number }}</h2>
+        <p class="kpi-subtext">{{ dashboard()?.financial?.totalRevenue?.count }} Transactions processed</p>
+      </div>
+
+      <div class="kpi-card glass-panel">
+        <div class="kpi-header">
+          <span class="kpi-label">Net Profit</span>
+          <p-tag [severity]="dashboard()?.financial?.netProfit?.status === 'profitable' ? 'success' : 'danger'" 
+                 [value]="dashboard()?.financial?.netProfit?.status"></p-tag>
+        </div>
+        <h2 class="kpi-value success">₹{{ dashboard()?.financial?.netProfit?.value | number }}</h2>
+        <p class="kpi-subtext">Net Margin: {{ dashboard()?.financial?.netProfit?.margin }}%</p>
+      </div>
+
+      <div class="kpi-card glass-panel">
+        <div class="kpi-header">
+          <span class="kpi-label">Inventory Value</span>
+          <i class="pi pi-box icon-faded"></i>
+        </div>
+        <h2 class="kpi-value">₹{{ dashboard()?.leaders?.summary?.valuation | number:'1.0-0' }}</h2>
+        <p class="kpi-subtext">{{ dashboard()?.leaders?.inventoryValuation?.totalItems }} Items / {{ dashboard()?.leaders?.inventoryValuation?.productCount }} SKUs</p>
+      </div>
+
+      <div class="kpi-card glass-panel">
+        <div class="kpi-header">
+          <span class="kpi-label">Outstanding Debt</span>
+          <i class="pi pi-exclamation-circle error-text"></i>
+        </div>
+        <h2 class="kpi-value error">₹{{ dashboard()?.financial?.outstanding?.receivables | number }}</h2>
+        <p class="kpi-subtext">{{ dashboard()?.topCategories?.highRiskDebtCount }} High-Risk Accounts</p>
+      </div>
+    </div>
+
+    <div class="layout-grid">
+      
+      <div class="main-column">
+        
+        <div class="content-card glass-panel">
+          <h3 class="card-title mb-md"><i class="pi pi-sparkles text-accent"></i> AI Business Insights</h3>
+          <div class="insights-container">
+            @for (insight of dashboard()?.insights?.insights; track insight.title) {
+              <div class="insight-row" [class.positive]="insight.type === 'positive'">
+                <div class="insight-icon"><i class="pi" [class.pi-check-circle]="insight.type==='positive'" [class.pi-info-circle]="insight.type!=='positive'"></i></div>
+                <div class="insight-content">
+                  <p class="i-title">{{ insight.title }} <span class="priority-tag">{{ insight.priority }}</span></p>
+                  <p class="i-msg">{{ insight.message }}</p>
+                </div>
+              </div>
+            }
           </div>
-          <p-button icon="pi pi-refresh" [outlined]="true" severity="secondary" (onClick)="loadDashboard()"></p-button>
+        </div>
+
+        <div class="grid-card glass-panel">
+          <div class="card-header-flex">
+            <h3 class="card-title">Stock Urgency Monitor</h3>
+            <span class="count-pill">{{ dashboard()?.inventory?.lowStockAlerts?.length || 0 }} Critical</span>
+          </div>
+          <div class="grid-wrapper">
+             <app-ag-share-grid [columns]="alertColumns" [data]="dashboard()?.inventory?.lowStockAlerts || []" 
+                               [showActions]="false" class="compact-grid"></app-ag-share-grid>
+          </div>
         </div>
       </div>
 
-      <ng-container *ngIf="!loading(); else loader">
+      <div class="side-column">
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div class="p-4 border transition-all hover:scale-[1.01]" 
-               [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'" [style.box-shadow]="'var(--shadow-sm)'">
-            <div class="flex justify-between items-start mb-2">
-              <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase tracking-widest">Total Revenue</span>
-              <i class="pi pi-wallet text-indigo-400"></i>
+        <div class="content-card glass-panel">
+          <h4 class="sidebar-title">Operational Efficiency</h4>
+          <div class="stat-list">
+            <div class="stat-row">
+              <span class="text-muted">Avg. Order Value</span>
+              <span class="font-bold">₹{{ dashboard()?.operations?.orderEfficiency?.averageOrderValue | number:'1.0-0' }}</span>
             </div>
-            <div class="flex items-end gap-2">
-              <h2 class="font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-3xl)'">
-                ₹{{ dashboard()?.financial?.totalRevenue?.value | number:'1.0-0' }}
-              </h2>
-              <span class="mb-1 text-emerald-500 font-bold" [style.font-size]="'var(--font-size-xs)'">
-                <i class="pi pi-arrow-up-right"></i> {{ dashboard()?.financial?.totalRevenue?.growth }}%
-              </span>
+            <div class="stat-row">
+              <span class="text-muted">Discount Rate</span>
+              <span class="font-bold">{{ dashboard()?.operations?.discountMetrics?.discountRate }}%</span>
             </div>
-            <p class="mt-2" [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">
-              Avg Ticket: ₹{{ dashboard()?.financial?.totalRevenue?.avgTicket | number:'1.0-0' }}
-            </p>
-          </div>
-
-          <div class="p-4 border transition-all hover:scale-[1.01]" 
-               [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-            <div class="flex justify-between items-start mb-2">
-              <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase tracking-widest">Net Profit</span>
-              <i class="pi pi-chart-line text-emerald-400"></i>
+            <div class="stat-row">
+              <span class="text-muted">New Customers</span>
+              <span class="text-success font-bold">+{{ dashboard()?.financial?.customers?.new }}</span>
             </div>
-            <h2 class="font-bold tabular-nums" [style.color]="'var(--theme-success)'" [style.font-size]="'var(--font-size-3xl)'">
-              ₹{{ dashboard()?.financial?.netProfit?.value | number:'1.0-0' }}
-            </h2>
-            <div class="flex gap-2 mt-2 items-center">
-              <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold" [style.font-size]="'var(--font-size-xs)'">Margin {{ dashboard()?.financial?.netProfit?.margin }}%</span>
-            </div>
-          </div>
-
-          <div class="p-4 border transition-all hover:scale-[1.01]" 
-               [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-            <div class="flex justify-between items-start mb-2">
-              <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase tracking-widest">Total Expenses</span>
-              <i class="pi pi-minus-circle text-rose-400"></i>
-            </div>
-            <h2 class="font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-3xl)'">
-              ₹{{ dashboard()?.financial?.totalExpense?.value | number }}
-            </h2>
-            <p class="mt-2" [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">{{ dashboard()?.financial?.totalExpense?.count }} Transactions recorded</p>
-          </div>
-
-          <div class="p-4 border transition-all hover:scale-[1.01]" 
-               [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-            <div class="flex justify-between items-start mb-2">
-              <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase tracking-widest">Inventory Value</span>
-              <i class="pi pi-box text-blue-400"></i>
-            </div>
-            <h2 class="font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-2xl)'">
-              ₹{{ (dashboard()?.inventory?.summary?.valuation / 10000000) | number:'1.2-2' }} Cr
-            </h2>
-            <p class="mt-2" [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">{{ dashboard()?.inventory?.inventoryValuation?.totalItems }} Units in Stock</p>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-          <div class="lg:col-span-8 space-y-6">
-            
-            <div class="p-5 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-              <div class="flex items-center gap-2 mb-4">
-                <i class="pi pi-sparkles text-indigo-400"></i>
-                <h3 class="font-bold uppercase tracking-tighter" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-md)'">Operational Insights</h3>
+        <div class="content-card glass-panel">
+          <h4 class="sidebar-title">Customer Segments</h4>
+          <div class="segment-pill-container">
+            @for (seg of dashboard()?.customers?.segmentation; track seg._id) {
+              <div class="seg-pill">
+                <span class="seg-name">{{ seg._id }}</span>
+                <span class="seg-count">{{ seg.count }}</span>
               </div>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                @for (insight of dashboard()?.insights?.insights; track insight.title) {
-                  <div class="p-3 border rounded-lg transition-all" 
-                       [style.background]="'var(--theme-bg-ternary)'" [style.border-left]="insight.type === 'positive' ? '4px solid var(--theme-success)' : '4px solid var(--theme-info)'">
-                    <p class="font-bold" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">{{ insight.title }}</p>
-                    <p class="mt-1" [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">{{ insight.message }}</p>
-                  </div>
-                }
-              </div>
-            </div>
-
-            <div class="border overflow-hidden" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-              <div class="p-4 border-b flex justify-between items-center" [style.border-color]="'var(--theme-border-primary)'" [style.background]="'var(--theme-bg-ternary)'">
-                <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-xs)'">Critical Inventory Alerts</h3>
-                <span class="px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-500 font-bold text-[10px]">{{ dashboard()?.alerts?.lowStockCount }} ACTIONS REQUIRED</span>
-              </div>
-              
-              <div class="grid-wrapper">
-                 <app-ag-share-grid 
-                   [columns]="alertColumns" 
-                   [data]="dashboard()?.inventory?.lowStockAlerts || []" 
-                   [showActions]="false" 
-                   style="height: 100%; min-height: 250px; width: 100%; display: block;">
-                 </app-ag-share-grid>
-              </div>
-            </div>
-          </div>
-
-          <div class="lg:col-span-4 space-y-6">
-            
-            <div class="p-5 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-              <h4 class="font-bold mb-4 uppercase tracking-tighter" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Top Sellers</h4>
-              <div class="space-y-4">
-                @for (prod of dashboard()?.leaders?.topProducts; track prod._id) {
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                      <div class="w-8 h-8 rounded bg-indigo-500/10 flex items-center justify-center text-indigo-400 font-bold text-xs">
-                        #{{ $index + 1 }}
-                      </div>
-                      <div>
-                        <p class="font-bold leading-none truncate w-32" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">{{ prod.name }}</p>
-                        <p class="mt-1" [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Qty: {{ prod.soldQty }}</p>
-                      </div>
-                    </div>
-                    <span class="font-bold" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">₹{{ prod.revenue | number }}</span>
-                  </div>
-                }
-              </div>
-            </div>
-
-            <div class="border overflow-hidden" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-              <div class="p-4 border-b flex justify-between items-center" [style.border-color]="'var(--theme-border-primary)'" [style.background]="'var(--theme-bg-ternary)'">
-                <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-xs)'">Top Customers</h3>
-                <span class="text-[10px]" [style.color]="'var(--theme-text-tertiary)'">By Revenue</span>
-              </div>
-              
-              <div class="grid-wrapper">
-                 <app-ag-share-grid 
-                   [columns]="customerColumns" 
-                   [data]="dashboard()?.leaders?.topCustomers || []" 
-                   [showActions]="false" 
-                   style="height: 100%; min-height: 300px; width: 100%; display: block;">
-                 </app-ag-share-grid>
-              </div>
-            </div>
-
-            <div class="p-5 border transition-colors" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-              <h4 class="font-bold mb-4 uppercase tracking-tighter" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Sales Leaderboard</h4>
-              @for (staff of dashboard()?.operations?.topStaff; track staff._id) {
-                <div class="flex items-center justify-between group py-2 border-b border-white/5 last:border-0">
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-[10px]" [style.background]="'var(--theme-accent-gradient)'">
-                      {{ staff.name.charAt(0) }}
-                    </div>
-                    <div>
-                      <p class="font-bold" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">{{ staff.name }}</p>
-                      <p [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">{{ staff.count }} deals closed</p>
-                    </div>
-                  </div>
-                  <span class="font-bold tabular-nums text-emerald-500" [style.font-size]="'var(--font-size-sm)'">₹{{ staff.revenue | number }}</span>
-                </div>
-              }
-            </div>
-
+            }
           </div>
         </div>
-      </ng-container>
 
-      <ng-template #loader>
-        <div class="h-[60vh] flex flex-col items-center justify-center gap-4">
-          <p-progressSpinner strokeWidth="4" fill="transparent" animationDuration=".8s" styleClass="w-12 h-12"></p-progressSpinner>
-          <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">Compiling executive data...</p>
+        <div class="content-card glass-panel">
+          <h4 class="sidebar-title">Top Staff</h4>
+          @for (staff of dashboard()?.operations?.topStaff; track staff._id) {
+            <div class="staff-card">
+              <div class="staff-avatar">{{ staff.name.charAt(0) }}</div>
+              <div class="staff-info">
+                <p class="s-name">{{ staff.name }}</p>
+                <p class="s-sub">{{ staff.count }} Orders</p>
+              </div>
+              <div class="staff-value">₹{{ staff.revenue }}</div>
+              <!-- | numberCompact  -->
+            </div>
+          }
         </div>
-      </ng-template>
-
+      </div>
     </div>
-  `,
-  styles: []
+  </ng-container>
+
+  <ng-template #loader>
+    <div class="full-loader">
+      <p-progressSpinner styleClass="w-3rem h-3rem" strokeWidth="3"></p-progressSpinner>
+      <span class="loading-text">Synchronizing Enterprise Data...</span>
+    </div>
+  </ng-template>
+</div>
+`,
+  styles: [`
+  /* STRICT ENTERPRISE THEME IMPLEMENTATION 
+     Uses the CSS Variables defined in your Root Token System
+  */
+
+  :host {
+    display: block; /* CRITICAL FIX: Ensures component has dimensions */
+    width: 100%;
+    height: 100%;
+  }
+
+  .dashboard-container {
+    padding: var(--spacing-xl);
+    background-color: var(--bg-secondary);
+    min-height: 100vh;
+    font-family: var(--font-body);
+    color: var(--text-primary);
+  }
+
+  /* --- GLASS PANELS --- */
+  .glass-panel {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--ui-border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    /* Optional real glass effect if supported */
+    /* backdrop-filter: blur(10px); */ 
+  }
+
+  /* --- HEADER & FILTERS --- */
+  .filter-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md) var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+    
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xl);
+    }
+
+    .brand-indicator {
+      display: flex; align-items: center; gap: 8px;
+      .dot { width: 8px; height: 8px; background: var(--accent-primary); border-radius: 50%; box-shadow: 0 0 8px var(--accent-primary); }
+      .brand-text { font-weight: 700; font-family: var(--font-heading); font-size: 16px; }
+    }
+
+    .separator { height: 24px; width: 1px; background: var(--border-secondary); }
+
+    .filter-box {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      
+      label {
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+
+  .header-actions {
+    display: flex; align-items: center; gap: var(--spacing-lg);
+    .execution-time { 
+      font-family: var(--font-mono); 
+      font-size: 11px; 
+      color: var(--text-tertiary); 
+      background: var(--bg-secondary); 
+      padding: 4px 8px; 
+      border-radius: 4px; 
+    }
+  }
+
+  .header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: var(--spacing-xl);
+
+    .page-title {
+      font-family: var(--font-heading);
+      font-size: var(--font-size-3xl);
+      font-weight: 700;
+      margin: 0 0 4px 0;
+      color: var(--text-primary);
+    }
+    .page-subtitle {
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      display: flex; align-items: center; gap: 6px;
+      .days-badge { background: var(--bg-ternary); padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+    }
+  }
+
+  /* --- HEALTH RING ANIMATION --- */
+  .health-stat {
+    text-align: center;
+    .label { display: block; font-size: 10px; font-weight: 800; color: var(--text-tertiary); margin-bottom: 4px; text-transform: uppercase; }
+    .health-ring { position: relative; width: 48px; height: 48px; }
+    .circular-chart { display: block; margin: 0 auto; max-width: 100%; max-height: 100%; }
+    .circle-bg { fill: none; stroke: var(--bg-ternary); stroke-width: 3.8; }
+    .circle { fill: none; stroke-width: 2.8; stroke: var(--color-success); stroke-linecap: round; animation: progress 1s ease-out forwards; }
+    .value { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 11px; font-weight: 800; color: var(--text-primary); }
+  }
+
+  /* --- KPI GRID --- */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    
+    @media (max-width: 1200px) { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 768px) { grid-template-columns: 1fr; }
+  }
+
+  .kpi-card {
+    padding: var(--spacing-lg);
+    transition: transform 0.2s ease;
+    
+    &:hover { transform: translateY(-2px); border-color: var(--accent-focus); }
+
+    .kpi-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md); }
+    .kpi-label { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi-value { font-family: var(--font-heading); font-size: 28px; font-weight: 700; margin: 0; letter-spacing: -0.5px; color: var(--text-primary); }
+    .kpi-value.success { color: var(--color-success); }
+    .kpi-value.error { color: var(--color-error); }
+    .kpi-subtext { font-size: 11px; color: var(--text-tertiary); margin-top: 6px; }
+    
+    .trend-pill { 
+      padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 4px;
+      &.positive { background: var(--color-success-bg); color: var(--color-success); }
+    }
+  }
+
+  /* --- MAIN LAYOUT --- */
+  .layout-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: var(--spacing-lg);
+    
+    @media (max-width: 1024px) { grid-template-columns: 1fr; }
+  }
+
+  .main-column, .side-column { display: flex; flex-direction: column; gap: var(--spacing-lg); }
+  .content-card, .grid-card { padding: var(--spacing-lg); }
+  
+  .card-title { 
+    font-size: 14px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px; 
+    color: var(--text-primary);
+  }
+  .mb-md { margin-bottom: var(--spacing-md); }
+  .text-accent { color: var(--accent-primary); }
+
+  /* --- INSIGHTS --- */
+  .insight-row {
+    display: flex; gap: var(--spacing-md); padding: 12px; 
+    background: var(--bg-secondary); border-radius: 8px; margin-bottom: 8px;
+    border-left: 3px solid var(--color-info);
+    
+    &.positive { border-left-color: var(--color-success); background: color-mix(in srgb, var(--color-success-bg), white 50%); }
+    
+    .insight-icon { margin-top: 2px; color: var(--text-secondary); }
+    .i-title { font-weight: 700; font-size: 12px; margin: 0 0 2px 0; display: flex; justify-content: space-between; }
+    .i-msg { font-size: 12px; color: var(--text-secondary); margin: 0; line-height: 1.4; }
+    .priority-tag { font-size: 9px; text-transform: uppercase; background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); }
+  }
+
+  /* --- GRID WRAPPER --- */
+  .card-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md); }
+  .count-pill { background: var(--color-error); color: white; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+  .grid-wrapper { height: 300px; /* Essential for AgGrid */ }
+
+  /* --- SIDEBAR WIDGETS --- */
+  .sidebar-title { 
+    font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-tertiary); 
+    margin: 0 0 var(--spacing-lg) 0; border-bottom: 1px solid var(--border-secondary); padding-bottom: 8px; 
+  }
+
+  .stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border-secondary); font-size: 13px; }
+  .text-muted { color: var(--text-secondary); }
+  .font-bold { font-weight: 600; }
+  .text-success { color: var(--color-success); }
+
+  .seg-pill {
+    display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; 
+    background: var(--bg-secondary); border-radius: 6px; margin-bottom: 6px;
+    .seg-name { font-size: 12px; font-weight: 600; }
+    .seg-count { background: var(--accent-primary); color: #fff; font-size: 10px; padding: 1px 8px; border-radius: 10px; font-weight: 700; }
+  }
+
+  .staff-card {
+    display: flex; align-items: center; padding: 8px; gap: 10px; border-bottom: 1px solid var(--bg-secondary);
+    .staff-avatar { width: 32px; height: 32px; background: var(--bg-secondary); border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: var(--text-secondary); }
+    .staff-info { flex: 1; }
+    .s-name { font-weight: 700; font-size: 12px; margin: 0; }
+    .s-sub { font-size: 10px; color: var(--text-tertiary); margin: 0; }
+    .staff-value { font-weight: 700; color: var(--color-success); font-size: 12px; font-family: var(--font-mono); }
+  }
+
+  /* --- LOADER --- */
+  .full-loader { 
+    height: 60vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--spacing-md); 
+    .loading-text { color: var(--text-tertiary); font-weight: 600; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+  }
+
+  /* --- PRIMENG OVERRIDES --- */
+  ::ng-deep .dashboard-select .p-select-label { padding: 6px 12px; font-size: 12px; font-weight: 500; }
+  ::ng-deep .dashboard-datepicker .p-inputtext { padding: 6px 12px; font-size: 12px; width: 200px; }
+  `]
 })
 export class DashboardUI implements OnInit {
-  // Signals for Reactive UI
   dashboard = signal<any>(null);
   loading = signal<boolean>(true);
+  public masterList = inject(MasterListService);
   
-  // Grid Columns
+  selectedBranch = signal<string>('');
+  dateRange = signal<Date[] | null>(null);
+
   alertColumns: any[] = [];
-  customerColumns: any[] = [];
 
   constructor(
     private analyticsService: AdminAnalyticsService,
@@ -233,99 +443,44 @@ export class DashboardUI implements OnInit {
   }
 
   setupColumns(): void {
-    // 1. Critical Inventory Alert Columns
     this.alertColumns = [
-      {
-        field: 'name', 
-        headerName: 'Product', 
-        sortable: true, 
-        flex: 1,
-        cellStyle: { 'font-weight': '700' }
-      },
-      {
-        field: 'currentStock', 
-        headerName: 'Stock', 
-        sortable: true, 
-        width: 100,
-        cellStyle: { 'color': 'var(--theme-error)', 'font-family': 'monospace' }
-      },
-      {
-        field: 'reorderLevel', 
-        headerName: 'Threshold', 
-        sortable: true, 
-        width: 120,
-        cellStyle: { 'font-family': 'monospace' }
-      },
-      {
-        field: 'urgency', 
-        headerName: 'Urgency', 
-        sortable: true, 
-        width: 110,
-        cellRenderer: (params: any) => {
-          return `<span style="padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; background: var(--theme-error); color: #fff;">
-                    ${params.value || 'HIGH'}
-                  </span>`;
-        }
+      { field: 'name', headerName: 'Inventory Item', flex: 2, cellStyle: { 'font-weight': '600' } },
+      { field: 'currentStock', headerName: 'Stock', flex: 1, cellStyle: { 'color': 'var(--color-error)', 'font-weight': '800' } },
+      { 
+        field: 'revenue', 
+        headerName: 'Potential Revenue', 
+        flex: 1, 
+        // Using your common service as requested
+        valueFormatter: (p: any) => this.commonService.formatCurrency(p.value) 
       }
     ];
-
-    // 2. Top Customers Columns (New)
-    this.customerColumns = [
-      {
-        field: 'name',
-        headerName: 'Customer',
-        sortable: true,
-        flex: 1,
-        cellRenderer: (params: any) => {
-             return `<div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
-                        <span style="font-weight: 600; line-height: 1.2;">${params.value}</span>
-                        <span style="font-size: 10px; color: var(--theme-text-tertiary);">${params.data.phone || ''}</span>
-                     </div>`
-        }
-      },
-      {
-        field: 'totalSpent',
-        headerName: 'Total Spent',
-        sortable: true,
-        width: 120,
-        type: 'rightAligned',
-        valueFormatter: (params: any) => this.commonService.formatCurrency(params.value),
-        cellStyle: { 'font-weight': '700', 'color': 'var(--theme-success)' }
-      },
-      {
-        field: 'transactions',
-        headerName: 'Txns',
-        sortable: true,
-        width: 70,
-        cellStyle: { 'text-align': 'center' }
-      }
-    ];
-
     this.cdr.detectChanges();
   }
 
   loadDashboard() {
     this.loading.set(true);
-    this.analyticsService.getDashboardOverview().subscribe({
+    let start, end;
+    if (this.dateRange()?.length === 2) {
+      start = this.dateRange()![0]?.toISOString();
+      end = this.dateRange()![1]?.toISOString();
+    }
+
+    this.analyticsService.getDashboardOverview(start, end, this.selectedBranch()).subscribe({
       next: (res) => {
-        if (res.status === 'success') {
-          this.dashboard.set(res.data);
-        }
+        this.dashboard.set(res.data);
         this.loading.set(false);
       },
-      error: (err) => {
-        console.error('Dashboard Error', err);
-        this.loading.set(false);
-      }
+      error: () => this.loading.set(false) // Safety turn off loader
     });
   }
+
+  onFilterChange() { this.loadDashboard(); }
 }
 
-// import { Component, OnInit, signal, inject, ChangeDetectorRef } from '@angular/core';
+// import { Component, OnInit, signal, ChangeDetectorRef, inject } from '@angular/core';
 // import { CommonModule } from '@angular/common';
 // import { FormsModule } from '@angular/forms';
 // import { ButtonModule } from 'primeng/button';
-// // Removed TableModule
 // import { TagModule } from 'primeng/tag';
 // import { TooltipModule } from 'primeng/tooltip';
 // import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -333,214 +488,258 @@ export class DashboardUI implements OnInit {
 // import { AdminAnalyticsService } from '../admin-analytics.service';
 // import { CommonMethodService } from '../../core/utils/common-method.service';
 // import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
+// import { SelectModule } from 'primeng/select';
+// import { DatePicker } from 'primeng/datepicker';
+// import { MasterListService } from '../../core/services/master-list.service';
 
 // @Component({
 //   selector: 'app-admin-dashboard-Ui',
 //   standalone: true,
 //   imports: [
-//     CommonModule, FormsModule, ButtonModule, 
-//     TagModule, TooltipModule, ProgressSpinnerModule, ToastModule,
-//     AgShareGrid // Added your custom grid component
+//     CommonModule, FormsModule, ButtonModule, TagModule, TooltipModule, 
+//     SelectModule, DatePicker, ProgressSpinnerModule, ToastModule, AgShareGrid
 //   ],
 //   template: `
-//     <div class="min-h-screen p-4 md:p-6 transition-colors duration-300" 
-//          [style.background]="'var(--theme-bg-primary)'"
-//          [style.font-family]="'var(--font-body)'">
-         
-//       <div class="mb-6 flex flex-wrap justify-between items-end gap-4">
-//         <div>
-//           <h1 class="font-bold tracking-tight" 
-//               [style.color]="'var(--theme-text-primary)'"
-//               [style.font-family]="'var(--font-heading)'"
-//               [style.font-size]="'var(--font-size-3xl)'">Executive Overview</h1>
-//           <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">
-//             Analyzing {{ dashboard()?.period?.days }} days of performance for Shivam Electronics
-//           </p>
+// <div class="dashboard-container">
+//   <div class="filter-wrapper glass-panel">
+//     <div class="filter-group">
+//       <div class="filter-box">
+//         <label>Operational Branch</label>
+//         <p-select appendTo="body" [options]="masterList.branches()" optionLabel="name" optionValue="_id" 
+//                   [(ngModel)]="selectedBranch" (onChange)="onFilterChange()"
+//                   styleClass="dashboard-select" placeholder="Select Branch"></p-select>
+//       </div>
+//       <div class="filter-box">
+//         <label>Analysis Period</label>
+//         <p-datepicker [(ngModel)]="dateRange" selectionMode="range" [showIcon]="true" 
+//                     (onSelect)="onFilterChange()" placeholder="Start - End Dates"
+//                     styleClass="dashboard-datepicker"></p-datepicker>
+//       </div>
+//     </div>
+//     <div class="header-actions">
+//       <div class="execution-time">Engine: {{ dashboard()?.financial?.performance?.executionTime }}</div>
+//       <p-button icon="pi pi-refresh" [outlined]="true" severity="secondary" (onClick)="loadDashboard()"></p-button>
+//     </div>
+//   </div>
+
+//   <div class="header-section">
+//     <div class="title-group">
+//       <h1 class="page-title">Executive Dashboard</h1>
+//       <p class="page-subtitle">Period: {{ dashboard()?.period?.start | date }} - {{ dashboard()?.period?.end | date }} ({{ dashboard()?.period?.days }} Days)</p>
+//     </div>
+//     <div class="health-summary">
+//       <div class="health-stat">
+//         <span class="label">Inventory Health</span>
+//         <span class="value success">{{ dashboard()?.inventory?.healthScore }}%</span>
+//       </div>
+//     </div>
+//   </div>
+
+//   <ng-container *ngIf="!loading(); else loader">
+    
+//     <div class="kpi-grid">
+//       <div class="kpi-card revenue glass-panel">
+//         <div class="kpi-header">
+//           <span class="kpi-label">Gross Revenue</span>
+//           <span class="trend-pill positive">+{{ dashboard()?.financial?.totalRevenue?.growth }}%</span>
 //         </div>
-//         <div class="flex items-center gap-2">
-//           <div class="px-3 py-1 border rounded-lg flex items-center gap-2" 
-//                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'">
-//             <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold">HEALTH SCORE</span>
-//             <span class="font-bold text-emerald-500" [style.font-size]="'var(--font-size-md)'">{{ dashboard()?.inventory?.healthScore }}%</span>
+//         <h2 class="kpi-value">₹{{ dashboard()?.financial?.totalRevenue?.value | number }}</h2>
+//         <p class="kpi-subtext">{{ dashboard()?.financial?.totalRevenue?.count }} Transactions</p>
+//       </div>
+
+//       <div class="kpi-card profit glass-panel">
+//         <div class="kpi-header">
+//           <span class="kpi-label">Net Profit</span>
+//           <p-tag severity="success" [value]="dashboard()?.financial?.netProfit?.status"></p-tag>
+//         </div>
+//         <h2 class="kpi-value success">₹{{ dashboard()?.financial?.netProfit?.value | number }}</h2>
+//         <p class="kpi-subtext">Margin: {{ dashboard()?.financial?.netProfit?.margin }}%</p>
+//       </div>
+
+//       <div class="kpi-card valuation glass-panel">
+//         <div class="kpi-header">
+//           <span class="kpi-label">Inventory Valuation</span>
+//           <i class="pi pi-box"></i>
+//         </div>
+//         <h2 class="kpi-value">₹{{ dashboard()?.leaders?.summary?.valuation | number }}</h2>
+//         <p class="kpi-subtext">{{ dashboard()?.leaders?.inventoryValuation?.totalItems }} Items across {{ dashboard()?.leaders?.inventoryValuation?.productCount }} SKUs</p>
+//       </div>
+
+//       <div class="kpi-card risk glass-panel">
+//         <div class="kpi-header">
+//           <span class="kpi-label">Outstanding Debt</span>
+//           <i class="pi pi-exclamation-triangle error-text"></i>
+//         </div>
+//         <h2 class="kpi-value error">₹{{ dashboard()?.financial?.outstanding?.receivables | number }}</h2>
+//         <p class="kpi-subtext">{{ dashboard()?.topCategories?.highRiskDebtCount }} High-Risk Accounts</p>
+//       </div>
+//     </div>
+
+//     <div class="layout-grid">
+//       <div class="main-column">
+//         <div class="content-card glass-panel">
+//           <h3 class="card-title mb-md"><i class="pi pi-bolt"></i> Intelligent Business Insights</h3>
+//           <div class="insights-container">
+//             @for (insight of dashboard()?.insights?.insights; track insight.title) {
+//               <div class="insight-row" [class.positive]="insight.type === 'positive'">
+//                 <div class="insight-icon"><i class="pi pi-check-circle"></i></div>
+//                 <div class="insight-content">
+//                   <p class="i-title">{{ insight.title }} <span class="priority-tag">{{ insight.priority }}</span></p>
+//                   <p class="i-msg">{{ insight.message }}</p>
+//                 </div>
+//               </div>
+//             }
 //           </div>
-//           <p-button icon="pi pi-refresh" [outlined]="true" severity="secondary" (onClick)="loadDashboard()"></p-button>
+//         </div>
+
+//         <div class="grid-card glass-panel">
+//           <div class="card-header-flex">
+//             <h3 class="card-title">Stock Urgency Monitor</h3>
+//             <span class="count-pill">{{ dashboard()?.inventory?.lowStockAlerts?.length || 0 }} Alerts</span>
+//           </div>
+//           <div class="grid-wrapper">
+//              <app-ag-share-grid [columns]="alertColumns" [data]="dashboard()?.inventory?.lowStockAlerts || []" 
+//                                [showActions]="false" class="compact-grid"></app-ag-share-grid>
+//           </div>
 //         </div>
 //       </div>
 
-//       <ng-container *ngIf="!loading(); else loader">
-        
-//         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-//           <div class="p-4 border transition-all hover:scale-[1.01]" 
-//                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'" [style.box-shadow]="'var(--shadow-sm)'">
-//             <div class="flex justify-between items-start mb-2">
-//               <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase tracking-widest">Total Revenue</span>
-//               <i class="pi pi-wallet text-indigo-400"></i>
+//       <div class="side-column">
+//         <div class="content-card glass-panel">
+//           <h4 class="sidebar-title">Operational Efficiency</h4>
+//           <div class="stat-list">
+//             <div class="stat-row">
+//               <span>Avg. Order Value</span>
+//               <b>₹{{ dashboard()?.operations?.orderEfficiency?.averageOrderValue | number:'1.0-0' }}</b>
 //             </div>
-//             <div class="flex items-end gap-2">
-//               <h2 class="font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-3xl)'">
-//                 ₹{{ dashboard()?.financial?.totalRevenue?.value | number:'1.0-0' }}
-//               </h2>
-//               <span class="mb-1 text-emerald-500 font-bold" [style.font-size]="'var(--font-size-xs)'">
-//                 <i class="pi pi-arrow-up-right"></i> {{ dashboard()?.financial?.totalRevenue?.growth }}%
-//               </span>
+//             <div class="stat-row">
+//               <span>Discount Rate</span>
+//               <b>{{ dashboard()?.operations?.discountMetrics?.discountRate }}%</b>
 //             </div>
-//             <p class="mt-2" [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">
-//               Avg Ticket: ₹{{ dashboard()?.financial?.totalRevenue?.avgTicket | number }}
-//             </p>
-//           </div>
-
-//           <div class="p-4 border transition-all hover:scale-[1.01]" 
-//                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//             <div class="flex justify-between items-start mb-2">
-//               <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase tracking-widest">Net Profit</span>
-//               <i class="pi pi-chart-line text-emerald-400"></i>
+//             <div class="stat-row">
+//               <span>New Customers</span>
+//               <span class="text-success">+{{ dashboard()?.financial?.customers?.new }}</span>
 //             </div>
-//             <h2 class="font-bold tabular-nums" [style.color]="'var(--theme-success)'" [style.font-size]="'var(--font-size-3xl)'">
-//               ₹{{ dashboard()?.financial?.netProfit?.value | number:'1.0-0' }}
-//             </h2>
-//             <div class="flex gap-2 mt-2 items-center">
-//               <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold" [style.font-size]="'var(--font-size-xs)'">Margin {{ dashboard()?.financial?.netProfit?.margin }}%</span>
-//             </div>
-//           </div>
-
-//           <div class="p-4 border transition-all hover:scale-[1.01]" 
-//                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//             <div class="flex justify-between items-start mb-2">
-//               <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase tracking-widest">Receivables</span>
-//               <i class="pi pi-info-circle text-amber-400"></i>
-//             </div>
-//             <h2 class="font-bold tabular-nums" [style.color]="'var(--theme-warning)'" [style.font-size]="'var(--font-size-3xl)'">
-//               ₹{{ dashboard()?.financial?.outstanding?.receivables | number }}
-//             </h2>
-//             <p class="mt-2" [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Pending from 3 customers</p>
-//           </div>
-
-//           <div class="p-4 border transition-all hover:scale-[1.01]" 
-//                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//             <div class="flex justify-between items-start mb-2">
-//               <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase tracking-widest">Inventory Value</span>
-//               <i class="pi pi-box text-blue-400"></i>
-//             </div>
-//             <h2 class="font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-2xl)'">
-//               ₹{{ (dashboard()?.inventory?.summary?.valuation / 10000000) | number:'1.2-2' }} Cr
-//             </h2>
-//             <p class="mt-2" [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">{{ dashboard()?.inventory?.inventoryValuation?.totalItems }} Units in Stock</p>
 //           </div>
 //         </div>
 
-//         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-//           <div class="lg:col-span-8 space-y-6">
-            
-//             <div class="p-5 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//               <div class="flex items-center gap-2 mb-4">
-//                 <i class="pi pi-sparkles text-indigo-400"></i>
-//                 <h3 class="font-bold uppercase tracking-tighter" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-md)'">Operational Insights</h3>
+//         <div class="content-card glass-panel">
+//           <h4 class="sidebar-title">Customer Segmentation</h4>
+//           <div class="segment-pill-container">
+//             @for (seg of dashboard()?.customers?.segmentation; track seg._id) {
+//               <div class="seg-pill">
+//                 <span class="seg-name">{{ seg._id }}</span>
+//                 <span class="seg-count">{{ seg.count }}</span>
 //               </div>
-//               <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-//                 @for (insight of dashboard()?.insights?.insights; track insight.title) {
-//                   <div class="p-3 border rounded-lg transition-all" 
-//                        [style.background]="'var(--theme-bg-ternary)'" [style.border-left]="insight.type === 'positive' ? '4px solid var(--theme-success)' : '4px solid var(--theme-info)'">
-//                     <p class="font-bold" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">{{ insight.title }}</p>
-//                     <p class="mt-1" [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">{{ insight.message }}</p>
-//                   </div>
-//                 }
-//               </div>
-//             </div>
-
-//             <div class="border overflow-hidden" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//               <div class="p-4 border-b flex justify-between items-center" [style.border-color]="'var(--theme-border-primary)'" [style.background]="'var(--theme-bg-ternary)'">
-//                 <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-xs)'">Critical Inventory Alerts</h3>
-//                 <span class="px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-500 font-bold text-[10px]">{{ dashboard()?.alerts?.lowStockCount }} ACTIONS REQUIRED</span>
-//               </div>
-              
-//               <div class="grid-wrapper">
-//                  <app-ag-share-grid 
-//                    [columns]="alertColumns" 
-//                    [data]="dashboard()?.inventory?.lowStockAlerts || []" 
-//                    [showActions]="false" 
-//                    style="height: 100%; min-height: 300px; width: 100%; display: block;">
-//                  </app-ag-share-grid>
-//               </div>
-
-//             </div>
-//           </div>
-
-//           <div class="lg:col-span-4 space-y-6">
-            
-//             <div class="p-5 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//               <h4 class="font-bold mb-4 uppercase tracking-tighter" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Top Sellers</h4>
-//               <div class="space-y-4">
-//                 @for (prod of dashboard()?.leaders?.topProducts; track prod._id) {
-//                   <div class="flex items-center justify-between">
-//                     <div class="flex items-center gap-3">
-//                       <div class="w-8 h-8 rounded bg-indigo-500/10 flex items-center justify-center text-indigo-400 font-bold text-xs">
-//                         #{{ $index + 1 }}
-//                       </div>
-//                       <div>
-//                         <p class="font-bold leading-none truncate w-32" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">{{ prod.name }}</p>
-//                         <p class="mt-1" [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Qty: {{ prod.soldQty }}</p>
-//                       </div>
-//                     </div>
-//                     <span class="font-bold" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">₹{{ prod.revenue | number }}</span>
-//                   </div>
-//                 }
-//               </div>
-//             </div>
-
-//             <div class="p-5 border transition-colors" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//               <h4 class="font-bold mb-4 uppercase tracking-tighter" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Sales Leaderboard</h4>
-//               @for (staff of dashboard()?.operations?.topStaff; track staff._id) {
-//                 <div class="flex items-center justify-between group py-2 border-b border-white/5 last:border-0">
-//                   <div class="flex items-center gap-3">
-//                     <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-[10px]" [style.background]="'var(--theme-accent-gradient)'">
-//                       {{ staff.name.charAt(0) }}
-//                     </div>
-//                     <div>
-//                       <p class="font-bold" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">{{ staff.name }}</p>
-//                       <p [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">{{ staff.count }} deals closed</p>
-//                     </div>
-//                   </div>
-//                   <span class="font-bold tabular-nums text-emerald-500" [style.font-size]="'var(--font-size-sm)'">₹{{ staff.revenue | number }}</span>
-//                 </div>
-//               }
-//             </div>
-
-//             <div class="p-5 border transition-colors" [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//               <h4 class="font-bold mb-4 uppercase tracking-tighter" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Customer Base</h4>
-//               <div class="space-y-3">
-//                 <div class="flex justify-between items-center">
-//                   <span [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">Total Active</span>
-//                   <span class="font-bold" [style.color]="'var(--theme-text-primary)'">{{ dashboard()?.financial?.customers?.active }}</span>
-//                 </div>
-//                 <div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
-//                   <div class="h-full bg-indigo-500" [style.width]="'40%'"></div>
-//                 </div>
-//                 <p class="text-[10px]" [style.color]="'var(--theme-text-tertiary)'">New Customers: {{ dashboard()?.customers?.segmentation['New Customer'] }}</p>
-//               </div>
-//             </div>
-
+//             }
 //           </div>
 //         </div>
-//       </ng-container>
 
-//       <ng-template #loader>
-//         <div class="h-[60vh] flex flex-col items-center justify-center gap-4">
-//           <p-progressSpinner strokeWidth="4" fill="transparent" animationDuration=".8s" styleClass="w-12 h-12"></p-progressSpinner>
-//           <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">Compiling executive data...</p>
+//         <div class="content-card glass-panel">
+//           <h4 class="sidebar-title">Top Staff Performance</h4>
+//           @for (staff of dashboard()?.operations?.topStaff; track staff._id) {
+//             <div class="staff-card">
+//               <div class="staff-info">
+//                 <p class="s-name">{{ staff.name }}</p>
+//                 <p class="s-sub">{{ staff.count }} Sales handled</p>
+//               </div>
+//               <div class="staff-value">₹{{ staff.revenue | number }}</div>
+//             </div>
+//           }
 //         </div>
-//       </ng-template>
-
+//       </div>
 //     </div>
-//   `,
-//   styles: [] // Removed p-datatable styles as they are no longer needed
+//   </ng-container>
+
+//   <ng-template #loader>
+//     <div class="full-loader">
+//       <p-progressSpinner strokeWidth="3"></p-progressSpinner>
+//       <span>Syncing Financial Data...</span>
+//     </div>
+//   </ng-template>
+// </div>
+// `,
+//   styles: [`
+//   .dashboard-container {
+//     padding: var(--spacing-xl); background: var(--bg-primary); min-height: 100vh; color: var(--text-primary);
+    
+//     .glass-panel {
+//       background: color-mix(in srgb, var(--bg-secondary), transparent 10%);
+//       backdrop-filter: blur(var(--glass-blur-c)); border: 1px solid var(--border-primary);
+//       border-radius: var(--ui-border-radius-lg); box-shadow: var(--shadow-sm);
+//     }
+
+//     .filter-wrapper {
+//       display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-xl);
+//       .filter-group { display: flex; gap: var(--spacing-xl); }
+//       .filter-box { display: flex; flex-direction: column; gap: 4px; label { font-size: 10px; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; } }
+//       .execution-time { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); margin-right: var(--spacing-md); }
+//     }
+
+//     .header-section {
+//       display: flex; justify-content: space-between; margin-bottom: var(--spacing-xl);
+//       .page-title { font-family: var(--font-heading); font-size: var(--font-size-3xl); font-weight: 700; margin: 0; }
+//       .page-subtitle { font-size: var(--font-size-sm); color: var(--text-secondary); }
+//       .health-stat { text-align: right; .label { display: block; font-size: 10px; font-weight: 800; color: var(--text-tertiary); } .value { font-size: var(--font-size-2xl); font-weight: 900; } }
+//     }
+
+//     .kpi-grid {
+//       display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-lg); margin-bottom: var(--spacing-xl);
+//       @media (max-width: 1200px) { grid-template-columns: repeat(2, 1fr); }
+//     }
+
+//     .kpi-card {
+//       padding: var(--spacing-lg);
+//       .kpi-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md); }
+//       .kpi-label { font-size: 11px; font-weight: 700; color: var(--text-label); text-transform: uppercase; }
+//       .kpi-value { font-size: var(--font-size-3xl); font-weight: 800; margin: 0; letter-spacing: -1px; }
+//       .kpi-subtext { font-size: 10px; color: var(--text-tertiary); margin-top: 4px; }
+//       .trend-pill { padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 800; &.positive { background: var(--color-success-bg); color: var(--color-success); } }
+//     }
+
+//     .layout-grid { display: grid; grid-template-columns: 2.5fr 1fr; gap: var(--spacing-lg); }
+//     .main-column, .side-column { display: flex; flex-direction: column; gap: var(--spacing-lg); }
+    
+//     .content-card, .grid-card { padding: var(--spacing-lg); }
+//     .card-title { font-size: var(--font-size-md); font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px; }
+
+//     .insight-row {
+//       display: flex; gap: var(--spacing-md); padding: var(--spacing-md); background: var(--bg-primary); border-radius: 8px; margin-bottom: var(--spacing-sm);
+//       border-left: 4px solid var(--color-info);
+//       &.positive { border-left-color: var(--color-success); background: var(--color-success-bg); }
+//       .i-title { font-weight: 800; font-size: var(--font-size-sm); margin: 0; display: flex; justify-content: space-between; }
+//       .i-msg { font-size: var(--font-size-xs); color: var(--text-secondary); margin-top: 2px; }
+//       .priority-tag { font-size: 8px; text-transform: uppercase; background: rgba(0,0,0,0.1); padding: 2px 4px; border-radius: 4px; }
+//     }
+
+//     .sidebar-title { font-size: 12px; font-weight: 800; text-transform: uppercase; color: var(--text-label); margin-bottom: var(--spacing-lg); border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px; }
+//     .stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border-primary); font-size: var(--font-size-sm); }
+    
+//     .seg-pill {
+//       display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-sm) var(--spacing-md); background: var(--bg-primary); border-radius: var(--ui-border-radius); margin-bottom: 4px;
+//       .seg-name { font-size: 11px; font-weight: 600; }
+//       .seg-count { background: var(--accent-primary); color: #fff; font-size: 10px; padding: 0 6px; border-radius: 10px; }
+//     }
+
+//     .staff-card {
+//       display: flex; justify-content: space-between; align-items: center; padding: 10px; background: var(--bg-ternary); border-radius: 8px; margin-bottom: 6px;
+//       .s-name { font-weight: 700; font-size: var(--font-size-sm); margin: 0; }
+//       .s-sub { font-size: 9px; color: var(--text-muted); }
+//       .staff-value { font-weight: 800; color: var(--color-success); font-size: var(--font-size-sm); }
+//     }
+
+//     .full-loader { height: 60vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--spacing-md); color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; font-size: 10px; }
+//   }
+//   `]
 // })
 // export class DashboardUI implements OnInit {
-//   // Signals for Reactive UI
 //   dashboard = signal<any>(null);
 //   loading = signal<boolean>(true);
+//   public masterList = inject(MasterListService);
   
-//   // Grid Columns
+//   selectedBranch = signal<string>('');
+//   dateRange = signal<Date[] | null>(null);
+
 //   alertColumns: any[] = [];
 
 //   constructor(
@@ -550,43 +749,19 @@ export class DashboardUI implements OnInit {
 //   ) {}
 
 //   ngOnInit() {
-//     this.getAlertColumns();
+//     this.setupColumns();
 //     this.loadDashboard();
 //   }
 
-//   getAlertColumns(): void {
+//   setupColumns(): void {
 //     this.alertColumns = [
-//       {
-//         field: 'name', 
-//         headerName: 'Product', 
-//         sortable: true, 
-//         flex: 1,
-//         cellStyle: { 'font-weight': '700' }
-//       },
-//       {
-//         field: 'currentStock', 
-//         headerName: 'Stock', 
-//         sortable: true, 
-//         width: 100,
-//         cellStyle: { 'color': 'var(--theme-error)', 'font-family': 'monospace' }
-//       },
-//       {
-//         field: 'reorderLevel', 
-//         headerName: 'Threshold', 
-//         sortable: true, 
-//         width: 120,
-//         cellStyle: { 'font-family': 'monospace' }
-//       },
-//       {
-//         field: 'urgency', 
-//         headerName: 'Urgency', 
-//         sortable: true, 
-//         width: 120,
-//         cellRenderer: (params: any) => {
-//           return `<span style="padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; background: var(--theme-error); color: #fff;">
-//                     ${params.value || 'HIGH'}
-//                   </span>`;
-//         }
+//       { field: 'name', headerName: 'Inventory Item', flex: 2, cellStyle: { 'font-weight': '700' } },
+//       { field: 'currentStock', headerName: 'Stock', flex: 1, cellStyle: { 'color': 'var(--color-error)', 'font-weight': '900' } },
+//       { 
+//         field: 'revenue', 
+//         headerName: 'Potential Revenue', 
+//         flex: 1, 
+//         valueFormatter: (p: any) => this.commonService.formatCurrency(p.value) 
 //       }
 //     ];
 //     this.cdr.detectChanges();
@@ -594,283 +769,19 @@ export class DashboardUI implements OnInit {
 
 //   loadDashboard() {
 //     this.loading.set(true);
-//     this.analyticsService.getDashboardOverview().subscribe({
+//     let start, end;
+//     if (this.dateRange()?.length === 2) {
+//       start = this.dateRange()![0]?.toISOString();
+//       end = this.dateRange()![1]?.toISOString();
+//     }
+
+//     this.analyticsService.getDashboardOverview(start, end, this.selectedBranch()).subscribe({
 //       next: (res) => {
-//         if (res.status === 'success') {
-//           this.dashboard.set(res.data);
-//         }
-//         this.loading.set(false);
-//       },
-//       error: (err) => {
-//         console.error('Dashboard Error', err);
+//         this.dashboard.set(res.data);
 //         this.loading.set(false);
 //       }
 //     });
 //   }
+
+//   onFilterChange() { this.loadDashboard(); }
 // }
-
-// // import { Component, OnInit, signal, inject } from '@angular/core';
-// // import { CommonModule } from '@angular/common';
-// // import { FormsModule } from '@angular/forms';
-// // import { ButtonModule } from 'primeng/button';
-// // import { TableModule } from 'primeng/table';
-// // import { TagModule } from 'primeng/tag';
-// // import { TooltipModule } from 'primeng/tooltip';
-// // import { ProgressSpinnerModule } from 'primeng/progressspinner';
-// // import { ToastModule } from 'primeng/toast';
-// // import { AdminAnalyticsService } from '../admin-analytics.service';
-// // import { CommonMethodService } from '../../core/utils/common-method.service';
-
-// // @Component({
-// //   selector: 'app-admin-dashboard-Ui',
-// //   standalone: true,
-// //   imports: [
-// //     CommonModule, FormsModule, ButtonModule, TableModule, 
-// //     TagModule, TooltipModule, ProgressSpinnerModule, ToastModule
-// //   ],
-// //   template: `
-// //     <div class="min-h-screen p-4 md:p-6 transition-colors duration-300" 
-// //          [style.background]="'var(--theme-bg-primary)'"
-// //          [style.font-family]="'var(--font-body)'">
-         
-// //       <div class="mb-6 flex flex-wrap justify-between items-end gap-4">
-// //         <div>
-// //           <h1 class="font-bold tracking-tight" 
-// //               [style.color]="'var(--theme-text-primary)'"
-// //               [style.font-family]="'var(--font-heading)'"
-// //               [style.font-size]="'var(--font-size-3xl)'">Executive Overview</h1>
-// //           <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">
-// //             Analyzing {{ dashboard()?.period?.days }} days of performance for Shivam Electronics
-// //           </p>
-// //         </div>
-// //         <div class="flex items-center gap-2">
-// //           <div class="px-3 py-1 border rounded-lg flex items-center gap-2" 
-// //                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'">
-// //             <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold">HEALTH SCORE</span>
-// //             <span class="font-bold text-emerald-500" [style.font-size]="'var(--font-size-md)'">{{ dashboard()?.inventory?.healthScore }}%</span>
-// //           </div>
-// //           <p-button icon="pi pi-refresh" [outlined]="true" severity="secondary" (onClick)="loadDashboard()"></p-button>
-// //         </div>
-// //       </div>
-
-// //       <ng-container *ngIf="!loading(); else loader">
-        
-// //         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-// //           <div class="p-4 border transition-all hover:scale-[1.01]" 
-// //                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'" [style.box-shadow]="'var(--shadow-sm)'">
-// //             <div class="flex justify-between items-start mb-2">
-// //               <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase tracking-widest">Total Revenue</span>
-// //               <i class="pi pi-wallet text-indigo-400"></i>
-// //             </div>
-// //             <div class="flex items-end gap-2">
-// //               <h2 class="font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-3xl)'">
-// //                 ₹{{ dashboard()?.financial?.totalRevenue?.value | number:'1.0-0' }}
-// //               </h2>
-// //               <span class="mb-1 text-emerald-500 font-bold" [style.font-size]="'var(--font-size-xs)'">
-// //                 <i class="pi pi-arrow-up-right"></i> {{ dashboard()?.financial?.totalRevenue?.growth }}%
-// //               </span>
-// //             </div>
-// //             <p class="mt-2" [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">
-// //               Avg Ticket: ₹{{ dashboard()?.financial?.totalRevenue?.avgTicket | number }}
-// //             </p>
-// //           </div>
-
-// //           <div class="p-4 border transition-all hover:scale-[1.01]" 
-// //                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //             <div class="flex justify-between items-start mb-2">
-// //               <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase tracking-widest">Net Profit</span>
-// //               <i class="pi pi-chart-line text-emerald-400"></i>
-// //             </div>
-// //             <h2 class="font-bold tabular-nums" [style.color]="'var(--theme-success)'" [style.font-size]="'var(--font-size-3xl)'">
-// //               ₹{{ dashboard()?.financial?.netProfit?.value | number:'1.0-0' }}
-// //             </h2>
-// //             <div class="flex gap-2 mt-2 items-center">
-// //               <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold" [style.font-size]="'var(--font-size-xs)'">Margin {{ dashboard()?.financial?.netProfit?.margin }}%</span>
-// //             </div>
-// //           </div>
-
-// //           <div class="p-4 border transition-all hover:scale-[1.01]" 
-// //                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //             <div class="flex justify-between items-start mb-2">
-// //               <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase tracking-widest">Receivables</span>
-// //               <i class="pi pi-info-circle text-amber-400"></i>
-// //             </div>
-// //             <h2 class="font-bold tabular-nums" [style.color]="'var(--theme-warning)'" [style.font-size]="'var(--font-size-3xl)'">
-// //               ₹{{ dashboard()?.financial?.outstanding?.receivables | number }}
-// //             </h2>
-// //             <p class="mt-2" [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Pending from 3 customers</p>
-// //           </div>
-
-// //           <div class="p-4 border transition-all hover:scale-[1.01]" 
-// //                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //             <div class="flex justify-between items-start mb-2">
-// //               <span [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold uppercase tracking-widest">Inventory Value</span>
-// //               <i class="pi pi-box text-blue-400"></i>
-// //             </div>
-// //             <h2 class="font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-2xl)'">
-// //               ₹{{ (dashboard()?.inventory?.summary?.valuation / 10000000) | number:'1.2-2' }} Cr
-// //             </h2>
-// //             <p class="mt-2" [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">{{ dashboard()?.inventory?.inventoryValuation?.totalItems }} Units in Stock</p>
-// //           </div>
-// //         </div>
-
-// //         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-// //           <div class="lg:col-span-8 space-y-6">
-            
-// //             <div class="p-5 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //               <div class="flex items-center gap-2 mb-4">
-// //                 <i class="pi pi-sparkles text-indigo-400"></i>
-// //                 <h3 class="font-bold uppercase tracking-tighter" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-md)'">Operational Insights</h3>
-// //               </div>
-// //               <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-// //                 @for (insight of dashboard()?.insights?.insights; track insight.title) {
-// //                   <div class="p-3 border rounded-lg transition-all" 
-// //                        [style.background]="'var(--theme-bg-ternary)'" [style.border-left]="insight.type === 'positive' ? '4px solid var(--theme-success)' : '4px solid var(--theme-info)'">
-// //                     <p class="font-bold" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">{{ insight.title }}</p>
-// //                     <p class="mt-1" [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">{{ insight.message }}</p>
-// //                   </div>
-// //                 }
-// //               </div>
-// //             </div>
-
-// //             <div class="border overflow-hidden" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //               <div class="p-4 border-b flex justify-between items-center" [style.border-color]="'var(--theme-border-primary)'" [style.background]="'var(--theme-bg-ternary)'">
-// //                 <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-xs)'">Critical Inventory Alerts</h3>
-// //                 <span class="px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-500 font-bold text-[10px]">{{ dashboard()?.alerts?.lowStockCount }} ACTIONS REQUIRED</span>
-// //               </div>
-// //               <p-table [value]="dashboard()?.inventory?.lowStockAlerts" styleClass="p-datatable-sm">
-// //                 <ng-template pTemplate="header">
-// //                   <tr>
-// //                     <th [style.background]="'transparent'" [style.color]="'var(--theme-text-label)'">Product</th>
-// //                     <th [style.background]="'transparent'" [style.color]="'var(--theme-text-label)'">Stock</th>
-// //                     <th [style.background]="'transparent'" [style.color]="'var(--theme-text-label)'">Threshold</th>
-// //                     <th [style.background]="'transparent'" [style.color]="'var(--theme-text-label)'">Urgency</th>
-// //                   </tr>
-// //                 </ng-template>
-// //                 <ng-template pTemplate="body" let-item>
-// //                   <tr [style.color]="'var(--theme-text-secondary)'" [style.border-color]="'var(--theme-border-primary)'">
-// //                     <td class="font-bold">{{ item.name }}</td>
-// //                     <td [style.color]="'var(--theme-error)'" class="font-mono">{{ item.currentStock }}</td>
-// //                     <td class="font-mono">{{ item.reorderLevel }}</td>
-// //                     <td>
-// //                       <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase"
-// //                             [style.background]="'var(--theme-error)'" [style.color]="'#fff'">{{ item.urgency }}</span>
-// //                     </td>
-// //                   </tr>
-// //                 </ng-template>
-// //               </p-table>
-// //             </div>
-// //           </div>
-
-// //           <div class="lg:col-span-4 space-y-6">
-            
-// //             <div class="p-5 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //               <h4 class="font-bold mb-4 uppercase tracking-tighter" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Top Sellers</h4>
-// //               <div class="space-y-4">
-// //                 @for (prod of dashboard()?.leaders?.topProducts; track prod._id) {
-// //                   <div class="flex items-center justify-between">
-// //                     <div class="flex items-center gap-3">
-// //                       <div class="w-8 h-8 rounded bg-indigo-500/10 flex items-center justify-center text-indigo-400 font-bold text-xs">
-// //                         #{{ $index + 1 }}
-// //                       </div>
-// //                       <div>
-// //                         <p class="font-bold leading-none truncate w-32" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">{{ prod.name }}</p>
-// //                         <p class="mt-1" [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Qty: {{ prod.soldQty }}</p>
-// //                       </div>
-// //                     </div>
-// //                     <span class="font-bold" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">₹{{ prod.revenue | number }}</span>
-// //                   </div>
-// //                 }
-// //               </div>
-// //             </div>
-
-// //             <div class="p-5 border transition-colors" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //               <h4 class="font-bold mb-4 uppercase tracking-tighter" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Sales Leaderboard</h4>
-// //               @for (staff of dashboard()?.operations?.topStaff; track staff._id) {
-// //                 <div class="flex items-center justify-between group py-2 border-b border-white/5 last:border-0">
-// //                   <div class="flex items-center gap-3">
-// //                     <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-[10px]" [style.background]="'var(--theme-accent-gradient)'">
-// //                       {{ staff.name.charAt(0) }}
-// //                     </div>
-// //                     <div>
-// //                       <p class="font-bold" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">{{ staff.name }}</p>
-// //                       <p [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">{{ staff.count }} deals closed</p>
-// //                     </div>
-// //                   </div>
-// //                   <span class="font-bold tabular-nums text-emerald-500" [style.font-size]="'var(--font-size-sm)'">₹{{ staff.revenue | number }}</span>
-// //                 </div>
-// //               }
-// //             </div>
-
-// //             <div class="p-5 border transition-colors" [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-// //               <h4 class="font-bold mb-4 uppercase tracking-tighter" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Customer Base</h4>
-// //               <div class="space-y-3">
-// //                 <div class="flex justify-between items-center">
-// //                   <span [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">Total Active</span>
-// //                   <span class="font-bold" [style.color]="'var(--theme-text-primary)'">{{ dashboard()?.financial?.customers?.active }}</span>
-// //                 </div>
-// //                 <div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
-// //                   <div class="h-full bg-indigo-500" [style.width]="'40%'"></div>
-// //                 </div>
-// //                 <p class="text-[10px]" [style.color]="'var(--theme-text-tertiary)'">New Customers: {{ dashboard()?.customers?.segmentation['New Customer'] }}</p>
-// //               </div>
-// //             </div>
-
-// //           </div>
-// //         </div>
-// //       </ng-container>
-
-// //       <ng-template #loader>
-// //         <div class="h-[60vh] flex flex-col items-center justify-center gap-4">
-// //           <p-progressSpinner strokeWidth="4" fill="transparent" animationDuration=".8s" styleClass="w-12 h-12"></p-progressSpinner>
-// //           <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">Compiling executive data...</p>
-// //         </div>
-// //       </ng-template>
-
-// //     </div>
-// //   `,
-// //   styles: [`
-// //     :host ::ng-deep .p-datatable .p-datatable-tbody > tr {
-// //       background: transparent !important;
-// //       border-bottom: 1px solid var(--theme-border-primary) !important;
-// //     }
-// //     :host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
-// //       padding: 0.75rem 1rem;
-// //       font-size: var(--font-size-xs);
-// //       font-weight: 700;
-// //       text-transform: uppercase;
-// //       letter-spacing: 0.05em;
-// //     }
-// //   `]
-// // })
-// // export class DashboardUI implements OnInit {
-// //   // Signals for Reactive UI
-// //   dashboard = signal<any>(null);
-// //   loading = signal<boolean>(true);
-
-// //   constructor(
-// //     private analyticsService: AdminAnalyticsService,
-// //     public commonService: CommonMethodService
-// //   ) {}
-
-// //   ngOnInit() {
-// //     this.loadDashboard();
-// //   }
-
-// //   loadDashboard() {
-// //     this.loading.set(true);
-// //     this.analyticsService.getDashboardOverview().subscribe({
-// //       next: (res) => {
-// //         if (res.status === 'success') {
-// //           this.dashboard.set(res.data);
-// //         }
-// //         this.loading.set(false);
-// //       },
-// //       error: (err) => {
-// //         console.error('Dashboard Error', err);
-// //         this.loading.set(false);
-// //       }
-// //     });
-// //   }
-// // }

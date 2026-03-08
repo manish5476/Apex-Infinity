@@ -1,121 +1,117 @@
-import { Component, OnInit, signal, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, signal, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TooltipModule } from 'primeng/tooltip';
-import { AdminAnalyticsService } from '../admin-analytics.service';
-import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
 
-interface LTVCustomer {
-  _id: string;
-  name: string;
-  email: string;
-  totalSpent: number;
-  transactionCount: number;
-  avgOrderValue: number;
-  tier: string;
-  valueScore: number;
-  lifespanDays: number;
-}
+// Services
+import { AdminAnalyticsService } from '../admin-analytics.service';
+import { MasterListService } from '../../core/services/master-list.service'; // Ensure this is imported
+import { CommonMethodService } from '../../core/utils/common-method.service'; // Added CommonMethodService
+
+// Components
+import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
+import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
+import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
 
 @Component({
   selector: 'app-customer-ltv-analysis',
   standalone: true,
   imports: [
-    CommonModule, ButtonModule, 
-    ProgressSpinnerModule, TooltipModule,
-    AgShareGrid // Added Custom Grid
+    CommonModule, 
+    ButtonModule, 
+    ProgressSpinnerModule, 
+    TooltipModule,
+    AgShareGrid,
+    UniversalFilterComponent
   ],
   template: `
-    <div class="p-4 md:p-6 transition-colors duration-300" 
-         [style.background]="'var(--theme-bg-primary)'"
-         [style.font-family]="'var(--font-body)'">
+    <div class="ltv-container">
+
+      <div class="filter-section">
+        <app-universal-filter
+          [entityType]="'ltv-analysis'"
+          [config]="filterConfig"
+          (filterChange)="onFilterUpdate($event)">
+        </app-universal-filter>
+      </div>
 
       <ng-container *ngIf="!loading(); else loader">
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div class="p-5 border transition-all hover:shadow-md" 
-               [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-            <p class="uppercase font-bold tracking-widest mb-1" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Total Network LTV</p>
-            <h2 class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'">₹{{ ltvData()?.summary?.totalLTV | number }}</h2>
+        <div class="kpi-grid">
+          
+          <div class="kpi-card total-ltv">
+            <p class="kpi-label">Total Network LTV</p>
+            <h2 class="kpi-value">{{ commonService.formatCurrency(calculateTotalLTV()) }}</h2>
           </div>
 
-          <div class="p-5 border transition-all" 
-               [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-            <p class="uppercase font-bold tracking-widest mb-1" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Avg Customer Value</p>
-            <h2 class="text-3xl font-bold tabular-nums text-indigo-400">₹{{ ltvData()?.summary?.avgLTV | number:'1.0-0' }}</h2>
+          <div class="kpi-card avg-value">
+            <p class="kpi-label">Avg Customer Value</p>
+            <h2 class="kpi-value highlight">{{ commonService.formatCurrency(ltvData()?.summary?.avgLTV) }}</h2>
           </div>
 
-          <div class="p-5 border flex items-center justify-between" 
-               [style.background]="'var(--theme-accent-gradient)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-            <div class="text-white">
-              <p class="uppercase font-black tracking-tighter opacity-80" [style.font-size]="'var(--font-size-xs)'">Top Performer</p>
-              <h3 class="font-bold text-lg truncate w-40">{{ ltvData()?.summary?.topCustomer?.name }}</h3>
+          <div class="kpi-card performer-card">
+            <div class="performer-info">
+              <p class="performer-label">Top Performer</p>
+              <h3 class="performer-name">{{ getTopCustomerName() }}</h3>
             </div>
-            <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center border border-white/30 text-white shadow-lg">
-              <i class="pi pi-star-fill text-xl"></i>
+            <div class="star-badge">
+              <i class="pi pi-star-fill star-icon"></i>
             </div>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="content-grid">
           
-          <div class="lg:col-span-8">
-            <div class="border overflow-hidden h-full flex flex-col" 
-                 [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-              <div class="p-4 border-b flex justify-between items-center shrink-0" [style.border-color]="'var(--theme-border-primary)'" [style.background]="'var(--theme-bg-ternary)'">
-                <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-xs)'">Lifetime Value Ranking</h3>
-                <p-button icon="pi pi-download" [text]="true" size="small"></p-button>
+          <div class="main-column">
+            <div class="grid-card">
+              <div class="grid-header">
+                <h3 class="grid-title">Lifetime Value Ranking</h3>
+                <p-button icon="pi pi-download" [text]="true" size="small" severity="secondary"></p-button>
               </div>
 
-              <div class="grid-wrapper flex-1 relative min-h-[400px]">
+              <div class="grid-container">
                  <app-ag-share-grid 
                    [columns]="ltvColumns" 
                    [data]="ltvData()?.customers || []" 
                    [showActions]="false" 
-                   style="width: 100%; height: 100%; display: block; position: absolute; inset: 0;">
+                   class="full-size-grid">
                  </app-ag-share-grid>
               </div>
             </div>
           </div>
 
-          <div class="lg:col-span-4 space-y-6">
-            <div class="p-6 border relative overflow-hidden" 
-                 [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-              <h4 class="font-bold mb-6 uppercase tracking-tighter" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Top Contributor Details</h4>
+          <div class="side-column">
+            
+            <div class="side-card profile-card" *ngIf="getTopCustomer()">
+              <h4 class="side-title mb-lg">Top Contributor Details</h4>
               
-              <div class="flex flex-col items-center mb-6">
-                <div class="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white mb-3 shadow-xl" 
-                     [style.background]="'var(--theme-accent-gradient)'">
-                  {{ ltvData()?.summary?.topCustomer?.name.charAt(0) }}
+              <div class="profile-header">
+                <div class="avatar-circle">
+                  {{ getTopCustomer().name.charAt(0) }}
                 </div>
-                <p class="font-bold text-white">{{ ltvData()?.summary?.topCustomer?.name }}</p>
-                <p class="text-[10px] uppercase font-bold text-indigo-400">High-Ticket Buyer</p>
+                <p class="profile-name">{{ getTopCustomer().name }}</p>
+                <span class="profile-badge">{{ getTopCustomer().tier || 'VIP' }}</span>
               </div>
 
-              <div class="space-y-4 pt-4 border-t" [style.border-color]="'var(--theme-border-primary)'">
-                <div class="flex justify-between">
-                  <span [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Avg Ticket Size</span>
-                  <span class="font-bold text-white">₹{{ ltvData()?.summary?.topCustomer?.avgOrderValue | number }}</span>
+              <div class="stats-list">
+                <div class="stat-row">
+                  <span class="stat-label">Avg Ticket Size</span>
+                  <span class="stat-value">{{ commonService.formatCurrency(getTopCustomer().avgOrder) }}</span>
                 </div>
-                <div class="flex justify-between">
-                  <span [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Frequency</span>
-                  <span class="font-bold text-white">{{ ltvData()?.summary?.topCustomer?.transactionCount }} Orders</span>
-                </div>
-                <div class="flex justify-between">
-                  <span [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Account Lifespan</span>
-                  <span class="font-bold text-white">{{ ltvData()?.summary?.topCustomer?.lifespanDays | number:'1.1-1' }} Days</span>
+                <div class="stat-row">
+                  <span class="stat-label">Total Contribution</span>
+                  <span class="stat-value">{{ commonService.formatCurrency(getTopCustomer().ltv) }}</span>
                 </div>
               </div>
             </div>
 
-            <div class="p-5 border transition-colors border-dashed" 
-                 [style.background]="'rgba(16, 185, 129, 0.05)'" [style.border-color]="'var(--theme-success)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-              <h4 class="font-bold mb-3 uppercase tracking-tighter" [style.color]="'var(--theme-success)'" [style.font-size]="'var(--font-size-xs)'">Retention Trigger</h4>
-              <p [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">
-                <i class="pi pi-bolt mr-1"></i>
-                High AOV detected for <span class="text-white font-bold">{{ ltvData()?.customers[0]?.name }}</span>. 
-                Triggering a VIP concierge invite could increase retention by 15%.
+            <div class="side-card retention-card">
+              <h4 class="side-title success mb-sm">Retention Trigger</h4>
+              <p class="retention-text">
+                <i class="pi pi-bolt retention-icon"></i>
+                High value detected for <span class="highlight-text">{{ getTopCustomerName() }}</span>. 
+                Triggering a VIP concierge invite could increase retention.
               </p>
             </div>
           </div>
@@ -124,30 +120,328 @@ interface LTVCustomer {
       </ng-container>
 
       <ng-template #loader>
-        <div class="h-[50vh] flex flex-col items-center justify-center gap-4">
+        <div class="loader-container">
           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-12 h-12"></p-progressSpinner>
-          <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">Reconstructing customer lifecycles...</p>
+          <p class="loader-text">Reconstructing customer lifecycles...</p>
         </div>
       </ng-template>
 
     </div>
   `,
-  styles: []
+  styles: [`
+    :host { display: block; width: 100%; }
+
+    .ltv-container {
+      padding: var(--spacing-lg) var(--spacing-xl);
+      background: var(--bg-primary);
+      font-family: var(--font-body);
+      min-height: 100%;
+    }
+
+    /* Filter Section */
+    .filter-section { margin-bottom: var(--spacing-lg); }
+
+    /* KPI GRID */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+    }
+    @media(min-width: 768px) {
+      .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    /* KPI CARDS */
+    .kpi-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius-xl);
+      padding: var(--spacing-lg);
+      transition: var(--transition-base);
+    }
+    .kpi-card:hover {
+      box-shadow: var(--shadow-sm);
+      border-color: var(--border-secondary);
+    }
+
+    .kpi-label {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-label);
+      margin: 0 0 4px 0;
+    }
+
+    .kpi-value {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      margin: 0;
+      font-family: var(--font-heading);
+    }
+    .kpi-value.highlight { color: var(--accent-primary); }
+
+    /* PERFORMER CARD (Accented) */
+    .performer-card {
+      background: var(--accent-gradient);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #ffffff; /* Always white on gradient */
+    }
+
+    .performer-info { color: #ffffff; }
+    
+    .performer-label {
+      font-size: var(--font-size-xs);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      opacity: 0.9;
+      margin: 0 0 2px 0;
+    }
+
+    .performer-name {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-bold);
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 140px;
+    }
+
+    .star-badge {
+      width: 3rem;
+      height: 3rem;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-md);
+    }
+    .star-icon { font-size: 1.25rem; color: #ffffff; }
+
+    /* CONTENT GRID */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--spacing-lg);
+    }
+    @media(min-width: 1024px) {
+      .content-grid { grid-template-columns: 2fr 1fr; }
+    }
+
+    /* GRID CARD */
+    .grid-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius-xl);
+      overflow: hidden;
+      height: 100%;
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .grid-header {
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-bottom: 1px solid var(--border-primary);
+      background: var(--bg-ternary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .grid-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .grid-container { flex: 1; position: relative; }
+    .full-size-grid { width: 100%; height: 100%; display: block; }
+
+    /* SIDE COLUMN */
+    .side-column { display: flex; flex-direction: column; gap: var(--spacing-lg); }
+
+    .side-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius-xl);
+      padding: var(--spacing-lg);
+    }
+
+    .profile-card { background: var(--bg-ternary); border-color: var(--border-secondary); }
+
+    .side-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      color: var(--text-label);
+      margin: 0;
+    }
+    .side-title.mb-lg { margin-bottom: var(--spacing-lg); }
+    .side-title.mb-sm { margin-bottom: var(--spacing-sm); }
+    .side-title.success { color: var(--color-success); }
+
+    /* PROFILE HEADER */
+    .profile-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .avatar-circle {
+      width: 4rem;
+      height: 4rem;
+      border-radius: 50%;
+      background: var(--accent-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ffffff;
+      box-shadow: var(--shadow-md);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .profile-name {
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      margin: 0 0 4px 0;
+    }
+
+    .profile-badge {
+      font-size: 10px;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: var(--accent-primary);
+      background: var(--accent-focus);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    /* STATS LIST */
+    .stats-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md);
+      padding-top: var(--spacing-md);
+      border-top: 1px solid var(--border-primary);
+    }
+
+    .stat-row { display: flex; justify-content: space-between; font-size: var(--font-size-xs); }
+    .stat-label { color: var(--text-tertiary); }
+    .stat-value { font-weight: bold; color: var(--text-primary); }
+
+    /* RETENTION CARD */
+    .retention-card {
+      border: 1px dashed var(--color-success);
+      background: var(--color-success-bg);
+    }
+
+    .retention-text {
+      font-size: var(--font-size-xs);
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin: 0;
+    }
+    .retention-icon { margin-right: 4px; color: var(--color-warning); }
+    .highlight-text { font-weight: bold; color: var(--text-primary); }
+
+    /* LOADER */
+    .loader-container {
+      height: 50vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-md);
+    }
+    .loader-text { font-size: var(--font-size-sm); color: var(--text-tertiary); }
+  `]
 })
 export class CustomerLtvAnalysisComponent implements OnInit {
+  // Injections
+  public masterList = inject(MasterListService); 
+  public commonService = inject(CommonMethodService); // Injected here
+  private analyticsService = inject(AdminAnalyticsService);
+  private cdr = inject(ChangeDetectorRef);
+
+  // Signals
   ltvData = signal<any>(null);
-  loading = signal<boolean>(true);
-  
+  loading = signal<boolean>(false);
   ltvColumns: any[] = [];
 
-  constructor(
-    private analyticsService: AdminAnalyticsService,
-    private cdr: ChangeDetectorRef
-  ) { }
+  // Filter State
+  private currentFilters: any = {};
+
+  // 1. FILTER CONFIG
+  filterConfig: FilterField[] = [
+    {
+      key: 'branchId',
+      label: 'Branch Context',
+      type: 'select',
+      dataSourceKey: 'branches', // Binds to MasterListService.branches()
+      optionLabel: 'name',
+      optionValue: '_id',
+      placeholder: 'Global Network Average'
+    }
+  ];
 
   ngOnInit() {
     this.setupColumns();
+    // loadData triggers on filter init
+  }
+
+  // 2. FILTER HANDLER
+  onFilterUpdate(filters: any) {
+    this.currentFilters = filters;
     this.loadData();
+  }
+
+  loadData() {
+    this.loading.set(true);
+    
+    const branchId = this.currentFilters.branchId;
+
+    this.analyticsService.getCustomerLifetimeValue(branchId).subscribe({
+      next: (res) => {
+        if (res.status === 'success') {
+          this.ltvData.set(res.data);
+        }
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false)
+    });
+  }
+
+  // Helper Methods
+  calculateTotalLTV(): number {
+    const customers = this.ltvData()?.customers || [];
+    return customers.reduce((sum: number, c: any) => sum + (c.ltv || 0), 0);
+  }
+
+  getTopCustomer() {
+    const customers = this.ltvData()?.customers || [];
+    if (customers.length === 0) return null;
+    // Assuming the list is sorted by LTV descending, or we sort it
+    return customers.sort((a: any, b: any) => b.ltv - a.ltv)[0];
+  }
+
+  getTopCustomerName(): string {
+    const top = this.getTopCustomer();
+    return top ? top.name : '--';
   }
 
   setupColumns(): void {
@@ -158,11 +452,11 @@ export class CustomerLtvAnalysisComponent implements OnInit {
         sortable: false,
         cellRenderer: (params: any) => {
           const rank = (params.node.rowIndex || 0) + 1;
-          return `<span style="font-weight: 700; opacity: 0.5;">#${rank}</span>`;
+          return `<span style="font-weight: 700; opacity: 0.5; color: var(--text-tertiary);">#${rank}</span>`;
         },
-        cellStyle: { 'text-align': 'center' }
+        cellStyle: { 'text-align': 'center', 'display': 'flex', 'align-items': 'center', 'justify-content': 'center' }
       },
-    {
+      {
         field: 'name', 
         headerName: 'Customer', 
         sortable: true, 
@@ -170,242 +464,173 @@ export class CustomerLtvAnalysisComponent implements OnInit {
         minWidth: 200,
         cellRenderer: (params: any) => {
           const tier = params.data.tier || 'Standard';
-          // Refined colors for better contrast and "glass" feel
-          let tierColor = '#94a3b8'; // slate-400
-          let tierBg = 'rgba(148, 163, 184, 0.15)';
-          let borderColor = 'rgba(148, 163, 184, 0.2)';
-          
+          let colorStyle = 'color: var(--text-secondary); background: var(--bg-ternary); border: 1px solid var(--border-secondary);';
+
           if(tier === 'Platinum') { 
-            tierColor = '#c4b5fd'; // violet-300
-            tierBg = 'rgba(139, 92, 246, 0.15)'; 
-            borderColor = 'rgba(139, 92, 246, 0.3)';
+            colorStyle = 'color: var(--accent-primary); background: var(--accent-focus); border: 1px solid var(--accent-secondary);';
           }
           else if(tier === 'Gold') { 
-            tierColor = '#fde047'; // yellow-300
-            tierBg = 'rgba(234, 179, 8, 0.15)'; 
-            borderColor = 'rgba(234, 179, 8, 0.3)';
+            colorStyle = 'color: var(--color-warning); background: var(--color-warning-bg); border: 1px solid var(--color-warning-border);';
           }
-          else if(tier === 'Silver') { 
-            tierColor = '#cbd5e1'; // slate-300
-            tierBg = 'rgba(148, 163, 184, 0.15)';
-            borderColor = 'rgba(148, 163, 184, 0.3)'; 
-          }
-
-          // FIX: Added 'overflow: hidden' to container, refined flex alignment, and added truncation
+          
           return `<div style="display: flex; flex-direction: column; justify-content: center; height: 100%; width: 100%; overflow: hidden;">
                     <div style="display: flex; align-items: center; gap: 6px; width: 100%;">
-                      <span style="font-weight: 600; color: #f1f5f9; font-size: 13px; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${params.value}">
+                      <span style="font-weight: 600; color: var(--text-primary); font-size: var(--font-size-base); line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${params.value}">
                         ${params.value}
                       </span>
-                      <span style="padding: 1px 5px; border-radius: 4px; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; background: ${tierBg}; color: ${tierColor}; border: 1px solid ${borderColor}; flex-shrink: 0; line-height: 1;">
+                      <span style="padding: 1px 5px; border-radius: 4px; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; flex-shrink: 0; line-height: 1; ${colorStyle}">
                         ${tier}
                       </span>
                     </div>
-                    <span style="font-size: 11px; color: #64748b; margin-top: 3px; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${params.data.email || ''}">
-                      ${params.data.email || ''}
+                    <span style="font-size: 11px; color: var(--text-tertiary); margin-top: 3px; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${params.data._id}">
+                      ID: ...${params.data._id.slice(-6)}
                     </span>
                   </div>`;
         }
       },
       {
-        field: 'avgOrderValue', 
-        headerName: 'AOV', 
-        sortable: true, 
-        width: 100,
+        field: 'avgOrder', 
+        headerName: 'Avg Ticket', 
+        width: 120,
         type: 'rightAligned',
         valueFormatter: (params: any) => {
            if(params.value == null) return '-';
            return '₹' + Math.round(params.value).toLocaleString();
         },
-        cellStyle: { 'font-family': 'monospace', 'text-align': 'right', 'font-size': '11px' }
+        cellStyle: { 'font-family': 'var(--font-mono)', 'text-align': 'right', 'font-size': '11px', 'color': 'var(--text-secondary)' }
       },
       {
-        field: 'totalSpent', 
-        headerName: 'Total Spent', 
-        sortable: true, 
-        width: 120,
+        field: 'ltv', 
+        headerName: 'Lifetime Value', 
+        width: 140,
         type: 'rightAligned',
         valueFormatter: (params: any) => {
            if(params.value == null) return '-';
            return '₹' + params.value.toLocaleString();
         },
-        cellStyle: { 'font-weight': '700', 'color': '#10b981', 'text-align': 'right' } // Emerald color
-      },
-      {
-        field: 'valueScore', 
-        headerName: 'Score', 
-        sortable: true, 
-        width: 100,
-        cellRenderer: (params: any) => {
-           const val = params.value || 0;
-           return `<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 2px;">
-                    <span style="font-size: 10px; font-weight: 700; color: var(--theme-text-primary);">${val.toFixed(0)}%</span>
-                    <div style="width: 100%; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden;">
-                       <div style="width: ${val}%; height: 100%; background: #6366f1;"></div>
-                    </div>
-                   </div>`;
-        }
+        cellStyle: { 'font-weight': '700', 'color': 'var(--color-success)', 'text-align': 'right' }
       }
     ];
     this.cdr.detectChanges();
   }
-
-  loadData() {
-    this.loading.set(true);
-    this.analyticsService.getCustomerLifetimeValue().subscribe({
-      next: (res) => {
-        if (res.status === 'success') {
-          this.ltvData.set(res.data);
-        }
-        this.loading.set(false);
-      },
-      error: () => this.loading.set(false)
-    });
-  }
 }
-// import { Component, OnInit, signal } from '@angular/core';
-// import { CommonModule } from '@angular/common';
 
-// import { TableModule } from 'primeng/table';
+// import { Component, OnInit, signal, ChangeDetectorRef, inject } from '@angular/core';
+// import { CommonModule } from '@angular/common';
 // import { ButtonModule } from 'primeng/button';
 // import { ProgressSpinnerModule } from 'primeng/progressspinner';
 // import { TooltipModule } from 'primeng/tooltip';
-// import { AdminAnalyticsService } from '../admin-analytics.service';
 
-// interface LTVCustomer {
-//   _id: string;
-//   name: string;
-//   email: string;
-//   totalSpent: number;
-//   transactionCount: number;
-//   avgOrderValue: number;
-//   tier: string;
-//   valueScore: number;
-//   lifespanDays: number;
-// }
+// // Services
+// import { AdminAnalyticsService } from '../admin-analytics.service';
+// import { MasterListService } from '../../core/services/master-list.service'; // Ensure this is imported
+
+// // Components
+// import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
+// import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
+// import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
 
 // @Component({
 //   selector: 'app-customer-ltv-analysis',
 //   standalone: true,
-//   imports: [CommonModule, TableModule, ButtonModule, ProgressSpinnerModule, TooltipModule],
+//   imports: [
+//     CommonModule, 
+//     ButtonModule, 
+//     ProgressSpinnerModule, 
+//     TooltipModule,
+//     AgShareGrid,
+//     UniversalFilterComponent // <--- Imported
+//   ],
 //   template: `
-//     <div class="p-4 md:p-6 transition-colors duration-300" 
-//          [style.background]="'var(--theme-bg-primary)'"
-//          [style.font-family]="'var(--font-body)'">
+//     <div class="ltv-container">
+
+//       <div class="filter-section">
+//         <app-universal-filter
+//           [entityType]="'ltv-analysis'"
+//           [config]="filterConfig"
+//           (filterChange)="onFilterUpdate($event)">
+//         </app-universal-filter>
+//       </div>
 
 //       <ng-container *ngIf="!loading(); else loader">
         
-//         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-//           <div class="p-5 border transition-all hover:shadow-md" 
-//                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//             <p class="uppercase font-bold tracking-widest mb-1" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Total Network LTV</p>
-//             <h2 class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'">₹{{ ltvData()?.summary?.totalLTV | number }}</h2>
+//         <div class="kpi-grid">
+          
+//           <div class="kpi-card total-ltv">
+//             <p class="kpi-label">Total Network LTV</p>
+//             <h2 class="kpi-value">₹{{ ltvData()?.summary?.totalLTV | number }}</h2>
 //           </div>
 
-//           <div class="p-5 border transition-all" 
-//                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//             <p class="uppercase font-bold tracking-widest mb-1" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Avg Customer Value</p>
-//             <h2 class="text-3xl font-bold tabular-nums text-indigo-400">₹{{ ltvData()?.summary?.avgLTV | number:'1.0-0' }}</h2>
+//           <div class="kpi-card avg-value">
+//             <p class="kpi-label">Avg Customer Value</p>
+//             <h2 class="kpi-value highlight">₹{{ ltvData()?.summary?.avgLTV | number:'1.0-0' }}</h2>
 //           </div>
 
-//           <div class="p-5 border flex items-center justify-between" 
-//                [style.background]="'var(--theme-accent-gradient)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//             <div class="text-white">
-//               <p class="uppercase font-black tracking-tighter opacity-80" [style.font-size]="'var(--font-size-xs)'">Top Performer</p>
-//               <h3 class="font-bold text-lg truncate w-40">{{ ltvData()?.summary?.topCustomer?.name }}</h3>
+//           <div class="kpi-card performer-card">
+//             <div class="performer-info">
+//               <p class="performer-label">Top Performer</p>
+//               <h3 class="performer-name">{{ ltvData()?.summary?.topCustomer?.name }}</h3>
 //             </div>
-//             <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center border border-white/30 text-white shadow-lg">
-//               <i class="pi pi-star-fill text-xl"></i>
+//             <div class="star-badge">
+//               <i class="pi pi-star-fill star-icon"></i>
 //             </div>
 //           </div>
 //         </div>
 
-//         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+//         <div class="content-grid">
           
-//           <div class="lg:col-span-8">
-//             <div class="border overflow-hidden" 
-//                  [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//               <div class="p-4 border-b flex justify-between items-center" [style.border-color]="'var(--theme-border-primary)'" [style.background]="'var(--theme-bg-ternary)'">
-//                 <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-xs)'">Lifetime Value Ranking</h3>
-//                 <p-button icon="pi pi-download" [text]="true" size="small"></p-button>
+//           <div class="main-column">
+//             <div class="grid-card">
+//               <div class="grid-header">
+//                 <h3 class="grid-title">Lifetime Value Ranking</h3>
+//                 <p-button icon="pi pi-download" [text]="true" size="small" severity="secondary"></p-button>
 //               </div>
 
-//               <p-table [value]="ltvData()?.customers" styleClass="p-datatable-sm" [responsiveLayout]="'scroll'">
-//                 <ng-template pTemplate="header">
-//                   <tr>
-//                     <th [style.background]="'transparent'" [style.color]="'var(--theme-text-label)'">Rank</th>
-//                     <th [style.background]="'transparent'" [style.color]="'var(--theme-text-label)'">Customer</th>
-//                     <th [style.background]="'transparent'" [style.color]="'var(--theme-text-label)'" class="text-right">AOV</th>
-//                     <th [style.background]="'transparent'" [style.color]="'var(--theme-text-label)'" class="text-right">Total Spent</th>
-//                     <th [style.background]="'transparent'" [style.color]="'var(--theme-text-label)'" class="text-center">Score</th>
-//                   </tr>
-//                 </ng-template>
-//                 <ng-template pTemplate="body" let-customer let-i="rowIndex">
-//                   <tr [style.color]="'var(--theme-text-secondary)'" [style.border-color]="'var(--theme-border-primary)'">
-//                     <td class="text-center font-bold tabular-nums opacity-50">#{{ i + 1 }}</td>
-//                     <td>
-//                       <div class="flex flex-col">
-//                         <div class="flex items-center gap-2">
-//                           <span class="font-bold text-white">{{ customer.name }}</span>
-//                           <span class="px-1.5 py-0.5 rounded text-[8px] font-black bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 uppercase">
-//                             {{ customer.tier }}
-//                           </span>
-//                         </div>
-//                         <span class="text-[10px]" [style.color]="'var(--theme-text-label)'">{{ customer.email }}</span>
-//                       </div>
-//                     </td>
-//                     <td class="text-right font-mono" [style.font-size]="'var(--font-size-xs)'">₹{{ customer.avgOrderValue | number:'1.0-0' }}</td>
-//                     <td class="text-right font-bold tabular-nums text-emerald-500">₹{{ customer.totalSpent | number }}</td>
-//                     <td>
-//                       <div class="flex flex-col items-center gap-1">
-//                         <span class="text-[10px] font-bold" [style.color]="'var(--theme-text-primary)'">{{ customer.valueScore | number:'1.0-0' }}%</span>
-//                         <div class="w-16 h-1 bg-white/5 rounded-full overflow-hidden">
-//                           <div class="h-full bg-indigo-500" [style.width]="customer.valueScore + '%'"></div>
-//                         </div>
-//                       </div>
-//                     </td>
-//                   </tr>
-//                 </ng-template>
-//               </p-table>
+//               <div class="grid-container">
+//                  <app-ag-share-grid 
+//                    [columns]="ltvColumns" 
+//                    [data]="ltvData()?.customers || []" 
+//                    [showActions]="false" 
+//                    class="full-size-grid">
+//                  </app-ag-share-grid>
+//               </div>
 //             </div>
 //           </div>
 
-//           <div class="lg:col-span-4 space-y-6">
-//             <div class="p-6 border relative overflow-hidden" 
-//                  [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//               <h4 class="font-bold mb-6 uppercase tracking-tighter" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Top Contributor Details</h4>
+//           <div class="side-column">
+            
+//             <div class="side-card profile-card">
+//               <h4 class="side-title mb-lg">Top Contributor Details</h4>
               
-//               <div class="flex flex-col items-center mb-6">
-//                 <div class="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white mb-3 shadow-xl" 
-//                      [style.background]="'var(--theme-accent-gradient)'">
+//               <div class="profile-header">
+//                 <div class="avatar-circle">
 //                   {{ ltvData()?.summary?.topCustomer?.name.charAt(0) }}
 //                 </div>
-//                 <p class="font-bold text-white">{{ ltvData()?.summary?.topCustomer?.name }}</p>
-//                 <p class="text-[10px] uppercase font-bold text-indigo-400">High-Ticket Buyer</p>
+//                 <p class="profile-name">{{ ltvData()?.summary?.topCustomer?.name }}</p>
+//                 <span class="profile-badge">High-Ticket Buyer</span>
 //               </div>
 
-//               <div class="space-y-4 pt-4 border-t" [style.border-color]="'var(--theme-border-primary)'">
-//                 <div class="flex justify-between">
-//                   <span [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Avg Ticket Size</span>
-//                   <span class="font-bold text-white">₹{{ ltvData()?.summary?.topCustomer?.avgOrderValue | number }}</span>
+//               <div class="stats-list">
+//                 <div class="stat-row">
+//                   <span class="stat-label">Avg Ticket Size</span>
+//                   <span class="stat-value">₹{{ ltvData()?.summary?.topCustomer?.avgOrderValue | number }}</span>
 //                 </div>
-//                 <div class="flex justify-between">
-//                   <span [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Frequency</span>
-//                   <span class="font-bold text-white">{{ ltvData()?.summary?.topCustomer?.transactionCount }} Orders</span>
+//                 <div class="stat-row">
+//                   <span class="stat-label">Frequency</span>
+//                   <span class="stat-value">{{ ltvData()?.summary?.topCustomer?.transactionCount }} Orders</span>
 //                 </div>
-//                 <div class="flex justify-between">
-//                   <span [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Account Lifespan</span>
-//                   <span class="font-bold text-white">{{ ltvData()?.summary?.topCustomer?.lifespanDays | number:'1.1-1' }} Days</span>
+//                 <div class="stat-row">
+//                   <span class="stat-label">Account Lifespan</span>
+//                   <span class="stat-value">{{ ltvData()?.summary?.topCustomer?.lifespanDays | number:'1.1-1' }} Days</span>
 //                 </div>
 //               </div>
 //             </div>
 
-//             <div class="p-5 border transition-colors border-dashed" 
-//                  [style.background]="'rgba(16, 185, 129, 0.05)'" [style.border-color]="'var(--theme-success)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//               <h4 class="font-bold mb-3 uppercase tracking-tighter" [style.color]="'var(--theme-success)'" [style.font-size]="'var(--font-size-xs)'">Retention Trigger</h4>
-//               <p [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">
-//                 <i class="pi pi-bolt mr-1"></i>
-//                 High AOV detected for <span class="text-white font-bold">{{ ltvData()?.customers[0]?.name }}</span>. 
+//             <div class="side-card retention-card">
+//               <h4 class="side-title success mb-sm">Retention Trigger</h4>
+//               <p class="retention-text">
+//                 <i class="pi pi-bolt retention-icon"></i>
+//                 High AOV detected for <span class="highlight-text">{{ ltvData()?.customers[0]?.name }}</span>. 
 //                 Triggering a VIP concierge invite could increase retention by 15%.
 //               </p>
 //             </div>
@@ -415,41 +640,302 @@ export class CustomerLtvAnalysisComponent implements OnInit {
 //       </ng-container>
 
 //       <ng-template #loader>
-//         <div class="h-[50vh] flex flex-col items-center justify-center gap-4">
+//         <div class="loader-container">
 //           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-12 h-12"></p-progressSpinner>
-//           <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">Reconstructing customer lifecycles...</p>
+//           <p class="loader-text">Reconstructing customer lifecycles...</p>
 //         </div>
 //       </ng-template>
 
 //     </div>
 //   `,
 //   styles: [`
-//     :host ::ng-deep .p-datatable .p-datatable-tbody > tr {
-//       background: transparent !important;
-//       border-bottom: 1px solid var(--theme-border-primary) !important;
+//     :host { display: block; width: 100%; }
+
+//     .ltv-container {
+//       padding: var(--spacing-lg) var(--spacing-xl);
+//       background: var(--bg-primary);
+//       font-family: var(--font-body);
+//       min-height: 100%;
 //     }
-//     :host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
-//       padding: 0.85rem 1rem;
-//       font-size: 10px;
-//       font-weight: 700;
+
+//     /* Filter Section */
+//     .filter-section { margin-bottom: var(--spacing-lg); }
+
+//     /* KPI GRID */
+//     .kpi-grid {
+//       display: grid;
+//       grid-template-columns: 1fr;
+//       gap: var(--spacing-lg);
+//       margin-bottom: var(--spacing-lg);
+//     }
+//     @media(min-width: 768px) {
+//       .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+//     }
+
+//     /* KPI CARDS */
+//     .kpi-card {
+//       background: var(--bg-secondary);
+//       border: 1px solid var(--border-primary);
+//       border-radius: var(--ui-border-radius-xl);
+//       padding: var(--spacing-lg);
+//       transition: var(--transition-base);
+//     }
+//     .kpi-card:hover {
+//       box-shadow: var(--shadow-sm);
+//       border-color: var(--border-secondary);
+//     }
+
+//     .kpi-label {
+//       font-size: var(--font-size-xs);
+//       font-weight: var(--font-weight-bold);
 //       text-transform: uppercase;
-//       border: none !important;
+//       letter-spacing: 0.05em;
+//       color: var(--text-label);
+//       margin: 0 0 4px 0;
 //     }
+
+//     .kpi-value {
+//       font-size: var(--font-size-3xl);
+//       font-weight: var(--font-weight-bold);
+//       color: var(--text-primary);
+//       margin: 0;
+//       font-family: var(--font-heading);
+//     }
+//     .kpi-value.highlight { color: var(--accent-primary); }
+
+//     /* PERFORMER CARD (Accented) */
+//     .performer-card {
+//       background: var(--accent-gradient);
+//       border: none;
+//       display: flex;
+//       align-items: center;
+//       justify-content: space-between;
+//       color: #ffffff; /* Always white on gradient */
+//     }
+
+//     .performer-info { color: #ffffff; }
+    
+//     .performer-label {
+//       font-size: var(--font-size-xs);
+//       font-weight: 900;
+//       text-transform: uppercase;
+//       letter-spacing: 0.05em;
+//       opacity: 0.9;
+//       margin: 0 0 2px 0;
+//     }
+
+//     .performer-name {
+//       font-size: var(--font-size-lg);
+//       font-weight: var(--font-weight-bold);
+//       margin: 0;
+//       white-space: nowrap;
+//       overflow: hidden;
+//       text-overflow: ellipsis;
+//       max-width: 140px;
+//     }
+
+//     .star-badge {
+//       width: 3rem;
+//       height: 3rem;
+//       border-radius: 50%;
+//       background: rgba(255, 255, 255, 0.2);
+//       border: 1px solid rgba(255, 255, 255, 0.3);
+//       display: flex;
+//       align-items: center;
+//       justify-content: center;
+//       box-shadow: var(--shadow-md);
+//     }
+//     .star-icon { font-size: 1.25rem; color: #ffffff; }
+
+//     /* CONTENT GRID */
+//     .content-grid {
+//       display: grid;
+//       grid-template-columns: 1fr;
+//       gap: var(--spacing-lg);
+//     }
+//     @media(min-width: 1024px) {
+//       .content-grid { grid-template-columns: 2fr 1fr; }
+//     }
+
+//     /* GRID CARD */
+//     .grid-card {
+//       background: var(--bg-secondary);
+//       border: 1px solid var(--border-primary);
+//       border-radius: var(--ui-border-radius-xl);
+//       overflow: hidden;
+//       height: 100%;
+//       min-height: 400px;
+//       display: flex;
+//       flex-direction: column;
+//     }
+
+//     .grid-header {
+//       padding: var(--spacing-md) var(--spacing-lg);
+//       border-bottom: 1px solid var(--border-primary);
+//       background: var(--bg-ternary);
+//       display: flex;
+//       justify-content: space-between;
+//       align-items: center;
+//     }
+
+//     .grid-title {
+//       font-size: var(--font-size-xs);
+//       font-weight: var(--font-weight-bold);
+//       text-transform: uppercase;
+//       color: var(--text-primary);
+//       margin: 0;
+//     }
+
+//     .grid-container { flex: 1; position: relative; }
+//     .full-size-grid { width: 100%; height: 100%; display: block; }
+
+//     /* SIDE COLUMN */
+//     .side-column { display: flex; flex-direction: column; gap: var(--spacing-lg); }
+
+//     .side-card {
+//       background: var(--bg-secondary);
+//       border: 1px solid var(--border-primary);
+//       border-radius: var(--ui-border-radius-xl);
+//       padding: var(--spacing-lg);
+//     }
+
+//     .profile-card { background: var(--bg-ternary); border-color: var(--border-secondary); }
+
+//     .side-title {
+//       font-size: var(--font-size-xs);
+//       font-weight: var(--font-weight-bold);
+//       text-transform: uppercase;
+//       color: var(--text-label);
+//       margin: 0;
+//     }
+//     .side-title.mb-lg { margin-bottom: var(--spacing-lg); }
+//     .side-title.mb-sm { margin-bottom: var(--spacing-sm); }
+//     .side-title.success { color: var(--color-success); }
+
+//     /* PROFILE HEADER */
+//     .profile-header {
+//       display: flex;
+//       flex-direction: column;
+//       align-items: center;
+//       margin-bottom: var(--spacing-lg);
+//     }
+
+//     .avatar-circle {
+//       width: 4rem;
+//       height: 4rem;
+//       border-radius: 50%;
+//       background: var(--accent-gradient);
+//       display: flex;
+//       align-items: center;
+//       justify-content: center;
+//       font-size: 1.5rem;
+//       font-weight: bold;
+//       color: #ffffff;
+//       box-shadow: var(--shadow-md);
+//       margin-bottom: var(--spacing-sm);
+//     }
+
+//     .profile-name {
+//       font-weight: var(--font-weight-bold);
+//       color: var(--text-primary);
+//       margin: 0 0 4px 0;
+//     }
+
+//     .profile-badge {
+//       font-size: 10px;
+//       font-weight: bold;
+//       text-transform: uppercase;
+//       color: var(--accent-primary);
+//       background: var(--accent-focus);
+//       padding: 2px 8px;
+//       border-radius: 4px;
+//     }
+
+//     /* STATS LIST */
+//     .stats-list {
+//       display: flex;
+//       flex-direction: column;
+//       gap: var(--spacing-md);
+//       padding-top: var(--spacing-md);
+//       border-top: 1px solid var(--border-primary);
+//     }
+
+//     .stat-row { display: flex; justify-content: space-between; font-size: var(--font-size-xs); }
+//     .stat-label { color: var(--text-tertiary); }
+//     .stat-value { font-weight: bold; color: var(--text-primary); }
+
+//     /* RETENTION CARD */
+//     .retention-card {
+//       border: 1px dashed var(--color-success);
+//       background: var(--color-success-bg);
+//     }
+
+//     .retention-text {
+//       font-size: var(--font-size-xs);
+//       color: var(--text-secondary);
+//       line-height: 1.5;
+//       margin: 0;
+//     }
+//     .retention-icon { margin-right: 4px; color: var(--color-warning); }
+//     .highlight-text { font-weight: bold; color: var(--text-primary); }
+
+//     /* LOADER */
+//     .loader-container {
+//       height: 50vh;
+//       display: flex;
+//       flex-direction: column;
+//       align-items: center;
+//       justify-content: center;
+//       gap: var(--spacing-md);
+//     }
+//     .loader-text { font-size: var(--font-size-sm); color: var(--text-tertiary); }
 //   `]
 // })
 // export class CustomerLtvAnalysisComponent implements OnInit {
-//   ltvData = signal<any>(null);
-//   loading = signal<boolean>(true);
+//   // Injections
+//   public masterList = inject(MasterListService); // Needed for branch dropdown
+//   private analyticsService = inject(AdminAnalyticsService);
+//   private cdr = inject(ChangeDetectorRef);
 
-//   constructor(private analyticsService: AdminAnalyticsService) { }
+//   // Signals
+//   ltvData = signal<any>(null);
+//   loading = signal<boolean>(false);
+//   ltvColumns: any[] = [];
+
+//   // Filter State
+//   private currentFilters: any = {};
+
+//   // 1. FILTER CONFIG
+//   filterConfig: FilterField[] = [
+//     {
+//       key: 'branchId',
+//       label: 'Branch Context',
+//       type: 'select',
+//       dataSourceKey: 'branches', // Binds to MasterListService.branches()
+//       optionLabel: 'name',
+//       optionValue: '_id',
+//       placeholder: 'Global Network Average'
+//     }
+//   ];
 
 //   ngOnInit() {
+//     this.setupColumns();
+//     // loadData triggers on filter init
+//   }
+
+//   // 2. FILTER HANDLER
+//   onFilterUpdate(filters: any) {
+//     this.currentFilters = filters;
 //     this.loadData();
 //   }
 
 //   loadData() {
 //     this.loading.set(true);
-//     this.analyticsService.getCustomerLifetimeValue().subscribe({
+    
+//     // Pass branchId if selected, otherwise undefined for global
+//     const branchId = this.currentFilters.branchId;
+
+//     this.analyticsService.getCustomerLifetimeValue(branchId).subscribe({
 //       next: (res) => {
 //         if (res.status === 'success') {
 //           this.ltvData.set(res.data);
@@ -458,5 +944,92 @@ export class CustomerLtvAnalysisComponent implements OnInit {
 //       },
 //       error: () => this.loading.set(false)
 //     });
+//   }
+
+//   setupColumns(): void {
+//     this.ltvColumns = [
+//       {
+//         headerName: 'Rank',
+//         width: 70,
+//         sortable: false,
+//         cellRenderer: (params: any) => {
+//           const rank = (params.node.rowIndex || 0) + 1;
+//           return `<span style="font-weight: 700; opacity: 0.5; color: var(--text-tertiary);">#${rank}</span>`;
+//         },
+//         cellStyle: { 'text-align': 'center', 'display': 'flex', 'align-items': 'center', 'justify-content': 'center' }
+//       },
+//       {
+//         field: 'name', 
+//         headerName: 'Customer', 
+//         sortable: true, 
+//         flex: 1,
+//         minWidth: 200,
+//         cellRenderer: (params: any) => {
+//           const tier = params.data.tier || 'Standard';
+//           let colorStyle = 'color: var(--text-secondary); background: var(--bg-ternary); border: 1px solid var(--border-secondary);';
+
+//           if(tier === 'Platinum') { 
+//             colorStyle = 'color: var(--accent-primary); background: var(--accent-focus); border: 1px solid var(--accent-secondary);';
+//           }
+//           else if(tier === 'Gold') { 
+//             colorStyle = 'color: var(--color-warning); background: var(--color-warning-bg); border: 1px solid var(--color-warning-border);';
+//           }
+          
+//           return `<div style="display: flex; flex-direction: column; justify-content: center; height: 100%; width: 100%; overflow: hidden;">
+//                     <div style="display: flex; align-items: center; gap: 6px; width: 100%;">
+//                       <span style="font-weight: 600; color: var(--text-primary); font-size: var(--font-size-base); line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${params.value}">
+//                         ${params.value}
+//                       </span>
+//                       <span style="padding: 1px 5px; border-radius: 4px; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; flex-shrink: 0; line-height: 1; ${colorStyle}">
+//                         ${tier}
+//                       </span>
+//                     </div>
+//                     <span style="font-size: 11px; color: var(--text-tertiary); margin-top: 3px; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${params.data.email || ''}">
+//                       ${params.data.email || ''}
+//                     </span>
+//                   </div>`;
+//         }
+//       },
+//       {
+//         field: 'avgOrderValue', 
+//         headerName: 'AOV', 
+//         sortable: true, 
+//         width: 100,
+//         type: 'rightAligned',
+//         valueFormatter: (params: any) => {
+//            if(params.value == null) return '-';
+//            return '₹' + Math.round(params.value).toLocaleString();
+//         },
+//         cellStyle: { 'font-family': 'var(--font-mono)', 'text-align': 'right', 'font-size': '11px', 'color': 'var(--text-secondary)' }
+//       },
+//       {
+//         field: 'totalSpent', 
+//         headerName: 'Total Spent', 
+//         sortable: true, 
+//         width: 120,
+//         type: 'rightAligned',
+//         valueFormatter: (params: any) => {
+//            if(params.value == null) return '-';
+//            return '₹' + params.value.toLocaleString();
+//         },
+//         cellStyle: { 'font-weight': '700', 'color': 'var(--color-success)', 'text-align': 'right' }
+//       },
+//       {
+//         field: 'valueScore', 
+//         headerName: 'Score', 
+//         sortable: true, 
+//         width: 100,
+//         cellRenderer: (params: any) => {
+//            const val = params.value || 0;
+//            return `<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 2px;">
+//                      <span style="font-size: 10px; font-weight: 700; color: var(--text-primary);">${val.toFixed(0)}%</span>
+//                      <div style="width: 100%; height: 3px; background: var(--bg-ternary); border-radius: 2px; overflow: hidden;">
+//                         <div style="width: ${val}%; height: 100%; background: var(--accent-primary);"></div>
+//                      </div>
+//                     </div>`;
+//         }
+//       }
+//     ];
+//     this.cdr.detectChanges();
 //   }
 // }

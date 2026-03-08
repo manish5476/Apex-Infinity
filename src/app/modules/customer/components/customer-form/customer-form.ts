@@ -131,8 +131,9 @@ export class CustomerForm implements OnInit {
           if (data.shippingAddress) this.customerForm.get('shippingAddress')?.patchValue(data.shippingAddress);
         }
         this.loadingData.set(false);
-      },
-      'Fetch Customer Data'
+      }
+      // Removed the redundant 'Fetch Customer Data' parameter assuming your common service
+      // is now using the new handleHttpError signature!
     );
   }
 
@@ -152,7 +153,8 @@ export class CustomerForm implements OnInit {
   onSubmit(): void {
     if (this.customerForm.invalid) {
       this.customerForm.markAllAsTouched();
-      this.messageService.showWarn('Validation Error', 'Please check the highlighted fields.');
+      // Combined the title and detail into a single warning string
+      this.messageService.showWarn('Validation Error: Please check the highlighted fields.');
       return;
     }
 
@@ -165,13 +167,8 @@ export class CustomerForm implements OnInit {
     // 2. Remove avatar from the JSON payload (it's handled separately)
     delete formValue.avatar;
 
-    // 3. Determine if Create or Update
-    // Note: Update logic might differ slightly depending on if you want to support 2-step update too
-    // For now, let's assume Create uses 2-step, and Update uses standard JSON (or 2-step if you adapt API)
-
     if (this.editMode()) {
       // --- UPDATE FLOW ---
-      // If you updated your Update API to be JSON-only too, use this:
       this.handleUpdate(this.customerId()!, formValue, avatarFile);
     } else {
       // --- CREATE FLOW (2-Step) ---
@@ -184,7 +181,7 @@ export class CustomerForm implements OnInit {
     this.customerService.createNewCustomer(jsonData).pipe(
       switchMap((response: any) => {
         // Step 1 Success: We have the new ID
-        const newCustomerId = response.data.customer._id; // Adjust based on your actual API response structure
+        const newCustomerId = response.data.customer._id;
 
         // Step 2: Check if we need to upload an avatar
         if (file && file instanceof File) {
@@ -196,7 +193,8 @@ export class CustomerForm implements OnInit {
       })
     ).subscribe({
       next: (res) => {
-        this.messageService.showSuccess('Created', 'Customer created successfully.');
+        // Simplified to a clean single string
+        this.messageService.showSuccess('Customer created successfully.');
         this.finishSubmit();
       },
       error: (err) => {
@@ -216,7 +214,7 @@ export class CustomerForm implements OnInit {
       })
     ).subscribe({
       next: (res) => {
-        this.messageService.showSuccess('Updated', 'Customer updated successfully.');
+        this.messageService.showSuccess('Customer updated successfully.');
         this.finishSubmit();
       },
       error: (err) => {
@@ -233,7 +231,9 @@ export class CustomerForm implements OnInit {
   private handleError(err: any) {
     this.isSubmitting.set(false);
     console.error('Error:', err);
-    this.messageService.showError('Error', err.error?.message);
+    
+    // Completely replaced the manual extraction with your robust global handler
+    this.messageService.handleHttpError(err);
   }
 
   copyBillingAddress(event: any): void {
@@ -246,7 +246,6 @@ export class CustomerForm implements OnInit {
       });
     }
   }
-
   isFieldInvalid(field: string): boolean {
     const control = this.customerForm.get(field);
     return !!(control && control.invalid && (control.dirty || control.touched));

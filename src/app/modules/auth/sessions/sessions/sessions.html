@@ -39,7 +39,7 @@
 
 </div>
 
-<p-dialog header="Session Details" [(visible)]="displayDialog" [modal]="true" styleClass="glass-dialog"
+<p-dialog appendTo="body"   header="Session Details" [(visible)]="displayDialog" [modal]="true" styleClass="glass-dialog"
   [draggable]="false" [resizable]="false">
 
   @if (selectedSession) {
@@ -113,8 +113,9 @@
   </div>
 
   <div class="dialog-footer">
-    <button pButton label="Close" class="p-button-text p-button-secondary" (click)="displayDialog = false"></button>
-    <div class="right-actions">
+    <div class="right-actions flex">
+      <button pButton label="Close" class="p-button-text p-button-secondary" (click)="displayDialog = false"></button>
+
       <button pButton label="Delete" icon="pi pi-trash" class="p-button-outlined p-button-danger"
         [loading]="isDeleting()" (click)="deleteSession()"></button>
       @if (selectedSession.isValid) {

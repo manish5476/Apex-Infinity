@@ -1,142 +1,153 @@
 import { Component, OnInit, signal, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
+// Services
 import { AdminAnalyticsService } from '../admin-analytics.service';
 import { CommonMethodService } from '../../core/utils/common-method.service';
-// import { AgShareGridComponent } from '../../shared/components/ag-share-grid/ag-share-grid.component';
+
+// Components
 import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
+import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
+import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
 
 @Component({
   selector: 'app-customer-intelligence',
   standalone: true,
   imports: [
-    CommonModule, ButtonModule, TooltipModule, 
-    TagModule, ProgressSpinnerModule,
-    AgShareGrid // Using Custom Grid
+    CommonModule,
+    FormsModule,
+    ButtonModule,
+    TooltipModule,
+    TagModule,
+    ProgressSpinnerModule,
+    AgShareGrid,
+    UniversalFilterComponent // <--- Imported
   ],
   template: `
-    <div class="p-4 md:p-6 transition-colors duration-300" 
-         [style.background]="'var(--theme-bg-primary)'"
-         [style.font-family]="'var(--font-body)'">
+    <div class="intelligence-container">
+
+      <div class="filter-section">
+        <div class="filter-row">
+           <app-universal-filter
+             [entityType]="'customer-intelligence'"
+             [config]="filterConfig"
+             (filterChange)="onFilterUpdate($event)"
+             class="flex-grow-1">
+           </app-universal-filter>
+           
+           <div class="header-actions">
+              <p-button icon="pi pi-refresh" [outlined]="true" severity="secondary" (onClick)="loadData()" size="small"></p-button>
+           </div>
+        </div>
+      </div>
 
       <ng-container *ngIf="!loading(); else loader">
         
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
-          <div class="p-5 border transition-all" 
-               [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-            <p class="uppercase font-bold tracking-widest mb-1" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Total Network LTV</p>
-            <h2 class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'">₹{{ intelligenceData()?.valueAnalysis?.totalLTV | number }}</h2>
-            <div class="flex items-center gap-2 mt-2">
-              <span [style.color]="'var(--theme-success)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold">AVG: ₹{{ intelligenceData()?.valueAnalysis?.avgLTV | number:'1.0-0' }}</span>
+        <div class="stats-grid">
+          <div class="stat-card ltv-card">
+            <p class="card-label">Total Portfolio LTV</p>
+            <h2 class="card-value">{{ commonService.formatCurrency(intelligenceData()?.valueAnalysis?.totalLTV) }}</h2>
+            <div class="card-footer">
+              <span class="footer-metric success">
+                NETWORK AVG: {{ commonService.formatCurrency(intelligenceData()?.valueAnalysis?.avgLTV) }}
+              </span>
             </div>
           </div>
 
-          <div class="lg:col-span-3 p-5 border flex items-center justify-around gap-4" 
-               [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-            @for (segment of intelligenceData()?.segmentation | keyvalue; track segment.key) {
-              <div class="text-center px-4">
-                <p class="font-bold tabular-nums" [style.font-size]="'var(--font-size-xl)'" 
-                   [style.color]="$any(segment.value) > 0 ? 'var(--theme-accent-primary)' : 'var(--theme-text-tertiary)'">
-                  {{ segment.value }}
+          <div class="stat-card segments-card">
+            @for (segment of intelligenceData()?.segmentation; track segment._id) {
+              <div class="segment-item">
+                <p class="segment-value" [class.active]="segment.count > 0">
+                  {{ segment.count || '0' }}
                 </p>
-                <p class="uppercase font-bold tracking-tighter" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">
-                  {{ segment.key }}
-                </p>
+                <p class="segment-label">{{ segment._id }}</p>
               </div>
+            } @empty {
+              <p class="segment-label">No acquisition data found for this period.</p>
             }
           </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-          <div class="lg:col-span-8 space-y-6">
-            <div class="border overflow-hidden h-full flex flex-col" 
-                 [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-              <div class="p-4 border-b flex justify-between items-center shrink-0" [style.border-color]="'var(--theme-border-primary)'" [style.background]="'var(--theme-bg-ternary)'">
-                <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-xs)'">Top Value Performers (LTV)</h3>
-                <p-button icon="pi pi-star" [text]="true" severity="warn" size="small"></p-button>
+        <div class="content-grid">
+          <div class="main-column">
+            <div class="grid-card">
+              <div class="grid-header">
+                <h3 class="grid-title">Top Value Performers (LTV)</h3>
+                <span class="grid-meta">Top {{ intelligenceData()?.valueAnalysis?.topLTV?.length || 0 }} Customers</span>
               </div>
               
-              <div class="grid-wrapper flex-1 relative min-h-[400px]">
+              <div class="grid-container">
                  <app-ag-share-grid 
                    [columns]="ltvColumns" 
                    [data]="intelligenceData()?.valueAnalysis?.topLTV || []" 
                    [showActions]="false" 
-                   style="width: 100%; height: 100%; display: block; position: absolute; inset: 0;">
+                   class="full-size-grid">
                  </app-ag-share-grid>
               </div>
             </div>
           </div>
 
-          <div class="lg:col-span-4 space-y-6">
+          <div class="side-column">
             
-            <div class="p-5 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-              <div class="flex justify-between items-center mb-6">
-                <h4 class="font-bold uppercase tracking-tighter" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-md)'">Credit Risk Monitor</h4>
-                <span class="px-2 py-0.5 rounded bg-rose-500/10 text-rose-500 font-bold text-[10px]">FLAGGED: {{ intelligenceData()?.riskAnalysis?.creditRisk?.length || 0 }}</span>
+            <div class="side-card risk-monitor">
+              <div class="side-header">
+                <h4 class="side-title">Credit Risk Monitor</h4>
+                <span class="flag-badge">FLAGGED: {{ intelligenceData()?.riskAnalysis?.creditRisk?.length || 0 }}</span>
               </div>
               
-              <div class="space-y-4">
+              <div class="risk-list">
                 @for (risk of intelligenceData()?.riskAnalysis?.creditRisk; track risk._id) {
-                  <div class="p-3 border transition-colors hover:bg-white/5" 
-                       [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius-lg)'">
-                    <div class="flex justify-between items-start mb-2">
-                      <p class="font-bold" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">{{ risk.name }}</p>
-                      <i class="pi pi-exclamation-triangle text-rose-500 text-xs"></i>
+                  <div class="risk-item">
+                    <div class="risk-header">
+                      <p class="risk-name">{{ risk.name }}</p>
+                      <i class="pi pi-exclamation-circle risk-icon"></i>
                     </div>
-                    <div class="flex justify-between text-[11px] mb-1">
-                      <span [style.color]="'var(--theme-text-tertiary)'">Outstanding Balance</span>
-                      <span class="font-bold text-rose-400">₹{{ risk.outstandingBalance | number }}</span>
+                    <div class="risk-details">
+                      <div class="detail-row">
+                        <span class="detail-label">Outstanding</span>
+                        <span class="detail-value error">{{ commonService.formatCurrency(risk.outstandingBalance) }}</span>
+                      </div>
                     </div>
-                    <div class="flex justify-between text-[11px]">
-                      <span [style.color]="'var(--theme-text-tertiary)'">Limit Restricted To</span>
-                      <span [style.color]="'var(--theme-text-secondary)'">₹{{ risk.creditLimit | number }}</span>
-                    </div>
-                    <div class="w-full h-1 bg-white/5 rounded-full mt-3 overflow-hidden">
-                       <div class="h-full bg-rose-600" [style.width]="'100%'"></div>
+                    <div class="risk-bar">
+                       <div class="bar-fill error" style="width: 100%"></div>
                     </div>
                   </div>
-                }
-                
-                @if (!intelligenceData()?.riskAnalysis?.creditRisk?.length) {
-                   <div class="p-6 text-center border border-dashed rounded opacity-50">
-                      <p class="text-xs font-bold text-white">No High-Risk Accounts</p>
-                      <p class="text-[10px]">Credit portfolio is healthy.</p>
+                } @empty {
+                   <div class="empty-state">
+                      <i class="pi pi-check-circle empty-icon success"></i>
+                      <p class="empty-title">All Accounts Healthy</p>
+                      <p class="empty-text">No high-risk credit exposure detected.</p>
                    </div>
                 }
               </div>
-
-              <p-button label="Freeze High Risk Accounts" severity="danger" [text]="true" size="small" class="w-full mt-4" 
-                        [disabled]="!intelligenceData()?.riskAnalysis?.creditRisk?.length"></p-button>
             </div>
 
-            <div class="p-5 border transition-colors border-dashed" [style.background]="'rgba(139, 92, 246, 0.05)'" [style.border-color]="'var(--theme-accent-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-              <h4 class="font-bold mb-4 uppercase tracking-tighter" [style.color]="'var(--theme-accent-primary)'" [style.font-size]="'var(--font-size-xs)'">Loyalty Strategy</h4>
-              
-              <div class="space-y-3">
-                @if (intelligenceData()?.valueAnalysis?.topLTV?.length) {
-                   <p [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">
-                     <i class="pi pi-info-circle mr-2 text-indigo-400"></i>
-                     {{ intelligenceData()?.valueAnalysis?.topLTV[0]?.name }} has a Value Score of 100. Consider offering an exclusive service plan.
-                   </p>
+            <div class="side-card strategy-card">
+              <h4 class="side-title highlight">Loyalty Intelligence</h4>
+              <div class="strategy-content">
+                @if (intelligenceData()?.recommendations?.highValue?.length > 0) {
+                   <div class="strategy-item">
+                     <p class="strategy-text">
+                       <i class="pi pi-bolt strategy-icon"></i>
+                       <b>{{ intelligenceData()?.recommendations?.highValue[0]?.name }}</b> is currently your top contributor. Suggest a VIP membership.
+                     </p>
+                   </div>
                 } @else {
-                   <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'" class="italic">
-                     Not enough transaction data to generate loyalty strategies yet.
-                   </p>
+                   <p class="strategy-text empty">Generating strategic recommendations...</p>
                 }
               </div>
             </div>
 
-            <div class="p-5 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-               <h4 class="font-bold mb-4 uppercase tracking-tighter" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Payment Behavior Analysis</h4>
-               
-               <div class="flex flex-col items-center justify-center py-6 opacity-60">
-                  <i class="pi pi-chart-pie text-2xl mb-2 text-indigo-300"></i>
-                  <span class="text-xs font-bold uppercase tracking-widest text-indigo-300">Coming Soon</span>
-                  <p class="text-[10px] text-center mt-1 max-w-[200px]">Advanced behavioral segmentation based on payment punctuality is currently processing.</p>
+            <div class="side-card">
+               <h4 class="side-title mb-md">Payment Reliability</h4>
+               <div class="placeholder-box">
+                  <i class="pi pi-chart-line placeholder-icon"></i>
+                  <p class="placeholder-text">Payment behavior scoring is processing for {{ currentFilters.branchId ? 'selected branch' : 'all branches' }}.</p>
                </div>
             </div>
 
@@ -146,308 +157,191 @@ import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
       </ng-container>
 
       <ng-template #loader>
-        <div class="h-[50vh] flex flex-col items-center justify-center gap-4">
-          <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-10 h-10"></p-progressSpinner>
-          <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">Computing behavioral patterns...</p>
+        <div class="loader-container">
+          <p-progressSpinner strokeWidth="4"></p-progressSpinner>
+          <p class="loader-text">Analyzing customer lifecycle patterns...</p>
         </div>
       </ng-template>
 
     </div>
-  `
+  `,
+  styles: [`
+    :host { display: block; width: 100%; }
+    .intelligence-container { padding: var(--spacing-lg) var(--spacing-xl); background: var(--bg-primary); min-height: 100vh; }
+
+    /* Filter Layout */
+    .filter-section { margin-bottom: var(--spacing-xl); }
+    .filter-row { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--spacing-md); }
+    .flex-grow-1 { flex: 1; }
+    .header-actions { margin-top: 28px; /* Align with filter inputs roughly */ }
+
+    .stats-grid { display: grid; grid-template-columns: 1fr; gap: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+    @media(min-width: 1024px) { .stats-grid { grid-template-columns: 1fr 3fr; } }
+
+    .stat-card, .side-card, .grid-card { background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--ui-border-radius-xl); padding: var(--spacing-lg); }
+    .card-label { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--text-label); margin-bottom: 8px; letter-spacing: 0.5px; }
+    .card-value { font-size: 2.2rem; font-weight: 800; color: var(--text-primary); margin: 0; }
+    .card-footer { margin-top: 8px; font-size: 11px; font-weight: 700; color: var(--text-tertiary); }
+    
+    .segments-card { display: flex; justify-content: space-around; align-items: center; }
+    .segment-item { text-align: center; .segment-value { font-size: 2.2rem; font-weight: 800; color: var(--text-tertiary); margin: 0; &.active { color: var(--accent-primary); } } .segment-label { font-size: 10px; font-weight: 700; color: var(--text-label); text-transform: uppercase; } }
+
+    .content-grid { display: grid; grid-template-columns: 1fr; gap: var(--spacing-lg); }
+    @media(min-width: 1024px) { .content-grid { grid-template-columns: 2fr 1fr; } }
+
+    .grid-card { padding: 0; overflow: hidden; height: 100%; min-height: 550px; display: flex; flex-direction: column; }
+    .grid-header { padding: var(--spacing-md) var(--spacing-lg); background: var(--bg-ternary); border-bottom: 1px solid var(--border-primary); display: flex; justify-content: space-between; align-items: center; }
+    .grid-title { font-size: var(--font-size-xs); font-weight: bold; text-transform: uppercase; margin: 0; }
+    .grid-meta { font-size: 10px; color: var(--text-tertiary); }
+    .grid-container { flex: 1; position: relative; }
+    .full-size-grid { width: 100%; height: 100%; display: block; }
+
+    .side-column { display: flex; flex-direction: column; gap: var(--spacing-lg); }
+    .side-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md); }
+    .side-title { font-size: var(--font-size-sm); font-weight: 800; text-transform: uppercase; color: var(--text-primary); margin: 0; }
+    .flag-badge { font-size: 9px; font-weight: bold; padding: 2px 6px; border-radius: 4px; background: var(--color-error-bg); color: var(--color-error); }
+
+    .risk-item { padding: var(--spacing-md); background: var(--bg-ternary); border-radius: var(--ui-border-radius-lg); margin-bottom: 12px; .risk-header { display: flex; justify-content: space-between; margin-bottom: 8px; .risk-name { font-weight: 600; font-size: 13px; } .risk-icon { color: var(--color-error); font-size: 14px; } } .detail-row { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 8px; } .risk-bar { height: 4px; background: var(--bg-primary); border-radius: 2px; overflow: hidden; .bar-fill { height: 100%; } } }
+
+    .strategy-card { border: 1px dashed var(--accent-primary); .highlight { color: var(--accent-primary); } .strategy-text { font-size: 12px; line-height: 1.5; margin: 10px 0 0 0; } .strategy-icon { color: var(--accent-primary); margin-right: 6px; } }
+
+    .placeholder-box { text-align: center; padding: 30px 10px; opacity: 0.5; .placeholder-icon { font-size: 1.5rem; color: var(--accent-primary); margin-bottom: 10px; } .placeholder-text { font-size: 11px; font-weight: 500; } }
+    .loader-container { height: 60vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; .loader-text { font-size: 13px; color: var(--text-tertiary); font-weight: 500; } }
+    .success { color: var(--color-success); }
+    .empty-state { text-align: center; padding: 1rem; opacity: 0.8; }
+    .empty-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .empty-title { font-weight: bold; font-size: 12px; margin: 0; }
+    .empty-text { font-size: 11px; margin: 0; }
+  `]
 })
 export class CustomerIntelligenceComponent implements OnInit {
+  public commonService = inject(CommonMethodService);
+  private analyticsService = inject(AdminAnalyticsService);
+  private cdr = inject(ChangeDetectorRef);
+
   intelligenceData = signal<any>(null);
-  loading = signal<boolean>(true);
-  
+  loading = signal<boolean>(false);
   ltvColumns: any[] = [];
 
-  constructor(
-    private analyticsService: AdminAnalyticsService,
-    public commonService: CommonMethodService,
-    private cdr: ChangeDetectorRef
-  ) { }
+  // Stored Filters
+  public currentFilters: any = {};
+
+  // 1. FILTER CONFIG
+  filterConfig: FilterField[] = [
+    {
+      key: 'branchId',
+      label: 'Branch Context',
+      type: 'select',
+      dataSourceKey: 'branches', // Connects to MasterListService.branches()
+      optionLabel: 'name',
+      optionValue: '_id',
+      placeholder: 'All Branches'
+    },
+    {
+      key: 'date',
+      label: 'Analysis Period',
+      type: 'date-range',
+      placeholder: 'Select Dates'
+    }
+  ];
 
   ngOnInit() {
     this.setupColumns();
-    this.loadData();
+    // loadData triggered by filter init
   }
 
-  setupColumns(): void {
-    this.ltvColumns = [
-      {
-        field: 'name', 
-        headerName: 'Customer', 
-        sortable: true, 
-        flex: 1,
-        minWidth: 180,
-        cellRenderer: (params: any) => {
-          return `<div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
-                    <span style="font-weight: 700; color: #fff;">${params.value}</span>
-                    <span style="font-size: 10px; color: var(--theme-text-label); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${params.data.email || ''}</span>
-                  </div>`;
-        }
-      },
-      {
-        field: 'tier', 
-        headerName: 'Tier', 
-        sortable: true, 
-        width: 100,
-        cellRenderer: (params: any) => {
-          const tier = params.value || 'Standard';
-          // Simple color logic for tiers
-          let color = '#94a3b8'; // default slate
-          let bg = 'rgba(148, 163, 184, 0.1)';
-          
-          if(tier === 'Platinum') { color = '#a78bfa'; bg = 'rgba(167, 139, 250, 0.1)'; }
-          else if(tier === 'Gold') { color = '#facc15'; bg = 'rgba(250, 204, 21, 0.1)'; }
-          else if(tier === 'Silver') { color = '#9ca3af'; bg = 'rgba(156, 163, 175, 0.1)'; }
-
-          return `<span style="padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; background: ${bg}; color: ${color};">
-                    ${tier}
-                  </span>`;
-        }
-      },
-      {
-        field: 'transactionCount', 
-        headerName: 'Orders', 
-        sortable: true, 
-        width: 80,
-        type: 'rightAligned',
-        cellStyle: { 'font-family': 'monospace', 'text-align': 'right' }
-      },
-      {
-        field: 'totalSpent', 
-        headerName: 'Total Spent', 
-        sortable: true, 
-        width: 120,
-        type: 'rightAligned',
-        valueFormatter: (params: any) => this.commonService.formatCurrency(params.value),
-        cellStyle: { 'font-weight': '700', 'color': 'var(--theme-text-primary)', 'text-align': 'right' }
-      },
-      {
-        field: 'valueScore', 
-        headerName: 'Value Score', 
-        sortable: true, 
-        width: 130,
-        type: 'rightAligned',
-        cellRenderer: (params: any) => {
-           const val = params.value || 0;
-           return `<div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; height: 100%;">
-                    <div style="width: 60px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px;">
-                       <div style="width: ${val}%; height: 100%; background: #10b981; border-radius: 2px;"></div>
-                    </div>
-                    <span style="font-size: 10px; font-family: monospace; width: 25px; text-align: right;">${val.toFixed(0)}</span>
-                   </div>`;
-        }
-      }
-    ];
-    this.cdr.detectChanges();
+  // 2. FILTER HANDLER
+  onFilterUpdate(filters: any) {
+    this.currentFilters = filters;
+    this.loadData();
   }
 
   loadData() {
     this.loading.set(true);
-    this.analyticsService.getCustomerIntelligence().subscribe({
+
+    // Prepare params from filter object
+    // Note: Assuming service accepts dates, if not it will just ignore them
+    // based on your original service signature: getCustomerIntelligence(branchId)
+    // If you've updated the backend to support dates, you can pass them here.
+    const branchId = this.currentFilters.branchId;
+
+    this.analyticsService.getCustomerIntelligence(branchId).subscribe({
       next: (res) => {
         if (res.status === 'success') {
           this.intelligenceData.set(res.data);
         }
         this.loading.set(false);
+        this.cdr.detectChanges();
       },
       error: () => this.loading.set(false)
     });
   }
+
+  setupColumns(): void {
+    this.ltvColumns = [
+      // 1. CUSTOMER NAME
+      {
+        field: 'name',
+        headerName: 'Customer Name',
+        flex: 1,
+        minWidth: 160,
+        cellStyle: { 'font-weight': '700', 'color': 'var(--text-primary)', 'display': 'flex', 'align-items': 'center' }
+      },
+
+      // 2. CUSTOMER ID (Separate Column)
+      {
+        field: '_id',
+        headerName: 'System ID',
+        width: 120,
+        // displaying last 8 chars for cleaner UI, or remove valueFormatter to show full ID
+        valueFormatter: (params: any) => params.value ? '...' + params.value.slice(-8) : '--',
+        cellStyle: { 'font-family': 'var(--font-mono)', 'color': 'var(--text-tertiary)', 'font-size': '11px', 'display': 'flex', 'align-items': 'center' }
+      },
+
+      // 3. STATUS (Slimmer Badge)
+      {
+        field: 'tier',
+        headerName: 'Status',
+        width: 110,
+        cellRenderer: (params: any) => {
+          const tier = params.value || 'Standard';
+
+          let color = '#94a3b8'; // gray
+          let bg = '#f1f5f9';
+          if (tier === 'Platinum') { color = '#8b5cf6'; bg = '#f3e8ff'; }
+          if (tier === 'Gold') { color = '#f59e0b'; bg = '#fef3c7'; }
+          if (tier === 'Silver') { color = '#64748b'; bg = '#e2e8f0'; }
+
+          // Slim padding (1px 8px) and line-height: 1
+          return `<div style="display: flex; align-items: center; height: 100%;">
+                    <span style="padding: 1px 8px; border-radius: 4px; font-size: 9px; line-height: 1; font-weight: 800; text-transform: uppercase; background: ${bg}; color: ${color}; border: 1px solid ${color}33;">
+                      ${tier}
+                    </span>
+                  </div>`;
+        }
+      },
+
+      // 4. AVERAGE ORDER
+      {
+        field: 'avgOrder',
+        headerName: 'Avg Ticket',
+        width: 130,
+        type: 'rightAligned',
+        valueFormatter: (params: any) => this.commonService.formatCurrency(params.value),
+        cellStyle: { 'font-family': 'var(--font-mono)', 'text-align': 'right', 'font-weight': '600', 'color': 'var(--text-secondary)', 'display': 'flex', 'align-items': 'center', 'justify-content': 'flex-end' }
+      },
+
+      // 5. LIFETIME VALUE
+      {
+        field: 'ltv',
+        headerName: 'Lifetime Value',
+        width: 150,
+        type: 'rightAligned',
+        valueFormatter: (params: any) => this.commonService.formatCurrency(params.value),
+        cellStyle: { 'font-weight': '800', 'color': 'var(--color-success)', 'text-align': 'right', 'font-size': '13px', 'font-family': 'var(--font-mono)', 'display': 'flex', 'align-items': 'center', 'justify-content': 'flex-end' }
+      }
+    ];
+    this.cdr.detectChanges();
+  }
 }
 
-// import { Component, OnInit, signal } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-
-// import { ButtonModule } from 'primeng/button';
-// import { TableModule } from 'primeng/table';
-// import { TooltipModule } from 'primeng/tooltip';
-// import { TagModule } from 'primeng/tag';
-// import { ProgressSpinnerModule } from 'primeng/progressspinner';
-// import { CommonMethodService } from '../../core/utils/common-method.service';
-// import { AdminAnalyticsService } from '../admin-analytics.service';
-
-// @Component({
-//   selector: 'app-customer-intelligence',
-//   standalone: true,
-//   imports: [CommonModule, ButtonModule, TableModule, TooltipModule, TagModule, ProgressSpinnerModule],
-//   template: `
-//     <div class="p-4 md:p-6 transition-colors duration-300" 
-//          [style.background]="'var(--theme-bg-primary)'"
-//          [style.font-family]="'var(--font-body)'">
-
-//       <ng-container *ngIf="!loading(); else loader">
-        
-//         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
-//           <div class="p-5 border transition-all" 
-//                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//             <p class="uppercase font-bold tracking-widest mb-1" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Total Network LTV</p>
-//             <h2 class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'">₹{{ intelligenceData()?.valueAnalysis?.totalLTV | number }}</h2>
-//             <div class="flex items-center gap-2 mt-2">
-//               <span [style.color]="'var(--theme-success)'" [style.font-size]="'var(--font-size-xs)'" class="font-bold">AVG: ₹{{ intelligenceData()?.valueAnalysis?.avgLTV | number:'1.0-0' }}</span>
-//             </div>
-//           </div>
-
-//           <div class="lg:col-span-3 p-5 border flex items-center justify-around gap-4" 
-//                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//             @for (segment of intelligenceData()?.segmentation | keyvalue; track segment.key) {
-//               <div class="text-center px-4">
-//                <p class="font-bold tabular-nums" [style.font-size]="'var(--font-size-xl)'" 
-//    [style.color]="$any(segment.value) > 0 ? 'var(--theme-accent-primary)' : 'var(--theme-text-tertiary)'">
-//   {{ segment.value }}
-// </p>
-//                 <p class="uppercase font-bold tracking-tighter" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">
-//                   {{ segment.key }}
-//                 </p>
-//               </div>
-//             }
-//           </div>
-//         </div>
-
-//         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-//           <div class="lg:col-span-8 space-y-6">
-//             <div class="border overflow-hidden" 
-//                  [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//               <div class="p-4 border-b flex justify-between items-center" [style.border-color]="'var(--theme-border-primary)'" [style.background]="'var(--theme-bg-ternary)'">
-//                 <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-xs)'">Top Value Performers (LTV)</h3>
-//                 <p-button icon="pi pi-star" [text]="true" severity="warn" size="small"></p-button>
-//               </div>
-              
-//               <p-table [value]="intelligenceData()?.valueAnalysis?.topLTV" styleClass="p-datatable-sm">
-//                 <ng-template pTemplate="header">
-//                   <tr>
-//                     <th [style.background]="'transparent'" [style.color]="'var(--theme-text-label)'">Customer</th>
-//                     <th [style.background]="'transparent'" [style.color]="'var(--theme-text-label)'">Tier</th>
-//                     <th [style.background]="'transparent'" [style.color]="'var(--theme-text-label)'" class="text-right">Orders</th>
-//                     <th [style.background]="'transparent'" [style.color]="'var(--theme-text-label)'" class="text-right">Total Spent</th>
-//                     <th [style.background]="'transparent'" [style.color]="'var(--theme-text-label)'" class="text-right w-32">Value Score</th>
-//                   </tr>
-//                 </ng-template>
-//                 <ng-template pTemplate="body" let-customer>
-//                   <tr [style.color]="'var(--theme-text-secondary)'" [style.border-color]="'var(--theme-border-primary)'">
-//                     <td>
-//                       <div class="flex flex-col">
-//                         <span class="font-bold text-white">{{ customer.name }}</span>
-//                         <span class="text-[10px]" [style.color]="'var(--theme-text-label)'">{{ customer.email }}</span>
-//                       </div>
-//                     </td>
-//                     <td>
-//                       <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-indigo-500/10 text-indigo-400">
-//                         {{ customer.tier }}
-//                       </span>
-//                     </td>
-//                     <td class="text-right font-mono">{{ customer.transactionCount }}</td>
-//                     <td class="text-right font-bold tabular-nums">₹{{ customer.totalSpent | number }}</td>
-//                     <td>
-//                       <div class="flex items-center gap-2">
-//                         <div class="flex-1 h-1 rounded-full bg-white/5 overflow-hidden">
-//                           <div class="h-full bg-emerald-500" [style.width]="customer.valueScore + '%'"></div>
-//                         </div>
-//                         <span class="text-[10px] font-mono">{{ customer.valueScore | number:'1.0-0' }}</span>
-//                       </div>
-//                     </td>
-//                   </tr>
-//                 </ng-template>
-//               </p-table>
-//             </div>
-//           </div>
-
-//           <div class="lg:col-span-4 space-y-6">
-//             <div class="p-5 border" [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//               <div class="flex justify-between items-center mb-6">
-//                 <h4 class="font-bold uppercase tracking-tighter" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-md)'">Credit Risk Monitor</h4>
-//                 <span class="px-2 py-0.5 rounded bg-rose-500/10 text-rose-500 font-bold text-[10px]">FLAGGED: {{ intelligenceData()?.riskAnalysis?.creditRisk?.length }}</span>
-//               </div>
-              
-//               <div class="space-y-4">
-//                 @for (risk of intelligenceData()?.riskAnalysis?.creditRisk; track risk._id) {
-//                   <div class="p-3 border transition-colors hover:bg-white/5" 
-//                        [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius-lg)'">
-//                     <div class="flex justify-between items-start mb-2">
-//                       <p class="font-bold" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">{{ risk.name }}</p>
-//                       <i class="pi pi-exclamation-triangle text-rose-500 text-xs"></i>
-//                     </div>
-//                     <div class="flex justify-between text-[11px] mb-1">
-//                       <span [style.color]="'var(--theme-text-tertiary)'">Outstanding Balance</span>
-//                       <span class="font-bold text-rose-400">₹{{ risk.outstandingBalance | number }}</span>
-//                     </div>
-//                     <div class="flex justify-between text-[11px]">
-//                       <span [style.color]="'var(--theme-text-tertiary)'">Limit Restricted To</span>
-//                       <span [style.color]="'var(--theme-text-secondary)'">₹{{ risk.creditLimit | number }}</span>
-//                     </div>
-//                     <div class="w-full h-1 bg-white/5 rounded-full mt-3 overflow-hidden">
-//                        <div class="h-full bg-rose-600" [style.width]="'100%'"></div>
-//                     </div>
-//                   </div>
-//                 }
-//               </div>
-
-//               <p-button label="Freeze High Risk Accounts" severity="danger" [text]="true" size="small" class="w-full mt-4"></p-button>
-//             </div>
-
-//             <div class="p-5 border transition-colors border-dashed" [style.background]="'rgba(139, 92, 246, 0.05)'" [style.border-color]="'var(--theme-accent-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//               <h4 class="font-bold mb-4 uppercase tracking-tighter" [style.color]="'var(--theme-accent-primary)'" [style.font-size]="'var(--font-size-xs)'">Loyalty Strategy</h4>
-//               <div class="space-y-3">
-//                 <p [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">
-//                   <i class="pi pi-info-circle mr-2 text-indigo-400"></i>
-//                   {{ intelligenceData()?.valueAnalysis?.topLTV[0]?.name }} has a Value Score of 100. Consider offering an exclusive service plan.
-//                 </p>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-
-//       </ng-container>
-
-//       <ng-template #loader>
-//         <div class="h-[50vh] flex flex-col items-center justify-center gap-4">
-//           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-10 h-10"></p-progressSpinner>
-//           <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">Computing behavioral patterns...</p>
-//         </div>
-//       </ng-template>
-
-//     </div>
-//   `,
-//   styles: [`
-//     :host ::ng-deep .p-datatable .p-datatable-tbody > tr {
-//       background: transparent !important;
-//       border-bottom: 1px solid var(--theme-border-primary) !important;
-//     }
-//     :host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
-//       padding: 0.75rem 1rem;
-//       font-size: 10px;
-//       font-weight: 700;
-//       text-transform: uppercase;
-//       border: none !important;
-//     }
-//   `]
-// })
-// export class CustomerIntelligenceComponent implements OnInit {
-//   intelligenceData = signal<any>(null);
-//   loading = signal<boolean>(true);
-
-//   constructor(
-//     private analyticsService: AdminAnalyticsService,
-//     public commonService: CommonMethodService
-//   ) { }
-
-//   ngOnInit() {
-//     this.loadData();
-//   }
-
-//   loadData() {
-//     this.loading.set(true);
-//     this.analyticsService.getCustomerIntelligence().subscribe({
-//       next: (res) => {
-//         if (res.status === 'success') {
-//           this.intelligenceData.set(res.data);
-//         }
-//         this.loading.set(false);
-//       },
-//       error: () => this.loading.set(false)
-//     });
-//   }
-// }

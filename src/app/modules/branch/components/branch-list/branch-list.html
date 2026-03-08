@@ -1,10 +1,5 @@
 <p-toast></p-toast>
 
-<!-- 
-  REFACTORED:
-  - Removed Tailwind classes and applied a single, clean class.
-  - This is now styled in the .scss file.
--->
 <div class="list-page-container">
   <!-- HEADER -->
   <div class="list-header">
@@ -15,12 +10,6 @@
     <p-button label="New Branch" icon="pi pi-plus" routerLink="create">
     </p-button>
   </div>
-
-  <!-- FILTER BAR -->
-  <!-- 
-    REFACTORED:
-    - Replaced 'glass-card' with 'themed-card' for consistency.
-  -->
   <div class="themed-card">
     <div class="se-filter-bar">
 
@@ -39,18 +28,7 @@
       </div>
     </div>
   </div>
-
-  <!-- GRID AREA -->
-  <!-- 
-    REFACTORED:
-    - Replaced 'glass-card' with 'themed-card' for consistency.
-    - Added 'list-grid-area' to make it fill height.
-  -->
   <div class="themed-card list-grid-area">
-    <!-- <app-shared-grid [data]="data" [gridHeight]="'210px'" [headerFilter]="false" [rowSelectionMode]="rowSelectionMode"
-      [GridName]="'Branches'" [column]="column" (eventFromGrid)="eventFromGrid($event)"
-      (gridReady)="onGridReady($event)" (scrolledToBottom)="onScrolledToBottom($event)">
-    </app-shared-grid> -->
     <app-ag-share-grid [columns]="column" [data]="data" [showActions]="false" selectionMode="multiple"
       (gridEvent)="eventFromGrid($event)" style="height: 210px; width: 100%; display: block;">
     </app-ag-share-grid>

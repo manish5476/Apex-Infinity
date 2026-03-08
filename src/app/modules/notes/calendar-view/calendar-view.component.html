@@ -1,0 +1,135 @@
+<div class="calendar-layout">
+
+  <div class="calendar-main">
+
+    <!-- Header -->
+    <header class="cal-header">
+      <div class="cal-title-group">
+        <h2 class="month-title">{{ currentDate() | date:'MMMM yyyy' }}</h2>
+        <div class="cal-nav">
+          <button class="btn-icon" (click)="changeMonth(-1)"><i class="pi pi-chevron-left"></i></button>
+          <button class="btn-today" (click)="jumpToToday()">Today</button>
+          <button class="btn-icon" (click)="changeMonth(1)"><i class="pi pi-chevron-right"></i></button>
+        </div>
+      </div>
+
+      <div class="cal-actions">
+        <div class="scope-switch">
+          <button [class.active]="viewScope() === 'personal'" (click)="toggleScope('personal')">Personal</button>
+          <button [class.active]="viewScope() === 'shared'" (click)="toggleScope('shared')">Shared</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Grid -->
+    <div class="cal-grid-container">
+      <!-- Weekdays -->
+      <div class="weekday-row">
+        @for(day of weekDays; track day) {
+        <div class="weekday">{{ day }}</div>
+        }
+      </div>
+
+      <!-- Days -->
+      <div class="days-grid custom-scrollbar">
+        @if (isLoading()) {
+        <div class="loader-overlay"><i class="pi pi-spin pi-spinner"></i></div>
+        }
+
+        @for(cell of gridCells(); track cell.dateStr) {
+        <div class="day-cell" [class.inactive]="!cell.isCurrentMonth" [class.today]="cell.isToday"
+          [class.selected]="selectedDateStr() === cell.dateStr"
+          [style.--intensity-color]="getHeatmapColor(cell.intensity)" (click)="selectDate(cell)">
+
+          <!-- Heatmap Background (Subtle Glow) -->
+          @if(cell.intensity > 0) {
+          <div class="heatmap-glow" [style.opacity]="cell.intensity * 0.5"></div>
+          }
+
+          <div class="day-header">
+            <span class="day-num">{{ cell.dayNum }}</span>
+            @if(cell.dayNum === 1) { <span class="month-label">{{ cell.date | date:'MMM' }}</span> }
+
+            <!-- Activity Dot -->
+            @if(cell.events.length > 0) {
+            <div class="activity-dot"></div>
+            }
+          </div>
+
+          <!-- Events Stack -->
+          <div class="events-stack">
+            @for(evt of cell.events.slice(0, 3); track evt.id) {
+            <div class="evt-pill" [style.--evt-color]="evt.color || '#64748b'"
+              [class.is-meeting]="evt.extendedProps.noteType === 'meeting'" [title]="evt.title">
+              <div class="evt-marker"></div>
+              <span class="evt-title">{{ evt.title }}</span>
+            </div>
+            }
+            @if(cell.events.length > 3) {
+            <div class="more-count">+{{ cell.events.length - 3 }}</div>
+            }
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR SUMMARY (Contextual Details) -->
+  <aside class="calendar-sidebar glass-panel">
+    <div class="sidebar-header">
+      <h3>{{ selectedDate() | date:'EEEE, MMM d' }}</h3>
+      <button class="btn-add-mini" (click)="onCreateNote()" title="Add Note">
+        <i class="pi pi-plus"></i>
+      </button>
+    </div>
+
+    <div class="selected-day-events custom-scrollbar">
+      @if (selectedDayEvents().length === 0) {
+      <div class="empty-day-state">
+        <i class="pi pi-calendar-times"></i>
+        <p>No events planned</p>
+        <button class="btn-text" (click)="onCreateNote()">Add something</button>
+      </div>
+      }
+
+      @for (evt of selectedDayEvents(); track evt.id) {
+      <div class="event-card" (click)="onEventClick(evt.id)" [style.border-left-color]="evt.color || '#cbd5e1'">
+
+        <div class="evt-card-header">
+          <span class="badge" [style.background]="evt.color + '20'" [style.color]="evt.color">
+            {{ evt.extendedProps.noteType | titlecase }}
+          </span>
+          @if(evt.extendedProps.priority === 'urgent') {
+          <i class="pi pi-bolt" style="color: #ef4444"></i>
+          }
+        </div>
+
+        <h4 class="evt-card-title">{{ evt.title }}</h4>
+
+        <div class="evt-card-meta">
+          @if(evt.extendedProps.noteType === 'meeting') {
+          <span class="meta-item"><i class="pi pi-clock"></i> {{ evt.start | date:'shortTime' }}</span>
+          }
+          <span class="meta-item status" [class.done]="evt.extendedProps.status === 'completed'">
+            {{ evt.extendedProps.status || 'Active' }}
+          </span>
+        </div>
+      </div>
+      }
+    </div>
+
+    <!-- Mini Analytics -->
+    <div class="mini-stats">
+      <div class="stat-item">
+        <span class="lbl">Productivity</span>
+        <span class="val">{{ (getSelectedDayIntensity() * 100) | number:'1.0-0' }}%</span>
+      </div>
+      <div class="stat-item">
+        <span class="lbl">Tasks</span>
+        <span class="val">{{ getSelectedDayTaskCount() }}</span>
+      </div>
+    </div>
+  </aside>
+
+</div>

@@ -43,11 +43,14 @@ export class InvoiceService extends BaseApiService {
   // STOCK MANAGEMENT ENDPOINTS
   // ==============================================
 
-  /** Check stock availability before creating invoice */
-  checkStock(items: any[]): Observable<any> {
-    return this.post(`${this.endpoint}/check-stock`, { items }, 'checkStock');
-  }
+  // /** Check stock availability before creating invoice */
+  // checkStock(items: any[]): Observable<any> {
+  //   return this.post(`${this.endpoint}/check-stock`, { items }, 'checkStock');
+  // }
 
+  checkStock(payload: { branchId: string, items: any[] }): Observable<any> {
+    return this.post(`${this.endpoint}/check-stock`, payload, 'checkStock');
+  }
   /** Get invoice with current stock information */
   getInvoiceWithStock(id: string): Observable<any> {
     return this.get(`${this.endpoint}/${id}/stock-info`, {}, 'getInvoiceWithStock');
@@ -144,7 +147,7 @@ export class InvoiceService extends BaseApiService {
   getProfitAnalysis(filters?: any): Observable<any> {
     return this.get(`${this.endpoint}/invoiceanalytics/profit`, filters, 'getProfitAnalysis');
   }
-  
+
   /** Get sales report by date range */
   getSalesReport(filterParams?: any): Observable<any> {
     return this.get(`${this.endpoint}/reports/sales`, filterParams, 'getSalesReport');
@@ -330,7 +333,7 @@ export class InvoiceService extends BaseApiService {
     const params: any = {};
     if (startDate) params.startDate = startDate;
     if (endDate) params.endDate = endDate;
-    
+
     return this.get(this.endpoint, params, 'getInvoiceStats');
   }
 

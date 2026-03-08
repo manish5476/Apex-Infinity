@@ -9,12 +9,14 @@ import { environment } from '../../../environments/environment';
 export class SmartRuleService {
   private http = inject(HttpClient);
   
-  // ✅ FIX: Use standard apiUrl directly
-  // Backend now listens at: /api/v1/admin/storefront/smart-rules
-  private baseUrl = `${environment.apiUrl}/admin/storefront/smart-rules`;
+  // ✅ FIX: Match Backend Route structure (/api/v1/...)
+  // Backend Mount: app.use('/api/v1/admin/storefront/smart-rules', smartRuleRoutes);
+  // Environment: apiUrl = 'http://localhost:5000/api'
+  // Result: http://localhost:5000/api/v1/admin/storefront/smart-rules
+  private baseUrl = `${environment.apiUrl}/v1/admin/storefront/smart-rules`;
 
-  getAllRules(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}`);
+  getAllRules(): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}`);
   }
 
   createRule(rule: Partial<any>): Observable<any> {
@@ -33,17 +35,20 @@ export class SmartRuleService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
-  // Actions
-  previewRule(ruleData: Partial<any>): Observable<any[]> {
-    return this.http.post<any[]>(`${this.baseUrl}/preview`, ruleData);
+  // ================= ACTIONS =================
+
+  // Used for "Ad-Hoc" preview in the builder (doesn't save to DB)
+  previewRule(ruleData: Partial<any>): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/preview`, ruleData);
   }
 
-  executeRule(id: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/${id}/execute`);
+  // Used for testing a Saved Rule
+  executeRule(id: string): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/${id}/execute`);
   }
 
-  createFromTemplate(templateId: string): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/template`, { templateId });
+  clearCache(id: string): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/${id}/cache`);
   }
 }
 
@@ -51,8 +56,6 @@ export class SmartRuleService {
 // import { HttpClient } from '@angular/common/http';
 // import { Observable } from 'rxjs';
 // import { environment } from '../../../environments/environment';
-// // import { SmartRule } from '../models/storefront.model';
-
 
 // @Injectable({
 //   providedIn: 'root'
@@ -60,8 +63,9 @@ export class SmartRuleService {
 // export class SmartRuleService {
 //   private http = inject(HttpClient);
   
-//   // Mounted at /admin/storefront/smart-rules
-//   private baseUrl = `${environment.apiUrl.replace('/api/v1', '')}/admin/storefront/smart-rules`;
+//   // ✅ FIX: Use standard apiUrl directly
+//   // Backend now listens at: /api/v1/admin/storefront/smart-rules
+//   private baseUrl = `${environment.apiUrl}/admin/storefront/smart-rules`;
 
 //   getAllRules(): Observable<any[]> {
 //     return this.http.get<any[]>(`${this.baseUrl}`);

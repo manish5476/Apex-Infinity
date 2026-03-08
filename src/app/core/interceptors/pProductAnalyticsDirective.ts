@@ -9,7 +9,7 @@ import { ProductAnalyticsDialogComponent } from '../../UtilityComponents/product
 })
 export class ProductAnalyticsDirective {
   @Input('appProductAnalytics') productId!: string;
-  
+
   private dialogService = inject(DialogService);
 
   @HostListener('click', ['$event'])
@@ -21,12 +21,14 @@ export class ProductAnalyticsDirective {
       data: {
         productId: this.productId
       },
-      header: ' ', 
-      width: '700px',
+      header: ' ',
+      // showHeader: true, // <--- Hides default PrimeNG header
+      width: '90%',
       contentStyle: { "padding": "0" }, // Reset padding for edge-to-edge look
       styleClass: 'product-analytics-dialog-wrapper',
       baseZIndex: 10000,
       maximizable: true,
+      // showClose: true,
       dismissableMask: true
     });
   }

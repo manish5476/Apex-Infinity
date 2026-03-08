@@ -1,6 +1,6 @@
-import { Component, OnInit, inject, signal, computed, effect } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -8,27 +8,24 @@ import { finalize } from 'rxjs/operators';
 /* PrimeNG v18 Modules */
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { TableModule } from 'primeng/table';
 import { DialogModule } from 'primeng/dialog';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
 import { TagModule } from 'primeng/tag';
-import { TimelineModule } from 'primeng/timeline';
 import { AvatarModule } from 'primeng/avatar';
 import { TabsModule } from 'primeng/tabs';
+import { SelectModule } from 'primeng/select';
+import { ToastModule } from 'primeng/toast';
+import { BadgeModule } from 'primeng/badge';
 import { DividerModule } from 'primeng/divider';
 import { TooltipModule } from 'primeng/tooltip';
-import { SelectModule } from 'primeng/select';
-import { BadgeModule } from 'primeng/badge';
-import { ToastModule } from 'primeng/toast';
 
-/* Services */
+/* Custom Services & Components - Update paths as needed */
 import { AuthService } from '../../../auth/services/auth-service';
 import { OrganizationService } from '../../organization.service';
 import { MasterListService } from '../../../../core/services/master-list.service';
-
-/* Shared Grid */
-import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
+import { AppMessageService } from '../../../../core/services/message.service';
+import { UserListComponent } from '../../../user/user-list/user-list'; // Assuming this is the grid component
 
 @Component({
   selector: 'app-org-settings',
@@ -38,94 +35,74 @@ import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
     ReactiveFormsModule,
     RouterModule,
     FormsModule,
-    // PrimeNG
+    UserListComponent,
     ButtonModule,
     InputTextModule,
-    TableModule,
     DialogModule,
     TabsModule,
     ConfirmDialogModule,
     TagModule,
-    TimelineModule,
     AvatarModule,
-    DividerModule,
-    TooltipModule,
     SelectModule,
     BadgeModule,
     ToastModule,
-    AgShareGrid
+    DividerModule,
+    TooltipModule
   ],
-  providers: [ConfirmationService, MessageService],
+  providers: [ConfirmationService],
   templateUrl: './org-settings.html',
   styleUrl: './org-settings.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OrgSettingsComponent implements OnInit {
-  // Dependencies
   private orgService = inject(OrganizationService);
   private authService = inject(AuthService);
   private fb = inject(FormBuilder);
-  private messageService = inject(MessageService);
+  private appMessage = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
   private router = inject(Router);
   private masterList = inject(MasterListService);
+  private cdr = inject(ChangeDetectorRef);
 
-  // Signals
+  // --- UI State Signals ---
   isLoading = signal(true);
   isSaving = signal(false);
-  activeTabValue = signal('0');
+  activeTab = signal('0');
+  
+  // Dialog visibility signals
+  showInviteDialog = signal(false);
+  showTransferDialog = signal(false);
 
-  // Data Signals
+  // --- Data Signals ---
   organization = signal<any>(null);
   activeMembers = signal<any[]>([]);
   pendingMembers = signal<any[]>([]);
-  activityLogs = signal<any[]>([]);
-
-  // Grid Props
-  column: any[] = [];
-
-  // Computed: Determines if current user is the owner
+  
+  // --- Computed State ---
   isOwner = computed(() => {
     const org = this.organization();
-    const currentUser = this.authService.getCurrentUser();
-    if (!org || !currentUser) return false;
+    const user = this.authService.getCurrentUser();
+    if (!org || !user) return false;
+    // Handle both populated object or ID string
     const ownerId = org.owner?._id || org.owner;
-    return ownerId === currentUser._id;
+    return ownerId === user._id;
   });
 
-  // Forms
+  // --- Forms ---
   orgForm!: FormGroup;
   inviteForm!: FormGroup;
-  transferForm!: FormGroup;
+  
+  // Transfer Ownership state
+  selectedNewOwnerId = signal<string | null>(null);
+  transferConfirmName = signal<string>('');
 
-  // Dialog State
-  showInviteDialog = false;
-  showTransferDialog = false;
-
-  // Data
+  // Track selections for pending user approvals
   selectedRoles: { [userId: string]: string } = {};
   selectedBranches: { [userId: string]: string } = {};
-  roles: any[] = [];
-  branches: any[] = [];
-
-  availableRoles = [
-    { label: 'Admin', value: 'admin' },
-    { label: 'Member', value: 'member' }
-  ];
-
-  constructor() {
-    // Reactively update grid columns when organization data is loaded
-    effect(() => {
-      if (this.organization()) {
-        this.initGridColumns();
-      }
-    });
-  }
 
   ngOnInit() {
     this.initForms();
     this.loadData();
-    this.roles = this.masterList.roles();
-    this.branches = this.masterList.branches();
   }
 
   private initForms() {
@@ -139,266 +116,397 @@ export class OrgSettingsComponent implements OnInit {
     this.inviteForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
       role: [null, Validators.required],
-      branchId: [null]
-    });
-
-    this.transferForm = this.fb.group({
-      newOwnerId: [null, Validators.required],
-      confirmName: ['', Validators.required]
+      branchId: [null, Validators.required]
     });
   }
-
-  // --- Grid Column Definition ---
-  initGridColumns() {
-    const ownerId = this.organization()?.owner?._id || this.organization()?.owner;
-
-    this.column = [
-      {
-        field: 'name',
-        headerName: 'User',
-        flex: 2,
-        minWidth: 250,
-        cellRenderer: (params: any) => {
-          if (!params.value) return '';
-          const initials = this.getInitials(params.value);
-          const isOwner = params.data._id === ownerId;
-
-          return `
-          <div class="user-cell-wrapper">
-            <div class="user-avatar-circle">${initials}</div>
-            <div class="user-info">
-              ${isOwner ? `<span class="owner-icon-small" title="Organization Owner"><i class="pi pi-shield-fill"></i></span>` : ''}
-              <span class="user-name" title="${params.value}">${params.value}</span>
-            </div>
-          </div>
-        `;
-        }
-      },
-      {
-        field: 'email',
-        headerName: 'Email',
-        flex: 2,
-        minWidth: 200,
-        cellStyle: { color: 'var(--text-secondary)' }
-      },
-      {
-        field: 'role.name',
-        headerName: 'Role',
-        width: 150,
-        cellRenderer: (params: any) => {
-          const role = params.value || 'Member';
-          const isOwner = params.data._id === ownerId;
-          // If it's owner, we might want to show Admin styling
-          const styleClass = (role === 'Admin' || isOwner) ? 'badge-info' : 'badge-secondary';
-          return `<span class="ag-badge ${styleClass}">${role}</span>`;
-        }
-      },
-    ];
-  }
-
-  eventFromGrid(event: any) {
-    console.log(event);
-    if (event.type === 'delete') {
-      const rowData = event.row
-      this.removeMember(rowData._id);
-    }
-    if (event.type === 'editStart') {
-      const userId = event.row._id;
-      this.router.navigate(['/user/details', userId]);
-    }
-  }
-
 
   loadData() {
+    this.isLoading.set(true);
+    
     forkJoin({
       org: this.orgService.getMyOrganization(),
-      pending: this.orgService.getPendingMembers(),
-      logs: this.orgService.getActivityLog()
+      pending: this.orgService.getPendingMembers()
     })
-      .pipe(finalize(() => this.isLoading.set(false)))
-      .subscribe({
-        next: (res: any) => {
-          const orgData = res.org.data;
-          this.organization.set(orgData);
+    .pipe(finalize(() => {
+      this.isLoading.set(false);
+      this.cdr.markForCheck();
+    }))
+    .subscribe({
+      next: (res: any) => {
+        const orgData = res.org.data;
+        this.organization.set(orgData);
+        this.orgForm.patchValue(orgData);
 
-          this.orgForm.patchValue({
-            name: orgData.name,
-            primaryEmail: orgData.primaryEmail,
-            primaryPhone: orgData.primaryPhone,
-            gstNumber: orgData.gstNumber
-          });
+        // Filter approved members
+        const members = orgData.members || [];
+        this.activeMembers.set(members.filter((m: any) => m.status === 'approved' || !m.status));
 
-          if (orgData.members) {
-            this.activeMembers.set(orgData.members.filter((m: any) => m.status === 'approved'));
-          }
-          this.pendingMembers.set(res.pending.data?.pendingMembers || []);
-          this.activityLogs.set(res.logs.data?.logs || []);
-        },
-        error: (err) => {
-          this.messageService.add({ severity: 'error', summary: 'Load Failed', detail: 'Could not load organization data.' });
-        }
-      });
+        // Load pending requests
+        this.pendingMembers.set(res.pending.data?.pendingMembers || []);
+      },
+      // Removed the trailing context string
+      error: (err) => this.appMessage.handleHttpError(err) 
+    });
   }
 
-  // --- ACTIONS ---
+  // --- Helpers for Template ---
+  get roles() { return this.masterList.roles(); }
+  get branches() { return this.masterList.branches(); }
+
+  getSelectedOwnerName(): string {
+    const id = this.selectedNewOwnerId();
+    if (!id) return '';
+    return this.activeMembers().find(m => m._id === id)?.name || '';
+  }
+
+  // --- Actions ---
 
   updateOrgDetails() {
-    if (this.orgForm.invalid) return;
+    if (this.orgForm.invalid) {
+      this.appMessage.showWarn('Validation Error: Please check the required fields.');
+      return;
+    }
+    
+    this.isSaving.set(true);
     this.orgService.updateMyOrganization(this.orgForm.value)
-      .pipe(finalize(() => this.isSaving.set(false)))
+      .pipe(finalize(() => {
+        this.isSaving.set(false);
+        this.cdr.markForCheck();
+      }))
       .subscribe({
-        next: () => this.messageService.add({ severity: 'success', summary: 'Updated', detail: 'Organization details saved.' }),
-        error: (err) => this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message || 'Update failed' })
+        next: () => this.appMessage.showSuccess('Organization details updated successfully.'),
+        error: (err) => this.appMessage.handleHttpError(err)
       });
   }
 
   inviteUser() {
-    if (this.inviteForm.invalid) return;
-
-    const payload = {
-      ...this.inviteForm.value,
-      branchId: this.organization().mainBranch
-    };
-
-    this.orgService.inviteUser(payload)
-      .pipe(finalize(() => this.isSaving.set(false)))
+    if (this.inviteForm.invalid) {
+      this.inviteForm.markAllAsTouched();
+      this.appMessage.showWarn('Validation Error: Please fill in all required fields for the invitation.');
+      return;
+    }
+    
+    this.isSaving.set(true);
+    this.orgService.inviteUser(this.inviteForm.value)
+      .pipe(finalize(() => {
+        this.isSaving.set(false);
+        this.cdr.markForCheck();
+      }))
       .subscribe({
         next: () => {
-          this.messageService.add({ severity: 'success', summary: 'Invited', detail: 'Invitation sent successfully.' });
-          this.showInviteDialog = false;
+          this.appMessage.showSuccess('Invitation sent successfully.');
+          this.showInviteDialog.set(false);
           this.inviteForm.reset();
+          this.loadData();
         },
-        error: (err) => this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message })
+        error: (err) => this.appMessage.handleHttpError(err)
       });
   }
+
+  transferOwnership() {
+    const newOwnerId = this.selectedNewOwnerId();
+    
+    if (!newOwnerId || this.transferConfirmName() !== this.organization()?.name) {
+      this.appMessage.showWarn('Transfer Error: Name confirmation does not match or no user selected.');
+      return;
+    }
+
+    this.isSaving.set(true);
+    this.orgService.transferOwnership({ user: newOwnerId })
+      .pipe(finalize(() => {
+        this.isSaving.set(false);
+        this.cdr.markForCheck();
+      }))
+      .subscribe({
+        next: (res: any) => {
+          this.appMessage.showSuccess(res.message || 'Ownership transferred successfully.');
+          this.showTransferDialog.set(false);
+          this.loadData();
+        },
+        error: (err) => this.appMessage.handleHttpError(err)
+      });
+  }
+  
+  
 
   approveMember(userId: string) {
     const roleId = this.selectedRoles[userId];
     const branchId = this.selectedBranches[userId];
 
     if (!roleId || !branchId) {
-      this.messageService.add({ severity: 'warn', summary: 'Missing Info', detail: 'Please select a role and branch.' });
+      this.appMessage.showWarn('Missing Info: Please assign a Role and Branch first.');
       return;
     }
 
     this.orgService.approveMember({ userId, branchId, roleId }).subscribe({
       next: () => {
-        this.messageService.add({ severity: 'success', summary: 'Approved', detail: 'Member has been added.' });
+        this.appMessage.showSuccess('Member approved successfully.');
         this.loadData();
       },
-      error: (err) => this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message })
+      error: (err) => this.appMessage.handleHttpError(err)
     });
   }
 
-  removeMember(memberId: string) {
+  
+
+  rejectMember(userId: string) {
     this.confirmationService.confirm({
-      message: 'Are you sure you want to remove this member? They will lose access immediately.',
-      header: 'Revoke Access',
-      icon: 'pi pi-exclamation-triangle',
+      message: 'Are you sure you want to reject this access request?',
+      header: 'Confirm Rejection',
+      icon: 'pi pi-user-minus',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.orgService.removeMember(memberId).subscribe({
+        this.orgService.rejectMember({ userId }).subscribe({
           next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Removed', detail: 'Member removed successfully.' });
+            this.appMessage.showInfo('Request rejected.');
             this.loadData();
           },
-          error: (err) => this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message })
+          error: (err) => this.appMessage.handleHttpError(err)
         });
       }
     });
   }
 
-  // transferOwnership() {
-  //   if (this.transferForm.invalid) return;
-
-  //   this.confirmationService.confirm({
-  //     message: 'This action is irreversible. You will become a regular admin.',
-  //     header: 'Transfer Ownership',
-  //     icon: 'pi pi-exclamation-triangle',
-  //     acceptButtonStyleClass: 'p-button-danger',
-  //     accept: () => {
-  //       this.orgService.transferOwnership({ user: this.transferForm.value.newOwnerId }).subscribe({
-  //         next: () => {
-  //           this.messageService.add({ severity: 'success', summary: 'Transferred', detail: 'Ownership updated.' });
-  //           window.location.reload();
-  //         },
-  //         error: (err) => this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message })
-  //       });
-  //     }
-  //   });
-  // }
-  transferOwnership() {
-    if (this.transferForm.invalid) return;
-
-    // 1. Get the target user ID from the form
-    const targetUserId = this.transferForm.value.newOwnerId;
-
-    this.confirmationService.confirm({
-      message: 'This will send an email to the selected user. They must accept the request to finalize the transfer.',
-      header: 'Initiate Ownership Transfer',
-      icon: 'pi pi-send',
-      acceptButtonStyleClass: 'p-button-warning',
-      accept: () => {
-
-        // 2. Call the Initiate API
-        // Backend expects { userId: string } based on your previous controller logic
-        const payload = { userId: targetUserId };
-
-        this.orgService.initiateTransfer(payload)
-          .pipe(finalize(() => this.showTransferDialog = false))
-          .subscribe({
-            next: (res: any) => {
-              // 3. Update UI to reflect "Pending" state (no page reload needed yet)
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Request Sent',
-                detail: 'An email has been sent to the new owner to accept the transfer.'
-              });
-              this.transferForm.reset();
-            },
-            error: (err) => {
-              this.messageService.add({
-                severity: 'error',
-                summary: 'Transfer Failed',
-                detail: err.error?.message || 'Could not initiate transfer'
-              });
-            }
-          });
-      }
-    });
-  }
   deleteOrganization() {
-    const orgId = this.organization()?._id;
-
-    if (!orgId) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Organization ID not found.' });
-      return;
-    }
-
     this.confirmationService.confirm({
-      message: 'This will permanently delete the organization and all associated data. This cannot be undone.',
-      header: 'DELETE ORGANIZATION',
+      message: 'PERMANENT: This will delete the organization and all its data. Type your organization name to confirm.',
+      header: 'CRITICAL ACTION',
       icon: 'pi pi-trash',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.orgService.deleteOrganization(orgId).subscribe({
+        this.orgService.deleteOrganization(this.organization()._id).subscribe({
           next: () => {
+            this.appMessage.showInfo('Organization deleted. Logging out...');
             this.authService.logout();
             this.router.navigate(['/auth/login']);
           },
-          error: (err) => this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message })
+          error: (err) => this.appMessage.handleHttpError(err)
         });
       }
     });
   }
-
-  // --- HELPERS ---
-  getInitials(name: string): string {
-    return name ? name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : 'U';
-  }
-
-  onTabChange(event: any) {
-    this.activeTabValue.set(event);
-  }
 }
+
+// export class OrgSettingsComponent implements OnInit {
+//   private orgService = inject(OrganizationService);
+//   private authService = inject(AuthService);
+//   private fb = inject(FormBuilder);
+//   private appMessage = inject(AppMessageService);
+//   private confirmationService = inject(ConfirmationService);
+//   private router = inject(Router);
+//   private masterList = inject(MasterListService);
+//   private cdr = inject(ChangeDetectorRef);
+
+//   // --- UI State Signals ---
+//   isLoading = signal(true);
+//   isSaving = signal(false);
+//   activeTab = signal('0');
+  
+//   // Dialog visibility signals
+//   showInviteDialog = signal(false);
+//   showTransferDialog = signal(false);
+
+//   // --- Data Signals ---
+//   organization = signal<any>(null);
+//   activeMembers = signal<any[]>([]);
+//   pendingMembers = signal<any[]>([]);
+  
+//   // --- Computed State ---
+//   isOwner = computed(() => {
+//     const org = this.organization();
+//     const user = this.authService.getCurrentUser();
+//     if (!org || !user) return false;
+//     // Handle both populated object or ID string
+//     const ownerId = org.owner?._id || org.owner;
+//     return ownerId === user._id;
+//   });
+
+//   // --- Forms ---
+//   orgForm!: FormGroup;
+//   inviteForm!: FormGroup;
+  
+//   // Transfer Ownership state
+//   selectedNewOwnerId = signal<string | null>(null);
+//   transferConfirmName = signal<string>('');
+
+//   // Track selections for pending user approvals
+//   selectedRoles: { [userId: string]: string } = {};
+//   selectedBranches: { [userId: string]: string } = {};
+
+//   ngOnInit() {
+//     this.initForms();
+//     this.loadData();
+//   }
+
+//   private initForms() {
+//     this.orgForm = this.fb.group({
+//       name: ['', Validators.required],
+//       primaryEmail: ['', [Validators.required, Validators.email]],
+//       primaryPhone: ['', Validators.required],
+//       gstNumber: [''],
+//     });
+
+//     this.inviteForm = this.fb.group({
+//       name: ['', Validators.required],
+//       email: ['', [Validators.required, Validators.email]],
+//       password: ['', [Validators.required, Validators.minLength(6)]],
+//       role: [null, Validators.required],
+//       branchId: [null, Validators.required]
+//     });
+//   }
+
+//   loadData() {
+//     this.isLoading.set(true);
+    
+//     forkJoin({
+//       org: this.orgService.getMyOrganization(),
+//       pending: this.orgService.getPendingMembers()
+//     })
+//     .pipe(finalize(() => {
+//       this.isLoading.set(false);
+//       this.cdr.markForCheck();
+//     }))
+//     .subscribe({
+//       next: (res: any) => {
+//         const orgData = res.org.data;
+//         this.organization.set(orgData);
+//         this.orgForm.patchValue(orgData);
+
+//         // Filter approved members
+//         const members = orgData.members || [];
+//         this.activeMembers.set(members.filter((m: any) => m.status === 'approved' || !m.status));
+
+//         // Load pending requests
+//         this.pendingMembers.set(res.pending.data?.pendingMembers || []);
+//       },
+//       error: (err) => this.appMessage.handleHttpError(err, 'Organization Load')
+//     });
+//   }
+
+//   // --- Helpers for Template ---
+//   get roles() { return this.masterList.roles(); }
+//   get branches() { return this.masterList.branches(); }
+
+//   getSelectedOwnerName(): string {
+//     const id = this.selectedNewOwnerId();
+//     if (!id) return '';
+//     return this.activeMembers().find(m => m._id === id)?.name || '';
+//   }
+
+//   // --- Actions ---
+
+//   updateOrgDetails() {
+//     if (this.orgForm.invalid) return;
+//     this.isSaving.set(true);
+//     this.orgService.updateMyOrganization(this.orgForm.value)
+//       .pipe(finalize(() => {
+//         this.isSaving.set(false);
+//         this.cdr.markForCheck();
+//       }))
+//       .subscribe({
+//         next: () => this.appMessage.showSuccess('Organization details updated successfully'),
+//         error: (err) => this.appMessage.handleHttpError(err, 'Update Settings')
+//       });
+//   }
+
+//   inviteUser() {
+//     if (this.inviteForm.invalid) {
+//       this.inviteForm.markAllAsTouched();
+//       return;
+//     }
+    
+//     this.isSaving.set(true);
+//     this.orgService.inviteUser(this.inviteForm.value)
+//       .pipe(finalize(() => {
+//         this.isSaving.set(false);
+//         this.cdr.markForCheck();
+//       }))
+//       .subscribe({
+//         next: () => {
+//           this.appMessage.showSuccess('Invitation sent successfully');
+//           this.showInviteDialog.set(false);
+//           this.inviteForm.reset();
+//           this.loadData();
+//         },
+//         error: (err) => this.appMessage.handleHttpError(err, 'Invite User')
+//       });
+//   }
+
+//   transferOwnership() {
+//     const newOwnerId = this.selectedNewOwnerId();
+//     // Validate name match
+//     if (!newOwnerId || this.transferConfirmName() !== this.organization()?.name) return;
+
+//     this.isSaving.set(true);
+//     this.orgService.transferOwnership({ user: newOwnerId })
+//       .pipe(finalize(() => {
+//         this.isSaving.set(false);
+//         this.cdr.markForCheck();
+//       }))
+//       .subscribe({
+//         next: (res: any) => {
+//           this.appMessage.showSuccess(res.message || 'Ownership transferred successfully');
+//           this.showTransferDialog.set(false);
+//           this.loadData();
+//         },
+//         error: (err) => this.appMessage.handleHttpError(err, 'Transfer Ownership')
+//       });
+//   }
+
+//   approveMember(userId: string) {
+//     const roleId = this.selectedRoles[userId];
+//     const branchId = this.selectedBranches[userId];
+
+//     if (!roleId || !branchId) {
+//       this.appMessage.showWarn('Please assign a Role and Branch first');
+//       return;
+//     }
+
+//     this.orgService.approveMember({ userId, branchId, roleId }).subscribe({
+//       next: () => {
+//         this.appMessage.showSuccess('Member approved successfully');
+//         this.loadData();
+//       },
+//       error: (err) => this.appMessage.handleHttpError(err, 'Approval')
+//     });
+//   }
+
+//   rejectMember(userId: string) {
+//     this.confirmationService.confirm({
+//       message: 'Are you sure you want to reject this access request?',
+//       header: 'Confirm Rejection',
+//       icon: 'pi pi-user-minus',
+//       acceptButtonStyleClass: 'p-button-danger',
+//       accept: () => {
+//         this.orgService.rejectMember({ userId }).subscribe({
+//           next: () => {
+//             this.appMessage.showInfo('Request rejected');
+//             this.loadData();
+//           },
+//           error: (err) => this.appMessage.handleHttpError(err, 'Reject Member')
+//         });
+//       }
+//     });
+//   }
+
+//   deleteOrganization() {
+//     this.confirmationService.confirm({
+//       message: 'PERMANENT: This will delete the organization and all its data. Type your organization name to confirm.',
+//       header: 'CRITICAL ACTION',
+//       icon: 'pi pi-trash',
+//       acceptButtonStyleClass: 'p-button-danger',
+//       accept: () => {
+//         this.orgService.deleteOrganization(this.organization()._id).subscribe({
+//           next: () => {
+//             this.appMessage.showInfo('Organization deleted. Logging out...');
+//             this.authService.logout();
+//             this.router.navigate(['/auth/login']);
+//           },
+//           error: (err) => this.appMessage.handleHttpError(err, 'Delete Organization')
+//         });
+//       }
+//     });
+//   }
+// }

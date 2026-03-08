@@ -2,19 +2,18 @@ import { ApiService } from './../../../../core/services/api';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { PasswordModule } from 'primeng/password';
 import { CheckboxModule } from 'primeng/checkbox';
-import { AutoCompleteModule } from 'primeng/autocomplete'; // Added
+import { AutoCompleteModule } from 'primeng/autocomplete';
 import { AuthService } from '../../services/auth-service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
-
 
 @Component({
   selector: 'app-login',
@@ -28,54 +27,86 @@ import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
     ButtonModule,
     PasswordModule,
     CheckboxModule,
-    AutoCompleteModule // Added
+    AutoCompleteModule
   ],
   templateUrl: './login.html',
   styleUrl: './login.scss',
-  providers: [MessageService, AppMessageService]
+  providers: [AppMessageService]
 })
 export class Login implements OnInit {
-  // --- Injections ---
   private masterListService = inject(MasterListService);
   private fb = inject(FormBuilder);
-  private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private authService = inject(AuthService);
   private messageService = inject(AppMessageService);
-  private ApiService = inject(ApiService);
+
   isLoading = signal(false);
+  errorMessage = signal<string | null>(null);
+
   filteredEmails: string[] = [];
-  emailDomains: string[] = ['gmail.com', 'outlook.com', 'yahoo.com', 'icloud.com', 'hotmail.com'];
+  emailDomains: string[] = ['gmail.com', 'outlook.com', 'proton.me', 'protonmail.me', 'yahoo.com', 'icloud.com', 'hotmail.com'];
   loginForm!: FormGroup;
+  returnUrl: string = '/dashboard';
+
   ngOnInit(): void {
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
     this.initForm();
   }
 
-private initForm(): void {
-  this.loginForm = this.fb.group({
-    email: [
-      '',
-      [
-        Validators.required,
-        Validators.email,
-        this.allowedEmailDomains(this.emailDomains) 
-      ]
-    ],
-    password: ['', Validators.required],
-    uniqueShopId: ['', Validators.required],
-    remember: [false]
-  });
-}
+  private initForm(): void {
+    this.loginForm = this.fb.group({
+      // Labelled as 'email' in the form but accepts phone numbers too
+      email: [
+        '',
+        [
+          Validators.required,
+          this.emailOrPhoneValidator() // Custom validator for dual support
+        ]
+      ],
+      password: ['', Validators.required],
+      uniqueShopId: ['', Validators.required],
+      remember: [false]
+    });
+  }
 
   get form() {
     return this.loginForm.controls;
   }
 
-  // --- Email Suggestion Logic ---
+  /**
+   * Custom validator that allows either a valid email 
+   * OR a valid phone number (numeric, 7-15 digits).
+   */
+  private emailOrPhoneValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = control.value;
+      if (!value) return null;
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const phoneRegex = /^\+?[0-9]{7,15}$/;
+
+      const isValidEmail = emailRegex.test(value);
+      const isValidPhone = phoneRegex.test(value);
+
+      if (isValidEmail) {
+        // If it's an email, we still check the domain whitelist
+        const domain = value.split('@')[1]?.toLowerCase();
+        if (domain && !this.emailDomains.includes(domain)) {
+          return { domainNotAllowed: true };
+        }
+        return null;
+      }
+
+      return isValidPhone ? null : { invalidIdentifier: true };
+    };
+  }
+
   filterEmail(event: any) {
     const query = event.query;
+    // Only show suggestions if the user starts typing an email format
     if (query.includes('@')) {
       const [prefix, suffix] = query.split('@');
-      // Filter domains based on what user types after @
       this.filteredEmails = this.emailDomains
         .filter(domain => domain.toLowerCase().startsWith(suffix.toLowerCase()))
         .map(domain => `${prefix}@${domain}`);
@@ -87,37 +118,29 @@ private initForm(): void {
   onSubmit(): void {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
-      this.messageService.showWarn('Invalid Form', 'Please enter a valid email and password.');
+      this.messageService.showWarn('Please fill out all required fields correctly.');
       return;
     }
 
     this.isLoading.set(true);
-
+    this.errorMessage.set(null);
     this.authService.login(this.loginForm.value).subscribe({
       next: (response: any) => {
         this.authService.handleLoginSuccess(response);
         this.masterListService.load();
         this.isLoading.set(false);
+
+        // Added a nice welcome touch before navigating away
+        this.messageService.showSuccess('Login successful!');
+
+        this.router.navigateByUrl(this.returnUrl);
       },
       error: (err) => {
         this.isLoading.set(false);
+        const message = err.error?.message || 'Login failed. Please check your credentials.';
+        this.errorMessage.set(message);
+        this.messageService.showError(message);
       }
     });
   }
-
-
-  
- allowedEmailDomains(domains: string[]): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors | null => {
-    const value = control.value;
-    if (!value || !value.includes('@')) return null;
-
-    const domain = value.split('@')[1]?.toLowerCase();
-    if (!domain) return null;
-
-    return domains.includes(domain)
-      ? null
-      : { domainNotAllowed: true };
-  };
-}
 }

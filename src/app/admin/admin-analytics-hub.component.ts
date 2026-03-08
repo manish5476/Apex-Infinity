@@ -40,866 +40,759 @@ import { DashboardUI } from "./components/dashboard.ui";
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule,SelectModule, MultiSelectModule, ButtonModule, TooltipModule,AvatarModule, ScrollPanelModule,RealTimeMonitoringComponent,FinancialTrendChartComponent,SystemAuditAlertsComponent,BranchComparisonComponent,FinancialDashboardComponent,CashFlowAnalysisComponent,EmiAnalyticsComponent,CustomerIntelligenceComponent,CustomerSegmentationComponent,CustomerLtvAnalysisComponent,ProductPerformanceComponent,DeadStockAnalysisComponent,OrderFunnelChartComponent,SalesDistributionChartComponent,PredictiveAnalyticsComponent,SalesForecastComponent,OperationalMetricsComponent,PeakHoursAnalysisComponent,StaffPerformanceAnalysisComponent,BranchRadarChartComponent,ComplianceDashboardComponent,SystemDataHealthComponent,AnalyticsExportHubComponent,TimeAnalyticsComponent,     DashboardUI
+  imports: [CommonModule, FormsModule,SelectModule, MultiSelectModule, ButtonModule, TooltipModule,AvatarModule, ScrollPanelModule,RealTimeMonitoringComponent,FinancialTrendChartComponent,SystemAuditAlertsComponent,BranchComparisonComponent,FinancialDashboardComponent,CashFlowAnalysisComponent,EmiAnalyticsComponent,CustomerIntelligenceComponent,CustomerSegmentationComponent,CustomerLtvAnalysisComponent,ProductPerformanceComponent,DeadStockAnalysisComponent,OrderFunnelChartComponent,SalesDistributionChartComponent,PredictiveAnalyticsComponent,SalesForecastComponent,OperationalMetricsComponent,PeakHoursAnalysisComponent,StaffPerformanceAnalysisComponent,BranchRadarChartComponent,ComplianceDashboardComponent,SystemDataHealthComponent,AnalyticsExportHubComponent,TimeAnalyticsComponent, DashboardUI
   ],
-  template: `
-    <div class="admin-dashboard">
-      <header class="dashboard-header rounded-lg glass-surface">
-        <div class="component-tabs">
-          <div class="tabs-scroll-container">
-            <div class="tabs-container">
+   template: `
+    <div class="app-layout">
+      
+      <header class="glass-header">
+        <div class="header-content">
+          
+          <div class="brand-box">
+             <div class="logo-circle">
+                <i class="pi pi-bolt"></i>
+             </div>
+             <span class="brand-name">Nexus<span class="brand-highlight">Admin</span></span>
+          </div>
+
+          <div class="nav-capsule">
+            <div class="nav-scroller custom-scrollbar-hidden">
               @for (comp of componentOptions; track comp.value) {
                 <button 
-                  class="tab-button surface-interactive"
-                  [class.active-tab]="selectedComponent?.value === comp.value"
-                  (click)="selectedComponent = comp">
+                  class="nav-item"
+                  [class.active]="selectedComponent?.value === comp.value"
+                  (click)="selectedComponent = comp"
+                  pTooltip="{{comp.label}}" tooltipPosition="bottom">
                   <i [class]="'pi ' + comp.icon"></i>
                   <span>{{comp.label}}</span>
                 </button>
               }
             </div>
           </div>
+
+          <div class="user-box">
+             <button class="icon-btn"><i class="pi pi-bell"></i><span class="dot"></span></button>
+             <p-avatar label="AD" shape="circle" styleClass="profile-avatar"></p-avatar>
+          </div>
+
         </div>
       </header>
       
-      <!-- Main Content Area -->
-      <main class="dashboard-main">
-        <div class="main-content">
+      <main class="stage-viewport">
+        <div class="stage-box glass-panel">
           
-          
-          @if (selectedComponent?.value === 'dashboard-ui') {
-            <div class="component-container">
-              <app-admin-dashboard-Ui class="component-full"></app-admin-dashboard-Ui>
-            </div>
-          }
-          @if (selectedComponent?.value === 'realtime') {
-            <div class="component-container">
-              <app-real-time-monitoring class="component-full"></app-real-time-monitoring>
-            </div>
-          }
-          
+          <div class="scrollable-inner custom-scrollbar">
+            @switch (selectedComponent?.value) {
+              
+              @case ('dashboard-ui') { <app-admin-dashboard-Ui class="component-host"></app-admin-dashboard-Ui> }
+              @case ('realtime') { <app-real-time-monitoring class="component-host"></app-real-time-monitoring> }
+              @case ('financial-trend') { <app-financial-trend-chart class="component-host"></app-financial-trend-chart> }
+              @case ('system-audit') { <app-system-audit-alerts class="component-host"></app-system-audit-alerts> }
+              @case ('branch-comparison') { <app-branch-comparison class="component-host"></app-branch-comparison> }
+              @case ('financial-dashboard') { <app-financial-dashboard class="component-host"></app-financial-dashboard> }
+              @case ('cash-flow') { <app-cash-flow-analysis class="component-host"></app-cash-flow-analysis> }
+              @case ('emi-analytics') { <app-emi-analytics class="component-host"></app-emi-analytics> }
+              @case ('customer-intelligence') { <app-customer-intelligence class="component-host"></app-customer-intelligence> }
+              @case ('customer-segmentation') { <app-customer-segmentation class="component-host"></app-customer-segmentation> }
+              @case ('customer-ltv') { <app-customer-ltv-analysis class="component-host"></app-customer-ltv-analysis> }
+              @case ('product-performance') { <app-product-performance class="component-host"></app-product-performance> }
+              @case ('dead-stock') { <app-dead-stock-analysis class="component-host"></app-dead-stock-analysis> }
+              @case ('order-funnel') { <app-order-funnel-chart class="component-host"></app-order-funnel-chart> }
+              @case ('sales-distribution') { <app-sales-distribution-chart class="component-host"></app-sales-distribution-chart> }
+              @case ('predictive-analytics') { <app-predictive-analytics class="component-host"></app-predictive-analytics> }
+              @case ('sales-forecast') { <app-sales-forecast class="component-host"></app-sales-forecast> }
+              @case ('operational-metrics') { <app-operational-metrics class="component-host"></app-operational-metrics> }
+              @case ('peak-hours') { <app-peak-hours-analysis class="component-host"></app-peak-hours-analysis> }
+              @case ('staff-performance') { <app-staff-performance-analysis class="component-host"></app-staff-performance-analysis> }
+              @case ('branch-radar') { <app-branch-radar-chart class="component-host"></app-branch-radar-chart> }
+              @case ('compliance-dashboard') { <app-compliance-dashboard class="component-host"></app-compliance-dashboard> }
+              @case ('system-data-health') { <app-system-data-health class="component-host"></app-system-data-health> }
+              @case ('analytics-export') { <app-analytics-export-hub class="component-host"></app-analytics-export-hub> }
+              @case ('time-analytics') { <app-time-analytics class="component-host"></app-time-analytics> }
 
-          @if (selectedComponent?.value === 'financial-trend') {
-            <div class="component-container">
-              <app-financial-trend-chart class="component-full"></app-financial-trend-chart>
-            </div>
-          }
-          
-
-          @if (selectedComponent?.value === 'system-audit') {
-            <div class="component-container">
-              <app-system-audit-alerts class="component-full"></app-system-audit-alerts>
-            </div>
-          }
-          
-
-          @if (selectedComponent?.value === 'branch-comparison') {
-            <div class="component-container">
-              <app-branch-comparison class="component-full"></app-branch-comparison>
-            </div>
-          }
-          
-
-          @if (selectedComponent?.value === 'financial-dashboard') {
-            <div class="component-container">
-              <app-financial-dashboard class="component-full"></app-financial-dashboard>
-            </div>
-          }
-          
-
-          @if (selectedComponent?.value === 'cash-flow') {
-            <div class="component-container">
-              <app-cash-flow-analysis class="component-full"></app-cash-flow-analysis>
-            </div>
-          }
-          
-
-          @if (selectedComponent?.value === 'emi-analytics') {
-            <div class="component-container">
-              <app-emi-analytics class="component-full"></app-emi-analytics>
-            </div>
-          }
-          
-
-          @if (selectedComponent?.value === 'customer-intelligence') {
-            <div class="component-container">
-              <app-customer-intelligence class="component-full"></app-customer-intelligence>
-            </div>
-          }
-          
-
-          @if (selectedComponent?.value === 'customer-segmentation') {
-            <div class="component-container">
-              <app-customer-segmentation class="component-full"></app-customer-segmentation>
-            </div>
-          }
-          
-
-          @if (selectedComponent?.value === 'customer-ltv') {
-            <div class="component-container">
-              <app-customer-ltv-analysis class="component-full"></app-customer-ltv-analysis>
-            </div>
-          }
-          
-
-          @if (selectedComponent?.value === 'product-performance') {
-            <div class="component-container">
-              <app-product-performance class="component-full"></app-product-performance>
-            </div>
-          }
-          
-
-          @if (selectedComponent?.value === 'dead-stock') {
-            <div class="component-container">
-              <app-dead-stock-analysis class="component-full"></app-dead-stock-analysis>
-            </div>
-          }
-          
-
-          @if (selectedComponent?.value === 'order-funnel') {
-            <div class="component-container">
-              <app-order-funnel-chart class="component-full"></app-order-funnel-chart>
-            </div>
-          }
-          
-
-          @if (selectedComponent?.value === 'sales-distribution') {
-            <div class="component-container">
-              <app-sales-distribution-chart class="component-full"></app-sales-distribution-chart>
-            </div>
-          }
-          
-
-          @if (selectedComponent?.value === 'predictive-analytics') {
-            <div class="component-container">
-              <app-predictive-analytics class="component-full"></app-predictive-analytics>
-            </div>
-          }
-          
-
-          @if (selectedComponent?.value === 'sales-forecast') {
-            <div class="component-container">
-              <app-sales-forecast class="component-full"></app-sales-forecast>
-            </div>
-          }
-          
-
-          @if (selectedComponent?.value === 'operational-metrics') {
-            <div class="component-container">
-              <app-operational-metrics class="component-full"></app-operational-metrics>
-            </div>
-          }
-          
-
-          @if (selectedComponent?.value === 'peak-hours') {
-            <div class="component-container">
-              <app-peak-hours-analysis class="component-full"></app-peak-hours-analysis>
-            </div>
-          }
-          
-
-          @if (selectedComponent?.value === 'staff-performance') {
-            <div class="component-container">
-              <app-staff-performance-analysis class="component-full"></app-staff-performance-analysis>
-            </div>
-          }
-          
-
-          @if (selectedComponent?.value === 'branch-radar') {
-            <div class="component-container">
-              <app-branch-radar-chart class="component-full"></app-branch-radar-chart>
-            </div>
-          }
-          
-
-          @if (selectedComponent?.value === 'compliance-dashboard') {
-            <div class="component-container">
-              <app-compliance-dashboard class="component-full"></app-compliance-dashboard>
-            </div>
-          }
-          
-
-          @if (selectedComponent?.value === 'system-data-health') {
-            <div class="component-container">
-              <app-system-data-health class="component-full"></app-system-data-health>
-            </div>
-          }
-          
-
-          @if (selectedComponent?.value === 'analytics-export') {
-            <div class="component-container">
-              <app-analytics-export-hub class="component-full"></app-analytics-export-hub>
-            </div>
-          }
-          
-
-          @if (selectedComponent?.value === 'time-analytics') {
-            <div class="component-container">
-              <app-time-analytics class="component-full"></app-time-analytics>
-            </div>
-          }
-          
-
-          @if (!selectedComponent) {
-            <div class="empty-state">
-              <div class="empty-state-icon surface-elevated">
-                <i class="pi pi-chart-line"></i>
-              </div>
-              <h2 class="empty-state-title">Welcome to Analytics Dashboard</h2>
-              <p class="empty-state-description">Select a component from the header to view detailed analytics and monitoring tools.</p>
-              <div class="empty-state-grid">
-                <div class="empty-state-card surface-interactive">
-                  <i class="pi pi-eye"></i>
-                  <h3 class="empty-state-card-title">Live Monitoring</h3>
+              @default {
+                <div class="empty-state">
+                   <div class="empty-content">
+                      <i class="pi pi-th-large empty-icon"></i>
+                      <h3>Select a Module</h3>
+                      <p>Navigate using the top bar to view analytics.</p>
+                   </div>
                 </div>
-                <div class="empty-state-card surface-interactive">
-                  <i class="pi pi-chart-line"></i>
-                  <h3 class="empty-state-card-title">Financial Analytics</h3>
-                </div>
-                <div class="empty-state-card surface-interactive">
-                  <i class="pi pi-users"></i>
-                  <h3 class="empty-state-card-title">Customer Insights</h3>
-                </div>
-                <div class="empty-state-card surface-interactive">
-                  <i class="pi pi-bolt"></i>
-                  <h3 class="empty-state-card-title">AI Analytics</h3>
-                </div>
-              </div>
-            </div>
-          }
+              }
+            }
+          </div>
+
         </div>
       </main>
     </div>
   `,
   styles: [`
-    /* ===== BASE STYLES ===== */
+    /* =========================================
+       1. GLOBAL LAYOUT (FIXED SCROLL ISSUE)
+       ========================================= */
     :host {
-      font-family: var(--font-body);
-      font-size: var(--font-size-base);
-      line-height: var(--line-height-normal);
-      color: var(--text-primary);
       display: block;
-      min-height: 100vh;
-      background: var(--bg-primary);
+      height: 100%;
+      width: 100%; /* Changed from 100vw to 100% to fix scrollbar overflow */
+      overflow: hidden; /* Prevent native scroll */
+      box-sizing: border-box;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-body);
     }
 
-    .admin-dashboard {
-      min-height: 100vh;
+    .app-layout {
       display: flex;
       flex-direction: column;
-      background: var(--bg-primary);
-      transition: var(--transition-colors);
+      height: 100%;
+      position: relative;
+      width: 100%;
     }
 
-    /* ===== HEADER STYLES ===== */
-    .dashboard-header {
-      position: sticky;
-      top: 0;
-      z-index: var(--z-sticky);
-      border-bottom: var(--ui-border-width) solid var(--border-primary);
-      transition: var(--transition-colors);
+    /* =========================================
+       2. FLOATING GLASS HEADER
+       ========================================= */
+    .glass-header {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      width: 95%;
+      max-width: 1600px;
+      height: 64px;
     }
 
     .header-content {
-      padding: var(--spacing-lg) var(--spacing-2xl);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: var(--spacing-2xl);
-      transition: var(--transition-colors);
+      height: 100%;
+      padding: 0 8px 0 24px;
+      
+      /* The Glass Effect */
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 99px;
+      box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
     }
 
-    .brand-section {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-lg);
-      flex-shrink: 0;
+    /* Brand */
+    .brand-box { display: flex; align-items: center; gap: 12px; min-width: 180px; }
+    .logo-circle {
+       width: 32px; height: 32px; border-radius: 50%;
+       background: var(--accent-gradient);
+       display: flex; align-items: center; justify-content: center;
+       color: #fff; font-size: 14px;
     }
+    .brand-name { font-family: var(--font-heading); font-weight: 700; font-size: 16px; color: #fff; letter-spacing: -0.02em; }
+    .brand-highlight { color: var(--accent-primary); }
 
-    .brand-logo {
-      width: calc(var(--spacing-2xl) + var(--spacing-sm));
-      height: calc(var(--spacing-2xl) + var(--spacing-sm));
-      border-radius: var(--ui-border-radius-lg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--accent-gradient);
-      color: var(--text-primary);
-    }
-
-    .brand-logo i {
-      font-size: var(--font-size-md);
-    }
-
-    .brand-title {
-      font-family: var(--font-heading);
-      font-size: var(--font-size-lg);
-      font-weight: var(--font-weight-semibold);
-      line-height: var(--line-height-tight);
-      color: var(--text-primary);
-      margin: 0;
-    }
-
-    .brand-subtitle {
-      font-size: var(--font-size-sm);
-      color: var(--text-secondary);
-      margin: 0;
-      line-height: var(--line-height-tight);
-    }
-
-    .desktop-selector {
-      display: none;
-    }
-
-    @media (min-width: 768px) {
-      .desktop-selector {
-        display: block;
-        flex: 1;
-        max-width: 280px;
-      }
-    }
-
-    .user-section {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-sm);
-    }
-
-    .settings-button {
-      padding: var(--spacing-sm);
-      border-radius: var(--ui-border-radius);
-      color: var(--text-secondary);
-      transition: var(--transition-colors);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      border: var(--ui-border-width) solid transparent;
-    }
-
-    .settings-button:hover {
-      color: var(--text-primary);
-      border-color: var(--border-secondary);
-    }
-
-    .settings-button i {
-      font-size: var(--font-size-sm);
-    }
-
-    .user-avatar {
-      background: var(--accent-gradient) !important;
-      color: var(--text-primary) !important;
-      font-weight: var(--font-weight-bold) !important;
-    }
-
-    /* Mobile Selector */
-    .mobile-selector {
-      padding: 0 var(--spacing-2xl) var(--spacing-lg);
-      display: block;
-    }
-
-    @media (min-width: 768px) {
-      .mobile-selector {
-        display: none;
-      }
-    }
-
-    /* Component Tabs */
-    .component-tabs {
-      border-top: var(--ui-border-width) solid var(--component-divider);
-      display: none;
-    }
-
-    @media (min-width: 768px) {
-      .component-tabs {
-        display: block;
-      }
-    }
-
-    .tabs-scroll-container {
-      padding: 0 var(--spacing-2xl);
-      overflow-x: auto;
-    }
-
-    .tabs-container {
-      display: flex;
-      gap: var(--spacing-xs);
-      padding: var(--spacing-md) 0;
-      min-width: max-content;
-    }
-
-    .tab-button {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-sm);
-      padding: var(--spacing-sm) var(--spacing-lg);
-      border-radius: var(--ui-border-radius-lg);
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: var(--transition-base);
-      white-space: nowrap;
-      font-size: var(--font-size-sm);
-      line-height: var(--line-height-tight);
-      border: var(--ui-border-width) solid transparent;
-    }
-
-    .tab-button:hover {
-      background: var(--component-bg-hover);
-      border-color: var(--border-primary);
-    }
-
-    .tab-button i {
-      font-size: var(--font-size-sm);
-      color: var(--text-tertiary);
-      transition: var(--transition-colors);
-    }
-
-    .tab-button:hover i {
-      color: var(--accent-primary);
-    }
-
-    .tab-button.active-tab {
-      background: var(--component-bg-active);
-      border-color: var(--accent-primary);
-      color: var(--text-primary);
-    }
-
-    .tab-button.active-tab i {
-      color: var(--accent-primary);
-    }
-
-    /* ===== MAIN CONTENT STYLES ===== */
-    .dashboard-main {
+    /* Nav Capsule (Scrollable) */
+    .nav-capsule {
       flex: 1;
-      overflow: auto;
+      margin: 0 24px;
+      overflow: hidden;
+      mask-image: linear-gradient(to right, transparent, black 20px, black 95%, transparent);
+    }
+
+    .nav-scroller {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      overflow-x: auto;
+      padding: 4px 0;
+    }
+    .custom-scrollbar-hidden::-webkit-scrollbar { display: none; }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 16px;
+      border-radius: 99px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: rgba(255,255,255,0.6);
+      font-size: 12px; font-weight: 600;
+      white-space: nowrap; cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
+    .nav-item.active {
+      background: var(--bg-primary); 
+      color: var(--accent-primary);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    /* User Box */
+    .user-box { display: flex; align-items: center; gap: 16px; margin-right: 8px; }
+    .icon-btn { 
+      background: none; border: none; color: rgba(255,255,255,0.6); 
+      font-size: 1.1rem; cursor: pointer; position: relative; 
+    }
+    .icon-btn .dot { 
+      position: absolute; top: 0; right: 0; width: 6px; height: 6px; 
+      background: var(--color-error); border-radius: 50%; 
+    }
+    ::ng-deep .profile-avatar { background: var(--accent-primary); color: #fff; font-weight: 700; width: 36px; height: 36px; }
+
+    /* =========================================
+       3. STAGE VIEWPORT (PADDED CONTAINER)
+       ========================================= */
+    .stage-viewport {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      
+      /* ADDED SIDE PADDING HERE (40px) to prevent edge touching */
+      padding: 104px 0px 0px 0px;
+      
+      height: 100%;
+      overflow: hidden; /* No scroll on outer viewport */
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* =========================================
+       4. THE BOX CONTAINER (The "Fixed Stage")
+       ========================================= */
+    .stage-box {
+      width: 100%;
+      max-width: 1800px;
+      height: 100%;
+      
+      /* The Box Look */
       background: var(--bg-primary);
-      transition: var(--transition-colors);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius-xl);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      
+      /* Content Handling */
+      display: flex;
+      flex-direction: column;
+      overflow: hidden; /* Clips children */
+      position: relative;
     }
 
-    .main-content {
-      height: 100%;
+    /* =========================================
+       5. INNER SCROLL AREA (The Content)
+       ========================================= */
+    .scrollable-inner {
+      flex: 1;
+      overflow-y: auto; /* SCROLL HAPPENS HERE */
+      padding: 0;
+      scroll-behavior: smooth;
     }
 
-    .component-container {
-      height: 100%;
-      padding: var(--spacing-2xl);
-    }
-
-    @media (max-width: 768px) {
-      .component-container {
-        padding: var(--spacing-xl);
-      }
-    }
-
-    .component-full {
+    .component-host {
       display: block;
-      height: 100%;
+      animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Scrollbar Polish */
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
 
     /* Empty State */
-    .empty-state {
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: var(--spacing-3xl);
-      text-align: center;
-    }
-
-    .empty-state-icon {
-      width: calc(var(--spacing-3xl) * 2);
-      height: calc(var(--spacing-3xl) * 2);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: var(--spacing-2xl);
-      background: var(--accent-gradient);
-    }
-
-    .empty-state-icon i {
-      font-size: var(--font-size-3xl);
-      color: var(--text-primary);
-    }
-
-    .empty-state-title {
-      font-family: var(--font-heading);
-      font-size: var(--font-size-2xl);
-      font-weight: var(--font-weight-bold);
-      color: var(--text-primary);
-      margin: 0 0 var(--spacing-lg);
-      line-height: var(--line-height-tight);
-    }
-
-    .empty-state-description {
-      font-size: var(--font-size-md);
-      color: var(--text-secondary);
-      max-width: 32rem;
-      margin: 0 auto var(--spacing-3xl);
-      line-height: var(--line-height-relaxed);
-    }
-
-    .empty-state-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: var(--spacing-lg);
-      max-width: 32rem;
-    }
-
-    @media (min-width: 768px) {
-      .empty-state-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    .empty-state-card {
-      border-radius: var(--ui-border-radius);
-      padding: var(--spacing-xl);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: var(--spacing-sm);
-      border: var(--ui-border-width) solid var(--border-secondary);
-      transition: var(--transition-colors);
-    }
-
-    .empty-state-card:hover {
-      border-color: var(--border-primary);
-    }
-
-    .empty-state-card i {
-      font-size: var(--font-size-lg);
-      color: var(--accent-primary);
-      margin-bottom: var(--spacing-xs);
-    }
-
-    .empty-state-card-title {
-      font-size: var(--font-size-sm);
-      font-weight: var(--font-weight-medium);
-      color: var(--text-primary);
-      margin: 0;
-      line-height: var(--line-height-tight);
-    }
-
-    /* ===== FOOTER STYLES ===== */
-    .dashboard-footer {
-      padding: var(--spacing-lg);
-      border-top: var(--ui-border-width) solid var(--border-primary);
-      transition: var(--transition-colors);
-    }
-
-    .footer-content {
-      max-width: 100%;
-    }
-
-    .footer-actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: var(--spacing-sm);
-    }
-
-    .selected-count {
-      font-size: var(--font-size-xs);
-      color: var(--text-tertiary);
-      margin: 0;
-    }
-
-    .view-selected-button {
-      font-size: var(--font-size-sm);
-      color: var(--accent-primary);
-        background: var(--bg-secondary);
-      border: none;
-      cursor: pointer;
-      transition: var(--transition-colors);
-      padding: 0;
-    }
-
-    .view-selected-button:hover:not(:disabled) {
-      color: var(--accent-hover);
-    }
-
-    .view-selected-button:disabled {
-      color: var(--color-disabled-text);
-      cursor: not-allowed;
-      opacity: var(--state-disabled-opacity);
-    }
-
-    /* ===== PRIME NG CUSTOMIZATION ===== */
-    // :host ::ng-deep .p-select,
-    // :host ::ng-deep .p-multiselect {
-    //   background: var(--bg-secondary) !important;
-    //   border-radius: var(--ui-border-radius) !important;
-    //   border: var(--ui-border-width) solid var(--border-primary) !important;
-    //   transition: var(--transition-colors) !important;
-    //   width: 100% !important;
-    // }
-
-    // :host ::ng-deep .p-select:hover,
-    // :host ::ng-deep .p-multiselect:hover {
-    //   border-color: var(--accent-primary) !important;
-    // }
-
-    // :host ::ng-deep .p-select:focus-within,
-    // :host ::ng-deep .p-multiselect:focus-within {
-    //   border-color: var(--accent-primary) !important;
-    //   box-shadow: 0 0 0 var(--focus-ring-width) var(--accent-focus) !important;
-    // }
-
-    // :host ::ng-deep .p-select-label,
-    // :host ::ng-deep .p-multiselect-label {
-    //   font-size: var(--font-size-sm) !important;
-    //   color: var(--text-primary) !important;
-    //   font-family: var(--font-body) !important;
-    //   font-weight: var(--font-weight-normal) !important;
-    // }
-
-    // :host ::ng-deep .p-select-trigger,
-    // :host ::ng-deep .p-multiselect-trigger {
-    //   color: var(--text-tertiary) !important;
-    //   transition: var(--transition-colors) !important;
-    // }
-
-    // :host ::ng-deep .p-select:hover .p-select-trigger,
-    // :host ::ng-deep .p-multiselect:hover .p-multiselect-trigger {
-    //   color: var(--accent-primary) !important;
-    // }
-
-    // :host ::ng-deep .p-select-panel,
-    // :host ::ng-deep .p-multiselect-panel {
-    //   background: var(--bg-secondary) !important;
-    //   border: var(--ui-border-width) solid var(--border-primary) !important;
-    //   border-radius: var(--ui-border-radius) !important;
-    //   box-shadow: var(--shadow-lg) !important;
-    // }
-
-    // :host ::ng-deep .p-select-item,
-    // :host ::ng-deep .p-multiselect-item {
-    //   font-size: var(--font-size-sm) !important;
-    //   color: var(--text-primary) !important;
-    //   padding: var(--spacing-sm) var(--spacing-lg) !important;
-    //   font-family: var(--font-body) !important;
-    //   transition: var(--transition-colors) !important;
-    // }
-
-    // :host ::ng-deep .p-select-item:hover,
-    // :host ::ng-deep .p-multiselect-item:hover {
-    //   background: var(--component-bg-hover) !important;
-    //   color: var(--text-primary) !important;
-    // }
-
-    // :host ::ng-deep .p-select-item.p-highlight,
-    // :host ::ng-deep .p-multiselect-item.p-highlight {
-    //   background: var(--component-bg-active) !important;
-    //   color: var(--text-primary) !important;
-    // }
-
-    :host ::ng-deep .p-multiselect-header {
-      background: var(--bg-secondary) !important;
-      border-bottom: var(--ui-border-width) solid var(--border-primary) !important;
-      padding: var(--spacing-sm) var(--spacing-lg) !important;
-    }
-
-    :host ::ng-deep .p-multiselect-close {
-      color: var(--text-tertiary) !important;
-    }
-
-    :host ::ng-deep .p-multiselect-close:hover {
-      color: var(--accent-primary) !important;
-    }
-
-    /* ===== SCROLLBAR STYLING ===== */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--scroll-track-c);
-      border-radius: var(--ui-border-radius);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--scroll-thumb-c);
-      border-radius: var(--ui-border-radius);
-      transition: var(--transition-colors);
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--accent-primary);
-    }
-
-    /* Hide scrollbar for tabs container */
-    .tabs-scroll-container::-webkit-scrollbar {
-      display: none;
-    }
-
-    .tabs-scroll-container {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-
-    /* ===== FOCUS STATES ===== */
-    // button:focus-visible,
-    // .p-select:focus-within,
-    // .p-multiselect:focus-within {
-    //   outline: var(--focus-ring-width) solid var(--focus-ring-color);
-    //   outline-offset: var(--focus-ring-offset);
-    // }
-
-    /* ===== RESPONSIVE ADJUSTMENTS ===== */
-    @media (max-width: 768px) {
-      .header-content {
-        padding: var(--spacing-lg);
-        gap: var(--spacing-lg);
-      }
-      
-      .mobile-selector {
-        padding: 0 var(--spacing-lg) var(--spacing-lg);
-      }
-      
-      .empty-state {
-        padding: var(--spacing-2xl);
-      }
-      
-      .empty-state-icon {
-        width: calc(var(--spacing-2xl) * 2);
-        height: calc(var(--spacing-2xl) * 2);
-      }
-      
-      .empty-state-icon i {
-        font-size: var(--font-size-2xl);
-      }
-      
-      .empty-state-title {
-        font-size: var(--font-size-xl);
-      }
-      
-      .dashboard-footer {
-        padding: var(--spacing-lg);
-      }
-    }
-
-    @media (max-width: 640px) {
-      .brand-section {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--spacing-xs);
-      }
-      
-      .brand-logo {
-        width: var(--spacing-2xl);
-        height: var(--spacing-2xl);
-      }
-      
-      .header-content {
-        flex-wrap: wrap;
-      }
-      
-      .user-section {
-        order: 1;
-      }
-      
-      .empty-state-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* ===== ANIMATIONS ===== */
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(var(--spacing-xs));
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .component-container {
-      animation: fadeIn var(--transition-base) ease-out;
-    }
-
-    .empty-state {
-      animation: fadeIn var(--transition-slow) ease-out;
-    }
+    .empty-state { height: 100%; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); text-align: center; }
+    .empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.3; }
   `]
 })
+
 export class AdminDashboardComponent implements OnInit, OnDestroy {
-  // Currently selected single component
   selectedComponent: any = null;
   
-  // Multiple selected components for footer
-  selectedComponents: any[] = [];
-  
-  // All 25 components with metadata
   componentOptions = [
-    { value: 'dashboard-ui', label: 'Dashboard', icon: 'pi-screen' },
-    { value: 'realtime', label: 'Real-Time Monitoring', icon: 'pi-eye' },
-    { value: 'financial-trend', label: 'Financial Trends', icon: 'pi-chart-line' },
-    { value: 'system-audit', label: 'System Audit Alerts', icon: 'pi-shield' },
-    { value: 'branch-comparison', label: 'Branch Comparison', icon: 'pi-building' },
-    { value: 'financial-dashboard', label: 'Financial Dashboard', icon: 'pi-wallet' },
-    { value: 'cash-flow', label: 'Cash Flow Analysis', icon: 'pi-money-bill' },
-    { value: 'emi-analytics', label: 'EMI Analytics', icon: 'pi-credit-card' },
-    { value: 'customer-intelligence', label: 'Customer Intelligence', icon: 'pi-user' },
-    { value: 'customer-segmentation', label: 'Customer Segmentation', icon: 'pi-sitemap' },
-    { value: 'customer-ltv', label: 'Customer LTV Analysis', icon: 'pi-star' },
-    { value: 'product-performance', label: 'Product Performance', icon: 'pi-shopping-bag' },
-    { value: 'dead-stock', label: 'Dead Stock Analysis', icon: 'pi-exclamation-circle' },
-    { value: 'order-funnel', label: 'Order Funnel Chart', icon: 'pi-filter' },
-    { value: 'sales-distribution', label: 'Sales Distribution', icon: 'pi-chart-pie' },
-    { value: 'predictive-analytics', label: 'Predictive Analytics', icon: 'pi-brain' },
-    { value: 'sales-forecast', label: 'Sales Forecast', icon: 'pi-chart-bar' },
-    { value: 'operational-metrics', label: 'Operational Metrics', icon: 'pi-cog' },
-    { value: 'peak-hours', label: 'Peak Hours Analysis', icon: 'pi-clock' },
-    { value: 'staff-performance', label: 'Staff Performance', icon: 'pi-user-edit' },
-    { value: 'branch-radar', label: 'Branch Radar Chart', icon: 'pi-radar-chart' },
-    { value: 'compliance-dashboard', label: 'Compliance Dashboard', icon: 'pi-shield' },
-    { value: 'system-data-health', label: 'System Data Health', icon: 'pi-database' },
-    { value: 'analytics-export', label: 'Analytics Export Hub', icon: 'pi-file-export' },
-    { value: 'time-analytics', label: 'Time Analytics', icon: 'pi-history' }
+    { value: 'dashboard-ui', label: 'Executive', icon: 'pi-objects-column' },
+    { value: 'realtime', label: 'Live Monitor', icon: 'pi-bolt' },
+    { value: 'financial-trend', label: 'Trends', icon: 'pi-chart-line' },
+    { value: 'financial-dashboard', label: 'Financials', icon: 'pi-wallet' },
+    { value: 'cash-flow', label: 'Cash Flow', icon: 'pi-money-bill' },
+    { value: 'order-funnel', label: 'Funnel', icon: 'pi-filter' },
+    { value: 'product-performance', label: 'Products', icon: 'pi-box' },
+    { value: 'dead-stock', label: 'Inventory Health', icon: 'pi-exclamation-circle' },
+    { value: 'customer-intelligence', label: 'Customer 360', icon: 'pi-users' },
+    { value: 'customer-segmentation', label: 'Segments', icon: 'pi-sitemap' },
+    { value: 'customer-ltv', label: 'LTV Analysis', icon: 'pi-star' },
+    { value: 'predictive-analytics', label: 'Predictive', icon: 'pi-brain' },
+    { value: 'sales-forecast', label: 'Forecast', icon: 'pi-chart-bar' },
+    { value: 'sales-distribution', label: 'Sales Mix', icon: 'pi-chart-pie' },
+    { value: 'operational-metrics', label: 'Operations', icon: 'pi-cog' },
+    { value: 'peak-hours', label: 'Peak Hours', icon: 'pi-clock' },
+    { value: 'staff-performance', label: 'Staff Stats', icon: 'pi-user-edit' },
+    { value: 'branch-radar', label: 'Radar View', icon: 'pi-compass' },
+    { value: 'system-audit', label: 'Audit Logs', icon: 'pi-list-check' },
+    { value: 'compliance-dashboard', label: 'Compliance', icon: 'pi-shield' },
+    { value: 'system-data-health', label: 'Data Health', icon: 'pi-database' },
+    { value: 'analytics-export', label: 'Export Hub', icon: 'pi-download' },
+    { value: 'time-analytics', label: 'Time Analysis', icon: 'pi-calendar' },
+    { value: 'branch-comparison', label: 'Branch Comp.', icon: 'pi-building' }
   ];
 
   constructor() { }
   
   ngOnInit() {
-    // Set default component on load
     this.selectedComponent = this.componentOptions[0];
   }
   
-  ngOnDestroy() {
-    // Cleanup if needed
-  }
-
-  getSelectorStyle(): any {
-    return {
-      'width': '100%',
-      'background': 'var(--bg-secondary)',
-      'border': 'var(--ui-border-width) solid var(--border-primary)',
-      'color': 'var(--text-primary)',
-      'fontFamily': 'var(--font-body)',
-      'fontSize': 'var(--font-size-sm)'
-    };
-  }
-  
-  /**
-   * View the first selected component from footer
-   */
-  viewFirstSelected(): void {
-    if (this.selectedComponents.length > 0) {
-      this.selectedComponent = this.selectedComponents[0];
-    }
-  }
-  
-  /**
-   * Track component changes
-   */
-  onComponentChange(): void {
-    // Add any logic needed when component changes
-    console.log('Component changed to:', this.selectedComponent);
-  }
+  ngOnDestroy() {}
 }
+// import { CommonModule } from '@angular/common';
+// import { FormsModule } from '@angular/forms';
+// import { Component, OnInit, OnDestroy } from '@angular/core';
+
+// // PrimeNG Imports
+// import { SelectModule } from 'primeng/select';
+// import { MultiSelectModule } from 'primeng/multiselect';
+// import { ButtonModule } from 'primeng/button';
+// import { TooltipModule } from 'primeng/tooltip';
+// import { AvatarModule } from 'primeng/avatar';
+// import { ScrollPanelModule } from 'primeng/scrollpanel';
+
+// // Component Imports
+// import { RealTimeMonitoringComponent } from "./components/real-time-monitoring.component";
+// import { FinancialTrendChartComponent } from "./components/financial-trend-chart.component";
+// import { SystemAuditAlertsComponent } from "./components/system-audit-alerts.component";
+// import { BranchComparisonComponent } from "./components/admin.branch.comparison";
+// import { FinancialDashboardComponent } from "./components/admin.finanical.analytics";
+// import { CashFlowAnalysisComponent } from "./components/admin.cashflow";
+// import { EmiAnalyticsComponent } from "./components/emi-analytics.component";
+// import { CustomerIntelligenceComponent } from "./components/customer-intelligence.component";
+// import { CustomerSegmentationComponent } from "./components/customer-segmentation.component";
+// import { CustomerLtvAnalysisComponent } from "./components/customer-ltv-analysis.component";
+// import { ProductPerformanceComponent } from "./components/product-performance.component";
+// import { DeadStockAnalysisComponent } from "./components/dead-stock-analysis.component";
+// import { OrderFunnelChartComponent } from "./components/order-funnel-chart.component";
+// import { SalesDistributionChartComponent } from "./components/sales-distribution-chart.component";
+// import { PredictiveAnalyticsComponent } from "./components/predictive-analytics.component";
+// import { SalesForecastComponent } from "./components/sales-forecast.component";
+// import { OperationalMetricsComponent } from "./components/operational-metrics.component";
+// import { PeakHoursAnalysisComponent } from "./components/peak-hours-analysis.component";
+// import { StaffPerformanceAnalysisComponent } from "./components/staff-performance-analysis.component";
+// import { BranchRadarChartComponent } from "./components/branch-radar-chart.component";
+// import { ComplianceDashboardComponent } from "./components/compliance-dashboard.component";
+// import { SystemDataHealthComponent } from "./components/system-data-health.component";
+// import { AnalyticsExportHubComponent } from "./components/analytics-export-hub.component";
+// import { TimeAnalyticsComponent } from "./components/time-analytics.component";
+// import { DashboardUI } from "./components/dashboard.ui";
+
+// @Component({
+//   selector: 'app-admin-dashboard',
+//   standalone: true,
+//   imports: [CommonModule, FormsModule,SelectModule, MultiSelectModule, ButtonModule, TooltipModule,AvatarModule, ScrollPanelModule,RealTimeMonitoringComponent,FinancialTrendChartComponent,SystemAuditAlertsComponent,BranchComparisonComponent,FinancialDashboardComponent,CashFlowAnalysisComponent,EmiAnalyticsComponent,CustomerIntelligenceComponent,CustomerSegmentationComponent,CustomerLtvAnalysisComponent,ProductPerformanceComponent,DeadStockAnalysisComponent,OrderFunnelChartComponent,SalesDistributionChartComponent,PredictiveAnalyticsComponent,SalesForecastComponent,OperationalMetricsComponent,PeakHoursAnalysisComponent,StaffPerformanceAnalysisComponent,BranchRadarChartComponent,ComplianceDashboardComponent,SystemDataHealthComponent,AnalyticsExportHubComponent,TimeAnalyticsComponent,     DashboardUI
+//   ],
+//    template: `
+//     <div class="admin-layout">
+      
+//       <header class="dashboard-header">
+//         <div class="header-inner">
+          
+//           <div class="tabs-wrapper">
+//             <div class="tabs-scroll-area custom-scrollbar">
+//               <div class="tabs-track">
+//                 @for (comp of componentOptions; track comp.value) {
+//                   <button 
+//                     class="tab-pill"
+//                     [class.active]="selectedComponent?.value === comp.value"
+//                     (click)="selectedComponent = comp">
+//                     <i [class]="'pi ' + comp.icon"></i>
+//                     <span>{{comp.label}}</span>
+//                     @if (selectedComponent?.value === comp.value) {
+//                       <span class="active-indicator" ></span>
+//                     }
+//                   </button>
+//                 }
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       </header>
+      
+//       <main class="dashboard-content">
+//         <div class="content-wrapper">
+          
+//           @switch (selectedComponent?.value) {
+            
+//             @case ('dashboard-ui') {
+//               <app-admin-dashboard-Ui class="component-host"></app-admin-dashboard-Ui>
+//             }
+//             @case ('realtime') {
+//               <app-real-time-monitoring class="component-host"></app-real-time-monitoring>
+//             }
+//             @case ('financial-trend') {
+//               <app-financial-trend-chart class="component-host"></app-financial-trend-chart>
+//             }
+//             @case ('system-audit') {
+//               <app-system-audit-alerts class="component-host"></app-system-audit-alerts>
+//             }
+//             @case ('branch-comparison') {
+//               <app-branch-comparison class="component-host"></app-branch-comparison>
+//             }
+//             @case ('financial-dashboard') {
+//               <app-financial-dashboard class="component-host"></app-financial-dashboard>
+//             }
+//             @case ('cash-flow') {
+//               <app-cash-flow-analysis class="component-host"></app-cash-flow-analysis>
+//             }
+//             @case ('emi-analytics') {
+//               <app-emi-analytics class="component-host"></app-emi-analytics>
+//             }
+//             @case ('customer-intelligence') {
+//               <app-customer-intelligence class="component-host"></app-customer-intelligence>
+//             }
+//             @case ('customer-segmentation') {
+//               <app-customer-segmentation class="component-host"></app-customer-segmentation>
+//             }
+//             @case ('customer-ltv') {
+//               <app-customer-ltv-analysis class="component-host"></app-customer-ltv-analysis>
+//             }
+//             @case ('product-performance') {
+//               <app-product-performance class="component-host"></app-product-performance>
+//             }
+//             @case ('dead-stock') {
+//               <app-dead-stock-analysis class="component-host"></app-dead-stock-analysis>
+//             }
+//             @case ('order-funnel') {
+//               <app-order-funnel-chart class="component-host"></app-order-funnel-chart>
+//             }
+//             @case ('sales-distribution') {
+//               <app-sales-distribution-chart class="component-host"></app-sales-distribution-chart>
+//             }
+//             @case ('predictive-analytics') {
+//               <app-predictive-analytics class="component-host"></app-predictive-analytics>
+//             }
+//             @case ('sales-forecast') {
+//               <app-sales-forecast class="component-host"></app-sales-forecast>
+//             }
+//             @case ('operational-metrics') {
+//               <app-operational-metrics class="component-host"></app-operational-metrics>
+//             }
+//             @case ('peak-hours') {
+//               <app-peak-hours-analysis class="component-host"></app-peak-hours-analysis>
+//             }
+//             @case ('staff-performance') {
+//               <app-staff-performance-analysis class="component-host"></app-staff-performance-analysis>
+//             }
+//             @case ('branch-radar') {
+//               <app-branch-radar-chart class="component-host"></app-branch-radar-chart>
+//             }
+//             @case ('compliance-dashboard') {
+//               <app-compliance-dashboard class="component-host"></app-compliance-dashboard>
+//             }
+//             @case ('system-data-health') {
+//               <app-system-data-health class="component-host"></app-system-data-health>
+//             }
+//             @case ('analytics-export') {
+//               <app-analytics-export-hub class="component-host"></app-analytics-export-hub>
+//             }
+//             @case ('time-analytics') {
+//               <app-time-analytics class="component-host"></app-time-analytics>
+//             }
+
+//             @default {
+//               <div class="empty-state-container">
+//                 <div class="empty-content">
+//                   <div class="empty-icon-circle">
+//                     <i class="pi pi-chart-bar"></i>
+//                   </div>
+//                   <h2 class="empty-title">Analytics HQ</h2>
+//                   <p class="empty-desc">Select a module from the navigation bar above to view detailed metrics, reports, and insights.</p>
+                  
+//                   <div class="shortcut-grid">
+//                     <div class="shortcut-card" (click)="selectedComponent = componentOptions[1]">
+//                       <i class="pi pi-bolt shortcut-icon"></i>
+//                       <span>Live Monitor</span>
+//                     </div>
+//                     <div class="shortcut-card" (click)="selectedComponent = componentOptions[8]">
+//                       <i class="pi pi-users shortcut-icon"></i>
+//                       <span>Customers</span>
+//                     </div>
+//                     <div class="shortcut-card" (click)="selectedComponent = componentOptions[5]">
+//                       <i class="pi pi-wallet shortcut-icon"></i>
+//                       <span>Financials</span>
+//                     </div>
+//                     <div class="shortcut-card" (click)="selectedComponent = componentOptions[11]">
+//                       <i class="pi pi-box shortcut-icon"></i>
+//                       <span>Inventory</span>
+//                     </div>
+//                   </div>
+//                 </div>
+//               </div>
+//             }
+
+//           }
+//         </div>
+//       </main>
+//     </div>
+//   `,
+//   styles: [`
+//     /* ===== LAYOUT ===== */
+//     :host {
+//       display: block;
+//       height: 100vh;
+//       overflow: hidden; /* Prevent body scroll */
+//       background: var(--bg-primary);
+//       color: var(--text-primary);
+//       font-family: var(--font-body);
+//     }
+
+//     .admin-layout {
+//       display: flex;
+//       flex-direction: column;
+//       height: 100%;
+//     }
+
+//     /* ===== HEADER (SOLID) ===== */
+//     .dashboard-header {
+//       flex-shrink: 0;
+//       /* Solid Background using theme token */
+//       background: var(--bg-secondary); 
+//       border-bottom: 1px solid var(--border-primary);
+//       position: sticky;
+//       top: 0;
+//       z-index: 50;
+//       box-shadow: var(--shadow-sm); /* Slight shadow for separation */
+//     }
+
+//     .header-inner {
+//       padding: var(--spacing-sm) var(--spacing-lg);
+//     }
+
+//     /* ===== TABS ===== */
+//     .tabs-wrapper {
+//       position: relative;
+//     }
+
+//     .tabs-scroll-area {
+//       overflow-x: auto;
+//       scrollbar-width: none; /* Firefox */
+//       -ms-overflow-style: none; /* IE */
+//       padding-bottom: 2px;
+//     }
+//     .tabs-scroll-area::-webkit-scrollbar { display: none; }
+
+//     .tabs-track {
+//       display: flex;
+//       gap: var(--spacing-sm);
+//       padding: var(--spacing-xs) 0;
+//       min-width: max-content;
+//     }
+
+//     .tab-pill {
+//       position: relative;
+//       display: flex;
+//       align-items: center;
+//       gap: var(--spacing-sm);
+//       padding: 8px 16px;
+//       border-radius: 99px;
+//       background: transparent;
+//       border: 1px solid transparent;
+//       color: var(--text-secondary);
+//       font-size: var(--font-size-sm);
+//       font-weight: 600;
+//       cursor: pointer;
+//       transition: all 0.2s ease;
+//     }
+
+//     .tab-pill:hover {
+//       background: var(--bg-ternary);
+//       color: var(--text-primary);
+//     }
+
+//     .tab-pill.active {
+//       background: var(--accent-focus); /* Low opacity accent */
+//       color: var(--accent-primary);
+//       border-color: var(--accent-secondary);
+//     }
+
+//     .tab-pill i { font-size: 0.9rem; }
+
+//     /* Indicator dots for active state */
+//     .active-indicator {
+//       position: absolute;
+//       bottom: -4px;
+//       left: 50%;
+//       transform: translateX(-50%);
+//       width: 4px;
+//       height: 4px;
+//       border-radius: 50%;
+//       background: var(--accent-primary);
+//     }
+
+//     /* ===== MAIN CONTENT ===== */
+//     .dashboard-content {
+//       flex: 1;
+//       overflow-y: auto; /* Scroll internally */
+//       background: var(--bg-primary);
+//       position: relative;
+//     }
+
+//     .content-wrapper {
+//       min-height: 100%; 
+//     }
+
+//     /* Host helper for child components */
+//     .component-host {
+//       display: block;
+//       min-height: 100%; 
+//     }
+
+//     /* ===== EMPTY STATE ===== */
+//     .empty-state-container {
+//       height: 100%;
+//       min-height: 70vh;
+//       display: flex;
+//       align-items: center;
+//       justify-content: center;
+//       padding: var(--spacing-2xl);
+//     }
+
+//     .empty-content {
+//       text-align: center;
+//       max-width: 480px;
+//     }
+
+//     .empty-icon-circle {
+//       width: 80px; height: 80px;
+//       border-radius: 50%;
+//       background: var(--accent-gradient);
+//       display: flex; align-items: center; justify-content: center;
+//       margin: 0 auto var(--spacing-lg);
+//       box-shadow: var(--shadow-lg);
+//     }
+//     .empty-icon-circle i { font-size: 2.5rem; color: #fff; }
+
+//     .empty-title {
+//       font-size: var(--font-size-2xl);
+//       font-weight: bold;
+//       color: var(--text-primary);
+//       margin: 0 0 var(--spacing-sm);
+//       letter-spacing: -0.01em;
+//     }
+
+//     .empty-desc {
+//       font-size: var(--font-size-sm);
+//       color: var(--text-secondary);
+//       line-height: 1.5;
+//       margin-bottom: var(--spacing-2xl);
+//     }
+
+//     .shortcut-grid {
+//       display: grid;
+//       grid-template-columns: repeat(2, 1fr);
+//       gap: var(--spacing-md);
+//     }
+
+//     .shortcut-card {
+//       background: var(--bg-secondary);
+//       border: 1px solid var(--border-primary);
+//       border-radius: var(--ui-border-radius);
+//       padding: var(--spacing-lg);
+//       display: flex;
+//       flex-direction: column;
+//       align-items: center;
+//       gap: var(--spacing-sm);
+//       cursor: pointer;
+//       transition: var(--transition-base);
+//     }
+//     .shortcut-card:hover {
+//       border-color: var(--accent-primary);
+//       transform: translateY(-2px);
+//       background: var(--bg-ternary);
+//     }
+
+//     .shortcut-icon { font-size: 1.5rem; color: var(--accent-primary); }
+//     .shortcut-card span { font-size: var(--font-size-xs); font-weight: bold; color: var(--text-primary); }
+
+//     /* ===== SCROLLBAR UTILITY ===== */
+//     .custom-scrollbar::-webkit-scrollbar { height: 4px; width: 4px; }
+//     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+//     .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border-primary); border-radius: 4px; }
+//     .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+//   `]
+// })
+
+// export class AdminDashboardComponent implements OnInit, OnDestroy {
+//   // Currently selected single component
+//   selectedComponent: any = null;
+  
+//   // Multiple selected components for footer
+//   selectedComponents: any[] = [];
+  
+//   // All 25 components with metadata
+//   componentOptions = [
+//     { value: 'dashboard-ui', label: 'Dashboard', icon: 'pi-screen' },
+//     { value: 'realtime', label: 'Real-Time Monitoring', icon: 'pi-eye' },
+//     { value: 'financial-trend', label: 'Financial Trends', icon: 'pi-chart-line' },
+//     { value: 'system-audit', label: 'System Audit Alerts', icon: 'pi-shield' },
+//     { value: 'branch-comparison', label: 'Branch Comparison', icon: 'pi-building' },
+//     { value: 'financial-dashboard', label: 'Financial Dashboard', icon: 'pi-wallet' },
+//     { value: 'cash-flow', label: 'Cash Flow Analysis', icon: 'pi-money-bill' },
+//     { value: 'emi-analytics', label: 'EMI Analytics', icon: 'pi-credit-card' },
+//     { value: 'customer-intelligence', label: 'Customer Intelligence', icon: 'pi-user' },
+//     { value: 'customer-segmentation', label: 'Customer Segmentation', icon: 'pi-sitemap' },
+//     { value: 'customer-ltv', label: 'Customer LTV Analysis', icon: 'pi-star' },
+//     { value: 'product-performance', label: 'Product Performance', icon: 'pi-shopping-bag' },
+//     { value: 'dead-stock', label: 'Dead Stock Analysis', icon: 'pi-exclamation-circle' },
+//     { value: 'order-funnel', label: 'Order Funnel Chart', icon: 'pi-filter' },
+//     { value: 'sales-distribution', label: 'Sales Distribution', icon: 'pi-chart-pie' },
+//     { value: 'predictive-analytics', label: 'Predictive Analytics', icon: 'pi-brain' },
+//     { value: 'sales-forecast', label: 'Sales Forecast', icon: 'pi-chart-bar' },
+//     { value: 'operational-metrics', label: 'Operational Metrics', icon: 'pi-cog' },
+//     { value: 'peak-hours', label: 'Peak Hours Analysis', icon: 'pi-clock' },
+//     { value: 'staff-performance', label: 'Staff Performance', icon: 'pi-user-edit' },
+//     { value: 'branch-radar', label: 'Branch Radar Chart', icon: 'pi-radar-chart' },
+//     { value: 'compliance-dashboard', label: 'Compliance Dashboard', icon: 'pi-shield' },
+//     { value: 'system-data-health', label: 'System Data Health', icon: 'pi-database' },
+//     { value: 'analytics-export', label: 'Analytics Export Hub', icon: 'pi-file-export' },
+//     { value: 'time-analytics', label: 'Time Analytics', icon: 'pi-history' }
+//   ];
+
+//   constructor() { }
+  
+//   ngOnInit() {
+//     // Set default component on load
+//     this.selectedComponent = this.componentOptions[0];
+//   }
+  
+//   ngOnDestroy() {
+//     // Cleanup if needed
+//   }
+
+//   getSelectorStyle(): any {
+//     return {
+//       'width': '100%',
+//       'background': 'var(--bg-secondary)',
+//       'border': 'var(--ui-border-width) solid var(--border-primary)',
+//       'color': 'var(--text-primary)',
+//       'fontFamily': 'var(--font-body)',
+//       'fontSize': 'var(--font-size-sm)'
+//     };
+//   }
+  
+//   /**
+//    * View the first selected component from footer
+//    */
+//   viewFirstSelected(): void {
+//     if (this.selectedComponents.length > 0) {
+//       this.selectedComponent = this.selectedComponents[0];
+//     }
+//   }
+  
+//   /**
+//    * Track component changes
+//    */
+//   onComponentChange(): void {
+//     // Add any logic needed when component changes
+//     console.log('Component changed to:', this.selectedComponent);
+//   }
+// }
 

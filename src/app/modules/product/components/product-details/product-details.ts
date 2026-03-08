@@ -4,13 +4,13 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { finalize, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 
-// PrimeNG Imports (Kept for layout/feedback, removed Table)
+// PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
 import { CarouselModule } from 'primeng/carousel';
 import { TooltipModule } from 'primeng/tooltip';
-import { ToastModule } from 'primeng/toast';
+import { ToastModule } from 'primeng/toast'; import { DialogService } from 'primeng/dynamicdialog';
 
 // Services & Shared
 import { ProductService } from '../../services/product-service';
@@ -20,85 +20,57 @@ import { CommonMethodService } from '../../../../core/utils/common-method.servic
 import { ImageViewerDirective } from '../../../shared/directives/image-viewer.directive';
 import { ProductAnalyticsDirective } from '../../../../core/interceptors/pProductAnalyticsDirective';
 import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
+import { StockAdjustmentComponent } from '../stock-adjustment/stock-adjustment';
+import { StockTransferComponent } from '../stoct-transfer/stoct-transfer';
+import { ProductHistoryComponent } from '../product-history/product-history';
+import { DynamicDialogServices } from '../../../../core/services/dynamic-dialog-services';
+
+// Import the dialog component (Ensure path is correct)
 
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [
-    CommonModule, 
-    RouterModule, 
-    ButtonModule, 
-    TagModule, 
-    SkeletonModule, 
-    CarouselModule, 
-    TooltipModule,
-    ToastModule,
-    ImageViewerDirective,
-    ProductAnalyticsDirective,
-    AgShareGrid // 👈 Added
-  ],
+  imports: [CommonModule, RouterModule, ButtonModule, TagModule, SkeletonModule, CarouselModule, TooltipModule, ToastModule, ImageViewerDirective, ProductAnalyticsDirective, AgShareGrid],
+  providers: [DialogService],
   templateUrl: './product-details.html',
   styleUrls: ['./product-details.scss'],
 })
 export class ProductDetailsComponent implements OnInit {
-  // --- Injections ---
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private productService = inject(ProductService);
   private masterList = inject(MasterListService);
   private messageService = inject(AppMessageService);
   public common = inject(CommonMethodService);
-  private cdr = inject(ChangeDetectorRef);
+  private cdr = inject(ChangeDetectorRef); 
+  private dialogService = inject(DialogService);
 
-  // --- Signals ---
   product = signal<any | null>(null);
   loading = signal(true);
   isError = signal(false);
-  
-  // Inventory Grid Data
-  inventoryData: any[] = [];
-  inventoryColumns: any[] = [];
 
-  // Helpers
+  inventoryData: any[] = [];
+  inventoryColumns: any[] = []; productId: string | null = null;
+
   branchNameMap = new Map<string, string>();
 
   constructor() {
-    // Populate branch map for quick lookup
     effect(() => {
       this.masterList.branches().forEach(b => this.branchNameMap.set(b._id, b.name));
     });
   }
 
   ngOnInit(): void {
-    this.setupInventoryColumns(); // Prepare Grid Columns
-    
-    this.route.paramMap.pipe(
-      switchMap(params => {
-        const id = params.get('id');
-        if (!id) return of(null);
-        
-        this.loading.set(true);
-        this.isError.set(false);
-        return this.productService.getProductById(id).pipe(
-          finalize(() => this.loading.set(false))
-        );
-      })
-    ).subscribe({
-      next: (res: any) => {
-        if (res?.data?.data || res?.data) {
-          const p = res.data.data || res.data;
-          this.product.set(p);
-          // Set Grid Data
-          this.inventoryData = p.inventory || [];
-        } else {
-          this.isError.set(true);
-        }
-      },
-      error: () => this.isError.set(true)
+    this.setupInventoryColumns();
+
+    this.route.paramMap.subscribe(params => {
+      this.productId = params.get('id'); this.loadProductData();
     });
   }
 
-  // --- AG Grid Setup for Inventory ---
+
+
+ 
   setupInventoryColumns() {
     this.inventoryColumns = [
       {
@@ -106,19 +78,20 @@ export class ProductDetailsComponent implements OnInit {
         field: 'branchId',
         width: 150,
         cellRenderer: (params: any) => {
-          // Handle both populated object or raw ID
+          if (!params.value) return '';
           const id = typeof params.value === 'object' ? params.value?._id : params.value;
           const name = this.branchNameMap.get(id) || 'Unknown Branch';
-          return `<div style="font-weight:600; color:var(--text-primary);">${name}</div>`;
+          return `<div style="font-weight:600;">${name}</div>`;
         }
       },
       {
         headerName: 'Current Stock',
         field: 'quantity',
         width: 130,
-        cellStyle: { 'justify-content': 'flex-end', 'display': 'flex' }, // Right align numbers
+        cellStyle: { 'justify-content': 'flex-end', 'display': 'flex' },
         cellRenderer: (params: any) => {
-          return `<div style="font-family:var(--font-mono); font-weight:700; color:var(--text-primary);">${params.value}</div>`;
+          const val = params.value !== undefined ? params.value : 0;
+          return `<div style="font-family:monospace; font-weight:700;">${val}</div>`;
         }
       },
       {
@@ -126,30 +99,30 @@ export class ProductDetailsComponent implements OnInit {
         field: 'reorderLevel',
         width: 130,
         cellStyle: { 'justify-content': 'flex-end', 'display': 'flex' },
-        cellRenderer: (params: any) => {
-           return `<div style="font-family:var(--font-mono); color:var(--text-tertiary);">${params.value}</div>`;
-        }
+        cellRenderer: (params: any) => params.value
       },
       {
         headerName: 'Status',
         width: 140,
         valueGetter: (params: any) => {
-          return params.data.quantity <= params.data.reorderLevel ? 'Low' : 'OK';
+          const qty = params.data.quantity || 0;
+          const reorder = params.data.reorderLevel || 0;
+          return qty <= reorder ? 'Low' : 'OK';
         },
         cellRenderer: (params: any) => {
           const isLow = params.value === 'Low';
-          const bg = isLow ? 'var(--bg-warning-subtle)' : 'var(--bg-success-subtle)'; // You'll need to ensure these map to your rgba tokens or use specific colors
-          const color = isLow ? '#d97706' : '#15803d'; // Fallback or token
+          const color = isLow ? '#d97706' : '#15803d';
+          const bg = isLow ? '#fffbeb' : '#ecfdf5';
+          const border = isLow ? '#fcd34d' : '#bbf7d0';
           const icon = isLow ? 'pi-exclamation-triangle' : 'pi-check-circle';
           const text = isLow ? 'LOW STOCK' : 'IN STOCK';
 
-          // Inline styles using variables where possible
           return `
             <div style="display:flex; align-items:center; height:100%;">
               <span style="
-                background-color: ${isLow ? '#fffbeb' : '#ecfdf5'}; 
+                background-color: ${bg}; 
                 color: ${color}; 
-                border: 1px solid ${isLow ? '#fcd34d' : '#bbf7d0'};
+                border: 1px solid ${border};
                 padding: 2px 8px; 
                 border-radius: 4px; 
                 font-size: 10px; 
@@ -165,8 +138,6 @@ export class ProductDetailsComponent implements OnInit {
     ];
   }
 
-  // --- Logic Helpers ---
-
   formatCurrency(val: any): string {
     return this.common.formatCurrency(val);
   }
@@ -176,42 +147,104 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   calculateMargin(p: any): string {
-    if (!p.sellingPrice || !p.purchasePrice) return '0.00';
+    if (!p?.sellingPrice || !p?.purchasePrice) return '0.00';
     const margin = ((p.sellingPrice - p.purchasePrice) / p.sellingPrice) * 100;
     return margin.toFixed(2);
   }
 
   getFilteredTags(): string[] {
-    return this.product()?.tags?.filter((t: string) => t.trim()) || [];
+    return this.product()?.tags?.filter((t: string) => t && t.trim()) || [];
   }
 
-  // --- Actions ---
+loadProductData() {
+    if (!this.productId) return;
 
-  openStockAdjustment() {
-    this.messageService.showInfo('Coming Soon', 'Stock adjustment module in progress');
+    this.loading.set(true);
+    this.isError.set(false);
+
+    this.productService.getProductById(this.productId).pipe(
+      finalize(() => this.loading.set(false))
+    ).subscribe({
+      next: (res: any) => {
+        if (res?.data?.data || res?.data) {
+          const p = res.data.data || res.data;
+          
+          // Safeguard the inventory calculation
+          const calculatedStock = p.inventory?.reduce((acc: number, item: any) => acc + (item.quantity || 0), 0) || 0;
+          p.totalStock = calculatedStock;
+          
+          this.product.set(p);
+          this.inventoryData = [...(p.inventory || [])];
+        } else {
+          this.isError.set(true);
+          this.messageService.showError('Product data not found.');
+        }
+      },
+      error: (err) => {
+        this.isError.set(true);
+        // Integrated global error handler for timeouts or 404s
+        this.messageService.handleHttpError(err);
+      }
+    });
   }
 
   onFileSelected(event: any) {
     const files = event.target.files;
-    if (files?.length) {
-      const formData = new FormData();
-      for (let i = 0; i < files.length; i++) {
-        formData.append('photos', files[i]);
-      }
-      this.loading.set(true);
-      this.productService.uploadProductFile(this.product()._id, formData)
-        .pipe(finalize(() => this.loading.set(false)))
-        .subscribe((res: any) => {
+    const prod = this.product();
+    
+    // Fast exit if no files or no product ID
+    if (!files?.length || !prod?._id) return; 
+
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      formData.append('photos', files[i]);
+    }
+    
+    this.loading.set(true);
+    
+    this.productService.uploadProductFile(prod._id, formData)
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: (res: any) => {
           if (res?.data?.product) {
             this.product.set(res.data.product);
-            this.messageService.showSuccess('Success', 'Images uploaded successfully');
+            // Updated to single string format
+            this.messageService.showSuccess('Images uploaded successfully.');
           }
-        });
+        },
+        error: (err) => {
+          // Previously missing! Now catches large file errors or network drops.
+          this.messageService.handleHttpError(err);
+        }
+      });
+  }
+
+  eventFromGrid(event: any) {
+  }
+
+  private dialogHelper = inject(DynamicDialogServices);
+
+  openStockAdjustment(product: any) {
+    const ref = this.dialogHelper.openStockAdjustment(product);
+    if (ref) {
+      ref.onClose.subscribe((success: boolean) => {
+        if (success) {
+          this.loadProductData(); 
+        }
+      });
     }
   }
 
-  // Grid Event Listener (Optional if you need row clicks in inventory)
-  eventFromGrid(event: any) {
-     // Handle grid events if necessary
+  openHistory(product: any) {
+    const ref = this.dialogHelper.openProductHistory(product);
+  }
+
+  openStockTransfer(product: any) {
+    const ref = this.dialogHelper.openStockTransfer(product);
+    if (ref) {
+      ref.onClose.subscribe((success: boolean) => {
+        if (success) this.loadProductData();
+      });
+    }
   }
 }

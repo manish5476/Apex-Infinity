@@ -1,0 +1,676 @@
+   <div class="detail-container">
+      @if (isLoading()) {
+        <div class="loading-overlay">
+          <div class="spinner"></div>
+        </div>
+      }
+
+      @if (note(); as note) {
+        @if (isTrash()) {
+          <div class="system-banner danger">
+            <div class="banner-content">
+              <i class="pi pi-trash"></i>
+              <span>This note is in the trash. It will be permanently deleted in 30 days.</span>
+            </div>
+            <div class="banner-actions">
+              <button class="btn-text" (click)="deleteNote()">Delete Forever</button>
+              <button class="btn-solid" (click)="restoreNote()">Restore Note</button>
+            </div>
+          </div>
+        }
+        @if (isArchived()) {
+          <div class="system-banner warning">
+            <div class="banner-content">
+              <i class="pi pi-box"></i>
+              <span>This note is archived and read-only.</span>
+            </div>
+            <button class="btn-solid" (click)="restoreNote()">Unarchive</button>
+          </div>
+        }
+
+        <!-- ==================== HEADER ==================== -->
+        <header class="detail-header">
+          <div class="left-nav">
+            <button class="btn-back" routerLink="/notes">
+              <i class="pi pi-arrow-left"></i> Back
+            </button>
+            <div class="breadcrumbs">
+              <span class="crumb">Notes</span>
+              <span class="separator">/</span>
+              <span class="crumb active">{{ note.title }}</span>
+            </div>
+          </div>
+
+          <div class="actions">
+            @if (!isEditing()) {
+              <span class="status-badge" [ngClass]="note.status">{{ note.status | titlecase }}</span>
+              
+              @if (!isTrash() && !isArchived()) {
+                <button class="btn-icon" (click)="duplicateNote()" title="Duplicate Note">
+                  <i class="pi pi-copy"></i>
+                </button>
+                <button class="btn-icon" (click)="convertToTask()" title="Convert to Task">
+                  <i class="pi pi-check-square"></i>
+                </button>
+                <button class="btn-icon" (click)="archiveNote()" title="Archive">
+                  <i class="pi pi-box"></i>
+                </button>
+                <div class="divider-v"></div>
+                <button class="btn-primary" (click)="toggleEdit()">
+                  <i class="pi pi-pencil"></i> Edit
+                </button>
+              }
+            }
+
+            @if (isEditing()) {
+              <button class="btn-ghost" (click)="toggleEdit()">Cancel</button>
+              <button class="btn-primary" (click)="saveChanges()" [disabled]="isSaving()">
+                <i class="pi" [ngClass]="isSaving() ? 'pi-spin pi-spinner' : 'pi-check'"></i>
+                {{ isSaving() ? 'Saving...' : 'Done' }}
+              </button>
+            }
+          </div>
+        </header>
+
+        <div class="content-grid">
+
+          <!-- ==================== MAIN DOCUMENT ==================== -->
+          <main class="main-panel glass-panel" [class.editing]="isEditing()">
+
+            <!-- READ MODE -->
+            @if (!isEditing()) {
+              <div class="read-view">
+                <h1 class="note-title">{{ note.title }}</h1>
+
+                <div class="meta-row">
+                  <span class="priority-tag" [ngClass]="note.priority">
+                    <i class="pi pi-flag"></i> {{ note.priority | titlecase }} Priority
+                  </span>
+                  
+                  <!-- IMPROVED DATE DISPLAY -->
+                  <span class="meta-item">
+                    <i class="pi pi-calendar"></i> 
+                    {{ (note.startDate || note.updatedAt) | date:'mediumDate' }}
+                    @if(note.noteType === 'meeting' && note.startDate) {
+                       at {{ note.startDate | date:'shortTime' }}
+                    }
+                  </span>
+
+                  @if (note.noteType === 'meeting') {
+                    <span class="meta-item highlight">
+                      <i class="pi pi-video"></i> Meeting
+                    </span>
+                  }
+                </div>
+
+                <!-- Content Body -->
+                <div class="note-body ql-editor" [innerHTML]="note.content"></div>
+
+                <!-- Checklist / Subtasks -->
+                <div class="subtasks-section">
+                  <div class="section-header">
+                    <h3>Checklist</h3>
+                    @if (note.subtasks?.length) {
+                      <span class="progress-text">{{ progress() }}% Done</span>
+                    }
+                  </div>
+
+                  @if (note.subtasks?.length) {
+                    <div class="progress-track">
+                      <div class="progress-fill" [style.width.%]="progress()"></div>
+                    </div>
+                  }
+
+                  <div class="subtask-list">
+                    @for (task of note.subtasks; track task._id) {
+                      <div class="subtask-item">
+                        <label class="custom-checkbox">
+                          <input type="checkbox" [checked]="task.completed" (change)="toggleSubtask(task)">
+                          <span class="checkmark"></span>
+                        </label>
+                        <span class="task-text" [class.completed]="task.completed">{{ task.title }}</span>
+                        <button class="btn-remove-task" (click)="deleteSubtask(task._id!)">
+                          <i class="pi pi-times"></i>
+                        </button>
+                      </div>
+                    }
+                  </div>
+
+                  <div class="add-subtask-row">
+                    <i class="pi pi-plus"></i>
+                    <input #taskInput type="text" placeholder="Add an item..." (keyup.enter)="addSubtask(taskInput)">
+                  </div>
+                </div>
+
+                <!-- Linked References (Backlinks) -->
+                <div class="linked-section">
+                  <div class="section-header">
+                    <h3>Linked References</h3>
+                    <button class="btn-sm-action" (click)="openLinkDialog()">+ Link Note</button>
+                  </div>
+                  
+                  @if (note.relatedNotes?.length) {
+                    <div class="links-grid">
+                      @for (link of note.relatedNotes; track $any(link)._id) {
+                        <div class="link-card" routerLink="/notes/{{$any(link)._id}}">
+                          <i class="pi pi-link"></i>
+                          <span class="link-title">{{ $any(link).title || 'Untitled Note' }}</span>
+                          <button class="btn-unlink" (click)="$event.stopPropagation(); unlinkNote($any(link)._id)">×</button>
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <p class="empty-text">No linked notes.</p>
+                  }
+                </div>
+
+                <!-- Tags Footer -->
+                @if (note.tags.length) {
+                  <div class="tags-footer">
+                    @for (tag of note.tags; track tag) {
+                      <span class="tag">#{{ tag }}</span>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- EDIT MODE -->
+            @if (isEditing()) {
+              <form [formGroup]="editForm" class="edit-form">
+                <div class="form-header">
+                  <input type="text" formControlName="title" class="input-title-edit" placeholder="Note Title">
+                </div>
+
+                <div class="form-row">
+                  <div class="field-group">
+                    <label>Priority</label>
+                    <select formControlName="priority" class="input-std">
+                      <option value="low">Low</option>
+                      <option value="medium">Medium</option>
+                      <option value="high">High</option>
+                      <option value="urgent">Urgent</option>
+                    </select>
+                  </div>
+                  <div class="field-group">
+                    <label>Date</label>
+                    <input type="date" formControlName="startDate" class="input-std">
+                  </div>
+                </div>
+
+                <div class="editor-container">
+                  <p-editor formControlName="content" [style]="{ height: '400px' }">
+                      <ng-template pTemplate="header">
+                      <span class="ql-formats">
+                        <button type="button" class="ql-bold"></button>
+                        <button type="button" class="ql-italic"></button>
+                        <button type="button" class="ql-underline"></button>
+                      </span>
+                      <span class="ql-formats">
+                        <button type="button" class="ql-list" value="ordered"></button>
+                        <button type="button" class="ql-list" value="bullet"></button>
+                        <button type="button" class="ql-link"></button>
+                        <button type="button" class="ql-code-block"></button>
+                      </span>
+                    </ng-template>
+                  </p-editor>
+                </div>
+                
+                <div class="form-row">
+                   <div class="field-group full">
+                      <label>Tags (comma separated)</label>
+                      <input type="text" formControlName="tags" class="input-std">
+                   </div>
+                </div>
+              </form>
+            }
+
+          </main>
+
+          <!-- ==================== SIDEBAR ==================== -->
+          <aside class="sidebar-panel">
+
+            <!-- Meeting Widget -->
+            @if (note.noteType === 'meeting') {
+              <div class="widget glass-panel meeting-widget">
+                <h3>Meeting Details</h3>
+                
+                @if (note.startDate) {
+                  <div class="info-row">
+                    <i class="pi pi-calendar"></i>
+                    <span>{{ note.startDate | date:'mediumDate' }}</span>
+                  </div>
+                  <div class="info-row">
+                    <i class="pi pi-clock"></i>
+                    <span>{{ note.startDate | date:'shortTime' }} - {{ note.dueDate | date:'shortTime' }}</span>
+                  </div>
+                }
+
+                <div class="info-row">
+                  <i class="pi pi-map-marker"></i>
+                  <span>{{ note.meetingDetails?.location || 'No location' }}</span>
+                </div>
+                <div class="info-row">
+                  <i class="pi pi-video"></i>
+                  <a [href]="note.meetingDetails?.videoLink" target="_blank" class="link">
+                    {{ note.meetingDetails?.videoLink ? 'Join Call' : 'No Link' }}
+                  </a>
+                </div>
+              </div>
+            }
+
+            <!-- Attachments -->
+            <div class="widget glass-panel">
+              <div class="widget-header">
+                <h3>Attachments</h3>
+                <span class="badge">{{ note.attachments.length || 0 }}</span>
+              </div>
+              
+              @if (note.attachments.length) {
+                <ul class="file-list">
+                  @for (file of note.attachments; track file.fileName) {
+                    <li (click)="downloadAttachment(file)">
+                      <div class="file-icon-box">
+                        <i class="pi pi-file"></i>
+                      </div>
+                      <div class="file-info">
+                        <span class="name">{{ file.fileName }}</span>
+                        <span class="size">{{ file.size / 1024 | number:'1.0-0' }} KB</span>
+                      </div>
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <div class="empty-widget">No files attached</div>
+              }
+            </div>
+
+            <!-- Collaborators -->
+            <div class="widget glass-panel">
+              <h3>Collaborators</h3>
+              <div class="collaborators-list">
+                <div class="collaborator-row">
+                  <div class="avatar owner">{{ getInitials(note.owner.name) }}</div>
+                  <div class="collab-info">
+                    <span class="name">{{ note.owner.name || 'Unknown' }}</span>
+                    <span class="role">Owner</span>
+                  </div>
+                </div>
+                @for (p of note.participants; track p._id) {
+                  <div class="collaborator-row">
+                    <div class="avatar">{{ getInitials(p.user.name) }}</div>
+                    <div class="collab-info">
+                      <span class="name">{{ p.user.name || 'Guest' }}</span>
+                      <span class="role">{{ p.role }}</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- History -->
+            <div class="widget glass-panel history-widget">
+              <h3>Activity Log</h3>
+              <div class="activity-timeline">
+                @for (log of activityLog(); track log.timestamp) {
+                  <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                      <p class="log-text">
+                        <span class="user">{{ log.user.name || 'System' }}</span>
+                        {{ log.action }}
+                      </p>
+                      <span class="log-time">{{ log.timestamp | date:'shortTime' }}</span>
+                    </div>
+                  </div>
+                }
+                @if (activityLog().length === 0) {
+                  <div class="empty-widget">No recent history</div>
+                }
+              </div>
+            </div>
+
+          </aside>
+        </div>
+      }
+
+      @if (!isLoading() && !note()) {
+        <div class="empty-state">
+          <i class="pi pi-search" style="font-size: 3rem; opacity: 0.5;"></i>
+          <h2>Note not found</h2>
+          <button class="btn-primary" routerLink="/notes">Back to Library</button>
+        </div>
+      }
+
+    </div>
+    
+<!-- <div class="detail-container">
+
+ 
+  @if (isLoading()) {
+    <div class="loading-overlay">
+      <div class="spinner"></div>
+    </div>
+  }
+
+  @if (note(); as note) {
+
+   
+    @if (isTrash()) {
+      <div class="system-banner danger">
+        <div class="banner-content">
+          <i class="pi pi-trash"></i>
+          <span>This note is in the trash. It will be permanently deleted in 30 days.</span>
+        </div>
+        <div class="banner-actions">
+          <button class="btn-text" (click)="deleteNote()">Delete Forever</button>
+          <button class="btn-solid" (click)="restoreNote()">Restore Note</button>
+        </div>
+      </div>
+    }
+    @if (isArchived()) {
+      <div class="system-banner warning">
+        <div class="banner-content">
+          <i class="pi pi-box"></i>
+          <span>This note is archived and read-only.</span>
+        </div>
+        <button class="btn-solid" (click)="restoreNote()">Unarchive</button>
+      </div>
+    }
+
+   
+    <header class="detail-header">
+      <div class="left-nav">
+        <button class="btn-back" routerLink="/notes">
+          <i class="pi pi-arrow-left"></i> Back
+        </button>
+        <div class="breadcrumbs">
+          <span class="crumb">Notes</span>
+          <span class="separator">/</span>
+          <span class="crumb active">{{ note.title }}</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        @if (!isEditing()) {
+          <span class="status-badge" [ngClass]="note.status">{{ note.status | titlecase }}</span>
+          
+          @if (!isTrash() && !isArchived()) {
+            <button class="btn-icon" (click)="duplicateNote()" title="Duplicate Note">
+              <i class="pi pi-copy"></i>
+            </button>
+            <button class="btn-icon" (click)="convertToTask()" title="Convert to Task">
+              <i class="pi pi-check-square"></i>
+            </button>
+            <button class="btn-icon" (click)="archiveNote()" title="Archive">
+              <i class="pi pi-box"></i>
+            </button>
+            <div class="divider-v"></div>
+            <button class="btn-primary" (click)="toggleEdit()">
+              <i class="pi pi-pencil"></i> Edit
+            </button>
+          }
+        }
+
+        @if (isEditing()) {
+          <button class="btn-ghost" (click)="toggleEdit()">Cancel</button>
+          <button class="btn-primary" (click)="saveChanges()" [disabled]="isSaving()">
+            <i class="pi" [ngClass]="isSaving() ? 'pi-spin pi-spinner' : 'pi-check'"></i>
+            {{ isSaving() ? 'Saving...' : 'Done' }}
+          </button>
+        }
+      </div>
+    </header>
+
+    <div class="content-grid">
+
+     
+      <main class="main-panel glass-panel" [class.editing]="isEditing()">
+
+       
+        @if (!isEditing()) {
+          <div class="read-view">
+            <h1 class="note-title">{{ note.title }}</h1>
+
+            <div class="meta-row">
+              <span class="priority-tag" [ngClass]="note.priority">
+                <i class="pi pi-flag"></i> {{ note.priority | titlecase }} Priority
+              </span>
+              <span class="meta-item">
+                <i class="pi pi-calendar"></i> {{ note.updatedAt | date:'mediumDate' }}
+              </span>
+              @if (note.noteType === 'meeting') {
+                <span class="meta-item highlight">
+                  <i class="pi pi-video"></i> Meeting
+                </span>
+              }
+            </div>
+
+           
+            <div class="note-body ql-editor" [innerHTML]="note.content"></div>
+
+           
+            <div class="subtasks-section">
+              <div class="section-header">
+                <h3>Checklist</h3>
+                @if (note.subtasks?.length) {
+                  <span class="progress-text">{{ progress() }}% Done</span>
+                }
+              </div>
+
+              @if (note.subtasks?.length) {
+                <div class="progress-track">
+                  <div class="progress-fill" [style.width.%]="progress()"></div>
+                </div>
+              }
+
+              <div class="subtask-list">
+                @for (task of note.subtasks; track task._id) {
+                  <div class="subtask-item">
+                    <label class="custom-checkbox">
+                      <input type="checkbox" [checked]="task.completed" (change)="toggleSubtask(task)">
+                      <span class="checkmark"></span>
+                    </label>
+                    <span class="task-text" [class.completed]="task.completed">{{ task.title }}</span>
+                    <button class="btn-remove-task" (click)="deleteSubtask(task._id!)">
+                      <i class="pi pi-times"></i>
+                    </button>
+                  </div>
+                }
+              </div>
+
+              <div class="add-subtask-row">
+                <i class="pi pi-plus"></i>
+                <input #taskInput type="text" placeholder="Add an item..." (keyup.enter)="addSubtask(taskInput)">
+              </div>
+            </div>
+
+           
+            <div class="linked-section">
+              <div class="section-header">
+                <h3>Linked References</h3>
+                <button class="btn-sm-action" (click)="openLinkDialog()">+ Link Note</button>
+              </div>
+              
+              @if (note.relatedNotes?.length) {
+                <div class="links-grid">
+                  @for (link of note.relatedNotes; track $any(link)._id) {
+                    <div class="link-card" routerLink="/notes/{{$any(link)._id}}">
+                      <i class="pi pi-link"></i>
+                      <span class="link-title">{{ $any(link).title || 'Untitled Note' }}</span>
+                      <button class="btn-unlink" (click)="$event.stopPropagation(); unlinkNote($any(link)._id)">×</button>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <p class="empty-text">No linked notes.</p>
+              }
+            </div>
+
+           
+            @if (note.tags.length) {
+              <div class="tags-footer">
+                @for (tag of note.tags; track tag) {
+                  <span class="tag">#{{ tag }}</span>
+                }
+              </div>
+            }
+          </div>
+        }
+
+       
+        @if (isEditing()) {
+          <form [formGroup]="editForm" class="edit-form">
+            <div class="form-header">
+              <input type="text" formControlName="title" class="input-title-edit" placeholder="Note Title">
+            </div>
+
+            <div class="form-row">
+              <div class="field-group">
+                <label>Priority</label>
+                <select formControlName="priority" class="input-std">
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                  <option value="urgent">Urgent</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label>Date</label>
+                <input type="date" formControlName="startDate" class="input-std">
+              </div>
+            </div>
+
+            <div class="editor-container">
+              <p-editor formControlName="content" [style]="{ height: '400px' }">
+                  <ng-template pTemplate="header">
+                  <span class="ql-formats">
+                    <button type="button" class="ql-bold"></button>
+                    <button type="button" class="ql-italic"></button>
+                    <button type="button" class="ql-underline"></button>
+                  </span>
+                  <span class="ql-formats">
+                    <button type="button" class="ql-list" value="ordered"></button>
+                    <button type="button" class="ql-list" value="bullet"></button>
+                    <button type="button" class="ql-link"></button>
+                    <button type="button" class="ql-code-block"></button>
+                  </span>
+                </ng-template>
+              </p-editor>
+            </div>
+            
+            <div class="form-row">
+               <div class="field-group full">
+                  <label>Tags (comma separated)</label>
+                  <input type="text" formControlName="tags" class="input-std">
+               </div>
+            </div>
+          </form>
+        }
+
+      </main>
+
+     
+      <aside class="sidebar-panel">
+
+       
+        @if (note.noteType === 'meeting') {
+          <div class="widget glass-panel meeting-widget">
+            <h3>Meeting Details</h3>
+            <div class="info-row">
+              <i class="pi pi-map-marker"></i>
+              <span>{{ note.meetingDetails?.location || 'No location' }}</span>
+            </div>
+            <div class="info-row">
+              <i class="pi pi-video"></i>
+              <a [href]="note.meetingDetails?.videoLink" target="_blank" class="link">
+                {{ note.meetingDetails?.videoLink ? 'Join Call' : 'No Link' }}
+              </a>
+            </div>
+          </div>
+        }
+
+       
+        <div class="widget glass-panel">
+          <div class="widget-header">
+            <h3>Attachments</h3>
+            <span class="badge">{{ note.attachments.length || 0 }}</span>
+          </div>
+          
+          @if (note.attachments.length) {
+            <ul class="file-list">
+              @for (file of note.attachments; track file.fileName) {
+                <li (click)="downloadAttachment(file)">
+                  <div class="file-icon-box">
+                    <i class="pi pi-file"></i>
+                  </div>
+                  <div class="file-info">
+                    <span class="name">{{ file.fileName }}</span>
+                    <span class="size">{{ file.size / 1024 | number:'1.0-0' }} KB</span>
+                  </div>
+                </li>
+              }
+            </ul>
+          } @else {
+            <div class="empty-widget">No files attached</div>
+          }
+        </div>
+
+       
+        <div class="widget glass-panel">
+          <h3>Collaborators</h3>
+          <div class="collaborators-list">
+            <div class="collaborator-row">
+              <div class="avatar owner">{{ getInitials(note.owner.name) }}</div>
+              <div class="collab-info">
+                <span class="name">{{ note.owner.name || 'Unknown' }}</span>
+                <span class="role">Owner</span>
+              </div>
+            </div>
+            @for (p of note.participants; track p._id) {
+              <div class="collaborator-row">
+                <div class="avatar">{{ getInitials(p.user.name) }}</div>
+                <div class="collab-info">
+                  <span class="name">{{ p.user.name || 'Guest' }}</span>
+                  <span class="role">{{ p.role }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+       
+        <div class="widget glass-panel history-widget">
+          <h3>Activity Log</h3>
+          <div class="activity-timeline">
+            @for (log of activityLog(); track log.timestamp) {
+              <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                  <p class="log-text">
+                    <span class="user">{{ log.user.name || 'System' }}</span>
+                    {{ log.action }}
+                  </p>
+                  <span class="log-time">{{ log.timestamp | date:'shortTime' }}</span>
+                </div>
+              </div>
+            }
+            @if (activityLog().length === 0) {
+              <div class="empty-widget">No recent history</div>
+            }
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  }
+
+  @if (!isLoading() && !note()) {
+    <div class="empty-state">
+      <i class="pi pi-search" style="font-size: 3rem; opacity: 0.5;"></i>
+      <h2>Note not found</h2>
+      <button class="btn-primary" routerLink="/notes">Back to Library</button>
+    </div>
+  }
+
+</div> -->

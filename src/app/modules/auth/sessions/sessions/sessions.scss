@@ -131,68 +131,7 @@
   }
 }
 
-/* --- GRID BADGE STYLES --- */
-:host ::ng-deep {
-  .status-badge {
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    display: inline-block;
-    line-height: 1;
-    
-    /* Green for Active */
-    &.status-active {
-      background: color-mix(in srgb, var(--color-success) 15%, transparent);
-      color: var(--color-success);
-      border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent);
-    }
-    
-    /* Red for Revoked */
-    &.status-revoked {
-      background: color-mix(in srgb, var(--color-error) 15%, transparent);
-      color: var(--color-error);
-      border: 1px solid color-mix(in srgb, var(--color-error) 30%, transparent);
-    }
-  }
-}
 
-/* --- DIALOG STYLES --- */
-::ng-deep .glass-dialog {
-    // width: 550px !important;
-    max-width: 95vw !important;
-    
-    .p-dialog-content {
-        background: var(--bg-secondary) !important;
-        padding: 0 !important;
-        border-bottom-left-radius: var(--ui-border-radius-xl);
-        border-bottom-right-radius: var(--ui-border-radius-xl);
-    }
-
-    .p-dialog-header {
-        background: var(--bg-secondary) !important;
-        border-bottom: 1px solid var(--border-primary);
-        padding: var(--spacing-lg) var(--spacing-xl);
-        border-top-left-radius: var(--ui-border-radius-xl);
-        border-top-right-radius: var(--ui-border-radius-xl);
-        
-        .p-dialog-title {
-            font-family: var(--font-heading);
-            font-weight: 700;
-            font-size: var(--font-size-lg);
-            color: var(--text-primary);
-        }
-        
-        .p-dialog-header-icon {
-            color: var(--text-secondary);
-            &:hover {
-                background: var(--component-bg-hover);
-                color: var(--text-primary);
-            }
-        }
-    }
-}
 
 .session-details-form {
   padding: var(--spacing-xl);

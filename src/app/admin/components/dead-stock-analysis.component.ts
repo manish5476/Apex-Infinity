@@ -1,12 +1,19 @@
-import { Component, OnInit, signal, computed, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, signal, computed, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
+// PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
+
+// Services & Shared
 import { AdminAnalyticsService } from '../admin-analytics.service';
 import { CommonMethodService } from '../../core/utils/common-method.service';
 import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
+import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
+import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
+
 
 interface DeadStockItem {
   _id: string;
@@ -21,92 +28,88 @@ interface DeadStockItem {
   selector: 'app-dead-stock-analysis',
   standalone: true,
   imports: [
-    CommonModule, ButtonModule, 
-    ProgressSpinnerModule, TooltipModule, TagModule,
-    AgShareGrid // Added Custom Grid
+    CommonModule, 
+    ButtonModule, 
+    ProgressSpinnerModule, 
+    TooltipModule, 
+    TagModule,
+    AgShareGrid,
+    UniversalFilterComponent
   ],
   template: `
-    <div class="p-4 md:p-6 transition-colors duration-300" 
-         [style.background]="'var(--theme-bg-primary)'"
-         [style.font-family]="'var(--font-body)'">
+    <div class="deadstock-container">
 
-      <div class="mb-8 flex flex-wrap justify-between items-end gap-4">
+      <div class="header-section">
         <div>
-          <h2 class="font-bold tracking-tight mb-1" 
-              [style.color]="'var(--theme-text-primary)'"
-              [style.font-family]="'var(--font-heading)'"
-              [style.font-size]="'var(--font-size-2xl)'">Dead Stock Audit</h2>
-          <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">
-            Identifying inventory with zero movement for over 90 days
+          <h2 class="page-title">Inventory Liquidity Audit</h2>
+          <p class="page-subtitle">
+            Items stagnant for {{ currentThreshold }}+ days requiring liquidation
           </p>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="action-group">
            <p-button label="Export Report" icon="pi pi-file-pdf" severity="secondary" [outlined]="true" size="small"></p-button>
-           <p-button label="Clear Inventory" icon="pi pi-bolt" severity="danger" size="small"></p-button>
+           <p-button label="Bulk Liquidation" icon="pi pi-bolt" severity="danger" size="small"></p-button>
         </div>
+      </div>
+
+      <div class="filter-section">
+        <app-universal-filter
+          [entityType]="'dead-stock'"
+          [config]="filterConfig"
+          (filterChange)="onFilterUpdate($event)">
+        </app-universal-filter>
       </div>
 
       <ng-container *ngIf="!loading(); else loader">
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div class="p-6 border relative overflow-hidden transition-all" 
-               [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-            <p class="uppercase font-bold tracking-widest mb-1" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Capital Locked</p>
-            <h2 class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-error)'">₹{{ totalValueLocked() | number }}</h2>
-            <p class="mt-2" [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Across {{ deadStock().length }} Unique SKUs</p>
-            <div class="absolute bottom-0 right-0 p-2 opacity-10">
-              <i class="pi pi-lock text-6xl"></i>
-            </div>
+        <div class="kpi-grid">
+          
+          <div class="kpi-card locked-card">
+            <p class="kpi-label">Total Capital Locked</p>
+            <h2 class="kpi-value error">{{ commonService.formatCurrency(totalValueLocked()) }}</h2>
+            <p class="kpi-meta">Across {{ deadStock().length }} Unique SKUs</p>
+            <i class="pi pi-lock kpi-bg-icon"></i>
           </div>
 
-          <div class="p-6 border transition-all" 
-               [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-            <p class="uppercase font-bold tracking-widest mb-1" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Non-Moving Units</p>
-            <h2 class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'">{{ totalUnits() | number }}</h2>
-            <p class="mt-2 text-amber-500 font-bold" [style.font-size]="'var(--font-size-xs)'">90+ Days of Inactivity</p>
+          <div class="kpi-card units-card">
+            <p class="kpi-label">Idle Units</p>
+            <h2 class="kpi-value primary">{{ totalUnits() | number }}</h2>
+            <p class="kpi-alert">Avg Inactivity: {{ getAvgInactivity() | number:'1.0-0' }} Days</p>
           </div>
 
-          <div class="p-6 border" [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-            <p class="uppercase font-bold tracking-widest mb-1" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Highest Single Risk</p>
-            <h3 class="font-bold truncate" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-md)'">{{ deadStock()[0]?.name }}</h3>
-            <div class="flex justify-between items-end mt-2">
-               <span class="font-bold text-rose-400 tabular-nums">₹{{ deadStock()[0]?.value | number }}</span>
-               <span class="text-[10px] px-2 py-0.5 rounded bg-rose-500/10 text-rose-500 font-bold border border-rose-500/20 uppercase">Critical</span>
+          <div class="kpi-card risk-card">
+            <p class="kpi-label">Top Liquidation Target</p>
+            <h3 class="risk-name" [title]="deadStock()[0]?.name">{{ deadStock()[0]?.name || '--' }}</h3>
+            <div class="risk-footer">
+               <span class="risk-value">{{ commonService.formatCurrency(deadStock()[0]?.value) }}</span>
+               <span class="badge critical" *ngIf="deadStock().length">Priority</span>
             </div>
           </div>
         </div>
 
-        <div class="border overflow-hidden shadow-sm flex flex-col h-full" 
-             [style.background]="'var(--theme-bg-secondary)'" 
-             [style.border-color]="'var(--theme-border-primary)'" 
-             [style.border-radius]="'var(--ui-border-radius-xl)'">
-          
-          <div class="p-4 border-b flex justify-between items-center shrink-0" 
-               [style.border-color]="'var(--theme-border-primary)'" 
-               [style.background]="'var(--theme-bg-ternary)'">
-            <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-xs)'">Inventory Liquidation Priority</h3>
-            <span class="text-[10px] font-bold" [style.color]="'var(--theme-text-label)'">SORTED BY CAPITAL VALUE</span>
+        <div class="table-card">
+          <div class="card-header">
+            <h3 class="card-title">Stagnant Inventory List</h3>
+            <span class="header-tag">SORTED BY VALUE LOCKED</span>
           </div>
 
-          <div class="grid-wrapper flex-1 relative min-h-[500px]">
+          <div class="grid-container">
              <app-ag-share-grid 
                [columns]="stockColumns" 
                [data]="deadStock()" 
                [showActions]="false" 
-               style="width: 100%; height: 100%; display: block; position: absolute; inset: 0;">
+               class="full-size-grid">
              </app-ag-share-grid>
           </div>
         </div>
 
-        <div class="mt-6 p-4 border border-dashed rounded-lg flex items-start gap-4"
-             [style.border-color]="'var(--theme-border-secondary)'"
-             [style.background]="'rgba(244, 63, 94, 0.03)'">
-          <i class="pi pi-exclamation-circle text-rose-500 mt-1"></i>
+        <div class="advisory-box">
+          <i class="pi pi-exclamation-circle advisory-icon"></i>
           <div>
-            <p class="font-bold" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">Liquidation Notice</p>
-            <p [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">
-              Inventory worth <span class="font-bold text-rose-400">₹{{ totalValueLocked() | number }}</span> has exceeded the 90-day threshold. 
-              We recommend a 15% markdown or bundled promotion for the <span class="text-white font-bold">{{ deadStock()[0]?.name }}</span> and other high-value SKUs to free up warehouse space.
+            <p class="advisory-title">Liquidation Strategy</p>
+            <p class="advisory-text">
+              Capital worth <span class="highlight">{{ commonService.formatCurrency(totalValueLocked()) }}</span> is tied up. 
+              Recommended Action: Apply a <b>15-20% Flash Sale</b> on the top 5 high-value items like <span class="highlight-white">{{ deadStock()[0]?.name }}</span> to recover liquidity immediately.
             </p>
           </div>
         </div>
@@ -114,24 +117,161 @@ interface DeadStockItem {
       </ng-container>
 
       <ng-template #loader>
-        <div class="h-[60vh] flex flex-col items-center justify-center gap-4">
+        <div class="loader-container">
           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-12 h-12"></p-progressSpinner>
-          <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'" class="font-bold uppercase tracking-widest">Auditing Stock Lifecycle...</p>
+          <p class="loader-text">Analyzing Inventory Aging...</p>
         </div>
       </ng-template>
 
     </div>
-  `
+  `,
+  styles: [`
+    :host { display: block; width: 100%; height: 100%; }
+
+    .deadstock-container {
+      padding: var(--spacing-lg) var(--spacing-xl);
+      background: var(--bg-primary);
+      font-family: var(--font-body);
+      min-height: 100%;
+    }
+
+    /* HEADER */
+    .header-section {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end;
+      gap: var(--spacing-md); margin-bottom: var(--spacing-md);
+    }
+    .page-title {
+      font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold);
+      color: var(--text-primary); font-family: var(--font-heading); margin: 0 0 4px 0;
+    }
+    .page-subtitle { color: var(--text-tertiary); font-size: var(--font-size-sm); margin: 0; }
+    .action-group { display: flex; align-items: center; gap: var(--spacing-sm); }
+    
+    .filter-section { margin-bottom: var(--spacing-lg); }
+
+    /* KPI GRID */
+    .kpi-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--spacing-lg); margin-bottom: var(--spacing-lg);
+    }
+
+    .kpi-card {
+      background: var(--bg-secondary); border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius-xl); padding: var(--spacing-lg);
+      position: relative; overflow: hidden;
+    }
+
+    .kpi-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em; color: var(--text-label); margin: 0 0 4px 0;
+    }
+    .kpi-value {
+      font-size: 2rem; font-weight: 700; margin: 0; line-height: 1;
+      &.error { color: var(--color-error); }
+      &.primary { color: var(--text-primary); }
+    }
+    .kpi-meta { margin-top: 8px; font-size: 12px; color: var(--text-tertiary); }
+    .kpi-alert { margin-top: 8px; font-size: 12px; font-weight: 700; color: var(--color-warning); }
+
+    .kpi-bg-icon {
+      position: absolute; bottom: -10px; right: -10px; opacity: 0.05;
+      font-size: 4rem; pointer-events: none; color: var(--text-primary);
+    }
+
+    /* Risk Card Specifics */
+    .risk-card { background: var(--bg-ternary); border-color: var(--border-secondary); }
+    .risk-name {
+      font-size: 1rem; font-weight: 700; color: var(--text-primary);
+      margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .risk-footer {
+      display: flex; justify-content: space-between; align-items: flex-end; margin-top: 8px;
+    }
+    .risk-value { font-weight: 700; color: var(--color-error); font-family: var(--font-mono); }
+    .badge.critical {
+      background: rgba(239, 68, 68, 0.1); color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.2); font-size: 10px;
+      padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase;
+    }
+
+    /* TABLE CARD */
+    .table-card {
+      background: var(--bg-secondary); border: 1px solid var(--border-primary);
+      border-radius: var(--ui-border-radius-xl); overflow: hidden;
+      display: flex; flex-direction: column;
+      height: 600px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card-header {
+      padding: var(--spacing-md) var(--spacing-lg); border-bottom: 1px solid var(--border-primary);
+      background: var(--bg-ternary); display: flex; justify-content: space-between; align-items: center;
+      flex-shrink: 0;
+    }
+    .card-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-primary); margin: 0; }
+    .header-tag { font-size: 10px; font-weight: 700; color: var(--text-label); background: var(--bg-primary); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-secondary); }
+
+    .grid-container { flex: 1; position: relative; min-height: 0; overflow: hidden; }
+    .full-size-grid { width: 100%; height: 100%; display: block; }
+
+    /* ADVISORY BOX */
+    .advisory-box {
+      margin-top: var(--spacing-lg); padding: var(--spacing-md);
+      border: 1px dashed var(--border-secondary); background: rgba(239, 68, 68, 0.03);
+      border-radius: var(--ui-border-radius-lg); display: flex; gap: var(--spacing-md);
+    }
+    .advisory-icon { color: var(--color-error); margin-top: 2px; }
+    .advisory-title { font-weight: 700; font-size: 14px; color: var(--text-primary); margin: 0 0 2px 0; }
+    .advisory-text { font-size: 12px; color: var(--text-secondary); margin: 0; line-height: 1.4; }
+    .highlight { color: var(--color-error); font-weight: 700; }
+    .highlight-white { color: var(--text-primary); font-weight: 700; }
+
+    /* LOADER */
+    .loader-container {
+      height: 60vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+    }
+    .loader-text { font-size: 12px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+  `]
 })
 export class DeadStockAnalysisComponent implements OnInit {
   deadStock = signal<DeadStockItem[]>([]);
   loading = signal<boolean>(true);
-  
   stockColumns: any[] = [];
 
-  // Computed totals for the KPI cards
+  // Data Computations
   totalValueLocked = computed(() => this.deadStock().reduce((acc, item) => acc + item.value, 0));
   totalUnits = computed(() => this.deadStock().reduce((acc, item) => acc + item.quantity, 0));
+
+  // Current State
+  currentThreshold = 90;
+  private currentFilters: any = {};
+
+  // 1. FILTER CONFIG
+  filterConfig: FilterField[] = [
+    {
+      key: 'branchId',
+      label: 'Branch Context',
+      type: 'select',
+      dataSourceKey: 'branches',
+      optionLabel: 'name',
+      optionValue: '_id',
+      placeholder: 'Global Inventory'
+    },
+    {
+      key: 'days',
+      label: 'Inactivity Threshold',
+      type: 'select',
+      staticOptions: [
+        { label: '60 Days', value: 60 },
+        { label: '90 Days', value: 90 },
+        { label: '120 Days', value: 120 },
+        { label: '180 Days', value: 180 }
+      ],
+      defaultValue: 90,
+      optionLabel: 'label',
+      optionValue: 'value'
+    }
+  ];
 
   constructor(
     private analyticsService: AdminAnalyticsService,
@@ -141,84 +281,21 @@ export class DeadStockAnalysisComponent implements OnInit {
 
   ngOnInit() {
     this.setupColumns();
-    this.loadData();
+    // loadData triggered by filter init
   }
 
-  setupColumns(): void {
-    this.stockColumns = [
-      {
-        field: 'name', 
-        headerName: 'Product Detail', 
-        sortable: true, 
-        flex: 1,
-        minWidth: 200,
-        cellRenderer: (params: any) => {
-          return `<div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
-                    <span style="font-weight: 700; color: var(--theme-text-primary);">${params.value}</span>
-                  </div>`;
-        }
-      },
-      {
-        field: 'sku', 
-        headerName: 'Product Detail', 
-        sortable: true, 
-        flex: 1,
-        minWidth: 200,
-        cellRenderer: (params: any) => {
-          return `<div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
-                    <span style="font-size: 10px; color: var(--theme-text-label); font-family: monospace;">${params.data.sku}</span>
-                  </div>`;
-        }
-      },
-      {
-        field: 'quantity', 
-        headerName: 'Qty', 
-        sortable: true, 
-        width: 100,
-        type: 'rightAligned',
-        cellStyle: { 'font-family': 'monospace', 'font-weight': '700', 'text-align': 'right' }
-      },
-      {
-        field: 'value', 
-        headerName: 'Value Locked', 
-        sortable: true, 
-        width: 140,
-        type: 'rightAligned',
-        valueFormatter: (params: any) => this.commonService.formatCurrency(params.value),
-        cellStyle: (params: any) => {
-           // Highlight high value items in red
-           return { 
-             'font-weight': '700', 
-             'color': params.value > 2000000 ? 'var(--theme-error)' : 'var(--theme-text-primary)',
-             'text-align': 'right' 
-           };
-        }
-      },
-      {
-        field: 'daysInactive', 
-        headerName: 'Days Idle', 
-        sortable: true, 
-        width: 100,
-        cellStyle: { 'font-weight': '700', 'color': 'var(--theme-warning)', 'text-align': 'center' }
-      },
-      {
-        headerName: 'Strategy',
-        width: 140,
-        cellRenderer: (params: any) => {
-           return `<div style="display: flex; gap: 4px; justify-content: center;">
-                     <button style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); color: #60a5fa; padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; cursor: pointer;" title="Flash Sale">SALE</button>
-                     <button style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); color: #fbbf24; padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; cursor: pointer;" title="Branch Transfer">MOVE</button>
-                   </div>`;
-        },
-        cellStyle: { 'display': 'flex', 'align-items': 'center', 'justify-content': 'center' }
-      }
-    ];
-    this.cdr.detectChanges();
+  onFilterUpdate(filters: any) {
+    this.currentFilters = filters;
+    this.currentThreshold = filters.days || 90;
+    this.loadData();
   }
 
   loadData() {
     this.loading.set(true);
-    this.analyticsService.getDeadStockReport().subscribe({
+    const branchId = this.currentFilters.branchId;
+    const days = this.currentFilters.days || 90;
+
+    this.analyticsService.getDeadStockReport(branchId, days).subscribe({
       next: (res) => {
         if (res.status === 'success') {
           this.deadStock.set(res.data);
@@ -228,15 +305,110 @@ export class DeadStockAnalysisComponent implements OnInit {
       error: () => this.loading.set(false)
     });
   }
+
+  getAvgInactivity(): number {
+    const items = this.deadStock();
+    if (!items.length) return 0;
+    return items.reduce((sum, item) => sum + item.daysInactive, 0) / items.length;
+  }
+
+  setupColumns(): void {
+    this.stockColumns = [
+      {
+        field: 'name', 
+        headerName: 'Product Name', 
+        sortable: true, 
+        flex: 1.2, 
+        minWidth: 180,
+        cellStyle: { 'font-weight': '700', 'color': 'var(--text-primary)', 'font-size': '12px', 'display': 'flex', 'align-items': 'center' }
+      },
+      {
+        field: 'sku', 
+        headerName: 'SKU Code', 
+        sortable: true, 
+        width: 140, 
+        cellStyle: { 'font-family': 'var(--font-mono)', 'color': 'var(--text-secondary)', 'font-size': '11px', 'display': 'flex', 'align-items': 'center' }
+      },
+      {
+        field: 'quantity', 
+        headerName: 'Qty', 
+        sortable: true, 
+        width: 90, 
+        type: 'rightAligned',
+        cellStyle: { 'font-family': 'var(--font-mono)', 'font-weight': '600', 'text-align': 'right', 'color': 'var(--text-secondary)', 'display': 'flex', 'align-items': 'center', 'justify-content': 'flex-end' }
+      },
+      {
+        field: 'value', 
+        headerName: 'Value Locked', 
+        sortable: true, 
+        width: 130, 
+        type: 'rightAligned',
+        valueFormatter: (params: any) => this.commonService.formatCurrency(params.value),
+        cellStyle: (params: any) => ({
+          'font-weight': '700', 
+          'color': 'var(--color-error)',
+          'text-align': 'right',
+          'font-family': 'var(--font-mono)',
+          'display': 'flex', 'align-items': 'center', 'justify-content': 'flex-end'
+        })
+      },
+      {
+        headerName: 'Strategy',
+        width: 130,
+        cellRenderer: (params: any) => `
+          <div style="display: flex; gap: 6px; align-items: center; height: 100%;">
+            <button style="
+              background: var(--bg-primary); 
+              border: 1px solid var(--accent-primary); 
+              color: var(--accent-primary); 
+              padding: 0px 8px; 
+              height: 22px; 
+              border-radius: 4px; 
+              font-size: 9px; 
+              font-weight: 800; 
+              cursor: pointer; 
+              line-height: 20px;
+              text-transform: uppercase;">
+              SALE
+            </button>
+            <button style="
+              background: var(--bg-primary); 
+              border: 1px solid var(--color-warning); 
+              color: var(--color-warning); 
+              padding: 0px 8px; 
+              height: 22px; 
+              border-radius: 4px; 
+              font-size: 9px; 
+              font-weight: 800; 
+              cursor: pointer; 
+              line-height: 20px;
+              text-transform: uppercase;">
+              MOVE
+            </button>
+          </div>`,
+        cellStyle: { 'display': 'flex', 'align-items': 'center' }
+      }
+    ];
+    this.cdr.detectChanges();
+  }
 }
-// import { Component, OnInit, signal, computed } from '@angular/core';
+
+// import { Component, OnInit, signal, computed, ChangeDetectorRef, inject } from '@angular/core';
 // import { CommonModule } from '@angular/common';
-// import { TableModule } from 'primeng/table';
+
+// // PrimeNG Imports
 // import { ButtonModule } from 'primeng/button';
 // import { ProgressSpinnerModule } from 'primeng/progressspinner';
 // import { TooltipModule } from 'primeng/tooltip';
 // import { TagModule } from 'primeng/tag';
+
+// // Services & Shared
 // import { AdminAnalyticsService } from '../admin-analytics.service';
+// import { CommonMethodService } from '../../core/utils/common-method.service';
+// import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
+// import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
+// import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
+
 
 // interface DeadStockItem {
 //   _id: string;
@@ -250,113 +422,90 @@ export class DeadStockAnalysisComponent implements OnInit {
 // @Component({
 //   selector: 'app-dead-stock-analysis',
 //   standalone: true,
-//   imports: [CommonModule, TableModule, ButtonModule, ProgressSpinnerModule, TooltipModule, TagModule],
+//   imports: [
+//     CommonModule, 
+//     ButtonModule, 
+//     ProgressSpinnerModule, 
+//     TooltipModule, 
+//     TagModule,
+//     AgShareGrid,
+//     UniversalFilterComponent // <--- Imported
+//   ],
 //   template: `
-//     <div class="p-4 md:p-6 transition-colors duration-300" 
-//          [style.background]="'var(--theme-bg-primary)'"
-//          [style.font-family]="'var(--font-body)'">
+//     <div class="deadstock-container">
 
-//       <div class="mb-8 flex flex-wrap justify-between items-end gap-4">
+//       <div class="header-section">
 //         <div>
-//           <h2 class="font-bold tracking-tight mb-1" 
-//               [style.color]="'var(--theme-text-primary)'"
-//               [style.font-family]="'var(--font-heading)'"
-//               [style.font-size]="'var(--font-size-2xl)'">Dead Stock Audit</h2>
-//           <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'">
-//             Identifying inventory with zero movement for over 90 days
+//           <h2 class="page-title">Dead Stock Audit</h2>
+//           <p class="page-subtitle">
+//             Identifying inventory with zero movement for over {{ currentThreshold }} days
 //           </p>
 //         </div>
-//         <div class="flex items-center gap-2">
+//         <div class="action-group">
 //            <p-button label="Export Report" icon="pi pi-file-pdf" severity="secondary" [outlined]="true" size="small"></p-button>
 //            <p-button label="Clear Inventory" icon="pi pi-bolt" severity="danger" size="small"></p-button>
 //         </div>
 //       </div>
 
+//       <div class="filter-section">
+//         <app-universal-filter
+//           [entityType]="'dead-stock'"
+//           [config]="filterConfig"
+//           (filterChange)="onFilterUpdate($event)">
+//         </app-universal-filter>
+//       </div>
+
 //       <ng-container *ngIf="!loading(); else loader">
         
-//         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-//           <div class="p-6 border relative overflow-hidden transition-all" 
-//                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//             <p class="uppercase font-bold tracking-widest mb-1" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Capital Locked</p>
-//             <h2 class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-error)'">₹{{ totalValueLocked() | number }}</h2>
-//             <p class="mt-2" [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-xs)'">Across {{ deadStock().length }} Unique SKUs</p>
-//             <div class="absolute bottom-0 right-0 p-2 opacity-10">
-//               <i class="pi pi-lock text-6xl"></i>
-//             </div>
-//           </div>
-
-//           <div class="p-6 border transition-all" 
-//                [style.background]="'var(--theme-bg-secondary)'" [style.border-color]="'var(--theme-border-primary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//             <p class="uppercase font-bold tracking-widest mb-1" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Non-Moving Units</p>
-//             <h2 class="text-3xl font-bold tabular-nums" [style.color]="'var(--theme-text-primary)'">{{ totalUnits() | number }}</h2>
-//             <p class="mt-2 text-amber-500 font-bold" [style.font-size]="'var(--font-size-xs)'">90+ Days of Inactivity</p>
-//           </div>
-
-//           <div class="p-6 border" [style.background]="'var(--theme-bg-ternary)'" [style.border-color]="'var(--theme-border-secondary)'" [style.border-radius]="'var(--ui-border-radius-xl)'">
-//             <p class="uppercase font-bold tracking-widest mb-1" [style.color]="'var(--theme-text-label)'" [style.font-size]="'var(--font-size-xs)'">Highest Single Risk</p>
-//             <h3 class="font-bold truncate" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-md)'">{{ deadStock()[0]?.name }}</h3>
-//             <div class="flex justify-between items-end mt-2">
-//                <span class="font-bold text-rose-400 tabular-nums">₹{{ deadStock()[0]?.value | number }}</span>
-//                <span class="text-[10px] px-2 py-0.5 rounded bg-rose-500/10 text-rose-500 font-bold border border-rose-500/20 uppercase">Critical</span>
-//             </div>
-//           </div>
-//         </div>
-
-//         <div class="border overflow-hidden shadow-sm" 
-//              [style.background]="'var(--theme-bg-secondary)'" 
-//              [style.border-color]="'var(--theme-border-primary)'" 
-//              [style.border-radius]="'var(--ui-border-radius-xl)'">
+//         <div class="kpi-grid">
           
-//           <div class="p-4 border-b flex justify-between items-center" 
-//                [style.border-color]="'var(--theme-border-primary)'" 
-//                [style.background]="'var(--theme-bg-ternary)'">
-//             <h3 class="font-bold uppercase tracking-tight" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-xs)'">Inventory Liquidation Priority</h3>
-//             <span class="text-[10px] font-bold" [style.color]="'var(--theme-text-label)'">SORTED BY CAPITAL VALUE</span>
+//           <div class="kpi-card locked-card">
+//             <p class="kpi-label">Capital Locked</p>
+//             <h2 class="kpi-value error">{{ commonService.formatCurrency(totalValueLocked()) }}</h2>
+//             <p class="kpi-meta">Across {{ deadStock().length }} Unique SKUs</p>
+//             <div class="bg-icon"><i class="pi pi-lock"></i></div>
 //           </div>
 
-//           <p-table [value]="deadStock()" [paginator]="true" [rows]="10" styleClass="p-datatable-sm" [responsiveLayout]="'scroll'">
-//             <ng-template pTemplate="header">
-//               <tr>
-//                 <th [style.background]="'transparent'" [style.color]="'var(--theme-text-label)'">Product Detail</th>
-//                 <th [style.background]="'transparent'" [style.color]="'var(--theme-text-label)'" class="text-right">Qty</th>
-//                 <th [style.background]="'transparent'" [style.color]="'var(--theme-text-label)'" class="text-right">Value Locked</th>
-//                 <th [style.background]="'transparent'" [style.color]="'var(--theme-text-label)'" class="text-center">Days Idle</th>
-//                 <th [style.background]="'transparent'" [style.color]="'var(--theme-text-label)'" class="text-center">Strategy</th>
-//               </tr>
-//             </ng-template>
-//             <ng-template pTemplate="body" let-item>
-//               <tr [style.color]="'var(--theme-text-secondary)'" [style.border-color]="'var(--theme-border-primary)'">
-//                 <td>
-//                   <div class="flex flex-col">
-//                     <span class="font-bold text-white">{{ item.name }}</span>
-//                     <span class="text-[10px] font-mono" [style.color]="'var(--theme-text-label)'">{{ item.sku }}</span>
-//                   </div>
-//                 </td>
-//                 <td class="text-right font-mono font-bold">{{ item.quantity }}</td>
-//                 <td class="text-right font-bold tabular-nums" [style.color]="item.value > 2000000 ? 'var(--theme-error)' : 'var(--theme-text-primary)'">
-//                   ₹{{ item.value | number }}
-//                 </td>
-//                 <td class="text-center font-bold tabular-nums" [style.color]="'var(--theme-warning)'">{{ item.daysInactive }}</td>
-//                 <td class="text-center">
-//                   <div class="flex justify-center gap-1">
-//                     <p-button icon="pi pi-tag" [text]="true" severity="info" pTooltip="Flash Sale" size="small"></p-button>
-//                     <p-button icon="pi pi-arrow-right-arrow-left" [text]="true" severity="warn" pTooltip="Branch Transfer" size="small"></p-button>
-//                   </div>
-//                 </td>
-//               </tr>
-//             </ng-template>
-//           </p-table>
+//           <div class="kpi-card units-card">
+//             <p class="kpi-label">Non-Moving Units</p>
+//             <h2 class="kpi-value primary">{{ totalUnits() | number }}</h2>
+//             <p class="kpi-alert">{{ currentThreshold }}+ Days of Inactivity</p>
+//           </div>
+
+//           <div class="kpi-card risk-card">
+//             <p class="kpi-label">Highest Single Risk</p>
+//             <h3 class="risk-name" [title]="deadStock()[0]?.name">{{ deadStock()[0]?.name || '--' }}</h3>
+//             <div class="risk-footer">
+//                <span class="risk-value">{{ commonService.formatCurrency(deadStock()[0]?.value) }}</span>
+//                <span class="badge critical" *ngIf="deadStock().length">Critical</span>
+//             </div>
+//           </div>
 //         </div>
 
-//         <div class="mt-6 p-4 border border-dashed rounded-lg flex items-start gap-4"
-//              [style.border-color]="'var(--theme-border-secondary)'"
-//              [style.background]="'rgba(244, 63, 94, 0.03)'">
-//           <i class="pi pi-exclamation-circle text-rose-500 mt-1"></i>
+//         <div class="table-card">
+//           <div class="card-header">
+//             <h3 class="card-title">Inventory Liquidation Priority</h3>
+//             <span class="header-tag">SORTED BY CAPITAL VALUE</span>
+//           </div>
+
+//           <div class="grid-container">
+//              <app-ag-share-grid 
+//                [columns]="stockColumns" 
+//                [data]="deadStock()" 
+//                [showActions]="false" 
+//                style="width: 100%; height: 100%; display: block;"
+//                class="full-size-grid">
+//              </app-ag-share-grid>
+//           </div>
+//         </div>
+
+//         <div class="advisory-box">
+//           <i class="pi pi-exclamation-circle advisory-icon"></i>
 //           <div>
-//             <p class="font-bold" [style.color]="'var(--theme-text-primary)'" [style.font-size]="'var(--font-size-sm)'">Liquidation Notice</p>
-//             <p [style.color]="'var(--theme-text-secondary)'" [style.font-size]="'var(--font-size-xs)'">
-//               Inventory worth <span class="font-bold text-rose-400">₹{{ totalValueLocked() | number }}</span> has exceeded the 90-day threshold. 
-//               We recommend a 15% markdown or bundled promotion for the <span class="text-white font-bold">{{ deadStock()[0]?.name }}</span> and other high-value SKUs to free up warehouse space.
+//             <p class="advisory-title">Liquidation Notice</p>
+//             <p class="advisory-text">
+//               Inventory worth <span class="highlight">{{ commonService.formatCurrency(totalValueLocked()) }}</span> has exceeded the {{ currentThreshold }}-day threshold. 
+//               We recommend a 15% markdown or bundled promotion for the <span class="highlight-white">{{ deadStock()[0]?.name || 'top items' }}</span> and other high-value SKUs.
 //             </p>
 //           </div>
 //         </div>
@@ -364,45 +513,195 @@ export class DeadStockAnalysisComponent implements OnInit {
 //       </ng-container>
 
 //       <ng-template #loader>
-//         <div class="h-[60vh] flex flex-col items-center justify-center gap-4">
+//         <div class="loader-container">
 //           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-12 h-12"></p-progressSpinner>
-//           <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'" class="font-bold uppercase tracking-widest">Auditing Stock Lifecycle...</p>
+//           <p class="loader-text">Auditing Stock Lifecycle...</p>
 //         </div>
 //       </ng-template>
 
 //     </div>
 //   `,
 //   styles: [`
-//     :host ::ng-deep .p-datatable .p-datatable-tbody > tr {
-//       background: transparent !important;
-//       border-bottom: 1px solid var(--theme-border-primary) !important;
+//     :host { display: block; width: 100%; height: 100%; }
+
+//     .deadstock-container {
+//       padding: var(--spacing-lg) var(--spacing-xl);
+//       background: var(--bg-primary);
+//       font-family: var(--font-body);
+//       height: 100%;
+//       overflow-y: auto;
 //     }
-//     :host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
-//       padding: 0.85rem 1rem;
-//       font-size: 10px;
-//       font-weight: 700;
-//       text-transform: uppercase;
-//       border: none !important;
+
+//     /* HEADER */
+//     .header-section {
+//       display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end;
+//       gap: var(--spacing-md); margin-bottom: var(--spacing-md);
 //     }
+//     .page-title {
+//       font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold);
+//       color: var(--text-primary); font-family: var(--font-heading); margin: 0 0 4px 0;
+//     }
+//     .page-subtitle { color: var(--text-tertiary); font-size: var(--font-size-sm); margin: 0; }
+//     .action-group { display: flex; align-items: center; gap: var(--spacing-sm); }
+    
+//     .filter-section { margin-bottom: var(--spacing-lg); }
+
+//     /* KPI GRID */
+//     .kpi-grid {
+//       display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+//       gap: var(--spacing-lg); margin-bottom: var(--spacing-lg);
+//     }
+
+//     .kpi-card {
+//       background: var(--bg-secondary); border: 1px solid var(--border-primary);
+//       border-radius: var(--ui-border-radius-xl); padding: var(--spacing-lg);
+//       position: relative; overflow: hidden;
+//     }
+
+//     .kpi-label {
+//       font-size: 11px; font-weight: 700; text-transform: uppercase;
+//       letter-spacing: 0.05em; color: var(--text-label); margin: 0 0 4px 0;
+//     }
+//     .kpi-value {
+//       font-size: 2rem; font-weight: 700; margin: 0; line-height: 1;
+//       &.error { color: var(--color-error); }
+//       &.primary { color: var(--text-primary); }
+//     }
+//     .kpi-meta { margin-top: 8px; font-size: 12px; color: var(--text-tertiary); }
+//     .kpi-alert { margin-top: 8px; font-size: 12px; font-weight: 700; color: var(--color-warning); }
+
+//     .bg-icon {
+//       position: absolute; bottom: -10px; right: -10px; opacity: 0.05;
+//       font-size: 4rem; pointer-events: none; color: var(--text-primary);
+//     }
+
+//     /* Risk Card Specifics */
+//     .risk-card { background: var(--bg-ternary); border-color: var(--border-secondary); }
+//     .risk-name {
+//       font-size: 1rem; font-weight: 700; color: var(--text-primary);
+//       margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+//     }
+//     .risk-footer {
+//       display: flex; justify-content: space-between; align-items: flex-end; margin-top: 8px;
+//     }
+//     .risk-value { font-weight: 700; color: var(--color-error); font-family: var(--font-mono); }
+//     .badge.critical {
+//       background: rgba(239, 68, 68, 0.1); color: #ef4444;
+//       border: 1px solid rgba(239, 68, 68, 0.2); font-size: 10px;
+//       padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase;
+//     }
+
+//     /* TABLE CARD (Grid Fixes) */
+//     .table-card {
+//       background: var(--bg-secondary); border: 1px solid var(--border-primary);
+//       border-radius: var(--ui-border-radius-xl); overflow: hidden;
+      
+//       /* Flex Column to manage height */
+//       display: flex; flex-direction: column;
+//       height: 600px; /* Defined height for flex container */
+//       box-shadow: var(--shadow-sm);
+//     }
+
+//     .card-header {
+//       padding: var(--spacing-md) var(--spacing-lg); border-bottom: 1px solid var(--border-primary);
+//       background: var(--bg-ternary); display: flex; justify-content: space-between; align-items: center;
+//       flex-shrink: 0;
+//     }
+//     .card-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-primary); margin: 0; }
+//     .header-tag { font-size: 10px; font-weight: 700; color: var(--text-label); }
+
+//     .grid-container { 
+//       flex: 1; /* Fills remaining space in card */
+//       position: relative; 
+//       min-height: 0; /* Important for flex scrolling */
+//       overflow: hidden; 
+//     }
+
+//     /* ADVISORY BOX */
+//     .advisory-box {
+//       margin-top: var(--spacing-lg); padding: var(--spacing-md);
+//       border: 1px dashed var(--border-secondary); background: rgba(239, 68, 68, 0.03);
+//       border-radius: var(--ui-border-radius-lg); display: flex; gap: var(--spacing-md);
+//     }
+//     .advisory-icon { color: var(--color-error); margin-top: 2px; }
+//     .advisory-title { font-weight: 700; font-size: 14px; color: var(--text-primary); margin: 0 0 2px 0; }
+//     .advisory-text { font-size: 12px; color: var(--text-secondary); margin: 0; line-height: 1.4; }
+//     .highlight { color: var(--color-error); font-weight: 700; }
+//     .highlight-white { color: var(--text-primary); font-weight: 700; }
+
+//     /* LOADER */
+//     .loader-container {
+//       height: 60vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+//     }
+//     .loader-text { font-size: 12px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
 //   `]
 // })
 // export class DeadStockAnalysisComponent implements OnInit {
 //   deadStock = signal<DeadStockItem[]>([]);
 //   loading = signal<boolean>(true);
+//   stockColumns: any[] = [];
 
-//   // Computed totals for the KPI cards
+//   // Data Computations
 //   totalValueLocked = computed(() => this.deadStock().reduce((acc, item) => acc + item.value, 0));
 //   totalUnits = computed(() => this.deadStock().reduce((acc, item) => acc + item.quantity, 0));
 
-//   constructor(private analyticsService: AdminAnalyticsService) {}
+//   // Current State
+//   currentThreshold = 90;
+//   private currentFilters: any = {};
+
+//   // 1. FILTER CONFIG
+//   filterConfig: FilterField[] = [
+//     {
+//       key: 'branchId',
+//       label: 'Branch Context',
+//       type: 'select',
+//       dataSourceKey: 'branches',
+//       optionLabel: 'name',
+//       optionValue: '_id',
+//       placeholder: 'Global Inventory'
+//     },
+//     {
+//       key: 'days',
+//       label: 'Inactivity Threshold',
+//       type: 'select',
+//       staticOptions: [
+//         { label: '60 Days', value: 60 },
+//         { label: '90 Days', value: 90 },
+//         { label: '120 Days', value: 120 },
+//         { label: '180 Days', value: 180 }
+//       ],
+//       defaultValue: 90,
+//       optionLabel: 'label',
+//       optionValue: 'value'
+//     }
+//   ];
+
+//   constructor(
+//     private analyticsService: AdminAnalyticsService,
+//     public commonService: CommonMethodService,
+//     private cdr: ChangeDetectorRef
+//   ) {}
 
 //   ngOnInit() {
+//     this.setupColumns();
+//     // loadData triggered by filter init
+//   }
+
+//   // 2. FILTER HANDLER
+//   onFilterUpdate(filters: any) {
+//     this.currentFilters = filters;
+//     this.currentThreshold = filters.days || 90;
 //     this.loadData();
 //   }
 
 //   loadData() {
 //     this.loading.set(true);
-//     this.analyticsService.getDeadStockReport().subscribe({
+    
+//     // Pass filters to API
+//     const branchId = this.currentFilters.branchId;
+//     const days = this.currentFilters.days || 90;
+
+//     this.analyticsService.getDeadStockReport(branchId, days).subscribe({
 //       next: (res) => {
 //         if (res.status === 'success') {
 //           this.deadStock.set(res.data);
@@ -411,5 +710,86 @@ export class DeadStockAnalysisComponent implements OnInit {
 //       },
 //       error: () => this.loading.set(false)
 //     });
+//   }
+
+//   setupColumns(): void {
+//     this.stockColumns = [
+//       {
+//         field: 'name', 
+//         headerName: 'Product Detail', 
+//         sortable: true, 
+//         flex: 1, 
+//         minWidth: 220,
+//         cellRenderer: (params: any) => `
+//           <div style="display: flex; flex-direction: column; justify-content: center; height: 100%; line-height: 1.2;">
+//             <span style="font-weight: 700; color: var(--theme-text-primary); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${params.value}</span>
+//             <span style="font-size: 10px; color: var(--theme-text-tertiary); font-family: var(--font-mono); margin-top: 1px;">${params.data.sku}</span>
+//           </div>`
+//       },
+//       {
+//         field: 'quantity', 
+//         headerName: 'Qty', 
+//         sortable: true, 
+//         width: 90, 
+//         type: 'rightAligned',
+//         cellStyle: { 'font-family': 'var(--font-mono)', 'font-weight': '700', 'text-align': 'right', 'color': 'var(--theme-text-secondary)' }
+//       },
+//       {
+//         field: 'value', 
+//         headerName: 'Value Locked', 
+//         sortable: true, 
+//         width: 130, 
+//         type: 'rightAligned',
+//         valueFormatter: (params: any) => this.commonService.formatCurrency(params.value),
+//         cellStyle: (params: any) => ({
+//           'font-weight': '700', 
+//           'color': params.value > 2000000 ? 'var(--color-error)' : 'var(--theme-text-primary)',
+//           'text-align': 'right',
+//           'font-family': 'var(--font-mono)'
+//         })
+//       },
+//       {
+//         field: 'daysInactive', 
+//         headerName: 'Days Idle', 
+//         sortable: true, 
+//         width: 100,
+//         cellStyle: { 'font-weight': '700', 'color': 'var(--color-warning)', 'text-align': 'center' }
+//       },
+//       {
+//         headerName: 'Strategy',
+//         width: 130,
+//         cellRenderer: (params: any) => `
+//           <div style="display: flex; gap: 6px; align-items: center; height: 100%;">
+//             <button style="
+//               background: rgba(59, 130, 246, 0.1); 
+//               border: 1px solid #3b82f6; 
+//               color: #3b82f6; 
+//               padding: 0px 6px; 
+//               height: 20px; 
+//               border-radius: 4px; 
+//               font-size: 9px; 
+//               font-weight: 800; 
+//               cursor: pointer; 
+//               line-height: 18px;">
+//               SALE
+//             </button>
+//             <button style="
+//               background: rgba(245, 158, 11, 0.1); 
+//               border: 1px solid #f59e0b; 
+//               color: #f59e0b; 
+//               padding: 0px 6px; 
+//               height: 20px; 
+//               border-radius: 4px; 
+//               font-size: 9px; 
+//               font-weight: 800; 
+//               cursor: pointer; 
+//               line-height: 18px;">
+//               MOVE
+//             </button>
+//           </div>`,
+//         cellStyle: { 'display': 'flex', 'align-items': 'center' }
+//       }
+//     ];
+//     this.cdr.detectChanges();
 //   }
 // }

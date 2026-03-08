@@ -1,297 +1,521 @@
 /* ==============================================
    EMI DETAILS STYLES
-   Theme: Enterprise Glass / Canonical Tokens
+   Layout: Fixed Header, Scrollable Body
    ============================================== */
 
 :host {
   display: block;
+  height: 100%; /* Full Viewport */
   width: 100%;
-  height: 100%;
+  overflow: hidden; /* Prevent global scroll */
 }
 
 .page-container {
-  width: 100%;
   height: 100%;
-  overflow-y: auto; /* Allow body scroll */
+  width: 100%;
+  background: var(--bg-primary);
   display: flex;
   flex-direction: column;
-  background: var(--bg-primary);
-  padding: 0; /* Full width */
 }
 
-/* === 1. HEADER (Sticky) === */
+/* === 1. HEADER (Static) === */
 .details-header {
+  flex-shrink: 0; /* Prevent shrinking */
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-lg) var(--spacing-2xl);
+  padding: 16px 32px;
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-primary);
-  position: sticky;
-  top: 0;
   z-index: 20;
-  backdrop-filter: blur(10px);
+
+  &.glass-effect {
+    background: rgba(var(--bg-secondary-rgb), 0.95);
+    backdrop-filter: blur(10px);
+  }
 
   .header-left {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-lg);
+    display: flex; align-items: center; gap: 16px;
 
     .back-btn {
-      color: var(--text-secondary);
-      &:hover { color: var(--text-primary); background: var(--bg-ternary); }
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 1px solid var(--border-secondary);
+      background: var(--bg-ternary); color: var(--text-secondary);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s;
+      &:hover { background: var(--border-secondary); color: var(--text-primary); }
     }
 
     .title-group {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-
+      display: flex; flex-direction: column; gap: 2px;
       h1 {
-        margin: 0;
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        font-family: var(--font-heading);
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
+        margin: 0; font-size: 1.25rem; font-weight: 800; color: var(--text-primary);
+        font-family: var(--font-heading); display: flex; align-items: center; gap: 12px;
       }
-
-      .subtitle {
-        font-size: 0.8rem;
-        color: var(--text-secondary);
-        font-weight: 500;
-      }
+      .subtitle { font-size: 0.8rem; color: var(--text-secondary); font-weight: 500; }
     }
+  }
+
+  .header-right .btn-outlined {
+    background: transparent; border: 1px solid var(--border-secondary);
+    color: var(--text-secondary); padding: 8px 16px; border-radius: 8px;
+    font-weight: 600; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; gap: 8px;
+    &:hover { background: var(--bg-ternary); color: var(--text-primary); border-color: var(--text-secondary); }
   }
 }
 
-/* === 2. STATS BAR (Summary) === */
+/* === 2. STATS BAR (Static) === */
 .stats-bar {
+  flex-shrink: 0;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--spacing-xl);
-  padding: var(--spacing-xl) var(--spacing-2xl);
-  background: linear-gradient(to bottom, var(--bg-secondary), var(--bg-primary));
+  gap: 20px;
+  padding: 24px 32px;
+  background: var(--bg-primary); 
   border-bottom: 1px solid var(--border-primary);
 
-  .stat-item {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-    padding: var(--spacing-lg);
+  .stat-card {
+    display: flex; align-items: center; gap: 16px;
+    padding: 16px;
     background: var(--bg-secondary);
     border: 1px solid var(--border-primary);
-    border-radius: var(--ui-border-radius-lg);
-    box-shadow: var(--shadow-sm);
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 
     .icon-box {
-      width: 48px; height: 48px;
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.25rem;
-      
-      &.blue { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
-      &.green { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-      &.orange { background: rgba(249, 115, 22, 0.1); color: #f97316; }
-      &.purple { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+      width: 44px; height: 44px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+      &.blue { background: #eff6ff; color: #3b82f6; }
+      &.green { background: #f0fdf4; color: #16a34a; }
+      &.orange { background: #fff7ed; color: #f97316; }
+      &.purple { background: #f5f3ff; color: #8b5cf6; }
     }
 
     .stat-content {
       display: flex; flex-direction: column;
-      label { font-size: 0.75rem; text-transform: uppercase; font-weight: 600; color: var(--text-label); letter-spacing: 0.5px; }
-      strong { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); font-family: var(--font-heading); }
+      label { font-size: 0.7rem; text-transform: uppercase; font-weight: 700; color: var(--text-tertiary); letter-spacing: 0.5px; }
+      strong { font-size: 1.1rem; font-weight: 800; color: var(--text-primary); font-family: var(--font-heading); }
     }
   }
 }
 
-/* === 3. MAIN LAYOUT === */
+/* === 3. LAYOUT BODY (Scrollable) === */
 .layout-body {
-  padding: var(--spacing-2xl);
+  flex: 1; /* Take remaining height */
+  min-height: 0; /* CRITICAL */
+  padding: 24px 32px;
   display: grid;
-  grid-template-columns: 350px 1fr;
-  gap: var(--spacing-2xl);
-  max-width: 1800px;
-  margin: 0 auto;
-  width: 100%;
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
+  overflow-y: auto; /* Scroll ONLY this area */
 
-  @media (max-width: 1100px) {
+  @media (max-width: 1024px) {
     grid-template-columns: 1fr;
-    padding: var(--spacing-lg);
+    padding: 16px;
   }
 }
 
-/* === LEFT SIDEBAR (Info Cards) === */
+/* === SIDEBAR COL === */
 .sidebar-col {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xl);
+  display: flex; flex-direction: column; gap: 24px;
 }
 
-.glass-card {
+.info-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius-lg);
-  box-shadow: var(--shadow-md);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -2px rgba(0,0,0,0.03);
   overflow: hidden;
 
   .card-header {
-    padding: var(--spacing-md) var(--spacing-lg);
+    padding: 16px 20px;
     border-bottom: 1px solid var(--border-primary);
     background: var(--bg-ternary);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: flex; justify-content: space-between; align-items: center;
+    h3 { margin: 0; font-size: 0.9rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px; i { color: var(--accent-primary); } }
     
-    h3 {
-      margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--text-primary);
-      display: flex; align-items: center; gap: 0.5rem;
-      i { color: var(--accent-primary); }
+    .icon-btn {
+      background: transparent; border: none; color: var(--text-secondary); cursor: pointer;
+      &:hover { color: var(--accent-primary); }
     }
   }
 
   .card-content {
-    padding: var(--spacing-lg);
-    display: flex; flex-direction: column; gap: var(--spacing-md);
+    padding: 16px 20px;
+    display: flex; flex-direction: column; gap: 12px;
   }
 
   .info-row {
-    display: flex; justify-content: space-between; align-items: center;
-    font-size: 0.9rem;
-    
-    .label { color: var(--text-secondary); }
+    display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;
+    .label { color: var(--text-secondary); font-size: 0.85rem; }
     .val { 
       color: var(--text-primary); font-weight: 500; 
       &.link { color: var(--accent-primary); cursor: pointer; &:hover { text-decoration: underline; } }
     }
   }
+  
+  .divider { height: 1px; background: var(--border-primary); margin: 4px 0; border-style: dashed; }
 }
 
-/* === RIGHT COLUMN (Schedule) === */
+/* === MAIN COL === */
 .main-col {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xl);
-  min-width: 0;
+  display: flex; flex-direction: column; gap: 24px;
+  min-width: 0; /* Prevents grid blowout */
+  flex: 1;
 }
 
 /* Progress Widget */
 .progress-widget {
   background: var(--bg-secondary);
   border: 1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius-lg);
-  padding: var(--spacing-xl);
-  box-shadow: var(--shadow-sm);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
   
   .widget-header {
-    display: flex; justify-content: space-between; margin-bottom: var(--spacing-md);
-    h4 { margin: 0; color: var(--text-primary); font-weight: 600; }
-    span { color: var(--accent-primary); font-weight: 700; font-family: var(--font-mono); }
+    display: flex; justify-content: space-between; margin-bottom: 12px;
+    h4 { margin: 0; color: var(--text-primary); font-weight: 700; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .percentage { color: var(--accent-primary); font-weight: 800; font-family: var(--font-mono); }
   }
+  
+  ::ng-deep .custom-progress .p-progressbar-value { background: var(--accent-primary); }
 }
 
-/* === UPDATED TABLE CARD FOR AG GRID === */
+/* === TABLE CARD (Flex Grow) === */
 .table-card {
-  @extend .glass-card;
-  padding: 0;
-  
-  /* Added specific height for AG Grid to render properly */
-  min-height: 600px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   
+  /* Make the card grow to fill remaining space */
+  flex: 1; 
+  min-height: 400px; /* Minimum readable height */
+
   .table-header {
-    padding: var(--spacing-lg);
-    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 20px;
     border-bottom: 1px solid var(--border-primary);
-    flex-shrink: 0;
-    
-    h3 { margin: 0; font-size: 1.1rem; color: var(--text-primary); }
+    background: var(--bg-secondary);
+    h3 { margin: 0; font-size: 1rem; font-weight: 700; color: var(--text-primary); }
   }
 
-  /* Wrapper for AG Grid inside the card */
   .grid-wrapper {
-    flex: 1;
-    width: 100%;
-    min-height: 0; /* Important for flex child scroll */
+    flex: 1;       /* Grow to fill card */
+    min-height: 0; /* CRITICAL */
+    position: relative;
+    background: var(--bg-primary);
     
-    app-ag-share-grid {
-      height: 100%;
+    .full-size-grid {
       width: 100%;
+      height: 100%;
       display: block;
+      
+      ::ng-deep ag-grid-angular {
+        width: 100%;
+        height: 100%;
+      }
     }
   }
 }
 
-/* === PRIME NG OVERRIDES === */
-:host ::ng-deep {
-  
-  /* Progress Bar */
-  .p-progressbar {
-    height: 0.75rem;
-    background: var(--bg-ternary);
-    border-radius: 99px;
-    .p-progressbar-value { background: var(--accent-gradient); }
-  }
-
-  /* Dialog */
-  .p-dialog .p-dialog-content {
-    background: var(--bg-secondary);
-    padding: var(--spacing-xl);
-  }
-  
-  .p-inputnumber, .p-select, .p-inputtext { width: 100%; }
-}
-
-/* === UTILITIES === */
-.text-success { color: var(--color-success) !important; }
-.text-danger { color: var(--color-error) !important; }
+/* === UTILITIES & LOADING === */
+.text-success { color: #16a34a !important; }
+.text-danger { color: #dc2626 !important; }
 .font-mono { font-family: var(--font-mono); }
 
-/* Animation */
-.animate-fadeIn { animation: fadeIn 0.4s ease-out; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-/* Loading */
-.loading-container {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  height: 100vh; gap: 1rem; color: var(--text-secondary);
+.loading-wrapper {
+  padding: 40px; max-width: 1200px; margin: 0 auto;
+  .header-skeleton { display: flex; justify-content: space-between; margin-bottom: 32px; }
+  .stats-skeleton { margin-bottom: 32px; }
+  .grid-skeleton { display: grid; grid-template-columns: 320px 1fr; gap: 24px; }
 }
 
-/* === UPDATED TABLE CARD === */
-.table-card {
-  @extend .glass-card;
-  padding: 0;
-  
-  /* ✅ CHANGED: Use Viewport Height (vh) instead of fixed pixels */
-  /* This calculates to roughly 55% of the screen height, fitting it nicely */
-  height: 55vh; 
-  min-height: 400px; /* Safety minimum so it doesn't get too small */
-  
-  display: flex;
-  flex-direction: column;
-  
-  .table-header {
-    padding: var(--spacing-lg);
-    display: flex; justify-content: space-between; align-items: center;
-    border-bottom: 1px solid var(--border-primary);
-    flex-shrink: 0; /* Prevents header from shrinking */
-    
-    h3 { margin: 0; font-size: 1.1rem; color: var(--text-primary); }
-  }
-
-  /* Wrapper for AG Grid inside the card */
-  .grid-wrapper {
-    flex: 1;
-    width: 100%;
-    min-height: 0; /* Crucial: Allows the grid to scroll internally */
-    overflow: hidden;
-    
-    app-ag-share-grid {
-      height: 100%;
-      width: 100%;
-      display: block;
-    }
-  }
+/* === DIALOG STYLES === */
+.dialog-content { display: flex; flex-direction: column; gap: 16px; margin-top: 8px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; label { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); } }
+.installment-summary {
+  background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; margin-bottom: 8px;
+  .summary-row { display: flex; justify-content: space-between; font-size: 0.9rem; color: #64748b; margin-bottom: 4px; }
+  .amount-row { display: flex; justify-content: space-between; align-items: flex-end; font-weight: 600; font-size: 0.9rem; .amount { font-size: 1.2rem; color: var(--accent-primary); } }
 }
+
+// /* ==============================================
+//    EMI DETAILS STYLES
+//    Theme: Enterprise Glass / Canonical Tokens
+//    ============================================== */
+
+// :host {
+//   display: block;
+//   width: 100%;
+//   height: 100%;
+// }
+
+// .page-container {
+//   width: 100%;
+//   height: 100%;
+//   overflow-y: auto; /* Allow body scroll */
+//   display: flex;
+//   flex-direction: column;
+//   background: var(--bg-primary);
+//   padding: 0; /* Full width */
+// }
+
+// /* === 1. HEADER (Sticky) === */
+// .details-header {
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   padding: var(--spacing-lg) var(--spacing-2xl);
+//   background: var(--bg-secondary);
+//   border-bottom: 1px solid var(--border-primary);
+//   position: sticky;
+//   top: 0;
+//   z-index: 20;
+//   backdrop-filter: blur(10px);
+
+//   .header-left {
+//     display: flex;
+//     align-items: center;
+//     gap: var(--spacing-lg);
+
+//     .back-btn {
+//       color: var(--text-secondary);
+//       &:hover { color: var(--text-primary); background: var(--bg-ternary); }
+//     }
+
+//     .title-group {
+//       display: flex;
+//       flex-direction: column;
+//       gap: 2px;
+
+//       h1 {
+//         margin: 0;
+//         font-size: 1.25rem;
+//         font-weight: 700;
+//         color: var(--text-primary);
+//         font-family: var(--font-heading);
+//         display: flex;
+//         align-items: center;
+//         gap: 0.75rem;
+//       }
+
+//       .subtitle {
+//         font-size: 0.8rem;
+//         color: var(--text-secondary);
+//         font-weight: 500;
+//       }
+//     }
+//   }
+// }
+
+// /* === 2. STATS BAR (Summary) === */
+// .stats-bar {
+//   display: grid;
+//   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+//   gap: var(--spacing-xl);
+//   padding: var(--spacing-xl) var(--spacing-2xl);
+//   background: linear-gradient(to bottom, var(--bg-secondary), var(--bg-primary));
+//   border-bottom: 1px solid var(--border-primary);
+
+//   .stat-item {
+//     display: flex;
+//     align-items: center;
+//     gap: var(--spacing-md);
+//     padding: var(--spacing-lg);
+//     background: var(--bg-secondary);
+//     border: 1px solid var(--border-primary);
+//     border-radius: var(--ui-border-radius-lg);
+//     box-shadow: var(--shadow-sm);
+
+//     .icon-box {
+//       width: 48px; height: 48px;
+//       border-radius: 12px;
+//       display: flex; align-items: center; justify-content: center;
+//       font-size: 1.25rem;
+      
+//       &.blue { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+//       &.green { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+//       &.orange { background: rgba(249, 115, 22, 0.1); color: #f97316; }
+//       &.purple { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+//     }
+
+//     .stat-content {
+//       display: flex; flex-direction: column;
+//       label { font-size: 0.75rem; text-transform: uppercase; font-weight: 600; color: var(--text-label); letter-spacing: 0.5px; }
+//       strong { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); font-family: var(--font-heading); }
+//     }
+//   }
+// }
+
+// /* === 3. MAIN LAYOUT === */
+// .layout-body {
+//   padding: var(--spacing-2xl);
+//   display: grid;
+//   grid-template-columns: 350px 1fr;
+//   gap: var(--spacing-2xl);
+//   max-width: 1800px;
+//   margin: 0 auto;
+//   width: 100%;
+
+//   @media (max-width: 1100px) {
+//     grid-template-columns: 1fr;
+//     padding: var(--spacing-lg);
+//   }
+// }
+
+// /* === LEFT SIDEBAR (Info Cards) === */
+// .sidebar-col {
+//   display: flex;
+//   flex-direction: column;
+//   gap: var(--spacing-xl);
+// }
+
+// .glass-card {
+//   background: var(--bg-secondary);
+//   border: 1px solid var(--border-primary);
+//   border-radius: var(--ui-border-radius-lg);
+//   box-shadow: var(--shadow-md);
+//   overflow: hidden;
+
+//   .card-header {
+//     padding: var(--spacing-md) var(--spacing-lg);
+//     border-bottom: 1px solid var(--border-primary);
+//     background: var(--bg-ternary);
+//     display: flex;
+//     justify-content: space-between;
+//     align-items: center;
+    
+//     h3 {
+//       margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--text-primary);
+//       display: flex; align-items: center; gap: 0.5rem;
+//       i { color: var(--accent-primary); }
+//     }
+//   }
+
+//   .card-content {
+//     padding: var(--spacing-lg);
+//     display: flex; flex-direction: column; gap: var(--spacing-md);
+//   }
+
+//   .info-row {
+//     display: flex; justify-content: space-between; align-items: center;
+//     font-size: 0.9rem;
+    
+//     .label { color: var(--text-secondary); }
+//     .val { 
+//       color: var(--text-primary); font-weight: 500; 
+//       &.link { color: var(--accent-primary); cursor: pointer; &:hover { text-decoration: underline; } }
+//     }
+//   }
+// }
+
+// /* === RIGHT COLUMN (Schedule) === */
+// .main-col {
+//   display: flex;
+//   flex-direction: column;
+//   gap: var(--spacing-xl);
+//   min-width: 0;
+// }
+
+// /* Progress Widget */
+// .progress-widget {
+//   background: var(--bg-secondary);
+//   border: 1px solid var(--border-primary);
+//   border-radius: var(--ui-border-radius-lg);
+//   padding: var(--spacing-xl);
+//   box-shadow: var(--shadow-sm);
+  
+//   .widget-header {
+//     display: flex; justify-content: space-between; margin-bottom: var(--spacing-md);
+//     h4 { margin: 0; color: var(--text-primary); font-weight: 600; }
+//     span { color: var(--accent-primary); font-weight: 700; font-family: var(--font-mono); }
+//   }
+// }
+
+// /* === UPDATED TABLE CARD FOR AG GRID === */
+// .table-card {
+//   @extend .glass-card;
+//   padding: 0;
+  
+//   /* Added specific height for AG Grid to render properly */
+//   min-height: 600px;
+//   display: flex;
+//   flex-direction: column;
+  
+//   .table-header {
+//     padding: var(--spacing-lg);
+//     display: flex; justify-content: space-between; align-items: center;
+//     border-bottom: 1px solid var(--border-primary);
+//     flex-shrink: 0;
+    
+//     h3 { margin: 0; font-size: 1.1rem; color: var(--text-primary); }
+//   }
+
+//   /* Wrapper for AG Grid inside the card */
+//   .grid-wrapper {
+//     flex: 1;
+//     width: 100%;
+//     min-height: 0; /* Important for flex child scroll */
+    
+//     app-ag-share-grid {
+//       height: 100%;
+//       width: 100%;
+//       display: block;
+//     }
+//   }
+// }
+
+// /* === UTILITIES === */
+// .text-success { color: var(--color-success) !important; }
+// .text-danger { color: var(--color-error) !important; }
+// .font-mono { font-family: var(--font-mono); }
+
+// /* Animation */
+// .animate-fadeIn { animation: fadeIn 0.4s ease-out; }
+// @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+// /* Loading */
+// .loading-container {
+//   display: flex; flex-direction: column; align-items: center; justify-content: center;
+//   height: 100vh; gap: 1rem; color: var(--text-secondary);
+// }
+
+// /* === UPDATED TABLE CARD === */
+// .table-card {
+//   @extend .glass-card;
+//   padding: 0;
+  
+//   /* ✅ CHANGED: Use Viewport Height (vh) instead of fixed pixels */
+//   /* This calculates to roughly 55% of the screen height, fitting it nicely */
+//   height: 55vh; 
+//   min-height: 400px; /* Safety minimum so it doesn't get too small */
+  
+//   display: flex;
+//   flex-direction: column;
+  
+//   .table-header {
+//     padding: var(--spacing-lg);
+//     display: flex; justify-content: space-between; align-items: center;
+//     border-bottom: 1px solid var(--border-primary);
+//     flex-shrink: 0; /* Prevents header from shrinking */
+    
+//     h3 { margin: 0; font-size: 1.1rem; color: var(--text-primary); }
+//   }
+
+//   /* Wrapper for AG Grid inside the card */
+//   .grid-wrapper {
+//     flex: 1;
+//     width: 100%;
+//     min-height: 0; /* Crucial: Allows the grid to scroll internally */
+//     overflow: hidden;
+    
+//     app-ag-share-grid {
+//       height: 100%;
+//       width: 100%;
+//       display: block;
+//     }
+//   }
+// }

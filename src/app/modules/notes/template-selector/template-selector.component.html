@@ -1,0 +1,54 @@
+ <div class="template-selector-container">
+            <div class="selector-header">
+        <p>Select a template to start with. This will overwrite your current title and content.</p>
+      </div>
+
+      @if (isLoading()) {
+        <div class="loading-state">
+          <i class="pi pi-spin pi-spinner"></i> Loading templates...
+        </div>
+      }
+
+      <!-- Empty State -->
+      @if (!isLoading() && templates().length === 0) {
+        <div class="empty-state">
+          <div class="icon-circle"><i class="pi pi-file-o"></i></div>
+          <h3>No templates found</h3>
+          <p>Create a note and check "Save as Template" to add one here.</p>
+          <button class="btn-text" (click)="close()">Cancel</button>
+        </div>
+      }
+
+      <!-- Templates Grid -->
+      <div class="templates-grid custom-scrollbar">
+        @for (template of templates(); track template._id) {
+          <div class="template-card" (click)="selectTemplate(template)">
+            
+            <div class="card-preview">
+              <!-- Mini visual representation of content -->
+              <div class="mini-lines">
+                <div class="line title"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line short"></div>
+              </div>
+              <div class="hover-overlay">
+                <button class="btn-use">Use Template</button>
+              </div>
+            </div>
+
+            <div class="card-meta">
+              <span class="type-icon" [ngClass]="template.noteType">
+                <i [class]="getTypeIcon(template.noteType)"></i>
+              </span>
+              <div class="info">
+                <h4 class="title">{{ template.title }}</h4>
+                <span class="date">Updated {{ template.updatedAt | date:'MMM d' }}</span>
+              </div>
+            </div>
+
+          </div>
+        }
+      </div>
+
+    </div>

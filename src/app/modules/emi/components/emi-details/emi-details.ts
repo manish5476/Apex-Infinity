@@ -30,18 +30,7 @@ import { CommonMethodService } from '../../../../core/utils/common-method.servic
 @Component({
   selector: 'app-emi-details',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    ReactiveFormsModule,
-    // PrimeNG
-    ButtonModule, TagModule, CardModule, DividerModule,
-    ProgressBarModule, DialogModule, InputNumberModule,
-    InputTextModule, SelectModule, ToastModule,
-    ConfirmDialogModule, SkeletonModule,
-    // Shared
-    AgShareGrid
-  ],
+  imports: [CommonModule,RouterModule,ReactiveFormsModule,ButtonModule, TagModule, CardModule, DividerModule,ProgressBarModule, DialogModule, InputNumberModule,InputTextModule, SelectModule, ToastModule,ConfirmDialogModule, SkeletonModule,AgShareGrid  ],
   providers: [ConfirmationService, DatePipe], // Add DatePipe to providers
   templateUrl: './emi-details.html',
   styleUrl: './emi-details.scss'
@@ -86,11 +75,21 @@ export class EmiDetailsComponent implements OnInit {
     return data ? data.installments.reduce((acc: number, curr: any) => acc + (curr.paidAmount || 0), 0) : 0;
   });
 
+// ... inside EmiDetailsComponent
+
   remainingAmount = computed(() => {
     const data = this.emiData();
-    return data ? data.totalAmount - this.totalPaidAmount() : 0;
-  });
+    if (!data || !data.installments) return 0;
 
+    // 1. Calculate the Total Amount that NEEDS to be paid via installments
+    const totalInstallmentValue = data.installments.reduce((acc: number, curr: any) => acc + (curr.totalAmount || 0), 0);
+
+    // 2. Calculate what has actually been paid against those installments
+    const totalPaidAgainstInstallments = data.installments.reduce((acc: number, curr: any) => acc + (curr.paidAmount || 0), 0);
+
+    // 3. The true remaining balance is simply the difference
+    return totalInstallmentValue - totalPaidAgainstInstallments;
+  });
   paymentModes = [
     { label: 'Cash', value: 'cash' },
     { label: 'Bank Transfer', value: 'bank' },
@@ -115,20 +114,7 @@ export class EmiDetailsComponent implements OnInit {
     });
   }
 
-  private fetchEmiDetails(id: string) {
-    this.isLoading.set(true);
-    this.common.apiCall(
-      this.emiService.getEmiById(id),
-      (res: any) => {
-        const data = res.data?.emi || res.data;
-        this.emiData.set(data);
-        this.gridData = data.installments || []; // Populate Grid Data
-        this.isLoading.set(false);
-      },
-      'Fetch EMI Details'
-    );
-  }
-
+  
   // --- Grid Configuration ---
   setupColumns() {
     this.column = [
@@ -233,11 +219,11 @@ export class EmiDetailsComponent implements OnInit {
 
     this.showPaymentDialog = true;
   }
-
-  submitPayment() {
+submitPayment() {
     if (this.paymentForm.invalid) {
       this.paymentForm.markAllAsTouched();
-      this.messageService.showError('Validation Error', 'Reference ID is required.');
+      // Swapped showError for showWarn (better for form validation) and combined into one string
+      this.messageService.showWarn('Validation Error: Reference ID is required.');
       return;
     }
 
@@ -257,15 +243,28 @@ export class EmiDetailsComponent implements OnInit {
     this.common.apiCall(
       this.emiService.payEmiInstallment(payload),
       (res: any) => {
-        this.messageService.showSuccess('Success', `Payment recorded.`);
+        this.messageService.showSuccess('Payment recorded successfully.');
         this.showPaymentDialog = false;
         this.isSubmittingPayment.set(false);
         this.fetchEmiDetails(emiId); // Refresh Data & Grid
-      },
-      'Record Payment'
+      }
     );
   }
 
+  private fetchEmiDetails(id: string) {
+    this.isLoading.set(true);
+    
+    this.common.apiCall(
+      this.emiService.getEmiById(id),
+      (res: any) => {
+        const data = res.data?.emi || res.data;
+        this.emiData.set(data);
+        this.gridData = data.installments || []; // Populate Grid Data
+        this.isLoading.set(false);
+      }
+      // Removed the redundant 'Fetch EMI Details' context string here
+    );
+  }
   isOverdue(installment: any): boolean {
     if (!installment || installment.paymentStatus === 'paid') return false;
     const dueDate = new Date(installment.dueDate);
