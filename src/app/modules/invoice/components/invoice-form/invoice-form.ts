@@ -62,10 +62,10 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 
   // --- Computed ---
   formTitle = computed(() => this.editMode() ? `Edit Invoice #${this.invoiceForm.get('invoiceNumber')?.value || ''}` : 'New Smart Invoice');
-  
+
   // --- Master Data ---
   customerOptions = computed(() => this.masterList.customers());
-  productOptions = computed(() => this.masterList.products()); 
+  productOptions = computed(() => this.masterList.products());
   branchOptions = computed(() => this.masterList.branches());
 
   gstTypeOptions = [
@@ -94,8 +94,6 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.buildForm();
     this.setupTotalsCalculation();
-
-    // Default Branch
     const defaultBranch = this.masterList.branches()[0]?._id;
     if (defaultBranch && !this.editMode()) {
       this.invoiceForm.patchValue({ branchId: defaultBranch });
@@ -110,7 +108,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
       } else {
         this.isLoading.set(false);
         this.generateInvoiceNumber();
-        this.addItem(); // Start with 1 item
+        this.addItem();
       }
     });
   }
@@ -127,7 +125,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
       invoiceNumber: ['', Validators.required],
       invoiceDate: [new Date(), Validators.required],
       dueDate: [null],
-      status: ['draft', Validators.required], 
+      status: ['draft', Validators.required],
       billingAddress: [''],
       shippingAddress: [''],
       placeOfSupply: [''],
@@ -140,12 +138,9 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
     });
   }
 
- 
-
   private patchForm(data: any): void {
     const customerValue = data.customerId?._id || data.customerId;
     const branchValue = data.branchId?._id || data.branchId;
-
     this.invoiceForm.patchValue({
       customerId: customerValue,
       branchId: branchValue,
@@ -162,7 +157,6 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
       gstType: data.gstType,
       notes: data.notes
     });
-
     const itemControl = this.items;
     itemControl.clear();
     if (data.items?.length) {
@@ -171,14 +165,12 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
     this.invoiceForm.updateValueAndValidity();
   }
 
-  // === 2. Smart Items (Auto-Stock Check) ===
   get items(): FormArray {
     return this.invoiceForm.get('items') as FormArray;
   }
 
   createItem(data?: any): FormGroup {
     const productValue = data?.productId?._id || data?.productId || null;
-    
     return this.fb.group({
       productId: [productValue, Validators.required],
       name: [data?.name || '', Validators.required],
@@ -188,9 +180,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
       price: [data?.price || 0, [Validators.required, Validators.min(0)]],
       discount: [data?.discount || 0, Validators.min(0)],
       taxRate: [data?.taxRate || 0, [Validators.required, Validators.min(0)]],
-      
-      // Virtual Fields for UI
-      currentStock: [data?.currentStock || 0], 
+      currentStock: [data?.currentStock || 0],
       isLowStock: [data?.willBeLow || false],
       isCheckingStock: [false] // Loading state for stock
     });
@@ -204,8 +194,6 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
     this.items.removeAt(index);
   }
 
-
-
   onCustomerSelect(event: any): void {
     const customer = this.customerOptions().find(c => c._id === event.value);
     if (customer) {
@@ -215,7 +203,6 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
         shippingAddress: this.formatAddress(customer['shippingAddress']) || billAddr,
         placeOfSupply: customer['billingAddress']?.state || ''
       });
-
       const terms = parseInt(customer['paymentTerms'] as string) || 0;
       if (terms > 0) {
         const due = new Date();
@@ -225,24 +212,20 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
     }
   }
 
-  // === 4. Live Calculations ===
   private setupTotalsCalculation(): void {
     this.invoiceForm.valueChanges.pipe(
       takeUntil(this.destroy$),
       debounceTime(100)
     ).subscribe(val => {
       let sub = 0, disc = 0, tax = 0;
-
       (val.items || []).forEach((item: any) => {
         const qty = Number(item.quantity) || 0;
         const price = Number(item.price) || 0;
         const d = Number(item.discount) || 0;
         const tRate = Number(item.taxRate) || 0;
-
         const lineTotal = price * qty;
         const taxable = lineTotal - d;
         const tAmount = (taxable * tRate) / 100;
-
         sub += lineTotal;
         disc += d;
         tax += tAmount;
@@ -251,7 +234,6 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
       const round = Number(val.roundOff) || 0;
       const grand = (sub - disc + tax) + round;
       const paid = Number(val.paidAmount) || 0;
-
       this.subTotal.set(sub);
       this.totalDiscount.set(disc);
       this.totalTax.set(tax);
@@ -259,8 +241,8 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
       this.balanceAmount.set(Math.round(grand) - paid);
     });
   }
-// === 5. Smart Submit Flow ===
 
+  // === 5. Smart Submit Flow ===
   private preparePayload(): any {
     const formValue = this.invoiceForm.getRawValue();
     return {
@@ -270,14 +252,7 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
       totalTax: this.totalTax(),
       grandTotal: this.grandTotal(),
       balanceAmount: this.balanceAmount(),
-      items: formValue.items.map((i: any) => ({
-        productId: i.productId,
-        quantity: i.quantity,
-        price: i.price,
-        discount: i.discount,
-        taxRate: i.taxRate,
-        unit: i.unit
-      }))
+      items: formValue.items.map((i: any) => ({ productId: i.productId, quantity: i.quantity, price: i.price, discount: i.discount, taxRate: i.taxRate, unit: i.unit }))
     };
   }
 
@@ -296,15 +271,9 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
   // === 1. Smart Load (With Stock Info) ===
   private loadInvoiceData(id: string): void {
     this.invoiceService.getInvoiceWithStock(id).subscribe({
-      next: (res: any) => {
-        const data = res.data?.invoice || res.data;
-        if (data) this.patchForm(data);
-        this.isLoading.set(false);
-      },
+      next: (res: any) => { const data = res.data?.invoice || res.data; if (data) this.patchForm(data); this.isLoading.set(false); },
       error: (err) => {
-        // Simplified to single string and redirected
-        this.messageService.handleHttpError(err);
-        this.router.navigate(['/invoices']);
+        this.messageService.handleHttpError(err); this.router.navigate(['/invoices']);
       }
     });
   }
@@ -317,14 +286,13 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 
     if (product) {
       const itemGroup = this.items.at(index) as FormGroup;
-      
       itemGroup.patchValue({
         name: product.name,
         price: product['sellingPrice'],
         taxRate: product['taxRate'] || 0,
         hsnCode: product['sku'] || '',
         unit: product['unit'] || 'pcs',
-        isCheckingStock: true 
+        isCheckingStock: true
       });
 
       if (branchId) {
@@ -332,7 +300,6 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
           branchId: branchId,
           items: [{ productId: productId, quantity: 1 }]
         };
-
         this.invoiceService.checkStock(checkPayload).subscribe({
           next: (res: any) => {
             let availableQty = 0;
@@ -351,13 +318,11 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
           error: (err) => {
             console.error('Stock check failed', err);
             itemGroup.patchValue({ isCheckingStock: false, currentStock: 0 });
-            // Optional: notify user stock check failed
             this.messageService.showWarn('Stock Check: Failed to verify current availability.');
           }
         });
       } else {
         itemGroup.patchValue({ isCheckingStock: false });
-        // Combined into single string
         this.messageService.showWarn('Branch Required: Please select a branch to check stock.');
       }
     }
@@ -366,26 +331,21 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
   handleSubmit(status: 'draft' | 'issued'): void {
     if (this.invoiceForm.invalid) {
       this.invoiceForm.markAllAsTouched();
-      // Combined into single string
       this.messageService.showWarn('Validation Error: Please complete all required fields.');
       return;
     }
 
     this.invoiceForm.patchValue({ status });
     const payload = this.preparePayload();
-
     if (status === 'issued') {
       this.isSubmitting.set(true);
-
       const checkPayload = {
         branchId: payload.branchId,
         items: payload.items
       };
-
       this.invoiceService.checkStock(checkPayload).subscribe({
         next: (validation: any) => {
           const isValid = validation.isValid;
-          
           if (isValid) {
             if (validation.warnings?.length > 0) {
               this.confirmSubmission(payload, 'Stock warnings detected. Continue?', 'pi pi-exclamation-triangle');
@@ -402,8 +362,6 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
             } else {
               msg = validation.message || 'Items out of stock';
             }
-
-            // Updated to single message parameter
             this.messageService.showError(`Stock Unavailable: ${msg}`);
             this.isSubmitting.set(false);
           }
@@ -417,19 +375,14 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
       this.saveInvoice(payload);
     }
   }
-// === 4. Confirmation & Saving ===
-
   private confirmSubmission(payload: any, message: string, icon: string): void {
     this.confirmationService.confirm({
       message: message,
       header: 'Stock Warning',
       icon: icon,
-      accept: () => {
-        this.saveInvoice(payload);
-      },
+      accept: () => { this.saveInvoice(payload); },
       reject: () => {
         this.isSubmitting.set(false);
-        // Optional: show a quick info message that the action was cancelled
         this.messageService.showInfo('Submission cancelled by user.');
       }
     });
@@ -437,28 +390,17 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
 
   private saveInvoice(payload: any): void {
     this.isSubmitting.set(true);
-
-    const request$ = this.editMode()
-      ? this.invoiceService.updateInvoice(this.invoiceId!, payload)
-      : this.invoiceService.createInvoice(payload);
-
-    request$.pipe(
-      finalize(() => this.isSubmitting.set(false))
-    ).subscribe({
+    const request$ = this.editMode() ? this.invoiceService.updateInvoice(this.invoiceId!, payload) : this.invoiceService.createInvoice(payload);
+    request$.pipe(finalize(() => this.isSubmitting.set(false))).subscribe({
       next: (res) => {
         const invNum = res.data?.invoice?.invoiceNumber || 'New';
         const statusText = payload.status === 'draft' ? 'saved as draft' : 'issued';
-        
-        // Simplified success message string
         this.messageService.showSuccess(`Success: Invoice #${invNum} has been ${statusText}.`);
-        
         this.router.navigate(['/invoices']);
       },
       error: (err) => {
-        // Use the global handler to parse backend errors (e.g., database failures)
         this.messageService.handleHttpError(err);
       }
     });
   }
-  
 }

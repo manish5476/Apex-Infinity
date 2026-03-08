@@ -1,0 +1,29 @@
+.pos-layout {
+  height: calc(100vh - 80px); // Adjust based on your top nav
+  display: flex;
+  flex-direction: column;
+
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .scanner-input {
+    &:focus {
+      box-shadow: none;
+      outline: none;
+    }
+  }
+
+  // Hide number arrows in webkit for a cleaner look
+  ::ng-deep .p-inputnumber-input::-webkit-outer-spin-button,
+  ::ng-deep .p-inputnumber-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}

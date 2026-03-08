@@ -8,7 +8,7 @@ export interface StockAdjustmentPayload {
   type: 'add' | 'subtract';
   quantity: number;
   reason: string;
-  branchId?: string; 
+  branchId?: string;
 }
 
 export interface StockTransferPayload {
@@ -28,7 +28,6 @@ export class ProductService extends BaseApiService {
     return this.post(this.endpoint, data, 'createProduct');
   }
 
-  // ================= GET =================
   getAllProducts(filterParams?: any): Observable<any> {
     return this.get(this.endpoint, filterParams, 'getAllProducts');
   }
@@ -37,7 +36,10 @@ export class ProductService extends BaseApiService {
     return this.get(`${this.endpoint}/${id}`, {}, 'getProductById');
   }
 
-  // Used for dropdown search
+  scanProduct(code: string, branchId: string) {
+    return this.http.post<any>(`${this.endpoint}/scan`, { code, branchId });
+  }
+
   searchProducts(query: any): Observable<any> {
     return this.get(`${this.endpoint}/search`, query, 'searchProducts');
   }
@@ -90,7 +92,7 @@ export class ProductService extends BaseApiService {
 
   getProductHistory(id: string, startDate?: string | Date | any, endDate?: string | Date | any): Observable<any> {
     const params: any = {};
-    
+
     // Check if it's already a string before calling toISOString()
     if (startDate) {
       params.startDate = typeof startDate === 'string' ? startDate : startDate.toISOString();

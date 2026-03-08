@@ -1,0 +1,134 @@
+
+<!-- <p-toast></p-toast>
+<p-confirmDialog [style]="{width: '400px'}"></p-confirmDialog>
+
+<div class="page-layout pos-layout">
+  <form [formGroup]="invoiceForm" class="invoice-container glass-panel">
+    
+    <header class="invoice-header">
+      <div class="header-left gap-4">
+        <button pButton icon="pi pi-arrow-left" class="p-button-rounded p-button-secondary p-button-text" routerLink="/invoices"></button>
+        <div class="flex flex-col">
+          <h1 class="text-2xl font-bold text-primary">{{ formTitle() }}</h1>
+          <span class="text-sm text-gray-500">{{ invoiceForm.get('invoiceDate')?.value | date:'medium' }}</span>
+        </div>
+      </div>
+      
+      <div class="header-right flex gap-3">
+        <p-select formControlName="branchId" [options]="branchOptions()" optionLabel="name" optionValue="_id" placeholder="Select Branch" styleClass="w-48"></p-select>
+        <p-select formControlName="customerId" [options]="customerOptions()" optionLabel="name" optionValue="_id" [filter]="true" filterBy="name" placeholder="Walk-in Customer" styleClass="w-48"></p-select>
+      </div>
+    </header>
+
+    <div class="scanner-section my-3 px-4">
+      <div class="p-inputgroup w-full shadow-lg rounded-xl overflow-hidden">
+        <span class="p-inputgroup-addon bg-blue-900 text-white border-none px-4">
+          <i class="pi pi-barcode text-2xl"></i>
+        </span>
+        <input #scannerInput pInputText type="text" 
+               placeholder="Scan Barcode or SKU here... (Press Enter)" 
+               (keyup.enter)="onProductScan($event)" 
+               [disabled]="isScanning()"
+               class="scanner-input text-xl font-bold py-3 border-none bg-blue-50/50" />
+        <span class="p-inputgroup-addon border-none bg-blue-50/50" *ngIf="isScanning()">
+          <p-progressSpinner [style]="{width: '24px', height: '24px'}"></p-progressSpinner>
+        </span>
+      </div>
+    </div>
+
+    <div class="invoice-body px-4 custom-scrollbar" style="min-height: 40vh;">
+      <div formArrayName="items" class="table-wrapper">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b-2 border-orange-500 text-gray-600">
+              <th class="py-3 px-2 w-1/3">Item Details</th>
+              <th class="py-3 px-2 text-center w-1/6">Qty</th>
+              <th class="py-3 px-2 text-right w-1/6">Price</th>
+              <th class="py-3 px-2 text-right w-1/6">Tax %</th>
+              <th class="py-3 px-2 text-right w-1/6">Total</th>
+              <th class="py-3 px-2 w-12"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of items.controls; track $index; let i = $index) {
+            <tr [formGroupName]="i" class="border-b border-gray-200 hover:bg-gray-50/50 transition-colors">
+              
+              <td class="py-3 px-2">
+                <div class="font-bold text-lg text-blue-900">{{ items.at(i).get('name')?.value }}</div>
+                <div class="text-xs text-gray-500 flex gap-2">
+                  <span class="bg-gray-200 px-2 py-1 rounded">SKU: {{ items.at(i).get('sku')?.value }}</span>
+                  <span class="text-orange-600 font-semibold px-2 py-1">Stock: {{ items.at(i).get('currentStock')?.value }}</span>
+                </div>
+              </td>
+
+              <td class="py-2 px-2 text-center">
+                <p-inputNumber formControlName="quantity" [showButtons]="true" [min]="1" 
+                  [max]="items.at(i).get('currentStock')?.value"
+                  buttonLayout="horizontal" spinnerMode="horizontal"
+                  decrementButtonClass="p-button-secondary" incrementButtonClass="p-button-secondary"
+                  incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
+                  styleClass="w-full max-w-[120px]" inputStyleClass="text-center font-bold text-lg">
+                </p-inputNumber>
+              </td>
+
+              <td class="py-2 px-2">
+                <p-inputNumber formControlName="price" mode="decimal" [minFractionDigits]="2" styleClass="w-full" inputStyleClass="text-right"></p-inputNumber>
+              </td>
+
+              <td class="py-2 px-2 text-center text-gray-500 font-semibold">
+                {{ items.at(i).get('taxRate')?.value }}%
+              </td>
+
+              <td class="py-2 px-2 text-right font-bold text-xl text-blue-900">
+                {{ (((items.at(i).get('quantity')?.value || 0) * (items.at(i).get('price')?.value || 0)) - 
+                    (items.at(i).get('discount')?.value || 0)) * (1 + ((items.at(i).get('taxRate')?.value || 0) / 100)) | currency:'INR' }}
+              </td>
+
+              <td class="py-2 px-2 text-center">
+                <button pButton icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" (click)="removeItem(i)"></button>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+
+        @if (items.controls.length === 0) {
+          <div class="text-center py-12 text-gray-400">
+            <i class="pi pi-shopping-cart text-6xl mb-4 opacity-50"></i>
+            <h3 class="text-xl">Cart is empty</h3>
+            <p>Scan a product to begin billing</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <footer class="invoice-footer bg-gray-50 border-t border-gray-200 p-4 mt-auto rounded-b-xl flex justify-between items-end">
+      
+      <div class="quick-pay flex gap-3 w-1/3">
+        <div class="w-full">
+          <label class="text-sm font-bold text-gray-600 block mb-1">Payment Received</label>
+          <div class="p-inputgroup">
+            <p-inputNumber formControlName="paidAmount" mode="currency" currency="INR" styleClass="w-full" inputStyleClass="text-xl font-bold text-green-700"></p-inputNumber>
+            <p-select formControlName="paymentMethod" [options]="paymentMethodOptions" styleClass="w-32"></p-select>
+          </div>
+        </div>
+      </div>
+
+      <div class="totals flex gap-8 items-center">
+        <div class="text-right">
+          <div class="text-sm text-gray-500">Subtotal: {{ subTotal() | currency:'INR' }}</div>
+          <div class="text-sm text-green-600">Tax: +{{ totalTax() | currency:'INR' }}</div>
+        </div>
+        
+        <div class="grand-total bg-blue-900 text-white px-6 py-3 rounded-xl text-right">
+          <div class="text-sm opacity-80 uppercase tracking-wider">Amount Due</div>
+          <div class="text-4xl font-black text-orange-400">{{ balanceAmount() | currency:'INR' }}</div>
+        </div>
+
+        <button pButton label="Complete Sale (Enter)" icon="pi pi-check-circle" 
+          class="p-button-lg p-button-success shadow-lg h-full" 
+          (click)="handleSubmit('issued')" [loading]="isSubmitting()"></button>
+      </div>
+    </footer>
+  </form>
+</div>   -->
