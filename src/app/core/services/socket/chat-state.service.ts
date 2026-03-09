@@ -3,7 +3,7 @@ import { Injectable, inject, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Subject, Observable, distinctUntilChanged, shareReplay, map } from 'rxjs';
 import { SocketConnectionService } from './socket-connection.service';
 import { Channel } from 'diagnostics_channel';
-import { Message, OnlineUser } from '../socket.service';
+import { Message, OnlineUser } from '../../../chat/chat.component/chat.models';
 
 @Injectable({ providedIn: 'root' })
 export class ChatStateService implements OnDestroy {
@@ -15,7 +15,8 @@ export class ChatStateService implements OnDestroy {
 
   public channels$ = new BehaviorSubject<Channel[]>([]);
   public channelUsers$ = new BehaviorSubject<Record<string, string[]>>({});
-  
+  public channelActivity$ = new Subject<{ channelId: string; lastMessage: any }>();
+
   public onlineUsers$ = new BehaviorSubject<Set<string>>(new Set());
   public onlineUsersList$: Observable<OnlineUser[]> = this.onlineUsers$.pipe(
     map(users => Array.from(users).map(userId => ({ userId }))),
@@ -32,7 +33,7 @@ export class ChatStateService implements OnDestroy {
 
   private setupSocketListeners() {
     // Note: The on() method in SocketConnectionService already handles NgZone.run()
-    
+
     // --- MESSAGES ---
     this.socketService.on('newMessage', (msg: Message) => {
       this.messages$.next(msg);
@@ -73,19 +74,45 @@ export class ChatStateService implements OnDestroy {
       if (data.channels) this.channels$.next(data.channels);
     });
 
+this.socketService.on('channelActivity', (data: any) => {
+      this.channelActivity$.next(data);
+
+      // 1. Get the current value from the BehaviorSubject
+      const currentChannels = [...this.channels$.value];
+      
+      // 2. Find the index using a safe typecast
+      const index = currentChannels.findIndex((c: any) => String(c._id) === String(data.channelId));
+      
+      if (index > -1) {
+        // 3. Create the updated channel object
+        // Use : any here to stop TS from comparing it to the Global Channel API
+        const updatedChannel: any = { 
+          ...currentChannels[index], 
+          lastMessage: data.lastMessage 
+        };
+
+        // 4. Remove the old one and push the new one to the front (Top of sidebar)
+        const filtered = currentChannels.filter((c: any) => String(c._id) !== String(data.channelId));
+        
+        // 5. Update the stream
+        this.channels$.next([updatedChannel, ...filtered]);
+      }
+    });
+    
+
     this.socketService.on('channelCreated', (channel: any) => {
       const current = this.channels$.value;
-      if (!current.some((c:any) => c._id === channel._id)) {
+      if (!current.some((c: any) => c._id === channel._id)) {
         this.channels$.next([channel, ...current]);
       }
     });
 
     this.socketService.on('channelUpdated', (channel: any) => {
-      this.channels$.next(this.channels$.value.map((c:any) => c._id === channel._id ? channel : c));
+      this.channels$.next(this.channels$.value.map((c: any) => c._id === channel._id ? channel : c));
     });
 
     this.socketService.on('removedFromChannel', (data: { channelId: string }) => {
-      this.channels$.next(this.channels$.value.filter((c:any) => c._id !== data.channelId));
+      this.channels$.next(this.channels$.value.filter((c: any) => c._id !== data.channelId));
       this.messagesBatch$.next(this.messagesBatch$.value.filter(m => m.channelId !== data.channelId));
     });
 
@@ -93,7 +120,7 @@ export class ChatStateService implements OnDestroy {
     this.socketService.on('userTyping', (data: any) => this.typing$.next(data));
     this.socketService.on('readReceipt', (data: any) => this.readReceipt$.next(data));
     this.socketService.on('channelUsers', (data: any) => this.channelUsers$.next({ ...this.channelUsers$.value, [data.channelId]: data.users }));
-    
+
     this.socketService.on('userJoinedChannel', (data: any) => {
       const current = this.channelUsers$.value;
       const users = current[data.channelId] || [];

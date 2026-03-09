@@ -2,7 +2,7 @@ import { Injectable, Inject, PLATFORM_ID, inject, Injector } from '@angular/core
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { tap, catchError, map, switchMap } from 'rxjs/operators';
+import { tap, catchError, map, switchMap, finalize } from 'rxjs/operators';
 import { AppMessageService } from '../../../core/services/message.service';
 import { ApiService } from '../../../core/services/api';
 import { OrganizationService } from './../../organization/organization.service';
@@ -132,7 +132,7 @@ export class AuthService {
   private readonly USER_KEY = 'apex_current_user';
   private readonly REMEMBER_ME_KEY = 'apex_remember_me';
 
-  public authTokenData: any;
+  // public authTokenData: any;
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser$: Observable<User | null>;
   public isAuthenticated$: Observable<boolean>;
@@ -142,6 +142,25 @@ export class AuthService {
   private messageService = inject(AppMessageService);
   private router = inject(Router);
 
+  // 🟢 CRITICAL FIX: Ensure this is always synced with Storage
+  // private _token: string | null = null;
+  private _token: string | null = null;
+
+  public get authTokenData(): string | null {
+    if (!this._token) {
+      this._token = this.getItem<string>(this.TOKEN_KEY);
+    }
+    return this._token;
+  }
+
+  public set authTokenData(value: string | null) {
+    this._token = value;
+    if (value) {
+      this.setItem(this.TOKEN_KEY, value);
+    } else {
+      this.removeItem(this.TOKEN_KEY);
+    }
+  }
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     this.currentUserSubject = new BehaviorSubject<User | null>(null);
     this.currentUser$ = this.currentUserSubject.asObservable();
@@ -152,29 +171,53 @@ export class AuthService {
   // INITIALIZATION
   // ======================================================
 
+  //   initializeFromStorage(): Promise<void> {
+  //   return new Promise(resolve => {
+  //     const token = this.getToken();
+  //     const user = this.getItem<User>(this.USER_KEY);
+
+  //     if (token && user) {
+  //       this.currentUserSubject.next(user);
+  //       this.verifyToken().subscribe({
+  //         next: () => {
+  //           this.refreshPermissions(); // <--- Add this here
+  //           resolve();
+  //         },
+  //         error: () => {
+  //           this.performClientLogout();
+  //           resolve();
+  //         }
+  //       });
+  //     } else {
+  //       resolve();
+  //     }
+  //   });
+  // }
+
   initializeFromStorage(): Promise<void> {
-  return new Promise(resolve => {
-    const token = this.getToken();
-    const user = this.getItem<User>(this.USER_KEY);
+    return new Promise(resolve => {
+      const token = this.getToken();
+      const user = this.getItem<any>(this.USER_KEY);
 
-    if (token && user) {
-      this.currentUserSubject.next(user);
-      this.verifyToken().subscribe({
-        next: () => {
-          this.refreshPermissions(); // <--- Add this here
-          resolve();
-        },
-        error: () => {
-          this.performClientLogout();
-          resolve();
-        }
-      });
-    } else {
-      resolve();
-    }
-  });
-}
+      if (token && user) {
+        this._token = token; // ✅ Sync internal token variable
+        this.currentUserSubject.next(user);
 
+        this.verifyToken().subscribe({
+          next: () => {
+            this.refreshPermissions();
+            resolve();
+          },
+          error: () => {
+            this.performClientLogout();
+            resolve();
+          }
+        });
+      } else {
+        resolve();
+      }
+    });
+  }
   // initializeFromStorage(): Promise<void> {
   //   return new Promise(resolve => {
   //     const token = this.getToken();
@@ -197,30 +240,60 @@ export class AuthService {
   //     }
   //   });
   // }
-
   // ======================================================
   // AUTHENTICATION HANDLERS
   // ======================================================
 
-  public handleLoginSuccess(response: LoginResponse, rememberMe: boolean = false): void {
+  public handleLoginSuccess(response: any, rememberMe: boolean = false): void {
     const user = response.data?.user;
-    if (!response.token || !user) return;
+    const token = response.token;
 
-    this.authTokenData = response.token;
-    this.setItem(this.TOKEN_KEY, response.token);
+    if (!token || !user) return;
+
+    this._token = token; // ✅ Update internal state
+    this.setItem(this.TOKEN_KEY, token);
     this.setItem(this.USER_KEY, user);
     this.setItem('orgSlug', response.data.organization?.uniqueShopId?.trim());
 
-    if (rememberMe) { this.setItem(this.REMEMBER_ME_KEY, 'true');    }
+    if (rememberMe) {
+      this.setItem(this.REMEMBER_ME_KEY, 'true');
+    }
+
     this.currentUserSubject.next(user);
+
     const statusMessage = user.status === 'approved' ? 'Welcome back!' : 'Account pending approval';
-    this.messageService.showSuccess( statusMessage);
+    this.messageService.showSuccess(statusMessage);
+
     if (user.status === 'approved') {
       this.router.navigate(['/dashboard']);
     } else {
       this.router.navigate(['/auth/pending-approval']);
     }
   }
+
+  // // ======================================================
+  // // AUTHENTICATION HANDLERS
+  // // ======================================================
+
+  // public handleLoginSuccess(response: LoginResponse, rememberMe: boolean = false): void {
+  //   const user = response.data?.user;
+  //   if (!response.token || !user) return;
+
+  //   this.authTokenData = response.token;
+  //   this.setItem(this.TOKEN_KEY, response.token);
+  //   this.setItem(this.USER_KEY, user);
+  //   this.setItem('orgSlug', response.data.organization?.uniqueShopId?.trim());
+
+  //   if (rememberMe) { this.setItem(this.REMEMBER_ME_KEY, 'true');    }
+  //   this.currentUserSubject.next(user);
+  //   const statusMessage = user.status === 'approved' ? 'Welcome back!' : 'Account pending approval';
+  //   this.messageService.showSuccess( statusMessage);
+  //   if (user.status === 'approved') {
+  //     this.router.navigate(['/dashboard']);
+  //   } else {
+  //     this.router.navigate(['/auth/pending-approval']);
+  //   }
+  // }
 
   public handleSignupSuccess(response: SignupResponse): void {
     this.messageService.showSuccess(
@@ -235,14 +308,24 @@ export class AuthService {
   // LOGOUT
   // ======================================================
 
+  // logout(): void {
+  //   const currentUrl = this.router.url;
+
+  //   this.apiService.logOut().subscribe({
+  //     next: () => console.log('Backend logout successful'),
+  //     error: (err) => console.warn('Backend logout failed', err),
+  //     complete: () => this.performClientLogout(currentUrl)
+  //   });
+  // }
+  // ======================================================
+  // LOGOUT (Ensures Socket Cleanup)
+  // ======================================================
+
   logout(): void {
     const currentUrl = this.router.url;
-
-    this.apiService.logOut().subscribe({
-      next: () => console.log('Backend logout successful'),
-      error: (err) => console.warn('Backend logout failed', err),
-      complete: () => this.performClientLogout(currentUrl)
-    });
+    this.apiService.logOut().pipe(
+      finalize(() => this.performClientLogout(currentUrl))
+    ).subscribe();
   }
 
   logoutAll(): void {
@@ -264,27 +347,45 @@ export class AuthService {
 
   private performClientLogout(returnUrl?: string): void {
     if (isPlatformBrowser(this.platformId)) {
-      // Clear only auth-related items, keep other app data if needed
       localStorage.removeItem(this.TOKEN_KEY);
       localStorage.removeItem(this.USER_KEY);
       localStorage.removeItem(this.REMEMBER_ME_KEY);
       localStorage.removeItem('orgSlug');
-      // Optional: Clear all if you want full cleanup
-      // localStorage.clear(); 
-      // sessionStorage.clear();
     }
 
-    this.authTokenData = null;
-    this.currentUserSubject.next(null);
+    this._token = null; // ✅ Kill the token state
+    this.currentUserSubject.next(null); // ✅ Triggers app.component socket disconnect
 
-    if (returnUrl && !returnUrl.includes('/auth/')) {
-      this.router.navigate(['/auth/login'], {
-        queryParams: { returnUrl: returnUrl }
-      });
-    } else {
-      this.router.navigate(['/auth/login']);
-    }
+    const target = (returnUrl && !returnUrl.includes('/auth/')) ?
+      ['/auth/login', { queryParams: { returnUrl } }] :
+      ['/auth/login'];
+
+    this.router.navigate(target as any[]);
   }
+
+  // private performClientLogout(returnUrl?: string): void {
+  //   if (isPlatformBrowser(this.platformId)) {
+  //     // Clear only auth-related items, keep other app data if needed
+  //     localStorage.removeItem(this.TOKEN_KEY);
+  //     localStorage.removeItem(this.USER_KEY);
+  //     localStorage.removeItem(this.REMEMBER_ME_KEY);
+  //     localStorage.removeItem('orgSlug');
+  //     // Optional: Clear all if you want full cleanup
+  //     // localStorage.clear(); 
+  //     // sessionStorage.clear();
+  //   }
+
+  //   this.authTokenData = null;
+  //   this.currentUserSubject.next(null);
+
+  //   if (returnUrl && !returnUrl.includes('/auth/')) {
+  //     this.router.navigate(['/auth/login'], {
+  //       queryParams: { returnUrl: returnUrl }
+  //     });
+  //   } else {
+  //     this.router.navigate(['/auth/login']);
+  //   }
+  // }
 
   // ======================================================
   // AUTH API METHODS
@@ -320,7 +421,7 @@ export class AuthService {
     return this.OrganizationService.createNewOrganization(data).pipe(
       tap((response: LoginResponse) => {
         this.handleLoginSuccess(response, true);
-        this.messageService.showSuccess( 'Welcome! Your organization is ready.');
+        this.messageService.showSuccess('Welcome! Your organization is ready.');
       }),
       catchError(err => {
         this.messageService.handleHttpError(err)
@@ -350,16 +451,65 @@ export class AuthService {
     );
   }
 
+
+
   /**
    * Verify current token validity
    */
-  verifyToken(): Observable<VerifyTokenResponse> {
+  verifyToken(): Observable<any> {
     return this.apiService.verifyToken().pipe(
-      tap((response: VerifyTokenResponse) => {
-        // Update stored user data if changed
-        if (response.data?.user) {
-          this.setItem(this.USER_KEY, response.data.user);
-          this.currentUserSubject.next(response.data.user);
+      tap((res: any) => {
+        if (res.data?.user) {
+          this.setItem(this.USER_KEY, res.data.user);
+          this.currentUserSubject.next(res.data.user);
+        }
+      }),
+      catchError(err => {
+        this.performClientLogout();
+        return throwError(() => err);
+      })
+    );
+  }
+  // verifyToken(): Observable<VerifyTokenResponse> {
+  //   return this.apiService.verifyToken().pipe(
+  //     tap((response: VerifyTokenResponse) => {
+  //       // Update stored user data if changed
+  //       if (response.data?.user) {
+  //         this.setItem(this.USER_KEY, response.data.user);
+  //         this.currentUserSubject.next(response.data.user);
+  //       }
+  //     }),
+  //     catchError(err => {
+  //       this.performClientLogout();
+  //       return throwError(() => err);
+  //     })
+  //   );
+  // }
+
+  /**
+   * Refresh access token
+   */
+  // refreshToken() {
+  //   return this.apiService.refreshToken().pipe(
+  //     tap((response: any) => {
+  //       if (response?.token) {
+  //         this.setItem(this.TOKEN_KEY, response.token);
+  //         this.authTokenData = response.token;
+  //       }
+  //     }),
+  //     catchError(err => {
+  //       // If refresh fails, log out
+  //       this.performClientLogout();
+  //       return throwError(() => err);
+  //     })
+  //   );
+  // }
+  refreshToken(): Observable<any> {
+    return this.apiService.refreshToken().pipe(
+      tap((res: any) => {
+        if (res?.token) {
+          this._token = res.token;
+          this.setItem(this.TOKEN_KEY, res.token);
         }
       }),
       catchError(err => {
@@ -369,24 +519,6 @@ export class AuthService {
     );
   }
 
-  /**
-   * Refresh access token
-   */
-  refreshToken() {
-    return this.apiService.refreshToken().pipe(
-      tap((response: any) => {
-        if (response?.token) {
-          this.setItem(this.TOKEN_KEY, response.token);
-          this.authTokenData = response.token;
-        }
-      }),
-      catchError(err => {
-        // If refresh fails, log out
-        this.performClientLogout();
-        return throwError(() => err);
-      })
-    );
-  }
 
   // ======================================================
   // PASSWORD MANAGEMENT
@@ -417,7 +549,7 @@ export class AuthService {
     return this.apiService.resetPassword(resetToken, passwords).pipe(
       tap((response: LoginResponse) => {
         this.handleLoginSuccess(response);
-        this.messageService.showSuccess( 'Your password has been reset successfully.');
+        this.messageService.showSuccess('Your password has been reset successfully.');
       }),
       catchError(err => {
         this.messageService.handleHttpError(err)
@@ -436,7 +568,7 @@ export class AuthService {
           this.setItem(this.TOKEN_KEY, response.token);
           this.authTokenData = response.token;
         }
-        this.messageService.showSuccess( 'Your password has been changed successfully.');
+        this.messageService.showSuccess('Your password has been changed successfully.');
       }),
       catchError(err => {
         this.messageService.handleHttpError(err)
@@ -479,7 +611,7 @@ export class AuthService {
           this.setItem(this.USER_KEY, currentUser);
           this.currentUserSubject.next(currentUser);
         }
-        this.messageService.showSuccess( 'Your email has been verified successfully.');
+        this.messageService.showSuccess('Your email has been verified successfully.');
       }),
       catchError(err => {
         this.messageService.handleHttpError(err)
@@ -510,7 +642,7 @@ export class AuthService {
   terminateSession(sessionId: string): Observable<any> {
     return this.apiService.terminateSession(sessionId).pipe(
       tap(() => {
-        this.messageService.showInfo( 'Selected session has been logged out.');
+        this.messageService.showInfo('Selected session has been logged out.');
       }),
       catchError(err => {
         this.messageService.handleHttpError(err)
@@ -586,9 +718,9 @@ export class AuthService {
   // GETTERS & STORAGE
   // ======================================================
 
-  public get currentUserValue(): User | null {
-    return this.currentUserSubject.value;
-  }
+  // public get currentUserValue(): User | null {
+  //   return this.currentUserSubject.value;
+  // }
 
   public getCurrentUser(): User | null {
     return this.currentUserSubject.value;
@@ -596,6 +728,10 @@ export class AuthService {
 
   public getToken(): string | null {
     return this.getItem<string>(this.TOKEN_KEY);
+  }
+
+  public get currentUserValue(): any | null {
+    return this.currentUserSubject.value;
   }
 
   public isLoggedIn(): boolean {
@@ -613,35 +749,50 @@ export class AuthService {
   // ======================================================
   // STORAGE HELPERS
   // ======================================================
-
   private setItem(key: string, value: any): void {
     if (!isPlatformBrowser(this.platformId)) return;
-
-    if (key === this.TOKEN_KEY || key === this.REMEMBER_ME_KEY || key === 'orgSlug') {
-      localStorage.setItem(key, String(value));
-      return;
-    }
-
-    localStorage.setItem(key, JSON.stringify(value));
+    const data = (typeof value === 'string') ? value : JSON.stringify(value);
+    localStorage.setItem(key, data);
   }
 
-  getItem<T>(key: string): T | null {
+  private getItem<T>(key: string): T | null {
     if (!isPlatformBrowser(this.platformId)) return null;
-
     const item = localStorage.getItem(key);
     if (!item) return null;
-
-    if (key === this.TOKEN_KEY || key === this.REMEMBER_ME_KEY || key === 'orgSlug') {
-      return item as any;
-    }
-
     try {
       return JSON.parse(item);
     } catch {
-      localStorage.removeItem(key);
-      return null;
+      return item as unknown as T;
     }
   }
+  // private setItem(key: string, value: any): void {
+  //   if (!isPlatformBrowser(this.platformId)) return;
+
+  //   if (key === this.TOKEN_KEY || key === this.REMEMBER_ME_KEY || key === 'orgSlug') {
+  //     localStorage.setItem(key, String(value));
+  //     return;
+  //   }
+
+  //   localStorage.setItem(key, JSON.stringify(value));
+  // }
+
+  // getItem<T>(key: string): T | null {
+  //   if (!isPlatformBrowser(this.platformId)) return null;
+
+  //   const item = localStorage.getItem(key);
+  //   if (!item) return null;
+
+  //   if (key === this.TOKEN_KEY || key === this.REMEMBER_ME_KEY || key === 'orgSlug') {
+  //     return item as any;
+  //   }
+
+  //   try {
+  //     return JSON.parse(item);
+  //   } catch {
+  //     localStorage.removeItem(key);
+  //     return null;
+  //   }
+  // }
 
   private removeItem(key: string): void {
     if (isPlatformBrowser(this.platformId)) {
@@ -649,29 +800,42 @@ export class AuthService {
     }
   }
 
+  refreshPermissions(): void {
+    this.apiService.getMyPermissions().subscribe({
+      next: (res) => {
+        const user: any = this.currentUserValue;
+        if (user && res.data) {
+          user.role = { ...user.role, permissions: res.data };
+          this.setItem(this.USER_KEY, user);
+          this.currentUserSubject.next({ ...user });
+        }
+      }
+    });
+  }
+
   /**
  * Fetch fresh permissions from the server and update local state
  */
-refreshPermissions(): void {
-  this.apiService.getMyPermissions().subscribe({
-    next: (res) => {
-      const currentUser = this.currentUserValue;
-      if (currentUser && res.data) {
-        // We cast the object to 'User' to satisfy the Type check
-        const updatedUser: User = {
-          ...currentUser,
-          role: {
-            ...currentUser.role,
-            permissions: res.data // New permissions from API
-          }
-        } as User; 
-        
-        this.setItem(this.USER_KEY, updatedUser);
-        this.currentUserSubject.next(updatedUser);
-      }
-    }
-  });
-}
+  // refreshPermissions(): void {
+  //   this.apiService.getMyPermissions().subscribe({
+  //     next: (res) => {
+  //       const currentUser = this.currentUserValue;
+  //       if (currentUser && res.data) {
+  //         // We cast the object to 'User' to satisfy the Type check
+  //         const updatedUser: User = {
+  //           ...currentUser,
+  //           role: {
+  //             ...currentUser.role,
+  //             permissions: res.data // New permissions from API
+  //           }
+  //         } as User; 
+
+  //         this.setItem(this.USER_KEY, updatedUser);
+  //         this.currentUserSubject.next(updatedUser);
+  //       }
+  //     }
+  //   });
+  // }
 
   // /**
   //  * The "Perfect" check logic: 
@@ -679,7 +843,7 @@ refreshPermissions(): void {
   //  */
   // can(permission: string): boolean {
   //   if (this.isSuperAdmin()) return true;
-    
+
   //   const perms = this.userPermissions();
   //   if (perms.includes('*')) return true;
   //   if (perms.includes(permission)) return true;

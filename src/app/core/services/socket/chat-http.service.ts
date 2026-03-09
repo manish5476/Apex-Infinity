@@ -4,7 +4,8 @@ import { HttpClient } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { Channel } from 'diagnostics_channel';
-import { Attachment, Message } from '../socket.service';
+import { Message } from '../message';
+import { Attachment } from '../../../chat/chat.component/chat.models';
 
 @Injectable({ providedIn: 'root' })
 export class ChatHttpService {
