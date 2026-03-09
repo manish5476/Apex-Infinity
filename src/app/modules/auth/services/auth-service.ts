@@ -211,17 +211,10 @@ export class AuthService {
     this.setItem(this.USER_KEY, user);
     this.setItem('orgSlug', response.data.organization?.uniqueShopId?.trim());
 
-    if (rememberMe) {
-      this.setItem(this.REMEMBER_ME_KEY, 'true');
-    }
-
+    if (rememberMe) { this.setItem(this.REMEMBER_ME_KEY, 'true');    }
     this.currentUserSubject.next(user);
-
-    // Show welcome message
     const statusMessage = user.status === 'approved' ? 'Welcome back!' : 'Account pending approval';
     this.messageService.showSuccess( statusMessage);
-
-    // Redirect based on user status
     if (user.status === 'approved') {
       this.router.navigate(['/dashboard']);
     } else {

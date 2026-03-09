@@ -1,7 +1,7 @@
 import { Component, signal, OnInit, OnDestroy, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
-import { Subscription, take } from 'rxjs';
+import { Subject, take, takeUntil } from 'rxjs'; // ✅ Added Subject and takeUntil
 import { LoadingComponent } from "./modules/shared/components/loader.component";
 import { MasterListService } from './core/services/master-list.service';
 import { AnnouncementListenerComponent } from "./modules/shared/components/announcement-banner/announcement-banner.component";
@@ -13,20 +13,21 @@ import { AiAssistantComponent } from "./AIAgent/components/ai-assistant/ai-assis
 
 @Component({
   selector: 'app-root',
-  imports: [ToastModule, RouterOutlet, LoadingComponent,AiAssistantComponent, AnnouncementListenerComponent],
+  standalone: true,
+  imports: [ToastModule, RouterOutlet, LoadingComponent, AiAssistantComponent, AnnouncementListenerComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App implements OnInit, OnDestroy {
   protected readonly title = signal('apex');
+
   private auth = inject(AuthService);
   private socketService = inject(SocketService);
   private notificationService = inject(NotificationService);
   private masterList = inject(MasterListService);
   private messageService = inject(AppMessageService);
 
-  private authSub: Subscription | null = null;
-  private reconnectSub: Subscription | null = null;
+  private destroy$ = new Subject<void>(); // ✅ The proper way to clean up RxJS
 
   constructor() {
     this.setupAuthListener();
@@ -37,127 +38,48 @@ export class App implements OnInit, OnDestroy {
   }
 
   private setupAuthListener(): void {
-    this.authSub = this.auth.currentUser$.subscribe({
-      next: (user) => {
-        if (user && user._id && user.organizationId) {
+    this.auth.currentUser$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (user) => {
           const token = this.auth.authTokenData;
-          if (token) {
+          if (user && user._id && user.organizationId && token) {
             this.socketService.connect(token, user.organizationId, user._id);
-            this.notificationService.connect(user._id, token, user.organizationId);
-            this.loadNotifications(user._id);
-            console.log('Socket & Notification services connected for user:', user._id);
+            this.notificationService.loadInitialNotifications().pipe(take(1)).subscribe();
           } else {
-            console.warn('No token available for socket connection');
+            this.socketService.disconnect();
           }
-        } else {
-          // User logged out or no user data
-          this.socketService.disconnect();
-          this.notificationService.disconnect();
-          console.log('Socket & Notification services disconnected');
-        }
-      },
-      error: (err) => {
-        console.error('Auth subscription error:', err);
-        this.messageService.handleHttpError(err)
-      }
-    });
-    this.socketService.forceLogout$.subscribe({
-      next: (data) => {
-        console.warn('Force logout received:', data.reason);
-        this.messageService.showError('Your session has been terminated by an administrator');
-        this.auth.logout(); // Trigger logout
-      }
-    });
+        },
+        error: (err) => this.messageService.handleHttpError(err)
+      });
 
-    this.socketService.connectionStatus$.subscribe({
-      next: (status) => {
-        if (status === 'disconnected') {
-          // Attempt reconnection after delay
-          this.attemptReconnection();
+    this.socketService.forceLogout$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          console.warn('Force logout received:', data.reason);
+          this.messageService.showError('Your session has been terminated by an administrator');
+          this.auth.logout();
         }
-      }
-    });
+      });
+
+    // ❌ REMOVED: Your manual attemptReconnection() loop. 
+    // Socket.io natively handles reconnections automatically. 
+    // Manual loops fight the framework and cause infinite loops.
   }
 
-  private loadNotifications(userId: string): void {
-    this.notificationService.loadInitialNotifications().subscribe({
-      error: (err) => {
-        console.error('Failed to load notifications:', err);
-      }
-    });
-  }
-
-  private attemptReconnection(): void {
-    // Clear any existing reconnection attempt
-    if (this.reconnectSub) {
-      this.reconnectSub.unsubscribe();
-    }
-
-    // Wait 5 seconds before attempting reconnection
-    this.reconnectSub = new Subscription(() => {
-      setTimeout(() => {
-        const user = this.auth.currentUserValue;
-        const token = this.auth.authTokenData;
-
-        if (user && token) {
-          console.log('Attempting socket reconnection...');
-          this.socketService.connect(token, user.organizationId, user._id);
-        }
-      }, 5000);
-    });
+  private loadNotifications(): void {
+    this.notificationService.loadInitialNotifications()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        error: (err) => console.error('Failed to load notifications:', err)
+      });
   }
 
   ngOnDestroy(): void {
-    // Clean up subscriptions
-    if (this.authSub) {
-      this.authSub.unsubscribe();
-    }
-
-    if (this.reconnectSub) {
-      this.reconnectSub.unsubscribe();
-    }
-
-    // Disconnect services
+    // ✅ Safely kills all subscriptions instantly
+    this.destroy$.next();
+    this.destroy$.complete();
     this.socketService.disconnect();
-    this.notificationService.disconnect();
-
-    console.log('App component destroyed, services disconnected');
   }
 }
-
-
-// import { Component, signal } from '@angular/core';
-// import { RouterOutlet } from '@angular/router';
-// import { MainScreen } from './projectLayout/main-screen/main-screen';
-// import { ToastModule } from 'primeng/toast';
-// import { LoadingComponent } from "./modules/shared/components/loader.component";
-// import { MasterListService } from './core/services/master-list.service';
-// import { AnnouncementListenerComponent } from "./modules/shared/components/announcement-banner/announcement-banner.component";
-// import { AuthService } from './modules/auth/services/auth-service';
-// import { SocketService } from './core/services/socket.service';
-// // import { AiAssistantComponent } from "./AIAgent/components/ai-assistant/ai-assistant";
-// @Component({
-//   selector: 'app-root',
-//   imports: [ToastModule, RouterOutlet, LoadingComponent, AnnouncementListenerComponent],
-//   templateUrl: './app.html',
-//   styleUrl: './app.scss'
-// })
-// export class App {
-//   protected readonly title = signal('apex');
-
-//   constructor(private auth: AuthService, private socketService: SocketService, private masterList: MasterListService) {
-//     this.auth.currentUser$.subscribe(user => {
-//       if (user) {
-//         this.socketService.connect(this.auth.authTokenData, user.organizationId,user._id);
-//       } else {
-//         this.socketService.disconnect();
-//       }
-//     });
-//   }
-
-//   ngOnInit() {
-//     this.masterList.initFromCache();
-//     // this.masterList.load();
-//   }
-
-// }
