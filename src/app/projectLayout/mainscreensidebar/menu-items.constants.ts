@@ -192,6 +192,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
       { label: 'Roles & Permissions', icon: 'pi pi-lock', routerLink: ['/admin/roles'] },
       { label: 'Master Data', icon: 'pi pi-database', routerLink: ['/masterList'] },
       { label: 'Active Sessions', icon: 'pi pi-wifi', routerLink: ['/sessions'] },
+      { label: 'Assets', icon: 'pi pi-wifi', routerLink: ['/assets'] },
     ]
   }
 ];

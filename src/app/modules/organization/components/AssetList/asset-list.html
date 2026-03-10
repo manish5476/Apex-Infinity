@@ -1,0 +1,64 @@
+<p-toast></p-toast>
+
+<div class="list-page-container">
+  
+  <div class="list-header">
+    <div class="title-section">
+      <div class="icon-box">
+        <i class="pi pi-images"></i>
+      </div>
+      <div class="text-content">
+        <h2 class="list-title">Media Vault</h2>
+        <p class="list-subtitle">Manage organization assets, storage, and indexing.</p>
+      </div>
+    </div>
+
+    @if (stats()) {
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="label">Total Storage</span>
+          <span class="value">{{ stats().totalMB }} MB</span>
+        </div>
+        <div class="stat-card">
+          <span class="label">Total Files</span>
+          <span class="value">{{ stats().totalFiles }}</span>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="themed-card list-content-area">
+    
+    <div class="se-filter-bar">
+      <div class="se-filter-field search-field">
+        <label>Search Files</label>
+        <span class="p-input-icon-left w-full">
+          <i class="pi pi-search"></i>
+          <input type="text" pInputText placeholder="File name..." 
+                 [(ngModel)]="assetFilter.search" (input)="getData(true)" class="w-full">
+        </span>
+      </div>
+
+      <div class="se-filter-field">
+        <label>Category</label>
+        <p-select [options]="categoryOptions" [(ngModel)]="assetFilter.category" 
+                  (onChange)="getData(true)" placeholder="All Categories" 
+                  [showClear]="true" styleClass="w-full"></p-select>
+      </div>
+
+      <div class="se-filter-actions">
+        <p-button label="Refresh" icon="pi pi-refresh" (onClick)="getData(true)" styleClass="p-button-outlined"></p-button>
+      </div>
+    </div>
+
+    <div class="list-grid-wrapper">
+      <app-ag-share-grid 
+        [columns]="column" 
+        [data]="data" 
+        [showActions]="false" 
+        (gridEvent)="eventFromGrid($event)">
+      </app-ag-share-grid>
+    </div>
+
+  </div>
+</div>

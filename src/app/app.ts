@@ -10,7 +10,7 @@ import { NotificationService } from './core/services/notification.service';
 import { AppMessageService } from './core/services/message.service';
 import { AiAssistantComponent } from "./AIAgent/components/ai-assistant/ai-assistant";
 import { SocketConnectionService } from '@core/services/socket/socket-connection.service';
-
+import { ConfigFormComponent } from './modules/storefront-admin/pages/config-form/config-form.component';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -26,6 +26,7 @@ export class App implements OnInit, OnDestroy {
   private notificationService = inject(NotificationService);
   private masterList = inject(MasterListService);
   private messageService = inject(AppMessageService);
+  private confirm = inject(ConfigFormComponent);
 
   private destroy$ = new Subject<void>();
   constructor() {

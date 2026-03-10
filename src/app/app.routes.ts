@@ -13,6 +13,7 @@ import { LedgerComponent } from './modules/Ledger/ledger/ledger';
 import { Transactions } from './modules/transactions/transactions/transactions';
 import { LogsComponent } from './modules/transactions/logs/logs';
 import { SalesListComponent } from './modules/sales/sales-list/sales-list';
+import { AssetList } from './modules/organization/components/AssetList/asset-list';
 
 export const routes: Routes = [
   // ==========================================================
@@ -63,6 +64,7 @@ export const routes: Routes = [
       { path: 'financials', component: LedgerComponent, title: 'Financial Ledger' },
       { path: 'transactions', component: Transactions, title: 'Transaction History' },
       { path: 'sales', component: SalesListComponent, title: 'Sales Reports' },
+      { path: 'assets', component: AssetList, title: 'Asset Lists' },
       
       // --- Modular Feature Routing (Lazy Loaded) ---
       { path: 'accounts', loadChildren: () => import('./modules/accounts/accounts.routes').then(m => m.ACCOUNT_ROUTES) },
@@ -76,6 +78,7 @@ export const routes: Routes = [
       { path: 'customer', loadChildren: () => import('./modules/customer/customer.routes').then(m => m.CUSTOMER_ROUTES) },
       { path: 'user', loadChildren: () => import('./modules/user/user.routes').then(m => m.USER_ROUTES) },
       { path: 'branches', loadChildren: () => import('./modules/branch/branch.routes').then(m => m.BRANCH_ROUTES) },
+      // { path: 'Assets', loadChildren: () => import('./modules/branch/branch.routes').then(m => m.BRANCH_ROUTES) },
       
       // -> Our Massive HRMS Module
       { path: 'hrms', loadChildren: () => import('./modules/hrms/hrms.routes').then(m => m.HRMS_ROUTES) },
