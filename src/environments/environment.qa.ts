@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:4001/api',
-    socketUrl: 'http://localhost:5000',
+  apiUrl: 'https://apex-km0w.onrender.com/api',
+    socketUrl: 'https://apex-km0w.onrender.com',
 
 };
