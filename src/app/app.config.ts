@@ -52,8 +52,8 @@ export const appConfig: ApplicationConfig = {
         } 
       } 
     }),
-
-    MessageService,ConfirmationService,
+// ConfirmationService
+    MessageService,
     DatePipe,DialogService,
 
     // ✅ THE MODERN FIX: Using provideAppInitializer

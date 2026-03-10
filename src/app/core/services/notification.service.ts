@@ -31,24 +31,33 @@ export class NotificationService {
   private notificationsSource = new BehaviorSubject<NotificationData[]>([]);
   public notifications$ = this.notificationsSource.asObservable();
 
-  public unreadCount$: Observable<number> = this.notifications$.pipe(
-    map(notifications => notifications.filter(n => !n.isRead).length),
-    distinctUntilChanged(),
-    shareReplay(1)
-  );
+public unreadCount$: Observable<number> = this.notifications$.pipe(
+    map((notifications: any) => {
+      // Ensure it's an array before filtering
+      if (!Array.isArray(notifications)) return 0;
+      return notifications.filter((n: any) => !n.isRead).length;
+    }),
+    distinctUntilChanged(),
+    shareReplay(1)
+  );
 
   // ==========================================================================
   // HTTP FETCHERS
   // ==========================================================================
 
-  loadInitialNotifications(): Observable<NotificationData[]> {
-    return this.http.get<NotificationData[]>(`${this.apiUrl}/v1/notifications`).pipe(
-      map(notifications => {
-        this.notificationsSource.next(notifications);
-        return notifications;
-      })
-    );
-  }
+loadInitialNotifications(): Observable<NotificationData[]> {
+    return this.http.get<any>(`${this.apiUrl}/v1/notifications`).pipe(
+      map(response => {
+        // Extract the array safely depending on your backend's format
+        const notificationsArray = Array.isArray(response) 
+          ? response 
+          : (response?.data || response?.notifications || []);
+
+        this.notificationsSource.next(notificationsArray);
+        return notificationsArray;
+      })
+    );
+  }
 
   // ==========================================================================
   // ACTIONS (Called by UI)

@@ -85,15 +85,32 @@ export class NotificationBellComponent implements OnInit {
     });
 
     this.notificationService.notifications$
-      .pipe(takeUntilDestroyed())
-      .subscribe((allNotifications) => {
-        this.allNotifications = allNotifications;
-        this.historyList = allNotifications;
-        this.unreadList = allNotifications.filter(n => !n.isRead);
+      .pipe(takeUntilDestroyed())
+      .subscribe((response:any) => {
+        // 1. Ensure we always have an array. 
+        // If the API returns an object like { data: [...] }, adjust the fallback accordingly.
+        const safeNotifications = Array.isArray(response) 
+          ? response 
+          : (response?.data || response?.notifications || []);
+
+        this.allNotifications = safeNotifications;
+        this.historyList = safeNotifications;
+        this.unreadList = safeNotifications.filter((n:any) => !n.isRead);
+        
+        this.checkForSignupRequests();
+        this.cdr.markForCheck(); 
+      });
+
+    // this.notificationService.notifications$
+    //   .pipe(takeUntilDestroyed())
+    //   .subscribe((allNotifications) => {
+    //     this.allNotifications = allNotifications;
+    //     this.historyList = allNotifications;
+    //     this.unreadList = allNotifications.filter(n => !n.isRead);
         
-        this.checkForSignupRequests();
-        this.cdr.markForCheck(); 
-      });
+    //     this.checkForSignupRequests();
+    //     this.cdr.markForCheck(); 
+    //   });
 
     this.notificationService.unreadCount$
       .pipe(takeUntilDestroyed())

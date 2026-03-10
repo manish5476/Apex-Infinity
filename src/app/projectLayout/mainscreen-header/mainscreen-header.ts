@@ -83,26 +83,52 @@ textScale: number = 100;
     { id: 4, title: 'New Message', message: 'You have a new message from Sarah', time: '5 hours ago', read: true, type: 'info' },
   ];
   mobileMenuItems: any
-  ngOnInit() {
-    this.organizeThemes();
-    this.mobileMenuItems = SIDEBAR_MENU;
-    this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(u => this.currentUser = u);
-    this.notificationService.notifications$.pipe(takeUntil(this.destroy$)).subscribe(n => {
-      this.recentNotifications = n.filter(x => !x.isRead);
-      if (this.recentNotifications.length === 0) {
-        this.recentNotifications = this.mockNotifications.filter(n => !n.read);
-      }
-    });
+  // ngOnInit() {
+  //   this.organizeThemes();
+  //   this.mobileMenuItems = SIDEBAR_MENU;
+  //   this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(u => this.currentUser = u);
+  //   this.notificationService.notifications$.pipe(takeUntil(this.destroy$)).subscribe(n => {
+  //     this.recentNotifications = n.filter(x => !x.isRead);
+  //     if (this.recentNotifications.length === 0) {
+  //       this.recentNotifications = this.mockNotifications.filter(n => !n.read);
+  //     }
+  //   });
 
-    // Subscribe to Theme Settings
-    this.themeService.settings$.pipe(takeUntil(this.destroy$)).subscribe((s: ThemeSettings) => {
-      this.isDarkMode = s.isDarkMode;
-      this.activeThemeId = s.isDarkMode ? 'theme-dark' : s.lightThemeClass || 'theme-light';
-      if (s.textScale) {
-        this.textScale = s.textScale;
-      }
-    });
-  }
+  //   // Subscribe to Theme Settings
+  //   this.themeService.settings$.pipe(takeUntil(this.destroy$)).subscribe((s: ThemeSettings) => {
+  //     this.isDarkMode = s.isDarkMode;
+  //     this.activeThemeId = s.isDarkMode ? 'theme-dark' : s.lightThemeClass || 'theme-light';
+  //     if (s.textScale) {
+  //       this.textScale = s.textScale;
+  //     }
+  //   });
+  // }
+ngOnInit() {
+    this.organizeThemes();
+    this.mobileMenuItems = SIDEBAR_MENU;
+    this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(u => this.currentUser = u);
+    
+    this.notificationService.notifications$.pipe(takeUntil(this.destroy$)).subscribe((n:any) => {
+      // 1. Safely extract the array just in case the service sends a raw object
+      const safeNotifications = Array.isArray(n) ? n : (n?.data || n?.notifications || []);
+
+      // 2. Filter the safe array
+      this.recentNotifications = safeNotifications.filter((x: any) => !x.isRead);
+      
+      if (this.recentNotifications.length === 0) {
+        this.recentNotifications = this.mockNotifications.filter(mock => !mock.read);
+      }
+    });
+
+    // Subscribe to Theme Settings
+    this.themeService.settings$.pipe(takeUntil(this.destroy$)).subscribe((s: ThemeSettings) => {
+      this.isDarkMode = s.isDarkMode;
+      this.activeThemeId = s.isDarkMode ? 'theme-dark' : s.lightThemeClass || 'theme-light';
+      if (s.textScale) {
+        this.textScale = s.textScale;
+      }
+    });
+  }
 
   updateTextScale(event: Event) {
     const input = event.target as HTMLInputElement;

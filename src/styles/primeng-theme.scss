@@ -1041,41 +1041,260 @@
 // 7. PANELS & CONTAINERS
 // ==========================================================================
 
-/* Card */
+// /* Card */
+// .p-card {
+//   background: var(--bg-primary);
+//   color: var(--text-primary);
+//   box-shadow: var(--shadow-md);
+//   border-radius: var(--ui-border-radius-xl);
+//   display: flex;
+//   flex-direction: column;
+
+//   .p-card-body {
+//     padding: var(--spacing-xl);
+//   }
+
+//   .p-card-title {
+//     font-family: var(--font-heading);
+//     font-size: var(--font-size-xl);
+//     font-weight: var(--font-weight-semibold);
+//     margin-bottom: var(--spacing-md);
+//   }
+
+//   .p-card-subtitle {
+//     font-weight: var(--font-weight-normal);
+//     color: var(--text-secondary);
+//     margin-bottom: var(--spacing-md);
+//   }
+  
+//   .p-card-content {
+//      padding: var(--spacing-sm) 0;
+//   }
+  
+//   .p-card-footer {
+//      padding-top: var(--spacing-md);
+//   }
+// }
+/* ==========================================================================
+   PRIMENG CARD COMPONENT
+   Clean & Minimal Design with Your Theme Tokens
+   ========================================================================== */
+
 .p-card {
   background: var(--bg-primary);
   color: var(--text-primary);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm); /* Lighter shadow like your original */
   border-radius: var(--ui-border-radius-xl);
   display: flex;
   flex-direction: column;
+  border: var(--ui-border-width) solid var(--border-primary); /* Added subtle border */
+  transition: var(--transition-base);
+  height: 100%;
+
+  /* Subtle hover effect (optional - remove if not needed) */
+  &:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-secondary);
+  }
 
   .p-card-body {
     padding: var(--spacing-xl);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   }
 
   .p-card-title {
     font-family: var(--font-heading);
     font-size: var(--font-size-xl);
     font-weight: var(--font-weight-semibold);
-    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+    margin: 0 0 var(--spacing-md) 0;
+    line-height: var(--line-height-tight);
+    letter-spacing: -0.02em;
   }
 
   .p-card-subtitle {
+    font-family: var(--font-body);
+    font-size: var(--font-size-sm);
     font-weight: var(--font-weight-normal);
     color: var(--text-secondary);
-    margin-bottom: var(--spacing-md);
+    margin: 0 0 var(--spacing-md) 0;
+    line-height: var(--line-height-normal);
   }
   
   .p-card-content {
-     padding: var(--spacing-sm) 0;
+    flex: 1;
+    color: var(--text-secondary);
+    font-size: var(--font-size-md);
+    line-height: var(--line-height-relaxed);
+    
+    /* Simple padding - exactly like your original */
+    padding: var(--spacing-sm) 0;
   }
   
   .p-card-footer {
-     padding-top: var(--spacing-md);
+    padding: var(--spacing-md) 0 0 0;
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    
+    /* Simple divider when needed */
+    &:not(:empty) {
+      border-top: var(--ui-border-width) solid var(--border-primary);
+      margin-top: var(--spacing-lg);
+      padding: var(--spacing-lg) 0 0 0;
+    }
+  }
+
+  /* ==========================================================================
+     Card Variants (Optional - Use Only When Needed)
+     ========================================================================== */
+
+  /* No border variant */
+  &.borderless {
+    border: none;
+    box-shadow: none;
+    background: transparent;
+    
+    &:hover {
+      box-shadow: none;
+      border: none;
+    }
+  }
+
+  /* Interactive card (clickable) */
+  &.interactive {
+    cursor: pointer;
+    
+    &:hover {
+      transform: translateY(-2px);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  /* Compact card */
+  &.compact {
+    .p-card-body {
+      padding: var(--spacing-lg);
+    }
+    
+    .p-card-title {
+      font-size: var(--font-size-lg);
+      margin-bottom: var(--spacing-sm);
+    }
+    
+    .p-card-subtitle {
+      font-size: var(--font-size-xs);
+      margin-bottom: var(--spacing-sm);
+    }
+    
+    .p-card-content {
+      padding: var(--spacing-xs) 0;
+      font-size: var(--font-size-sm);
+    }
+    
+    .p-card-footer {
+      padding: var(--spacing-sm) 0 0 0;
+    }
+  }
+
+  /* Header/Footer specific styling */
+  .p-card-header {
+    margin: 0;
+    padding: var(--spacing-xl) var(--spacing-xl) 0 var(--spacing-xl);
+    
+    &:not(:empty) {
+      margin-bottom: var(--spacing-md);
+    }
+  }
+
+  /* For cards with image headers */
+  &.has-image-header {
+    .p-card-header {
+      padding: 0;
+      border-top-left-radius: var(--ui-border-radius-xl);
+      border-top-right-radius: var(--ui-border-radius-xl);
+      overflow: hidden;
+      margin-bottom: 0;
+      
+      img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+    }
+    
+    .p-card-body {
+      padding-top: var(--spacing-lg);
+    }
   }
 }
 
+/* ==========================================================================
+   Card Groups (Simple Layout Helpers)
+   ========================================================================== */
+
+/* Simple card grid */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--spacing-xl);
+}
+
+/* Card deck - horizontal scroll */
+.card-deck {
+  display: flex;
+  gap: var(--spacing-xl);
+  overflow-x: auto;
+  padding: var(--spacing-xs) 0 var(--spacing-xl);
+  
+  .p-card {
+    min-width: 280px;
+    flex-shrink: 0;
+  }
+  
+  /* Simple scrollbar */
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+    border-radius: var(--ui-border-radius-pill);
+  }
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 768px) {
+  .p-card {
+    .p-card-body {
+      padding: var(--spacing-lg);
+    }
+    
+    .p-card-title {
+      font-size: var(--font-size-lg);
+    }
+    
+    .p-card-subtitle {
+      font-size: var(--font-size-xs);
+    }
+    
+    .p-card-content {
+      font-size: var(--font-size-sm);
+    }
+  }
+  
+  .card-grid {
+    gap: var(--spacing-lg);
+  }
+}
 /* Divider */
 .p-divider {
    width: 100%;
@@ -1118,57 +1337,527 @@
    }
 }
 
-/* Tabs */
+/* ==========================================================================
+   PRIMENG TABS COMPONENT
+   Clean, Modern Design with Your Theme Tokens
+   ========================================================================== */
+
 .p-tabs {
-   display: flex;
-   flex-direction: column;
-   
-   .p-tablist {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  
+  /* ==========================================================================
+     Tab List - The Navigation Bar
+     ========================================================================== */
+  .p-tablist {
+    position: relative;
+    
+    .p-tablist-tab-list {
+      display: flex;
+      background: var(--bg-primary);
+      border-bottom: var(--ui-border-width) solid var(--border-primary);
+      gap: var(--spacing-xs);
+      padding: 0 var(--spacing-md);
+    }
+    
+    /* Individual Tab */
+    .p-tab {
+      padding: var(--spacing-md) var(--spacing-xl);
+      color: var(--text-secondary);
+      font-weight: var(--font-weight-medium);
+      font-size: var(--font-size-md);
+      cursor: pointer;
+      transition: var(--transition-base);
+      background: transparent;
+      border: none;
       position: relative;
+      margin-bottom: calc(var(--ui-border-width) * -1); /* Overlap border */
+      border-radius: var(--ui-border-radius) var(--ui-border-radius) 0 0;
       
+      /* Hover State */
+      &:not(.p-disabled):hover {
+        color: var(--text-primary);
+        background: var(--bg-secondary);
+      }
+      
+      /* Focus State for Accessibility */
+      &:focus-visible {
+        outline: var(--focus-outline-width) solid var(--focus-ring-color);
+        outline-offset: -2px;
+        border-radius: var(--ui-border-radius-sm);
+      }
+      
+      /* Active Tab */
+      &.p-tab-active {
+        color: var(--accent-primary);
+        font-weight: var(--font-weight-semibold);
+        background: linear-gradient(to bottom, var(--bg-secondary), var(--bg-primary));
+        
+        /* Active indicator line */
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: var(--spacing-md);
+          right: var(--spacing-md);
+          height: 2px;
+          background: var(--accent-primary);
+          border-radius: var(--ui-border-radius-pill) var(--ui-border-radius-pill) 0 0;
+        }
+      }
+      
+      /* Disabled Tab */
+      &.p-disabled {
+        opacity: var(--state-disabled-opacity);
+        cursor: not-allowed;
+        pointer-events: none;
+      }
+      
+      /* Tab with Icon */
+      .p-tab-icon {
+        margin-right: var(--spacing-sm);
+        font-size: var(--font-size-lg);
+        vertical-align: middle;
+      }
+      
+      /* Tab with Badge */
+      .p-tab-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 20px;
+        height: 20px;
+        padding: 0 var(--spacing-xs);
+        margin-left: var(--spacing-sm);
+        background: var(--bg-secondary);
+        color: var(--text-secondary);
+        border-radius: var(--ui-border-radius-pill);
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-semibold);
+        border: var(--ui-border-width) solid var(--border-primary);
+      }
+    }
+    
+    /* Active Ink Bar (if used separately) */
+    .p-tablist-active-bar {
+      height: 2px;
+      background: var(--accent-primary);
+      border-radius: var(--ui-border-radius-pill) var(--ui-border-radius-pill) 0 0;
+      bottom: 0;
+      transition: var(--transition-base);
+    }
+    
+    /* ========================================================================
+       Tab List Variants
+       ======================================================================== */
+    
+    /* Pill Tabs - More rounded, card-like */
+    &.p-tablist-pill {
       .p-tablist-tab-list {
-         display: flex;
-         background: var(--bg-primary);
-         border-bottom: 2px solid var(--border-secondary);
+        background: var(--bg-secondary);
+        border: var(--ui-border-width) solid var(--border-primary);
+        border-radius: var(--ui-border-radius-xl);
+        padding: var(--spacing-xs);
+        gap: var(--spacing-xs);
       }
       
       .p-tab {
-         padding: var(--spacing-md) var(--spacing-xl);
-         color: var(--text-secondary);
-         font-weight: var(--font-weight-medium);
-         cursor: pointer;
-         transition: var(--transition-colors);
-         background: transparent;
-         border: none;
-         position: relative;
-         bottom: -2px; // Overlap border
-         border-bottom: 2px solid transparent;
-         
-         &:not(.p-disabled):hover {
-            color: var(--text-primary);
-            border-bottom-color: var(--border-secondary);
-         }
-         
-         &.p-tab-active {
-            color: var(--accent-primary);
-            border-bottom-color: var(--accent-primary);
-         }
+        margin-bottom: 0;
+        border-radius: var(--ui-border-radius-lg);
+        padding: var(--spacing-sm) var(--spacing-lg);
+        
+        &.p-tab-active {
+          background: var(--bg-primary);
+          color: var(--accent-primary);
+          box-shadow: var(--shadow-sm);
+          
+          &::after {
+            display: none; /* Remove line indicator for pill style */
+          }
+        }
+        
+        &:hover:not(.p-disabled):not(.p-tab-active) {
+          background: var(--bg-primary);
+          color: var(--text-primary);
+        }
+      }
+    }
+    
+    /* Underline Tabs - Minimal style */
+    &.p-tablist-underline {
+      .p-tablist-tab-list {
+        border-bottom-width: 1px;
       }
       
-      // Active ink bar handling if component uses it separately
-      .p-tablist-active-bar {
-         height: 2px;
-         background-color: var(--accent-primary);
-         bottom: -2px;
+      .p-tab {
+        padding: var(--spacing-md) var(--spacing-lg);
+        
+        &.p-tab-active {
+          background: transparent;
+          
+          &::after {
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--accent-primary);
+          }
+        }
+        
+        &:hover:not(.p-disabled):not(.p-tab-active) {
+          background: transparent;
+          color: var(--text-primary);
+          
+          &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: var(--spacing-md);
+            right: var(--spacing-md);
+            height: 2px;
+            background: var(--border-secondary);
+            border-radius: var(--ui-border-radius-pill);
+          }
+        }
       }
-   }
-   
-   .p-tabpanels {
-      background: var(--bg-primary);
-      padding: var(--spacing-lg) 0;
-      color: var(--text-primary);
-   }
+    }
+    
+    /* Segmented Tabs - Like button group */
+    &.p-tablist-segmented {
+      .p-tablist-tab-list {
+        background: var(--bg-secondary);
+        border: var(--ui-border-width) solid var(--border-primary);
+        border-radius: var(--ui-border-radius);
+        padding: 2px;
+        gap: 2px;
+      }
+      
+      .p-tab {
+        margin-bottom: 0;
+        border-radius: calc(var(--ui-border-radius) - 2px);
+        padding: var(--spacing-sm) var(--spacing-md);
+        
+        &.p-tab-active {
+          background: var(--bg-primary);
+          color: var(--accent-primary);
+          box-shadow: var(--shadow-sm);
+          
+          &::after {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+  
+  /* ==========================================================================
+     Tab Panels - Content Area
+     ========================================================================== */
+  .p-tabpanels {
+    background: var(--bg-primary);
+    padding: var(--spacing-xl);
+    color: var(--text-primary);
+    border-radius: 0 0 var(--ui-border-radius-lg) var(--ui-border-radius-lg);
+    flex: 1;
+    overflow: auto;
+    
+    /* No padding variant */
+    &.p-tabpanels-nopadding {
+      padding: 0;
+    }
+    
+    /* With border variant */
+    &.p-tabpanels-bordered {
+      border: var(--ui-border-width) solid var(--border-primary);
+      border-top: none;
+    }
+    
+    /* Individual Tab Panel */
+    .p-tabpanel {
+      height: 100%;
+      outline: none;
+      
+      &:focus-visible {
+        outline: var(--focus-outline-width) solid var(--focus-ring-color);
+        outline-offset: var(--focus-ring-offset);
+        border-radius: var(--ui-border-radius);
+      }
+    }
+  }
+  
+  /* ==========================================================================
+     Orientation Variants
+     ========================================================================== */
+  
+  /* Vertical Tabs */
+  &.p-tabs-vertical {
+    flex-direction: row;
+    height: 100%;
+    
+    .p-tablist {
+      width: 200px;
+      flex-shrink: 0;
+      
+      .p-tablist-tab-list {
+        flex-direction: column;
+        border-bottom: none;
+        border-right: var(--ui-border-width) solid var(--border-primary);
+        height: 100%;
+        padding: var(--spacing-md) 0;
+      }
+      
+      .p-tab {
+        margin-bottom: 0;
+        margin-right: calc(var(--ui-border-width) * -1);
+        border-radius: var(--ui-border-radius) 0 0 var(--ui-border-radius);
+        padding: var(--spacing-md) var(--spacing-lg);
+        
+        &.p-tab-active {
+          &::after {
+            left: auto;
+            right: 0;
+            top: var(--spacing-md);
+            bottom: var(--spacing-md);
+            width: 2px;
+            height: auto;
+            border-radius: var(--ui-border-radius-pill) 0 0 var(--ui-border-radius-pill);
+          }
+        }
+        
+        &:hover:not(.p-disabled):not(.p-tab-active)::after {
+          left: auto;
+          right: 0;
+          top: var(--spacing-md);
+          bottom: var(--spacing-md);
+          width: 2px;
+          height: auto;
+          background: var(--border-secondary);
+        }
+      }
+      
+      /* Vertical variants */
+      &.p-tablist-pill {
+        .p-tablist-tab-list {
+          border-right: none;
+          border-radius: var(--ui-border-radius-xl);
+        }
+        
+        .p-tab {
+          margin-right: 0;
+          border-radius: var(--ui-border-radius-lg);
+        }
+      }
+    }
+    
+    .p-tabpanels {
+      flex: 1;
+      border-radius: 0 var(--ui-border-radius-lg) var(--ui-border-radius-lg) 0;
+    }
+  }
+  
+  /* ==========================================================================
+     Size Variants
+     ========================================================================== */
+  
+  /* Small Tabs */
+  &.p-tabs-sm {
+    .p-tab {
+      padding: var(--spacing-xs) var(--spacing-md);
+      font-size: var(--font-size-sm);
+    }
+    
+    .p-tabpanels {
+      padding: var(--spacing-md);
+    }
+  }
+  
+  /* Large Tabs */
+  &.p-tabs-lg {
+    .p-tab {
+      padding: var(--spacing-lg) var(--spacing-2xl);
+      font-size: var(--font-size-lg);
+    }
+    
+    .p-tabpanels {
+      padding: var(--spacing-2xl);
+    }
+  }
+  
+  /* ==========================================================================
+     Styled Tab Content Examples
+     ========================================================================== */
+  
+  /* Tab with counter badge */
+  .tab-with-count {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    
+    .tab-count {
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      border-radius: var(--ui-border-radius-pill);
+      padding: 2px var(--spacing-sm);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      border: var(--ui-border-width) solid var(--border-primary);
+    }
+  }
+  
+  /* Tab with loading indicator */
+  .tab-loading {
+    .p-tab {
+      position: relative;
+      
+      &.p-tab-active::before {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, var(--accent-primary) 0%, var(--accent-secondary) 50%, var(--accent-primary) 100%);
+        background-size: 200% 100%;
+        animation: loading-shimmer 1.5s infinite;
+      }
+    }
+  }
 }
+
+/* ==========================================================================
+   Animation Keyframes
+   ========================================================================== */
+@keyframes loading-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ==========================================================================
+   Dark Mode Adjustments
+   ========================================================================== */
+@media (prefers-color-scheme: dark) {
+  .p-tabs {
+    .p-tablist {
+      &.p-tablist-pill {
+        .p-tab.p-tab-active {
+          background: var(--bg-secondary);
+        }
+      }
+    }
+  }
+}
+
+/* ==========================================================================
+   Responsive Adjustments
+   ========================================================================== */
+@media (max-width: 768px) {
+  .p-tabs {
+    /* Stack vertical tabs on mobile */
+    &.p-tabs-vertical {
+      flex-direction: column;
+      
+      .p-tablist {
+        width: 100%;
+        
+        .p-tablist-tab-list {
+          flex-direction: row;
+          border-right: none;
+          border-bottom: var(--ui-border-width) solid var(--border-primary);
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+        }
+        
+        .p-tab {
+          white-space: nowrap;
+        }
+      }
+    }
+    
+    /* Make tabs scrollable on mobile */
+    .p-tablist .p-tablist-tab-list {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 2px; /* Space for scrollbar */
+    }
+    
+    .p-tab {
+      white-space: nowrap;
+    }
+  }
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+@media print {
+  .p-tabs {
+    .p-tablist {
+      display: none;
+    }
+    
+    .p-tabpanels {
+      display: block !important;
+      padding: 0;
+      
+      .p-tabpanel {
+        display: block !important;
+        page-break-after: always;
+      }
+    }
+  }
+}
+
+// /* Tabs */
+// .p-tabs {
+//    display: flex;
+//    flex-direction: column;
+   
+//    .p-tablist {
+//       position: relative;
+      
+//       .p-tablist-tab-list {
+//          display: flex;
+//          background: var(--bg-primary);
+//          border-bottom: 2px solid var(--border-secondary);
+//       }
+      
+//       .p-tab {
+//          padding: var(--spacing-md) var(--spacing-xl);
+//          color: var(--text-secondary);
+//          font-weight: var(--font-weight-medium);
+//          cursor: pointer;
+//          transition: var(--transition-colors);
+//          background: transparent;
+//          border: none;
+//          position: relative;
+//          bottom: -2px; // Overlap border
+//          border-bottom: 2px solid transparent;
+         
+//          &:not(.p-disabled):hover {
+//             color: var(--text-primary);
+//             border-bottom-color: var(--border-secondary);
+//          }
+         
+//          &.p-tab-active {
+//             color: var(--accent-primary);
+//             border-bottom-color: var(--accent-primary);
+//          }
+//       }
+      
+//       // Active ink bar handling if component uses it separately
+//       .p-tablist-active-bar {
+//          height: 2px;
+//          background-color: var(--accent-primary);
+//          bottom: -2px;
+//       }
+//    }
+   
+//    .p-tabpanels {
+//       background: var(--bg-primary);
+//       padding: var(--spacing-lg) 0;
+//       color: var(--text-primary);
+//    }
+// }
 
 // ==========================================================================
 // 8. FEEDBACK (Toast, Message)
