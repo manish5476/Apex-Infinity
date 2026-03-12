@@ -25,6 +25,7 @@ import { ChartModule } from 'primeng/chart';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { HRMSService } from '../../hrms.service';
 import { SelectModule } from 'primeng/select';
+import { AppMessageService } from '@core/services/message.service';
 
 @Component({
   selector: 'app-leave-balance-admin',
@@ -380,7 +381,7 @@ import { SelectModule } from 'primeng/select';
 export class LeaveBalanceAdminComponent implements OnInit {
   private fb = inject(FormBuilder);
   private hrmsService = inject(HRMSService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
 
   isLoading = signal(true);
   balances = signal<any[]>([]);
@@ -463,16 +464,16 @@ export class LeaveBalanceAdminComponent implements OnInit {
     const val = this.bulkInitForm.value;
     this.hrmsService.bulkInitializeLeaveBalances(val.financialYear, val.carryForward).pipe(
       catchError(err => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Bulk initialization failed.' });
+        this.messageService.handleHttpError(err)
         return of(null);
       }),
       finalize(() => {
         this.isProcessing.set(false);
         this.displayBulkDialog = false;
       })
-    ).subscribe(res => {
+    ).subscribe((res:any) => {
       if (res) {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Financial year initialized successfully.' });
+        this.messageService.showSuccess(res.message)
         this.selectedFy = val.financialYear;
         // Optionally add new year to select array here
         this.loadData();
@@ -504,16 +505,16 @@ export class LeaveBalanceAdminComponent implements OnInit {
 
     this.hrmsService.updateLeaveBalance(this.selectedBalance._id, payload).pipe(
       catchError(err => {
-        this.messageService.add({ severity: 'error', summary: 'Update Failed', detail: err.error?.message || 'Server error' });
+        this.messageService.handleHttpError(err)
         return of(null);
       }),
       finalize(() => {
         this.isProcessing.set(false);
         this.displayAdjustDialog = false;
       })
-    ).subscribe(res => {
+    ).subscribe((res:any) => {
       if (res) {
-        this.messageService.add({ severity: 'success', summary: 'Adjusted', detail: 'Balance updated successfully.' });
+        this.messageService.showSuccess(res.message)
         this.loadData();
       }
     });

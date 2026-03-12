@@ -18,6 +18,7 @@ import { AvatarModule } from 'primeng/avatar';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { HRMSService } from '../../hrms.service';
+import { AppMessageService } from '@core/services/message.service';
 
 @Component({
   selector: 'app-leave-hub',
@@ -410,7 +411,7 @@ import { HRMSService } from '../../hrms.service';
 })
 export class LeaveHubComponent implements OnInit {
   private hrmsService = inject(HRMSService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
   private router = inject(Router);
 
   // State
@@ -464,7 +465,7 @@ export class LeaveHubComponent implements OnInit {
     
     // Optimistic UI update
     this.pendingApprovals.update(apps => apps.filter(a => a._id !== id));
-    this.messageService.add({ severity, summary: summaryMsg, detail: `The request has been processed.` });
+    // this.messageService.add({ severity, summary: summaryMsg, detail: `The request has been processed.` });
   }
 
   // --- Helpers ---

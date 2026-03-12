@@ -763,7 +763,7 @@ export class MachineFormComponent implements OnInit {
 // export class MachineFormComponent implements OnInit {
 //   private fb = inject(FormBuilder);
 //   private hrmsService = inject(HRMSService);
-//   private messageService = inject(MessageService);
+//   private messageService = inject(AppMessageService);
 //   private router = inject(Router);
 //   private route = inject(ActivatedRoute);
 

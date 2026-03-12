@@ -18,6 +18,7 @@ import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { HRMSService } from '../../hrms.service';
+import { AppMessageService } from '@core/services/message.service';
 
 @Component({
   selector: 'app-holiday-form',
@@ -222,7 +223,7 @@ import { HRMSService } from '../../hrms.service';
 export class HolidayFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private hrmsService = inject(HRMSService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -283,8 +284,8 @@ export class HolidayFormComponent implements OnInit {
 
   private loadHoliday(id: string) {
     this.hrmsService.getHoliday(id).pipe(
-      catchError(() => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not load holiday.' });
+      catchError((err) => {
+        this.messageService.handleHttpError(err)
         this.onCancel();
         return of(null);
       }),
@@ -315,13 +316,13 @@ export class HolidayFormComponent implements OnInit {
 
     req$.pipe(
       catchError(err => {
-        this.messageService.add({ severity: 'error', summary: 'Save Failed', detail: 'Server error.' });
+        this.messageService.handleHttpError(err)
         return of(null);
       }),
       finalize(() => this.isSaving.set(false))
     ).subscribe((res: any) => {
       if (res) {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Holiday saved.' });
+        this.messageService.showSuccess(res.message)
         setTimeout(() => this.onCancel(), 1000);
       }
     });

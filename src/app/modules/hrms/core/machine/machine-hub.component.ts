@@ -20,6 +20,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { HRMSService } from '../../hrms.service';
+import { AppMessageService } from '@core/services/message.service';
 
 @Component({
   selector: 'app-machine-hub',
@@ -295,7 +296,7 @@ import { HRMSService } from '../../hrms.service';
 })
 export class MachineHubComponent implements OnInit {
   private hrmsService = inject(HRMSService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
   private router = inject(Router);
 
   isLoading = signal(true);
@@ -353,12 +354,12 @@ export class MachineHubComponent implements OnInit {
         this.displayBulkDialog = false;
       }),
       catchError(err => {
-        this.messageService.add({ severity: 'error', summary: 'Update Failed', detail: 'Server error during bulk operation.' });
+        this.messageService.handleHttpError(err)
         return of(null);
       })
-    ).subscribe(res => {
+    ).subscribe((res:any) => {
       if (res) {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: `Status updated for ${ids.length} machines.` });
+        this.messageService.showSuccess(res.message)
         this.loadData();
       }
     });

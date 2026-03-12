@@ -149,7 +149,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
         { label: 'Shift Calculator', icon: 'pi pi-calculator', routerLink: ['/hrms/shifts/calculator'] },
         { label: 'Clone Shift', icon: 'pi pi-copy', routerLink: ['/hrms/shifts/clone'] },
         { label: 'Group Rotation', icon: 'pi pi-sync', routerLink: ['/hrms/shift-groups/list'] },
-        { label: 'Add Shift Group', icon: 'pi pi-plus', routerLink: ['/hrms/shift-groups/new'] }
+        { label: 'Add Shift Group', icon: 'pi pi-plus', routerLink: ['/hrms/shift-groups/create'] }
       ]
     },
     {

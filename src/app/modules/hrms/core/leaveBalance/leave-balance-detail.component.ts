@@ -18,6 +18,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { DividerModule } from 'primeng/divider';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { HRMSService } from '../../hrms.service';
+import { AppMessageService } from '@core/services/message.service';
 
 @Component({
   selector: 'app-leave-balance-detail',
@@ -301,7 +302,7 @@ export class LeaveBalanceDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private hrmsService = inject(HRMSService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
 
   balanceId: string = '';
@@ -320,8 +321,8 @@ export class LeaveBalanceDetailComponent implements OnInit {
   private loadBalanceDetails() {
     this.isLoading.set(true);
     this.hrmsService.getLeaveBalance(this.balanceId).pipe(
-      catchError(() => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not load balance ledger.' });
+      catchError((err) => {
+        this.messageService.handleHttpError(err)
         this.onBack();
         return of(null);
       }),
@@ -354,10 +355,10 @@ export class LeaveBalanceDetailComponent implements OnInit {
       accept: () => {
         this.hrmsService.initializeLeaveBalance(userId, nextFy).subscribe({
           next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Initialized', detail: `Ledger for ${nextFy} created successfully.` });
+            // this.messageService.add({ severity: 'success', summary: 'Initialized', detail: `Ledger for ${nextFy} created successfully.` });
             // Optionally route them to the new ledger ID returned by the API
           },
-          error: (err) => this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message || 'Failed to initialize.' })
+          error: (err) => this.messageService.handleHttpError(err)
         });
       }
     });
@@ -366,7 +367,7 @@ export class LeaveBalanceDetailComponent implements OnInit {
   openAdjustModal() {
     // Navigates or emits event to parent if you want to use the dialog from the Admin component,
     // or you can implement the standalone dialog here exactly as done in Admin.
-    this.messageService.add({ severity: 'info', summary: 'Manual Adjustment', detail: 'Use the admin hub to perform manual credits/debits.' });
+    // this.messageService.add({ severity: 'info', summary: 'Manual Adjustment', detail: 'Use the admin hub to perform manual credits/debits.' });
   }
 
   // --- Formatting Helpers ---

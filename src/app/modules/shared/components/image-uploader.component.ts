@@ -104,7 +104,7 @@
 // })
 // export class ImageUploaderComponent {
 //   private imageUploadService = inject(ImageUploadService);
-//   private messageService = inject(MessageService);
+//   private messageService = inject(AppMessageService);
 
 //   @Output() uploaded = new EventEmitter<string>();
 
@@ -287,7 +287,7 @@
 // // export class ImageUploaderComponent {
 // //   // --- Dependencies ---
 // //   private imageUploadService = inject(ImageUploadService);
-// //   private messageService = inject(MessageService);
+// //   private messageService = inject(AppMessageService);
 
 // //   // --- Outputs ---
 // //   @Output() uploaded = new EventEmitter<string>();

@@ -23,6 +23,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { Toast } from 'primeng/toast';
 import { HRMSService } from '../../hrms.service';
+import { AppMessageService } from '@core/services/message.service';
 
 @Component({
   selector: 'app-holiday-hub',
@@ -315,7 +316,7 @@ import { HRMSService } from '../../hrms.service';
 })
 export class HolidayHubComponent implements OnInit {
   private hrmsService = inject(HRMSService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
   private router = inject(Router);
 
@@ -375,8 +376,8 @@ export class HolidayHubComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         this.hrmsService.deleteHoliday(holiday._id).subscribe({
-          next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Holiday removed.' });
+          next: (res:any) => {
+            this.messageService.showSuccess(res.message)
             this.loadYearData();
           }
         });
@@ -392,12 +393,12 @@ export class HolidayHubComponent implements OnInit {
         this.displayCopyDialog = false;
       }),
       catchError(err => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to copy holidays.' });
+        this.messageService.handleHttpError(err)
         return of(null);
       })
-    ).subscribe(res => {
+    ).subscribe((res:any) => {
       if (res) {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: `Holidays cloned to ${this.copyToYear}.` });
+        this.messageService.showSuccess(res.message)
         this.selectedYear = this.copyToYear;
         this.loadYearData();
       }
@@ -406,7 +407,7 @@ export class HolidayHubComponent implements OnInit {
 
   onExport() {
     this.hrmsService.exportHolidayCalendar(this.selectedYear, undefined, 'calendar').subscribe({
-      next: () => this.messageService.add({ severity: 'success', summary: 'Exported', detail: 'Calendar download started.' })
+      next: (res:any) => this.messageService.showSuccess(res.message)
     });
   }
 

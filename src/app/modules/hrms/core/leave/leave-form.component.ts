@@ -19,6 +19,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { DatePickerModule } from 'primeng/datepicker';
 import { SelectModule } from 'primeng/select';
 import { HRMSService } from '../../hrms.service';
+import { AppMessageService } from '@core/services/message.service';
 
 @Component({
   selector: 'app-leave-form',
@@ -206,7 +207,7 @@ import { HRMSService } from '../../hrms.service';
 export class LeaveFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private hrmsService = inject(HRMSService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -268,8 +269,8 @@ export class LeaveFormComponent implements OnInit {
 
   private loadRequest(id: string) {
     this.hrmsService.getLeaveRequest(id).pipe(
-      catchError(() => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not load leave details.' });
+      catchError((err) => {
+        this.messageService.handleHttpError(err)
         this.onCancel();
         return of(null);
       }),
@@ -323,13 +324,13 @@ export class LeaveFormComponent implements OnInit {
 
     req$.pipe(
       catchError(err => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to save request.' });
+        this.messageService.handleHttpError(err)
         return of(null);
       }),
       finalize(() => this.isSaving.set(false))
     ).subscribe(res => {
       if (res) {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Leave request submitted.' });
+        // this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Leave request submitted.' });
         setTimeout(() => this.onCancel(), 1000);
       }
     });

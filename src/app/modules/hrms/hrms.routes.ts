@@ -114,7 +114,7 @@ export const HRMS_ROUTES: Routes = [
     children: [
       { path: '', redirectTo: 'list', pathMatch: 'full' },
       { path: 'list', component: ShiftGroupListComponent },
-      { path: 'new', component: ShiftGroupFormComponent },
+      { path: 'create', component: ShiftGroupFormComponent },
       { path: 'edit/:id', component: ShiftGroupFormComponent },
       { path: ':id/assignments', component: ShiftGroupAssignmentsComponent },
     ]

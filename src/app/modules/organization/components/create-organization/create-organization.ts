@@ -237,7 +237,7 @@ export class CreateOrganizationComponent implements OnInit {
 //   // --- Dependencies ---
 //   private fb = inject(FormBuilder);
 //   private router = inject(Router);
-//   private messageService = inject(MessageService);
+//   private messageService = inject(AppMessageService);
 //   private organizationService = inject(OrganizationService);
 //   private authService = inject(AuthService);
 //   private masterList = inject(MasterListService);

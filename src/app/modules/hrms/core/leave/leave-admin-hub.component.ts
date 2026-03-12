@@ -22,6 +22,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { HRMSService } from '../../hrms.service';
+import { AppMessageService } from '@core/services/message.service';
 
 @Component({
   selector: 'app-leave-admin-hub',
@@ -417,7 +418,7 @@ import { HRMSService } from '../../hrms.service';
 })
 export class LeaveAdminHubComponent implements OnInit {
   private hrmsService = inject(HRMSService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
 
   // State
   isLoading = signal<boolean>(true);
@@ -489,13 +490,13 @@ export class LeaveAdminHubComponent implements OnInit {
 
     this.hrmsService.bulkApproveLeaves(requestIds, 'Bulk approved by manager').pipe(
       catchError(err => {
-        this.messageService.add({ severity: 'error', summary: 'Bulk Action Failed', detail: 'Could not process bulk approval.' });
+        this.messageService.handleHttpError(err)
         return of(null);
       }),
       finalize(() => this.isBulkApproving.set(false))
-    ).subscribe(res => {
+    ).subscribe((res:any) => {
       if (res) {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: `${requestIds.length} requests approved.` });
+        this.messageService.showSuccess(res.message)
         this.selectedApprovals.set([]); // Clear selection
         // this.loadDashboardData(); // Refresh the lists
       }

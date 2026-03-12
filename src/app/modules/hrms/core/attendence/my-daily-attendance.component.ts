@@ -19,6 +19,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { TooltipModule } from 'primeng/tooltip';
 import { HRMSService } from '../../hrms.service';
 import { DatePickerModule } from 'primeng/datepicker';
+import { AppMessageService } from '@core/services/message.service';
 
 @Component({
   selector: 'app-my-daily-attendance',
@@ -264,7 +265,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 })
 export class MyDailyAttendanceComponent implements OnInit {
   private hrmsService = inject(HRMSService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
   private fb = inject(FormBuilder);
 
   isLoading = signal(true);
@@ -299,8 +300,8 @@ export class MyDailyAttendanceComponent implements OnInit {
     const end = new Date(this.selectedMonth.getFullYear(), this.selectedMonth.getMonth() + 1, 0);
 
     this.hrmsService.getMyAttendance({ fromDate: start, toDate: end }).pipe(
-      catchError(() => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not load timesheet.' });
+      catchError((err) => {
+        this.messageService.handleHttpError(err)
         return of({ data: { records: [], summary: {} } });
       }),
       finalize(() => this.isLoading.set(false))
@@ -338,16 +339,16 @@ export class MyDailyAttendanceComponent implements OnInit {
     // Call the specific regularization API
     this.hrmsService.regularizeAttendance(this.selectedRecord._id, payload).pipe(
       catchError(err => {
-        this.messageService.add({ severity: 'error', summary: 'Failed', detail: err.error?.message || 'Server error' });
+        this.messageService.handleHttpError(err)
         return of(null);
       }),
       finalize(() => {
         this.isSubmitting.set(false);
         this.displayRegularize = false;
       })
-    ).subscribe(res => {
+    ).subscribe((res:any) => {
       if (res) {
-        this.messageService.add({ severity: 'success', summary: 'Submitted', detail: 'Regularization request sent to manager.' });
+        this.messageService.showSuccess(res.message)
         this.loadMyAttendance(); // Reload to show pending status if applicable
       }
     });

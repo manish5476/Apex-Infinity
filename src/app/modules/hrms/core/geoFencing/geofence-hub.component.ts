@@ -20,6 +20,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { HRMSService } from '../../hrms.service';
 import { ToastModule } from 'primeng/toast';
+import { AppMessageService } from '@core/services/message.service';
 
 @Component({
   selector: 'app-geofence-hub',
@@ -265,7 +266,7 @@ import { ToastModule } from 'primeng/toast';
 })
 export class GeofenceHubComponent implements OnInit {
   private hrmsService = inject(HRMSService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
   private router = inject(Router);
 
@@ -312,8 +313,8 @@ export class GeofenceHubComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         this.hrmsService.deleteGeoFence(fence._id).subscribe({
-          next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Geofence removed successfully.' });
+          next: (res:any) => {
+            this.messageService.showSuccess(res.message);
             this.loadData();
           }
         });

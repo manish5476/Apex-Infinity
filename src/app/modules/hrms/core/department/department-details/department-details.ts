@@ -20,6 +20,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { AvatarModule } from 'primeng/avatar';
 import { AgShareGrid } from '../../../../shared/components/ag-shared-grid';
+import { AppMessageService } from '@core/services/message.service';
 
 // Shared Components
 
@@ -455,7 +456,7 @@ export class DepartmentDetailsComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private dataService = inject(HRMSService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
 
   deptId: string = '';
@@ -576,15 +577,15 @@ gridColumns: any = [
     forkJoin({
       department: this.dataService.getDepartment(this.deptId).pipe(
         map((res: any) => res?.data?.data || res),
-        catchError(() => {
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load department details.' });
+        catchError((err) => {
+          this.messageService.handleHttpError(err)
           return of(null);
         })
       ),
       employeesData: this.dataService.getDepartmentEmployees(this.deptId).pipe(
         map((res: any) => res?.data?.employees || []),
-        catchError(() => {
-          this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Could not fetch employee roster.' });
+        catchError((err) => {
+          this.messageService.handleHttpError(err)
           return of([]);
         })
       )
@@ -1204,7 +1205,7 @@ gridColumns: any = [
 //   private route = inject(ActivatedRoute);
 //   private router = inject(Router);
 //   private dataService = inject(HRMSService);
-//   private messageService = inject(MessageService);
+//   private messageService = inject(AppMessageService);
 //   private confirmationService = inject(ConfirmationService);
 
 //   deptId: string = '';

@@ -19,6 +19,7 @@ import { TimelineModule } from 'primeng/timeline';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SelectModule } from 'primeng/select';
 import { HRMSService } from '../../hrms.service';
+import { AppMessageService } from '@core/services/message.service';
 
 @Component({
   selector: 'app-leave-details',
@@ -267,7 +268,7 @@ import { HRMSService } from '../../hrms.service';
 })
 export class LeaveDetailsComponent implements OnInit {
   private hrmsService = inject(HRMSService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -305,8 +306,8 @@ export class LeaveDetailsComponent implements OnInit {
   private loadRequest(id: string) {
     this.isLoading.set(true);
     this.hrmsService.getLeaveRequest(id).pipe(
-      catchError(() => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not load request details.' });
+      catchError((err) => {
+        this.messageService.handleHttpError(err)
         return of(null);
       }),
       finalize(() => this.isLoading.set(false))
@@ -327,8 +328,8 @@ export class LeaveDetailsComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         this.hrmsService.cancelLeaveRequest(this.request()._id).subscribe({
-          next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Cancelled', detail: 'Leave request withdrawn.' });
+          next: (res:any) => {
+            this.messageService.showSuccess(res.message)
             this.loadRequest(this.request()._id); // Refresh
           }
         });
@@ -371,16 +372,16 @@ export class LeaveDetailsComponent implements OnInit {
 
     req$.pipe(
       catchError(err => {
-        this.messageService.add({ severity: 'error', summary: 'Action Failed', detail: err.error?.message || 'Server error occurred.' });
+        this.messageService.handleHttpError(err)
         return of(null);
       }),
       finalize(() => {
         this.isProcessing.set(false);
         this.displayActionDialog = false;
       })
-    ).subscribe(res => {
+    ).subscribe((res:any) => {
       if (res) {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: `Request has been ${this.actionType}d.` });
+        this.messageService.showSuccess(res.message)
         this.loadRequest(id);
       }
     });
