@@ -1,21 +1,19 @@
-<section class="section-root" [ngStyle]="backgroundStyle()">
+<section class="section-root" [ngStyle]="sectionStyle()">
   
-  <div class="overlay" *ngIf="config.backgroundImage"></div>
-
   <div class="container-wrapper">
     
     <div class="content-wrapper" 
          [ngClass]="[maxWidthClass(), alignmentClass(), textClass()]">
 
-      @if (config.title) {
+      @if (cfg().title) {
         <h2 class="main-title animate-fade-up">
-          {{ config.title }}
+          {{ cfg().title }}
         </h2>
       }
 
-      @if (config.content) {
+      @if (cfg().content) {
         <div class="prose animate-fade-up delay-1" 
-             [innerHTML]="config.content">
+             [innerHTML]="cfg().content">
         </div>
       }
 

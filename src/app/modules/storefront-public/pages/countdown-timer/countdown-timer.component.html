@@ -57,17 +57,17 @@
     }
 
     <!-- CTA -->
-    @if (cfg().ctaUrl && !isExpired()) {
+    @if (cfg().ctaButton?.link && !isExpired()) {
     <div class="ct-cta-wrap">
 
       @if (ctaIsExternal()) {
-      <a [href]="cfg().ctaUrl" target="_blank" rel="noopener" class="ct-cta-btn">
-        {{ cfg().ctaText }}
+      <a [href]="cfg().ctaButton!.link" target="_blank" rel="noopener" class="ct-cta-btn">
+        {{ cfg().ctaButton!.text }}
         <i class="pi pi-arrow-right"></i>
       </a>
       } @else if (ctaLink()) {
       <a [routerLink]="ctaLink()" class="ct-cta-btn">
-        {{ cfg().ctaText }}
+        {{ cfg().ctaButton!.text }}
         <i class="pi pi-arrow-right"></i>
       </a>
       }

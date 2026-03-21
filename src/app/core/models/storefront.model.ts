@@ -234,18 +234,39 @@ export interface FooterData {
 // SECTION CONFIG  (per-type configs for the page builder)
 // ============================================================================
 
-export interface CtaButton {
-  text: string;
-  link: string;
-  variant: 'primary' | 'secondary' | 'outline' | 'ghost';
-  icon?: string;
+export interface StorefrontSectionConfig {
+  isActive?: boolean;
+  hideOnMobile?: boolean;
+  hideOnDesktop?: boolean;
+  paddingTop?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
+  paddingBottom?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
+  backgroundColor?: string;
+  themeMode?: 'auto' | 'light' | 'dark' | 'glass';
 }
 
-export interface HeroBannerConfig {
+export interface TypographyFields {
   title?: string;
   titleTag?: 'h1' | 'h2' | 'h3';
   subtitle?: string;
   alignment?: 'left' | 'center' | 'right';
+}
+
+export interface CtaButton {
+  text?: string;
+  link?: string;
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+  icon?: string;
+}
+
+export interface ProductDataSourceFields {
+  ruleType?: 'new_arrivals' | 'best_sellers' | 'trending' | 'clearance_sale' | 'manual_selection' | 'category_based' | 'custom_query';
+  manualProductIds?: string[];
+  categoryId?: string;
+  limit?: number;
+}
+
+// ---------------------- HERO ----------------------
+export interface HeroBannerConfig extends StorefrontSectionConfig, TypographyFields {
   backgroundImage?: string;
   height?: 'auto' | 'small' | 'medium' | 'large' | 'screen';
   overlayOpacity?: number;
@@ -253,53 +274,197 @@ export interface HeroBannerConfig {
   contentPosition?: 'left' | 'center' | 'right';
 }
 
-export interface ProductSectionConfig {
+export interface VideoHeroConfig extends StorefrontSectionConfig, TypographyFields {
+  videoUrl?: string; // required
+  posterImage?: string;
+  overlayOpacity?: number;
+  ctaButtons?: CtaButton[];
+}
+
+// -------------------- COMMERCE --------------------
+export interface ProductSliderConfig extends StorefrontSectionConfig, ProductDataSourceFields {
   title?: string;
-  ruleType?: string;
-  manualProductIds?: string[];
-  categoryId?: string;
-  limit?: number;
-  itemsPerView?: number;
-  columns?: 2 | 3 | 4;
+  itemsPerView?: 2 | 3 | 4 | 5;
   showPrice?: boolean;
   showAddToCart?: boolean;
   autoPlay?: boolean;
+}
+
+export interface ProductGridConfig extends StorefrontSectionConfig, ProductDataSourceFields {
+  title?: string;
+  columns?: 2 | 3 | 4;
+  gap?: 'sm' | 'md' | 'lg';
   pagination?: boolean;
 }
 
-export interface CategoryGridConfig {
+export interface FeaturedProductConfig extends StorefrontSectionConfig {
+  productId?: string; // required
+  layout?: 'image_left' | 'image_right';
+  showDescription?: boolean;
+  showReviews?: boolean;
+}
+
+export interface ProductListingConfig extends StorefrontSectionConfig {
+  showSidebar?: boolean;
+  defaultSort?: 'newest' | 'price_asc' | 'price_desc' | 'best_sellers';
+  itemsPerPage?: number;
+}
+
+// --------------------- CONTENT --------------------
+export interface TextContentConfig extends StorefrontSectionConfig {
+  title?: string;
+  content?: string;
+  alignment?: 'left' | 'center' | 'right' | 'justify';
+  maxWidth?: 'sm' | 'md' | 'lg' | 'full';
+}
+
+export interface SplitImageTextConfig extends StorefrontSectionConfig {
+  image?: string; // required
+  imagePosition?: 'left' | 'right';
+  title?: string;
+  content?: string;
+  ctaButton?: CtaButton;
+}
+
+export interface FeatureGridConfig extends StorefrontSectionConfig {
+  title?: string;
+  columns?: 2 | 3 | 4;
+  items?: Array<{ icon?: string; title?: string; description?: string }>;
+}
+
+export interface CategoryGridConfig extends StorefrontSectionConfig {
   title?: string;
   layout?: 'grid' | 'masonry' | 'circle';
   selectedCategories?: string[];
   limit?: number;
 }
 
-export interface TestimonialConfig {
+export interface FaqAccordionConfig extends StorefrontSectionConfig {
   title?: string;
-  items?: TestimonialItem[];
+  items?: Array<{ question?: string; answer?: string }>;
 }
 
-export interface TestimonialItem {
-  name: string;
-  role?: string;
-  avatar?: string;
-  rating: number;
-  text: string;
+export interface BlogFeedConfig extends StorefrontSectionConfig {
+  title?: string;
+  limit?: number;
+  showDate?: boolean;
+  showExcerpt?: boolean;
 }
 
-export interface CountdownConfig {
-  targetDate: string;
+// ----------------- SOCIAL & TRUST -----------------
+export interface TestimonialSliderConfig extends StorefrontSectionConfig {
+  title?: string;
+  subtitle?: string;
+  layout?: 'single' | 'grid';
+  autoPlay?: boolean;
+  items?: Array<{ name?: string; role?: string; avatar?: string; rating?: number; text?: string }>;
+}
+
+export interface LogoCloudConfig extends StorefrontSectionConfig {
+  title?: string;
+  grayscale?: boolean;
+  logos?: Array<{ image?: string; alt?: string; link?: string }>;
+}
+
+export interface InstagramFeedConfig extends StorefrontSectionConfig {
+  title?: string;
+  username?: string;
+  limit?: number;
+}
+
+export interface StatsCounterConfig extends StorefrontSectionConfig {
+  items?: Array<{ value?: number; suffix?: string; label?: string; icon?: string }>;
+}
+
+// ------------------- MARKETING --------------------
+export interface NewsletterSignupConfig extends StorefrontSectionConfig {
+  title?: string;
+  description?: string;
+  buttonText?: string;
+  layout?: 'center' | 'inline' | 'split';
+  placeholder?: string;
+  disclaimer?: string;
+}
+
+export interface CountdownTimerConfig extends StorefrontSectionConfig {
+  targetDate?: string; // required
   title?: string;
   style?: 'boxes' | 'plain';
+  backgroundImage?: string;
+  ctaButton?: CtaButton;
+}
+
+export interface PricingTableConfig extends StorefrontSectionConfig {
+  title?: string;
+  plans?: Array<{ name?: string; price?: string; period?: string; features?: string[]; isPopular?: boolean; ctaText?: string; ctaLink?: string }>;
+}
+
+// -------------------- UTILITY ---------------------
+export interface MapLocationsConfig extends StorefrontSectionConfig {
+  title?: string;
+  zoom?: number;
+  height?: string;
+  clusterMarkers?: boolean;
+  enableHeatmap?: boolean;
+  mapStyle?: 'dark' | 'light' | 'satellite';
+  animationDuration?: number;
+}
+
+export interface ContactFieldConfig {
+  name:      string;
+  label:     string;
+  type:      'text' | 'email' | 'tel' | 'textarea';
+  required?: boolean;
+  width?:    'full' | 'half';
+}
+
+export interface ContactFormConfig extends StorefrontSectionConfig {
+  title?: string;
+  subtitle?: string;
+  description?: string;
+  emailTo?: string;
+  submitButtonText?: string;
+  successMessage?: string;
+  fields?: ContactFieldConfig[];
+  backgroundImage?: string;
+}
+
+export interface DividerConfig extends StorefrontSectionConfig {
+  style?: 'solid' | 'dashed' | 'dotted';
+  width?: 'full' | 'container' | 'small';
+  color?: string;
+}
+
+export interface SpacerConfig {
+  height?: number;
+  hideOnMobile?: boolean;
 }
 
 // Generic fallback for configs not yet strongly typed
 export type SectionConfig =
   | HeroBannerConfig
-  | ProductSectionConfig
+  | VideoHeroConfig
+  | ProductSliderConfig
+  | ProductGridConfig
+  | FeaturedProductConfig
+  | ProductListingConfig
+  | TextContentConfig
+  | SplitImageTextConfig
+  | FeatureGridConfig
   | CategoryGridConfig
-  | TestimonialConfig
-  | CountdownConfig
+  | FaqAccordionConfig
+  | BlogFeedConfig
+  | TestimonialSliderConfig
+  | LogoCloudConfig
+  | InstagramFeedConfig
+  | StatsCounterConfig
+  | NewsletterSignupConfig
+  | CountdownTimerConfig
+  | PricingTableConfig
+  | MapLocationsConfig
+  | ContactFormConfig
+  | DividerConfig
+  | SpacerConfig
   | Record<string, any>;
 
 // ============================================================================

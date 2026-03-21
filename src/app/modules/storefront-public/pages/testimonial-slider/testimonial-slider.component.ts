@@ -1,55 +1,56 @@
-import { Component, Input, OnInit, OnDestroy, computed, signal } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, computed, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TestimonialSliderConfig } from '@core/models/storefront.model';
 
 @Component({
   selector: 'app-testimonial-slider',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './testimonial-slider.component.html',
-  styleUrls: ['./testimonial-slider.component.scss']
+  styleUrls: ['./testimonial-slider.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TestimonialSliderComponent implements OnInit, OnDestroy {
-  @Input() config: any = {};
+  @Input() set config(v: TestimonialSliderConfig) { this._config.set(v ?? {}); }
+  private _config = signal<TestimonialSliderConfig>({});
+
+  readonly cfg = computed(() => ({
+    title:           this._config().title           ?? 'What Our Customers Say',
+    subtitle:        this._config().subtitle,
+    layout:          this._config().layout          ?? 'single',
+    autoPlay:        this._config().autoPlay        ?? true,
+    paddingTop:      this._config().paddingTop      ?? 'lg',
+    paddingBottom:   this._config().paddingBottom   ?? 'lg',
+    backgroundColor: this._config().backgroundColor ?? '#0f172a',
+    themeMode:       this._config().themeMode       ?? 'dark',
+    items:           this._config().items           ?? []
+  }));
 
   currentSlide = signal(0);
   autoplayInterval: any;
 
   // Background Style Logic
-  backgroundStyle = computed(() => {
-    const style: any = {};
-    
-    // Background Color
-    style['background-color'] = this.config.backgroundColor || '#0f172a';
-    
-    // Background Image
-    if (this.config.backgroundImage) {
-      style['background-image'] = `url(${this.config.backgroundImage})`;
-      style['background-size'] = 'cover';
-      style['background-position'] = 'center';
-    }
-    
-    // Padding Logic
-    const paddingMap: any = { 
-      'sm': 'var(--spacing-3xl)', 
-      'md': 'var(--spacing-6xl)', 
-      'lg': 'var(--spacing-9xl)' 
-    };
-    
-    style['padding-top'] = paddingMap[this.config.paddingTop] || 'var(--spacing-7xl)';
-    style['padding-bottom'] = paddingMap[this.config.paddingBottom] || 'var(--spacing-7xl)';
-    
-    return style;
-  });
+  readonly paddingMap: Record<string, string> = { 
+    'none': '0',
+    'sm': 'var(--spacing-3xl)', 
+    'md': 'var(--spacing-6xl)', 
+    'lg': 'var(--spacing-9xl)' 
+  };
+  
+  readonly sectionStyle = computed(() => ({
+    'background-color': this.cfg().backgroundColor,
+    'padding-top':      this.paddingMap[this.cfg().paddingTop]    ?? this.paddingMap['lg'],
+    'padding-bottom':   this.paddingMap[this.cfg().paddingBottom] ?? this.paddingMap['lg']
+  }));
 
   // Rating Helper
-  getStars(rating: number): number[] {
-    // Default to 5 stars if not provided
-    const count = Math.round(rating) || 5; 
+  getStars(rating: number | undefined): number[] {
+    const count = Math.round(rating ?? 5); 
     return Array(count).fill(0);
   }
 
   ngOnInit() {
-    if (this.config.autoSlide !== false) { // Default to true
+    if (this.cfg().autoPlay) {
       this.startAutoplay();
     }
   }
@@ -60,13 +61,13 @@ export class TestimonialSliderComponent implements OnInit, OnDestroy {
 
   // --- Navigation ---
   next() {
-    const total = this.config.testimonials?.length || 0;
+    const total = this.cfg().items.length;
     if (total === 0) return;
     this.currentSlide.update(i => (i + 1) % total);
   }
 
   prev() {
-    const total = this.config.testimonials?.length || 0;
+    const total = this.cfg().items.length;
     if (total === 0) return;
     this.currentSlide.update(i => (i - 1 + total) % total);
   }
@@ -78,8 +79,7 @@ export class TestimonialSliderComponent implements OnInit, OnDestroy {
   // --- Autoplay ---
   startAutoplay() {
     this.stopAutoplay();
-    // Default 6 seconds
-    const interval = this.config.interval || 6000;
+    const interval = 6000;
     this.autoplayInterval = setInterval(() => {
       this.next();
     }, interval);
@@ -88,87 +88,7 @@ export class TestimonialSliderComponent implements OnInit, OnDestroy {
   stopAutoplay() {
     if (this.autoplayInterval) {
       clearInterval(this.autoplayInterval);
+      this.autoplayInterval = null;
     }
   }
 }
-
-// import { Component, Input, OnInit, OnDestroy, computed, signal } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-
-// @Component({
-//   selector: 'app-testimonial-slider',
-//   standalone: true,
-//   imports: [CommonModule],
-//   templateUrl: './testimonial-slider.component.html',
-//   styleUrls: ['./testimonial-slider.component.scss']
-// })
-// export class TestimonialSliderComponent implements OnInit, OnDestroy {
-//   @Input() config: any = {};
-
-//   currentSlide = signal(0);
-//   autoplayInterval: any;
-
-//   // Generate an array for star ratings (e.g. 5 -> [1,2,3,4,5])
-//   getStars(rating: number): number[] {
-//     return Array(Math.round(rating || 5)).fill(0);
-//   }
-
-//   // Background Logic
-//   backgroundStyle = computed(() => {
-//     const style: any = {};
-//     if (this.config.backgroundColor) style['background-color'] = this.config.backgroundColor;
-//     if (this.config.backgroundImage) {
-//       style['background-image'] = `url(${this.config.backgroundImage})`;
-//       style['background-size'] = 'cover';
-//       style['background-position'] = 'center';
-//     }
-    
-//     // Padding
-//     const paddingMap: any = { 'sm': '3rem', 'md': '6rem', 'lg': '9rem' };
-//     style['padding-top'] = paddingMap[this.config.paddingTop] || '6rem';
-//     style['padding-bottom'] = paddingMap[this.config.paddingBottom] || '6rem';
-    
-//     return style;
-//   });
-
-//   ngOnInit() {
-//     if (this.config.autoSlide) {
-//       this.startAutoplay();
-//     }
-//   }
-
-//   ngOnDestroy() {
-//     this.stopAutoplay();
-//   }
-
-//   // --- Navigation Logic ---
-
-//   next() {
-//     const total = this.config.testimonials?.length || 0;
-//     this.currentSlide.update(i => (i + 1) % total);
-//   }
-
-//   prev() {
-//     const total = this.config.testimonials?.length || 0;
-//     this.currentSlide.update(i => (i - 1 + total) % total);
-//   }
-
-//   goTo(index: number) {
-//     this.currentSlide.set(index);
-//   }
-
-//   // --- Autoplay Logic ---
-
-//   startAutoplay() {
-//     this.stopAutoplay(); // Clear existing to be safe
-//     this.autoplayInterval = setInterval(() => {
-//       this.next();
-//     }, 5000); // 5 Seconds per slide
-//   }
-
-//   stopAutoplay() {
-//     if (this.autoplayInterval) {
-//       clearInterval(this.autoplayInterval);
-//     }
-//   }
-// }

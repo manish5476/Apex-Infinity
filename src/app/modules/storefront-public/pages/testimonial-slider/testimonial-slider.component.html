@@ -1,5 +1,5 @@
 <section class="section-root" 
-         [ngStyle]="backgroundStyle()"
+         [ngStyle]="sectionStyle()"
          (mouseenter)="stopAutoplay()"
          (mouseleave)="startAutoplay()">
   
@@ -7,8 +7,8 @@
 
   <div class="container-wrapper">
     
-    <div class="header-group" *ngIf="config.title">
-      <h2 class="section-title">{{ config.title }}</h2>
+    <div class="header-group" *ngIf="cfg().title">
+      <h2 class="section-title">{{ cfg().title }}</h2>
       <div class="divider-line"></div>
     </div>
 
@@ -16,7 +16,7 @@
       <div class="slider-track"
            [style.transform]="'translateX(-' + (currentSlide() * 100) + '%)'">
         
-        @for (item of config.testimonials; track $index) {
+        @for (item of cfg().items; track $index) {
           <div class="slide-item">
             
             <div class="testimonial-card group">
@@ -29,7 +29,7 @@
                 }
               </div>
 
-              <p class="quote-text">"{{ item.quote }}"</p>
+              <p class="quote-text">"{{ item.text }}"</p>
 
               <div class="divider-small"></div>
 
@@ -58,7 +58,7 @@
       </button>
 
       <div class="dots">
-        @for (item of config.testimonials; track $index) {
+        @for (item of cfg().items; track $index) {
           <button class="dot" 
                   [class.active]="currentSlide() === $index"
                   (click)="goTo($index)">
