@@ -1,0 +1,61 @@
+<!-- category-grid.component.html -->
+<section class="grid-root" [ngStyle]="sectionStyle()">
+
+  <!-- Background image layer -->
+  @if (cfg().backgroundImage) {
+  <div class="grid-bg-image" [style.background-image]="'url(' + cfg().backgroundImage + ')'">
+  </div>
+  <div class="grid-bg-overlay"></div>
+  }
+
+  <div class="grid-container">
+
+    <!-- Header -->
+    <header class="grid-header">
+      <div class="grid-header-inner">
+        <span class="grid-eyebrow" [class.light]="hasBgImage()">Categories</span>
+        <h2 class="grid-title" [class.light]="hasBgImage()">{{ cfg().title }}</h2>
+      </div>
+    </header>
+
+    <!-- Category grid -->
+    <div class="cat-grid" [class.layout-grid]="cfg().layout === 'grid' || cfg().layout === 'masonry'"
+      [class.layout-circle]="cfg().layout === 'circle'">
+
+      @for (cat of displayCategories(); track cat.id; let i = $index) {
+      <a [routerLink]="categoryLink(cat)" [queryParams]="categoryParams(cat)" class="cat-card"
+        [class.circle-card]="cfg().layout === 'circle'" [attr.aria-label]="'Browse ' + cat.name">
+
+        <!-- Image -->
+        <div class="cat-img-wrap">
+          <img [src]="cat.image || 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=600&q=80'"
+            [alt]="cat.name" loading="lazy" class="cat-img" />
+          <div class="cat-gradient"></div>
+        </div>
+
+        <!-- Item count badge -->
+        @if (cat.count !== undefined) {
+        <span class="cat-count-badge">{{ cat.count }}</span>
+        }
+
+        <!-- Content overlay -->
+        <div class="cat-content">
+          <h3 class="cat-name">{{ cat.name }}</h3>
+          <div class="cat-cta">
+            <span>Explore</span>
+            <span class="cat-arrow">
+              <i class="pi pi-arrow-right"></i>
+            </span>
+          </div>
+        </div>
+
+        <!-- Hover shine effect -->
+        <div class="cat-shine" aria-hidden="true"></div>
+
+      </a>
+      }
+
+    </div>
+  </div>
+
+</section>

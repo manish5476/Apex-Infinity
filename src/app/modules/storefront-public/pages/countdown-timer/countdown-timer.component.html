@@ -1,0 +1,80 @@
+<!-- countdown-timer.component.html -->
+<section class="ct-root" [ngStyle]="sectionStyle()">
+
+  <!-- Background image -->
+  @if (cfg().backgroundImage) {
+  <img [src]="cfg().backgroundImage" class="ct-bg-img" alt="" aria-hidden="true" loading="lazy" />
+  }
+  <div class="ct-overlay" [class.has-image]="!!cfg().backgroundImage"></div>
+
+  <div class="ct-container">
+
+    <!-- Badge -->
+    <div class="ct-badge">
+      <span class="ct-badge-dot"></span>
+      Ending Soon
+    </div>
+
+    <!-- Title -->
+    <h2 class="ct-title">{{ cfg().title }}</h2>
+
+    <!-- Timer -->
+    @if (!isExpired()) {
+    <div class="ct-units" [class.plain-style]="cfg().style === 'plain'">
+
+      <div class="ct-unit">
+        <div class="ct-number">{{ timeLeft().days }}</div>
+        <div class="ct-label">Days</div>
+      </div>
+
+      <div class="ct-sep" aria-hidden="true">:</div>
+
+      <div class="ct-unit">
+        <div class="ct-number">{{ timeLeft().hours }}</div>
+        <div class="ct-label">Hours</div>
+      </div>
+
+      <div class="ct-sep" aria-hidden="true">:</div>
+
+      <div class="ct-unit">
+        <div class="ct-number">{{ timeLeft().minutes }}</div>
+        <div class="ct-label">Mins</div>
+      </div>
+
+      <div class="ct-sep" aria-hidden="true">:</div>
+
+      <div class="ct-unit ct-unit-secs">
+        <div class="ct-number">{{ timeLeft().seconds }}</div>
+        <div class="ct-label">Secs</div>
+      </div>
+
+    </div>
+    } @else {
+    <div class="ct-expired">
+      <i class="pi pi-clock"></i>
+      <span>This offer has ended.</span>
+    </div>
+    }
+
+    <!-- CTA -->
+    @if (cfg().ctaUrl && !isExpired()) {
+    <div class="ct-cta-wrap">
+
+      @if (ctaIsExternal()) {
+      <a [href]="cfg().ctaUrl" target="_blank" rel="noopener" class="ct-cta-btn">
+        {{ cfg().ctaText }}
+        <i class="pi pi-arrow-right"></i>
+      </a>
+      } @else if (ctaLink()) {
+      <a [routerLink]="ctaLink()" class="ct-cta-btn">
+        {{ cfg().ctaText }}
+        <i class="pi pi-arrow-right"></i>
+      </a>
+      }
+
+    </div>
+    }
+
+  </div>
+
+</section>

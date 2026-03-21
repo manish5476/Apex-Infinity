@@ -1,141 +1,257 @@
+<!-- dynamic-page.component.html -->
+
 @if (isLoading()) {
-  <div class="loader-screen">
-    <div class="loader-pulse"></div>
-    <span class="loading-text">Loading Experience</span>
-  </div>
+<div class="loader-screen">
+  <div class="loader-pulse"></div>
+  <span class="loading-text">Loading Experience</span>
+</div>
 }
 
 @if (error()) {
-  <div class="error-screen" @fadeInUp>
-    <div class="error-card">
-      <div class="gradient-line"></div>
-      <h1 class="error-code">404</h1>
-      <div class="separator"></div>
-      <p class="error-msg">{{ error() }}</p>
-      
-      <a routerLink="/" class="return-btn">
-        <i class="pi pi-arrow-left"></i> Return Home
-      </a>
-    </div>
+<div class="error-screen" @fadeInUp>
+  <div class="error-card">
+    <div class="gradient-line"></div>
+    <h1 class="error-code">404</h1>
+    <div class="separator"></div>
+    <p class="error-msg">{{ error() }}</p>
+    <a routerLink="/" class="return-btn">
+      <i class="pi pi-arrow-left"></i> Return Home
+    </a>
   </div>
+</div>
 }
 
 @if (pageData(); as data) {
-  <div class="page-wrapper"
-       [style.--primary-color]="data.page.theme?.primaryColor || '#0f172a'"
-       [style.--secondary-color]="data.page.theme?.secondaryColor || '#64748b'"
-       [style.font-family]="data.page.theme?.fontFamily || 'inherit'"
-       @staggerFade>
+<div class="page-wrapper" @staggerFade>
+  <main>
 
-    <main class="main-content">
-      
-      @for (section of data.page.sections; track section.id) {
-        <section [id]="'section-' + section.position" class="section-block section-enter">
-          
-          @switch (section.type) {
-            
-            @case ('hero_banner') {
-              <app-hero-banner [config]="section.config" />
-            }
-            
-            @case ('product_slider') {
-              <app-product-slider 
-                [config]="section.config" 
-                [products]="section.data || []"> 
-              </app-product-slider>
-            }
-            
-            @case ('category_grid') {
-              <app-category-grid 
-                [config]="section.config" 
-                [categories]="section.data || []"
-                [orgSlug]="orgSlug">
-              </app-category-grid>
-            }
+    @for (section of data.page.sections; track section.id) {
 
-            @case ('product_grid') {
-              <app-product-grid 
-                [config]="section.config" 
-                [products]="section.data || []" 
-                [orgSlug]="orgSlug">
-              </app-product-grid>
-            }
+    @if (section.isActive !== false) {
+    <!-- ✅ FIX: use section.id — 'position' does not exist on PageSection -->
+    <section [id]="'section-' + section.id" class="section-block section-enter">
 
-            @case ('feature_grid') {
-              <app-feature-grid [config]="section.config" />
-            }
+      @switch (section.type) {
 
-            @case ('text_content') {
-              <app-text-content [config]="section.config" />
-            }
-
-            @case ('video_hero') {
-              <app-video-hero [config]="section.config" />
-            }
-            
-            @case ('split_image_text') {
-              <app-split-content [config]="section.config" />
-            }
-
-            @case ('contact_form') {
-              <app-contact-form [config]="section.config" />
-            }
-
-            @case ('map_locations') {
-              <app-map-locations 
-                [config]="section.config" 
-                [locations]="section.data || []">
-              </app-map-locations>
-            }
-
-            @case ('blog_feed') {
-              <app-blog-feed 
-                [config]="section.config"
-                [posts]="section.data || []">
-              </app-blog-feed>
-            }
-
-            @case ('logo_cloud') {
-              <app-logo-cloud [config]="section.config" />
-            }
-
-            @case ('testimonial_slider') {
-              <app-testimonial-slider [config]="section.config" />
-            }
-
-            @case ('newsletter_signup') {
-              <app-newsletter-signup [config]="section.config" />
-            }
-
-            @case ('stats_counter') {
-              <app-stats-counter [config]="section.config" />
-            }
-            
-            @case ('pricing_table') {
-              <app-pricing-table [config]="section.config" />
-            }
-
-            @case ('countdown_timer') {
-              <app-countdown-timer [config]="section.config" />
-            }
-            
-            @case ('faq_accordion') {
-              <app-faq-accordion [config]="section.config" />
-            }
-
-            @default {
-              @if (isDevMode) {
-                <div class="debug-placeholder">
-                  <i class="pi pi-code"></i>
-                  <span>Unknown Section: <strong>{{ section.type }}</strong></span>
-                </div>
-              }
-            }
-
-          }
-        </section>
+      @case ('hero_banner') {
+      <app-hero-banner [config]="section.config" />
       }
 
-    </main>
-  </div>
+      @case ('product_slider') {
+      <app-product-slider [config]="section.config" [products]="section.data || []">
+      </app-product-slider>
+      }
+
+      @case ('product_grid') {
+      <app-product-grid [config]="section.config" [products]="section.data || []" [orgSlug]="orgSlug">
+      </app-product-grid>
+      }
+
+      @case ('category_grid') {
+      <app-category-grid [config]="section.config" [categories]="section.data || []" [orgSlug]="orgSlug">
+      </app-category-grid>
+      }
+
+      @case ('feature_grid') {
+      <app-feature-grid [config]="section.config" />
+      }
+
+      @case ('text_content') {
+      <app-text-content [config]="section.config" />
+      }
+
+      @case ('video_hero') {
+      <app-video-hero [config]="section.config" />
+      }
+
+      @case ('split_image_text') {
+      <app-split-content [config]="section.config" />
+      }
+
+      @case ('contact_form') {
+      <app-contact-form [config]="section.config" />
+      }
+
+      @case ('map_locations') {
+      <app-map-locations [config]="section.config" [locations]="section.data || []">
+      </app-map-locations>
+      }
+
+      @case ('testimonial_slider') {
+      <app-testimonial-slider [config]="section.config" />
+      }
+
+      @case ('logo_cloud') {
+      <app-logo-cloud [config]="section.config" />
+      }
+
+      @case ('newsletter_signup') {
+      <app-newsletter-signup [config]="section.config" />
+      }
+
+      @case ('stats_counter') {
+      <app-stats-counter [config]="section.config" />
+      }
+
+      @case ('pricing_table') {
+      <app-pricing-table [config]="section.config" />
+      }
+
+      @case ('countdown_timer') {
+      <app-countdown-timer [config]="section.config" />
+      }
+
+      @case ('faq_accordion') {
+      <app-faq-accordion [config]="section.config" />
+      }
+
+      @case ('blog_feed') {
+      <app-blog-feed [config]="section.config" [posts]="section.data || []">
+      </app-blog-feed>
+      }
+
+      @default {
+      @if (isDev) {
+      <div class="debug-placeholder">
+        <i class="pi pi-code"></i>
+        <span>Unknown section type: <strong>{{ section.type }}</strong></span>
+      </div>
+      }
+      }
+
+      }
+    </section>
+    }
+
+    }
+
+  </main>
+</div>
 }
+<!-- @if (isLoading()) {
+<div class="loader-screen">
+  <div class="loader-pulse"></div>
+  <span class="loading-text">Loading Experience</span>
+</div>
+}
+
+@if (error()) {
+<div class="error-screen" @fadeInUp>
+  <div class="error-card">
+    <div class="gradient-line"></div>
+    <h1 class="error-code">404</h1>
+    <div class="separator"></div>
+    <p class="error-msg">{{ error() }}</p>
+
+    <a routerLink="/" class="return-btn">
+      <i class="pi pi-arrow-left"></i> Return Home
+    </a>
+  </div>
+</div>
+}
+
+@if (pageData(); as data) {
+<div class="page-wrapper" [style.--primary-color]="data.page.theme?.primaryColor || '#0f172a'"
+  [style.--secondary-color]="data.page.theme?.secondaryColor || '#64748b'"
+  [style.font-family]="data.page.theme?.fontFamily || 'inherit'" @staggerFade>
+
+  <main class="main-content">
+
+    @for (section of data.page.sections; track section.id) {
+    <section [id]="'section-' + section.position" class="section-block section-enter">
+
+      @switch (section.type) {
+
+      @case ('hero_banner') {
+      <app-hero-banner [config]="section.config" />
+      }
+
+      @case ('product_slider') {
+      <app-product-slider [config]="section.config" [products]="section.data || []">
+      </app-product-slider>
+      }
+
+      @case ('category_grid') {
+      <app-category-grid [config]="section.config" [categories]="section.data || []" [orgSlug]="orgSlug">
+      </app-category-grid>
+      }
+
+      @case ('product_grid') {
+      <app-product-grid [config]="section.config" [products]="section.data || []" [orgSlug]="orgSlug">
+      </app-product-grid>
+      }
+
+      @case ('feature_grid') {
+      <app-feature-grid [config]="section.config" />
+      }
+
+      @case ('text_content') {
+      <app-text-content [config]="section.config" />
+      }
+
+      @case ('video_hero') {
+      <app-video-hero [config]="section.config" />
+      }
+
+      @case ('split_image_text') {
+      <app-split-content [config]="section.config" />
+      }
+
+      @case ('contact_form') {
+      <app-contact-form [config]="section.config" />
+      }
+
+      @case ('map_locations') {
+      <app-map-locations [config]="section.config" [locations]="section.data || []">
+      </app-map-locations>
+      }
+
+      @case ('blog_feed') {
+      <app-blog-feed [config]="section.config" [posts]="section.data || []">
+      </app-blog-feed>
+      }
+
+      @case ('logo_cloud') {
+      <app-logo-cloud [config]="section.config" />
+      }
+
+      @case ('testimonial_slider') {
+      <app-testimonial-slider [config]="section.config" />
+      }
+
+      @case ('newsletter_signup') {
+      <app-newsletter-signup [config]="section.config" />
+      }
+
+      @case ('stats_counter') {
+      <app-stats-counter [config]="section.config" />
+      }
+
+      @case ('pricing_table') {
+      <app-pricing-table [config]="section.config" />
+      }
+
+      @case ('countdown_timer') {
+      <app-countdown-timer [config]="section.config" />
+      }
+
+      @case ('faq_accordion') {
+      <app-faq-accordion [config]="section.config" />
+      }
+
+      @default {
+      @if (isDevMode) {
+      <div class="debug-placeholder">
+        <i class="pi pi-code"></i>
+        <span>Unknown Section: <strong>{{ section.type }}</strong></span>
+      </div>
+      }
+      }
+
+      }
+    </section>
+    }
+
+  </main>
+</div>
+} -->

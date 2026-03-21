@@ -1,4 +1,179 @@
-<section class="section-root">
+<!-- blog-feed.component.html -->
+<section class="feed-root">
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <div class="feed-container">
+    <header class="feed-header">
+      <div class="feed-header-left">
+        <span class="feed-eyebrow">Journal</span>
+        <h2 class="feed-title">{{ cfg().title }}</h2>
+      </div>
+      <a href="#" class="feed-view-all">
+        <span>Read all stories</span>
+        <span class="feed-view-all-arrow">
+          <i class="pi pi-arrow-right"></i>
+        </span>
+      </a>
+    </header>
+
+    <!-- ── Posts layout ──────────────────────────────────────────────────── -->
+    @if (displayPosts().length > 0) {
+
+    <!-- 1-post: single wide card -->
+    @if (displayPosts().length === 1) {
+    <div class="layout-single">
+      <ng-container *ngTemplateOutlet="featuredCard; context: { $implicit: displayPosts()[0] }"></ng-container>
+    </div>
+    }
+
+    <!-- 2-posts: side by side -->
+    @else if (displayPosts().length === 2) {
+    <div class="layout-two">
+      @for (post of displayPosts(); track post.id ?? $index) {
+      <ng-container *ngTemplateOutlet="standardCard; context: { $implicit: post }"></ng-container>
+      }
+    </div>
+    }
+
+    <!-- 3+ posts: featured left + side stack right -->
+    @else {
+    <div class="layout-featured">
+
+      <!-- Featured post (left, large) -->
+      <div class="featured-col">
+        <ng-container *ngTemplateOutlet="featuredCard; context: { $implicit: featuredPost() }"></ng-container>
+      </div>
+
+      <!-- Side posts (right, stacked) -->
+      <div class="side-col">
+        @for (post of sidePosts(); track post.id ?? $index; let last = $last) {
+        <ng-container *ngTemplateOutlet="sideCard; context: { $implicit: post, last: last }"></ng-container>
+        }
+      </div>
+
+    </div>
+    }
+
+    } @else {
+    <!-- Empty state — only in builder preview -->
+    <div class="feed-empty">
+      <i class="pi pi-book"></i>
+      <p>No posts yet. Connect a blog to populate this section.</p>
+    </div>
+    }
+
+    <!-- Mobile view-all -->
+    <div class="feed-mobile-cta">
+      <button class="mobile-view-all-btn" type="button">View All Posts</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     TEMPLATES
+════════════════════════════════════════════════════════════════════════════ -->
+
+<!-- Featured card — large, full image background -->
+<ng-template #featuredCard let-post>
+  <article class="card-featured" tabindex="0" role="button" [attr.aria-label]="'Read: ' + post.title">
+
+    <div class="card-featured-image">
+      <img [src]="post.image || 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=900&q=80'"
+        [alt]="post.title" loading="lazy" class="img-cover" />
+      <div class="card-featured-gradient"></div>
+    </div>
+
+    <!-- Category + read time chips -->
+    <div class="card-featured-chips">
+      @if (post.category) {
+      <span class="chip chip-cat">{{ post.category }}</span>
+      }
+      @if (post.readTime) {
+      <span class="chip chip-time">
+        <i class="pi pi-clock"></i> {{ post.readTime }} min
+      </span>
+      }
+    </div>
+
+    <!-- Date pill -->
+    @if (cfg().showDate && post.date) {
+    <div class="card-date-pill">{{ formatDate(post.date) }}</div>
+    }
+
+    <!-- Content overlay -->
+    <div class="card-featured-content">
+      <h3 class="card-featured-title">{{ post.title }}</h3>
+
+      @if (cfg().showExcerpt && post.excerpt) {
+      <p class="card-featured-excerpt">{{ post.excerpt }}</p>
+      }
+
+      <span class="card-cta-text">
+        Read Story <i class="pi pi-arrow-right" style="font-size: 10px;"></i>
+      </span>
+    </div>
+
+  </article>
+</ng-template>
+
+<!-- Standard card — image top, content below -->
+<ng-template #standardCard let-post>
+  <article class="card-standard" tabindex="0" role="button" [attr.aria-label]="'Read: ' + post.title">
+
+    <div class="card-standard-image">
+      <img [src]="post.image || 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=700&q=80'"
+        [alt]="post.title" loading="lazy" class="img-cover" />
+      <div class="card-standard-overlay"></div>
+      @if (post.category) {
+      <span class="card-cat-badge">{{ post.category }}</span>
+      }
+    </div>
+
+    <div class="card-standard-body">
+      @if (cfg().showDate && post.date) {
+      <span class="card-meta">{{ formatDate(post.date) }}
+        @if (post.readTime) { · {{ post.readTime }} min read }
+      </span>
+      }
+      <h3 class="card-standard-title">{{ post.title }}</h3>
+      @if (cfg().showExcerpt && post.excerpt) {
+      <p class="card-standard-excerpt">{{ post.excerpt }}</p>
+      }
+      <span class="card-read-more">Read Story</span>
+    </div>
+
+  </article>
+</ng-template>
+
+<!-- Side card — compact horizontal layout -->
+<ng-template #sideCard let-post let-last="last">
+  <article class="card-side" [class.card-side-last]="last" tabindex="0" role="button"
+    [attr.aria-label]="'Read: ' + post.title">
+
+    <div class="card-side-image">
+      <img [src]="post.image || 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&q=80'"
+        [alt]="post.title" loading="lazy" class="img-cover" />
+    </div>
+
+    <div class="card-side-body">
+      @if (post.category) {
+      <span class="card-side-cat">{{ post.category }}</span>
+      }
+      <h4 class="card-side-title">{{ post.title }}</h4>
+      @if (cfg().showDate && post.date) {
+      <span class="card-side-meta">{{ formatDate(post.date) }}</span>
+      }
+    </div>
+
+    <div class="card-side-arrow">
+      <i class="pi pi-arrow-right"></i>
+    </div>
+
+  </article>
+</ng-template>
+
+<!-- <section class="section-root">
   
   <div class="absolute inset-0 opacity-[0.03] pointer-events-none" *ngIf="config.backgroundImage">
     <img [src]="config.backgroundImage" class="w-full h-full object-cover grayscale">
@@ -64,4 +239,4 @@
     </div>
 
   </div>
-</section>
+</section> -->

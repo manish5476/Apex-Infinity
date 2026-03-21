@@ -1,172 +1,448 @@
 /* ==========================================================================
-   COMPONENT: PREMIUM FAQ ACCORDION
-   Strict Token Usage
+   FAQ ACCORDION — Refined Two-Column Layout
+   
+   Left: accordion list with smooth grid-template-rows height animation.
+   Right: decorative floating card (desktop only).
+   All colours via theme tokens — full dark mode support.
    ========================================================================== */
 
-:host {
-  display: block;
-}
+:host { display: block; }
 
-.section-root {
+// ── Section shell ────────────────────────────────────────────────────────────
+
+.faq-root {
   position: relative;
-  background-color: var(--bg-secondary); /* Default background */
+  background-color: var(--bg-secondary);
   overflow: hidden;
-  
-  /* Optional: Subtle pattern overlay */
+
+  // Dot-grid ambient texture
   &::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background-image: radial-gradient(var(--border-secondary) 1px, transparent 1px);
+    inset: 0;
+    background-image: radial-gradient(
+      circle,
+      var(--border-secondary) 1px,
+      transparent 1px
+    );
     background-size: 24px 24px;
     opacity: 0.3;
     pointer-events: none;
   }
 }
 
-.container-wrapper {
+.faq-container {
   position: relative;
-  z-index: 10;
-  max-width: 800px; /* Optimal width for reading */
+  z-index: 1;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 0 var(--spacing-2xl);
 }
 
-/* --- HEADER --- */
-.header-group {
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.faq-header {
   text-align: center;
   margin-bottom: var(--spacing-5xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
 }
 
-.section-title {
+.faq-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--accent-primary);
+}
+
+.faq-title {
+  margin: 0;
   font-family: var(--font-heading);
-  font-size: var(--font-size-3xl);
+  font-size: clamp(24px, 3.5vw, 40px);
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: var(--spacing-sm);
   line-height: 1.2;
-
-  @media (min-width: 768px) { font-size: var(--font-size-4xl); }
+  letter-spacing: -0.02em;
 }
 
-.divider-pill {
-  width: 48px;
-  height: 4px;
-  background-color: var(--color-primary);
-  border-radius: 100px;
-  margin: 0 auto;
-  opacity: 0.8;
+.faq-title-accent {
+  width: 40px;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--accent-primary);
+  opacity: 0.85;
 }
 
-/* --- ACCORDION LIST --- */
-.accordion-list {
+// ── Two-column layout ─────────────────────────────────────────────────────────
+
+.faq-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-4xl);
+  align-items: start;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 1fr 320px;
+  }
+}
+
+// ── Accordion list ────────────────────────────────────────────────────────────
+
+.faq-list {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
 }
 
-/* --- ACCORDION ITEM --- */
-.accordion-item {
+// ── Accordion item ────────────────────────────────────────────────────────────
+
+.faq-item {
   background: var(--bg-primary);
   border: 1px solid var(--border-secondary);
   border-radius: var(--ui-border-radius-lg);
   overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  
-  /* Idle State */
   box-shadow: var(--shadow-sm);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
 
-  /* Open/Active State */
-  &.is-open {
-    box-shadow: var(--shadow-lg);
-    border-color: var(--color-primary-border, var(--border-secondary));
-    
-    .toggle-btn { color: var(--color-primary); }
-    .icon-box { 
-      background-color: var(--color-primary-bg); 
-      color: var(--color-primary); 
-      transform: rotate(180deg);
-    }
-  }
-  
-  /* Hover State */
-  &:hover:not(.is-open) {
-    border-color: var(--text-tertiary);
+  &:hover:not(.faq-item-open) {
+    border-color: var(--border-primary);
     transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+
+  &.faq-item-open {
+    border-color: var(--accent-primary);
+    box-shadow: var(--shadow-lg), 0 0 0 1px var(--accent-primary);
+
+    .faq-chevron { transform: rotate(180deg); color: var(--accent-primary); }
+    .faq-question { color: var(--accent-primary); }
   }
 }
 
-/* --- TOGGLE BUTTON --- */
-.toggle-btn {
+// ── Toggle button ─────────────────────────────────────────────────────────────
+
+.faq-toggle {
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--spacing-xl);
+  padding: var(--spacing-xl) var(--spacing-xl);
   background: none;
   border: none;
   cursor: pointer;
   text-align: left;
   gap: var(--spacing-lg);
+  outline: none;
+
+  &:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--accent-primary);
+  }
 }
 
-.question-text {
+.faq-question {
   font-family: var(--font-heading);
   font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--text-primary);
   line-height: 1.4;
   transition: color 0.2s ease;
+  text-align: left;
 }
 
-.icon-box {
+.faq-chevron {
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background-color: var(--bg-secondary);
-  color: var(--text-tertiary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
-  
-  i { font-size: 0.75rem; }
+  color: var(--text-tertiary);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), color 0.2s ease, background 0.2s ease;
+
+  i { font-size: 10px; }
 }
 
-/* --- CONTENT PANEL (Smooth Expand) --- */
-.content-wrapper {
+// ── Answer panel — grid-template-rows smooth expand ────────────────────────────
+
+.faq-panel {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
-  &.expanded {
+  transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.faq-panel-open {
     grid-template-rows: 1fr;
   }
 }
 
-.content-inner {
+.faq-panel-inner {
   overflow: hidden;
-  padding: 0 var(--spacing-xl);
 }
 
-.answer-text {
-  padding-top: var(--spacing-md); /* Space from top line */
-  padding-bottom: var(--spacing-xl); /* Space at bottom */
+.faq-answer {
+  margin: 0;
+  padding: var(--spacing-md) var(--spacing-xl) var(--spacing-xl);
   border-top: 1px solid var(--border-secondary);
-  
   font-family: var(--font-body);
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-sm);
   color: var(--text-secondary);
-  line-height: 1.7;
+  line-height: 1.75;
 }
 
-/* Animation Utilities */
-.animate-in { opacity: 0; animation: fadeUp 0.8s ease forwards; }
-.delay-1 { animation-delay: 100ms; }
-.delay-2 { animation-delay: 200ms; }
+// ── Decorative side card ──────────────────────────────────────────────────────
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+.faq-side {
+  display: none;
+
+  @media (min-width: 1024px) { display: block; }
 }
+
+.faq-side-card {
+  position: relative;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--ui-border-radius-xl);
+  padding: var(--spacing-3xl);
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+
+  // Top accent gradient
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(
+      to right,
+      var(--accent-primary),
+      var(--accent-secondary, var(--accent-primary))
+    );
+  }
+}
+
+.faq-side-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--spacing-lg);
+  color: var(--accent-primary);
+
+  i { font-size: 1.75rem; }
+}
+
+.faq-side-text {
+  margin: 0 0 var(--spacing-sm);
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.faq-side-sub {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+// Decorative floating dots
+.faq-side-dot {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.12;
+  background: var(--accent-primary);
+  pointer-events: none;
+}
+
+.faq-side-dot-1 { width: 80px; height: 80px; bottom: -24px; right: -24px; }
+.faq-side-dot-2 { width: 48px; height: 48px; top: 20px;    left: -16px; }
+.faq-side-dot-3 { width: 24px; height: 24px; bottom: 40px; left: 20px;  }
+// /* ==========================================================================
+//    COMPONENT: PREMIUM FAQ ACCORDION
+//    Strict Token Usage
+//    ========================================================================== */
+
+// :host {
+//   display: block;
+// }
+
+// .section-root {
+//   position: relative;
+//   background-color: var(--bg-secondary); /* Default background */
+//   overflow: hidden;
+  
+//   /* Optional: Subtle pattern overlay */
+//   &::before {
+//     content: '';
+//     position: absolute;
+//     top: 0; left: 0; width: 100%; height: 100%;
+//     background-image: radial-gradient(var(--border-secondary) 1px, transparent 1px);
+//     background-size: 24px 24px;
+//     opacity: 0.3;
+//     pointer-events: none;
+//   }
+// }
+
+// .container-wrapper {
+//   position: relative;
+//   z-index: 10;
+//   max-width: 800px; /* Optimal width for reading */
+//   margin: 0 auto;
+//   padding: 0 var(--spacing-2xl);
+// }
+
+// /* --- HEADER --- */
+// .header-group {
+//   text-align: center;
+//   margin-bottom: var(--spacing-5xl);
+// }
+
+// .section-title {
+//   font-family: var(--font-heading);
+//   font-size: var(--font-size-3xl);
+//   font-weight: 700;
+//   color: var(--text-primary);
+//   margin-bottom: var(--spacing-sm);
+//   line-height: 1.2;
+
+//   @media (min-width: 768px) { font-size: var(--font-size-4xl); }
+// }
+
+// .divider-pill {
+//   width: 48px;
+//   height: 4px;
+//   background-color: var(--color-primary);
+//   border-radius: 100px;
+//   margin: 0 auto;
+//   opacity: 0.8;
+// }
+
+// /* --- ACCORDION LIST --- */
+// .accordion-list {
+//   display: flex;
+//   flex-direction: column;
+//   gap: var(--spacing-md);
+// }
+
+// /* --- ACCORDION ITEM --- */
+// .accordion-item {
+//   background: var(--bg-primary);
+//   border: 1px solid var(--border-secondary);
+//   border-radius: var(--ui-border-radius-lg);
+//   overflow: hidden;
+//   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  
+//   /* Idle State */
+//   box-shadow: var(--shadow-sm);
+
+//   /* Open/Active State */
+//   &.is-open {
+//     box-shadow: var(--shadow-lg);
+//     border-color: var(--color-primary-border, var(--border-secondary));
+    
+//     .toggle-btn { color: var(--color-primary); }
+//     .icon-box { 
+//       background-color: var(--color-primary-bg); 
+//       color: var(--color-primary); 
+//       transform: rotate(180deg);
+//     }
+//   }
+  
+//   /* Hover State */
+//   &:hover:not(.is-open) {
+//     border-color: var(--text-tertiary);
+//     transform: translateY(-1px);
+//   }
+// }
+
+// /* --- TOGGLE BUTTON --- */
+// .toggle-btn {
+//   width: 100%;
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-between;
+//   padding: var(--spacing-xl);
+//   background: none;
+//   border: none;
+//   cursor: pointer;
+//   text-align: left;
+//   gap: var(--spacing-lg);
+// }
+
+// .question-text {
+//   font-family: var(--font-heading);
+//   font-size: var(--font-size-md);
+//   font-weight: 600;
+//   color: var(--text-primary);
+//   line-height: 1.4;
+//   transition: color 0.2s ease;
+// }
+
+// .icon-box {
+//   flex-shrink: 0;
+//   width: 32px;
+//   height: 32px;
+//   border-radius: 50%;
+//   background-color: var(--bg-secondary);
+//   color: var(--text-tertiary);
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   transition: all 0.3s ease;
+  
+//   i { font-size: 0.75rem; }
+// }
+
+// /* --- CONTENT PANEL (Smooth Expand) --- */
+// .content-wrapper {
+//   display: grid;
+//   grid-template-rows: 0fr;
+//   transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+//   &.expanded {
+//     grid-template-rows: 1fr;
+//   }
+// }
+
+// .content-inner {
+//   overflow: hidden;
+//   padding: 0 var(--spacing-xl);
+// }
+
+// .answer-text {
+//   padding-top: var(--spacing-md); /* Space from top line */
+//   padding-bottom: var(--spacing-xl); /* Space at bottom */
+//   border-top: 1px solid var(--border-secondary);
+  
+//   font-family: var(--font-body);
+//   font-size: var(--font-size-md);
+//   color: var(--text-secondary);
+//   line-height: 1.7;
+// }
+
+// /* Animation Utilities */
+// .animate-in { opacity: 0; animation: fadeUp 0.8s ease forwards; }
+// .delay-1 { animation-delay: 100ms; }
+// .delay-2 { animation-delay: 200ms; }
+
+// @keyframes fadeUp {
+//   from { opacity: 0; transform: translateY(20px); }
+//   to { opacity: 1; transform: translateY(0); }
+// }
