@@ -1,80 +1,132 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+// src/app/core/services/storefront-admin.service.ts
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
+import { BaseApiService } from './base-api.service';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class StorefrontAdminService {
-  private http = inject(HttpClient);
-  
-  // ✅ FIX: Match Backend Route structure (/api/v1/...)
-  // Backend Mount: app.use('/api/v1/admin/storefront', storefrontAdminRoutes);
-  // Environment: apiUrl = 'http://localhost:5000/api'
-  // Result: http://localhost:5000/api/v1/admin/storefront
-  private baseUrl = `${environment.apiUrl}/v1/admin/storefront`;
+// ---------------------------------------------------------------------------
+// Lightweight DTOs
+// ---------------------------------------------------------------------------
 
-  // ================= PAGES CRUD =================
+export interface PageListParams {
+  status?: 'draft' | 'published' | 'archived';
+  pageType?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}
 
-  getPages(params?: { status?: string; search?: string }): Observable<any> {
-    let httpParams = new HttpParams();
-    if (params?.status) httpParams = httpParams.set('status', params.status);
-    if (params?.search) httpParams = httpParams.set('search', params.search);
-    
-    return this.http.get<{ results: number, data: any[] }>(`${this.baseUrl}/pages`, { params: httpParams });
+export interface CreatePageDto {
+  name: string;
+  slug: string;
+  pageType?: string;
+  sections?: any[];
+  seo?: Record<string, any>;
+  themeOverride?: Record<string, any>;
+  isHomepage?: boolean;
+}
+
+export interface DuplicatePageDto {
+  newName?: string;
+  newSlug?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Service
+//
+// Backend mount: app.use('/api/v1/admin/storefront', adminRoutes)
+// Resolved URL : {environment.apiUrl}/v1/admin/storefront/...
+//                e.g. http://localhost:5000/api/v1/admin/storefront/pages
+//
+// All methods delegate to BaseApiService which handles:
+//   - withCredentials: true  (auth cookie / refresh token)
+//   - baseUrl prefix         (environment.apiUrl)
+// ---------------------------------------------------------------------------
+
+@Injectable({ providedIn: 'root' })
+export class StorefrontAdminService extends BaseApiService {
+
+  private readonly base = '/v1/admin/storefront';
+
+  // ── Layout ────────────────────────────────────────────────────────────────
+
+  getLayout(): Observable<any> {
+    return this.get(`${this.base}/layout`);
   }
 
-  createPage(pageData: Partial<any>): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/pages`, pageData);
+  updateLayout(data: {
+    header?: any[];
+    footer?: any[];
+    globalSettings?: any;
+  }): Observable<any> {
+    return this.put(`${this.base}/layout`, data);
   }
 
-  getPageById(pageId: string): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/pages/${pageId}`);
+  resetLayout(): Observable<any> {
+    return this.delete(`${this.base}/layout/reset`);
   }
 
-  updatePage(pageId: string, pageData: Partial<any>): Observable<any> {
-    return this.http.put<any>(`${this.baseUrl}/pages/${pageId}`, pageData);
+  // ── Builder catalogue ─────────────────────────────────────────────────────
+
+  /** Section type definitions that drive the page-builder sidebar UI. */
+  getSectionTypes(includeSystem = false): Observable<any> {
+    return this.get(`${this.base}/sections`, { includeSystem: String(includeSystem) });
   }
 
-  deletePage(pageId: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/pages/${pageId}`);
-  }
-
-  // ================= ACTIONS =================
-
-  publishPage(pageId: string): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/pages/${pageId}/publish`, {});
-  }
-
-  unpublishPage(pageId: string): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/pages/${pageId}/unpublish`, {});
-  }
-
-  duplicatePage(pageId: string, data: { newName: string; newSlug: string }): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/pages/${pageId}/duplicate`, data);
-  }
-
-  // ================= METADATA =================
-
-  getSectionTypes(): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/sections`);
-  }
-
-  getTemplates(category?: string): Observable<any> {
-    let params = new HttpParams();
-    if (category) params = params.set('category', category);
-    return this.http.get<any>(`${this.baseUrl}/templates`, { params });
+  getTemplates(params?: { sectionType?: string; category?: string }): Observable<any> {
+    return this.get(`${this.base}/templates`, params ?? {});
   }
 
   getAvailableThemes(): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/themes`);
+    return this.get(`${this.base}/themes`);
   }
 
-  getPageAnalytics(pageId: string, period: '7d' | '30d' | '90d' = '30d'): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/pages/${pageId}/analytics`, {
-      params: { period }
-    });
+  // ── Pages CRUD ────────────────────────────────────────────────────────────
+
+  getPages(params?: PageListParams): Observable<any> {
+    return this.get(`${this.base}/pages`, params ?? {});
+  }
+
+  createPage(data: CreatePageDto): Observable<any> {
+    return this.post(`${this.base}/pages`, data);
+  }
+
+  getPageById(pageId: string): Observable<any> {
+    return this.get(`${this.base}/pages/${pageId}`);
+  }
+
+  /** Core builder save — sends partial page data (sections, seo, name, etc.) */
+  updatePage(pageId: string, data: Partial<any>): Observable<any> {
+    return this.put(`${this.base}/pages/${pageId}`, data);
+  }
+
+  deletePage(pageId: string): Observable<any> {
+    return this.delete(`${this.base}/pages/${pageId}`);
+  }
+
+  // ── Page lifecycle ────────────────────────────────────────────────────────
+
+  publishPage(pageId: string): Observable<any> {
+    return this.post(`${this.base}/pages/${pageId}/publish`, {});
+  }
+
+  unpublishPage(pageId: string): Observable<any> {
+    return this.post(`${this.base}/pages/${pageId}/unpublish`, {});
+  }
+
+  /** Marks this page as the homepage. Page must be published first. */
+  setHomepage(pageId: string): Observable<any> {
+    return this.post(`${this.base}/pages/${pageId}/set-homepage`, {});
+  }
+
+  duplicatePage(pageId: string, data: DuplicatePageDto = {}): Observable<any> {
+    return this.post(`${this.base}/pages/${pageId}/duplicate`, data);
+  }
+
+  getPageAnalytics(
+    pageId: string,
+    period: '7d' | '30d' | '90d' = '30d'
+  ): Observable<any> {
+    return this.get(`${this.base}/pages/${pageId}/analytics`, { period });
   }
 }
 
@@ -88,17 +140,21 @@ export class StorefrontAdminService {
 // })
 // export class StorefrontAdminService {
 //   private http = inject(HttpClient);
-  
-//   // ✅ FIX: Use standard apiUrl (e.g. http://localhost:5000/api/v1) directly
-//   // Now it matches: http://localhost:5000/api/v1/admin/storefront
+
+//   // ✅ FIX: Match Backend Route structure (/api/v1/...)
+//   // Backend Mount: app.use('/api/v1/admin/storefront', storefrontAdminRoutes);
+//   // Environment: apiUrl = 'http://localhost:5000/api'
+//   // Result: http://localhost:5000/api/v1/admin/storefront
 //   private baseUrl = `${environment.apiUrl}/v1/admin/storefront`;
 
-//   getPages(params?: { status?: string; search?: string }): Observable<{ pages: any[], total: number }> {
+//   // ================= PAGES CRUD =================
+
+//   getPages(params?: { status?: string; search?: string }): Observable<any> {
 //     let httpParams = new HttpParams();
 //     if (params?.status) httpParams = httpParams.set('status', params.status);
 //     if (params?.search) httpParams = httpParams.set('search', params.search);
-    
-//     return this.http.get<{ pages: any[], total: number }>(`${this.baseUrl}/pages`, { params: httpParams });
+
+//     return this.http.get<{ results: number, data: any[] }>(`${this.baseUrl}/pages`, { params: httpParams });
 //   }
 
 //   createPage(pageData: Partial<any>): Observable<any> {
@@ -117,6 +173,8 @@ export class StorefrontAdminService {
 //     return this.http.delete<void>(`${this.baseUrl}/pages/${pageId}`);
 //   }
 
+//   // ================= ACTIONS =================
+
 //   publishPage(pageId: string): Observable<any> {
 //     return this.http.post<any>(`${this.baseUrl}/pages/${pageId}/publish`, {});
 //   }
@@ -129,15 +187,20 @@ export class StorefrontAdminService {
 //     return this.http.post<any>(`${this.baseUrl}/pages/${pageId}/duplicate`, data);
 //   }
 
-//   getSectionTypes(): Observable<any[]> {
-//     return this.http.get<any[]>(`${this.baseUrl}/sections`);
+//   // ================= METADATA =================
+
+//   getSectionTypes(): Observable<any> {
+//     return this.http.get<any>(`${this.baseUrl}/sections`);
 //   }
 
-//   getTemplates(category?: string): Observable<any[]> {
+//   getTemplates(category?: string): Observable<any> {
 //     let params = new HttpParams();
 //     if (category) params = params.set('category', category);
-    
-//     return this.http.get<any[]>(`${this.baseUrl}/templates`, { params });
+//     return this.http.get<any>(`${this.baseUrl}/templates`, { params });
+//   }
+
+//   getAvailableThemes(): Observable<any> {
+//     return this.http.get<any>(`${this.baseUrl}/themes`);
 //   }
 
 //   getPageAnalytics(pageId: string, period: '7d' | '30d' | '90d' = '30d'): Observable<any> {
