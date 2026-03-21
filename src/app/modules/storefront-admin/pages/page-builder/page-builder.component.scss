@@ -11,6 +11,34 @@
   width: 100%;
 }
 
+// ── Force all section preview components to render as block elements ──────
+// Angular custom elements default to `display: inline` unless :host defines
+// `display: block`. The section components had this commented out, so they
+// weren't stacking vertically in the canvas. This rule overrides that at the
+// builder level (ViewEncapsulation.None) without touching each component.
+app-hero-banner,
+app-product-slider,
+app-product-grid,
+app-category-grid,
+app-feature-grid,
+app-text-content,
+app-video-hero,
+app-split-content,
+app-testimonial-slider,
+app-logo-cloud,
+app-stats-counter,
+app-newsletter-signup,
+app-contact-form,
+app-pricing-table,
+app-faq-accordion,
+app-countdown-timer,
+app-blog-feed,
+app-product-listing,
+app-map-locations {
+  display: block !important;
+  width: 100%;
+}
+
 /* --- Layout Utils --- */
 .builder-layout {
   font-family: var(--font-body);

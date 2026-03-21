@@ -787,8 +787,13 @@ export class PageListComponent implements OnInit {
       next: (res: any) => {
         this.closeCreateModal();
         this.isSubmitting.set(false);
-        // Navigate directly to the builder for the new page
-        this.router.navigate([res.data._id, 'builder'], { relativeTo: null });
+        // ✅ FIX: relativeTo: null is wrong here — it navigates from the app root
+        // which means the segments [id, 'builder'] go to /id/builder instead of
+        // the correct storefront-admin nested path. Navigate using the current URL
+        // prefix to preserve the admin module segment.
+        const currentUrl = this.router.url; // e.g. /admin/storefront/pages
+        const baseSegment = currentUrl.substring(0, currentUrl.lastIndexOf('/'));
+        this.router.navigateByUrl(`${baseSegment}/${res.data._id}/builder`);
         this.loadPages();
       },
       error: (err: any) => {
