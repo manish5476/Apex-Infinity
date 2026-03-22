@@ -36,10 +36,10 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { TooltipModule } from 'primeng/tooltip';
 import { SliderModule } from 'primeng/slider';
 
-// Services
 import { StorefrontPublicService } from '../../../../core/services/storefront-public.service';
 import { StorefrontStateService } from '../../../../core/services/storefront-state.service';
 import { ProductCardComponent } from '../../components/product-card/product-card';
+import { ProductListingConfig } from '@core/models/storefront.model';
 
 @Component({
   selector: 'app-product-listing',
@@ -74,7 +74,31 @@ import { ProductCardComponent } from '../../components/product-card/product-card
   ]
 })
 export class ProductListingComponent implements OnInit, OnDestroy {
-  @Input() config: any; // For Page Builder context
+  @Input() set config(v: ProductListingConfig) { this._config.set(v ?? {}); }
+  private _config = signal<ProductListingConfig>({});
+
+  readonly cfg = computed(() => ({
+    showSidebar: this._config().showSidebar ?? true,
+    defaultSort: this._config().defaultSort ?? 'newest',
+    itemsPerPage: this._config().itemsPerPage ?? 12,
+    paddingTop: this._config().paddingTop ?? 'md',
+    paddingBottom: this._config().paddingBottom ?? 'md',
+    backgroundColor: this._config().backgroundColor ?? ''
+  }));
+
+  readonly paddingMap: Record<string, string> = {
+    none: '0',
+    sm: 'var(--spacing-3xl)',
+    md: 'var(--spacing-5xl)',
+    lg: 'calc(var(--spacing-5xl) * 1.5)',
+    xl: 'calc(var(--spacing-5xl) * 2)'
+  };
+
+  readonly sectionStyle = computed(() => ({
+    'padding-top': this.paddingMap[this.cfg().paddingTop] ?? this.paddingMap['md'],
+    'padding-bottom': this.paddingMap[this.cfg().paddingBottom] ?? this.paddingMap['md'],
+    'background-color': this.cfg().backgroundColor || ''
+  }));
   
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -269,6 +293,7 @@ export class ProductListingComponent implements OnInit, OnDestroy {
     // Coerce types
     if (params['page']) this.filters.page = +params['page'];
     if (params['limit']) this.filters.limit = +params['limit'];
+    else this.filters.limit = this.cfg().itemsPerPage;
     this.filters.inStock = params['inStock'] === 'true';
 
     // Sync Slider UI

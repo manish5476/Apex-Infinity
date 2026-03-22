@@ -1,0 +1,43 @@
+<div class="section-root" [ngClass]="heightClass()" @heroAnim>
+
+  <div class="bg-wrapper">
+    <img [src]="cfg().backgroundImage" alt="Banner Image" class="bg-image">
+
+    <div class="overlay" [style.opacity]="(cfg().overlayOpacity / 100) || 0.4"></div>
+    <div class="gradient-bottom"></div>
+  </div>
+
+  <div class="content-wrapper" [ngClass]="alignmentClass()">
+    <div class="container" [class.w-standard]="true">
+
+      <header class="anim-target">
+        <ng-container [ngSwitch]="cfg().titleTag">
+          <h1 *ngSwitchCase="'h1'" class="hero-title">{{ cfg().title }}</h1>
+          <h2 *ngSwitchCase="'h2'" class="hero-title">{{ cfg().title }}</h2>
+          <h3 *ngSwitchCase="'h3'" class="hero-title">{{ cfg().title }}</h3>
+          <h1 *ngSwitchDefault class="hero-title">{{ cfg().title }}</h1>
+        </ng-container>
+      </header>
+
+      @if (cfg().subtitle) {
+      <p class="hero-subtitle anim-target">
+        {{ cfg().subtitle }}
+      </p>
+      }
+
+      @if (validButtons().length > 0) {
+      <div class="btn-group anim-target">
+        @for (btn of validButtons(); track $index) {
+        <a [routerLink]="!isExternal(btn.link) ? getLink(btn.link) : null"
+           [href]="isExternal(btn.link) ? btn.link : null"
+           [target]="isExternal(btn.link) ? '_blank' : '_self'"
+           class="hero-btn" [ngClass]="'variant-' + (btn.variant || 'primary')">
+          @if (btn.icon) { <i [class]="'pi ' + btn.icon"></i> }
+          {{ btn.text }}
+        </a>
+        }
+      </div>
+      }
+    </div>
+  </div>
+</div>

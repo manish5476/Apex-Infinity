@@ -1,39 +1,41 @@
 <section class="section-root" [ngClass]="heightClass()">
 
   <div class="video-wrapper">
-    <img [src]="config.posterImage || 'https://via.placeholder.com/1920x1080'" 
+    <img [src]="cfg().posterImage || 'https://via.placeholder.com/1920x1080'" 
          class="poster-img" 
          alt="Background">
     
     <video #videoPlayer 
            [class.is-playing]="isPlaying()"
-           [poster]="config.posterImage"
+           [poster]="cfg().posterImage"
            autoplay loop muted playsinline>
-      <source [src]="config.videoUrl" type="video/mp4">
+      <source [src]="cfg().videoUrl" type="video/mp4">
     </video>
   </div>
 
-  <div class="overlay-tint" [style.opacity]="config.overlayOpacity || 0.4"></div>
+  <div class="overlay-tint" [style.opacity]="(cfg().overlayOpacity / 100) || 0.4"></div>
   <div class="overlay-gradient"></div>
 
   <div class="content-container">
     
-    @if (config.title) {
+    @if (cfg().title) {
       <h1 class="hero-title animate-fade-up">
-        {{ config.title }}
+        {{ cfg().title }}
       </h1>
     }
 
-    @if (config.subtitle) {
+    @if (cfg().subtitle) {
       <p class="hero-subtitle animate-fade-up delay-1">
-        {{ config.subtitle }}
+        {{ cfg().subtitle }}
       </p>
     }
 
-    @if (validButtons.length > 0) {
+    @if (validButtons().length > 0) {
       <div class="btn-group animate-fade-up delay-2">
-        @for (btn of validButtons; track $index) {
-          <a [routerLink]="getLink(btn.url)" 
+        @for (btn of validButtons(); track $index) {
+          <a [routerLink]="!isExternal(btn.link) ? getLink(btn.link) : null" 
+             [href]="isExternal(btn.link) ? btn.link : null"
+             [target]="isExternal(btn.link) ? '_blank' : '_self'"
              class="hero-btn"
              [ngClass]="'variant-' + (btn.variant || 'primary')">
             {{ btn.text }}

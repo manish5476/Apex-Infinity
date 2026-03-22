@@ -1,122 +1,60 @@
-// :root {
-//   /* ==========================================================================
-//      1. TYPOGRAPHY
-//      ========================================================================== */
-//   --font-body: 'Inter', -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-//   --font-heading: 'Poppins', -apple-system, system-ui, sans-serif;
-//   --font-mono: 'Fira Code', 'Courier New', monospace;
-
-//   --font-size-xs: 0.65rem;
-//   --font-size-sm: 0.75rem;
-//   --font-size-base: 0.8125rem;
-//   --font-size-md: 0.875rem;
-//   --font-size-lg: 0.9375rem;
-//   --font-size-xl: 1rem;
-//   --font-size-2xl: 1.125rem;
-
-//   --font-weight-light: 300;
-//   --font-weight-normal: 400;
-//   --font-weight-medium: 500;
-//   --font-weight-semibold: 600;
-//   --font-weight-bold: 700;
-
-//   /* ==========================================================================
-//      2. SPACING
-//      ========================================================================== */
-//   --spacing-xs: 0.25rem;
-//   --spacing-sm: 0.375rem;
-//   --spacing-md: 0.5rem;
-//   --spacing-lg: 0.75rem;
-//   --spacing-xl: 1rem;
-//   --spacing-2xl: 1.5rem;
-
-//   /* ==========================================================================
-//      3. UI CONSTANTS & SHADOWS
-//      ========================================================================== */
-//   --ui-border-radius: 6px;
-//   --ui-border-radius-lg: 12px;
-  
-//   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-//   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-//   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  
-//   /* ==========================================================================
-//      4. THEME DEFINITIONS (Required for Mixin)
-//      ========================================================================== */
-//   /* Neutral Slate Scale */
-//   --theme-bg-primary: #ffffff;
-//   --theme-bg-secondary: #f8fafc;
-//   --theme-bg-ternary: #f1f5f9;
-  
-//   --theme-text-primary: #0f172a;
-//   --theme-text-secondary: #334155;
-//   --theme-text-tertiary: #64748b;
-//   --theme-text-label: #94a3b8;
-  
-//   --theme-border-primary: #e2e8f0;
-//   --theme-border-secondary: #cbd5e1;
-
-//   /* Accent Blue Scale */
-//   --theme-accent-primary: #3b82f6;
-//   --theme-accent-secondary: #60a5fa;
-//   --theme-accent-tertiary: #93c5fd;
-//   --theme-accent-focus: rgba(59, 130, 246, 0.15);
-//   --theme-accent-hover: #2563eb;
-  
-//   /* Semantic */
-//   --theme-success: #22c55e;
-//   --theme-warning: #f59e0b;
-//   --theme-error: #ef4444;
-//   --theme-info: #3b82f6;
-//   --theme-disabled: #cbd5e1;
-//   --theme-disabled-text: #94a3b8;
-  
-//   --glass-bg: rgba(255, 255, 255, 0.7);
-//   --glass-blur: blur(12px);
-//   --glass-border: 1px solid rgba(255, 255, 255, 0.3);
-
-//   --component-bg-hover: #f1f5f9;
-//   --component-bg-active: #e2e8f0;
-//   --scroll-thumb: #cbd5e1;
-//   --scroll-track: transparent;
-// }
-
-// @mixin apply-canonical-mapping {
-//   --bg-primary: var(--theme-bg-primary);
-//   --bg-secondary: var(--theme-bg-secondary);
-//   --text-primary: var(--theme-text-primary);
-//   --text-secondary: var(--theme-text-secondary);
-//   --border-primary: var(--theme-border-primary);
-//   --accent-primary: var(--theme-accent-primary);
-//   --accent-hover: var(--theme-accent-hover);
-//   --accent-focus: var(--theme-accent-focus);
-//   /* Maps user provided mixin content... */
-//   --color-primary: var(--theme-accent-primary);
-//   --color-primary-bg: var(--accent-focus);
-// }
-
 /* ==========================================================================
-   COMPONENT STYLES
+   PAGE BUILDER STYLES
+   ViewEncapsulation.None — styles pierce all child components.
    ========================================================================== */
-   
-/* Apply Token Mapping */
+
 :host {
-  // @include apply-canonical-mapping;
   display: block;
   height: 100vh;
   width: 100%;
+  // FIX: Prevent the host from ever growing taller than the viewport.
+  // Without this, flex children can push past 100vh and break scroll containment.
+  overflow: hidden;
 }
 
-/* --- Layout Utils --- */
+// ── Force all section preview components to render as block ───────────────
+// Prevents inline stacking inside the builder canvas.
+app-hero-banner,
+app-product-slider,
+app-product-grid,
+app-category-grid,
+app-feature-grid,
+app-text-content,
+app-video-hero,
+app-split-content,
+app-testimonial-slider,
+app-logo-cloud,
+app-stats-counter,
+app-newsletter-signup,
+app-contact-form,
+app-pricing-table,
+app-faq-accordion,
+app-countdown-timer,
+app-blog-feed,
+app-product-listing,
+app-map-locations {
+  display: block !important;
+  width: 100%;
+}
+
+// ── Layout shell ─────────────────────────────────────────────────────────────
+
 .builder-layout {
   font-family: var(--font-body);
   color: var(--text-secondary);
+  // FIX: Ensure the layout itself is bounded to the host's height.
+  // flex + h-full inside a height:100vh :host means the header + body
+  // never exceed the viewport — scroll containment works correctly.
+  height: 100%;
+  overflow: hidden;
 }
 
 .builder-header {
   background: var(--bg-primary);
   border-bottom: 1px solid var(--border-primary);
 }
+
+// ── Header action buttons ─────────────────────────────────────────────────────
 
 .action-btn-secondary {
   height: 32px;
@@ -126,29 +64,35 @@
   text-transform: uppercase;
   letter-spacing: 0.025em;
   background: var(--bg-primary);
-  border: 1px solid var(--theme-border-secondary);
+  border: 1px solid var(--border-secondary);
   color: var(--text-secondary);
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: var(--bg-secondary);
     color: var(--text-primary);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
   }
 }
 
 .action-btn-primary {
   @extend .action-btn-secondary;
-  background: var(--theme-text-primary);
-  color: white;
+  background: var(--text-primary);
+  color: #fff;
   border: none;
-  
-  &:hover {
-    background: black;
-    color: white;
+
+  &:hover:not(:disabled) {
+    background: var(--accent-primary);
+    color: #fff;
   }
 }
 
-/* --- Sidebar --- */
+// ── Sidebar layer panel ───────────────────────────────────────────────────────
+
 .badge-count {
   font-family: var(--font-mono);
   font-size: 10px;
@@ -162,38 +106,41 @@
 .layer-card {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px;
+  gap: 10px;
+  padding: 9px 10px;
   background: var(--bg-primary);
   border: 1px solid var(--border-primary);
   border-radius: var(--ui-border-radius);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   position: relative;
   overflow: hidden;
+  // FIX: Prevent layer cards from shrinking when the list is long.
+  // Without flex-shrink: 0 the cards compress and become unclickable.
+  flex-shrink: 0;
 
   &:hover {
-    border-color: var(--accent-tertiary);
+    border-color: var(--accent-tertiary, var(--border-secondary));
     box-shadow: var(--shadow-sm);
-    
+
     .delete-btn { opacity: 1; }
   }
 
   &.active {
     background: var(--bg-primary);
     border-color: var(--accent-primary);
-    box-shadow: 0 0 0 2px var(--accent-focus);
-    
+    box-shadow: 0 0 0 2px var(--accent-focus, rgba(99,102,241,0.12));
+
     .layer-title { color: var(--accent-primary); }
-    .drag-handle i { color: var(--accent-primary) !important; }
   }
 }
 
 .drag-handle {
   display: flex;
   cursor: grab;
-  padding: 4px;
-  
+  padding: 2px;
+  color: var(--text-tertiary);
+
   &:active { cursor: grabbing; }
 }
 
@@ -202,6 +149,9 @@
   font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .layer-subtitle {
@@ -213,25 +163,27 @@
 }
 
 .delete-btn {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 4px;
-  color: var(--theme-error);
+  color: var(--color-error, #e11d48);
   opacity: 0;
-  transition: all 0.2s;
-  
-  &:hover {
-    background: rgba(239, 68, 68, 0.1);
-  }
+  transition: all 0.15s;
+  background: none;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &:hover { background: rgba(239, 68, 68, 0.1); }
 }
 
 .btn-dashed {
   width: 100%;
-  padding: 12px;
-  border: 1px dashed var(--theme-border-secondary);
+  padding: 10px;
+  border: 1px dashed var(--border-secondary);
   border-radius: var(--ui-border-radius);
   background: transparent;
   color: var(--text-tertiary);
@@ -242,15 +194,19 @@
   justify-content: center;
   gap: 8px;
   transition: all 0.2s;
-  
+  cursor: pointer;
+  // FIX: Prevent the add button from shrinking in a long list.
+  flex-shrink: 0;
+
   &:hover {
     border-color: var(--accent-primary);
     color: var(--accent-primary);
-    background: var(--accent-focus);
+    background: var(--accent-focus, rgba(99,102,241,0.06));
   }
 }
 
-/* --- Config Area --- */
+// ── Config panel header ───────────────────────────────────────────────────────
+
 .config-header {
   height: 40px;
   padding: 0 12px;
@@ -259,94 +215,143 @@
   justify-content: space-between;
   align-items: center;
   background: var(--bg-secondary);
+  flex-shrink: 0;
 }
 
 .icon-btn {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 4px;
   color: var(--text-tertiary);
-  transition: background 0.2s;
-  
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+
   &:hover {
-    background: var(--component-bg-hover);
+    background: var(--bg-primary);
     color: var(--text-primary);
   }
 }
 
-/* --- Library Modal --- */
+// ── Component library modal ───────────────────────────────────────────────────
+
 .library-card {
   display: flex;
   flex-direction: column;
-  padding: 16px;
-  background: white;
+  padding: 14px;
+  background: #fff;
   border: 1px solid var(--border-primary);
   border-radius: var(--ui-border-radius-lg);
   text-align: left;
   transition: all 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
-  
+  cursor: pointer;
+
   &:hover {
     border-color: var(--accent-primary);
     transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
-    
+
     .icon-wrapper {
       background: var(--accent-primary);
-      color: white;
-      transform: scale(1.1);
+      color: #fff;
+      transform: scale(1.08);
     }
   }
 }
 
 .icon-wrapper {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   background: var(--bg-secondary);
-  border-radius: 12px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-label);
-  transition: all 0.3s ease;
+  color: var(--text-secondary);
+  transition: all 0.25s ease;
   margin-bottom: 8px;
+  flex-shrink: 0;
 }
 
-/* --- Animations --- */
-@keyframes slide-up {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+// ── Animations ────────────────────────────────────────────────────────────────
 
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+@keyframes fade-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scale-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
 
-@keyframes scale-in {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
+.animate-fade-in  { animation: fade-in  0.15s ease-out forwards; }
+.animate-scale-in { animation: scale-in 0.18s ease-out forwards; }
 
-.animate-slide-up { animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-.animate-fade-in { animation: fade-in 0.2s ease-out forwards; }
-.animate-scale-in { animation: scale-in 0.2s ease-out forwards; }
+// ── PrimeNG Splitter overrides ────────────────────────────────────────────────
+// ViewEncapsulation.None is required for these to pierce the shadow DOM.
 
-/* --- PrimeNG Overrides (ViewEncapsulation.None required) --- */
 .custom-splitter {
-  .p-splitter-gutter {
+
+  // ── HORIZONTAL gutter (between sidebar and canvas panels) ────────────────
+  &.p-splitter-horizontal > .p-splitter-gutter {
     background: var(--bg-secondary) !important;
-    width: 1px !important;
+    width: 5px !important;
+    cursor: col-resize;
     transition: background 0.2s;
-    
-    &:hover { background: var(--accent-primary) !important; }
+
+    &:hover,
+    &:active {
+      background: var(--accent-primary) !important;
+    }
   }
-  .p-splitter-gutter-handle { display: none !important; }
+
+  &.p-splitter-horizontal > .p-splitter-gutter > .p-splitter-gutter-handle {
+    width: 2px !important;
+    background: var(--border-secondary) !important;
+    border-radius: 2px;
+    height: 40px !important;
+    margin: auto;
+  }
+
+  // ── VERTICAL gutter (between canvas top/bottom panels) ───────────────────
+  // FIX: Added full vertical gutter styles — these were missing entirely,
+  //      so users had no way to resize the canvas vs the status bar.
+  &.p-splitter-vertical > .p-splitter-gutter {
+    background: var(--bg-secondary) !important;
+    height: 5px !important;
+    cursor: row-resize;
+    transition: background 0.2s;
+
+    &:hover,
+    &:active {
+      background: var(--accent-primary) !important;
+    }
+  }
+
+  &.p-splitter-vertical > .p-splitter-gutter > .p-splitter-gutter-handle {
+    height: 2px !important;
+    width: 40px !important;
+    background: var(--border-secondary) !important;
+    border-radius: 2px;
+    margin: auto;
+  }
+
 }
 
-/* Floating Dialog Styling */
+// ── Canvas vertical splitter specific overrides ───────────────────────────────
+// The canvas splitter panels must use overflow:hidden so the scroll container
+// inside (main#preview-container) is the only thing that scrolls.
+// Without this, PrimeNG's default overflow:auto on panels competes with the
+// inner scroll and sections appear cut off or duplicated in scroll position.
+
+.canvas-v-splitter {
+  // FIX: Force splitter panels to clip overflow so the inner <main>
+  //      with overflow-y:auto is the SOLE scroll surface for the canvas.
+  .p-splitter-panel {
+    overflow: hidden !important;
+  }
+}
+
+// ── Floating dialog panel ─────────────────────────────────────────────────────
+
 .builder-floating-panel {
   border-radius: var(--ui-border-radius-lg) !important;
   box-shadow: var(--shadow-2xl) !important;
@@ -354,365 +359,359 @@
   border: 1px solid var(--border-primary);
 
   .p-dialog-header {
-    padding: 12px 16px !important;
-    background: white !important;
+    padding: 10px 14px !important;
+    background: #fff !important;
     border-bottom: 1px solid var(--border-primary);
-    
-    .p-dialog-title { font-size: 1rem; }
-    .p-dialog-header-icons { display: none; } /* We use custom header */
+
+    .p-dialog-title { font-size: 0.9rem; }
+    .p-dialog-header-icons { display: none !important; }
   }
 
   .p-dialog-content {
     padding: 0 !important;
     background: var(--bg-secondary) !important;
+    height: 100%;
   }
-  
-  .p-resizable-handle { opacity: 0.5; }
+
+  .p-resizable-handle { opacity: 0.4; }
 }
 
+// ── Custom scrollbar (shared across sidebar + canvas) ─────────────────────────
 
-// /* Theme Tokens & Layout */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-secondary) transparent;
+
+  &::-webkit-scrollbar       { width: 4px; height: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+    border-radius: 4px;
+
+    &:hover { background: var(--border-primary); }
+  }
+}
+
+// ── PrimeNG Splitter panel height fix ─────────────────────────────────────────
+// PrimeNG sets .p-splitter and .p-splitter-panel to height: auto by default.
+// This breaks scroll containment when nested inside a flex container.
+// FIX: Force the root splitter and all panels to fill their allocated space.
+
+.p-splitter {
+  &.h-full {
+    height: 100% !important;
+  }
+
+  // FIX: Splitter panels must be block-level and fill their allocated size.
+  // This is the root cause of the "sections not visible" bug — panels were
+  // collapsing to auto height, so the canvas never had a bounded height to
+  // scroll within.
+  .p-splitter-panel {
+    min-height: 0;  // Required so flex children can shrink below content height
+    overflow: hidden; // Delegate scrolling to inner elements, not the panel
+  }
+}
+
+// /* ==========================================================================
+//    COMPONENT STYLES
+//    ========================================================================== */
+   
+// /* Apply Token Mapping */
 // :host {
-//   display: block; /* Changed from flex col to block as the h-full div takes over */
+//   // @include apply-canonical-mapping;
+//   display: block;
 //   height: 100vh;
-//   overflow: hidden;
+//   width: 100%;
+// }
+
+// // ── Force all section preview components to render as block elements ──────
+// // Angular custom elements default to `display: inline` unless :host defines
+// // `display: block`. The section components had this commented out, so they
+// // weren't stacking vertically in the canvas. This rule overrides that at the
+// // builder level (ViewEncapsulation.None) without touching each component.
+// app-hero-banner,
+// app-product-slider,
+// app-product-grid,
+// app-category-grid,
+// app-feature-grid,
+// app-text-content,
+// app-video-hero,
+// app-split-content,
+// app-testimonial-slider,
+// app-logo-cloud,
+// app-stats-counter,
+// app-newsletter-signup,
+// app-contact-form,
+// app-pricing-table,
+// app-faq-accordion,
+// app-countdown-timer,
+// app-blog-feed,
+// app-product-listing,
+// app-map-locations {
+//   display: block !important;
+//   width: 100%;
+// }
+
+// /* --- Layout Utils --- */
+// .builder-layout {
 //   font-family: var(--font-body);
-//   font-size: var(--font-size-base);
-//   color: #1e293b;
-//   background-color: #f8fafc;
-//   --scrollbar-width: 5px;
-// }
-
-// /* --- SPLITTER CUSTOMIZATION --- */
-// :host ::ng-deep .custom-splitter {
-//   .p-splitter {
-//     border: none;
-//     background: transparent;
-//   }
-  
-//   .p-splitter-gutter {
-//     background: #e2e8f0; /* Color of the drag handle bar */
-//     transition: background 0.2s;
-//     z-index: 50;
-    
-//     &:hover {
-//       background: #3b82f6; /* Blue hover effect */
-//     }
-//   }
-
-//   .p-splitter-gutter-handle {
-//     background: #94a3b8; /* The little dots/grip icon color */
-//     display: none; /* Optional: Hide the grip dots for a cleaner Apple-like look */
-//   }
-// }
-
-// .custom-scrollbar {
-//   &::-webkit-scrollbar {
-//     width: var(--scrollbar-width);
-//     height: var(--scrollbar-width);
-//   }
-//   &::-webkit-scrollbar-track {
-//       background: var(--bg-secondary);
-//   }
-//   &::-webkit-scrollbar-thumb {
-//     background: #cbd5e1;
-//     border-radius: 4px;
-//   }
+//   color: var(--text-secondary);
 // }
 
 // .builder-header {
-//   height: 56px;
-//   background: white;
-//   border-bottom: 1px solid #e2e8f0;
-//   padding: 0 1rem;
-//   display: flex;
-//   align-items: center;
-//   justify-content: space-between;
-//   box-shadow: var(--shadow-sm);
-//   z-index: 200;
+//   background: var(--bg-primary);
+//   border-bottom: 1px solid var(--border-primary);
 // }
 
-// /* Layer Card Styles */
+// .action-btn-secondary {
+//   height: 32px;
+//   border-radius: var(--ui-border-radius);
+//   font-size: var(--font-size-xs);
+//   font-weight: var(--font-weight-bold);
+//   text-transform: uppercase;
+//   letter-spacing: 0.025em;
+//   background: var(--bg-primary);
+//   border: 1px solid var(--theme-border-secondary);
+//   color: var(--text-secondary);
+//   transition: all 0.2s ease;
+  
+//   &:hover {
+//     background: var(--bg-secondary);
+//     color: var(--text-primary);
+//   }
+// }
+
+// .action-btn-primary {
+//   @extend .action-btn-secondary;
+//   background: var(--theme-text-primary);
+//   color: white;
+//   border: none;
+  
+//   &:hover {
+//     background: black;
+//     color: white;
+//   }
+// }
+
+// /* --- Sidebar --- */
+// .badge-count {
+//   font-family: var(--font-mono);
+//   font-size: 10px;
+//   background: var(--bg-primary);
+//   border: 1px solid var(--border-primary);
+//   padding: 2px 6px;
+//   border-radius: 4px;
+//   color: var(--text-tertiary);
+// }
+
 // .layer-card {
 //   display: flex;
 //   align-items: center;
-//   gap: 8px;
-//   padding: 8px 12px;
-//   background: white;
-//   border: 1px solid #f1f5f9;
-//   border-radius: 6px;
-//   margin-bottom: 4px;
+//   gap: 12px;
+//   padding: 10px;
+//   background: var(--bg-primary);
+//   border: 1px solid var(--border-primary);
+//   border-radius: var(--ui-border-radius);
 //   cursor: pointer;
-//   transition: all 0.2s;
-  
+//   transition: all 0.2s ease;
+//   position: relative;
+//   overflow: hidden;
+
 //   &:hover {
-//     border-color: #cbd5e1;
-//     transform: translateY(-1px);
+//     border-color: var(--accent-tertiary);
+//     box-shadow: var(--shadow-sm);
+    
+//     .delete-btn { opacity: 1; }
 //   }
-  
+
 //   &.active {
-//     background: #eff6ff;
-//     border-color: #3b82f6;
-//     .layer-title {
-//       color: #1e3a8a;
-//     }
+//     background: var(--bg-primary);
+//     border-color: var(--accent-primary);
+//     box-shadow: 0 0 0 2px var(--accent-focus);
+    
+//     .layer-title { color: var(--accent-primary); }
+//     .drag-handle i { color: var(--accent-primary) !important; }
 //   }
 // }
 
 // .drag-handle {
+//   display: flex;
 //   cursor: grab;
-//   color: #cbd5e1;
-//   &:hover {
-//     color: #64748b;
-//   }
+//   padding: 4px;
+  
+//   &:active { cursor: grabbing; }
 // }
 
-// .btn-add-section {
-//   width: 100%;
-//   padding: 12px;
-//   border: 1px dashed #cbd5e1;
-//   border-radius: 8px;
-//   color: #64748b;
-//   font-size: 11px;
-//   font-weight: 700;
-//   text-transform: uppercase;
-//   background: var(--bg-secondary);
-//   transition: all 0.2s;
+// .layer-title {
+//   font-size: var(--font-size-sm);
+//   font-weight: var(--font-weight-semibold);
+//   color: var(--text-primary);
+//   line-height: 1.2;
+// }
+
+// .layer-subtitle {
+//   font-size: 10px;
+//   color: var(--text-tertiary);
+//   white-space: nowrap;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+// }
+
+// .delete-btn {
+//   width: 24px;
+//   height: 24px;
 //   display: flex;
 //   align-items: center;
 //   justify-content: center;
-//   gap: 6px;
+//   border-radius: 4px;
+//   color: var(--theme-error);
+//   opacity: 0;
+//   transition: all 0.2s;
   
 //   &:hover {
-//     border-color: #3b82f6;
-//     color: #3b82f6;
-//     background: #eff6ff;
+//     background: rgba(239, 68, 68, 0.1);
 //   }
 // }
 
-// .overlay-backdrop {
-//   background: rgba(15, 23, 42, 0.4);
-//   backdrop-filter: blur(2px);
-//   z-index: 400;
+// .btn-dashed {
+//   width: 100%;
+//   padding: 12px;
+//   border: 1px dashed var(--theme-border-secondary);
+//   border-radius: var(--ui-border-radius);
+//   background: transparent;
+//   color: var(--text-tertiary);
+//   font-size: var(--font-size-xs);
+//   font-weight: var(--font-weight-semibold);
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   gap: 8px;
+//   transition: all 0.2s;
+  
+//   &:hover {
+//     border-color: var(--accent-primary);
+//     color: var(--accent-primary);
+//     background: var(--accent-focus);
+//   }
 // }
 
-// .library-modal {
+// /* --- Config Area --- */
+// .config-header {
+//   height: 40px;
+//   padding: 0 12px;
+//   border-bottom: 1px solid var(--border-primary);
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   background: var(--bg-secondary);
+// }
+
+// .icon-btn {
+//   width: 28px;
+//   height: 28px;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   border-radius: 4px;
+//   color: var(--text-tertiary);
+//   transition: background 0.2s;
+  
+//   &:hover {
+//     background: var(--component-bg-hover);
+//     color: var(--text-primary);
+//   }
+// }
+
+// /* --- Library Modal --- */
+// .library-card {
+//   display: flex;
+//   flex-direction: column;
+//   padding: 16px;
 //   background: white;
+//   border: 1px solid var(--border-primary);
+//   border-radius: var(--ui-border-radius-lg);
+//   text-align: left;
+//   transition: all 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
+  
+//   &:hover {
+//     border-color: var(--accent-primary);
+//     transform: translateY(-2px);
+//     box-shadow: var(--shadow-lg);
+    
+//     .icon-wrapper {
+//       background: var(--accent-primary);
+//       color: white;
+//       transform: scale(1.1);
+//     }
+//   }
+// }
+
+// .icon-wrapper {
+//   width: 48px;
+//   height: 48px;
+//   background: var(--bg-secondary);
 //   border-radius: 12px;
-//   box-shadow: var(--shadow-2xl);
-//   border: 1px solid #e2e8f0;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   color: var(--text-label);
+//   transition: all 0.3s ease;
+//   margin-bottom: 8px;
 // }
 
-// @keyframes slideUp {
-//   from {
-//     transform: translateY(20px);
-//     opacity: 0;
+// /* --- Animations --- */
+// @keyframes slide-up {
+//   from { opacity: 0; transform: translateY(20px); }
+//   to { opacity: 1; transform: translateY(0); }
+// }
+
+// @keyframes fade-in {
+//   from { opacity: 0; }
+//   to { opacity: 1; }
+// }
+
+// @keyframes scale-in {
+//   from { opacity: 0; transform: scale(0.95); }
+//   to { opacity: 1; transform: scale(1); }
+// }
+
+// .animate-slide-up { animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+// .animate-fade-in { animation: fade-in 0.2s ease-out forwards; }
+// .animate-scale-in { animation: scale-in 0.2s ease-out forwards; }
+
+// /* --- PrimeNG Overrides (ViewEncapsulation.None required) --- */
+// .custom-splitter {
+//   .p-splitter-gutter {
+//     background: var(--bg-secondary) !important;
+//     width: 1px !important;
+//     transition: background 0.2s;
+    
+//     &:hover { background: var(--accent-primary) !important; }
 //   }
-//   to {
-//     transform: translateY(0);
-//     opacity: 1;
+//   .p-splitter-gutter-handle { display: none !important; }
+// }
+
+// /* Floating Dialog Styling */
+// .builder-floating-panel {
+//   border-radius: var(--ui-border-radius-lg) !important;
+//   box-shadow: var(--shadow-2xl) !important;
+//   overflow: hidden;
+//   border: 1px solid var(--border-primary);
+
+//   .p-dialog-header {
+//     padding: 12px 16px !important;
+//     background: white !important;
+//     border-bottom: 1px solid var(--border-primary);
+    
+//     .p-dialog-title { font-size: 1rem; }
+//     .p-dialog-header-icons { display: none; } /* We use custom header */
 //   }
+
+//   .p-dialog-content {
+//     padding: 0 !important;
+//     background: var(--bg-secondary) !important;
+//   }
+  
+//   .p-resizable-handle { opacity: 0.5; }
 // }
 
-// .animate-slide-up {
-//     animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-// }
-
-// // /* Theme Tokens & Layout */
-// // :host {
-// //   display: flex;
-// //   flex-direction: column;
-// //   height: 100vh;
-// //   overflow: hidden;
-// //   font-family: var(--font-body);
-// //   font-size: var(--font-size-base);
-// //   color: #1e293b;
-// //   background-color: #f8fafc;
-// //   --scrollbar-width: 5px;
-// // }
-// // .custom-scrollbar {
-// //   &::-webkit-scrollbar {
-// //     width: var(--scrollbar-width);
-// //     height: var(--scrollbar-width);
-// //   }
-// //   &::-webkit-scrollbar-track {
-// //       background: var(--bg-secondary);
-// //   }
-// //   &::-webkit-scrollbar-thumb {
-// //     background: #cbd5e1;
-// //     border-radius: 4px;
-// //   }
-// // }
-
-// // .builder-header {
-// //   height: 56px;
-// //   background: white;
-// //   border-bottom: 1px solid #e2e8f0;
-// //   padding: 0 1rem;
-// //   display: flex;
-// //   align-items: center;
-// //   justify-content: space-between;
-// //   box-shadow: var(--shadow-sm);
-// //   z-index: 200;
-// // }
-// // .builder-sidebar {
-// //   background: white;
-// //   border-right: 1px solid #e2e8f0;
-// //   display: flex;
-// //   flex-direction: column;
-// //   z-index: 100;
-// //   box-shadow: var(--shadow-lg);
-// //   transition: width 0.3s ease;
-// //   width: 320px;
-// //   position: relative;
-// // }
-
-// // .layers-panel {
-// //   flex: 1;
-// //   min-height: 0;      /* REQUIRED for flex scrolling */
-// //   overflow-y: auto;
-
-// //   display: flex;
-// //   flex-direction: column;
-// //   transition: flex 0.3s ease;
-
-// //   &.hidden {
-// //     display: none;
-// //   }
-// // }
-
-
-// // .settings-panel {
-// //   border-top: 1px solid #e2e8f0;
-// //   background: #fff;
-// //   display: flex;
-// //   flex-direction: column;
-// //   min-height: 0;
-// //   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-// //   transition: min-height 0.3s ease;
-// // }
-// // @keyframes slideUp {
-// //   from {
-// //     transform: translateY(20px);
-// //     opacity: 0;
-// //   }
-// //   to {
-// //     transform: translateY(0);
-// //     opacity: 1;
-// //   }
-// // }
-
-// // .layer-card {
-// //   display: flex;
-// //   align-items: center;
-// //   gap: 8px;
-// //   padding: 8px 12px;
-// //   background: white;
-// //   border: 1px solid #f1f5f9;
-// //   border-radius: 6px;
-// //   margin-bottom: 4px;
-// //   cursor: pointer;
-// //   transition: all 0.2s;
-// //   &:hover {
-// //     border-color: #cbd5e1;
-// //     transform: translateY(-1px);
-// //   }
-// //   &.active {
-// //     background: #eff6ff;
-// //     border-color: #3b82f6;
-// //     .layer-title {
-// //       color: #1e3a8a;
-// //     }
-// //   }
-// // }
-// // .drag-handle {
-// //   cursor: grab;
-// //   color: #cbd5e1;
-// //   &:hover {
-// //     color: #64748b;
-// //   }
-// // }
-// // .btn-add-section {
-// //   width: 100%;
-// //   padding: 12px;
-// //   border: 1px dashed #cbd5e1;
-// //   border-radius: 8px;
-// //   color: #64748b;
-// //   font-size: 11px;
-// //   font-weight: 700;
-// //   text-transform: uppercase;
-// //     background: var(--bg-secondary);
-// //   transition: all 0.2s;
-// //   display: flex;
-// //   align-items: center;
-// //   justify-content: center;
-// //   gap: 6px;
-// //   &:hover {
-// //     border-color: #3b82f6;
-// //     color: #3b82f6;
-// //     background: #eff6ff;
-// //   }
-// // }
-// // .overlay-backdrop {
-// //   background: rgba(15, 23, 42, 0.4);
-// //   backdrop-filter: blur(2px);
-// //   z-index: 400;
-// // }
-// // .library-modal {
-// //   background: white;
-// //   border-radius: 12px;
-// //   box-shadow: var(--shadow-2xl);
-// //   border: 1px solid #e2e8f0;
-// // }
-
-// // // :host ::ng-deep .builder-dialog {
-// // //   box-shadow: var(--shadow-2xl);
-// // //   border: 1px solid #e2e8f0;
-// // //   border-radius: 10px;
-// // //   .p-dialog-header {
-// // //     padding: 0.75rem 1rem;
-// // //     border-bottom: 1px solid #f1f5f9;
-// // //     background: #fff;
-// // //     border-top-left-radius: 10px;
-// // //     border-top-right-radius: 10px;
-// // //   }
-// // //   .p-dialog-content {
-// // //     padding: 0;
-// // //     background: #fff;
-// // //     border-bottom-left-radius: 10px;
-// // //     border-bottom-right-radius: 10px;
-// // //   }
-// // // }
-// // @keyframes fadeIn {
-// //   from { opacity: 0; transform: translateY(-5px); }
-// //   to { opacity: 1; transform: translateY(0); }
-// // }
-// // .animate-fade-in {
-// //   animation: fadeIn 0.2s ease-out forwards;
-// // }
-
-// // /* Ensure PrimeNG Tabs look good in Sidebar */
-// // .p-tablist-tab-list {
-// //   background: transparent !important;
-// //   border-bottom: none !important;
-// // }
-// // .p-tabpanels {
-// //   background: transparent !important;
-// // }
-// // .custom-scrollbar {
-// //   scrollbar-width: thin;
-// //   scrollbar-color: #cbd5e1 transparent;
-// // }
-
-// // .custom-scrollbar::-webkit-scrollbar {
-// //   width: 6px;
-// // }
-
-// // .custom-scrollbar::-webkit-scrollbar-thumb {
-// //   background: #cbd5e1;
-// //   border-radius: 999px;
-// // }
-
-// // .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-// //   background: #94a3b8;
-// // }

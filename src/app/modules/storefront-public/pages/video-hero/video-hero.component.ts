@@ -1,17 +1,31 @@
-import { Component, Input, computed, ElementRef, ViewChild, AfterViewInit, signal } from '@angular/core';
+// src/app/modules/storefront-public/pages/video-hero/video-hero.component.ts
+import { Component, Input, computed, ElementRef, ViewChild, AfterViewInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { VideoHeroConfig } from '@core/models/storefront.model';
 
 @Component({
   selector: 'app-video-hero',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './video-hero.component.html',
-  styleUrls: ['./video-hero.component.scss']
+  styleUrls: ['./video-hero.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class VideoHeroComponent implements AfterViewInit {
-  @Input() config: any = {};
-  
+
+  @Input() set config(v: VideoHeroConfig) { this._config.set(v ?? {}); }
+  private _config = signal<VideoHeroConfig>({});
+
+  readonly cfg = computed(() => ({
+    title:          this._config().title,
+    subtitle:       this._config().subtitle,
+    videoUrl:       this._config().videoUrl,
+    posterImage:    this._config().posterImage,
+    overlayOpacity: this._config().overlayOpacity ?? 40,
+    ctaButtons:     this._config().ctaButtons ?? []
+  }));
+
   @ViewChild('videoPlayer') videoPlayer!: ElementRef<HTMLVideoElement>;
   
   // Track if video has actually started playing to fade it in
@@ -19,25 +33,20 @@ export class VideoHeroComponent implements AfterViewInit {
 
   // Layout Computation
   heightClass = computed(() => {
-    switch (this.config.height) {
-      case 'medium': return 'h-medium';
-      case 'large': return 'h-large';
-      case 'full_screen': return 'h-fullscreen';
-      default: return 'h-large'; // Default to large/hero
-    }
+    // Currently no height defined in video-hero backend schema, defaulting to fullscreen-like or large
+    return 'h-large';
   });
 
   // Valid Button Filter
-  get validButtons() {
-    return this.config.ctaButtons?.filter((b: any) => b.text && b.url) || [];
-  }
+  readonly validButtons = computed(() => {
+    return this.cfg().ctaButtons.filter(b => b.text && b.link);
+  });
 
   ngAfterViewInit() {
     if (this.videoPlayer?.nativeElement) {
       const video = this.videoPlayer.nativeElement;
       
-      video.muted = true; // Required for auto-play
-      
+      video.muted = true; // Required for auto-play      
       const playPromise = video.play();
       
       if (playPromise !== undefined) {
@@ -54,50 +63,14 @@ export class VideoHeroComponent implements AfterViewInit {
     }
   }
 
-  getLink(url: string): any[] {
-    // Simple internal link handler
+  getLink(url: string | undefined): any[] {
     if (!url) return [];
-    return [url];
+    if (url.startsWith('http') || url.startsWith('www')) return [];
+    const clean = url.startsWith('/') ? url.slice(1) : url;
+    return clean ? ['/', clean] : [];
+  }
+
+  isExternal(url: string | undefined): boolean {
+    return !!url && (url.startsWith('http') || url.startsWith('www'));
   }
 }
-
-// import { Component, Input, computed, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { RouterModule } from '@angular/router';
-
-// @Component({
-//   selector: 'app-video-hero',
-//   standalone: true,
-//   imports: [CommonModule, RouterModule],
-//   templateUrl: './video-hero.component.html',
-//   styleUrls: ['./video-hero.component.scss']
-// })
-// export class VideoHeroComponent implements AfterViewInit {
-//   @Input() config: any = {};
-//   @ViewChild('videoPlayer') videoPlayer!: ElementRef<HTMLVideoElement>;
-
-//   // Height Logic
-//   heightClass = computed(() => {
-//     switch (this.config.height) {
-//       case 'medium': return 'h-[60vh] min-h-[500px]';
-//       case 'large': return 'h-[80vh] min-h-[600px]';
-//       case 'full_screen': return 'h-screen';
-//       default: return 'h-[80vh] min-h-[600px]';
-//     }
-//   });
-
-//   // Ensure video plays (some browsers require interaction)
-//   ngAfterViewInit() {
-//     if (this.videoPlayer?.nativeElement) {
-//       this.videoPlayer.nativeElement.muted = true; // Auto-play requires mute
-//       this.videoPlayer.nativeElement.play().catch(err => {
-//         console.warn('Video autoplay blocked:', err);
-//       });
-//     }
-//   }
-
-//   // Filter valid buttons
-//   get validButtons() {
-//     return this.config.ctaButtons?.filter((b: any) => b.text && b.url) || [];
-//   }
-// }

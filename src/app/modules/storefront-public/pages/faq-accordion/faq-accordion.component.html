@@ -1,0 +1,62 @@
+<!-- faq-accordion.component.html -->
+<section class="faq-root" [ngStyle]="sectionStyle()">
+
+  <div class="faq-container">
+
+    <!-- Header -->
+    <header class="faq-header">
+      <span class="faq-eyebrow">FAQ</span>
+      <h2 class="faq-title">{{ cfg().title }}</h2>
+      <div class="faq-title-accent" aria-hidden="true"></div>
+    </header>
+
+    <!-- Two-column layout: question list + decorative side -->
+    <div class="faq-layout">
+
+      <!-- Accordion list -->
+      <div class="faq-list" role="list">
+
+        @for (item of items(); track item.question; let i = $index) {
+        <div class="faq-item" [class.faq-item-open]="isOpen(i)" role="listitem">
+
+          <!-- Toggle button -->
+          <button class="faq-toggle" type="button" (click)="toggle(i)" [attr.aria-expanded]="isOpen(i)"
+            [attr.aria-controls]="'faq-panel-' + i">
+
+            <span class="faq-question">{{ item.question }}</span>
+
+            <span class="faq-chevron" aria-hidden="true">
+              <i class="pi pi-chevron-down"></i>
+            </span>
+          </button>
+
+          <!-- Answer panel — grid-template-rows trick for smooth height -->
+          <div class="faq-panel" [class.faq-panel-open]="isOpen(i)" [id]="'faq-panel-' + i" role="region">
+            <div class="faq-panel-inner">
+              <p class="faq-answer">{{ item.answer }}</p>
+            </div>
+          </div>
+
+        </div>
+        }
+
+      </div>
+
+      <!-- Decorative side column (desktop only) -->
+      <div class="faq-side" aria-hidden="true">
+        <div class="faq-side-card">
+          <div class="faq-side-icon">
+            <i class="pi pi-question-circle"></i>
+          </div>
+          <p class="faq-side-text">Still have questions?</p>
+          <p class="faq-side-sub">Our team is available 24/7 to help you find the answers you need.</p>
+          <div class="faq-side-dot faq-side-dot-1"></div>
+          <div class="faq-side-dot faq-side-dot-2"></div>
+          <div class="faq-side-dot faq-side-dot-3"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</section>

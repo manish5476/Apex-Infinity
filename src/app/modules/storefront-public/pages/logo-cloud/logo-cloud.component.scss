@@ -1,6 +1,6 @@
 /* ==========================================================================
    COMPONENT: PREMIUM LOGO CLOUD
-   Strict Token Usage & Layout
+   Standardized Tokens & Modern Layout
    ========================================================================== */
 
 :host {
@@ -10,23 +10,9 @@
 .section-root {
   position: relative;
   overflow: hidden;
-  /* Use a transparent bg fallback so parent section colors show through if needed */
-  background-color: var( #f8fafc); 
-}
-
-/* --- BACKGROUND OVERLAY --- */
-.bg-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  
-  /* Glassmorphism base */
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px);
-  
-  /* Gradient fade for depth */
-  mask-image: linear-gradient(to bottom, black 20%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  padding-top: var(--pt, var(--spacing-6xl));
+  padding-bottom: var(--pb, var(--spacing-6xl));
+  transition: background 0.3s ease;
 }
 
 /* --- CONTAINER --- */
@@ -34,11 +20,10 @@
   position: relative;
   z-index: 10;
   margin: 0 auto;
-  padding: 0 var(--spacing-2xl);
+  padding: 0 var(--spacing-xl);
   
-  /* Variant Widths */
   &.standard { max-width: 1280px; }
-  &.full { max-width: 100%; padding: 0 var(--spacing-xl); }
+  &.full { max-width: 100%; }
 }
 
 /* --- HEADER --- */
@@ -52,24 +37,22 @@
 
 .section-label {
   display: block;
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-family: var(--font-header, sans-serif);
+  font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 3px;
+  letter-spacing: 0.2em;
   margin-bottom: var(--spacing-md);
-  
-  /* Muted text color */
   color: var(--text-tertiary, #94a3b8);
-  opacity: 0.8;
 }
 
 .divider-line {
   width: 40px;
   height: 2px;
-  background: var(--border-secondary, #e2e8f0);
+  background: var(--primary-color, #3b82f6);
   margin: 0 auto;
-  border-radius: 2px;
+  border-radius: 99px;
+  opacity: 0.3;
 }
 
 /* --- LOGO GRID --- */
@@ -79,177 +62,76 @@
   justify-content: center;
   align-items: center;
   
-  /* Dynamic Gaps */
-  gap: var(--spacing-3xl);
+  /* Gap Variants */
+  &.gap-sm { gap: var(--spacing-xl); }
+  &.gap-md { gap: var(--spacing-3xl); }
+  &.gap-lg { gap: var(--spacing-5xl); }
   
   @media (min-width: 768px) { 
-    gap: var(--spacing-4xl); 
-  }
-  
-  @media (min-width: 1024px) { 
-    gap: var(--spacing-5xl); 
+    &.gap-sm { gap: var(--spacing-2xl); }
+    &.gap-md { gap: var(--spacing-4xl); }
+    &.gap-lg { gap: var(--spacing-7xl); }
   }
 }
 
 /* --- LOGO ITEM --- */
 .logo-item {
-  /* Box Model */
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 80px; /* Fixed height for consistent rows */
-  width: 140px; /* Base width constraint */
-  padding: var(--spacing-sm);
+  height: 60px;
+  padding: var(--spacing-md);
   
-  /* Initial State: Muted & Grayscale */
-  opacity: 0.5;
-  filter: grayscale(100%) contrast(80%);
+  /* Configuration Overrides */
+  opacity: var(--logo-opacity, 0.6);
+  filter: var(--logo-filter, grayscale(100%));
   
-  /* Animation Props */
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Transition Props */
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   backface-visibility: hidden;
-  transform: translateZ(0);
-
-  /* Hover State: Full Color, Lift, Shadow */
-  &:hover {
-    opacity: 1 !important;
-    filter: grayscale(0%) contrast(100%) !important;
-    transform: translateY(-4px) scale(1.05);
-    background: radial-gradient(closest-side, rgba(255,255,255,0.8) 0%, transparent 100%);
-  }
 
   img {
     width: auto;
     height: 100%;
     object-fit: contain;
-    
-    /* Max height constraints per breakpoint */
     max-height: 32px;
     
     @media (min-width: 768px) { 
-      max-height: 40px; 
-      width: auto;
+      max-height: 42px; 
     }
     
     @media (min-width: 1024px) { 
       max-height: 48px; 
     }
   }
+
+  /* Hover State: Premium Reveal */
+  &:hover {
+    opacity: 1 !important;
+    filter: grayscale(0%) contrast(105%) !important;
+    transform: translateY(-5px) scale(1.08);
+    
+    /* Subtle glow for dark mode or light backgrounds */
+    &::after {
+      content: '';
+      position: absolute;
+      inset: -10px;
+      background: radial-gradient(circle, rgba(var(--primary-rgb, 59, 130, 246), 0.1) 0%, transparent 70%);
+      z-index: -1;
+      border-radius: 50%;
+    }
+  }
 }
 
-// /* ==========================================================================
-//    COMPONENT: PREMIUM LOGO CLOUD
-//    Strict Token Usage
-//    ========================================================================== */
-
-// :host {
-//   display: block;
-// }
-
-// .section-root {
-//   position: relative;
-//   overflow: hidden;
-//   background-color: var(--bg-secondary); /* Default fallback */
-// }
-
-// /* --- OVERLAY --- */
-// .bg-overlay {
-//   position: absolute;
-//   inset: 0;
-//   /* Default: Lighten for readability */
-//   background: rgba(255, 255, 255, 0.9);
-//   backdrop-filter: blur(12px);
-//   z-index: 0;
-// }
-
-// /* --- CONTAINER --- */
-// .container-wrapper {
-//   position: relative;
-//   z-index: 10;
-//   margin: 0 auto;
-//   padding: 0 var(--spacing-2xl);
+/* --- DARK MODE ADAPTATIONS --- */
+.text-white {
+  .section-label { color: rgba(255,255,255,0.6); }
+  .divider-line { background: #fff; opacity: 0.2; }
   
-//   &.standard { max-width: 1280px; }
-//   &.full { max-width: 100%; padding: 0 var(--spacing-xl); }
-// }
-
-// /* --- HEADER --- */
-// .header-group {
-//   text-align: center;
-//   margin-bottom: var(--spacing-4xl);
-//   max-width: 600px;
-//   margin-left: auto;
-//   margin-right: auto;
-// }
-
-// .section-label {
-//   display: block;
-//   font-family: var(--font-mono);
-//   font-size: var(--font-size-xs);
-//   font-weight: 700;
-//   text-transform: uppercase;
-//   letter-spacing: 3px;
-//   margin-bottom: var(--spacing-sm);
-//   opacity: 0.6;
-// }
-
-// .divider-line {
-//   width: 48px;
-//   height: 2px;
-//   background: currentColor;
-//   margin: 0 auto;
-//   opacity: 0.2;
-//   border-radius: 2px;
-// }
-
-// /* --- LOGO GRID --- */
-// .logo-grid {
-//   display: flex;
-//   flex-wrap: wrap;
-//   justify-content: center;
-//   align-items: center;
-  
-//   /* Responsive Gaps */
-//   gap: var(--spacing-3xl);
-  
-//   @media (min-width: 768px) { gap: var(--spacing-4xl); }
-//   @media (min-width: 1024px) { gap: var(--spacing-5xl); }
-// }
-
-// /* --- LOGO ITEM --- */
-// .logo-item {
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-  
-//   /* Fixed height constraint for uniformity */
-//   height: 64px;
-//   min-width: 120px;
-  
-//   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-//   cursor: pointer;
-  
-//   /* Ensure images render sharply */
-//   backface-visibility: hidden;
-//   transform: translateZ(0);
-
-//   img {
-//     width: auto;
-//     height: 100%;
-//     max-height: 40px; /* Restrain height */
-//     object-fit: contain;
-//     transition: filter 0.3s ease;
-    
-//     @media (min-width: 768px) { max-height: 48px; }
-//   }
-
-//   /* HOVER STATE: Full Color & Lift */
-//   &:hover {
-//     opacity: 1 !important;
-//     filter: none !important;
-//     transform: translateY(-4px);
-    
-//     img { filter: none; }
-//   }
-// }
+  .logo-item:hover {
+    &::after {
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+    }
+  }
+}

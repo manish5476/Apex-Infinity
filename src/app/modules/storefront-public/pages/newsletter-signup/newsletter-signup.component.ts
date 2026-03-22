@@ -1,16 +1,19 @@
-import { Component, Input, signal, computed, inject } from '@angular/core';
+import { Component, Input, signal, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NewsletterSignupConfig } from '@core/models/storefront.model';
 
 @Component({
   selector: 'app-newsletter-signup',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './newsletter-signup.component.html',
-  styleUrls: ['./newsletter-signup.component.scss']
+  styleUrls: ['./newsletter-signup.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NewsletterSignupComponent {
-  @Input() config: any = {};
+  @Input() set config(v: NewsletterSignupConfig) { this._config.set(v ?? {}); }
+  private _config = signal<NewsletterSignupConfig>({});
 
   private fb = inject(FormBuilder);
 
@@ -23,33 +26,34 @@ export class NewsletterSignupComponent {
   isSubmitting = signal(false);
   subscribed = signal(false);
 
+  readonly cfg = computed(() => ({
+    title:           this._config().title           ?? 'Join Our Community',
+    description:     this._config().description     ?? 'Stay updated with our latest news and offers.',
+    buttonText:      this._config().buttonText      ?? 'Subscribe',
+    layout:          this._config().layout          ?? 'center',
+    placeholder:     this._config().placeholder     ?? 'Enter your email address',
+    disclaimer:      this._config().disclaimer      ?? 'No spam. Unsubscribe anytime.',
+    paddingTop:      this._config().paddingTop      ?? 'lg',
+    paddingBottom:   this._config().paddingBottom   ?? 'lg',
+    backgroundColor: this._config().backgroundColor ?? 'var(--bg-secondary)',
+    themeMode:       this._config().themeMode       ?? 'auto',
+  }));
+
   // 3. Dynamic Styling (Theme Token Mapping)
-  sectionStyles = computed(() => {
-    const style: any = {};
-    
-    // Background Color (Fallback to secondary theme color)
-    style['background-color'] = this.config.backgroundColor || 'var(--bg-secondary)';
-    
-    // Background Image (if provided)
-    if (this.config.backgroundImage) {
-        style['background-image'] = `url(${this.config.backgroundImage})`;
-        style['background-size'] = 'cover';
-        style['background-position'] = 'center';
-    }
+  readonly paddingMap: Record<string, string> = {
+    'none': '0',
+    'sm': 'var(--spacing-4xl)',
+    'md': 'var(--spacing-6xl)',
+    'lg': 'var(--spacing-8xl)',
+    'xl': 'var(--spacing-10xl)' // Optional scaling
+  };
 
-    // Padding Logic (Maps to your CSS Variables)
-    const paddingMap: any = {
-      'none': '0',
-      'sm': 'var(--spacing-4xl)',
-      'md': 'var(--spacing-6xl)',
-      'lg': 'var(--spacing-8xl)'
+  readonly sectionStyles = computed(() => {
+    return {
+      'background-color': this.cfg().backgroundColor,
+      'padding-top':      this.paddingMap[this.cfg().paddingTop]    ?? this.paddingMap['lg'],
+      'padding-bottom':   this.paddingMap[this.cfg().paddingBottom] ?? this.paddingMap['lg']
     };
-
-    // Default to 'lg' for a spacious premium look
-    style['padding-top'] = paddingMap[this.config.paddingTop] || 'var(--spacing-7xl)';
-    style['padding-bottom'] = paddingMap[this.config.paddingBottom] || 'var(--spacing-7xl)';
-
-    return style;
   });
 
   // 4. Submit Logic
@@ -72,54 +76,3 @@ export class NewsletterSignupComponent {
     }, 1500);
   }
 }
-
-// import { Component, Input, computed } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-
-// @Component({
-//   selector: 'app-newsletter-signup',
-//   standalone: true,
-//   imports: [CommonModule, ReactiveFormsModule],
-//   templateUrl: './newsletter-signup.component.html',
-//   styleUrls: ['./newsletter-signup.component.scss']
-// })
-// export class NewsletterSignupComponent {
-//   @Input() config: any = {};
-
-//   subscribed: any
-//   emailForm: any
-
-//   constructor(private fb: FormBuilder) { }
-//   ngOnInit(): void {
-//     this.subscribed = false;
-//     this.emailForm = this.fb.group({
-//       email: ['', [Validators.required, Validators.email]]
-//     });
-//   }
-
-//   // Layout Logic
-//   sectionStyle = computed(() => {
-//     const style: any = {};
-//     if (this.config.backgroundColor) style['background-color'] = this.config.backgroundColor;
-
-//     // Padding
-//     const paddingMap: any = { 'sm': '3rem', 'md': '5rem', 'lg': '8rem' };
-//     style['padding-top'] = paddingMap[this.config.paddingTop] || '5rem';
-//     style['padding-bottom'] = paddingMap[this.config.paddingBottom] || '5rem';
-
-//     return style;
-//   });
-
-//   onSubmit() {
-//     if (this.emailForm.valid) {
-//       // Simulate API call
-//       setTimeout(() => {
-//         this.subscribed = true;
-//         this.emailForm.reset();
-//       }, 800);
-//     } else {
-//       this.emailForm.markAllAsTouched();
-//     }
-//   }
-// }

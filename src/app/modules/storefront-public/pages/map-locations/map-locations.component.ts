@@ -3,6 +3,8 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as L from 'leaflet';
 
+import { MapLocationsConfig } from '@core/models/storefront.model';
+
 export interface MapLocation {
   _id: string;
   name: string;
@@ -15,15 +17,6 @@ export interface MapLocation {
   description?: string;
 }
 
-export interface MapConfig {
-  title?: string;
-  clusterMarkers?: boolean;
-  enableHeatmap?: boolean;
-  mapStyle?: 'dark' | 'light' | 'satellite';
-  zoomLevel?: number;
-  animationDuration?: number;
-}
-
 @Component({
   selector: 'app-map-locations',
   standalone: true,
@@ -33,11 +26,11 @@ export interface MapConfig {
   encapsulation: ViewEncapsulation.None 
 })
 export class MapLocationsComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
-  @Input() config: MapConfig = {
+  @Input() config: MapLocationsConfig = {
     title: 'Our Presence',
     clusterMarkers: true,
     mapStyle: 'dark', // Default style
-    zoomLevel: 13,
+    zoom: 13,
     animationDuration: 1.5
   };
   
@@ -132,7 +125,7 @@ export class MapLocationsComponent implements OnInit, AfterViewInit, OnChanges, 
       attributionControl: false,
       fadeAnimation: true,
       zoomAnimation: true
-    }).setView([startLoc.lat, startLoc.lng], this.config.zoomLevel || 13);
+    }).setView([startLoc.lat, startLoc.lng], this.config.zoom || 13);
 
     // 6. Set Initial Tile Layer
     this.setMapLayer(this.currentStyle);

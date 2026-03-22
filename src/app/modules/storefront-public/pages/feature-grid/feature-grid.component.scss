@@ -1,247 +1,346 @@
 /* ==========================================================================
-   COMPONENT: PREMIUM FEATURE GRID
-   Strict Token Usage
+   FEATURE GRID — Refined Icon Cards
+   
+   Single card style that works beautifully in both light and dark contexts.
+   Token-native throughout; dark section variants via .fg-card-dark modifier.
    ========================================================================== */
 
-:host {
-  display: block;
-}
+:host { display: block; }
 
-.section-root {
+// ── Section shell ────────────────────────────────────────────────────────────
+
+.fg-root {
   position: relative;
-  background-size: cover;
-  background-position: center;
-  background-color: var(--bg-primary); /* Default fallback */
+  background-color: var(--bg-primary);
   overflow: hidden;
+
+  // Subtle dot-grid texture
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(
+      circle,
+      var(--border-secondary) 1px,
+      transparent 1px
+    );
+    background-size: 28px 28px;
+    opacity: 0.25;
+    pointer-events: none;
+  }
 }
 
-/* Dark Overlay for Background Images */
-.bg-overlay {
+.fg-bg-image {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
+  background-size: cover;
+  background-position: center;
   z-index: 0;
 }
 
-.container-wrapper {
+.fg-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1;
+}
+
+.fg-container {
   position: relative;
   z-index: 10;
+  max-width: 1300px;
   margin: 0 auto;
   padding: 0 var(--spacing-2xl);
-  
-  &.standard { max-width: 1280px; }
-  &.full { max-width: 100%; padding: 0 var(--spacing-xl); }
 }
 
-/* --- HEADER --- */
-.header-group {
+// ── Header ───────────────────────────────────────────────────────────────────
+
+.fg-header {
+  text-align: center;
   margin-bottom: var(--spacing-5xl);
-  max-width: 800px;
-  
-  /* Text Align Utility */
-  &.text-center { text-align: center; margin-left: auto; margin-right: auto; }
-  &.text-left { text-align: left; }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
 }
 
-.subtitle {
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 100px;
-  
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  
-  font-family: var(--font-mono);
-  font-size: var(--font-size-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: white;
-  margin-bottom: var(--spacing-md);
-}
-
-.section-title {
+.fg-title {
+  margin: 0;
   font-family: var(--font-heading);
-  font-size: var(--font-size-4xl);
+  font-size: clamp(26px, 4vw, 44px);
   font-weight: 700;
-  color: white; /* Assumes dark bg if image exists, otherwise override in template */
-  line-height: 1.1;
-  text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  color: var(--text-primary);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
 
-  @media (min-width: 768px) { font-size: var(--font-size-5xl); }
+  &.fg-title-light {
+    color: #fff;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  }
 }
 
-/* --- GRID LAYOUT --- */
-.feature-grid {
+.fg-title-line {
+  width: 48px;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--accent-primary);
+  opacity: 0.9;
+
+  &.fg-title-line-light { opacity: 0.7; }
+}
+
+// ── Grid ─────────────────────────────────────────────────────────────────────
+
+.fg-grid {
   display: grid;
-  gap: var(--gap, var(--spacing-xl));
+  gap: var(--spacing-xl);
   grid-template-columns: repeat(1, 1fr);
 
-  @media (min-width: 768px) {
+  @media (min-width: 640px) {
     grid-template-columns: repeat(2, 1fr);
   }
 
   @media (min-width: 1024px) {
-    grid-template-columns: repeat(var(--cols, 3), 1fr);
+    // --fg-cols is set via [ngStyle] from the component
+    grid-template-columns: repeat(var(--fg-cols, 3), 1fr);
   }
 }
 
-/* ============================================================
-   CARD STYLES
-   ============================================================ */
+// ── Card ─────────────────────────────────────────────────────────────────────
 
-/* 1. GLASS STYLE (Premium, Dark) */
-.feature-card.style-glass {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--ui-border-radius-xl);
+.fg-card {
+  position: relative;
   padding: var(--spacing-2xl);
-  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.3s;
-  
-  h3, p { color: white; }
-  p { opacity: 0.8; }
-
-  &:hover {
-    transform: translateY(-8px);
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: var(--shadow-2xl);
-  }
-
-  .media-wrapper {
-    height: 220px;
-    border-radius: var(--ui-border-radius-lg);
-    overflow: hidden;
-    margin-bottom: var(--spacing-lg);
-    
-    img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
-  }
-  
-  &:hover .media-wrapper img { transform: scale(1.08); }
-}
-
-/* 2. MINIMAL STYLE (Clean, Icon-based) */
-.feature-card.style-minimal {
-  padding: var(--spacing-xl);
-  border-radius: var(--ui-border-radius-lg);
-  transition: background 0.3s ease;
-  
-  h3 { color: var(--text-primary); margin-bottom: var(--spacing-sm); }
-  p { color: var(--text-secondary); }
-
-  &:hover {
-    background: var(--bg-secondary);
-  }
-
-  .icon-frame {
-    width: 56px;
-    height: 56px;
-    border-radius: 12px;
-    background: var(--bg-secondary);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    margin-bottom: var(--spacing-md);
-    color: var(--color-primary);
-    transition: all 0.3s ease;
-  }
-  
-  &:hover .icon-frame {
-    background: var(--color-primary);
-    color: white;
-    transform: scale(1.1) rotate(-5deg);
-  }
-}
-
-/* 3. BOXED STYLE (Classic Card) */
-.feature-card.style-boxed {
-  background: var(--bg-secondary);
+  background: var(--bg-primary);
   border: 1px solid var(--border-secondary);
   border-radius: var(--ui-border-radius-xl);
-  padding: 0; /* Image goes to edge */
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
   overflow: hidden;
-  box-shadow: var(--shadow-md);
-  transition: transform 0.3s ease;
 
-  &:hover { transform: translateY(-5px); box-shadow: var(--shadow-xl); }
+  // GPU-promoted hover lift
+  will-change: transform;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s ease,
+    border-color 0.25s ease;
 
-  .media-wrapper {
-    height: 240px;
-    width: 100%;
-    
-    img { width: 100%; height: 100%; object-fit: cover; }
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-2xl);
+    border-color: var(--accent-primary);
+    outline: none;
+
+    .fg-icon-wrap   { background: var(--accent-primary); color: #fff; transform: scale(1.08) rotate(-4deg); }
+    .fg-card-accent { transform: scaleX(1); }
+    .fg-link        { gap: 10px; }
   }
 
-  .content-box {
-    padding: var(--spacing-xl);
-    h3 { color: var(--text-primary); font-size: var(--font-size-xl); margin-bottom: var(--spacing-sm); }
-    p { color: var(--text-secondary); font-size: var(--font-size-sm); }
+  // Dark context variant — glassmorphic card
+  &.fg-card-dark {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
   }
 }
 
-/* SHARED LINK STYLES */
-.action-link {
+// Accent bar at bottom — scales in on hover
+.fg-card-accent {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent-primary);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+// ── Icon ─────────────────────────────────────────────────────────────────────
+
+.fg-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+  flex-shrink: 0;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+
+  &.fg-icon-wrap-dark {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.85);
+  }
+}
+
+.fg-icon {
+  font-size: 1.3rem;
+}
+
+// ── Media image (for image-type items) ───────────────────────────────────────
+
+.fg-media {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--ui-border-radius-lg);
+  overflow: hidden;
+  background: var(--bg-secondary);
+}
+
+.fg-media-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s ease;
+
+  .fg-card:hover & { transform: scale(1.05); }
+}
+
+// ── Text ─────────────────────────────────────────────────────────────────────
+
+.fg-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  flex: 1;
+}
+
+.fg-item-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  transition: color 0.2s ease;
+
+  &.fg-item-title-light { color: #fff; }
+}
+
+.fg-item-desc {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.7;
+
+  &.fg-item-desc-light { color: rgba(255, 255, 255, 0.65); }
+}
+
+// ── Link ─────────────────────────────────────────────────────────────────────
+
+.fg-link {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-top: var(--spacing-lg);
-  
+  gap: 6px;
   font-family: var(--font-mono);
-  font-size: var(--font-size-xs);
-  font-weight: 700;
+  font-size: 10px;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--color-primary); /* Default for light bg */
-  
+  letter-spacing: 1.5px;
+  color: var(--accent-primary);
   text-decoration: none;
-  transition: gap 0.2s ease;
-  
-  i { font-size: 0.7rem; }
-  
-  &:hover { gap: 12px; }
+  transition: gap 0.2s ease, color 0.15s ease;
+  margin-top: auto;
+  padding-top: var(--spacing-sm);
+
+  i { font-size: 9px; }
+
+  &.fg-link-light { color: rgba(255, 255, 255, 0.8); }
+  &:hover { color: var(--accent-hover, var(--accent-primary)); }
 }
 
-/* Animation Utilities */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fade-up {
-  opacity: 0;
-  animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-}
-
-.delay-100 { animation-delay: 100ms; }
-
-// @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Manrope:wght@400;600;700&display=swap');
+// /* ==========================================================================
+//    COMPONENT: PREMIUM FEATURE GRID
+//    Strict Token Usage
+//    ========================================================================== */
 
 // :host {
 //   display: block;
-//   font-family: 'Manrope', sans-serif;
 // }
 
 // .section-root {
 //   position: relative;
 //   background-size: cover;
 //   background-position: center;
-//   /* Default dark background if image fails */
-//   background-color: #1a1a1a; 
+//   background-color: var(--bg-primary); /* Default fallback */
+//   overflow: hidden;
 // }
 
 // /* Dark Overlay for Background Images */
 // .bg-overlay {
 //   position: absolute;
 //   inset: 0;
-//   background: rgba(0, 0, 0, 0.6); /* Adjust opacity for contrast */
+//   background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
 //   z-index: 0;
 // }
 
+// .container-wrapper {
+//   position: relative;
+//   z-index: 10;
+//   margin: 0 auto;
+//   padding: 0 var(--spacing-2xl);
+  
+//   &.standard { max-width: 1280px; }
+//   &.full { max-width: 100%; padding: 0 var(--spacing-xl); }
+// }
+
+// /* --- HEADER --- */
+// .header-group {
+//   margin-bottom: var(--spacing-5xl);
+//   max-width: 800px;
+  
+//   /* Text Align Utility */
+//   &.text-center { text-align: center; margin-left: auto; margin-right: auto; }
+//   &.text-left { text-align: left; }
+// }
+
+// .subtitle {
+//   display: inline-block;
+//   padding: 6px 12px;
+//   border-radius: 100px;
+  
+//   background: rgba(255, 255, 255, 0.1);
+//   backdrop-filter: blur(8px);
+//   border: 1px solid rgba(255, 255, 255, 0.2);
+  
+//   font-family: var(--font-mono);
+//   font-size: var(--font-size-xs);
+//   font-weight: 700;
+//   text-transform: uppercase;
+//   letter-spacing: 2px;
+//   color: white;
+//   margin-bottom: var(--spacing-md);
+// }
+
+// .section-title {
+//   font-family: var(--font-heading);
+//   font-size: var(--font-size-4xl);
+//   font-weight: 700;
+//   color: white; /* Assumes dark bg if image exists, otherwise override in template */
+//   line-height: 1.1;
+//   text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+
+//   @media (min-width: 768px) { font-size: var(--font-size-5xl); }
+// }
+
+// /* --- GRID LAYOUT --- */
 // .feature-grid {
 //   display: grid;
-//   gap: var(--gap, 2rem);
+//   gap: var(--gap, var(--spacing-xl));
 //   grid-template-columns: repeat(1, 1fr);
 
 //   @media (min-width: 768px) {
@@ -257,93 +356,127 @@
 //    CARD STYLES
 //    ============================================================ */
 
-// /* 1. Glass Style (Requested in JSON) */
+// /* 1. GLASS STYLE (Premium, Dark) */
 // .feature-card.style-glass {
-//   background: rgba(255, 255, 255, 0.1);
-//   backdrop-filter: blur(12px);
-//   border: 1px solid rgba(255, 255, 255, 0.15);
-//   border-radius: 24px;
-//   padding: 2.5rem;
-//   transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
+//   background: rgba(255, 255, 255, 0.05);
+//   backdrop-filter: blur(16px);
+//   border: 1px solid rgba(255, 255, 255, 0.1);
+//   border-radius: var(--ui-border-radius-xl);
+//   padding: var(--spacing-2xl);
+//   transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.3s;
+  
+//   h3, p { color: white; }
+//   p { opacity: 0.8; }
 
 //   &:hover {
-//     transform: translateY(-10px);
-//     box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
-//     background: rgba(255, 255, 255, 0.15);
+//     transform: translateY(-8px);
+//     background: rgba(255, 255, 255, 0.1);
+//     box-shadow: var(--shadow-2xl);
 //   }
 
-//   .image-frame {
-//     width: 100%;
-//     height: 200px;
-//     border-radius: 16px;
+//   .media-wrapper {
+//     height: 220px;
+//     border-radius: var(--ui-border-radius-lg);
 //     overflow: hidden;
-//     margin-bottom: 1.5rem;
+//     margin-bottom: var(--spacing-lg);
     
-//     img {
-//       width: 100%;
-//       height: 100%;
-//       object-fit: cover;
-//       transition: transform 0.6s ease;
-//     }
+//     img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
 //   }
-
-//   &:hover .image-frame img {
-//     transform: scale(1.1);
-//   }
+  
+//   &:hover .media-wrapper img { transform: scale(1.08); }
 // }
 
-// /* 2. Minimal Style (Icon based usually) */
+// /* 2. MINIMAL STYLE (Clean, Icon-based) */
 // .feature-card.style-minimal {
-//   padding: 1.5rem;
-//     background: var(--bg-secondary);
-//   border: 1px solid transparent;
+//   padding: var(--spacing-xl);
+//   border-radius: var(--ui-border-radius-lg);
+//   transition: background 0.3s ease;
+  
+//   h3 { color: var(--text-primary); margin-bottom: var(--spacing-sm); }
+//   p { color: var(--text-secondary); }
 
 //   &:hover {
-//     background: rgba(255,255,255,0.05);
-//     border-radius: 16px;
+//     background: var(--bg-secondary);
 //   }
 
 //   .icon-frame {
-//     width: 60px;
-//     height: 60px;
+//     width: 56px;
+//     height: 56px;
 //     border-radius: 12px;
-//     background: rgba(255,255,255,0.1);
-//     display: inline-flex; /* Centers it if text-align is center */
+//     background: var(--bg-secondary);
+//     display: inline-flex;
 //     align-items: center;
 //     justify-content: center;
 //     font-size: 1.5rem;
-//     margin-bottom: 1rem;
+//     margin-bottom: var(--spacing-md);
+//     color: var(--color-primary);
+//     transition: all 0.3s ease;
+//   }
+  
+//   &:hover .icon-frame {
+//     background: var(--color-primary);
+//     color: white;
+//     transform: scale(1.1) rotate(-5deg);
 //   }
 // }
 
-// /* 3. Boxed Style */
+// /* 3. BOXED STYLE (Classic Card) */
 // .feature-card.style-boxed {
-//   background: #ffffff;
-//   border-radius: 20px;
-//   padding: 2rem;
-//   box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  
-//   /* Text override for white card */
-//   h3 { color: #0f172a !important; }
-//   p { color: #64748b !important; }
-  
-//   .image-frame {
-//     height: 180px;
-//     border-radius: 12px;
-//     overflow: hidden;
+//   background: var(--bg-secondary);
+//   border: 1px solid var(--border-secondary);
+//   border-radius: var(--ui-border-radius-xl);
+//   padding: 0; /* Image goes to edge */
+//   overflow: hidden;
+//   box-shadow: var(--shadow-md);
+//   transition: transform 0.3s ease;
+
+//   &:hover { transform: translateY(-5px); box-shadow: var(--shadow-xl); }
+
+//   .media-wrapper {
+//     height: 240px;
+//     width: 100%;
+    
 //     img { width: 100%; height: 100%; object-fit: cover; }
 //   }
+
+//   .content-box {
+//     padding: var(--spacing-xl);
+//     h3 { color: var(--text-primary); font-size: var(--font-size-xl); margin-bottom: var(--spacing-sm); }
+//     p { color: var(--text-secondary); font-size: var(--font-size-sm); }
+//   }
 // }
 
-// /* Animation Classes */
+// /* SHARED LINK STYLES */
+// .action-link {
+//   display: inline-flex;
+//   align-items: center;
+//   gap: 8px;
+//   margin-top: var(--spacing-lg);
+  
+//   font-family: var(--font-mono);
+//   font-size: var(--font-size-xs);
+//   font-weight: 700;
+//   text-transform: uppercase;
+//   letter-spacing: 1px;
+//   color: var(--color-primary); /* Default for light bg */
+  
+//   text-decoration: none;
+//   transition: gap 0.2s ease;
+  
+//   i { font-size: 0.7rem; }
+  
+//   &:hover { gap: 12px; }
+// }
+
+// /* Animation Utilities */
+// @keyframes fadeUp {
+//   from { opacity: 0; transform: translateY(30px); }
+//   to { opacity: 1; transform: translateY(0); }
+// }
+
 // .animate-fade-up {
 //   opacity: 0;
-//   animation: fadeUp 0.8s ease-out forwards;
+//   animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 // }
 
 // .delay-100 { animation-delay: 100ms; }
-
-// @keyframes fadeUp {
-//   from { opacity: 0; transform: translateY(20px); }
-//   to { opacity: 1; transform: translateY(0); }
-// }

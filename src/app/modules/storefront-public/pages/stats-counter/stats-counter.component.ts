@@ -1,45 +1,53 @@
-import { Component, Input, ElementRef, ViewChild, AfterViewInit, computed, signal, Inject, PLATFORM_ID, OnDestroy } from '@angular/core';
+import { Component, Input, ElementRef, ViewChild, AfterViewInit, computed, signal, Inject, PLATFORM_ID, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { StatsCounterConfig } from '@core/models/storefront.model';
 
 @Component({
   selector: 'app-stats-counter',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './stats-counter.component.html',
-  styleUrls: ['./stats-counter.component.scss']
+  styleUrls: ['./stats-counter.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StatsCounterComponent implements AfterViewInit, OnDestroy {
-  @Input() config: any = {};
-  
+  @Input() set config(v: StatsCounterConfig) { this._config.set(v ?? {}); }
+  private _config = signal<StatsCounterConfig>({});
+
   @ViewChild('container') containerRef!: ElementRef;
-  
+
   // Track display values for animation
   displayValues = signal<string[]>([]);
-  
+
   private observer: IntersectionObserver | undefined;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) { }
 
-  backgroundStyle = computed(() => {
-    const style: any = {};
-    style['background-color'] = this.config.backgroundColor || 'var(--bg-secondary)';
-    
-    const paddingMap: any = { 
-      'sm': 'var(--spacing-3xl)', 
-      'md': 'var(--spacing-5xl)', 
-      'lg': 'var(--spacing-7xl)' 
-    };
-    
-    style['padding-top'] = paddingMap[this.config.paddingTop] || 'var(--spacing-5xl)';
-    style['padding-bottom'] = paddingMap[this.config.paddingBottom] || 'var(--spacing-5xl)';
-    
-    return style;
-  });
+  readonly cfg = computed(() => ({
+    paddingTop: this._config().paddingTop ?? 'md',
+    paddingBottom: this._config().paddingBottom ?? 'md',
+    backgroundColor: this._config().backgroundColor ?? 'var(--bg-secondary)',
+    themeMode: this._config().themeMode ?? 'auto',
+    items: this._config().items ?? []
+  }));
+
+  readonly paddingMap: Record<string, string> = {
+    'none': '0',
+    'sm': 'var(--spacing-3xl)',
+    'md': 'var(--spacing-5xl)',
+    'lg': 'var(--spacing-7xl)'
+  };
+
+  readonly sectionStyle = computed(() => ({
+    'background-color': this.cfg().backgroundColor,
+    'padding-top': this.paddingMap[this.cfg().paddingTop] ?? this.paddingMap['md'],
+    'padding-bottom': this.paddingMap[this.cfg().paddingBottom] ?? this.paddingMap['md']
+  }));
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
       // Initialize with zeros
-      this.displayValues.set(this.config.stats.map(() => '0'));
+      this.displayValues.set(this.cfg().items.map(() => '0'));
 
       this.observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -65,20 +73,20 @@ export class StatsCounterComponent implements AfterViewInit, OnDestroy {
     const frameDuration = 1000 / 60; // 60 FPS
     const totalFrames = Math.round(duration / frameDuration);
 
-    this.config.stats.forEach((stat: any, index: number) => {
+    this.cfg().items.forEach((stat, index) => {
       // Parse targets (handle "10.5" vs "1000")
-      const targetValue = parseFloat(stat.value) || 0;
-      const isFloat = stat.value.includes('.');
-      
+      const targetValue = stat.value || 0;
+      const isFloat = !Number.isInteger(targetValue);
+
       let frame = 0;
 
       const counter = setInterval(() => {
         frame++;
-        
+
         // Easing Function (EaseOutExpo) for premium feel
         const progress = frame / totalFrames;
         const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-        
+
         const currentVal = targetValue * easeProgress;
 
         // Formatting
@@ -102,76 +110,3 @@ export class StatsCounterComponent implements AfterViewInit, OnDestroy {
     });
   }
 }
-
-// import { Component, Input, ElementRef, ViewChildren, QueryList, AfterViewInit, computed, signal } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-
-// @Component({
-//   selector: 'app-stats-counter',
-//   standalone: true,
-//   imports: [CommonModule],
-//   templateUrl: './stats-counter.component.html',
-//   styleUrls: ['./stats-counter.component.scss']
-// })
-// export class StatsCounterComponent implements AfterViewInit {
-//   @Input() config: any = {};
-  
-//   @ViewChildren('statItem') statItems!: QueryList<ElementRef>;
-  
-//   // Track display values for animation
-//   displayValues = signal<number[]>([]);
-
-//   backgroundStyle = computed(() => {
-//     const style: any = {};
-//     if (this.config.backgroundColor) style['background-color'] = this.config.backgroundColor;
-//     const paddingMap: any = { 'sm': '2rem', 'md': '4rem', 'lg': '6rem' };
-//     style['padding-top'] = paddingMap[this.config.paddingTop] || '4rem';
-//     style['padding-bottom'] = paddingMap[this.config.paddingBottom] || '4rem';
-//     return style;
-//   });
-
-//   ngAfterViewInit() {
-//     // Initialize array with zeros
-//     this.displayValues.set(new Array(this.config.stats.length).fill(0));
-
-//     const observer = new IntersectionObserver((entries) => {
-//       entries.forEach(entry => {
-//         if (entry.isIntersecting) {
-//           this.animateCounters();
-//           observer.disconnect(); // Run once
-//         }
-//       });
-//     }, { threshold: 0.2 });
-
-//     if (this.statItems.first) {
-//       observer.observe(this.statItems.first.nativeElement.parentElement);
-//     }
-//   }
-
-//   animateCounters() {
-//     const duration = 2000; // 2 seconds
-//     const steps = 60;
-//     const intervalTime = duration / steps;
-
-//     this.config.stats.forEach((stat: any, index: number) => {
-//       const target = parseInt(stat.value, 10) || 0;
-//       const increment = target / steps;
-//       let current = 0;
-
-//       const timer = setInterval(() => {
-//         current += increment;
-//         if (current >= target) {
-//           current = target;
-//           clearInterval(timer);
-//         }
-        
-//         // Update signal immutably
-//         this.displayValues.update(vals => {
-//           const newVals = [...vals];
-//           newVals[index] = Math.floor(current);
-//           return newVals;
-//         });
-//       }, intervalTime);
-//     });
-//   }
-// }

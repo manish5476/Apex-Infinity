@@ -1,3 +1,4 @@
+// src/app/features/storefront-admin/storefront-admin.routes.ts
 import { Routes } from '@angular/router';
 
 export const STOREFRONT_ADMIN_ROUTES: Routes = [
@@ -8,14 +9,14 @@ export const STOREFRONT_ADMIN_ROUTES: Routes = [
   },
   {
     path: 'pages',
-    loadComponent: () => import('./pages/page-list/page-list.component')
-      .then(m => m.PageListComponent),
+    loadComponent: () =>
+      import('./pages/page-list/page-list.component').then(m => m.PageListComponent),
     title: 'Store Pages'
   },
   {
-    path: 'pages/:id/builder', // The main Editor
-    loadComponent: () => import('./pages/page-builder/page-builder.component')
-      .then(m => m.PageBuilderComponent),
+    path: 'pages/:id/builder',
+    loadComponent: () =>
+      import('./pages/page-builder/page-builder.component').then(m => m.PageBuilderComponent),
     title: 'Page Builder'
-  },
+  }
 ];

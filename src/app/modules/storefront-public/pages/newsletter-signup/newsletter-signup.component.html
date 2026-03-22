@@ -22,15 +22,15 @@
             <i class="pi pi-envelope"></i>
           </div>
 
-          <h2 class="title">{{ config.title || 'Stay Updated' }}</h2>
-          <p class="subtitle">{{ config.subtitle || 'Join our community and get exclusive access to new products and deals.' }}</p>
+          <h2 class="title">{{ cfg().title }}</h2>
+          <p class="subtitle">{{ cfg().description }}</p>
 
           <form [formGroup]="emailForm" (ngSubmit)="onSubmit()" class="form-wrapper">
             
             <div class="input-pill">
               <input type="email" 
                      formControlName="email"
-                     [placeholder]="config.placeholder || 'Enter your email address'"
+                     [placeholder]="cfg().placeholder"
                      class="email-input"
                      aria-label="Email Address">
               
@@ -40,13 +40,13 @@
                 @if (isSubmitting()) {
                   <span><i class="pi pi-spin pi-spinner"></i></span>
                 } @else {
-                  <span>{{ config.buttonText || 'Subscribe' }}</span>
+                  <span>{{ cfg().buttonText }}</span>
                 }
               </button>
             </div>
 
             <p class="disclaimer">
-              {{ config.disclaimer || 'No spam. Unsubscribe anytime.' }}
+              {{ cfg().disclaimer }}
             </p>
 
           </form>
