@@ -336,7 +336,9 @@ export class PageBuilderComponent implements OnInit {
       }
     });
   }
-
+  scrollToTop(): void {
+    document.getElementById('preview-container')?.scrollTo({ top: 0, behavior: 'smooth' });
+  }
   deletePage(): void {
     const page = this.page();
     if (!page?._id) return;
