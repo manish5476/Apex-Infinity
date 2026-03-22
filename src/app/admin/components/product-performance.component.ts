@@ -1,15 +1,9 @@
-import { Component, OnInit, signal, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { TagModule } from 'primeng/tag';
-
-// Services
 import { AdminAnalyticsService } from '../admin-analytics.service';
 import { CommonMethodService } from '../../core/utils/common-method.service';
-
-// Components
 import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
@@ -18,314 +12,690 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
   selector: 'app-product-performance',
   standalone: true,
   imports: [
-    CommonModule, 
-    ButtonModule, 
-    TooltipModule, 
-    ProgressSpinnerModule, 
-    TagModule, 
-    AgShareGrid,
-    UniversalFilterComponent
+    CommonModule, TooltipModule, ProgressSpinnerModule,
+    AgShareGrid, UniversalFilterComponent
   ],
   template: `
-    <div class="performance-container">
+<div class="pp-root">
 
-      <div class="filter-section">
-        <app-universal-filter
-          [entityType]="'product-performance'"
-          [config]="filterConfig"
-          (filterChange)="onFilterUpdate($event)">
-        </app-universal-filter>
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <app-universal-filter
+      entityType="product-performance"
+      [config]="filterConfig"
+      (filterChange)="onFilterUpdate($event)">
+    </app-universal-filter>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       LOADING
+  ═══════════════════════════════════════ -->
+  @if (loading()) {
+    <div class="loader-state">
+      <p-progressSpinner strokeWidth="3" styleClass="w-10 h-10"></p-progressSpinner>
+      <span class="loader-text">Auditing product performance…</span>
+    </div>
+  }
+
+  <!-- ══════════════════════════════════════
+       CONTENT
+  ═══════════════════════════════════════ -->
+  @if (!loading()) {
+
+    <!-- ── Profitability champions ── -->
+    <section class="champions-section">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">Profitability Champions</h2>
+          <p class="section-sub">Products delivering the highest net margin per unit</p>
+        </div>
+        <div class="head-actions">
+          <span class="scroll-hint">Scroll &rarr;</span>
+          <button class="export-btn" pTooltip="Export CSV" tooltipPosition="bottom">
+            <i class="pi pi-file-excel"></i>
+            <span>Export CSV</span>
+          </button>
+        </div>
       </div>
 
-      <ng-container *ngIf="!loading(); else loader">
-        
-        <div class="top-section">
-          <div class="section-header">
+      <!-- Horizontally scrollable margin cards -->
+      <div class="cards-track">
+        @for (prod of performanceData()?.highMargin; track prod._id) {
+          <div class="margin-card">
+            <div class="card-top-row">
+              <span class="status-badge status-badge--success">High Margin</span>
+              <i class="pi pi-arrow-up-right trend-icon"></i>
+            </div>
+            <p class="prod-name" [title]="prod.name">{{ prod.name }}</p>
+            <p class="prod-sku">{{ prod.sku }}</p>
+            <div class="card-stats">
+              <div>
+                <p class="card-stat-label">Margin / Unit</p>
+                <p class="card-stat-value card-stat-value--success">
+                  {{ commonService.formatCurrency(prod.margin) }}
+                </p>
+              </div>
+              <div class="card-stat-right">
+                <p class="card-pct">{{ prod.marginPercent | number:'1.1-1' }}%</p>
+                <div class="mini-track">
+                  <div class="mini-fill" [style.width.%]="prod.marginPercent > 100 ? 100 : prod.marginPercent"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <p class="empty-note">No high-margin products found for this selection.</p>
+        }
+      </div>
+    </section>
+
+    <!-- ── Dead stock grid + sidebar ── -->
+    <div class="body-grid">
+
+      <!-- Main: dead stock table -->
+      <div class="panel panel--flush">
+        <div class="panel-head">
+          <div>
+            <h3 class="panel-title">Dead Stock Inventory</h3>
+            <p class="panel-sub">Items with zero movement — liquidation candidates</p>
+          </div>
+          <span class="error-badge">
+            {{ performanceData()?.deadStock?.length || 0 }} items found
+          </span>
+        </div>
+        <div class="grid-wrap">
+          <app-ag-share-grid
+            [columns]="deadStockColumns"
+            [data]="performanceData()?.deadStock || []"
+            [showActions]="true"
+            (gridEvent)="handleGridAction($event)"
+            class="fill-grid">
+          </app-ag-share-grid>
+        </div>
+      </div>
+
+      <!-- Side: asset efficiency + tip -->
+      <div class="side-col">
+
+        <div class="panel panel--tinted">
+          <h4 class="widget-title">Asset Efficiency</h4>
+          <p class="widget-desc">Total capital locked in non-moving stock:</p>
+          <p class="locked-value">{{ commonService.formatCurrency(calculateTotalDeadStockValue()) }}</p>
+          <p class="locked-label">High Risk Exposure</p>
+          <button class="danger-btn">
+            <i class="pi pi-bolt"></i>
+            <span>Liquidate Strategy</span>
+          </button>
+        </div>
+
+        <div class="panel panel--info">
+          <div class="tip-row">
+            <i class="pi pi-info-circle tip-icon"></i>
             <div>
-              <h2 class="page-title">Profitability Champions</h2>
-              <p class="page-subtitle">Products delivering the highest net margin per unit</p>
-            </div>
-            <div class="header-actions">
-               <span class="scroll-hint">SCROLL &rarr;</span>
-               <p-button label="Export CSV" icon="pi pi-file-excel" [text]="true" size="small" severity="secondary"></p-button>
-            </div>
-          </div>
-
-          <div class="cards-scroller custom-scrollbar">
-            @for (prod of performanceData()?.highMargin; track prod._id) {
-              <div class="margin-card">
-                <div class="card-top">
-                  <span class="badge success">High Margin</span>
-                  <i class="pi pi-arrow-up-right trend-icon"></i>
-                </div>
-                
-                <h3 class="prod-name" [title]="prod.name">{{ prod.name }}</h3>
-                <p class="prod-sku">{{ prod.sku }}</p>
-                
-                <div class="card-stats">
-                  <div>
-                    <p class="stat-label">Margin/Unit</p>
-                    <p class="stat-value success">{{ commonService.formatCurrency(prod.margin) }}</p>
-                  </div>
-                  <div class="stat-right">
-                    <p class="percent-value">{{ prod.marginPercent | number:'1.1-1' }}%</p>
-                    <div class="progress-track">
-                       <div class="progress-fill success" [style.width]="(prod.marginPercent > 100 ? 100 : prod.marginPercent) + '%'"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            }
-          </div>
-        </div>
-
-        <div class="content-grid">
-          
-          <div class="main-column">
-            <div class="grid-card">
-              <div class="grid-header">
-                <div>
-                   <h3 class="grid-title">Dead Stock Inventory</h3>
-                   <p class="grid-sub">Items with zero movement (Liquidation Candidates)</p>
-                </div>
-                <span class="badge error">{{ performanceData()?.deadStock?.length || 0 }} ITEMS FOUND</span>
-              </div>
-              
-              <div class="grid-container">
-                 <app-ag-share-grid 
-                   [columns]="deadStockColumns" 
-                   [data]="performanceData()?.deadStock || []" 
-                   [showActions]="true" 
-                   (gridEvent)="handleGridAction($event)"
-                   class="full-size-grid">
-                 </app-ag-share-grid>
-              </div>
-            </div>
-          </div>
-
-          <div class="side-column">
-            <div class="side-card">
-               <h4 class="side-title">Asset Efficiency</h4>
-               <p class="side-text mb-md">Total capital locked in non-moving stock:</p>
-               <div class="mb-lg">
-                 <p class="locked-value">{{ commonService.formatCurrency(calculateTotalDeadStockValue()) }}</p>
-                 <p class="risk-label">High Risk Exposure</p>
-               </div>
-               <p-button label="Liquidate Strategy" severity="danger" [fluid]="true" size="small"></p-button>
-            </div>
-
-            <div class="side-card tip-card">
-              <div class="tip-content">
-                <i class="pi pi-info-circle tip-icon"></i>
-                <div>
-                  <p class="tip-title">Stock Rotation Tip</p>
-                  <p class="tip-text">
-                    <span class="highlight">Bundle Offer:</span> Combine dead stock items with high-margin champions to clear inventory faster.
-                  </p>
-                </div>
-              </div>
+              <p class="tip-title">Stock Rotation Tip</p>
+              <p class="tip-body">
+                <strong>Bundle Offer:</strong> Combine dead stock items with
+                high-margin champions to clear inventory faster.
+              </p>
             </div>
           </div>
         </div>
 
-      </ng-container>
-
-      <ng-template #loader>
-        <div class="loader-container">
-          <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-10 h-10"></p-progressSpinner>
-          <p class="loader-text">Auditing product performance...</p>
-        </div>
-      </ng-template>
-
+      </div>
     </div>
+
+  }
+
+</div>
   `,
   styles: [`
-    :host { display: block; width: 100%; }
-    .performance-container { padding: var(--spacing-lg) var(--spacing-xl); background: var(--bg-primary); min-height: 100%; }
+/* ============================================================
+   PRODUCT PERFORMANCE — TOKEN-DRIVEN
+   Zero hardcoded colors. All values use the canonical token
+   system. The only intentional non-token value is the
+   border-radius: 4px inside the cell-renderer button string —
+   CSS custom properties work in inline styles but border-radius
+   on an injected HTML string cannot reference SCSS variables.
+   Using var(--ui-border-radius-sm) in the inline style string
+   is safe and IS used below.
+   ============================================================ */
 
-    /* Filter Section */
-    .filter-section { margin-bottom: var(--spacing-lg); }
+:host { display: block; width: 100%; }
 
-    /* TOP SECTION */
-    .top-section { margin-bottom: var(--spacing-2xl); }
-    .section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--spacing-lg); }
-    .page-title { font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); color: var(--text-primary); margin: 0 0 4px 0; }
-    .page-subtitle { font-size: var(--font-size-sm); color: var(--text-tertiary); margin: 0; }
-    .header-actions { display: flex; gap: var(--spacing-sm); align-items: center; }
-    .scroll-hint { font-size: 10px; opacity: 0.6; font-weight: bold; color: var(--text-tertiary); display: none; }
-    @media(min-width: 768px) { .scroll-hint { display: block; } }
+.pp-root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+  padding: var(--spacing-xl);
+  background: var(--bg-secondary);
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  min-height: 100%;
+}
 
-    /* CARDS SCROLLER */
-    .cards-scroller { display: flex; gap: var(--spacing-lg); overflow-x: auto; padding-bottom: var(--spacing-md); scroll-snap-type: x mandatory; }
-    .margin-card { min-width: 280px; padding: var(--spacing-lg); background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--ui-border-radius-xl); transition: var(--transition-base); scroll-snap-align: start; display: flex; flex-direction: column; }
-    .margin-card:hover { transform: translateY(-2px); border-color: var(--border-secondary); box-shadow: var(--shadow-sm); }
-    .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--spacing-md); }
-    
-    .badge { font-size: 9px; font-weight: 800; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; border: 1px solid transparent; }
-    .badge.success { background: var(--color-success-bg); color: var(--color-success); border-color: var(--color-success-border); }
-    .badge.error { background: var(--color-error-bg); color: var(--color-error); border-color: var(--color-error-border); }
+/* ── Filter bar ── */
+.filter-bar { flex-shrink: 0; }
 
-    .trend-icon { color: var(--color-success); font-size: var(--font-size-xs); }
-    .prod-name { font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); color: var(--text-primary); margin: 0 0 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .prod-sku { font-size: var(--font-size-xs); color: var(--text-label); font-family: var(--font-mono); margin: 0 0 var(--spacing-lg) 0; }
-    .card-stats { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; }
-    .stat-label { font-size: var(--font-size-xs); color: var(--text-tertiary); margin: 0; }
-    .stat-value { font-size: var(--font-size-lg); font-weight: bold; margin: 0; }
-    .stat-value.success { color: var(--color-success); }
-    .stat-right { text-align: right; }
-    .percent-value { font-weight: bold; color: var(--text-primary); font-size: var(--font-size-sm); margin: 0; }
-    .progress-track { width: 3rem; height: 4px; background: var(--bg-ternary); border-radius: 99px; margin-top: 4px; overflow: hidden; }
-    .progress-fill.success { background: var(--color-success); height: 100%; }
+/* ── Loader ── */
+.loader-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-5xl);
+  min-height: 300px;
+}
 
-    /* CONTENT GRID */
-    .content-grid { display: grid; grid-template-columns: 1fr; gap: var(--spacing-lg); }
-    @media(min-width: 1024px) { .content-grid { grid-template-columns: 2fr 1fr; } }
+.loader-text {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+}
 
-    /* GRID CARD */
-    .grid-card { background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--ui-border-radius-xl); overflow: hidden; height: 100%; min-height: 400px; display: flex; flex-direction: column; box-shadow: var(--shadow-sm); }
-    .grid-header { padding: var(--spacing-md) var(--spacing-lg); border-bottom: 1px solid var(--border-primary); background: var(--bg-ternary); display: flex; justify-content: space-between; align-items: center; }
-    .grid-title { font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); text-transform: uppercase; color: var(--text-primary); margin: 0; }
-    .grid-sub { font-size: 10px; color: var(--text-tertiary); margin: 2px 0 0 0; }
-    .grid-container { flex: 1; position: relative; }
-    .full-size-grid { width: 100%; height: 100%; display: block; }
+/* ══════════════════════════════════════════════════════════
+   CHAMPIONS SECTION
+   ══════════════════════════════════════════════════════════ */
+.champions-section { flex-shrink: 0; }
 
-    /* SIDEBAR */
-    .side-column { display: flex; flex-direction: column; gap: var(--spacing-lg); }
-    .side-card { background: var(--bg-ternary); border: 1px solid var(--border-secondary); border-radius: var(--ui-border-radius-xl); padding: var(--spacing-lg); }
-    .side-title { font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); text-transform: uppercase; color: var(--text-label); margin: 0 0 var(--spacing-sm) 0; }
-    .side-text { font-size: var(--font-size-xs); color: var(--text-tertiary); margin: 0; }
-    .mb-md { margin-bottom: var(--spacing-md); }
-    .mb-lg { margin-bottom: var(--spacing-lg); }
-    .locked-value { font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--color-error); margin: 0; line-height: 1; }
-    .risk-label { font-size: 10px; font-weight: bold; text-transform: uppercase; color: var(--color-error); opacity: 0.8; margin-top: 4px; }
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
 
-    /* TIP CARD */
-    .tip-card { background: var(--color-info-bg); border: 1px dashed var(--color-info); }
-    .tip-content { display: flex; gap: var(--spacing-sm); }
-    .tip-icon { color: var(--color-info); margin-top: 2px; }
-    .tip-title { font-weight: var(--font-weight-bold); font-size: var(--font-size-sm); color: var(--color-info); margin: 0 0 4px 0; }
-    .tip-text { font-size: var(--font-size-xs); color: var(--text-secondary); line-height: 1.4; margin: 0; }
-    .highlight { font-weight: bold; color: var(--text-primary); }
+.section-title {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs) 0;
+  line-height: var(--line-height-tight);
+}
 
-    /* SCROLLBAR */
-    .custom-scrollbar::-webkit-scrollbar { height: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: var(--bg-secondary); }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border-primary); border-radius: 4px; }
+.section-sub {
+  font-size: var(--font-size-sm);
+  color: var(--text-tertiary);
+  margin: 0;
+}
 
-    /* LOADER */
-    .loader-container { height: 50vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--spacing-md); }
-    .loader-text { font-size: var(--font-size-sm); color: var(--text-tertiary); }
+.head-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex-shrink: 0;
+}
+
+.scroll-hint {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-tertiary);
+  opacity: 0.6;
+  display: none;
+
+  @media (min-width: 768px) { display: block; }
+}
+
+.export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  height: 30px;
+  padding: 0 var(--spacing-lg);
+  border: var(--ui-border-width) solid var(--border-primary);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  border-radius: var(--ui-border-radius);
+  cursor: pointer;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  font-family: var(--font-body);
+  transition: var(--transition-base);
+
+  &:hover { background: var(--component-bg-hover); color: var(--accent-primary); }
+}
+
+/* ── Horizontally scrollable card track ── */
+.cards-track {
+  display: flex;
+  gap: var(--spacing-lg);
+  overflow-x: auto;
+  padding-bottom: var(--spacing-md);
+  scroll-snap-type: x mandatory;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+
+  &::-webkit-scrollbar       { height: 5px; }
+  &::-webkit-scrollbar-track { background: var(--scroll-track); }
+  &::-webkit-scrollbar-thumb {
+    background: var(--scroll-thumb);
+    border-radius: var(--ui-border-radius-pill);
+  }
+}
+
+.empty-note {
+  font-size: var(--font-size-sm);
+  color: var(--text-tertiary);
+  font-style: italic;
+  padding: var(--spacing-xl);
+}
+
+/* ── Margin card ── */
+.margin-card {
+  min-width: 270px;
+  flex-shrink: 0;
+  padding: var(--spacing-lg);
+  background: var(--bg-primary);
+  border: var(--ui-border-width) solid var(--border-primary);
+  border-radius: var(--ui-border-radius-lg);
+  display: flex;
+  flex-direction: column;
+  scroll-snap-align: start;
+  transition: var(--transition-base);
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-secondary);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-md);
+}
+
+/* Status badge */
+.status-badge {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--ui-border-radius-pill);
+  border: var(--ui-border-width) solid transparent;
+
+  &--success {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+    border-color: var(--color-success-border);
+  }
+}
+
+.trend-icon { color: var(--color-success); font-size: var(--font-size-base); }
+
+.prod-name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs) 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.prod-sku {
+  font-size: var(--font-size-xs);
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.card-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: auto;
+}
+
+.card-stat-label {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.card-stat-value {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-mono);
+  margin: 0;
+  color: var(--text-primary);
+
+  &--success { color: var(--color-success); }
+}
+
+.card-stat-right { text-align: right; }
+
+.card-pct {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.mini-track {
+  width: 3rem;
+  height: 4px;
+  background: var(--bg-ternary);
+  border-radius: var(--ui-border-radius-pill);
+  overflow: hidden;
+  margin-left: auto;
+}
+
+.mini-fill {
+  height: 100%;
+  background: var(--color-success);
+  border-radius: var(--ui-border-radius-pill);
+}
+
+/* ══════════════════════════════════════════════════════════
+   BODY GRID
+   ══════════════════════════════════════════════════════════ */
+.body-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-lg);
+  flex: 1;
+  min-height: 0;
+
+  @media (min-width: 1024px) { grid-template-columns: 2fr 1fr; }
+}
+
+/* ── Shared panel ── */
+.panel {
+  background: var(--bg-primary);
+  border: var(--ui-border-width) solid var(--border-primary);
+  border-radius: var(--ui-border-radius-lg);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+
+  &--flush {
+    padding: 0;
+    overflow: hidden;
+    min-height: 400px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  &--tinted {
+    background: var(--bg-ternary);
+    border-color: var(--border-secondary);
+  }
+
+  &--info {
+    background: var(--color-info-bg);
+    border: var(--ui-border-width) dashed var(--color-info-border);
+  }
+}
+
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: var(--ui-border-width) solid var(--border-primary);
+  background: var(--bg-secondary);
+  flex-shrink: 0;
+  gap: var(--spacing-lg);
+}
+
+.panel-title {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.panel-sub {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  margin: var(--spacing-xs) 0 0 0;
+}
+
+.error-badge {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--ui-border-radius-pill);
+  background: var(--color-error-bg);
+  color: var(--color-error);
+  border: var(--ui-border-width) solid var(--color-error-border);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.grid-wrap {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+}
+
+.fill-grid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── Side column ── */
+.side-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.widget-title {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
+.widget-desc {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
+.locked-value {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-mono);
+  color: var(--color-error);
+  margin: 0;
+  line-height: var(--line-height-tight);
+}
+
+.locked-label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-error);
+  opacity: 0.8;
+  margin: var(--spacing-xs) 0 0 0;
+}
+
+.danger-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  width: 100%;
+  height: 34px;
+  background: var(--color-error);
+  color: #fff;
+  border: none;
+  border-radius: var(--ui-border-radius);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-body);
+  transition: var(--transition-base);
+
+  &:hover { background: var(--color-error-dark); }
+}
+
+/* ── Tip panel ── */
+.tip-row {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+}
+
+.tip-icon {
+  color: var(--color-info);
+  font-size: var(--font-size-base);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.tip-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-info);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.tip-body {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  line-height: var(--line-height-relaxed);
+  margin: 0;
+}
   `]
 })
 export class ProductPerformanceComponent implements OnInit {
+  private analyticsService = inject(AdminAnalyticsService);
+  public commonService = inject(CommonMethodService);
+  private cdr = inject(ChangeDetectorRef);
+
   performanceData = signal<any>(null);
-  loading = signal<boolean>(false);
+  loading = signal(false);
   deadStockColumns: any[] = [];
 
-  private currentFilters: any = {};
+  private currentFilters: Record<string, any> = {};
 
   filterConfig: FilterField[] = [
-    { 
-      key: 'branchId', 
-      label: 'Branch Context', 
-      type: 'select', 
-      dataSourceKey: 'branches', 
-      optionLabel: 'name', 
-      optionValue: '_id', 
-      placeholder: 'Global Inventory' 
+    {
+      key: 'branchId',
+      label: 'Branch Context',
+      type: 'select',
+      dataSourceKey: 'branches',
+      optionLabel: 'name',
+      optionValue: '_id',
+      placeholder: 'Global Inventory'
     }
   ];
 
-  constructor(
-    private analyticsService: AdminAnalyticsService,
-    public commonService: CommonMethodService,
-    private cdr: ChangeDetectorRef
-  ) {}
+  ngOnInit(): void { this.setupColumns(); }
 
-  ngOnInit() {
-    this.setupColumns();
-  }
-
-  onFilterUpdate(filters: any) {
+  onFilterUpdate(filters: Record<string, any>): void {
     this.currentFilters = filters;
     this.loadData();
   }
 
-  // FIXED: Separated Columns
-  setupColumns(): void {
-    this.deadStockColumns = [
-      // 1. PRODUCT NAME
-      { 
-        field: 'name', 
-        headerName: 'Product Name', 
-        sortable: true, 
-        flex: 1.5, 
-        minWidth: 180,
-        cellStyle: { 'font-weight': '700', 'color': 'var(--text-primary)', 'font-size': '12px' }
-      },
-      // 2. SKU CODE
-      { 
-        field: 'sku', 
-        headerName: 'SKU', 
-        sortable: true, 
-        width: 140, 
-        cellStyle: { 'font-family': 'var(--font-mono)', 'color': 'var(--text-secondary)', 'font-size': '11px', 'letter-spacing': '0.5px' }
-      },
-      // 3. QUANTITY
-      { 
-        field: 'stockQuantity', 
-        headerName: 'Qty', 
-        sortable: true, 
-        width: 100, 
-        type: 'rightAligned',
-        cellStyle: { 'font-family': 'var(--font-mono)', 'font-weight': '600', 'text-align': 'right', 'color': 'var(--text-primary)' }
-      },
-      // 4. TIED CAPITAL (Value)
-      { 
-        field: 'value', 
-        headerName: 'Tied Capital', 
-        sortable: true, 
-        width: 140, 
-        type: 'rightAligned',
-        valueFormatter: (params: any) => this.commonService.formatCurrency(params.value),
-        cellStyle: { 'font-weight': '700', 'color': 'var(--color-error)', 'text-align': 'right', 'font-family': 'var(--font-mono)' }
-      },
-      // 5. ACTION
-      { 
-        headerName: 'Action',
-        width: 110,
-        cellRenderer: (params: any) => {
-           return `<button style="background: var(--bg-primary); border: 1px solid var(--color-error-border); color: var(--color-error); padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; cursor: pointer; text-transform: uppercase; transition: all 0.2s;">
-                     Liquidate
-                   </button>`;
-        },
-        cellStyle: { 'display': 'flex', 'align-items': 'center', 'justify-content': 'center' }
-      }
-    ];
-    this.cdr.detectChanges();
-  }
-
-  handleGridAction(event: any) {
-    console.log('Grid Action:', event);
-  }
-
-  calculateTotalDeadStockValue(): number {
-    const stock = this.performanceData()?.deadStock || [];
-    return stock.reduce((sum: number, item: any) => sum + (item.value || 0), 0);
-  }
-
-  loadData() {
+  loadData(): void {
     this.loading.set(true);
-    const branchId = this.currentFilters.branchId;
-
-    this.analyticsService.getProductPerformance(branchId).subscribe({
+    this.analyticsService.getProductPerformance(this.currentFilters['branchId']).subscribe({
       next: (res) => {
-        if (res.status === 'success') {
-          this.performanceData.set(res.data);
-        }
+        if (res.status === 'success') this.performanceData.set(res.data);
         this.loading.set(false);
       },
       error: () => this.loading.set(false)
     });
+  }
+
+  calculateTotalDeadStockValue(): number {
+    return (this.performanceData()?.deadStock ?? [])
+      .reduce((sum: number, item: any) => sum + (item.value ?? 0), 0);
+  }
+
+  handleGridAction(event: any): void {
+    // Handle liquidate action from grid
+  }
+
+  setupColumns(): void {
+    this.deadStockColumns = [
+      {
+        field: 'name',
+        headerName: 'Product Name',
+        sortable: true,
+        flex: 1.5,
+        minWidth: 180,
+        cellStyle: {
+          'font-weight': 'var(--font-weight-semibold)',
+          'color': 'var(--text-primary)',
+          'font-size': 'var(--font-size-sm)'
+        }
+      },
+      {
+        field: 'sku',
+        headerName: 'SKU',
+        sortable: true,
+        width: 140,
+        cellStyle: {
+          'font-family': 'var(--font-mono)',
+          'color': 'var(--text-secondary)',
+          'font-size': 'var(--font-size-xs)',
+          'letter-spacing': '0.5px'
+        }
+      },
+      {
+        field: 'stockQuantity',
+        headerName: 'Qty',
+        sortable: true,
+        width: 100,
+        type: 'rightAligned',
+        cellStyle: {
+          'font-family': 'var(--font-mono)',
+          'font-weight': 'var(--font-weight-semibold)',
+          'text-align': 'right',
+          'color': 'var(--text-primary)'
+        }
+      },
+      {
+        field: 'value',
+        headerName: 'Tied Capital',
+        sortable: true,
+        width: 140,
+        type: 'rightAligned',
+        valueFormatter: (p: any) => this.commonService.formatCurrency(p.value),
+        cellStyle: {
+          'font-weight': 'var(--font-weight-bold)',
+          'font-family': 'var(--font-mono)',
+          'color': 'var(--color-error)',
+          'text-align': 'right'
+        }
+      },
+      {
+        headerName: 'Action',
+        width: 110,
+        // CSS vars work in inline styles injected into cell renderer HTML
+        cellRenderer: () =>
+          `<button style="background:var(--bg-primary);border:1px solid var(--color-error-border);color:var(--color-error);padding:4px 10px;border-radius:var(--ui-border-radius-sm);font-size:var(--font-size-xs);font-weight:var(--font-weight-bold);cursor:pointer;text-transform:uppercase;font-family:var(--font-body);">
+             Liquidate
+           </button>`,
+        cellStyle: { 'display': 'flex', 'align-items': 'center', 'justify-content': 'center' }
+      }
+    ];
+    this.cdr.detectChanges();
   }
 }

@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { Login } from './components/login/login'; // Adjust path if needed
+import { LoginComponent } from './components/login/login'; // Adjust path if needed
 import { Signup } from './components/signup/signup'; // Adjust path if needed
 import { ResetPasswordComponent } from './components/reset-password/reset-password';
 import { UpdatePasswordComponent } from './components/update-password/update-password';
@@ -8,7 +8,7 @@ import { CreateOrganizationComponent } from '../organization/components/create-o
 
 export const AUTH_ROUTES: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
-  { path: 'login', component: Login, title: 'Login - Apex CRM' },
+  { path: 'login', component: LoginComponent, title: 'Login - Apex CRM' },
   { path: 'signup', component: Signup, title: 'Signup - Apex CRM' },
   { path: 'resetpassword/:token', component: ResetPasswordComponent, title: 'Reset Password - Apex CRM' },
   { path: 'forgot-password', component: ForgotPasswordComponent, title: 'Forgot Password - Apex CRM' },
