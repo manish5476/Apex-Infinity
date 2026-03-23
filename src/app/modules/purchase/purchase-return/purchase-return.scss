@@ -13,6 +13,7 @@
   margin: 0 auto;
   height: 100%;
   display: flex;
+  border-radius: var(--radius-2xl);
   flex-direction: column;
   overflow: hidden; /* Prevent double scrollbars */
 }

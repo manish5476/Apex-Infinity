@@ -1,4 +1,36 @@
-<section class="section-root" [ngStyle]="sectionStyle()">
+<!-- split-image-text.component.html -->
+<section class="split-root" [ngStyle]="sectionStyle()">
+  <div class="split-container" [class.image-right]="cfg().imagePosition === 'right'">
+
+    <!-- Image column -->
+    <div class="split-image-col">
+      <div class="split-image-frame">
+        <img [src]="cfg().image" [alt]="cfg().title" loading="lazy" class="split-img" />
+        <div class="split-img-accent" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <!-- Text column -->
+    <div class="split-text-col">
+      <span class="split-eyebrow">Our Story</span>
+      <h2 class="split-title">{{ cfg().title }}</h2>
+      <p class="split-body">{{ cfg().content }}</p>
+
+      @if (cfg().ctaButton) {
+      @if (isExternal(cfg().ctaButton!.link)) {
+      <a [href]="cfg().ctaButton!.link" target="_blank" rel="noopener" class="split-cta">
+        {{ cfg().ctaButton!.text }} <i class="pi pi-arrow-right"></i>
+      </a>
+      } @else {
+      <a [routerLink]="[cfg().ctaButton!.link]" class="split-cta">
+        {{ cfg().ctaButton!.text }} <i class="pi pi-arrow-right"></i>
+      </a>
+      }
+      }
+    </div>
+  </div>
+</section>
+<!-- <section class="section-root" [ngStyle]="sectionStyle()">
   
   <div class="container-wrapper">
     
@@ -42,4 +74,4 @@
     </div>
 
   </div>
-</section>
+</section> -->

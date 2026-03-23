@@ -3759,10 +3759,6 @@
   box-shadow: var(--shadow-xl);
 }
 
-
-
-
-
 // 0000000000000000000
 /* =========================================
    THEME 18: DEEP SPACE (Void Black & Cyan)
@@ -3811,6 +3807,130 @@
   --component-border-focus: #22d3ee;
   --component-surface-raised: #0b0f19;
   --component-divider: #1e293b;
+
+  @include apply-canonical-mapping;
+}
+
+
+// =============================================================================
+// THEME 1 — Slate Ember
+// Dark shell with warm terracotta accents. Use when you want a sophisticated
+// dark UI that feels grounded and premium rather than "gamer dark".
+// =============================================================================
+.theme-slate-ember {
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  // ── Backgrounds (deep slate blue-black stack) ───────────────────────────
+  --theme-bg-primary:   #161b28; // Deepest — sidebars, modals, wells
+  --theme-bg-secondary: #1a1f2e; // Canvas — the page background
+  --theme-bg-ternary:   #212636; // Raised — cards, panels, table rows
+
+  // ── Typography ──────────────────────────────────────────────────────────
+  --theme-text-primary:   #f0ebe3; // Near-white with a warm tint
+  --theme-text-secondary: #c7bfb7; // Muted warm grey
+  --theme-text-tertiary:  #8a96b0; // Dimmed cool-slate
+  --theme-text-label:     #5a6480; // Faintest — placeholder, hints
+
+  // ── Borders ─────────────────────────────────────────────────────────────
+  --theme-border-primary:   rgba(255, 255, 255, 0.07); // Subtle panel dividers
+  --theme-border-secondary: rgba(255, 255, 255, 0.12); // Hover / focus borders
+
+  // ── Accents (terracotta ember) ───────────────────────────────────────────
+  --theme-accent-primary:   #c96a3b; // Burnt orange — CTAs, active states
+  --theme-accent-secondary: #e0854d; // Mid ember — hover highlights
+  --theme-accent-tertiary:  #f0a876; // Soft glow — selected bg tint
+  --theme-accent-gradient:  linear-gradient(135deg, #c96a3b 0%, #e0854d 100%);
+  --theme-accent-focus:     rgba(201, 106, 59, 0.18);
+  --theme-accent-hover:     #a8542c; // Darker for hover on buttons
+
+  // ── Status ──────────────────────────────────────────────────────────────
+  --theme-success: #059669;
+  --theme-warning: #ea580c;
+  --theme-error:   #e11d48;
+  --theme-info:    #0284c7;
+
+  --theme-disabled:      #2e3448;
+  --theme-disabled-text: #4a5270;
+
+  // ── Glass (dark tinted) ─────────────────────────────────────────────────
+  --glass-bg:     rgba(22, 27, 40, 0.75);
+  --glass-blur:   16px;
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+  // ── Component states ────────────────────────────────────────────────────
+  --component-bg-hover:       #252b3d;
+  --component-bg-active:      #1e2333;
+  --component-border-focus:   #c96a3b;
+  --component-surface-raised: #212636;
+  --component-divider:        rgba(255, 255, 255, 0.07);
+
+  // ── Scrollbar ───────────────────────────────────────────────────────────
+  --scroll-thumb: rgba(201, 106, 59, 0.4);
+  --scroll-track: transparent;
+
+  @include apply-canonical-mapping;
+}
+
+
+// =============================================================================
+// THEME 2 — Sage & Cream
+// Light cream background with deep forest-green accents. Organic, warm, and
+// easy on the eyes — ideal for long work sessions and content-heavy UIs.
+// =============================================================================
+.theme-sage-cream {
+  --font-heading: 'Plus Jakarta Sans', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  // ── Backgrounds (warm cream stack) ─────────────────────────────────────
+  --theme-bg-primary:   #f5f0e8; // Parchment — sidebar, modal surface
+  --theme-bg-secondary: #eee8dc; // Cream — main canvas
+  --theme-bg-ternary:   #e4dcd0; // Linen — table rows, wells, alternates
+
+  // ── Typography ──────────────────────────────────────────────────────────
+  --theme-text-primary:   #1c2b1e; // Deep forest — headings, body
+  --theme-text-secondary: #2d4030; // Dark sage — subheadings
+  --theme-text-tertiary:  #4a5e4d; // Mid sage — descriptions, meta
+  --theme-text-label:     #8a9e8d; // Faint sage — placeholders, hints
+
+  // ── Borders ─────────────────────────────────────────────────────────────
+  --theme-border-primary:   #d4cbbe; // Warm taupe — default borders
+  --theme-border-secondary: #c6bfb1; // Slightly darker on hover / focus
+
+  // ── Accents (forest green) ───────────────────────────────────────────────
+  --theme-accent-primary:   #3d5c41; // Deep pine — buttons, links, active
+  --theme-accent-secondary: #527a57; // Mid forest — hover
+  --theme-accent-tertiary:  #7da882; // Sage mist — selected bg tint
+  --theme-accent-gradient:  linear-gradient(135deg, #3d5c41 0%, #527a57 100%);
+  --theme-accent-focus:     rgba(61, 92, 65, 0.12);
+  --theme-accent-hover:     #2c4530; // Darker for pressed states
+
+  // ── Status ──────────────────────────────────────────────────────────────
+  --theme-success: #059669;
+  --theme-warning: #b45309;
+  --theme-error:   #b91c1c;
+  --theme-info:    #0369a1;
+
+  --theme-disabled:      #d4cbbe;
+  --theme-disabled-text: #9a9488;
+
+  // ── Glass (frosted cream) ───────────────────────────────────────────────
+  --glass-bg:     rgba(245, 240, 232, 0.72);
+  --glass-blur:   14px;
+  --glass-border: rgba(255, 255, 255, 0.65);
+  --glass-shadow: 0 4px 20px rgba(61, 92, 65, 0.12);
+
+  // ── Component states ────────────────────────────────────────────────────
+  --component-bg-hover:       #f9f6f0;
+  --component-bg-active:      #ece5d8;
+  --component-border-focus:   #3d5c41;
+  --component-surface-raised: #ffffff;
+  --component-divider:        #d4cbbe;
+
+  // ── Scrollbar ───────────────────────────────────────────────────────────
+  --scroll-thumb: rgba(61, 92, 65, 0.3);
+  --scroll-track: transparent;
 
   @include apply-canonical-mapping;
 }

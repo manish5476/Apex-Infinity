@@ -8,6 +8,7 @@
 .list-page-container {
   display: flex;
   flex-direction: column;
+  border-radius: var(--radius-2xl);
   height: 100%;
   padding: 0.75rem; // Minimal padding for maximum grid size
   background-color: var(--theme-bg-secondary);

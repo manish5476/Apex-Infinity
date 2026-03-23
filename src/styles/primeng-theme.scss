@@ -1,3 +1,51 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* * PRIMENG DESIGN SYSTEM OVERRIDE
  * Source: Project Root Tokens
  * Scope: Full Component Suite
@@ -1041,40 +1089,6 @@
 // 7. PANELS & CONTAINERS
 // ==========================================================================
 
-// /* Card */
-// .p-card {
-//   background: var(--bg-primary);
-//   color: var(--text-primary);
-//   box-shadow: var(--shadow-md);
-//   border-radius: var(--ui-border-radius-xl);
-//   display: flex;
-//   flex-direction: column;
-
-//   .p-card-body {
-//     padding: var(--spacing-xl);
-//   }
-
-//   .p-card-title {
-//     font-family: var(--font-heading);
-//     font-size: var(--font-size-xl);
-//     font-weight: var(--font-weight-semibold);
-//     margin-bottom: var(--spacing-md);
-//   }
-
-//   .p-card-subtitle {
-//     font-weight: var(--font-weight-normal);
-//     color: var(--text-secondary);
-//     margin-bottom: var(--spacing-md);
-//   }
-  
-//   .p-card-content {
-//      padding: var(--spacing-sm) 0;
-//   }
-  
-//   .p-card-footer {
-//      padding-top: var(--spacing-md);
-//   }
-// }
 /* ==========================================================================
    PRIMENG CARD COMPONENT
    Clean & Minimal Design with Your Theme Tokens
@@ -1806,59 +1820,6 @@
     }
   }
 }
-
-// /* Tabs */
-// .p-tabs {
-//    display: flex;
-//    flex-direction: column;
-   
-//    .p-tablist {
-//       position: relative;
-      
-//       .p-tablist-tab-list {
-//          display: flex;
-//          background: var(--bg-primary);
-//          border-bottom: 2px solid var(--border-secondary);
-//       }
-      
-//       .p-tab {
-//          padding: var(--spacing-md) var(--spacing-xl);
-//          color: var(--text-secondary);
-//          font-weight: var(--font-weight-medium);
-//          cursor: pointer;
-//          transition: var(--transition-colors);
-//          background: transparent;
-//          border: none;
-//          position: relative;
-//          bottom: -2px; // Overlap border
-//          border-bottom: 2px solid transparent;
-         
-//          &:not(.p-disabled):hover {
-//             color: var(--text-primary);
-//             border-bottom-color: var(--border-secondary);
-//          }
-         
-//          &.p-tab-active {
-//             color: var(--accent-primary);
-//             border-bottom-color: var(--accent-primary);
-//          }
-//       }
-      
-//       // Active ink bar handling if component uses it separately
-//       .p-tablist-active-bar {
-//          height: 2px;
-//          background-color: var(--accent-primary);
-//          bottom: -2px;
-//       }
-//    }
-   
-//    .p-tabpanels {
-//       background: var(--bg-primary);
-//       padding: var(--spacing-lg) 0;
-//       color: var(--text-primary);
-//    }
-// }
-
 // ==========================================================================
 // 8. FEEDBACK (Toast, Message)
 // ==========================================================================
@@ -2929,3 +2890,3202 @@
 .p-editor .ql-fill {
   fill: var(--text-primary) !important;
 }
+
+
+
+
+// /* ==========================================================================
+//    PRIMENG PREMIUM DESIGN SYSTEM OVERRIDE
+//    ─────────────────────────────────────────────────────────────────────────
+//    Philosophy : Every pixel earns its place. Token-only colors. Zero magic
+//                 numbers. Overlays always stack correctly. Interactions feel
+//                 physical — not just "styled".
+
+//    Structure  :
+//      1.  Mixins & Utilities
+//      2.  Inputs & Form Controls
+//      3.  Selection Components (Select / Multi / Cascade / AutoComplete)
+//      4.  DatePicker
+//      5.  Buttons
+//      6.  Data Display (Table, Tree, Paginator, Timeline, OrderList)
+//      7.  Panels & Containers (Card, Accordion, Panel, Fieldset, Divider)
+//      8.  Tabs
+//      9.  Overlays (Dialog, Drawer/Sidebar, OverlayPanel, Tooltip, Popover)
+//      10. Feedback (Toast, Messages, InlineMessage)
+//      11. Navigation (Menu, TieredMenu, Breadcrumb, Steps, MegaMenu)
+//      12. Misc (Badge, Tag, Chip, Avatar, ProgressBar, Spinner, Skeleton)
+//      13. Editor (Quill)
+//      14. Animations
+//    ========================================================================== */
+
+
+// // ============================================================
+// //  1. MIXINS & UTILITIES
+// // ============================================================
+
+// // ── Shared input foundation ──────────────────────────────────
+// @mixin input-base {
+//   font-family    : var(--font-body);
+//   font-size      : var(--font-size-md);
+//   font-weight    : var(--font-weight-normal);
+//   color          : var(--text-primary);
+//   background     : var(--bg-primary);
+//   border         : var(--ui-border-width) solid var(--border-primary);
+//   border-radius  : var(--ui-border-radius);
+//   padding        : var(--spacing-md) var(--spacing-lg);
+//   line-height    : var(--line-height-normal);
+//   transition     : border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+//   outline        : none;
+//   width          : 100%;
+//   appearance     : none;
+
+//   &::placeholder {
+//     color       : var(--text-label);
+//     font-weight : var(--font-weight-normal);
+//   }
+
+//   &:enabled:hover {
+//     border-color : var(--border-secondary);
+//     background   : var(--component-bg-hover);
+//   }
+
+//   &:enabled:focus,
+//   &:enabled:focus-visible {
+//     border-color : var(--accent-primary);
+//     box-shadow   : 0 0 0 3px var(--accent-focus);
+//     background   : var(--bg-primary);
+//   }
+
+//   &.ng-dirty.ng-invalid,
+//   &.p-invalid {
+//     border-color : var(--color-error);
+
+//     &:enabled:focus {
+//       box-shadow : 0 0 0 3px var(--color-error-bg);
+//     }
+//   }
+
+//   &:disabled,
+//   &.p-disabled {
+//     background   : var(--color-disabled);
+//     color        : var(--color-disabled-text);
+//     border-color : var(--border-primary);
+//     opacity      : var(--state-disabled-opacity);
+//     cursor       : not-allowed;
+//     pointer-events: none;
+//   }
+// }
+
+// // ── Overlay panel foundation ─────────────────────────────────
+// // FIX: explicit position + isolation so overlays never get
+// //      clipped by parent overflow:hidden or wrong z-index.
+// @mixin overlay-panel {
+//   position         : absolute; // overridden to fixed where needed
+//   z-index          : var(--z-dropdown) !important;
+//   background       : var(--bg-primary);
+//   border           : var(--ui-border-width) solid var(--border-secondary);
+//   border-radius    : var(--ui-border-radius-lg);
+//   box-shadow       : var(--shadow-xl);
+//   margin-top       : var(--spacing-xs);
+//   overflow         : hidden; // clips child border-radius correctly
+//   transform-origin : top center;
+//   animation        : overlayIn 0.14s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+//   will-change      : opacity, transform;
+// }
+
+// // ── Dropdown list item ───────────────────────────────────────
+// @mixin list-item {
+//   display       : flex;
+//   align-items   : center;
+//   gap           : var(--spacing-md);
+//   padding       : var(--spacing-md) var(--spacing-lg);
+//   border-radius : var(--ui-border-radius-sm);
+//   color         : var(--text-primary);
+//   font-size     : var(--font-size-md);
+//   font-weight   : var(--font-weight-normal);
+//   cursor        : pointer;
+//   transition    : background 0.12s ease, color 0.12s ease;
+//   user-select   : none;
+
+//   &:not(.p-highlight):not(.p-disabled):hover {
+//     background : var(--component-bg-hover);
+//     color      : var(--text-primary);
+//   }
+
+//   &.p-highlight {
+//     background  : var(--accent-focus);
+//     color       : var(--accent-primary);
+//     font-weight : var(--font-weight-medium);
+//   }
+
+//   &.p-disabled {
+//     color   : var(--color-disabled-text);
+//     opacity : var(--state-disabled-opacity);
+//     cursor  : default;
+//   }
+// }
+
+// // ── Focus ring shorthand ────────────────────────────────────
+// @mixin focus-ring {
+//   outline    : none;
+//   box-shadow : 0 0 0 3px var(--accent-focus);
+// }
+
+// // ── Icon button (circular clickable icon) ───────────────────
+// @mixin icon-btn {
+//   display         : inline-flex;
+//   align-items     : center;
+//   justify-content : center;
+//   width           : 2rem;
+//   height          : 2rem;
+//   border-radius   : 50%;
+//   border          : none;
+//   background      : transparent;
+//   color           : var(--text-secondary);
+//   cursor          : pointer;
+//   transition      : background 0.14s ease, color 0.14s ease;
+//   flex-shrink     : 0;
+
+//   &:hover {
+//     background : var(--component-bg-hover);
+//     color      : var(--text-primary);
+//   }
+
+//   &:focus-visible { @include focus-ring; }
+// }
+
+
+// // ============================================================
+// //  2. INPUTS & FORM CONTROLS
+// // ============================================================
+
+// /* ── InputText ───────────────────────────────────────────── */
+// .p-inputtext {
+//   @include input-base;
+// }
+
+// /* ── Textarea ────────────────────────────────────────────── */
+// .p-textarea {
+//   @include input-base;
+//   resize      : vertical;
+//   min-height  : 6rem;
+//   line-height : var(--line-height-relaxed);
+// }
+
+// /* ── InputGroup ──────────────────────────────────────────── */
+// .p-inputgroup {
+//   display     : flex;
+//   align-items : stretch;
+//   width       : 100%;
+
+//   // Remove individual radii from inner children
+//   > .p-inputtext,
+//   > .p-inputnumber .p-inputnumber-input,
+//   > .p-inputgroup-addon,
+//   > .p-button {
+//     border-radius : 0;
+
+//     &:first-child { border-radius: var(--ui-border-radius) 0 0 var(--ui-border-radius); }
+//     &:last-child  { border-radius: 0 var(--ui-border-radius) var(--ui-border-radius) 0; }
+//     &:only-child  { border-radius: var(--ui-border-radius); }
+//   }
+
+//   > * + * { border-left: none; } // prevent double borders
+
+//   .p-inputgroup-addon {
+//     display         : flex;
+//     align-items     : center;
+//     justify-content : center;
+//     padding         : 0 var(--spacing-lg);
+//     background      : var(--bg-secondary);
+//     border          : var(--ui-border-width) solid var(--border-primary);
+//     color           : var(--text-secondary);
+//     font-size       : var(--font-size-md);
+//     min-width       : 2.75rem;
+//     white-space     : nowrap;
+//     transition      : border-color 0.18s ease;
+//   }
+// }
+
+// /* ── InputNumber ─────────────────────────────────────────── */
+// .p-inputnumber {
+//   display : inline-flex;
+//   width   : 100%;
+
+//   .p-inputnumber-input { @include input-base; }
+
+//   // Spinner buttons (stacked variant)
+//   &.p-inputnumber-buttons-stacked {
+//     .p-inputnumber-button-group {
+//       display        : flex;
+//       flex-direction : column;
+
+//       .p-button {
+//         flex          : 1;
+//         width         : 2.25rem;
+//         padding       : 0;
+//         border-radius : 0;
+//         border-left   : none;
+
+//         &:first-child {
+//           border-top-right-radius    : var(--ui-border-radius);
+//           border-bottom-right-radius : 0;
+//         }
+//         &:last-child {
+//           border-top-right-radius    : 0;
+//           border-bottom-right-radius : var(--ui-border-radius);
+//           border-top                 : var(--ui-border-width) solid rgba(255,255,255,0.2);
+//         }
+//       }
+//     }
+//   }
+
+//   // Horizontal buttons
+//   &.p-inputnumber-buttons-horizontal {
+//     .p-button {
+//       width         : 2.5rem;
+//       padding       : 0;
+//       border-radius : 0;
+
+//       &.p-inputnumber-button-up {
+//         border-left                : none;
+//         border-top-right-radius    : var(--ui-border-radius);
+//         border-bottom-right-radius : var(--ui-border-radius);
+//       }
+//       &.p-inputnumber-button-down {
+//         border-right               : none;
+//         border-top-left-radius     : var(--ui-border-radius);
+//         border-bottom-left-radius  : var(--ui-border-radius);
+//       }
+//     }
+//   }
+// }
+
+// /* ── Password ────────────────────────────────────────────── */
+// .p-password {
+//   display  : inline-flex;
+//   position : relative;
+//   width    : 100%;
+
+//   .p-password-input {
+//     @include input-base;
+//     padding-right : 2.75rem;
+//   }
+
+//   .p-password-toggle-mask-icon,
+//   .p-password-mask-icon,
+//   .p-password-unmask-icon {
+//     position  : absolute;
+//     right     : var(--spacing-lg);
+//     top       : 50%;
+//     transform : translateY(-50%);
+//     color     : var(--text-tertiary);
+//     cursor    : pointer;
+//     transition: color 0.14s ease;
+//     font-size : var(--font-size-lg);
+
+//     &:hover { color: var(--text-primary); }
+//   }
+
+//   // Strength panel
+//   .p-password-panel {
+//     @include overlay-panel;
+//     padding    : var(--spacing-lg);
+//     min-width  : 220px;
+
+//     .p-password-meter {
+//       height        : 4px;
+//       background    : var(--bg-ternary);
+//       border-radius : var(--ui-border-radius-pill);
+//       overflow      : hidden;
+//       margin-bottom : var(--spacing-md);
+
+//       .p-password-strength {
+//         height        : 100%;
+//         border-radius : var(--ui-border-radius-pill);
+//         transition    : width 0.3s ease;
+
+//         &.weak   { background: var(--color-error);   width: 33%; }
+//         &.medium { background: var(--color-warning);  width: 66%; }
+//         &.strong { background: var(--color-success);  width: 100%; }
+//       }
+//     }
+
+//     p {
+//       font-size : var(--font-size-sm);
+//       color     : var(--text-secondary);
+//       margin    : 0;
+//     }
+//   }
+// }
+
+// /* ── Checkbox ────────────────────────────────────────────── */
+// .p-checkbox {
+//   display     : inline-flex;
+//   align-items : center;
+//   width       : 1.125rem;
+//   height      : 1.125rem;
+//   flex-shrink : 0;
+
+//   .p-checkbox-box {
+//     width           : 1.125rem;
+//     height          : 1.125rem;
+//     border          : var(--ui-border-width) solid var(--border-primary);
+//     border-radius   : var(--ui-border-radius-sm);
+//     background      : var(--bg-primary);
+//     display         : flex;
+//     align-items     : center;
+//     justify-content : center;
+//     transition      : all 0.14s ease;
+//     cursor          : pointer;
+
+//     &:not(.p-disabled):not(.p-highlight):hover {
+//       border-color : var(--accent-primary);
+//       background   : var(--accent-focus);
+//     }
+
+//     &.p-highlight {
+//       background   : var(--accent-primary);
+//       border-color : var(--accent-primary);
+
+//       .p-checkbox-icon {
+//         color     : #ffffff;
+//         font-size : 0.7rem;
+//       }
+//     }
+
+//     &.p-focus { @include focus-ring; }
+
+//     &.p-invalid { border-color: var(--color-error); }
+//   }
+// }
+
+// /* ── RadioButton ─────────────────────────────────────────── */
+// .p-radiobutton {
+//   display     : inline-flex;
+//   align-items : center;
+//   width       : 1.125rem;
+//   height      : 1.125rem;
+//   flex-shrink : 0;
+
+//   .p-radiobutton-box {
+//     width           : 1.125rem;
+//     height          : 1.125rem;
+//     border          : var(--ui-border-width) solid var(--border-primary);
+//     border-radius   : 50%;
+//     background      : var(--bg-primary);
+//     display         : flex;
+//     align-items     : center;
+//     justify-content : center;
+//     transition      : all 0.14s ease;
+//     cursor          : pointer;
+
+//     .p-radiobutton-icon {
+//       width         : 0.5rem;
+//       height        : 0.5rem;
+//       border-radius : 50%;
+//       background    : transparent;
+//       transition    : background 0.14s ease, transform 0.14s ease;
+//       transform     : scale(0);
+//     }
+
+//     &:not(.p-disabled):not(.p-highlight):hover {
+//       border-color : var(--accent-primary);
+//       background   : var(--accent-focus);
+//     }
+
+//     &.p-highlight {
+//       border-color : var(--accent-primary);
+
+//       .p-radiobutton-icon {
+//         background : var(--accent-primary);
+//         transform  : scale(1);
+//       }
+//     }
+
+//     &.p-focus      { @include focus-ring; }
+//     &.p-invalid    { border-color: var(--color-error); }
+//   }
+// }
+
+// /* ── ToggleSwitch ─────────────────────────────────────────── */
+// .p-toggleswitch {
+//   width    : 2.75rem;
+//   height   : 1.5rem;
+//   position : relative;
+//   cursor   : pointer;
+
+//   .p-toggleswitch-slider {
+//     position      : absolute;
+//     inset         : 0;
+//     background    : var(--border-primary);
+//     border-radius : var(--ui-border-radius-pill);
+//     transition    : background 0.2s ease;
+
+//     &::before {
+//       content       : '';
+//       position      : absolute;
+//       width         : 1.125rem;
+//       height        : 1.125rem;
+//       left          : 3px;
+//       top           : 50%;
+//       transform     : translateY(-50%);
+//       background    : #ffffff;
+//       border-radius : 50%;
+//       transition    : transform 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
+//       box-shadow    : var(--shadow-sm);
+//     }
+//   }
+
+//   &.p-toggleswitch-checked .p-toggleswitch-slider {
+//     background : var(--accent-primary);
+
+//     &::before { transform: translate(1.25rem, -50%); }
+//   }
+
+//   &:not(.p-disabled):hover .p-toggleswitch-slider { filter: brightness(0.95); }
+
+//   &.p-focus .p-toggleswitch-slider { @include focus-ring; }
+// }
+
+// /* ── Slider ──────────────────────────────────────────────── */
+// .p-slider {
+//   background    : var(--bg-ternary);
+//   border-radius : var(--ui-border-radius-pill);
+//   position      : relative;
+
+//   &.p-slider-horizontal {
+//     height : 4px;
+
+//     .p-slider-handle {
+//       top       : 50%;
+//       margin-top: -0.625rem;
+//     }
+//   }
+
+//   &.p-slider-vertical {
+//     width       : 4px;
+//     height      : 10rem;
+
+//     .p-slider-handle {
+//       left        : 50%;
+//       margin-left : -0.625rem;
+//     }
+//   }
+
+//   .p-slider-range {
+//     background    : var(--accent-primary);
+//     border-radius : var(--ui-border-radius-pill);
+//     position      : absolute;
+//     height        : 100%;
+//   }
+
+//   .p-slider-handle {
+//     width         : 1.25rem;
+//     height        : 1.25rem;
+//     background    : var(--bg-primary);
+//     border        : 2px solid var(--accent-primary);
+//     border-radius : 50%;
+//     position      : absolute;
+//     box-shadow    : var(--shadow-sm);
+//     transition    : transform 0.14s ease, box-shadow 0.14s ease;
+//     cursor        : grab;
+
+//     &:hover {
+//       transform  : scale(1.15);
+//       box-shadow : 0 0 0 6px var(--accent-focus);
+//     }
+
+//     &:active { cursor: grabbing; }
+//     &:focus-visible { @include focus-ring; }
+//   }
+// }
+
+// /* ── Rating ──────────────────────────────────────────────── */
+// .p-rating {
+//   display : flex;
+//   gap     : var(--spacing-xs);
+
+//   .p-rating-option {
+//     cursor     : pointer;
+//     color      : var(--border-primary);
+//     font-size  : var(--font-size-xl);
+//     transition : color 0.12s ease, transform 0.12s ease;
+
+//     &.p-rating-option-active { color: var(--color-warning); }
+
+//     &:hover {
+//       color     : var(--color-warning);
+//       transform : scale(1.15);
+//     }
+//   }
+// }
+
+
+// // ============================================================
+// //  3. SELECTION COMPONENTS
+// // ============================================================
+
+// /* ── Base wrapper (Select / MultiSelect / Cascade / Auto) ── */
+// .p-select,
+// .p-multiselect,
+// .p-cascadeselect,
+// .p-autocomplete:not(.p-autocomplete-multiple) {
+//   @include input-base;
+//   display     : inline-flex;
+//   align-items : center;
+//   padding     : 0;
+//   cursor      : pointer;
+
+//   // ── Labellling area ──────────────────────────────────────
+//   .p-select-label,
+//   .p-multiselect-label,
+//   .p-cascadeselect-label,
+//   .p-autocomplete-input {
+//     flex         : 1 1 auto;
+//     padding      : var(--spacing-md) var(--spacing-lg);
+//     border       : none;
+//     background   : transparent;
+//     color        : var(--text-primary);
+//     font-family  : var(--font-body);
+//     font-size    : var(--font-size-md);
+//     outline      : none;
+//     min-width    : 0;
+//     overflow     : hidden;
+//     text-overflow: ellipsis;
+//     white-space  : nowrap;
+//     cursor       : inherit;
+
+//     &.p-placeholder { color: var(--text-label); }
+//   }
+
+//   // ── Chevron button ───────────────────────────────────────
+//   .p-select-dropdown,
+//   .p-multiselect-dropdown,
+//   .p-cascadeselect-dropdown,
+//   .p-autocomplete-dropdown {
+//     display         : flex;
+//     align-items     : center;
+//     justify-content : center;
+//     width           : 2.5rem;
+//     flex-shrink     : 0;
+//     color           : var(--text-tertiary);
+//     background      : transparent;
+//     border          : none;
+//     cursor          : pointer;
+//     transition      : color 0.14s ease;
+
+//     &:hover { color: var(--text-primary); }
+
+//     .p-icon { width: 1rem; height: 1rem; }
+//   }
+
+//   // ── Clear icon ───────────────────────────────────────────
+//   .p-select-clear-icon,
+//   .p-multiselect-clear-icon,
+//   .p-cascadeselect-clear-icon,
+//   .p-autocomplete-clear-icon {
+//     position  : absolute;
+//     right     : 2.5rem;
+//     color     : var(--text-tertiary);
+//     cursor    : pointer;
+//     font-size : var(--font-size-sm);
+//     transition: color 0.14s ease;
+
+//     &:hover { color: var(--text-primary); }
+//   }
+// }
+
+// /* ── MultiSelect chips ───────────────────────────────────── */
+// .p-multiselect {
+//   .p-multiselect-label-container {
+//     display    : flex;
+//     flex       : 1 1 auto;
+//     overflow   : hidden;
+//     align-items: center;
+//   }
+
+//   .p-multiselect-chip {
+//     display       : inline-flex;
+//     align-items   : center;
+//     gap           : var(--spacing-xs);
+//     background    : var(--accent-focus);
+//     color         : var(--accent-primary);
+//     border-radius : var(--ui-border-radius-sm);
+//     padding       : 2px var(--spacing-sm);
+//     font-size     : var(--font-size-sm);
+//     font-weight   : var(--font-weight-medium);
+//     margin-right  : var(--spacing-xs);
+//     flex-shrink   : 0;
+
+//     .p-multiselect-chip-icon {
+//       cursor    : pointer;
+//       font-size : var(--font-size-xs);
+//       opacity   : 0.7;
+//       transition: opacity 0.12s ease;
+
+//       &:hover { opacity: 1; }
+//     }
+//   }
+// }
+
+// /* ── AutoComplete (multiple/tags mode) ───────────────────── */
+// .p-autocomplete {
+//   &.p-autocomplete-multiple {
+//     .p-autocomplete-input-multiple {
+//       @include input-base;
+//       display     : flex;
+//       flex-wrap   : wrap;
+//       align-items : center;
+//       gap         : var(--spacing-xs);
+//       padding     : var(--spacing-sm) var(--spacing-lg);
+//       cursor      : text;
+//     }
+
+//     .p-autocomplete-token {
+//       display       : inline-flex;
+//       align-items   : center;
+//       gap           : var(--spacing-xs);
+//       background    : var(--accent-focus);
+//       color         : var(--accent-primary);
+//       border-radius : var(--ui-border-radius-sm);
+//       padding       : 2px var(--spacing-sm);
+//       font-size     : var(--font-size-sm);
+//       font-weight   : var(--font-weight-medium);
+
+//       .p-autocomplete-token-icon {
+//         cursor    : pointer;
+//         font-size : var(--font-size-xs);
+//         opacity   : 0.7;
+//         &:hover { opacity: 1; }
+//       }
+//     }
+
+//     .p-autocomplete-input-token input {
+//       background  : transparent;
+//       border      : none;
+//       outline     : none;
+//       font-family : var(--font-body);
+//       font-size   : var(--font-size-md);
+//       color       : var(--text-primary);
+//     }
+//   }
+// }
+
+// /* ── FIX: Overlay panels for all selection components ─────
+//    KEY FIXES:
+//    - position: fixed prevents clipping by overflow:hidden ancestors
+//    - explicit z-index with !important overrides inline styles
+//    - animation only on open (not close) prevents jank
+//    ──────────────────────────────────────────────────────── */
+// .p-select-overlay,
+// .p-multiselect-overlay,
+// .p-cascadeselect-overlay,
+// .p-autocomplete-overlay {
+//   position         : fixed !important; // escape parent overflow
+//   z-index          : var(--z-dropdown) !important;
+//   background       : var(--bg-primary);
+//   border           : var(--ui-border-width) solid var(--border-secondary);
+//   border-radius    : var(--ui-border-radius-lg);
+//   box-shadow       : 0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08);
+//   overflow         : hidden;
+//   transform-origin : top center;
+//   animation        : overlayIn 0.14s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+//   min-width        : 12rem;
+//   max-height       : 18rem;
+
+//   // ── Filter row inside dropdown ─────────────────────────
+//   .p-select-filter,
+//   .p-multiselect-filter,
+//   .p-autocomplete-filter {
+//     width      : 100%;
+//     padding    : var(--spacing-md);
+//     border-bottom: var(--ui-border-width) solid var(--border-secondary);
+
+//     .p-inputtext {
+//       width : 100%;
+//     }
+//   }
+
+//   .p-multiselect-header {
+//     display       : flex;
+//     align-items   : center;
+//     gap           : var(--spacing-md);
+//     padding       : var(--spacing-md) var(--spacing-lg);
+//     background    : var(--bg-secondary);
+//     border-bottom : var(--ui-border-width) solid var(--border-secondary);
+//   }
+
+//   // ── Scrollable list container ──────────────────────────
+//   .p-select-list-container,
+//   .p-multiselect-list-container,
+//   .p-autocomplete-list-container {
+//     overflow-y    : auto;
+//     max-height    : 14rem;
+//     overscroll-behavior: contain;
+
+//     scrollbar-width: thin;
+//     scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+
+//     &::-webkit-scrollbar       { width: 4px; }
+//     &::-webkit-scrollbar-track { background: var(--scroll-track); }
+//     &::-webkit-scrollbar-thumb {
+//       background    : var(--scroll-thumb);
+//       border-radius : var(--ui-border-radius-pill);
+//     }
+//   }
+
+//   // ── Item lists ─────────────────────────────────────────
+//   .p-select-list,
+//   .p-multiselect-list,
+//   .p-autocomplete-list {
+//     padding    : var(--spacing-xs);
+//     list-style : none;
+//     margin     : 0;
+//   }
+
+//   .p-select-option,
+//   .p-multiselect-option,
+//   .p-autocomplete-option {
+//     @include list-item;
+//     border-radius : var(--ui-border-radius-sm);
+
+//     .p-checkbox { flex-shrink: 0; }
+//   }
+
+//   .p-select-option-group,
+//   .p-multiselect-option-group {
+//     padding     : var(--spacing-xs) var(--spacing-lg);
+//     font-size   : var(--font-size-xs);
+//     font-weight : var(--font-weight-semibold);
+//     color       : var(--text-label);
+//     text-transform: uppercase;
+//     letter-spacing: 0.06em;
+//     cursor      : default;
+//   }
+
+//   .p-select-empty-message,
+//   .p-multiselect-empty-message,
+//   .p-autocomplete-empty-message {
+//     padding    : var(--spacing-lg);
+//     color      : var(--text-secondary);
+//     font-size  : var(--font-size-sm);
+//     text-align : center;
+//   }
+// }
+
+// /* ── CascadeSelect panel ─────────────────────────────────── */
+// .p-cascadeselect-overlay {
+//   .p-cascadeselect-items {
+//     padding    : var(--spacing-xs);
+//     list-style : none;
+//     margin     : 0;
+//   }
+
+//   .p-cascadeselect-item {
+//     @include list-item;
+//     border-radius : var(--ui-border-radius-sm);
+//     justify-content: space-between;
+
+//     .p-cascadeselect-item-active-icon {
+//       color     : var(--text-tertiary);
+//       font-size : var(--font-size-sm);
+//     }
+//   }
+
+//   // Sub-panels float to the right
+//   .p-cascadeselect-sublist {
+//     position   : absolute;
+//     left       : 100%;
+//     top        : 0;
+//     z-index    : 1;
+//     @include overlay-panel;
+//     margin-top : 0;
+//     margin-left: var(--spacing-xs);
+//     min-width  : 10rem;
+//   }
+// }
+
+
+// // NOTE: Parts 4–14 appended below after save
+// // ============================================================
+// //  4. DATEPICKER
+// // ============================================================
+
+// /* ── FIX: Panel must be fixed + high z-index ────────────── */
+// .p-datepicker-panel {
+//   position  : fixed !important;
+//   z-index   : var(--z-dropdown) !important;
+//   background: var(--bg-primary);
+//   border    : var(--ui-border-width) solid var(--border-secondary);
+//   border-radius: var(--ui-border-radius-lg);
+//   box-shadow: 0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08);
+//   overflow  : hidden;
+//   animation : overlayIn 0.14s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+//   padding   : 0;
+//   min-width : 280px;
+// }
+
+// /* Inline (embedded) variant */
+// .p-datepicker-inline {
+//   position      : static !important;
+//   box-shadow    : none;
+//   border-color  : var(--border-primary);
+//   border-radius : var(--ui-border-radius-lg);
+//   overflow      : hidden;
+// }
+
+// /* Header */
+// .p-datepicker-header {
+//   display         : flex;
+//   align-items     : center;
+//   justify-content : space-between;
+//   padding         : var(--spacing-md) var(--spacing-lg);
+//   background      : var(--bg-secondary);
+//   border-bottom   : var(--ui-border-width) solid var(--border-secondary);
+
+//   .p-datepicker-title {
+//     display     : flex;
+//     align-items : center;
+//     gap         : var(--spacing-xs);
+//     font-weight : var(--font-weight-semibold);
+//     font-size   : var(--font-size-md);
+//     color       : var(--text-primary);
+
+//     .p-datepicker-select-month,
+//     .p-datepicker-select-year {
+//       background   : transparent;
+//       border       : none;
+//       padding      : var(--spacing-xs) var(--spacing-sm);
+//       border-radius: var(--ui-border-radius-sm);
+//       font-weight  : var(--font-weight-semibold);
+//       font-size    : var(--font-size-md);
+//       color        : var(--text-primary);
+//       cursor       : pointer;
+//       transition   : background 0.14s ease, color 0.14s ease;
+
+//       &:hover {
+//         background : var(--component-bg-hover);
+//         color      : var(--accent-primary);
+//       }
+//     }
+//   }
+
+//   .p-datepicker-prev-button,
+//   .p-datepicker-next-button { @include icon-btn; }
+// }
+
+// /* Calendar grid */
+// .p-datepicker-calendar-container {
+//   padding: var(--spacing-md);
+
+//   .p-datepicker-calendar {
+//     width            : 100%;
+//     border-collapse  : separate;
+//     border-spacing   : 2px;
+
+//     thead th {
+//       padding    : var(--spacing-sm);
+//       text-align : center;
+//       color      : var(--text-label);
+//       font-size  : var(--font-size-xs);
+//       font-weight: var(--font-weight-semibold);
+//       text-transform: uppercase;
+//       letter-spacing: 0.06em;
+//     }
+
+//     tbody td {
+//       padding : 2px;
+
+//       > span,
+//       > a {
+//         display         : flex;
+//         align-items     : center;
+//         justify-content : center;
+//         width           : 2.25rem;
+//         height          : 2.25rem;
+//         border-radius   : 50%;
+//         font-size       : var(--font-size-sm);
+//         color           : var(--text-primary);
+//         cursor          : pointer;
+//         border          : 1px solid transparent;
+//         transition      : background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+//         margin          : auto;
+
+//         &:not(.p-highlight):not(.p-disabled):hover {
+//           background : var(--component-bg-hover);
+//         }
+
+//         &.p-highlight {
+//           background : var(--accent-primary);
+//           color      : #ffffff;
+//           font-weight: var(--font-weight-medium);
+//         }
+//       }
+
+//       &.p-datepicker-today > span:not(.p-highlight) {
+//         border-color : var(--accent-primary);
+//         color        : var(--accent-primary);
+//         font-weight  : var(--font-weight-semibold);
+//       }
+
+//       &.p-disabled > span {
+//         color   : var(--color-disabled-text);
+//         cursor  : default;
+//         opacity : 0.5;
+//       }
+
+//       // Range start / end / in-between
+//       &.p-datepicker-range-start > span { border-radius: 50% 0 0 50%; }
+//       &.p-datepicker-range-end   > span { border-radius: 0 50% 50% 0; }
+//       &.p-datepicker-range-between > span {
+//         background    : var(--accent-focus);
+//         border-radius : 0;
+//         color         : var(--accent-primary);
+//       }
+//     }
+//   }
+// }
+
+// /* Month/Year picker grids */
+// .p-datepicker-month-view,
+// .p-datepicker-year-view {
+//   display               : grid;
+//   grid-template-columns : repeat(3, 1fr);
+//   gap                   : var(--spacing-xs);
+//   padding               : var(--spacing-md);
+
+//   .p-datepicker-month,
+//   .p-datepicker-year {
+//     display         : flex;
+//     align-items     : center;
+//     justify-content : center;
+//     padding         : var(--spacing-md);
+//     border-radius   : var(--ui-border-radius);
+//     cursor          : pointer;
+//     font-size       : var(--font-size-sm);
+//     font-weight     : var(--font-weight-medium);
+//     transition      : background 0.12s ease;
+
+//     &:not(.p-highlight):not(.p-disabled):hover {
+//       background : var(--component-bg-hover);
+//     }
+
+//     &.p-highlight {
+//       background : var(--accent-primary);
+//       color      : #ffffff;
+//     }
+//   }
+// }
+
+// /* Time picker */
+// .p-datepicker-time-picker {
+//   display         : flex;
+//   align-items     : center;
+//   justify-content : center;
+//   gap             : var(--spacing-xs);
+//   padding         : var(--spacing-md) var(--spacing-lg);
+//   border-top      : var(--ui-border-width) solid var(--border-secondary);
+
+//   .p-datepicker-hour-picker,
+//   .p-datepicker-minute-picker,
+//   .p-datepicker-second-picker,
+//   .p-datepicker-ampm-picker {
+//     display        : flex;
+//     flex-direction : column;
+//     align-items    : center;
+//     gap            : var(--spacing-xs);
+
+//     span {
+//       font-size   : var(--font-size-xl);
+//       font-weight : var(--font-weight-medium);
+//       min-width   : 2ch;
+//       text-align  : center;
+//     }
+
+//     button { @include icon-btn; width: 1.5rem; height: 1.5rem; }
+//   }
+
+//   .p-datepicker-separator {
+//     font-size   : var(--font-size-xl);
+//     font-weight : var(--font-weight-medium);
+//     color       : var(--text-secondary);
+//     padding     : 0 2px;
+//     align-self  : center;
+//     margin-top  : 1.5rem; // align with time digits not buttons
+//   }
+// }
+
+// /* Today / Clear button bar */
+// .p-datepicker-buttonbar {
+//   display         : flex;
+//   justify-content : space-between;
+//   padding         : var(--spacing-md) var(--spacing-lg);
+//   border-top      : var(--ui-border-width) solid var(--border-secondary);
+//   background      : var(--bg-secondary);
+
+//   .p-button { width: auto; min-width: 5rem; }
+// }
+
+
+// // ============================================================
+// //  5. BUTTONS
+// // ============================================================
+
+// .p-button {
+//   display         : inline-flex;
+//   align-items     : center;
+//   justify-content : center;
+//   gap             : var(--spacing-sm);
+//   padding         : var(--spacing-md) var(--spacing-xl);
+//   font-family     : var(--font-body);
+//   font-size       : var(--font-size-md);
+//   font-weight     : var(--font-weight-medium);
+//   border-radius   : var(--ui-border-radius);
+//   border          : 1px solid var(--accent-primary);
+//   background      : var(--accent-primary);
+//   color           : #ffffff;
+//   cursor          : pointer;
+//   user-select     : none;
+//   transition      : background 0.16s ease, border-color 0.16s ease,
+//                     box-shadow 0.16s ease, transform 0.1s ease;
+//   white-space     : nowrap;
+//   overflow        : hidden;
+//   position        : relative;
+
+//   // Ripple suppressor (we use CSS hover instead)
+//   .p-ink { display: none; }
+
+//   &:enabled:hover {
+//     background   : var(--accent-hover);
+//     border-color : var(--accent-hover);
+//     box-shadow   : 0 2px 8px rgba(0,0,0,0.15);
+//   }
+
+//   &:enabled:active {
+//     transform    : translateY(1px);
+//     box-shadow   : none;
+//     background   : var(--accent-hover);
+//   }
+
+//   &:focus-visible {
+//     outline    : none;
+//     box-shadow : 0 0 0 3px var(--accent-focus);
+//   }
+
+//   &:disabled {
+//     background   : var(--color-disabled);
+//     border-color : var(--color-disabled);
+//     color        : var(--color-disabled-text);
+//     cursor       : not-allowed;
+//     opacity      : var(--state-disabled-opacity);
+//     transform    : none;
+//   }
+
+//   .p-button-icon { font-size: var(--font-size-lg); flex-shrink: 0; }
+//   .p-button-label { font-weight: inherit; }
+
+//   // ── Severity variants ────────────────────────────────────
+//   &.p-button-secondary {
+//     background   : var(--bg-secondary);
+//     border-color : var(--border-primary);
+//     color        : var(--text-primary);
+
+//     &:enabled:hover {
+//       background   : var(--component-bg-hover);
+//       border-color : var(--border-secondary);
+//       box-shadow   : var(--shadow-sm);
+//     }
+//   }
+
+//   &.p-button-success {
+//     background   : var(--color-success);
+//     border-color : var(--color-success);
+//     &:enabled:hover { background: var(--color-success-dark); border-color: var(--color-success-dark); }
+//   }
+
+//   &.p-button-warning {
+//     background   : var(--color-warning);
+//     border-color : var(--color-warning);
+//     &:enabled:hover { background: var(--color-warning-dark); border-color: var(--color-warning-dark); }
+//   }
+
+//   &.p-button-danger {
+//     background   : var(--color-error);
+//     border-color : var(--color-error);
+//     &:enabled:hover { background: var(--color-error-dark); border-color: var(--color-error-dark); }
+//   }
+
+//   &.p-button-info {
+//     background   : var(--color-info);
+//     border-color : var(--color-info);
+//     &:enabled:hover { background: var(--color-info-dark); border-color: var(--color-info-dark); }
+//   }
+
+//   &.p-button-contrast {
+//     background   : var(--text-primary);
+//     border-color : var(--text-primary);
+//     color        : var(--bg-primary);
+//     &:enabled:hover { opacity: 0.85; }
+//   }
+
+//   // ── Style variants ───────────────────────────────────────
+//   &.p-button-outlined {
+//     background   : transparent;
+//     color        : var(--accent-primary);
+//     border-color : var(--accent-primary);
+
+//     &:enabled:hover {
+//       background : var(--accent-focus);
+//       box-shadow : none;
+//     }
+
+//     &.p-button-secondary {
+//       color: var(--text-secondary); border-color: var(--border-primary);
+//       &:enabled:hover { background: var(--component-bg-hover); }
+//     }
+//     &.p-button-success  { color: var(--color-success); border-color: var(--color-success); &:enabled:hover { background: var(--color-success-bg); } }
+//     &.p-button-warning  { color: var(--color-warning); border-color: var(--color-warning); &:enabled:hover { background: var(--color-warning-bg); } }
+//     &.p-button-danger   { color: var(--color-error);   border-color: var(--color-error);   &:enabled:hover { background: var(--color-error-bg);   } }
+//     &.p-button-info     { color: var(--color-info);    border-color: var(--color-info);     &:enabled:hover { background: var(--color-info-bg);    } }
+//   }
+
+//   &.p-button-text {
+//     background   : transparent;
+//     border-color : transparent;
+//     color        : var(--accent-primary);
+
+//     &:enabled:hover {
+//       background : var(--component-bg-hover);
+//       box-shadow : none;
+//     }
+
+//     &.p-button-secondary { color: var(--text-secondary); &:enabled:hover { background: var(--component-bg-hover); } }
+//     &.p-button-success   { color: var(--color-success); }
+//     &.p-button-warning   { color: var(--color-warning); }
+//     &.p-button-danger    { color: var(--color-error);   }
+//     &.p-button-info      { color: var(--color-info);    }
+//   }
+
+//   // ── Size variants ────────────────────────────────────────
+//   &.p-button-sm {
+//     font-size  : var(--font-size-sm);
+//     padding    : var(--spacing-sm) var(--spacing-lg);
+
+//     .p-button-icon { font-size: var(--font-size-md); }
+//   }
+
+//   &.p-button-lg {
+//     font-size  : var(--font-size-lg);
+//     padding    : var(--spacing-lg) var(--spacing-2xl);
+
+//     .p-button-icon { font-size: var(--font-size-xl); }
+//   }
+
+//   // ── Icon-only ────────────────────────────────────────────
+//   &.p-button-icon-only {
+//     width  : 2.5rem;
+//     height : 2.5rem;
+//     padding: 0;
+
+//     &.p-button-sm { width: 2rem;    height: 2rem;    }
+//     &.p-button-lg { width: 3rem;    height: 3rem;    }
+//     &.p-button-rounded { border-radius: 50%; }
+//   }
+
+//   // ── Rounded ──────────────────────────────────────────────
+//   &.p-button-rounded { border-radius: var(--ui-border-radius-pill); }
+
+//   // ── Loading state ────────────────────────────────────────
+//   &.p-button-loading {
+//     cursor   : wait;
+//     opacity  : var(--state-loading-opacity);
+
+//     .p-button-loading-icon {
+//       animation : spin 0.6s linear infinite;
+//     }
+//   }
+// }
+
+// /* ── SplitButton ─────────────────────────────────────────── */
+// .p-splitbutton {
+//   display       : inline-flex;
+//   border-radius : var(--ui-border-radius);
+//   overflow      : hidden;
+
+//   .p-button:first-child {
+//     border-top-right-radius    : 0;
+//     border-bottom-right-radius : 0;
+//     border-right               : 1px solid rgba(255,255,255,0.25);
+//     flex                       : 1;
+//   }
+
+//   .p-splitbutton-dropdown {
+//     border-top-left-radius    : 0;
+//     border-bottom-left-radius : 0;
+//     width                     : 2.5rem;
+//     padding                   : 0;
+//   }
+// }
+
+// /* ── ToggleButton ────────────────────────────────────────── */
+// .p-togglebutton {
+//   display         : inline-flex;
+//   align-items     : center;
+//   justify-content : center;
+//   gap             : var(--spacing-sm);
+//   padding         : var(--spacing-md) var(--spacing-xl);
+//   font-family     : var(--font-body);
+//   font-size       : var(--font-size-md);
+//   font-weight     : var(--font-weight-medium);
+//   border          : var(--ui-border-width) solid var(--border-primary);
+//   border-radius   : var(--ui-border-radius);
+//   background      : var(--bg-secondary);
+//   color           : var(--text-secondary);
+//   cursor          : pointer;
+//   transition      : all 0.16s ease;
+//   user-select     : none;
+
+//   &:not(.p-disabled):not(.p-highlight):hover {
+//     background : var(--component-bg-hover);
+//     color      : var(--text-primary);
+//   }
+
+//   &.p-highlight {
+//     background   : var(--accent-focus);
+//     border-color : var(--accent-primary);
+//     color        : var(--accent-primary);
+//     font-weight  : var(--font-weight-semibold);
+//   }
+
+//   &:focus-visible { @include focus-ring; }
+// }
+
+// /* ── SelectButton ────────────────────────────────────────── */
+// .p-selectbutton {
+//   display     : inline-flex;
+//   border      : var(--ui-border-width) solid var(--border-primary);
+//   border-radius: var(--ui-border-radius);
+//   overflow    : hidden;
+
+//   .p-button {
+//     border-radius : 0;
+//     border        : none;
+//     border-right  : var(--ui-border-width) solid var(--border-primary);
+//     background    : var(--bg-secondary);
+//     color         : var(--text-secondary);
+//     font-weight   : var(--font-weight-medium);
+
+//     &:last-child { border-right: none; }
+
+//     &:not(.p-highlight):not(.p-disabled):hover {
+//       background : var(--component-bg-hover);
+//       color      : var(--text-primary);
+//     }
+
+//     &.p-highlight {
+//       background : var(--accent-primary);
+//       color      : #ffffff;
+//       border-color: var(--accent-primary);
+//     }
+//   }
+// }
+
+
+
+// // ============================================================
+// //  6. DATA DISPLAY
+// // ============================================================
+
+// /* ── DataTable ───────────────────────────────────────────── */
+// .p-datatable {
+//   // Outer wrapper
+//   .p-datatable-header {
+//     background    : var(--bg-secondary);
+//     border        : var(--ui-border-width) solid var(--border-secondary);
+//     border-bottom : none;
+//     border-radius : var(--ui-border-radius-lg) var(--ui-border-radius-lg) 0 0;
+//     padding       : var(--spacing-lg) var(--spacing-xl);
+//     font-weight   : var(--font-weight-semibold);
+//     color         : var(--text-primary);
+//     display       : flex;
+//     align-items   : center;
+//     justify-content: space-between;
+//   }
+
+//   .p-datatable-wrapper { overflow: auto; }
+
+//   .p-datatable-table {
+//     width           : 100%;
+//     border-collapse : collapse;
+//     background      : var(--bg-primary);
+//   }
+
+//   // ── Head ─────────────────────────────────────────────────
+//   .p-datatable-thead > tr > th {
+//     background   : var(--bg-secondary);
+//     color        : var(--text-secondary);
+//     padding      : var(--spacing-md) var(--spacing-lg);
+//     border-bottom: var(--ui-border-width) solid var(--border-secondary);
+//     border-right : var(--ui-border-width) solid var(--border-secondary);
+//     text-align   : left;
+//     font-weight  : var(--font-weight-semibold);
+//     font-size    : var(--font-size-sm);
+//     white-space  : nowrap;
+//     transition   : background 0.14s ease, color 0.14s ease;
+
+//     &:last-child { border-right: none; }
+
+//     &.p-sortable-column {
+//       cursor      : pointer;
+//       user-select : none;
+
+//       &:hover {
+//         background : var(--component-bg-hover);
+//         color      : var(--text-primary);
+//       }
+
+//       &.p-highlight {
+//         color : var(--accent-primary);
+//         background: var(--accent-focus);
+
+//         .p-sortable-column-icon { color: var(--accent-primary); }
+//       }
+
+//       &:focus-visible {
+//         outline    : none;
+//         box-shadow : inset 0 0 0 2px var(--accent-focus);
+//       }
+//     }
+
+//     .p-sortable-column-icon {
+//       margin-left : var(--spacing-xs);
+//       font-size   : var(--font-size-xs);
+//       color       : var(--text-label);
+//       vertical-align: middle;
+//     }
+
+//     // Column resizer handle
+//     .p-column-resizer {
+//       position   : absolute;
+//       right      : 0;
+//       top        : 0;
+//       bottom     : 0;
+//       width      : 4px;
+//       cursor     : col-resize;
+//       background : transparent;
+//       transition : background 0.14s ease;
+
+//       &:hover { background: var(--accent-primary); }
+//     }
+
+//     // Filter menu button
+//     .p-column-filter-menu-button {
+//       width      : 1.5rem;
+//       height     : 1.5rem;
+//       border-radius: 50%;
+//       border     : none;
+//       background : transparent;
+//       color      : var(--text-tertiary);
+//       cursor     : pointer;
+//       display    : inline-flex;
+//       align-items: center;
+//       justify-content: center;
+//       transition : all 0.14s ease;
+//       margin-left: var(--spacing-xs);
+
+//       &:hover { background: var(--component-bg-hover); color: var(--text-primary); }
+//       &.p-column-filter-menu-button-active {
+//         background: var(--accent-focus);
+//         color     : var(--accent-primary);
+//       }
+//     }
+//   }
+
+//   // ── Body ─────────────────────────────────────────────────
+//   .p-datatable-tbody > tr {
+//     background  : var(--bg-primary);
+//     transition  : background 0.1s ease;
+
+//     > td {
+//       padding      : var(--spacing-md) var(--spacing-lg);
+//       border-bottom: var(--ui-border-width) solid var(--border-secondary);
+//       border-right : var(--ui-border-width) solid var(--border-secondary);
+//       color        : var(--text-primary);
+//       font-size    : var(--font-size-md);
+//       vertical-align: middle;
+
+//       &:last-child { border-right: none; }
+//     }
+
+//     &:last-child > td { border-bottom: none; }
+
+//     &.p-selectable-row {
+//       cursor: pointer;
+//       &:hover { background: var(--component-bg-hover); }
+//     }
+
+//     &.p-highlight {
+//       background : var(--accent-focus);
+//       > td { color: var(--accent-primary); border-color: var(--border-secondary); }
+//     }
+
+//     // Striped variant
+//     &.p-datatable-row-odd { background: var(--bg-secondary); }
+
+//     // Expanded row
+//     &.p-datatable-row-expansion {
+//       background : var(--bg-secondary);
+//       > td { padding: var(--spacing-xl); }
+//     }
+//   }
+
+//   .p-datatable-tfoot > tr > td {
+//     padding    : var(--spacing-md) var(--spacing-lg);
+//     background : var(--bg-secondary);
+//     border-top : var(--ui-border-width) solid var(--border-secondary);
+//     color      : var(--text-secondary);
+//     font-weight: var(--font-weight-medium);
+//   }
+
+//   .p-datatable-footer {
+//     background    : var(--bg-secondary);
+//     border        : var(--ui-border-width) solid var(--border-secondary);
+//     border-top    : none;
+//     padding       : var(--spacing-md) var(--spacing-xl);
+//     border-radius : 0 0 var(--ui-border-radius-lg) var(--ui-border-radius-lg);
+//   }
+
+//   // Empty state
+//   .p-datatable-empty-message td {
+//     text-align  : center;
+//     padding     : var(--spacing-4xl);
+//     color       : var(--text-secondary);
+//     font-size   : var(--font-size-md);
+//   }
+
+//   // Loading overlay
+//   .p-datatable-loading-overlay {
+//     background   : rgba(var(--bg-primary), 0.7);
+//     z-index      : 10;
+//     border-radius: var(--ui-border-radius-lg);
+//   }
+// }
+
+// // Column filter overlay (popup)
+// .p-datatable-filter-overlay {
+//   position      : fixed !important;
+//   z-index       : var(--z-dropdown) !important;
+//   background    : var(--bg-primary);
+//   border        : var(--ui-border-width) solid var(--border-secondary);
+//   border-radius : var(--ui-border-radius-lg);
+//   box-shadow    : 0 8px 32px rgba(0,0,0,0.14);
+//   min-width     : 14rem;
+//   animation     : overlayIn 0.14s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+//   overflow      : hidden;
+
+//   .p-column-filter-constraint {
+//     padding       : var(--spacing-lg);
+//     border-bottom : var(--ui-border-width) solid var(--border-secondary);
+//   }
+
+//   .p-column-filter-buttonbar {
+//     display         : flex;
+//     justify-content : space-between;
+//     padding         : var(--spacing-md) var(--spacing-lg);
+//     background      : var(--bg-secondary);
+//   }
+
+//   .p-column-filter-add-rule {
+//     padding    : var(--spacing-md) var(--spacing-lg);
+//     border-top : var(--ui-border-width) solid var(--border-secondary);
+//   }
+// }
+
+// /* ── Paginator ───────────────────────────────────────────── */
+// .p-paginator {
+//   display         : flex;
+//   align-items     : center;
+//   justify-content : center;
+//   flex-wrap       : wrap;
+//   gap             : var(--spacing-xs);
+//   padding         : var(--spacing-md) var(--spacing-lg);
+//   background      : var(--bg-secondary);
+//   border          : var(--ui-border-width) solid var(--border-secondary);
+//   border-top      : none;
+//   border-radius   : 0 0 var(--ui-border-radius-lg) var(--ui-border-radius-lg);
+
+//   .p-paginator-first, .p-paginator-prev,
+//   .p-paginator-next,  .p-paginator-last,
+//   .p-paginator-page {
+//     display         : flex;
+//     align-items     : center;
+//     justify-content : center;
+//     min-width       : 2.25rem;
+//     height          : 2.25rem;
+//     padding         : 0 var(--spacing-sm);
+//     border-radius   : var(--ui-border-radius);
+//     border          : none;
+//     background      : transparent;
+//     color           : var(--text-secondary);
+//     font-size       : var(--font-size-sm);
+//     font-weight     : var(--font-weight-medium);
+//     cursor          : pointer;
+//     transition      : all 0.14s ease;
+
+//     &:not(.p-disabled):not(.p-highlight):hover {
+//       background : var(--component-bg-hover);
+//       color      : var(--text-primary);
+//     }
+
+//     &.p-highlight {
+//       background   : var(--accent-primary);
+//       color        : #ffffff;
+//       font-weight  : var(--font-weight-semibold);
+//     }
+
+//     &.p-disabled {
+//       opacity : 0.4;
+//       cursor  : default;
+//     }
+//   }
+
+//   .p-paginator-current {
+//     color     : var(--text-secondary);
+//     font-size : var(--font-size-sm);
+//     padding   : 0 var(--spacing-md);
+//   }
+
+//   .p-select {
+//     height      : 2.25rem;
+//     font-size   : var(--font-size-sm);
+//     margin-left : var(--spacing-sm);
+//   }
+// }
+
+// /* ── Tree ────────────────────────────────────────────────── */
+// .p-tree {
+//   background    : var(--bg-primary);
+//   border        : var(--ui-border-width) solid var(--border-secondary);
+//   border-radius : var(--ui-border-radius-lg);
+//   padding       : var(--spacing-md);
+
+//   .p-tree-filter-container {
+//     padding       : var(--spacing-sm);
+//     border-bottom : var(--ui-border-width) solid var(--border-secondary);
+//     margin-bottom : var(--spacing-sm);
+//   }
+
+//   .p-tree-wrapper { overflow: auto; }
+
+//   .p-tree-node {
+//     padding : 0;
+
+//     .p-tree-node-content {
+//       display       : flex;
+//       align-items   : center;
+//       gap           : var(--spacing-sm);
+//       padding       : var(--spacing-sm) var(--spacing-md);
+//       border-radius : var(--ui-border-radius-sm);
+//       cursor        : pointer;
+//       transition    : background 0.12s ease;
+
+//       &:hover { background: var(--component-bg-hover); }
+
+//       &.p-highlight {
+//         background : var(--accent-focus);
+//         color      : var(--accent-primary);
+//       }
+
+//       &:focus-visible { @include focus-ring; }
+
+//       .p-tree-node-toggle-button {
+//         display         : flex;
+//         align-items     : center;
+//         justify-content : center;
+//         width           : 1.25rem;
+//         height          : 1.25rem;
+//         border-radius   : var(--ui-border-radius-sm);
+//         border          : none;
+//         background      : transparent;
+//         color           : var(--text-secondary);
+//         cursor          : pointer;
+//         flex-shrink     : 0;
+//         transition      : transform 0.2s ease;
+//       }
+
+//       .p-tree-node-icon {
+//         color      : var(--text-tertiary);
+//         font-size  : var(--font-size-lg);
+//         flex-shrink: 0;
+//       }
+
+//       .p-tree-node-label {
+//         font-size : var(--font-size-md);
+//         color     : var(--text-primary);
+//         flex      : 1;
+//       }
+//     }
+
+//     &.p-tree-node-leaf .p-tree-node-content .p-tree-node-toggle-button {
+//       visibility: hidden;
+//     }
+//   }
+
+//   .p-tree-children {
+//     padding-left : var(--spacing-xl);
+//   }
+// }
+
+// /* ── Timeline ────────────────────────────────────────────── */
+// .p-timeline {
+//   .p-timeline-event { min-height: 3.5rem; }
+
+//   .p-timeline-event-marker {
+//     width         : 1rem;
+//     height        : 1rem;
+//     border-radius : 50%;
+//     border        : 2px solid var(--accent-primary);
+//     background    : var(--bg-primary);
+//     box-shadow    : 0 0 0 3px var(--accent-focus);
+//     flex-shrink   : 0;
+//   }
+
+//   .p-timeline-event-connector {
+//     background : var(--border-secondary);
+//     width      : 2px;
+//     flex       : 1;
+//   }
+
+//   .p-timeline-event-content {
+//     padding-bottom : var(--spacing-xl);
+//     color          : var(--text-primary);
+//   }
+
+//   .p-timeline-event-opposite {
+//     color     : var(--text-secondary);
+//     font-size : var(--font-size-sm);
+//   }
+// }
+
+// /* ── OrderList ───────────────────────────────────────────── */
+// .p-orderlist {
+//   display : flex;
+//   gap     : var(--spacing-md);
+
+//   .p-orderlist-controls {
+//     display        : flex;
+//     flex-direction : column;
+//     gap            : var(--spacing-xs);
+//     justify-content: center;
+//   }
+
+//   .p-orderlist-list-container {
+//     flex          : 1;
+//     border        : var(--ui-border-width) solid var(--border-secondary);
+//     border-radius : var(--ui-border-radius-lg);
+//     overflow      : hidden;
+
+//     .p-orderlist-header {
+//       padding       : var(--spacing-md) var(--spacing-lg);
+//       background    : var(--bg-secondary);
+//       border-bottom : var(--ui-border-width) solid var(--border-secondary);
+//       font-weight   : var(--font-weight-semibold);
+//       color         : var(--text-primary);
+//     }
+
+//     .p-orderlist-list {
+//       padding  : var(--spacing-xs);
+//       margin   : 0;
+//       list-style: none;
+//       min-height: 8rem;
+
+//       .p-orderlist-item {
+//         padding       : var(--spacing-md) var(--spacing-lg);
+//         border-radius : var(--ui-border-radius-sm);
+//         cursor        : pointer;
+//         transition    : background 0.12s ease;
+
+//         &:hover  { background: var(--component-bg-hover); }
+//         &.p-highlight {
+//           background : var(--accent-focus);
+//           color      : var(--accent-primary);
+//         }
+//       }
+//     }
+//   }
+// }
+
+
+// // ============================================================
+// //  7. PANELS & CONTAINERS
+// // ============================================================
+
+// /* ── Card ────────────────────────────────────────────────── */
+// .p-card {
+//   background    : var(--bg-primary);
+//   border        : var(--ui-border-width) solid var(--border-primary);
+//   border-radius : var(--ui-border-radius-xl);
+//   box-shadow    : var(--shadow-sm);
+//   display       : flex;
+//   flex-direction: column;
+//   color         : var(--text-primary);
+//   transition    : box-shadow 0.2s ease, border-color 0.2s ease;
+
+//   &:hover {
+//     box-shadow   : var(--shadow-md);
+//     border-color : var(--border-secondary);
+//   }
+
+//   .p-card-header {
+//     padding : var(--spacing-xl) var(--spacing-xl) 0;
+//     &:empty { display: none; }
+
+//     img { width: 100%; border-radius: var(--ui-border-radius-xl) var(--ui-border-radius-xl) 0 0; display: block; }
+//   }
+
+//   .p-card-body {
+//     padding       : var(--spacing-xl);
+//     flex          : 1;
+//     display       : flex;
+//     flex-direction: column;
+//   }
+
+//   .p-card-title {
+//     font-family : var(--font-heading);
+//     font-size   : var(--font-size-xl);
+//     font-weight : var(--font-weight-semibold);
+//     color       : var(--text-primary);
+//     margin      : 0 0 var(--spacing-sm);
+//     line-height : var(--line-height-tight);
+//     letter-spacing: -0.01em;
+//   }
+
+//   .p-card-subtitle {
+//     font-size  : var(--font-size-sm);
+//     color      : var(--text-secondary);
+//     margin     : 0 0 var(--spacing-md);
+//     line-height: var(--line-height-normal);
+//   }
+
+//   .p-card-content {
+//     flex       : 1;
+//     font-size  : var(--font-size-md);
+//     color      : var(--text-secondary);
+//     line-height: var(--line-height-relaxed);
+//     padding    : var(--spacing-xs) 0;
+//   }
+
+//   .p-card-footer {
+//     padding    : var(--spacing-lg) 0 0;
+//     margin-top : auto;
+//     display    : flex;
+//     align-items: center;
+//     gap        : var(--spacing-md);
+//     border-top : var(--ui-border-width) solid var(--border-primary);
+
+//     &:empty { display: none; }
+//   }
+
+//   // Variants
+//   &.interactive {
+//     cursor: pointer;
+//     &:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+//     &:active { transform: translateY(0); }
+//   }
+
+//   &.compact {
+//     .p-card-body { padding: var(--spacing-lg); }
+//     .p-card-title { font-size: var(--font-size-lg); }
+//   }
+
+//   &.flat {
+//     border: none;
+//     box-shadow: none;
+//     background: var(--bg-secondary);
+//     &:hover { box-shadow: none; }
+//   }
+// }
+
+// /* Grid helpers */
+// .card-grid {
+//   display               : grid;
+//   grid-template-columns : repeat(auto-fill, minmax(280px, 1fr));
+//   gap                   : var(--spacing-xl);
+// }
+
+// /* ── Panel ───────────────────────────────────────────────── */
+// .p-panel {
+//   border        : var(--ui-border-width) solid var(--border-secondary);
+//   border-radius : var(--ui-border-radius-lg);
+//   overflow      : hidden;
+
+//   .p-panel-header {
+//     display         : flex;
+//     align-items     : center;
+//     justify-content : space-between;
+//     padding         : var(--spacing-md) var(--spacing-xl);
+//     background      : var(--bg-secondary);
+//     border-bottom   : var(--ui-border-width) solid var(--border-secondary);
+
+//     .p-panel-title {
+//       font-weight : var(--font-weight-semibold);
+//       font-size   : var(--font-size-lg);
+//       color       : var(--text-primary);
+//     }
+//   }
+
+//   .p-panel-content {
+//     padding    : var(--spacing-xl);
+//     background : var(--bg-primary);
+//     color      : var(--text-primary);
+//   }
+
+//   .p-panel-footer {
+//     padding    : var(--spacing-md) var(--spacing-xl);
+//     background : var(--bg-secondary);
+//     border-top : var(--ui-border-width) solid var(--border-secondary);
+//   }
+// }
+
+// /* ── Accordion ───────────────────────────────────────────── */
+// .p-accordion {
+//   display       : flex;
+//   flex-direction: column;
+//   gap           : var(--spacing-xs);
+
+//   .p-accordion-panel {
+//     border        : var(--ui-border-width) solid var(--border-secondary);
+//     border-radius : var(--ui-border-radius-lg);
+//     overflow      : hidden;
+//     transition    : box-shadow 0.2s ease;
+
+//     &.p-accordion-panel-active {
+//       box-shadow : var(--shadow-sm);
+//     }
+//   }
+
+//   .p-accordion-header {
+//     .p-accordion-header-link {
+//       display         : flex;
+//       align-items     : center;
+//       justify-content : space-between;
+//       padding         : var(--spacing-lg) var(--spacing-xl);
+//       background      : var(--bg-secondary);
+//       color           : var(--text-primary);
+//       font-weight     : var(--font-weight-semibold);
+//       font-size       : var(--font-size-md);
+//       cursor          : pointer;
+//       border          : none;
+//       width           : 100%;
+//       text-align      : left;
+//       transition      : background 0.14s ease;
+
+//       &:hover { background: var(--component-bg-hover); }
+//       &:focus-visible { @include focus-ring; }
+
+//       .p-accordion-toggle-icon {
+//         color      : var(--text-secondary);
+//         transition : transform 0.25s cubic-bezier(0.2, 0.9, 0.2, 1);
+//         flex-shrink: 0;
+//       }
+//     }
+
+//     &.p-accordion-header-active .p-accordion-toggle-icon {
+//       transform: rotate(180deg);
+//     }
+//   }
+
+//   .p-accordion-content {
+//     padding    : var(--spacing-xl);
+//     background : var(--bg-primary);
+//     color      : var(--text-primary);
+//     font-size  : var(--font-size-md);
+//     line-height: var(--line-height-relaxed);
+//     border-top : var(--ui-border-width) solid var(--border-secondary);
+//   }
+// }
+
+// /* ── Fieldset ────────────────────────────────────────────── */
+// .p-fieldset {
+//   border        : var(--ui-border-width) solid var(--border-secondary);
+//   border-radius : var(--ui-border-radius-lg);
+//   padding       : 0;
+//   overflow      : hidden;
+
+//   .p-fieldset-legend {
+//     padding     : var(--spacing-sm) var(--spacing-lg);
+//     font-weight : var(--font-weight-semibold);
+//     font-size   : var(--font-size-md);
+//     color       : var(--text-primary);
+//     background  : var(--bg-secondary);
+//     border-bottom: var(--ui-border-width) solid var(--border-secondary);
+//     display     : block;
+//     width       : 100%;
+//   }
+
+//   .p-fieldset-content {
+//     padding    : var(--spacing-xl);
+//     background : var(--bg-primary);
+//   }
+// }
+
+// /* ── Divider ─────────────────────────────────────────────── */
+// .p-divider {
+//   display         : flex;
+//   align-items     : center;
+//   justify-content : center;
+//   margin          : var(--spacing-xl) 0;
+//   position        : relative;
+
+//   &.p-divider-horizontal {
+//     flex-direction : row;
+
+//     &::before {
+//       content    : '';
+//       flex       : 1;
+//       border-top : var(--ui-border-width) solid var(--component-divider);
+//     }
+//   }
+
+//   &.p-divider-vertical {
+//     flex-direction : column;
+//     height         : 100%;
+//     margin         : 0 var(--spacing-xl);
+
+//     &::before {
+//       content     : '';
+//       flex        : 1;
+//       border-left : var(--ui-border-width) solid var(--component-divider);
+//     }
+//   }
+
+//   .p-divider-content {
+//     padding    : 0 var(--spacing-md);
+//     font-size  : var(--font-size-sm);
+//     color      : var(--text-tertiary);
+//     white-space: nowrap;
+//   }
+// }
+
+// /* ── ScrollPanel ─────────────────────────────────────────── */
+// .p-scrollpanel {
+//   .p-scrollpanel-bar {
+//     background    : var(--scroll-thumb);
+//     border-radius : var(--ui-border-radius-pill);
+//     opacity       : 0.6;
+//     transition    : opacity 0.2s ease;
+
+//     &:hover { opacity: 1; }
+//   }
+
+//   .p-scrollpanel-bar-x { height: 4px; }
+//   .p-scrollpanel-bar-y { width:  4px; }
+// }
+
+
+// // ============================================================
+// //  8. TABS
+// // ============================================================
+
+// .p-tabs {
+//   display        : flex;
+//   flex-direction : column;
+
+//   .p-tablist {
+//     position: relative;
+
+//     .p-tablist-tab-list {
+//       display      : flex;
+//       align-items  : flex-end;
+//       background   : var(--bg-primary);
+//       border-bottom: var(--ui-border-width) solid var(--border-primary);
+//       padding      : 0 var(--spacing-md);
+//       gap          : var(--spacing-xs);
+//       overflow-x   : auto;
+//       -webkit-overflow-scrolling: touch;
+
+//       &::-webkit-scrollbar { height: 0; }
+//     }
+
+//     .p-tab {
+//       padding       : var(--spacing-md) var(--spacing-lg);
+//       color         : var(--text-secondary);
+//       font-weight   : var(--font-weight-medium);
+//       font-size     : var(--font-size-md);
+//       cursor        : pointer;
+//       border        : none;
+//       background    : transparent;
+//       position      : relative;
+//       white-space   : nowrap;
+//       flex-shrink   : 0;
+//       border-radius : var(--ui-border-radius) var(--ui-border-radius) 0 0;
+//       transition    : color 0.16s ease, background 0.16s ease;
+//       margin-bottom : calc(var(--ui-border-width) * -1);
+
+//       &:not(.p-disabled):not(.p-tab-active):hover {
+//         color      : var(--text-primary);
+//         background : var(--bg-secondary);
+//       }
+
+//       &:focus-visible { @include focus-ring; }
+
+//       &.p-tab-active {
+//         color       : var(--accent-primary);
+//         font-weight : var(--font-weight-semibold);
+//         background  : var(--bg-primary);
+
+//         &::after {
+//           content      : '';
+//           position     : absolute;
+//           bottom       : 0;
+//           left         : var(--spacing-md);
+//           right        : var(--spacing-md);
+//           height       : 2px;
+//           background   : var(--accent-primary);
+//           border-radius: var(--ui-border-radius-pill) var(--ui-border-radius-pill) 0 0;
+//         }
+//       }
+
+//       &.p-disabled { opacity: var(--state-disabled-opacity); cursor: not-allowed; }
+
+//       .p-tab-icon { margin-right: var(--spacing-sm); vertical-align: middle; }
+//     }
+
+//     .p-tablist-active-bar {
+//       position     : absolute;
+//       bottom       : 0;
+//       height       : 2px;
+//       background   : var(--accent-primary);
+//       border-radius: var(--ui-border-radius-pill);
+//       transition   : left 0.22s cubic-bezier(0.2, 0.9, 0.2, 1),
+//                      width 0.22s cubic-bezier(0.2, 0.9, 0.2, 1);
+//     }
+
+//     // Pill variant
+//     &.p-tablist-pill {
+//       .p-tablist-tab-list {
+//         background    : var(--bg-secondary);
+//         border        : var(--ui-border-width) solid var(--border-primary);
+//         border-radius : var(--ui-border-radius-xl);
+//         padding       : var(--spacing-xs);
+//         gap           : var(--spacing-xs);
+//         border-bottom : var(--ui-border-width) solid var(--border-primary);
+//       }
+
+//       .p-tab {
+//         border-radius : var(--ui-border-radius-lg);
+//         margin-bottom : 0;
+
+//         &.p-tab-active {
+//           background  : var(--bg-primary);
+//           box-shadow  : var(--shadow-sm);
+//           &::after { display: none; }
+//         }
+
+//         &:not(.p-disabled):not(.p-tab-active):hover {
+//           background : var(--component-bg-hover);
+//         }
+//       }
+//     }
+//   }
+
+//   .p-tabpanels {
+//     background    : var(--bg-primary);
+//     padding       : var(--spacing-xl);
+//     flex          : 1;
+//     overflow      : auto;
+
+//     .p-tabpanel { outline: none; }
+//   }
+
+//   // Vertical variant
+//   &.p-tabs-vertical {
+//     flex-direction : row;
+
+//     .p-tablist {
+//       width      : 200px;
+//       flex-shrink: 0;
+
+//       .p-tablist-tab-list {
+//         flex-direction : column;
+//         border-bottom  : none;
+//         border-right   : var(--ui-border-width) solid var(--border-primary);
+//         padding        : var(--spacing-md) 0;
+//         height         : 100%;
+//         align-items    : flex-start;
+//       }
+
+//       .p-tab {
+//         width         : 100%;
+//         border-radius : var(--ui-border-radius) 0 0 var(--ui-border-radius);
+//         margin-bottom : 0;
+//         margin-right  : calc(var(--ui-border-width) * -1);
+
+//         &.p-tab-active::after {
+//           left       : auto;
+//           right      : 0;
+//           top        : var(--spacing-md);
+//           bottom     : var(--spacing-md);
+//           width      : 2px;
+//           height     : auto;
+//           border-radius: var(--ui-border-radius-pill) 0 0 var(--ui-border-radius-pill);
+//         }
+//       }
+//     }
+
+//     .p-tabpanels {
+//       border-radius: 0 var(--ui-border-radius-lg) var(--ui-border-radius-lg) 0;
+//     }
+//   }
+
+//   &.p-tabs-sm .p-tab { padding: var(--spacing-sm) var(--spacing-md); font-size: var(--font-size-sm); }
+//   &.p-tabs-lg .p-tab { padding: var(--spacing-lg) var(--spacing-2xl); font-size: var(--font-size-lg); }
+// }
+
+
+// // ============================================================
+// //  9. OVERLAYS
+// // ============================================================
+
+// /* ── Dialog ──────────────────────────────────────────────── */
+// .p-dialog-mask {
+//   position        : fixed !important;
+//   inset           : 0;
+//   z-index         : var(--z-modal-backdrop) !important;
+//   background      : rgba(0, 0, 0, 0.4);
+//   backdrop-filter : blur(3px);
+//   -webkit-backdrop-filter: blur(3px);
+//   display         : flex;
+//   align-items     : center;
+//   justify-content : center;
+//   animation       : backdropIn 0.2s ease both;
+// }
+
+// .p-dialog {
+//   z-index        : var(--z-modal) !important;
+//   display        : flex;
+//   flex-direction : column;
+//   max-height     : 90vh;
+//   max-width      : 90vw;
+//   background     : var(--bg-primary);
+//   border         : var(--ui-border-width) solid var(--border-secondary);
+//   border-radius  : var(--ui-border-radius-xl);
+//   box-shadow     : 0 24px 64px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.12);
+//   animation      : dialogIn 0.22s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+//   overflow       : hidden;
+
+//   &.p-dialog-maximized {
+//     width         : 100vw !important;
+//     height        : 100vh !important;
+//     max-height    : 100%;
+//     max-width     : 100%;
+//     border-radius : 0;
+//     border        : none;
+//     animation     : none;
+//   }
+// }
+
+// .p-dialog-header {
+//   display         : flex;
+//   align-items     : center;
+//   justify-content : space-between;
+//   padding         : var(--spacing-xl);
+//   background      : var(--bg-primary);
+//   border-bottom   : var(--ui-border-width) solid var(--border-secondary);
+//   flex-shrink     : 0;
+
+//   .p-dialog-title {
+//     font-family  : var(--font-heading);
+//     font-size    : var(--font-size-xl);
+//     font-weight  : var(--font-weight-semibold);
+//     color        : var(--text-primary);
+//     margin       : 0;
+//     line-height  : var(--line-height-tight);
+//   }
+
+//   .p-dialog-header-actions {
+//     display : flex;
+//     gap     : var(--spacing-xs);
+//   }
+// }
+
+// .p-dialog-header-icon,
+// .p-dialog-maximize-button,
+// .p-dialog-close-button { @include icon-btn; }
+
+// .p-dialog-content {
+//   flex       : 1;
+//   overflow-y : auto;
+//   padding    : var(--spacing-xl);
+//   color      : var(--text-primary);
+//   font-size  : var(--font-size-md);
+//   line-height: var(--line-height-relaxed);
+
+//   scrollbar-width: thin;
+//   scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+//   &::-webkit-scrollbar       { width: 5px; }
+//   &::-webkit-scrollbar-track { background: var(--scroll-track); }
+//   &::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: var(--ui-border-radius-pill); }
+// }
+
+// .p-dialog-footer {
+//   display         : flex;
+//   align-items     : center;
+//   justify-content : flex-end;
+//   gap             : var(--spacing-md);
+//   padding         : var(--spacing-lg) var(--spacing-xl);
+//   background      : var(--bg-secondary);
+//   border-top      : var(--ui-border-width) solid var(--border-secondary);
+//   flex-shrink     : 0;
+// }
+
+// /* ── Drawer / Sidebar ────────────────────────────────────── */
+// .p-drawer {
+//   position   : fixed !important;
+//   z-index    : var(--z-modal) !important;
+//   background : var(--bg-primary);
+//   box-shadow : 0 24px 64px rgba(0,0,0,0.18);
+//   display    : flex;
+//   flex-direction: column;
+//   overflow   : hidden;
+
+//   &.p-drawer-left, &.p-drawer-right {
+//     top    : 0;
+//     height : 100vh;
+//     width  : 20rem;
+//   }
+
+//   &.p-drawer-left  { left: 0; animation: drawerInLeft  0.28s cubic-bezier(0.2, 0.9, 0.2, 1) both; }
+//   &.p-drawer-right { right: 0; animation: drawerInRight 0.28s cubic-bezier(0.2, 0.9, 0.2, 1) both; }
+
+//   &.p-drawer-top, &.p-drawer-bottom {
+//     left  : 0;
+//     width : 100vw;
+//     height: 28rem;
+//   }
+
+//   &.p-drawer-top    { top: 0; animation: drawerInTop    0.28s cubic-bezier(0.2, 0.9, 0.2, 1) both; }
+//   &.p-drawer-bottom { bottom: 0; animation: drawerInBottom 0.28s cubic-bezier(0.2, 0.9, 0.2, 1) both; }
+
+//   .p-drawer-header {
+//     display         : flex;
+//     align-items     : center;
+//     justify-content : space-between;
+//     padding         : var(--spacing-xl);
+//     border-bottom   : var(--ui-border-width) solid var(--border-secondary);
+//     flex-shrink     : 0;
+
+//     .p-drawer-title {
+//       font-size   : var(--font-size-xl);
+//       font-weight : var(--font-weight-semibold);
+//       color       : var(--text-primary);
+//     }
+
+//     .p-drawer-close-button { @include icon-btn; }
+//   }
+
+//   .p-drawer-content {
+//     flex       : 1;
+//     overflow-y : auto;
+//     padding    : var(--spacing-xl);
+
+//     scrollbar-width: thin;
+//     scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+//   }
+
+//   .p-drawer-footer {
+//     padding    : var(--spacing-lg) var(--spacing-xl);
+//     border-top : var(--ui-border-width) solid var(--border-secondary);
+//     background : var(--bg-secondary);
+//     flex-shrink: 0;
+//   }
+// }
+
+// /* ── OverlayPanel / Popover ──────────────────────────────── */
+// .p-overlaypanel,
+// .p-popover {
+//   position      : fixed !important;
+//   z-index       : var(--z-dropdown) !important;
+//   background    : var(--bg-primary);
+//   border        : var(--ui-border-width) solid var(--border-secondary);
+//   border-radius : var(--ui-border-radius-lg);
+//   box-shadow    : 0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08);
+//   animation     : overlayIn 0.14s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+//   overflow      : hidden;
+//   padding       : var(--spacing-md);
+
+//   // Arrow / caret
+//   &::before, &::after {
+//     content    : '';
+//     position   : absolute;
+//     border     : 6px solid transparent;
+//   }
+
+//   &.p-overlaypanel-flipped::before,
+//   &.p-overlaypanel-flipped::after { top: auto; }
+
+//   .p-overlaypanel-close {
+//     @include icon-btn;
+//     position : absolute;
+//     top      : var(--spacing-sm);
+//     right    : var(--spacing-sm);
+//   }
+// }
+
+// /* ── ContextMenu ─────────────────────────────────────────── */
+// .p-contextmenu,
+// .p-tieredmenu {
+//   position      : fixed !important;
+//   z-index       : var(--z-modal) !important;
+//   background    : var(--bg-primary);
+//   border        : var(--ui-border-width) solid var(--border-secondary);
+//   border-radius : var(--ui-border-radius-lg);
+//   box-shadow    : 0 8px 32px rgba(0,0,0,0.14);
+//   padding       : var(--spacing-xs);
+//   min-width     : 10rem;
+//   animation     : overlayIn 0.14s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+
+//   .p-menuitem {
+//     border-radius: var(--ui-border-radius-sm);
+
+//     .p-menuitem-link {
+//       display       : flex;
+//       align-items   : center;
+//       gap           : var(--spacing-md);
+//       padding       : var(--spacing-md) var(--spacing-lg);
+//       border-radius : var(--ui-border-radius-sm);
+//       cursor        : pointer;
+//       transition    : background 0.12s ease;
+//       text-decoration: none;
+
+//       &:hover { background: var(--component-bg-hover); }
+
+//       .p-menuitem-icon { color: var(--text-secondary); font-size: var(--font-size-lg); }
+//       .p-menuitem-text { color: var(--text-primary); font-size: var(--font-size-md); }
+//       .p-submenu-icon  { color: var(--text-tertiary); margin-left: auto; }
+//     }
+
+//     &.p-menuitem-active > .p-menuitem-link {
+//       background : var(--accent-focus);
+//       .p-menuitem-icon, .p-menuitem-text { color: var(--accent-primary); }
+//     }
+
+//     &.p-menuitem-separator {
+//       border-top : var(--ui-border-width) solid var(--border-secondary);
+//       margin     : var(--spacing-xs) 0;
+//     }
+//   }
+
+//   // Submenus
+//   .p-submenu-list {
+//     position  : absolute;
+//     left      : 100%;
+//     top       : 0;
+//     z-index   : 1;
+//     background: var(--bg-primary);
+//     border    : var(--ui-border-width) solid var(--border-secondary);
+//     border-radius: var(--ui-border-radius-lg);
+//     box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+//     padding   : var(--spacing-xs);
+//     min-width : 10rem;
+//     animation : overlayIn 0.14s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+//   }
+// }
+
+// /* ── Tooltip ─────────────────────────────────────────────── */
+// .p-tooltip {
+//   position  : fixed !important;
+//   z-index   : var(--z-tooltip) !important;
+//   max-width : 16rem;
+
+//   .p-tooltip-text {
+//     background    : var(--tooltip-bg);
+//     color         : var(--tooltip-color);
+//     font-size     : var(--font-size-sm);
+//     font-weight   : var(--font-weight-medium);
+//     padding       : var(--spacing-sm) var(--spacing-md);
+//     border-radius : var(--ui-border-radius);
+//     box-shadow    : var(--shadow-md);
+//     line-height   : var(--line-height-normal);
+//     word-break    : break-word;
+//   }
+
+//   &.p-tooltip-right  .p-tooltip-arrow { border-right-color:  var(--tooltip-bg); }
+//   &.p-tooltip-left   .p-tooltip-arrow { border-left-color:   var(--tooltip-bg); }
+//   &.p-tooltip-top    .p-tooltip-arrow { border-top-color:    var(--tooltip-bg); }
+//   &.p-tooltip-bottom .p-tooltip-arrow { border-bottom-color: var(--tooltip-bg); }
+// }
+
+// /* ── ConfirmDialog / ConfirmPopup ────────────────────────── */
+// .p-confirmdialog {
+//   .p-dialog-content {
+//     display     : flex;
+//     align-items : flex-start;
+//     gap         : var(--spacing-lg);
+
+//     .p-confirmdialog-icon {
+//       font-size   : 1.75rem;
+//       flex-shrink : 0;
+//       margin-top  : 2px;
+//     }
+
+//     .p-confirmdialog-message {
+//       font-size  : var(--font-size-md);
+//       color      : var(--text-primary);
+//       line-height: var(--line-height-relaxed);
+//     }
+//   }
+// }
+
+// .p-confirmpopup {
+//   position      : fixed !important;
+//   z-index       : var(--z-modal) !important;
+//   background    : var(--bg-primary);
+//   border        : var(--ui-border-width) solid var(--border-secondary);
+//   border-radius : var(--ui-border-radius-lg);
+//   box-shadow    : 0 8px 32px rgba(0,0,0,0.14);
+//   animation     : overlayIn 0.14s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+//   padding       : var(--spacing-lg);
+//   min-width     : 16rem;
+
+//   .p-confirmpopup-content {
+//     display  : flex;
+//     gap      : var(--spacing-md);
+//     padding  : var(--spacing-sm) 0;
+
+//     .p-confirmpopup-icon {
+//       font-size   : 1.5rem;
+//       flex-shrink : 0;
+//     }
+
+//     .p-confirmpopup-message {
+//       font-size  : var(--font-size-md);
+//       color      : var(--text-primary);
+//       line-height: var(--line-height-relaxed);
+//     }
+//   }
+
+//   .p-confirmpopup-footer {
+//     display         : flex;
+//     justify-content : flex-end;
+//     gap             : var(--spacing-sm);
+//     padding-top     : var(--spacing-md);
+//     border-top      : var(--ui-border-width) solid var(--border-secondary);
+//     margin-top      : var(--spacing-md);
+//   }
+// }
+
+
+// // ============================================================
+// //  10. FEEDBACK
+// // ============================================================
+
+// /* ── Toast ───────────────────────────────────────────────── */
+// .p-toast {
+//   position   : fixed !important;
+//   z-index    : var(--z-toast) !important;
+//   width      : 22rem;
+//   font-family: var(--font-body);
+
+//   // Position helpers (PrimeNG sets inline style; these are fallbacks)
+//   &.p-toast-top-right    { top: 1.25rem !important; right: 1.25rem !important; }
+//   &.p-toast-top-left     { top: 1.25rem !important; left:  1.25rem !important; }
+//   &.p-toast-bottom-right { bottom: 1.25rem !important; right: 1.25rem !important; }
+//   &.p-toast-bottom-left  { bottom: 1.25rem !important; left:  1.25rem !important; }
+//   &.p-toast-top-center   { top: 1.25rem !important; left: 50% !important; transform: translateX(-50%); }
+//   &.p-toast-bottom-center{ bottom: 1.25rem !important; left: 50% !important; transform: translateX(-50%); }
+
+//   .p-toast-message {
+//     margin-bottom    : var(--spacing-sm);
+//     border-radius    : var(--ui-border-radius-lg);
+//     box-shadow       : 0 8px 24px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.08);
+//     overflow         : hidden;
+//     background       : var(--bg-primary);
+//     border           : var(--ui-border-width) solid var(--border-secondary);
+//     animation        : toastSlideIn 0.28s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+//     backdrop-filter  : blur(8px);
+
+//     .p-toast-message-content {
+//       display    : flex;
+//       align-items: flex-start;
+//       gap        : var(--spacing-md);
+//       padding    : var(--spacing-lg);
+//     }
+
+//     .p-toast-message-icon {
+//       font-size   : 1.25rem;
+//       flex-shrink : 0;
+//       margin-top  : 1px;
+//     }
+
+//     .p-toast-message-text {
+//       flex       : 1;
+//       min-width  : 0;
+//     }
+
+//     .p-toast-summary {
+//       display     : block;
+//       font-family : var(--font-heading, var(--font-body));
+//       font-weight : var(--font-weight-semibold);
+//       font-size   : var(--font-size-md);
+//       color       : var(--text-primary);
+//       line-height : var(--line-height-tight);
+//     }
+
+//     .p-toast-detail {
+//       display    : block;
+//       font-size  : var(--font-size-sm);
+//       color      : var(--text-secondary);
+//       line-height: var(--line-height-relaxed);
+//       margin-top : 2px;
+//     }
+
+//     .p-toast-icon-close {
+//       @include icon-btn;
+//       color      : var(--text-tertiary);
+//       flex-shrink: 0;
+//     }
+
+//     // Severity — accent stripe + tinted icon
+//     &.p-toast-message-info {
+//       border-left : 4px solid var(--color-info);
+//       .p-toast-message-icon { color: var(--color-info); }
+//     }
+//     &.p-toast-message-success {
+//       border-left : 4px solid var(--color-success);
+//       .p-toast-message-icon { color: var(--color-success); }
+//     }
+//     &.p-toast-message-warn {
+//       border-left : 4px solid var(--color-warning);
+//       .p-toast-message-icon { color: var(--color-warning); }
+//     }
+//     &.p-toast-message-error {
+//       border-left : 4px solid var(--color-error);
+//       .p-toast-message-icon { color: var(--color-error); }
+//     }
+//   }
+// }
+
+// /* ── Inline Message ──────────────────────────────────────── */
+// .p-message {
+//   display       : flex;
+//   align-items   : center;
+//   gap           : var(--spacing-md);
+//   padding       : var(--spacing-md) var(--spacing-lg);
+//   border-radius : var(--ui-border-radius);
+//   border        : var(--ui-border-width) solid;
+//   font-size     : var(--font-size-md);
+//   line-height   : var(--line-height-normal);
+//   width         : 100%;
+
+//   .p-message-icon { font-size: var(--font-size-lg); flex-shrink: 0; }
+//   .p-message-text { flex: 1; }
+//   .p-message-close-button {
+//     @include icon-btn;
+//     width: 1.5rem;
+//     height: 1.5rem;
+//   }
+
+//   &.p-message-info    { background: var(--color-info-bg);    border-color: var(--color-info-border);    color: var(--color-info-dark);    .p-message-icon { color: var(--color-info);    } }
+//   &.p-message-success { background: var(--color-success-bg); border-color: var(--color-success-border); color: var(--color-success-dark); .p-message-icon { color: var(--color-success); } }
+//   &.p-message-warn    { background: var(--color-warning-bg); border-color: var(--color-warning-border); color: var(--color-warning-dark); .p-message-icon { color: var(--color-warning); } }
+//   &.p-message-error   { background: var(--color-error-bg);   border-color: var(--color-error-border);   color: var(--color-error-dark);   .p-message-icon { color: var(--color-error);   } }
+// }
+
+// /* ── InlineMessage ───────────────────────────────────────── */
+// .p-inlinemessage {
+//   display       : inline-flex;
+//   align-items   : center;
+//   gap           : var(--spacing-sm);
+//   padding       : var(--spacing-xs) var(--spacing-md);
+//   border-radius : var(--ui-border-radius-sm);
+//   font-size     : var(--font-size-sm);
+//   font-weight   : var(--font-weight-medium);
+
+//   .p-inlinemessage-icon { font-size: var(--font-size-md); flex-shrink: 0; }
+
+//   &.p-inlinemessage-info    { background: var(--color-info-bg);    color: var(--color-info-dark);    }
+//   &.p-inlinemessage-success { background: var(--color-success-bg); color: var(--color-success-dark); }
+//   &.p-inlinemessage-warn    { background: var(--color-warning-bg); color: var(--color-warning-dark); }
+//   &.p-inlinemessage-error   { background: var(--color-error-bg);   color: var(--color-error-dark);   }
+// }
+
+
+// // ============================================================
+// //  11. NAVIGATION
+// // ============================================================
+
+// /* ── Menu / PanelMenu / Listbox ──────────────────────────── */
+// .p-menu {
+//   background    : var(--bg-primary);
+//   border        : var(--ui-border-width) solid var(--border-secondary);
+//   border-radius : var(--ui-border-radius-lg);
+//   padding       : var(--spacing-xs);
+//   min-width     : 10rem;
+
+//   &.p-menu-overlay {
+//     position  : fixed !important;
+//     z-index   : var(--z-dropdown) !important;
+//     box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+//     animation : overlayIn 0.14s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+//   }
+
+//   .p-menu-submenu-header {
+//     padding       : var(--spacing-sm) var(--spacing-lg);
+//     font-size     : var(--font-size-xs);
+//     font-weight   : var(--font-weight-semibold);
+//     color         : var(--text-label);
+//     text-transform: uppercase;
+//     letter-spacing: 0.06em;
+//     cursor        : default;
+//     margin-top    : var(--spacing-xs);
+
+//     &:first-child { margin-top: 0; }
+//   }
+
+//   .p-menuitem {
+//     .p-menuitem-link {
+//       display       : flex;
+//       align-items   : center;
+//       gap           : var(--spacing-md);
+//       padding       : var(--spacing-md) var(--spacing-lg);
+//       border-radius : var(--ui-border-radius-sm);
+//       cursor        : pointer;
+//       transition    : background 0.12s ease;
+//       text-decoration: none;
+//       color         : var(--text-primary);
+
+//       &:hover { background: var(--component-bg-hover); }
+
+//       .p-menuitem-icon { color: var(--text-secondary); font-size: var(--font-size-lg); flex-shrink: 0; }
+//       .p-menuitem-text { font-size: var(--font-size-md); }
+//     }
+
+//     &.p-menuitem-active > .p-menuitem-link {
+//       background : var(--accent-focus);
+//       color      : var(--accent-primary);
+//       .p-menuitem-icon { color: var(--accent-primary); }
+//     }
+
+//     &.p-menuitem-separator {
+//       border-top : var(--ui-border-width) solid var(--border-secondary);
+//       margin     : var(--spacing-xs) 0;
+//     }
+//   }
+// }
+
+// /* ── Breadcrumb ──────────────────────────────────────────── */
+// .p-breadcrumb {
+//   padding       : var(--spacing-md) 0;
+//   background    : transparent;
+//   border-radius : var(--ui-border-radius);
+
+//   .p-breadcrumb-list {
+//     display    : flex;
+//     align-items: center;
+//     flex-wrap  : wrap;
+//     gap        : var(--spacing-xs);
+//     list-style : none;
+//     padding    : 0;
+//     margin     : 0;
+//   }
+
+//   .p-breadcrumb-item {
+//     .p-menuitem-link {
+//       display        : flex;
+//       align-items    : center;
+//       gap            : var(--spacing-xs);
+//       color          : var(--text-secondary);
+//       font-size      : var(--font-size-sm);
+//       text-decoration: none;
+//       transition     : color 0.14s ease;
+
+//       &:hover { color: var(--text-primary); }
+
+//       .p-menuitem-icon { font-size: var(--font-size-md); }
+//     }
+
+//     &.p-breadcrumb-item-active .p-menuitem-link {
+//       color       : var(--text-primary);
+//       font-weight : var(--font-weight-medium);
+//       pointer-events: none;
+//     }
+//   }
+
+//   .p-breadcrumb-separator {
+//     color     : var(--text-label);
+//     font-size : var(--font-size-sm);
+//   }
+// }
+
+// /* ── Steps ───────────────────────────────────────────────── */
+// .p-steps {
+//   .p-steps-list {
+//     display    : flex;
+//     align-items: center;
+//     list-style : none;
+//     padding    : 0;
+//     margin     : 0;
+//   }
+
+//   .p-steps-item {
+//     flex       : 1;
+//     position   : relative;
+//     display    : flex;
+//     flex-direction: column;
+//     align-items: center;
+
+//     &:not(:last-child)::after {
+//       content    : '';
+//       position   : absolute;
+//       top        : 1.125rem;
+//       left       : 50%;
+//       width      : 100%;
+//       height     : 2px;
+//       background : var(--border-secondary);
+//       z-index    : 0;
+//     }
+
+//     .p-steps-item-link {
+//       display        : flex;
+//       flex-direction : column;
+//       align-items    : center;
+//       gap            : var(--spacing-sm);
+//       text-decoration: none;
+//       cursor         : pointer;
+//       z-index        : 1;
+//       position       : relative;
+//     }
+
+//     .p-steps-number {
+//       display         : flex;
+//       align-items     : center;
+//       justify-content : center;
+//       width           : 2.25rem;
+//       height          : 2.25rem;
+//       border-radius   : 50%;
+//       border          : 2px solid var(--border-primary);
+//       background      : var(--bg-primary);
+//       color           : var(--text-secondary);
+//       font-size       : var(--font-size-sm);
+//       font-weight     : var(--font-weight-semibold);
+//       transition      : all 0.2s ease;
+//     }
+
+//     .p-steps-title {
+//       font-size  : var(--font-size-sm);
+//       color      : var(--text-secondary);
+//       white-space: nowrap;
+//     }
+
+//     &.p-steps-item-active {
+//       .p-steps-number {
+//         background   : var(--accent-primary);
+//         border-color : var(--accent-primary);
+//         color        : #ffffff;
+//         box-shadow   : 0 0 0 4px var(--accent-focus);
+//       }
+//       .p-steps-title { color: var(--accent-primary); font-weight: var(--font-weight-semibold); }
+//     }
+
+//     &.p-steps-item-completed {
+//       &::after { background: var(--accent-primary); }
+
+//       .p-steps-number {
+//         background   : var(--accent-focus);
+//         border-color : var(--accent-primary);
+//         color        : var(--accent-primary);
+//       }
+//     }
+//   }
+// }
+
+
+// // ============================================================
+// //  12. MISC COMPONENTS
+// // ============================================================
+
+// /* ── Badge ───────────────────────────────────────────────── */
+// .p-badge {
+//   display         : inline-flex;
+//   align-items     : center;
+//   justify-content : center;
+//   min-width       : 1.25rem;
+//   height          : 1.25rem;
+//   padding         : 0 var(--spacing-xs);
+//   font-size       : var(--font-size-xs);
+//   font-weight     : var(--font-weight-semibold);
+//   border-radius   : var(--ui-border-radius-pill);
+//   background      : var(--accent-primary);
+//   color           : #ffffff;
+//   line-height     : 1;
+//   white-space     : nowrap;
+
+//   &.p-badge-secondary { background: var(--bg-ternary);      color: var(--text-secondary); }
+//   &.p-badge-success   { background: var(--color-success);   color: #ffffff; }
+//   &.p-badge-info      { background: var(--color-info);      color: #ffffff; }
+//   &.p-badge-warning   { background: var(--color-warning);   color: #ffffff; }
+//   &.p-badge-danger    { background: var(--color-error);     color: #ffffff; }
+//   &.p-badge-contrast  { background: var(--text-primary);    color: var(--bg-primary); }
+
+//   &.p-badge-lg { min-width: 1.75rem; height: 1.75rem; font-size: var(--font-size-sm); }
+//   &.p-badge-xl { min-width: 2rem;    height: 2rem;    font-size: var(--font-size-md); }
+
+//   &.p-badge-dot {
+//     width   : 0.5rem;
+//     height  : 0.5rem;
+//     min-width: 0;
+//     padding : 0;
+//   }
+// }
+
+// /* ── Tag ─────────────────────────────────────────────────── */
+// .p-tag {
+//   display       : inline-flex;
+//   align-items   : center;
+//   gap           : var(--spacing-xs);
+//   padding       : var(--spacing-xs) var(--spacing-md);
+//   border-radius : var(--ui-border-radius-sm);
+//   font-size     : var(--font-size-xs);
+//   font-weight   : var(--font-weight-semibold);
+//   background    : var(--accent-focus);
+//   color         : var(--accent-primary);
+//   white-space   : nowrap;
+
+//   .p-tag-icon { font-size: var(--font-size-sm); }
+
+//   &.p-tag-success  { background: var(--color-success-bg); color: var(--color-success-dark); }
+//   &.p-tag-info     { background: var(--color-info-bg);    color: var(--color-info-dark);    }
+//   &.p-tag-warning  { background: var(--color-warning-bg); color: var(--color-warning-dark); }
+//   &.p-tag-danger   { background: var(--color-error-bg);   color: var(--color-error-dark);   }
+
+//   &.p-tag-rounded { border-radius: var(--ui-border-radius-pill); }
+// }
+
+// /* ── Chip ────────────────────────────────────────────────── */
+// .p-chip {
+//   display       : inline-flex;
+//   align-items   : center;
+//   gap           : var(--spacing-sm);
+//   padding       : var(--spacing-xs) var(--spacing-md);
+//   border-radius : var(--ui-border-radius-pill);
+//   background    : var(--bg-secondary);
+//   border        : var(--ui-border-width) solid var(--border-primary);
+//   color         : var(--text-primary);
+//   font-size     : var(--font-size-sm);
+//   font-weight   : var(--font-weight-medium);
+
+//   .p-chip-icon { font-size: var(--font-size-md); color: var(--text-secondary); }
+//   .p-chip-label { line-height: 1; }
+
+//   .p-chip-remove-icon {
+//     cursor    : pointer;
+//     font-size : var(--font-size-xs);
+//     color     : var(--text-tertiary);
+//     transition: color 0.12s ease;
+//     margin-left: var(--spacing-xs);
+
+//     &:hover { color: var(--color-error); }
+//   }
+// }
+
+// /* ── Avatar ──────────────────────────────────────────────── */
+// .p-avatar {
+//   display         : inline-flex;
+//   align-items     : center;
+//   justify-content : center;
+//   width           : 2.5rem;
+//   height          : 2.5rem;
+//   border-radius   : var(--ui-border-radius-lg);
+//   background      : var(--accent-focus);
+//   color           : var(--accent-primary);
+//   font-size       : var(--font-size-md);
+//   font-weight     : var(--font-weight-semibold);
+//   overflow        : hidden;
+//   flex-shrink     : 0;
+
+//   img { width: 100%; height: 100%; object-fit: cover; }
+
+//   &.p-avatar-circle { border-radius: 50%; }
+//   &.p-avatar-lg { width: 3rem;    height: 3rem;    font-size: var(--font-size-xl);  }
+//   &.p-avatar-xl { width: 4rem;    height: 4rem;    font-size: var(--font-size-2xl); }
+//   &.p-avatar-sm { width: 1.75rem; height: 1.75rem; font-size: var(--font-size-sm);  border-radius: var(--ui-border-radius-sm); }
+// }
+
+// .p-avatar-group {
+//   display : flex;
+
+//   .p-avatar {
+//     border      : 2px solid var(--bg-primary);
+//     margin-left : -0.625rem;
+
+//     &:first-child { margin-left: 0; }
+//   }
+// }
+
+// /* ── ProgressBar ─────────────────────────────────────────── */
+// .p-progressbar {
+//   height        : 6px;
+//   background    : var(--bg-ternary);
+//   border-radius : var(--ui-border-radius-pill);
+//   overflow      : hidden;
+
+//   .p-progressbar-value {
+//     height        : 100%;
+//     background    : var(--accent-primary);
+//     border-radius : var(--ui-border-radius-pill);
+//     transition    : width 0.4s cubic-bezier(0.2, 0.9, 0.2, 1);
+//   }
+
+//   .p-progressbar-label {
+//     position    : absolute;
+//     font-size   : var(--font-size-xs);
+//     font-weight : var(--font-weight-semibold);
+//     color       : #ffffff;
+//     line-height : 1;
+//   }
+
+//   // Indeterminate
+//   &.p-progressbar-indeterminate {
+//     .p-progressbar-value {
+//       width     : 40%;
+//       animation : indeterminate 1.4s cubic-bezier(0.2, 0.9, 0.2, 1) infinite;
+//     }
+//   }
+
+//   // Tall variant
+//   &.p-progressbar-lg { height: 10px; }
+// }
+
+// /* ── Skeleton ────────────────────────────────────────────── */
+// .p-skeleton {
+//   background       : var(--bg-ternary);
+//   border-radius    : var(--ui-border-radius);
+//   overflow         : hidden;
+//   position         : relative;
+
+//   &::after {
+//     content    : '';
+//     position   : absolute;
+//     inset      : 0;
+//     background : linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
+//     animation  : shimmer 1.6s infinite;
+//     transform  : translateX(-100%);
+//   }
+
+//   &.p-skeleton-circle { border-radius: 50%; }
+// }
+
+// /* ── ProgressSpinner ─────────────────────────────────────── */
+// .p-progressspinner {
+//   display : inline-flex;
+
+//   .p-progressspinner-circle {
+//     stroke           : var(--accent-primary);
+//     animation        : spin 1.2s linear infinite;
+//     stroke-dasharray : 80px, 200px;
+//     stroke-dashoffset: 0;
+//   }
+// }
+
+// /* ── Knob ────────────────────────────────────────────────── */
+// .p-knob {
+//   .p-knob-range { stroke: var(--bg-ternary); }
+//   .p-knob-value { stroke: var(--accent-primary); }
+//   .p-knob-text  { fill: var(--text-primary); font-size: var(--font-size-md); }
+// }
+
+// /* ── Scroller / VirtualScroller ──────────────────────────── */
+// .p-scroller {
+//   scrollbar-width: thin;
+//   scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+
+//   &::-webkit-scrollbar       { width: 5px; }
+//   &::-webkit-scrollbar-track { background: var(--scroll-track); }
+//   &::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: var(--ui-border-radius-pill); }
+// }
+
+
+// // ============================================================
+// //  13. EDITOR (QUILL)
+// // ============================================================
+
+// .p-editor {
+//   border        : var(--ui-border-width) solid var(--border-primary);
+//   border-radius : var(--ui-border-radius-lg);
+//   overflow      : hidden;
+//   background    : var(--bg-primary);
+//   transition    : border-color 0.18s ease, box-shadow 0.18s ease;
+
+//   &:focus-within {
+//     border-color : var(--accent-primary);
+//     box-shadow   : 0 0 0 3px var(--accent-focus);
+//   }
+// }
+
+// .p-editor-toolbar {
+//   background    : var(--bg-secondary);
+//   border-bottom : var(--ui-border-width) solid var(--border-secondary);
+//   padding       : var(--spacing-sm) var(--spacing-md);
+//   display       : flex;
+//   flex-wrap     : wrap;
+//   gap           : var(--spacing-xs);
+
+//   button, .ql-picker {
+//     color         : var(--text-secondary);
+//     border-radius : var(--ui-border-radius-sm);
+//     transition    : background 0.12s ease, color 0.12s ease;
+//   }
+
+//   button {
+//     display         : inline-flex;
+//     align-items     : center;
+//     justify-content : center;
+//     width           : 2rem !important;
+//     height          : 2rem !important;
+//     border          : none;
+//     background      : transparent;
+//     cursor          : pointer;
+
+//     &:hover { background: var(--component-bg-hover); color: var(--text-primary); }
+//     &.ql-active { background: var(--accent-focus); color: var(--accent-primary); }
+
+//     svg { width: 1rem !important; height: 1rem !important; display: block !important; }
+//   }
+
+//   .ql-stroke { stroke: currentColor !important; }
+//   .ql-fill   { fill:   currentColor !important; }
+
+//   .ql-picker {
+//     color: var(--text-secondary);
+
+//     .ql-picker-label {
+//       border   : none;
+//       padding  : var(--spacing-xs) var(--spacing-sm);
+//       &:hover  { color: var(--text-primary); }
+//     }
+
+//     .ql-picker-options {
+//       position      : absolute;
+//       z-index       : var(--z-dropdown);
+//       background    : var(--bg-primary);
+//       border        : var(--ui-border-width) solid var(--border-secondary);
+//       border-radius : var(--ui-border-radius);
+//       box-shadow    : var(--shadow-md);
+//       padding       : var(--spacing-xs);
+//       animation     : overlayIn 0.12s ease both;
+
+//       .ql-picker-item:hover { background: var(--component-bg-hover); }
+//     }
+//   }
+
+//   .ql-formats { margin-right: var(--spacing-sm); }
+// }
+
+// .p-editor-content {
+//   background  : var(--bg-primary);
+//   color       : var(--text-primary);
+//   font-family : var(--font-body);
+//   font-size   : var(--font-size-md);
+//   line-height : var(--line-height-relaxed);
+//   min-height  : 8rem;
+
+//   .ql-editor {
+//     padding : var(--spacing-lg);
+
+//     &.ql-blank::before {
+//       color      : var(--text-label);
+//       font-style : normal;
+//     }
+
+//     p, li { color: var(--text-primary); }
+//     h1, h2, h3 { color: var(--text-primary); font-family: var(--font-heading); }
+
+//     blockquote {
+//       border-left : 3px solid var(--accent-primary);
+//       padding-left: var(--spacing-lg);
+//       color       : var(--text-secondary);
+//       margin      : var(--spacing-md) 0;
+//     }
+
+//     pre.ql-syntax {
+//       background    : var(--bg-secondary);
+//       border-radius : var(--ui-border-radius);
+//       padding       : var(--spacing-lg);
+//       font-family   : var(--font-mono);
+//       font-size     : var(--font-size-sm);
+//       color         : var(--text-primary);
+//     }
+//   }
+
+//   scrollbar-width: thin;
+//   scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+//   &::-webkit-scrollbar { width: 5px; }
+//   &::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: var(--ui-border-radius-pill); }
+// }
+
+
+// // ============================================================
+// //  14. ANIMATIONS
+// // ============================================================
+
+// @keyframes overlayIn {
+//   from { opacity: 0; transform: scaleY(0.96) translateY(-4px); }
+//   to   { opacity: 1; transform: scaleY(1)    translateY(0); }
+// }
+
+// @keyframes backdropIn {
+//   from { opacity: 0; }
+//   to   { opacity: 1; }
+// }
+
+// @keyframes dialogIn {
+//   from { opacity: 0; transform: scale(0.96) translateY(8px); }
+//   to   { opacity: 1; transform: scale(1)    translateY(0); }
+// }
+
+// @keyframes toastSlideIn {
+//   from { opacity: 0; transform: translateX(24px) scale(0.97); }
+//   to   { opacity: 1; transform: translateX(0)    scale(1); }
+// }
+
+// @keyframes drawerInLeft   { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+// @keyframes drawerInRight  { from { transform: translateX(100%);  } to { transform: translateX(0); } }
+// @keyframes drawerInTop    { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+// @keyframes drawerInBottom { from { transform: translateY(100%);  } to { transform: translateY(0); } }
+
+// @keyframes spin {
+//   to { transform: rotate(360deg); }
+// }
+
+// @keyframes shimmer {
+//   to { transform: translateX(100%); }
+// }
+
+// @keyframes indeterminate {
+//   0%   { margin-left: -40%; }
+//   60%  { margin-left: 100%; }
+//   100% { margin-left: 100%; }
+// }
+
+// @keyframes loading-shimmer {
+//   0%   { background-position: 200% 0; }
+//   100% { background-position: -200% 0; }
+// }
+
+
+// // ============================================================
+// //  RESPONSIVE SAFETY NET
+// // ============================================================
+
+// @media (max-width: 640px) {
+//   .p-dialog { max-width: 96vw !important; max-height: 92vh !important; border-radius: var(--ui-border-radius-lg); }
+//   .p-toast  { width: calc(100vw - 2rem) !important; left: 1rem !important; right: 1rem !important; }
+//   .p-drawer {
+//     &.p-drawer-left, &.p-drawer-right { width: 90vw !important; }
+//     &.p-drawer-top, &.p-drawer-bottom { height: 70vh !important; }
+//   }
+//   .p-tabs .p-tablist .p-tablist-tab-list { padding: 0 var(--spacing-sm); }
+//   .p-steps .p-steps-item .p-steps-title { display: none; }
+// }

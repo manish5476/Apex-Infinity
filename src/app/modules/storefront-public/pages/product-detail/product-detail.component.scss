@@ -39,7 +39,7 @@
   max-width: 1440px;
   margin: 0 auto;
   padding: var(--spacing-2xl); /* Mobile padding */
-  
+  border-radius: var(--radius-2xl);
   @media (min-width: 1024px) {
     padding: var(--spacing-4xl);
   }

@@ -13,6 +13,8 @@
 // 1. Main Layout Container
 .form-container {
   display: flex;
+  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-2xl);
   flex-direction: column;
   height: 100%;
   background: var(--bg-ternary);

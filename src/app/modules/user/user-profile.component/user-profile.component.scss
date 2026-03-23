@@ -13,6 +13,7 @@
   width: 100%;
   background-color: var(--bg-primary);
   display: flex;
+  border-radius: var(--radius-2xl);
   flex-direction: column;
   overflow-y: auto;
   padding: var(--spacing-xl);

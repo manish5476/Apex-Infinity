@@ -1,119 +1,267 @@
-import { Component, Input, computed, signal, ChangeDetectionStrategy } from '@angular/core';
+// logo-cloud.component.ts
+import { Component, Input, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
 
-export interface LogoItem {
-  id?: string;
-  name: string;
-  image: string;
-  url?: string;
-  order?: number;
-}
+export interface LogoItem { name: string; image: string; url?: string; }
 
 export interface LogoCloudConfig {
   title?: string;
-  logos: LogoItem[];
-  theme?: 'light' | 'dark';
-  backgroundColor?: string;
-  backgroundImage?: string;
-  containerWidth?: 'standard' | 'full';
-  paddingTop?: 'sm' | 'md' | 'lg';
-  paddingBottom?: 'sm' | 'md' | 'lg';
+  items?: LogoItem[];
   grayscale?: boolean;
-  opacity?: number;
-  gap?: 'sm' | 'md' | 'lg';
+  paddingTop?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
+  paddingBottom?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
+  backgroundColor?: string;
 }
 
-/**
- * Premium Logo Cloud Component
- * Displays a grid of partner/client logos with elegant hover effects and transitions.
- */
+const PADDING: Record<string, string> = { none: '0', sm: '2.5rem', md: '4rem', lg: '6rem', xl: '9rem' };
+
+const MOCK: LogoItem[] = [
+  { name: 'Samsung', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Samsung_Logo.svg/512px-Samsung_Logo.svg.png' },
+  { name: 'Sony', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sony_logo.svg/512px-Sony_logo.svg.png' },
+  { name: 'Apple', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/512px-Apple_logo_black.svg.png' },
+  { name: 'LG', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/LG_logo_%282015%29.svg/512px-LG_logo_%282015%29.svg.png' },
+  { name: 'Bose', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Bose_logo.svg/512px-Bose_logo.svg.png' },
+  { name: 'JBL', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/JBL_logo.svg/512px-JBL_logo.svg.png' }
+];
+
 @Component({
   selector: 'app-logo-cloud',
   standalone: true,
-  imports: [CommonModule, RouterModule],
-  templateUrl: './logo-cloud.component.html',
-  styleUrls: ['./logo-cloud.component.scss'],
+  imports: [CommonModule],
+  template: `
+    <section class="lc-root" [ngStyle]="sectionStyle()">
+      <div class="lc-container">
+        @if (cfg().title) {
+          <p class="lc-label">{{ cfg().title }}</p>
+        }
+        <div class="lc-track-wrap">
+          <div class="lc-track">
+            @for (item of items(); track item.name) {
+              <div class="lc-logo" [class.lc-grayscale]="cfg().grayscale">
+                <img [src]="item.image" [alt]="item.name" loading="lazy" />
+              </div>
+            }
+            <!-- Duplicate for seamless loop -->
+            @for (item of items(); track item.name + '_dup') {
+              <div class="lc-logo" [class.lc-grayscale]="cfg().grayscale" aria-hidden="true">
+                <img [src]="item.image" [alt]="item.name" loading="lazy" />
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+  `,
+  styles: [`
+    :host { display: block; }
+
+    .lc-root {
+      background: var(--bg-secondary);
+      overflow: hidden;
+    }
+
+    .lc-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 var(--spacing-2xl);
+    }
+
+    .lc-label {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2.5px;
+      color: var(--text-tertiary);
+      margin: 0 0 var(--spacing-3xl);
+    }
+
+    /* Marquee track */
+    .lc-track-wrap {
+      overflow: hidden;
+      mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+    }
+
+    .lc-track {
+      display: flex;
+      gap: 48px;
+      align-items: center;
+      animation: lc-scroll 28s linear infinite;
+      width: max-content;
+
+      &:hover { animation-play-state: paused; }
+    }
+
+    .lc-logo {
+      flex-shrink: 0;
+      height: 36px;
+      display: flex;
+      align-items: center;
+
+      img {
+        height: 100%;
+        width: auto;
+        max-width: 120px;
+        object-fit: contain;
+        transition: opacity 0.2s ease, filter 0.2s ease;
+      }
+    }
+
+    .lc-grayscale img {
+      filter: grayscale(100%);
+      opacity: 0.4;
+      &:hover { filter: none; opacity: 1; }
+    }
+
+    @keyframes lc-scroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+  `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LogoCloudComponent {
-  // --- Private State ---
-  private readonly _config = signal<LogoCloudConfig | any>({});
+  @Input() set config(v: LogoCloudConfig) { this._config.set(v ?? {}); }
+  private _config = signal<LogoCloudConfig>({});
 
-  // --- Inputs ---
-  @Input() set config(v: LogoCloudConfig | any) {
-    this._config.set(v ?? {});
-  }
+  readonly cfg = computed(() => ({
+    title: this._config().title ?? 'Trusted Brands',
+    grayscale: this._config().grayscale !== false,
+    paddingTop: this._config().paddingTop ?? 'md',
+    paddingBottom: this._config().paddingBottom ?? 'md',
+    backgroundColor: this._config().backgroundColor ?? ''
+  }));
 
-  // --- Computed State ---
-  readonly cfg = computed(() => {
-    const v = this._config();
-    return {
-      title: v.title || '',
-      logos: v.logos || [],
-      theme: v.theme || 'light',
-      backgroundColor: v.backgroundColor || 'transparent',
-      backgroundImage: v.backgroundImage || '',
-      containerWidth: v.containerWidth || 'standard',
-      paddingTop: v.paddingTop || 'md',
-      paddingBottom: v.paddingBottom || 'md',
-      grayscale: v.grayscale ?? true,
-      opacity: v.opacity ?? 0.6,
-      gap: v.gap || 'md'
-    };
+  readonly items = computed(() => {
+    const src = this._config().items;
+    return (Array.isArray(src) && src.length > 0) ? src : MOCK;
   });
 
-  readonly isDark = computed(() => this.cfg().theme === 'dark');
-
-  /**
-   * Section Root Styles (Background and Spacing)
-   */
-  readonly sectionStyle = computed(() => {
-    const c = this.cfg();
-    const style: any = {
-      'background-color': c.backgroundColor,
-      '--pt': this._getPadding(c.paddingTop),
-      '--pb': this._getPadding(c.paddingBottom),
-    };
-
-    if (c.backgroundImage) {
-      style['background-image'] = `url('${c.backgroundImage}')`;
-      style['background-size'] = 'cover';
-      style['background-position'] = 'center';
-    }
-
-    return style;
-  });
-
-  /**
-   * Individual Logo Styles
-   */
-  readonly logoItemStyle = computed(() => {
-    const c = this.cfg();
-    return {
-      '--logo-opacity': c.opacity,
-      '--logo-filter': c.grayscale ? 'grayscale(100%)' : 'none'
-    };
-  });
-
-  // --- Helpers ---
-
-  private _getPadding(size: string): string {
-    const map: Record<string, string> = {
-      'sm': 'var(--spacing-3xl)',
-      'md': 'var(--spacing-6xl)',
-      'lg': 'var(--spacing-8xl)'
-    };
-    return map[size] || map['md'];
-  }
-
-  isExternal(url: string | undefined): boolean {
-    if (!url) return false;
-    return url.startsWith('http') || url.startsWith('www');
-  }
-
-  getLink(url: string | undefined): any[] | null {
-    if (!url) return null;
-    return [url];
-  }
+  readonly sectionStyle = computed(() => ({
+    'padding-top': PADDING[this.cfg().paddingTop] ?? '4rem',
+    'padding-bottom': PADDING[this.cfg().paddingBottom] ?? '4rem',
+    'background-color': this.cfg().backgroundColor || ''
+  }));
 }
+
+// import { Component, Input, computed, signal, ChangeDetectionStrategy } from '@angular/core';
+// import { CommonModule } from '@angular/common';
+// import { RouterModule } from '@angular/router';
+
+// export interface LogoItem {
+//   id?: string;
+//   name: string;
+//   image: string;
+//   url?: string;
+//   order?: number;
+// }
+
+// export interface LogoCloudConfig {
+//   title?: string;
+//   logos: LogoItem[];
+//   theme?: 'light' | 'dark';
+//   backgroundColor?: string;
+//   backgroundImage?: string;
+//   containerWidth?: 'standard' | 'full';
+//   paddingTop?: 'sm' | 'md' | 'lg';
+//   paddingBottom?: 'sm' | 'md' | 'lg';
+//   grayscale?: boolean;
+//   opacity?: number;
+//   gap?: 'sm' | 'md' | 'lg';
+// }
+
+// /**
+//  * Premium Logo Cloud Component
+//  * Displays a grid of partner/client logos with elegant hover effects and transitions.
+//  */
+// @Component({
+//   selector: 'app-logo-cloud',
+//   standalone: true,
+//   imports: [CommonModule, RouterModule],
+//   templateUrl: './logo-cloud.component.html',
+//   styleUrls: ['./logo-cloud.component.scss'],
+//   changeDetection: ChangeDetectionStrategy.OnPush
+// })
+// export class LogoCloudComponent {
+//   // --- Private State ---
+//   private readonly _config = signal<LogoCloudConfig | any>({});
+
+//   // --- Inputs ---
+//   @Input() set config(v: LogoCloudConfig | any) {
+//     this._config.set(v ?? {});
+//   }
+
+//   // --- Computed State ---
+//   readonly cfg = computed(() => {
+//     const v = this._config();
+//     return {
+//       title: v.title || '',
+//       logos: v.logos || [],
+//       theme: v.theme || 'light',
+//       backgroundColor: v.backgroundColor || 'transparent',
+//       backgroundImage: v.backgroundImage || '',
+//       containerWidth: v.containerWidth || 'standard',
+//       paddingTop: v.paddingTop || 'md',
+//       paddingBottom: v.paddingBottom || 'md',
+//       grayscale: v.grayscale ?? true,
+//       opacity: v.opacity ?? 0.6,
+//       gap: v.gap || 'md'
+//     };
+//   });
+
+//   readonly isDark = computed(() => this.cfg().theme === 'dark');
+
+//   /**
+//    * Section Root Styles (Background and Spacing)
+//    */
+//   readonly sectionStyle = computed(() => {
+//     const c = this.cfg();
+//     const style: any = {
+//       'background-color': c.backgroundColor,
+//       '--pt': this._getPadding(c.paddingTop),
+//       '--pb': this._getPadding(c.paddingBottom),
+//     };
+
+//     if (c.backgroundImage) {
+//       style['background-image'] = `url('${c.backgroundImage}')`;
+//       style['background-size'] = 'cover';
+//       style['background-position'] = 'center';
+//     }
+
+//     return style;
+//   });
+
+//   /**
+//    * Individual Logo Styles
+//    */
+//   readonly logoItemStyle = computed(() => {
+//     const c = this.cfg();
+//     return {
+//       '--logo-opacity': c.opacity,
+//       '--logo-filter': c.grayscale ? 'grayscale(100%)' : 'none'
+//     };
+//   });
+
+//   // --- Helpers ---
+
+//   private _getPadding(size: string): string {
+//     const map: Record<string, string> = {
+//       'sm': 'var(--spacing-3xl)',
+//       'md': 'var(--spacing-6xl)',
+//       'lg': 'var(--spacing-8xl)'
+//     };
+//     return map[size] || map['md'];
+//   }
+
+//   isExternal(url: string | undefined): boolean {
+//     if (!url) return false;
+//     return url.startsWith('http') || url.startsWith('www');
+//   }
+
+//   getLink(url: string | undefined): any[] | null {
+//     if (!url) return null;
+//     return [url];
+//   }
+// }
