@@ -102,7 +102,7 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
   position: relative;
   padding: var(--spacing-xl);
   overflow: hidden;
-  border-radius: var(--ui-border-radius-xl);
+  border-radius: var(--radius-2xl);
   background: var(--bg-secondary);
   font-family: var(--font-body);
 }
@@ -560,7 +560,7 @@ export class FinancialTrendChartComponent implements OnInit {
 //       width: 100%;
 //       padding: var(--spacing-sm);
 //       overflow: hidden;
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //     }
 
 //     .filter-section {
@@ -599,7 +599,7 @@ export class FinancialTrendChartComponent implements OnInit {
 //       z-index: 1;
 //       background: var(--bg-secondary);
 //       border: 1px solid var(--border-primary);
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       padding: var(--spacing-xl);
 //       box-shadow: var(--shadow-sm);
 //       backdrop-filter: blur(12px); 

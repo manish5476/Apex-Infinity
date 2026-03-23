@@ -30,7 +30,7 @@ import { AppMessageService } from '@core/services/message.service';
   standalone: true,
   imports: [
     CommonModule, FormsModule, CardModule, TableModule, ButtonModule,
-    TagModule, SelectModule, SkeletonModule, TooltipModule,Toast,
+    TagModule, SelectModule, SkeletonModule, TooltipModule, Toast,
     DialogModule, ConfirmDialogModule, IconFieldModule, InputIconModule, InputTextModule
   ],
   providers: [MessageService, ConfirmationService],
@@ -275,7 +275,7 @@ import { AppMessageService } from '@core/services/message.service';
     .border-left-warning { border-left: 4px solid var(--color-warning) !important; }
 
     /* Header */
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--ui-border-radius-xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--radius-2xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
     .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
     .icon-brand { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: var(--font-size-2xl); }
     .page-title { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); font-family: var(--font-heading); letter-spacing: -0.02em; }
@@ -283,7 +283,7 @@ import { AppMessageService } from '@core/services/message.service';
     .badge-mono-sm { font-family: var(--font-mono); font-size: 10px; background: var(--bg-secondary); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border-primary); color: var(--text-secondary); }
 
     /* Cards */
-    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-md); overflow: hidden; }
+    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); overflow: hidden; }
     ::ng-deep .premium-card { border-radius: var(--ui-border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-primary); }
     ::ng-deep .premium-card .p-card-body { padding: var(--spacing-xl); height: 100%; display: flex; flex-direction: column; justify-content: center;}
     ::ng-deep .workspace-card .p-card-body, ::ng-deep .workspace-card .p-card-content { padding: 0; display: block;}
@@ -321,7 +321,7 @@ export class HolidayHubComponent implements OnInit {
   private router = inject(Router);
 
   isLoading = signal(true);
-  
+
   currentYear = new Date().getFullYear();
   years = [
     { label: (this.currentYear - 1).toString(), value: this.currentYear - 1 },
@@ -376,7 +376,7 @@ export class HolidayHubComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         this.hrmsService.deleteHoliday(holiday._id).subscribe({
-          next: (res:any) => {
+          next: (res: any) => {
             this.messageService.showSuccess(res.message)
             this.loadYearData();
           }
@@ -396,7 +396,7 @@ export class HolidayHubComponent implements OnInit {
         this.messageService.handleHttpError(err)
         return of(null);
       })
-    ).subscribe((res:any) => {
+    ).subscribe((res: any) => {
       if (res) {
         this.messageService.showSuccess(res.message)
         this.selectedYear = this.copyToYear;
@@ -407,7 +407,7 @@ export class HolidayHubComponent implements OnInit {
 
   onExport() {
     this.hrmsService.exportHolidayCalendar(this.selectedYear, undefined, 'calendar').subscribe({
-      next: (res:any) => this.messageService.showSuccess(res.message)
+      next: (res: any) => this.messageService.showSuccess(res.message)
     });
   }
 

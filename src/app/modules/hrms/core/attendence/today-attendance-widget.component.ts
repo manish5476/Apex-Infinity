@@ -166,7 +166,7 @@ import { HRMSService } from '../../hrms.service';
     .glass-inset { background: color-mix(in srgb, var(--bg-primary) 40%, transparent); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
     
     .border-radius-md { border-radius: var(--ui-border-radius-md); }
-    .border-radius-xl { border-radius: var(--ui-border-radius-xl); }
+    .border-radius-xl { border-radius: var(--radius-2xl); }
     
     .border-top-subtle { border-top: 1px solid var(--border-secondary); }
     .border-bottom-subtle { border-bottom: 1px solid var(--border-secondary); }
@@ -287,7 +287,7 @@ export class TodayAttendanceWidgetComponent implements OnInit {
 //     </p-card>
 //   `,
 //   styles: [`
-//     .widget-card { border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-sm); border: 1px solid var(--border-primary); background: var(--bg-primary); }
+//     .widget-card { border-radius: var(--radius-2xl); box-shadow: var(--shadow-sm); border: 1px solid var(--border-primary); background: var(--bg-primary); }
 //     ::ng-deep .widget-card .p-card-body { padding: var(--spacing-lg); }
 //     ::ng-deep .widget-card .p-card-content { padding: 0; }
     

@@ -367,7 +367,7 @@ export interface ProfitAnalysisReport {
     .trend-section {
       background: var(--bg-secondary);
       border: 1px solid var(--border-primary);
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
       padding: var(--spacing-xl);
       margin-bottom: var(--spacing-xl);
     }
@@ -430,7 +430,7 @@ export interface ProfitAnalysisReport {
 
     /* TABLE SECTION */
     .analysis-tabs-card {
-      background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--ui-border-radius-xl); overflow: hidden;
+      background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--radius-2xl); overflow: hidden;
     }
 
     /* Custom Table Styles matching Theme */

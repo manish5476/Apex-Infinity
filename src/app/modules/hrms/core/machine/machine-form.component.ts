@@ -736,7 +736,7 @@ export class MachineFormComponent implements OnInit {
 //     .page-subtitle { font-size: var(--font-size-sm); color: var(--text-secondary); }
 
 //     /* Cards & Form */
-//     .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-sm); }
+//     .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-sm); }
 //     ::ng-deep .premium-card .p-card-body { padding: var(--spacing-2xl); }
 //     ::ng-deep .premium-card .p-card-content { padding: 0; }
     

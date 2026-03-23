@@ -212,7 +212,7 @@ import { TooltipModule } from 'primeng/tooltip';
     
     .border-radius-sm { border-radius: var(--ui-border-radius-sm); }
     .border-radius-lg { border-radius: var(--ui-border-radius-lg); }
-    .border-radius-xl { border-radius: var(--ui-border-radius-xl); }
+    .border-radius-xl { border-radius: var(--radius-2xl); }
     .border-radius-full { border-radius: 9999px; }
     
     .border-bottom-subtle { border-bottom: 1px solid var(--border-secondary); }
@@ -462,7 +462,7 @@ export class LiveAttendanceFeedComponent implements OnInit {
 //     .bg-surface { background: var(--bg-secondary); }
 
 //     /* Header & Live Indicator */
-//     .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--ui-border-radius-xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
+//     .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--radius-2xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
 //     .header-left { display: flex; align-items: center; }
 //     .page-title { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); font-family: var(--font-heading); letter-spacing: -0.02em; }
     
@@ -472,7 +472,7 @@ export class LiveAttendanceFeedComponent implements OnInit {
 //     @keyframes ping { 75%, 100% { transform: scale(2.5); opacity: 0; } }
 
 //     /* Cards */
-//     ::ng-deep .feed-card.p-card { border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-md); border: 1px solid var(--border-primary); background: var(--bg-primary); transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.2, 1), box-shadow 0.3s; height: 100%; }
+//     ::ng-deep .feed-card.p-card { border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); border: 1px solid var(--border-primary); background: var(--bg-primary); transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.2, 1), box-shadow 0.3s; height: 100%; }
 //     ::ng-deep .feed-card.p-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-xl); border-color: var(--color-primary-border); }
 //     ::ng-deep .feed-card .p-card-body { padding: var(--spacing-xl); height: 100%; }
 //     ::ng-deep .feed-card .p-card-content { padding: 0; height: 100%; }
@@ -841,7 +841,7 @@ export class LiveAttendanceFeedComponent implements OnInit {
 //     :host ::ng-deep .bento-card.p-card {
 //       background: var(--component-bg);
 //       border: var(--ui-border-width) solid var(--border-primary);
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       display: flex; flex-direction: column; min-height: 180px;
 //       transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.2, 1), box-shadow 0.3s, border-color 0.3s;
 //     }

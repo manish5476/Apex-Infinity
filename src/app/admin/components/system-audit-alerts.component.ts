@@ -694,7 +694,7 @@ export class SystemAuditAlertsComponent implements OnInit {
 //     /* GRID CARD */
 //     .grid-card {
 //       background: var(--bg-secondary); border: 1px solid var(--border-primary);
-//       border-radius: var(--ui-border-radius-xl); overflow: hidden;
+//       border-radius: var(--radius-2xl); overflow: hidden;
 //       flex: 1; display: flex; flex-direction: column; min-height: 500px;
 //       box-shadow: var(--shadow-sm);
 //     }

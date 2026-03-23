@@ -374,7 +374,7 @@ import { error } from 'console';
     .border-radius-sm { border-radius: var(--ui-border-radius-sm); }
     .border-radius-md { border-radius: var(--ui-border-radius-md); }
     .border-radius-lg { border-radius: var(--ui-border-radius-lg); }
-    .border-radius-xl { border-radius: var(--ui-border-radius-xl); }
+    .border-radius-xl { border-radius: var(--radius-2xl); }
     .border-radius-full { border-radius: 9999px; }
     
     .border-top-subtle { border-top: 1px solid var(--border-secondary); }
@@ -860,7 +860,7 @@ export class ShiftGroupAssignmentsComponent implements OnInit {
 //     /* --------------------------------------------------------------------------
 //        HEADER & TABS
 //        -------------------------------------------------------------------------- */
-//     .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--ui-border-radius-xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
+//     .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--radius-2xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
 //     .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
 //     ::ng-deep .back-btn { color: var(--text-secondary) !important; background: var(--bg-primary) !important; border: 1px solid var(--border-primary) !important; }
 //     ::ng-deep .back-btn:hover { color: var(--color-primary) !important; background: var(--color-primary-bg) !important; border-color: var(--color-primary-border) !important; }
@@ -870,7 +870,7 @@ export class ShiftGroupAssignmentsComponent implements OnInit {
 //     .page-title { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); font-family: var(--font-heading); margin: 0; letter-spacing: -0.02em; }
 //     .page-subtitle { font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0; }
 
-//     .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-md); overflow: hidden; }
+//     .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); overflow: hidden; }
     
 //     ::ng-deep .workspace-card .p-card-body { padding: 0; }
 //     ::ng-deep .workspace-card .p-card-content { padding: 0; }

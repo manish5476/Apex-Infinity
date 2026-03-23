@@ -116,7 +116,7 @@ import { SelectModule } from 'primeng/select';
     .themed-card {
       background: var(--bg-primary);
       border: 1px solid var(--border-primary);
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
       box-shadow: var(--shadow-xl);
       display: flex;
       flex-direction: column;

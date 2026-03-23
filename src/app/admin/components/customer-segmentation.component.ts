@@ -500,7 +500,7 @@ export class CustomerSegmentationComponent implements OnInit {
 //     .segment-card {
 //       background: var(--bg-secondary);
 //       border: 1px solid var(--border-primary);
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       padding: var(--spacing-xl);
 //       display: flex;
 //       flex-direction: column;

@@ -242,7 +242,7 @@ import { Channel } from './chat.models';
     .modal-card {
       width: 90%; max-width: 520px;
       background: var(--bg-surface);
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
       box-shadow: var(--shadow-2xl);
       border: 1px solid var(--border-primary);
       display: flex; flex-direction: column;
@@ -610,7 +610,7 @@ export class ChatModalsComponent {
 //     .modal-card {
 //       width: 90%; max-width: 520px;
 //       background: var(--bg-surface);
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       box-shadow: var(--shadow-2xl);
 //       border: 1px solid var(--border-primary);
 //       display: flex; flex-direction: column;

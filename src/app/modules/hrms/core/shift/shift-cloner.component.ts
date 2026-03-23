@@ -238,7 +238,7 @@ import { AppMessageService } from '@core/services/message.service';
     
     .border-radius-sm { border-radius: var(--ui-border-radius-sm); }
     .border-radius-lg { border-radius: var(--ui-border-radius-lg); }
-    .border-radius-xl { border-radius: var(--ui-border-radius-xl); }
+    .border-radius-xl { border-radius: var(--radius-2xl); }
     .border-radius-full { border-radius: 9999px; }
     
     .border-top-subtle { border-top: 1px solid var(--border-secondary); }
@@ -604,7 +604,7 @@ export class ShiftClonerComponent implements OnInit {
 //     .glass-card {
 //       background: var(--component-bg, var(--bg-primary));
 //       border: var(--ui-border-width) solid var(--border-primary);
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       box-shadow: var(--shadow-lg);
 //       padding: var(--spacing-lg);
 //     }

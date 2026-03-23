@@ -264,7 +264,7 @@ export interface ProductAnalyticsData {
       height: 85vh;
       max-height: 900px;
       background: var(--bg-primary); /* Theme Token */
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
       box-shadow: var(--shadow-2xl);
       display: flex;
       flex-direction: column;
@@ -675,13 +675,13 @@ export class ProductProfitPopupComponent implements OnInit {
   @Output() close = new EventEmitter<void>(); // Event to notify parent to close
 
   private invoiceService = inject(InvoiceService);
-  
+
   loading = signal(false);
   productData = signal<ProductAnalyticsData | null>(null);
   maxMonthlyProfit = 0;
 
   ngOnInit(): void {
-    if(this.productId) {
+    if (this.productId) {
       this.loadProductAnalytics();
     }
   }

@@ -25,7 +25,7 @@ import { AppMessageService } from '@core/services/message.service';
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, CardModule, ButtonModule,
-    InputTextModule, SelectModule, DatePickerModule, 
+    InputTextModule, SelectModule, DatePickerModule,
     ToggleSwitchModule, MultiSelectModule, SkeletonModule
   ],
   providers: [MessageService],
@@ -199,7 +199,7 @@ import { AppMessageService } from '@core/services/message.service';
     .page-subtitle { font-size: var(--font-size-sm); color: var(--text-secondary); }
 
     /* Cards & Inputs */
-    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-sm); }
+    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-sm); }
     ::ng-deep .premium-card .p-card-body { padding: var(--spacing-2xl); height: 100%; }
     ::ng-deep .premium-card .p-card-content { padding: 0; }
     
@@ -254,7 +254,7 @@ export class HolidayFormComponent implements OnInit {
   ngOnInit() {
     this.initForm();
     this.holidayId = this.route.snapshot.paramMap.get('id');
-    
+
     if (this.holidayId) {
       this.isEditMode.set(true);
       this.loadHoliday(this.holidayId);
@@ -273,7 +273,7 @@ export class HolidayFormComponent implements OnInit {
       branchId: [null],
       isOptional: [false],
       isActive: [true],
-      
+
       applicableTo: this.fb.group({
         allEmployees: [true],
         departments: [[]],

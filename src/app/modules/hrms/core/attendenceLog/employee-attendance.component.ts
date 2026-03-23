@@ -382,7 +382,7 @@ import { TooltipModule } from 'primeng/tooltip';
     :host ::ng-deep .bento-card.p-card {
       background: var(--component-bg);
       border: var(--ui-border-width) solid var(--border-primary);
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
       display: flex; flex-direction: column; min-height: 0;
     }
     :host ::ng-deep .bento-card .p-card-body { padding: var(--spacing-xl); flex: 1; display: flex; flex-direction: column; min-height: 0; }
@@ -747,7 +747,7 @@ export class EmployeeAttendanceComponent implements OnInit, OnDestroy {
 //     .tracking-wide { letter-spacing: 0.05em; }
 
 //     /* Header */
-//     .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--ui-border-radius-xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
+//     .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--radius-2xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
 //     .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
 //     .icon-brand { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: var(--font-size-2xl); border: 1px solid var(--color-primary-border); }
 //     .header-titles { display: flex; flex-direction: column; }
@@ -755,7 +755,7 @@ export class EmployeeAttendanceComponent implements OnInit, OnDestroy {
 //     .page-subtitle { font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0; }
 
 //     /* Cards */
-//     .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-md); overflow: hidden; }
+//     .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); overflow: hidden; }
 //     ::ng-deep .premium-card .p-card-body { padding: var(--spacing-2xl); }
 //     ::ng-deep .premium-card .p-card-content { padding: 0; }
 

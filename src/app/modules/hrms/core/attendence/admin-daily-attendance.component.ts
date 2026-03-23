@@ -359,7 +359,7 @@ import { ToastModule } from 'primeng/toast';
     
     .border-radius-sm { border-radius: var(--ui-border-radius-sm); }
     .border-radius-lg { border-radius: var(--ui-border-radius-lg); }
-    .border-radius-xl { border-radius: var(--ui-border-radius-xl); }
+    .border-radius-xl { border-radius: var(--radius-2xl); }
     
     .border-top-subtle { border-top: 1px solid var(--border-secondary); }
     .border-bottom-subtle { border-bottom: 1px solid var(--border-secondary); }
@@ -734,7 +734,7 @@ export class AdminDailyAttendanceComponent implements OnInit {
 //     .border-bottom { border-bottom: 1px solid var(--border-primary); }
 //     .border-1 { border: 1px solid; }
 //     .surface-border { border-color: var(--border-primary); }
-//     .border-radius-xl { border-radius: var(--ui-border-radius-xl); }
+//     .border-radius-xl { border-radius: var(--radius-2xl); }
 //     .border-radius-sm { border-radius: var(--ui-border-radius-sm); }
 //     .shadow-none { box-shadow: none !important; }
     
@@ -763,7 +763,7 @@ export class AdminDailyAttendanceComponent implements OnInit {
 //     .tracking-wide { letter-spacing: 0.05em; }
 
 //     /* Header */
-//     .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--ui-border-radius-xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
+//     .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--radius-2xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
 //     .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
 //     .icon-brand { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: var(--font-size-2xl); }
 //     .header-titles { display: flex; flex-direction: column; }
@@ -778,7 +778,7 @@ export class AdminDailyAttendanceComponent implements OnInit {
 //     .border-top-error { border-top: 4px solid var(--color-error); }
 
 //     /* Tabs & Cards */
-//     .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-md); overflow: hidden; }
+//     .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); overflow: hidden; }
 //     ::ng-deep .workspace-card .p-card-body, ::ng-deep .workspace-card .p-card-content { padding: 0; }
 //     ::ng-deep .hub-tablist .p-tablist-nav { background: var(--bg-secondary) !important; border-bottom: 1px solid var(--border-primary) !important; padding: 0 var(--spacing-xl) !important; }
 //     ::ng-deep .hub-tablist .p-tablist-nav .p-tab { padding: var(--spacing-lg) var(--spacing-xl) !important; border: none !important; border-bottom: 2px solid transparent !important; color: var(--text-secondary) !important; font-weight: var(--font-weight-medium) !important; transition: var(--transition-base); }

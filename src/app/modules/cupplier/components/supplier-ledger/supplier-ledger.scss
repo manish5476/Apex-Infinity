@@ -41,7 +41,7 @@
     .avatar {
       width: 64px;
       height: 64px;
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
       background-color: var(--color-primary-bg);
       color: var(--color-primary);
       display: flex;
@@ -151,7 +151,7 @@
 .table-card {
   background-color: var(--bg-secondary);
   border: var(--ui-border-width) solid var(--border-primary);
-  border-radius: var(--ui-border-radius-xl);
+  border-radius: var(--radius-2xl);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
 

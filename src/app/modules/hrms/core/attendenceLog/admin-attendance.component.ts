@@ -311,7 +311,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
     .glass-inset { background: color-mix(in srgb, var(--bg-primary) 40%, transparent); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
     
     .border-radius-lg { border-radius: var(--ui-border-radius-lg); }
-    .border-radius-xl { border-radius: var(--ui-border-radius-xl); }
+    .border-radius-xl { border-radius: var(--radius-2xl); }
     
     .border-top-subtle { border-top: 1px solid var(--border-secondary); }
     .border-bottom-subtle { border-bottom: 1px solid var(--border-secondary); }
@@ -933,7 +933,7 @@ export class AdminAttendanceComponent implements OnInit {
 //     .border-bottom { border-bottom: 1px solid var(--border-primary); }
 //     .border-1 { border: 1px solid; }
 //     .surface-border { border-color: var(--border-primary); }
-//     .border-round-xl { border-radius: var(--ui-border-radius-xl); }
+//     .border-round-xl { border-radius: var(--radius-2xl); }
     
 //     .text-center { text-align: center; }
 //     .text-right { text-align: right; }
@@ -954,7 +954,7 @@ export class AdminAttendanceComponent implements OnInit {
 //     .capitalize { text-transform: capitalize; }
 
 //     /* Header */
-//     .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--ui-border-radius-xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
+//     .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--radius-2xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
 //     .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
 //     .icon-brand { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: var(--font-size-2xl); }
 //     .header-titles { display: flex; flex-direction: column; gap: 4px; }
@@ -962,7 +962,7 @@ export class AdminAttendanceComponent implements OnInit {
 //     .page-subtitle { font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0; }
 
 //     /* Cards */
-//     .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-md); overflow: hidden; }
+//     .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); overflow: hidden; }
 //     ::ng-deep .workspace-card .p-card-body, ::ng-deep .workspace-card .p-card-content { padding: 0; }
     
 //     ::ng-deep .stat-card.p-card { border-radius: var(--ui-border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-primary); }

@@ -913,7 +913,7 @@ export class AdminDashboardComponent implements OnInit {
 //       /* The Box Look */
 //       background: var(--bg-primary);
 //       border: 1px solid var(--border-primary);
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       box-shadow: 0 4px 24px rgba(0,0,0,0.08);
       
 //       /* Content Handling */

@@ -841,7 +841,7 @@ export class CustomerIntelligenceComponent implements OnInit {
 //     .stats-grid { display: grid; grid-template-columns: 1fr; gap: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
 //     @media(min-width: 1024px) { .stats-grid { grid-template-columns: 1fr 3fr; } }
 
-//     .stat-card, .side-card, .grid-card { background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--ui-border-radius-xl); padding: var(--spacing-lg); }
+//     .stat-card, .side-card, .grid-card { background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--radius-2xl); padding: var(--spacing-lg); }
 //     .card-label { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--text-label); margin-bottom: 8px; letter-spacing: 0.5px; }
 //     .card-value { font-size: 2.2rem; font-weight: 800; color: var(--text-primary); margin: 0; }
 //     .card-footer { margin-top: 8px; font-size: 11px; font-weight: 700; color: var(--text-tertiary); }

@@ -1098,7 +1098,7 @@
   background: var(--bg-primary);
   color: var(--text-primary);
   box-shadow: var(--shadow-sm); /* Lighter shadow like your original */
-  border-radius: var(--ui-border-radius-xl);
+  border-radius: var(--radius-2xl);
   display: flex;
   flex-direction: column;
   border: var(--ui-border-width) solid var(--border-primary); /* Added subtle border */
@@ -1471,7 +1471,7 @@
       .p-tablist-tab-list {
         background: var(--bg-secondary);
         border: var(--ui-border-width) solid var(--border-primary);
-        border-radius: var(--ui-border-radius-xl);
+        border-radius: var(--radius-2xl);
         padding: var(--spacing-xs);
         gap: var(--spacing-xs);
       }
@@ -1653,7 +1653,7 @@
       &.p-tablist-pill {
         .p-tablist-tab-list {
           border-right: none;
-          border-radius: var(--ui-border-radius-xl);
+          border-radius: var(--radius-2xl);
         }
         
         .p-tab {
@@ -1947,7 +1947,7 @@
   // Dimensions & Shape
   max-height: 90%; // Safety constraint
   transform: scale(1);
-  border-radius: var(--ui-border-radius-xl);
+  border-radius: var(--radius-2xl);
   
   // Visuals
   background: var(--bg-primary);

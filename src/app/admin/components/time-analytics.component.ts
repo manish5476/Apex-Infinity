@@ -209,7 +209,7 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
       padding: var(--spacing-lg);
       background: var(--bg-secondary);
       border: 1px solid var(--border-primary);
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
       transition: var(--transition-base);
     }
     .kpi-card:hover { transform: translateY(-2px); border-color: var(--border-secondary); box-shadow: var(--shadow-sm); }
@@ -283,7 +283,7 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
     .tabs-card {
       background: var(--bg-secondary);
       border: 1px solid var(--border-primary);
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
       overflow: hidden;
     }
 
@@ -622,7 +622,7 @@ export class TimeAnalyticsComponent implements OnInit {
 //       padding: var(--spacing-lg);
 //       background: var(--bg-secondary);
 //       border: 1px solid var(--border-primary);
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       transition: var(--transition-base);
 //     }
 //     .kpi-card:hover { transform: translateY(-2px); border-color: var(--border-secondary); box-shadow: var(--shadow-sm); }
@@ -696,7 +696,7 @@ export class TimeAnalyticsComponent implements OnInit {
 //     .tabs-card {
 //       background: var(--bg-secondary);
 //       border: 1px solid var(--border-primary);
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       overflow: hidden;
 //     }
 

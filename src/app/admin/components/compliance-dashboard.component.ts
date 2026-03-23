@@ -154,7 +154,7 @@ interface HealthIssue {
   styles: [`
     :host { display: block; width: 100%; }
     .compliance-container { padding: var(--spacing-sm); font-family: var(--font-body); }
-    .main-card { background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--ui-border-radius-xl); padding: var(--spacing-xl); backdrop-filter: blur(16px); box-shadow: var(--shadow-lg); }
+    .main-card { background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--radius-2xl); padding: var(--spacing-xl); backdrop-filter: blur(16px); box-shadow: var(--shadow-lg); }
 
     .header-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: var(--spacing-md); margin-bottom: var(--spacing-md); }
     .filter-wrapper { margin-bottom: var(--spacing-xl); }
@@ -517,7 +517,7 @@ export class ComplianceDashboardComponent implements OnInit {
 //   styles: [`
 //     :host { display: block; width: 100%; }
 //     .compliance-container { padding: var(--spacing-sm); font-family: var(--font-body); }
-//     .main-card { background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--ui-border-radius-xl); padding: var(--spacing-xl); backdrop-filter: blur(16px); box-shadow: var(--shadow-lg); }
+//     .main-card { background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--radius-2xl); padding: var(--spacing-xl); backdrop-filter: blur(16px); box-shadow: var(--shadow-lg); }
 
 //     .header-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: var(--spacing-md); margin-bottom: var(--spacing-md); }
 //     .filter-wrapper { margin-bottom: var(--spacing-xl); }

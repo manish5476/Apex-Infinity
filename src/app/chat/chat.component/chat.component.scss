@@ -84,7 +84,7 @@ app-chat-sidebar {
   
   /* Floating Card Style */
   border: 1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius-xl); /* Rounded corners */
+  border-radius: var(--radius-2xl); /* Rounded corners */
   overflow: hidden; /* Clips content to corners */
 }
 
@@ -100,7 +100,7 @@ app-chat-sidebar {
   
   /* Floating Card Style */
   border: 1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius-xl); /* Rounded corners */
+  border-radius: var(--radius-2xl); /* Rounded corners */
   overflow: hidden; /* Clips content to corners */
   
   /* HEADER */
@@ -142,7 +142,7 @@ app-chat-sidebar {
       width: 100%;
       padding: var(--spacing-3xl);
       background: var(--bg-surface); 
-      border-radius: var(--ui-border-radius-xl); 
+      border-radius: var(--radius-2xl); 
       border: 1px solid var(--border-subtle);
       box-shadow: var(--shadow-xl);
       

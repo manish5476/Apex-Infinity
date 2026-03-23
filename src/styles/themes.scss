@@ -3499,7 +3499,7 @@
   -webkit-backdrop-filter: blur(var(--glass-blur-c));
   border: 1px solid var(--glass-border-c);
   box-shadow: var(--glass-shadow-c);
-  border-radius: var(--ui-border-radius-xl);
+  border-radius: var(--radius-2xl);
   transition: var(--transition-base);
 }
 
@@ -3528,7 +3528,7 @@
     var(--glass-bg-c);
   backdrop-filter: blur(var(--glass-blur-c)) saturate(180%);
   -webkit-backdrop-filter: blur(var(--glass-blur-c)) saturate(180%);
-  border-radius: var(--ui-border-radius-xl);
+  border-radius: var(--radius-2xl);
   border: 1px solid var(--glass-border-c);
   box-shadow:
     var(--glass-shadow-c),
@@ -3574,7 +3574,7 @@
 
 .card-3d {
   background: var(--bg-secondary);
-  border-radius: var(--ui-border-radius-xl);
+  border-radius: var(--radius-2xl);
   border: 1px solid var(--border-primary);
   transform-style: preserve-3d;
   transition:

@@ -197,7 +197,7 @@ import { HRMSService } from '../../hrms.service';
     
     .border-radius-sm { border-radius: var(--ui-border-radius-sm); }
     .border-radius-md { border-radius: var(--ui-border-radius-md); }
-    .border-radius-xl { border-radius: var(--ui-border-radius-xl); }
+    .border-radius-xl { border-radius: var(--radius-2xl); }
     .border-top-subtle { border-top: 1px solid var(--border-secondary); }
     .border-bottom-subtle { border-bottom: 1px solid var(--border-secondary); }
     .border-1 { border-width: 1px; }

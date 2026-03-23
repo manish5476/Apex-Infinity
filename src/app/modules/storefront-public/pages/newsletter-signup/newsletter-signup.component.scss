@@ -33,7 +33,7 @@
   position: relative;
   background: var(--bg-primary);
   border: 1px solid var(--border-secondary);
-  border-radius: var(--ui-border-radius-xl);
+  border-radius: var(--radius-2xl);
   padding: var(--spacing-4xl);
   overflow: hidden;
   box-shadow: var(--shadow-xl);
@@ -250,7 +250,7 @@
 //   background: rgba(255, 255, 255, 0.7); /* Light mode base */
 //   backdrop-filter: blur(20px);
 //   border: 1px solid rgba(255, 255, 255, 0.5);
-//   border-radius: var(--ui-border-radius-xl);
+//   border-radius: var(--radius-2xl);
 //   padding: var(--spacing-4xl) var(--spacing-2xl);
 //   text-align: center;
 //   box-shadow: var(--shadow-2xl);

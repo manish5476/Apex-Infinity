@@ -102,7 +102,7 @@ import { ProductSliderComponent } from '../components/product-slider/product-sli
       backdrop-filter: var(--glass-blur-c);
       border: 1px solid var(--glass-border-c);
       box-shadow: var(--glass-shadow-c);
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
       overflow: hidden;
     }
 
@@ -389,7 +389,7 @@ isDevMode: any;
 //       border: 1px solid var(--glass-border-c);
 //       box-shadow: var(--glass-shadow-c);
       
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       overflow: hidden;
 //     }
 

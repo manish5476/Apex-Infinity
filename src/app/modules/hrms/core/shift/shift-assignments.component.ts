@@ -368,7 +368,7 @@ import { AppMessageService } from '@core/services/message.service';
     :host ::ng-deep .bento-card.p-card {
       background: var(--component-bg);
       border: var(--ui-border-width) solid var(--border-primary);
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
       display: flex; flex-direction: column;
     }
     :host ::ng-deep .bento-card .p-card-body { padding: 0; flex: 1; display: flex; flex-direction: column; min-height: 0; }
@@ -759,7 +759,7 @@ export class ShiftAssignmentsComponent implements OnInit {
 
 //     /* Borders & Structural Elements */
 //     .border-radius-md { border-radius: var(--ui-border-radius-md); }
-//     .border-radius-xl { border-radius: var(--ui-border-radius-xl); }
+//     .border-radius-xl { border-radius: var(--radius-2xl); }
 //     .border-radius-full { border-radius: 9999px; }
     
 //     .border-bottom-subtle { border-bottom: 1px solid var(--border-secondary); }
@@ -1128,7 +1128,7 @@ export class ShiftAssignmentsComponent implements OnInit {
 // //       align-items: center;
 // //       background: var(--component-bg, var(--bg-secondary));
 // //       padding: var(--spacing-xl) var(--spacing-2xl);
-// //       border-radius: var(--ui-border-radius-xl);
+// //       border-radius: var(--radius-2xl);
 // //       border: var(--ui-border-width) solid var(--border-primary);
 // //       box-shadow: var(--shadow-sm);
 // //     }
@@ -1154,7 +1154,7 @@ export class ShiftAssignmentsComponent implements OnInit {
 // //     .glass-card {
 // //       background: var(--component-bg, var(--bg-primary));
 // //       border: var(--ui-border-width) solid var(--border-primary);
-// //       border-radius: var(--ui-border-radius-xl);
+// //       border-radius: var(--radius-2xl);
 // //       box-shadow: var(--shadow-md);
 // //       overflow: hidden;
 // //     }
