@@ -66,7 +66,8 @@ import { AppMessageService } from '@core/services/message.service';
                     </div>
                     <div class="input-group">
                       <label class="info-label">Holiday Category <span class="text-error">*</span></label>
-                      <p-select formControlName="holidayType" [options]="holidayTypes" appendTo="body" styleClass="w-full premium-select"></p-select>
+                      <p-select formControlName="holidayType" [options]="holidayTypes" appendTo="body" styleClass="w-full premium-select" [filter]="true" filterBy="label"></p-select>
+
                     </div>
                   </div>
 
@@ -103,7 +104,8 @@ import { AppMessageService } from '@core/services/message.service';
               <div class="flex-col gap-5">
                 <div class="input-group">
                   <label class="info-label">Branch Override</label>
-                  <p-select formControlName="branchId" [options]="branches" [showClear]="true" placeholder="All Branches (Global)" appendTo="body" styleClass="w-full premium-select"></p-select>
+                  <p-select formControlName="branchId" [options]="branches" [showClear]="true" placeholder="All Branches (Global)" appendTo="body" styleClass="w-full premium-select" [filter]="true" filterBy="label"></p-select>
+
                   <span class="text-xs text-secondary mt-1">If set, this holiday is ONLY observed at this specific location.</span>
                 </div>
 

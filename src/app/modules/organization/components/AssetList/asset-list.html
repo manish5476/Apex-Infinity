@@ -52,8 +52,10 @@
         <label for="category">Category</label>
         <p-select appendTo="body" (onChange)="applyFilters()" id="category" 
                   [options]="categoryOptions" [(ngModel)]="assetFilter.category" 
-                  [showClear]="true" placeholder="Filter by Category" styleClass="w-full">
+                  [showClear]="true" placeholder="Filter by Category" styleClass="w-full"
+                  [filter]="true" filterBy="label">
         </p-select>
+
       </div>
 
       <div class="se-filter-actions">

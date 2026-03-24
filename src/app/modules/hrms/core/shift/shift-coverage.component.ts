@@ -9,6 +9,8 @@ import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { InputTextModule } from 'primeng/inputtext';
+import { DatePickerModule } from 'primeng/datepicker';
+
 
 import { AppMessageService } from '../../../../core/services/message.service';
 import { HRMSService } from '../../hrms.service';
@@ -23,8 +25,10 @@ import { HRMSService } from '../../hrms.service';
     CardModule,
     ButtonModule,
     TagModule,
-    InputTextModule
+    InputTextModule,
+    DatePickerModule
   ],
+
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [DatePipe],
   template: `
@@ -41,8 +45,9 @@ import { HRMSService } from '../../hrms.service';
         
         <div class="header-right gap-sm">
           <div class="date-picker-wrapper">
-            <input pInputText type="date" [(ngModel)]="selectedDateStr" (change)="loadDashboardData()" class="w-full" />
+            <p-datepicker [(ngModel)]="selectedDate" (onSelect)="loadDashboardData()" [showIcon]="true" iconDisplay="input" placeholder="Select Date" dateFormat="yy-mm-dd" appendTo="body" styleClass="w-full"></p-datepicker>
           </div>
+
           <p-button icon="pi pi-sync" [loading]="isLoading()" [outlined]="true" severity="secondary" (onClick)="loadDashboardData()" tooltip="Refresh Data"></p-button>
         </div>
       </header>
@@ -294,15 +299,17 @@ export class ShiftCoverageComponent implements OnInit {
   private datePipe = inject(DatePipe);
 
   // State
-  selectedDateStr: string = new Date().toISOString().split('T')[0];
+  selectedDate: Date = new Date();
+
   isLoading = signal(false);
   
   coverageData = signal<any[]>([]);
   timelineData = signal<any[]>([]);
 
   get formattedDate() {
-    return this.datePipe.transform(this.selectedDateStr, 'fullDate');
+    return this.datePipe.transform(this.selectedDate, 'fullDate');
   }
+
 
   ngOnInit() {
     this.loadDashboardData();
@@ -310,12 +317,13 @@ export class ShiftCoverageComponent implements OnInit {
 
   loadDashboardData() {
     this.isLoading.set(true);
-    const targetDate = new Date(this.selectedDateStr);
-
+    const dateStr = this.selectedDate instanceof Date ? this.selectedDate.toISOString().split('T')[0] : (this.selectedDate as any);
+    
     forkJoin({
-      coverage: this.hrmsService.getShiftCoverage(targetDate),
-      timeline: this.hrmsService.getShiftTimeline({ date: this.selectedDateStr })
+      coverage: this.hrmsService.getShiftCoverage(this.selectedDate),
+      timeline: this.hrmsService.getShiftTimeline({ date: dateStr })
     }).pipe(
+
       finalize(() => this.isLoading.set(false))
     ).subscribe({
       next: (res: any) => {

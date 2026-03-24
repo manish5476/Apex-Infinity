@@ -206,8 +206,11 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
             formControlName="type" 
             [options]="punchTypes" 
             appendTo="body" 
-            styleClass="w-full">
+            styleClass="w-full"
+            [filter]="true"
+            filterBy="label">
           </p-select>
+
         </div>
 
         <div class="input-group flex-col gap-xs">

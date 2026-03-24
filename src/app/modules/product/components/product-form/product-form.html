@@ -79,8 +79,10 @@
                 <div [formGroupName]="i" class="inventory-row animate-slideInRight">
                   <div>
                     <p-select [options]="branchOptions()" formControlName="branchId" optionLabel="name"
-                      optionValue="_id" placeholder="Select Branch" appendTo="body" [style]="{'width':'100%'}">
+                      optionValue="_id" placeholder="Select Branch" appendTo="body" [style]="{'width':'100%'}"
+                      [filter]="true" filterBy="name">
                     </p-select>
+
                   </div>
                   <div>
                     <p-inputNumber formControlName="quantity" [min]="0" inputId="qty-{{i}}"></p-inputNumber>
@@ -159,31 +161,36 @@
             <div class="field-group">
               <label>Department</label>
               <p-select [options]="masterList.department()" formControlName="departmentId" optionLabel="name"
-                optionValue="_id" placeholder="Select..." [filter]="true"></p-select>
+                optionValue="_id" placeholder="Select..." [filter]="true" filterBy="name"></p-select>
+
             </div>
 
             <div class="field-group">
               <label>Category</label>
               <p-select [options]="masterList.categories()" formControlName="categoryId" optionLabel="name"
-                optionValue="_id" placeholder="Select..." [filter]="true"></p-select>
+                optionValue="_id" placeholder="Select..." [filter]="true" filterBy="name"></p-select>
+
             </div>
 
             <div class="field-group">
               <label>Brand</label>
               <p-select [options]="masterList.brands()" formControlName="brandId" optionLabel="name" optionValue="_id"
-                placeholder="Select..." [filter]="true"></p-select>
+                placeholder="Select..." [filter]="true" filterBy="name"></p-select>
+
             </div>
 
             <div class="field-group">
               <label>Base Unit</label>
               <p-select [options]="masterList.units()" formControlName="unitId" optionLabel="name" optionValue="_id"
-                placeholder="e.g. Kg, Pcs"></p-select>
+                placeholder="e.g. Kg, Pcs" [filter]="true" filterBy="name"></p-select>
+
             </div>
 
             <div class="field-group">
               <label>Primary Supplier</label>
               <p-select [options]="masterList.suppliers()" formControlName="defaultSupplierId" optionLabel="companyName"
-                optionValue="_id" placeholder="Select..." [filter]="true"></p-select>
+                optionValue="_id" placeholder="Select..." [filter]="true" filterBy="companyName"></p-select>
+
             </div>
           </div>
         </section>

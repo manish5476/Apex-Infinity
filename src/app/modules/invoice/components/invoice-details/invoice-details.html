@@ -278,7 +278,7 @@
     </div>
     <div class="form-group">
       <label>Payment Mode</label>
-      <p-select appendTo="body" formControlName="paymentMethod" [options]="paymentMethods" optionLabel="label" optionValue="value" styleClass="w-full"></p-select>
+      <p-select appendTo="body" formControlName="paymentMethod" [options]="paymentMethods" optionLabel="label" optionValue="value" [filter]="true" filterBy="label" styleClass="w-full"></p-select>
     </div>
     <div class="form-group">
       <label>Reference / Transaction ID</label>

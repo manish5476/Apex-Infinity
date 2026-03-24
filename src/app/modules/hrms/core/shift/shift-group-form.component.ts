@@ -135,8 +135,11 @@ import { InputIconModule } from 'primeng/inputicon';
                     optionValue="id" 
                     placeholder="Select Org" 
                     appendTo="body"
-                    styleClass="w-full">
+                    styleClass="w-full"
+                    [filter]="true"
+                    filterBy="name">
                   </p-select>
+
                 </div>
 
                 <div class="form-field">
@@ -150,8 +153,11 @@ import { InputIconModule } from 'primeng/inputicon';
                     placeholder="Select Branch" 
                     [showClear]="true" 
                     appendTo="body"
-                    styleClass="w-full">
+                    styleClass="w-full"
+                    [filter]="true"
+                    filterBy="name">
                   </p-select>
+
                 </div>
 
                 <div class="form-field">
@@ -329,8 +335,11 @@ import { InputIconModule } from 'primeng/inputicon';
                     optionLabel="label" 
                     optionValue="value" 
                     appendTo="body"
-                    styleClass="w-full">
+                    styleClass="w-full"
+                    [filter]="true"
+                    filterBy="label">
                   </p-select>
+
                 </div>
               </div>
 
@@ -356,8 +365,11 @@ import { InputIconModule } from 'primeng/inputicon';
                         placeholder="Assign Shift (Leave blank for Day Off)" 
                         [showClear]="true" 
                         appendTo="body"
-                        styleClass="w-full">
+                        styleClass="w-full"
+                        [filter]="true"
+                        filterBy="name">
                       </p-select>
+
                     </div>
 
                     <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true" (onClick)="removeRotationPattern($index)" pTooltip="Remove Rule"></p-button>

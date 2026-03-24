@@ -147,8 +147,11 @@ import { MultiSelectModule } from 'primeng/multiselect';
                     [options]="gradeOptions" 
                     placeholder="Select Grade" 
                     styleClass="w-full" 
-                    appendTo="body">
+                    appendTo="body"
+                    [filter]="true"
+                    filterBy="label">
                   </p-select>
+
                 </div>
               </div>
 
@@ -257,8 +260,11 @@ import { MultiSelectModule } from 'primeng/multiselect';
                   optionLabel="label"
                   optionValue="value"
                   styleClass="w-full" 
-                  appendTo="body">
+                  appendTo="body"
+                  [filter]="true"
+                  filterBy="label">
                 </p-select>
+
               </div>
             </div>
           </p-card>

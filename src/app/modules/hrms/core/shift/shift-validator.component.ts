@@ -99,7 +99,10 @@ import { AppMessageService } from "@core/services/message.service";
                 optionLabel="name" 
                 optionValue="id"
                 placeholder="Select a Shift"
-                styleClass="w-full premium-input">
+                styleClass="w-full premium-input"
+                [filter]="true"
+                filterBy="name">
+
                 <ng-template pTemplate="item" let-shift>
                   <div class="flex-col gap-xs">
                     <span class="font-bold text-primary">{{ shift.name }}</span>

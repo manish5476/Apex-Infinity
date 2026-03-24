@@ -107,8 +107,11 @@ import { DatePickerModule } from 'primeng/datepicker';
                   placeholder="Select Branch Location" 
                   [showClear]="true" 
                   styleClass="w-full prime-override" 
-                  appendTo="body">
+                  appendTo="body"
+                  [filter]="true"
+                  filterBy="name">
                 </p-select>
+
               </div>
 
               <div class="form-field span-2-inner">

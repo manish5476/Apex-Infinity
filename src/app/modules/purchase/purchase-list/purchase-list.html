@@ -14,10 +14,11 @@
 
       <div class="se-filter-field">
         <label for="supplier">Supplier</label>
-        <p-select appendTo="body" appendTo="body" id="supplier" [options]="supplierOptions()" [(ngModel)]="purchaseFilter.supplierId"
+        <p-select appendTo="body" id="supplier" [options]="supplierOptions()" [(ngModel)]="purchaseFilter.supplierId"
           (onChange)="applyFilters()" optionLabel="companyName" optionValue="_id" [showClear]="true" 
-          placeholder="Select Supplier" [filter]="true" styleClass="w-full">
+          placeholder="Select Supplier" [filter]="true" filterBy="companyName" styleClass="w-full">
         </p-select>
+
       </div>
 
       <div class="se-filter-field" style="min-width: 220px;">
@@ -30,9 +31,10 @@
 
       <div class="se-filter-field">
         <label for="status">Order Status</label>
-        <p-select appendTo="body" appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="purchaseFilter.status"
-          (onChange)="applyFilters()" [showClear]="true" placeholder="Any Status" styleClass="w-full">
+        <p-select appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="purchaseFilter.status"
+          (onChange)="applyFilters()" [showClear]="true" placeholder="Any Status" [filter]="true" filterBy="label" styleClass="w-full">
         </p-select>
+
       </div>
 
       <div class="se-filter-actions">

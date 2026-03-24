@@ -24,8 +24,10 @@
       <div class="field-group">
         <span class="p-float-label">
           <p-select formControlName="branchId" [options]="branches" optionLabel="name" optionValue="_id"
-            [style]="{'width':'100%'}" appendTo="body" inputId="branch-input">
+            [style]="{'width':'100%'}" appendTo="body" inputId="branch-input"
+            [filter]="true" filterBy="name">
           </p-select>
+
           <label for="branch-input">Target Branch</label>
         </span>
         @if (branchCtrl?.invalid && branchCtrl?.touched) {
@@ -38,7 +40,8 @@
       <div class="field-group">
         <span class="p-float-label">
           <p-select formControlName="type" [options]="adjustmentTypes" optionLabel="label" optionValue="value"
-            [style]="{'width':'100%'}" inputId="type-input">
+            [style]="{'width':'100%'}" inputId="type-input" [filter]="true" filterBy="label">
+
 
             <ng-template pTemplate="selectedItem" let-selected>
               <div class="flex align-items-center gap-2">

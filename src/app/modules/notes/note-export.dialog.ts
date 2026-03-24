@@ -6,11 +6,13 @@ import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { NoteService } from '../../core/services/notes.service';
 import { AppMessageService } from "../../core/services/message.service";
 import { finalize } from "rxjs";
+import { DatePickerModule } from 'primeng/datepicker';
+
 
 @Component({
   selector: 'app-note-export-dialog',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DatePickerModule],
   template: `
     <div class="export-container">
       
@@ -49,12 +51,13 @@ import { finalize } from "rxjs";
         <div class="form-group">
           <label class="section-label">Select Period</label>
           <div class="date-inputs">
-             <input type="date" [(ngModel)]="startDate" class="std-input" placeholder="Start">
+             <p-datepicker [(ngModel)]="startDate" placeholder="Start" dateFormat="yy-mm-dd" [showIcon]="true" iconDisplay="input" appendTo="body" styleClass="w-full"></p-datepicker>
              <span class="separator">-</span>
-             <input type="date" [(ngModel)]="endDate" class="std-input" placeholder="End">
+             <p-datepicker [(ngModel)]="endDate" placeholder="End" dateFormat="yy-mm-dd" [showIcon]="true" iconDisplay="input" appendTo="body" styleClass="w-full"></p-datepicker>
           </div>
         </div>
       }
+
 
       <!-- Option 2: Format -->
       <div class="form-group">
@@ -252,8 +255,9 @@ import { finalize } from "rxjs";
   scope: 'all' | 'filtered' = 'all';
   format: 'json' | 'csv' = 'json';
 
-  startDate: string = '';
-  endDate: string = '';
+  startDate: Date | null = null;
+  endDate: Date | null = null;
+
 
   isLoading = false;
 
@@ -266,7 +270,12 @@ import { finalize } from "rxjs";
 
     const export$ = this.scope === 'all' 
       ? this.noteService.exportAllUserNotes(this.format)
-      : this.noteService.exportNoteData(this.format, this.startDate, this.endDate);
+      : this.noteService.exportNoteData(
+          this.format, 
+          this.startDate instanceof Date ? this.startDate.toISOString().split('T')[0] : (this.startDate || undefined), 
+          this.endDate instanceof Date ? this.endDate.toISOString().split('T')[0] : (this.endDate || undefined)
+        );
+
 
     export$.pipe(
       finalize(() => {

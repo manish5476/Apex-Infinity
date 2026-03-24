@@ -27,15 +27,17 @@
         <label for="payStatus">Payment Status</label>
         <p-select appendTo="body" id="payStatus" [options]="paymentStatusOptions"
           [(ngModel)]="salesFilter.paymentStatus" [showClear]="true" placeholder="All Status" styleClass="w-full"
-          (onChange)="applyFilters()">
+          [filter]="true" filterBy="label" (onChange)="applyFilters()">
         </p-select>
+
       </div>
 
       <div class="se-filter-field">
         <label for="status">Order Status</label>
         <p-select appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="salesFilter.status"
-          [showClear]="true" placeholder="All Orders" styleClass="w-full" (onChange)="applyFilters()">
+          [showClear]="true" placeholder="All Orders" styleClass="w-full" [filter]="true" filterBy="label" (onChange)="applyFilters()">
         </p-select>
+
       </div>
 
       <div class="se-filter-actions">

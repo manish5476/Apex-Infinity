@@ -50,7 +50,7 @@ import { AppMessageService } from '@core/services/message.service';
           </div>
         </div>
         <div class="header-right flex-align gap-3">
-          <p-select [options]="financialYears" [(ngModel)]="selectedFy" (onChange)="loadData()" styleClass="premium-select w-10rem"></p-select>
+          <p-select [options]="financialYears" [(ngModel)]="selectedFy" (onChange)="loadData()" [filter]="true" filterBy="label" styleClass="premium-select w-10rem"></p-select>
           <p-button label="Bulk Initialize Year" icon="pi pi-sync" styleClass="p-button-primary shadow-sm" (onClick)="showBulkInitDialog()"></p-button>
         </div>
       </header>
@@ -217,11 +217,11 @@ import { AppMessageService } from '@core/services/message.service';
         <div class="grid-2 gap-4">
           <div class="input-group">
             <label class="info-label">Leave Type <span class="text-error">*</span></label>
-            <p-select formControlName="leaveType" [options]="leaveTypes" placeholder="Select" styleClass="w-full premium-select" appendTo="body"></p-select>
+            <p-select formControlName="leaveType" [options]="leaveTypes" [filter]="true" filterBy="label" placeholder="Select" styleClass="w-full premium-select" appendTo="body"></p-select>
           </div>
           <div class="input-group">
             <label class="info-label">Action <span class="text-error">*</span></label>
-            <p-select formControlName="actionType" [options]="actionTypes" placeholder="Select" styleClass="w-full premium-select" appendTo="body"></p-select>
+            <p-select formControlName="actionType" [options]="actionTypes" [filter]="true" filterBy="label" placeholder="Select" styleClass="w-full premium-select" appendTo="body"></p-select>
           </div>
         </div>
 

@@ -94,8 +94,12 @@ import { DatePickerModule } from 'primeng/datepicker';
                   optionLabel="label"
                   optionValue="value"
                   styleClass="w-full" 
-                  appendTo="body">
+                  appendTo="body"
+                  [filter]="true"
+                  filterBy="label">
                 </p-select>
+
+
               </div>
 
               <div class="form-field">
@@ -110,13 +114,15 @@ import { DatePickerModule } from 'primeng/datepicker';
               </div>
 
               <div class="form-field">
-                <label for="startTime">Start Time <span class="required">*</span></label>
-                <input id="startTime" type="time" formControlName="startTime" class="se-input w-full prime-override-input">
+                <p-datepicker id="startTime" formControlName="startTime" [timeOnly]="true" 
+                  hourFormat="12" styleClass="w-full prime-override-input" appendTo="body"></p-datepicker>
+
               </div>
 
               <div class="form-field">
-                <label for="endTime">End Time <span class="required">*</span></label>
-                <input id="endTime" type="time" formControlName="endTime" class="se-input w-full prime-override-input">
+                <p-datepicker id="endTime" formControlName="endTime" [timeOnly]="true" 
+                  hourFormat="12" styleClass="w-full prime-override-input" appendTo="body"></p-datepicker>
+
               </div>
 
               <div class="form-field span-2-inner mt-1">
@@ -326,22 +332,26 @@ import { DatePickerModule } from 'primeng/datepicker';
               <div class="inner-grid-2">
                 <div class="form-field">
                   <label for="coreStartTime">Core Start Time</label>
-                  <input id="coreStartTime" type="time" formControlName="coreStartTime" class="se-input w-full prime-override-input">
+                  <p-datepicker id="coreStartTime" formControlName="coreStartTime" [timeOnly]="true" 
+                    hourFormat="12" styleClass="w-full prime-override-input" appendTo="body"></p-datepicker>
                 </div>
                 <div class="form-field">
                   <label for="coreEndTime">Core End Time</label>
-                  <input id="coreEndTime" type="time" formControlName="coreEndTime" class="se-input w-full prime-override-input">
+                  <p-datepicker id="coreEndTime" formControlName="coreEndTime" [timeOnly]="true" 
+                    hourFormat="12" styleClass="w-full prime-override-input" appendTo="body"></p-datepicker>
                 </div>
               </div>
 
               <div class="inner-grid-2">
                 <div class="form-field">
                   <label for="flexibleBandStart">Flexi Band Start</label>
-                  <input id="flexibleBandStart" type="time" formControlName="flexibleBandStart" class="se-input w-full prime-override-input">
+                  <p-datepicker id="flexibleBandStart" formControlName="flexibleBandStart" [timeOnly]="true" 
+                    hourFormat="12" styleClass="w-full prime-override-input" appendTo="body"></p-datepicker>
                 </div>
                 <div class="form-field">
                   <label for="flexibleBandEnd">Flexi Band End</label>
-                  <input id="flexibleBandEnd" type="time" formControlName="flexibleBandEnd" class="se-input w-full prime-override-input">
+                  <p-datepicker id="flexibleBandEnd" formControlName="flexibleBandEnd" [timeOnly]="true" 
+                    hourFormat="12" styleClass="w-full prime-override-input" appendTo="body"></p-datepicker>
                 </div>
               </div>
 

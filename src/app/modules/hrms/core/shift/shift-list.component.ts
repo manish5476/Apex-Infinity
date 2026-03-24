@@ -62,8 +62,11 @@ import { SelectModule } from 'primeng/select';
               (ngModelChange)="updateFilter('shiftType', $event)" 
               placeholder="All Types"
               styleClass="w-full md:w-14rem"
-              [showClear]="true">
+              [showClear]="true"
+              [filter]="true"
+              filterBy="label">
             </p-select>
+
           </div>
 
           <div class="se-filter-field">
@@ -73,8 +76,11 @@ import { SelectModule } from 'primeng/select';
               (ngModelChange)="updateFilter('isActive', $event)" 
               placeholder="All Statuses"
               styleClass="w-full md:w-12rem"
-              [showClear]="true">
+              [showClear]="true"
+              [filter]="true"
+              filterBy="label">
             </p-select>
+
           </div>
 
           <div class="se-filter-actions ml-auto flex gap-sm">

@@ -60,7 +60,8 @@
           <div class="form-group span-2">
             <label>Branch</label>
             <p-select appendTo="body" appendTo="body" formControlName="branchId" [options]="branchOptions()" 
-              optionLabel="name" optionValue="_id" styleClass="w-full theme-control" placeholder="Select Branch"></p-select>
+              optionLabel="name" optionValue="_id" styleClass="w-full theme-control" placeholder="Select Branch" [filter]="true" filterBy="name"></p-select>
+
           </div>
 
           <div class="form-group span-2">
@@ -184,7 +185,8 @@
                 <p-inputNumber formControlName="paidAmount" mode="currency" currency="INR" locale="en-IN" 
                   placeholder="0.00" styleClass="w-full theme-control"></p-inputNumber>
                 <p-select appendTo="body" appendTo="body" formControlName="paymentMethod" [options]="paymentMethodOptions" 
-                  placeholder="Mode" styleClass="w-full theme-control"></p-select>
+                  placeholder="Mode" styleClass="w-full theme-control" [filter]="true" filterBy="label"></p-select>
+
               </div>
             </div>
           </div>
