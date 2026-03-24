@@ -16,7 +16,7 @@ import TaskItem from '@tiptap/extension-task-item';
 @Component({
   selector: 'app-note-detail',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, TiptapEditorComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './note-detail.component.html',
   styleUrls: ['./note-detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
