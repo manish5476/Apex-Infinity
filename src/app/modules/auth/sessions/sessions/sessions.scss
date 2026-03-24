@@ -15,6 +15,7 @@
   flex-direction: column;
   height: 100%;
   width: 100%;
+  border-radius: var(--radius-2xl);
   background: var(--bg-primary); 
   padding: var(--spacing-xl);
   gap: var(--spacing-lg);
@@ -117,7 +118,7 @@
   flex-direction: column;
   background: var(--glass-bg-c);
   border: 1px solid var(--glass-border-c);
-  border-radius: var(--ui-border-radius-xl);
+  border-radius: var(--radius-2xl);
   box-shadow: var(--glass-shadow-c);
   backdrop-filter: blur(var(--glass-blur-c));
   overflow: hidden; 

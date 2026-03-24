@@ -2,16 +2,21 @@ import { Component, inject, signal, computed, OnInit, ChangeDetectionStrategy } 
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { EditorModule } from 'primeng/editor';
 import { Note, NoteAttachment, Subtask, ActivityLog } from '../../../core/models/note.types';
 import { NoteService } from '../../../core/services/notes.service';
-import Quill from 'quill';
 import { AppMessageService } from '../../../core/services/message.service';
+import { TiptapEditorComponent } from '../../shared/components/tiptap-editor/tiptap-editor.component';
+import { generateHTML } from '@tiptap/core';
+import StarterKit from '@tiptap/starter-kit';
+import Link from '@tiptap/extension-link';
+import Underline from '@tiptap/extension-underline';
+import TaskList from '@tiptap/extension-task-list';
+import TaskItem from '@tiptap/extension-task-item';
 
 @Component({
   selector: 'app-note-detail',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, EditorModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, TiptapEditorComponent],
   templateUrl: './note-detail.component.html',
   styleUrls: ['./note-detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -51,9 +56,7 @@ export class NoteDetailComponent implements OnInit {
     dueDate: [null as string | null]
   });
 
-  constructor() {
-    this.customizeQuill();
-  }
+  constructor() { }
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
@@ -66,23 +69,34 @@ export class NoteDetailComponent implements OnInit {
     });
   }
 
-  customizeQuill() {
-    try {
-      const icons: any = Quill.import('ui/icons');
-      if (icons) {
-        icons.bold = '<i class="pi pi-bold"></i>';
-        icons.italic = '<i class="pi pi-italic"></i>';
-        icons.underline = '<i class="pi pi-underline"></i>';
-        icons.list = {
-          ordered: '<i class="pi pi-list"></i>',
-          bullet: '<i class="pi pi-bars"></i>'
-        };
-        icons.link = '<i class="pi pi-link"></i>';
-        icons['code-block'] = '<i class="pi pi-code"></i>';
+  /** Converts Tiptap JSON content (or raw HTML string) → safe HTML for [innerHTML] */
+  getContentHtml(content: any): string {
+    if (!content) return '';
+    // Already an HTML string
+    if (typeof content === 'string') {
+      if (content.startsWith('<') || content === '') return content;
+      try {
+        const json = JSON.parse(content);
+        return generateHTML(json, [
+          StarterKit, Link, Underline,
+          TaskList, TaskItem.configure({ nested: true })
+        ]);
+      } catch {
+        return content;
       }
-    } catch (e) {
-      console.warn('Quill icons could not be customized', e);
     }
+    // Already a JSON object
+    if (typeof content === 'object') {
+      try {
+        return generateHTML(content, [
+          StarterKit, Link, Underline,
+          TaskList, TaskItem.configure({ nested: true })
+        ]);
+      } catch {
+        return '';
+      }
+    }
+    return '';
   }
 
   // Helper to safely get initials

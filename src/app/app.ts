@@ -13,10 +13,11 @@ import { SocketConnectionService } from '@core/services/socket/socket-connection
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [ToastModule, RouterOutlet, LoadingComponent, AiAssistantComponent, AnnouncementListenerComponent],
+  imports: [ToastModule, RouterOutlet, LoadingComponent, AnnouncementListenerComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
+// AiAssistantComponent
 export class App implements OnInit, OnDestroy {
   protected readonly title = signal('apex');
 

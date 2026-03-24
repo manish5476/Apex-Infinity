@@ -248,7 +248,7 @@ import { FilterField } from '../../modules/shared/components/universal-filter/fi
   justify-content: center;
   background: rgba(255, 255, 255, 0.65);
   backdrop-filter: blur(3px);
-  border-radius: var(--ui-border-radius-xl);
+  border-radius: var(--radius-2xl);
 }
 
 /* ══════════════════════════════════════════════════════════

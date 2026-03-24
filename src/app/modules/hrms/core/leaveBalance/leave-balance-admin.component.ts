@@ -33,7 +33,7 @@ import { AppMessageService } from '@core/services/message.service';
   imports: [
     CommonModule, ReactiveFormsModule, TabsModule, TableModule, CardModule, FormsModule,
     ButtonModule, TagModule, SkeletonModule, AvatarModule, TooltipModule,
-    DialogModule, InputTextModule, InputNumberModule, SelectModule, 
+    DialogModule, InputTextModule, InputNumberModule, SelectModule,
     CheckboxModule, ChartModule, ProgressBarModule
   ],
   providers: [MessageService, ConfirmationService],
@@ -294,7 +294,7 @@ import { AppMessageService } from '@core/services/message.service';
     .border-radius-md { border-radius: var(--ui-border-radius-md); }
     .border-1 { border: 1px solid; }
     .surface-border { border-color: var(--border-primary); }
-    .border-round-xl { border-radius: var(--ui-border-radius-xl); }
+    .border-round-xl { border-radius: var(--radius-2xl); }
     .overflow-hidden { overflow: hidden; }
     .shadow-none { box-shadow: none !important; }
     
@@ -319,14 +319,14 @@ import { AppMessageService } from '@core/services/message.service';
     /* --------------------------------------------------------------------------
        HEADER & TABS
        -------------------------------------------------------------------------- */
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--ui-border-radius-xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--radius-2xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
     .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
     .icon-brand { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: var(--font-size-2xl); }
     .header-titles { display: flex; flex-direction: column; gap: 4px; }
     .page-title { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); font-family: var(--font-heading); margin: 0; letter-spacing: -0.02em; }
     .page-subtitle { font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0; }
 
-    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-md); overflow: hidden; }
+    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); overflow: hidden; }
     ::ng-deep .workspace-card .p-card-body, ::ng-deep .workspace-card .p-card-content { padding: 0; }
 
     ::ng-deep .hub-tablist .p-tablist-nav { background: var(--bg-secondary) !important; border-bottom: 1px solid var(--border-primary) !important; padding: 0 var(--spacing-xl) !important; }
@@ -385,7 +385,7 @@ export class LeaveBalanceAdminComponent implements OnInit {
 
   isLoading = signal(true);
   balances = signal<any[]>([]);
-  
+
   // Header Filtering
   financialYears = [{ label: '2023-2024', value: '2023-2024' }, { label: '2024-2025', value: '2024-2025' }];
   selectedFy = '2024-2025';
@@ -397,7 +397,7 @@ export class LeaveBalanceAdminComponent implements OnInit {
   // Dialogs
   displayBulkDialog = false;
   bulkInitForm!: FormGroup;
-  
+
   displayAdjustDialog = false;
   adjustForm!: FormGroup;
   selectedBalance: any = null;
@@ -408,7 +408,7 @@ export class LeaveBalanceAdminComponent implements OnInit {
     { label: 'Sick Leave (SL)', value: 'sickLeave' },
     { label: 'Earned Leave (EL)', value: 'earnedLeave' }
   ];
-  
+
   actionTypes = [
     { label: 'Credit (Add)', value: 'credit' },
     { label: 'Debit (Deduct)', value: 'debit' }
@@ -460,7 +460,7 @@ export class LeaveBalanceAdminComponent implements OnInit {
   submitBulkInit() {
     if (this.bulkInitForm.invalid) return;
     this.isProcessing.set(true);
-    
+
     const val = this.bulkInitForm.value;
     this.hrmsService.bulkInitializeLeaveBalances(val.financialYear, val.carryForward).pipe(
       catchError(err => {
@@ -471,7 +471,7 @@ export class LeaveBalanceAdminComponent implements OnInit {
         this.isProcessing.set(false);
         this.displayBulkDialog = false;
       })
-    ).subscribe((res:any) => {
+    ).subscribe((res: any) => {
       if (res) {
         this.messageService.showSuccess(res.message)
         this.selectedFy = val.financialYear;
@@ -490,10 +490,10 @@ export class LeaveBalanceAdminComponent implements OnInit {
 
   submitAdjustment() {
     if (this.adjustForm.invalid || !this.selectedBalance) return;
-    
+
     this.isProcessing.set(true);
     const formVal = this.adjustForm.value;
-    
+
     // In a real app, you might have specific endpoints like /credit or /debit
     // or you pass a signed +/- amount to updateLeaveBalance
     const payload = {
@@ -512,7 +512,7 @@ export class LeaveBalanceAdminComponent implements OnInit {
         this.isProcessing.set(false);
         this.displayAdjustDialog = false;
       })
-    ).subscribe((res:any) => {
+    ).subscribe((res: any) => {
       if (res) {
         this.messageService.showSuccess(res.message)
         this.loadData();

@@ -26,7 +26,7 @@ import { AppMessageService } from '@core/services/message.service';
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, DatePipe, CardModule, TableModule,
-    ButtonModule, TagModule, DialogModule, DatePickerModule,FormsModule,
+    ButtonModule, TagModule, DialogModule, DatePickerModule, FormsModule,
     SkeletonModule, TooltipModule
   ],
   providers: [MessageService],
@@ -226,7 +226,7 @@ import { AppMessageService } from '@core/services/message.service';
     .border-top { border-top: 1px solid var(--border-primary); }
     
     /* Header */
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--ui-border-radius-xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--radius-2xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
     .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
     .icon-brand { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: var(--font-size-2xl); background: var(--color-primary-bg); color: var(--color-primary); }
     .header-titles { display: flex; flex-direction: column; gap: 4px; }
@@ -242,7 +242,7 @@ import { AppMessageService } from '@core/services/message.service';
     .stat-val { font-size: 2rem; font-weight: var(--font-weight-bold); line-height: 1; }
 
     /* Table & Dialog */
-    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-md); overflow: hidden; }
+    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); overflow: hidden; }
     ::ng-deep .premium-table .p-datatable-header { padding: 0; border: none; background: transparent; }
     ::ng-deep .premium-table .p-datatable-thead > tr > th { background: var(--bg-secondary) !important; border-bottom: 2px solid var(--border-primary) !important; color: var(--text-tertiary); font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); text-transform: uppercase; letter-spacing: 0.05em; padding: var(--spacing-lg) var(--spacing-xl); }
     ::ng-deep .premium-table .p-datatable-tbody > tr > td { border-bottom: 1px solid var(--border-primary); padding: var(--spacing-md) var(--spacing-xl); color: var(--text-secondary); transition: background-color 0.2s; }
@@ -332,7 +332,7 @@ export class MyDailyAttendanceComponent implements OnInit {
 
   submitRegularization() {
     if (this.regForm.invalid || !this.selectedRecord) return;
-    
+
     this.isSubmitting.set(true);
     const payload = this.regForm.value;
 
@@ -346,7 +346,7 @@ export class MyDailyAttendanceComponent implements OnInit {
         this.isSubmitting.set(false);
         this.displayRegularize = false;
       })
-    ).subscribe((res:any) => {
+    ).subscribe((res: any) => {
       if (res) {
         this.messageService.showSuccess(res.message)
         this.loadMyAttendance(); // Reload to show pending status if applicable

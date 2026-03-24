@@ -1,4 +1,64 @@
-<div class="section-root" [ngClass]="heightClass()" @heroAnim>
+<!-- hero-banner.component.html -->
+<section class="hero-root" [ngStyle]="sectionStyle()">
+
+  <!-- Background image -->
+  @if (cfg().backgroundImage) {
+  <div class="hero-bg" [style.background-image]="'url(' + cfg().backgroundImage + ')'"></div>
+  }
+
+  <!-- Overlay -->
+  <div class="hero-overlay" [ngStyle]="overlayStyle()"></div>
+
+  <!-- Grain texture -->
+  <div class="hero-grain" aria-hidden="true"></div>
+
+  <!-- Content -->
+  <div class="hero-content" [class.align-left]="cfg().contentPosition === 'left'"
+    [class.align-center]="cfg().contentPosition === 'center'" [class.align-right]="cfg().contentPosition === 'right'">
+
+    <div class="hero-inner" [class.text-left]="cfg().alignment === 'left'"
+      [class.text-center]="cfg().alignment === 'center'" [class.text-right]="cfg().alignment === 'right'">
+
+      @if (cfg().subtitle) {
+      <span class="hero-eyebrow">{{ cfg().subtitle }}</span>
+      }
+
+      @if (cfg().titleTag === 'h1') {
+      <h1 class="hero-title">{{ cfg().title }}</h1>
+      } @else if (cfg().titleTag === 'h2') {
+      <h2 class="hero-title">{{ cfg().title }}</h2>
+      } @else {
+      <h3 class="hero-title">{{ cfg().title }}</h3>
+      }
+
+      @if (cfg().ctaButtons.length) {
+      <div class="hero-actions" [class.justify-start]="cfg().alignment === 'left'"
+        [class.justify-center]="cfg().alignment === 'center'" [class.justify-end]="cfg().alignment === 'right'">
+
+        @for (btn of cfg().ctaButtons; track btn.text) {
+        @if (isExternal(btn.link)) {
+        <a [href]="btn.link" target="_blank" rel="noopener" class="hero-btn" [class]="'hero-btn-' + btn.variant">
+          {{ btn.text }}
+        </a>
+        } @else {
+        <a [routerLink]="[btn.link]" class="hero-btn" [class]="'hero-btn-' + btn.variant">
+          {{ btn.text }}
+        </a>
+        }
+        }
+      </div>
+      }
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="hero-scroll" aria-hidden="true">
+    <div class="hero-scroll-line"></div>
+  </div>
+
+</section>
+
+<!-- <div class="section-root" [ngClass]="heightClass()" @heroAnim>
 
   <div class="bg-wrapper">
     <img [src]="cfg().backgroundImage" alt="Banner Image" class="bg-image">
@@ -40,4 +100,4 @@
       }
     </div>
   </div>
-</div>
+</div> -->

@@ -462,7 +462,7 @@ import { InputIconModule } from 'primeng/inputicon';
     .border-radius-sm { border-radius: var(--ui-border-radius-sm); }
     .border-radius-md { border-radius: var(--ui-border-radius-md); }
     .border-radius-lg { border-radius: var(--ui-border-radius-lg); }
-    .border-radius-xl { border-radius: var(--ui-border-radius-xl); }
+    .border-radius-xl { border-radius: var(--radius-2xl); }
     .border-radius-full { border-radius: 9999px; }
     
     .border-top-subtle { border-top: 1px solid var(--border-secondary); }

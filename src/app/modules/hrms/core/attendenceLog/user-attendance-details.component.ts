@@ -263,7 +263,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
     .border-radius-none { border-radius: 0 !important; }
     .border-radius-md { border-radius: var(--ui-border-radius-md); }
     .border-radius-lg { border-radius: var(--ui-border-radius-lg); }
-    .border-radius-xl { border-radius: var(--ui-border-radius-xl); }
+    .border-radius-xl { border-radius: var(--radius-2xl); }
     
     .border-none { border: none !important; }
     .border-top-subtle { border-top: 1px solid var(--border-secondary); }
@@ -763,14 +763,14 @@ export class UserAttendanceDetailsComponent implements OnInit {
 //     .border-radius-md { border-radius: var(--ui-border-radius-md); }
 
 //     /* Header */
-//     .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--ui-border-radius-xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
+//     .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--radius-2xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
 //     .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
 //     ::ng-deep .back-btn { color: var(--text-secondary) !important; background: var(--bg-primary) !important; border: 1px solid var(--border-primary) !important; }
 //     .page-title { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); font-family: var(--font-heading); letter-spacing: -0.02em; }
 //     .page-subtitle { font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0; }
 
 //     /* Table */
-//     .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-md); overflow: hidden; }
+//     .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); overflow: hidden; }
 //     ::ng-deep .workspace-card .p-card-body, ::ng-deep .workspace-card .p-card-content { padding: 0; }
     
 //     ::ng-deep .premium-table .p-datatable-header { padding: 0; border: none; background: transparent; }

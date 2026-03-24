@@ -12,6 +12,7 @@
   height: 100%;
   overflow-y: auto;
   padding: 2rem;
+  border-radius: var(--radius-2xl);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -203,7 +204,7 @@
   @page { size: A4; margin: 1cm; }
   body * { visibility: hidden; }
   
-  .page-container { padding: 0; margin: 0; background: white; }
+  .page-container { padding: 0; margin: 0; background: white; border-radius: var(--radius-2xl);}
   .no-print { display: none !important; }
 
   .document-sheet, .document-sheet * { visibility: visible; }

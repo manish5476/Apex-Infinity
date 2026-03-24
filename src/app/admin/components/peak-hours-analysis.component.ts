@@ -175,7 +175,7 @@ interface PeakData {
     /* HERO CARD (Gradient) */
     .hero-card {
       background: var(--accent-gradient);
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
       padding: var(--spacing-xl);
       position: relative;
       overflow: hidden;
@@ -245,7 +245,7 @@ interface PeakData {
     .insight-card {
       background: var(--bg-secondary);
       border: 1px solid var(--border-primary);
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
       padding: var(--spacing-lg);
     }
     .insight-card.alt-bg { background: var(--bg-ternary); border-color: var(--border-secondary); }
@@ -297,7 +297,7 @@ interface PeakData {
     .slots-section {
       background: var(--bg-secondary);
       border: 1px solid var(--border-primary);
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
       padding: var(--spacing-xl);
     }
 
@@ -584,7 +584,7 @@ export class PeakHoursAnalysisComponent implements OnInit {
 //     /* HERO CARD (Gradient) */
 //     .hero-card {
 //       background: var(--accent-gradient);
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       padding: var(--spacing-xl);
 //       position: relative;
 //       overflow: hidden;
@@ -654,7 +654,7 @@ export class PeakHoursAnalysisComponent implements OnInit {
 //     .insight-card {
 //       background: var(--bg-secondary);
 //       border: 1px solid var(--border-primary);
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       padding: var(--spacing-lg);
 //     }
 //     .insight-card.alt-bg { background: var(--bg-ternary); border-color: var(--border-secondary); }
@@ -706,7 +706,7 @@ export class PeakHoursAnalysisComponent implements OnInit {
 //     .slots-section {
 //       background: var(--bg-secondary);
 //       border: 1px solid var(--border-primary);
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       padding: var(--spacing-xl);
 //     }
 

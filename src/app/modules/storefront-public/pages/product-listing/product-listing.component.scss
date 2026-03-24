@@ -47,7 +47,7 @@
   gap: var(--spacing-xl);
   background: var(--bg-primary);
   padding: var(--spacing-lg);
-  border-radius: var(--ui-border-radius-xl);
+  border-radius: var(--radius-2xl);
   box-shadow: var(--shadow-sm);
   @media (max-width: 768px) {
     flex-direction: column;
@@ -212,7 +212,7 @@
   margin-bottom: var(--spacing-2xl);
   padding: var(--spacing-lg);
   background: var(--bg-secondary);
-  border-radius: var(--ui-border-radius-xl);
+  border-radius: var(--radius-2xl);
   box-shadow: var(--shadow-sm);
 
   .filter-pills {
@@ -287,7 +287,7 @@
     margin-bottom: var(--spacing-3xl);
     background: var(--bg-primary);
     padding: var(--spacing-xl);
-    border-radius: var(--ui-border-radius-xl);
+    border-radius: var(--radius-2xl);
     box-shadow: var(--shadow-sm);
     h3 {
       font-family: var(--font-heading);
@@ -415,7 +415,7 @@
 .skeleton-placeholder {
   position: relative;
   width: 100%;
-  border-radius: var(--ui-border-radius-xl);
+  border-radius: var(--radius-2xl);
   overflow: hidden;
   background-color: var(--bg-ternary);
   border: var(--ui-border-width) solid var(--border-secondary);
@@ -467,7 +467,7 @@
   text-align: center;
   padding: calc(var(--spacing-3xl) * 4) 0;
   background: var(--bg-primary);
-  border-radius: var(--ui-border-radius-xl);
+  border-radius: var(--radius-2xl);
   box-shadow: var(--shadow-lg);
   .icon-circle {
     width: calc(var(--spacing-2xl) * 4);
@@ -593,7 +593,7 @@
 
   .sort-card {
     border: var(--ui-border-width) solid var(--border-secondary);
-    border-radius: var(--ui-border-radius-xl);
+    border-radius: var(--radius-2xl);
     padding: var(--spacing-xl);
     display: flex;
     flex-direction: column;
@@ -713,7 +713,7 @@
     border: var(--ui-border-width) solid var(--border-secondary);
     color: var(--text-primary);
     padding: var(--spacing-lg);
-    border-radius: var(--ui-border-radius-xl);
+    border-radius: var(--radius-2xl);
     font-weight: var(--font-weight-semibold);
     transition: var(--transition-base);
     &:hover {
@@ -726,7 +726,7 @@
     background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-hover) 100%);
     color: #ffffff;
     border: none;
-    border-radius: var(--ui-border-radius-xl);
+    border-radius: var(--radius-2xl);
     font-weight: var(--font-weight-semibold);
     box-shadow: var(--shadow-lg);
     transition: var(--transition-base);
@@ -1055,7 +1055,7 @@
 
 // .skeleton-placeholder {
 //   aspect-ratio: 3 / 4.2;
-//   border-radius: var(--ui-border-radius-xl);
+//   border-radius: var(--radius-2xl);
 //   overflow: hidden;
 //   background: var(--bg-ternary);
 // }
@@ -1259,7 +1259,7 @@
 // .skeleton-placeholder {
 //   position: relative;
 //   width: 100%;
-//   border-radius: var(--ui-border-radius-xl);
+//   border-radius: var(--radius-2xl);
 //   overflow: hidden;
 //   background-color: #e2e8f0; /* Fallback if var(--bg-ternary) fails */
 //   background-color: var(--bg-ternary);

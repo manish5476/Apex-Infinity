@@ -13,6 +13,7 @@
   height: 100%;
   overflow: hidden;
   display: flex;
+  border-radius: var(--radius-2xl);
   flex-direction: column;
   background: var(--bg-primary);
 }

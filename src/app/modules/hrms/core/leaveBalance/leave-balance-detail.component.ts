@@ -252,12 +252,12 @@ import { AppMessageService } from '@core/services/message.service';
     
     .border-1 { border: 1px solid; }
     .surface-border { border-color: var(--border-primary); }
-    .border-round-xl { border-radius: var(--ui-border-radius-xl); }
+    .border-round-xl { border-radius: var(--radius-2xl); }
     .border-dashed { border: 1px dashed var(--border-secondary); }
     .border-bottom-subtle { border-bottom: 1px solid rgba(0,0,0,0.05); }
 
     /* Header */
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--ui-border-radius-xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--radius-2xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
     .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
     ::ng-deep .back-btn { color: var(--text-secondary) !important; background: var(--bg-primary) !important; border: 1px solid var(--border-primary) !important; }
     .page-title { font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); font-family: var(--font-heading); letter-spacing: -0.02em; }
@@ -265,7 +265,7 @@ import { AppMessageService } from '@core/services/message.service';
     .badge-mono-sm { font-family: var(--font-mono); font-size: 11px; background: var(--bg-primary); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border-primary); color: var(--text-secondary); }
 
     /* Cards */
-    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-sm); }
+    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-sm); }
     ::ng-deep .premium-card .p-card-body { padding: var(--spacing-2xl); }
     ::ng-deep .premium-card .p-card-content { padding: 0; }
     
@@ -342,7 +342,7 @@ export class LeaveBalanceDetailComponent implements OnInit {
    */
   onInitializeNextYear(userId: string, currentFy: string) {
     if (!userId) return;
-    
+
     // Simple logic to parse "2024-2025" to "2025-2026"
     const years = currentFy.split('-');
     const nextFy = `${parseInt(years[0]) + 1}-${parseInt(years[1]) + 1}`;

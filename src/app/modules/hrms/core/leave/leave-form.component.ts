@@ -186,7 +186,7 @@ import { AppMessageService } from '@core/services/message.service';
     .info-label { font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); color: var(--text-label); text-transform: uppercase; letter-spacing: 0.05em; }
 
     /* Premium Components */
-    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-sm); }
+    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-sm); }
     ::ng-deep .premium-card .p-card-body { padding: var(--spacing-xl); }
     ::ng-deep .premium-card .p-card-content { padding: 0; }
 
@@ -238,7 +238,7 @@ export class LeaveFormComponent implements OnInit {
   ngOnInit() {
     this.initForm();
     this.leaveId = this.route.snapshot.paramMap.get('id');
-    
+
     if (this.leaveId) {
       this.isEditMode.set(true);
       this.loadRequest(this.leaveId);

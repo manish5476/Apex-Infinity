@@ -1,9 +1,239 @@
-    <div class="dashboard-container">
+<div class="dashboard-container">
+
+  <!-- ==================== SIDEBAR ==================== -->
+  <aside class="filters-sidebar">
+
+    <div class="compose-btn-wrapper">
+      <button class="btn-compose" routerLink="/notes/create">
+        <span class="compose-icon"><i class="pi pi-plus"></i></span>
+        <span class="label">New Note</span>
+      </button>
+    </div>
+
+    <nav class="nav-menu custom-scrollbar">
+
+      <div class="nav-group">
+        <label class="nav-group-label">Library</label>
+        <button class="nav-item" [class.active]="activeFilter() === 'all'" (click)="setFilter('all')">
+          <span class="icon"><i class="pi pi-file"></i></span>
+          <span class="text">All Notes</span>
+          <span class="count" *ngIf="dashboardStats().total">{{ dashboardStats().total }}</span>
+        </button>
+        <button class="nav-item" [class.active]="activeFilter() === 'favorites'" (click)="setFilter('favorites')">
+          <span class="icon"><i class="pi pi-star"></i></span>
+          <span class="text">Favorites</span>
+        </button>
+        <button class="nav-item" [class.active]="activeFilter() === 'recent'" (click)="setFilter('recent')">
+          <span class="icon"><i class="pi pi-clock"></i></span>
+          <span class="text">Recent Activity</span>
+        </button>
+        <button class="nav-item" [class.active]="activeFilter() === 'calendar'" (click)="setFilter('calendar')">
+          <span class="icon"><i class="pi pi-calendar"></i></span>
+          <span class="text">Calendar</span>
+        </button>
+      </div>
+
+      <div class="nav-divider"></div>
+
+      <div class="nav-group">
+        <label class="nav-group-label">Sharing</label>
+        <button class="nav-item" [class.active]="activeFilter() === 'shared'" (click)="setFilter('shared')">
+          <span class="icon"><i class="pi pi-users"></i></span>
+          <span class="text">Shared with me</span>
+        </button>
+        <button class="nav-item" [class.active]="activeFilter() === 'shared-by-me'" (click)="setFilter('shared-by-me')">
+          <span class="icon"><i class="pi pi-share-alt"></i></span>
+          <span class="text">Shared by me</span>
+        </button>
+      </div>
+
+      <div class="nav-divider"></div>
+
+      <div class="nav-group">
+        <label class="nav-group-label">Organization</label>
+        <button class="nav-item" [class.active]="activeFilter() === 'archived'" (click)="setFilter('archived')">
+          <span class="icon"><i class="pi pi-box"></i></span>
+          <span class="text">Archived</span>
+        </button>
+        <button class="nav-item danger" [class.active]="activeFilter() === 'trash'" (click)="setFilter('trash')">
+          <span class="icon"><i class="pi pi-trash"></i></span>
+          <span class="text">Trash Bin</span>
+        </button>
+      </div>
+
+    </nav>
+
+    <!-- Stats Widget -->
+    @if (stats()) {
+    <div class="stats-widget">
+      <div class="stats-header">
+        <span class="stats-title">Overview</span>
+        <i class="pi pi-chart-bar stats-icon"></i>
+      </div>
+      <div class="stats-body">
+        <div class="stat-item">
+          <span class="stat-label">Total</span>
+          <span class="stat-value">{{ dashboardStats().total }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Active</span>
+          <span class="stat-value">{{ dashboardStats().active }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Done</span>
+          <span class="stat-value success">{{ dashboardStats().completed }}</span>
+        </div>
+      </div>
+    </div>
+    }
+
+  </aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <main class="main-content">
+
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <div class="header-left">
+        <div class="context-title">
+          @switch (activeFilter()) {
+          @case ('recent') { <i class="pi pi-clock"></i><span>Recent Activity</span> }
+          @case ('calendar') { <i class="pi pi-calendar"></i><span>Calendar</span> }
+          @case ('shared') { <i class="pi pi-users"></i><span>Shared With Me</span> }
+          @case ('shared-by-me') { <i class="pi pi-share-alt"></i><span>Shared By Me</span> }
+          @case ('favorites') { <i class="pi pi-star-fill"></i><span>Favorites</span> }
+          @case ('trash') { <i class="pi pi-trash"></i><span>Trash</span> }
+          @case ('archived') { <i class="pi pi-box"></i><span>Archive</span> }
+          @default { <i class="pi pi-file"></i><span>All Notes</span> }
+          }
+        </div>
+      </div>
+
+      @if (activeFilter() !== 'calendar' && activeFilter() !== 'recent') {
+      <div class="search-wrapper">
+        <i class="pi pi-search search-icon"></i>
+        <input type="text" [formControl]="searchControl" placeholder="Search notes…" class="search-input">
+      </div>
+      }
+
+      <div class="actions-wrapper">
+        @if (activeFilter() === 'trash') {
+        <button class="btn-action danger" (click)="onEmptyTrash()" title="Empty Trash">
+          <i class="pi pi-trash"></i> Empty Trash
+        </button>
+        }
+
+        <button class="btn-icon" (click)="exportNotes()" title="Export Data">
+          <i class="pi pi-download"></i>
+        </button>
+
+        @if (activeFilter() !== 'recent' && activeFilter() !== 'calendar') {
+        <div class="view-controls">
+          <button class="btn-icon" [class.active]="viewMode() === 'grid'" (click)="viewMode.set('grid')"
+            title="Grid view">
+            <i class="pi pi-th-large"></i>
+          </button>
+          <button class="btn-icon" [class.active]="viewMode() === 'list'" (click)="viewMode.set('list')"
+            title="List view">
+            <i class="pi pi-list"></i>
+          </button>
+        </div>
+        }
+      </div>
+    </header>
+
+    <!-- Scrollable Content -->
+    <div class="content-area custom-scrollbar" [class.no-padding]="activeFilter() === 'calendar'">
+
+      <!-- Loading -->
+      @if (isLoading() && activeFilter() !== 'calendar') {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Syncing your notes…</p>
+      </div>
+      }
+
+      <!-- Empty State -->
+      @if (!isLoading() && notes().length === 0 && activeFilter() !== 'calendar') {
+      <div class="empty-state">
+        <div class="empty-illustration">
+          @if (activeFilter() === 'trash') { 🗑️ }
+          @else if (activeFilter() === 'favorites') { ⭐ }
+          @else if (activeFilter() === 'recent') { 🕰️ }
+          @else if (activeFilter() === 'shared') { 📪 }
+          @else if (activeFilter() === 'shared-by-me') { 📤 }
+          @else { 📝 }
+        </div>
+        <h3>{{ getEmptyMessage().title }}</h3>
+        <p>{{ getEmptyMessage().desc }}</p>
+        @if (activeFilter() === 'all') {
+        <button class="btn-primary" routerLink="/notes/create">Create your first note</button>
+        }
+      </div>
+      }
+
+      <!-- Content Views -->
+      @if (!isLoading() || activeFilter() === 'calendar') {
+
+      @if (activeFilter() === 'recent') {
+      <app-recent-activity></app-recent-activity>
+      }
+
+      @else if (activeFilter() === 'calendar') {
+      <app-datepicker-view></app-datepicker-view>
+      }
+
+      @else if (notes().length > 0) {
+      <div class="notes-grid" [class.list-layout]="viewMode() === 'list'">
+        @for (note of notes(); track note._id) {
+
+        @if (isSharedFilter()) {
+        <app-shared-note-card [note]="note" [viewMode]="viewMode()"
+          [filterType]="activeFilter() === 'shared-by-me' ? 'shared-by-me' : 'shared'"
+          (action)="handleSharedAction($event, note._id)">
+        </app-shared-note-card>
+        }
+
+        @else {
+        <app-note-card [note]="note" [viewMode]="viewMode()" [availableUsers]="availableUsers()"
+          (edit)="onEditNote($event)" (pin)="onPinNote($event)" (delete)="onDeleteNote($event)"
+          (deleteHard)="onHardDeleteNote($event)" (archive)="onArchiveNote($event)" (restore)="onRestoreNote($event)"
+          (share)="onShareNote($event)" (linkClick)="onLinkNoteRequest($event)"
+          (convertToTask)="onConvertToTask($event)">
+        </app-note-card>
+        }
+
+        }
+      </div>
+      }
+      }
+
+      <!-- Pagination -->
+      @if (!isLoading() && totalPages() > 1 && !isSpecialFilter()) {
+      <div class="pagination">
+        <button class="page-btn" (click)="changePage(-1)" [disabled]="currentPage() === 1">
+          <i class="pi pi-chevron-left"></i> Previous
+        </button>
+        <div class="page-dots">
+          @for (p of [].constructor(totalPages()); track $index) {
+          <span class="dot" [class.active]="currentPage() === $index + 1"></span>
+          }
+        </div>
+        <button class="page-btn" (click)="changePage(1)" [disabled]="currentPage() === totalPages()">
+          Next <i class="pi pi-chevron-right"></i>
+        </button>
+      </div>
+      }
+
+    </div>
+  </main>
+
+</div> <!-- <div class="dashboard-container">
       
-      <!-- ==================== SIDEBAR FILTERS ==================== -->
+      ==================== SIDEBAR FILTERS ====================
       <aside class="filters-sidebar">
         
-        <!-- Compose Button -->
+        Compose Button
         <div class="compose-btn-wrapper">
           <button class="btn-compose" routerLink="/notes/create">
             <span class="icon"><i class="pi pi-plus"></i></span> 
@@ -11,10 +241,10 @@
           </button>
         </div>
 
-        <!-- Navigation -->
+        Navigation
         <nav class="nav-menu custom-scrollbar">
           
-          <!-- Library Group -->
+          Library Group
           <div class="nav-group">
             <label>Library</label>
             <button class="nav-item" [class.active]="activeFilter() === 'all'" (click)="setFilter('all')">
@@ -38,7 +268,7 @@
 
           <div class="divider"></div>
 
-          <!-- Sharing Group -->
+          Sharing Group
           <div class="nav-group">
             <label>Sharing</label>
             <button class="nav-item" [class.active]="activeFilter() === 'shared'" (click)="setFilter('shared')">
@@ -53,7 +283,7 @@
 
           <div class="divider"></div>
 
-          <!-- Organization Group -->
+          Organization Group
           <div class="nav-group">
             <label>Organization</label>
             <button class="nav-item" [class.active]="activeFilter() === 'archived'" (click)="setFilter('archived')">
@@ -67,7 +297,7 @@
           </div>
         </nav>
 
-        <!-- Stats Widget -->
+        Stats Widget
         @if (stats()) {
         <div class="stats-widget glass-panel">
           <div class="stat-header">
@@ -86,13 +316,13 @@
         }
       </aside>
 
-      <!-- ==================== MAIN CONTENT ==================== -->
+      ==================== MAIN CONTENT ====================
       <main class="main-content">
         
-        <!-- Top Bar -->
+        Top Bar
         <header class="top-bar glass-panel">
           <div class="header-left">
-            <div class="mobile-toggle"><i class="pi pi-bars"></i></div> <!-- Placeholder for mobile -->
+            <div class="mobile-toggle"><i class="pi pi-bars"></i></div> Placeholder for mobile
             <div class="context-title">
               @switch (activeFilter()) {
                 @case ('recent') { <i class="pi pi-clock"></i> Recent Activity }
@@ -107,7 +337,7 @@
             </div>
           </div>
 
-          <!-- Search (Hidden on Calendar/Recent) -->
+          Search (Hidden on Calendar/Recent)
           @if (activeFilter() !== 'calendar' && activeFilter() !== 'recent') {
             <div class="search-wrapper">
               <i class="pi pi-search search-icon"></i>
@@ -116,21 +346,21 @@
           }
           
           <div class="actions-wrapper">
-            <!-- Trash Actions -->
+            Trash Actions
             @if (activeFilter() === 'trash') {
               <button class="btn-action danger" (click)="onEmptyTrash()" title="Empty Trash">
                  <i class="pi pi-trash"></i> Empty
               </button>
             }
 
-            <!-- Export -->
+            Export
             <button class="btn-icon" (click)="exportNotes()" title="Export Data">
               <i class="pi pi-download"></i>
             </button>
 
             <div class="divider-v"></div>
 
-            <!-- View Toggles (Hidden for Recent/Calendar) -->
+            View Toggles (Hidden for Recent/Calendar)
             @if (activeFilter() !== 'recent' && activeFilter() !== 'calendar') {
               <div class="view-controls">
                 <button class="btn-icon" [class.active]="viewMode() === 'grid'" (click)="viewMode.set('grid')">
@@ -144,10 +374,10 @@
           </div>
         </header>
 
-        <!-- Scrollable Content Area -->
+        Scrollable Content Area
         <div class="content-area custom-scrollbar" [class.no-padding]="activeFilter() === 'calendar'">
           
-          <!-- Loading -->
+          Loading
           @if (isLoading() && activeFilter() !== 'calendar') {
           <div class="loading-state">
             <div class="spinner"></div>
@@ -155,7 +385,7 @@
           </div>
           }
 
-          <!-- Empty State (Not for Calendar) -->
+          Empty State (Not for Calendar)
           @if (!isLoading() && notes().length === 0 && activeFilter() !== 'calendar') {
           <div class="empty-state">
             <div class="illustration">
@@ -174,25 +404,25 @@
           </div>
           }
 
-          <!-- CONTENT VIEW SWITCHER -->
+          CONTENT VIEW SWITCHER
           @if (!isLoading() || activeFilter() === 'calendar') {
             
-            <!-- 1. Recent Activity View -->
+            1. Recent Activity View
             @if (activeFilter() === 'recent') {
               <app-recent-activity></app-recent-activity>
             } 
 
-            <!-- 2. Calendar View -->
+            2. Calendar View
             @else if (activeFilter() === 'calendar') {
               <app-datepicker-view></app-datepicker-view>
             }
             
-            <!-- 3. Standard Grid/List View -->
+            3. Standard Grid/List View
             @else if (notes().length > 0) {
               <div class="notes-grid" [class.list-layout]="viewMode() === 'list'">
                 @for (note of notes(); track note._id) {
                   
-                  <!-- Shared Note Card -->
+                  Shared Note Card
                   @if (isSharedFilter()) {
                     <app-shared-note-card
                       [note]="note"
@@ -202,7 +432,7 @@
                     </app-shared-note-card>
                   } 
                   
-                  <!-- Standard Note Card -->
+                  Standard Note Card
                   @else {
                     <app-note-card 
                       [note]="note" 
@@ -224,7 +454,7 @@
             }
           }
 
-          <!-- Pagination (Hide for Recent/Trash/Calendar if needed) -->
+          Pagination (Hide for Recent/Trash/Calendar if needed)
           @if (!isLoading() && totalPages() > 1 && !isSpecialFilter()) {
           <div class="pagination">
             <button class="page-btn" (click)="changePage(-1)" [disabled]="currentPage() === 1">
@@ -238,4 +468,4 @@
           }
         </div>
       </main>
-    </div>
+    </div> -->

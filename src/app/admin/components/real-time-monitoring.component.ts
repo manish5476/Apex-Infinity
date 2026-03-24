@@ -945,7 +945,7 @@ export class RealTimeMonitoringComponent implements OnInit {
 //       background: color-mix(in srgb, var(--bg-secondary), transparent 10%);
 //       backdrop-filter: blur(var(--glass-blur-c)); 
 //       border: 1px solid var(--border-primary);
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //     }
 
 //     /* HEADER */

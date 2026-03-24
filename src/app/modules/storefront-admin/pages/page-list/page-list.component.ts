@@ -323,7 +323,7 @@ function getOrgSlug(): string {
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255,255,255,0.18);
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
     }
     .page-title {
       font-family: var(--font-heading);
@@ -428,7 +428,7 @@ function getOrgSlug(): string {
       background: rgba(255,255,255,0.05);
       backdrop-filter: blur(10px);
       border: 2px dashed rgba(255,255,255,0.25);
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -476,7 +476,7 @@ function getOrgSlug(): string {
     .page-card {
       position: relative;
       height: 340px;
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
       overflow: hidden;
       box-shadow: 0 8px 32px rgba(0,0,0,0.3);
       transition: all 0.3s cubic-bezier(0.2, 0.9, 0.2, 1);
@@ -1024,7 +1024,7 @@ export class PageListComponent implements OnInit {
 //       background: rgba(255, 255, 255, 0.1);
 //       backdrop-filter: blur(12px);
 //       border: 1px solid rgba(255, 255, 255, 0.2);
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       box-shadow: var(--shadow-lg);
 //     }
     
@@ -1089,7 +1089,7 @@ export class PageListComponent implements OnInit {
 //       background: rgba(255, 255, 255, 0.05);
 //       backdrop-filter: blur(10px);
 //       border: 2px dashed rgba(255, 255, 255, 0.3);
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       display: flex;
 //       flex-direction: column;
 //       align-items: center;
@@ -1124,7 +1124,7 @@ export class PageListComponent implements OnInit {
 //     .page-card {
 //       position: relative;
 //       height: 320px;
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       overflow: hidden;
 //       box-shadow: var(--shadow-xl);
 //       transition: var(--transition-base);
@@ -1291,7 +1291,7 @@ export class PageListComponent implements OnInit {
 //       background: #ffffff; /* Modal remains clean white */
 //       width: 100%;
 //       max-width: 450px;
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       padding: var(--spacing-3xl);
 //       box-shadow: var(--shadow-2xl);
 //       animation: scaleIn 0.2s ease-out;

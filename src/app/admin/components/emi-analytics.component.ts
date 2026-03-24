@@ -859,7 +859,7 @@ export class EmiAnalyticsComponent implements OnInit {
 //     /* KPI CARDS */
 //     .kpi-card {
 //       background: var(--bg-secondary); border: 1px solid var(--border-primary);
-//       border-radius: var(--ui-border-radius-xl); padding: var(--spacing-lg);
+//       border-radius: var(--radius-2xl); padding: var(--spacing-lg);
 //       position: relative; overflow: hidden;
 //     }
 
@@ -888,7 +888,7 @@ export class EmiAnalyticsComponent implements OnInit {
 //     /* MAIN GRID CARD */
 //     .grid-card {
 //       background: var(--bg-secondary); border: 1px solid var(--border-primary);
-//       border-radius: var(--ui-border-radius-xl); overflow: hidden; height: 100%; min-height: 400px;
+//       border-radius: var(--radius-2xl); overflow: hidden; height: 100%; min-height: 400px;
 //       display: flex; flex-direction: column;
 //     }
 //     .grid-header { padding: var(--spacing-md) var(--spacing-lg); border-bottom: 1px solid var(--border-primary); background: var(--bg-ternary); display: flex; justify-content: space-between; align-items: center; }
@@ -902,7 +902,7 @@ export class EmiAnalyticsComponent implements OnInit {
 //     .side-title { font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: var(--spacing-lg); }
 
 //     /* RISK GAUGE */
-//     .risk-card { background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--ui-border-radius-xl); padding: var(--spacing-xl); text-align: center; }
+//     .risk-card { background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--radius-2xl); padding: var(--spacing-xl); text-align: center; }
 //     .gauge-container { position: relative; width: 120px; height: 120px; margin: 0 auto var(--spacing-lg); }
 //     .circular-chart { display: block; margin: 0 auto; max-width: 100%; max-height: 100%; }
 //     .circle-bg { fill: none; stroke: var(--bg-ternary); stroke-width: 3.8; }
@@ -919,7 +919,7 @@ export class EmiAnalyticsComponent implements OnInit {
 //     .dot.risk { background: var(--color-error); }
 
 //     /* PIPELINE CARD */
-//     .pipeline-card { background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--ui-border-radius-xl); padding: var(--spacing-lg); }
+//     .pipeline-card { background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--radius-2xl); padding: var(--spacing-lg); }
 //     .pipeline-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 12px; }
 //     .pipeline-row .val { font-weight: 700; }
 //     .pipeline-row .val.warning { color: var(--color-warning); }

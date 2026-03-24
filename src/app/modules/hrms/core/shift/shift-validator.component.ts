@@ -258,7 +258,7 @@ import { AppMessageService } from "@core/services/message.service";
     .border-radius-sm { border-radius: var(--ui-border-radius-sm); }
     .border-radius-md { border-radius: var(--ui-border-radius-md); }
     .border-radius-lg { border-radius: var(--ui-border-radius-lg); }
-    .border-radius-xl { border-radius: var(--ui-border-radius-xl); }
+    .border-radius-xl { border-radius: var(--radius-2xl); }
     .border-radius-full { border-radius: 9999px; }
     .border-top-subtle { border-top: 1px solid var(--border-secondary); }
     .border-bottom-subtle { border-bottom: 1px solid var(--border-secondary); }
@@ -657,7 +657,7 @@ export class ShiftValidatorComponent implements OnInit {
 //     .border-radius-sm { border-radius: var(--ui-border-radius-sm); }
 //     .border-radius-md { border-radius: var(--ui-border-radius-md); }
 //     .border-radius-lg { border-radius: var(--ui-border-radius-lg); }
-//     .border-radius-xl { border-radius: var(--ui-border-radius-xl); }
+//     .border-radius-xl { border-radius: var(--radius-2xl); }
 //     .border-radius-full { border-radius: 9999px; }
 //     .border-top-subtle { border-top: 1px solid var(--border-secondary); }
 //     .border-bottom-subtle { border-bottom: 1px solid var(--border-secondary); }
@@ -1075,7 +1075,7 @@ export class ShiftValidatorComponent implements OnInit {
 // //     }
 
 // //     /* Utility */
-// //     .glass-card { background: var(--component-bg, var(--bg-secondary)); border: 1px solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-md); }
+// //     .glass-card { background: var(--component-bg, var(--bg-secondary)); border: 1px solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); }
 // //     .text-error { color: var(--color-error); }
 // //     .text-success { color: var(--color-success); }
 // //     .text-tertiary { color: var(--text-tertiary); }

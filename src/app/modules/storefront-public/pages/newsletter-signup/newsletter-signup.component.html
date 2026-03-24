@@ -1,4 +1,55 @@
-<section class="section-root" [ngStyle]="sectionStyles()">
+<!-- newsletter-signup.component.html -->
+<section class="nl-root" [ngStyle]="sectionStyle()">
+  <div class="nl-glow" aria-hidden="true"></div>
+
+  <div class="nl-container">
+    <div class="nl-card">
+      <div class="nl-card-accent" aria-hidden="true"></div>
+
+      @if (status() === 'success') {
+      <div class="nl-success">
+        <div class="nl-success-icon"><i class="pi pi-check-circle"></i></div>
+        <h3>{{ cfg().successMessage }}</h3>
+        <button (click)="reset()" class="nl-reset" type="button">Subscribe another email</button>
+      </div>
+      } @else {
+      <div class="nl-body">
+        <div class="nl-text">
+          <span class="nl-eyebrow">Newsletter</span>
+          <h2 class="nl-title">{{ cfg().title }}</h2>
+          <p class="nl-subtitle">{{ cfg().subtitle }}</p>
+        </div>
+
+        <form class="nl-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          <div class="nl-input-group" [class.nl-input-error]="emailInvalid">
+            <i class="pi pi-envelope nl-input-icon"></i>
+            <input type="email" formControlName="email" class="nl-input" [placeholder]="cfg().placeholder"
+              autocomplete="email" />
+            <button type="submit" class="nl-btn" [disabled]="status() === 'submitting'">
+              @if (status() === 'submitting') {
+              <i class="pi pi-spin pi-spinner"></i>
+              } @else {
+              {{ cfg().buttonText }}
+              }
+            </button>
+          </div>
+          @if (emailInvalid) {
+          <p class="nl-error-msg" role="alert">
+            <i class="pi pi-exclamation-circle"></i> Please enter a valid email address
+          </p>
+          }
+        </form>
+
+        <p class="nl-disclaimer">
+          No spam, ever. Unsubscribe with one click.
+        </p>
+      </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- <section class="section-root" [ngStyle]="sectionStyles()">
   
   <div class="aurora-bg"></div>
 
@@ -55,7 +106,7 @@
 
     </div>
   </div>
-</section>
+</section> -->
 <!-- <section class="section-root relative overflow-hidden" [ngStyle]="sectionStyle()">
   
   <div class="absolute -top-24 -left-24 w-96 h-96 bg-gray-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>

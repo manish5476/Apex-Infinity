@@ -1,4 +1,25 @@
-<section class="section-root" [ngStyle]="sectionStyle()">
+<!-- stats-counter.component.html -->
+<section class="sc-root" [ngStyle]="sectionStyle()">
+  <div class="sc-grid-bg" aria-hidden="true"></div>
+
+  <div class="sc-container">
+    <div class="sc-grid">
+      @for (item of items(); track item.label; let i = $index) {
+      <div class="sc-stat">
+        <div class="sc-value-row">
+          @if (item.prefix) { <span class="sc-prefix">{{ item.prefix }}</span> }
+          <span class="sc-number">{{ formatValue(displayValues()[i]) }}</span>
+          @if (item.suffix) { <span class="sc-suffix">{{ item.suffix }}</span> }
+        </div>
+        <div class="sc-label">{{ item.label }}</div>
+        <div class="sc-accent" aria-hidden="true"></div>
+      </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- <section class="section-root" [ngStyle]="sectionStyle()">
 
   <div class="container-wrapper">
 
@@ -26,7 +47,7 @@
     </div>
 
   </div>
-</section>
+</section> -->
 
 <!-- <section class="section-root" [ngStyle]="backgroundStyle()">
   <div class="container mx-auto px-6"

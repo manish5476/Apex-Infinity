@@ -671,7 +671,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 // //       width: 100%;
 // //       max-width: 380px;
 // //       padding: 40px;
-// //       border-radius: var(--ui-border-radius-xl);
+// //       border-radius: var(--radius-2xl);
 // //       text-align: center;
 // //       overflow: hidden;
 

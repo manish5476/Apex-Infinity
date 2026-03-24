@@ -733,7 +733,7 @@ export class CustomerLtvAnalysisComponent implements OnInit {
 //     .kpi-card {
 //       background: var(--bg-secondary);
 //       border: 1px solid var(--border-primary);
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       padding: var(--spacing-lg);
 //       transition: var(--transition-base);
 //     }
@@ -818,7 +818,7 @@ export class CustomerLtvAnalysisComponent implements OnInit {
 //     .grid-card {
 //       background: var(--bg-secondary);
 //       border: 1px solid var(--border-primary);
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       overflow: hidden;
 //       height: 100%;
 //       min-height: 400px;
@@ -852,7 +852,7 @@ export class CustomerLtvAnalysisComponent implements OnInit {
 //     .side-card {
 //       background: var(--bg-secondary);
 //       border: 1px solid var(--border-primary);
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       padding: var(--spacing-lg);
 //     }
 

@@ -198,7 +198,7 @@ interface ProfitSummaryData {
     .kpi-card {
       background: var(--theme-bg-secondary);
       border: 1px solid var(--theme-border-primary);
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
       padding: var(--spacing-lg);
       transition: transform 0.2s, box-shadow 0.2s;
       display: flex;
@@ -286,7 +286,7 @@ interface ProfitSummaryData {
     .section-card {
       background: var(--theme-bg-secondary);
       border: 1px solid var(--theme-border-primary);
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
       padding: var(--spacing-lg);
     }
 
@@ -348,7 +348,7 @@ interface ProfitSummaryData {
       justify-content: center;
       padding: 80px;
       background: var(--theme-bg-secondary);
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
       border: 1px dashed var(--theme-border-secondary);
       color: var(--theme-text-tertiary);
     }
@@ -616,7 +616,7 @@ export class ProfitSummaryComponent implements OnInit {
 
 //     .kpi-card {
 //       background: var(--bg-surface);
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       padding: var(--spacing-xl);
 //       box-shadow: var(--shadow-md);
 //       transition: var(--transition-transform), var(--transition-base);
@@ -774,7 +774,7 @@ export class ProfitSummaryComponent implements OnInit {
 //       color: #94a3b8;
 //       font-family: var(--font-body);
 //       background: #f8fafc;
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       border: 1px dashed #e2e8f0;
 //     }
     

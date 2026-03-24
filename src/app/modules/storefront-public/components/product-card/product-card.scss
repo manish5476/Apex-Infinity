@@ -695,7 +695,7 @@
 //   height: var(--card-height); 
 //   background-color: var(--bg-secondary); /* Dark Mode Safe */
 //   border: 1px solid var(--border-secondary); /* Theme Border */
-//   border-radius: var(--ui-border-radius-xl);
+//   border-radius: var(--radius-2xl);
 //   overflow: hidden;
 //   cursor: pointer;
   
@@ -954,7 +954,7 @@
 // ::ng-deep .premium-product-modal {
 //   .p-dialog-content {
 //     padding: 0 !important;
-//     border-radius: var(--ui-border-radius-xl);
+//     border-radius: var(--radius-2xl);
 //     overflow: hidden;
 //     background: transparent !important; /* Let inner container handle bg */
 //   }
@@ -1126,7 +1126,7 @@
   
 //   background-color: var(--bg-secondary);
 //   border: 1px solid var(--border-secondary);
-//   border-radius: var(--ui-border-radius-xl);
+//   border-radius: var(--radius-2xl);
 //   overflow: hidden; /* Crops images that are too big */
 //   cursor: pointer;
   

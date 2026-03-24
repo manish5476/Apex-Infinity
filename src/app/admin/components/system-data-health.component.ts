@@ -178,7 +178,7 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
     .score-card {
       background: var(--bg-secondary);
       border: 1px solid var(--border-primary);
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
       padding: var(--spacing-xl);
       display: flex;
       flex-direction: column;
@@ -268,7 +268,7 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
     /* LOG CARD (Gradient) */
     .log-card {
       background: var(--accent-gradient);
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
       padding: var(--spacing-lg);
       box-shadow: var(--shadow-sm);
       color: #ffffff;
@@ -299,7 +299,7 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
     .diagnostics-card {
       background: var(--bg-secondary);
       border: 1px solid var(--border-primary);
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
       padding: var(--spacing-xl);
     }
 
@@ -361,7 +361,7 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
       padding: var(--spacing-xl);
       border: 1px dashed var(--accent-secondary);
       background: var(--accent-focus); /* Low opacity accent bg */
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
     }
 
     .roadmap-header { display: flex; items-align: center; gap: var(--spacing-sm); }
@@ -411,7 +411,7 @@ export class SystemDataHealthComponent implements OnInit {
   meta = signal<any>(null);
   loading = signal<boolean>(true);
 
-  constructor(private analyticsService: AdminAnalyticsService) {}
+  constructor(private analyticsService: AdminAnalyticsService) { }
 
   ngOnInit() {
     this.loadData();

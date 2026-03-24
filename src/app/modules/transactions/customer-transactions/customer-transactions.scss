@@ -16,7 +16,7 @@
   height: 100%;
   width: 100%;
   padding: 0.5rem;
-  
+  border-radius: var(--radius-2xl);
   /* Remove padding if inside a dialog for a flush look */
   @media (min-width: 768px) {
     padding: 1rem;

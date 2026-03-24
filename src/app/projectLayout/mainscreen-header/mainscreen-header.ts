@@ -254,13 +254,30 @@ export class MainscreenHeader implements OnInit, OnDestroy {
 
   allThemes: Theme[] = [
     {
+      name: "theme-slate-ember",
+      id: "theme-slate-ember",
+      color: "#b88645",
+      gradient: "linear-gradient(135deg, #b88645 0%, #d4a363 100%)",
+      category: "theme-slate-ember",
+      description: "Dark premium glass with deep blue base and rich bronze accents."
+    },
+    {
+      name: "theme-sage-cream",
+      id: "theme-sage-cream",
+      color: "#b88645",
+      gradient: "linear-gradient(135deg, #b88645 0%, #d4a363 100%)",
+      category: "theme-sage-cream",
+      description: "Dark premium glass with deep blue base and rich bronze accents."
+    },
+    {
       name: "Midnight Bronze",
       id: "theme-midnight-bronze",
       color: "#b88645",
       gradient: "linear-gradient(135deg, #b88645 0%, #d4a363 100%)",
       category: "premium dark",
       description: "Dark premium glass with deep blue base and rich bronze accents."
-    }, {
+    },
+    {
       name: "Rose Glass",
       id: "theme-rose-glass",
       color: "#f43f5e",

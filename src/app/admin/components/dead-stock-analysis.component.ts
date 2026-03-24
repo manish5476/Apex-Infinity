@@ -157,7 +157,7 @@ interface DeadStockItem {
 
     .kpi-card {
       background: var(--bg-secondary); border: 1px solid var(--border-primary);
-      border-radius: var(--ui-border-radius-xl); padding: var(--spacing-lg);
+      border-radius: var(--radius-2xl); padding: var(--spacing-lg);
       position: relative; overflow: hidden;
     }
 
@@ -197,7 +197,7 @@ interface DeadStockItem {
     /* TABLE CARD */
     .table-card {
       background: var(--bg-secondary); border: 1px solid var(--border-primary);
-      border-radius: var(--ui-border-radius-xl); overflow: hidden;
+      border-radius: var(--radius-2xl); overflow: hidden;
       display: flex; flex-direction: column;
       height: 600px;
       box-shadow: var(--shadow-sm);
