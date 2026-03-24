@@ -11,7 +11,9 @@
               <div class="title-section">
                 <h1 class="page-title">{{ editMode() ? 'Edit Employee' : 'New Employee' }}</h1>
                 <div class="meta-badges">
-                    <span class="id-badge" *ngIf="userId">{{ userId }}</span>
+                    @if (userId) {
+                        <span class="id-badge">{{ userId }}</span>
+                    }
                     <span class="status-badge" [ngClass]="userForm.get('status')?.value">
                         {{ userForm.get('status')?.value || 'New' }}
                     </span>
@@ -75,13 +77,13 @@
                     </div>
 
                     
-                    <div class="control-item highlight">
+                    <label class="control-item highlight cursor-pointer">
                       <div class="control-info">
                           <span class="control-label">Login Access</span>
                           <span class="control-sub">Enable or disable system access</span>
                       </div>
                       <p-toggleswitch formControlName="isActive"></p-toggleswitch>
-                    </div>
+                    </label>
                 </div>
                 </div>
 
@@ -205,13 +207,14 @@
                       <h3>Attendance Settings</h3>
                       <p>Shift rules and punch permissions</p>
                     </div>
-                    <div class="toggle-wrapper">
+                    <label class="toggle-wrapper cursor-pointer">
                       <span class="toggle-label">Enable Attendance</span>
                       <p-toggleswitch formControlName="isAttendanceEnabled"></p-toggleswitch>
-                    </div>
+                    </label>
                 </div>
 
-                <div *ngIf="userForm.get('attendanceConfig.isAttendanceEnabled')?.value" class="animate-content mt-6">
+                @if (userForm.get('attendanceConfig.isAttendanceEnabled')?.value) {
+                <div class="animate-content mt-6">
                     <div class="form-grid mb-6">
                       <div class="field-group">
                           <label>Assigned Shift <span class="req">*</span></label>
@@ -235,24 +238,25 @@
 
                     
                     <div class="toggle-grid">
-                      <div class="control-item">
+                      <label class="control-item cursor-pointer">
                           <span class="control-label">Web Punch</span>
                           <p-toggleswitch formControlName="allowWebPunch"></p-toggleswitch>
-                      </div>
-                      <div class="control-item">
+                      </label>
+                      <label class="control-item cursor-pointer">
                           <span class="control-label">Mobile App Punch</span>
                           <p-toggleswitch formControlName="allowMobilePunch"></p-toggleswitch>
-                      </div>
-                      <div class="control-item">
+                      </label>
+                      <label class="control-item cursor-pointer">
                           <span class="control-label">Enforce GeoFence</span>
                           <p-toggleswitch formControlName="enforceGeoFence"></p-toggleswitch>
-                      </div>
-                      <div class="control-item">
+                      </label>
+                      <label class="control-item cursor-pointer">
                           <span class="control-label">Biometric Verified</span>
                           <p-toggleswitch formControlName="biometricVerified"></p-toggleswitch>
-                      </div>
+                      </label>
                     </div>
                 </div>
+                }
                 </div>
 
                 
@@ -262,10 +266,13 @@
                       <h3>Security</h3>
                       <p>Manage password and credentials</p>
                     </div>
-                    <button *ngIf="editMode()" pButton [label]="showPasswordFields() ? 'Cancel' : 'Change Password'" [text]="true" size="small" (click)="togglePasswordChange()"></button>
+                    @if (editMode()) {
+                        <button pButton [label]="showPasswordFields() ? 'Cancel' : 'Change Password'" [text]="true" size="small" (click)="togglePasswordChange()"></button>
+                    }
                 </div>
 
-                <div *ngIf="showPasswordFields()" class="form-grid animate-content mt-6">
+                @if (showPasswordFields()) {
+                <div class="form-grid animate-content mt-6">
                     <div class="field-group">
                       <label>New Password <span class="req">*</span></label>
                       <p-password formControlName="password" [toggleMask]="true" styleClass="full-width" inputStyleClass="full-width"></p-password>
@@ -275,6 +282,7 @@
                       <p-password formControlName="passwordConfirm" [toggleMask]="true" [feedback]="false" styleClass="full-width" inputStyleClass="full-width"></p-password>
                     </div>
                 </div>
+                }
                 </div>
             
             </div> 

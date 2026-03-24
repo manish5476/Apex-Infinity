@@ -1,4 +1,4 @@
-import { Injectable, Inject, PLATFORM_ID, inject, Injector } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID, inject, Injector, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
@@ -143,8 +143,8 @@ export class AuthService {
   private router = inject(Router);
 
   // 🟢 CRITICAL FIX: Ensure this is always synced with Storage
-  // private _token: string | null = null;
   private _token: string | null = null;
+  private isLoggingOut = signal(false); // ✅ Guard against concurrent logout calls
 
   public get authTokenData(): string | null {
     if (!this._token) {
@@ -322,25 +322,42 @@ export class AuthService {
   // ======================================================
 
   logout(): void {
+    if (this.isLoggingOut()) return;
+    this.isLoggingOut.set(true);
+
     const currentUrl = this.router.url;
+    
+    // Optimistically proceed to client logout regardless of backend success
     this.apiService.logOut().pipe(
-      finalize(() => this.performClientLogout(currentUrl))
-    ).subscribe();
+      finalize(() => {
+        this.performClientLogout(currentUrl);
+        this.isLoggingOut.set(false);
+      })
+    ).subscribe({
+      error: () => {
+        // Even if 401 or network error, we want to clear local session
+        console.warn('Backend logout failed or token already expired');
+      }
+    });
   }
 
   logoutAll(): void {
+    if (this.isLoggingOut()) return;
+    this.isLoggingOut.set(true);
+
     const currentUrl = this.router.url;
 
-    this.apiService.logoutAll().subscribe({
-      next: () => {
-        this.messageService.showSuccess(
-          'You have been logged out from all devices'
-        );
+    this.apiService.logoutAll().pipe(
+      finalize(() => {
         this.performClientLogout(currentUrl);
+        this.isLoggingOut.set(false);
+      })
+    ).subscribe({
+      next: () => {
+        this.messageService.showSuccess('You have been logged out from all devices');
       },
       error: (err) => {
         console.warn('Logout all failed', err);
-        this.performClientLogout(currentUrl);
       }
     });
   }

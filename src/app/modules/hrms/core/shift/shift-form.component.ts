@@ -14,6 +14,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DatePickerModule } from 'primeng/datepicker';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
 @Component({
   selector: 'app-shift-form',
@@ -21,7 +22,7 @@ import { DatePickerModule } from 'primeng/datepicker';
   imports: [
     CommonModule, ReactiveFormsModule, 
     CardModule, SelectModule, MultiSelectModule, TextareaModule, 
-    InputTextModule, InputNumberModule, DatePickerModule
+    InputTextModule, InputNumberModule, DatePickerModule, ToggleSwitchModule
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -264,13 +265,10 @@ import { DatePickerModule } from 'primeng/datepicker';
             </ng-template>
             
             <div class="flex-col gap-4">
-              <div class="status-toggle-wrapper" style="margin-top: 0; margin-bottom: 0;">
-                <label class="toggle-container">
-                  <input type="checkbox" formControlName="enabled" class="toggle-input">
-                  <span class="toggle-slider"></span>
-                  <div class="toggle-text"><span class="toggle-label font-bold">Enable Overtime</span></div>
-                </label>
-              </div>
+              <label class="status-toggle-wrapper flex-between cursor-pointer" style="margin-top: 0; margin-bottom: 0;">
+                <div class="toggle-text"><span class="toggle-label font-bold">Enable Overtime</span></div>
+                <p-toggleswitch formControlName="enabled"></p-toggleswitch>
+              </label>
 
               <div class="inner-grid-2">
                 <div class="form-field">
@@ -399,13 +397,10 @@ import { DatePickerModule } from 'primeng/datepicker';
                 </div>
               </div>
 
-              <div class="status-toggle-wrapper" style="border-color: var(--color-primary); margin: 0;">
-                <label class="toggle-container">
-                  <input type="checkbox" formControlName="isActive" class="toggle-input">
-                  <span class="toggle-slider"></span>
-                  <div class="toggle-text"><span class="toggle-label font-bold">Shift is Active</span></div>
-                </label>
-              </div>
+              <label class="status-toggle-wrapper flex-between cursor-pointer" style="border-color: var(--color-primary); margin: 0;">
+                <div class="toggle-text"><span class="toggle-label font-bold">Shift is Active</span></div>
+                <p-toggleswitch formControlName="isActive"></p-toggleswitch>
+              </label>
 
             </div>
           </p-card>
