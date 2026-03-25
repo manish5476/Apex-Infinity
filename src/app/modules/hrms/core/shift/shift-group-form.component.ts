@@ -709,7 +709,6 @@ export class ShiftGroupFormComponent implements OnInit {
       finalize(() => this.isSaving.set(false))
     ).subscribe((res:any) => {
       if (res) {
-        this.messageService.showSuccess(res.message)
         setTimeout(() => this.onCancel(), 1000); 
       }
     });

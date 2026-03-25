@@ -1,43 +1,50 @@
-/* ---- Global Reset & Root ---- */
-html, body, :host {
+// ==========================================================================
+// BASE STYLES — FULL REWRITE
+// Fixes: native input styles scoped to prevent bleed into PrimeNG components,
+// button hover lift preserved, glass utilities kept, all layout helpers retained.
+// ==========================================================================
+
+// ==========================================================================
+// 1. RESET & ROOT
+// ==========================================================================
+
+html,
+body,
+:host {
   height: 100%;
   margin: 0;
-  
-  /* Typography Root */
   font-family: var(--font-body);
-  font-size: var(--font-size-base); /* 13px - The Compact Base */
+  font-size: var(--font-size-base);
   color: var(--text-primary);
   background: var(--bg-primary);
   line-height: var(--line-height-normal);
-  
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
-/* ---- Smooth Transitions ---- */
 @media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after { 
-    transition: none !important; 
-    animation: none !important; 
+  *,
+  ::before,
+  ::after {
+    transition: none !important;
+    animation: none !important;
     scroll-behavior: auto !important;
   }
 }
 
-/* ---- Box Model & Scrollbar ---- */
-*, *::before, *::after { 
-  box-sizing: border-box; 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-/* Modern Scrollbar Strategy */
-* {
-  /* scrollbar-width: thin; */
-  /* scrollbar-color: var(--scroll-thumb) var(--scroll-track); */
-}
+// ==========================================================================
+// 2. SCROLLBARS
+// ==========================================================================
 
-/* Webkit Scrollbar Fallback */
 *::-webkit-scrollbar {
-  width: 6px; /* Sleeker width */
+  width: 6px;
   height: 6px;
 }
 
@@ -50,7 +57,10 @@ html, body, :host {
   background: transparent;
 }
 
-/* ---- Typography Hierarchy ---- */
+// ==========================================================================
+// 3. TYPOGRAPHY
+// ==========================================================================
+
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   margin: 0 0 var(--spacing-md) 0;
@@ -78,105 +88,121 @@ small {
   color: var(--text-muted);
 }
 
-/* ---- UI TASK FORCE: NATIVE FORM SYNCHRONIZATION ---- */
-/* Critical: Matching native inputs to PrimeNG .p-inputtext */
+a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  transition: color var(--transition-fast);
+  cursor: pointer;
 
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="search"],
-input[type="tel"],
-input[type="url"],
-select,
-textarea {
+  &:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+  }
+}
+
+// ==========================================================================
+// 4. NATIVE FORM ELEMENTS
+// FIX: scoped with :where(:not([class*="p-"])) to prevent bleeding into
+// PrimeNG components. :where() keeps specificity at 0 so PrimeNG rules win.
+// ==========================================================================
+
+:where(
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="url"],
+  select,
+  textarea
+):not([class*="p-"]) {
   appearance: none;
   -webkit-appearance: none;
   width: 100%;
-  
-  /* Typography */
   font-family: var(--font-body);
-  font-size: var(--font-size-md); /* Match PrimeNG Input Text Size */
+  font-size: var(--font-size-md);
   color: var(--text-primary);
-  
-  /* Geometry - Updated for Curved Look */
   background: var(--bg-secondary);
-  border: 1px solid var(--border-primary); /* Changed to solid for softer look */
+  border: 1px solid var(--border-primary);
   border-radius: var(--ui-border-radius);
-  /* Compact Spacing (Matches p-inputtext override) */
-  padding: var(--spacing-sm) var(--spacing-md); 
-  
-  /* Transitions */
-  transition: background-color var(--transition-base), 
-              border-color var(--transition-base), 
-              box-shadow var(--transition-base), 
-              color var(--transition-base);
+  padding: var(--spacing-sm) var(--spacing-md);
+  transition:
+    background-color var(--transition-base),
+    border-color var(--transition-base),
+    box-shadow var(--transition-base),
+    color var(--transition-base);
 }
 
-/* Height Synchronization - Bumped slightly for the rounded corners */
-input:not([type="checkbox"]):not([type="radio"]), select {
-  min-height: 2.5rem; /* Was 2.25rem */
+:where(
+  input:not([type="checkbox"]):not([type="radio"]):not([class*="p-"]),
+  select:not([class*="p-"])
+) {
+  min-height: 2.5rem;
 }
 
-/* Focus States (Unified with PrimeNG) - Softer glow */
-input:focus, 
-select:focus, 
-textarea:focus {
+:where(
+  input:not([class*="p-"]):focus,
+  select:not([class*="p-"]):focus,
+  textarea:not([class*="p-"]):focus
+) {
   outline: none;
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px var(--focus-ring-color); /* Slightly wider/softer ring */
-  background: var(--bg-primary); 
+  box-shadow: 0 0 0 3px var(--focus-ring-color);
+  background: var(--bg-primary);
 }
 
-/* Hover States */
-input:hover:not(:disabled), 
-select:hover:not(:disabled), 
-textarea:hover:not(:disabled) {
-  border-color: var(--accent-primary); 
+:where(
+  input:not([class*="p-"]):hover:not(:disabled),
+  select:not([class*="p-"]):hover:not(:disabled),
+  textarea:not([class*="p-"]):hover:not(:disabled)
+) {
+  border-color: var(--border-secondary);
   background: var(--component-bg-hover);
 }
 
-/* Disabled States */
-input:disabled, 
-select:disabled, 
-textarea:disabled {
+:where(
+  input:not([class*="p-"]):disabled,
+  select:not([class*="p-"]):disabled,
+  textarea:not([class*="p-"]):disabled
+) {
   background: var(--bg-ternary);
   color: var(--text-muted);
   opacity: var(--state-disabled-opacity);
   cursor: not-allowed;
-  border-color: var(--border-subtle); /* Make sure this token exists, or fall back to --border-primary */
+  border-color: var(--border-primary);
 }
 
-/* Labels */
-label {
+label:not([class*="p-"]) {
   display: block;
   font-family: var(--font-body);
   font-weight: var(--font-weight-medium);
   color: var(--text-secondary);
-  font-size: var(--font-size-sm); 
+  font-size: var(--font-size-sm);
   margin-bottom: var(--spacing-xs);
 }
 
-/* ---- Button Standardization (.btn) ---- */
-button, .btn {
+// ==========================================================================
+// 5. BUTTONS (.btn classes and non-PrimeNG buttons)
+// ==========================================================================
+
+button:not([class*="p-"]),
+.btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  
   padding: var(--spacing-sm) var(--spacing-xl);
-  min-height: 2.5rem; /* Matched to new input height */
-  
+  min-height: 2.5rem;
   font-family: var(--font-body);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
-  
   border-radius: var(--ui-border-radius);
   border: 1px solid transparent;
   cursor: pointer;
   transition: all var(--transition-base);
   user-select: none;
-  
   background: var(--bg-ternary);
   border-color: var(--border-primary);
   color: var(--text-secondary);
@@ -184,13 +210,13 @@ button, .btn {
   &:hover:not(:disabled) {
     background: var(--component-bg-hover);
     color: var(--text-primary);
-    transform: translateY(-2px); /* Bumped lift for curved style */
-    box-shadow: var(--shadow-md); /* Enhanced shadow */
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
   }
 
   &:active:not(:disabled) {
     transform: translateY(0);
-    box-shadow: var(--shadow-sm); /* Keep a tiny shadow when pressed */
+    box-shadow: var(--shadow-sm);
   }
 
   &:disabled {
@@ -205,36 +231,33 @@ button, .btn {
   }
 }
 
-/* Bonus: Fully rounded pill button */
 .btn-pill {
   border-radius: var(--ui-border-radius-pill);
 }
 
-/* Primary Button Variant */
 .btn-primary {
   background: var(--accent-primary);
   border-color: var(--accent-primary);
-  color: var(--text-inverse); /* Make sure --text-inverse is defined in your theme mapping! */
-  
+  color: var(--text-inverse);
+
   &:hover:not(:disabled) {
     background: var(--accent-hover);
     border-color: var(--accent-hover);
     color: var(--text-inverse);
-    box-shadow: var(--shadow-lg); /* Slightly stronger shadow for primary CTA */
+    box-shadow: var(--shadow-lg);
   }
-  
+
   &:active:not(:disabled) {
     background: var(--accent-active);
     border-color: var(--accent-active);
   }
 }
 
-/* Secondary Button Variant */
 .btn-secondary {
   background: var(--bg-ternary);
   border-color: var(--border-primary);
   color: var(--text-secondary);
-  
+
   &:hover:not(:disabled) {
     background: var(--component-bg-hover);
     color: var(--text-primary);
@@ -242,32 +265,31 @@ button, .btn {
   }
 }
 
-/* Danger Button Variant */
 .btn-danger {
   background: var(--color-danger-bg);
   border-color: var(--color-danger-bg);
   color: var(--color-danger-text);
-  
+
   &:hover:not(:disabled) {
     filter: brightness(0.95);
   }
 }
 
-/* ---- Glass & Card Utilities ---- */
+// ==========================================================================
+// 6. CARD & GLASS UTILITIES
+// ==========================================================================
 
-/* Standard Card (Solid in Light, Glass in Themes) */
 .card {
   background: var(--bg-secondary);
   border: 1px solid var(--border-primary);
   border-radius: var(--ui-border-radius-lg);
   padding: var(--spacing-xl);
-  box-shadow: var(--shadow-md); /* Bumped to -md to emphasize the curves */
+  box-shadow: var(--shadow-md);
   transition: var(--transition-base);
   position: relative;
   backdrop-filter: blur(var(--glass-blur-c, 0px));
 }
 
-/* Explicit Glass Panel (Forced Transparency) */
 .glass-panel {
   background: var(--glass-bg-c);
   backdrop-filter: blur(var(--glass-blur-c));
@@ -277,16 +299,19 @@ button, .btn {
   border-radius: var(--ui-border-radius-lg);
 }
 
-/* ---- Layout Helpers (Flex/Grid) ---- */
-.flex { display: flex; }
-.flex-col { flex-direction: column; }
-.flex-row { flex-direction: row; }
-.items-center { align-items: center; }
+// ==========================================================================
+// 7. LAYOUT HELPERS
+// ==========================================================================
+
+.flex            { display: flex; }
+.flex-col        { flex-direction: column; }
+.flex-row        { flex-direction: row; }
+.items-center    { align-items: center; }
 .justify-between { justify-content: space-between; }
-.justify-center { justify-content: center; }
-.justify-end { justify-content: flex-end; }
-.flex-wrap { flex-wrap: wrap; }
-.flex-1 { flex: 1 1 0%; }
+.justify-center  { justify-content: center; }
+.justify-end     { justify-content: flex-end; }
+.flex-wrap       { flex-wrap: wrap; }
+.flex-1          { flex: 1 1 0%; }
 
 .gap-sm { gap: var(--spacing-sm); }
 .gap-md { gap: var(--spacing-md); }
@@ -295,16 +320,18 @@ button, .btn {
 .w-full { width: 100%; }
 .h-full { height: 100%; }
 
-/* ---- Text Helpers ---- */
+// ==========================================================================
+// 8. TEXT HELPERS
+// ==========================================================================
+
 .text-center { text-align: center; }
-.text-right { text-align: right; }
-.font-bold { font-weight: var(--font-weight-bold); }
-.text-sm { font-size: var(--font-size-sm); }
-.text-xs { font-size: var(--font-size-xs); }
-.text-muted { color: var(--text-muted); }
+.text-right  { text-align: right; }
+.font-bold   { font-weight: var(--font-weight-bold); }
+.text-sm     { font-size: var(--font-size-sm); }
+.text-xs     { font-size: var(--font-size-xs); }
+.text-muted  { color: var(--text-muted); }
 .text-accent { color: var(--accent-primary); }
 
-/* Utility to visually hide elements but keep them accessible */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -317,19 +344,7 @@ button, .btn {
   border: 0;
 }
 
-/* ---- Interactive Elements ---- */
-a {
-  color: var(--accent-primary);
-  text-decoration: none;
-  font-weight: var(--font-weight-medium);
-  transition: color var(--transition-fast);
-  cursor: pointer;
-}
 
-a:hover {
-  color: var(--accent-hover);
-  text-decoration: underline;
-}
 // /* ---- Global Reset & Root ---- */
 // html, body, :host {
 //   height: 100%;
@@ -363,8 +378,8 @@ a:hover {
 
 // /* Modern Scrollbar Strategy */
 // * {
-//   // scrollbar-width: thin;
-//   // scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+//   /* scrollbar-width: thin; */
+//   /* scrollbar-color: var(--scroll-thumb) var(--scroll-track); */
 // }
 
 // /* Webkit Scrollbar Fallback */
@@ -431,13 +446,11 @@ a:hover {
 //   font-size: var(--font-size-md); /* Match PrimeNG Input Text Size */
 //   color: var(--text-primary);
   
-//   /* Geometry */
+//   /* Geometry - Updated for Curved Look */
 //   background: var(--bg-secondary);
-//   border: 1px solid var(--border-primary);
+//   border: 1px solid var(--border-primary); /* Changed to solid for softer look */
 //   border-radius: var(--ui-border-radius);
-//   border-style: dashed;
 //   /* Compact Spacing (Matches p-inputtext override) */
-//   /* Vertical: 0.375rem (6px) | Horizontal: 0.5rem (8px) */
 //   padding: var(--spacing-sm) var(--spacing-md); 
   
 //   /* Transitions */
@@ -447,27 +460,26 @@ a:hover {
 //               color var(--transition-base);
 // }
 
-// /* Height Synchronization */
-// /* Padding (6+6=12) + LineHeight (~18) + Border (2) ~= 32px */
+// /* Height Synchronization - Bumped slightly for the rounded corners */
 // input:not([type="checkbox"]):not([type="radio"]), select {
-//   min-height: 2.25rem; 
+//   min-height: 2.5rem; /* Was 2.25rem */
 // }
 
-// /* Focus States (Unified with PrimeNG) */
+// /* Focus States (Unified with PrimeNG) - Softer glow */
 // input:focus, 
 // select:focus, 
 // textarea:focus {
 //   outline: none;
 //   border-color: var(--accent-primary);
-//   box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
-//   background: var(--bg-primary); /* Slight lift */
+//   box-shadow: 0 0 0 3px var(--focus-ring-color); /* Slightly wider/softer ring */
+//   background: var(--bg-primary); 
 // }
 
 // /* Hover States */
 // input:hover:not(:disabled), 
 // select:hover:not(:disabled), 
 // textarea:hover:not(:disabled) {
-//   border-color: var(--accent-primary); /* Slight preview of interaction */
+//   border-color: var(--accent-primary); 
 //   background: var(--component-bg-hover);
 // }
 
@@ -479,7 +491,7 @@ a:hover {
 //   color: var(--text-muted);
 //   opacity: var(--state-disabled-opacity);
 //   cursor: not-allowed;
-//   border-color: var(--border-subtle);
+//   border-color: var(--border-subtle); /* Make sure this token exists, or fall back to --border-primary */
 // }
 
 // /* Labels */
@@ -488,21 +500,19 @@ a:hover {
 //   font-family: var(--font-body);
 //   font-weight: var(--font-weight-medium);
 //   color: var(--text-secondary);
-//   font-size: var(--font-size-sm); /* 12px Labels */
+//   font-size: var(--font-size-sm); 
 //   margin-bottom: var(--spacing-xs);
 // }
 
 // /* ---- Button Standardization (.btn) ---- */
-// /* Mirrors .p-button styles for non-PrimeNG buttons */
 // button, .btn {
 //   display: inline-flex;
 //   align-items: center;
 //   justify-content: center;
 //   gap: var(--spacing-sm);
   
-//   /* Geometry matching PrimeNG p-button */
 //   padding: var(--spacing-sm) var(--spacing-xl);
-//   min-height: 2.25rem; /* Match input height */
+//   min-height: 2.5rem; /* Matched to new input height */
   
 //   font-family: var(--font-body);
 //   font-size: var(--font-size-md);
@@ -514,7 +524,6 @@ a:hover {
 //   transition: all var(--transition-base);
 //   user-select: none;
   
-//   /* Default to Primary style if not specified, or base style */
 //   background: var(--bg-ternary);
 //   border-color: var(--border-primary);
 //   color: var(--text-secondary);
@@ -522,13 +531,13 @@ a:hover {
 //   &:hover:not(:disabled) {
 //     background: var(--component-bg-hover);
 //     color: var(--text-primary);
-//     transform: translateY(-1px);
-//     box-shadow: var(--shadow-sm);
+//     transform: translateY(-2px); /* Bumped lift for curved style */
+//     box-shadow: var(--shadow-md); /* Enhanced shadow */
 //   }
 
 //   &:active:not(:disabled) {
 //     transform: translateY(0);
-//     box-shadow: none;
+//     box-shadow: var(--shadow-sm); /* Keep a tiny shadow when pressed */
 //   }
 
 //   &:disabled {
@@ -539,21 +548,26 @@ a:hover {
 
 //   &:focus-visible {
 //     outline: 0 none;
-//     box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+//     box-shadow: 0 0 0 3px var(--focus-ring-color);
 //   }
+// }
+
+// /* Bonus: Fully rounded pill button */
+// .btn-pill {
+//   border-radius: var(--ui-border-radius-pill);
 // }
 
 // /* Primary Button Variant */
 // .btn-primary {
 //   background: var(--accent-primary);
 //   border-color: var(--accent-primary);
-//   color: var(--text-inverse);
+//   color: var(--text-inverse); /* Make sure --text-inverse is defined in your theme mapping! */
   
 //   &:hover:not(:disabled) {
 //     background: var(--accent-hover);
 //     border-color: var(--accent-hover);
 //     color: var(--text-inverse);
-//     box-shadow: var(--shadow-md);
+//     box-shadow: var(--shadow-lg); /* Slightly stronger shadow for primary CTA */
 //   }
   
 //   &:active:not(:disabled) {
@@ -594,11 +608,9 @@ a:hover {
 //   border: 1px solid var(--border-primary);
 //   border-radius: var(--ui-border-radius-lg);
 //   padding: var(--spacing-xl);
-//   box-shadow: var(--shadow-sm);
+//   box-shadow: var(--shadow-md); /* Bumped to -md to emphasize the curves */
 //   transition: var(--transition-base);
 //   position: relative;
-  
-//   /* Use glass tokens if themes are active */
 //   backdrop-filter: blur(var(--glass-blur-c, 0px));
 // }
 

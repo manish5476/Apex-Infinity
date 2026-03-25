@@ -488,7 +488,6 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
       finalize(() => this.isSaving.set(false))
     ).subscribe((res:any) => {
       if (res) {
-        this.messageService.showSuccess(res.message || 'Geofence saved successfully.')
         setTimeout(() => this.onCancel(), 1000);
       }
     });
