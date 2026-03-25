@@ -360,7 +360,6 @@ export class MachineHubComponent implements OnInit {
       })
     ).subscribe((res: any) => {
       if (res) {
-        this.messageService.showSuccess(res.message)
         this.loadData();
       }
     });
