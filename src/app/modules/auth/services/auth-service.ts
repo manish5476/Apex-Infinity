@@ -76,7 +76,7 @@ export interface User {
   devices?: Device[];
   preferences?: {
     theme: 'light' | 'dark';
-    notifications: {
+    notifications?: {
       email: boolean;
       push: boolean;
       sms: boolean;
@@ -413,7 +413,7 @@ export class AuthService {
   /**
    * Login with email or phone
    */
-  login(data: { email: string; password: string; uniqueShopId: string }, rememberMe: boolean = false) {
+  login(data: { email: string; password: string; uniqueShopId: string; forceLogout?: boolean }, rememberMe: boolean = false) {
     return this.apiService.login(data).pipe(
       tap((response: LoginResponse) => {
         this.handleLoginSuccess(response, rememberMe);
@@ -792,6 +792,21 @@ export class AuthService {
         }
       }
     });
+  }
+
+  /**
+   * Update current user preferences locally and in storage
+   */
+  updateUserPreferences(preferences: Partial<User['preferences']>): void {
+    const user = this.currentUserValue;
+    if (user) {
+      user.preferences = {
+        ...(user.preferences || { theme: 'light' }),
+        ...preferences
+      } as any;
+      this.setItem(this.USER_KEY, user);
+      this.currentUserSubject.next({ ...user });
+    }
   }
 
   /**

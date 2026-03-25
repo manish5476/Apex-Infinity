@@ -17,6 +17,7 @@ export interface User {
   isActive: boolean;
   isLoginBlocked: boolean;
   emailVerified: boolean;
+  maxConcurrentSessions?: number;
   employeeProfile?: {
     employeeId?: string;
     departmentId?: any;

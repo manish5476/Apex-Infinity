@@ -13,7 +13,7 @@ import { LoadingInterceptor } from './core/interceptors/loading.interceptor';
 
 // PrimeNG Imports
 import { providePrimeNG } from 'primeng/config';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 
 // Import your custom preset
 // import { MyPreset } from './core/config/my-preset';
@@ -25,7 +25,7 @@ import { loggingInterceptor } from './core/interceptors/logging.interceptor';
 // Services
 import { AuthService } from './modules/auth/services/auth-service';
 import { DialogService } from 'primeng/dynamicdialog';
-import { ConfirmationService } from '@core/services/confirmationService';
+// import { ConfirmationService } from '@core/services/confirmationService';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -53,7 +53,7 @@ export const appConfig: ApplicationConfig = {
       }
     }),
     // ConfirmationService
-    MessageService,
+    MessageService, ConfirmationService,
     DatePipe, DialogService,
 
     // ✅ THE MODERN FIX: Using provideAppInitializer

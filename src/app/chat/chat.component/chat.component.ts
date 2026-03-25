@@ -290,25 +290,15 @@ export class ChatComponent implements OnInit, OnDestroy {
       })
     );
 
-    // 8. Theme Sync
-    this.socketConnection.on('themeChanged', ({ themeId }: {themeId: string}) => {
-      this.activeThemeId = themeId;
-      if (themeId === 'theme-dark') {
-        this.themeService.setDarkMode(true);
-      } else if (themeId === 'auto-theme') {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        this.themeService.setDarkMode(prefersDark);
-        this.activeThemeId = prefersDark ? 'theme-dark' : 'theme-light';
-      } else {
-        this.themeService.setLightTheme(themeId);
-        this.themeService.setDarkMode(false);
-        this.activeThemeId = themeId;
-      }
-    });
+    // 8. Theme Sync - Handled by ThemeService globally
   }
 
   changeTheme(newThemeId: string) {
-    this.socketConnection.emit('updateTheme', { themeId: newThemeId });
+    if (newThemeId === 'theme-dark') {
+      this.themeService.setDarkMode(true);
+    } else {
+      this.themeService.setLightTheme(newThemeId);
+    }
   }
 
   // --- Channel Management ---

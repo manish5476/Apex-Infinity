@@ -89,6 +89,7 @@ export class UserFormComponent implements OnInit {
       branchId: [null],
       status: ['approved'],
       isActive: [true], // Default for toggle
+      maxConcurrentSessions: [1, [Validators.required, Validators.min(1)]],
       password: [''],
       passwordConfirm: [''],
 
