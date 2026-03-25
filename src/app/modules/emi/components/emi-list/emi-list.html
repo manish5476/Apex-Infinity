@@ -32,8 +32,9 @@
         <label for="status">Status</label>
         <p-select appendTo="body" appendTo="body" (onChange)="applyFilters()" id="status" [options]="statusOptions" [(ngModel)]="emiFilter.status"
           optionLabel="label" optionValue="value" [showClear]="true" placeholder="Select Status" appendTo="body"
-          styleClass="w-full">
+          styleClass="w-full" [filter]="true" filterBy="label">
         </p-select>
+
       </div>
 
       <div class="se-filter-actions">

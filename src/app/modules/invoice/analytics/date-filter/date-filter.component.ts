@@ -1,36 +1,31 @@
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DatePickerModule } from 'primeng/datepicker';
+
 import { MasterListService } from '../../../../core/services/master-list.service';
 
 @Component({
   selector: 'app-date-filter',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DatePickerModule],
   template: `
     <div class="date-filter-container">
       
       <div class="filter-group">
         <label class="filter-label">Start Date</label>
         <div class="input-wrapper">
-          <input 
-            type="date" 
-            [(ngModel)]="startDate" 
-            (change)="onDateChange()"
-            class="theme-date-input">
+          <p-datepicker [(ngModel)]="startDate" (onSelect)="onDateChange()" [showIcon]="true" iconDisplay="input" placeholder="Start Date" dateFormat="yy-mm-dd" appendTo="body" styleClass="w-full"></p-datepicker>
         </div>
       </div>
 
       <div class="filter-group">
         <label class="filter-label">End Date</label>
         <div class="input-wrapper">
-          <input 
-            type="date" 
-            [(ngModel)]="endDate" 
-            (change)="onDateChange()"
-            class="theme-date-input">
+          <p-datepicker [(ngModel)]="endDate" (onSelect)="onDateChange()" [showIcon]="true" iconDisplay="input" placeholder="End Date" dateFormat="yy-mm-dd" appendTo="body" styleClass="w-full"></p-datepicker>
         </div>
       </div>
+
 
       <button class="reset-btn" (click)="resetDates()" title="Reset Date Range">
         <i class="pi pi-refresh"></i>
@@ -155,21 +150,26 @@ import { MasterListService } from '../../../../core/services/master-list.service
   `]
 })
 export class DateFilterComponent {
-  @Input() startDate?: string;
-  @Input() endDate?: string;
+  @Input() startDate?: string | Date;
+  @Input() endDate?: string | Date;
+
   @Output() dateChange = new EventEmitter<any>();
   public  masterList = inject(MasterListService);
 
   onDateChange(): void {
+    const start = this.startDate instanceof Date ? this.startDate.toISOString().split('T')[0] : this.startDate;
+    const end = this.endDate instanceof Date ? this.endDate.toISOString().split('T')[0] : this.endDate;
     this.dateChange.emit({
-      startDate: this.startDate,
-      endDate: this.endDate
+      startDate: start,
+      endDate: end
     });
   }
 
+
   resetDates(): void {
-    this.startDate = '';
-    this.endDate = '';
+    this.startDate = undefined;
+    this.endDate = undefined;
     this.onDateChange();
   }
+
 }

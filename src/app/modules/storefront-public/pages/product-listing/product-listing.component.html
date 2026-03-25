@@ -22,7 +22,10 @@
             optionLabel="label"
             optionValue="value"
             appendTo="body"
-            styleClass="minimal-select">
+            styleClass="minimal-select"
+            [filter]="true"
+            filterBy="label">
+
             <ng-template pTemplate="selectedItem" let-selectedOption>
               <div class="flex align-items-center gap-2">
                 <i [class]="selectedOption.icon"></i>

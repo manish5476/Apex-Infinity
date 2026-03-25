@@ -114,8 +114,11 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
                       placeholder="All Departments" 
                       [showClear]="true" 
                       appendTo="body"
-                      styleClass="w-full">
+                      styleClass="w-full"
+                      [filter]="true"
+                      filterBy="label">
                     </p-select>
+
                   </div>
                   <p-button 
                     label="Generate Report" 
@@ -167,8 +170,11 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
                       [options]="financialYears" 
                       [(ngModel)]="selectedFy" 
                       appendTo="body"
-                      styleClass="w-full">
+                      styleClass="w-full"
+                      [filter]="true"
+                      filterBy="label">
                     </p-select>
+
                   </div>
                   <p-button 
                     label="Fetch Liability Report" 
@@ -237,8 +243,11 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
             [options]="attendanceStatuses" 
             placeholder="Select New Status" 
             appendTo="body" 
-            styleClass="w-full">
+            styleClass="w-full"
+            [filter]="true"
+            filterBy="label">
           </p-select>
+
         </div>
         <div class="input-group flex-col gap-xs">
           <label class="info-label text-xs font-bold text-tertiary uppercase tracking-widest">Admin Reason <span class="text-error">*</span></label>

@@ -59,7 +59,8 @@
           <div class="form-group span-2">
             <label>Branch</label>
             <p-select appendTo="body" formControlName="branchId" [options]="branchOptions()" optionLabel="name"
-              optionValue="_id" styleClass="w-full theme-control" placeholder="Select Branch"></p-select>
+              optionValue="_id" styleClass="w-full theme-control" placeholder="Select Branch" [filter]="true" filterBy="name"></p-select>
+
           </div>
           <div class="form-group span-2">
             <label>Invoice Date</label>

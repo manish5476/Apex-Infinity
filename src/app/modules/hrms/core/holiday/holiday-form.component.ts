@@ -66,7 +66,8 @@ import { AppMessageService } from '@core/services/message.service';
                     </div>
                     <div class="input-group">
                       <label class="info-label">Holiday Category <span class="text-error">*</span></label>
-                      <p-select formControlName="holidayType" [options]="holidayTypes" appendTo="body" styleClass="w-full premium-select"></p-select>
+                      <p-select formControlName="holidayType" [options]="holidayTypes" appendTo="body" styleClass="w-full premium-select" [filter]="true" filterBy="label"></p-select>
+
                     </div>
                   </div>
 
@@ -79,20 +80,20 @@ import { AppMessageService } from '@core/services/message.service';
 
               <p-card styleClass="premium-card glass-card slide-down" styleclass="animation-delay: 0.15s">
                 <div class="grid-2 gap-4">
-                  <div class="bg-warning-light p-3 border-radius-md border-1 border-warning flex-between">
+                  <label class="bg-warning-light p-3 border-radius-md border-1 border-warning flex-between cursor-pointer">
                     <div class="flex-col">
                       <span class="font-bold text-sm text-warning">Restricted / Optional</span>
                       <span class="text-xs text-tertiary">Employees must opt-in.</span>
                     </div>
-                    <p-inputSwitch formControlName="isOptional"></p-inputSwitch>
-                  </div>
-                  <div class="bg-surface p-3 border-radius-md border-1 surface-border flex-between">
+                    <p-toggleswitch formControlName="isOptional"></p-toggleswitch>
+                  </label>
+                  <label class="bg-surface p-3 border-radius-md border-1 surface-border flex-between cursor-pointer">
                     <div class="flex-col">
                       <span class="font-bold text-sm text-primary-color">Active Status</span>
                       <span class="text-xs text-tertiary">Enable for calculations.</span>
                     </div>
-                    <p-inputSwitch formControlName="isActive"></p-inputSwitch>
-                  </div>
+                    <p-toggleswitch formControlName="isActive"></p-toggleswitch>
+                  </label>
                 </div>
               </p-card>
             </div>
@@ -103,15 +104,16 @@ import { AppMessageService } from '@core/services/message.service';
               <div class="flex-col gap-5">
                 <div class="input-group">
                   <label class="info-label">Branch Override</label>
-                  <p-select formControlName="branchId" [options]="branches" [showClear]="true" placeholder="All Branches (Global)" appendTo="body" styleClass="w-full premium-select"></p-select>
+                  <p-select formControlName="branchId" [options]="branches" [showClear]="true" placeholder="All Branches (Global)" appendTo="body" styleClass="w-full premium-select" [filter]="true" filterBy="label"></p-select>
+
                   <span class="text-xs text-secondary mt-1">If set, this holiday is ONLY observed at this specific location.</span>
                 </div>
 
                 <div formGroupName="applicableTo" class="flex-col gap-4 mt-2 border-top pt-4">
-                  <div class="flex-between mb-2">
+                  <label class="flex-between mb-2 cursor-pointer">
                     <span class="font-bold text-sm text-primary-color">Applies to All Employees</span>
-                    <p-inputSwitch formControlName="allEmployees"></p-inputSwitch>
-                  </div>
+                    <p-toggleswitch formControlName="allEmployees"></p-toggleswitch>
+                  </label>
 
                   @if (!holidayForm.get('applicableTo.allEmployees')?.value) {
                     <div class="input-group slide-down">

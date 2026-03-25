@@ -14,13 +14,15 @@ import { TextareaModule } from 'primeng/textarea';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
 @Component({
   selector: 'app-designation-form',
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, MultiSelectModule,
-    CardModule, SelectModule, TextareaModule, InputTextModule, InputNumberModule
+    CardModule, SelectModule, TextareaModule, InputTextModule, InputNumberModule,
+    ToggleSwitchModule
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -147,8 +149,11 @@ import { MultiSelectModule } from 'primeng/multiselect';
                     [options]="gradeOptions" 
                     placeholder="Select Grade" 
                     styleClass="w-full" 
-                    appendTo="body">
+                    appendTo="body"
+                    [filter]="true"
+                    filterBy="label">
                   </p-select>
+
                 </div>
               </div>
 
@@ -257,8 +262,11 @@ import { MultiSelectModule } from 'primeng/multiselect';
                   optionLabel="label"
                   optionValue="value"
                   styleClass="w-full" 
-                  appendTo="body">
+                  appendTo="body"
+                  [filter]="true"
+                  filterBy="label">
                 </p-select>
+
               </div>
             </div>
           </p-card>
@@ -294,39 +302,27 @@ import { MultiSelectModule } from 'primeng/multiselect';
               <div class="flex-col" style="gap: var(--spacing-md); display: flex; justify-content: center;">
                 <div formGroupName="metadata" style="display: flex; gap: var(--spacing-md); flex-wrap: wrap;">
                   
-                  <div class="status-toggle-wrapper">
-                    <label class="toggle-container">
-                      <input type="checkbox" formControlName="isManager" class="toggle-input">
-                      <span class="toggle-slider"></span>
-                      <div class="toggle-text"><span class="toggle-label">Managerial Role</span></div>
-                    </label>
-                  </div>
-
-                  <div class="status-toggle-wrapper">
-                    <label class="toggle-container">
-                      <input type="checkbox" formControlName="isExecutive" class="toggle-input">
-                      <span class="toggle-slider"></span>
-                      <div class="toggle-text"><span class="toggle-label">Executive Level</span></div>
-                    </label>
-                  </div>
-
-                  <div class="status-toggle-wrapper">
-                    <label class="toggle-container">
-                      <input type="checkbox" formControlName="requiresApproval" class="toggle-input">
-                      <span class="toggle-slider"></span>
-                      <div class="toggle-text"><span class="toggle-label">Requires Appr.</span></div>
-                    </label>
-                  </div>
-
-                </div>
-
-                <div class="status-toggle-wrapper" style="border-color: var(--color-primary);">
-                  <label class="toggle-container">
-                    <input type="checkbox" formControlName="isActive" class="toggle-input">
-                    <span class="toggle-slider"></span>
-                    <div class="toggle-text"><span class="toggle-label">Designation is Active</span></div>
+                  <label class="status-toggle-wrapper flex-between cursor-pointer">
+                    <div class="toggle-text"><span class="toggle-label font-bold text-xs uppercase text-tertiary">Managerial Role</span></div>
+                    <p-toggleswitch formControlName="isManager"></p-toggleswitch>
                   </label>
+
+                  <label class="status-toggle-wrapper flex-between cursor-pointer">
+                    <div class="toggle-text"><span class="toggle-label font-bold text-xs uppercase text-tertiary">Executive Level</span></div>
+                    <p-toggleswitch formControlName="isExecutive"></p-toggleswitch>
+                  </label>
+
+                  <label class="status-toggle-wrapper flex-between cursor-pointer">
+                    <div class="toggle-text"><span class="toggle-label font-bold text-xs uppercase text-tertiary">Requires Appr.</span></div>
+                    <p-toggleswitch formControlName="requiresApproval"></p-toggleswitch>
+                  </label>
+
                 </div>
+
+                <label class="status-toggle-wrapper flex-between cursor-pointer" style="border-color: var(--color-primary);">
+                  <div class="toggle-text"><span class="toggle-label font-bold text-sm text-primary">Designation is Active</span></div>
+                  <p-toggleswitch formControlName="isActive"></p-toggleswitch>
+                </label>
               </div>
 
             </div>

@@ -227,8 +227,9 @@
       <!-- enum or reference → Select dropdown -->
       @else if (field.enum || field.type === 'reference') {
       <p-select [options]="getEnumOptions(field)" [formControlName]="field.key" optionLabel="label" optionValue="value"
-        placeholder="Select…" appendTo="body" [filter]="getEnumOptions(field).length > 8" [showClear]="!field.required">
+        placeholder="Select…" appendTo="body" [filter]="true" filterBy="label" [showClear]="!field.required">
       </p-select>
+
       }
 
       <!-- color -->

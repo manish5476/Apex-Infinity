@@ -12,11 +12,13 @@ import Link from '@tiptap/extension-link';
 import Underline from '@tiptap/extension-underline';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
+import { DatePickerModule } from 'primeng/datepicker';
+
 
 @Component({
   selector: 'app-note-detail',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, TiptapEditorComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, DatePickerModule],
   templateUrl: './note-detail.component.html',
   styleUrls: ['./note-detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -52,9 +54,10 @@ export class NoteDetailComponent implements OnInit {
     content: ['', Validators.required],
     priority: ['medium'],
     tags: [''],
-    startDate: [null as string | null],
-    dueDate: [null as string | null]
+    startDate: [null as string | null | Date],
+    dueDate: [null as string | null | Date]
   });
+
 
   constructor() { }
 
@@ -188,10 +191,15 @@ export class NoteDetailComponent implements OnInit {
     this.isSaving.set(true);
 
     const rawTags = this.editForm.get('tags')?.value || '';
+    const formVals = this.editForm.value;
+
     const updates = {
-      ...this.editForm.value,
-      tags: rawTags.split(',').map((t: string) => t.trim()).filter(Boolean)
+      ...formVals,
+      tags: rawTags.split(',').map((t: string) => t.trim()).filter(Boolean),
+      startDate: formVals.startDate instanceof Date ? formVals.startDate.toISOString().split('T')[0] : formVals.startDate,
+      dueDate: formVals.dueDate instanceof Date ? formVals.dueDate.toISOString().split('T')[0] : formVals.dueDate
     };
+
 
     this.noteService.updateNote(this.note()!._id, updates).subscribe({
       next: (res) => {

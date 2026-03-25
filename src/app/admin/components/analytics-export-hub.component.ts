@@ -5,7 +5,9 @@ import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag'; 
+import { DatePickerModule } from 'primeng/datepicker';
 import { AdminAnalyticsService } from '../admin-analytics.service';
+
 
 @Component({
   selector: 'app-analytics-export-hub',
@@ -16,8 +18,10 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
     ProgressSpinnerModule, 
     TooltipModule, 
     FormsModule, 
-    TagModule
+    TagModule,
+    DatePickerModule
   ],
+
   template: `
     <div class="export-container">
 
@@ -62,13 +66,14 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
               <div class="date-grid">
                 <div class="form-group">
                   <label class="input-label">Start Date</label>
-                  <input type="date" [(ngModel)]="startDate" class="custom-date-input">
+                  <p-datepicker [(ngModel)]="startDate" placeholder="Start Date" dateFormat="yy-mm-dd" [showIcon]="true" iconDisplay="input" appendTo="body" styleClass="w-full"></p-datepicker>
                 </div>
                 <div class="form-group">
                   <label class="input-label">End Date</label>
-                  <input type="date" [(ngModel)]="endDate" class="custom-date-input">
+                  <p-datepicker [(ngModel)]="endDate" placeholder="End Date" dateFormat="yy-mm-dd" [showIcon]="true" iconDisplay="input" appendTo="body" styleClass="w-full"></p-datepicker>
                 </div>
               </div>
+
             </div>
           </div>
 
@@ -346,8 +351,9 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
 export class AnalyticsExportHubComponent {
   exporting = signal<boolean>(false);
   selectedType:any = signal<'sales' | 'inventory' | 'customers'>('sales');
-  startDate = '';
-  endDate = '';
+  startDate: Date | null = null;
+  endDate: Date | null = null;
+
 
   exportTypes = [
     { id: 'sales', label: 'Revenue & Sales', icon: 'pi-chart-line' },
@@ -364,11 +370,15 @@ export class AnalyticsExportHubComponent {
   handleExport() {
     this.exporting.set(true);
 
+    const startStr = this.startDate instanceof Date ? this.startDate.toISOString().split('T')[0] : (this.startDate || '');
+    const endStr = this.endDate instanceof Date ? this.endDate.toISOString().split('T')[0] : (this.endDate || '');
+
     this.analyticsService.exportAnalyticsData(
       this.selectedType(),
-      this.startDate,
-      this.endDate
+      startStr,
+      endStr
     ).subscribe({
+
       next: (blob: Blob) => {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');

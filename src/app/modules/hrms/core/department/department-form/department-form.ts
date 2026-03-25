@@ -12,11 +12,12 @@ import { HRMSService } from '../../../hrms.service';
 import { CardModule } from 'primeng/card';
 import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
 @Component({
   selector: 'app-department-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, CardModule, SelectModule, DatePickerModule],
+  imports: [CommonModule, ReactiveFormsModule, CardModule, SelectModule, DatePickerModule, ToggleSwitchModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="app-fullscreen-wrapper fade-in">
@@ -107,8 +108,11 @@ import { DatePickerModule } from 'primeng/datepicker';
                   placeholder="Select Branch Location" 
                   [showClear]="true" 
                   styleClass="w-full prime-override" 
-                  appendTo="body">
+                  appendTo="body"
+                  [filter]="true"
+                  filterBy="name">
                 </p-select>
+
               </div>
 
               <div class="form-field span-2-inner">
@@ -268,15 +272,12 @@ import { DatePickerModule } from 'primeng/datepicker';
                 </div>
               </div>
 
-              <div class="status-toggle-wrapper mt-auto" [formGroup]="deptForm">
-                <label class="toggle-container">
-                  <input type="checkbox" formControlName="isActive" class="toggle-input">
-                  <span class="toggle-slider"></span>
-                  <div class="toggle-text">
-                    <span class="toggle-label font-bold">Active Department</span>
-                  </div>
-                </label>
-              </div>
+              <label class="status-toggle-wrapper flex-between cursor-pointer mt-auto">
+                <div class="toggle-text">
+                  <span class="toggle-label font-bold">Active Department</span>
+                </div>
+                <p-toggleswitch formControlName="isActive"></p-toggleswitch>
+              </label>
             </div>
           </p-card>
 

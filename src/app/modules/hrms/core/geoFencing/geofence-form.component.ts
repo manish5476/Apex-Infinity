@@ -112,7 +112,8 @@ import { InputIconModule } from 'primeng/inputicon';
                       </div>
                       <div class="input-group flex-col gap-xs">
                         <label class="info-label text-xs font-bold text-tertiary uppercase tracking-widest">Shape Type</label>
-                        <p-select formControlName="type" [options]="types" appendTo="body" styleClass="w-full"></p-select>
+                        <p-select formControlName="type" [options]="types" appendTo="body" styleClass="w-full" [filter]="true" filterBy="label"></p-select>
+
                       </div>
                     </div>
                     
@@ -121,13 +122,13 @@ import { InputIconModule } from 'primeng/inputicon';
                       <input pInputText formControlName="city" placeholder="e.g. Bangalore" class="w-full" />
                     </div>
                     
-                    <div class="flex-between bg-primary-light p-md border-radius-md border-1 border-solid border-primary mt-sm">
+                    <label class="flex-between bg-primary-light p-md border-radius-md border-1 border-solid border-primary mt-sm cursor-pointer">
                       <div class="flex-col gap-xs">
                         <span class="font-bold text-sm text-primary">Enable Geofence</span>
                         <span class="text-xs text-secondary">Toggle to instantly activate/deactivate this zone.</span>
                       </div>
                       <p-toggleswitch formControlName="isActive"></p-toggleswitch>
-                    </div>
+                    </label>
                   </div>
                 </ng-template>
               </p-card>

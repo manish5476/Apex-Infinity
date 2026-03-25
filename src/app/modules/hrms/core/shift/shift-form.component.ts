@@ -14,6 +14,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DatePickerModule } from 'primeng/datepicker';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
 @Component({
   selector: 'app-shift-form',
@@ -21,7 +22,7 @@ import { DatePickerModule } from 'primeng/datepicker';
   imports: [
     CommonModule, ReactiveFormsModule, 
     CardModule, SelectModule, MultiSelectModule, TextareaModule, 
-    InputTextModule, InputNumberModule, DatePickerModule
+    InputTextModule, InputNumberModule, DatePickerModule, ToggleSwitchModule
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -94,8 +95,12 @@ import { DatePickerModule } from 'primeng/datepicker';
                   optionLabel="label"
                   optionValue="value"
                   styleClass="w-full" 
-                  appendTo="body">
+                  appendTo="body"
+                  [filter]="true"
+                  filterBy="label">
                 </p-select>
+
+
               </div>
 
               <div class="form-field">
@@ -110,13 +115,15 @@ import { DatePickerModule } from 'primeng/datepicker';
               </div>
 
               <div class="form-field">
-                <label for="startTime">Start Time <span class="required">*</span></label>
-                <input id="startTime" type="time" formControlName="startTime" class="se-input w-full prime-override-input">
+                <p-datepicker id="startTime" formControlName="startTime" [timeOnly]="true" 
+                  hourFormat="12" styleClass="w-full prime-override-input" appendTo="body"></p-datepicker>
+
               </div>
 
               <div class="form-field">
-                <label for="endTime">End Time <span class="required">*</span></label>
-                <input id="endTime" type="time" formControlName="endTime" class="se-input w-full prime-override-input">
+                <p-datepicker id="endTime" formControlName="endTime" [timeOnly]="true" 
+                  hourFormat="12" styleClass="w-full prime-override-input" appendTo="body"></p-datepicker>
+
               </div>
 
               <div class="form-field span-2-inner mt-1">
@@ -258,13 +265,10 @@ import { DatePickerModule } from 'primeng/datepicker';
             </ng-template>
             
             <div class="flex-col gap-4">
-              <div class="status-toggle-wrapper" style="margin-top: 0; margin-bottom: 0;">
-                <label class="toggle-container">
-                  <input type="checkbox" formControlName="enabled" class="toggle-input">
-                  <span class="toggle-slider"></span>
-                  <div class="toggle-text"><span class="toggle-label font-bold">Enable Overtime</span></div>
-                </label>
-              </div>
+              <label class="status-toggle-wrapper flex-between cursor-pointer" style="margin-top: 0; margin-bottom: 0;">
+                <div class="toggle-text"><span class="toggle-label font-bold">Enable Overtime</span></div>
+                <p-toggleswitch formControlName="enabled"></p-toggleswitch>
+              </label>
 
               <div class="inner-grid-2">
                 <div class="form-field">
@@ -326,22 +330,26 @@ import { DatePickerModule } from 'primeng/datepicker';
               <div class="inner-grid-2">
                 <div class="form-field">
                   <label for="coreStartTime">Core Start Time</label>
-                  <input id="coreStartTime" type="time" formControlName="coreStartTime" class="se-input w-full prime-override-input">
+                  <p-datepicker id="coreStartTime" formControlName="coreStartTime" [timeOnly]="true" 
+                    hourFormat="12" styleClass="w-full prime-override-input" appendTo="body"></p-datepicker>
                 </div>
                 <div class="form-field">
                   <label for="coreEndTime">Core End Time</label>
-                  <input id="coreEndTime" type="time" formControlName="coreEndTime" class="se-input w-full prime-override-input">
+                  <p-datepicker id="coreEndTime" formControlName="coreEndTime" [timeOnly]="true" 
+                    hourFormat="12" styleClass="w-full prime-override-input" appendTo="body"></p-datepicker>
                 </div>
               </div>
 
               <div class="inner-grid-2">
                 <div class="form-field">
                   <label for="flexibleBandStart">Flexi Band Start</label>
-                  <input id="flexibleBandStart" type="time" formControlName="flexibleBandStart" class="se-input w-full prime-override-input">
+                  <p-datepicker id="flexibleBandStart" formControlName="flexibleBandStart" [timeOnly]="true" 
+                    hourFormat="12" styleClass="w-full prime-override-input" appendTo="body"></p-datepicker>
                 </div>
                 <div class="form-field">
                   <label for="flexibleBandEnd">Flexi Band End</label>
-                  <input id="flexibleBandEnd" type="time" formControlName="flexibleBandEnd" class="se-input w-full prime-override-input">
+                  <p-datepicker id="flexibleBandEnd" formControlName="flexibleBandEnd" [timeOnly]="true" 
+                    hourFormat="12" styleClass="w-full prime-override-input" appendTo="body"></p-datepicker>
                 </div>
               </div>
 
@@ -389,13 +397,10 @@ import { DatePickerModule } from 'primeng/datepicker';
                 </div>
               </div>
 
-              <div class="status-toggle-wrapper" style="border-color: var(--color-primary); margin: 0;">
-                <label class="toggle-container">
-                  <input type="checkbox" formControlName="isActive" class="toggle-input">
-                  <span class="toggle-slider"></span>
-                  <div class="toggle-text"><span class="toggle-label font-bold">Shift is Active</span></div>
-                </label>
-              </div>
+              <label class="status-toggle-wrapper flex-between cursor-pointer" style="border-color: var(--color-primary); margin: 0;">
+                <div class="toggle-text"><span class="toggle-label font-bold">Shift is Active</span></div>
+                <p-toggleswitch formControlName="isActive"></p-toggleswitch>
+              </label>
 
             </div>
           </p-card>

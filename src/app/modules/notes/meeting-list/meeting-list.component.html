@@ -71,8 +71,11 @@
               optionValue="value"
               placeholder="Status" 
               styleClass="compact-select"
-              [style]="{'min-width':'140px'}">
+              [style]="{'min-width':'140px'}"
+              [filter]="true"
+              filterBy="label">
             </p-select>
+
 
             <!-- Date Filter -->
             <p-datepicker 

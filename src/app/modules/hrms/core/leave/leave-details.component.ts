@@ -155,7 +155,7 @@ import { AppMessageService } from '@core/services/message.service';
 
         <div *ngIf="actionType === 'escalate'" class="input-group">
           <label class="info-label">Escalate To <span class="text-error">*</span></label>
-          <p-select formControlName="escalateTo" [options]="managers" optionLabel="name" optionValue="id" styleClass="w-full premium-select" appendTo="body"></p-select>
+          <p-select formControlName="escalateTo" [options]="managers" optionLabel="name" optionValue="id" [filter]="true" filterBy="name" styleClass="w-full premium-select" appendTo="body"></p-select>
         </div>
 
         <div class="input-group">

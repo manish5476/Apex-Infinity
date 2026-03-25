@@ -17,8 +17,9 @@
       <div class="se-filter-field">
         <label for="file">Log File</label>
         <p-select appendTo="body" appendTo="body" id="file" [options]="logFiles" [(ngModel)]="filters.file" placeholder="Select File"
-          (onChange)="applyFilters()">
+          (onChange)="applyFilters()" [filter]="true" filterBy="label">
         </p-select>
+
       </div>
 
       <div class="se-filter-field">

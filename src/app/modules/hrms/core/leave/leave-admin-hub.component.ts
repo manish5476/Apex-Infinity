@@ -47,7 +47,7 @@ import { AppMessageService } from '@core/services/message.service';
           </div>
         </div>
         <div class="header-right flex-align gap-3">
-          <p-select [options]="departments" placeholder="Filter by Department" styleClass="premium-dropdown"></p-select>
+          <p-select [options]="departments" [filter]="true" filterBy="label" placeholder="Filter by Department" styleClass="premium-dropdown"></p-select>
           <p-button icon="pi pi-download" [outlined]="true" label="Export Report" severity="secondary"></p-button>
         </div>
         <div class="flex-between mb-4">

@@ -174,7 +174,8 @@ import { AppMessageService } from '@core/services/message.service';
       <div class="flex-col gap-4">
         <div class="input-group">
           <label class="info-label">New Status</label>
-          <p-select [(ngModel)]="bulkStatus" [options]="statusOptions" placeholder="Select Status" appendTo="body" styleClass="w-full premium-select"></p-select>
+          <p-select [(ngModel)]="bulkStatus" [options]="statusOptions" placeholder="Select Status" appendTo="body" styleClass="w-full premium-select" [filter]="true" filterBy="label"></p-select>
+
         </div>
         <div class="flex-align justify-end gap-3 pt-4 border-top mt-2">
           <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="displayBulkDialog = false"></p-button>

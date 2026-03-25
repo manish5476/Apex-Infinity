@@ -20,8 +20,9 @@
       <div class="se-filter-field">
         <label for="type">Payment Type</label>
         <p-select appendTo="body" appendTo="body" (onChange)="applyFilters()" appendTo="body" id="type" [options]="typeOptions"
-          [(ngModel)]="paymentFilter.type" [showClear]="true" placeholder="Inflow / Outflow" styleClass="w-full">
+          [(ngModel)]="paymentFilter.type" [showClear]="true" placeholder="Inflow / Outflow" styleClass="w-full" [filter]="true" filterBy="label">
         </p-select>
+
       </div>
 
       <div class="se-filter-field">
@@ -43,15 +44,17 @@
       <div class="se-filter-field">
         <label for="paymentMethod">Payment Method</label>
         <p-select appendTo="body" appendTo="body" (onChange)="applyFilters()" appendTo="body" id="paymentMethod" [options]="paymentMethodOptions"
-          [(ngModel)]="paymentFilter.paymentMethod" [showClear]="true" placeholder="Select Method" styleClass="w-full">
+          [(ngModel)]="paymentFilter.paymentMethod" [showClear]="true" placeholder="Select Method" styleClass="w-full" [filter]="true" filterBy="label">
         </p-select>
+
       </div>
 
       <div class="se-filter-field">
         <label for="status">Status</label>
         <p-select appendTo="body" appendTo="body" (onChange)="applyFilters()" appendTo="body" id="status" [options]="statusOptions"
-          [(ngModel)]="paymentFilter.status" [showClear]="true" placeholder="Select Status" styleClass="w-full">
+          [(ngModel)]="paymentFilter.status" [showClear]="true" placeholder="Select Status" styleClass="w-full" [filter]="true" filterBy="label">
         </p-select>
+
       </div>
 
       <div class="se-filter-actions">

@@ -103,11 +103,13 @@
                   <div class="card-body">
                     <div class="input-group">
                       <p-select [options]="roles" [(ngModel)]="selectedRoles[p._id]" optionLabel="name" optionValue="_id"
-                        placeholder="Assign Role" styleClass="w-full" appendTo="body"></p-select>
+                        placeholder="Assign Role" styleClass="w-full" appendTo="body" [filter]="true" filterBy="name"></p-select>
+
                     </div>
                     <div class="input-group">
                       <p-select [options]="branches" [(ngModel)]="selectedBranches[p._id]" optionLabel="name"
-                        optionValue="_id" placeholder="Assign Branch" styleClass="w-full" appendTo="body"></p-select>
+                        optionValue="_id" placeholder="Assign Branch" styleClass="w-full" appendTo="body" [filter]="true" filterBy="name"></p-select>
+
                     </div>
                   </div>
 
@@ -226,11 +228,13 @@
     <div class="form-row">
       <div class="form-group">
         <label>Role</label>
-        <p-select [options]="roles" formControlName="role" optionLabel="name" optionValue="_id" placeholder="Select Role" appendTo="body" styleClass="w-full"></p-select>
+        <p-select [options]="roles" formControlName="role" optionLabel="name" optionValue="_id" placeholder="Select Role" appendTo="body" styleClass="w-full" [filter]="true" filterBy="name"></p-select>
+
       </div>
       <div class="form-group">
         <label>Branch</label>
-        <p-select [options]="branches" formControlName="branchId" optionLabel="name" optionValue="_id" placeholder="Select Branch" appendTo="body" styleClass="w-full"></p-select>
+        <p-select [options]="branches" formControlName="branchId" optionLabel="name" optionValue="_id" placeholder="Select Branch" appendTo="body" styleClass="w-full" [filter]="true" filterBy="name"></p-select>
+
       </div>
     </div>
   </form>
