@@ -5,12 +5,14 @@ import { forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { DynamicDialogServices } from '../../../core/services/dynamic-dialog-services';
 import { NoteService } from '../../../core/services/notes.service';
+import { ItemType, Priority } from '../../../core/models/note.types';
 
 // --- Interfaces based on your JSON Data ---
 interface ExtendedProps {
+  noteType: any;
   type?: string;
-  noteType?: 'note' | 'task' | 'meeting';
-  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  itemType?: ItemType;
+  priority?: Priority;
   status?: string;
   meetingId?: string;
 }
@@ -169,7 +171,7 @@ export class CalendarViewComponent implements OnInit {
 
   getPriorityScore(e: CalendarEvent): number {
     if (e.extendedProps.priority === 'urgent') return 10;
-    if (e.extendedProps.noteType === 'meeting') return 8;
+    if (e.extendedProps.itemType === 'meeting') return 8;
     if (e.extendedProps.priority === 'high') return 6;
     return 1;
   }
@@ -190,7 +192,7 @@ export class CalendarViewComponent implements OnInit {
   }
 
   getSelectedDayTaskCount() {
-    return this.selectedDayEvents().filter(e => e.extendedProps.noteType === 'task').length;
+    return this.selectedDayEvents().filter(e => e.extendedProps.itemType === 'task').length;
   }
 
   // --- Interactions ---

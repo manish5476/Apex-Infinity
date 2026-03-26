@@ -91,12 +91,8 @@
           <span class="meta-item">
             <i class="pi pi-calendar"></i>
             {{ (note.startDate || note.updatedAt) | date:'mediumDate' }}
-            @if(note.noteType === 'meeting' && note.startDate) {
-            at {{ note.startDate | date:'shortTime' }}
-            }
           </span>
-
-          @if (note.noteType === 'meeting') {
+          @if (note.itemType === 'meeting') {
           <span class="meta-item highlight">
             <i class="pi pi-video"></i> Meeting
           </span>
@@ -106,30 +102,30 @@
         <!-- Content Body -->
         <div class="note-body ql-editor" [innerHTML]="note.content"></div>
 
-        <!-- Checklist / Subtasks -->
+        <!-- Checklist -->
         <div class="subtasks-section">
           <div class="section-header">
             <h3>Checklist</h3>
-            @if (note.subtasks?.length) {
+            @if (note.checklist?.length) {
             <span class="progress-text">{{ progress() }}% Done</span>
             }
           </div>
 
-          @if (note.subtasks?.length) {
+          @if (note.checklist?.length) {
           <div class="progress-track">
             <div class="progress-fill" [style.width.%]="progress()"></div>
           </div>
           }
 
           <div class="subtask-list">
-            @for (task of note.subtasks; track task._id) {
+            @for (item of note.checklist; track item._id) {
             <div class="subtask-item">
               <label class="custom-checkbox">
-                <input type="checkbox" [checked]="task.completed" (change)="toggleSubtask(task)">
+                <input type="checkbox" [checked]="item.completed" (change)="toggleSubtask(item)">
                 <span class="checkmark"></span>
               </label>
-              <span class="task-text" [class.completed]="task.completed">{{ task.title }}</span>
-              <button class="btn-remove-task" (click)="deleteSubtask(task._id!)">
+              <span class="task-text" [class.completed]="item.completed">{{ item.title }}</span>
+              <button class="btn-remove-task" (click)="deleteSubtask(item._id!)">
                 <i class="pi pi-times"></i>
               </button>
             </div>
@@ -232,7 +228,7 @@
     <aside class="sidebar-panel">
 
       <!-- Meeting Widget -->
-      @if (note.noteType === 'meeting') {
+      @if (note.itemType === 'meeting') {
       <div class="widget glass-panel meeting-widget">
         <h3>Meeting Details</h3>
 
@@ -249,12 +245,12 @@
 
         <div class="info-row">
           <i class="pi pi-map-marker"></i>
-          <span>{{ note.meetingDetails?.location || 'No location' }}</span>
+          <span>{{ $any(note).meetingDetails?.location || 'No location' }}</span>
         </div>
         <div class="info-row">
           <i class="pi pi-video"></i>
-          <a [href]="note.meetingDetails?.videoLink" target="_blank" class="link">
-            {{ note.meetingDetails?.videoLink ? 'Join Call' : 'No Link' }}
+          <a [href]="$any(note).meetingDetails?.videoLink" target="_blank" class="link">
+            {{ $any(note).meetingDetails?.videoLink ? 'Join Call' : 'No Link' }}
           </a>
         </div>
       </div>
@@ -297,11 +293,11 @@
               <span class="role">Owner</span>
             </div>
           </div>
-          @for (p of note.participants; track p._id) {
+          @for (p of note.assignees; track p._id) {
           <div class="collaborator-row">
-            <div class="avatar">{{ getInitials(p.user.name) }}</div>
+            <div class="avatar">{{ getInitials($any(p.user).name) }}</div>
             <div class="collab-info">
-              <span class="name">{{ p.user.name || 'Guest' }}</span>
+              <span class="name">{{ $any(p.user).name || 'Guest' }}</span>
               <span class="role">{{ p.role }}</span>
             </div>
           </div>
@@ -313,15 +309,15 @@
       <div class="widget glass-panel history-widget">
         <h3>Activity Log</h3>
         <div class="activity-timeline">
-          @for (log of activityLog(); track log.timestamp) {
+          @for (log of activityLog(); track log.createdAt) {
           <div class="timeline-item">
             <div class="timeline-dot"></div>
             <div class="timeline-content">
               <p class="log-text">
-                <span class="user">{{ log.user.name || 'System' }}</span>
+                <span class="user">{{ log.actor.name || 'System' }}</span>
                 {{ log.action }}
               </p>
-              <span class="log-time">{{ log.timestamp | date:'shortTime' }}</span>
+              <span class="log-time">{{ log.createdAt | date:'shortTime' }}</span>
             </div>
           </div>
           }

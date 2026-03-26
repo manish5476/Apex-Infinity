@@ -4,29 +4,16 @@ import { RouterModule } from '@angular/router';
 import { NoteService } from '../../../core/services/notes.service'; // Adjust path if needed
 import { AppMessageService } from '../../../core/services/message.service';
 
-// Interfaces based on your JSON
-interface ActivityLog {
-  _id: string;
-  action: string;
-  user: string; // ID only in your sample
-  timestamp: string;
-}
+import { 
+  Note, NoteActivity 
+} from '../../../core/models/note.types';
 
-interface NoteActivity {
-  _id: string;
-  title: string;
-  noteType: string;
-  status: string;
-  priority: string;
-  activityLog: ActivityLog[];
-  updatedAt: string;
-}
-
+// Interfaces based on your flattened UI needs
 interface FlattenedActivity {
   id: string;
   action: string;
   timestamp: Date;
-  userId: string;
+  actor: string | { name: string };
   note: {
     id: string;
     title: string;
@@ -48,22 +35,24 @@ export class RecentActivityComponent implements OnInit {
   private noteService = inject(NoteService);
   private messageService = inject(AppMessageService);
 
-  rawNotes = signal<NoteActivity[]>([]);
+  rawNotes = signal<Note[]>([]);
   isLoading = signal(true);
   timeline = computed(() => {
     const allActivities: FlattenedActivity[] = [];
     this.rawNotes().forEach(note => {
-      if (note.activityLog && note.activityLog.length > 0) {
-        note.activityLog.forEach(log => {
+      // Transitioning from 'activityLog' to 'history' as per new schema
+      const history = (note as any).history || (note as any).activityLog || [];
+      if (history.length > 0) {
+        history.forEach((log: any) => {
           allActivities.push({
             id: log._id,
             action: log.action,
-            timestamp: new Date(log.timestamp),
-            userId: log.user,
+            timestamp: new Date(log.createdAt || log.timestamp),
+            actor: log.actor || log.user,
             note: {
               id: note._id,
               title: note.title,
-              type: note.noteType,
+              type: note.itemType || (note as any).noteType,
               priority: note.priority
             }
           });
@@ -121,7 +110,7 @@ export class RecentActivityComponent implements OnInit {
     this.noteService.getRecentActivity(20).subscribe({
       next: (res) => {
         const notes = res?.data?.notes || [];
-        this.rawNotes.set(notes as unknown as NoteActivity[]);
+        this.rawNotes.set(notes as Note[]);
         this.isLoading.set(false);
         
         // Optional: show a small info toast if there is zero activity

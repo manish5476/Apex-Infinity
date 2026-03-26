@@ -12,7 +12,8 @@
 
 .faq-root {
   position: relative;
-  background-color: var(--bg-secondary);
+  // background-color: var(--bg-secondary);
+  background-color: transparent;
   overflow: hidden;
 
   // Dot-grid ambient texture
@@ -285,7 +286,8 @@
 
 // .section-root {
 //   position: relative;
-//   background-color: var(--bg-secondary); /* Default background */
+//   // background-color: var(--bg-secondary); /* Default background */
+//   background-color: transparent;
 //   overflow: hidden;
   
 //   /* Optional: Subtle pattern overlay */

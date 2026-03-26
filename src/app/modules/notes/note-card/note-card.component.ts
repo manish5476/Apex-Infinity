@@ -15,7 +15,7 @@ import { CommonModule, TitleCasePipe, DatePipe, SlicePipe } from '@angular/commo
 import { FormsModule } from '@angular/forms';
 import { NoteService } from '../../../core/services/notes.service';
 import { MasterListService } from '../../../core/services/master-list.service';
-import { Note, NoteType, Participant } from '../../../core/models/note.types';
+import { Note, ItemType, Assignee } from '../../../core/models/note.types';
 import { AppMessageService } from "../../../core/services/message.service";
 
 // Mock Interface for User (if not imported from models)
@@ -74,24 +74,24 @@ export class NoteCardComponent implements OnInit {
 
   // --- Computed Properties ---
   get isOverdue(): boolean {
-    if (!this.note.dueDate || this.note.status === 'completed') return false;
+    if (!this.note.dueDate || this.note.status === 'done') return false;
     return new Date(this.note.dueDate) < new Date();
   }
 
   get meetingDateDisplay(): string | null {
-    if (this.note.noteType !== 'meeting' || !this.note.startDate) return null;
+    if (this.note.itemType !== 'meeting' || !this.note.startDate) return null;
     return new Date(this.note.startDate).toLocaleDateString([], { month: 'short', day: 'numeric' });
   }
 
   get meetingTimeDisplay(): string | null {
-    if (this.note.noteType !== 'meeting' || !this.note.startDate) return null;
+    if (this.note.itemType !== 'meeting' || !this.note.startDate) return null;
     return new Date(this.note.startDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 
   get progress(): number | null {
-    if (!this.note.subtasks || this.note.subtasks.length === 0) return null;
-    const completed = this.note.subtasks.filter((t) => t.completed).length;
-    return Math.round((completed / this.note.subtasks.length) * 100);
+    if (!this.note.checklist || this.note.checklist.length === 0) return null;
+    const completed = this.note.checklist.filter((t) => t.completed).length;
+    return Math.round((completed / this.note.checklist.length) * 100);
   }
 
   getOwnerName(): string {
@@ -100,7 +100,7 @@ export class NoteCardComponent implements OnInit {
     return this.note.owner.name || 'Unknown';
   }
 
-  getParticipantName(p: Participant): string {
+  getParticipantName(p: Assignee): string {
     if (!p.user) return 'Guest';
     if (typeof p.user === 'string') return 'Guest';
     return p.user.name || 'Guest';
@@ -112,10 +112,11 @@ export class NoteCardComponent implements OnInit {
     this.edit.emit(this.note._id);
   }
 
-  getTypeIcon(type: NoteType): string {
+  getTypeIcon(type: ItemType): string {
     const map: Record<string, string> = {
       note: 'pi pi-file-o',
       meeting: 'pi pi-calendar',
+      meeting_note: 'pi pi-calendar',
       task: 'pi pi-check-square',
       idea: 'pi pi-bolt',
       project: 'pi pi-briefcase',

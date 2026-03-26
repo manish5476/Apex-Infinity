@@ -12,7 +12,8 @@
 
 .feed-root {
   position: relative;
-  background: #0c0e12;      // Intentionally deep — not a theme token, this is
+  // background: #0c0e12;      // Intentionally deep — not a theme token, this is
+  background: transparent;
   padding: 96px 0 80px;     // a design-forward dark editorial section
   overflow: hidden;
 
@@ -543,7 +544,8 @@
 
 // :host {
 //   display: block;
-//   background-color: var(--bg-primary);
+//   // background-color: var(--bg-primary);
+//   background-color: transparent;
 // }
 
 // .section-root {

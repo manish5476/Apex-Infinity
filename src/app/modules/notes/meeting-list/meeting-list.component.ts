@@ -57,6 +57,7 @@ export class MeetingListComponent {
   statusOptions = [
     { label: 'All Status', value: null },
     { label: 'Scheduled', value: 'scheduled' },
+    { label: 'In Progress', value: 'in_progress' },
     { label: 'Completed', value: 'completed' },
     { label: 'Cancelled', value: 'cancelled' }
   ];
@@ -164,7 +165,7 @@ export class MeetingListComponent {
       const pId = part.user?._id || part.user;
       return pId === userId;
     });
-    return p ? (p.invitationStatus || p.rsvp || 'pending') : 'pending';
+    return p ? (p.invitationStatus || 'pending') : 'pending';
   }
 
   getDuration(meeting: Meeting): number {
@@ -259,18 +260,18 @@ export class MeetingListComponent {
     });
   }
 
-  updateStatus(id: string, status: string) {
+  updateStatus(id: string, status: 'in_progress' | 'completed' | 'cancelled') {
     // Note: Consider replacing window.confirm with your confirmationService for a better UI
     if (!confirm(`Change meeting status to ${status}?`)) return;
 
-    this.noteService.updateMeetingStatus(id, { status }).subscribe({
-      next: (res) => {
+    this.noteService.updateMeeting(id, { status }).subscribe({
+      next: (res:any) => {
         if (res.data?.meeting) {
           this.messageService.showSuccess(`Meeting status changed to ${status}.`);
           this.meetings.update(list => list.map(m => m._id === id ? res.data.meeting : m));
         }
       },
-      error: (err) => this.messageService.handleHttpError(err)
+      error: (err:any) => this.messageService.handleHttpError(err)
     });
   }
 }

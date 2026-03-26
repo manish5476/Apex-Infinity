@@ -3,7 +3,8 @@
 
 .sc-root {
   position: relative;
-  background: #0c0e12;
+  // background: #0c0e12;
+  background: transparent;
   overflow: hidden;
 }
 
@@ -118,7 +119,8 @@
 // .section-root {
 //   position: relative;
 //   overflow: hidden;
-//   background-color: var(--bg-secondary); /* Default */
+//   // background-color: var(--bg-secondary); /* Default */
+//   background-color: transparent;
 //   padding: var(--spacing-5xl) 0;
 // }
 
@@ -246,7 +248,8 @@
 // // :host { display: block; font-family: 'Manrope', sans-serif; }
 
 // // .section-root {
-// //   background-color: white;
+// //   // background-color: white;
+// //   background-color: transparent;
 // // }
 
 // // /* Optional: Add a subtle grid pattern if background is white */

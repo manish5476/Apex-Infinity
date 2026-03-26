@@ -6,7 +6,8 @@
 :host {
   display: block;
   min-height: 100vh;
-  background-color: var(--bg-primary);
+  // background-color: var(--bg-primary);
+  background-color: transparent;
   color: var(--text-primary);
 }
 
@@ -17,7 +18,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-primary);
+  // background: var(--bg-primary);
+  background: transparent;
 }
 
 .loader-pulse {
@@ -497,7 +499,8 @@
 //   position: relative;
 //   min-height: 100vh;
 //   /* "Warm Cream" Luxury Base */
-//   background-color: #FDFCF8;
+//   // background-color: #FDFCF8;
+//   background-color: transparent;
 //   overflow-x: hidden;
 // }
 

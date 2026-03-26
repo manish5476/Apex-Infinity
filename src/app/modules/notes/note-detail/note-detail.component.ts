@@ -2,9 +2,11 @@ import { Component, inject, signal, computed, OnInit, ChangeDetectionStrategy } 
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Note, NoteAttachment, Subtask, ActivityLog } from '../../../core/models/note.types';
 import { NoteService } from '../../../core/services/notes.service';
 import { AppMessageService } from '../../../core/services/message.service';
+import {
+  Note, NoteActivity, AssetAttachment, ChecklistItem
+} from '../../../core/models/note.types';
 import { TiptapEditorComponent } from '../../shared/components/tiptap-editor/tiptap-editor.component';
 import { generateHTML } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
@@ -32,7 +34,7 @@ export class NoteDetailComponent implements OnInit {
 
   // --- State ---
   note = signal<Note | null>(null);
-  activityLog = signal<ActivityLog[]>([]);
+  activityLog = signal<NoteActivity[]>([]);
   isLoading = signal(true);
   isSaving = signal(false);
   isEditing = signal(false);
@@ -43,9 +45,9 @@ export class NoteDetailComponent implements OnInit {
 
   progress = computed(() => {
     const n = this.note();
-    if (!n?.subtasks?.length) return 0;
-    const completed = n.subtasks.filter(s => s.completed).length;
-    return Math.round((completed / n.subtasks.length) * 100);
+    if (!n?.checklist?.length) return 0;
+    const completed = n.checklist.filter(s => s.completed).length;
+    return Math.round((completed / n.checklist.length) * 100);
   });
 
   // --- Forms ---
@@ -107,7 +109,7 @@ export class NoteDetailComponent implements OnInit {
     return name ? name.charAt(0).toUpperCase() : '?';
   }
 
-  patchForm(note: Note) {
+  patchForm(note: any) {
     const formatDate = (dateVal?: string | Date) => {
       if (!dateVal) return null;
       try {
@@ -147,7 +149,7 @@ export class NoteDetailComponent implements OnInit {
     this.noteService.convertToTask(this.note()!._id).subscribe(res => this.note.set(res.data.note));
   }
 
-  downloadAttachment(file: NoteAttachment) {
+  downloadAttachment(file: any) {
     if (file.url) window.open(file.url, '_blank');
   }
   // ----------------------------------------------------------------------------------
@@ -216,23 +218,23 @@ export class NoteDetailComponent implements OnInit {
     });
   }
 
-  // --- Subtasks ---
+  // --- Checklist ---
   addSubtask(input: HTMLInputElement) {
     const val = input.value.trim();
     if (!val || !this.note()) return;
-    this.noteService.addSubtask(this.note()!._id, val).subscribe({
+    this.noteService.addChecklistItem(this.note()!._id, val).subscribe({
       next: (res) => {
         this.note.set(res.data.note);
-        this.messageServic.showSuccess('Subtask added.');
+        this.messageServic.showSuccess('Item added to checklist.');
         input.value = '';
       },
       error: (err) => this.messageServic.handleHttpError(err)
     });
   }
 
-  toggleSubtask(subtask: Subtask) {
-    if (!this.note()) return;
-    this.noteService.toggleSubtask(this.note()!._id, subtask._id!, !subtask.completed)
+  toggleSubtask(item: ChecklistItem) {
+    if (!this.note() || !item._id) return;
+    this.noteService.toggleChecklistItem(this.note()!._id, item._id, !item.completed)
       .subscribe({
         next: (res) => this.note.set(res.data.note),
         error: (err) => this.messageServic.handleHttpError(err)
@@ -241,12 +243,12 @@ export class NoteDetailComponent implements OnInit {
 
   deleteSubtask(id: string) {
     if (!this.note()) return;
-    this.noteService.removeSubtask(this.note()!._id, id).subscribe({
-      next: (res) => {
+    this.noteService.removeChecklistItem(this.note()!._id, id).subscribe({
+      next: (res: any) => {
         this.note.set(res.data.note);
-        this.messageServic.showSuccess('Subtask removed.');
+        this.messageServic.showSuccess('Item removed from checklist.');
       },
-      error: (err) => this.messageServic.handleHttpError(err)
+      error: (err: any) => this.messageServic.handleHttpError(err)
     });
   }
 

@@ -3,7 +3,8 @@
 
 .nl-root {
   position: relative;
-  background: var(--bg-secondary);
+  // background: var(--bg-secondary);
+  background: transparent;
   overflow: hidden;
 }
 
@@ -219,7 +220,8 @@
 //   position: relative;
 //   overflow: hidden;
 //   padding: var(--spacing-5xl) 0;
-//   background-color: var(--bg-secondary); /* Fallback */
+//   // background-color: var(--bg-secondary); /* Fallback */
+//   background-color: transparent;
 // }
 
 // /* --- ANIMATED BACKGROUND (Aurora) --- */

@@ -25,7 +25,7 @@
               <!-- Content Column -->
               <div class="timeline-content" [routerLink]="['/notes', item.note.id]">
                 <div class="activity-header">
-                  <span class="user-name">User</span>
+                  <span class="user-name">{{ $any(item.actor).name || item.actor }}</span>
                   <span class="action">{{ formatAction(item.action) }}</span>
                   <span class="target-title">{{ item.note.title }}</span>
                 </div>

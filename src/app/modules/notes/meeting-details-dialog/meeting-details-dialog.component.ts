@@ -320,7 +320,7 @@ export class MeetingDetailsDialogComponent {
     switch (status) {
       case 'confirmed': case 'completed': return 'success';
       case 'cancelled': return 'danger';
-      case 'in-progress': return 'info';
+      case 'in_progress': return 'info';
       default: return 'warn'; // scheduled/pending
     }
   }
