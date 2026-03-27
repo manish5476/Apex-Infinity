@@ -9,7 +9,8 @@
   border: var(--ui-border-width) solid var(--border-primary);
   border-radius: var(--ui-border-radius-lg);
   overflow: hidden;
-  background: var(--bg-primary);
+  // background: var(--bg-primary);
+  background: transparent;
   transition: border-color 0.2s ease;
 
   &:focus-within {
@@ -30,7 +31,8 @@
   flex-wrap: wrap;
   gap: var(--spacing-xs);
   padding: var(--spacing-md) var(--spacing-lg);
-  background: var(--bg-secondary);
+  // background: var(--bg-secondary);
+  background: transparent;
   border-bottom: var(--ui-border-width) solid var(--border-primary);
   position: sticky;
   top: 0;
@@ -112,7 +114,8 @@
   overflow-y: auto;
   min-height: 320px;
   max-height: 70vh;
-  background: var(--bg-primary);
+  // background: var(--bg-primary);
+  background: transparent;
 
   // Custom scrollbar
   &::-webkit-scrollbar { width: 6px; }

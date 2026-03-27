@@ -3,7 +3,8 @@
 // @include apply-canonical-mapping;
 
 .page-root {
-  background-color: var(--bg-primary); /* Updated from --bg-page to canonical */
+  // background-color: var(--bg-primary); /* Updated from --bg-page to canonical */
+  background-color: transparent;
   min-height: 100vh;
   position: relative;
   font-family: var(--font-body);
@@ -745,7 +746,8 @@
 //    ============================================================ */
 
 // .page-root {
-//   background-color: var(--bg-page);
+//   // background-color: var(--bg-page);
+//   background-color: transparent;
 //   min-height: 100vh;
 //   position: relative;
 //   font-family: var(--font-body);

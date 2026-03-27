@@ -4,7 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators, FormArray } from '@angula
 import { Router, RouterModule } from '@angular/router';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DialogService } from 'primeng/dynamicdialog';
-import { NoteAttachment, Note } from '../../../core/models/note.types';
+import { AssetAttachment, Note } from '../../../core/models/note.types';
 import { NoteService } from '../../../core/services/notes.service';
 import { TemplateSelectorComponent } from '../template-selector/template-selector.component';
 import { AppMessageService } from '../../../core/services/message.service';
@@ -37,7 +37,7 @@ export class NoteCreateComponent implements OnInit {
   // --- State ---
   isSubmitting = signal(false);
   isUploading = signal(false);
-  uploadedAttachments = signal<NoteAttachment[]>([]);
+  uploadedAttachments = signal<AssetAttachment[]>([]);
   participantsList = signal<string[]>([]);
   wordCount = signal(0);
 
@@ -55,7 +55,7 @@ export class NoteCreateComponent implements OnInit {
   noteForm = this.fb.group({
     title: ['', [Validators.required, Validators.maxLength(100)]],
     content: [null as any, [Validators.required]],
-    noteType: ['note'],
+    itemType: ['note'],
     priority: ['medium'],
     tags: [''],
     startDate: [null as Date | null],
@@ -65,11 +65,11 @@ export class NoteCreateComponent implements OnInit {
       location: [''],
       videoLink: ['']
     }),
-    subtasks: this.fb.array([])
+    checklist: this.fb.array([])
   });
 
-  get subtasks() {
-    return this.noteForm.get('subtasks') as FormArray;
+  get checklist() {
+    return this.noteForm.get('checklist') as FormArray;
   }
 
   isTemplateMode() {
@@ -85,14 +85,14 @@ export class NoteCreateComponent implements OnInit {
   }
 
   addSubtask() {
-    this.subtasks.push(this.fb.group({
+    this.checklist.push(this.fb.group({
       title: ['', Validators.required],
       completed: [false]
     }));
   }
 
   removeSubtask(index: number) {
-    this.subtasks.removeAt(index);
+    this.checklist.removeAt(index);
   }
 
   addParticipant(input: HTMLInputElement) {
@@ -112,10 +112,10 @@ export class NoteCreateComponent implements OnInit {
   }
 
   resetForm() {
-    this.noteForm.reset({ noteType: 'note', priority: 'medium', isTemplate: false, content: null });
+    this.noteForm.reset({ itemType: 'note', priority: 'medium', isTemplate: false, content: null });
     this.uploadedAttachments.set([]);
     this.participantsList.set([]);
-    this.subtasks.clear();
+    this.checklist.clear();
     this.wordCount.set(0);
     this.messageService.showInfo('Form has been cleared.');
   }
@@ -141,7 +141,7 @@ export class NoteCreateComponent implements OnInit {
       title: template.title,
       // Template content might be HTML string — TipTap's writeValue handles both
       content: template.content,
-      noteType: template.noteType,
+      itemType: template.itemType,
       priority: template.priority,
       tags: template.tags?.join(', ')
     });
@@ -184,7 +184,7 @@ export class NoteCreateComponent implements OnInit {
       ? formVal.tags.split(',').map(t => t.trim()).filter(Boolean)
       : [];
 
-    const isMeeting = formVal.noteType === 'meeting';
+    const isMeeting = formVal.itemType === 'meeting';
 
     const payload: any = {
       ...formVal,
@@ -192,7 +192,7 @@ export class NoteCreateComponent implements OnInit {
       attachments: this.uploadedAttachments(),
       participants: this.participantsList().map(email => ({ email, role: 'attendee' })),
       isMeeting,
-      subtasks: formVal.subtasks?.filter((t: any) => t.title),
+      checklist: formVal.checklist?.filter((t: any) => t.title),
       // Content is now TipTap JSON — stringify for API
       content: typeof formVal.content === 'object'
         ? JSON.stringify(formVal.content)

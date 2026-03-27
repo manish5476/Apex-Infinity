@@ -15,7 +15,8 @@
   flex-direction: column;
   height: 100%;
   width: 100%;
-  background: var(--bg-primary);
+  // background: var(--bg-primary);
+  background: transparent;
   padding: var(--spacing-xl);
   gap: var(--spacing-lg);
   overflow: hidden;
@@ -170,7 +171,8 @@
 //   flex-direction: column;
 //   height: 100%;
 //   width: 100%;
-//   background: var(--bg-primary);
+//   // background: var(--bg-primary);
+//   background: transparent;
 //   padding: var(--spacing-xl);
 //   gap: var(--spacing-lg);
 //   overflow: hidden;

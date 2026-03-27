@@ -11,11 +11,13 @@
   border-radius: var(--radius-2xl);
   height: 100%;
   padding: 0.75rem; // Minimal padding for maximum grid size
-  background-color: var(--theme-bg-secondary);
+  // background-color: var(--theme-bg-secondary);
+  background-color: transparent;
 }
 
 .themed-card {
-  background: var(--theme-bg-primary);
+  // background: var(--theme-bg-primary);
+  background: transparent;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
   display: flex;

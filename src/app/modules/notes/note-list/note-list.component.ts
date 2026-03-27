@@ -48,7 +48,7 @@ export class NoteListComponent {
     const total = Array.isArray(s.totalNotes) ? (s.totalNotes[0]?.count || 0) : (s.totalNotes || 0);
     let completed = 0;
     if (Array.isArray(s.byStatus)) {
-      const c = s.byStatus.find((i: any) => i._id === 'completed'); completed = c ? c.count : 0;
+      const c = s.byStatus.find((i: any) => i._id === 'done'); completed = c ? c.count : 0;
     } else if (typeof s.byStatus === 'number') {
       completed = s.byStatus;
     }

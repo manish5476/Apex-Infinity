@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BaseApiService } from './base-api.service';
 import {
-  Note, Meeting, CalendarEvent, NoteStatistics, HeatMapData, ActivityLog, Subtask
+  Note, Meeting, CalendarEvent, NoteStatistics, HeatMapData, NoteActivity
 } from '../models/note.types';
 
 @Injectable({ providedIn: 'root' })
@@ -9,29 +9,31 @@ export class NoteService extends BaseApiService {
   private endpoint = '/v1/notes';
 
   // ==========================================================================
-  // 1. GLOBAL & STATIC MODULES
+  // 1. MEDIA & FILES
   // ==========================================================================
 
-  // --- MEDIA UPLOAD ---
   uploadMedia(files: File[]) {
     const formData = new FormData();
     files.forEach((f) => formData.append('attachments', f));
     return this.post<{ data: any[] }>(`${this.endpoint}/upload`, formData, 'uploadMedia');
   }
 
-  // --- SEARCH ---
+  // ==========================================================================
+  // 2. SEARCH & GRAPH
+  // ==========================================================================
+
   searchNotes(query: string) {
     return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/search`, { q: query }, 'searchNotes');
   }
 
-  // --- VISUALIZATION & ANALYTICS ---
-
-  // Graph Network (Nodes/Links)
   getKnowledgeGraph() {
     return this.get<{ data: { nodes: any[]; links: any[] } }>(`${this.endpoint}/graph/network`, {}, 'getKnowledgeGraph');
   }
 
-  // Heatmap Data
+  // ==========================================================================
+  // 3. ANALYTICS
+  // ==========================================================================
+
   getHeatMapData(startDate?: string, endDate?: string, userId?: string) {
     return this.get<{ data: { heatMap: HeatMapData; stats: any } }>(
       `${this.endpoint}/analytics/heatmap`,
@@ -40,7 +42,6 @@ export class NoteService extends BaseApiService {
     );
   }
 
-  // General Analytics Summary
   getNoteAnalytics(period: 'week' | 'month' | 'quarter' | 'year' = 'month') {
     return this.get<{ data: any }>(
       `${this.endpoint}/analytics/summary`,
@@ -49,7 +50,17 @@ export class NoteService extends BaseApiService {
     );
   }
 
-  // --- CALENDAR MODULE ---
+  getNoteStatistics() {
+    return this.get<{ data: NoteStatistics }>(`${this.endpoint}/stats/summary`, {}, 'getNoteStatistics');
+  }
+
+  getRecentActivity(limit: number = 20) {
+    return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/activity/recent`, { limit }, 'getRecentActivity');
+  }
+
+  // ==========================================================================
+  // 4. CALENDAR
+  // ==========================================================================
 
   getCalendarView(start: string, end: string, view: 'month' | 'week' | 'day' = 'month') {
     return this.get<{ data: { events: CalendarEvent[] } }>(
@@ -67,17 +78,9 @@ export class NoteService extends BaseApiService {
     );
   }
 
-  // --- STATISTICS & ACTIVITY ---
-
-  getNoteStatistics() {
-    return this.get<{ data: NoteStatistics }>(`${this.endpoint}/stats/summary`, {}, 'getNoteStatistics');
-  }
-
-  getRecentActivity(limit: number = 20) {
-    return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/activity/recent`, { limit }, 'getRecentActivity');
-  }
-
-  // --- EXPORT MODULE ---
+  // ==========================================================================
+  // 5. EXPORT
+  // ==========================================================================
 
   exportNoteData(format: 'json' | 'csv' = 'json', startDate?: string, endDate?: string) {
     return this.get<any>(`${this.endpoint}/export/data`, { format, startDate, endDate }, 'exportNoteData');
@@ -87,60 +90,45 @@ export class NoteService extends BaseApiService {
     return this.get<any>(`${this.endpoint}/export/all`, { format }, 'exportAllUserNotes');
   }
 
-  // --- TEMPLATES MODULE ---
+  // ==========================================================================
+  // 6. TEMPLATES
+  // ==========================================================================
 
   createTemplate(data: any) {
     return this.post<{ data: { note: Note } }>(`${this.endpoint}/templates`, data, 'createTemplate');
   }
 
   getTemplate() {
-    // Returns list of templates
     return this.get<{ data: { templates: Note[] } | Note[] }>(`${this.endpoint}/templates`, {}, 'getTemplates');
   }
 
   createFromTemplate(templateId: string) {
-    return this.post<{ data: { note: Note } }>(
-      `${this.endpoint}/templates/${templateId}/create`,
-      {},
-      'createFromTemplate'
-    );
+    return this.post<{ data: { note: Note } }>(`${this.endpoint}/templates/${templateId}/create`, {}, 'createFromTemplate');
   }
 
   updateTemplate(templateId: string, data: any) {
-    return this.patch<{ data: { note: Note } }>(
-      `${this.endpoint}/templates/${templateId}`,
-      data,
-      'updateTemplate'
-    );
+    return this.patch<{ data: { note: Note } }>(`${this.endpoint}/templates/${templateId}`, data, 'updateTemplate');
   }
 
   deleteTemplate(templateId: string) {
-    return this.delete<void>(
-      `${this.endpoint}/templates/${templateId}`,
-      null,
-      'deleteTemplate'
-    );
+    return this.delete<void>(`${this.endpoint}/templates/${templateId}`, null, 'deleteTemplate');
   }
 
-  // --- BULK OPERATIONS ---
+  // ==========================================================================
+  // 7. BULK OPERATIONS
+  // ==========================================================================
 
   bulkUpdateNotes(noteIds: string[], updates: Partial<Note>) {
-    return this.patch<{ message: string; data: any }>(
-      `${this.endpoint}/bulk/update`,
-      { noteIds, updates },
-      'bulkUpdateNotes'
-    );
+    return this.patch<{ message: string; data: any }>(`${this.endpoint}/bulk/update`, { noteIds, updates }, 'bulkUpdateNotes');
   }
 
   bulkDeleteNotes(noteIds: string[]) {
-    return this.delete<{ message: string; data: any }>(
-      `${this.endpoint}/bulk/delete`,
-      { body: { noteIds } }, // Pass body for DELETE request
-      'bulkDeleteNotes'
-    );
+    return this.delete<{ message: string; data: any }>(`${this.endpoint}/bulk/delete`, { body: { noteIds } }, 'bulkDeleteNotes');
   }
 
-  // --- TRASH MANAGEMENT ---
+  // ==========================================================================
+  // 8. TRASH
+  // ==========================================================================
 
   getTrashBin() {
     return this.get<{ data: { notes: Note[]; pagination: any } }>(`${this.endpoint}/trash/bin`, {}, 'getTrashBin');
@@ -154,37 +142,79 @@ export class NoteService extends BaseApiService {
     return this.delete<{ data: { notes: Note[]; pagination: any } }>(`${this.endpoint}/trash/empty`, {}, 'emptyTrash');
   }
 
-  // --- MEETING MODULE ---
+  // ==========================================================================
+  // 9. MEETINGS
+  // ==========================================================================
 
+  // --- Meeting CRUD ---
   createMeeting(data: any) {
     return this.post<{ data: { meeting: Meeting; note: Note } }>(`${this.endpoint}/meetings`, data, 'createMeeting');
   }
 
   getUserMeetings(status?: string, startDate?: string, endDate?: string) {
-    return this.get<{ data: { meetings: Meeting[] } }>(
-      `${this.endpoint}/meetings`,
-      { status, startDate, endDate },
-      'getUserMeetings'
-    );
+    return this.get<{ data: { meetings: Meeting[] } }>(`${this.endpoint}/meetings`, { status, startDate, endDate }, 'getUserMeetings');
   }
 
-  updateMeetingStatus(meetingId: string, data: { status?: string; minutes?: string; actionItems?: any[] }) {
-    return this.patch<{ data: { meeting: Meeting } }>(
-      `${this.endpoint}/meetings/${meetingId}/status`,
-      data,
-      'updateMeetingStatus'
-    );
+  getMeetingById(meetingId: string) {
+    return this.get<{ data: { meeting: Meeting } }>(`${this.endpoint}/meetings/${meetingId}`, {}, 'getMeetingById');
   }
 
+  updateMeeting(meetingId: string, data: any) {
+    return this.patch<{ data: { meeting: Meeting } }>(`${this.endpoint}/meetings/${meetingId}`, data, 'updateMeeting');
+  }
+
+  cancelMeeting(meetingId: string) {
+    return this.delete<{ message: string }>(`${this.endpoint}/meetings/${meetingId}/cancel`, null, 'cancelMeeting');
+  }
+
+  // --- Meeting RSVP & Attendance ---
   rsvpToMeeting(meetingId: string, response: 'accepted' | 'declined' | 'tentative') {
-    return this.post<{ message: string }>(
-      `${this.endpoint}/meetings/${meetingId}/rsvp`,
-      { response },
-      'rsvpToMeeting'
-    );
+    return this.post<{ message: string }>(`${this.endpoint}/meetings/${meetingId}/rsvp`, { response }, 'rsvpToMeeting');
   }
 
-  // --- SHARED LISTS ---
+  joinMeeting(meetingId: string) {
+    return this.post<{ message: string }>(`${this.endpoint}/meetings/${meetingId}/join`, {}, 'joinMeeting');
+  }
+
+  leaveMeeting(meetingId: string) {
+    return this.post<{ message: string }>(`${this.endpoint}/meetings/${meetingId}/leave`, {}, 'leaveMeeting');
+  }
+
+  // --- Participants ---
+  addParticipants(meetingId: string, userIds: string[]) {
+    return this.post<{ message: string }>(`${this.endpoint}/meetings/${meetingId}/participants`, { userIds }, 'addParticipants');
+  }
+
+  removeParticipant(meetingId: string, userId: string) {
+    return this.delete<{ message: string }>(`${this.endpoint}/meetings/${meetingId}/participants/${userId}`, null, 'removeParticipant');
+  }
+
+  // --- Action Items ---
+  addActionItem(meetingId: string, data: any) {
+    return this.post<{ data: any }>(`${this.endpoint}/meetings/${meetingId}/action-items`, data, 'addActionItem');
+  }
+
+  convertActionItemToTask(meetingId: string, actionItemId: string) {
+    return this.post<{ data: any }>(`${this.endpoint}/meetings/${meetingId}/action-items/${actionItemId}/convert`, {}, 'convertActionItemToTask');
+  }
+
+  // --- Polls ---
+  createPoll(meetingId: string, data: any) {
+    return this.post<{ data: any }>(`${this.endpoint}/meetings/${meetingId}/polls`, data, 'createPoll');
+  }
+
+  votePoll(meetingId: string, pollId: string, optionId: string) {
+    return this.post<{ data: any }>(`${this.endpoint}/meetings/${meetingId}/polls/${pollId}/vote`, { optionId }, 'votePoll');
+  }
+
+  // --- Meeting Analytics ---
+  getMeetingAnalytics() {
+    return this.get<{ data: any }>(`${this.endpoint}/meetings/analytics/summary`, {}, 'getMeetingAnalytics');
+  }
+
+  // ==========================================================================
+  // 10. SHARED LISTS
+  // ==========================================================================
 
   getSharedNotesWithMe() {
     return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/shared/with-me`, {}, 'getSharedNotesWithMe');
@@ -194,16 +224,16 @@ export class NoteService extends BaseApiService {
     return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/shared/by-me`, {}, 'getNotesSharedByMe');
   }
 
-  // --- ADMIN ---
+  // ==========================================================================
+  // 11. ADMIN
+  // ==========================================================================
 
-  getAllOrganizationNotes(data:any) {
-    return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/organization/all`, data,
-      'getAllOrganizationNotes'
-    );
+  getAllOrganizationNotes(data: any) {
+    return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/organization/all`, data, 'getAllOrganizationNotes');
   }
 
   // ==========================================================================
-  // 2. CORE CRUD & 3. ID-DEPENDENT ROUTES
+  // 12. CORE CRUD
   // ==========================================================================
 
   getNotes(params: any) {
@@ -214,102 +244,78 @@ export class NoteService extends BaseApiService {
     return this.post<{ data: { note: Note; meeting?: Meeting } }>(this.endpoint, data, 'createNote');
   }
 
-  getNoteById(id: string) {
-    return this.get<{ data: { note: Note } }>(`${this.endpoint}/${id}`, {}, 'getNoteById');
+  // ==========================================================================
+  // 13. PARAM ROUTES (/:id)
+  // ==========================================================================
+
+  // --- Comments ---
+  getComments(id: string) {
+    return this.get<{ data: any[] }>(`${this.endpoint}/${id}/comments`, {}, 'getComments');
   }
 
-  updateNote(id: string, data: any) {
-    return this.patch<{ data: { note: Note } }>(`${this.endpoint}/${id}`, data, 'updateNote');
+  addComment(id: string, content: string) {
+    return this.post<{ data: any }>(`${this.endpoint}/${id}/comments`, { content }, 'addComment');
   }
 
-  // Soft delete (Move to Trash)
-  deleteNote(id: string) {
-    return this.delete<void>(`${this.endpoint}/${id}`, null, 'deleteNote');
+  deleteComment(id: string, commentId: string) {
+    return this.delete<void>(`${this.endpoint}/${id}/comments/${commentId}`, null, 'deleteComment');
   }
 
-  // Permanent Delete
-  hardDeleteNote(id: string) {
-    return this.delete<void>(`${this.endpoint}/${id}/permanent`, null, 'hardDeleteNote');
+  reactToComment(id: string, commentId: string, reaction: string) {
+    return this.post<{ data: any }>(`${this.endpoint}/${id}/comments/${commentId}/react`, { reaction }, 'reactToComment');
   }
 
-  // --- SUBTASKS ---
-
-  addSubtask(noteId: string, title: string) {
-    return this.post<{ data: { note: Note } }>(
-      `${this.endpoint}/${noteId}/subtasks`,
-      { title },
-      'addSubtask'
-    );
+  // --- Assignment ---
+  assignUsers(id: string, userIds: string[]) {
+    return this.post<{ data: any }>(`${this.endpoint}/${id}/assign`, { userIds }, 'assignUsers');
   }
 
-  toggleSubtask(noteId: string, subtaskId: string, completed: boolean) {
-    return this.patch<{ data: { note: Note } }>(
-      `${this.endpoint}/${noteId}/subtasks/${subtaskId}`,
-      { completed },
-      'toggleSubtask'
-    );
+  updateAssignmentStatus(id: string, status: string) {
+    return this.patch<{ data: any }>(`${this.endpoint}/${id}/assignment-status`, { status }, 'updateAssignmentStatus');
   }
 
-  removeSubtask(noteId: string, subtaskId: string) {
-    return this.delete<{ data: { note: Note } }>(
-      `${this.endpoint}/${noteId}/subtasks/${subtaskId}`,
-      null,
-      'removeSubtask'
-    );
+  // --- Checklist / Subtasks ---
+  addChecklistItem(noteId: string, title: string) {
+    return this.post<{ data: { note: Note } }>(`${this.endpoint}/${noteId}/checklist`, { title }, 'addChecklistItem');
   }
 
-  // --- SHARING & PERMISSIONS ---
+  toggleChecklistItem(noteId: string, subtaskId: string, completed: boolean) {
+    return this.patch<{ data: { note: Note } }>(`${this.endpoint}/${noteId}/checklist/${subtaskId}`, { completed }, 'toggleChecklistItem');
+  }
 
+  removeChecklistItem(noteId: string, subtaskId: string) {
+    return this.delete<{ data: { note: Note } }>(`${this.endpoint}/${noteId}/checklist/${subtaskId}`, null, 'removeChecklistItem');
+  }
+
+  // --- Time Tracking ---
+  logTime(id: string, durationMinutes: number, description?: string) {
+    return this.post<{ data: any }>(`${this.endpoint}/${id}/time-log`, { durationMinutes, description }, 'logTime');
+  }
+
+  // --- Sharing & Permissions ---
   shareNote(id: string, userIds: string[], permission: 'viewer' | 'contributor' | 'admin' = 'viewer') {
-    return this.post<{ data: { note: Note } }>(
-      `${this.endpoint}/${id}/share`,
-      { userIds, permission },
-      'shareNote'
-    );
+    return this.post<{ data: { note: Note } }>(`${this.endpoint}/${id}/share`, { userIds, permission }, 'shareNote');
   }
 
   updateSharePermissions(id: string, userId: string, permission: string) {
-    return this.patch<void>(
-      `${this.endpoint}/${id}/share/permissions`,
-      { userId, permission },
-      'updateSharePermissions'
-    );
+    return this.patch<void>(`${this.endpoint}/${id}/share/permissions`, { userId, permission }, 'updateSharePermissions');
   }
 
   removeUserFromSharedNote(id: string, userId: string) {
-    return this.delete<void>(
-      `${this.endpoint}/${id}/share/${userId}`,
-      null,
-      'removeUserFromSharedNote'
-    );
+    return this.delete<void>(`${this.endpoint}/${id}/share/${userId}`, null, 'removeUserFromSharedNote');
   }
 
-  // --- UTILITY ACTIONS ---
-
+  // --- Utility Actions ---
   linkNote(sourceNoteId: string, targetNoteId: string) {
-    return this.post<{ data: { note: Note } }>(
-      `${this.endpoint}/${sourceNoteId}/link`,
-      { targetNoteId },
-      'linkNote'
-    );
+    return this.post<{ data: { note: Note } }>(`${this.endpoint}/${sourceNoteId}/link`, { targetNoteId }, 'linkNote');
   }
 
   unlinkNote(sourceNoteId: string, targetNoteId: string) {
-    // Note: Assuming API supports delete for unlinking, otherwise this might need to use a different endpoint
-    // based on typical REST patterns.
-    return this.delete<{ data: { note: Note } }>(
-      `${this.endpoint}/${sourceNoteId}/link/${targetNoteId}`,
-      null,
-      'unlinkNote'
-    );
+    return this.post<{ data: { note: Note } }>(`${this.endpoint}/${sourceNoteId}/unlink`, { targetNoteId }, 'unlinkNote');
   }
 
   convertToTask(id: string, dueDate?: string, priority?: string) {
-    return this.post<{ data: { note: Note } }>(
-      `${this.endpoint}/${id}/convert-to-task`,
-      { dueDate, priority },
-      'convertToTask'
-    );
+    return this.post<{ data: { note: Note } }>(`${this.endpoint}/${id}/convert-to-task`, { dueDate, priority }, 'convertToTask');
   }
 
   duplicateNote(id: string) {
@@ -328,79 +334,126 @@ export class NoteService extends BaseApiService {
     return this.patch<{ data: { note: Note } }>(`${this.endpoint}/${id}/restore`, {}, 'restoreNote');
   }
 
-  // --- INFO & HISTORY ---
-
+  // --- History & Hard Delete ---
   getNoteHistory(id: string) {
-    return this.get<{ data: { activityLog: ActivityLog[] } }>(`${this.endpoint}/${id}/history`, {}, 'getNoteHistory');
+    return this.get<{ data: { activityLog: NoteActivity[] } }>(`${this.endpoint}/${id}/history`, {}, 'getNoteHistory');
+  }
+
+  hardDeleteNote(id: string) {
+    return this.delete<void>(`${this.endpoint}/${id}/permanent`, null, 'hardDeleteNote');
+  }
+
+  // --- Standard CRUD ---
+  getNoteById(id: string) {
+    return this.get<{ data: { note: Note } }>(`${this.endpoint}/${id}`, {}, 'getNoteById');
+  }
+
+  updateNote(id: string, data: any) {
+    return this.patch<{ data: { note: Note } }>(`${this.endpoint}/${id}`, data, 'updateNote');
+  }
+
+  deleteNote(id: string) {
+    return this.delete<void>(`${this.endpoint}/${id}`, null, 'deleteNote');
   }
 }
 
 // import { Injectable } from '@angular/core';
 // import { BaseApiService } from './base-api.service';
 // import {
-//   Note,
-//   Meeting,
-//   CalendarEvent,
-//   NoteStatistics,
-//   HeatMapData,
-//   ActivityLog,
-//   Subtask
+//   Note, Meeting, CalendarEvent, NoteStatistics, HeatMapData, ActivityLog, Subtask
 // } from '../models/note.types';
 
 // @Injectable({ providedIn: 'root' })
 // export class NoteService extends BaseApiService {
 //   private endpoint = '/v1/notes';
 
-//   // ==================== BASIC CRUD ====================
+//   // ==========================================================================
+//   // 1. GLOBAL & STATIC MODULES
+//   // ==========================================================================
 
-//   getNotes(params: any) {
-//     return this.get<{ data: { notes: Note[]; pagination: any } }>(this.endpoint, params, 'getNotes');
+//   // --- MEDIA UPLOAD ---
+//   uploadMedia(files: File[]) {
+//     const formData = new FormData();
+//     files.forEach((f) => formData.append('attachments', f));
+//     return this.post<{ data: any[] }>(`${this.endpoint}/upload`, formData, 'uploadMedia');
 //   }
 
-//   getNoteById(id: string) {
-//     return this.get<{ data: { note: Note } }>(`${this.endpoint}/${id}`, {}, 'getNoteById');
+//   // --- SEARCH ---
+//   searchNotes(query: string) {
+//     return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/search`, { q: query }, 'searchNotes');
 //   }
 
-//   createNote(data: Partial<Note>) {
-//     return this.post<{ data: { note: Note; meeting?: Meeting } }>(this.endpoint, data, 'createNote');
+//   // --- VISUALIZATION & ANALYTICS ---
+
+//   // Graph Network (Nodes/Links)
+//   getKnowledgeGraph() {
+//     return this.get<{ data: { nodes: any[]; links: any[] } }>(`${this.endpoint}/graph/network`, {}, 'getKnowledgeGraph');
 //   }
 
-//   updateNote(id: string, data: any) {
-//     return this.patch<{ data: { note: Note } }>(`${this.endpoint}/${id}`, data, 'updateNote');
+//   // Heatmap Data
+//   getHeatMapData(startDate?: string, endDate?: string, userId?: string) {
+//     return this.get<{ data: { heatMap: HeatMapData; stats: any } }>(
+//       `${this.endpoint}/analytics/heatmap`,
+//       { startDate, endDate, userId },
+//       'getHeatMapData'
+//     );
 //   }
 
-//   // Soft delete (Move to Trash)
-//   deleteNote(id: string) {
-//     return this.delete<void>(`${this.endpoint}/${id}`, null, 'deleteNote');
+//   // General Analytics Summary
+//   getNoteAnalytics(period: 'week' | 'month' | 'quarter' | 'year' = 'month') {
+//     return this.get<{ data: any }>(
+//       `${this.endpoint}/analytics/summary`,
+//       { period },
+//       'getNoteAnalytics'
+//     );
 //   }
 
-//   // ==================== TRASH MANAGEMENT ====================
+//   // --- CALENDAR MODULE ---
 
-//   getTrashBin() {
-//     return this.get<{ data: { notes: Note[]; pagination: any } }>(`${this.endpoint}/trash/bin`, {}, 'getTrashBin');
+//   getCalendarView(start: string, end: string, view: 'month' | 'week' | 'day' = 'month') {
+//     return this.get<{ data: { events: CalendarEvent[] } }>(
+//       `${this.endpoint}/calendar/view`,
+//       { start, end, view },
+//       'getCalendarView'
+//     );
 //   }
 
-//   restoreFromTrash(id: string) {
-//     return this.post<{ data: { note: Note } }>(`${this.endpoint}/trash/${id}/restore`, {}, 'restoreFromTrash');
+//   getNotesForMonth(year: number, month: number) {
+//     return this.get<{ data: Array<{ date: string; count: number; notes: string[] }> }>(
+//       `${this.endpoint}/calendar/monthly`,
+//       { year, month },
+//       'getNotesForMonth'
+//     );
 //   }
 
-//   emptyTrash() {
-//     return this.delete<{ data: { notes: Note[]; pagination: any } }>(`${this.endpoint}/trash/empty`, {}, 'emptyTrash');
+//   // --- STATISTICS & ACTIVITY ---
+
+//   getNoteStatistics() {
+//     return this.get<{ data: NoteStatistics }>(`${this.endpoint}/stats/summary`, {}, 'getNoteStatistics');
 //   }
 
-//   // Permanent Delete
-//   hardDeleteNote(id: string) {
-//     return this.delete<void>(`${this.endpoint}/${id}/permanent`, null, 'hardDeleteNote');
+//   getRecentActivity(limit: number = 20) {
+//     return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/activity/recent`, { limit }, 'getRecentActivity');
 //   }
 
-//   // ==================== TEMPLATES MODULE (Complete) ====================
+//   // --- EXPORT MODULE ---
+
+//   exportNoteData(format: 'json' | 'csv' = 'json', startDate?: string, endDate?: string) {
+//     return this.get<any>(`${this.endpoint}/export/data`, { format, startDate, endDate }, 'exportNoteData');
+//   }
+
+//   exportAllUserNotes(format: 'json' | 'csv' = 'json') {
+//     return this.get<any>(`${this.endpoint}/export/all`, { format }, 'exportAllUserNotes');
+//   }
+
+//   // --- TEMPLATES MODULE ---
 
 //   createTemplate(data: any) {
 //     return this.post<{ data: { note: Note } }>(`${this.endpoint}/templates`, data, 'createTemplate');
 //   }
 
 //   getTemplate() {
-//     // Note: Backend might return array or wrapped object, handled in component usually
+//     // Returns list of templates
 //     return this.get<{ data: { templates: Note[] } | Note[] }>(`${this.endpoint}/templates`, {}, 'getTemplates');
 //   }
 
@@ -428,180 +481,39 @@ export class NoteService extends BaseApiService {
 //     );
 //   }
 
-//   // ==================== EXPORT ====================
+//   // --- BULK OPERATIONS ---
 
-//   exportNoteData(format: 'json' | 'csv' = 'json', startDate?: string, endDate?: string) {
-//     return this.get<any>(`${this.endpoint}/export/data`, { format, startDate, endDate }, 'exportNoteData');
-//   }
-
-//   exportAllUserNotes(format: 'json' | 'csv' = 'json') {
-//     return this.get<any>(`${this.endpoint}/export/all`, { format }, 'exportAllUserNotes');
-//   }
-
-//   // ==================== LINKING NOTES ====================
-
-//   linkNote(sourceNoteId: string, targetNoteId: string) {
-//     return this.post<{ data: { note: Note } }>(
-//       `${this.endpoint}/${sourceNoteId}/link`,
-//       { targetNoteId },
-//       'linkNote'
+//   bulkUpdateNotes(noteIds: string[], updates: Partial<Note>) {
+//     return this.patch<{ message: string; data: any }>(
+//       `${this.endpoint}/bulk/update`,
+//       { noteIds, updates },
+//       'bulkUpdateNotes'
 //     );
 //   }
 
-//   unlinkNote(sourceNoteId: string, targetNoteId: string) {
-//     return this.delete<{ data: { note: Note } }>(
-//       `${this.endpoint}/${sourceNoteId}/link/${targetNoteId}`,
-//       null,
-//       'unlinkNote'
+//   bulkDeleteNotes(noteIds: string[]) {
+//     return this.delete<{ message: string; data: any }>(
+//       `${this.endpoint}/bulk/delete`,
+//       { body: { noteIds } }, // Pass body for DELETE request
+//       'bulkDeleteNotes'
 //     );
 //   }
 
-//   // ==================== SHARING ====================
+//   // --- TRASH MANAGEMENT ---
 
-//   shareNote(id: string, userIds: string[], permission: 'viewer' | 'contributor' | 'admin' = 'viewer') {
-//     return this.post<{ data: { note: Note } }>(
-//       `${this.endpoint}/${id}/share`,
-//       { userIds, permission },
-//       'shareNote'
-//     );
+//   getTrashBin() {
+//     return this.get<{ data: { notes: Note[]; pagination: any } }>(`${this.endpoint}/trash/bin`, {}, 'getTrashBin');
 //   }
 
-//   updateSharePermissions(id: string, userId: string, permission: string) {
-//     return this.patch<void>(
-//       `${this.endpoint}/${id}/share/permissions`,
-//       { userId, permission },
-//       'updateSharePermissions'
-//     );
+//   restoreFromTrash(id: string) {
+//     return this.post<{ data: { note: Note } }>(`${this.endpoint}/trash/${id}/restore`, {}, 'restoreFromTrash');
 //   }
 
-//   removeUserFromSharedNote(id: string, userId: string) {
-//     return this.delete<void>(
-//       `${this.endpoint}/${id}/share/${userId}`,
-//       null,
-//       'removeUserFromSharedNote'
-//     );
+//   emptyTrash() {
+//     return this.delete<{ data: { notes: Note[]; pagination: any } }>(`${this.endpoint}/trash/empty`, {}, 'emptyTrash');
 //   }
 
-//   getNotesSharedByMe() {
-//     return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/shared/by-me`, {}, 'getNotesSharedByMe');
-//   }
-
-//   getSharedNotesWithMe() {
-//     return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/shared/with-me`, {}, 'getSharedNotesWithMe');
-//   }
-
-//   // ==================== SUBTASKS ====================
-
-//   addSubtask(noteId: string, title: string) {
-//     return this.post<{ data: { note: Note } }>(
-//       `${this.endpoint}/${noteId}/subtasks`,
-//       { title },
-//       'addSubtask'
-//     );
-//   }
-
-//   toggleSubtask(noteId: string, subtaskId: string, completed: boolean) {
-//     return this.patch<{ data: { note: Note } }>(
-//       `${this.endpoint}/${noteId}/subtasks/${subtaskId}`,
-//       { completed },
-//       'toggleSubtask'
-//     );
-//   }
-
-//   removeSubtask(noteId: string, subtaskId: string) {
-//     return this.delete<{ data: { note: Note } }>(
-//       `${this.endpoint}/${noteId}/subtasks/${subtaskId}`,
-//       null,
-//       'removeSubtask'
-//     );
-//   }
-
-//   // ==================== MEDIA UPLOAD ====================
-
-//   uploadMedia(files: File[]) {
-//     const formData = new FormData();
-//     files.forEach((f) => formData.append('attachments', f));
-//     return this.post<{ data: any[] }>(`${this.endpoint}/upload`, formData, 'uploadMedia');
-//   }
-
-//   // ==================== ARCHIVE & RESTORE ====================
-
-//   archiveNote(id: string) {
-//     return this.patch<{ data: { note: Note } }>(`${this.endpoint}/${id}/archive`, {}, 'archiveNote');
-//   }
-
-//   restoreNote(id: string) {
-//     return this.patch<{ data: { note: Note } }>(`${this.endpoint}/${id}/restore`, {}, 'restoreNote');
-//   }
-
-//   // ==================== DUPLICATION & ACTIONS ====================
-
-//   duplicateNote(id: string) {
-//     return this.post<{ data: { note: Note } }>(`${this.endpoint}/${id}/duplicate`, {}, 'duplicateNote');
-//   }
-
-//   convertToTask(id: string, dueDate?: string, priority?: string) {
-//     return this.post<{ data: { note: Note } }>(
-//       `${this.endpoint}/${id}/convert-to-task`,
-//       { dueDate, priority },
-//       'convertToTask'
-//     );
-//   }
-
-//   togglePinNote(id: string) {
-//     return this.patch<{ data: { note: Note } }>(`${this.endpoint}/${id}/pin`, {}, 'togglePinNote');
-//   }
-
-//   // ==================== SEARCH & CALENDAR ====================
-
-//   searchNotes(query: string) {
-//     return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/search`, { q: query }, 'searchNotes');
-//   }
-
-//   getCalendarView(start: string, end: string, view: 'month' | 'week' | 'day' = 'month') {
-//     return this.get<{ data: { events: CalendarEvent[] } }>(
-//       `${this.endpoint}/calendar/view`,
-//       { start, end, view },
-//       'getCalendarView'
-//     );
-//   }
-
-//   getNotesForMonth(year: number, month: number) {
-//     return this.get<{ data: Array<{ date: string; count: number; notes: string[] }> }>(
-//       `${this.endpoint}/calendar/monthly`,
-//       { year, month },
-//       'getNotesForMonth'
-//     );
-//   }
-
-//   // ==================== ANALYTICS & VISUALIZATION ====================
-
-//   getHeatMapData(startDate?: string, endDate?: string, userId?: string) {
-//     return this.get<{ data: { heatMap: HeatMapData; stats: any } }>(
-//       `${this.endpoint}/analytics/heatmap`,
-//       { startDate, endDate, userId },
-//       'getHeatMapData'
-//     );
-//   }
-
-//   getNoteStatistics() {
-//     return this.get<{ data: NoteStatistics }>(`${this.endpoint}/stats/summary`, {}, 'getNoteStatistics');
-//   }
-
-//   getRecentActivity(limit: number = 20) {
-//     return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/activity/recent`, { limit }, 'getRecentActivity');
-//   }
-
-//   getNoteHistory(id: string) {
-//     return this.get<{ data: { activityLog: ActivityLog[] } }>(`${this.endpoint}/${id}/history`, {}, 'getNoteHistory');
-//   }
-
-//   // NEW: Knowledge Graph
-//   getKnowledgeGraph() {
-//     return this.get<{ data: { nodes: any[]; links: any[] } }>(`${this.endpoint}/graph/network`, {}, 'getKnowledgeGraph');
-//   }
-
-//   // ==================== MEETINGS ====================
+//   // --- MEETING MODULE ---
 
 //   createMeeting(data: any) {
 //     return this.post<{ data: { meeting: Meeting; note: Note } }>(`${this.endpoint}/meetings`, data, 'createMeeting');
@@ -631,340 +543,153 @@ export class NoteService extends BaseApiService {
 //     );
 //   }
 
-//   // ==================== BULK OPERATIONS ====================
+//   // --- SHARED LISTS ---
 
-//   bulkUpdateNotes(noteIds: string[], updates: Partial<Note>) {
-//     return this.patch<{ message: string; data: any }>(
-//       `${this.endpoint}/bulk/update`,
-//       { noteIds, updates },
-//       'bulkUpdateNotes'
-//     );
+//   getSharedNotesWithMe() {
+//     return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/shared/with-me`, {}, 'getSharedNotesWithMe');
 //   }
 
-//   bulkDeleteNotes(noteIds: string[]) {
-//     return this.delete<{ message: string; data: any }>(
-//       `${this.endpoint}/bulk/delete`,
-//       { body: { noteIds } }, // Axios style body for delete
-//       'bulkDeleteNotes'
-//     );
+//   getNotesSharedByMe() {
+//     return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/shared/by-me`, {}, 'getNotesSharedByMe');
 //   }
 
-//   // ==================== ADMIN ====================
+//   // --- ADMIN ---
 
-//   getAllOrganizationNotes() {
-//     return this.get<{ data: { notes: Note[] } }>(
-//       `${this.endpoint}/organization/all`,
-//       {},
+//   getAllOrganizationNotes(data:any) {
+//     return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/organization/all`, data,
 //       'getAllOrganizationNotes'
 //     );
 //   }
+
+//   // ==========================================================================
+//   // 2. CORE CRUD & 3. ID-DEPENDENT ROUTES
+//   // ==========================================================================
+
+//   getNotes(params: any) {
+//     return this.get<{ data: { notes: Note[]; pagination: any } }>(this.endpoint, params, 'getNotes');
+//   }
+
+//   createNote(data: Partial<Note>) {
+//     return this.post<{ data: { note: Note; meeting?: Meeting } }>(this.endpoint, data, 'createNote');
+//   }
+
+//   getNoteById(id: string) {
+//     return this.get<{ data: { note: Note } }>(`${this.endpoint}/${id}`, {}, 'getNoteById');
+//   }
+
+//   updateNote(id: string, data: any) {
+//     return this.patch<{ data: { note: Note } }>(`${this.endpoint}/${id}`, data, 'updateNote');
+//   }
+
+//   // Soft delete (Move to Trash)
+//   deleteNote(id: string) {
+//     return this.delete<void>(`${this.endpoint}/${id}`, null, 'deleteNote');
+//   }
+
+//   // Permanent Delete
+//   hardDeleteNote(id: string) {
+//     return this.delete<void>(`${this.endpoint}/${id}/permanent`, null, 'hardDeleteNote');
+//   }
+
+//   // --- SUBTASKS ---
+
+//   addSubtask(noteId: string, title: string) {
+//     return this.post<{ data: { note: Note } }>(
+//       `${this.endpoint}/${noteId}/subtasks`,
+//       { title },
+//       'addSubtask'
+//     );
+//   }
+
+//   toggleSubtask(noteId: string, subtaskId: string, completed: boolean) {
+//     return this.patch<{ data: { note: Note } }>(
+//       `${this.endpoint}/${noteId}/subtasks/${subtaskId}`,
+//       { completed },
+//       'toggleSubtask'
+//     );
+//   }
+
+//   removeSubtask(noteId: string, subtaskId: string) {
+//     return this.delete<{ data: { note: Note } }>(
+//       `${this.endpoint}/${noteId}/subtasks/${subtaskId}`,
+//       null,
+//       'removeSubtask'
+//     );
+//   }
+
+//   // --- SHARING & PERMISSIONS ---
+
+//   shareNote(id: string, userIds: string[], permission: 'viewer' | 'contributor' | 'admin' = 'viewer') {
+//     return this.post<{ data: { note: Note } }>(
+//       `${this.endpoint}/${id}/share`,
+//       { userIds, permission },
+//       'shareNote'
+//     );
+//   }
+
+//   updateSharePermissions(id: string, userId: string, permission: string) {
+//     return this.patch<void>(
+//       `${this.endpoint}/${id}/share/permissions`,
+//       { userId, permission },
+//       'updateSharePermissions'
+//     );
+//   }
+
+//   removeUserFromSharedNote(id: string, userId: string) {
+//     return this.delete<void>(
+//       `${this.endpoint}/${id}/share/${userId}`,
+//       null,
+//       'removeUserFromSharedNote'
+//     );
+//   }
+
+//   // --- UTILITY ACTIONS ---
+
+//   linkNote(sourceNoteId: string, targetNoteId: string) {
+//     return this.post<{ data: { note: Note } }>(
+//       `${this.endpoint}/${sourceNoteId}/link`,
+//       { targetNoteId },
+//       'linkNote'
+//     );
+//   }
+
+//   unlinkNote(sourceNoteId: string, targetNoteId: string) {
+//     // Note: Assuming API supports delete for unlinking, otherwise this might need to use a different endpoint
+//     // based on typical REST patterns.
+//     return this.delete<{ data: { note: Note } }>(
+//       `${this.endpoint}/${sourceNoteId}/link/${targetNoteId}`,
+//       null,
+//       'unlinkNote'
+//     );
+//   }
+
+//   convertToTask(id: string, dueDate?: string, priority?: string) {
+//     return this.post<{ data: { note: Note } }>(
+//       `${this.endpoint}/${id}/convert-to-task`,
+//       { dueDate, priority },
+//       'convertToTask'
+//     );
+//   }
+
+//   duplicateNote(id: string) {
+//     return this.post<{ data: { note: Note } }>(`${this.endpoint}/${id}/duplicate`, {}, 'duplicateNote');
+//   }
+
+//   togglePinNote(id: string) {
+//     return this.patch<{ data: { note: Note } }>(`${this.endpoint}/${id}/pin`, {}, 'togglePinNote');
+//   }
+
+//   archiveNote(id: string) {
+//     return this.patch<{ data: { note: Note } }>(`${this.endpoint}/${id}/archive`, {}, 'archiveNote');
+//   }
+
+//   restoreNote(id: string) {
+//     return this.patch<{ data: { note: Note } }>(`${this.endpoint}/${id}/restore`, {}, 'restoreNote');
+//   }
+
+//   // --- INFO & HISTORY ---
+
+//   getNoteHistory(id: string) {
+//     return this.get<{ data: { activityLog: ActivityLog[] } }>(`${this.endpoint}/${id}/history`, {}, 'getNoteHistory');
+//   }
 // }
-
-// // import { Injectable } from '@angular/core';
-// // import { BaseApiService } from './base-api.service';
-// // import {
-// //   Note,
-// //   Meeting,
-// //   CalendarEvent,
-// //   NoteStatistics,
-// //   HeatMapData,
-// //   ActivityLog, // Ensure this is imported
-// //   Subtask      // Ensure this is imported
-// // } from '../models/note.types';
-
-// // @Injectable({ providedIn: 'root' })
-// // export class NoteService extends BaseApiService {
-// //   private endpoint = '/v1/notes';
-
-// //   // ==================== BASIC CRUD ====================
-
-// //   getNotes(params: any) {
-// //     return this.get<{ data: { notes: Note[]; pagination: any } }>(this.endpoint, params, 'getNotes');
-// //   }
-
-// //   getTrashBin() {
-// //     return this.get<{ data: { notes: Note[]; pagination: any } }>(`${this.endpoint}/trash/bin`, {}, 'getNotes');
-// //   }
-
-// //   emptyTrash() {
-// //     return this.delete<{ data: { notes: Note[]; pagination: any } }>(`${this.endpoint}/trash/empty`, {}, 'getNotes');
-// //   }
-
-// //   getNoteById(id: string) {
-// //     return this.get<{ data: { note: Note } }>(`${this.endpoint}/${id}`, {}, 'getNoteById');
-// //   }
-
-// //   createNote(data: Partial<Note>) {
-// //     return this.post<{ data: { note: Note; meeting?: Meeting } }>(this.endpoint, data, 'createNote');
-// //   }
-
-
-
-
-// //   restoreFromTrash(id: string) {
-// //     return this.patch<{ data: { note: Note } }>(`${this.endpoint}/trash/${id}/restore`, {}, 'updateNote');
-// //   }
-
-// //   updateNote(id: string, data: any) {
-// //     return this.patch<{ data: { note: Note } }>(`${this.endpoint}/${id}`, data, 'updateNote');
-// //   }
-
-// //   // This is your SOFT delete (Move to Trash)
-// //   deleteNote(id: string) {
-// //     return this.delete<void>(`${this.endpoint}/${id}`, null, 'deleteNote');
-// //   }
-
-// //   // -------------------------------------------- pending
-// //   createTemplate(data: any) {
-// //     return this.post<{ data: { note: Note; meeting?: Meeting } }>(`${this.endpoint}/templates`, data, 'createNote');
-// //   }
-// //   getTemplate() {
-// //     return this.get<{ data: { note: Note; meeting?: Meeting } }>(`${this.endpoint}/templates`, {}, 'createNote');
-// //   }
-
-// //   // ==================== EXPORT ====================
-
-// //   exportNoteData(format: 'json' | 'csv' = 'json', startDate?: string, endDate?: string) {
-// //     return this.get<any>(`${this.endpoint}/export/data`, { format, startDate, endDate }, 'exportNoteData');
-// //   }
-
-// //   exportAllUserNotes(format: 'json' | 'csv' = 'json') {
-// //     return this.get<any>(`${this.endpoint}/export/all`, { format }, 'exportAllUserNotes');
-// //   }
-
-// //   // ==================== MISSING: LINKING NOTES ====================
-// //   linkNote(sourceNoteId: string, targetNoteId: string) {
-// //     return this.post<{ data: { note: Note } }>(
-// //       `${this.endpoint}/${sourceNoteId}/link`,
-// //       { targetNoteId },
-// //       'linkNote'
-// //     );
-// //   }
-// //   unlinkNote(sourceNoteId: string, targetNoteId: string) {
-// //     return this.delete<{ data: { note: Note } }>(
-// //       `${this.endpoint}/${sourceNoteId}/link/${targetNoteId}`,
-// //       null,
-// //       'unlinkNote'
-// //     );
-// //   }
-
-// //   // ==================== SHARING ====================
-
-// //   shareNote(id: string, userIds: string[], permission: 'viewer' | 'contributor' | 'admin' = 'viewer') {
-// //     console.log(id);
-// //     return this.post<{ data: { note: Note } }>(
-// //       `${this.endpoint}/${id}/share`,
-// //       { userIds, permission },
-// //       'shareNote'
-// //     );
-// //   }
-
-// //   // ==================== MISSING: HARD DELETE & HISTORY ====================
-
-// //   // FIXED: Added this method to fix "Property 'hardDeleteNote' does not exist"
-// //   hardDeleteNote(id: string) {
-// //     return this.delete<void>(
-// //       `${this.endpoint}/${id}/permanent`,
-// //       null,
-// //       'hardDeleteNote'
-// //     );
-// //   }
-
-// //   // FIXED: Added specific history fetch for the details panel
-// //   getNoteHistory(id: string) {
-// //     return this.get<{ data: { activityLog: ActivityLog[] } }>(
-// //       `${this.endpoint}/${id}/history`,
-// //       {},
-// //       'getNoteHistory'
-// //     );
-// //   }
-
-// //   // ==================== MISSING: SUBTASKS ====================
-// //   // FIXED: These add the subtask functionality required by your UI
-
-// //   addSubtask(noteId: string, title: string) {
-// //     return this.post<{ data: { note: Note } }>(
-// //       `${this.endpoint}/${noteId}/subtasks`,
-// //       { title },
-// //       'addSubtask'
-// //     );
-// //   }
-
-// //   toggleSubtask(noteId: string, subtaskId: string, completed: boolean) {
-// //     return this.patch<{ data: { note: Note } }>(
-// //       `${this.endpoint}/${noteId}/subtasks/${subtaskId}`,
-// //       { completed },
-// //       'toggleSubtask'
-// //     );
-// //   }
-
-// //   removeSubtask(noteId: string, subtaskId: string) {
-// //     return this.delete<{ data: { note: Note } }>(
-// //       `${this.endpoint}/${noteId}/subtasks/${subtaskId}`,
-// //       null,
-// //       'removeSubtask'
-// //     );
-// //   }
-
-
-// //   // ==================== MEDIA UPLOAD ====================
-
-// //   uploadMedia(files: File[]) {
-// //     const formData = new FormData();
-// //     files.forEach((f) => formData.append('attachments', f));
-// //     return this.post<{ data: any[] }>(`${this.endpoint}/upload`, formData, 'uploadMedia');
-// //   }
-
-// //   // ==================== ARCHIVE & RESTORE ====================
-
-// //   archiveNote(id: string) {
-// //     return this.patch<{ data: { note: Note } }>(
-// //       `${this.endpoint}/${id}/archive`,
-// //       {},
-// //       'archiveNote'
-// //     );
-// //   }
-
-// //   restoreNote(id: string) {
-// //     return this.patch<{ data: { note: Note } }>(
-// //       `${this.endpoint}/${id}/restore`,
-// //       {},
-// //       'restoreNote'
-// //     );
-// //   }
-
-// //   // ==================== DUPLICATION ====================
-
-// //   duplicateNote(id: string) {
-// //     return this.post<{ data: { note: Note } }>(
-// //       `${this.endpoint}/${id}/duplicate`,
-// //       {},
-// //       'duplicateNote'
-// //     );
-// //   }
-
-// //   // ==================== SEARCH & CALENDAR ====================
-// //   searchNotes(query: string) {
-// //     return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/search`, { q: query }, 'searchNotes');
-// //   }
-
-// //   getCalendarView(start: string, end: string, view: 'month' | 'week' | 'day' = 'month') {
-// //     return this.get<{ data: { events: CalendarEvent[] } }>(
-// //       `${this.endpoint}/calendar/view`,
-// //       { start, end, view },
-// //       'getCalendarView'
-// //     );
-// //   }
-
-// //   getNotesForMonth(year: number, month: number) {
-// //     return this.get<{ data: Array<{ date: string; count: number; notes: string[] }> }>(
-// //       `${this.endpoint}/calendar/monthly`,
-// //       { year, month },
-// //       'getNotesForMonth'
-// //     );
-// //   }
-
-// //   // ==================== ANALYTICS ====================
-
-// //   getHeatMapData(startDate?: string, endDate?: string, userId?: string) {
-// //     return this.get<{ data: { heatMap: HeatMapData; stats: any } }>(
-// //       `${this.endpoint}/analytics/heatmap`,
-// //       { startDate, endDate, userId },
-// //       'getHeatMapData'
-// //     );
-// //   }
-
-// //   getNoteStatistics() {
-// //     return this.get<{ data: NoteStatistics }>(`${this.endpoint}/stats/summary`, {}, 'getNoteStatistics');
-// //   }
-
-// //   updateSharePermissions(id: string, userId: string, permission: string) {
-// //     return this.patch<void>(`${this.endpoint}/${id}/share/permissions`, { userId, permission }, 'updateSharePermissions');
-// //   }
-
-// //   removeUserFromSharedNote(id: string, userId: string) {
-// //     return this.delete<void>(`${this.endpoint}/${id}/share/${userId}`, null, 'removeUserFromSharedNote');
-// //   }
-
-// //   getNotesSharedByMe() {
-// //     return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/shared/by-me`, {}, 'getNotesSharedByMe');
-// //   }
-
-// //   getSharedNotesWithMe() {
-// //     return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/shared/with-me`, {}, 'getSharedNotesWithMe');
-// //   }
-
-// //   getRecentActivity(limit: number = 20) {
-// //     return this.get<{ data: { notes: Note[] } }>(`${this.endpoint}/activity/recent`, { limit }, 'getRecentActivity');
-// //   }
-
-// //   // --------
-// //   // bad
-// //   // getNoteAnalytics(period: 'week' | 'month' | 'quarter' | 'year' = 'month') {
-// //   //   return this.get<{ data: any }>(`${this.endpoint}/analytics/summary`, { period }, 'getNoteAnalytics');
-// //   // }
-
-
-
-// //   // ==================== BULK OPERATIONS ==================== notimplemented
-
-// //   bulkUpdateNotes(noteIds: string[], updates: Partial<Note>) {
-// //     return this.patch<{ message: string; data: any }>(
-// //       `${this.endpoint}/bulk/update`,
-// //       { noteIds, updates },
-// //       'bulkUpdateNotes'
-// //     );
-// //   }
-
-// //   bulkDeleteNotes(noteIds: string[]) {
-// //     return this.delete<{ message: string; data: any }>(
-// //       `${this.endpoint}/bulk/delete`,
-// //       { body: { noteIds } },
-// //       'bulkDeleteNotes'
-// //     );
-// //   }
-
-// //   // ==================== SPECIAL ACTIONS ====================
-
-// //   convertToTask(id: string, dueDate?: string, priority?: string) {
-// //     return this.post<{ data: { note: Note } }>(
-// //       `${this.endpoint}/${id}/convert-to-task`,
-// //       { dueDate, priority },
-// //       'convertToTask'
-// //     );
-// //   }
-
-// //   togglePinNote(id: string) {
-// //     return this.patch<{ data: { note: Note } }>(`${this.endpoint}/${id}/pin`, {}, 'togglePinNote');
-// //   }
-
-// //   // ==================== MEETINGS ====================
-
-// //   createMeeting(data: any) {
-// //     return this.post<{ data: { meeting: Meeting; note: Note } }>(`${this.endpoint}/meetings`, data, 'createMeeting');
-// //   }
-
-// //   getUserMeetings(status?: string, startDate?: string, endDate?: string) {
-// //     return this.get<{ data: { meetings: Meeting[] } }>(
-// //       `${this.endpoint}/meetings`,
-// //       { status, startDate, endDate },
-// //       'getUserMeetings'
-// //     );
-// //   }
-
-// //   updateMeetingStatus(meetingId: string, data: { status?: string; minutes?: string; actionItems?: any[] }) {
-// //     return this.patch<{ data: { meeting: Meeting } }>(
-// //       `${this.endpoint}/meetings/${meetingId}/status`,
-// //       data,
-// //       'updateMeetingStatus'
-// //     );
-// //   }
-
-// //   rsvpToMeeting(meetingId: string, response: 'accepted' | 'declined' | 'tentative') {
-// //     return this.post<{ message: string }>(
-// //       `${this.endpoint}/meetings/${meetingId}/rsvp`,
-// //       { response },
-// //       'rsvpToMeeting'
-// //     );
-// //   }
-// // }

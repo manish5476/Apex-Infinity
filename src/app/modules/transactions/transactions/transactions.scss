@@ -18,7 +18,8 @@
   width: 100%;
   padding: var(--spacing-xl);
   gap: var(--spacing-lg);
-  background: var(--bg-primary);
+  // background: var(--bg-primary);
+  background: transparent;
   overflow: hidden;
 }
 
@@ -132,7 +133,8 @@
 //   width: 100%;
 //   padding: var(--spacing-xl);
 //   gap: var(--spacing-lg);
-//   background: var(--bg-primary);
+//   // background: var(--bg-primary);
+//   background: transparent;
 //   overflow: hidden;    /* Prevent scroll here too */
 // }
 

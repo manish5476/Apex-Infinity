@@ -1,245 +1,225 @@
-    <div class="meeting-dashboard">
-      
-      <!-- ==================== SIDEBAR ==================== -->
-      <aside class="sidebar">
-        <div class="action-section">
-          <button class="btn-create" (click)="onCreateMeeting()">
-            <i class="pi pi-plus"></i> 
-            <span>Schedule Meeting</span>
-          </button>
+<div class="meeting-dashboard">
+
+  <!-- ==================== SIDEBAR ==================== -->
+  <aside class="sidebar">
+    <div class="action-section">
+      <button class="btn-create" (click)="onCreateMeeting()">
+        <i class="pi pi-plus"></i>
+        <span>Schedule Meeting</span>
+      </button>
+    </div>
+
+    <nav class="nav-menu">
+      <label>Schedule</label>
+
+      <button class="nav-item" [class.active]="activeFilter() === 'all'" (click)="setFilter('all')">
+        <i class="pi pi-list"></i>
+        <span>All Meetings</span>
+      </button>
+
+      <button class="nav-item" [class.active]="activeFilter() === 'upcoming'" (click)="setFilter('upcoming')">
+        <i class="pi pi-calendar"></i>
+        <span>Upcoming</span>
+        <span class="badge" *ngIf="counts().upcoming > 0">{{ counts().upcoming }}</span>
+      </button>
+
+      <button class="nav-item" [class.active]="activeFilter() === 'pending'" (click)="setFilter('pending')">
+        <i class="pi pi-question-circle"></i>
+        <span>Pending RSVP</span>
+        <span class="badge warning" *ngIf="counts().pending > 0">{{ counts().pending }}</span>
+      </button>
+
+      <button class="nav-item" [class.active]="activeFilter() === 'past'" (click)="setFilter('past')">
+        <i class="pi pi-history"></i>
+        <span>Past Meetings</span>
+      </button>
+
+      <button class="nav-item" [class.active]="activeFilter() === 'cancelled'" (click)="setFilter('cancelled')">
+        <i class="pi pi-times-circle"></i>
+        <span>Cancelled</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <main class="content">
+
+    <!-- Header / Toolbar -->
+    <header class="top-bar">
+      <div class="title-group">
+        <h2>Meetings Dashboard</h2>
+        <span class="date-today">{{ today | date:'fullDate' }}</span>
+      </div>
+
+      <div class="controls">
+        <!-- Status Filter -->
+        <p-select [options]="statusOptions" [ngModel]="selectedStatus()" (ngModelChange)="onStatusChange($event)"
+          optionLabel="label" optionValue="value" placeholder="Status" styleClass="compact-select"
+          [style]="{'min-width':'140px'}" [filter]="true" filterBy="label">
+        </p-select>
+
+
+        <!-- Date Filter -->
+        <p-datepicker [ngModel]="selectedDate()" (ngModelChange)="onDateChange($event)" showIcon="true"
+          placeholder="Filter by date" styleClass="compact-datepicker">
+        </p-datepicker>
+
+        <!-- Reset -->
+        <button class="btn-text" (click)="resetFilters()">Reset</button>
+
+        <!-- Refresh -->
+        <button class="btn-icon" (click)="loadMeetings()" [class.loading]="isLoading()">
+          <i class="pi pi-refresh" [class.spin]="isLoading()"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Meeting Grid -->
+    <div class="meetings-grid custom-scrollbar">
+
+      <!-- Loading State -->
+      @if (isLoading()) {
+      <div class="state-container">
+        <div class="spinner"></div>
+        <p>Syncing schedule...</p>
+      </div>
+      }
+
+      <!-- Empty State -->
+      @if (!isLoading() && filteredMeetings().length === 0) {
+      <div class="state-container">
+        <div class="empty-icon-wrapper">
+          <i class="pi pi-calendar-times"></i>
+        </div>
+        <h3>No meetings found</h3>
+        <p>
+          @if (activeFilter() === 'upcoming') { You have no upcoming meetings scheduled. }
+          @else if (activeFilter() === 'pending') { You're all caught up on RSVPs! }
+          @else { No meetings match your current filters. }
+        </p>
+        @if (activeFilter() === 'upcoming') {
+        <button class="btn-link" (click)="onCreateMeeting()">Schedule one now</button>
+        }
+      </div>
+      }
+
+      <!-- Meeting Cards -->
+      @for (meeting of filteredMeetings(); track meeting._id) {
+      <div class="meeting-card" [class.is-cancelled]="meeting.status === 'cancelled'">
+
+        <!-- Left: Date Strip -->
+        <div class="date-strip">
+          <span class="month">{{ meeting.startTime | date:'MMM' }}</span>
+          <span class="day">{{ meeting.startTime | date:'dd' }}</span>
+          <span class="time">{{ meeting.startTime | date:'HH:mm' }}</span>
         </div>
 
-        <nav class="nav-menu">
-          <label>Schedule</label>
-          
-          <button class="nav-item" 
-                  [class.active]="activeFilter() === 'all'" 
-                  (click)="setFilter('all')">
-            <i class="pi pi-list"></i>
-            <span>All Meetings</span>
-          </button>
+        <!-- Right: Content -->
+        <div class="card-content">
 
-          <button class="nav-item" 
-                  [class.active]="activeFilter() === 'upcoming'" 
-                  (click)="setFilter('upcoming')">
-            <i class="pi pi-calendar"></i>
-            <span>Upcoming</span>
-            <span class="badge" *ngIf="counts().upcoming > 0">{{ counts().upcoming }}</span>
-          </button>
+          <!-- Header: Title & Status & Actions -->
+          <div class="card-header">
+            <div class="title-section" (click)="openDialog(meeting)">
+              <h3 class="title" [title]="meeting.title">{{ meeting.title }}</h3>
 
-          <button class="nav-item" 
-                  [class.active]="activeFilter() === 'pending'" 
-                  (click)="setFilter('pending')">
-            <i class="pi pi-question-circle"></i>
-            <span>Pending RSVP</span>
-            <span class="badge warning" *ngIf="counts().pending > 0">{{ counts().pending }}</span>
-          </button>
-
-          <button class="nav-item" 
-                  [class.active]="activeFilter() === 'past'" 
-                  (click)="setFilter('past')">
-            <i class="pi pi-history"></i>
-            <span>Past Meetings</span>
-          </button>
-
-          <button class="nav-item" 
-                  [class.active]="activeFilter() === 'cancelled'" 
-                  (click)="setFilter('cancelled')">
-            <i class="pi pi-times-circle"></i>
-            <span>Cancelled</span>
-          </button>
-        </nav>
-      </aside>
-
-      <!-- ==================== MAIN CONTENT ==================== -->
-      <main class="content">
-        
-        <!-- Header / Toolbar -->
-        <header class="top-bar">
-          <div class="title-group">
-            <h2>Meetings Dashboard</h2>
-            <span class="date-today">{{ today | date:'fullDate' }}</span>
-          </div>
-
-          <div class="controls">
-            <!-- Status Filter -->
-            <p-select 
-              [options]="statusOptions" 
-              [ngModel]="selectedStatus()" 
-              (ngModelChange)="onStatusChange($event)"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Status" 
-              styleClass="compact-select"
-              [style]="{'min-width':'140px'}"
-              [filter]="true"
-              filterBy="label">
-            </p-select>
-
-
-            <!-- Date Filter -->
-            <p-datepicker 
-              [ngModel]="selectedDate()" 
-              (ngModelChange)="onDateChange($event)"
-              showIcon="true" 
-              placeholder="Filter by date"
-              styleClass="compact-datepicker">
-            </p-datepicker>
-
-            <!-- Reset -->
-            <button class="btn-text" (click)="resetFilters()">Reset</button>
-
-            <!-- Refresh -->
-            <button class="btn-icon" (click)="loadMeetings()" [class.loading]="isLoading()">
-              <i class="pi pi-refresh" [class.spin]="isLoading()"></i>
-            </button>
-          </div>
-        </header>
-
-        <!-- Meeting Grid -->
-        <div class="meetings-grid custom-scrollbar">
-          
-          <!-- Loading State -->
-          @if (isLoading()) {
-            <div class="state-container">
-              <div class="spinner"></div>
-              <p>Syncing schedule...</p>
-            </div>
-          }
-
-          <!-- Empty State -->
-          @if (!isLoading() && filteredMeetings().length === 0) {
-            <div class="state-container">
-              <div class="empty-icon-wrapper">
-                <i class="pi pi-calendar-times"></i>
-              </div>
-              <h3>No meetings found</h3>
-              <p>
-                @if (activeFilter() === 'upcoming') { You have no upcoming meetings scheduled. }
-                @else if (activeFilter() === 'pending') { You're all caught up on RSVPs! }
-                @else { No meetings match your current filters. }
-              </p>
-              @if (activeFilter() === 'upcoming') {
-                <button class="btn-link" (click)="onCreateMeeting()">Schedule one now</button>
+              @if (meeting.status === 'cancelled') {
+              <span class="status-badge error">Cancelled</span>
+              } @else if (meeting.status === 'completed') {
+              <span class="status-badge success">Done</span>
+              } @else if (meeting.status === 'in_progress') {
+              <span class="status-badge info">Live</span>
+              } @else if (meeting.status === 'postponed') {
+              <span class="status-badge warning">Postponed</span>
               }
             </div>
-          }
 
-          <!-- Meeting Cards -->
-          @for (meeting of filteredMeetings(); track meeting._id) {
-            <div class="meeting-card" [class.is-cancelled]="meeting.status === 'cancelled'">
-              
-              <!-- Left: Date Strip -->
-              <div class="date-strip">
-                <span class="month">{{ meeting.startTime | date:'MMM' }}</span>
-                <span class="day">{{ meeting.startTime | date:'dd' }}</span>
-                <span class="time">{{ meeting.startTime | date:'HH:mm' }}</span>
-              </div>
+            <!-- New View Button -->
+            <button class="btn-view" (click)="openDialog(meeting); $event.stopPropagation()" pTooltip="View Details"
+              tooltipPosition="left">
+              <i class="pi pi-eye"></i>
+            </button>
+          </div>
 
-              <!-- Right: Content -->
-              <div class="card-content">
-                
-                <!-- Header: Title & Status & Actions -->
-                <div class="card-header">
-                  <div class="title-section" (click)="openDialog(meeting)">
-                    <h3 class="title" [title]="meeting.title">{{ meeting.title }}</h3>
-                    
-                    @if (meeting.status === 'cancelled') {
-                      <span class="status-badge error">Cancelled</span>
-                    } @else if (meeting.status === 'completed') {
-                      <span class="status-badge success">Done</span>
-                    } @else if (meeting.status === 'in-progress') {
-                      <span class="status-badge info">Live</span>
-                    } @else if (meeting.status === 'postponed') {
-                      <span class="status-badge warning">Postponed</span>
-                    }
-                  </div>
-                  
-                  <!-- New View Button -->
-                  <button class="btn-view" (click)="openDialog(meeting); $event.stopPropagation()" pTooltip="View Details" tooltipPosition="left">
-                    <i class="pi pi-eye"></i>
-                  </button>
-                </div>
+          <!-- Meta Info -->
+          <div class="meta-info">
+            <div class="meta-row">
+              <i class="pi pi-clock"></i>
+              <span>{{ getDuration(meeting) }} mins &bull; {{ meeting.endTime | date:'shortTime' }}</span>
+            </div>
 
-                <!-- Meta Info -->
-                <div class="meta-info">
-                  <div class="meta-row">
-                    <i class="pi pi-clock"></i>
-                    <span>{{ getDuration(meeting) }} mins &bull; {{ meeting.endTime | date:'shortTime' }}</span>
-                  </div>
-                  
-                  <div class="meta-row location">
-                    @if (meeting.locationType === 'virtual') {
-                      <i class="pi pi-video"></i>
-                      <a [href]="meeting.virtualLink || '#'" target="_blank" (click)="$event.stopPropagation()">Virtual Meeting</a>
-                    } @else if (meeting.locationType === 'physical') {
-                      <i class="pi pi-map-marker"></i>
-                      <span>{{ meeting.physicalLocation || 'In Person' }}</span>
-                    } @else {
-                      <i class="pi pi-globe"></i>
-                      <span>Hybrid</span>
-                    }
-                  </div>
+            <div class="meta-row location">
+              @if (meeting.locationType === 'virtual') {
+              <i class="pi pi-video"></i>
+              <a [href]="meeting.virtualLink || '#'" target="_blank" (click)="$event.stopPropagation()">Virtual
+                Meeting</a>
+              } @else if (meeting.locationType === 'physical') {
+              <i class="pi pi-map-marker"></i>
+              <span>{{ meeting.physicalLocation || 'In Person' }}</span>
+              } @else {
+              <i class="pi pi-globe"></i>
+              <span>Hybrid</span>
+              }
+            </div>
 
-                  <div class="meta-row organizer">
-                    <i class="pi pi-user"></i>
-                    <span>Host: {{ getOrganizerName(meeting) }}</span>
-                  </div>
-                </div>
+            <div class="meta-row organizer">
+              <i class="pi pi-user"></i>
+              <span>Host: {{ getOrganizerName(meeting) }}</span>
+            </div>
+          </div>
 
-                <!-- Footer: Actions -->
-                <div class="card-actions">
-                  
-                  <!-- SCENARIO 1: Needs RSVP -->
-                  @if (shouldShowRsvp(meeting)) {
-                    <div class="rsvp-actions">
-                      <span class="label">RSVP Required</span>
-                      <div class="btn-group">
-                        <button class="btn-icon-action accept" (click)="onRsvp(meeting._id!, 'accepted')" title="Accept">
-                          <i class="pi pi-check"></i>
-                        </button>
-                        <button class="btn-icon-action tentative" (click)="onRsvp(meeting._id!, 'tentative')" title="Tentative">
-                          <i class="pi pi-question"></i>
-                        </button>
-                        <button class="btn-icon-action decline" (click)="onRsvp(meeting._id!, 'declined')" title="Decline">
-                          <i class="pi pi-times"></i>
-                        </button>
-                      </div>
-                    </div>
-                  } 
-                  
-                  <!-- SCENARIO 2: Organizer Controls -->
-                  @else if (isOrganizer(meeting) && meeting.status === 'scheduled') {
-                    <div class="organizer-actions">
-                      <span class="role-label">You are Host</span>
-                      <div class="btn-group text-only">
-                        <button (click)="updateStatus(meeting._id!, 'in-progress')">Start</button>
-                        <button (click)="updateStatus(meeting._id!, 'cancelled')" class="text-danger">Cancel</button>
-                      </div>
-                    </div>
-                  }
-                  
-                  <!-- SCENARIO 3: Organizer - In Progress -->
-                  @else if (isOrganizer(meeting) && meeting.status === 'in-progress') {
-                    <div class="organizer-actions">
-                      <span class="role-label live"><span class="dot"></span> Live</span>
-                      <button class="btn-sm success" (click)="updateStatus(meeting._id!, 'completed')">End Meeting</button>
-                    </div>
-                  }
+          <!-- Footer: Actions -->
+          <div class="card-actions">
 
-                  <!-- SCENARIO 4: View Only / Responded -->
-                  @else {
-                    <div class="status-display">
-                      <span class="rsvp-status" [ngClass]="getMyRsvp(meeting)">
-                        {{ getMyRsvp(meeting) | titlecase }}
-                      </span>
-                    </div>
-                  }
-                </div>
-
+            <!-- SCENARIO 1: Needs RSVP -->
+            @if (shouldShowRsvp(meeting)) {
+            <div class="rsvp-actions">
+              <span class="label">RSVP Required</span>
+              <div class="btn-group">
+                <button class="btn-icon-action accept" (click)="onRsvp(meeting._id!, 'accepted')" title="Accept">
+                  <i class="pi pi-check"></i>
+                </button>
+                <button class="btn-icon-action tentative" (click)="onRsvp(meeting._id!, 'tentative')" title="Tentative">
+                  <i class="pi pi-question"></i>
+                </button>
+                <button class="btn-icon-action decline" (click)="onRsvp(meeting._id!, 'declined')" title="Decline">
+                  <i class="pi pi-times"></i>
+                </button>
               </div>
             </div>
-          }
+            }
+
+            <!-- SCENARIO 2: Organizer Controls -->
+            @else if (isOrganizer(meeting) && meeting.status === 'scheduled') {
+            <div class="organizer-actions">
+              <span class="role-label">You are Host</span>
+              <div class="btn-group text-only">
+                <button (click)="updateStatus(meeting._id!, 'in_progress')">Start</button>
+                <button (click)="updateStatus(meeting._id!, 'cancelled')" class="text-danger">Cancel</button>
+              </div>
+            </div>
+            }
+
+            <!-- SCENARIO 3: Organizer - In Progress -->
+            @else if (isOrganizer(meeting) && meeting.status === 'in_progress') {
+            <div class="organizer-actions">
+              <span class="role-label live"><span class="dot"></span> Live</span>
+              <button class="btn-sm success" (click)="updateStatus(meeting._id!, 'completed')">End Meeting</button>
+            </div>
+            }
+
+            <!-- SCENARIO 4: View Only / Responded -->
+            @else {
+            <div class="status-display">
+              <span class="rsvp-status" [ngClass]="getMyRsvp(meeting)">
+                {{ getMyRsvp(meeting) | titlecase }}
+              </span>
+            </div>
+            }
+          </div>
+
         </div>
-      </main>
+      </div>
+      }
     </div>
+  </main>
+</div>

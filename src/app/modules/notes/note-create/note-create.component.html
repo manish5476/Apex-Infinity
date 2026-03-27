@@ -45,8 +45,8 @@
       <!-- Note Type Tabs -->
       <div class="type-tabs">
         @for (type of noteTypes; track type.value) {
-        <label class="type-tab" [class.active]="noteForm.get('noteType')?.value === type.value">
-          <input type="radio" formControlName="noteType" [value]="type.value" hidden>
+        <label class="type-tab" [class.active]="noteForm.get('itemType')?.value === type.value">
+          <input type="radio" formControlName="itemType" [value]="type.value" hidden>
           <span class="tab-icon">{{ type.icon }}</span>
           <span class="tab-label">{{ type.label }}</span>
         </label>
@@ -74,8 +74,8 @@
           </button>
         </div>
 
-        <div class="subtasks-list" formArrayName="subtasks">
-          @for (task of subtasks.controls; track i; let i = $index) {
+        <div class="subtasks-list" formArrayName="checklist">
+          @for (item of checklist.controls; track i; let i = $index) {
           <div class="subtask-row" [formGroupName]="i">
             <input type="checkbox" formControlName="completed" class="checkbox-std">
             <input type="text" formControlName="title" placeholder="Task item..." class="input-std small">
@@ -173,7 +173,7 @@
       </div>
 
       <!-- Meeting Details (conditional) -->
-      @if (noteForm.get('noteType')?.value === 'meeting') {
+      @if (noteForm.get('itemType')?.value === 'meeting') {
       <div class="sidebar-section highlight-section" formGroupName="meetingDetails">
         <label class="section-label">Meeting Details</label>
         <div class="form-row">
