@@ -181,7 +181,7 @@ export interface Note {
   _id: string;
   organizationId: string;
   owner: UserLight;
-
+noteType:string;
   itemType: ItemType;
   title: string;
   content?: string;
