@@ -3373,6 +3373,464 @@
 
 
 
+// =============================================================================
+// NEW GLASSMORPHISM THEMES — 5 ADDITIONS
+// Design rule: Background orbs/gradients bleed through near-invisible glass.
+// Text uses text-shadow glows to appear "floating" above the surface.
+// Every glass panel uses a 3-layer inset shadow for rim lighting.
+// =============================================================================
+
+// =============================================================================
+// THEME 1 — AURORA GLASS
+// Arctic night sky, green-to-violet aurora. Max blur, luminous frost.
+// bg-secondary / bg-ternary used as glass panel backgrounds.
+// =============================================================================
+.theme-aurora-glass {
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body:    'Inter', sans-serif;
+
+  // ── Backgrounds — the aurora that bleeds THROUGH the glass ──────────────
+  --theme-bg-primary:   radial-gradient(
+    ellipse 120% 70% at 40% -10%,
+    #0a4d35  0%,
+    #071830 38%,
+    #06091a 65%,
+    #020408 100%
+  );
+  --theme-bg-secondary: rgba(57, 255, 138, 0.07);   // ← used as glass tint
+  --theme-bg-ternary:   rgba(168, 85, 247, 0.06);   // ← violet glass tint
+
+  // ── Typography — floating glow text ──────────────────────────────────────
+  --theme-text-primary:   #f0fff8;
+  --theme-text-secondary: #7fffd4;
+  --theme-text-tertiary:  #4db89a;
+  --theme-text-label:     #2d7a62;
+
+  // ── Borders ───────────────────────────────────────────────────────────────
+  --theme-border-primary:   rgba(127, 255, 212, 0.2);
+  --theme-border-secondary: rgba(127, 255, 212, 0.08);
+
+  // ── Accents ───────────────────────────────────────────────────────────────
+  --theme-accent-primary:   #39ff8a;
+  --theme-accent-secondary: #00d4a0;
+  --theme-accent-tertiary:  #a855f7;
+  --theme-accent-gradient:  linear-gradient(135deg, #00d4a0 0%, #39ff8a 42%, #a855f7 100%);
+  --theme-accent-focus:     rgba(57, 255, 138, 0.22);
+  --theme-accent-hover:     #00ff7f;
+
+  // ── Status ────────────────────────────────────────────────────────────────
+  --theme-success: #39ff8a;
+  --theme-warning: #ffd700;
+  --theme-error:   #ff4d6d;
+  --theme-info:    #38bdf8;
+  --theme-disabled:      rgba(255, 255, 255, 0.06);
+  --theme-disabled-text: rgba(255, 255, 255, 0.24);
+
+  // ── Glass — maximum frosted depth ─────────────────────────────────────────
+  // Layer 1: accent-tinted gradient at very low opacity → aurora bleeds through
+  // Layer 2: 52px blur = thick ice look
+  // Layer 3: bright top rim + colored bottom reflection + ambient glow shadow
+  --glass-bg:     linear-gradient(
+    160deg,
+    var(--theme-bg-secondary)   0%,
+    rgba(255, 255, 255, 0.025) 50%,
+    var(--theme-bg-ternary)    100%
+  );
+  --glass-blur:   52px;
+  --glass-border: rgba(127, 255, 212, 0.28);
+  --glass-shadow:
+    0 32px 64px -16px rgba(0, 0, 0, 0.72),
+    inset 0 1px 0 rgba(255, 255, 255, 0.38),
+    inset 0 -1px 0 rgba(57, 255, 138, 0.14),
+    0 0 60px rgba(57, 255, 138, 0.06);
+
+  // ── Components ────────────────────────────────────────────────────────────
+  --component-bg-hover:       rgba(57, 255, 138, 0.07);
+  --component-bg-active:      rgba(57, 255, 138, 0.14);
+  --component-border-focus:   #39ff8a;
+  --component-surface-raised: rgba(0, 0, 0, 0.38);
+  --component-divider:        rgba(127, 255, 212, 0.1);
+
+  --scroll-thumb: rgba(57, 255, 138, 0.32);
+  --scroll-track: rgba(0, 0, 0, 0.22);
+
+  @include apply-canonical-mapping;
+}
+
+// =============================================================================
+// THEME 2 — OBSIDIAN ROSE
+// Volcanic black with hot-pink luminescence and gold micro-accents.
+// Luxury fashion / midnight editorial.
+// =============================================================================
+.theme-obsidian-rose {
+  --font-heading: 'Cormorant Garamond', serif;
+  --font-body:    'Plus Jakarta Sans', sans-serif;
+
+  --theme-bg-primary:   radial-gradient(
+    ellipse 100% 80% at 50% 10%,
+    #2d0a1a  0%,
+    #180810 45%,
+    #0e050a 75%,
+    #060204 100%
+  );
+  --theme-bg-secondary: rgba(255, 45, 120, 0.1);    // ← hot-pink glass base
+  --theme-bg-ternary:   rgba(212, 175, 55, 0.06);   // ← gold shimmer tint
+
+  --theme-text-primary:   #fff0f5;
+  --theme-text-secondary: #ffb8cc;
+  --theme-text-tertiary:  #c87098;
+  --theme-text-label:     #884466;
+
+  --theme-border-primary:   rgba(255, 100, 150, 0.22);
+  --theme-border-secondary: rgba(255, 100, 150, 0.08);
+
+  --theme-accent-primary:   #ff2d78;
+  --theme-accent-secondary: #ff6699;
+  --theme-accent-tertiary:  #d4af37;
+  --theme-accent-gradient:  linear-gradient(135deg, #cc0055 0%, #ff2d78 45%, #d4af37 100%);
+  --theme-accent-focus:     rgba(255, 45, 120, 0.22);
+  --theme-accent-hover:     #ff5599;
+
+  --theme-success: #22d3a0;
+  --theme-warning: #d4af37;
+  --theme-error:   #ff2d78;
+  --theme-info:    #818cf8;
+  --theme-disabled:      rgba(255, 255, 255, 0.06);
+  --theme-disabled-text: rgba(255, 255, 255, 0.22);
+
+  --glass-bg:     linear-gradient(
+    150deg,
+    var(--theme-bg-secondary)   0%,
+    rgba(255, 255, 255, 0.02)  48%,
+    var(--theme-bg-ternary)   100%
+  );
+  --glass-blur:   48px;
+  --glass-border: rgba(255, 100, 150, 0.32);
+  --glass-shadow:
+    0 32px 64px -16px rgba(0, 0, 0, 0.82),
+    inset 0 1px 0 rgba(255, 180, 200, 0.38),
+    inset 0 -1px 0 rgba(212, 175, 55, 0.16),
+    0 0 80px rgba(255, 45, 120, 0.08);
+
+  --component-bg-hover:       rgba(255, 45, 120, 0.08);
+  --component-bg-active:      rgba(255, 45, 120, 0.16);
+  --component-border-focus:   #ff2d78;
+  --component-surface-raised: rgba(0, 0, 0, 0.45);
+  --component-divider:        rgba(255, 100, 150, 0.12);
+
+  --scroll-thumb: rgba(255, 45, 120, 0.36);
+  --scroll-track: rgba(0, 0, 0, 0.25);
+
+  @include apply-canonical-mapping;
+}
+
+// =============================================================================
+// THEME 3 — ARCTIC CRYSTAL
+// Bright cold white-blue. Near-invisible panels with extreme blur.
+// Maximum luminosity — Apple Vision Pro / surgical precision aesthetic.
+// =============================================================================
+.theme-arctic-crystal {
+  --font-heading: 'DM Sans', sans-serif;
+  --font-body:    'Inter', sans-serif;
+
+  --theme-bg-primary:   radial-gradient(
+    ellipse 160% 100% at 50% -20%,
+    #dbeeff  0%,
+    #eef4ff 30%,
+    #f4f8ff 60%,
+    #fafcff 100%
+  );
+  --theme-bg-secondary: rgba(219, 238, 255, 0.45);  // ← cool blue glass tint
+  --theme-bg-ternary:   rgba(255, 255, 255, 0.72);  // ← bright surface tint
+
+  --theme-text-primary:   #001033;
+  --theme-text-secondary: #1a3060;
+  --theme-text-tertiary:  #3a5880;
+  --theme-text-label:     #7090b0;
+
+  --theme-border-primary:   rgba(147, 197, 253, 0.6);
+  --theme-border-secondary: rgba(0, 16, 51, 0.08);
+
+  --theme-accent-primary:   #0ea5e9;
+  --theme-accent-secondary: #38bdf8;
+  --theme-accent-tertiary:  #7dd3fc;
+  --theme-accent-gradient:  linear-gradient(135deg, #0284c7 0%, #0ea5e9 50%, #38bdf8 100%);
+  --theme-accent-focus:     rgba(14, 165, 233, 0.16);
+  --theme-accent-hover:     #0284c7;
+
+  --theme-success: #059669;
+  --theme-warning: #d97706;
+  --theme-error:   #dc2626;
+  --theme-info:    #0ea5e9;
+  --theme-disabled:      rgba(219, 238, 255, 0.6);
+  --theme-disabled-text: #93c5fd;
+
+  // 4-sided inset rim — the "crystal edge" effect
+  --glass-bg:     linear-gradient(
+    145deg,
+    var(--theme-bg-ternary)    0%,
+    var(--theme-bg-secondary) 50%,
+    rgba(255, 255, 255, 0.58) 100%
+  );
+  --glass-blur:   56px;
+  --glass-border: rgba(255, 255, 255, 0.9);
+  --glass-shadow:
+    0 24px 48px -12px rgba(0, 16, 80, 0.14),
+    inset 0 2px 0 rgba(255, 255, 255, 0.96),
+    inset 0 -1px 0 rgba(147, 197, 253, 0.42),
+    inset 1px 0 0 rgba(255, 255, 255, 0.62),
+    inset -1px 0 0 rgba(255, 255, 255, 0.32);
+
+  --component-bg-hover:       rgba(14, 165, 233, 0.06);
+  --component-bg-active:      rgba(14, 165, 233, 0.12);
+  --component-border-focus:   #0ea5e9;
+  --component-surface-raised: rgba(255, 255, 255, 0.96);
+  --component-divider:        rgba(147, 197, 253, 0.4);
+
+  --scroll-thumb: rgba(14, 165, 233, 0.3);
+  --scroll-track: transparent;
+
+  @include apply-canonical-mapping;
+}
+
+// =============================================================================
+// THEME 4 — NEON VOID
+// Pure black void with violet-purple neon corona.
+// Cyberpunk ML dashboard / deep night developer mode.
+// =============================================================================
+.theme-neon-void {
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body:    'Inter', sans-serif;
+
+  --theme-bg-primary:   radial-gradient(
+    ellipse 130% 90% at 60% 0%,
+    #140028  0%,
+    #080015 42%,
+    #030008 72%,
+    #010005 100%
+  );
+  --theme-bg-secondary: rgba(153, 0, 255, 0.1);     // ← violet glass base
+  --theme-bg-ternary:   rgba(0, 180, 255, 0.08);    // ← cyan cool tint
+
+  --theme-text-primary:   #f5e8ff;
+  --theme-text-secondary: #c090ff;
+  --theme-text-tertiary:  #8855cc;
+  --theme-text-label:     #553388;
+
+  --theme-border-primary:   rgba(200, 100, 255, 0.24);
+  --theme-border-secondary: rgba(200, 100, 255, 0.08);
+
+  --theme-accent-primary:   #b44dff;
+  --theme-accent-secondary: #7722ee;
+  --theme-accent-tertiary:  #00ccff;
+  --theme-accent-gradient:  linear-gradient(135deg, #7722ee 0%, #b44dff 48%, #00ccff 100%);
+  --theme-accent-focus:     rgba(180, 77, 255, 0.22);
+  --theme-accent-hover:     #cc77ff;
+
+  --theme-success: #00ffcc;
+  --theme-warning: #ffcc00;
+  --theme-error:   #ff3355;
+  --theme-info:    #00ccff;
+  --theme-disabled:      rgba(255, 255, 255, 0.05);
+  --theme-disabled-text: rgba(255, 255, 255, 0.2);
+
+  --glass-bg:     linear-gradient(
+    145deg,
+    var(--theme-bg-secondary)   0%,
+    rgba(255, 255, 255, 0.018) 52%,
+    var(--theme-bg-ternary)   100%
+  );
+  --glass-blur:   44px;
+  --glass-border: rgba(200, 100, 255, 0.3);
+  --glass-shadow:
+    0 28px 56px -14px rgba(0, 0, 0, 0.85),
+    inset 0 1px 0 rgba(220, 140, 255, 0.32),
+    inset 0 -1px 0 rgba(0, 200, 255, 0.12),
+    0 0 60px rgba(153, 0, 255, 0.1);
+
+  --component-bg-hover:       rgba(153, 0, 255, 0.08);
+  --component-bg-active:      rgba(153, 0, 255, 0.16);
+  --component-border-focus:   #b44dff;
+  --component-surface-raised: rgba(8, 0, 18, 0.65);
+  --component-divider:        rgba(200, 100, 255, 0.1);
+
+  --scroll-thumb: rgba(180, 77, 255, 0.36);
+  --scroll-track: rgba(0, 0, 0, 0.3);
+
+  @include apply-canonical-mapping;
+}
+
+// =============================================================================
+// THEME 5 — MOLTEN EMBER
+// Deep charcoal-brown with orange-gold fire from below.
+// Finance dashboards / Q4 reporting / warm executive dark.
+// =============================================================================
+.theme-molten-ember {
+  --font-heading: 'Plus Jakarta Sans', sans-serif;
+  --font-body:    'Inter', sans-serif;
+
+  --theme-bg-primary:   radial-gradient(
+    ellipse 120% 80% at 45% 0%,
+    #5a1a00  0%,
+    #2d0d00 45%,
+    #180800 72%,
+    #0d0400 100%
+  );
+  --theme-bg-secondary: rgba(255, 100, 30, 0.12);   // ← ember orange glass
+  --theme-bg-ternary:   rgba(255, 200, 50, 0.07);   // ← gold flicker tint
+
+  --theme-text-primary:   #fff5ee;
+  --theme-text-secondary: #ffc080;
+  --theme-text-tertiary:  #c07040;
+  --theme-text-label:     #804020;
+
+  --theme-border-primary:   rgba(255, 140, 60, 0.28);
+  --theme-border-secondary: rgba(255, 140, 60, 0.1);
+
+  --theme-accent-primary:   #ff6420;
+  --theme-accent-secondary: #ffaa44;
+  --theme-accent-tertiary:  #ffdd88;
+  --theme-accent-gradient:  linear-gradient(135deg, #cc4400 0%, #ff6420 48%, #ffaa44 100%);
+  --theme-accent-focus:     rgba(255, 100, 32, 0.22);
+  --theme-accent-hover:     #ff8844;
+
+  --theme-success: #44dd88;
+  --theme-warning: #ffcc00;
+  --theme-error:   #ff3322;
+  --theme-info:    #44aaff;
+  --theme-disabled:      rgba(255, 255, 255, 0.06);
+  --theme-disabled-text: rgba(255, 255, 255, 0.22);
+
+  --glass-bg:     linear-gradient(
+    145deg,
+    var(--theme-bg-secondary)   0%,
+    rgba(255, 255, 255, 0.022) 50%,
+    var(--theme-bg-ternary)   100%
+  );
+  --glass-blur:   40px;
+  --glass-border: rgba(255, 140, 60, 0.34);
+  --glass-shadow:
+    0 28px 56px -14px rgba(0, 0, 0, 0.75),
+    inset 0 1px 0 rgba(255, 200, 140, 0.4),
+    inset 0 -1px 0 rgba(255, 200, 50, 0.2),
+    0 0 50px rgba(255, 100, 30, 0.07);
+
+  --component-bg-hover:       rgba(255, 100, 30, 0.08);
+  --component-bg-active:      rgba(255, 100, 30, 0.16);
+  --component-border-focus:   #ff6420;
+  --component-surface-raised: rgba(13, 4, 0, 0.55);
+  --component-divider:        rgba(255, 140, 60, 0.12);
+
+  --scroll-thumb: rgba(255, 100, 32, 0.38);
+  --scroll-track: rgba(0, 0, 0, 0.25);
+
+  @include apply-canonical-mapping;
+}
+
+// =============================================================================
+// HOW TO USE THE "FLOATING TEXT" EFFECT IN YOUR COMPONENTS
+// Apply these CSS helpers to any element inside a glass theme
+// =============================================================================
+
+/*
+  TEXT GLOW UTILITIES (add to your global CSS)
+  These make headings feel like they float above the glass surface.
+
+  Usage: <h1 class="text-float-primary">Dashboard</h1>
+*/
+
+.text-float-primary {
+  text-shadow:
+    0 0 20px rgba(var(--accent-rgb, 255,255,255), 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.text-float-soft {
+  text-shadow:
+    0 0 12px rgba(var(--accent-rgb, 255,255,255), 0.2);
+}
+
+.text-float-label {
+  /* For small labels/chips — subtle lift only, no glow */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  letter-spacing: 0.06em;
+}
+
+/*
+  GLASS CARD HELPER (ready to drop in HTML)
+  Works with any of the 5 themes above.
+
+  <div class="glass-panel">
+    <span class="glass-label">Section title</span>
+    <h2 class="glass-heading">Your Heading</h2>
+    <p class="glass-body">Supporting copy.</p>
+  </div>
+*/
+
+.glass-panel {
+  background:  var(--glass-bg-c);
+  backdrop-filter: blur(var(--glass-blur-c)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-c)) saturate(180%);
+  border:      1px solid var(--glass-border-c);
+  box-shadow:  var(--glass-shadow-c);
+  border-radius: var(--ui-border-radius-lg);
+  padding:     20px 24px;
+  position:    relative;
+}
+
+.glass-label {
+  display:        block;
+  font-size:      var(--font-size-xs);
+  font-weight:    var(--font-weight-semibold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color:          var(--text-tertiary);
+  margin-bottom:  4px;
+  text-shadow:    0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.glass-heading {
+  font-family:  var(--font-heading);
+  font-size:    var(--font-size-2xl);
+  font-weight:  var(--font-weight-semibold);
+  color:        var(--text-primary);
+  line-height:  var(--line-height-tight);
+  margin-bottom: 8px;
+  /* THE FLOATING EFFECT — accent glow + upward offset */
+  text-shadow:
+    0 0 24px rgba(var(--accent-rgb, 255,255,255), 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.glass-body {
+  font-size:   var(--font-size-sm);
+  color:       var(--text-secondary);
+  line-height: var(--line-height-relaxed);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+/*
+  CHIP / BADGE HELPER
+  Inherits glass properties, feels embedded in the surface.
+*/
+
+.glass-chip {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             4px;
+  font-size:       var(--font-size-xs);
+  font-weight:     var(--font-weight-medium);
+  padding:         4px 10px;
+  border-radius:   var(--ui-border-radius-pill);
+  background:      var(--accent-focus);
+  border:          1px solid var(--theme-border-primary);
+  color:           var(--accent-secondary);
+  letter-spacing:  0.04em;
+  backdrop-filter: blur(12px);
+  text-shadow:     0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+
 
 
 
