@@ -1,4 +1,3 @@
-// mainscreen-header.ts
 import { Component, EventEmitter, Input, Output, OnInit, OnDestroy, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -11,6 +10,7 @@ import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { PopoverModule, Popover } from 'primeng/popover';
+import { TieredMenuModule } from 'primeng/tieredmenu';
 
 // Services & Components
 import { ThemeService, ThemeSettings } from '../../core/services/theme.service';
@@ -19,7 +19,7 @@ import { NotificationService } from '../../core/services/notification.service';
 import { NotificationBellComponent } from '../../modules/organization/components/notification-bell-component/notification-bell-component';
 import { LayoutService } from '../layout.service';
 import { SIDEBAR_MENU } from '../mainscreensidebar/menu-items.constants';
-import { TieredMenuModule } from 'primeng/tieredmenu';
+
 // Interfaces for Type Safety
 export interface Theme {
   name: string;
@@ -39,7 +39,8 @@ export interface ThemeGroup {
   selector: 'app-mainscreen-header',
   standalone: true,
   imports: [
-    CommonModule, TieredMenuModule,
+    CommonModule, 
+    TieredMenuModule,
     FormsModule,
     RouterModule,
     AvatarModule,
@@ -66,7 +67,9 @@ export class MainscreenHeader implements OnInit, OnDestroy {
   private notificationService = inject(NotificationService);
   private layout = inject(LayoutService);
   private destroy$ = new Subject<void>();
+  
   textScale: number = 100;
+  
   // State
   activePopoverTab: 'settings' | 'notifications' = 'settings';
   currentUser: any = null;
@@ -76,43 +79,93 @@ export class MainscreenHeader implements OnInit, OnDestroy {
   isDarkMode = false;
   activeThemeId: string = 'theme-light';
   themeGroups: ThemeGroup[] = [];
+  mobileMenuItems: any;
+
   mockNotifications = [
     { id: 1, title: 'New Member Request', message: 'John Doe wants to join your organization', time: '2 min ago', read: false, type: 'info' },
     { id: 2, title: 'Task Completed', message: 'Project "Dashboard Redesign" has been completed', time: '1 hour ago', read: false, type: 'success' },
     { id: 3, title: 'System Update', message: 'Scheduled maintenance in 30 minutes', time: '3 hours ago', read: true, type: 'warning' },
     { id: 4, title: 'New Message', message: 'You have a new message from Sarah', time: '5 hours ago', read: true, type: 'info' },
   ];
-  mobileMenuItems: any
-  // ngOnInit() {
-  //   this.organizeThemes();
-  //   this.mobileMenuItems = SIDEBAR_MENU;
-  //   this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(u => this.currentUser = u);
-  //   this.notificationService.notifications$.pipe(takeUntil(this.destroy$)).subscribe(n => {
-  //     this.recentNotifications = n.filter(x => !x.isRead);
-  //     if (this.recentNotifications.length === 0) {
-  //       this.recentNotifications = this.mockNotifications.filter(n => !n.read);
-  //     }
-  //   });
 
-  //   // Subscribe to Theme Settings
-  //   this.themeService.settings$.pipe(takeUntil(this.destroy$)).subscribe((s: ThemeSettings) => {
-  //     this.isDarkMode = s.isDarkMode;
-  //     this.activeThemeId = s.isDarkMode ? 'theme-dark' : s.lightThemeClass || 'theme-light';
-  //     if (s.textScale) {
-  //       this.textScale = s.textScale;
-  //     }
-  //   });
-  // }
+  // Converted to a class property instead of an exported const
+  allThemes: Theme[] = [
+    {name: "theme-neon-eclipse",id: "theme-neon-eclipse",color: "#bf00ff",gradient: "linear-gradient(135deg, #bf00ff 0%, #3a0088 100%)",category: "theme-neon-eclipse",description: "Vibrant neon tones piercing through a deep, dark eclipse background."},
+    {name: "theme-naval-amber",id: "theme-naval-amber",color: "#ffbf00",gradient: "linear-gradient(135deg, #000080 0%, #ffbf00 100%)",category: "theme-naval-amber",description: "A commanding deep naval blue contrasted with warm, glowing amber highlights."},
+    {name: "theme-abyssal-coral",id: "theme-abyssal-coral",color: "#ff7f50",gradient: "linear-gradient(135deg, #0b1d28 0%, #ff7f50 100%)",category: "theme-abyssal-coral",description: "Deep oceanic abyssal tones paired with vibrant, living coral."},
+    {name: "theme-slate-rust",id: "theme-slate-rust",color: "#b7410e",gradient: "linear-gradient(135deg, #708090 0%, #b7410e 100%)",category: "theme-slate-rust",description: "Cool slate gray accented by earthy, oxidized rust tones."},
+    {name: "theme-indigo-tangerine",id: "theme-indigo-tangerine",color: "#f28500",gradient: "linear-gradient(135deg, #4b0082 0%, #f28500 100%)",category: "theme-indigo-tangerine",description: "A striking combination of deep indigo and bright, citrusy tangerine."},
+    {name: "theme-solar-space",id: "theme-solar-space",color: "#ffcc00",gradient: "linear-gradient(135deg, #000000 0%, #ffcc00 100%)",category: "theme-solar-space",description: "The absolute darkness of space illuminated by intense solar yellow."},
+    {name: "theme-cobalt-mango",id: "theme-cobalt-mango",color: "#ff8243",gradient: "linear-gradient(135deg, #0047ab 0%, #ff8243 100%)",category: "theme-cobalt-mango",description: "Rich cobalt blue balanced with sweet, tropical mango orange."},
+    {name: "theme-sapphire-flame",id: "theme-sapphire-flame",color: "#e25822",gradient: "linear-gradient(135deg, #0f52ba 0%, #e25822 100%)",category: "theme-sapphire-flame",description: "Cool sapphire depths ignited by a warm, fiery red-orange."},
+    {name: "theme-oceanic-peach",id: "theme-oceanic-peach",color: "#ffcba4",gradient: "linear-gradient(135deg, #006994 0%, #ffcba4 100%)",category: "theme-oceanic-peach",description: "Rolling oceanic blues softened by gentle peach pastels."},
+    {name: "theme-lapis-tiger",id: "theme-lapis-tiger",color: "#fd6a02",gradient: "linear-gradient(135deg, #26619c 0%, #fd6a02 100%)",category: "theme-lapis-tiger",description: "Bold lapis lazuli combined with fierce, striking tiger orange."},
+    {name: "theme-midnight-marigold",id: "theme-midnight-marigold",color: "#eaa221",gradient: "linear-gradient(135deg, #191970 0%, #eaa221 100%)",category: "theme-midnight-marigold",description: "The darkest midnight hour lit up by golden marigold hues."},
+    {name: "theme-twilight-burnt",id: "theme-twilight-burnt",color: "#cc5500",gradient: "linear-gradient(135deg, #301934 0%, #cc5500 100%)",category: "theme-twilight-burnt",description: "A fading twilight purple grounded by deep, burnt orange."},
+    {name: "theme-void-electric",id: "theme-void-electric",color: "#0ff0fc",gradient: "linear-gradient(135deg, #0f0f0f 0%, #0ff0fc 100%)",category: "theme-void-electric",description: "A deep, empty void pierced by bright electric cyan."},
+    {name: "theme-storm-apricot",id: "theme-storm-apricot",color: "#fbceb1",gradient: "linear-gradient(135deg, #4f666a 0%, #fbceb1 100%)",category: "theme-storm-apricot",description: "Turbulent storm-cloud grays offset by a soft, cheerful apricot."},
+    {name: "theme-marine-copper",id: "theme-marine-copper",color: "#b87333",gradient: "linear-gradient(135deg, #000080 0%, #b87333 100%)",category: "theme-marine-copper",description: "Nautical marine blues complemented by polished copper accents."},
+    {name: "theme-royal-pumpkin",id: "theme-royal-pumpkin",color: "#ff7518",gradient: "linear-gradient(135deg, #4169e1 0%, #ff7518 100%)",category: "theme-royal-pumpkin",description: "Classic royal blue paired with a festive, bright pumpkin orange."},
+    {name: "theme-eclipse-tangerine",id: "theme-eclipse-tangerine",color: "#f28500",gradient: "linear-gradient(135deg, #111111 0%, #f28500 100%)",category: "theme-eclipse-tangerine",description: "A stark shadow eclipse rimmed with a vibrant tangerine glow."},
+    {name: "theme-cyber-navy",id: "theme-cyber-navy",color: "#00ff00",gradient: "linear-gradient(135deg, #000080 0%, #00ff00 100%)",category: "theme-cyber-navy",description: "Traditional navy blue upgraded with futuristic cyber-green elements."},
+    {name: "theme-midnight-gold",id: "theme-midnight-gold",color: "#ffd700",gradient: "linear-gradient(135deg, #191970 0%, #ffd700 100%)",category: "theme-midnight-gold",description: "Luxurious metallic gold standing out against a midnight backdrop."},
+    {name: "theme-deep-supernova",id: "theme-deep-supernova",color: "#ff4040",gradient: "linear-gradient(135deg, #1a0b2e 0%, #ff4040 100%)",category: "theme-deep-supernova",description: "The deep purples of space exploding into a brilliant red supernova."},
+    {name: "theme-midnight-bronze",id: "theme-midnight-bronze",color: "#cd7f32",gradient: "linear-gradient(135deg, #191970 0%, #cd7f32 100%)",category: "theme-midnight-bronze",description: "Dark, moody blues accented by rich, antiqued bronze."},
+    {name: "theme-frosted-pearl",id: "theme-frosted-pearl",color: "#eae0c8",gradient: "linear-gradient(135deg, #ffffff 0%, #eae0c8 100%)",category: "theme-frosted-pearl",description: "A clean, bright theme featuring icy whites and soft pearl undertones."},
+    {name: "theme-crisp-structure",id: "theme-crisp-structure",color: "#2a2a2a",gradient: "linear-gradient(135deg, #f5f5f5 0%, #2a2a2a 100%)",category: "theme-crisp-structure",description: "High-contrast architectural whites and structured, sharp charcoal grays."},
+    {name: "theme-blueprint-light",id: "theme-blueprint-light",color: "#3b82f6",gradient: "linear-gradient(135deg, #ffffff 0%, #3b82f6 100%)",category: "theme-blueprint-light",description: "A light, analytical theme inspired by crisp architectural blueprints."},
+    {name: "theme-cloud-ivory",id: "theme-cloud-ivory",color: "#fffff0",gradient: "linear-gradient(135deg, #f0f8ff 0%, #fffff0 100%)",category: "theme-cloud-ivory",description: "Soft, floating cloud colors blended with warm, luxurious ivory."},
+    {name: "theme-royal-sapphire",id: "theme-royal-sapphire",color: "#0f52ba",gradient: "linear-gradient(135deg, #4169e1 0%, #0f52ba 100%)",category: "theme-royal-sapphire",description: "A majestic blend of royal blue and deep, brilliant sapphire."},
+    {name: "theme-ocean-mist",id: "theme-ocean-mist",color: "#e0ffff",gradient: "linear-gradient(135deg, #006994 0%, #e0ffff 100%)",category: "theme-ocean-mist",description: "Cool oceanic blues softened by a sheer, breathable mist."},
+    {name: "theme-executive-velvet",id: "theme-executive-velvet",color: "#800020",gradient: "linear-gradient(135deg, #1a1a1a 0%, #800020 100%)",category: "theme-executive-velvet",description: "Professional, dark styling with rich, tactile burgundy velvet accents."},
+    {name: "theme-obsidian-blue",id: "theme-obsidian-blue",color: "#00008b",gradient: "linear-gradient(135deg, #0b0b0b 0%, #00008b 100%)",category: "theme-obsidian-blue",description: "Sleek, black volcanic obsidian shining with deep blue undertones."},
+    {name: "theme-coastal-command",id: "theme-coastal-command",color: "#4682b4",gradient: "linear-gradient(135deg, #2f4f4f 0%, #4682b4 100%)",category: "theme-coastal-command",description: "Authoritative slate and steel blues inspired by coastal defense operations."},
+    {name: "theme-warm-meridian",id: "theme-warm-meridian",color: "#ff8c00",gradient: "linear-gradient(135deg, #d2691e 0%, #ff8c00 100%)",category: "theme-warm-meridian",description: "Sun-drenched, equatorial warmth in deep orange and terracotta."},
+    {name: "theme-arctic-glass",id: "theme-arctic-glass",color: "#b0e0e6",gradient: "linear-gradient(135deg, #ffffff 0%, #b0e0e6 100%)",category: "theme-arctic-glass",description: "Transparent, freezing whites combined with icy powder blues."},
+    {name: "theme-obsidian-contrast",id: "theme-obsidian-contrast",color: "#ffffff",gradient: "linear-gradient(135deg, #050505 0%, #ffffff 100%)",category: "theme-obsidian-contrast",description: "Maximum contrast featuring pitch-black obsidian and pure white."},
+    {name: "theme-deep-emerald",id: "theme-deep-emerald",color: "#004b23",gradient: "linear-gradient(135deg, #001f0e 0%, #004b23 100%)",category: "theme-deep-emerald",description: "Lush, dark green styling inspired by deep forest emeralds."},
+    {name: "theme-obsidian-jade",id: "theme-obsidian-jade",color: "#00a86b",gradient: "linear-gradient(135deg, #0b0b0b 0%, #00a86b 100%)",category: "theme-obsidian-jade",description: "Dark, glossy obsidian paired with striking, vibrant jade green."},
+    {name: "theme-daylight-orange",id: "theme-daylight-orange",color: "#ff8c00",gradient: "linear-gradient(135deg, #87ceeb 0%, #ff8c00 100%)",category: "theme-daylight-orange",description: "Bright daylight sky blues warming up to a sunny, daytime orange."},
+    {name: "theme-morning-tangerine",id: "theme-morning-tangerine",color: "#f28500",gradient: "linear-gradient(135deg, #ffdf00 0%, #f28500 100%)",category: "theme-morning-tangerine",description: "A fresh, awakening blend of early yellow light and tangerine."},
+    {name: "theme-crisp-apricot",id: "theme-crisp-apricot",color: "#fbceb1",gradient: "linear-gradient(135deg, #ffffff 0%, #fbceb1 100%)",category: "theme-crisp-apricot",description: "Clean whites with a very subtle, refreshing splash of apricot."},
+    {name: "theme-naval-dawn",id: "theme-naval-dawn",color: "#ffb6c1",gradient: "linear-gradient(135deg, #000080 0%, #ffb6c1 100%)",category: "theme-naval-dawn",description: "Deep naval night-sky giving way to the soft pinks of early dawn."},
+    {name: "theme-azure-sun",id: "theme-azure-sun",color: "#ffd700",gradient: "linear-gradient(135deg, #007fff 0%, #ffd700 100%)",category: "theme-azure-sun",description: "A brilliant, cloudless azure sky paired with a radiant yellow sun."},
+    {name: "theme-cloud-amber",id: "theme-cloud-amber",color: "#ffbf00",gradient: "linear-gradient(135deg, #f0f8ff 0%, #ffbf00 100%)",category: "theme-cloud-amber",description: "Soft, misty cloud grays touched by the warm glow of amber."},
+    {name: "theme-luminous-coral",id: "theme-luminous-coral",color: "#ff7f50",gradient: "linear-gradient(135deg, #ffdab9 0%, #ff7f50 100%)",category: "theme-luminous-coral",description: "A highly radiant, glowing coral over a warm, luminous background."},
+    {name: "theme-midnight-slate",id: "theme-midnight-slate",color: "#708090",gradient: "linear-gradient(135deg, #191970 0%, #708090 100%)",category: "theme-midnight-slate",description: "The deep hues of midnight blue resting against cool, rigid slate."},
+    {name: "theme-solar-flare",id: "theme-solar-flare",color: "#ff4500",gradient: "linear-gradient(135deg, #ff8c00 0%, #ff4500 100%)",category: "theme-solar-flare",description: "Intense, radiating heat captured through brilliant oranges and reds."},
+    {name: "theme-horizon",id: "theme-horizon",color: "#db7093",gradient: "linear-gradient(135deg, #87ceeb 0%, #db7093 100%)",category: "theme-horizon",description: "A vast gradient spanning from a light blue sky to a pale, dusky pink."},
+    {name: "theme-midnight-city",id: "theme-midnight-city",color: "#ff1493",gradient: "linear-gradient(135deg, #1a1a2e 0%, #ff1493 100%)",category: "theme-midnight-city",description: "Dark, urban nightscapes splashed with bright pink neon lights."},
+    {name: "theme-bio-frost",id: "theme-bio-frost",color: "#00fa9a",gradient: "linear-gradient(135deg, #e0ffff 0%, #00fa9a 100%)",category: "theme-bio-frost",description: "Organic, glowing bio-luminescent greens under a layer of icy frost."},
+    {name: "theme-royal",id: "theme-royal",color: "#4169e1",gradient: "linear-gradient(135deg, #000080 0%, #4169e1 100%)",category: "theme-royal",description: "A classic, elegant theme rooted entirely in majestic royal blues."},
+    {name: "theme-nebula",id: "theme-nebula",color: "#8a2be2",gradient: "linear-gradient(135deg, #4b0082 0%, #8a2be2 100%)",category: "theme-nebula",description: "Swirling, cosmic dust rendered in vibrant purples and deep indigos."},
+    {name: "theme-luxury",id: "theme-luxury",color: "#d4af37",gradient: "linear-gradient(135deg, #000000 0%, #d4af37 100%)",category: "theme-luxury",description: "High-end aesthetic combining absolute black with opulent gold."},
+    {name: "theme-futuristic",id: "theme-futuristic",color: "#00ffff",gradient: "linear-gradient(135deg, #0a0a0a 0%, #00ffff 100%)",category: "theme-futuristic",description: "A highly technical dark interface lit by sharp, glowing cyan."},
+    {name: "theme-sunset",id: "theme-sunset",color: "#ff4500",gradient: "linear-gradient(135deg, #ff8c00 0%, #ff4500 100%)",category: "theme-sunset",description: "The dramatic, cascading colors of a late evening sunset."},
+    {name: "theme-slate-ember",id: "theme-slate-ember",color: "#b88645",gradient: "linear-gradient(135deg, #2f4f4f 0%, #b88645 100%)",category: "theme-slate-ember",description: "Dark premium glass with deep blue base and rich bronze accents."},
+    {name: "theme-sage-cream",id: "theme-sage-cream",color: "#fffdd0",gradient: "linear-gradient(135deg, #9dc183 0%, #fffdd0 100%)",category: "theme-sage-cream",description: "An earthy, calming blend of herbal sage green and smooth cream."},
+    {name: "theme-midnight-royal",id: "theme-midnight-royal",color: "#4169e1",gradient: "linear-gradient(135deg, #191970 0%, #4169e1 100%)",category: "theme-midnight-royal",description: "A rich, monochromatic dive from midnight shadows into royal blue."},
+    {name: "theme-deep-space",id: "theme-deep-space",color: "#ffffff",gradient: "linear-gradient(135deg, #0d0d0d 0%, #2a2a35 100%)",category: "theme-deep-space",description: "An ultra-dark, immersive theme mirroring the vastness of space."},
+    {name: "theme-rose-glass",id: "theme-rose-glass",color: "#ff66cc",gradient: "linear-gradient(135deg, #ffb6c1 0%, #ff66cc 100%)",category: "theme-rose-glass",description: "Translucent, elegant interfaces tinted with a delicate rose hue."},
+    {name: "theme-amethyst-pearl",id: "theme-amethyst-pearl",color: "#9966cc",gradient: "linear-gradient(135deg, #fdfbf7 0%, #9966cc 100%)",category: "theme-amethyst-pearl",description: "Soft pearlescent whites intersecting with crystalline amethyst purple."},
+    {name: "theme-indigo-breeze",id: "theme-indigo-breeze",color: "#00bfff",gradient: "linear-gradient(135deg, #4b0082 0%, #00bfff 100%)",category: "theme-indigo-breeze",description: "Heavy, dark indigo lightened by a sweeping, breezy cyan."},
+    {name: "theme-teal-mist",id: "theme-teal-mist",color: "#008080",gradient: "linear-gradient(135deg, #e0f6f6 0%, #008080 100%)",category: "theme-teal-mist",description: "A foggy, atmospheric gradient featuring deep and light teal tones."},
+    {name: "theme-emerald-dawn",id: "theme-emerald-dawn",color: "#50c878",gradient: "linear-gradient(135deg, #013220 0%, #50c878 100%)",category: "theme-emerald-dawn",description: "The transition from dark, forest night to a vibrant emerald morning."},
+    {name: "theme-royal-sky",id: "theme-royal-sky",color: "#87ceeb",gradient: "linear-gradient(135deg, #4169e1 0%, #87ceeb 100%)",category: "theme-royal-sky",description: "A soaring gradient blending deep royal blue into light sky blue."},
+    {name: "theme-violet-whisper",id: "theme-violet-whisper",color: "#ee82ee",gradient: "linear-gradient(135deg, #f8f8ff 0%, #ee82ee 100%)",category: "theme-violet-whisper",description: "A barely-there, airy theme with a soft touch of violet."},
+    {name: "theme-aurora-glass",id: "theme-aurora-glass",color: "#00ff7f",gradient: "linear-gradient(135deg, #020024 0%, #00ff7f 100%)",category: "theme-aurora-glass",description: "Translucent layering capturing the green luminescence of the aurora."},
+    {name: "theme-obsidian-rose",id: "theme-obsidian-rose",color: "#ff007f",gradient: "linear-gradient(135deg, #111111 0%, #ff007f 100%)",category: "theme-obsidian-rose",description: "Sleek, dark obsidian pierced by a bold, romantic rose pink."},
+    {name: "theme-arctic-crystal",id: "theme-arctic-crystal",color: "#aeece1",gradient: "linear-gradient(135deg, #ffffff 0%, #aeece1 100%)",category: "theme-arctic-crystal",description: "A pristine, sharp theme inspired by crystalline arctic ice formations."}
+  ];
+
   ngOnInit() {
     this.organizeThemes();
     this.mobileMenuItems = SIDEBAR_MENU;
+    
     this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(u => this.currentUser = u);
 
     this.notificationService.notifications$.pipe(takeUntil(this.destroy$)).subscribe((n: any) => {
-      // 1. Safely extract the array just in case the service sends a raw object
       const safeNotifications = Array.isArray(n) ? n : (n?.data || n?.notifications || []);
-
-      // 2. Filter the safe array
       this.recentNotifications = safeNotifications.filter((x: any) => !x.isRead);
 
       if (this.recentNotifications.length === 0) {
@@ -120,7 +173,6 @@ export class MainscreenHeader implements OnInit, OnDestroy {
       }
     });
 
-    // Subscribe to Theme Settings
     this.themeService.settings$.pipe(takeUntil(this.destroy$)).subscribe((s: ThemeSettings) => {
       this.isDarkMode = s.isDarkMode;
       this.activeThemeId = s.isDarkMode ? 'theme-dark' : s.lightThemeClass || 'theme-light';
@@ -135,9 +187,8 @@ export class MainscreenHeader implements OnInit, OnDestroy {
     const value = parseInt(input.value, 10);
     this.themeService.setTextScale(value);
   }
-  // Grouping Logic
+
   organizeThemes() {
-    // Fix: Ensure all categories are properly defined
     const categoryMapping: Record<string, string> = {
       'core': 'Core',
       'professional': 'Professional',
@@ -149,10 +200,8 @@ export class MainscreenHeader implements OnInit, OnDestroy {
       'dark': 'Dark'
     };
 
-    // Extract unique categories from actual themes
     const categories = [...new Set(this.allThemes.map(t => t.category))];
 
-    // Create the grouped structure with proper category names
     this.themeGroups = categories.map(cat => ({
       category: categoryMapping[cat] || cat.charAt(0).toUpperCase() + cat.slice(1),
       themes: this.allThemes.filter(t => t.category === cat)
@@ -176,7 +225,6 @@ export class MainscreenHeader implements OnInit, OnDestroy {
     if (id === 'theme-dark') {
       this.themeService.setDarkMode(true);
     } else if (id === 'auto-theme') {
-      // Handle auto theme - detect system preference
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       this.themeService.setDarkMode(prefersDark);
       this.activeThemeId = prefersDark ? 'theme-dark' : 'theme-light';
@@ -187,7 +235,6 @@ export class MainscreenHeader implements OnInit, OnDestroy {
     }
   }
 
-  // Randomize from the full list
   randomTheme() {
     const availableThemes = this.allThemes.filter(theme => theme.id !== this.activeThemeId);
     if (availableThemes.length === 0) return;
@@ -213,7 +260,6 @@ export class MainscreenHeader implements OnInit, OnDestroy {
 
   loadNotifications() {
     // Refresh notifications if needed
-    // this.notificationService.refreshNotifications();
   }
 
   clearAllNotifications() {
@@ -252,1404 +298,6 @@ export class MainscreenHeader implements OnInit, OnDestroy {
     if (this.notificationPopover) this.notificationPopover.hide();
   }
   
-export interface Theme {
-  name: string;
-  id: string;
-  color: string;
-  gradient: string;
-  category: string;
-  description: string;
-}
-
-export const allThemes: any[] = [
-  {
-    name: "theme-neon-eclipse",
-    id: "theme-neon-eclipse",
-    color: "#bf00ff",
-    gradient: "linear-gradient(135deg, #bf00ff 0%, #3a0088 100%)",
-    category: "theme-neon-eclipse",
-    description: "Vibrant neon tones piercing through a deep, dark eclipse background."
-  },
-  {
-    name: "theme-naval-amber",
-    id: "theme-naval-amber",
-    color: "#ffbf00",
-    gradient: "linear-gradient(135deg, #000080 0%, #ffbf00 100%)",
-    category: "theme-naval-amber",
-    description: "A commanding deep naval blue contrasted with warm, glowing amber highlights."
-  },
-  {
-    name: "theme-abyssal-coral",
-    id: "theme-abyssal-coral",
-    color: "#ff7f50",
-    gradient: "linear-gradient(135deg, #0b1d28 0%, #ff7f50 100%)",
-    category: "theme-abyssal-coral",
-    description: "Deep oceanic abyssal tones paired with vibrant, living coral."
-  },
-  {
-    name: "theme-slate-rust",
-    id: "theme-slate-rust",
-    color: "#b7410e",
-    gradient: "linear-gradient(135deg, #708090 0%, #b7410e 100%)",
-    category: "theme-slate-rust",
-    description: "Cool slate gray accented by earthy, oxidized rust tones."
-  },
-  {
-    name: "theme-indigo-tangerine",
-    id: "theme-indigo-tangerine",
-    color: "#f28500",
-    gradient: "linear-gradient(135deg, #4b0082 0%, #f28500 100%)",
-    category: "theme-indigo-tangerine",
-    description: "A striking combination of deep indigo and bright, citrusy tangerine."
-  },
-  {
-    name: "theme-solar-space",
-    id: "theme-solar-space",
-    color: "#ffcc00",
-    gradient: "linear-gradient(135deg, #000000 0%, #ffcc00 100%)",
-    category: "theme-solar-space",
-    description: "The absolute darkness of space illuminated by intense solar yellow."
-  },
-  {
-    name: "theme-cobalt-mango",
-    id: "theme-cobalt-mango",
-    color: "#ff8243",
-    gradient: "linear-gradient(135deg, #0047ab 0%, #ff8243 100%)",
-    category: "theme-cobalt-mango",
-    description: "Rich cobalt blue balanced with sweet, tropical mango orange."
-  },
-  {
-    name: "theme-sapphire-flame",
-    id: "theme-sapphire-flame",
-    color: "#e25822",
-    gradient: "linear-gradient(135deg, #0f52ba 0%, #e25822 100%)",
-    category: "theme-sapphire-flame",
-    description: "Cool sapphire depths ignited by a warm, fiery red-orange."
-  },
-  {
-    name: "theme-oceanic-peach",
-    id: "theme-oceanic-peach",
-    color: "#ffcba4",
-    gradient: "linear-gradient(135deg, #006994 0%, #ffcba4 100%)",
-    category: "theme-oceanic-peach",
-    description: "Rolling oceanic blues softened by gentle peach pastels."
-  },
-  {
-    name: "theme-lapis-tiger",
-    id: "theme-lapis-tiger",
-    color: "#fd6a02",
-    gradient: "linear-gradient(135deg, #26619c 0%, #fd6a02 100%)",
-    category: "theme-lapis-tiger",
-    description: "Bold lapis lazuli combined with fierce, striking tiger orange."
-  },
-  {
-    name: "theme-midnight-marigold",
-    id: "theme-midnight-marigold",
-    color: "#eaa221",
-    gradient: "linear-gradient(135deg, #191970 0%, #eaa221 100%)",
-    category: "theme-midnight-marigold",
-    description: "The darkest midnight hour lit up by golden marigold hues."
-  },
-  {
-    name: "theme-twilight-burnt",
-    id: "theme-twilight-burnt",
-    color: "#cc5500",
-    gradient: "linear-gradient(135deg, #301934 0%, #cc5500 100%)",
-    category: "theme-twilight-burnt",
-    description: "A fading twilight purple grounded by deep, burnt orange."
-  },
-  {
-    name: "theme-void-electric",
-    id: "theme-void-electric",
-    color: "#0ff0fc",
-    gradient: "linear-gradient(135deg, #0f0f0f 0%, #0ff0fc 100%)",
-    category: "theme-void-electric",
-    description: "A deep, empty void pierced by bright electric cyan."
-  },
-  {
-    name: "theme-storm-apricot",
-    id: "theme-storm-apricot",
-    color: "#fbceb1",
-    gradient: "linear-gradient(135deg, #4f666a 0%, #fbceb1 100%)",
-    category: "theme-storm-apricot",
-    description: "Turbulent storm-cloud grays offset by a soft, cheerful apricot."
-  },
-  {
-    name: "theme-marine-copper",
-    id: "theme-marine-copper",
-    color: "#b87333",
-    gradient: "linear-gradient(135deg, #000080 0%, #b87333 100%)",
-    category: "theme-marine-copper",
-    description: "Nautical marine blues complemented by polished copper accents."
-  },
-  {
-    name: "theme-royal-pumpkin",
-    id: "theme-royal-pumpkin",
-    color: "#ff7518",
-    gradient: "linear-gradient(135deg, #4169e1 0%, #ff7518 100%)",
-    category: "theme-royal-pumpkin",
-    description: "Classic royal blue paired with a festive, bright pumpkin orange."
-  },
-  {
-    name: "theme-eclipse-tangerine",
-    id: "theme-eclipse-tangerine",
-    color: "#f28500",
-    gradient: "linear-gradient(135deg, #111111 0%, #f28500 100%)",
-    category: "theme-eclipse-tangerine",
-    description: "A stark shadow eclipse rimmed with a vibrant tangerine glow."
-  },
-  {
-    name: "theme-cyber-navy",
-    id: "theme-cyber-navy",
-    color: "#00ff00",
-    gradient: "linear-gradient(135deg, #000080 0%, #00ff00 100%)",
-    category: "theme-cyber-navy",
-    description: "Traditional navy blue upgraded with futuristic cyber-green elements."
-  },
-  {
-    name: "theme-midnight-gold",
-    id: "theme-midnight-gold",
-    color: "#ffd700",
-    gradient: "linear-gradient(135deg, #191970 0%, #ffd700 100%)",
-    category: "theme-midnight-gold",
-    description: "Luxurious metallic gold standing out against a midnight backdrop."
-  },
-  {
-    name: "theme-deep-supernova",
-    id: "theme-deep-supernova",
-    color: "#ff4040",
-    gradient: "linear-gradient(135deg, #1a0b2e 0%, #ff4040 100%)",
-    category: "theme-deep-supernova",
-    description: "The deep purples of space exploding into a brilliant red supernova."
-  },
-  {
-    name: "theme-midnight-bronze",
-    id: "theme-midnight-bronze",
-    color: "#cd7f32",
-    gradient: "linear-gradient(135deg, #191970 0%, #cd7f32 100%)",
-    category: "theme-midnight-bronze",
-    description: "Dark, moody blues accented by rich, antiqued bronze."
-  },
-  {
-    name: "theme-frosted-pearl",
-    id: "theme-frosted-pearl",
-    color: "#eae0c8",
-    gradient: "linear-gradient(135deg, #ffffff 0%, #eae0c8 100%)",
-    category: "theme-frosted-pearl",
-    description: "A clean, bright theme featuring icy whites and soft pearl undertones."
-  },
-  {
-    name: "theme-crisp-structure",
-    id: "theme-crisp-structure",
-    color: "#2a2a2a",
-    gradient: "linear-gradient(135deg, #f5f5f5 0%, #2a2a2a 100%)",
-    category: "theme-crisp-structure",
-    description: "High-contrast architectural whites and structured, sharp charcoal grays."
-  },
-  {
-    name: "theme-blueprint-light",
-    id: "theme-blueprint-light",
-    color: "#3b82f6",
-    gradient: "linear-gradient(135deg, #ffffff 0%, #3b82f6 100%)",
-    category: "theme-blueprint-light",
-    description: "A light, analytical theme inspired by crisp architectural blueprints."
-  },
-  {
-    name: "theme-cloud-ivory",
-    id: "theme-cloud-ivory",
-    color: "#fffff0",
-    gradient: "linear-gradient(135deg, #f0f8ff 0%, #fffff0 100%)",
-    category: "theme-cloud-ivory",
-    description: "Soft, floating cloud colors blended with warm, luxurious ivory."
-  },
-  {
-    name: "theme-royal-sapphire",
-    id: "theme-royal-sapphire",
-    color: "#0f52ba",
-    gradient: "linear-gradient(135deg, #4169e1 0%, #0f52ba 100%)",
-    category: "theme-royal-sapphire",
-    description: "A majestic blend of royal blue and deep, brilliant sapphire."
-  },
-  {
-    name: "theme-ocean-mist",
-    id: "theme-ocean-mist",
-    color: "#e0ffff",
-    gradient: "linear-gradient(135deg, #006994 0%, #e0ffff 100%)",
-    category: "theme-ocean-mist",
-    description: "Cool oceanic blues softened by a sheer, breathable mist."
-  },
-  {
-    name: "theme-executive-velvet",
-    id: "theme-executive-velvet",
-    color: "#800020",
-    gradient: "linear-gradient(135deg, #1a1a1a 0%, #800020 100%)",
-    category: "theme-executive-velvet",
-    description: "Professional, dark styling with rich, tactile burgundy velvet accents."
-  },
-  {
-    name: "theme-obsidian-blue",
-    id: "theme-obsidian-blue",
-    color: "#00008b",
-    gradient: "linear-gradient(135deg, #0b0b0b 0%, #00008b 100%)",
-    category: "theme-obsidian-blue",
-    description: "Sleek, black volcanic obsidian shining with deep blue undertones."
-  },
-  {
-    name: "theme-coastal-command",
-    id: "theme-coastal-command",
-    color: "#4682b4",
-    gradient: "linear-gradient(135deg, #2f4f4f 0%, #4682b4 100%)",
-    category: "theme-coastal-command",
-    description: "Authoritative slate and steel blues inspired by coastal defense operations."
-  },
-  {
-    name: "theme-warm-meridian",
-    id: "theme-warm-meridian",
-    color: "#ff8c00",
-    gradient: "linear-gradient(135deg, #d2691e 0%, #ff8c00 100%)",
-    category: "theme-warm-meridian",
-    description: "Sun-drenched, equatorial warmth in deep orange and terracotta."
-  },
-  {
-    name: "theme-arctic-glass",
-    id: "theme-arctic-glass",
-    color: "#b0e0e6",
-    gradient: "linear-gradient(135deg, #ffffff 0%, #b0e0e6 100%)",
-    category: "theme-arctic-glass",
-    description: "Transparent, freezing whites combined with icy powder blues."
-  },
-  {
-    name: "theme-obsidian-contrast",
-    id: "theme-obsidian-contrast",
-    color: "#ffffff",
-    gradient: "linear-gradient(135deg, #050505 0%, #ffffff 100%)",
-    category: "theme-obsidian-contrast",
-    description: "Maximum contrast featuring pitch-black obsidian and pure white."
-  },
-  {
-    name: "theme-deep-emerald",
-    id: "theme-deep-emerald",
-    color: "#004b23",
-    gradient: "linear-gradient(135deg, #001f0e 0%, #004b23 100%)",
-    category: "theme-deep-emerald",
-    description: "Lush, dark green styling inspired by deep forest emeralds."
-  },
-  {
-    name: "theme-obsidian-jade",
-    id: "theme-obsidian-jade",
-    color: "#00a86b",
-    gradient: "linear-gradient(135deg, #0b0b0b 0%, #00a86b 100%)",
-    category: "theme-obsidian-jade",
-    description: "Dark, glossy obsidian paired with striking, vibrant jade green."
-  },
-  {
-    name: "theme-daylight-orange",
-    id: "theme-daylight-orange",
-    color: "#ff8c00",
-    gradient: "linear-gradient(135deg, #87ceeb 0%, #ff8c00 100%)",
-    category: "theme-daylight-orange",
-    description: "Bright daylight sky blues warming up to a sunny, daytime orange."
-  },
-  {
-    name: "theme-morning-tangerine",
-    id: "theme-morning-tangerine",
-    color: "#f28500",
-    gradient: "linear-gradient(135deg, #ffdf00 0%, #f28500 100%)",
-    category: "theme-morning-tangerine",
-    description: "A fresh, awakening blend of early yellow light and tangerine."
-  },
-  {
-    name: "theme-crisp-apricot",
-    id: "theme-crisp-apricot",
-    color: "#fbceb1",
-    gradient: "linear-gradient(135deg, #ffffff 0%, #fbceb1 100%)",
-    category: "theme-crisp-apricot",
-    description: "Clean whites with a very subtle, refreshing splash of apricot."
-  },
-  {
-    name: "theme-naval-dawn",
-    id: "theme-naval-dawn",
-    color: "#ffb6c1",
-    gradient: "linear-gradient(135deg, #000080 0%, #ffb6c1 100%)",
-    category: "theme-naval-dawn",
-    description: "Deep naval night-sky giving way to the soft pinks of early dawn."
-  },
-  {
-    name: "theme-azure-sun",
-    id: "theme-azure-sun",
-    color: "#ffd700",
-    gradient: "linear-gradient(135deg, #007fff 0%, #ffd700 100%)",
-    category: "theme-azure-sun",
-    description: "A brilliant, cloudless azure sky paired with a radiant yellow sun."
-  },
-  {
-    name: "theme-cloud-amber",
-    id: "theme-cloud-amber",
-    color: "#ffbf00",
-    gradient: "linear-gradient(135deg, #f0f8ff 0%, #ffbf00 100%)",
-    category: "theme-cloud-amber",
-    description: "Soft, misty cloud grays touched by the warm glow of amber."
-  },
-  {
-    name: "theme-luminous-coral",
-    id: "theme-luminous-coral",
-    color: "#ff7f50",
-    gradient: "linear-gradient(135deg, #ffdab9 0%, #ff7f50 100%)",
-    category: "theme-luminous-coral",
-    description: "A highly radiant, glowing coral over a warm, luminous background."
-  },
-  {
-    name: "theme-midnight-slate",
-    id: "theme-midnight-slate",
-    color: "#708090",
-    gradient: "linear-gradient(135deg, #191970 0%, #708090 100%)",
-    category: "theme-midnight-slate",
-    description: "The deep hues of midnight blue resting against cool, rigid slate."
-  },
-  {
-    name: "theme-solar-flare",
-    id: "theme-solar-flare",
-    color: "#ff4500",
-    gradient: "linear-gradient(135deg, #ff8c00 0%, #ff4500 100%)",
-    category: "theme-solar-flare",
-    description: "Intense, radiating heat captured through brilliant oranges and reds."
-  },
-  {
-    name: "theme-horizon",
-    id: "theme-horizon",
-    color: "#db7093",
-    gradient: "linear-gradient(135deg, #87ceeb 0%, #db7093 100%)",
-    category: "theme-horizon",
-    description: "A vast gradient spanning from a light blue sky to a pale, dusky pink."
-  },
-  {
-    name: "theme-midnight-city",
-    id: "theme-midnight-city",
-    color: "#ff1493",
-    gradient: "linear-gradient(135deg, #1a1a2e 0%, #ff1493 100%)",
-    category: "theme-midnight-city",
-    description: "Dark, urban nightscapes splashed with bright pink neon lights."
-  },
-  {
-    name: "theme-bio-frost",
-    id: "theme-bio-frost",
-    color: "#00fa9a",
-    gradient: "linear-gradient(135deg, #e0ffff 0%, #00fa9a 100%)",
-    category: "theme-bio-frost",
-    description: "Organic, glowing bio-luminescent greens under a layer of icy frost."
-  },
-  {
-    name: "theme-royal",
-    id: "theme-royal",
-    color: "#4169e1",
-    gradient: "linear-gradient(135deg, #000080 0%, #4169e1 100%)",
-    category: "theme-royal",
-    description: "A classic, elegant theme rooted entirely in majestic royal blues."
-  },
-  {
-    name: "theme-nebula",
-    id: "theme-nebula",
-    color: "#8a2be2",
-    gradient: "linear-gradient(135deg, #4b0082 0%, #8a2be2 100%)",
-    category: "theme-nebula",
-    description: "Swirling, cosmic dust rendered in vibrant purples and deep indigos."
-  },
-  {
-    name: "theme-luxury",
-    id: "theme-luxury",
-    color: "#d4af37",
-    gradient: "linear-gradient(135deg, #000000 0%, #d4af37 100%)",
-    category: "theme-luxury",
-    description: "High-end aesthetic combining absolute black with opulent gold."
-  },
-  {
-    name: "theme-futuristic",
-    id: "theme-futuristic",
-    color: "#00ffff",
-    gradient: "linear-gradient(135deg, #0a0a0a 0%, #00ffff 100%)",
-    category: "theme-futuristic",
-    description: "A highly technical dark interface lit by sharp, glowing cyan."
-  },
-  {
-    name: "theme-sunset",
-    id: "theme-sunset",
-    color: "#ff4500",
-    gradient: "linear-gradient(135deg, #ff8c00 0%, #ff4500 100%)",
-    category: "theme-sunset",
-    description: "The dramatic, cascading colors of a late evening sunset."
-  },
-  {
-    name: "theme-slate-ember",
-    id: "theme-slate-ember",
-    color: "#b88645",
-    gradient: "linear-gradient(135deg, #2f4f4f 0%, #b88645 100%)",
-    category: "theme-slate-ember",
-    description: "Dark premium glass with deep blue base and rich bronze accents."
-  },
-  {
-    name: "theme-sage-cream",
-    id: "theme-sage-cream",
-    color: "#fffdd0",
-    gradient: "linear-gradient(135deg, #9dc183 0%, #fffdd0 100%)",
-    category: "theme-sage-cream",
-    description: "An earthy, calming blend of herbal sage green and smooth cream."
-  },
-  {
-    name: "theme-midnight-royal",
-    id: "theme-midnight-royal",
-    color: "#4169e1",
-    gradient: "linear-gradient(135deg, #191970 0%, #4169e1 100%)",
-    category: "theme-midnight-royal",
-    description: "A rich, monochromatic dive from midnight shadows into royal blue."
-  },
-  {
-    name: "theme-deep-space",
-    id: "theme-deep-space",
-    color: "#ffffff",
-    gradient: "linear-gradient(135deg, #0d0d0d 0%, #2a2a35 100%)",
-    category: "theme-deep-space",
-    description: "An ultra-dark, immersive theme mirroring the vastness of space."
-  },
-  {
-    name: "theme-rose-glass",
-    id: "theme-rose-glass",
-    color: "#ff66cc",
-    gradient: "linear-gradient(135deg, #ffb6c1 0%, #ff66cc 100%)",
-    category: "theme-rose-glass",
-    description: "Translucent, elegant interfaces tinted with a delicate rose hue."
-  },
-  {
-    name: "theme-amethyst-pearl",
-    id: "theme-amethyst-pearl",
-    color: "#9966cc",
-    gradient: "linear-gradient(135deg, #fdfbf7 0%, #9966cc 100%)",
-    category: "theme-amethyst-pearl",
-    description: "Soft pearlescent whites intersecting with crystalline amethyst purple."
-  },
-  {
-    name: "theme-indigo-breeze",
-    id: "theme-indigo-breeze",
-    color: "#00bfff",
-    gradient: "linear-gradient(135deg, #4b0082 0%, #00bfff 100%)",
-    category: "theme-indigo-breeze",
-    description: "Heavy, dark indigo lightened by a sweeping, breezy cyan."
-  },
-  {
-    name: "theme-teal-mist",
-    id: "theme-teal-mist",
-    color: "#008080",
-    gradient: "linear-gradient(135deg, #e0f6f6 0%, #008080 100%)",
-    category: "theme-teal-mist",
-    description: "A foggy, atmospheric gradient featuring deep and light teal tones."
-  },
-  {
-    name: "theme-emerald-dawn",
-    id: "theme-emerald-dawn",
-    color: "#50c878",
-    gradient: "linear-gradient(135deg, #013220 0%, #50c878 100%)",
-    category: "theme-emerald-dawn",
-    description: "The transition from dark, forest night to a vibrant emerald morning."
-  },
-  {
-    name: "theme-royal-sky",
-    id: "theme-royal-sky",
-    color: "#87ceeb",
-    gradient: "linear-gradient(135deg, #4169e1 0%, #87ceeb 100%)",
-    category: "theme-royal-sky",
-    description: "A soaring gradient blending deep royal blue into light sky blue."
-  },
-  {
-    name: "theme-violet-whisper",
-    id: "theme-violet-whisper",
-    color: "#ee82ee",
-    gradient: "linear-gradient(135deg, #f8f8ff 0%, #ee82ee 100%)",
-    category: "theme-violet-whisper",
-    description: "A barely-there, airy theme with a soft touch of violet."
-  },
-  {
-    name: "theme-aurora-glass",
-    id: "theme-aurora-glass",
-    color: "#00ff7f",
-    gradient: "linear-gradient(135deg, #020024 0%, #00ff7f 100%)",
-    category: "theme-aurora-glass",
-    description: "Translucent layering capturing the green luminescence of the aurora."
-  },
-  {
-    name: "theme-obsidian-rose",
-    id: "theme-obsidian-rose",
-    color: "#ff007f",
-    gradient: "linear-gradient(135deg, #111111 0%, #ff007f 100%)",
-    category: "theme-obsidian-rose",
-    description: "Sleek, dark obsidian pierced by a bold, romantic rose pink."
-  },
-  {
-    name: "theme-arctic-crystal",
-    id: "theme-arctic-crystal",
-    color: "#aeece1",
-    gradient: "linear-gradient(135deg, #ffffff 0%, #aeece1 100%)",
-    category: "theme-arctic-crystal",
-    description: "A pristine, sharp theme inspired by crystalline arctic ice formations."
-  }
-];
-  // allThemes: Theme[] = [
-  //   {
-  //     name: "theme-slate-ember",
-  //     id: "theme-slate-ember",
-  //     color: "#b88645",
-  //     gradient: "linear-gradient(135deg, #b88645 0%, #d4a363 100%)",
-  //     category: "theme-slate-ember",
-  //     description: "Dark premium glass with deep blue base and rich bronze accents."
-  //   },
-  //   {
-  //     name: "theme-sage-cream",
-  //     id: "theme-sage-cream",
-  //     color: "#b88645",
-  //     gradient: "linear-gradient(135deg, #b88645 0%, #d4a363 100%)",
-  //     category: "theme-sage-cream",
-  //     description: "Dark premium glass with deep blue base and rich bronze accents."
-  //   },
-  //   {
-  //     name: "Midnight Bronze",
-  //     id: "theme-midnight-bronze",
-  //     color: "#b88645",
-  //     gradient: "linear-gradient(135deg, #b88645 0%, #d4a363 100%)",
-  //     category: "premium dark",
-  //     description: "Dark premium glass with deep blue base and rich bronze accents."
-  //   },
-  //   {
-  //     name: "Rose Glass",
-  //     id: "theme-rose-glass",
-  //     color: "#f43f5e",
-  //     gradient: "linear-gradient(135deg, #f43f5e 0%, #fb7185 100%)",
-  //     category: "glass light",
-  //     description: "Vibrant red-pink accents on a pristine white glass background."
-  //   },
-  //   {
-  //     name: "Fuchsia Glow",
-  //     id: "theme-fuchsia-glow",
-  //     color: "#d946ef",
-  //     gradient: "linear-gradient(135deg, #d946ef 0%, #e879f9 100%)",
-  //     category: "glass light",
-  //     description: "Bright pink-purple gradients illuminating a soft off-white canvas."
-  //   },
-  //   {
-  //     name: "Amethyst Pearl",
-  //     id: "theme-amethyst-pearl",
-  //     color: "#a855f7",
-  //     gradient: "linear-gradient(135deg, #a855f7 0%, #c084fc 100%)",
-  //     category: "premium light",
-  //     description: "Rich purple jewel tones paired with elegant dark blue typography."
-  //   },
-  //   {
-  //     name: "Violet Whisper",
-  //     id: "theme-violet-whisper",
-  //     color: "#8b5cf6",
-  //     gradient: "linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)",
-  //     category: "glass light",
-  //     description: "Deep violet accents floating over highly transparent white glass."
-  //   },
-  //   {
-  //     name: "Indigo Breeze",
-  //     id: "theme-indigo-breeze",
-  //     color: "#6366f1",
-  //     gradient: "linear-gradient(135deg, #6366f1 0%, #818cf8 100%)",
-  //     category: "glass light",
-  //     description: "Sophisticated indigo-blue accents providing a calm, professional interface."
-  //   },
-  //   {
-  //     name: "Royal Sky",
-  //     id: "theme-royal-sky",
-  //     color: "#3b82f6",
-  //     gradient: "linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)",
-  //     category: "glass light",
-  //     description: "Classic royal blue highlights bringing clarity and trust to light mode."
-  //   },
-  //   {
-  //     name: "Cerulean Day",
-  //     id: "theme-cerulean-day",
-  //     color: "#0ea5e9",
-  //     gradient: "linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)",
-  //     category: "glass light",
-  //     description: "Bright cerulean light-blue elements over clear structural lines."
-  //   },
-  //   {
-  //     name: "Cyan Crystal",
-  //     id: "theme-cyan-crystal",
-  //     color: "#06b6d4",
-  //     gradient: "linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%)",
-  //     category: "glass light",
-  //     description: "Vibrant and energetic cyan tones glowing through frosted panels."
-  //   },
-  //   {
-  //     name: "Teal Mist",
-  //     id: "theme-teal-mist",
-  //     color: "#14b8a6",
-  //     gradient: "linear-gradient(135deg, #14b8a6 0%, #2dd4bf 100%)",
-  //     category: "premium light",
-  //     description: "Sophisticated teal-green gradients offering a mature, high-end feel."
-  //   },
-  //   {
-  //     name: "Emerald Dawn",
-  //     id: "theme-emerald-dawn",
-  //     color: "#10b981",
-  //     gradient: "linear-gradient(135deg, #10b981 0%, #34d399 100%)",
-  //     category: "glass light",
-  //     description: "Fresh, bright emerald mint greens contrasting sharply with dark text."
-  //   },
-  //   {
-  //     name: "Fresh Green",
-  //     id: "theme-fresh-green",
-  //     color: "#22c55e",
-  //     gradient: "linear-gradient(135deg, #22c55e 0%, #4ade80 100%)",
-  //     category: "glass light",
-  //     description: "Pure, vibrant green accents evoking growth and natural light."
-  //   },
-  //   {
-  //     name: "Lime Light",
-  //     id: "theme-lime-light",
-  //     color: "#84cc16",
-  //     gradient: "linear-gradient(135deg, #84cc16 0%, #a3e635 100%)",
-  //     category: "glass light",
-  //     description: "Electric yellow-green bringing high energy to a clean white background."
-  //   },
-  //   {
-  //     name: "Olive Sun",
-  //     id: "theme-olive-sun",
-  //     color: "#65a30d",
-  //     gradient: "linear-gradient(135deg, #65a30d 0%, #84cc16 100%)",
-  //     category: "premium light",
-  //     description: "Earthy dark yellow-green paired with elegant serif typography."
-  //   },
-  //   {
-  //     name: "Lemon Yellow",
-  //     id: "theme-lemon-yellow",
-  //     color: "#eab308",
-  //     gradient: "linear-gradient(135deg, #eab308 0%, #facc15 100%)",
-  //     category: "glass light",
-  //     description: "Sunny, pure yellow highlights contrasting deeply with navy blue text."
-  //   },
-  //   {
-  //     name: "Mustard Clear",
-  //     id: "theme-mustard-clear",
-  //     color: "#ca8a04",
-  //     gradient: "linear-gradient(135deg, #ca8a04 0%, #eab308 100%)",
-  //     category: "glass light",
-  //     description: "Deep mustard yellow providing a grounded, professional highlight color."
-  //   },
-  //   {
-  //     name: "Amber Light",
-  //     id: "theme-amber-light",
-  //     color: "#f59e0b",
-  //     gradient: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
-  //     category: "glass light",
-  //     description: "Warm amber-orange gradients softening a highly structured layout."
-  //   },
-  //   {
-  //     name: "Rust Ivory",
-  //     id: "theme-rust-ivory",
-  //     color: "#b45309",
-  //     gradient: "linear-gradient(135deg, #b45309 0%, #d97706 100%)",
-  //     category: "premium light",
-  //     description: "Classic rust orange details bringing a tactile warmth to the UI."
-  //   },
-  //   {
-  //     name: "Sunset Glass",
-  //     id: "theme-sunset-glass",
-  //     color: "#ea580c",
-  //     gradient: "linear-gradient(135deg, #ea580c 0%, #f97316 100%)",
-  //     category: "glass light",
-  //     description: "Intense orange-red accents cutting perfectly through clear glass."
-  //   },
-  //   {
-  //     name: "Crimson Frost",
-  //     id: "theme-crimson-frost",
-  //     color: "#dc2626",
-  //     gradient: "linear-gradient(135deg, #dc2626 0%, #ef4444 100%)",
-  //     category: "glass light",
-  //     description: "A commanding pure red accent color over frosted light panels."
-  //   },
-  //   {
-  //     name: "Ruby Pearl",
-  //     id: "theme-ruby-pearl",
-  //     color: "#be123c",
-  //     gradient: "linear-gradient(135deg, #be123c 0%, #e11d48 100%)",
-  //     category: "premium light",
-  //     description: "Luxurious deep ruby red creating an executive, high-impact aesthetic."
-  //   },
-  //   {
-  //     name: "Magenta Cloud",
-  //     id: "theme-magenta-cloud",
-  //     color: "#c026d3",
-  //     gradient: "linear-gradient(135deg, #c026d3 0%, #d946ef 100%)",
-  //     category: "glass light",
-  //     description: "Deep red-purple magenta highlights bursting from an airy white interface."
-  //   },
-  //   {
-  //     name: "Lavender Light",
-  //     id: "theme-lavender-light",
-  //     color: "#a78bfa",
-  //     gradient: "linear-gradient(135deg, #a78bfa 0%, #c4b5fd 100%)",
-  //     category: "glass light",
-  //     description: "Very soft, calming purple hues wrapping around solid dark blue content."
-  //   },
-  //   {
-  //     name: "Sky Breeze",
-  //     id: "theme-sky-breeze",
-  //     color: "#38bdf8",
-  //     gradient: "linear-gradient(135deg, #38bdf8 0%, #7dd3fc 100%)",
-  //     category: "glass light",
-  //     description: "Cloudless sky-blue interactive elements providing ultimate clarity."
-  //   },
-  //   {
-  //     name: "Seafoam Ice",
-  //     id: "theme-seafoam-ice",
-  //     color: "#2dd4bf",
-  //     gradient: "linear-gradient(135deg, #2dd4bf 0%, #5eead4 100%)",
-  //     category: "glass light",
-  //     description: "Gentle seafoam teal adding a refreshing, icy touch to buttons and borders."
-  //   },
-  //   {
-  //     name: "Mint Glacier",
-  //     id: "theme-mint-glacier",
-  //     color: "#34d399",
-  //     gradient: "linear-gradient(135deg, #34d399 0%, #6ee7b7 100%)",
-  //     category: "glass light",
-  //     description: "Soft, icy mint green providing a subtle but effective pop of color."
-  //   },
-  //   {
-  //     name: "Lemon Drop",
-  //     id: "theme-lemon-drop",
-  //     color: "#facc15",
-  //     gradient: "linear-gradient(135deg, #facc15 0%, #fde047 100%)",
-  //     category: "glass light",
-  //     description: "Sweet, bright yellow tones layered beautifully over white glass."
-  //   },
-  //   {
-  //     name: "Peach Air",
-  //     id: "theme-peach-air",
-  //     color: "#fb923c",
-  //     gradient: "linear-gradient(135deg, #fb923c 0%, #fdba74 100%)",
-  //     category: "glass light",
-  //     description: "Airy, soft orange accents creating an inviting and warm experience."
-  //   },
-  //   {
-  //     name: "Salmon Pink",
-  //     id: "theme-salmon-pink",
-  //     color: "#fb7185",
-  //     gradient: "linear-gradient(135deg, #fb7185 0%, #fda4af 100%)",
-  //     category: "glass light",
-  //     description: "A gentle blend of pink and red bringing life to a pristine layout."
-  //   },
-  //   {
-  //     name: "Berry Juice",
-  //     id: "theme-berry-juice",
-  //     color: "#9f1239",
-  //     gradient: "linear-gradient(135deg, #9f1239 0%, #be123c 100%)",
-  //     category: "premium light",
-  //     description: "Intense, dark berry-pink providing profound contrast against off-white."
-  //   },
-  //   {
-  //     name: "Neon Pink",
-  //     id: "theme-neon-pink",
-  //     color: "#ff1493",
-  //     gradient: "linear-gradient(135deg, #ff1493 0%, #ff69b4 100%)",
-  //     category: "glass light",
-  //     description: "Unapologetically vibrant true neon pink for maximum visual flair."
-  //   }, {
-  //     name: "Daylight Orange",
-  //     id: "theme-daylight-orange",
-  //     color: "#f97316",
-  //     gradient: "linear-gradient(135deg, #f97316 0%, #fb923c 100%)",
-  //     category: "glass light",
-  //     description: "Bright pure light glass with crisp dark blue text and vibrant orange accents."
-  //   },
-  //   {
-  //     name: "Morning Tangerine",
-  //     id: "theme-morning-tangerine",
-  //     color: "#ff8800",
-  //     gradient: "linear-gradient(135deg, #ff8800 0%, #ff9d33 100%)",
-  //     category: "glass light",
-  //     description: "Soft off-white glass paired with deep navy structure and bright tangerine buttons."
-  //   },
-  //   {
-  //     name: "Crisp Apricot",
-  //     id: "theme-crisp-apricot",
-  //     color: "#fb923c",
-  //     gradient: "linear-gradient(135deg, #fb923c 0%, #fdba74 100%)",
-  //     category: "glass light",
-  //     description: "Very light, airy interface with gentle apricot orange highlights and dark blue borders."
-  //   },
-  //   {
-  //     name: "Naval Dawn",
-  //     id: "theme-naval-dawn",
-  //     color: "#ffbf00",
-  //     gradient: "linear-gradient(135deg, #ffbf00 0%, #ffcf40 100%)",
-  //     category: "premium light",
-  //     description: "Professional white glass theme with bold navy headings and golden amber accents."
-  //   },
-  //   {
-  //     name: "Azure Sun",
-  //     id: "theme-azure-sun",
-  //     color: "#ea580c",
-  //     gradient: "linear-gradient(135deg, #ea580c 0%, #f97316 100%)",
-  //     category: "glass light",
-  //     description: "High-contrast light mode with rich sapphire text and aggressive sun-orange elements."
-  //   },
-  //   {
-  //     name: "Frosty Mango",
-  //     id: "theme-frosty-mango",
-  //     color: "#ff8c00",
-  //     gradient: "linear-gradient(135deg, #ff8c00 0%, #ffa633 100%)",
-  //     category: "glass light",
-  //     description: "Frosted white glass layered over pale blue with sweet mango orange interactive states."
-  //   },
-  //   {
-  //     name: "Cloud Amber",
-  //     id: "theme-cloud-amber",
-  //     color: "#d97706",
-  //     gradient: "linear-gradient(135deg, #d97706 0%, #f59e0b 100%)",
-  //     category: "premium light",
-  //     description: "Soft ivory background framing solid dark blue content and mature amber orange accents."
-  //   },
-  //   {
-  //     name: "Glazed Rust",
-  //     id: "theme-glazed-rust",
-  //     color: "#be4d25",
-  //     gradient: "linear-gradient(135deg, #be4d25 0%, #d6592f 100%)",
-  //     category: "premium light",
-  //     description: "Sophisticated light interface utilizing slate-navy text and refined rustic orange buttons."
-  //   },
-  //   {
-  //     name: "Luminous Coral",
-  //     id: "theme-luminous-coral",
-  //     color: "#ff7f50",
-  //     gradient: "linear-gradient(135deg, #ff7f50 0%, #ff9e7a 100%)",
-  //     category: "glass light",
-  //     description: "Radiant light blue-grey background with deep ocean text and vibrant coral highlights."
-  //   },
-  //   {
-  //     name: "Clear Tiger",
-  //     id: "theme-clear-tiger",
-  //     color: "#fd7e14",
-  //     gradient: "linear-gradient(135deg, #fd7e14 0%, #ff922b 100%)",
-  //     category: "glass light",
-  //     description: "Ultra-clear pure white glass with stealthy dark blue UI lines and fierce tiger orange."
-  //   },
-  //   {
-  //     name: "Airy Marigold",
-  //     id: "theme-airy-marigold",
-  //     color: "#faa307",
-  //     gradient: "linear-gradient(135deg, #faa307 0%, #ffba08 100%)",
-  //     category: "glass light",
-  //     description: "Breezy light theme warmed by marigold yellow-orange and grounded by midnight text."
-  //   },
-  //   {
-  //     name: "Soft Flame",
-  //     id: "theme-soft-flame",
-  //     color: "#ff4500",
-  //     gradient: "linear-gradient(135deg, #ff4500 0%, #ff632b 100%)",
-  //     category: "glass light",
-  //     description: "Clean, minimal light background pierced by striking solar flare red-orange accents."
-  //   },
-  //   {
-  //     name: "Lucid Copper",
-  //     id: "theme-lucid-copper",
-  //     color: "#b87333",
-  //     gradient: "linear-gradient(135deg, #b87333 0%, #c88951 100%)",
-  //     category: "premium light",
-  //     description: "Executive light theme featuring marine blue typography and metallic copper gradients."
-  //   },
-  //   {
-  //     name: "Mist Pumpkin",
-  //     id: "theme-mist-pumpkin",
-  //     color: "#ff7518",
-  //     gradient: "linear-gradient(135deg, #ff7518 0%, #ff8c3a 100%)",
-  //     category: "glass light",
-  //     description: "Foggy light-grey glass panels over pure white, featuring rich pumpkin orange calls-to-action."
-  //   },
-  //   {
-  //     name: "Breeze Supernova",
-  //     id: "theme-breeze-supernova",
-  //     color: "#ff5e00",
-  //     gradient: "linear-gradient(135deg, #ff5e00 0%, #ff7d2e 100%)",
-  //     category: "glass light",
-  //     description: "Refreshing light theme disrupted by an intense, energetic supernova orange."
-  //   },
-  //   {
-  //     name: "Crystal Neon",
-  //     id: "theme-crystal-neon",
-  //     color: "#ff6600",
-  //     gradient: "linear-gradient(135deg, #ff6600 0%, #ff8533 100%)",
-  //     category: "glass light",
-  //     description: "Crystalline white glass with high-tech navy text and highly saturated neon orange."
-  //   },
-  //   {
-  //     name: "Sky Electric",
-  //     id: "theme-sky-electric",
-  //     color: "#ff5500",
-  //     gradient: "linear-gradient(135deg, #ff5500 0%, #ff7733 100%)",
-  //     category: "glass light",
-  //     description: "Lightweight, cloud-like backgrounds heavily contrasted with electric orange focal points."
-  //   },
-  //   {
-  //     name: "Pearl Sapphire",
-  //     id: "theme-pearl-sapphire",
-  //     color: "#ff632b",
-  //     gradient: "linear-gradient(135deg, #ff632b 0%, #ff8c61 100%)",
-  //     category: "premium light",
-  //     description: "Luxurious pearlescent backgrounds framed by sapphire lines and bright orange buttons."
-  //   },
-  //   {
-  //     name: "Ivory Cobalt",
-  //     id: "theme-ivory-cobalt",
-  //     color: "#ffa633",
-  //     gradient: "linear-gradient(135deg, #ffa633 0%, #ffbf66 100%)",
-  //     category: "glass light",
-  //     description: "Warm ivory glass interfaces paired with cool cobalt text and soft orange glows."
-  //   },
-  //   {
-  //     name: "White Eclipse",
-  //     id: "theme-white-eclipse",
-  //     color: "#ff9d33",
-  //     gradient: "linear-gradient(135deg, #ff9d33 0%, #ffb166 100%)",
-  //     category: "glass light",
-  //     description: "A stark white theme utilizing deep space navy for readability and pure tangerine accents."
-  //   },
-  //   {
-  //     name: "Frosted Pearl",
-  //     id: "theme-frosted-pearl",
-  //     color: "#000B58",
-  //     gradient: "linear-gradient(135deg, #000B58 0%, #1a2780 100%)",
-  //     category: "premium light",
-  //     description: "Hyper-clean pure light glass with crisp off-white and deep blue."
-  //   },
-  //   {
-  //     name: "Royal Sapphire",
-  //     id: "theme-royal-sapphire",
-  //     color: "#c99d66",
-  //     gradient: "linear-gradient(135deg, #8c6a46 0%, #c99d66 100%)",
-  //     category: "premium dark",
-  //     description: "Classic high-contrast luxury combining sapphire depth with warm gold."
-  //   }, {
-  //     name: "Neon Eclipse",
-  //     id: "theme-neon-eclipse",
-  //     color: "#ff6600",
-  //     gradient: "linear-gradient(135deg, #ff6600 0%, #ff8533 100%)",
-  //     category: "glass dark",
-  //     description: "Deep space navy infused with vibrant neon orange glassmorphism."
-  //   },
-  //   {
-  //     name: "Naval Amber",
-  //     id: "theme-naval-amber",
-  //     color: "#ffbf00",
-  //     gradient: "linear-gradient(135deg, #ffbf00 0%, #ffcf40 100%)",
-  //     category: "glass dark",
-  //     description: "Rich traditional navy blue paired with golden amber accents."
-  //   },
-  //   {
-  //     name: "Abyssal Coral",
-  //     id: "theme-abyssal-coral",
-  //     color: "#ff7f50",
-  //     gradient: "linear-gradient(135deg, #ff7f50 0%, #ff9e7a 100%)",
-  //     category: "glass dark",
-  //     description: "Deepest ocean dark blue with bright, vibrant coral orange borders."
-  //   },
-  //   {
-  //     name: "Slate Rust",
-  //     id: "theme-slate-rust",
-  //     color: "#d97706",
-  //     gradient: "linear-gradient(135deg, #d97706 0%, #f59e0b 100%)",
-  //     category: "glass dark",
-  //     description: "Muted slate navy complemented by mature, rusty metallic orange."
-  //   },
-  //   {
-  //     name: "Indigo Tangerine",
-  //     id: "theme-indigo-tangerine",
-  //     color: "#f97316",
-  //     gradient: "linear-gradient(135deg, #f97316 0%, #fb923c 100%)",
-  //     category: "glass dark",
-  //     description: "A strong indigo foundation with popping tangerine orange glass."
-  //   },
-  //   {
-  //     name: "Solar Space",
-  //     id: "theme-solar-space",
-  //     color: "#ff4500",
-  //     gradient: "linear-gradient(135deg, #ff4500 0%, #ff632b 100%)",
-  //     category: "neon glass",
-  //     description: "Pitch black-blue void pierced by solar flare red-orange elements."
-  //   },
-  //   {
-  //     name: "Cobalt Mango",
-  //     id: "theme-cobalt-mango",
-  //     color: "#ff8c00",
-  //     gradient: "linear-gradient(135deg, #ff8c00 0%, #ffa633 100%)",
-  //     category: "glass dark",
-  //     description: "Slightly lighter cobalt dark blue with sweet mango orange touches."
-  //   },
-  //   {
-  //     name: "Sapphire Flame",
-  //     id: "theme-sapphire-flame",
-  //     color: "#ea580c",
-  //     gradient: "linear-gradient(135deg, #ea580c 0%, #f97316 100%)",
-  //     category: "premium dark",
-  //     description: "Luxurious sapphire blue heavily contrasted with aggressive flame orange."
-  //   },
-  //   {
-  //     name: "Oceanic Peach",
-  //     id: "theme-oceanic-peach",
-  //     color: "#ffb085",
-  //     gradient: "linear-gradient(135deg, #ffb085 0%, #ffc2a3 100%)",
-  //     category: "glass dark",
-  //     description: "A dark teal-tinted blue base paired with soft, glowing peach orange."
-  //   },
-  //   {
-  //     name: "Lapis Tiger",
-  //     id: "theme-lapis-tiger",
-  //     color: "#fd7e14",
-  //     gradient: "linear-gradient(135deg, #fd7e14 0%, #ff922b 100%)",
-  //     category: "neon glass",
-  //     description: "Lapis Lazuli structural blue featuring fierce tiger-orange glowing borders."
-  //   },
-  //   {
-  //     name: "Midnight Marigold",
-  //     id: "theme-midnight-marigold",
-  //     color: "#faa307",
-  //     gradient: "linear-gradient(135deg, #faa307 0%, #ffba08 100%)",
-  //     category: "glass dark",
-  //     description: "Pure midnight aesthetic warmed by bright marigold yellow-orange."
-  //   },
-  //   {
-  //     name: "Twilight Burnt",
-  //     id: "theme-twilight-burnt",
-  //     color: "#be4d25",
-  //     gradient: "linear-gradient(135deg, #be4d25 0%, #d6592f 100%)",
-  //     category: "premium dark",
-  //     description: "Elegant twilight dark blue paired with a grounded burnt orange tone."
-  //   },
-  //   {
-  //     name: "Void Electric",
-  //     id: "theme-void-electric",
-  //     color: "#ff5500",
-  //     gradient: "linear-gradient(135deg, #ff5500 0%, #ff7733 100%)",
-  //     category: "neon glass",
-  //     description: "Maximum contrast pure dark mode with electric neon orange UI elements."
-  //   },
-  //   {
-  //     name: "Storm Apricot",
-  //     id: "theme-storm-apricot",
-  //     color: "#fb923c",
-  //     gradient: "linear-gradient(135deg, #fb923c 0%, #fdba74 100%)",
-  //     category: "glass dark",
-  //     description: "Desaturated stormy dark blue lightened by gentle apricot orange glass."
-  //   },
-  //   {
-  //     name: "Marine Copper",
-  //     id: "theme-marine-copper",
-  //     color: "#b87333",
-  //     gradient: "linear-gradient(135deg, #b87333 0%, #c88951 100%)",
-  //     category: "premium dark",
-  //     description: "Professional marine blue base featuring high-end metallic copper borders."
-  //   },
-  //   {
-  //     name: "Royal Pumpkin",
-  //     id: "theme-royal-pumpkin",
-  //     color: "#ff7518",
-  //     gradient: "linear-gradient(135deg, #ff7518 0%, #ff8c3a 100%)",
-  //     category: "glass dark",
-  //     description: "Regal dark blue with a rich, autumnal pumpkin orange highlight."
-  //   },
-  //   {
-  //     name: "Eclipse Tangerine",
-  //     id: "theme-eclipse-tangerine",
-  //     color: "#ff8800",
-  //     gradient: "linear-gradient(135deg, #ff8800 0%, #ff9d33 100%)",
-  //     category: "glass dark",
-  //     description: "Near-black eclipse background driven by a pure, bright tangerine orange."
-  //   },
-  //   {
-  //     name: "Cyber Navy",
-  //     id: "theme-cyber-navy",
-  //     color: "#ff3c00",
-  //     gradient: "linear-gradient(135deg, #ff3c00 0%, #ff5f2e 100%)",
-  //     category: "neon glass",
-  //     description: "Sci-fi inspired dark navy with aggressive laser-orange glass borders."
-  //   },
-  //   {
-  //     name: "Midnight Gold",
-  //     id: "theme-midnight-gold",
-  //     color: "#f59e0b",
-  //     gradient: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
-  //     category: "premium dark",
-  //     description: "Deepest indigo luxury theme detailed with gold-leaning orange accents."
-  //   },
-  //   {
-  //     name: "Deep Supernova",
-  //     id: "theme-deep-supernova",
-  //     color: "#ff5e00",
-  //     gradient: "linear-gradient(135deg, #ff5e00 0%, #ff7d2e 100%)",
-  //     category: "glass dark",
-  //     description: "Infinite deep space blue disrupted by an intense supernova orange."
-  //   },
-  //   {
-  //     name: "Ocean Mist",
-  //     id: "theme-ocean-mist",
-  //     color: "#8a6a52",
-  //     gradient: "linear-gradient(135deg, #8a6a52 0%, #a3856d 100%)",
-  //     category: "premium light",
-  //     description: "Soft, airy, and calming light blue-grey interface with muted brown touches."
-  //   },
-  //   {
-  //     name: "Executive Velvet",
-  //     id: "theme-executive-velvet",
-  //     color: "#000B58",
-  //     gradient: "linear-gradient(135deg, #000B58 0%, #273385 100%)",
-  //     category: "premium light",
-  //     description: "Warm corporate off-white with sophisticated deep blue typography and accents."
-  //   }, {
-  //     name: "Crisp Structure",
-  //     id: "theme-crisp-structure",
-  //     color: "#000B58",
-  //     gradient: "linear-gradient(135deg, #000B58 0%, #1a2780 100%)",
-  //     category: "light",
-  //     description: "Pure light SaaS interface with strong borders and solid deep blue accents."
-  //   },
-  //   {
-  //     name: "Blueprint Light",
-  //     id: "theme-blueprint-light",
-  //     color: "#000B58",
-  //     gradient: "linear-gradient(135deg, #000B58 0%, #202b75 100%)",
-  //     category: "light",
-  //     description: "High-contrast structural theme relying heavily on borders instead of shadows."
-  //   },
-  //   {
-  //     name: "Cloud Ivory",
-  //     id: "theme-cloud-ivory",
-  //     color: "#ADC4CE",
-  //     gradient: "linear-gradient(135deg, #000B58 0%, #151e5e 100%)",
-  //     category: "light",
-  //     description: "Soft off-white framing with pure white content areas and deep blue text."
-  //   },
-  //   {
-  //     name: "Obsidian Blue",
-  //     id: "theme-obsidian-blue",
-  //     color: "#ADC4CE",
-  //     gradient: "linear-gradient(135deg, #ADC4CE 0%, #ffffff 100%)",
-  //     category: "premium dark",
-  //     description: "Ultra-modern deep tech dark mode with stealth glass and light blue-grey highlights."
-  //   },
-  //   // --- CORE THEMES ---
-  //   {
-  //     name: "Auto",
-  //     id: "auto-theme",
-  //     color: "#2563eb",
-  //     gradient: "linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%)",
-  //     category: "core",
-  //     description: "Auto-detects system preference"
-  //   },
-  //   {
-  //     name: "Glass",
-  //     id: "theme-glass",
-  //     color: "#6366f1",
-  //     gradient: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%)",
-  //     category: "core",
-  //     description: "Modern professional glassmorphism"
-  //   },
-  //   {
-  //     name: "Light",
-  //     id: "theme-light",
-  //     color: "#f1f5f9",
-  //     gradient: "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)",
-  //     category: "core",
-  //     description: "Clean data-optimized light mode"
-  //   },
-  //   {
-  //     name: "Dark",
-  //     id: "theme-dark",
-  //     color: "#0f172a",
-  //     gradient: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
-  //     category: "core",
-  //     description: "Enhanced high-contrast dark mode"
-  //   },
-  //   {
-  //     name: "Bio Frost",
-  //     id: "theme-bio-frost",
-  //     color: "#34d399",
-  //     gradient: "linear-gradient(135deg, #34d399 0%, #10b981 100%)",
-  //     category: "core",
-  //     description: "Milky white glass with emerald accents"
-  //   },
-
-  //   // --- PROFESSIONAL ---
-  //   {
-  //     name: "Premium",
-  //     id: "theme-premium",
-  //     color: "#0d9488",
-  //     gradient: "linear-gradient(135deg, #0d9488 0%, #0891b2 100%)",
-  //     category: "professional",
-  //     description: "Rich Teal & Sky Blue"
-  //   },
-  //   {
-  //     name: "Titanium",
-  //     id: "theme-titanium",
-  //     color: "#0891b2",
-  //     gradient: "linear-gradient(135deg, #0891b2 0%, #06b6d4 100%)",
-  //     category: "professional",
-  //     description: "Industrial Cyan & Silver"
-  //   },
-  //   {
-  //     name: "Slate",
-  //     id: "theme-slate",
-  //     color: "#334155",
-  //     gradient: "linear-gradient(135deg, #334155 0%, #475569 100%)",
-  //     category: "professional",
-  //     description: "Executive Gunmetal Gray"
-  //   },
-  //   {
-  //     name: "Data Science",
-  //     id: "theme-data-science",
-  //     color: "#2563eb",
-  //     gradient: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
-  //     category: "professional",
-  //     description: "Analytics optimized Blue"
-  //   },
-  //   {
-  //     name: "Cobalt Steel",
-  //     id: "theme-cobalt-steel",
-  //     color: "#0284c7",
-  //     gradient: "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)",
-  //     category: "professional",
-  //     description: "Corporate Navy & Sapphire"
-  //   },
-  //   {
-  //     name: "Luminous",
-  //     id: "theme-luminous",
-  //     color: "#4f46e5",
-  //     gradient: "linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)",
-  //     category: "professional",
-  //     description: "Clean Executive Indigo"
-  //   },
-
-  //   // --- MINIMAL ---
-  //   {
-  //     name: "Minimal",
-  //     id: "theme-minimal",
-  //     color: "#171717",
-  //     gradient: "linear-gradient(135deg, #171717 0%, #404040 100%)",
-  //     category: "minimal",
-  //     description: "Stark High-Fashion Monochrome"
-  //   },
-  //   {
-  //     name: "Monochrome",
-  //     id: "theme-monochrome",
-  //     color: "#09090b",
-  //     gradient: "linear-gradient(135deg, #09090b 0%, #27272a 100%)",
-  //     category: "minimal",
-  //     description: "Architectural Pure Black"
-  //   },
-
-  //   // --- COLORFUL ---
-  //   {
-  //     name: "Rose",
-  //     id: "theme-rose",
-  //     color: "#e11d48",
-  //     gradient: "linear-gradient(135deg, #be123c 0%, #e11d48 100%)",
-  //     category: "colorful",
-  //     description: "Executive Crimson & Merlot"
-  //   },
-  //   {
-  //     name: "Sunset",
-  //     id: "theme-sunset",
-  //     color: "#ea580c",
-  //     gradient: "linear-gradient(135deg, #ea580c 0%, #db2777 100%)",
-  //     category: "colorful",
-  //     description: "Vibrant Golden Hour Glow"
-  //   },
-  //   {
-  //     name: "Bold",
-  //     id: "theme-bold",
-  //     color: "#d946ef",
-  //     gradient: "linear-gradient(135deg, #d946ef 0%, #8b5cf6 100%)",
-  //     category: "colorful",
-  //     description: "High-Voltage Neon Cyberpunk"
-  //   },
-  //   {
-  //     name: "Nebula",
-  //     id: "theme-nebula",
-  //     color: "#d946ef",
-  //     gradient: "linear-gradient(to right, #ec4899, #8b5cf6)",
-  //     category: "colorful",
-  //     description: "Electric Future Neon"
-  //   },
-
-  //   // --- LUXURY ---
-  //   {
-  //     name: "Luxury",
-  //     id: "theme-luxury",
-  //     color: "#d4af37",
-  //     gradient: "linear-gradient(135deg, #d4af37 0%, #b45309 100%)",
-  //     category: "luxury",
-  //     description: "Sharp Onyx & Gold"
-  //   },
-  //   {
-  //     name: "Futuristic",
-  //     id: "theme-futuristic",
-  //     color: "#3b82f6",
-  //     gradient: "linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)",
-  //     category: "luxury",
-  //     description: "Sci-Fi HUD Blue"
-  //   },
-  //   {
-  //     name: "Midnight Royal",
-  //     id: "theme-midnight-royal",
-  //     color: "#7c3aed",
-  //     gradient: "linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%)",
-  //     category: "luxury",
-  //     description: "Deep Navy & Electric Violet"
-  //   },
-  //   {
-  //     name: "Emerald Regal",
-  //     id: "theme-emerald-regal",
-  //     color: "#059669",
-  //     gradient: "linear-gradient(135deg, #059669 0%, #047857 100%)",
-  //     category: "luxury",
-  //     description: "Wealth & Finance Green"
-  //   },
-  //   {
-  //     name: "Horizon",
-  //     id: "theme-horizon",
-  //     color: "#F56217",
-  //     gradient: "linear-gradient(to right, #F56217, #0B486B)",
-  //     category: "colorful",
-  //     description: "Vibrant orange to deep ocean blue"
-  //   },
-  //   {
-  //     name: "Midnight City",
-  //     id: "theme-midnight-city",
-  //     color: "#243B55",
-  //     gradient: "linear-gradient(to right, #243B55, #141E30)",
-  //     category: "professional",
-  //     description: "Deep Steel Blue Gradient"
-  //   },
-  //   {
-  //     name: "Synthwave",
-  //     id: "theme-synthwave",
-  //     color: "#ff6a00",
-  //     gradient: "linear-gradient(to right, #ff6a00, #ee0979)",
-  //     category: "colorful",
-  //     description: "Vibrant Orange to Pink"
-  //   },
-
-
-
-  //   {
-  //     name: "Deep Space",
-  //     id: "theme-deep-space",
-  //     color: "#06b6d4",
-  //     gradient: "linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)",
-  //     category: "modern",
-  //     description: "Void Black & Cyan"
-  //   }
-  // ];
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
