@@ -299,7 +299,7 @@ export class MainscreenHeader implements OnInit, OnDestroy {
   }
   
   ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
+    this.destroy$?.next();
+    this.destroy$?.complete();
   }
 }
