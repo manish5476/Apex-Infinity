@@ -3099,6 +3099,276 @@
 
 
 
+/* ==========================================================================
+   5. UTILITY & COMPONENT CLASSES
+   ========================================================================== */
+
+/* The Standard Glass Card (Used in HTML as class="glass-card") */
+.glass-card {
+  background: var(--glass-bg-c);
+  backdrop-filter: blur(var(--glass-blur-c));
+  -webkit-backdrop-filter: blur(var(--glass-blur-c));
+  border: 1px solid var(--glass-border-c);
+  box-shadow: var(--glass-shadow-c);
+  border-radius: var(--radius-2xl);
+  transition: var(--transition-base);
+}
+
+/* INTERACTIVE STATE: Add this class to make cards hoverable/clickable */
+.glass-card.interactive {
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card.interactive:hover {
+  transform: translateY(-4px);
+  background: var(--component-bg-hover);
+  border-color: var(--color-primary-light);
+  box-shadow: var(--shadow-2xl);
+}
+
+/* ==========================================================================
+   6. ADVANCED UTILITIES & COMPONENTS
+   ========================================================================== */
+
+/* --- Glass Effects --- */
+.glass-surface-layered {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%),
+    var(--glass-bg-c);
+  backdrop-filter: blur(var(--glass-blur-c)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-c)) saturate(180%);
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--glass-border-c);
+  box-shadow:
+    var(--glass-shadow-c),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    pointer-events: none; /* Fix: Prevent click blocking */
+  }
+}
+
+.glass-surface:hover {
+  backdrop-filter: blur(calc(var(--glass-blur-c) * 1.1));
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur-c) * 1.1));
+  box-shadow:
+    var(--glass-shadow-c),
+    0 0 0 1px var(--accent-focus);
+}
+
+/* --- Interactive Surfaces --- */
+.surface-interactive {
+  transition:
+    transform 0.2s cubic-bezier(0.2, 0.9, 0.2, 1),
+    box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  &:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.card-3d {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--border-primary);
+  transform-style: preserve-3d;
+  transition:
+    transform 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+    box-shadow 0.4s;
+
+  &:hover {
+    transform: translateY(-8px) rotateX(2deg) rotateY(-2deg); /* Reduced rotation for subtlety */
+    box-shadow:
+      0 20px 40px rgba(0, 0, 0, 0.1),
+      0 0 0 1px var(--accent-primary);
+  }
+}
+
+/* --- Typography & Gradients --- */
+.gradient-text {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+  animation: gradientShift 4s ease infinite; /* Slowed down for elegance */
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* --- Data Grid & Charts --- */
+.data-grid-cell {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    background: var(--component-bg-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    z-index: 1; /* Ensure shadow shows over neighbors */
+  }
+
+  &.highlighted {
+    background: var(--accent-focus);
+    border-color: var(--accent-primary);
+  }
+}
+
+.chart-grid-line {
+  stroke: var(--border-primary);
+  stroke-width: 1;
+  stroke-dasharray: 4;
+}
+.chart-area {
+  fill: var(--accent-gradient);
+  opacity: 0.1;
+}
+.chart-line {
+  stroke: var(--accent-primary);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+/* --- Focus & Accessibility --- */
+.focus-ring:focus-visible {
+  outline: var(--focus-outline-width) solid var(--component-border-focus);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: 0 0 0 3px var(--accent-focus);
+}
+
+.focus-mode {
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+
+  *:not(.focus-highlight) {
+    opacity: 0.3;
+    filter: grayscale(100%); /* Add grayscale to non-focused elements */
+    transition:
+      opacity 0.3s ease,
+      filter 0.3s ease;
+  }
+
+  .focus-highlight {
+    opacity: 1;
+    filter: none;
+    box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.5); /* Dimming overlay simulation */
+    z-index: var(--z-modal);
+    position: relative;
+  }
+}
+
+/* --- Auto Theme Logic --- */
+.auto-theme {
+  /* Default Light Logic */
+  --theme-bg-primary: #fafbfc;
+  --theme-bg-secondary: #ffffff;
+  /* ... (Your provided Light defaults) ... */
+  @include apply-canonical-mapping;
+}
+
+@media (prefers-color-scheme: dark) {
+  .auto-theme {
+    /* Dark Logic Override */
+    --theme-bg-primary: #020617;
+    --theme-bg-secondary: #0f172a;
+    /* ... (Your provided Dark defaults) ... */
+    @include apply-canonical-mapping;
+  }
+}
+
+/* --- Print Styles (Consolidated) --- */
+@media print {
+  :root,
+  * {
+    --theme-bg-primary: #ffffff !important;
+    --theme-bg-secondary: #ffffff !important;
+    --theme-text-primary: #000000 !important;
+    --theme-border-primary: #000000 !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+  }
+
+  .glass-surface,
+  .glass-surface-layered,
+  .card-3d {
+    background: #ffffff !important;
+    border: 1px solid #ccc !important;
+    transform: none !important;
+  }
+}
+
+/* --- Semantic Helpers --- */
+.text-success {
+  color: var(--color-success);
+}
+.bg-success {
+  background-color: var(--color-success-bg);
+}
+.text-error {
+  color: var(--color-error);
+}
+.bg-error {
+  background-color: var(--color-error-bg);
+}
+.text-warning {
+  color: var(--color-warning);
+}
+.bg-warning {
+  background-color: var(--color-warning-bg);
+}
+.text-info {
+  color: var(--color-info);
+}
+.bg-info {
+  background-color: var(--color-info-bg);
+}
+
+/* --- Elevations --- */
+.elevation-0 {
+  box-shadow: none;
+}
+.elevation-1 {
+  box-shadow: var(--shadow-xs);
+}
+.elevation-2 {
+  box-shadow: var(--shadow-sm);
+}
+.elevation-3 {
+  box-shadow: var(--shadow-md);
+}
+.elevation-4 {
+  box-shadow: var(--shadow-lg);
+}
+.elevation-5 {
+  box-shadow: var(--shadow-xl);
+}
 
 
 
