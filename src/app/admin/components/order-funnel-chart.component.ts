@@ -47,7 +47,7 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
           <p-button icon="pi pi-refresh" [rounded]="true" [text]="true" size="small" (onClick)="loadFunnel()" [loading]="loading()"></p-button>
         </div>
 
-        <ng-container *ngIf="!loading(); else loader">
+        @if (!loading()) {
           <div class="content-grid">
             <div class="chart-wrapper">
               <p-chart type="bar" [data]="chartData()" [options]="chartOptions" height="320px"></p-chart>
@@ -79,14 +79,12 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
                </div>
             </div>
           </div>
-        </ng-container>
-
-        <ng-template #loader>
+        } @else {
           <div class="loader-container">
             <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-10 h-10"></p-progressSpinner>
             <p class="loader-text">Mapping Data...</p>
           </div>
-        </ng-template>
+        }
       </div>
     </div>
   `,

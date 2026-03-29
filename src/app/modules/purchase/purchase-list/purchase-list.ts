@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GridApi } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 
@@ -10,17 +10,18 @@ import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { DatePickerModule } from 'primeng/datepicker';
 import { PurchaseService } from '../purchase.service';
-import { AgShareGrid } from "../../shared/components/ag-shared-grid";
+import { AgShareGrid, ActionColumnConfig } from "../../shared/components/ag-shared-grid";
 import { MasterListService } from '../../../core/services/master-list.service';
 import { AppMessageService } from '../../../core/services/message.service';
 import { CommonMethodService } from '../../../core/utils/common-method.service';
-import { ActionViewRenderer } from '../../shared/AgGrid/AgGridcomponents/DynamicDetailCard/ActionViewRenderer';
 import { finalize } from 'rxjs';
+import { HasPermissionDirective } from '../../../core/auth/directives/has-permission.directive';
+import { PERMISSIONS } from '../../../core/auth/permissions.constants';
 
 @Component({
   selector: 'app-purchase-list',
   standalone: true,
-  imports: [ CommonModule, SelectModule, FormsModule, ButtonModule, InputTextModule, DatePickerModule, RouterModule, AgShareGrid  ],
+  imports: [ CommonModule, SelectModule, FormsModule, ButtonModule, InputTextModule, DatePickerModule, RouterModule, AgShareGrid, HasPermissionDirective ],
   templateUrl: './purchase-list.html',
   styleUrl: './purchase-list.scss',
 })
@@ -32,6 +33,15 @@ export class PurchaseListComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private common = inject(CommonMethodService);
+
+  PERMISSIONS = PERMISSIONS;
+
+  readonly purchaseActionColumn: ActionColumnConfig = {
+    showView: true,
+    showEdit: false,
+    showDelete: false,
+    viewPermission: PERMISSIONS.PURCHASE.READ,
+  };
 
   private gridApi!: GridApi;
   private currentPage = 1;
@@ -173,11 +183,11 @@ getData(isReset: boolean = false) {
     }
   }
 
-  onGridReady(params: GridReadyEvent) {
-    this.gridApi = params.api;
-  }
-
    eventFromGrid(event: any) {
+    if (event.type === 'init') {
+      this.gridApi = event.api;
+      return;
+    }
     if (event.type=== 'cellClicked') {
       const purchaseId = event.row._id;
       if (purchaseId) {
@@ -191,15 +201,6 @@ getData(isReset: boolean = false) {
 
    getColumn(): void {
   this.column = [
-    {
-      headerName: '',
-      field: '_id',
-      width: 50,
-      pinned: 'left',
-      cellRenderer: ActionViewRenderer,
-      lockPosition: true,
-      suppressMenu: true
-    },
     {
       field: 'invoiceNumber',
       headerName: 'Invoice #',

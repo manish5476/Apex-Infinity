@@ -18,15 +18,19 @@ import { AppMessageService } from '../../../core/services/message.service';
 import { CommonMethodService } from '../../../core/utils/common-method.service';
 import { SalesService } from '../sales-service';
 import { AgShareGrid } from "../../shared/components/ag-shared-grid";
+import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
+import { PERMISSIONS } from '@core/auth/permissions.constants';
 
 @Component({
   selector: 'app-sales-list',
   standalone: true,
-  imports: [CommonModule, SelectModule, FormsModule, ReactiveFormsModule, ButtonModule, InputTextModule, RouterModule, TooltipModule, AgShareGrid, ToastModule],
+  imports: [CommonModule, SelectModule, FormsModule, ReactiveFormsModule, ButtonModule, InputTextModule, RouterModule, TooltipModule, AgShareGrid, ToastModule, HasPermissionDirective],
   templateUrl: './sales-list.html',
   styleUrl: './sales-list.scss',
 })
 export class SalesListComponent implements OnInit {
+  readonly PERMISSIONS = PERMISSIONS;
+
   private cdr = inject(ChangeDetectorRef);
   private salesService = inject(SalesService);
   private messageService = inject(AppMessageService);

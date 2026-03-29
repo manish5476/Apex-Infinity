@@ -55,7 +55,7 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
         </app-universal-filter>
       </div>
 
-      <ng-container *ngIf="!loading(); else loader">
+      @if (!loading()) {
         
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
@@ -165,14 +165,12 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
           </div>
         </div>
 
-      </ng-container>
-
-      <ng-template #loader>
+      } @else {
         <div class="h-[60vh] flex flex-col items-center justify-center gap-4">
           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-12 h-12"></p-progressSpinner>
           <p [style.color]="'var(--theme-text-tertiary)'" [style.font-size]="'var(--font-size-sm)'" class="font-bold uppercase tracking-widest">Training Regression Model...</p>
         </div>
-      </ng-template>
+      }
 
     </div>
   `

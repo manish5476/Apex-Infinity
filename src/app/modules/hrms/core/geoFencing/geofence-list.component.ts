@@ -2,9 +2,9 @@ import { ChangeDetectorRef, Component, OnInit, inject, ChangeDetectionStrategy }
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { AppMessageService } from '../../../../core/services/message.service';
-import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
+import { AgShareGrid, ActionColumnConfig } from '../../../shared/components/ag-shared-grid';
+import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 import { HRMSService } from '../../hrms.service';
 
 
@@ -65,7 +65,7 @@ import { HRMSService } from '../../hrms.service';
           <app-ag-share-grid 
             [columns]="column" 
             [data]="data" 
-            [showActions]="true" 
+            [actionColumn]="geofenceActionColumn"
             selectionMode="single"
             (gridEvent)="eventFromGrid($event)">
           </app-ag-share-grid>
@@ -106,6 +106,15 @@ export class GeofenceListComponent implements OnInit {
   column: any[] = [];
   filter = { search: '', type: null, isActive: null };
   isLoading = false;
+
+  readonly geofenceActionColumn: ActionColumnConfig = {
+    showView: true,
+    showEdit: true,
+    showDelete: true,
+    viewPermission: PERMISSIONS.ATTENDANCE.GEOFENCE_READ,
+    editPermission: PERMISSIONS.ATTENDANCE.GEOFENCE_MANAGE,
+    deletePermission: PERMISSIONS.ATTENDANCE.GEOFENCE_MANAGE,
+  };
 
   ngOnInit() {
     this.setupColumns();

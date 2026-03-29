@@ -50,7 +50,7 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
         </app-universal-filter>
       </div>
 
-      <ng-container *ngIf="!loading(); else loader">
+      @if (!loading()) {
         
         <div class="kpi-grid">
            
@@ -97,8 +97,7 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
                  <div class="grid-container">
                     <app-ag-share-grid 
                       [columns]="hourlyColumns" 
-                      [data]="timeData()?.hourly || []" 
-                      [showActions]="false"
+                      [data]="timeData()?.hourly || []"
                       class="full-size-grid">
                     </app-ag-share-grid>
                  </div>
@@ -108,8 +107,7 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
                  <div class="grid-container">
                     <app-ag-share-grid 
                       [columns]="dailyColumns" 
-                      [data]="timeData()?.daily || []" 
-                      [showActions]="false"
+                      [data]="timeData()?.daily || []"
                       class="full-size-grid">
                     </app-ag-share-grid>
                  </div>
@@ -119,8 +117,7 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
                  <div class="grid-container">
                     <app-ag-share-grid 
                       [columns]="weeklyColumns" 
-                      [data]="timeData()?.weekly || []" 
-                      [showActions]="false"
+                      [data]="timeData()?.weekly || []"
                       class="full-size-grid">
                     </app-ag-share-grid>
                  </div>
@@ -130,8 +127,7 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
                  <div class="grid-container">
                     <app-ag-share-grid 
                       [columns]="monthlyColumns" 
-                      [data]="timeData()?.monthly || []" 
-                      [showActions]="false"
+                      [data]="timeData()?.monthly || []"
                       class="full-size-grid">
                     </app-ag-share-grid>
                  </div>
@@ -141,14 +137,12 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
           </p-tabs>
         </div>
 
-      </ng-container>
-
-      <ng-template #loader>
+      } @else {
         <div class="loader-container">
           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-12 h-12"></p-progressSpinner>
           <p class="loader-text">Compiling Time Series...</p>
         </div>
-      </ng-template>
+      }
 
     </div>
   `,
@@ -512,7 +506,7 @@ export class TimeAnalyticsComponent implements OnInit {
 //                     <app-ag-share-grid 
 //                       [columns]="hourlyColumns" 
 //                       [data]="timeData()?.hourly || []" 
-//                       [showActions]="false"
+//
 //                       class="full-size-grid">
 //                     </app-ag-share-grid>
 //                  </div>
@@ -523,7 +517,7 @@ export class TimeAnalyticsComponent implements OnInit {
 //                     <app-ag-share-grid 
 //                       [columns]="dailyColumns" 
 //                       [data]="timeData()?.daily || []" 
-//                       [showActions]="false"
+//
 //                       class="full-size-grid">
 //                     </app-ag-share-grid>
 //                  </div>
@@ -534,7 +528,7 @@ export class TimeAnalyticsComponent implements OnInit {
 //                     <app-ag-share-grid 
 //                       [columns]="weeklyColumns" 
 //                       [data]="timeData()?.weekly || []" 
-//                       [showActions]="false"
+//
 //                       class="full-size-grid">
 //                     </app-ag-share-grid>
 //                  </div>
@@ -545,7 +539,7 @@ export class TimeAnalyticsComponent implements OnInit {
 //                     <app-ag-share-grid 
 //                       [columns]="monthlyColumns" 
 //                       [data]="timeData()?.monthly || []" 
-//                       [showActions]="false"
+//
 //                       class="full-size-grid">
 //                     </app-ag-share-grid>
 //                  </div>

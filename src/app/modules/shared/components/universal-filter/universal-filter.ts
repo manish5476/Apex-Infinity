@@ -30,119 +30,123 @@ import { FilterField } from './filter-config.interface';
   template: `
     <div class="filter-deck">
       
-      <div *ngFor="let field of config" class="deck-control-group" [ngClass]="field.styleClass">
-        
-        <label class="deck-label">{{ field.label }}</label>
+      @for (field of config; track field.key) {
+        <div class="deck-control-group" [ngClass]="field.styleClass">
+          
+          <label class="deck-label">{{ field.label }}</label>
 
-        <ng-container *ngIf="field.type === 'text'">
-          <p-iconField iconPosition="left" class="deck-field-wrapper">
-            <p-inputIcon styleClass="pi pi-search text-xs" />
-            <input 
-              pInputText 
-              [placeholder]="field.placeholder || 'Type to search...'"
+          @if (field.type === 'text') {
+            <p-iconField iconPosition="left" class="deck-field-wrapper">
+              <p-inputIcon styleClass="pi pi-search text-xs" />
+              <input 
+                pInputText 
+                [placeholder]="field.placeholder || 'Type to search...'"
+                [(ngModel)]="filters[field.key]"
+                (ngModelChange)="onFilterChange()"
+                class="deck-input" />
+            </p-iconField>
+          }
+
+          @if (field.type === 'select') {
+            <p-select appendTo="body" 
+              [options]="getOptions(field)"
+              [optionLabel]="field.optionLabel || 'name'"
+              [optionValue]="field.optionValue || '_id'"
+              [placeholder]="field.placeholder || 'Select'"
               [(ngModel)]="filters[field.key]"
               (ngModelChange)="onFilterChange()"
-              class="deck-input" />
-          </p-iconField>
-        </ng-container>
+              [showClear]="true"
+              styleClass="deck-select"
+              [filter]="true"
+              [filterBy]="field.optionLabel || 'name'">
+            </p-select>
+          }
 
-        <ng-container *ngIf="field.type === 'select'">
-          <p-select appendTo="body" 
-            [options]="getOptions(field)"
-            [optionLabel]="field.optionLabel || 'name'"
-            [optionValue]="field.optionValue || '_id'"
-            [placeholder]="field.placeholder || 'Select'"
-            [(ngModel)]="filters[field.key]"
-            (ngModelChange)="onFilterChange()"
-            [showClear]="true"
-            styleClass="deck-select"
-            [filter]="true"
-            [filterBy]="field.optionLabel || 'name'">
-          </p-select>
+          @if (field.type === 'multiselect') {
+            <p-multiSelect appendTo="body"
+              [options]="getOptions(field)"
+              [optionLabel]="field.optionLabel || 'name'"
+              [optionValue]="field.optionValue || '_id'"
+              [placeholder]="field.placeholder || 'Select Multiple'"
+              [(ngModel)]="filters[field.key]"
+              (ngModelChange)="onFilterChange()"
+              display="chip"
+              [showClear]="true"
+              styleClass="deck-multiselect"
+              [filter]="true"
+              [filterBy]="field.optionLabel || 'name'">
+            </p-multiSelect>
+          }
 
-        </ng-container>
-
-        <ng-container *ngIf="field.type === 'multiselect'">
-          <p-multiSelect appendTo="body"
-            [options]="getOptions(field)"
-            [optionLabel]="field.optionLabel || 'name'"
-            [optionValue]="field.optionValue || '_id'"
-            [placeholder]="field.placeholder || 'Select Multiple'"
-            [(ngModel)]="filters[field.key]"
-            (ngModelChange)="onFilterChange()"
-            display="chip"
-            [showClear]="true"
-            styleClass="deck-multiselect"
-            [filter]="true"
-            [filterBy]="field.optionLabel || 'name'">
-          </p-multiSelect>
-
-        </ng-container>
-
-        <ng-container *ngIf="field.type === 'date'">
-          <p-datepicker appendTo="body"
-            [(ngModel)]="filters[field.key]" 
-            (ngModelChange)="onFilterChange()"
-            [placeholder]="field.placeholder || 'Date'"
-            [showIcon]="true"
-            styleClass="deck-date"
-            dateFormat="yy-mm-dd">
-          </p-datepicker>
-        </ng-container>
-
-        <ng-container *ngIf="field.type === 'date-range'">
-          <p-datepicker appendTo="body"
-            [(ngModel)]="filters[field.key]" 
-            selectionMode="range" 
-            [readonlyInput]="true"
-            (ngModelChange)="onDateRangeChange($event, field.key)"
-            [placeholder]="field.placeholder || 'Start - End'"
-            [showIcon]="true"
-            styleClass="deck-date-range"
-            dateFormat="yy-mm-dd">
-          </p-datepicker>
-        </ng-container>
-
-        <ng-container *ngIf="field.type === 'checkbox'">
-          <div class="deck-checkbox-wrapper" (click)="toggleCheckbox(field.key)">
-            <p-checkbox 
+          @if (field.type === 'date') {
+            <p-datepicker appendTo="body"
               [(ngModel)]="filters[field.key]" 
-              [binary]="true" 
-              (ngModelChange)="onFilterChange()" 
-              styleClass="deck-checkbox">
-            </p-checkbox>
-            <span class="deck-checkbox-label">{{ field.placeholder || 'Enable' }}</span>
-          </div>
-        </ng-container>
+              (ngModelChange)="onFilterChange()"
+              [placeholder]="field.placeholder || 'Date'"
+              [showIcon]="true"
+              styleClass="deck-date"
+              dateFormat="yy-mm-dd">
+            </p-datepicker>
+          }
 
-        <ng-container *ngIf="field.type === 'radio'">
-          <div class="deck-radio-group">
-            <div *ngFor="let opt of getOptions(field)" class="radio-item">
-              <p-radiobutton 
-                [name]="field.key" 
-                [value]="opt[field.optionValue || 'value']" 
+          @if (field.type === 'date-range') {
+            <p-datepicker appendTo="body"
+              [(ngModel)]="filters[field.key]" 
+              selectionMode="range" 
+              [readonlyInput]="true"
+              (ngModelChange)="onDateRangeChange($event, field.key)"
+              [placeholder]="field.placeholder || 'Start - End'"
+              [showIcon]="true"
+              styleClass="deck-date-range"
+              dateFormat="yy-mm-dd">
+            </p-datepicker>
+          }
+
+          @if (field.type === 'checkbox') {
+            <div class="deck-checkbox-wrapper" (click)="toggleCheckbox(field.key)">
+              <p-checkbox 
                 [(ngModel)]="filters[field.key]" 
-                (ngModelChange)="onFilterChange()">
-              </p-radiobutton>
-              <label (click)="filters[field.key] = opt[field.optionValue || 'value']; onFilterChange()">
-                {{ opt[field.optionLabel || 'label'] }}
-              </label>
+                [binary]="true" 
+                (ngModelChange)="onFilterChange()" 
+                styleClass="deck-checkbox">
+              </p-checkbox>
+              <span class="deck-checkbox-label">{{ field.placeholder || 'Enable' }}</span>
             </div>
-          </div>
-        </ng-container>
+          }
 
-      </div>
+          @if (field.type === 'radio') {
+            <div class="deck-radio-group">
+              @for (opt of getOptions(field); track $index) {
+                <div class="radio-item">
+                  <p-radiobutton 
+                    [name]="field.key" 
+                    [value]="opt[field.optionValue || 'value']" 
+                    [(ngModel)]="filters[field.key]" 
+                    (ngModelChange)="onFilterChange()">
+                  </p-radiobutton>
+                  <label (click)="filters[field.key] = opt[field.optionValue || 'value']; onFilterChange()">
+                    {{ opt[field.optionLabel || 'label'] }}
+                  </label>
+                </div>
+              }
+            </div>
+          }
 
-      <div class="deck-actions" *ngIf="hasActiveFilters">
-        <div class="separator-vertical"></div>
-        <button pButton 
-          icon="pi pi-filter-slash" 
-          pTooltip="Clear All"
-          tooltipPosition="top"
-          class="p-button-rounded p-button-text p-button-secondary clear-btn"
-          (click)="clearAll()">
-        </button>
-      </div>
+        </div>
+      }
+
+      @if (hasActiveFilters) {
+        <div class="deck-actions">
+          <div class="separator-vertical"></div>
+          <button pButton 
+            icon="pi pi-filter-slash" 
+            pTooltip="Clear All"
+            tooltipPosition="top"
+            class="p-button-rounded p-button-text p-button-secondary clear-btn"
+            (click)="clearAll()">
+          </button>
+        </div>
+      }
 
     </div>
   `,

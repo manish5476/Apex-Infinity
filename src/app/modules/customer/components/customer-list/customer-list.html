@@ -33,11 +33,11 @@
       </div>
 
       <div class="se-filter-right">
-        <p-button label="New Customer" icon="pi pi-plus" routerLink="create" styleClass="p-button-primary"></p-button>
+        <p-button *hasPermission="PERMISSIONS.CUSTOMER.CREATE" label="New Customer" icon="pi pi-plus" routerLink="create" styleClass="p-button-primary"></p-button>
       </div>
     </div>
     <div class="list-grid-wrapper">
-      <app-ag-share-grid [columns]="column" [data]="data" [showActions]="false" selectionMode="multiple"
+      <app-ag-share-grid [columns]="column" [data]="data" [actionColumn]="customerActionColumn" selectionMode="multiple"
         (gridEvent)="eventFromGrid($event)">
       </app-ag-share-grid>
     </div>

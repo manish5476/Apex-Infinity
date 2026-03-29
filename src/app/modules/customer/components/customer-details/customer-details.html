@@ -62,8 +62,8 @@
 
       <div class="header-actions">
         <button pButton label="Transactions" icon="pi pi-list" class="p-button-outlined p-button-secondary" (click)="showTransactionsDialog = true"></button>
-        <button pButton label="Edit Profile" icon="pi pi-user-edit" class="p-button-outlined p-button-secondary" [routerLink]="['../../customer/create']" [queryParams]="{id: c._id}"></button>
-        <button pButton label="New Invoice" icon="pi pi-plus" class="p-button-primary" routerLink="/invoices/create" [queryParams]="{customerId: c._id}"></button>
+        <button *hasPermission="PERMISSIONS.CUSTOMER.UPDATE" pButton label="Edit Profile" icon="pi pi-user-edit" class="p-button-outlined p-button-secondary" [routerLink]="['../../customer/create']" [queryParams]="{id: c._id}"></button>
+        <button *hasPermission="PERMISSIONS.INVOICE.CREATE" pButton label="New Invoice" icon="pi pi-plus" class="p-button-primary" routerLink="/invoices/create" [queryParams]="{customerId: c._id}"></button>
       </div>
     </header>
 
@@ -76,7 +76,7 @@
           <div class="avatar-wrapper">
             <p-avatar [appImageViewer]="c.avatar" [image]="c.avatar" [label]="!c.avatar ? common.getInitials(c.name) : ''" size="xlarge" shape="circle" styleClass="user-avatar"></p-avatar>
             
-            <button class="edit-avatar-btn" (click)="fileInput.click()" title="Change Photo">
+            <button *hasPermission="PERMISSIONS.CUSTOMER.UPDATE" class="edit-avatar-btn" (click)="fileInput.click()" title="Change Photo">
               <i class="pi pi-camera"></i>
             </button>
             <input #fileInput type="file" accept="image/*" style="display: none" (change)="onFileSelected($event)">
@@ -85,7 +85,9 @@
           </div>
 
           <h3 class="contact-name">{{ c.contactPerson || c.name }}</h3>
-          <a *ngIf="c.email" [href]="'mailto:' + c.email" class="contact-email">{{ c.email }}</a>
+          @if (c.email) {
+          <a [href]="'mailto:' + c.email" class="contact-email">{{ c.email }}</a>
+          }
 
           <div class="info-list">
             <div class="info-item">
@@ -186,8 +188,7 @@
             @if (activeTab() === 'invoices') {
               <app-ag-share-grid 
                 [columns]="invoiceColumns" 
-                [data]="invoices()" 
-                [showActions]="false"
+                [data]="invoices()"
                 selectionMode="multiple" 
                 (gridEvent)="onGridEvent($event, 'invoices')"
                 class="full-size-grid">
@@ -197,8 +198,7 @@
             @if (activeTab() === 'payments') {
               <app-ag-share-grid 
                 [columns]="paymentColumns" 
-                [data]="payments()" 
-                [showActions]="false"
+                [data]="payments()"
                 selectionMode="multiple" 
                 (gridEvent)="onGridEvent($event, 'payments')"
                 class="full-size-grid">
@@ -213,9 +213,9 @@
 </div>
 
 <p-dialog appendTo="body"   header="Transaction History" [(visible)]="showTransactionsDialog" [modal]="true" [style]="{ width: '90vw', height: '90vh' }" [maximizable]="true" [draggable]="false" [resizable]="false" styleClass="modern-dialog" appendTo="body">
-  <ng-container *ngIf="showTransactionsDialog">
+  @if (showTransactionsDialog) {
     <app-customer-transactions [inputCustomerId]="customer()?._id"></app-customer-transactions>
-  </ng-container>
+  }
 </p-dialog>
 
 <p-toast position="bottom-right"></p-toast>

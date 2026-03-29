@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GridApi } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
 import { AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
@@ -14,8 +14,9 @@ import { CustomerService } from '../../services/customer-service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { Toast } from "primeng/toast";
-import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
-import { ActionViewRenderer } from '../../../shared/AgGrid/AgGridcomponents/DynamicDetailCard/ActionViewRenderer';
+import { AgShareGrid, ActionColumnConfig } from '../../../shared/components/ag-shared-grid';
+import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
+import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 
 @Component({
   selector: 'app-customer-list',
@@ -29,7 +30,8 @@ import { ActionViewRenderer } from '../../../shared/AgGrid/AgGridcomponents/Dyna
     RouterModule,
     InputTextModule,
     Toast,
-    AgShareGrid
+    AgShareGrid,
+    HasPermissionDirective
   ],
   providers: [CustomerService],
   templateUrl: './customer-list.html',
@@ -42,6 +44,15 @@ export class CustomerList implements OnInit {
   private messageService = inject(AppMessageService);
   public masterList = inject(MasterListService);
   private router = inject(Router);
+
+  PERMISSIONS = PERMISSIONS;
+
+  readonly customerActionColumn: ActionColumnConfig = {
+    showView: true,
+    showEdit: false,
+    showDelete: false,
+    viewPermission: PERMISSIONS.CUSTOMER.READ,
+  };
 
   private gridApi!: GridApi;
   
@@ -181,11 +192,11 @@ getData(isReset: boolean = false) {
     }
   }
 
-  onGridReady(params: GridReadyEvent) {
-    this.gridApi = params.api;
-  }
-
   eventFromGrid(event: any) {
+    if (event.type === 'init') {
+      this.gridApi = event.api;
+      return;
+    }
     if (event.type === 'cellClicked') {
       const customerId = event.row._id;
       if (customerId) {
@@ -199,19 +210,7 @@ getData(isReset: boolean = false) {
 
   getColumn(): void {
   this.column = [
-    // 1. Actions (Pinned Left for quick access)
-    {
-      headerName: '',
-      field: '_id',
-      width: 50,
-      pinned: 'left',
-      cellRenderer: ActionViewRenderer,
-      suppressMenu: true,
-      sortable: false,
-      lockPosition: true
-    },
-
-    // 2. Identity Group
+    // 1. Identity Group
     {
       headerName: 'Customer Identity',
       children: [

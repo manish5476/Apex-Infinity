@@ -48,7 +48,7 @@ interface PeakData {
         </app-universal-filter>
       </div>
 
-      <ng-container *ngIf="!loading(); else loader">
+      @if (!loading()) {
         
         <div class="highlight-grid">
           
@@ -113,14 +113,12 @@ interface PeakData {
           </div>
         </div>
 
-      </ng-container>
-
-      <ng-template #loader>
+      } @else {
         <div class="loader-container">
           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-12 h-12"></p-progressSpinner>
           <p class="loader-text">Mapping traffic flow...</p>
         </div>
-      </ng-template>
+      }
 
     </div>
   `,

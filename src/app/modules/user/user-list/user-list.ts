@@ -3,7 +3,6 @@ import { ChangeDetectorRef, Component, OnInit, effect, inject, signal } from '@a
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
 
 // --- PrimeNG ---
 import { ButtonModule } from 'primeng/button';
@@ -17,9 +16,11 @@ import { ConfirmationService } from 'primeng/api';
 import { MasterListService } from '../../../core/services/master-list.service';
 import { AppMessageService } from '../../../core/services/message.service';
 import { ImageCellRendererComponent } from '../../shared/AgGrid/AgGridcomponents/image-cell-renderer/image-cell-renderer.component';
-import { AgShareGrid } from '../../shared/components/ag-shared-grid';
+import { AgShareGrid, ActionColumnConfig } from '../../shared/components/ag-shared-grid';
 import { UserManagementService } from '../user-management.service';
 import { finalize } from 'rxjs';
+import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
+import { PERMISSIONS } from '@core/auth/permissions.constants';
 
 @Component({
   selector: 'app-user-list',
@@ -33,13 +34,25 @@ import { finalize } from 'rxjs';
     InputTextModule,
     ToastModule,
     ConfirmDialogModule,
-    AgShareGrid
+    AgShareGrid,
+    HasPermissionDirective
   ],
   providers: [UserManagementService, ConfirmationService],
   templateUrl: './user-list.html',
   styleUrl: './user-list.scss'
 })
 export class UserListComponent implements OnInit {
+  readonly PERMISSIONS = PERMISSIONS;
+
+  readonly userActionColumn: ActionColumnConfig = {
+    showView: true,
+    showEdit: true,
+    showDelete: true,
+    viewPermission: PERMISSIONS.USER.READ,
+    editPermission: PERMISSIONS.USER.MANAGE,
+    deletePermission: PERMISSIONS.USER.MANAGE,
+  };
+
   private cdr = inject(ChangeDetectorRef);
   private userService = inject(UserManagementService);
   private messageService = inject(AppMessageService);
@@ -47,7 +60,6 @@ export class UserListComponent implements OnInit {
   public masterList = inject(MasterListService);
   private router = inject(Router);
 
-  private gridApi!: GridApi;
   private currentPage = 1;
   private isLoading = false;
   private totalCount = 0;
@@ -92,11 +104,6 @@ export class UserListComponent implements OnInit {
       this.getData(false);
     }
   }
-
-  onGridReady(params: GridReadyEvent) {
-    this.gridApi = params.api;
-  }
-
 
   eventFromGrid(event: any) {
     if (event.type === 'cellClicked') {

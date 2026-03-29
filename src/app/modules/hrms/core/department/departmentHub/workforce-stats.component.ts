@@ -48,8 +48,7 @@ import { AgShareGrid } from '../../../../shared/components/ag-shared-grid';
             <div class="grid-wrapper">
               <app-ag-share-grid 
                 [columns]="columns" 
-                [data]="stats.departments" 
-                [showActions]="false"
+                [data]="stats.departments"
                 selectionMode="single">
               </app-ag-share-grid>
             </div>

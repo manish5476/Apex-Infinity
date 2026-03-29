@@ -8,10 +8,12 @@ import { NG_VALUE_ACCESSOR, ControlValueAccessor, FormsModule } from '@angular/f
   imports: [CommonModule, FormsModule],
   template: `
     <div class="chips-container">
-      <div class="chip" *ngFor="let tag of tags; let i = index">
-        {{ tag }}
-        <span class="remove" (click)="removeTag(i)">×</span>
-      </div>
+      @for (tag of tags; track $index; let i = $index) {
+        <div class="chip">
+          {{ tag }}
+          <span class="remove" (click)="removeTag(i)">×</span>
+        </div>
+      }
 
       <input
         class="chip-input"

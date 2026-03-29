@@ -53,7 +53,7 @@ interface PeakHour {
         </app-universal-filter>
       </div>
 
-      <ng-container *ngIf="!loading(); else loader">
+      @if (!loading()) {
         
         <div class="kpi-grid">
           
@@ -95,7 +95,6 @@ interface PeakHour {
                  <app-ag-share-grid 
                    [columns]="staffColumns" 
                    [data]="opData()?.metrics?.topStaff || []" 
-                   [showActions]="false" 
                    class="full-size-grid">
                  </app-ag-share-grid>
               </div>
@@ -142,14 +141,12 @@ interface PeakHour {
           </div>
         </div>
 
-      </ng-container>
-
-      <ng-template #loader>
+      } @else {
         <div class="loader-container">
           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-10 h-10"></p-progressSpinner>
           <p class="loader-text">Synchronizing operational logs...</p>
         </div>
-      </ng-template>
+      }
 
     </div>
   `,

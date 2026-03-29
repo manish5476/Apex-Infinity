@@ -3,14 +3,19 @@ import { Component, ElementRef, ViewChild, AfterViewChecked } from '@angular/cor
 import { ChatService } from '../../services/chat';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
+import { PERMISSIONS } from '@core/auth/permissions.constants';
 
 @Component({
   selector: 'app-ai-assistant',
-  imports: [CommonModule,FormsModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule, HasPermissionDirective],
   templateUrl: './ai-assistant.html',
   styleUrl: './ai-assistant.scss',
 })
 export class AiAssistantComponent implements AfterViewChecked {
+  readonly PERMISSIONS = PERMISSIONS;
+
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
   isOpen = false; // Is the chat window open?

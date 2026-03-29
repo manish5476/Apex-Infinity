@@ -54,7 +54,7 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
           </div>
         </div>
 
-        <ng-container *ngIf="!loading(); else loader">
+        @if (!loading()) {
           <div class="content-grid">
             
             <div class="chart-wrapper">
@@ -87,14 +87,12 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
                </div>
             </div>
           </div>
-        </ng-container>
-
-        <ng-template #loader>
+        } @else {
           <div class="loader-container">
             <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-10 h-10"></p-progressSpinner>
             <p class="loader-text">Slicing Sales Data...</p>
           </div>
-        </ng-template>
+        }
 
       </div>
 

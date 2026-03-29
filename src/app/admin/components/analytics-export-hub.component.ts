@@ -7,7 +7,8 @@ import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag'; 
 import { DatePickerModule } from 'primeng/datepicker';
 import { AdminAnalyticsService } from '../admin-analytics.service';
-
+import { PERMISSIONS } from '@core/auth/permissions.constants';
+import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
 
 @Component({
   selector: 'app-analytics-export-hub',
@@ -19,7 +20,8 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
     TooltipModule, 
     FormsModule, 
     TagModule,
-    DatePickerModule
+    DatePickerModule,
+    HasPermissionDirective
   ],
 
   template: `
@@ -52,9 +54,11 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
                     
                     <span class="dimension-name">{{ type.label }}</span>
                     
-                    <div *ngIf="selectedType() === type.id" class="check-badge">
+                    @if (selectedType() === type.id) {
+                    <div class="check-badge">
                       <i class="pi pi-check"></i>
                     </div>
+                    }
                   </div>
                 }
               </div>
@@ -77,7 +81,7 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
             </div>
           </div>
 
-          <div class="action-bar">
+          <div class="action-bar" *hasPermission="PERMISSIONS.ANALYTICS.EXPORT_DATA; else lockedExport">
              <p-button [label]="exporting() ? 'Generating CSV...' : 'Download Analysis'" 
                        [icon]="exporting() ? 'pi pi-spin pi-spinner' : 'pi pi-cloud-download'" 
                        [disabled]="exporting()"
@@ -85,6 +89,15 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
                        styleClass="p-button-lg export-btn">
              </p-button>
           </div>
+          <ng-template #lockedExport>
+             <div class="action-bar">
+                <p-button label="Export Restricted" 
+                          icon="pi pi-lock" 
+                          [disabled]="true"
+                          styleClass="p-button-lg p-button-secondary">
+                </p-button>
+             </div>
+          </ng-template>
         </div>
 
         <div class="side-column">
@@ -349,6 +362,7 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
   `]
 })
 export class AnalyticsExportHubComponent {
+  PERMISSIONS = PERMISSIONS;
   exporting = signal<boolean>(false);
   selectedType:any = signal<'sales' | 'inventory' | 'customers'>('sales');
   startDate: Date | null = null;

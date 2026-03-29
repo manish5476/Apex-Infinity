@@ -4,281 +4,304 @@
 <div class="page-container custom-scrollbar">
 
   @if (isLoading()) {
-    <div class="loading-wrapper">
-      <div class="header-skeleton">
-        <p-skeleton width="200px" height="40px" borderRadius="12px"></p-skeleton>
-        <div class="flex gap-3">
-          <p-skeleton width="120px" height="40px" borderRadius="8px"></p-skeleton>
-          <p-skeleton width="120px" height="40px" borderRadius="8px"></p-skeleton>
+  <div class="loading-wrapper">
+    <div class="header-skeleton">
+      <p-skeleton width="200px" height="40px" borderRadius="12px"></p-skeleton>
+      <div class="flex gap-3">
+        <p-skeleton width="120px" height="40px" borderRadius="8px"></p-skeleton>
+        <p-skeleton width="120px" height="40px" borderRadius="8px"></p-skeleton>
+      </div>
+    </div>
+    <div class="grid grid-cols-12 gap-8 mt-8">
+      <div class="col-span-12 lg:col-span-8 space-y-6">
+        <p-skeleton height="180px" borderRadius="16px"></p-skeleton>
+        <p-skeleton height="400px" borderRadius="16px"></p-skeleton>
+      </div>
+      <div class="col-span-12 lg:col-span-4">
+        <p-skeleton height="500px" borderRadius="16px"></p-skeleton>
+      </div>
+    </div>
+  </div>
+  }
+
+  @else if (invoice(); as inv) {
+
+  <header class="page-header glass-effect">
+    <div class="header-content">
+      <div class="header-left">
+        <button class="back-btn" routerLink="/invoices">
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <div class="title-group">
+          <div class="flex items-center gap-3">
+            <h1>Invoice #{{ inv.invoiceNumber }}</h1>
+            <span class="status-pill" [ngClass]="inv.status">{{ inv.status }}</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-item"><i class="pi pi-calendar"></i> Issued: <strong>{{ inv.invoiceDate |
+                date:'mediumDate' }}</strong></span>
+            <span class="divider"></span>
+            <span class="meta-item"><i class="pi pi-clock"></i> Due: <strong>{{ inv.dueDate | date:'mediumDate'
+                }}</strong></span>
+          </div>
         </div>
       </div>
-      <div class="grid grid-cols-12 gap-8 mt-8">
-        <div class="col-span-12 lg:col-span-8 space-y-6">
-          <p-skeleton height="180px" borderRadius="16px"></p-skeleton>
-          <p-skeleton height="400px" borderRadius="16px"></p-skeleton>
-        </div>
-        <div class="col-span-12 lg:col-span-4">
-          <p-skeleton height="500px" borderRadius="16px"></p-skeleton>
+
+      <div class="header-actions">
+        @if (inv.status !== 'cancelled' && inv.balanceAmount > 0) {
+        <button *hasPermission="PERMISSIONS.PAYMENT.CREATE" class="btn-primary glow-effect"
+          (click)="openPaymentModal()">
+          <i class="pi pi-wallet"></i> <span>Record Payment</span>
+        </button>
+        }
+
+        <div class="action-group">
+          <button *hasPermission="PERMISSIONS.INVOICE.DOWNLOAD" class="btn-secondary" pTooltip="Download PDF"
+            tooltipPosition="bottom" (click)="onDownload()">
+            <i class="pi pi-download"></i>
+          </button>
+          <button class="btn-secondary" pTooltip="Email Invoice" tooltipPosition="bottom" (click)="onEmail()">
+            <i class="pi pi-envelope"></i>
+          </button>
+
+          @if (inv.status !== 'cancelled') {
+          <div class="divider-vertical"></div>
+          <button *hasPermission="PERMISSIONS.INVOICE.DELETE" class="btn-secondary danger" pTooltip="Cancel Invoice"
+            tooltipPosition="bottom" (click)="openCancelModal()">
+            <i class="pi pi-ban"></i>
+          </button>
+          }
         </div>
       </div>
     </div>
-  } 
-  
-  @else if (invoice(); as inv) {
+  </header>
 
-    <header class="page-header glass-effect">
-      <div class="header-content">
-        <div class="header-left">
-          <button class="back-btn" routerLink="/invoices">
-            <i class="pi pi-arrow-left"></i>
-          </button>
-          <div class="title-group">
-            <div class="flex items-center gap-3">
-              <h1>Invoice #{{ inv.invoiceNumber }}</h1>
-              <span class="status-pill" [ngClass]="inv.status">{{ inv.status }}</span>
+  <main class="content-wrapper">
+    <div class="grid grid-cols-12 gap-8">
+
+      <div class="col-span-12 lg:col-span-8 flex flex-col gap-8">
+
+        <div class="participants-card">
+          <div class="party-block">
+            <div class="block-label">From</div>
+            <div class="party-info">
+              <div class="icon-box from"><i class="pi pi-building"></i></div>
+              <div>
+                <h3>{{ inv.branchId?.name || 'Head Office' }}</h3>
+                <p class="address-text">{{ inv.branchId?.address?.street }}</p>
+                <p class="address-text">{{ inv.branchId?.address?.city }}, {{ inv.branchId?.address?.state }}</p>
+              </div>
             </div>
-            <div class="meta-row">
-              <span class="meta-item"><i class="pi pi-calendar"></i> Issued: <strong>{{ inv.invoiceDate | date:'mediumDate' }}</strong></span>
-              <span class="divider"></span>
-              <span class="meta-item"><i class="pi pi-clock"></i> Due: <strong>{{ inv.dueDate | date:'mediumDate' }}</strong></span>
+          </div>
+
+          <div class="connector-line"></div>
+
+          <div class="party-block">
+            <div class="block-label">Bill To</div>
+            <div class="party-info">
+              <div class="icon-box to"><i class="pi pi-user"></i></div>
+              <div>
+                <h3>{{ inv.customerId?.name }}</h3>
+                <div class="contact-row">
+                  <span><i class="pi pi-envelope"></i> {{ inv.customerId?.email }}</span>
+                  <span><i class="pi pi-phone"></i> {{ inv.customerId?.phone }}</span>
+                </div>
+                <p class="address-text mt-2 opacity-80">{{ inv.billingAddress || 'No address provided' }}</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="header-actions">
-          @if (inv.status !== 'cancelled' && inv.balanceAmount > 0) {
-            <button class="btn-primary glow-effect" (click)="openPaymentModal()">
-              <i class="pi pi-wallet"></i> <span>Record Payment</span>
-            </button>
-          }
-
-          <div class="action-group">
-            <button class="btn-secondary" pTooltip="Download PDF" tooltipPosition="bottom" (click)="onDownload()">
-              <i class="pi pi-download"></i>
-            </button>
-            <button class="btn-secondary" pTooltip="Email Invoice" tooltipPosition="bottom" (click)="onEmail()">
-              <i class="pi pi-envelope"></i>
-            </button>
-            
-            @if (inv.status !== 'cancelled') {
-              <div class="divider-vertical"></div>
-              <button class="btn-secondary danger" pTooltip="Cancel Invoice" tooltipPosition="bottom" (click)="openCancelModal()">
-                <i class="pi pi-ban"></i>
-              </button>
-            }
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <main class="content-wrapper">
-      <div class="grid grid-cols-12 gap-8">
-        
-        <div class="col-span-12 lg:col-span-8 flex flex-col gap-8">
-          
-          <div class="participants-card">
-            <div class="party-block">
-              <div class="block-label">From</div>
-              <div class="party-info">
-                <div class="icon-box from"><i class="pi pi-building"></i></div>
-                <div>
-                  <h3>{{ inv.branchId?.name || 'Head Office' }}</h3>
-                  <p class="address-text">{{ inv.branchId?.address?.street }}</p>
-                  <p class="address-text">{{ inv.branchId?.address?.city }}, {{ inv.branchId?.address?.state }}</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="connector-line"></div>
-
-            <div class="party-block">
-              <div class="block-label">Bill To</div>
-              <div class="party-info">
-                <div class="icon-box to"><i class="pi pi-user"></i></div>
-                <div>
-                  <h3>{{ inv.customerId?.name }}</h3>
-                  <div class="contact-row">
-                    <span><i class="pi pi-envelope"></i> {{ inv.customerId?.email }}</span>
-                    <span><i class="pi pi-phone"></i> {{ inv.customerId?.phone }}</span>
-                  </div>
-                  <p class="address-text mt-2 opacity-80">{{ inv.billingAddress || 'No address provided' }}</p>
-                </div>
-              </div>
-            </div>
+        <div class="modern-card">
+          <div class="card-header">
+            <h3>Items & Services</h3>
+            <span class="badge">{{ inv.items.length }} Entries</span>
           </div>
 
-          <div class="modern-card">
-            <div class="card-header">
-              <h3>Items & Services</h3>
-              <span class="badge">{{ inv.items.length }} Entries</span>
-            </div>
-            
-            <div class="table-container">
-              <table class="styled-table">
-                <thead>
-                  <tr>
-                    <th width="45%">Description</th>
-                    <th class="text-right">Qty</th>
-                    <th class="text-right">Price</th>
-                    <th class="text-right">Tax</th>
-                    <th class="text-right">Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (item of inv.items; track $index) {
-                    <tr>
-                      <td>
-                        <div class="item-title">{{ item.name }}</div>
-                        <div class="item-sub" *ngIf="item.hsnCode">HSN: {{ item.hsnCode }}</div>
-                      </td>
-                      <td class="text-right">
-                        <span class="qty-badge">{{ item.quantity }} {{ item.unit }}</span>
-                      </td>
-                      <td class="text-right">{{ item.price | currency:'INR' }}</td>
-                      <td class="text-right text-muted">{{ item.taxRate }}%</td>
-                      <td class="text-right font-bold text-primary">
-                        {{ (((item.quantity * item.price) - item.discount) * (1 + item.taxRate/100)) | currency:'INR' }}
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-            
-            <div class="mobile-list">
-              @for (item of inv.items; track $index) {
-                <div class="mobile-item">
-                  <div class="mi-top">
-                    <span class="mi-name">{{ item.name }}</span>
-                    <span class="mi-price">{{ (((item.quantity * item.price) - item.discount) * (1 + item.taxRate/100)) | currency:'INR' }}</span>
-                  </div>
-                  <div class="mi-bottom">
-                    <span>{{ item.quantity }} {{ item.unit }} x {{ item.price | currency:'INR' }}</span>
-                    <span class="mi-tax" *ngIf="item.taxRate > 0">+{{ item.taxRate }}% Tax</span>
-                  </div>
-                </div>
-              }
-            </div>
+          <div class="table-container">
+            <table class="styled-table">
+              <thead>
+                <tr>
+                  <th width="45%">Description</th>
+                  <th class="text-right">Qty</th>
+                  <th class="text-right">Price</th>
+                  <th class="text-right">Tax</th>
+                  <th class="text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of inv.items; track $index) {
+                <tr>
+                  <td>
+                    <div class="item-title">{{ item.name }}</div>
+                    @if (item.hsnCode) {
+                    <div class="item-sub">HSN: {{ item.hsnCode }}</div>
+                    }
+                  </td>
+                  <td class="text-right">
+                    <span class="qty-badge">{{ item.quantity }} {{ item.unit }}</span>
+                  </td>
+                  <td class="text-right">{{ item.price | currency:'INR' }}</td>
+                  <td class="text-right text-muted">{{ item.taxRate }}%</td>
+                  <td class="text-right font-bold text-primary">
+                    {{ (((item.quantity * item.price) - item.discount) * (1 + item.taxRate/100)) | currency:'INR' }}
+                  </td>
+                </tr>
+                }
+              </tbody>
+            </table>
           </div>
 
-          @if (payments().length > 0) {
-            <div class="modern-card">
-              <div class="card-header">
-                <h3>Payment History</h3>
+          <div class="mobile-list">
+            @for (item of inv.items; track $index) {
+            <div class="mobile-item">
+              <div class="mi-top">
+                <span class="mi-name">{{ item.name }}</span>
+                <span class="mi-price">{{ (((item.quantity * item.price) - item.discount) * (1 + item.taxRate/100)) |
+                  currency:'INR' }}</span>
               </div>
-              <div class="timeline-wrapper">
-                @for (pay of payments(); track pay._id; let last = $last) {
-                  <div class="timeline-row" [class.last]="last">
-                    <div class="time-col">
-                      <span class="t-date">{{ pay.paymentDate | date:'MMM d' }}</span>
-                      <span class="t-time">{{ pay.paymentDate | date:'shortTime' }}</span>
-                    </div>
-                    <div class="marker-col">
-                      <div class="dot"></div>
-                      <div class="line" *ngIf="!last"></div>
-                    </div>
-                    <div class="data-col">
-                      <div class="pay-card">
-                        <div class="pc-head">
-                          <span class="pc-method">{{ pay.paymentMethod | titlecase }}</span>
-                          <span class="pc-amount">+{{ pay.amount | currency:'INR' }}</span>
-                        </div>
-                        <div class="pc-ref" *ngIf="pay.transactionId">Ref: {{ pay.transactionId }}</div>
-                      </div>
-                    </div>
-                  </div>
+              <div class="mi-bottom">
+                <span>{{ item.quantity }} {{ item.unit }} x {{ item.price | currency:'INR' }}</span>
+                @if (item.taxRate > 0) {
+                <span class="mi-tax">+{{ item.taxRate }}% Tax</span>
                 }
               </div>
             </div>
-          }
-
+            }
+          </div>
         </div>
 
-        <div class="col-span-12 lg:col-span-4 space-y-6">
-          
-          <div class="financial-card sticky-desktop">
-            <div class="fin-header">
-              <span class="label">Payment Status</span>
-              <span class="status-badge" [ngClass]="inv.paymentStatus">{{ inv.paymentStatus | uppercase }}</span>
-            </div>
-
-            <div class="fin-content">
-              <div class="calc-row">
-                <span>Subtotal</span>
-                <span class="val">{{ inv.subTotal | currency:'INR' }}</span>
+        @if (payments().length > 0) {
+        <div class="modern-card">
+          <div class="card-header">
+            <h3>Payment History</h3>
+          </div>
+          <div class="timeline-wrapper">
+            @for (pay of payments(); track pay._id; let last = $last) {
+            <div class="timeline-row" [class.last]="last">
+              <div class="time-col">
+                <span class="t-date">{{ pay.paymentDate | date:'MMM d' }}</span>
+                <span class="t-time">{{ pay.paymentDate | date:'shortTime' }}</span>
               </div>
-              <div class="calc-row">
-                <span>Tax</span>
-                <span class="val">{{ inv.totalTax | currency:'INR' }}</span>
+              <div class="marker-col">
+                <div class="dot"></div>
+                @if (!last) {
+                <div class="line"></div>
+                }
               </div>
-              <div class="calc-row discount" *ngIf="inv.totalDiscount > 0">
-                <span>Discount</span>
-                <span class="val">-{{ inv.totalDiscount | currency:'INR' }}</span>
-              </div>
-              <div class="calc-row" *ngIf="inv.roundOff">
-                <span>Round Off</span>
-                <span class="val">{{ inv.roundOff | currency:'INR' }}</span>
-              </div>
-
-              <div class="dash-divider"></div>
-
-              <div class="calc-row total">
-                <span>Grand Total</span>
-                <span class="val big">{{ inv.grandTotal | currency:'INR' }}</span>
-              </div>
-
-              <div class="payment-progress">
-                <div class="prog-bar">
-                  <div class="fill" [style.width.%]="(inv.paidAmount / inv.grandTotal) * 100"></div>
-                </div>
-                <div class="prog-labels">
-                  <span class="paid">Paid: {{ inv.paidAmount | currency:'INR' }}</span>
-                  <span class="balance" [class.danger]="inv.balanceAmount > 0">Due: {{ inv.balanceAmount | currency:'INR' }}</span>
+              <div class="data-col">
+                <div class="pay-card">
+                  <div class="pc-head">
+                    <span class="pc-method">{{ pay.paymentMethod | titlecase }}</span>
+                    <span class="pc-amount">+{{ pay.amount | currency:'INR' }}</span>
+                  </div>
+                  @if (pay.transactionId) {
+                  <div class="pc-ref">Ref: {{ pay.transactionId }}</div>
+                  }
                 </div>
               </div>
             </div>
-
-            @if (inv.notes) {
-              <div class="fin-notes">
-                <span class="note-icon">📝</span>
-                <p>{{ inv.notes }}</p>
-              </div>
             }
           </div>
-
-          <div class="quick-actions-grid">
-            @if (existingEmiId()) {
-              <button class="action-card" [routerLink]="['/emis', existingEmiId()]">
-                <div class="ac-icon emi"><i class="pi pi-percentage"></i></div>
-                <div class="ac-text">View EMI Plan</div>
-              </button>
-            } @else if (inv.status !== 'cancelled' && inv.paymentStatus !== 'paid') {
-              <button class="action-card" [routerLink]="['/emis/create']" [queryParams]="{invoiceId: inv._id}">
-                <div class="ac-icon emi"><i class="pi pi-calculator"></i></div>
-                <div class="ac-text">Convert to EMI</div>
-              </button>
-            }
-            <button class="action-card" (click)="onDownload()">
-              <div class="ac-icon pdf"><i class="pi pi-file-pdf"></i></div>
-              <div class="ac-text">Download PDF</div>
-            </button>
-          </div>
-
         </div>
+        }
+
       </div>
-    </main>
+
+      <div class="col-span-12 lg:col-span-4 space-y-6">
+
+        <div class="financial-card sticky-desktop">
+          <div class="fin-header">
+            <span class="label">Payment Status</span>
+            <span class="status-badge" [ngClass]="inv.paymentStatus">{{ inv.paymentStatus | uppercase }}</span>
+          </div>
+
+          <div class="fin-content">
+            <div class="calc-row">
+              <span>Subtotal</span>
+              <span class="val">{{ inv.subTotal | currency:'INR' }}</span>
+            </div>
+            <div class="calc-row">
+              <span>Tax</span>
+              <span class="val">{{ inv.totalTax | currency:'INR' }}</span>
+            </div>
+            @if (inv.totalDiscount > 0) {
+            <div class="calc-row discount">
+              <span>Discount</span>
+              <span class="val">-{{ inv.totalDiscount | currency:'INR' }}</span>
+            </div>
+            }
+            @if (inv.roundOff) {
+            <div class="calc-row">
+              <span>Round Off</span>
+              <span class="val">{{ inv.roundOff | currency:'INR' }}</span>
+            </div>
+            }
+
+            <div class="dash-divider"></div>
+
+            <div class="calc-row total">
+              <span>Grand Total</span>
+              <span class="val big">{{ inv.grandTotal | currency:'INR' }}</span>
+            </div>
+
+            <div class="payment-progress">
+              <div class="prog-bar">
+                <div class="fill" [style.width.%]="(inv.paidAmount / inv.grandTotal) * 100"></div>
+              </div>
+              <div class="prog-labels">
+                <span class="paid">Paid: {{ inv.paidAmount | currency:'INR' }}</span>
+                <span class="balance" [class.danger]="inv.balanceAmount > 0">Due: {{ inv.balanceAmount | currency:'INR'
+                  }}</span>
+              </div>
+            </div>
+          </div>
+
+          @if (inv.notes) {
+          <div class="fin-notes">
+            <span class="note-icon">📝</span>
+            <p>{{ inv.notes }}</p>
+          </div>
+          }
+        </div>
+
+        <div class="quick-actions-grid">
+          @if (existingEmiId()) {
+          <button class="action-card" [routerLink]="['/emis', existingEmiId()]">
+            <div class="ac-icon emi"><i class="pi pi-percentage"></i></div>
+            <div class="ac-text">View EMI Plan</div>
+          </button>
+          } @else if (inv.status !== 'cancelled' && inv.paymentStatus !== 'paid') {
+          <button *hasPermission="PERMISSIONS.EMI.CREATE" class="action-card" [routerLink]="['/emis/create']"
+            [queryParams]="{invoiceId: inv._id}">
+            <div class="ac-icon emi"><i class="pi pi-calculator"></i></div>
+            <div class="ac-text">Convert to EMI</div>
+          </button>
+          }
+          <button *hasPermission="PERMISSIONS.INVOICE.DOWNLOAD" class="action-card" (click)="onDownload()">
+            <div class="ac-icon pdf"><i class="pi pi-file-pdf"></i></div>
+            <div class="ac-text">Download PDF</div>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </main>
   }
 </div>
 
-<p-dialog appendTo="body"   header="Record Payment" [(visible)]="showPaymentModal" [modal]="true" [style]="{width: '400px'}" [draggable]="false" [resizable]="false" styleClass="modern-dialog">
+<p-dialog appendTo="body" header="Record Payment" [(visible)]="showPaymentModal" [modal]="true"
+  [style]="{width: '400px'}" [draggable]="false" [resizable]="false" styleClass="modern-dialog">
   <form [formGroup]="paymentForm" class="flex flex-col gap-5 mt-2">
     <div class="form-group">
       <label>Amount Received</label>
-      <p-inputNumber formControlName="amount" mode="currency" currency="INR" locale="en-IN" styleClass="w-full"></p-inputNumber>
+      <p-inputNumber formControlName="amount" mode="currency" currency="INR" locale="en-IN"
+        styleClass="w-full"></p-inputNumber>
     </div>
     <div class="form-group">
       <label>Payment Mode</label>
-      <p-select appendTo="body" formControlName="paymentMethod" [options]="paymentMethods" optionLabel="label" optionValue="value" [filter]="true" filterBy="label" styleClass="w-full"></p-select>
+      <p-select appendTo="body" formControlName="paymentMethod" [options]="paymentMethods" optionLabel="label"
+        optionValue="value" [filter]="true" filterBy="label" styleClass="w-full"></p-select>
     </div>
     <div class="form-group">
       <label>Reference / Transaction ID</label>
@@ -291,13 +314,16 @@
   </form>
   <ng-template pTemplate="footer">
     <div class="flex justify-end gap-2">
-      <button pButton label="Cancel" class="p-button-text p-button-secondary" (click)="showPaymentModal.set(false)"></button>
-      <button pButton label="Confirm" class="p-button-primary" (click)="submitPayment()" [loading]="isProcessing()"></button>
+      <button pButton label="Cancel" class="p-button-text p-button-secondary"
+        (click)="showPaymentModal.set(false)"></button>
+      <button pButton label="Confirm" class="p-button-primary" (click)="submitPayment()"
+        [loading]="isProcessing()"></button>
     </div>
   </ng-template>
 </p-dialog>
 
-<p-dialog appendTo="body"   header="Cancel Invoice" [(visible)]="showCancelModal" [modal]="true" [style]="{width: '450px'}" [draggable]="false" [resizable]="false" styleClass="modern-dialog">
+<p-dialog appendTo="body" header="Cancel Invoice" [(visible)]="showCancelModal" [modal]="true"
+  [style]="{width: '450px'}" [draggable]="false" [resizable]="false" styleClass="modern-dialog">
   <form [formGroup]="cancelForm" class="flex flex-col gap-4 mt-2">
     <div class="warning-banner">
       <i class="pi pi-exclamation-triangle"></i>
@@ -305,7 +331,8 @@
     </div>
     <div class="form-group">
       <label>Cancellation Reason</label>
-      <textarea pInputTextarea formControlName="reason" rows="3" class="w-full" placeholder="Reason is required..."></textarea>
+      <textarea pInputTextarea formControlName="reason" rows="3" class="w-full"
+        placeholder="Reason is required..."></textarea>
     </div>
     <div class="flex items-center gap-2 mt-1">
       <p-checkbox formControlName="restock" [binary]="true" inputId="restockCheck"></p-checkbox>
@@ -315,7 +342,8 @@
   <ng-template pTemplate="footer">
     <div class="flex justify-end gap-2">
       <button pButton label="Keep Invoice" class="p-button-text" (click)="showCancelModal.set(false)"></button>
-      <button pButton label="Confirm Cancel" class="p-button-danger" (click)="submitCancel()" [disabled]="cancelForm.invalid" [loading]="isProcessing()"></button>
+      <button pButton label="Confirm Cancel" class="p-button-danger" (click)="submitCancel()"
+        [disabled]="cancelForm.invalid" [loading]="isProcessing()"></button>
     </div>
   </ng-template>
 </p-dialog>

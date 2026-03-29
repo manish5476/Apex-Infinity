@@ -2,10 +2,9 @@ import { ChangeDetectorRef, Component, OnInit, inject, ChangeDetectionStrategy }
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
-
 import { AppMessageService } from '../../../../core/services/message.service';
-import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
+import { AgShareGrid, ActionColumnConfig } from '../../../shared/components/ag-shared-grid';
+import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 import { HRMSService } from '../../hrms.service';
 
 @Component({
@@ -92,10 +91,9 @@ import { HRMSService } from '../../hrms.service';
           <app-ag-share-grid 
             [columns]="column" 
             [data]="data" 
-            [showActions]="true" 
+            [actionColumn]="designationActionColumn"
             selectionMode="single"
-            (gridEvent)="eventFromGrid($event)"
-            (gridReady)="onGridReady($event)">
+            (gridEvent)="eventFromGrid($event)">
           </app-ag-share-grid>
         </div>
 
@@ -240,7 +238,6 @@ export class DesignationListComponent implements OnInit {
   private messageService = inject(AppMessageService);
   private router = inject(Router);
 
-  private gridApi!: GridApi;
   public currentPage = 1;
   public isLoading = false;
   public totalCount = 0;
@@ -253,6 +250,15 @@ export class DesignationListComponent implements OnInit {
     search: '',
     grade: null,
     isActive: null
+  };
+
+  readonly designationActionColumn: ActionColumnConfig = {
+    showView: true,
+    showEdit: true,
+    showDelete: true,
+    viewPermission: PERMISSIONS.DESIGNATION.READ,
+    editPermission: PERMISSIONS.DESIGNATION.MANAGE,
+    deletePermission: PERMISSIONS.DESIGNATION.MANAGE,
   };
 
   ngOnInit(): void {
@@ -318,10 +324,6 @@ export class DesignationListComponent implements OnInit {
     if (!this.isLoading && this.data.length < this.totalCount) {
       this.getData(false);
     }
-  }
-
-  onGridReady(params: any) {
-    this.gridApi = params.api;
   }
 
   eventFromGrid(event: any) {

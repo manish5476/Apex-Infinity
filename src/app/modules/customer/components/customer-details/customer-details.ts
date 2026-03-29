@@ -23,6 +23,8 @@ import { CommonMethodService } from '../../../../core/utils/common-method.servic
 import { CustomerTransactions } from '../../../transactions/customer-transactions/customer-transactions';
 import { ImageViewerDirective } from '../../../shared/directives/image-viewer.directive';
 import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
+import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
+import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 
 type TabType = 'ledger' | 'invoices' | 'payments';
 
@@ -48,7 +50,8 @@ interface TabState {
     DialogModule,
     ToastModule,
     CustomerTransactions,
-    AgShareGrid
+    AgShareGrid,
+    HasPermissionDirective
   ],
   providers: [CustomerService, InvoiceService, PaymentService, FinancialService],
   templateUrl: './customer-details.html',
@@ -65,6 +68,8 @@ export class CustomerDetails implements OnInit {
   private messageService = inject(AppMessageService);
   public common = inject(CommonMethodService);
   private cdr = inject(ChangeDetectorRef);
+
+  PERMISSIONS = PERMISSIONS;
 
   // --- State Signals ---
   loadingProfile = signal(true);

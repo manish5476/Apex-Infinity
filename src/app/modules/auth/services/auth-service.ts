@@ -131,25 +131,18 @@ export class AuthService {
   private readonly TOKEN_KEY = 'apex_auth_token';
   private readonly USER_KEY = 'apex_current_user';
   private readonly REMEMBER_ME_KEY = 'apex_remember_me';
-
-  // public authTokenData: any;
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser$: Observable<User | null>;
   public isAuthenticated$: Observable<boolean>;
-
   private apiService = inject(ApiService);
   private OrganizationService = inject(OrganizationService);
   private messageService = inject(AppMessageService);
   private router = inject(Router);
-
-  // 🟢 CRITICAL FIX: Ensure this is always synced with Storage
   private _token: string | null = null;
-  private isLoggingOut = signal(false); // ✅ Guard against concurrent logout calls
+  private isLoggingOut = signal(false)
 
   public get authTokenData(): string | null {
-    if (!this._token) {
-      this._token = this.getItem<string>(this.TOKEN_KEY);
-    }
+    if (!this._token) { this._token = this.getItem<string>(this.TOKEN_KEY); }
     return this._token;
   }
 
@@ -167,40 +160,13 @@ export class AuthService {
     this.isAuthenticated$ = this.currentUser$.pipe(map((user: any) => !!user));
   }
 
-  // ======================================================
-  // INITIALIZATION
-  // ======================================================
-
-  //   initializeFromStorage(): Promise<void> {
-  //   return new Promise(resolve => {
-  //     const token = this.getToken();
-  //     const user = this.getItem<User>(this.USER_KEY);
-
-  //     if (token && user) {
-  //       this.currentUserSubject.next(user);
-  //       this.verifyToken().subscribe({
-  //         next: () => {
-  //           this.refreshPermissions(); // <--- Add this here
-  //           resolve();
-  //         },
-  //         error: () => {
-  //           this.performClientLogout();
-  //           resolve();
-  //         }
-  //       });
-  //     } else {
-  //       resolve();
-  //     }
-  //   });
-  // }
 
   initializeFromStorage(): Promise<void> {
     return new Promise(resolve => {
       const token = this.getToken();
       const user = this.getItem<any>(this.USER_KEY);
-
       if (token && user) {
-        this._token = token; // ✅ Sync internal token variable
+        this._token = token;
         this.currentUserSubject.next(user);
 
         this.verifyToken().subscribe({
@@ -218,84 +184,26 @@ export class AuthService {
       }
     });
   }
-  // initializeFromStorage(): Promise<void> {
-  //   return new Promise(resolve => {
-  //     const token = this.getToken();
-  //     this.authTokenData = token;
-  //     const user = this.getItem<User>(this.USER_KEY);
-
-  //     if (token && user) {
-  //       this.currentUserSubject.next(user);
-  //       // Verify token is still valid
-  //       this.verifyToken().subscribe({
-  //         next: () => resolve(),
-  //         error: () => {
-  //           // Token invalid, clear storage
-  //           this.performClientLogout();
-  //           resolve();
-  //         }
-  //       });
-  //     } else {
-  //       resolve();
-  //     }
-  //   });
-  // }
-  // ======================================================
-  // AUTHENTICATION HANDLERS
-  // ======================================================
 
   public handleLoginSuccess(response: any, rememberMe: boolean = false): void {
     const user = response.data?.user;
     const token = response.token;
-
     if (!token || !user) return;
-
     this._token = token; // ✅ Update internal state
     this.setItem(this.TOKEN_KEY, token);
     this.setItem(this.USER_KEY, user);
     this.setItem('orgSlug', response.data.organization?.uniqueShopId?.trim());
-
     if (rememberMe) {
       this.setItem(this.REMEMBER_ME_KEY, 'true');
     }
-
     this.currentUserSubject.next(user);
-
-    // SuccessInterceptor will show res.message if the backend provides one.
-    // However, login response is handled in AuthService.handleLoginSuccess.
-    // Let's use handleSuccess for better fallback logic.
     this.messageService.handleSuccess(response, user.status === 'approved' ? 'Welcome back!' : 'Account pending approval');
-
     if (user.status === 'approved') {
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(['/notes']);
     } else {
       this.router.navigate(['/auth/pending-approval']);
     }
   }
-
-  // // ======================================================
-  // // AUTHENTICATION HANDLERS
-  // // ======================================================
-
-  // public handleLoginSuccess(response: LoginResponse, rememberMe: boolean = false): void {
-  //   const user = response.data?.user;
-  //   if (!response.token || !user) return;
-
-  //   this.authTokenData = response.token;
-  //   this.setItem(this.TOKEN_KEY, response.token);
-  //   this.setItem(this.USER_KEY, user);
-  //   this.setItem('orgSlug', response.data.organization?.uniqueShopId?.trim());
-
-  //   if (rememberMe) { this.setItem(this.REMEMBER_ME_KEY, 'true');    }
-  //   this.currentUserSubject.next(user);
-  //   const statusMessage = user.status === 'approved' ? 'Welcome back!' : 'Account pending approval';
-  //   this.messageService.showSuccess( statusMessage);
-  //   if (user.status === 'approved') {
-  //     this.router.navigate(['/dashboard']);
-  //   } else {
-  //     this.router.navigate(['/auth/pending-approval']);
-  //   }
-  // }
 
   public handleSignupSuccess(response: SignupResponse): void {
     this.messageService.showSuccess(
@@ -306,30 +214,10 @@ export class AuthService {
     });
   }
 
-  // ======================================================
-  // LOGOUT
-  // ======================================================
-
-  // logout(): void {
-  //   const currentUrl = this.router.url;
-
-  //   this.apiService.logOut().subscribe({
-  //     next: () => console.log('Backend logout successful'),
-  //     error: (err) => console.warn('Backend logout failed', err),
-  //     complete: () => this.performClientLogout(currentUrl)
-  //   });
-  // }
-  // ======================================================
-  // LOGOUT (Ensures Socket Cleanup)
-  // ======================================================
-
   logout(): void {
     if (this.isLoggingOut()) return;
     this.isLoggingOut.set(true);
-
     const currentUrl = this.router.url;
-
-    // Optimistically proceed to client logout regardless of backend success
     this.apiService.logOut().pipe(
       finalize(() => {
         this.performClientLogout(currentUrl);
@@ -337,7 +225,6 @@ export class AuthService {
       })
     ).subscribe({
       error: () => {
-        // Even if 401 or network error, we want to clear local session
         console.warn('Backend logout failed or token already expired');
       }
     });
@@ -381,34 +268,6 @@ export class AuthService {
 
     this.router.navigate(target as any[]);
   }
-
-  // private performClientLogout(returnUrl?: string): void {
-  //   if (isPlatformBrowser(this.platformId)) {
-  //     // Clear only auth-related items, keep other app data if needed
-  //     localStorage.removeItem(this.TOKEN_KEY);
-  //     localStorage.removeItem(this.USER_KEY);
-  //     localStorage.removeItem(this.REMEMBER_ME_KEY);
-  //     localStorage.removeItem('orgSlug');
-  //     // Optional: Clear all if you want full cleanup
-  //     // localStorage.clear(); 
-  //     // sessionStorage.clear();
-  //   }
-
-  //   this.authTokenData = null;
-  //   this.currentUserSubject.next(null);
-
-  //   if (returnUrl && !returnUrl.includes('/auth/')) {
-  //     this.router.navigate(['/auth/login'], {
-  //       queryParams: { returnUrl: returnUrl }
-  //     });
-  //   } else {
-  //     this.router.navigate(['/auth/login']);
-  //   }
-  // }
-
-  // ======================================================
-  // AUTH API METHODS
-  // ======================================================
 
   /**
    * Login with email or phone
@@ -469,11 +328,6 @@ export class AuthService {
     );
   }
 
-
-
-  /**
-   * Verify current token validity
-   */
   verifyToken(): Observable<any> {
     return this.apiService.verifyToken().pipe(
       tap((res: any) => {
@@ -504,14 +358,6 @@ export class AuthService {
     );
   }
 
-
-  // ======================================================
-  // PASSWORD MANAGEMENT
-  // ======================================================
-
-  /**
-   * Request password reset email
-   */
   forgotPassword(email: string) {
     return this.apiService.forgotPassword({ email }).pipe(
       tap(() => {
@@ -558,13 +404,6 @@ export class AuthService {
     );
   }
 
-  // ======================================================
-  // EMAIL VERIFICATION
-  // ======================================================
-
-  /**
-   * Send verification email
-   */
   sendVerificationEmail() {
     return this.apiService.sendVerificationEmail().pipe(
       tap(() => {
@@ -579,13 +418,9 @@ export class AuthService {
     );
   }
 
-  /**
-   * Verify email with token
-   */
   verifyEmail(token: string) {
     return this.apiService.verifyEmail(token).pipe(
       tap(() => {
-        // Update local user data
         const currentUser = this.currentUserValue;
         if (currentUser) {
           currentUser.emailVerified = true;
@@ -601,13 +436,6 @@ export class AuthService {
     );
   }
 
-  // ======================================================
-  // SESSION MANAGEMENT
-  // ======================================================
-
-  /**
-   * Get all active sessions
-   */
   getActiveSessions(): Observable<{ sessions: Session[] }> {
     return this.apiService.getActiveSessions().pipe(
       catchError(err => {
@@ -617,9 +445,6 @@ export class AuthService {
     );
   }
 
-  /**
-   * Terminate specific session
-   */
   terminateSession(sessionId: string): Observable<any> {
     return this.apiService.terminateSession(sessionId).pipe(
       tap(() => {
@@ -632,13 +457,6 @@ export class AuthService {
     );
   }
 
-  // ======================================================
-  // USER STATE & PERMISSIONS
-  // ======================================================
-
-  /**
-   * Check if user has specific permission
-   */
   hasPermission(permission: string): boolean {
     const user = this.currentUserValue;
     if (!user) return false;
@@ -648,44 +466,26 @@ export class AuthService {
       false;
   }
 
-  /**
-   * Check if user has any of the given permissions
-   */
   hasAnyPermission(permissions: string[]): boolean {
     return permissions.some(permission => this.hasPermission(permission));
   }
 
-  /**
-   * Check if user has all given permissions
-   */
   hasAllPermissions(permissions: string[]): boolean {
     return permissions.every(permission => this.hasPermission(permission));
   }
 
-  /**
-   * Check if user is approved
-   */
   isApproved(): boolean {
     return this.currentUserValue?.status === 'approved';
   }
 
-  /**
-   * Check if user is pending approval
-   */
   isPending(): boolean {
     return this.currentUserValue?.status === 'pending';
   }
 
-  /**
-   * Check if email is verified
-   */
   isEmailVerified(): boolean {
     return this.currentUserValue?.emailVerified || false;
   }
 
-  /**
-   * Get user's full name with employee ID
-   */
   getDisplayName(): string {
     const user = this.currentUserValue;
     if (!user) return '';
@@ -694,14 +494,6 @@ export class AuthService {
     }
     return user.name;
   }
-
-  // ======================================================
-  // GETTERS & STORAGE
-  // ======================================================
-
-  // public get currentUserValue(): User | null {
-  //   return this.currentUserSubject.value;
-  // }
 
   public getCurrentUser(): User | null {
     return this.currentUserSubject.value;
@@ -727,9 +519,6 @@ export class AuthService {
     return this.getItem<string>(this.REMEMBER_ME_KEY) === 'true';
   }
 
-  // ======================================================
-  // STORAGE HELPERS
-  // ======================================================
   private setItem(key: string, value: any): void {
     if (!isPlatformBrowser(this.platformId)) return;
     const data = (typeof value === 'string') ? value : JSON.stringify(value);
@@ -746,34 +535,6 @@ export class AuthService {
       return item as unknown as T;
     }
   }
-  // private setItem(key: string, value: any): void {
-  //   if (!isPlatformBrowser(this.platformId)) return;
-
-  //   if (key === this.TOKEN_KEY || key === this.REMEMBER_ME_KEY || key === 'orgSlug') {
-  //     localStorage.setItem(key, String(value));
-  //     return;
-  //   }
-
-  //   localStorage.setItem(key, JSON.stringify(value));
-  // }
-
-  // getItem<T>(key: string): T | null {
-  //   if (!isPlatformBrowser(this.platformId)) return null;
-
-  //   const item = localStorage.getItem(key);
-  //   if (!item) return null;
-
-  //   if (key === this.TOKEN_KEY || key === this.REMEMBER_ME_KEY || key === 'orgSlug') {
-  //     return item as any;
-  //   }
-
-  //   try {
-  //     return JSON.parse(item);
-  //   } catch {
-  //     localStorage.removeItem(key);
-  //     return null;
-  //   }
-  // }
 
   private removeItem(key: string): void {
     if (isPlatformBrowser(this.platformId)) {
@@ -794,9 +555,6 @@ export class AuthService {
     });
   }
 
-  /**
-   * Update current user preferences locally and in storage
-   */
   updateUserPreferences(preferences: Partial<User['preferences']>): void {
     const user = this.currentUserValue;
     if (user) {
@@ -808,240 +566,4 @@ export class AuthService {
       this.currentUserSubject.next({ ...user });
     }
   }
-
-  /**
- * Fetch fresh permissions from the server and update local state
- */
-  // refreshPermissions(): void {
-  //   this.apiService.getMyPermissions().subscribe({
-  //     next: (res) => {
-  //       const currentUser = this.currentUserValue;
-  //       if (currentUser && res.data) {
-  //         // We cast the object to 'User' to satisfy the Type check
-  //         const updatedUser: User = {
-  //           ...currentUser,
-  //           role: {
-  //             ...currentUser.role,
-  //             permissions: res.data // New permissions from API
-  //           }
-  //         } as User; 
-
-  //         this.setItem(this.USER_KEY, updatedUser);
-  //         this.currentUserSubject.next(updatedUser);
-  //       }
-  //     }
-  //   });
-  // }
-
-  // /**
-  //  * The "Perfect" check logic: 
-  //  * Handles Wildcards (*), SuperAdmin status, and Category wildcards (invoice:*)
-  //  */
-  // can(permission: string): boolean {
-  //   if (this.isSuperAdmin()) return true;
-
-  //   const perms = this.userPermissions();
-  //   if (perms.includes('*')) return true;
-  //   if (perms.includes(permission)) return true;
-
-  //   // Support for category-level access (e.g., 'invoice:*')
-  //   const [category] = permission.split(':');
-  //   return perms.includes(`${category}:*`);
-  // }
 }
-
-// import { Injectable, Inject, PLATFORM_ID, inject, Injector } from '@angular/core';
-// import { isPlatformBrowser } from '@angular/common';
-// import { Router } from '@angular/router';
-// import { BehaviorSubject, Observable, throwError } from 'rxjs';
-// import { tap, catchError, map } from 'rxjs/operators';
-// import { AppMessageService } from '../../../core/services/message.service';
-// import { ApiService } from '../../../core/services/api';
-// import { OrganizationService } from './../../organization/organization.service';
-// export interface Role { _id: string; name: string; permissions: string[]; isSuperAdmin: boolean; }
-// export interface Branch { _id: string; name: string; address: any; isMainBranch: boolean; }
-// export interface User { _id: string; name: string; email: string; organizationId: string; branchId: string; role: Role; }
-
-// export interface LoginResponse {
-//   token: string;
-//   data: {
-//     uniqueShopId?: string;
-//     user?: User;
-//     owner?: User;
-//     organization?: any;
-//     branch?: Branch;
-//     role?: Role;
-//   };
-// }
-
-// @Injectable({ providedIn: 'root' })
-// export class AuthService {
-//   private readonly TOKEN_KEY = 'apex_auth_token';
-//   private readonly USER_KEY = 'apex_current_user';
-//   public authTokenData: any;
-//   private currentUserSubject: BehaviorSubject<User | null>;
-//   public currentUser$: Observable<User | null>;
-//   public isAuthenticated$: Observable<boolean>;
-//   private apiService = inject(ApiService);
-//   private OrganizationService = inject(OrganizationService);
-//   private messageService = inject(AppMessageService);
-//   private router = inject(Router);
-//   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
-//     this.currentUserSubject = new BehaviorSubject<User | null>(null);
-//     this.currentUser$ = this.currentUserSubject.asObservable();
-//     this.isAuthenticated$ = this.currentUser$.pipe(map((user: any) => !!user));
-//   }
-
-//   initializeFromStorage(): Promise<void> {
-//     return new Promise(resolve => {
-//       const token = this.getToken();
-//       this.authTokenData = token;
-//       const user = this.getItem<User>(this.USER_KEY);
-
-//       if (token && user) {
-//         this.currentUserSubject.next(user);
-//         // Socket connection is now handled in AppComponent!
-//         this.verifyToken().subscribe(() => resolve());
-//       } else {
-//         resolve();
-//       }
-//     });
-//   }
-
-//   public handleLoginSuccess(response: LoginResponse): void {
-//     const user = response.data.user || response.data.owner;
-//     if (!response.token || !user) return;
-//     this.authTokenData = response.token;
-//     this.setItem(this.TOKEN_KEY, response.token);
-//     this.setItem(this.USER_KEY, user);
-//     this.setItem('orgSlug', response.data.uniqueShopId?.trim());
-//     this.currentUserSubject.next(user);
-//     this.router.navigate(['/dashboard']);
-//   }
-
-// logout(): void {
-//     const currentUrl = this.router.url;
-//     this.apiService.logOut().subscribe({
-//       next: () => console.log('Backend logout successful'),
-//       error: (err) => console.warn('Backend logout failed', err),
-//     });
-//     this.performClientLogout(currentUrl);
-//   }
-
-//   private performClientLogout(returnUrl?: string): void {
-//     if (isPlatformBrowser(this.platformId)) {
-//       localStorage.clear();
-//       sessionStorage.clear();
-//     }
-//     this.authTokenData = null;
-//     this.currentUserSubject.next(null);
-//     if (returnUrl && !returnUrl.includes('/auth/')) {
-//       this.router.navigate(['/auth/login'], {
-//         queryParams: { returnUrl: returnUrl }
-//       });
-//     } else {
-//       this.router.navigate(['/auth/login']);
-//     }
-//   }
-
-//   // --- API Methods (Keep existing) ---
-//   login(data: any) {
-//     return this.apiService.login(data).pipe(
-//       tap((response: any) => { this.handleLoginSuccess(response); }),
-//       catchError(err => throwError(() => err))
-//     );
-//   }
-
-//   createOrganization(data: any) {
-//     return this.OrganizationService.createNewOrganization(data).pipe(
-//       tap(response => {
-//         this.handleLoginSuccess(response);
-//         this.messageService.showSuccess( 'Welcome!');
-//       }),
-//       catchError(err => throwError(() => err))
-//     );
-//   }
-
-//   employeeSignup(data: any) {
-//     return this.apiService.employeeSignup(data).pipe(
-//       tap(() => {
-//         this.messageService.showSuccess( 'Your account is pending admin approval.');
-//         this.router.navigate(['/auth/login']);
-//       }),
-//       catchError(err => throwError(() => err))
-//     );
-//   }
-
-//   verifyToken() {
-//     return this.apiService.verifyToken().pipe(
-//       tap(() => { }),
-//       catchError(err => {
-//         this.logout();
-//         return throwError(() => err);
-//       })
-//     );
-//   }
-
-//   refreshToken() {
-//     return this.apiService.refreshToken().pipe(
-//       tap((response: any) => {
-//         if (response?.token) {
-//           this.setItem(this.TOKEN_KEY, response.token);
-//           this.authTokenData = response.token;
-//         }
-//       }),
-//       catchError(err => throwError(() => err))
-//     );
-//   }
-
-//   forgotPassword(email: string) {
-//     return this.apiService.forgotPassword({ email }).pipe(
-//       tap(() => this.messageService.showSuccess(', 'Password reset instructions sent.')),
-//       catchError(err => throwError(() => err))
-//     );
-//   }
-
-//   resetPassword(resetToken: string, passwords: any) {
-//     return this.apiService.resetPassword(resetToken, passwords).pipe(
-//       tap(response => {
-//         this.handleLoginSuccess(response);
-//         this.messageService.showSuccess( 'You are now logged in.');
-//       }),
-//       catchError(err => throwError(() => err))
-//     );
-//   }
-
-//   updateUserPassword(data: any) {
-//     return this.apiService.updateMyPassword(data).pipe(
-//       tap((response: any) => {
-//         if (response?.token) this.setItem(this.TOKEN_KEY, response.token);
-//         this.messageService.showSuccess( 'Your password has been changed.');
-//       }),
-//       catchError(err => throwError(() => err))
-//     );
-//   }
-
-//   // --- Getters & Storage ---
-//   public get currentUserValue(): User | null { return this.currentUserSubject.value; }
-//   public getCurrentUser(): User | null { return this.currentUserSubject.value; }
-//   public getToken(): string | null { return this.getItem<string>(this.TOKEN_KEY); }
-//   public isLoggedIn(): boolean { return !!this.currentUserSubject.value; }
-
-//   private setItem(key: string, value: any): void {
-//     if (!isPlatformBrowser(this.platformId)) return;
-//     if (key === this.TOKEN_KEY) { localStorage.setItem(key, value); return; }
-//     localStorage.setItem(key, JSON.stringify(value));
-//   }
-
-//   getItem<T>(key: string): T | null {
-//     if (!isPlatformBrowser(this.platformId)) return null;
-//     const item = localStorage.getItem(key);
-//     if (!item) return null;
-//     if (key === this.TOKEN_KEY) return item as any;
-//     try { return JSON.parse(item); } catch { localStorage.removeItem(key); return null; }
-//   }
-
-//   private removeItem(key: string): void {
-//     if (isPlatformBrowser(this.platformId)) localStorage.removeItem(key);
-//   }
-// }

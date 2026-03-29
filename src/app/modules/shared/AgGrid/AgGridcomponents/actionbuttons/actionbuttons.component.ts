@@ -1,13 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ICellRendererAngularComp } from 'ag-grid-angular';
 import { ICellRendererParams } from 'ag-grid-community';
 import { CommonModule } from '@angular/common';
+import { PermissionService } from '@core/auth/services/permission.service';
+import { Permission } from '@core/auth/permissions.constants';
 
-// Define a custom interface for the cell renderer parameters
-// It includes a custom actionHandler function and a utility function to check editing status.
 interface ActionbuttonsCellRendererParams extends ICellRendererParams {
   actionHandler: (action: string, data: any) => void;
   isRowEditing: (id: string) => boolean;
+  editPermission?: Permission;
+  deletePermission?: Permission;
 }
 
 @Component({
@@ -19,6 +21,7 @@ interface ActionbuttonsCellRendererParams extends ICellRendererParams {
       <ng-container *ngIf="isEditing">
         <!-- Save Button -->
         <button
+          *ngIf="canEdit()"
           (click)="onSaveClick($event)"
           class="text-green-600 hover:text-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 rounded-full w-6 h-6 flex items-center justify-center"
           title="Save"
@@ -28,6 +31,7 @@ interface ActionbuttonsCellRendererParams extends ICellRendererParams {
         </button>
         <!-- Cancel Button -->
         <button
+          *ngIf="canEdit()"
           (click)="onCancelClick($event)"
           class="text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 rounded-full w-6 h-6 flex items-center justify-center"
           title="Cancel"
@@ -39,7 +43,7 @@ interface ActionbuttonsCellRendererParams extends ICellRendererParams {
       <ng-container *ngIf="!isEditing">
         <!-- Edit Button -->
         <button
-          *ngIf="params.data"
+          *ngIf="params.data && canEdit()"
           (click)="onEditClick($event)"
           class="text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full w-6 h-6 flex items-center justify-center"
           title="Edit"
@@ -49,7 +53,7 @@ interface ActionbuttonsCellRendererParams extends ICellRendererParams {
         </button>
         <!-- Delete Button -->
         <button
-          *ngIf="params.data"
+          *ngIf="params.data && canDelete()"
           (click)="onDeleteClick($event)"
           class="text-red-600 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 rounded-full w-6 h-6 flex items-center justify-center"
           title="Delete"
@@ -75,6 +79,7 @@ interface ActionbuttonsCellRendererParams extends ICellRendererParams {
 export class ActionbuttonsComponent implements ICellRendererAngularComp {
   params!: ActionbuttonsCellRendererParams;
   isEditing: boolean = false;
+  private readonly permSvc = inject(PermissionService);
 
   agInit(params: ActionbuttonsCellRendererParams): void {
     this.params = params;
@@ -90,6 +95,19 @@ export class ActionbuttonsComponent implements ICellRendererAngularComp {
   private updateEditingState(): void {
     const rowId = this.params.data?._id || this.params.data?.id;
     this.isEditing = this.params.isRowEditing(rowId);
+  }
+
+  /** Omitted permission = show (backward compatible). */
+  canEdit(): boolean {
+    const p = this.params?.editPermission;
+    if (!p) return true;
+    return this.permSvc.hasPermission(p);
+  }
+
+  canDelete(): boolean {
+    const p = this.params?.deletePermission;
+    if (!p) return true;
+    return this.permSvc.hasPermission(p);
   }
 
   onEditClick(event: MouseEvent): void {

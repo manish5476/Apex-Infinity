@@ -14,11 +14,11 @@
     </div>
 
     <div class="flex gap-2">
-      <p-button label="Export CSV" icon="pi pi-download" styleClass="p-button-outlined p-button-secondary"
+      <p-button *hasPermission="PERMISSIONS.INVOICE.EXPORT" label="Export CSV" icon="pi pi-download" styleClass="p-button-outlined p-button-secondary"
         [loading]="isExporting" (onClick)="exportReport()">
       </p-button>
 
-      <p-button label="New Invoice" icon="pi pi-plus" routerLink="create" styleClass="p-button-primary">
+      <p-button *hasPermission="PERMISSIONS.INVOICE.CREATE" label="New Invoice" icon="pi pi-plus" routerLink="create" styleClass="p-button-primary">
       </p-button>
     </div>
   </div>
@@ -81,7 +81,7 @@
       <app-ag-share-grid 
         [columns]="column" 
         [data]="data" 
-        [showActions]="false" 
+        [actionColumn]="invoiceActionColumn"
         selectionMode="multiple"
         (gridEvent)="eventFromGrid($event)" 
         style="height: 100%; width: 100%; display: block;">

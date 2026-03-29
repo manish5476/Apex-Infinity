@@ -4,7 +4,8 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AdminAnalyticsService } from '../admin-analytics.service';
 import { CommonMethodService } from '../../core/utils/common-method.service';
-import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
+import { AgShareGrid, ActionColumnConfig } from '../../modules/shared/components/ag-shared-grid';
+import { PERMISSIONS } from '../../core/auth/permissions.constants';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
 
@@ -107,7 +108,7 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
           <app-ag-share-grid
             [columns]="deadStockColumns"
             [data]="performanceData()?.deadStock || []"
-            [showActions]="true"
+            [actionColumn]="deadStockActionColumn"
             (gridEvent)="handleGridAction($event)"
             class="fill-grid">
           </app-ag-share-grid>
@@ -590,6 +591,13 @@ export class ProductPerformanceComponent implements OnInit {
   performanceData = signal<any>(null);
   loading = signal(false);
   deadStockColumns: any[] = [];
+
+  readonly deadStockActionColumn: ActionColumnConfig = {
+    showView: true,
+    showEdit: false,
+    showDelete: false,
+    viewPermission: PERMISSIONS.PRODUCT.READ,
+  };
 
   private currentFilters: Record<string, any> = {};
 

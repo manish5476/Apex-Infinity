@@ -219,7 +219,6 @@ import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
             <app-ag-share-grid
               [columns]="alertColumns"
               [data]="dashboard()?.inventory?.lowStockAlerts || []"
-              [showActions]="false"
               class="compact-grid">
             </app-ag-share-grid>
           </div>
@@ -1127,7 +1126,7 @@ export class DashboardUI implements OnInit {
 //           </div>
 //           <div class="grid-wrapper">
 //              <app-ag-share-grid [columns]="alertColumns" [data]="dashboard()?.inventory?.lowStockAlerts || []" 
-//                                [showActions]="false" class="compact-grid"></app-ag-share-grid>
+// class="compact-grid"></app-ag-share-grid>
 //           </div>
 //         </div>
 //       </div>

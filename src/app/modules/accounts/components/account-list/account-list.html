@@ -11,8 +11,8 @@
     <div class="list-grid-wrapper h-[calc(100vh-220px)]">
       <app-ag-share-grid 
         [columns]="column" 
-        [data]="data" 
-        [showActions]="false"
+        [data]="data"
+        [actionColumn]="accountActionColumn"
         (gridEvent)="handleGridEvent($event)">
       </app-ag-share-grid>
     </div>

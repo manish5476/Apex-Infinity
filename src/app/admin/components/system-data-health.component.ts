@@ -22,7 +22,7 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
         <p-button label="Run Full Audit" icon="pi pi-shield" severity="secondary" [outlined]="true" size="small" (onClick)="loadData()"></p-button>
       </div>
 
-      <ng-container *ngIf="!loading(); else loader">
+      @if (!loading()) {
         
         <div class="content-grid">
           
@@ -114,14 +114,12 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
           </div>
         </div>
 
-      </ng-container>
-
-      <ng-template #loader>
+      } @else {
         <div class="loader-container">
           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-12 h-12"></p-progressSpinner>
           <p class="loader-text">Running Data Integrity Checks...</p>
         </div>
-      </ng-template>
+      }
 
     </div>
   `,

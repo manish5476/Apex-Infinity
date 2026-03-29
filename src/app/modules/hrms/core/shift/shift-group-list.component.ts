@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { AppMessageService } from '../../../../core/services/message.service';
-import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
+import { AgShareGrid, ActionColumnConfig } from '../../../shared/components/ag-shared-grid';
+import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 import { HRMSService } from '../../hrms.service';
 
 
@@ -75,7 +75,7 @@ import { HRMSService } from '../../hrms.service';
           <app-ag-share-grid 
             [columns]="column" 
             [data]="data" 
-            [showActions]="true" 
+            [actionColumn]="shiftGroupActionColumn"
             selectionMode="single"
             (gridEvent)="eventFromGrid($event)">
           </app-ag-share-grid>
@@ -208,7 +208,6 @@ export class ShiftGroupListComponent implements OnInit {
   private messageService = inject(AppMessageService);
   private router = inject(Router);
 
-  private gridApi!: GridApi;
   private currentPage = 1;
   private isLoading = false;
   private totalCount = 0;
@@ -221,6 +220,15 @@ export class ShiftGroupListComponent implements OnInit {
     search: '',
     rotationType: null,
     isActive: null
+  };
+
+  readonly shiftGroupActionColumn: ActionColumnConfig = {
+    showView: true,
+    showEdit: true,
+    showDelete: true,
+    viewPermission: PERMISSIONS.SHIFT.GROUP_READ,
+    editPermission: PERMISSIONS.SHIFT.GROUP_MANAGE,
+    deletePermission: PERMISSIONS.SHIFT.GROUP_MANAGE,
   };
 
   ngOnInit(): void {
@@ -290,10 +298,6 @@ export class ShiftGroupListComponent implements OnInit {
     }
   }
 
-  onGridReady(params: GridReadyEvent) {
-    this.gridApi = params.api;
-  }
-
   eventFromGrid(event: any) {
     const groupId = event?.row?._id || event?.row?.id;
     switch (event.type) {
@@ -302,7 +306,7 @@ export class ShiftGroupListComponent implements OnInit {
         // this.router.navigate(['/shift-groups/details', groupId]);
         break;
       case 'editStart':
-        this.router.navigate(['/shift-groups/edit', groupId]);
+        this.router.navigate(['/hrms/shift-groups/edit', groupId]);
         break;
       case 'delete':
         const groupName = event.row.name;

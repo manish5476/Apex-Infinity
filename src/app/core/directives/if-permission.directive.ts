@@ -1,3 +1,7 @@
+/**
+ * @deprecated Prefer `HasPermissionDirective` (`*hasPermission` / `*permission`) from `@core/auth`
+ * with `PERMISSIONS` from `permissions.constants.ts`.
+ */
 // src/app/core/directives/if-permission.directive.ts
 import { Directive, Input, TemplateRef, ViewContainerRef, inject } from '@angular/core';
 import { AuthService } from '../../modules/auth/services/auth-service';
