@@ -74,39 +74,39 @@ export const routes: Routes = [
         canActivate: [permissionGuard],
         data: { permissions: [PERMISSIONS.DASHBOARD.VIEW] }
       },
-      { 
-        path: 'chat', 
-        component: ChatComponent, 
+      {
+        path: 'chat',
+        component: ChatComponent,
         title: 'Team Chat',
         canActivate: [permissionGuard],
         data: { permissions: [PERMISSIONS.CHAT.READ] }
       },
 
       // Finance
-      { 
-        path: 'financials', 
-        component: LedgerComponent, 
+      {
+        path: 'financials',
+        component: LedgerComponent,
         title: 'Financial Ledger',
         canActivate: [permissionGuard],
         data: { permissions: [PERMISSIONS.LEDGER.READ] }
       },
-      { 
-        path: 'transactions', 
-        component: Transactions, 
+      {
+        path: 'transactions',
+        component: Transactions,
         title: 'Transaction History',
         canActivate: [permissionGuard],
         data: { permissions: [PERMISSIONS.TRANSACTION.READ] }
       },
-      { 
-        path: 'sales', 
-        component: SalesListComponent, 
+      {
+        path: 'sales',
+        component: SalesListComponent,
         title: 'Sales Reports',
         canActivate: [permissionGuard],
         data: { permissions: [PERMISSIONS.SALES.VIEW] }
       },
-      { 
-        path: 'assets', 
-        component: AssetList, 
+      {
+        path: 'assets',
+        component: AssetList,
         title: 'Asset Lists',
         canActivate: [permissionGuard],
         data: { permissions: [PERMISSIONS.ASSET.READ] }
@@ -124,7 +124,7 @@ export const routes: Routes = [
       { path: 'customer', loadChildren: () => import('./modules/customer/customer.routes').then(m => m.CUSTOMER_ROUTES), canActivate: [permissionGuard], data: { permissions: [PERMISSIONS.CUSTOMER.READ] } },
       { path: 'user', loadChildren: () => import('./modules/user/user.routes').then(m => m.USER_ROUTES), canActivate: [permissionGuard], data: { permissions: [PERMISSIONS.USER.READ] } },
       { path: 'branches', loadChildren: () => import('./modules/branch/branch.routes').then(m => m.BRANCH_ROUTES), canActivate: [permissionGuard], data: { permissions: [PERMISSIONS.BRANCH.READ] } },
-      
+
       // HRMS explicitly skipped per request
       { path: 'hrms', loadChildren: () => import('./modules/hrms/hrms.routes').then(m => m.HRMS_ROUTES) },
 
@@ -152,38 +152,38 @@ export const routes: Routes = [
       },
 
       // Utilities
-      { 
-        path: 'masterList', 
-        component: MasterList, 
+      {
+        path: 'masterList',
+        component: MasterList,
         title: 'System Masters',
         canActivate: [permissionGuard],
         data: { permissions: [PERMISSIONS.MASTER.READ] }
       },
-      { 
-        path: 'sessions', 
-        component: Sessions, 
+      {
+        path: 'sessions',
+        component: Sessions,
         title: 'Active Sessions',
         canActivate: [permissionGuard],
         data: { permissions: [PERMISSIONS.SESSION.VIEW_ALL] }
       },
-      { 
-        path: 'logs', 
-        component: LogsComponent, 
+      {
+        path: 'logs',
+        component: LogsComponent,
         title: 'System Logs',
         canActivate: [permissionGuard],
         data: { permissions: [PERMISSIONS.LOGS.VIEW] }
       },
-      { 
-        path: 'dashboard/settings/ownership', 
-        component: AcceptOwnershipComponent, 
+      {
+        path: 'dashboard/settings/ownership',
+        component: AcceptOwnershipComponent,
         title: 'Accept Ownership',
         canActivate: [permissionGuard],
         data: { permissions: [PERMISSIONS.OWNERSHIP.TRANSFER] }
       },
-      { 
-        path: 'unauthorized', 
-        component: UnauthorizedComponent, 
-        title: 'Access Restricted' 
+      {
+        path: 'unauthorized',
+        component: UnauthorizedComponent,
+        title: 'Access Restricted'
       }
     ]
   },
