@@ -20,13 +20,14 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { HRMSService } from '../../hrms.service';
+import { AppMessageService } from '@core/services/message.service';
 
 @Component({
   selector: 'app-machine-hub',
   standalone: true,
   imports: [
-    CommonModule, DatePipe, FormsModule, CardModule, TableModule, 
-    ButtonModule, TagModule, TooltipModule, SkeletonModule, 
+    CommonModule, DatePipe, FormsModule, CardModule, TableModule,
+    ButtonModule, TagModule, TooltipModule, SkeletonModule,
     DialogModule, SelectModule, IconFieldModule, InputIconModule, InputTextModule
   ],
   providers: [MessageService, ConfirmationService],
@@ -173,7 +174,8 @@ import { HRMSService } from '../../hrms.service';
       <div class="flex-col gap-4">
         <div class="input-group">
           <label class="info-label">New Status</label>
-          <p-select [(ngModel)]="bulkStatus" [options]="statusOptions" placeholder="Select Status" appendTo="body" styleClass="w-full premium-select"></p-select>
+          <p-select [(ngModel)]="bulkStatus" [options]="statusOptions" placeholder="Select Status" appendTo="body" styleClass="w-full premium-select" [filter]="true" filterBy="label"></p-select>
+
         </div>
         <div class="flex-align justify-end gap-3 pt-4 border-top mt-2">
           <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="displayBulkDialog = false"></p-button>
@@ -218,7 +220,7 @@ import { HRMSService } from '../../hrms.service';
     .border-bottom { border-bottom: 1px solid var(--border-primary); }
     .border-1 { border: 1px solid; }
     .surface-border { border-color: var(--border-primary); }
-    .border-round-xl { border-radius: var(--ui-border-radius-xl); }
+    .border-round-xl { border-radius: var(--radius-2xl); }
     
     .text-center { text-align: center; }
     .text-right { text-align: right; }
@@ -243,7 +245,7 @@ import { HRMSService } from '../../hrms.service';
     .italic { font-style: italic; }
 
     /* Header */
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--ui-border-radius-xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--radius-2xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
     .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
     .icon-brand { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: var(--font-size-2xl); }
     .page-title { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); font-family: var(--font-heading); letter-spacing: -0.02em; }
@@ -261,7 +263,7 @@ import { HRMSService } from '../../hrms.service';
     .stat-val { font-size: 2.2rem; font-weight: var(--font-weight-bold); line-height: 1; }
 
     /* Table */
-    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-md); overflow: hidden; }
+    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); overflow: hidden; }
     ::ng-deep .premium-table .p-datatable-header { padding: 0; border: none; background: transparent; }
     ::ng-deep .premium-table .p-datatable-thead > tr > th { background: var(--bg-secondary) !important; border-bottom: 2px solid var(--border-primary) !important; color: var(--text-tertiary); font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); text-transform: uppercase; letter-spacing: 0.05em; padding: var(--spacing-lg) var(--spacing-xl); }
     ::ng-deep .premium-table .p-datatable-tbody > tr > td { border-bottom: 1px solid var(--border-primary); padding: var(--spacing-md) var(--spacing-xl); color: var(--text-secondary); transition: background-color 0.2s; }
@@ -295,13 +297,13 @@ import { HRMSService } from '../../hrms.service';
 })
 export class MachineHubComponent implements OnInit {
   private hrmsService = inject(HRMSService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
   private router = inject(Router);
 
   isLoading = signal(true);
   machines = signal<any[]>([]);
   analytics = signal<any>(null);
-  
+
   // Bulk actions
   selectedMachines: any[] = [];
   displayBulkDialog = false;
@@ -346,19 +348,18 @@ export class MachineHubComponent implements OnInit {
     this.isProcessing.set(true);
 
     const ids = this.selectedMachines.map(m => m._id);
-    
+
     this.hrmsService.bulkUpdateMachineStatus({ machineIds: ids, status: this.bulkStatus }).pipe(
       finalize(() => {
         this.isProcessing.set(false);
         this.displayBulkDialog = false;
       }),
       catchError(err => {
-        this.messageService.add({ severity: 'error', summary: 'Update Failed', detail: 'Server error during bulk operation.' });
+        this.messageService.handleHttpError(err)
         return of(null);
       })
-    ).subscribe(res => {
+    ).subscribe((res: any) => {
       if (res) {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: `Status updated for ${ids.length} machines.` });
         this.loadData();
       }
     });

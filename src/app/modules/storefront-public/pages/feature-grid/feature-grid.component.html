@@ -1,4 +1,77 @@
-<section class="section-root" [ngStyle]="backgroundStyle()">
+<!-- feature-grid.component.html -->
+<section class="fg-root" [ngStyle]="sectionStyle()">
+
+  <!-- Background image layer -->
+  @if (cfg().backgroundImage) {
+  <div class="fg-bg-image" [style.background-image]="'url(' + cfg().backgroundImage + ')'">
+  </div>
+  <div class="fg-bg-overlay"></div>
+  }
+
+  <div class="fg-container">
+
+    <!-- Header -->
+    @if (cfg().title) {
+    <header class="fg-header">
+      <h2 class="fg-title" [class.fg-title-light]="isDarkSection()">
+        {{ cfg().title }}
+      </h2>
+      <div class="fg-title-line" [class.fg-title-line-light]="isDarkSection()"></div>
+    </header>
+    }
+
+    <!-- Grid -->
+    <div class="fg-grid" [ngStyle]="gridVars()">
+
+      @for (item of items(); track item.title; let i = $index) {
+      <div class="fg-card" [class.fg-card-dark]="isDarkSection()">
+
+        <!-- Icon or image -->
+        @if (item.image) {
+        <div class="fg-media">
+          <img [src]="item.image" [alt]="item.title" loading="lazy" class="fg-media-img" />
+        </div>
+        } @else if (item.icon) {
+        <div class="fg-icon-wrap" [class.fg-icon-wrap-dark]="isDarkSection()">
+          <i [class]="'pi ' + item.icon" class="fg-icon"></i>
+        </div>
+        }
+
+        <!-- Text -->
+        <div class="fg-text">
+          <h3 class="fg-item-title" [class.fg-item-title-light]="isDarkSection()">
+            {{ item.title }}
+          </h3>
+          <p class="fg-item-desc" [class.fg-item-desc-light]="isDarkSection()">
+            {{ item.description }}
+          </p>
+        </div>
+
+        <!-- Optional CTA link -->
+        @if (item.linkUrl) {
+        @if (isExternal(item.linkUrl)) {
+        <a [href]="item.linkUrl" target="_blank" rel="noopener" class="fg-link" [class.fg-link-light]="isDarkSection()">
+          Learn More <i class="pi pi-arrow-right"></i>
+        </a>
+        } @else if (itemLink(item.linkUrl)) {
+        <a [routerLink]="itemLink(item.linkUrl)" class="fg-link" [class.fg-link-light]="isDarkSection()">
+          Learn More <i class="pi pi-arrow-right"></i>
+        </a>
+        }
+        }
+
+        <!-- Hover accent bar -->
+        <div class="fg-card-accent" aria-hidden="true"></div>
+
+      </div>
+      }
+
+    </div>
+  </div>
+
+</section>
+
+<!-- <section class="section-root" [ngStyle]="backgroundStyle()">
   
   <div class="bg-overlay" *ngIf="config.backgroundImage"></div>
 
@@ -64,4 +137,4 @@
     </div>
 
   </div>
-</section>
+</section> -->

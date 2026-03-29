@@ -13,6 +13,7 @@
   height: 100%;
   overflow: hidden;
   display: flex;
+  border-radius: var(--radius-2xl);
   flex-direction: column;
   background: var(--bg-primary);
 }
@@ -158,7 +159,8 @@
   border-radius: var(--ui-border-radius-lg);
   color: #fff;
   box-shadow: var(--shadow-md);
-  position: relative; overflow: hidden;
+  position: relative;
+  //  overflow: hidden;
 
   &.inflow { background: linear-gradient(135deg, #059669 0%, #10b981 100%); }
   &.outflow { background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); }

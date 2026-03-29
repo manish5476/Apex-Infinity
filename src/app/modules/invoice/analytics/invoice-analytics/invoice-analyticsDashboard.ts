@@ -48,7 +48,7 @@ interface DashboardData {
     TooltipModule,
     DateFilterComponent,
     ProgressSpinner
-],
+  ],
   template: `
    <div class="dashboard-container">
   
@@ -390,7 +390,7 @@ interface DashboardData {
 .custom-filter-panel {
   background: var(--theme-bg-secondary);
   padding: var(--spacing-md);
-  border-radius: var(--ui-border-radius-xl);
+  border-radius: var(--radius-2xl);
   margin-bottom: var(--spacing-xl);
   border: 1px dashed var(--theme-border-secondary);
 }
@@ -406,7 +406,7 @@ interface DashboardData {
 .stat-card {
   background: var(--theme-bg-secondary);
   border: 1px solid var(--theme-border-primary);
-  border-radius: var(--ui-border-radius-xl);
+  border-radius: var(--radius-2xl);
   padding: var(--spacing-lg);
   display: flex;
   flex-direction: column;
@@ -487,7 +487,7 @@ interface DashboardData {
 .content-card {
   background: var(--theme-bg-secondary);
   border: 1px solid var(--theme-border-primary);
-  border-radius: var(--ui-border-radius-xl);
+  border-radius: var(--radius-2xl);
   padding: var(--spacing-lg);
   height: 100%;
 }

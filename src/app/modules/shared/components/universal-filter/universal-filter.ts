@@ -55,8 +55,11 @@ import { FilterField } from './filter-config.interface';
             [(ngModel)]="filters[field.key]"
             (ngModelChange)="onFilterChange()"
             [showClear]="true"
-            styleClass="deck-select">
+            styleClass="deck-select"
+            [filter]="true"
+            [filterBy]="field.optionLabel || 'name'">
           </p-select>
+
         </ng-container>
 
         <ng-container *ngIf="field.type === 'multiselect'">
@@ -69,8 +72,11 @@ import { FilterField } from './filter-config.interface';
             (ngModelChange)="onFilterChange()"
             display="chip"
             [showClear]="true"
-            styleClass="deck-multiselect">
+            styleClass="deck-multiselect"
+            [filter]="true"
+            [filterBy]="field.optionLabel || 'name'">
           </p-multiSelect>
+
         </ng-container>
 
         <ng-container *ngIf="field.type === 'date'">

@@ -20,6 +20,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { HRMSService } from '../../hrms.service';
+import { AppMessageService } from '@core/services/message.service';
 
 @Component({
   selector: 'app-machine-details',
@@ -278,7 +279,7 @@ import { HRMSService } from '../../hrms.service';
     .opacity-20 { opacity: 0.2; }
 
     /* Header */
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--ui-border-radius-xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--radius-2xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
     .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
     ::ng-deep .back-btn { color: var(--text-secondary) !important; background: var(--bg-primary) !important; border: 1px solid var(--border-primary) !important; }
     .icon-brand { width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 1px solid var(--color-primary-border); }
@@ -287,7 +288,7 @@ import { HRMSService } from '../../hrms.service';
     ::ng-deep .status-tag { font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 1px; padding: 4px 8px; border-radius: 6px; }
 
     /* Cards & Tabs */
-    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-md); overflow: hidden; }
+    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); overflow: hidden; }
     ::ng-deep .premium-card { border-radius: var(--ui-border-radius-lg); border: 1px solid var(--border-primary); box-shadow: var(--shadow-sm); }
     ::ng-deep .workspace-card .p-card-body, ::ng-deep .workspace-card .p-card-content { padding: 0; }
     
@@ -324,7 +325,7 @@ export class MachineDetailsComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private hrmsService = inject(HRMSService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
 
   machineId: string = '';
@@ -367,7 +368,7 @@ export class MachineDetailsComponent implements OnInit {
       if (machineData?.data?.machine) {
         this.machine.set(machineData.data.machine);
       } else {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Device not found.' });
+        this.messageService.showError( 'Device not found.' );
         this.onBack();
       }
       
@@ -385,14 +386,14 @@ export class MachineDetailsComponent implements OnInit {
     this.hrmsService.testMachineConnection(this.machineId).pipe(
       finalize(() => this.isTesting.set(false)),
       catchError(err => {
-        this.messageService.add({ severity: 'error', summary: 'Ping Failed', detail: 'Device is unreachable.' });
+        this.messageService.handleHttpError(err)
         // Update local state to offline
         this.machine.update(m => ({ ...m, connectionStatus: 'offline' }));
         return of(null);
       })
-    ).subscribe(res => {
+    ).subscribe((res:any) => {
       if (res) {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Device responded to ping successfully.' });
+        this.messageService.showSuccess(res.message)
         // Optionally reload data to get updated lastPingAt
         this.loadAllData();
       }
@@ -407,7 +408,7 @@ export class MachineDetailsComponent implements OnInit {
       .map(u => ({ userId: u._id, machineUserId: u.machineUserId.trim() }));
 
     if (filledMappings.length === 0) {
-      this.messageService.add({ severity: 'info', summary: 'No changes', detail: 'Please enter at least one Machine User ID to map.' });
+      this.messageService.showInfo('Please enter at least one Machine User ID to map.' ) 
       return;
     }
 
@@ -416,12 +417,12 @@ export class MachineDetailsComponent implements OnInit {
     this.hrmsService.bulkMapUsers(filledMappings, this.machineId).pipe(
       finalize(() => this.isMapping.set(false)),
       catchError(err => {
-        this.messageService.add({ severity: 'error', summary: 'Mapping Failed', detail: 'Could not complete bulk mapping.' });
+        this.messageService.handleHttpError(err)
         return of(null);
       })
-    ).subscribe(res => {
+    ).subscribe((res:any) => {
       if (res) {
-        this.messageService.add({ severity: 'success', summary: 'Mapped', detail: `Successfully mapped ${filledMappings.length} users.` });
+        this.messageService.showSuccess(res.message)
         this.loadAllData(); // Reload to clear mapped users from the unmapped list
       }
     });
@@ -442,7 +443,7 @@ export class MachineDetailsComponent implements OnInit {
               this.displayKeyModal = true;
             }
           },
-          error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to rotate key.' })
+          error: (err) => this.messageService.handleHttpError(err)
         });
       }
     });
@@ -457,8 +458,8 @@ export class MachineDetailsComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         this.hrmsService.deleteMachine(this.machineId).subscribe({
-          next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Device removed successfully.' });
+          next: (res:any) => {
+            this.messageService.showSuccess(res.message)
             this.onBack();
           }
         });
@@ -469,7 +470,7 @@ export class MachineDetailsComponent implements OnInit {
   // --- Helpers ---
   copyKey() {
     navigator.clipboard.writeText(this.newApiKey).then(() => {
-      this.messageService.add({ severity: 'info', summary: 'Copied', detail: 'API Key copied to clipboard.' });
+      this.messageService.showInfo('API Key copied to clipboard.')
     });
   }
 

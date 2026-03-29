@@ -19,6 +19,7 @@ import { TimelineModule } from 'primeng/timeline';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SelectModule } from 'primeng/select';
 import { HRMSService } from '../../hrms.service';
+import { AppMessageService } from '@core/services/message.service';
 
 @Component({
   selector: 'app-leave-details',
@@ -154,7 +155,7 @@ import { HRMSService } from '../../hrms.service';
 
         <div *ngIf="actionType === 'escalate'" class="input-group">
           <label class="info-label">Escalate To <span class="text-error">*</span></label>
-          <p-select formControlName="escalateTo" [options]="managers" optionLabel="name" optionValue="id" styleClass="w-full premium-select" appendTo="body"></p-select>
+          <p-select formControlName="escalateTo" [options]="managers" optionLabel="name" optionValue="id" [filter]="true" filterBy="name" styleClass="w-full premium-select" appendTo="body"></p-select>
         </div>
 
         <div class="input-group">
@@ -226,7 +227,7 @@ import { HRMSService } from '../../hrms.service';
     .border-radius-sm { border-radius: var(--ui-border-radius-sm); }
 
     /* Header */
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--ui-border-radius-xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--radius-2xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
     .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
     ::ng-deep .back-btn { color: var(--text-secondary) !important; background: var(--bg-primary) !important; border: 1px solid var(--border-primary) !important; }
     .page-title { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); font-family: var(--font-heading); }
@@ -234,7 +235,7 @@ import { HRMSService } from '../../hrms.service';
     ::ng-deep .status-tag { font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 1px; padding: 4px 8px; border-radius: 6px; }
 
     /* Cards */
-    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-sm); }
+    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-sm); }
     ::ng-deep .premium-card .p-card-body { padding: var(--spacing-2xl); }
     ::ng-deep .premium-card .p-card-content { padding: 0; }
     
@@ -267,7 +268,7 @@ import { HRMSService } from '../../hrms.service';
 })
 export class LeaveDetailsComponent implements OnInit {
   private hrmsService = inject(HRMSService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -275,7 +276,7 @@ export class LeaveDetailsComponent implements OnInit {
 
   request = signal<any>(null);
   isLoading = signal(true);
-  
+
   // Dialog State
   displayActionDialog = false;
   actionType: 'approve' | 'reject' | 'escalate' | '' = '';
@@ -305,8 +306,8 @@ export class LeaveDetailsComponent implements OnInit {
   private loadRequest(id: string) {
     this.isLoading.set(true);
     this.hrmsService.getLeaveRequest(id).pipe(
-      catchError(() => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not load request details.' });
+      catchError((err) => {
+        this.messageService.handleHttpError(err)
         return of(null);
       }),
       finalize(() => this.isLoading.set(false))
@@ -318,7 +319,7 @@ export class LeaveDetailsComponent implements OnInit {
   }
 
   // --- Actions APIs ---
-  
+
   onCancelRequest() {
     this.confirmationService.confirm({
       message: 'Are you sure you want to cancel this leave request? This cannot be undone.',
@@ -327,8 +328,8 @@ export class LeaveDetailsComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         this.hrmsService.cancelLeaveRequest(this.request()._id).subscribe({
-          next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Cancelled', detail: 'Leave request withdrawn.' });
+          next: (res: any) => {
+            this.messageService.showSuccess(res.message)
             this.loadRequest(this.request()._id); // Refresh
           }
         });
@@ -339,7 +340,7 @@ export class LeaveDetailsComponent implements OnInit {
   showDialog(type: 'approve' | 'reject' | 'escalate') {
     this.actionType = type;
     this.actionForm.reset();
-    
+
     // Setup validation rules dynamically based on action
     if (type === 'reject') {
       this.actionDialog = { title: 'Reject Request', message: 'Please provide a reason for rejecting this leave.', btnLabel: 'Reject Leave', btnSeverity: 'danger' };
@@ -352,7 +353,7 @@ export class LeaveDetailsComponent implements OnInit {
       this.actionDialog = { title: 'Approve Request', message: 'Add optional comments to your approval.', btnLabel: 'Approve Leave', btnSeverity: 'success' };
       this.actionForm.clearValidators();
     }
-    
+
     this.actionForm.updateValueAndValidity();
     this.displayActionDialog = true;
   }
@@ -360,10 +361,10 @@ export class LeaveDetailsComponent implements OnInit {
   submitAction() {
     if (this.actionForm.invalid) return;
     this.isProcessing.set(true);
-    
+
     const id = this.request()._id;
     const { comments, escalateTo } = this.actionForm.value;
-    
+
     let req$;
     if (this.actionType === 'approve') req$ = this.hrmsService.approveLeaveRequest(id, comments);
     else if (this.actionType === 'reject') req$ = this.hrmsService.rejectLeaveRequest(id, comments);
@@ -371,16 +372,16 @@ export class LeaveDetailsComponent implements OnInit {
 
     req$.pipe(
       catchError(err => {
-        this.messageService.add({ severity: 'error', summary: 'Action Failed', detail: err.error?.message || 'Server error occurred.' });
+        this.messageService.handleHttpError(err)
         return of(null);
       }),
       finalize(() => {
         this.isProcessing.set(false);
         this.displayActionDialog = false;
       })
-    ).subscribe(res => {
+    ).subscribe((res: any) => {
       if (res) {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: `Request has been ${this.actionType}d.` });
+        this.messageService.showSuccess(res.message)
         this.loadRequest(id);
       }
     });

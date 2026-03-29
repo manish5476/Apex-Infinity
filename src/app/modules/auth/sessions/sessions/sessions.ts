@@ -16,6 +16,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { SessionService } from '../../services/session.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
 import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
+import { AppMessageService } from '@core/services/message.service';
 
 @Component({
   selector: 'app-sessions',
@@ -40,7 +41,7 @@ export class Sessions implements OnInit {
   // --- Injections ---
   private cdr = inject(ChangeDetectorRef);
   private sessionService = inject(SessionService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
   public common = inject(CommonMethodService);
   selectedIds: any[]=[]
@@ -80,7 +81,7 @@ export class Sessions implements OnInit {
       },
       error: (err) => {
         this.isLoading.set(false);
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load sessions' });
+        this.messageService.handleHttpError(err)
       }
     });
   }
@@ -178,14 +179,14 @@ export class Sessions implements OnInit {
       accept: () => {
         // this.isRevoking.set(true);
         this.sessionService.revokeSession(this.selectedSession._id).subscribe({
-          next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Session revoked' });
+          next: (res:any) => {
+            this.messageService.showSuccess(res.message)
             this.displayDialog = false;
             this.isRevoking.set(false);
             this.loadData();
           },
           error: (err) => {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message || 'Failed' });
+            this.messageService.handleHttpError(err)
             this.isRevoking.set(false);
           }
         });
@@ -204,14 +205,14 @@ export class Sessions implements OnInit {
       accept: () => {
         // this.isDeleting.set(true);
         this.sessionService.deleteSession(this.selectedSession._id).subscribe({
-          next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Record removed' });
+          next: (res:any) => {
+            this.messageService.showSuccess(res.message)
             this.displayDialog = false;
             this.isDeleting.set(false);
             this.loadData();
           },
           error: (err) => {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not delete' });
+            this.messageService.handleHttpError(err)
             this.isDeleting.set(false);
           }
         });
@@ -228,14 +229,14 @@ export class Sessions implements OnInit {
       accept: () => {
         let payload = this.selectedIds
         this.sessionService.bulkDeleteSessions(payload).subscribe({
-          next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Records removed' });
+          next: (res:any) => {
+            this.messageService.showSuccess(res.message)
             this.displayDialog = false;
             this.isDeleting.set(false);
             this.loadData();
           },
           error: (err) => {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not delete' });
+            this.messageService.handleHttpError(err)
             this.isDeleting.set(false);
           }
         });
@@ -251,11 +252,11 @@ export class Sessions implements OnInit {
       acceptButtonStyleClass: 'p-button-warning',
       accept: () => {
         this.sessionService.revokeAllOthers().subscribe({
-          next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'All other sessions revoked' });
+          next: (res:any) => {
+            this.messageService.showSuccess(res.message)
             this.loadData();
           },
-          error: (err) => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed' })
+          error: (err) => this.messageService.handleHttpError(err)
         });
       }
     });

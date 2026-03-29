@@ -89,6 +89,7 @@ export class UserFormComponent implements OnInit {
       branchId: [null],
       status: ['approved'],
       isActive: [true], // Default for toggle
+      maxConcurrentSessions: [1, [Validators.required, Validators.min(1)]],
       password: [''],
       passwordConfirm: [''],
 
@@ -246,8 +247,6 @@ export class UserFormComponent implements OnInit {
       .pipe(finalize(() => this.isSubmitting.set(false)))
       .subscribe({
         next: () => {
-          // Converted to single-string dynamic success message
-          this.messageService.showSuccess(`User ${this.editMode() ? 'updated' : 'created'} successfully.`);
           setTimeout(() => this.onCancel(), 500);
         },
         error: (err) => {

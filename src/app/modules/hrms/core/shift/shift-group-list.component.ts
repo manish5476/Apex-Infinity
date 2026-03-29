@@ -238,7 +238,7 @@ export class ShiftGroupListComponent implements OnInit {
   }
 
   createNew() {
-    this.router.navigate(['/shift-groups/create']);
+    this.router.navigate(['/hrms/shift-groups/create']);
   }
 
   getData(isReset: boolean = false) {

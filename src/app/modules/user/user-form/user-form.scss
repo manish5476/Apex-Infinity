@@ -3,7 +3,8 @@
         height: 100vh; 
         width: 100%; 
         overflow: hidden;
-        background: var(--bg-secondary);
+        // background: var(--bg-secondary);
+        background: transparent;
     }
     
     .app-layout {
@@ -24,7 +25,8 @@
     .form-header {
         flex-shrink: 0;
         height: 72px;
-        background: var(--bg-primary);
+        // background: var(--bg-primary);
+        background: transparent;
         border-bottom: 1px solid var(--border-primary);
         padding: 0 var(--spacing-3xl);
         display: flex;
@@ -78,7 +80,8 @@
         flex: 1;
         overflow-y: auto;
         padding: var(--spacing-3xl);
-        background: var(--bg-secondary);
+        // background: var(--bg-secondary);
+        background: transparent;
     }
 
     /* 🟢 FULL WIDTH FIX */

@@ -2,16 +2,25 @@ import { Component, inject, signal, computed, OnInit, ChangeDetectionStrategy } 
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { EditorModule } from 'primeng/editor';
-import { Note, NoteAttachment, Subtask, ActivityLog } from '../../../core/models/note.types';
 import { NoteService } from '../../../core/services/notes.service';
-import Quill from 'quill';
 import { AppMessageService } from '../../../core/services/message.service';
+import {
+  Note, NoteActivity, AssetAttachment, ChecklistItem
+} from '../../../core/models/note.types';
+import { TiptapEditorComponent } from '../../shared/components/tiptap-editor/tiptap-editor.component';
+import { generateHTML } from '@tiptap/core';
+import StarterKit from '@tiptap/starter-kit';
+import Link from '@tiptap/extension-link';
+import Underline from '@tiptap/extension-underline';
+import TaskList from '@tiptap/extension-task-list';
+import TaskItem from '@tiptap/extension-task-item';
+import { DatePickerModule } from 'primeng/datepicker';
+
 
 @Component({
   selector: 'app-note-detail',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, EditorModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, DatePickerModule],
   templateUrl: './note-detail.component.html',
   styleUrls: ['./note-detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -25,7 +34,7 @@ export class NoteDetailComponent implements OnInit {
 
   // --- State ---
   note = signal<Note | null>(null);
-  activityLog = signal<ActivityLog[]>([]);
+  activityLog = signal<NoteActivity[]>([]);
   isLoading = signal(true);
   isSaving = signal(false);
   isEditing = signal(false);
@@ -36,9 +45,9 @@ export class NoteDetailComponent implements OnInit {
 
   progress = computed(() => {
     const n = this.note();
-    if (!n?.subtasks?.length) return 0;
-    const completed = n.subtasks.filter(s => s.completed).length;
-    return Math.round((completed / n.subtasks.length) * 100);
+    if (!n?.checklist?.length) return 0;
+    const completed = n.checklist.filter(s => s.completed).length;
+    return Math.round((completed / n.checklist.length) * 100);
   });
 
   // --- Forms ---
@@ -47,13 +56,12 @@ export class NoteDetailComponent implements OnInit {
     content: ['', Validators.required],
     priority: ['medium'],
     tags: [''],
-    startDate: [null as string | null],
-    dueDate: [null as string | null]
+    startDate: [null as string | null | Date],
+    dueDate: [null as string | null | Date]
   });
 
-  constructor() {
-    this.customizeQuill();
-  }
+
+  constructor() { }
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
@@ -66,23 +74,34 @@ export class NoteDetailComponent implements OnInit {
     });
   }
 
-  customizeQuill() {
-    try {
-      const icons: any = Quill.import('ui/icons');
-      if (icons) {
-        icons.bold = '<i class="pi pi-bold"></i>';
-        icons.italic = '<i class="pi pi-italic"></i>';
-        icons.underline = '<i class="pi pi-underline"></i>';
-        icons.list = {
-          ordered: '<i class="pi pi-list"></i>',
-          bullet: '<i class="pi pi-bars"></i>'
-        };
-        icons.link = '<i class="pi pi-link"></i>';
-        icons['code-block'] = '<i class="pi pi-code"></i>';
+  /** Converts Tiptap JSON content (or raw HTML string) → safe HTML for [innerHTML] */
+  getContentHtml(content: any): string {
+    if (!content) return '';
+    // Already an HTML string
+    if (typeof content === 'string') {
+      if (content.startsWith('<') || content === '') return content;
+      try {
+        const json = JSON.parse(content);
+        return generateHTML(json, [
+          StarterKit, Link, Underline,
+          TaskList, TaskItem.configure({ nested: true })
+        ]);
+      } catch {
+        return content;
       }
-    } catch (e) {
-      console.warn('Quill icons could not be customized', e);
     }
+    // Already a JSON object
+    if (typeof content === 'object') {
+      try {
+        return generateHTML(content, [
+          StarterKit, Link, Underline,
+          TaskList, TaskItem.configure({ nested: true })
+        ]);
+      } catch {
+        return '';
+      }
+    }
+    return '';
   }
 
   // Helper to safely get initials
@@ -90,7 +109,7 @@ export class NoteDetailComponent implements OnInit {
     return name ? name.charAt(0).toUpperCase() : '?';
   }
 
-  patchForm(note: Note) {
+  patchForm(note: any) {
     const formatDate = (dateVal?: string | Date) => {
       if (!dateVal) return null;
       try {
@@ -130,7 +149,7 @@ export class NoteDetailComponent implements OnInit {
     this.noteService.convertToTask(this.note()!._id).subscribe(res => this.note.set(res.data.note));
   }
 
-  downloadAttachment(file: NoteAttachment) {
+  downloadAttachment(file: any) {
     if (file.url) window.open(file.url, '_blank');
   }
   // ----------------------------------------------------------------------------------
@@ -174,10 +193,15 @@ export class NoteDetailComponent implements OnInit {
     this.isSaving.set(true);
 
     const rawTags = this.editForm.get('tags')?.value || '';
+    const formVals = this.editForm.value;
+
     const updates = {
-      ...this.editForm.value,
-      tags: rawTags.split(',').map((t: string) => t.trim()).filter(Boolean)
+      ...formVals,
+      tags: rawTags.split(',').map((t: string) => t.trim()).filter(Boolean),
+      startDate: formVals.startDate instanceof Date ? formVals.startDate.toISOString().split('T')[0] : formVals.startDate,
+      dueDate: formVals.dueDate instanceof Date ? formVals.dueDate.toISOString().split('T')[0] : formVals.dueDate
     };
+
 
     this.noteService.updateNote(this.note()!._id, updates).subscribe({
       next: (res) => {
@@ -194,23 +218,23 @@ export class NoteDetailComponent implements OnInit {
     });
   }
 
-  // --- Subtasks ---
+  // --- Checklist ---
   addSubtask(input: HTMLInputElement) {
     const val = input.value.trim();
     if (!val || !this.note()) return;
-    this.noteService.addSubtask(this.note()!._id, val).subscribe({
+    this.noteService.addChecklistItem(this.note()!._id, val).subscribe({
       next: (res) => {
         this.note.set(res.data.note);
-        this.messageServic.showSuccess('Subtask added.');
+        this.messageServic.showSuccess('Item added to checklist.');
         input.value = '';
       },
       error: (err) => this.messageServic.handleHttpError(err)
     });
   }
 
-  toggleSubtask(subtask: Subtask) {
-    if (!this.note()) return;
-    this.noteService.toggleSubtask(this.note()!._id, subtask._id!, !subtask.completed)
+  toggleSubtask(item: ChecklistItem) {
+    if (!this.note() || !item._id) return;
+    this.noteService.toggleChecklistItem(this.note()!._id, item._id, !item.completed)
       .subscribe({
         next: (res) => this.note.set(res.data.note),
         error: (err) => this.messageServic.handleHttpError(err)
@@ -219,12 +243,12 @@ export class NoteDetailComponent implements OnInit {
 
   deleteSubtask(id: string) {
     if (!this.note()) return;
-    this.noteService.removeSubtask(this.note()!._id, id).subscribe({
-      next: (res) => {
+    this.noteService.removeChecklistItem(this.note()!._id, id).subscribe({
+      next: (res: any) => {
         this.note.set(res.data.note);
-        this.messageServic.showSuccess('Subtask removed.');
+        this.messageServic.showSuccess('Item removed from checklist.');
       },
-      error: (err) => this.messageServic.handleHttpError(err)
+      error: (err: any) => this.messageServic.handleHttpError(err)
     });
   }
 

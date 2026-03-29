@@ -26,6 +26,15 @@ export class AppMessageService {
     this.messageService.add({ severity: 'warn', summary: 'Warning', detail: message, life: 4000 });
   }
 
+  /**
+   * Unified handler for successful API responses.
+   * Prioritizes backend-returned messages.
+   */
+  public handleSuccess(response: any, defaultMessage: string = 'Operation completed successfully') {
+    const message = response?.message || response?.data?.message || defaultMessage;
+    this.showSuccess(message);
+  }
+
   public clear() {
     this.messageService.clear();
   }

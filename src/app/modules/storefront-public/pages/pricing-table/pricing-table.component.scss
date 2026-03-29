@@ -10,7 +10,8 @@
 .section-root {
   position: relative;
   overflow: hidden;
-  background-color: var(--bg-secondary); /* Default fallback */
+  // background-color: var(--bg-secondary); /* Default fallback */
+  background-color: transparent;
   padding: var(--spacing-5xl) 0;
 }
 
@@ -71,7 +72,7 @@
   flex-direction: column;
   padding: var(--spacing-3xl);
   
-  border-radius: var(--ui-border-radius-xl);
+  border-radius: var(--radius-2xl);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   
   /* Default: Minimal Light */

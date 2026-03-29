@@ -8,12 +8,155 @@
 
 /* In styles.scss */
 :root {
+    --card-bg: var(--bg-primary);
+  --card-border: var(--ui-border-width) solid var(--border-primary);
+  --card-shadow: var(--shadow-sm);
+  --card-shadow-hover: var(--shadow-md);
+  --card-radius: var(--ui-border-radius-xl);
+  --card-padding: var(--spacing-xl);
   --p-comp-height: 2rem;   
   
   /* Update padding to match the Preset */
   --p-comp-padding-y: 0.3rem; 
 }
 
+/* ==========================================================================
+   CARD STYLES - Clean & Minimal
+   ========================================================================== */
+
+
+/* Base Card */
+.premium-card {
+  background: var(--card-bg);
+  border: var(--card-border);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  transition: var(--transition-base);
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    box-shadow: var(--card-shadow-hover);
+    border-color: var(--border-secondary);
+  }
+
+  .card-header {
+    padding: var(--card-padding) var(--card-padding) calc(var(--card-padding) * 0.75);
+    border-bottom: var(--ui-border-width) solid var(--border-primary);
+    background: var(--bg-secondary);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-body {
+    padding: var(--card-padding);
+    flex: 1;
+  }
+
+  .card-footer {
+    padding: calc(var(--card-padding) * 0.75) var(--card-padding);
+    border-top: var(--ui-border-width) solid var(--border-primary);
+    background: var(--bg-secondary);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+  }
+
+  /* Compact variant */
+  &.compact {
+    --card-padding: var(--spacing-lg);
+    --card-radius: var(--ui-border-radius-lg);
+  }
+
+  /* Borderless variant */
+  &.borderless {
+    border: none;
+    box-shadow: none;
+    background: transparent;
+
+    &:hover {
+      box-shadow: none;
+      border: none;
+    }
+  }
+
+  /* Interactive variant */
+  &.interactive {
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Stat Card - for dashboard metrics */
+.stat-card {
+  background: var(--card-bg);
+  border: var(--card-border);
+  border-radius: var(--ui-border-radius-lg);
+  padding: var(--spacing-xl);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-base);
+
+  &:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+    border-color: var(--border-secondary);
+  }
+
+  .stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--ui-border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+
+    &.primary { background: var(--color-primary-bg); color: var(--color-primary); }
+    &.success { background: var(--color-success-bg); color: var(--color-success); }
+    &.info { background: var(--color-info-bg); color: var(--color-info); }
+    &.warning { background: var(--color-warning-bg); color: var(--color-warning); }
+  }
+
+  .stat-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .stat-label {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      font-weight: var(--font-weight-semibold);
+      letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      line-height: 1;
+    }
+  }
+
+  &.border-top-primary { border-top: 4px solid var(--color-primary); }
+  &.border-top-success { border-top: 4px solid var(--color-success); }
+  &.border-top-info { border-top: 4px solid var(--color-info); }
+}
 /* Add this to your main CSS file */
 
 /* Option 1: For a very bold, vibrant gradient background using the accent colors */

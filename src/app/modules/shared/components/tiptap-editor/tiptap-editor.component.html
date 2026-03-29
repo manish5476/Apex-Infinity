@@ -1,0 +1,180 @@
+<div class="tiptap-wrapper" [class.disabled]="isDisabled()">
+
+  <!-- ── TOOLBAR ── -->
+  <div class="tiptap-toolbar" role="toolbar" aria-label="Text formatting">
+
+    <!-- Undo / Redo -->
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" (click)="undo()" [disabled]="!canUndo()" title="Undo (Ctrl+Z)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 7v6h6" />
+          <path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" />
+        </svg>
+      </button>
+      <button type="button" class="toolbar-btn" (click)="redo()" [disabled]="!canRedo()" title="Redo (Ctrl+Y)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 7v6h-6" />
+          <path d="M3 17a9 9 0 019-9 9 9 0 016 2.3L21 13" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <!-- Headings -->
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn heading-btn" [class.active]="isActive('h1')" (click)="setHeading(1)"
+        title="Heading 1">H1</button>
+      <button type="button" class="toolbar-btn heading-btn" [class.active]="isActive('h2')" (click)="setHeading(2)"
+        title="Heading 2">H2</button>
+      <button type="button" class="toolbar-btn heading-btn" [class.active]="isActive('h3')" (click)="setHeading(3)"
+        title="Heading 3">H3</button>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <!-- Inline formatting -->
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" [class.active]="isActive('bold')" (click)="toggleBold()"
+        title="Bold (Ctrl+B)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M6 4h8a4 4 0 010 8H6z" />
+          <path d="M6 12h9a4 4 0 010 8H6z" />
+        </svg>
+      </button>
+      <button type="button" class="toolbar-btn" [class.active]="isActive('italic')" (click)="toggleItalic()"
+        title="Italic (Ctrl+I)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="19" y1="4" x2="10" y2="4" />
+          <line x1="14" y1="20" x2="5" y2="20" />
+          <line x1="15" y1="4" x2="9" y2="20" />
+        </svg>
+      </button>
+      <button type="button" class="toolbar-btn" [class.active]="isActive('underline')" (click)="toggleUnderline()"
+        title="Underline (Ctrl+U)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 4v6a6 6 0 0012 0V4" />
+          <line x1="4" y1="20" x2="20" y2="20" />
+        </svg>
+      </button>
+      <button type="button" class="toolbar-btn" [class.active]="isActive('strike')" (click)="toggleStrike()"
+        title="Strikethrough">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="4" y1="12" x2="20" y2="12" />
+          <path d="M17.5 6.5C17 5 15.5 4 13 4c-3 0-5 1.5-5 4 0 1.2.5 2.2 1.3 3" />
+          <path d="M6.5 17.5C7 19 8.5 20 11 20c3 0 5-1.5 5-4 0-1.2-.5-2.2-1.3-3" />
+        </svg>
+      </button>
+      <button type="button" class="toolbar-btn" [class.active]="isActive('code')" (click)="toggleCode()"
+        title="Inline code">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="16 18 22 12 16 6" />
+          <polyline points="8 6 2 12 8 18" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <!-- Lists -->
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" [class.active]="isActive('bulletList')" (click)="toggleBulletList()"
+        title="Bullet list">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="9" y1="6" x2="20" y2="6" />
+          <line x1="9" y1="12" x2="20" y2="12" />
+          <line x1="9" y1="18" x2="20" y2="18" />
+          <circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none" />
+          <circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none" />
+          <circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none" />
+        </svg>
+      </button>
+      <button type="button" class="toolbar-btn" [class.active]="isActive('orderedList')" (click)="toggleOrderedList()"
+        title="Numbered list">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="10" y1="6" x2="21" y2="6" />
+          <line x1="10" y1="12" x2="21" y2="12" />
+          <line x1="10" y1="18" x2="21" y2="18" />
+          <path d="M4 6h1v4" stroke-linecap="round" />
+          <path d="M4 10h2" stroke-linecap="round" />
+          <path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+      <button type="button" class="toolbar-btn" [class.active]="isActive('taskList')" (click)="toggleTaskList()"
+        title="Task / Todo list">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="5" width="6" height="6" rx="1" />
+          <path d="M5 8l1.5 1.5L9 6" />
+          <line x1="13" y1="8" x2="21" y2="8" />
+          <rect x="3" y="15" width="6" height="6" rx="1" />
+          <line x1="13" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <!-- Block elements -->
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" [class.active]="isActive('blockquote')" (click)="toggleBlockquote()"
+        title="Blockquote">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path
+            d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z" />
+          <path
+            d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z" />
+        </svg>
+      </button>
+      <button type="button" class="toolbar-btn" [class.active]="isActive('codeBlock')" (click)="toggleCodeBlock()"
+        title="Code block">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="3" width="20" height="14" rx="2" />
+          <path d="M8 21h8" />
+          <path d="M12 17v4" />
+          <path d="M7 8l-3 3 3 3" />
+          <path d="M17 8l3 3-3 3" />
+        </svg>
+      </button>
+      <button type="button" class="toolbar-btn" (click)="insertHRule()" title="Horizontal rule">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12" />
+        </svg>
+      </button>
+      <button type="button" class="toolbar-btn" [class.active]="isActive('link')" (click)="openLinkDialog()"
+        title="Insert link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" />
+          <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Word count (right aligned) -->
+    <div class="toolbar-spacer"></div>
+    <div class="word-count">{{ words() }} words</div>
+  </div>
+
+  <!-- ── EDITOR AREA ── -->
+  <div class="tiptap-editor-area">
+    <div #editorEl class="tiptap-editor-host"></div>
+  </div>
+
+  <!-- ── LINK DIALOG ── -->
+  @if (isLinkDialogOpen()) {
+  <div class="link-dialog-backdrop" (click)="cancelLink()">
+    <div class="link-dialog" (click)="$event.stopPropagation()">
+      <p class="link-dialog-title">Insert Link</p>
+      <input class="link-input" type="url" placeholder="https://..." [value]="linkUrl()"
+        (input)="linkUrl.set($any($event.target).value)" (keyup.enter)="applyLink()" (keyup.escape)="cancelLink()"
+        autofocus>
+      <div class="link-dialog-actions">
+        @if (isActive('link')) {
+        <button type="button" class="link-btn danger" (click)="removeLink()">Remove</button>
+        }
+        <button type="button" class="link-btn ghost" (click)="cancelLink()">Cancel</button>
+        <button type="button" class="link-btn primary" (click)="applyLink()">Apply</button>
+      </div>
+    </div>
+  </div>
+  }
+</div>

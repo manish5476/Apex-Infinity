@@ -17,9 +17,9 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
   selector: 'app-predictive-analytics',
   standalone: true,
   imports: [
-    CommonModule, 
-    ButtonModule, 
-    ProgressSpinnerModule, 
+    CommonModule,
+    ButtonModule,
+    ProgressSpinnerModule,
     TooltipModule,
     AgShareGrid,
     UniversalFilterComponent
@@ -164,7 +164,7 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
   styles: [`
     :host { display: block; width: 100%; }
     .predictive-container { padding: var(--spacing-sm); font-family: var(--font-body); }
-    .main-card { background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--ui-border-radius-xl); padding: var(--spacing-xl); backdrop-filter: blur(10px); box-shadow: var(--shadow-lg); }
+    .main-card { background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--radius-2xl); padding: var(--spacing-xl); backdrop-filter: blur(10px); box-shadow: var(--shadow-lg); }
 
     .header-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: var(--spacing-md); margin-bottom: var(--spacing-md); }
     .filter-section { margin-bottom: var(--spacing-xl); }
@@ -255,7 +255,7 @@ export class PredictiveAnalyticsComponent implements OnInit {
   predictData = signal<any>(null);
   loading = signal<boolean>(false);
   projectionColumns: any[] = [];
-  
+
   public currentFilters: any = { periods: 3, confidence: 0.95 };
 
   // Computed helper for template
@@ -305,33 +305,33 @@ export class PredictiveAnalyticsComponent implements OnInit {
   setupColumns(): void {
     this.projectionColumns = [
       {
-        field: 'date', 
-        headerName: 'Date', 
+        field: 'date',
+        headerName: 'Date',
         width: 110,
         valueFormatter: (params: any) => this.commonService.formatDate(params.value, 'dd MMM yy'),
         cellStyle: { 'color': 'var(--text-primary)', 'font-weight': '700', 'font-size': '11px', 'display': 'flex', 'align-items': 'center' }
       },
       {
-        field: 'projectedInflow', 
-        headerName: 'Predicted Inflow', 
+        field: 'projectedInflow',
+        headerName: 'Predicted Inflow',
         flex: 1,
         type: 'rightAligned',
         valueFormatter: (params: any) => `+${this.commonService.formatCurrency(params.value)}`,
         cellStyle: { 'color': 'var(--color-success)', 'font-family': 'var(--font-mono)', 'text-align': 'right', 'font-size': '11px', 'display': 'flex', 'align-items': 'center', 'justify-content': 'flex-end' }
       },
       {
-        field: 'netCash', 
-        headerName: 'Net Position', 
+        field: 'netCash',
+        headerName: 'Net Position',
         width: 120,
         type: 'rightAligned',
         valueFormatter: (params: any) => this.commonService.formatCurrency(params.value),
         cellStyle: (params: any) => ({
-           'font-weight': '700',
-           'text-align': 'right',
-           'font-family': 'var(--font-mono)',
-           'font-size': '11px',
-           'display': 'flex', 'align-items': 'center', 'justify-content': 'flex-end',
-           'color': params.value >= 0 ? 'var(--text-primary)' : 'var(--color-error)'
+          'font-weight': '700',
+          'text-align': 'right',
+          'font-family': 'var(--font-mono)',
+          'font-size': '11px',
+          'display': 'flex', 'align-items': 'center', 'justify-content': 'flex-end',
+          'color': params.value >= 0 ? 'var(--text-primary)' : 'var(--color-error)'
         })
       }
     ];

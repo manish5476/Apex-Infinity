@@ -6,7 +6,8 @@
 :host {
   display: block;
   min-height: 100vh;
-  background-color: var(--bg-primary);
+  // background-color: var(--bg-primary);
+  background-color: transparent;
   color: var(--text-primary);
 }
 
@@ -17,7 +18,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-primary);
+  // background: var(--bg-primary);
+  background: transparent;
 }
 
 .loader-pulse {
@@ -39,7 +41,7 @@
   max-width: 1440px;
   margin: 0 auto;
   padding: var(--spacing-2xl); /* Mobile padding */
-  
+  border-radius: var(--radius-2xl);
   @media (min-width: 1024px) {
     padding: var(--spacing-4xl);
   }
@@ -93,7 +95,7 @@
   width: 100%;
   aspect-ratio: 1 / 1.1; /* Slightly tall square */
   background: var(--bg-ternary);
-  border-radius: var(--ui-border-radius-xl);
+  border-radius: var(--radius-2xl);
   overflow: hidden;
   box-shadow: var(--shadow-xl);
   border: 1px solid var(--border-secondary);
@@ -497,7 +499,8 @@
 //   position: relative;
 //   min-height: 100vh;
 //   /* "Warm Cream" Luxury Base */
-//   background-color: #FDFCF8;
+//   // background-color: #FDFCF8;
+//   background-color: transparent;
 //   overflow-x: hidden;
 // }
 

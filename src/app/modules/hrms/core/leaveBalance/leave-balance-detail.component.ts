@@ -18,6 +18,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { DividerModule } from 'primeng/divider';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { HRMSService } from '../../hrms.service';
+import { AppMessageService } from '@core/services/message.service';
 
 @Component({
   selector: 'app-leave-balance-detail',
@@ -251,12 +252,12 @@ import { HRMSService } from '../../hrms.service';
     
     .border-1 { border: 1px solid; }
     .surface-border { border-color: var(--border-primary); }
-    .border-round-xl { border-radius: var(--ui-border-radius-xl); }
+    .border-round-xl { border-radius: var(--radius-2xl); }
     .border-dashed { border: 1px dashed var(--border-secondary); }
     .border-bottom-subtle { border-bottom: 1px solid rgba(0,0,0,0.05); }
 
     /* Header */
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--ui-border-radius-xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--radius-2xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
     .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
     ::ng-deep .back-btn { color: var(--text-secondary) !important; background: var(--bg-primary) !important; border: 1px solid var(--border-primary) !important; }
     .page-title { font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); font-family: var(--font-heading); letter-spacing: -0.02em; }
@@ -264,7 +265,7 @@ import { HRMSService } from '../../hrms.service';
     .badge-mono-sm { font-family: var(--font-mono); font-size: 11px; background: var(--bg-primary); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border-primary); color: var(--text-secondary); }
 
     /* Cards */
-    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-sm); }
+    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-sm); }
     ::ng-deep .premium-card .p-card-body { padding: var(--spacing-2xl); }
     ::ng-deep .premium-card .p-card-content { padding: 0; }
     
@@ -301,7 +302,7 @@ export class LeaveBalanceDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private hrmsService = inject(HRMSService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
 
   balanceId: string = '';
@@ -320,8 +321,8 @@ export class LeaveBalanceDetailComponent implements OnInit {
   private loadBalanceDetails() {
     this.isLoading.set(true);
     this.hrmsService.getLeaveBalance(this.balanceId).pipe(
-      catchError(() => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not load balance ledger.' });
+      catchError((err) => {
+        this.messageService.handleHttpError(err)
         this.onBack();
         return of(null);
       }),
@@ -341,7 +342,7 @@ export class LeaveBalanceDetailComponent implements OnInit {
    */
   onInitializeNextYear(userId: string, currentFy: string) {
     if (!userId) return;
-    
+
     // Simple logic to parse "2024-2025" to "2025-2026"
     const years = currentFy.split('-');
     const nextFy = `${parseInt(years[0]) + 1}-${parseInt(years[1]) + 1}`;
@@ -354,10 +355,10 @@ export class LeaveBalanceDetailComponent implements OnInit {
       accept: () => {
         this.hrmsService.initializeLeaveBalance(userId, nextFy).subscribe({
           next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Initialized', detail: `Ledger for ${nextFy} created successfully.` });
+            // this.messageService.add({ severity: 'success', summary: 'Initialized', detail: `Ledger for ${nextFy} created successfully.` });
             // Optionally route them to the new ledger ID returned by the API
           },
-          error: (err) => this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message || 'Failed to initialize.' })
+          error: (err) => this.messageService.handleHttpError(err)
         });
       }
     });
@@ -366,7 +367,7 @@ export class LeaveBalanceDetailComponent implements OnInit {
   openAdjustModal() {
     // Navigates or emits event to parent if you want to use the dialog from the Admin component,
     // or you can implement the standalone dialog here exactly as done in Admin.
-    this.messageService.add({ severity: 'info', summary: 'Manual Adjustment', detail: 'Use the admin hub to perform manual credits/debits.' });
+    // this.messageService.add({ severity: 'info', summary: 'Manual Adjustment', detail: 'Use the admin hub to perform manual credits/debits.' });
   }
 
   // --- Formatting Helpers ---

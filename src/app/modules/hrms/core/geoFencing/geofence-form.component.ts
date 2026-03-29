@@ -10,6 +10,8 @@ import * as L from 'leaflet';
 
 // Services
 import { MessageService } from 'primeng/api';
+import { AppMessageService } from '@core/services/message.service';
+import { HRMSService } from '../../hrms.service';
 
 // PrimeNG
 import { CardModule } from 'primeng/card';
@@ -18,185 +20,280 @@ import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SliderModule } from 'primeng/slider';
 import { SelectModule } from 'primeng/select';
-import { ToggleSwitch, ToggleSwitchModule } from 'primeng/toggleswitch';
-import { HRMSService } from '../../hrms.service';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { SkeletonModule } from 'primeng/skeleton';
+import { ToastModule } from 'primeng/toast';
+import { TooltipModule } from 'primeng/tooltip';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 
 @Component({
   selector: 'app-geofence-form',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, CardModule, ButtonModule,
-    InputTextModule, SelectModule, InputNumberModule, ToggleSwitchModule,
-    SliderModule
+    CommonModule, 
+    ReactiveFormsModule, 
+    CardModule, 
+    ButtonModule,
+    InputTextModule, 
+    SelectModule, 
+    InputNumberModule, 
+    ToggleSwitchModule,
+    SliderModule,
+    SkeletonModule,
+    ToastModule,
+    TooltipModule,
+    IconFieldModule,
+    InputIconModule
   ],
   providers: [MessageService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="page-wrapper fade-in">
-      <header class="dashboard-header slide-down mb-4">
-        <div class="header-left">
-          <p-button icon="pi pi-arrow-left" [text]="true" [rounded]="true" size="large" styleClass="back-btn" (onClick)="onCancel()"></p-button>
-          <div class="header-titles">
-            <h1 class="page-title m-0">{{ isEditMode() ? 'Edit Boundary' : 'Define New Boundary' }}</h1>
-            <p class="page-subtitle mt-1">Use the interactive map to place your virtual site perimeter.</p>
+    <p-toast position="top-right"></p-toast>
+
+    <div class="page-container fade-in">
+      
+      <header class="page-header flex-between flex-wrap gap-md mb-4xl slide-down">
+        <div class="flex align-items-center gap-xl">
+          <p-button 
+            icon="pi pi-arrow-left" 
+            [text]="true" 
+            [rounded]="true" 
+            size="large" 
+            severity="secondary" 
+            (onClick)="onCancel()">
+          </p-button>
+          <div class="header-titles flex-col gap-xs">
+            <h1 class="title font-heading text-3xl font-bold text-primary m-0 line-height-tight">
+              {{ isEditMode() ? 'Edit Boundary' : 'Define New Boundary' }}
+            </h1>
+            <p class="subtitle text-secondary text-md m-0 max-w-prose">
+              Use the interactive map to place your virtual site perimeter.
+            </p>
           </div>
         </div>
       </header>
 
-      <form [formGroup]="fenceForm" (ngSubmit)="onSubmit()" class="flex-col gap-5 pb-6">
+      @if (isLoading()) {
+        <div class="bento-grid">
+          <div class="flex-col gap-xl">
+            <p-skeleton width="100%" height="400px" borderRadius="16px"></p-skeleton>
+            <p-skeleton width="100%" height="200px" borderRadius="16px"></p-skeleton>
+          </div>
+          <p-skeleton width="100%" height="600px" borderRadius="16px"></p-skeleton>
+        </div>
+      } @else {
         
-        <div class="grid-layout">
+        <form [formGroup]="fenceForm" (ngSubmit)="onSubmit()" class="flex-col gap-xl pb-4xl">
           
-          <div class="flex-col gap-4">
-            <p-card styleClass="premium-card glass-card slide-down" styleClass="animation-delay: 0.1s">
-              <h3 class="font-heading text-lg m-0 mb-4 border-bottom pb-3"><i class="pi pi-info-circle text-primary mr-2"></i> Fence Details</h3>
+          <div class="bento-grid">
+            
+            <div class="flex-col gap-xl">
               
-              <div class="flex-col gap-4">
-                <div class="input-group">
-                  <label class="info-label">Boundary Name <span class="text-error">*</span></label>
-                  <input pInputText formControlName="name" placeholder="e.g. Corporate HQ" class="w-full premium-input" />
-                </div>
-                <div class="grid-2 gap-4">
-                  <div class="input-group">
-                    <label class="info-label">Code <span class="text-error">*</span></label>
-                    <input pInputText formControlName="code" placeholder="HQ-01" class="w-full premium-input uppercase" />
+              <p-card styleClass="glass-panel border-radius-xl shadow-sm overflow-hidden p-0 slide-down" [style.animation-delay]="'0.1s'">
+                <ng-template pTemplate="title">
+                  <div class="flex align-items-center gap-sm border-bottom-subtle pb-sm">
+                    <i class="pi pi-info-circle text-primary text-xl"></i>
+                    <h3 class="font-heading text-lg m-0 font-bold text-primary">Fence Details</h3>
                   </div>
-                  <div class="input-group">
-                    <label class="info-label">Shape Type</label>
-                    <p-select formControlName="type" [options]="types" styleClass="w-full premium-select"></p-select>
+                </ng-template>
+                
+                <ng-template pTemplate="content">
+                  <div class="flex-col gap-md mt-sm">
+                    <div class="input-group flex-col gap-xs">
+                      <label class="info-label text-xs font-bold text-tertiary uppercase tracking-widest">Boundary Name <span class="text-error">*</span></label>
+                      <input pInputText formControlName="name" placeholder="e.g. Corporate HQ" class="w-full" />
+                    </div>
+                    
+                    <div class="grid-2 gap-md">
+                      <div class="input-group flex-col gap-xs">
+                        <label class="info-label text-xs font-bold text-tertiary uppercase tracking-widest">Code <span class="text-error">*</span></label>
+                        <input pInputText formControlName="code" placeholder="HQ-01" class="w-full uppercase font-mono" />
+                      </div>
+                      <div class="input-group flex-col gap-xs">
+                        <label class="info-label text-xs font-bold text-tertiary uppercase tracking-widest">Shape Type</label>
+                        <p-select formControlName="type" [options]="types" appendTo="body" styleClass="w-full" [filter]="true" filterBy="label"></p-select>
+
+                      </div>
+                    </div>
+                    
+                    <div formGroupName="address" class="input-group flex-col gap-xs">
+                      <label class="info-label text-xs font-bold text-tertiary uppercase tracking-widest">Resolved City/Location Name</label>
+                      <input pInputText formControlName="city" placeholder="e.g. Bangalore" class="w-full" />
+                    </div>
+                    
+                    <label class="flex-between bg-primary-light p-md border-radius-md border-1 border-solid border-primary mt-sm cursor-pointer">
+                      <div class="flex-col gap-xs">
+                        <span class="font-bold text-sm text-primary">Enable Geofence</span>
+                        <span class="text-xs text-secondary">Toggle to instantly activate/deactivate this zone.</span>
+                      </div>
+                      <p-toggleswitch formControlName="isActive"></p-toggleswitch>
+                    </label>
                   </div>
-                </div>
-                
-                <div formGroupName="address" class="input-group">
-                  <label class="info-label">Resolved City/Location Name</label>
-                  <input pInputText formControlName="city" placeholder="e.g. Bangalore" class="w-full premium-input" />
-                </div>
-                
-                <div class="flex-between bg-surface p-3 border-radius-md mt-2">
-                  <span class="font-bold text-sm text-secondary">Enable Geofence</span>
-                  <p-toggleswitch formControlName="isActive"></p-toggleswitch>
-                </div>
-              </div>
-            </p-card>
+                </ng-template>
+              </p-card>
 
-            <p-card styleClass="premium-card glass-card slide-down" styleClas="animation-delay: 0.15s">
-              <h3 class="font-heading text-lg m-0 mb-4 border-bottom pb-3"><i class="pi pi-compass text-primary mr-2"></i> Perimeter Rules</h3>
-              
-              <div class="input-group mb-4">
-                <label class="info-label flex-between">
-                  <span>Radius Coverage (Meters) <span class="text-error">*</span></span>
-                  <span class="text-primary font-bold text-lg">{{ fenceForm.get('radius')?.value }}m</span>
-                </label>
-                <p-slider formControlName="radius" [min]="10" [max]="1000" [step]="5" (onChange)="updateMapCircle()"></p-slider>
-                <div class="flex-between text-xs text-tertiary mt-2"><span>10m</span><span>1000m</span></div>
-              </div>
+              <p-card styleClass="glass-panel border-radius-xl shadow-sm overflow-hidden p-0 slide-down" [style.animation-delay]="'0.15s'">
+                <ng-template pTemplate="title">
+                  <div class="flex align-items-center gap-sm border-bottom-subtle pb-sm">
+                    <i class="pi pi-compass text-primary text-xl"></i>
+                    <h3 class="font-heading text-lg m-0 font-bold text-primary">Perimeter Rules</h3>
+                  </div>
+                </ng-template>
+                
+                <ng-template pTemplate="content">
+                  <div class="flex-col gap-xl mt-sm">
+                    
+                    <div class="input-group flex-col gap-md">
+                      <div class="flex-between w-full">
+                        <label class="info-label text-xs font-bold text-tertiary uppercase tracking-widest m-0">Radius Coverage (Meters) <span class="text-error">*</span></label>
+                        <span class="text-primary font-heading font-bold text-xl">{{ fenceForm.get('radius')?.value }}m</span>
+                      </div>
+                      <p-slider formControlName="radius" [min]="10" [max]="1000" [step]="5" (onChange)="updateMapCircle()"></p-slider>
+                      <div class="flex-between text-xs font-mono text-tertiary"><span>10m</span><span>1000m</span></div>
+                    </div>
 
-              <div class="grid-2 gap-4">
-                <div class="input-group">
-                  <label class="info-label">Latitude</label>
-                  <input pInputText [value]="fenceForm.get('center.coordinates')?.value?.[1] || ''" readonly class="w-full premium-input bg-surface font-mono text-xs" />
+                    <div class="grid-2 gap-md pt-md border-top-subtle">
+                      <div class="input-group flex-col gap-xs">
+                        <label class="info-label text-xs font-bold text-tertiary uppercase tracking-widest">Latitude</label>
+                        <input pInputText [value]="fenceForm.get('center.coordinates')?.value?.[1] || ''" readonly class="w-full bg-secondary font-mono text-sm opacity-80" />
+                      </div>
+                      <div class="input-group flex-col gap-xs">
+                        <label class="info-label text-xs font-bold text-tertiary uppercase tracking-widest">Longitude</label>
+                        <input pInputText [value]="fenceForm.get('center.coordinates')?.value?.[0] || ''" readonly class="w-full bg-secondary font-mono text-sm opacity-80" />
+                      </div>
+                    </div>
+                    
+                  </div>
+                </ng-template>
+              </p-card>
+
+            </div>
+
+            <div class="flex-col h-full slide-down" [style.animation-delay]="'0.2s'">
+              <p-card styleClass="glass-panel border-radius-xl shadow-sm overflow-hidden p-0 h-full flex-col">
+                <div class="map-toolbar bg-secondary px-xl py-md flex-between border-bottom-subtle">
+                  <span class="text-sm font-bold text-primary flex align-items-center gap-sm">
+                    <i class="pi pi-map-marker text-lg"></i> Click map to drop central pin
+                  </span>
+                  <p-button icon="pi pi-search" [text]="true" [rounded]="true" severity="secondary" pTooltip="Recenter to pin" tooltipPosition="left"></p-button>
                 </div>
-                <div class="input-group">
-                  <label class="info-label">Longitude</label>
-                  <input pInputText [value]="fenceForm.get('center.coordinates')?.value?.[0] || ''" readonly class="w-full premium-input bg-surface font-mono text-xs" />
-                </div>
-              </div>
-            </p-card>
+                <div #mapContainer id="leaflet-map" class="map-container flex-grow-1 w-full bg-surface" style="min-height: 550px; z-index: 1;"></div>
+              </p-card>
+            </div>
+
           </div>
 
-          <div class="flex-col h-full slide-down" style="animation-delay: 0.2s">
-            <p-card styleClass="premium-card glass-card map-card h-full">
-              <div class="map-toolbar bg-secondary p-3 flex-between">
-                <span class="text-sm font-bold text-white"><i class="pi pi-map-marker mr-2"></i> Click map to drop pin</span>
-                <p-button icon="pi pi-search" [text]="true" styleClass="text-white" pTooltip="Recenter"></p-button>
-              </div>
-              <div #mapContainer id="leaflet-map" class="map-container"></div>
-            </p-card>
+          <div class="form-footer flex justify-content-end gap-md p-xl bg-primary border-top-subtle slide-down sticky bottom-0 z-10 border-radius-lg shadow-xl mt-xl border-1 border-solid border-secondary" [style.animation-delay]="'0.3s'">
+            <p-button label="Cancel" icon="pi pi-times" [text]="true" severity="secondary" (onClick)="onCancel()"></p-button>
+            <p-button 
+              [label]="isEditMode() ? 'Save Boundary' : 'Create Boundary'" 
+              icon="pi pi-check" 
+              type="submit" 
+              [loading]="isSaving()" 
+              [disabled]="fenceForm.invalid || !hasCoordinates()" 
+              styleClass="p-button-primary">
+            </p-button>
           </div>
 
-        </div>
-
-        <div class="form-footer flex-align justify-end gap-3 mt-4 slide-down" style="animation-delay: 0.3s">
-          <p-button label="Cancel" icon="pi pi-times" [text]="true" severity="secondary" (onClick)="onCancel()"></p-button>
-          <p-button [label]="isEditMode() ? 'Save Boundary' : 'Create Boundary'" icon="pi pi-check" type="submit" [loading]="isSaving()" [disabled]="fenceForm.invalid || !hasCoordinates()" styleClass="p-button-primary shadow-md"></p-button>
-        </div>
-
-      </form>
+        </form>
+      }
     </div>
   `,
   styles: [`
-    :host { display: block; width: 100%; min-height: 100vh; background-color: var(--bg-primary); color: var(--text-primary); font-family: var(--font-body); }
-    .page-wrapper { padding: var(--spacing-2xl) var(--spacing-3xl); max-width: 1400px; margin: 0 auto; }
+    /* ==========================================================================
+       BASE & LAYOUT UTILITIES
+       ========================================================================== */
+    :host { display: block; font-family: var(--font-body); color: var(--text-primary); min-height: 100vh; background-color: var(--bg-secondary); }
     
-    .grid-layout { display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--spacing-2xl); align-items: stretch; }
-    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); }
+    .page-container { max-width: 1400px; margin: 0 auto; padding: var(--spacing-2xl) var(--spacing-xl); }
     
+    .flex { display: flex; }
     .flex-col { display: flex; flex-direction: column; }
     .flex-between { display: flex; justify-content: space-between; align-items: center; }
-    .flex-align { display: flex; align-items: center; }
-    .justify-end { justify-content: flex-end; }
+    .flex-center { display: flex; align-items: center; justify-content: center; }
+    .align-items-center { align-items: center; }
+    .justify-content-end { justify-content: flex-end; }
+    .flex-shrink-0 { flex-shrink: 0; }
+    .flex-grow-1 { flex-grow: 1; }
     
     .w-full { width: 100%; }
     .h-full { height: 100%; }
-    .gap-4 { gap: var(--spacing-lg); }
-    .gap-5 { gap: var(--spacing-2xl); }
     
-    .m-0 { margin: 0; }
-    .mb-4 { margin-bottom: var(--spacing-xl); }
-    .mt-1 { margin-top: var(--spacing-xs); }
-    .mt-2 { margin-top: var(--spacing-sm); }
-    .mt-4 { margin-top: var(--spacing-xl); }
-    .mr-2 { margin-right: var(--spacing-sm); }
-    .pb-3 { padding-bottom: var(--spacing-md); }
-    .pb-6 { padding-bottom: var(--spacing-4xl); }
-    .p-3 { padding: var(--spacing-lg); }
+    .bento-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--spacing-2xl); align-items: stretch; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); }
+
+    /* Spacing */
+    .m-0 { margin: 0 !important; }
+    .p-0 { padding: 0 !important; }
+    .mb-md { margin-bottom: var(--spacing-md); }
+    .mb-4xl { margin-bottom: var(--spacing-4xl); }
+    .mt-sm { margin-top: var(--spacing-sm); }
+    .mt-xl { margin-top: var(--spacing-xl); }
     
-    .text-sm { font-size: var(--font-size-sm); }
-    .text-xs { font-size: var(--font-size-xs); }
-    .text-lg { font-size: var(--font-size-lg); }
-    .text-secondary { color: var(--text-secondary); }
-    .text-tertiary { color: var(--text-tertiary); }
-    .text-primary-color { color: var(--text-primary); }
-    .text-primary { color: var(--color-primary); }
-    .text-error { color: var(--color-error); }
-    .text-white { color: white; }
+    .p-md { padding: var(--spacing-md); }
+    .p-xl { padding: var(--spacing-xl); }
+    .px-xl { padding-left: var(--spacing-xl); padding-right: var(--spacing-xl); }
+    .py-md { padding-top: var(--spacing-md); padding-bottom: var(--spacing-md); }
+    .pb-sm { padding-bottom: var(--spacing-sm); }
+    .pb-4xl { padding-bottom: var(--spacing-4xl); }
+    .pt-md { padding-top: var(--spacing-md); }
     
-    .font-bold { font-weight: var(--font-weight-bold); }
+    .gap-xs { gap: var(--spacing-xs); }
+    .gap-sm { gap: var(--spacing-sm); }
+    .gap-md { gap: var(--spacing-md); }
+    .gap-xl { gap: var(--spacing-xl); }
+
+    /* Typography & Colors */
     .font-heading { font-family: var(--font-heading); }
     .font-mono { font-family: var(--font-mono); }
+    .font-medium { font-weight: var(--font-weight-medium); }
+    .font-bold { font-weight: var(--font-weight-bold); }
+    
+    .text-xs { font-size: var(--font-size-xs); }
+    .text-sm { font-size: var(--font-size-sm); }
+    .text-md { font-size: var(--font-size-md); }
+    .text-lg { font-size: var(--font-size-lg); }
+    .text-xl { font-size: var(--font-size-xl); }
+    .text-3xl { font-size: var(--font-size-3xl); }
+    
     .uppercase { text-transform: uppercase; }
+    .tracking-widest { letter-spacing: 0.05em; }
+    .line-height-tight { line-height: var(--line-height-tight); }
+    .max-w-prose { max-width: 65ch; }
 
-    .bg-surface { background: var(--bg-secondary); }
-    .bg-secondary { background: var(--text-secondary); } /* Darker bar for map */
-    .border-bottom { border-bottom: 1px solid var(--border-primary); }
-    .border-top { border-top: 1px solid var(--border-primary); }
+    .text-primary { color: var(--text-primary); }
+    .text-secondary { color: var(--text-secondary); }
+    .text-tertiary { color: var(--text-tertiary); }
+    .text-error { color: var(--color-error, #dc2626); }
+    
+    .bg-primary { background: var(--bg-primary); }
+    .bg-secondary { background: var(--bg-secondary); }
+    .bg-surface { background: #e2e8f0; } /* Fallback for map loading */
+    .bg-primary-light { background: color-mix(in srgb, var(--color-primary) 10%, transparent); }
+
+    /* Borders & Glassmorphism */
+    .glass-panel { background: var(--glass-bg-c); backdrop-filter: blur(var(--glass-blur-c)); border: 1px solid var(--border-primary); }
+    
     .border-radius-md { border-radius: var(--ui-border-radius-md); }
-
-    /* Header */
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--ui-border-radius-xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
-    .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
-    ::ng-deep .back-btn { color: var(--text-secondary) !important; background: var(--bg-primary) !important; border: 1px solid var(--border-primary) !important; }
-    .page-title { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); font-family: var(--font-heading); letter-spacing: -0.02em; }
-    .page-subtitle { font-size: var(--font-size-sm); color: var(--text-secondary); }
-
-    /* Cards */
-    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-md); overflow: hidden; }
-    ::ng-deep .premium-card .p-card-body { padding: var(--spacing-2xl); height: 100%; display: flex; flex-direction: column; }
-    ::ng-deep .premium-card .p-card-content { padding: 0; flex: 1; }
+    .border-radius-lg { border-radius: var(--ui-border-radius-lg); }
+    .border-radius-xl { border-radius: var(--radius-2xl); }
     
-    ::ng-deep .map-card .p-card-body { padding: 0; }
-    .map-container { width: 100%; height: 100%; min-height: 500px; z-index: 1; }
+    .border-top-subtle { border-top: 1px solid var(--border-secondary); }
+    .border-bottom-subtle { border-bottom: 1px solid var(--border-secondary); }
+    .border-1 { border-width: 1px; }
+    .border-solid { border-style: solid; }
+    .border-primary { border-color: var(--border-primary); }
+    .border-secondary { border-color: var(--border-secondary); }
     
-    /* Inputs */
-    .input-group { display: flex; flex-direction: column; gap: var(--spacing-xs); }
-    .info-label { font-size: 10px; font-weight: var(--font-weight-bold); color: var(--text-label); text-transform: uppercase; letter-spacing: 0.05em; }
-    ::ng-deep .premium-input, ::ng-deep .premium-select .p-select { background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--ui-border-radius-md); transition: var(--transition-base); font-family: var(--font-body); }
-    ::ng-deep .premium-input:focus, ::ng-deep .premium-select .p-select.p-focus { border-color: var(--color-primary); box-shadow: 0 0 0 2px var(--color-primary-bg) !important; }
-
-    ::ng-deep .p-slider .p-slider-range { background: var(--color-primary); }
-    ::ng-deep .p-slider .p-slider-handle { border: 2px solid var(--color-primary); }
-
-    .form-footer { position: sticky; bottom: 0; background: var(--bg-primary); padding: var(--spacing-lg) 0; border-top: 1px solid var(--border-primary); z-index: 10; }
+    .shadow-sm { box-shadow: var(--shadow-sm); }
+    .shadow-xl { box-shadow: var(--shadow-xl); }
+    .overflow-hidden { overflow: hidden; }
+    .opacity-80 { opacity: 0.8; }
+    
+    .sticky { position: sticky; }
+    .bottom-0 { bottom: 0; }
+    .z-10 { z-index: 10; }
 
     /* Animations */
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -204,7 +301,16 @@ import { HRMSService } from '../../hrms.service';
     .fade-in { animation: fadeIn 0.4s cubic-bezier(0.2, 0.9, 0.2, 1); }
     .slide-down { animation: slideDown 0.4s cubic-bezier(0.2, 0.9, 0.2, 1); animation-fill-mode: both; }
 
-    @media (max-width: 900px) { .grid-layout { grid-template-columns: 1fr; } .map-container { min-height: 400px; } }
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .bento-grid { grid-template-columns: 1fr; }
+      .map-container { min-height: 400px !important; }
+    }
+    @media (max-width: 640px) {
+      .page-container { padding: var(--spacing-xl) var(--spacing-md); }
+      .grid-2 { grid-template-columns: 1fr; }
+      .form-footer { flex-direction: column; align-items: stretch; }
+    }
   `]
 })
 export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -212,7 +318,7 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private fb = inject(FormBuilder);
   private hrmsService = inject(HRMSService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -246,10 +352,10 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    // Wait slightly to ensure container is fully rendered by Angular
-    setTimeout(() => {
-      this.initMap();
-    }, 100);
+    // Only init map if the container exists (handled after loading signal flips)
+    if (!this.isLoading()) {
+      this.initMapSafely();
+    }
   }
 
   ngOnDestroy() {
@@ -260,7 +366,7 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private initForm() {
     this.fenceForm = this.fb.group({
-      organizationId: ['698f1a7feff3e811b71a590f', Validators.required],
+      organizationId: ['org_01', Validators.required], // Inject auth context here
       name: ['', Validators.required],
       code: ['', Validators.required],
       type: ['circle'],
@@ -278,8 +384,8 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private loadFence(id: string) {
     this.hrmsService.getGeoFence(id).pipe(
-      catchError(() => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not load geofence.' });
+      catchError((error) => {
+        this.messageService.handleHttpError(error)
         this.onCancel();
         return of(null);
       }),
@@ -287,14 +393,16 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
     ).subscribe((res: any) => {
       if (res?.data?.geofence) {
         this.fenceForm.patchValue(res.data.geofence);
-        this.updateMapFromForm();
+        
+        // Wait for Angular to destroy skeleton and render map container
+        setTimeout(() => this.initMapSafely(), 50);
       }
     });
   }
 
   // --- Leaflet Integration ---
-  private initMap() {
-    if (!this.mapContainer) return;
+  private initMapSafely() {
+    if (!this.mapContainer || this.map) return;
 
     this.map = L.map(this.mapContainer.nativeElement).setView([this.defaultLat, this.defaultLng], 5);
 
@@ -302,7 +410,6 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
       attribution: '© OpenStreetMap contributors'
     }).addTo(this.map);
 
-    // Handle Clicks
     this.map.on('click', (e: L.LeafletMouseEvent) => {
       const lat = e.latlng.lat;
       const lng = e.latlng.lng;
@@ -311,7 +418,6 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
       this.drawMarkerAndCircle(lat, lng);
     });
 
-    // If edit mode and loaded early, draw it
     if (this.hasCoordinates()) {
       this.updateMapFromForm();
     }
@@ -322,27 +428,26 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const radius = this.fenceForm.get('radius')?.value || 100;
 
-    // Clear existing
     if (this.marker) this.map.removeLayer(this.marker);
     if (this.circle) this.map.removeLayer(this.circle);
 
-    // Custom Blue Icon (since default assets might be missing in Angular build)
+    // Custom Icon using standard CSS vars
     const customIcon = L.divIcon({
       className: 'custom-leaflet-marker',
-      html: `<div style="background-color: #3b82f6; width: 14px; height: 14px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 4px rgba(0,0,0,0.5);"></div>`,
+      html: `<div style="background-color: var(--color-primary); width: 14px; height: 14px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 4px rgba(0,0,0,0.5);"></div>`,
       iconSize: [14, 14],
       iconAnchor: [7, 7]
     });
 
     this.marker = L.marker([lat, lng], { icon: customIcon }).addTo(this.map);
     this.circle = L.circle([lat, lng], {
-      color: '#3b82f6',
-      fillColor: '#3b82f6',
+      color: 'var(--color-primary)',
+      fillColor: 'var(--color-primary)',
       fillOpacity: 0.2,
       radius: radius
     }).addTo(this.map);
 
-    this.map.setView([lat, lng], 16); // Zoom in on click
+    this.map.setView([lat, lng], 16); 
   }
 
   updateMapCircle() {
@@ -361,7 +466,7 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
   hasCoordinates(): boolean {
     const coords = this.fenceForm.get('center.coordinates')?.value;
-    return coords && coords.length === 2;
+    return Array.isArray(coords) && coords.length === 2 && coords[0] !== undefined;
   }
 
   // --- Submissions ---
@@ -377,20 +482,422 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
     req$.pipe(
       catchError(err => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Save failed.' });
+        this.messageService.handleHttpError(err)
         return of(null);
       }),
       finalize(() => this.isSaving.set(false))
-    ).subscribe(res => {
+    ).subscribe((res:any) => {
       if (res) {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Geofence saved.' });
         setTimeout(() => this.onCancel(), 1000);
       }
     });
   }
 
-  onCancel() { this.router.navigate(['/hrms/geofence']); }
+  onCancel() { 
+    this.router.navigate(['/hrms/geofence']); 
+  }
 }
+
+
+
+// import { Component, OnInit, AfterViewInit, OnDestroy, ChangeDetectionStrategy, inject, signal, ViewChild, ElementRef } from '@angular/core';
+// import { CommonModule } from '@angular/common';
+// import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+// import { ActivatedRoute, Router } from '@angular/router';
+// import { catchError, finalize } from 'rxjs/operators';
+// import { of } from 'rxjs';
+
+// // Leaflet
+// import * as L from 'leaflet';
+
+// // Services
+// import { MessageService } from 'primeng/api';
+
+// // PrimeNG
+// import { CardModule } from 'primeng/card';
+// import { ButtonModule } from 'primeng/button';
+// import { InputTextModule } from 'primeng/inputtext';
+// import { InputNumberModule } from 'primeng/inputnumber';
+// import { SliderModule } from 'primeng/slider';
+// import { SelectModule } from 'primeng/select';
+// import { ToggleSwitch, ToggleSwitchModule } from 'primeng/toggleswitch';
+// import { HRMSService } from '../../hrms.service';
+// import { AppMessageService } from '@core/services/message.service';
+// import { error } from 'console';
+
+// @Component({
+//   selector: 'app-geofence-form',
+//   standalone: true,
+//   imports: [
+//     CommonModule, ReactiveFormsModule, CardModule, ButtonModule,
+//     InputTextModule, SelectModule, InputNumberModule, ToggleSwitchModule,
+//     SliderModule
+//   ],
+//   providers: [MessageService],
+//   changeDetection: ChangeDetectionStrategy.OnPush,
+//   template: `
+//     <div class="page-wrapper fade-in">
+//       <header class="dashboard-header slide-down mb-4">
+//         <div class="header-left">
+//           <p-button icon="pi pi-arrow-left" [text]="true" [rounded]="true" size="large" styleClass="back-btn" (onClick)="onCancel()"></p-button>
+//           <div class="header-titles">
+//             <h1 class="page-title m-0">{{ isEditMode() ? 'Edit Boundary' : 'Define New Boundary' }}</h1>
+//             <p class="page-subtitle mt-1">Use the interactive map to place your virtual site perimeter.</p>
+//           </div>
+//         </div>
+//       </header>
+
+//       <form [formGroup]="fenceForm" (ngSubmit)="onSubmit()" class="flex-col gap-5 pb-6">
+        
+//         <div class="grid-layout">
+          
+//           <div class="flex-col gap-4">
+//             <p-card styleClass="premium-card glass-card slide-down" styleClass="animation-delay: 0.1s">
+//               <h3 class="font-heading text-lg m-0 mb-4 border-bottom pb-3"><i class="pi pi-info-circle text-primary mr-2"></i> Fence Details</h3>
+              
+//               <div class="flex-col gap-4">
+//                 <div class="input-group">
+//                   <label class="info-label">Boundary Name <span class="text-error">*</span></label>
+//                   <input pInputText formControlName="name" placeholder="e.g. Corporate HQ" class="w-full premium-input" />
+//                 </div>
+//                 <div class="grid-2 gap-4">
+//                   <div class="input-group">
+//                     <label class="info-label">Code <span class="text-error">*</span></label>
+//                     <input pInputText formControlName="code" placeholder="HQ-01" class="w-full premium-input uppercase" />
+//                   </div>
+//                   <div class="input-group">
+//                     <label class="info-label">Shape Type</label>
+//                     <p-select formControlName="type" [options]="types" styleClass="w-full premium-select"></p-select>
+//                   </div>
+//                 </div>
+                
+//                 <div formGroupName="address" class="input-group">
+//                   <label class="info-label">Resolved City/Location Name</label>
+//                   <input pInputText formControlName="city" placeholder="e.g. Bangalore" class="w-full premium-input" />
+//                 </div>
+                
+//                 <div class="flex-between bg-surface p-3 border-radius-md mt-2">
+//                   <span class="font-bold text-sm text-secondary">Enable Geofence</span>
+//                   <p-toggleswitch formControlName="isActive"></p-toggleswitch>
+//                 </div>
+//               </div>
+//             </p-card>
+
+//             <p-card styleClass="premium-card glass-card slide-down" styleClas="animation-delay: 0.15s">
+//               <h3 class="font-heading text-lg m-0 mb-4 border-bottom pb-3"><i class="pi pi-compass text-primary mr-2"></i> Perimeter Rules</h3>
+              
+//               <div class="input-group mb-4">
+//                 <label class="info-label flex-between">
+//                   <span>Radius Coverage (Meters) <span class="text-error">*</span></span>
+//                   <span class="text-primary font-bold text-lg">{{ fenceForm.get('radius')?.value }}m</span>
+//                 </label>
+//                 <p-slider formControlName="radius" [min]="10" [max]="1000" [step]="5" (onChange)="updateMapCircle()"></p-slider>
+//                 <div class="flex-between text-xs text-tertiary mt-2"><span>10m</span><span>1000m</span></div>
+//               </div>
+
+//               <div class="grid-2 gap-4">
+//                 <div class="input-group">
+//                   <label class="info-label">Latitude</label>
+//                   <input pInputText [value]="fenceForm.get('center.coordinates')?.value?.[1] || ''" readonly class="w-full premium-input bg-surface font-mono text-xs" />
+//                 </div>
+//                 <div class="input-group">
+//                   <label class="info-label">Longitude</label>
+//                   <input pInputText [value]="fenceForm.get('center.coordinates')?.value?.[0] || ''" readonly class="w-full premium-input bg-surface font-mono text-xs" />
+//                 </div>
+//               </div>
+//             </p-card>
+//           </div>
+
+//           <div class="flex-col h-full slide-down" style="animation-delay: 0.2s">
+//             <p-card styleClass="premium-card glass-card map-card h-full">
+//               <div class="map-toolbar bg-secondary p-3 flex-between">
+//                 <span class="text-sm font-bold text-white"><i class="pi pi-map-marker mr-2"></i> Click map to drop pin</span>
+//                 <p-button icon="pi pi-search" [text]="true" styleClass="text-white" pTooltip="Recenter"></p-button>
+//               </div>
+//               <div #mapContainer id="leaflet-map" class="map-container"></div>
+//             </p-card>
+//           </div>
+
+//         </div>
+
+//         <div class="form-footer flex-align justify-end gap-3 mt-4 slide-down" style="animation-delay: 0.3s">
+//           <p-button label="Cancel" icon="pi pi-times" [text]="true" severity="secondary" (onClick)="onCancel()"></p-button>
+//           <p-button [label]="isEditMode() ? 'Save Boundary' : 'Create Boundary'" icon="pi pi-check" type="submit" [loading]="isSaving()" [disabled]="fenceForm.invalid || !hasCoordinates()" styleClass="p-button-primary shadow-md"></p-button>
+//         </div>
+
+//       </form>
+//     </div>
+//   `,
+//   styles: [`
+//     :host { display: block; width: 100%; min-height: 100vh; background-color: var(--bg-primary); color: var(--text-primary); font-family: var(--font-body); }
+//     .page-wrapper { padding: var(--spacing-2xl) var(--spacing-3xl); max-width: 1400px; margin: 0 auto; }
+    
+//     .grid-layout { display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--spacing-2xl); align-items: stretch; }
+//     .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); }
+    
+//     .flex-col { display: flex; flex-direction: column; }
+//     .flex-between { display: flex; justify-content: space-between; align-items: center; }
+//     .flex-align { display: flex; align-items: center; }
+//     .justify-end { justify-content: flex-end; }
+    
+//     .w-full { width: 100%; }
+//     .h-full { height: 100%; }
+//     .gap-4 { gap: var(--spacing-lg); }
+//     .gap-5 { gap: var(--spacing-2xl); }
+    
+//     .m-0 { margin: 0; }
+//     .mb-4 { margin-bottom: var(--spacing-xl); }
+//     .mt-1 { margin-top: var(--spacing-xs); }
+//     .mt-2 { margin-top: var(--spacing-sm); }
+//     .mt-4 { margin-top: var(--spacing-xl); }
+//     .mr-2 { margin-right: var(--spacing-sm); }
+//     .pb-3 { padding-bottom: var(--spacing-md); }
+//     .pb-6 { padding-bottom: var(--spacing-4xl); }
+//     .p-3 { padding: var(--spacing-lg); }
+    
+//     .text-sm { font-size: var(--font-size-sm); }
+//     .text-xs { font-size: var(--font-size-xs); }
+//     .text-lg { font-size: var(--font-size-lg); }
+//     .text-secondary { color: var(--text-secondary); }
+//     .text-tertiary { color: var(--text-tertiary); }
+//     .text-primary-color { color: var(--text-primary); }
+//     .text-primary { color: var(--color-primary); }
+//     .text-error { color: var(--color-error); }
+//     .text-white { color: white; }
+    
+//     .font-bold { font-weight: var(--font-weight-bold); }
+//     .font-heading { font-family: var(--font-heading); }
+//     .font-mono { font-family: var(--font-mono); }
+//     .uppercase { text-transform: uppercase; }
+
+//     .bg-surface { background: var(--bg-secondary); }
+//     .bg-secondary { background: var(--text-secondary); } /* Darker bar for map */
+//     .border-bottom { border-bottom: 1px solid var(--border-primary); }
+//     .border-top { border-top: 1px solid var(--border-primary); }
+//     .border-radius-md { border-radius: var(--ui-border-radius-md); }
+
+//     /* Header */
+//     .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--radius-2xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
+//     .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
+//     ::ng-deep .back-btn { color: var(--text-secondary) !important; background: var(--bg-primary) !important; border: 1px solid var(--border-primary) !important; }
+//     .page-title { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); font-family: var(--font-heading); letter-spacing: -0.02em; }
+//     .page-subtitle { font-size: var(--font-size-sm); color: var(--text-secondary); }
+
+//     /* Cards */
+//     .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); overflow: hidden; }
+//     ::ng-deep .premium-card .p-card-body { padding: var(--spacing-2xl); height: 100%; display: flex; flex-direction: column; }
+//     ::ng-deep .premium-card .p-card-content { padding: 0; flex: 1; }
+    
+//     ::ng-deep .map-card .p-card-body { padding: 0; }
+//     .map-container { width: 100%; height: 100%; min-height: 500px; z-index: 1; }
+    
+//     /* Inputs */
+//     .input-group { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+//     .info-label { font-size: 10px; font-weight: var(--font-weight-bold); color: var(--text-label); text-transform: uppercase; letter-spacing: 0.05em; }
+//     ::ng-deep .premium-input, ::ng-deep .premium-select .p-select { background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--ui-border-radius-md); transition: var(--transition-base); font-family: var(--font-body); }
+//     ::ng-deep .premium-input:focus, ::ng-deep .premium-select .p-select.p-focus { border-color: var(--color-primary); box-shadow: 0 0 0 2px var(--color-primary-bg) !important; }
+
+//     ::ng-deep .p-slider .p-slider-range { background: var(--color-primary); }
+//     ::ng-deep .p-slider .p-slider-handle { border: 2px solid var(--color-primary); }
+
+//     .form-footer { position: sticky; bottom: 0; background: var(--bg-primary); padding: var(--spacing-lg) 0; border-top: 1px solid var(--border-primary); z-index: 10; }
+
+//     /* Animations */
+//     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+//     @keyframes slideDown { from { transform: translateY(-15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+//     .fade-in { animation: fadeIn 0.4s cubic-bezier(0.2, 0.9, 0.2, 1); }
+//     .slide-down { animation: slideDown 0.4s cubic-bezier(0.2, 0.9, 0.2, 1); animation-fill-mode: both; }
+
+//     @media (max-width: 900px) { .grid-layout { grid-template-columns: 1fr; } .map-container { min-height: 400px; } }
+//   `]
+// })
+// export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
+//   @ViewChild('mapContainer') mapContainer!: ElementRef;
+
+//   private fb = inject(FormBuilder);
+//   private hrmsService = inject(HRMSService);
+//   private messageService = inject(AppMessageService);
+//   private router = inject(Router);
+//   private route = inject(ActivatedRoute);
+
+//   fenceForm!: FormGroup;
+//   isLoading = signal(true);
+//   isSaving = signal(false);
+//   isEditMode = signal(false);
+//   fenceId: string | null = null;
+
+//   types = [{ label: 'Circular Radius', value: 'circle' }];
+
+//   // Leaflet Map State
+//   private map!: L.Map;
+//   private marker!: L.Marker;
+//   private circle!: L.Circle;
+
+//   // Default to India Center if no coordinates
+//   private defaultLat = 20.5937;
+//   private defaultLng = 78.9629;
+
+//   ngOnInit() {
+//     this.initForm();
+//     this.fenceId = this.route.snapshot.paramMap.get('id');
+    
+//     if (this.fenceId) {
+//       this.isEditMode.set(true);
+//       this.loadFence(this.fenceId);
+//     } else {
+//       this.isLoading.set(false);
+//     }
+//   }
+
+//   ngAfterViewInit() {
+//     // Wait slightly to ensure container is fully rendered by Angular
+//     setTimeout(() => {
+//       this.initMap();
+//     }, 100);
+//   }
+
+//   ngOnDestroy() {
+//     if (this.map) {
+//       this.map.remove();
+//     }
+//   }
+
+//   private initForm() {
+//     this.fenceForm = this.fb.group({
+//       organizationId: ['698f1a7feff3e811b71a590f', Validators.required],
+//       name: ['', Validators.required],
+//       code: ['', Validators.required],
+//       type: ['circle'],
+//       radius: [100, [Validators.required, Validators.min(10)]],
+//       center: this.fb.group({
+//         type: ['Point'],
+//         coordinates: [[]] // [lng, lat]
+//       }),
+//       address: this.fb.group({
+//         city: ['']
+//       }),
+//       isActive: [true]
+//     });
+//   }
+
+//   private loadFence(id: string) {
+//     this.hrmsService.getGeoFence(id).pipe(
+//       catchError((error) => {
+//         this.messageService.handleHttpError(error)
+//         this.onCancel();
+//         return of(null);
+//       }),
+//       finalize(() => this.isLoading.set(false))
+//     ).subscribe((res: any) => {
+//       if (res?.data?.geofence) {
+//         this.fenceForm.patchValue(res.data.geofence);
+//         this.updateMapFromForm();
+//       }
+//     });
+//   }
+
+//   // --- Leaflet Integration ---
+//   private initMap() {
+//     if (!this.mapContainer) return;
+
+//     this.map = L.map(this.mapContainer.nativeElement).setView([this.defaultLat, this.defaultLng], 5);
+
+//     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+//       attribution: '© OpenStreetMap contributors'
+//     }).addTo(this.map);
+
+//     // Handle Clicks
+//     this.map.on('click', (e: L.LeafletMouseEvent) => {
+//       const lat = e.latlng.lat;
+//       const lng = e.latlng.lng;
+      
+//       this.fenceForm.get('center.coordinates')?.setValue([lng, lat]);
+//       this.drawMarkerAndCircle(lat, lng);
+//     });
+
+//     // If edit mode and loaded early, draw it
+//     if (this.hasCoordinates()) {
+//       this.updateMapFromForm();
+//     }
+//   }
+
+//   private drawMarkerAndCircle(lat: number, lng: number) {
+//     if (!this.map) return;
+
+//     const radius = this.fenceForm.get('radius')?.value || 100;
+
+//     // Clear existing
+//     if (this.marker) this.map.removeLayer(this.marker);
+//     if (this.circle) this.map.removeLayer(this.circle);
+
+//     // Custom Blue Icon (since default assets might be missing in Angular build)
+//     const customIcon = L.divIcon({
+//       className: 'custom-leaflet-marker',
+//       html: `<div style="background-color: #3b82f6; width: 14px; height: 14px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 4px rgba(0,0,0,0.5);"></div>`,
+//       iconSize: [14, 14],
+//       iconAnchor: [7, 7]
+//     });
+
+//     this.marker = L.marker([lat, lng], { icon: customIcon }).addTo(this.map);
+//     this.circle = L.circle([lat, lng], {
+//       color: '#3b82f6',
+//       fillColor: '#3b82f6',
+//       fillOpacity: 0.2,
+//       radius: radius
+//     }).addTo(this.map);
+
+//     this.map.setView([lat, lng], 16); // Zoom in on click
+//   }
+
+//   updateMapCircle() {
+//     const coords = this.fenceForm.get('center.coordinates')?.value;
+//     if (coords && coords.length === 2) {
+//       this.drawMarkerAndCircle(coords[1], coords[0]);
+//     }
+//   }
+
+//   private updateMapFromForm() {
+//     const coords = this.fenceForm.get('center.coordinates')?.value;
+//     if (coords && coords.length === 2) {
+//       this.drawMarkerAndCircle(coords[1], coords[0]);
+//     }
+//   }
+
+//   hasCoordinates(): boolean {
+//     const coords = this.fenceForm.get('center.coordinates')?.value;
+//     return coords && coords.length === 2;
+//   }
+
+//   // --- Submissions ---
+//   onSubmit() {
+//     if (this.fenceForm.invalid || !this.hasCoordinates()) return;
+
+//     this.isSaving.set(true);
+//     const payload = this.fenceForm.value;
+
+//     const req$ = this.isEditMode() && this.fenceId
+//       ? this.hrmsService.updateGeoFence(this.fenceId, payload)
+//       : this.hrmsService.createGeoFence(payload);
+
+//     req$.pipe(
+//       catchError(err => {
+//         this.messageService.handleHttpError(err)
+//         return of(null);
+//       }),
+//       finalize(() => this.isSaving.set(false))
+//     ).subscribe((res:any) => {
+//       if (res) {
+//         this.messageService.showSuccess(res.message)
+//         setTimeout(() => this.onCancel(), 1000);
+//       }
+//     });
+//   }
+
+//   onCancel() { this.router.navigate(['/hrms/geofence']); }
+// }
+
+
+
 // import { Component, OnInit, AfterViewInit, OnDestroy, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 // import { CommonModule } from '@angular/common';
 // import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';

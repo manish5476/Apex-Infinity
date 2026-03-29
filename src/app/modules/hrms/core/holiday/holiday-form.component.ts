@@ -18,13 +18,14 @@ import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { HRMSService } from '../../hrms.service';
+import { AppMessageService } from '@core/services/message.service';
 
 @Component({
   selector: 'app-holiday-form',
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, CardModule, ButtonModule,
-    InputTextModule, SelectModule, DatePickerModule, 
+    InputTextModule, SelectModule, DatePickerModule,
     ToggleSwitchModule, MultiSelectModule, SkeletonModule
   ],
   providers: [MessageService],
@@ -65,7 +66,8 @@ import { HRMSService } from '../../hrms.service';
                     </div>
                     <div class="input-group">
                       <label class="info-label">Holiday Category <span class="text-error">*</span></label>
-                      <p-select formControlName="holidayType" [options]="holidayTypes" appendTo="body" styleClass="w-full premium-select"></p-select>
+                      <p-select formControlName="holidayType" [options]="holidayTypes" appendTo="body" styleClass="w-full premium-select" [filter]="true" filterBy="label"></p-select>
+
                     </div>
                   </div>
 
@@ -78,20 +80,20 @@ import { HRMSService } from '../../hrms.service';
 
               <p-card styleClass="premium-card glass-card slide-down" styleclass="animation-delay: 0.15s">
                 <div class="grid-2 gap-4">
-                  <div class="bg-warning-light p-3 border-radius-md border-1 border-warning flex-between">
+                  <label class="bg-warning-light p-3 border-radius-md border-1 border-warning flex-between cursor-pointer">
                     <div class="flex-col">
                       <span class="font-bold text-sm text-warning">Restricted / Optional</span>
                       <span class="text-xs text-tertiary">Employees must opt-in.</span>
                     </div>
-                    <p-inputSwitch formControlName="isOptional"></p-inputSwitch>
-                  </div>
-                  <div class="bg-surface p-3 border-radius-md border-1 surface-border flex-between">
+                    <p-toggleswitch formControlName="isOptional"></p-toggleswitch>
+                  </label>
+                  <label class="bg-surface p-3 border-radius-md border-1 surface-border flex-between cursor-pointer">
                     <div class="flex-col">
                       <span class="font-bold text-sm text-primary-color">Active Status</span>
                       <span class="text-xs text-tertiary">Enable for calculations.</span>
                     </div>
-                    <p-inputSwitch formControlName="isActive"></p-inputSwitch>
-                  </div>
+                    <p-toggleswitch formControlName="isActive"></p-toggleswitch>
+                  </label>
                 </div>
               </p-card>
             </div>
@@ -102,15 +104,16 @@ import { HRMSService } from '../../hrms.service';
               <div class="flex-col gap-5">
                 <div class="input-group">
                   <label class="info-label">Branch Override</label>
-                  <p-select formControlName="branchId" [options]="branches" [showClear]="true" placeholder="All Branches (Global)" appendTo="body" styleClass="w-full premium-select"></p-select>
+                  <p-select formControlName="branchId" [options]="branches" [showClear]="true" placeholder="All Branches (Global)" appendTo="body" styleClass="w-full premium-select" [filter]="true" filterBy="label"></p-select>
+
                   <span class="text-xs text-secondary mt-1">If set, this holiday is ONLY observed at this specific location.</span>
                 </div>
 
                 <div formGroupName="applicableTo" class="flex-col gap-4 mt-2 border-top pt-4">
-                  <div class="flex-between mb-2">
+                  <label class="flex-between mb-2 cursor-pointer">
                     <span class="font-bold text-sm text-primary-color">Applies to All Employees</span>
-                    <p-inputSwitch formControlName="allEmployees"></p-inputSwitch>
-                  </div>
+                    <p-toggleswitch formControlName="allEmployees"></p-toggleswitch>
+                  </label>
 
                   @if (!holidayForm.get('applicableTo.allEmployees')?.value) {
                     <div class="input-group slide-down">
@@ -198,7 +201,7 @@ import { HRMSService } from '../../hrms.service';
     .page-subtitle { font-size: var(--font-size-sm); color: var(--text-secondary); }
 
     /* Cards & Inputs */
-    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-sm); }
+    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-sm); }
     ::ng-deep .premium-card .p-card-body { padding: var(--spacing-2xl); height: 100%; }
     ::ng-deep .premium-card .p-card-content { padding: 0; }
     
@@ -222,7 +225,7 @@ import { HRMSService } from '../../hrms.service';
 export class HolidayFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private hrmsService = inject(HRMSService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -253,7 +256,7 @@ export class HolidayFormComponent implements OnInit {
   ngOnInit() {
     this.initForm();
     this.holidayId = this.route.snapshot.paramMap.get('id');
-    
+
     if (this.holidayId) {
       this.isEditMode.set(true);
       this.loadHoliday(this.holidayId);
@@ -272,7 +275,7 @@ export class HolidayFormComponent implements OnInit {
       branchId: [null],
       isOptional: [false],
       isActive: [true],
-      
+
       applicableTo: this.fb.group({
         allEmployees: [true],
         departments: [[]],
@@ -283,8 +286,8 @@ export class HolidayFormComponent implements OnInit {
 
   private loadHoliday(id: string) {
     this.hrmsService.getHoliday(id).pipe(
-      catchError(() => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not load holiday.' });
+      catchError((err) => {
+        this.messageService.handleHttpError(err)
         this.onCancel();
         return of(null);
       }),
@@ -315,13 +318,13 @@ export class HolidayFormComponent implements OnInit {
 
     req$.pipe(
       catchError(err => {
-        this.messageService.add({ severity: 'error', summary: 'Save Failed', detail: 'Server error.' });
+        this.messageService.handleHttpError(err)
         return of(null);
       }),
       finalize(() => this.isSaving.set(false))
     ).subscribe((res: any) => {
       if (res) {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Holiday saved.' });
+        this.messageService.showSuccess(res.message)
         setTimeout(() => this.onCancel(), 1000);
       }
     });

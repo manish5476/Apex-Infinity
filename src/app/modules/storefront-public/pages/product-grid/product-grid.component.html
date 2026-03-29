@@ -1,42 +1,18 @@
-<section class="section-root"
-  [style.padding-top]="config.paddingTop === 'none' ? '0' : (config.paddingTop === 'sm' ? '2rem' : '5rem')"
-  [style.padding-bottom]="config.paddingBottom === 'none' ? '0' : (config.paddingBottom === 'sm' ? '2rem' : '5rem')">
+<section class="section-root" [ngStyle]="sectionStyle()">
 
-  <div class="container mx-auto" [class.px-4]="config.containerWidth !== 'full'"
-    [class.px-8]="config.containerWidth === 'full'" [class.max-w-7xl]="config.containerWidth === 'standard'">
+  <div class="container mx-auto" [class.px-4]="true" [class.max-w-7xl]="true">
 
     <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
 
       <div class="w-full text-center md:text-left">
-        @if (config.subtitle) {
-        <span class="text-rose-500 font-bold uppercase tracking-[0.2em] text-xs mb-3 block animate-fade-in-up">
-          {{ config.subtitle }}
-        </span>
-        }
         <h2 class="text-3xl md:text-5xl font-serif font-bold text-slate-900 leading-tight animate-fade-in-up delay-100">
-          {{ config.title }}
+          {{ cfg().title }}
         </h2>
       </div>
 
-      @if ((config.showSorting || config.showFilters) && products.length > 0) {
-      <div class="flex gap-3 animate-fade-in-up delay-200">
-        @if (config.showFilters) {
-        <button
-          class="px-5 py-2.5 bg-white border border-slate-200 rounded-full hover:border-slate-400 hover:shadow-md transition-all flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-700">
-          <i class="pi pi-filter"></i> Filter
-        </button>
-        }
-        @if (config.showSorting) {
-        <button
-          class="px-5 py-2.5 bg-white border border-slate-200 rounded-full hover:border-slate-400 hover:shadow-md transition-all flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-700">
-          <i class="pi pi-sort-alt"></i> Sort
-        </button>
-        }
-      </div>
-      }
     </div>
-    <div class="product-grid-layout" [style.--desktop-cols]="config.columns || 4"
-      [style.--gap]="config.gap === 'lg' ? '40px' : (config.gap === 'sm' ? '16px' : '24px')">
+    <div class="product-grid-layout" [style.--desktop-cols]="cfg().columns"
+      [style.--gap]="cfg().gap === 'lg' ? '40px' : (cfg().gap === 'sm' ? '16px' : '24px')">
 
       @for (product of products; track product.slug || $index; let i = $index) {
 
@@ -59,31 +35,12 @@
 
     </div>
 
-    @if ((config.paginationType === 'pagination' || config.paginationType === 'load_more') && products.length > 0) {
+    @if (cfg().pagination && products.length > 0) {
     <div class="mt-20 flex justify-center">
-      @if (config.paginationType === 'load_more') {
       <button
         class="px-10 py-4 bg-slate-900 text-white rounded-full text-xs font-bold uppercase tracking-[0.15em] hover:bg-slate-800 hover:scale-105 transition-all shadow-lg shadow-slate-900/20">
         Load More Products
       </button>
-      } @else {
-      <nav class="flex gap-3 bg-white p-2 rounded-full border border-slate-100 shadow-sm">
-        <button
-          class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-slate-50 transition-colors text-slate-400 hover:text-slate-900">
-          <i class="pi pi-chevron-left text-xs"></i>
-        </button>
-        <button
-          class="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-bold shadow-md">1</button>
-        <button
-          class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-slate-50 transition-colors text-sm font-medium text-slate-600">2</button>
-        <button
-          class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-slate-50 transition-colors text-sm font-medium text-slate-600">3</button>
-        <button
-          class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-slate-50 transition-colors text-slate-400 hover:text-slate-900">
-          <i class="pi pi-chevron-right text-xs"></i>
-        </button>
-      </nav>
-      }
     </div>
     }
 

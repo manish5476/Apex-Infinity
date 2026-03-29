@@ -21,28 +21,5 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
     });
   }
 
-  return next(req).pipe(
-    catchError((error) => {
-      const msg = error?.error?.message || error?.message;
-
-      // 🔥 Detect token expiration
-      if (
-        error.status === 401 ||
-        msg === 'jwt expired' ||
-        msg === 'TokenExpiredError'
-      ) {
-        console.warn('⛔ JWT expired — logging out...');
-
-        localStorage.removeItem('apex_auth_token');
-        localStorage.removeItem('apex_user');
-
-        // Redirect to login
-        router.navigate(['/auth/login']);
-
-        return throwError(() => error);
-      }
-
-      return throwError(() => error);
-    })
-  );
+  return next(req);
 };

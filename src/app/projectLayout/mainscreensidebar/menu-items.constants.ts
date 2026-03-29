@@ -110,74 +110,154 @@ export const SIDEBAR_MENU: MenuItem[] = [
       { label: 'Sales Reports', icon: 'pi pi-chart-bar', routerLink: ['/sales'] },
     ]
   },
-
+{
+  label: 'Human Resources',
+  icon: 'pi pi-id-card',
+  items: [
+    {
+      label: 'Core HR',
+      icon: 'pi pi-building',
+      items: [
+        { label: 'Department Hub', icon: 'pi pi-home', routerLink: ['/hrms/department/hub'] },
+        { label: 'Department List', icon: 'pi pi-list', routerLink: ['/hrms/department/list'] },
+        { label: 'Department Hierarchy', icon: 'pi pi-sitemap', routerLink: ['/hrms/department/heirachy'] },
+        { label: 'Add Department', icon: 'pi pi-plus', routerLink: ['/hrms/department/new'] },
+        { label: 'Designation List', icon: 'pi pi-list', routerLink: ['/hrms/designation/list'] },
+        { label: 'Designation Hierarchy', icon: 'pi pi-sitemap', routerLink: ['/hrms/designation/heirachy'] },
+        { label: 'Add Designation', icon: 'pi pi-plus', routerLink: ['/hrms/designation/new'] },
+        { label: 'Salary Bands', icon: 'pi pi-money-bill', routerLink: ['/hrms/designation/salary'] },
+        { label: 'Promotions', icon: 'pi pi-angle-double-up', routerLink: ['/hrms/designation/promotion'] },
+        { label: 'Career Path', icon: 'pi pi-map', routerLink: ['/hrms/designation/career'] }
+      ]
+    },
+    {
+      label: 'Staff Management',
+      icon: 'pi pi-users',
+      items: [
+        { label: 'Employee List', icon: 'pi pi-users', routerLink: ['/user/list'] },
+        { label: 'Onboard User', icon: 'pi pi-user-plus', routerLink: ['/user/create'] },
+      ]
+    },
+    {
+      label: 'Shifts & Rosters',
+      icon: 'pi pi-clock',
+      items: [
+        { label: 'Shift Hub', icon: 'pi pi-calendar', routerLink: ['/hrms/shifts/list'] },
+        { label: 'Add Shift', icon: 'pi pi-plus', routerLink: ['/hrms/shifts/new'] },
+        { label: 'Shift Coverage', icon: 'pi pi-users', routerLink: ['/hrms/shifts/coverage'] },
+        { label: 'Shift Validator', icon: 'pi pi-check-square', routerLink: ['/hrms/shifts/validator'] },
+        { label: 'Shift Calculator', icon: 'pi pi-calculator', routerLink: ['/hrms/shifts/calculator'] },
+        { label: 'Clone Shift', icon: 'pi pi-copy', routerLink: ['/hrms/shifts/clone'] },
+        { label: 'Group Rotation', icon: 'pi pi-sync', routerLink: ['/hrms/shift-groups/list'] },
+        { label: 'Add Shift Group', icon: 'pi pi-plus', routerLink: ['/hrms/shift-groups/create'] }
+      ]
+    },
+    {
+      label: 'Time & Attendance',
+      icon: 'pi pi-calendar-times',
+      items: [
+        { label: 'My Web Clock', icon: 'pi pi-clock', routerLink: ['/hrms/attendance/my-clock'] },
+        { label: 'My Timesheet', icon: 'pi pi-calendar', routerLink: ['/hrms/daily-attendance/my-timesheet'] },
+        { label: 'Live Punch Feed', icon: 'pi pi-video', routerLink: ['/hrms/attendance/live-feed'] },
+        { label: 'Attendance Admin', icon: 'pi pi-shield', routerLink: ['/hrms/attendance/admin'] },
+        { label: 'Daily Admin Register', icon: 'pi pi-sliders-h', routerLink: ['/hrms/daily-attendance/admin'] },
+        { label: 'Reports & Bulk Edit', icon: 'pi pi-file-excel', routerLink: ['/hrms/daily-attendance/reports'] }
+      ]
+    },
+    {
+      label: 'Leaves & Holidays',
+      icon: 'pi pi-calendar-minus',
+      items: [
+        { label: 'My Leaves', icon: 'pi pi-user', routerLink: ['/hrms/leave/hub'] },
+        { label: 'Apply Leave', icon: 'pi pi-pencil', routerLink: ['/hrms/leave/apply'] },
+        { label: 'Leave Admin Hub', icon: 'pi pi-shield', routerLink: ['/hrms/leave/admin'] },
+        { label: 'Balance Admin', icon: 'pi pi-wallet', routerLink: ['/hrms/leave-balances/admin'] },
+        { label: 'Holiday Calendar', icon: 'pi pi-calendar-plus', routerLink: ['/hrms/holidays/hub'] },
+        { label: 'Add Holiday', icon: 'pi pi-plus', routerLink: ['/hrms/holidays/new'] }
+      ]
+    },
+    {
+      label: 'Devices & Locations',
+      icon: 'pi pi-server',
+      items: [
+        { label: 'Machine Fleet Hub', icon: 'pi pi-desktop', routerLink: ['/hrms/attendance/machines/hub'] },
+        { label: 'Add Machine', icon: 'pi pi-plus', routerLink: ['/hrms/attendance/machines/new'] },
+        { label: 'Machine Logs', icon: 'pi pi-list', routerLink: ['/hrms/attendance/machines/logs'] },
+        { label: 'Machine Analytics', icon: 'pi pi-chart-bar', routerLink: ['/hrms/attendance/machines/analytics'] },
+        { label: 'Geofence Command', icon: 'pi pi-map', routerLink: ['/hrms/geofence/hub'] },
+        { label: 'Add Geofence', icon: 'pi pi-plus', routerLink: ['/hrms/geofence/new'] }
+      ]
+    }
+  ]
+}
+,
   // ==========================
   // 6. HUMAN RESOURCES (HRMS)
   // ==========================
-  {
-    label: 'Human Resources',
-    icon: 'pi pi-id-card',
-    items: [
-      {
-        label: 'Core HR',
-        icon: 'pi pi-building',
-        items: [
-          { label: 'Department Hub', icon: 'pi pi-home', routerLink: ['/hrms/department/hub'] },
-          { label: 'Department List', icon: 'pi pi-list', routerLink: ['/hrms/department/list'] },
-          { label: 'Designation Hierarchy', icon: 'pi pi-sitemap', routerLink: ['/hrms/designation/heirachy'] },
-          { label: 'Designation List', icon: 'pi pi-list', routerLink: ['/hrms/designation/list'] }
-        ]
-      },
-      {
-        label: 'Staff Management',
-        icon: 'pi pi-users',
-        items: [
-          { label: 'Employee List', icon: 'pi pi-users', routerLink: ['/user/list'] },
-          { label: 'Onboard User', icon: 'pi pi-user-plus', routerLink: ['/user/create'] },
-        ]
-      },
-      {
-        label: 'Shifts & Rosters',
-        icon: 'pi pi-clock',
-        items: [
-          { label: 'Shift Hub', icon: 'pi pi-calendar', routerLink: ['/hrms/shifts/list'] },
-          { label: 'Shift Coverage', icon: 'pi pi-users', routerLink: ['/hrms/shifts/coverage'] },
-          { label: 'Group Rotation', icon: 'pi pi-sync', routerLink: ['/hrms/shift-groups/list'] }
-        ]
-      },
-      {
-        label: 'Time & Attendance',
-        icon: 'pi pi-calendar-times',
-        items: [
-          { label: 'My Web Clock', icon: 'pi pi-clock', routerLink: ['/hrms/attendance/my-clock'] },
-          { label: 'My Timesheet', icon: 'pi pi-calendar', routerLink: ['/hrms/daily-attendance/my-timesheet'] },
-          { label: 'Live Punch Feed', icon: 'pi pi-video', routerLink: ['/hrms/attendance/live-feed'] },
-          { label: 'Daily Admin Register', icon: 'pi pi-sliders-h', routerLink: ['/hrms/daily-attendance/admin'] },
-          { label: 'Reports & Bulk Edit', icon: 'pi pi-file-excel', routerLink: ['/hrms/daily-attendance/reports'] }
-        ]
-      },
-      {
-        label: 'Leaves & Holidays',
-        icon: 'pi pi-calendar-minus',
-        items: [
-          { label: 'My Leaves', icon: 'pi pi-user', routerLink: ['/hrms/leave/hub'] },
-          { label: 'Leave Admin Hub', icon: 'pi pi-shield', routerLink: ['/hrms/leave/admin'] },
-          { label: 'Balance Admin', icon: 'pi pi-wallet', routerLink: ['/hrms/leave-balances/admin'] },
-          { label: 'Holiday Calendar', icon: 'pi pi-calendar-plus', routerLink: ['/hrms/holidays/hub'] },
-        ]
-      },
-      {
-        label: 'Devices & Locations',
-        icon: 'pi pi-server',
-        items: [
-          { label: 'Machine Fleet Hub', icon: 'pi pi-desktop', routerLink: ['/hrms/machines/hub'] },
-          { label: 'Machine Logs', icon: 'pi pi-list', routerLink: ['/hrms/machines/logs'] },
-          { label: 'Machine Analytics', icon: 'pi pi-chart-bar', routerLink: ['/hrms/machines/analytics'] },
-          { label: 'Geofence Command', icon: 'pi pi-map', routerLink: ['/hrms/geofence/hub'] }
-        ]
-      }
-    ]
-  },
+  // {
+  //   label: 'Human Resources',
+  //   icon: 'pi pi-id-card',
+  //   items: [
+  //     {
+  //       label: 'Core HR',
+  //       icon: 'pi pi-building',
+  //       items: [
+  //         { label: 'Department Hub', icon: 'pi pi-home', routerLink: ['/hrms/department/hub'] },
+  //         { label: 'Department List', icon: 'pi pi-list', routerLink: ['/hrms/department/list'] },
+  //         { label: 'Designation Hierarchy', icon: 'pi pi-sitemap', routerLink: ['/hrms/designation/heirachy'] },
+  //         { label: 'Designation List', icon: 'pi pi-list', routerLink: ['/hrms/designation/list'] }
+  //       ]
+  //     },
+  //     {
+  //       label: 'Staff Management',
+  //       icon: 'pi pi-users',
+  //       items: [
+  //         { label: 'Employee List', icon: 'pi pi-users', routerLink: ['/user/list'] },
+  //         { label: 'Onboard User', icon: 'pi pi-user-plus', routerLink: ['/user/create'] },
+  //       ]
+  //     },
+  //     {
+  //       label: 'Shifts & Rosters',
+  //       icon: 'pi pi-clock',
+  //       items: [
+  //         { label: 'Shift Hub', icon: 'pi pi-calendar', routerLink: ['/hrms/shifts/list'] },
+  //         { label: 'Shift Coverage', icon: 'pi pi-users', routerLink: ['/hrms/shifts/coverage'] },
+  //         { label: 'Group Rotation', icon: 'pi pi-sync', routerLink: ['/hrms/shift-groups/list'] }
+  //       ]
+  //     },
+  //     {
+  //       label: 'Time & Attendance',
+  //       icon: 'pi pi-calendar-times',
+  //       items: [
+  //         { label: 'My Web Clock', icon: 'pi pi-clock', routerLink: ['/hrms/attendance/my-clock'] },
+  //         { label: 'My Timesheet', icon: 'pi pi-calendar', routerLink: ['/hrms/daily-attendance/my-timesheet'] },
+  //         { label: 'Live Punch Feed', icon: 'pi pi-video', routerLink: ['/hrms/attendance/live-feed'] },
+  //         { label: 'Daily Admin Register', icon: 'pi pi-sliders-h', routerLink: ['/hrms/daily-attendance/admin'] },
+  //         { label: 'Reports & Bulk Edit', icon: 'pi pi-file-excel', routerLink: ['/hrms/daily-attendance/reports'] }
+  //       ]
+  //     },
+  //     {
+  //       label: 'Leaves & Holidays',
+  //       icon: 'pi pi-calendar-minus',
+  //       items: [
+  //         { label: 'My Leaves', icon: 'pi pi-user', routerLink: ['/hrms/leave/hub'] },
+  //         { label: 'Leave Admin Hub', icon: 'pi pi-shield', routerLink: ['/hrms/leave/admin'] },
+  //         { label: 'Balance Admin', icon: 'pi pi-wallet', routerLink: ['/hrms/leave-balances/admin'] },
+  //         { label: 'Holiday Calendar', icon: 'pi pi-calendar-plus', routerLink: ['/hrms/holidays/hub'] },
+  //       ]
+  //     },
+  //     {
+  //       label: 'Devices & Locations',
+  //       icon: 'pi pi-server',
+  //       items: [
+  //         { label: 'Machine Fleet Hub', icon: 'pi pi-desktop', routerLink: ['/hrms/machines/hub'] },
+  //         { label: 'Machine Logs', icon: 'pi pi-list', routerLink: ['/hrms/machines/logs'] },
+  //         { label: 'Machine Analytics', icon: 'pi pi-chart-bar', routerLink: ['/hrms/machines/analytics'] },
+  //         { label: 'Geofence Command', icon: 'pi pi-map', routerLink: ['/hrms/geofence/hub'] }
+  //       ]
+  //     }
+  //   ]
+  // },
 
   // ==========================
   // 7. SYSTEM ADMINISTRATION

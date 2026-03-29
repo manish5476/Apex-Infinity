@@ -24,10 +24,10 @@ interface PeakHour {
   selector: 'app-operational-metrics',
   standalone: true,
   imports: [
-    CommonModule, 
-    ButtonModule, 
-    TooltipModule, 
-    ProgressSpinnerModule, 
+    CommonModule,
+    ButtonModule,
+    TooltipModule,
+    ProgressSpinnerModule,
     TagModule,
     AgShareGrid,
     UniversalFilterComponent
@@ -181,7 +181,7 @@ interface PeakHour {
 
     .kpi-card {
       background: var(--bg-secondary); border: 1px solid var(--border-primary);
-      border-radius: var(--ui-border-radius-xl); padding: var(--spacing-lg);
+      border-radius: var(--radius-2xl); padding: var(--spacing-lg);
       position: relative; overflow: hidden; transition: var(--transition-base);
     }
     .kpi-card:hover { border-color: var(--border-secondary); box-shadow: var(--shadow-sm); }
@@ -215,7 +215,7 @@ interface PeakHour {
     /* GRID CARD */
     .grid-card {
       background: var(--bg-secondary); border: 1px solid var(--border-primary);
-      border-radius: var(--ui-border-radius-xl); overflow: hidden;
+      border-radius: var(--radius-2xl); overflow: hidden;
       height: 100%; min-height: 400px; display: flex; flex-direction: column;
     }
     .grid-header {
@@ -228,7 +228,7 @@ interface PeakHour {
 
     /* SIDEBAR */
     .side-column { display: flex; flex-direction: column; gap: var(--spacing-lg); }
-    .side-card { background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--ui-border-radius-xl); padding: var(--spacing-lg); }
+    .side-card { background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--radius-2xl); padding: var(--spacing-lg); }
     
     .side-header { display: flex; align-items: center; gap: 8px; }
     .header-icon.warning { color: var(--color-warning); }
@@ -305,7 +305,7 @@ export class OperationalMetricsComponent implements OnInit {
   getFormattedPeakHour(): string {
     const peaks = this.opData()?.operations?.peakHours;
     if (!peaks || peaks.length === 0) return '--';
-    
+
     // Sort by count descending to find highest peak
     const topPeak = [...peaks].sort((a: any, b: any) => b.count - a.count)[0];
     return `${this.getDayName(topPeak.day)} @ ${topPeak.hour}:00`;
@@ -330,9 +330,9 @@ export class OperationalMetricsComponent implements OnInit {
       },
       // 2. NAME
       {
-        field: 'name', 
-        headerName: 'Associate Name', 
-        flex: 1.5, 
+        field: 'name',
+        headerName: 'Associate Name',
+        flex: 1.5,
         minWidth: 180,
         cellRenderer: (params: any) => {
           const name = params.value || 'Unknown';
@@ -347,17 +347,17 @@ export class OperationalMetricsComponent implements OnInit {
       },
       // 3. TRANSACTION COUNT
       {
-        field: 'count', 
-        headerName: 'Orders', 
-        width: 100, 
+        field: 'count',
+        headerName: 'Orders',
+        width: 100,
         type: 'rightAligned',
         cellStyle: { 'font-family': 'var(--font-mono)', 'color': 'var(--text-secondary)', 'font-weight': '600', 'text-align': 'right', 'display': 'flex', 'align-items': 'center', 'justify-content': 'flex-end' }
       },
       // 4. TOTAL REVENUE
       {
-        field: 'revenue', 
-        headerName: 'Total Sales', 
-        width: 130, 
+        field: 'revenue',
+        headerName: 'Total Sales',
+        width: 130,
         type: 'rightAligned',
         valueFormatter: (params: any) => this.commonService.formatCurrency(params.value),
         cellStyle: { 'font-weight': '700', 'color': 'var(--color-success)', 'font-family': 'var(--font-mono)', 'text-align': 'right', 'display': 'flex', 'align-items': 'center', 'justify-content': 'flex-end' }
@@ -368,9 +368,9 @@ export class OperationalMetricsComponent implements OnInit {
         width: 120,
         type: 'rightAligned',
         valueGetter: (params: any) => {
-           const rev = params.data.revenue || 0;
-           const cnt = params.data.count || 1;
-           return rev / cnt;
+          const rev = params.data.revenue || 0;
+          const cnt = params.data.count || 1;
+          return rev / cnt;
         },
         valueFormatter: (params: any) => this.commonService.formatCurrency(params.value),
         cellStyle: { 'color': 'var(--accent-primary)', 'font-family': 'var(--font-mono)', 'text-align': 'right', 'font-size': '11px', 'display': 'flex', 'align-items': 'center', 'justify-content': 'flex-end' }

@@ -1,5 +1,48 @@
-<section class="section-root" 
-         [ngStyle]="backgroundStyle()"
+<!-- testimonial-slider.component.html -->
+<section class="ts-root" [ngStyle]="sectionStyle()">
+  <div class="ts-container">
+    <header class="ts-header">
+      <span class="ts-eyebrow">Reviews</span>
+      <h2 class="ts-title">{{ cfg().title }}</h2>
+    </header>
+
+    <div class="ts-grid">
+      @for (item of items(); track item.name; let i = $index) {
+      <article class="ts-card" [class.ts-card-featured]="i === 0">
+
+        <!-- Stars -->
+        <div class="ts-stars">
+          @for (s of stars(item.rating); track s) {
+          <i class="pi pi-star-fill ts-star"></i>
+          }
+        </div>
+
+        <!-- Quote -->
+        <blockquote class="ts-quote">"{{ item.text }}"</blockquote>
+
+        <!-- Author -->
+        <footer class="ts-author">
+          @if (item.avatar) {
+          <img [src]="item.avatar" [alt]="item.name" class="ts-avatar" loading="lazy" />
+          } @else {
+          <div class="ts-avatar-placeholder">
+            {{ item.name.charAt(0) }}
+          </div>
+          }
+          <div>
+            <div class="ts-name">{{ item.name }}</div>
+            @if (item.role) { <div class="ts-role">{{ item.role }}</div> }
+          </div>
+        </footer>
+
+      </article>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- <section class="section-root" 
+         [ngStyle]="sectionStyle()"
          (mouseenter)="stopAutoplay()"
          (mouseleave)="startAutoplay()">
   
@@ -7,8 +50,8 @@
 
   <div class="container-wrapper">
     
-    <div class="header-group" *ngIf="config.title">
-      <h2 class="section-title">{{ config.title }}</h2>
+    <div class="header-group" *ngIf="cfg().title">
+      <h2 class="section-title">{{ cfg().title }}</h2>
       <div class="divider-line"></div>
     </div>
 
@@ -16,7 +59,7 @@
       <div class="slider-track"
            [style.transform]="'translateX(-' + (currentSlide() * 100) + '%)'">
         
-        @for (item of config.testimonials; track $index) {
+        @for (item of cfg().items; track $index) {
           <div class="slide-item">
             
             <div class="testimonial-card group">
@@ -29,7 +72,7 @@
                 }
               </div>
 
-              <p class="quote-text">"{{ item.quote }}"</p>
+              <p class="quote-text">"{{ item.text }}"</p>
 
               <div class="divider-small"></div>
 
@@ -58,7 +101,7 @@
       </button>
 
       <div class="dots">
-        @for (item of config.testimonials; track $index) {
+        @for (item of cfg().items; track $index) {
           <button class="dot" 
                   [class.active]="currentSlide() === $index"
                   (click)="goTo($index)">
@@ -72,7 +115,7 @@
     </div>
 
   </div>
-</section>
+</section> -->
 
 <!-- <section class="section-root relative overflow-hidden" 
          [ngStyle]="backgroundStyle()"

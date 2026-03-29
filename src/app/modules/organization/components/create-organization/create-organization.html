@@ -1,4 +1,477 @@
-<div class="premium-setup-wrapper">
+<!-- create-organization.component.html -->
+<div class="auth-root org-root">
+
+  <!-- ══════════════════════════════════════════════════════
+       LEFT — Brand Panel
+  ═══════════════════════════════════════════════════════ -->
+  <aside class="brand-panel">
+    <div class="grid-lines" aria-hidden="true"></div>
+    <div class="orb orb-1" aria-hidden="true"></div>
+    <div class="orb orb-2" aria-hidden="true"></div>
+
+    <div class="brand-inner">
+
+      <div class="wordmark">
+        <div class="logo-glyph">
+          <svg viewBox="0 0 32 32" fill="none">
+            <path d="M4 28L16 4L28 28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+              stroke-linejoin="round" />
+            <path d="M8.5 20L23.5 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+          </svg>
+        </div>
+        <span class="wordmark-text">Apex</span>
+      </div>
+
+      <div class="hero-copy">
+        <p class="overline-text">Enterprise setup</p>
+        <h1 class="hero-headline">
+          Your org,<br>
+          your <em>rules.</em>
+        </h1>
+        <p class="hero-body">
+          Set up your organization's workspace, configure your headquarters, and establish super-admin access — all in
+          one step.
+        </p>
+      </div>
+
+      <!-- Step progress tracker -->
+      <div class="step-tracker">
+        @for (step of sections; track step; let i = $index) {
+        <div class="step-item" [class.active]="activeSection() === i" [class.done]="activeSection() > i">
+          <div class="step-dot">
+            @if (activeSection() > i) {
+            <svg viewBox="0 0 12 12" fill="none">
+              <path d="M2 6l2.5 2.5L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+            } @else {
+            <span>{{ i + 1 }}</span>
+            }
+          </div>
+          <span class="step-label">{{ step }}</span>
+        </div>
+        @if (i < sections.length - 1) { <div class="step-connector" [class.done]="activeSection() > i">
+      </div>
+      }
+      }
+    </div>
+
+    <footer class="brand-footer">
+      <span>© 2026 Apex Inc.</span>
+      <nav class="footer-nav">
+        <a href="#" tabindex="-1">Privacy</a>
+        <a href="#" tabindex="-1">Terms</a>
+      </nav>
+    </footer>
+
+</div>
+</aside>
+
+<!-- ══════════════════════════════════════════════════════
+       RIGHT — Form Panel (scrollable, all sections visible)
+  ═══════════════════════════════════════════════════════ -->
+<main class="form-panel">
+  <div class="form-inner">
+
+    <!-- Mobile logo -->
+    <div class="mobile-logo">
+      <div class="logo-glyph">
+        <svg viewBox="0 0 32 32" fill="none">
+          <path d="M4 28L16 4L28 28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <path d="M8.5 20L23.5 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+        </svg>
+      </div>
+      <span>Apex</span>
+    </div>
+
+    <div class="form-header">
+      <h2 class="form-title">Setup Organization</h2>
+      <p class="form-subtitle">Register your enterprise profile and admin access</p>
+    </div>
+
+    <form [formGroup]="organizationForm" (ngSubmit)="onSubmit()" class="org-form" novalidate>
+
+      <!-- ══════════════════════════════════════════════
+             SECTION 1 — Organization Profile
+        ═══════════════════════════════════════════════ -->
+      <div class="form-section" id="section-org" [class.section-active]="activeSection() === 0">
+        <div class="section-heading">
+          <div class="section-badge">
+            <svg viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd"
+                d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z"
+                clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="section-title">Organization Profile</h3>
+            <p class="section-desc">Your company's public identity and contact details</p>
+          </div>
+        </div>
+
+        <div class="fields-grid">
+
+          <!-- Org name -->
+          <div class="field-group col-span-2" [class.focused]="focusedField() === 'organizationName'"
+            [class.has-error]="f['organizationName'].touched && f['organizationName'].invalid">
+            <label class="field-label" for="orgName">
+              <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                  d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4z"
+                  clip-rule="evenodd" />
+              </svg>
+              Organization Name
+            </label>
+            <input id="orgName" type="text" class="apex-input" formControlName="organizationName"
+              placeholder="Apex Innovations Ltd." (focus)="onFocus('organizationName')"
+              (blur)="onBlur(); generateShopId()" />
+            @if (f['organizationName'].touched && f['organizationName'].invalid) {
+            <p class="field-error">
+              @if (f['organizationName'].errors?.['required']) { Name is required }
+              @else { Minimum 3 characters }
+            </p>
+            }
+          </div>
+
+          <!-- Shop ID -->
+          <div class="field-group" [class.focused]="focusedField() === 'uniqueShopId'"
+            [class.has-error]="f['uniqueShopId'].touched && f['uniqueShopId'].invalid">
+            <label class="field-label" for="shopId">
+              <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                  d="M9.243 3.03a1 1 0 01.727 1.213L9.53 6h2.94l.56-2.243a1 1 0 111.94.486L14.53 6H17a1 1 0 110 2h-2.97l-1 4H15a1 1 0 110 2h-2.47l-.56 2.242a1 1 0 11-1.94-.485L10.47 14H7.53l-.56 2.242a1 1 0 11-1.94-.485L5.47 14H3a1 1 0 110-2h2.97l1-4H5a1 1 0 110-2h2.47l.56-2.243a1 1 0 011.213-.727zM9.03 8l-1 4h2.938l1-4H9.031z"
+                  clip-rule="evenodd" />
+              </svg>
+              Shop ID
+            </label>
+            <input id="shopId" type="text" class="apex-input uppercase-field" formControlName="uniqueShopId"
+              placeholder="APEX-001" (focus)="onFocus('uniqueShopId')" (blur)="onBlur()" />
+            @if (f['uniqueShopId'].touched && f['uniqueShopId'].invalid) {
+            <p class="field-error">Letters, numbers and hyphens only</p>
+            }
+            <span class="field-hint">Auto-generated from org name · editable</span>
+          </div>
+
+          <!-- GST -->
+          <div class="field-group" [class.focused]="focusedField() === 'gstNumber'"
+            [class.has-error]="f['gstNumber'].touched && f['gstNumber'].invalid">
+            <label class="field-label" for="gst">
+              <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                  d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
+                  clip-rule="evenodd" />
+              </svg>
+              GST Number
+              <span class="optional-badge">Optional</span>
+            </label>
+            <input id="gst" type="text" class="apex-input uppercase-field" formControlName="gstNumber"
+              placeholder="22AAAAA0000A1Z5" (focus)="onFocus('gstNumber')" (blur)="onBlur()" />
+            @if (f['gstNumber'].touched && f['gstNumber'].invalid) {
+            <p class="field-error">Invalid GST format</p>
+            }
+          </div>
+
+          <!-- Primary email -->
+          <div class="field-group" [class.focused]="focusedField() === 'primaryEmail'"
+            [class.has-error]="f['primaryEmail'].touched && f['primaryEmail'].invalid">
+            <label class="field-label" for="pEmail">
+              <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+              </svg>
+              Primary Email
+            </label>
+            <input id="pEmail" type="email" class="apex-input" formControlName="primaryEmail"
+              placeholder="contact@company.com" (focus)="onFocus('primaryEmail')" (blur)="onBlur()" />
+            @if (f['primaryEmail'].touched && f['primaryEmail'].invalid) {
+            <p class="field-error">
+              @if (f['primaryEmail'].errors?.['required']) { Email required }
+              @else { Invalid email address }
+            </p>
+            }
+          </div>
+
+          <!-- Primary phone -->
+          <div class="field-group" [class.focused]="focusedField() === 'primaryPhone'"
+            [class.has-error]="f['primaryPhone'].touched && f['primaryPhone'].invalid">
+            <label class="field-label" for="pPhone">
+              <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+              </svg>
+              Primary Phone
+            </label>
+            <input id="pPhone" type="tel" class="apex-input" formControlName="primaryPhone"
+              placeholder="+91 98765 43210" (focus)="onFocus('primaryPhone')" (blur)="onBlur()" />
+            @if (f['primaryPhone'].touched && f['primaryPhone'].invalid) {
+            <p class="field-error">
+              @if (f['primaryPhone'].errors?.['required']) { Phone required }
+              @else { Invalid phone number }
+            </p>
+            }
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Section divider -->
+      <div class="section-divider">
+        <div class="divider-line"></div>
+        <span class="divider-label">Headquarters</span>
+        <div class="divider-line"></div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════
+             SECTION 2 — Headquarters Location
+        ═══════════════════════════════════════════════ -->
+      <div class="form-section" id="section-location" [class.section-active]="activeSection() === 1">
+        <div class="section-heading">
+          <div class="section-badge">
+            <svg viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd"
+                d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="section-title">Headquarters Location</h3>
+            <p class="section-desc">Your primary office address for records and billing</p>
+          </div>
+        </div>
+
+        <div class="fields-grid">
+
+          <!-- Branch name -->
+          <div class="field-group col-span-2" [class.focused]="focusedField() === 'mainBranchName'"
+            [class.has-error]="f['mainBranchName'].touched && f['mainBranchName'].invalid">
+            <label class="field-label" for="branchName">
+              <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+              </svg>
+              Branch Name
+            </label>
+            <input id="branchName" type="text" class="apex-input" formControlName="mainBranchName"
+              placeholder="Head Office" (focus)="onFocus('mainBranchName')" (blur)="onBlur()" />
+            @if (f['mainBranchName'].touched && f['mainBranchName'].invalid) {
+            <p class="field-error">Branch name is required</p>
+            }
+          </div>
+
+          <ng-container formGroupName="mainBranchAddress">
+
+            <!-- Street -->
+            <div class="field-group col-span-2" [class.focused]="focusedField() === 'street'"
+              [class.has-error]="branch['street'].touched && branch['street'].invalid">
+              <label class="field-label" for="street">
+                <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                    d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.293.707L6 18.414V5.586L3.707 3.293zm10.586 14.828L18 14.414V4a1 1 0 00-.293-.707L14 0v16l.293.121zM14 2H6v14h8V2z"
+                    clip-rule="evenodd" />
+                </svg>
+                Street Address
+              </label>
+              <input id="street" type="text" class="apex-input" formControlName="street"
+                placeholder="123 Business Park, Suite 400" (focus)="onFocus('street')" (blur)="onBlur()" />
+              @if (branch['street'].touched && branch['street'].invalid) {
+              <p class="field-error">Street address is required</p>
+              }
+            </div>
+
+            <!-- City -->
+            <div class="field-group" [class.focused]="focusedField() === 'city'"
+              [class.has-error]="branch['city'].touched && branch['city'].invalid">
+              <label class="field-label" for="city">City</label>
+              <input id="city" type="text" class="apex-input" formControlName="city" placeholder="Mumbai"
+                (focus)="onFocus('city')" (blur)="onBlur()" />
+              @if (branch['city'].touched && branch['city'].invalid) {
+              <p class="field-error">Required</p>
+              }
+            </div>
+
+            <!-- State -->
+            <div class="field-group" [class.focused]="focusedField() === 'state'"
+              [class.has-error]="branch['state'].touched && branch['state'].invalid">
+              <label class="field-label" for="state">State</label>
+              <input id="state" type="text" class="apex-input" formControlName="state" placeholder="Maharashtra"
+                (focus)="onFocus('state')" (blur)="onBlur()" />
+              @if (branch['state'].touched && branch['state'].invalid) {
+              <p class="field-error">Required</p>
+              }
+            </div>
+
+            <!-- Zip -->
+            <div class="field-group" [class.focused]="focusedField() === 'zipCode'"
+              [class.has-error]="branch['zipCode'].touched && branch['zipCode'].invalid">
+              <label class="field-label" for="zip">Zip / Pin Code</label>
+              <input id="zip" type="text" class="apex-input" formControlName="zipCode" placeholder="400001"
+                (focus)="onFocus('zipCode')" (blur)="onBlur()" />
+              @if (branch['zipCode'].touched && branch['zipCode'].invalid) {
+              <p class="field-error">Required</p>
+              }
+            </div>
+
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- Section divider -->
+      <div class="section-divider">
+        <div class="divider-line"></div>
+        <span class="divider-label">Admin Access</span>
+        <div class="divider-line"></div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════
+             SECTION 3 — Super Admin
+        ═══════════════════════════════════════════════ -->
+      <div class="form-section admin-section" id="section-admin" [class.section-active]="activeSection() === 2">
+        <div class="section-heading">
+          <div class="section-badge section-badge--admin">
+            <svg viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd"
+                d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="section-title">Super Admin Access</h3>
+            <p class="section-desc">The primary owner account with full system privileges</p>
+          </div>
+        </div>
+
+        <div class="fields-grid">
+
+          <!-- Owner name -->
+          <div class="field-group" [class.focused]="focusedField() === 'ownerName'"
+            [class.has-error]="f['ownerName'].touched && f['ownerName'].invalid">
+            <label class="field-label" for="ownerName">
+              <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+              </svg>
+              Owner Name
+            </label>
+            <input id="ownerName" type="text" class="apex-input" formControlName="ownerName" placeholder="Full name"
+              (focus)="onFocus('ownerName')" (blur)="onBlur()" />
+            @if (f['ownerName'].touched && f['ownerName'].invalid) {
+            <p class="field-error">Owner name is required</p>
+            }
+          </div>
+
+          <!-- Owner email -->
+          <div class="field-group" [class.focused]="focusedField() === 'ownerEmail'"
+            [class.has-error]="f['ownerEmail'].touched && f['ownerEmail'].invalid">
+            <label class="field-label" for="ownerEmail">
+              <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+              </svg>
+              Login Email
+            </label>
+            <input id="ownerEmail" type="email" class="apex-input" formControlName="ownerEmail"
+              placeholder="admin@company.com" (focus)="onFocus('ownerEmail')" (blur)="onBlur()" />
+            @if (f['ownerEmail'].touched && f['ownerEmail'].invalid) {
+            <p class="field-error">
+              @if (f['ownerEmail'].errors?.['required']) { Email required }
+              @else { Invalid email address }
+            </p>
+            }
+          </div>
+
+          <!-- Password -->
+          <div class="field-group col-span-2" [class.focused]="focusedField() === 'ownerPassword'"
+            [class.has-error]="f['ownerPassword'].touched && f['ownerPassword'].invalid">
+            <label class="field-label" for="ownerPwd">
+              <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                  d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                  clip-rule="evenodd" />
+              </svg>
+              Password
+            </label>
+            <div class="password-wrap">
+              <input id="ownerPwd" [type]="passwordVisible() ? 'text' : 'password'" class="apex-input"
+                formControlName="ownerPassword" placeholder="Minimum 8 characters" (focus)="onFocus('ownerPassword')"
+                (blur)="onBlur()" />
+              <button type="button" class="pwd-eye-btn" (click)="togglePassword()" tabindex="-1">
+                @if (passwordVisible()) {
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                  <path fill-rule="evenodd"
+                    d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                    clip-rule="evenodd" />
+                </svg>
+                } @else {
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                    d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z"
+                    clip-rule="evenodd" />
+                  <path
+                    d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
+                </svg>
+                }
+              </button>
+            </div>
+            @if (f['ownerPassword'].touched && f['ownerPassword'].invalid) {
+            <p class="field-error">
+              @if (f['ownerPassword'].errors?.['required']) { Password required }
+              @else { Minimum 8 characters }
+            </p>
+            }
+            <!-- Strength bar -->
+            @if (f['ownerPassword'].value) {
+            <div class="strength-row">
+              <div class="strength-track">
+                <div class="strength-fill" [class]="strengthClass" [style.width.%]="passwordStrength * 25"></div>
+              </div>
+              <span class="strength-label" [class]="strengthClass">{{ strengthLabel }}</span>
+            </div>
+            }
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── Submit row ── -->
+      <div class="submit-row">
+        <a routerLink="/auth/login" class="cancel-link">
+          <svg viewBox="0 0 20 20" fill="currentColor" class="cancel-icon">
+            <path fill-rule="evenodd"
+              d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+              clip-rule="evenodd" />
+          </svg>
+          Back to login
+        </a>
+
+        <button type="submit" class="submit-btn" [class.loading]="isLoading()" [disabled]="isLoading()">
+          @if (isLoading()) {
+          <span class="spinner" aria-hidden="true"></span>
+          <span>Creating organization…</span>
+          } @else {
+          <span>Create Organization</span>
+          <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+              d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+              clip-rule="evenodd" />
+          </svg>
+          }
+        </button>
+      </div>
+
+    </form>
+
+    <p class="footer-note">
+      Already have an org?
+      <a routerLink="/auth/login" class="footer-link">Sign in instead</a>
+    </p>
+
+  </div>
+</main>
+
+</div>
+
+<!-- <div class="premium-setup-wrapper">
   <div class="ambient-mesh"></div>
 
   <div class="glass-panel">
@@ -143,216 +616,4 @@
       </button>
     </footer>
   </div>
-</div>
-
-
-
-<!-- Custom Toast Notification
-    @if (toastMessage()) {
-      <div class="custom-toast" [class.success]="toastType() === 'success'" [class.error]="toastType() === 'error'">
-        <div class="toast-icon">
-          @if (toastType() === 'success') {
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-          } @else {
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="8" x2="12" y2="12"></line>
-              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
-          }
-        </div>
-        <div class="toast-content">
-          <div class="toast-title">{{ toastTitle() }}</div>
-          <div class="toast-desc">{{ toastMessage() }}</div>
-        </div>
-        <button class="toast-close" (click)="clearToast()">×</button>
-      </div>
-    }
-
-    Main Background Wrapper
-    <div class="glass-background">
-      <div class="glass-overlay"></div>
-      
-      <div class="page-layout">
-        
-        1. HEADER (Fixed/Sticky)
-        <header class="glass-header">
-          <div class="header-content">
-            <div class="icon-box">
-              Building Icon
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
-                <line x1="9" y1="22" x2="9" y2="22.01"></line>
-                <line x1="15" y1="22" x2="15" y2="22.01"></line>
-                <line x1="12" y1="22" x2="12" y2="22.01"></line>
-                <line x1="12" y1="2" x2="12" y2="22"></line>
-                <line x1="4" y1="10" x2="20" y2="10"></line>
-                <line x1="4" y1="18" x2="20" y2="18"></line>
-              </svg>
-            </div>
-            <div class="header-text">
-              <h1>Setup Organization</h1>
-              <p>Register your enterprise profile and administrative access.</p>
-            </div>
-          </div>
-        </header>
-
-        2. SCROLLABLE CONTENT AREA
-        <main class="scroll-container">
-          <div class="content-wrapper">
-            
-            <form [formGroup]="organizationForm" class="glass-form">
-
-              SECTION 1: ORGANIZATION DETAILS
-              <section class="glass-card">
-                <div class="card-header">
-                  <h3>
-                    ID Card Icon
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-400">
-                      <rect x="3" y="4" width="18" height="16" rx="3"></rect>
-                      <circle cx="9" cy="10" r="2"></circle>
-                      <line x1="15" y1="8" x2="17" y2="8"></line>
-                      <line x1="15" y1="12" x2="17" y2="12"></line>
-                      <line x1="7" y1="16" x2="17" y2="16"></line>
-                    </svg>
-                    Organization Profile
-                  </h3>
-                  <span class="card-desc">Basic identification and contact information.</span>
-                </div>
-
-                <div class="form-grid">
-                  <div class="form-group">
-                    <label>Organization Name <span class="req">*</span></label>
-                    <input type="text" class="glass-input" formControlName="organizationName" placeholder="Ex: Apex Innovations" (blur)="generateShopId()" />
-                  </div>
-
-                  <div class="form-group">
-                    <label>Unique Shop ID <span class="req">*</span></label>
-                    <input type="text" class="glass-input" formControlName="uniqueShopId" placeholder="Ex: APEX-001" style="text-transform: uppercase" />
-                    <small class="hint">Auto-generated ID.</small>
-                  </div>
-
-                  <div class="form-group">
-                    <label>Primary Email <span class="req">*</span></label>
-                    <input type="email" class="glass-input" formControlName="primaryEmail" placeholder="contact@company.com" />
-                  </div>
-
-                  <div class="form-group">
-                    <label>Primary Phone <span class="req">*</span></label>
-                    <input type="text" class="glass-input" formControlName="primaryPhone" placeholder="+91 98765 43210" />
-                  </div>
-
-                  <div class="form-group">
-                    <label>GST Number</label>
-                    <input type="text" class="glass-input" formControlName="gstNumber" placeholder="22AAAAA0000A1Z5" style="text-transform: uppercase" />
-                  </div>
-                </div>
-              </section>
-
-              SECTION 2: MAIN BRANCH
-              <section class="glass-card">
-                <div class="card-header">
-                  <h3>
-                    Map Pin Icon
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-400">
-                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                      <circle cx="12" cy="10" r="3"></circle>
-                    </svg>
-                    Headquarters Location
-                  </h3>
-                  <span class="card-desc">Details for your primary operating branch.</span>
-                </div>
-
-                <div class="form-grid">
-                  <div class="form-group span-2">
-                    <label>Branch Name <span class="req">*</span></label>
-                    <input type="text" class="glass-input" formControlName="mainBranchName" placeholder="Ex: Head Office" />
-                  </div>
-
-                  <ng-container formGroupName="mainBranchAddress">
-                    <div class="form-group span-2">
-                      <label>Street Address <span class="req">*</span></label>
-                      <input type="text" class="glass-input" formControlName="street" placeholder="123 Business Park" />
-                    </div>
-                    <div class="form-group">
-                      <label>City <span class="req">*</span></label>
-                      <input type="text" class="glass-input" formControlName="city" placeholder="New York" />
-                    </div>
-                    <div class="form-group">
-                      <label>State <span class="req">*</span></label>
-                      <input type="text" class="glass-input" formControlName="state" placeholder="NY" />
-                    </div>
-                    <div class="form-group">
-                      <label>Zip Code <span class="req">*</span></label>
-                      <input type="text" class="glass-input" formControlName="zipCode" placeholder="10001" />
-                    </div>
-                  </ng-container>
-                </div>
-              </section>
-
-              SECTION 3: ADMIN ACCOUNT
-              <section class="glass-card highlight-card">
-                <div class="card-header">
-                  <h3>
-                    Shield Icon
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-400">
-                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                    </svg>
-                    Super Admin Access
-                  </h3>
-                  <span class="card-desc">Credentials for the primary owner.</span>
-                </div>
-
-                <div class="form-grid">
-                  <div class="form-group">
-                    <label>Owner Name <span class="req">*</span></label>
-                    <input type="text" class="glass-input" formControlName="ownerName" placeholder="Full Name" />
-                  </div>
-                  <div class="form-group">
-                    <label>Login Email <span class="req">*</span></label>
-                    <input type="email" class="glass-input" formControlName="ownerEmail" placeholder="admin@company.com" />
-                  </div>
-                  <div class="form-group">
-                    <label>Password <span class="req">*</span></label>
-                    <div class="password-wrapper">
-                        <input [type]="passwordVisible() ? 'text' : 'password'" class="glass-input password-input" formControlName="ownerPassword" placeholder="Strong Password" />
-                        <button type="button" class="password-toggle" (click)="togglePassword()">
-                            @if(passwordVisible()) {
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                            } @else {
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
-                            }
-                        </button>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-            </form>
-          </div>
-        </main>
-
-        3. FOOTER (Fixed/Sticky)
-        <footer class="glass-footer">
-          <div class="footer-content">
-            <button type="button" class="glass-button secondary">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
-                <line x1="19" y1="12" x2="5" y2="12"></line>
-                <polyline points="12 19 5 12 12 5"></polyline>
-              </svg>
-              Back
-            </button>
-            <button type="button" class="glass-button primary" (click)="onSubmit()" [disabled]="isLoading()">
-                @if(isLoading()) {
-                    <span class="spinner"></span> Processing...
-                } @else {
-                    Create Organization
-                }
-            </button>
-          </div>
-        </footer>
-
-      </div>
-    </div> -->
+</div> -->

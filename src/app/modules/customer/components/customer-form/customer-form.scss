@@ -12,6 +12,7 @@
 .form-page-container {
   width: 100%;
   height: 100%;
+  border-radius: var(--radius-2xl);
   /* Prevent double scrollbars: The container is fixed, children scroll */
   overflow: hidden; 
   display: flex;

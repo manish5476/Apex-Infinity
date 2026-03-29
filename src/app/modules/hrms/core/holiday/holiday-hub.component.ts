@@ -23,13 +23,14 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { Toast } from 'primeng/toast';
 import { HRMSService } from '../../hrms.service';
+import { AppMessageService } from '@core/services/message.service';
 
 @Component({
   selector: 'app-holiday-hub',
   standalone: true,
   imports: [
     CommonModule, FormsModule, CardModule, TableModule, ButtonModule,
-    TagModule, SelectModule, SkeletonModule, TooltipModule,Toast,
+    TagModule, SelectModule, SkeletonModule, TooltipModule, Toast,
     DialogModule, ConfirmDialogModule, IconFieldModule, InputIconModule, InputTextModule
   ],
   providers: [MessageService, ConfirmationService],
@@ -49,7 +50,8 @@ import { HRMSService } from '../../hrms.service';
           </div>
         </div>
         <div class="header-right flex-align gap-3">
-          <p-select [options]="years" [(ngModel)]="selectedYear" (onChange)="loadYearData()" styleClass="premium-select font-bold"></p-select>
+          <p-select [options]="years" [(ngModel)]="selectedYear" (onChange)="loadYearData()" styleClass="premium-select font-bold" [filter]="true" filterBy="label"></p-select>
+
           <p-button icon="pi pi-copy" label="Copy Previous Year" severity="secondary" [outlined]="true" (onClick)="displayCopyDialog = true"></p-button>
           <p-button icon="pi pi-plus" label="Add Holiday" styleClass="p-button-primary" (onClick)="onAdd()"></p-button>
         </div>
@@ -184,11 +186,13 @@ import { HRMSService } from '../../hrms.service';
       <div class="flex-col gap-4">
         <div class="input-group">
           <label class="info-label">Source Year (Copy From)</label>
-          <p-select [(ngModel)]="copyFromYear" [options]="years" appendTo="body" styleClass="w-full premium-select"></p-select>
+          <p-select [(ngModel)]="copyFromYear" [options]="years" appendTo="body" styleClass="w-full premium-select" [filter]="true" filterBy="label"></p-select>
+
         </div>
         <div class="input-group">
           <label class="info-label">Target Year (Copy To)</label>
-          <p-select [(ngModel)]="copyToYear" [options]="years" appendTo="body" styleClass="w-full premium-select"></p-select>
+          <p-select [(ngModel)]="copyToYear" [options]="years" appendTo="body" styleClass="w-full premium-select" [filter]="true" filterBy="label"></p-select>
+
         </div>
         <div class="flex-align justify-end gap-3 mt-4 pt-4 border-top">
           <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="displayCopyDialog = false"></p-button>
@@ -274,7 +278,7 @@ import { HRMSService } from '../../hrms.service';
     .border-left-warning { border-left: 4px solid var(--color-warning) !important; }
 
     /* Header */
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--ui-border-radius-xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--radius-2xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
     .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
     .icon-brand { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: var(--font-size-2xl); }
     .page-title { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); font-family: var(--font-heading); letter-spacing: -0.02em; }
@@ -282,7 +286,7 @@ import { HRMSService } from '../../hrms.service';
     .badge-mono-sm { font-family: var(--font-mono); font-size: 10px; background: var(--bg-secondary); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border-primary); color: var(--text-secondary); }
 
     /* Cards */
-    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-md); overflow: hidden; }
+    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); overflow: hidden; }
     ::ng-deep .premium-card { border-radius: var(--ui-border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-primary); }
     ::ng-deep .premium-card .p-card-body { padding: var(--spacing-xl); height: 100%; display: flex; flex-direction: column; justify-content: center;}
     ::ng-deep .workspace-card .p-card-body, ::ng-deep .workspace-card .p-card-content { padding: 0; display: block;}
@@ -315,12 +319,12 @@ import { HRMSService } from '../../hrms.service';
 })
 export class HolidayHubComponent implements OnInit {
   private hrmsService = inject(HRMSService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
   private router = inject(Router);
 
   isLoading = signal(true);
-  
+
   currentYear = new Date().getFullYear();
   years = [
     { label: (this.currentYear - 1).toString(), value: this.currentYear - 1 },
@@ -375,8 +379,8 @@ export class HolidayHubComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         this.hrmsService.deleteHoliday(holiday._id).subscribe({
-          next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Holiday removed.' });
+          next: (res: any) => {
+            this.messageService.showSuccess(res.message)
             this.loadYearData();
           }
         });
@@ -392,12 +396,12 @@ export class HolidayHubComponent implements OnInit {
         this.displayCopyDialog = false;
       }),
       catchError(err => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to copy holidays.' });
+        this.messageService.handleHttpError(err)
         return of(null);
       })
-    ).subscribe(res => {
+    ).subscribe((res: any) => {
       if (res) {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: `Holidays cloned to ${this.copyToYear}.` });
+        this.messageService.showSuccess(res.message)
         this.selectedYear = this.copyToYear;
         this.loadYearData();
       }
@@ -406,7 +410,7 @@ export class HolidayHubComponent implements OnInit {
 
   onExport() {
     this.hrmsService.exportHolidayCalendar(this.selectedYear, undefined, 'calendar').subscribe({
-      next: () => this.messageService.add({ severity: 'success', summary: 'Exported', detail: 'Calendar download started.' })
+      next: (res: any) => this.messageService.showSuccess(res.message)
     });
   }
 

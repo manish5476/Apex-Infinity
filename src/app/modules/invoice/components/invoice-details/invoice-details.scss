@@ -10,9 +10,11 @@
 
 .page-container {
   width: 100%;
+  border-radius: var(--radius-2xl);
   height: 100%;
   background-color: var(--bg-primary);
   display: flex;
+  border-radius: var(--radius-2xl);
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;

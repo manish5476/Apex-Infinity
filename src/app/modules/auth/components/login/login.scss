@@ -1,357 +1,668 @@
-/* =========================================
-   IMMERSIVE LOGIN THEME
-   Full width/height split layout
-   ========================================= */
+/* ============================================================
+   LOGIN COMPONENT — EDITORIAL SPLIT
+   Design direction: ink-black left editorial panel + bone-white
+   form panel. Stark contrast, generous whitespace, precise type.
+   Font: "DM Serif Display" for headlines, "DM Sans" for body.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap');
+
+// ── Design tokens ─────────────────────────────────────────────────────────────
 
 :host {
+  --ink: #0a0a0a;
+  --ink-80: rgba(10, 10, 10, 0.8);
+  --ink-40: rgba(10, 10, 10, 0.4);
+  --ink-12: rgba(10, 10, 10, 0.12);
+  --bone: #f7f5f0;
+  --white: #ffffff;
+  --accent: #e8622a;
+  --accent-light: #fdf0ea;
+  --accent-dark: #c44d19;
+  --success: #16a34a;
+  --error: #dc2626;
+  --error-bg: #fef2f2;
+  --error-border: #fecaca;
+  --border: #e5e3de;
+  --muted: #737066;
+
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  --shadow-field: 0 1px 2px rgba(0,0,0,0.04), 0 0 0 1px var(--border);
+  --shadow-field-focus: 0 0 0 2px var(--accent), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-field-error: 0 0 0 2px var(--error), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-btn: 0 1px 2px rgba(0,0,0,0.12), 0 4px 12px rgba(232, 98, 42, 0.3);
+  --shadow-btn-hover: 0 2px 4px rgba(0,0,0,0.16), 0 8px 24px rgba(232, 98, 42, 0.4);
+
   display: block;
+  font-family: var(--font-body);
 }
 
-// Variables specific to this dark/glass theme
-$glass-bg: rgba(20, 20, 20, 0.6);
-$glass-border: rgba(255, 255, 255, 0.1);
-$glass-blur: 40px;
-$text-primary: #ffffff;
-$text-secondary: rgba(255, 255, 255, 0.6);
-$accent-color: #38bdf8; // Sky blue
-$error-color: #f87171;
+// ══════════════════════════════════════════════════════════════════════════════
+//  SHARED INPUT MIXIN
+//
+//  WHY A MIXIN AND NOT @extend?
+//  ────────────────────────────
+//  SCSS @extend groups selectors at compile time:
+//    .a { color: red }  →  .a, .b { color: red }
+//  This works for normal selectors, but SCSS refuses to group selectors
+//  that contain ::ng-deep, pseudo-elements, or certain combinators because
+//  the resulting grouped selector would be invalid CSS.
+//
+//  @include copies the declarations inline at each call site — no selector
+//  grouping happens, so ::ng-deep is never part of the grouping. That's
+//  why @include always works where @extend fails here.
+// ══════════════════════════════════════════════════════════════════════════════
 
-.immersive-login {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  background-color: #0f172a; // Fallback
-}
+@mixin input-base() {
+  width: 100%;
+  height: 50px;
+  background: var(--white) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 0 14px !important;
+  font-family: var(--font-body) !important;
+  font-size: 0.925rem !important;
+  color: var(--ink) !important;
+  box-shadow: var(--shadow-field) !important;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s !important;
+  outline: none !important;
 
-/* --- 1. Background Layer --- */
-.bg-visual {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  z-index: 0;
-  
-  // Dark overlay to ensure text readability
-  .bg-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      90deg, 
-      rgba(15, 23, 42, 0.9) 0%,   // Darker on left for text
-      rgba(15, 23, 42, 0.4) 60%,  // Lighter in middle
-      rgba(15, 23, 42, 0.8) 100%  // Darker on right for form contrast
-    );
+  &::placeholder {
+    color: rgba(10, 10, 10, 0.28) !important;
+  }
+
+  &:hover:not(:disabled) {
+    border-color: rgba(10, 10, 10, 0.3) !important;
+  }
+
+  &:focus {
+    border-color: var(--accent) !important;
+    box-shadow: var(--shadow-field-focus) !important;
+    background: var(--white) !important;
   }
 }
 
-/* --- 2. Layout Grid --- */
-.layout-grid {
-  position: relative;
-  z-index: 1;
+// ── Root layout ───────────────────────────────────────────────────────────────
+
+.auth-root {
   display: grid;
-  grid-template-columns: 1fr 480px; // Left fluid, Right fixed width (adjust as needed)
-  height: 100%;
-  width: 100%;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+  background: var(--ink);
 
   @media (max-width: 1024px) {
-    grid-template-columns: 1fr 400px;
-  }
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr; // Stack on mobile
+    grid-template-columns: 1fr;
   }
 }
 
-/* --- 3. Hero Panel (Left) --- */
-.hero-panel {
-  padding: 60px 80px;
+// ══════════════════════════════════════════════════════════════════════════════
+//  BRAND PANEL (left)
+// ══════════════════════════════════════════════════════════════════════════════
+
+.brand-panel {
+  position: relative;
+  background: var(--ink);
+  overflow: hidden;
+  padding: 48px 56px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  
-  // Animation entrance
-  animation: fadeIn 0.8s ease-out;
 
-  .brand-header {
+  @media (max-width: 1024px) { display: none; }
+}
+
+.grid-lines {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 64px 64px;
+  pointer-events: none;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  opacity: 0.18;
+}
+.orb-1 {
+  width: 400px; height: 400px;
+  background: var(--accent);
+  top: -120px; right: -80px;
+  animation: orb-drift 12s ease-in-out infinite alternate;
+}
+.orb-2 {
+  width: 280px; height: 280px;
+  background: #4f6ef7;
+  bottom: -60px; left: 40px;
+  animation: orb-drift 16s ease-in-out infinite alternate-reverse;
+}
+@keyframes orb-drift {
+  from { transform: translate(0, 0); }
+  to   { transform: translate(20px, 30px); }
+}
+
+.brand-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  animation: slide-up 0.7s cubic-bezier(0.22,1,0.36,1) both;
+
+  .logo-glyph {
+    width: 36px;
+    height: 36px;
+    background: var(--accent);
+    border-radius: 8px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    
-    .logo-mark {
-      width: 40px; height: 40px;
-      background: linear-gradient(135deg, $accent-color, #818cf8);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      color: white; font-size: 1.25rem;
-      box-shadow: 0 0 20px rgba($accent-color, 0.4);
-    }
-    .brand-name {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: $text-primary;
-      letter-spacing: -0.5px;
+    justify-content: center;
+    color: white;
+    padding: 7px;
+    flex-shrink: 0;
+
+    svg { width: 100%; height: 100%; }
+  }
+
+  .wordmark-text {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+    color: white;
+  }
+}
+
+.hero-copy {
+  margin-top: auto;
+  margin-bottom: 56px;
+  animation: slide-up 0.8s cubic-bezier(0.22,1,0.36,1) 0.1s both;
+
+  .overline-text {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &::before {
+      content: '';
+      display: inline-block;
+      width: 24px;
+      height: 1px;
+      background: var(--accent);
     }
   }
 
-  .hero-content {
-    max-width: 600px;
+  .hero-headline {
+    font-family: var(--font-display);
+    font-size: clamp(2.8rem, 4vw, 4.2rem);
+    line-height: 1.05;
+    color: white;
+    letter-spacing: -0.03em;
+    margin-bottom: 24px;
 
-    .badge-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 12px;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 20px;
-      color: $text-primary;
-      font-size: 0.875rem;
+    em {
+      font-style: italic;
+      color: transparent;
+      -webkit-text-stroke: 1.5px rgba(255,255,255,0.9);
+    }
+  }
+
+  .hero-body {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: rgba(255,255,255,0.55);
+    max-width: 380px;
+    font-weight: 300;
+  }
+}
+
+.stats-strip {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 24px 0;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 32px;
+  animation: slide-up 0.8s cubic-bezier(0.22,1,0.36,1) 0.2s both;
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      color: white;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
       font-weight: 500;
-      margin-bottom: 24px;
-      backdrop-filter: blur(4px);
-
-      .dot {
-        width: 8px; height: 8px; background: #4ade80; border-radius: 50%;
-        box-shadow: 0 0 8px #4ade80;
-      }
-    }
-
-    .display-title {
-      font-size: 4.5rem;
-      line-height: 1.1;
-      font-weight: 800;
-      color: $text-primary;
-      margin-bottom: 24px;
-      letter-spacing: -2px;
-
-      .text-gradient {
-        background: linear-gradient(to right, #38bdf8, #c084fc);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-    }
-
-    .hero-desc {
-      font-size: 1.25rem;
-      color: rgba(255, 255, 255, 0.8);
-      line-height: 1.6;
-      margin-bottom: 40px;
-    }
-
-    .social-proof {
-      display: flex; align-items: center; gap: 16px;
-      
-      .avatars {
-        display: flex;
-        span {
-          width: 36px; height: 36px;
-          border-radius: 50%;
-          background: rgba(255, 255, 255, 0.2);
-          border: 2px solid rgba(255, 255, 255, 0.1);
-          display: flex; align-items: center; justify-content: center;
-          margin-left: -10px;
-          font-size: 0.75rem; color: white;
-          &:first-child { margin-left: 0; }
-        }
-      }
-      .proof-text {
-        color: $text-secondary;
-        font-size: 0.875rem;
-      }
     }
   }
 
-  .hero-footer {
-    display: flex; justify-content: space-between;
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 0.875rem;
+  .stat-divider {
+    width: 1px;
+    height: 32px;
+    background: rgba(255,255,255,0.12);
+  }
+}
 
-    .footer-links {
-      display: flex; gap: 24px;
-      a { color: inherit; text-decoration: none; transition: 0.2s; &:hover { color: white; } }
+.brand-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.3);
+  animation: slide-up 0.8s cubic-bezier(0.22,1,0.36,1) 0.25s both;
+
+  .footer-nav {
+    display: flex;
+    gap: 20px;
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.2s;
+      &:hover { color: rgba(255,255,255,0.7); }
     }
   }
 }
 
-/* --- 4. Form Panel (Right - Glass Sidebar) --- */
+// ══════════════════════════════════════════════════════════════════════════════
+//  FORM PANEL (right)
+// ══════════════════════════════════════════════════════════════════════════════
+
 .form-panel {
-  height: 100%;
+  background: var(--bone);
   display: flex;
   align-items: center;
   justify-content: center;
-  
-  // The Magic Glass Effect
-  background: rgba(10, 10, 10, 0.5); // Dark tint
-  backdrop-filter: blur($glass-blur); // Heavy blur
-  -webkit-backdrop-filter: blur($glass-blur);
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: -20px 0 40px rgba(0,0,0,0.3);
+  padding: 48px 32px;
+  min-height: 100vh;
 
-  .form-content-wrapper {
-    width: 100%;
-    max-width: 380px; // Compact form width
-    padding: 0 20px;
-    animation: slideIn 0.8s ease-out;
-  }
+  @media (max-width: 640px) { padding: 40px 20px; }
 }
 
-.auth-header {
-  margin-bottom: 40px;
-  .auth-title { font-size: 2rem; font-weight: 700; color: white; margin-bottom: 8px; letter-spacing: -0.5px; }
-  .auth-subtitle { color: $text-secondary; font-size: 0.95rem; }
-}
-
-/* --- 5. Form Styles --- */
-.auth-form {
-  display: flex; flex-direction: column; gap: 24px;
-}
-
-.form-group {
-  position: relative;
-  
-  .input-label {
-    display: block; font-size: 0.85rem; font-weight: 500; color: rgba(255, 255, 255, 0.8); margin-bottom: 8px;
-  }
-  
-  .label-row {
-    display: flex; justify-content: space-between; margin-bottom: 8px;
-    .link-text { color: $accent-color; font-size: 0.85rem; text-decoration: none; &:hover { text-decoration: underline; } }
-  }
-
-  .input-wrapper {
-    position: relative;
-    .field-icon {
-      position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
-      z-index: 2; color: rgba(255, 255, 255, 0.5); pointer-events: none;
-    }
-  }
-
-  .error-msg { color: $error-color; font-size: 0.75rem; margin-top: 4px; display: block; }
-}
-
-/* Custom Glass Inputs (Overrides PrimeNG) */
-::ng-deep .glass-input-field {
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: white !important;
-  border-radius: 12px !important;
-  padding: 14px 14px 14px 44px !important; // Left padding for icon
-  font-size: 0.95rem !important;
-  height: 50px !important; // Taller inputs
-  transition: all 0.2s ease !important;
-
-  &::placeholder { color: rgba(255, 255, 255, 0.3) !important; }
-
-  &:enabled:hover {
-    background: rgba(255, 255, 255, 0.08) !important;
-    border-color: rgba(255, 255, 255, 0.2) !important;
-  }
-  
-  &:enabled:focus {
-    background: rgba(255, 255, 255, 0.1) !important;
-    border-color: $accent-color !important;
-    box-shadow: 0 0 0 2px rgba($accent-color, 0.25) !important;
-  }
-}
-
-/* AutoComplete Panel */
-::ng-deep .glass-dropdown-panel {
-  background: #1e293b !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  
-  .p-autocomplete-item {
-    color: rgba(255, 255, 255, 0.9) !important;
-    &:hover { background: rgba(255, 255, 255, 0.1) !important; }
-  }
-}
-
-/* Checkbox */
-.remember-toggle {
-  display: flex; align-items: center; gap: 8px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;
-  
-  ::ng-deep .p-checkbox-box {
-    background: rgba(255, 255, 255, 0.1) !important;
-    border-color: rgba(255, 255, 255, 0.3) !important;
-    &.p-highlight {
-      background: $accent-color !important; border-color: $accent-color !important;
-    }
-  }
-}
-
-/* Submit Button */
-.submit-btn {
+.form-inner {
   width: 100%;
-  height: 50px;
-  border-radius: 12px !important;
-  background: linear-gradient(135deg, $accent-color, #3b82f6) !important;
-  border: none !important;
-  font-weight: 600 !important;
-  font-size: 1rem !important;
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-  transition: transform 0.2s !important;
-  
-  &:enabled:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5); }
+  max-width: 420px;
+  animation: slide-up 0.8s cubic-bezier(0.22,1,0.36,1) 0.15s both;
 }
 
-/* Divider & Social */
-.divider {
-  display: flex; align-items: center; justify-content: center; margin: 10px 0;
-  span {
-      background: var(--bg-secondary); padding: 0 10px; color: rgba(255, 255, 255, 0.4); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;
+.mobile-logo {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 40px;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--ink);
+
+  .logo-glyph {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; padding: 6px;
+    svg { width: 100%; height: 100%; }
+  }
+
+  @media (max-width: 1024px) { display: flex; }
+}
+
+.form-header {
+  margin-bottom: 36px;
+
+  .form-title {
+    font-family: var(--font-display);
+    font-size: 2.25rem;
+    color: var(--ink);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+
+  .form-subtitle {
+    font-size: 0.9rem;
+    color: var(--muted);
+    font-weight: 400;
   }
 }
 
-.social-grid {
-  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;
-  .social-btn {
-    height: 44px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.15); background: rgba(255, 255, 255, 0.05);
-    color: white; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center;
-    &:hover { background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.3); }
+.error-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-bottom: 24px;
+  font-size: 0.875rem;
+  color: var(--error);
+  animation: shake 0.4s ease;
+
+  .error-icon { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; }
+
+  span { flex: 1; line-height: 1.5; }
+
+  .error-dismiss {
+    background: none; border: none; cursor: pointer;
+    color: var(--error); opacity: 0.7; padding: 0;
+    transition: opacity 0.2s;
+    &:hover { opacity: 1; }
   }
 }
 
-.auth-footer-text {
-  margin-top: 32px; text-align: center; color: rgba(255, 255, 255, 0.6); font-size: 0.9rem;
-  .highlight-link { color: $accent-color; text-decoration: none; font-weight: 500; &:hover { text-decoration: underline; } }
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-/* Responsive Adjustments */
-@media (max-width: 1024px) {
-  .hero-panel { padding: 40px; }
-  .display-title { font-size: 3.5rem !important; }
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-@media (max-width: 768px) {
-  .immersive-login { overflow-y: auto; } // Allow scroll on mobile
-  .layout-grid { grid-template-columns: 1fr; }
-  .hero-panel { display: none; } // Hide hero on mobile, or stack it
-  .form-panel { 
-    width: 100%; background: rgba(15, 23, 42, 0.9); border-left: none; padding: 40px 0;
-  }
-}
-
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
-
-.server-error-container {
+.field-label {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: rgba(255, 0, 0, 0.1);
-  border: 1px solid rgba(255, 0, 0, 0.2);
-  color: #ffb3b3; // Light red for dark themes
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
-  animation: fadeIn 0.3s ease-in;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink-80);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  cursor: pointer;
 
-  i {
-    font-size: 1.1rem;
+  .label-icon {
+    width: 13px; height: 13px;
+    color: var(--muted);
+    flex-shrink: 0;
   }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
+.field-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.forgot-link {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.2s;
+  &:hover { color: var(--accent-dark); text-decoration: underline; }
+}
+
+.field-error {
+  font-size: 0.78rem;
+  color: var(--error);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &::before {
+    content: '!';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px; height: 14px;
+    background: var(--error);
+    color: white;
+    border-radius: 50%;
+    font-size: 0.65rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+}
+
+.remember-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .remember-label {
+    font-size: 0.875rem;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+  }
+}
+
+.submit-btn {
+  position: relative;
+  width: 100%;
+  height: 52px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: var(--shadow-btn);
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  margin-top: 4px;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%);
+    transform: translateX(-100%);
+    transition: transform 0.5s ease;
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--accent-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-btn-hover);
+
+    &::before { transform: translateX(100%); }
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: var(--shadow-btn);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-arrow {
+    width: 18px; height: 18px;
+    transition: transform 0.2s;
+  }
+
+  &:hover:not(:disabled) .btn-arrow { transform: translateX(3px); }
+
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+}
+
+.signup-nudge {
+  margin-top: 28px;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--muted);
+
+  .signup-link {
+    color: var(--accent);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s;
+    &:hover { color: var(--accent-dark); text-decoration: underline; }
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  PRIMENG OVERRIDES
+//  Every place that previously used `@extend ::ng-deep .apex-input` now
+//  uses `@include input-base()` instead — the mixin copies declarations
+//  in-place, which is always valid inside ::ng-deep blocks.
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Native inputs (e.g. Shop ID — plain <input pInputText>)
+::ng-deep .apex-input {
+  @include input-base();
+}
+
+// AutoComplete
+// ::ng-deep .apex-autocomplete {
+//   display: block !important;
+
+//   .p-autocomplete-input {
+//     @include input-base();  // ← was: @extend ::ng-deep .apex-input
+//   }
+
+//   .p-autocomplete-dropdown { display: none !important; }
+// }
+
+// AutoComplete dropdown panel
+::ng-deep .apex-dropdown {
+  background: var(--white) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1) !important;
+  padding: 6px !important;
+  margin-top: 4px !important;
+  overflow: hidden;
+
+  .p-autocomplete-item {
+    font-family: var(--font-body) !important;
+    font-size: 0.9rem !important;
+    color: var(--ink) !important;
+    padding: 10px 12px !important;
+    border-radius: 6px !important;
+    transition: background 0.15s !important;
+
+    &:hover,
+    &.p-highlight {
+      background: var(--accent-light) !important;
+      color: var(--accent-dark) !important;
+    }
+  }
+}
+
+// Password
+::ng-deep .apex-password {
+  display: block !important;
+
+  .p-password-input {
+    @include input-base();  // ← was: @extend ::ng-deep .apex-input
+    padding-right: 44px !important;
+  }
+
+  .p-password-toggle-mask-icon,
+  .p-password-unmask-icon,
+  .p-password-mask-icon {
+    right: 14px !important;
+    color: var(--muted) !important;
+    &:hover { color: var(--ink) !important; }
+  }
+}
+
+// Checkbox
+::ng-deep .apex-checkbox {
+  .p-checkbox-box {
+    width: 18px !important;
+    height: 18px !important;
+    border: 1.5px solid var(--border) !important;
+    border-radius: 4px !important;
+    background: var(--white) !important;
+    box-shadow: var(--shadow-field) !important;
+    transition: all 0.15s !important;
+
+    &:hover {
+      border-color: var(--accent) !important;
+    }
+
+    &.p-highlight {
+      background: var(--accent) !important;
+      border-color: var(--accent) !important;
+
+      .p-checkbox-icon {
+        color: white !important;
+        font-size: 11px !important;
+      }
+    }
+  }
+}
+
+// Error state — driven by [class.has-error] on .field-group in the template
+.field-group.has-error {
+  ::ng-deep .apex-input,
+  ::ng-deep .p-autocomplete-input,
+  ::ng-deep .p-password-input {
+    border-color: var(--error) !important;
+    box-shadow: var(--shadow-field-error) !important;
+  }
+}
+
+// ── Animations ────────────────────────────────────────────────────────────────
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-6px); }
+  40%       { transform: translateX(6px); }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX(4px); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

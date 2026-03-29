@@ -22,6 +22,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { HRMSService } from '../../hrms.service';
+import { AppMessageService } from '@core/services/message.service';
 
 @Component({
   selector: 'app-leave-admin-hub',
@@ -46,7 +47,7 @@ import { HRMSService } from '../../hrms.service';
           </div>
         </div>
         <div class="header-right flex-align gap-3">
-          <p-select [options]="departments" placeholder="Filter by Department" styleClass="premium-dropdown"></p-select>
+          <p-select [options]="departments" [filter]="true" filterBy="label" placeholder="Filter by Department" styleClass="premium-dropdown"></p-select>
           <p-button icon="pi pi-download" [outlined]="true" label="Export Report" severity="secondary"></p-button>
         </div>
         <div class="flex-between mb-4">
@@ -337,7 +338,7 @@ import { HRMSService } from '../../hrms.service';
     /* --------------------------------------------------------------------------
        HEADER & TABS
        -------------------------------------------------------------------------- */
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--ui-border-radius-xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--radius-2xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
     .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
     .icon-brand { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: var(--font-size-2xl); }
     .header-titles { display: flex; flex-direction: column; gap: 4px; }
@@ -346,7 +347,7 @@ import { HRMSService } from '../../hrms.service';
 
     ::ng-deep .premium-dropdown .p-select { background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--ui-border-radius-md); transition: var(--transition-base); }
     
-    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-md); overflow: hidden; }
+    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); overflow: hidden; }
     ::ng-deep .workspace-card .p-card-body, ::ng-deep .workspace-card .p-card-content { padding: 0; }
 
     ::ng-deep .hub-tablist .p-tablist-nav { background: var(--bg-secondary) !important; border-bottom: 1px solid var(--border-primary) !important; padding: 0 var(--spacing-xl) !important; }
@@ -417,7 +418,7 @@ import { HRMSService } from '../../hrms.service';
 })
 export class LeaveAdminHubComponent implements OnInit {
   private hrmsService = inject(HRMSService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
 
   // State
   isLoading = signal<boolean>(true);
@@ -489,13 +490,13 @@ export class LeaveAdminHubComponent implements OnInit {
 
     this.hrmsService.bulkApproveLeaves(requestIds, 'Bulk approved by manager').pipe(
       catchError(err => {
-        this.messageService.add({ severity: 'error', summary: 'Bulk Action Failed', detail: 'Could not process bulk approval.' });
+        this.messageService.handleHttpError(err)
         return of(null);
       }),
       finalize(() => this.isBulkApproving.set(false))
-    ).subscribe(res => {
+    ).subscribe((res: any) => {
       if (res) {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: `${requestIds.length} requests approved.` });
+        this.messageService.showSuccess(res.message)
         this.selectedApprovals.set([]); // Clear selection
         // this.loadDashboardData(); // Refresh the lists
       }

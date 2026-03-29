@@ -1,4 +1,94 @@
+<!-- footer-simple.component.html -->
 <footer class="footer-root">
+
+  <!-- Wave divider -->
+  <div class="wave-divider">
+    <svg preserveAspectRatio="none" viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z">
+      </path>
+    </svg>
+  </div>
+
+  <div class="container">
+
+    <!-- Brand watermark -->
+    <div class="brand-watermark" aria-hidden="true">
+      <h1>{{ organization?.name || 'STORE' }}</h1>
+    </div>
+
+    <div class="footer-grid">
+
+      <!-- Brand & Contact -->
+      <div class="brand-col">
+        <h2 class="tagline">Designed for life.</h2>
+        <address class="contact-info not-italic">
+          @if (organization?.contact?.email) {
+          <a [href]="'mailto:' + organization.contact.email">
+            {{ organization.contact.email }}
+          </a>
+          }
+          @if (organization?.contact?.phone) {
+          <a [href]="'tel:' + organization.contact.phone">
+            {{ organization.contact.phone }}
+          </a>
+          }
+          @if (!organization?.contact?.email && !organization?.contact?.phone) {
+          <span style="opacity: 0.4;">Contact info unavailable</span>
+          }
+        </address>
+      </div>
+
+      <!-- Explore links -->
+      <div class="link-col">
+        <h4>Explore</h4>
+        <ul>
+          <li><a [routerLink]="['/store', slug()]">Home</a></li>
+          <li><a [routerLink]="['/store', slug(), 'products']">Shop</a></li>
+          <li><a [routerLink]="['/store', slug(), 'about']">About Us</a></li>
+        </ul>
+      </div>
+
+      <!-- Help links -->
+      <div class="link-col">
+        <h4>Help</h4>
+        <ul>
+          @if (config?.columns?.length) {
+          @for (col of config.columns; track col.title) {
+          @for (link of col.links; track link.url) {
+          <li><a [href]="link.url">{{ link.label }}</a></li>
+          }
+          }
+          } @else {
+          <li><a href="#">Shipping</a></li>
+          <li><a href="#">Returns</a></li>
+          <li><a href="#">FAQ</a></li>
+          }
+        </ul>
+      </div>
+
+      <!-- Newsletter -->
+      <div class="newsletter-col">
+        <h4>Stay in the loop</h4>
+        <div class="input-group">
+          <input type="email" placeholder="Email address" aria-label="Email for newsletter" />
+          <button type="button">Join</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Sub-footer -->
+    <div class="sub-footer">
+      <p>{{ config?.copyright || ('© ' + currentYear + ' ' + (organization?.name || 'Store') + '. All rights reserved.')
+        }}</p>
+      <p>Powered by <span style="color: rgba(255,255,255,0.6);">Apex</span></p>
+    </div>
+
+  </div>
+</footer>
+
+<!-- <footer class="footer-root">
   
   <div class="wave-divider">
     <svg preserveAspectRatio="none" viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg">
@@ -63,4 +153,4 @@
     </div>
 
   </div>
-</footer>
+</footer> -->

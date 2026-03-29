@@ -1,4 +1,4 @@
-<div class="page-root">
+<div class="page-root" [ngStyle]="sectionStyle()">
   <div class="ambient-layer"></div>
   <div class="container">
     <header class="listing-header" @fadeIn>
@@ -22,7 +22,10 @@
             optionLabel="label"
             optionValue="value"
             appendTo="body"
-            styleClass="minimal-select">
+            styleClass="minimal-select"
+            [filter]="true"
+            filterBy="label">
+
             <ng-template pTemplate="selectedItem" let-selectedOption>
               <div class="flex align-items-center gap-2">
                 <i [class]="selectedOption.icon"></i>
@@ -87,6 +90,7 @@
       </div>
     }
     <div class="layout-grid">
+      @if (cfg().showSidebar) {
       <aside class="sidebar-desktop">
         <div class="sticky-content">
           <div class="widget">
@@ -164,7 +168,8 @@
           </div>
         </div>
       </aside>
-      <main class="products-area">
+      }
+      <main class="products-area" [class.w-full]="!cfg().showSidebar">
         @if (loading()) {
           <div class="products-wrapper" [class.list-mode]="viewMode() === 'list'">
             @for (i of [1,2,3,4,5,6,7,8]; track i) {

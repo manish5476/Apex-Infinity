@@ -11,11 +11,13 @@
 .page-container {
   height: 100%;
   width: 100%;
-  background-color: var(--bg-primary);
+  // background-color: var(--bg-primary);
+  background-color: transparent;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
   padding: var(--spacing-xl);
+  border-radius: var(--radius-2xl);
   gap: var(--spacing-xl);
 
   @media (max-width: 768px) { padding: var(--spacing-md); gap: var(--spacing-lg); }

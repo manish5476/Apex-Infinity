@@ -1,4 +1,201 @@
-<div class="card-root group" [class.out-of-stock]="!stockInfo().isAvailable" (click)="goToFullDetails()" tabindex="0"
+<!-- product-card.html -->
+<div class="card-root" [class.is-unavailable]="!stockInfo().isAvailable" (click)="goToFullDetails()"
+  (keydown.enter)="goToFullDetails()" tabindex="0" role="button" [attr.aria-label]="'View ' + product().name">
+
+  <!-- ═══════════════════════════════════════════════════
+       FULL-BLEED IMAGE
+  ════════════════════════════════════════════════════ -->
+  <div class="card-image">
+    <img [src]="displayImage()" [alt]="product().name" (error)="onImageError()" loading="lazy" class="card-img" />
+
+    <!-- Cinematic gradient — always present, deepens on hover -->
+    <div class="card-gradient"></div>
+
+    <!-- Thin accent line at bottom of image -->
+    <div class="card-accent-line"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       FLOATING BADGES (top-left)
+  ════════════════════════════════════════════════════ -->
+  <div class="badge-stack">
+    @if (discountPercent() > 0) {
+    <span class="badge badge-sale">−{{ discountPercent() }}%</span>
+    }
+    @if (!stockInfo().isAvailable) {
+    <span class="badge badge-out">Sold Out</span>
+    }
+    @if (product().stock?.qty !== undefined && product().stock!.qty < 5 && stockInfo().isAvailable) { <span
+      class="badge badge-low">{{ product().stock!.qty }} left</span>
+      }
+  </div>
+
+  <!-- Quick-view trigger (top-right) -->
+  <button class="quick-view-btn" (click)="openQuickView($event)" aria-label="Quick view">
+    <i class="pi pi-eye"></i>
+  </button>
+
+  <!-- ═══════════════════════════════════════════════════
+       SLIDING INFO PANEL
+  ════════════════════════════════════════════════════ -->
+  <div class="info-panel">
+
+    <!-- Category / brand micro-label -->
+    <span class="card-eyebrow">{{ product().brand || product().category || 'Collection' }}</span>
+
+    <!-- Product name — editorial serif -->
+    <h3 class="card-title">{{ product().name }}</h3>
+
+    <!-- Price row -->
+    <div class="card-price-row">
+      <span class="card-price">{{ priceDisplay().current | currency: priceDisplay().currency : 'symbol' : '1.0-0'
+        }}</span>
+      @if (priceDisplay().hasDiscount) {
+      <span class="card-price-old">{{ priceDisplay().original | currency: priceDisplay().currency : 'symbol' : '1.0-0'
+        }}</span>
+      }
+    </div>
+
+    <!-- CTA — slides in with the panel -->
+    <div class="card-cta">
+      @if (stockInfo().isAvailable) {
+      <button class="cta-btn" (click)="handleAddToCart($event)" type="button">
+        <span>Add to Bag</span>
+        <i class="pi pi-shopping-bag"></i>
+      </button>
+      } @else {
+      <button class="cta-btn cta-disabled" disabled type="button">
+        <span>Unavailable</span>
+      </button>
+      }
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     QUICK-VIEW MODAL
+════════════════════════════════════════════════════════════════ -->
+<p-dialog appendTo="body" [visible]="showModal()" (visibleChange)="showModal.set($event)" [modal]="true"
+  [dismissableMask]="true" [showHeader]="false" styleClass="qv-dialog"
+  [style]="{ width: '95vw', maxWidth: '1080px', padding: '0', borderRadius: '20px', overflow: 'hidden' }">
+
+  <div class="qv-layout">
+
+    <!-- Close button -->
+    <button class="qv-close" (click)="closeQuickView($event)" aria-label="Close">
+      <i class="pi pi-times"></i>
+    </button>
+
+    <!-- ── Left: Gallery ── -->
+    <div class="qv-gallery">
+
+      <!-- Image counter pill -->
+      @if ((product().images?.length ?? 0) > 1) {
+      <div class="qv-image-count">
+        <i class="pi pi-images"></i>
+        {{ product().images!.length }} photos
+      </div>
+      }
+
+      <img [src]="displayImage()" [alt]="product().name" class="qv-hero-img" loading="lazy" />
+
+      <!-- Thumbnail strip for multi-image products -->
+      @if ((product().images?.length ?? 0) > 1) {
+      <div class="qv-thumbs">
+        @for (img of product().images!.slice(0, 4); track img; let i = $index) {
+        <button class="qv-thumb" type="button">
+          <img [src]="img" [alt]="'View ' + (i + 1)" />
+        </button>
+        }
+      </div>
+      }
+    </div>
+
+    <!-- ── Right: Details ── -->
+    <div class="qv-details">
+
+      <!-- Eyebrow + title -->
+      <div class="qv-header">
+        <span class="qv-eyebrow">{{ product().brand || product().category || 'Collection' }}</span>
+        <h2 class="qv-title">{{ product().name }}</h2>
+
+        <!-- Price block -->
+        <div class="qv-price-block">
+          <span class="qv-price">
+            {{ priceDisplay().current | currency: priceDisplay().currency : 'symbol' : '1.0-0' }}
+          </span>
+          @if (priceDisplay().hasDiscount) {
+          <span class="qv-price-old">
+            {{ priceDisplay().original | currency: priceDisplay().currency : 'symbol' : '1.0-0' }}
+          </span>
+          <span class="qv-price-save">Save {{ discountPercent() }}%</span>
+          }
+        </div>
+
+        <!-- Stock + Rating chips -->
+        <div class="qv-chips">
+          <span class="chip" [class.chip-green]="stockInfo().isAvailable" [class.chip-red]="!stockInfo().isAvailable">
+            <span class="chip-dot"></span>
+            {{ stockInfo().label }}
+          </span>
+          @if (product().rating) {
+          <span class="chip chip-amber">
+            <i class="pi pi-star-fill" style="font-size: 9px;"></i>
+            {{ product().rating }}
+          </span>
+          }
+          @if (product().sku) {
+          <span class="chip chip-neutral">SKU: {{ product().sku }}</span>
+          }
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div class="qv-divider"></div>
+
+      <!-- Description -->
+      <div class="qv-description">
+        @if (product().description) {
+        <p>{{ product().description }}</p>
+        } @else {
+        <p class="qv-no-desc">No description available.</p>
+        }
+      </div>
+
+      <!-- Tags -->
+      @if (product().tags?.length) {
+      <div class="qv-tags">
+        @for (tag of product().tags!.slice(0, 5); track tag) {
+        <span class="tag-pill">#{{ tag }}</span>
+        }
+      </div>
+      }
+
+      <!-- CTA dock -->
+      <div class="qv-dock">
+        <button class="qv-add-btn" (click)="handleAddToCart($event)" [disabled]="!stockInfo().isAvailable"
+          type="button">
+          @if (stockInfo().isAvailable) {
+          <i class="pi pi-shopping-bag"></i>
+          <span>Add to Cart · {{ priceDisplay().current | currency: priceDisplay().currency : 'symbol' : '1.0-0'
+            }}</span>
+          } @else {
+          <span>Out of Stock</span>
+          }
+        </button>
+        <button class="qv-detail-btn" (click)="goToFullDetails()" type="button">
+          <i class="pi pi-arrow-right"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</p-dialog>
+
+<!-- <div class="card-root group" [class.out-of-stock]="!stockInfo().isAvailable" (click)="goToFullDetails()" tabindex="0"
   role="button">
 
   <div class="hero-section">
@@ -53,7 +250,7 @@
   </div>
 </div>
 
-<p-dialog appendTo="body"   [visible]="showModal()" (visibleChange)="showModal.set($event)" [modal]="true" appendTo="body"
+<p-dialog appendTo="body" [visible]="showModal()" (visibleChange)="showModal.set($event)" [modal]="true" appendTo="body"
   [dismissableMask]="true" [showHeader]="false" styleClass="premium-product-modal"
   [style]="{ width: '90vw', maxWidth: '1000px', margin: '0' }">
 
@@ -98,92 +295,5 @@
         </button>
       </div>
     </div>
-  </div>
-</p-dialog>
-
-<!-- <div class="card-root group" (click)="openQuickView($event)" tabindex="0">
-  
-  <div class="image-wrapper">
-    <img [src]="displayImage" [alt]="product.name" (error)="onImageError()" class="base-image" />
-    <div class="overlay-gradient"></div>
-  </div>
-
-  <div class="info-float">
-    <span class="brand-badge">{{ product.brand || 'Collection' }}</span>
-    <h3 class="product-name">{{ product.name }}</h3>
-    <div class="price-row">
-      <span class="price">
-        {{ product.price?.discounted || product.price?.original | currency: product.price?.currency || 'USD' }}
-      </span>
-    </div>
-  </div>
-
-  <button class="quick-look-btn">
-    <i class="pi pi-eye"></i> Quick Look
-  </button>
-</div>
-
-<p-dialog appendTo="body"   
-  [(visible)]="showModal" 
-  [modal]="true" 
-  appendTo="body" 
-  [dismissableMask]="true"
-  [showHeader]="false"
-  styleClass="glass-dialog"
-  [style]="{ width: '100%', maxWidth: '1000px', margin: '16px' }">
-
-  <div class="modal-glass-panel">
-      
-    <button class="close-btn" (click)="closeQuickView($event)">
-      <i class="pi pi-times"></i>
-    </button>
-
-    <div class="modal-image-col">
-      <img [src]="displayImage" [alt]="product.name" class="modal-img" />
-      
-      <div class="badge-overlay">
-        @if ((product.stock?.stockLevel ?? 0) > 0) {
-          <span class="stock-pill in-stock">In Stock</span>
-        } @else {
-          <span class="stock-pill out-stock">Sold Out</span>
-        }
-      </div>
-    </div>
-
-    <div class="modal-content-col">
-      
-      <div class="content-header">
-        <p class="modal-brand">{{ product.brand || 'Exclusive' }}</p>
-        <h2 class="modal-title">{{ product.name }}</h2>
-        
-        <div class="rating-row">
-          <i class="pi pi-star-fill text-yellow-400"></i>
-          <span>{{ product.rating || '4.8' }} (120 reviews)</span>
-        </div>
-      </div>
-
-      <div class="modal-body-scroll">
-        <p class="modal-desc">
-          {{ product.description || 'Experience the finest quality with our signature collection. Meticulously crafted for those who appreciate detail and design excellence.' }}
-        </p>
-      </div>
-
-      <div class="modal-footer">
-        <span class="big-price">
-          {{ product.price?.discounted || product.price?.original | currency: product.price?.currency || 'USD' }}
-        </span>
-        
-        <div class="action-dock">
-          <button class="add-cart-btn" (click)="addToCart.emit(product)">
-            Add to Cart
-          </button>
-          <button class="view-full-btn" (click)="goToFullDetails()">
-            View Details <i class="pi pi-arrow-right ml-1 text-xs"></i>
-          </button>
-        </div>
-      </div>
-
-    </div>
-
   </div>
 </p-dialog> -->

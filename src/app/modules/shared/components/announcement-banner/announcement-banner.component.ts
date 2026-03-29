@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { SocketConnectionService } from '@core/services/socket/socket-connection.service';
+import { AppMessageService } from '@core/services/message.service';
 
 // ✅ UPDATE: Import from the new connection engine
 
@@ -173,7 +174,7 @@ export interface AnnouncementData {
 })
 export class AnnouncementListenerComponent {
   private socketConnection = inject(SocketConnectionService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
 
   constructor() {
     // ✅ Modern RxJS: Automatically cleans up when component dies
@@ -184,18 +185,19 @@ export class AnnouncementListenerComponent {
         this.playNotificationSound();
       });
   }
+showToast(ann: AnnouncementData) {
+  const message = `${ann.title}: ${ann.message}`;
 
-  showToast(ann: AnnouncementData) {
-    this.messageService.add({
-      key: 'announcement',
-      severity: 'custom', 
-      summary: ann.title,
-      detail: ann.message,
-      data: ann, 
-      sticky: ann.type === 'urgent' || ann.type === 'error',
-      life: 6000
-    });
+  if (ann.type === 'error') {
+    this.messageService.showError(message);
+  } 
+  else if (ann.type === 'urgent') {
+    this.messageService.showWarn(message);
+  } 
+  else {
+    this.messageService.showInfo(message);
   }
+}
 
   getIcon(type: string | undefined): string {
     switch (type) {
@@ -390,7 +392,7 @@ export class AnnouncementListenerComponent {
 // export class AnnouncementListenerComponent implements OnInit, OnDestroy {
 //   // ✅ Inject SocketService
 //   private socketService = inject(SocketService);
-//   private messageService = inject(MessageService);
+//   private messageService = inject(AppMessageService);
 //   private subscription: Subscription | null = null;
 
 //   ngOnInit() {

@@ -108,7 +108,7 @@ import { FilterField } from '../../modules/shared/components/universal-filter/fi
       padding: var(--spacing-sm);
       font-family: var(--font-body);
       background: radial-gradient(circle at top right, var(--bg-ternary), transparent 70%);
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
     }
 
     .filter-section {
@@ -121,7 +121,7 @@ import { FilterField } from '../../modules/shared/components/universal-filter/fi
     .chart-card {
       background: var(--bg-secondary);
       border: 1px solid var(--border-primary);
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
       padding: var(--spacing-xl);
       position: relative;
       backdrop-filter: blur(10px);
@@ -556,14 +556,14 @@ export class BranchRadarChartComponent implements OnInit {
 //       font-family: var(--font-body);
 //       /* Optional: subtle background glow using theme color */
 //       background: radial-gradient(circle at top right, var(--bg-ternary), transparent 70%);
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //     }
 
 //     /* CARD STYLES */
 //     .chart-card {
 //       background: var(--bg-secondary);
 //       border: 1px solid var(--border-primary);
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       padding: var(--spacing-xl);
 //       position: relative;
 //       /* Glass effect base */

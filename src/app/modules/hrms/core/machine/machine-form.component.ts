@@ -7,12 +7,16 @@ import { MasterListService } from '../../../../core/services/master-list.service
 import { AppMessageService } from '../../../../core/services/message.service';
 import { HRMSService } from '../../hrms.service';
 
-
+// PrimeNG
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { SelectModule } from 'primeng/select';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
   selector: 'app-machine-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ToggleSwitchModule, SelectModule, ButtonModule, InputTextModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="app-fullscreen-wrapper fade-in">
@@ -70,28 +74,12 @@ import { HRMSService } from '../../hrms.service';
 
                 <div class="form-field">
                   <label for="branchId">Branch Location <span class="required">*</span></label>
-                  <div class="select-wrapper">
-                    <select id="branchId" formControlName="branchId" class="se-input">
-                      <option [ngValue]="null">Select Branch</option>
-                      @for (branch of branchOptions(); track branch._id) {
-                        <option [value]="branch._id">{{ branch.name }}</option>
-                      }
-                    </select>
-                  </div>
+                  <p-select id="branchId" formControlName="branchId" [options]="$any(branchOptions())" optionLabel="name" optionValue="_id" placeholder="Select Branch" styleClass="full-width" [filter]="true" filterBy="name"></p-select>
                 </div>
 
                 <div class="form-field">
                   <label for="providerType">Device Provider</label>
-                  <div class="select-wrapper">
-                    <select id="providerType" formControlName="providerType" class="se-input">
-                      <option value="generic">Generic / Custom</option>
-                      <option value="zkteco">ZKTeco</option>
-                      <option value="hikvision">Hikvision</option>
-                      <option value="essl">eSSL</option>
-                      <option value="bioenable">BioEnable</option>
-                      <option value="suprema">Suprema</option>
-                    </select>
-                  </div>
+                  <p-select id="providerType" formControlName="providerType" [options]="deviceProviderOptions" optionLabel="label" optionValue="value" styleClass="full-width" [filter]="true" filterBy="label"></p-select>
                 </div>
 
                 <div class="form-field">
@@ -132,15 +120,7 @@ import { HRMSService } from '../../hrms.service';
 
               <div class="form-field">
                 <label for="connectionProtocol">Protocol</label>
-                <div class="select-wrapper">
-                  <select id="connectionProtocol" formControlName="connectionProtocol" class="se-input">
-                    <option value="http">HTTP / HTTPS</option>
-                    <option value="tcp">TCP / IP</option>
-                    <option value="websocket">WebSocket</option>
-                    <option value="mqtt">MQTT</option>
-                    <option value="usb">USB (Local)</option>
-                  </select>
-                </div>
+                <p-select id="connectionProtocol" formControlName="connectionProtocol" [options]="protocolOptions" optionLabel="label" optionValue="value" styleClass="full-width" [filter]="true" filterBy="label"></p-select>
               </div>
             </div>
           </div>
@@ -154,43 +134,48 @@ import { HRMSService } from '../../hrms.service';
             <div class="card-body">
               <div class="toggle-grid">
                 
-                <label class="toggle-card">
-                  <input type="checkbox" formControlName="fingerprint">
+                <label class="toggle-card cursor-pointer">
+                  <input type="checkbox" formControlName="fingerprint" style="display:none">
                   <div class="toggle-content">
                     <span class="toggle-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12C2 6.48 6.48 2 12 2s10 4.48 10 10-4.48 10-10 10S2 17.52 2 12zm10 6c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"></path></svg></span>
                     <span>Fingerprint</span>
+                    <p-toggleswitch formControlName="fingerprint" class="mt-2"></p-toggleswitch>
                   </div>
                 </label>
 
-                <label class="toggle-card">
-                  <input type="checkbox" formControlName="faceRecognition">
+                <label class="toggle-card cursor-pointer">
+                  <input type="checkbox" formControlName="faceRecognition" style="display:none">
                   <div class="toggle-content">
                     <span class="toggle-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="15" x2="16" y2="15"></line><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg></span>
                     <span>Face ID</span>
+                    <p-toggleswitch formControlName="faceRecognition" class="mt-2"></p-toggleswitch>
                   </div>
                 </label>
 
-                <label class="toggle-card">
-                  <input type="checkbox" formControlName="rfid">
+                <label class="toggle-card cursor-pointer">
+                  <input type="checkbox" formControlName="rfid" style="display:none">
                   <div class="toggle-content">
                     <span class="toggle-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"></rect><line x1="7" y1="8" x2="17" y2="8"></line><line x1="7" y1="12" x2="17" y2="12"></line><line x1="7" y1="16" x2="10" y2="16"></line></svg></span>
                     <span>RFID Card</span>
+                    <p-toggleswitch formControlName="rfid" class="mt-2"></p-toggleswitch>
                   </div>
                 </label>
 
-                <label class="toggle-card">
-                  <input type="checkbox" formControlName="maskDetection">
+                <label class="toggle-card cursor-pointer">
+                  <input type="checkbox" formControlName="maskDetection" style="display:none">
                   <div class="toggle-content">
                     <span class="toggle-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 0 1 10 10v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-4A10 10 0 0 1 12 2z"></path></svg></span>
                     <span>Mask Detect</span>
+                    <p-toggleswitch formControlName="maskDetection" class="mt-2"></p-toggleswitch>
                   </div>
                 </label>
 
-                <label class="toggle-card">
-                  <input type="checkbox" formControlName="temperature">
+                <label class="toggle-card cursor-pointer">
+                  <input type="checkbox" formControlName="temperature" style="display:none">
                   <div class="toggle-content">
                     <span class="toggle-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path></svg></span>
                     <span>Thermal</span>
+                    <p-toggleswitch formControlName="temperature" class="mt-2"></p-toggleswitch>
                   </div>
                 </label>
 
@@ -206,13 +191,10 @@ import { HRMSService } from '../../hrms.service';
             
             <div class="card-body flex-col" formGroupName="config">
               
-              <div class="status-toggle-wrapper" style="margin-top: 0; margin-bottom: var(--spacing-sm);">
-                <label class="toggle-container">
-                  <input type="checkbox" formControlName="autoSync" class="toggle-input">
-                  <span class="toggle-slider"></span>
-                  <div class="toggle-text"><span class="toggle-label">Auto-Sync Enabled</span></div>
-                </label>
-              </div>
+              <label class="status-toggle-wrapper flex-between cursor-pointer" style="margin-top: 0; margin-bottom: var(--spacing-sm);">
+                  <div class="toggle-text"><span class="toggle-label font-bold text-sm">Auto-Sync Enabled</span></div>
+                  <p-toggleswitch formControlName="autoSync"></p-toggleswitch>
+              </label>
 
               <div class="form-field">
                 <label for="syncInterval">Sync Interval (Minutes)</label>
@@ -226,15 +208,9 @@ import { HRMSService } from '../../hrms.service';
 
               <div class="divider"></div>
 
-              <div class="form-field" [formGroup]="machineForm">
+              <div class="form-field">
                 <label for="status">Operational Status</label>
-                <div class="select-wrapper">
-                  <select id="status" formControlName="status" class="se-input">
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="maintenance">Maintenance</option>
-                  </select>
-                </div>
+                <p-select id="status" formControlName="status" [options]="statusOptions" optionLabel="label" optionValue="value" styleClass="full-width" [filter]="true" filterBy="label"></p-select>
               </div>
 
             </div>
@@ -332,6 +308,10 @@ export class MachineFormComponent implements OnInit {
 
   branchOptions = this.masterList.branches;
 
+  deviceProviderOptions: any[] = [];
+  protocolOptions: any[] = [];
+  statusOptions: any[] = [];
+
   ngOnInit() {
     this.initForm();
     this.checkEditMode();
@@ -367,6 +347,30 @@ export class MachineFormComponent implements OnInit {
 
       status: ['active']
     });
+
+    // Options for PrimeNG selects
+    this.deviceProviderOptions = [
+      { label: 'Generic / Custom', value: 'generic' },
+      { label: 'ZKTeco', value: 'zkteco' },
+      { label: 'Hikvision', value: 'hikvision' },
+      { label: 'eSSL', value: 'essl' },
+      { label: 'BioEnable', value: 'bioenable' },
+      { label: 'Suprema', value: 'suprema' }
+    ];
+
+    this.protocolOptions = [
+      { label: 'HTTP / HTTPS', value: 'http' },
+      { label: 'TCP / IP', value: 'tcp' },
+      { label: 'WebSocket', value: 'websocket' },
+      { label: 'MQTT', value: 'mqtt' },
+      { label: 'USB (Local)', value: 'usb' }
+    ];
+
+    this.statusOptions = [
+      { label: 'Active', value: 'active' },
+      { label: 'Inactive', value: 'inactive' },
+      { label: 'Maintenance', value: 'maintenance' }
+    ];
 
     // Auto-uppercase
     this.machineForm.get('serialNumber')?.valueChanges.subscribe(val => {
@@ -736,7 +740,7 @@ export class MachineFormComponent implements OnInit {
 //     .page-subtitle { font-size: var(--font-size-sm); color: var(--text-secondary); }
 
 //     /* Cards & Form */
-//     .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-sm); }
+//     .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-sm); }
 //     ::ng-deep .premium-card .p-card-body { padding: var(--spacing-2xl); }
 //     ::ng-deep .premium-card .p-card-content { padding: 0; }
     
@@ -763,7 +767,7 @@ export class MachineFormComponent implements OnInit {
 // export class MachineFormComponent implements OnInit {
 //   private fb = inject(FormBuilder);
 //   private hrmsService = inject(HRMSService);
-//   private messageService = inject(MessageService);
+//   private messageService = inject(AppMessageService);
 //   private router = inject(Router);
 //   private route = inject(ActivatedRoute);
 

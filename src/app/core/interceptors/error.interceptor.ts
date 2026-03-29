@@ -23,8 +23,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       } 
       
       // 2. Handle 401 Unauthorized (Session Expired)
-      // ⚠️ IMPORTANT: Ignore 401s coming from the login page itself to prevent loops
-      else if (error.status === 401 && !req.url.includes('/auth/login')) {
+      // ⚠️ IMPORTANT: Ignore 401s coming from auth endpoints to prevent recursion loops
+      else if (error.status === 401 && 
+               !req.url.includes('/auth/login') && 
+               !req.url.includes('/auth/logout') && 
+               !req.url.includes('/auth/logout-all')) {
         
         // Show Toast
         messageService.add({

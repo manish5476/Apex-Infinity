@@ -121,7 +121,7 @@
   display: flex; align-items: flex-end; gap: var(--spacing-md);
   background: var(--bg-primary);
   border: 1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius-xl); /* Pill shape for bar */
+  border-radius: var(--radius-2xl); /* Pill shape for bar */
   padding: var(--spacing-xs);
   box-shadow: var(--shadow-sm);
   transition: var(--transition-base);

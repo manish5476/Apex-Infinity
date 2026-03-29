@@ -1,41 +1,45 @@
-<section class="section-root relative overflow-hidden" [ngStyle]="backgroundStyle()">
+<section class="section-root" 
+         [ngStyle]="sectionStyle()"
+         [class.text-white]="isDark()"
+         [class.text-dark]="!isDark()">
   
-  <div class="bg-overlay" *ngIf="config.backgroundImage"></div>
+  <div class="container-wrapper" 
+       [class.standard]="cfg().containerWidth === 'standard'"
+       [class.full]="cfg().containerWidth === 'full'">
 
-  <div class="container relative z-10 mx-auto px-6 md:px-12"
-       [class.max-w-7xl]="config.containerWidth === 'standard'"
-       [class.max-w-full]="config.containerWidth === 'full'">
-
-    <div class="text-center mb-14" *ngIf="config.title">
-      <h3 class="text-sm font-bold uppercase tracking-[0.25em] text-slate-500/80 mb-4">
-        {{ config.title }}
+    <!-- Header Section -->
+    <div class="header-group" *ngIf="cfg().title">
+      <h3 class="section-label">
+        {{ cfg().title }}
       </h3>
-      <div class="w-12 h-0.5 bg-slate-400/30 mx-auto rounded-full"></div>
+      <div class="divider-line"></div>
     </div>
 
-    <div class="flex flex-wrap justify-center items-center gap-x-12 gap-y-12 md:gap-x-16 lg:gap-x-24">
+    <!-- Logo Grid -->
+    <div class="logo-grid" 
+         [class.gap-sm]="cfg().gap === 'sm'"
+         [class.gap-md]="cfg().gap === 'md'"
+         [class.gap-lg]="cfg().gap === 'lg'">
       
-      @for (logo of config.logos; track $index) {
+      @for (logo of cfg().logos; track logo.id || logo.name) {
         
-        @if (logo.url) {
+        <ng-container *ngIf="logo.url; else staticLogo">
           <a [attr.href]="isExternal(logo.url) ? logo.url : null"
-             [routerLink]="!isExternal(logo.url) ? getLink(logo.url) : undefined"
-             [attr.target]="isExternal(logo.url) ? '_blank' : null"
+             [routerLink]="!isExternal(logo.url) ? getLink(logo.url) : null"
+             [target]="isExternal(logo.url) ? '_blank' : '_self'"
+             [attr.rel]="isExternal(logo.url) ? 'noopener noreferrer' : null"
              class="logo-item group"
-             [ngStyle]="logoStyle()">
+             [ngStyle]="logoItemStyle()">
              
-             <img [src]="logo.image" 
-                  [alt]="logo.name" 
-                  loading="lazy">
+             <img [src]="logo.image" [alt]="logo.name" loading="lazy">
           </a>
-        } 
-        @else {
-          <div class="logo-item" [ngStyle]="logoStyle()">
-             <img [src]="logo.image" 
-                  [alt]="logo.name" 
-                  loading="lazy">
+        </ng-container>
+
+        <ng-template #staticLogo>
+          <div class="logo-item" [ngStyle]="logoItemStyle()">
+            <img [src]="logo.image" [alt]="logo.name" loading="lazy">
           </div>
-        }
+        </ng-template>
 
       }
 

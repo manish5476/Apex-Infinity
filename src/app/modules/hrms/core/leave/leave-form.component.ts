@@ -19,6 +19,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { DatePickerModule } from 'primeng/datepicker';
 import { SelectModule } from 'primeng/select';
 import { HRMSService } from '../../hrms.service';
+import { AppMessageService } from '@core/services/message.service';
 
 @Component({
   selector: 'app-leave-form',
@@ -56,7 +57,8 @@ import { HRMSService } from '../../hrms.service';
                 
                 <div class="input-group mb-4">
                   <label class="info-label">Leave Type <span class="text-error">*</span></label>
-                  <p-select formControlName="leaveType" [options]="leaveTypes" placeholder="Select Leave Type" styleClass="w-full premium-dropdown"></p-select>
+                  <p-select formControlName="leaveType" [options]="leaveTypes" placeholder="Select Leave Type" styleClass="w-full premium-dropdown" [filter]="true" filterBy="label"></p-select>
+
                 </div>
 
                 <div class="grid-2 gap-4 mb-4">
@@ -73,11 +75,13 @@ import { HRMSService } from '../../hrms.service';
                 <div class="grid-2 gap-4 mb-4">
                   <div class="input-group">
                     <label class="info-label">Start Session</label>
-                    <p-select formControlName="startSession" [options]="sessions" styleClass="w-full premium-dropdown" (onChange)="calculateDays()"></p-select>
+                    <p-select formControlName="startSession" [options]="sessions" styleClass="w-full premium-dropdown" (onChange)="calculateDays()" [filter]="true" filterBy="label"></p-select>
+
                   </div>
                   <div class="input-group">
                     <label class="info-label">End Session</label>
-                    <p-select formControlName="endSession" [options]="sessions" styleClass="w-full premium-dropdown" (onChange)="calculateDays()"></p-select>
+                    <p-select formControlName="endSession" [options]="sessions" styleClass="w-full premium-dropdown" (onChange)="calculateDays()" [filter]="true" filterBy="label"></p-select>
+
                   </div>
                 </div>
 
@@ -108,7 +112,8 @@ import { HRMSService } from '../../hrms.service';
                 
                 <div class="input-group mb-4">
                   <label class="info-label">Handover To</label>
-                  <p-select formControlName="handoverTo" [options]="colleagues" optionLabel="name" optionValue="id" placeholder="Select Colleague" [showClear]="true" styleClass="w-full premium-dropdown"></p-select>
+                  <p-select formControlName="handoverTo" [options]="colleagues" optionLabel="name" optionValue="id" placeholder="Select Colleague" [showClear]="true" styleClass="w-full premium-dropdown" [filter]="true" filterBy="name"></p-select>
+
                 </div>
                 <div class="input-group">
                   <label class="info-label">Handover Notes / Tasks</label>
@@ -185,7 +190,7 @@ import { HRMSService } from '../../hrms.service';
     .info-label { font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); color: var(--text-label); text-transform: uppercase; letter-spacing: 0.05em; }
 
     /* Premium Components */
-    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-sm); }
+    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-sm); }
     ::ng-deep .premium-card .p-card-body { padding: var(--spacing-xl); }
     ::ng-deep .premium-card .p-card-content { padding: 0; }
 
@@ -206,7 +211,7 @@ import { HRMSService } from '../../hrms.service';
 export class LeaveFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private hrmsService = inject(HRMSService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -237,7 +242,7 @@ export class LeaveFormComponent implements OnInit {
   ngOnInit() {
     this.initForm();
     this.leaveId = this.route.snapshot.paramMap.get('id');
-    
+
     if (this.leaveId) {
       this.isEditMode.set(true);
       this.loadRequest(this.leaveId);
@@ -268,8 +273,8 @@ export class LeaveFormComponent implements OnInit {
 
   private loadRequest(id: string) {
     this.hrmsService.getLeaveRequest(id).pipe(
-      catchError(() => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not load leave details.' });
+      catchError((err) => {
+        this.messageService.handleHttpError(err)
         this.onCancel();
         return of(null);
       }),
@@ -323,13 +328,13 @@ export class LeaveFormComponent implements OnInit {
 
     req$.pipe(
       catchError(err => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to save request.' });
+        this.messageService.handleHttpError(err)
         return of(null);
       }),
       finalize(() => this.isSaving.set(false))
     ).subscribe(res => {
       if (res) {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Leave request submitted.' });
+        // this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Leave request submitted.' });
         setTimeout(() => this.onCancel(), 1000);
       }
     });

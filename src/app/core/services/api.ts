@@ -36,7 +36,7 @@ export class ApiService extends BaseApiService {
   /**
    * Login with email/phone
    */
-  login(credentials: any): Observable<LoginResponse> {
+  login(credentials: { email: string; password: string; uniqueShopId: string; forceLogout?: boolean }): Observable<LoginResponse> {
     return this.post<LoginResponse>('/v1/auth/login', credentials, 'login');
   }
 

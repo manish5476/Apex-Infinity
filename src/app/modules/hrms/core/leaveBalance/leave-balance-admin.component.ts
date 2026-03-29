@@ -25,6 +25,7 @@ import { ChartModule } from 'primeng/chart';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { HRMSService } from '../../hrms.service';
 import { SelectModule } from 'primeng/select';
+import { AppMessageService } from '@core/services/message.service';
 
 @Component({
   selector: 'app-leave-balance-admin',
@@ -32,7 +33,7 @@ import { SelectModule } from 'primeng/select';
   imports: [
     CommonModule, ReactiveFormsModule, TabsModule, TableModule, CardModule, FormsModule,
     ButtonModule, TagModule, SkeletonModule, AvatarModule, TooltipModule,
-    DialogModule, InputTextModule, InputNumberModule, SelectModule, 
+    DialogModule, InputTextModule, InputNumberModule, SelectModule,
     CheckboxModule, ChartModule, ProgressBarModule
   ],
   providers: [MessageService, ConfirmationService],
@@ -49,7 +50,7 @@ import { SelectModule } from 'primeng/select';
           </div>
         </div>
         <div class="header-right flex-align gap-3">
-          <p-select [options]="financialYears" [(ngModel)]="selectedFy" (onChange)="loadData()" styleClass="premium-select w-10rem"></p-select>
+          <p-select [options]="financialYears" [(ngModel)]="selectedFy" (onChange)="loadData()" [filter]="true" filterBy="label" styleClass="premium-select w-10rem"></p-select>
           <p-button label="Bulk Initialize Year" icon="pi pi-sync" styleClass="p-button-primary shadow-sm" (onClick)="showBulkInitDialog()"></p-button>
         </div>
       </header>
@@ -216,11 +217,11 @@ import { SelectModule } from 'primeng/select';
         <div class="grid-2 gap-4">
           <div class="input-group">
             <label class="info-label">Leave Type <span class="text-error">*</span></label>
-            <p-select formControlName="leaveType" [options]="leaveTypes" placeholder="Select" styleClass="w-full premium-select" appendTo="body"></p-select>
+            <p-select formControlName="leaveType" [options]="leaveTypes" [filter]="true" filterBy="label" placeholder="Select" styleClass="w-full premium-select" appendTo="body"></p-select>
           </div>
           <div class="input-group">
             <label class="info-label">Action <span class="text-error">*</span></label>
-            <p-select formControlName="actionType" [options]="actionTypes" placeholder="Select" styleClass="w-full premium-select" appendTo="body"></p-select>
+            <p-select formControlName="actionType" [options]="actionTypes" [filter]="true" filterBy="label" placeholder="Select" styleClass="w-full premium-select" appendTo="body"></p-select>
           </div>
         </div>
 
@@ -293,7 +294,7 @@ import { SelectModule } from 'primeng/select';
     .border-radius-md { border-radius: var(--ui-border-radius-md); }
     .border-1 { border: 1px solid; }
     .surface-border { border-color: var(--border-primary); }
-    .border-round-xl { border-radius: var(--ui-border-radius-xl); }
+    .border-round-xl { border-radius: var(--radius-2xl); }
     .overflow-hidden { overflow: hidden; }
     .shadow-none { box-shadow: none !important; }
     
@@ -318,14 +319,14 @@ import { SelectModule } from 'primeng/select';
     /* --------------------------------------------------------------------------
        HEADER & TABS
        -------------------------------------------------------------------------- */
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--ui-border-radius-xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--radius-2xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
     .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
     .icon-brand { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: var(--font-size-2xl); }
     .header-titles { display: flex; flex-direction: column; gap: 4px; }
     .page-title { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); font-family: var(--font-heading); margin: 0; letter-spacing: -0.02em; }
     .page-subtitle { font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0; }
 
-    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-md); overflow: hidden; }
+    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); overflow: hidden; }
     ::ng-deep .workspace-card .p-card-body, ::ng-deep .workspace-card .p-card-content { padding: 0; }
 
     ::ng-deep .hub-tablist .p-tablist-nav { background: var(--bg-secondary) !important; border-bottom: 1px solid var(--border-primary) !important; padding: 0 var(--spacing-xl) !important; }
@@ -380,11 +381,11 @@ import { SelectModule } from 'primeng/select';
 export class LeaveBalanceAdminComponent implements OnInit {
   private fb = inject(FormBuilder);
   private hrmsService = inject(HRMSService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
 
   isLoading = signal(true);
   balances = signal<any[]>([]);
-  
+
   // Header Filtering
   financialYears = [{ label: '2023-2024', value: '2023-2024' }, { label: '2024-2025', value: '2024-2025' }];
   selectedFy = '2024-2025';
@@ -396,7 +397,7 @@ export class LeaveBalanceAdminComponent implements OnInit {
   // Dialogs
   displayBulkDialog = false;
   bulkInitForm!: FormGroup;
-  
+
   displayAdjustDialog = false;
   adjustForm!: FormGroup;
   selectedBalance: any = null;
@@ -407,7 +408,7 @@ export class LeaveBalanceAdminComponent implements OnInit {
     { label: 'Sick Leave (SL)', value: 'sickLeave' },
     { label: 'Earned Leave (EL)', value: 'earnedLeave' }
   ];
-  
+
   actionTypes = [
     { label: 'Credit (Add)', value: 'credit' },
     { label: 'Debit (Deduct)', value: 'debit' }
@@ -459,20 +460,20 @@ export class LeaveBalanceAdminComponent implements OnInit {
   submitBulkInit() {
     if (this.bulkInitForm.invalid) return;
     this.isProcessing.set(true);
-    
+
     const val = this.bulkInitForm.value;
     this.hrmsService.bulkInitializeLeaveBalances(val.financialYear, val.carryForward).pipe(
       catchError(err => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Bulk initialization failed.' });
+        this.messageService.handleHttpError(err)
         return of(null);
       }),
       finalize(() => {
         this.isProcessing.set(false);
         this.displayBulkDialog = false;
       })
-    ).subscribe(res => {
+    ).subscribe((res: any) => {
       if (res) {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Financial year initialized successfully.' });
+        this.messageService.showSuccess(res.message)
         this.selectedFy = val.financialYear;
         // Optionally add new year to select array here
         this.loadData();
@@ -489,10 +490,10 @@ export class LeaveBalanceAdminComponent implements OnInit {
 
   submitAdjustment() {
     if (this.adjustForm.invalid || !this.selectedBalance) return;
-    
+
     this.isProcessing.set(true);
     const formVal = this.adjustForm.value;
-    
+
     // In a real app, you might have specific endpoints like /credit or /debit
     // or you pass a signed +/- amount to updateLeaveBalance
     const payload = {
@@ -504,16 +505,16 @@ export class LeaveBalanceAdminComponent implements OnInit {
 
     this.hrmsService.updateLeaveBalance(this.selectedBalance._id, payload).pipe(
       catchError(err => {
-        this.messageService.add({ severity: 'error', summary: 'Update Failed', detail: err.error?.message || 'Server error' });
+        this.messageService.handleHttpError(err)
         return of(null);
       }),
       finalize(() => {
         this.isProcessing.set(false);
         this.displayAdjustDialog = false;
       })
-    ).subscribe(res => {
+    ).subscribe((res: any) => {
       if (res) {
-        this.messageService.add({ severity: 'success', summary: 'Adjusted', detail: 'Balance updated successfully.' });
+        this.messageService.showSuccess(res.message)
         this.loadData();
       }
     });

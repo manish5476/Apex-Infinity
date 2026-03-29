@@ -147,9 +147,9 @@
 .newsletter-col {
   @media (min-width: 768px) { grid-column: span 4; }
   
-  background: rgba(255, 255, 255, 0.03);
+  // background: rgba(255, 255, 255, 0.03);
   // border: 1px solid rgba(255, 255, 255, 0.08);
-  // border-radius: var(--ui-border-radius-xl);
+  // border-radius: var(--radius-2xl);
   // padding: var(--spacing-xl);
   
   h4 {

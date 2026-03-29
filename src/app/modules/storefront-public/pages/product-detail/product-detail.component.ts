@@ -28,6 +28,7 @@ import { TagModule } from 'primeng/tag';
 // ✅ Services
 import { StorefrontPublicService } from '../../../../core/services/storefront-public.service';
 import { StorefrontStateService } from '../../../../core/services/storefront-state.service';
+import { AppMessageService } from '@core/services/message.service';
 
 @Component({
   selector: 'app-product-detail',
@@ -68,7 +69,7 @@ export class ProductDetailComponent implements OnInit {
   private publicService = inject(StorefrontPublicService);
   private stateService = inject(StorefrontStateService);
   private titleService = inject(Title);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
   private destroyRef = inject(DestroyRef); // Modern version of your `destroy$` Subject
 
   // --- State Signals ---
@@ -200,12 +201,7 @@ export class ProductDetailComponent implements OnInit {
     const product = this.product();
     if (!product) return;
     
-    this.messageService.add({ 
-        key: 'pd', // Targets the specific toast in this template
-        severity: 'success', 
-        summary: 'Added to Bag', 
-        detail: `${this.quantity()}x ${product.name}` 
-    });
+    this.messageService.showSuccess( `${this.quantity()}x ${product.name}` );
   }
 }
 
@@ -271,7 +267,7 @@ export class ProductDetailComponent implements OnInit {
 //   private publicService = inject(StorefrontPublicService);
 //   private stateService = inject(StorefrontStateService);
 //   private titleService = inject(Title);
-//   private messageService = inject(MessageService);
+//   private messageService = inject(AppMessageService);
 //   private destroyRef = inject(DestroyRef); // 1. Inject DestroyRef for cleanup
 
 //   // --- State ---

@@ -1,0 +1,286 @@
+/* ==========================================================================
+   CATEGORY GRID
+   Clean editorial grid for category browsing.
+   Full dark-mode support via theme tokens throughout.
+   ========================================================================== */
+
+:host { display: block; }
+
+.grid-root {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bg-primary);
+}
+
+// Background image layers
+.grid-bg-image {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  z-index: 0;
+}
+
+.grid-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 1;
+}
+
+.grid-container {
+  position: relative;
+  z-index: 10;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-2xl);
+}
+
+// ── Header ───────────────────────────────────────────────────────────────────
+
+.grid-header {
+  text-align: center;
+  margin-bottom: var(--spacing-4xl);
+}
+
+.grid-header-inner {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.grid-eyebrow {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--accent-primary);
+  font-family: var(--font-mono);
+
+  &.light { color: rgba(255, 255, 255, 0.65); }
+}
+
+.grid-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(26px, 4vw, 42px);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+
+  &.light { color: #fff; text-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+}
+
+// ── Grid layouts ─────────────────────────────────────────────────────────────
+
+.cat-grid {
+  display: grid;
+  gap: var(--spacing-xl);
+
+  @media (min-width: 480px) { grid-template-columns: repeat(2, 1fr); }
+  @media (min-width: 900px) { grid-template-columns: repeat(4, 1fr); }
+}
+
+// Circle layout — square cells, forced circular clipping
+.layout-circle {
+  @media (min-width: 480px) { grid-template-columns: repeat(3, 1fr); }
+  @media (min-width: 900px) { grid-template-columns: repeat(4, 1fr); }
+
+  .cat-card {
+    aspect-ratio: 1 / 1;
+    border-radius: 50% !important;
+    overflow: hidden;
+  }
+
+  .cat-content {
+    padding: var(--spacing-lg);
+    text-align: center;
+
+    .cat-cta { justify-content: center; }
+  }
+
+  .cat-gradient {
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 0, 0, 0.3) 50%,
+      transparent 100%
+    );
+  }
+}
+
+// ── Card ─────────────────────────────────────────────────────────────────────
+
+.cat-card {
+  position: relative;
+  display: block;
+  text-decoration: none;
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+  cursor: pointer;
+  outline: none;
+  aspect-ratio: 3 / 4;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+
+  will-change: transform;
+  transition:
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s ease,
+    border-color 0.3s ease;
+
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.2);
+    border-color: var(--accent-primary);
+    outline: none;
+
+    .cat-img    { transform: scale(1.08); }
+    .cat-gradient { opacity: 1; }
+    .cat-cta    { opacity: 1; transform: translateY(0); }
+    .cat-arrow  { transform: translateX(4px); }
+    .cat-shine  { opacity: 1; transform: translateX(100%); }
+  }
+
+  // Focus ring for keyboard nav
+  &:focus-visible {
+    box-shadow:
+      0 0 0 3px var(--bg-primary),
+      0 0 0 5px var(--accent-primary);
+  }
+}
+
+// ── Image ─────────────────────────────────────────────────────────────────────
+
+.cat-img-wrap {
+  position: absolute;
+  inset: 0;
+}
+
+.cat-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.cat-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.88) 0%,
+    rgba(0, 0, 0, 0.45) 45%,
+    rgba(0, 0, 0, 0.05) 70%,
+    transparent         100%
+  );
+  opacity: 0.75;
+  transition: opacity 0.3s ease;
+}
+
+// ── Count badge ───────────────────────────────────────────────────────────────
+
+.cat-count-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.9);
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  letter-spacing: 0.3px;
+}
+
+// ── Content overlay ───────────────────────────────────────────────────────────
+
+.cat-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--spacing-xl) var(--spacing-xl) var(--spacing-lg);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.cat-name {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(16px, 1.8vw, 20px);
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.cat-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding-top: var(--spacing-sm);
+
+  opacity: 0.7;
+  transform: translateY(6px);
+  transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+
+  span:first-child {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.85);
+    font-family: var(--font-mono);
+  }
+}
+
+.cat-arrow {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  transition: transform 0.25s ease;
+  flex-shrink: 0;
+
+  i { font-size: 10px; }
+}
+
+// ── Shine sweep effect (hover) ────────────────────────────────────────────────
+
+.cat-shine {
+  position: absolute;
+  top: 0;
+  left: -80%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 70%
+  );
+  transform: translateX(0);
+  opacity: 0;
+  z-index: 5;
+  pointer-events: none;
+  transition: opacity 0.1s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}

@@ -13,6 +13,7 @@
 .page-container {
   height: 100%;
   width: 100%;
+  border-radius: var(--radius-2xl);
   background: var(--bg-primary);
   display: flex;
   flex-direction: column;

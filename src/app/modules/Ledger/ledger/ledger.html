@@ -15,8 +15,9 @@
       <div class="filters-row" [formGroup]="filterForm">
 
         <p-select appendTo="body" [options]="branchOptions()" formControlName="branchId" placeholder="All Branches" [showClear]="true"
-          appendTo="body" styleClass="glass-input filter-branch" (onChange)="applyFilters()">
+          appendTo="body" styleClass="glass-input filter-branch" (onChange)="applyFilters()" [filter]="true" filterBy="label">
         </p-select>
+
 
         <p-datepicker formControlName="dateRange" selectionMode="range" [readonlyInput]="true"
           placeholder="Select Period" [showIcon]="true" [showClear]="true" appendTo="body" styleClass="glass-input filter-date"
@@ -30,11 +31,13 @@
             class="glass-input-sm filter-search" />
         </span>
         <p-select appendTo="body" [options]="accountOptions()" formControlName="accountId" placeholder="Account" [showClear]="true"
-          appendTo="body" styleClass="glass-input-sm filter-account" (onChange)="applyFilters()"></p-select>
+          appendTo="body" styleClass="glass-input-sm filter-account" (onChange)="applyFilters()" [filter]="true" filterBy="label"></p-select>
+
         <p-select appendTo="body" formControlName="txnType"
           [options]="[{label:'Debit', value:'debit'}, {label:'Credit', value:'credit'}]" placeholder="Type"
           [showClear]="true" appendTo="body" styleClass="glass-input-sm filter-type"
-          (onChange)="applyFilters()"></p-select>
+          (onChange)="applyFilters()" [filter]="true" filterBy="label"></p-select>
+
         }
 
         @if (currentTab() === 'customer') {

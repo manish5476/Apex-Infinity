@@ -55,16 +55,19 @@
       <div class="se-filter-field">
         <label for="status">Status</label>
         <p-select appendTo="body" appendTo="body" appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="invoiceFilter.status"
-          [showClear]="true" placeholder="All Status" (onChange)="applyFilters()" styleClass="w-full">
+          [showClear]="true" placeholder="All Status" (onChange)="applyFilters()" styleClass="w-full"
+          [filter]="true" filterBy="label">
         </p-select>
+
       </div>
 
       <div class="se-filter-field">
         <label for="paymentStatus">Payment</label>
         <p-select appendTo="body" appendTo="body" appendTo="body" id="paymentStatus" [options]="paymentStatusOptions"
           [(ngModel)]="invoiceFilter.paymentStatus" [showClear]="true" placeholder="All Payments"
-          (onChange)="applyFilters()" styleClass="w-full">
+          (onChange)="applyFilters()" styleClass="w-full" [filter]="true" filterBy="label">
         </p-select>
+
       </div>
 
       <div class="se-filter-actions">

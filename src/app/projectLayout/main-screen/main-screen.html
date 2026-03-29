@@ -1,19 +1,41 @@
-<div class="layout-root bg-theme-soft-gradient " 
-     [class.is-mobile]="layout.isMobile()"
-     [class.is-pinned]="layout.isPinned() && !layout.isMobile()">
-<!-- meteor -->
+<!-- main-screen.html -->
+<!--
+  STRUCTURE:
+    .layout-root
+      app-mainscreen-header       ← fixed-height header strip (z: 300)
+      .layout-body                ← flex row: sidebar + content
+        app-mainscreen-sidebar    ← desktop: absolute/sticky  mobile: fixed (z: 200/500)
+        main.main-content         ← scrollable content column (flex: 1)
+          router-outlet
+      .mobile-backdrop            ← overlay when mobile menu is open (z: 400)
+    p-toast                       ← lives outside layout so it's never clipped
+-->
+
+<div class="layout-root" [class.is-mobile]="layout.isMobile()"
+  [class.is-pinned]="layout.isPinned() && !layout.isMobile()">
+
+  <!-- ① Header ─────────────────────────────────────────────────────────── -->
   <app-mainscreen-header (toggleSidebar)="onMenuToggle()"></app-mainscreen-header>
 
-  <app-mainscreen-sidebar></app-mainscreen-sidebar>
+  <!-- ② Body row ───────────────────────────────────────────────────────── -->
+  <div class="layout-body">
 
-  <div class="layout-body ">
-    <main class="main-content">
+    <!-- Sidebar lives INSIDE layout-body so it shares the same flex row -->
+    <app-mainscreen-sidebar></app-mainscreen-sidebar>
+
+    <!-- Main scrollable area -->
+    <main class="main-content" id="main-content">
       <router-outlet></router-outlet>
     </main>
-  </div>
 
+  </div><!-- /.layout-body -->
+
+  <!-- ③ Mobile backdrop ────────────────────────────────────────────────── -->
   @if (layout.isMobile() && layout.isMobileMenuOpen()) {
-    <div class="mobile-backdrop" (click)="layout.closeMobile()"></div>
+  <div class="mobile-backdrop" (click)="layout.closeMobile()"></div>
   }
-</div>
+
+</div><!-- /.layout-root -->
+
+<!-- Toast is outside layout so it's never clipped by overflow:hidden -->
 <p-toast position="top-right"></p-toast>

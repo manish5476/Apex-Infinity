@@ -1,105 +1,108 @@
-import { Component, Input, computed } from '@angular/core';
+// split-image-text.component.ts  (selector: app-split-content)
+import { Component, Input, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+
+export interface SplitImageTextConfig {
+  image?:         string;
+  imagePosition?: 'left' | 'right';
+  title?:         string;
+  content?:       string;
+  ctaButton?:     { text: string; link: string; variant?: string };
+  paddingTop?:    'none' | 'sm' | 'md' | 'lg' | 'xl';
+  paddingBottom?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
+  backgroundColor?: string;
+}
+
+const PADDING: Record<string, string> = { none:'0', sm:'3rem', md:'5rem', lg:'8rem', xl:'11rem' };
+const PLACEHOLDER = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80';
 
 @Component({
   selector: 'app-split-content',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './split-content.component.html',
-  styleUrls: ['./split-content.component.scss']
+  styleUrls:   ['./split-content.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SplitContentComponent {
-  @Input() config: any = {};
+  @Input() set config(v: SplitImageTextConfig) { this._config.set(v ?? {}); }
+  private _config = signal<SplitImageTextConfig>({});
 
-  // Background Styles
-  backgroundStyle = computed(() => {
-    const style: any = {};
-    
-    // Background Color
-    style['background-color'] = this.config.backgroundColor || 'var(--bg-primary)';
-    
-    // Background Image
-    if (this.config.backgroundImage) {
-      style['background-image'] = `url(${this.config.backgroundImage})`;
-      style['background-size'] = 'cover';
-      style['background-position'] = 'center';
-      style['background-attachment'] = 'fixed'; // Parallax effect
-    }
-    
-    // Padding Logic
-    const paddingMap: any = { 
-        'sm': 'var(--spacing-3xl)', 
-        'md': 'var(--spacing-5xl)', 
-        'lg': 'var(--spacing-7xl)' 
-    };
-    
-    style['padding-top'] = paddingMap[this.config.paddingTop] || 'var(--spacing-5xl)';
-    style['padding-bottom'] = paddingMap[this.config.paddingBottom] || 'var(--spacing-5xl)';
-    
-    return style;
-  });
+  readonly cfg = computed(() => ({
+    image:         this._config().image         ?? PLACEHOLDER,
+    imagePosition: this._config().imagePosition ?? 'left',
+    title:         this._config().title         ?? 'Crafted with Purpose',
+    content:       this._config().content       ?? 'Every detail matters. We combine thoughtful design with premium materials to create products that stand the test of time.',
+    ctaButton:     this._config().ctaButton,
+    paddingTop:    this._config().paddingTop    ?? 'lg',
+    paddingBottom: this._config().paddingBottom ?? 'lg',
+    backgroundColor: this._config().backgroundColor ?? ''
+  }));
 
-  // Helper for CTA Link
-  getLink(url: string): any[] {
-    if (!url) return [];
-    // If internal, return array for routerLink.
-    return [url];
-  }
-  
-  isExternalLink(url: string): boolean {
-    return !!url && (url.startsWith('http') || url.startsWith('www'));
+  readonly sectionStyle = computed(() => ({
+    'padding-top':    PADDING[this.cfg().paddingTop]    ?? '8rem',
+    'padding-bottom': PADDING[this.cfg().paddingBottom] ?? '8rem',
+    'background-color': this.cfg().backgroundColor || ''
+  }));
+
+  isExternal(url: string): boolean {
+    return url?.startsWith('http') || url?.startsWith('www');
   }
 }
-
-// import { Component, Input, computed } from '@angular/core';
+// // src/app/modules/storefront-public/pages/split-content/split-content.component.ts
+// import { Component, Input, computed, signal, ChangeDetectionStrategy } from '@angular/core';
 // import { CommonModule } from '@angular/common';
 // import { RouterModule } from '@angular/router';
+// import { SplitImageTextConfig } from '@core/models/storefront.model';
 
 // @Component({
 //   selector: 'app-split-content',
 //   standalone: true,
 //   imports: [CommonModule, RouterModule],
 //   templateUrl: './split-content.component.html',
-//   styleUrls: ['./split-content.component.scss']
+//   styleUrls: ['./split-content.component.scss'],
+//   changeDetection: ChangeDetectionStrategy.OnPush
 // })
 // export class SplitContentComponent {
-//   @Input() config: any = {};
+//   @Input() set config(v: SplitImageTextConfig) { this._config.set(v ?? {}); }
+//   private _config = signal<SplitImageTextConfig>({});
 
-//   // Background Styles
-//   backgroundStyle = computed(() => {
-//     const style: any = {};
-//     if (this.config.backgroundColor) {
-//       style['background-color'] = this.config.backgroundColor;
-//     }
-//     // Only use background image if it's meant for the SECTION bg, not the split image
-//     if (this.config.backgroundImage) {
-//       style['background-image'] = `url(${this.config.backgroundImage})`;
-//       style['background-size'] = 'cover';
-//       style['background-position'] = 'center';
-//     }
-    
-//     const paddingMap: any = { 'sm': '3rem', 'md': '6rem', 'lg': '9rem' };
-//     style['padding-top'] = paddingMap[this.config.paddingTop] || '6rem';
-//     style['padding-bottom'] = paddingMap[this.config.paddingBottom] || '6rem';
-    
-//     return style;
-//   });
+//   readonly cfg = computed(() => ({
+//     title:           this._config().title,
+//     content:         this._config().content,
+//     image:           this._config().image           ?? 'https://via.placeholder.com/800x600',
+//     imagePosition:   this._config().imagePosition   ?? 'left',
+//     ctaButton:       this._config().ctaButton,
+//     paddingTop:      this._config().paddingTop      ?? 'md',
+//     paddingBottom:   this._config().paddingBottom   ?? 'md',
+//     backgroundColor: this._config().backgroundColor ?? 'var(--bg-primary)',
+//     themeMode:       this._config().themeMode       ?? 'auto',
+//   }));
 
-//   // Layout Logic (Row vs Row-Reverse)
-//   layoutClass = computed(() => {
-//     return this.config.imagePosition === 'right' 
-//       ? 'lg:flex-row-reverse' 
-//       : 'lg:flex-row';
-//   });
+//   readonly paddingMap: Record<string, string> = { 
+//     'none': '0',
+//     'sm': 'var(--spacing-3xl)', 
+//     'md': 'var(--spacing-5xl)', 
+//     'lg': 'var(--spacing-7xl)',
+//     'xl': 'calc(var(--spacing-7xl) * 1.5)' 
+//   };
+
+//   readonly sectionStyle = computed(() => ({
+//     'background-color': this.cfg().backgroundColor,
+//     'padding-top':      this.paddingMap[this.cfg().paddingTop]    ?? this.paddingMap['md'],
+//     'padding-bottom':   this.paddingMap[this.cfg().paddingBottom] ?? this.paddingMap['md']
+//   }));
 
 //   // Helper for CTA Link
-//   getLink(url: string): any[] | string {
+//   getLink(url: string | undefined): any[] {
 //     if (!url) return [];
-//     return url.startsWith('http') ? url : [url];
+//     if (url.startsWith('http') || url.startsWith('www')) return [];
+//     const clean = url.startsWith('/') ? url.slice(1) : url;
+//     return clean ? ['/', clean] : [];
 //   }
   
-//   isExternalLink(url: string): boolean {
-//     return url?.startsWith('http');
+//   isExternalLink(url: string | undefined): boolean {
+//     return !!url && (url.startsWith('http') || url.startsWith('www'));
 //   }
 // }

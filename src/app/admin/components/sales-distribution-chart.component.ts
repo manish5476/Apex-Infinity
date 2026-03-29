@@ -118,7 +118,7 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
       width: 100%;
       padding: var(--spacing-sm);
       overflow: hidden;
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
     }
     
     .filter-section {
@@ -158,7 +158,7 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
       z-index: 1;
       background: var(--bg-secondary);
       border: 1px solid var(--border-primary);
-      border-radius: var(--ui-border-radius-xl);
+      border-radius: var(--radius-2xl);
       padding: var(--spacing-xl);
       box-shadow: var(--shadow-sm);
       backdrop-filter: blur(10px);
@@ -620,7 +620,7 @@ export class SalesDistributionChartComponent implements OnInit {
 //       width: 100%;
 //       padding: var(--spacing-sm);
 //       overflow: hidden;
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //     }
     
 //     .filter-section {
@@ -660,7 +660,7 @@ export class SalesDistributionChartComponent implements OnInit {
 //       z-index: 1;
 //       background: var(--bg-secondary);
 //       border: 1px solid var(--border-primary);
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       padding: var(--spacing-xl);
 //       box-shadow: var(--shadow-sm);
 //       backdrop-filter: blur(10px);
@@ -1117,7 +1117,7 @@ export class SalesDistributionChartComponent implements OnInit {
 //       width: 100%;
 //       padding: var(--spacing-sm);
 //       overflow: hidden;
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //     }
 
 //     /* AMBIENT BLOBS */
@@ -1151,7 +1151,7 @@ export class SalesDistributionChartComponent implements OnInit {
 //       z-index: 1;
 //       background: var(--bg-secondary);
 //       border: 1px solid var(--border-primary);
-//       border-radius: var(--ui-border-radius-xl);
+//       border-radius: var(--radius-2xl);
 //       padding: var(--spacing-xl);
 //       box-shadow: var(--shadow-sm);
 //       backdrop-filter: blur(10px);

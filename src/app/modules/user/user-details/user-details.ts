@@ -214,7 +214,7 @@ export class UserDetailsComponent implements OnInit {
 //   private route = inject(ActivatedRoute);
 //   private router = inject(Router);
 //   private userService = inject(UserManagementService);
-//   private messageService = inject(MessageService);
+//   private messageService = inject(AppMessageService);
 //   private confirmationService = inject(ConfirmationService);
 //   private fb = inject(FormBuilder);
 

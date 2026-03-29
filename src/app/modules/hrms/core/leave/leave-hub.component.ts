@@ -18,13 +18,14 @@ import { AvatarModule } from 'primeng/avatar';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { HRMSService } from '../../hrms.service';
+import { AppMessageService } from '@core/services/message.service';
 
 @Component({
   selector: 'app-leave-hub',
   standalone: true,
   imports: [
-    CommonModule, TabsModule, TableModule, CardModule, 
-    ButtonModule, TagModule, SkeletonModule, AvatarModule, 
+    CommonModule, TabsModule, TableModule, CardModule,
+    ButtonModule, TagModule, SkeletonModule, AvatarModule,
     TooltipModule, ProgressBarModule
   ],
   providers: [MessageService],
@@ -321,14 +322,14 @@ import { HRMSService } from '../../hrms.service';
     /* --------------------------------------------------------------------------
        HEADER & TABS
        -------------------------------------------------------------------------- */
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--ui-border-radius-xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: var(--spacing-xl) var(--spacing-2xl); border-radius: var(--radius-2xl); border: var(--ui-border-width) solid var(--border-primary); box-shadow: var(--shadow-sm); }
     .header-left { display: flex; align-items: center; gap: var(--spacing-xl); }
     .icon-brand { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: var(--font-size-2xl); border: 1px solid var(--color-primary-border); }
     .header-titles { display: flex; flex-direction: column; }
     .page-title { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); font-family: var(--font-heading); margin: 0 0 4px 0; letter-spacing: -0.02em; }
     .page-subtitle { font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0; }
 
-    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--ui-border-radius-xl); box-shadow: var(--shadow-md); overflow: hidden; }
+    .glass-card { background: var(--component-bg, var(--bg-primary)); border: var(--ui-border-width) solid var(--border-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); overflow: hidden; }
     ::ng-deep .workspace-card .p-card-body, ::ng-deep .workspace-card .p-card-content { padding: 0; }
 
     ::ng-deep .hub-tablist .p-tablist-nav { background: var(--bg-secondary) !important; border-bottom: 1px solid var(--border-primary) !important; padding: 0 var(--spacing-xl) !important; }
@@ -410,7 +411,7 @@ import { HRMSService } from '../../hrms.service';
 })
 export class LeaveHubComponent implements OnInit {
   private hrmsService = inject(HRMSService);
-  private messageService = inject(MessageService);
+  private messageService = inject(AppMessageService);
   private router = inject(Router);
 
   // State
@@ -461,10 +462,10 @@ export class LeaveHubComponent implements OnInit {
     // Stub for approval workflow endpoint integration
     const summaryMsg = action === 'approve' ? 'Leave Approved' : 'Leave Rejected';
     const severity = action === 'approve' ? 'success' : 'warn';
-    
+
     // Optimistic UI update
     this.pendingApprovals.update(apps => apps.filter(a => a._id !== id));
-    this.messageService.add({ severity, summary: summaryMsg, detail: `The request has been processed.` });
+    // this.messageService.add({ severity, summary: summaryMsg, detail: `The request has been processed.` });
   }
 
   // --- Helpers ---

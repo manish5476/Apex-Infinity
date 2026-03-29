@@ -34,17 +34,19 @@
       </div>
       <div class="se-filter-field">
         <label for="brand">Brand</label>
-        <p-select appendTo="body" appendTo="body" appendTo="body" id="brand" [options]="brandOptions()"
-          [(ngModel)]="productFilter.brand" [filter]="true" optionLabel="name" optionValue="_id" [showClear]="true"
+        <p-select appendTo="body" id="brand" [options]="brandOptions()"
+          [(ngModel)]="productFilter.brand" [filter]="true" filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true"
           placeholder="Select Brand" styleClass="w-full">
         </p-select>
+
       </div>
       <div class="se-filter-field">
         <label for="category">Category</label>
-        <p-select appendTo="body" appendTo="body" appendTo="body" id="category" [options]="categoryOptions()"
-          [(ngModel)]="productFilter.category" [filter]="true" optionLabel="name" optionValue="_id" [showClear]="true"
+        <p-select appendTo="body" id="category" [options]="categoryOptions()"
+          [(ngModel)]="productFilter.category" [filter]="true" filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true"
           placeholder="Select Category" styleClass="w-full">
         </p-select>
+
       </div>
       <div class="se-filter-actions">
         <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()"></p-button>

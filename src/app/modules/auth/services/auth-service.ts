@@ -1,4 +1,4 @@
-import { Injectable, Inject, PLATFORM_ID, inject, Injector } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID, inject, Injector, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
@@ -76,7 +76,7 @@ export interface User {
   devices?: Device[];
   preferences?: {
     theme: 'light' | 'dark';
-    notifications: {
+    notifications?: {
       email: boolean;
       push: boolean;
       sms: boolean;
@@ -143,8 +143,8 @@ export class AuthService {
   private router = inject(Router);
 
   // 🟢 CRITICAL FIX: Ensure this is always synced with Storage
-  // private _token: string | null = null;
   private _token: string | null = null;
+  private isLoggingOut = signal(false); // ✅ Guard against concurrent logout calls
 
   public get authTokenData(): string | null {
     if (!this._token) {
@@ -261,8 +261,10 @@ export class AuthService {
 
     this.currentUserSubject.next(user);
 
-    const statusMessage = user.status === 'approved' ? 'Welcome back!' : 'Account pending approval';
-    this.messageService.showSuccess(statusMessage);
+    // SuccessInterceptor will show res.message if the backend provides one.
+    // However, login response is handled in AuthService.handleLoginSuccess.
+    // Let's use handleSuccess for better fallback logic.
+    this.messageService.handleSuccess(response, user.status === 'approved' ? 'Welcome back!' : 'Account pending approval');
 
     if (user.status === 'approved') {
       this.router.navigate(['/dashboard']);
@@ -322,25 +324,42 @@ export class AuthService {
   // ======================================================
 
   logout(): void {
+    if (this.isLoggingOut()) return;
+    this.isLoggingOut.set(true);
+
     const currentUrl = this.router.url;
+
+    // Optimistically proceed to client logout regardless of backend success
     this.apiService.logOut().pipe(
-      finalize(() => this.performClientLogout(currentUrl))
-    ).subscribe();
+      finalize(() => {
+        this.performClientLogout(currentUrl);
+        this.isLoggingOut.set(false);
+      })
+    ).subscribe({
+      error: () => {
+        // Even if 401 or network error, we want to clear local session
+        console.warn('Backend logout failed or token already expired');
+      }
+    });
   }
 
   logoutAll(): void {
+    if (this.isLoggingOut()) return;
+    this.isLoggingOut.set(true);
+
     const currentUrl = this.router.url;
 
-    this.apiService.logoutAll().subscribe({
-      next: () => {
-        this.messageService.showSuccess(
-          'You have been logged out from all devices'
-        );
+    this.apiService.logoutAll().pipe(
+      finalize(() => {
         this.performClientLogout(currentUrl);
+        this.isLoggingOut.set(false);
+      })
+    ).subscribe({
+      next: () => {
+        this.messageService.showSuccess('You have been logged out from all devices');
       },
       error: (err) => {
         console.warn('Logout all failed', err);
-        this.performClientLogout(currentUrl);
       }
     });
   }
@@ -394,7 +413,7 @@ export class AuthService {
   /**
    * Login with email or phone
    */
-  login(data: { email: string; password: string; uniqueShopId: string }, rememberMe: boolean = false) {
+  login(data: { email: string; password: string; uniqueShopId: string; forceLogout?: boolean }, rememberMe: boolean = false) {
     return this.apiService.login(data).pipe(
       tap((response: LoginResponse) => {
         this.handleLoginSuccess(response, rememberMe);
@@ -421,7 +440,6 @@ export class AuthService {
     return this.OrganizationService.createNewOrganization(data).pipe(
       tap((response: LoginResponse) => {
         this.handleLoginSuccess(response, true);
-        this.messageService.showSuccess('Welcome! Your organization is ready.');
       }),
       catchError(err => {
         this.messageService.handleHttpError(err)
@@ -470,40 +488,7 @@ export class AuthService {
       })
     );
   }
-  // verifyToken(): Observable<VerifyTokenResponse> {
-  //   return this.apiService.verifyToken().pipe(
-  //     tap((response: VerifyTokenResponse) => {
-  //       // Update stored user data if changed
-  //       if (response.data?.user) {
-  //         this.setItem(this.USER_KEY, response.data.user);
-  //         this.currentUserSubject.next(response.data.user);
-  //       }
-  //     }),
-  //     catchError(err => {
-  //       this.performClientLogout();
-  //       return throwError(() => err);
-  //     })
-  //   );
-  // }
 
-  /**
-   * Refresh access token
-   */
-  // refreshToken() {
-  //   return this.apiService.refreshToken().pipe(
-  //     tap((response: any) => {
-  //       if (response?.token) {
-  //         this.setItem(this.TOKEN_KEY, response.token);
-  //         this.authTokenData = response.token;
-  //       }
-  //     }),
-  //     catchError(err => {
-  //       // If refresh fails, log out
-  //       this.performClientLogout();
-  //       return throwError(() => err);
-  //     })
-  //   );
-  // }
   refreshToken(): Observable<any> {
     return this.apiService.refreshToken().pipe(
       tap((res: any) => {
@@ -530,9 +515,7 @@ export class AuthService {
   forgotPassword(email: string) {
     return this.apiService.forgotPassword({ email }).pipe(
       tap(() => {
-        this.messageService.showSuccess(
-          'Password reset instructions sent if account exists.'
-        );
+        // Interceptor will show res.message
       }),
       catchError(err => {
         this.messageService.handleHttpError(err)
@@ -549,7 +532,6 @@ export class AuthService {
     return this.apiService.resetPassword(resetToken, passwords).pipe(
       tap((response: LoginResponse) => {
         this.handleLoginSuccess(response);
-        this.messageService.showSuccess('Your password has been reset successfully.');
       }),
       catchError(err => {
         this.messageService.handleHttpError(err)
@@ -568,7 +550,6 @@ export class AuthService {
           this.setItem(this.TOKEN_KEY, response.token);
           this.authTokenData = response.token;
         }
-        this.messageService.showSuccess('Your password has been changed successfully.');
       }),
       catchError(err => {
         this.messageService.handleHttpError(err)
@@ -811,6 +792,21 @@ export class AuthService {
         }
       }
     });
+  }
+
+  /**
+   * Update current user preferences locally and in storage
+   */
+  updateUserPreferences(preferences: Partial<User['preferences']>): void {
+    const user = this.currentUserValue;
+    if (user) {
+      user.preferences = {
+        ...(user.preferences || { theme: 'light' }),
+        ...preferences
+      } as any;
+      this.setItem(this.USER_KEY, user);
+      this.currentUserSubject.next({ ...user });
+    }
   }
 
   /**

@@ -42,9 +42,11 @@
       <div class="filter-field">
         <label>Transaction Type</label>
         <p-select appendTo="body" [(ngModel)]="filterParams.type" [options]="transactionTypes" [showClear]="true"
-          placeholder="All Types" styleClass="w-full" (onChange)="applyFilters()">
+          placeholder="All Types" styleClass="w-full" (onChange)="applyFilters()"
+          [filter]="true" filterBy="label">
         </p-select>
       </div>
+
 
       <div class="filter-field search-field">
         <label>Search</label>
