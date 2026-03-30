@@ -542,18 +542,39 @@ export class AuthService {
     }
   }
 
-  refreshPermissions(): void {
-    this.apiService.getMyPermissions().subscribe({
-      next: (res) => {
-        const user: any = this.currentUserValue;
-        if (user && res.data) {
-          user.role = { ...user.role, permissions: res.data };
-          this.setItem(this.USER_KEY, user);
-          this.currentUserSubject.next({ ...user });
-        }
+refreshPermissions(): void {
+  this.apiService.getMyPermissions().subscribe({
+    next: (res) => {
+      const user: any = this.currentUserValue;
+      if (user && res?.data) {
+        const updated = {
+          ...user,
+          isOwner: res.data.isOwner ?? user.isOwner,
+          isSuperAdmin: res.data.isSuperAdmin ?? user.isSuperAdmin,
+          role: {
+            ...user.role,
+            permissions: res.data.permissions ?? []
+          }
+        };
+        this.setItem(this.USER_KEY, updated);
+        this.currentUserSubject.next(updated);
       }
-    });
-  }
+    },
+    error: (err) => console.warn('Permission refresh failed', err)
+  });
+}
+  // refreshPermissions(): void {
+  //   this.apiService.getMyPermissions().subscribe({
+  //     next: (res) => {
+  //       const user: any = this.currentUserValue;
+  //       if (user && res.data) {
+  //         user.role = { ...user.role, permissions: res.data };
+  //         this.setItem(this.USER_KEY, user);
+  //         this.currentUserSubject.next({ ...user });
+  //       }
+  //     }
+  //   });
+  // }
 
   updateUserPreferences(preferences: Partial<User['preferences']>): void {
     const user = this.currentUserValue;
