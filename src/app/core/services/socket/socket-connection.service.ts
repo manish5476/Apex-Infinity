@@ -14,7 +14,7 @@ export class SocketConnectionService implements OnDestroy {
 
   private socket: Socket | null = null;
   private readonly url = environment.socketUrl;
-
+public permissionsUpdated$ = new Subject<{ type: 'role' | 'override'; roleId?: string; userId?: string }>();
   public themeChanged$ = new Subject<{ themeId: string }>();
   private outboundQueue: Array<{ event: string; payload: any }> = [];
   public connectionStatus$ = new BehaviorSubject<'connected' | 'disconnected' | 'reconnecting'>('disconnected');
@@ -63,7 +63,10 @@ export class SocketConnectionService implements OnDestroy {
       this.zone.run(() => this.themeChanged$.next(data));
     });
 
-
+this.socket.on('permissions:updated', (payload: any) => {
+  this.zone.run(() => this.permissionsUpdated$.next(payload));
+});
+    
     // Add to setupCoreListeners()
     this.socket.on('pong', (data: { timestamp: string }) => {
       this.lastPongTime = Date.now();
@@ -170,6 +173,7 @@ export class SocketConnectionService implements OnDestroy {
   }
 
   ngOnDestroy() {
+    this.permissionsUpdated$.complete();
     this.disconnect();
     this.connectionStatus$.complete();
     this.forceLogout$.complete();
