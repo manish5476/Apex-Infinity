@@ -24,13 +24,15 @@ import { StockAdjustmentComponent } from '../stock-adjustment/stock-adjustment';
 import { StockTransferComponent } from '../stoct-transfer/stoct-transfer';
 import { ProductHistoryComponent } from '../product-history/product-history';
 import { DynamicDialogServices } from '../../../../core/services/dynamic-dialog-services';
+import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
+import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 
 // Import the dialog component (Ensure path is correct)
 
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule, TagModule, SkeletonModule, CarouselModule, TooltipModule, ToastModule, ImageViewerDirective, ProductAnalyticsDirective, AgShareGrid],
+  imports: [CommonModule, RouterModule, ButtonModule, TagModule, SkeletonModule, CarouselModule, TooltipModule, ToastModule, ImageViewerDirective, ProductAnalyticsDirective, AgShareGrid, HasPermissionDirective],
   providers: [DialogService],
   templateUrl: './product-details.html',
   styleUrls: ['./product-details.scss'],
@@ -44,6 +46,8 @@ export class ProductDetailsComponent implements OnInit {
   public common = inject(CommonMethodService);
   private cdr = inject(ChangeDetectorRef); 
   private dialogService = inject(DialogService);
+
+  PERMISSIONS = PERMISSIONS;
 
   product = signal<any | null>(null);
   loading = signal(true);

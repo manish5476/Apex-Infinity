@@ -11,7 +11,7 @@
         <p class="list-subtitle">Track inflows, outflows, and reconciliation status.</p>
       </div>
     </div>
-    <p-button label="Record Payment" icon="pi pi-plus" routerLink="create" styleClass="p-button-primary"></p-button>
+    <p-button *hasPermission="PERMISSIONS.PAYMENT.CREATE" label="Record Payment" icon="pi pi-plus" routerLink="create" styleClass="p-button-primary"></p-button>
   </div>
 
   <div class="themed-card">
@@ -68,7 +68,7 @@
     <app-ag-share-grid 
       [columns]="column" 
       [data]="data" 
-      [showActions]="false" 
+      [actionColumn]="paymentActionColumn"
       selectionMode="multiple"
       (gridEvent)="eventFromGrid($event)" 
       style="height: 100%; width: 100%; display: block;">

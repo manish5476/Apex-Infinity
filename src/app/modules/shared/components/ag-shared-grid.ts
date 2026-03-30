@@ -4,19 +4,37 @@ import {
   ViewEncapsulation,
   input,
   output,
-  computed
+  computed,
+  signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { AgGridAngular } from 'ag-grid-angular';
 
 import {
-  ColDef, GridApi, GridReadyEvent, GridOptions, RowSelectionOptions, ClientSideRowModelModule, CsvExportModule, TooltipModule, BodyScrollEndEvent, CellClickedEvent, themeQuartz, Theme
+  ColDef,
+  GridApi,
+  GridReadyEvent,
+  GridOptions,
+  RowSelectionOptions,
+  CellClickedEvent,
+  BodyScrollEndEvent,
+  AllCommunityModule,
+  ModuleRegistry,
+  themeQuartz,
+  Theme,
 } from 'ag-grid-community';
 
-import { ActionbuttonsComponent } from '../AgGrid/AgGridcomponents/actionbuttons/actionbuttons.component';
-import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
+import type { Permission } from '@core/auth/permissions.constants';
+import {
+  UnifiedActionRenderer,
+  GridActionConfig,
+  GridAction,
+} from './unified-action-renderer.component';
+import { ExcelExportDialogComponent } from './excel-export/excel-export-dialog.component ';
+import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
+
 ModuleRegistry.registerModules([AllCommunityModule]);
+
 /* --------------------------------------------------
    GRID EVENT CONTRACT
 --------------------------------------------------- */
@@ -31,20 +49,59 @@ export type SharedGridEvent<T> =
   | { type: 'delete'; row: T }
   | { type: 'reachedBottom' };
 
+/* --------------------------------------------------
+   ACTION COLUMN INPUT — fully drives which buttons appear
+   Pass this from the consuming component.
+   Omitting it entirely = no action column rendered.
+--------------------------------------------------- */
+export interface ActionColumnConfig {
+  /** Which actions to display */
+  showView?: boolean;
+  showEdit?: boolean;
+  showDelete?: boolean;
+
+  /** RBAC guards (optional) */
+  viewPermission?: Permission;
+  editPermission?: Permission;
+  deletePermission?: Permission;
+
+  /** Column width — defaults to auto based on visible actions */
+  width?: number;
+
+  /** Pin position — defaults to 'right' */
+  pinned?: 'left' | 'right';
+}
+
+/* --------------------------------------------------
+   COMPONENT
+--------------------------------------------------- */
 @Component({
   selector: 'app-ag-share-grid',
   standalone: true,
-  imports: [CommonModule, FormsModule, AgGridAngular],
+  imports: [CommonModule, AgGridAngular, ExcelExportDialogComponent, HasPermissionDirective],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 
   template: `
     <div class="shared-grid-root">
+      @if (enableExcelExport()) {
+        <div class="grid-top-bar">
+          <ng-container *ngIf="excelExportPermission(); else noPermExport">
+            <ng-container *hasPermission="excelExportPermission()!">
+              <app-excel-export-dialog [data]="$any(data() ?? [])"></app-excel-export-dialog>
+            </ng-container>
+          </ng-container>
+          <ng-template #noPermExport>
+            <app-excel-export-dialog [data]="$any(data() ?? [])"></app-excel-export-dialog>
+          </ng-template>
+        </div>
+      }
       <ag-grid-angular
         class="ag-theme-quartz"
         style="width:100%; height:100%;"
         [theme]="agTheme()"
-         [tooltipShowDelay]="tooltipShowDelay"
+        [tooltipShowDelay]="500"
+        [tooltipShowMode]="'whenTruncated'"
         [components]="components"
         [rowData]="data() ?? []"
         [columnDefs]="resolvedColumns()"
@@ -58,6 +115,7 @@ export type SharedGridEvent<T> =
       </ag-grid-angular>
     </div>
   `,
+
   styles: [`
     :host {
       display: flex;
@@ -65,8 +123,7 @@ export type SharedGridEvent<T> =
       flex: 1;
       width: 100%;
       height: 100%;
-      /* Enforces a minimum height on PC */
-      min-height: 400px; 
+      min-height: 400px;
       box-sizing: border-box;
     }
 
@@ -76,10 +133,20 @@ export type SharedGridEvent<T> =
       flex-direction: column;
       width: 100%;
       height: 100%;
-      background: var(--bg-primary);
-      border: 1px solid var(--border-primary);
+      background: var(--theme-bg-primary);
+      border: 1px solid var(--theme-border-primary);
       border-radius: var(--ui-border-radius-lg);
       overflow: hidden;
+
+      .grid-top-bar {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        padding: 6px 12px;
+        background: var(--theme-bg-secondary);
+        border-bottom: 1px solid var(--theme-border-primary);
+        flex-shrink: 0;
+      }
 
       ag-grid-angular {
         flex: 1;
@@ -88,23 +155,13 @@ export type SharedGridEvent<T> =
       }
     }
 
-    /* Mobile Adjustment */
     @media (max-width: 768px) {
-      :host {
-        /* On small screens, we allow a smaller floor to prevent overflow */
-        min-height: 300px; 
-        height: auto;
-      }
-      
-      .shared-grid-root {
-        height: 450px; 
-      }
+      :host { min-height: 300px; height: auto; }
+      .shared-grid-root { height: 450px; }
     }
   `]
 })
 export class AgShareGrid<T = any> {
-  tooltipShowDelay = 500;
-  tooltipShowMode: "standard" | "whenTruncated" = "whenTruncated";
 
   /* --------------------------------------------------
      INPUTS
@@ -112,10 +169,19 @@ export class AgShareGrid<T = any> {
   readonly columns = input.required<ColDef<T>[]>();
   readonly data = input<T[] | null>([]);
   readonly selectionMode = input<'single' | 'multiple' | null>(null);
-  readonly showActions = input(false);
+
+  /**
+   * Drives the entire action column declaratively.
+   * Omit this input and no action column is injected.
+   */
+  readonly actionColumn = input<ActionColumnConfig | null>(null);
+
+  readonly enableExcelExport = input(true);
+  readonly excelExportPermission = input<string | undefined>(undefined);
+  readonly excelFileName = input<string>('Exported_Data');
 
   /* --------------------------------------------------
-     OUTPUT
+     OUTPUT — single event bus
   --------------------------------------------------- */
   readonly gridEvent = output<SharedGridEvent<T>>();
 
@@ -123,231 +189,204 @@ export class AgShareGrid<T = any> {
      INTERNAL STATE
   --------------------------------------------------- */
   private api!: GridApi<T>;
-  private editingRowId: string | number | null = null;
+
+  /** Tracked as a signal so computed columns react to it */
+  private readonly editingRowId = signal<string | number | null>(null);
   private originalRowSnapshot: any = null;
 
+
+
   /* --------------------------------------------------
-     AG GRID COMPONENT REGISTRY (v33+)
+     COMPONENT REGISTRY
   --------------------------------------------------- */
-  components = {
-    ActionbuttonsComponent
-  };
+  readonly components = { UnifiedActionRenderer };
 
-  // readonly agTheme = computed<Theme>(() =>
-  //   themeQuartz.withParams({
-  //     /* Typography */
-  //     fontFamily: 'var(--font-body)',
-  //     fontSize: 'var(--font-size-base)',
-
-  //     /* Backgrounds */
-  //     backgroundColor: 'var(--bg-primary)',
-  //     headerBackgroundColor: 'var(--bg-secondary)',
-
-  //     /* Text */
-  //     foregroundColor: 'var(--text-primary)',
-  //     headerTextColor: 'var(--text-label)',
-
-  //     /* Borders */
-  //     borderColor: 'var(--border-primary)',
-
-  //     /* Interaction */
-  //     rowHoverColor: 'var(--component-bg-hover)',
-  //     selectedRowBackgroundColor: 'var(--accent-focus)',
-  //     rangeSelectionBackgroundColor: 'var(--accent-focus)',
-  //     rangeSelectionBorderColor: 'var(--accent-primary)',
-
-  //     /* Inputs */
-  //     inputBackgroundColor: 'var(--bg-ternary)',
-  //     inputBorder: 'var(--component-border-focus)',
-  //     inputPlaceholderTextColor: 'var(--text-tertiary)',
-
-  //     /* Scrollbars */
-  //     // scrollbarThumbColor: 'var(--scroll-thumb-c)',
-  //     // scrollbarTrackColor: 'var(--scroll-track-c)',
-
-  //     /* Density */
-  //     rowHeight: 44,
-  //     headerHeight: 44,
-  //     spacing: 6
-  //   })
-  // );
-readonly agTheme = computed<Theme>(() =>
-  themeQuartz.withParams({
-    /* Typography */
-    fontFamily: 'var(--font-body)',
-    fontSize: '13px', // Slightly smaller for dense data, or use var(--font-size-sm)
-
-    /* Backgrounds */
-    backgroundColor: 'var(--theme-bg-primary)',
-    headerBackgroundColor: 'var(--theme-bg-secondary)',
-    
-    /* Text */
-    foregroundColor: 'var(--theme-text-primary)',
-    headerTextColor: 'var(--theme-text-tertiary)', // Muted headers
-    // secondaryForegroundColor: 'var(--theme-text-secondary)', // For disabled/secondary text
-
-    /* Borders */
-    borderColor: 'var(--theme-border-primary)',
-    headerColumnResizeHandleColor: 'var(--theme-border-secondary)',
-
-    /* Interaction & Selection */
-    rowHoverColor: 'var(--component-bg-hover)', // Subtle hover
-    selectedRowBackgroundColor: 'rgba(var(--accent-primary-rgb), 0.08)', // Tinted selection
-    rangeSelectionBackgroundColor: 'rgba(var(--accent-primary-rgb), 0.15)',
-    rangeSelectionBorderColor: 'var(--theme-accent-primary)',
-    
-    /* Inputs (Editors) */
-    inputBackgroundColor: 'var(--theme-bg-primary)',
-    inputBorder: '1px solid var(--theme-border-primary)',
-    // inputFocusBorderColor: 'var(--theme-accent-primary)',
-    inputPlaceholderTextColor: 'var(--theme-text-tertiary)',
-
-    /* Icons & UI Controls */
-    checkboxCheckedBackgroundColor: 'var(--theme-accent-primary)',
-    checkboxCheckedBorderColor: 'var(--theme-accent-primary)',
-    checkboxUncheckedBackgroundColor: 'var(--theme-bg-ternary)',
-    checkboxUncheckedBorderColor: 'var(--theme-border-secondary)',
-
-    /* Density & Spacing */
-    rowHeight: 40,       // Compact rows (Standard is usually 48-50)
-    headerHeight: 42,    // Slightly taller header for clarity
-    spacing: 4,          // Tighter cell padding
-    cellHorizontalPaddingScale: 0.8, // Reduces left/right padding inside cells
-  })
-);
   /* --------------------------------------------------
-     GRID OPTIONS (CLIENT SIDE SAFE)
+     THEME
   --------------------------------------------------- */
-  gridOptions: GridOptions<T> = {
+  readonly agTheme = computed<Theme>(() =>
+    themeQuartz.withParams({
+      fontFamily: 'var(--font-body)',
+      fontSize: '13px',
+
+      backgroundColor: 'var(--theme-bg-primary)',
+      headerBackgroundColor: 'var(--theme-bg-secondary)',
+
+      foregroundColor: 'var(--theme-text-primary)',
+      headerTextColor: 'var(--theme-text-tertiary)',
+
+      borderColor: 'var(--theme-border-primary)',
+      headerColumnResizeHandleColor: 'var(--theme-border-secondary)',
+
+      rowHoverColor: 'var(--component-bg-hover)',
+      selectedRowBackgroundColor: 'rgba(var(--accent-primary-rgb), 0.08)',
+      rangeSelectionBackgroundColor: 'rgba(var(--accent-primary-rgb), 0.15)',
+      rangeSelectionBorderColor: 'var(--theme-accent-primary)',
+
+      inputBackgroundColor: 'var(--theme-bg-primary)',
+      inputBorder: '1px solid var(--theme-border-primary)',
+      inputPlaceholderTextColor: 'var(--theme-text-tertiary)',
+
+      checkboxCheckedBackgroundColor: 'var(--theme-accent-primary)',
+      checkboxCheckedBorderColor: 'var(--theme-accent-primary)',
+      checkboxUncheckedBackgroundColor: 'var(--theme-bg-ternary)',
+      checkboxUncheckedBorderColor: 'var(--theme-border-secondary)',
+
+      rowHeight: 40,
+      headerHeight: 42,
+      spacing: 4,
+      cellHorizontalPaddingScale: 0.8,
+    })
+  );
+
+  /* --------------------------------------------------
+     GRID OPTIONS
+  --------------------------------------------------- */
+  readonly gridOptions: GridOptions<T> = {
     defaultColDef: {
       flex: 1,
-      minWidth: 120,
+      minWidth: 100,
       sortable: true,
       filter: true,
-      
       resizable: true,
-      editable: params =>
-        this.editingRowId === this.getRowId(params.data)
+      editable: (params) =>
+        this.editingRowId() === this.resolveRowId(params.data),
     },
-    suppressCellFocus: false, // IMPORTANT for clicks
+    suppressCellFocus: false,
     animateRows: false,
-    rowBuffer: 20
+    rowBuffer: 20,
+    suppressAnimationFrame: false,
+    getRowId: (params) => String(this.resolveRowId(params.data)),
   };
 
   /* --------------------------------------------------
-     COLUMN RESOLUTION
+     COLUMN RESOLUTION — reactive via computed + signal
   --------------------------------------------------- */
-  resolvedColumns = computed<ColDef<T>[]>(() => {
-    const base = this.columns?.();
-    if (!base || base.length === 0) return [];
+  readonly resolvedColumns = computed<ColDef<T>[]>(() => {
+    const base = this.columns();
+    if (!base?.length) return [];
 
-    const cols = [...base];
+    const ac = this.actionColumn();
+    if (!ac) return [...base]; // no action column needed
 
-    if (this.showActions()) {
-      cols.push({
-        headerName: 'Actions',
-        colId: '__actions__',
-        pinned: 'right',
-        width: 120,
-        editable: false,
-        sortable: false,
-        filter: false,
-        cellRenderer: 'ActionbuttonsComponent',
-        cellRendererParams: {
-          actionHandler: (action: string, row: T) =>
-            this.handleRowAction(action, row),
-          isRowEditing: (id: string | number) =>
-            this.editingRowId === id
-        }
-      });
-    }
+    // Build the GridActionConfig passed into the renderer
+    const actionConfig: GridActionConfig = {
+      showView: ac.showView ?? false,
+      showEdit: ac.showEdit ?? false,
+      showDelete: ac.showDelete ?? false,
+      viewPermission: ac.viewPermission,
+      editPermission: ac.editPermission,
+      deletePermission: ac.deletePermission,
 
-    return cols;
+      actionHandler: (action: GridAction, row: T) =>
+        this.handleRowAction(action, row),
+
+      // Renderer calls this to know whether to show save/cancel
+      isRowEditing: (id: string | number) => this.editingRowId() === id,
+    };
+
+    // Auto-calculate width if not specified
+    const visibleCount = [ac.showView, ac.showEdit, ac.showDelete].filter(Boolean).length;
+    const colWidth = ac.width ?? Math.max(visibleCount * 38 + 20, 80);
+
+    const actionColDef: ColDef<T> = {
+      headerName: '',
+      colId: '__actions__',
+      pinned: ac.pinned ?? 'right',
+      width: colWidth,
+      minWidth: colWidth,
+      maxWidth: colWidth + 20,
+      editable: false,
+      sortable: false,
+      filter: false,
+      resizable: false,
+      suppressMovable: true,
+      cellRenderer: 'UnifiedActionRenderer',
+      cellRendererParams: { actionConfig },
+    };
+
+    return [...base, actionColDef];
   });
 
   /* --------------------------------------------------
      SELECTION
   --------------------------------------------------- */
   get selectionOptions(): RowSelectionOptions | undefined {
-    if (!this.selectionMode()) return undefined;
-    return {
-      mode: this.selectionMode() === 'single' ? 'singleRow' : 'multiRow'
-    };
+    const mode = this.selectionMode();
+    if (!mode) return undefined;
+    return { mode: mode === 'single' ? 'singleRow' : 'multiRow' };
   }
 
   /* --------------------------------------------------
      GRID EVENTS
   --------------------------------------------------- */
-  onGridReady(e: GridReadyEvent<T>) {
+  onGridReady(e: GridReadyEvent<T>): void {
     this.api = e.api;
     this.gridEvent.emit({ type: 'init', api: this.api });
   }
 
-  onSelectionChanged() {
+  onSelectionChanged(): void {
     this.gridEvent.emit({
       type: 'selectionChanged',
-      rows: this.api.getSelectedRows()
+      rows: this.api.getSelectedRows(),
     });
   }
 
-  /**
-   * ✅ THIS IS WHAT YOU WERE MISSING
-   * Fires ONLY when NOT editing
-   */
-  onCellClicked(e: CellClickedEvent<T>) {
+  onCellClicked(e: CellClickedEvent<T>): void {
     if (!e.data) return;
-
-    const rowId = this.getRowId(e.data);
-    if (this.editingRowId === rowId) return; // ignore clicks during edit
+    const rowId = this.resolveRowId(e.data);
+    // Suppress click events during inline editing
+    if (this.editingRowId() === rowId) return;
+    // Suppress action column clicks (handled by renderer)
+    if (e.column.getColId() === '__actions__') return;
 
     this.gridEvent.emit({
       type: 'cellClicked',
       row: e.data,
-      field: e.colDef.field!,
-      value: e.value
+      field: e.colDef.field ?? '',
+      value: e.value,
     });
   }
 
-  onCellValueChanged(e: any) {
+  onCellValueChanged(e: any): void {
     this.gridEvent.emit({
       type: 'cellEdited',
       row: e.data,
-      field: e.colDef.field!,
-      value: e.newValue
+      field: e.colDef.field ?? '',
+      value: e.newValue,
     });
   }
 
-  onBodyScrollEnd(_: BodyScrollEndEvent) {
-    const viewport = document.querySelector('.ag-body-viewport') as HTMLElement;
-    if (!viewport) return;
-
-    if (viewport.scrollTop + viewport.clientHeight >= viewport.scrollHeight - 2) {
+  onBodyScrollEnd(_: BodyScrollEndEvent): void {
+    const vp = document.querySelector('.ag-body-viewport') as HTMLElement;
+    if (!vp) return;
+    if (vp.scrollTop + vp.clientHeight >= vp.scrollHeight - 2) {
       this.gridEvent.emit({ type: 'reachedBottom' });
     }
   }
 
   /* --------------------------------------------------
-     CRUD CORE
+     CRUD CORE — called by renderer via actionConfig
   --------------------------------------------------- */
-  private handleRowAction(action: string, row: T) {
-    const id = this.getRowId(row);
+  private handleRowAction(action: GridAction, row: T): void {
+    const id = this.resolveRowId(row);
 
     switch (action) {
       case 'edit':
-        this.editingRowId = id;
+        this.editingRowId.set(id);
         this.originalRowSnapshot = { ...row };
         this.gridEvent.emit({ type: 'editStart', row });
         break;
 
       case 'save':
-        this.editingRowId = null;
+        this.editingRowId.set(null);
         this.originalRowSnapshot = null;
         this.gridEvent.emit({ type: 'save', row });
         break;
 
       case 'cancel':
         this.restoreRow(id);
-        this.editingRowId = null;
+        this.editingRowId.set(null);
         this.originalRowSnapshot = null;
         this.gridEvent.emit({ type: 'cancel', row });
         break;
@@ -355,18 +394,406 @@ readonly agTheme = computed<Theme>(() =>
       case 'delete':
         this.gridEvent.emit({ type: 'delete', row });
         break;
+
+      case 'view':
+        // Handled inside UnifiedActionRenderer (modal); not routed here
+        break;
     }
 
-    this.api.refreshCells({ force: true });
+    // Refresh only action column cells — cheaper than refreshing all
+    this.api.refreshCells({ columns: ['__actions__'], force: true });
   }
 
-  private restoreRow(rowId: string | number) {
+  private restoreRow(rowId: string | number): void {
     if (!this.originalRowSnapshot) return;
     const node = this.api.getRowNode(String(rowId));
     node?.setData(this.originalRowSnapshot);
   }
 
-  private getRowId(row: any): string | number {
-    return row?._id ?? row?.id;
+  /* --------------------------------------------------
+     PUBLIC API — callable from parent via viewChild
+  --------------------------------------------------- */
+  applyTransaction(update: T[], add?: T[], remove?: T[]): void {
+    this.api?.applyTransaction({ update, add, remove });
+  }
+
+  refreshGrid(): void {
+    this.api?.refreshCells({ force: true });
+  }
+
+  sizeColumnsToFit(): void {
+    this.api?.sizeColumnsToFit();
+  }
+
+  exportToCsv(fileName?: string): void {
+    this.api?.exportDataAsCsv({ fileName: fileName ?? 'export.csv' });
+  }
+
+  showLoadingOverlay(): void {
+    this.api?.showLoadingOverlay();
+  }
+
+  showNoRowsOverlay(): void {
+    this.api?.showNoRowsOverlay();
+  }
+
+  hideOverlay(): void {
+    this.api?.hideOverlay();
+  }
+
+  getSelectedRows(): T[] {
+    return this.api?.getSelectedRows() ?? [];
+  }
+
+  /* --------------------------------------------------
+     UTIL
+  --------------------------------------------------- */
+  private resolveRowId(row: any): string | number {
+    return row?._id ?? row?.id ?? '';
   }
 }
+
+// import {
+//   Component,
+//   ChangeDetectionStrategy,
+//   ViewEncapsulation,
+//   input,
+//   output,
+//   computed
+// } from '@angular/core';
+// import { CommonModule } from '@angular/common';
+// import { FormsModule } from '@angular/forms';
+// import { AgGridAngular } from 'ag-grid-angular';
+
+// import {
+//   ColDef, GridApi, GridReadyEvent, GridOptions, RowSelectionOptions, ClientSideRowModelModule, CsvExportModule, TooltipModule, BodyScrollEndEvent, CellClickedEvent, themeQuartz, Theme
+// } from 'ag-grid-community';
+// import { Permission } from '@core/auth/permissions.constants';
+
+// import { ActionbuttonsComponent } from '../AgGrid/AgGridcomponents/actionbuttons/actionbuttons.component';
+// import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
+// ModuleRegistry.registerModules([AllCommunityModule]);
+// /* --------------------------------------------------
+//    GRID EVENT CONTRACT
+// --------------------------------------------------- */
+// export type SharedGridEvent<T> =
+//   | { type: 'init'; api: GridApi<T> }
+//   | { type: 'cellClicked'; row: T; field: string; value: any }
+//   | { type: 'selectionChanged'; rows: T[] }
+//   | { type: 'cellEdited'; row: T; field: string; value: any }
+//   | { type: 'editStart'; row: T }
+//   | { type: 'save'; row: T }
+//   | { type: 'cancel'; row: T }
+//   | { type: 'delete'; row: T }
+//   | { type: 'reachedBottom' };
+
+// @Component({
+//   selector: 'app-ag-share-grid',
+//   standalone: true,
+//   imports: [CommonModule, FormsModule, AgGridAngular],
+//   encapsulation: ViewEncapsulation.None,
+//   changeDetection: ChangeDetectionStrategy.OnPush,
+
+//   template: `
+//     <div class="shared-grid-root">
+//       <ag-grid-angular
+//         class="ag-theme-quartz"
+//         style="width:100%; height:100%;"
+//         [theme]="agTheme()"
+//          [tooltipShowDelay]="tooltipShowDelay"
+//         [components]="components"
+//         [rowData]="data() ?? []"
+//         [columnDefs]="resolvedColumns()"
+//         [gridOptions]="gridOptions"
+//         [rowSelection]="selectionOptions"
+//         (gridReady)="onGridReady($event)"
+//         (cellClicked)="onCellClicked($event)"
+//         (cellValueChanged)="onCellValueChanged($event)"
+//         (selectionChanged)="onSelectionChanged()"
+//         (bodyScrollEnd)="onBodyScrollEnd($event)">
+//       </ag-grid-angular>
+//     </div>
+//   `,
+//   styles: [`
+//     :host {
+//       display: flex;
+//       flex-direction: column;
+//       flex: 1;
+//       width: 100%;
+//       height: 100%;
+//       /* Enforces a minimum height on PC */
+//       min-height: 400px; 
+//       box-sizing: border-box;
+//     }
+
+//     .shared-grid-root {
+//       flex: 1;
+//       display: flex;
+//       flex-direction: column;
+//       width: 100%;
+//       height: 100%;
+//       background: var(--bg-primary);
+//       border: 1px solid var(--border-primary);
+//       border-radius: var(--ui-border-radius-lg);
+//       overflow: hidden;
+
+//       ag-grid-angular {
+//         flex: 1;
+//         width: 100%;
+//         height: 100% !important;
+//       }
+//     }
+
+//     /* Mobile Adjustment */
+//     @media (max-width: 768px) {
+//       :host {
+//         /* On small screens, we allow a smaller floor to prevent overflow */
+//         min-height: 300px; 
+//         height: auto;
+//       }
+      
+//       .shared-grid-root {
+//         height: 450px; 
+//       }
+//     }
+//   `]
+// })
+// export class AgShareGrid<T = any> {
+//   tooltipShowDelay = 500;
+//   tooltipShowMode: "standard" | "whenTruncated" = "whenTruncated";
+
+//   /* --------------------------------------------------
+//      INPUTS
+//   --------------------------------------------------- */
+//   readonly columns = input.required<ColDef<T>[]>();
+//   readonly data = input<T[] | null>([]);
+//   readonly selectionMode = input<'single' | 'multiple' | null>(null);
+//   readonly showActions = input(false);
+
+//   /** When `showActions` is true, optionally hide edit/delete based on RBAC. */
+//   readonly actionPermissions = input<{
+//     edit?: Permission;
+//     delete?: Permission;
+//   } | null>(null);
+
+//   /* --------------------------------------------------
+//      OUTPUT
+//   --------------------------------------------------- */
+//   readonly gridEvent = output<SharedGridEvent<T>>();
+
+//   /* --------------------------------------------------
+//      INTERNAL STATE
+//   --------------------------------------------------- */
+//   private api!: GridApi<T>;
+//   private editingRowId: string | number | null = null;
+//   private originalRowSnapshot: any = null;
+
+//   /* --------------------------------------------------
+//      AG GRID COMPONENT REGISTRY (v33+)
+//   --------------------------------------------------- */
+//   components = {
+//     ActionbuttonsComponent
+//   };
+
+// readonly agTheme = computed<Theme>(() =>
+//   themeQuartz.withParams({
+//     /* Typography */
+//     fontFamily: 'var(--font-body)',
+//     fontSize: '13px', // Slightly smaller for dense data, or use var(--font-size-sm)
+
+//     /* Backgrounds */
+//     backgroundColor: 'var(--theme-bg-primary)',
+//     headerBackgroundColor: 'var(--theme-bg-secondary)',
+    
+//     /* Text */
+//     foregroundColor: 'var(--theme-text-primary)',
+//     headerTextColor: 'var(--theme-text-tertiary)', // Muted headers
+//     // secondaryForegroundColor: 'var(--theme-text-secondary)', // For disabled/secondary text
+
+//     /* Borders */
+//     borderColor: 'var(--theme-border-primary)',
+//     headerColumnResizeHandleColor: 'var(--theme-border-secondary)',
+
+//     /* Interaction & Selection */
+//     rowHoverColor: 'var(--component-bg-hover)', // Subtle hover
+//     selectedRowBackgroundColor: 'rgba(var(--accent-primary-rgb), 0.08)', // Tinted selection
+//     rangeSelectionBackgroundColor: 'rgba(var(--accent-primary-rgb), 0.15)',
+//     rangeSelectionBorderColor: 'var(--theme-accent-primary)',
+    
+//     /* Inputs (Editors) */
+//     inputBackgroundColor: 'var(--theme-bg-primary)',
+//     inputBorder: '1px solid var(--theme-border-primary)',
+//     // inputFocusBorderColor: 'var(--theme-accent-primary)',
+//     inputPlaceholderTextColor: 'var(--theme-text-tertiary)',
+
+//     /* Icons & UI Controls */
+//     checkboxCheckedBackgroundColor: 'var(--theme-accent-primary)',
+//     checkboxCheckedBorderColor: 'var(--theme-accent-primary)',
+//     checkboxUncheckedBackgroundColor: 'var(--theme-bg-ternary)',
+//     checkboxUncheckedBorderColor: 'var(--theme-border-secondary)',
+
+//     /* Density & Spacing */
+//     rowHeight: 40,       // Compact rows (Standard is usually 48-50)
+//     headerHeight: 42,    // Slightly taller header for clarity
+//     spacing: 4,          // Tighter cell padding
+//     cellHorizontalPaddingScale: 0.8, // Reduces left/right padding inside cells
+//   })
+// );
+//   /* --------------------------------------------------
+//      GRID OPTIONS (CLIENT SIDE SAFE)
+//   --------------------------------------------------- */
+//   gridOptions: GridOptions<T> = {
+//     defaultColDef: {
+//       flex: 1,
+//       minWidth: 120,
+//       sortable: true,
+//       filter: true,
+      
+//       resizable: true,
+//       editable: params =>
+//         this.editingRowId === this.getRowId(params.data)
+//     },
+//     suppressCellFocus: false, // IMPORTANT for clicks
+//     animateRows: false,
+//     rowBuffer: 20
+//   };
+
+//   /* --------------------------------------------------
+//      COLUMN RESOLUTION
+//   --------------------------------------------------- */
+//   resolvedColumns = computed<ColDef<T>[]>(() => {
+//     const base = this.columns?.();
+//     if (!base || base.length === 0) return [];
+
+//     const cols = [...base];
+
+//     if (this.showActions()) {
+//       const ap = this.actionPermissions();
+//       cols.push({
+//         headerName: 'Actions',
+//         colId: '__actions__',
+//         pinned: 'right',
+//         width: 120,
+//         editable: false,
+//         sortable: false,
+//         filter: false,
+//         cellRenderer: 'ActionbuttonsComponent',
+//         cellRendererParams: {
+//           actionHandler: (action: string, row: T) =>
+//             this.handleRowAction(action, row),
+//           isRowEditing: (id: string | number) =>
+//             this.editingRowId === id,
+//           editPermission: ap?.edit,
+//           deletePermission: ap?.delete,
+//         }
+//       });
+//     }
+
+//     return cols;
+//   });
+
+//   /* --------------------------------------------------
+//      SELECTION
+//   --------------------------------------------------- */
+//   get selectionOptions(): RowSelectionOptions | undefined {
+//     if (!this.selectionMode()) return undefined;
+//     return {
+//       mode: this.selectionMode() === 'single' ? 'singleRow' : 'multiRow'
+//     };
+//   }
+
+//   /* --------------------------------------------------
+//      GRID EVENTS
+//   --------------------------------------------------- */
+//   onGridReady(e: GridReadyEvent<T>) {
+//     this.api = e.api;
+//     this.gridEvent.emit({ type: 'init', api: this.api });
+//   }
+
+//   onSelectionChanged() {
+//     this.gridEvent.emit({
+//       type: 'selectionChanged',
+//       rows: this.api.getSelectedRows()
+//     });
+//   }
+
+//   /**
+//    * ✅ THIS IS WHAT YOU WERE MISSING
+//    * Fires ONLY when NOT editing
+//    */
+//   onCellClicked(e: CellClickedEvent<T>) {
+//     if (!e.data) return;
+
+//     const rowId = this.getRowId(e.data);
+//     if (this.editingRowId === rowId) return; // ignore clicks during edit
+
+//     this.gridEvent.emit({
+//       type: 'cellClicked',
+//       row: e.data,
+//       field: e.colDef.field!,
+//       value: e.value
+//     });
+//   }
+
+//   onCellValueChanged(e: any) {
+//     this.gridEvent.emit({
+//       type: 'cellEdited',
+//       row: e.data,
+//       field: e.colDef.field!,
+//       value: e.newValue
+//     });
+//   }
+
+//   onBodyScrollEnd(_: BodyScrollEndEvent) {
+//     const viewport = document.querySelector('.ag-body-viewport') as HTMLElement;
+//     if (!viewport) return;
+
+//     if (viewport.scrollTop + viewport.clientHeight >= viewport.scrollHeight - 2) {
+//       this.gridEvent.emit({ type: 'reachedBottom' });
+//     }
+//   }
+
+//   /* --------------------------------------------------
+//      CRUD CORE
+//   --------------------------------------------------- */
+//   private handleRowAction(action: string, row: T) {
+//     const id = this.getRowId(row);
+
+//     switch (action) {
+//       case 'edit':
+//         this.editingRowId = id;
+//         this.originalRowSnapshot = { ...row };
+//         this.gridEvent.emit({ type: 'editStart', row });
+//         break;
+
+//       case 'save':
+//         this.editingRowId = null;
+//         this.originalRowSnapshot = null;
+//         this.gridEvent.emit({ type: 'save', row });
+//         break;
+
+//       case 'cancel':
+//         this.restoreRow(id);
+//         this.editingRowId = null;
+//         this.originalRowSnapshot = null;
+//         this.gridEvent.emit({ type: 'cancel', row });
+//         break;
+
+//       case 'delete':
+//         this.gridEvent.emit({ type: 'delete', row });
+//         break;
+//     }
+
+//     this.api.refreshCells({ force: true });
+//   }
+
+//   private restoreRow(rowId: string | number) {
+//     if (!this.originalRowSnapshot) return;
+//     const node = this.api.getRowNode(String(rowId));
+//     node?.setData(this.originalRowSnapshot);
+//   }
+
+//   private getRowId(row: any): string | number {
+//     return row?._id ?? row?.id;
+//   }
+// }

@@ -145,7 +145,6 @@ import { FilterField } from '../../modules/shared/components/universal-filter/fi
         <app-ag-share-grid
           [columns]="branchColumns"
           [data]="comparison()?.branches || []"
-          [showActions]="false"
           class="fill-grid">
         </app-ag-share-grid>
       </div>
@@ -809,7 +808,7 @@ export class BranchComparisonComponent implements OnInit {
 //              <app-ag-share-grid 
 //                [columns]="branchColumns" 
 //                [data]="comparison()?.branches || []" 
-//                [showActions]="false" 
+// 
 //                class="full-size-grid">
 //              </app-ag-share-grid>
 //           </div>

@@ -13,10 +13,11 @@
     "test": "ng test",
     "start": "ng serve",
     "build": "ng build",
-    "electron:dev": "ng build --configuration=development --base-href ./ && electron electron-main.js",
-    "electron:qa": "ng build --configuration=qa --base-href ./ && electron electron-main.js",
-    "electron:prod": "ng build --configuration=production --base-href ./ && electron electron-main.js",
-    "dist": "electron-builder",
+    "electron:serve": "concurrently -k \"ng serve\" \"wait-on http://localhost:4200 && electron . --serve\"",
+    "electron:dev": "ng build --configuration=development --base-href ./ && electron .",
+    "electron:qa": "ng build --configuration=qa --base-href ./ && electron .",
+    "electron:prod": "ng build --configuration=production --base-href ./ && electron .",
+    "dist": "ng build --configuration=production --base-href ./ && electron-builder",
     "serve:ssr:apex": "node dist/apex/server/server.mjs"
   },
   "prettier": {
@@ -31,6 +32,7 @@
       }
     ]
   },
+  "main": "electron-main.js",
   "private": true,
   "dependencies": {
     "@angular/cdk": "~20.2.11",
@@ -55,7 +57,9 @@
     "@tiptap/starter-kit": "^3.20.4",
     "ag-grid-angular": "^34.3.1",
     "chart.js": "^4.5.1",
+    "exceljs": "^4.4.0",
     "express": "^5.1.0",
+    "file-saver": "^2.0.5",
     "leaflet": "^1.9.4",
     "ngx-compact-number": "^0.0.5",
     "postcss": "^8.5.6",
@@ -72,17 +76,22 @@
     "@angular/cli": "^20.3.9",
     "@angular/compiler-cli": "^20.3.0",
     "@types/express": "^5.0.1",
+    "@types/file-saver": "^2.0.7",
     "@types/jasmine": "~5.1.0",
     "@types/leaflet": "^1.9.21",
     "@types/node": "^20.17.19",
     "baseline-browser-mapping": "^2.10.0",
+    "concurrently": "^9.2.1",
+    "electron": "^41.1.0",
+    "electron-builder": "^26.8.1",
     "jasmine-core": "~5.9.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "wait-on": "^9.0.4"
   },
   "build": {
     "appId": "com.apex_infinity.app",
@@ -91,8 +100,7 @@
       "output": "dist/electron"
     },
     "win": {
-      "target": "nsis",
-      "icon": "src/assets/icon.ico"
+      "target": "nsis"
     },
     "files": [
       "dist/apex/**/*",

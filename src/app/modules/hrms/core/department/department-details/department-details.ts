@@ -254,8 +254,7 @@ import { AppMessageService } from '@core/services/message.service';
                 <div class="list-grid-wrapper p-4">
                   <app-ag-share-grid 
                     [columns]="gridColumns" 
-                    [data]="employees()" 
-                    [showActions]="false"
+                    [data]="employees()"
                     selectionMode="single">
                   </app-ag-share-grid>
                 </div>

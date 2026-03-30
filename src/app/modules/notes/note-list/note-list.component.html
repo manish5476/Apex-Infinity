@@ -4,7 +4,7 @@
   <aside class="filters-sidebar">
 
     <div class="compose-btn-wrapper">
-      <button class="btn-compose" routerLink="/notes/create">
+      <button *hasPermission="PERMISSIONS.NOTE.WRITE" class="btn-compose" routerLink="/notes/create">
         <span class="compose-icon"><i class="pi pi-plus"></i></span>
         <span class="label">New Note</span>
       </button>

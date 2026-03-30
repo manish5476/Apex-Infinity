@@ -1,15 +1,13 @@
 import { AppMessageService } from './../../../../core/services/message.service';
 import { Component, OnInit, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
-import { Router } from '@angular/router';
-
 // Services
 import { AccountService } from '../../accounts';
 import { MessageService } from 'primeng/api';
 
 // Shared Components
-import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
-import { ActionViewRenderer } from '../../../shared/AgGrid/AgGridcomponents/DynamicDetailCard/ActionViewRenderer';
+import { AgShareGrid, ActionColumnConfig } from '../../../shared/components/ag-shared-grid';
+import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 
 @Component({
   selector: 'app-account-list',
@@ -23,7 +21,6 @@ export class AccountListComponent implements OnInit {
   // Dependencies
   private accountService = inject(AccountService);
   private messageService = inject(AppMessageService);
-  private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private decimalPipe = inject(DecimalPipe);
 
@@ -32,6 +29,13 @@ export class AccountListComponent implements OnInit {
   column: any[] = [];
   isLoading = false;
 
+  readonly accountActionColumn: ActionColumnConfig = {
+    showView: true,
+    showEdit: false,
+    showDelete: false,
+    viewPermission: PERMISSIONS.ACCOUNT.READ,
+  };
+
   ngOnInit(): void {
     this.setupColumns();
     this.loadAccounts();
@@ -39,7 +43,6 @@ export class AccountListComponent implements OnInit {
 
   setupColumns(): void {
     this.column = [
-      { headerName: 'Actions', field: '_id', width: 100, cellRenderer: ActionViewRenderer, pinned: 'left', suppressMenu: true },
       { field: 'code', headerName: 'Code', width: 120, sortable: true, filter: true, pinned: 'left', cellStyle: { 'font-weight': '600', 'color': 'var(--text-primary)' } },
       { field: 'name', headerName: 'Account Name', flex: 1, minWidth: 200, sortable: true, filter: true },
       { field: 'type', headerName: 'Type', width: 150, sortable: true, filter: true, valueFormatter: (p: any) => p.value ? p.value.toUpperCase() : '', cellStyle: { 'text-transform': 'capitalize' } },
@@ -81,11 +84,5 @@ export class AccountListComponent implements OnInit {
     return this.decimalPipe.transform(value, '1.2-2') || '0.00';
   }
 
-  // Handle Grid Events (e.g., Click Edit)
-  handleGridEvent(event: any) {
-    if (event.type === 'cellClicked' && event.colDef.headerName === 'Actions') {
-      const id = event.data._id;
-      console.log('Action clicked for:', id);
-    }
-  }
+  handleGridEvent(_event: any) {}
 }

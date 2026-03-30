@@ -24,8 +24,7 @@ import { finalize } from 'rxjs';
       <div class="list-grid-area themed-card grow-grid">
         <app-ag-share-grid 
           [columns]="columns" 
-          [data]="data()" 
-          [showActions]="false"
+          [data]="data()"
           (gridEvent)="onGridEvent($event)">
         </app-ag-share-grid>
       </div>

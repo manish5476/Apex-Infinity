@@ -78,16 +78,16 @@
     <button pButton label="History" icon="pi pi-history" class="p-button-outlined p-button-secondary btn-sm"
       (click)="openHistory(p)"></button>
 
-    <button pButton label="Transfer" icon="pi pi-sync" class="p-button-outlined p-button-secondary btn-sm"
+    <button *hasPermission="PERMISSIONS.PRODUCT.UPDATE" pButton label="Transfer" icon="pi pi-sync" class="p-button-outlined p-button-secondary btn-sm"
       (click)="openStockTransfer(p)"></button>
 
-    <button pButton label="Adjust" icon="pi pi-sliders-h" class="p-button-outlined p-button-secondary btn-sm"
+    <button *hasPermission="PERMISSIONS.PRODUCT.UPDATE" pButton label="Adjust" icon="pi pi-sliders-h" class="p-button-outlined p-button-secondary btn-sm"
       (click)="openStockAdjustment(p)"></button>
 
     <button pButton icon="pi pi-chart-bar" class="p-button-outlined p-button-secondary btn-sm"
       [appProductAnalytics]="p._id" pTooltip="Analytics" tooltipPosition="bottom"></button>
 
-    <button pButton label="Edit" icon="pi pi-pencil" class="p-button-primary btn-sm"
+    <button *hasPermission="PERMISSIONS.PRODUCT.UPDATE" pButton label="Edit" icon="pi pi-pencil" class="p-button-primary btn-sm"
       [routerLink]="['/product', p._id, 'edit']"></button>
   </div>
 </header>
@@ -115,7 +115,7 @@
                 </div>
               }
 
-              <button class="upload-fab" (click)="fileInput.click()" pTooltip="Upload Images" tooltipPosition="left">
+              <button *hasPermission="PERMISSIONS.PRODUCT.UPDATE" class="upload-fab" (click)="fileInput.click()" pTooltip="Upload Images" tooltipPosition="left">
                 <i class="pi pi-camera"></i>
               </button>
               <input #fileInput type="file" multiple accept="image/*" style="display:none" (change)="onFileSelected($event)">
@@ -217,8 +217,7 @@
             <div class="grid-wrapper">
               <app-ag-share-grid 
                 [columns]="inventoryColumns" 
-                [data]="inventoryData" 
-                [showActions]="false"
+                [data]="inventoryData"
                 selectionMode="single" 
                 (gridEvent)="eventFromGrid($event)"
                 class="full-size-grid">

@@ -139,10 +139,11 @@
           </p-select>
           <label>Target Branch</label>
         </span>
-        <small class="helper-text error"
-          *ngIf="adjustmentForm.get('branchId')?.invalid && adjustmentForm.get('branchId')?.touched">
+        @if (adjustmentForm.get('branchId')?.invalid && adjustmentForm.get('branchId')?.touched) {
+        <small class="helper-text error">
           <i class="pi pi-exclamation-circle"></i> Branch is required
         </small>
+        }
       </div>
 
       <div class="field">
@@ -171,10 +172,11 @@
           </p-inputNumber>
           <label for="qty">Quantity</label>
         </span>
-        <small class="helper-text error"
-          *ngIf="adjustmentForm.get('quantity')?.invalid && adjustmentForm.get('quantity')?.touched">
+        @if (adjustmentForm.get('quantity')?.invalid && adjustmentForm.get('quantity')?.touched) {
+        <small class="helper-text error">
           Quantity must be > 0
         </small>
+        }
       </div>
     </div>
 

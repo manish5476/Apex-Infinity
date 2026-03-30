@@ -103,7 +103,6 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
         <app-ag-share-grid
           [columns]="auditColumns"
           [data]="securityData()?.recentEvents || []"
-          [showActions]="false"
           class="fill-grid">
         </app-ag-share-grid>
       </div>
@@ -630,7 +629,7 @@ export class SystemAuditAlertsComponent implements OnInit {
 //              <app-ag-share-grid 
 //                [columns]="auditColumns" 
 //                [data]="securityData()?.recentEvents || []" 
-//                [showActions]="false" 
+// 
 //                class="full-size-grid">
 //              </app-ag-share-grid>
 //           </div>

@@ -150,8 +150,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
                 <div class="grid-wrapper border-radius-lg border-1 border-solid border-primary overflow-hidden w-full flex-grow-1" style="min-height: 550px;">
                   <app-ag-share-grid 
                     [columns]="attendanceColumns" 
-                    [data]="attendanceReportData()" 
-                    [showActions]="false"
+                    [data]="attendanceReportData()"
                     rowSelection="multiple"
                     (gridEvent)="onAttendanceGridEvent($event)">
                   </app-ag-share-grid>
@@ -208,8 +207,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
                 <div class="grid-wrapper border-radius-lg border-1 border-solid border-primary overflow-hidden w-full flex-grow-1" style="min-height: 450px;">
                   <app-ag-share-grid 
                     [columns]="leaveColumns" 
-                    [data]="leaveReportData()" 
-                    [showActions]="false"
+                    [data]="leaveReportData()"
                     (gridEvent)="onLeaveGridEvent($event)">
                   </app-ag-share-grid>
                 </div>

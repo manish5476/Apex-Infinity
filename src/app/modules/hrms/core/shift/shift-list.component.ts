@@ -10,9 +10,9 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 
 // AG Grid & Services
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { AppMessageService } from '../../../../core/services/message.service';
-import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
+import { AgShareGrid, ActionColumnConfig } from '../../../shared/components/ag-shared-grid';
+import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 import { HRMSService } from '../../hrms.service';
 import { SelectModule } from 'primeng/select';
 
@@ -92,7 +92,7 @@ import { SelectModule } from 'primeng/select';
           <app-ag-share-grid 
             [columns]="column()" 
             [data]="data()" 
-            [showActions]="true" 
+            [actionColumn]="shiftActionColumn"
             selectionMode="single"
             (gridEvent)="eventFromGrid($event)">
           </app-ag-share-grid>
@@ -186,8 +186,16 @@ export class ShiftListComponent implements OnInit {
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
 
-  private gridApi!: GridApi;
   private searchSubject = new Subject<string>();
+
+  readonly shiftActionColumn: ActionColumnConfig = {
+    showView: true,
+    showEdit: true,
+    showDelete: true,
+    viewPermission: PERMISSIONS.SHIFT.READ,
+    editPermission: PERMISSIONS.SHIFT.MANAGE,
+    deletePermission: PERMISSIONS.SHIFT.MANAGE,
+  };
 
   // State Signals
   isLoading = signal<boolean>(false);
@@ -303,11 +311,6 @@ export class ShiftListComponent implements OnInit {
   }
 
   eventFromGrid(event: any): void {
-    if (event.type === 'gridReady') {
-      this.gridApi = event.api;
-      return;
-    }
-
     const shiftId = event?.row?._id;
     switch (event.type) {
       case 'cellClicked':

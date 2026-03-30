@@ -143,7 +143,6 @@ import { DatePicker } from 'primeng/datepicker';
           <app-ag-share-grid
             [columns]="columnDefs"
             [data]="rowData"
-            [showActions]="false"
             selectionMode="single"
             (gridEvent)="onGridEvent($event)"
           >

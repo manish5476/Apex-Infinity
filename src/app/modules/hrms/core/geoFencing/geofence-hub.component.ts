@@ -120,8 +120,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
                   <div class="grid-wrapper w-full flex-grow-1 border-radius-lg border-1 border-solid border-primary overflow-hidden shadow-sm" style="min-height: 500px;">
                     <app-ag-share-grid 
                       [columns]="geofenceColumns" 
-                      [data]="geofences()" 
-                      [showActions]="false"
+                      [data]="geofences()"
                       (gridEvent)="onGeofenceGridEvent($event)">
                     </app-ag-share-grid>
                   </div>
@@ -145,8 +144,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
                   <div class="grid-wrapper w-full flex-grow-1 border-radius-lg border-1 border-solid border-error overflow-hidden shadow-sm" style="min-height: 500px;">
                     <app-ag-share-grid 
                       [columns]="violationColumns" 
-                      [data]="violations()" 
-                      [showActions]="false"
+                      [data]="violations()"
                       (gridEvent)="onViolationGridEvent($event)">
                     </app-ag-share-grid>
                   </div>

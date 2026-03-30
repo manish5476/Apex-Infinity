@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GridApi } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 
@@ -9,13 +9,14 @@ import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { Toast } from "primeng/toast";
-import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
+import { AgShareGrid, ActionColumnConfig } from "../../../shared/components/ag-shared-grid";
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { PaymentService } from '../../services/payment-service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
-import { ActionViewRenderer } from '../../../shared/AgGrid/AgGridcomponents/DynamicDetailCard/ActionViewRenderer';
 import { finalize } from 'rxjs';
+import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
+import { PERMISSIONS } from '@core/auth/permissions.constants';
 
 @Component({
   selector: 'app-payment-list',
@@ -28,12 +29,22 @@ import { finalize } from 'rxjs';
     InputTextModule,
     RouterModule,
     Toast,
-    AgShareGrid
+    AgShareGrid,
+    HasPermissionDirective
   ],
   templateUrl: './payment-list.html',
   styleUrl: './payment-list.scss',
 })
 export class PaymentListComponent implements OnInit {
+  readonly PERMISSIONS = PERMISSIONS;
+
+  readonly paymentActionColumn: ActionColumnConfig = {
+    showView: true,
+    showEdit: false,
+    showDelete: false,
+    viewPermission: PERMISSIONS.PAYMENT.READ,
+  };
+
   private cdr = inject(ChangeDetectorRef);
   private paymentService = inject(PaymentService);
   private messageService = inject(AppMessageService);
@@ -162,11 +173,11 @@ getData(isReset: boolean = false) {
     }
   }
 
-  onGridReady(params: GridReadyEvent) {
-    this.gridApi = params.api;
-  }
-
   eventFromGrid(event: any) {
+    if (event.type === 'init') {
+      this.gridApi = event.api;
+      return;
+    }
     if (event.type === 'cellClicked') {
       const paymentId = event.row._id;
       if (paymentId) {
@@ -180,14 +191,6 @@ getData(isReset: boolean = false) {
 
   getColumn(): void {
   this.column = [
-    {
-      headerName: 'Actions',
-      field: '_id',
-      width: 80,
-      pinned: 'left',
-      cellRenderer: ActionViewRenderer,
-      cellClass: 'compact-cell'
-    },
     {
       field: 'paymentDate',
       headerName: 'Date',

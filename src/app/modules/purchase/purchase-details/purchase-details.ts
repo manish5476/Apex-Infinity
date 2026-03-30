@@ -19,20 +19,22 @@ import { AgShareGrid } from "../../shared/components/ag-shared-grid";
 // Services
 import { AppMessageService } from '../../../core/services/message.service';
 import { PurchaseService } from '../purchase.service';
-import { ActionViewRenderer } from '../../shared/AgGrid/AgGridcomponents/DynamicDetailCard/ActionViewRenderer';
 import { FileUpload } from "primeng/fileupload";
 import { ImageViewerDirective } from '../../shared/directives/image-viewer.directive';
 import { Badge } from "primeng/badge";
 import { forkJoin } from 'rxjs';
+import { HasPermissionDirective } from '../../../core/auth/directives/has-permission.directive';
+import { PERMISSIONS } from '../../../core/auth/permissions.constants';
 
 @Component({
   selector: 'app-purchase-details',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, CurrencyPipe, TitleCasePipe, TabsModule, ButtonModule, TagModule, DividerModule, DialogModule, InputNumberModule, DatePicker, FormsModule, Select, InputTextModule, Toast, AgShareGrid, FileUpload, ImageViewerDirective, Badge],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, CurrencyPipe, TitleCasePipe, TabsModule, ButtonModule, TagModule, DividerModule, DialogModule, InputNumberModule, DatePicker, FormsModule, Select, InputTextModule, Toast, AgShareGrid, FileUpload, ImageViewerDirective, Badge, HasPermissionDirective],
   templateUrl: './purchase-details.html',
   styleUrl: './purchase-details.scss',
 })
 export class PurchaseDetailsComponent implements OnInit {
+  readonly PERMISSIONS = PERMISSIONS;
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private fb = inject(FormBuilder);
@@ -252,7 +254,7 @@ export class PurchaseDetailsComponent implements OnInit {
     }
 
     this.isLoading.set(true);
-    forkJoin({purchase: this.purchaseService.getPurchaseById(this.purchaseId),payments: this.purchaseService.getPaymentHistory(this.purchaseId)    })
+    forkJoin({ purchase: this.purchaseService.getPurchaseById(this.purchaseId), payments: this.purchaseService.getPaymentHistory(this.purchaseId) })
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: (res: any) => {

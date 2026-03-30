@@ -10,8 +10,8 @@
         <p class="list-subtitle">Manage inventory, prices, and product details.</p>
       </div>
     </div>
-    <p-button label="New Product" icon="pi pi-plus" routerLink="create" styleClass="p-button-primary"></p-button>
-    <p-button [label]="selectedRows && selectedRows.length>0?'Edit Product': 'New Product'"
+    <p-button *hasPermission="PERMISSIONS.PRODUCT.CREATE" label="New Product" icon="pi pi-plus" routerLink="create" styleClass="p-button-primary"></p-button>
+    <p-button *hasPermission="[PERMISSIONS.PRODUCT.CREATE, PERMISSIONS.PRODUCT.UPDATE]" [label]="selectedRows && selectedRows.length>0?'Edit Product': 'New Product'"
       (onClick)="bulkDialogVisible=true" styleClass="p-button-primary"> </p-button>
   </div>
 
@@ -57,7 +57,7 @@
   </div>
 
   <div class="list-grid-area themed-card">
-    <app-ag-share-grid [columns]="column" [data]="data" [showActions]="false" selectionMode="multiple"
+    <app-ag-share-grid [columns]="column" [data]="data" selectionMode="multiple"
       (gridEvent)="eventFromGrid($event)" style="height: 100%; width: 100%; display: block;">
     </app-ag-share-grid>
   </div>

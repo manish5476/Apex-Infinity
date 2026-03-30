@@ -187,7 +187,6 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
           <app-ag-share-grid
             [columns]="agingColumns"
             [data]="financialData()?.receivables?.aging || []"
-            [showActions]="false"
             class="fill-grid">
           </app-ag-share-grid>
         </div>
@@ -916,7 +915,7 @@ export class FinancialDashboardComponent implements OnInit {
 //                   <h4 class="card-subtitle">Receivables Aging Report</h4>
 //                </div>
 //                <div class="grid-container">
-//                   <app-ag-share-grid [columns]="agingColumns" [data]="financialData()?.receivables?.aging || []" [showActions]="false" class="full-size-grid"></app-ag-share-grid>
+//                   <app-ag-share-grid [columns]="agingColumns" [data]="financialData()?.receivables?.aging || []" class="full-size-grid"></app-ag-share-grid>
 //                </div>
 //             </div>
 //           </div>

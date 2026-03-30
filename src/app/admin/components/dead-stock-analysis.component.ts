@@ -60,7 +60,7 @@ interface DeadStockItem {
         </app-universal-filter>
       </div>
 
-      <ng-container *ngIf="!loading(); else loader">
+      @if (!loading()) {
         
         <div class="kpi-grid">
           
@@ -82,7 +82,9 @@ interface DeadStockItem {
             <h3 class="risk-name" [title]="deadStock()[0]?.name">{{ deadStock()[0]?.name || '--' }}</h3>
             <div class="risk-footer">
                <span class="risk-value">{{ commonService.formatCurrency(deadStock()[0]?.value) }}</span>
-               <span class="badge critical" *ngIf="deadStock().length">Priority</span>
+               @if (deadStock().length) {
+                 <span class="badge critical">Priority</span>
+               }
             </div>
           </div>
         </div>
@@ -97,7 +99,6 @@ interface DeadStockItem {
              <app-ag-share-grid 
                [columns]="stockColumns" 
                [data]="deadStock()" 
-               [showActions]="false" 
                class="full-size-grid">
              </app-ag-share-grid>
           </div>
@@ -114,14 +115,12 @@ interface DeadStockItem {
           </div>
         </div>
 
-      </ng-container>
-
-      <ng-template #loader>
+      } @else {
         <div class="loader-container">
           <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-12 h-12"></p-progressSpinner>
           <p class="loader-text">Analyzing Inventory Aging...</p>
         </div>
-      </ng-template>
+      }
 
     </div>
   `,

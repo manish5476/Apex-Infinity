@@ -7,7 +7,7 @@
       <i class="pi pi-building text-[var(--accent-primary)]"></i>
       Branch Management
     </h2>
-    <p-button label="New Branch" icon="pi pi-plus" routerLink="create">
+    <p-button *hasPermission="PERMISSIONS.BRANCH.MANAGE" label="New Branch" icon="pi pi-plus" routerLink="create">
     </p-button>
   </div>
   <div class="themed-card">
@@ -29,7 +29,7 @@
     </div>
   </div>
   <div class="themed-card list-grid-area">
-    <app-ag-share-grid [columns]="column" [data]="data" [showActions]="false" selectionMode="multiple"
+    <app-ag-share-grid [columns]="column" [data]="data" selectionMode="multiple"
       (gridEvent)="eventFromGrid($event)" style="height: 210px; width: 100%; display: block;">
     </app-ag-share-grid>
 

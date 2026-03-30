@@ -8,12 +8,14 @@
        [class.full]="cfg().containerWidth === 'full'">
 
     <!-- Header Section -->
-    <div class="header-group" *ngIf="cfg().title">
+    @if (cfg().title) {
+    <div class="header-group">
       <h3 class="section-label">
         {{ cfg().title }}
       </h3>
       <div class="divider-line"></div>
     </div>
+    }
 
     <!-- Logo Grid -->
     <div class="logo-grid" 
@@ -22,8 +24,7 @@
          [class.gap-lg]="cfg().gap === 'lg'">
       
       @for (logo of cfg().logos; track logo.id || logo.name) {
-        
-        <ng-container *ngIf="logo.url; else staticLogo">
+        @if (logo.url) {
           <a [attr.href]="isExternal(logo.url) ? logo.url : null"
              [routerLink]="!isExternal(logo.url) ? getLink(logo.url) : null"
              [target]="isExternal(logo.url) ? '_blank' : '_self'"
@@ -33,14 +34,11 @@
              
              <img [src]="logo.image" [alt]="logo.name" loading="lazy">
           </a>
-        </ng-container>
-
-        <ng-template #staticLogo>
+        } @else {
           <div class="logo-item" [ngStyle]="logoItemStyle()">
             <img [src]="logo.image" [alt]="logo.name" loading="lazy">
           </div>
-        </ng-template>
-
+        }
       }
 
     </div>

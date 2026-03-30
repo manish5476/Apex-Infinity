@@ -7,7 +7,7 @@
       <i class="pi pi-chart-line text-[var(--accent-primary)]"></i>
       Sales Register
     </h2>
-    <p-button label="New Sale" icon="pi pi-plus" (onClick)="onCreateSales()">
+    <p-button *hasPermission="PERMISSIONS.SALES.MANAGE" label="New Sale" icon="pi pi-plus" (onClick)="onCreateSales()">
     </p-button>
   </div>
 
@@ -51,7 +51,6 @@
     <app-ag-share-grid 
       [columns]="column" 
       [data]="data" 
-      [showActions]="false" 
       selectionMode="multiple"
       (gridEvent)="eventFromGrid($event)" 
       class="full-size-grid">
@@ -69,7 +68,7 @@
       <i class="pi pi-chart-line text-[var(--accent-primary)]"></i>
       Sales Register
     </h2>
-    <p-button label="New Sale" icon="pi pi-plus" (onClick)="onCreateSales()">
+    <p-button *hasPermission="PERMISSIONS.SALES.MANAGE" label="New Sale" icon="pi pi-plus" (onClick)="onCreateSales()">
     </p-button>
   </div>
 
@@ -109,7 +108,6 @@
     <app-ag-share-grid 
       [columns]="column" 
       [data]="data" 
-      [showActions]="false" 
       selectionMode="multiple"
       (gridEvent)="eventFromGrid($event)" 
       style="height: 100%; width: 100%; display: block;">

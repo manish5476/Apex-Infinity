@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GridApi } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 
@@ -11,18 +11,29 @@ import { InputTextModule } from 'primeng/inputtext';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { SupplierService } from '../../services/supplier-service';
 import { Toast } from "primeng/toast";
-import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
-import { ActionViewRenderer } from '../../../shared/AgGrid/AgGridcomponents/DynamicDetailCard/ActionViewRenderer';
+import { AgShareGrid, ActionColumnConfig } from "../../../shared/components/ag-shared-grid";
+import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
+import { PERMISSIONS } from '@core/auth/permissions.constants';
 
 @Component({
   selector: 'app-supplier-list',
   standalone: true,
-  imports: [CommonModule,SelectModule,FormsModule,ButtonModule,InputTextModule,RouterModule,Toast,AgShareGrid
+  imports: [CommonModule,SelectModule,FormsModule,ButtonModule,InputTextModule,RouterModule,Toast,AgShareGrid,
+    HasPermissionDirective
   ],
   templateUrl: './supplier-list.html',
   styleUrl: './supplier-list.scss',
 })
 export class SupplierListComponent implements OnInit {
+  readonly PERMISSIONS = PERMISSIONS;
+
+  readonly supplierActionColumn: ActionColumnConfig = {
+    showView: true,
+    showEdit: false,
+    showDelete: false,
+    viewPermission: PERMISSIONS.SUPPLIER.READ,
+  };
+
   // --- Injected Services ---
   private cdr = inject(ChangeDetectorRef);
   private supplierService = inject(SupplierService);
@@ -136,11 +147,11 @@ getData(isReset: boolean = false) {
     }
   }
 
-  onGridReady(params: GridReadyEvent) {
-    this.gridApi = params.api;
-  }
-
    eventFromGrid(event: any) {
+    if (event.type === 'init') {
+      this.gridApi = event.api;
+      return;
+    }
     if (event.type=== 'cellClicked') {
       const supplierId = event.row._id;
       if (supplierId) {
@@ -332,22 +343,6 @@ getData(isReset: boolean = false) {
       width: 110,
       valueFormatter: (p: any) => p.value ? new Date(p.value).toLocaleDateString() : '—',
       cellStyle: { ...compactCell, color: 'var(--text-label)' }
-    },
-
-    // ========================
-    // 8. ACTIONS
-    // ========================
-    {
-      headerName: '',
-      field: '_id',
-      width: 80,
-      pinned: 'right',
-      sortable: false,
-      filter: false,
-      cellRenderer: ActionViewRenderer,
-      cellRendererParams: {
-        onClick: (id: string) => this.router.navigate([id], { relativeTo: this.route })
-      }
     }
   ];
 

@@ -9,7 +9,7 @@
       <i class="pi pi-truck text-[var(--accent-primary)]"></i>
       Supplier Management
     </h2>
-    <p-button label="New Supplier" icon="pi pi-plus" routerLink="create">
+    <p-button *hasPermission="PERMISSIONS.SUPPLIER.CREATE" label="New Supplier" icon="pi pi-plus" routerLink="create">
     </p-button>
   </div>
 
@@ -42,7 +42,7 @@
 
   <!-- GRID AREA -->
   <div class="list-grid-wrapper">
-    <app-ag-share-grid [columns]="column" [data]="data" [showActions]="false" selectionMode="multiple"
+    <app-ag-share-grid [columns]="column" [data]="data" [actionColumn]="supplierActionColumn" selectionMode="multiple"
       (gridEvent)="eventFromGrid($event)" style="height: 100%; width: 100%; display: block;">
     </app-ag-share-grid>
   </div>

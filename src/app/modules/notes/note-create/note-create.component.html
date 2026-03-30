@@ -201,8 +201,12 @@
       <!-- Submit -->
       <div class="sidebar-footer">
         <button type="submit" class="btn-primary" [disabled]="noteForm.invalid || isSubmitting() || isUploading()">
-          <i class="pi pi-check" *ngIf="!isSubmitting()"></i>
-          <i class="pi pi-spin pi-spinner" *ngIf="isSubmitting()"></i>
+          @if (!isSubmitting()) {
+          <i class="pi pi-check"></i>
+          }
+          @if (isSubmitting()) {
+          <i class="pi pi-spin pi-spinner"></i>
+          }
           {{ isSubmitting() ? 'Saving...' : (isTemplateMode() ? 'Save Template' : 'Create Note') }}
         </button>
       </div>
@@ -426,8 +430,12 @@
           Footer Actions
           <div class="sidebar-footer">
             <button type="submit" class="btn-primary" [disabled]="noteForm.invalid || isSubmitting() || isUploading()">
-              <i class="pi pi-check" *ngIf="!isSubmitting()"></i>
-              <i class="pi pi-spin pi-spinner" *ngIf="isSubmitting()"></i>
+              @if (!isSubmitting()) {
+              <i class="pi pi-check"></i>
+              }
+              @if (isSubmitting()) {
+              <i class="pi pi-spin pi-spinner"></i>
+              }
               {{ isSubmitting() ? 'Saving...' : (isTemplateMode() ? 'Save Template' : 'Create Note') }}
             </button>
           </div>

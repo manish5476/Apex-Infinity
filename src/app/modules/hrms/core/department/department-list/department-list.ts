@@ -2,13 +2,13 @@ import { ChangeDetectorRef, Component, OnInit, effect, inject, signal, ChangeDet
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { finalize } from 'rxjs/operators';
 
 import { MasterListService } from '../../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../../core/services/message.service';
 import { HRMSService } from '../../../hrms.service';
-import { AgShareGrid } from '../../../../shared/components/ag-shared-grid';
+import { AgShareGrid, ActionColumnConfig } from '../../../../shared/components/ag-shared-grid';
+import { PERMISSIONS } from '../../../../../core/auth/permissions.constants';
 
 @Component({
   selector: 'app-department-list',
@@ -86,10 +86,9 @@ import { AgShareGrid } from '../../../../shared/components/ag-shared-grid';
           <app-ag-share-grid 
             [columns]="column" 
             [data]="data" 
-            [showActions]="true" 
+            [actionColumn]="departmentActionColumn"
             selectionMode="single"
-            (gridEvent)="eventFromGrid($event)"
-            (gridReady)="onGridReady($event)">
+            (gridEvent)="eventFromGrid($event)">
           </app-ag-share-grid>
         </div>
 
@@ -235,7 +234,6 @@ export class DepartmentListComponent implements OnInit {
   private router = inject(Router);
   public masterList = inject(MasterListService);
 
-  private gridApi!: GridApi;
   data: any[] = [];
   column: any[] = [];
   totalCount = 0;
@@ -245,6 +243,14 @@ export class DepartmentListComponent implements OnInit {
   branchOptions = signal<any[]>([]);
   
   deptFilter = { search: '', branchId: null, isActive: null };
+
+  readonly departmentActionColumn: ActionColumnConfig = {
+    showView: true,
+    showEdit: true,
+    showDelete: false,
+    viewPermission: PERMISSIONS.DEPARTMENT.READ,
+    editPermission: PERMISSIONS.DEPARTMENT.MANAGE,
+  };
 
   constructor() {
     effect(() => this.branchOptions.set(this.masterList.branches()));
@@ -365,14 +371,19 @@ export class DepartmentListComponent implements OnInit {
   resetFilters() { this.deptFilter = { search: '', branchId: null, isActive: null }; this.getData(true); }
   createNew() { this.router.navigate(['/hrms/department/new']); }
 
-  onGridReady(params: any) {
-    this.gridApi = params.api;
-  }
-
   eventFromGrid(event: any) {
     const id = event?.row?._id;
-    if (event.type === 'cellClicked') this.router.navigate(['/hrms/department/details', id]);
-    if (event.type === 'reachedBottom') this.getData(false);
+    switch (event.type) {
+      case 'cellClicked':
+        this.router.navigate(['/hrms/department/details', id]);
+        break;
+      case 'editStart':
+        this.router.navigate(['/hrms/department/edit', id]);
+        break;
+      case 'reachedBottom':
+        this.getData(false);
+        break;
+    }
   }
 }
 // import { ChangeDetectorRef, Component, OnInit, effect, inject, signal, ChangeDetectionStrategy } from '@angular/core';

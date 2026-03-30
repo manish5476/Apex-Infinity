@@ -86,8 +86,8 @@
 
       <!-- ── LEFT PANEL: Layers + Config ── -->
       <ng-template pTemplate>
-        <div class="h-full w-full flex flex-col bg-white border-r border-surface-200 z-10 overflow-hidden"
-          *ngIf="viewMode() === 'sidebar'; else emptySidebar">
+        @if (viewMode() === 'sidebar') {
+        <div class="h-full w-full flex flex-col bg-white border-r border-surface-200 z-10 overflow-hidden">
 
           <p-splitter layout="vertical" styleClass="h-full border-none"
             [panelSizes]="sidebarState() === 'full' ? [0, 100] : [40, 60]" [minSizes]="[10, 10]"
@@ -153,8 +153,8 @@
 
             <!-- Config panel -->
             <ng-template pTemplate>
-              <div class="h-full w-full flex flex-col bg-white overflow-hidden"
-                *ngIf="selectedSection(); else noSelection">
+              @if (selectedSection()) {
+              <div class="h-full w-full flex flex-col bg-white overflow-hidden">
 
                 <div class="config-header shrink-0">
                   <div class="flex items-center gap-2">
@@ -187,8 +187,7 @@
                 </div>
 
               </div>
-
-              <ng-template #noSelection>
+              } @else {
                 <div class="h-full flex flex-col items-center justify-center text-surface-300 bg-surface-50/40 gap-3">
                   <div
                     class="w-14 h-14 rounded-2xl bg-surface-100 border border-surface-200 flex items-center justify-center">
@@ -198,17 +197,16 @@
                     Select a layer to configure
                   </span>
                 </div>
-              </ng-template>
+              }
             </ng-template>
 
           </p-splitter>
         </div>
-
-        <ng-template #emptySidebar>
+        } @else {
           <div class="h-full w-full bg-surface-50 flex items-center justify-center">
             <span class="text-surface-300 text-xs italic">Sidebar docked</span>
           </div>
-        </ng-template>
+        }
       </ng-template>
 
       <!-- ══════════════════════════════════════════════════════════════════
@@ -349,9 +347,10 @@
                       [class.z-20]="selectedSection()?.id === section.id" (click)="selectSection(section)">
 
                       <!-- Hover overlay -->
+                      @if (selectedSection()?.id !== section.id) {
                       <div
-                        class="absolute inset-0 bg-primary-500/[0.03] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                        *ngIf="selectedSection()?.id !== section.id"></div>
+                        class="absolute inset-0 bg-primary-500/[0.03] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-10"></div>
+                      }
 
                       <!-- Section type label -->
                       <div

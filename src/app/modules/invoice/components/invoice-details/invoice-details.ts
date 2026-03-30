@@ -25,6 +25,8 @@ import { InvoiceService } from '../../services/invoice-service';
 import { EmiService } from '../../../emi/services/emi-service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
+import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
+import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 
 @Component({
   selector: 'app-invoice-details',
@@ -34,7 +36,7 @@ import { CommonMethodService } from '../../../../core/utils/common-method.servic
     ButtonModule, TagModule, ConfirmDialogModule, TooltipModule,
     TableModule, ToastModule, SkeletonModule, DialogModule,
     InputNumberModule, InputTextModule, SelectModule, TextareaModule,
-    CheckboxModule
+    CheckboxModule, HasPermissionDirective
   ],
   providers: [ConfirmationService],
   templateUrl: './invoice-details.html',
@@ -49,6 +51,8 @@ export class InvoiceDetailsComponent implements OnInit {
   private confirmService = inject(ConfirmationService);
   private messageService = inject(AppMessageService);
   public common = inject(CommonMethodService);
+
+  PERMISSIONS = PERMISSIONS;
 
   // === Signals ===
   invoice = signal<any | null>(null);

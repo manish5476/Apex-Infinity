@@ -2,9 +2,9 @@ import { ChangeDetectorRef, Component, OnInit, inject, ChangeDetectionStrategy }
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { AppMessageService } from '../../../../core/services/message.service';
-import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
+import { AgShareGrid, ActionColumnConfig } from '../../../shared/components/ag-shared-grid';
+import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 import { HRMSService } from '../../hrms.service';
 
 
@@ -66,7 +66,7 @@ import { HRMSService } from '../../hrms.service';
           <app-ag-share-grid 
             [columns]="column" 
             [data]="data" 
-            [showActions]="true" 
+            [actionColumn]="machineActionColumn"
             selectionMode="single"
             (gridEvent)="eventFromGrid($event)">
           </app-ag-share-grid>
@@ -112,6 +112,15 @@ export class MachineListComponent implements OnInit {
   
   filter = { search: '', connectionStatus: null, status: null };
   isLoading = false;
+
+  readonly machineActionColumn: ActionColumnConfig = {
+    showView: true,
+    showEdit: true,
+    showDelete: true,
+    viewPermission: PERMISSIONS.ATTENDANCE.MACHINE_READ,
+    editPermission: PERMISSIONS.ATTENDANCE.MACHINE_MANAGE,
+    deletePermission: PERMISSIONS.ATTENDANCE.MACHINE_MANAGE,
+  };
 
   ngOnInit() {
     this.setupColumns();

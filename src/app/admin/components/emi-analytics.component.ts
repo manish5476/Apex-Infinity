@@ -116,7 +116,6 @@ interface EMIData {
           <app-ag-share-grid
             [columns]="emiColumns"
             [data]="emiRawData()"
-            [showActions]="false"
             class="fill-grid">
           </app-ag-share-grid>
         </div>
@@ -767,7 +766,7 @@ export class EmiAnalyticsComponent implements OnInit {
 //                   <app-ag-share-grid 
 //                     [columns]="emiColumns" 
 //                     [data]="emiRawData()" 
-//                     [showActions]="false" 
+// 
 //                     class="full-size-grid">
 //                   </app-ag-share-grid>
 //                </div>

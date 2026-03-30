@@ -20,13 +20,17 @@
       <button class="nav-item" [class.active]="activeFilter() === 'upcoming'" (click)="setFilter('upcoming')">
         <i class="pi pi-calendar"></i>
         <span>Upcoming</span>
-        <span class="badge" *ngIf="counts().upcoming > 0">{{ counts().upcoming }}</span>
+        @if (counts().upcoming > 0) {
+        <span class="badge">{{ counts().upcoming }}</span>
+        }
       </button>
 
       <button class="nav-item" [class.active]="activeFilter() === 'pending'" (click)="setFilter('pending')">
         <i class="pi pi-question-circle"></i>
         <span>Pending RSVP</span>
-        <span class="badge warning" *ngIf="counts().pending > 0">{{ counts().pending }}</span>
+        @if (counts().pending > 0) {
+        <span class="badge warning">{{ counts().pending }}</span>
+        }
       </button>
 
       <button class="nav-item" [class.active]="activeFilter() === 'past'" (click)="setFilter('past')">

@@ -1,7 +1,7 @@
 
 import { ChangeDetectorRef, Component, OnInit, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GridApi, GridReadyEvent, ITooltipParams } from 'ag-grid-community';
+import { GridApi, ITooltipParams } from 'ag-grid-community';
 import { ITooltipAngularComp } from 'ag-grid-angular';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
@@ -19,8 +19,9 @@ import { MasterListService } from '../../../../core/services/master-list.service
 import { AppMessageService } from '../../../../core/services/message.service';
 import { InvoiceService } from '../../services/invoice-service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
-import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
-import { ActionViewRenderer } from '../../../shared/AgGrid/AgGridcomponents/DynamicDetailCard/ActionViewRenderer';
+import { AgShareGrid, ActionColumnConfig } from "../../../shared/components/ag-shared-grid";
+import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
+import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 
 // -------------------------------------------------------------------------
 // 2. Main Invoice List Component
@@ -37,7 +38,8 @@ import { ActionViewRenderer } from '../../../shared/AgGrid/AgGridcomponents/Dyna
     RouterModule,
     ToastModule,
     DatePickerModule,
-    AgShareGrid
+    AgShareGrid,
+    HasPermissionDirective
   ],
   templateUrl: './invoice-list.html',
   styleUrl: './invoice-list.scss',
@@ -50,6 +52,15 @@ export class InvoiceListComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private common = inject(CommonMethodService);
+
+  PERMISSIONS = PERMISSIONS;
+
+  readonly invoiceActionColumn: ActionColumnConfig = {
+    showView: true,
+    showEdit: false,
+    showDelete: false,
+    viewPermission: PERMISSIONS.INVOICE.READ,
+  };
 
   private gridApi!: GridApi;
 
@@ -123,19 +134,14 @@ export class InvoiceListComponent implements OnInit {
     }
   }
 
-  onGridReady(params: GridReadyEvent) {
-    this.gridApi = params.api;
-  }
-
   eventFromGrid(event: any) {
-    console.log(event);
+    if (event.type === 'init') {
+      this.gridApi = event.api;
+      return;
+    }
     if (event.type === 'cellClicked') {
       const invoiceId = event.row._id;
-      if (event.field === '_id') {
-
-      } else {
-        this.router.navigate([invoiceId], { relativeTo: this.route });
-      }
+      this.router.navigate([invoiceId], { relativeTo: this.route });
     }
     if (event.type === 'reachedBottom') {
       this.onScrolledToBottom(event)
@@ -287,14 +293,6 @@ export class InvoiceListComponent implements OnInit {
           }
         ]
       },
-
-
-      {
-        headerName: 'Actions',
-        field: '_id',
-        width: 50,
-        cellRenderer: ActionViewRenderer,
-      }
     ];
     this.cdr.detectChanges();
   }

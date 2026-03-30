@@ -46,7 +46,7 @@ import { FilterField } from '../../modules/shared/components/universal-filter/fi
           <p-button icon="pi pi-sync" [text]="true" [rounded]="true" severity="secondary" size="small" (onClick)="loadRadar()" [loading]="loading()"></p-button>
         </div>
 
-        <ng-container *ngIf="!loading(); else loader">
+        @if (!loading()) {
           
           <div class="content-grid">
             
@@ -88,14 +88,12 @@ import { FilterField } from '../../modules/shared/components/universal-filter/fi
             </div>
           </div>
 
-        </ng-container>
-
-        <ng-template #loader>
+        } @else {
           <div class="loader-container">
             <p-progressSpinner strokeWidth="4" animationDuration=".8s" styleClass="w-10 h-10"></p-progressSpinner>
             <p class="loader-text">Calibrating Performance Matrix...</p>
           </div>
-        </ng-template>
+        }
 
       </div>
     </div>

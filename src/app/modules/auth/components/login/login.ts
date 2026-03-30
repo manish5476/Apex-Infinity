@@ -47,10 +47,10 @@ export class LoginComponent implements OnInit {
   emailDomains = ['gmail.com', 'outlook.com', 'proton.me', 'protonmail.me', 'yahoo.com', 'icloud.com', 'hotmail.com'];
 
   loginForm!: FormGroup;
-  returnUrl = '/dashboard';
+  returnUrl = '/notes';
 
   ngOnInit(): void {
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/notes';
     this.initForm();
   }
 

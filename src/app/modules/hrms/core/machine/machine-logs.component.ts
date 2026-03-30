@@ -40,7 +40,6 @@ import { HRMSService } from '../../hrms.service';
           <app-ag-share-grid 
             [columns]="column" 
             [data]="data" 
-            [showActions]="false" 
             selectionMode="single">
           </app-ag-share-grid>
         </div>

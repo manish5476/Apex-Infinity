@@ -12,18 +12,22 @@ import { DynamicDialogServices } from '../../../core/services/dynamic-dialog-ser
 import { NoteService } from '../../../core/services/notes.service';
 import { RecentActivityComponent } from '../recent-activity/recent-activity.component';
 import { AppMessageService } from "../../../core/services/message.service";
+import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
+import { PERMISSIONS } from '@core/auth/permissions.constants';
 
 type FilterType = 'all' | 'favorites' | 'shared' | 'shared-by-me' | 'recent' | 'archived' | 'trash' | 'calendar';
 
 @Component({
   selector: 'app-note-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, NoteCardComponent, SharedNoteCardComponent, RecentActivityComponent, CalendarViewComponent],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, NoteCardComponent, SharedNoteCardComponent, RecentActivityComponent, CalendarViewComponent, HasPermissionDirective],
   encapsulation: ViewEncapsulation.None,
   templateUrl: './note-list.component.html',
   styleUrl: './note-list.component.scss'
 })
 export class NoteListComponent {
+  readonly PERMISSIONS = PERMISSIONS;
+
   private notesService = inject(NoteService);
   private messageService = inject(AppMessageService);
   private dialogServices = inject(DynamicDialogServices);

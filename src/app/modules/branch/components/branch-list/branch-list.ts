@@ -12,6 +12,8 @@ import { AppMessageService } from '../../../../core/services/message.service';
 import { BranchService } from '../../services/branch-service';
 import { Toast } from "primeng/toast";
 import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
+import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
+import { PERMISSIONS } from '@core/auth/permissions.constants';
 
 @Component({
   selector: 'app-branch-list',
@@ -24,12 +26,15 @@ import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
     InputTextModule,
     RouterModule,
     Toast,
-    AgShareGrid
+    AgShareGrid,
+    HasPermissionDirective
   ],
   templateUrl: './branch-list.html',
   styleUrl: './branch-list.scss',
 })
 export class BranchListComponent implements OnInit {
+  readonly PERMISSIONS = PERMISSIONS;
+
   private cdr = inject(ChangeDetectorRef);
   private branchService = inject(BranchService);
   private messageService = inject(AppMessageService);

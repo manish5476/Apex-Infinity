@@ -7,22 +7,32 @@ import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
 import { AutoCompleteModule } from 'primeng/autocomplete';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GridApi } from 'ag-grid-community';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { EmiService } from '../../services/emi-service';
-import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
-import { ActionViewRenderer } from '../../../shared/AgGrid/AgGridcomponents/DynamicDetailCard/ActionViewRenderer';
+import { AgShareGrid, ActionColumnConfig } from "../../../shared/components/ag-shared-grid";
+import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
+import { PERMISSIONS } from '@core/auth/permissions.constants';
 
 @Component({
   selector: 'app-emi-list',
   standalone: true,
-  imports: [CommonModule,FormsModule,RouterModule,SelectModule,AutoCompleteModule,ButtonModule,InputTextModule,ToastModule,AgShareGrid  ],
+  imports: [CommonModule,FormsModule,RouterModule,SelectModule,AutoCompleteModule,ButtonModule,InputTextModule,ToastModule,AgShareGrid, HasPermissionDirective],
   providers: [EmiService],
   templateUrl: './emi-list.html',
   styleUrl: './emi-list.scss',
 })
 export class EmiList implements OnInit {
+  readonly PERMISSIONS = PERMISSIONS;
+
+  readonly emiActionColumn: ActionColumnConfig = {
+    showView: true,
+    showEdit: false,
+    showDelete: false,
+    viewPermission: PERMISSIONS.EMI.READ,
+  };
+
   private cdr = inject(ChangeDetectorRef);
   private emiService = inject(EmiService);
   private messageService = inject(AppMessageService);
@@ -78,11 +88,11 @@ export class EmiList implements OnInit {
     }
   }
 
-  onGridReady(params: GridReadyEvent) {
-    this.gridApi = params.api;
-  }
-
   eventFromGrid(event: any) {
+    if (event.type === 'init') {
+      this.gridApi = event.api;
+      return;
+    }
     if (event.type === 'cellClicked') {
       const emiId = event.row._id;
       if (emiId) {
@@ -182,15 +192,6 @@ getData(isReset: boolean = false) {
 
   getColumn(): void {
     this.column = [
-
-      // ================= ACTIONS =================
-      {
-        headerName: 'Actions',
-        field: '_id',
-        width: 30,
-        pinned: 'left',
-        cellRenderer: ActionViewRenderer
-      },
 
       // ================= ROW INDEX =================
       {

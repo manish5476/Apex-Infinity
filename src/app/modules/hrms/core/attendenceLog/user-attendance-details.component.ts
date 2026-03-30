@@ -67,8 +67,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
           <div class="grid-wrapper w-full flex-grow-1" style="min-height: 600px;">
             <app-ag-share-grid 
               [columns]="columns" 
-              [data]="userLogs()" 
-              [showActions]="false"
+              [data]="userLogs()"
               (gridEvent)="onGridEvent($event)">
             </app-ag-share-grid>
           </div>

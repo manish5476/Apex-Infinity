@@ -7,40 +7,59 @@ import { ProfitSummaryComponent } from './analytics/invoice-analytics/invoice-pr
 import { ProfitDashboardComponent } from './analytics/invoice-analytics/invoice-analyticsDashboard';
 import { AdvancedProfitAnalysisComponent } from './analytics/invoice-analytics/advanceInvoiceDetails';
 import { PosInvoiceComponent } from './components/pos-invoice/pos-invoice.component';
+import { permissionGuard } from '@core/auth/guards/permission.guard';
+import { PERMISSIONS } from '@core/auth/permissions.constants';
+
 // These routes will be lazy-loaded under a '/invoices' path (defined in app.routes.ts)
 export const INVOICE_ROUTES: Routes = [
   {
     path: 'PosInvoiceComponent',
     component: PosInvoiceComponent,
+    canActivate: [permissionGuard],
+    data: { permissions: [PERMISSIONS.INVOICE.CREATE] }
   },
   {
     path: 'ProfitSummaryComponent',
     component: ProfitSummaryComponent,
+    canActivate: [permissionGuard],
+    data: { permissions: [PERMISSIONS.REPORT.PROFIT] }
   },
   {
     path: 'ProfitDashboardComponent',
     component: ProfitDashboardComponent,
+    canActivate: [permissionGuard],
+    data: { permissions: [PERMISSIONS.REPORT.PROFIT] }
   },
   {
     path: 'AdvancedProfitAnalysisComponent',
     component: AdvancedProfitAnalysisComponent,
+    canActivate: [permissionGuard],
+    data: { permissions: [PERMISSIONS.REPORT.PROFIT] }
   },
   {
     path: '',
     component: InvoiceListComponent,
+    canActivate: [permissionGuard],
+    data: { permissions: [PERMISSIONS.INVOICE.READ] }
   },
 
   {
     path: 'create',
     component: InvoiceFormComponent,
+    canActivate: [permissionGuard],
+    data: { permissions: [PERMISSIONS.INVOICE.CREATE] }
   },
   {
     path: ':id',
     component: InvoiceDetailsComponent,
+    canActivate: [permissionGuard],
+    data: { permissions: [PERMISSIONS.INVOICE.READ] }
   },
   {
     path: ':id/edit',
     component: InvoiceFormComponent,
+    canActivate: [permissionGuard],
+    data: { permissions: [PERMISSIONS.INVOICE.UPDATE] }
   },
 
 ];

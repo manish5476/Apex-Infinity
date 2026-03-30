@@ -1,0 +1,157 @@
+// excel-export.component.scss
+@use 'sass:color';
+
+// ── Design Tokens ─────────────────────────────────────────────────────────────
+$green:       #1d7a3b;
+$green-dark:  #155c2c;
+$green-light: #e8f5ec;
+$green-done:  #28a745;
+$text-muted:  #6c757d;
+$radius:      8px;
+$ease:        cubic-bezier(0.4, 0, 0.2, 1);
+$duration:    180ms;
+
+// ── Host ──────────────────────────────────────────────────────────────────────
+:host {
+  display: inline-block;
+}
+
+// ── Wrapper ───────────────────────────────────────────────────────────────────
+.excel-export-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+// ── Button ────────────────────────────────────────────────────────────────────
+.export-btn {
+  // Hard-reset browser + PrimeNG button defaults
+  all: unset;
+  cursor: pointer;
+  box-sizing: border-box;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 8px 16px 8px 12px;
+  border-radius: $radius;
+  border: 1.5px solid color.adjust($green, $lightness: -5%);
+  background: $green;
+  color: #fff;
+
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  white-space: nowrap;
+  user-select: none;
+
+  box-shadow: 0 2px 6px rgba($green-dark, 0.25);
+  transition:
+    background $duration $ease,
+    border-color $duration $ease,
+    box-shadow $duration $ease,
+    transform $duration $ease,
+    opacity $duration $ease;
+
+  // ── State: Done ─────────────────────────────────────────────────────────────
+  &.done {
+    background:   $green-done;
+    border-color: color.adjust($green-done, $lightness: -8%);
+    box-shadow:   0 2px 8px rgba($green-done, 0.35);
+  }
+
+  // ── State: Loading ──────────────────────────────────────────────────────────
+  &.loading {
+    cursor: default;
+  }
+
+  // ── State: Hover ────────────────────────────────────────────────────────────
+  &:hover:not(:disabled) {
+    background:  $green-dark;
+    border-color: color.adjust($green-dark, $lightness: -5%);
+    box-shadow:  0 4px 12px rgba($green-dark, 0.35);
+    transform:   translateY(-1px);
+  }
+
+  // ── State: Active ───────────────────────────────────────────────────────────
+  &:active:not(:disabled) {
+    transform:  translateY(0);
+    box-shadow: 0 1px 4px rgba($green-dark, 0.2);
+  }
+
+  // ── State: Disabled ─────────────────────────────────────────────────────────
+  &:disabled {
+    opacity:    0.52;
+    cursor:     not-allowed;
+    box-shadow: none;
+    transform:  none;
+  }
+
+  // ── Focus ring (keyboard a11y) ───────────────────────────────────────────────
+  &:focus-visible {
+    outline: 2px solid $green;
+    outline-offset: 3px;
+  }
+
+  // ── Icon ────────────────────────────────────────────────────────────────────
+  .btn-icon {
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    width:  18px;
+    height: 18px;
+    flex-shrink: 0;
+
+    svg {
+      width:  18px;
+      height: 18px;
+      display: block;
+    }
+
+    .spin {
+      animation: spin 0.75s linear infinite;
+    }
+  }
+
+  // ── Label ────────────────────────────────────────────────────────────────────
+  .btn-label {
+    min-width: 76px;    // prevents layout shift between states
+    text-align: left;
+  }
+
+  // ── Row-count badge ──────────────────────────────────────────────────────────
+  .row-badge {
+    display:         inline-flex;
+    align-items:     center;
+    justify-content: center;
+    min-width: 22px;
+    height:    18px;
+    padding:   0 5px;
+    border-radius: 9px;
+
+    background: rgba(#fff, 0.22);
+    border:     1px solid rgba(#fff, 0.30);
+
+    font-size:   11px;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1;
+  }
+}
+
+// ── Meta hint ─────────────────────────────────────────────────────────────────
+.meta-hint {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size:  11.5px;
+  color:      $text-muted;
+  white-space: nowrap;
+  user-select: none;
+}
+
+// ── Keyframes ─────────────────────────────────────────────────────────────────
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

@@ -1,8 +1,9 @@
-import { Component, inject, HostBinding, OnInit, HostListener, ViewChild, ElementRef, signal } from '@angular/core';
+import { Component, inject, HostBinding, OnInit, HostListener, ViewChild, ElementRef, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { LayoutService } from '../layout.service';
 import { AuthService } from './../../modules/auth/services/auth-service';
+import { PermissionService } from '@core/auth/services/permission.service';
 import { SIDEBAR_MENU, MenuItem } from './menu-items.constants';
 import { filter } from 'rxjs/operators';
 import { Dialog } from "primeng/dialog";
@@ -24,10 +25,47 @@ interface FlatMenuItem {
 export class Mainscreensidebar implements OnInit {
   layout = inject(LayoutService);
   authService = inject(AuthService);
+  permService = inject(PermissionService);
   router = inject(Router);
 
-  menuItems = SIDEBAR_MENU;
+  menuItems: MenuItem[] = [];
   expandedState: Record<string, boolean> = {};
+
+  constructor() {
+    // Re-evaluate sidebar menu entirely when user's permissions change
+    effect(() => {
+      // Just accessing the signal registers the dependency
+      this.permService.permissions();
+      this.filterMenu();
+      this.buildSearchIndex();
+      this.checkActiveRoutes();
+    });
+  }
+
+  private filterMenu() {
+    const filterRecursive = (items: MenuItem[]): MenuItem[] => {
+      return items.filter(item => {
+        // Drop node if user fails the permission check
+        if (item.permissions && !this.permService.check(item.permissions)) {
+          return false;
+        }
+        
+        // If it's a parent with children, filter its children
+        if (item.items) {
+          item.items = filterRecursive(item.items);
+          // If all children were pruned and it's strictly a category node without a route, drop the parent
+          if (item.items.length === 0 && !item.routerLink) {
+             return false;
+          }
+        }
+        return true;
+      });
+    };
+    
+    // Deep clone raw constants so filtering doesn't mutate original objects
+    const clonedMenu = JSON.parse(JSON.stringify(SIDEBAR_MENU));
+    this.menuItems = filterRecursive(clonedMenu);
+  }
 
   // --- SEARCH STATE ---
   isSearchVisible = false;
@@ -81,8 +119,6 @@ export class Mainscreensidebar implements OnInit {
   }
 
   ngOnInit() {
-    this.buildSearchIndex();
-    this.checkActiveRoutes();
     this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(() => {
       this.checkActiveRoutes();
     });
@@ -91,6 +127,7 @@ export class Mainscreensidebar implements OnInit {
   // --- SEARCH LOGIC ---
 
   buildSearchIndex() {
+    this.searchIndex = []; // RESET index so duplicate search records aren't generated when Effect runs
     const flatten = (items: MenuItem[], parentLabel = ''): void => {
       for (const item of items) {
         const currentBreadcrumb = parentLabel ? `${parentLabel} > ${item.label}` : item.label;

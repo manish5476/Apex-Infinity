@@ -16,6 +16,8 @@ import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
 import { Dialog } from "primeng/dialog";
 import { BulkProductEntry } from "../bulk-product-entry/bulk-product-entry";
 import { finalize } from 'rxjs';
+import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
+import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 
 @Component({
   selector: 'app-product-list',
@@ -29,7 +31,8 @@ import { finalize } from 'rxjs';
     RouterModule,
     AgShareGrid,
     Dialog,
-    BulkProductEntry
+    BulkProductEntry,
+    HasPermissionDirective
   ],
   templateUrl: './product-list.html',
   styleUrl: './product-list.scss',
@@ -41,6 +44,9 @@ export class ProductListComponent implements OnInit {
   private masterList = inject(MasterListService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+
+  PERMISSIONS = PERMISSIONS;
+
   public selectedRows: any
   private gridApi!: GridApi;
   private currentPage = 1;

@@ -1,168 +1,364 @@
-import { Component, ViewEncapsulation } from '@angular/core';
-import { ICellRendererAngularComp } from 'ag-grid-angular';
+import {
+  Component,
+  ViewEncapsulation,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
+import { ICellRendererAngularComp } from 'ag-grid-angular';
 import { TooltipModule } from 'primeng/tooltip';
 
+/* ==========================================================================
+   ACTION BUTTON CELL RENDERER
+   
+   Reads editing state directly from the parent grid via context.componentParent.
+   No props needed — state is always fresh via signal read in refresh().
+   ========================================================================== */
 @Component({
   selector: 'app-shared-action-btn',
   standalone: true,
-  imports: [CommonModule, ButtonModule, TooltipModule],
-  encapsulation: ViewEncapsulation.None, // Ensures tooltip styles work seamlessly
+  imports: [CommonModule, TooltipModule],
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="action-cell-wrapper" (mousedown)="$event.stopPropagation()">
-      
+    <div class="action-cell" (mousedown)="$event.stopPropagation()">
+
       @if (isEditing) {
-        <button 
-          pButton 
-          icon="pi pi-check" 
-          class="action-btn btn-save"
-          pTooltip="Save Changes" 
+
+        <!-- SAVE -->
+        <button
+          class="act-btn save"
+          (click)="onAction('save')"
+          pTooltip="Save changes"
           tooltipPosition="top"
-          (click)="onAction('save')">
+          [showDelay]="300"
+          aria-label="Save row"
+        >
+          <i class="pi pi-check"></i>
         </button>
 
-        <button 
-          pButton 
-          icon="pi pi-times" 
-          class="action-btn btn-cancel"
-          pTooltip="Discard" 
+        <!-- CANCEL -->
+        <button
+          class="act-btn cancel"
+          (click)="onAction('cancel')"
+          pTooltip="Discard changes"
           tooltipPosition="top"
-          (click)="onAction('cancel')">
+          [showDelay]="300"
+          aria-label="Cancel edit"
+        >
+          <i class="pi pi-times"></i>
         </button>
 
       } @else {
-        <button 
-          pButton 
-          icon="pi pi-pencil" 
-          class="action-btn btn-edit"
-          pTooltip="Edit Row" 
+
+        <!-- EDIT -->
+        <button
+          class="act-btn edit"
+          (click)="onAction('edit')"
+          pTooltip="Edit row"
           tooltipPosition="top"
-          (click)="onAction('edit')">
+          [showDelay]="300"
+          aria-label="Edit row"
+        >
+          <i class="pi pi-pencil"></i>
         </button>
 
-        <button 
-          pButton 
-          icon="pi pi-trash" 
-          class="action-btn btn-delete"
-          pTooltip="Delete Row" 
+        <!-- DELETE -->
+        <button
+          class="act-btn delete"
+          (click)="onAction('delete')"
+          pTooltip="Delete row"
           tooltipPosition="top"
-          (click)="onAction('delete')">
+          [showDelay]="300"
+          aria-label="Delete row"
+        >
+          <i class="pi pi-trash"></i>
         </button>
+
       }
 
     </div>
   `,
   styles: [`
-    /* ==========================================================================
-       ACTION CELL CONTAINER
-       ========================================================================== */
-    .action-cell-wrapper {
-      width: 100%;
-      height: 100%;
+    :host {
       display: flex;
       align-items: center;
-      justify-content: center; /* Center buttons in cell */
-      gap: var(--spacing-sm);  /* 0.375rem (6px) - Compact Gap */
+      justify-content: center;
+      height: 100%;
     }
 
-    /* ==========================================================================
-       BASE ACTION BUTTON
-       "Ghost" style: Transparent until hovered
-       ========================================================================== */
-    .action-btn.p-button {
+    .action-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      height: 100%;
+    }
+
+    /* ── BASE BUTTON ── */
+    .act-btn {
       width: 28px;
       height: 28px;
-      padding: 0;
+      border-radius: var(--ui-border-radius, 5px);
       border: 1px solid transparent;
-      border-radius: var(--ui-border-radius); /* 5px */
       background: transparent;
-      transition: var(--transition-fast); /* 0.12s snappy response */
-      
-      /* Default Icon Style */
-      color: var(--text-secondary);
-      
-      .p-button-icon {
-        font-size: 0.85rem; /* ~13-14px balanced icon */
-        font-weight: var(--font-weight-medium);
-      }
+      color: var(--theme-text-tertiary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.13s, color 0.13s, border-color 0.13s, transform 0.1s, box-shadow 0.13s;
+      line-height: 1;
 
-      /* Hover: Slight background lift for generic state */
+      i { font-size: 0.78rem; }
+
+      &:focus-visible {
+        outline: 2px solid var(--theme-accent-primary);
+        outline-offset: 2px;
+      }
+      &:active { transform: scale(0.9); }
+    }
+
+    /* ── SEMANTIC VARIANTS ── */
+    .act-btn.edit:hover {
+      background: rgba(var(--accent-primary-rgb), 0.1);
+      color: var(--theme-accent-primary);
+      border-color: rgba(var(--accent-primary-rgb), 0.22);
+      box-shadow: 0 2px 5px rgba(var(--accent-primary-rgb), 0.12);
+      transform: translateY(-1px);
+    }
+
+    .act-btn.delete:hover {
+      background: rgba(239, 68, 68, 0.09);
+      color: var(--color-error, #ef4444);
+      border-color: rgba(239, 68, 68, 0.22);
+      box-shadow: 0 2px 5px rgba(239, 68, 68, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .act-btn.save {
+      color: var(--color-success, #22c55e);
+      background: rgba(34, 197, 94, 0.08);
+      border-color: rgba(34, 197, 94, 0.2);
+
+      &:hover {
+        background: var(--color-success, #22c55e);
+        color: #fff;
+        border-color: transparent;
+        box-shadow: 0 3px 7px rgba(34, 197, 94, 0.25);
+        transform: translateY(-1px);
+      }
+    }
+
+    .act-btn.cancel {
+      color: var(--theme-text-secondary);
+      background: var(--theme-bg-ternary);
+      border-color: var(--theme-border-primary);
+
       &:hover {
         background: var(--component-bg-hover);
-        color: var(--text-primary);
-      }
-      
-      /* Focus: Accessibility Ring */
-      &:focus-visible {
-        outline: none;
-        box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+        color: var(--theme-text-primary);
+        transform: translateY(-1px);
       }
     }
-
-    /* ==========================================================================
-       SEMANTIC VARIANTS (Hover States)
-       Uses your color-mix tokens for perfect harmony
-       ========================================================================== */
-
-    /* 1. EDIT (Primary/Accent) */
-    .action-btn.btn-edit:hover {
-      background: var(--color-primary-bg); /* Tinted Background */
-      color: var(--accent-primary);        /* Bold Text */
-      border-color: rgba(var(--accent-primary-rgb), 0.2); /* Subtle Border */
-    }
-
-    /* 2. DELETE (Error) */
-    .action-btn.btn-delete:hover {
-      background: var(--color-error-bg);
-      color: var(--color-error);
-      border-color: var(--color-error-border);
-    }
-
-    /* 3. SAVE (Success) */
-    .action-btn.btn-save {
-      /* Save is special: It's often green even before hover to indicate "Safe" */
-      color: var(--color-success);
-      
-      &:hover {
-        background: var(--color-success);
-        color: white; /* Invert on hover for strong call to action */
-        box-shadow: var(--shadow-sm);
-      }
-    }
-
-    /* 4. CANCEL (Secondary/Muted) */
-    .action-btn.btn-cancel:hover {
-      background: var(--bg-ternary);
-      color: var(--text-primary);
-      border-color: var(--border-secondary);
-    }
-  `]
+  `],
 })
 export class AppSharedGridActionButton implements ICellRendererAngularComp {
+  private readonly cdr = inject(ChangeDetectorRef);
   params: any;
   isEditing = false;
 
   agInit(params: any): void {
     this.params = params;
-    this.checkState();
+    this.syncState();
   }
 
   refresh(params: any): boolean {
     this.params = params;
-    this.checkState();
+    this.syncState();
+    this.cdr.markForCheck();
     return true;
   }
 
-  checkState() {
-    // Check Parent Signal for editing state
-    const parent = this.params.context.componentParent;
-    if (parent) {
-      this.isEditing = parent.editingIds().has(this.params.node.id);
-    }
+  private syncState(): void {
+    const parent = this.params?.context?.componentParent;
+    const nodeId = this.params?.node?.id;
+    // Read the signal — always fresh
+    this.isEditing = parent?.editingIds?.()?.has(nodeId) ?? false;
   }
 
-  onAction(action: string) {
+  onAction(action: string): void {
     this.params.context.componentParent.handleRowAction(action, this.params.data);
   }
 }
+
+
+// import { Component, ViewEncapsulation } from '@angular/core';
+// import { ICellRendererAngularComp } from 'ag-grid-angular';
+// import { CommonModule } from '@angular/common';
+// import { ButtonModule } from 'primeng/button';
+// import { TooltipModule } from 'primeng/tooltip';
+
+// @Component({
+//   selector: 'app-shared-action-btn',
+//   standalone: true,
+//   imports: [CommonModule, ButtonModule, TooltipModule],
+//   encapsulation: ViewEncapsulation.None, // Ensures tooltip styles work seamlessly
+//   template: `
+//     <div class="action-cell-wrapper" (mousedown)="$event.stopPropagation()">
+      
+//       @if (isEditing) {
+//         <button 
+//           pButton 
+//           icon="pi pi-check" 
+//           class="action-btn btn-save"
+//           pTooltip="Save Changes" 
+//           tooltipPosition="top"
+//           (click)="onAction('save')">
+//         </button>
+
+//         <button 
+//           pButton 
+//           icon="pi pi-times" 
+//           class="action-btn btn-cancel"
+//           pTooltip="Discard" 
+//           tooltipPosition="top"
+//           (click)="onAction('cancel')">
+//         </button>
+
+//       } @else {
+//         <button 
+//           pButton 
+//           icon="pi pi-pencil" 
+//           class="action-btn btn-edit"
+//           pTooltip="Edit Row" 
+//           tooltipPosition="top"
+//           (click)="onAction('edit')">
+//         </button>
+
+//         <button 
+//           pButton 
+//           icon="pi pi-trash" 
+//           class="action-btn btn-delete"
+//           pTooltip="Delete Row" 
+//           tooltipPosition="top"
+//           (click)="onAction('delete')">
+//         </button>
+//       }
+
+//     </div>
+//   `,
+//   styles: [`
+//     /* ==========================================================================
+//        ACTION CELL CONTAINER
+//        ========================================================================== */
+//     .action-cell-wrapper {
+//       width: 100%;
+//       height: 100%;
+//       display: flex;
+//       align-items: center;
+//       justify-content: center; /* Center buttons in cell */
+//       gap: var(--spacing-sm);  /* 0.375rem (6px) - Compact Gap */
+//     }
+
+//     /* ==========================================================================
+//        BASE ACTION BUTTON
+//        "Ghost" style: Transparent until hovered
+//        ========================================================================== */
+//     .action-btn.p-button {
+//       width: 28px;
+//       height: 28px;
+//       padding: 0;
+//       border: 1px solid transparent;
+//       border-radius: var(--ui-border-radius); /* 5px */
+//       background: transparent;
+//       transition: var(--transition-fast); /* 0.12s snappy response */
+      
+//       /* Default Icon Style */
+//       color: var(--text-secondary);
+      
+//       .p-button-icon {
+//         font-size: 0.85rem; /* ~13-14px balanced icon */
+//         font-weight: var(--font-weight-medium);
+//       }
+
+//       /* Hover: Slight background lift for generic state */
+//       &:hover {
+//         background: var(--component-bg-hover);
+//         color: var(--text-primary);
+//       }
+      
+//       /* Focus: Accessibility Ring */
+//       &:focus-visible {
+//         outline: none;
+//         box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+//       }
+//     }
+
+//     /* ==========================================================================
+//        SEMANTIC VARIANTS (Hover States)
+//        Uses your color-mix tokens for perfect harmony
+//        ========================================================================== */
+
+//     /* 1. EDIT (Primary/Accent) */
+//     .action-btn.btn-edit:hover {
+//       background: var(--color-primary-bg); /* Tinted Background */
+//       color: var(--accent-primary);        /* Bold Text */
+//       border-color: rgba(var(--accent-primary-rgb), 0.2); /* Subtle Border */
+//     }
+
+//     /* 2. DELETE (Error) */
+//     .action-btn.btn-delete:hover {
+//       background: var(--color-error-bg);
+//       color: var(--color-error);
+//       border-color: var(--color-error-border);
+//     }
+
+//     /* 3. SAVE (Success) */
+//     .action-btn.btn-save {
+//       /* Save is special: It's often green even before hover to indicate "Safe" */
+//       color: var(--color-success);
+      
+//       &:hover {
+//         background: var(--color-success);
+//         color: white; /* Invert on hover for strong call to action */
+//         box-shadow: var(--shadow-sm);
+//       }
+//     }
+
+//     /* 4. CANCEL (Secondary/Muted) */
+//     .action-btn.btn-cancel:hover {
+//       background: var(--bg-ternary);
+//       color: var(--text-primary);
+//       border-color: var(--border-secondary);
+//     }
+//   `]
+// })
+// export class AppSharedGridActionButton implements ICellRendererAngularComp {
+//   params: any;
+//   isEditing = false;
+
+//   agInit(params: any): void {
+//     this.params = params;
+//     this.checkState();
+//   }
+
+//   refresh(params: any): boolean {
+//     this.params = params;
+//     this.checkState();
+//     return true;
+//   }
+
+//   checkState() {
+//     // Check Parent Signal for editing state
+//     const parent = this.params.context.componentParent;
+//     if (parent) {
+//       this.isEditing = parent.editingIds().has(this.params.node.id);
+//     }
+//   }
+
+//   onAction(action: string) {
+//     this.params.context.componentParent.handleRowAction(action, this.params.data);
+//   }
+// }

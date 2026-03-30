@@ -40,14 +40,13 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
           </div>
           <button type="button" class="btn btn-outline" (click)="goBack()" [disabled]="isSubmitting() || isLoading()">Cancel</button>
           <button type="button" class="btn btn-primary" [disabled]="isSubmitting() || isLoading() || deptForm.invalid" (click)="onSubmit()">
-            <ng-container *ngIf="!isSubmitting(); else loadingState">
+            @if (!isSubmitting()) {
               <i class="pi pi-save"></i>
               <span>{{ isEditMode() ? 'Update Department' : 'Save Department' }}</span>
-            </ng-container>
-            <ng-template #loadingState>
+            } @else {
               <i class="pi pi-spin pi-spinner"></i>
               <span>{{ isEditMode() ? 'Updating...' : 'Saving...' }}</span>
-            </ng-template>
+            }
           </button>
         </div>
       </header>

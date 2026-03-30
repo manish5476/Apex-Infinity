@@ -85,7 +85,6 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
           <app-ag-share-grid
             [columns]="ltvColumns"
             [data]="intelligenceData()?.valueAnalysis?.topLTV || []"
-            [showActions]="false"
             class="fill-grid">
           </app-ag-share-grid>
         </div>
@@ -748,7 +747,7 @@ export class CustomerIntelligenceComponent implements OnInit {
 //                  <app-ag-share-grid 
 //                    [columns]="ltvColumns" 
 //                    [data]="intelligenceData()?.valueAnalysis?.topLTV || []" 
-//                    [showActions]="false" 
+// 
 //                    class="full-size-grid">
 //                  </app-ag-share-grid>
 //               </div>
