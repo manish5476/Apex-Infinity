@@ -6,6 +6,7 @@ import { tap, catchError, map, switchMap, finalize } from 'rxjs/operators';
 import { AppMessageService } from '../../../core/services/message.service';
 import { ApiService } from '../../../core/services/api';
 import { OrganizationService } from './../../organization/organization.service';
+import { SocketConnectionService } from '@core/services/socket/socket-connection.service';
 
 // ======================================================
 // INTERFACES
@@ -542,27 +543,27 @@ export class AuthService {
     }
   }
 
-refreshPermissions(): void {
-  this.apiService.getMyPermissions().subscribe({
-    next: (res) => {
-      const user: any = this.currentUserValue;
-      if (user && res?.data) {
-        const updated = {
-          ...user,
-          isOwner: res.data.isOwner ?? user.isOwner,
-          isSuperAdmin: res.data.isSuperAdmin ?? user.isSuperAdmin,
-          role: {
-            ...user.role,
-            permissions: res.data.permissions ?? []
-          }
-        };
-        this.setItem(this.USER_KEY, updated);
-        this.currentUserSubject.next(updated);
-      }
-    },
-    error: (err) => console.warn('Permission refresh failed', err)
-  });
-}
+  refreshPermissions(): void {
+    this.apiService.getMyPermissions().subscribe({
+      next: (res) => {
+        const user: any = this.currentUserValue;
+        if (user && res?.data) {
+          const updated = {
+            ...user,
+            isOwner: res.data.isOwner ?? user.isOwner,
+            isSuperAdmin: res.data.isSuperAdmin ?? user.isSuperAdmin,
+            role: {
+              ...user.role,
+              permissions: res.data.permissions ?? []
+            }
+          };
+          this.setItem(this.USER_KEY, updated);
+          this.currentUserSubject.next(updated);
+        }
+      },
+      error: (err) => console.warn('Permission refresh failed', err)
+    });
+  }
   // refreshPermissions(): void {
   //   this.apiService.getMyPermissions().subscribe({
   //     next: (res) => {
