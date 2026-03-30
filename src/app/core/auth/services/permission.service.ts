@@ -3,7 +3,10 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Permission, PermissionMode } from '../permissions.constants';
 import { AuthService } from '../../../modules/auth/services/auth-service';
-
+// add to imports
+import { SocketConnectionService } from '../../../core/services/socket-connection.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DestroyRef } from '@angular/core';
 /**
  * PermissionService
  *
@@ -30,7 +33,15 @@ import { AuthService } from '../../../modules/auth/services/auth-service';
 export class PermissionService {
   private readonly authSvc = inject(AuthService);
   private readonly router = inject(Router);
+// add to injections at the top of the class
+private readonly socket = inject(SocketConnectionService);
+private readonly destroyRef = inject(DestroyRef);
 
+  constructor() {
+  this.socket.permissionsUpdated$
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe(() => this.authSvc.refreshPermissions());
+}
   // ── Convert BehaviorSubject → Signal ─────────────────────────────
   // toSignal subscribes to currentUser$ once and keeps it in sync.
   // When authSvc calls currentUserSubject.next(user) (login/logout/
