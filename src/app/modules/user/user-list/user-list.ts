@@ -21,6 +21,7 @@ import { UserManagementService } from '../user-management.service';
 import { finalize } from 'rxjs';
 import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
+import { DynamicDialogServices } from '../../../core/services/dynamic-dialog-services';
 
 @Component({
   selector: 'app-user-list',
@@ -59,6 +60,7 @@ export class UserListComponent implements OnInit {
   private confirmationService = inject(ConfirmationService);
   public masterList = inject(MasterListService);
   private router = inject(Router);
+  private dynamicDialog = inject(DynamicDialogServices);
 
   private currentPage = 1;
   private isLoading = false;
@@ -96,6 +98,10 @@ export class UserListComponent implements OnInit {
 
   createNew() {
     this.router.navigate(['/user/create']);
+  }
+
+  openExportDialog() {
+    this.dynamicDialog.openUserExport();
   }
 
 

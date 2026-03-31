@@ -1,0 +1,216 @@
+<div class="page-container animate-fadeIn">
+
+  <header class="page-header flex justify-between align-center mb-5">
+    <div class="header-titles">
+      <h1 class="page-title">Organization Chart</h1>
+      <p class="page-subtitle text-muted">Interactive reporting structure. Click nodes to select or collapse branches.
+      </p>
+    </div>
+
+    <div class="header-actions flex gap-3">
+      @if (!isLoading()) {
+      <div class="glass-badge flex align-center gap-2">
+        <i class="pi pi-sitemap text-primary"></i>
+        <span>Depth: <strong>{{ maxDepth() }}</strong></span>
+      </div>
+      <div class="glass-badge flex align-center gap-2">
+        <i class="pi pi-users text-primary"></i>
+        <span>Members: <strong>{{ totalUsers() }}</strong></span>
+      </div>
+      }
+    </div>
+  </header>
+
+  <div class="glass-card chart-container">
+    <div class="card-body p-0 overflow-x-auto custom-scroll">
+
+      @if (isLoading()) {
+      <div class="flex-col align-center justify-center py-6 gap-4 min-h-[500px]">
+        <p-skeleton width="240px" height="140px" styleClass="rounded-xl"></p-skeleton>
+        <div class="flex gap-5 mt-4">
+          <p-skeleton width="220px" height="140px" styleClass="rounded-xl"></p-skeleton>
+          <p-skeleton width="220px" height="140px" styleClass="rounded-xl"></p-skeleton>
+        </div>
+      </div>
+      }
+
+      @else if (treeNodes().length > 0) {
+      <div class="org-chart-wrapper p-6 min-h-[600px] flex justify-center">
+
+        <p-organizationChart [value]="treeNodes()" selectionMode="multiple" [(selection)]="selectedNodes"
+          [collapsible]="true">
+
+          <ng-template let-node pTemplate="person">
+            <div class="org-node-card">
+
+              <div class="node-banner bg-accent-gradient"></div>
+
+              <div class="node-avatar-wrapper shadow-md border-2 border-bg-secondary">
+                @if (node.data.avatar) {
+                <img [src]="node.data.avatar" [alt]="node.data.name" class="profile-image">
+                } @else {
+                <span class="initials">{{ getInitials(node.data.name) }}</span>
+                }
+
+                @if (node.data.employeeProfile?.designationId?.level) {
+                <div class="level-indicator bg-primary text-white text-xs font-bold rounded-full shadow-sm"
+                  pTooltip="Clearance Level" tooltipPosition="top">
+                  L{{ node.data.employeeProfile.designationId.level }}
+                </div>
+                }
+              </div>
+
+              <div class="node-details flex-col align-center mt-2 px-3 pb-4">
+                <h3 class="node-name text-md font-bold text-text-primary m-0 truncate w-full text-center"
+                  [title]="node.data.name">
+                  {{ node.data.name }}
+                </h3>
+
+                <div
+                  class="node-title text-xs font-bold text-primary mt-1 bg-primary-light px-2 py-0.5 rounded-pill uppercase tracking-wider truncate w-full text-center">
+                  {{ node.data.employeeProfile?.designationId?.title || 'No Title' }}
+                </div>
+
+                <div class="flex-col gap-1 mt-3 w-full border-t border-tertiary pt-3">
+                  <div class="node-dept text-xs text-muted flex justify-center align-center gap-1 w-full truncate"
+                    [title]="node.data.employeeProfile?.departmentId?.name">
+                    <i class="pi pi-building text-xs"></i>
+                    <span class="truncate">{{ node.data.employeeProfile?.departmentId?.name || 'Unassigned' }}</span>
+                  </div>
+
+                  <div class="node-email text-xs text-muted flex justify-center align-center gap-1 w-full truncate"
+                    [title]="node.data.email">
+                    <i class="pi pi-envelope text-xs"></i>
+                    <span class="truncate">{{ node.data.email }}</span>
+                  </div>
+                </div>
+
+                @if (node.data.reportees && node.data.reportees.length > 0) {
+                <div
+                  class="team-size-badge mt-3 bg-secondary border border-tertiary text-text-primary text-xs font-bold px-3 py-1 rounded-pill flex align-center gap-2 shadow-sm">
+                  <i class="pi pi-users text-primary text-xs"></i>
+                  {{ node.data.reportees.length }} Direct Reports
+                </div>
+                }
+              </div>
+
+            </div>
+          </ng-template>
+        </p-organizationChart>
+
+      </div>
+      }
+
+      @else {
+      <div class="empty-state text-center py-6 min-h-[400px] flex-col align-center justify-center">
+        <i class="pi pi-sitemap text-4xl text-muted mb-3"></i>
+        <h3 class="text-lg font-bold text-text-primary m-0">Empty Hierarchy</h3>
+        <p class="text-muted mt-2">No reporting structure has been defined yet.</p>
+      </div>
+      }
+
+    </div>
+  </div>
+</div>
+<!-- <div class="page-container animate-fadeIn">
+
+  <header class="page-header flex justify-between align-center mb-5">
+    <div class="header-titles">
+      <h1 class="page-title">Organization Chart</h1>
+      <p class="page-subtitle text-muted">Interactive reporting structure. Click nodes to select or collapse branches.
+      </p>
+    </div>
+
+    <div class="header-actions flex gap-3">
+      @if (!isLoading()) {
+      <div class="glass-badge flex align-center gap-2">
+        <i class="pi pi-sitemap text-primary"></i>
+        <span>Depth: <strong>{{ maxDepth() }}</strong></span>
+      </div>
+      <div class="glass-badge flex align-center gap-2">
+        <i class="pi pi-users text-primary"></i>
+        <span>Members: <strong>{{ totalUsers() }}</strong></span>
+      </div>
+      }
+    </div>
+  </header>
+
+  <div class="glass-card chart-container">
+    <div class="card-body p-0 overflow-x-auto custom-scroll">
+
+      @if (isLoading()) {
+      <div class="flex-col align-center justify-center py-6 gap-4 min-h-[500px]">
+        <p-skeleton width="220px" height="120px" styleClass="rounded-xl"></p-skeleton>
+        <div class="flex gap-5 mt-4">
+          <p-skeleton width="200px" height="120px" styleClass="rounded-xl"></p-skeleton>
+          <p-skeleton width="200px" height="120px" styleClass="rounded-xl"></p-skeleton>
+        </div>
+      </div>
+      }
+
+      @else if (treeNodes().length > 0) {
+
+      <div class="org-chart-wrapper p-6 min-h-[600px] flex justify-center">
+        <p-organizationChart [value]="treeNodes()" selectionMode="multiple" [(selection)]="selectedNodes"
+          [collapsible]="true">
+
+          <ng-template let-node pTemplate="person">
+            <div class="org-node-card mt-5">
+              <div class="node-banner bg-accent-gradient"></div>
+              <div class="node-avatar-wrapper shadow-md border-2 border-bg-secondary">
+                @if (node.data.avatar) {
+                <img [src]="node.data.avatar" [alt]="node.data.name" class="profile-image">
+                } @else {
+                <span class="initials">{{ getInitials(node.data.name) }}</span>
+                }
+                @if (node.data.employeeProfile?.designationId?.level) {
+                <div class="level-indicator bg-primary text-white text-xs font-bold rounded-full shadow-sm"
+                  pTooltip="Clearance Level" tooltipPosition="top">
+                  L{{ node.data.employeeProfile.designationId.level }}
+                </div>
+                }
+              </div>
+
+              <div class="node-details flex-col align-center mt-2 px-3 pb-4">
+                <h3 class="node-name text-md font-bold text-text-primary m-0 truncate w-full text-center"
+                  [title]="node.data.name">
+                  {{ node.data.name }}
+                </h3>
+
+                <div
+                  class="node-title text-xs font-bold text-primary mt-1 bg-primary-light px-2 py-0.5 rounded-pill uppercase tracking-wider truncate w-full text-center">
+                  {{ node.data.employeeProfile?.designationId?.title || 'No Title' }}
+                </div>
+
+                <div class="flex-col gap-1 mt-3 w-full border-t border-tertiary pt-2">
+                  <div class="node-dept text-xs text-muted flex justify-center align-center gap-1 w-full truncate"
+                    [title]="node.data.employeeProfile?.departmentId?.name">
+                    <i class="pi pi-building text-xs"></i>
+                    <span class="truncate">{{ node.data.employeeProfile?.departmentId?.name || 'No Dept' }}</span>
+                  </div>
+
+                  <div class="node-email text-xs text-muted flex justify-center align-center gap-1 w-full truncate"
+                    [title]="node.data.email">
+                    <i class="pi pi-envelope text-xs"></i>
+                    <span class="truncate">{{ node.data.email }}</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </ng-template>
+        </p-organizationChart>
+      </div>
+      }
+
+      @else {
+      <div class="empty-state text-center py-6 min-h-[400px] flex-col align-center justify-center">
+        <i class="pi pi-sitemap text-4xl text-muted mb-3"></i>
+        <h3 class="text-lg font-bold text-text-primary m-0">Empty Hierarchy</h3>
+        <p class="text-muted mt-2">No reporting structure has been defined yet.</p>
+      </div>
+      }
+
+    </div>
+  </div>
+</div> -->

@@ -153,6 +153,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
         permissions: [PERMISSIONS.USER.READ],
         items: [
           { label: 'Employee List', icon: 'pi pi-users', routerLink: ['/user/list'], permissions: [PERMISSIONS.USER.READ] },
+          { label: 'Employee Hierarchy', icon: 'pi pi-sitemap', routerLink: ['/user/hierarchy'], permissions: [PERMISSIONS.USER.READ] },
           { label: 'Onboard User', icon: 'pi pi-user-plus', routerLink: ['/user/create'], permissions: [PERMISSIONS.USER.MANAGE] },
         ]
       },

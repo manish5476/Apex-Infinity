@@ -30,7 +30,7 @@ import { DialogService } from 'primeng/dynamicdialog';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(
-      withInterceptors([jwtInterceptor, loggingInterceptor, successInterceptor, errorInterceptor, LoadingInterceptor]),
+      withInterceptors([jwtInterceptor, successInterceptor, errorInterceptor, LoadingInterceptor]),
       withFetch()
     ),
     provideRouter(routes),
