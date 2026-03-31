@@ -141,6 +141,21 @@
             <i class="pi pi-chevron-right text-muted"></i>
           </button>
 
+          <button
+            class="action-list-item flex align-center justify-between p-3 rounded-xl border border-tertiary bg-secondary transition-base hover-border-primary w-full text-left"
+            (click)="onManagePermissions()">
+            <div class="flex align-center gap-4">
+              <div class="w-12 h-12 rounded-lg bg-primary-light text-primary flex align-center justify-center text-xl">
+                <i class="pi pi-shield"></i>
+              </div>
+              <div class="flex-col">
+                <span class="font-bold text-text-primary text-md">Advanced Permissions</span>
+                <span class="text-xs text-muted mt-1">Manage manual overrides (Grant/Revoke)</span>
+              </div>
+            </div>
+            <i class="pi pi-chevron-right text-muted"></i>
+          </button>
+
         </div>
       </div>
       }
@@ -261,233 +276,3 @@
     </div>
   </ng-template>
 </p-dialog>
-
-<!-- <p-toast></p-toast>
-<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
-
-<div class="page-container animate-fadeIn">
-
-  @if (!user()) {
-  <div class="loading-state">
-    <div class="skeleton-header">
-      <div class="left-group">
-        <p-skeleton width="3rem" height="3rem" shape="circle"></p-skeleton>
-        <div class="text-group">
-          <p-skeleton width="12rem" height="1.5rem"></p-skeleton>
-          <p-skeleton width="8rem" height="1rem"></p-skeleton>
-        </div>
-      </div>
-    </div>
-    <div class="layout-grid">
-      <aside class="skeleton-sidebar">
-        <p-skeleton height="400px" styleClass="w-full"></p-skeleton>
-      </aside>
-      <main class="skeleton-main">
-        <p-skeleton height="600px" styleClass="w-full"></p-skeleton>
-      </main>
-    </div>
-  </div>
-  }
-
-  @else if (user(); as u) {
-
-  <header class="dashboard-header">
-    <div class="header-left">
-      <button pButton icon="pi pi-arrow-left" class="p-button-text p-button-rounded back-btn" (click)="onBack()"
-        pTooltip="Back to List"></button>
-
-      <div class="identity-group">
-        <div class="name-row">
-          <h1>{{ u.name | titlecase }}</h1>
-          <p-tag [value]="u.isActive ? 'Active' : 'Inactive'" [severity]="u.isActive ? 'success' : 'danger'"
-            styleClass="status-tag"></p-tag>
-        </div>
-        <div class="meta-row">
-          <span class="role-badge" [class.admin]="u.role?.name === 'all access'">
-            <i class="pi" [ngClass]="u.role?.name === 'all access' ? 'pi-shield' : 'pi-user'"></i>
-            {{ u.role?.name || 'Standard User' }}
-          </span>
-          <span class="branch-badge">
-            <i class="pi pi-building"></i> {{ u.branchId?.name || 'Head Office' }}
-          </span>
-        </div>
-      </div>
-    </div>
-
-    <div class="header-actions">
-      <button *hasPermission="PERMISSIONS.USER.MANAGE" pButton label="Edit Profile" icon="pi pi-user-edit"
-        class="p-button-outlined p-button-secondary btn-sm" (click)="onEditUser()"></button>
-    </div>
-  </header>
-
-  <div class="layout-grid">
-
-    <aside class="sidebar-column">
-
-      <div class="profile-card">
-        <div class="card-banner"></div>
-
-        <div class="profile-content">
-          <div class="avatar-wrapper" [class.no-permission]="!userService.checkPermission(PERMISSIONS.USER.MANAGE)"
-            (click)="!uploading() && fileInput.click()">
-            <input #fileInput type="file" accept="image/*" hidden (change)="onFileSelected($event)">
-
-            <div class="avatar-circle">
-              @if (u.avatar) {
-              <img [src]="u.avatar" class="avatar-img">
-              } @else {
-              <span class="initials">{{ u.name[0] | uppercase }}</span>
-              }
-
-              <div class="avatar-overlay">
-                <i class="pi pi-camera"></i>
-              </div>
-
-              @if (uploading()) {
-              <div class="avatar-loader"><i class="pi pi-spin pi-spinner"></i></div>
-              }
-            </div>
-
-            <div class="status-dot" [class.active]="u.isActive"></div>
-          </div>
-
-          <h3 class="contact-name">{{ u.name }}</h3>
-          <span class="contact-email">{{ u.email }}</span>
-
-          <div class="info-list">
-            <div class="info-item">
-              <div class="icon-box"><i class="pi pi-phone"></i></div>
-              <div class="info-text">
-                <label>Phone</label>
-                <span>{{ u.phone || '—' }}</span>
-              </div>
-            </div>
-
-            <div class="info-item">
-              <div class="icon-box"><i class="pi pi-calendar"></i></div>
-              <div class="info-text">
-                <label>Joined</label>
-                <span>{{ u.createdAt | date:'mediumDate' }}</span>
-              </div>
-            </div>
-
-            <div class="info-item">
-              <div class="icon-box"><i class="pi pi-id-card"></i></div>
-              <div class="info-text">
-                <label>System ID</label>
-                <span class="font-mono text-xs">{{ u._id | slice:0:8 }}...</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div *hasPermission="PERMISSIONS.USER.MANAGE" class="glass-card security-card">
-        <div class="card-header">
-          <i class="pi pi-lock"></i> <span>Security & Access</span>
-        </div>
-        <div class="card-body">
-
-          <button class="action-row" (click)="showPasswordDialog = true">
-            <div class="icon-box blue"><i class="pi pi-key"></i></div>
-            <div class="action-text">
-              <span class="label">Reset Password</span>
-              <span class="sub">Admin override</span>
-            </div>
-            <i class="pi pi-chevron-right arrow"></i>
-          </button>
-
-          <button class="action-row" (click)="toggleStatus()">
-            <div class="icon-box" [ngClass]="u.isActive ? 'red' : 'green'">
-              <i class="pi" [ngClass]="u.isActive ? 'pi-ban' : 'pi-check-circle'"></i>
-            </div>
-            <div class="action-text">
-              <span class="label">{{ u.isActive ? 'Deactivate User' : 'Activate User' }}</span>
-              <span class="sub">Change account status</span>
-            </div>
-            <i class="pi pi-chevron-right arrow"></i>
-          </button>
-
-        </div>
-      </div>
-
-    </aside>
-
-    <main class="main-column">
-
-      <div class="glass-card timeline-panel">
-        <div class="card-header">
-          <div class="flex items-center gap-2">
-            <i class="pi pi-history"></i>
-            <span>Activity Log</span>
-          </div>
-          <span class="badge">{{ activities().length }} Events</span>
-        </div>
-
-        <div class="timeline-scroll-area custom-scrollbar">
-          @if (activities().length > 0) {
-          <div class="timeline-list">
-            @for (act of activities(); track act._id) {
-            <div class="timeline-item">
-              <div class="time-col">
-                <span class="time">{{ act.createdAt | date:'h:mm a' }}</span>
-                <span class="date">{{ act.createdAt | date:'MMM d' }}</span>
-              </div>
-              <div class="marker-col">
-                <div class="line"></div>
-                <div class="dot"></div>
-              </div>
-              <div class="content-col">
-                <div class="act-header">
-                  <span class="action">{{ act.action }}</span>
-                  @if(act.ipAddress) {
-                  <span class="ip"><i class="pi pi-globe"></i> {{ act.ipAddress }}</span>
-                  }
-                </div>
-                <p class="details">{{ act.details }}</p>
-              </div>
-            </div>
-            }
-          </div>
-          } @else {
-          <div class="empty-state">
-            <i class="pi pi-inbox"></i>
-            <p>No activity recorded for this user.</p>
-          </div>
-          }
-        </div>
-      </div>
-
-    </main>
-
-  </div>
-  }
-</div>
-
-<p-dialog appendTo="body" header="Reset Password" [(visible)]="showPasswordDialog" [modal]="true"
-  [style]="{width: '400px'}" [draggable]="false" [resizable]="false" styleClass="theme-dialog" appendTo="body">
-
-  <form [formGroup]="passwordForm" class="dialog-form">
-    <div class="alert-box info">
-      <i class="pi pi-info-circle"></i>
-      <span>Admin Override: The new password will apply immediately.</span>
-    </div>
-
-    <div class="form-group">
-      <label>New Password</label>
-      <input pInputText type="password" formControlName="password" placeholder="Min 6 characters" />
-    </div>
-
-    <div class="form-group">
-      <label>Confirm Password</label>
-      <input pInputText type="password" formControlName="passwordConfirm" placeholder="Re-type password" />
-    </div>
-  </form>
-
-  <ng-template pTemplate="footer">
-    <button pButton label="Cancel" class="p-button-text p-button-secondary"
-      (click)="showPasswordDialog = false"></button>
-    <button pButton label="Reset" icon="pi pi-check" (click)="resetPassword()" [loading]="isSubmitting"
-      [disabled]="passwordForm.invalid"></button>
-  </ng-template>
-</p-dialog> -->

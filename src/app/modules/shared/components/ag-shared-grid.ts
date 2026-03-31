@@ -10,19 +10,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { AgGridAngular } from 'ag-grid-angular';
 
-import {
-  ColDef,
-  GridApi,
-  GridReadyEvent,
-  GridOptions,
-  RowSelectionOptions,
-  CellClickedEvent,
-  BodyScrollEndEvent,
-  AllCommunityModule,
-  ModuleRegistry,
-  themeQuartz,
-  Theme,
-} from 'ag-grid-community';
+import {ColDef,GridApi,GridReadyEvent,GridOptions,RowSelectionOptions,CellClickedEvent,BodyScrollEndEvent,AllCommunityModule,ModuleRegistry,themeQuartz,Theme,} from 'ag-grid-community';
 
 import type { Permission } from '@core/auth/permissions.constants';
 import {

@@ -16,6 +16,9 @@ import { ProductHistoryComponent } from '../../modules/product/components/produc
 import { StockAdjustmentComponent } from '../../modules/product/components/stock-adjustment/stock-adjustment';
 import { StockTransferComponent } from '../../modules/product/components/stoct-transfer/stoct-transfer';
 import { UserExportDialogComponent } from '../../modules/user/user-export/user-export-dialog.component';
+import { UserPermissionDialogComponent } from '../../modules/user/user-permission-dialog/user-permission-dialog.component';
+import { UserStatusDialogComponent } from '../../modules/user/user-status-dialog/user-status-dialog.component';
+import { User } from '../../modules/user/user-management.service';
 
 @Injectable({
   providedIn: 'root',
@@ -194,6 +197,35 @@ export class DynamicDialogServices {
       showHeader: true,
       width: '500px',
       data: {}
+    });
+  }
+
+  /**
+   * Opens a high-fidelity dialog to manage per-user permission overrides.
+   * Allows granting or revoking specific system tags for a single user.
+   */
+  openUserPermissions(user: User): DynamicDialogRef | null {
+    return this.dialogService.open(UserPermissionDialogComponent, {
+      ...this.defaultConfig,
+      header: `Manage Overrides: ${user.name}`,
+      showHeader: true,
+      width: '800px',
+      height: 'auto',
+      data: { user }
+    });
+  }
+
+  /**
+   * Opens a dialog to manage user account status and security locks.
+   * Allows toggling account activation and login block status.
+   */
+  openUserStatus(user: User): DynamicDialogRef | null {
+    return this.dialogService.open(UserStatusDialogComponent, {
+      ...this.defaultConfig,
+      header: `Account Status: ${user.name}`,
+      showHeader: true,
+      width: '450px',
+      data: { user }
     });
   }
 }

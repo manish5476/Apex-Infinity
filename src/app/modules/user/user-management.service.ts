@@ -47,6 +47,10 @@ export interface User {
   };
   devices?: any[];
   preferences?: any;
+  permissionOverrides?: {
+    granted: string[];
+    revoked: string[];
+  };
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -273,7 +277,7 @@ export class UserManagementService extends BaseApiService {
   /**
    * Update user permission overrides (Admin)
    */
-  updatePermissionOverrides(id: string, data: { permissions: string[] }): Observable<{ status: string; data: { user: User } }> {
+  updatePermissionOverrides(id: string, data: { grant: string[]; revoke: string[] }): Observable<{ status: string; data: { user: User } }> {
     return this.patch<{ status: string; data: { user: User } }>(`${this.endpoint}/${id}/permission-overrides`, data, 'updatePermissionOverrides');
   }
 

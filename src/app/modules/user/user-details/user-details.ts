@@ -24,6 +24,7 @@ import { AppMessageService } from '../../../core/services/message.service';
 import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
 import { PermissionService } from '@core/auth/services/permission.service';
+import { DynamicDialogServices } from '../../../core/services/dynamic-dialog-services';
 
 
 @Component({
@@ -50,6 +51,7 @@ export class UserDetailsComponent implements OnInit {
   private messageService = inject(AppMessageService); // Updated injection
   private confirmationService = inject(ConfirmationService);
   private fb = inject(FormBuilder);
+  private dialogService = inject(DynamicDialogServices);
 
   readonly canManage = this.permissionService.can(this.PERMISSIONS.USER.MANAGE);
   userId: string = '';
@@ -215,5 +217,17 @@ export class UserDetailsComponent implements OnInit {
           this.messageService.handleHttpError(err);
         }
       });
+  }
+
+  // --- Permissions ---
+  onManagePermissions() {
+    const currentUser = this.user();
+    if (!currentUser) return;
+
+    this.dialogService.openUserPermissions(currentUser)?.onClose.subscribe(result => {
+      if (result) {
+        this.loadUserDetails(); // Refresh to get updated overrides
+      }
+    });
   }
 }

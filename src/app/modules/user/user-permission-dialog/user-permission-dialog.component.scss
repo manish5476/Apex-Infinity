@@ -1,0 +1,138 @@
+.user-permission-container {
+    display: flex;
+    flex-direction: column;
+    max-height: 80vh;
+    background: var(--bg-primary);
+  
+    .dialog-header-sticky {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+  
+      .backdrop-blur {
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+    }
+  
+    .permission-list-scroll {
+      flex: 1;
+      padding: var(--spacing-xl);
+    }
+  
+    .permission-group-section {
+      .group-title {
+        color: var(--text-muted);
+        font-weight: 900;
+        letter-spacing: 0.1em;
+        font-size: 10px;
+      }
+    }
+  
+    .permission-card {
+      transition: var(--transition-base);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid var(--border-tertiary);
+      background: var(--bg-secondary);
+      cursor: default;
+  
+      &:hover {
+        background: var(--bg-hover);
+        border-color: var(--border-secondary);
+      }
+  
+      &.override-granted {
+        border-color: var(--color-success-border);
+        background: var(--color-success-bg);
+  
+        .tag-badge {
+          color: var(--color-success);
+        }
+      }
+  
+      &.override-revoked {
+        border-color: var(--color-error-border);
+        background: var(--color-error-bg);
+  
+        .tag-badge {
+          color: var(--color-error);
+        }
+      }
+  
+      .tag-badge {
+        font-family: var(--font-mono);
+        color: var(--color-primary);
+        font-weight: 700;
+      }
+  
+      .description {
+        line-height: 1.4;
+      }
+    }
+  
+    .dialog-footer {
+      background: var(--bg-primary);
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+    }
+  }
+  
+  /* SelectButton Premium Customization */
+  ::ng-deep {
+    .glass-select-button {
+      &.compact-selector {
+        .p-button {
+          padding: 0.4rem 0.6rem;
+          background: var(--bg-secondary);
+          border: 1px solid var(--border-tertiary);
+          color: var(--text-muted);
+          font-size: 0.8rem;
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  
+          &:hover:not(.p-highlight) {
+            background: var(--bg-hover);
+            color: var(--text-secondary);
+          }
+  
+          &.p-highlight {
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            border-color: var(--text-primary);
+            z-index: 2;
+  
+            /* Grant Highlight */
+            &:nth-child(2) {
+              background: var(--color-success);
+              border-color: var(--color-success);
+              color: white;
+            }
+  
+            /* Revoke Highlight */
+            &:nth-child(3) {
+              background: var(--color-error);
+              border-color: var(--color-error);
+              color: white;
+            }
+          }
+  
+          &:focus {
+            box-shadow: none;
+          }
+        }
+      }
+    }
+  }
+  
+  .shadow-glow {
+    box-shadow: 0 4px 14px 0 rgba(var(--accent-primary-rgb), 0.39);
+  }
+  
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }

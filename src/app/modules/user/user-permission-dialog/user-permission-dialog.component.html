@@ -1,0 +1,92 @@
+<div class="user-permission-container">
+
+  <!-- Header Section (Search & Summary) -->
+  <header class="dialog-header-sticky">
+    <div class="flex justify-between align-center p-4 bg-secondary-90 border-b border-tertiary backdrop-blur">
+      <div class="search-box-wrapper flex-1 mr-4">
+        <span class="p-input-icon-left w-full">
+          <i class="pi pi-search"></i>
+          <input pInputText type="text" class="w-full glass-input" placeholder="Search permissions by tag or group..."
+            (input)="onSearch($event)">
+        </span>
+      </div>
+      <div class="summary-pills flex gap-2">
+        <span class="badge bg-success-light text-success px-3 py-1 rounded-pill text-xs font-bold shadow-sm">
+          {{ grantedCount() }} Granted
+        </span>
+        <span class="badge bg-error-light text-error px-3 py-1 rounded-pill text-xs font-bold shadow-sm">
+          {{ revokedCount() }} Revoked
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content Section (Grouped Permissions) -->
+  <main class="permission-list-scroll custom-scroll p-4 overflow-y-auto max-h-[60vh]">
+    @if (isLoading()) {
+    <div class="flex-col gap-4 py-10 opacity-50">
+      <div class="w-full h-12 bg-secondary rounded-xl animate-pulse"></div>
+      <div class="w-full h-12 bg-secondary rounded-xl animate-pulse"></div>
+      <div class="w-full h-12 bg-secondary rounded-xl animate-pulse"></div>
+    </div>
+    }
+
+    @else {
+    @for (group of groupedPermissions(); track group.name) {
+    <div class="permission-group-section mb-8">
+      <div class="group-header flex align-center gap-3 mb-4 sticky top-0 z-10 bg-bg-primary pt-2 pb-1">
+        <span class="group-title text-sm font-black text-muted uppercase tracking-widest">{{ group.name }}</span>
+        <div class="group-line flex-1 h-px bg-tertiary"></div>
+      </div>
+
+      <div class="group-items-grid grid grid-cols-1 gap-3">
+        @for (p of group.items; track p.tag) {
+        <div
+          class="permission-card bg-secondary border border-tertiary rounded-xl p-3 flex align-center justify-between transition-base hover-border-primary hover-shadow-sm"
+          [class.override-granted]="p.state === 'grant'" [class.override-revoked]="p.state === 'revoke'">
+
+          <div class="permission-info flex-1 pr-4">
+            <div class="flex align-center gap-2 mb-1">
+              <span class="tag-badge font-mono text-xs font-bold text-primary">{{ p.tag }}</span>
+            </div>
+            <p class="description text-xs text-muted m-0">{{ p.description }}</p>
+          </div>
+
+          <div class="permission-actions">
+            <p-selectButton [options]="stateOptions" [(ngModel)]="p.state" optionLabel="label" optionValue="value"
+              styleClass="glass-select-button compact-selector">
+              <ng-template let-item pTemplate="item">
+                <i [class]="item.icon" [pTooltip]="item.label" tooltipPosition="bottom"></i>
+              </ng-template>
+            </p-selectButton>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+    }
+
+    @if (groupedPermissions().length === 0) {
+    <div class="empty-state py-20 text-center flex-col align-center">
+      <i class="pi pi-search text-4xl text-muted mb-4 opacity-30"></i>
+      <h4 class="text-md font-bold text-muted">No permissions found matching search.</h4>
+    </div>
+    }
+    }
+  </main>
+
+  <!-- Footer Section (Actions) -->
+  <footer class="dialog-footer p-4 border-t border-tertiary flex justify-between align-center">
+    <button pButton label="Reset All Overrides" icon="pi pi-refresh"
+      class="p-button-text p-button-warning p-button-sm font-bold" (click)="resetAll()"
+      [disabled]="isLoading() || isSaving()"></button>
+
+    <div class="flex gap-3">
+      <button pButton label="Cancel" class="p-button-text p-button-secondary p-button-lg rounded-pill" (click)="close()"
+        [disabled]="isSaving()"></button>
+      <button pButton label="Save Changes" icon="pi pi-check"
+        class="p-button-primary p-button-lg rounded-pill px-6 shadow-glow" (click)="save()" [loading]="isSaving()"
+        [disabled]="isLoading()"></button>
+    </div>
+  </footer>
+</div>

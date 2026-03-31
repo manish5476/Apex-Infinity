@@ -1,0 +1,58 @@
+.status-dialog-container {
+    background: var(--bg-primary);
+    border-radius: 12px;
+    overflow: hidden;
+
+    .dialog-header {
+        backdrop-filter: blur(12px);
+    }
+
+    .status-panel {
+        background: var(--bg-secondary-90);
+        border: 1px solid var(--border-tertiary);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+        &.active-mode {
+            border-color: var(--color-success-primary);
+            background: rgba(var(--color-success-rgb), 0.05);
+            box-shadow: 0 4px 12px rgba(var(--color-success-rgb), 0.1);
+        }
+
+        &.blocked-mode {
+            border-color: var(--color-error-primary);
+            background: rgba(var(--color-error-rgb), 0.05);
+            box-shadow: 0 4px 12px rgba(var(--color-error-rgb), 0.1);
+        }
+    }
+
+    .glass-input {
+        background: var(--bg-secondary);
+        backdrop-filter: blur(8px);
+        border: 1px solid var(--border-tertiary);
+        resize: none;
+        transition: all 0.2s ease;
+
+        &:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(var(--accent-primary-rgb), 0.1);
+            outline: none;
+        }
+    }
+}
+
+.animate-slideDown {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from { 
+        opacity: 0; 
+        max-height: 0;
+        transform: translateY(-10px); 
+    }
+    to { 
+        opacity: 1; 
+        max-height: 200px;
+        transform: translateY(0); 
+    }
+}
