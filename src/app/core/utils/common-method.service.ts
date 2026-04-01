@@ -793,6 +793,54 @@ export class CommonMethodService {
   }
 
   allThemes: Theme[] = [
+    { 
+    name: "Ivory", 
+    id: "ivory", 
+    color: "#B35A3D", 
+    gradient: "linear-gradient(135deg, #B35A3D 0%, #D4846A 100%)", 
+    category: "light", 
+    description: "Premium, warm, and minimalist design with terracotta accents on soft ivory backgrounds." 
+  },
+  { 
+    name: "Aurora", 
+    id: "aurora", 
+    color: "#4a6fa5", 
+    gradient: "linear-gradient(135deg, #4a6fa5 0%, #7fb5c8 100%)", 
+    category: "light", 
+    description: "Clean, corporate, and professional with crisp blue and slate tones." 
+  },
+  { 
+    name: "Ember", 
+    id: "ember", 
+    color: "#c05621", 
+    gradient: "linear-gradient(135deg, #c05621 0%, #d4a843 100%)", 
+    category: "light", 
+    description: "Warm, earthy, and energetic featuring deep orange and radiant gold gradients." 
+  },
+  { 
+    name: "Verdant", 
+    id: "verdant", 
+    color: "#2d6a2d", 
+    gradient: "linear-gradient(135deg, #2d6a2d 0%, #7ab87a 100%)", 
+    category: "light", 
+    description: "Organic, calm, and botanical with refreshing forest and leaf greens." 
+  },
+  { 
+    name: "Sakura", 
+    id: "sakura", 
+    color: "#b83060", 
+    gradient: "linear-gradient(135deg, #b83060 0%, #e897b0 100%)", 
+    category: "light", 
+    description: "Soft, floral, and elegant using delicate pinks and rich rose shades." 
+  },
+  { 
+    name: "Cyberpunk", 
+    id: "cyberpunk", 
+    color: "#fef08a", 
+    gradient: "linear-gradient(135deg, #fef08a 0%, #22d3ee 100%)", 
+    category: "dark", 
+    description: "High-contrast retro-futuristic dark mode with piercing neon yellow and cyan." 
+  },
     { name: "theme-neon-eclipse", id: "theme-neon-eclipse", color: "#bf00ff", gradient: "linear-gradient(135deg, #bf00ff 0%, #3a0088 100%)", category: "dark", description: "Vibrant neon tones piercing through a deep, dark eclipse background." },
     { name: "theme-naval-amber", id: "theme-naval-amber", color: "#ffbf00", gradient: "linear-gradient(135deg, #000080 0%, #ffbf00 100%)", category: "professional", description: "A commanding deep naval blue contrasted with warm, glowing amber highlights." },
     { name: "theme-abyssal-coral", id: "theme-abyssal-coral", color: "#ff7f50", gradient: "linear-gradient(135deg, #0b1d28 0%, #ff7f50 100%)", category: "dark", description: "Deep oceanic abyssal tones paired with vibrant, living coral." },
