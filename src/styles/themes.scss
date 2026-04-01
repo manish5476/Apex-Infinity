@@ -441,6 +441,285 @@
 /* --------------------------------------------------------------------------
    GROUP A: DARK BLUE × ORANGE/AMBER — 20 Variations (Enhanced)
    -------------------------------------------------------------------------- */
+/* ==========================================================================
+   THEME: IVORY (Premium, Warm, Minimalist)
+   ========================================================================== */
+.ivory {
+  /* Core Backgrounds - Soft, warm whites and beiges */
+  --theme-bg-primary: #FFFAF0;     /* Pure Ivory */
+  --theme-bg-secondary: #FDF5E6;   /* Slightly warmer/darker for contrast panels */
+  --theme-bg-ternary: #F5EBE0;     /* Soft beige for deep depth */
+
+  /* Text Colors - Warm darks instead of harsh pure blacks */
+  --theme-text-primary: #2C2A28;   /* Rich warm charcoal */
+  --theme-text-secondary: #5C5752; /* Muted warm gray */
+  --theme-text-tertiary: #8B8680;  /* Soft text for hints */
+  --theme-text-label: #A19B95;     /* Overlines and meta text */
+
+  /* Borders */
+  --theme-border-primary: #E6DED5; 
+  --theme-border-secondary: #D6CEC4;
+
+  /* Accent - Refined Terracotta / Warm Bronze */
+  --theme-accent-primary: #B35A3D; 
+  --theme-accent-secondary: #D4846A;
+  --theme-accent-tertiary: #E8C1B5;
+  --theme-accent-gradient: linear-gradient(135deg, #B35A3D 0%, #D4846A 100%);
+  --theme-accent-hover: #94462C;
+  --theme-accent-focus: rgba(179, 90, 61, 0.15);
+
+  /* Semantic Feedback Colors - Muted to match the elegant vibe */
+  --theme-success: #3C7A51;        /* Muted forest green */
+  --theme-warning: #D68A27;        /* Warm ochre */
+  --theme-error: #C44545;          /* Brick red */
+  --theme-info: #4A7A8C;           /* Muted slate blue */
+
+  /* Disabled States */
+  --theme-disabled: #EBE5DF;
+  --theme-disabled-text: #A39E99;
+
+  /* Component States (using subtle overlays) */
+  --component-bg-hover: rgba(44, 42, 40, 0.04);
+  --component-bg-active: rgba(44, 42, 40, 0.08);
+
+  /* Glassmorphism Settings */
+  --glass-bg: rgba(255, 250, 240, 0.75);
+  --glass-blur: 12px;
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-shadow: 0 8px 32px rgba(44, 42, 40, 0.06);
+
+  /* Scrollbar */
+  --scroll-thumb: #D6CEC4;
+  --scroll-track: transparent;
+  
+  /* Automatically trigger the mixin to map these into the UI variables */
+  @include apply-canonical-mapping;
+}
+
+/* ==========================================================================
+   THEME 1: AURORA (Clean, Corporate, Blue-Tinted)
+   ========================================================================== */
+aurora {
+  --theme-bg-primary: #ffffff;
+  --theme-bg-secondary: #f7f9fc;
+  --theme-bg-ternary: #f0f4f8;
+  
+  --theme-text-primary: #1a2233;
+  --theme-text-secondary: #4a5568;
+  --theme-text-tertiary: #718096;
+  --theme-text-label: #a0aec0;
+  
+  --theme-border-primary: #e2e8f0;
+  --theme-border-secondary: #cbd5e0;
+  
+  --theme-accent-primary: #4a6fa5;
+  --theme-accent-secondary: #7fb5c8;
+  --theme-accent-tertiary: #d0dff0;
+  --theme-accent-gradient: linear-gradient(135deg, #4a6fa5 0%, #7fb5c8 100%);
+  --theme-accent-hover: #3a5a8a;
+  --theme-accent-focus: rgba(74, 111, 165, 0.15);
+  
+  --theme-success: #38a169;
+  --theme-warning: #d69e2e;
+  --theme-error: #e53e3e;
+  --theme-info: #3182ce;
+  
+  --theme-disabled: #e2e8f0;
+  --theme-disabled-text: #a0aec0;
+  
+  --component-bg-hover: rgba(74, 111, 165, 0.07);
+  --component-bg-active: rgba(74, 111, 165, 0.14);
+  
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-blur: 16px;
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-shadow: 0 8px 32px rgba(74, 111, 165, 0.08);
+  
+  --scroll-thumb: #c0cfe0;
+  --scroll-track: transparent;
+  
+  @include apply-canonical-mapping;
+}
+
+/* ==========================================================================
+   THEME 2: EMBER (Warm, Earthy, Energetic)
+   ========================================================================== */
+ember {
+  --theme-bg-primary: #ffffff;
+  --theme-bg-secondary: #fdf5ec;
+  --theme-bg-ternary: #fdf8f2;
+  
+  --theme-text-primary: #2a1810;
+  --theme-text-secondary: #6b3d28;
+  --theme-text-tertiary: #9c6444;
+  --theme-text-label: #c9a080;
+  
+  --theme-border-primary: #f0dcc8;
+  --theme-border-secondary: #e8d0b8;
+  
+  --theme-accent-primary: #c05621;
+  --theme-accent-secondary: #d4a843;
+  --theme-accent-tertiary: #fde0cc;
+  --theme-accent-gradient: linear-gradient(135deg, #c05621 0%, #d4a843 100%);
+  --theme-accent-hover: #a04418;
+  --theme-accent-focus: rgba(192, 86, 33, 0.15);
+  
+  --theme-success: #276749;
+  --theme-warning: #c05621;
+  --theme-error: #9b2335;
+  --theme-info: #2c5282;
+  
+  --theme-disabled: #f0dcc8;
+  --theme-disabled-text: #c9a080;
+  
+  --component-bg-hover: rgba(192, 86, 33, 0.06);
+  --component-bg-active: rgba(192, 86, 33, 0.12);
+  
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-blur: 16px;
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-shadow: 0 8px 32px rgba(192, 86, 33, 0.08);
+  
+  --scroll-thumb: #e0c0a0;
+  --scroll-track: transparent;
+  
+  @include apply-canonical-mapping;
+}
+
+/* ==========================================================================
+   THEME 3: VERDANT (Organic, Calm, Botanical)
+   ========================================================================== */
+verdant {
+  --theme-bg-primary: #ffffff;
+  --theme-bg-secondary: #f5faf5;
+  --theme-bg-ternary: #f2f7f2;
+  
+  --theme-text-primary: #1a2e1a;
+  --theme-text-secondary: #3d5c3d;
+  --theme-text-tertiary: #618061;
+  --theme-text-label: #a0c0a0;
+  
+  --theme-border-primary: #d8ecd8;
+  --theme-border-secondary: #c0d8c0;
+  
+  --theme-accent-primary: #2d6a2d;
+  --theme-accent-secondary: #7ab87a;
+  --theme-accent-tertiary: #d0ead0;
+  --theme-accent-gradient: linear-gradient(135deg, #2d6a2d 0%, #7ab87a 100%);
+  --theme-accent-hover: #1f5020;
+  --theme-accent-focus: rgba(45, 106, 45, 0.15);
+  
+  --theme-success: #276749;
+  --theme-warning: #b7791f;
+  --theme-error: #c53030;
+  --theme-info: #2b6cb0;
+  
+  --theme-disabled: #d8ecd8;
+  --theme-disabled-text: #a0c0a0;
+  
+  --component-bg-hover: rgba(45, 106, 45, 0.07);
+  --component-bg-active: rgba(45, 106, 45, 0.14);
+  
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-blur: 16px;
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-shadow: 0 8px 32px rgba(45, 106, 45, 0.08);
+  
+  --scroll-thumb: #b0d0b0;
+  --scroll-track: transparent;
+  
+  @include apply-canonical-mapping;
+}
+
+/* ==========================================================================
+   THEME 4: SAKURA (Soft, Floral, Elegant)
+   ========================================================================== */
+sakura {
+  --theme-bg-primary: #ffffff;
+  --theme-bg-secondary: #fdf0f4;
+  --theme-bg-ternary: #fdf5f7;
+  
+  --theme-text-primary: #2d1a22;
+  --theme-text-secondary: #6b3a50;
+  --theme-text-tertiary: #9c6878;
+  --theme-text-label: #d0a0b0;
+  
+  --theme-border-primary: #f0d8e4;
+  --theme-border-secondary: #e8c8d4;
+  
+  --theme-accent-primary: #b83060;
+  --theme-accent-secondary: #e897b0;
+  --theme-accent-tertiary: #fbd8e8;
+  --theme-accent-gradient: linear-gradient(135deg, #b83060 0%, #e897b0 100%);
+  --theme-accent-hover: #941848;
+  --theme-accent-focus: rgba(184, 48, 96, 0.15);
+  
+  --theme-success: #2f855a;
+  --theme-warning: #c05621;
+  --theme-error: #9b2335;
+  --theme-info: #2c5282;
+  
+  --theme-disabled: #f0d8e4;
+  --theme-disabled-text: #d0a0b0;
+  
+  --component-bg-hover: rgba(184, 48, 96, 0.06);
+  --component-bg-active: rgba(184, 48, 96, 0.12);
+  
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-blur: 16px;
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-shadow: 0 8px 32px rgba(184, 48, 96, 0.08);
+  
+  --scroll-thumb: #e0b0c4;
+  --scroll-track: transparent;
+  
+  @include apply-canonical-mapping;
+}
+
+/* ==========================================================================
+   THEME 5: CYBERPUNK (High Contrast Dark Mode First)
+   ========================================================================== */
+cyberpunk {
+  --theme-bg-primary: #000000;
+  --theme-bg-secondary: #09090b;
+  --theme-bg-ternary: #18181b;
+  
+  --theme-text-primary: #fef08a;
+  --theme-text-secondary: #fde047;
+  --theme-text-tertiary: #facc15;
+  --theme-text-label: #71717a;
+  
+  --theme-border-primary: #18181b;
+  --theme-border-secondary: #27272a;
+  
+  --theme-accent-primary: #fef08a;
+  --theme-accent-secondary: #22d3ee;
+  --theme-accent-tertiary: rgba(254, 240, 138, 0.25);
+  --theme-accent-gradient: linear-gradient(135deg, #fef08a 0%, #22d3ee 100%);
+  --theme-accent-hover: #fde047;
+  --theme-accent-focus: rgba(254, 240, 138, 0.2);
+  
+  --theme-success: #4ade80;
+  --theme-warning: #fb923c;
+  --theme-error: #f87171;
+  --theme-info: #38bdf8;
+  
+  --theme-disabled: #27272a;
+  --theme-disabled-text: #71717a;
+  
+  --component-bg-hover: rgba(254, 240, 138, 0.1);
+  --component-bg-active: rgba(254, 240, 138, 0.2);
+  
+  --glass-bg: rgba(0, 0, 0, 0.75);
+  --glass-blur: 16px;
+  --glass-border: rgba(254, 240, 138, 0.1);
+  --glass-shadow: 4px 4px 0 #fef08a; /* Keeping that rigid retro shadow style */
+  
+  --scroll-thumb: #3f3f46;
+  --scroll-track: transparent;
+  
+  @include apply-canonical-mapping;
+}
 
 /* 1. Neon Eclipse — Enhanced */
 .theme-neon-eclipse {
