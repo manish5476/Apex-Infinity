@@ -22,6 +22,8 @@ export class ResetPasswordComponent implements OnInit {
   private authService = inject(AuthService);
   private messageService = inject(AppMessageService);
   isLoading = signal(false);
+  successMessage = signal<string | null>(null);
+  errorMessage = signal<string | null>(null);
   token = '';
 
   resetForm = this.fb.group({
@@ -42,17 +44,23 @@ export class ResetPasswordComponent implements OnInit {
       this.messageService.showWarn('Passwords do not match.');
       return;
     }
+
     this.isLoading.set(true);
+    this.successMessage.set(null);
+    this.errorMessage.set(null);
+
     this.authService.resetPassword(this.token, this.resetForm.value).subscribe({
       next: () => {
         this.isLoading.set(false);
         this.resetForm.reset();
-        this.messageService.showSuccess('Password reset successfully! You can now log in.');
+        const msg = 'Password reset successfully! You can now log in.';
+        this.successMessage.set(msg);
+        this.messageService.showSuccess(msg);
       },
       error: (err) => {
         this.isLoading.set(false);
-
-        // Replaced the manual error handling with your centralized handler
+        const msg = err.error?.message || 'Something went wrong. Please try again.';
+        this.errorMessage.set(msg);
         this.messageService.handleHttpError(err);
       }
     });

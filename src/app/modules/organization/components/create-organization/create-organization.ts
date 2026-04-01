@@ -5,6 +5,8 @@ import { Router, RouterModule } from '@angular/router';
 import { finalize } from 'rxjs/operators';
 import { ToastModule } from 'primeng/toast';
 import { PasswordModule } from 'primeng/password';
+import { StepperModule } from 'primeng/stepper';
+import { ButtonModule } from 'primeng/button';
 import { AuthService } from '../../../auth/services/auth-service';
 import { OrganizationService } from '../../organization.service';
 import { MasterListService } from '../../../../core/services/master-list.service';
@@ -19,6 +21,8 @@ import { AppMessageService } from '../../../../core/services/message.service';
     RouterModule,
     ToastModule,
     PasswordModule,
+    StepperModule,
+    ButtonModule
   ],
   providers: [AppMessageService],
   templateUrl: './create-organization.html',
@@ -33,13 +37,15 @@ export class CreateOrganizationComponent implements OnInit {
   private masterList = inject(MasterListService);
 
   isLoading = signal(false);
+  successMessage = signal<string | null>(null);
+  errorMessage = signal<string | null>(null);
   passwordVisible = signal(false);
   focusedField = signal<string | null>(null);
 
   organizationForm!: FormGroup;
 
   // Multi-step: 3 sections, track which is active for progress indicator
-  activeSection = signal(0);
+  activeSection: any = signal(0);
   readonly sections = ['Organization', 'Location', 'Admin'];
 
   ngOnInit(): void { this.initForm(); }
@@ -108,7 +114,11 @@ export class CreateOrganizationComponent implements OnInit {
       this.messageService.showWarn('Please check all required fields.');
       return;
     }
+
     this.isLoading.set(true);
+    this.successMessage.set(null);
+    this.errorMessage.set(null);
+
     const payload = { ...this.organizationForm.value };
     payload.uniqueShopId = payload.uniqueShopId.toUpperCase();
     if (payload.gstNumber) payload.gstNumber = payload.gstNumber.toUpperCase();
@@ -117,7 +127,9 @@ export class CreateOrganizationComponent implements OnInit {
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: (res: any) => {
-          this.messageService.showSuccess('Organization created! Logging you in…');
+          const msg = 'Organization created! Logging you in…';
+          this.successMessage.set(msg);
+          this.messageService.showSuccess(msg);
           if (res.token) {
             this.authService.handleLoginSuccess(res);
             this.masterList.load();
@@ -126,7 +138,11 @@ export class CreateOrganizationComponent implements OnInit {
             this.router.navigate(['/auth/login']);
           }
         },
-        error: (err: any) => this.messageService.handleHttpError(err),
+        error: (err: any) => {
+          const msg = err.error?.message || 'Failed to create organization. Please try again.';
+          this.errorMessage.set(msg);
+          this.messageService.handleHttpError(err);
+        },
       });
   }
 }
