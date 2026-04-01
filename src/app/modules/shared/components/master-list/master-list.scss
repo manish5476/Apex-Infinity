@@ -2,15 +2,18 @@
    1. CORE LAYOUT & VARIABLES
    ============================================== */
 :host {
-  display: flex;          /* Changed to flex */
+  display: flex;
+  /* Changed to flex */
   flex-direction: column;
   width: 100%;
-  height: 100%;           /* Fill parent */
+  height: 100%;
+  /* Fill parent */
   padding: var(--spacing-xl);
   // background: var(--bg-primary);
   background: transparent;
-  overflow: hidden;       /* Prevent host scroll */
-  
+  overflow: hidden;
+  /* Prevent host scroll */
+
   /* Local Variables for the "Rectangular" look */
   --radius-sharp: 2px;
   --shadow-deep: 0 10px 40px -10px rgba(0, 0, 0, 0.3);
@@ -21,7 +24,8 @@
   width: 100%;
   margin: 0 auto;
   border-radius: var(--radius-2xl);
-  display: flex;          /* Ensure container flexes */
+  display: flex;
+  /* Ensure container flexes */
   flex-direction: column;
 }
 
@@ -29,8 +33,10 @@
    2. CARD & TOOLBAR (PREMIUM SHARP LOOK)
    ============================================== */
 .master-card {
-  flex: 1;                /* Grow to fill height */
-  min-height: 0;          /* Allow shrinking */
+  flex: 1;
+  /* Grow to fill height */
+  min-height: 0;
+  /* Allow shrinking */
   display: flex;
   flex-direction: column;
   padding: var(--spacing-xl);
@@ -38,7 +44,7 @@
   background: transparent;
   border: 1px solid var(--border-primary);
   /* Optional: overflow hidden if you want rounded corners clipping content */
-  /* overflow: hidden; */ 
+  /* overflow: hidden; */
 }
 
 .master-toolbar {
@@ -48,7 +54,8 @@
   border-bottom: 1px solid var(--border-primary) !important;
   margin-bottom: var(--spacing-lg);
   border-radius: 0 !important;
-  flex-shrink: 0; /* Keep toolbar visible */
+  flex-shrink: 0;
+  /* Keep toolbar visible */
 
   .section-heading {
     font-size: 1.5rem;
@@ -63,10 +70,13 @@
    3. GRID WRAPPER (THE HEIGHT FIX)
    ============================================== */
 .master-grid-wrapper {
-  flex: 1;                /* Grow to fill remaining space */
-  min-height: 0;          /* CRITICAL for grid scrolling */
+  flex: 1;
+  /* Grow to fill remaining space */
+  min-height: 0;
+  /* CRITICAL for grid scrolling */
   border: 1px solid var(--border-primary);
-  background: var(--bg-primary); /* Optional contrast */
+  background: var(--bg-primary);
+  /* Optional contrast */
   border-radius: var(--radius-sharp);
   overflow: hidden;
 
@@ -81,12 +91,12 @@
 //    4. SHARP COMPONENT OVERRIDES
 //    ============================================== */
 // :host ::ng-deep {
-    
+
 //     /* --- Buttons: Sharp & Flat --- */
 //     .p-button {
 //         border-radius: var(--radius-sharp) !important;
 //         font-weight: 600;
-        
+
 //         &.p-button-outlined {
 //             border-width: 1px;
 //         }
@@ -104,13 +114,13 @@
 //             border-color: var(--primary-color);
 //             box-shadow: 0 0 0 1px var(--primary-color);
 //         }
-        
+
 //         &::placeholder {
 //             color: var(--text-secondary);
 //             opacity: 0.7;
 //         }
 //     }
-    
+
 //     /* --- Tags: Rectangular --- */
 //     .p-tag {
 //         border-radius: var(--radius-sharp) !important;
@@ -135,7 +145,7 @@
 //             border-bottom: 1px solid var(--border-primary);
 //             padding: 1.25rem 1.5rem;
 //             border-radius: 0;
-            
+
 //             .p-dialog-title {
 //                 font-weight: 700;
 //                 font-size: 1.1rem;
@@ -146,7 +156,7 @@
 //             background: var(--bg-secondary);
 //             color: var(--text-primary);
 //             padding: 1.5rem;
-            
+
 //             &::-webkit-scrollbar { width: 6px; }
 //             &::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 3px; }
 //         }
@@ -160,7 +170,7 @@
 
 //         .form-group {
 //             margin-bottom: 0.5rem;
-            
+
 //             label {
 //                 color: var(--text-label);
 //                 font-size: 0.85rem;
@@ -176,86 +186,95 @@
    6. BULK EDITOR - SPREADSHEET LOOK
    ============================================== */
 .bulk-form-layout {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .bulk-control-panel {
-    border-bottom: 1px solid var(--border-primary);
-    padding-bottom: 1rem;
-    margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-primary);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
 }
 
 .bulk-data-table {
-    border: 1px solid var(--border-primary);
-    border-radius: var(--radius-sharp);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-sharp);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .bulk-header-row {
-    display: flex;
-    background: var(--bg-ternary);
-    border-bottom: 1px solid var(--border-primary);
-    padding: 0.75rem 1rem;
-    
-    span {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        font-weight: 700;
-        color: var(--text-label);
-        letter-spacing: 0.04em;
-    }
+  display: flex;
+  background: var(--bg-ternary);
+  border-bottom: 1px solid var(--border-primary);
+  padding: 0.75rem 1rem;
+
+  span {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--text-label);
+    letter-spacing: 0.04em;
+  }
 }
 
 .bulk-data-rows {
+  background: var(--bg-secondary);
+
+  .bulk-item-row {
+    display: flex;
+    align-items: flex-start;
+    border-bottom: 1px solid var(--border-secondary);
+    padding: 0.5rem 1rem;
     background: var(--bg-secondary);
-    
-    .bulk-item-row {
-        display: flex;
-        align-items: flex-start;
-        border-bottom: 1px solid var(--border-secondary);
-        padding: 0.5rem 1rem;
-        background: var(--bg-secondary);
-        transition: background 0.2s;
+    transition: background 0.2s;
 
-        &:hover {
-            background: var(--bg-ternary);
-        }
-        
-        &:last-child {
-            border-bottom: none;
-        }
-
-        .form-group-inline {
-            padding-right: 0.75rem;
-            display: flex;
-            flex-direction: column;
-            
-            input {
-                height: 2.4rem;
-                font-size: 0.9rem;
-            }
-            
-            .uppercase-input {
-                font-family: monospace;
-                letter-spacing: 1px;
-            }
-        }
+    &:hover {
+      background: var(--bg-ternary);
     }
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .form-group-inline {
+      padding-right: 0.75rem;
+      display: flex;
+      flex-direction: column;
+
+      input {
+        height: 2.4rem;
+        font-size: 0.9rem;
+      }
+
+      .uppercase-input {
+        font-family: monospace;
+        letter-spacing: 1px;
+      }
+    }
+  }
 }
 
 .bulk-scroll-wrapper {
-    &::-webkit-scrollbar { width: 8px; }
-    &::-webkit-scrollbar-track {   background: var(--bg-secondary); }
-    &::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 4px; }
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+    border-radius: 4px;
+  }
 }
 
 .error-message {
-    color: #ef4444;
-    font-size: 0.75rem;
-    margin-top: 2px;
-    display: block;
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 2px;
+  display: block;
 }

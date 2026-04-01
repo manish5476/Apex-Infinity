@@ -1,129 +1,22 @@
-/* ==========================================
-   SALES LIST (Enterprise Full Height)
-   ========================================== */
-
 :host {
   display: block;
   width: 100%;
   height: 100%;
-  overflow: hidden; /* Prevent host scrolling */
-}
-
-.list-page-container {
-  display: flex;
-  border-radius: var(--radius-2xl);
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-  // background: var(--bg-primary);
-  background: transparent;
-  padding: var(--spacing-xl);
-  gap: var(--spacing-lg);
   overflow: hidden;
 }
 
-/* --- 1. HEADER --- */
-.list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-shrink: 0;
-
-  .list-title {
-    margin: 0;
-    font-family: var(--font-heading);
-    font-size: var(--font-size-2xl);
-    font-weight: 700;
-    color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-}
-
-/* --- 2. FILTER BAR --- */
-.themed-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--ui-border-radius-lg);
-  box-shadow: var(--shadow-sm);
-  padding: var(--spacing-lg);
-  flex-shrink: 0;
-}
-
-.se-filter-bar {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--spacing-lg);
-  flex-wrap: wrap;
-}
-
-.se-filter-field {
+.full-size-grid {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 6px;
   flex: 1;
-  min-width: 180px;
 
-  &.search-field {
-    flex: 2;
-    min-width: 250px;
-  }
-
-  label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    color: var(--text-tertiary);
-    letter-spacing: 0.5px;
-  }
-}
-
-.se-filter-actions {
-  display: flex;
-  gap: var(--spacing-sm);
-  margin-left: auto;
-  padding-bottom: 2px;
-  
-  @media (max-width: 1024px) {
-    width: 100%;
-    margin-left: 0;
-    justify-content: flex-end;
-    margin-top: var(--spacing-md);
-  }
-}
-
-/* --- 3. GRID AREA (The Flex Magic) --- */
-.list-grid-area {
-  flex: 1;             /* Grow to fill space */
-  min-height: 0;       /* CRITICAL: Allows shrinking below content size */
-  display: flex;
-  flex-direction: column;
-  padding: 0;          /* Remove padding for flush grid */
-  position: relative;
-  
-  /* Override default card styles for grid container */
-  &.themed-card {
-    padding: 0;
-    border: 1px solid var(--border-primary);
-    background: var(--bg-secondary);
-    overflow: hidden;
-  }
-
-  .full-size-grid {
+  ::ng-deep ag-grid-angular,
+  ::ng-deep .ag-root-wrapper {
     width: 100%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
     flex: 1;
-
-    /* Deep selector to force AG Grid height */
-    ::ng-deep ag-grid-angular,
-    ::ng-deep .ag-root-wrapper {
-        width: 100%;
-        height: 100%;
-        flex: 1;
-    }
   }
 }
 

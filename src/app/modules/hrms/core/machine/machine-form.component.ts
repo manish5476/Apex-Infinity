@@ -657,7 +657,7 @@ export class MachineFormComponent implements OnInit {
 //         <strong class="text-error">For security reasons, this key will never be shown again.</strong>
 //       </p>
 
-//       <div class="api-key-box bg-surface p-4 border-radius-md border-1 surface-border flex-between mb-4">
+//       <div class="api-key-box bg-surface p-4 border-radius-md manish-border-1 surface-border flex-between mb-4">
 //         <code class="font-bold text-primary-color break-all">{{ generatedApiKey }}</code>
 //         <p-button icon="pi pi-copy" [text]="true" [rounded]="true" severity="secondary" pTooltip="Copy to clipboard" (onClick)="copyKey()"></p-button>
 //       </div>
@@ -708,7 +708,7 @@ export class MachineFormComponent implements OnInit {
 //     .bg-surface { background: var(--bg-secondary); }
 //     .border-top { border-top: 1px solid var(--border-primary); }
 //     .border-bottom { border-bottom: 1px solid var(--border-primary); }
-//     .border-1 { border: 1px solid; }
+//     .manish-border-1 { border: 1px solid; }
 //     .surface-border { border-color: var(--border-primary); }
 //     .border-radius-md { border-radius: var(--ui-border-radius-md); }
     

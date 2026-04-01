@@ -74,15 +74,15 @@ import { ToastModule } from 'primeng/toast';
         </header>
 
         <div class="grid-3 mb-4xl slide-down" style="animation-delay: 0.1s">
-          <div class="kpi-card glass-inset p-xl border-radius-lg border-1 border-solid border-secondary border-left-primary">
+          <div class="kpi-card glass-inset p-xl border-radius-lg manish-border-1 border-solid border-secondary border-left-primary">
              <span class="text-xs text-tertiary uppercase font-bold tracking-widest">Total Authorized Entrances</span>
              <div class="text-4xl font-heading font-bold text-primary mt-sm line-height-none">{{ stats()?.totalCheckIns || 0 }}</div>
           </div>
-          <div class="kpi-card glass-inset p-xl border-radius-lg border-1 border-solid border-secondary border-left-success">
+          <div class="kpi-card glass-inset p-xl border-radius-lg manish-border-1 border-solid border-secondary border-left-success">
              <span class="text-xs text-tertiary uppercase font-bold tracking-widest">Users Mapped</span>
              <div class="text-4xl font-heading font-bold text-success mt-sm line-height-none">{{ data.applicableUsers?.length || 0 }}</div>
           </div>
-          <div class="kpi-card glass-inset p-xl border-radius-lg border-1 border-solid border-secondary border-left-warning">
+          <div class="kpi-card glass-inset p-xl border-radius-lg manish-border-1 border-solid border-secondary border-left-warning">
              <span class="text-xs text-tertiary uppercase font-bold tracking-widest">Departments Mapped</span>
              <div class="text-4xl font-heading font-bold color-warning mt-sm line-height-none">{{ data.applicableDepartments?.length || 0 }}</div>
           </div>
@@ -115,7 +115,7 @@ import { ToastModule } from 'primeng/toast';
                     <p-button label="Save Applicability" icon="pi pi-save" styleClass="p-button-primary" [loading]="isAssigning()" (onClick)="saveUserAssignments()"></p-button>
                   </div>
                   
-                  <div class="picklist-wrapper border-radius-lg overflow-hidden border-1 border-solid border-secondary">
+                  <div class="picklist-wrapper border-radius-lg overflow-hidden manish-border-1 border-solid border-secondary">
                     <p-pickList 
                       [source]="availableUsers" 
                       [target]="targetUsers" 
@@ -149,7 +149,7 @@ import { ToastModule } from 'primeng/toast';
                       <p class="text-sm text-secondary m-0 line-height-relaxed">Enter a raw GPS coordinate to simulate a mobile app punch and verify if the backend calculates it as inside or outside the radius.</p>
                     </div>
                     
-                    <div class="glass-inset p-xl border-radius-lg border-1 border-solid border-secondary flex-col gap-md">
+                    <div class="glass-inset p-xl border-radius-lg manish-border-1 border-solid border-secondary flex-col gap-md">
                       <div class="input-group flex-col gap-xs">
                         <label class="info-label text-xs font-bold text-tertiary uppercase tracking-widest">Test Latitude</label>
                         <p-inputNumber 
@@ -178,7 +178,7 @@ import { ToastModule } from 'primeng/toast';
                     </div>
 
                     @if (testResult()) {
-                      <div class="p-xl border-radius-lg border-1 border-solid slide-down" 
+                      <div class="p-xl border-radius-lg manish-border-1 border-solid slide-down" 
                            [ngClass]="testResult().isInside ? 'bg-success-light border-success text-success' : 'bg-error-light border-error text-error'">
                         <div class="flex align-items-center gap-md">
                           <i class="pi text-4xl" [ngClass]="testResult().isInside ? 'pi-check-circle' : 'pi-times-circle'"></i>
@@ -282,7 +282,7 @@ import { ToastModule } from 'primeng/toast';
     
     .border-top-subtle { border-top: 1px solid var(--border-secondary); }
     .border-bottom-subtle { border-bottom: 1px solid var(--border-secondary); }
-    .border-1 { border-width: 1px; }
+    .manish-border-1 { border-width: 1px; }
     .border-solid { border-style: solid; }
     .border-primary { border-color: var(--border-primary); }
     .border-secondary { border-color: var(--border-secondary); }
@@ -528,7 +528,7 @@ export class GeofenceDetailsComponent implements OnInit {
 //                     <p-button label="Execute Simulation Test" icon="pi pi-bolt" styleClass="p-button-warning w-full" [loading]="isTesting()" (onClick)="testPoint()"></p-button>
 
 //                     @if (testResult()) {
-//                       <div class="p-4 border-radius-md border-1 mt-4" [ngClass]="testResult().isInside ? 'bg-success-light border-success text-success' : 'bg-error-light border-error text-error'">
+//                       <div class="p-4 border-radius-md manish-border-1 mt-4" [ngClass]="testResult().isInside ? 'bg-success-light border-success text-success' : 'bg-error-light border-error text-error'">
 //                         <div class="flex-align gap-3">
 //                           <i class="pi text-3xl" [ngClass]="testResult().isInside ? 'pi-check-circle' : 'pi-times-circle'"></i>
 //                           <div class="flex-col">
@@ -602,7 +602,7 @@ export class GeofenceDetailsComponent implements OnInit {
 //     .bg-error-light { background: var(--color-error-bg, #fef2f2); }
     
 //     .border-bottom { border-bottom: 1px solid var(--border-primary); }
-//     .border-1 { border: 1px solid; }
+//     .manish-border-1 { border: 1px solid; }
 //     .border-success { border-color: color-mix(in srgb, var(--color-success) 30%, transparent); }
 //     .border-error { border-color: color-mix(in srgb, var(--color-error) 30%, transparent); }
 //     .border-radius-md { border-radius: var(--ui-border-radius-md); }

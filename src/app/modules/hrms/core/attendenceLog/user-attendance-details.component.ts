@@ -99,7 +99,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
           
           <div class="flex-col gap-xl h-full">
             
-            <div class="glass-inset p-xl border-radius-lg border-1 border-solid border-secondary flex-between">
+            <div class="glass-inset p-xl border-radius-lg manish-border-1 border-solid border-secondary flex-between">
               <div class="flex-col gap-xs">
                 <span class="text-xs text-tertiary uppercase font-bold tracking-widest">Server Timestamp</span>
                 <span class="font-mono font-bold text-xl text-primary">{{ log.serverTimestamp | date:'dd/MM/yyyy HH:mm:ss' }}</span>
@@ -112,7 +112,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
                 <i class="pi pi-map-marker"></i> Geolocation Data
               </h4>
               
-              <div class="map-placeholder border-radius-md border-1 border-solid border-secondary">
+              <div class="map-placeholder border-radius-md manish-border-1 border-solid border-secondary">
                 <div class="map-grid"></div>
                 <div class="pin-marker"><i class="pi pi-map-marker text-error text-3xl"></i></div>
               </div>
@@ -139,7 +139,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
               <h4 class="m-0 font-heading text-sm font-bold text-tertiary uppercase tracking-widest border-bottom-subtle pb-sm flex align-items-center gap-sm">
                 <i class="pi pi-cog"></i> Device & Network
               </h4>
-              <div class="glass-inset p-md border-radius-md border-1 border-solid border-secondary grid-2 gap-md">
+              <div class="glass-inset p-md border-radius-md manish-border-1 border-solid border-secondary grid-2 gap-md">
                 <div class="flex-col gap-xs">
                   <span class="text-xs text-tertiary font-bold tracking-widest uppercase">IP Address</span>
                   <span class="font-mono text-sm font-bold text-secondary">{{ log.ipAddress || 'Unknown' }}</span>
@@ -160,7 +160,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
                 <h4 class="m-0 font-heading text-sm font-bold text-tertiary uppercase tracking-widest border-bottom-subtle pb-sm flex align-items-center gap-sm">
                   <i class="pi pi-eye"></i> Biometric Verification
                 </h4>
-                <div class="bg-primary-light p-md border-radius-md border-1 border-solid border-primary flex-between">
+                <div class="bg-primary-light p-md border-radius-md manish-border-1 border-solid border-primary flex-between">
                   <div class="flex-col gap-xs">
                     <span class="text-xs text-tertiary uppercase font-bold tracking-widest">Method: {{ log.biometricData.method }}</span>
                     <span class="text-sm text-primary font-bold">Confidence Score</span>
@@ -267,7 +267,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
     .border-none { border: none !important; }
     .border-top-subtle { border-top: 1px solid var(--border-secondary); }
     .border-bottom-subtle { border-bottom: 1px solid var(--border-secondary); }
-    .border-1 { border-width: 1px; }
+    .manish-border-1 { border-width: 1px; }
     .border-left-1 { border-left-width: 1px; }
     .border-solid { border-style: solid; }
     .border-primary { border-color: var(--border-primary); }
@@ -584,7 +584,7 @@ export class UserAttendanceDetailsComponent implements OnInit {
 //             [paginator]="true" 
 //             [rows]="15" 
 //             responsiveLayout="scroll"
-//             styleClass="premium-table border-round-xl border-1 surface-border">
+//             styleClass="premium-table border-round-xl manish-border-1 surface-border">
             
 //             <ng-template pTemplate="header">
 //               <tr>
@@ -643,7 +643,7 @@ export class UserAttendanceDetailsComponent implements OnInit {
         
 //         <div class="inspection-content flex-col gap-4 mt-2">
           
-//           <div class="bg-surface p-4 border-radius-md border-1 surface-border flex-between">
+//           <div class="bg-surface p-4 border-radius-md manish-border-1 surface-border flex-between">
 //             <div class="flex-col gap-1">
 //               <span class="text-xs text-tertiary uppercase font-bold">Server Timestamp</span>
 //               <span class="font-mono font-bold text-lg text-primary-color">{{ log.serverTimestamp | date:'dd/MM/yyyy HH:mm:ss' }}</span>
@@ -670,7 +670,7 @@ export class UserAttendanceDetailsComponent implements OnInit {
 
 //           <div class="detail-section">
 //             <h4 class="section-title"><i class="pi pi-cog"></i> Device & Network</h4>
-//             <div class="bg-surface p-3 border-radius-md border-1 surface-border grid-2 gap-3 mt-2">
+//             <div class="bg-surface p-3 border-radius-md manish-border-1 surface-border grid-2 gap-3 mt-2">
 //               <div class="flex-col"><span class="text-xs text-tertiary">IP Address</span><span class="font-mono text-sm text-secondary">{{ log.ipAddress || 'Unknown' }}</span></div>
 //               <div class="flex-col"><span class="text-xs text-tertiary">Source</span><span class="text-sm text-secondary capitalize">{{ log.source }}</span></div>
 //               <div class="flex-col span-2"><span class="text-xs text-tertiary">Device/Agent</span><span class="text-xs text-secondary line-clamp-2">{{ log.userAgent || log.deviceName || 'N/A' }}</span></div>
@@ -680,7 +680,7 @@ export class UserAttendanceDetailsComponent implements OnInit {
 //           @if (log.biometricData?.method) {
 //             <div class="detail-section">
 //               <h4 class="section-title"><i class="pi pi-eye"></i> Biometric Verification</h4>
-//               <div class="bg-primary-light p-3 border-radius-md border-1 surface-border flex-between mt-2">
+//               <div class="bg-primary-light p-3 border-radius-md manish-border-1 surface-border flex-between mt-2">
 //                 <div class="flex-col gap-1">
 //                   <span class="text-xs text-tertiary uppercase font-bold">Method: {{ log.biometricData.method }}</span>
 //                   <span class="text-sm text-primary-color font-medium">Confidence Score</span>
@@ -757,7 +757,7 @@ export class UserAttendanceDetailsComponent implements OnInit {
     
 //     .border-top { border-top: 1px solid var(--border-primary); }
 //     .border-bottom { border-bottom: 1px solid var(--border-primary); }
-//     .border-1 { border: 1px solid; }
+//     .manish-border-1 { border: 1px solid; }
 //     .surface-border { border-color: var(--border-primary); }
 //     .border-radius-md { border-radius: var(--ui-border-radius-md); }
 

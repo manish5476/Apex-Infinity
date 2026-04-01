@@ -107,7 +107,7 @@ import { HRMSService } from '../../hrms.service';
               </div>
 
               <div class="flex gap-md w-full">
-                <div class="result-box flex-grow-1 bg-secondary border-secondary flex-col flex-center border-radius-md p-sm border-1 border-solid">
+                <div class="result-box flex-grow-1 bg-secondary border-secondary flex-col flex-center border-radius-md p-sm manish-border-1 border-solid">
                   <span class="res-label text-xs font-bold text-tertiary uppercase tracking-widest mb-xs">Gross Duration</span>
                   <span class="res-value font-mono font-bold text-primary flex align-items-baseline gap-xs">
                     <span style="font-size: 1.25rem;">{{ res.totalHours }}</span>
@@ -115,7 +115,7 @@ import { HRMSService } from '../../hrms.service';
                   </span>
                 </div>
 
-                <div class="result-box flex-grow-1 bg-secondary border-secondary flex-col flex-center border-radius-md p-sm border-1 border-solid">
+                <div class="result-box flex-grow-1 bg-secondary border-secondary flex-col flex-center border-radius-md p-sm manish-border-1 border-solid">
                   <span class="res-label text-xs font-bold text-tertiary uppercase tracking-widest mb-xs">Break Deduction</span>
                   <span class="res-value font-mono font-bold color-warning flex align-items-baseline gap-xs">
                     <span style="font-size: 1.25rem;">-{{ res.breakHours }}</span>
@@ -200,7 +200,7 @@ import { HRMSService } from '../../hrms.service';
     .border-radius-xl { border-radius: var(--radius-2xl); }
     .border-top-subtle { border-top: 1px solid var(--border-secondary); }
     .border-bottom-subtle { border-bottom: 1px solid var(--border-secondary); }
-    .border-1 { border-width: 1px; }
+    .manish-border-1 { border-width: 1px; }
     .border-solid { border-style: solid; }
     .shadow-xl { box-shadow: var(--shadow-xl); }
     .overflow-hidden { overflow: hidden; }

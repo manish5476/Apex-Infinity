@@ -77,7 +77,7 @@ import { AppMessageService } from '@core/services/message.service';
                     [rows]="10" 
                     [globalFilterFields]="['user.name', 'user.employeeProfile.employeeId']"
                     responsiveLayout="scroll"
-                    styleClass="premium-table border-round-xl border-1 surface-border">
+                    styleClass="premium-table border-round-xl manish-border-1 surface-border">
                     
                     <ng-template pTemplate="header">
                       <tr>
@@ -148,12 +148,12 @@ import { AppMessageService } from '@core/services/message.service';
               <p-tabpanel value="1">
                 <div class="panel-inner p-4 bg-surface h-full">
                   <div class="grid-2">
-                    <p-card styleClass="h-full border-1 surface-border shadow-none">
+                    <p-card styleClass="h-full manish-border-1 surface-border shadow-none">
                       <h4 class="font-heading m-0 mb-4 text-primary-color">Year-over-Year Utilization Trends</h4>
                       <p-chart type="bar" [data]="trendsChartData" [options]="chartOptions" height="300px"></p-chart>
                     </p-card>
 
-                    <p-card styleClass="h-full border-1 surface-border shadow-none">
+                    <p-card styleClass="h-full manish-border-1 surface-border shadow-none">
                        <h4 class="font-heading m-0 mb-4 text-primary-color">Department Liability Report</h4>
                        <p class="text-sm text-secondary mb-4">Current unutilized leave balances across departments representing financial liability.</p>
                        
@@ -292,7 +292,7 @@ import { AppMessageService } from '@core/services/message.service';
     .border-top { border-top: 1px solid var(--border-primary); }
     .border-bottom { border-bottom: 1px solid var(--border-primary); }
     .border-radius-md { border-radius: var(--ui-border-radius-md); }
-    .border-1 { border: 1px solid; }
+    .manish-border-1 { border: 1px solid; }
     .surface-border { border-color: var(--border-primary); }
     .border-round-xl { border-radius: var(--radius-2xl); }
     .overflow-hidden { overflow: hidden; }

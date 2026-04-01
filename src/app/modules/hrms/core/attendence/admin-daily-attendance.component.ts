@@ -118,7 +118,7 @@ import { ToastModule } from 'primeng/toast';
                   
                   @if (dashboardStats(); as dash) {
                     <div class="grid-4 mb-4xl">
-                      <div class="kpi-card glass-inset p-xl border-radius-lg border-1 border-solid border-secondary border-top-primary">
+                      <div class="kpi-card glass-inset p-xl border-radius-lg manish-border-1 border-solid border-secondary border-top-primary">
                         <span class="text-xs text-tertiary uppercase font-bold tracking-widest">Total Headcount</span>
                         <div class="flex-between align-items-end mt-md">
                           <span class="text-4xl font-heading font-bold text-primary line-height-none">{{ dash.totalEmployees || 0 }}</span>
@@ -126,7 +126,7 @@ import { ToastModule } from 'primeng/toast';
                         </div>
                       </div>
                       
-                      <div class="kpi-card glass-inset p-xl border-radius-lg border-1 border-solid border-secondary border-top-success">
+                      <div class="kpi-card glass-inset p-xl border-radius-lg manish-border-1 border-solid border-secondary border-top-success">
                         <span class="text-xs text-tertiary uppercase font-bold tracking-widest">Present</span>
                         <div class="flex-between align-items-end mt-md">
                           <span class="text-4xl font-heading font-bold text-success line-height-none">{{ dash.presentCount || 0 }}</span>
@@ -134,7 +134,7 @@ import { ToastModule } from 'primeng/toast';
                         </div>
                       </div>
                       
-                      <div class="kpi-card glass-inset p-xl border-radius-lg border-1 border-solid border-secondary border-top-warning">
+                      <div class="kpi-card glass-inset p-xl border-radius-lg manish-border-1 border-solid border-secondary border-top-warning">
                         <span class="text-xs text-tertiary uppercase font-bold tracking-widest">Late Arrivals</span>
                         <div class="flex-between align-items-end mt-md">
                           <span class="text-4xl font-heading font-bold color-warning line-height-none">{{ dash.lateCount || 0 }}</span>
@@ -142,7 +142,7 @@ import { ToastModule } from 'primeng/toast';
                         </div>
                       </div>
                       
-                      <div class="kpi-card glass-inset p-xl border-radius-lg border-1 border-solid border-secondary border-top-error">
+                      <div class="kpi-card glass-inset p-xl border-radius-lg manish-border-1 border-solid border-secondary border-top-error">
                         <span class="text-xs text-tertiary uppercase font-bold tracking-widest">Absent</span>
                         <div class="flex-between align-items-end mt-md">
                           <span class="text-4xl font-heading font-bold text-error line-height-none">{{ dash.absentCount || 0 }}</span>
@@ -152,7 +152,7 @@ import { ToastModule } from 'primeng/toast';
                     </div>
                   }
 
-                  <div class="border-radius-xl border-1 border-solid border-primary overflow-hidden shadow-sm">
+                  <div class="border-radius-xl manish-border-1 border-solid border-primary overflow-hidden shadow-sm">
                     <p-table 
                       #dt
                       [value]="allRecords()" 
@@ -208,7 +208,7 @@ import { ToastModule } from 'primeng/toast';
                             </div>
                           </td>
                           <td class="px-xl py-md border-bottom-subtle">
-                            <div class="text-xs font-mono font-medium text-secondary bg-secondary px-sm py-xs border-radius-sm border-1 border-solid border-secondary w-max-content">
+                            <div class="text-xs font-mono font-medium text-secondary bg-secondary px-sm py-xs border-radius-sm manish-border-1 border-solid border-secondary w-max-content">
                               {{ record.scheduledInTime || '--:--' }} - {{ record.scheduledOutTime || '--:--' }}
                             </div>
                           </td>
@@ -255,7 +255,7 @@ import { ToastModule } from 'primeng/toast';
 
               <p-tabpanel value="1">
                 <div class="panel-content p-xl bg-secondary min-h-screen">
-                  <div class="glass-inset p-xl border-radius-xl border-1 border-solid border-secondary">
+                  <div class="glass-inset p-xl border-radius-xl manish-border-1 border-solid border-secondary">
                     <h3 class="font-heading m-0 mb-xl text-primary text-xl font-bold">Monthly Absence & Tardy Trends</h3>
                     <p-chart type="line" [data]="trendsChartData" [options]="chartOptions" height="400px"></p-chart>
                   </div>
@@ -364,7 +364,7 @@ import { ToastModule } from 'primeng/toast';
     .border-top-subtle { border-top: 1px solid var(--border-secondary); }
     .border-bottom-subtle { border-bottom: 1px solid var(--border-secondary); }
     .border-bottom-primary { border-bottom: 2px solid var(--border-primary); }
-    .border-1 { border-width: 1px; }
+    .manish-border-1 { border-width: 1px; }
     .border-solid { border-style: solid; }
     .border-primary { border-color: var(--border-primary); }
     .border-secondary { border-color: var(--border-secondary); }
@@ -612,7 +612,7 @@ export class AdminDailyAttendanceComponent implements OnInit {
 //                     [rows]="15" 
 //                     [globalFilterFields]="['user.name', 'status']"
 //                     responsiveLayout="scroll"
-//                     styleClass="premium-table border-round-xl border-1 surface-border">
+//                     styleClass="premium-table border-round-xl manish-border-1 surface-border">
                     
 //                     <ng-template pTemplate="caption">
 //                       <div class="table-toolbar flex-between p-3 bg-surface border-bottom">
@@ -682,7 +682,7 @@ export class AdminDailyAttendanceComponent implements OnInit {
 
 //               <p-tabpanel value="1">
 //                 <div class="panel-inner p-4 bg-surface h-full">
-//                   <p-card styleClass="border-1 surface-border shadow-none">
+//                   <p-card styleClass="manish-border-1 surface-border shadow-none">
 //                     <h3 class="font-heading m-0 mb-4 text-primary-color">Monthly Absence Trends</h3>
 //                     <p-chart type="line" [data]="trendsChartData" [options]="chartOptions" height="350px"></p-chart>
 //                   </p-card>
@@ -732,7 +732,7 @@ export class AdminDailyAttendanceComponent implements OnInit {
     
 //     .border-top { border-top: 1px solid var(--border-primary); }
 //     .border-bottom { border-bottom: 1px solid var(--border-primary); }
-//     .border-1 { border: 1px solid; }
+//     .manish-border-1 { border: 1px solid; }
 //     .surface-border { border-color: var(--border-primary); }
 //     .border-radius-xl { border-radius: var(--radius-2xl); }
 //     .border-radius-sm { border-radius: var(--ui-border-radius-sm); }

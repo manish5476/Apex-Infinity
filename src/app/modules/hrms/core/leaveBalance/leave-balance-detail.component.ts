@@ -148,7 +148,7 @@ import { AppMessageService } from '@core/services/message.service';
             [sortField]="'date'" 
             [sortOrder]="-1"
             responsiveLayout="scroll"
-            styleClass="premium-table border-round-xl border-1 surface-border">
+            styleClass="premium-table border-round-xl manish-border-1 surface-border">
             
             <ng-template pTemplate="header">
               <tr>
@@ -250,7 +250,7 @@ import { AppMessageService } from '@core/services/message.service';
     .bg-error-light { background: var(--color-error-bg, #fef2f2); }
     .bg-warning-light { background: #fff7ed; }
     
-    .border-1 { border: 1px solid; }
+    .manish-border-1 { border: 1px solid; }
     .surface-border { border-color: var(--border-primary); }
     .border-round-xl { border-radius: var(--radius-2xl); }
     .border-dashed { border: 1px dashed var(--border-secondary); }

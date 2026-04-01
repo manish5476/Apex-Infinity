@@ -122,7 +122,7 @@ import { InputIconModule } from 'primeng/inputicon';
                       <input pInputText formControlName="city" placeholder="e.g. Bangalore" class="w-full" />
                     </div>
                     
-                    <label class="flex-between bg-primary-light p-md border-radius-md border-1 border-solid border-primary mt-sm cursor-pointer">
+                    <label class="flex-between bg-primary-light p-md border-radius-md manish-border-1 border-solid border-primary mt-sm cursor-pointer">
                       <div class="flex-col gap-xs">
                         <span class="font-bold text-sm text-primary">Enable Geofence</span>
                         <span class="text-xs text-secondary">Toggle to instantly activate/deactivate this zone.</span>
@@ -184,7 +184,7 @@ import { InputIconModule } from 'primeng/inputicon';
 
           </div>
 
-          <div class="form-footer flex justify-content-end gap-md p-xl bg-primary border-top-subtle slide-down sticky bottom-0 z-10 border-radius-lg shadow-xl mt-xl border-1 border-solid border-secondary" [style.animation-delay]="'0.3s'">
+          <div class="form-footer flex justify-content-end gap-md p-xl bg-primary border-top-subtle slide-down sticky bottom-0 z-10 border-radius-lg shadow-xl mt-xl manish-border-1 border-solid border-secondary" [style.animation-delay]="'0.3s'">
             <p-button label="Cancel" icon="pi pi-times" [text]="true" severity="secondary" (onClick)="onCancel()"></p-button>
             <p-button 
               [label]="isEditMode() ? 'Save Boundary' : 'Create Boundary'" 
@@ -281,7 +281,7 @@ import { InputIconModule } from 'primeng/inputicon';
     
     .border-top-subtle { border-top: 1px solid var(--border-secondary); }
     .border-bottom-subtle { border-bottom: 1px solid var(--border-secondary); }
-    .border-1 { border-width: 1px; }
+    .manish-border-1 { border-width: 1px; }
     .border-solid { border-style: solid; }
     .border-primary { border-color: var(--border-primary); }
     .border-secondary { border-color: var(--border-secondary); }

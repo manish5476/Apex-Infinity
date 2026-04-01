@@ -96,7 +96,7 @@ import { AppMessageService } from '@core/services/message.service';
             [rows]="10" 
             [globalFilterFields]="['name', 'serialNumber', 'ipAddress', 'model']"
             responsiveLayout="scroll"
-            styleClass="premium-table border-round-xl border-1 surface-border">
+            styleClass="premium-table border-round-xl manish-border-1 surface-border">
             
             <ng-template pTemplate="caption">
               <div class="table-toolbar flex-between p-3 bg-surface border-bottom">
@@ -218,7 +218,7 @@ import { AppMessageService } from '@core/services/message.service';
     
     .border-top { border-top: 1px solid var(--border-primary); }
     .border-bottom { border-bottom: 1px solid var(--border-primary); }
-    .border-1 { border: 1px solid; }
+    .manish-border-1 { border: 1px solid; }
     .surface-border { border-color: var(--border-primary); }
     .border-round-xl { border-radius: var(--radius-2xl); }
     

@@ -108,7 +108,7 @@ import { AppMessageService } from '@core/services/message.service';
               
               <p-tabpanel value="0">
                 <div class="panel-inner p-4">
-                  <div class="flex-between mb-4 bg-primary-light p-3 border-radius-md border-1 surface-border">
+                  <div class="flex-between mb-4 bg-primary-light p-3 border-radius-md manish-border-1 surface-border">
                     <div class="flex-col">
                       <h3 class="m-0 text-primary-color font-bold flex-align gap-2"><i class="pi pi-link"></i> Map HRMS Users to Machine IDs</h3>
                       <p class="m-0 text-sm text-secondary mt-1">Assign the physical machine ID (e.g., Biometric Enrolment ID) to unmapped system users.</p>
@@ -121,7 +121,7 @@ import { AppMessageService } from '@core/services/message.service';
                     [paginator]="true" 
                     [rows]="10" 
                     responsiveLayout="scroll"
-                    styleClass="premium-table border-round-xl border-1 surface-border">
+                    styleClass="premium-table border-round-xl manish-border-1 surface-border">
                     <ng-template pTemplate="header">
                       <tr>
                         <th>HRMS Employee</th>
@@ -158,7 +158,7 @@ import { AppMessageService } from '@core/services/message.service';
                     [paginator]="true" 
                     [rows]="10" 
                     responsiveLayout="scroll"
-                    styleClass="premium-table border-round-xl border-1 surface-border">
+                    styleClass="premium-table border-round-xl manish-border-1 surface-border">
                     <ng-template pTemplate="header">
                       <tr>
                         <th>Timestamp</th>
@@ -205,7 +205,7 @@ import { AppMessageService } from '@core/services/message.service';
       <p class="text-sm text-secondary mb-4 text-center">
         The previous API key for this device has been invalidated. Please update your device/sync utility with this new key immediately.
       </p>
-      <div class="bg-surface p-4 border-radius-md border-1 surface-border flex-between mb-4">
+      <div class="bg-surface p-4 border-radius-md manish-border-1 surface-border flex-between mb-4">
         <code class="font-bold text-primary-color break-all">{{ newApiKey }}</code>
         <p-button icon="pi pi-copy" [text]="true" [rounded]="true" pTooltip="Copy" (onClick)="copyKey()"></p-button>
       </div>
@@ -248,7 +248,7 @@ import { AppMessageService } from '@core/services/message.service';
     .bg-primary-light { background: var(--color-primary-bg, #eff6ff); }
     
     .border-top { border-top: 1px solid var(--border-primary); }
-    .border-1 { border: 1px solid; }
+    .manish-border-1 { border: 1px solid; }
     .surface-border { border-color: var(--border-primary); }
     .border-radius-md { border-radius: var(--ui-border-radius-md); }
     

@@ -104,7 +104,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
               <p-tabpanel value="0">
                 <div class="panel-content p-xl flex-col h-full">
                   
-                  <div class="flex-between flex-wrap gap-md mb-md px-xl py-lg bg-secondary border-radius-lg border-1 border-solid border-secondary">
+                  <div class="flex-between flex-wrap gap-md mb-md px-xl py-lg bg-secondary border-radius-lg manish-border-1 border-solid border-secondary">
                     <h3 class="m-0 font-heading text-lg font-bold text-primary">Established Boundaries</h3>
                     <p-iconField iconPosition="left">
                       <p-inputIcon styleClass="pi pi-search text-tertiary"></p-inputIcon>
@@ -117,7 +117,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
                     </p-iconField>
                   </div>
 
-                  <div class="grid-wrapper w-full flex-grow-1 border-radius-lg border-1 border-solid border-primary overflow-hidden shadow-sm" style="min-height: 500px;">
+                  <div class="grid-wrapper w-full flex-grow-1 border-radius-lg manish-border-1 border-solid border-primary overflow-hidden shadow-sm" style="min-height: 500px;">
                     <app-ag-share-grid 
                       [columns]="geofenceColumns" 
                       [data]="geofences()"
@@ -141,7 +141,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
                     </div>
                   </div>
 
-                  <div class="grid-wrapper w-full flex-grow-1 border-radius-lg border-1 border-solid border-error overflow-hidden shadow-sm" style="min-height: 500px;">
+                  <div class="grid-wrapper w-full flex-grow-1 border-radius-lg manish-border-1 border-solid border-error overflow-hidden shadow-sm" style="min-height: 500px;">
                     <app-ag-share-grid 
                       [columns]="violationColumns" 
                       [data]="violations()"
@@ -233,7 +233,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
     .border-radius-lg { border-radius: var(--ui-border-radius-lg); }
     .border-radius-xl { border-radius: var(--radius-2xl); }
     
-    .border-1 { border-width: 1px; }
+    .manish-border-1 { border-width: 1px; }
     .border-solid { border-style: solid; }
     .border-primary { border-color: var(--border-primary); }
     .border-secondary { border-color: var(--border-secondary); }
@@ -562,7 +562,7 @@ export class GeofenceHubComponent implements OnInit {
 //                     [rows]="10" 
 //                     [globalFilterFields]="['name', 'code', 'type']"
 //                     responsiveLayout="scroll"
-//                     styleClass="premium-table border-round-xl border-1 surface-border">
+//                     styleClass="premium-table border-round-xl manish-border-1 surface-border">
                     
 //                     <ng-template pTemplate="caption">
 //                       <div class="flex-between p-3 bg-surface border-bottom">
@@ -636,7 +636,7 @@ export class GeofenceHubComponent implements OnInit {
 //                     [value]="violations()" 
 //                     [paginator]="true" 
 //                     [rows]="10" 
-//                     styleClass="premium-table border-round-xl border-1 border-error">
+//                     styleClass="premium-table border-round-xl manish-border-1 border-error">
 //                     <ng-template pTemplate="header">
 //                       <tr>
 //                         <th>Date & Time</th>
@@ -702,7 +702,7 @@ export class GeofenceHubComponent implements OnInit {
 //     .bg-error-faded { background-color: rgba(239, 68, 68, 0.02); }
     
 //     .border-bottom { border-bottom: 1px solid var(--border-primary); }
-//     .border-1 { border: 1px solid; }
+//     .manish-border-1 { border: 1px solid; }
 //     .surface-border { border-color: var(--border-primary); }
 //     .border-error { border-color: rgba(239, 68, 68, 0.2) !important; }
 //     .border-round-xl { border-radius: var(--radius-2xl); }

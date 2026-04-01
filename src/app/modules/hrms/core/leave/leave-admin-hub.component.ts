@@ -91,7 +91,7 @@ import { AppMessageService } from '@core/services/message.service';
                     [rows]="10" 
                     [globalFilterFields]="['leaveRequestId', 'user.name', 'leaveType', 'status']"
                     responsiveLayout="scroll"
-                    styleClass="premium-table border-round-xl overflow-hidden border-1 surface-border">
+                    styleClass="premium-table border-round-xl overflow-hidden manish-border-1 surface-border">
                     
                     <ng-template pTemplate="caption">
                       <div class="table-toolbar flex-between">

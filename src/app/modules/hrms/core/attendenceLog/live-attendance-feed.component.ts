@@ -47,7 +47,7 @@ import { TooltipModule } from 'primeng/tooltip';
         </div>
         
         <div class="header-actions">
-          <div class="glass-inset px-xl py-sm border-radius-lg flex align-items-center gap-sm border-1 border-solid border-secondary shadow-sm">
+          <div class="glass-inset px-xl py-sm border-radius-lg flex align-items-center gap-sm manish-border-1 border-solid border-secondary shadow-sm">
             <i class="pi pi-clock text-tertiary text-xl"></i>
             <span class="font-mono font-bold text-lg text-primary tracking-widest">{{ currentTime() | date:'HH:mm:ss' }}</span>
           </div>
@@ -86,7 +86,7 @@ import { TooltipModule } from 'primeng/tooltip';
                     [label]="getInitials(log.user?.name)" 
                     shape="circle" 
                     size="large" 
-                    styleClass="bg-primary-light text-primary font-bold border-1 border-solid border-primary">
+                    styleClass="bg-primary-light text-primary font-bold manish-border-1 border-solid border-primary">
                   </p-avatar>
                   <div class="flex-col gap-xs">
                     <span class="font-bold text-lg text-primary line-height-none">{{ log.user?.name || 'Unknown User' }}</span>
@@ -94,7 +94,7 @@ import { TooltipModule } from 'primeng/tooltip';
                   </div>
                 </div>
 
-                <div class="flex-between text-xs text-secondary bg-secondary px-sm py-xs border-radius-sm mt-auto border-1 border-solid border-secondary">
+                <div class="flex-between text-xs text-secondary bg-secondary px-sm py-xs border-radius-sm mt-auto manish-border-1 border-solid border-secondary">
                   <span class="flex align-items-center gap-xs capitalize font-medium">
                     <i class="pi text-tertiary" [ngClass]="getSourceIcon(log.source)"></i> {{ log.source }}
                   </span>
@@ -119,7 +119,7 @@ import { TooltipModule } from 'primeng/tooltip';
         </div>
 
         @if (feedLogs().length === 0) {
-          <div class="empty-state flex-col flex-center text-center py-5xl my-4xl glass-inset border-radius-xl border-1 border-solid border-secondary">
+          <div class="empty-state flex-col flex-center text-center py-5xl my-4xl glass-inset border-radius-xl manish-border-1 border-solid border-secondary">
             <i class="pi pi-spinner pi-spin text-5xl text-tertiary mb-md opacity-50"></i>
             <h3 class="font-heading text-2xl font-bold text-primary m-0 mb-xs">Awaiting Punches...</h3>
             <p class="text-secondary m-0 max-w-prose">The live feed will update automatically when an employee clocks in or out.</p>
@@ -216,7 +216,7 @@ import { TooltipModule } from 'primeng/tooltip';
     .border-radius-full { border-radius: 9999px; }
     
     .border-bottom-subtle { border-bottom: 1px solid var(--border-secondary); }
-    .border-1 { border-width: 1px; }
+    .manish-border-1 { border-width: 1px; }
     .border-solid { border-style: solid; }
     .border-primary { border-color: var(--border-primary); }
     .border-secondary { border-color: var(--border-secondary); }
@@ -356,7 +356,7 @@ export class LiveAttendanceFeedComponent implements OnInit {
 //           </div>
 //         </div>
 //         <div class="header-right">
-//           <div class="bg-surface p-2 border-radius-md flex-align gap-2 px-3 border-1 surface-border">
+//           <div class="bg-surface p-2 border-radius-md flex-align gap-2 px-3 manish-border-1 surface-border">
 //             <i class="pi pi-clock text-tertiary"></i>
 //             <span class="font-mono font-bold">{{ currentTime | date:'HH:mm:ss' }}</span>
 //           </div>
@@ -456,7 +456,7 @@ export class LiveAttendanceFeedComponent implements OnInit {
 //     .w-10rem { max-width: 10rem; }
     
 //     .border-top { border-top: 1px solid var(--border-primary); }
-//     .border-1 { border: 1px solid; }
+//     .manish-border-1 { border: 1px solid; }
 //     .surface-border { border-color: var(--border-primary); }
 //     .border-radius-md { border-radius: var(--ui-border-radius-md); }
 //     .bg-surface { background: var(--bg-secondary); }

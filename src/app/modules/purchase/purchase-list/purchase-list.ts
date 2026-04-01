@@ -9,6 +9,7 @@ import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { DatePickerModule } from 'primeng/datepicker';
+import { ToastModule } from 'primeng/toast';
 import { PurchaseService } from '../purchase.service';
 import { AgShareGrid, ActionColumnConfig } from "../../shared/components/ag-shared-grid";
 import { MasterListService } from '../../../core/services/master-list.service';
@@ -21,7 +22,7 @@ import { PERMISSIONS } from '../../../core/auth/permissions.constants';
 @Component({
   selector: 'app-purchase-list',
   standalone: true,
-  imports: [ CommonModule, SelectModule, FormsModule, ButtonModule, InputTextModule, DatePickerModule, RouterModule, AgShareGrid, HasPermissionDirective ],
+  imports: [ CommonModule, SelectModule, FormsModule, ButtonModule, InputTextModule, DatePickerModule, RouterModule, AgShareGrid, HasPermissionDirective, ToastModule ],
   templateUrl: './purchase-list.html',
   styleUrl: './purchase-list.scss',
 })

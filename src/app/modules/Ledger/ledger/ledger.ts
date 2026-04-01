@@ -26,6 +26,7 @@ import { TabsModule } from 'primeng/tabs';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
 import { CardModule } from 'primeng/card';
+import { ToastModule } from 'primeng/toast';
 import { AppMessageService } from '../../../core/services/message.service';
 
 type LedgerTab =
@@ -45,7 +46,7 @@ type LedgerTab =
     TabsModule, ButtonModule, SelectModule, IconFieldModule,
     InputTextModule, TooltipModule, SkeletonModule,
     DatePickerModule, DialogModule, RadioButtonModule,
-    TagModule, CardModule,
+    TagModule, CardModule, ToastModule,
     AgShareGrid
   ],
   templateUrl: './ledger.html',
@@ -119,6 +120,21 @@ export class LedgerComponent implements OnInit {
   }
   applyFilters() {
     this.loadData(this.currentTab(), true);
+  }
+  resetFilters() {
+    const now = new Date();
+    const first = new Date(now.getFullYear(), now.getMonth(), 1);
+    const last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    this.filterForm.reset({
+      dateRange: [first, last],
+      branchId: null,
+      customerId: null,
+      supplierId: null,
+      search: "",
+      accountId: null,
+      txnType: null
+    });
+    this.applyFilters();
   }
   private getParams(resetCursor: boolean = false) {
     const v = this.filterForm.value;

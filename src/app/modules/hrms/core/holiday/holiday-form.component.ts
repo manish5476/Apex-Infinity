@@ -80,14 +80,14 @@ import { AppMessageService } from '@core/services/message.service';
 
               <p-card styleClass="premium-card glass-card slide-down" styleclass="animation-delay: 0.15s">
                 <div class="grid-2 gap-4">
-                  <label class="bg-warning-light p-3 border-radius-md border-1 border-warning flex-between cursor-pointer">
+                  <label class="bg-warning-light p-3 border-radius-md manish-border-1 border-warning flex-between cursor-pointer">
                     <div class="flex-col">
                       <span class="font-bold text-sm text-warning">Restricted / Optional</span>
                       <span class="text-xs text-tertiary">Employees must opt-in.</span>
                     </div>
                     <p-toggleswitch formControlName="isOptional"></p-toggleswitch>
                   </label>
-                  <label class="bg-surface p-3 border-radius-md border-1 surface-border flex-between cursor-pointer">
+                  <label class="bg-surface p-3 border-radius-md manish-border-1 surface-border flex-between cursor-pointer">
                     <div class="flex-col">
                       <span class="font-bold text-sm text-primary-color">Active Status</span>
                       <span class="text-xs text-tertiary">Enable for calculations.</span>
@@ -189,7 +189,7 @@ import { AppMessageService } from '@core/services/message.service';
     
     .border-bottom { border-bottom: 1px solid var(--border-primary); }
     .border-top { border-top: 1px solid var(--border-primary); }
-    .border-1 { border: 1px solid; }
+    .manish-border-1 { border: 1px solid; }
     .surface-border { border-color: var(--border-primary); }
     .border-radius-md { border-radius: var(--ui-border-radius-md); }
 

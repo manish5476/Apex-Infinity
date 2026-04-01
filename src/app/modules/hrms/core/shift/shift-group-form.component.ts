@@ -71,7 +71,7 @@ import { InputIconModule } from 'primeng/inputicon';
         </div>
         
         <div class="header-actions flex align-items-center gap-md">
-          <div class="header-status flex align-items-center gap-sm px-md py-xs border-radius-full border-1 border-solid" 
+          <div class="header-status flex align-items-center gap-sm px-md py-xs border-radius-full manish-border-1 border-solid" 
                [class.valid-status]="form.valid" 
                [class.invalid-status]="!form.valid">
             <div class="status-dot"></div>
@@ -245,7 +245,7 @@ import { InputIconModule } from 'primeng/inputicon';
                   </p-multiSelect>
                 </div>
 
-                <div class="status-toggle-wrapper mt-auto border-1 border-solid border-primary">
+                <div class="status-toggle-wrapper mt-auto manish-border-1 border-solid border-primary">
                   <label class="toggle-container m-0">
                     <input type="checkbox" formControlName="isActive" class="toggle-input">
                     <span class="toggle-slider"></span>
@@ -270,7 +270,7 @@ import { InputIconModule } from 'primeng/inputicon';
 
               <div formArrayName="shifts" class="flex-col gap-md">
                 @for (shiftCtrl of shiftsArray.controls; track $index) {
-                  <div [formGroupName]="$index" class="array-row flex align-items-center gap-md p-md glass-inset border-radius-lg border-1 border-solid border-secondary fade-in">
+                  <div [formGroupName]="$index" class="array-row flex align-items-center gap-md p-md glass-inset border-radius-lg manish-border-1 border-solid border-secondary fade-in">
                     <div class="drag-handle flex-shrink-0 text-tertiary cursor-grab"><i class="pi pi-bars text-xl"></i></div>
                     
                     <div class="form-field flex-grow-1 m-0">
@@ -296,7 +296,7 @@ import { InputIconModule } from 'primeng/inputicon';
                     </div>
 
                     <div class="form-field m-0 flex-center" style="width: 50px;">
-                      <div class="color-picker-wrapper border-radius-sm border-1 border-solid border-secondary overflow-hidden cursor-pointer" pTooltip="UI Indicator Color" tooltipPosition="top" style="width: 38px; height: 38px;">
+                      <div class="color-picker-wrapper border-radius-sm manish-border-1 border-solid border-secondary overflow-hidden cursor-pointer" pTooltip="UI Indicator Color" tooltipPosition="top" style="width: 38px; height: 38px;">
                         <input type="color" formControlName="color" class="color-picker-input w-full h-full border-none p-0 cursor-pointer" />
                       </div>
                     </div>
@@ -306,7 +306,7 @@ import { InputIconModule } from 'primeng/inputicon';
                 }
                 
                 @if (shiftsArray.length === 0) {
-                  <div class="empty-array-state flex-col flex-center p-xl bg-secondary border-radius-lg border-1 border-solid border-secondary border-dashed text-tertiary text-center">
+                  <div class="empty-array-state flex-col flex-center p-xl bg-secondary border-radius-lg manish-border-1 border-solid border-secondary border-dashed text-tertiary text-center">
                     <i class="pi pi-calendar-plus text-3xl mb-sm"></i>
                     <p class="m-0 text-sm">No shifts added. Click "Add Shift" to include shifts in this group.</p>
                   </div>
@@ -345,7 +345,7 @@ import { InputIconModule } from 'primeng/inputicon';
 
               <div formArrayName="rotationPattern" class="flex-col gap-md">
                 @for (patternCtrl of rotationPatternArray.controls; track $index) {
-                  <div [formGroupName]="$index" class="array-row flex align-items-center gap-md p-md glass-inset border-radius-lg border-1 border-solid border-secondary fade-in">
+                  <div [formGroupName]="$index" class="array-row flex align-items-center gap-md p-md glass-inset border-radius-lg manish-border-1 border-solid border-secondary fade-in">
                     
                     <div class="form-field flex align-items-center gap-sm m-0 flex-shrink-0" style="width: 180px;">
                       <span class="info-label m-0">Day Offset:</span>
@@ -377,7 +377,7 @@ import { InputIconModule } from 'primeng/inputicon';
                 }
                 
                 @if (rotationPatternArray.length === 0) {
-                  <div class="empty-array-state flex-col flex-center p-xl bg-secondary border-radius-lg border-1 border-solid border-secondary border-dashed text-tertiary text-center">
+                  <div class="empty-array-state flex-col flex-center p-xl bg-secondary border-radius-lg manish-border-1 border-solid border-secondary border-dashed text-tertiary text-center">
                     <i class="pi pi-sitemap text-3xl mb-sm"></i>
                     <p class="m-0 text-sm">No pattern defined. Add offsets mapping days to specific shifts.</p>
                   </div>
@@ -479,7 +479,7 @@ import { InputIconModule } from 'primeng/inputicon';
     
     .border-top-subtle { border-top: 1px solid var(--border-secondary); }
     .border-bottom-subtle { border-bottom: 1px solid var(--border-secondary); }
-    .border-1 { border-width: 1px; }
+    .manish-border-1 { border-width: 1px; }
     .border-solid { border-style: solid; }
     .border-primary { border-color: var(--border-primary); }
     .border-secondary { border-color: var(--border-secondary); }

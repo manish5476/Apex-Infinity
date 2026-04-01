@@ -1,62 +1,67 @@
 <p-toast></p-toast>
 
-<div class="list-page-container">
+<div class="app-container h-full">
 
-  <div class="list-header">
-    <h2 class="list-title">
-      <i class="pi pi-chart-line text-[var(--accent-primary)]"></i>
-      Sales Register
-    </h2>
-    <p-button *hasPermission="PERMISSIONS.SALES.MANAGE" label="New Sale" icon="pi pi-plus" (onClick)="onCreateSales()">
-    </p-button>
+  <!-- Standard Header -->
+  <div class="container-header">
+    <div class="flex align-center gap-3">
+      <div class="icon-box bg-primary-light text-primary border-round p-2 flex align-center justify-center">
+        <i class="pi pi-chart-line text-xl"></i>
+      </div>
+      <div class="header-titles">
+        <h2 class="container-title">Sales Register</h2>
+        <p class="container-subtitle">Manage sales orders, track payments, and analyze revenue.</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <p-button *hasPermission="PERMISSIONS.SALES.MANAGE" label="New Sale" icon="pi pi-plus" (onClick)="onCreateSales()"
+        styleClass="p-button-primary">
+      </p-button>
+    </div>
   </div>
 
-  <div class="themed-card">
-    <div class="se-filter-bar">
+  <div class="container-body flex flex-col h-full gap-4">
 
-      <div class="se-filter-field search-field">
+    <div class="app-filter-panel">
+
+      <div class="filter-field search-field" style="flex: 2">
         <label for="search">Search</label>
-        <span class="p-input-icon-left w-full">
-          <!-- <i class="pi pi-search"></i> -->
-          <input id="search" type="text" pInputText [formControl]="searchControl"
-            placeholder="Search Invoice # or Customer..." class="w-full" />
-        </span>
+        <input id="search" type="text" pInputText [formControl]="searchControl"
+          placeholder="Search Invoice # or Customer..." class="w-full" />
       </div>
 
-      <div class="se-filter-field">
+      <div class="filter-field">
         <label for="payStatus">Payment Status</label>
         <p-select appendTo="body" id="payStatus" [options]="paymentStatusOptions"
           [(ngModel)]="salesFilter.paymentStatus" [showClear]="true" placeholder="All Status" styleClass="w-full"
           [filter]="true" filterBy="label" (onChange)="applyFilters()">
         </p-select>
-
       </div>
 
-      <div class="se-filter-field">
+      <div class="filter-field">
         <label for="status">Order Status</label>
         <p-select appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="salesFilter.status"
-          [showClear]="true" placeholder="All Orders" styleClass="w-full" [filter]="true" filterBy="label" (onChange)="applyFilters()">
+          [showClear]="true" placeholder="All Orders" styleClass="w-full" [filter]="true" filterBy="label"
+          (onChange)="applyFilters()">
         </p-select>
-
       </div>
 
-      <div class="se-filter-actions">
-        <p-button icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary" (onClick)="resetFilters()" pTooltip="Reset Filters"></p-button>
+      <div class="filter-actions">
+        <p-button icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary" (onClick)="resetFilters()"
+          pTooltip="Reset Filters"></p-button>
         <p-button label="Apply" icon="pi pi-filter" (onClick)="applyFilters()"></p-button>
       </div>
+
     </div>
-  </div>
 
-  <div class="list-grid-area themed-card">
-    <app-ag-share-grid 
-      [columns]="column" 
-      [data]="data" 
-      selectionMode="multiple"
-      (gridEvent)="eventFromGrid($event)" 
-      class="full-size-grid">
-    </app-ag-share-grid>
-  </div>
+    <div class="flex-1 min-h-0 manish-border-1 border-secondary border-round overflow-hidden">
+      <app-ag-share-grid [columns]="column" [data]="data" selectionMode="multiple" (gridEvent)="eventFromGrid($event)"
+        class="full-size-grid">
+      </app-ag-share-grid>
+    </div>
 
+  </div>
 </div>
 
 <!-- <p-toast></p-toast>

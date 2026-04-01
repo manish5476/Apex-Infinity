@@ -1,156 +1,77 @@
 <p-toast></p-toast>
 <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
 
-<div class="list-page-container">
-  
-  <div class="list-header" *ngIf="stats()">
-    <div class="title-section">
-      <div class="icon-box">
-        <i class="pi pi-images"></i>
-      </div>
-      <div class="text-content">
-        <h2 class="list-title">Media Vault</h2>
-        <p class="list-subtitle">Manage organization assets, storage, and indexing.</p>
-      </div>
-    </div>
+<div class="app-container h-full">
+  <div class="container-body flex flex-col h-full gap-4">
 
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon storage-icon">
-          <i class="pi pi-server"></i>
-        </div>
-        <div class="stat-details">
-          <span class="label">Total Storage</span>
-          <span class="value">{{ stats().totalMB }} <small>MB</small></span>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon files-icon">
-          <i class="pi pi-copy"></i>
-        </div>
-        <div class="stat-details">
-          <span class="label">Total Files</span>
-          <span class="value">{{ stats().totalFiles }}</span>
-        </div>
-      </div>
-    </div>
-  </div>
+    <div class="app-filter-panel single-row">
 
-  <div class="themed-card list-content-area">
-    
-    <div class="se-filter-bar">
-      <div class="se-filter-field search-field">
+      <div class="flex align-center gap-3 mr-3 mb-1 flex-shrink-0">
+        <div class="icon-box bg-primary-light text-primary border-round p-2 flex align-center justify-center"
+          style="width: 42px; height: 42px; border-radius: var(--ui-border-radius-lg);">
+          <i class="pi pi-images text-lg"></i>
+        </div>
+        <div class="flex flex-col">
+          <h2 class="m-0 font-heading text-primary" style="font-size: 1.15rem; font-weight: 700; line-height: 1.2;">
+            Media Vault</h2>
+          <span class="text-secondary" style="font-size: 0.75rem;">Manage organization assets</span>
+        </div>
+      </div>
+
+      @if (stats()) {
+      <div class="flex gap-2 mr-3 mb-1 hidden xl:flex flex-shrink-0">
+        <div
+          class="flex align-center gap-2 px-3 py-1 border-round bg-secondary border-1 border-secondary shadow-sm hover-lift">
+          <i class="pi pi-server text-primary"></i>
+          <div class="flex flex-col">
+            <span class="text-xs uppercase font-bold text-tertiary" style="font-size: 0.6rem;">Storage</span>
+            <span class="text-xs font-bold text-primary">{{ stats().totalMB }} MB</span>
+          </div>
+        </div>
+        <div
+          class="flex align-center gap-2 px-3 py-1 border-round bg-secondary border-1 border-secondary shadow-sm hover-lift">
+          <i class="pi pi-copy text-primary"></i>
+          <div class="flex flex-col">
+            <span class="text-xs uppercase font-bold text-tertiary" style="font-size: 0.6rem;">Files</span>
+            <span class="text-xs font-bold text-primary">{{ stats().totalFiles }}</span>
+          </div>
+        </div>
+      </div>
+      }
+
+      <div class="filter-field" style="flex: 1; min-width: 150px;">
         <label for="search">Search</label>
-        <span class="p-input-icon-left w-full">
-          <input id="search" type="text" pInputText placeholder="File name..." 
-                 [(ngModel)]="assetFilter.search" (keydown.enter)="applyFilters()"
-                 (blur)="applyFilters()" class="w-full">
-        </span>
+        <div class="p-input-icon-left w-full">
+          <input id="search" type="text" pInputText placeholder="File name..." [(ngModel)]="assetFilter.search"
+            (keydown.enter)="applyFilters()" (blur)="applyFilters()" class="w-full">
+        </div>
       </div>
 
-      <div class="se-filter-field">
+      <div class="filter-field" style="width: 180px; flex-shrink: 0;">
         <label for="category">Category</label>
-        <p-select appendTo="body" (onChange)="applyFilters()" id="category" 
-                  [options]="categoryOptions" [(ngModel)]="assetFilter.category" 
-                  [showClear]="true" placeholder="Filter by Category" styleClass="w-full"
-                  [filter]="true" filterBy="label">
+        <p-select appendTo="body" (onChange)="applyFilters()" id="category" [options]="categoryOptions"
+          [(ngModel)]="assetFilter.category" [showClear]="true" placeholder="All Categories" styleClass="w-full"
+          [filter]="true" filterBy="label">
         </p-select>
-
       </div>
 
-      <div class="se-filter-actions">
+      <div class="filter-actions-right ml-auto flex gap-2 flex-shrink-0">
         <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary"
-                  (onClick)="resetFilters()">
-        </p-button>
+          (onClick)="resetFilters()"></p-button>
+
+        <div class="divider-vertical border-right-1 border-secondary mx-1 mb-1"></div>
+
+        <p-button label="Upload File" icon="pi pi-upload" (onClick)="triggerUpload()"
+          styleClass="p-button-primary"></p-button>
       </div>
 
-      <div class="se-filter-right">
-        <p-button label="Upload File" icon="pi pi-upload" (onClick)="triggerUpload()" styleClass="p-button-primary"></p-button>
-      </div>
     </div>
 
-    <div class="list-grid-wrapper">
-      <app-ag-share-grid 
-        [columns]="column" 
-        [data]="data"
-        selectionMode="single"
-        (gridEvent)="eventFromGrid($event)"
-        (gridReady)="onGridReady($event)">
+    <div class="flex-1 min-h-0 overflow-hidden">
+      <app-ag-share-grid [columns]="column" [data]="data" selectionMode="single" (gridEvent)="eventFromGrid($event)"
+        (gridReady)="onGridReady($event)" style="height: 100%; width: 100%; display: block;">
       </app-ag-share-grid>
     </div>
 
   </div>
 </div>
-
-<!-- <p-toast></p-toast>
-
-<div class="list-page-container">
-  
-  <div class="list-header">
-    <div class="title-section">
-      <div class="icon-box">
-        <i class="pi pi-images"></i>
-      </div>
-      <div class="text-content">
-        <h2 class="list-title">Media Vault</h2>
-        <p class="list-subtitle">Manage organization assets, storage, and indexing.</p>
-      </div>
-    </div>
-
-    @if (stats()) {
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon storage-icon">
-            <i class="pi pi-server"></i>
-          </div>
-          <div class="stat-details">
-            <span class="label">Total Storage</span>
-            <span class="value">{{ stats().totalMB }} <small>MB</small></span>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon files-icon">
-            <i class="pi pi-copy"></i>
-          </div>
-          <div class="stat-details">
-            <span class="label">Total Files</span>
-            <span class="value">{{ stats().totalFiles }}</span>
-          </div>
-        </div>
-      </div>
-    }
-  </div>
-
-  <div class="themed-card list-content-area">
-    
-    <div class="se-filter-bar">
-      <div class="se-filter-field search-field">
-        <span class="p-input-icon-left w-full search-input-wrapper">
-          <input type="text" pInputText placeholder="Search files by name..." 
-                 [(ngModel)]="assetFilter.search" (input)="getData(true)" class="w-full p-inputtext-sm">
-        </span>
-      </div>
-
-      <div class="se-filter-field category-field">
-        <p-select [options]="categoryOptions" [(ngModel)]="assetFilter.category" 
-                  (onChange)="getData(true)" placeholder="All Categories" 
-                  [showClear]="true" styleClass="w-full p-inputtext-sm"
-                  dropdownIcon="pi pi-chevron-down"></p-select>
-      </div>
-
-      <div class="se-filter-actions">
-        <p-button label="Refresh" icon="pi pi-refresh" (onClick)="getData(true)" 
-                  styleClass="p-button-outlined p-button-sm"></p-button>
-      </div>
-    </div>
-
-    <div class="list-grid-wrapper ag-theme-custom">
-      <app-ag-share-grid 
-        [columns]="column" 
-        [data]="data"
-        (gridEvent)="eventFromGrid($event)">
-      </app-ag-share-grid>
-    </div>
-
-  </div>
-</div> -->
