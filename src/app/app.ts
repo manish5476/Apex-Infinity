@@ -37,7 +37,7 @@ export class App implements OnInit, OnDestroy {
 
   ngOnInit() {
     // Set default theme as requested
-    this.themeService.setLightTheme('theme-slate-ember');
+    this.themeService.setLightTheme('theme-aurora');
     
     this.masterList.initFromCache();
     this.setupAuthListener();
