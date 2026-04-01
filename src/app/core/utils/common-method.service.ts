@@ -792,202 +792,250 @@ export class CommonMethodService {
     };
   }
 allThemes: Theme[] = [
-    // ---------------------------------------------------------
-    // LIGHT THEMES
-    // ---------------------------------------------------------
-    {
-      name: "Light Default",
-      id: "theme-light",
-      color: "#3b82f6",
-      gradient: "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)",
-      category: "light",
-      description: "Clean, default SaaS light mode with sleek blue accents."
-    },
-    {
-      name: "Ivory",
-      id: "theme-ivory",
-      color: "#B35A3D",
-      gradient: "linear-gradient(135deg, #B35A3D 0%, #D4846A 100%)",
-      category: "light",
-      description: "Premium, warm, and editorial design with terracotta accents on soft ivory."
-    },
-    {
-      name: "Aurora",
-      id: "theme-aurora",
-      color: "#4a6fa5",
-      gradient: "linear-gradient(135deg, #4a6fa5 0%, #7fb5c8 100%)",
-      category: "light",
-      description: "Cool corporate blue with crisp, professional slate tones."
-    },
-    {
-      name: "Verdant",
-      id: "theme-verdant",
-      color: "#2d6a2d",
-      gradient: "linear-gradient(135deg, #2d6a2d 0%, #7ab87a 100%)",
-      category: "light",
-      description: "Organic, calm, and botanical with refreshing forest and leaf greens."
-    },
-    {
-      name: "Coastal Command",
-      id: "theme-coastal-command",
-      color: "#0d9488",
-      gradient: "linear-gradient(135deg, #0d9488 0%, #059669 100%)",
-      category: "light",
-      description: "Enterprise SaaS teal with cool neutral backgrounds for commanding authority."
-    },
-    {
-      name: "Warm Meridian",
-      id: "theme-warm-meridian",
-      color: "#0a7c72",
-      gradient: "linear-gradient(135deg, #0a7c72 0%, #d97706 100%)",
-      category: "light",
-      description: "Refined and welcoming warm ivory backgrounds with sophisticated gold-teal accents."
-    },
-    {
-      name: "Daylight Orange",
-      id: "theme-daylight-orange",
-      color: "#f97316",
-      gradient: "linear-gradient(135deg, #ea580c 0%, #f97316 55%, #fb923c 100%)",
-      category: "light",
-      description: "Cool pearl white surfaces accented by energetic, bright orange gradients."
-    },
-    {
-      name: "Naval Dawn",
-      id: "theme-naval-dawn",
-      color: "#ffbf00",
-      gradient: "linear-gradient(135deg, #cc9900 0%, #ffbf00 55%, #ffcf40 100%)",
-      category: "light",
-      description: "Crisp, airy naval whites and greys offset by a commanding golden-amber glow."
-    },
+  // ───────────────────────────────────────────────
+  // LIGHT THEMES
+  // ───────────────────────────────────────────────
+  {
+    name: "Light Default",
+    id: "theme-light",
+    color: "#2563eb",
+    gradient: "linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)",
+    category: "light",
+    description: "Clean, default SaaS light mode with authoritative blue accents on pure white."
+  },
+  {
+    name: "Ivory",
+    id: "theme-ivory",
+    color: "#a84e33",
+    gradient: "linear-gradient(135deg, #8b3a22 0%, #a84e33 55%, #c97055 100%)",
+    category: "light",
+    description: "Premium editorial warmth. Linen ivory base with deep terracotta accents."
+  },
+  {
+    name: "Aurora",
+    id: "theme-aurora",
+    color: "#2e5fa3",
+    gradient: "linear-gradient(135deg, #1e4a8a 0%, #2e5fa3 55%, #5b88c4 100%)",
+    category: "light",
+    description: "Corporate authority in cool slate-blue with crisp pearl-white surfaces."
+  },
+  {
+    name: "Verdant",
+    id: "theme-verdant",
+    color: "#1f5c1f",
+    gradient: "linear-gradient(135deg, #145014 0%, #1f5c1f 50%, #4ea04e 100%)",
+    category: "light",
+    description: "Deep botanical greens on soft cream whites. Organic and grounding."
+  },
+  {
+    name: "Coastal Command",
+    id: "theme-coastal-command",
+    color: "#0a857a",
+    gradient: "linear-gradient(135deg, #076e64 0%, #0a857a 50%, #0fb3a4 100%)",
+    category: "light",
+    description: "Enterprise-grade teal authority on cool neutral surfaces."
+  },
+  {
+    name: "Warm Meridian",
+    id: "theme-warm-meridian",
+    color: "#08726a",
+    gradient: "linear-gradient(135deg, #08726a 0%, #b8860b 100%)",
+    category: "light",
+    description: "Creamy warm ivory with sophisticated gold-teal accent duet."
+  },
+  {
+    name: "Daylight Orange",
+    id: "theme-daylight-orange",
+    color: "#e86510",
+    gradient: "linear-gradient(135deg, #c94e00 0%, #e86510 50%, #f68934 100%)",
+    category: "light",
+    description: "Cool pearl white surfaces paired with sunset-orange energy."
+  },
+  {
+    name: "Naval Dawn",
+    id: "theme-naval-dawn",
+    color: "#c49600",
+    gradient: "linear-gradient(135deg, #9a7400 0%, #c49600 55%, #ddb200 100%)",
+    category: "light",
+    description: "Maritime silver-blue surfaces commanded by deep antique gold."
+  },
+  {
+    name: "Sand Dune",
+    id: "theme-sand-dune",
+    color: "#b06020",
+    gradient: "linear-gradient(135deg, #884800 0%, #b06020 55%, #d08040 100%)",
+    category: "light",
+    description: "Desert warmth. Sun-bleached sand tones with cognac-amber accents."
+  },
+  {
+    name: "Sakura",
+    id: "theme-sakura",
+    color: "#c45070",
+    gradient: "linear-gradient(135deg, #a03050 0%, #c45070 55%, #e07090 100%)",
+    category: "light",
+    description: "Japanese cherry blossom. Blush whites, warm mist, and rose petal pink."
+  },
 
-    // ---------------------------------------------------------
-    // DARK THEMES
-    // ---------------------------------------------------------
-    {
-      name: "Dark Default",
-      id: "theme-dark",
-      color: "#818cf8",
-      gradient: "linear-gradient(135deg, #6366f1 0%, #818cf8 100%)",
-      category: "dark",
-      description: "Sleek, modern Tailwind-style dark mode with soft indigo accents."
-    },
-    {
-      name: "Neon Eclipse",
-      id: "theme-neon-eclipse",
-      color: "#ff6600",
-      gradient: "linear-gradient(135deg, #ff4400 0%, #ff6600 55%, #ff8533 100%)",
-      category: "dark",
-      description: "Vibrant neon tones piercing through a deep, dark eclipse background."
-    },
-    {
-      name: "Obsidian Rose",
-      id: "theme-obsidian-rose",
-      color: "#ff2d78",
-      gradient: "linear-gradient(135deg, #cc0055 0%, #ff2d78 45%, #d4af37 100%)",
-      category: "dark",
-      description: "Volcanic black surface with hot-pink glass panels and gold micro-details."
-    },
-    {
-      name: "Deep Emerald",
-      id: "theme-deep-emerald",
-      color: "#10b981",
-      gradient: "linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%)",
-      category: "dark",
-      description: "Flagship dark theme featuring deep navy backgrounds and electric emerald accents."
-    },
-    {
-      name: "Midnight Bronze",
-      id: "theme-midnight-bronze",
-      color: "#c49050",
-      gradient: "linear-gradient(135deg, #a87030 0%, #c49050 55%, #d8a870 100%)",
-      category: "dark",
-      description: "Rich navy base with warm, premium bronze and gold glassmorphism details."
-    },
-    {
-      name: "Molten Ember",
-      id: "theme-molten-ember",
-      color: "#ff6420",
-      gradient: "linear-gradient(135deg, #cc4400 0%, #ff6420 48%, #ffaa44 100%)",
-      category: "dark",
-      description: "Deep charcoal-brown with vibrant orange-gold fire glowing from below."
-    },
-    {
-      name: "Neon Void",
-      id: "theme-neon-void",
-      color: "#b44dff",
-      gradient: "linear-gradient(135deg, #7722ee 0%, #b44dff 48%, #00ccff 100%)",
-      category: "dark",
-      description: "Pure black void with violet-purple neon corona and cyberpunk cyan glows."
-    },
-    {
-      name: "Obsidian Jade",
-      id: "theme-obsidian-jade",
-      color: "#2dd4bf",
-      gradient: "linear-gradient(135deg, #0d9488 0%, #2dd4bf 50%, #a3e8c8 100%)",
-      category: "dark",
-      description: "Warm deep charcoal contrasted with glowing jade and gold luxury aesthetics."
-    },
-    {
-      name: "Solar Flare",
-      id: "theme-solar-flare",
-      color: "#fb923c",
-      gradient: "linear-gradient(135deg, #fb923c 0%, #f97316 50%, #db2777 100%)",
-      category: "dark",
-      description: "Intense deep red and brown backgrounds radiating a bright, solar orange flare."
-    },
-    {
-      name: "Nebula",
-      id: "theme-nebula",
-      color: "#d946ef",
-      gradient: "linear-gradient(to right, #ec4899 0%, #a855f7 55%, #8b5cf6 100%)",
-      category: "dark",
-      description: "Deep void space with striking fuchsia and purple nebula-inspired gradients."
-    },
-    {
-      name: "Luxury",
-      id: "theme-luxury",
-      color: "#d4af37",
-      gradient: "linear-gradient(135deg, #9c7a00 0%, #d4af37 55%, #f59e0b 100%)",
-      category: "dark",
-      description: "Classic onyx black and rich gold styling for an uncompromising luxury feel."
-    },
-    {
-      name: "Abyssal Coral",
-      id: "theme-abyssal-coral",
-      color: "#ff7040",
-      gradient: "linear-gradient(135deg, #f05030 0%, #ff7040 55%, #ff9470 100%)",
-      category: "dark",
-      description: "Deep oceanic abyssal tones paired with vibrant, living coral highlights."
-    },
+  // ───────────────────────────────────────────────
+  // DARK THEMES
+  // ───────────────────────────────────────────────
+  {
+    name: "Dark Default",
+    id: "theme-dark",
+    color: "#818cf8",
+    gradient: "linear-gradient(135deg, #4f46e5 0%, #6366f1 45%, #818cf8 100%)",
+    category: "dark",
+    description: "Deep zinc void with soft indigo-violet accents. Timeless dark mode."
+  },
+  {
+    name: "Neon Eclipse",
+    id: "theme-neon-eclipse",
+    color: "#ff6e14",
+    gradient: "linear-gradient(135deg, #e04c00 0%, #ff6e14 55%, #ff9450 100%)",
+    category: "dark",
+    description: "Void black space with amber-orange neon cutting through the dark."
+  },
+  {
+    name: "Obsidian Rose",
+    id: "theme-obsidian-rose",
+    color: "#f0186a",
+    gradient: "linear-gradient(135deg, #c00048 0%, #f0186a 45%, #c8a030 100%)",
+    category: "dark",
+    description: "Volcanic obsidian with hot magenta glass panels and champagne gold edge."
+  },
+  {
+    name: "Deep Emerald",
+    id: "theme-deep-emerald",
+    color: "#0db87a",
+    gradient: "linear-gradient(135deg, #048a5a 0%, #0db87a 50%, #26e09a 100%)",
+    category: "dark",
+    description: "Near-black emerald depths with electric green bioluminescent glow."
+  },
+  {
+    name: "Midnight Bronze",
+    id: "theme-midnight-bronze",
+    color: "#c4882e",
+    gradient: "linear-gradient(135deg, #9e6a18 0%, #c4882e 55%, #dc9e4a 100%)",
+    category: "dark",
+    description: "Deep navy abyss with warm cognac-bronze and antique gold shimmer."
+  },
+  {
+    name: "Molten Ember",
+    id: "theme-molten-ember",
+    color: "#f55e18",
+    gradient: "linear-gradient(135deg, #c03800 0%, #f55e18 48%, #ffa040 100%)",
+    category: "dark",
+    description: "Charred brown-black with fire-orange and molten gold glowing beneath."
+  },
+  {
+    name: "Neon Void",
+    id: "theme-neon-void",
+    color: "#aa40ff",
+    gradient: "linear-gradient(135deg, #6e18ee 0%, #aa40ff 48%, #00d8ff 100%)",
+    category: "dark",
+    description: "Pure black void with electric violet neon corona and icy cyan accent."
+  },
+  {
+    name: "Obsidian Jade",
+    id: "theme-obsidian-jade",
+    color: "#20c8ac",
+    gradient: "linear-gradient(135deg, #0a9478 0%, #20c8ac 50%, #90e8c8 100%)",
+    category: "dark",
+    description: "Warm brown-black charcoal with glowing jade teal and subtle gold luxury."
+  },
+  {
+    name: "Solar Flare",
+    id: "theme-solar-flare",
+    color: "#ffa060",
+    gradient: "linear-gradient(135deg, #ffa060 0%, #ff7020 50%, #e01868 100%)",
+    category: "dark",
+    description: "Deep red-brown surface with solar orange flare radiating to hot coral."
+  },
+  {
+    name: "Nebula",
+    id: "theme-nebula",
+    color: "#e040f8",
+    gradient: "linear-gradient(to right, #f06eaa 0%, #b040f8 55%, #7b44f2 100%)",
+    category: "dark",
+    description: "Deep space void with fuchsia and violet nebula gradients burning outward."
+  },
+  {
+    name: "Luxury",
+    id: "theme-luxury",
+    color: "#c8a028",
+    gradient: "linear-gradient(135deg, #8c6c00 0%, #c8a028 55%, #e0b848 100%)",
+    category: "dark",
+    description: "Warm onyx-brown with burnished antique gold. Uncompromising luxury."
+  },
+  {
+    name: "Abyssal Coral",
+    id: "theme-abyssal-coral",
+    color: "#ff6840",
+    gradient: "linear-gradient(135deg, #e04828 0%, #ff6840 55%, #ff9068 100%)",
+    category: "dark",
+    description: "Deep ocean-black with living reef coral glowing from below."
+  },
+  {
+    name: "Crimson Noir",
+    id: "theme-crimson-noir",
+    color: "#cc1a30",
+    gradient: "linear-gradient(135deg, #8a0818 0%, #cc1a30 50%, #e84060 100%)",
+    category: "dark",
+    description: "Pitch black with blood crimson and silver-chrome micro-details. Pure drama."
+  },
+  {
+    name: "Void Steel",
+    id: "theme-void-steel",
+    color: "#2c68ff",
+    gradient: "linear-gradient(135deg, #1040e0 0%, #2c68ff 55%, #5888ff 100%)",
+    category: "dark",
+    description: "Matte anthracite industrial surface with electric cobalt precision."
+  },
 
-    // ---------------------------------------------------------
-    // GLASSMORPHISM THEMES
-    // ---------------------------------------------------------
-    {
-      name: "Aurora Glass",
-      id: "theme-aurora-glass",
-      color: "#39ff8a",
-      gradient: "linear-gradient(135deg, #00d4a0 0%, #39ff8a 40%, #a855f7 100%)",
-      category: "glass",
-      description: "Deep arctic night sky with green-violet aurora bleeding through thick frosted ice."
-    },
-    {
-      name: "Arctic Crystal",
-      id: "theme-arctic-crystal",
-      color: "#0ea5e9",
-      gradient: "linear-gradient(135deg, #0284c7 0%, #0ea5e9 50%, #38bdf8 100%)",
-      category: "glass",
-      description: "Pure white-blue crystalline light with extreme frosted glass and maximum luminosity."
-    },
-    {
-      name: "Horizon",
-      id: "theme-horizon",
-      color: "#ffbd9b",
-      gradient: "linear-gradient(135deg, #f56217 0%, #ff8c50 100%)",
-      category: "glass",
-      description: "A striking gradient background bleeding through sleek, frosted glass surfaces."
-    }
-  ];
+  // ───────────────────────────────────────────────
+  // GLASSMORPHISM THEMES
+  // ───────────────────────────────────────────────
+  {
+    name: "Aurora Glass",
+    id: "theme-aurora-glass",
+    color: "#28ff90",
+    gradient: "linear-gradient(135deg, #00c898 0%, #28ff90 40%, #9050f8 100%)",
+    category: "glass",
+    description: "Arctic night sky with layered green-violet aurora bleeding through deep frost."
+  },
+  {
+    name: "Arctic Crystal",
+    id: "theme-arctic-crystal",
+    color: "#0b9ee0",
+    gradient: "linear-gradient(135deg, #0176c0 0%, #0b9ee0 50%, #32bbf8 100%)",
+    category: "glass",
+    description: "Pure white-blue polar light with ice-prism glass and maximum luminosity."
+  },
+  {
+    name: "Horizon",
+    id: "theme-horizon",
+    color: "#ffcc9a",
+    gradient: "linear-gradient(135deg, #f04818 0%, #9040a8 50%, #1858a8 100%)",
+    category: "glass",
+    description: "Dramatic diagonal sunset from coral to deep ocean, frosted aircraft glass."
+  },
+  {
+    name: "Mercury Glass",
+    id: "theme-mercury-glass",
+    color: "#5070a8",
+    gradient: "linear-gradient(135deg, #304880 0%, #5070a8 50%, #7898cc 100%)",
+    category: "glass",
+    description: "Polished silver-chrome mirror with platinum reflections and steel-blue precision."
+  },
+  {
+    name: "Amethyst Dusk",
+    id: "theme-amethyst-dusk",
+    color: "#9040e8",
+    gradient: "linear-gradient(135deg, #6820c0 0%, #9040e8 48%, #c8a030 100%)",
+    category: "glass",
+    description: "Twilight purple sky fading to indigo night with warm gold dust shimmer."
+  },
+];
   // allThemes: Theme[] = [
   //   { 
   //   name: "Ivory", 
