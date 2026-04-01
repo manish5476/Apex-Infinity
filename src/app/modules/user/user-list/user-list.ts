@@ -21,6 +21,7 @@ import { UserManagementService } from '../user-management.service';
 import { finalize } from 'rxjs';
 import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
+import { DynamicDialogServices } from '../../../core/services/dynamic-dialog-services';
 
 @Component({
   selector: 'app-user-list',
@@ -59,6 +60,7 @@ export class UserListComponent implements OnInit {
   private confirmationService = inject(ConfirmationService);
   public masterList = inject(MasterListService);
   private router = inject(Router);
+  private dynamicDialog = inject(DynamicDialogServices);
 
   private currentPage = 1;
   private isLoading = false;
@@ -98,6 +100,10 @@ export class UserListComponent implements OnInit {
     this.router.navigate(['/user/create']);
   }
 
+  openExportDialog() {
+    this.dynamicDialog.openUserExport();
+  }
+
 
   onScrolledToBottom() {
     if (!this.isLoading && this.data.length < this.totalCount) {
@@ -108,12 +114,28 @@ export class UserListComponent implements OnInit {
   eventFromGrid(event: any) {
     if (event.type === 'cellClicked') {
       const userId = event.row._id;
+
+      // Handle direct dialog triggers on specific columns
+      if (event.field === 'security') {
+        this.dynamicDialog.openUserStatus(event.row)?.onClose.subscribe(result => {
+          if (result) this.getData(false); // Refresh row data
+        });
+        return;
+      }
+
+      // Navigate to details if clicking the name column
+      if (event.field === 'name') {
+        this.router.navigate(['/user/details', userId]);
+      }
+    }
+
+    if (event.type === 'view') {
+      const userId = event.row._id;
       this.router.navigate(['/user/details', userId]);
     }
 
     if (event.type === 'editStart') {
       const userId = event.row._id;
-
       this.router.navigate(['/user/edit', userId]);
     }
 
@@ -139,7 +161,7 @@ export class UserListComponent implements OnInit {
     }
   }
 
-getData(isReset: boolean = false) {
+  getData(isReset: boolean = false) {
     if (this.isLoading) return;
     this.isLoading = true;
 
@@ -364,43 +386,25 @@ getData(isReset: boolean = false) {
         cellStyle: { 'display': 'flex', 'align-items': 'center', 'color': 'var(--text-secondary)', 'font-size': '12px' }
       },
 
-
-
       {
-        field: 'isActive',
-        headerName: 'Status',
-        width: 100,
-        sortable: true,
+        headerName: 'Safety',
+        field: 'security',
+        width: 80,
+        sortable: false,
+        filter: false,
         cellRenderer: (params: any) => {
-          const isActive = params.value;
-
-
-          const bg = isActive ? '#ecfdf5' : '#fef2f2';
-          const color = isActive ? '#15803d' : '#b91c1c';
-          const border = isActive ? '#bbf7d0' : '#fecaca';
+          const isBlocked = params.data.isLoginBlocked;
+          const icon = isBlocked ? 'pi-lock text-error' : 'pi-shield text-primary';
+          const tooltip = isBlocked ? 'Login Blocked' : 'Account Secure';
 
           return `
-            <div style="display:flex; align-items:center; height:100%;">
-              <span style="
-                background-color: ${bg}; 
-                color: ${color}; 
-                border: 1px solid ${border}; 
-                padding: 1px 8px; 
-                border-radius: 4px; 
-                font-size: 10px; 
-                font-weight: 700; 
-                text-transform: uppercase; 
-                line-height: 1.2; 
-                white-space: nowrap;
-                letter-spacing: 0.5px;
-              ">
-                ${isActive ? 'ACTIVE' : 'INACTIVE'}
-              </span>
-            </div>`;
+            <div style="display:flex; align-items:center; justify-content:center; height:100%; cursor:pointer;">
+              <i class="pi ${icon}" style="font-size: 1.2rem;" title="${tooltip}"></i>
+            </div>
+          `;
         }
       }
     ];
     this.cdr.detectChanges();
   }
 }
-

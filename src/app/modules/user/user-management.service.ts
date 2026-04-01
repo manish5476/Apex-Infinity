@@ -47,6 +47,10 @@ export interface User {
   };
   devices?: any[];
   preferences?: any;
+  permissionOverrides?: {
+    granted: string[];
+    revoked: string[];
+  };
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -98,10 +102,10 @@ export class UserManagementService extends BaseApiService {
   }
 
   /**
-   * Upload profile photo
-   */
+     * Upload profile photo
+     */
   uploadProfilePhoto(formData: FormData): Observable<{ status: string; data: { user: User } }> {
-    return this.patch<{ status: string; data: { user: User } }>('/v1/users/me/photo', formData, 'uploadProfilePhoto');
+    return this.post<{ status: string; data: { user: User } }>('/v1/users/me/photo', formData, 'uploadProfilePhoto');
   }
 
   /**
@@ -151,9 +155,12 @@ export class UserManagementService extends BaseApiService {
   }
 
   /**
-   * Export users data
-   */
+     * Export users data
+     */
   exportUsers(params?: { format?: 'json' | 'csv'; departmentId?: string; isActive?: boolean }): Observable<any> {
+    if (params?.format === 'csv') {
+      return this.getBlob(`${this.endpoint}/export`, params, 'exportUsers');
+    }
     return this.get<any>(`${this.endpoint}/export`, params, 'exportUsers');
   }
 
@@ -261,6 +268,20 @@ export class UserManagementService extends BaseApiService {
   // ======================================================
 
   /**
+   * Get all available system permissions
+   */
+  getAllAvailablePermissions(): Observable<{ status: string; data: { permissions: any[] } }> {
+    return this.get<{ status: string; data: { permissions: any[] } }>(`${this.endpoint}/all-permissions`, {}, 'getAllAvailablePermissions');
+  }
+
+  /**
+   * Update user permission overrides (Admin)
+   */
+  updatePermissionOverrides(id: string, data: { grant: string[]; revoke: string[] }): Observable<{ status: string; data: { user: User } }> {
+    return this.patch<{ status: string; data: { user: User } }>(`${this.endpoint}/${id}/permission-overrides`, data, 'updatePermissionOverrides');
+  }
+
+  /**
    * @deprecated Use toggleUserBlock instead
    */
   togglestatus(formData: FormData): Observable<any> {
@@ -268,73 +289,3 @@ export class UserManagementService extends BaseApiService {
     return this.patch('/v1/users/togglestatus', formData, 'togglestatus');
   }
 }
-
-// import { Injectable } from '@angular/core';
-// import { Observable } from 'rxjs';
-// import { BaseApiService } from '../../core/services/base-api.service';
-
-// @Injectable({ providedIn: 'root' })
-// export class UserManagementService extends BaseApiService {
-//   private endpoint = '/v1/users';
-//   // Admin: Get all users with pagination & search
-//   getAllUsers(params?: any): Observable<any> {
-//     return this.get(this.endpoint, params, 'getAllUsers');
-//   }
-//   // Admin: Search specific users
-//   searchUsers(query: string): Observable<any> {
-//     return this.get(`${this.endpoint}/search`, { q: query }, 'searchUsers');
-//   }
-
-//   uploadProfilePhoto(formData: FormData): Observable<any> {
-//     return this.patch('/v1/users/me/photo', formData, 'uploadProfilePhoto');
-//   }
-
-//   togglestatus(formData: FormData): Observable<any> {
-//     return this.patch('/v1/users/togglestatus', formData, 'togglestatus');
-//   }
-
-//   uploadUserPhoto(id: string, formData: FormData): Observable<any> {
-//     // Assuming your backend supports PATCH /v1/users/:id/photo
-//     return this.patch(`${this.endpoint}/${id}/photo`, formData, 'uploadUserPhoto');
-//   }
-
-//   // Admin: Create Employee/Manager
-//   createUser(data: any): Observable<any> {
-//     return this.post(this.endpoint, data, 'createUser');
-//   }
-
-//   updateUser(id: string, data: any): Observable<any> {
-//     return this.patch(`${this.endpoint}/${id}`, data, 'updateUser');
-//   }
-
-//   // Admin: Security Actions
-//   deactivateUser(id: string): Observable<any> {
-//     return this.patch(`${this.endpoint}/${id}/deactivate`, {}, 'deactivateUser');
-//   }
-
-//   activateUser(id: string): Observable<any> {
-//     return this.patch(`${this.endpoint}/${id}/activate`, {}, 'activateUser');
-//   }
-
-//   // Admin: Reset another user's password
-//   adminResetPassword(id: string, password: string): Observable<any> {
-//     return this.patch(`${this.endpoint}/${id}/password`, { password }, 'adminResetPassword');
-//   }
-
-//   // Admin: View User Activity Logs
-//   getUserActivity(id: string): Observable<any> {
-//     return this.get(`${this.endpoint}/${id}/activity`, {}, 'getUserActivity');
-//   }
-
-//   getMe(): Observable<any> {
-//     return this.get<any>('/v1/users/me', {}, 'getMe');
-//   }
-//   // --- 🆕 ADDED MISSING METHODS ---
-//   getUser(id: string): Observable<any> {
-//     return this.get(`${this.endpoint}/${id}`, {}, 'getUser');
-//   }
-
-//   deleteUser(id: string): Observable<any> {
-//     return this.delete(`${this.endpoint}/${id}`,null, 'deleteUser');
-//   }
-// }

@@ -1,192 +1,795 @@
 <div class="page-container animate-fadeIn">
 
   @if (!currentUser()) {
-    <div class="loading-state">
-      <div class="skeleton-header">
-        <div class="left-group">
-          <p-skeleton shape="circle" size="4rem"></p-skeleton>
-          <div class="text-group">
-            <p-skeleton width="12rem" height="1.5rem"></p-skeleton>
-            <p-skeleton width="8rem" height="1rem"></p-skeleton>
-          </div>
-        </div>
-      </div>
-      <div class="layout-grid">
-        <aside class="skeleton-sidebar">
-          <p-skeleton height="400px" styleClass="w-full"></p-skeleton>
-        </aside>
-        <main class="skeleton-main">
-          <p-skeleton height="200px" styleClass="w-full"></p-skeleton>
-          <p-skeleton height="300px" styleClass="w-full"></p-skeleton>
-        </main>
-      </div>
-    </div>
+  <div class="p-5"><p-skeleton width="100%" height="400px" styleClass="rounded-xl"></p-skeleton></div>
   }
 
   @else if (currentUser(); as user) {
+  <header class="page-header flex justify-between align-center">
+    <div class="header-titles">
+      <h1 class="page-title">Employee Profile</h1>
+      <p class="page-subtitle text-muted">Manage your identity, active sessions, and permissions.</p>
+    </div>
+    <div class="header-actions">
+      <button pButton label="Edit Profile" icon="pi pi-pencil"
+        class="p-button-outlined p-button-rounded p-button-lg shadow-sm hover-shadow-md"
+        (click)="openEditModal()"></button>
+    </div>
+  </header>
 
-    <header class="dashboard-header">
-      <div class="header-left">
-        <div class="identity-group">
-          <div class="name-row">
-            <h1>{{ user.name }}</h1>
-            <p-tag [value]="user.isActive ? 'Active' : 'Inactive'" [severity]="user.isActive ? 'success' : 'danger'" styleClass="status-tag"></p-tag>
+  <div class="master-grid">
+
+    <aside class="sidebar-column">
+      <div class="glass-card profile-card">
+        <div class="card-banner bg-accent-gradient"></div>
+
+        <div class="profile-content">
+          <div class="avatar-wrapper" (click)="!uploading() && triggerFileInput()" pTooltip="Update Photo"
+            tooltipPosition="right">
+            <div class="avatar-circle shadow-2xl">
+              @if (user.avatar) {
+              <img [src]="user.avatar" [alt]="user.name" class="profile-image">
+              } @else {
+              <span class="initials">{{ getInitials(user.name) }}</span>
+              }
+              <div class="avatar-overlay"><i class="pi pi-camera"></i></div>
+              @if (uploading()) { <div class="avatar-loader"><i class="pi pi-spin pi-spinner"></i></div> }
+            </div>
+            <div class="status-indicator shadow-md" [class.active]="user.isActive"></div>
           </div>
-          <div class="meta-row">
-            <span class="role-badge">
-              <i class="pi" [ngClass]="user.role.name === 'all access' ? 'pi-shield' : 'pi-user'"></i>
-              {{ user.role.name | uppercase }}
-            </span>
-            <span class="org-badge">{{ user.organizationId }}</span>
+          <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" class="hidden">
+
+          <div class="user-identity text-center">
+            <h2 class="user-name">{{ user.name }}</h2>
+            <p-tag [value]="user.status | uppercase" [severity]="user.isActive ? 'success' : 'danger'"
+              styleClass="status-tag rounded-pill"></p-tag>
+
+            <div class="contact-pills mt-4 flex flex-wrap justify-center gap-2">
+              <span class="contact-pill"><i class="pi pi-envelope"></i> {{ user.email }}</span>
+              <span class="contact-pill"><i class="pi pi-phone"></i> {{ user.phone }}</span>
+            </div>
+          </div>
+
+          <hr class="card-divider">
+
+          <div class="employment-details flex-col gap-4">
+            <div class="detail-row">
+              <div class="detail-icon bg-primary-light text-primary"><i class="pi pi-briefcase"></i></div>
+              <div class="detail-text">
+                <label>Designation</label>
+                <span>{{ user.employeeProfile?.designationId?.title || 'Not Assigned' | titlecase }}</span>
+              </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-icon bg-info-light text-info"><i class="pi pi-sitemap"></i></div>
+              <div class="detail-text">
+                <label>Department</label>
+                <span>{{ user.employeeProfile?.departmentId?.name || 'Not Assigned' }}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="header-actions">
-        <button pButton label="Edit Profile" icon="pi pi-user-edit" class="p-button-outlined p-button-secondary btn-sm"></button>
+      @if (user.branchId; as branch) {
+      <div class="glass-card branch-card mt-5">
+        <div class="card-header border-b">
+          <h3 class="card-title"><i class="pi pi-map-marker text-primary"></i> Location</h3>
+        </div>
+        <div class="card-body">
+          <h4 class="text-lg font-semibold text-primary">{{ branch.name }}</h4>
+          <p class="text-muted text-sm mt-2 leading-relaxed">
+            {{ branch.address.street | titlecase }}<br>
+            {{ branch.address.city | titlecase }}, {{ branch.address.state | titlecase }}<br>
+            {{ branch.address.country }}
+          </p>
+        </div>
       </div>
-    </header>
+      }
+    </aside>
 
-    <div class="layout-grid">
+    <main class="content-column flex-col gap-5">
 
-      <aside class="sidebar-column">
-        
-        <div class="profile-card">
-          <div class="card-banner"></div>
-          
-          <div class="profile-content">
-            
-            <div class="avatar-wrapper" (click)="!uploading() && triggerFileInput()">
-              <div class="avatar-circle">
-                @if (user.avatar) {
-                  <img [src]="user.avatar" [alt]="user.name" class="profile-image">
-                } @else {
-                  <span class="initials">{{ getInitials(user.name) }}</span>
-                }
-                
-                <div class="avatar-overlay">
-                  <i class="pi pi-camera"></i>
-                </div>
-
-                @if (uploading()) {
-                  <div class="avatar-loader"><i class="pi pi-spin pi-spinner"></i></div>
-                }
-              </div>
-              <div class="status-dot" [class.active]="user.isActive"></div>
-            </div>
-            
-            <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none;">
-
-            <h3 class="contact-name">{{ user.name }}</h3>
-            <span class="contact-email">{{ user.email }}</span>
-
-            <div class="info-list">
-              <div class="info-item">
-                <div class="icon-box"><i class="pi pi-calendar"></i></div>
-                <div class="info-text">
-                  <label>Joined</label>
-                  <span>{{ user.createdAt | date:'mediumDate' }}</span>
-                </div>
-              </div>
-              
-              <div class="info-item">
-                <div class="icon-box"><i class="pi pi-id-card"></i></div>
-                <div class="info-text">
-                  <label>User ID</label>
-                  <span class="font-mono text-xs">{{ user._id | slice:0:8 }}...</span>
-                </div>
-              </div>
-            </div>
-
-            @if (uploadError()) {
-              <div class="error-alert">
-                <i class="pi pi-exclamation-circle"></i> {{ uploadError() }}
-              </div>
-            }
+      <div class="bento-stats-grid">
+        <div class="glass-card stat-box">
+          <div class="stat-icon bg-success-light text-success"><i class="pi pi-shield"></i></div>
+          <div class="stat-data">
+            <label>Role / Access</label>
+            <div class="val">{{ user.role.name | titlecase }}</div>
           </div>
         </div>
+        <div class="glass-card stat-box">
+          <div class="stat-icon bg-primary-light text-primary"><i class="pi pi-clock"></i></div>
+          <div class="stat-data">
+            <label>Account Created</label>
+            <div class="val text-sm">{{ user.createdAt | date:'mediumDate' }}</div>
+          </div>
+        </div>
+      </div>
 
-        @if (user.branchId; as branch) {
-          <div class="glass-card branch-card">
-            <div class="card-header">
-              <i class="pi pi-building"></i> <span>Assigned Branch</span>
-            </div>
-            <div class="card-body">
-              <h4 class="branch-name">{{ branch.name }}</h4>
-              <p class="branch-address">
-                {{ branch.address.city }}, {{ branch.address.state }}<br>
-                <span class="text-xs text-muted">{{ branch.address.country }} - {{ branch.address.zipCode }}</span>
-              </p>
+      <div class="bento-split-grid">
+
+        @if (user.attendanceConfig; as att) {
+        <div class="glass-card flex-col h-full">
+          <div class="card-header border-b flex justify-between align-center">
+            <h3 class="card-title"><i class="pi pi-calendar-times text-primary"></i> Attendance Rules</h3>
+            <div class="status-dot-pulse" [class.bg-success]="att.isAttendanceEnabled"></div>
+          </div>
+          <div class="card-body flex-1 flex-col gap-4">
+            <div class="punch-rules flex gap-3">
+              <div
+                class="rule-box flex-1 bg-secondary rounded-xl border border-tertiary text-center p-4 transition-base hover-border-primary">
+                <i class="pi pi-globe text-3xl mb-2" [class.text-success]="att.allowWebPunch"
+                  [class.text-muted]="!att.allowWebPunch"></i>
+                <div class="text-sm font-semibold text-muted uppercase tracking-wider">Web Punch</div>
+              </div>
+              <div
+                class="rule-box flex-1 bg-secondary rounded-xl border border-tertiary text-center p-4 transition-base hover-border-primary">
+                <i class="pi pi-mobile text-3xl mb-2" [class.text-success]="att.allowMobilePunch"
+                  [class.text-muted]="!att.allowMobilePunch"></i>
+                <div class="text-sm font-semibold text-muted uppercase tracking-wider">App Punch</div>
+              </div>
             </div>
           </div>
+        </div>
         }
 
-        <div class="glass-card pref-card">
-          <div class="card-header">
-            <i class="pi pi-cog"></i> <span>Preferences</span>
+        <div class="glass-card flex-col h-full">
+          <div class="card-header border-b flex justify-between align-center">
+            <h3 class="card-title"><i class="pi pi-desktop text-primary"></i> Active Sessions</h3>
+            <span
+              class="badge bg-secondary text-text-secondary rounded-pill px-3 py-1 text-xs font-bold border border-tertiary">
+              {{ user.devices.length }} Online
+            </span>
           </div>
-          <div class="card-body">
-            <div class="pref-row">
-              <span>Dark Mode</span>
-              <div class="status-indicator" [class.on]="user.preferences.theme === 'dark'"></div>
-            </div>
-            <div class="pref-row">
-              <span>Dense Mode</span>
-              <div class="status-indicator" [class.on]="user.preferences.denseMode"></div>
-            </div>
-            <div class="tags-row">
-              <span class="pref-tag" [class.active]="user.preferences.notifications.email">Email</span>
-              <span class="pref-tag" [class.active]="user.preferences.notifications.push">Push</span>
-              <span class="pref-tag" [class.active]="user.preferences.notifications.sms">SMS</span>
-            </div>
-          </div>
-        </div>
-
-      </aside>
-
-      <main class="main-column">
-        
-        <section class="glass-card permissions-panel">
-          <div class="card-header">
-            <div class="flex items-center gap-2">
-              <i class="pi pi-lock"></i> 
-              <span>Access & Permissions</span>
-            </div>
-            <span class="count-badge">{{ user.role.permissions?user.role.permissions.length:0 }} Perms</span>
-          </div>
-
-          <div class="card-body">
-            <div class="permissions-grid">
-              @for (perm of user.role.permissions; track perm) {
-                <div class="perm-chip">
-                  <i class="pi pi-check-circle"></i>
-                  <span>{{ formatPermission(perm) }}</span>
+          <div class="card-body p-0 overflow-hidden">
+            <div class="device-list custom-scroll p-4 flex-col gap-3 max-h-[280px] overflow-y-auto">
+              @for (device of user.devices; track device._id) {
+              <div
+                class="device-item flex align-center gap-4 p-4 rounded-xl border border-tertiary bg-secondary transition-base hover-shadow-md">
+                <div
+                  class="device-icon w-12 h-12 flex align-center justify-center rounded-full bg-primary-light text-primary text-2xl">
+                  <i class="pi" [ngClass]="getDeviceIcon(device.userAgent)"></i>
                 </div>
+                <div class="device-info flex-1 overflow-hidden">
+                  <div class="text-md font-bold text-text-primary truncate" [title]="device.userAgent">{{
+                    device?.userAgent?.split(' ')?.[0] || 'Unknown Browser' }}</div>
+                  <div class="text-sm text-muted mt-1 font-mono">Last seen: {{ device.lastActive | date:'MMM d, HH:mm'
+                    }}</div>
+                </div>
+                <button pButton icon="pi pi-trash" class="p-button-danger p-button-text p-button-rounded"
+                  pTooltip="Revoke Access" tooltipPosition="left" [loading]="revokingDeviceId() === device._id"
+                  (click)="revokeDevice(device._id)"></button>
+              </div>
+              }
+              @if (user.devices.length === 0) {
+              <div class="p-4 text-center text-muted">No active sessions found.</div>
               }
             </div>
           </div>
-        </section>
+        </div>
+      </div>
 
-        <section class="glass-card meta-panel">
-          <div class="card-header">
-            <i class="pi pi-server"></i> <span>System Metadata</span>
-          </div>
-          <div class="card-body grid-2">
-            <div class="meta-box">
-              <label>Last Updated</label>
-              <span class="val">{{ user.updatedAt | date:'medium' }}</span>
+      <div class="glass-card">
+        <div class="card-header border-b flex justify-between align-center p-5">
+          <h3 class="card-title text-xl"><i class="pi pi-key text-primary"></i> Access Control</h3>
+          <span class="badge bg-primary text-white rounded-pill px-4 py-2 text-sm font-bold shadow-md">
+            {{ user.role.permissions.length }} Granted
+          </span>
+        </div>
+        <div class="card-body p-6">
+          <div class="permissions-masonry">
+            @for (group of groupedPermissions() | keyvalue; track group.key) {
+            <div
+              class="perm-module bg-bg-secondary border border-tertiary rounded-xl p-5 transition-base hover-shadow-lg">
+              <h4 class="text-sm font-bold uppercase tracking-wider text-primary mb-4 flex align-center gap-2">
+                <i class="pi pi-folder-open text-muted"></i> {{ group.key }}
+              </h4>
+              <div class="flex flex-wrap gap-2">
+                @for (action of group.value; track action) {
+                <span
+                  class="perm-pill bg-bg-primary border border-tertiary text-text-secondary text-sm rounded-pill px-4 py-1.5 capitalize transition-base hover-border-primary">
+                  {{ action }}
+                </span>
+                }
+              </div>
             </div>
-            <div class="meta-box">
-              <label>Account Status</label>
-              <span class="val status-text" [class.active]="user.isActive">
-                {{ user.isActive ? 'Operational' : 'Suspended' }}
-              </span>
-            </div>
+            }
           </div>
-        </section>
+        </div>
+      </div>
 
-      </main>
+    </main>
+  </div>
 
-    </div>
+  <p-dialog [(visible)]="isEditModalOpen" [modal]="true" styleClass="glass-dialog-spacious" header="Update Profile"
+    [style]="{ width: '700px', maxWidth: '95vw' }">
+    <ng-template pTemplate="header">
+      <div class="flex align-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-primary-light text-primary flex align-center justify-center text-xl">
+          <i class="pi pi-user-edit"></i>
+        </div>
+        <h2 class="text-xl font-bold m-0 font-heading text-text-primary">Profile Settings</h2>
+      </div>
+    </ng-template>
+
+    <form [formGroup]="profileForm" class="flex-col gap-5 mt-4">
+
+      <div class="form-section">
+        <h4 class="section-title">Identity Parameters</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="field"><label>Full Name</label><input pInputText formControlName="name"
+              class="glass-input p-inputtext-lg"></div>
+          <div class="field"><label>UPI ID (Optional)</label><input pInputText formControlName="upiId"
+              class="glass-input p-inputtext-lg" placeholder="user@upi"></div>
+        </div>
+      </div>
+
+      <div class="form-section" formGroupName="employeeProfile">
+        <h4 class="section-title">Contact & Location</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="field"><label>Secondary Phone</label><input pInputText formControlName="secondaryPhone"
+              class="glass-input p-inputtext-lg"></div>
+          <div class="field"><label>Work Area</label><input pInputText formControlName="workLocation"
+              class="glass-input p-inputtext-lg" placeholder="e.g. Desk 4A"></div>
+        </div>
+
+        <div class="glass-box p-5 mt-4 rounded-xl" formGroupName="guarantorDetails">
+          <h5 class="text-sm font-bold text-muted uppercase tracking-wider mb-3 m-0">Guarantor Information</h5>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="field"><input pInputText formControlName="name" class="glass-input" placeholder="Name"></div>
+            <div class="field"><input pInputText formControlName="relationship" class="glass-input"
+                placeholder="Relation"></div>
+            <div class="field"><input pInputText formControlName="phone" class="glass-input" placeholder="Phone"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section" formGroupName="preferences">
+        <h4 class="section-title">Notifications</h4>
+
+        <div formGroupName="notifications"
+          class="flex flex-wrap gap-5 mt-2 p-5 bg-secondary border border-tertiary rounded-xl transition-base hover-shadow-sm">
+
+          <div class="flex align-center gap-3">
+            <p-togglebutton name="email" formControlName="email" />
+            <label class="font-bold cursor-pointer">Email</label>
+          </div>
+
+          <div class="flex align-center gap-3">
+            <p-togglebutton name="push" formControlName="push" />
+            <label class="font-bold cursor-pointer">Push</label>
+          </div>
+
+          <div class="flex align-center gap-3">
+            <p-togglebutton name="sms" formControlName="sms" />
+            <label class="font-bold cursor-pointer">SMS</label>
+          </div>
+
+        </div>
+      </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+      <div class="flex justify-end gap-3 pt-4">
+        <button pButton label="Cancel" class="p-button-text p-button-secondary p-button-lg rounded-pill"
+          (click)="isEditModalOpen.set(false)" [disabled]="isSaving()"></button>
+        <button pButton label="Save Changes" icon="pi pi-check" class="p-button-primary p-button-lg rounded-pill"
+          (click)="saveProfile()" [loading]="isSaving()"></button>
+      </div>
+    </ng-template>
+  </p-dialog>
+
   }
 </div>
+<!-- <div class="page-container animate-fadeIn">
+
+  @if (!currentUser()) {
+  <div class="p-5"><p-skeleton width="100%" height="400px"></p-skeleton></div>
+  }
+
+  @else if (currentUser(); as user) {
+  <header class="page-header flex justify-between align-center">
+    <div class="header-titles">
+      <h1 class="page-title">Employee Profile</h1>
+      <p class="page-subtitle text-muted">Manage your identity, active sessions, and permissions.</p>
+    </div>
+    <div class="header-actions">
+      <button pButton label="Edit Profile" icon="pi pi-pencil" class="p-button-outlined p-button-rounded p-button-lg"
+        (click)="openEditModal()"></button>
+    </div>
+  </header>
+
+  <div class="master-grid">
+
+    <aside class="sidebar-column">
+      <div class="glass-card profile-card">
+        <div class="card-banner bg-accent-gradient"></div>
+
+        <div class="profile-content">
+          <div class="avatar-wrapper" (click)="!uploading() && triggerFileInput()" pTooltip="Update Photo"
+            tooltipPosition="right">
+            <div class="avatar-circle shadow-2xl">
+              @if (user.avatar) {
+              <img [src]="user.avatar" [alt]="user.name" class="profile-image">
+              } @else {
+              <span class="initials">{{ getInitials(user.name) }}</span>
+              }
+              <div class="avatar-overlay"><i class="pi pi-camera"></i></div>
+              @if (uploading()) { <div class="avatar-loader"><i class="pi pi-spin pi-spinner"></i></div> }
+            </div>
+            <div class="status-indicator shadow-md" [class.active]="user.isActive"></div>
+          </div>
+          <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" class="hidden">
+
+          <div class="user-identity text-center">
+            <h2 class="user-name">{{ user.name }}</h2>
+            <p-tag [value]="user.status | uppercase" [severity]="user.isActive ? 'success' : 'danger'"
+              styleClass="status-tag rounded-pill"></p-tag>
+
+            <div class="contact-pills mt-4 flex flex-wrap justify-center gap-2">
+              <span class="contact-pill"><i class="pi pi-envelope"></i> {{ user.email }}</span>
+              <span class="contact-pill"><i class="pi pi-phone"></i> {{ user.phone }}</span>
+            </div>
+          </div>
+
+          <hr class="card-divider">
+
+          <div class="employment-details flex-col gap-4">
+            <div class="detail-row">
+              <div class="detail-icon bg-primary-light text-primary"><i class="pi pi-briefcase"></i></div>
+              <div class="detail-text">
+                <label>Designation</label>
+                <span>{{ user.employeeProfile?.designationId?.title || 'Not Assigned' | titlecase }}</span>
+              </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-icon bg-info-light text-info"><i class="pi pi-sitemap"></i></div>
+              <div class="detail-text">
+                <label>Department</label>
+                <span>{{ user.employeeProfile?.departmentId?.name || 'Not Assigned' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      @if (user.branchId; as branch) {
+      <div class="glass-card branch-card mt-5">
+        <div class="card-header border-b">
+          <h3 class="card-title"><i class="pi pi-map-marker text-primary"></i> Location</h3>
+        </div>
+        <div class="card-body">
+          <h4 class="text-lg font-semibold text-primary">{{ branch.name }}</h4>
+          <p class="text-muted text-sm mt-2 leading-relaxed">
+            {{ branch.address.street | titlecase }}<br>
+            {{ branch.address.city | titlecase }}, {{ branch.address.state | titlecase }}<br>
+            {{ branch.address.country }}
+          </p>
+        </div>
+      </div>
+      }
+    </aside>
+
+    <main class="content-column flex-col gap-5">
+
+      <div class="bento-stats-grid">
+        <div class="glass-card stat-box">
+          <div class="stat-icon bg-success-light text-success"><i class="pi pi-shield"></i></div>
+          <div class="stat-data">
+            <label>Role / Access</label>
+            <div class="val">{{ user.role.name | titlecase }}</div>
+          </div>
+        </div>
+        <div class="glass-card stat-box">
+          <div class="stat-icon bg-primary-light text-primary"><i class="pi pi-clock"></i></div>
+          <div class="stat-data">
+            <label>Account Created</label>
+            <div class="val text-sm">{{ user.createdAt | date:'mediumDate' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bento-split-grid">
+
+        @if (user.attendanceConfig; as att) {
+        <div class="glass-card flex-col h-full">
+          <div class="card-header border-b flex justify-between align-center">
+            <h3 class="card-title"><i class="pi pi-calendar-times text-primary"></i> Attendance Rules</h3>
+            <div class="status-dot-pulse" [class.bg-success]="att.isAttendanceEnabled"></div>
+          </div>
+          <div class="card-body flex-1 flex-col gap-4">
+            <div class="punch-rules flex gap-3">
+              <div class="rule-box flex-1 bg-secondary rounded-lg border border-tertiary text-center p-4">
+                <i class="pi pi-globe text-3xl mb-2" [class.text-success]="att.allowWebPunch"
+                  [class.text-muted]="!att.allowWebPunch"></i>
+                <div class="text-sm font-semibold text-muted uppercase tracking-wider">Web Punch</div>
+              </div>
+              <div class="rule-box flex-1 bg-secondary rounded-lg border border-tertiary text-center p-4">
+                <i class="pi pi-mobile text-3xl mb-2" [class.text-success]="att.allowMobilePunch"
+                  [class.text-muted]="!att.allowMobilePunch"></i>
+                <div class="text-sm font-semibold text-muted uppercase tracking-wider">App Punch</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        }
+
+        <div class="glass-card flex-col h-full">
+          <div class="card-header border-b flex justify-between align-center">
+            <h3 class="card-title"><i class="pi pi-desktop text-primary"></i> Active Sessions</h3>
+            <span
+              class="badge bg-secondary text-text-secondary rounded-pill px-3 py-1 text-xs font-bold border border-tertiary">
+              {{ activeSessions().length }} Online
+            </span>
+          </div>
+          <div class="card-body p-0 overflow-hidden">
+            <div class="device-list custom-scroll p-4 flex-col gap-3 max-h-[280px] overflow-y-auto">
+              @for (session of activeSessions(); track session._id) {
+              <div
+                class="device-item flex align-center gap-4 p-4 rounded-xl border border-tertiary bg-secondary transition-base"
+                [class.hover-shadow-md]="currentSessionId() !== session._id">
+                <div
+                  class="device-icon w-12 h-12 flex align-center justify-center rounded-full bg-primary-light text-primary text-2xl">
+                  <i class="pi" [ngClass]="getDeviceIcon(session.userAgent)"></i>
+                </div>
+                <div class="device-info flex-1 overflow-hidden">
+                  <div class="flex align-center gap-2">
+                    <span class="text-md font-bold text-text-primary truncate" [title]="session.userAgent">{{
+                      session.userAgent.split(' ')[0] || 'Unknown Device' }}</span>
+                    @if (currentSessionId() === session._id) {
+                    <span
+                      class="text-xs bg-success-light text-success px-2 py-0.5 rounded-pill font-bold">Current</span>
+                    }
+                  </div>
+                  <div class="text-sm text-muted mt-1 font-mono">Last seen: {{ session.lastActivityAt | date:'MMM d,
+                    HH:mm' }}</div>
+                </div>
+                @if (currentSessionId() !== session._id) {
+                <button pButton icon="pi pi-trash" class="p-button-danger p-button-text p-button-rounded"
+                  pTooltip="Revoke Access" [loading]="revokingDeviceId() === session._id"
+                  (click)="revokeDevice(session._id)"></button>
+                }
+              </div>
+              }
+              @if (activeSessions().length === 0) {
+              <div class="p-4 text-center text-muted">No active sessions found.</div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card">
+        <div class="card-header border-b flex justify-between align-center p-5">
+          <h3 class="card-title text-xl"><i class="pi pi-key text-primary"></i> Access Control</h3>
+          <span class="badge bg-primary text-white rounded-pill px-4 py-2 text-sm font-bold shadow-md">
+            {{ user.role.permissions.length }} Granted
+          </span>
+        </div>
+        <div class="card-body p-6">
+          <div class="permissions-masonry">
+            @for (group of groupedPermissions() | keyvalue; track group.key) {
+            <div
+              class="perm-module bg-bg-secondary border border-tertiary rounded-xl p-5 transition-base hover-shadow-lg">
+              <h4 class="text-sm font-bold uppercase tracking-wider text-primary mb-4 flex align-center gap-2">
+                <i class="pi pi-folder-open text-muted"></i> {{ group.key }}
+              </h4>
+              <div class="flex flex-wrap gap-2">
+                @for (action of group.value; track action) {
+                <span
+                  class="perm-pill bg-bg-primary border border-tertiary text-text-secondary text-sm rounded-pill px-4 py-1.5 capitalize transition-base hover-border-primary">
+                  {{ action }}
+                </span>
+                }
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <p-dialog [(visible)]="isEditModalOpen" [modal]="true" styleClass="glass-dialog-spacious" header="Update Profile"
+    [style]="{ width: '700px', maxWidth: '95vw' }">
+    <ng-template pTemplate="header">
+      <div class="flex align-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-primary-light text-primary flex align-center justify-center text-xl">
+          <i class="pi pi-user-edit"></i>
+        </div>
+        <h2 class="text-xl font-bold m-0 font-heading text-text-primary">Profile Settings</h2>
+      </div>
+    </ng-template>
+
+    <form [formGroup]="profileForm" class="flex-col gap-5 mt-4">
+
+      <div class="form-section">
+        <h4 class="section-title">Identity Parameters</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="field"><label>Full Name</label><input pInputText formControlName="name"
+              class="glass-input p-inputtext-lg"></div>
+          <div class="field"><label>UPI ID (Optional)</label><input pInputText formControlName="upiId"
+              class="glass-input p-inputtext-lg" placeholder="user@upi"></div>
+        </div>
+      </div>
+
+      <div class="form-section" formGroupName="employeeProfile">
+        <h4 class="section-title">Contact & Location</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="field"><label>Secondary Phone</label><input pInputText formControlName="secondaryPhone"
+              class="glass-input p-inputtext-lg"></div>
+          <div class="field"><label>Work Area</label><input pInputText formControlName="workLocation"
+              class="glass-input p-inputtext-lg" placeholder="e.g. Desk 4A"></div>
+        </div>
+
+        <div class="glass-box p-5 mt-4 rounded-xl" formGroupName="guarantorDetails">
+          <h5 class="text-sm font-bold text-muted uppercase tracking-wider mb-3 m-0">Guarantor Information</h5>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="field"><input pInputText formControlName="name" class="glass-input" placeholder="Name"></div>
+            <div class="field"><input pInputText formControlName="relationship" class="glass-input"
+                placeholder="Relation"></div>
+            <div class="field"><input pInputText formControlName="phone" class="glass-input" placeholder="Phone"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section" formGroupName="preferences">
+        <h4 class="section-title">Notifications</h4>
+        <div formGroupName="notifications"
+          class="flex flex-wrap gap-5 mt-2 p-5 bg-secondary border border-tertiary rounded-xl">
+          <div class="flex align-center gap-3"><p-togglebutton  formControlName="email"></p-togglebutton ><label
+              class="font-bold">Email</label></div>
+          <div class="flex align-center gap-3"><p-togglebutton  formControlName="push"></p-togglebutton ><label
+              class="font-bold">Push</label></div>
+          <div class="flex align-center gap-3"><p-togglebutton  formControlName="sms"></p-togglebutton ><label
+              class="font-bold">SMS</label></div>
+        </div>
+      </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+      <div class="flex justify-end gap-3 pt-4">
+        <button pButton label="Cancel" class="p-button-text p-button-secondary p-button-lg rounded-pill"
+          (click)="isEditModalOpen.set(false)" [disabled]="isSaving()"></button>
+        <button pButton label="Save Changes" icon="pi pi-check" class="p-button-primary p-button-lg rounded-pill"
+          (click)="saveProfile()" [loading]="isSaving()"></button>
+      </div>
+    </ng-template>
+  </p-dialog>
+
+  }
+</div>
+ -->
+
+<!-- <div class="page-container animate-fadeIn">
+
+  @if (!currentUser()) {
+  }
+
+  @else if (currentUser(); as user) {
+  <header class="page-header flex justify-between align-center">
+    <div class="header-titles">
+      <h1 class="page-title">Employee Profile</h1>
+      <p class="page-subtitle text-muted">Manage user identity, access, and system records.</p>
+    </div>
+    <div class="header-actions">
+      <button pButton label="Edit Profile" icon="pi pi-pencil" class="p-button-outlined p-button-rounded"></button>
+    </div>
+  </header>
+
+  <div class="master-grid">
+
+    <aside class="sidebar-column">
+
+      <div class="glass-card profile-card">
+        <div class="card-banner bg-accent-gradient"></div>
+
+        <div class="profile-content">
+          <div class="avatar-wrapper" (click)="!uploading() && triggerFileInput()" pTooltip="Update Photo"
+            tooltipPosition="right">
+            <div class="avatar-circle shadow-2xl">
+              @if (user.avatar) {
+              <img [src]="user.avatar" [alt]="user.name" class="profile-image">
+              } @else {
+              <span class="initials">{{ getInitials(user.name) }}</span>
+              }
+              <div class="avatar-overlay"><i class="pi pi-camera"></i></div>
+              @if (uploading()) { <div class="avatar-loader"><i class="pi pi-spin pi-spinner"></i></div> }
+            </div>
+            <div class="status-indicator shadow-md" [class.active]="user.isActive"></div>
+          </div>
+
+          <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" class="hidden">
+
+          <div class="user-identity text-center">
+            <h2 class="user-name">{{ user.name }}</h2>
+            <p-tag [value]="user.status | uppercase" [severity]="user.isActive ? 'success' : 'danger'"
+              styleClass="status-tag rounded-pill"></p-tag>
+
+            <div class="contact-pills mt-4 flex flex-wrap justify-center gap-2">
+              <span class="contact-pill"><i class="pi pi-envelope"></i> {{ user.email }}</span>
+              <span class="contact-pill"><i class="pi pi-phone"></i> {{ user.phone }}</span>
+            </div>
+          </div>
+
+          <hr class="card-divider">
+
+          <div class="employment-details flex-col gap-4">
+            <div class="detail-row">
+              <div class="detail-icon bg-primary-light text-primary"><i class="pi pi-briefcase"></i></div>
+              <div class="detail-text">
+                <label>Designation</label>
+                <span>{{ user.employeeProfile?.designationId?.title || 'Not Assigned' | titlecase }}</span>
+              </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-icon bg-info-light text-info"><i class="pi pi-sitemap"></i></div>
+              <div class="detail-text">
+                <label>Department</label>
+                <span>{{ user.employeeProfile?.departmentId?.name || 'Not Assigned' }}</span>
+              </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-icon bg-warning-light text-warning"><i class="pi pi-user-plus"></i></div>
+              <div class="detail-text">
+                <label>Reporting Manager</label>
+                <span>{{ user.employeeProfile?.reportingManagerId?.name || 'Self' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      @if (user.branchId; as branch) {
+      <div class="glass-card branch-card mt-5">
+        <div class="card-header border-b">
+          <h3 class="card-title"><i class="pi pi-map-marker text-primary"></i> Assigned Location</h3>
+        </div>
+        <div class="card-body">
+          <h4 class="text-lg font-semibold text-primary">{{ branch.name }}</h4>
+          <p class="text-muted text-sm mt-2 leading-relaxed">
+            {{ branch.address['street'] | titlecase }}<br>
+            {{ branch.address.city | titlecase }}, {{ branch.address.state | titlecase }} {{ branch.address['zipCode']
+            }}<br>
+            {{ branch.address.country }}
+          </p>
+        </div>
+      </div>
+      }
+    </aside>
+
+    <main class="content-column flex-col gap-5">
+
+      <div class="bento-stats-grid">
+        <div class="glass-card stat-box">
+          <div class="stat-icon bg-success-light text-success"><i class="pi pi-shield"></i></div>
+          <div class="stat-data">
+            <label>System Role</label>
+            <div class="val">{{ user.role.name | titlecase }}</div>
+          </div>
+        </div>
+        <div class="glass-card stat-box">
+          <div class="stat-icon bg-info-light text-info"><i class="pi pi-clock"></i></div>
+          <div class="stat-data">
+            <label>Last System Login</label>
+            <div class="val text-sm">{{ user.lastLoginAt | date:'medium' }}</div>
+          </div>
+        </div>
+        <div class="glass-card stat-box">
+          <div class="stat-icon bg-primary-light text-primary"><i class="pi pi-id-card"></i></div>
+          <div class="stat-data">
+            <label>Account Created</label>
+            <div class="val text-sm">{{ user.createdAt | date:'mediumDate' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bento-split-grid">
+
+        @if (user.attendanceConfig; as att) {
+        <div class="glass-card flex-col h-full">
+          <div class="card-header border-b flex justify-between align-center">
+            <h3 class="card-title"><i class="pi pi-calendar-times text-primary"></i> Attendance Rules</h3>
+            <div class="status-dot-pulse" [class.bg-success]="att.isAttendanceEnabled"></div>
+          </div>
+          <div class="card-body flex-1 flex-col gap-4">
+
+            <div class="punch-rules flex gap-3">
+              <div class="rule-box flex-1 bg-secondary rounded-lg border border-tertiary text-center p-3">
+                <i class="pi pi-globe text-2xl mb-2" [class.text-success]="att.allowWebPunch"
+                  [class.text-muted]="!att.allowWebPunch"></i>
+                <div class="text-xs font-semibold text-muted uppercase">Web Punch</div>
+              </div>
+              <div class="rule-box flex-1 bg-secondary rounded-lg border border-tertiary text-center p-3">
+                <i class="pi pi-mobile text-2xl mb-2" [class.text-success]="att.allowMobilePunch"
+                  [class.text-muted]="!att.allowMobilePunch"></i>
+                <div class="text-xs font-semibold text-muted uppercase">Mobile Punch</div>
+              </div>
+            </div>
+
+            @if(att.shiftId) {
+            <div class="shift-box mt-auto bg-primary-light rounded-xl p-4 border border-primary-border">
+              <div class="text-xs font-bold text-primary uppercase tracking-wider mb-1">Active Shift</div>
+              <div class="flex justify-between align-end">
+                <div class="text-lg font-bold text-text-primary">{{ att.shiftId.name }}</div>
+                <div class="text-right">
+                  <div class="text-sm font-mono text-text-primary">{{ att.shiftId.startTime }} - {{ att.shiftId.endTime
+                    }}</div>
+                  <div class="text-xs text-muted">{{ att.shiftId.duration }}</div>
+                </div>
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+        }
+
+        <div class="glass-card flex-col h-full">
+          <div class="card-header border-b flex justify-between align-center">
+            <h3 class="card-title"><i class="pi pi-desktop text-primary"></i> Active Sessions</h3>
+            <span
+              class="badge bg-secondary text-text-secondary rounded-pill px-3 py-1 text-xs font-bold border border-tertiary">
+              {{ user.devices.length }} Devices
+            </span>
+          </div>
+          <div class="card-body p-0 overflow-hidden">
+            <div class="device-list custom-scroll p-4 flex-col gap-3 max-h-[320px] overflow-y-auto">
+              @for (device of user.devices; track device.deviceId) {
+              <div
+                class="device-item flex align-center gap-4 p-3 rounded-xl border border-tertiary bg-secondary hover-bg-primary transition-base">
+                <div
+                  class="device-icon w-10 h-10 flex align-center justify-center rounded-full bg-primary-light text-primary text-xl">
+                  <i class="pi" [ngClass]="getDeviceIcon(device.userAgent)"></i>
+                </div>
+                <div class="device-info flex-1 overflow-hidden">
+                  <div class="text-sm font-semibold text-text-primary truncate" [title]="device.userAgent">
+                    {{ device.userAgent.split(' ')[0] }} <span class="text-muted font-normal">({{ device.deviceType |
+                      titlecase }})</span>
+                  </div>
+                  <div class="text-xs text-muted mt-1 font-mono">
+                    Seen: {{ device.lastActive | date:'MMM d, HH:mm' }}
+                  </div>
+                </div>
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card">
+        <div class="card-header border-b flex justify-between align-center p-5">
+          <h3 class="card-title text-xl"><i class="pi pi-key text-primary"></i> Access Control & Permissions</h3>
+          <span class="badge bg-primary text-white rounded-pill px-3 py-1 text-xs font-bold shadow-md">
+            {{ user.role.permissions.length }} Total Granted
+          </span>
+        </div>
+
+        <div class="card-body p-5">
+          <div class="permissions-masonry">
+            @for (group of groupedPermissions() | keyvalue; track group.key) {
+            <div
+              class="perm-module bg-bg-secondary border border-tertiary rounded-xl p-4 transition-base hover-shadow-lg">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-primary mb-3 flex align-center gap-2">
+                <i class="pi pi-folder-open text-muted"></i> {{ group.key }}
+              </h4>
+              <div class="flex flex-wrap gap-2">
+                @for (action of group.value; track action) {
+                <span
+                  class="perm-pill bg-bg-primary border border-tertiary text-text-secondary text-xs rounded-pill px-3 py-1 capitalize transition-base hover-border-primary">
+                  {{ action }}
+                </span>
+                }
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+  }
+</div> -->

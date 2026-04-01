@@ -504,7 +504,7 @@ export class MachineFormComponent implements OnInit {
 // import { InputTextModule } from 'primeng/inputtext';
 // import { DropdownModule } from 'primeng/dropdown';
 // import { InputNumberModule } from 'primeng/inputnumber';
-// import { InputSwitchModule } from 'primeng/inputswitch';
+// import { ToggleSwitchModule } from 'primeng/toggleswitch';
 // import { ToastModule } from 'primeng/toast';
 // import { DialogModule } from 'primeng/dialog';
 // import { SkeletonModule } from 'primeng/skeleton';
@@ -514,7 +514,7 @@ export class MachineFormComponent implements OnInit {
 //   standalone: true,
 //   imports: [
 //     CommonModule, ReactiveFormsModule, CardModule, ButtonModule,
-//     InputTextModule, DropdownModule, InputNumberModule, InputSwitchModule,
+//     InputTextModule, DropdownModule, InputNumberModule, ToggleSwitchModule,
 //     ToastModule, DialogModule, SkeletonModule
 //   ],
 //   providers: [MessageService],
@@ -601,15 +601,15 @@ export class MachineFormComponent implements OnInit {
 //                 <div formGroupName="capabilities" class="flex-col gap-3">
 //                   <div class="flex-between bg-surface p-3 border-radius-md">
 //                     <span class="font-medium text-sm"><i class="pi pi-camera text-tertiary mr-2"></i> Face Recognition</span>
-//                     <p-inputSwitch formControlName="faceRecognition"></p-inputSwitch>
+//                     <p-toggleswitch formControlName="faceRecognition"></p-toggleswitch>
 //                   </div>
 //                   <div class="flex-between bg-surface p-3 border-radius-md">
 //                     <span class="font-medium text-sm"><i class="pi pi-user text-tertiary mr-2"></i> Fingerprint Scanner</span>
-//                     <p-inputSwitch formControlName="fingerprint"></p-inputSwitch>
+//                     <p-toggleswitch formControlName="fingerprint"></p-toggleswitch>
 //                   </div>
 //                   <div class="flex-between bg-surface p-3 border-radius-md">
 //                     <span class="font-medium text-sm"><i class="pi pi-id-card text-tertiary mr-2"></i> RFID Card Reader</span>
-//                     <p-inputSwitch formControlName="rfid"></p-inputSwitch>
+//                     <p-toggleswitch formControlName="rfid"></p-toggleswitch>
 //                   </div>
 //                 </div>
 //               </p-card>
@@ -630,7 +630,7 @@ export class MachineFormComponent implements OnInit {
 //                   </div>
 //                   <div class="flex-between mt-2 pt-2 border-top">
 //                     <span class="font-bold text-sm text-secondary">Auto-Sync Enabled</span>
-//                     <p-inputSwitch formControlName="autoSync"></p-inputSwitch>
+//                     <p-toggleswitch formControlName="autoSync"></p-toggleswitch>
 //                   </div>
 //                 </div>
 //               </p-card>

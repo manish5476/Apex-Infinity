@@ -1,99 +1,506 @@
- import { Component, inject, computed, ElementRef, viewChild, signal, WritableSignal } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { Component, inject, computed, ElementRef, viewChild, signal, WritableSignal, OnInit } from '@angular/core';
+import { CommonModule, DatePipe, KeyValuePipe } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { catchError, map, of } from 'rxjs';
 import { UserManagementService } from '../user-management.service';
-import { Skeleton } from 'primeng/skeleton';
-import { Tag } from 'primeng/tag';
 
-interface User {_id: string;name: string;email: string;organizationId: string;isActive: boolean;createdAt: string;updatedAt: string;avatar?: string;preferences: { notifications: { email: boolean, sms: boolean, push: boolean }, theme: string, denseMode: boolean };branchId?: { _id: string; name: string; address: { street: string; city: string; state: string; zipCode: string; country: string } };role: { _id: string; name: string; permissions: string[] };
+// PrimeNG
+import { SkeletonModule } from 'primeng/skeleton';
+import { TagModule } from 'primeng/tag';
+import { ButtonModule } from 'primeng/button';
+import { TooltipModule } from 'primeng/tooltip';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { ToggleButtonModule } from 'primeng/togglebutton';
+
+interface Device { _id: string; deviceId: string; deviceType: string; lastActive: string; userAgent: string; }
+
+interface User {
+  _id: string; name: string; email: string; phone: string; avatar?: string; isActive: boolean; status: string;
+  createdAt: string; updatedAt: string; lastLoginAt: string;
+  upiId?: string; language?: string; themeId?: string;
+  employeeProfile?: { designationId?: { title: string }; departmentId?: { name: string }; reportingManagerId?: { name: string }; secondaryPhone?: string; workLocation?: string; guarantorDetails?: { name: string; relationship: string; phone: string }; };
+  attendanceConfig?: { isAttendanceEnabled: boolean; allowWebPunch: boolean; allowMobilePunch: boolean; shiftId?: { name: string; duration: string; startTime: string; endTime: string }; };
+  preferences: { theme: string; notifications: { email: boolean; push: boolean; sms: boolean } };
+  branchId?: { name: string; address: { street: string; city: string; state: string; zipCode: string; country: string } };
+  role: { name: string; permissions: string[] };
+  devices: Device[];
 }
 
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [CommonModule, DatePipe,Skeleton,Tag],
+  imports: [
+    CommonModule, DatePipe, KeyValuePipe, ReactiveFormsModule,
+    SkeletonModule, TagModule, ButtonModule, TooltipModule,
+    DialogModule, InputTextModule, ToggleButtonModule
+  ],
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.scss']
 })
-export class UserProfileComponent {
+export class UserProfileComponent implements OnInit {
   private userService = inject(UserManagementService);
+  private fb = inject(FormBuilder);
   fileInputRef = viewChild<ElementRef<HTMLInputElement>>('fileInput');
   currentUser: WritableSignal<User | null> = signal(null);
   uploading = signal(false);
-  uploadError = signal<string | null>(null);
+  isEditModalOpen = signal(false);
+  isSaving = signal(false);
+  revokingDeviceId = signal<string | null>(null);
+  profileForm!: FormGroup;
 
-  constructor() {
-    toSignal(
-      this.userService.getMe().pipe(
-        map((response:any) => response.data.data as User),
-        catchError(err => {
-          console.error('Failed to load profile', err);
-          return of(null);
-        })
-      )
-    );
+  ngOnInit() {
+    this.initForm();
+    this.loadProfile();
+  }
+
+  // Single API call handles Identity, Devices, and Permissions
+  loadProfile() {
     this.userService.getMe().pipe(
-      map((response:any) => response.data.data as User),
-      catchError(err => of(null))
+      map((res: any) => res.data.user as User),
+      catchError(() => of(null))
     ).subscribe(user => {
-      if (user) {
-        this.currentUser.set(user); // Initialize the writable signal
+      if (user) this.currentUser.set(user);
+    });
+  }
+
+  // --- Form Logic ---
+  initForm() {
+    this.profileForm = this.fb.group({
+      name: ['', Validators.required],
+      upiId: [''], language: ['en'], themeId: ['theme-glass'],
+      employeeProfile: this.fb.group({
+        secondaryPhone: [''], workLocation: [''],
+        guarantorDetails: this.fb.group({ name: [''], relationship: [''], phone: [''] })
+      }),
+      preferences: this.fb.group({
+        theme: ['light'], notifications: this.fb.group({ email: [true], push: [true], sms: [false] })
+      })
+    });
+  }
+
+  openEditModal() {
+    const user = this.currentUser();
+    if (user) {
+      this.profileForm.patchValue({
+        name: user.name || '', upiId: user.upiId || '', language: user.language || 'en', themeId: user.themeId || 'theme-glass',
+        employeeProfile: {
+          secondaryPhone: user.employeeProfile?.secondaryPhone || '', workLocation: user.employeeProfile?.workLocation || '',
+          guarantorDetails: {
+            name: user.employeeProfile?.guarantorDetails?.name || '',
+            relationship: user.employeeProfile?.guarantorDetails?.relationship || '',
+            phone: user.employeeProfile?.guarantorDetails?.phone || ''
+          }
+        },
+        preferences: {
+          theme: user.preferences?.theme || 'light',
+          notifications: {
+            email: user.preferences?.notifications?.email ?? true,
+            push: user.preferences?.notifications?.push ?? true,
+            sms: user.preferences?.notifications?.sms ?? false
+          }
+        }
+      });
+      this.isEditModalOpen.set(true);
+    }
+  }
+
+  saveProfile() {
+    if (this.profileForm.invalid) return;
+    this.isSaving.set(true);
+    const val = this.profileForm.value;
+
+    const payload = {
+      name: val.name, upiId: val.upiId, language: val.language, themeId: val.themeId,
+      'preferences.theme': val.preferences.theme, 'preferences.notifications': val.preferences.notifications,
+      'employeeProfile.secondaryPhone': val.employeeProfile.secondaryPhone,
+      'employeeProfile.workLocation': val.employeeProfile.workLocation,
+      'employeeProfile.guarantorDetails': val.employeeProfile.guarantorDetails
+    };
+
+    this.userService.updateMyProfile(payload).subscribe({
+      next: (res: any) => {
+        this.currentUser.set(res.data.user);
+        this.isSaving.set(false);
+        this.isEditModalOpen.set(false);
+      },
+      error: () => this.isSaving.set(false)
+    });
+  }
+
+  // --- Device Management ---
+  revokeDevice(sessionId: string) {
+    this.revokingDeviceId.set(sessionId);
+    this.userService.revokeDevice(sessionId).subscribe({
+      next: () => {
+        // Optimistically remove the device from the UI array without reloading the user
+        this.currentUser.update(user => {
+          if (!user) return user;
+          return { ...user, devices: user.devices.filter(d => d._id !== sessionId) };
+        });
+        this.revokingDeviceId.set(null);
+      },
+      error: (err) => {
+        console.error('Failed to revoke session', err);
+        // If the backend returns 400 because it's the current session, the spinner stops
+        this.revokingDeviceId.set(null);
       }
     });
   }
 
-  isActive = computed(() => this.currentUser()?.isActive ?? false);
-  triggerFileInput(): void {
-    this.fileInputRef()?.nativeElement.click();
-  }
+  // --- Avatar Upload ---
+  triggerFileInput(): void { this.fileInputRef()?.nativeElement.click(); }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     input.value = '';
 
-    if (!file || !file.type.startsWith('image/') || file.size > 5 * 1024 * 1024) {
-      this.uploadError.set(file ? (file.type.startsWith('image/') ? 'File size exceeds 5MB limit.' : 'Only image files are allowed.') : null);
-      return;
-    }
-
-    this.uploadError.set(null);
+    if (!file) return;
     this.uploading.set(true);
-
     const formData = new FormData();
     formData.append('photo', file);
 
-    this.userService.uploadProfilePhoto(formData).pipe(
-      map((response:any) => response.data.user as User),
-      catchError(err => {
+    this.userService.uploadProfilePhoto(formData).subscribe({
+      next: (res: any) => {
         this.uploading.set(false);
-        const errorMessage = err.error?.message || 'Upload failed due to a server error.';
-        this.uploadError.set(errorMessage);
-        return of(null);
-      })
-    ).subscribe({
-      next: (updatedUser) => {
-        this.uploading.set(false);
-        if (updatedUser) {
-          // 3. **The Fix:** Use .set() on the writable `currentUser` signal.
-          this.currentUser.set(updatedUser);
-        }
+        this.currentUser.set(res.data.user);
       },
-      error: () => {
-        this.uploading.set(false);
-      }
+      error: () => this.uploading.set(false)
     });
   }
 
-  // --- Helper Methods (remains the same) ---
-  getInitials(name: string): string {
-    return name
-      ? name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
-      : 'U';
-  }
+  // --- Helpers ---
+  groupedPermissions = computed(() => {
+    const perms = this.currentUser()?.role?.permissions || [];
+    const groups: { [key: string]: string[] } = {};
+    perms.forEach(p => {
+      const [module, action] = p.split(':');
+      if (!groups[module]) groups[module] = [];
+      groups[module].push(action.replace(/_/g, ' '));
+    });
+    return groups;
+  });
 
-  formatPermission(perm: string): string {
-    return perm.replace(/_/g, ' ').toUpperCase();
+  getInitials(name: string): string { return name ? name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : 'U'; }
+
+  getDeviceIcon(agent: string): string {
+    const lower = agent?.toLowerCase() || '';
+    if (lower.includes('mobile') || lower.includes('android') || lower.includes('iphone')) return 'pi-mobile';
+    return 'pi-desktop';
   }
 }
+
+// import { Component, inject, computed, ElementRef, viewChild, signal, WritableSignal, OnInit } from '@angular/core';
+// import { CommonModule, DatePipe, KeyValuePipe } from '@angular/common';
+// import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+// import { catchError, map, of } from 'rxjs';
+// import { UserManagementService } from '../user-management.service';
+
+// // PrimeNG
+// import { SkeletonModule } from 'primeng/skeleton';
+// import { TagModule } from 'primeng/tag';
+// import { ButtonModule } from 'primeng/button';
+// import { TooltipModule } from 'primeng/tooltip';
+// import { DialogModule } from 'primeng/dialog';
+// import { InputTextModule } from 'primeng/inputtext';
+// import { ToggleSwitchModule } from 'primeng/toggleswitch';
+
+// // Interfaces based on your backend
+// interface User {
+//   _id: string; name: string; email: string; phone: string; avatar?: string; isActive: boolean; status: string;
+//   createdAt: string; updatedAt: string; lastLoginAt: string;
+//   upiId?: string; language?: string; themeId?: string;
+//   employeeProfile?: { designationId?: { title: string }; departmentId?: { name: string }; reportingManagerId?: { name: string }; secondaryPhone?: string; workLocation?: string; guarantorDetails?: { name: string; relationship: string; phone: string }; };
+//   attendanceConfig?: { isAttendanceEnabled: boolean; allowWebPunch: boolean; allowMobilePunch: boolean; shiftId?: { name: string; duration: string; startTime: string; endTime: string }; };
+//   preferences: { theme: string; notifications: { email: boolean; push: boolean; sms: boolean } };
+//   branchId?: { name: string; address: { street: string; city: string; state: string; zipCode: string; country: string } };
+//   role: { name: string; permissions: string[] };
+// }
+
+// interface DeviceSession {
+//   _id: string; deviceType: string; lastActivityAt: string; userAgent: string; isValid: boolean;
+// }
+
+// @Component({
+//   selector: 'app-user-profile',
+//   standalone: true,
+//   imports: [
+//     CommonModule, DatePipe, KeyValuePipe, ReactiveFormsModule,
+//     SkeletonModule, TagModule, ButtonModule, TooltipModule,
+//     DialogModule, InputTextModule, ToggleSwitchModule
+//   ],
+//   templateUrl: './user-profile.component.html',
+//   styleUrls: ['./user-profile.component.scss']
+// })
+// export class UserProfileComponent implements OnInit {
+//   private userService = inject(UserManagementService);
+//   private fb = inject(FormBuilder);
+
+//   fileInputRef = viewChild<ElementRef<HTMLInputElement>>('fileInput');
+
+//   // State Signals
+//   currentUser: WritableSignal<User | null> = signal(null);
+//   activeSessions: WritableSignal<DeviceSession[]> = signal([]);
+//   currentSessionId = signal<string | null>(null);
+
+//   uploading = signal(false);
+//   isEditModalOpen = signal(false);
+//   isSaving = signal(false);
+//   revokingDeviceId = signal<string | null>(null);
+
+//   profileForm!: FormGroup;
+
+//   ngOnInit() {
+//     this.initForm();
+//     this.loadProfile();
+//     this.loadDevices();
+//   }
+
+//   loadProfile() {
+//     this.userService.getMe().pipe(
+//       map((res: any) => res.data.user as User),
+//       catchError(() => of(null))
+//     ).subscribe(user => {
+//       if (user) this.currentUser.set(user);
+//     });
+//   }
+
+//   loadDevices() {
+//     this.userService.getMyDevices().pipe(
+//       catchError(() => of(null))
+//     ).subscribe((res: any) => {
+//       if (res?.data) {
+//         this.activeSessions.set(res.data.devices || []);
+//         this.currentSessionId.set(res.data.currentSessionId || null);
+//       }
+//     });
+//   }
+
+//   // --- Form Logic ---
+//   initForm() {
+//     this.profileForm = this.fb.group({
+//       name: ['', Validators.required],
+//       upiId: [''],
+//       language: ['en'],
+//       themeId: ['theme-glass'],
+//       employeeProfile: this.fb.group({
+//         secondaryPhone: [''],
+//         workLocation: [''],
+//         guarantorDetails: this.fb.group({ name: [''], relationship: [''], phone: [''] })
+//       }),
+//       preferences: this.fb.group({
+//         theme: ['light'],
+//         notifications: this.fb.group({ email: [true], push: [true], sms: [false] })
+//       })
+//     });
+//   }
+
+//   openEditModal() {
+//     const user = this.currentUser();
+//     if (user) {
+//       this.profileForm.patchValue({
+//         name: user.name || '', upiId: user.upiId || '', language: user.language || 'en', themeId: user.themeId || 'theme-glass',
+//         employeeProfile: {
+//           secondaryPhone: user.employeeProfile?.secondaryPhone || '', workLocation: user.employeeProfile?.workLocation || '',
+//           guarantorDetails: {
+//             name: user.employeeProfile?.guarantorDetails?.name || '',
+//             relationship: user.employeeProfile?.guarantorDetails?.relationship || '',
+//             phone: user.employeeProfile?.guarantorDetails?.phone || ''
+//           }
+//         },
+//         preferences: {
+//           theme: user.preferences?.theme || 'light',
+//           notifications: {
+//             email: user.preferences?.notifications?.email ?? true,
+//             push: user.preferences?.notifications?.push ?? true,
+//             sms: user.preferences?.notifications?.sms ?? false
+//           }
+//         }
+//       });
+//       this.isEditModalOpen.set(true);
+//     }
+//   }
+
+//   saveProfile() {
+//     if (this.profileForm.invalid) return;
+//     this.isSaving.set(true);
+//     const val = this.profileForm.value;
+
+//     // Map to Express Backend expected structure
+//     const payload = {
+//       name: val.name, upiId: val.upiId, language: val.language, themeId: val.themeId,
+//       'preferences.theme': val.preferences.theme,
+//       'preferences.notifications': val.preferences.notifications,
+//       'employeeProfile.secondaryPhone': val.employeeProfile.secondaryPhone,
+//       'employeeProfile.workLocation': val.employeeProfile.workLocation,
+//       'employeeProfile.guarantorDetails': val.employeeProfile.guarantorDetails
+//     };
+
+//     this.userService.updateMyProfile(payload).subscribe({
+//       next: (res: any) => {
+//         this.currentUser.set(res.data.user);
+//         this.isSaving.set(false);
+//         this.isEditModalOpen.set(false);
+//       },
+//       error: () => this.isSaving.set(false)
+//     });
+//   }
+
+//   // --- Device Management ---
+//   revokeDevice(sessionId: string) {
+//     if (this.currentSessionId() === sessionId) return;
+
+//     this.revokingDeviceId.set(sessionId);
+//     this.userService.revokeDevice(sessionId).subscribe({
+//       next: () => {
+//         this.activeSessions.update(sessions => sessions.filter(s => s._id !== sessionId));
+//         this.revokingDeviceId.set(null);
+//       },
+//       error: () => this.revokingDeviceId.set(null)
+//     });
+//   }
+
+//   // --- Avatar Upload ---
+//   triggerFileInput(): void { this.fileInputRef()?.nativeElement.click(); }
+
+//   onFileSelected(event: Event): void {
+//     const input = event.target as HTMLInputElement;
+//     const file = input.files?.[0];
+//     input.value = '';
+
+//     if (!file) return;
+//     this.uploading.set(true);
+//     const formData = new FormData();
+//     formData.append('photo', file);
+
+//     this.userService.uploadProfilePhoto(formData).subscribe({
+//       next: (res: any) => {
+//         this.uploading.set(false);
+//         this.currentUser.set(res.data.user);
+//       },
+//       error: () => this.uploading.set(false)
+//     });
+//   }
+
+//   // --- Helpers ---
+//   groupedPermissions = computed(() => {
+//     const perms = this.currentUser()?.role?.permissions || [];
+//     const groups: { [key: string]: string[] } = {};
+//     perms.forEach(p => {
+//       const [module, action] = p.split(':');
+//       if (!groups[module]) groups[module] = [];
+//       groups[module].push(action.replace(/_/g, ' '));
+//     });
+//     return groups;
+//   });
+
+//   getInitials(name: string): string { return name ? name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : 'U'; }
+//   getDeviceIcon(agent: string): string {
+//     const lower = agent?.toLowerCase() || '';
+//     if (lower.includes('mobile') || lower.includes('android') || lower.includes('iphone')) return 'pi-mobile';
+//     return 'pi-desktop';
+//   }
+// }
+
+
+// // import { Component, inject, computed, ElementRef, viewChild, signal, WritableSignal } from '@angular/core';
+// // import { CommonModule, DatePipe, KeyValuePipe } from '@angular/common';
+// // import { catchError, map, of } from 'rxjs';
+// // import { UserManagementService } from '../user-management.service';
+// // import { SkeletonModule } from 'primeng/skeleton';
+// // import { TagModule } from 'primeng/tag';
+// // import { ButtonModule } from 'primeng/button';
+// // import { TooltipModule } from 'primeng/tooltip';
+
+// // interface User {
+// //   _id: string; name: string; email: string; phone: string; avatar?: string; isActive: boolean; status: string;
+// //   createdAt: string; updatedAt: string; lastLoginAt: string; lastLoginIP: string;
+// //   employeeProfile?: { employmentType: string; departmentId?: { name: string }; designationId?: { title: string }; reportingManagerId?: { name: string }; };
+// //   attendanceConfig?: { isAttendanceEnabled: boolean; allowWebPunch: boolean; allowMobilePunch: boolean; shiftId?: { name: string; duration: string; startTime: string; endTime: string }; };
+// //   preferences: { theme: string };
+// //   branchId?: { name: string; address: { city: string; state: string; country: string, street: string, zipCode: string } };
+// //   role: { name: string; permissions: string[] };
+// //   devices: Array<{ deviceType: string; lastActive: string; userAgent: string; deviceId: string }>;
+// // }
+
+// // @Component({
+// //   selector: 'app-user-profile',
+// //   standalone: true,
+// //   imports: [CommonModule, DatePipe, KeyValuePipe, SkeletonModule, TagModule, ButtonModule, TooltipModule],
+// //   templateUrl: './user-profile.component.html',
+// //   styleUrls: ['./user-profile.component.scss']
+// // })
+// // export class UserProfileComponent {
+// //   private userService = inject(UserManagementService);
+// //   fileInputRef = viewChild<ElementRef<HTMLInputElement>>('fileInput');
+// //   currentUser: WritableSignal<User | null> = signal(null);
+// //   uploading = signal(false);
+// //   uploadError = signal<string | null>(null);
+
+// //   constructor() {
+// //     this.userService.getMe().pipe(
+// //       map((response: any) => response.data.user as User),
+// //       catchError(err => of(null))
+// //     ).subscribe(user => {
+// //       if (user) this.currentUser.set(user);
+// //     });
+// //   }
+
+// //   // Groups permissions into categories (e.g., { Analytics: ['Read', 'Export'] })
+// //   groupedPermissions = computed(() => {
+// //     const perms = this.currentUser()?.role?.permissions || [];
+// //     const groups: { [key: string]: string[] } = {};
+// //     perms.forEach(p => {
+// //       const [module, action] = p.split(':');
+// //       if (!groups[module]) groups[module] = [];
+// //       groups[module].push(action.replace(/_/g, ' '));
+// //     });
+// //     return groups;
+// //   });
+
+// //   triggerFileInput(): void {
+// //     this.fileInputRef()?.nativeElement.click();
+// //   }
+
+// //   onFileSelected(event: Event): void {
+// //     const input = event.target as HTMLInputElement;
+// //     const file = input.files?.[0];
+// //     input.value = '';
+
+// //     if (!file || !file.type.startsWith('image/') || file.size > 5 * 1024 * 1024) {
+// //       this.uploadError.set(file ? (file.type.startsWith('image/') ? 'File exceeds 5MB limit.' : 'Only images allowed.') : null);
+// //       return;
+// //     }
+
+// //     this.uploadError.set(null);
+// //     this.uploading.set(true);
+// //     const formData = new FormData();
+// //     formData.append('photo', file);
+
+// //     this.userService.uploadProfilePhoto(formData).pipe(
+// //       map((response: any) => response.data.user as User),
+// //       catchError(err => {
+// //         this.uploading.set(false);
+// //         this.uploadError.set(err.error?.message || 'Upload failed.');
+// //         return of(null);
+// //       })
+// //     ).subscribe({
+// //       next: (updatedUser) => {
+// //         this.uploading.set(false);
+// //         if (updatedUser) this.currentUser.set(updatedUser);
+// //       },
+// //       error: () => this.uploading.set(false)
+// //     });
+// //   }
+
+// //   getInitials(name: string): string {
+// //     return name ? name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : 'U';
+// //   }
+
+// //   getDeviceIcon(agent: string): string {
+// //     const lower = agent.toLowerCase();
+// //     if (lower.includes('mobile') || lower.includes('android') || lower.includes('iphone')) return 'pi-mobile';
+// //     return 'pi-desktop';
+// //   }
+// // }

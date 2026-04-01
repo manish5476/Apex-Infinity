@@ -7,7 +7,6 @@
     <button class="icon-btn menu-toggle" (click)="onMenuToggle()" aria-label="Toggle sidebar">
       <i class="pi pi-bars"></i>
     </button>
-
     <a routerLink="/dashboard" class="logotype">
       <div class="logo-mark">
         <svg viewBox="0 0 32 32" fill="none">
@@ -37,9 +36,9 @@
       </div>
     </p-popover>
 
-    <button *hasPermission="PERMISSIONS.NOTIFICATION.READ" class="icon-btn notification-btn" [class.has-badge]="recentNotifications.length > 0"
-      (click)="notificationPopover.toggle($event)" pTooltip="Notifications" tooltipPosition="bottom"
-      aria-label="Notifications">
+    <button *hasPermission="PERMISSIONS.NOTIFICATION.READ" class="icon-btn notification-btn"
+      [class.has-badge]="recentNotifications.length > 0" (click)="notificationPopover.toggle($event)"
+      pTooltip="Notifications" tooltipPosition="bottom" aria-label="Notifications">
       <i class="pi pi-bell"></i>
       @if (recentNotifications.length > 0) {
       <span class="notif-badge">{{ recentNotifications.length > 9 ? '9+' : recentNotifications.length }}</span>
@@ -50,12 +49,17 @@
     @if (currentUser) {
     <p-popover #profilePopover styleClass="apex-profile-popover" appendTo="body">
       <div class="profile-panel">
-
-        <!-- Profile panel header -->
         <div class="profile-panel-head">
-          <p-avatar [label]="getInitials(currentUser?.name)" shape="circle" size="xlarge"
+          <!-- Wrap in <a> and add (click) to hide popover -->
+          <a routerLink="/user/profile" (click)="closeProfilePanel()" class="avatar-link" style="cursor: pointer;">
+            <p-avatar [label]="getInitials(currentUser?.name)" shape="circle" size="xlarge"
+              [style]="{'background': 'rgba(255,255,255,0.15)', 'color': '#fff', 'font-weight': '700', 'font-size': '1.1rem'}">
+            </p-avatar>
+          </a>
+
+          <!-- <p-avatar routerLink="/user/profile" [label]="getInitials(currentUser?.name)" shape="circle" size="xlarge"
             [style]="{'background': 'rgba(255,255,255,0.15)', 'color': '#fff', 'font-weight': '700', 'font-size': '1.1rem'}">
-          </p-avatar>
+          </p-avatar> -->
           <div class="profile-meta">
             <h3 class="profile-name">{{ currentUser?.name }}</h3>
             <p class="profile-email">{{ currentUser?.email }}</p>
@@ -77,13 +81,8 @@
             <i class="pi pi-bell"></i> Alerts
           </button>
         </div>
-
-        <!-- Tab content -->
         <div class="profile-body">
-
           @if (activePopoverTab === 'settings') {
-
-          <!-- Appearance -->
           <div class="setting-card">
             <div class="setting-card-head">
               <span class="setting-label"><i class="pi pi-palette"></i> Appearance</span>
@@ -92,8 +91,6 @@
               </p-toggleButton>
             </div>
           </div>
-
-          <!-- Display size -->
           <div class="setting-card">
             <div class="setting-card-head">
               <span class="setting-label"><i class="pi pi-desktop"></i> Display Size</span>
@@ -111,8 +108,6 @@
               <span class="scale-a large">A</span>
             </div>
           </div>
-
-          <!-- Theme picker -->
           <div class="setting-card">
             <div class="setting-card-head">
               <span class="setting-label"><i class="pi pi-objects-column"></i> Theme</span>
@@ -141,7 +136,6 @@
             </div>
           </div>
 
-          <!-- Quick actions -->
           <div class="setting-card">
             <div class="setting-card-head">
               <span class="setting-label"><i class="pi pi-bolt"></i> Quick Actions</span>
@@ -156,7 +150,6 @@
             </div>
           </div>
 
-          <!-- Account links -->
           <div class="setting-card">
             <div class="setting-card-head">
               <span class="setting-label"><i class="pi pi-user"></i> Account</span>

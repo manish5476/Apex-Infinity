@@ -6,38 +6,45 @@ import { UserListComponent } from './user-list/user-list';
 import { UserFormComponent } from './user-form/user-form';
 import { permissionGuard } from '@core/auth/guards/permission.guard';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
+import { OrgHierarchyComponent } from './organization-heirachy-component/organization-heirachy-component';
 
 export const USER_ROUTES: Routes = [
-  { 
-    path: 'profile', 
+  {
+    path: 'profile',
     component: UserProfileComponent,
     canActivate: [permissionGuard],
-    data: { permissions: [PERMISSIONS.USER.READ] } 
+    data: { permissions: [PERMISSIONS.USER.READ] }
   },
-  { 
-    path: 'list', 
+  {
+    path: 'list',
     component: UserListComponent,
     canActivate: [permissionGuard],
-    data: { permissions: [PERMISSIONS.USER.READ] } 
+    data: { permissions: [PERMISSIONS.USER.READ] }
   },
-  { 
-    path: 'details/:id', 
+  {
+    path: 'details/:id',
     component: UserDetailsComponent,
     canActivate: [permissionGuard],
-    data: { permissions: [PERMISSIONS.USER.READ] } 
+    data: { permissions: [PERMISSIONS.USER.READ] }
   },
-  { 
-    path: 'create', 
+  {
+    path: 'create',
     component: UserFormComponent,
     canActivate: [permissionGuard],
-    data: { permissions: [PERMISSIONS.USER.MANAGE] } 
-  }, 
+    data: { permissions: [PERMISSIONS.USER.MANAGE] }
+  },
   // 👇 Add this line for Editing
-  { 
-    path: 'edit/:id', 
+  {
+    path: 'edit/:id',
     component: UserFormComponent,
     canActivate: [permissionGuard],
-    data: { permissions: [PERMISSIONS.USER.MANAGE] } 
-  }, 
+    data: { permissions: [PERMISSIONS.USER.MANAGE] }
+  },
+  {
+    path: 'hierarchy',
+    component: OrgHierarchyComponent,
+    canActivate: [permissionGuard],
+    data: { permissions: [PERMISSIONS.USER.READ] }
+  },
   { path: '', redirectTo: 'list', pathMatch: 'full' }
 ];

@@ -1,0 +1,51 @@
+<div class="user-export-container">
+    
+    <!-- Option 1: Format Selection -->
+    <div class="form-group">
+      <label class="section-label">Export Format</label>
+      <div class="format-options">
+        <button class="format-btn" [class.selected]="format === 'csv'" (click)="format = 'csv'">
+          <i class="pi pi-file-excel"></i> CSV
+        </button>
+        <button class="format-btn" [class.selected]="format === 'json'" (click)="format = 'json'">
+          <i class="pi pi-code"></i> JSON
+        </button>
+      </div>
+    </div>
+  
+    <!-- Option 2: Department Filter -->
+    <div class="form-group">
+      <label class="section-label">Filter by Department</label>
+      <p-select [options]="departmentOptions()" 
+                [(ngModel)]="departmentId" 
+                optionLabel="name" 
+                optionValue="_id" 
+                [showClear]="true" 
+                placeholder="All Departments"
+                styleClass="w-full glass-input">
+      </p-select>
+    </div>
+  
+    <!-- Option 3: Status Filter -->
+    <div class="form-group">
+      <label class="section-label">Account Status</label>
+      <p-select [options]="statusOptions" 
+                [(ngModel)]="isActive" 
+                optionLabel="label" 
+                optionValue="value" 
+                placeholder="Active & Inactive"
+                styleClass="w-full glass-input">
+      </p-select>
+    </div>
+  
+    <div class="disclaimer">
+      <i class="pi pi-info-circle"></i>
+      <span>Selected filters will be applied to the export.</span>
+    </div>
+  
+    <!-- Footer Actions -->
+    <div class="dialog-footer">
+      <button pButton label="Cancel" class="p-button-text p-button-secondary p-button-lg rounded-pill" (click)="close()" [disabled]="isLoading()"></button>
+      <button pButton label="Download Export" icon="pi pi-download" class="p-button-primary p-button-lg rounded-pill" (click)="onExport()" [loading]="isLoading()"></button>
+    </div>
+  </div>

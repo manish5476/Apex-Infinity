@@ -1,0 +1,84 @@
+.user-export-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+    padding: var(--spacing-lg);
+  
+    .section-label {
+      display: block;
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--spacing-sm);
+    }
+  
+    .format-options {
+      display: flex;
+      gap: var(--spacing-md);
+    }
+  
+    .format-btn {
+      flex: 1;
+      padding: var(--spacing-md);
+      border: var(--ui-border-width) solid var(--border-secondary);
+      background: var(--bg-secondary);
+      border-radius: var(--ui-border-radius);
+      cursor: pointer;
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-secondary);
+      transition: var(--transition-base);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-sm);
+  
+      &:hover {
+        background: var(--bg-hover);
+        border-color: var(--color-primary-border);
+      }
+  
+      &.selected {
+        background: var(--color-primary);
+        color: white;
+        border-color: var(--color-primary);
+        box-shadow: var(--shadow-md);
+      }
+    }
+  
+    .disclaimer {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      padding: var(--spacing-md);
+      background: var(--bg-secondary);
+      border-radius: var(--ui-border-radius);
+      font-size: var(--font-size-sm);
+      color: var(--text-muted);
+      border: var(--ui-border-width) solid var(--border-secondary);
+  
+      i {
+        color: var(--color-info);
+      }
+    }
+  
+    .dialog-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-lg);
+      padding-top: var(--spacing-lg);
+      border-top: var(--ui-border-width) solid var(--border-tertiary);
+    }
+  }
+  
+  :host ::ng-deep {
+    .glass-input {
+      .p-select {
+        border-radius: var(--ui-border-radius);
+        background: var(--bg-secondary);
+        border: var(--ui-border-width) solid var(--border-secondary);
+      }
+    }
+  }
