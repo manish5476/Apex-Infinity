@@ -11,14 +11,14 @@
     p-toast                       ← lives outside layout so it's never clipped
 -->
 
-<div class="layout-root" [class.is-mobile]="layout.isMobile()"
+<div class="layout-root apex-layout" [class.is-mobile]="layout.isMobile()"
   [class.is-pinned]="layout.isPinned() && !layout.isMobile()">
 
   <!-- ① Header ─────────────────────────────────────────────────────────── -->
   <app-mainscreen-header (toggleSidebar)="onMenuToggle()"></app-mainscreen-header>
 
   <!-- ② Body row ───────────────────────────────────────────────────────── -->
-  <div class="layout-body">
+  <div class="apex-layout layout-body">
 
     <!-- Sidebar lives INSIDE layout-body so it shares the same flex row -->
     <app-mainscreen-sidebar></app-mainscreen-sidebar>
