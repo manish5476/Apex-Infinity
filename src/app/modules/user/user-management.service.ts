@@ -63,7 +63,6 @@ export interface Device {
   location?: string;
   current?: boolean;
 }
-
 export interface ActivityLog {
   _id: string;
   action: string;
