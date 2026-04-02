@@ -2790,9 +2790,56 @@
   background: var(--accent-primary) !important;
 }
 
+// /* ============================================================================
+//    FORM FIELD GEOMETRY FIX
+//    Forces PrimeNG inputs to match the 2.5rem min-height of native inputs
+//    ============================================================================ */
+
+// /* Target all PrimeNG input types */
+// .p-inputtext,
+// .p-select,
+// .p-multiselect,
+// .p-password input,
+// .p-inputnumber input,
+// .p-autocomplete input,
+// .p-cascadeselect,
+// .p-treeselect,
+// .p-datepicker input {
+//   min-height: 2.5rem !important;
+//   line-height: var(--line-height-relaxed) !important;
+//   padding-top: var(--spacing-md) !important;
+//   padding-bottom: var(--spacing-md) !important;
+// }
+
+// /* Fix dropdown/select labels so text centers vertically inside the new height */
+// .p-select-label,
+// .p-multiselect-label,
+// .p-cascadeselect-label,
+// .p-treeselect-label {
+//   display: flex !important;
+//   align-items: center !important;
+//   padding-top: 0 !important;
+//   padding-bottom: 0 !important;
+//   height: 100% !important;
+//   line-height: var(--line-height-relaxed) !important;
+// }
+
+// /* Ensure chips in multiselect don't break the container height */
+// .p-multiselect-chip {
+//   margin-top: 0 !important;
+//   margin-bottom: 0 !important;
+// }
+
+// /* Adjust textarea specifically so it doesn't get locked to 2.5rem */
+// .p-textarea {
+//   min-height: 5rem !important;
+//   resize: vertical !important;
+// }
+
 /* ============================================================================
    FORM FIELD GEOMETRY FIX
-   Forces PrimeNG inputs to match the 2.5rem min-height of native inputs
+   Forces PrimeNG inputs to match the 2.5rem min-height of native inputs,
+   and applies the global theme border & curve.
    ============================================================================ */
 
 /* Target all PrimeNG input types */
@@ -2809,6 +2856,22 @@
   line-height: var(--line-height-relaxed) !important;
   padding-top: var(--spacing-md) !important;
   padding-bottom: var(--spacing-md) !important;
+
+  /* ADDED: Perfect curve and light theme border */
+  border-radius: var(--ui-border-radius) !important;
+  border: 1px solid var(--border-primary) !important;
+  
+  transition: border-color var(--transition-base), box-shadow var(--transition-base) !important;
+}
+
+/* Ensure the border highlights correctly on focus */
+.p-inputtext:enabled:focus,
+.p-select:not(.p-disabled):not(.p-invalid).p-focus,
+.p-multiselect:not(.p-disabled):not(.p-invalid).p-focus,
+.p-password input:enabled:focus,
+.p-inputnumber input:enabled:focus {
+  border-color: var(--accent-primary) !important;
+  /* (The box-shadow glow is already handled in your global component overrides) */
 }
 
 /* Fix dropdown/select labels so text centers vertically inside the new height */
@@ -2834,7 +2897,59 @@
 .p-textarea {
   min-height: 5rem !important;
   resize: vertical !important;
+  border-radius: var(--ui-border-radius) !important;
+  border: 1px solid var(--border-primary) !important;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // // /*
 // //  * ============================================================================
 // //  * APEX CRM — PrimeNG Theme Override  v1.0
