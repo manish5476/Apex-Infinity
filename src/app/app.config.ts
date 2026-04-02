@@ -37,30 +37,30 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideClientHydration(),
     provideAnimationsAsync(),
-providePrimeNG({
-  ripple: true,
-  theme: {
-    preset: ApexPreset,
-    options: {
-      darkModeSelector: '.theme-dark, .theme-neon-eclipse, ...',
-      cssLayer: { name: 'primeng', order: 'theme, base, primeng' }
-    }
-  }
-})
+// providePrimeNG({
+//   ripple: true,
+//   theme: {
+//     preset: ApexPreset,
+//     options: {
+//       darkModeSelector: '.theme-dark, .theme-neon-eclipse, ...',
+//       cssLayer: { name: 'primeng', order: 'theme, base, primeng' }
+//     }
+//   }
+// })
     // PRIME NG CONFIGURATION
-    // providePrimeNG({
-    //   ripple: true,
-    //   theme: {
-    //     preset: MyPreset, 
-    //     options: {
-    //       darkModeSelector: '.theme-dark',
-    //       cssLayer: {
-    //         name: 'primeng',
-    //         order: 'tailwind-base, primeng, tailwind-utilities'
-    //       }
-    //     }
-    //   }
-    // }),
+    providePrimeNG({
+      ripple: true,
+      theme: {
+        preset: MyPreset, 
+        options: {
+          darkModeSelector: '.theme-dark',
+          cssLayer: {
+            name: 'primeng',
+            order: 'tailwind-base, primeng, tailwind-utilities'
+          }
+        }
+      }
+    }),
     // ConfirmationService
     MessageService, ConfirmationService,
     DatePipe, DialogService,
