@@ -31,6 +31,34 @@
     @else {
       <form [formGroup]="customerForm" (ngSubmit)="onSubmit()" class="form-body">
         
+        <!-- Duplicate Warning Banner -->
+        @if (duplicateCustomer()) {
+          <div class="mb-6 p-4 rounded-xl border border-amber-200 bg-amber-50/50 flex items-start gap-4 animate-fadeIn">
+            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
+              <i class="pi pi-exclamation-triangle text-xl"></i>
+            </div>
+            <div class="flex-grow">
+              <div class="flex items-center justify-between">
+                <h5 class="font-semibold text-amber-900 leading-tight">Possible Duplicate Found</h5>
+                <span class="text-[10px] uppercase tracking-wider font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">Validation</span>
+              </div>
+              <p class="text-xs text-amber-800/80 mt-1">
+                A customer named <strong class="text-amber-900">{{ duplicateCustomer().name }}</strong> 
+                already exists with these details (Email: {{ duplicateCustomer().email || 'N/A' }}, Phone: {{ duplicateCustomer().phone || 'N/A' }}). 
+              </p>
+              <div class="flex items-center gap-3 mt-3">
+                <p-button 
+                    label="View Profile" 
+                    icon="pi pi-external-link" 
+                    styleClass="p-button-sm p-button-warning p-button-outlined"
+                    [routerLink]="['/customer', duplicateCustomer()._id]">
+                </p-button>
+                <span class="text-[11px] text-amber-700 italic">Please verify if this is a new customer.</span>
+              </div>
+            </div>
+          </div>
+        }
+
         <section class="form-section">
           <h4 class="section-title">Basic Information</h4>
           <div class="form-grid">

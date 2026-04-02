@@ -16,8 +16,8 @@
       <p-button *hasPermission="PERMISSIONS.PRODUCT.CREATE" label="New Product" icon="pi pi-plus" routerLink="create"
         styleClass="p-button-primary"></p-button>
       <p-button *hasPermission="[PERMISSIONS.PRODUCT.CREATE, PERMISSIONS.PRODUCT.UPDATE]"
-        [label]="selectedRows && selectedRows.length > 0 ? 'Edit Product' : 'New Product'" (onClick)="bulkDialogVisible = true"
-        styleClass="p-button-primary">
+        [label]="selectedRows && selectedRows.length > 0 ? 'Edit Product' : 'New Product'"
+        (onClick)="bulkDialogVisible = true" styleClass="p-button-primary">
       </p-button>
     </div>
   </div>
@@ -41,9 +41,9 @@
 
       <div class="filter-field">
         <label for="brand">Brand</label>
-        <p-select appendTo="body" id="brand" [options]="brandOptions()" [(ngModel)]="productFilter.brand" [filter]="true"
-          filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select Brand"
-          styleClass="w-full">
+        <p-select appendTo="body" id="brand" [options]="brandOptions()" [(ngModel)]="productFilter.brand"
+          [filter]="true" filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true"
+          placeholder="Select Brand" styleClass="w-full">
         </p-select>
       </div>
 
@@ -73,8 +73,9 @@
   </div>
 </div>
 
-<p-dialog appendTo="body" [(visible)]="bulkDialogVisible" [modal]="true" [style]="{ width: '90%', height: '90%' }"
-  header="Bulk Product Editor" styleClass="bulk-dialog" [draggable]="false" [resizable]="false" [maximizable]="true">
-  <app-bulk-product-entry [selectedData]="selectedRows">
-  </app-bulk-product-entry>
+<p-dialog appendTo="body" [(visible)]="bulkDialogVisible" [modal]="true" header="Bulk Product Editor"
+  styleClass="bulk-dialog p-dialog-full" [draggable]="false" [resizable]="false" [maximizable]="true">
+
+  <app-bulk-product-entry [selectedData]="selectedRows"></app-bulk-product-entry>
+
 </p-dialog>

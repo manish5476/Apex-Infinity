@@ -1,45 +1,249 @@
 <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
 
-<div class="list-page-container">
+<div class="app-container h-full">
 
-  <div class="list-header">
-    <div class="title-section">
-      <div class="icon-box">
-        <i class="pi pi-shield"></i>
+  <div class="container-header">
+    <div class="flex items-center gap-md">
+      <div class="flex items-center justify-center p-2 rounded-md"
+        style="background: var(--color-primary-bg); color: var(--accent-primary);">
+        <i class="pi pi-shield text-xl"></i>
       </div>
-      <div class="text-content">
-        <h2 class="list-title">Session Management</h2>
-        <p class="list-subtitle">Monitor and control active sessions across all devices.</p>
+      <div class="header-titles">
+        <h2 class="container-title">Session Management</h2>
+        <p class="container-subtitle">Monitor and control active sessions across all devices.</p>
       </div>
     </div>
 
-    <div class="actions-section">
-      <div class="p-buttongroup mode-toggle">
+    <div class="header-actions">
+      <div class="mode-toggle mr-2">
+        <button type="button" class="btn borderless" [class.active-mode]="viewMode() === 'all'"
+          (click)="toggleViewMode('all')">
+          All Sessions
+        </button>
+        <button type="button" class="btn borderless" [class.active-mode]="viewMode() === 'mine'"
+          (click)="toggleViewMode('mine')">
+          My Sessions
+        </button>
+      </div>
+
+      <p-button label="Revoke Others" icon="pi pi-ban" severity="warn" [outlined]="true" (onClick)="revokeAllOthers()"
+        pTooltip="Log out from all other devices"></p-button>
+
+      @if (selectedIds.length > 0) {
+      <p-button label="Delete" icon="pi pi-trash" severity="danger" [outlined]="true" (onClick)="deleteBulkSession()"
+        pTooltip="Delete selected sessions"></p-button>
+      }
+    </div>
+  </div>
+
+  <div class="container-body flex flex-col h-full gap-lg">
+
+    @if (viewMode() === 'all') {
+    <div class="app-filter-panel single-row">
+
+      <div class="filter-field" style="flex: 1 1 250px;">
+        <label for="search">Search User</label>
+        <input id="search" type="text" [(ngModel)]="filter().search" placeholder="Name or Email"
+          (keydown.enter)="applyFilters()" />
+      </div>
+
+      <div class="filter-field" style="width: 200px;">
+        <label for="os">OS</label>
+        <p-select id="os" [options]="osOptions" [(ngModel)]="filter().os" [showClear]="true" placeholder="All OS"
+          (onChange)="applyFilters()" styleClass="w-full" appendTo="body"></p-select>
+      </div>
+
+      <div class="filter-field" style="width: 200px;">
+        <label for="browser">Browser</label>
+        <p-select id="browser" [options]="browserOptions" [(ngModel)]="filter().browser" [showClear]="true"
+          placeholder="All Browsers" (onChange)="applyFilters()" styleClass="w-full" appendTo="body"></p-select>
+      </div>
+
+      <div class="filter-actions-right">
+        <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()"></p-button>
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary"
+          (onClick)="resetFilters()"></p-button>
+      </div>
+
+    </div>
+    }
+
+    <div class="flex-1 min-h-0 border border-primary rounded-lg overflow-hidden">
+      <app-ag-share-grid [columns]="column" [data]="data" selectionMode="multiple" (gridEvent)="eventFromGrid($event)"
+        class="block w-full h-full">
+      </app-ag-share-grid>
+    </div>
+
+  </div>
+</div>
+
+<p-dialog appendTo="body" header="Session Details" [(visible)]="displayDialog" [modal]="true" styleClass="app-dialog"
+  [draggable]="false" [resizable]="false" [style]="{width: '500px'}">
+
+  @if (selectedSession) {
+  <div class="flex flex-col gap-lg pt-2">
+
+    <div class="status-banner" [class.active]="selectedSession.isValid" [class.revoked]="!selectedSession.isValid">
+      <i class="pi" [class.pi-check-circle]="selectedSession.isValid"
+        [class.pi-times-circle]="!selectedSession.isValid"></i>
+      <div class="banner-text">
+        <strong>{{ selectedSession.isValid ? 'Active Session' : 'Revoked Session' }}</strong>
+        <span>{{ selectedSession.isValid ? 'This session allows access to the system.' : 'Access has been terminated for
+          this session.' }}</span>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      @if (selectedSession.userId) {
+      <div class="detail-group full-width">
+        <label>User Account</label>
+        <div class="value-box user-box">
+          <div class="user-avatar-small">
+            {{ selectedSession.userId.name.charAt(0).toUpperCase() }}
+          </div>
+          <div class="flex flex-col">
+            <span class="font-bold">{{ selectedSession.userId.name }}</span>
+            <span class="text-xs text-muted">{{ selectedSession.userId.email }}</span>
+          </div>
+        </div>
+      </div>
+      }
+
+      <div class="detail-group full-width">
+        <label>Device / Browser</label>
+        <div class="value-box">
+          <i class="pi pi-globe text-accent"></i>
+          <span class="simple-value">{{ selectedSession.browser }} <span class="text-tertiary">on</span> {{
+            selectedSession.os }}</span>
+        </div>
+      </div>
+
+      <div class="detail-group">
+        <label>IP Address</label>
+        <div class="value-box">
+          <i class="pi pi-map-marker text-accent"></i>
+          <span class="simple-value font-mono">{{ selectedSession.ipAddress }}</span>
+        </div>
+      </div>
+
+      <div class="detail-group">
+        <label>Logged In</label>
+        <div class="value-box">
+          <i class="pi pi-calendar text-accent"></i>
+          <span class="simple-value">{{ common.formatDate(selectedSession.loggedInAt, 'medium') }}</span>
+        </div>
+      </div>
+
+      <div class="detail-group full-width">
+        <label>Last Activity</label>
+        <div class="value-box">
+          <i class="pi pi-clock text-accent"></i>
+          <span class="simple-value">{{ common.formatDate(selectedSession.lastActivityAt, 'medium') }}</span>
+        </div>
+      </div>
+
+      <div class="detail-group full-width">
+        <label>User Agent String</label>
+        <div class="code-block">
+          {{ selectedSession.userAgent }}
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Close" [text]="true" severity="secondary" (click)="displayDialog = false"></p-button>
+    <p-button label="Delete" icon="pi pi-trash" [outlined]="true" severity="danger" [loading]="isDeleting()"
+      (click)="deleteSession()"></p-button>
+
+    @if (selectedSession.isValid) {
+    <p-button label="Revoke Access" icon="pi pi-power-off" severity="danger" [loading]="isRevoking()"
+      (click)="revokeSession()"></p-button>
+    }
+  </ng-template>
+  }
+</p-dialog>
+
+
+
+<!-- <p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="app-container h-full">
+
+  <div class="container-header">
+    <div class="flex align-center gap-3">
+      <div class="icon-box bg-primary-light text-primary border-round p-2 flex align-center justify-center">
+        <i class="pi pi-shield text-xl"></i>
+      </div>
+      <div class="header-titles">
+        <h2 class="container-title">Session Management</h2>
+        <p class="container-subtitle">Monitor and control active sessions across all devices.</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="p-buttongroup mode-toggle mr-2">
         <button pButton label="All Sessions" [ngClass]="viewMode() === 'all' ? 'active-mode' : 'p-button-text'"
           (click)="toggleViewMode('all')"></button>
         <button pButton label="My Sessions" [ngClass]="viewMode() === 'mine' ? 'active-mode' : 'p-button-text'"
           (click)="toggleViewMode('mine')"></button>
       </div>
 
-      <button pButton label="Revoke Others" icon="pi pi-ban" class="p-button-warning p-button-outlined"
-        (click)="revokeAllOthers()" pTooltip="Log out from all other devices">
-      </button>
-      <button pButton label="Delete" icon="pi pi-ban" class="p-button-warning p-button-outlined"
-        [hidden]="selectedIds.length === 0" (click)="deleteBulkSession()" pTooltip="Log out from all other devices">
-      </button>
+      <p-button label="Revoke Others" icon="pi pi-ban" severity="warn" [outlined]="true" (onClick)="revokeAllOthers()"
+        pTooltip="Log out from all other devices">
+      </p-button>
+
+      <p-button label="Delete" icon="pi pi-trash" severity="danger" [outlined]="true" *ngIf="selectedIds.length > 0"
+        (onClick)="deleteBulkSession()" pTooltip="Delete selected sessions">
+      </p-button>
     </div>
   </div>
 
-  <div class="glass-panel">
-    <app-ag-share-grid [columns]="column" [data]="data" selectionMode="multiple"
-      (gridEvent)="eventFromGrid($event)" style="height: 100%; width: 100%; display: block;">
-    </app-ag-share-grid>
-  </div>
+  <div class="container-body flex flex-col h-full gap-4">
 
+    <div class="app-filter-panel" *ngIf="viewMode() === 'all'">
+
+      <div class="filter-field">
+        <label for="search">Search User</label>
+        <input id="search" type="text" pInputText [(ngModel)]="filter().search" placeholder="Name or Email"
+          (keydown.enter)="applyFilters()" class="w-full" />
+      </div>
+
+      <div class="filter-field">
+        <label for="os">OS</label>
+        <p-select id="os" [options]="osOptions" [(ngModel)]="filter().os" [showClear]="true" placeholder="All OS"
+          (onChange)="applyFilters()" styleClass="w-full" appendTo="body">
+        </p-select>
+      </div>
+
+      <div class="filter-field">
+        <label for="browser">Browser</label>
+        <p-select id="browser" [options]="browserOptions" [(ngModel)]="filter().browser" [showClear]="true"
+          placeholder="All Browsers" (onChange)="applyFilters()" styleClass="w-full" appendTo="body">
+        </p-select>
+      </div>
+
+      <div class="filter-actions">
+        <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()"></p-button>
+        <p-button label="Reset" icon="pi pi-refresh" [outlined]="true" severity="secondary"
+          (onClick)="resetFilters()"></p-button>
+      </div>
+
+    </div>
+
+    <div class="flex-1 min-h-0 manish-border-1 border-secondary border-round overflow-hidden">
+      <app-ag-share-grid [columns]="column" [data]="data" selectionMode="multiple" (gridEvent)="eventFromGrid($event)"
+        style="height: 100%; width: 100%; display: block;">
+      </app-ag-share-grid>
+    </div>
+
+  </div>
 </div>
 
-<p-dialog appendTo="body"   header="Session Details" [(visible)]="displayDialog" [modal]="true" styleClass="glass-dialog"
+<p-dialog appendTo="body" header="Session Details" [(visible)]="displayDialog" [modal]="true" styleClass="glass-dialog"
   [draggable]="false" [resizable]="false">
 
   @if (selectedSession) {
@@ -125,4 +329,4 @@
     </div>
   </div>
   }
-</p-dialog>
+</p-dialog> -->

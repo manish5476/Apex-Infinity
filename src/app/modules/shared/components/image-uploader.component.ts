@@ -1,356 +1,277 @@
-// import { Component, EventEmitter, Output, inject } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { finalize } from 'rxjs/operators';
+import { Component, EventEmitter, Output, inject, signal, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { finalize } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
 
-// // --- PrimeNG Modules ---
-// import { ProgressSpinnerModule } from 'primeng/progressspinner';
-// import { ToastModule } from 'primeng/toast';
-// import { MessageService } from 'primeng/api';
+// --- PrimeNG Modules ---
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { ToastModule } from 'primeng/toast';
+import { ButtonModule } from 'primeng/button';
+import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { AppMessageService } from '../../../core/services/message.service';
 
-// // --- Custom Services ---
-// // import { ImageUploadService } from '../../core/services/image-upload.service';
+@Component({
+  selector: 'app-image-uploader',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ProgressSpinnerModule,
+    ToastModule,
+    ButtonModule
+  ],
+  template: `
+    <div class="uploader-wrapper" [class.is-dialog]="isDialog()">
+      <!-- Header (Only if in Dialog) -->
+      @if (isDialog()) {
+        <div class="uploader-header">
+          <p class="subtitle">{{ config?.data?.description || 'Select or drag an image to upload.' }}</p>
+        </div>
+      }
 
-// @Component({
-//   selector: 'app-image-uploader',
-//   standalone: true,
-//   imports: [
-//     CommonModule,
-//     ProgressSpinnerModule,
-//     ToastModule
-//   ],
-//   providers: [MessageService],
-//   template: `
-//     <p-toast></p-toast>
+      <div class="drop-zone" 
+           [class.has-file]="!!selectedFile()"
+           [class.uploading]="isUploading()"
+           (click)="!isUploading() && fileInput.click()"
+           (dragover)="$event.preventDefault()"
+           (drop)="onFileDropped($event)">
+        
+        <input #fileInput type="file" [accept]="accept()" (change)="onFileSelected($event)" hidden>
 
-//     <div class="uploader-container" (click)="fileInput.click()">
-//       <input 
-//         #fileInput 
-//         type="file" 
-//         accept="image/*" 
-//         (change)="onFileSelected($event)" 
-//         [disabled]="isUploading"
-//         hidden>
-      
-//       <!-- Loading State -->
-//       <div *ngIf="isUploading" class="loading-overlay">
-//         <p-progressSpinner styleClass="w-8 h-8" strokeWidth="4"></p-progressSpinner>
-//         <span>Uploading...</span>
-//       </div>
+        <!-- Initial/Empty State -->
+        @if (!selectedFile() && !isUploading()) {
+          <div class="empty-state fade-in">
+            <div class="icon-circle">
+              <i class="pi pi-images"></i>
+            </div>
+            <span class="label">Click or Drag Image</span>
+            <span class="hint">Supports: PNG, JPG (Max {{ maxSize() }}MB)</span>
+          </div>
+        }
 
-//       <!-- Initial State -->
-//       <div *ngIf="!previewUrl && !isUploading" class="initial-state">
-//         <i class="pi pi-cloud-upload"></i>
-//         <span>Click to Upload</span>
-//         <small>Max 5MB</small>
-//       </div>
+        <!-- File Preview -->
+        @if (selectedFile() && !isUploading()) {
+          <div class="preview-container fade-in">
+            <img [src]="previewUrl()" alt="Preview" class="preview-img">
+            <div class="preview-overlay">
+              <p-button icon="pi pi-refresh" severity="secondary" [rounded]="true" (click)="$event.stopPropagation(); fileInput.click()"></p-button>
+              <p-button icon="pi pi-trash" severity="danger" [rounded]="true" (click)="$event.stopPropagation(); clearSelection()"></p-button>
+            </div>
+          </div>
+        }
 
-//       <!-- Preview -->
-//       <img *ngIf="previewUrl && !isUploading" [src]="previewUrl" alt="Image Preview" class="image-preview">
-//     </div>
-//   `,
-//   styles: [`
-//     :host { display: block; font-family: var(--font-body); }
+        <!-- Uploading State -->
+        @if (isUploading()) {
+          <div class="loading-state">
+            <p-progressSpinner styleClass="w-3rem h-3rem" strokeWidth="4"></p-progressSpinner>
+            <span class="status-text">Processing Upload...</span>
+          </div>
+        }
+      </div>
 
-//     .uploader-container {
-//       position: relative;
-//       width: 100%;
-//       aspect-ratio: 4 / 3; /* Slimmer ratio */
-//       max-width: 250px; /* Smaller width */
-//       border: 1.5px dashed var(--theme-border-secondary);
-//       border-radius: 0.5rem;
-//       background-color: var(--theme-bg-secondary);
-//       display: flex;
-//       align-items: center;
-//       justify-content: center;
-//       cursor: pointer;
-//       overflow: hidden;
-//       transition: background-color 0.2s ease, border-color 0.2s ease;
-//     }
+      <!-- Footer Actions -->
+      <div class="uploader-footer">
+        @if (isDialog()) {
+          <p-button label="Cancel" icon="pi pi-times" severity="secondary" [text]="true" (click)="ref?.close()"></p-button>
+        }
+        <p-button [label]="isUploading() ? 'Uploading...' : 'Confirm Upload'" 
+                  icon="pi pi-check" 
+                  [disabled]="!selectedFile() || isUploading()" 
+                  [loading]="isUploading()"
+                  (click)="handleUpload()">
+        </p-button>
+      </div>
+    </div>
+    <p-toast></p-toast>
+  `,
+  styles: [`
+    .uploader-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      padding: 1.5rem;
+      min-width: 320px;
+    }
 
-//     .uploader-container:hover {
-//       border-color: var(--theme-accent-primary);
-//       background-color: var(--theme-bg-ternary);
-//     }
+    .uploader-wrapper.is-dialog { padding: 0; }
 
-//     .initial-state {
-//       display: flex;
-//       flex-direction: column;
-//       align-items: center;
-//       justify-content: center;
-//       color: var(--theme-text-secondary);
-//       text-align: center;
-//       gap: 0.25rem;
-//     }
+    .uploader-header .subtitle {
+      color: var(--theme-text-secondary);
+      font-size: 0.875rem;
+      margin: 0;
+    }
 
-//     .initial-state .pi { font-size: 2rem; }
-//     .initial-state span { font-weight: 500; font-size: 0.9rem; }
-//     .initial-state small { font-size: 0.7rem; }
+    .drop-zone {
+      position: relative;
+      height: 240px;
+      border: 2px dashed var(--theme-border-primary);
+      border-radius: 12px;
+      background: var(--theme-bg-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      overflow: hidden;
+    }
 
-//     .image-preview { width: 100%; height: 100%; object-fit: cover; }
+    .drop-zone:hover:not(.uploading) {
+      border-color: var(--theme-accent-primary);
+      background: rgba(var(--accent-primary-rgb, 59, 130, 246), 0.04);
+    }
 
-//     .loading-overlay {
-//       position: absolute;
-//       top: 0; left: 0; right: 0; bottom: 0;
-//       background-color: rgba(0, 0, 0, 0.35);
-//       display: flex;
-//       flex-direction: column;
-//       align-items: center;
-//       justify-content: center;
-//       z-index: 10;
-//       color: white;
-//       gap: 0.5rem;
-//     }
-//   `]
-// })
-// export class ImageUploaderComponent {
-//   private imageUploadService = inject(ImageUploadService);
-//   private messageService = inject(AppMessageService);
+    .drop-zone.has-file { border-style: solid; }
 
-//   @Output() uploaded = new EventEmitter<string>();
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      text-align: center;
+    }
 
-//   isUploading = false;
-//   previewUrl: string | ArrayBuffer | null = null;
+    .icon-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--theme-bg-ternary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--theme-text-tertiary);
+      font-size: 1.5rem;
+    }
 
-//   onFileSelected(event: Event): void {
-//     const input = event.target as HTMLInputElement;
-//     if (!input.files || input.files.length === 0) return;
-    
-//     const file = input.files[0];
+    .empty-state .label { font-weight: 600; color: var(--theme-text-primary); }
+    .empty-state .hint { font-size: 0.75rem; color: var(--theme-text-tertiary); }
 
-//     if (!file.type.startsWith('image/')) {
-//       this.messageService.add({ severity: 'error', summary: 'Invalid File', detail: 'Select an image file.' });
-//       return;
-//     }
-//     if (file.size > 5 * 1024 * 1024) {
-//       this.messageService.add({ severity: 'error', summary: 'File Too Large', detail: 'Max 5MB allowed.' });
-//       return;
-//     }
+    .preview-container { width: 100%; height: 100%; position: relative; }
+    .preview-img { width: 100%; height: 100%; object-fit: contain; background: #000; }
 
-//     const reader = new FileReader();
-//     reader.onload = () => this.previewUrl = reader.result;
-//     reader.readAsDataURL(file);
+    .preview-overlay {
+      position: absolute;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 0.5rem;
+      background: rgba(0,0,0,0.5);
+      padding: 0.5rem;
+      border-radius: 40px;
+      backdrop-filter: blur(4px);
+    }
 
-//     this.uploadFile(file);
-//   }
+    .loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      color: var(--theme-text-secondary);
+    }
 
-//   private uploadFile(file: File): void {
-//     this.isUploading = true;
+    .uploader-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
 
-//     this.imageUploadService.uploadImage(file).pipe(
-//       finalize(() => this.isUploading = false)
-//     ).subscribe({
-//       next: (res) => {
-//         const url = res?.data?.imageUrl;
-//         if (url) {
-//           this.previewUrl = url;
-//           this.uploaded.emit(url);
-//           this.messageService.add({ severity: 'success', summary: 'Uploaded', detail: 'Image uploaded!' });
-//         } else {
-//           this.previewUrl = null;
-//           this.messageService.add({ severity: 'error', summary: 'Failed', detail: 'Invalid server response.' });
-//         }
-//       },
-//       error: (err) => {
-//         this.previewUrl = null;
-//         this.messageService.add({ severity: 'error', summary: 'Failed', detail: err.message || 'Upload error.' });
-//       }
-//     });
-//   }
-// }
+    .manish-fade-in {
+      animation: fadeIn 0.3s ease-out;
+    }
 
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  `],
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class ImageUploaderComponent implements OnInit {
+  // Dependencies
+  protected config = inject(DynamicDialogConfig, { optional: true });
+  protected ref = inject(DynamicDialogRef, { optional: true });
+  private appMessage = inject(AppMessageService);
 
-// // import { Component, EventEmitter, Output, inject } from '@angular/core';
-// // import { CommonModule } from '@angular/common';
-// // import { finalize } from 'rxjs/operators';
+  // Constraints (Inputs for direct usage, Defaults from config for dialog)
+  @Input() accept = signal('image/*');
+  @Input() maxSize = signal(5); // MB
 
-// // // --- PrimeNG Modules for UI ---
-// // import { ProgressSpinnerModule } from 'primeng/progressspinner';
-// // import { MessageService } from 'primeng/api';
-// // import { ToastModule } from 'primeng/toast';
+  @Output() uploaded = new EventEmitter<any>();
 
-// // // --- Your Custom Services ---
-// // import { ImageUploadService } from '../../core/services/image-upload.service';
-// // @Component({
-// //   selector: 'app-image-uploader',
-// //   standalone: true,
-// //   imports: [
-// //     CommonModule,
-// //     ProgressSpinnerModule,
-// //     ToastModule
-// //   ],
-// //   providers: [MessageService],
-// //   template: `
-// //     <p-toast></p-toast>
+  // State
+  selectedFile = signal<File | null>(null);
+  previewUrl = signal<string | null>(null);
+  isUploading = signal(false);
+  isDialog = signal(false);
 
-// //     <div class="uploader-container" (click)="fileInput.click()">
-      
-// //       <input 
-// //         #fileInput 
-// //         type="file" 
-// //         accept="image/*" 
-// //         (change)="onFileSelected($event)" 
-// //         [disabled]="isUploading"
-// //         hidden>
-      
-// //       <div *ngIf="isUploading" class="loading-overlay">
-// //         <p-progressSpinner styleClass="w-12 h-12" strokeWidth="6"></p-progressSpinner>
-// //         <span>Uploading...</span>
-// //       </div>
-      
-// //       <div *ngIf="!previewUrl && !isUploading" class="initial-state">
-// //         <i class="pi pi-cloud-upload"></i>
-// //         <span>Click to Upload Image</span>
-// //         <small>Max file size: 5MB</small>
-// //       </div>
-      
-// //       <img 
-// //         *ngIf="previewUrl && !isUploading" 
-// //         [src]="previewUrl" 
-// //         alt="Image Preview" 
-// //         class="image-preview">
-// //     </div>
-// //   `,
-// //   styles: [`
-// //     :host {
-// //       display: block;
-// //       font-family: var(--font-body);
-// //     }
+  ngOnInit() {
+    if (this.config?.data) {
+      this.isDialog.set(true);
+      if (this.config.data.accept) this.accept.set(this.config.data.accept);
+      if (this.config.data.maxSize) this.maxSize.set(this.config.data.maxSize);
+    }
+  }
 
-// //     .uploader-container {
-// //       position: relative;
-// //       width: 100%;
-// //       aspect-ratio: 16 / 9;
-// //       max-width: 400px;
-// //       border: 2px dashed var(--theme-border-secondary);
-// //       border-radius: 0.75rem;
-// //       background-color: var(--theme-bg-secondary);
-// //       display: flex;
-// //       align-items: center;
-// //       justify-content: center;
-// //       cursor: pointer;
-// //       overflow: hidden;
-// //       transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
-// //     }
+  onFileSelected(event: any) {
+    const file = event.target.files?.[0];
+    if (file) this.processFile(file);
+  }
 
-// //     .uploader-container:hover {
-// //       border-color: var(--theme-accent-primary);
-// //       background-color: var(--theme-bg-ternary);
-// //     }
+  onFileDropped(event: DragEvent) {
+    event.preventDefault();
+    const file = event.dataTransfer?.files?.[0];
+    if (file) this.processFile(file);
+  }
 
-// //     .initial-state {
-// //       display: flex;
-// //       flex-direction: column;
-// //       align-items: center;
-// //       justify-content: center;
-// //       color: var(--theme-text-secondary);
-// //       text-align: center;
-// //     }
+  processFile(file: File) {
+    // 1. Type Check
+    if (!file.type.startsWith('image/')) {
+      this.appMessage.showError('Invalid File Type ,Please select an image file (PNG, JPG, etc).');
+      return;
+    }
 
-// //     .initial-state .pi {
-// //       font-size: 3rem;
-// //       margin-bottom: 0.75rem;
-// //     }
+    // 2. Size Check
+    if (file.size > this.maxSize() * 1024 * 1024) {
+      this.appMessage.showError(`File Too Large, Image must be smaller than ${this.maxSize()}MB.`);
+      return;
+    }
 
-// //     .initial-state span {
-// //       font-weight: 600;
-// //       font-size: 1rem;
-// //     }
+    this.selectedFile.set(file);
+    const reader = new FileReader();
+    reader.onload = (e: any) => this.previewUrl.set(e.target.result);
+    reader.readAsDataURL(file);
+  }
 
-// //     .initial-state small {
-// //       font-size: 0.8rem;
-// //       margin-top: 0.25rem;
-// //     }
+  clearSelection() {
+    this.selectedFile.set(null);
+    this.previewUrl.set(null);
+  }
 
-// //     .image-preview {
-// //       width: 100%;
-// //       height: 100%;
-// //       object-fit: cover;
-// //     }
+  handleUpload() {
+    const file = this.selectedFile();
+    if (!file) return;
 
-// //     .loading-overlay {
-// //       position: absolute;
-// //       top: 0;
-// //       left: 0;
-// //       right: 0;
-// //       bottom: 0;
-// //       background-color: rgba(0, 0, 0, 0.5);
-// //       display: flex;
-// //       flex-direction: column;
-// //       align-items: center;
-// //       justify-content: center;
-// //       z-index: 10;
-// //       color: white;
-// //       gap: 1rem;
-// //     }
-// //   `]
-// // })
-// // export class ImageUploaderComponent {
-// //   // --- Dependencies ---
-// //   private imageUploadService = inject(ImageUploadService);
-// //   private messageService = inject(AppMessageService);
+    // Check if an upload function was provided via dialog config
+    const uploadFn = this.config?.data?.uploadFn as (f: File) => Observable<any>;
 
-// //   // --- Outputs ---
-// //   @Output() uploaded = new EventEmitter<string>();
-
-// //   // --- Component State ---
-// //   isUploading = false;
-// //   previewUrl: string | ArrayBuffer | null = null;
-
-// //   onFileSelected(event: Event): void {
-// //     const input = event.target as HTMLInputElement;
-// //     if (!input.files || input.files.length === 0) return;
-    
-// //     const file = input.files[0];
-
-// //     if (!file.type.startsWith('image/')) {
-// //       this.messageService.add({ severity: 'error', summary: 'Invalid File', detail: 'Please select an image file.' });
-// //       return;
-// //     }
-// //     if (file.size > 5 * 1024 * 1024) { // 5MB limit
-// //       this.messageService.add({ severity: 'error', summary: 'File Too Large', detail: 'Image size cannot exceed 5MB.' });
-// //       return;
-// //     }
-
-// //     const reader = new FileReader();
-// //     reader.onload = () => {
-// //       this.previewUrl = reader.result;
-// //     };
-// //     reader.readAsDataURL(file);
-
-// //     this.uploadFile(file);
-// //   }
-  
-// //   // ====================================================================
-// //   // === THIS IS THE CORRECTED METHOD ===
-// //   // ====================================================================
-// //   private uploadFile(file: File): void {
-// //     this.isUploading = true;
-
-// //     this.imageUploadService.uploadImage(file).pipe(
-// //       // The finalize operator ensures that isUploading is set to false
-// //       // whether the upload succeeds or fails.
-// //       finalize(() => {
-// //         this.isUploading = false;
-// //       })
-// //     ).subscribe({
-// //       next: (response) => {
-// //         // --- Success Handler ---
-// //         if (response && response.data && response.data.imageUrl) {
-// //           const imageUrl = response.data.imageUrl;
-// //           this.previewUrl = imageUrl; // Update preview to the final URL
-// //           this.uploaded.emit(imageUrl); // Notify the parent component
-// //           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Image uploaded!' });
-// //         } else {
-// //           // Handle cases where the response format is unexpected
-// //           this.previewUrl = null;
-// //           this.messageService.add({ severity: 'error', summary: 'Upload Failed', detail: 'Invalid response from server.' });
-// //         }
-// //       },
-// //       error: (err) => {
-// //         // --- Error Handler ---
-// //         this.previewUrl = null; // Clear preview on error
-// //         this.messageService.add({ severity: 'error', summary: 'Upload Failed', detail: err.message || 'Could not upload image.' });
-// //       }
-// //     });
-// //   }
-// // }
+    if (uploadFn) {
+      this.isUploading.set(true);
+      uploadFn(file).pipe(
+        finalize(() => this.isUploading.set(false))
+      ).subscribe({
+        next: (res) => {
+          this.appMessage.showSuccess(`Upload Complete Your image has been saved successfully.`);
+          this.uploaded.emit(res);
+          if (this.isDialog()) this.ref?.close(res);
+        },
+        error: (err) => {
+          this.appMessage.handleHttpError(err);
+        }
+      });
+    } else {
+      // If no uploadFn, just emit the file and let the parent handle it
+      this.uploaded.emit(file);
+      if (this.isDialog()) this.ref?.close(file);
+    }
+  }
+}

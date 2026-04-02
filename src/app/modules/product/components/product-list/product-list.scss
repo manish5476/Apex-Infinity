@@ -6,3 +6,7 @@
 }
 
 
+/* Remove padding specifically for the bulk editor so the table sits flush */
+.bulk-dialog .p-dialog-content {
+  padding: 0 !important;
+}

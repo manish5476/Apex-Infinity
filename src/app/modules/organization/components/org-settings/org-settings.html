@@ -15,7 +15,8 @@
           @if (organization()) {
           <div class="meta-row">
             <span class="id-badge">ID: {{ organization().uniqueShopId }}</span>
-            <span class="meta-item"><i class="pi pi-building"></i> {{ organization().branches?.length || 0 }} Branches</span>
+            <span class="meta-item"><i class="pi pi-building"></i> {{ organization().branches?.length || 0 }}
+              Branches</span>
             <span class="meta-item status-active"><i class="pi pi-check-circle"></i> Active ERP</span>
           </div>
           }
@@ -23,7 +24,8 @@
       </div>
 
       <div class="header-actions">
-        <p-button label="Invite Member" icon="pi pi-plus" (click)="showInviteDialog.set(true)" severity="primary"></p-button>
+        <p-button label="Invite Member" icon="pi pi-plus" (click)="showInviteDialog.set(true)"
+          severity="primary"></p-button>
       </div>
     </div>
   </header>
@@ -102,20 +104,24 @@
 
                   <div class="card-body">
                     <div class="input-group">
-                      <p-select [options]="roles" [(ngModel)]="selectedRoles[p._id]" optionLabel="name" optionValue="_id"
-                        placeholder="Assign Role" styleClass="w-full" appendTo="body" [filter]="true" filterBy="name"></p-select>
+                      <p-select [options]="roles" [(ngModel)]="selectedRoles[p._id]" optionLabel="name"
+                        optionValue="_id" placeholder="Assign Role" styleClass="w-full" appendTo="body" [filter]="true"
+                        filterBy="name"></p-select>
 
                     </div>
                     <div class="input-group">
                       <p-select [options]="branches" [(ngModel)]="selectedBranches[p._id]" optionLabel="name"
-                        optionValue="_id" placeholder="Assign Branch" styleClass="w-full" appendTo="body" [filter]="true" filterBy="name"></p-select>
+                        optionValue="_id" placeholder="Assign Branch" styleClass="w-full" appendTo="body"
+                        [filter]="true" filterBy="name"></p-select>
 
                     </div>
                   </div>
 
                   <div class="card-actions">
-                    <p-button icon="pi pi-check" label="Approve" severity="success" (click)="approveMember(p._id)" styleClass="w-full"></p-button>
-                    <p-button icon="pi pi-times" label="Reject" [outlined]="true" severity="danger" (click)="rejectMember(p._id)" styleClass="w-full"></p-button>
+                    <p-button icon="pi pi-check" label="Approve" severity="success" (click)="approveMember(p._id)"
+                      styleClass="w-full"></p-button>
+                    <p-button icon="pi pi-times" label="Reject" [outlined]="true" severity="danger"
+                      (click)="rejectMember(p._id)" styleClass="w-full"></p-button>
                   </div>
                 </div>
                 }
@@ -126,11 +132,6 @@
 
             <!-- ACTIVE MEMBERS GRID CONTAINER -->
             <div class="active-members-section">
-              <div class="section-header mb-3">
-                <h3>Active Members</h3>
-              </div>
-              
-              <!-- Responsive Grid Container -->
               <div class="grid-container-wrapper">
                 <app-user-list></app-user-list>
               </div>
@@ -183,7 +184,7 @@
                   <label class="field-label">Business Name</label>
                   <input type="text" class="apex-input" formControlName="name" />
                 </div>
-                
+
                 <div class="field-group">
                   <label class="field-label">GST Number</label>
                   <input type="text" class="apex-input" formControlName="gstNumber" placeholder="Optional" />
@@ -203,10 +204,10 @@
               <div class="form-actions">
                 <button type="submit" class="submit-btn" [disabled]="isSaving()">
                   @if (isSaving()) {
-                    <span class="spinner"></span>
-                    <span>Saving…</span>
+                  <span class="spinner"></span>
+                  <span>Saving…</span>
                   } @else {
-                    <span>Save Changes</span>
+                  <span>Save Changes</span>
                   }
                 </button>
               </div>
@@ -227,7 +228,8 @@
                   <h4>Transfer Ownership</h4>
                   <p>Hand over full control of this organization. You will be downgraded to a regular Admin.</p>
                 </div>
-                <p-button label="Transfer" [outlined]="true" severity="warn" (click)="showTransferDialog.set(true)"></p-button>
+                <p-button label="Transfer" [outlined]="true" severity="warn"
+                  (click)="showTransferDialog.set(true)"></p-button>
               </div>
 
               <div class="danger-item destructive">
@@ -246,7 +248,8 @@
 </div>
 
 <!-- INVITE DIALOG -->
-<p-dialog header="Invite Team Member" [(visible)]="showInviteDialog" [modal]="true" [style]="{width: '450px'}" [draggable]="false" [resizable]="false">
+<p-dialog header="Invite Team Member" [(visible)]="showInviteDialog" [modal]="true" [style]="{width: '450px'}"
+  [draggable]="false" [resizable]="false">
   <form [formGroup]="inviteForm" class="dialog-form">
     <div class="form-group">
       <label>Full Name</label>
@@ -266,12 +269,14 @@
     <div class="form-row">
       <div class="form-group">
         <label>Role</label>
-        <p-select [options]="roles" formControlName="role" optionLabel="name" optionValue="_id" placeholder="Select Role" appendTo="body" styleClass="w-full" [filter]="true" filterBy="name"></p-select>
+        <p-select [options]="roles" formControlName="role" optionLabel="name" optionValue="_id"
+          placeholder="Select Role" appendTo="body" styleClass="w-full" [filter]="true" filterBy="name"></p-select>
 
       </div>
       <div class="form-group">
         <label>Branch</label>
-        <p-select [options]="branches" formControlName="branchId" optionLabel="name" optionValue="_id" placeholder="Select Branch" appendTo="body" styleClass="w-full" [filter]="true" filterBy="name"></p-select>
+        <p-select [options]="branches" formControlName="branchId" optionLabel="name" optionValue="_id"
+          placeholder="Select Branch" appendTo="body" styleClass="w-full" [filter]="true" filterBy="name"></p-select>
 
       </div>
     </div>
@@ -284,11 +289,13 @@
 </p-dialog>
 
 <!-- TRANSFER OWNERSHIP DIALOG -->
-<p-dialog header="Transfer Ownership" [(visible)]="showTransferDialog" [modal]="true" [style]="{width: '500px'}" [draggable]="false">
+<p-dialog header="Transfer Ownership" [(visible)]="showTransferDialog" [modal]="true" [style]="{width: '500px'}"
+  [draggable]="false">
   <div class="dialog-content">
     <div class="warning-box">
       <i class="pi pi-info-circle"></i>
-      <p>Transferring ownership grants <b>Super Admin</b> privileges to the selected user. You will lose billing and deletion rights.</p>
+      <p>Transferring ownership grants <b>Super Admin</b> privileges to the selected user. You will lose billing and
+        deletion rights.</p>
     </div>
 
     <div class="form-group mt-4">
@@ -306,7 +313,8 @@
 
     <div class="form-group mt-3">
       <label>Confirm Organization Name</label>
-      <input pInputText [(ngModel)]="transferConfirmName" class="w-full" [placeholder]="'Type ' + organization()?.name + ' to confirm'" />
+      <input pInputText [(ngModel)]="transferConfirmName" class="w-full"
+        [placeholder]="'Type ' + organization()?.name + ' to confirm'" />
     </div>
   </div>
 

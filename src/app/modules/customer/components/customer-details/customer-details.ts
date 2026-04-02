@@ -12,6 +12,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { TooltipModule } from 'primeng/tooltip';
 import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
+import { ConfirmationService } from 'primeng/api';
 
 // Services & Components
 import { CustomerService } from '../../services/customer-service';
@@ -20,6 +21,7 @@ import { PaymentService } from '../../../payment/services/payment-service';
 import { FinancialService } from '../../../Ledger/financial.service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
+import { DynamicDialogServices } from '../../../../core/services/dynamic-dialog-services';
 import { CustomerTransactions } from '../../../transactions/customer-transactions/customer-transactions';
 import { ImageViewerDirective } from '../../../shared/directives/image-viewer.directive';
 import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
@@ -68,6 +70,8 @@ export class CustomerDetails implements OnInit {
   private messageService = inject(AppMessageService);
   public common = inject(CommonMethodService);
   private cdr = inject(ChangeDetectorRef);
+  private dialogServices = inject(DynamicDialogServices);
+  private confirmationService = inject(ConfirmationService);
 
   PERMISSIONS = PERMISSIONS;
 
@@ -115,6 +119,30 @@ export class CustomerDetails implements OnInit {
       }
       this.customerId.set(id);
       this.loadProfile(id);
+    });
+  }
+
+  confirmDelete() {
+    const customer = this.customer();
+    if (!customer) return;
+
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete the customer "${customer.name}"? This action cannot be undone.`,
+      header: 'Confirm Deletion',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-text',
+      accept: () => {
+        this.customerService.deleteCustomer(customer._id).subscribe({
+          next: () => {
+            this.messageService.showSuccess('Customer deleted successfully');
+            this.router.navigate(['/customer']);
+          },
+          error: (err: any) => {
+            this.messageService.handleHttpError(err);
+          }
+        });
+      }
     });
   }
 
@@ -188,7 +216,7 @@ export class CustomerDetails implements OnInit {
       this.router.navigate(['/payments', paymentid]);
     }
   }
-  
+
 
   private finishTabLoad(tab: TabType) {
     this.tabStatus[tab].page++;
@@ -203,10 +231,10 @@ export class CustomerDetails implements OnInit {
   initColumns() {
     this.ledgerColumns = [
       { field: 'date', headerName: 'Date', width: 120, valueFormatter: (p: any) => p.value ? new Date(p.value).toLocaleDateString('en-IN') : '' },
-      { 
+      {
         // No direct reference number in history, potentially construct from invoiceId/paymentId or use description
-        headerName: 'Reference', field: 'description', width: 220, 
-        cellRenderer: (p: any) => p.value ? `<span style="color:var(--text-primary);font-weight:500;">${p.value}</span>` : '' 
+        headerName: 'Reference', field: 'description', width: 220,
+        cellRenderer: (p: any) => p.value ? `<span style="color:var(--text-primary);font-weight:500;">${p.value}</span>` : ''
       },
       {
         field: 'referenceType', headerName: 'Type', width: 110,
@@ -253,25 +281,23 @@ export class CustomerDetails implements OnInit {
     return `<span style="background:${theme.bg};color:${theme.text};padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">${val}</span>`;
   }
 
-onFileSelected(event: any): void {
-    const file: File = event.target.files[0];
-    if (file && this.customer()?._id) {
-      this.common.apiCall(
-        this.customerService.uploadCustomerPhoto(this.customer()._id, file),
-        (res: any) => {
-          if (res.data?.customer?.photo) {
-            this.customer.update(c => ({ ...c, avatar: res.data.customer.photo }));
-            
-            // Simplified to your new single-string method!
-            this.messageService.showSuccess('Photo updated successfully.');
-          }
-        }
-        // I removed the redundant 'Upload Photo' context string here, assuming your 
-        // common.apiCall wrapper has been updated to use the new handleHttpError signature!
-      );
-    }
+  openPhotoUpload() {
+    const custId = this.customer()?._id;
+    if (!custId) return;
+
+    this.dialogServices.openImageUpload({
+      header: 'Update Customer Photo',
+      description: 'Upload a new avatar for this customer.',
+      uploadFn: (file: File) => this.customerService.uploadCustomerPhoto(custId, file)
+    })?.onClose.subscribe((res: any) => {
+      // The ImageUploaderComponent ensures 'res' is the exact response from our uploadFn on success
+      if (res?.data?.customer?.photo) {
+        this.customer.update(c => ({ ...c, avatar: res.data.customer.photo }));
+        this.cdr.detectChanges(); // ensure view updates if binding doesn't catch the signal fast enough
+      }
+    });
   }
-  
+
   loadProfile(id: string): void {
     this.isError.set(false);
     this.customerService.getCustomerDataWithId(id)
@@ -279,9 +305,9 @@ onFileSelected(event: any): void {
         catchError(err => {
           // Passed the actual HTTP error to your global handler!
           this.messageService.handleHttpError(err);
-          
+
           // Added this so your UI can display a fallback state if the profile fails
-          this.isError.set(true); 
+          this.isError.set(true);
           return of(null);
         }),
         finalize(() => this.loadingProfile.set(false))
@@ -305,19 +331,19 @@ onFileSelected(event: any): void {
       finalize(() => this.tabStatus.ledger.loading = false)
     ).subscribe((res: any) => {
       // Use the history array directly as per the JSON structure
-      const history = res.history || []; 
+      const history = res.history || [];
       this.ledgerHistory.update(old => isReset ? history : [...old, ...history]);
-      
+
       this.tabStatus.ledger.total = res.count || 0; // Use count for total
       this.closingBalance.set(res.closingBalance || 0); // Use closingBalance directly
-      
+
       this.finishTabLoad('ledger');
     });
   }
 
   private fetchInvoices(id: string, params: any, isReset: boolean) {
     this.invoiceService.getInvoicesByCustomer(id).pipe(
-      catchError((err) => {
+      catchError((err: any) => {
         // Alert the user if the invoice tab fails to populate
         this.messageService.handleHttpError(err);
         return of({ data: { invoices: [] }, total: 0 });
@@ -326,7 +352,7 @@ onFileSelected(event: any): void {
     ).subscribe((res: any) => {
       let data = res.invoices || res.data?.invoices || (Array.isArray(res) ? res : []);
       this.invoices.update(old => isReset ? data : [...old, ...data]);
-      
+
       this.tabStatus.invoices.total = res.total || res.results || 0;
       this.finishTabLoad('invoices');
     });
@@ -343,7 +369,7 @@ onFileSelected(event: any): void {
     ).subscribe((res: any) => {
       let data = res.payments || res.data?.payments || (Array.isArray(res) ? res : []);
       this.payments.update(old => isReset ? data : [...old, ...data]);
-      
+
       this.tabStatus.payments.total = res.total || res.results || 0;
       this.finishTabLoad('payments');
     });

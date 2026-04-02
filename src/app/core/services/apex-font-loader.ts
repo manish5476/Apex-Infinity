@@ -227,6 +227,13 @@ export class ThemeFontLoader {
     return config ? loadedFontUrls.has(config.url) : false;
   }
 
+  /**
+   * Check if a theme ID exists in the system map.
+   */
+  static isValidTheme(themeId: string): boolean {
+    return !!THEME_FONT_MAP[themeId];
+  }
+
   // ── Private ────────────────────────────────────────────────────────────────
 
   private static _injectAndWait(url: string): Promise<void> {
