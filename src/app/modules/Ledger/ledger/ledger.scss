@@ -20,7 +20,7 @@
 .report-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: var(--spacing-lg);
+  // gap: var(--spacing-lg);
 }
 
 .kpi-card-v2 {
@@ -94,7 +94,7 @@
 .report-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: $spacing-lg;
+  // gap: $spacing-lg;
 }
 
 // KPI Cards
@@ -224,7 +224,7 @@
       font-size: var(--font-size-xs);
       color: $text-tertiary;
       border-bottom: 2px solid $border-primary;
-      margin-bottom: $spacing-lg;
+      // margin-bottom: $spacing-lg;
     }
 
     &.total {
@@ -245,7 +245,7 @@
     h3 {
       font-size: var(--font-size-lg);
       color: $accent-primary;
-      margin-bottom: $spacing-lg;
+      // margin-bottom: $spacing-lg;
       font-weight: var(--font-weight-semibold);
     }
   }
