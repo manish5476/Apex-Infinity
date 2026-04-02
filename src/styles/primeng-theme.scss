@@ -2789,6 +2789,52 @@
 .p-dialog-content::-webkit-scrollbar-thumb:hover {
   background: var(--accent-primary) !important;
 }
+
+/* ============================================================================
+   FORM FIELD GEOMETRY FIX
+   Forces PrimeNG inputs to match the 2.5rem min-height of native inputs
+   ============================================================================ */
+
+/* Target all PrimeNG input types */
+.p-inputtext,
+.p-select,
+.p-multiselect,
+.p-password input,
+.p-inputnumber input,
+.p-autocomplete input,
+.p-cascadeselect,
+.p-treeselect,
+.p-datepicker input {
+  min-height: 2.5rem !important;
+  line-height: var(--line-height-relaxed) !important;
+  padding-top: var(--spacing-md) !important;
+  padding-bottom: var(--spacing-md) !important;
+}
+
+/* Fix dropdown/select labels so text centers vertically inside the new height */
+.p-select-label,
+.p-multiselect-label,
+.p-cascadeselect-label,
+.p-treeselect-label {
+  display: flex !important;
+  align-items: center !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  height: 100% !important;
+  line-height: var(--line-height-relaxed) !important;
+}
+
+/* Ensure chips in multiselect don't break the container height */
+.p-multiselect-chip {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Adjust textarea specifically so it doesn't get locked to 2.5rem */
+.p-textarea {
+  min-height: 5rem !important;
+  resize: vertical !important;
+}
 // // /*
 // //  * ============================================================================
 // //  * APEX CRM — PrimeNG Theme Override  v1.0
