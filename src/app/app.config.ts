@@ -16,7 +16,7 @@ import { providePrimeNG } from 'primeng/config';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
 // Import your custom preset
-import { MyPreset } from './core/config/my-preset';
+// import { MyPreset } from './core/config/my-preset';
 
 // Interceptors
 import { jwtInterceptor } from './core/interceptors/jwt.interceptor';
