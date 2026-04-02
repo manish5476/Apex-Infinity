@@ -67,6 +67,8 @@ export class OrgSettingsComponent implements OnInit {
   // --- UI State Signals ---
   isLoading = signal(true);
   isSaving = signal(false);
+  successMessage = signal<string | null>(null);
+  errorMessage = signal<string | null>(null);
   activeTab = signal('0');
   
   // Dialog visibility signals
@@ -170,14 +172,25 @@ export class OrgSettingsComponent implements OnInit {
     }
     
     this.isSaving.set(true);
+    this.successMessage.set(null);
+    this.errorMessage.set(null);
+
     this.orgService.updateMyOrganization(this.orgForm.value)
       .pipe(finalize(() => {
         this.isSaving.set(false);
         this.cdr.markForCheck();
       }))
       .subscribe({
-        next: () => this.appMessage.showSuccess('Organization details updated successfully.'),
-        error: (err) => this.appMessage.handleHttpError(err)
+        next: () => {
+          const msg = 'Organization details updated successfully.';
+          this.successMessage.set(msg);
+          this.appMessage.showSuccess(msg);
+        },
+        error: (err) => {
+          const msg = err.error?.message || 'Failed to update organization details. Please try again.';
+          this.errorMessage.set(msg);
+          this.appMessage.handleHttpError(err);
+        }
       });
   }
 

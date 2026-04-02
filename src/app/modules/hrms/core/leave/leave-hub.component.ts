@@ -127,7 +127,7 @@ import { AppMessageService } from '@core/services/message.service';
                     [paginator]="true" 
                     [rows]="10" 
                     responsiveLayout="scroll"
-                    styleClass="premium-table border-round-xl overflow-hidden border-1 surface-border">
+                    styleClass="premium-table border-round-xl overflow-hidden manish-border-1 surface-border">
                     <ng-template pTemplate="header">
                       <tr>
                         <th>Request ID & Type</th>

@@ -85,7 +85,7 @@ import { AppMessageService } from '@core/services/message.service';
             [value]="records()" 
             [rows]="31" 
             responsiveLayout="scroll"
-            styleClass="premium-table border-round-xl border-1 surface-border">
+            styleClass="premium-table border-round-xl manish-border-1 surface-border">
             
             <ng-template pTemplate="header">
               <tr>

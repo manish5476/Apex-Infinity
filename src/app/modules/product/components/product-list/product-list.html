@@ -1,67 +1,76 @@
-<div class="list-page-container">
+<div class="app-container h-full">
 
-  <div class="list-header">
-    <div class="title-section">
-      <div class="icon-box">
-        <i class="pi pi-box"></i>
+  <!-- Standard Header -->
+  <div class="container-header">
+    <div class="flex align-center gap-3">
+      <div class="icon-box bg-primary-light text-primary border-round p-2 flex align-center justify-center">
+        <i class="pi pi-box text-xl"></i>
       </div>
-      <div class="text-content">
-        <h2 class="list-title">Product Management</h2>
-        <p class="list-subtitle">Manage inventory, prices, and product details.</p>
+      <div class="header-titles">
+        <h2 class="container-title">Product Management</h2>
+        <p class="container-subtitle">Manage inventory, prices, and product details.</p>
       </div>
     </div>
-    <p-button *hasPermission="PERMISSIONS.PRODUCT.CREATE" label="New Product" icon="pi pi-plus" routerLink="create" styleClass="p-button-primary"></p-button>
-    <p-button *hasPermission="[PERMISSIONS.PRODUCT.CREATE, PERMISSIONS.PRODUCT.UPDATE]" [label]="selectedRows && selectedRows.length>0?'Edit Product': 'New Product'"
-      (onClick)="bulkDialogVisible=true" styleClass="p-button-primary"> </p-button>
+
+    <div class="header-actions">
+      <p-button *hasPermission="PERMISSIONS.PRODUCT.CREATE" label="New Product" icon="pi pi-plus" routerLink="create"
+        styleClass="p-button-primary"></p-button>
+      <p-button *hasPermission="[PERMISSIONS.PRODUCT.CREATE, PERMISSIONS.PRODUCT.UPDATE]"
+        [label]="selectedRows && selectedRows.length > 0 ? 'Edit Product' : 'New Product'" (onClick)="bulkDialogVisible = true"
+        styleClass="p-button-primary">
+      </p-button>
+    </div>
   </div>
 
-  <div class="themed-card">
-    <div class="se-filter-bar">
+  <div class="container-body flex flex-col h-full gap-4">
 
-      <div class="se-filter-field" style="flex: 2">
+    <!-- Standard Filter Panel -->
+    <div class="app-filter-panel">
+
+      <div class="filter-field" style="flex: 2">
         <label for="name">Product Name</label>
-        <div class="p-input-icon-left w-full">
-          <!-- <i class="pi pi-search"></i> -->
-          <input id="name" type="text" pInputText [(ngModel)]="productFilter.name" placeholder="Search by name..."
-            class="w-full" />
-        </div>
+        <input id="name" type="text" pInputText [(ngModel)]="productFilter.name" placeholder="Search by name..."
+          class="w-full" />
       </div>
 
-      <div class="se-filter-field">
+      <div class="filter-field">
         <label for="sku">SKU</label>
         <input id="sku" type="text" pInputText [(ngModel)]="productFilter.sku" placeholder="Search by SKU"
           class="w-full" />
       </div>
-      <div class="se-filter-field">
-        <label for="brand">Brand</label>
-        <p-select appendTo="body" id="brand" [options]="brandOptions()"
-          [(ngModel)]="productFilter.brand" [filter]="true" filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true"
-          placeholder="Select Brand" styleClass="w-full">
-        </p-select>
 
+      <div class="filter-field">
+        <label for="brand">Brand</label>
+        <p-select appendTo="body" id="brand" [options]="brandOptions()" [(ngModel)]="productFilter.brand" [filter]="true"
+          filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true" placeholder="Select Brand"
+          styleClass="w-full">
+        </p-select>
       </div>
-      <div class="se-filter-field">
+
+      <div class="filter-field">
         <label for="category">Category</label>
-        <p-select appendTo="body" id="category" [options]="categoryOptions()"
-          [(ngModel)]="productFilter.category" [filter]="true" filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true"
+        <p-select appendTo="body" id="category" [options]="categoryOptions()" [(ngModel)]="productFilter.category"
+          [filter]="true" filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true"
           placeholder="Select Category" styleClass="w-full">
         </p-select>
-
       </div>
-      <div class="se-filter-actions">
+
+      <div class="filter-actions">
         <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()"></p-button>
         <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary"
           (onClick)="resetFilters()"></p-button>
       </div>
+
     </div>
-  </div>
 
-  <div class="list-grid-area themed-card">
-    <app-ag-share-grid [columns]="column" [data]="data" selectionMode="multiple"
-      (gridEvent)="eventFromGrid($event)" style="height: 100%; width: 100%; display: block;">
-    </app-ag-share-grid>
-  </div>
+    <!-- Data Grid Wrapper -->
+    <div class="flex-1 min-h-0 manish-border-1 border-secondary border-round overflow-hidden">
+      <app-ag-share-grid [columns]="column" [data]="data" selectionMode="multiple" (gridEvent)="eventFromGrid($event)"
+        style="height: 100%; width: 100%; display: block;">
+      </app-ag-share-grid>
+    </div>
 
+  </div>
 </div>
 
 <p-dialog appendTo="body" [(visible)]="bulkDialogVisible" [modal]="true" [style]="{ width: '90%', height: '90%' }"

@@ -1,0 +1,338 @@
+// ============================================================================
+// APEX CRM — Background Pattern System
+// Applied via: html[data-bg-pattern="<id>"] and .apex-layout[data-bg-pattern="<id>"]
+// All color values use color-mix() with --accent-primary so they respond to theme changes.
+// Opacity controlled by --pattern-opacity CSS var (set by ThemeService).
+// ============================================================================
+
+// ── Transition mixin ─────────────────────────────────────────────────────────
+@mixin bg-pattern-base {
+  transition: background 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    background-image 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+// ── Shared target selector ────────────────────────────────────────────────────
+@mixin pattern($id) {
+
+  html[data-bg-pattern='#{$id}'],
+  .apex-layout[data-bg-pattern='#{$id}'] {
+    @include bg-pattern-base;
+    @content;
+  }
+}
+
+// ── None ──────────────────────────────────────────────────────────────────────
+@include pattern('none') {
+  background: var(--bg-primary);
+}
+
+// ============================================================================
+// CSS GEOMETRIC PATTERNS
+// ============================================================================
+
+@include pattern('dots') {
+  background-color: var(--bg-primary);
+  background-image: radial-gradient(circle,
+      color-mix(in srgb, var(--accent-primary) calc(22% * var(--pattern-opacity, 1)), transparent) 1.5px,
+      transparent 1.5px);
+  background-size: 20px 20px;
+}
+
+@include pattern('grid') {
+  background-color: var(--bg-primary);
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--accent-primary) calc(10% * var(--pattern-opacity, 1)), transparent) 1px,
+      transparent 1px),
+    linear-gradient(90deg,
+      color-mix(in srgb, var(--accent-primary) calc(10% * var(--pattern-opacity, 1)), transparent) 1px,
+      transparent 1px);
+  background-size: 24px 24px;
+}
+
+@include pattern('lines-h') {
+  background-color: var(--bg-primary);
+  background-image: repeating-linear-gradient(0deg,
+      transparent,
+      transparent 22px,
+      color-mix(in srgb, var(--accent-primary) calc(12% * var(--pattern-opacity, 1)), transparent) 22px,
+      color-mix(in srgb, var(--accent-primary) calc(12% * var(--pattern-opacity, 1)), transparent) 23px);
+}
+
+@include pattern('lines-d') {
+  background-color: var(--bg-primary);
+  background-image: repeating-linear-gradient(45deg,
+      transparent,
+      transparent 16px,
+      color-mix(in srgb, var(--accent-primary) calc(9% * var(--pattern-opacity, 1)), transparent) 16px,
+      color-mix(in srgb, var(--accent-primary) calc(9% * var(--pattern-opacity, 1)), transparent) 17px);
+}
+
+@include pattern('crosshatch') {
+  background-color: var(--bg-primary);
+  background-image:
+    repeating-linear-gradient(45deg,
+      transparent,
+      transparent 12px,
+      color-mix(in srgb, var(--accent-primary) calc(8% * var(--pattern-opacity, 1)), transparent) 12px,
+      color-mix(in srgb, var(--accent-primary) calc(8% * var(--pattern-opacity, 1)), transparent) 13px),
+    repeating-linear-gradient(-45deg,
+      transparent,
+      transparent 12px,
+      color-mix(in srgb, var(--accent-primary) calc(8% * var(--pattern-opacity, 1)), transparent) 12px,
+      color-mix(in srgb, var(--accent-primary) calc(8% * var(--pattern-opacity, 1)), transparent) 13px);
+}
+
+// ============================================================================
+// SVG PATTERNS
+// Base background-color only — actual background-image injected by ThemeService
+// at runtime because data URIs cannot reference CSS variables.
+// ============================================================================
+
+html[data-bg-pattern='hexagons'],
+.apex-layout[data-bg-pattern='hexagons'],
+html[data-bg-pattern='triangles'],
+.apex-layout[data-bg-pattern='triangles'],
+html[data-bg-pattern='circuits'],
+.apex-layout[data-bg-pattern='circuits'],
+html[data-bg-pattern='waves'],
+.apex-layout[data-bg-pattern='waves'] {
+  @include bg-pattern-base;
+  background-color: var(--bg-primary);
+  // background-image set by ThemeService.applySvgPattern()
+}
+
+// ============================================================================
+// GRADIENT / AURORA PATTERNS
+// ============================================================================
+
+@include pattern('aurora') {
+  background:
+    radial-gradient(ellipse at 20% 30%,
+      color-mix(in srgb, var(--accent-primary) calc(18% * var(--pattern-opacity, 1)), transparent) 0%,
+      transparent 55%),
+    radial-gradient(ellipse at 80% 70%,
+      color-mix(in srgb, var(--accent-secondary) calc(14% * var(--pattern-opacity, 1)), transparent) 0%,
+      transparent 55%),
+    var(--bg-primary);
+}
+
+@include pattern('gradient-mesh') {
+  background:
+    radial-gradient(at 0% 0%, color-mix(in srgb, var(--accent-primary) calc(15% * var(--pattern-opacity, 1)), transparent) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, color-mix(in srgb, var(--accent-secondary) calc(12% * var(--pattern-opacity, 1)), transparent) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, color-mix(in srgb, var(--accent-tertiary) calc(10% * var(--pattern-opacity, 1)), transparent) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, color-mix(in srgb, var(--accent-secondary) calc(13% * var(--pattern-opacity, 1)), transparent) 0px, transparent 50%),
+    var(--bg-primary);
+}
+
+@include pattern('sunset') {
+  background:
+    radial-gradient(ellipse at top left,
+      color-mix(in srgb, var(--accent-primary) calc(20% * var(--pattern-opacity, 1)), transparent) 0%,
+      transparent 60%),
+    radial-gradient(ellipse at bottom right,
+      color-mix(in srgb, var(--accent-tertiary) calc(15% * var(--pattern-opacity, 1)), transparent) 0%,
+      transparent 60%),
+    var(--bg-primary);
+}
+
+@include pattern('vignette') {
+  background:
+    radial-gradient(ellipse at center,
+      transparent 40%,
+      color-mix(in srgb, var(--accent-primary) calc(10% * var(--pattern-opacity, 1)), transparent) 100%),
+    var(--bg-primary);
+}
+
+// // ============================================================================
+// // APEX CRM — Background Pattern System
+// // All patterns use --theme-* CSS variables so they respond to theme changes.
+// // Applied via data-bg-pattern="<id>" on <html> and .apex-layout (body wrapper).
+// // ============================================================================
+
+// // ── Shared mixin ─────────────────────────────────────────────────────────────
+// @mixin bg-pattern-base {
+//   transition: background 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+// }
+
+// // Targets both <html> and a layout wrapper simultaneously
+// @mixin pattern-target {
+
+//   html[data-bg-pattern='#{$pattern-id}'],
+//   .apex-layout[data-bg-pattern='#{$pattern-id}'] {
+//     @content;
+//   }
+// }
+
+// // ── None (default — pure theme surface) ──────────────────────────────────────
+// html[data-bg-pattern='none'],
+// .apex-layout[data-bg-pattern='none'] {
+//   @include bg-pattern-base;
+//   background: var(--bg-primary);
+// }
+
+// // ============================================================================
+// // CSS GEOMETRIC PATTERNS
+// // ============================================================================
+
+// // Dots
+// $pattern-id: 'dots';
+
+// @include pattern-target {
+//   @include bg-pattern-base;
+//   background-color: var(--bg-primary);
+//   background-image: radial-gradient(circle,
+//       color-mix(in srgb, var(--accent-primary) 22%, transparent) 1.5px,
+//       transparent 1.5px);
+//   background-size: 20px 20px;
+// }
+
+// // Grid
+// $pattern-id: 'grid';
+
+// @include pattern-target {
+//   @include bg-pattern-base;
+//   background-color: var(--bg-primary);
+//   background-image:
+//     linear-gradient(color-mix(in srgb, var(--accent-primary) 10%, transparent) 1px,
+//       transparent 1px),
+//     linear-gradient(90deg,
+//       color-mix(in srgb, var(--accent-primary) 10%, transparent) 1px,
+//       transparent 1px);
+//   background-size: 24px 24px;
+// }
+
+// // Horizontal lines
+// $pattern-id: 'lines-h';
+
+// @include pattern-target {
+//   @include bg-pattern-base;
+//   background-color: var(--bg-primary);
+//   background-image: repeating-linear-gradient(0deg,
+//       transparent,
+//       transparent 22px,
+//       color-mix(in srgb, var(--accent-primary) 12%, transparent) 22px,
+//       color-mix(in srgb, var(--accent-primary) 12%, transparent) 23px);
+// }
+
+// // Diagonal stripes
+// $pattern-id: 'lines-d';
+
+// @include pattern-target {
+//   @include bg-pattern-base;
+//   background-color: var(--bg-primary);
+//   background-image: repeating-linear-gradient(45deg,
+//       transparent,
+//       transparent 16px,
+//       color-mix(in srgb, var(--accent-primary) 9%, transparent) 16px,
+//       color-mix(in srgb, var(--accent-primary) 9%, transparent) 17px);
+// }
+
+// // Crosshatch
+// $pattern-id: 'crosshatch';
+
+// @include pattern-target {
+//   @include bg-pattern-base;
+//   background-color: var(--bg-primary);
+//   background-image:
+//     repeating-linear-gradient(45deg,
+//       transparent,
+//       transparent 12px,
+//       color-mix(in srgb, var(--accent-primary) 8%, transparent) 12px,
+//       color-mix(in srgb, var(--accent-primary) 8%, transparent) 13px),
+//     repeating-linear-gradient(-45deg,
+//       transparent,
+//       transparent 12px,
+//       color-mix(in srgb, var(--accent-primary) 8%, transparent) 12px,
+//       color-mix(in srgb, var(--accent-primary) 8%, transparent) 13px);
+// }
+
+// // ============================================================================
+// // SVG-BASED PATTERNS (inline data URIs — theme color injected via JS)
+// // These are applied by ThemePatternService.applySvgPattern() at runtime.
+// // The SCSS here provides the base fallback; JS overrides background-image.
+// // ============================================================================
+
+// html[data-bg-pattern='hexagons'],
+// .apex-layout[data-bg-pattern='hexagons'] {
+//   @include bg-pattern-base;
+//   background-color: var(--bg-primary);
+//   // actual SVG injected by ThemePatternService using computed accent color
+// }
+
+// html[data-bg-pattern='triangles'],
+// .apex-layout[data-bg-pattern='triangles'] {
+//   @include bg-pattern-base;
+//   background-color: var(--bg-primary);
+// }
+
+// html[data-bg-pattern='circuits'],
+// .apex-layout[data-bg-pattern='circuits'] {
+//   @include bg-pattern-base;
+//   background-color: var(--bg-primary);
+// }
+
+// html[data-bg-pattern='waves'],
+// .apex-layout[data-bg-pattern='waves'] {
+//   @include bg-pattern-base;
+//   background-color: var(--bg-primary);
+// }
+
+// // ============================================================================
+// // GRADIENT / AURORA PATTERNS
+// // ============================================================================
+
+// // Aurora — two soft radial glows
+// $pattern-id: 'aurora';
+
+// @include pattern-target {
+//   @include bg-pattern-base;
+//   background:
+//     radial-gradient(ellipse at 20% 30%,
+//       color-mix(in srgb, var(--accent-primary) 18%, transparent) 0%,
+//       transparent 55%),
+//     radial-gradient(ellipse at 80% 70%,
+//       color-mix(in srgb, var(--accent-secondary) 14%, transparent) 0%,
+//       transparent 55%),
+//     var(--bg-primary);
+// }
+
+// // Gradient mesh — four-corner point gradient
+// $pattern-id: 'gradient-mesh';
+
+// @include pattern-target {
+//   @include bg-pattern-base;
+//   background:
+//     radial-gradient(at 0% 0%, color-mix(in srgb, var(--accent-primary) 15%, transparent) 0px, transparent 50%),
+//     radial-gradient(at 100% 0%, color-mix(in srgb, var(--accent-secondary) 12%, transparent) 0px, transparent 50%),
+//     radial-gradient(at 100% 100%, color-mix(in srgb, var(--accent-tertiary) 10%, transparent) 0px, transparent 50%),
+//     radial-gradient(at 0% 100%, color-mix(in srgb, var(--accent-secondary) 13%, transparent) 0px, transparent 50%),
+//     var(--bg-primary);
+// }
+
+// // Sunset — top-left / bottom-right diagonal glow
+// $pattern-id: 'sunset';
+
+// @include pattern-target {
+//   @include bg-pattern-base;
+//   background:
+//     radial-gradient(ellipse at top left,
+//       color-mix(in srgb, var(--accent-primary) 20%, transparent) 0%,
+//       transparent 60%),
+//     radial-gradient(ellipse at bottom right,
+//       color-mix(in srgb, var(--accent-tertiary) 15%, transparent) 0%,
+//       transparent 60%),
+//     var(--bg-primary);
+// }
+
+// // Vignette — subtle edge darkening with accent tint
+// $pattern-id: 'vignette';
+
+// @include pattern-target {
+//   @include bg-pattern-base;
+//   background:
+//     radial-gradient(ellipse at center,
+//       transparent 40%,
+//       color-mix(in srgb, var(--accent-primary) 10%, transparent) 100%),
+//     var(--bg-primary);
+// }

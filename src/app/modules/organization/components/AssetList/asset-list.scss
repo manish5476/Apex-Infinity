@@ -5,185 +5,25 @@
   overflow: hidden;
 }
 
-.list-page-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  border-radius: var(--radius-2xl);
-  padding: 0.75rem; /* Minimal padding for maximum grid size */
-  background-color: var(--bg-secondary);
-  gap: 1rem;
-}
+// Media Vault Header Stats
+.header-stats {
+  .stat-item {
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+    min-width: 120px;
 
-/* --- Header & Stats Specific to Asset List --- */
-.list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--spacing-xl);
-  padding: 0 0.5rem; /* Slight indent to align with the card below */
-
-  .title-section {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xl);
-
-    .icon-box {
-      width: 48px;
-      height: 48px;
-      background: var(--bg-primary);
-      border: var(--ui-border-width) solid var(--border-secondary);
-      border-radius: var(--ui-border-radius);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    &:hover {
+      transform: translateY(-1px);
       box-shadow: var(--shadow-sm);
-      
-      i {
-        font-size: var(--font-size-2xl);
-        color: var(--accent-primary);
-      }
-    }
-
-    .list-title {
-      margin: 0;
-      font-size: var(--font-size-2xl);
-      font-weight: var(--font-weight-bold);
-      color: var(--text-primary);
-    }
-
-    .list-subtitle {
-      margin: var(--spacing-xs) 0 0 0;
-      font-size: var(--font-size-sm);
-      color: var(--text-secondary);
     }
   }
 }
 
-.stats-grid {
-  display: flex;
-  gap: var(--spacing-xl);
-
-  .stat-card {
-    background: var(--bg-primary);
-    padding: var(--spacing-md) var(--spacing-lg);
-    border-radius: var(--ui-border-radius);
-    border: var(--ui-border-width) solid var(--border-secondary);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xl);
-    min-width: 160px;
-    box-shadow: var(--shadow-sm);
-
-    .stat-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: var(--ui-border-radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      
-      &.storage-icon {
-        background: var(--color-info-bg);
-        color: var(--color-info);
-      }
-      &.files-icon {
-        background: var(--color-success-bg);
-        color: var(--color-success);
-      }
-    }
-
-    .stat-details {
-      display: flex;
-      flex-direction: column;
-
-      .label {
-        font-size: var(--font-size-xs);
-        text-transform: uppercase;
-        color: var(--text-tertiary);
-        font-weight: var(--font-weight-bold);
-        letter-spacing: 0.5px;
-      }
-      .value {
-        font-size: var(--font-size-xl);
-        font-weight: var(--font-weight-bold);
-        color: var(--text-primary);
-        line-height: var(--line-height-tight);
-        
-        small {
-          font-size: var(--font-size-xs);
-          color: var(--text-secondary);
-        }
-      }
-    }
-  }
+// Ensure AG Grid fills the container correctly
+::ng-deep .ag-root-wrapper {
+  border: none !important;
 }
 
-/* --- Shared Layout Classes (Matches UserList) --- */
-.themed-card {
-  background: var(--bg-primary);
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
-  display: flex;
-  flex-direction: column;
-  flex: 1;
+// Scrollable area for grid
+.container-body {
   overflow: hidden;
-  padding: 1rem;
-  gap: 1rem;
-}
-
-.se-filter-bar {
-  display: flex;
-  gap: 1rem;
-  align-items: flex-end;
-  flex-shrink: 0;
-  flex-wrap: wrap;
-  width: 100%;
-
-  .se-filter-field {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    flex: 0 1 240px; 
-
-    &.search-field {
-      flex: 1;
-      max-width: 400px;
-    }
-
-    label {
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-    }
-  }
-
-  .se-filter-actions {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .se-filter-right {
-    margin-left: auto;
-    display: flex;
-    align-items: flex-end;
-  }
-}
-
-.list-grid-wrapper {
-  flex: 1;
-  width: 100%;
-  min-height: 0; 
-  border: 1px solid var(--border-secondary);
-  border-radius: 8px;
-  overflow: hidden;
-
-  app-ag-share-grid {
-    height: 100%;
-    width: 100%;
-    display: block;
-  }
 }

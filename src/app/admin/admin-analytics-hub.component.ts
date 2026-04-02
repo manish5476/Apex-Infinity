@@ -68,7 +68,7 @@ interface NavCategory {
     UnauthorizedComponent
   ],
   template: `
-    <div class="dash-root">
+    <div class=" dash-root">
 
       <!-- ══════════════════════════════════
            LEFT SIDEBAR — Category navigation

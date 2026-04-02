@@ -1,37 +1,149 @@
-
+/* ==========================================================================
+   1. IMPORTS & DEPENDENCIES
+   ========================================================================== */
 @use 'tailwindcss';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
 @import 'primeicons/primeicons.css';
-// @import 'leaflet/dist/leaflet.css;
-
 @import 'leaflet/dist/leaflet.css';
 
-/* In styles.scss */
+/* ==========================================================================
+   2. GLOBAL VARIABLES & OVERRIDES
+   ========================================================================== */
 :root {
-    --card-bg: var(--bg-primary);
+  /* Component Base Overrides */
+  --p-comp-height: 2rem;
+  --p-comp-padding-y: 0.3rem;
+
+  /* Global Card Tokens */
+  --card-bg: var(--bg-primary);
   --card-border: var(--ui-border-width) solid var(--border-primary);
   --card-shadow: var(--shadow-sm);
   --card-shadow-hover: var(--shadow-md);
   --card-radius: var(--ui-border-radius-xl);
   --card-padding: var(--spacing-xl);
-  --p-comp-height: 2rem;   
-  
-  /* Update padding to match the Preset */
-  --p-comp-padding-y: 0.3rem; 
+}
+
+/* Base Body settings to ensure fonts apply correctly globally */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--theme-bg-secondary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
 }
 
 /* ==========================================================================
-   CARD STYLES - Clean & Minimal
+   3. LAYOUT CONTAINERS
    ========================================================================== */
 
+/* Shared App Container (For main page wrappers, tables, etc.) */
+.app-container {
+  background: var(--bg-primary);
+  border-radius: var(--ui-border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+  /* Keeps border-radius clean */
+  transition: box-shadow var(--transition-base), border-color var(--transition-base);
 
-/* Base Card */
+  /* Interactive Hover State */
+  &.interactive-container:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-primary-light);
+  }
+
+  /* Header Section */
+  .container-header {
+    padding: var(--spacing-xl) var(--spacing-2xl);
+    border-bottom: 1px solid var(--border-secondary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+
+    .header-titles {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .container-title {
+      margin: 0;
+      font-family: var(--font-heading);
+      font-size: var(--font-size-xl);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .container-subtitle {
+      margin: 0;
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      flex-wrap: wrap;
+    }
+  }
+
+  /* Body Section */
+  .container-body {
+    padding: var(--spacing-2xl);
+    flex: 1;
+    overflow-y: auto;
+
+    &.no-padding {
+      padding: 0;
+    }
+  }
+
+  /* Footer Section */
+  .container-footer {
+    padding: var(--spacing-lg) var(--spacing-2xl);
+    border-top: 1px solid var(--border-secondary);
+    background: var(--bg-secondary);
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+  }
+
+  /* Mobile Responsiveness for App Container */
+  @media (max-width: 768px) {
+    border-radius: 0;
+
+    /* Often looks better edge-to-edge on mobile */
+    .container-header {
+      padding: var(--spacing-lg) var(--spacing-xl);
+    }
+
+    .container-body {
+      padding: var(--spacing-xl);
+    }
+
+    .container-footer {
+      padding: var(--spacing-lg) var(--spacing-xl);
+    }
+  }
+}
+
+/* ==========================================================================
+   4. UI COMPONENTS (Cards & Stats)
+   ========================================================================== */
+
+/* Premium Standard Card */
 .premium-card {
   background: var(--card-bg);
   border: var(--card-border);
   border-radius: var(--card-radius);
   box-shadow: var(--card-shadow);
-  transition: var(--transition-base);
+  transition: all var(--transition-base);
   overflow: hidden;
   height: 100%;
   display: flex;
@@ -46,7 +158,7 @@
     padding: var(--card-padding) var(--card-padding) calc(var(--card-padding) * 0.75);
     border-bottom: var(--ui-border-width) solid var(--border-primary);
     background: var(--bg-secondary);
-    font-weight: var(--font-weight-semibold);
+    font-weight: 600;
     color: var(--text-primary);
     display: flex;
     align-items: center;
@@ -67,13 +179,12 @@
     gap: var(--spacing-md);
   }
 
-  /* Compact variant */
+  /* Variants */
   &.compact {
     --card-padding: var(--spacing-lg);
     --card-radius: var(--ui-border-radius-lg);
   }
 
-  /* Borderless variant */
   &.borderless {
     border: none;
     box-shadow: none;
@@ -85,7 +196,6 @@
     }
   }
 
-  /* Interactive variant */
   &.interactive {
     cursor: pointer;
 
@@ -99,7 +209,7 @@
   }
 }
 
-/* Stat Card - for dashboard metrics */
+/* Dashboard Statistic Card */
 .stat-card {
   background: var(--card-bg);
   border: var(--card-border);
@@ -109,7 +219,9 @@
   align-items: center;
   gap: var(--spacing-lg);
   box-shadow: var(--shadow-sm);
-  transition: var(--transition-base);
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
 
   &:hover {
     box-shadow: var(--shadow-lg);
@@ -125,141 +237,316 @@
     align-items: center;
     justify-content: center;
     font-size: 24px;
+    flex-shrink: 0;
 
-    &.primary { background: var(--color-primary-bg); color: var(--color-primary); }
-    &.success { background: var(--color-success-bg); color: var(--color-success); }
-    &.info { background: var(--color-info-bg); color: var(--color-info); }
-    &.warning { background: var(--color-warning-bg); color: var(--color-warning); }
+    &.primary {
+      background: var(--color-primary-bg);
+      color: var(--color-primary);
+    }
+
+    &.success {
+      background: var(--color-success-bg);
+      color: var(--color-success);
+    }
+
+    &.info {
+      background: var(--color-info-bg);
+      color: var(--color-info);
+    }
+
+    &.warning {
+      background: var(--color-warning-bg);
+      color: var(--color-warning);
+    }
   }
 
   .stat-content {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    min-width: 0;
+    /* Helps truncate text if needed */
 
     .stat-label {
       font-size: var(--font-size-xs);
       color: var(--text-tertiary);
       text-transform: uppercase;
-      font-weight: var(--font-weight-semibold);
+      font-weight: 600;
       letter-spacing: 0.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .stat-value {
       font-size: var(--font-size-3xl);
-      font-weight: var(--font-weight-bold);
+      font-weight: 700;
       color: var(--text-primary);
       line-height: 1;
     }
   }
 
-  &.border-top-primary { border-top: 4px solid var(--color-primary); }
-  &.border-top-success { border-top: 4px solid var(--color-success); }
-  &.border-top-info { border-top: 4px solid var(--color-info); }
-}
-/* Add this to your main CSS file */
+  /* Top Border Accents */
+  &.border-top-primary {
+    border-top: 4px solid var(--color-primary);
+  }
 
-/* Option 1: For a very bold, vibrant gradient background using the accent colors */
+  &.border-top-success {
+    border-top: 4px solid var(--color-success);
+  }
+
+  &.border-top-info {
+    border-top: 4px solid var(--color-info);
+  }
+}
+
+/* ==========================================================================
+   5. SHARED FILTER PANEL (Grid/Table Headers)
+   ========================================================================== */
+// .app-filter-panel {
+//   display: flex;
+//   align-items: flex-end;
+//   gap: var(--spacing-xl);
+//   width: 100%;
+//   background: var(--bg-secondary);
+//   border: 1px solid var(--border-secondary);
+//   border-radius: var(--ui-border-radius-lg);
+//   padding: var(--spacing-xl);
+//   box-shadow: var(--shadow-xs);
+//   transition: box-shadow var(--transition-base);
+//   flex-wrap: wrap;
+
+//   &:hover {
+//     box-shadow: var(--shadow-sm);
+//   }
+.app-filter-panel {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--spacing-xl);
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--ui-border-radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-xs);
+  transition: box-shadow var(--transition-base);
+
+  /* Default behavior is to wrap */
+  flex-wrap: wrap;
+
+  /* === NEW: SINGLE ROW MODIFIER === */
+  &.single-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: var(--spacing-xl);
+    /* Extra padding so the scrollbar doesn't overlap inputs */
+
+    /* Thin desktop scrollbar */
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--border-secondary);
+      border-radius: var(--ui-border-radius-pill);
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: var(--text-tertiary);
+    }
+
+    .filter-field {
+      flex: 0 0 auto;
+      /* Don't grow or shrink wildly */
+      width: 180px;
+      /* Tighter width to fit more items on screen */
+    }
+
+    .filter-actions,
+    .filter-actions-right {
+      flex-shrink: 0;
+      /* Prevents buttons from getting squished */
+    }
+  }
+
+  /* ================================ */
+
+  &:hover {
+    box-shadow: var(--shadow-sm);
+  }
+
+  .filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    flex: 1 1 220px;
+    min-width: 200px;
+    max-width: 320px;
+
+    label {
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      color: var(--text-label);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+  }
+
+  .filter-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    align-items: flex-end;
+  }
+
+  .filter-actions-right {
+    margin-left: auto;
+    display: flex;
+    align-items: flex-end;
+    gap: var(--spacing-md);
+  }
+}
+
+/* Mobile Swipeable Filter Bar */
+@media (max-width: 768px) {
+  .app-filter-panel {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: var(--spacing-lg);
+    gap: var(--spacing-lg);
+
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--border-secondary);
+      border-radius: var(--ui-border-radius-pill);
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: var(--text-tertiary);
+    }
+
+    .filter-field {
+      flex: 0 0 220px;
+      max-width: none;
+    }
+
+    .filter-actions,
+    .filter-actions-right {
+      flex-shrink: 0;
+      margin-left: 0;
+    }
+
+    .filter-actions-right::after {
+      content: '';
+      padding-right: var(--spacing-md);
+    }
+  }
+}
+
+/* ==========================================================================
+   6. UTILITIES & BACKGROUND EFFECTS
+   ========================================================================== */
+
 .bg-theme-gradient {
   background-image: var(--theme-accent-gradient);
-  color: #ffffff; /* You might want white text if the background is a bold color */
+  color: #ffffff;
 }
 
-/* Option 2: For a soft, subtle gradient using the light background colors (Recommended for main app background) */
 .bg-theme-soft-gradient {
   background: linear-gradient(135deg, var(--theme-bg-primary) 0%, var(--theme-bg-ternary) 100%);
 }
+
+/* Animated Meteor Background Effect */
 .meteor {
   position: absolute;
   inset: 0;
-  /* Replaced hardcoded gray with your canonical background token */
-  background: var(--bg-primary); 
-  overflow: hidden; /* Recommended to contain the rotated ::before pseudo-element */
-}
+  background: var(--bg-primary);
+  overflow: hidden;
 
-.meteor::before {
-  content: "";
-  position: absolute;
-  inset: -145%;
-  rotate: -45deg;
-  background: transparent;
-  background-image: 
-    /* Primary Accent Lines (formerly Warm orange) */
-    radial-gradient(2px 80px at 0px 235px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
-    radial-gradient(2px 80px at 300px 235px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
-    radial-gradient(1px 1px at 150px 117.5px, color-mix(in srgb, var(--accent-primary) 30%, transparent) 100%, transparent 150%),
-    
-    /* Secondary/Info Lines (formerly purple-blue) */
-    radial-gradient(2px 80px at 0px 252px, color-mix(in srgb, var(--accent-secondary) 10%, transparent), transparent),
-    radial-gradient(2px 80px at 300px 252px, color-mix(in srgb, var(--color-info) 10%, transparent), transparent),
-    radial-gradient(1px 1px at 150px 126px, color-mix(in srgb, var(--accent-secondary) 20%, transparent) 100%, transparent 150%),
-    
-    /* Gentle Primary Accents (formerly gentle orange) */
-    radial-gradient(2px 80px at 0px 150px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
-    radial-gradient(2px 80px at 300px 150px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
-    radial-gradient(1px 1px at 150px 75px, color-mix(in srgb, var(--accent-primary) 30%, transparent) 100%, transparent 150%),
-    
-    /* Warning Tones (formerly warm yellow) */
-    radial-gradient(2px 80px at 0px 253px, color-mix(in srgb, var(--color-warning) 12%, transparent), transparent),
-    radial-gradient(2px 80px at 300px 253px, color-mix(in srgb, var(--color-warning) 12%, transparent), transparent),
-    radial-gradient(1px 1px at 150px 126.5px, color-mix(in srgb, var(--color-warning) 25%, transparent) 100%, transparent 150%),
-    
-    /* Deep Primary Tones (formerly earthy oranges) */
-    radial-gradient(2px 80px at 0px 204px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
-    radial-gradient(2px 80px at 300px 204px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
-    radial-gradient(1px 1px at 150px 102px, color-mix(in srgb, var(--accent-primary) 30%, transparent) 100%, transparent 150%),
-    
-    /* Soft Primary Hues (formerly soft orange) */
-    radial-gradient(2px 80px at 0px 134px, color-mix(in srgb, var(--accent-primary) 12%, transparent), transparent),
-    radial-gradient(2px 80px at 300px 134px, color-mix(in srgb, var(--accent-primary) 12%, transparent), transparent),
-    radial-gradient(1px 1px at 150px 67px, color-mix(in srgb, var(--accent-primary) 25%, transparent) 100%, transparent 150%),
-    
-    /* Amber/Warning Accents */
-    radial-gradient(2px 80px at 0px 179px, color-mix(in srgb, var(--color-warning) 15%, transparent), transparent),
-    radial-gradient(2px 80px at 300px 179px, color-mix(in srgb, var(--color-warning) 15%, transparent), transparent),
-    radial-gradient(1px 1px at 150px 89.5px, color-mix(in srgb, var(--color-warning) 30%, transparent) 100%, transparent 150%),
-    
-    /* Bright Accent Highlights */
-    radial-gradient(2px 80px at 0px 299px, color-mix(in srgb, var(--accent-primary) 10%, transparent), transparent),
-    radial-gradient(2px 80px at 300px 299px, color-mix(in srgb, var(--accent-primary) 10%, transparent), transparent),
-    radial-gradient(1px 1px at 150px 149.5px, color-mix(in srgb, var(--accent-primary) 20%, transparent) 100%, transparent 150%),
-    
-    /* Golden Tones */
-    radial-gradient(2px 80px at 0px 215px, color-mix(in srgb, var(--color-warning) 12%, transparent), transparent),
-    radial-gradient(2px 80px at 300px 215px, color-mix(in srgb, var(--color-warning) 12%, transparent), transparent),
-    radial-gradient(1px 1px at 150px 107.5px, color-mix(in srgb, var(--color-warning) 25%, transparent) 100%, transparent 150%),
-    
-    /* Sunset Colors (Mix of Error/Warning for vibrancy) */
-    radial-gradient(2px 80px at 0px 281px, color-mix(in srgb, var(--color-error) 10%, transparent), transparent),
-    radial-gradient(2px 80px at 300px 281px, color-mix(in srgb, var(--color-warning) 10%, transparent), transparent),
-    radial-gradient(1px 1px at 150px 140.5px, color-mix(in srgb, var(--color-error) 20%, transparent) 100%, transparent 150%),
-    
-    /* Soft Tertiary/Peach */
-    radial-gradient(2px 80px at 0px 158px, color-mix(in srgb, var(--accent-tertiary) 12%, transparent), transparent),
-    radial-gradient(2px 80px at 300px 158px, color-mix(in srgb, var(--accent-tertiary) 12%, transparent), transparent),
-    radial-gradient(1px 1px at 150px 79px, color-mix(in srgb, var(--accent-tertiary) 25%, transparent) 100%, transparent 150%),
-    
-    /* Final Primary Accents */
-    radial-gradient(2px 80px at 0px 210px, color-mix(in srgb, var(--accent-primary) 12%, transparent), transparent),
-    radial-gradient(2px 80px at 300px 210px, color-mix(in srgb, var(--accent-primary) 12%, transparent), transparent),
-    radial-gradient(1px 1px at 150px 105px, color-mix(in srgb, var(--accent-primary) 25%, transparent) 100%, transparent 150%);
-  
-  background-size:
-    300px 235px, 300px 235px, 300px 235px,
-    300px 252px, 300px 252px, 300px 252px,
-    300px 150px, 300px 150px, 300px 150px,
-    300px 253px, 300px 253px, 300px 253px,
-    300px 204px, 300px 204px, 300px 204px,
-    300px 134px, 300px 134px, 300px 134px,
-    300px 179px, 300px 179px, 300px 179px,
-    300px 299px, 300px 299px, 300px 299px,
-    300px 215px, 300px 215px, 300px 215px,
-    300px 281px, 300px 281px, 300px 281px,
-    300px 158px, 300px 158px, 300px 158px,
-    300px 210px, 300px 210px, 300px 210px;
-  
-  animation: gentleFloat 180s linear infinite;
-  opacity: 0.8;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -145%;
+    rotate: -45deg;
+    background: transparent;
+
+    /* Using color-mix to create dynamic, theme-aware animated streaks */
+    background-image:
+      radial-gradient(2px 80px at 0px 235px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
+      radial-gradient(2px 80px at 300px 235px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
+      radial-gradient(1px 1px at 150px 117.5px, color-mix(in srgb, var(--accent-primary) 30%, transparent) 100%, transparent 150%),
+      radial-gradient(2px 80px at 0px 252px, color-mix(in srgb, var(--accent-secondary) 10%, transparent), transparent),
+      radial-gradient(2px 80px at 300px 252px, color-mix(in srgb, var(--color-info) 10%, transparent), transparent),
+      radial-gradient(1px 1px at 150px 126px, color-mix(in srgb, var(--accent-secondary) 20%, transparent) 100%, transparent 150%),
+      radial-gradient(2px 80px at 0px 150px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
+      radial-gradient(2px 80px at 300px 150px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
+      radial-gradient(1px 1px at 150px 75px, color-mix(in srgb, var(--accent-primary) 30%, transparent) 100%, transparent 150%),
+      radial-gradient(2px 80px at 0px 253px, color-mix(in srgb, var(--color-warning) 12%, transparent), transparent),
+      radial-gradient(2px 80px at 300px 253px, color-mix(in srgb, var(--color-warning) 12%, transparent), transparent),
+      radial-gradient(1px 1px at 150px 126.5px, color-mix(in srgb, var(--color-warning) 25%, transparent) 100%, transparent 150%),
+      radial-gradient(2px 80px at 0px 204px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
+      radial-gradient(2px 80px at 300px 204px, color-mix(in srgb, var(--accent-primary) 15%, transparent), transparent),
+      radial-gradient(1px 1px at 150px 102px, color-mix(in srgb, var(--accent-primary) 30%, transparent) 100%, transparent 150%),
+      radial-gradient(2px 80px at 0px 134px, color-mix(in srgb, var(--accent-primary) 12%, transparent), transparent),
+      radial-gradient(2px 80px at 300px 134px, color-mix(in srgb, var(--accent-primary) 12%, transparent), transparent),
+      radial-gradient(1px 1px at 150px 67px, color-mix(in srgb, var(--accent-primary) 25%, transparent) 100%, transparent 150%),
+      radial-gradient(2px 80px at 0px 179px, color-mix(in srgb, var(--color-warning) 15%, transparent), transparent),
+      radial-gradient(2px 80px at 300px 179px, color-mix(in srgb, var(--color-warning) 15%, transparent), transparent),
+      radial-gradient(1px 1px at 150px 89.5px, color-mix(in srgb, var(--color-warning) 30%, transparent) 100%, transparent 150%),
+      radial-gradient(2px 80px at 0px 299px, color-mix(in srgb, var(--accent-primary) 10%, transparent), transparent),
+      radial-gradient(2px 80px at 300px 299px, color-mix(in srgb, var(--accent-primary) 10%, transparent), transparent),
+      radial-gradient(1px 1px at 150px 149.5px, color-mix(in srgb, var(--accent-primary) 20%, transparent) 100%, transparent 150%),
+      radial-gradient(2px 80px at 0px 215px, color-mix(in srgb, var(--color-warning) 12%, transparent), transparent),
+      radial-gradient(2px 80px at 300px 215px, color-mix(in srgb, var(--color-warning) 12%, transparent), transparent),
+      radial-gradient(1px 1px at 150px 107.5px, color-mix(in srgb, var(--color-warning) 25%, transparent) 100%, transparent 150%),
+      radial-gradient(2px 80px at 0px 281px, color-mix(in srgb, var(--color-error) 10%, transparent), transparent),
+      radial-gradient(2px 80px at 300px 281px, color-mix(in srgb, var(--color-warning) 10%, transparent), transparent),
+      radial-gradient(1px 1px at 150px 140.5px, color-mix(in srgb, var(--color-error) 20%, transparent) 100%, transparent 150%),
+      radial-gradient(2px 80px at 0px 158px, color-mix(in srgb, var(--accent-tertiary) 12%, transparent), transparent),
+      radial-gradient(2px 80px at 300px 158px, color-mix(in srgb, var(--accent-tertiary) 12%, transparent), transparent),
+      radial-gradient(1px 1px at 150px 79px, color-mix(in srgb, var(--accent-tertiary) 25%, transparent) 100%, transparent 150%),
+      radial-gradient(2px 80px at 0px 210px, color-mix(in srgb, var(--accent-primary) 12%, transparent), transparent),
+      radial-gradient(2px 80px at 300px 210px, color-mix(in srgb, var(--accent-primary) 12%, transparent), transparent),
+      radial-gradient(1px 1px at 150px 105px, color-mix(in srgb, var(--accent-primary) 25%, transparent) 100%, transparent 150%);
+
+    background-size:
+      300px 235px, 300px 235px, 300px 235px,
+      300px 252px, 300px 252px, 300px 252px,
+      300px 150px, 300px 150px, 300px 150px,
+      300px 253px, 300px 253px, 300px 253px,
+      300px 204px, 300px 204px, 300px 204px,
+      300px 134px, 300px 134px, 300px 134px,
+      300px 179px, 300px 179px, 300px 179px,
+      300px 299px, 300px 299px, 300px 299px,
+      300px 215px, 300px 215px, 300px 215px,
+      300px 281px, 300px 281px, 300px 281px,
+      300px 158px, 300px 158px, 300px 158px,
+      300px 210px, 300px 210px, 300px 210px;
+
+    animation: gentleFloat 180s linear infinite;
+    opacity: 0.8;
+  }
+
+  /* Fade Overlay for Depth */
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--bg-secondary) 40%, transparent) 0%, transparent 80%);
+    pointer-events: none;
+  }
 }
 
 @keyframes gentleFloat {
@@ -278,6 +565,7 @@
       250px 26px, 253px 26px, 401.5px 105px,
       275px 75px, 278px 75px, 426.5px 180px;
   }
+
   to {
     background-position:
       0px 6800px, 3px 6800px, 151.5px 6917.5px,
@@ -295,12 +583,305 @@
   }
 }
 
-/* Updated overlay to be theme-aware (works in Light and Dark mode) */
-.meteor::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  /* Uses your secondary background color with a radial gradient fade */
-  background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--bg-secondary) 40%, transparent) 0%, transparent 80%);
-  pointer-events: none;
+/* ==========================================================================
+   PRIME-NG DYNAMIC DIALOG CUSTOMIZATION (Using Theme Tokens)
+   ========================================================================== */
+
+/* 1. Backdrop Styling (Slight blur, darker background) */
+.app-dialog-mask {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: fadeInMask 0.2s ease-out;
+}
+
+@keyframes fadeInMask {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+
+  to {
+    opacity: 1;
+    backdrop-filter: blur(4px);
+  }
+}
+
+/* 2. Main Dialog Window */
+.app-dialog {
+  background: var(--bg-primary) !important;
+  border: 1px solid var(--border-secondary) !important;
+  border-radius: var(--ui-border-radius-xl) !important;
+  box-shadow: var(--shadow-3xl) !important;
+  overflow: hidden;
+  /* Ensures headers/footers respect the border-radius */
+  transform: translateY(0);
+  animation: slideUpFade 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* The Header Bar */
+  .p-dialog-header {
+    background: var(--bg-secondary) !important;
+    border-bottom: 1px solid var(--border-secondary) !important;
+    padding: var(--spacing-lg) var(--spacing-2xl) !important;
+
+    .p-dialog-title {
+      font-family: var(--font-heading);
+      font-size: var(--font-size-lg);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* Window Controls (Close, Maximize) */
+    .p-dialog-header-icons {
+      display: flex;
+      gap: var(--spacing-sm);
+
+      button {
+        background: transparent;
+        color: var(--text-secondary);
+        border: none;
+        border-radius: var(--ui-border-radius);
+        width: 32px;
+        height: 32px;
+        transition: all var(--transition-base);
+
+        &:hover {
+          background: var(--color-error-bg);
+          /* Use error tint for close hover */
+          color: var(--color-error-dark);
+        }
+
+        &:focus {
+          box-shadow: 0 0 0 2px var(--color-primary-bg);
+        }
+
+        /* Specific style for Maximize button */
+        &.p-dialog-header-maximize:hover {
+          background: var(--color-primary-bg);
+          color: var(--color-primary);
+        }
+      }
+    }
+  }
+
+  /* The Body Content */
+  .p-dialog-content {
+    background: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    /* Note: padding is controlled dynamically via the service's contentStyle */
+  }
+
+  /* The Footer (if you use p-template="footer" inside your components) */
+  .p-dialog-footer {
+    background: var(--bg-secondary) !important;
+    border-top: 1px solid var(--border-secondary) !important;
+    padding: var(--spacing-lg) var(--spacing-2xl) !important;
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-md);
+  }
+}
+
+/* 3. Enterprise Variant Adjustments (For massive grids) */
+.enterprise-dialog {
+  border-radius: calc(var(--ui-border-radius-xl) * 1.5) !important;
+
+  /* When maxmized, drop the border radius to fill screen perfectly */
+  &.p-dialog-maximized {
+    border-radius: 0 !important;
+    border: none !important;
+  }
+}
+
+/* Entry Animation */
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// ==========================================================================
+// _mixins.scss — Shared Component Mixins
+// ==========================================================================
+
+
+// ── Icon Alignment (fixes all PrimeNG icon misalignment) ──────────────────
+// Use on any element that contains a .p-icon, svg, or i tag alongside text
+@mixin icon-host {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  line-height: 1;
+
+  .p-icon,
+  svg {
+    display: block;
+    flex-shrink: 0;
+    width: var(--icon-base);
+    height: var(--icon-base);
+    fill: currentColor;
+  }
+}
+
+// ── Base input reset ────────────────────────────────────────────────────────
+@mixin input-reset {
+  appearance: none;
+  -webkit-appearance: none;
+  box-sizing: border-box;
+  margin: 0;
+  outline: none;
+}
+
+// ── Input base ──────────────────────────────────────────────────────────────
+@mixin input-base {
+  @include input-reset;
+  display: block;
+  width: 100%;
+  height: var(--input-height-md);
+  padding: 0 var(--space-8);
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-normal);
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+
+  &::placeholder {
+    color: var(--text-tertiary);
+  }
+
+  &:hover:not(:disabled):not(:focus) {
+    border-color: color-mix(in srgb, var(--border-primary) 100%, var(--text-primary) 10%);
+  }
+
+  &:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+  }
+
+  &:disabled {
+    background: var(--bg-secondary);
+    color: var(--text-disabled);
+    border-color: var(--border-secondary);
+    cursor: not-allowed;
+    opacity: var(--state-disabled-opacity);
+  }
+}
+
+// ── Overlay/dropdown panel ─────────────────────────────────────────────────
+@mixin overlay-panel {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+// ── List item (dropdown options, menu items) ─────────────────────────────
+@mixin list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: 0 var(--space-6);
+  height: 32px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-md);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  white-space: nowrap;
+  user-select: none;
+
+  .p-icon,
+  svg {
+    width: var(--icon-base);
+    height: var(--icon-base);
+    flex-shrink: 0;
+    display: block;
+  }
+
+  &:hover:not(.p-disabled):not(.p-highlight) {
+    background: var(--state-hover-bg);
+  }
+
+  &.p-highlight {
+    background: var(--accent-subtle);
+    color: var(--accent-primary);
+    font-weight: var(--font-weight-medium);
+  }
+
+  &.p-disabled {
+    opacity: var(--state-disabled-opacity);
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+// ── Icon-only action button (close, toggle, etc.) ──────────────────────────
+@mixin icon-button($size: 28px) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: $size;
+  height: $size;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  outline: none;
+
+  .p-icon,
+  svg {
+    width: var(--icon-base);
+    height: var(--icon-base);
+    display: block;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: var(--state-hover-bg);
+    color: var(--text-primary);
+  }
+
+  &:active {
+    background: var(--state-active-bg);
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+  }
+}
+
+// ── Invalid state modifier ───────────────────────────────────────────────
+@mixin invalid-state {
+  border-color: var(--color-error) !important;
+
+  &:focus {
+    box-shadow: 0 0 0 var(--focus-ring-width) rgba(220, 38, 38, 0.20) !important;
+  }
+}
+
+// ── Feedback severity ────────────────────────────────────────────────────
+@mixin severity($bg, $border, $text) {
+  background: $bg;
+  border-color: $border;
+  color: $text;
+
+  .p-message-icon,
+  .p-toast-message-icon {
+    color: $text;
+    width: var(--icon-lg);
+    height: var(--icon-lg);
+  }
 }

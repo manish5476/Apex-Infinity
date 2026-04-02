@@ -214,7 +214,7 @@ import { error } from 'console';
                     </div>
                     
                     <div class="mock-timeline flex-col gap-sm">
-                      <div class="timeline-item bg-primary-light border-radius-md p-md flex-between border-1 border-solid border-primary">
+                      <div class="timeline-item bg-primary-light border-radius-md p-md flex-between manish-border-1 border-solid border-primary">
                         <div class="flex-col gap-xs">
                           <span class="font-bold text-primary">Mukesh Singh</span>
                           <span class="text-xs font-mono text-secondary">12 Oct 2026</span>
@@ -222,7 +222,7 @@ import { error } from 'console';
                         <p-tag value="Morning Shift"></p-tag>
                       </div>
                       
-                      <div class="timeline-item bg-primary border-radius-md p-md flex-between border-1 border-solid border-secondary">
+                      <div class="timeline-item bg-primary border-radius-md p-md flex-between manish-border-1 border-solid border-secondary">
                         <div class="flex-col gap-xs">
                           <span class="font-bold text-primary">Sarah Jenkins</span>
                           <span class="text-xs font-mono text-secondary">12 Oct 2026</span>
@@ -380,7 +380,7 @@ import { error } from 'console';
     .border-top-subtle { border-top: 1px solid var(--border-secondary); }
     .border-bottom-subtle { border-bottom: 1px solid var(--border-secondary); }
     .border-success-subtle { border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent); }
-    .border-1 { border-width: 1px; }
+    .manish-border-1 { border-width: 1px; }
     .border-solid { border-style: solid; }
     .border-primary { border-color: var(--border-primary); }
     .border-secondary { border-color: var(--border-secondary); }

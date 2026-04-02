@@ -1,60 +1,72 @@
-<div class="list-page-container">
+<p-toast></p-toast>
 
-  <div class="themed-card">
-    <div class="se-filter-bar">
+<div class="app-container h-full">
 
-      <div class="se-filter-field">
-        <label for="invoice">Invoice No</label>
-        <div class="p-input-icon-left w-full">
-          <!-- <i class="pi pi-search"></i> -->
-          <input id="invoice" type="text" pInputText [(ngModel)]="purchaseFilter.invoiceNumber"
-            (keydown.enter)="applyFilters()" placeholder="Search Invoice" class="w-full"/>
-        </div>
+  <!-- Standard Header -->
+  <div class="container-header">
+    <div class="flex align-center gap-3">
+      <div class="icon-box bg-primary-light text-primary border-round p-2 flex align-center justify-center">
+        <i class="pi pi-shopping-cart text-xl"></i>
       </div>
-
-      <div class="se-filter-field">
-        <label for="supplier">Supplier</label>
-        <p-select appendTo="body" id="supplier" [options]="supplierOptions()" [(ngModel)]="purchaseFilter.supplierId"
-          (onChange)="applyFilters()" optionLabel="companyName" optionValue="_id" [showClear]="true" 
-          placeholder="Select Supplier" [filter]="true" filterBy="companyName" styleClass="w-full">
-        </p-select>
-
+      <div class="header-titles">
+        <h2 class="container-title">Purchase Register</h2>
+        <p class="container-subtitle">Manage purchase orders, track supplier invoices, and inventory intake.</p>
       </div>
+    </div>
 
-      <div class="se-filter-field" style="min-width: 220px;">
-        <label for="dateRange">Date Range</label>
-        <p-datepicker id="dateRange" [(ngModel)]="purchaseFilter.dateRange" (onSelect)="applyFilters()"
-          selectionMode="range" [readonlyInput]="true" placeholder="Select Range" appendTo="body" 
-          dateFormat="dd/mm/yy" [showIcon]="true" styleClass="w-full" inputStyleClass="w-full">
-        </p-datepicker>
-      </div>
-
-      <div class="se-filter-field">
-        <label for="status">Order Status</label>
-        <p-select appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="purchaseFilter.status"
-          (onChange)="applyFilters()" [showClear]="true" placeholder="Any Status" [filter]="true" filterBy="label" styleClass="w-full">
-        </p-select>
-
-      </div>
-
-      <div class="se-filter-actions">
-        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary" (onClick)="resetFilters()"></p-button>
-      </div>
-
-      <div class="se-filter-right">
-        <p-button *hasPermission="PERMISSIONS.PURCHASE.CREATE" label="New Purchase" icon="pi pi-plus" routerLink="create" styleClass="p-button-primary"></p-button>
-      </div>
+    <div class="header-actions">
+      <p-button *hasPermission="PERMISSIONS.PURCHASE.CREATE" label="New Purchase" icon="pi pi-plus" routerLink="create"
+        styleClass="p-button-primary">
+      </p-button>
     </div>
   </div>
 
-  <div class="list-grid-area themed-card grow-grid">
-    <app-ag-share-grid 
-      [columns]="column" 
-      [data]="data" 
-      [actionColumn]="purchaseActionColumn"
-      selectionMode="multiple"
-      (gridEvent)="eventFromGrid($event)">
-    </app-ag-share-grid>
-  </div>
+  <div class="container-body flex flex-col h-full gap-4">
 
-</div>
+    <div class="app-filter-panel">
+
+      <div class="filter-field">
+        <label for="invoice">Invoice No</label>
+        <input id="invoice" type="text" pInputText [(ngModel)]="purchaseFilter.invoiceNumber"
+          (keydown.enter)="applyFilters()" placeholder="Search Invoice" class="w-full" />
+      </div>
+
+      <div class="filter-field">
+        <label for="supplier">Supplier</label>
+        <p-select appendTo="body" id="supplier" [options]="supplierOptions()" [(ngModel)]="purchaseFilter.supplierId"
+          (onChange)="applyFilters()" optionLabel="companyName" optionValue="_id" [showClear]="true"
+          placeholder="Select Supplier" [filter]="true" filterBy="companyName" styleClass="w-full">
+        </p-select>
+      </div>
+
+      <div class="filter-field" style="min-width: 220px;">
+        <label for="dateRange">Date Range</label>
+        <p-datepicker id="dateRange" [(ngModel)]="purchaseFilter.dateRange" (onSelect)="applyFilters()"
+          selectionMode="range" [readonlyInput]="true" placeholder="Select Range" appendTo="body" dateFormat="dd/mm/yy"
+          [showIcon]="true" styleClass="w-full" inputStyleClass="w-full">
+        </p-datepicker>
+      </div>
+
+      <div class="filter-field">
+        <label for="status">Order Status</label>
+        <p-select appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="purchaseFilter.status"
+          (onChange)="applyFilters()" [showClear]="true" placeholder="Any Status" [filter]="true" filterBy="label"
+          styleClass="w-full">
+        </p-select>
+      </div>
+
+      <div class="filter-actions">
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary"
+          (onClick)="resetFilters()"></p-button>
+      </div>
+
+    </div>
+
+    <div class="flex-1 min-h-0 manish-border-1 border-secondary border-round overflow-hidden">
+      <app-ag-share-grid [columns]="column" [data]="data" [actionColumn]="purchaseActionColumn" selectionMode="multiple"
+        (gridEvent)="eventFromGrid($event)" style="height: 100%; width: 100%; display: block;">
+      </app-ag-share-grid>
+    </div>
+
+  </div>
+</div>

@@ -95,7 +95,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
         
         @if (stats(); as s) {
           <div class="grid-3 mb-4xl slide-down">
-            <div class="kpi-card glass-inset p-xl border-radius-lg border-1 border-solid border-secondary border-left-success">
+            <div class="kpi-card glass-inset p-xl border-radius-lg manish-border-1 border-solid border-secondary border-left-success">
               <span class="text-xs text-tertiary uppercase font-bold tracking-widest">Present Today</span>
               <div class="flex align-items-baseline gap-sm mt-md">
                 <span class="text-4xl font-heading font-bold text-success line-height-none">{{ s.presentCount || 0 }}</span>
@@ -103,7 +103,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
               </div>
             </div>
             
-            <div class="kpi-card glass-inset p-xl border-radius-lg border-1 border-solid border-secondary border-left-warning">
+            <div class="kpi-card glass-inset p-xl border-radius-lg manish-border-1 border-solid border-secondary border-left-warning">
               <span class="text-xs text-tertiary uppercase font-bold tracking-widest">Anomalies / Flagged</span>
               <div class="flex align-items-baseline gap-sm mt-md">
                 <span class="text-4xl font-heading font-bold color-warning line-height-none">{{ s.flaggedCount || 0 }}</span>
@@ -111,7 +111,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
               </div>
             </div>
             
-            <div class="kpi-card glass-inset p-xl border-radius-lg border-1 border-solid border-secondary border-left-primary">
+            <div class="kpi-card glass-inset p-xl border-radius-lg manish-border-1 border-solid border-secondary border-left-primary">
               <span class="text-xs text-tertiary uppercase font-bold tracking-widest">Remote / Web Punches</span>
               <div class="flex align-items-baseline gap-sm mt-md">
                 <span class="text-4xl font-heading font-bold text-primary line-height-none">{{ s.remoteCount || 0 }}</span>
@@ -317,7 +317,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
     
     .border-top-subtle { border-top: 1px solid var(--border-secondary); }
     .border-bottom-subtle { border-bottom: 1px solid var(--border-secondary); }
-    .border-1 { border-width: 1px; }
+    .manish-border-1 { border-width: 1px; }
     .border-solid { border-style: solid; }
     .border-secondary { border-color: var(--border-secondary); }
     
@@ -785,7 +785,7 @@ export class AdminAttendanceComponent implements OnInit {
 //             [rows]="15" 
 //             [globalFilterFields]="['user.name', 'type', 'source', 'processingStatus']"
 //             responsiveLayout="scroll"
-//             styleClass="premium-table border-round-xl border-1 surface-border">
+//             styleClass="premium-table border-round-xl manish-border-1 surface-border">
             
 //             <ng-template pTemplate="caption">
 //               <div class="table-toolbar flex-between p-4 bg-surface border-bottom">
@@ -933,7 +933,7 @@ export class AdminAttendanceComponent implements OnInit {
     
 //     .border-top { border-top: 1px solid var(--border-primary); }
 //     .border-bottom { border-bottom: 1px solid var(--border-primary); }
-//     .border-1 { border: 1px solid; }
+//     .manish-border-1 { border: 1px solid; }
 //     .surface-border { border-color: var(--border-primary); }
 //     .border-round-xl { border-radius: var(--radius-2xl); }
     

@@ -31,6 +31,8 @@ export class Signup implements OnInit {
   private messageService = inject(AppMessageService);
 
   isLoading = signal(false);
+  successMessage = signal<string | null>(null);
+  errorMessage = signal<string | null>(null);
   focusedField = signal<string | null>(null);
   // Track current step for the multi-step progress indicator
   currentStep = signal(1);
@@ -88,6 +90,9 @@ export class Signup implements OnInit {
     }
 
     this.isLoading.set(true);
+    this.successMessage.set(null);
+    this.errorMessage.set(null);
+
     const { passwordConfirm, terms, ...payload } = this.signupForm.value;
     if (payload.uniqueShopId) {
       payload.uniqueShopId = payload.uniqueShopId.toUpperCase();
@@ -96,11 +101,15 @@ export class Signup implements OnInit {
     this.authService.employeeSignup(payload).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.messageService.showSuccess('Account created! Welcome to Apex.');
+        const msg = 'Account created! Welcome to Apex.';
+        this.successMessage.set(msg);
+        this.messageService.showSuccess(msg);
         this.router.navigateByUrl('/dashboard');
       },
       error: (err) => {
         this.isLoading.set(false);
+        const msg = err.error?.message || 'Failed to create account. Please try again.';
+        this.errorMessage.set(msg);
         this.messageService.handleHttpError(err);
       }
     });

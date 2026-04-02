@@ -656,7 +656,7 @@ export class EmployeeAttendanceComponent implements OnInit, OnDestroy {
 //                 </span>
 //               </ng-template>
 //               <ng-template pTemplate="content" let-log>
-//                 <div class="p-3 bg-surface border-radius-md mb-3 border-1 surface-border">
+//                 <div class="p-3 bg-surface border-radius-md mb-3 manish-border-1 surface-border">
 //                   <div class="flex-between mb-1">
 //                     <span class="font-bold text-primary-color capitalize">{{ formatType(log.type) }}</span>
 //                     <span class="font-mono text-sm text-secondary font-bold">{{ log.timestamp | date:'HH:mm:ss' }}</span>
@@ -722,7 +722,7 @@ export class EmployeeAttendanceComponent implements OnInit, OnDestroy {
 //     .bg-primary-light { background: var(--color-primary-bg); }
 //     .border-bottom { border-bottom: 1px solid var(--border-primary); }
 //     .border-right { border-right: 1px solid var(--border-primary); }
-//     .border-1 { border: 1px solid; }
+//     .manish-border-1 { border: 1px solid; }
 //     .surface-border { border-color: var(--border-primary); }
 //     .border-radius-md { border-radius: var(--ui-border-radius-md); }
     

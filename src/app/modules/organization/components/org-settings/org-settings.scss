@@ -1,3 +1,5 @@
+@use '../../../auth/auth.shared' as *;
+
 /* ==========================================================================
    1. ROOT VARIABLES (Local Scope based on your Global Tokens)
    ========================================================================== */
@@ -289,16 +291,17 @@
     .span-2 { grid-column: span 2; }
   }
 
-  .form-group {
+  .field-group {
     display: flex;
     flex-direction: column;
     gap: 6px;
 
-    label {
+    .field-label {
       font-size: 0.75rem;
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
-      color: var(--text-secondary);
+      color: var(--text-label);
+      letter-spacing: 0.05em;
     }
   }
 

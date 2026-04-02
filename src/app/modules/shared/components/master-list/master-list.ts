@@ -196,7 +196,7 @@ export class MasterList implements OnInit {
 
   // --- Signals ---
   masters = signal<Master[]>([]);
-  bulkData = signal<Master[]>([]); 
+  bulkData = signal<Master[]>([]);
   selectedRows = signal<Master[]>([]);
   loading = signal(false);
   isBulkEditing = signal(false);
@@ -240,7 +240,7 @@ export class MasterList implements OnInit {
       cellConfig: { type: 'text', placeholder: 'Enter Name (Required)' }
     },
     {
-      field: 'imageUrl', 
+      field: 'imageUrl',
       headerName: 'Image URL',
       width: 150,
       cellConfig: { type: 'text', placeholder: 'https://example.com/img.png' }
@@ -258,11 +258,11 @@ export class MasterList implements OnInit {
       cellConfig: { type: 'boolean' }
     },
     {
-      field: 'metadata.isFeatured', 
+      field: 'metadata.isFeatured',
       headerName: 'Featured',
       width: 90,
       valueGetter: (p) => p.data?.metadata?.isFeatured,
-      cellConfig: { type: 'boolean' } 
+      cellConfig: { type: 'boolean' }
     },
     {
       field: 'description',
@@ -273,7 +273,7 @@ export class MasterList implements OnInit {
   ];
 
   constructor() {
-    effect(() => {});
+    effect(() => { });
   }
 
   ngOnInit() {
@@ -302,7 +302,7 @@ export class MasterList implements OnInit {
       case 'init':
         this.gridApi = event.api;
         break;
-      
+
       case 'selectionChanged':
         if (event.rows) {
           this.selectedRows.set(event.rows);
@@ -330,7 +330,7 @@ export class MasterList implements OnInit {
           this.handleBulkUpdate(event.rows);
         }
         break;
-        
+
       // Handle Bulk Delete (Triggered by grid)
       case 'bulkDelete':
         if (event.rows) {
@@ -360,7 +360,7 @@ export class MasterList implements OnInit {
       this.masterService.createMaster(payload).subscribe({
         next: () => {
           this.appMessage.showSuccess('Master created successfully');
-          this.loadMasters(); 
+          this.loadMasters();
         },
         error: (err) => this.appMessage.handleHttpError(err)
       });
@@ -393,7 +393,7 @@ export class MasterList implements OnInit {
   toggleBulkEdit() {
     this.isBulkEditing.set(true);
     // Call grid method to enable edit mode for selected rows
-    this.mainGrid.enableBulkEdit(); 
+    this.mainGrid.enableBulkEdit();
   }
 
   cancelBulkEdit() {
@@ -409,8 +409,8 @@ export class MasterList implements OnInit {
   handleBulkUpdate(rows: Master[]) {
     // Prepare items for API
     const items = rows.map(r => ({
-       _id: r._id,
-       ...this.preparePayload(r)
+      _id: r._id,
+      ...this.preparePayload(r)
     }));
 
     this.loading.set(true);
@@ -440,23 +440,23 @@ export class MasterList implements OnInit {
       acceptButtonStyleClass: 'p-button-danger p-button-text',
       accept: () => {
         // Trigger grid method to remove from UI and emit 'bulkDelete'
-        this.mainGrid.deleteSelected(); 
+        this.mainGrid.deleteSelected();
       }
     });
   }
 
   handleBulkDelete(rows: Master[]) {
     const ids = rows.map(m => m._id).filter(id => !id.startsWith('new_'));
-    
+
     if (ids.length === 0) return;
 
     this.loading.set(true);
     this.masterService.bulkDeleteMasters(ids).subscribe({
       next: (res) => {
         this.appMessage.showSuccess(res.message || 'Items deleted');
-        this.selectedRows.set([]); 
+        this.selectedRows.set([]);
         this.loading.set(false);
-            this.loadMasters();
+        this.loadMasters();
 
         // UI is already updated by grid
       },
@@ -471,7 +471,7 @@ export class MasterList implements OnInit {
 
   openBulkDialog() {
     const initialRows = Array.from({ length: 5 }, () => this.createEmptyMaster());
-    this.bulkData.set(initialRows); 
+    this.bulkData.set(initialRows);
     this.isBulkDialogVisible = true;
   }
 
@@ -493,9 +493,9 @@ export class MasterList implements OnInit {
 
   saveBulkImport() {
     if (!this.bulkGrid) return;
-        if (this.bulkGridApi) this.bulkGridApi.stopEditing();
+    if (this.bulkGridApi) this.bulkGridApi.stopEditing();
     const validItems: any[] = [];
-    
+
     this.bulkGridApi.forEachNode((node: any) => {
       const data = node.data;
       if (!data) return;
@@ -506,7 +506,7 @@ export class MasterList implements OnInit {
       if (name && name.trim() !== '' && type) {
         const payload = this.preparePayload(data);
         if (!payload.slug) {
-           payload['slug'] = this.generateSlug(payload.name);
+          payload['slug'] = this.generateSlug(payload.name);
         }
         validItems.push(payload);
       }
@@ -518,16 +518,16 @@ export class MasterList implements OnInit {
     }
 
     this.isBulkSaving = true;
-    
+
     this.masterService.createBulkMasters(validItems).subscribe({
       next: (res) => {
         if (res.status === 'partial_success') {
-           this.appMessage.showWarn('Partial Import. Check duplicates.');
+          this.appMessage.showWarn('Partial Import. Check duplicates.');
         } else {
-           this.appMessage.showSuccess(`${validItems.length} items imported successfully`);
+          this.appMessage.showSuccess(`${validItems.length} items imported successfully`);
         }
         this.isBulkDialogVisible = false;
-        this.loadMasters(); 
+        this.loadMasters();
       },
       error: (err) => this.appMessage.handleHttpError(err),
       complete: () => this.isBulkSaving = false
@@ -547,11 +547,11 @@ export class MasterList implements OnInit {
     return {
       _id: tempId,
       _tempId: tempId, // Match grid expectation
-      type: 'category', 
+      type: 'category',
       name: '',
       code: '',
       description: '',
-      imageUrl: '', 
+      imageUrl: '',
       isActive: true,
       metadata: { isFeatured: false, sortOrder: 0 },
     };

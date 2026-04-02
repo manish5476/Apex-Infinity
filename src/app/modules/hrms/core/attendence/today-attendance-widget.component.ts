@@ -52,7 +52,7 @@ import { HRMSService } from '../../hrms.service';
                 <p-tag [severity]="getStatusSeverity(data.status)" [value]="(data.status || 'UNKNOWN') | uppercase"></p-tag>
               </div>
 
-              <div class="grid-2 glass-inset border-radius-md p-md border-1 border-solid border-secondary">
+              <div class="grid-2 glass-inset border-radius-md p-md manish-border-1 border-solid border-secondary">
                 <div class="flex-col border-right-subtle pr-md">
                   <span class="text-xs text-tertiary font-medium">First In</span>
                   <div class="flex align-items-baseline gap-xs mt-1">
@@ -86,7 +86,7 @@ import { HRMSService } from '../../hrms.service';
             </div>
             
           } @else {
-            <div class="flex-col flex-center text-center py-3xl text-tertiary border-1 border-dashed border-secondary border-radius-md mt-sm">
+            <div class="flex-col flex-center text-center py-3xl text-tertiary manish-border-1 border-dashed border-secondary border-radius-md mt-sm">
               <i class="pi pi-inbox text-3xl mb-sm"></i>
               <span class="text-sm font-medium">No records for today.</span>
             </div>
@@ -171,7 +171,7 @@ import { HRMSService } from '../../hrms.service';
     .border-top-subtle { border-top: 1px solid var(--border-secondary); }
     .border-bottom-subtle { border-bottom: 1px solid var(--border-secondary); }
     .border-right-subtle { border-right: 1px solid var(--border-secondary); }
-    .border-1 { border-width: 1px; }
+    .manish-border-1 { border-width: 1px; }
     .border-solid { border-style: solid; }
     .border-dashed { border-style: dashed; }
     .border-secondary { border-color: var(--border-secondary); }
@@ -255,7 +255,7 @@ export class TodayAttendanceWidgetComponent implements OnInit {
 //             <p-tag [severity]="getStatusSeverity(data.status)" [value]="data.status | uppercase" styleClass="text-xs"></p-tag>
 //           </div>
 
-//           <div class="grid-2 bg-surface border-radius-md p-3 border-1 surface-border mt-1">
+//           <div class="grid-2 bg-surface border-radius-md p-3 manish-border-1 surface-border mt-1">
 //             <div class="flex-col border-right pr-2">
 //               <span class="text-xs text-tertiary">First In</span>
 //               <span class="font-mono font-bold text-primary-color text-lg">{{ data.firstIn ? (data.firstIn | date:'HH:mm') : '--:--' }}</span>
@@ -314,7 +314,7 @@ export class TodayAttendanceWidgetComponent implements OnInit {
 //     .border-bottom { border-bottom: 1px solid var(--border-primary); }
 //     .border-top { border-top: 1px dashed var(--border-secondary); }
 //     .border-right { border-right: 1px solid var(--border-primary); }
-//     .border-1 { border: 1px solid; }
+//     .manish-border-1 { border: 1px solid; }
 //     .surface-border { border-color: var(--border-primary); }
 //     .border-radius-md { border-radius: var(--ui-border-radius-md); }
     

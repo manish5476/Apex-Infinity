@@ -84,7 +84,7 @@ import { AppMessageService } from '@core/services/message.service';
             </p-card>
           </div>
 
-          <p-card styleClass="premium-card bg-surface border-1 surface-border h-full">
+          <p-card styleClass="premium-card bg-surface manish-border-1 surface-border h-full">
             <div class="flex-between mb-3 border-bottom pb-2">
               <h3 class="m-0 text-primary-color font-heading text-lg"><i class="pi pi-bell text-warning mr-2"></i> Approaching Next</h3>
             </div>
@@ -117,7 +117,7 @@ import { AppMessageService } from '@core/services/message.service';
             [rows]="15" 
             [globalFilterFields]="['name', 'holidayType']"
             responsiveLayout="scroll"
-            styleClass="premium-table border-round-xl border-1 surface-border">
+            styleClass="premium-table border-round-xl manish-border-1 surface-border">
             
             <ng-template pTemplate="caption">
               <div class="flex-between p-3 bg-surface border-bottom">
@@ -271,7 +271,7 @@ import { AppMessageService } from '@core/services/message.service';
     .border-bottom { border-bottom: 1px solid var(--border-primary); }
     .border-top { border-top: 1px solid var(--border-primary); }
     .border-right { border-right: 1px solid var(--border-primary); }
-    .border-1 { border: 1px solid; }
+    .manish-border-1 { border: 1px solid; }
     .surface-border { border-color: var(--border-primary); }
     .border-radius-md { border-radius: var(--ui-border-radius-md); }
     .border-left-primary { border-left: 4px solid var(--color-primary) !important; }

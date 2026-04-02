@@ -1,90 +1,82 @@
 <p-toast></p-toast>
 
-<div class="list-page-container">
+<div class="app-container h-full">
 
-  <div class="list-header">
-    <div class="title-section">
-      <div class="icon-box">
-        <i class="pi pi-receipt"></i>
+  <div class="container-header">
+    <div class="flex align-center gap-3">
+      <div class="icon-box bg-primary-light text-primary border-round p-2 flex align-center justify-center">
+        <i class="pi pi-receipt text-xl"></i>
       </div>
-      <div class="text-content">
-        <h2 class="list-title">Invoices</h2>
-        <p class="list-subtitle">Manage billing, track payments, and export reports.</p>
+      <div class="header-titles">
+        <h2 class="container-title">Invoices</h2>
+        <p class="container-subtitle">Manage billing, track payments, and export reports.</p>
       </div>
     </div>
 
-    <div class="flex gap-2">
-      <p-button *hasPermission="PERMISSIONS.INVOICE.EXPORT" label="Export CSV" icon="pi pi-download" styleClass="p-button-outlined p-button-secondary"
-        [loading]="isExporting" (onClick)="exportReport()">
+    <div class="header-actions">
+      <p-button *hasPermission="PERMISSIONS.INVOICE.EXPORT" label="Export CSV" icon="pi pi-download"
+        styleClass="p-button-outlined p-button-secondary" [loading]="isExporting" (onClick)="exportReport()">
       </p-button>
 
-      <p-button *hasPermission="PERMISSIONS.INVOICE.CREATE" label="New Invoice" icon="pi pi-plus" routerLink="create" styleClass="p-button-primary">
+      <p-button *hasPermission="PERMISSIONS.INVOICE.CREATE" label="New Invoice" icon="pi pi-plus" routerLink="create"
+        styleClass="p-button-primary">
       </p-button>
     </div>
   </div>
 
-  <div class="themed-card">
-    
-    <div class="se-filter-bar">
+  <div class="container-body flex flex-col h-full gap-4">
 
-      <div class="se-filter-field" style="min-width: 220px;">
+    <div class="app-filter-panel">
+
+      <div class="filter-field" style="min-width: 220px;">
         <label for="dateRange">Date Range</label>
         <p-datepicker [(ngModel)]="dateRange" selectionMode="range" [readonlyInput]="true" placeholder="Start - End"
-          [showIcon]="true" inputId="dateRange" appendTo="body" (onClose)="applyFilters()" 
-          styleClass="w-full" inputStyleClass="w-full">
+          [showIcon]="true" inputId="dateRange" appendTo="body" (onClose)="applyFilters()" styleClass="w-full"
+          inputStyleClass="w-full">
         </p-datepicker>
       </div>
 
-      <div class="se-filter-field">
+      <div class="filter-field">
         <label for="invoiceNumber">Invoice Number</label>
-        <div class="p-input-icon-left w-full">
-          <!-- <i class="pi pi-search"></i> -->
-          <input id="invoiceNumber" type="text" pInputText [(ngModel)]="invoiceFilter.invoiceNumber"
-            placeholder="Search number" (keydown.enter)="applyFilters()" class="w-full" />
-        </div>
+        <input id="invoiceNumber" type="text" pInputText [(ngModel)]="invoiceFilter.invoiceNumber"
+          placeholder="Search number" (keydown.enter)="applyFilters()" class="w-full" />
       </div>
 
-      <div class="se-filter-field">
+      <div class="filter-field">
         <label for="customer">Customer</label>
-        <p-select appendTo="body" appendTo="body" appendTo="body" id="customer" [options]="customerOptions()" [(ngModel)]="invoiceFilter.customerId"
+        <p-select appendTo="body" id="customer" [options]="customerOptions()" [(ngModel)]="invoiceFilter.customerId"
           [filter]="true" filterBy="name" optionLabel="name" optionValue="_id" [showClear]="true"
           placeholder="All Customers" (onChange)="applyFilters()" styleClass="w-full">
         </p-select>
       </div>
 
-      <div class="se-filter-field">
+      <div class="filter-field">
         <label for="status">Status</label>
-        <p-select appendTo="body" appendTo="body" appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="invoiceFilter.status"
-          [showClear]="true" placeholder="All Status" (onChange)="applyFilters()" styleClass="w-full"
-          [filter]="true" filterBy="label">
+        <p-select appendTo="body" id="status" [options]="statusOptions" [(ngModel)]="invoiceFilter.status"
+          [showClear]="true" placeholder="All Status" (onChange)="applyFilters()" styleClass="w-full" [filter]="true"
+          filterBy="label">
         </p-select>
-
       </div>
 
-      <div class="se-filter-field">
+      <div class="filter-field">
         <label for="paymentStatus">Payment</label>
-        <p-select appendTo="body" appendTo="body" appendTo="body" id="paymentStatus" [options]="paymentStatusOptions"
+        <p-select appendTo="body" id="paymentStatus" [options]="paymentStatusOptions"
           [(ngModel)]="invoiceFilter.paymentStatus" [showClear]="true" placeholder="All Payments"
           (onChange)="applyFilters()" styleClass="w-full" [filter]="true" filterBy="label">
         </p-select>
-
       </div>
 
-      <div class="se-filter-actions">
+      <div class="filter-actions">
         <p-button label="Apply" icon="pi pi-check" (onClick)="applyFilters()"></p-button>
-        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary" (onClick)="resetFilters()">
-        </p-button>
+        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary"
+          (onClick)="resetFilters()"></p-button>
       </div>
+
     </div>
 
-    <div class="list-grid-area">
-      <app-ag-share-grid 
-        [columns]="column" 
-        [data]="data" 
-        [actionColumn]="invoiceActionColumn"
-        selectionMode="multiple"
-        (gridEvent)="eventFromGrid($event)" 
-        style="height: 100%; width: 100%; display: block;">
+    <div class="flex-1 min-h-0 manish-border-1 border-secondary border-round overflow-hidden">
+      <app-ag-share-grid [columns]="column" [data]="data" [actionColumn]="invoiceActionColumn" selectionMode="multiple"
+        (gridEvent)="eventFromGrid($event)" style="height: 100%; width: 100%; display: block;">
       </app-ag-share-grid>
     </div>
 

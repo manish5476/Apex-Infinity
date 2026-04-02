@@ -93,7 +93,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
             <p-tabpanel value="0">
               <div class="panel-content p-xl flex-col h-full">
                 
-                <div class="filter-bar bg-secondary p-xl border-radius-lg border-1 border-solid border-secondary mb-xl flex align-items-end gap-xl flex-wrap">
+                <div class="filter-bar bg-secondary p-xl border-radius-lg manish-border-1 border-solid border-secondary mb-xl flex align-items-end gap-xl flex-wrap">
                   <div class="input-group flex-col gap-xs">
                     <label class="info-label text-xs font-bold text-tertiary uppercase tracking-widest">Date Range</label>
                     <p-datepicker 
@@ -147,7 +147,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
                   </div>
                 </div>
 
-                <div class="grid-wrapper border-radius-lg border-1 border-solid border-primary overflow-hidden w-full flex-grow-1" style="min-height: 550px;">
+                <div class="grid-wrapper border-radius-lg manish-border-1 border-solid border-primary overflow-hidden w-full flex-grow-1" style="min-height: 550px;">
                   <app-ag-share-grid 
                     [columns]="attendanceColumns" 
                     [data]="attendanceReportData()"
@@ -162,7 +162,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
             <p-tabpanel value="1">
               <div class="panel-content p-xl bg-secondary h-full flex-col">
                 
-                <div class="filter-bar glass-inset p-xl border-radius-lg border-1 border-solid border-secondary mb-xl flex align-items-end gap-xl flex-wrap">
+                <div class="filter-bar glass-inset p-xl border-radius-lg manish-border-1 border-solid border-secondary mb-xl flex align-items-end gap-xl flex-wrap">
                   <div class="input-group flex-col gap-xs">
                     <label class="info-label text-xs font-bold text-primary uppercase tracking-widest">Financial Year</label>
                     <p-select 
@@ -185,11 +185,11 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
 
                 @if (leaveReportSummary(); as summary) {
                   <div class="grid-2 mb-xl">
-                    <div class="glass-inset p-xl border-radius-lg border-1 border-solid border-secondary border-top-primary">
+                    <div class="glass-inset p-xl border-radius-lg manish-border-1 border-solid border-secondary border-top-primary">
                       <span class="text-xs text-tertiary uppercase font-bold tracking-widest">Total Employees</span>
                       <div class="text-3xl font-heading font-bold text-primary mt-sm">{{ summary.totalEmployees }}</div>
                     </div>
-                    <div class="glass-inset p-xl border-radius-lg border-1 border-solid border-secondary border-top-warning">
+                    <div class="glass-inset p-xl border-radius-lg manish-border-1 border-solid border-secondary border-top-warning">
                       <span class="text-xs text-tertiary uppercase font-bold tracking-widest">Total Enterprise Liability</span>
                       <div class="text-3xl font-heading font-bold color-warning mt-sm">{{ summary.totalLeaveBalance }} Days</div>
                     </div>
@@ -204,7 +204,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
                   </p-iconField>
                 </div>
 
-                <div class="grid-wrapper border-radius-lg border-1 border-solid border-primary overflow-hidden w-full flex-grow-1" style="min-height: 450px;">
+                <div class="grid-wrapper border-radius-lg manish-border-1 border-solid border-primary overflow-hidden w-full flex-grow-1" style="min-height: 450px;">
                   <app-ag-share-grid 
                     [columns]="leaveColumns" 
                     [data]="leaveReportData()"
@@ -228,7 +228,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
       [draggable]="false"
       styleClass="glass-panel border-radius-xl shadow-xl">
       
-      <div class="flex align-items-start gap-md mb-xl p-md bg-secondary border-radius-md border-1 border-solid border-secondary">
+      <div class="flex align-items-start gap-md mb-xl p-md bg-secondary border-radius-md manish-border-1 border-solid border-secondary">
         <i class="pi pi-info-circle text-primary text-xl mt-1"></i>
         <p class="m-0 text-sm text-secondary line-height-relaxed">You are about to override the daily status for <strong class="text-primary">{{ selectedRecords.length }}</strong> selected records.</p>
       </div>
@@ -292,7 +292,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
           </div>
         } @else if (dailyDetails(); as details) {
           
-          <div class="glass-inset p-xl border-radius-lg border-1 border-solid border-secondary flex-between mb-4xl">
+          <div class="glass-inset p-xl border-radius-lg manish-border-1 border-solid border-secondary flex-between mb-4xl">
             <div class="flex-col gap-xs">
               <span class="text-xs text-tertiary uppercase font-bold tracking-widest">{{ details.date | date:'EEEE, dd MMM yyyy' }}</span>
               <span class="font-heading font-bold text-2xl text-primary">{{ details.user?.name }}</span>
@@ -329,7 +329,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
             </div>
           </div>
 
-          <div class="bg-primary-light p-xl border-radius-lg border-1 border-solid border-primary mt-auto">
+          <div class="bg-primary-light p-xl border-radius-lg manish-border-1 border-solid border-primary mt-auto">
             <div class="flex-between mb-sm">
               <span class="text-md font-bold text-primary">Gross Work Hours</span>
               <span class="font-mono font-bold text-primary">{{ details.totalWorkHours }}h</span>
@@ -453,7 +453,7 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
     .border-top-primary { border-top: 2px solid var(--color-primary); }
     .border-top-warning { border-top: 2px solid var(--color-warning); }
     
-    .border-1 { border-width: 1px; }
+    .manish-border-1 { border-width: 1px; }
     .border-solid { border-style: solid; }
     .border-primary { border-color: var(--border-primary); }
     .border-secondary { border-color: var(--border-secondary); }
@@ -918,7 +918,7 @@ export class AttendanceReportsComponent implements OnInit {
 //             <p-tabpanel value="0">
 //               <div class="panel-content p-xl">
                 
-//                 <div class="filter-bar bg-secondary p-xl border-radius-lg border-1 border-solid border-secondary mb-4xl flex align-items-end gap-xl flex-wrap">
+//                 <div class="filter-bar bg-secondary p-xl border-radius-lg manish-border-1 border-solid border-secondary mb-4xl flex align-items-end gap-xl flex-wrap">
 //                   <div class="input-group flex-col gap-xs">
 //                     <label class="info-label text-xs font-bold text-tertiary uppercase tracking-widest">Date Range</label>
 //                     <p-datepicker 
@@ -964,7 +964,7 @@ export class AttendanceReportsComponent implements OnInit {
 //                   </div>
 //                 </div>
 
-//                 <div class="border-radius-xl border-1 border-solid border-primary overflow-hidden shadow-sm">
+//                 <div class="border-radius-xl manish-border-1 border-solid border-primary overflow-hidden shadow-sm">
 //                   <p-table 
 //                     [value]="attendanceReportData()" 
 //                     [(selection)]="selectedRecords" 
@@ -1029,7 +1029,7 @@ export class AttendanceReportsComponent implements OnInit {
 //             <p-tabpanel value="1">
 //               <div class="panel-content p-xl bg-secondary min-h-screen">
                 
-//                 <div class="filter-bar glass-inset p-xl border-radius-lg border-1 border-solid border-secondary mb-4xl flex align-items-end gap-xl flex-wrap">
+//                 <div class="filter-bar glass-inset p-xl border-radius-lg manish-border-1 border-solid border-secondary mb-4xl flex align-items-end gap-xl flex-wrap">
 //                   <div class="input-group flex-col gap-xs">
 //                     <label class="info-label text-xs font-bold text-primary uppercase tracking-widest">Financial Year</label>
 //                     <p-select 
@@ -1047,7 +1047,7 @@ export class AttendanceReportsComponent implements OnInit {
 //                   </p-button>
 //                 </div>
 
-//                 <div class="border-radius-xl border-1 border-solid border-primary overflow-hidden shadow-sm">
+//                 <div class="border-radius-xl manish-border-1 border-solid border-primary overflow-hidden shadow-sm">
 //                   <p-table 
 //                     [value]="leaveReportData()" 
 //                     [paginator]="true" 
@@ -1104,7 +1104,7 @@ export class AttendanceReportsComponent implements OnInit {
 //       [draggable]="false"
 //       styleClass="glass-panel border-radius-xl shadow-xl">
       
-//       <div class="flex align-items-start gap-md mb-xl p-md bg-secondary border-radius-md border-1 border-solid border-secondary">
+//       <div class="flex align-items-start gap-md mb-xl p-md bg-secondary border-radius-md manish-border-1 border-solid border-secondary">
 //         <i class="pi pi-info-circle text-primary text-xl mt-1"></i>
 //         <p class="m-0 text-sm text-secondary line-height-relaxed">You are about to override the daily status for <strong class="text-primary">{{ selectedRecords.length }}</strong> selected records.</p>
 //       </div>
@@ -1165,7 +1165,7 @@ export class AttendanceReportsComponent implements OnInit {
 //           </div>
 //         } @else if (dailyDetails(); as details) {
           
-//           <div class="glass-inset p-xl border-radius-lg border-1 border-solid border-secondary flex-between mb-4xl">
+//           <div class="glass-inset p-xl border-radius-lg manish-border-1 border-solid border-secondary flex-between mb-4xl">
 //             <div class="flex-col gap-xs">
 //               <span class="text-xs text-tertiary uppercase font-bold tracking-widest">{{ details.date | date:'EEEE, dd MMM yyyy' }}</span>
 //               <span class="font-heading font-bold text-2xl text-primary">{{ details.user?.name }}</span>
@@ -1202,7 +1202,7 @@ export class AttendanceReportsComponent implements OnInit {
 //             </div>
 //           </div>
 
-//           <div class="bg-primary-light p-xl border-radius-lg border-1 border-solid border-primary mt-auto">
+//           <div class="bg-primary-light p-xl border-radius-lg manish-border-1 border-solid border-primary mt-auto">
 //             <div class="flex-between mb-sm">
 //               <span class="text-md font-bold text-primary">Gross Work Hours</span>
 //               <span class="font-mono font-bold text-primary">{{ details.totalWorkHours }}h</span>
@@ -1330,7 +1330,7 @@ export class AttendanceReportsComponent implements OnInit {
 //     .border-bottom-subtle { border-bottom: 1px solid var(--border-secondary); }
 //     .border-bottom-primary { border-bottom: 2px solid var(--border-primary); }
 //     .border-top-primary { border-top: 2px solid var(--border-primary); }
-//     .border-1 { border-width: 1px; }
+//     .manish-border-1 { border-width: 1px; }
 //     .border-solid { border-style: solid; }
 //     .border-primary { border-color: var(--border-primary); }
 //     .border-secondary { border-color: var(--border-secondary); }
@@ -1573,7 +1573,7 @@ export class AttendanceReportsComponent implements OnInit {
 // //             <p-tabpanel value="0">
 // //               <div class="panel-inner p-4">
                 
-// //                 <div class="filter-bar bg-surface p-3 border-radius-md border-1 surface-border mb-4 flex-align gap-4 flex-wrap">
+// //                 <div class="filter-bar bg-surface p-3 border-radius-md manish-border-1 surface-border mb-4 flex-align gap-4 flex-wrap">
 // //                   <div class="input-group">
 // //                     <label class="info-label">Date Range</label>
 // //                     <p-datepicker [(ngModel)]="dateRange" selectionMode="range" [readonlyInput]="true" [showIcon]="true" placeholder="Select Range" styleClass="premium-datepicker"></p-datepicker>
@@ -1605,7 +1605,7 @@ export class AttendanceReportsComponent implements OnInit {
 // //                   [paginator]="true" 
 // //                   [rows]="10" 
 // //                   responsiveLayout="scroll"
-// //                   styleClass="premium-table border-round-xl border-1 surface-border">
+// //                   styleClass="premium-table border-round-xl manish-border-1 surface-border">
                   
 // //                   <ng-template pTemplate="header">
 // //                     <tr>
@@ -1653,7 +1653,7 @@ export class AttendanceReportsComponent implements OnInit {
 
 // //             <p-tabpanel value="1">
 // //               <div class="panel-inner p-4 bg-surface h-full">
-// //                  <div class="filter-bar bg-primary-light p-3 border-radius-md border-1 surface-border mb-4 flex-align gap-4">
+// //                  <div class="filter-bar bg-primary-light p-3 border-radius-md manish-border-1 surface-border mb-4 flex-align gap-4">
 // //                   <div class="input-group">
 // //                     <label class="info-label text-primary">Financial Year</label>
 // //                     <p-select [options]="financialYears" [(ngModel)]="selectedFy" styleClass="premium-select"></p-select>
@@ -1665,7 +1665,7 @@ export class AttendanceReportsComponent implements OnInit {
 // //                   [value]="leaveReportData()" 
 // //                   [paginator]="true" 
 // //                   [rows]="10" 
-// //                   styleClass="premium-table border-round-xl border-1 surface-border bg-primary">
+// //                   styleClass="premium-table border-round-xl manish-border-1 surface-border bg-primary">
 // //                   <ng-template pTemplate="header">
 // //                     <tr>
 // //                       <th>Employee</th>
@@ -1727,7 +1727,7 @@ export class AttendanceReportsComponent implements OnInit {
 // //       } @else if (dailyDetails(); as details) {
 // //         <div class="inspection-content flex-col gap-4 mt-2">
           
-// //           <div class="bg-surface p-4 border-radius-md border-1 surface-border flex-between">
+// //           <div class="bg-surface p-4 border-radius-md manish-border-1 surface-border flex-between">
 // //             <div class="flex-col gap-1">
 // //               <span class="text-xs text-tertiary uppercase font-bold">{{ details.date | date:'EEEE, dd MMM yyyy' }}</span>
 // //               <span class="font-bold text-lg text-primary-color">{{ details.user?.name }}</span>
@@ -1807,7 +1807,7 @@ export class AttendanceReportsComponent implements OnInit {
 // //     .bg-primary-light { background: var(--color-primary-bg, #eff6ff); }
 // //     .border-top { border-top: 1px solid var(--border-primary); }
 // //     .border-bottom { border-bottom: 1px solid var(--border-primary); }
-// //     .border-1 { border: 1px solid; }
+// //     .manish-border-1 { border: 1px solid; }
 // //     .surface-border { border-color: var(--border-primary); }
 // //     .border-radius-md { border-radius: var(--ui-border-radius-md); }
     

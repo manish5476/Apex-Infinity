@@ -1,37 +1,39 @@
 <p-toast></p-toast>
 
-<div class="txn-container">
+<div class="app-container h-full">
 
-  <div class="txn-header">
-    <div class="title-section">
-      <div class="icon-box">
-        <i class="pi pi-arrow-right-arrow-left"></i>
+  <!-- Standard Header -->
+  <div class="container-header">
+    <div class="flex align-center gap-3">
+      <div class="icon-box bg-primary-light text-primary border-round p-2 flex align-center justify-center">
+        <i class="pi pi-arrow-right-arrow-left text-xl"></i>
       </div>
-      <div class="text-content">
-        <h2>Transactions</h2>
-        <p>Real-time log of all financial movements.</p>
+      <div class="header-titles">
+        <h2 class="container-title">Transactions</h2>
+        <p class="container-subtitle">Real-time log of all financial movements.</p>
       </div>
     </div>
 
-    <div class="actions-section">
+    <div class="header-actions">
       <div class="p-buttongroup mode-toggle">
         <button pButton label="All" 
-          [ngClass]="viewMode() === 'all' ? 'active-mode' : 'p-button-text'"
+          [ngClass]="viewMode() === 'all' ? 'p-button-primary' : 'p-button-outlined p-button-secondary'"
           (click)="toggleViewMode('all')"></button>
         <button pButton label="My Entries" 
-          [ngClass]="viewMode() === 'mine' ? 'active-mode' : 'p-button-text'"
+          [ngClass]="viewMode() === 'mine' ? 'p-button-primary' : 'p-button-outlined p-button-secondary'"
           (click)="toggleViewMode('mine')"></button>
       </div>
 
-      <button pButton label="Export" icon="pi pi-download" class="p-button-outlined p-button-secondary btn-sm" 
-        (click)="downloadCsv()">
-      </button>
+      <p-button label="Export" icon="pi pi-download" styleClass="p-button-outlined p-button-secondary" 
+        (onClick)="downloadCsv()">
+      </p-button>
     </div>
   </div>
 
-  <div class="txn-card">
+  <div class="container-body flex flex-col h-full gap-4">
 
-    <div class="filter-bar">
+    <div class="app-filter-panel">
+
       <div class="filter-field">
         <label>Date Period</label>
         <p-datepicker [(ngModel)]="rangeDates" selectionMode="range" [readonlyInput]="true" placeholder="Start - End"
@@ -47,23 +49,20 @@
         </p-select>
       </div>
 
-
-      <div class="filter-field search-field">
+      <div class="filter-field search-field" style="flex: 2">
         <label>Search</label>
-        <span class="p-input-icon-left w-full">
-          <i class="pi pi-search"></i>
-          <input type="text" placeholder="Party Name, Ref #..." [(ngModel)]="filterParams.search"
-            (keydown.enter)="applyFilters()" pInputText class="w-full" />
-        </span>
+        <input type="text" placeholder="Party Name, Ref #..." [(ngModel)]="filterParams.search"
+          (keydown.enter)="applyFilters()" pInputText class="w-full" />
       </div>
 
       <div class="filter-actions">
-        <button pButton icon="pi pi-filter-slash" class="p-button-text p-button-rounded p-button-secondary" 
-          pTooltip="Reset Filters" (click)="resetFilters()"></button>
+        <p-button icon="pi pi-filter-slash" styleClass="p-button-text p-button-rounded p-button-secondary" 
+          pTooltip="Reset Filters" (onClick)="resetFilters()"></p-button>
       </div>
+
     </div>
 
-    <div class="grid-wrapper">
+    <div class="flex-1 min-h-0 manish-border-1 border-secondary border-round overflow-hidden">
       <app-ag-share-grid 
         [columns]="column" 
         [data]="data" 
