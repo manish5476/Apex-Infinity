@@ -791,7 +791,7 @@ export class CommonMethodService {
       errors
     };
   }
-allThemes: Theme[] = [
+allThemes:any= [
   // ───────────────────────────────────────────────
   // LIGHT THEMES
   // ───────────────────────────────────────────────
