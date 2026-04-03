@@ -1,0 +1,32 @@
+<div class="editor-shell" [class.focused]="isFocused()">
+
+  <!-- Toolbar -->
+  <div class="editor-toolbar">
+    @for (tool of tools; track tool.id) {
+      <button
+        type="button"
+        class="tool-btn"
+        [title]="tool.label"
+        (click)="tool.action()"
+        [attr.aria-label]="tool.label">
+        <span class="tool-glyph">{{ tool.icon }}</span>
+      </button>
+    }
+  </div>
+
+  <!-- Textarea -->
+  <textarea
+    #editorRef
+    class="editor-textarea"
+    [placeholder]="placeholder"
+    [style.min-height]="minHeight"
+    [value]="value()"
+    (input)="onInput($event)"
+    (focus)="onFocus()"
+    (blur)="onBlur()"
+    spellcheck="true"
+    autocomplete="off"
+    autocorrect="on"
+  ></textarea>
+
+</div>
