@@ -62,7 +62,8 @@
 
       <div class="header-actions">
         <button pButton label="Transactions" icon="pi pi-list" class="p-button-outlined p-button-secondary" (click)="showTransactionsDialog = true"></button>
-        <button *hasPermission="PERMISSIONS.CUSTOMER.UPDATE" pButton label="Edit Profile" icon="pi pi-user-edit" class="p-button-outlined p-button-secondary" [routerLink]="['../../customer/create']" [queryParams]="{id: c._id}"></button>
+        <button *hasPermission="PERMISSIONS.CUSTOMER.UPDATE" pButton label="Edit" icon="pi pi-user-edit" class="p-button-outlined p-button-secondary" [routerLink]="['../../customer/create']" [queryParams]="{id: c._id}"></button>
+        <button *hasPermission="PERMISSIONS.CUSTOMER.DELETE" pButton label="Delete" icon="pi pi-trash" class="p-button-outlined p-button-danger" (click)="confirmDelete()"></button>
         <button *hasPermission="PERMISSIONS.INVOICE.CREATE" pButton label="New Invoice" icon="pi pi-plus" class="p-button-primary" routerLink="/invoices/create" [queryParams]="{customerId: c._id}"></button>
       </div>
     </header>
@@ -76,10 +77,9 @@
           <div class="avatar-wrapper">
             <p-avatar [appImageViewer]="c.avatar" [image]="c.avatar" [label]="!c.avatar ? common.getInitials(c.name) : ''" size="xlarge" shape="circle" styleClass="user-avatar"></p-avatar>
             
-            <button *hasPermission="PERMISSIONS.CUSTOMER.UPDATE" class="edit-avatar-btn" (click)="fileInput.click()" title="Change Photo">
+            <button *hasPermission="PERMISSIONS.CUSTOMER.UPDATE" class="edit-avatar-btn" (click)="openPhotoUpload()" title="Change Photo">
               <i class="pi pi-camera"></i>
             </button>
-            <input #fileInput type="file" accept="image/*" style="display: none" (change)="onFileSelected($event)">
             
             <div class="status-dot" [class.active]="c.isActive"></div>
           </div>

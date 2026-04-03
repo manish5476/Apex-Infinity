@@ -1,4 +1,5 @@
 <p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
 
 <div class="app-container h-full">
 
@@ -15,6 +16,17 @@
     </div>
 
     <div class="header-actions">
+      @if (selectedRows && selectedRows.length === 1) {
+        <p-button *hasPermission="PERMISSIONS.CUSTOMER.UPDATE" 
+          label="Upload Photo" icon="pi pi-camera" 
+          styleClass="p-button-outlined p-button-info mr-2" 
+          (onClick)="openPhotoUpload()">
+        </p-button>
+      }
+
+      <p-button label="Bulk Import" icon="pi pi-upload" 
+        styleClass="p-button-outlined p-button-secondary mr-2" (onClick)="openBulkImport()">
+      </p-button>
       <p-button *hasPermission="PERMISSIONS.CUSTOMER.CREATE" label="New Customer" icon="pi pi-plus" routerLink="create"
         styleClass="p-button-primary">
       </p-button>

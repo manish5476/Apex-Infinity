@@ -11,6 +11,8 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
+import { SelectModule } from 'primeng/select';
+import { InputTextModule } from 'primeng/inputtext';
 
 // Shared
 import { SessionService } from '../../services/session.service';
@@ -30,8 +32,9 @@ import { AppMessageService } from '@core/services/message.service';
     TagModule,
     ToastModule,
     ConfirmDialogModule,
-    TooltipModule,
-    AgShareGrid
+    AgShareGrid,
+    SelectModule,
+    InputTextModule,
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './sessions.html',
@@ -55,6 +58,30 @@ export class Sessions implements OnInit {
   // --- View State ---
   viewMode = signal<'all' | 'mine'>('all');
 
+  // --- Filter State ---
+  filter = signal({
+    search: '',
+    os: null,
+    browser: null
+  });
+
+  // --- Options ---
+  osOptions = [
+    { label: 'Windows', value: 'Windows' },
+    { label: 'macOS', value: 'Mac OS X' },
+    { label: 'Linux', value: 'Linux' },
+    { label: 'iOS', value: 'iOS' },
+    { label: 'Android', value: 'Android' }
+  ];
+
+  browserOptions = [
+    { label: 'Chrome', value: 'Chrome' },
+    { label: 'Safari', value: 'Safari' },
+    { label: 'Firefox', value: 'Firefox' },
+    { label: 'Edge', value: 'Edge' },
+    { label: 'Opera', value: 'Opera' }
+  ];
+
   // --- Dialog State ---
   displayDialog: boolean = false;
   selectedSession: any = null;
@@ -68,10 +95,19 @@ export class Sessions implements OnInit {
 
   // --- Data Loading ---
   loadData() {
+    this.isLoading.set(true);
     this.data = [];
+    
+    // Prepare filter params
+    const params: any = {};
+    if (this.filter().search) params.q = this.filter().search;
+    if (this.filter().os) params.os = this.filter().os;
+    if (this.filter().browser) params.browser = this.filter().browser;
+
     const req$ = this.viewMode() === 'mine'
       ? this.sessionService.getMySessions()
-      : this.sessionService.getAllSessions();
+      : this.sessionService.getAllSessions(params);
+
     req$.subscribe({
       next: (res: any) => {
         const rows = res.data?.data || res.data || [];
@@ -84,6 +120,19 @@ export class Sessions implements OnInit {
         this.messageService.handleHttpError(err)
       }
     });
+  }
+
+  applyFilters() {
+    this.loadData();
+  }
+
+  resetFilters() {
+    this.filter.set({
+      search: '',
+      os: null,
+      browser: null
+    });
+    this.loadData();
   }
 
   toggleViewMode(mode: 'all' | 'mine') {

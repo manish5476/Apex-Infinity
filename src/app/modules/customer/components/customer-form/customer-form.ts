@@ -2,7 +2,8 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
-import { switchMap, of } from 'rxjs'; // <--- NEW: Required for chaining requests
+import { switchMap, of, debounceTime, distinctUntilChanged } from 'rxjs'; // <--- NEW: Required for chaining requests
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // Services
 import { CustomerService } from '../../services/customer-service';
@@ -45,6 +46,7 @@ export class CustomerForm implements OnInit {
   loadingData = signal(false);
   editMode = signal(false);
   customerId = signal<string | null>(null);
+  duplicateCustomer = signal<any>(null); // NEW: Stores found duplicate
 
   // Computed
   pageTitle = computed(() => this.editMode() ? 'Edit Customer' : 'Create New Customer');
@@ -63,6 +65,7 @@ export class CustomerForm implements OnInit {
   ngOnInit(): void {
     this.buildForm();
     this.checkEditMode();
+    this.setupDuplicateCheck();
   }
 
   buildForm(): void {
@@ -101,6 +104,51 @@ export class CustomerForm implements OnInit {
       isActive: [true]
     });
   }
+
+  // === Duplicate Check Component ===
+  private setupDuplicateCheck(): void {
+    this.customerForm.valueChanges.pipe(
+      debounceTime(600),
+      distinctUntilChanged((prev, curr) => 
+        prev.name === curr.name && 
+        prev.email === curr.email && 
+        prev.phone === curr.phone
+      ),
+      takeUntilDestroyed()
+    ).subscribe(values => {
+      this.performDuplicateCheck(values);
+    });
+  }
+
+  private performDuplicateCheck(values: any): void {
+    const { name, email, phone } = values;
+
+    if (!name?.trim() && !email?.trim() && !phone?.trim()) {
+      this.duplicateCustomer.set(null);
+      return;
+    }
+
+    const params: any = {};
+    if (name?.trim()) params.name = name.trim();
+    if (email?.trim()) params.email = email.trim();
+    if (phone?.trim()) params.phone = phone.trim();
+
+    this.customerService.checkDuplicate(params).subscribe({
+      next: (res: any) => {
+        if (res.isDuplicate && res.existingCustomer) {
+          if (this.editMode() && res.existingCustomer._id === this.customerId()) {
+            this.duplicateCustomer.set(null);
+          } else {
+            this.duplicateCustomer.set(res.existingCustomer);
+          }
+        } else {
+          this.duplicateCustomer.set(null);
+        }
+      },
+      error: () => this.duplicateCustomer.set(null)
+    });
+  }
+
 
   // === 1. Edit Mode Logic ===
   private checkEditMode(): void {
