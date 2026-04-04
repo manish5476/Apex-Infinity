@@ -20,6 +20,7 @@ import { AgShareGrid, ActionColumnConfig } from '../../../shared/components/ag-s
 import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 import { DynamicDialogServices } from '../../../../core/services/dynamic-dialog-services';
+import { CommonMethodService } from '@core/utils/common-method.service';
 
 @Component({
   selector: 'app-customer-list',
@@ -50,6 +51,7 @@ export class CustomerList implements OnInit {
   private router = inject(Router);
   private dialogServices = inject(DynamicDialogServices);
   private confirmationService = inject(ConfirmationService);
+  private common = inject(CommonMethodService);
 
   PERMISSIONS = PERMISSIONS;
 
@@ -268,200 +270,579 @@ export class CustomerList implements OnInit {
     this.dialogServices.openBulkCustomer();
   }
 
+  // getColumn(): void {
+  //   this.column = [
+  //     {
+  //       headerName: 'Customer Identity',
+  //       children: [
+  //         {
+  //           field: 'name',
+  //           headerName: 'Name & Type',
+  //           pinned: 'left',
+  //           minWidth: 240,
+  //           flex: 2,
+  //           cellRenderer: (params: any) => {
+  //             if (!params.value) return '';
+  //             const data = params.data;
+  //             const initials = data.name.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase();
+  //             const subText = data.contactPerson && data.contactPerson !== data.name
+  //               ? `<i class="pi pi-user" style="font-size:10px; margin-right:4px"></i>${data.contactPerson}`
+  //               : `<span style="text-transform:capitalize">${data.type}</span>`;
+
+  //             return `
+  //             <div style="display:flex; align-items:center; gap:12px; height:100%;">
+  //               <div style="
+  //                 width:36px; height:36px; border-radius:50%; 
+  //                 background:var(--bg-ternary); color:var(--text-secondary);
+  //                 display:flex; align-items:center; justify-content:center; 
+  //                 font-weight:700; font-size:11px; border:1px solid var(--border-secondary);">
+  //                 ${initials}
+  //               </div>
+  //               <div style="display:flex; flex-direction:column; justify-content:center; line-height:1.3;">
+  //                 <span style="font-weight:600; color:var(--text-primary); font-size:13px;">${data.name}</span>
+  //                 <span style="font-size:11px; color:var(--text-tertiary); display:flex; align-items:center;">${subText}</span>
+  //               </div>
+  //             </div>
+  //           `;
+  //           }
+  //         },
+  //         {
+  //           field: 'isActive',
+  //           headerName: 'Status',
+  //           width: 110,
+  //           cellRenderer: (params: any) => {
+  //             const isDeleted = params.data.isDeleted;
+  //             if (isDeleted) {
+  //               return `<span style="background:var(--color-error-bg); color:var(--color-error); padding:2px 8px; border-radius:6px; font-size:10px; font-weight:700;">DELETED</span>`;
+  //             }
+  //             const status = params.value ? 'ACTIVE' : 'INACTIVE';
+  //             const bg = params.value ? 'var(--color-success-bg)' : 'var(--bg-ternary)';
+  //             const color = params.value ? 'var(--color-success)' : 'var(--text-tertiary)';
+  //             return `<span style="background:${bg}; color:${color}; padding:2px 8px; border-radius:6px; font-size:10px; font-weight:700; letter-spacing:0.5px;">${status}</span>`;
+  //           }
+  //         },
+  //         {
+  //           field: 'tags',
+  //           headerName: 'Tags',
+  //           width: 140,
+  //           cellRenderer: (params: any) => {
+  //             if (!params.value || !params.value.length || params.value[0] === "") return '<span style="color:var(--text-disabled);">-</span>';
+  //             // Render max 2 tags
+  //             return params.value.slice(0, 2).map((tag: string) =>
+  //               `<span style="
+  //               background:var(--bg-secondary); border:1px solid var(--border-secondary); 
+  //               padding:1px 6px; border-radius:10px; font-size:10px; 
+  //               color:var(--text-secondary); margin-right:4px; white-space:nowrap;">
+  //               ${tag}
+  //             </span>`
+  //             ).join('') + (params.value.length > 2 ? '...' : '');
+  //           }
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       headerName: 'Contact Details',
+  //       children: [
+  //         {
+  //           headerName: 'Email & Phone',
+  //           width: 230,
+  //           cellRenderer: (params: any) => {
+  //             const email = params.data.email || '';
+  //             const phone = params.data.phone || '';
+  //             if (!email && !phone) return '<span style="color:var(--text-disabled);">-</span>';
+
+  //             return `
+  //             <div style="display:flex; flex-direction:column; justify-content:center; height:100%; gap:2px;">
+  //               ${email ? `<div style="display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-primary); text-overflow:ellipsis; overflow:hidden;"><i class="pi pi-envelope" style="color:var(--text-tertiary); font-size:10px;"></i> ${email}</div>` : ''}
+  //               ${phone ? `<div style="display:flex; align-items:center; gap:6px; font-size:11px; color:var(--text-secondary);"><i class="pi pi-phone" style="color:var(--text-tertiary); font-size:10px;"></i> ${phone} ${params.data.altPhone ? '<span style="font-size:9px; color:var(--text-tertiary)">(+1)</span>' : ''}</div>` : ''}
+  //             </div>
+  //           `;
+  //           }
+  //         }
+  //       ]
+  //     },
+
+  //     // 4. Financial Group
+  //     {
+  //       headerName: 'Financial Overview',
+  //       children: [
+  //         {
+  //           field: 'outstandingBalance',
+  //           headerName: 'Outstanding',
+  //           width: 140,
+  //           type: 'numericColumn',
+  //           cellRenderer: (params: any) => {
+  //             const val = params.value || 0;
+  //             // Orange if positive debt, Green if 0 or negative (credit)
+  //             const color = val > 0 ? 'var(--color-warning)' : 'var(--color-success)';
+  //             const weight = val > 0 ? '700' : '500';
+  //             const formatted = this.currencyFormatter(val);
+  //             return `<span style="color:${color}; font-weight:${weight};">${formatted}</span>`;
+  //           }
+  //         },
+  //         {
+  //           field: 'creditLimit',
+  //           headerName: 'Limit',
+  //           width: 110,
+  //           type: 'numericColumn',
+  //           valueFormatter: (params: any) => this.currencyFormatter(params.value),
+  //           cellStyle: { color: 'var(--text-tertiary)' }
+  //         },
+  //         {
+  //           field: 'paymentTerms',
+  //           headerName: 'Terms',
+  //           width: 120,
+  //           valueFormatter: (p: any) => p.value || 'Standard'
+  //         }
+  //       ]
+  //     },
+
+  //     // 5. Compliance & Address
+  //     {
+  //       headerName: 'Compliance & Location',
+  //       children: [
+  //         {
+  //           field: 'gstNumber',
+  //           headerName: 'GST / Tax ID',
+  //           width: 150,
+  //           cellRenderer: (params: any) => {
+  //             const gst = params.value;
+  //             const pan = params.data.panNumber;
+  //             if (!gst && !pan) return '<span style="color:var(--text-disabled);">-</span>';
+
+  //             return `
+  //              <div style="display:flex; flex-direction:column; justify-content:center; line-height:1.2;">
+  //                <span style="font-size:12px; font-weight:500;">${gst || '-'}</span>
+  //                <span style="font-size:10px; color:var(--text-tertiary);">PAN: ${pan || 'N/A'}</span>
+  //              </div>
+  //            `;
+  //           }
+  //         },
+  //         {
+  //           headerName: 'Billing City',
+  //           field: 'billingAddress.city',
+  //           width: 140,
+  //           valueGetter: (params: any) => {
+  //             const addr = params.data.billingAddress;
+  //             return addr ? `${addr.city}, ${addr.state}` : '';
+  //           },
+  //           tooltipValueGetter: (params: any) => {
+  //             const addr = params.data.billingAddress;
+  //             if (!addr) return '';
+  //             return `${addr.street}, ${addr.city}, ${addr.state}, ${addr.zipCode}, ${addr.country}`;
+  //           }
+  //         }
+  //       ]
+  //     },
+
+  //     // 6. System Info
+  //     {
+  //       headerName: 'System',
+  //       children: [
+  //         {
+  //           field: 'notes',
+  //           headerName: 'Notes',
+  //           width: 150,
+  //           tooltipField: 'notes',
+  //           cellRenderer: (params: any) => {
+  //             if (!params.value) return '';
+  //             return `<i class="pi pi-file-o" style="margin-right:6px; color:var(--text-tertiary)"></i>${params.value}`;
+  //           }
+  //         },
+  //         {
+  //           field: 'createdAt',
+  //           headerName: 'Since',
+  //           width: 110,
+  //           valueFormatter: (params: any) => params.value ? new Date(params.value).toLocaleDateString() : '',
+  //           cellStyle: { color: 'var(--text-tertiary)', fontSize: '11px' }
+  //         }
+  //       ]
+  //     }
+  //   ];
+  //   this.cdr.detectChanges();
+  // }
+  private badge(
+    label: string,
+    bg: string, color: string, border: string
+  ): string {
+    return `<span style="
+    background:${bg};
+    color:${color};
+    border:1px solid ${border};
+    padding:1px 6px;
+    border-radius:3px;
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:0.3px;
+    text-transform:uppercase;
+    white-space:nowrap;
+    line-height:1.4;
+    display:inline-block;">
+    ${label}
+  </span>`;
+  }
+
+  private twoLine(
+    top: string,
+    bottom: string,
+    topStyle = 'font-size:11px; color:var(--text-secondary);',
+    bottomStyle = 'font-size:10px; color:var(--text-tertiary);'
+  ): string {
+    return `
+    <div style="
+      display:flex; flex-direction:column;
+      justify-content:center; gap:0px;
+      line-height:1.25; overflow:hidden;">
+      <span style="${topStyle} white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${top}</span>
+      <span style="${bottomStyle} white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${bottom}</span>
+    </div>`;
+  }
   getColumn(): void {
     this.column = [
       {
         headerName: 'Customer Identity',
         children: [
+
           {
             field: 'name',
             headerName: 'Name & Type',
             pinned: 'left',
-            minWidth: 240,
+            minWidth: 210,
             flex: 2,
+            cellStyle: { display: 'flex', alignItems: 'center', padding: '0 10px' },
             cellRenderer: (params: any) => {
               if (!params.value) return '';
-              const data = params.data;
-              const initials = data.name.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase();
-              const subText = data.contactPerson && data.contactPerson !== data.name
-                ? `<i class="pi pi-user" style="font-size:10px; margin-right:4px"></i>${data.contactPerson}`
-                : `<span style="text-transform:capitalize">${data.type}</span>`;
+              const d = params.data;
+              const initials = this.common.getInitials(d.name);
+              const avatar = this.common.getAvatarStyle(d.name);
+              const isIndiv = d.type === 'individual';
+              const icon = isIndiv ? 'pi-user' : 'pi-building';
+              const sub = d.contactPerson && d.contactPerson !== d.name
+                ? d.contactPerson
+                : this.common.toTitleCase(d.type || '');
 
               return `
-              <div style="display:flex; align-items:center; gap:12px; height:100%;">
-                <div style="
-                  width:36px; height:36px; border-radius:50%; 
-                  background:var(--bg-ternary); color:var(--text-secondary);
-                  display:flex; align-items:center; justify-content:center; 
-                  font-weight:700; font-size:11px; border:1px solid var(--border-secondary);">
+              <div style="display:flex; align-items:center; gap:8px; width:100%; overflow:hidden;">
+                <span style="
+                  width:26px; height:26px; border-radius:50%; flex-shrink:0;
+                  background:${avatar.background}; color:${avatar.color};
+                  display:inline-flex; align-items:center; justify-content:center;
+                  font-size:9px; font-weight:700;">
                   ${initials}
-                </div>
-                <div style="display:flex; flex-direction:column; justify-content:center; line-height:1.3;">
-                  <span style="font-weight:600; color:var(--text-primary); font-size:13px;">${data.name}</span>
-                  <span style="font-size:11px; color:var(--text-tertiary); display:flex; align-items:center;">${subText}</span>
-                </div>
-              </div>
-            `;
+                </span>
+                ${this.twoLine(
+                d.name,
+                `<i class="pi ${icon}" style="font-size:8px; margin-right:3px;"></i>${sub}`,
+                'font-size:12px; font-weight:600; color:var(--text-primary);',
+                'font-size:10px; color:var(--text-tertiary);'
+              )}
+              </div>`;
             }
           },
+
           {
             field: 'isActive',
             headerName: 'Status',
-            width: 110,
+            width: 90,
+            cellStyle: { display: 'flex', alignItems: 'center' },
             cellRenderer: (params: any) => {
-              const isDeleted = params.data.isDeleted;
-              if (isDeleted) {
-                return `<span style="background:var(--color-error-bg); color:var(--color-error); padding:2px 8px; border-radius:6px; font-size:10px; font-weight:700;">DELETED</span>`;
+              if (params.data.isDeleted) {
+                return this.badge('Deleted',
+                  'var(--color-error-bg)', 'var(--color-error)', 'var(--color-error-border)');
               }
-              const status = params.value ? 'ACTIVE' : 'INACTIVE';
-              const bg = params.value ? 'var(--color-success-bg)' : 'var(--bg-ternary)';
-              const color = params.value ? 'var(--color-success)' : 'var(--text-tertiary)';
-              return `<span style="background:${bg}; color:${color}; padding:2px 8px; border-radius:6px; font-size:10px; font-weight:700; letter-spacing:0.5px;">${status}</span>`;
+              return params.value
+                ? this.badge('Active',
+                  'var(--color-success-bg)', 'var(--color-success)', 'var(--color-success-border)')
+                : this.badge('Inactive',
+                  'var(--bg-secondary)', 'var(--text-tertiary)', 'var(--border-primary)');
             }
           },
           {
             field: 'tags',
             headerName: 'Tags',
-            width: 140,
+            width: 135,
             cellRenderer: (params: any) => {
-              if (!params.value || !params.value.length || params.value[0] === "") return '<span style="color:var(--text-disabled);">-</span>';
-              // Render max 2 tags
-              return params.value.slice(0, 2).map((tag: string) =>
-                `<span style="
-                background:var(--bg-secondary); border:1px solid var(--border-secondary); 
-                padding:1px 6px; border-radius:10px; font-size:10px; 
-                color:var(--text-secondary); margin-right:4px; white-space:nowrap;">
-                ${tag}
-              </span>`
-              ).join('') + (params.value.length > 2 ? '...' : '');
+              const tags: string[] = (params.value || []).filter((t: string) => t?.trim());
+
+              if (!tags.length) {
+                return `<span class="tag-empty">—</span>`;
+              }
+
+              const chips = tags.slice(0, 2).map(tag =>
+                `<span class="tag-chip">${this.common.toTitleCase(tag)}</span>`
+              ).join('');
+
+              const more = tags.length > 2
+                ? `<span class="tag-more">+${tags.length - 2}</span>`
+                : '';
+
+              return `<div class="tag-container">${chips}${more}</div>`;
             }
           }
+          // {
+          //   field: 'tags',
+          //   headerName: 'Tags',
+          //   width: 135,
+          //   cellStyle: { display: 'flex', alignItems: 'center', gap: '3px' },
+          //   cellRenderer: (params: any) => {
+          //     const tags: string[] = (params.value || []).filter((t: string) => t?.trim());
+          //     if (!tags.length) return `<span style="color:var(--text-tertiary); font-size:10px;">—</span>`;
+          //     const chips = tags.slice(0, 2).map(tag => `
+          //     <span style="
+          //       background:var(--bg-secondary);
+          //       border:1px solid var(--border-primary);
+          //       padding:1px 5px; border-radius:3px;
+          //       font-size:10px; color:var(--text-secondary);
+          //       white-space:nowrap;">
+          //       ${this.common.toTitleCase(tag)}
+          //     </span>`).join('');
+          //     const more = tags.length > 2
+          //       ? `<span style="font-size:10px; color:var(--text-tertiary);">+${tags.length - 2}</span>`
+          //       : '';
+          //     return `<div style="display:flex; align-items:center; gap:3px;">${chips}${more}</div>`;
+          //   }
+          // }
         ]
       },
+
       {
         headerName: 'Contact Details',
         children: [
-          {
-            headerName: 'Email & Phone',
-            width: 230,
-            cellRenderer: (params: any) => {
-              const email = params.data.email || '';
-              const phone = params.data.phone || '';
-              if (!email && !phone) return '<span style="color:var(--text-disabled);">-</span>';
 
+          {
+            headerName: 'Email',
+            field: 'email',
+            width: 195,
+            cellStyle: { display: 'flex', alignItems: 'center' },
+            cellRenderer: (params: any) => {
+              if (!params.value) return `<span style="color:var(--text-tertiary);font-size:10px;">—</span>`;
               return `
-              <div style="display:flex; flex-direction:column; justify-content:center; height:100%; gap:2px;">
-                ${email ? `<div style="display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-primary); text-overflow:ellipsis; overflow:hidden;"><i class="pi pi-envelope" style="color:var(--text-tertiary); font-size:10px;"></i> ${email}</div>` : ''}
-                ${phone ? `<div style="display:flex; align-items:center; gap:6px; font-size:11px; color:var(--text-secondary);"><i class="pi pi-phone" style="color:var(--text-tertiary); font-size:10px;"></i> ${phone} ${params.data.altPhone ? '<span style="font-size:9px; color:var(--text-tertiary)">(+1)</span>' : ''}</div>` : ''}
-              </div>
-            `;
+              <div style="display:flex; align-items:center; gap:5px; overflow:hidden; width:100%;">
+                <i class="pi pi-envelope" style="font-size:9px; color:var(--text-tertiary); flex-shrink:0;"></i>
+                <span style="font-size:11px; color:var(--text-secondary);
+                  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                  ${params.value}
+                </span>
+              </div>`;
+            }
+          },
+
+          {
+            headerName: 'Phone',
+            field: 'phone',
+            width: 145,
+            cellStyle: { display: 'flex', alignItems: 'center' },
+            cellRenderer: (params: any) => {
+              const phone = params.value;
+              const alt = params.data?.altPhone;
+              if (!phone) return `<span style="color:var(--text-tertiary);font-size:10px;">—</span>`;
+
+              const top = `<i class="pi pi-phone" style="font-size:8px; margin-right:3px;"></i>${this.common.formatPhone(phone)}`;
+              const bot = alt ? `Alt: ${this.common.formatPhone(alt)}` : '';
+              return bot
+                ? this.twoLine(top, bot)
+                : `<div style="display:flex; align-items:center; gap:4px;">
+                   <i class="pi pi-phone" style="font-size:9px; color:var(--text-tertiary);"></i>
+                   <span style="font-size:11px; color:var(--text-secondary);">
+                     ${this.common.formatPhone(phone)}
+                   </span>
+                 </div>`;
+            }
+          },
+
+          {
+            headerName: 'Location',
+            field: 'billingAddress.city',
+            width: 145,
+            cellStyle: { display: 'flex', alignItems: 'center' },
+            valueGetter: (p: any) => {
+              const a = p.data?.billingAddress;
+              return a?.city ? `${a.city}, ${a.state}` : '';
+            },
+            tooltipValueGetter: (p: any) => {
+              const a = p.data?.billingAddress;
+              return a ? this.common.formatAddress(a) : '';
+            },
+            cellRenderer: (params: any) => {
+              if (!params.value) return `<span style="color:var(--text-tertiary);font-size:10px;">—</span>`;
+              return `
+              <div style="display:flex; align-items:center; gap:4px; overflow:hidden;">
+                <i class="pi pi-map-marker" style="font-size:9px; color:var(--text-tertiary); flex-shrink:0;"></i>
+                <span style="font-size:11px; color:var(--text-secondary);
+                  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                  ${params.value}
+                </span>
+              </div>`;
             }
           }
         ]
       },
 
-      // 4. Financial Group
       {
         headerName: 'Financial Overview',
         children: [
+
           {
             field: 'outstandingBalance',
             headerName: 'Outstanding',
-            width: 140,
-            type: 'numericColumn',
+            width: 125,
+            type: 'rightAligned',
+            cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end' },
             cellRenderer: (params: any) => {
               const val = params.value || 0;
-              // Orange if positive debt, Green if 0 or negative (credit)
-              const color = val > 0 ? 'var(--color-warning)' : 'var(--color-success)';
-              const weight = val > 0 ? '700' : '500';
-              const formatted = this.currencyFormatter(val);
-              return `<span style="color:${color}; font-weight:${weight};">${formatted}</span>`;
+              if (val <= 0) {
+                return this.badge('✓ Clear',
+                  'var(--color-success-bg)', 'var(--color-success)', 'var(--color-success-border)');
+              }
+              return `<span style="
+              color:var(--color-warning); font-weight:700;
+              font-family:var(--font-mono); font-size:11px;">
+              ${this.common.formatCurrency(val)}
+            </span>`;
             }
           },
+
           {
             field: 'creditLimit',
-            headerName: 'Limit',
-            width: 110,
-            type: 'numericColumn',
-            valueFormatter: (params: any) => this.currencyFormatter(params.value),
-            cellStyle: { color: 'var(--text-tertiary)' }
+            headerName: 'Credit Limit',
+            width: 115,
+            type: 'rightAligned',
+            cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end' },
+            cellRenderer: (params: any) => {
+              const val = params.value || 0;
+              if (!val) return `<span style="color:var(--text-tertiary);font-size:10px;">—</span>`;
+              return `<span style="color:var(--text-secondary); font-family:var(--font-mono); font-size:11px;">
+              ${this.common.formatCurrency(val)}
+            </span>`;
+            }
           },
+
+          {
+            field: 'invoiceCount',
+            headerName: 'Invoices',
+            width: 85,
+            type: 'rightAligned',
+            cellStyle: {
+              display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
+              fontWeight: '600', fontSize: '12px',
+            },
+            cellRenderer: (params: any) => {
+              const val = params.value || 0;
+              return `<span style="
+              font-weight:600; font-size:12px;
+              color:${val > 0 ? 'var(--accent-primary)' : 'var(--text-tertiary)'};">
+              ${val}
+            </span>`;
+            }
+          },
+
+          {
+            field: 'totalPurchases',
+            headerName: 'Purchases',
+            width: 125,
+            type: 'rightAligned',
+            cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end' },
+            cellRenderer: (params: any) => {
+              const val = params.value || 0;
+              if (!val) return `<span style="color:var(--text-tertiary);font-size:10px;">—</span>`;
+              return `<span style="font-weight:700; color:var(--text-primary);
+              font-family:var(--font-mono); font-size:11px;">
+              ${this.common.formatCurrency(val)}
+            </span>`;
+            }
+          },
+
           {
             field: 'paymentTerms',
             headerName: 'Terms',
-            width: 120,
-            valueFormatter: (p: any) => p.value || 'Standard'
+            width: 90,
+            cellStyle: { display: 'flex', alignItems: 'center' },
+            cellRenderer: (params: any) => {
+              const val = params.value && params.value !== '0' ? params.value : 'Standard';
+              return `<span style="
+              font-size:10px; color:var(--text-secondary);
+              background:var(--bg-secondary);
+              border:1px solid var(--border-primary);
+              padding:1px 6px; border-radius:3px;">
+              ${val}
+            </span>`;
+            }
           }
         ]
       },
 
-      // 5. Compliance & Address
       {
-        headerName: 'Compliance & Location',
+        headerName: 'Compliance',
         children: [
           {
             field: 'gstNumber',
-            headerName: 'GST / Tax ID',
-            width: 150,
+            headerName: 'GST / PAN',
+            width: 155,
+            cellStyle: { display: 'flex', alignItems: 'center', padding: '0 8px' },
             cellRenderer: (params: any) => {
               const gst = params.value;
-              const pan = params.data.panNumber;
-              if (!gst && !pan) return '<span style="color:var(--text-disabled);">-</span>';
+              const pan = params.data?.panNumber;
+              if (!gst && !pan) return `<span style="color:var(--text-tertiary);font-size:10px;">—</span>`;
 
-              return `
-               <div style="display:flex; flex-direction:column; justify-content:center; line-height:1.2;">
-                 <span style="font-size:12px; font-weight:500;">${gst || '-'}</span>
-                 <span style="font-size:10px; color:var(--text-tertiary);">PAN: ${pan || 'N/A'}</span>
-               </div>
-             `;
-            }
-          },
-          {
-            headerName: 'Billing City',
-            field: 'billingAddress.city',
-            width: 140,
-            valueGetter: (params: any) => {
-              const addr = params.data.billingAddress;
-              return addr ? `${addr.city}, ${addr.state}` : '';
-            },
-            tooltipValueGetter: (params: any) => {
-              const addr = params.data.billingAddress;
-              if (!addr) return '';
-              return `${addr.street}, ${addr.city}, ${addr.state}, ${addr.zipCode}, ${addr.country}`;
+              const top = gst
+                ? `<span style="font-size:11px; font-weight:600; font-family:var(--font-mono); color:var(--text-primary);">${this.common.formatGSTIN(gst)}</span>`
+                : '';
+              const bot = pan
+                ? `<i class="pi pi-id-card" style="font-size:8px; margin-right:2px;"></i>${this.common.formatPAN(pan)}`
+                : '';
+
+              if (top && bot) return this.twoLine(
+                gst,
+                bot,
+                'font-size:11px; font-weight:600; font-family:var(--font-mono); color:var(--text-primary);',
+                'font-size:10px; color:var(--text-tertiary);'
+              );
+              return top || `<span style="font-size:11px; color:var(--text-secondary);">${bot}</span>`;
             }
           }
         ]
       },
 
-      // 6. System Info
       {
         headerName: 'System',
         children: [
           {
             field: 'notes',
             headerName: 'Notes',
-            width: 150,
+            width: 135,
             tooltipField: 'notes',
+            cellStyle: { display: 'flex', alignItems: 'center' },
             cellRenderer: (params: any) => {
-              if (!params.value) return '';
-              return `<i class="pi pi-file-o" style="margin-right:6px; color:var(--text-tertiary)"></i>${params.value}`;
+              if (!params.value) return `<span style="color:var(--text-tertiary);font-size:10px;">—</span>`;
+              return `
+              <div style="display:flex; align-items:center; gap:5px; overflow:hidden;">
+                <i class="pi pi-file-o" style="font-size:9px; color:var(--text-tertiary); flex-shrink:0;"></i>
+                <span style="font-size:11px; color:var(--text-secondary);
+                  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                  ${this.common.truncateText(params.value, 25)}
+                </span>
+              </div>`;
             }
           },
+
           {
             field: 'createdAt',
             headerName: 'Since',
             width: 110,
-            valueFormatter: (params: any) => params.value ? new Date(params.value).toLocaleDateString() : '',
-            cellStyle: { color: 'var(--text-tertiary)', fontSize: '11px' }
+            sortable: true,
+            cellStyle: { display: 'flex', alignItems: 'center', padding: '0 8px' },
+            cellRenderer: (params: any) => {
+              if (!params.value) return '-';
+              return this.twoLine(
+                this.common.formatDate(params.value),
+                this.common.timeAgoText(params.value)
+              );
+            }
           }
         ]
       }
     ];
-    this.cdr.detectChanges();
-  }
 
-  currencyFormatter(value: number) {
-    if (value === undefined || value === null) return '₹ 0.00';
-    return '₹ ' + value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    this.cdr.detectChanges();
   }
 }

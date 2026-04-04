@@ -10,7 +10,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { AgGridAngular } from 'ag-grid-angular';
 
-import { ColDef, GridApi, GridReadyEvent, GridOptions, RowSelectionOptions, CellClickedEvent, BodyScrollEndEvent, AllCommunityModule, ModuleRegistry, themeQuartz, Theme, } from 'ag-grid-community';
+import { ColDef, GridApi, GridReadyEvent, GridOptions, ColumnResizedEvent, RowSelectionOptions, CellClickedEvent, BodyScrollEndEvent, AllCommunityModule, ModuleRegistry, themeQuartz, Theme, } from 'ag-grid-community';
 
 import type { Permission } from '@core/auth/permissions.constants';
 import {
@@ -96,7 +96,7 @@ export interface ActionColumnConfig {
         [gridOptions]="gridOptions"
         [rowSelection]="selectionOptions"
         (gridReady)="onGridReady($event)"
-        (cellClicked)="onCellClicked($event)"
+   (columnResized)="onColumnResized($event)"     (cellClicked)="onCellClicked($event)"
         (cellValueChanged)="onCellValueChanged($event)"
         (selectionChanged)="onSelectionChanged()"
         (bodyScrollEnd)="onBodyScrollEnd($event)">
@@ -230,6 +230,27 @@ export class AgShareGrid<T = any> {
   /* --------------------------------------------------
      GRID OPTIONS
   --------------------------------------------------- */
+  // readonly gridOptions: GridOptions<T> = {
+  // defaultColDef: {
+  //   flex: 1,
+  //   minWidth: 100,
+  //   sortable: true,
+  //   // rowHeight: 52,
+  //   // headerHeight: 38,
+  //   // groupHeaderHeight: 32,
+  //   filter: true,
+  //   resizable: true,
+  //   editable: (params) =>
+  //     this.editingRowId() === this.resolveRowId(params.data),
+  // },
+
+  onColumnResized(e: ColumnResizedEvent<T>): void {
+    if (e.source === 'autosizeColumns' && e.finished) {
+      const allColumnIds = e.api.getColumns()?.map((col) => col.getColId()) || [];
+      e.api.autoSizeColumns(allColumnIds);
+    }
+  }
+
   readonly gridOptions: GridOptions<T> = {
     defaultColDef: {
       flex: 1,
@@ -237,6 +258,11 @@ export class AgShareGrid<T = any> {
       sortable: true,
       filter: true,
       resizable: true,
+
+      // Add these two lines for auto row height:
+      // wrapText: true,
+      // autoHeight: true,
+
       editable: (params) =>
         this.editingRowId() === this.resolveRowId(params.data),
     },

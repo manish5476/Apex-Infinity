@@ -44,12 +44,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   standalone: true,
   imports: [
     CommonModule, FormsModule, TooltipModule,
-    // AovTrendChartComponent, BranchRadarChartComponent, CustomerAcquisitionChartComponent,
-    // EmiPortfolioChartComponent, FinancialTrendChartComponent, GrossProfitTrendChartComponent,
-    // HeatmapChartComponent, InventoryHealthChartComponent, OrderFunnelChartComponent,
-    // PaymentMethodsChartComponent, PurchaseVsSalesChartComponent, SalesDistributionChartComponent,
-    // SalesReturnRateChartComponent, TopPerformersChartComponent, YoyGrowthChartComponent
-    // CustomerOutstandingChartComponent
+
   ],
   template: `
     <div class="analysis-hub">

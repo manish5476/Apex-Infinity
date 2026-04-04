@@ -3,4 +3,285 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-}
+}
+
+/* ==========================================================================
+   AG Grid Invoice List Styles
+   ========================================================================== */
+
+/* Layout & Alignments */
+.cell-flex-center {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.cell-flex-end {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+}
+
+.cell-stack {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+
+.align-end {
+  align-items: flex-end;
+}
+
+/* Spacing */
+.gap-xs {
+  gap: var(--spacing-xs);
+}
+
+.gap-sm {
+  gap: var(--spacing-sm);
+}
+
+.px-sm {
+  padding: 0 var(--spacing-sm) !important;
+}
+
+.w-full {
+  width: 100%;
+}
+
+/* Typography & Helpers */
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.font-semibold {
+  font-weight: var(--font-weight-semibold);
+}
+
+.font-bold {
+  font-weight: var(--font-weight-bold);
+}
+
+.line-tight {
+  line-height: var(--line-height-tight);
+}
+
+.tracking-tight {
+  letter-spacing: 0.2px;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.hover-underline:hover {
+  text-decoration: underline;
+}
+
+/* Font Sizes */
+.text-xxs {
+  font-size: calc(var(--font-size-xs) * 0.9);
+}
+
+/* Approx 9-10px */
+.text-xs {
+  font-size: var(--font-size-xs);
+}
+
+/* Approx 11px */
+.text-sm {
+  font-size: var(--font-size-sm);
+}
+
+/* Approx 12px */
+
+/* Colors */
+.text-primary {
+  color: var(--text-primary);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-tertiary {
+  color: var(--text-tertiary);
+}
+
+.text-accent {
+  color: var(--accent-primary);
+}
+
+.text-success {
+  color: var(--color-success);
+}
+
+.text-warning {
+  color: var(--color-warning);
+}
+
+.text-error {
+  color: var(--color-error);
+}
+
+.text-info {
+  color: var(--color-info);
+}
+
+/* Text Truncation */
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  max-width: 100%;
+}
+
+/* Icons */
+.icon-xxs {
+  font-size: 8px;
+  flex-shrink: 0;
+}
+
+.icon-xs {
+  font-size: 10px;
+}
+
+.icon-accent-muted {
+  font-size: 10px;
+  color: var(--accent-primary);
+  opacity: 0.6;
+}
+
+.icon-overdue {
+  font-size: 9px;
+  color: var(--color-error);
+  margin-left: 4px;
+}
+
+/* Avatars */
+.avatar-xs,
+.avatar-sm {
+  border-radius: var(--ui-border-radius-pill);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.avatar-xs {
+  width: 22px;
+  height: 22px;
+  font-size: 8px;
+}
+
+.avatar-sm {
+  width: 26px;
+  height: 26px;
+  font-size: 9px;
+}
+
+/* Customer Block Specifics */
+.cell-customer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  overflow: hidden;
+}
+
+.customer-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  gap: 1px;
+}
+
+.customer-name {
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: var(--line-height-tight);
+}
+
+.customer-contact {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  line-height: var(--line-height-tight);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Badges */
+.grid-badge {
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.badge-dynamic {
+  /* Used when colors are passed via inline styles from your common service */
+  border: 1px solid transparent;
+}
+
+.badge-info-soft {
+  background: var(--color-info-bg);
+  color: var(--color-info);
+  border: 1px solid var(--color-info-border);
+}
+
+.badge-warning-soft {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+  border: 1px solid var(--color-warning-border);
+}
+
+.badge-success-solid {
+  color: var(--color-success);
+  font-weight: var(--font-weight-bold);
+  font-size: 10px;
+  background: var(--color-success-bg);
+  border: 1px solid var(--color-success-border);
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.tag-alert {
+  font-size: 9px;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+/* Progress Bar (Balance Due) */
+.progress-track {
+  width: 70px;
+  height: 2px;
+  background: var(--border-primary);
+  border-radius: var(--ui-border-radius-pill);
+  overflow: hidden;
+  margin-top: 2px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--color-success);
+  border-radius: var(--ui-border-radius-pill);
+}
