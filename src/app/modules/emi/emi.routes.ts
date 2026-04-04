@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { EmiDetailsComponent } from './components/emi-details/emi-details';
 import { EmiFormComponent } from './components/emi-form/emi-form';
 import { EmiList } from './components/emi-list/emi-list';
+import { EmiLedger } from './components/emi-ledger/emi-ledger';
 import { permissionGuard } from '@core/auth/guards/permission.guard';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
 
@@ -10,6 +11,12 @@ export const EMI_ROUTES: Routes = [
   {
     path: '',
     component: EmiList,
+    canActivate: [permissionGuard],
+    data: { permissions: [PERMISSIONS.EMI.READ] }
+  },
+  {
+    path: 'ledger',
+    component: EmiLedger,
     canActivate: [permissionGuard],
     data: { permissions: [PERMISSIONS.EMI.READ] }
   },

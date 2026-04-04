@@ -13,6 +13,21 @@
     </div>
 
     <div class="header-actions">
+      <!-- Hidden file input -->
+      <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" multiple style="display: none;">
+
+      <p-button *hasPermission="PERMISSIONS.PRODUCT.UPDATE"
+        [disabled]="!selectedRows || selectedRows.length !== 1"
+        label="Upload Image" icon="pi pi-upload"
+        (onClick)="triggerUpload()" styleClass="p-button-secondary p-button-outlined">
+      </p-button>
+
+      <p-button *hasPermission="PERMISSIONS.PRODUCT.DELETE"
+        [disabled]="!selectedRows || selectedRows.length !== 1"
+        label="Delete Product" icon="pi pi-trash"
+        (onClick)="deleteProduct()" styleClass="p-button-danger p-button-outlined">
+      </p-button>
+
       <p-button *hasPermission="PERMISSIONS.PRODUCT.CREATE" label="New Product" icon="pi pi-plus" routerLink="create"
         styleClass="p-button-primary"></p-button>
       <p-button *hasPermission="[PERMISSIONS.PRODUCT.CREATE, PERMISSIONS.PRODUCT.UPDATE]"
@@ -79,3 +94,5 @@
   <app-bulk-product-entry [selectedData]="selectedRows"></app-bulk-product-entry>
 
 </p-dialog>
+
+<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>

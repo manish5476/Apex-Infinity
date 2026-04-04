@@ -27,6 +27,20 @@
     </button>
     <p-tieredMenu #mobileMenu [model]="mobileMenuItems" [popup]="true" appendTo="body" styleClass="apex-mobile-nav" />
 
+    <!-- Announcements -->
+    <button *hasPermission="PERMISSIONS.ANNOUNCEMENT.READ" class="icon-btn announcement-btn"
+      (click)="announcementDialogVisible.set(true)" pTooltip="Announcements" tooltipPosition="bottom"
+      aria-label="Announcements">
+      <i class="pi pi-megaphone"></i>
+    </button>
+
+    <p-dialog header="Organization Announcements" [visible]="announcementDialogVisible()"
+      (visibleChange)="announcementDialogVisible.set($event)" [modal]="true"
+      [style]="{width: '90vw', maxWidth: '1200px'}" [draggable]="false" [resizable]="false" appendTo="body"
+      styleClass="apex-announcement-dialog">
+      <app-announcement-list></app-announcement-list>
+    </p-dialog>
+
     <!-- Notifications -->
     <p-popover #notificationPopover styleClass="apex-notification-popover" appendTo="body">
       <div class="notification-panel">
@@ -143,67 +157,6 @@
               </div>
             </div>
           </div>
-
-          <!-- ── Background Pattern ── NEW CARD ── -->
-          <!-- <div class="setting-card">
-            <div class="setting-card-head">
-              <span class="setting-label"><i class="pi pi-image"></i> Background Pattern</span>
-              @if (activePatternId !== 'none') {
-              <button class="reset-pattern-btn" (click)="resetPattern()" pTooltip="Remove pattern"
-                tooltipPosition="top">
-                <i class="pi pi-times"></i>
-              </button>
-              }
-            </div>
-
-            <div class="pattern-type-tabs">
-              <button class="ptype-tab" [class.active]="activePatternTab === 'css'" (click)="activePatternTab = 'css'">
-                <i class="pi pi-hashtag"></i> Geometric
-              </button>
-              <button class="ptype-tab" [class.active]="activePatternTab === 'svg'" (click)="activePatternTab = 'svg'">
-                <i class="pi pi-star"></i> SVG
-              </button>
-              <button class="ptype-tab" [class.active]="activePatternTab === 'gradient'"
-                (click)="activePatternTab = 'gradient'">
-                <i class="pi pi-sun"></i> Gradient
-              </button>
-            </div>
-
-            <div class="pattern-grid">
-              <div class="pattern-tile" [class.pattern-tile--active]="activePatternId === 'none'"
-                (click)="selectPattern('none')" pTooltip="No pattern" tooltipPosition="top">
-                <div class="pattern-tile-preview pattern-preview--none">
-                  <i class="pi pi-ban"></i>
-                </div>
-                <span class="pattern-tile-name">None</span>
-              </div>
-
-              @for (p of getPatternsForTab(activePatternTab); track p.id) {
-              <div class="pattern-tile" [class.pattern-tile--active]="activePatternId === p.id"
-                (click)="selectPattern(p.id)" [pTooltip]="p.description" tooltipPosition="top">
-                <div class="pattern-tile-preview" [attr.data-pattern]="p.id">
-                  @if (activePatternId === p.id) {
-                  <div class="pattern-tile-check"><i class="pi pi-check"></i></div>
-                  }
-                </div>
-                <span class="pattern-tile-name">{{ p.name }}</span>
-              </div>
-              }
-            </div>
-
-          @if (activePatternId !== 'none') {
-          <div class="pattern-opacity-row">
-            <span class="opacity-label"><i class="pi pi-eye"></i> Intensity</span>
-            <div class="opacity-track">
-              <input type="range" min="10" max="100" step="5" [value]="patternOpacityPercent"
-                (input)="onPatternOpacityChange($event)" class="scale-range opacity-slider" />
-            </div>
-            <span class="setting-value-badge">{{ patternOpacityPercent }}%</span>
-          </div>
-          }
-        </div> -->
-
-          <!-- Quick actions -->
           <div class="setting-card">
             <div class="setting-card-head">
               <span class="setting-label"><i class="pi pi-bolt"></i> Quick Actions</span>
@@ -275,206 +228,3 @@
 
   </div>
 </div>
-
-<!-- <div class="header-bar">
-
-
-  <div class="header-left">
-
-    <button class="icon-btn menu-toggle" (click)="onMenuToggle()" aria-label="Toggle sidebar">
-      <i class="pi pi-bars"></i>
-    </button>
-    <a routerLink="/dashboard" class="logotype">
-      <div class="logo-mark">
-        <svg viewBox="0 0 32 32" fill="none">
-          <path d="M4 28L16 4L28 28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-            stroke-linejoin="round" />
-          <path d="M8.5 20L23.5 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
-        </svg>
-      </div>
-      <span class="logo-wordmark">Apex <span class="logo-sub">Infinity</span></span>
-    </a>
-
-  </div>
-
-
-  <div class="header-right">
-
-
-    <button class="icon-btn mobile-only" (click)="mobileMenu.toggle($event)" aria-label="Mobile navigation">
-      <i class="pi pi-compass"></i>
-    </button>
-    <p-tieredMenu #mobileMenu [model]="mobileMenuItems" [popup]="true" appendTo="body" styleClass="apex-mobile-nav" />
-
-
-    <p-popover #notificationPopover styleClass="apex-notification-popover" appendTo="body">
-      <div class="notification-panel">
-        <app-notification-bell (close)="notificationPopover.hide()"></app-notification-bell>
-      </div>
-    </p-popover>
-
-    <button *hasPermission="PERMISSIONS.NOTIFICATION.READ" class="icon-btn notification-btn"
-      [class.has-badge]="recentNotifications.length > 0" (click)="notificationPopover.toggle($event)"
-      pTooltip="Notifications" tooltipPosition="bottom" aria-label="Notifications">
-      <i class="pi pi-bell"></i>
-      @if (recentNotifications.length > 0) {
-      <span class="notif-badge">{{ recentNotifications.length > 9 ? '9+' : recentNotifications.length }}</span>
-      }
-    </button>
-
-
-    @if (currentUser) {
-    <p-popover #profilePopover styleClass="apex-profile-popover" appendTo="body">
-      <div class="profile-panel">
-        <div class="profile-panel-head">
-
-          <a routerLink="/user/profile" (click)="closeProfilePanel()" class="avatar-link" style="cursor: pointer;">
-            <p-avatar [label]="getInitials(currentUser?.name)" shape="circle" size="xlarge"
-              [style]="{'background': 'rgba(255,255,255,0.15)', 'color': '#fff', 'font-weight': '700', 'font-size': '1.1rem'}">
-            </p-avatar>
-          </a>
-
-
-          <div class="profile-meta">
-            <h3 class="profile-name">{{ currentUser?.name }}</h3>
-            <p class="profile-email">{{ currentUser?.email }}</p>
-            <div class="profile-chips">
-              <span class="chip chip--role"><i class="pi pi-shield"></i> {{ currentUser?.role?.name || 'Admin' }}</span>
-              <span class="chip chip--online"><i class="pi pi-circle-fill"></i> Online</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="profile-tabs">
-          <button class="ptab" [class.ptab--active]="activePopoverTab === 'settings'"
-            (click)="activePopoverTab = 'settings'">
-            <i class="pi pi-cog"></i> Settings
-          </button>
-          <button class="ptab" [class.ptab--active]="activePopoverTab === 'notifications'"
-            (click)="activePopoverTab = 'notifications'">
-            <i class="pi pi-bell"></i> Alerts
-          </button>
-        </div>
-        <div class="profile-body">
-          @if (activePopoverTab === 'settings') {
-          <div class="setting-card">
-            <div class="setting-card-head">
-              <span class="setting-label"><i class="pi pi-palette"></i> Appearance</span>
-              <p-toggleButton [(ngModel)]="isDarkMode" onIcon="pi-moon" offIcon="pi pi-sun"
-                [style]="{'width':'3rem','height':'1.75rem'}" (onChange)="toggleDarkMode($event.checked)">
-              </p-toggleButton>
-            </div>
-          </div>
-          <div class="setting-card">
-            <div class="setting-card-head">
-              <span class="setting-label"><i class="pi pi-desktop"></i> Display Size</span>
-              <span class="setting-value-badge">{{ textScale }}%</span>
-            </div>
-            <div class="scale-row">
-              <span class="scale-a small">A</span>
-              <div class="scale-track">
-                <input type="range" min="85" max="125" step="5" [value]="textScale" (input)="updateTextScale($event)"
-                  class="scale-range" />
-                <div class="scale-ticks">
-                  <span></span><span></span><span></span><span></span><span></span>
-                </div>
-              </div>
-              <span class="scale-a large">A</span>
-            </div>
-          </div>
-          <div class="setting-card">
-            <div class="setting-card-head">
-              <span class="setting-label"><i class="pi pi-objects-column"></i> Theme</span>
-            </div>
-            <div class="theme-picker-wrap">
-              <div class="theme-picker-scroll">
-                @for (group of themeGroups; track group.category) {
-                <div class="theme-group">
-                  <span class="theme-group-name">{{ group.category }}</span>
-                  <div class="theme-grid">
-                    @for (theme of group.themes; track theme.id) {
-                    <div class="theme-swatch" [class.theme-swatch--active]="activeThemeId === theme.id"
-                      (click)="selectTheme(theme.id)" [pTooltip]="theme.description" tooltipPosition="top">
-                      <div class="swatch-preview" [style.background]="theme.gradient">
-                        @if (activeThemeId === theme.id) {
-                        <span class="swatch-check"><i class="pi pi-check"></i></span>
-                        }
-                      </div>
-                      <span class="swatch-name">{{ theme.name }}</span>
-                    </div>
-                    }
-                  </div>
-                </div>
-                }
-              </div>
-            </div>
-          </div>
-
-          <div class="setting-card">
-            <div class="setting-card-head">
-              <span class="setting-label"><i class="pi pi-bolt"></i> Quick Actions</span>
-            </div>
-            <div class="quick-actions">
-              <button class="quick-btn" (click)="randomTheme()">
-                <i class="pi pi-sparkles"></i><span>Shuffle Theme</span>
-              </button>
-              <button class="quick-btn" (click)="resetToDefault()">
-                <i class="pi pi-refresh"></i><span>Reset Default</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="setting-card">
-            <div class="setting-card-head">
-              <span class="setting-label"><i class="pi pi-user"></i> Account</span>
-            </div>
-            <nav class="account-nav">
-              <a routerLink="/auth/update-password" class="account-nav-item" (click)="profilePopover.hide()">
-                <span class="ani-icon"><i class="pi pi-user-edit"></i></span>
-                <span class="ani-content"><span class="ani-title">Update Password</span></span>
-                <i class="pi pi-chevron-right ani-arrow"></i>
-              </a>
-              <a routerLink="/security" class="account-nav-item" (click)="profilePopover.hide()">
-                <span class="ani-icon"><i class="pi pi-lock"></i></span>
-                <span class="ani-content"><span class="ani-title">Security</span><span class="ani-sub">Password,
-                    2FA</span></span>
-                <i class="pi pi-chevron-right ani-arrow"></i>
-              </a>
-            </nav>
-          </div>
-
-          <button class="signout-btn" (click)="logout(); profilePopover.hide()">
-            <i class="pi pi-power-off"></i> Sign Out
-          </button>
-
-          }
-
-          @if (activePopoverTab === 'notifications') {
-          <div class="empty-tab">
-            <i class="pi pi-bell-slash"></i>
-            <span>Manage alerts in the bell menu</span>
-          </div>
-          }
-
-        </div>
-      </div>
-    </p-popover>
-
-    <button class="profile-pill" (click)="profilePopover.toggle($event)" pTooltip="Account" tooltipPosition="bottom">
-      <p-avatar [label]="getInitials(currentUser?.name)" shape="circle" size="normal"
-        [style]="{'background':'var(--accent-primary)','color':'#fff','font-weight':'600'}">
-      </p-avatar>
-      <div class="pill-meta">
-        <span class="pill-name">{{ currentUser?.name }}</span>
-        <span class="pill-role">{{ currentUser?.role?.name || 'Admin' }}</span>
-      </div>
-      <i class="pi pi-chevron-down pill-caret"></i>
-    </button>
-    }
-
-    @else {
-    <a routerLink="/auth/login" class="login-cta">Login</a>
-    }
-
-  </div>
-</div> -->

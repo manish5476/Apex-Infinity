@@ -9,6 +9,7 @@ import { AdvancedProfitAnalysisComponent } from './analytics/invoice-analytics/a
 import { PosInvoiceComponent } from './components/pos-invoice/pos-invoice.component';
 import { permissionGuard } from '@core/auth/guards/permission.guard';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
+import { ProfitDashboardComponentNew } from './analytics/invoice-analytics/profitDashboard/profit-dashboard.component';
 
 // These routes will be lazy-loaded under a '/invoices' path (defined in app.routes.ts)
 export const INVOICE_ROUTES: Routes = [
@@ -27,6 +28,12 @@ export const INVOICE_ROUTES: Routes = [
   {
     path: 'ProfitDashboardComponent',
     component: ProfitDashboardComponent,
+    canActivate: [permissionGuard],
+    data: { permissions: [PERMISSIONS.REPORT.PROFIT] }
+  },
+  {
+    path: 'profitDashboardNew',
+    component: ProfitDashboardComponentNew,
     canActivate: [permissionGuard],
     data: { permissions: [PERMISSIONS.REPORT.PROFIT] }
   },

@@ -1,0 +1,73 @@
+<p-toast></p-toast>
+
+<div class="app-container h-full">
+
+  <!-- Header -->
+  <div class="container-header">
+    <div class="flex align-center gap-3">
+      <div class="icon-box bg-primary-light text-primary border-round p-2 flex align-center justify-center">
+        <i class="pi pi-book text-xl"></i>
+      </div>
+      <div class="header-titles">
+        <h2 class="container-title">EMI Ledger Report</h2>
+        <p class="container-subtitle">Detailed transactional history for all EMI activities.</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+       <p-button label="Back to EMIs" icon="pi pi-arrow-left" routerLink="/emis" 
+          styleClass="p-button-outlined p-button-secondary mr-2">
+       </p-button>
+       <p-button label="Export CSV" icon="pi pi-download" (onClick)="exportLedger()"
+          styleClass="p-button-primary">
+       </p-button>
+    </div>
+  </div>
+
+  <div class="container-body flex flex-col h-full gap-4">
+
+    <!-- Filter Panel -->
+    <div class="app-filter-panel ledger-filters p-4 border-round glass-effect shadow-1">
+      <div class="flex flex-wrap gap-4 align-items-end">
+        
+        <div class="filter-field flex-1 min-w-[200px]">
+          <label class="block text-xs font-semibold mb-1 text-secondary">Start Date</label>
+          <p-datepicker appendTo="body" [(ngModel)]="filter.startDate" (onSelect)="applyFilters()" 
+             [showIcon]="true" placeholder="Select Start Date" styleClass="w-full">
+          </p-datepicker>
+        </div>
+
+        <div class="filter-field flex-1 min-w-[200px]">
+          <label class="block text-xs font-semibold mb-1 text-secondary">End Date</label>
+          <p-datepicker appendTo="body" [(ngModel)]="filter.endDate" (onSelect)="applyFilters()" 
+             [showIcon]="true" placeholder="Select End Date" styleClass="w-full">
+          </p-datepicker>
+        </div>
+
+        <div class="filter-field flex-2 min-w-[250px]">
+          <label class="block text-xs font-semibold mb-1 text-secondary">Customer</label>
+          <p-select appendTo="body" [(ngModel)]="filter.customerId" (onChange)="applyFilters()" 
+             [options]="customerOptions()" optionLabel="name" optionValue="_id" [filter]="true" 
+             filterBy="name" [showClear]="true" placeholder="Filter by Customer" styleClass="w-full">
+          </p-select>
+        </div>
+
+        <div class="filter-actions flex align-items-center mb-1">
+          <p-button icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary" 
+             (onClick)="resetFilters()" label="Reset">
+          </p-button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex-1 min-h-0 overflow-hidden manish-border-1 border-secondary border-round shadow-1">
+      <app-ag-share-grid 
+        [columns]="column" 
+        [data]="data" 
+        (gridEvent)="eventFromGrid($event)" 
+        style="height: 100%; width: 100%; display: block;">
+      </app-ag-share-grid>
+    </div>
+
+  </div>
+</div>

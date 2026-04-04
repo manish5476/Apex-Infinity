@@ -37,7 +37,7 @@ import { DynamicDialogServices } from '../../../../core/services/dynamic-dialog-
     AgShareGrid,
     HasPermissionDirective
   ],
-  providers: [CustomerService],
+  providers: [CustomerService, ConfirmationService],
   templateUrl: './customer-list.html',
   styleUrl: './customer-list.scss',
 })
@@ -55,9 +55,10 @@ export class CustomerList implements OnInit {
 
   readonly customerActionColumn: ActionColumnConfig = {
     showView: true,
-    showEdit: false,
+    showEdit: true,
     showDelete: true,
     viewPermission: PERMISSIONS.CUSTOMER.READ,
+    editPermission: PERMISSIONS.CUSTOMER.UPDATE,
     deletePermission: PERMISSIONS.CUSTOMER.DELETE,
   };
 
@@ -213,6 +214,13 @@ export class CustomerList implements OnInit {
     }
     if (event.type === 'selectionChanged') {
       this.selectedRows = event.rows || [];
+    }
+    if (event.type === 'save') {
+      const limitVal = Number(event.row.creditLimit) || 0;
+      this.customerService.updateCreditLimit(event.row._id, { creditLimit: limitVal }).subscribe({
+        next: () => this.messageService.showSuccess('Credit limit updated successfully'),
+        error: (err: any) => this.messageService.handleHttpError(err)
+      });
     }
     if (event.type === 'delete') {
       this.confirmDelete(event.row);

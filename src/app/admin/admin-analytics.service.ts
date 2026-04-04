@@ -60,10 +60,10 @@ export class AdminAnalyticsService extends BaseApiService {
     return this.get<any>('/v1/analytics/customer-intelligence', params, 'getCustomerIntelligence');
   }
 
-    /** RFM customer segmentation */
-    getCustomerSegmentation(): Observable<any> {
-      return this.get<any>('/v1/analytics/customer-segmentation', {}, 'getCustomerSegmentation');
-    }
+  /** RFM customer segmentation */
+  getCustomerSegmentation(): Observable<any> {
+    return this.get<any>('/v1/analytics/customer-segmentation', {}, 'getCustomerSegmentation');
+  }
 
   /** Customer lifetime value analysis */
   getCustomerLifetimeValue(branchId?: string): Observable<any> {
@@ -191,7 +191,7 @@ export class AdminAnalyticsService extends BaseApiService {
   exportAnalyticsData(type: 'sales' | 'inventory' | 'customers', startDate?: string, endDate?: string): Observable<Blob> {
     const params = this.buildParams(startDate, endDate, undefined, { type, format: 'csv' });
     const httpParams = this.createHttpParams(params);
-    
+
     return this.http.get(`${this.baseUrl}/v1/analytics/export`, {
       params: httpParams,
       responseType: 'blob'
@@ -307,8 +307,8 @@ export class AdminAnalyticsService extends BaseApiService {
     const params = this.buildParams(undefined, undefined, branchId, { includeValuation, includePredictions });
     return this.get<any>('/v1/analytics/inventory-health', params, 'getInventoryHealth');
   }
-  
-// ///////////////////////////////////
+
+  // ///////////////////////////////////
   /** Customer churn risk analysis */
   getChurnRiskAnalysis(threshold: number = 90): Observable<any> {
     const params = { threshold };
@@ -611,7 +611,7 @@ export class AdminAnalyticsService extends BaseApiService {
 
 //   /**
 //    * 📥 EXPORT DATA (Handles Binary/Blob)
-//    * We skip `this.get()` because BaseApiService expects JSON, 
+//    * We skip `this.get()` because BaseApiService expects JSON,
 //    * but this endpoint returns a file (Blob).
 //    */
 

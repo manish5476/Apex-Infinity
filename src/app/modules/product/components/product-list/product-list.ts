@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, effect, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, effect, inject, signal, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
@@ -18,6 +18,8 @@ import { BulkProductEntry } from "../bulk-product-entry/bulk-product-entry";
 import { finalize } from 'rxjs';
 import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @Component({
   selector: 'app-product-list',
@@ -32,8 +34,10 @@ import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
     AgShareGrid,
     Dialog,
     BulkProductEntry,
-    HasPermissionDirective
+    HasPermissionDirective,
+    ConfirmDialogModule
   ],
+  providers: [ConfirmationService],
   templateUrl: './product-list.html',
   styleUrl: './product-list.scss',
 })
@@ -44,6 +48,7 @@ export class ProductListComponent implements OnInit {
   private masterList = inject(MasterListService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private confirmationService = inject(ConfirmationService);
 
   PERMISSIONS = PERMISSIONS;
 
@@ -54,6 +59,7 @@ export class ProductListComponent implements OnInit {
   private totalCount = 0;
   private pageSize = 50;
   public bulkDialogVisible: boolean = false
+  @ViewChild('fileInput') fileInput!: ElementRef;
   data: any[] = [];
   column: any = [];
   rowSelectionMode: any = 'single';
@@ -176,6 +182,61 @@ export class ProductListComponent implements OnInit {
     if (event.type === 'selectionChanged') {
       this.selectedRows = event.rows
     }
+  }
+
+  deleteProduct() {
+     if (!this.selectedRows || this.selectedRows.length !== 1) return;
+     const productId = this.selectedRows[0]._id;
+     const productName = this.selectedRows[0].name;
+
+     this.confirmationService.confirm({
+       message: `Are you sure you want to delete ${productName}?`,
+       header: 'Confirm Deletion',
+       icon: 'pi pi-exclamation-triangle',
+       accept: () => {
+         this.productService.deleteProductById(productId).subscribe({
+           next: () => {
+             this.messageService.showSuccess('Product deleted successfully');
+             this.selectedRows = [];
+             this.getData(true);
+           },
+           error: (err) => this.messageService.handleHttpError(err)
+         });
+       }
+     });
+  }
+
+  triggerUpload() {
+    if (this.selectedRows && this.selectedRows.length === 1) {
+      this.fileInput.nativeElement.click();
+    }
+  }
+
+  onFileSelected(event: any) {
+    const files = event.target.files;
+    if (!files?.length || !this.selectedRows || this.selectedRows.length !== 1) return;
+
+    const productId = this.selectedRows[0]._id;
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      formData.append('photos', files[i]);
+    }
+
+    this.isLoading = true;
+    this.productService.uploadProductFile(productId, formData)
+      .pipe(finalize(() => {
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      }))
+      .subscribe({
+        next: (res: any) => {
+          this.messageService.showSuccess('Images uploaded successfully.');
+          this.getData(true);
+        },
+        error: (err: any) => {
+          this.messageService.handleHttpError(err);
+        }
+      });
   }
 
   getColumn(): void {

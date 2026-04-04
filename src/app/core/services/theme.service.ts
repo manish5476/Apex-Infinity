@@ -126,6 +126,7 @@ export class ThemeService {
       const current = this.settingsSubject.value;
       let newSettings: ThemeSettings;
 
+      if (!themeId) return;
       if (themeId === 'theme-dark') {
         newSettings = { ...current, isDarkMode: true };
       } else if (themeId === 'theme-light' || themeId.startsWith('theme-')) {

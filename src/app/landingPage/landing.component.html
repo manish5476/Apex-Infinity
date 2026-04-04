@@ -1,324 +1,461 @@
-<div class="landing-root">
-  
-  <nav class="navbar" [class.navbar-scrolled]="scrollY() > 50">
-    <div class="container nav-content">
-      <div class="brand">
-        <div class="logo-box"><i class="pi pi-infinity"></i></div>
-        <span class="logo-text">APEX <strong>INFINITY</strong></span>
+<!-- ═══════════════════════════════════════════════════
+     APEX INFINITY — LANDING PAGE
+     ═══════════════════════════════════════════════════ -->
+<div class="lp">
+
+  <!-- ── NAVBAR ─────────────────────────────────────── -->
+  <nav class="nav" [class.nav--scrolled]="scrollY() > 60">
+    <div class="nav__inner">
+
+      <a class="nav__brand" routerLink="/">
+        <span class="nav__logo-mark">∞</span>
+        <span class="nav__logo-text">APEX <b>INFINITY</b></span>
+      </a>
+
+      <div class="nav__links">
+        @for (link of navLinks; track link) {
+        <a class="nav__link" href="#{{ link.toLowerCase() }}">{{ link }}</a>
+        }
       </div>
 
-      <div class="desktop-links">
-        <a href="#solutions">Solutions</a>
-        <a href="#platform">Platform</a>
-        <a href="#developers">Developers</a>
-        <a href="#pricing">Pricing</a>
+      <div class="nav__actions">
+        <button class="btn btn--ghost" routerLink="/auth/login">Sign In</button>
+        <button class="btn btn--primary" routerLink="/auth/signup">
+          Start Free Trial <span class="btn__arrow">→</span>
+        </button>
       </div>
 
-      <div class="nav-actions">
-        <button pButton label="Login" class="p-button-text font-bold" routerLink="/auth/login"></button>
-        <button pButton label="Start Trial" class="p-button-primary p-button-rounded font-bold"></button>
-      </div>
-
-      <button class="mobile-toggle" (click)="toggleMobileMenu()"><i class="pi pi-bars"></i></button>
+      <button class="nav__hamburger" (click)="toggleMobileMenu()" [class.is-open]="mobileMenuOpen()">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </nav>
 
-  <header class="hero-section">
-    <div class="glow-orb top-right"></div>
-    <div class="glow-orb bottom-left"></div>
-    
-    <div class="container hero-grid">
-      <div class="hero-text reveal-on-scroll">
-        <div class="accent-pill">
-          <i class="pi pi-check-circle"></i> Angular 20 Powered
-        </div>
-        <h1>{{ heroData().headline }}</h1>
-        <p class="hero-sub">{{ heroData().subhead }}</p>
-        
-        <div class="hero-cta">
-          <button pButton label="Get Started Now" icon="pi pi-bolt" class="p-button-lg p-button-rounded p-button-primary"></button>
-          <button pButton label="Watch Demo" icon="pi pi-play" class="p-button-lg p-button-rounded p-button-outlined"></button>
+  <!-- Mobile drawer -->
+  <div class="mob-overlay" [class.is-open]="mobileMenuOpen()" (click)="toggleMobileMenu()"></div>
+  <div class="mob-drawer" [class.is-open]="mobileMenuOpen()">
+    <div class="mob-drawer__head">
+      <span class="nav__logo-text">APEX <b>INFINITY</b></span>
+      <button (click)="toggleMobileMenu()">✕</button>
+    </div>
+    <nav class="mob-drawer__links">
+      @for (link of navLinks; track link) {
+      <a href="#{{ link.toLowerCase() }}" (click)="toggleMobileMenu()">{{ link }}</a>
+      }
+    </nav>
+    <div class="mob-drawer__actions">
+      <button class="btn btn--ghost w-full" routerLink="/auth/login">Sign In</button>
+      <button class="btn btn--primary w-full" routerLink="/auth/signup">Start Free Trial</button>
+    </div>
+  </div>
+
+  <!-- ── HERO ───────────────────────────────────────── -->
+  <section class="hero">
+    <!-- Background atmosphere -->
+    <div class="hero__bg">
+      <div class="hero__grid-lines"></div>
+      <div class="hero__orb hero__orb--1"></div>
+      <div class="hero__orb hero__orb--2"></div>
+      <div class="hero__orb hero__orb--3"></div>
+    </div>
+
+    <div class="hero__inner">
+      <div class="hero__content reveal">
+        <div class="hero__eyebrow">
+          <span class="badge badge--live">
+            <span class="badge__dot"></span> Live on 500+ organisations
+          </span>
         </div>
 
-        <div class="hero-stats">
+        <h1 class="hero__headline">
+          {{ heroData().headline }}
+        </h1>
+
+        <p class="hero__sub">{{ heroData().subhead }}</p>
+
+        <div class="hero__cta">
+          <button class="btn btn--primary btn--xl" routerLink="/auth/signup">
+            Get Started Free <span class="btn__arrow">→</span>
+          </button>
+          <button class="btn btn--ghost btn--xl">
+            <span class="play-icon">▶</span> Watch 2-min Demo
+          </button>
+        </div>
+
+        <div class="hero__stats">
           @for (stat of heroData().stats; track stat.label) {
-            <div class="stat-item">
-              <strong>{{ stat.value }}</strong>
-              <span>{{ stat.label }}</span>
-            </div>
+          <div class="hero__stat">
+            <span class="hero__stat-val">{{ stat.value }}</span>
+            <span class="hero__stat-label">{{ stat.label }}</span>
+          </div>
           }
         </div>
       </div>
 
-      <div class="hero-visual reveal-on-scroll">
-        <div class="glass-dashboard">
-          <div class="dash-header">
-            <div class="dots"><span></span><span></span><span></span></div>
-            <div class="dash-search">Search Modules...</div>
-          </div>
-          <div class="dash-body">
-            <div class="dash-sidebar">
-              <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      <!-- Dashboard mockup -->
+      <div class="hero__visual reveal">
+        <div class="dash-mock">
+          <!-- Titlebar -->
+          <div class="dash-mock__bar">
+            <div class="dash-mock__dots">
+              <span class="dot dot--red"></span>
+              <span class="dot dot--yellow"></span>
+              <span class="dot dot--green"></span>
             </div>
-            <div class="dash-content">
-              <div class="widget-row">
-                <div class="widget lg">
-                  <div class="chart-line"></div>
+            <span class="dash-mock__title">Apex Infinity — Dashboard</span>
+          </div>
+
+          <!-- Body -->
+          <div class="dash-mock__body">
+            <!-- Sidebar -->
+            <div class="dash-mock__sidebar">
+              <div class="dm-s-logo">∞</div>
+              @for (i of [1,2,3,4,5,6]; track i) {
+              <div class="dm-s-item" [class.dm-s-item--active]="i === 1"></div>
+              }
+            </div>
+
+            <!-- Content -->
+            <div class="dash-mock__content">
+              <!-- KPI row -->
+              <div class="dm-kpis">
+                <div class="dm-kpi dm-kpi--green">
+                  <span class="dm-kpi__label">Revenue</span>
+                  <span class="dm-kpi__val">₹84.2L</span>
+                  <span class="dm-kpi__delta">↑ 18%</span>
                 </div>
-                <div class="widget sm"></div>
+                <div class="dm-kpi dm-kpi--blue">
+                  <span class="dm-kpi__label">Invoices</span>
+                  <span class="dm-kpi__val">1,284</span>
+                  <span class="dm-kpi__delta">↑ 6%</span>
+                </div>
+                <div class="dm-kpi dm-kpi--amber">
+                  <span class="dm-kpi__label">Pending</span>
+                  <span class="dm-kpi__val">₹12.4L</span>
+                  <span class="dm-kpi__delta">↓ 3%</span>
+                </div>
               </div>
-              <div class="widget-row">
-                <div class="widget md"></div>
-                <div class="widget md"></div>
+
+              <!-- Chart -->
+              <div class="dm-chart">
+                <div class="dm-chart__label">Monthly Revenue</div>
+                <div class="dm-chart__bars">
+                  @for (h of [45,60,38,72,55,80,65,90,70,85,95,88]; track h) {
+                  <div class="dm-chart__bar" [style.height.%]="h"></div>
+                  }
+                </div>
+              </div>
+
+              <!-- Table preview -->
+              <div class="dm-table">
+                @for (i of [1,2,3]; track i) {
+                <div class="dm-table__row">
+                  <div class="dm-table__cell dm-table__cell--wide"></div>
+                  <div class="dm-table__cell"></div>
+                  <div class="dm-table__cell dm-table__cell--badge"></div>
+                </div>
+                }
               </div>
             </div>
-          </div>
-          <div class="float-card users">
-            <i class="pi pi-users"></i>
-            <div><span>New Users</span><strong>+128</strong></div>
-          </div>
-          <div class="float-card sales">
-            <i class="pi pi-chart-line"></i>
-            <div><span>Revenue</span><strong>$42k</strong></div>
           </div>
         </div>
-      </div>
-    </div>
-  </header>
 
-  <section class="trust-section">
-    <div class="container">
-      <p>POWERING NEXT-GEN ENTERPRISES</p>
-      <div class="logos">
-        <i class="pi pi-google"></i>
-        <i class="pi pi-amazon"></i>
-        <i class="pi pi-microsoft"></i>
-        <i class="pi pi-apple"></i>
-        <i class="pi pi-discord"></i>
-        <i class="pi pi-slack"></i>
+        <!-- Floating cards -->
+        <div class="float-card float-card--tl reveal">
+          <i class="pi pi-check-circle float-card__icon float-card__icon--green"></i>
+          <div>
+            <div class="float-card__label">Invoice Paid</div>
+            <div class="float-card__val">₹2,40,000</div>
+          </div>
+        </div>
+
+        <div class="float-card float-card--br reveal">
+          <i class="pi pi-chart-line float-card__icon float-card__icon--blue"></i>
+          <div>
+            <div class="float-card__label">Monthly Growth</div>
+            <div class="float-card__val">+22.4%</div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="problem-solution container reveal-on-scroll">
-    <div class="section-head">
-      <h2>The Fragmentation Trap</h2>
-      <p>Why modern businesses stop growing.</p>
-    </div>
-    <div class="problem-grid">
-      @for (prob of problems(); track prob.title) {
-        <div class="problem-card">
-          <div class="icon-box"><i class="pi" [class]="prob.icon"></i></div>
-          <h3>{{ prob.title }}</h3>
-          <p>{{ prob.desc }}</p>
-        </div>
+  <!-- ── TRUST BAR ──────────────────────────────────── -->
+  <div class="trust reveal">
+    <p class="trust__label">Powering next-gen enterprises across India</p>
+    <div class="trust__logos">
+      @for (icon of ['pi-google','pi-amazon','pi-microsoft','pi-apple','pi-discord','pi-slack']; track icon) {
+      <i class="pi {{ icon }} trust__logo"></i>
       }
     </div>
-  </section>
-
-  <div id="solutions" class="deep-dive-wrapper">
-    <div class="section-head container">
-      <h2>The Infinite Suite</h2>
-      <p>20+ Integrated Modules. One Source of Truth.</p>
-    </div>
-
-    @for (feature of deepDiveFeatures(); track feature.id; let i = $index) {
-      <section class="feature-row reveal-on-scroll" [class.reversed]="i % 2 !== 0">
-        <div class="container row-inner">
-          
-          <div class="feature-text">
-            <div class="feature-pill" [style.background]="feature.colorVar + '20'" [style.color]="feature.colorVar">
-              {{ feature.category }}
-            </div>
-            <h3>{{ feature.title }}</h3>
-            <span class="tagline">{{ feature.tagline }}</span>
-            <p>{{ feature.description }}</p>
-            
-            <ul class="check-points">
-              @for (pt of feature.points; track pt) {
-                <li><i class="pi pi-check" [style.color]="feature.colorVar"></i> {{ pt }}</li>
-              }
-            </ul>
-
-            <div class="metric-badge" *ngIf="feature.metric">
-              <span class="lbl">{{ feature.metric.label }}</span>
-              <span class="val" [style.color]="feature.colorVar">{{ feature.metric.value }}</span>
-            </div>
-          </div>
-
-          <div class="feature-visual">
-            <div class="glass-window" [style.border-top-color]="feature.colorVar">
-              <div class="window-controls"><span></span><span></span></div>
-              <div class="window-body center-content">
-                <i [class]="feature.icon" class="main-icon" [style.color]="feature.colorVar"></i>
-                <div class="abstract-lines">
-                  <div class="line" style="width: 80%"></div>
-                  <div class="line" style="width: 60%"></div>
-                  <div class="line" style="width: 90%"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-    }
   </div>
 
-  <section class="ai-section reveal-on-scroll">
-    <div class="container ai-grid">
-      <div class="ai-visual">
-        <div class="brain-graphic">
-          <i class="pi pi-sparkles"></i>
+  <!-- ── PROBLEM ────────────────────────────────────── -->
+  <section class="section problems" id="solutions">
+    <div class="section__inner">
+      <div class="section__head reveal">
+        <span class="section__eyebrow">The Problem</span>
+        <h2 class="section__title">Fragmentation kills growth.</h2>
+        <p class="section__sub">Most businesses run on 6–10 disconnected tools. The cost is invisible — until it isn't.
+        </p>
+      </div>
+
+      <div class="problems__grid">
+        @for (p of problems(); track p.title; let i = $index) {
+        <div class="problem-card reveal" [style.animation-delay.ms]="i * 80">
+          <div class="problem-card__icon">
+            <i class="pi {{ p.icon }}"></i>
+          </div>
+          <h3 class="problem-card__title">{{ p.title }}</h3>
+          <p class="problem-card__desc">{{ p.desc }}</p>
         </div>
-      </div>
-      <div class="ai-content">
-        <span class="highlight">POWERED BY APEX INTELLIGENCE</span>
-        <h2>Your Business, Self-Driving.</h2>
-        <p>Apex AI doesn't just report history; it predicts the future. Forecast cash flow, detect inventory theft, and auto-generate purchase orders.</p>
-        <div class="chat-sim">
-          <div class="msg user">"Analyze Q3 profit margins."</div>
-          <div class="msg bot">"Margins are up 12% driven by lower logistics costs in the North region."</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="developers" class="dev-section container reveal-on-scroll">
-    <div class="section-head">
-      <h2>Built for Builders</h2>
-      <p>Extensible API first architecture.</p>
-    </div>
-    <div class="tech-grid">
-      @for (tech of techStack(); track tech.name) {
-        <div class="tech-card">
-          <i [class]="tech.icon"></i>
-          <span>{{ tech.name }}</span>
-        </div>
-      }
-    </div>
-    <div class="code-block">
-      <div class="code-head">inventory-sync.ts</div>
-      <pre><code><span class="kwd">import</span> {{ '{' }} ApexClient {{ '}' }} <span class="kwd">from</span> '@apex/sdk';
-
-<span class="kwd">const</span> client = <span class="kwd">new</span> ApexClient(API_KEY);
-
-<span class="comment">// Real-time stock update</span>
-<span class="kwd">await</span> client.inventory.sync({{ '{' }}
-  sku: 'IPHONE-15-PRO',
-  qty: 50,
-  warehouse: 'MUM-01'
-{{ '}' }});</code></pre>
-    </div>
-  </section>
-
-  <section id="pricing" class="pricing-section container reveal-on-scroll">
-    <div class="section-head">
-      <h2>Transparent Pricing</h2>
-    </div>
-    <div class="pricing-grid">
-      <div class="price-card glass">
-        <h3>Starter</h3>
-        <div class="amount">₹4,999<span>/mo</span></div>
-        <ul>
-          <li><i class="pi pi-check"></i> 1 Branch</li>
-          <li><i class="pi pi-check"></i> Finance & Inventory</li>
-          <li><i class="pi pi-check"></i> 2 Users</li>
-        </ul>
-        <button pButton label="Start Free" class="p-button-outlined w-full"></button>
-      </div>
-      <div class="price-card glass popular">
-        <div class="ribbon">BEST VALUE</div>
-        <h3>Growth</h3>
-        <div class="amount">₹12,999<span>/mo</span></div>
-        <ul>
-          <li><i class="pi pi-check"></i> 5 Branches</li>
-          <li><i class="pi pi-check"></i> HR, Payroll & Storefront</li>
-          <li><i class="pi pi-check"></i> 10 Users</li>
-        </ul>
-        <button pButton label="Go Pro" class="p-button-primary w-full"></button>
-      </div>
-      <div class="price-card glass">
-        <h3>Enterprise</h3>
-        <div class="amount">Custom</div>
-        <ul>
-          <li><i class="pi pi-check"></i> Unlimited Branches</li>
-          <li><i class="pi pi-check"></i> AI Agent Access</li>
-          <li><i class="pi pi-check"></i> Dedicated Support</li>
-        </ul>
-        <button pButton label="Contact Sales" class="p-button-outlined w-full"></button>
-      </div>
-    </div>
-  </section>
-
-  <section class="testimonial-section container reveal-on-scroll">
-    <h2>From the Founders</h2>
-    <div class="review-grid">
-      <div class="review-card glass">
-        <p>"We reduced our audit time from 15 days to 2 hours. The real-time ledger is magic."</p>
-        <div class="user">
-          <div class="avatar">R</div>
-          <div><strong>Rahul S.</strong><br><small>CFO, TechFlow</small></div>
-        </div>
-      </div>
-      <div class="review-card glass">
-        <p>"The storefront builder allowed us to go D2C in a weekend. Inventory sync is flawless."</p>
-        <div class="user">
-          <div class="avatar">P</div>
-          <div><strong>Priya M.</strong><br><small>Founder, StyleUp</small></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="faq-section container reveal-on-scroll">
-    <h2>Common Questions</h2>
-    <div class="faq-wrapper">
-      <p-accordion value="0">
-        @for (faq of faqs(); track faq.id; let i = $index) {
-          <p-accordion-panel [value]="i.toString()">
-            <p-accordion-header>
-              <span class="faq-head">{{ faq.question }}</span>
-            </p-accordion-header>
-            <p-accordion-content>
-              <p class="faq-body">{{ faq.answer }}</p>
-            </p-accordion-content>
-          </p-accordion-panel>
         }
-      </p-accordion>
-    </div>
-  </section>
-
-  <section class="final-cta reveal-on-scroll">
-    <div class="container">
-      <div class="cta-box glass">
-        <h2>Ready to Scale?</h2>
-        <p>Join 500+ high-growth companies today.</p>
-        <button pButton label="Get Started Free" class="p-button-lg p-button-primary p-button-rounded"></button>
       </div>
     </div>
   </section>
 
-  <footer class="main-footer">
-    <div class="container footer-content">
-      <div class="col brand-col">
-        <h3>APEX INFINITY</h3>
-        <p>© 2026 Apex Systems.</p>
+  <!-- ── FEATURES DEEP-DIVE ─────────────────────────── -->
+  <section class="section features" id="platform">
+    <div class="section__inner">
+      <div class="section__head reveal">
+        <span class="section__eyebrow">The Platform</span>
+        <h2 class="section__title">The Infinite Suite.</h2>
+        <p class="section__sub">20+ integrated modules. One source of truth.</p>
       </div>
-      <div class="col">
+
+      <div class="features__layout">
+        <!-- Tab list -->
+        <div class="features__tabs reveal">
+          @for (feat of features(); track feat.id; let i = $index) {
+          <button class="feature-tab" [class.feature-tab--active]="activeFeatureIdx() === i"
+            [style.--tab-color]="feat.color" (click)="setFeature(i)">
+            <i class="pi {{ feat.icon }} feature-tab__icon"></i>
+            <span class="feature-tab__text">{{ feat.category }}</span>
+            <div class="feature-tab__progress" *ngIf="activeFeatureIdx() === i"></div>
+          </button>
+          }
+        </div>
+
+        <!-- Feature panel -->
+        <div class="features__panel reveal">
+          <div class="feature-panel" [style.--panel-color]="getActiveFeature().color">
+            <div class="feature-panel__text">
+              <span class="feature-panel__cat" [style.color]="getActiveFeature().color">
+                {{ getActiveFeature().category }}
+              </span>
+              <h3 class="feature-panel__title">{{ getActiveFeature().title }}</h3>
+              <p class="feature-panel__tagline">{{ getActiveFeature().tagline }}</p>
+              <p class="feature-panel__desc">{{ getActiveFeature().description }}</p>
+
+              <ul class="feature-panel__points">
+                @for (pt of getActiveFeature().points; track pt) {
+                <li>
+                  <span class="feature-panel__check" [style.background]="getActiveFeature().color + '22'"
+                    [style.color]="getActiveFeature().color">✓</span>
+                  {{ pt }}
+                </li>
+                }
+              </ul>
+
+              @if (getActiveFeature().metric) {
+              <div class="feature-panel__metric">
+                <span class="feature-panel__metric-label">{{ getActiveFeature().metric!.label }}</span>
+                <span class="feature-panel__metric-val" [style.color]="getActiveFeature().color">
+                  {{ getActiveFeature().metric!.value }}
+                </span>
+              </div>
+              }
+            </div>
+
+            <div class="feature-panel__visual">
+              <div class="feature-panel__window" [style.border-top-color]="getActiveFeature().color">
+                <div class="feature-panel__win-bar">
+                  <span class="dot dot--red"></span>
+                  <span class="dot dot--yellow"></span>
+                  <span class="dot dot--green"></span>
+                </div>
+                <div class="feature-panel__win-body">
+                  <div class="feature-panel__icon-wrap" [style.background]="getActiveFeature().color + '15'">
+                    <i class="pi {{ getActiveFeature().icon }}" [style.color]="getActiveFeature().color"></i>
+                  </div>
+                  <div class="feature-panel__lines">
+                    <div class="feature-panel__line" style="width:75%"></div>
+                    <div class="feature-panel__line" style="width:55%"></div>
+                    <div class="feature-panel__line" style="width:85%"></div>
+                    <div class="feature-panel__line" style="width:45%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── AI SECTION ─────────────────────────────────── -->
+  <section class="ai-section reveal">
+    <div class="ai-section__inner">
+      <div class="ai-section__badge">POWERED BY APEX INTELLIGENCE</div>
+      <h2 class="ai-section__title">Your business,<br><em>self-driving.</em></h2>
+      <p class="ai-section__sub">
+        Apex AI doesn't just report history — it predicts the future.
+        Forecast cash flow, detect inventory anomalies, and auto-raise purchase orders.
+      </p>
+
+      <div class="ai-chat">
+        <div class="ai-chat__row ai-chat__row--user">
+          <div class="ai-chat__bubble ai-chat__bubble--user">
+            "Which branch had the highest net margin last month, and why?"
+          </div>
+        </div>
+        <div class="ai-chat__row ai-chat__row--bot">
+          <div class="ai-chat__avatar">∞</div>
+          <div class="ai-chat__bubble ai-chat__bubble--bot">
+            <strong>Mumbai - Andheri</strong> led with <strong>34.2% net margin</strong>,
+            driven by a 22% reduction in logistics costs and 3 bulk B2B orders totalling ₹18.4L.
+            <span class="ai-chat__sources">Based on 1,284 transactions · Updated 2s ago</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PRICING ────────────────────────────────────── -->
+  <section class="section pricing" id="pricing">
+    <div class="section__inner">
+      <div class="section__head reveal">
+        <span class="section__eyebrow">Pricing</span>
+        <h2 class="section__title">Transparent, always.</h2>
+        <p class="section__sub">No hidden fees. No per-module charges. Cancel anytime.</p>
+      </div>
+
+      <div class="pricing__grid">
+        @for (plan of pricingPlans(); track plan.name; let i = $index) {
+        <div class="price-card reveal" [class.price-card--popular]="plan.popular" [style.animation-delay.ms]="i * 100">
+          @if (plan.popular) {
+          <div class="price-card__ribbon">Most Popular</div>
+          }
+          <div class="price-card__name">{{ plan.name }}</div>
+          <div class="price-card__price">
+            {{ plan.price }}<span class="price-card__period">{{ plan.period }}</span>
+          </div>
+          <ul class="price-card__features">
+            @for (f of plan.features; track f) {
+            <li><span class="price-card__check">✓</span> {{ f }}</li>
+            }
+          </ul>
+          <button class="btn w-full" [class.btn--primary]="plan.popular" [class.btn--outline]="!plan.popular">
+            {{ plan.cta }}
+          </button>
+        </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TESTIMONIALS ───────────────────────────────── -->
+  <section class="section testimonials">
+    <div class="section__inner">
+      <div class="section__head reveal">
+        <span class="section__eyebrow">Social Proof</span>
+        <h2 class="section__title">Trusted by founders.</h2>
+      </div>
+
+      <div class="testimonials__grid">
+        @for (t of testimonials(); track t.name; let i = $index) {
+        <div class="testi-card reveal" [style.animation-delay.ms]="i * 100">
+          <div class="testi-card__quote">"</div>
+          <p class="testi-card__text">{{ t.quote }}</p>
+          <div class="testi-card__author">
+            <div class="testi-card__avatar" [style.background]="t.color + '22'" [style.color]="t.color">
+              {{ t.initials }}
+            </div>
+            <div>
+              <div class="testi-card__name">{{ t.name }}</div>
+              <div class="testi-card__role">{{ t.role }}</div>
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FAQ ───────────────────────────────────────── -->
+  <section class="section faq">
+    <div class="section__inner faq__inner">
+      <div class="section__head reveal">
+        <span class="section__eyebrow">FAQ</span>
+        <h2 class="section__title">Common questions.</h2>
+      </div>
+
+      <div class="faq__list">
+        @for (item of faqs(); track item.q; let i = $index) {
+        <div class="faq-item reveal" [class.faq-item--open]="activeAccordionIdx() === i">
+          <button class="faq-item__btn" (click)="toggleAccordion(i)">
+            <span>{{ item.q }}</span>
+            <span class="faq-item__chevron">{{ activeAccordionIdx() === i ? '−' : '+' }}</span>
+          </button>
+          @if (activeAccordionIdx() === i) {
+          <div class="faq-item__body">{{ item.a }}</div>
+          }
+        </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FINAL CTA ──────────────────────────────────── -->
+  <section class="cta-section reveal">
+    <div class="cta-section__inner">
+      <div class="cta-section__orb"></div>
+      <span class="section__eyebrow">Get Started Today</span>
+      <h2 class="cta-section__title">Ready to scale<br>without limits?</h2>
+      <p class="cta-section__sub">Join 500+ high-growth companies already running on Apex Infinity.</p>
+      <div class="cta-section__actions">
+        <button class="btn btn--primary btn--xl" routerLink="/auth/signup">
+          Start Your Free Trial <span class="btn__arrow">→</span>
+        </button>
+        <button class="btn btn--ghost btn--xl">Talk to Sales</button>
+      </div>
+      <p class="cta-section__note">No credit card required · 14-day free trial · Cancel anytime</p>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ─────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <div class="footer__brand">
+        <div class="footer__logo">
+          <span class="nav__logo-mark">∞</span>
+          <span>APEX INFINITY</span>
+        </div>
+        <p class="footer__tagline">The operating system for the modern Indian enterprise.</p>
+        <p class="footer__copy">© 2026 Apex Systems Pvt. Ltd. All rights reserved.</p>
+      </div>
+
+      <div class="footer__col">
         <h4>Product</h4>
-        <a href="#">Finance</a>
+        <a href="#">Finance & Accounting</a>
         <a href="#">HR & Payroll</a>
+        <a href="#">Inventory</a>
         <a href="#">Commerce</a>
+        <a href="#">Apex AI</a>
       </div>
-      <div class="col">
+
+      <div class="footer__col">
         <h4>Resources</h4>
         <a href="#">Documentation</a>
         <a href="#">API Reference</a>
-        <a href="#">Status</a>
+        <a href="#">Changelog</a>
+        <a href="#">Status Page</a>
       </div>
-      <div class="col">
-        <h4>Legal</h4>
+
+      <div class="footer__col">
+        <h4>Company</h4>
+        <a href="#">About Us</a>
+        <a href="#">Careers</a>
         <a href="#">Privacy Policy</a>
         <a href="#">Terms of Service</a>
       </div>

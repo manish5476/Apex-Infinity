@@ -26,14 +26,16 @@ import { ProductHistoryComponent } from '../product-history/product-history';
 import { DynamicDialogServices } from '../../../../core/services/dynamic-dialog-services';
 import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 // Import the dialog component (Ensure path is correct)
 
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule, TagModule, SkeletonModule, CarouselModule, TooltipModule, ToastModule, ImageViewerDirective, ProductAnalyticsDirective, AgShareGrid, HasPermissionDirective],
-  providers: [DialogService],
+  imports: [CommonModule, RouterModule, ButtonModule, TagModule, SkeletonModule, CarouselModule, TooltipModule, ToastModule, ImageViewerDirective, ProductAnalyticsDirective, AgShareGrid, HasPermissionDirective, ConfirmDialogModule],
+  providers: [DialogService, ConfirmationService],
   templateUrl: './product-details.html',
   styleUrls: ['./product-details.scss'],
 })
@@ -46,6 +48,7 @@ export class ProductDetailsComponent implements OnInit {
   public common = inject(CommonMethodService);
   private cdr = inject(ChangeDetectorRef); 
   private dialogService = inject(DialogService);
+  private confirmationService = inject(ConfirmationService);
 
   PERMISSIONS = PERMISSIONS;
 
@@ -250,5 +253,25 @@ loadProductData() {
         if (success) this.loadProductData();
       });
     }
+  }
+
+  deleteProduct() {
+     if (!this.productId) return;
+     const productName = this.product()?.name || 'this product';
+
+     this.confirmationService.confirm({
+       message: `Are you sure you want to delete ${productName}?`,
+       header: 'Confirm Deletion',
+       icon: 'pi pi-exclamation-triangle',
+       accept: () => {
+         this.productService.deleteProductById(this.productId!).subscribe({
+           next: () => {
+             this.messageService.showSuccess('Product deleted successfully');
+             this.router.navigate(['/products']);
+           },
+           error: (err) => this.messageService.handleHttpError(err)
+         });
+       }
+     });
   }
 }

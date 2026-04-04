@@ -1,0 +1,95 @@
+<p-toast></p-toast>
+  
+<div class="immersive-auth">
+  <div class="bg-visual" [style.background-image]="'url(https://images.pexels.com/photos/33784246/pexels-photo-33784246.jpeg)'">
+    <div class="bg-overlay"></div>
+  </div>
+
+  <div class="layout-grid">
+    
+    <div class="hero-panel">
+      <div class="brand-header">
+        <div class="logo-mark">
+          <i class="pi pi-infinity"></i>
+        </div>
+        <span class="brand-name">Apex Infinity</span>
+      </div>
+
+      <div class="hero-content">
+        <h1 class="display-title">
+          Verify <br>
+          <span class="text-gradient">Organization.</span>
+        </h1>
+        <p class="hero-desc">
+          Security first. Validate the Shop ID before logging in to ensure you are connecting to your designated workspace.
+        </p>
+      </div>
+
+      <div class="hero-footer">
+        <span>© 2026 Apex Inc.</span>
+        <div class="footer-links">
+          <a href="#">Support</a>
+          <a href="#">Security</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-panel glass-sidebar">
+      <div class="form-content-wrapper">
+        
+        <div class="auth-header">
+          <div class="icon-badge">
+            <i class="pi pi-verified"></i>
+          </div>
+          <h2 class="auth-title">Verify Shop ID</h2>
+          <p class="auth-subtitle">Look up the details of your organization using its unique Shop ID.</p>
+        </div>
+
+        <form [formGroup]="verifyForm" (ngSubmit)="onSubmit()" class="auth-form">
+          
+          <div class="form-group">
+            <label class="input-label">Shop ID <span class="req">*</span></label>
+            <div class="input-wrapper">
+              <i class="field-icon pi pi-hashtag"></i>
+              <input pInputText formControlName="uniqueShopId" placeholder="e.g. SHOP-1042" class="w-full glass-input-field" />
+            </div>
+          </div>
+
+          <button pButton label="Lookup Organization" icon="pi pi-search" iconPos="right" 
+            class="submit-btn" type="submit" [loading]="isLoading()" [disabled]="verifyForm.invalid">
+          </button>
+
+          @if (orgDetails()) {
+          <div class="org-info-box">
+            <h3><i class="pi pi-building"></i> {{ orgDetails()?.organizationName || orgDetails()?.name || 'Organization' }}</h3>
+            @if (orgDetails()?.mainBranchName) {
+              <p><strong>Primary Branch:</strong> {{ orgDetails()?.mainBranchName }}</p>
+            }
+            @if (orgDetails()?.ownerName) {
+              <p><strong>Owner:</strong> {{ orgDetails()?.ownerName }}</p>
+            }
+            @if (orgDetails()?.primaryEmail) {
+              <p><strong>Email:</strong> {{ orgDetails()?.primaryEmail }}</p>
+            }
+            <div style="margin-top:15px;text-align:center;">
+              <button pButton type="button" class="p-button-outlined w-full p-button-sm" label="Continue to Login" icon="pi pi-sign-in" routerLink="/auth/login"></button>
+            </div>
+          </div>
+          }
+
+          <div class="auth-footer-text">
+            <a routerLink="/auth/find-shop" class="back-link">
+              Forgot Shop ID?
+            </a>
+            &nbsp; | &nbsp;
+            <a routerLink="/auth/login" class="back-link">
+               Back to Login
+            </a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
