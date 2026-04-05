@@ -1,0 +1,60 @@
+<nav class="tab-strip" role="tablist" aria-label="Open tabs">
+
+  <div class="tab-strip__scroll-wrap">
+    <div class="tab-strip__scroll" #scrollContainer>
+
+      @for (tab of tabs(); track tab.id; let i = $index) {
+      <button class="tab-item" [class.tab-item--active]="tab.active" [class.tab-item--pinned]="tab.pinned"
+        [class.tab-item--loading]="tab.loading" role="tab" [attr.aria-selected]="tab.active"
+        [attr.aria-label]="tab.label" [pTooltip]="tab.label" tooltipPosition="bottom"
+        [tooltipOptions]="{ showDelay: 600 }" (click)="activateTab(tab.id)" (mousedown)="onMouseDown($event, tab.id)"
+        (contextmenu)="onContextMenu($event, tab)" draggable="true" (dragstart)="onDragStart($event, i)"
+        (dragover)="onDragOver($event)" (drop)="onDrop($event, i)">
+
+        @if (tab.loading) {
+        <span class="tab-item__shimmer" aria-hidden="true"></span>
+        }
+
+        @if (tab.icon && !tab.loading) {
+        <i class="tab-item__icon" [ngClass]="tab.icon" aria-hidden="true"></i>
+        }
+
+        <span class="tab-item__label">{{ tab.label }}</span>
+
+        @if (tab.count !== undefined) {
+        <span class="tab-item__badge">{{ tab.count }}</span>
+        }
+
+        @if (tab.pinned) {
+        <i class="tab-item__pin pi pi-thumbtack" aria-hidden="true"></i>
+        }
+
+        @if (!tab.pinned) {
+        <div class="tab-item__close" role="button" aria-label="Close tab" (click)="closeTab($event, tab.id)"
+          (mousedown)="$event.stopPropagation()">
+          <i class="pi pi-times"></i>
+        </div>
+        }
+      </button>
+      }
+
+    </div>
+  </div>
+
+  <div class="tab-strip__controls">
+    <button class="tab-ctrl-btn" type="button" pTooltip="New tab" tooltipPosition="bottom" aria-label="New tab"
+      (click)="openNewTab()">
+      <i class="pi pi-plus"></i>
+    </button>
+
+    <div class="tab-ctrl-divider" aria-hidden="true"></div>
+
+    <button class="tab-ctrl-btn tab-ctrl-btn--danger" type="button" pTooltip="Close all tabs" tooltipPosition="bottom"
+      aria-label="Close all tabs" (click)="closeAll()" [disabled]="tabs().length === 0">
+      <i class="pi pi-times-circle"></i>
+    </button>
+  </div>
+
+</nav>
+
+<p-contextMenu #ctxMenu [model]="contextMenuItems()" appendTo="body"></p-contextMenu>

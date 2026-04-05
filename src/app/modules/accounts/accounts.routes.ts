@@ -3,18 +3,19 @@ import { AccountTreeComponent } from './components/accounts-tree/accounts-tree';
 import { AccountListComponent } from './components/account-list/account-list';
 import { permissionGuard } from '@core/auth/guards/permission.guard';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
+import { TabRouterGuard } from '../../Tabbing';
 
 export const ACCOUNT_ROUTES: Routes = [
   { 
     path: '', 
     component: AccountListComponent,
-    canActivate: [permissionGuard],
-    data: { permissions: [PERMISSIONS.ACCOUNT.READ] }
+    canActivate: [TabRouterGuard, permissionGuard],
+    data: { tabLabel: 'Chart of Accounts', tabIcon: 'pi pi-list', permissions: [PERMISSIONS.ACCOUNT.READ] }
   },
   { 
     path: 'tree', 
     component: AccountTreeComponent,
-    canActivate: [permissionGuard],
-    data: { permissions: [PERMISSIONS.ACCOUNT.READ] }
+    canActivate: [TabRouterGuard, permissionGuard],
+    data: { tabLabel: 'Account Tree', tabIcon: 'pi pi-sitemap', permissions: [PERMISSIONS.ACCOUNT.READ] }
   }
 ];

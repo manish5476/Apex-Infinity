@@ -40,10 +40,10 @@ app-mainscreen-header {
   z-index: var(--z-fixed); // 300
 }
 
-// ── 4. Body row (sidebar + content sit side-by-side here) ────────────────────
+// ── 4. Body row (sidebar + content column) ───────────────────────────────────
 .layout-body {
   flex: 1;
-  min-height: 0; // crucial: lets flex child shrink below content height
+  min-height: 0;
   display: flex;
   flex-direction: row;
   position: relative;
@@ -51,480 +51,142 @@ app-mainscreen-header {
 }
 
 // ── 5. Sidebar ───────────────────────────────────────────────────────────────
-// Desktop: absolutely positioned inside layout-body, pushes content via margin.
-// Mobile:  fixed over everything.
 app-mainscreen-sidebar {
   flex-shrink: 0;
-  z-index: var(--z-sticky); // 200 on desktop
+  z-index: var(--z-sticky); // 200
 }
 
-// ── 6. Main content ───────────────────────────────────────────────────────────
+// ── 6. Content Column (Tab shell + Main scroll) ──────────────────────────────
+.content-column {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: transparent;
+  transition: margin-left var(--transition-slow);
+
+  // When sidebar is pinned, push the whole column
+  .is-pinned:not(.is-mobile) & {
+    margin-left: $sidebar-width;
+  }
+}
+
+// ── 7. Tab Strip Fixed Shell ──────────────────────────────────────────────────
+.tab-strip-shell {
+  flex-shrink: 0;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-primary);
+  padding: var(--spacing-sm) var(--spacing-xl) 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+// ── 8. Main Scrollable Content ────────────────────────────────────────────────
 .main-content {
   flex: 1;
-  min-width: 0; // prevents flex blowout on narrow viewports
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-
-  // Content breathes evenly on all sides
-  padding: var(--spacing-xl);
-
-  // Small left peek so content never clips under collapsed sidebar sliver
-  padding-left: calc(#{$sidebar-peek} + var(--spacing-xl));
-
+  min-height: 0; // critical for flex scroll
+  overflow: hidden; // ✅ CRITICAL: Force children to handle their own scroll (sticky grid)
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0; // Removing global padding to allow full-screen grids
   background: transparent;
-
-  transition:
-    margin-left var(--transition-slow),
-    padding-left var(--transition-slow);
 
   // Themed scrollbar
   scrollbar-width: thin;
   scrollbar-color: var(--scroll-thumb) var(--scroll-track);
 
-  &::-webkit-scrollbar {
-    width: 5px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: var(--scroll-track);
-  }
-
+  &::-webkit-scrollbar { width: 5px; }
+  &::-webkit-scrollbar-track { background: var(--scroll-track); }
   &::-webkit-scrollbar-thumb {
     background: var(--scroll-thumb);
     border-radius: var(--ui-border-radius-pill);
   }
 }
 
-// ── 7. Pinned sidebar state (desktop only) ───────────────────────────────────
-// When the sidebar is pinned open, push main content right so nothing overlaps.
-.layout-root.is-pinned:not(.is-mobile) {
-  .main-content {
-    margin-left: $sidebar-width;
-    padding-left: var(--spacing-xl); // restore even padding—no peek needed
-  }
-}
-
-// ── 8. Mobile overrides ───────────────────────────────────────────────────────
+// ── 9. Mobile overrides ───────────────────────────────────────────────────────
 .layout-root.is-mobile {
-
-  // Sidebar floats above everything on mobile
-  app-mainscreen-sidebar {
-    z-index: var(--z-modal); // 500
-  }
-
-  // Content always fills full width; sidebar overlays it
-  .main-content {
+  .content-column {
     margin-left: 0 !important;
-    padding-left: var(--spacing-xl) !important;
   }
 }
 
-// ── 9. Mobile backdrop ────────────────────────────────────────────────────────
+// ── 10. Mobile backdrop ────────────────────────────────────────────────────────
 .mobile-backdrop {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
-  z-index: var(--z-modal-backdrop); // 400 — above sidebar on mobile
+  z-index: var(--z-modal-backdrop);
   cursor: pointer;
   animation: backdrop-in 0.2s ease-out;
 }
 
 @keyframes backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+// ── 11. Tab Content Area & Empty State ────────────────────────────────────────
+.tab-outlet-wrapper {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+
+  // Direct page component injected into outlet
+  & > *:not(.tab-empty-state) {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    width: 100%;
+    animation: tabFadeIn 0.2s ease-out;
+  }
+}
+
+.tab-empty-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  color: var(--text-tertiary);
+  pointer-events: none;
+  background: var(--bg-primary);
+
+  i {
+    font-size: 4rem;
+    opacity: 0.15;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  p {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0;
+    max-width: 300px;
+    text-align: center;
+    line-height: 1.5;
+  }
+}
+
+@keyframes tabFadeIn {
   from {
     opacity: 0;
+    transform: translateY(8px);
   }
-
   to {
     opacity: 1;
+    transform: translateY(0);
   }
 }
-
-// ── 10. Router outlet content normalisation ───────────────────────────────────
-// Ensure whatever routed component renders fills the column cleanly.
-.main-content>router-outlet+* {
-  display: block;
-  width: 100%;
-}
-
-// /* ==========================================================================
-//    MAIN SCREEN LAYOUT ENGINE — TOKEN-DRIVEN
-//    Zero hardcoded colors. All values reference the canonical token system
-//    defined in globals.scss via @mixin apply-canonical-mapping.
-
-//    Z-INDEX STACK (uses --z-* tokens from :root):
-//      content        → 1 (natural flow)
-//      header         → var(--z-fixed)      = 300
-//      sidebar        → var(--z-sticky)     = 200  (desktop float)
-//      mobile sidebar → var(--z-modal)      = 500
-//      backdrop       → var(--z-modal-backdrop) = 400
-//      spotlight      → var(--z-tooltip)    = 700
-//    ========================================================================== */
-
-// // ── Structural constants (not theme-dependent) ───────────────────────────────
-// $sidebar-width : 260px;
-// $header-height : 60px;
-// $sidebar-peek  : 6px;
-// $top-gap       : 12px;
-// $bottom-gap    : 12px;
-
-// :host {
-//   display: block;
-//   height: 100%;
-// }
-
-// // ── 1. Root ───────────────────────────────────────────────────────────────────
-// .layout-root {
-//   height: 100vh;
-//   width: 100vw;
-//   display: flex;
-//   flex-direction: column;
-//   overflow: hidden;
-//   position: relative;
-//   background: var(--bg-secondary);
-// }
-
-// // ── 2. Header slot ────────────────────────────────────────────────────────────
-// app-mainscreen-header {
-//   height: $header-height;
-//   flex-shrink: 0;
-//   position: relative;
-//   z-index: var(--z-fixed); // 300
-// }
-
-// // ── 3. Body row ───────────────────────────────────────────────────────────────
-// .layout-body {
-//   flex: 1;
-//   min-height: 0;      // Allows flex children to shrink below content height
-//   position: relative;
-//   overflow: hidden;
-//   display: flex;
-// }
-
-// // ── 4. Main content ───────────────────────────────────────────────────────────
-// .main-content {
-//   flex: 1;
-//   min-width: 0;       // Prevents flex blowout on narrow screens
-//   height: 100%;
-//   // border-radius: 20px;
-//   overflow-y: auto;
-//   overflow-x: hidden;
-//   // background: var(--bg-secondary);
-
-//   // Pad left so content never hides behind the sidebar peek sliver
-//   padding: var(--spacing-xl);
-//   padding-left: calc(#{$sidebar-peek} + var(--spacing-xl));
-
-//   // All transitions use the --transition-slow token (0.35s ease)
-//   transition:
-//     margin-left var(--transition-slow),
-//     padding-left var(--transition-slow);
-
-//   // Scrollbar uses theme scroll tokens
-//   scrollbar-width: thin;
-//   scrollbar-color: var(--scroll-thumb) var(--scroll-track);
-
-//   &::-webkit-scrollbar       { width: 5px; }
-//   &::-webkit-scrollbar-track { background: var(--scroll-track); }
-//   &::-webkit-scrollbar-thumb {
-//     background: var(--scroll-thumb);
-//     border-radius: var(--ui-border-radius-pill);
-//   }
-// }
-
-// // ── 5. Sidebar z-index ────────────────────────────────────────────────────────
-// // Positioning (fixed, top/bottom) is owned by the component's own :host.
-// // The parent only controls stacking context.
-// app-mainscreen-sidebar {
-//   z-index: var(--z-sticky); // 200
-// }
-
-// // ── 6. Pinned state (desktop only) ───────────────────────────────────────────
-// .layout-root.is-pinned:not(.is-mobile) {
-//   .main-content {
-//     margin-left: $sidebar-width;
-//     padding-left: var(--spacing-xl);
-//   }
-// }
-
-// // ── 7. Mobile state ───────────────────────────────────────────────────────────
-// .layout-root.is-mobile {
-//   app-mainscreen-sidebar {
-//     z-index: var(--z-modal); // 500 — covers header on mobile
-//   }
-
-//   .main-content {
-//     margin-left: 0 !important;
-//     padding-left: var(--spacing-xl) !important;
-//   }
-// }
-
-// // ── 8. Mobile backdrop ────────────────────────────────────────────────────────
-// .mobile-backdrop {
-//   position: fixed;
-//   inset: 0;
-//   // Semi-transparent black is intentionally not a theme token —
-//   // it's a universal overlay convention, not a theme color.
-//   background: rgba(0, 0, 0, 0.45);
-//   backdrop-filter: blur(3px);
-//   -webkit-backdrop-filter: blur(3px);
-//   z-index: var(--z-modal-backdrop); // 400
-//   cursor: pointer;
-//   animation: backdrop-in 0.2s ease-out;
-// }
-
-// @keyframes backdrop-in {
-//   from { opacity: 0; }
-//   to   { opacity: 1; }
-// }
-// // /* ==========================================================================
-// //    MAIN SCREEN LAYOUT ENGINE
-
-// //    Z-INDEX STACK (from bottom to top):
-// //    1   — layout-body / main-content
-// //    100 — header
-// //    200 — sidebar (desktop floating)
-// //    1000— sidebar (mobile)
-// //    1500— mobile backdrop
-// //    9999— spotlight search (inside sidebar component)
-
-// //    SIDEBAR BEHAVIOUR:
-// //    • Desktop unpinned: sidebar floats over content (peek on left edge, 
-// //      slides in on hover or when toggled). Content does NOT shift.
-// //    • Desktop pinned: sidebar is docked, main-content gets margin-left 
-// //      equal to sidebar width so nothing is obscured.
-// //    • Mobile: sidebar covers full height, backdrop dims the content behind.
-// //    ========================================================================== */
-
-// // // ── Layout tokens ─────────────────────────────────────────────────────────────
-// // $sidebar-width  : 260px;
-// // $header-height  : 60px;
-// // $sidebar-peek   : 6px;       // Visible sliver on left when unpinned
-// // $transition     : 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-
-// // // ── Host ──────────────────────────────────────────────────────────────────────
-// // :host {
-// //   display: block;
-// //   height: 100%;
-// // }
-
-// // // ── 1. Root container ─────────────────────────────────────────────────────────
-// // .layout-root {
-// //   height: 100vh;
-// //   width: 100vw;
-// //   display: flex;
-// //   flex-direction: column;
-// //   overflow: hidden;
-// //   position: relative;
-// //   // Background is set by the active theme via CSS variables on <body>
-// //   background: var(--bg-body, var(--bg-primary));
-// // }
-
-// // // ── 2. Header ─────────────────────────────────────────────────────────────────
-// // app-mainscreen-header {
-// //   // Exact height — header never grows or shrinks
-// //   height: $header-height;
-// //   flex-shrink: 0;
-// //   position: relative;
-// //   z-index: 100;
-// // }
-
-// // // ── 3. Body row (sidebar + content live here) ─────────────────────────────────
-// // .layout-body {
-// //   flex: 1;
-// //   min-height: 0;      // Critical: allows flex children to shrink below content size
-// //   position: relative;
-// //   overflow: hidden;
-// //   display: flex;
-// // }
-
-// // // ── 4. Main content ───────────────────────────────────────────────────────────
-// // .main-content {
-// //   flex: 1;
-// //   min-width: 0;       // Prevents flex blowout on narrow content
-// //   height: 100%;
-// //   overflow-y: auto;
-// //   overflow-x: hidden;
-
-// //   // FIX: padding accounts for the sidebar peek so nothing is ever hidden
-// //   // behind the sidebar sliver when unpinned.
-// //   padding-left: calc(#{$sidebar-peek} + 0px);
-// //   padding-right: 0;
-
-// //   // Smooth push when sidebar is pinned
-// //   transition: margin-left $transition, padding-left $transition;
-
-// //   // Slim scrollbar — matches sidebar scrollbar style
-// //   scrollbar-width: thin;
-// //   scrollbar-color: var(--border-secondary, rgba(0,0,0,0.15)) transparent;
-
-// //   &::-webkit-scrollbar       { width: 5px; }
-// //   &::-webkit-scrollbar-track { background: transparent; }
-// //   &::-webkit-scrollbar-thumb {
-// //     background: var(--border-secondary, rgba(0,0,0,0.15));
-// //     border-radius: 4px;
-// //   }
-// // }
-
-// // // ── 5. Sidebar — positioned by the component's own :host ─────────────────────
-// // // The sidebar component uses fixed positioning with top/bottom offsets.
-// // // We set z-index here on the element so the main layout controls the stack.
-// // app-mainscreen-sidebar {
-// //   // Let the component's :host handle positioning. We only control stacking.
-// //   z-index: 200;
-// // }
-
-// // // ── 6. Pinned state (desktop only) ───────────────────────────────────────────
-// // // When pinned, the sidebar is docked and we push the content to the right
-// // // so the sidebar and content sit side-by-side with no overlap.
-// // .layout-root.is-pinned:not(.is-mobile) {
-// //   .main-content {
-// //     margin-left: $sidebar-width;
-// //     padding-left: 0;    // No peek needed — sidebar occupies real space
-// //   }
-
-// //   app-mainscreen-sidebar {
-// //     box-shadow: none;   // No floating shadow when docked
-// //   }
-// // }
-
-// // // ── 7. Mobile state ───────────────────────────────────────────────────────────
-// // .layout-root.is-mobile {
-// //   // On mobile the sidebar covers the header too (full-height overlay)
-// //   app-mainscreen-sidebar {
-// //     z-index: 1000;
-// //   }
-
-// //   // Mobile content: never push, always full width
-// //   .main-content {
-// //     margin-left: 0 !important;
-// //     padding-left: 0 !important;
-// //   }
-// // }
-
-// // // ── 8. Mobile backdrop ────────────────────────────────────────────────────────
-// // .mobile-backdrop {
-// //   position: fixed;
-// //   inset: 0;
-// //   background: rgba(0, 0, 0, 0.45);
-// //   backdrop-filter: blur(3px);
-// //   -webkit-backdrop-filter: blur(3px);
-// //   z-index: 500;         // Below sidebar (1000), above header (100)
-// //   animation: backdrop-in 0.2s ease-out;
-// //   cursor: pointer;
-// // }
-
-// // @keyframes backdrop-in {
-// //   from { opacity: 0; }
-// //   to   { opacity: 1; }
-// // }
-
-
-// // // /* Variables */
-// // // $sidebar-width: 260px;
-// // // $header-height: 64px;
-
-// // // /* 1. Root Container */
-// // // .layout-root {
-// // //   height: 100vh;
-// // //   width: 100vw;
-// // //   display: flex;
-// // //   flex-direction: column;
-// // //   overflow: hidden;
-// // //   position: relative;
-// // // }
-
-// // // /* 2. Header */
-// // // app-mainscreen-header {
-// // //   height: $header-height;
-// // //   flex-shrink: 0;
-// // //   position: relative;
-// // //   z-index: 500; /* High, but lower than Sidebar */
-// // //   background: var(--bg-surface);
-// // //   border-bottom: 1px solid var(--border-subtle);
-// // // }
-
-// // // /* 3. Sidebar - ALWAYS ON TOP FIX */
-// // // app-mainscreen-sidebar {
-// // //   /* Use FIXED positioning to float above everything else */
-// // //   position: fixed; 
-// // //   top: $header-height; /* Starts below header (optional, set to 0 to cover header) */
-// // //   left: 0;
-// // //   bottom: 0;
-// // //   width: $sidebar-width;
-
-// // //   /* CRITICAL: Higher than datepickers (usually 1000) and content */
-// // //   z-index: 1100; 
-
-// // //   /* Smooth Animation */
-// // //   transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-
-// // //   /* Visuals handled inside the component, but we set boundaries here */
-// // // }
-
-// // // /* 4. Layout Body (Content Wrapper) */
-// // // .layout-body {
-// // //   display: flex;
-// // //   flex: 1;
-// // //   position: relative;
-// // //   overflow: hidden; /* Scroll happens inside main-content */
-// // //   z-index: 1; /* Lowest level */
-// // // }
-
-// // // /* 5. Main Content Area */
-// // // .main-content {
-// // //   flex: 1;
-// // //   height: 100%;
-// // //   width: 100%;
-// // //   overflow-y: auto;
-// // //   background: var(--bg-body-secondary);
-
-// // //   /* Default: Content takes full width (Sidebar floats over it) */
-// // //   margin-left: 0;
-// // //   padding: 1.5rem;
-
-// // //   /* Smooth push animation */
-// // //   transition: margin-left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-// // // }
-
-// // // /* --- PINNED STATE (Desktop Only) --- */
-// // // /* When pinned, we squeeze the content to make room */
-// // // .layout-root.is-pinned {
-
-// // //   /* Shift content to the right */
-// // //   .main-content {
-// // //     margin-left: $sidebar-width;
-// // //   }
-
-// // //   /* Sidebar visual tweak (optional) */
-// // //   app-mainscreen-sidebar {
-// // //     box-shadow: none; /* Remove floating shadow when docked */
-// // //     border-right: 1px solid var(--border-subtle);
-// // //   }
-// // // }
-
-// // // /* --- MOBILE STATE --- */
-// // // .layout-root.is-mobile {
-
-// // //   /* Sidebar covers header on mobile */
-// // //   app-mainscreen-sidebar {
-// // //     top: 0; 
-// // //     z-index: 2000; /* Maximum height for mobile menu */
-// // //   }
-
-// // //   /* Never push content on mobile */
-// // //   &.is-pinned .main-content {
-// // //     margin-left: 0 !important;
-// // //   }
-// // // }
-
-// // // /* Backdrop */
-// // // .mobile-backdrop {
-// // //   position: fixed;
-// // //   inset: 0;
-// // //   background: rgba(0, 0, 0, 0.5);
-// // //   backdrop-filter: blur(2px);
-// // //   z-index: 1500; /* Behind sidebar (2000), Above header (500) */
-// // // }

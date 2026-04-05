@@ -111,8 +111,9 @@ export interface ActionColumnConfig {
       flex: 1;
       width: 100%;
       height: 100%;
-      min-height: 400px;
+      min-height: 0; // ✅ Allow the parent flex container to shrink/grow it
       box-sizing: border-box;
+      position: relative;
     }
 
     .shared-grid-root {
@@ -144,8 +145,8 @@ export interface ActionColumnConfig {
     }
 
     @media (max-width: 768px) {
-      :host { min-height: 300px; height: auto; }
-      .shared-grid-root { height: 450px; }
+      :host { min-height: 300px; }
+      .shared-grid-root { flex: 1; min-height: 300px; }
     }
   `]
 })

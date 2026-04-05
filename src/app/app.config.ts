@@ -2,7 +2,7 @@
 import { ApplicationConfig, provideAppInitializer, inject } from '@angular/core';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { provideHttpClient, withInterceptors, withFetch } from '@angular/common/http';
-import { provideRouter } from '@angular/router';
+import { provideRouter, RouteReuseStrategy } from '@angular/router';
 import { routes } from './app.routes';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -17,14 +17,14 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 
 // Import your custom preset
 // import { MyPreset } from './core/config/my-preset';
-
-// Interceptors
 import { jwtInterceptor } from './core/interceptors/jwt.interceptor';
 import { loggingInterceptor } from './core/interceptors/logging.interceptor';
+// import { TabReuseStrategy } from '';
 
 // Services
 import { AuthService } from './modules/auth/services/auth-service';
 import { DialogService } from 'primeng/dynamicdialog';
+import { TabReuseStrategy } from './Tabbing';
 // import { ConfirmationService } from '@core/services/confirmationService';
 
 export const appConfig: ApplicationConfig = {
@@ -47,7 +47,8 @@ export const appConfig: ApplicationConfig = {
     //     }
     //   }
     // })
-    // PRIME NG CONFIGURATION
+    { provide: RouteReuseStrategy, useClass: TabReuseStrategy },
+
     providePrimeNG({
       ripple: true,
       theme: {

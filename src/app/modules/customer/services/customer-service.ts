@@ -64,6 +64,9 @@ export class CustomerService extends BaseApiService {
     return this.get(`${this.endpoint}/search`, queryParams, 'searchCustomers');
   }
 
+  getCustomerFeed(customerId: string): Observable<any> {
+    return this.get(`/v1/feed/customer/${customerId}`, {}, 'getCustomerFeed');
+  }
   checkDuplicate(queryParams: CheckDuplicateQuery): Observable<any> {
     return this.get(`${this.endpoint}/check-duplicate`, queryParams, 'checkDuplicate');
   }

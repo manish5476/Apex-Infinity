@@ -1,0 +1,304 @@
+/* ==========================================================================
+   TAB STRIP COMPONENT — PREMIUM FLOATING PILL (FINAL)
+   ========================================================================== */
+
+.tab-strip {
+  display: flex;
+  align-items: center;
+  height: clamp(48px, 5vh + 10px, 56px);
+  background-color: var(--bg-secondary);
+  border-bottom: var(--ui-border-width) solid var(--component-divider);
+  padding: 0 var(--spacing-sm);
+  gap: var(--spacing-md);
+  user-select: none;
+}
+
+/* ── Scroll Wrapper ─────────────────────────────────────────────────────── */
+.tab-strip__scroll-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+
+  /* Edge fade (left + right) */
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 28px;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  &::before {
+    left: 0;
+    background: linear-gradient(to right, var(--bg-secondary), transparent);
+  }
+
+  &::after {
+    right: 0;
+    background: linear-gradient(to left, var(--bg-secondary), transparent);
+  }
+}
+
+/* ── Scroll Container ───────────────────────────────────────────────────── */
+.tab-strip__scroll {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: var(--spacing-sm);
+
+  flex-wrap: nowrap;
+
+  /* ✅ CRITICAL FIX: Removed max-content which prevented overflow calculation */
+  width: 100%;
+  min-width: 0;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  padding: 0 var(--spacing-xs);
+
+  scroll-behavior: auto;
+  scroll-snap-type: x proximity;
+
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ── Tab Item ───────────────────────────────────────────────────────────── */
+.tab-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+
+  flex: 0 0 auto;
+
+  height: clamp(32px, 3.5vh, 40px);
+  min-width: 120px;
+  max-width: 220px;
+
+  padding: 0 var(--spacing-md);
+  border-radius: var(--ui-border-radius);
+
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: var(--ui-border-width) solid transparent;
+
+  font-family: var(--font-heading);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+
+  transition: all 0.2s ease;
+
+  scroll-snap-align: start;
+
+  /* Hover */
+  &:hover:not(.tab-item--active) {
+    background-color: var(--component-bg-hover);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+  }
+
+  /* Active */
+  &--active {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border-color: var(--component-divider);
+
+    box-shadow:
+      0 2px 6px rgba(0, 0, 0, 0.2),
+      0 0 0 1px var(--component-divider),
+      0 0 12px rgba(var(--accent-primary-rgb), 0.25);
+
+    z-index: 2;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent-primary);
+    }
+  }
+
+  /* Pinned */
+  &--pinned {
+    min-width: auto;
+    max-width: fit-content;
+    padding: 0 var(--spacing-sm);
+  }
+
+  /* Loading */
+  &--loading {
+    cursor: wait;
+    opacity: 0.7;
+  }
+}
+
+/* ── Internal Elements ──────────────────────────────────────────────────── */
+.tab-item__icon {
+  font-size: var(--font-size-md);
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.tab-item__label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+.tab-item__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 var(--spacing-xs);
+  min-width: 1.5rem;
+  height: 1.25rem;
+
+  border-radius: var(--ui-border-radius-pill);
+  background-color: var(--bg-ternary);
+  color: var(--text-primary);
+
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+
+  box-shadow: inset var(--shadow-xs);
+}
+
+.tab-item__pin {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+/* ── Close Button ───────────────────────────────────────────────────────── */
+.tab-item__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 22px;
+  height: 22px;
+
+  border-radius: var(--ui-border-radius-sm);
+  color: var(--text-muted);
+
+  flex-shrink: 0;
+
+  opacity: 0;
+  transform: scale(0.8);
+
+  transition: all 0.15s ease;
+
+  i {
+    font-size: var(--font-size-xs);
+  }
+
+  &:hover {
+    background-color: var(--color-error-bg);
+    color: var(--color-error);
+  }
+}
+
+/* Show close button */
+.tab-item:hover .tab-item__close,
+.tab-item--active .tab-item__close {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ── Controls (Right Side) ──────────────────────────────────────────────── */
+.tab-strip__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+  padding-left: var(--spacing-xs);
+}
+
+.tab-ctrl-divider {
+  width: var(--ui-border-width);
+  height: 24px;
+  background-color: var(--component-divider);
+}
+
+.tab-ctrl-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 32px;
+  height: 32px;
+
+  border: none;
+  border-radius: var(--ui-border-radius-sm);
+
+  background: transparent;
+  color: var(--text-secondary);
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  i {
+    font-size: var(--font-size-md);
+  }
+
+  &:hover:not(:disabled) {
+    background-color: var(--component-bg-hover);
+    color: var(--text-primary);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &--danger:hover:not(:disabled) {
+    background-color: var(--color-error-bg);
+    color: var(--color-error);
+  }
+}
+
+/* ── Loading Shimmer ───────────────────────────────────────────────────── */
+.tab-item__shimmer {
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.06) 50%,
+      transparent 100%);
+
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  pointer-events: none;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}

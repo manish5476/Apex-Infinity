@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
+import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 
 // PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
@@ -28,8 +29,9 @@ import { ImageViewerDirective } from '../../../shared/directives/image-viewer.di
 import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
 import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
+import { CustomerFeedComponent } from '../customer-feed/customer-feed';
 
-type TabType = 'ledger' | 'invoices' | 'payments';
+type TabType = 'ledger' | 'invoices' | 'payments' | 'feed';
 
 interface TabState {
   loaded: boolean;
@@ -55,7 +57,8 @@ interface TabState {
     CustomerTransactions,
     AgShareGrid,
     HasPermissionDirective,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    CustomerFeedComponent
   ],
   providers: [CustomerService, InvoiceService, PaymentService, FinancialService, ConfirmationService],
   templateUrl: './customer-details.html',
@@ -74,12 +77,15 @@ export class CustomerDetails implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private dialogServices = inject(DynamicDialogServices);
   private confirmationService = inject(ConfirmationService);
+  private dialogConfig = inject(DynamicDialogConfig, { optional: true });
+  private dialogRef = inject(DynamicDialogRef, { optional: true });
 
   PERMISSIONS = PERMISSIONS;
 
   // --- State Signals ---
   loadingProfile = signal(true);
   isError = signal(false);
+  isDialog = signal(false);
   customerId = signal<string | null>(null);
   customer = signal<any | null>(null);
 
@@ -90,7 +96,8 @@ export class CustomerDetails implements OnInit {
   tabStatus: Record<TabType, TabState> = {
     ledger: { loaded: false, loading: false, page: 1, total: 0 },
     invoices: { loaded: false, loading: false, page: 1, total: 0 },
-    payments: { loaded: false, loading: false, page: 1, total: 0 }
+    payments: { loaded: false, loading: false, page: 1, total: 0 },
+    feed: { loaded: false, loading: false, page: 1, total: 0 }
   };
 
   // Data Signals
@@ -113,6 +120,17 @@ export class CustomerDetails implements OnInit {
 
   ngOnInit(): void {
     this.initColumns();
+
+    // 1. Check Dialog Data first
+    const dialogId = this.dialogConfig?.data?.id;
+    if (dialogId) {
+      this.isDialog.set(true);
+      this.customerId.set(dialogId);
+      this.loadProfile(dialogId);
+      return;
+    }
+
+    // 2. Fallback to Route Params
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (!id) {

@@ -10,63 +10,62 @@ import { PosInvoiceComponent } from './components/pos-invoice/pos-invoice.compon
 import { permissionGuard } from '@core/auth/guards/permission.guard';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
 import { ProfitDashboardComponentNew } from './analytics/invoice-analytics/profitDashboard/profit-dashboard.component';
+import { TabRouterGuard } from '../../Tabbing';
 
 // These routes will be lazy-loaded under a '/invoices' path (defined in app.routes.ts)
 export const INVOICE_ROUTES: Routes = [
   {
     path: 'PosInvoiceComponent',
     component: PosInvoiceComponent,
-    canActivate: [permissionGuard],
-    data: { permissions: [PERMISSIONS.INVOICE.CREATE] }
+    canActivate: [TabRouterGuard, permissionGuard],
+    data: { tabLabel: 'POS Terminal', tabIcon: 'pi pi-print', permissions: [PERMISSIONS.INVOICE.CREATE] }
   },
   {
     path: 'ProfitSummaryComponent',
     component: ProfitSummaryComponent,
-    canActivate: [permissionGuard],
-    data: { permissions: [PERMISSIONS.REPORT.PROFIT] }
+    canActivate: [TabRouterGuard, permissionGuard],
+    data: { tabLabel: 'Profit Summary', tabIcon: 'pi pi-file-excel', permissions: [PERMISSIONS.REPORT.PROFIT] }
   },
   {
     path: 'ProfitDashboardComponent',
     component: ProfitDashboardComponent,
-    canActivate: [permissionGuard],
-    data: { permissions: [PERMISSIONS.REPORT.PROFIT] }
+    canActivate: [TabRouterGuard, permissionGuard],
+    data: { tabLabel: 'Profit Center', tabIcon: 'pi pi-chart-pie', permissions: [PERMISSIONS.REPORT.PROFIT] }
   },
   {
     path: 'profitDashboardNew',
     component: ProfitDashboardComponentNew,
-    canActivate: [permissionGuard],
-    data: { permissions: [PERMISSIONS.REPORT.PROFIT] }
+    canActivate: [TabRouterGuard, permissionGuard],
+    data: { tabLabel: 'Advanced BI', tabIcon: 'pi pi-chart-line', permissions: [PERMISSIONS.REPORT.PROFIT] }
   },
   {
     path: 'AdvancedProfitAnalysisComponent',
     component: AdvancedProfitAnalysisComponent,
-    canActivate: [permissionGuard],
-    data: { permissions: [PERMISSIONS.REPORT.PROFIT] }
+    canActivate: [TabRouterGuard, permissionGuard],
+    data: { tabLabel: 'Analysis Suite', tabIcon: 'pi pi-search-plus', permissions: [PERMISSIONS.REPORT.PROFIT] }
   },
   {
     path: '',
     component: InvoiceListComponent,
-    canActivate: [permissionGuard],
-    data: { permissions: [PERMISSIONS.INVOICE.READ] }
+    canActivate: [TabRouterGuard, permissionGuard],
+    data: { tabLabel: 'Invoice Registry', tabIcon: 'pi pi-list', permissions: [PERMISSIONS.INVOICE.READ] }
   },
-
   {
     path: 'create',
     component: InvoiceFormComponent,
-    canActivate: [permissionGuard],
-    data: { permissions: [PERMISSIONS.INVOICE.CREATE] }
+    canActivate: [TabRouterGuard, permissionGuard],
+    data: { tabLabel: 'Create Invoice', tabIcon: 'pi pi-plus', permissions: [PERMISSIONS.INVOICE.CREATE] }
   },
   {
     path: ':id',
     component: InvoiceDetailsComponent,
-    canActivate: [permissionGuard],
-    data: { permissions: [PERMISSIONS.INVOICE.READ] }
+    canActivate: [TabRouterGuard, permissionGuard],
+    data: { tabLabel: 'Invoice Details', tabIcon: 'pi pi-file', permissions: [PERMISSIONS.INVOICE.READ] }
   },
   {
     path: ':id/edit',
     component: InvoiceFormComponent,
-    canActivate: [permissionGuard],
-    data: { permissions: [PERMISSIONS.INVOICE.UPDATE] }
+    canActivate: [TabRouterGuard, permissionGuard],
+    data: { tabLabel: 'Edit Invoice', tabIcon: 'pi pi-pencil', permissions: [PERMISSIONS.INVOICE.UPDATE] }
   },
-
-];
+];
