@@ -205,10 +205,10 @@ export class CustomerList implements OnInit {
       this.gridApi = event.api;
       return;
     }
-    if (event.type === 'cellClicked') {
-      const customerId = event.row._id;
+    if (event.type === 'cellClicked' || event.type === 'view') {
+      const customerId = event.row?._id;
       if (customerId) {
-        this.router.navigate(['/customer', customerId]);
+        this.dialogServices.openCustomerDetails(customerId);
       }
     }
     if (event.type === 'reachedBottom') {

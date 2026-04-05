@@ -44,7 +44,9 @@
 
     <header class="dashboard-header glass-effect">
       <div class="header-left">
+        @if (!isDialog()) {
         <button pButton icon="pi pi-arrow-left" class="p-button-text p-button-rounded back-btn" routerLink="/customer"></button>
+        }
 
         <div class="identity-group">
           <div class="name-row">
@@ -173,6 +175,9 @@
             <button class="tab-btn" [class.active]="activeTab() === 'payments'" (click)="switchTab('payments')">
               <i class="pi pi-credit-card"></i> Payments
             </button>
+            <button class="tab-btn" [class.active]="activeTab() === 'feed'" (click)="switchTab('feed')">
+              <i class="pi pi-history"></i> Activity
+            </button>
           </div>
 
           <div class="grid-container">
@@ -203,6 +208,12 @@
                 (gridEvent)="onGridEvent($event, 'payments')"
                 class="full-size-grid">
               </app-ag-share-grid>
+            }
+
+            @if (activeTab() === 'feed' && customerId()) {
+              <div class="feed-container">
+                <app-customer-feed [customerId]="customerId()!"></app-customer-feed>
+              </div>
             }
           </div>
         </section>

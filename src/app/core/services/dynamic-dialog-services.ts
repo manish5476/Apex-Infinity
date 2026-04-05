@@ -25,6 +25,7 @@ import { User } from '../../modules/user/user-management.service';
 
 // Customer & Shared
 import { BulkCustomerComponent } from '../../modules/customer/components/bulk-customer/bulk-customer.component';
+import { CustomerDetails } from '../../modules/customer/components/customer-details/customer-details';
 import { ImageUploaderComponent } from '../../modules/shared/components/image-uploader.component';
 
 @Injectable({
@@ -192,6 +193,14 @@ export class DynamicDialogServices {
       width: '90vw',
       height: '85vh',
       data: { isDialog: true }
+    });
+  }
+
+  openCustomerDetails(customerId: string): DynamicDialogRef | null {
+    return this.dialogService.open(CustomerDetails, {
+      ...this.enterpriseConfig,
+      header: 'Customer Details Profile',
+      data: { id: customerId }
     });
   }
 

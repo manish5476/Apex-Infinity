@@ -26,7 +26,7 @@ export const CUSTOMER_ROUTES: Routes = [
     data: { permissions: [PERMISSIONS.CUSTOMER.READ] }
   },
   {
-    path: ':id', // <-- CHANGED: Was 'customer/:id'.
+    path: ':id',
     component: CustomerDetails,
     canActivate: [permissionGuard],
     data: { permissions: [PERMISSIONS.CUSTOMER.READ] }
