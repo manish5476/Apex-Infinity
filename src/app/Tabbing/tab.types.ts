@@ -5,6 +5,7 @@
 export type TabId = string;
 
 export interface TabMeta {
+  count: any;
   /** Unique identifier — derived from route + serialised params */
   id: TabId;
 

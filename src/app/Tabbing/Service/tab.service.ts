@@ -16,10 +16,10 @@ import {
 import { Router, NavigationExtras } from '@angular/router';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
-import { TabId, TabMeta, TabState, OpenTabOptions } from './tab.types';
+import { TabId, TabMeta, TabState, OpenTabOptions } from '../tab.types';
 
 const STORAGE_KEY = 'apex__tab_state';
-const MAX_TABS    = 20;
+const MAX_TABS = 20;
 
 @Injectable({ providedIn: 'root' })
 export class TabService {
@@ -28,17 +28,17 @@ export class TabService {
   private readonly _state = signal<TabState>(this._loadPersistedState());
 
   // ── Selectors ────────────────────────────────────────────────────────────────
-  readonly state     = this._state.asReadonly();
-  readonly tabs      = computed(() => this._state().tabs);
+  readonly state = this._state.asReadonly();
+  readonly tabs = computed(() => this._state().tabs);
   readonly activeTab = computed(() =>
     this._state().tabs.find(t => t.id === this._state().activeTabId) ?? null
   );
-  readonly tabCount  = computed(() => this._state().tabs.length);
+  readonly tabCount = computed(() => this._state().tabs.length);
 
   // ── RxJS mirrors ─────────────────────────────────────────────────────────────
-  readonly tabs$:        Observable<TabMeta[]>      = toObservable(this.tabs);
-  readonly activeTab$:   Observable<TabMeta | null> = toObservable(this.activeTab);
-  readonly activeTabId$: Observable<TabId | null>   =
+  readonly tabs$: Observable<TabMeta[]> = toObservable(this.tabs);
+  readonly activeTab$: Observable<TabMeta | null> = toObservable(this.activeTab);
+  readonly activeTabId$: Observable<TabId | null> =
     toObservable(computed(() => this._state().activeTabId));
 
   constructor() {
@@ -62,8 +62,8 @@ export class TabService {
     options: OpenTabOptions = {},
     navigationExtras: NavigationExtras = {}
   ): void {
-    const params   = (navigationExtras.queryParams as Record<string, string>) ?? {};
-    const id       = this.buildTabId(path, params);
+    const params = (navigationExtras.queryParams as Record<string, string>) ?? {};
+    const id = this.buildTabId(path, params);
     const existing = this._findById(id);
 
     if (existing && !options.replace) {
@@ -77,16 +77,17 @@ export class TabService {
 
     const tab: TabMeta = {
       id,
-      label:      options.label ?? label,
-      icon:       options.icon,
+      label: options.label ?? label,
+      icon: options.icon,
       path,
-      params:     {},
+      params: {},
       queryParams: params,
-      data:       options.data ?? {},
-      openedAt:   Date.now(),
-      active:     false,
-      pinned:     options.pinned ?? false,
-      loading:    true,
+      data: options.data ?? {},
+      openedAt: Date.now(),
+      active: false,
+      pinned: options.pinned ?? false,
+      loading: true,
+      count: undefined
     };
 
     this._state.update(s => ({
@@ -98,6 +99,9 @@ export class TabService {
       this._patchTab(id, { active: true, loading: false });
     });
   }
+
+  openNewTab?: () => void;
+
 
   /**
    * FIX #1 — Register a tab without triggering navigation.
@@ -122,15 +126,16 @@ export class TabService {
     const tab: TabMeta = {
       id,
       label,
-      icon:       options.icon,
+      icon: options.icon,
       path,
-      params:     {},
+      params: {},
       queryParams,
-      data:       options.data ?? {},
-      openedAt:   Date.now(),
-      active:     true,
-      pinned:     options.pinned ?? false,
-      loading:    false,
+      data: options.data ?? {},
+      openedAt: Date.now(),
+      active: true,
+      pinned: options.pinned ?? false,
+      loading: false,
+      count: undefined
     };
 
     this._state.update(s => ({
@@ -151,7 +156,7 @@ export class TabService {
   activateNext(): void {
     const { tabs, activeTabId } = this._state();
     if (tabs.length < 2) return;
-    const idx  = tabs.findIndex(t => t.id === activeTabId);
+    const idx = tabs.findIndex(t => t.id === activeTabId);
     const next = tabs[(idx + 1) % tabs.length];
     this.activateTab(next.id);
   }
@@ -160,7 +165,7 @@ export class TabService {
   activatePrev(): void {
     const { tabs, activeTabId } = this._state();
     if (tabs.length < 2) return;
-    const idx  = tabs.findIndex(t => t.id === activeTabId);
+    const idx = tabs.findIndex(t => t.id === activeTabId);
     const prev = tabs[(idx - 1 + tabs.length) % tabs.length];
     this.activateTab(prev.id);
   }
@@ -170,8 +175,8 @@ export class TabService {
     const tab = this._findById(id);
     if (!tab || tab.pinned) return;
 
-    const s         = this._state();
-    const idx       = s.tabs.findIndex(t => t.id === id);
+    const s = this._state();
+    const idx = s.tabs.findIndex(t => t.id === id);
     const wasActive = s.activeTabId === id;
     const remaining = s.tabs.filter(t => t.id !== id);
 
@@ -207,12 +212,12 @@ export class TabService {
   }
 
   closeTabsToRight(fromId: TabId): void {
-    const s   = this._state();
+    const s = this._state();
     const idx = s.tabs.findIndex(t => t.id === fromId);
     if (idx === -1) return;
-    const keep              = s.tabs.filter((_, i) => i <= idx || s.tabs[i].pinned);
-    const activeStillHere   = keep.some(t => t.id === s.activeTabId);
-    const newActiveId       = activeStillHere ? s.activeTabId : (keep[keep.length - 1]?.id ?? null);
+    const keep = s.tabs.filter((_, i) => i <= idx || s.tabs[i].pinned);
+    const activeStillHere = keep.some(t => t.id === s.activeTabId);
+    const newActiveId = activeStillHere ? s.activeTabId : (keep[keep.length - 1]?.id ?? null);
     this._state.set({
       tabs: keep.map(t => ({ ...t, active: t.id === newActiveId })),
       activeTabId: newActiveId,
@@ -220,7 +225,7 @@ export class TabService {
   }
 
   closeAllTabs(): void {
-    const pinned    = this._state().tabs.filter(t => t.pinned);
+    const pinned = this._state().tabs.filter(t => t.pinned);
     const newActive = pinned[pinned.length - 1]?.id ?? null;
     this._state.set({
       tabs: pinned.map(t => ({ ...t, active: t.id === newActive })),

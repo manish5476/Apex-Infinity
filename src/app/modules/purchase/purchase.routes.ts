@@ -9,84 +9,49 @@ import { PurchaseFormComponent } from './purchase-form/purchase-form';
 import { PurchaseListComponent } from './purchase-list/purchase-list';
 import { permissionGuard } from '@core/auth/guards/permission.guard';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
+import { TabRouterGuard } from '../../Tabbing';
 
 export const PURCHASE_ROUTES: Routes = [
-  // =========================================================
-  // 1. MAIN LIST
-  // =========================================================
   {
     path: '',
     component: PurchaseListComponent,
-    title: 'Purchase Orders',
-    canActivate: [permissionGuard],
-    data: { permissions: [PERMISSIONS.PURCHASE.READ] }
+    canActivate: [TabRouterGuard, permissionGuard],
+    data: { tabLabel: 'Purchase Orders', tabIcon: 'pi pi-shopping-bag', permissions: [PERMISSIONS.PURCHASE.READ] }
   },
-
-  // =========================================================
-  // 2. STATIC ROUTES (MUST COME BEFORE :id)
-  // =========================================================
   {
     path: 'create',
     component: PurchaseFormComponent,
-    title: 'Create Purchase',
-    canActivate: [permissionGuard],
-    data: { permissions: [PERMISSIONS.PURCHASE.CREATE] }
+    canActivate: [TabRouterGuard, permissionGuard],
+    data: { tabLabel: 'New Purchase', tabIcon: 'pi pi-plus', permissions: [PERMISSIONS.PURCHASE.CREATE] }
   },
-
-  // NEW: History of all Returns (Debit Notes)
-  // Matches: /purchase/returns
   {
     path: 'returns',
     component: PurchaseReturnListComponent,
-    title: 'Purchase Returns History',
-    canActivate: [permissionGuard],
-    data: { permissions: [PERMISSIONS.PURCHASE.RETURN] }
+    canActivate: [TabRouterGuard, permissionGuard],
+    data: { tabLabel: 'Debit Notes', tabIcon: 'pi pi-replay', permissions: [PERMISSIONS.PURCHASE.RETURN] }
   },
-
-  // NEW: Read-Only View of a specific Debit Note
-  // Matches: /purchase/returns/65a... (ID of the Return doc)
-  // Note: This must be separate from 'return/:id' to avoid confusion
   {
     path: 'returns/:id',
     component: PurchaseReturnDetailsComponent,
-    title: 'Debit Note Details',
-    canActivate: [permissionGuard],
-    data: { permissions: [PERMISSIONS.PURCHASE.RETURN] }
+    canActivate: [TabRouterGuard, permissionGuard],
+    data: { tabLabel: 'Debit Note Details', tabIcon: 'pi pi-file', permissions: [PERMISSIONS.PURCHASE.RETURN] }
   },
-
-  // =========================================================
-  // 3. ACTION ROUTES
-  // =========================================================
-
-  // Action: Create a Return FOR a specific Purchase
-  // Matches: /purchase/return/65a... (ID of the Purchase doc)
   {
     path: 'return/:id',
     component: PurchaseReturnComponent,
-    title: 'Create Purchase Return',
-    canActivate: [permissionGuard],
-    data: { permissions: [PERMISSIONS.PURCHASE.RETURN] }
+    canActivate: [TabRouterGuard, permissionGuard],
+    data: { tabLabel: 'Create Return', tabIcon: 'pi pi-backward', permissions: [PERMISSIONS.PURCHASE.RETURN] }
   },
-
-  // =========================================================
-  // 4. DYNAMIC ID ROUTES (CATCH-ALL)
-  // =========================================================
-
-  // View Purchase Details
   {
     path: ':id',
     component: PurchaseDetailsComponent,
-    title: 'Purchase Details',
-    canActivate: [permissionGuard],
-    data: { permissions: [PERMISSIONS.PURCHASE.READ] }
+    canActivate: [TabRouterGuard, permissionGuard],
+    data: { tabLabel: 'Purchase Details', tabIcon: 'pi pi-tag', permissions: [PERMISSIONS.PURCHASE.READ] }
   },
-
-  // Edit Purchase
   {
     path: ':id/edit',
     component: PurchaseFormComponent,
-    title: 'Edit Purchase',
-    canActivate: [permissionGuard],
-    data: { permissions: [PERMISSIONS.PURCHASE.UPDATE] }
+    canActivate: [TabRouterGuard, permissionGuard],
+    data: { tabLabel: 'Edit Purchase', tabIcon: 'pi pi-pencil', permissions: [PERMISSIONS.PURCHASE.UPDATE] }
   }
 ];

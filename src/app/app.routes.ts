@@ -19,6 +19,9 @@ import { SalesListComponent } from './modules/sales/sales-list/sales-list';
 import { AssetList } from './modules/organization/components/AssetList/asset-list';
 import { STOREFRONT_PUBLIC_ROUTES } from './modules/storefront-public/Storefront public.routes';
 import { UnauthorizedComponent } from './modules/shared/components/unauthorized/unauthorized';
+import { ADMIN_ANALYTICS_ROUTES } from './admin/admin.routes';
+import { ADMIN_CHARTS_ROUTES } from './admin/charts.routes';
+import { TabRouterGuard } from './Tabbing';
 
 // Storefront public child routes (extracted for readability)
 
@@ -63,56 +66,65 @@ export const routes: Routes = [
     path: '',
     component: MainScreen,
     canActivate: [authGuard],
+    canActivateChild: [TabRouterGuard],
     children: [
-
-      // Dashboard & Communication
+      // 1. Data Analytics (Directly mapped to tabs)
       {
         path: 'dashboard',
-        loadComponent: () =>
-          import('./admin/admin-analytics-hub.component').then(m => m.AdminDashboardComponent),
-        title: 'Dashboard',
         canActivate: [permissionGuard],
-        data: { permissions: [PERMISSIONS.DASHBOARD.VIEW] }
+        data: { permissions: [PERMISSIONS.DASHBOARD.VIEW] },
+        children: [
+          ...ADMIN_ANALYTICS_ROUTES,
+          { path: '', redirectTo: 'executive', pathMatch: 'full' }
+        ]
       },
+
+      // 2. Visual  / Charts (Directly mapped to tabs)
+      {
+        path: 'charts',
+        canActivate: [permissionGuard],
+        data: { permissions: [PERMISSIONS.DASHBOARD.VIEW] },
+        children: [
+          ...ADMIN_CHARTS_ROUTES,
+          { path: '', redirectTo: 'gallery', pathMatch: 'full' }
+        ]
+      },
+
+      // 3. Communications & Core
       {
         path: 'chat',
         component: ChatComponent,
-        title: 'Team Chat',
-        canActivate: [permissionGuard],
-        data: { permissions: [PERMISSIONS.CHAT.READ] }
+        canActivate: [TabRouterGuard, permissionGuard],
+        data: { tabLabel: 'Team Chat', tabIcon: 'pi pi-comments', permissions: [PERMISSIONS.CHAT.READ] }
       },
 
-      // Finance
+      // 4. Financials
       {
         path: 'financials',
         component: LedgerComponent,
-        title: 'Financial Ledger',
-        canActivate: [permissionGuard],
-        data: { permissions: [PERMISSIONS.LEDGER.READ] }
+        canActivate: [TabRouterGuard, permissionGuard],
+        data: { tabLabel: 'Financial Ledger', tabIcon: 'pi pi-book', permissions: [PERMISSIONS.LEDGER.READ] }
       },
       {
         path: 'transactions',
         component: Transactions,
-        title: 'Transaction History',
-        canActivate: [permissionGuard],
-        data: { permissions: [PERMISSIONS.TRANSACTION.READ] }
+        canActivate: [TabRouterGuard, permissionGuard],
+        data: { tabLabel: 'Transactions', tabIcon: 'pi pi-history', permissions: [PERMISSIONS.TRANSACTION.READ] }
       },
       {
         path: 'sales',
         component: SalesListComponent,
-        title: 'Sales Reports',
-        canActivate: [permissionGuard],
-        data: { permissions: [PERMISSIONS.SALES.VIEW] }
+        canActivate: [TabRouterGuard, permissionGuard],
+        data: { tabLabel: 'Sales Reports', tabIcon: 'pi pi-chart-bar', permissions: [PERMISSIONS.SALES.VIEW] }
       },
       {
         path: 'assets',
         component: AssetList,
-        title: 'Asset Lists',
-        canActivate: [permissionGuard],
-        data: { permissions: [PERMISSIONS.ASSET.READ] }
+        canActivate: [TabRouterGuard, permissionGuard],
+        data: { tabLabel: 'Assets', tabIcon: 'pi pi-wifi', permissions: [PERMISSIONS.ASSET.READ] }
       },
 
-      // Lazy-loaded feature modules
+      // 5. Business Modules (Lazy-loaded)
       { path: 'accounts', loadChildren: () => import('./modules/accounts/accounts.routes').then(m => m.ACCOUNT_ROUTES), canActivate: [permissionGuard], data: { permissions: [PERMISSIONS.ACCOUNT.READ] } },
       { path: 'payments', loadChildren: () => import('./modules/payment/payment.routes').then(m => m.PAYMENT_ROUTES), canActivate: [permissionGuard], data: { permissions: [PERMISSIONS.PAYMENT.READ] } },
       { path: 'notes', loadChildren: () => import('./modules/notes/note.routes').then(m => m.NOTE_ROUTES), canActivate: [permissionGuard], data: { permissions: [PERMISSIONS.NOTE.READ] } },
@@ -125,7 +137,7 @@ export const routes: Routes = [
       { path: 'user', loadChildren: () => import('./modules/user/user.routes').then(m => m.USER_ROUTES), canActivate: [permissionGuard], data: { permissions: [PERMISSIONS.USER.READ] } },
       { path: 'branches', loadChildren: () => import('./modules/branch/branch.routes').then(m => m.BRANCH_ROUTES), canActivate: [permissionGuard], data: { permissions: [PERMISSIONS.BRANCH.READ] } },
 
-      // HRMS explicitly skipped per request
+      // HRMS
       { path: 'hrms', loadChildren: () => import('./modules/hrms/hrms.routes').then(m => m.HRMS_ROUTES) },
 
       // Administration
@@ -133,17 +145,15 @@ export const routes: Routes = [
         path: 'admin/organization',
         loadComponent: () =>
           import('./modules/organization/components/org-settings/org-settings').then(m => m.OrgSettingsComponent),
-        title: 'Organization Settings',
-        canActivate: [permissionGuard],
-        data: { permissions: [PERMISSIONS.ORG.MANAGE] }
+        canActivate: [TabRouterGuard, permissionGuard],
+        data: { tabLabel: 'Organization', tabIcon: 'pi pi-building', permissions: [PERMISSIONS.ORG.MANAGE] }
       },
       {
         path: 'admin/roles',
         loadComponent: () =>
           import('./modules/organization/components/role-management/role-management').then(m => m.RoleManagementComponent),
-        title: 'Role Management',
-        canActivate: [permissionGuard],
-        data: { permissions: [PERMISSIONS.ROLE.MANAGE] }
+        canActivate: [TabRouterGuard, permissionGuard],
+        data: { tabLabel: 'Roles & Permissions', tabIcon: 'pi pi-lock', permissions: [PERMISSIONS.ROLE.MANAGE] }
       },
       {
         path: 'storefront',
@@ -155,30 +165,20 @@ export const routes: Routes = [
       {
         path: 'masterList',
         component: MasterList,
-        title: 'System Masters',
-        canActivate: [permissionGuard],
-        data: { permissions: [PERMISSIONS.MASTER.READ] }
+        canActivate: [TabRouterGuard, permissionGuard],
+        data: { tabLabel: 'Master Data', tabIcon: 'pi pi-database', permissions: [PERMISSIONS.MASTER.READ] }
       },
       {
         path: 'sessions',
         component: Sessions,
-        title: 'Active Sessions',
-        canActivate: [permissionGuard],
-        data: { permissions: [PERMISSIONS.SESSION.VIEW_ALL] }
+        canActivate: [TabRouterGuard, permissionGuard],
+        data: { tabLabel: 'Active Sessions', tabIcon: 'pi pi-wifi', permissions: [PERMISSIONS.SESSION.VIEW_ALL] }
       },
       {
         path: 'logs',
         component: LogsComponent,
-        title: 'System Logs',
-        canActivate: [permissionGuard],
-        data: { permissions: [PERMISSIONS.LOGS.VIEW] }
-      },
-      {
-        path: 'dashboard/settings/ownership',
-        component: AcceptOwnershipComponent,
-        title: 'Accept Ownership',
-        canActivate: [permissionGuard],
-        data: { permissions: [PERMISSIONS.OWNERSHIP.TRANSFER] }
+        canActivate: [TabRouterGuard, permissionGuard],
+        data: { tabLabel: 'Audit Logs', tabIcon: 'pi pi-list', permissions: [PERMISSIONS.LOGS.VIEW] }
       },
       {
         path: 'unauthorized',

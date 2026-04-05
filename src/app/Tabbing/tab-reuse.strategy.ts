@@ -74,11 +74,14 @@ export class TabReuseStrategy implements RouteReuseStrategy {
 
   // ─────────────────────────────────────────────────────────────────────────
   private _key(route: ActivatedRouteSnapshot): string {
-    const path = route.pathFromRoot
+    const segments = route.pathFromRoot
       .flatMap(r => r.url)
       .map(s => s.toString())
-      .join('/');
+      .filter(Boolean);
+    
+    const path = '/' + segments.join('/');
     const qp = route.queryParams as Record<string, string>;
-    return TabReuseStrategy.buildKey('/' + path, qp);
+    
+    return TabReuseStrategy.buildKey(path, qp);
   }
 }

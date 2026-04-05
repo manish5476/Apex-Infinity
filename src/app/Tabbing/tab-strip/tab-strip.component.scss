@@ -1,319 +1,304 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// tab-strip.component.scss
-// FIX #5: --theme-shimmer is now defined inline with a fallback so it works
-//         even if the token isn't in the theme yet.
-// FIX #3: overflow menu styles added.
-// ─────────────────────────────────────────────────────────────────────────────
+/* ==========================================================================
+   TAB STRIP COMPONENT — PREMIUM FLOATING PILL (FINAL)
+   ========================================================================== */
 
-:host {
-  display: block;
-  width: 100%;
-  // FIX #5 — define the shimmer token locally so it never falls back to nothing.
-  // Your theme can override this by defining --theme-shimmer at a higher scope.
-  --theme-shimmer: rgba(255 255 255 / 0.07);
-}
-
-// ── Strip container ───────────────────────────────────────────────────────────
 .tab-strip {
   display: flex;
-  align-items: stretch;
-  height: var(--tab-strip-height, 40px);
-  background: var(--theme-surface-2, #1e1e2e);
-  border-bottom: 1px solid var(--theme-border, rgba(255 255 255 / .08));
+  align-items: center;
+  height: clamp(48px, 5vh + 10px, 56px);
+  background-color: var(--bg-secondary);
+  border-bottom: var(--ui-border-width) solid var(--component-divider);
+  padding: 0 var(--spacing-sm);
+  gap: var(--spacing-md);
   user-select: none;
-  overflow: hidden;
-  position: relative;
 }
 
-// ── Scrollable area ───────────────────────────────────────────────────────────
-.tab-strip__scroll {
-  display: flex;
-  align-items: stretch;
-  flex: 1 1 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-behavior: smooth;
-  scrollbar-width: none;
-
-  &::-webkit-scrollbar { display: none; }
-}
-
-// ── Right-side controls ───────────────────────────────────────────────────────
-.tab-strip__controls {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  padding: 0 6px;
-  border-left: 1px solid var(--theme-border, rgba(255 255 255 / .08));
-  flex-shrink: 0;
-}
-
-// ── Control buttons ───────────────────────────────────────────────────────────
-.tab-ctrl-btn {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: none;
-  background: transparent;
-  color: var(--theme-text-3, #6c7086);
-  border-radius: var(--radius-sm, 4px);
-  cursor: pointer;
-  transition: color 120ms, background 120ms;
-
-  &:hover:not(:disabled) {
-    background: var(--theme-hover, rgba(255 255 255 / .06));
-    color: var(--theme-text-1, #cdd6f4);
-  }
-
-  &:disabled { opacity: .35; cursor: default; }
-
-  &--active {
-    background: var(--theme-hover, rgba(255 255 255 / .06));
-    color: var(--theme-text-1, #cdd6f4);
-  }
-
-  i { font-size: 13px; }
-}
-
-.tab-ctrl-btn__badge {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  min-width: 14px;
-  height: 14px;
-  padding: 0 3px;
-  border-radius: 7px;
-  background: var(--theme-accent, #89b4fa);
-  color: var(--theme-surface-1, #11111b);
-  font-size: 9px;
-  font-weight: 700;
-  line-height: 14px;
-  text-align: center;
-  font-family: var(--theme-font-ui, 'Inter', sans-serif);
-}
-
-// ── Individual tab ────────────────────────────────────────────────────────────
-.tab-item {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0 10px 0 12px;
-  min-width: 120px;
-  max-width: 220px;
+/* ── Scroll Wrapper ─────────────────────────────────────────────────────── */
+.tab-strip__scroll-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
   height: 100%;
-  cursor: pointer;
+  display: flex;
+  align-items: center;
+  position: relative;
   overflow: hidden;
-  border-right: 1px solid var(--theme-border, rgba(255 255 255 / .06));
-  background: var(--theme-surface-2, #1e1e2e);
-  color: var(--theme-text-3, #6c7086);
-  transition: background 120ms, color 120ms;
-  outline: none;
 
+  /* Edge fade (left + right) */
+  &::before,
   &::after {
     content: '';
     position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 2px;
-    background: var(--theme-accent-gradient, linear-gradient(90deg, #89b4fa, #cba6f7));
-    opacity: 0;
-    transition: opacity 150ms;
+    top: 0;
+    bottom: 0;
+    width: 28px;
+    pointer-events: none;
+    z-index: 3;
   }
 
+  &::before {
+    left: 0;
+    background: linear-gradient(to right, var(--bg-secondary), transparent);
+  }
+
+  &::after {
+    right: 0;
+    background: linear-gradient(to left, var(--bg-secondary), transparent);
+  }
+}
+
+/* ── Scroll Container ───────────────────────────────────────────────────── */
+.tab-strip__scroll {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: var(--spacing-sm);
+
+  flex-wrap: nowrap;
+
+  /* ✅ CRITICAL FIX: Removed max-content which prevented overflow calculation */
+  width: 100%;
+  min-width: 0;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  padding: 0 var(--spacing-xs);
+
+  scroll-behavior: auto;
+  scroll-snap-type: x proximity;
+
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ── Tab Item ───────────────────────────────────────────────────────────── */
+.tab-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+
+  flex: 0 0 auto;
+
+  height: clamp(32px, 3.5vh, 40px);
+  min-width: 120px;
+  max-width: 220px;
+
+  padding: 0 var(--spacing-md);
+  border-radius: var(--ui-border-radius);
+
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: var(--ui-border-width) solid transparent;
+
+  font-family: var(--font-heading);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+
+  transition: all 0.2s ease;
+
+  scroll-snap-align: start;
+
+  /* Hover */
   &:hover:not(.tab-item--active) {
-    background: var(--theme-hover, rgba(255 255 255 / .04));
-    color: var(--theme-text-2, #a6adc8);
+    background-color: var(--component-bg-hover);
+    color: var(--text-primary);
+    transform: translateY(-1px);
   }
 
-  &:focus-visible {
-    outline: 2px solid var(--theme-accent, #89b4fa);
-    outline-offset: -2px;
-  }
-
+  /* Active */
   &--active {
-    background: var(--theme-surface-3, #181825);
-    color: var(--theme-text-1, #cdd6f4);
-    border-bottom-color: transparent;
-    &::after { opacity: 1; }
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border-color: var(--component-divider);
+
+    box-shadow:
+      0 2px 6px rgba(0, 0, 0, 0.2),
+      0 0 0 1px var(--component-divider),
+      0 0 12px rgba(var(--accent-primary-rgb), 0.25);
+
+    z-index: 2;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent-primary);
+    }
   }
 
+  /* Pinned */
   &--pinned {
-    min-width: 0;
-    padding: 0 10px;
-    .tab-item__label { display: none; }
-    .tab-item__close  { display: none; }
+    min-width: auto;
+    max-width: fit-content;
+    padding: 0 var(--spacing-sm);
   }
 
-  &--loading .tab-item__label { opacity: 0.4; }
+  /* Loading */
+  &--loading {
+    cursor: wait;
+    opacity: 0.7;
+  }
 }
 
-// ── FIX #5: shimmer — uses the locally defined token (always resolves) ────────
-.tab-item__shimmer {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    var(--theme-shimmer) 40%,
-    transparent 100%
-  );
-  background-size: 200% 100%;
-  animation: tabShimmer 1.2s infinite;
+/* ── Internal Elements ──────────────────────────────────────────────────── */
+.tab-item__icon {
+  font-size: var(--font-size-md);
+  flex-shrink: 0;
+  opacity: 0.8;
 }
 
-@keyframes tabShimmer {
-  0%   { background-position:  200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-// ── Tab inner elements ────────────────────────────────────────────────────────
 .tab-item__label {
-  flex: 1 1 0;
-  font-size: 12.5px;
-  font-weight: 500;
+  flex: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-family: var(--theme-font-ui, 'Inter', sans-serif);
-  letter-spacing: 0.01em;
+  text-align: left;
 }
 
-.tab-item__icon {
-  font-size: 13px;
-  flex-shrink: 0;
-  color: var(--theme-accent, #89b4fa);
+.tab-item__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 var(--spacing-xs);
+  min-width: 1.5rem;
+  height: 1.25rem;
+
+  border-radius: var(--ui-border-radius-pill);
+  background-color: var(--bg-ternary);
+  color: var(--text-primary);
+
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+
+  box-shadow: inset var(--shadow-xs);
 }
 
 .tab-item__pin {
-  font-size: 10px;
-  opacity: .5;
-  flex-shrink: 0;
-  transform: rotate(45deg);
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
 }
 
+/* ── Close Button ───────────────────────────────────────────────────────── */
 .tab-item__close {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  width: 18px;
-  height: 18px;
-  border: none;
-  background: transparent;
-  border-radius: 3px;
-  color: var(--theme-text-3, #6c7086);
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 120ms, background 120ms, color 120ms;
-  padding: 0;
 
-  i { font-size: 10px; }
+  width: 22px;
+  height: 22px;
+
+  border-radius: var(--ui-border-radius-sm);
+  color: var(--text-muted);
+
+  flex-shrink: 0;
+
+  opacity: 0;
+  transform: scale(0.8);
+
+  transition: all 0.15s ease;
+
+  i {
+    font-size: var(--font-size-xs);
+  }
 
   &:hover {
-    background: var(--theme-danger-subtle, rgba(243 139 168 / .15));
-    color: var(--theme-danger, #f38ba8);
+    background-color: var(--color-error-bg);
+    color: var(--color-error);
   }
 }
 
+/* Show close button */
 .tab-item:hover .tab-item__close,
 .tab-item--active .tab-item__close {
   opacity: 1;
+  transform: scale(1);
 }
 
-// ── FIX #3: Overflow dropdown ─────────────────────────────────────────────────
-.tab-overflow {
-  position: relative;
-}
-
-.tab-overflow__menu {
-  position: absolute;
-  top: calc(100% + 4px);
-  right: 0;
-  z-index: 1000;
-  min-width: 220px;
-  max-height: 320px;
-  overflow-y: auto;
-  background: var(--theme-surface-3, #181825);
-  border: 1px solid var(--theme-border, rgba(255 255 255 / .1));
-  border-radius: var(--radius-md, 6px);
-  box-shadow: 0 8px 24px rgba(0 0 0 / .4);
-  padding: 4px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--theme-border, rgba(255 255 255 / .1)) transparent;
-
-  animation: overflowIn 120ms ease-out;
-
-  @keyframes overflowIn {
-    from { opacity: 0; transform: translateY(-4px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-}
-
-.tab-overflow__item {
+/* ── Controls (Right Side) ──────────────────────────────────────────────── */
+.tab-strip__controls {
   display: flex;
   align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 7px 10px;
-  border: none;
-  background: transparent;
-  border-radius: var(--radius-sm, 4px);
-  color: var(--theme-text-2, #a6adc8);
-  cursor: pointer;
-  font-size: 13px;
-  font-family: var(--theme-font-ui, 'Inter', sans-serif);
-  text-align: left;
-  transition: background 100ms, color 100ms;
-
-  &:hover {
-    background: var(--theme-hover, rgba(255 255 255 / .05));
-    color: var(--theme-text-1, #cdd6f4);
-  }
-
-  &--active {
-    color: var(--theme-accent, #89b4fa);
-    background: var(--theme-accent-subtle, rgba(137 180 250 / .08));
-  }
-}
-
-.tab-overflow__item-icon {
-  font-size: 13px;
+  gap: var(--spacing-sm);
   flex-shrink: 0;
-  width: 16px;
-  color: var(--theme-accent, #89b4fa);
+  padding-left: var(--spacing-xs);
 }
 
-.tab-overflow__item-label {
-  flex: 1 1 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.tab-ctrl-divider {
+  width: var(--ui-border-width);
+  height: 24px;
+  background-color: var(--component-divider);
 }
 
-.tab-overflow__item-close {
+.tab-ctrl-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  width: 18px;
-  height: 18px;
+
+  width: 32px;
+  height: 32px;
+
   border: none;
+  border-radius: var(--ui-border-radius-sm);
+
   background: transparent;
-  border-radius: 3px;
-  color: var(--theme-text-3, #6c7086);
+  color: var(--text-secondary);
+
   cursor: pointer;
-  opacity: 0;
-  transition: opacity 100ms, color 100ms;
-  padding: 0;
+  transition: all 0.2s ease;
 
-  i { font-size: 10px; }
+  i {
+    font-size: var(--font-size-md);
+  }
 
-  &:hover { color: var(--theme-danger, #f38ba8); }
+  &:hover:not(:disabled) {
+    background-color: var(--component-bg-hover);
+    color: var(--text-primary);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &--danger:hover:not(:disabled) {
+    background-color: var(--color-error-bg);
+    color: var(--color-error);
+  }
 }
 
-.tab-overflow__item:hover .tab-overflow__item-close {
-  opacity: 1;
+/* ── Loading Shimmer ───────────────────────────────────────────────────── */
+.tab-item__shimmer {
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.06) 50%,
+      transparent 100%);
+
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  pointer-events: none;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }

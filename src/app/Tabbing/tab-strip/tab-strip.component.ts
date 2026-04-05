@@ -1,94 +1,76 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// tab-strip.component.ts
-// FIX #2: keyboard shortcuts wired via TabKeyboardService
-// FIX #3: overflow dropdown for 15+ tabs (visibleTabs / overflowTabs computed)
-// FIX #4: mousedown instead of auxclick for middle-click close
-// ─────────────────────────────────────────────────────────────────────────────
-
 import {
-  ChangeDetectionStrategy,
-  Component,
-  ElementRef,
-  HostListener,
   OnInit,
+  AfterViewInit,
+  Renderer2,
   ViewChild,
   computed,
   inject,
   signal,
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TooltipModule }    from 'primeng/tooltip';
-import { ContextMenuModule } from 'primeng/contextmenu';
-import { MenuItem }          from 'primeng/api';
+import { TooltipModule } from 'primeng/tooltip';
+import { ContextMenu, ContextMenuModule } from 'primeng/contextmenu';
+import { MenuItem } from 'primeng/api';
 
-import { TabService }         from '../tab.service';
-import { TabKeyboardService } from '../tab-keyboard.service';
-import { TabId, TabMeta }     from '../tab.types';
-
-// How many tabs to show before moving the rest to the overflow dropdown
-const OVERFLOW_THRESHOLD = 12;
+import { TabService } from '../Service/tab.service';
+import { TabKeyboardService } from '../Service/tab-keyboard.service';
+import { TabId, TabMeta } from '../tab.types';
 
 @Component({
   selector: 'apex-tab-strip',
   standalone: true,
   imports: [CommonModule, TooltipModule, ContextMenuModule],
   templateUrl: './tab-strip.component.html',
-  styleUrls:  ['./tab-strip.component.scss'],
+  styleUrls: ['./tab-strip.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TabStripComponent implements OnInit {
-
-  private readonly tabService      = inject(TabService);
+export class TabStripComponent implements OnInit, AfterViewInit {
+  private readonly tabService = inject(TabService);
   private readonly keyboardService = inject(TabKeyboardService);
 
   @ViewChild('scrollContainer') scrollContainer!: ElementRef<HTMLDivElement>;
-  @ViewChild('overflowRef')     overflowRef?: ElementRef<HTMLDivElement>;
+  @ViewChild('ctxMenu') ctxMenu!: ContextMenu;
 
   // ── Tab data ──────────────────────────────────────────────────────────────
-  readonly tabs         = this.tabService.tabs;
-
-  /** FIX #3: tabs shown in the strip */
-  readonly visibleTabs  = computed(() => this.tabs().slice(0, OVERFLOW_THRESHOLD));
-
-  /** FIX #3: tabs hidden in the overflow dropdown */
-  readonly overflowTabs = computed(() => this.tabs().slice(OVERFLOW_THRESHOLD));
-
-  // ── Overflow state ────────────────────────────────────────────────────────
-  readonly overflowOpen = signal(false);
+  readonly tabs = this.tabService.tabs;
 
   // ── Context menu ──────────────────────────────────────────────────────────
-  private _ctxTab = signal<TabMeta | null>(null);
+  private readonly _ctxTab = signal<TabMeta | null>(null);
 
   readonly contextMenuItems = computed<MenuItem[]>(() => {
     const tab = this._ctxTab();
     if (!tab) return [];
     return [
       {
-        label:   tab.pinned ? 'Unpin tab' : 'Pin tab',
-        icon:    'pi pi-thumbtack',
+        label: tab.pinned ? 'Unpin tab' : 'Pin tab',
+        icon: 'pi pi-thumbtack',
         command: () => this.tabService.togglePin(tab.id),
       },
       { separator: true },
       {
-        label:    'Close tab',
-        icon:     'pi pi-times',
+        label: 'Close tab',
+        icon: 'pi pi-times',
         disabled: tab.pinned,
-        command:  () => this.tabService.closeTab(tab.id),
+        command: () => this.tabService.closeTab(tab.id),
       },
       {
-        label:   'Close other tabs',
-        icon:    'pi pi-times-circle',
+        label: 'Close other tabs',
+        icon: 'pi pi-times-circle',
         command: () => this.tabService.closeOtherTabs(tab.id),
       },
       {
-        label:   'Close tabs to the right',
-        icon:    'pi pi-chevron-right',
+        label: 'Close tabs to the right',
+        icon: 'pi pi-chevron-right',
         command: () => this.tabService.closeTabsToRight(tab.id),
       },
       { separator: true },
       {
-        label:   'Close all tabs',
-        icon:    'pi pi-ban',
+        label: 'Close all tabs',
+        icon: 'pi pi-ban',
         command: () => this.tabService.closeAllTabs(),
       },
     ];
@@ -97,11 +79,27 @@ export class TabStripComponent implements OnInit {
   // ── Drag state ────────────────────────────────────────────────────────────
   private _dragFromIndex: number | null = null;
 
-  // ─────────────────────────────────────────────────────────────────────────
-
   ngOnInit(): void {
-    // FIX #2: activate keyboard shortcuts once the strip mounts
     this.keyboardService.init();
+  }
+
+  ngAfterViewInit(): void {
+    // We add the wheel listener manually with passive: false to allow preventDefault()
+    if (this.scrollContainer) {
+      this.scrollContainer.nativeElement.addEventListener('wheel', (e: WheelEvent) => {
+        this.onWheelScroll(e);
+      }, { passive: false });
+    }
+  }
+
+  onWheelScroll(event: WheelEvent): void {
+    // Prevent vertical page scroll while hovering the tab strip
+    event.preventDefault();
+
+    if (this.scrollContainer) {
+      // Multiply by a factor to make it feel more responsive
+      this.scrollContainer.nativeElement.scrollLeft += (event.deltaY * 1.8);
+    }
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -110,6 +108,7 @@ export class TabStripComponent implements OnInit {
 
   activateTab(id: TabId): void {
     this.tabService.activateTab(id);
+    this.scrollActiveTabIntoView();
   }
 
   closeTab(event: MouseEvent, id: TabId): void {
@@ -121,49 +120,39 @@ export class TabStripComponent implements OnInit {
     this.tabService.closeAllTabs();
   }
 
-  /**
-   * FIX #4: use mousedown (not auxclick) for middle-click.
-   * auxclick fires AFTER mouseup and can be swallowed by the browser's
-   * auto-scroll cursor that appears on middle-mousedown in some browsers.
-   * mousedown fires immediately and is reliable across all browsers.
-   */
+  openNewTab(): void {
+    // this.tabService.openNewTab?.();
+  }
+
   onMouseDown(event: MouseEvent, id: TabId): void {
-    if (event.button === 1) {
-      event.preventDefault(); // prevent browser auto-scroll cursor
+    if (event.button === 1) { // Middle click
+      event.preventDefault();
       this.tabService.closeTab(id);
     }
   }
 
   onContextMenu(event: MouseEvent, tab: TabMeta): void {
     this._ctxTab.set(tab);
-    // PrimeNG p-contextMenu opens via the directive binding
-  }
-
-  onWheelScroll(event: WheelEvent): void {
-    event.preventDefault();
-    this.scrollContainer.nativeElement.scrollLeft += event.deltaY * 0.6;
+    this.ctxMenu.show(event);
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  // FIX #3: Overflow dropdown
+  // Keyboard navigation
   // ─────────────────────────────────────────────────────────────────────────
 
-  toggleOverflow(event: MouseEvent): void {
-    event.stopPropagation();
-    this.overflowOpen.update(v => !v);
-  }
-
-  closeOverflow(): void {
-    this.overflowOpen.set(false);
-  }
-
-  /** Close overflow dropdown when clicking outside it */
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    if (!this.overflowOpen()) return;
-    const el = this.overflowRef?.nativeElement;
-    if (el && !el.contains(event.target as Node)) {
-      this.overflowOpen.set(false);
+  @HostListener('keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent): void {
+    const tabs = this.tabs();
+    if (!tabs.length) return;
+    const currentIdx = tabs.findIndex((t) => t.active);
+    if (event.key === 'ArrowRight') {
+      const next = tabs[(currentIdx + 1) % tabs.length];
+      this.activateTab(next.id);
+      event.preventDefault();
+    } else if (event.key === 'ArrowLeft') {
+      const prev = tabs[(currentIdx - 1 + tabs.length) % tabs.length];
+      this.activateTab(prev.id);
+      event.preventDefault();
     }
   }
 
@@ -177,7 +166,7 @@ export class TabStripComponent implements OnInit {
   }
 
   onDragOver(event: DragEvent): void {
-    event.preventDefault();
+    event.preventDefault(); // Required to allow dropping
   }
 
   onDrop(event: DragEvent, toIndex: number): void {
@@ -186,5 +175,16 @@ export class TabStripComponent implements OnInit {
       this.tabService.moveTab(this._dragFromIndex, toIndex);
     }
     this._dragFromIndex = null;
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Helpers
+  // ─────────────────────────────────────────────────────────────────────────
+
+  private scrollActiveTabIntoView(): void {
+    setTimeout(() => {
+      const el = this.scrollContainer?.nativeElement.querySelector<HTMLElement>('.tab-item--active');
+      el?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }, 30);
   }
 }

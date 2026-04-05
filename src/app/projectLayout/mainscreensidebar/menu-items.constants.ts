@@ -25,7 +25,112 @@ export const SIDEBAR_MENU: MenuItem[] = [
   },
 
   // ==========================
-  // 2. SALES & BILLING (CRM)
+  // 2. DATA ANALYTICS (UNIFIED)
+  // ==========================
+  {
+    label: 'Analytics & BI',
+    icon: 'pi pi-chart-bar',
+    permissions: [PERMISSIONS.ANALYTICS.VIEW_EXECUTIVE],
+    items: [
+      {
+        label: 'Core Hubs',
+        icon: 'pi pi-objects-column',
+        items: [
+          { label: 'Executive View', icon: 'pi pi-shield', routerLink: ['/dashboard/executive'], permissions: [PERMISSIONS.ANALYTICS.VIEW_EXECUTIVE] },
+          { label: 'Live Monitor', icon: 'pi pi-bolt', routerLink: ['/dashboard/live-monitor'], permissions: [PERMISSIONS.ANALYTICS.VIEW_ALERTS] },
+          { label: 'Real-time Stats', icon: 'pi pi-sync', routerLink: ['/dashboard/predictive'], permissions: [PERMISSIONS.ANALYTICS.VIEW_FORECAST] },
+          { label: 'Export Hub', icon: 'pi pi-download', routerLink: ['/dashboard/export-hub'], permissions: [PERMISSIONS.ANALYTICS.EXPORT_DATA] },
+        ]
+      },
+      {
+        label: 'Financial BI',
+        icon: 'pi pi-wallet',
+        items: [
+          { label: 'Financials', icon: 'pi pi-chart-line', routerLink: ['/dashboard/finance-main'], permissions: [PERMISSIONS.ANALYTICS.VIEW_FINANCIAL] },
+          { label: 'Cash Flow', icon: 'pi pi-money-bill', routerLink: ['/dashboard/cash-flow'], permissions: [PERMISSIONS.ANALYTICS.VIEW_FINANCIAL] },
+          { label: 'EMI Stats', icon: 'pi pi-credit-card', routerLink: ['/dashboard/emi-analytics'], permissions: [PERMISSIONS.ANALYTICS.EMI_READ] },
+        ]
+      },
+      {
+        label: 'Customer Intelligence',
+        icon: 'pi pi-users',
+        items: [
+          { label: 'Customer 360', icon: 'pi pi-user', routerLink: ['/dashboard/customer-360'], permissions: [PERMISSIONS.CUSTOMER.READ] },
+          { label: 'Market Segments', icon: 'pi pi-sitemap', routerLink: ['/dashboard/customer-segmentation'], permissions: [PERMISSIONS.ANALYTICS.VIEW_CUSTOMER_SEGMENTATION] },
+          { label: 'LTV Analysis', icon: 'pi pi-star', routerLink: ['/dashboard/customer-ltv-analysis'], permissions: [PERMISSIONS.ANALYTICS.VIEW_CUSTOMER_LTV] },
+        ]
+      },
+      {
+        label: 'Inventory & Ops',
+        icon: 'pi pi-box',
+        items: [
+          { label: 'Product Stats', icon: 'pi pi-tag', routerLink: ['/dashboard/product-stats'], permissions: [PERMISSIONS.ANALYTICS.VIEW_INVENTORY] },
+          { label: 'Dead Stock', icon: 'pi pi-exclamation-circle', routerLink: ['/dashboard/dead-stock'], permissions: [PERMISSIONS.ANALYTICS.VIEW_STOCK_FORECAST] },
+          { label: 'Operational BI', icon: 'pi pi-cog', routerLink: ['/dashboard/operational'], permissions: [PERMISSIONS.ANALYTICS.VIEW_OPERATIONAL] },
+          { label: 'Peak Analysis', icon: 'pi pi-clock', routerLink: ['/dashboard/peak-hours'], permissions: [PERMISSIONS.ANALYTICS.VIEW_STAFF_PERFORMANCE] },
+          { label: 'Staff Stats', icon: 'pi pi-users', routerLink: ['/dashboard/staff-performance'], permissions: [PERMISSIONS.ANALYTICS.VIEW_STAFF_PERFORMANCE] },
+        ]
+      },
+      {
+        label: 'System & Security',
+        icon: 'pi pi-shield',
+        items: [
+          { label: 'Audit Logs', icon: 'pi pi-list-check', routerLink: ['/dashboard/audit-logs'], permissions: [PERMISSIONS.ANALYTICS.VIEW_SECURITY_AUDIT] },
+          { label: 'Compliance', icon: 'pi pi-verified', routerLink: ['/dashboard/compliance'], permissions: [PERMISSIONS.ANALYTICS.VIEW_SECURITY_AUDIT] },
+          { label: 'Data Health', icon: 'pi pi-database', routerLink: ['/dashboard/data-health'], permissions: [PERMISSIONS.ANALYTICS.VIEW_SECURITY_AUDIT] },
+        ]
+      }
+    ]
+  },
+
+  // ==========================
+  // 3. CHART ANALYSIS (UNIFIED)
+  // ==========================
+  {
+    label: 'Visual Insights',
+    icon: 'pi pi-chart-pie',
+    permissions: [PERMISSIONS.ANALYTICS.VIEW_EXECUTIVE],
+    items: [
+      { label: 'Gallery View', icon: 'pi pi-th-large', routerLink: ['/charts/gallery'], permissions: [PERMISSIONS.ANALYTICS.VIEW_EXECUTIVE] },
+      {
+        label: 'Finance Charts',
+        icon: 'pi pi-wallet',
+        items: [
+          { label: 'Finance Trend', icon: 'pi pi-chart-line', routerLink: ['/charts/financial'], permissions: [PERMISSIONS.ANALYTICS.VIEW_FINANCIAL] },
+          { label: 'Gross Profit', icon: 'pi pi-dollar', routerLink: ['/charts/gp'], permissions: [PERMISSIONS.ANALYTICS.VIEW_FINANCIAL] },
+          { label: 'YoY Growth', icon: 'pi pi-arrow-up-right', routerLink: ['/charts/growth'], permissions: [PERMISSIONS.ANALYTICS.VIEW_FINANCIAL] },
+          { label: 'Payment Mix', icon: 'pi pi-credit-card', routerLink: ['/charts/payment'], permissions: [PERMISSIONS.ANALYTICS.VIEW_FINANCIAL] },
+          { label: 'Purchase/Sales', icon: 'pi pi-sync', routerLink: ['/charts/pvs'], permissions: [PERMISSIONS.ANALYTICS.VIEW_FINANCIAL] },
+          { label: 'EMI Portfolio', icon: 'pi pi-calendar', routerLink: ['/charts/emi'], permissions: [PERMISSIONS.ANALYTICS.EMI_READ] },
+        ]
+      },
+      {
+        label: 'Sales Charts',
+        icon: 'pi pi-shopping-cart',
+        items: [
+          { label: 'AOV Trend', icon: 'pi pi-chart-line', routerLink: ['/charts/aov'], permissions: [PERMISSIONS.ANALYTICS.VIEW_FORECAST] },
+          { label: 'Sales Dist', icon: 'pi pi-globe', routerLink: ['/charts/dist'], permissions: [PERMISSIONS.ANALYTICS.VIEW_FORECAST] },
+          { label: 'Return Rate', icon: 'pi pi-replay', routerLink: ['/charts/return'], permissions: [PERMISSIONS.ANALYTICS.VIEW_FORECAST] },
+          { label: 'Performers', icon: 'pi pi-star', routerLink: ['/charts/performers'], permissions: [PERMISSIONS.ANALYTICS.VIEW_EXECUTIVE] },
+          { label: 'Order Funnel', icon: 'pi pi-filter-fill', routerLink: ['/charts/funnel'], permissions: [PERMISSIONS.ANALYTICS.VIEW_FORECAST] },
+        ]
+      },
+      {
+        label: 'Customer & Ops',
+        icon: 'pi pi-users',
+        items: [
+          { label: 'Acquisition', icon: 'pi pi-user-plus', routerLink: ['/charts/acquisition'], permissions: [PERMISSIONS.CUSTOMER.READ] },
+          { label: 'Outstanding', icon: 'pi pi-money-bill', routerLink: ['/charts/outstanding'], permissions: [PERMISSIONS.CUSTOMER.READ] },
+          { label: 'Branch Radar', icon: 'pi pi-map-marker', routerLink: ['/charts/radar'], permissions: [PERMISSIONS.ANALYTICS.VIEW_BRANCH_COMPARISON] },
+          { label: 'Activity Heatmap', icon: 'pi pi-th-large', routerLink: ['/charts/heatmap'], permissions: [PERMISSIONS.ANALYTICS.VIEW_OPERATIONAL] },
+          { label: 'Inventory Health', icon: 'pi pi-box', routerLink: ['/charts/inventory'], permissions: [PERMISSIONS.ANALYTICS.VIEW_INVENTORY] },
+        ]
+      }
+    ]
+  },
+
+  // ==========================
+  // 4. SALES & BILLING (CRM)
   // ==========================
   {
     label: 'Sales & Billing',
@@ -53,7 +158,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
   },
 
   // ==========================
-  // 3. WORKSPACE & MEETINGS
+  // 5. WORKSPACE & MEETINGS
   // ==========================
   {
     label: 'Workspace',
@@ -70,7 +175,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
   },
 
   // ==========================
-  // 4. INVENTORY & SUPPLY (SCM)
+  // 6. INVENTORY & PURCHASE
   // ==========================
   {
     label: 'Inventory & Purchase',
@@ -102,7 +207,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
   },
 
   // ==========================
-  // 5. FINANCE & ACCOUNTS
+  // 7. FINANCE & ACCOUNTS
   // ==========================
   {
     label: 'Accounting',
@@ -126,7 +231,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
   },
 
   // ==========================
-  // 6. HUMAN RESOURCES
+  // 8. HUMAN RESOURCES
   // ==========================
   {
     label: 'Human Resources',
@@ -159,66 +264,12 @@ export const SIDEBAR_MENU: MenuItem[] = [
           { label: 'Employee Hierarchy', icon: 'pi pi-sitemap', routerLink: ['/user/hierarchy'], permissions: [PERMISSIONS.USER.READ] },
           { label: 'Onboard User', icon: 'pi pi-user-plus', routerLink: ['/user/create'], permissions: [PERMISSIONS.USER.MANAGE] },
         ]
-      },
-      {
-        label: 'Shifts & Rosters',
-        icon: 'pi pi-clock',
-        permissions: [PERMISSIONS.SHIFT.READ],
-        items: [
-          { label: 'Shift Hub', icon: 'pi pi-calendar', routerLink: ['/hrms/shifts/list'], permissions: [PERMISSIONS.SHIFT.READ] },
-          { label: 'Add Shift', icon: 'pi pi-plus', routerLink: ['/hrms/shifts/new'], permissions: [PERMISSIONS.SHIFT.MANAGE] },
-          { label: 'Shift Coverage', icon: 'pi pi-users', routerLink: ['/hrms/shifts/coverage'], permissions: [PERMISSIONS.SHIFT.READ] },
-          { label: 'Shift Validator', icon: 'pi pi-check-square', routerLink: ['/hrms/shifts/validator'], permissions: [PERMISSIONS.SHIFT.MANAGE] },
-          { label: 'Shift Calculator', icon: 'pi pi-calculator', routerLink: ['/hrms/shifts/calculator'], permissions: [PERMISSIONS.SHIFT.MANAGE] },
-          { label: 'Clone Shift', icon: 'pi pi-copy', routerLink: ['/hrms/shifts/clone'], permissions: [PERMISSIONS.SHIFT.MANAGE] },
-          { label: 'Group Rotation', icon: 'pi pi-sync', routerLink: ['/hrms/shift-groups/list'], permissions: [PERMISSIONS.SHIFT.GROUP_READ] },
-          { label: 'Add Shift Group', icon: 'pi pi-plus', routerLink: ['/hrms/shift-groups/create'], permissions: [PERMISSIONS.SHIFT.GROUP_MANAGE] }
-        ]
-      },
-      {
-        label: 'Time & Attendance',
-        icon: 'pi pi-calendar-times',
-        permissions: [PERMISSIONS.ATTENDANCE.READ],
-        items: [
-          { label: 'My Web Clock', icon: 'pi pi-clock', routerLink: ['/hrms/attendance/my-clock'], permissions: [PERMISSIONS.ATTENDANCE.READ] },
-          { label: 'My Timesheet', icon: 'pi pi-calendar', routerLink: ['/hrms/daily-attendance/my-timesheet'], permissions: [PERMISSIONS.ATTENDANCE.READ] },
-          { label: 'Live Punch Feed', icon: 'pi pi-video', routerLink: ['/hrms/attendance/live-feed'], permissions: [PERMISSIONS.ATTENDANCE.READ] },
-          { label: 'Attendance Admin', icon: 'pi pi-shield', routerLink: ['/hrms/attendance/admin'], permissions: [PERMISSIONS.ATTENDANCE.MANAGE] },
-          { label: 'Daily Admin Register', icon: 'pi pi-sliders-h', routerLink: ['/hrms/daily-attendance/admin'], permissions: [PERMISSIONS.ATTENDANCE.MANAGE] },
-          { label: 'Reports & Bulk Edit', icon: 'pi pi-file-excel', routerLink: ['/hrms/daily-attendance/reports'], permissions: [PERMISSIONS.ATTENDANCE.MANAGE] }
-        ]
-      },
-      {
-        label: 'Leaves & Holidays',
-        icon: 'pi pi-calendar-minus',
-        permissions: [PERMISSIONS.LEAVE.READ, PERMISSIONS.HOLIDAY.READ],
-        items: [
-          { label: 'My Leaves', icon: 'pi pi-user', routerLink: ['/hrms/leave/hub'], permissions: [PERMISSIONS.LEAVE.READ] },
-          { label: 'Apply Leave', icon: 'pi pi-pencil', routerLink: ['/hrms/leave/apply'], permissions: [PERMISSIONS.LEAVE.REQUEST] },
-          { label: 'Leave Admin Hub', icon: 'pi pi-shield', routerLink: ['/hrms/leave/admin'], permissions: [PERMISSIONS.LEAVE.ADMIN] },
-          { label: 'Balance Admin', icon: 'pi pi-wallet', routerLink: ['/hrms/leave-balances/admin'], permissions: [PERMISSIONS.LEAVE.BALANCE_MANAGE] },
-          { label: 'Holiday Calendar', icon: 'pi pi-calendar-plus', routerLink: ['/hrms/holidays/hub'], permissions: [PERMISSIONS.HOLIDAY.READ] },
-          { label: 'Add Holiday', icon: 'pi pi-plus', routerLink: ['/hrms/holidays/new'], permissions: [PERMISSIONS.HOLIDAY.MANAGE] }
-        ]
-      },
-      {
-        label: 'Devices & Locations',
-        icon: 'pi pi-server',
-        permissions: [PERMISSIONS.ATTENDANCE.MACHINE_READ, PERMISSIONS.ATTENDANCE.GEOFENCE_READ],
-        items: [
-          { label: 'Machine Fleet Hub', icon: 'pi pi-desktop', routerLink: ['/hrms/attendance/machines/hub'], permissions: [PERMISSIONS.ATTENDANCE.MACHINE_READ] },
-          { label: 'Add Machine', icon: 'pi pi-plus', routerLink: ['/hrms/attendance/machines/new'], permissions: [PERMISSIONS.ATTENDANCE.MACHINE_MANAGE] },
-          { label: 'Machine Logs', icon: 'pi pi-list', routerLink: ['/hrms/attendance/machines/logs'], permissions: [PERMISSIONS.ATTENDANCE.MACHINE_READ] },
-          { label: 'Machine Analytics', icon: 'pi pi-chart-bar', routerLink: ['/hrms/attendance/machines/analytics'], permissions: [PERMISSIONS.ATTENDANCE.MACHINE_READ] },
-          { label: 'Geofence Command', icon: 'pi pi-map', routerLink: ['/hrms/geofence/hub'], permissions: [PERMISSIONS.ATTENDANCE.GEOFENCE_READ] },
-          { label: 'Add Geofence', icon: 'pi pi-plus', routerLink: ['/hrms/geofence/new'], permissions: [PERMISSIONS.ATTENDANCE.GEOFENCE_MANAGE] }
-        ]
       }
     ]
   },
 
   // ==========================
-  // 7. SYSTEM ADMINISTRATION
+  // 9. SYSTEM ADMINISTRATION
   // ==========================
   {
     label: 'Administration',

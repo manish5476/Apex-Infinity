@@ -1,8 +1,8 @@
 import { Injectable, Inject, PLATFORM_ID, inject, Injector, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { tap, catchError, map, switchMap, finalize } from 'rxjs/operators';
+import { BehaviorSubject, Observable, throwError, firstValueFrom, of } from 'rxjs';
+import { tap, catchError, map, switchMap, finalize, shareReplay } from 'rxjs/operators';
 import { AppMessageService } from '../../../core/services/message.service';
 import { ApiService } from '../../../core/services/api';
 import { OrganizationService } from './../../organization/organization.service';
@@ -160,28 +160,24 @@ export class AuthService {
     this.isAuthenticated$ = this.currentUser$.pipe(map((user: any) => !!user));
   }
 
-  initializeFromStorage(): Promise<void> {
-    return new Promise(resolve => {
-      const token = this.getToken();
-      const user = this.getItem<any>(this.USER_KEY);
-      if (token && user) {
-        this._token = token;
-        this.currentUserSubject.next(user);
+  async initializeFromStorage(): Promise<void> {
+    const token = this.getToken();
+    const user = this.getItem<any>(this.USER_KEY);
+    
+    if (token && user) {
+      this._token = token;
+      this.currentUserSubject.next(user);
 
-        this.verifyToken().subscribe({
-          next: () => {
-            this.refreshPermissions();
-            resolve();
-          },
-          error: () => {
-            this.performClientLogout();
-            resolve();
-          }
-        });
-      } else {
-        resolve();
+      try {
+        // 1. Verify token validity with backend
+        await firstValueFrom(this.verifyToken());
+        // 2. STRENGTHEN: Wait for permissions to be fully fetched BEFORE completing init
+        await firstValueFrom(this.refreshPermissions());
+      } catch (err) {
+        console.warn('Auth initialization failed, clearing state', err);
+        this.performClientLogout();
       }
-    });
+    }
   }
 
   public handleLoginSuccess(response: any, rememberMe: boolean = false): void {
@@ -196,9 +192,10 @@ export class AuthService {
       this.setItem(this.REMEMBER_ME_KEY, 'true');
     }
     this.currentUserSubject.next(user);
+    this.refreshPermissions().subscribe(); // ✅ MUST subscribe for the side-effect (tap) to run
     this.messageService.handleSuccess(response, user.status === 'approved' ? 'Welcome back!' : 'Account pending approval');
     if (user.status === 'approved') {
-      this.router.navigate(['/notes']);
+      this.router.navigate(['/dashboard']);
     } else {
       this.router.navigate(['/auth/pending-approval']);
     }
@@ -541,9 +538,9 @@ export class AuthService {
     }
   }
 
-  refreshPermissions(): void {
-    this.apiService.getMyPermissions().subscribe({
-      next: (res) => {
+  refreshPermissions(): Observable<any> {
+    return this.apiService.getMyPermissions().pipe(
+      tap((res) => {
         const user: any = this.currentUserValue;
         if (user && res?.data) {
           const updated = {
@@ -558,9 +555,13 @@ export class AuthService {
           this.setItem(this.USER_KEY, updated);
           this.currentUserSubject.next(updated);
         }
-      },
-      error: (err) => console.warn('Permission refresh failed', err)
-    });
+      }),
+      catchError((err) => {
+        console.warn('Permission refresh failed', err);
+        return of(null);
+      }),
+      shareReplay(1) // Ensure subsequent subscribers get the same result
+    );
   }
   // refreshPermissions(): void {
   //   this.apiService.getMyPermissions().subscribe({
