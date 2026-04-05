@@ -8,7 +8,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { AuthService } from '../../services/auth-service';
 import { AppMessageService } from '../../../../core/services/message.service';
 
-// Inline Validator to guarantee it works perfectly
+// Inline Validator to guarantee password matching works perfectly
 export function passwordMatchValidator(controlName: string, matchingControlName: string): ValidatorFn {
   return (formGroup: AbstractControl): ValidationErrors | null => {
     const control = formGroup.get(controlName);
@@ -61,12 +61,12 @@ export class Signup implements OnInit {
     this.signupForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
-      // FIXED: Regex now allows spaces and hyphens for phone numbers
+      // FIXED: Regex now allows spaces, pluses, and hyphens for phone numbers
       phone: ['', [Validators.required, Validators.pattern(/^\+?[\d\s\-]{7,20}$/)]],
       uniqueShopId: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9-]+$/)]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       passwordConfirm: ['', [Validators.required]],
-      // FIXED: requiredTrue ensures the checkbox must be checked
+      // FIXED: requiredTrue ensures the checkbox validation works correctly
       terms: [false, [Validators.requiredTrue]],
     }, {
       validators: passwordMatchValidator('password', 'passwordConfirm')
@@ -85,7 +85,7 @@ export class Signup implements OnInit {
     if (/[A-Z]/.test(val)) score++;
     if (/[0-9]/.test(val)) score++;
     if (/[^a-zA-Z0-9]/.test(val)) score++;
-    return score;
+    return score; 
   }
 
   get strengthLabel(): string {
@@ -99,7 +99,7 @@ export class Signup implements OnInit {
   onSubmit(): void {
     if (this.signupForm.invalid) {
       this.signupForm.markAllAsTouched();
-      this.messageService.showWarn('Please fill out all required fields correctly.');
+      this.messageService.showWarn('Please fill out all fields correctly.');
       return;
     }
 
