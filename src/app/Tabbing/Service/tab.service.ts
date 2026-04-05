@@ -1,18 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// tab.service.ts  –  Central tab-state manager (Signals + RxJS)
-// Angular 21 · Injectable root
-// v2 fixes: registerTab() replaces private method hack; activateNext/Prev for
-//           keyboard navigation; closeActiveTab() for Ctrl+W; evictOldestIfFull
-//           extracted; buildTabId() is package-internal (used by guard cleanly)
-// ─────────────────────────────────────────────────────────────────────────────
-
-import {
-  Injectable,
-  computed,
-  effect,
-  inject,
-  signal,
-} from '@angular/core';
+import { Injectable, computed, effect, inject, signal, } from '@angular/core';
 import { Router, NavigationExtras } from '@angular/router';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
@@ -47,10 +33,6 @@ export class TabService {
       catch { /* storage full / private mode */ }
     });
   }
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // PUBLIC API
-  // ─────────────────────────────────────────────────────────────────────────
 
   /**
    * Open or activate a tab, then navigate.
@@ -102,12 +84,6 @@ export class TabService {
 
   openNewTab?: () => void;
 
-
-  /**
-   * FIX #1 — Register a tab without triggering navigation.
-   * Used exclusively by TabRouterGuard where navigation is already in progress.
-   * Replaces the old (tabService as any)._state.update() hack entirely.
-   */
   registerTab(
     path: string,
     label: string,
@@ -115,8 +91,18 @@ export class TabService {
     options: Pick<OpenTabOptions, 'icon' | 'pinned' | 'data'> = {}
   ): void {
     const id = this.buildTabId(path, queryParams);
+    const existing = this._findById(id);
 
-    if (this._findById(id)) {
+    if (existing) {
+      const patch: Partial<TabMeta> = {};
+      if (label && label !== existing.label && !label.toLowerCase().includes('notes')) {
+        patch.label = label;
+      }
+      if (options.icon && options.icon !== existing.icon) patch.icon = options.icon;
+      if (options.data) patch.data = { ...existing.data, ...options.data };
+
+      if (Object.keys(patch).length > 0) this._patchTab(id, patch);
+
       this._activate(id);
       return;
     }

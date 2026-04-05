@@ -33,6 +33,7 @@
       <!-- SCROLLABLE HUB: Main content area scrolls below the tabs -->
       <main class="main-content" id="main-content">
         <div class="tab-outlet-wrapper">
+          <router-outlet></router-outlet>
 
           <!-- EMPTY STATE: Only shows when no tabs are open -->
           @if (tabService.tabCount() === 0) {
@@ -42,8 +43,6 @@
           </div>
           }
         </div>
-        <router-outlet></router-outlet>
-
       </main>
     </div>
 

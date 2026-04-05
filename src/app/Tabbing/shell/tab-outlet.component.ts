@@ -52,7 +52,7 @@ import { TabService } from '../Service/tab.service';
       p    { font-size: 14px; margin: 0; font-family: var(--theme-font-ui, sans-serif); }
     }
 
-    router-outlet + * {
+    :host ::ng-deep router-outlet + * {
       display: flex;
       flex-direction: column;
       flex: 1 1 0;

@@ -60,7 +60,7 @@
             <div class="nav-sub-group">
 
               <!-- Level 2 item -->
-              <div class="nav-item lv2" [class.is-active]="isActiveLink(sub)" (click)="handleItemClick(sub)">
+              <div class="nav-item lv2" [class.is-active]="isActiveLink(sub)" (click)="handleItemClick(sub); $event.stopPropagation()">
                 <span class="nav-label">{{ sub.label }}</span>
                 @if (sub.items) {
                 <i class="nav-arrow pi pi-chevron-down sm" [class.is-open]="expandedState[sub.label]"></i>
@@ -72,7 +72,7 @@
               <div class="nav-accordion" [class.is-expanded]="expandedState[sub.label]">
                 <div class="nav-accordion-inner lv3-wrap">
                   @for (deep of sub.items; track deep.label) {
-                  <div class="nav-item lv3" [class.is-active]="isActiveLink(deep)" (click)="handleItemClick(deep)">
+                  <div class="nav-item lv3" [class.is-active]="isActiveLink(deep)" (click)="handleItemClick(deep); $event.stopPropagation()">
                     <span class="nav-label">{{ deep.label }}</span>
                   </div>
                   }
