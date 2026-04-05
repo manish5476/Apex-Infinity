@@ -1,13 +1,29 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
 import { PasswordModule } from 'primeng/password';
 import { CheckboxModule } from 'primeng/checkbox';
 import { AuthService } from '../../services/auth-service';
 import { AppMessageService } from '../../../../core/services/message.service';
-import { passwordMatchValidator } from '../../../../core/validators/password-match.validator';
+
+// Inline Validator to guarantee it works perfectly
+export function passwordMatchValidator(controlName: string, matchingControlName: string): ValidatorFn {
+  return (formGroup: AbstractControl): ValidationErrors | null => {
+    const control = formGroup.get(controlName);
+    const matchingControl = formGroup.get(matchingControlName);
+    if (!control || !matchingControl) return null;
+    if (matchingControl.errors && !matchingControl.errors['passwordMismatch']) return null;
+    if (control.value !== matchingControl.value) {
+      matchingControl.setErrors({ passwordMismatch: true });
+      return { passwordMismatch: true };
+    } else {
+      matchingControl.setErrors(null);
+      return null;
+    }
+  };
+}
 
 @Component({
   selector: 'app-signup',
@@ -34,9 +50,6 @@ export class Signup implements OnInit {
   successMessage = signal<string | null>(null);
   errorMessage = signal<string | null>(null);
   focusedField = signal<string | null>(null);
-  // Track current step for the multi-step progress indicator
-  currentStep = signal(1);
-  totalSteps = 2;
 
   signupForm!: FormGroup;
 
@@ -48,10 +61,12 @@ export class Signup implements OnInit {
     this.signupForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.required, Validators.pattern(/^\+?[0-9]{7,15}$/)]],
+      // FIXED: Regex now allows spaces and hyphens for phone numbers
+      phone: ['', [Validators.required, Validators.pattern(/^\+?[\d\s\-]{7,20}$/)]],
       uniqueShopId: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9-]+$/)]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       passwordConfirm: ['', [Validators.required]],
+      // FIXED: requiredTrue ensures the checkbox must be checked
       terms: [false, [Validators.requiredTrue]],
     }, {
       validators: passwordMatchValidator('password', 'passwordConfirm')
@@ -63,7 +78,6 @@ export class Signup implements OnInit {
   onFocus(field: string): void { this.focusedField.set(field); }
   onBlur(): void { this.focusedField.set(null); }
 
-  // Password strength helpers for the inline strength bar
   get passwordStrength(): number {
     const val: string = this.f['password'].value || '';
     let score = 0;
@@ -71,7 +85,7 @@ export class Signup implements OnInit {
     if (/[A-Z]/.test(val)) score++;
     if (/[0-9]/.test(val)) score++;
     if (/[^a-zA-Z0-9]/.test(val)) score++;
-    return score; // 0–4
+    return score;
   }
 
   get strengthLabel(): string {
@@ -85,7 +99,7 @@ export class Signup implements OnInit {
   onSubmit(): void {
     if (this.signupForm.invalid) {
       this.signupForm.markAllAsTouched();
-      this.messageService.showWarn('Please fill out all fields correctly.');
+      this.messageService.showWarn('Please fill out all required fields correctly.');
       return;
     }
 
@@ -106,7 +120,7 @@ export class Signup implements OnInit {
         this.messageService.showSuccess(msg);
         this.router.navigateByUrl('/dashboard');
       },
-      error: (err) => {
+      error: (err: any) => {
         this.isLoading.set(false);
         const msg = err.error?.message || 'Failed to create account. Please try again.';
         this.errorMessage.set(msg);
