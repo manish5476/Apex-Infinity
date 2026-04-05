@@ -86,9 +86,11 @@ app-mainscreen-sidebar {
 .main-content {
   flex: 1;
   min-height: 0; // critical for flex scroll
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: var(--spacing-xl);
+  overflow: hidden; // ✅ CRITICAL: Force children to handle their own scroll (sticky grid)
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0; // Removing global padding to allow full-screen grids
   background: transparent;
 
   // Themed scrollbar
@@ -134,9 +136,15 @@ app-mainscreen-sidebar {
   display: flex;
   flex-direction: column;
   position: relative;
+  width: 100%;
 
-  // Modern Fade-in for child components
-  &>*:not(.tab-empty-state) {
+  // Direct page component injected into outlet
+  & > *:not(.tab-empty-state) {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    width: 100%;
     animation: tabFadeIn 0.2s ease-out;
   }
 }
