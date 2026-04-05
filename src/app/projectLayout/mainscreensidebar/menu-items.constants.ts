@@ -46,6 +46,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
           { label: 'Advanced Analysis', icon: 'pi pi-chart-bar', routerLink: ['/invoices/AdvancedProfitAnalysisComponent'], permissions: [PERMISSIONS.REPORT.PROFIT] },
         ]
       },
+      { label: 'Customers Analytics', icon: 'pi pi-users', routerLink: ['/customer/analytics'], permissions: [PERMISSIONS.CUSTOMER.READ] },
       { label: 'Customers', icon: 'pi pi-users', routerLink: ['/customer'], permissions: [PERMISSIONS.CUSTOMER.READ] },
       { label: 'EMI Management', icon: 'pi pi-calendar-clock', routerLink: ['/emis'], permissions: [PERMISSIONS.EMI.READ] },
     ]

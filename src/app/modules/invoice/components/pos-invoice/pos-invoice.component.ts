@@ -147,8 +147,8 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
           this.isScanning.set(false);
           return EMPTY;
         }
-
-        return this.productService.scanProduct({ barcode: code, branchId: branchId }).pipe(
+        //  branchId: branchId
+        return this.productService.scanProduct({ barcode: code }).pipe(
           catchError(err => {
             this.messageService.showError(err);
             return EMPTY;

@@ -120,7 +120,7 @@ export class BulkProductEntry implements OnInit, OnChanges {
 
   // --- Actions ---
   searchProduct(event: any) {
-    this.productService.searchProducts({ q: event.query }).subscribe(res => {
+    this.productService.searchProducts(event.query).subscribe(res => {
       this.filteredProducts.set(res.data || []);
     });
   }
@@ -150,7 +150,7 @@ export class BulkProductEntry implements OnInit, OnChanges {
     this.onAddNew();
   }
 
-onSaveAll() {
+  onSaveAll() {
     const rowsToSave: any[] = [];
     if (this.gridApi) {
       this.gridApi.forEachNode((node: any) => rowsToSave.push(node.data));
@@ -159,16 +159,16 @@ onSaveAll() {
     }
 
     const validRows = rowsToSave.filter(r => r.name && r.name.trim() !== '');
-    
+
     if (validRows.length === 0) {
       // Replaced silent return with a user warning
       this.messageService.showWarn('Validation Error: No valid products to save.');
-      return; 
+      return;
     }
 
     // Assign temporary IDs to distinguish new vs. existing rows
     validRows.forEach(r => { if (!r._id) r._id = `temp_${Date.now()}_fallback`; });
-    
+
     const toCreate = validRows.filter(r => (r._id || '').startsWith('temp_'));
     const toUpdate = validRows.filter(r => !(r._id || '').startsWith('temp_'));
 
@@ -191,7 +191,7 @@ onSaveAll() {
       });
       tasks.push(this.productService.bulkImportProducts(createPayload));
     }
-    
+
     if (toUpdate.length > 0) {
       const updatePayload = toUpdate.map(r => {
         const cleaned = cleanPayload(r);
