@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, computed, ChangeDetectorRef } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common'; // Import DatePipe
+import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 
@@ -26,12 +26,19 @@ import { GridApi } from 'ag-grid-community';
 import { EmiService } from '../../services/emi-service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
+import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
+import { PERMISSIONS } from '@core/auth/permissions.constants';
 
 @Component({
   selector: 'app-emi-details',
   standalone: true,
-  imports: [CommonModule,RouterModule,ReactiveFormsModule,ButtonModule, TagModule, CardModule, DividerModule,ProgressBarModule, DialogModule, InputNumberModule,InputTextModule, SelectModule, ToastModule,ConfirmDialogModule, SkeletonModule,AgShareGrid  ],
-  providers: [ConfirmationService, DatePipe], // Add DatePipe to providers
+  imports: [
+    CommonModule, RouterModule, ReactiveFormsModule, ButtonModule, TagModule, 
+    CardModule, DividerModule, ProgressBarModule, DialogModule, InputNumberModule, 
+    InputTextModule, SelectModule, ToastModule, ConfirmDialogModule, SkeletonModule, 
+    AgShareGrid, HasPermissionDirective
+  ],
+  providers: [ConfirmationService, DatePipe],
   templateUrl: './emi-details.html',
   styleUrl: './emi-details.scss'
 })
@@ -43,8 +50,10 @@ export class EmiDetailsComponent implements OnInit {
   private messageService = inject(AppMessageService);
   private fb = inject(FormBuilder);
   public common = inject(CommonMethodService);
-  private datePipe = inject(DatePipe); // Inject DatePipe
+  private datePipe = inject(DatePipe);
   private cdr = inject(ChangeDetectorRef);
+  private confirmationService = inject(ConfirmationService);
+  readonly PERMISSIONS = PERMISSIONS;
 
   // --- State ---
   emiData = signal<any | null>(null);
@@ -53,6 +62,9 @@ export class EmiDetailsComponent implements OnInit {
   // Grid
   column: any[] = [];
   gridData: any[] = [];
+  historyColumn: any[] = [];
+  historyData = signal<any[]>([]);
+  activeTab = signal<'schedule' | 'history'>('schedule');
 
   // Payment Dialog
   showPaymentDialog = false;
@@ -75,21 +87,14 @@ export class EmiDetailsComponent implements OnInit {
     return data ? data.installments.reduce((acc: number, curr: any) => acc + (curr.paidAmount || 0), 0) : 0;
   });
 
-// ... inside EmiDetailsComponent
-
   remainingAmount = computed(() => {
     const data = this.emiData();
     if (!data || !data.installments) return 0;
-
-    // 1. Calculate the Total Amount that NEEDS to be paid via installments
     const totalInstallmentValue = data.installments.reduce((acc: number, curr: any) => acc + (curr.totalAmount || 0), 0);
-
-    // 2. Calculate what has actually been paid against those installments
     const totalPaidAgainstInstallments = data.installments.reduce((acc: number, curr: any) => acc + (curr.paidAmount || 0), 0);
-
-    // 3. The true remaining balance is simply the difference
     return totalInstallmentValue - totalPaidAgainstInstallments;
   });
+
   paymentModes = [
     { label: 'Cash', value: 'cash' },
     { label: 'Bank Transfer', value: 'bank' },
@@ -103,18 +108,40 @@ export class EmiDetailsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.setupColumns(); // Initialize Grid Cols
+    this.setupColumns();
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (id) {
         this.fetchEmiDetails(id);
+        this.fetchEmiHistory(id);
       } else {
         this.router.navigate(['/emis']);
       }
     });
   }
 
-  
+  deletePlan() {
+    const data = this.emiData();
+    if (!data) return;
+
+    this.confirmationService.confirm({
+      message: 'Are you sure you want to delete this EMI plan? This will remove all associated schedules. This action cannot be undone.',
+      header: 'Confirm Deletion',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-text',
+      accept: () => {
+        this.common.apiCall(
+          this.emiService.deleteEmi(data._id),
+          (res: any) => {
+            this.messageService.showSuccess('EMI plan deleted successfully.');
+            this.router.navigate(['/emis']);
+          }
+        );
+      }
+    });
+  }
+
   // --- Grid Configuration ---
   setupColumns() {
     this.column = [
@@ -168,23 +195,63 @@ export class EmiDetailsComponent implements OnInit {
       {
         headerName: 'Action',
         field: 'action',
-
         width: 100,
         cellRenderer: (params: any) => {
           if (params.data.paymentStatus === 'paid') {
             return `<i class="pi pi-check-circle text-green-500" style="font-size: 1.2rem;"></i>`;
           }
-          return `<button class="action-pay-btn p-button-rounded p-button-text" style="cursor: pointer;   background: var(--bg-secondary); border: none; color: #3b82f6;">
+          return `<button class="action-pay-btn p-button-rounded p-button-text" style="cursor: pointer; background: var(--bg-secondary); border: none; color: #3b82f6;">
                      <i class="pi pi-wallet" style="font-size: 1.2rem;"></i>
                    </button>`;
         }
       }
     ];
+
+    this.historyColumn = [
+      {
+        headerName: 'Inst #',
+        field: 'installmentNumber',
+        width: 80,
+        sortable: true,
+        cellClass: 'font-semibold text-center'
+      },
+      {
+        headerName: 'Paid Date',
+        field: 'paidAt',
+        width: 150,
+        valueFormatter: (params: any) => params.value ? this.datePipe.transform(params.value, 'mediumDate') : '—',
+        cellStyle: { color: 'var(--accent-primary)', fontWeight: '600' }
+      },
+      {
+        headerName: 'Amount Paid',
+        field: 'paidAmount',
+        width: 140,
+        type: 'rightAligned',
+        valueFormatter: (params: any) => this.common.formatCurrency(params.value),
+        cellStyle: { color: 'var(--color-success)', fontWeight: 'bold' }
+      },
+      {
+        headerName: 'Status',
+        field: 'paymentStatus',
+        width: 120,
+        cellRenderer: (params: any) => {
+          const status = params.value || 'pending';
+          const color = status === 'paid' ? '#16a34a' : (status === 'partial' ? '#f59e0b' : '#dc2626');
+          const bg = status === 'paid' ? '#dcfce7' : (status === 'partial' ? '#fef3c7' : '#fee2e2');
+          return `<span style="background:${bg}; color:${color}; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase;">${status}</span>`;
+        }
+      },
+      {
+        headerName: 'Reference',
+        field: 'paymentId',
+        flex: 1,
+        minWidth: 150,
+        cellRenderer: (params: any) => params.value ? `<span class="font-mono text-xs text-gray-500">ID: ${params.value.slice(-8).toUpperCase()}</span>` : '—'
+      }
+    ];
   }
 
-  // Handle Grid Clicks (Pay Button)
   eventFromGrid(event: any) {
-    console.log(event);
     if (event.type === 'cellClicked') {
       const target = event.field;
       if (target === 'action') {
@@ -192,8 +259,6 @@ export class EmiDetailsComponent implements OnInit {
       }
     }
   }
-
-  // --- Payment Logic ---
 
   initPaymentForm() {
     this.paymentForm = this.fb.group({
@@ -209,27 +274,24 @@ export class EmiDetailsComponent implements OnInit {
     this.selectedInstallment = installment;
 
     const dueAmount = installment.totalAmount - (installment.paidAmount || 0);
-
     this.paymentForm.patchValue({
       amount: dueAmount,
       paymentId: '',
       paymentMode: 'cash',
       notes: ''
     });
-
     this.showPaymentDialog = true;
   }
-submitPayment() {
+
+  submitPayment() {
     if (this.paymentForm.invalid) {
       this.paymentForm.markAllAsTouched();
-      // Swapped showError for showWarn (better for form validation) and combined into one string
       this.messageService.showWarn('Validation Error: Reference ID is required.');
       return;
     }
 
     const emiId = this.emiData()._id;
     const { amount, paymentId, paymentMode } = this.paymentForm.value;
-
     this.isSubmittingPayment.set(true);
 
     const payload = {
@@ -241,30 +303,39 @@ submitPayment() {
     };
 
     this.common.apiCall(
-      this.emiService.payEmiInstallment(payload),
+      this.emiService.payEmiInstallment(emiId, payload),
       (res: any) => {
         this.messageService.showSuccess('Payment recorded successfully.');
         this.showPaymentDialog = false;
         this.isSubmittingPayment.set(false);
-        this.fetchEmiDetails(emiId); // Refresh Data & Grid
+        this.fetchEmiDetails(emiId);
+        this.fetchEmiHistory(emiId);
       }
     );
   }
 
   private fetchEmiDetails(id: string) {
     this.isLoading.set(true);
-    
     this.common.apiCall(
       this.emiService.getEmiById(id),
       (res: any) => {
         const data = res.data?.emi || res.data;
         this.emiData.set(data);
-        this.gridData = data.installments || []; // Populate Grid Data
+        this.gridData = data.installments || [];
         this.isLoading.set(false);
       }
-      // Removed the redundant 'Fetch EMI Details' context string here
     );
   }
+
+  fetchEmiHistory(emiId: string) {
+    this.emiService.getEmiHistory(emiId).subscribe({
+      next: (res: any) => {
+        this.historyData.set(res.data?.history || []);
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
   isOverdue(installment: any): boolean {
     if (!installment || installment.paymentStatus === 'paid') return false;
     const dueDate = new Date(installment.dueDate);

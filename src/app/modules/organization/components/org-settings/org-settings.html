@@ -232,12 +232,21 @@
                   (click)="showTransferDialog.set(true)"></p-button>
               </div>
 
+              <div class="danger-item">
+                <div class="info">
+                  <h4>Cancel Pending Transfer</h4>
+                  <p>Revoke an active transfer invitation. The target user's link will be invalidated.</p>
+                </div>
+                <p-button label="Cancel Request" [outlined]="true" severity="secondary"
+                  (click)="cancelTransfer()"></p-button>
+              </div>
+
               <div class="danger-item destructive">
                 <div class="info">
                   <h4>Delete Organization</h4>
                   <p>Permanently wipe all branches, users, and data. This action is irreversible.</p>
                 </div>
-                <p-button label="Delete Forever" severity="danger" (click)="deleteOrganization()"></p-button>
+                <p-button label="Delete Forever" severity="danger" (click)="showDeleteDialog.set(true)"></p-button>
               </div>
             </div>
           </div>
@@ -322,6 +331,30 @@
     <p-button label="Cancel" [text]="true" (click)="showTransferDialog.set(false)" severity="secondary"></p-button>
     <p-button label="Transfer Ownership" severity="warn" icon="pi pi-sync"
       [disabled]="transferConfirmName !== organization()?.name || !selectedNewOwnerId" (click)="transferOwnership()"
+      [loading]="isSaving()"></p-button>
+  </ng-template>
+</p-dialog>
+
+<!-- DELETE ORGANIZATION DIALOG -->
+<p-dialog header="Delete Organization" [(visible)]="showDeleteDialog" [modal]="true" [style]="{width: '500px'}"
+  [draggable]="false">
+  <div class="dialog-content">
+    <div class="warning-box" style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; color: #ef4444; padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
+      <i class="pi pi-exclamation-triangle" style="font-size: 1.5rem; margin-bottom: 10px; display: block;"></i>
+      <p style="margin:0;"><b>CRITICAL WARNING:</b> You are about to permanently delete <strong>{{ organization()?.name }}</strong>. All branches, users, and resources will be irrevocably stripped and wiped from our systems. This action cannot be undone.</p>
+    </div>
+
+    <div class="form-group mt-3">
+      <label>To confirm this deletion, type the organization name below:</label>
+      <input pInputText [(ngModel)]="deleteConfirmName" class="w-full mt-2"
+        [placeholder]="organization()?.name" />
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancel" [text]="true" (click)="showDeleteDialog.set(false)" severity="secondary"></p-button>
+    <p-button label="Delete Forever" severity="danger" icon="pi pi-trash"
+      [disabled]="deleteConfirmName() !== organization()?.name" (click)="deleteOrganization()"
       [loading]="isSaving()"></p-button>
   </ng-template>
 </p-dialog>

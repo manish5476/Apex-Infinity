@@ -1,0 +1,411 @@
+// ============================================================
+//  profit-dashboard.component.scss
+//  Uses your canonical --theme-* token system throughout.
+// ============================================================
+
+:host {
+  display: block;
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.dash-container {
+  padding: var(--spacing-xl) var(--spacing-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+  min-height: 100%;
+  background: var(--bg-ternary);
+}
+
+// ── Header ─────────────────────────────────────────────────────────────────
+.dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 0.5px solid var(--border-primary);
+}
+
+.page-title {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+
+.page-sub {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.trend-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--text-tertiary);
+  flex-shrink: 0;
+  &.dot-stable { background: var(--color-info); }
+  &.dot-up     { background: var(--color-success); }
+  &.dot-down   { background: var(--color-error); }
+}
+
+.period-chip {
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 0.5px solid var(--border-primary);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.controls {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.ctrl-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ctrl-label {
+  font-size: 10px;
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-label);
+}
+
+// PrimeNG select override
+::ng-deep .dash-select {
+  .p-select {
+    height: 30px !important;
+    min-width: 150px;
+    border-color: var(--border-primary) !important;
+    background: var(--bg-primary) !important;
+    border-radius: var(--ui-border-radius-sm) !important;
+    font-size: 12.5px !important;
+  }
+}
+
+.refresh-btn.p-button {
+  width: 30px !important;
+  height: 30px !important;
+  background: var(--bg-secondary) !important;
+  border: 0.5px solid var(--border-primary) !important;
+  color: var(--text-secondary) !important;
+  border-radius: 50% !important;
+  &:hover { background: var(--bg-ternary) !important; }
+}
+
+// ── Loading ─────────────────────────────────────────────────────────────────
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px;
+  gap: var(--spacing-lg);
+}
+
+.loading-text {
+  font-size: 11px;
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+}
+
+// ── KPI Cards ───────────────────────────────────────────────────────────────
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--spacing-md);
+
+  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 540px) { grid-template-columns: 1fr; }
+}
+
+.kpi-card {
+  background: var(--bg-primary);
+  border: 0.5px solid var(--border-primary);
+  border-radius: var(--ui-border-radius-lg);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  transition: border-color var(--transition-fast);
+
+  &:hover { border-color: var(--border-secondary); }
+}
+
+.kpi-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.kpi-label {
+  font-size: 10px;
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+}
+
+.kpi-value {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+}
+
+.kpi-primary { color: var(--text-primary); }
+.kpi-muted   { color: var(--text-secondary); }
+.kpi-success { color: var(--color-success); }
+.kpi-info    { color: var(--accent-primary); }
+
+.kpi-footer {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+// Badges
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  border-radius: 99px;
+  font-size: 10px;
+  font-weight: var(--font-weight-semibold);
+  &.badge-up      { background: var(--color-success-bg); color: var(--color-success); }
+  &.badge-dn      { background: var(--color-error-bg);   color: var(--color-error);   }
+  &.badge-neutral { background: var(--bg-secondary);     color: var(--text-secondary); border: 0.5px solid var(--border-primary); }
+}
+
+// Margin progress
+.margin-track {
+  height: 3px;
+  background: var(--bg-ternary);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.margin-fill {
+  height: 100%;
+  background: var(--accent-primary);
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+// ── Insight Row ──────────────────────────────────────────────────────────────
+.insight-row {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.insight-chip {
+  flex: 1;
+  min-width: 120px;
+  background: var(--bg-secondary);
+  border-radius: var(--ui-border-radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.ic-label {
+  display: block;
+  font-size: 10px;
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  margin-bottom: 3px;
+}
+
+.ic-val {
+  display: block;
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  &.ic-green { color: var(--color-success); }
+}
+
+// ── Mid Grid ─────────────────────────────────────────────────────────────────
+.mid-grid {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: var(--spacing-md);
+  align-items: start;
+
+  @media (max-width: 900px) { grid-template-columns: 1fr; }
+}
+
+// ── Shared Card ───────────────────────────────────────────────────────────────
+.content-card {
+  background: var(--bg-primary);
+  border: 0.5px solid var(--border-primary);
+  border-radius: var(--ui-border-radius-lg);
+  overflow: hidden;
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--bg-secondary);
+  border-bottom: 0.5px solid var(--border-primary);
+}
+
+.card-title {
+  font-size: 10.5px;
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+
+.card-sub {
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+// Metrics list
+.metric-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 0.5px solid var(--border-primary);
+  &:last-child { border-bottom: none; }
+}
+
+.m-label { font-size: 12px; color: var(--text-secondary); }
+.m-val   { font-size: 12px; font-weight: var(--font-weight-medium); font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.m-green { color: var(--color-success); }
+
+// ── CSS Bar Chart ─────────────────────────────────────────────────────────────
+.simple-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  height: 180px;
+  padding: var(--spacing-lg);
+  gap: 4px;
+}
+
+.bar-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  cursor: default;
+}
+
+.bar-track {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 2px;
+  border-bottom: 0.5px solid var(--border-primary);
+}
+
+.bar-fill {
+  width: 10px;
+  min-height: 4px;
+  background: var(--color-success);
+  border-radius: 2px 2px 0 0;
+  opacity: 0.7;
+  transition: height 0.4s ease, opacity 0.15s;
+
+  .bar-group:hover & { opacity: 1; width: 12px; }
+}
+
+.bar-label {
+  font-size: 9.5px;
+  color: var(--text-tertiary);
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+.chart-empty {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  text-align: center;
+  padding: 40px;
+}
+
+// ── Tables Grid ───────────────────────────────────────────────────────────────
+.tables-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-md);
+
+  @media (max-width: 900px) { grid-template-columns: 1fr; }
+}
+
+.table-wrap { overflow-x: auto; }
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+
+  th {
+    padding: 8px 10px;
+    font-size: 9.5px;
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary);
+    border-bottom: 0.5px solid var(--border-primary);
+    background: var(--bg-secondary);
+    text-align: left;
+    white-space: nowrap;
+    &.r { text-align: right; }
+  }
+
+  td {
+    padding: 9px 10px;
+    border-bottom: 0.5px solid var(--border-primary);
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--bg-secondary); }
+}
+
+.t-main  { font-weight: var(--font-weight-medium); font-size: 12px; }
+.t-sub   { font-size: 10px; color: var(--text-tertiary); margin-top: 1px; }
+.t-val   { font-family: var(--font-mono); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.r       { text-align: right; }
+.t-green { color: var(--color-success); }
+.t-red   { color: var(--color-error); }
+.t-empty { text-align: center; color: var(--text-tertiary); font-style: italic; padding: 24px; }

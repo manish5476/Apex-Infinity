@@ -1,58 +1,140 @@
 <p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
 
-<div class="app-container h-full">
+<div class="emi-page">
 
-  <!-- Standard Header -->
-  <div class="container-header">
-    <div class="flex align-center gap-3">
-      <div class="icon-box bg-primary-light text-primary border-round p-2 flex align-center justify-center">
-        <i class="pi pi-calendar text-xl"></i>
+  <!-- ─────────── PAGE HEADER ─────────── -->
+  <div class="page-header">
+    <div class="page-header__left">
+      <div class="page-icon">
+        <i class="pi pi-calendar-clock"></i>
       </div>
-      <div class="header-titles">
-        <h2 class="container-title">EMI Schedules</h2>
-        <p class="container-subtitle">Manage and track installment payments and recovery.</p>
+      <div>
+        <h2 class="page-title">EMI Schedules</h2>
+        <p class="page-subtitle">Track installment payments &amp; recovery</p>
       </div>
     </div>
 
-    <div class="header-actions">
-       <p-button *hasPermission="PERMISSIONS.EMI.CREATE" label="New EMI Plan" icon="pi pi-plus" routerLink="create"
-          styleClass="p-button-primary">
-       </p-button>
+    <div class="page-header__actions">
+      <p-button *hasPermission="PERMISSIONS.EMI.CREATE" label="New EMI Plan" icon="pi pi-plus" routerLink="create"
+        styleClass="p-button-primary btn-create">
+      </p-button>
     </div>
   </div>
 
-  <div class="container-body flex flex-col h-full gap-4">
+  <!-- ─────────── ANALYTICS STRIP ─────────── -->
+  <div class="analytics-strip" *ngIf="emiAnalytics()">
 
-    <div class="app-filter-panel">
+    <!-- Outstanding -->
+    <div class="stat-card stat-card--primary">
+      <div class="stat-card__icon">
+        <i class="pi pi-indian-rupee"></i>
+      </div>
+      <div class="stat-card__body">
+        <span class="stat-card__label">Total Outstanding</span>
+        <span class="stat-card__value">{{ common.formatCurrency(emiAnalytics().totalOutstanding) }}</span>
+      </div>
+    </div>
+
+    <!-- Plan Overview -->
+    <div class="stat-card stat-card--plans">
+      <div class="stat-card__icon">
+        <i class="pi pi-list-check"></i>
+      </div>
+      <div class="stat-card__body">
+        <span class="stat-card__label">EMI Plans</span>
+        <div class="plan-badges">
+          <span class="badge badge--active">
+            <span class="badge__dot"></span>
+            {{ emiAnalytics().active }} Active
+          </span>
+          <span class="badge badge--done">
+            <span class="badge__dot"></span>
+            {{ emiAnalytics().completed }} Done
+          </span>
+          <span class="badge badge--late" [class.badge--late-alert]="emiAnalytics().defaulted > 0">
+            <span class="badge__dot"></span>
+            {{ emiAnalytics().defaulted }} Late
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Installment Progress -->
+    <div class="stat-card stat-card--progress">
+      <div class="stat-card__icon">
+        <i class="pi pi-chart-pie"></i>
+      </div>
+      <div class="stat-card__body" style="flex:1;min-width:0">
+        <div class="stat-card__label-row">
+          <span class="stat-card__label">Installments Paid</span>
+          <span class="stat-card__pct">{{ installmentPct(emiAnalytics()).toFixed(1) }}%</span>
+        </div>
+        <span class="stat-card__value stat-card__value--sm">
+          {{ emiAnalytics().installments.paid }}
+          <span class="stat-card__value-total">/ {{ installmentTotal(emiAnalytics()) }}</span>
+        </span>
+        <div class="progress-track">
+          <div class="progress-fill" [style.width.%]="installmentPct(emiAnalytics())">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overdue -->
+    <div class="stat-card stat-card--overdue" [class.stat-card--alert]="emiAnalytics().installments.overdue > 0">
+      <div class="stat-card__icon">
+        <i class="pi pi-exclamation-triangle"></i>
+      </div>
+      <div class="stat-card__body">
+        <span class="stat-card__label">Overdue</span>
+        <span class="stat-card__value">{{ emiAnalytics().installments.overdue }}</span>
+        <span class="stat-card__sub" *ngIf="emiAnalytics().installments.overdue > 0">
+          installments pending
+        </span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ─────────── FILTER BAR ─────────── -->
+  <div class="filter-bar">
+    <div class="filter-bar__fields">
 
       <div class="filter-field">
-        <label for="customer">Customer</label>
-        <p-select appendTo="body" (onChange)="applyFilters()" id="customer" [options]="customerOptions()"
+        <label class="filter-label">
+          <i class="pi pi-user"></i>
+          Customer
+        </label>
+        <p-select appendTo="body" (onChange)="applyFilters()" [options]="customerOptions()"
           [(ngModel)]="emiFilter.customerId" [filter]="true" filterBy="name" optionLabel="name" optionValue="_id"
-          [showClear]="true" placeholder="Filter by Customer" styleClass="w-full">
+          [showClear]="true" placeholder="All customers" styleClass="w-full filter-select">
         </p-select>
       </div>
 
       <div class="filter-field">
-        <label for="status">Status</label>
-        <p-select appendTo="body" (onChange)="applyFilters()" id="status" [options]="statusOptions"
-          [(ngModel)]="emiFilter.status" optionLabel="label" optionValue="value" [showClear]="true"
-          placeholder="Select Status" styleClass="w-full" [filter]="true" filterBy="label">
+        <label class="filter-label">
+          <i class="pi pi-tag"></i>
+          Status
+        </label>
+        <p-select appendTo="body" (onChange)="applyFilters()" [options]="statusOptions" [(ngModel)]="emiFilter.status"
+          optionLabel="label" optionValue="value" [showClear]="true" placeholder="All statuses"
+          styleClass="w-full filter-select" [filter]="true" filterBy="label">
         </p-select>
       </div>
 
-      <div class="filter-actions ml-auto">
-        <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-outlined p-button-secondary"
-          (onClick)="resetFilters()"></p-button>
-      </div>
-
     </div>
 
-    <div class="flex-1 min-h-0 overflow-hidden manish-border-1 border-secondary border-round">
-      <app-ag-share-grid [columns]="column" [data]="data" [actionColumn]="emiActionColumn" selectionMode="multiple"
-        (gridEvent)="eventFromGrid($event)" style="height: 100%; width: 100%; display: block;">
-      </app-ag-share-grid>
-    </div>
-
+    <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-text p-button-secondary btn-reset"
+      (onClick)="resetFilters()">
+    </p-button>
   </div>
+
+  <!-- ─────────── GRID ─────────── -->
+  <div class="grid-wrapper">
+    <app-ag-share-grid [columns]="column" [data]="data" [actionColumn]="emiActionColumn" selectionMode="multiple"
+      (gridEvent)="eventFromGrid($event)" style="height: 100%; width: 100%; display: block;">
+    </app-ag-share-grid>
+  </div>
+
 </div>

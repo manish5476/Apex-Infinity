@@ -10,7 +10,6 @@ import { UnauthorizedComponent } from '../modules/shared/components/unauthorized
 
 // Component Imports
 import { RealTimeMonitoringComponent } from "./components/real-time-monitoring.component";
-import { FinancialTrendChartComponent } from "./components/financial-trend-chart.component";
 import { SystemAuditAlertsComponent } from "./components/system-audit-alerts.component";
 import { BranchComparisonComponent } from "./components/admin.branch.comparison";
 import { FinancialDashboardComponent } from "./components/admin.finanical.analytics";
@@ -21,19 +20,17 @@ import { CustomerSegmentationComponent } from "./components/customer-segmentatio
 import { CustomerLtvAnalysisComponent } from "./components/customer-ltv-analysis.component";
 import { ProductPerformanceComponent } from "./components/product-performance.component";
 import { DeadStockAnalysisComponent } from "./components/dead-stock-analysis.component";
-import { OrderFunnelChartComponent } from "./components/order-funnel-chart.component";
-import { SalesDistributionChartComponent } from "./components/sales-distribution-chart.component";
 import { PredictiveAnalyticsComponent } from "./components/predictive-analytics.component";
 import { SalesForecastComponent } from "./components/sales-forecast.component";
 import { OperationalMetricsComponent } from "./components/operational-metrics.component";
 import { PeakHoursAnalysisComponent } from "./components/peak-hours-analysis.component";
 import { StaffPerformanceAnalysisComponent } from "./components/staff-performance-analysis.component";
-import { BranchRadarChartComponent } from "./components/branch-radar-chart.component";
 import { ComplianceDashboardComponent } from "./components/compliance-dashboard.component";
 import { SystemDataHealthComponent } from "./components/system-data-health.component";
 import { AnalyticsExportHubComponent } from "./components/analytics-export-hub.component";
 import { TimeAnalyticsComponent } from "./components/time-analytics.component";
 import { DashboardUI } from "./components/dashboard.ui";
+import { AdminChartsAnalysisComponent } from './admin-charts-analysis.component';
 
 interface NavItem {
   value: string;
@@ -53,18 +50,18 @@ interface NavCategory {
   standalone: true,
   imports: [
     CommonModule, FormsModule, TooltipModule, AvatarModule,
-    RealTimeMonitoringComponent, FinancialTrendChartComponent,
+    RealTimeMonitoringComponent,
     SystemAuditAlertsComponent, BranchComparisonComponent,
     FinancialDashboardComponent, CashFlowAnalysisComponent,
     EmiAnalyticsComponent, CustomerIntelligenceComponent,
     CustomerSegmentationComponent, CustomerLtvAnalysisComponent,
     ProductPerformanceComponent, DeadStockAnalysisComponent,
-    OrderFunnelChartComponent, SalesDistributionChartComponent,
     PredictiveAnalyticsComponent, SalesForecastComponent,
     OperationalMetricsComponent, PeakHoursAnalysisComponent,
-    StaffPerformanceAnalysisComponent, BranchRadarChartComponent,
+    StaffPerformanceAnalysisComponent,
     ComplianceDashboardComponent, SystemDataHealthComponent,
     AnalyticsExportHubComponent, TimeAnalyticsComponent, DashboardUI,
+    AdminChartsAnalysisComponent,
     UnauthorizedComponent
   ],
   template: `
@@ -155,8 +152,8 @@ interface NavCategory {
           } @else {
             @switch (active()) {
               @case ('dashboard-ui')          { <app-admin-dashboard-Ui class="module-host"></app-admin-dashboard-Ui> }
+              @case ('charts-analysis')       { <app-admin-charts-analysis class="module-host"></app-admin-charts-analysis> }
               @case ('realtime')              { <app-real-time-monitoring class="module-host"></app-real-time-monitoring> }
-              @case ('financial-trend')       { <app-financial-trend-chart class="module-host"></app-financial-trend-chart> }
               @case ('system-audit')          { <app-system-audit-alerts class="module-host"></app-system-audit-alerts> }
               @case ('branch-comparison')     { <app-branch-comparison class="module-host"></app-branch-comparison> }
               @case ('financial-dashboard')   { <app-financial-dashboard class="module-host"></app-financial-dashboard> }
@@ -167,14 +164,11 @@ interface NavCategory {
               @case ('customer-ltv')          { <app-customer-ltv-analysis class="module-host"></app-customer-ltv-analysis> }
               @case ('product-performance')   { <app-product-performance class="module-host"></app-product-performance> }
               @case ('dead-stock')            { <app-dead-stock-analysis class="module-host"></app-dead-stock-analysis> }
-              @case ('order-funnel')          { <app-order-funnel-chart class="module-host"></app-order-funnel-chart> }
-              @case ('sales-distribution')    { <app-sales-distribution-chart class="module-host"></app-sales-distribution-chart> }
               @case ('predictive-analytics')  { <app-predictive-analytics class="module-host"></app-predictive-analytics> }
               @case ('sales-forecast')        { <app-sales-forecast class="module-host"></app-sales-forecast> }
               @case ('operational-metrics')   { <app-operational-metrics class="module-host"></app-operational-metrics> }
               @case ('peak-hours')            { <app-peak-hours-analysis class="module-host"></app-peak-hours-analysis> }
               @case ('staff-performance')     { <app-staff-performance-analysis class="module-host"></app-staff-performance-analysis> }
-              @case ('branch-radar')          { <app-branch-radar-chart class="module-host"></app-branch-radar-chart> }
               @case ('compliance-dashboard')  { <app-compliance-dashboard class="module-host"></app-compliance-dashboard> }
               @case ('system-data-health')    { <app-system-data-health class="module-host"></app-system-data-health> }
               @case ('analytics-export')      { <app-analytics-export-hub class="module-host"></app-analytics-export-hub> }
@@ -585,9 +579,9 @@ export class AdminDashboardComponent implements OnInit {
   setActive(value: string) { this.active.set(value); }
 
   hasAccess(itemValue: string): boolean {
-    const item = this.navCategories.flatMap(c => c.items).find(i => i.value === itemValue);
+    const item = this.navCategories.flatMap((c: NavCategory) => c.items).find((i: NavItem) => i.value === itemValue);
     if (!item || !item.permission || item.permission.length === 0) return true;
-    return item.permission.some(p => this.permSvc.hasPermission(p));
+    return item.permission.some((p: string) => this.permSvc.hasPermission(p));
   }
 
   // Computed: find which category the active item belongs to
@@ -600,7 +594,7 @@ export class AdminDashboardComponent implements OnInit {
 
   activeItemLabel = computed(() => {
     for (const cat of this.navCategories) {
-      const found = cat.items.find(i => i.value === this.active());
+      const found = cat.items.find((i: NavItem) => i.value === this.active());
       if (found) return found.label;
     }
     return '';
@@ -612,6 +606,7 @@ export class AdminDashboardComponent implements OnInit {
       icon: 'pi-th-large',
       items: [
         { value: 'dashboard-ui', label: 'Executive', icon: 'pi-objects-column', permission: [PERMISSIONS.ANALYTICS.VIEW_EXECUTIVE] },
+        { value: 'charts-analysis', label: 'Charts Hub', icon: 'pi-chart-scatter', permission: [PERMISSIONS.ANALYTICS.VIEW_EXECUTIVE] },
         { value: 'realtime', label: 'Live Monitor', icon: 'pi-bolt', permission: [PERMISSIONS.ANALYTICS.VIEW_ALERTS] },
       ]
     },
@@ -620,7 +615,11 @@ export class AdminDashboardComponent implements OnInit {
       icon: 'pi-wallet',
       items: [
         { value: 'financial-dashboard', label: 'Overview', icon: 'pi-wallet', permission: [PERMISSIONS.ANALYTICS.VIEW_FINANCIAL] },
-        { value: 'financial-trend', label: 'Trends', icon: 'pi-chart-line', permission: [PERMISSIONS.ANALYTICS.VIEW_FINANCIAL] },
+        // { value: 'sales-return', label: 'sales-return', icon: 'pi-chart-line', permission: [PERMISSIONS.ANALYTICS.VIEW_FINANCIAL] },
+        // { value: 'purchase-vs-sales', label: 'purchase-vs-sales', icon: 'pi-chart-line', permission: [PERMISSIONS.ANALYTICS.VIEW_FINANCIAL] },
+        // { value: 'yoy-growth', label: 'yoy-growth', icon: 'pi-chart-line', permission: [PERMISSIONS.ANALYTICS.VIEW_FINANCIAL] },
+        // { value: 'gross-profit', label: 'Gross Profit', icon: 'pi-chart-line', permission: [PERMISSIONS.ANALYTICS.VIEW_FINANCIAL] },
+        // { value: 'financial-trend', label: 'Trends', icon: 'pi-chart-line', permission: [PERMISSIONS.ANALYTICS.VIEW_FINANCIAL] },
         { value: 'cash-flow', label: 'Cash Flow', icon: 'pi-money-bill', permission: [PERMISSIONS.ANALYTICS.VIEW_FINANCIAL] },
         { value: 'emi-analytics', label: 'EMI / Credit', icon: 'pi-credit-card', permission: [PERMISSIONS.ANALYTICS.EMI_READ] },
       ]
@@ -629,8 +628,8 @@ export class AdminDashboardComponent implements OnInit {
       label: 'Sales',
       icon: 'pi-chart-bar',
       items: [
-        { value: 'order-funnel', label: 'Order Funnel', icon: 'pi-filter', permission: [PERMISSIONS.SALES.VIEW] },
-        { value: 'sales-distribution', label: 'Sales Mix', icon: 'pi-chart-pie', permission: [PERMISSIONS.SALES.VIEW] },
+        // { value: 'order-funnel', label: 'Order Funnel', icon: 'pi-filter', permission: [PERMISSIONS.SALES.VIEW] },
+        // { value: 'sales-distribution', label: 'Sales Mix', icon: 'pi-chart-pie', permission: [PERMISSIONS.SALES.VIEW] },
         { value: 'sales-forecast', label: 'Forecast', icon: 'pi-chart-bar', permission: [PERMISSIONS.ANALYTICS.VIEW_FORECAST] },
         { value: 'predictive-analytics', label: 'Predictive', icon: 'pi-brain', permission: [PERMISSIONS.ANALYTICS.VIEW_FORECAST] },
       ]
@@ -667,7 +666,7 @@ export class AdminDashboardComponent implements OnInit {
       icon: 'pi-building',
       items: [
         { value: 'branch-comparison', label: 'Comparison', icon: 'pi-building', permission: [PERMISSIONS.ANALYTICS.VIEW_BRANCH_COMPARISON] },
-        { value: 'branch-radar', label: 'Radar View', icon: 'pi-compass', permission: [PERMISSIONS.ANALYTICS.VIEW_BRANCH_COMPARISON] },
+        // { value: 'branch-radar', label: 'Radar View', icon: 'pi-compass', permission: [PERMISSIONS.ANALYTICS.VIEW_BRANCH_COMPARISON] },
       ]
     },
     {

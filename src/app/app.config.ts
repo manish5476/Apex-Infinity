@@ -6,10 +6,10 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe, PercentPipe } from '@angular/common';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { successInterceptor } from './core/interceptors/success.interceptor';
-import { LoadingInterceptor } from './core/interceptors/loading.interceptor';
+// import { LoadingInterceptor } from './core/interceptors/loading.interceptor';
 
 // PrimeNG Imports
 import { providePrimeNG } from 'primeng/config';
@@ -30,23 +30,23 @@ import { DialogService } from 'primeng/dynamicdialog';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(
-      withInterceptors([jwtInterceptor, successInterceptor, errorInterceptor, LoadingInterceptor]),
+      withInterceptors([jwtInterceptor, successInterceptor, errorInterceptor]),//LoadingInterceptor
       withFetch()
     ),
     provideRouter(routes),
     provideZonelessChangeDetection(),
     provideClientHydration(),
     provideAnimationsAsync(),
-// providePrimeNG({
-//   ripple: true,
-//   theme: {
-//     preset: ApexPreset,
-//     options: {
-//       darkModeSelector: '.theme-dark, .theme-neon-eclipse, ...',
-//       cssLayer: { name: 'primeng', order: 'theme, base, primeng' }
-//     }
-//   }
-// })
+    // providePrimeNG({
+    //   ripple: true,
+    //   theme: {
+    //     preset: ApexPreset,
+    //     options: {
+    //       darkModeSelector: '.theme-dark, .theme-neon-eclipse, ...',
+    //       cssLayer: { name: 'primeng', order: 'theme, base, primeng' }
+    //     }
+    //   }
+    // })
     // PRIME NG CONFIGURATION
     providePrimeNG({
       ripple: true,
@@ -63,7 +63,7 @@ export const appConfig: ApplicationConfig = {
     }),
     // ConfirmationService
     MessageService, ConfirmationService,
-    DatePipe, DialogService,
+    DatePipe, DecimalPipe, PercentPipe, DialogService,
 
     // ✅ THE MODERN FIX: Using provideAppInitializer
     provideAppInitializer(() => {

@@ -63,7 +63,7 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
   invoiceId: string | null = null;
   stockWarnings = signal<any[]>([]);
   private destroy$ = new Subject<void>();
-  
+
   // POS Specific State
   selectionMode = signal<'scan' | 'manual'>('scan');
   isScanning = signal(false);
@@ -100,12 +100,12 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
   balanceAmount = signal(0);
 
   invoiceForm!: FormGroup;
-manualSearchControl = new FormControl(null);
+  manualSearchControl = new FormControl(null);
   ngOnInit(): void {
     this.buildForm();
     this.setupTotalsCalculation();
     this.setupScannerQueue();
-    
+
     const defaultBranch = this.masterList.branches()[0]?._id;
     if (defaultBranch && !this.editMode()) {
       this.invoiceForm.patchValue({ branchId: defaultBranch });
@@ -141,17 +141,17 @@ manualSearchControl = new FormControl(null);
       concatMap(code => {
         this.isScanning.set(true);
         const branchId = this.invoiceForm.get('branchId')?.value;
-        
+
         if (!branchId) {
           this.messageService.showWarn('Branch Required: Please select a branch before scanning.');
           this.isScanning.set(false);
           return EMPTY;
         }
-
-        return this.productService.scanProduct(code, branchId).pipe(
+        //  branchId: branchId
+        return this.productService.scanProduct({ barcode: code }).pipe(
           catchError(err => {
             this.messageService.showError(err);
-            return EMPTY; 
+            return EMPTY;
           }),
           finalize(() => {
             this.isScanning.set(false);
@@ -183,7 +183,7 @@ manualSearchControl = new FormControl(null);
       this.focusScanner();
     }
   }
-onManualProductSelect(event: any): void {
+  onManualProductSelect(event: any): void {
     const productId = event.value;
     const product = this.productOptions().find(p => p._id === productId);
     const branchId = this.invoiceForm.get('branchId')?.value;
@@ -199,9 +199,9 @@ onManualProductSelect(event: any): void {
           }
 
           this.addProductToInvoice(product, availableQty);
-          
+
           // 3. Reset the form control instead of the signal
-          this.manualSearchControl.reset(); 
+          this.manualSearchControl.reset();
         },
         error: (err) => {
           this.messageService.showError('Stock Check: Failed to verify current availability.');
@@ -209,8 +209,8 @@ onManualProductSelect(event: any): void {
         }
       });
     } else if (!branchId) {
-       this.messageService.showWarn('Branch Required: Please select a branch to check stock.');
-       this.manualSearchControl.reset();
+      this.messageService.showWarn('Branch Required: Please select a branch to check stock.');
+      this.manualSearchControl.reset();
     }
   }
   // // 4. Manual Dropdown Handler
@@ -349,7 +349,7 @@ onManualProductSelect(event: any): void {
       taxRate: [data?.taxRate || 0, [Validators.required, Validators.min(0)]],
       currentStock: [data?.currentStock || 0],
       isLowStock: [data?.willBeLow || false],
-      isCheckingStock: [false] 
+      isCheckingStock: [false]
     });
   }
 

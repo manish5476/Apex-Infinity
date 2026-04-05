@@ -41,10 +41,12 @@ export const SIDEBAR_MENU: MenuItem[] = [
           { label: 'Scan Invoice', icon: 'pi pi-plus', routerLink: ['/invoices/PosInvoiceComponent'], permissions: [PERMISSIONS.INVOICE.CREATE] },
           { label: 'Create Invoice', icon: 'pi pi-plus', routerLink: ['/invoices/create'], permissions: [PERMISSIONS.INVOICE.CREATE] },
           { label: 'Profit Dashboard', icon: 'pi pi-chart-pie', routerLink: ['/invoices/ProfitDashboardComponent'], permissions: [PERMISSIONS.REPORT.PROFIT] },
+          { label: 'Profit Dashboard', icon: 'pi pi-file-excel', routerLink: ['/invoices/profitDashboardNew'], permissions: [PERMISSIONS.REPORT.PROFIT] },
           { label: 'Profit Summary', icon: 'pi pi-file-excel', routerLink: ['/invoices/ProfitSummaryComponent'], permissions: [PERMISSIONS.REPORT.PROFIT] },
           { label: 'Advanced Analysis', icon: 'pi pi-chart-bar', routerLink: ['/invoices/AdvancedProfitAnalysisComponent'], permissions: [PERMISSIONS.REPORT.PROFIT] },
         ]
       },
+      { label: 'Customers Analytics', icon: 'pi pi-users', routerLink: ['/customer/analytics'], permissions: [PERMISSIONS.CUSTOMER.READ] },
       { label: 'Customers', icon: 'pi pi-users', routerLink: ['/customer'], permissions: [PERMISSIONS.CUSTOMER.READ] },
       { label: 'EMI Management', icon: 'pi pi-calendar-clock', routerLink: ['/emis'], permissions: [PERMISSIONS.EMI.READ] },
     ]
@@ -82,6 +84,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
         items: [
           { label: 'Product List', icon: 'pi pi-list', routerLink: ['/product'], permissions: [PERMISSIONS.PRODUCT.READ] },
           { label: 'Add Product', icon: 'pi pi-plus', routerLink: ['/product/create'], permissions: [PERMISSIONS.PRODUCT.CREATE] },
+          { label: 'Low Stock Report', icon: 'pi pi-exclamation-triangle', routerLink: ['/product/reports/low-stock'], permissions: [PERMISSIONS.PRODUCT.READ] },
         ]
       },
       {

@@ -87,6 +87,9 @@
     <button pButton icon="pi pi-chart-bar" class="p-button-outlined p-button-secondary btn-sm"
       [appProductAnalytics]="p._id" pTooltip="Analytics" tooltipPosition="bottom"></button>
 
+    <button *hasPermission="PERMISSIONS.PRODUCT.DELETE" pButton label="Delete" icon="pi pi-trash" class="p-button-danger p-button-outlined btn-sm"
+      (click)="deleteProduct()"></button>
+
     <button *hasPermission="PERMISSIONS.PRODUCT.UPDATE" pButton label="Edit" icon="pi pi-pencil" class="p-button-primary btn-sm"
       [routerLink]="['/product', p._id, 'edit']"></button>
   </div>
@@ -232,3 +235,4 @@
   }
 </div>
 
+<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>

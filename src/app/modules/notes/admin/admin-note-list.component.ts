@@ -256,7 +256,141 @@ import { DatePicker } from 'primeng/datepicker';
       ::ng-deep .p-select {
         font-size: 0.9rem;
       }
-    `,
+    
+    /* ==========================================================================
+   AG Grid Custom Cell Styles (Theme Aware)
+   ========================================================================== */
+
+/* Layout Helpers */
+.cell-flex-center {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.cell-stack {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: var(--line-height-tight);
+  height: 100%;
+}
+
+.gap-sm { gap: var(--spacing-sm); }
+.gap-md { gap: var(--spacing-md); }
+
+/* Typography Helpers */
+.cell-title {
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.text-primary { color: var(--text-secondary); font-size: var(--font-size-xs); }
+.text-secondary { color: var(--text-tertiary); font-size: 10px; }
+.text-muted { color: var(--text-tertiary); font-size: var(--font-size-xs); }
+.text-mono { 
+  color: var(--text-secondary); 
+  font-size: var(--font-size-xs); 
+  font-family: var(--font-mono); 
+}
+
+/* Type Icons (Mapped to theme semantic colors) */
+.type-label {
+  text-transform: capitalize;
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+.icon-type-meeting { color: var(--accent-primary); font-size: var(--font-size-md); }
+.icon-type-task { color: var(--color-info); font-size: var(--font-size-md); }
+.icon-type-note { color: var(--color-warning); font-size: var(--font-size-md); }
+
+/* Owner Avatar & Details */
+.owner-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--ui-border-radius-pill);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: var(--ui-border-width) solid var(--border-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  flex-shrink: 0;
+}
+
+.owner-info {
+  display: flex;
+  flex-direction: column;
+  line-height: var(--line-height-tight);
+  justify-content: center;
+  overflow: hidden;
+}
+
+.owner-name {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.owner-email {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Base Badge System */
+.grid-badge {
+  padding: 2px 8px;
+  border-radius: var(--ui-border-radius-sm);
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: var(--line-height-normal);
+  border: var(--ui-border-width) solid transparent;
+}
+
+/* Priority Modifiers (Mapped to semantic colors) */
+.badge-urgent {
+  background-color: var(--color-error-bg);
+  color: var(--color-error-dark);
+  border-color: var(--color-error-border);
+}
+.badge-high {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning-dark);
+  border-color: var(--color-warning-border);
+}
+.badge-medium {
+  background-color: var(--color-info-bg);
+  color: var(--color-info-dark);
+  border-color: var(--color-info-border);
+}
+.badge-low {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-dark);
+  border-color: var(--color-success-border);
+}
+
+/* Status Modifiers */
+.badge-success {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-dark);
+  border-color: var(--color-success-border);
+}
+.badge-neutral {
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+  border-color: var(--border-secondary);
+}`,
   ],
 })
 export class AdminNoteListComponent implements OnInit {
@@ -452,12 +586,7 @@ export class AdminNoteListComponent implements OnInit {
         pinned: 'left',
         sortable: true,
         filter: true,
-        cellStyle: {
-          display: 'flex',
-          'align-items': 'center',
-          'font-weight': '600',
-          color: 'var(--text-primary)',
-        },
+        cellClass: 'cell-flex-center cell-title',
       },
 
       {
@@ -467,26 +596,18 @@ export class AdminNoteListComponent implements OnInit {
         sortable: true,
         cellRenderer: (params: any) => {
           const type = params.value || 'note';
-          let icon = 'pi-file';
-          let color = '#64748b';
+          const iconMap: Record<string, string> = {
+            meeting: 'pi-calendar',
+            task: 'pi-check-square',
+            note: 'pi-file-edit'
+          };
 
-          if (type === 'meeting') {
-            icon = 'pi-calendar';
-            color = '#8b5cf6';
-          }
-          if (type === 'task') {
-            icon = 'pi-check-square';
-            color = '#0ea5e9';
-          }
-          if (type === 'note') {
-            icon = 'pi-file-edit';
-            color = '#f59e0b';
-          }
+          const icon = iconMap[type] || 'pi-file';
 
           return `
-            <div style="display:flex; align-items:center; height:100%; gap:8px;">
-               <i class="pi ${icon}" style="color:${color}; font-size:14px;"></i>
-               <span style="text-transform:capitalize; color:var(--text-secondary); font-size:12px; font-weight:500;">${type}</span>
+            <div class="cell-flex-center gap-sm">
+               <i class="pi ${icon} icon-type-${type}"></i>
+               <span class="type-label">${type}</span>
             </div>
           `;
         },
@@ -498,40 +619,10 @@ export class AdminNoteListComponent implements OnInit {
         width: 110,
         sortable: true,
         cellRenderer: (params: any) => {
-          const priority = params.value || 'medium';
-
-          let bg = '#f1f5f9';
-          let text = '#475569';
-
-          if (priority === 'urgent') {
-            bg = '#fef2f2';
-            text = '#dc2626';
-          }
-          if (priority === 'high') {
-            bg = '#fff1f2';
-            text = '#e11d48';
-          }
-          if (priority === 'medium') {
-            bg = '#eff6ff';
-            text = '#2563eb';
-          }
-          if (priority === 'low') {
-            bg = '#f0fdf4';
-            text = '#16a34a';
-          }
-
+          const priority = (params.value || 'medium').toLowerCase();
           return `
-            <div style="display:flex; align-items:center; height:100%;">
-              <span style="
-                background:${bg}; 
-                color:${text}; 
-                padding:2px 8px; 
-                border-radius:4px; 
-                font-size:10px; 
-                font-weight:700; 
-                text-transform:uppercase;
-                letter-spacing: 0.5px;
-              ">
+            <div class="cell-flex-center">
+              <span class="grid-badge badge-${priority}">
                 ${priority}
               </span>
             </div>
@@ -549,21 +640,11 @@ export class AdminNoteListComponent implements OnInit {
           const initial = name.charAt(0).toUpperCase();
 
           return `
-            <div style="display:flex; align-items:center; height:100%; gap:10px;">
-               <div style="
-                  width:28px; height:28px; 
-                  border-radius:50%; 
-                  background:#f1f5f9; 
-                  color:#64748b; 
-                  display:flex; align-items:center; justify-content:center; 
-                  font-size:11px; font-weight:700;
-                  border: 1px solid #e2e8f0;
-               ">
-                  ${initial}
-               </div>
-               <div style="display:flex; flex-direction:column; line-height:1.2; justify-content:center;">
-                  <span style="font-size:12px; font-weight:500; color:var(--text-primary); white-space:nowrap;">${name}</span>
-                  <span style="font-size:10px; color:var(--text-tertiary); overflow:hidden; text-overflow:ellipsis; max-width:120px;">${email}</span>
+            <div class="cell-flex-center gap-md">
+               <div class="owner-avatar">${initial}</div>
+               <div class="owner-info">
+                  <span class="owner-name">${name}</span>
+                  <span class="owner-email" title="${email}">${email}</span>
                </div>
             </div>
           `;
@@ -576,28 +657,13 @@ export class AdminNoteListComponent implements OnInit {
         width: 120,
         sortable: true,
         cellRenderer: (params: any) => {
-          const status = params.value;
-
-          const isActive = status === 'active';
-          const bg = isActive ? '#ecfdf5' : '#f3f4f6';
-          const color = isActive ? '#15803d' : '#4b5563';
-          const border = isActive ? '#bbf7d0' : '#e5e7eb';
+          const status = (params.value || 'UNKNOWN').toLowerCase();
+          const badgeClass = status === 'active' ? 'badge-success' : 'badge-neutral';
 
           return `
-            <div style="display:flex; align-items:center; height:100%;">
-              <span style="
-                background-color: ${bg}; 
-                color: ${color}; 
-                border: 1px solid ${border}; 
-                padding: 1px 8px; 
-                border-radius: 4px; 
-                font-size: 10px; 
-                font-weight: 700; 
-                text-transform: uppercase; 
-                line-height: 1.2; 
-                letter-spacing: 0.5px;
-              ">
-                ${status || 'UNKNOWN'}
+            <div class="cell-flex-center">
+              <span class="grid-badge ${badgeClass}">
+                ${status}
               </span>
             </div>`;
         },
@@ -610,15 +676,12 @@ export class AdminNoteListComponent implements OnInit {
         sortable: true,
         cellRenderer: (params: any) => {
           if (!params.value) return '-';
-          const date = new Date(params.value).toLocaleDateString();
-          const time = new Date(params.value).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
-          });
+          const dateObj = new Date(params.value);
+
           return `
-            <div style="display:flex; flex-direction:column; justify-content:center; line-height:1.2; height:100%;">
-               <span style="color:var(--text-secondary); font-size:12px;">${date}</span>
-               <span style="color:var(--text-tertiary); font-size:10px;">${time}</span>
+            <div class="cell-stack">
+               <span class="text-primary">${dateObj.toLocaleDateString()}</span>
+               <span class="text-secondary">${dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
             </div>
            `;
         },
@@ -630,12 +693,207 @@ export class AdminNoteListComponent implements OnInit {
         width: 140,
         sortable: true,
         cellRenderer: (params: any) => {
-          if (!params.value)
-            return `<span style="color:var(--text-tertiary); font-size:11px;">-</span>`;
+          if (!params.value) return `<span class="text-muted">-</span>`;
           const date = new Date(params.value).toLocaleDateString();
-          return `<span style="color:var(--text-secondary); font-size:12px; font-family:monospace;">${date}</span>`;
+          return `<span class="text-mono">${date}</span>`;
         },
       },
     ];
   }
+
+  // setupColumns(): void {
+  //   this.columnDefs = [
+  //     {
+  //       field: 'title',
+  //       headerName: 'Title',
+  //       width: 240,
+  //       pinned: 'left',
+  //       sortable: true,
+  //       filter: true,
+  //       cellStyle: {
+  //         display: 'flex',
+  //         'align-items': 'center',
+  //         'font-weight': '600',
+  //         color: 'var(--text-primary)',
+  //       },
+  //     },
+
+  //     {
+  //       field: 'noteType',
+  //       headerName: 'Type',
+  //       width: 120,
+  //       sortable: true,
+  //       cellRenderer: (params: any) => {
+  //         const type = params.value || 'note';
+  //         let icon = 'pi-file';
+  //         let color = '#64748b';
+
+  //         if (type === 'meeting') {
+  //           icon = 'pi-calendar';
+  //           color = '#8b5cf6';
+  //         }
+  //         if (type === 'task') {
+  //           icon = 'pi-check-square';
+  //           color = '#0ea5e9';
+  //         }
+  //         if (type === 'note') {
+  //           icon = 'pi-file-edit';
+  //           color = '#f59e0b';
+  //         }
+
+  //         return `
+  //           <div style="display:flex; align-items:center; height:100%; gap:8px;">
+  //              <i class="pi ${icon}" style="color:${color}; font-size:14px;"></i>
+  //              <span style="text-transform:capitalize; color:var(--text-secondary); font-size:12px; font-weight:500;">${type}</span>
+  //           </div>
+  //         `;
+  //       },
+  //     },
+
+  //     {
+  //       field: 'priority',
+  //       headerName: 'Priority',
+  //       width: 110,
+  //       sortable: true,
+  //       cellRenderer: (params: any) => {
+  //         const priority = params.value || 'medium';
+
+  //         let bg = '#f1f5f9';
+  //         let text = '#475569';
+
+  //         if (priority === 'urgent') {
+  //           bg = '#fef2f2';
+  //           text = '#dc2626';
+  //         }
+  //         if (priority === 'high') {
+  //           bg = '#fff1f2';
+  //           text = '#e11d48';
+  //         }
+  //         if (priority === 'medium') {
+  //           bg = '#eff6ff';
+  //           text = '#2563eb';
+  //         }
+  //         if (priority === 'low') {
+  //           bg = '#f0fdf4';
+  //           text = '#16a34a';
+  //         }
+
+  //         return `
+  //           <div style="display:flex; align-items:center; height:100%;">
+  //             <span style="
+  //               background:${bg}; 
+  //               color:${text}; 
+  //               padding:2px 8px; 
+  //               border-radius:4px; 
+  //               font-size:10px; 
+  //               font-weight:700; 
+  //               text-transform:uppercase;
+  //               letter-spacing: 0.5px;
+  //             ">
+  //               ${priority}
+  //             </span>
+  //           </div>
+  //         `;
+  //       },
+  //     },
+
+  //     {
+  //       field: 'owner',
+  //       headerName: 'Owner',
+  //       width: 180,
+  //       cellRenderer: (params: any) => {
+  //         const name = params.data.owner?.name || 'Unknown';
+  //         const email = params.data.owner?.email || '';
+  //         const initial = name.charAt(0).toUpperCase();
+
+  //         return `
+  //           <div style="display:flex; align-items:center; height:100%; gap:10px;">
+  //              <div style="
+  //                 width:28px; height:28px; 
+  //                 border-radius:50%; 
+  //                 background:#f1f5f9; 
+  //                 color:#64748b; 
+  //                 display:flex; align-items:center; justify-content:center; 
+  //                 font-size:11px; font-weight:700;
+  //                 border: 1px solid #e2e8f0;
+  //              ">
+  //                 ${initial}
+  //              </div>
+  //              <div style="display:flex; flex-direction:column; line-height:1.2; justify-content:center;">
+  //                 <span style="font-size:12px; font-weight:500; color:var(--text-primary); white-space:nowrap;">${name}</span>
+  //                 <span style="font-size:10px; color:var(--text-tertiary); overflow:hidden; text-overflow:ellipsis; max-width:120px;">${email}</span>
+  //              </div>
+  //           </div>
+  //         `;
+  //       },
+  //     },
+
+  //     {
+  //       field: 'status',
+  //       headerName: 'Status',
+  //       width: 120,
+  //       sortable: true,
+  //       cellRenderer: (params: any) => {
+  //         const status = params.value;
+
+  //         const isActive = status === 'active';
+  //         const bg = isActive ? '#ecfdf5' : '#f3f4f6';
+  //         const color = isActive ? '#15803d' : '#4b5563';
+  //         const border = isActive ? '#bbf7d0' : '#e5e7eb';
+
+  //         return `
+  //           <div style="display:flex; align-items:center; height:100%;">
+  //             <span style="
+  //               background-color: ${bg}; 
+  //               color: ${color}; 
+  //               border: 1px solid ${border}; 
+  //               padding: 1px 8px; 
+  //               border-radius: 4px; 
+  //               font-size: 10px; 
+  //               font-weight: 700; 
+  //               text-transform: uppercase; 
+  //               line-height: 1.2; 
+  //               letter-spacing: 0.5px;
+  //             ">
+  //               ${status || 'UNKNOWN'}
+  //             </span>
+  //           </div>`;
+  //       },
+  //     },
+
+  //     {
+  //       field: 'createdAt',
+  //       headerName: 'Created',
+  //       width: 140,
+  //       sortable: true,
+  //       cellRenderer: (params: any) => {
+  //         if (!params.value) return '-';
+  //         const date = new Date(params.value).toLocaleDateString();
+  //         const time = new Date(params.value).toLocaleTimeString([], {
+  //           hour: '2-digit',
+  //           minute: '2-digit',
+  //         });
+  //         return `
+  //           <div style="display:flex; flex-direction:column; justify-content:center; line-height:1.2; height:100%;">
+  //              <span style="color:var(--text-secondary); font-size:12px;">${date}</span>
+  //              <span style="color:var(--text-tertiary); font-size:10px;">${time}</span>
+  //           </div>
+  //          `;
+  //       },
+  //     },
+
+  //     {
+  //       field: 'dueDate',
+  //       headerName: 'Due Date',
+  //       width: 140,
+  //       sortable: true,
+  //       cellRenderer: (params: any) => {
+  //         if (!params.value)
+  //           return `<span style="color:var(--text-tertiary); font-size:11px;">-</span>`;
+  //         const date = new Date(params.value).toLocaleDateString();
+  //         return `<span style="color:var(--text-secondary); font-size:12px; font-family:monospace;">${date}</span>`;
+  //       },
+  //     },
+  //   ];
+  // }
 }

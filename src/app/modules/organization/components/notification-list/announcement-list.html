@@ -1,0 +1,214 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="announce-page">
+
+  <!-- ─────────── PAGE HEADER ─────────── -->
+  <div class="page-header">
+    <div class="page-header__left">
+      <div class="page-icon">
+        <i class="pi pi-megaphone"></i>
+      </div>
+      <div>
+        <h2 class="page-title">
+          Announcements
+          <span class="unread-pill" *ngIf="totalUnread() > 0">
+            {{ totalUnread() }} unread
+          </span>
+        </h2>
+        <p class="page-subtitle">Broadcast messages to staff, customers, or everyone</p>
+      </div>
+    </div>
+    <div class="page-header__actions">
+      <p-button *hasPermission="PERMISSIONS.ANNOUNCEMENT.MANAGE" label="New Announcement" icon="pi pi-plus"
+        styleClass="p-button-primary" (onClick)="openCreate()">
+      </p-button>
+    </div>
+  </div>
+
+  <!-- ─────────── STATS STRIP ─────────── -->
+  <div class="stats-strip" *ngIf="stats()">
+
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--primary"><i class="pi pi-megaphone"></i></div>
+      <div class="stat-body">
+        <span class="stat-label">Total</span>
+        <span class="stat-value">{{ stats().total }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card" [class.stat-card--alert]="totalUnread() > 0">
+      <div class="stat-icon stat-icon--warn"><i class="pi pi-envelope"></i></div>
+      <div class="stat-body">
+        <span class="stat-label">Unread</span>
+        <span class="stat-value">{{ totalUnread() }}</span>
+      </div>
+    </div>
+
+    <!-- Audience breakdown -->
+    <div class="stat-card stat-card--wide" *ngIf="stats().byAudience?.length">
+      <div class="stat-icon stat-icon--info"><i class="pi pi-users"></i></div>
+      <div class="stat-body">
+        <span class="stat-label">By Audience</span>
+        <div class="audience-chips">
+          <span class="aud-chip" *ngFor="let a of stats().byAudience">
+            <span class="aud-chip__name" style="text-transform:capitalize">{{ a.audience }}</span>
+            <span class="aud-chip__count">{{ a.count }}</span>
+            <span class="aud-chip__unread" *ngIf="a.unread > 0">{{ a.unread }} unread</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ─────────── FILTER BAR ─────────── -->
+  <div class="filter-bar">
+    <div class="filter-bar__fields">
+
+      <div class="filter-field">
+        <label class="filter-label"><i class="pi pi-tag"></i> Type</label>
+        <p-select appendTo="body" [options]="typeOptions" [(ngModel)]="filterType" optionLabel="label"
+          optionValue="value" [showClear]="true" placeholder="All types" styleClass="w-full"
+          (onChange)="applyFilters()">
+        </p-select>
+      </div>
+
+      <div class="filter-field">
+        <label class="filter-label"><i class="pi pi-users"></i> Audience</label>
+        <p-select appendTo="body" [options]="audienceOptions" [(ngModel)]="filterAudience" optionLabel="label"
+          optionValue="value" [showClear]="true" placeholder="All audiences" styleClass="w-full"
+          (onChange)="applyFilters()">
+        </p-select>
+      </div>
+
+      <div class="filter-field">
+        <label class="filter-label"><i class="pi pi-circle"></i> Status</label>
+        <p-select appendTo="body" [options]="statusOptions" [(ngModel)]="filterStatus" optionLabel="label"
+          optionValue="value" [showClear]="true" placeholder="All statuses" styleClass="w-full"
+          (onChange)="applyFilters()">
+        </p-select>
+      </div>
+
+    </div>
+
+    <p-button label="Reset" icon="pi pi-refresh" styleClass="p-button-text p-button-secondary"
+      (onClick)="resetFilters()">
+    </p-button>
+  </div>
+
+  <!-- ─────────── GRID ─────────── -->
+  <div class="grid-wrapper">
+    <app-ag-share-grid [columns]="columns" [data]="data()" [actionColumn]="actionColumn" selectionMode="multiple"
+      (gridEvent)="onGridEvent($event)" style="height: 100%; width: 100%; display: block;">
+    </app-ag-share-grid>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     CREATE / EDIT DIALOG
+═══════════════════════════════════════════════════════ -->
+<p-dialog [(visible)]="dialogOpen" [modal]="true" [draggable]="false" [resizable]="false"
+  [style]="{ width: '580px', maxWidth: '95vw' }" styleClass="announce-dialog" [header]="dialogTitle"
+  (onHide)="closeDialog()">
+
+  <div class="dialog-body">
+
+    <!-- Title -->
+    <div class="form-group">
+      <label class="form-label required">Title</label>
+      <input pInputText class="w-full" placeholder="Announcement title" [(ngModel)]="form.title" maxlength="150" />
+      <span class="char-count">{{ form.title.length }}/150</span>
+    </div>
+
+    <!-- Message -->
+    <div class="form-group">
+      <label class="form-label required">Message</label>
+      <textarea pTextarea class="w-full" [rows]="4" placeholder="Write your announcement message…"
+        [(ngModel)]="form.message" maxlength="2000">
+      </textarea>
+      <span class="char-count">{{ form.message.length }}/2000</span>
+    </div>
+
+    <!-- Type + Audience -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <p-select appendTo="body" [options]="typeOptions" [(ngModel)]="form.type" optionLabel="label"
+          optionValue="value" styleClass="w-full">
+        </p-select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Target Audience</label>
+        <p-select appendTo="body" [options]="audienceOptions" [(ngModel)]="form.targetAudience" optionLabel="label"
+          optionValue="value" styleClass="w-full">
+        </p-select>
+      </div>
+    </div>
+
+    <!-- Priority -->
+    <div class="form-group">
+      <label class="form-label">Priority</label>
+      <div class="priority-picker">
+        <button class="priority-btn" *ngFor="let opt of priorityOptions"
+          [class.priority-btn--active]="form.priority === opt.value" [attr.data-priority]="opt.value" type="button"
+          (click)="form.priority = opt.value">
+          {{ opt.label }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Toggles -->
+    <div class="form-toggles">
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <span class="toggle-label">📌 Pin Announcement</span>
+          <span class="toggle-sub">Keep this at the top of the list</span>
+        </div>
+        <p-toggleSwitch [(ngModel)]="form.isPinned"></p-toggleSwitch>
+      </div>
+
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <span class="toggle-label">🔴 Mark as Urgent</span>
+          <span class="toggle-sub">Alert recipients immediately</span>
+        </div>
+        <p-toggleSwitch [(ngModel)]="form.isUrgent"></p-toggleSwitch>
+      </div>
+
+      <div class="toggle-row" *ngIf="dialogMode() === 'edit'">
+        <div class="toggle-info">
+          <span class="toggle-label">✅ Active</span>
+          <span class="toggle-sub">Visible to recipients</span>
+        </div>
+        <p-toggleSwitch [(ngModel)]="form.isActive"></p-toggleSwitch>
+      </div>
+    </div>
+
+    <!-- Type Preview Badge -->
+    <div class="type-preview" *ngIf="form.type">
+      <span class="type-preview__label">Preview badge:</span>
+      <span class="type-badge" [attr.data-type]="form.type">
+        {{ form.type | titlecase }}
+      </span>
+      <span class="urgency-badge" *ngIf="form.isUrgent">URGENT</span>
+      <span class="pin-badge" *ngIf="form.isPinned">📌 Pinned</span>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <p-button label="Cancel" icon="pi pi-times" styleClass="p-button-text p-button-secondary"
+        (onClick)="closeDialog()">
+      </p-button>
+      <p-button [label]="dialogMode() === 'create' ? 'Publish' : 'Save Changes'"
+        [icon]="dialogMode() === 'create' ? 'pi pi-send' : 'pi pi-check'" styleClass="p-button-primary"
+        [loading]="dialogLoading()" (onClick)="saveDialog()">
+      </p-button>
+    </div>
+  </ng-template>
+
+</p-dialog>

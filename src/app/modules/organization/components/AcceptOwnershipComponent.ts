@@ -137,8 +137,8 @@ export class AcceptOwnershipComponent implements OnInit {
       action: action
     };
 
-    // Note: Kept 'finalizaTransfer' to match your service, but you might want to fix that typo!
-    this.orgService.finalizaTransfer(payload)
+    // Map variable names to match what the backend finalize transfer endpoint expects
+    this.orgService.finalizeOwnershipTransfer(payload)
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: (res) => {
@@ -146,10 +146,10 @@ export class AcceptOwnershipComponent implements OnInit {
             this.isSuccess.set(true);
             // Updated to single-string success format
             this.messageService.showSuccess('Success: Ownership Transferred!');
-            
+
             setTimeout(() => {
               // Full reload is excellent here to completely reset auth states and guards
-              window.location.href = '/dashboard'; 
+              window.location.href = '/dashboard';
             }, 1500);
           } else {
             // Updated to single-string info format
@@ -157,7 +157,7 @@ export class AcceptOwnershipComponent implements OnInit {
             this.goToDashboard();
           }
         },
-        error: (err) => {
+        error: (err: any) => {
           // Toast notification for the specific backend error (e.g., 401 Unauthorized)
           this.messageService.handleHttpError(err);
           // UI fallback state so the page isn't blank
@@ -207,7 +207,7 @@ export class AcceptOwnershipComponent implements OnInit {
 //           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Ownership Transferred!' });
 //           setTimeout(() => {
 //             // Full reload to ensure user permissions (Super Admin) update in the app
-//             window.location.href = '/dashboard'; 
+//             window.location.href = '/dashboard';
 //           }, 1500);
 //         } else {
 //           this.messageService.add({ severity: 'info', summary: 'Rejected', detail: 'You declined the transfer.' });

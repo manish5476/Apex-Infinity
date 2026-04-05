@@ -30,7 +30,7 @@
 .invoice-header {
   flex-shrink: 0;
   padding: var(--spacing-lg) var(--spacing-2xl);
-  background: var(--bg-primary); 
+  background: var(--bg-primary);
   border-bottom: 1px solid var(--border-primary);
   display: flex;
   justify-content: space-between;
@@ -47,7 +47,7 @@
 /* Back button specific layout styling */
 .back-btn {
   color: var(--text-secondary);
-  width: 2.5rem; 
+  width: 2.5rem;
   height: 2.5rem;
   border: 1px solid var(--border-primary);
 }
@@ -67,9 +67,18 @@
   padding: 2px 8px;
   border-radius: 4px;
   letter-spacing: 0.05em;
-  
-  &.status-success { background: var(--color-success-bg, #dcfce7); color: var(--color-success); border: 1px solid var(--color-success); }
-  &.status-warn { background: var(--color-warning-bg, #fef9c3); color: var(--color-warning); border: 1px solid var(--color-warning); }
+
+  &.status-success {
+    background: var(--color-success-bg, #dcfce7);
+    color: var(--color-success);
+    border: 1px solid var(--color-success);
+  }
+
+  &.status-warn {
+    background: var(--color-warning-bg, #fef9c3);
+    color: var(--color-warning);
+    border: 1px solid var(--color-warning);
+  }
 }
 
 .meta-row {
@@ -81,7 +90,9 @@
   color: var(--text-secondary);
 }
 
-.divider { opacity: 0.3; }
+.divider {
+  opacity: 0.3;
+}
 
 .header-right .value-box {
   text-align: right;
@@ -111,7 +122,7 @@
   flex: 1;
   overflow-y: auto;
   padding: var(--spacing-2xl);
-  background: var(--bg-secondary); 
+  background: var(--bg-secondary);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xl);
@@ -132,16 +143,38 @@
   gap: var(--spacing-lg);
 }
 
-.span-2 { grid-column: span 2; }
-.span-3 { grid-column: span 3; }
-.span-4 { grid-column: span 4; }
-.span-12 { grid-column: span 12; }
+.span-2 {
+  grid-column: span 2;
+}
+
+.span-3 {
+  grid-column: span 3;
+}
+
+.span-4 {
+  grid-column: span 4;
+}
+
+.span-12 {
+  grid-column: span 12;
+}
 
 @media (max-width: 1024px) {
-  .span-2, .span-3, .span-4 { grid-column: span 6; }
+
+  .span-2,
+  .span-3,
+  .span-4 {
+    grid-column: span 6;
+  }
 }
+
 @media (max-width: 640px) {
-  .span-2, .span-3, .span-4 { grid-column: span 12; }
+
+  .span-2,
+  .span-3,
+  .span-4 {
+    grid-column: span 12;
+  }
 }
 
 .form-group label {
@@ -154,7 +187,9 @@
   letter-spacing: 0.02em;
 }
 
-.required { color: var(--color-danger-text); }
+.required {
+  color: var(--color-danger-text);
+}
 
 /* 4. TABLE SECTION */
 .section-toolbar {
@@ -218,9 +253,16 @@
   font-weight: 700;
   padding: 2px 6px;
   border-radius: 4px;
-  
-  &.stock-ok { background: var(--color-success-bg, #dcfce7); color: var(--color-success); }
-  &.stock-low { background: var(--color-danger-bg, #fee2e2); color: var(--color-danger-text); }
+
+  &.stock-ok {
+    background: var(--color-success-bg, #dcfce7);
+    color: var(--color-success);
+  }
+
+  &.stock-low {
+    background: var(--color-danger-bg, #fee2e2);
+    color: var(--color-danger-text);
+  }
 }
 
 /* 5. FOOTER GRID */
@@ -229,7 +271,12 @@
   grid-template-columns: 7fr 5fr;
   gap: var(--spacing-xl);
 }
-@media (max-width: 1024px) { .footer-grid { grid-template-columns: 1fr; } }
+
+@media (max-width: 1024px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
+}
 
 .quick-pay-card {
   margin-top: var(--spacing-lg);
@@ -243,16 +290,26 @@
 }
 
 .icon-circle {
-  width: 2.5rem; height: 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: 50%;
   background: var(--bg-ternary);
   border: 1px solid var(--border-secondary);
   color: var(--text-secondary);
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.pay-inputs { flex: 1; }
-.input-row { display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-xs); }
+.pay-inputs {
+  flex: 1;
+}
+
+.input-row {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-xs);
+}
 
 /* TOTALS CARD */
 .totals-card {
@@ -269,10 +326,19 @@
   margin-bottom: var(--spacing-sm);
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
-  
-  .val { font-weight: 600; color: var(--text-primary); }
-  .text-danger { color: var(--color-danger-text); }
-  .text-success { color: var(--color-success); }
+
+  .val {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .text-danger {
+    color: var(--color-danger-text);
+  }
+
+  .text-success {
+    color: var(--color-success);
+  }
 }
 
 .summary-divider {
@@ -283,9 +349,17 @@
 
 .grand-total-row {
   margin-top: var(--spacing-sm);
-  
-  span { font-size: var(--font-size-lg); font-weight: 700; color: var(--text-primary); }
-  .val { font-size: var(--font-size-xl); color: var(--accent-primary); }
+
+  span {
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .val {
+    font-size: var(--font-size-xl);
+    color: var(--accent-primary);
+  }
 }
 
 .balance-row {
@@ -296,9 +370,18 @@
   justify-content: space-between;
   font-weight: 700;
   font-size: var(--font-size-md);
-  
-  &.bg-warn { background: var(--color-danger-bg); color: var(--color-danger-text); border: 1px solid var(--color-danger-text); }
-  &.bg-success { background: var(--color-success-bg); color: var(--color-success); border: 1px solid var(--color-success); }
+
+  &.bg-warn {
+    background: var(--color-danger-bg);
+    color: var(--color-danger-text);
+    border: 1px solid var(--color-danger-text);
+  }
+
+  &.bg-success {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+    border: 1px solid var(--color-success);
+  }
 }
 
 /* 6. STICKY FOOTER */
@@ -335,12 +418,30 @@
   padding: var(--spacing-3xl);
   text-align: center;
   color: var(--text-tertiary);
-  
-  i { font-size: 2rem; margin-bottom: var(--spacing-sm); display: block; opacity: 0.5; }
-  p { font-size: var(--font-size-sm); margin: 0; }
+
+  i {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-sm);
+    display: block;
+    opacity: 0.5;
+  }
+
+  p {
+    font-size: var(--font-size-sm);
+    margin: 0;
+  }
 }
 
 /* Scrollbar */
-.custom-scrollbar::-webkit-scrollbar { width: 6px; }
-.custom-scrollbar::-webkit-scrollbar-track { background: var(--bg-secondary); }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 4px; }
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border-secondary);
+  border-radius: 4px;
+}

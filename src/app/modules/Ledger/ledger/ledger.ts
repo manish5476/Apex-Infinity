@@ -152,7 +152,7 @@ export class LedgerComponent implements OnInit {
     if (v.minAmount) params.minAmount = v.minAmount;
     if (v.maxAmount) params.maxAmount = v.maxAmount;
     if (v.reference) params.reference = v.reference;
-   if (!resetCursor && this.nextCursor) {
+    if (!resetCursor && this.nextCursor) {
       params.lastDate = this.nextCursor.lastDate;
       params.lastId = this.nextCursor.lastId;
     }
@@ -172,7 +172,7 @@ export class LedgerComponent implements OnInit {
       const entity = tab === 'customer' ? 'Customer' : 'Supplier';
       this.messageService.showWarn(`Selection Required: Please select a ${entity} to view their ledger.`);
       return;
-   }
+    }
     this.isLoading.set(true);
     const params = this.getParams(reset);
     let request: Observable<any>;
@@ -241,152 +241,325 @@ export class LedgerComponent implements OnInit {
     if (tab === 'supplier' && !f.supplierId) return false;
     return true;
   }
-
   private initColumns(tab: LedgerTab) {
     let cols: any[] = [];
 
-    if (tab === 'all') {
-      cols = [
-        {
-          field: 'date',
-          headerName: 'Date',
-          sortable: true,
-          width: 140,
-          valueFormatter: (params: any) => this.common.formatDate(params.value, 'dd MMM yyyy'),
-          cellStyle: { 'color': 'var(--text-secondary)' }
-        },
-        {
-          field: 'referenceNumber',
-          headerName: 'Ref #',
-          sortable: true,
-          width: 160,
-          cellStyle: { 'font-weight': '600', 'color': 'var(--accent-primary)', 'cursor': 'pointer' }
-        },
-        {
-          field: 'accountName',
-          headerName: 'Account',
-          sortable: true,
-          flex: 1,
-          minWidth: 150
-        },
-        {
-          field: 'description',
-          headerName: 'Description',
-          flex: 2,
-          minWidth: 250,
-          cellStyle: { 'color': 'var(--text-secondary)' }
-        },
-        {
-          field: 'debit',
-          headerName: 'Debit',
-          sortable: true,
-          width: 130,
-          type: 'rightAligned',
-          valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
-          cellStyle: { 'color': 'var(--color-error)', 'font-family': 'var(--font-mono)' }
-        },
-        {
-          field: 'credit',
-          headerName: 'Credit',
-          sortable: true,
-          width: 130,
-          type: 'rightAligned',
-          valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
-          cellStyle: { 'color': 'var(--color-success)', 'font-family': 'var(--font-mono)' }
-        }
-      ];
+    switch (tab) {
+      // ═══════════════════════════════════════════════════════
+      // TAB: ALL (GENERAL LEDGER)
+      // ═══════════════════════════════════════════════════════
+      case 'all':
+        cols = [
+          {
+            field: 'date',
+            headerName: 'Date',
+            sortable: true,
+            width: 140,
+            valueFormatter: (params: any) => this.common.formatDate(params.value, 'dd MMM yyyy'),
+            cellClass: 'text-secondary font-medium cell-flex-center'
+          },
+          {
+            field: 'referenceNumber',
+            headerName: 'Ref #',
+            sortable: true,
+            width: 160,
+            cellClass: 'text-accent font-bold cursor-pointer hover-underline cell-flex-center'
+          },
+          {
+            field: 'accountName',
+            headerName: 'Account',
+            sortable: true,
+            flex: 1,
+            minWidth: 150,
+            cellClass: 'text-primary font-semibold cell-flex-center'
+          },
+          {
+            field: 'description',
+            headerName: 'Description',
+            flex: 2,
+            minWidth: 250,
+            cellClass: 'text-secondary ellipsis cell-flex-center'
+          },
+          {
+            field: 'debit',
+            headerName: 'Debit',
+            sortable: true,
+            width: 130,
+            type: 'rightAligned',
+            valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
+            cellClass: 'text-error font-mono font-semibold cell-flex-end'
+          },
+          {
+            field: 'credit',
+            headerName: 'Credit',
+            sortable: true,
+            width: 130,
+            type: 'rightAligned',
+            valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
+            cellClass: 'text-success font-mono font-semibold cell-flex-end'
+          }
+        ];
+        break;
+
+      // ═══════════════════════════════════════════════════════
+      // TAB: CUSTOMER / SUPPLIER (SUB-LEDGER)
+      // ═══════════════════════════════════════════════════════
+      case 'customer':
+      case 'supplier':
+        cols = [
+          {
+            field: 'date',
+            headerName: 'Date',
+            sortable: true,
+            width: 140,
+            valueFormatter: (params: any) => this.common.formatDate(params.value, 'dd MMM yyyy'),
+            cellClass: 'text-secondary font-medium cell-flex-center'
+          },
+          {
+            field: 'referenceNumber',
+            headerName: 'Ref #',
+            width: 160,
+            cellClass: 'text-primary font-bold cell-flex-center'
+          },
+          {
+            field: 'description',
+            headerName: 'Description',
+            flex: 2,
+            minWidth: 250,
+            cellClass: 'text-secondary ellipsis cell-flex-center'
+          },
+          {
+            field: 'debit',
+            headerName: 'Debit',
+            width: 130,
+            type: 'rightAligned',
+            valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
+            cellClass: 'text-error font-mono font-semibold cell-flex-end'
+          },
+          {
+            field: 'credit',
+            headerName: 'Credit',
+            width: 130,
+            type: 'rightAligned',
+            valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
+            cellClass: 'text-success font-mono font-semibold cell-flex-end'
+          },
+          {
+            field: 'balance',
+            headerName: 'Balance',
+            width: 140,
+            type: 'rightAligned',
+            valueFormatter: (params: any) => this.common.formatCurrency(params.value),
+            cellClass: 'text-primary font-mono font-bold cell-flex-end'
+          }
+        ];
+        break;
+
+      // ═══════════════════════════════════════════════════════
+      // TAB: TRIAL BALANCE
+      // ═══════════════════════════════════════════════════════
+      case 'trialBalance':
+        cols = [
+          {
+            field: 'accountCode',
+            headerName: 'Code',
+            width: 100,
+            cellClass: 'text-tertiary font-mono font-medium cell-flex-center'
+          },
+          {
+            field: 'accountName',
+            headerName: 'Account Name',
+            flex: 2,
+            sortable: true,
+            cellClass: 'text-primary font-semibold cell-flex-center'
+          },
+          {
+            field: 'type',
+            headerName: 'Type',
+            width: 140,
+            cellClass: 'cell-flex-center',
+            cellRenderer: (params: any) => {
+              if (!params.value) return '-';
+              const type = params.value.toLowerCase();
+              // Assign logical colors to accounting types
+              let badgeClass = 'badge-neutral';
+              if (type.includes('asset')) badgeClass = 'badge-info-soft';
+              if (type.includes('liability')) badgeClass = 'badge-warning-soft';
+              if (type.includes('equity')) badgeClass = 'badge-success-soft';
+              if (type.includes('revenue') || type.includes('income')) badgeClass = 'badge-success-solid';
+              if (type.includes('expense')) badgeClass = 'badge-error-soft';
+
+              return `<span class="grid-badge ${badgeClass}">${params.value}</span>`;
+            }
+          },
+          {
+            field: 'debit',
+            headerName: 'Debit',
+            width: 150,
+            type: 'rightAligned',
+            valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
+            cellClass: 'text-primary font-mono font-medium cell-flex-end'
+          },
+          {
+            field: 'credit',
+            headerName: 'Credit',
+            width: 150,
+            type: 'rightAligned',
+            valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
+            cellClass: 'text-primary font-mono font-medium cell-flex-end'
+          }
+        ];
+        break;
     }
-    else if (tab === 'customer' || tab === 'supplier') {
-      cols = [
-        {
-          field: 'date',
-          headerName: 'Date',
-          sortable: true,
-          width: 140,
-          valueFormatter: (params: any) => this.common.formatDate(params.value, 'dd MMM yyyy'),
-          cellStyle: { 'color': 'var(--text-secondary)' }
-        },
-        {
-          field: 'referenceNumber',
-          headerName: 'Ref #',
-          width: 160,
-          cellStyle: { 'font-weight': '600', 'color': 'var(--text-primary)' }
-        },
-        {
-          field: 'description',
-          headerName: 'Description',
-          flex: 2,
-          minWidth: 250,
-          cellStyle: { 'color': 'var(--text-secondary)' }
-        },
-        {
-          field: 'debit',
-          headerName: 'Debit',
-          width: 130,
-          type: 'rightAligned',
-          valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
-          cellStyle: { 'color': 'var(--color-error)', 'font-family': 'var(--font-mono)' }
-        },
-        {
-          field: 'credit',
-          headerName: 'Credit',
-          width: 130,
-          type: 'rightAligned',
-          valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
-          cellStyle: { 'color': 'var(--color-success)', 'font-family': 'var(--font-mono)' }
-        },
-        {
-          field: 'balance',
-          headerName: 'Balance',
-          width: 140,
-          type: 'rightAligned',
-          valueFormatter: (params: any) => this.common.formatCurrency(params.value),
-          cellStyle: { 'font-weight': 'bold', 'font-family': 'var(--font-mono)' }
-        }
-      ];
-    }
-    else if (tab === 'trialBalance') {
-      cols = [
-        {
-          field: 'accountCode',
-          headerName: 'Code',
-          width: 100,
-          cellStyle: { 'font-family': 'var(--font-mono)', 'color': 'var(--text-secondary)' }
-        },
-        {
-          field: 'accountName',
-          headerName: 'Account Name',
-          flex: 2,
-          sortable: true,
-          cellStyle: { 'font-weight': '500' }
-        },
-        {
-          field: 'type',
-          headerName: 'Type',
-          width: 120,
-          valueFormatter: (params: any) => (params.value || '').toUpperCase(),
-          cellStyle: { 'font-size': '0.75rem', 'font-weight': '600', 'color': 'var(--text-secondary)' }
-        },
-        {
-          field: 'debit',
-          headerName: 'Debit',
-          width: 150,
-          type: 'rightAligned',
-          valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
-          cellStyle: { 'color': 'var(--text-primary)', 'font-family': 'var(--font-mono)' }
-        },
-        {
-          field: 'credit',
-          headerName: 'Credit',
-          width: 150,
-          type: 'rightAligned',
-          valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
-          cellStyle: { 'color': 'var(--text-primary)', 'font-family': 'var(--font-mono)' }
-        }
-      ];
-    }
+
     this.gridColumns.set(cols);
   }
+
+  // private initColumns(tab: LedgerTab) {
+  //   let cols: any[] = [];
+
+  //   if (tab === 'all') {
+  //     cols = [
+  //       {
+  //         field: 'date',
+  //         headerName: 'Date',
+  //         sortable: true,
+  //         width: 140,
+  //         valueFormatter: (params: any) => this.common.formatDate(params.value, 'dd MMM yyyy'),
+  //         cellStyle: { 'color': 'var(--text-secondary)' }
+  //       },
+  //       {
+  //         field: 'referenceNumber',
+  //         headerName: 'Ref #',
+  //         sortable: true,
+  //         width: 160,
+  //         cellStyle: { 'font-weight': '600', 'color': 'var(--accent-primary)', 'cursor': 'pointer' }
+  //       },
+  //       {
+  //         field: 'accountName',
+  //         headerName: 'Account',
+  //         sortable: true,
+  //         flex: 1,
+  //         minWidth: 150
+  //       },
+  //       {
+  //         field: 'description',
+  //         headerName: 'Description',
+  //         flex: 2,
+  //         minWidth: 250,
+  //         cellStyle: { 'color': 'var(--text-secondary)' }
+  //       },
+  //       {
+  //         field: 'debit',
+  //         headerName: 'Debit',
+  //         sortable: true,
+  //         width: 130,
+  //         type: 'rightAligned',
+  //         valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
+  //         cellStyle: { 'color': 'var(--color-error)', 'font-family': 'var(--font-mono)' }
+  //       },
+  //       {
+  //         field: 'credit',
+  //         headerName: 'Credit',
+  //         sortable: true,
+  //         width: 130,
+  //         type: 'rightAligned',
+  //         valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
+  //         cellStyle: { 'color': 'var(--color-success)', 'font-family': 'var(--font-mono)' }
+  //       }
+  //     ];
+  //   }
+  //   else if (tab === 'customer' || tab === 'supplier') {
+  //     cols = [
+  //       {
+  //         field: 'date',
+  //         headerName: 'Date',
+  //         sortable: true,
+  //         width: 140,
+  //         valueFormatter: (params: any) => this.common.formatDate(params.value, 'dd MMM yyyy'),
+  //         cellStyle: { 'color': 'var(--text-secondary)' }
+  //       },
+  //       {
+  //         field: 'referenceNumber',
+  //         headerName: 'Ref #',
+  //         width: 160,
+  //         cellStyle: { 'font-weight': '600', 'color': 'var(--text-primary)' }
+  //       },
+  //       {
+  //         field: 'description',
+  //         headerName: 'Description',
+  //         flex: 2,
+  //         minWidth: 250,
+  //         cellStyle: { 'color': 'var(--text-secondary)' }
+  //       },
+  //       {
+  //         field: 'debit',
+  //         headerName: 'Debit',
+  //         width: 130,
+  //         type: 'rightAligned',
+  //         valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
+  //         cellStyle: { 'color': 'var(--color-error)', 'font-family': 'var(--font-mono)' }
+  //       },
+  //       {
+  //         field: 'credit',
+  //         headerName: 'Credit',
+  //         width: 130,
+  //         type: 'rightAligned',
+  //         valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
+  //         cellStyle: { 'color': 'var(--color-success)', 'font-family': 'var(--font-mono)' }
+  //       },
+  //       {
+  //         field: 'balance',
+  //         headerName: 'Balance',
+  //         width: 140,
+  //         type: 'rightAligned',
+  //         valueFormatter: (params: any) => this.common.formatCurrency(params.value),
+  //         cellStyle: { 'font-weight': 'bold', 'font-family': 'var(--font-mono)' }
+  //       }
+  //     ];
+  //   }
+  //   else if (tab === 'trialBalance') {
+  //     cols = [
+  //       {
+  //         field: 'accountCode',
+  //         headerName: 'Code',
+  //         width: 100,
+  //         cellStyle: { 'font-family': 'var(--font-mono)', 'color': 'var(--text-secondary)' }
+  //       },
+  //       {
+  //         field: 'accountName',
+  //         headerName: 'Account Name',
+  //         flex: 2,
+  //         sortable: true,
+  //         cellStyle: { 'font-weight': '500' }
+  //       },
+  //       {
+  //         field: 'type',
+  //         headerName: 'Type',
+  //         width: 120,
+  //         valueFormatter: (params: any) => (params.value || '').toUpperCase(),
+  //         cellStyle: { 'font-size': '0.75rem', 'font-weight': '600', 'color': 'var(--text-secondary)' }
+  //       },
+  //       {
+  //         field: 'debit',
+  //         headerName: 'Debit',
+  //         width: 150,
+  //         type: 'rightAligned',
+  //         valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
+  //         cellStyle: { 'color': 'var(--text-primary)', 'font-family': 'var(--font-mono)' }
+  //       },
+  //       {
+  //         field: 'credit',
+  //         headerName: 'Credit',
+  //         width: 150,
+  //         type: 'rightAligned',
+  //         valueFormatter: (params: any) => params.value ? this.common.formatCurrency(params.value) : '-',
+  //         cellStyle: { 'color': 'var(--text-primary)', 'font-family': 'var(--font-mono)' }
+  //       }
+  //     ];
+  //   }
+  //   this.gridColumns.set(cols);
+  // }
   eventFromGrid(ev: any) {
     if (ev.type === 'reachedBottom' && this.currentTab() === 'all' && this.hasMore) {
       this.loadData('all', false);
@@ -450,6 +623,6 @@ export class LedgerComponent implements OnInit {
       .subscribe(blob => this.common.downloadBlob(blob, `ledger_${type}_${new Date().getTime()}.csv`));
   }
 
-  get isReportView() {return ['orgSummary', 'pnl', 'balanceSheet'].includes(this.currentTab());  }
-  get isEntityView() {return ['customer', 'supplier'].includes(this.currentTab());  }
+  get isReportView() { return ['orgSummary', 'pnl', 'balanceSheet'].includes(this.currentTab()); }
+  get isEntityView() { return ['customer', 'supplier'].includes(this.currentTab()); }
 }

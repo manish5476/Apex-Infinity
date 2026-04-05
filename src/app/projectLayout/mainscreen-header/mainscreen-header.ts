@@ -1,6 +1,6 @@
 import {
   Component, EventEmitter, Input, Output,
-  OnInit, OnDestroy, inject, ViewChild
+  OnInit, OnDestroy, inject, ViewChild, signal
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,12 +15,14 @@ import { ToggleButtonModule } from 'primeng/togglebutton';
 import { PopoverModule, Popover } from 'primeng/popover';
 import { TieredMenuModule } from 'primeng/tieredmenu';
 import { SliderModule } from 'primeng/slider';
+import { DialogModule } from 'primeng/dialog';
 
 // Services & Components
 import { ThemeService, ThemeSettings, BACKGROUND_PATTERNS, BackgroundPattern } from '../../core/services/theme.service';
 import { AuthService } from '../../modules/auth/services/auth-service';
 import { NotificationService } from '../../core/services/notification.service';
 import { NotificationBellComponent } from '../../modules/organization/components/notification-bell-component/notification-bell-component';
+import { AnnouncementList } from '../../modules/organization/components/notification-list/notification-list';
 import { LayoutService } from '../layout.service';
 import { SIDEBAR_MENU } from '../mainscreensidebar/menu-items.constants';
 import { CommonMethodService } from '@core/utils/common-method.service';
@@ -48,7 +50,8 @@ export interface ThemeGroup {
     CommonModule, TieredMenuModule, FormsModule, RouterModule,
     AvatarModule, ButtonModule, TooltipModule, ToggleButtonModule,
     PopoverModule, NotificationBellComponent, HasPermissionDirective,
-    SliderModule,
+    SliderModule, DialogModule,
+    AnnouncementList
   ],
   templateUrl: './mainscreen-header.html',
   styleUrl: './mainscreen-header.scss',
@@ -64,6 +67,7 @@ export class MainscreenHeader implements OnInit, OnDestroy {
   @ViewChild('notificationPopover') notificationPopover!: Popover;
   profileViewMode: 'popover' | 'dialog' = 'popover';
   profileDialogVisible = false;
+  announcementDialogVisible = signal(false);
 
   private themeService = inject(ThemeService);
   private authService = inject(AuthService);
@@ -214,7 +218,8 @@ export class MainscreenHeader implements OnInit, OnDestroy {
   // ── Auth & misc ─────────────────────────────────────────────────────────────
 
   logout() {
-    this.authService.logout();
+    this.authService.logoutAll();
+    // this.authService.logout();
     this.closeAllPopovers();
   }
 

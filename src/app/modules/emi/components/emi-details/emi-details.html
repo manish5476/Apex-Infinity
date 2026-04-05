@@ -35,9 +35,12 @@
         </div>
       </div>
 
-      <div class="header-right">
+      <div class="header-right flex gap-3">
         <button class="btn-outlined" [routerLink]="['/invoices', emi.invoiceId?._id]">
           <i class="pi pi-file"></i> View Invoice
+        </button>
+        <button *hasPermission="PERMISSIONS.EMI.MANAGE" class="p-button p-button-danger p-button-outlined" (click)="deletePlan()">
+          <i class="pi pi-trash"></i> Delete Plan
         </button>
       </div>
     </header>
@@ -154,16 +157,40 @@
         </div>
 
         <div class="table-card">
-          <div class="table-header">
-            <h3>Installment Schedule</h3>
+          <div class="table-header flex justify-between items-center px-4 py-3 border-b">
+            <div class="flex gap-4">
+              <button 
+                (click)="activeTab.set('schedule')" 
+                [class.active-tab]="activeTab() === 'schedule'"
+                class="tab-btn">
+                Installment Schedule
+              </button>
+              <button 
+                (click)="activeTab.set('history')" 
+                [class.active-tab]="activeTab() === 'history'"
+                class="tab-btn">
+                Payment History
+              </button>
+            </div>
+            <div class="tab-indicator-text text-xs text-secondary italic">
+              {{ activeTab() === 'schedule' ? 'Planed installments' : 'Actual payment logs' }}
+            </div>
           </div>
           <div class="grid-wrapper">
-            <app-ag-share-grid 
-              [columns]="column" 
-              [data]="gridData"
-              (gridEvent)="eventFromGrid($event)"
-              class="full-size-grid">
-            </app-ag-share-grid>
+            @if (activeTab() === 'schedule') {
+              <app-ag-share-grid 
+                [columns]="column" 
+                [data]="gridData"
+                (gridEvent)="eventFromGrid($event)"
+                class="full-size-grid">
+              </app-ag-share-grid>
+            } @else {
+              <app-ag-share-grid 
+                [columns]="historyColumn" 
+                [data]="historyData()"
+                class="full-size-grid">
+              </app-ag-share-grid>
+            }
           </div>
         </div>
 

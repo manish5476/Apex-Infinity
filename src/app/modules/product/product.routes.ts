@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { ProductDetailsComponent } from './components/product-details/product-details';
 import { ProductFormComponent } from './components/product-form/product-form';
 import { ProductListComponent } from './components/product-list/product-list';
+import { LowStockReportComponent } from './components/low-stock-report/low-stock-report';
 import { permissionGuard } from '@core/auth/guards/permission.guard';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
 
@@ -10,6 +11,12 @@ export const PRODUCT_ROUTES: Routes = [
   {
     path: '',
     component: ProductListComponent,
+    canActivate: [permissionGuard],
+    data: { permissions: [PERMISSIONS.PRODUCT.READ] }
+  },
+  {
+    path: 'reports/low-stock',
+    component: LowStockReportComponent,
     canActivate: [permissionGuard],
     data: { permissions: [PERMISSIONS.PRODUCT.READ] }
   },

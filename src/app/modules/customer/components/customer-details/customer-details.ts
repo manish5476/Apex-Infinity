@@ -13,6 +13,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 // Services & Components
 import { CustomerService } from '../../services/customer-service';
@@ -53,9 +54,10 @@ interface TabState {
     ToastModule,
     CustomerTransactions,
     AgShareGrid,
-    HasPermissionDirective
+    HasPermissionDirective,
+    ConfirmDialogModule
   ],
-  providers: [CustomerService, InvoiceService, PaymentService, FinancialService],
+  providers: [CustomerService, InvoiceService, PaymentService, FinancialService, ConfirmationService],
   templateUrl: './customer-details.html',
   styleUrl: './customer-details.scss',
 })
