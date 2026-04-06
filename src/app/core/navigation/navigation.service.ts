@@ -126,8 +126,20 @@ export class NavigationService {
     {
       label: 'Sales',
       icon: 'point_of_sale',
-      route: '/sales',
-      permissions: [PERMISSIONS.SALES.VIEW, PERMISSIONS.SALES.MANAGE],
+      children: [
+        {
+          label: 'Transactions',
+          icon: 'receipt',
+          route: '/sales',
+          permissions: [PERMISSIONS.SALES.VIEW, PERMISSIONS.SALES.MANAGE],
+        },
+        {
+          label: 'Returns',
+          icon: 'replay',
+          route: '/sales/returns',
+          permissions: [PERMISSIONS.SALES_RETURN.READ],
+        },
+      ],
     },
     {
       label: 'Purchases',

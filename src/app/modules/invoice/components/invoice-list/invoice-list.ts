@@ -19,7 +19,9 @@ import { MasterListService } from '../../../../core/services/master-list.service
 import { AppMessageService } from '../../../../core/services/message.service';
 import { InvoiceService } from '../../services/invoice-service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
+import { DynamicDialogServices } from '../../../../core/services/dynamic-dialog-services';
 import { AgShareGrid, ActionColumnConfig } from "../../../shared/components/ag-shared-grid";
+
 import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 
@@ -53,6 +55,8 @@ export class InvoiceListComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private common = inject(CommonMethodService);
+  private dialogServices = inject(DynamicDialogServices);
+
 
   PERMISSIONS = PERMISSIONS;
 
@@ -60,10 +64,13 @@ export class InvoiceListComponent implements OnInit {
     showView: true,
     showEdit: false,
     showDelete: false,
+    showReturn: true,
     viewPermission: PERMISSIONS.INVOICE.READ,
+    returnPermission: PERMISSIONS.SALES_RETURN.MANAGE
   };
 
   private gridApi!: GridApi;
+
 
 
   private currentPage = 1;
@@ -147,7 +154,13 @@ export class InvoiceListComponent implements OnInit {
     if (event.type === 'reachedBottom') {
       this.onScrolledToBottom(event)
     }
+    if (event.type === 'return') {
+      this.dialogServices.openSalesReturn({ invoice: event.row })?.onClose.subscribe(res => {
+        if (res) this.getData(true);
+      });
+    }
   }
+
 
   getColumn(): void {
     this.column = [

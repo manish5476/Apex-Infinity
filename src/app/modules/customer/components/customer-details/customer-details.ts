@@ -26,7 +26,8 @@ import { CommonMethodService } from '../../../../core/utils/common-method.servic
 import { DynamicDialogServices } from '../../../../core/services/dynamic-dialog-services';
 import { CustomerTransactions } from '../../../transactions/customer-transactions/customer-transactions';
 import { ImageViewerDirective } from '../../../shared/directives/image-viewer.directive';
-import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
+import { AgShareGrid, ActionColumnConfig } from '../../../shared/components/ag-shared-grid';
+
 import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 import { CustomerFeedComponent } from '../customer-feed/customer-feed';
@@ -81,6 +82,15 @@ export class CustomerDetails implements OnInit {
   private dialogRef = inject(DynamicDialogRef, { optional: true });
 
   PERMISSIONS = PERMISSIONS;
+
+  readonly invoiceActionColumn: ActionColumnConfig = {
+    showView: true,
+    showEdit: false,
+    showDelete: false,
+    showReturn: true,
+    viewPermission: PERMISSIONS.INVOICE.READ,
+    returnPermission: PERMISSIONS.SALES_RETURN.MANAGE
+  };
 
   // --- State Signals ---
   loadingProfile = signal(true);
@@ -166,22 +176,6 @@ export class CustomerDetails implements OnInit {
     });
   }
 
-  // --- Grid Event Central ---
-  eventFromGrid(event: any) {
-    const tab = this.activeTab();
-
-    // 1. Handle Infinite Scroll
-    if (event.type === 'reachedBottom') {
-      this.onScrolledToBottom(tab);
-    }
-
-    // 2. Handle Navigation
-    if (event.type === 'cellClicked') {
-      if (tab === 'invoices') this.router.navigate(['/invoices', event.row._id]);
-      if (tab === 'payments') this.router.navigate(['/payments', event.row._id]);
-    }
-  }
-
   onScrolledToBottom(tab: TabType) {
     const currentDataLength = this.getTabData(tab).length;
     if (!this.tabStatus[tab].loading && currentDataLength < this.tabStatus[tab].total) {
@@ -226,14 +220,28 @@ export class CustomerDetails implements OnInit {
   }
 
   // --- Data Fetching Methods ---
-  onGridEvent(event: any, type: TabType) {
-    if (event.type === 'cellClicked' && type === 'invoices') {
-      const invoiceId = event.row._id;
-      this.router.navigate(['/invoices', invoiceId]);
+  onGridEvent(event: any, tab: TabType) {
+    if (event.type === 'reachedBottom') {
+      this.onScrolledToBottom(tab);
     }
-    if (event.type === 'cellClicked' && type === 'payments') {
-      const paymentid = event.row._id;
-      this.router.navigate(['/payments', paymentid]);
+
+    if (tab === 'invoices') {
+      if (event.type === 'cellClicked' && event.field === 'invoiceNumber') {
+        const invoiceId = event.row._id;
+        this.router.navigate(['/invoices', invoiceId]);
+      } else if (event.type === 'return') {
+        this.dialogServices.openSalesReturn({ invoice: event.row })?.onClose.subscribe(res => {
+          if (res) this.fetchDataForTab('invoices', true);
+        });
+      }
+    } else if (tab === 'payments') {
+      if (event.type === 'cellClicked') {
+        this.router.navigate(['/payments', event.row._id]);
+      }
+    } else if (tab === 'ledger') {
+      if (event.type === 'cellClicked') {
+        // Handle ledger clicks if needed
+      }
     }
   }
 

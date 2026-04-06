@@ -39,22 +39,22 @@
 
     <!-- ── Navigation ── -->
     <nav class="nav-scroll" role="navigation" aria-label="Main navigation">
-      @for (item of menuItems; track item.label) {
+      @for (item of menuItems(); track item.label) {
       <div class="nav-group">
 
         <!-- Level 1 item -->
         <div class="nav-item lv1" [class.is-parent-active]="hasActiveChild(item)" (click)="handleItemClick(item)"
-          [attr.aria-expanded]="item.items ? expandedState[item.label] : null">
+          [attr.aria-expanded]="item.items ? expandedState()[item.label] : null">
           <span class="nav-icon"><i [class]="item.icon"></i></span>
           <span class="nav-label">{{ item.label }}</span>
           @if (item.items) {
-          <i class="nav-arrow pi pi-chevron-down" [class.is-open]="expandedState[item.label]"></i>
+          <i class="nav-arrow pi pi-chevron-down" [class.is-open]="expandedState()[item.label]"></i>
           }
         </div>
 
         <!-- Level 2 accordion -->
         @if (item.items) {
-        <div class="nav-accordion" [class.is-expanded]="expandedState[item.label]">
+        <div class="nav-accordion" [class.is-expanded]="expandedState()[item.label]">
           <div class="nav-accordion-inner">
             @for (sub of item.items; track sub.label) {
             <div class="nav-sub-group">
@@ -63,13 +63,13 @@
               <div class="nav-item lv2" [class.is-active]="isActiveLink(sub)" (click)="handleItemClick(sub); $event.stopPropagation()">
                 <span class="nav-label">{{ sub.label }}</span>
                 @if (sub.items) {
-                <i class="nav-arrow pi pi-chevron-down sm" [class.is-open]="expandedState[sub.label]"></i>
+                <i class="nav-arrow pi pi-chevron-down sm" [class.is-open]="expandedState()[sub.label]"></i>
                 }
               </div>
 
               <!-- Level 3 accordion -->
               @if (sub.items) {
-              <div class="nav-accordion" [class.is-expanded]="expandedState[sub.label]">
+              <div class="nav-accordion" [class.is-expanded]="expandedState()[sub.label]">
                 <div class="nav-accordion-inner lv3-wrap">
                   @for (deep of sub.items; track deep.label) {
                   <div class="nav-item lv3" [class.is-active]="isActiveLink(deep)" (click)="handleItemClick(deep); $event.stopPropagation()">

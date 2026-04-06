@@ -1,0 +1,65 @@
+<div class="sales-action-container glass-effect">
+  <div class="dialog-header mb-6">
+    <div class="flex items-center gap-4">
+      <div class="icon-circle" [class.bg-success]="actionType === 'approve'" [class.bg-error]="actionType === 'reject'">
+        <i class="pi" [class.pi-check-circle]="actionType === 'approve'" [class.pi-times-circle]="actionType === 'reject'"></i>
+      </div>
+      <div>
+        <h2 class="text-xl font-bold tracking-tight">
+          {{ actionType === 'approve' ? 'Approve Return' : 'Reject Return' }}
+        </h2>
+        <p class="text-sm text-secondary opacity-70">
+          Confirming action for Return <strong>{{ returnNumber }}</strong>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-body mb-6">
+    @if (actionType === 'reject') {
+      <div class="rejection-form">
+        <label class="text-xs font-semibold uppercase tracking-wider mb-2 block opacity-70">
+          Reason for Rejection <span class="text-error">*</span>
+        </label>
+        <form [formGroup]="actionForm">
+          <textarea 
+            pTextarea 
+            formControlName="rejectionReason" 
+            rows="4" 
+            class="w-full modern-textarea" 
+            placeholder="Please provide a brief explanation for rejecting this return..."
+          ></textarea>
+          @if (actionForm.get('rejectionReason')?.invalid && actionForm.get('rejectionReason')?.touched) {
+            <small class="text-error mt-1 block">Rejection reason is required.</small>
+          }
+        </form>
+      </div>
+    } @else {
+      <div class="approval-confirmation bg-white/5 p-4 rounded-xl border border-white/10">
+        <p class="text-sm leading-relaxed">
+          Are you sure you want to approve this sales return? This action will finalize the return process and update the inventory/accounts accordingly.
+        </p>
+      </div>
+    }
+  </div>
+
+  <div class="dialog-footer flex items-center justify-end gap-3 pt-4 border-t border-white/5">
+    <button 
+      pButton 
+      label="Cancel" 
+      icon="pi pi-times" 
+      class="p-button-text p-button-secondary" 
+      (click)="cancel()"
+    ></button>
+    <button 
+      pButton 
+      [label]="actionType === 'approve' ? 'Confirm Approval' : 'Confirm Rejection'" 
+      [icon]="actionType === 'approve' ? 'pi pi-check' : 'pi pi-ban'" 
+      [class.p-button-success]="actionType === 'approve'" 
+      [class.p-button-danger]="actionType === 'reject'"
+      class="glow-effect"
+      [loading]="isSubmitting()"
+      (click)="confirm()"
+    ></button>
+  </div>
+</div>

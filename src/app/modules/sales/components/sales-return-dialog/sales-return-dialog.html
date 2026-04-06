@@ -1,0 +1,113 @@
+<div class="sales-return-container glass-effect">
+
+  @if (isLoading()) {
+  <div class="flex flex-col items-center justify-center p-10 gap-4">
+    <i class="pi pi-spin pi-spinner text-4xl text-primary opacity-60"></i>
+    <p class="text-secondary animate-pulse">Fetching invoice data...</p>
+  </div>
+  } @else {
+  <div class="dialog-header mb-6">
+    <div class="flex items-center gap-4">
+      <div class="icon-circle">
+        <i class="pi pi-replay"></i>
+      </div>
+      <div>
+        <h2 class="text-xl font-bold tracking-tight">Sales Return</h2>
+        <p class="text-sm text-secondary opacity-70">Initiating return for Invoice <strong>#{{ invoice().invoiceNumber
+            }}</strong></p>
+      </div>
+    </div>
+    <div class="header-right text-right">
+      <span class="text-xs text-secondary opacity-50 uppercase tracking-widest block mb-1">Customer</span>
+      <span class="font-semibold">{{ invoice().customerId?.name }}</span>
+    </div>
+  </div>
+
+  <div class="return-workflow grid grid-cols-12 gap-8">
+    <!-- Item Selection Section -->
+    <div class="col-span-12 lg:col-span-8">
+      <div class="selection-card">
+        <div class="card-header border-b border-white/5 pb-4 mb-4 flex items-center justify-between">
+          <h3 class="text-md font-semibold">Select Items to Return</h3>
+          <span class="badge secondary">{{ selectedItemsCount() }} / {{ returnItems().length
+            }} Items Selected</span>
+        </div>
+
+        <div class="item-list-container custom-scrollbar max-h-[400px] pr-2">
+          @for (item of returnItems(); track item._id) {
+          <div class="return-item-row" [class.selected]="item.isSelected">
+            <div class="item-meta flex-1">
+              <div class="flex items-center gap-3">
+                <p-checkbox [binary]="true" [ngModel]="item.isSelected" (onChange)="toggleItem(item)"></p-checkbox>
+                <div>
+                  <h4 class="font-semibold text-sm">{{ item.name }}</h4>
+                  <p class="text-xs text-secondary opacity-70">
+                    Invoiced: {{ item.quantity }} {{ item.unit }} |
+                    Price: {{ item.price | currency:'INR' }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="quantity-control flex items-center gap-4">
+              <div class="flex flex-col items-end">
+                <span class="text-xxs uppercase opacity-50 mb-1">Return Qty</span>
+                <p-inputNumber [ngModel]="item.returnQuantity" (ngModelChange)="onQuantityChange(item, $event)"
+                  [min]="0" [max]="item.quantity" [showButtons]="true" buttonLayout="horizontal"
+                  spinnerMode="horizontal" decrementButtonClass="p-button-text p-button-secondary qty-btn"
+                  incrementButtonClass="p-button-text p-button-secondary qty-btn" incrementButtonIcon="pi pi-plus"
+                  decrementButtonIcon="pi pi-minus" inputStyleClass="qty-input"></p-inputNumber>
+              </div>
+              <div class="subtotal-item min-w-[100px] text-right">
+                <span class="text-xxs uppercase opacity-50 mb-1 block">Subtotal</span>
+                <span class="font-mono text-sm font-semibold" [class.text-primary]="item.isSelected">
+                  {{ (item.returnQuantity * item.price) * (1 + (item.taxRate || 0)/100) | currency:'INR' }}
+                </span>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Section -->
+    <div class="col-span-12 lg:col-span-4 self-start">
+      <div class="action-card sticky top-0">
+        <form [formGroup]="returnForm" class="flex flex-col gap-6">
+          <div class="form-group">
+            <label class="text-xs font-semibold uppercase tracking-wider mb-2 block opacity-70">Return Reason</label>
+            <p-select [options]="reasons" formControlName="reason" optionLabel="label" optionValue="value"
+              appendTo="body" placeholder="Select Reason" styleClass="w-full modern-select"></p-select>
+          </div>
+
+          <div class="form-group">
+            <label class="text-xs font-semibold uppercase tracking-wider mb-2 block opacity-70">Notes (Optional)</label>
+            <textarea pInputTextarea formControlName="notes" rows="3" class="w-full modern-textarea"
+              placeholder="Additional details about the return..."></textarea>
+          </div>
+
+          <div class="return-summary border-t border-white/10 pt-4 mt-2">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm opacity-70">Eligible Refound</span>
+              <span class="font-mono font-bold text-lg text-primary">{{ totalReturnAmount() | currency:'INR' }}</span>
+            </div>
+            <p class="text-xxs opacity-50 leading-relaxed italic">
+              * Amount is calculated based on returned quantities and applicable taxes.
+              Refund adjustment will be processed upon approval.
+            </p>
+          </div>
+
+          <div class="flex flex-col gap-3 mt-4">
+            <button pButton label="Process Return" icon="pi pi-check-circle"
+              class="p-button-primary p-button-lg w-full glow-effect" [loading]="isSubmitting()" [disabled]="!isValid()"
+              (click)="submitReturn()"></button>
+            <button pButton label="Cancel & Close" icon="pi pi-times" class="p-button-text p-button-secondary w-full"
+              (click)="cancel()"></button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  }
+</div>

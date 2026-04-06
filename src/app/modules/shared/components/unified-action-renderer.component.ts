@@ -24,11 +24,15 @@ export interface GridActionConfig {
   showEdit?: boolean;
   /** Show the delete button */
   showDelete?: boolean;
+  /** Show the return button */
+  showReturn?: boolean;
 
   /** Optional RBAC guards — omit to always show */
   viewPermission?: Permission;
   editPermission?: Permission;
   deletePermission?: Permission;
+  returnPermission?: Permission;
+
 
   /**
    * Callback fired for every action.
@@ -43,7 +47,7 @@ export interface GridActionConfig {
   isRowEditing: (id: string | number) => boolean;
 }
 
-export type GridAction = 'view' | 'edit' | 'save' | 'cancel' | 'delete';
+export type GridAction = 'view' | 'edit' | 'save' | 'cancel' | 'delete' | 'return';
 
 /* --------------------------------------------------
    PARAMS INTERFACE
@@ -108,7 +112,22 @@ interface UnifiedActionParams extends ICellRendererParams {
             <i class="pi pi-trash"></i>
           </button>
         }
+
+        <!-- Return -->
+        @if (cfg.showReturn && canDo('return')) {
+          <button
+            class="act-btn return"
+            (click)="onAction('return', $event)"
+            pTooltip="Return Items"
+            tooltipPosition="top"
+            [showDelay]="300"
+            aria-label="Return items"
+          >
+            <i class="pi pi-replay"></i>
+          </button>
+        }
       }
+
 
       <!-- ── EDITING STATE ──────────────────────────── -->
       @if (isEditing) {
@@ -215,6 +234,16 @@ interface UnifiedActionParams extends ICellRendererParams {
       }
     }
 
+    .act-btn.return {
+      &:hover {
+        background: rgba(var(--primary-rgb), 0.1);
+        color: var(--primary-color);
+        border-color: rgba(var(--primary-rgb), 0.3);
+        box-shadow: 0 2px 6px rgba(var(--primary-rgb), 0.15);
+      }
+    }
+
+
     .act-btn.save {
       background: rgba(34, 197, 94, 0.1);
       color: #16a34a;
@@ -268,7 +297,9 @@ export class UnifiedActionRenderer implements ICellRendererAngularComp {
       view: this.cfg.viewPermission,
       edit: this.cfg.editPermission,
       delete: this.cfg.deletePermission,
+      return: this.cfg.returnPermission,
     };
+
     const perm = permMap[action];
     if (!perm) return true; // no guard → always show
     return this.permSvc.hasPermission(perm);

@@ -1,0 +1,268 @@
+/* ==========================================================================
+   SALES RETURN DIALOG - PURE TOKEN UI
+   Apply this SCSS alongside your PrimeNG HTML template.
+   ========================================================================== */
+
+/* 1. Main Container & Glass Effect */
+.glass-effect {
+  background: var(--glass-bg-c, rgba(26, 29, 36, 0.65));
+  backdrop-filter: blur(var(--glass-blur-c, 16px));
+  -webkit-backdrop-filter: blur(var(--glass-blur-c, 16px));
+  border: var(--ui-border-width, 1px) solid var(--glass-border-c, rgba(255, 255, 255, 0.08));
+  border-radius: var(--ui-border-radius-xl, 24px);
+  box-shadow: var(--glass-shadow-c, 0 24px 40px rgba(0, 0, 0, 0.4));
+  padding: var(--spacing-4xl, 2rem);
+  color: var(--text-primary, #ffffff);
+}
+
+/* 2. Dialog Header */
+.dialog-header {
+  border-bottom: var(--ui-border-width, 1px) solid var(--component-divider, rgba(255, 255, 255, 0.05));
+  padding-bottom: var(--spacing-2xl, 1.5rem);
+
+  .icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--ui-border-radius, 10px);
+    background: var(--accent-gradient, linear-gradient(135deg, #4f46e5, #818cf8));
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: var(--elevation-1, 0 4px 12px rgba(0, 0, 0, 0.1));
+  }
+
+  .header-right {
+    background: var(--bg-secondary, #1a1d24);
+    padding: var(--spacing-sm, 0.5rem) var(--spacing-lg, 1rem);
+    border-radius: var(--ui-border-radius, 10px);
+    border: var(--ui-border-width, 1px) solid var(--border-secondary, rgba(255, 255, 255, 0.05));
+  }
+}
+
+/* 3. Cards (Selection & Action) */
+.selection-card,
+.action-card {
+  background: var(--component-surface-raised, rgba(0, 0, 0, 0.2));
+  border: var(--ui-border-width, 1px) solid var(--component-border, rgba(255, 255, 255, 0.08));
+  border-radius: var(--ui-border-radius-lg, 16px);
+  padding: var(--spacing-3xl, 1.5rem);
+}
+
+.badge.secondary {
+  background: var(--bg-secondary, #1a1d24);
+  color: var(--text-primary, #ffffff);
+  padding: var(--spacing-xs, 0.25rem) var(--spacing-md, 0.75rem);
+  border-radius: var(--ui-border-radius-pill, 9999px);
+  font-size: var(--font-size-xs, 0.7rem);
+  border: var(--ui-border-width, 1px) solid var(--border-secondary, rgba(255, 255, 255, 0.05));
+}
+
+/* 4. Return Item Row */
+.return-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-lg, 1rem);
+  margin-bottom: var(--spacing-sm, 0.5rem);
+  border-radius: var(--ui-border-radius, 10px);
+  background: var(--component-bg, rgba(255, 255, 255, 0.02));
+  border: var(--ui-border-width, 1px) solid transparent;
+  transition: var(--transition-base, all 0.2s ease);
+
+  &:hover {
+    background: var(--bg-hover, rgba(255, 255, 255, 0.04));
+    border-color: var(--border-secondary, rgba(255, 255, 255, 0.05));
+  }
+
+  &.selected {
+    background: var(--color-primary-bg, rgba(79, 70, 229, 0.1));
+    border-color: var(--color-primary-border, rgba(79, 70, 229, 0.3));
+  }
+}
+
+/* 5. Custom Utilities */
+.text-xxs {
+  font-size: 0.65rem;
+}
+
+.custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--scroll-thumb, rgba(255, 255, 255, 0.1));
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* ==========================================================================
+   6. PRIMENG DEEP OVERRIDES
+   Forces PrimeNG components to inherit your canonical design tokens.
+   ========================================================================== */
+:host ::ng-deep {
+
+  /* --- Checkbox --- */
+  .p-checkbox {
+    .p-checkbox-box {
+      border-radius: 6px;
+      border: 2px solid var(--border-secondary, rgba(255, 255, 255, 0.2));
+      background: var(--bg-ternary, #242832);
+      width: 22px;
+      height: 22px;
+      transition: var(--transition-fast, all 0.1s ease);
+
+      &.p-highlight {
+        background: var(--color-primary, #4f46e5);
+        border-color: var(--color-primary, #4f46e5);
+
+        .p-checkbox-icon {
+          color: #ffffff;
+        }
+      }
+    }
+  }
+
+  /* --- InputNumber (Stepper) --- */
+  .p-inputnumber {
+    border: 1px solid var(--component-divider, rgba(255, 255, 255, 0.1));
+    border-radius: var(--ui-border-radius, 10px);
+    overflow: hidden;
+    background: var(--bg-secondary, #1a1d24);
+
+    .qty-input {
+      width: 48px;
+      text-align: center;
+      background: transparent;
+      border: none;
+      color: var(--text-primary, #ffffff);
+      font-weight: var(--font-weight-bold, 700);
+      font-family: var(--font-mono, monospace);
+      padding: 0;
+      box-shadow: none;
+
+      &:focus {
+        box-shadow: none;
+      }
+    }
+
+    .qty-btn {
+      background: transparent;
+      color: var(--text-secondary, #94a3b8);
+      border: none;
+      padding: 0.5rem;
+      width: 32px;
+      transition: var(--transition-fast, all 0.1s ease);
+
+      &:hover:not(:disabled) {
+        background: var(--bg-hover, rgba(255, 255, 255, 0.05));
+        color: var(--text-primary, #ffffff);
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  /* --- Select / Dropdown --- */
+  .modern-select {
+
+    /* Targets both p-select and older p-dropdown depending on PrimeNG version */
+    .p-select,
+    .p-dropdown {
+      width: 100%;
+      background: var(--bg-ternary, #242832);
+      border: 1px solid var(--component-border, rgba(255, 255, 255, 0.1));
+      border-radius: var(--ui-border-radius, 10px);
+      transition: var(--transition-base, all 0.2s ease);
+
+      .p-select-label,
+      .p-dropdown-label {
+        color: var(--text-primary, #ffffff);
+        font-size: var(--font-size-sm, 0.875rem);
+        padding: var(--spacing-md, 0.5rem) var(--spacing-lg, 0.75rem);
+      }
+
+      .p-select-trigger,
+      .p-dropdown-trigger {
+        color: var(--text-secondary, #94a3b8);
+      }
+
+      &:not(.p-disabled).p-focus {
+        border-color: var(--color-primary, #4f46e5);
+        box-shadow: 0 0 0 var(--focus-ring-width, 2px) var(--color-primary-bg, rgba(79, 70, 229, 0.2));
+      }
+    }
+  }
+
+  /* --- Textarea --- */
+  .modern-textarea {
+    background: var(--bg-ternary, #242832);
+    border: 1px solid var(--component-border, rgba(255, 255, 255, 0.1));
+    border-radius: var(--ui-border-radius, 10px);
+    color: var(--text-primary, #ffffff);
+    padding: var(--spacing-md, 0.5rem) var(--spacing-lg, 0.75rem);
+    font-size: var(--font-size-sm, 0.875rem);
+    transition: var(--transition-base, all 0.2s ease);
+    resize: none;
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-primary, #4f46e5);
+      box-shadow: 0 0 0 var(--focus-ring-width, 2px) var(--color-primary-bg, rgba(79, 70, 229, 0.2));
+    }
+
+    &::placeholder {
+      color: var(--text-muted, #64748b);
+    }
+  }
+
+  /* --- Buttons --- */
+  .glow-effect {
+    background: var(--accent-gradient, linear-gradient(135deg, #4f46e5, #818cf8)) !important;
+    border: none !important;
+    border-radius: var(--ui-border-radius, 10px) !important;
+    font-weight: var(--font-weight-bold, 700) !important;
+    color: #ffffff !important;
+    box-shadow: var(--elevation-1, 0 4px 12px rgba(79, 70, 229, 0.3)) !important;
+    transition: var(--transition-base, all 0.2s ease) !important;
+    padding: var(--spacing-md, 0.75rem) var(--spacing-lg, 1rem) !important;
+
+    &:not(:disabled):hover {
+      box-shadow: var(--elevation-2, 0 8px 24px rgba(79, 70, 229, 0.5)) !important;
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.5 !important;
+      cursor: not-allowed;
+      transform: none;
+    }
+  }
+
+  .p-button-secondary {
+    background: transparent !important;
+    border: none !important;
+    border-radius: var(--ui-border-radius, 10px) !important;
+    color: var(--text-secondary, #94a3b8) !important;
+    font-weight: var(--font-weight-semibold, 600) !important;
+    padding: var(--spacing-md, 0.75rem) var(--spacing-lg, 1rem) !important;
+
+    &:hover {
+      background: var(--bg-hover, rgba(255, 255, 255, 0.05)) !important;
+      color: var(--text-primary, #ffffff) !important;
+    }
+  }
+}

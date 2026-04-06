@@ -15,7 +15,7 @@ import { Sessions } from './modules/auth/sessions/sessions/sessions';
 import { LedgerComponent } from './modules/Ledger/ledger/ledger';
 import { Transactions } from './modules/transactions/transactions/transactions';
 import { LogsComponent } from './modules/transactions/logs/logs';
-import { SalesListComponent } from './modules/sales/sales-list/sales-list';
+// import { SalesListComponent } from './modules/sales/sales-list/sales-list';
 import { AssetList } from './modules/organization/components/AssetList/asset-list';
 import { STOREFRONT_PUBLIC_ROUTES } from './modules/storefront-public/Storefront public.routes';
 import { UnauthorizedComponent } from './modules/shared/components/unauthorized/unauthorized';
@@ -66,7 +66,6 @@ export const routes: Routes = [
     path: '',
     component: MainScreen,
     canActivate: [authGuard],
-    canActivateChild: [TabRouterGuard],
     children: [
       // 1. Data Analytics (Directly mapped to tabs)
       {
@@ -113,9 +112,7 @@ export const routes: Routes = [
       },
       {
         path: 'sales',
-        component: SalesListComponent,
-        canActivate: [TabRouterGuard, permissionGuard],
-        data: { tabLabel: 'Sales Reports', tabIcon: 'pi pi-chart-bar', permissions: [PERMISSIONS.SALES.VIEW] }
+        loadChildren: () => import('./modules/sales/sales.routes').then(m => m.SALES_ROUTES)
       },
       {
         path: 'assets',

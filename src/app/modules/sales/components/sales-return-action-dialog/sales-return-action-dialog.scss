@@ -1,0 +1,89 @@
+.glass-effect {
+  background: var(--glass-bg-c, rgba(26, 29, 36, 0.75));
+  backdrop-filter: blur(var(--glass-blur-c, 24px));
+  -webkit-backdrop-filter: blur(var(--glass-blur-c, 24px));
+  border: var(--ui-border-width, 1px) solid var(--glass-border-c, rgba(255, 255, 255, 0.12));
+  border-radius: var(--ui-border-radius-xl, 24px);
+  box-shadow: var(--glass-shadow-c, 0 32px 64px rgba(0, 0, 0, 0.6));
+  padding: var(--spacing-4xl, 2rem);
+  color: var(--text-primary, #ffffff);
+}
+
+.dialog-header {
+  .icon-circle {
+    width: 54px;
+    height: 54px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    color: #ffffff;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+
+    &.bg-success {
+      background: linear-gradient(135deg, #10b981, #34d399);
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+    }
+
+    &.bg-error {
+      background: linear-gradient(135deg, #ef4444, #f87171);
+      box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3);
+    }
+  }
+}
+
+.modern-textarea {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #ffffff;
+  padding: 1rem;
+  font-size: 0.925rem;
+  transition: all 0.2s ease;
+  resize: none;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary, #4f46e5);
+    background: rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+  }
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+}
+
+.glow-effect {
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  transition: all 0.3s ease !important;
+  
+  &.p-button-success {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
+    
+    &:hover {
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4) !important;
+      transform: translateY(-1px);
+    }
+  }
+
+  &.p-button-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2) !important;
+    
+    &:hover {
+      box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4) !important;
+      transform: translateY(-1px);
+    }
+  }
+}
+
+.text-error {
+  color: #f87171;
+  font-size: 0.75rem;
+}
