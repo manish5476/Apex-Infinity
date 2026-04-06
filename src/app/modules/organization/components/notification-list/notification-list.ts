@@ -339,6 +339,7 @@ export class AnnouncementList implements OnInit, OnDestroy {
         sortable: true,
         filter: true,
         valueGetter: (p: any) => p.data,
+        valueFormatter: (p: any) => p.data?.title ?? '',
         cellRenderer: (p: any) => {
           const row = p.value;
           const pinBadge = row.isPinned
@@ -404,6 +405,7 @@ export class AnnouncementList implements OnInit, OnDestroy {
         field: 'senderId',
         minWidth: 130,
         flex: 1,
+        valueFormatter: (p: any) => p.value?.name ?? '—',
         cellRenderer: (p: any) => {
           const name = p.value?.name ?? '—';
           const initials = name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase();
@@ -427,6 +429,7 @@ export class AnnouncementList implements OnInit, OnDestroy {
         field: 'createdAt',
         minWidth: 130,
         sortable: true,
+        valueFormatter: (p: any) => this.common.formatDate(p.value),
         cellRenderer: (p: any) => `
           <div style="font-size:11px;color:var(--text-secondary);line-height:1.4">
             <div>${c.formatDate(p.value)}</div>
