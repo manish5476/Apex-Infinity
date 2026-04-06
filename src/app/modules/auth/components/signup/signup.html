@@ -1,20 +1,26 @@
+<!-- signup.component.html -->
 <div class="auth-root">
 
+  <!-- ══════════════════════════════════════════════════════
+       LEFT — Brand Panel (mirrors login design)
+  ═══════════════════════════════════════════════════════ -->
   <aside class="brand-panel">
     <div class="grid-lines" aria-hidden="true"></div>
     <div class="orb orb-1" aria-hidden="true"></div>
     <div class="orb orb-2" aria-hidden="true"></div>
 
     <div class="brand-inner">
-      <a routerLink="/" class="wordmark" aria-label="Apex home">
+
+      <div class="wordmark">
         <div class="logo-glyph">
-          <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
-            <path d="M4 28 L16 4 L28 28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 28 L16 4 L28 28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+              stroke-linejoin="round" />
             <path d="M8.5 20 L23.5 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
           </svg>
         </div>
         <span class="wordmark-text">Apex</span>
-      </a>
+      </div>
 
       <div class="hero-copy">
         <p class="overline-text">Get started free</p>
@@ -27,35 +33,40 @@
         </p>
       </div>
 
-      <ul class="feature-list" aria-label="Plan features">
+      <!-- Feature checklist -->
+      <ul class="feature-list">
         <li class="feature-item">
-          <span class="feature-check" aria-hidden="true">
+          <span class="feature-check">
             <svg viewBox="0 0 16 16" fill="none">
-              <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
             </svg>
           </span>
           <span>14-day free trial, no credit card</span>
         </li>
         <li class="feature-item">
-          <span class="feature-check" aria-hidden="true">
+          <span class="feature-check">
             <svg viewBox="0 0 16 16" fill="none">
-              <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
             </svg>
           </span>
           <span>Unlimited team members</span>
         </li>
         <li class="feature-item">
-          <span class="feature-check" aria-hidden="true">
+          <span class="feature-check">
             <svg viewBox="0 0 16 16" fill="none">
-              <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
             </svg>
           </span>
           <span>99.9% uptime SLA</span>
         </li>
         <li class="feature-item">
-          <span class="feature-check" aria-hidden="true">
+          <span class="feature-check">
             <svg viewBox="0 0 16 16" fill="none">
-              <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
             </svg>
           </span>
           <span>SOC 2 Type II certified</span>
@@ -64,167 +75,182 @@
 
       <footer class="brand-footer">
         <span>© 2026 Apex Inc.</span>
-        <nav class="footer-nav" aria-label="Footer links">
+        <nav class="footer-nav">
           <a href="#" tabindex="-1">Privacy</a>
           <a href="#" tabindex="-1">Terms</a>
           <a href="#" tabindex="-1">Status</a>
         </nav>
       </footer>
+
     </div>
   </aside>
 
-  <main class="form-panel" id="main-content">
+  <!-- ══════════════════════════════════════════════════════
+       RIGHT — Signup Form Panel
+  ═══════════════════════════════════════════════════════ -->
+  <main class="form-panel">
     <div class="form-inner">
 
-      <a routerLink="/" class="mobile-logo" aria-label="Apex home">
+      <!-- Mobile logo -->
+      <div class="mobile-logo">
         <div class="logo-glyph">
-          <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
-            <path d="M4 28 L16 4 L28 28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+          <svg viewBox="0 0 32 32" fill="none">
+            <path d="M4 28 L16 4 L28 28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+              stroke-linejoin="round" />
             <path d="M8.5 20 L23.5 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
           </svg>
         </div>
         <span>Apex</span>
-      </a>
+      </div>
 
       <div class="form-header">
         <h2 class="form-title">Create account</h2>
         <p class="form-subtitle">Set up your workspace in under a minute</p>
       </div>
 
-      @if (successMessage()) {
-      <div class="success-banner" role="status" aria-live="polite" style="margin-bottom: 1.5rem;">
-        <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-        </svg>
-        <span>{{ successMessage() }}</span>
-      </div>
-      }
+      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="auth-form" novalidate>
 
-      @if (errorMessage()) {
-      <div class="error-banner" role="alert" aria-live="polite" style="margin-bottom: 1.5rem;">
-        <svg class="error-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-        </svg>
-        <span>{{ errorMessage() }}</span>
-        <button type="button" class="error-dismiss" (click)="errorMessage.set(null)" aria-label="Dismiss error">
-          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-          </svg>
-        </button>
-      </div>
-      }
-
-      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="auth-form" novalidate aria-label="Create account form">
-
-        <div class="field-group" [class.focused]="focusedField() === 'name'" [class.has-value]="f['name'].value" [class.has-error]="f['name'].touched && f['name'].invalid">
+        <!-- ── Row 1: Full name ── -->
+        <div class="field-group" [class.focused]="focusedField() === 'name'" [class.has-value]="f['name'].value"
+          [class.has-error]="f['name'].touched && f['name'].invalid">
           <label class="field-label" for="name">
-            <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
             </svg>
-            Full Name
+            Full Name <span class="required-star">*</span>
           </label>
-          <input id="name" type="text" formControlName="name" placeholder="Jane Smith" class="apex-input" autocomplete="name" (focus)="onFocus('name')" (blur)="onBlur()" [attr.aria-invalid]="f['name'].touched && f['name'].invalid" />
+          <input id="name" type="text" formControlName="name" placeholder="Jane Smith" class="apex-input"
+            (focus)="onFocus('name')" (blur)="onBlur()" />
           @if (f['name'].touched && f['name'].invalid) {
-          <p class="field-error" role="alert">
+          <p class="field-error">
             @if (f['name'].errors?.['required']) { Name is required }
             @else if (f['name'].errors?.['minlength']) { Minimum 2 characters }
           </p>
           }
         </div>
 
+        <!-- ── Row 2: Email + Phone (split) ── -->
         <div class="field-row-split">
-          <div class="field-group" [class.focused]="focusedField() === 'email'" [class.has-value]="f['email'].value" [class.has-error]="f['email'].touched && f['email'].invalid">
+
+          <div class="field-group" [class.focused]="focusedField() === 'email'" [class.has-value]="f['email'].value"
+            [class.has-error]="f['email'].touched && f['email'].invalid">
             <label class="field-label" for="email">
-              <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
                 <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
               </svg>
-              Email
+              Email <span class="required-star">*</span>
             </label>
-            <input id="email" type="email" formControlName="email" placeholder="you@company.com" class="apex-input" autocomplete="email" (focus)="onFocus('email')" (blur)="onBlur()" [attr.aria-invalid]="f['email'].touched && f['email'].invalid" />
+            <input id="email" type="email" formControlName="email" placeholder="you@company.com" class="apex-input"
+              (focus)="onFocus('email')" (blur)="onBlur()" />
             @if (f['email'].touched && f['email'].invalid) {
-            <p class="field-error" role="alert">
+            <p class="field-error">
               @if (f['email'].errors?.['required']) { Required }
               @else { Invalid email }
             </p>
             }
           </div>
 
-          <div class="field-group" [class.focused]="focusedField() === 'phone'" [class.has-value]="f['phone'].value" [class.has-error]="f['phone'].touched && f['phone'].invalid">
+          <div class="field-group" [class.focused]="focusedField() === 'phone'" [class.has-value]="f['phone'].value"
+            [class.has-error]="f['phone'].touched && f['phone'].invalid">
             <label class="field-label" for="phone">
-              <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+              <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
               </svg>
-              Phone
+              Phone <span class="required-star">*</span>
             </label>
-            <input id="phone" type="tel" formControlName="phone" placeholder="+91 98765 43210" class="apex-input" autocomplete="tel" (focus)="onFocus('phone')" (blur)="onBlur()" [attr.aria-invalid]="f['phone'].touched && f['phone'].invalid" />
+            <input id="phone" type="tel" formControlName="phone" placeholder="+91 98765 43210" class="apex-input"
+              (focus)="onFocus('phone')" (blur)="onBlur()" />
             @if (f['phone'].touched && f['phone'].invalid) {
-            <p class="field-error" role="alert">
+            <p class="field-error">
               @if (f['phone'].errors?.['required']) { Required }
               @else { Invalid number }
             </p>
             }
           </div>
+
         </div>
 
-        <div class="field-group" [class.focused]="focusedField() === 'shopId'" [class.has-value]="f['uniqueShopId'].value" [class.has-error]="f['uniqueShopId'].touched && f['uniqueShopId'].invalid">
+        <!-- ── Row 3: Shop ID ── -->
+        <div class="field-group" [class.focused]="focusedField() === 'shopId'"
+          [class.has-value]="f['uniqueShopId'].value"
+          [class.has-error]="f['uniqueShopId'].touched && f['uniqueShopId'].invalid">
           <label class="field-label" for="shopId">
-            <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd" />
+            <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd"
+                d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z"
+                clip-rule="evenodd" />
             </svg>
-            Shop ID
+            Shop ID <span class="required-star">*</span>
           </label>
           <div class="input-with-hint">
-            <input id="shopId" type="text" formControlName="uniqueShopId" placeholder="APEX-001" class="apex-input shop-id-input" (focus)="onFocus('shopId')" (blur)="onBlur()" [attr.aria-invalid]="f['uniqueShopId'].touched && f['uniqueShopId'].invalid" />
-            <span class="input-hint-badge" aria-hidden="true">Unique workspace ID</span>
+            <input id="shopId" type="text" formControlName="uniqueShopId" placeholder="APEX-001"
+              class="apex-input shop-id-input" (focus)="onFocus('shopId')" (blur)="onBlur()" />
+            <span class="input-hint-badge">Unique workspace identifier</span>
           </div>
           @if (f['uniqueShopId'].touched && f['uniqueShopId'].invalid) {
-          <p class="field-error" role="alert">
+          <p class="field-error">
             @if (f['uniqueShopId'].errors?.['required']) { Shop ID is required }
             @else { Only letters, numbers and hyphens }
           </p>
           }
         </div>
 
+        <!-- ── Row 4: Password + Confirm (split) ── -->
         <div class="field-row-split">
-          <div class="field-group" [class.focused]="focusedField() === 'password'" [class.has-value]="f['password'].value" [class.has-error]="f['password'].touched && f['password'].invalid">
+
+          <div class="field-group" [class.focused]="focusedField() === 'password'"
+            [class.has-value]="f['password'].value" [class.has-error]="f['password'].touched && f['password'].invalid">
             <label class="field-label" for="password">
-              <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+              <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                  d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                  clip-rule="evenodd" />
               </svg>
-              Password
+              Password <span class="required-star">*</span>
             </label>
-            <p-password inputId="password" formControlName="password" [toggleMask]="true" [feedback]="false" placeholder="Min. 8 chars" styleClass="apex-password w-full" inputStyleClass="apex-input w-full" (onFocus)="onFocus('password')" (onBlur)="onBlur()">
+            <p-password inputId="password" formControlName="password" [toggleMask]="true" [feedback]="false"
+              placeholder="Min. 8 chars" styleClass="apex-password w-full" inputStyleClass="apex-input"
+              (onFocus)="onFocus('password')" (onBlur)="onBlur()">
             </p-password>
             @if (f['password'].touched && f['password'].invalid) {
-            <p class="field-error" role="alert">
+            <p class="field-error">
               @if (f['password'].errors?.['required']) { Required }
               @else { Minimum 8 characters }
             </p>
             }
           </div>
 
-          <div class="field-group" [class.focused]="focusedField() === 'confirm'" [class.has-value]="f['passwordConfirm'].value" [class.has-error]="f['passwordConfirm'].touched && f['passwordConfirm'].invalid">
+          <div class="field-group" [class.focused]="focusedField() === 'confirm'"
+            [class.has-value]="f['passwordConfirm'].value"
+            [class.has-error]="f['passwordConfirm'].touched && f['passwordConfirm'].invalid">
             <label class="field-label" for="confirm">
-              <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                  d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clip-rule="evenodd" />
               </svg>
-              Confirm
+              Confirm <span class="required-star">*</span>
             </label>
-            <p-password inputId="confirm" formControlName="passwordConfirm" [toggleMask]="true" [feedback]="false" placeholder="Repeat password" styleClass="apex-password w-full" inputStyleClass="apex-input w-full" (onFocus)="onFocus('confirm')" (onBlur)="onBlur()">
+            <p-password inputId="confirm" formControlName="passwordConfirm" [toggleMask]="true" [feedback]="false"
+              placeholder="Repeat password" styleClass="apex-password w-full" inputStyleClass="apex-input"
+              (onFocus)="onFocus('confirm')" (onBlur)="onBlur()">
             </p-password>
             @if (f['passwordConfirm'].touched && f['passwordConfirm'].invalid) {
-            <p class="field-error" role="alert">Required</p>
+            <p class="field-error">Required</p>
             }
             @if (signupForm.errors?.['passwordMismatch'] && f['passwordConfirm'].touched) {
-            <p class="field-error" role="alert">Passwords don't match</p>
+            <p class="field-error">Passwords don't match</p>
             }
           </div>
+
         </div>
 
+        <!-- Password strength bar (shown while password field has value) -->
         @if (f['password'].value) {
-        <div class="strength-row" aria-live="polite">
-          <div class="strength-bar" role="progressbar" [attr.aria-valuenow]="passwordStrength * 25" aria-valuemin="0" aria-valuemax="100" [attr.aria-label]="'Password strength: ' + strengthLabel">
+        <div class="strength-row">
+          <div class="strength-bar">
             <div class="strength-track">
               <div class="strength-fill" [class]="strengthClass" [style.width.%]="passwordStrength * 25"></div>
             </div>
@@ -233,44 +259,55 @@
         </div>
         }
 
-        <div class="terms-row" [class.has-error]="f['terms'].touched && f['terms'].invalid">
-          <p-checkbox formControlName="terms" [binary]="true" inputId="terms" styleClass="apex-checkbox"></p-checkbox>
-          <label for="terms" class="terms-label" style="margin-left: 0.5rem; cursor: pointer;">
-            I agree to the <a href="#" class="terms-link">Terms of Service</a> and <a href="#" class="terms-link">Privacy Policy</a>
+        <!-- Terms -->
+        <div class="terms-row" [class.has-error]="f['terms'].touched && f['terms'].invalid"
+          (click)="f['terms'].setValue(!f['terms'].value); f['terms'].markAsTouched()">
+          <p-checkbox formControlName="terms" [binary]="true" inputId="terms" styleClass="apex-checkbox"
+            (click)="$event.stopPropagation()">
+          </p-checkbox>
+          <label class="terms-label" (click)="$event.stopPropagation()">
+            I agree to the
+            <a href="#" class="terms-link" (click)="$event.stopPropagation()">Terms of Service</a>
+            and
+            <a href="#" class="terms-link" (click)="$event.stopPropagation()">Privacy Policy</a>
           </label>
         </div>
-
         @if (f['terms'].touched && f['terms'].invalid) {
-        <p class="field-error terms-error" role="alert">
-          You must accept the terms to continue
-        </p>
+        <p class="field-error terms-error">You must accept the terms to continue</p>
         }
 
-        <button type="submit" class="submit-btn" [class.loading]="isLoading()" [disabled]="isLoading()" [attr.aria-busy]="isLoading()">
+        <!-- Submit -->
+        <button type="submit" class="submit-btn" [class.loading]="isLoading()" [disabled]="isLoading()">
           @if (isLoading()) {
           <span class="spinner" aria-hidden="true"></span>
           <span>Creating account…</span>
           } @else {
           <span>Create account</span>
-          <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fill-rule="evenodd" d="M10 3a7 7 0 100 14A7 7 0 0010 3zm1 9.5V11h1.5a.5.5 0 000-1H11V8.5a.5.5 0 00-1 0V10H8.5a.5.5 0 000 1H10v1.5a.5.5 0 001 0z" clip-rule="evenodd" />
+          <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+              d="M10 3a7 7 0 100 14A7 7 0 0010 3zm1 9.5V11h1.5a.5.5 0 000-1H11V8.5a.5.5 0 00-1 0V10H8.5a.5.5 0 000 1H10v1.5a.5.5 0 001 0z"
+              clip-rule="evenodd" />
           </svg>
           }
         </button>
 
       </form>
 
+      <!-- Footer links -->
       <div class="form-footer">
         <p class="signin-nudge">
-          Already have an account? <a routerLink="/auth/login" class="footer-link">Sign in</a>
+          Already have an account?
+          <a routerLink="/auth/login" class="footer-link">Sign in</a>
         </p>
         <div class="footer-divider"></div>
         <p class="org-nudge">
           Registering an organization?
           <a routerLink="/auth/org" class="footer-link footer-link--accent">
             Create org
-            <svg class="inline-arrow" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M3.75 8a.75.75 0 01.75-.75h5.19l-1.72-1.72a.75.75 0 011.06-1.06l3 3a.75.75 0 010 1.06l-3 3a.75.75 0 11-1.06-1.06l1.72-1.72H4.5A.75.75 0 013.75 8z" clip-rule="evenodd" />
+            <svg class="inline-arrow" viewBox="0 0 16 16" fill="currentColor">
+              <path fill-rule="evenodd"
+                d="M3.75 8a.75.75 0 01.75-.75h5.19l-1.72-1.72a.75.75 0 011.06-1.06l3 3a.75.75 0 010 1.06l-3 3a.75.75 0 11-1.06-1.06l1.72-1.72H4.5A.75.75 0 013.75 8z"
+                clip-rule="evenodd" />
             </svg>
           </a>
         </p>
@@ -278,4 +315,5 @@
 
     </div>
   </main>
+
 </div>

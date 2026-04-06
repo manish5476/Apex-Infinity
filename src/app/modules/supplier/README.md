@@ -1,6 +1,6 @@
 # 🤝 Supplier Management
 
-The **Supplier Module** (internally `cupplier`) maintains the database of all external vendors and service providers, tracking their performance and transaction history.
+The **Supplier Module** (internally `supplier`) maintains the database of all external vendors and service providers, tracking their performance and transaction history.
 
 ---
 

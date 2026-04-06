@@ -8,9 +8,9 @@ import { NoteLinkDialogComponent } from '../../modules/notes/note-link.dialog';
 import { AnalyticsDashboardComponent } from '../../modules/notes/analytics/analytics-dashboard.component';
 
 // Supplier Components
-import { SupplierKyc } from '../../modules/cupplier/components/supplier-kyc/supplier-kyc';
-import { SupplierLedger } from '../../modules/cupplier/components/supplier-ledger/supplier-ledger';
-import { SupplierDashboardComponent } from '../../modules/cupplier/components/supplier-dashboard/supplier-dashboard';
+import { SupplierKyc } from '../../modules/supplier/components/supplier-kyc/supplier-kyc';
+import { SupplierLedger } from '../../modules/supplier/components/supplier-ledger/supplier-ledger';
+import { SupplierDashboardComponent } from '../../modules/supplier/components/supplier-dashboard/supplier-dashboard';
 
 // Product Components
 import { ProductHistoryComponent } from '../../modules/product/components/product-history/product-history';

@@ -22,34 +22,55 @@ export const TabRouterGuard: CanActivateFn = (
   state: RouterStateSnapshot
 ) => {
   const tabService = inject(TabService);
-  const path = state.url.split('?')[0];
+
+  // 1. Identify target
+  const data = route.data || {};
+  const routeConfig = route.routeConfig;
+  
+  // A route is a valid tab if it has a component, loads one, OR has explicit tab metadata
+  const hasTarget = !!route.component || 
+                    !!routeConfig?.loadComponent || 
+                    !!routeConfig?.loadChildren || 
+                    !!data['tabLabel'];
+
+  if (!hasTarget) return true;
+
+  // 2. Build path & metadata
+  // Use state.url for the absolute path, but strip query params
+  const fullUrl = state.url.split('?')[0];
+  
+  // Normalisation: Ensure we don't register the root '/' as a tab unless intended
+  if (fullUrl === '/' || fullUrl === '/login' || fullUrl === '/signup') return true;
+
   const queryParams = route.queryParams as Record<string, string>;
-  const data = route.data as Record<string, unknown>;
-
-  // FIX: Only register a tab for routes that render a component or were explicitly marked as a tab.
-  // This handles standard 'component' and lazy-loaded 'loadComponent'/ 'loadChildren' correctly.
-  const hasTarget = !!route.component || !!route.routeConfig?.loadComponent || !!route.routeConfig?.loadChildren || !!data['tabLabel'];
-
-  if (!hasTarget) {
-    return true; 
+  
+  // Label Resolution: Preferred from Data > TitleCase from Path
+  let label = (data['tabLabel'] as string | undefined);
+  if (!label) {
+    const segments = fullUrl.split('/').filter(Boolean);
+    const lastSegment = segments.pop() || 'Home';
+    label = titleCase(lastSegment);
   }
 
-  const label = (data['tabLabel'] as string | undefined)
-    ?? titleCase(path.split('/').filter(Boolean).pop() ?? path);
-
   const options: Pick<OpenTabOptions, 'icon' | 'pinned' | 'data'> = {
-    icon: data['tabIcon'] as string | undefined,
-    pinned: (data['tabPinned'] as boolean | undefined) ?? false,
-    data: (data['tabData'] as Record<string, unknown> | undefined) ?? {},
+    icon: (data['tabIcon'] as string) || 'pi pi-file',
+    pinned: !!data['tabPinned'],
+    data: data
   };
 
-  tabService.registerTab(path, label, queryParams, options);
+  // 3. Register with Service
+  // The service handles activation if the tab already exists.
+  tabService.registerTab(fullUrl, label, queryParams, options);
 
   return true;
 };
 
+/** Helper to convert 'my-route' to 'My Route' */
 function titleCase(str: string): string {
-  return str.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  return str
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
 }
 
 // // ─────────────────────────────────────────────────────────────────────────────
