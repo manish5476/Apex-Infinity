@@ -7,13 +7,13 @@ import { Mainscreensidebar } from '../mainscreensidebar/mainscreensidebar';
 import { TabStripComponent, TabService } from '../../Tabbing';
 import { Toast } from "primeng/toast";
 @Component({
-  selector: 'app-main-screen',
+  selector: 'app-main-dashboard',
   standalone: true,
   imports: [CommonModule, RouterOutlet, MainscreenHeader, Mainscreensidebar, Toast, TabStripComponent],
-  templateUrl: './main-screen.html',
-  styleUrl: './main-screen.scss'
+  templateUrl: './main-dashboard.html',
+  styleUrl: './main-dashboard.scss'
 })
-export class MainScreen {
+export class MainDashboardComponent {
   public layout = inject(LayoutService);
   public tabService = inject(TabService);
 

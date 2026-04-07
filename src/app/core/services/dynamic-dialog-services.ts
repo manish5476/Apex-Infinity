@@ -25,7 +25,7 @@ import { User } from '../../modules/user/user-management.service';
 
 // Customer & Shared
 import { BulkCustomerComponent } from '../../modules/customer/components/bulk-customer/bulk-customer.component';
-import { CustomerDetails } from '../../modules/customer/components/customer-details/customer-details';
+// CustomerDetails imported lazily
 import { ImageUploaderComponent } from '../../modules/shared/components/image-uploader.component';
 import { SalesReturnDialogComponent } from '../../modules/sales/components/sales-return-dialog/sales-return-dialog';
 
@@ -198,7 +198,8 @@ export class DynamicDialogServices {
     });
   }
 
-  openCustomerDetails(customerId: string): DynamicDialogRef | null {
+  async openCustomerDetails(customerId: string): Promise<DynamicDialogRef | null> {
+    const { CustomerDetails } = await import('../../modules/customer/components/customer-details/customer-details');
     return this.dialogService.open(CustomerDetails, {
       ...this.enterpriseConfig,
       header: 'Customer Details Profile',

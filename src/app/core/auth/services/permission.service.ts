@@ -63,7 +63,7 @@ export class PermissionService {
    */
   readonly isSuperAdmin = computed(() => {
     const u = this.user();
-    return u?.isOwner || u?.isSuperAdmin || u?.role?.isSuperAdmin || false;
+    return u?.isOwner || u?.isSuperAdmin || false;
   });
 
   /**
@@ -75,13 +75,11 @@ export class PermissionService {
     const u = this.user();
     if (!u) return [];
     if (u.isOwner) return ['*'];
-    return u.role?.permissions ?? [];
+    return u.permissions ?? [];
   });
 
   /** Current role name — used by *hasRole directive */
-  readonly roleName = computed(() => this.user()?.role?.name ?? null);
-
-  /** True when account status === 'approved' */
+  readonly roleName = computed(() => this.user()?.role ?? null);
   readonly isApproved = computed(() => this.user()?.status === 'approved');
 
   // ── Permission checks — delegate to AuthService ───────────────────

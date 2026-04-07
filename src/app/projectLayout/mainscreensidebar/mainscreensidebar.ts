@@ -1,4 +1,4 @@
-import { Component, inject, HostBinding, OnInit, HostListener, ViewChild, ElementRef, effect, signal } from '@angular/core';
+import { Component, inject, HostBinding, OnInit, HostListener, ViewChild, ElementRef, effect, signal, computed, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { LayoutService } from '../layout.service';
@@ -28,21 +28,8 @@ export class Mainscreensidebar implements OnInit {
   permService = inject(PermissionService);
   router = inject(Router);
 
-  menuItems = signal<MenuItem[]>([]);
-  expandedState = signal<Record<string, boolean>>({});
-
-  constructor() {
-    // Re-evaluate sidebar menu entirely when user's permissions change
-    effect(() => {
-      // Just accessing the signal registers the dependency
-      this.permService.permissions();
-      this.filterMenu();
-      this.buildSearchIndex();
-      this.checkActiveRoutes();
-    });
-  }
-
-  private filterMenu() {
+  menuItems = computed(() => {
+    this.permService.permissions(); // Just accessing the signal registers the dependency
     const filterRecursive = (items: MenuItem[]): MenuItem[] => {
       return items.filter(item => {
         // Drop node if user fails the permission check
@@ -64,13 +51,44 @@ export class Mainscreensidebar implements OnInit {
     
     // Deep clone raw constants so filtering doesn't mutate original objects
     const clonedMenu = JSON.parse(JSON.stringify(SIDEBAR_MENU));
-    this.menuItems.set(filterRecursive(clonedMenu));
+    return filterRecursive(clonedMenu);
+  });
+
+  expandedState = signal<Record<string, boolean>>({});
+
+  constructor() {
+    // Re-evaluate expanded state when menu items change
+    effect(() => {
+      const items = this.menuItems(); // register dependency
+      untracked(() => this.checkActiveRoutes(items));
+    });
   }
 
   // --- SEARCH STATE ---
   isSearchVisible = false;
   searchQuery = '';
-  searchIndex: FlatMenuItem[] = [];
+  
+  searchIndex = computed(() => {
+    const index: FlatMenuItem[] = [];
+    const flatten = (items: MenuItem[], parentLabel = ''): void => {
+      for (const item of items) {
+        const currentBreadcrumb = parentLabel ? `${parentLabel} > ${item.label}` : item.label;
+        if (item.routerLink) {
+          index.push({
+            label: item.label,
+            routerLink: item.routerLink,
+            icon: item.icon,
+            breadcrumb: parentLabel
+          });
+        }
+        if (item.items) {
+          flatten(item.items, currentBreadcrumb);
+        }
+      }
+    };
+    flatten(this.menuItems());
+    return index;
+  });
   filteredResults: FlatMenuItem[] = [];
   focusedIndex = 0;
 
@@ -126,31 +144,10 @@ export class Mainscreensidebar implements OnInit {
 
   // --- SEARCH LOGIC ---
 
-  buildSearchIndex() {
-    this.searchIndex = []; // RESET index so duplicate search records aren't generated when Effect runs
-    const flatten = (items: MenuItem[], parentLabel = ''): void => {
-      for (const item of items) {
-        const currentBreadcrumb = parentLabel ? `${parentLabel} > ${item.label}` : item.label;
-        if (item.routerLink) {
-          this.searchIndex.push({
-            label: item.label,
-            routerLink: item.routerLink,
-            icon: item.icon,
-            breadcrumb: parentLabel
-          });
-        }
-        if (item.items) {
-          flatten(item.items, currentBreadcrumb);
-        }
-      }
-    };
-    flatten(this.menuItems());
-  }
-
   openSearch() {
     this.isSearchVisible = true;
     this.searchQuery = '';
-    this.filteredResults = this.searchIndex;
+    this.filteredResults = this.searchIndex();
     this.focusedIndex = 0;
     setTimeout(() => this.searchInput?.nativeElement?.focus(), 50);
   }
@@ -165,11 +162,11 @@ export class Mainscreensidebar implements OnInit {
     this.focusedIndex = 0;
 
     if (!query) {
-      this.filteredResults = this.searchIndex;
+      this.filteredResults = this.searchIndex();
       return;
     }
 
-    this.filteredResults = this.searchIndex.filter(item =>
+    this.filteredResults = this.searchIndex().filter(item =>
       item.label.toLowerCase().includes(query) ||
       (item.breadcrumb && item.breadcrumb.toLowerCase().includes(query))
     );
@@ -223,11 +220,12 @@ export class Mainscreensidebar implements OnInit {
     });
   }
 
-  private checkActiveRoutes() {
+  private checkActiveRoutes(items?: MenuItem[]) {
     const newState: Record<string, boolean> = { ...this.expandedState() };
+    const menu = items || this.menuItems();
     
-    const expandRecursive = (items: MenuItem[]) => {
-      for (const item of items) {
+    const expandRecursive = (menuGrp: MenuItem[]) => {
+      for (const item of menuGrp) {
         if (item.items && this.hasActiveChild(item)) {
           newState[item.label] = true;
           expandRecursive(item.items);
@@ -235,7 +233,7 @@ export class Mainscreensidebar implements OnInit {
       }
     };
     
-    expandRecursive(this.menuItems());
+    expandRecursive(menu);
     this.expandedState.set(newState);
   }
 

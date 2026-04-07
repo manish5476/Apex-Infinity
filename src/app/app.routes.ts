@@ -5,7 +5,7 @@ import { permissionGuard } from '@core/auth/guards/permission.guard';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
 
 // Standalone Components (eagerly loaded — small, always needed)
-import { MainScreen } from './projectLayout/main-screen/main-screen';
+import { MainDashboardComponent } from './projectLayout/main-dashboard/main-dashboard';
 import { LandingComponent } from './landingPage/landing.component';
 import { NotFoundComponent } from './modules/shared/components/notfound/notfound.component';
 import { ChatComponent } from './chat/chat.component/chat.component';
@@ -64,7 +64,7 @@ export const routes: Routes = [
   // ============================================================
   {
     path: '',
-    component: MainScreen,
+    component: MainDashboardComponent,
     canActivate: [authGuard],
     children: [
       // 1. Data Analytics (Directly mapped to tabs)

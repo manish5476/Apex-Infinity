@@ -6,126 +6,9 @@ import { tap, catchError, map, switchMap, finalize, shareReplay } from 'rxjs/ope
 import { AppMessageService } from '../../../core/services/message.service';
 import { ApiService } from '../../../core/services/api';
 import { OrganizationService } from './../../organization/organization.service';
-import { SocketConnectionService } from '@core/services/socket/socket-connection.service';
 
-// ======================================================
-// INTERFACES
-// ======================================================
 
-export interface Role {
-  _id: string;
-  name: string;
-  permissions: string[];
-  isSuperAdmin: boolean;
-}
-
-export interface Branch {
-  _id: string;
-  name: string;
-  address: any;
-  isMainBranch: boolean;
-}
-
-export interface EmployeeProfile {
-  employeeId?: string;
-  departmentId?: string;
-  designationId?: string;
-  dateOfJoining?: Date;
-  dateOfBirth?: Date;
-  reportingManagerId?: string;
-  employmentType?: 'permanent' | 'contract' | 'intern' | 'probation' | 'consultant';
-  workLocation?: string;
-  secondaryPhone?: string;
-}
-
-export interface AttendanceConfig {
-  machineUserId?: string;
-  shiftId?: string;
-  shiftGroupId?: string;
-  isAttendanceEnabled: boolean;
-  allowWebPunch: boolean;
-  allowMobilePunch: boolean;
-  enforceGeoFence: boolean;
-  geoFenceId?: string;
-  biometricVerified: boolean;
-}
-
-export interface Device {
-  deviceId: string;
-  deviceType: 'web' | 'mobile' | 'tablet';
-  lastActive: Date;
-  userAgent: string;
-}
-
-export interface User {
-  _id: string;
-  name: string;
-  email: string;
-  phone: string;
-  avatar?: string;
-  organizationId: string;
-  branchId?: string;
-  role?: Role;
-  isOwner: boolean;
-  isSuperAdmin: boolean;
-  status: 'pending' | 'approved' | 'rejected' | 'inactive' | 'suspended';
-  isActive: boolean;
-  isLoginBlocked: boolean;
-  emailVerified: boolean;
-  employeeProfile?: EmployeeProfile;
-  attendanceConfig?: AttendanceConfig;
-  devices?: Device[];
-  preferences?: {
-    theme: 'light' | 'dark';
-    notifications?: {
-      email: boolean;
-      push: boolean;
-      sms: boolean;
-    };
-  };
-}
-
-export interface Session {
-  _id: string;
-  browser: string;
-  os: string;
-  deviceType: string;
-  ipAddress: string;
-  lastActivityAt: Date;
-  createdAt: Date;
-}
-
-export interface LoginResponse {
-  status: string;
-  token: string;
-  data: {
-    user: User;
-    session: Session;
-    organization: {
-      id: string;
-      name: string;
-      uniqueShopId: string;
-    };
-  };
-}
-
-export interface SignupResponse {
-  status: string;
-  message: string;
-  data: {
-    email: string;
-    name: string;
-    status: string;
-  };
-}
-
-export interface VerifyTokenResponse {
-  status: string;
-  data: {
-    user: User;
-    session: Session;
-  };
-}
+import { User, Session, LoginResponse, SignupResponse, VerifyTokenResponse } from './auth.types';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -172,7 +55,8 @@ export class AuthService {
         // 1. Verify token validity with backend
         await firstValueFrom(this.verifyToken());
         // 2. STRENGTHEN: Wait for permissions to be fully fetched BEFORE completing init
-        await firstValueFrom(this.refreshPermissions());
+        // Removed as per user request to use direct login data instead.
+        // await firstValueFrom(this.refreshPermissions());
       } catch (err) {
         console.warn('Auth initialization failed, clearing state', err);
         this.performClientLogout();
@@ -180,7 +64,7 @@ export class AuthService {
     }
   }
 
-  public handleLoginSuccess(response: any, rememberMe: boolean = false): void {
+  public handleLoginSuccess(response: any, rememberMe: boolean = false, returnUrl: string = '/dashboard'): void {
     const user = response.data?.user;
     const token = response.token;
     if (!token || !user) return;
@@ -192,10 +76,10 @@ export class AuthService {
       this.setItem(this.REMEMBER_ME_KEY, 'true');
     }
     this.currentUserSubject.next(user);
-    this.refreshPermissions().subscribe(); // ✅ MUST subscribe for the side-effect (tap) to run
+    // this.refreshPermissions().subscribe(); // Removed to rely on direct data 
     this.messageService.handleSuccess(response, user.status === 'approved' ? 'Welcome back!' : 'Account pending approval');
     if (user.status === 'approved') {
-      this.router.navigate(['/dashboard']);
+      this.router.navigateByUrl(returnUrl);
     } else {
       this.router.navigate(['/auth/pending-approval']);
     }
@@ -268,10 +152,10 @@ export class AuthService {
   /**
    * Login with email or phone
    */
-  login(data: { email: string; password: string; uniqueShopId: string; forceLogout?: boolean }, rememberMe: boolean = false) {
+  login(data: { email: string; password: string; uniqueShopId: string; forceLogout?: boolean }, rememberMe: boolean = false, returnUrl: string = '/dashboard') {
     return this.apiService.login(data).pipe(
       tap((response: LoginResponse) => {
-        this.handleLoginSuccess(response, rememberMe);
+        this.handleLoginSuccess(response, rememberMe, returnUrl);
       }),
       catchError(err => {
         let errorMessage = 'Login failed';
@@ -457,9 +341,8 @@ export class AuthService {
     const user = this.currentUserValue;
     if (!user) return false;
     if (user.isOwner || user.isSuperAdmin) return true;
-    return user.role?.permissions?.includes(permission) ||
-      user.role?.permissions?.includes('*') ||
-      false;
+    const perms = user.permissions || [];
+    return perms.includes(permission) || perms.includes('*');
   }
 
   hasAnyPermission(permissions: string[]): boolean {
@@ -547,10 +430,7 @@ export class AuthService {
             ...user,
             isOwner: res.data.isOwner ?? user.isOwner,
             isSuperAdmin: res.data.isSuperAdmin ?? user.isSuperAdmin,
-            role: {
-              ...user.role,
-              permissions: res.data.permissions ?? []
-            }
+            permissions: res.data.permissions ?? user.permissions ?? []
           };
           this.setItem(this.USER_KEY, updated);
           this.currentUserSubject.next(updated);

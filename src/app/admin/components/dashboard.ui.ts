@@ -488,7 +488,7 @@ import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
 .dash-header {
   position: sticky;
   top: 0;
-  z-index: var(--z-sticky);
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;

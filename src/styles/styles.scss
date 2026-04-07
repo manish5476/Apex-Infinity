@@ -641,9 +641,9 @@ body {
 
 /* Backdrop Styling */
 .app-dialog-mask {
-  background-color: var(--z-modal-backdrop, rgba(0, 0, 0, 0.56)) !important;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background-color: rgba(0, 0, 0, 0.56) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   animation: fadeInMask 0.2s ease-out;
 }
 
@@ -665,14 +665,17 @@ body {
   border: 1px solid var(--border-primary) !important;
   border-radius: var(--ui-border-radius-xl) !important;
   box-shadow: var(--elevation-3) !important;
-  overflow: hidden;
   transform: translateY(0);
   animation: slideUpFade 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  display: flex !important;
+  flex-direction: column;
 
   .p-dialog-header {
     background: var(--component-surface-raised) !important;
     border-bottom: 1px solid var(--border-primary) !important;
     padding: var(--spacing-xl) var(--spacing-2xl) !important;
+    border-top-left-radius: var(--ui-border-radius-xl) !important;
+    border-top-right-radius: var(--ui-border-radius-xl) !important;
 
     .p-dialog-title {
       font-family: var(--font-heading);
@@ -713,6 +716,8 @@ body {
     display: flex;
     justify-content: flex-end;
     gap: var(--spacing-md);
+    border-bottom-left-radius: var(--ui-border-radius-xl) !important;
+    border-bottom-right-radius: var(--ui-border-radius-xl) !important;
   }
 }
 
