@@ -1,4 +1,4 @@
-import { Component, inject, HostBinding, OnInit, HostListener, ViewChild, ElementRef, effect } from '@angular/core';
+import { Component, inject, HostBinding, OnInit, HostListener, ViewChild, ElementRef, effect, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { LayoutService } from '../layout.service';
@@ -28,8 +28,8 @@ export class Mainscreensidebar implements OnInit {
   permService = inject(PermissionService);
   router = inject(Router);
 
-  menuItems: MenuItem[] = [];
-  expandedState: Record<string, boolean> = {};
+  menuItems = signal<MenuItem[]>([]);
+  expandedState = signal<Record<string, boolean>>({});
 
   constructor() {
     // Re-evaluate sidebar menu entirely when user's permissions change
@@ -64,7 +64,7 @@ export class Mainscreensidebar implements OnInit {
     
     // Deep clone raw constants so filtering doesn't mutate original objects
     const clonedMenu = JSON.parse(JSON.stringify(SIDEBAR_MENU));
-    this.menuItems = filterRecursive(clonedMenu);
+    this.menuItems.set(filterRecursive(clonedMenu));
   }
 
   // --- SEARCH STATE ---
@@ -144,7 +144,7 @@ export class Mainscreensidebar implements OnInit {
         }
       }
     };
-    flatten(this.menuItems);
+    flatten(this.menuItems());
   }
 
   openSearch() {
@@ -195,38 +195,48 @@ export class Mainscreensidebar implements OnInit {
 
   handleItemClick(item: MenuItem) {
     if (item.items) {
-      this.expandedState[item.label] = !this.expandedState[item.label];
+      this.expandedState.update((prev: Record<string, boolean>) => ({
+        ...prev,
+        [item.label]: !prev[item.label]
+      }));
     } else {
       if (item.routerLink) this.router.navigate(item.routerLink);
       if (this.layout.isMobile()) this.layout.closeMobile();
     }
   }
 
-  // --- HELPERS ---
-
-  hasActiveChild(item: MenuItem): boolean {
+  // Limit depth to 5 to prevent infinite recursion in case of circular menu definitions
+  hasActiveChild(item: MenuItem, depth = 0): boolean {
+    if (depth > 5) return false;
+    
     if (item.routerLink && this.router.isActive(this.router.createUrlTree(item.routerLink), {
       paths: 'subset', queryParams: 'ignored', fragment: 'ignored', matrixParams: 'ignored'
     })) return true;
-    return !!item.items?.some(child => this.hasActiveChild(child));
+    
+    return !!item.items?.some(child => this.hasActiveChild(child, depth + 1));
   }
 
   isActiveLink(item: MenuItem): boolean {
-    return !!item.routerLink && this.router.isActive(this.router.createUrlTree(item.routerLink), {
+    if (!item.routerLink) return false;
+    return this.router.isActive(this.router.createUrlTree(item.routerLink), {
       paths: 'exact', queryParams: 'ignored', fragment: 'ignored', matrixParams: 'ignored'
     });
   }
 
   private checkActiveRoutes() {
+    const newState: Record<string, boolean> = { ...this.expandedState() };
+    
     const expandRecursive = (items: MenuItem[]) => {
       for (const item of items) {
         if (item.items && this.hasActiveChild(item)) {
-          this.expandedState[item.label] = true;
+          newState[item.label] = true;
           expandRecursive(item.items);
         }
       }
     };
-    expandRecursive(this.menuItems);
+    
+    expandRecursive(this.menuItems());
+    this.expandedState.set(newState);
   }
 
   logout() {

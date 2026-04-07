@@ -1,112 +1,75 @@
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { BaseApiService } from './base-api.service';
+
 // =============================================================================
-// routes/salesReturn.routes.js
+// Interfaces for Payload Suggestions (IntelliSense)
 // =============================================================================
-'use strict';
 
-const express = require('express');
-const router = express.Router();
+export interface SalesReturnItem {
+  productId: string;
+  quantity: number;
+}
 
-const salesReturnController = require('../../modules/inventory/core/salesReturn.controller');
-const authController = require('../../modules/auth/core/auth.controller');
-const { checkPermission } = require('../../core/middleware/permission.middleware');
-const { PERMISSIONS } = require('../../config/permissions');
+export interface CreateSalesReturnPayload {
+  invoiceId: string; // FIXED: Matches controller's req.body.invoiceId
+  items: SalesReturnItem[];
+  reason: string;    // FIXED: Matches controller's req.body.reason
+  notes?: string;
+}
 
-// ─────────────────────────────────────────────
-//  All routes require authentication
-// ─────────────────────────────────────────────
-router.use(authController.protect);
+export interface GetSalesReturnsQuery {
+  page?: number;
+  limit?: number;
+  status?: 'pending' | 'approved' | 'rejected' | string;
+  customerId?: string;
+  invoiceId?: string;
+  startDate?: string; // Format: YYYY-MM-DD
+  endDate?: string;   // Format: YYYY-MM-DD
+  [key: string]: any;
+}
 
-// ============================================================
-//  COLLECTION ROUTES
-// ============================================================
+export interface RejectSalesReturnPayload {
+  rejectionReason: string; // Matches controller's req.body.rejectionReason
+}
 
-/**
- * POST /
- * Creates a new return in PENDING status.
- * * @payload {
- * invoiceId* (required): string,
- * reason* (required): string,
- * notes: string,
- * items* (required): Array<{
- * productId*: string,
- * quantity*: number (min 1)
- * }>
- * }
- * Note: Financials (refundAmount, tax, etc.) are intentionally omitted 
- * from the payload as they are auto-calculated by the backend schema.
- */
-router.post(
-  '/',
-  checkPermission(PERMISSIONS.SALES_RETURN.MANAGE),
-  salesReturnController.createReturn
-);
+// =============================================================================
+// Sales Return Service
+// =============================================================================
 
-/**
- * GET /
- * List all returns with optional filters and pagination.
- * * @query {
- * page: number,
- * limit: number,
- * status: 'pending' | 'approved' | 'rejected',
- * customerId: string,
- * invoiceId: string,
- * startDate: string (ISO),
- * endDate: string (ISO)
- * }
- */
-router.get(
-  '/',
-  checkPermission(PERMISSIONS.SALES_RETURN.READ),
-  salesReturnController.getReturns
-);
+@Injectable({ providedIn: 'root' })
+export class SalesReturnService extends BaseApiService {
+  private endpoint = '/v1/sales-returns';
 
-// ============================================================
-//  APPROVAL WORKFLOW ACTIONS
-//  Must be defined BEFORE /:id to avoid route collisions
-// ============================================================
+  // ============================================================
+  // ── COLLECTION ROUTES ───────────────────────────────────────
+  // ============================================================
 
-/**
- * PATCH /:id/approve
- * Approves a pending return.
- * Triggers: stock restoration, COGS reversal, credit note journal, customer balance update.
- * * @params { id }
- * @payload {} (Empty body required by standard PATCH requests)
- */
-router.patch(
-  '/:id/approve',
-  checkPermission(PERMISSIONS.SALES_RETURN.MANAGE),
-  salesReturnController.approveReturn
-);
+  createSalesReturn(payload: CreateSalesReturnPayload): Observable<any> {
+    return this.post(this.endpoint, payload, 'createSalesReturn');
+  }
 
-/**
- * PATCH /:id/reject
- * Rejects a pending return. No stock or ledger changes.
- * * @params { id }
- * @payload { 
- * rejectionReason* (required): string 
- * }
- */
-router.patch(
-  '/:id/reject',
-  checkPermission(PERMISSIONS.SALES_RETURN.MANAGE),
-  salesReturnController.rejectReturn
-);
+  getSalesReturns(queryParams?: GetSalesReturnsQuery): Observable<any> {
+    return this.get(this.endpoint, queryParams, 'getSalesReturns');
+  }
 
-// ============================================================
-//  ITEM ROUTES
-// ============================================================
+  // ============================================================
+  // ── APPROVAL WORKFLOW ACTIONS ───────────────────────────────
+  // ============================================================
 
-/**
- * GET /:id
- * Get full details of a single return including populated items,
- * customer, invoice, and audit fields (approvedBy, rejectedBy).
- * * @params { id }
- * @payload none
- */
-router.get(
-  '/:id',
-  checkPermission(PERMISSIONS.SALES_RETURN.READ),
-  salesReturnController.getReturn
-);
+  approveReturn(returnId: string, payload: any): Observable<any> {
+    return this.patch(`${this.endpoint}/${returnId}/approve`, payload, 'approveReturn');
+  }
 
-module.exports = router;  
+  rejectReturn(returnId: string, payload: RejectSalesReturnPayload): Observable<any> {
+    return this.patch(`${this.endpoint}/${returnId}/reject`, payload, 'rejectReturn');
+  }
+
+  // ============================================================
+  // ── ITEM ROUTES ─────────────────────────────────────────────
+  // ============================================================
+
+  getSalesReturnById(returnId: string): Observable<any> {
+    return this.get(`${this.endpoint}/${returnId}`, {}, 'getSalesReturnById');
+  }
+}

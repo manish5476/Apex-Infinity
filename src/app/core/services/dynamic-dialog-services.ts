@@ -27,6 +27,8 @@ import { User } from '../../modules/user/user-management.service';
 import { BulkCustomerComponent } from '../../modules/customer/components/bulk-customer/bulk-customer.component';
 import { CustomerDetails } from '../../modules/customer/components/customer-details/customer-details';
 import { ImageUploaderComponent } from '../../modules/shared/components/image-uploader.component';
+import { SalesReturnDialogComponent } from '../../modules/sales/components/sales-return-dialog/sales-return-dialog';
+
 
 @Injectable({
   providedIn: 'root',
@@ -225,10 +227,24 @@ export class DynamicDialogServices {
       ...this.baseConfig,
       header: config.header || 'Upload Image',
       width: '450px',
-      data: { 
+      data: {
         ...config,
-        isDialog: true 
+        isDialog: true
       }
+    });
+  }
+
+
+  // ==========================================
+  // SALES & RETURNS
+  // ==========================================
+
+  openSalesReturn(data: { invoice?: any, invoiceId?: string }): DynamicDialogRef | null {
+    return this.dialogService.open(SalesReturnDialogComponent, {
+      ...this.baseConfig,
+      header: 'Process Sales Return',
+      width: '1000px',
+      data
     });
   }
 }

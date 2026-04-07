@@ -24,6 +24,8 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { InvoiceService } from '../../services/invoice-service';
 import { EmiService } from '../../../emi/services/emi-service';
 import { AppMessageService } from '../../../../core/services/message.service';
+import { DynamicDialogServices } from '../../../../core/services/dynamic-dialog-services';
+
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
 import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
@@ -50,7 +52,9 @@ export class InvoiceDetailsComponent implements OnInit {
   private emiService = inject(EmiService);
   private confirmService = inject(ConfirmationService);
   private messageService = inject(AppMessageService);
+  private dialogServices = inject(DynamicDialogServices);
   public common = inject(CommonMethodService);
+
 
   PERMISSIONS = PERMISSIONS;
 
@@ -255,7 +259,20 @@ private loadInvoiceData(): void {
     );
   }
 
+  onReturn(): void {
+    const inv = this.invoice();
+    if (!inv) return;
+    
+    this.dialogServices.openSalesReturn({ invoice: inv })?.onClose.subscribe(res => {
+      if (res) {
+        // Refresh data if return was successful
+        this.loadInvoiceData();
+      }
+    });
+  }
+
   // Helper for Status Severity
+
   getPaymentSeverity(status: string): "success" | "info" | "warn" | "danger" | "secondary" | "contrast" | undefined {
     switch (status?.toLowerCase()) {
       case 'paid': return 'success';

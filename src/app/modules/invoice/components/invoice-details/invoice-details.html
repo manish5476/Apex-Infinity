@@ -63,6 +63,10 @@
           <button class="btn-secondary" pTooltip="Email Invoice" tooltipPosition="bottom" (click)="onEmail()">
             <i class="pi pi-envelope"></i>
           </button>
+          <button *hasPermission="PERMISSIONS.SALES_RETURN.MANAGE || PERMISSIONS.INVOICE.UPDATE" class="btn-secondary"
+            pTooltip="Return Items" tooltipPosition="bottom" (click)='onReturn()'>
+            <i class="pi pi-replay"></i>
+          </button>
 
           @if (inv.status !== 'cancelled') {
           <div class="divider-vertical"></div>

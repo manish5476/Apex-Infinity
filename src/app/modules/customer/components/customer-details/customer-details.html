@@ -185,7 +185,8 @@
               <app-ag-share-grid 
                 [columns]="ledgerColumns" 
                 [data]="ledgerHistory()" 
-                (gridEvent)="eventFromGrid($event)"
+                (gridEvent)="onGridEvent($event, 'ledger')"
+
                 class="full-size-grid">
               </app-ag-share-grid>
             }
@@ -194,10 +195,12 @@
               <app-ag-share-grid 
                 [columns]="invoiceColumns" 
                 [data]="invoices()"
+                [actionColumn]="invoiceActionColumn"
                 selectionMode="multiple" 
                 (gridEvent)="onGridEvent($event, 'invoices')"
                 class="full-size-grid">
               </app-ag-share-grid>
+
             }
 
             @if (activeTab() === 'payments') {

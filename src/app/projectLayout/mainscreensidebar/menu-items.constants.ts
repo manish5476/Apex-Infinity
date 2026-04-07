@@ -153,6 +153,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
       },
       { label: 'Customers Analytics', icon: 'pi pi-users', routerLink: ['/customer/analytics'], permissions: [PERMISSIONS.CUSTOMER.READ] },
       { label: 'Customers', icon: 'pi pi-users', routerLink: ['/customer'], permissions: [PERMISSIONS.CUSTOMER.READ] },
+      { label: 'Sales Returns', icon: 'pi pi-replay', routerLink: ['/sales/returns'], permissions: [PERMISSIONS.SALES_RETURN.READ] },
       { label: 'EMI Management', icon: 'pi pi-calendar-clock', routerLink: ['/emis'], permissions: [PERMISSIONS.EMI.READ] },
     ]
   },
@@ -227,6 +228,7 @@ export const SIDEBAR_MENU: MenuItem[] = [
       { label: 'Payments', icon: 'pi pi-money-bill', routerLink: ['/payments'], permissions: [PERMISSIONS.PAYMENT.READ] },
       { label: 'Transactions', icon: 'pi pi-history', routerLink: ['/transactions'], permissions: [PERMISSIONS.TRANSACTION.READ] },
       { label: 'Sales Reports', icon: 'pi pi-chart-bar', routerLink: ['/sales'], permissions: [PERMISSIONS.SALES.VIEW] },
+      { label: 'Sales Returns', icon: 'pi pi-replay', routerLink: ['/sales/returns'], permissions: [PERMISSIONS.SALES_RETURN.READ] },
     ]
   },
 

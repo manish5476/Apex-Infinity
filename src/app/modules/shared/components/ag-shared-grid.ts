@@ -35,7 +35,9 @@ export type SharedGridEvent<T> =
   | { type: 'save'; row: T }
   | { type: 'cancel'; row: T }
   | { type: 'delete'; row: T }
+  | { type: 'return'; row: T }
   | { type: 'reachedBottom' };
+
 
 /* --------------------------------------------------
    ACTION COLUMN INPUT — fully drives which buttons appear
@@ -47,11 +49,14 @@ export interface ActionColumnConfig {
   showView?: boolean;
   showEdit?: boolean;
   showDelete?: boolean;
+  showReturn?: boolean;
 
   /** RBAC guards (optional) */
   viewPermission?: Permission;
   editPermission?: Permission;
   deletePermission?: Permission;
+  returnPermission?: Permission;
+
 
   /** Column width — defaults to auto based on visible actions */
   width?: number;
@@ -292,6 +297,8 @@ export class AgShareGrid<T = any> {
       viewPermission: ac.viewPermission,
       editPermission: ac.editPermission,
       deletePermission: ac.deletePermission,
+      showReturn: ac.showReturn ?? false,
+      returnPermission: ac.returnPermission,
 
       actionHandler: (action: GridAction, row: T) =>
         this.handleRowAction(action, row),
@@ -301,8 +308,9 @@ export class AgShareGrid<T = any> {
     };
 
     // Auto-calculate width if not specified
-    const visibleCount = [ac.showView, ac.showEdit, ac.showDelete].filter(Boolean).length;
+    const visibleCount = [ac.showView, ac.showEdit, ac.showDelete, ac.showReturn].filter(Boolean).length;
     const colWidth = ac.width ?? Math.max(visibleCount * 38 + 20, 80);
+
 
     const actionColDef: ColDef<T> = {
       headerName: '',
@@ -409,6 +417,11 @@ export class AgShareGrid<T = any> {
       case 'delete':
         this.gridEvent.emit({ type: 'delete', row });
         break;
+
+      case 'return':
+        this.gridEvent.emit({ type: 'return', row });
+        break;
+
 
       case 'view':
         // Handled inside UnifiedActionRenderer (modal); not routed here
