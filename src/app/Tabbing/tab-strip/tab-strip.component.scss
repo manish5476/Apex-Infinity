@@ -1,36 +1,55 @@
 /* ==========================================================================
-   TAB STRIP COMPONENT — PREMIUM FLOATING PILL (FINAL)
+   🔥 ULTRA PREMIUM TAB STRIP (FINAL — CLEAN + TOKEN-DRIVEN + RGB BORDER)
    ========================================================================== */
 
 .tab-strip {
   display: flex;
-  align-items: center;
-  height: clamp(48px, 5vh + 10px, 56px);
-  background-color: var(--bg-secondary);
-  border-bottom: var(--ui-border-width) solid var(--component-divider);
-  padding: 0 var(--spacing-sm);
+  align-items: flex-end;
   gap: var(--spacing-md);
+
+  height: clamp(56px, 6vh + 12px, 64px);
+  padding: 0 var(--spacing-md);
+
+  background: color-mix(in srgb, var(--bg-secondary) 88%, transparent);
+  backdrop-filter: blur(18px) saturate(160%);
+
+  border-bottom: var(--ui-border-width) solid var(--border-tertiary);
+
+  position: relative;
+  overflow: visible;
   user-select: none;
+
+  /* ✨ Apple top hairline */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 0.5px;
+    background: color-mix(in srgb, white 60%, transparent);
+    opacity: 0.4;
+  }
 }
 
-/* ── Scroll Wrapper ─────────────────────────────────────────────────────── */
+/* ==========================================================================
+   SCROLL WRAP
+   ========================================================================== */
+
 .tab-strip__scroll-wrap {
   flex: 1 1 auto;
   min-width: 0;
-  height: 100%;
+
   display: flex;
   align-items: center;
-  position: relative;
   overflow: hidden;
+  position: relative;
 
-  /* Edge fade (left + right) */
   &::before,
   &::after {
     content: '';
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 28px;
+    width: 36px;
     pointer-events: none;
     z-index: 3;
   }
@@ -46,28 +65,26 @@
   }
 }
 
-/* ── Scroll Container ───────────────────────────────────────────────────── */
+/* ==========================================================================
+   SCROLL CONTAINER
+   ========================================================================== */
+
 .tab-strip__scroll {
   display: flex;
   align-items: center;
-  height: 100%;
-  gap: var(--spacing-sm);
+  gap: calc(var(--spacing-sm) + 2px);
 
-  flex-wrap: nowrap;
-
-  /* ✅ CRITICAL FIX: Removed max-content which prevented overflow calculation */
   width: 100%;
   min-width: 0;
 
   overflow-x: auto;
   overflow-y: hidden;
 
-  padding: 0 var(--spacing-xs);
+  padding: 0 var(--spacing-sm);
 
-  scroll-behavior: auto;
+  scroll-behavior: smooth;
   scroll-snap-type: x proximity;
 
-  -ms-overflow-style: none;
   scrollbar-width: none;
 
   &::-webkit-scrollbar {
@@ -75,7 +92,10 @@
   }
 }
 
-/* ── Tab Item ───────────────────────────────────────────────────────────── */
+/* ==========================================================================
+   🔥 TAB ITEM
+   ========================================================================== */
+
 .tab-item {
   display: flex;
   align-items: center;
@@ -83,57 +103,139 @@
 
   flex: 0 0 auto;
 
-  height: clamp(32px, 3.5vh, 40px);
-  min-width: 120px;
-  max-width: 220px;
+  height: clamp(34px, 3.8vh, 42px);
+  min-width: 130px;
+  max-width: 240px;
 
-  padding: 0 var(--spacing-md);
+  margin: 6px 2px 8px;
+  padding: 0 calc(var(--spacing-md) + 2px);
+
   border-radius: var(--ui-border-radius);
-
-  background-color: transparent;
-  color: var(--text-secondary);
   border: var(--ui-border-width) solid transparent;
 
+  background: transparent;
+
   font-family: var(--font-heading);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
+  letter-spacing: 0.2px;
+
+  color: var(--text-tertiary);
 
   cursor: pointer;
   position: relative;
   overflow: hidden;
 
-  transition: all 0.2s ease;
+  transition: var(--transition-base);
+  will-change: transform;
 
   scroll-snap-align: start;
 
-  /* Hover */
-  &:hover:not(.tab-item--active) {
-    background-color: var(--component-bg-hover);
-    color: var(--text-primary);
-    transform: translateY(-1px);
+  /* ✨ glass reflection */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+
+    background: linear-gradient(120deg,
+        rgba(255, 255, 255, 0.35),
+        transparent 40%);
+
+    opacity: 0;
+    transition: opacity 0.2s ease;
   }
 
-  /* Active */
-  &--active {
-    background-color: var(--bg-primary);
+  /* Hover */
+  &:hover:not(.tab-item--active) {
+    background: var(--bg-hover);
     color: var(--text-primary);
-    border-color: var(--component-divider);
 
-    box-shadow:
-      0 2px 6px rgba(0, 0, 0, 0.2),
-      0 0 0 1px var(--component-divider),
-      0 0 12px rgba(var(--accent-primary-rgb), 0.25);
+    border-color: var(--border-secondary);
 
-    z-index: 2;
+    transform: translateY(-2px) scale(1.02);
+
+    box-shadow: var(--elevation-1);
 
     &::before {
+      opacity: 0.6;
+    }
+  }
+
+  /* Press */
+  &:active {
+    transform: scale(0.96);
+  }
+
+  /* ==========================================================================
+     🌈 ACTIVE TAB
+     ========================================================================== */
+  &--active {
+    background: var(--component-surface-raised);
+    color: var(--text-primary);
+
+    font-weight: var(--font-weight-semibold);
+
+    border-color: var(--border-primary);
+
+    transform: translateY(-3px) scale(1.03);
+
+    z-index: 5;
+
+    box-shadow: var(--elevation-3);
+
+    &::before {
+      opacity: 0.85;
+    }
+
+    /* 🔥 RGB BORDER */
+    &::after {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: var(--accent-primary);
+      inset: 0;
+
+      border-radius: inherit;
+      padding: 1px;
+
+      background: linear-gradient(120deg,
+          #ff4d4d,
+          #ff9a00,
+          #ffd500,
+          #4dff88,
+          #00cfff,
+          #4d7dff,
+          #b84dff,
+          #ff4d4d);
+
+      background-size: 300% 300%;
+      animation: rgb-border-move 6s linear infinite;
+
+      /* mask → border only */
+      -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+
+      filter: blur(0.6px) brightness(1.1) saturate(1.1);
+      opacity: 0.85;
+
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .tab-item__close {
+      color: var(--text-primary);
+
+      &:hover {
+        background: var(--color-error-bg);
+        color: var(--color-error);
+      }
+    }
+
+    .tab-item__badge {
+      background: var(--accent-focus);
+      color: var(--color-primary);
     }
   }
 
@@ -147,15 +249,18 @@
   /* Loading */
   &--loading {
     cursor: wait;
-    opacity: 0.7;
+    opacity: 0.75;
   }
 }
 
-/* ── Internal Elements ──────────────────────────────────────────────────── */
+/* ==========================================================================
+   INTERNALS
+   ========================================================================== */
+
 .tab-item__icon {
   font-size: var(--font-size-md);
   flex-shrink: 0;
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 .tab-item__label {
@@ -163,7 +268,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-align: left;
 }
 
 .tab-item__badge {
@@ -171,18 +275,19 @@
   align-items: center;
   justify-content: center;
 
-  padding: 0 var(--spacing-xs);
-  min-width: 1.5rem;
-  height: 1.25rem;
+  height: 1.1rem;
+  min-width: 1.1rem;
+  padding: 0 6px;
 
   border-radius: var(--ui-border-radius-pill);
-  background-color: var(--bg-ternary);
+
+  background: var(--bg-ternary);
   color: var(--text-primary);
 
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-semibold);
 
-  box-shadow: inset var(--shadow-xs);
+  box-shadow: var(--shadow-xs);
 }
 
 .tab-item__pin {
@@ -190,55 +295,58 @@
   color: var(--text-muted);
 }
 
-/* ── Close Button ───────────────────────────────────────────────────────── */
+/* ==========================================================================
+   CLOSE BUTTON
+   ========================================================================== */
+
 .tab-item__close {
+  width: 18px;
+  height: 18px;
+
+  border-radius: 50%;
+
   display: flex;
   align-items: center;
   justify-content: center;
 
-  width: 22px;
-  height: 22px;
-
-  border-radius: var(--ui-border-radius-sm);
   color: var(--text-muted);
 
-  flex-shrink: 0;
-
   opacity: 0;
-  transform: scale(0.8);
+  transform: scale(0.7);
 
-  transition: all 0.15s ease;
+  transition: var(--transition-fast);
 
   i {
     font-size: var(--font-size-xs);
   }
 
   &:hover {
-    background-color: var(--color-error-bg);
+    background: var(--color-error-bg);
     color: var(--color-error);
   }
 }
 
-/* Show close button */
 .tab-item:hover .tab-item__close,
 .tab-item--active .tab-item__close {
   opacity: 1;
   transform: scale(1);
 }
 
-/* ── Controls (Right Side) ──────────────────────────────────────────────── */
+/* ==========================================================================
+   CONTROLS
+   ========================================================================== */
+
 .tab-strip__controls {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
   flex-shrink: 0;
-  padding-left: var(--spacing-xs);
 }
 
 .tab-ctrl-divider {
   width: var(--ui-border-width);
   height: 24px;
-  background-color: var(--component-divider);
+  background: var(--border-tertiary);
 }
 
 .tab-ctrl-btn {
@@ -246,25 +354,33 @@
   align-items: center;
   justify-content: center;
 
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
 
-  border: none;
   border-radius: var(--ui-border-radius-sm);
+  border: var(--ui-border-width) solid transparent;
 
   background: transparent;
   color: var(--text-secondary);
 
   cursor: pointer;
-  transition: all 0.2s ease;
+
+  transition: var(--transition-base);
 
   i {
     font-size: var(--font-size-md);
   }
 
   &:hover:not(:disabled) {
-    background-color: var(--component-bg-hover);
+    background: var(--bg-hover);
     color: var(--text-primary);
+    border-color: var(--border-secondary);
+
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 
   &:disabled {
@@ -273,32 +389,763 @@
   }
 
   &--danger:hover:not(:disabled) {
-    background-color: var(--color-error-bg);
+    background: var(--color-error-bg);
     color: var(--color-error);
   }
 }
 
-/* ── Loading Shimmer ───────────────────────────────────────────────────── */
+/* ==========================================================================
+   SHIMMER
+   ========================================================================== */
+
 .tab-item__shimmer {
   position: absolute;
   inset: 0;
 
   background: linear-gradient(90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.06) 50%,
-      transparent 100%);
+      transparent,
+      rgba(255, 255, 255, 0.08),
+      transparent);
 
   background-size: 200% 100%;
-  animation: shimmer 1.5s infinite linear;
-  pointer-events: none;
+  animation: shimmer 1.4s linear infinite;
 }
 
 @keyframes shimmer {
-  0% {
+  from {
     background-position: 200% 0;
   }
 
-  100% {
+  to {
     background-position: -200% 0;
   }
 }
+
+/* 🔥 RGB BORDER ANIMATION */
+@keyframes rgb-border-move {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+// /* ==========================================================================
+//    🔥 ULTRA PREMIUM TAB STRIP (TOKEN-ALIGNED + APPLE LEVEL)
+//    ========================================================================== */
+
+// .tab-strip {
+//   display: flex;
+//   align-items: center;
+//   gap: var(--spacing-md);
+
+//   height: clamp(52px, 5vh + 12px, 60px);
+//   padding: 0 var(--spacing-md);
+
+//   background: color-mix(in srgb, var(--bg-secondary) 88%, transparent);
+//   backdrop-filter: blur(18px) saturate(160%);
+
+//   border-bottom: var(--ui-border-width) solid var(--border-tertiary);
+
+//   position: relative;
+//   user-select: none;
+
+//   /* ✨ Apple hairline */
+//   &::before {
+//     content: '';
+//     position: absolute;
+//     inset: 0 0 auto 0;
+//     height: 0.5px;
+//     background: color-mix(in srgb, white 60%, transparent);
+//     opacity: 0.4;
+//   }
+// }
+
+// /* ==========================================================================
+//    SCROLL WRAP (EDGE FADE)
+//    ========================================================================== */
+
+// .tab-strip__scroll-wrap {
+//   flex: 1 1 auto;
+//   min-width: 0;
+
+//   display: flex;
+//   align-items: center;
+//   overflow: hidden;
+//   position: relative;
+
+//   &::before,
+//   &::after {
+//     content: '';
+//     position: absolute;
+//     top: 0;
+//     bottom: 0;
+//     width: 36px;
+//     z-index: 5;
+//     pointer-events: none;
+//   }
+
+//   &::before {
+//     left: 0;
+//     background: linear-gradient(to right, var(--bg-secondary), transparent);
+//   }
+
+//   &::after {
+//     right: 0;
+//     background: linear-gradient(to left, var(--bg-secondary), transparent);
+//   }
+// }
+
+// /* ==========================================================================
+//    SCROLL CONTAINER
+//    ========================================================================== */
+
+// .tab-strip__scroll {
+//   display: flex;
+//   align-items: center;
+//   gap: var(--spacing-sm);
+
+//   width: 100%;
+//   min-width: 0;
+
+//   overflow-x: auto;
+//   overflow-y: hidden;
+
+//   padding: 0 var(--spacing-xs);
+
+//   scroll-behavior: smooth;
+//   scroll-snap-type: x proximity;
+
+//   scrollbar-width: none;
+
+//   &::-webkit-scrollbar {
+//     display: none;
+//   }
+// }
+
+// /* ==========================================================================
+//    🔥 TAB ITEM (CORE)
+//    ========================================================================== */
+
+// .tab-item {
+//   display: flex;
+//   align-items: center;
+//   gap: var(--spacing-sm);
+
+//   flex: 0 0 auto;
+
+//   height: clamp(34px, 3.8vh, 42px);
+//   min-width: 130px;
+//   max-width: 240px;
+
+//   padding: 0 calc(var(--spacing-md) + 2px);
+
+//   border-radius: var(--ui-border-radius);
+//   border: var(--ui-border-width) solid transparent;
+
+//   background: transparent;
+
+//   font-family: var(--font-heading);
+//   font-size: var(--font-size-md);
+//   font-weight: var(--font-weight-medium);
+//   letter-spacing: 0.2px;
+
+//   color: var(--text-tertiary);
+
+//   cursor: pointer;
+//   position: relative;
+//   overflow: hidden;
+
+//   transition: var(--transition-base);
+
+//   scroll-snap-align: start;
+//   will-change: transform;
+
+//   /* ✨ Glass reflection */
+//   &::before {
+//     content: '';
+//     position: absolute;
+//     inset: 0;
+//     border-radius: inherit;
+
+//     background: linear-gradient(120deg,
+//         rgba(255, 255, 255, 0.35),
+//         transparent 40%);
+
+//     opacity: 0;
+//     transition: opacity 0.2s ease;
+//   }
+
+//   /* 🔥 Hover */
+//   &:hover:not(.tab-item--active) {
+//     background: var(--bg-hover);
+//     color: var(--text-primary);
+
+//     border-color: var(--border-secondary);
+
+//     transform: translateY(-2px) scale(1.02);
+
+//     box-shadow: var(--elevation-1);
+
+//     &::before {
+//       opacity: 0.6;
+//     }
+//   }
+
+//   /* 🔥 Press */
+//   &:active {
+//     transform: scale(0.96);
+//   }
+
+//   /* ==========================================================================
+//      🌈 ACTIVE TAB (FLOATING LAYER)
+//      ========================================================================== */
+//   &--active {
+//     background: var(--component-surface-raised);
+//     color: var(--text-primary);
+
+//     font-weight: var(--font-weight-semibold);
+
+//     border-color: var(--border-primary);
+
+//     transform: translateY(-3px) scale(1.03);
+
+//     z-index: 3;
+
+//     box-shadow: var(--elevation-3);
+
+//     /* ✨ shine */
+//     &::before {
+//       opacity: 0.85;
+//     }
+
+//     /* 🌈 glow aura */
+//     &::after {
+//       content: '';
+//       position: absolute;
+//       inset: -2px;
+
+//       border-radius: inherit;
+
+//       background: linear-gradient(var(--accent-gradient-angle),
+//           var(--accent-primary),
+//           var(--accent-secondary));
+
+//       filter: blur(10px);
+//       opacity: 0.25;
+//       z-index: -1;
+//     }
+
+//     .tab-item__close {
+//       color: var(--text-primary);
+
+//       &:hover {
+//         background: var(--color-error-bg);
+//         color: var(--color-error);
+//       }
+//     }
+
+//     .tab-item__badge {
+//       background: var(--accent-focus);
+//       color: var(--color-primary);
+//     }
+//   }
+
+//   /* ── Pinned */
+//   &--pinned {
+//     min-width: auto;
+//     max-width: fit-content;
+//     padding: 0 var(--spacing-sm);
+//   }
+
+//   /* ── Loading */
+//   &--loading {
+//     cursor: wait;
+//     opacity: 0.75;
+//   }
+// }
+
+// /* ==========================================================================
+//    INTERNAL ELEMENTS
+//    ========================================================================== */
+
+// .tab-item__icon {
+//   font-size: var(--font-size-md);
+//   flex-shrink: 0;
+//   opacity: 0.85;
+// }
+
+// .tab-item__label {
+//   flex: 1;
+
+//   white-space: nowrap;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+
+//   letter-spacing: 0.2px;
+// }
+
+// .tab-item__badge {
+//   display: inline-flex;
+//   align-items: center;
+//   justify-content: center;
+
+//   height: 1.1rem;
+//   min-width: 1.1rem;
+//   padding: 0 6px;
+
+//   border-radius: var(--ui-border-radius-pill);
+
+//   background: var(--bg-ternary);
+//   color: var(--text-primary);
+
+//   font-size: var(--font-size-xs);
+//   font-weight: var(--font-weight-semibold);
+
+//   box-shadow: var(--shadow-xs);
+// }
+
+// .tab-item__pin {
+//   font-size: var(--font-size-sm);
+//   color: var(--text-muted);
+// }
+
+// /* ==========================================================================
+//    CLOSE BUTTON
+//    ========================================================================== */
+
+// .tab-item__close {
+//   width: 18px;
+//   height: 18px;
+
+//   border-radius: 50%;
+
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+
+//   color: var(--text-muted);
+
+//   opacity: 0;
+//   transform: scale(0.7);
+
+//   transition: var(--transition-fast);
+
+//   i {
+//     font-size: var(--font-size-xs);
+//   }
+
+//   &:hover {
+//     background: var(--color-error-bg);
+//     color: var(--color-error);
+//   }
+// }
+
+// .tab-item:hover .tab-item__close,
+// .tab-item--active .tab-item__close {
+//   opacity: 1;
+//   transform: scale(1);
+// }
+
+// /* ==========================================================================
+//    CONTROLS
+//    ========================================================================== */
+
+// .tab-strip__controls {
+//   display: flex;
+//   align-items: center;
+//   gap: var(--spacing-sm);
+//   flex-shrink: 0;
+// }
+
+// .tab-ctrl-divider {
+//   width: var(--ui-border-width);
+//   height: 24px;
+//   background: var(--border-tertiary);
+// }
+
+// .tab-ctrl-btn {
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+
+//   width: 30px;
+//   height: 30px;
+
+//   border-radius: var(--ui-border-radius-sm);
+//   border: var(--ui-border-width) solid transparent;
+
+//   background: transparent;
+//   color: var(--text-secondary);
+
+//   cursor: pointer;
+
+//   transition: var(--transition-base);
+
+//   i {
+//     font-size: var(--font-size-md);
+//   }
+
+//   &:hover:not(:disabled) {
+//     background: var(--bg-hover);
+//     color: var(--text-primary);
+//     border-color: var(--border-secondary);
+
+//     transform: translateY(-1px);
+//   }
+
+//   &:active {
+//     transform: scale(0.95);
+//   }
+
+//   &:disabled {
+//     opacity: 0.4;
+//     cursor: not-allowed;
+//   }
+
+//   &--danger:hover:not(:disabled) {
+//     background: var(--color-error-bg);
+//     color: var(--color-error);
+//   }
+// }
+
+// /* ==========================================================================
+//    SHIMMER
+//    ========================================================================== */
+
+// .tab-item__shimmer {
+//   position: absolute;
+//   inset: 0;
+
+//   background: linear-gradient(90deg,
+//       transparent,
+//       rgba(255, 255, 255, 0.08),
+//       transparent);
+
+//   background-size: 200% 100%;
+//   animation: shimmer 1.4s linear infinite;
+// }
+
+// @keyframes shimmer {
+//   from {
+//     background-position: 200% 0;
+//   }
+
+//   to {
+//     background-position: -200% 0;
+//   }
+// }
+
+// // /* ==========================================================================
+// //   TAB STRIP COMPONENT — PREMIUM FLOATING PILL (FINAL)
+// //   ========================================================================== */
+
+// // .tab-strip {
+// //   display: flex;
+// //   align-items: center;
+// //   height: clamp(48px, 5vh + 10px, 56px);
+// //   background-color: var(--bg-secondary);
+// //   border-bottom: var(--ui-border-width) solid var(--component-divider);
+// //   padding: 0 var(--spacing-sm);
+// //   gap: var(--spacing-md);
+// //   user-select: none;
+// // }
+
+// // /* ── Scroll Wrapper ─────────────────────────────────────────────────────── */
+// // .tab-strip__scroll-wrap {
+// //   flex: 1 1 auto;
+// //   min-width: 0;
+// //   height: 100%;
+// //   display: flex;
+// //   align-items: center;
+// //   position: relative;
+// //   overflow: hidden;
+
+// //   /* Edge fade (left + right) */
+// //   &::before,
+// //   &::after {
+// //     content: '';
+// //     position: absolute;
+// //     top: 0;
+// //     bottom: 0;
+// //     width: 28px;
+// //     pointer-events: none;
+// //     z-index: 3;
+// //   }
+
+// //   &::before {
+// //     left: 0;
+// //     background: linear-gradient(to right, var(--bg-secondary), transparent);
+// //   }
+
+// //   &::after {
+// //     right: 0;
+// //     background: linear-gradient(to left, var(--bg-secondary), transparent);
+// //   }
+// // }
+
+// // /* ── Scroll Container ───────────────────────────────────────────────────── */
+// // .tab-strip__scroll {
+// //   display: flex;
+// //   align-items: center;
+// //   height: 100%;
+// //   gap: var(--spacing-sm);
+
+// //   flex-wrap: nowrap;
+
+// //   /* ✅ CRITICAL FIX: Removed max-content which prevented overflow calculation */
+// //   width: 100%;
+// //   min-width: 0;
+
+// //   overflow-x: auto;
+// //   overflow-y: hidden;
+
+// //   padding: 0 var(--spacing-xs);
+
+// //   scroll-behavior: auto;
+// //   scroll-snap-type: x proximity;
+
+// //   -ms-overflow-style: none;
+// //   scrollbar-width: none;
+
+// //   &::-webkit-scrollbar {
+// //     display: none;
+// //   }
+// // }
+
+// // /* ── Tab Item ───────────────────────────────────────────────────────────── */
+// // .tab-item {
+// //   display: flex;
+// //   align-items: center;
+// //   gap: var(--spacing-sm);
+
+// //   flex: 0 0 auto;
+
+// //   height: clamp(32px, 3.5vh, 40px);
+// //   min-width: 120px;
+// //   max-width: 220px;
+
+// //   padding: 0 var(--spacing-md);
+// //   border-radius: var(--ui-border-radius);
+
+// //   background-color: transparent;
+// //   color: var(--text-secondary);
+// //   border: var(--ui-border-width) solid transparent;
+
+// //   font-family: var(--font-heading);
+// //   font-size: var(--font-size-sm);
+// //   font-weight: var(--font-weight-medium);
+
+// //   cursor: pointer;
+// //   position: relative;
+// //   overflow: hidden;
+
+// //   transition: all 0.2s ease;
+
+// //   scroll-snap-align: start;
+
+// //   /* Hover */
+// //   &:hover:not(.tab-item--active) {
+// //     background-color: var(--component-bg-hover);
+// //     color: var(--text-primary);
+// //     transform: translateY(-1px);
+// //   }
+
+// //   /* Active */
+// //   &--active {
+// //     background: var(--accent-gradient);
+// //     color: #fff;
+// //     font-weight: var(--font-weight-semibold);
+// //     border-color: transparent;
+
+// //     box-shadow: 0 2px 10px color-mix(in srgb, var(--accent-primary) 35%, transparent 65%);
+
+// //     z-index: 2;
+
+// //     .tab-item__close {
+// //       color: rgba(255, 255, 255, 0.7);
+
+// //       &:hover {
+// //         background-color: rgba(255, 255, 255, 0.2);
+// //         color: #fff;
+// //       }
+// //     }
+
+// //     .tab-item__badge {
+// //       background-color: rgba(255, 255, 255, 0.2);
+// //       color: #fff;
+// //       box-shadow: none;
+// //     }
+// //   }
+
+// //   /* Pinned */
+// //   &--pinned {
+// //     min-width: auto;
+// //     max-width: fit-content;
+// //     padding: 0 var(--spacing-sm);
+// //   }
+
+// //   /* Loading */
+// //   &--loading {
+// //     cursor: wait;
+// //     opacity: 0.7;
+// //   }
+// // }
+
+// // /* ── Internal Elements ──────────────────────────────────────────────────── */
+// // .tab-item__icon {
+// //   font-size: var(--font-size-md);
+// //   flex-shrink: 0;
+// //   opacity: 0.8;
+// // }
+
+// // .tab-item__label {
+// //   flex: 1;
+// //   white-space: nowrap;
+// //   overflow: hidden;
+// //   text-overflow: ellipsis;
+// //   text-align: left;
+// // }
+
+// // .tab-item__badge {
+// //   display: inline-flex;
+// //   align-items: center;
+// //   justify-content: center;
+
+// //   padding: 0 var(--spacing-xs);
+// //   min-width: 1.5rem;
+// //   height: 1.25rem;
+
+// //   border-radius: var(--ui-border-radius-pill);
+// //   background-color: var(--bg-ternary);
+// //   color: var(--text-primary);
+
+// //   font-size: var(--font-size-xs);
+// //   font-weight: var(--font-weight-bold);
+
+// //   box-shadow: inset var(--shadow-xs);
+// // }
+
+// // .tab-item__pin {
+// //   font-size: var(--font-size-sm);
+// //   color: var(--text-muted);
+// // }
+
+// // /* ── Close Button ───────────────────────────────────────────────────────── */
+// // .tab-item__close {
+// //   display: flex;
+// //   align-items: center;
+// //   justify-content: center;
+
+// //   width: 22px;
+// //   height: 22px;
+
+// //   border-radius: var(--ui-border-radius-sm);
+// //   color: var(--text-muted);
+
+// //   flex-shrink: 0;
+
+// //   opacity: 0;
+// //   transform: scale(0.8);
+
+// //   transition: all 0.15s ease;
+
+// //   i {
+// //     font-size: var(--font-size-xs);
+// //   }
+
+// //   &:hover {
+// //     background-color: var(--color-error-bg);
+// //     color: var(--color-error);
+// //   }
+// // }
+
+// // /* Show close button */
+// // .tab-item:hover .tab-item__close,
+// // .tab-item--active .tab-item__close {
+// //   opacity: 1;
+// //   transform: scale(1);
+// // }
+
+// // /* ── Controls (Right Side) ──────────────────────────────────────────────── */
+// // .tab-strip__controls {
+// //   display: flex;
+// //   align-items: center;
+// //   gap: var(--spacing-sm);
+// //   flex-shrink: 0;
+// //   padding-left: var(--spacing-xs);
+// // }
+
+// // .tab-ctrl-divider {
+// //   width: var(--ui-border-width);
+// //   height: 24px;
+// //   background-color: var(--component-divider);
+// // }
+
+// // .tab-ctrl-btn {
+// //   display: flex;
+// //   align-items: center;
+// //   justify-content: center;
+
+// //   width: 32px;
+// //   height: 32px;
+
+// //   border: none;
+// //   border-radius: var(--ui-border-radius-sm);
+
+// //   background: transparent;
+// //   color: var(--text-secondary);
+
+// //   cursor: pointer;
+// //   transition: all 0.2s ease;
+
+// //   i {
+// //     font-size: var(--font-size-md);
+// //   }
+
+// //   &:hover:not(:disabled) {
+// //     background-color: var(--component-bg-hover);
+// //     color: var(--text-primary);
+// //   }
+
+// //   &:disabled {
+// //     opacity: 0.4;
+// //     cursor: not-allowed;
+// //   }
+
+// //   &--danger:hover:not(:disabled) {
+// //     background-color: var(--color-error-bg);
+// //     color: var(--color-error);
+// //   }
+// // }
+
+// // /* ── Loading Shimmer ───────────────────────────────────────────────────── */
+// // .tab-item__shimmer {
+// //   position: absolute;
+// //   inset: 0;
+
+// //   background: linear-gradient(90deg,
+// //       transparent 0%,
+// //       rgba(255, 255, 255, 0.06) 50%,
+// //       transparent 100%);
+
+// //   background-size: 200% 100%;
+// //   animation: shimmer 1.5s infinite linear;
+// //   pointer-events: none;
+// // }
+
+// // @keyframes shimmer {
+// //   0% {
+// //     background-position: 200% 0;
+// //   }
+
+// //   100% {
+// //     background-position: -200% 0;
+// //   }
+// // }
