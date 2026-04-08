@@ -1,8 +1,8 @@
-import { Injectable, Inject, PLATFORM_ID, inject, Injector, signal } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID, inject, Injector, signal, OnDestroy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, throwError, firstValueFrom, of } from 'rxjs';
-import { tap, catchError, map, switchMap, finalize, shareReplay } from 'rxjs/operators';
+import { BehaviorSubject, Observable, throwError, firstValueFrom, of, Subject } from 'rxjs';
+import { tap, catchError, map, switchMap, finalize, shareReplay, takeUntil } from 'rxjs/operators';
 import { AppMessageService } from '../../../core/services/message.service';
 import { ApiService } from '../../../core/services/api';
 import { OrganizationService } from './../../organization/organization.service';
@@ -11,7 +11,8 @@ import { OrganizationService } from './../../organization/organization.service';
 import { User, Session, LoginResponse, SignupResponse, VerifyTokenResponse } from './auth.types';
 
 @Injectable({ providedIn: 'root' })
-export class AuthService {
+export class AuthService implements OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private readonly TOKEN_KEY = 'apex_auth_token';
   private readonly USER_KEY = 'apex_current_user';
   private readonly REMEMBER_ME_KEY = 'apex_remember_me';
@@ -102,7 +103,7 @@ export class AuthService {
       finalize(() => {
         this.performClientLogout(currentUrl);
         this.isLoggingOut.set(false);
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe({
       error: () => {
         console.warn('Backend logout failed or token already expired');
@@ -120,7 +121,7 @@ export class AuthService {
       finalize(() => {
         this.performClientLogout(currentUrl);
         this.isLoggingOut.set(false);
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
         this.messageService.showSuccess('You have been logged out from all devices');
@@ -467,4 +468,9 @@ export class AuthService {
       this.currentUserSubject.next({ ...user });
     }
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

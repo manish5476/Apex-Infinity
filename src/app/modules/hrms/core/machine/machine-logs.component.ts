@@ -1,11 +1,12 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GridApi } from 'ag-grid-community';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
 import { HRMSService } from '../../hrms.service';
-
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-machine-logs',
@@ -61,7 +62,8 @@ import { HRMSService } from '../../hrms.service';
     .fade-in { animation: fadeIn 0.3s ease-out; }
   `]
 })
-export class MachineLogsComponent implements OnInit {
+export class MachineLogsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
@@ -75,7 +77,7 @@ export class MachineLogsComponent implements OnInit {
 
   ngOnInit() {
     this.setupColumns();
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.machineId = params.get('id');
       if (this.machineId) {
         this.getStatus();
@@ -85,14 +87,14 @@ export class MachineLogsComponent implements OnInit {
   }
 
   getStatus() {
-    this.hrmsService.getMachineStatus(this.machineId!).subscribe(res => {
+    this.hrmsService.getMachineStatus(this.machineId!).pipe(takeUntil(this.destroy$)).subscribe(res => {
       this.machineStatus = res.data;
       this.cdr.markForCheck();
     });
   }
 
   getData() {
-    this.hrmsService.getMachineLogs(this.machineId!).subscribe({
+    this.hrmsService.getMachineLogs(this.machineId!).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         this.data = res.data?.logs || res.data || [];
         this.cdr.markForCheck();
@@ -152,4 +154,9 @@ export class MachineLogsComponent implements OnInit {
       }
     ];
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

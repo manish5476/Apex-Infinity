@@ -1,14 +1,14 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, OnDestroy } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 
 import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { InvoiceService } from '../../../services/invoice-service';
-
+import { takeUntil } from "rxjs/operators";
 
 // ── Typed exactly to match your API response ──────────────────────────────
 export interface PeriodInfo {
@@ -119,7 +119,8 @@ export interface DashboardData {
   templateUrl: './profit-dashboard.component.html',
   styleUrls: ['./profit-dashboard.component.scss'],
 })
-export class ProfitDashboardComponentNew implements OnInit {
+export class ProfitDashboardComponentNew implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private invoiceService = inject(InvoiceService);
 
   // ── State ─────────────────────────────────────────────────────────────────
@@ -187,7 +188,7 @@ export class ProfitDashboardComponentNew implements OnInit {
 
     this.invoiceService
       .getProfitDashboard(this.selectedPeriod, filters)
-      .pipe(finalize(() => this.loading.set(false)))
+      .pipe(finalize(() => this.loading.set(false)), takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
           if (res.status === 'success') this.data.set(res.data as DashboardData);
@@ -223,4 +224,9 @@ export class ProfitDashboardComponentNew implements OnInit {
     const e = new Date(p.end).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
     return `${s} – ${e} · ${p.days} days`;
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

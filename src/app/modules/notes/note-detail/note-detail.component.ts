@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -15,7 +15,8 @@ import Underline from '@tiptap/extension-underline';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
 import { DatePickerModule } from 'primeng/datepicker';
-
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-note-detail',
@@ -25,7 +26,8 @@ import { DatePickerModule } from 'primeng/datepicker';
   styleUrls: ['./note-detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NoteDetailComponent implements OnInit {
+export class NoteDetailComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private noteService = inject(NoteService);
@@ -64,7 +66,7 @@ export class NoteDetailComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const id = params.get('id');
       if (id) {
         this.isEditing.set(false);
@@ -133,20 +135,20 @@ export class NoteDetailComponent implements OnInit {
   openLinkDialog() {
     const id = prompt('Enter Note ID to link (Mock Dialog):');
     if (id && this.note()) {
-      this.noteService.linkNote(this.note()!._id, id).subscribe(res => this.note.set(res.data.note));
+      this.noteService.linkNote(this.note()!._id, id).pipe(takeUntil(this.destroy$)).subscribe(res => this.note.set(res.data.note));
     }
   }
 
   unlinkNote(targetId: string) {
     if (!confirm('Remove link?') || !this.note()) return;
-    this.noteService.unlinkNote(this.note()!._id, targetId).subscribe(res => this.note.set(res.data.note));
+    this.noteService.unlinkNote(this.note()!._id, targetId).pipe(takeUntil(this.destroy$)).subscribe(res => this.note.set(res.data.note));
   }
 
   // --- General ---
 
   convertToTask() {
     if (!this.note()) return;
-    this.noteService.convertToTask(this.note()!._id).subscribe(res => this.note.set(res.data.note));
+    this.noteService.convertToTask(this.note()!._id).pipe(takeUntil(this.destroy$)).subscribe(res => this.note.set(res.data.note));
   }
 
   downloadAttachment(file: any) {
@@ -155,7 +157,7 @@ export class NoteDetailComponent implements OnInit {
   // ----------------------------------------------------------------------------------
   fetchNote(id: string) {
     this.isLoading.set(true);
-    this.noteService.getNoteById(id).subscribe({
+    this.noteService.getNoteById(id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.note.set(res.data.note);
         this.patchForm(res.data.note);
@@ -170,7 +172,7 @@ export class NoteDetailComponent implements OnInit {
   }
 
   fetchHistory(id: string) {
-    this.noteService.getNoteHistory(id).subscribe({
+    this.noteService.getNoteHistory(id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => this.activityLog.set(res.data.activityLog),
       error: (err) => this.messageServic.handleHttpError(err)
     });
@@ -203,7 +205,7 @@ export class NoteDetailComponent implements OnInit {
     };
 
 
-    this.noteService.updateNote(this.note()!._id, updates).subscribe({
+    this.noteService.updateNote(this.note()!._id, updates).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.note.set(res.data.note);
         this.isEditing.set(false);
@@ -222,7 +224,7 @@ export class NoteDetailComponent implements OnInit {
   addSubtask(input: HTMLInputElement) {
     const val = input.value.trim();
     if (!val || !this.note()) return;
-    this.noteService.addChecklistItem(this.note()!._id, val).subscribe({
+    this.noteService.addChecklistItem(this.note()!._id, val).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.note.set(res.data.note);
         this.messageServic.showSuccess('Item added to checklist.');
@@ -234,7 +236,7 @@ export class NoteDetailComponent implements OnInit {
 
   toggleSubtask(item: ChecklistItem) {
     if (!this.note() || !item._id) return;
-    this.noteService.toggleChecklistItem(this.note()!._id, item._id, !item.completed)
+    this.noteService.toggleChecklistItem(this.note()!._id, item._id, !item.completed).pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => this.note.set(res.data.note),
         error: (err) => this.messageServic.handleHttpError(err)
@@ -243,7 +245,7 @@ export class NoteDetailComponent implements OnInit {
 
   deleteSubtask(id: string) {
     if (!this.note()) return;
-    this.noteService.removeChecklistItem(this.note()!._id, id).subscribe({
+    this.noteService.removeChecklistItem(this.note()!._id, id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         this.note.set(res.data.note);
         this.messageServic.showSuccess('Item removed from checklist.');
@@ -255,7 +257,7 @@ export class NoteDetailComponent implements OnInit {
   // --- General Actions ---
   duplicateNote() {
     if (!this.note()) return;
-    this.noteService.duplicateNote(this.note()!._id).subscribe({
+    this.noteService.duplicateNote(this.note()!._id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.messageServic.showSuccess('Note duplicated.');
         this.router.navigate(['/notes', res.data.note._id]);
@@ -266,7 +268,7 @@ export class NoteDetailComponent implements OnInit {
 
   archiveNote() {
     if (!this.note()) return;
-    this.noteService.archiveNote(this.note()!._id).subscribe({
+    this.noteService.archiveNote(this.note()!._id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.note.set(res.data.note);
         this.messageServic.showSuccess('Note moved to archive.');
@@ -282,7 +284,7 @@ export class NoteDetailComponent implements OnInit {
       ? this.noteService.restoreFromTrash(this.note()!._id)
       : this.noteService.restoreNote(this.note()!._id);
 
-    request$.subscribe({
+    request$.pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.note.set(res.data.note);
         this.messageServic.showSuccess('Note restored successfully.');
@@ -297,7 +299,7 @@ export class NoteDetailComponent implements OnInit {
 
     if (this.isTrash()) {
       if (!confirm('Permanently delete this note? This action cannot be undone.')) return;
-      this.noteService.hardDeleteNote(noteId).subscribe({
+      this.noteService.hardDeleteNote(noteId).pipe(takeUntil(this.destroy$)).subscribe({
         next: () => {
           this.messageServic.showSuccess('Note permanently deleted.');
           this.router.navigate(['/notes']);
@@ -305,7 +307,7 @@ export class NoteDetailComponent implements OnInit {
         error: (err) => this.messageServic.handleHttpError(err)
       });
     } else {
-      this.noteService.deleteNote(noteId).subscribe({
+      this.noteService.deleteNote(noteId).pipe(takeUntil(this.destroy$)).subscribe({
         next: () => {
           this.messageServic.showSuccess('Note moved to trash.');
           this.router.navigate(['/notes']);
@@ -314,4 +316,9 @@ export class NoteDetailComponent implements OnInit {
       });
     }
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

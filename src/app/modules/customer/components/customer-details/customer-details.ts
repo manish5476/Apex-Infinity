@@ -1,8 +1,8 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
-import { of } from 'rxjs';
-import { catchError, finalize } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 
 // PrimeNG Imports
@@ -65,7 +65,8 @@ interface TabState {
   templateUrl: './customer-details.html',
   styleUrl: './customer-details.scss',
 })
-export class CustomerDetails implements OnInit {
+export class CustomerDetails implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   // --- Dependencies ---
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -141,7 +142,7 @@ export class CustomerDetails implements OnInit {
     }
 
     // 2. Fallback to Route Params
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const id = params.get('id');
       if (!id) {
         this.router.navigate(['/customer']);
@@ -163,7 +164,7 @@ export class CustomerDetails implements OnInit {
       acceptButtonStyleClass: 'p-button-danger',
       rejectButtonStyleClass: 'p-button-text',
       accept: () => {
-        this.customerService.deleteCustomer(customer._id).subscribe({
+        this.customerService.deleteCustomer(customer._id).pipe(takeUntil(this.destroy$)).subscribe({
           next: () => {
             this.messageService.showSuccess('Customer deleted successfully');
             this.router.navigate(['/customer']);
@@ -230,7 +231,7 @@ export class CustomerDetails implements OnInit {
         const invoiceId = event.row._id;
         this.router.navigate(['/invoices', invoiceId]);
       } else if (event.type === 'return') {
-        this.dialogServices.openSalesReturn({ invoice: event.row })?.onClose.subscribe(res => {
+        this.dialogServices.openSalesReturn({ invoice: event.row })?.onClose.pipe(takeUntil(this.destroy$)).subscribe(res => {
           if (res) this.fetchDataForTab('invoices', true);
         });
       }
@@ -314,10 +315,10 @@ export class CustomerDetails implements OnInit {
     if (!custId) return;
 
     this.dialogServices.openImageUpload({
-      header: 'Update Customer Photo',
-      description: 'Upload a new avatar for this customer.',
-      uploadFn: (file: File) => this.customerService.uploadCustomerPhoto(custId, file)
-    })?.onClose.subscribe((res: any) => {
+            header: 'Update Customer Photo',
+            description: 'Upload a new avatar for this customer.',
+            uploadFn: (file: File) => this.customerService.uploadCustomerPhoto(custId, file)
+          })?.onClose.pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
       // The ImageUploaderComponent ensures 'res' is the exact response from our uploadFn on success
       if (res?.data?.customer?.photo) {
         this.customer.update(c => ({ ...c, avatar: res.data.customer.photo }));
@@ -338,7 +339,7 @@ export class CustomerDetails implements OnInit {
           this.isError.set(true);
           return of(null);
         }),
-        finalize(() => this.loadingProfile.set(false))
+        finalize(() => this.loadingProfile.set(false)), takeUntil(this.destroy$)
       )
       .subscribe((res: any) => {
         if (res?.data) {
@@ -356,7 +357,7 @@ export class CustomerDetails implements OnInit {
         this.messageService.handleHttpError(err);
         return of({ history: [], closingBalance: 0, count: 0 });
       }),
-      finalize(() => this.tabStatus.ledger.loading = false)
+      finalize(() => this.tabStatus.ledger.loading = false), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       // Use the history array directly as per the JSON structure
       const history = res.history || [];
@@ -376,7 +377,7 @@ export class CustomerDetails implements OnInit {
         this.messageService.handleHttpError(err);
         return of({ data: { invoices: [] }, total: 0 });
       }),
-      finalize(() => this.tabStatus.invoices.loading = false)
+      finalize(() => this.tabStatus.invoices.loading = false), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       let data = res.invoices || res.data?.invoices || (Array.isArray(res) ? res : []);
       this.invoices.update(old => isReset ? data : [...old, ...data]);
@@ -393,7 +394,7 @@ export class CustomerDetails implements OnInit {
         this.messageService.handleHttpError(err);
         return of({ data: { payments: [] }, total: 0 });
       }),
-      finalize(() => this.tabStatus.payments.loading = false)
+      finalize(() => this.tabStatus.payments.loading = false), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       let data = res.payments || res.data?.payments || (Array.isArray(res) ? res : []);
       this.payments.update(old => isReset ? data : [...old, ...data]);
@@ -407,4 +408,9 @@ export class CustomerDetails implements OnInit {
   retryLoad() {
     if (this.customerId()) this.loadProfile(this.customerId()!);
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

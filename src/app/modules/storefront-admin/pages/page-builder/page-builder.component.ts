@@ -1,7 +1,6 @@
 // src/app/features/storefront-admin/pages/page-builder/page-builder.component.ts
 import {
-  Component, OnInit, inject, signal, ViewEncapsulation
-} from '@angular/core';
+  Component, OnInit, inject, signal, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
@@ -36,6 +35,8 @@ import { AdminPage, PageSection, SectionDefinition } from '@core/models/storefro
 import { StorefrontAdminService } from '@core/services/storefront-admin.service';
 import { StorefrontPublicService } from '@core/services/storefront-public.service';
 import { ProductSliderComponent } from '../../../storefront-public/components/product-slider/product-slider.component';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -82,7 +83,8 @@ function buildDefaultConfig(schema: Record<string, any>): Record<string, any> {
   styleUrls: ['./page-builder.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class PageBuilderComponent implements OnInit {
+export class PageBuilderComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private adminService = inject(StorefrontAdminService);
   private publicService = inject(StorefrontPublicService);
@@ -115,7 +117,7 @@ export class PageBuilderComponent implements OnInit {
     const pageId = this.route.snapshot.paramMap.get('id');
 
     // Load section type catalogue first, then the page
-    this.adminService.getSectionTypes().subscribe({
+    this.adminService.getSectionTypes().pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         const types: SectionDefinition[] = res.data ?? (Array.isArray(res) ? res : []);
 
@@ -145,7 +147,7 @@ export class PageBuilderComponent implements OnInit {
   // ── Loaders ───────────────────────────────────────────────────────────────
 
   loadPage(id: string): void {
-    this.adminService.getPageById(id).subscribe({
+    this.adminService.getPageById(id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         const data: AdminPage = res.data;
         this.page.set(data);
@@ -165,7 +167,7 @@ export class PageBuilderComponent implements OnInit {
     const orgSlug = getOrgSlug();
     if (!orgSlug) return;
 
-    this.publicService.getStoreMetadata(orgSlug).subscribe({
+    this.publicService.getStoreMetadata(orgSlug).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         const enums = res.data?.enums ?? res.enums ?? {};
         this.mastersData.set({
@@ -306,7 +308,7 @@ export class PageBuilderComponent implements OnInit {
       };
     });
 
-    this.adminService.updatePage(pageId, { sections }).subscribe({
+    this.adminService.updatePage(pageId, { sections }).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => this.isSaving.set(false),
       error: (err: any) => {
         this.isSaving.set(false);
@@ -325,7 +327,7 @@ export class PageBuilderComponent implements OnInit {
       : this.adminService.publishPage(page._id);
 
     this.isSaving.set(true);
-    request$.subscribe({
+    request$.pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         this.page.set(res.data);
         this.isSaving.set(false);
@@ -345,7 +347,7 @@ export class PageBuilderComponent implements OnInit {
     if (!confirm('DANGER: Permanently delete this page? This cannot be undone.')) return;
 
     this.isSaving.set(true);
-    this.adminService.deletePage(page._id).subscribe({
+    this.adminService.deletePage(page._id).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => window.history.back(),
       error: (err: any) => {
         this.isSaving.set(false);
@@ -353,5 +355,10 @@ export class PageBuilderComponent implements OnInit {
       }
     });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 

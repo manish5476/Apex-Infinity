@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, signal, computed, ViewEncapsulation, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, FormsModule } from '@angular/forms';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -12,6 +12,8 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { NoteService } from '../../../core/services/notes.service';
 import { MasterListService } from '../../../core/services/master-list.service';
 import { AppMessageService } from '../../../core/services/message.service';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-create-meeting-dialog',
@@ -31,7 +33,8 @@ import { AppMessageService } from '../../../core/services/message.service';
   templateUrl: './create-meeting-dialog.html',
   styleUrl:'./create-meeting-dialog.scss'
 })
-export class CreateMeetingDialogComponent {
+export class CreateMeetingDialogComponent implements OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private ref = inject(DynamicDialogRef);
   private noteService = inject(NoteService);
@@ -133,7 +136,7 @@ onSubmit() {
       participants: (formVal.participants || []).map((uid: string) => ({ user: uid, role: 'attendee' }))
     };
 
-    this.noteService.createMeeting(payload).subscribe({
+    this.noteService.createMeeting(payload).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.isSubmitting.set(false);
         this.messageService.showSuccess('Meeting scheduled successfully.');
@@ -164,4 +167,9 @@ onSubmit() {
     }
     return colors[Math.abs(hash) % colors.length];
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

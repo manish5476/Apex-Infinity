@@ -1,14 +1,15 @@
-import { Component, inject, signal, computed, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, signal, computed, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 
 import { UserManagementService } from '../user-management.service';
 import { MasterListService } from '../../../core/services/master-list.service';
 import { AppMessageService } from '../../../core/services/message.service';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-user-export-dialog',
@@ -17,7 +18,8 @@ import { AppMessageService } from '../../../core/services/message.service';
   templateUrl: './user-export-dialog.component.html',
   styleUrl: './user-export-dialog.component.scss'
 })
-export class UserExportDialogComponent {
+export class UserExportDialogComponent implements OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private ref = inject(DynamicDialogRef);
   private config = inject(DynamicDialogConfig);
   private userService = inject(UserManagementService);
@@ -57,7 +59,7 @@ export class UserExportDialogComponent {
       finalize(() => {
         this.isLoading.set(false);
         this.cdr.markForCheck();
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe({
       next: (response) => {
         const timestamp = new Date().toISOString().split('T')[0];
@@ -98,4 +100,9 @@ export class UserExportDialogComponent {
     document.body.removeChild(a);
     this.ref.close();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

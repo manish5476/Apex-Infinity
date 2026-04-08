@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, effect, ChangeDetectionStrategy, ViewChild } from '@angular/core';
+import { Component, OnInit, inject, signal, effect, ChangeDetectionStrategy, ViewChild, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
@@ -22,6 +22,8 @@ import { AppMessageService } from '../../../../core/services/message.service';
 // Grid Components & Types
 import { AppSharedGrid, SharedGridEvent } from "../../AgGrid/grid/app-shared-grid/app-shared-grid";
 import { GridColDef } from "../../AgGrid/grid/grid.types";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 // --- Interface based on Mongoose Schema ---
 export interface Master {
@@ -183,7 +185,8 @@ export interface Master {
   styleUrls: ['./master-list.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MasterList implements OnInit {
+export class MasterList implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   // --- Services ---
   private masterService = inject(MasterService);
   private appMessage = inject(AppMessageService);
@@ -283,7 +286,7 @@ export class MasterList implements OnInit {
   // --- Load Data ---
   loadMasters() {
     this.loading.set(true);
-    this.masterService.getMasters().subscribe({
+    this.masterService.getMasters().pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         const data = res.data?.masters || res.data || [];
         this.masters.set(data);
@@ -357,7 +360,7 @@ export class MasterList implements OnInit {
 
     // Check if it's a new row based on temp ID logic
     if (row._id.startsWith('new_') || row._tempId) {
-      this.masterService.createMaster(payload).subscribe({
+      this.masterService.createMaster(payload).pipe(takeUntil(this.destroy$)).subscribe({
         next: () => {
           this.appMessage.showSuccess('Master created successfully');
           this.loadMasters();
@@ -365,7 +368,7 @@ export class MasterList implements OnInit {
         error: (err) => this.appMessage.handleHttpError(err)
       });
     } else {
-      this.masterService.updateMaster(row._id, payload).subscribe({
+      this.masterService.updateMaster(row._id, payload).pipe(takeUntil(this.destroy$)).subscribe({
         next: () => this.appMessage.showSuccess('Master updated successfully'),
         error: (err) => this.appMessage.handleHttpError(err)
       });
@@ -376,7 +379,7 @@ export class MasterList implements OnInit {
     // If it was a temp row, the grid already removed it from UI.
     if (row._id.startsWith('new_')) return;
 
-    this.masterService.deleteMaster(row._id).subscribe({
+    this.masterService.deleteMaster(row._id).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.appMessage.showSuccess(`${row.name} removed successfully`);
         // Grid already updated via transaction, but we can sync signal if needed
@@ -414,7 +417,7 @@ export class MasterList implements OnInit {
     }));
 
     this.loading.set(true);
-    this.masterService.bulkUpdateMasters(items).subscribe({
+    this.masterService.bulkUpdateMasters(items).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.appMessage.showSuccess(res.message || 'Bulk Update Completed');
         this.loadMasters();
@@ -451,7 +454,7 @@ export class MasterList implements OnInit {
     if (ids.length === 0) return;
 
     this.loading.set(true);
-    this.masterService.bulkDeleteMasters(ids).subscribe({
+    this.masterService.bulkDeleteMasters(ids).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.appMessage.showSuccess(res.message || 'Items deleted');
         this.selectedRows.set([]);
@@ -519,7 +522,7 @@ export class MasterList implements OnInit {
 
     this.isBulkSaving = true;
 
-    this.masterService.createBulkMasters(validItems).subscribe({
+    this.masterService.createBulkMasters(validItems).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         if (res.status === 'partial_success') {
           this.appMessage.showWarn('Partial Import. Check duplicates.');
@@ -582,4 +585,9 @@ export class MasterList implements OnInit {
     const random = Math.random().toString(36).substring(2, 8);
     return `${slug}-${random}`;
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

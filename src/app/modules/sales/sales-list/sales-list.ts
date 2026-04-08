@@ -1,8 +1,8 @@
-import { ChangeDetectorRef, Component, OnInit, inject, signal, computed } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject, signal, computed, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
-import { debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, finalize, takeUntil } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 
@@ -20,6 +20,7 @@ import { SalesService } from '../sales-service';
 import { AgShareGrid } from "../../shared/components/ag-shared-grid";
 import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
+import { Subject } from "rxjs";
 
 @Component({
   selector: 'app-sales-list',
@@ -28,7 +29,8 @@ import { PERMISSIONS } from '@core/auth/permissions.constants';
   templateUrl: './sales-list.html',
   styleUrl: './sales-list.scss',
 })
-export class SalesListComponent implements OnInit {
+export class SalesListComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   readonly PERMISSIONS = PERMISSIONS;
 
   private cdr = inject(ChangeDetectorRef);
@@ -103,7 +105,7 @@ export class SalesListComponent implements OnInit {
       .pipe(finalize(() => {
         this.isLoading = false;
         this.cdr.markForCheck();
-      })
+      }), takeUntil(this.destroy$)
       )
       .subscribe({
         next: (res: any) => {
@@ -238,4 +240,9 @@ export class SalesListComponent implements OnInit {
   onCreateSales() {
     this.router.navigate(['/invoices/create']);
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

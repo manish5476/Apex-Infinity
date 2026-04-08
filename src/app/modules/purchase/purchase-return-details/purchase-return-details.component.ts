@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -7,7 +7,9 @@ import { DividerModule } from 'primeng/divider';
 import { TooltipModule } from 'primeng/tooltip';
 import { PurchaseService } from '../purchase.service';
 import { AppMessageService } from '../../../core/services/message.service';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
+import { takeUntil } from "rxjs/operators";
+
 @Component({
   selector: 'app-purchase-return-details',
   standalone: true,
@@ -15,7 +17,8 @@ import { finalize } from 'rxjs';
   templateUrl: './purchase-return-details.html',
   styleUrl: './purchase-return-details.scss'
 })
-export class PurchaseReturnDetailsComponent implements OnInit {
+export class PurchaseReturnDetailsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private purchaseService = inject(PurchaseService);
@@ -35,7 +38,7 @@ ngOnInit() {
 
     this.loading.set(true);
     this.purchaseService.getReturnById(id)
-      .pipe(finalize(() => this.loading.set(false)))
+      .pipe(finalize(() => this.loading.set(false)), takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
           // Safely extract the data payload
@@ -65,4 +68,9 @@ ngOnInit() {
   print() {
     window.print();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

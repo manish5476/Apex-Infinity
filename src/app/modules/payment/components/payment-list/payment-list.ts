@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, effect, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, effect, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GridApi } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
@@ -14,9 +14,10 @@ import { MasterListService } from '../../../../core/services/master-list.service
 import { AppMessageService } from '../../../../core/services/message.service';
 import { PaymentService } from '../../services/payment-service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-payment-list',
@@ -35,7 +36,8 @@ import { PERMISSIONS } from '@core/auth/permissions.constants';
   templateUrl: './payment-list.html',
   styleUrl: './payment-list.scss',
 })
-export class PaymentListComponent implements OnInit {
+export class PaymentListComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   readonly PERMISSIONS = PERMISSIONS;
 
   readonly paymentActionColumn: ActionColumnConfig = {
@@ -137,7 +139,7 @@ getData(isReset: boolean = false) {
         finalize(() => {
           this.isLoading = false;
           this.cdr.markForCheck();
-        })
+        }), takeUntil(this.destroy$)
       )
       .subscribe({
         next: (res: any) => {
@@ -263,4 +265,8 @@ getData(isReset: boolean = false) {
   this.cdr.detectChanges();
 }
 
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

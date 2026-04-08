@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -7,6 +7,8 @@ import { CommonMethodService } from '../../core/utils/common-method.service';
 import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-branch-comparison',
@@ -536,7 +538,8 @@ import { FilterField } from '../../modules/shared/components/universal-filter/fi
 }
   `]
 })
-export class BranchComparisonComponent implements OnInit {
+export class BranchComparisonComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   comparison   = signal<any>(null);
   loading      = signal(false);
   branchColumns: any[] = [];
@@ -578,11 +581,11 @@ export class BranchComparisonComponent implements OnInit {
   loadData(): void {
     this.loading.set(true);
     this.analyticsService.getBranchComparison(
-      this.currentFilters['startDate'],
-      this.currentFilters['endDate'],
-      this.currentFilters['groupBy'] ?? 'revenue',
-      50
-    ).subscribe({
+            this.currentFilters['startDate'],
+            this.currentFilters['endDate'],
+            this.currentFilters['groupBy'] ?? 'revenue',
+            50
+          ).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         if (res.status === 'success') this.comparison.set(res.data.comparison);
         this.loading.set(false);
@@ -675,6 +678,11 @@ export class BranchComparisonComponent implements OnInit {
     ];
     this.cdr.detectChanges();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 // import { Component, OnInit, signal, inject, ChangeDetectorRef, computed } from '@angular/core';
 // import { CommonModule } from '@angular/common';

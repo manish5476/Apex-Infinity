@@ -1,10 +1,11 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Injectable, OnDestroy } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
 import { BaseApiService } from '../../../core/services/base-api.service';
 
 @Injectable({ providedIn: 'root' })
-export class InvoiceService extends BaseApiService {
+export class InvoiceService extends BaseApiService implements OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private endpoint = '/v1/invoices';
 
   // ==============================================
@@ -302,11 +303,11 @@ export class InvoiceService extends BaseApiService {
   createInvoiceWithValidation(invoiceData: any): Observable<any> {
     // First check stock
     return new Observable(observer => {
-      this.checkStock(invoiceData.items).subscribe({
+      this.checkStock(invoiceData.items).pipe(takeUntil(this.destroy$)).subscribe({
         next: (stockCheck) => {
           if (stockCheck.isValid) {
             // Stock is available, create invoice
-            this.createInvoice(invoiceData).subscribe({
+            this.createInvoice(invoiceData).pipe(takeUntil(this.destroy$)).subscribe({
               next: (invoice) => observer.next(invoice),
               error: (err) => observer.error(err)
             });
@@ -347,6 +348,11 @@ export class InvoiceService extends BaseApiService {
       notes: 'Payment received'
     });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // // Get filtered invoices

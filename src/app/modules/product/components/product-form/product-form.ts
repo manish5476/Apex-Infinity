@@ -1,9 +1,9 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { finalize, switchMap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { finalize, switchMap, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 
 // PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
@@ -29,7 +29,8 @@ import { ChipsComponent } from '../../../shared/components/chips.component';
   templateUrl: './product-form.html',
   styleUrls: ['./product-form.scss']
 })
-export class ProductFormComponent implements OnInit {
+export class ProductFormComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   // Services
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
@@ -122,7 +123,7 @@ private initDataFetch(): void {
         // Ensure spinner hides if navigating directly to "Create New"
         this.loadingService.hide();
         return of(null);
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe({
       next: (response) => {
         if (!response) return; // Exit early if in create mode
@@ -161,7 +162,7 @@ private initDataFetch(): void {
       : this.productService.createProduct(payload);
 
     request.pipe(
-      finalize(() => this.isSubmitting.set(false))
+      finalize(() => this.isSubmitting.set(false)), takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
         this.messageService.showSuccess(`Product ${this.editMode() ? 'updated' : 'created'} successfully.`);
@@ -174,4 +175,8 @@ private initDataFetch(): void {
     });
   }
 
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

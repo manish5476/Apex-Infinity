@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
@@ -6,10 +6,11 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { TooltipModule } from 'primeng/tooltip';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 
 import { UserManagementService, User } from '../user-management.service';
 import { AppMessageService } from '../../../core/services/message.service';
+import { takeUntil } from "rxjs/operators";
 
 interface PermissionItem {
   tag: string;
@@ -25,7 +26,8 @@ interface PermissionItem {
   templateUrl: './user-permission-dialog.component.html',
   styleUrl: './user-permission-dialog.component.scss'
 })
-export class UserPermissionDialogComponent implements OnInit {
+export class UserPermissionDialogComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private ref = inject(DynamicDialogRef);
   private config = inject(DynamicDialogConfig);
   private userService = inject(UserManagementService);
@@ -79,7 +81,7 @@ export class UserPermissionDialogComponent implements OnInit {
   fetchPermissions() {
     this.isLoading.set(true);
     this.userService.getAllAvailablePermissions().pipe(
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe({
       next: (res) => {
         const available = res.data.permissions;
@@ -104,7 +106,7 @@ export class UserPermissionDialogComponent implements OnInit {
     const revoke = this.allPermissions().filter(p => p.state === 'revoke').map(p => p.tag);
 
     this.userService.updatePermissionOverrides(this.user._id, { grant, revoke }).pipe(
-      finalize(() => this.isSaving.set(false))
+      finalize(() => this.isSaving.set(false)), takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
         this.messageService.showSuccess(`Permission overrides updated for ${this.user.name}.`);
@@ -126,4 +128,9 @@ export class UserPermissionDialogComponent implements OnInit {
     const reset = this.allPermissions().map(p => ({ ...p, state: 'none' as const }));
     this.allPermissions.set(reset);
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

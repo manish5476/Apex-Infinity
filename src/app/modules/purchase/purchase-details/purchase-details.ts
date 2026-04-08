@@ -1,8 +1,8 @@
-import { Component, OnInit, inject, signal, effect } from '@angular/core';
+import { Component, OnInit, inject, signal, effect, OnDestroy } from '@angular/core';
 import { CommonModule, CurrencyPipe, TitleCasePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { finalize } from 'rxjs/operators';
+import { finalize, takeUntil } from 'rxjs/operators';
 
 // PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
@@ -22,7 +22,7 @@ import { PurchaseService } from '../purchase.service';
 import { FileUpload } from "primeng/fileupload";
 import { ImageViewerDirective } from '../../shared/directives/image-viewer.directive';
 import { Badge } from "primeng/badge";
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subject } from 'rxjs';
 import { HasPermissionDirective } from '../../../core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '../../../core/auth/permissions.constants';
 
@@ -33,7 +33,8 @@ import { PERMISSIONS } from '../../../core/auth/permissions.constants';
   templateUrl: './purchase-details.html',
   styleUrl: './purchase-details.scss',
 })
-export class PurchaseDetailsComponent implements OnInit {
+export class PurchaseDetailsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   readonly PERMISSIONS = PERMISSIONS;
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -255,7 +256,7 @@ export class PurchaseDetailsComponent implements OnInit {
 
     this.isLoading.set(true);
     forkJoin({ purchase: this.purchaseService.getPurchaseById(this.purchaseId), payments: this.purchaseService.getPaymentHistory(this.purchaseId) })
-      .pipe(finalize(() => this.isLoading.set(false)))
+      .pipe(finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
           const data = res.purchase.data?.data || res.purchase.data;
@@ -289,7 +290,7 @@ export class PurchaseDetailsComponent implements OnInit {
 
     this.isSubmittingPayment.set(true);
     this.purchaseService.recordPayment(this.purchaseId!, formVal)
-      .pipe(finalize(() => this.isSubmittingPayment.set(false)))
+      .pipe(finalize(() => this.isSubmittingPayment.set(false)), takeUntil(this.destroy$))
       .subscribe({
         next: () => {
           this.messageService.showSuccess('Payment recorded successfully.');
@@ -303,7 +304,7 @@ export class PurchaseDetailsComponent implements OnInit {
   deletePayment(paymentId: string, amount: number) {
     if (!confirm(`Delete payment of ${this.formatCurrency(amount)}? This will restore the balance.`)) return;
 
-    this.purchaseService.deletePayment(this.purchaseId!, paymentId).subscribe({
+    this.purchaseService.deletePayment(this.purchaseId!, paymentId).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.messageService.showSuccess('Payment removed successfully.');
         this.loadData();
@@ -314,7 +315,7 @@ export class PurchaseDetailsComponent implements OnInit {
 
   // --- Status Workflow ---
   updateStatus(newStatus: string) {
-    this.purchaseService.updateStatus(this.purchaseId!, newStatus, 'Status updated via UI')
+    this.purchaseService.updateStatus(this.purchaseId!, newStatus, 'Status updated via UI').pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
           this.messageService.showSuccess(`Purchase status changed to ${newStatus}.`);
@@ -334,7 +335,7 @@ export class PurchaseDetailsComponent implements OnInit {
       return;
     }
 
-    this.purchaseService.cancelPurchase(this.purchaseId!, this.cancelReason)
+    this.purchaseService.cancelPurchase(this.purchaseId!, this.cancelReason).pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
           this.messageService.showSuccess('Purchase cancelled successfully.');
@@ -358,7 +359,7 @@ export class PurchaseDetailsComponent implements OnInit {
       .pipe(finalize(() => {
         this.isUploading.set(false);
         fileUpload.clear();
-      }))
+      }), takeUntil(this.destroy$))
       .subscribe({
         next: () => {
           this.messageService.showSuccess('Files attached successfully.');
@@ -371,7 +372,7 @@ export class PurchaseDetailsComponent implements OnInit {
   deleteAttachment(index: number) {
     if (!confirm('Delete this attachment?')) return;
 
-    this.purchaseService.deleteAttachment(this.purchaseId!, index).subscribe({
+    this.purchaseService.deleteAttachment(this.purchaseId!, index).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.messageService.showSuccess('Attachment removed successfully.');
         this.loadData();
@@ -505,5 +506,8 @@ export class PurchaseDetailsComponent implements OnInit {
   //     error: () => this.messageService.showError('Error', 'Delete failed')
   //   });
   // }
-
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

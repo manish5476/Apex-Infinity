@@ -1,10 +1,11 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { HRMSService } from '../../hrms.service';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-designation-career-path',
@@ -318,7 +319,8 @@ import { HRMSService } from '../../hrms.service';
     }
   `]
 })
-export class DesignationCareerPathComponent implements OnInit {
+export class DesignationCareerPathComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private hrmsService = inject(HRMSService);
@@ -335,7 +337,7 @@ export class DesignationCareerPathComponent implements OnInit {
     this.loadDesignationsDropdown();
 
     // Pick up ID from route if navigating directly here from a list
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const id = params.get('id');
       if (id) {
         this.selectedDesignationId = id;
@@ -345,7 +347,7 @@ export class DesignationCareerPathComponent implements OnInit {
   }
 
   loadDesignationsDropdown() {
-    this.hrmsService.getDesignations().subscribe({
+    this.hrmsService.getDesignations().pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         const list = res?.data?.designations || res?.data?.data || [];
         this.designationOptions.set(list);
@@ -360,7 +362,7 @@ export class DesignationCareerPathComponent implements OnInit {
     
     // API: /v1/hrms/designations/career-path/:id
     this.hrmsService.getCareerPath(this.selectedDesignationId).pipe(
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe({
       next: (res: any) => {
         // Matches JSON: { data: { current, careerPath, lateralMoves } }
@@ -383,4 +385,9 @@ export class DesignationCareerPathComponent implements OnInit {
   goBack() {
     this.router.navigate(['/hrms/designation/list']);
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

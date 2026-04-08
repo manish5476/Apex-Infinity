@@ -1,10 +1,10 @@
-import { Component, OnInit, inject, signal, effect } from '@angular/core';
+import { Component, OnInit, inject, signal, effect, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
-import { finalize, switchMap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { finalize, switchMap, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
@@ -41,7 +41,8 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
   templateUrl: './supplier-form.html',
   styleUrls: ['./supplier-form.scss']
 })
-export class SupplierFormComponent implements OnInit {
+export class SupplierFormComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -159,7 +160,7 @@ private checkRouteForEditMode(): void {
         }
         return of(null);
       }),
-      finalize(() => this.loadingService.hide())
+      finalize(() => this.loadingService.hide()), takeUntil(this.destroy$)
     ).subscribe({
       next: (response) => {
         if (response && response.data) {
@@ -238,7 +239,7 @@ private checkRouteForEditMode(): void {
       : this.supplierService.createSupplier(payload);
 
     request$.pipe(
-      finalize(() => this.isSubmitting.set(false))
+      finalize(() => this.isSubmitting.set(false)), takeUntil(this.destroy$)
     ).subscribe({
       next: (res) => {
         // Removed the extra 'Success' argument
@@ -350,4 +351,8 @@ private checkRouteForEditMode(): void {
   //     }
   //   });
   // }
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

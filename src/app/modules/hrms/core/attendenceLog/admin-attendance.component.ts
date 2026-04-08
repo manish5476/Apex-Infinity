@@ -1,7 +1,7 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { catchError, finalize, forkJoin, of } from 'rxjs';
+import { catchError, finalize, forkJoin, of, Subject } from 'rxjs';
 
 // Services
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -26,6 +26,7 @@ import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
 
 import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-admin-attendance',
@@ -371,7 +372,8 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
     }
   `]
 })
-export class AdminAttendanceComponent implements OnInit {
+export class AdminAttendanceComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
@@ -543,7 +545,7 @@ export class AdminAttendanceComponent implements OnInit {
         catchError(() => of({ data: { presentCount: 42, flaggedCount: 3, remoteCount: 12 } }))
       )
     }).pipe(
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe(({ logsData, statsData }) => {
       this.logs.set(logsData?.data?.logs || []);
       this.stats.set(statsData?.data || {});
@@ -582,7 +584,7 @@ export class AdminAttendanceComponent implements OnInit {
       header: 'Verify Log',
       icon: 'pi pi-check-circle',
       accept: () => {
-        this.hrmsService.verifyLog(log._id).subscribe({
+        this.hrmsService.verifyLog(log._id).pipe(takeUntil(this.destroy$)).subscribe({
           next: (res:any) => {
             this.messageService.showSuccess(res.message || 'Log Verified');
             this.loadData();
@@ -607,7 +609,7 @@ export class AdminAttendanceComponent implements OnInit {
       finalize(() => {
         this.isProcessing.set(false);
         this.displayFlagDialog = false;
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe({
       next: (res:any) => {
         this.messageService.showSuccess(res.message || 'Log Flagged');
@@ -637,7 +639,7 @@ export class AdminAttendanceComponent implements OnInit {
       finalize(() => {
         this.isProcessing.set(false);
         this.displayCorrectDialog = false;
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe({
       next: (res:any) => {
         this.messageService.showSuccess(res.message || 'Correction Applied');
@@ -682,6 +684,11 @@ export class AdminAttendanceComponent implements OnInit {
       default: return 'warn';
     }
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';

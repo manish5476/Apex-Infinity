@@ -1,7 +1,7 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { catchError, finalize, forkJoin, of } from 'rxjs';
+import { catchError, finalize, forkJoin, of, Subject } from 'rxjs';
 
 // Services
 // import { HRMSService } from '../../../hrms.service';
@@ -26,6 +26,7 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { HRMSService } from '../../hrms.service';
 import { SelectModule } from 'primeng/select';
 import { AppMessageService } from '@core/services/message.service';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-leave-balance-admin',
@@ -378,7 +379,8 @@ import { AppMessageService } from '@core/services/message.service';
     }
   `]
 })
-export class LeaveBalanceAdminComponent implements OnInit {
+export class LeaveBalanceAdminComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
@@ -445,7 +447,7 @@ export class LeaveBalanceAdminComponent implements OnInit {
         catchError(() => of(null))
       )
     }).pipe(
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe(({ bals }) => {
       this.balances.set(bals?.data?.leaveBalances || []);
     });
@@ -470,7 +472,7 @@ export class LeaveBalanceAdminComponent implements OnInit {
       finalize(() => {
         this.isProcessing.set(false);
         this.displayBulkDialog = false;
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       if (res) {
         this.messageService.showSuccess(res.message)
@@ -511,7 +513,7 @@ export class LeaveBalanceAdminComponent implements OnInit {
       finalize(() => {
         this.isProcessing.set(false);
         this.displayAdjustDialog = false;
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       if (res) {
         this.messageService.showSuccess(res.message)
@@ -555,4 +557,9 @@ export class LeaveBalanceAdminComponent implements OnInit {
       }
     };
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

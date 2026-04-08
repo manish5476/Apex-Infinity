@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { forkJoin, of } from 'rxjs';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { forkJoin, of, Subject } from 'rxjs';
+import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
 
 // Services
 import { MessageService } from 'primeng/api';
@@ -416,7 +416,8 @@ import { AppMessageService } from '@core/services/message.service';
     }
   `]
 })
-export class LeaveAdminHubComponent implements OnInit {
+export class LeaveAdminHubComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
 
@@ -458,7 +459,7 @@ export class LeaveAdminHubComponent implements OnInit {
         catchError(() => of({ totalLeavesTaken: 142, pendingRequests: 8, mostUsedType: 'casual' }))
       )
     }).pipe(
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe(({ all, calendar, analytics }) => {
       this.allRequests.set(all);
       this.calendarData.set(calendar);
@@ -493,7 +494,7 @@ export class LeaveAdminHubComponent implements OnInit {
         this.messageService.handleHttpError(err)
         return of(null);
       }),
-      finalize(() => this.isBulkApproving.set(false))
+      finalize(() => this.isBulkApproving.set(false)), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       if (res) {
         this.messageService.showSuccess(res.message)
@@ -556,4 +557,9 @@ export class LeaveAdminHubComponent implements OnInit {
       }
     ];
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

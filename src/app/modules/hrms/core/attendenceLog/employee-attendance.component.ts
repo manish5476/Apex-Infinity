@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 
 // Services
 import { MessageService } from 'primeng/api';
@@ -406,6 +406,7 @@ import { TooltipModule } from 'primeng/tooltip';
   `]
 })
 export class EmployeeAttendanceComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
 
@@ -433,6 +434,8 @@ export class EmployeeAttendanceComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     if (this.clockInterval) clearInterval(this.clockInterval);
+      this.destroy$.next();
+      this.destroy$.complete();
   }
 
   private startClock() {
@@ -468,7 +471,7 @@ export class EmployeeAttendanceComponent implements OnInit, OnDestroy {
         this.messageService.handleHttpError(err);
         return of({ data: { logs: [], summary: {} } });
       }),
-      finalize(() => this.isLoadingLogs.set(false))
+      finalize(() => this.isLoadingLogs.set(false)), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       const logs = res?.data?.logs || [];
       this.myLogs.set(logs);
@@ -507,7 +510,7 @@ export class EmployeeAttendanceComponent implements OnInit, OnDestroy {
         this.messageService.handleHttpError(err);
         return of(null);
       }),
-      finalize(() => this.isPunching.set(false))
+      finalize(() => this.isPunching.set(false)), takeUntil(this.destroy$)
     ).subscribe((res:any) => {
       if (res) {
         this.messageService.showSuccess(res.message);

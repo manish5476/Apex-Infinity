@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -7,6 +7,8 @@ import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
 import { AuthService } from '../../services/auth-service';
 import { AppMessageService } from '../../../../core/services/message.service';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-update-password',
@@ -16,7 +18,8 @@ import { AppMessageService } from '../../../../core/services/message.service';
   templateUrl: './update-password.html',
   styleUrl: './update-password.scss'
 })
-export class UpdatePasswordComponent {
+export class UpdatePasswordComponent implements OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private messageService = inject(AppMessageService);
@@ -44,7 +47,7 @@ export class UpdatePasswordComponent {
     this.successMessage.set(null);
     this.errorMessage.set(null);
 
-    this.authService.updateUserPassword(this.updateForm.value).subscribe({
+    this.authService.updateUserPassword(this.updateForm.value).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.isLoading.set(false);
         this.updateForm.reset();
@@ -61,4 +64,9 @@ export class UpdatePasswordComponent {
       }
     });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

@@ -1,10 +1,10 @@
 import { Message } from "./../../../../chat/chat.component/chat.models";
 
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 
 // Services
 import { MessageService } from 'primeng/api';
@@ -321,7 +321,8 @@ import { AppMessageService } from "@core/services/message.service";
     }
   `]
 })
-export class ShiftValidatorComponent implements OnInit {
+export class ShiftValidatorComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
@@ -384,7 +385,7 @@ export class ShiftValidatorComponent implements OnInit {
           }
         });
       }),
-      finalize(() => this.isValidating.set(false))
+      finalize(() => this.isValidating.set(false)), takeUntil(this.destroy$)
     ).subscribe((response: any) => {
       if (response?.status === 'success' || response?.isValid === true) {
         this.validationResult.set({ isValid: true, conflicts: [] });
@@ -399,6 +400,11 @@ export class ShiftValidatorComponent implements OnInit {
     this.validationForm.reset();
     this.validationResult.set(null);
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 

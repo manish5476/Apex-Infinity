@@ -1,7 +1,7 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
-import { catchError, finalize, forkJoin, of } from 'rxjs';
+import { catchError, finalize, forkJoin, of, Subject } from 'rxjs';
 
 // Services
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -22,6 +22,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
 import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-geofence-hub',
@@ -260,7 +261,8 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
     }
   `]
 })
-export class GeofenceHubComponent implements OnInit {
+export class GeofenceHubComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
@@ -419,7 +421,7 @@ export class GeofenceHubComponent implements OnInit {
       fences: this.hrmsService.getGeoFences().pipe(catchError(() => of({ data: { geofences: [] } }))),
       viols: this.hrmsService.getGeoFenceViolations().pipe(catchError(() => of({ data: [] })))
     }).pipe(
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe(({ fences, viols }) => {
       this.geofences.set(fences?.data?.geofences || []);
       this.violations.set(Array.isArray(viols?.data) ? viols.data : []); 
@@ -475,7 +477,7 @@ export class GeofenceHubComponent implements OnInit {
       header: 'Delete Boundary',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        this.hrmsService.deleteGeoFence(fence._id).subscribe({
+        this.hrmsService.deleteGeoFence(fence._id).pipe(takeUntil(this.destroy$)).subscribe({
           next: (res:any) => {
             this.messageService.showSuccess(res.message || 'Geofence deleted successfully.');
             this.loadData();
@@ -485,6 +487,11 @@ export class GeofenceHubComponent implements OnInit {
       }
     });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 

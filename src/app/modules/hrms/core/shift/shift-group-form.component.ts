@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, finalize, of } from 'rxjs';
+import { catchError, finalize, of, Subject } from 'rxjs';
 
 // Services
 import { MessageService } from 'primeng/api';
@@ -22,6 +22,7 @@ import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-shift-group-form',
@@ -550,7 +551,8 @@ import { InputIconModule } from 'primeng/inputicon';
     }
   `]
 })
-export class ShiftGroupFormComponent implements OnInit {
+export class ShiftGroupFormComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
@@ -649,7 +651,7 @@ export class ShiftGroupFormComponent implements OnInit {
         this.onCancel();
         return of(null);
       }),
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       const groupData = res?.data?.shiftGroup || res?.data?.data || res;
       if (groupData) {
@@ -706,7 +708,7 @@ export class ShiftGroupFormComponent implements OnInit {
         this.messageService.handleHttpError(err)
         return of(null);
       }),
-      finalize(() => this.isSaving.set(false))
+      finalize(() => this.isSaving.set(false)), takeUntil(this.destroy$)
     ).subscribe((res:any) => {
       if (res) {
         setTimeout(() => this.onCancel(), 1000); 
@@ -717,6 +719,11 @@ export class ShiftGroupFormComponent implements OnInit {
   onCancel() {
     this.router.navigate(['/hrms/shift-groups/list']);
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';

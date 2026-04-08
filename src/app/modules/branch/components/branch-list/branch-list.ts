@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
@@ -14,6 +14,8 @@ import { Toast } from "primeng/toast";
 import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
 import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-branch-list',
@@ -32,7 +34,8 @@ import { PERMISSIONS } from '@core/auth/permissions.constants';
   templateUrl: './branch-list.html',
   styleUrl: './branch-list.scss',
 })
-export class BranchListComponent implements OnInit {
+export class BranchListComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   readonly PERMISSIONS = PERMISSIONS;
 
   private cdr = inject(ChangeDetectorRef);
@@ -83,7 +86,7 @@ export class BranchListComponent implements OnInit {
       params.search = this.branchFilter.name.trim();
     }
 
-    this.branchService.getAllBranches(params).subscribe({
+    this.branchService.getAllBranches(params).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         // Correctly access nested data from Factory response
         const newData = res.data?.data || [];
@@ -170,4 +173,9 @@ export class BranchListComponent implements OnInit {
     ];
     this.cdr.detectChanges();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

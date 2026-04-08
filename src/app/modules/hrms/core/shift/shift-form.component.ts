@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of, catchError, map } from 'rxjs';
+import { of, catchError, map, Subject } from 'rxjs';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { HRMSService } from '../../hrms.service';
 
@@ -15,6 +15,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DatePickerModule } from 'primeng/datepicker';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-shift-form',
@@ -529,7 +530,8 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
     @media (max-width: 768px) { .dashboard-content { padding: var(--spacing-lg); } .dashboard-header { flex-direction: column; align-items: flex-start; gap: var(--spacing-lg); } .header-right { width: 100%; justify-content: flex-end; } .bento-grid { grid-template-columns: 1fr; } .span-2, .span-2-inner, .span-3 { grid-column: span 1; } .inner-grid-2 { grid-template-columns: 1fr; } }
   `]
 })
-export class ShiftFormComponent implements OnInit {
+export class ShiftFormComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
@@ -609,7 +611,7 @@ export class ShiftFormComponent implements OnInit {
       effectiveTo: [null]
     });
 
-    this.shiftForm.get('code')?.valueChanges.subscribe(val => {
+    this.shiftForm.get('code')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(val => {
       if (val && val !== val.toUpperCase()) {
         this.shiftForm.get('code')?.setValue(val.toUpperCase(), { emitEvent: false });
       }
@@ -617,7 +619,7 @@ export class ShiftFormComponent implements OnInit {
   }
 
   private checkEditMode() {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const id = params.get('id');
       if (id) {
         this.isEditMode.set(true);
@@ -638,7 +640,7 @@ export class ShiftFormComponent implements OnInit {
         this.shiftForm.enable();
         this.messageService.handleHttpError(err);
         return of(null);
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe((data) => {
       if (data) {
         this.patchFormValues(data);
@@ -718,7 +720,7 @@ export class ShiftFormComponent implements OnInit {
     }
 
     if (this.isEditMode()) {
-      this.hrmsService.updateShift(this.shiftId!, payload).subscribe({
+      this.hrmsService.updateShift(this.shiftId!, payload).pipe(takeUntil(this.destroy$)).subscribe({
         next: () => {
           this.messageService.showSuccess('Shift updated successfully');
           this.isSubmitting.set(false);
@@ -730,7 +732,7 @@ export class ShiftFormComponent implements OnInit {
         }
       });
     } else {
-      this.hrmsService.createShift(payload).subscribe({
+      this.hrmsService.createShift(payload).pipe(takeUntil(this.destroy$)).subscribe({
         next: () => {
           this.messageService.showSuccess('Shift created successfully');
           this.isSubmitting.set(false);
@@ -747,6 +749,11 @@ export class ShiftFormComponent implements OnInit {
   goBack() {
     this.router.navigate(['/hrms/shifts/list']);
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';

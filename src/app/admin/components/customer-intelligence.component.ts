@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, signal, inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -7,6 +7,8 @@ import { CommonMethodService } from '../../core/utils/common-method.service';
 import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-customer-intelligence',
@@ -533,7 +535,8 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
 .empty-sub { font-size: var(--font-size-xs); color: var(--text-tertiary); margin: 0; }
   `]
 })
-export class CustomerIntelligenceComponent implements OnInit {
+export class CustomerIntelligenceComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   public  commonService    = inject(CommonMethodService);
   private analyticsService = inject(AdminAnalyticsService);
   private cdr              = inject(ChangeDetectorRef);
@@ -568,7 +571,7 @@ export class CustomerIntelligenceComponent implements OnInit {
 
   loadData(): void {
     this.loading.set(true);
-    this.analyticsService.getCustomerIntelligence(this.currentFilters['branchId']).subscribe({
+    this.analyticsService.getCustomerIntelligence(this.currentFilters['branchId']).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         if (res.status === 'success') this.intelligenceData.set(res.data);
         this.loading.set(false);
@@ -658,6 +661,11 @@ export class CustomerIntelligenceComponent implements OnInit {
     ];
     this.cdr.detectChanges();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { Component, OnInit, signal, inject, ChangeDetectorRef } from '@angular/core';

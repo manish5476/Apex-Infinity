@@ -1,16 +1,16 @@
-import { Injectable, computed, effect, inject, signal } from '@angular/core';
+import { Injectable, computed, effect, inject, signal, OnDestroy } from '@angular/core';
 import { Router, NavigationExtras, NavigationEnd } from '@angular/router'; // 👈 Added NavigationEnd
 import { toObservable } from '@angular/core/rxjs-interop';
-import { Observable } from 'rxjs';
-import { filter } from 'rxjs/operators'; // 👈 Added filter
+import { Observable, Subject } from 'rxjs';
+import { filter, takeUntil } from 'rxjs/operators'; // 👈 Added filter
 import { TabId, TabMeta, TabState, OpenTabOptions } from '../tab.types';
 
 const STORAGE_KEY = 'apex__tab_state';
 const MAX_TABS = 20;
 
 @Injectable({ providedIn: 'root' })
-export class TabService {
-
+export class TabService implements OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private readonly router = inject(Router);
   private readonly _state = signal<TabState>(this._loadPersistedState());
 
@@ -36,7 +36,7 @@ export class TabService {
 
     // Clean, standard RxJS implementation
     this.router.events.pipe(
-      filter((e): e is NavigationEnd => e instanceof NavigationEnd)
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd), takeUntil(this.destroy$)
     ).subscribe((e: NavigationEnd) => {
       this.handleNavigationEnd(e);
     });
@@ -347,4 +347,9 @@ export class TabService {
     } catch { /* corrupted */ }
     return { tabs: [], activeTabId: null };
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

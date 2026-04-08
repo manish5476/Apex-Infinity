@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, ViewEncapsulation } from '@angular/core';
+import { Component, inject, signal, computed, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe, TitleCasePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -13,6 +13,8 @@ import { AuthService } from '../../auth/services/auth-service';
 import { CreateMeetingDialogComponent } from '../create-meeting-dialog/create-meeting-dialog';
 import { MeetingDetailsDialogComponent } from '../meeting-details-dialog/meeting-details-dialog.component';
 import { AppMessageService } from '../../../core/services/message.service';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 // Services & Models
 
@@ -37,7 +39,8 @@ type MeetingFilter = 'upcoming' | 'all' | 'pending' | 'past' | 'cancelled';
   templateUrl: './meeting-list.component.html',
   styleUrl: './meeting-list.component.scss'
 })
-export class MeetingListComponent {
+export class MeetingListComponent implements OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private noteService = inject(NoteService);
   private authService = inject(AuthService);
   private dialogService = inject(DialogService);
@@ -199,7 +202,7 @@ export class MeetingListComponent {
       endDate = end.toISOString();
     }
 
-    this.noteService.getUserMeetings(status, startDate, endDate).subscribe({
+    this.noteService.getUserMeetings(status, startDate, endDate).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         const data = res?.data?.meetings || [];
         const list = Array.isArray(data) ? data : [data];
@@ -224,7 +227,7 @@ export class MeetingListComponent {
       dismissableMask: true
     });
 
-    ref.onClose.subscribe((meeting: Meeting) => {
+    ref.onClose.pipe(takeUntil(this.destroy$)).subscribe((meeting: Meeting) => {
       if (meeting) {
         this.messageService.showSuccess('Meeting scheduled successfully.');
         this.meetings.update(prev => [...prev, meeting]);
@@ -234,7 +237,7 @@ export class MeetingListComponent {
   }
 
   onRsvp(meetingId: string, response: 'accepted' | 'declined' | 'tentative') {
-    this.noteService.rsvpToMeeting(meetingId, response).subscribe({
+    this.noteService.rsvpToMeeting(meetingId, response).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         // Single-string success feedback
         this.messageService.showSuccess(`RSVP status updated to ${response}.`);
@@ -264,7 +267,7 @@ export class MeetingListComponent {
     // Note: Consider replacing window.confirm with your confirmationService for a better UI
     if (!confirm(`Change meeting status to ${status}?`)) return;
 
-    this.noteService.updateMeeting(id, { status }).subscribe({
+    this.noteService.updateMeeting(id, { status }).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res:any) => {
         if (res.data?.meeting) {
           this.messageService.showSuccess(`Meeting status changed to ${status}.`);
@@ -274,6 +277,11 @@ export class MeetingListComponent {
       error: (err:any) => this.messageService.handleHttpError(err)
     });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 

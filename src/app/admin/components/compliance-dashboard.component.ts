@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, signal, inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -12,6 +12,8 @@ import { CommonMethodService } from '../../core/utils/common-method.service';
 import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 interface HealthIssue {
   check: string;
@@ -222,7 +224,8 @@ interface HealthIssue {
     .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 4px; }
   `]
 })
-export class ComplianceDashboardComponent implements OnInit {
+export class ComplianceDashboardComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   complianceData = signal<any>(null);
   loading = signal<boolean>(false);
   auditColumns: any[] = [];
@@ -275,10 +278,10 @@ export class ComplianceDashboardComponent implements OnInit {
     };
 
     this.analyticsService.getComplianceDashboard(
-      params.startDate, 
-      params.endDate, 
-      params.branchId
-    ).subscribe({
+            params.startDate, 
+            params.endDate, 
+            params.branchId
+          ).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         if (res.status === 'success') {
           this.complianceData.set(res.data);
@@ -356,6 +359,11 @@ export class ComplianceDashboardComponent implements OnInit {
     ];
     this.cdr.detectChanges();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { Component, OnInit, signal, inject, ChangeDetectorRef } from '@angular/core';

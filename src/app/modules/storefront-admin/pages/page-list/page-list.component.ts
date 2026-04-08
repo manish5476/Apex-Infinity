@@ -1,9 +1,12 @@
 // src/app/features/storefront-admin/pages/page-list/page-list.component.ts
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { StorefrontAdminService, CreatePageDto } from '@core/services/storefront-admin.service';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
+
 // import { AdminPage } from '@core/models/storefront.model';
 
 // ---------------------------------------------------------------------------
@@ -722,7 +725,8 @@ function getOrgSlug(): string {
     @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
   `]
 })
-export class PageListComponent implements OnInit {
+export class PageListComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private adminService = inject(StorefrontAdminService);
   private fb           = inject(FormBuilder);
   private router       = inject(Router);
@@ -747,7 +751,7 @@ export class PageListComponent implements OnInit {
     this.loadPages();
 
     // Auto-slugify from name while slug is untouched
-    this.createForm.get('name')?.valueChanges.subscribe(name => {
+    this.createForm.get('name')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(name => {
       const slugCtrl = this.createForm.get('slug')!;
       if (name && !slugCtrl.dirty) {
         slugCtrl.setValue(slugify(name), { emitEvent: false });
@@ -758,7 +762,7 @@ export class PageListComponent implements OnInit {
   loadPages(): void {
     this.isLoading.set(true);
     this.error.set(null);
-    this.adminService.getPages().subscribe({
+    this.adminService.getPages().pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         this.pages.set(res.data ?? []);
         this.isLoading.set(false);
@@ -783,7 +787,7 @@ export class PageListComponent implements OnInit {
       return;
     }
     this.isSubmitting.set(true);
-    this.adminService.createPage(this.createForm.getRawValue() as CreatePageDto).subscribe({
+    this.adminService.createPage(this.createForm.getRawValue() as CreatePageDto).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         this.closeCreateModal();
         this.isSubmitting.set(false);
@@ -815,7 +819,7 @@ export class PageListComponent implements OnInit {
       ? this.adminService.unpublishPage(page._id)
       : this.adminService.publishPage(page._id);
 
-    request$.subscribe({
+    request$.pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.pages.update(list =>
           list.map(p => p._id === page._id ? { ...p, isPublished: !page.isPublished } : p)
@@ -826,7 +830,7 @@ export class PageListComponent implements OnInit {
   }
 
   duplicatePage(page: any): void {
-    this.adminService.duplicatePage(page._id).subscribe({
+    this.adminService.duplicatePage(page._id).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => this.loadPages(),
       error: (err: any) => this.error.set(err?.error?.message ?? 'Failed to duplicate page.')
     });
@@ -842,11 +846,16 @@ export class PageListComponent implements OnInit {
       return;
     }
     if (!confirm(`Permanently delete "${page.name}"? This cannot be undone.`)) return;
-    this.adminService.deletePage(page._id).subscribe({
+    this.adminService.deletePage(page._id).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => this.pages.update(list => list.filter(p => p._id !== page._id)),
       error: (err: any) => this.error.set(err?.error?.message ?? 'Failed to delete page.')
     });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 

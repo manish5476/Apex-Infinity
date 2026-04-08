@@ -1,8 +1,8 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule, UpperCasePipe, DecimalPipe } from '@angular/common'; // Added Pipes
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { finalize, switchMap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { finalize, switchMap, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
@@ -28,7 +28,8 @@ import { TooltipModule } from 'primeng/tooltip'; // Added for hover info
   templateUrl: './payment-details.html',
   styleUrls: ['./payment-details.scss']
 })
-export class PaymentDetailsComponent implements OnInit {
+export class PaymentDetailsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private paymentService = inject(PaymentService);
   private loadingService = inject(LoadingService);
@@ -50,7 +51,7 @@ export class PaymentDetailsComponent implements OnInit {
         return this.paymentService.getPaymentById(id).pipe(
           finalize(() => this.loadingService.hide()) 
         ); 
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe({
       next: (res: any) => {
         if (res?.data) {
@@ -115,6 +116,11 @@ export class PaymentDetailsComponent implements OnInit {
       default: return 'info';
     }
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // export class PaymentDetailsComponent implements OnInit {

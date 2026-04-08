@@ -1,7 +1,7 @@
-import { Component, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, inject, OnInit, signal, WritableSignal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UserManagementService } from '../user-management.service';
-import { catchError, map, of } from 'rxjs';
+import { catchError, map, of, Subject } from 'rxjs';
 
 // PrimeNG Modules
 import { OrganizationChartModule } from 'primeng/organizationchart';
@@ -9,6 +9,7 @@ import { TreeNode } from 'primeng/api';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TooltipModule } from 'primeng/tooltip';
 import { BadgeModule } from 'primeng/badge';
+import { takeUntil } from "rxjs/operators";
 
 interface OrgUser {
   _id: string;
@@ -30,7 +31,8 @@ interface OrgUser {
   templateUrl: './organization-heirachy-component.html',
   styleUrls: ['./organization-heirachy-component.scss']
 })
-export class OrgHierarchyComponent implements OnInit {
+export class OrgHierarchyComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private userService = inject(UserManagementService);
 
   treeNodes: WritableSignal<TreeNode[]> = signal([]);
@@ -50,7 +52,7 @@ export class OrgHierarchyComponent implements OnInit {
       catchError((err) => {
         console.error('Failed to load hierarchy', err);
         return of(null);
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       this.isLoading.set(false);
       if (res?.data) {
@@ -74,4 +76,9 @@ export class OrgHierarchyComponent implements OnInit {
     if (!name) return 'U';
     return name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

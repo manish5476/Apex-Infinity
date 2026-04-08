@@ -1,8 +1,8 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 
 // PrimeNG Modules
 import { InputTextModule } from 'primeng/inputtext';
@@ -23,6 +23,7 @@ import { UserManagementService } from '../user-management.service';
 import { AppMessageService } from '../../../core/services/message.service';
 import { LoadingService } from '../../../core/services/loading.service';
 import { MasterDropdownComponent } from '../../shared/components/masterFilterDropdown/master-dropdown.component';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-user-form',
@@ -36,7 +37,8 @@ import { MasterDropdownComponent } from '../../shared/components/masterFilterDro
   templateUrl: './user-form.html',
   styleUrl: './user-form.scss'
 })
-export class UserFormComponent implements OnInit {
+export class UserFormComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private userService = inject(UserManagementService);
   private router = inject(Router);
@@ -140,7 +142,7 @@ export class UserFormComponent implements OnInit {
 
     // React to Attendance Toggle
     const attConfig = this.userForm.get('attendanceConfig') as FormGroup;
-    attConfig.get('isAttendanceEnabled')?.valueChanges.subscribe(enabled => {
+    attConfig.get('isAttendanceEnabled')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(enabled => {
        const shiftCtrl = attConfig.get('shiftId');
        if (enabled) {
          shiftCtrl?.setValidators(Validators.required);
@@ -186,7 +188,7 @@ export class UserFormComponent implements OnInit {
     this.loadingService.show();
     
     this.userService.getUser(id)
-      .pipe(finalize(() => this.loadingService.hide()))
+      .pipe(finalize(() => this.loadingService.hide()), takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
           const user = res.data?.data || res.data?.user || res.data;
@@ -247,7 +249,7 @@ export class UserFormComponent implements OnInit {
       : this.userService.createUser(formValue);
 
     req$
-      .pipe(finalize(() => this.isSubmitting.set(false)))
+      .pipe(finalize(() => this.isSubmitting.set(false)), takeUntil(this.destroy$))
       .subscribe({
         next: () => {
           setTimeout(() => this.onCancel(), 500);
@@ -261,6 +263,11 @@ export class UserFormComponent implements OnInit {
   onCancel() {
     this.router.navigate(['/user/list']);
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // // import { Component, OnInit, inject, signal } from '@angular/core';

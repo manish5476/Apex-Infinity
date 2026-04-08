@@ -1,10 +1,12 @@
 import { MessageService } from "primeng/api";
-import { Component, inject, signal, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, inject, signal, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { NoteService } from '../../../core/services/notes.service';
 import { Note } from '../../../core/models/note.types';
 import { AppMessageService } from "../../../core/services/message.service";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-template-selector',
@@ -14,7 +16,8 @@ import { AppMessageService } from "../../../core/services/message.service";
   templateUrl: './template-selector.component.html',
   styleUrl: './template-selector.component.scss'
 })
-export class TemplateSelectorComponent implements OnInit {
+export class TemplateSelectorComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   ref = inject(DynamicDialogRef);
   noteService = inject(NoteService);
   messageService = inject(AppMessageService);
@@ -24,7 +27,7 @@ export class TemplateSelectorComponent implements OnInit {
 ngOnInit() {
     this.isLoading.set(true);
     
-    this.noteService.getTemplate().subscribe({
+    this.noteService.getTemplate().pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         const data = Array.isArray(res.data) ? res.data : (res.data.templates || [res.data.note].filter(Boolean));
         this.templates.set(data);
@@ -52,4 +55,9 @@ ngOnInit() {
     const map: any = { note: 'pi pi-file', meeting: 'pi pi-calendar', task: 'pi pi-check-square', project: 'pi pi-briefcase' };
     return map[type] || 'pi pi-file';
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

@@ -1,9 +1,9 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { finalize, switchMap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { finalize, switchMap, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 
 // PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
@@ -29,7 +29,8 @@ import { PurchaseService } from '../purchase.service';
   styleUrl: './purchase-form.scss',
 })
 
-export class PurchaseFormComponent implements OnInit {
+export class PurchaseFormComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   // --- Injections ---
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
@@ -101,7 +102,7 @@ export class PurchaseFormComponent implements OnInit {
       notes: [''],
     });
     if (!this.editMode()) { this.addItem(); }
-    this.purchaseForm.get('paidAmount')?.valueChanges.subscribe(() => this.calculateTotals());
+    this.purchaseForm.get('paidAmount')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => this.calculateTotals());
   }
 
   // --- Items Management ---
@@ -124,7 +125,7 @@ export class PurchaseFormComponent implements OnInit {
 
   addItem(): void {
     const itemGroup = this.createItem();
-    itemGroup.valueChanges.subscribe(() => {
+    itemGroup.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.calculateRowTotal(itemGroup);
       this.calculateTotals();
     });
@@ -321,7 +322,7 @@ onSubmit(): void {
       : this.purchaseService.createPurchase(fd);
 
     request$.pipe(
-      finalize(() => this.isSubmitting.set(false))
+      finalize(() => this.isSubmitting.set(false)), takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
         this.messageService.showSuccess(`Purchase ${this.editMode() ? 'updated' : 'saved'} successfully.`);
@@ -343,7 +344,7 @@ onSubmit(): void {
           return this.purchaseService.getPurchaseById(this.purchaseId);
         }
         return of(null);
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe({
       next: (res: any) => {
         if (!res) return; 
@@ -379,7 +380,7 @@ onSubmit(): void {
           itemPatch.productId = itemPatch.productId._id;
         }
         group.patchValue(itemPatch);
-        group.valueChanges.subscribe(() => {
+        group.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
           this.calculateRowTotal(group);
           this.calculateTotals();
         });
@@ -389,4 +390,9 @@ onSubmit(): void {
     }
     this.calculateTotals();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

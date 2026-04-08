@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -7,6 +7,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { OrganizationService } from '../../../organization/organization.service';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-find-shop',
@@ -16,7 +18,8 @@ import { OrganizationService } from '../../../organization/organization.service'
   templateUrl: './find-shop.html',
   styleUrl: './find-shop.scss'
 })
-export class FindShopComponent {
+export class FindShopComponent implements OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private orgService = inject(OrganizationService);
   private messageService = inject(AppMessageService);
@@ -35,7 +38,7 @@ export class FindShopComponent {
 
     this.isLoading.set(true);
 
-    this.orgService.lookupOrganizations({ email: this.findForm.value.email! }).subscribe({
+    this.orgService.lookupOrganizations({ email: this.findForm.value.email! }).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.isLoading.set(false);
         // Emulate sending real time id to verify
@@ -48,4 +51,9 @@ export class FindShopComponent {
       }
     });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

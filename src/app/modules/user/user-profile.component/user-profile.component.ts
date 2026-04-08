@@ -1,7 +1,7 @@
-import { Component, inject, computed, ElementRef, viewChild, signal, WritableSignal, OnInit } from '@angular/core';
+import { Component, inject, computed, ElementRef, viewChild, signal, WritableSignal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe, KeyValuePipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { catchError, map, of } from 'rxjs';
+import { catchError, map, of, Subject } from 'rxjs';
 import { UserManagementService } from '../user-management.service';
 
 // PrimeNG
@@ -12,6 +12,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToggleButtonModule } from 'primeng/togglebutton';
+import { takeUntil } from "rxjs/operators";
 
 interface Device { _id: string; deviceId: string; deviceType: string; lastActive: string; userAgent: string; }
 
@@ -38,7 +39,8 @@ interface User {
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.scss']
 })
-export class UserProfileComponent implements OnInit {
+export class UserProfileComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private userService = inject(UserManagementService);
   private fb = inject(FormBuilder);
   fileInputRef = viewChild<ElementRef<HTMLInputElement>>('fileInput');
@@ -58,7 +60,7 @@ export class UserProfileComponent implements OnInit {
   loadProfile() {
     this.userService.getMe().pipe(
       map((res: any) => res.data.user as User),
-      catchError(() => of(null))
+      catchError(() => of(null)), takeUntil(this.destroy$)
     ).subscribe(user => {
       if (user) this.currentUser.set(user);
     });
@@ -118,7 +120,7 @@ export class UserProfileComponent implements OnInit {
       'employeeProfile.guarantorDetails': val.employeeProfile.guarantorDetails
     };
 
-    this.userService.updateMyProfile(payload).subscribe({
+    this.userService.updateMyProfile(payload).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         this.currentUser.set(res.data.user);
         this.isSaving.set(false);
@@ -131,7 +133,7 @@ export class UserProfileComponent implements OnInit {
   // --- Device Management ---
   revokeDevice(sessionId: string) {
     this.revokingDeviceId.set(sessionId);
-    this.userService.revokeDevice(sessionId).subscribe({
+    this.userService.revokeDevice(sessionId).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         // Optimistically remove the device from the UI array without reloading the user
         this.currentUser.update(user => {
@@ -161,7 +163,7 @@ export class UserProfileComponent implements OnInit {
     const formData = new FormData();
     formData.append('photo', file);
 
-    this.userService.uploadProfilePhoto(formData).subscribe({
+    this.userService.uploadProfilePhoto(formData).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         this.uploading.set(false);
         this.currentUser.set(res.data.user);
@@ -189,4 +191,9 @@ export class UserProfileComponent implements OnInit {
     if (lower.includes('mobile') || lower.includes('android') || lower.includes('iphone')) return 'pi-mobile';
     return 'pi-desktop';
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

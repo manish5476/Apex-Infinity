@@ -1,12 +1,13 @@
-import { Component, OnInit, inject, signal, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '../../services/product-service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
 import { ButtonModule } from 'primeng/button';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 import { ImageCellRendererComponent } from '../../../shared/AgGrid/AgGridcomponents/image-cell-renderer/image-cell-renderer.component';
 import { RouterModule } from '@angular/router';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-low-stock-report',
@@ -15,7 +16,8 @@ import { RouterModule } from '@angular/router';
   templateUrl: './low-stock-report.html',
   styleUrls: ['./low-stock-report.scss']
 })
-export class LowStockReportComponent implements OnInit {
+export class LowStockReportComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private productService = inject(ProductService);
   private messageService = inject(AppMessageService);
   private cdr = inject(ChangeDetectorRef);
@@ -85,7 +87,7 @@ export class LowStockReportComponent implements OnInit {
       .pipe(finalize(() => {
         this.isLoading.set(false);
         this.cdr.detectChanges();
-      }))
+      }), takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
           if (res?.data?.products) {
@@ -105,4 +107,9 @@ export class LowStockReportComponent implements OnInit {
   refresh() {
     this.loadData();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

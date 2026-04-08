@@ -1,9 +1,9 @@
 
-import { Component, OnInit, inject, signal, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
-import { finalize, switchMap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { finalize, switchMap, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 import { FormsModule } from '@angular/forms'; // Added
 
 // AG Grid
@@ -44,7 +44,8 @@ import { DynamicDialogServices } from '../../../../core/services/dynamic-dialog-
   styleUrls: ['./supplier-detail.scss'],
   providers: [DialogService]
 })
-export class SupplierDetailsComponent implements OnInit {
+export class SupplierDetailsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   // Injections
   private dialogHelper = inject(DynamicDialogServices);
   private route = inject(ActivatedRoute);
@@ -102,7 +103,7 @@ export class SupplierDetailsComponent implements OnInit {
         return this.supplierService.getSupplierById(id).pipe(
           finalize(() => this.loading.set(false))
         );
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe({
       next: (res: any) => {
         if (res?.data?.data || res?.data) {
@@ -216,7 +217,7 @@ export class SupplierDetailsComponent implements OnInit {
   openSupplierKyc(supplier: any) {
     const ref = this.dialogHelper.openSupplierKyc(supplier._id);
     if (ref) {
-      ref.onClose.subscribe((result) => {
+      ref.onClose.pipe(takeUntil(this.destroy$)).subscribe((result) => {
         if (result === 'success') {
           // Changed to showSuccess (since 'success' makes more sense here) 
           // and simplified to a single clean string.
@@ -229,7 +230,7 @@ export class SupplierDetailsComponent implements OnInit {
   openSupplierLedger(supplier: any) {
     const ref = this.dialogHelper.openSupplierLedger(supplier._id);
     if (ref) {
-      ref.onClose.subscribe(() => {
+      ref.onClose.pipe(takeUntil(this.destroy$)).subscribe(() => {
         // Optional: refresh data if ledger interactions affected anything
       });
     }
@@ -239,7 +240,7 @@ export class SupplierDetailsComponent implements OnInit {
     // Pass the supplier object. Make sure your dynamic dialog service expects a supplier!
     const ref = this.dialogHelper.openSupplierDashboard(supplier);
     if (ref) {
-      ref.onClose.subscribe((success: boolean) => {
+      ref.onClose.pipe(takeUntil(this.destroy$)).subscribe((success: boolean) => {
         if (success) {
           this.getTransactions(true); // Refresh if needed
         }
@@ -270,7 +271,7 @@ export class SupplierDetailsComponent implements OnInit {
       if (this.rangeDates[1]) queryParams.endDate = this.formatDateForApi(this.rangeDates[1]);
     }
 
-    this.transactionService.getSupplierTransactions(supplierId, queryParams).subscribe({
+    this.transactionService.getSupplierTransactions(supplierId, queryParams).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         let newData = res.results || [];
         this.txnTotal = res.total || this.txnTotal;
@@ -369,4 +370,8 @@ export class SupplierDetailsComponent implements OnInit {
   //     }
   //   });
   // }
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

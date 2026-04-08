@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { forkJoin, of } from 'rxjs';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { forkJoin, of, Subject } from 'rxjs';
+import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
 
 // Services
 import { MessageService } from 'primeng/api';
@@ -409,7 +409,8 @@ import { AppMessageService } from '@core/services/message.service';
     }
   `]
 })
-export class LeaveHubComponent implements OnInit {
+export class LeaveHubComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
   private router = inject(Router);
@@ -441,7 +442,7 @@ export class LeaveHubComponent implements OnInit {
         catchError(() => of([]))
       )
     }).pipe(
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe(({ balances, myReqs, approvals }) => {
       this.balances.set(balances);
       this.myRequests.set(myReqs);
@@ -489,4 +490,9 @@ export class LeaveHubComponent implements OnInit {
     if (!name || name.trim() === '') return '?';
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

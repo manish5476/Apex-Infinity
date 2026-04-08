@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, ChangeDetectorRef, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TabsModule } from 'primeng/tabs'; 
 import { ButtonModule } from 'primeng/button';
@@ -13,6 +13,8 @@ import { CommonMethodService } from '../../core/utils/common-method.service';
 import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-time-analytics',
@@ -306,7 +308,8 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
     }
   `]
 })
-export class TimeAnalyticsComponent implements OnInit {
+export class TimeAnalyticsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   public commonService = inject(CommonMethodService);
   private analyticsService = inject(AdminAnalyticsService);
   private cdr = inject(ChangeDetectorRef);
@@ -374,7 +377,7 @@ export class TimeAnalyticsComponent implements OnInit {
     // Pass branch context
     const branchId = this.currentFilters.branchId;
 
-    this.analyticsService.getTimeBasedAnalytics(branchId).subscribe({
+    this.analyticsService.getTimeBasedAnalytics(branchId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         if (res.status === 'success') {
           this.timeData.set(res.data);
@@ -419,6 +422,11 @@ export class TimeAnalyticsComponent implements OnInit {
 
     this.cdr.detectChanges();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { Component, OnInit, signal, computed, ChangeDetectorRef } from '@angular/core';

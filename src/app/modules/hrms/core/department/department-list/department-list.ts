@@ -1,14 +1,15 @@
-import { ChangeDetectorRef, Component, OnInit, effect, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, effect, inject, signal, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { finalize } from 'rxjs/operators';
+import { finalize, takeUntil } from 'rxjs/operators';
 
 import { MasterListService } from '../../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../../core/services/message.service';
 import { HRMSService } from '../../../hrms.service';
 import { AgShareGrid, ActionColumnConfig } from '../../../../shared/components/ag-shared-grid';
 import { PERMISSIONS } from '../../../../../core/auth/permissions.constants';
+import { Subject } from "rxjs";
 
 @Component({
   selector: 'app-department-list',
@@ -227,7 +228,8 @@ import { PERMISSIONS } from '../../../../../core/auth/permissions.constants';
     }
   `]
 })
-export class DepartmentListComponent implements OnInit {
+export class DepartmentListComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
@@ -353,7 +355,7 @@ export class DepartmentListComponent implements OnInit {
       .pipe(finalize(() => {
         this.isLoading = false;
         this.cdr.markForCheck();
-      }))
+      }), takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
           const newData = res.data?.data || [];
@@ -385,6 +387,11 @@ export class DepartmentListComponent implements OnInit {
         break;
     }
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 // import { ChangeDetectorRef, Component, OnInit, effect, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 // import { CommonModule } from '@angular/common';

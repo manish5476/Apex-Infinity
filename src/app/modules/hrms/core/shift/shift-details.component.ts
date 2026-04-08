@@ -1,8 +1,8 @@
 import { ShiftAssignment } from "./../../hrms.service";
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe, TitleCasePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of, catchError, map, finalize } from 'rxjs';
+import { of, catchError, map, finalize, Subject } from 'rxjs';
 
 // PrimeNG Imports
 import { CardModule } from 'primeng/card';
@@ -11,6 +11,7 @@ import { TagModule } from 'primeng/tag';
 
 import { AppMessageService } from '../../../../core/services/message.service';
 import { HRMSService } from '../../hrms.service';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-shift-details',
@@ -408,7 +409,8 @@ import { HRMSService } from '../../hrms.service';
     }
   `]
 })
-export class ShiftDetailsComponent implements OnInit {
+export class ShiftDetailsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private hrmsService = inject(HRMSService);
@@ -425,7 +427,7 @@ export class ShiftDetailsComponent implements OnInit {
   };
 
   ngOnInit() {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.shiftId = params.get('id');
       if (this.shiftId) {
         this.loadShiftDetails();
@@ -445,7 +447,7 @@ export class ShiftDetailsComponent implements OnInit {
         this.messageService.handleHttpError(err)
         return of(null);
       }),
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe(data => {
       if (data) {
         this.shift.set(data);
@@ -479,6 +481,11 @@ export class ShiftDetailsComponent implements OnInit {
   goBack() {
     this.router.navigate(['/hrms/shifts/list']);
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 // import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 // import { CommonModule } from '@angular/common';

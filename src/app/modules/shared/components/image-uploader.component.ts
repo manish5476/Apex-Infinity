@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Output, inject, signal, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, EventEmitter, Output, inject, signal, Input, OnInit, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { finalize } from 'rxjs/operators';
-import { Observable, of } from 'rxjs';
+import { finalize, takeUntil } from 'rxjs/operators';
+import { Observable, of, Subject } from 'rxjs';
 
 // --- PrimeNG Modules ---
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -186,7 +186,8 @@ import { AppMessageService } from '../../../core/services/message.service';
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ImageUploaderComponent implements OnInit {
+export class ImageUploaderComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   // Dependencies
   protected config = inject(DynamicDialogConfig, { optional: true });
   protected ref = inject(DynamicDialogRef, { optional: true });
@@ -257,7 +258,7 @@ export class ImageUploaderComponent implements OnInit {
     if (uploadFn) {
       this.isUploading.set(true);
       uploadFn(file).pipe(
-        finalize(() => this.isUploading.set(false))
+        finalize(() => this.isUploading.set(false)), takeUntil(this.destroy$)
       ).subscribe({
         next: (res) => {
           this.appMessage.showSuccess(`Upload Complete Your image has been saved successfully.`);
@@ -274,4 +275,9 @@ export class ImageUploaderComponent implements OnInit {
       if (this.isDialog()) this.ref?.close(file);
     }
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

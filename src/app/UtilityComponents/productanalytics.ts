@@ -1,11 +1,12 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TabsModule } from 'primeng/tabs';
-import { finalize } from 'rxjs';
-import { InvoiceService } from '../modules/invoice/services/invoice-service'; // Check path
+import { finalize, Subject } from 'rxjs';
+import { InvoiceService } from '../modules/invoice/services/invoice-service';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-product-analytics-dialog',
@@ -177,7 +178,8 @@ import { InvoiceService } from '../modules/invoice/services/invoice-service'; //
   `,
   styleUrls: ['./product-analytics-dialog.component.scss']
 })
-export class ProductAnalyticsDialogComponent implements OnInit {
+export class ProductAnalyticsDialogComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private config = inject(DynamicDialogConfig);
   private invoiceService = inject(InvoiceService);
 // Inject Ref
@@ -200,7 +202,7 @@ export class ProductAnalyticsDialogComponent implements OnInit {
 
   loadData(id: string) {
     this.invoiceService.getProductProfitAnalysis(id)
-      .pipe(finalize(() => this.loading.set(false)))
+      .pipe(finalize(() => this.loading.set(false)), takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
           if (res.status === 'success') {
@@ -209,6 +211,11 @@ export class ProductAnalyticsDialogComponent implements OnInit {
         }
       });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { Component, OnInit, inject, signal } from '@angular/core';

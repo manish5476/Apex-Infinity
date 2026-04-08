@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl } from '@angular/forms';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -10,6 +10,8 @@ import { ProductService } from '../../services/product-service';
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { InputTextModule } from 'primeng/inputtext';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-stock-transfer',
@@ -18,7 +20,8 @@ import { InputTextModule } from 'primeng/inputtext';
   templateUrl: './stoct-transfer.html',
   styleUrls: ['./stoct-transfer.scss'],
 })
-export class StockTransferComponent implements OnInit {
+export class StockTransferComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   // Services
   private fb = inject(FormBuilder);
   private productService = inject(ProductService);
@@ -73,7 +76,7 @@ export class StockTransferComponent implements OnInit {
       return;
     }
     const payload = this.transferForm.value;
-    this.productService.transferProductStock(productId, payload).subscribe({
+    this.productService.transferProductStock(productId, payload).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.messageService.showSuccess('Transfer initiated successfully');
         this.ref.close(true);
@@ -88,4 +91,9 @@ export class StockTransferComponent implements OnInit {
   onCancel() {
     this.ref.close(false);
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

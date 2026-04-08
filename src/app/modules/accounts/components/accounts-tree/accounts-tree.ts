@@ -1,15 +1,19 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { TreeNode } from 'primeng/api';
 import { AccountService } from '../../accounts';
 import { TreeModule } from 'primeng/tree';
 import { AppMessageService } from '../../../../core/services/message.service';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
+
 @Component({
   selector: 'app-account-tree',
   imports: [TreeModule],
   templateUrl: './accounts-tree.html',
   styleUrl: './accounts-tree.scss',
 })
-export class AccountTreeComponent implements OnInit {
+export class AccountTreeComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
 private messageService=inject(AppMessageService)
   treeNodes: TreeNode[] = [];
   loading = false;
@@ -23,7 +27,7 @@ private messageService=inject(AppMessageService)
   loadTree(): void {
     this.loading = true;
     
-    this.accountService.getAccountHierarchy().subscribe({
+    this.accountService.getAccountHierarchy().pipe(takeUntil(this.destroy$)).subscribe({
       next: res => {
         this.treeNodes = this.mapToTreeNodes(res.data);
         this.loading = false;
@@ -46,4 +50,9 @@ private messageService=inject(AppMessageService)
         : []
     }));
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

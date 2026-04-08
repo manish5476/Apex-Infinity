@@ -1,7 +1,7 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of, catchError, map, finalize } from 'rxjs';
+import { of, catchError, map, finalize, Subject } from 'rxjs';
 
 // Services
 import { AppMessageService } from '../../../../core/services/message.service';
@@ -12,6 +12,7 @@ import { CardModule } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-designation-details',
@@ -458,7 +459,8 @@ import { TooltipModule } from 'primeng/tooltip';
     }
   `]
 })
-export class DesignationDetailsComponent implements OnInit {
+export class DesignationDetailsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private hrmsService = inject(HRMSService);
@@ -469,7 +471,7 @@ export class DesignationDetailsComponent implements OnInit {
   desigId: string | null = null;
 
   ngOnInit() {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.desigId = params.get('id');
       if (this.desigId) {
         this.loadDesignationDetails();
@@ -490,7 +492,7 @@ export class DesignationDetailsComponent implements OnInit {
         this.messageService.handleHttpError(err);
         return of(null);
       }),
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe(data => {
       this.designation.set(data || null);
     });
@@ -505,6 +507,11 @@ export class DesignationDetailsComponent implements OnInit {
   goBack() {
     this.router.navigate(['/hrms/designation/list']);
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 // import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 // import { CommonModule, DecimalPipe } from '@angular/common';

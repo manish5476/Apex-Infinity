@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -6,6 +6,8 @@ import { AppMessageService } from '../../../../core/services/message.service';
 import { AgShareGrid, ActionColumnConfig } from '../../../shared/components/ag-shared-grid';
 import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 import { HRMSService } from '../../hrms.service';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-designation-list',
@@ -232,7 +234,8 @@ import { HRMSService } from '../../hrms.service';
     }
   `]
 })
-export class DesignationListComponent implements OnInit {
+export class DesignationListComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
@@ -295,7 +298,7 @@ export class DesignationListComponent implements OnInit {
       limit: this.pageSize
     };
 
-    this.hrmsService.getDesignations(params).subscribe({
+    this.hrmsService.getDesignations(params).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         const newData = res.data?.designations || res.data?.data || [];
         const pagination = res.pagination; 
@@ -348,7 +351,7 @@ export class DesignationListComponent implements OnInit {
   }
 
   private deleteDesignation(id: string) {
-    this.hrmsService.deleteDesignation(id).subscribe({
+    this.hrmsService.deleteDesignation(id).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.messageService.showSuccess( 'Designation removed successfully');
         this.getData(true);
@@ -452,6 +455,11 @@ export class DesignationListComponent implements OnInit {
     ];
     this.cdr.detectChanges();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { ChangeDetectorRef, Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';

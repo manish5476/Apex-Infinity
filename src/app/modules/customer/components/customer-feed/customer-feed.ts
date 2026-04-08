@@ -1,6 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CustomerService } from '../../services/customer-service';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-customer-feed',
@@ -9,7 +11,8 @@ import { CustomerService } from '../../services/customer-service';
   templateUrl: './customer-feed.html',
   styleUrls: ['./customer-feed.scss']
 })
-export class CustomerFeedComponent implements OnInit {
+export class CustomerFeedComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   @Input() customerId!: string;
   feedItems: any[] = [];
   loading = false;
@@ -24,7 +27,7 @@ export class CustomerFeedComponent implements OnInit {
 
   loadFeed() {
     this.loading = true;
-    this.customerService.getCustomerFeed(this.customerId).subscribe({
+    this.customerService.getCustomerFeed(this.customerId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.feedItems = res.data.feed;
         this.loading = false;
@@ -51,4 +54,9 @@ export class CustomerFeedComponent implements OnInit {
     if (s === 'cancelled') return 'badge-error';
     return 'badge-ghost';
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ProductCardComponent } from '../../components/product-card/product-card';
 import { ProductSliderConfig } from '@core/models/storefront.model';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-product-slider',
@@ -14,6 +16,8 @@ import { ProductSliderConfig } from '@core/models/storefront.model';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductSliderComponent implements OnInit, AfterViewInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
+
   @Input() set config(v: ProductSliderConfig) { this._config.set(v ?? {}); }
   private _config = signal<ProductSliderConfig>({});
   
@@ -62,7 +66,7 @@ export class ProductSliderComponent implements OnInit, AfterViewInit, OnDestroy 
   });
 
   ngOnInit(): void {
-    this.route.parent?.paramMap.subscribe(params => {
+    this.route.parent?.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.orgSlug.set(params.get('orgSlug') || '');
     });
   }
@@ -76,6 +80,8 @@ export class ProductSliderComponent implements OnInit, AfterViewInit, OnDestroy 
 
   ngOnDestroy() {
     this.pauseAutoSlide();
+      this.destroy$.next();
+      this.destroy$.complete();
   }
 
   scroll(direction: 'left' | 'right') {

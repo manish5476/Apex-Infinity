@@ -1,13 +1,13 @@
 import { MessageService } from "primeng/api";
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { NoteService } from '../../core/services/notes.service';
 import { AppMessageService } from "../../core/services/message.service";
-import { finalize } from "rxjs";
+import { finalize, Subject } from "rxjs";
 import { DatePickerModule } from 'primeng/datepicker';
-
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-note-export-dialog',
@@ -245,7 +245,8 @@ import { DatePickerModule } from 'primeng/datepicker';
     }
     @keyframes spin { to { transform: rotate(360deg); } }
   `]
-})export class NoteExportDialogComponent {
+})export class NoteExportDialogComponent implements OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   ref = inject(DynamicDialogRef);
   config = inject(DynamicDialogConfig);
   noteService = inject(NoteService);
@@ -281,7 +282,7 @@ import { DatePickerModule } from 'primeng/datepicker';
       finalize(() => {
         this.isLoading = false;
         this.cdr.markForCheck();
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe({
       next: (response) => {
         const timestamp = new Date().toISOString().split('T')[0];
@@ -323,4 +324,9 @@ import { DatePickerModule } from 'primeng/datepicker';
     document.body.removeChild(a);
     this.ref.close();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

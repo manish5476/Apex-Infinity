@@ -1,7 +1,7 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, finalize, forkJoin, of } from 'rxjs';
+import { catchError, finalize, forkJoin, of, Subject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 
 // Services
@@ -18,6 +18,7 @@ import { PickListModule } from 'primeng/picklist';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-geofence-details',
@@ -312,7 +313,8 @@ import { ToastModule } from 'primeng/toast';
     }
   `]
 })
-export class GeofenceDetailsComponent implements OnInit {
+export class GeofenceDetailsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private hrmsService = inject(HRMSService);
@@ -349,7 +351,7 @@ export class GeofenceDetailsComponent implements OnInit {
       fenceData: this.hrmsService.getGeoFence(this.fenceId).pipe(catchError(() => of(null))),
       statsData: this.hrmsService.getGeoFenceStats(this.fenceId).pipe(catchError(() => of(null)))
     }).pipe(
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe(({ fenceData, statsData }) => {
       if (fenceData?.data?.geofence) {
         this.fence.set(fenceData.data.geofence);
@@ -369,7 +371,7 @@ export class GeofenceDetailsComponent implements OnInit {
         this.messageService.handleHttpError(err)
         return of(null);
       }),
-      finalize(() => this.isAssigning.set(false))
+      finalize(() => this.isAssigning.set(false)), takeUntil(this.destroy$)
     ).subscribe((res:any) => {
       if (res) {
         this.messageService.showSuccess(res.message || 'Users Assigned')
@@ -391,7 +393,7 @@ export class GeofenceDetailsComponent implements OnInit {
         this.messageService.handleHttpError(err)
         return of({ data: { isInside: false, distance: 0 } });
       }),
-      finalize(() => this.isTesting.set(false))
+      finalize(() => this.isTesting.set(false)), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       this.testResult.set(res?.data || { isInside: true, distance: 15.4 });
     });
@@ -400,6 +402,11 @@ export class GeofenceDetailsComponent implements OnInit {
   onBack() { 
     this.router.navigate(['/hrms/geofence']); 
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';

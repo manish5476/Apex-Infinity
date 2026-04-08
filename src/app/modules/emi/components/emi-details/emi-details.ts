@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -28,6 +28,8 @@ import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
 import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-emi-details',
@@ -42,7 +44,8 @@ import { PERMISSIONS } from '@core/auth/permissions.constants';
   templateUrl: './emi-details.html',
   styleUrl: './emi-details.scss'
 })
-export class EmiDetailsComponent implements OnInit {
+export class EmiDetailsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   // --- Injections ---
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -109,7 +112,7 @@ export class EmiDetailsComponent implements OnInit {
 
   ngOnInit() {
     this.setupColumns();
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const id = params.get('id');
       if (id) {
         this.fetchEmiDetails(id);
@@ -328,7 +331,7 @@ export class EmiDetailsComponent implements OnInit {
   }
 
   fetchEmiHistory(emiId: string) {
-    this.emiService.getEmiHistory(emiId).subscribe({
+    this.emiService.getEmiHistory(emiId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         this.historyData.set(res.data?.history || []);
         this.cdr.markForCheck();
@@ -343,4 +346,9 @@ export class EmiDetailsComponent implements OnInit {
     dueDate.setHours(0, 0, 0, 0); today.setHours(0, 0, 0, 0);
     return dueDate < today;
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

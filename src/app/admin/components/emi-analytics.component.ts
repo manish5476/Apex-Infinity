@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TooltipModule } from 'primeng/tooltip';
@@ -7,6 +7,8 @@ import { CommonMethodService } from '../../core/utils/common-method.service';
 import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 interface EMIData {
   _id: string;
@@ -565,7 +567,8 @@ interface EMIData {
 }
   `]
 })
-export class EmiAnalyticsComponent implements OnInit {
+export class EmiAnalyticsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   emiRawData = signal<EMIData[]>([]);
   loading    = signal(false);
   emiColumns: any[] = [];
@@ -602,7 +605,7 @@ export class EmiAnalyticsComponent implements OnInit {
 
   loadData(): void {
     this.loading.set(true);
-    this.analyticsService.getEMIAnalytics(this.currentFilters['branchId']).subscribe({
+    this.analyticsService.getEMIAnalytics(this.currentFilters['branchId']).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         if (res.status === 'success') this.emiRawData.set(res.data);
         this.loading.set(false);
@@ -666,6 +669,11 @@ export class EmiAnalyticsComponent implements OnInit {
     ];
     this.cdr.detectChanges();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 // import { Component, OnInit, signal, computed, ChangeDetectorRef, inject } from '@angular/core';
 // import { CommonModule } from '@angular/common';

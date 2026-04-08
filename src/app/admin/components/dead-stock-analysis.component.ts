@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, ChangeDetectorRef, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 // PrimeNG Imports
@@ -13,7 +13,8 @@ import { CommonMethodService } from '../../core/utils/common-method.service';
 import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
-
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 interface DeadStockItem {
   _id: string;
@@ -232,7 +233,8 @@ interface DeadStockItem {
     .loader-text { font-size: 12px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
   `]
 })
-export class DeadStockAnalysisComponent implements OnInit {
+export class DeadStockAnalysisComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   deadStock = signal<DeadStockItem[]>([]);
   loading = signal<boolean>(true);
   stockColumns: any[] = [];
@@ -294,7 +296,7 @@ export class DeadStockAnalysisComponent implements OnInit {
     const branchId = this.currentFilters.branchId;
     const days = this.currentFilters.days || 90;
 
-    this.analyticsService.getDeadStockReport(branchId, days).subscribe({
+    this.analyticsService.getDeadStockReport(branchId, days).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         if (res.status === 'success') {
           this.deadStock.set(res.data);
@@ -390,4 +392,9 @@ export class DeadStockAnalysisComponent implements OnInit {
     ];
     this.cdr.detectChanges();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

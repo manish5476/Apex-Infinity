@@ -1,5 +1,5 @@
 
-import { ChangeDetectorRef, Component, OnInit, effect, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, effect, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -18,10 +18,11 @@ import { AppMessageService } from '../../../core/services/message.service';
 import { ImageCellRendererComponent } from '../../shared/AgGrid/AgGridcomponents/image-cell-renderer/image-cell-renderer.component';
 import { AgShareGrid, ActionColumnConfig } from '../../shared/components/ag-shared-grid';
 import { UserManagementService } from '../user-management.service';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
 import { DynamicDialogServices } from '../../../core/services/dynamic-dialog-services';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-user-list',
@@ -42,7 +43,8 @@ import { DynamicDialogServices } from '../../../core/services/dynamic-dialog-ser
   templateUrl: './user-list.html',
   styleUrl: './user-list.scss'
 })
-export class UserListComponent implements OnInit {
+export class UserListComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   readonly PERMISSIONS = PERMISSIONS;
 
   readonly userActionColumn: ActionColumnConfig = {
@@ -117,7 +119,7 @@ export class UserListComponent implements OnInit {
 
       // Handle direct dialog triggers on specific columns
       if (event.field === 'security') {
-        this.dynamicDialog.openUserStatus(event.row)?.onClose.subscribe(result => {
+        this.dynamicDialog.openUserStatus(event.row)?.onClose.pipe(takeUntil(this.destroy$)).subscribe(result => {
           if (result) this.getData(false); // Refresh row data
         });
         return;
@@ -182,7 +184,7 @@ export class UserListComponent implements OnInit {
         finalize(() => {
           this.isLoading = false;
           this.cdr.markForCheck();
-        })
+        }), takeUntil(this.destroy$)
       )
       .subscribe({
         next: (res: any) => {
@@ -209,7 +211,7 @@ export class UserListComponent implements OnInit {
 
   private deleteUser(id: string) {
     // Note: Usually, you'd wrap this in a ConfirmationService call first
-    this.userService.deleteUser(id).subscribe({
+    this.userService.deleteUser(id).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.messageService.showSuccess('User removed successfully.');
         // Refresh the list from page 1
@@ -407,4 +409,9 @@ export class UserListComponent implements OnInit {
     ];
     this.cdr.detectChanges();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

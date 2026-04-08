@@ -1,12 +1,13 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { finalize } from 'rxjs/operators';
+import { finalize, takeUntil } from 'rxjs/operators';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 
 // Services
 import { SalesReturnService, RejectSalesReturnPayload } from '../../../../core/services/sales.return.service';
 import { AppMessageService } from '../../../../core/services/message.service';
+import { Subject } from "rxjs";
 
 @Component({
   selector: 'app-sales-return-action-dialog',
@@ -333,7 +334,8 @@ import { AppMessageService } from '../../../../core/services/message.service';
     }
   `]
 })
-export class SalesReturnActionDialogComponent implements OnInit {
+export class SalesReturnActionDialogComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private config = inject(DynamicDialogConfig);
   private ref = inject(DynamicDialogRef);
   private fb = inject(FormBuilder);
@@ -378,7 +380,7 @@ export class SalesReturnActionDialogComponent implements OnInit {
       
       // Update this service call if your backend specifically requires a different payload key for approvals
       this.salesReturnService.approveReturn(this.returnId, payload)
-        .pipe(finalize(() => this.isSubmitting.set(false)))
+        .pipe(finalize(() => this.isSubmitting.set(false)), takeUntil(this.destroy$))
         .subscribe({
           next: () => {
             this.messageService.showSuccess(`Return ${this.returnNumber} approved successfully`);
@@ -392,7 +394,7 @@ export class SalesReturnActionDialogComponent implements OnInit {
       };
       
       this.salesReturnService.rejectReturn(this.returnId, payload)
-        .pipe(finalize(() => this.isSubmitting.set(false)))
+        .pipe(finalize(() => this.isSubmitting.set(false)), takeUntil(this.destroy$))
         .subscribe({
           next: () => {
             this.messageService.showSuccess(`Return ${this.returnNumber} rejected`);
@@ -406,6 +408,11 @@ export class SalesReturnActionDialogComponent implements OnInit {
   cancel(): void {
     this.ref.close();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { Component, OnInit, inject, signal } from '@angular/core';

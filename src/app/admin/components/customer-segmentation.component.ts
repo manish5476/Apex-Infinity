@@ -1,8 +1,10 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TooltipModule } from 'primeng/tooltip';
 import { AdminAnalyticsService } from '../admin-analytics.service';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 interface SegmentationData {
   Champion:        number;
@@ -315,7 +317,8 @@ interface SegmentationData {
 }
   `]
 })
-export class CustomerSegmentationComponent implements OnInit {
+export class CustomerSegmentationComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   segments       = signal<{ key: string; value: number }[]>([]);
   totalCustomers = signal(0);
   loading        = signal(true);
@@ -326,7 +329,7 @@ export class CustomerSegmentationComponent implements OnInit {
 
   loadSegmentation(): void {
     this.loading.set(true);
-    this.analyticsService.getCustomerSegmentation().subscribe({
+    this.analyticsService.getCustomerSegmentation().pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         if (res.status === 'success') {
           const data = res.data as SegmentationData;
@@ -375,6 +378,11 @@ export class CustomerSegmentationComponent implements OnInit {
   getNewCustomerCount(): number {
     return this.segments().find(s => s.key === 'New Customer')?.value ?? 0;
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { Component, OnInit, signal } from '@angular/core';

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -8,6 +8,8 @@ import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../services/auth-service';
 import { AppMessageService } from '../../../../core/services/message.service';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-forgot-password',
@@ -17,7 +19,8 @@ import { AppMessageService } from '../../../../core/services/message.service';
   templateUrl: './forgot-password.html',
   styleUrl: './forgot-password.scss'
 })
-export class ForgotPasswordComponent {
+export class ForgotPasswordComponent implements OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private messageService = inject(AppMessageService);
@@ -37,7 +40,7 @@ export class ForgotPasswordComponent {
 
     this.isLoading.set(true);
 
-    this.authService.forgotPassword(this.forgotForm.value.email!).subscribe({
+    this.authService.forgotPassword(this.forgotForm.value.email!).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.isLoading.set(false);
         this.messageService.showSuccess('Check your inbox for reset instructions.');
@@ -51,4 +54,9 @@ export class ForgotPasswordComponent {
       }
     });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

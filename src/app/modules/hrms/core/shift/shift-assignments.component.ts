@@ -1,9 +1,9 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, computed, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { catchError, map, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { catchError, map, finalize, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 
 // Services
 import { MessageService } from 'primeng/api';
@@ -410,7 +410,8 @@ import { AppMessageService } from '@core/services/message.service';
     }
   `]
 })
-export class ShiftAssignmentsComponent implements OnInit {
+export class ShiftAssignmentsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private hrmsService = inject(HRMSService);
@@ -457,7 +458,7 @@ export class ShiftAssignmentsComponent implements OnInit {
         this.messageService.handleHttpError(error)
         return of([]);
       }),
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe((users: any[]) => {
       this.assignedUsers.set(users);
     });
@@ -475,6 +476,11 @@ export class ShiftAssignmentsComponent implements OnInit {
   onAssignNew() {
     this.messageService.showInfo( 'Assign new employee modal would open here.');
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 // import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 // import { CommonModule } from '@angular/common';

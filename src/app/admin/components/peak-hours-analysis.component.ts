@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TooltipModule } from 'primeng/tooltip';
@@ -8,6 +8,8 @@ import { ButtonModule } from 'primeng/button';
 import { AdminAnalyticsService } from '../admin-analytics.service';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 // Components
 
@@ -358,7 +360,8 @@ interface PeakData {
     }
   `]
 })
-export class PeakHoursAnalysisComponent implements OnInit {
+export class PeakHoursAnalysisComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   rawData = signal<PeakData[]>([]);
   loading = signal<boolean>(false); // Start false, filter triggers load
 
@@ -402,7 +405,7 @@ export class PeakHoursAnalysisComponent implements OnInit {
     // Pass branch context
     const branchId = this.currentFilters.branchId;
 
-    this.analyticsService.getPeakBusinessHours(branchId).subscribe({
+    this.analyticsService.getPeakBusinessHours(branchId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         if (res.status === 'success') {
           this.rawData.set(res.data);
@@ -424,6 +427,11 @@ export class PeakHoursAnalysisComponent implements OnInit {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
     return days[day] || days[0];
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { Component, OnInit, signal, computed } from '@angular/core';

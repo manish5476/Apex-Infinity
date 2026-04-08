@@ -1,7 +1,8 @@
-import { Injectable, signal, computed, inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, signal, computed, inject, PLATFORM_ID, OnDestroy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { catchError, Observable, of, tap } from 'rxjs';
+import { catchError, Observable, of, tap, Subject } from 'rxjs';
 import { ApiService } from './api';
+import { takeUntil } from "rxjs/operators";
 
 // Enhanced interfaces
 export interface MasterItem {
@@ -54,7 +55,8 @@ export interface QuickStats {
 }
 
 @Injectable({ providedIn: 'root' })
-export class MasterListService {
+export class MasterListService implements OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private api = inject(ApiService);
   private platformId = inject(PLATFORM_ID);
 
@@ -112,7 +114,7 @@ export class MasterListService {
       catchError(err => {
         console.error('Failed to load master list', err);
         return of({ status: 'error', data: null });
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       if (res?.data) {
         const genericMasters = res.data.masters || {};
@@ -138,7 +140,7 @@ export class MasterListService {
       catchError(err => {
         console.error(`Failed to load filter options for ${type}`, err);
         return of({ status: 'error', data: {} });
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       if (res?.data) {
         const currentOptions = this._filterOptions();
@@ -158,7 +160,7 @@ export class MasterListService {
       catchError(err => {
         console.error('Failed to load quick stats', err);
         return of({ status: 'error', data: null });
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       if (res?.data) {
         this._quickStats.set(res.data);
@@ -422,8 +424,13 @@ export class MasterListService {
 
   refreshSpecific(type: string): void {
     const filters = this._activeFilters()[type] || {};
-    this.loadSpecificList(type, filters).subscribe();
+    this.loadSpecificList(type, filters).pipe(takeUntil(this.destroy$)).subscribe();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // // ... existing imports ...

@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, computed, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of, catchError, map } from 'rxjs';
+import { of, catchError, map, Subject } from 'rxjs';
 
 import { MasterListService } from '../../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../../core/services/message.service';
@@ -13,6 +13,7 @@ import { CardModule } from 'primeng/card';
 import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-department-form',
@@ -499,7 +500,8 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
     }
   `]
 })
-export class DepartmentFormComponent implements OnInit {
+export class DepartmentFormComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
@@ -562,7 +564,7 @@ export class DepartmentFormComponent implements OnInit {
       })
     });
 
-    this.deptForm.get('code')?.valueChanges.subscribe(val => {
+    this.deptForm.get('code')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(val => {
       if (val && val !== val.toUpperCase()) {
         this.deptForm.get('code')?.setValue(val.toUpperCase(), { emitEvent: false });
       }
@@ -570,7 +572,7 @@ export class DepartmentFormComponent implements OnInit {
   }
 
   private loadDependencies() {
-    this.hrmsService.getDepartments().subscribe({
+    this.hrmsService.getDepartments().pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         if (res.data && res.data.departments) {
           this.departmentOptions.set(res.data.departments);
@@ -580,7 +582,7 @@ export class DepartmentFormComponent implements OnInit {
   }
 
   private checkEditMode() {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const id = params.get('id');
       if (id) {
         this.isEditMode.set(true);
@@ -601,7 +603,7 @@ export class DepartmentFormComponent implements OnInit {
         this.deptForm.enable();
         this.messageService.handleHttpError(err)
         return of(null);
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe((data) => {
       if (data) {
         this.patchFormValues(data);
@@ -666,7 +668,7 @@ export class DepartmentFormComponent implements OnInit {
     if (!payload.assistantHOD) delete payload.assistantHOD;
 
     if (this.isEditMode()) {
-      this.hrmsService.updateDepartment(this.deptId!, payload).subscribe({
+      this.hrmsService.updateDepartment(this.deptId!, payload).pipe(takeUntil(this.destroy$)).subscribe({
         next: (res: any) => {
           this.messageService.showSuccess( 'Department updated successfully');
           this.isSubmitting.set(false);
@@ -678,7 +680,7 @@ export class DepartmentFormComponent implements OnInit {
         }
       });
     } else {
-      this.hrmsService.createDepartment(payload).subscribe({
+      this.hrmsService.createDepartment(payload).pipe(takeUntil(this.destroy$)).subscribe({
         next: (res: any) => {
           this.messageService.showSuccess('Department created successfully');
           this.isSubmitting.set(false);
@@ -695,6 +697,11 @@ export class DepartmentFormComponent implements OnInit {
   goBack() {
     this.router.navigate(['/hrms/department/list']); 
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';

@@ -1,14 +1,15 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TextareaModule } from 'primeng/textarea';
 import { ButtonModule } from 'primeng/button';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { UserManagementService, User } from '../user-management.service';
 import { AppMessageService } from '../../../core/services/message.service';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-user-status-dialog',
@@ -17,7 +18,8 @@ import { AppMessageService } from '../../../core/services/message.service';
   templateUrl: './user-status-dialog.component.html',
   styleUrl: './user-status-dialog.component.scss'
 })
-export class UserStatusDialogComponent implements OnInit {
+export class UserStatusDialogComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private ref = inject(DynamicDialogRef);
   private config = inject(DynamicDialogConfig);
   private userService = inject(UserManagementService);
@@ -42,7 +44,7 @@ export class UserStatusDialogComponent implements OnInit {
       ? this.userService.activateUser(this.user._id)
       : this.userService.deactivateUser(this.user._id);
 
-    action$.pipe(finalize(() => this.isProcessing.set(false))).subscribe({
+    action$.pipe(finalize(() => this.isProcessing.set(false)), takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.isActive.set(activate);
         this.messageService.showSuccess(`User has been ${activate ? 'activated' : 'deactivated'}.`);
@@ -62,7 +64,7 @@ export class UserStatusDialogComponent implements OnInit {
       userId: this.user._id,
       blockStatus: block,
       reason: this.blockReason
-    }).pipe(finalize(() => this.isProcessing.set(false))).subscribe({
+    }).pipe(finalize(() => this.isProcessing.set(false)), takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.isLoginBlocked.set(block);
         this.messageService.showSuccess(`Login access ${block ? 'blocked' : 'unblocked'} successfully.`);
@@ -77,4 +79,9 @@ export class UserStatusDialogComponent implements OnInit {
   close() {
     this.ref.close({ isActive: this.isActive(), isLoginBlocked: this.isLoginBlocked() });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

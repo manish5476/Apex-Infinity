@@ -1,7 +1,7 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 
 // PrimeNG Imports
 import { TableModule } from 'primeng/table';
@@ -15,6 +15,7 @@ import { InvoiceService } from '../../services/invoice-service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
 import { FilterField } from '../../../shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../../shared/components/universal-filter/universal-filter';
+import { takeUntil } from "rxjs/operators";
 
 // --- Interfaces (Same as provided) ---
 export interface FinancialSummary {
@@ -462,7 +463,8 @@ export interface ProfitAnalysisReport {
     .loader-state { height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-tertiary); font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; gap: 16px; }
   `]
 })
-export class AdvancedProfitAnalysisComponent implements OnInit {
+export class AdvancedProfitAnalysisComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   public commonService = inject(CommonMethodService);
   private invoiceService = inject(InvoiceService);
 
@@ -547,7 +549,7 @@ export class AdvancedProfitAnalysisComponent implements OnInit {
     }
 
     this.invoiceService.getAdvancedProfitAnalysis(payload)
-      .pipe(finalize(() => this.loading.set(false)))
+      .pipe(finalize(() => this.loading.set(false)), takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
           if (res.status === 'success') {
@@ -575,6 +577,11 @@ export class AdvancedProfitAnalysisComponent implements OnInit {
     if (this.currentFilters.compareWith === 'same_period_last_year') return 'last year';
     return 'baseline';
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { Component, OnInit, inject, signal } from '@angular/core';

@@ -1,7 +1,7 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 
 // PrimeNG
 import { CardModule } from 'primeng/card';
@@ -184,7 +184,8 @@ import { HRMSService } from '../../hrms.service';
     .fade-in { animation: fadeIn 0.4s cubic-bezier(0.2, 0.9, 0.2, 1); }
   `]
 })
-export class TodayAttendanceWidgetComponent implements OnInit {
+export class TodayAttendanceWidgetComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private hrmsService = inject(HRMSService);
 
   isLoading = signal(true);
@@ -192,7 +193,7 @@ export class TodayAttendanceWidgetComponent implements OnInit {
 
   ngOnInit() {
     this.hrmsService.getTodayAttendance().pipe(
-      catchError(() => of({ data: null }))
+      catchError(() => of({ data: null })), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       this.todayData.set(res?.data || null);
       this.isLoading.set(false);
@@ -215,6 +216,11 @@ export class TodayAttendanceWidgetComponent implements OnInit {
       default: return 'secondary';
     }
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 

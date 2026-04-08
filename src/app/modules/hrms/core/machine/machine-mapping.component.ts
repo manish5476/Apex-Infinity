@@ -1,12 +1,11 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { HRMSService } from '../../hrms.service';
-
-
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-machine-mapping',
@@ -141,7 +140,8 @@ import { HRMSService } from '../../hrms.service';
     .card-anim-2 { animation: popIn 0.3s ease-out 0.1s both; }
   `]
 })
-export class MachineMappingComponent implements OnInit {
+export class MachineMappingComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
   private router = inject(Router);
@@ -158,12 +158,12 @@ export class MachineMappingComponent implements OnInit {
   loadData() {
     this.isLoading.set(true);
     // Fetch machines for dropdown
-    this.hrmsService.getMachines().subscribe(res => {
+    this.hrmsService.getMachines().pipe(takeUntil(this.destroy$)).subscribe(res => {
       this.machines.set(res.data?.machines || res.data || []);
     });
 
     // Fetch unmapped users
-    this.hrmsService.getUnmappedUsers().pipe(finalize(() => this.isLoading.set(false))).subscribe(res => {
+    this.hrmsService.getUnmappedUsers().pipe(finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)).subscribe(res => {
       const users = res.data?.users || res.data || [];
       // Attach local state properties to the objects
       const formatted = users.map((u: any) => ({ ...u, _selected: false, _machineUserId: '' }));
@@ -190,7 +190,7 @@ export class MachineMappingComponent implements OnInit {
   singleMap(user: any) {
     this.isLoading.set(true);
     this.hrmsService.mapUserToMachine({ userId: user._id, machineUserId: user._machineUserId }).pipe(
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
         this.messageService.showSuccess( `${user.name} linked successfully.`);
@@ -209,7 +209,7 @@ export class MachineMappingComponent implements OnInit {
     
     this.isLoading.set(true);
     this.hrmsService.bulkMapUsers(mappings, this.selectedMachineId!).pipe(
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
         this.messageService.showSuccess( `${mappings.length} users synced.`);
@@ -222,4 +222,9 @@ export class MachineMappingComponent implements OnInit {
   }
 
   goBack() { this.router.navigate(['/hrms/attendance/machines']); }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

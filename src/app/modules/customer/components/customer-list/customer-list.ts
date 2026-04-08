@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, effect, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, effect, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GridApi } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
@@ -21,6 +21,8 @@ import { HasPermissionDirective } from '../../../../core/auth/directives/has-per
 import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 import { DynamicDialogServices } from '../../../../core/services/dynamic-dialog-services';
 import { CommonMethodService } from '@core/utils/common-method.service';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-customer-list',
@@ -42,8 +44,8 @@ import { CommonMethodService } from '@core/utils/common-method.service';
   templateUrl: './customer-list.html',
   styleUrl: './customer-list.scss',
 })
-export class CustomerList implements OnInit {
-
+export class CustomerList implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
   private customerService = inject(CustomerService);
   private messageService = inject(AppMessageService);
@@ -146,7 +148,7 @@ export class CustomerList implements OnInit {
       limit: this.pageSize,
     };
 
-    this.customerService.getAllCustomerData(filterParams).subscribe({
+    this.customerService.getAllCustomerData(filterParams).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         let newData: any[] = [];
 
@@ -221,7 +223,7 @@ export class CustomerList implements OnInit {
     }
     if (event.type === 'save') {
       const limitVal = Number(event.row.creditLimit) || 0;
-      this.customerService.updateCreditLimit(event.row._id, { creditLimit: limitVal }).subscribe({
+      this.customerService.updateCreditLimit(event.row._id, { creditLimit: limitVal }).pipe(takeUntil(this.destroy$)).subscribe({
         next: () => this.messageService.showSuccess('Credit limit updated successfully'),
         error: (err: any) => this.messageService.handleHttpError(err)
       });
@@ -239,7 +241,7 @@ export class CustomerList implements OnInit {
       acceptButtonStyleClass: 'p-button-danger',
       rejectButtonStyleClass: 'p-button-text',
       accept: () => {
-        this.customerService.deleteCustomer(customer._id).subscribe({
+        this.customerService.deleteCustomer(customer._id).pipe(takeUntil(this.destroy$)).subscribe({
           next: () => {
             this.messageService.showSuccess('Customer deleted successfully');
             this.getData(true);
@@ -257,10 +259,10 @@ export class CustomerList implements OnInit {
     const custId = this.selectedRows[0]._id;
 
     this.dialogServices.openImageUpload({
-      header: 'Update Customer Photo',
-      description: `Upload a new avatar for ${this.selectedRows[0].name}.`,
-      uploadFn: (file: File) => this.customerService.uploadCustomerPhoto(custId, file)
-    })?.onClose.subscribe((res: any) => {
+            header: 'Update Customer Photo',
+            description: `Upload a new avatar for ${this.selectedRows[0].name}.`,
+            uploadFn: (file: File) => this.customerService.uploadCustomerPhoto(custId, file)
+          })?.onClose.pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
       if (res?.data?.customer?.photo) {
         this.messageService.showSuccess('Photo updated successfully.');
         this.getData(true); // Refresh grid to show new avatar
@@ -655,4 +657,9 @@ export class CustomerList implements OnInit {
 
     this.cdr.detectChanges();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

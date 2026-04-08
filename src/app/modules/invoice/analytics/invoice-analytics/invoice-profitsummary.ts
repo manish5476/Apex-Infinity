@@ -1,8 +1,9 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 import { InvoiceService } from '../../services/invoice-service';
 import { DateFilterComponent } from '../date-filter/date-filter.component';
+import { takeUntil } from "rxjs/operators";
 
 // Define the interface based on your API Response
 interface ProfitSummaryData {
@@ -376,7 +377,8 @@ interface ProfitSummaryData {
     }
   `]
 })
-export class ProfitSummaryComponent implements OnInit {
+export class ProfitSummaryComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private invoiceService = inject(InvoiceService);
   
   // State Signals
@@ -403,7 +405,7 @@ export class ProfitSummaryComponent implements OnInit {
     if (this.filters.branchId) queryParams.branchId = this.filters.branchId;
 
     this.invoiceService.getProfitSummarys(queryParams)
-      .pipe(finalize(() => this.loading.set(false)))
+      .pipe(finalize(() => this.loading.set(false)), takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
           if (res.status === 'success') {
@@ -421,6 +423,11 @@ export class ProfitSummaryComponent implements OnInit {
     this.filters.endDate = event.endDate;
     this.loadData();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { Component, OnInit, inject, signal } from '@angular/core';

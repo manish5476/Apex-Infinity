@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { finalize, forkJoin } from 'rxjs';
+import { finalize, forkJoin, Subject } from 'rxjs';
 
 // PrimeNG Imports
 import { CardModule } from 'primeng/card';
@@ -14,6 +14,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 
 import { AppMessageService } from '../../../../core/services/message.service';
 import { HRMSService } from '../../hrms.service';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-shift-coverage',
@@ -292,7 +293,8 @@ import { HRMSService } from '../../hrms.service';
     }
   `]
 })
-export class ShiftCoverageComponent implements OnInit {
+export class ShiftCoverageComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private router = inject(Router);
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
@@ -324,7 +326,7 @@ export class ShiftCoverageComponent implements OnInit {
       timeline: this.hrmsService.getShiftTimeline({ date: dateStr })
     }).pipe(
 
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe({
       next: (res: any) => {
         const covArray = res.coverage?.data?.coverage || [];
@@ -364,6 +366,11 @@ export class ShiftCoverageComponent implements OnInit {
   goBack() {
     this.router.navigate(['/hrms/shifts/list']);
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';

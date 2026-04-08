@@ -1,8 +1,7 @@
 // src/app/features/storefront-admin/pages/config-form/config-form.component.ts
 import {
   Component, Input, Output, EventEmitter,
-  OnChanges, SimpleChanges, inject, ViewEncapsulation
-} from '@angular/core';
+  OnChanges, SimpleChanges, inject, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule, FormBuilder, FormGroup, FormArray,
@@ -25,7 +24,8 @@ import { InputGroupModule } from 'primeng/inputgroup';
 import { BadgeModule } from 'primeng/badge';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { TooltipModule } from 'primeng/tooltip';
-
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -66,8 +66,8 @@ interface NormalisedField {
   styleUrls: ['./config-form.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class ConfigFormComponent implements OnChanges {
-
+export class ConfigFormComponent implements OnChanges, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   @Input() config: Record<string, any> = {};
   @Input() schema: Record<string, any> = {};
   /**
@@ -155,7 +155,7 @@ export class ConfigFormComponent implements OnChanges {
     // builder's section config (e.g. clearing pre-existing items arrays).
     // We do NOT emit an initial value — the builder already has the section
     // config and an early emit would clobber it with form defaults.
-    this.form.valueChanges.subscribe(val => {
+    this.form.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(val => {
       const clean: Record<string, any> = {};
       for (const [k, v] of Object.entries(val)) {
         // Keep arrays (even empty ones) and explicit false/0; only drop null & undefined
@@ -317,5 +317,10 @@ export class ConfigFormComponent implements OnChanges {
       .replace(/^./, str => str.toUpperCase())
       .trim();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 

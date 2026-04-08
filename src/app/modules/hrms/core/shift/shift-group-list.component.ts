@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -7,7 +7,8 @@ import { AppMessageService } from '../../../../core/services/message.service';
 import { AgShareGrid, ActionColumnConfig } from '../../../shared/components/ag-shared-grid';
 import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 import { HRMSService } from '../../hrms.service';
-
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-shift-group-list',
@@ -202,7 +203,8 @@ import { HRMSService } from '../../hrms.service';
     }
   `]
 })
-export class ShiftGroupListComponent implements OnInit {
+export class ShiftGroupListComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
@@ -267,7 +269,7 @@ export class ShiftGroupListComponent implements OnInit {
 
     // Assumes getShiftGroups is updated to accept params if paginated
     // Otherwise fallback to generic standard get: this.hrmsService.get('/v1/hrms/shift-groups', params)
-    this.hrmsService.getShiftGroups().subscribe({
+    this.hrmsService.getShiftGroups().pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         const newData = res.data?.shiftGroups || res.data?.data || [];
         const pagination = res.pagination; 
@@ -323,7 +325,7 @@ export class ShiftGroupListComponent implements OnInit {
   }
 
   private deleteGroup(id: string) {
-    this.hrmsService.deleteShiftGroup(id).subscribe({
+    this.hrmsService.deleteShiftGroup(id).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.messageService.showSuccess('Shift group removed successfully');
         this.getData(true);
@@ -480,4 +482,9 @@ export class ShiftGroupListComponent implements OnInit {
     ];
     this.cdr.detectChanges();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

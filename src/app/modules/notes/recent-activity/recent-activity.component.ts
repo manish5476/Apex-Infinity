@@ -1,4 +1,4 @@
-import { Component,Input, inject, signal, computed, ViewEncapsulation, OnInit } from '@angular/core';
+import { Component,Input, inject, signal, computed, ViewEncapsulation, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NoteService } from '../../../core/services/notes.service'; // Adjust path if needed
@@ -7,6 +7,8 @@ import { AppMessageService } from '../../../core/services/message.service';
 import { 
   Note, NoteActivity 
 } from '../../../core/models/note.types';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 // Interfaces based on your flattened UI needs
 interface FlattenedActivity {
@@ -30,7 +32,8 @@ interface FlattenedActivity {
   templateUrl:'./recent-activity.component.html',
   styleUrl:'./recent-activity.component.scss'
 })
-export class RecentActivityComponent implements OnInit {
+export class RecentActivityComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   @Input() notesData:any
   private noteService = inject(NoteService);
   private messageService = inject(AppMessageService);
@@ -107,7 +110,7 @@ export class RecentActivityComponent implements OnInit {
     this.isLoading.set(true);
     
     // Using your common pattern of single-string messages and global error handling
-    this.noteService.getRecentActivity(20).subscribe({
+    this.noteService.getRecentActivity(20).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         const notes = res?.data?.notes || [];
         this.rawNotes.set(notes as Note[]);
@@ -126,4 +129,8 @@ export class RecentActivityComponent implements OnInit {
     });
   }
 
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

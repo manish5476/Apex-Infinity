@@ -1,10 +1,10 @@
 import { Message } from "./../../../../chat/chat.component/chat.models";
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal, Input } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, Input, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 
 // Services
 import { MessageService } from 'primeng/api';
@@ -304,7 +304,8 @@ import { AppMessageService } from '@core/services/message.service';
     }
   `]
 })
-export class ShiftClonerComponent implements OnInit {
+export class ShiftClonerComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private hrmsService = inject(HRMSService);
@@ -352,7 +353,7 @@ export class ShiftClonerComponent implements OnInit {
           }
         });
       }),
-      finalize(() => this.isCloning.set(false))
+      finalize(() => this.isCloning.set(false)), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       if (res && res.status === 'success' && res.data?.shift) {
         this.clonedResult.set(res.data.shift);
@@ -372,6 +373,11 @@ export class ShiftClonerComponent implements OnInit {
   navigateToEdit(newShiftId: string) {
     this.router.navigate(['/shifts/edit', newShiftId]);
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { Component, OnInit, ChangeDetectionStrategy, inject, signal, Input } from '@angular/core';

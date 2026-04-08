@@ -9,7 +9,7 @@
 // export class Logs {
 
 // }
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { TransactionService } from '../transaction.service';
 import { Button } from "primeng/button";
 import { DatePicker } from "primeng/datepicker";
@@ -19,13 +19,18 @@ import { Toast } from "primeng/toast";
 import { CommonModule } from '@angular/common';
 import { CommonMethodService } from '../../../core/utils/common-method.service';
 import { AgShareGrid, SharedGridEvent } from "../../shared/components/ag-shared-grid";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
+
 @Component({
   selector: 'app-logs',
   imports: [Button, DatePicker, Select, FormsModule,  CommonModule, Toast, AgShareGrid],
   templateUrl: './logs.html',
   styleUrl: './logs.scss',
 })
-export class LogsComponent implements OnInit {
+export class LogsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
+
 eventFromGrid($event: SharedGridEvent<any>) {
 throw new Error('Method not implemented.');
 }
@@ -79,7 +84,7 @@ throw new Error('Method not implemented.');
         params.endDate = this.format(this.dateRange[1]);
     }
 
-    this.logsService.getLogs(params).subscribe(res => {
+    this.logsService.getLogs(params).pipe(takeUntil(this.destroy$)).subscribe(res => {
       this.logs = res.content
       this.cdr.detectChanges();
     });
@@ -128,4 +133,9 @@ throw new Error('Method not implemented.');
     ];
 
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
