@@ -12,66 +12,9 @@
 //     data: { tabLabel: 'Customer', tabIcon: 'pi pi-user', reuseTab: true }
 //   }
 
-import { inject } from '@angular/core';
-import { CanActivateFn, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { TabService } from './Service/tab.service';
-import { OpenTabOptions } from './tab.types';
+import { CanActivateFn } from "@angular/router";
 
-export const TabRouterGuard: CanActivateFn = (
-  route: ActivatedRouteSnapshot,
-  state: RouterStateSnapshot
-) => {
-  const tabService = inject(TabService);
-
-  // 1. Identify target
-  const data = route.data || {};
-  const routeConfig = route.routeConfig;
-  
-  // A route is a valid tab if it has a component, loads one, OR has explicit tab metadata
-  const hasTarget = !!route.component || 
-                    !!routeConfig?.loadComponent || 
-                    !!routeConfig?.loadChildren || 
-                    !!data['tabLabel'];
-
-  if (!hasTarget) return true;
-
-  // 2. Build path & metadata
-  // Use state.url for the absolute path, but strip query params
-  const fullUrl = state.url.split('?')[0];
-  
-  // Normalisation: Ensure we don't register the root '/' as a tab unless intended
-  if (fullUrl === '/' || fullUrl === '/login' || fullUrl === '/signup') return true;
-
-  const queryParams = route.queryParams as Record<string, string>;
-  
-  // Label Resolution: Preferred from Data > TitleCase from Path
-  let label = (data['tabLabel'] as string | undefined);
-  if (!label) {
-    const segments = fullUrl.split('/').filter(Boolean);
-    const lastSegment = segments.pop() || 'Home';
-    label = titleCase(lastSegment);
-  }
-
-  const options: Pick<OpenTabOptions, 'icon' | 'pinned' | 'data'> = {
-    icon: (data['tabIcon'] as string) || 'pi pi-file',
-    pinned: !!data['tabPinned'],
-    data: data
-  };
-
-  // 3. Register with Service
-  // The service handles activation if the tab already exists.
-  tabService.registerTab(fullUrl, label, queryParams, options);
-
-  return true;
-};
-
-/** Helper to convert 'my-route' to 'My Route' */
-function titleCase(str: string): string {
-  return str
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
-}
+export const TabRouterGuard: CanActivateFn = () => true;
 
 // // ─────────────────────────────────────────────────────────────────────────────
 // // tab-router.guard.ts  –  Intercepts Angular Router navigation → opens tabs

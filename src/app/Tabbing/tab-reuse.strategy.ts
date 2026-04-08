@@ -21,9 +21,12 @@ export class TabReuseStrategy implements RouteReuseStrategy {
   /** Map of route-key → detached handle */
   private readonly cache = new Map<string, DetachedRouteHandle>();
 
-  // ── Decide whether to detach (store) the current route ─────────────────────
   shouldDetach(route: ActivatedRouteSnapshot): boolean {
-    // Only cache leaf routes that belong to tabs (opt-in via route data)
+    // Do not cache parent routes or routes without components
+    if (!route.routeConfig || !route.routeConfig.component) return false;
+    if (route.firstChild) return false;
+
+    // Only cache leaf routes that belong to tabs (opt-out available via route data)
     return route.data?.['reuseTab'] !== false;
   }
 
@@ -38,6 +41,9 @@ export class TabReuseStrategy implements RouteReuseStrategy {
 
   // ── Decide whether to reattach a stored route ───────────────────────────────
   shouldAttach(route: ActivatedRouteSnapshot): boolean {
+    if (!route.routeConfig || !route.routeConfig.component) return false;
+    if (route.firstChild) return false;
+
     return this.cache.has(this._key(route));
   }
 
@@ -78,10 +84,10 @@ export class TabReuseStrategy implements RouteReuseStrategy {
       .flatMap(r => r.url)
       .map(s => s.toString())
       .filter(Boolean);
-    
+
     const path = '/' + segments.join('/');
     const qp = route.queryParams as Record<string, string>;
-    
+
     return TabReuseStrategy.buildKey(path, qp);
   }
 }

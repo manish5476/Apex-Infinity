@@ -1,8 +1,6 @@
-<!-- mainscreensidebar.html -->
 <aside class="sidebar-shell">
   <div class="sidebar-panel">
 
-    <!-- ── Header ── -->
     <div class="sidebar-head">
       <div class="brand-mark">
         <div class="brand-icon">
@@ -17,19 +15,16 @@
 
       <div class="head-actions">
         @if (!layout.isMobile()) {
-        <!-- Search trigger -->
         <button class="head-btn" (click)="openSearch()" title="Search (Ctrl+K)" pTooltip="Search"
           tooltipPosition="right">
           <i class="pi pi-search"></i>
         </button>
-        <!-- Pin toggle -->
         <button class="head-btn" [class.is-active]="layout.isPinned()" (click)="togglePin()" title="Pin Sidebar"
           pTooltip="Pin sidebar" tooltipPosition="right">
           <i class="pi pi-thumbtack"></i>
         </button>
         }
         @if (layout.isMobile()) {
-        <!-- Close on mobile -->
         <button class="head-btn" (click)="layout.closeMobile()">
           <i class="pi pi-times"></i>
         </button>
@@ -37,12 +32,10 @@
       </div>
     </div>
 
-    <!-- ── Navigation ── -->
     <nav class="nav-scroll" role="navigation" aria-label="Main navigation">
       @for (item of menuItems(); track item.label) {
       <div class="nav-group">
 
-        <!-- Level 1 item -->
         <div class="nav-item lv1" [class.is-parent-active]="hasActiveChild(item)" (click)="handleItemClick(item)"
           [attr.aria-expanded]="item.items ? expandedState()[item.label] : null">
           <span class="nav-icon"><i [class]="item.icon"></i></span>
@@ -52,27 +45,26 @@
           }
         </div>
 
-        <!-- Level 2 accordion -->
         @if (item.items) {
         <div class="nav-accordion" [class.is-expanded]="expandedState()[item.label]">
           <div class="nav-accordion-inner">
             @for (sub of item.items; track sub.label) {
             <div class="nav-sub-group">
 
-              <!-- Level 2 item -->
-              <div class="nav-item lv2" [class.is-active]="isActiveLink(sub)" (click)="handleItemClick(sub); $event.stopPropagation()">
+              <div class="nav-item lv2" [class.is-active]="isActiveLink(sub)"
+                (click)="handleItemClick(sub); $event.stopPropagation()">
                 <span class="nav-label">{{ sub.label }}</span>
                 @if (sub.items) {
                 <i class="nav-arrow pi pi-chevron-down sm" [class.is-open]="expandedState()[sub.label]"></i>
                 }
               </div>
 
-              <!-- Level 3 accordion -->
               @if (sub.items) {
               <div class="nav-accordion" [class.is-expanded]="expandedState()[sub.label]">
                 <div class="nav-accordion-inner lv3-wrap">
                   @for (deep of sub.items; track deep.label) {
-                  <div class="nav-item lv3" [class.is-active]="isActiveLink(deep)" (click)="handleItemClick(deep); $event.stopPropagation()">
+                  <div class="nav-item lv3" [class.is-active]="isActiveLink(deep)"
+                    (click)="handleItemClick(deep); $event.stopPropagation()">
                     <span class="nav-label">{{ deep.label }}</span>
                   </div>
                   }
@@ -90,7 +82,6 @@
       }
     </nav>
 
-    <!-- ── Footer ── -->
     <footer class="sidebar-foot">
       <button class="signout-btn" (click)="logout()" pTooltip="Sign out" tooltipPosition="top">
         <i class="pi pi-power-off"></i>
@@ -101,16 +92,11 @@
   </div>
 </aside>
 
-<!-- ══════════════════════════════════════════════════════
-     SPOTLIGHT SEARCH OVERLAY
-     Rendered outside <aside> so it's not clipped by overflow:hidden
-═══════════════════════════════════════════════════════ -->
 <p-dialog [(visible)]="isSearchVisible" [modal]="true" [closable]="false" [dismissableMask]="true" [showHeader]="false"
   [appendTo]="'body'" (onHide)="closeSearch()">
 
   <div class="spotlight-box">
 
-    <!-- Input row -->
     <div class="spotlight-input-row">
       <i class="pi pi-search spotlight-search-icon"></i>
       <input #searchInput type="text" class="spotlight-input" placeholder="Search navigation…" [value]="searchQuery"
@@ -118,7 +104,162 @@
       <kbd class="esc-key">ESC</kbd>
     </div>
 
-    <!-- Results -->
+    <div class="spotlight-results" role="listbox">
+      @if (filteredResults.length > 0) {
+      @for (result of filteredResults; track $index; let i = $index) {
+      <div class="spotlight-result" role="option" [id]="'result-' + i" [class.is-focused]="i === focusedIndex"
+        (click)="navigateToResult(result)" (mouseenter)="focusedIndex = i">
+        <span class="result-icon">
+          <i [class]="result.icon"></i>
+        </span>
+
+        <span class="result-body">
+          <span class="result-label">{{ result.label }}</span>
+          @if (result.breadcrumb) {
+          <span class="result-crumb">{{ result.breadcrumb }}</span>
+          }
+        </span>
+
+        <i class="pi pi-arrow-return-left result-enter"></i>
+      </div>
+      }
+      } @else {
+      <div class="spotlight-empty">
+        <i class="pi pi-inbox"></i>
+        <span>No results for "{{ searchQuery }}"</span>
+      </div>
+      }
+    </div>
+
+    <div class="spotlight-hints">
+      <span class="hint"><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+      <span class="hint"><kbd>↵</kbd> select</span>
+      <span class="hint"><kbd>ESC</kbd> close</span>
+    </div>
+
+  </div>
+
+</p-dialog>
+
+
+<!-- <aside class="sidebar-shell">
+  
+  <div class="sidebar-panel">
+
+   
+    <div class="sidebar-head">
+      <div class="brand-mark">
+        <div class="brand-icon">
+          <svg viewBox="0 0 32 32" fill="none">
+            <path d="M4 28L16 4L28 28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+              stroke-linejoin="round" />
+            <path d="M8.5 20L23.5 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+          </svg>
+        </div>
+        <span class="brand-name">Apex</span>
+      </div>
+
+      <div class="head-actions">
+        @if (!layout.isMobile()) {
+       
+        <button class="head-btn" (click)="openSearch()" title="Search (Ctrl+K)" pTooltip="Search"
+          tooltipPosition="right">
+          <i class="pi pi-search"></i>
+        </button>
+       
+        <button class="head-btn" [class.is-active]="layout.isPinned()" (click)="togglePin()" title="Pin Sidebar"
+          pTooltip="Pin sidebar" tooltipPosition="right">
+          <i class="pi pi-thumbtack"></i>
+        </button>
+        }
+        @if (layout.isMobile()) {
+       
+        <button class="head-btn" (click)="layout.closeMobile()">
+          <i class="pi pi-times"></i>
+        </button>
+        }
+      </div>
+    </div>
+
+   
+    <nav class="nav-scroll" role="navigation" aria-label="Main navigation">
+      @for (item of menuItems(); track item.label) {
+      <div class="nav-group">
+
+       
+        <div class="nav-item lv1" [class.is-parent-active]="hasActiveChild(item)" (click)="handleItemClick(item)"
+          [attr.aria-expanded]="item.items ? expandedState()[item.label] : null">
+          <span class="nav-icon"><i [class]="item.icon"></i></span>
+          <span class="nav-label">{{ item.label }}</span>
+          @if (item.items) {
+          <i class="nav-arrow pi pi-chevron-down" [class.is-open]="expandedState()[item.label]"></i>
+          }
+        </div>
+
+       
+        @if (item.items) {
+        <div class="nav-accordion" [class.is-expanded]="expandedState()[item.label]">
+          <div class="nav-accordion-inner">
+            @for (sub of item.items; track sub.label) {
+            <div class="nav-sub-group">
+
+             
+              <div class="nav-item lv2" [class.is-active]="isActiveLink(sub)"
+                (click)="handleItemClick(sub); $event.stopPropagation()">
+                <span class="nav-label">{{ sub.label }}</span>
+                @if (sub.items) {
+                <i class="nav-arrow pi pi-chevron-down sm" [class.is-open]="expandedState()[sub.label]"></i>
+                }
+              </div>
+
+             
+              @if (sub.items) {
+              <div class="nav-accordion" [class.is-expanded]="expandedState()[sub.label]">
+                <div class="nav-accordion-inner lv3-wrap">
+                  @for (deep of sub.items; track deep.label) {
+                  <div class="nav-item lv3" [class.is-active]="isActiveLink(deep)"
+                    (click)="handleItemClick(deep); $event.stopPropagation()">
+                    <span class="nav-label">{{ deep.label }}</span>
+                  </div>
+                  }
+                </div>
+              </div>
+              }
+
+            </div>
+            }
+          </div>
+        </div>
+        }
+
+      </div>
+      }
+    </nav>
+
+   
+    <footer class="sidebar-foot">
+      <button class="signout-btn" (click)="logout()" pTooltip="Sign out" tooltipPosition="top">
+        <i class="pi pi-power-off"></i>
+        <span>Sign Out</span>
+      </button>
+    </footer>
+
+  </div>
+</aside>
+<p-dialog [(visible)]="isSearchVisible" [modal]="true" [closable]="false" [dismissableMask]="true" [showHeader]="false"
+  [appendTo]="'body'" (onHide)="closeSearch()">
+
+  <div class="spotlight-box">
+
+   
+    <div class="spotlight-input-row">
+      <i class="pi pi-search spotlight-search-icon"></i>
+      <input #searchInput type="text" class="spotlight-input" placeholder="Search navigation…" [value]="searchQuery"
+        (input)="onSearchInput($event)" autocomplete="off" spellcheck="false" />
+      <kbd class="esc-key">ESC</kbd>
+    </div>
+
+   
     <div class="spotlight-results" role="listbox">
       @if (filteredResults.length > 0) {
       @for (result of filteredResults; track result.label; let i = $index) {
@@ -146,7 +287,7 @@
       }
     </div>
 
-    <!-- Keyboard hints -->
+   
     <div class="spotlight-hints">
       <span class="hint"><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
       <span class="hint"><kbd>↵</kbd> select</span>
@@ -155,52 +296,4 @@
 
   </div>
 
-</p-dialog>
-
-<!-- @if (isSearchVisible) {
-<div appendTo="body" class="spotlight-backdrop" (click)="closeSearch()" role="dialog" aria-modal="true"
-  aria-label="Navigation search">
-  <div class="spotlight-box" (click)="$event.stopPropagation()">
-
-    
-    <div class="spotlight-input-row">
-      <i class="pi pi-search spotlight-search-icon"></i>
-      <input #searchInput type="text" class="spotlight-input" placeholder="Search navigation…" [value]="searchQuery"
-        (input)="onSearchInput($event)" autocomplete="off" spellcheck="false" />
-      <kbd class="esc-key">ESC</kbd>
-    </div>
-
-    
-    <div class="spotlight-results" role="listbox">
-      @if (filteredResults.length > 0) {
-      @for (result of filteredResults; track result.label; let i = $index) {
-      <div class="spotlight-result" role="option" [id]="'result-' + i" [class.is-focused]="i === focusedIndex"
-        (click)="navigateToResult(result)" (mouseenter)="focusedIndex = i">
-        <span class="result-icon"><i [class]="result.icon"></i></span>
-        <span class="result-body">
-          <span class="result-label">{{ result.label }}</span>
-          @if (result.breadcrumb) {
-          <span class="result-crumb">{{ result.breadcrumb }}</span>
-          }
-        </span>
-        <i class="pi pi-arrow-return-left result-enter"></i>
-      </div>
-      }
-      } @else {
-      <div class="spotlight-empty">
-        <i class="pi pi-inbox"></i>
-        <span>No results for "{{ searchQuery }}"</span>
-      </div>
-      }
-    </div>
-
-    
-    <div class="spotlight-hints">
-      <span class="hint"><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
-      <span class="hint"><kbd>↵</kbd> select</span>
-      <span class="hint"><kbd>ESC</kbd> close</span>
-    </div>
-
-  </div>
-</div>
-} -->
+</p-dialog> -->

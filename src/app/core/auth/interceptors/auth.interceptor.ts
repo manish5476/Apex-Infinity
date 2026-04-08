@@ -24,15 +24,11 @@ import { AuthService } from '../../../modules/auth/services/auth-service';
  * Register in app.config.ts:
  *   provideHttpClient(withInterceptors([authInterceptor]))
  */
-export const authInterceptor: HttpInterceptorFn = (
-  req: HttpRequest<unknown>,
-  next: HttpHandlerFn
-) => {
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authSvc = inject(AuthService);
   const router = inject(Router);
   const token = authSvc.authTokenData;
 
-  // Attach Authorization header if token exists and not already set
   const authReq = (token && !req.headers.has('Authorization'))
     ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
     : req;
@@ -40,18 +36,16 @@ export const authInterceptor: HttpInterceptorFn = (
   return next(authReq).pipe(
     catchError((err: HttpErrorResponse) => {
       if (err.status === 401) {
-        const code = err.error?.code;
-        // TOKEN_EXPIRED or any 401 → AuthService.logout() handles
-        // clearing localStorage + redirecting to /auth/login
-        if (code === 'TOKEN_EXPIRED' || code === 'INVALID_TOKEN') {
-          authSvc.logout();
+        // If the request was to the login endpoint, let the component handle the "Wrong Password" error
+        if (req.url.includes('/login')) {
+          return throwError(() => err);
         }
-        // For other 401s (wrong password etc.), let the component handle it
+
+        // Otherwise, any 401 on any API means the session is dead. Kick them out.
+        authSvc.logout();
       } else if (err.status === 403) {
-        // Logged in but no permission — go to unauthorized page
         router.navigate(['/unauthorized']);
       }
-
       return throwError(() => err);
     })
   );

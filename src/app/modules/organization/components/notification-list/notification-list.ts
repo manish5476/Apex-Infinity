@@ -328,7 +328,7 @@ export class AnnouncementList implements OnInit, OnDestroy {
         width: 52,
         sortable: false,
         filter: false,
-        suppressMenu: true,
+        suppressHeaderMenuButton: true,
         pinned: 'left',
         cellStyle: { color: 'var(--text-secondary)', fontSize: '11px', textAlign: 'center' },
       },
@@ -338,10 +338,9 @@ export class AnnouncementList implements OnInit, OnDestroy {
         minWidth: 200,
         sortable: true,
         filter: true,
-        valueGetter: (p: any) => p.data,
-        valueFormatter: (p: any) => p.data?.title ?? '',
+        valueGetter: (p: any) => p.data?.title ?? '',
         cellRenderer: (p: any) => {
-          const row = p.value;
+          const row = p.data;
           const pinBadge = row.isPinned
             ? `<span style="font-size:9px;padding:1px 6px;border-radius:99px;background:var(--accent-focus);color:var(--accent-primary);font-weight:700;margin-left:6px">📌 PINNED</span>` : '';
           const urgentBadge = row.isUrgent

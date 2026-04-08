@@ -1,7 +1,8 @@
-import { Injectable, computed, effect, inject, signal, } from '@angular/core';
-import { Router, NavigationExtras } from '@angular/router';
+import { Injectable, computed, effect, inject, signal } from '@angular/core';
+import { Router, NavigationExtras, NavigationEnd } from '@angular/router'; // 👈 Added NavigationEnd
 import { toObservable } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
+import { filter } from 'rxjs/operators'; // 👈 Added filter
 import { TabId, TabMeta, TabState, OpenTabOptions } from '../tab.types';
 
 const STORAGE_KEY = 'apex__tab_state';
@@ -32,6 +33,60 @@ export class TabService {
       try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(this._state())); }
       catch { /* storage full / private mode */ }
     });
+
+    // Clean, standard RxJS implementation
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd)
+    ).subscribe((e: NavigationEnd) => {
+      this.handleNavigationEnd(e);
+    });
+  }
+
+  private handleNavigationEnd(e: NavigationEnd): void {
+    let route = this.router.routerState.root;
+    while (route.firstChild) {
+      route = route.firstChild;
+    }
+
+    const data = route.snapshot.data || {};
+    const routeConfig = route.snapshot.routeConfig;
+
+    const hasTarget = !!route.component ||
+      !!routeConfig?.loadComponent ||
+      !!routeConfig?.loadChildren ||
+      !!data['tabLabel'];
+
+    const fullUrl = e.urlAfterRedirects.split('?')[0];
+
+    // Get exact queryParams from the snapshot
+    const rawQueryParams = route.snapshot.queryParams;
+    const qp: Record<string, string> = {};
+    for (const key of Object.keys(rawQueryParams)) {
+      qp[key] = String(rawQueryParams[key]);
+    }
+
+    if (!hasTarget || fullUrl === '/' || fullUrl === '/login' || fullUrl === '/signup') {
+      this.syncFromRouter(fullUrl, qp);
+      return;
+    }
+
+    let label = (data['tabLabel'] as string | undefined);
+    if (!label) {
+      const segments = fullUrl.split('/').filter(Boolean);
+      const lastSegment = segments.pop() || 'Home';
+      label = lastSegment
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+    }
+
+    const options: Pick<OpenTabOptions, 'icon' | 'pinned' | 'data'> = {
+      icon: (data['tabIcon'] as string) || 'pi pi-file',
+      pinned: !!data['tabPinned'],
+      data: data
+    };
+
+    this.registerTab(fullUrl, label, qp, options);
   }
 
   /**
@@ -84,11 +139,7 @@ export class TabService {
 
   openNewTab?: () => void;
 
-  registerTab(
-    path: string,
-    label: string,
-    queryParams: Record<string, string>,
-    options: Pick<OpenTabOptions, 'icon' | 'pinned' | 'data'> = {}
+  registerTab(path: string, label: string, queryParams: Record<string, string>, options: Pick<OpenTabOptions, 'icon' | 'pinned' | 'data'> = {}
   ): void {
     const id = this.buildTabId(path, queryParams);
     const existing = this._findById(id);

@@ -208,7 +208,9 @@ export class CustomerList implements OnInit {
     if (event.type === 'cellClicked' || event.type === 'view') {
       const customerId = event.row?._id;
       if (customerId) {
-        this.dialogServices.openCustomerDetails(customerId);
+        this.router.navigate(['/customer', customerId]);
+
+        // this.dialogServices.openCustomerDetails(customerId);
       }
     }
     if (event.type === 'reachedBottom') {
@@ -270,197 +272,6 @@ export class CustomerList implements OnInit {
     this.dialogServices.openBulkCustomer();
   }
 
-  // getColumn(): void {
-  //   this.column = [
-  //     {
-  //       headerName: 'Customer Identity',
-  //       children: [
-  //         {
-  //           field: 'name',
-  //           headerName: 'Name & Type',
-  //           pinned: 'left',
-  //           minWidth: 240,
-  //           flex: 2,
-  //           cellRenderer: (params: any) => {
-  //             if (!params.value) return '';
-  //             const data = params.data;
-  //             const initials = data.name.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase();
-  //             const subText = data.contactPerson && data.contactPerson !== data.name
-  //               ? `<i class="pi pi-user" style="font-size:10px; margin-right:4px"></i>${data.contactPerson}`
-  //               : `<span style="text-transform:capitalize">${data.type}</span>`;
-
-  //             return `
-  //             <div style="display:flex; align-items:center; gap:12px; height:100%;">
-  //               <div style="
-  //                 width:36px; height:36px; border-radius:50%; 
-  //                 background:var(--bg-ternary); color:var(--text-secondary);
-  //                 display:flex; align-items:center; justify-content:center; 
-  //                 font-weight:700; font-size:11px; border:1px solid var(--border-secondary);">
-  //                 ${initials}
-  //               </div>
-  //               <div style="display:flex; flex-direction:column; justify-content:center; line-height:1.3;">
-  //                 <span style="font-weight:600; color:var(--text-primary); font-size:13px;">${data.name}</span>
-  //                 <span style="font-size:11px; color:var(--text-tertiary); display:flex; align-items:center;">${subText}</span>
-  //               </div>
-  //             </div>
-  //           `;
-  //           }
-  //         },
-  //         {
-  //           field: 'isActive',
-  //           headerName: 'Status',
-  //           width: 110,
-  //           cellRenderer: (params: any) => {
-  //             const isDeleted = params.data.isDeleted;
-  //             if (isDeleted) {
-  //               return `<span style="background:var(--color-error-bg); color:var(--color-error); padding:2px 8px; border-radius:6px; font-size:10px; font-weight:700;">DELETED</span>`;
-  //             }
-  //             const status = params.value ? 'ACTIVE' : 'INACTIVE';
-  //             const bg = params.value ? 'var(--color-success-bg)' : 'var(--bg-ternary)';
-  //             const color = params.value ? 'var(--color-success)' : 'var(--text-tertiary)';
-  //             return `<span style="background:${bg}; color:${color}; padding:2px 8px; border-radius:6px; font-size:10px; font-weight:700; letter-spacing:0.5px;">${status}</span>`;
-  //           }
-  //         },
-  //         {
-  //           field: 'tags',
-  //           headerName: 'Tags',
-  //           width: 140,
-  //           cellRenderer: (params: any) => {
-  //             if (!params.value || !params.value.length || params.value[0] === "") return '<span style="color:var(--text-disabled);">-</span>';
-  //             // Render max 2 tags
-  //             return params.value.slice(0, 2).map((tag: string) =>
-  //               `<span style="
-  //               background:var(--bg-secondary); border:1px solid var(--border-secondary); 
-  //               padding:1px 6px; border-radius:10px; font-size:10px; 
-  //               color:var(--text-secondary); margin-right:4px; white-space:nowrap;">
-  //               ${tag}
-  //             </span>`
-  //             ).join('') + (params.value.length > 2 ? '...' : '');
-  //           }
-  //         }
-  //       ]
-  //     },
-  //     {
-  //       headerName: 'Contact Details',
-  //       children: [
-  //         {
-  //           headerName: 'Email & Phone',
-  //           width: 230,
-  //           cellRenderer: (params: any) => {
-  //             const email = params.data.email || '';
-  //             const phone = params.data.phone || '';
-  //             if (!email && !phone) return '<span style="color:var(--text-disabled);">-</span>';
-
-  //             return `
-  //             <div style="display:flex; flex-direction:column; justify-content:center; height:100%; gap:2px;">
-  //               ${email ? `<div style="display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-primary); text-overflow:ellipsis; overflow:hidden;"><i class="pi pi-envelope" style="color:var(--text-tertiary); font-size:10px;"></i> ${email}</div>` : ''}
-  //               ${phone ? `<div style="display:flex; align-items:center; gap:6px; font-size:11px; color:var(--text-secondary);"><i class="pi pi-phone" style="color:var(--text-tertiary); font-size:10px;"></i> ${phone} ${params.data.altPhone ? '<span style="font-size:9px; color:var(--text-tertiary)">(+1)</span>' : ''}</div>` : ''}
-  //             </div>
-  //           `;
-  //           }
-  //         }
-  //       ]
-  //     },
-
-  //     // 4. Financial Group
-  //     {
-  //       headerName: 'Financial Overview',
-  //       children: [
-  //         {
-  //           field: 'outstandingBalance',
-  //           headerName: 'Outstanding',
-  //           width: 140,
-  //           type: 'numericColumn',
-  //           cellRenderer: (params: any) => {
-  //             const val = params.value || 0;
-  //             // Orange if positive debt, Green if 0 or negative (credit)
-  //             const color = val > 0 ? 'var(--color-warning)' : 'var(--color-success)';
-  //             const weight = val > 0 ? '700' : '500';
-  //             const formatted = this.currencyFormatter(val);
-  //             return `<span style="color:${color}; font-weight:${weight};">${formatted}</span>`;
-  //           }
-  //         },
-  //         {
-  //           field: 'creditLimit',
-  //           headerName: 'Limit',
-  //           width: 110,
-  //           type: 'numericColumn',
-  //           valueFormatter: (params: any) => this.currencyFormatter(params.value),
-  //           cellStyle: { color: 'var(--text-tertiary)' }
-  //         },
-  //         {
-  //           field: 'paymentTerms',
-  //           headerName: 'Terms',
-  //           width: 120,
-  //           valueFormatter: (p: any) => p.value || 'Standard'
-  //         }
-  //       ]
-  //     },
-
-  //     // 5. Compliance & Address
-  //     {
-  //       headerName: 'Compliance & Location',
-  //       children: [
-  //         {
-  //           field: 'gstNumber',
-  //           headerName: 'GST / Tax ID',
-  //           width: 150,
-  //           cellRenderer: (params: any) => {
-  //             const gst = params.value;
-  //             const pan = params.data.panNumber;
-  //             if (!gst && !pan) return '<span style="color:var(--text-disabled);">-</span>';
-
-  //             return `
-  //              <div style="display:flex; flex-direction:column; justify-content:center; line-height:1.2;">
-  //                <span style="font-size:12px; font-weight:500;">${gst || '-'}</span>
-  //                <span style="font-size:10px; color:var(--text-tertiary);">PAN: ${pan || 'N/A'}</span>
-  //              </div>
-  //            `;
-  //           }
-  //         },
-  //         {
-  //           headerName: 'Billing City',
-  //           field: 'billingAddress.city',
-  //           width: 140,
-  //           valueGetter: (params: any) => {
-  //             const addr = params.data.billingAddress;
-  //             return addr ? `${addr.city}, ${addr.state}` : '';
-  //           },
-  //           tooltipValueGetter: (params: any) => {
-  //             const addr = params.data.billingAddress;
-  //             if (!addr) return '';
-  //             return `${addr.street}, ${addr.city}, ${addr.state}, ${addr.zipCode}, ${addr.country}`;
-  //           }
-  //         }
-  //       ]
-  //     },
-
-  //     // 6. System Info
-  //     {
-  //       headerName: 'System',
-  //       children: [
-  //         {
-  //           field: 'notes',
-  //           headerName: 'Notes',
-  //           width: 150,
-  //           tooltipField: 'notes',
-  //           cellRenderer: (params: any) => {
-  //             if (!params.value) return '';
-  //             return `<i class="pi pi-file-o" style="margin-right:6px; color:var(--text-tertiary)"></i>${params.value}`;
-  //           }
-  //         },
-  //         {
-  //           field: 'createdAt',
-  //           headerName: 'Since',
-  //           width: 110,
-  //           valueFormatter: (params: any) => params.value ? new Date(params.value).toLocaleDateString() : '',
-  //           cellStyle: { color: 'var(--text-tertiary)', fontSize: '11px' }
-  //         }
-  //       ]
-  //     }
-  //   ];
-  //   this.cdr.detectChanges();
-  // }
   private badge(
     label: string,
     bg: string, color: string, border: string
@@ -561,12 +372,11 @@ export class CustomerList implements OnInit {
             field: 'tags',
             headerName: 'Tags',
             width: 135,
+            valueFormatter: (params: any) => (params.value || []).join(', '),
             cellRenderer: (params: any) => {
               const tags: string[] = (params.value || []).filter((t: string) => t?.trim());
 
-              if (!tags.length) {
-                return `<span class="tag-empty">—</span>`;
-              }
+              if (!tags.length) { return `<span class="tag-empty">—</span>`; }
 
               const chips = tags.slice(0, 2).map(tag =>
                 `<span class="tag-chip">${this.common.toTitleCase(tag)}</span>`

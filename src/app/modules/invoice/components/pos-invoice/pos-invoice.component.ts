@@ -86,11 +86,13 @@ export class PosInvoiceComponent implements OnInit, OnDestroy {
 
   paymentMethodOptions = [
     { label: 'Cash', value: 'cash' },
-    { label: 'Bank Transfer', value: 'bank' },
-    { label: 'Credit', value: 'credit' },
     { label: 'UPI', value: 'upi' },
+    { label: 'Bank Transfer', value: 'bank' },
+    { label: 'Card', value: 'card' },
+    { label: 'Cheque', value: 'cheque' },
     { label: 'Other', value: 'other' },
   ];
+
 
   // --- Totals (Reactive Signals) ---
   subTotal = signal(0);

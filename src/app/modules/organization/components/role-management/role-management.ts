@@ -124,8 +124,13 @@ export class RoleManagementComponent implements OnInit {
       },
       {
         field: 'permissions', headerName: 'Access Scope', flex: 2,
+        valueFormatter: (params: ICellRendererParams) => {
+          if (params.data?.isSuperAdmin) return 'Full System Access';
+          const count = params.value?.length || 0;
+          return `${count} permission${count !== 1 ? 's' : ''}`;
+        },
         cellRenderer: (params: ICellRendererParams) => {
-          if (params.data.isSuperAdmin) return `<span class="text-tertiary italic">Full System Access</span>`;
+          if (params.data?.isSuperAdmin) return `<span class="text-tertiary italic">Full System Access</span>`;
           const count = params.value?.length || 0;
           return `<span class="ag-tag">${count} permission${count !== 1 ? 's' : ''}</span>`;
         }
