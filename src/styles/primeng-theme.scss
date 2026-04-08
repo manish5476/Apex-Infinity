@@ -3452,7 +3452,224 @@
   }
 }
 
+/* ==========================================================================
+   🔥 PRIME NG TOAST — ULTRA PREMIUM THEME (TOKEN ALIGNED)
+   ========================================================================== */
 
+/* ==========================================================================
+   ROOT TOKEN MAPPING (IMPORTANT)
+   ========================================================================== */
+
+:root {
+  --p-toast-width: 360px;
+  --p-toast-border-radius: var(--ui-border-radius-lg);
+  --p-toast-border-width: var(--ui-border-width);
+  --p-toast-transition-duration: 0.25s;
+  --p-toast-blur: 14px;
+
+  --p-toast-icon-size: 1rem;
+
+  --p-toast-content-padding: var(--spacing-md);
+  --p-toast-content-gap: var(--spacing-md);
+  --p-toast-text-gap: 2px;
+
+  --p-toast-summary-font-weight: var(--font-weight-semibold);
+  --p-toast-summary-font-size: var(--font-size-md);
+
+  --p-toast-detail-font-weight: var(--font-weight-normal);
+  --p-toast-detail-font-size: var(--font-size-sm);
+
+  --p-toast-close-button-width: 26px;
+  --p-toast-close-button-height: 26px;
+  --p-toast-close-button-border-radius: var(--ui-border-radius-sm);
+
+  --p-toast-close-icon-size: 0.75rem;
+}
+
+/* ==========================================================================
+   BASE TOAST
+   ========================================================================== */
+
+.p-toast {
+  width: var(--p-toast-width);
+  z-index: var(--z-toast);
+}
+
+/* ==========================================================================
+   MESSAGE CONTAINER
+   ========================================================================== */
+
+.p-toast-message {
+  position: relative;
+
+  border-radius: var(--p-toast-border-radius);
+  border: var(--p-toast-border-width) solid var(--border-primary);
+
+  background: color-mix(in srgb, var(--bg-secondary) 88%, transparent);
+  backdrop-filter: blur(var(--p-toast-blur)) saturate(160%);
+
+  box-shadow: var(--elevation-2);
+
+  overflow: hidden;
+
+  transition: var(--transition-base);
+
+  /* ✨ subtle glass highlight */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+
+    background: linear-gradient(120deg,
+        rgba(255, 255, 255, 0.25),
+        transparent 40%);
+
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  /* 🔥 hover interaction */
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--elevation-3);
+  }
+}
+
+/* ==========================================================================
+   CONTENT
+   ========================================================================== */
+
+.p-toast-message-content {
+  display: flex;
+  align-items: flex-start;
+
+  gap: var(--p-toast-content-gap);
+  padding: var(--p-toast-content-padding);
+}
+
+/* ==========================================================================
+   ICON
+   ========================================================================== */
+
+.p-toast-message-icon {
+  font-size: var(--p-toast-icon-size);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   TEXT
+   ========================================================================== */
+
+.p-toast-message-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--p-toast-text-gap);
+}
+
+.p-toast-summary {
+  font-weight: var(--p-toast-summary-font-weight);
+  font-size: var(--p-toast-summary-font-size);
+  color: var(--text-primary);
+}
+
+.p-toast-detail {
+  font-weight: var(--p-toast-detail-font-weight);
+  font-size: var(--p-toast-detail-font-size);
+  color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   CLOSE BUTTON
+   ========================================================================== */
+
+.p-toast-close-button {
+  width: var(--p-toast-close-button-width);
+  height: var(--p-toast-close-button-height);
+
+  border-radius: var(--p-toast-close-button-border-radius);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--text-muted);
+
+  transition: var(--transition-fast);
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+  }
+
+  &:focus-visible {
+    outline: var(--focus-ring-width) solid var(--accent-primary);
+    outline-offset: var(--focus-ring-offset);
+  }
+}
+
+.p-toast-close-icon {
+  font-size: var(--p-toast-close-icon-size);
+}
+
+/* ==========================================================================
+   STATUS VARIANTS (TOKEN BASED)
+   ========================================================================== */
+
+/* INFO */
+.p-toast-message-info {
+  border-left: 3px solid var(--color-info);
+
+  .p-toast-message-icon {
+    color: var(--color-info);
+  }
+}
+
+/* SUCCESS */
+.p-toast-message-success {
+  border-left: 3px solid var(--color-success);
+
+  .p-toast-message-icon {
+    color: var(--color-success);
+  }
+}
+
+/* WARN */
+.p-toast-message-warn {
+  border-left: 3px solid var(--color-warning);
+
+  .p-toast-message-icon {
+    color: var(--color-warning);
+  }
+}
+
+/* ERROR */
+.p-toast-message-error {
+  border-left: 3px solid var(--color-error);
+
+  .p-toast-message-icon {
+    color: var(--color-error);
+  }
+}
+
+/* ==========================================================================
+   🔥 OPTIONAL: SUBTLE RGB ACCENT STRIP (TOP 1% TOUCH)
+   ========================================================================== */
+
+.p-toast-message::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+
+  background: linear-gradient(180deg,
+      var(--accent-primary),
+      var(--accent-secondary));
+
+  opacity: 0.7;
+}
 
 
 

@@ -106,13 +106,10 @@ export class LoginComponent implements OnInit {
 
     const loginData = { ...this.loginForm.value, forceLogout };
 
-    this.authService.login(loginData).subscribe({
+    this.authService.login(loginData, this.loginForm.value.remember, this.returnUrl).subscribe({
       next: (res: any) => {
-        this.authService.handleLoginSuccess(res);
         this.masterListService.load();
         this.isLoading.set(false);
-        this.messageService.showSuccess('Welcome back!');
-        this.router.navigateByUrl(this.returnUrl);
       },
       error: (err) => {
         this.isLoading.set(false);

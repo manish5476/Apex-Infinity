@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BaseApiService } from './base-api.service';
-import { LoginResponse, User, VerifyTokenResponse, SignupResponse } from '../../modules/auth/services/auth-service';
+import { LoginResponse, User, VerifyTokenResponse, SignupResponse } from '../../modules/auth/services/auth.types';
 
 // ======================================================
 // INTERFACES
