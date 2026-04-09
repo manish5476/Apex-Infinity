@@ -1,5 +1,5 @@
 import { AppMessageService } from './../../../../core/services/message.service';
-import { Component, OnInit, inject, signal, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 // Services
 import { AccountService } from '../../accounts';
@@ -8,6 +8,8 @@ import { MessageService } from 'primeng/api';
 // Shared Components
 import { AgShareGrid, ActionColumnConfig } from '../../../shared/components/ag-shared-grid';
 import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-account-list',
@@ -17,7 +19,8 @@ import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
   templateUrl: './account-list.html',
   styleUrls: ['./account-list.scss']
 })
-export class AccountListComponent implements OnInit {
+export class AccountListComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   // Dependencies
   private accountService = inject(AccountService);
   private messageService = inject(AppMessageService);
@@ -62,7 +65,7 @@ export class AccountListComponent implements OnInit {
 
   loadAccounts(): void {
     this.isLoading = true;
-    this.accountService.getAccounts().subscribe({
+    this.accountService.getAccounts().pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         this.data = Array.isArray(res.data) ? res.data : (Array.isArray(res) ? res : []);
         this.isLoading = false;
@@ -85,4 +88,9 @@ export class AccountListComponent implements OnInit {
   }
 
   handleGridEvent(_event: any) {}
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

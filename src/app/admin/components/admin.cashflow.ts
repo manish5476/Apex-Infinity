@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -6,6 +6,8 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
 import { CommonMethodService } from '../../core/utils/common-method.service';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-cash-flow-analysis',
@@ -653,7 +655,8 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
 }
   `]
 })
-export class CashFlowAnalysisComponent implements OnInit {
+export class CashFlowAnalysisComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   cashData = signal<any>(null);
   loading = signal(false);
 
@@ -687,10 +690,10 @@ export class CashFlowAnalysisComponent implements OnInit {
   loadData(): void {
     this.loading.set(true);
     this.analyticsService.getCashFlowAnalysis(
-      this.currentFilters['startDate'],
-      this.currentFilters['endDate'],
-      this.currentFilters['branchId']
-    ).subscribe({
+            this.currentFilters['startDate'],
+            this.currentFilters['endDate'],
+            this.currentFilters['branchId']
+          ).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         if (res.status === 'success') this.cashData.set(res.data);
         this.loading.set(false);
@@ -698,4 +701,9 @@ export class CashFlowAnalysisComponent implements OnInit {
       error: () => this.loading.set(false)
     });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

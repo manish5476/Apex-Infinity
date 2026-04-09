@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 
 // Services
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -298,7 +298,8 @@ import { AppMessageService } from '@core/services/message.service';
     }
   `]
 })
-export class LeaveBalanceDetailComponent implements OnInit {
+export class LeaveBalanceDetailComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private hrmsService = inject(HRMSService);
@@ -326,7 +327,7 @@ export class LeaveBalanceDetailComponent implements OnInit {
         this.onBack();
         return of(null);
       }),
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       if (res?.data?.leaveBalance) {
         this.balance.set(res.data.leaveBalance);
@@ -353,7 +354,7 @@ export class LeaveBalanceDetailComponent implements OnInit {
       icon: 'pi pi-calendar-plus',
       acceptButtonStyleClass: 'p-button-primary',
       accept: () => {
-        this.hrmsService.initializeLeaveBalance(userId, nextFy).subscribe({
+        this.hrmsService.initializeLeaveBalance(userId, nextFy).pipe(takeUntil(this.destroy$)).subscribe({
           next: () => {
             // this.messageService.add({ severity: 'success', summary: 'Initialized', detail: `Ledger for ${nextFy} created successfully.` });
             // Optionally route them to the new ledger ID returned by the API
@@ -406,4 +407,9 @@ export class LeaveBalanceDetailComponent implements OnInit {
   onBack() {
     this.router.navigate(['/leave-balances']);
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

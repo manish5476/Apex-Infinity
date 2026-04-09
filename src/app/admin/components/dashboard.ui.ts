@@ -1,7 +1,6 @@
 import {
   Component, OnInit, signal, computed,
-  ChangeDetectorRef, inject, ChangeDetectionStrategy
-} from '@angular/core';
+  ChangeDetectorRef, inject, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TagModule } from 'primeng/tag';
@@ -14,6 +13,8 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
 import { CommonMethodService } from '../../core/utils/common-method.service';
 import { MasterListService } from '../../core/services/master-list.service';
 import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-admin-dashboard-ui',
@@ -1424,8 +1425,8 @@ import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
 }
   `]
 })
-export class AdminDashboardUiComponent implements OnInit {
-
+export class AdminDashboardUiComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   dashboard = signal<any>(null);
   loading = signal(true);
 
@@ -1506,13 +1507,18 @@ export class AdminDashboardUiComponent implements OnInit {
       end = this.dateRange[1]?.toISOString();
     }
 
-    this.analyticsService.getDashboardOverview(start, end, this.selectedBranch).subscribe({
+    this.analyticsService.getDashboardOverview(start, end, this.selectedBranch).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => { this.dashboard.set(res.data); this.loading.set(false); },
       error: () => this.loading.set(false)
     });
   }
 
   onFilterChange(): void { this.loadDashboard(); }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 // import { Component, OnInit, signal, ChangeDetectorRef, inject } from '@angular/core';
 // import { CommonModule } from '@angular/common';

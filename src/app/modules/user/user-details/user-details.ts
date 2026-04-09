@@ -1,9 +1,9 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { catchError, finalize, map, of } from 'rxjs'; // 👈 Import RxJS operators
+import { catchError, finalize, map, of, Subject } from 'rxjs'; // 👈 Import RxJS operators
 
 // Services
 import { UserManagementService } from '../user-management.service';
@@ -25,7 +25,7 @@ import { HasPermissionDirective } from '@core/auth/directives/has-permission.dir
 import { PERMISSIONS } from '@core/auth/permissions.constants';
 import { PermissionService } from '@core/auth/services/permission.service';
 import { DynamicDialogServices } from '../../../core/services/dynamic-dialog-services';
-
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-user-details',
@@ -42,7 +42,8 @@ import { DynamicDialogServices } from '../../../core/services/dynamic-dialog-ser
   styleUrl: './user-details.scss'
 })
 
-export class UserDetailsComponent implements OnInit {
+export class UserDetailsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   readonly PERMISSIONS = PERMISSIONS;
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -94,7 +95,7 @@ export class UserDetailsComponent implements OnInit {
 
   // --- Data Loading ---
   loadUserDetails() {
-    this.userService.getUser(this.userId).subscribe({
+    this.userService.getUser(this.userId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         const userData = res.data?.data || res.data?.user;
         if (userData) {
@@ -110,7 +111,7 @@ export class UserDetailsComponent implements OnInit {
   }
 
   loadUserActivity() {
-    this.userService.getUserActivity(this.userId).subscribe({
+    this.userService.getUserActivity(this.userId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         const logs = res.data?.activities || res.data || [];
         this.activities.set(logs);
@@ -145,7 +146,7 @@ export class UserDetailsComponent implements OnInit {
     const formData = new FormData();
     formData.append('photo', file);
     this.userService.uploadUserPhoto(this.userId, formData)
-      .pipe(finalize(() => this.uploading.set(false)))
+      .pipe(finalize(() => this.uploading.set(false)), takeUntil(this.destroy$))
       .subscribe({
         next: (response: any) => {
           const updatedUser = response.data?.user || response.data?.data;
@@ -177,7 +178,7 @@ export class UserDetailsComponent implements OnInit {
           ? this.userService.deactivateUser(this.userId)
           : this.userService.activateUser(this.userId);
 
-        req$.subscribe({
+        req$.pipe(takeUntil(this.destroy$)).subscribe({
           next: () => {
             this.messageService.showSuccess(`User ${action.toLowerCase()}d successfully.`);
             this.user.update(u => ({ ...u, isActive: !u.isActive }));
@@ -206,7 +207,7 @@ export class UserDetailsComponent implements OnInit {
 
     this.isSubmitting = true;
     this.userService.adminResetPassword(this.userId, password, passwordConfirm)
-      .pipe(finalize(() => this.isSubmitting = false))
+      .pipe(finalize(() => this.isSubmitting = false), takeUntil(this.destroy$))
       .subscribe({
         next: () => {
           this.messageService.showSuccess('User password reset successfully.');
@@ -224,10 +225,15 @@ export class UserDetailsComponent implements OnInit {
     const currentUser = this.user();
     if (!currentUser) return;
 
-    this.dialogService.openUserPermissions(currentUser)?.onClose.subscribe(result => {
+    this.dialogService.openUserPermissions(currentUser)?.onClose.pipe(takeUntil(this.destroy$)).subscribe(result => {
       if (result) {
         this.loadUserDetails(); // Refresh to get updated overrides
       }
     });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

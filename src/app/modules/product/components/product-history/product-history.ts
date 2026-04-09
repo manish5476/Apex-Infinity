@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
@@ -7,9 +7,10 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog'; // 🟢 Added DynamicDialogRef
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 import { ProductService } from '../../services/product-service';
 import { AppMessageService } from '../../../../core/services/message.service';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-product-history',
@@ -26,7 +27,8 @@ import { AppMessageService } from '../../../../core/services/message.service';
   templateUrl: './product-history.html',
   styleUrls: ['./product-history.scss'] // Assuming you will add SCSS next
 })
-export class ProductHistoryComponent implements OnInit {
+export class ProductHistoryComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   // Signals
   history = signal<any[]>([]);
   loading = signal(false);
@@ -59,7 +61,7 @@ export class ProductHistoryComponent implements OnInit {
     const end = this.dateRange?.[1] ? this.formatDateForApi(this.dateRange[1]) : undefined;
 
     this.productService.getProductHistory(this.productId, { startDate: start, endDate: end })
-      .pipe(finalize(() => this.loading.set(false)))
+      .pipe(finalize(() => this.loading.set(false)), takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
           if (res.status === 'success') {
@@ -95,4 +97,9 @@ export class ProductHistoryComponent implements OnInit {
   getTypeLabel(type: string): string {
     return type ? type.replace(/_/g, ' ') : 'UNKNOWN';
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

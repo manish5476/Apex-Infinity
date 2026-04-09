@@ -1,7 +1,7 @@
-import { Component, OnInit, inject, signal, effect } from '@angular/core';
+import { Component, OnInit, inject, signal, effect, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 
 // PrimeNG Imports
 import { SelectModule } from 'primeng/select'; // v18+ <p-select appendTo="body">
@@ -13,6 +13,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { DateFilterComponent } from '../date-filter/date-filter.component';
 import { InvoiceService } from '../../services/invoice-service';
 import { ProgressSpinner } from "primeng/progressspinner";
+import { takeUntil } from "rxjs/operators";
 
 // --- Interfaces (Same as before) ---
 interface DashboardData {
@@ -618,7 +619,8 @@ interface DashboardData {
 `
   ]
 })
-export class ProfitDashboardComponent implements OnInit {
+export class ProfitDashboardComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private invoiceService = inject(InvoiceService);
 
   // --- STATE ---
@@ -694,7 +696,7 @@ export class ProfitDashboardComponent implements OnInit {
     const periodArg = this.selectedPeriod;
 
     this.invoiceService.getProfitDashboard(periodArg, filters)
-      .pipe(finalize(() => this.loading.set(false)))
+      .pipe(finalize(() => this.loading.set(false)), takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
           if (res.status === 'success') {
@@ -715,4 +717,9 @@ export class ProfitDashboardComponent implements OnInit {
     const pct = (value / safeMax) * 100;
     return Math.max(5, Math.min(pct, 100));
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

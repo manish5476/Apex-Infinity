@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, signal, ChangeDetectorRef, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
@@ -13,6 +13,8 @@ import { CommonMethodService } from '../../core/utils/common-method.service';
 import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 interface PeakHour {
   count: number;
@@ -259,7 +261,8 @@ interface PeakHour {
     .loader-text { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); }
   `]
 })
-export class OperationalMetricsComponent implements OnInit {
+export class OperationalMetricsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   public commonService = inject(CommonMethodService);
   private analyticsService = inject(AdminAnalyticsService);
   private cdr = inject(ChangeDetectorRef);
@@ -288,7 +291,7 @@ export class OperationalMetricsComponent implements OnInit {
     this.loading.set(true);
     const { startDate, endDate, branchId } = this.currentFilters;
 
-    this.analyticsService.getOperationalMetrics(startDate, endDate, branchId).subscribe({
+    this.analyticsService.getOperationalMetrics(startDate, endDate, branchId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         if (res.status === 'success') {
           this.opData.set(res.data);
@@ -375,4 +378,9 @@ export class OperationalMetricsComponent implements OnInit {
     ];
     this.cdr.detectChanges();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

@@ -1,7 +1,7 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
-import { forkJoin, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { forkJoin, of, Subject } from 'rxjs';
+import { catchError, map, takeUntil } from 'rxjs/operators';
 
 // Services
 import { HRMSService } from '../../../hrms.service';
@@ -204,7 +204,8 @@ import { AppMessageService } from '@core/services/message.service';
     }
   `]
 })
-export class DepartmentHubComponent implements OnInit {
+export class DepartmentHubComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
 
@@ -304,28 +305,28 @@ export class DepartmentHubComponent implements OnInit {
     this.isLoading.set(true);
 
     forkJoin({
-      hierarchy: this.hrmsService.getDepartmentHierarchy().pipe(
-        map((res: any) => res?.data?.hierarchy || []),
-        catchError(() => {
-          this.showError('Failed to load hierarchy');
-          return of([]);
-        })
-      ),
-      tree: this.hrmsService.getDepartmentTree().pipe(
-        map((res: any) => res?.data?.departments || []),
-        catchError(() => {
-          this.showError('Failed to load directory');
-          return of([]);
-        })
-      ),
-      stats: this.hrmsService.getDepartmentStats().pipe(
-        map((res: any) => res?.data?.stats || null),
-        catchError(() => {
-          this.showError('Failed to load stats');
-          return of(null);
-        })
-      )
-    }).subscribe(({ hierarchy, tree, stats }) => {
+            hierarchy: this.hrmsService.getDepartmentHierarchy().pipe(
+              map((res: any) => res?.data?.hierarchy || []),
+              catchError(() => {
+                this.showError('Failed to load hierarchy');
+                return of([]);
+              })
+            ),
+            tree: this.hrmsService.getDepartmentTree().pipe(
+              map((res: any) => res?.data?.departments || []),
+              catchError(() => {
+                this.showError('Failed to load directory');
+                return of([]);
+              })
+            ),
+            stats: this.hrmsService.getDepartmentStats().pipe(
+              map((res: any) => res?.data?.stats || null),
+              catchError(() => {
+                this.showError('Failed to load stats');
+                return of(null);
+              })
+            )
+          }).pipe(takeUntil(this.destroy$)).subscribe(({ hierarchy, tree, stats }) => {
       this.hierarchyNodes.set(this.transformHierarchy(hierarchy));
       this.rawTreeData.set(tree);
       this.stats.set(stats);
@@ -350,4 +351,9 @@ export class DepartmentHubComponent implements OnInit {
   private showError(detail: string) {
     this.messageService.showError(detail)
 }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 } 

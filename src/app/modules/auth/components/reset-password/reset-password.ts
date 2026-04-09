@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -7,6 +7,8 @@ import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
 import { AuthService } from '../../services/auth-service';
 import { AppMessageService } from '../../../../core/services/message.service';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-reset-password',
@@ -16,7 +18,8 @@ import { AppMessageService } from '../../../../core/services/message.service';
   templateUrl: './reset-password.html',
   styleUrl: './reset-password.scss'
 })
-export class ResetPasswordComponent implements OnInit {
+export class ResetPasswordComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
@@ -49,7 +52,7 @@ export class ResetPasswordComponent implements OnInit {
     this.successMessage.set(null);
     this.errorMessage.set(null);
 
-    this.authService.resetPassword(this.token, this.resetForm.value).subscribe({
+    this.authService.resetPassword(this.token, this.resetForm.value).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.isLoading.set(false);
         this.resetForm.reset();
@@ -65,4 +68,9 @@ export class ResetPasswordComponent implements OnInit {
       }
     });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

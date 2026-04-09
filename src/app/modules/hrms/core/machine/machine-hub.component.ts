@@ -1,7 +1,7 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
-import { catchError, finalize, forkJoin, of } from 'rxjs';
+import { catchError, finalize, forkJoin, of, Subject } from 'rxjs';
 
 // Services
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -21,6 +21,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { HRMSService } from '../../hrms.service';
 import { AppMessageService } from '@core/services/message.service';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-machine-hub',
@@ -295,7 +296,8 @@ import { AppMessageService } from '@core/services/message.service';
     .slide-down { animation: slideDown 0.4s cubic-bezier(0.2, 0.9, 0.2, 1); animation-fill-mode: both; }
   `]
 })
-export class MachineHubComponent implements OnInit {
+export class MachineHubComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
   private router = inject(Router);
@@ -328,7 +330,7 @@ export class MachineHubComponent implements OnInit {
       list: this.hrmsService.getMachines().pipe(catchError(() => of({ data: { machines: [] } }))),
       stats: this.hrmsService.getMachineAnalytics().pipe(catchError(() => of({ data: { totalMachines: 0, onlineMachines: 0, offlineMachines: 0, transactions24h: 0 } })))
     }).pipe(
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe(({ list, stats }) => {
       this.machines.set(list?.data?.machines || []);
       this.analytics.set(stats?.data || {});
@@ -357,7 +359,7 @@ export class MachineHubComponent implements OnInit {
       catchError(err => {
         this.messageService.handleHttpError(err)
         return of(null);
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       if (res) {
         this.loadData();
@@ -383,4 +385,9 @@ export class MachineHubComponent implements OnInit {
       default: return 'info';
     }
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

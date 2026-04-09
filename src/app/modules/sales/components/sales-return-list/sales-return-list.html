@@ -11,11 +11,11 @@
     </div>
 
     <div class="header-right flex items-center gap-3">
-      <button pButton icon="pi pi-refresh" class="p-button-text p-button-secondary p-button-rounded" 
+      <button pButton icon="pi pi-refresh" class="p-button-text p-button-secondary p-button-rounded"
         [loading]="isLoading()" (click)="getData(true)" pTooltip="Refresh List"></button>
-        
-      <button *hasPermission="PERMISSIONS.SALES.MANAGE" pButton label="New Sales Return" 
-        icon="pi pi-plus" class="p-button-primary shadow-lg" routerLink="/invoices"></button>
+
+      <button *hasPermission="PERMISSIONS.SALES.MANAGE" pButton label="New Sales Return" icon="pi pi-plus"
+        class="p-button-primary shadow-lg" routerLink="/invoices"></button>
     </div>
   </header>
 
@@ -24,71 +24,69 @@
     <div class="filter-group">
       <label class="filter-label">Search</label>
       <span class="p-input-icon-left w-full">
-        <i class="pi pi-search"></i>
-        <input type="text" pInputText [formControl]="searchControl" placeholder="Return #, Invoice #..." class="w-full" />
+        <!-- <i class="pi pi-search"></i> -->
+        <input type="text" pInputText [formControl]="searchControl" placeholder="Return #, Invoice #..."
+          class="w-full" />
       </span>
     </div>
 
     <div class="filter-group">
       <label class="filter-label">Status</label>
-      <p-select [options]="statusOptions" [(ngModel)]="filter.status" (onChange)="applyFilters()" 
+      <p-select [options]="statusOptions" [(ngModel)]="filter.status" (onChange)="applyFilters()"
         placeholder="Select Status" class="w-full" [showClear]="true"></p-select>
     </div>
 
     <div class="filter-group">
       <label class="filter-label">Branch</label>
-      <p-select [options]="masterList.branches()" optionLabel="name" optionValue="_id" 
-        [(ngModel)]="filter.branchId" (onChange)="applyFilters()" placeholder="Select Branch" 
-        class="w-full" [showClear]="true"></p-select>
+      <p-select [options]="masterList.branches()" optionLabel="name" optionValue="_id" [(ngModel)]="filter.branchId"
+        (onChange)="applyFilters()" placeholder="Select Branch" class="w-full" [showClear]="true"></p-select>
     </div>
 
     <div class="filter-group">
       <div class="flex items-center justify-between mb-1.5">
         <label class="filter-label !mb-0">Date Range</label>
         @if (filter.dateRange) {
-          <button class="text-xs text-accent-primary hover:underline" (click)="resetFilters()">Clear</button>
+        <button class="text-xs text-accent-primary hover:underline" (click)="resetFilters()">Clear</button>
         }
       </div>
-      <p-datepicker [(ngModel)]="filter.dateRange" selectionMode="range" (onSelect)="applyFilters()" 
+      <p-datepicker [(ngModel)]="filter.dateRange" selectionMode="range" (onSelect)="applyFilters()"
         placeholder="Start - End" class="w-full" appendTo="body"></p-datepicker>
     </div>
   </section>
 
   <!-- Grid Section -->
   <main class="grid-layout relative min-h-[400px]">
-    <app-ag-share-grid 
-      [columns]="column" 
-      [data]="data()" 
-      (gridEvent)="eventFromGrid($event)" 
-      class="full-size-grid">
+    <app-ag-share-grid [columns]="column" [data]="data()" (gridEvent)="eventFromGrid($event)" class="full-size-grid">
     </app-ag-share-grid>
 
     @if (isLoading() && data().length === 0) {
-      <div class="absolute inset-0 flex items-center justify-center bg-white/5 backdrop-blur-[2px] z-10 rounded-xl">
-        <div class="flex flex-col items-center gap-3">
-          <i class="pi pi-spin pi-spinner text-3xl text-accent-primary"></i>
-          <p class="text-sm font-semibold tracking-wider text-secondary">FETCHING RETURNS...</p>
-        </div>
+    <div class="absolute inset-0 flex items-center justify-center bg-white/5 backdrop-blur-[2px] z-10 rounded-xl">
+      <div class="flex flex-col items-center gap-3">
+        <i class="pi pi-spin pi-spinner text-3xl text-accent-primary"></i>
+        <p class="text-sm font-semibold tracking-wider text-secondary">FETCHING RETURNS...</p>
       </div>
+    </div>
     }
 
     @if (!isLoading() && data().length === 0) {
-      <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 text-center p-8 z-10">
-        <div class="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-2">
-          <i class="pi pi-inbox text-4xl text-secondary/30"></i>
-        </div>
-        <div>
-          <h3 class="text-lg font-bold">No Returns Found</h3>
-          <p class="text-sm text-secondary max-w-xs mx-auto">Try adjusting your filters or search terms to find what you're looking for.</p>
-        </div>
-        <button pButton label="Clear All Filters" class="p-button-text p-button-sm" (click)="resetFilters()"></button>
+    <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 text-center p-8 z-10">
+      <div class="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-2">
+        <i class="pi pi-inbox text-4xl text-secondary/30"></i>
       </div>
+      <div>
+        <h3 class="text-lg font-bold">No Returns Found</h3>
+        <p class="text-sm text-secondary max-w-xs mx-auto">Try adjusting your filters or search terms to find what
+          you're looking for.</p>
+      </div>
+      <button pButton label="Clear All Filters" class="p-button-text p-button-sm" (click)="resetFilters()"></button>
+    </div>
     }
   </main>
 
   <footer class="mt-4 flex items-center justify-between px-2">
     <p class="text-xs font-medium text-secondary">
-      Showing <span class="text-primary font-bold">{{ data().length }}</span> of <span class="text-primary font-bold">{{ data().length }}</span> results
+      Showing <span class="text-primary font-bold">{{ data().length }}</span> of <span class="text-primary font-bold">{{
+        data().length }}</span> results
     </p>
     <div class="flex items-center gap-1.5 grayscale opacity-50">
       <i class="pi pi-info-circle text-[10px]"></i>

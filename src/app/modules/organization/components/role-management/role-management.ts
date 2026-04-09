@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
@@ -21,7 +21,8 @@ import { CheckboxModule } from 'primeng/checkbox';
 // --- Shared Components & Grid ---
 import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
 import { GridApi, ICellRendererParams, GridReadyEvent } from 'ag-grid-community';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
+import { takeUntil } from "rxjs/operators";
 
 // --- Interfaces ---
 export interface Role {
@@ -60,7 +61,8 @@ export interface Permission {
   templateUrl: './role-management.html',
   styleUrl: './role-management.scss'
 })
-export class RoleManagementComponent implements OnInit {
+export class RoleManagementComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private apiService = inject(ApiService);
   private appMessage = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
@@ -105,7 +107,7 @@ export class RoleManagementComponent implements OnInit {
 
 
   loadPermissions(): void {
-    this.apiService.permissions().subscribe({
+    this.apiService.permissions().pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => this.permissionsList.set(res.data || []),
       error: (err) => console.warn('Permissions load failed', err)
     });
@@ -124,8 +126,13 @@ export class RoleManagementComponent implements OnInit {
       },
       {
         field: 'permissions', headerName: 'Access Scope', flex: 2,
+        valueFormatter: (params: ICellRendererParams) => {
+          if (params.data?.isSuperAdmin) return 'Full System Access';
+          const count = params.value?.length || 0;
+          return `${count} permission${count !== 1 ? 's' : ''}`;
+        },
         cellRenderer: (params: ICellRendererParams) => {
-          if (params.data.isSuperAdmin) return `<span class="text-tertiary italic">Full System Access</span>`;
+          if (params.data?.isSuperAdmin) return `<span class="text-tertiary italic">Full System Access</span>`;
           const count = params.value?.length || 0;
           return `<span class="ag-tag">${count} permission${count !== 1 ? 's' : ''}</span>`;
         }
@@ -205,7 +212,7 @@ export class RoleManagementComponent implements OnInit {
 
   loadRoles(): void {
     this.isLoading.set(true);
-    this.apiService.getRoles().subscribe({
+    this.apiService.getRoles().pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         this.roles.set(res.data?.roles || []);
         this.isLoading.set(false);
@@ -251,7 +258,7 @@ export class RoleManagementComponent implements OnInit {
       finalize(() => {
         this.isSaving.set(false);
         this.cdr.markForCheck();
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
         this.appMessage.showSuccess(`Role ${this.isEditMode() ? 'updated' : 'created'} successfully.`);
@@ -270,7 +277,7 @@ export class RoleManagementComponent implements OnInit {
       header: 'Confirm Delete',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        this.apiService.deleteRole(role._id).subscribe({
+        this.apiService.deleteRole(role._id).pipe(takeUntil(this.destroy$)).subscribe({
           next: () => {
             this.appMessage.showSuccess('Role removed successfully.');
             this.loadRoles();
@@ -282,6 +289,11 @@ export class RoleManagementComponent implements OnInit {
       }
     });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 

@@ -1,8 +1,8 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { finalize } from 'rxjs/operators';
+import { finalize, takeUntil } from 'rxjs/operators';
 import { ToastModule } from 'primeng/toast';
 import { PasswordModule } from 'primeng/password';
 import { StepperModule } from 'primeng/stepper';
@@ -11,6 +11,7 @@ import { AuthService } from '../../../auth/services/auth-service';
 import { OrganizationService } from '../../organization.service';
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../core/services/message.service';
+import { Subject } from "rxjs";
 
 @Component({
   selector: 'app-create-organization',
@@ -28,7 +29,8 @@ import { AppMessageService } from '../../../../core/services/message.service';
   templateUrl: './create-organization.html',
   styleUrl: './create-organization.scss'
 })
-export class CreateOrganizationComponent implements OnInit {
+export class CreateOrganizationComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private messageService = inject(AppMessageService);
@@ -124,7 +126,7 @@ export class CreateOrganizationComponent implements OnInit {
     if (payload.gstNumber) payload.gstNumber = payload.gstNumber.toUpperCase();
 
     this.orgService.createNewOrganization(payload)
-      .pipe(finalize(() => this.isLoading.set(false)))
+      .pipe(finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
           const msg = 'Organization created! Logging you in…';
@@ -145,6 +147,11 @@ export class CreateOrganizationComponent implements OnInit {
         },
       });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { Component, OnInit, inject, signal } from '@angular/core';

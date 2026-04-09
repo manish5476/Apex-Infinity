@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, effect, inject, signal, ViewChild, ElementRef } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, effect, inject, signal, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
@@ -15,11 +15,12 @@ import { ImageCellRendererComponent } from '../../../shared/AgGrid/AgGridcompone
 import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
 import { Dialog } from "primeng/dialog";
 import { BulkProductEntry } from "../bulk-product-entry/bulk-product-entry";
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-product-list',
@@ -41,7 +42,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
   templateUrl: './product-list.html',
   styleUrl: './product-list.scss',
 })
-export class ProductListComponent implements OnInit {
+export class ProductListComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
   private productService = inject(ProductService);
   private messageService = inject(AppMessageService);
@@ -116,7 +118,7 @@ export class ProductListComponent implements OnInit {
         finalize(() => {
           this.isLoading = false;
           this.cdr.markForCheck();
-        })
+        }), takeUntil(this.destroy$)
       )
       .subscribe({
         next: (res: any) => {
@@ -194,7 +196,7 @@ export class ProductListComponent implements OnInit {
       header: 'Confirm Deletion',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        this.productService.deleteProductById(productId).subscribe({
+        this.productService.deleteProductById(productId).pipe(takeUntil(this.destroy$)).subscribe({
           next: () => {
             this.messageService.showSuccess('Product deleted successfully');
             this.selectedRows = [];
@@ -227,7 +229,7 @@ export class ProductListComponent implements OnInit {
       .pipe(finalize(() => {
         this.isLoading = false;
         this.cdr.markForCheck();
-      }))
+      }), takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
           this.messageService.showSuccess('Images uploaded successfully.');
@@ -594,4 +596,8 @@ export class ProductListComponent implements OnInit {
     return '₹ ' + params.value.toLocaleString('en-IN', { minimumFractionDigits: 2 });
   }
 
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

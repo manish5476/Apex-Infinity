@@ -1,10 +1,12 @@
 
-import { Component, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewChecked, OnDestroy } from '@angular/core';
 import { ChatService } from '../../services/chat';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-ai-assistant',
@@ -13,7 +15,8 @@ import { PERMISSIONS } from '@core/auth/permissions.constants';
   templateUrl: './ai-assistant.html',
   styleUrl: './ai-assistant.scss',
 })
-export class AiAssistantComponent implements AfterViewChecked {
+export class AiAssistantComponent implements AfterViewChecked, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   readonly PERMISSIONS = PERMISSIONS;
 
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
@@ -53,7 +56,7 @@ export class AiAssistantComponent implements AfterViewChecked {
     this.scrollToBottom();
 
     // 2. Send to Backend
-    this.chatService.sendMessage(currentMsg).subscribe({
+    this.chatService.sendMessage(currentMsg).pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
         this.messages.push({
           text: response.reply, // Matches res.json({ reply: ... }) in Node
@@ -86,4 +89,9 @@ export class AiAssistantComponent implements AfterViewChecked {
       }
     } catch (err) { }
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

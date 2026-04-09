@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, inject, signal, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -9,6 +9,8 @@ import { NoteService } from '../../../core/services/notes.service';
 import { TemplateSelectorComponent } from '../template-selector/template-selector.component';
 import { AppMessageService } from '../../../core/services/message.service';
 import { SimpleEditorComponent } from '../../shared/components/simple-editor/simple-editor.component';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-note-create',
@@ -25,7 +27,8 @@ import { SimpleEditorComponent } from '../../shared/components/simple-editor/sim
   templateUrl: './note-create.component.html',
   styleUrl: './note-create.component.scss',
 })
-export class NoteCreateComponent implements OnInit {
+export class NoteCreateComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private fb             = inject(FormBuilder);
   private noteService    = inject(NoteService);
   private messageService = inject(AppMessageService);
@@ -130,7 +133,7 @@ export class NoteCreateComponent implements OnInit {
       dismissableMask: true,
     });
 
-    ref.onClose.subscribe((template: Note) => {
+    ref.onClose.pipe(takeUntil(this.destroy$)).subscribe((template: Note) => {
       if (template) this.applyTemplate(template);
     });
   }
@@ -162,7 +165,7 @@ export class NoteCreateComponent implements OnInit {
     this.isUploading.set(true);
     const files = Array.from(input.files);
 
-    this.noteService.uploadMedia(files).subscribe({
+    this.noteService.uploadMedia(files).pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
         this.uploadedAttachments.update(curr => [...curr, ...response.data]);
         this.isUploading.set(false);
@@ -230,7 +233,7 @@ export class NoteCreateComponent implements OnInit {
       ? this.noteService.createTemplate(payload)
       : this.noteService.createNote(payload);
 
-    request$.subscribe({
+    request$.pipe(takeUntil(this.destroy$)).subscribe({
       next:  () => {
         const type = payload.isTemplate ? 'Template' : 'Note';
         this.messageService.showSuccess(`${type} created successfully.`);
@@ -249,6 +252,11 @@ export class NoteCreateComponent implements OnInit {
     this.isSubmitting.set(false);
     this.messageService.handleHttpError(err);
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 // import { Component, inject, signal, OnInit, ViewEncapsulation } from '@angular/core';
 // import { CommonModule } from '@angular/common';

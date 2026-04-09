@@ -1,7 +1,9 @@
-import { Component, inject, signal, OnInit, ViewEncapsulation, ElementRef, ViewChild, computed, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, signal, OnInit, ViewEncapsulation, ElementRef, ViewChild, computed, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NoteService } from '../../../core/services/notes.service'; // Adjust path if needed
 import { AppMessageService } from '../../../core/services/message.service';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-analytics-dashboard',
@@ -245,7 +247,8 @@ import { AppMessageService } from '../../../core/services/message.service';
     }
   `]
 })
-export class AnalyticsDashboardComponent implements OnInit {
+export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   noteService = inject(NoteService);
   messageService = inject(AppMessageService);
   stats = signal<any>(null);
@@ -265,7 +268,7 @@ export class AnalyticsDashboardComponent implements OnInit {
   }
 
   loadStats() {
-    this.noteService.getNoteStatistics().subscribe({
+    this.noteService.getNoteStatistics().pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.stats.set(res.data);
       },
@@ -278,7 +281,7 @@ export class AnalyticsDashboardComponent implements OnInit {
 
   loadGraph() {
     this.isGraphLoading.set(true);
-    this.noteService.getKnowledgeGraph().subscribe({
+    this.noteService.getKnowledgeGraph().pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         const rawNodes = res.data.nodes || [];
         const rawLinks = res.data.links || [];
@@ -309,7 +312,7 @@ export class AnalyticsDashboardComponent implements OnInit {
   }
 
   loadHeatmap() {
-    this.noteService.getHeatMapData().subscribe({
+    this.noteService.getHeatMapData().pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         const heatMap = res.data?.heatMap || {};
         const grid = [];
@@ -414,4 +417,9 @@ export class AnalyticsDashboardComponent implements OnInit {
   getNodeSize(type: string) {
     return type === 'note' ? 8 : 6;
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

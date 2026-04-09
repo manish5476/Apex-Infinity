@@ -25,6 +25,7 @@ import { HasPermissionDirective } from '@core/auth/directives/has-permission.dir
 import { PERMISSIONS } from '@core/auth/permissions.constants';
 import { CommonMethodService } from '@core/utils/common-method.service';
 import { AnnouncementService, CreateAnnouncementPayload, UpdateAnnouncementPayload } from '@core/services/announcement.service';
+import { takeUntil } from "rxjs/operators";
 
 // ─── Form Model ───────────────────────────────────────────────
 interface AnnouncementForm {
@@ -165,7 +166,7 @@ export class AnnouncementList implements OnInit, OnDestroy {
     if (this.filterAudience) params['audience'] = this.filterAudience;
     if (this.filterStatus) params['status'] = this.filterStatus;
 
-    this.announcementSvc.getAllAnnouncements(params).subscribe({
+    this.announcementSvc.getAllAnnouncements(params).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         const newData: any[] = res.data?.announcements ?? [];
         this.hasNextPage = res.page < res.totalPages;
@@ -251,7 +252,7 @@ export class AnnouncementList implements OnInit, OnDestroy {
         isPinned: this.form.isPinned,
         isUrgent: this.form.isUrgent,
       };
-      this.announcementSvc.createAnnouncement(payload).subscribe({
+      this.announcementSvc.createAnnouncement(payload).pipe(takeUntil(this.destroy$)).subscribe({
         next: () => {
           this.dialogLoading.set(false);
           this.dialogOpen.set(false);
@@ -273,7 +274,7 @@ export class AnnouncementList implements OnInit, OnDestroy {
         isUrgent: this.form.isUrgent,
         isActive: this.form.isActive,
       };
-      this.announcementSvc.updateAnnouncement(id, payload).subscribe({
+      this.announcementSvc.updateAnnouncement(id, payload).pipe(takeUntil(this.destroy$)).subscribe({
         next: () => {
           this.dialogLoading.set(false);
           this.dialogOpen.set(false);
@@ -294,7 +295,7 @@ export class AnnouncementList implements OnInit, OnDestroy {
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.announcementSvc.deleteAnnouncement(row._id).subscribe({
+        this.announcementSvc.deleteAnnouncement(row._id).pipe(takeUntil(this.destroy$)).subscribe({
           next: () => {
             this.messageService.showSuccess('Deleted Announcement removed.');
             this.data.set(this.data().filter(d => d._id !== row._id));
@@ -309,7 +310,7 @@ export class AnnouncementList implements OnInit, OnDestroy {
 
   // ── Mark as Read ─────────────────────────────────────────────
   markRead(row: any): void {
-    this.announcementSvc.markAsRead(row._id).subscribe({
+    this.announcementSvc.markAsRead(row._id).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.messageService.showSuccess('Marked as read.');
         this.loadStats();
@@ -328,7 +329,7 @@ export class AnnouncementList implements OnInit, OnDestroy {
         width: 52,
         sortable: false,
         filter: false,
-        suppressMenu: true,
+        suppressHeaderMenuButton: true,
         pinned: 'left',
         cellStyle: { color: 'var(--text-secondary)', fontSize: '11px', textAlign: 'center' },
       },
@@ -338,10 +339,9 @@ export class AnnouncementList implements OnInit, OnDestroy {
         minWidth: 200,
         sortable: true,
         filter: true,
-        valueGetter: (p: any) => p.data,
-        valueFormatter: (p: any) => p.data?.title ?? '',
+        valueGetter: (p: any) => p.data?.title ?? '',
         cellRenderer: (p: any) => {
-          const row = p.value;
+          const row = p.data;
           const pinBadge = row.isPinned
             ? `<span style="font-size:9px;padding:1px 6px;border-radius:99px;background:var(--accent-focus);color:var(--accent-primary);font-weight:700;margin-left:6px">📌 PINNED</span>` : '';
           const urgentBadge = row.isUrgent

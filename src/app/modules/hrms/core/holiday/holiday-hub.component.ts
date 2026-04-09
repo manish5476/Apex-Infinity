@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { forkJoin, of } from 'rxjs';
-import { catchError, finalize } from 'rxjs/operators';
+import { forkJoin, of, Subject } from 'rxjs';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { FormsModule } from '@angular/forms';
 
 // Services
@@ -317,7 +317,8 @@ import { AppMessageService } from '@core/services/message.service';
     }
   `]
 })
-export class HolidayHubComponent implements OnInit {
+export class HolidayHubComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
@@ -355,7 +356,7 @@ export class HolidayHubComponent implements OnInit {
       upcoming: this.hrmsService.getUpcomingHolidays(3).pipe(catchError(() => of({ data: { holidays: [] } }))),
       statsData: this.hrmsService.getHolidayStats(this.selectedYear).pipe(catchError(() => of({ data: null })))
     }).pipe(
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe(({ yearList, upcoming, statsData }) => {
       this.holidays.set(yearList?.data?.holidays || []);
       this.upcomingHolidays.set(upcoming?.data?.holidays || []);
@@ -378,7 +379,7 @@ export class HolidayHubComponent implements OnInit {
       icon: 'pi pi-trash',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.hrmsService.deleteHoliday(holiday._id).subscribe({
+        this.hrmsService.deleteHoliday(holiday._id).pipe(takeUntil(this.destroy$)).subscribe({
           next: (res: any) => {
             this.messageService.showSuccess(res.message)
             this.loadYearData();
@@ -398,7 +399,7 @@ export class HolidayHubComponent implements OnInit {
       catchError(err => {
         this.messageService.handleHttpError(err)
         return of(null);
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       if (res) {
         this.messageService.showSuccess(res.message)
@@ -409,7 +410,7 @@ export class HolidayHubComponent implements OnInit {
   }
 
   onExport() {
-    this.hrmsService.exportHolidayCalendar(this.selectedYear, undefined, 'calendar').subscribe({
+    this.hrmsService.exportHolidayCalendar(this.selectedYear, undefined, 'calendar').pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => this.messageService.showSuccess(res.message)
     });
   }
@@ -427,4 +428,9 @@ export class HolidayHubComponent implements OnInit {
       default: return 'secondary';
     }
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

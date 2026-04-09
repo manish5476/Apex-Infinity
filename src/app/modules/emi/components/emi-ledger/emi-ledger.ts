@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, inject, signal, effect, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject, signal, effect, ViewChild, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -15,6 +15,8 @@ import { AppMessageService } from '../../../../core/services/message.service';
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { EmiService } from '../../services/emi-service';
 import { GridApi } from 'ag-grid-community';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-emi-ledger',
@@ -33,7 +35,8 @@ import { GridApi } from 'ag-grid-community';
   templateUrl: './emi-ledger.html',
   styleUrl: './emi-ledger.scss',
 })
-export class EmiLedger implements OnInit {
+export class EmiLedger implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
   private emiService = inject(EmiService);
   private messageService = inject(AppMessageService);
@@ -76,7 +79,7 @@ export class EmiLedger implements OnInit {
       endDate: this.filter.endDate ? this.filter.endDate.toISOString() : undefined
     };
 
-    this.emiService.getEmiLedgerReport(params).subscribe({
+    this.emiService.getEmiLedgerReport(params).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         this.data = res.data || [];
         this.isLoading = false;
@@ -202,4 +205,9 @@ export class EmiLedger implements OnInit {
       }
     ];
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

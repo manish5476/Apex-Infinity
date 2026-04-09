@@ -1,9 +1,9 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 
 // Services
 import { MessageService } from 'primeng/api';
@@ -208,7 +208,8 @@ import { AppMessageService } from '@core/services/message.service';
     @media (max-width: 900px) { .grid-layout { grid-template-columns: 1fr; } }
   `]
 })
-export class LeaveFormComponent implements OnInit {
+export class LeaveFormComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
@@ -278,7 +279,7 @@ export class LeaveFormComponent implements OnInit {
         this.onCancel();
         return of(null);
       }),
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       const data = res?.data?.leaveRequest;
       if (data) {
@@ -331,7 +332,7 @@ export class LeaveFormComponent implements OnInit {
         this.messageService.handleHttpError(err)
         return of(null);
       }),
-      finalize(() => this.isSaving.set(false))
+      finalize(() => this.isSaving.set(false)), takeUntil(this.destroy$)
     ).subscribe(res => {
       if (res) {
         // this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Leave request submitted.' });
@@ -343,4 +344,9 @@ export class LeaveFormComponent implements OnInit {
   onCancel() {
     this.router.navigate(['/leave']);
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

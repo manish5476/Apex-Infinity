@@ -4,8 +4,7 @@ import {
   OnInit,
   inject,
   signal,
-  ViewEncapsulation,
-} from '@angular/core';
+  ViewEncapsulation, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -19,6 +18,8 @@ import { NoteService } from '../../../core/services/notes.service';
 import { AppMessageService } from '../../../core/services/message.service';
 import { AgShareGrid } from '../../shared/components/ag-shared-grid';
 import { DatePicker } from 'primeng/datepicker';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-admin-note-list',
@@ -393,7 +394,8 @@ import { DatePicker } from 'primeng/datepicker';
 }`,
   ],
 })
-export class AdminNoteListComponent implements OnInit {
+export class AdminNoteListComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
   private noteService = inject(NoteService);
   private messageService = inject(AppMessageService);
@@ -502,7 +504,7 @@ export class AdminNoteListComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-danger p-button-text',
       rejectButtonStyleClass: 'p-button-secondary p-button-text',
       accept: () => {
-        this.noteService.hardDeleteNote(row._id).subscribe({
+        this.noteService.hardDeleteNote(row._id).pipe(takeUntil(this.destroy$)).subscribe({
           next: () => {
             // Simplified to single parameter string
             this.messageService.showSuccess('Note deleted successfully.');
@@ -552,7 +554,7 @@ export class AdminNoteListComponent implements OnInit {
       params.createdTo = this.dateRange[1].toISOString();
     }
 
-    this.noteService.getAllOrganizationNotes(params).subscribe({
+    this.noteService.getAllOrganizationNotes(params).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         const fetchedNotes = res.data?.notes || [];
         this.totalRecords = res.pagination?.total || res.results || 0;
@@ -896,4 +898,8 @@ export class AdminNoteListComponent implements OnInit {
   //     },
   //   ];
   // }
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

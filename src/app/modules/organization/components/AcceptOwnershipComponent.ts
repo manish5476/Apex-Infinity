@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
@@ -10,7 +10,8 @@ import { ToastModule } from 'primeng/toast';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { OrganizationService } from '../organization.service';
 import { AppMessageService } from '../../../core/services/message.service';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-accept-ownership',
@@ -108,7 +109,8 @@ import { finalize } from 'rxjs';
     .success-msg { color: var(--green-600); background: var(--green-50); padding: 1rem; border-radius: 6px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
   `]
 })
-export class AcceptOwnershipComponent implements OnInit {
+export class AcceptOwnershipComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private orgService = inject(OrganizationService);
@@ -139,7 +141,7 @@ export class AcceptOwnershipComponent implements OnInit {
 
     // Map variable names to match what the backend finalize transfer endpoint expects
     this.orgService.finalizeOwnershipTransfer(payload)
-      .pipe(finalize(() => this.isLoading.set(false)))
+      .pipe(finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
           if (action === 'accept') {
@@ -169,6 +171,11 @@ export class AcceptOwnershipComponent implements OnInit {
   goToDashboard() {
     this.router.navigate(['/dashboard']);
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // export class AcceptOwnershipComponent implements OnInit {

@@ -1,12 +1,12 @@
-import { ChangeDetectorRef, Component, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
-import { catchError, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { catchError, debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
 import { Note } from '../../core/models/note.types';
 import { NoteService } from '../../core/services/notes.service';
 import { AppMessageService } from '../../core/services/message.service';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 
 
 @Component({
@@ -191,7 +191,8 @@ import { of } from 'rxjs';
     }
   `]
 })
-export class NoteLinkDialogComponent {
+export class NoteLinkDialogComponent implements OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   ref = inject(DynamicDialogRef);
   config = inject(DynamicDialogConfig);
   noteService = inject(NoteService);
@@ -225,7 +226,7 @@ export class NoteLinkDialogComponent {
             return of({ data: { notes: [] } }); // Gracefully handle search failure
           })
         );
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe({
       next: (res: any) => {
         // Filter out the current note so you don't link to self
@@ -253,4 +254,9 @@ export class NoteLinkDialogComponent {
     };
     return map[type] || 'pi pi-file';
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

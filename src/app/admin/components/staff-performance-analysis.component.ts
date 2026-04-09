@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, ChangeDetectorRef, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
@@ -12,6 +12,8 @@ import { CommonMethodService } from '../../core/utils/common-method.service';
 import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 interface StaffPerformance {
   _id: string;
@@ -333,7 +335,8 @@ interface StaffPerformance {
     }
   `]
 })
-export class StaffPerformanceAnalysisComponent implements OnInit {
+export class StaffPerformanceAnalysisComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   public commonService = inject(CommonMethodService);
   private analyticsService = inject(AdminAnalyticsService);
   private cdr = inject(ChangeDetectorRef);
@@ -410,12 +413,12 @@ export class StaffPerformanceAnalysisComponent implements OnInit {
     };
 
     this.analyticsService.getStaffPerformance(
-      params.startDate, 
-      params.endDate, 
-      params.branchId, 
-      params.minSales, 
-      params.sortBy
-    ).subscribe({
+            params.startDate, 
+            params.endDate, 
+            params.branchId, 
+            params.minSales, 
+            params.sortBy
+          ).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         if (res.status === 'success') {
           this.staffData.set(res.data);
@@ -497,6 +500,11 @@ export class StaffPerformanceAnalysisComponent implements OnInit {
     ];
     this.cdr.detectChanges();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { Component, OnInit, signal, computed, ChangeDetectorRef } from '@angular/core';

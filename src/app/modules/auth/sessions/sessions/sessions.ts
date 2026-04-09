@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
@@ -19,6 +19,8 @@ import { SessionService } from '../../services/session.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
 import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
 import { AppMessageService } from '@core/services/message.service';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-sessions',
@@ -40,7 +42,8 @@ import { AppMessageService } from '@core/services/message.service';
   templateUrl: './sessions.html',
   styleUrl: './sessions.scss',
 })
-export class Sessions implements OnInit {
+export class Sessions implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   // --- Injections ---
   private cdr = inject(ChangeDetectorRef);
   private sessionService = inject(SessionService);
@@ -108,7 +111,7 @@ export class Sessions implements OnInit {
       ? this.sessionService.getMySessions()
       : this.sessionService.getAllSessions(params);
 
-    req$.subscribe({
+    req$.pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         const rows = res.data?.data || res.data || [];
         this.data = rows;
@@ -227,7 +230,7 @@ export class Sessions implements OnInit {
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         // this.isRevoking.set(true);
-        this.sessionService.revokeSession(this.selectedSession._id).subscribe({
+        this.sessionService.revokeSession(this.selectedSession._id).pipe(takeUntil(this.destroy$)).subscribe({
           next: (res:any) => {
             this.messageService.showSuccess(res.message)
             this.displayDialog = false;
@@ -253,7 +256,7 @@ export class Sessions implements OnInit {
       acceptButtonStyleClass: 'p-button-danger p-button-outlined',
       accept: () => {
         // this.isDeleting.set(true);
-        this.sessionService.deleteSession(this.selectedSession._id).subscribe({
+        this.sessionService.deleteSession(this.selectedSession._id).pipe(takeUntil(this.destroy$)).subscribe({
           next: (res:any) => {
             this.messageService.showSuccess(res.message)
             this.displayDialog = false;
@@ -277,7 +280,7 @@ export class Sessions implements OnInit {
       acceptButtonStyleClass: 'p-button-danger p-button-outlined',
       accept: () => {
         let payload = this.selectedIds
-        this.sessionService.bulkDeleteSessions(payload).subscribe({
+        this.sessionService.bulkDeleteSessions(payload).pipe(takeUntil(this.destroy$)).subscribe({
           next: (res:any) => {
             this.messageService.showSuccess(res.message)
             this.displayDialog = false;
@@ -300,7 +303,7 @@ export class Sessions implements OnInit {
       icon: 'pi pi-shield',
       acceptButtonStyleClass: 'p-button-warning',
       accept: () => {
-        this.sessionService.revokeAllOthers().subscribe({
+        this.sessionService.revokeAllOthers().pipe(takeUntil(this.destroy$)).subscribe({
           next: (res:any) => {
             this.messageService.showSuccess(res.message)
             this.loadData();
@@ -310,4 +313,9 @@ export class Sessions implements OnInit {
       }
     });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

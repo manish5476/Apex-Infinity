@@ -1,7 +1,7 @@
-import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 
 // PrimeNG
 import { CardModule } from 'primeng/card';
@@ -11,6 +11,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 
 import { AppMessageService } from '../../../../core/services/message.service';
 import { HRMSService } from '../../hrms.service';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-shift-calculator',
@@ -244,7 +245,8 @@ import { HRMSService } from '../../hrms.service';
     .slide-down { animation: slideDown 0.3s cubic-bezier(0.2, 0.9, 0.2, 1) both; }
   `]
 })
-export class ShiftCalculatorComponent implements OnInit {
+export class ShiftCalculatorComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
@@ -295,7 +297,7 @@ export class ShiftCalculatorComponent implements OnInit {
     };
 
     this.hrmsService.calculateShiftHours(payload).pipe(
-      finalize(() => this.isCalculating.set(false))
+      finalize(() => this.isCalculating.set(false)), takeUntil(this.destroy$)
     ).subscribe({
       next: (res: any) => {
         const payloadData = res?.data || null;
@@ -316,6 +318,11 @@ export class ShiftCalculatorComponent implements OnInit {
     const rm = String(date.getMinutes()).padStart(2, '0');
     return `${rh}:${rm}`;
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';

@@ -1,12 +1,13 @@
-import { Component, inject, HostBinding, OnInit, HostListener, ViewChild, ElementRef, effect, signal, computed, untracked } from '@angular/core';
+import { Component, inject, HostBinding, OnInit, HostListener, ViewChild, ElementRef, effect, signal, computed, untracked, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LayoutService } from '../layout.service';
 import { AuthService } from './../../modules/auth/services/auth-service';
 import { PermissionService } from '@core/auth/services/permission.service';
 import { SIDEBAR_MENU, MenuItem } from './menu-items.constants';
 import { filter } from 'rxjs/operators';
-import { Dialog } from "primeng/dialog";
+import { DialogModule } from 'primeng/dialog'; // ✅ FIX 1: Import DialogModule instead of Dialog
 
 interface FlatMenuItem {
   label: string;
@@ -18,7 +19,7 @@ interface FlatMenuItem {
 @Component({
   selector: 'app-mainscreen-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule, Dialog],
+  imports: [CommonModule, RouterModule, DialogModule], // ✅ FIX 1 Applied
   templateUrl: './mainscreensidebar.html',
   styleUrl: './mainscreensidebar.scss'
 })
@@ -27,6 +28,7 @@ export class Mainscreensidebar implements OnInit {
   authService = inject(AuthService);
   permService = inject(PermissionService);
   router = inject(Router);
+  destroyRef = inject(DestroyRef); // ✅ FIX 3: Inject DestroyRef for memory management
 
   menuItems = computed(() => {
     this.permService.permissions(); // Just accessing the signal registers the dependency
@@ -36,19 +38,19 @@ export class Mainscreensidebar implements OnInit {
         if (item.permissions && !this.permService.check(item.permissions)) {
           return false;
         }
-        
+
         // If it's a parent with children, filter its children
         if (item.items) {
           item.items = filterRecursive(item.items);
           // If all children were pruned and it's strictly a category node without a route, drop the parent
           if (item.items.length === 0 && !item.routerLink) {
-             return false;
+            return false;
           }
         }
         return true;
       });
     };
-    
+
     // Deep clone raw constants so filtering doesn't mutate original objects
     const clonedMenu = JSON.parse(JSON.stringify(SIDEBAR_MENU));
     return filterRecursive(clonedMenu);
@@ -61,13 +63,13 @@ export class Mainscreensidebar implements OnInit {
     effect(() => {
       const items = this.menuItems(); // register dependency
       untracked(() => this.checkActiveRoutes(items));
-    });
+    }, { allowSignalWrites: true }); // ✅ FIX 2: Explicitly allow signal writes inside this effect
   }
 
   // --- SEARCH STATE ---
   isSearchVisible = false;
   searchQuery = '';
-  
+
   searchIndex = computed(() => {
     const index: FlatMenuItem[] = [];
     const flatten = (items: MenuItem[], parentLabel = ''): void => {
@@ -104,7 +106,6 @@ export class Mainscreensidebar implements OnInit {
   @HostBinding('class.pinned')
   get isPinned() { return this.layout.isPinned(); }
 
-  // ✅ NEW: Allows the host to expand fully when search is open so the modal isn't clipped
   @HostBinding('class.search-mode')
   get isSearchActive() { return this.isSearchVisible; }
 
@@ -137,7 +138,10 @@ export class Mainscreensidebar implements OnInit {
   }
 
   ngOnInit() {
-    this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(() => {
+    this.router.events.pipe(
+      filter(e => e instanceof NavigationEnd),
+      takeUntilDestroyed(this.destroyRef) // ✅ FIX 3: Automatically unsubscribe when component is destroyed
+    ).subscribe(() => {
       this.checkActiveRoutes();
     });
   }
@@ -202,14 +206,13 @@ export class Mainscreensidebar implements OnInit {
     }
   }
 
-  // Limit depth to 5 to prevent infinite recursion in case of circular menu definitions
   hasActiveChild(item: MenuItem, depth = 0): boolean {
     if (depth > 5) return false;
-    
+
     if (item.routerLink && this.router.isActive(this.router.createUrlTree(item.routerLink), {
       paths: 'subset', queryParams: 'ignored', fragment: 'ignored', matrixParams: 'ignored'
     })) return true;
-    
+
     return !!item.items?.some(child => this.hasActiveChild(child, depth + 1));
   }
 
@@ -223,7 +226,7 @@ export class Mainscreensidebar implements OnInit {
   private checkActiveRoutes(items?: MenuItem[]) {
     const newState: Record<string, boolean> = { ...this.expandedState() };
     const menu = items || this.menuItems();
-    
+
     const expandRecursive = (menuGrp: MenuItem[]) => {
       for (const item of menuGrp) {
         if (item.items && this.hasActiveChild(item)) {
@@ -232,7 +235,7 @@ export class Mainscreensidebar implements OnInit {
         }
       }
     };
-    
+
     expandRecursive(menu);
     this.expandedState.set(newState);
   }

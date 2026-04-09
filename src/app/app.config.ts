@@ -4,7 +4,6 @@ import { provideZonelessChangeDetection } from '@angular/core';
 import { provideHttpClient, withInterceptors, withFetch } from '@angular/common/http';
 import { provideRouter, RouteReuseStrategy } from '@angular/router';
 import { routes } from './app.routes';
-import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { DatePipe, DecimalPipe, PercentPipe } from '@angular/common';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
@@ -19,9 +18,6 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 // import { MyPreset } from './core/config/my-preset';
 import { jwtInterceptor } from './core/interceptors/jwt.interceptor';
 import { loggingInterceptor } from './core/interceptors/logging.interceptor';
-// import { TabReuseStrategy } from '';
-
-// Services
 import { AuthService } from './modules/auth/services/auth-service';
 import { DialogService } from 'primeng/dynamicdialog';
 import { TabReuseStrategy } from './Tabbing';
@@ -35,7 +31,6 @@ export const appConfig: ApplicationConfig = {
     ),
     provideRouter(routes),
     provideZonelessChangeDetection(),
-    provideClientHydration(),
     provideAnimationsAsync(),
     // providePrimeNG({
     //   ripple: true,
@@ -137,7 +132,6 @@ export const appConfig: ApplicationConfig = {
 //     ),
 //     provideRouter(routes),
 //     provideZonelessChangeDetection(),
-//     provideClientHydration(),
 //     provideAnimationsAsync(),
 //     providePrimeNG({
 //       theme: {

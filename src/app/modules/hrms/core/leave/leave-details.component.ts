@@ -1,9 +1,9 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 
 // Services
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -266,7 +266,8 @@ import { AppMessageService } from '@core/services/message.service';
     @media (max-width: 900px) { .grid-layout { grid-template-columns: 1fr; } }
   `]
 })
-export class LeaveDetailsComponent implements OnInit {
+export class LeaveDetailsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
@@ -310,7 +311,7 @@ export class LeaveDetailsComponent implements OnInit {
         this.messageService.handleHttpError(err)
         return of(null);
       }),
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       if (res?.data?.leaveRequest) {
         this.request.set(res.data.leaveRequest);
@@ -327,7 +328,7 @@ export class LeaveDetailsComponent implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.hrmsService.cancelLeaveRequest(this.request()._id).subscribe({
+        this.hrmsService.cancelLeaveRequest(this.request()._id).pipe(takeUntil(this.destroy$)).subscribe({
           next: (res: any) => {
             this.messageService.showSuccess(res.message)
             this.loadRequest(this.request()._id); // Refresh
@@ -378,7 +379,7 @@ export class LeaveDetailsComponent implements OnInit {
       finalize(() => {
         this.isProcessing.set(false);
         this.displayActionDialog = false;
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       if (res) {
         this.messageService.showSuccess(res.message)
@@ -421,4 +422,9 @@ export class LeaveDetailsComponent implements OnInit {
   }
 
   onBack() { this.router.navigate(['/leave']); }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

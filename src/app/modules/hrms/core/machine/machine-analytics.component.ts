@@ -1,10 +1,10 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 import { HRMSService } from '../../hrms.service';
 import { AppMessageService } from '../../../../core/services/message.service';
-
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-machine-analytics',
@@ -181,7 +181,8 @@ import { AppMessageService } from '../../../../core/services/message.service';
     }
   `]
 })
-export class MachineAnalyticsComponent implements OnInit {
+export class MachineAnalyticsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
 
@@ -196,7 +197,7 @@ export class MachineAnalyticsComponent implements OnInit {
   loadAnalytics() {
     this.isLoading.set(true);
     this.hrmsService.getMachineAnalytics(this.filterDays).pipe(
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe({
       next: (res: any) => {
         // Unwraps JSON based on standard data object hierarchy
@@ -205,4 +206,9 @@ export class MachineAnalyticsComponent implements OnInit {
       error: (err) => this.messageService.handleHttpError(err)
     });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

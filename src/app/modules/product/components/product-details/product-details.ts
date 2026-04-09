@@ -1,8 +1,8 @@
-import { Component, OnInit, inject, signal, effect, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, signal, effect, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { finalize, switchMap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { finalize, switchMap, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 
 // PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
@@ -39,7 +39,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
   templateUrl: './product-details.html',
   styleUrls: ['./product-details.scss'],
 })
-export class ProductDetailsComponent implements OnInit {
+export class ProductDetailsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private productService = inject(ProductService);
@@ -70,7 +71,7 @@ export class ProductDetailsComponent implements OnInit {
   ngOnInit(): void {
     this.setupInventoryColumns();
 
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.productId = params.get('id'); this.loadProductData();
     });
   }
@@ -170,7 +171,7 @@ loadProductData() {
     this.isError.set(false);
 
     this.productService.getProductById(this.productId).pipe(
-      finalize(() => this.loading.set(false))
+      finalize(() => this.loading.set(false)), takeUntil(this.destroy$)
     ).subscribe({
       next: (res: any) => {
         if (res?.data?.data || res?.data) {
@@ -210,7 +211,7 @@ loadProductData() {
     this.loading.set(true);
     
     this.productService.uploadProductFile(prod._id, formData)
-      .pipe(finalize(() => this.loading.set(false)))
+      .pipe(finalize(() => this.loading.set(false)), takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
           if (res?.data?.product) {
@@ -234,7 +235,7 @@ loadProductData() {
   openStockAdjustment(product: any) {
     const ref = this.dialogHelper.openStockAdjustment(product);
     if (ref) {
-      ref.onClose.subscribe((success: boolean) => {
+      ref.onClose.pipe(takeUntil(this.destroy$)).subscribe((success: boolean) => {
         if (success) {
           this.loadProductData(); 
         }
@@ -249,7 +250,7 @@ loadProductData() {
   openStockTransfer(product: any) {
     const ref = this.dialogHelper.openStockTransfer(product);
     if (ref) {
-      ref.onClose.subscribe((success: boolean) => {
+      ref.onClose.pipe(takeUntil(this.destroy$)).subscribe((success: boolean) => {
         if (success) this.loadProductData();
       });
     }
@@ -264,7 +265,7 @@ loadProductData() {
        header: 'Confirm Deletion',
        icon: 'pi pi-exclamation-triangle',
        accept: () => {
-         this.productService.deleteProductById(this.productId!).subscribe({
+         this.productService.deleteProductById(this.productId!).pipe(takeUntil(this.destroy$)).subscribe({
            next: () => {
              this.messageService.showSuccess('Product deleted successfully');
              this.router.navigate(['/products']);
@@ -274,4 +275,9 @@ loadProductData() {
        }
      });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

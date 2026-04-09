@@ -1,9 +1,9 @@
 // src/app/modules/storefront-public/dynamic-page/dynamic-page.component.ts
-import { Component, OnInit, inject, signal, isDevMode } from '@angular/core';
+import { Component, OnInit, inject, signal, isDevMode, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { Title, Meta } from '@angular/platform-browser';
-import { combineLatest } from 'rxjs';
+import { combineLatest, Subject } from 'rxjs';
 import { animate, style, transition, trigger, query, stagger } from '@angular/animations';
 
 
@@ -28,6 +28,7 @@ import { HeroBannerComponent }        from '../components/hero-banner/hero-banne
 import { StorefrontPublicService } from '@core/services/storefront-public.service';
 import { StorefrontStateService } from '@core/services/storefront-state.service';
 import { ProductSliderComponent } from '../components/product-slider/product-slider.component';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-dynamic-page',
@@ -182,7 +183,8 @@ import { ProductSliderComponent } from '../components/product-slider/product-sli
     ])
   ]
 })
-export class DynamicPageComponent implements OnInit {
+export class DynamicPageComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private route           = inject(ActivatedRoute);
   private storefrontService = inject(StorefrontPublicService);
   private stateService    = inject(StorefrontStateService);
@@ -200,9 +202,9 @@ isDevMode: any;
 
   ngOnInit(): void {
     combineLatest([
-      this.route.parent?.params ?? this.route.params,
-      this.route.params
-    ]).subscribe(([parentParams, childParams]) => {
+            this.route.parent?.params ?? this.route.params,
+            this.route.params
+          ]).pipe(takeUntil(this.destroy$)).subscribe(([parentParams, childParams]) => {
       const params  = { ...parentParams, ...childParams };
       const orgSlug = params['orgSlug'];
       const pageSlug = params['pageSlug'] || 'home';
@@ -219,7 +221,7 @@ isDevMode: any;
     this.isLoading.set(true);
     this.error.set(null);
 
-    this.storefrontService.getPage(orgSlug, pageSlug).subscribe({
+    this.storefrontService.getPage(orgSlug, pageSlug).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         // Handle both { data: {...} } and flat response shapes
         const data = res?.data ?? res;
@@ -260,6 +262,11 @@ isDevMode: any;
       this.metaService.updateTag({ name: 'robots', content: 'noindex, nofollow' });
     }
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { Component, OnInit, inject, signal } from '@angular/core';

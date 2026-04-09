@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 
 // Services
 import { MessageService } from 'primeng/api';
@@ -306,7 +306,8 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
     }
   `]
 })
-export class UserAttendanceDetailsComponent implements OnInit {
+export class UserAttendanceDetailsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private hrmsService = inject(HRMSService);
@@ -442,7 +443,7 @@ export class UserAttendanceDetailsComponent implements OnInit {
         this.messageService.handleHttpError(err)
         return of({ data: { logs: [] } });
       }),
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       this.userLogs.set(res?.data?.logs || []);
     });
@@ -473,7 +474,7 @@ export class UserAttendanceDetailsComponent implements OnInit {
         this.displayInspection = false;
         return of(null);
       }),
-      finalize(() => this.isInspecting.set(false))
+      finalize(() => this.isInspecting.set(false)), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       if (res?.data?.log) {
         this.selectedLog.set(res.data.log);
@@ -527,6 +528,11 @@ export class UserAttendanceDetailsComponent implements OnInit {
       default: return 'warn';
     }
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';

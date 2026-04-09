@@ -1,15 +1,16 @@
-import { Injectable, computed, effect, inject, signal, } from '@angular/core';
-import { Router, NavigationExtras } from '@angular/router';
+import { Injectable, computed, effect, inject, signal, OnDestroy } from '@angular/core';
+import { Router, NavigationExtras, NavigationEnd } from '@angular/router'; // 👈 Added NavigationEnd
 import { toObservable } from '@angular/core/rxjs-interop';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import { filter, takeUntil } from 'rxjs/operators'; // 👈 Added filter
 import { TabId, TabMeta, TabState, OpenTabOptions } from '../tab.types';
 
 const STORAGE_KEY = 'apex__tab_state';
 const MAX_TABS = 20;
 
 @Injectable({ providedIn: 'root' })
-export class TabService {
-
+export class TabService implements OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private readonly router = inject(Router);
   private readonly _state = signal<TabState>(this._loadPersistedState());
 
@@ -32,6 +33,60 @@ export class TabService {
       try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(this._state())); }
       catch { /* storage full / private mode */ }
     });
+
+    // Clean, standard RxJS implementation
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd), takeUntil(this.destroy$)
+    ).subscribe((e: NavigationEnd) => {
+      this.handleNavigationEnd(e);
+    });
+  }
+
+  private handleNavigationEnd(e: NavigationEnd): void {
+    let route = this.router.routerState.root;
+    while (route.firstChild) {
+      route = route.firstChild;
+    }
+
+    const data = route.snapshot.data || {};
+    const routeConfig = route.snapshot.routeConfig;
+
+    const hasTarget = !!route.component ||
+      !!routeConfig?.loadComponent ||
+      !!routeConfig?.loadChildren ||
+      !!data['tabLabel'];
+
+    const fullUrl = e.urlAfterRedirects.split('?')[0];
+
+    // Get exact queryParams from the snapshot
+    const rawQueryParams = route.snapshot.queryParams;
+    const qp: Record<string, string> = {};
+    for (const key of Object.keys(rawQueryParams)) {
+      qp[key] = String(rawQueryParams[key]);
+    }
+
+    if (!hasTarget || fullUrl === '/' || fullUrl === '/login' || fullUrl === '/signup') {
+      this.syncFromRouter(fullUrl, qp);
+      return;
+    }
+
+    let label = (data['tabLabel'] as string | undefined);
+    if (!label) {
+      const segments = fullUrl.split('/').filter(Boolean);
+      const lastSegment = segments.pop() || 'Home';
+      label = lastSegment
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+    }
+
+    const options: Pick<OpenTabOptions, 'icon' | 'pinned' | 'data'> = {
+      icon: (data['tabIcon'] as string) || 'pi pi-file',
+      pinned: !!data['tabPinned'],
+      data: data
+    };
+
+    this.registerTab(fullUrl, label, qp, options);
   }
 
   /**
@@ -84,11 +139,7 @@ export class TabService {
 
   openNewTab?: () => void;
 
-  registerTab(
-    path: string,
-    label: string,
-    queryParams: Record<string, string>,
-    options: Pick<OpenTabOptions, 'icon' | 'pinned' | 'data'> = {}
+  registerTab(path: string, label: string, queryParams: Record<string, string>, options: Pick<OpenTabOptions, 'icon' | 'pinned' | 'data'> = {}
   ): void {
     const id = this.buildTabId(path, queryParams);
     const existing = this._findById(id);
@@ -296,4 +347,9 @@ export class TabService {
     } catch { /* corrupted */ }
     return { tabs: [], activeTabId: null };
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

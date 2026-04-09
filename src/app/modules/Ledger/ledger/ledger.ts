@@ -1,8 +1,8 @@
-import { Component, OnInit, inject, signal, computed, effect } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, effect, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
+import { finalize, takeUntil } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 
 // Services
@@ -52,8 +52,8 @@ type LedgerTab =
   templateUrl: './ledger.html',
   styleUrls: ['./ledger.scss']
 })
-export class LedgerComponent implements OnInit {
-
+export class LedgerComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private master = inject(MasterListService);
   private messageService = inject(AppMessageService);
@@ -186,7 +186,7 @@ export class LedgerComponent implements OnInit {
       case 'trialBalance': request = this.financial.getTrialBalance(params); break;
       default: this.isLoading.set(false); return;
     }
-    request.pipe(finalize(() => this.isLoading.set(false)))
+    request.pipe(finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$))
       .subscribe({
         next: (res) => this.processResponse(tab, res),
         error: (err) => {
@@ -619,10 +619,15 @@ export class LedgerComponent implements OnInit {
       req$ = this.financial.exportStatement(type, params);
     }
 
-    req$.pipe(finalize(() => this.isExporting.set(false)))
+    req$.pipe(finalize(() => this.isExporting.set(false)), takeUntil(this.destroy$))
       .subscribe(blob => this.common.downloadBlob(blob, `ledger_${type}_${new Date().getTime()}.csv`));
   }
 
   get isReportView() { return ['orgSummary', 'pnl', 'balanceSheet'].includes(this.currentTab()); }
   get isEntityView() { return ['customer', 'supplier'].includes(this.currentTab()); }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

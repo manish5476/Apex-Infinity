@@ -1,8 +1,8 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { finalize } from 'rxjs/operators'; // Import finalize
+import { finalize, takeUntil } from 'rxjs/operators'; // Import finalize
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
@@ -29,6 +29,7 @@ import { DynamicDialogServices } from '../../../../core/services/dynamic-dialog-
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
 import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
+import { Subject } from "rxjs";
 
 @Component({
   selector: 'app-invoice-details',
@@ -44,7 +45,8 @@ import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
   templateUrl: './invoice-details.html',
   styleUrls: ['./invoice-details.scss'],
 })
-export class InvoiceDetailsComponent implements OnInit {
+export class InvoiceDetailsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private fb = inject(FormBuilder);
@@ -118,7 +120,7 @@ export class InvoiceDetailsComponent implements OnInit {
   }
 
 private loadInvoiceData(): void {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const invoiceId = params.get('id');
       if (!invoiceId) {
         this.router.navigate(['/invoices']);
@@ -150,7 +152,7 @@ private loadInvoiceData(): void {
   }
 
   private loadPaymentHistory(id: string): void {
-    this.invoiceService.getInvoicePayments(id).subscribe({
+    this.invoiceService.getInvoicePayments(id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         this.payments.set(res.data?.payments || res.data || []);
       },
@@ -162,7 +164,7 @@ private loadInvoiceData(): void {
   }
 
   private checkEmiStatus(invoiceId: string) {
-    this.emiService.getEmiByInvoice(invoiceId).subscribe({
+    this.emiService.getEmiByInvoice(invoiceId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         if (res.data?.emi) {
           this.existingEmiId.set(res.data.emi._id);
@@ -230,7 +232,7 @@ private loadInvoiceData(): void {
     const id = this.invoice()?._id;
     if (!id) return;
     this.isProcessing.set(true);
-    this.invoiceService.downloadInvoicePDF(id).subscribe({
+    this.invoiceService.downloadInvoicePDF(id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (blob) => {
         this.common.downloadBlob(blob, `INV-${this.invoice().invoiceNumber}.pdf`);
         this.isProcessing.set(false);
@@ -263,7 +265,7 @@ private loadInvoiceData(): void {
     const inv = this.invoice();
     if (!inv) return;
     
-    this.dialogServices.openSalesReturn({ invoice: inv })?.onClose.subscribe(res => {
+    this.dialogServices.openSalesReturn({ invoice: inv })?.onClose.pipe(takeUntil(this.destroy$)).subscribe(res => {
       if (res) {
         // Refresh data if return was successful
         this.loadInvoiceData();
@@ -281,4 +283,9 @@ private loadInvoiceData(): void {
       default: return 'info';
     }
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

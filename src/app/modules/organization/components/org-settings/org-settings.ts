@@ -1,9 +1,9 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { forkJoin } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { forkJoin, Subject } from 'rxjs';
+import { finalize, takeUntil } from 'rxjs/operators';
 
 /* PrimeNG v18 Modules */
 import { ButtonModule } from 'primeng/button';
@@ -54,7 +54,8 @@ import { UserListComponent } from '../../../user/user-list/user-list'; // Assumi
   styleUrl: './org-settings.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class OrgSettingsComponent implements OnInit {
+export class OrgSettingsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private orgService = inject(OrganizationService);
   private authService = inject(AuthService);
   private fb = inject(FormBuilder);
@@ -138,7 +139,7 @@ export class OrgSettingsComponent implements OnInit {
       .pipe(finalize(() => {
         this.isLoading.set(false);
         this.cdr.markForCheck();
-      }))
+      }), takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
           const orgData = res.org.data;
@@ -183,7 +184,7 @@ export class OrgSettingsComponent implements OnInit {
       .pipe(finalize(() => {
         this.isSaving.set(false);
         this.cdr.markForCheck();
-      }))
+      }), takeUntil(this.destroy$))
       .subscribe({
         next: () => {
           const msg = 'Organization details updated successfully.';
@@ -210,7 +211,7 @@ export class OrgSettingsComponent implements OnInit {
       .pipe(finalize(() => {
         this.isSaving.set(false);
         this.cdr.markForCheck();
-      }))
+      }), takeUntil(this.destroy$))
       .subscribe({
         next: () => {
           this.appMessage.showSuccess('Invitation sent successfully.');
@@ -237,7 +238,7 @@ export class OrgSettingsComponent implements OnInit {
       .pipe(finalize(() => {
         this.isSaving.set(false);
         this.cdr.markForCheck();
-      }))
+      }), takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
           this.appMessage.showSuccess(res.message || 'Ownership transferred successfully.');
@@ -259,7 +260,7 @@ export class OrgSettingsComponent implements OnInit {
           .pipe(finalize(() => {
             this.isSaving.set(false);
             this.cdr.markForCheck();
-          }))
+          }), takeUntil(this.destroy$))
           .subscribe({
             next: (res: any) => {
               this.appMessage.showSuccess(res.message || 'Ownership transfer request cancelled successfully.');
@@ -281,7 +282,7 @@ export class OrgSettingsComponent implements OnInit {
       return;
     }
 
-    this.orgService.approveMember({ userId, branchId, roleId }).subscribe({
+    this.orgService.approveMember({ userId, branchId, roleId }).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.appMessage.showSuccess('Member approved successfully.');
         this.loadData();
@@ -299,7 +300,7 @@ export class OrgSettingsComponent implements OnInit {
       icon: 'pi pi-user-minus',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.orgService.rejectMember({ userId }).subscribe({
+        this.orgService.rejectMember({ userId }).pipe(takeUntil(this.destroy$)).subscribe({
           next: () => {
             this.appMessage.showInfo('Request rejected.');
             this.loadData();
@@ -322,7 +323,7 @@ export class OrgSettingsComponent implements OnInit {
       finalize(() => {
         this.isSaving.set(false);
         this.cdr.markForCheck();
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
         this.showDeleteDialog.set(false);
@@ -333,4 +334,9 @@ export class OrgSettingsComponent implements OnInit {
       error: (err) => this.appMessage.handleHttpError(err)
     });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

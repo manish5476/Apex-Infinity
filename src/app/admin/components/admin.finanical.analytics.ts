@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, signal, inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -8,6 +8,8 @@ import { CommonMethodService } from '../../core/utils/common-method.service';
 import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-financial-dashboard',
@@ -780,7 +782,8 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
 }
   `]
 })
-export class FinancialDashboardComponent implements OnInit {
+export class FinancialDashboardComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   public commonService = inject(CommonMethodService);
   private analyticsService = inject(AdminAnalyticsService);
   private cdr = inject(ChangeDetectorRef);
@@ -816,10 +819,10 @@ export class FinancialDashboardComponent implements OnInit {
   loadData(): void {
     this.loading.set(true);
     this.analyticsService.getFinancialDashboard(
-      this.currentFilters['date']?.[0]?.toISOString(),
-      this.currentFilters['date']?.[1]?.toISOString(),
-      this.currentFilters['branchId']
-    ).subscribe({
+            this.currentFilters['date']?.[0]?.toISOString(),
+            this.currentFilters['date']?.[1]?.toISOString(),
+            this.currentFilters['branchId']
+          ).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         if (res.status === 'success') this.financialData.set(res.data);
         this.loading.set(false);
@@ -855,6 +858,11 @@ export class FinancialDashboardComponent implements OnInit {
       }
     ];
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 // import { Component, OnInit, signal, inject, ChangeDetectorRef } from '@angular/core';
 // import { CommonModule } from '@angular/common';

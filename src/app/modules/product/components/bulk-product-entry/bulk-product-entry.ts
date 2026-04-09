@@ -1,7 +1,7 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, inject, signal, computed, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { finalize, forkJoin } from 'rxjs';
+import { finalize, forkJoin, Subject } from 'rxjs';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
@@ -19,6 +19,7 @@ import { LoadingService } from '../../../../core/services/loading.service';
 import { AppSharedGrid, SharedGridEvent } from "../../../shared/AgGrid/grid/app-shared-grid/app-shared-grid";
 import { GridColDef } from "../../../shared/AgGrid/grid/grid.types";
 import { AppMessageService } from '../../../../core/services/message.service';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-bulk-product-entry',
@@ -29,7 +30,8 @@ import { AppMessageService } from '../../../../core/services/message.service';
   styleUrls: ['./bulk-product-entry.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class BulkProductEntry implements OnInit, OnChanges {
+export class BulkProductEntry implements OnInit, OnChanges, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   // Input from Parent
   @Input() selectedData: any[] = [];
   private productService = inject(ProductService);
@@ -120,7 +122,7 @@ export class BulkProductEntry implements OnInit, OnChanges {
 
   // --- Actions ---
   searchProduct(event: any) {
-    this.productService.searchProducts(event.query).subscribe(res => {
+    this.productService.searchProducts(event.query).pipe(takeUntil(this.destroy$)).subscribe(res => {
       this.filteredProducts.set(res.data || []);
     });
   }
@@ -208,7 +210,7 @@ export class BulkProductEntry implements OnInit, OnChanges {
     this.loading.set(true);
 
     forkJoin(tasks).pipe(
-      finalize(() => this.loading.set(false))
+      finalize(() => this.loading.set(false)), takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
         // Updated to single-string success format
@@ -221,4 +223,9 @@ export class BulkProductEntry implements OnInit, OnChanges {
       }
     });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

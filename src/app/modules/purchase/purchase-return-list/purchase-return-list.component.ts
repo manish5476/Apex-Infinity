@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -6,7 +6,8 @@ import { Router } from '@angular/router';
 import { AgShareGrid } from "../../shared/components/ag-shared-grid";
 import { PurchaseService } from '../purchase.service';
 import { AppMessageService } from '../../../core/services/message.service';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-purchase-return-list',
@@ -37,7 +38,8 @@ import { finalize } from 'rxjs';
     .themed-card { background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: 12px; }
   `]
 })
-export class PurchaseReturnListComponent implements OnInit {
+export class PurchaseReturnListComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private purchaseService = inject(PurchaseService);
   private router = inject(Router);
   private messageService = inject(AppMessageService);
@@ -91,7 +93,7 @@ ngOnInit() {
     this.isLoading.set(true);
 
     this.purchaseService.getAllReturns()
-      .pipe(finalize(() => this.isLoading.set(false)))
+      .pipe(finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
           // Safely extract the returns payload
@@ -107,4 +109,9 @@ ngOnInit() {
   onGridEvent(event: any) {
     // Handle row clicks if not using specific column click handlers
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

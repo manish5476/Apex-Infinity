@@ -90,10 +90,10 @@ export class InvoiceFormComponent implements OnInit, OnDestroy {
     { label: 'Cash', value: 'cash' },
     { label: 'UPI', value: 'upi' },
     { label: 'Bank Transfer', value: 'bank' },
-    { label: 'Credit', value: 'credit' },
+    { label: 'Card', value: 'card' },
+    { label: 'Cheque', value: 'cheque' },
     { label: 'Other', value: 'other' },
   ];
-
   // ── Reactive totals ──────────────────────────────────────────────────────
   subTotal = signal(0);
   totalDiscount = signal(0);

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -12,6 +12,8 @@ import { TooltipModule } from 'primeng/tooltip';
 import { SelectModule } from 'primeng/select';
 import { SupplierService } from '../../services/supplier-service';
 import { AppMessageService } from '../../../../core/services/message.service';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-supplier-kyc',
@@ -31,7 +33,8 @@ import { AppMessageService } from '../../../../core/services/message.service';
   styleUrl: './supplier-kyc.scss',
   providers: [] // Required for Toast
 })
-export class SupplierKyc implements OnInit {
+export class SupplierKyc implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private config = inject(DynamicDialogConfig);
   private ref = inject(DynamicDialogRef);
   private supplierService = inject(SupplierService);
@@ -62,7 +65,7 @@ export class SupplierKyc implements OnInit {
 
   loadDocuments() {
     this.loading.set(true);
-    this.supplierService.getSupplierById(this.supplierId).subscribe({
+    this.supplierService.getSupplierById(this.supplierId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.documents.set(res.data?.data?.documents || []);
         this.loading.set(false);
@@ -103,7 +106,7 @@ export class SupplierKyc implements OnInit {
     }
 
     this.uploading.set(true);
-    this.supplierService.uploadKycDocument(this.supplierId, this.selectedFile, this.selectedDocType).subscribe({
+    this.supplierService.uploadKycDocument(this.supplierId, this.selectedFile, this.selectedDocType).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         // Simplified success message
         this.messageService.showSuccess('Document uploaded successfully.');
@@ -121,7 +124,7 @@ export class SupplierKyc implements OnInit {
 
   deleteDocument(docIndex: number) {
     if (confirm('Are you sure you want to delete this document?')) {
-      this.supplierService.deleteKycDocument(this.supplierId, docIndex).subscribe({
+      this.supplierService.deleteKycDocument(this.supplierId, docIndex).pipe(takeUntil(this.destroy$)).subscribe({
         next: () => {
           // Simplified success message
           this.messageService.showSuccess('Document removed successfully.');
@@ -213,4 +216,9 @@ export class SupplierKyc implements OnInit {
   viewDocument(url: string) {
     window.open(url, '_blank');
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

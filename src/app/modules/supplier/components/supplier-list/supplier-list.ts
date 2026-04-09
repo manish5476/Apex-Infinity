@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GridApi } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
@@ -14,6 +14,8 @@ import { Toast } from "primeng/toast";
 import { AgShareGrid, ActionColumnConfig } from "../../../shared/components/ag-shared-grid";
 import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-supplier-list',
@@ -24,7 +26,8 @@ import { PERMISSIONS } from '@core/auth/permissions.constants';
   templateUrl: './supplier-list.html',
   styleUrl: './supplier-list.scss',
 })
-export class SupplierListComponent implements OnInit {
+export class SupplierListComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   readonly PERMISSIONS = PERMISSIONS;
 
   readonly supplierActionColumn: ActionColumnConfig = {
@@ -95,7 +98,7 @@ getData(isReset: boolean = false) {
       limit: this.pageSize,
     };
 
-    this.supplierService.getAllSuppliers(filterParams).subscribe({
+    this.supplierService.getAllSuppliers(filterParams).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         let newData: any[] = [];
         
@@ -554,6 +557,10 @@ getData(isReset: boolean = false) {
 
 //   this.cdr.detectChanges();
 // }
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { ChangeDetectorRef, Component, OnInit, inject, signal } from '@angular/core';

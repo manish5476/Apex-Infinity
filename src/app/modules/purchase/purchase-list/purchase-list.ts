@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, effect, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, effect, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GridApi } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
@@ -15,9 +15,10 @@ import { AgShareGrid, ActionColumnConfig } from "../../shared/components/ag-shar
 import { MasterListService } from '../../../core/services/master-list.service';
 import { AppMessageService } from '../../../core/services/message.service';
 import { CommonMethodService } from '../../../core/utils/common-method.service';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 import { HasPermissionDirective } from '../../../core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '../../../core/auth/permissions.constants';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-purchase-list',
@@ -26,7 +27,8 @@ import { PERMISSIONS } from '../../../core/auth/permissions.constants';
   templateUrl: './purchase-list.html',
   styleUrl: './purchase-list.scss',
 })
-export class PurchaseListComponent implements OnInit {
+export class PurchaseListComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
   private purchaseService = inject(PurchaseService);
   private messageService = inject(AppMessageService);
@@ -139,7 +141,7 @@ getData(isReset: boolean = false) {
         finalize(() => {
           this.isLoading = false;
           this.cdr.markForCheck();
-        })
+        }), takeUntil(this.destroy$)
       )
       .subscribe({
         next: (res: any) => {
@@ -388,4 +390,9 @@ getData(isReset: boolean = false) {
       ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 2 }).format(value)
       : '₹ 0.00';
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

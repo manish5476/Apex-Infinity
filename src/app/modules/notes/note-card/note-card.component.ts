@@ -9,14 +9,15 @@ import {
   OnInit,
   ChangeDetectionStrategy,
   ViewEncapsulation,
-  ChangeDetectorRef
-} from '@angular/core';
+  ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule, TitleCasePipe, DatePipe, SlicePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NoteService } from '../../../core/services/notes.service';
 import { MasterListService } from '../../../core/services/master-list.service';
 import { Note, ItemType, Assignee } from '../../../core/models/note.types';
 import { AppMessageService } from "../../../core/services/message.service";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 // Mock Interface for User (if not imported from models)
 export interface User {
@@ -35,7 +36,8 @@ export interface User {
   templateUrl: './note-card.component.html',
   styleUrl: './note-card.component.scss'
 })
-export class NoteCardComponent implements OnInit {
+export class NoteCardComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private noteService = inject(NoteService);
   private masterList = inject(MasterListService);
   private messageService = inject(AppMessageService);
@@ -178,7 +180,7 @@ export class NoteCardComponent implements OnInit {
     this.isSharing = true;
     const userIds = Array.from(this.selectedUserIds);
 
-    this.noteService.shareNote(this.note._id, userIds, this.selectedPermission)
+    this.noteService.shareNote(this.note._id, userIds, this.selectedPermission).pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
           this.note = res.data.note;
@@ -199,4 +201,9 @@ export class NoteCardComponent implements OnInit {
         }
       });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

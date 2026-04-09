@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 
 // Services
 // import { HRMSService } from '../../../hrms.service';
@@ -263,7 +263,8 @@ import { AppMessageService } from '@core/services/message.service';
     .slide-down { animation: slideDown 0.4s cubic-bezier(0.2, 0.9, 0.2, 1); animation-fill-mode: both; }
   `]
 })
-export class MyDailyAttendanceComponent implements OnInit {
+export class MyDailyAttendanceComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
   private fb = inject(FormBuilder);
@@ -304,7 +305,7 @@ export class MyDailyAttendanceComponent implements OnInit {
         this.messageService.handleHttpError(err)
         return of({ data: { records: [], summary: {} } });
       }),
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       this.records.set(res?.data?.records || []);
       this.summary.set(res?.data?.summary || { presentDays: 0, totalHours: 0, lateDays: 0, absentDays: 0 });
@@ -345,7 +346,7 @@ export class MyDailyAttendanceComponent implements OnInit {
       finalize(() => {
         this.isSubmitting.set(false);
         this.displayRegularize = false;
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       if (res) {
         this.messageService.showSuccess(res.message)
@@ -364,4 +365,9 @@ export class MyDailyAttendanceComponent implements OnInit {
       default: return 'secondary';
     }
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, ViewChild, ChangeDetectionStrategy, Input } from '@angular/core';
+import { Component, OnInit, inject, signal, ViewChild, ChangeDetectionStrategy, Input, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -13,6 +13,8 @@ import { CustomerService } from '../../services/customer-service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { AppSharedGrid, SharedGridEvent } from '../../../shared/AgGrid/grid/app-shared-grid/app-shared-grid';
 import { GridColDef } from '../../../shared/AgGrid/grid/grid.types';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 // Grid Components & Types
 
@@ -83,7 +85,8 @@ import { GridColDef } from '../../../shared/AgGrid/grid/grid.types';
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class BulkCustomerComponent implements OnInit {
+export class BulkCustomerComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   // Dialog Mode
   @Input() isDialog = signal(false);
   // Dependencies
@@ -210,7 +213,7 @@ export class BulkCustomerComponent implements OnInit {
 
     this.isBulkSaving.set(true);
 
-    this.customerService.createBulkCustomer(validItems).subscribe({
+    this.customerService.createBulkCustomer(validItems).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         this.appMessage.showSuccess(`${validItems.length} customers imported successfully!`);
         // Reset grid on success
@@ -260,4 +263,9 @@ export class BulkCustomerComponent implements OnInit {
       shippingAddress: { street: '', city: '', state: '', zipCode: '', country: 'India' }
     };
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

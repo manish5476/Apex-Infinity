@@ -1,7 +1,7 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { finalize } from 'rxjs/operators'; // Import finalize
+import { finalize, takeUntil } from 'rxjs/operators'; // Import finalize
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
@@ -15,6 +15,7 @@ import { BranchService } from '../../services/branch-service';
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
+import { Subject } from "rxjs";
 
 @Component({
   selector: 'app-branch-details',
@@ -26,7 +27,8 @@ import { CommonMethodService } from '../../../../core/utils/common-method.servic
   templateUrl: './branch-details.html',
   styleUrl: './branch-details.scss',
 })
-export class BranchDetailsComponent implements OnInit {
+export class BranchDetailsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private branchService = inject(BranchService);
   private masterList = inject(MasterListService);
@@ -44,7 +46,7 @@ export class BranchDetailsComponent implements OnInit {
   }
 
 private loadBranchData(): void {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const branchId = params.get('id');
 
       if (!branchId) {
@@ -86,4 +88,9 @@ private loadBranchData(): void {
     return [address.street, address.city, address.state, address.zipCode, address.country]
       .filter(p => p && p.trim()).join(', ');
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

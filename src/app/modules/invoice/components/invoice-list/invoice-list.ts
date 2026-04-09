@@ -1,11 +1,11 @@
 
-import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation, effect, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation, effect, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GridApi, ITooltipParams } from 'ag-grid-community';
 import { ITooltipAngularComp } from 'ag-grid-angular';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
-import { finalize } from 'rxjs/operators';
+import { finalize, takeUntil } from 'rxjs/operators';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
@@ -24,6 +24,7 @@ import { AgShareGrid, ActionColumnConfig } from "../../../shared/components/ag-s
 
 import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
 import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
+import { Subject } from "rxjs";
 
 // -------------------------------------------------------------------------
 // 2. Main Invoice List Component
@@ -47,7 +48,8 @@ import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
   styleUrl: './invoice-list.scss',
   encapsulation: ViewEncapsulation.None
 })
-export class InvoiceListComponent implements OnInit {
+export class InvoiceListComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
   private invoiceService = inject(InvoiceService);
   private messageService = inject(AppMessageService);
@@ -155,7 +157,7 @@ export class InvoiceListComponent implements OnInit {
       this.onScrolledToBottom(event)
     }
     if (event.type === 'return') {
-      this.dialogServices.openSalesReturn({ invoice: event.row })?.onClose.subscribe(res => {
+      this.dialogServices.openSalesReturn({ invoice: event.row })?.onClose.pipe(takeUntil(this.destroy$)).subscribe(res => {
         if (res) this.getData(true);
       });
     }
@@ -1071,7 +1073,7 @@ export class InvoiceListComponent implements OnInit {
     }
 
     this.invoiceService.exportInvoices(params)
-      .pipe(finalize(() => this.isExporting = false))
+      .pipe(finalize(() => this.isExporting = false), takeUntil(this.destroy$))
       .subscribe({
         next: (blob) => {
           const filename = `Invoices_Export_${new Date().toISOString().slice(0, 10)}.csv`;
@@ -1114,7 +1116,7 @@ export class InvoiceListComponent implements OnInit {
       filterParams['invoiceDate[lte]'] = endDate.toISOString();
     }
 
-    this.invoiceService.getAllInvoices(filterParams).subscribe({
+    this.invoiceService.getAllInvoices(filterParams).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         let newData: any[] = [];
 
@@ -1158,4 +1160,9 @@ export class InvoiceListComponent implements OnInit {
       }
     });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

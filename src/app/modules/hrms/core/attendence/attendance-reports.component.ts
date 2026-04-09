@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 
 // Services
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -481,7 +481,8 @@ import { AgShareGrid } from '../../../shared/components/ag-shared-grid';
     }
   `]
 })
-export class AttendanceReportsComponent implements OnInit {
+export class AttendanceReportsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
   private fb = inject(FormBuilder);
@@ -717,7 +718,7 @@ export class AttendanceReportsComponent implements OnInit {
         this.messageService.handleHttpError(err)
         return of({ data: [] });
       }),
-      finalize(() => this.isLoadingReport.set(false))
+      finalize(() => this.isLoadingReport.set(false)), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       this.attendanceReportData.set(res?.data || []);
     });
@@ -725,7 +726,7 @@ export class AttendanceReportsComponent implements OnInit {
 
   loadLeaveReport() {
     this.hrmsService.getLeaveBalanceReport(this.selectedFy).pipe(
-      catchError(() => of({ data: { report: [], summary: null } }))
+      catchError(() => of({ data: { report: [], summary: null } })), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       this.leaveReportData.set(res?.data?.report || []);
       this.leaveReportSummary.set(res?.data?.summary || null);
@@ -783,7 +784,7 @@ export class AttendanceReportsComponent implements OnInit {
       finalize(() => {
         this.isProcessing.set(false);
         this.displayBulkDialog = false;
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe(res => {
       if (res) {
         this.loadAttendanceReport(); 
@@ -801,7 +802,7 @@ export class AttendanceReportsComponent implements OnInit {
         this.displayDetails = false;
         return of(null);
       }),
-      finalize(() => this.isInspecting.set(false))
+      finalize(() => this.isInspecting.set(false)), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       if (res?.data?.daily) {
         this.dailyDetails.set(res.data.daily);
@@ -823,6 +824,11 @@ export class AttendanceReportsComponent implements OnInit {
       default: return 'secondary';
     }
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 // import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 // import { CommonModule } from '@angular/common';

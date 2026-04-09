@@ -15,7 +15,7 @@ export const CUSTOMER_ROUTES: Routes = [
     data: { tabLabel: 'New Customer', tabIcon: 'pi pi-user-plus', permissions: [PERMISSIONS.CUSTOMER.CREATE] }
   },
   {
-    path: 'analytics',
+    path: 'analyticsCustomer',
     component: CustomerAnalyticsComponent,
     canActivate: [TabRouterGuard, permissionGuard],
     data: { tabLabel: 'Customer Analytics', tabIcon: 'pi pi-chart-line', permissions: [PERMISSIONS.CUSTOMER.READ] }

@@ -1,6 +1,7 @@
-import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable, inject, OnDestroy } from '@angular/core';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { ThemeService } from './theme.service';
+import { takeUntil } from "rxjs/operators";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -93,7 +94,8 @@ const SVG_TEMPLATES: Record<string, (color: string) => { svg: string; size: stri
 // ─────────────────────────────────────────────────────────────────────────────
 
 @Injectable({ providedIn: 'root' })
-export class ThemePatternService {
+export class ThemePatternService implements OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private themeService = inject(ThemeService);
   private readonly STORAGE_KEY = 'bgPatternSettings-v1';
   private readonly LAYOUT_SELECTOR = '.apex-layout'; // your main layout wrapper class
@@ -111,7 +113,7 @@ export class ThemePatternService {
     this.applyPattern(this.settingsSubject.value);
 
     // Re-apply SVG patterns whenever theme changes (accent color may differ)
-    this.themeService.settings$.subscribe(() => {
+    this.themeService.settings$.pipe(takeUntil(this.destroy$)).subscribe(() => {
       const current = this.settingsSubject.value;
       if (this.isSvgPattern(current.patternId)) {
         // Small delay to let CSS vars settle after theme class is applied
@@ -241,4 +243,9 @@ export class ThemePatternService {
       console.warn('ThemePatternService: Unable to save pattern settings.');
     }
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

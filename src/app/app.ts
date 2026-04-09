@@ -11,15 +11,16 @@ import { MasterListService } from './core/services/master-list.service';
 import { AppMessageService } from './core/services/message.service';
 import { LoadingComponent } from "./modules/shared/components/loader.component";
 import { AnnouncementListenerComponent } from "./modules/shared/components/announcement-banner/announcement-banner.component";
+import { TabKeyboardService } from './Tabbing';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
-    ToastModule, 
-    RouterOutlet, 
-    ConfirmDialog, 
-    LoadingComponent, 
+    ToastModule,
+    RouterOutlet,
+    ConfirmDialog,
+    LoadingComponent,
     AnnouncementListenerComponent
   ],
   templateUrl: './app.html',
@@ -32,13 +33,13 @@ export class App implements OnInit, OnDestroy {
   private notificationService = inject(NotificationService);
   private masterList = inject(MasterListService);
   private messageService = inject(AppMessageService);
-
+  private readonly tabKeyboardService = inject(TabKeyboardService);
   private destroy$ = new Subject<void>();
 
   ngOnInit() {
     // Set default theme as requested
     this.themeService.setLightTheme('theme-aurora');
-    
+    this.tabKeyboardService.init();
     this.masterList.initFromCache();
     this.setupAuthListener();
   }

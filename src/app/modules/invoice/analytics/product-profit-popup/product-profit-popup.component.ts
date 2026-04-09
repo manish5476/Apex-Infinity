@@ -1,7 +1,9 @@
-import { Component, Input, Output, EventEmitter, OnInit, inject, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InvoiceService } from '../../services/invoice-service';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 // --- Interfaces ---
 export interface ProductSummary {
@@ -670,7 +672,8 @@ export interface ProductAnalyticsData {
     }
   `]
 })
-export class ProductProfitPopupComponent implements OnInit {
+export class ProductProfitPopupComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   @Input() productId!: string;
   @Output() close = new EventEmitter<void>(); // Event to notify parent to close
 
@@ -688,7 +691,7 @@ export class ProductProfitPopupComponent implements OnInit {
 
   loadProductAnalytics(): void {
     this.loading.set(true);
-    this.invoiceService.getProductProfitAnalysis(this.productId).subscribe({
+    this.invoiceService.getProductProfitAnalysis(this.productId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (response: any) => {
         if (response.status === 'success') {
           this.productData.set(response.data);
@@ -723,6 +726,11 @@ export class ProductProfitPopupComponent implements OnInit {
     console.log('Exporting report for:', this.productId);
     // Implement actual export logic here
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, ChangeDetectorRef, computed } from '@angular/core';
+import { Component, OnInit, signal, inject, ChangeDetectorRef, computed, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TooltipModule } from 'primeng/tooltip';
@@ -11,6 +11,8 @@ import { CommonMethodService } from '../../core/utils/common-method.service';
 import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-predictive-analytics',
@@ -734,7 +736,8 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
 }
   `]
 })
-export class PredictiveAnalyticsComponent implements OnInit {
+export class PredictiveAnalyticsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   public commonService = inject(CommonMethodService);
   private analyticsService = inject(AdminAnalyticsService);
   private cdr = inject(ChangeDetectorRef);
@@ -778,7 +781,7 @@ export class PredictiveAnalyticsComponent implements OnInit {
     this.loading.set(true);
     const { branchId, periods, confidence } = this.currentFilters;
 
-    this.analyticsService.getPredictiveAnalytics(branchId, periods, confidence).subscribe({
+    this.analyticsService.getPredictiveAnalytics(branchId, periods, confidence).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         if (res.status === 'success') {
           this.predictData.set(res.data);
@@ -824,6 +827,11 @@ export class PredictiveAnalyticsComponent implements OnInit {
     ];
     this.cdr.detectChanges();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 // import { Component, OnInit, signal, inject, ChangeDetectorRef, computed } from '@angular/core';
 // import { CommonModule } from '@angular/common';

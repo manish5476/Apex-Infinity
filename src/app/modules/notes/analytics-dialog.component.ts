@@ -1,8 +1,10 @@
-import { Component, inject, signal, computed, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule, TitleCasePipe, DatePipe } from '@angular/common';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { NoteService } from '../../core/services/notes.service';
 import { AppMessageService } from '../../core/services/message.service';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 // Interface matching your specific JSON structure
 export interface AnalyticsData {
@@ -26,7 +28,8 @@ export interface AnalyticsData {
   styleUrls: ['./analytics-dialog.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AnalyticsDialogComponent implements OnInit {
+export class AnalyticsDialogComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private ref = inject(DynamicDialogRef);
   private noteService = inject(NoteService);
   private messageService = inject(AppMessageService);
@@ -70,7 +73,7 @@ loadData() {
     this.isLoading.set(true);
     
     // Using your common pattern of single-string messages and global error handling
-    this.noteService.getNoteStatistics().subscribe({
+    this.noteService.getNoteStatistics().pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => { 
         // We cast the incoming data to unknown then to our local AnalyticsData 
         // to handle the mismatch between the imported NoteStatistics and our local interface
@@ -120,4 +123,9 @@ loadData() {
     };
     return map[type] || 'pi pi-file';
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

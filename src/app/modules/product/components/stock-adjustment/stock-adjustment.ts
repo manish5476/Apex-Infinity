@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -10,7 +10,8 @@ import { ProductService } from '../../services/product-service';
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { InputTextModule } from 'primeng/inputtext';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-stock-adjustment',
@@ -19,7 +20,8 @@ import { finalize } from 'rxjs';
   templateUrl: './stock-adjustment.html',
   styleUrls: ['./stock-adjustment.scss'],
 })
-export class StockAdjustmentComponent implements OnInit {
+export class StockAdjustmentComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private productService = inject(ProductService);
   private messageService = inject(AppMessageService);
@@ -73,7 +75,7 @@ export class StockAdjustmentComponent implements OnInit {
     this.isLoading = true;
     const payload = { branchId, type, quantity, reason };
     this.productService.adjustProductStock(productId, payload)
-      .pipe(finalize(() => this.isLoading = false))
+      .pipe(finalize(() => this.isLoading = false), takeUntil(this.destroy$))
       .subscribe({
         next: () => {
           this.messageService.showSuccess('Stock adjusted successfully.');
@@ -93,4 +95,9 @@ export class StockAdjustmentComponent implements OnInit {
   onCancel() {
     this.ref.close(false);
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, signal, inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TooltipModule } from 'primeng/tooltip';
@@ -8,6 +8,8 @@ import { CommonMethodService } from '../../core/utils/common-method.service';
 import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-customer-ltv-analysis',
@@ -452,7 +454,8 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
 }
   `]
 })
-export class CustomerLtvAnalysisComponent implements OnInit {
+export class CustomerLtvAnalysisComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   public  masterList       = inject(MasterListService);
   public  commonService    = inject(CommonMethodService);
   private analyticsService = inject(AdminAnalyticsService);
@@ -485,7 +488,7 @@ export class CustomerLtvAnalysisComponent implements OnInit {
 
   loadData(): void {
     this.loading.set(true);
-    this.analyticsService.getCustomerLifetimeValue(this.currentFilters['branchId']).subscribe({
+    this.analyticsService.getCustomerLifetimeValue(this.currentFilters['branchId']).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         if (res.status === 'success') this.ltvData.set(res.data);
         this.loading.set(false);
@@ -573,6 +576,11 @@ export class CustomerLtvAnalysisComponent implements OnInit {
     ];
     this.cdr.detectChanges();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 // import { Component, OnInit, signal, ChangeDetectorRef, inject } from '@angular/core';
 // import { CommonModule } from '@angular/common';

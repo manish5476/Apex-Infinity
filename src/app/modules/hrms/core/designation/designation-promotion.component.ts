@@ -1,10 +1,12 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { HRMSService } from '../../hrms.service';
+import { takeUntil } from "rxjs/operators";
+
 @Component({
   selector: 'app-designation-promotion',
   standalone: true,
@@ -289,7 +291,8 @@ import { HRMSService } from '../../hrms.service';
     }
   `]
 })
-export class DesignationPromotionComponent implements OnInit {
+export class DesignationPromotionComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private hrmsService = inject(HRMSService);
@@ -308,7 +311,7 @@ export class DesignationPromotionComponent implements OnInit {
     this.loadDesignationsDropdown();
 
     // Check if a designation ID was passed in the route (e.g. from the list page)
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const id = params.get('id');
       if (id) {
         this.selectedDesignationId = id;
@@ -318,7 +321,7 @@ export class DesignationPromotionComponent implements OnInit {
   }
 
   loadDesignationsDropdown() {
-    this.hrmsService.getDesignations().subscribe({
+    this.hrmsService.getDesignations().pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         const list = res?.data?.designations || res?.data?.data || [];
         this.designationOptions.set(list);
@@ -336,7 +339,7 @@ export class DesignationPromotionComponent implements OnInit {
     
     // Calls API: /v1/hrms/designations/promotion-eligible?designationId=...&years=...
     this.hrmsService.getPromotionEligible(this.selectedDesignationId, this.filterYears).pipe(
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe({
       next: (res: any) => {
         // Matches your JSON exactly: res.data containing currentDesignation, nextDesignation, etc.
@@ -354,4 +357,9 @@ export class DesignationPromotionComponent implements OnInit {
     // Navigates back to the main list. Adjust route if needed based on your structure.
     this.router.navigate(['/hrms/designation/list']);
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

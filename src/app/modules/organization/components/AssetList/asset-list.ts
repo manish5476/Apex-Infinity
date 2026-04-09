@@ -1,7 +1,7 @@
-import { ChangeDetectorRef, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 
 // --- PrimeNG ---
@@ -17,6 +17,7 @@ import { AssetsService } from '@core/services/assets.service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { AgShareGrid } from "../../../shared/components/ag-shared-grid";
 import { ImageCellRendererComponent } from '../../../shared/AgGrid/AgGridcomponents/image-cell-renderer/image-cell-renderer.component';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-asset-list',
@@ -35,7 +36,8 @@ import { ImageCellRendererComponent } from '../../../shared/AgGrid/AgGridcompone
   templateUrl: './asset-list.html',
   styleUrl: './asset-list.scss',
 })
-export class AssetList implements OnInit {
+export class AssetList implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
   private assetService = inject(AssetsService);
   private messageService = inject(AppMessageService);
@@ -103,7 +105,7 @@ export class AssetList implements OnInit {
   // --- Data Fetching ---
 
   getStats() {
-    this.assetService.getMyAssetsStat().subscribe({
+    this.assetService.getMyAssetsStat().pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => this.stats.set(res.data),
       error: (err) => this.messageService.handleHttpError(err)
     });
@@ -131,7 +133,7 @@ export class AssetList implements OnInit {
         finalize(() => {
           this.isLoading = false;
           this.cdr.markForCheck();
-        })
+        }), takeUntil(this.destroy$)
       )
       .subscribe({
         next: (res: any) => {
@@ -160,7 +162,7 @@ export class AssetList implements OnInit {
       acceptButtonStyleClass: 'p-button-danger p-button-text',
       rejectButtonStyleClass: 'p-button-secondary p-button-text',
       accept: () => {
-        this.assetService.deleteAssetsId(id).subscribe({
+        this.assetService.deleteAssetsId(id).pipe(takeUntil(this.destroy$)).subscribe({
           next: () => {
             this.messageService.showSuccess('Asset deleted permanently');
             this.getData(true);
@@ -453,4 +455,8 @@ export class AssetList implements OnInit {
   //     }
   //   ];
   // }
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

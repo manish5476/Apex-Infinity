@@ -1,8 +1,8 @@
-import { Component, inject, signal, computed, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { forkJoin, Subject } from 'rxjs';
+import { finalize, takeUntil } from 'rxjs/operators';
 import { DynamicDialogServices } from '../../../core/services/dynamic-dialog-services';
 import { NoteService } from '../../../core/services/notes.service';
 import { ItemType, Priority } from '../../../core/models/note.types';
@@ -47,7 +47,8 @@ interface DayCell {
   templateUrl: './calendar-view.component.html',
   styleUrl: './calendar-view.component.scss'
 })
-export class CalendarViewComponent implements OnInit {
+export class CalendarViewComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private noteService = inject(NoteService);
   private router = inject(Router);
 
@@ -144,7 +145,7 @@ export class CalendarViewComponent implements OnInit {
     }
 
     forkJoin(reqs)
-      .pipe(finalize(() => this.isLoading.set(false)))
+      .pipe(finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
           this.events.set(res.events.data?.events || []);
@@ -237,4 +238,9 @@ export class CalendarViewComponent implements OnInit {
   private isSameDay(d1: Date, d2: Date) {
     return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

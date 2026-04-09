@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, ChangeDetectorRef, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TagModule } from 'primeng/tag';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -8,6 +8,8 @@ import { CommonMethodService } from '../../core/utils/common-method.service';
 import { AgShareGrid } from '../../modules/shared/components/ag-shared-grid';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-real-time-monitoring',
@@ -686,7 +688,8 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
 }
   `]
 })
-export class RealTimeMonitoringComponent implements OnInit {
+export class RealTimeMonitoringComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private analyticsService = inject(AdminAnalyticsService);
   private commonService = inject(CommonMethodService);
   private cdr = inject(ChangeDetectorRef);
@@ -743,7 +746,7 @@ export class RealTimeMonitoringComponent implements OnInit {
   loadData(): void {
     this.loading.set(true);
     this.analyticsService
-      .getRealTimeMonitoring(this.currentFilters['branchId'], this.currentFilters['severity'])
+            .getRealTimeMonitoring(this.currentFilters['branchId'], this.currentFilters['severity']).pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
           this.monitorData.set(res.data);
@@ -809,6 +812,11 @@ export class RealTimeMonitoringComponent implements OnInit {
     ];
     this.cdr.detectChanges();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 // import { Component, OnInit, signal, computed, ChangeDetectorRef, inject } from '@angular/core';
 // import { CommonModule } from '@angular/common';

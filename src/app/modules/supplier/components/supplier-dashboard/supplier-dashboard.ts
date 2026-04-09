@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog'; // 🟢 Added for Dialogs
 
@@ -11,6 +11,8 @@ import { AppMessageService } from '../../../../core/services/message.service';
 import { CommonMethodService } from '../../../../core/utils/common-method.service';
 import { TransactionService } from '../../../transactions/transaction.service';
 import { SupplierService } from '../../services/supplier-service';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-supplier-dashboard',
@@ -19,7 +21,8 @@ import { SupplierService } from '../../services/supplier-service';
   templateUrl: './supplier-dashboard.html',
   styleUrl: './supplier-dashboard.scss',
 })
-export class SupplierDashboardComponent implements OnInit {
+export class SupplierDashboardComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   // 🟢 Replaced ActivatedRoute with DynamicDialog tools
   private config = inject(DynamicDialogConfig);
   private ref = inject(DynamicDialogRef);
@@ -49,7 +52,7 @@ export class SupplierDashboardComponent implements OnInit {
       return;
     }
 
-    this.supplierService.getSupplierDashboard(id).subscribe({
+    this.supplierService.getSupplierDashboard(id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         if (res?.data?.data || res?.data) {
           const s = res.data.data || res.data;
@@ -87,4 +90,9 @@ export class SupplierDashboardComponent implements OnInit {
   closeDialog() {
     this.ref.close();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

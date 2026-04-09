@@ -1,8 +1,9 @@
-import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Subscription } from 'rxjs';
+import { Injectable, inject, OnDestroy } from '@angular/core';
+import { BehaviorSubject, Subscription, Subject } from 'rxjs';
 import { SocketConnectionService } from './socket/socket-connection.service';
 import { AuthService } from '../../modules/auth/services/auth-service';
 import { ThemeFontLoader } from './apex-font-loader';
+import { takeUntil } from "rxjs/operators";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Theme Settings
@@ -78,7 +79,8 @@ const SVG_TEMPLATES: Record<string, (color: string) => { svg: string; size: stri
 // ─────────────────────────────────────────────────────────────────────────────
 
 @Injectable({ providedIn: 'root' })
-export class ThemeService {
+export class ThemeService implements OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private socketService = inject(SocketConnectionService);
   private authService = inject(AuthService);
   private readonly STORAGE_KEY = 'themeSettings-v4'; // bumped version — merges pattern
@@ -122,7 +124,7 @@ export class ThemeService {
   // ─────────────────────────────────────────────────────────────────────────
 
   private setupSocketListener() {
-    this.socketService.themeChanged$.subscribe(({ themeId }) => {
+    this.socketService.themeChanged$.pipe(takeUntil(this.destroy$)).subscribe(({ themeId }) => {
       const current = this.settingsSubject.value;
       let newSettings: ThemeSettings;
 
@@ -142,7 +144,7 @@ export class ThemeService {
   }
 
   private listenToUserChanges() {
-    this.authService.currentUser$.subscribe(user => {
+    this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(user => {
       if (user?.preferences?.theme) {
         const isDark = user.preferences.theme === 'dark';
         const current = this.settingsSubject.value;
@@ -342,6 +344,11 @@ export class ThemeService {
       });
     }
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 // import { Injectable, inject } from '@angular/core';
 // import { BehaviorSubject, Subscription } from 'rxjs';

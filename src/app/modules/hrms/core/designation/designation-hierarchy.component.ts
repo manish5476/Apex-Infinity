@@ -1,9 +1,10 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { HRMSService } from '../../hrms.service';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-designation-hierarchy',
@@ -164,7 +165,8 @@ import { HRMSService } from '../../hrms.service';
     .card-anim-1 { animation: popIn 0.4s ease-out both; }
   `]
 })
-export class DesignationHierarchyComponent implements OnInit {
+export class DesignationHierarchyComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private router = inject(Router);
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
@@ -180,7 +182,7 @@ export class DesignationHierarchyComponent implements OnInit {
     this.isLoading.set(true);
     
     this.hrmsService.getDesignationHierarchy().pipe(
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe({
       next: (res: any) => {
         // Based on JSON: res.data.reportingHierarchy
@@ -198,4 +200,9 @@ export class DesignationHierarchyComponent implements OnInit {
   goBack() {
     this.router.navigate(['/hrms/designation/list']);
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

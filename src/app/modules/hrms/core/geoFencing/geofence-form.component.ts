@@ -2,8 +2,8 @@ import { Component, OnInit, AfterViewInit, OnDestroy, ChangeDetectionStrategy, i
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 
 // Leaflet
 import * as L from 'leaflet';
@@ -314,6 +314,7 @@ import { InputIconModule } from 'primeng/inputicon';
   `]
 })
 export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   @ViewChild('mapContainer') mapContainer!: ElementRef;
 
   private fb = inject(FormBuilder);
@@ -362,6 +363,8 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.map) {
       this.map.remove();
     }
+      this.destroy$.next();
+      this.destroy$.complete();
   }
 
   private initForm() {
@@ -389,7 +392,7 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
         this.onCancel();
         return of(null);
       }),
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe((res: any) => {
       if (res?.data?.geofence) {
         this.fenceForm.patchValue(res.data.geofence);
@@ -485,7 +488,7 @@ export class GeofenceFormComponent implements OnInit, AfterViewInit, OnDestroy {
         this.messageService.handleHttpError(err)
         return of(null);
       }),
-      finalize(() => this.isSaving.set(false))
+      finalize(() => this.isSaving.set(false)), takeUntil(this.destroy$)
     ).subscribe((res:any) => {
       if (res) {
         setTimeout(() => this.onCancel(), 1000);

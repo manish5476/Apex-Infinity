@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -9,6 +9,8 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { AdminAnalyticsService } from '../admin-analytics.service';
 import { PERMISSIONS } from '@core/auth/permissions.constants';
 import { HasPermissionDirective } from '@core/auth/directives/has-permission.directive';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-analytics-export-hub',
@@ -361,7 +363,8 @@ import { HasPermissionDirective } from '@core/auth/directives/has-permission.dir
     .tip-text { font-size: var(--font-size-xs); color: var(--text-secondary); line-height: 1.4; margin: 0; }
   `]
 })
-export class AnalyticsExportHubComponent {
+export class AnalyticsExportHubComponent implements OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   PERMISSIONS = PERMISSIONS;
   exporting = signal<boolean>(false);
   selectedType:any = signal<'sales' | 'inventory' | 'customers'>('sales');
@@ -388,10 +391,10 @@ export class AnalyticsExportHubComponent {
     const endStr = this.endDate instanceof Date ? this.endDate.toISOString().split('T')[0] : (this.endDate || '');
 
     this.analyticsService.exportAnalyticsData(
-      this.selectedType(),
-      startStr,
-      endStr
-    ).subscribe({
+            this.selectedType(),
+            startStr,
+            endStr
+          ).pipe(takeUntil(this.destroy$)).subscribe({
 
       next: (blob: Blob) => {
         const url = window.URL.createObjectURL(blob);
@@ -405,4 +408,9 @@ export class AnalyticsExportHubComponent {
       error: () => this.exporting.set(false)
     });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

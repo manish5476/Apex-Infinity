@@ -4,7 +4,7 @@
 
 
 
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -14,6 +14,8 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { AuthService } from '../../services/auth-service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { passwordMatchValidator } from '../../../../core/validators/password-match.validator';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-signup',
@@ -30,7 +32,8 @@ import { passwordMatchValidator } from '../../../../core/validators/password-mat
   styleUrl: './signup.scss',
   providers: [AppMessageService]
 })
-export class Signup implements OnInit {
+export class Signup implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
@@ -106,7 +109,7 @@ export class Signup implements OnInit {
       payload.uniqueShopId = payload.uniqueShopId.toUpperCase();
     }
 
-    this.authService.employeeSignup(payload).subscribe({
+    this.authService.employeeSignup(payload).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.isLoading.set(false);
         const msg = 'Account created! Welcome to Apex.';
@@ -122,4 +125,9 @@ export class Signup implements OnInit {
       }
     });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

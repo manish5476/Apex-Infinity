@@ -1,7 +1,7 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { finalize } from 'rxjs/operators';
+import { finalize, takeUntil } from 'rxjs/operators';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 
 // PrimeNG
@@ -16,6 +16,7 @@ import { SalesReturnService, CreateSalesReturnPayload } from '@core/services/sal
 import { InvoiceService } from '../../../../modules/invoice/services/invoice-service';
 import { AppMessageService } from '@core/services/message.service';
 import { CommonMethodService } from '@core/utils/common-method.service';
+import { Subject } from "rxjs";
 
 @Component({
   selector: 'app-sales-return-dialog',
@@ -33,7 +34,8 @@ import { CommonMethodService } from '@core/utils/common-method.service';
   templateUrl: './sales-return-dialog.html',
   styleUrl: './sales-return-dialog.scss'
 })
-export class SalesReturnDialogComponent implements OnInit {
+export class SalesReturnDialogComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private config = inject(DynamicDialogConfig);
   private ref = inject(DynamicDialogRef);
   private fb = inject(FormBuilder);
@@ -100,7 +102,7 @@ export class SalesReturnDialogComponent implements OnInit {
 
   private loadInvoice(id: string): void {
     this.isLoading.set(true);
-    this.invoiceService.getInvoiceById(id).subscribe({
+    this.invoiceService.getInvoiceById(id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         const data = res.data?.data || res.data?.invoice || res.data;
         this.setupInvoice(data);
@@ -188,7 +190,7 @@ export class SalesReturnDialogComponent implements OnInit {
     };
 
     this.salesReturnService.createSalesReturn(payload)
-      .pipe(finalize(() => this.isSubmitting.set(false)))
+      .pipe(finalize(() => this.isSubmitting.set(false)), takeUntil(this.destroy$))
       .subscribe({
         next: () => {
           this.messageService.showSuccess('Sales return processed successfully');
@@ -201,4 +203,9 @@ export class SalesReturnDialogComponent implements OnInit {
   cancel(): void {
     this.ref.close();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

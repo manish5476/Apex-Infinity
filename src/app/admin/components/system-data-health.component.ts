@@ -1,9 +1,11 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AdminAnalyticsService } from '../admin-analytics.service';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-system-data-health',
@@ -404,7 +406,8 @@ import { AdminAnalyticsService } from '../admin-analytics.service';
     }
   `]
 })
-export class SystemDataHealthComponent implements OnInit {
+export class SystemDataHealthComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   healthData = signal<any>(null);
   meta = signal<any>(null);
   loading = signal<boolean>(true);
@@ -417,7 +420,7 @@ export class SystemDataHealthComponent implements OnInit {
 
   loadData() {
     this.loading.set(true);
-    this.analyticsService.getDataHealth().subscribe({
+    this.analyticsService.getDataHealth().pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         if (res.status === 'success') {
           this.healthData.set(res.data);
@@ -448,4 +451,9 @@ export class SystemDataHealthComponent implements OnInit {
     if (score >= 50) return 'Attention Needed';
     return 'Critical Failure';
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

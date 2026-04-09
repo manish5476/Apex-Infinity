@@ -1,8 +1,8 @@
-import { ChangeDetectorRef, Component, OnInit, inject, signal, computed } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject, signal, computed, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
-import { debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, finalize, takeUntil } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 
@@ -24,6 +24,7 @@ import { HasPermissionDirective } from '../../../../core/auth/directives/has-per
 import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { Toast } from 'primeng/toast';
+import { Subject } from "rxjs";
 
 // ============================================================================
 // Custom Cell Renderer for Action Buttons
@@ -93,7 +94,8 @@ export class ActionButtonsRenderer {
   styleUrl: './sales-return-list.scss',
   providers: [DialogService]
 })
-export class SalesReturnListComponent implements OnInit {
+export class SalesReturnListComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   readonly PERMISSIONS = PERMISSIONS;
 
   private cdr = inject(ChangeDetectorRef);
@@ -143,7 +145,7 @@ export class SalesReturnListComponent implements OnInit {
     // Subscribe to search query changes after initial load
     this.searchControl.valueChanges.pipe(
       debounceTime(400),
-      distinctUntilChanged()
+      distinctUntilChanged(), takeUntil(this.destroy$)
     ).subscribe(() => {
       this.applyFilters();
     });
@@ -190,7 +192,7 @@ export class SalesReturnListComponent implements OnInit {
       .pipe(finalize(() => {
         this.isLoading.set(false);
         this.cdr.markForCheck();
-      }))
+      }), takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
           // Binding based on the provided API response structure (res.data.returns)
@@ -253,7 +255,7 @@ export class SalesReturnListComponent implements OnInit {
       }
     });
 
-    ref?.onClose.subscribe((result) => {
+    ref?.onClose.pipe(takeUntil(this.destroy$)).subscribe((result) => {
       if (result) {
         this.getData(true);
       }
@@ -326,4 +328,9 @@ export class SalesReturnListComponent implements OnInit {
       }
     ];
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

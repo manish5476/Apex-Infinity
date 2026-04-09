@@ -1,9 +1,9 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { finalize, switchMap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { finalize, switchMap, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 
 // PrimeNG Modules
 import { ButtonModule } from 'primeng/button';
@@ -41,7 +41,8 @@ import { LocationPickerComponent } from '../../components/location-picker/locati
   templateUrl: './branch-form.html',
   styleUrls: ['./branch-form.scss']
 })
-export class BranchFormComponent implements OnInit {
+export class BranchFormComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   // --- Injections ---
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
@@ -134,7 +135,7 @@ private checkRouteForEditMode(): void {
         }
         return of(null);
       }),
-      finalize(() => this.loadingService.hide())
+      finalize(() => this.loadingService.hide()), takeUntil(this.destroy$)
     ).subscribe({
       next: (response) => {
         if (response?.data?.data) {
@@ -202,7 +203,7 @@ private checkRouteForEditMode(): void {
       : this.branchService.createBranch(payload);
 
     request$.pipe(
-      finalize(() => this.isSubmitting.set(false))
+      finalize(() => this.isSubmitting.set(false)), takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
         // This was already a perfect single string, no changes needed here!
@@ -298,4 +299,8 @@ private checkRouteForEditMode(): void {
   //     error: (err) => this.appMessage.handleHttpError(err, this.editMode() ? 'Update Branch' : 'Create Branch')
   //   });
   // }
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

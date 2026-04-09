@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, signal, inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
@@ -9,6 +9,8 @@ import { TooltipModule } from 'primeng/tooltip';
 import { AdminAnalyticsService } from '../admin-analytics.service';
 import { FilterField } from '../../modules/shared/components/universal-filter/filter-config.interface';
 import { UniversalFilterComponent } from '../../modules/shared/components/universal-filter/universal-filter';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 // Components
 
@@ -175,7 +177,8 @@ import { UniversalFilterComponent } from '../../modules/shared/components/univer
     </div>
   `
 })
-export class SalesForecastComponent implements OnInit {
+export class SalesForecastComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   forecastData = signal<any>(null);
   meta = signal<any>(null);
   loading = signal<boolean>(false); // Start false, filters trigger load
@@ -242,7 +245,7 @@ export class SalesForecastComponent implements OnInit {
     const periods = this.currentFilters.periods || 3;
     const confidence = this.currentFilters.confidence || 0.95;
 
-    this.analyticsService.getSalesForecast(branchId, periods, confidence).subscribe({
+    this.analyticsService.getSalesForecast(branchId, periods, confidence).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         if (res.status === 'success') {
           this.forecastData.set(res.data);
@@ -253,6 +256,11 @@ export class SalesForecastComponent implements OnInit {
       error: () => this.loading.set(false)
     });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { Component, OnInit, signal, computed } from '@angular/core';

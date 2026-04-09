@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { forkJoin, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { forkJoin, of, Subject } from 'rxjs';
+import { catchError, map, takeUntil } from 'rxjs/operators';
 
 // Services
 import { HRMSService } from '../../../hrms.service';
@@ -451,7 +451,8 @@ import { AppMessageService } from '@core/services/message.service';
     @media (max-width: 768px) { .page-wrapper { padding: var(--spacing-xl); } .dashboard-header { flex-direction: column; align-items: stretch; gap: var(--spacing-xl); } .header-right { justify-content: flex-end; } .bento-grid { grid-template-columns: 1fr; } .span-2, .span-3 { grid-column: span 1; } .inner-grid-2 { grid-template-columns: 1fr; } }
   `]
 })
-export class DepartmentDetailsComponent implements OnInit {
+export class DepartmentDetailsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private dataService = inject(HRMSService);
@@ -574,21 +575,21 @@ gridColumns: any = [
     this.isLoading.set(true);
     
     forkJoin({
-      department: this.dataService.getDepartment(this.deptId).pipe(
-        map((res: any) => res?.data?.data || res),
-        catchError((err) => {
-          this.messageService.handleHttpError(err)
-          return of(null);
-        })
-      ),
-      employeesData: this.dataService.getDepartmentEmployees(this.deptId).pipe(
-        map((res: any) => res?.data?.employees || []),
-        catchError((err) => {
-          this.messageService.handleHttpError(err)
-          return of([]);
-        })
-      )
-    }).subscribe(({ department, employeesData }) => {
+            department: this.dataService.getDepartment(this.deptId).pipe(
+              map((res: any) => res?.data?.data || res),
+              catchError((err) => {
+                this.messageService.handleHttpError(err)
+                return of(null);
+              })
+            ),
+            employeesData: this.dataService.getDepartmentEmployees(this.deptId).pipe(
+              map((res: any) => res?.data?.employees || []),
+              catchError((err) => {
+                this.messageService.handleHttpError(err)
+                return of([]);
+              })
+            )
+          }).pipe(takeUntil(this.destroy$)).subscribe(({ department, employeesData }) => {
       if (department) {
         this.dept.set(department);
       }
@@ -642,6 +643,11 @@ gridColumns: any = [
     if (utilization > 85) return 'var(--color-warning)'; 
     return 'var(--color-success)'; 
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 // import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 // import { CommonModule, DatePipe } from '@angular/common';

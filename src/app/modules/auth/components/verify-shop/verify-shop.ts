@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -7,6 +7,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { OrganizationService } from '../../../organization/organization.service';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-verify-shop',
@@ -16,7 +18,8 @@ import { OrganizationService } from '../../../organization/organization.service'
   templateUrl: './verify-shop.html',
   styleUrl: './verify-shop.scss'
 })
-export class VerifyShopComponent {
+export class VerifyShopComponent implements OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private orgService = inject(OrganizationService);
   private messageService = inject(AppMessageService);
@@ -37,7 +40,7 @@ export class VerifyShopComponent {
     this.isLoading.set(true);
     this.orgDetails.set(null);
 
-    this.orgService.getOrganizationByShopId(this.verifyForm.value.uniqueShopId!).subscribe({
+    this.orgService.getOrganizationByShopId(this.verifyForm.value.uniqueShopId!).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.isLoading.set(false);
         this.orgDetails.set(res.data || res); // Depending on response format, assign real nested data if needed
@@ -50,4 +53,9 @@ export class VerifyShopComponent {
       }
     });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

@@ -1,7 +1,7 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { catchError, finalize, forkJoin, of } from 'rxjs';
+import { catchError, finalize, forkJoin, of, Subject } from 'rxjs';
 
 // Services
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -24,6 +24,7 @@ import { ChartModule } from 'primeng/chart';
 import { TabsModule } from 'primeng/tabs';
 import { DatePicker } from 'primeng/datepicker';
 import { ToastModule } from 'primeng/toast';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-admin-daily-attendance',
@@ -402,7 +403,8 @@ import { ToastModule } from 'primeng/toast';
     }
   `]
 })
-export class AdminDailyAttendanceComponent implements OnInit {
+export class AdminDailyAttendanceComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
   private confirmationService = inject(ConfirmationService);
@@ -433,7 +435,7 @@ export class AdminDailyAttendanceComponent implements OnInit {
         catchError(() => of({ data: { totalEmployees: 150, presentCount: 130, lateCount: 12, absentCount: 8 } })) 
       )
     }).pipe(
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe(({ recordsRes, dashRes }) => {
       this.allRecords.set(recordsRes?.data?.records || []);
       this.dashboardStats.set(dashRes?.data || {});
@@ -446,7 +448,7 @@ export class AdminDailyAttendanceComponent implements OnInit {
       header: 'Recalculate Daily Attendance',
       icon: 'pi pi-sync',
       accept: () => {
-        this.hrmsService.recalculateDaily(this.selectedDate).subscribe({
+        this.hrmsService.recalculateDaily(this.selectedDate).pipe(takeUntil(this.destroy$)).subscribe({
           next: (res:any) => {
             this.messageService.showSuccess(res.message || 'Recalculation successful.');
             this.loadDailyRegister();
@@ -461,7 +463,7 @@ export class AdminDailyAttendanceComponent implements OnInit {
     const start = new Date(this.selectedDate.getFullYear(), this.selectedDate.getMonth(), 1);
     const end = new Date(this.selectedDate.getFullYear(), this.selectedDate.getMonth() + 1, 0);
 
-    this.hrmsService.exportAttendance({ fromDate: start, toDate: end, format: 'csv' }).subscribe({
+    this.hrmsService.exportAttendance({ fromDate: start, toDate: end, format: 'csv' }).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res:any) => this.messageService.showSuccess(res.message || 'Export initiated.'),
       error: (err) => this.messageService.handleHttpError(err)
     });
@@ -510,6 +512,11 @@ export class AdminDailyAttendanceComponent implements OnInit {
       }
     };
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 // import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 // import { CommonModule } from '@angular/common';

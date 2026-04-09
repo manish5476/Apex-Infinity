@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { Chart, registerables } from 'chart.js';
@@ -117,13 +117,14 @@ export class AovTrendChartComponent implements OnInit, OnDestroy {
   peakAov = 0;
   totalOrders = 0;
 
-  constructor(private chartService: ChartService) { }
+  constructor(private chartService: ChartService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void { this.loadData(); }
 
   loadData(): void {
     this.isLoading = true;
     this.hasError = false;
+    this.cdr.detectChanges();
     this.chartService.getAOVTrend()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -134,9 +135,14 @@ export class AovTrendChartComponent implements OnInit, OnDestroy {
           this.peakAov = aovDs ? Math.max(...aovDs.data) : 0;
           this.totalOrders = cntDs ? cntDs.data.reduce((a: number, b: number) => a + b, 0) : 0;
           this.isLoading = false;
+          this.cdr.detectChanges();
           setTimeout(() => this.renderChart(data), 50);
         },
-        error: () => { this.isLoading = false; this.hasError = true; }
+        error: () => { 
+          this.isLoading = false; 
+          this.hasError = true; 
+          this.cdr.detectChanges();
+        }
       });
   }
 

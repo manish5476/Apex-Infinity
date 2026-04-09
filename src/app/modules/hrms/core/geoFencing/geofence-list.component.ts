@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -6,7 +6,8 @@ import { AppMessageService } from '../../../../core/services/message.service';
 import { AgShareGrid, ActionColumnConfig } from '../../../shared/components/ag-shared-grid';
 import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 import { HRMSService } from '../../hrms.service';
-
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-geofence-list',
@@ -96,7 +97,8 @@ import { HRMSService } from '../../hrms.service';
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } .fade-in { animation: fadeIn 0.3s ease-out; }
   `]
 })
-export class GeofenceListComponent implements OnInit {
+export class GeofenceListComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
@@ -123,7 +125,7 @@ export class GeofenceListComponent implements OnInit {
 
   getData() {
     this.isLoading = true;
-    this.hrmsService.getGeoFences(this.filter).subscribe({
+    this.hrmsService.getGeoFences(this.filter).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         this.data = res.data?.geofences || res.data || [];
         this.isLoading = false;
@@ -146,7 +148,7 @@ export class GeofenceListComponent implements OnInit {
 
   deleteFence(id: string, name: string) {
     if(confirm(`Delete Geofence ${name}?`)) {
-      this.hrmsService.deleteGeoFence(id).subscribe({
+      this.hrmsService.deleteGeoFence(id).pipe(takeUntil(this.destroy$)).subscribe({
         next: () => { this.messageService.showSuccess( 'Geofence removed'); this.getData(); },
         error: (err) => this.messageService.handleHttpError(err)
       });
@@ -196,4 +198,9 @@ export class GeofenceListComponent implements OnInit {
       }
     ];
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

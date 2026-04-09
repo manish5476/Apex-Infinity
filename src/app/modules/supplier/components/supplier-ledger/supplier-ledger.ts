@@ -1,5 +1,5 @@
 import { MessageService } from "primeng/api";
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 
@@ -11,6 +11,8 @@ import { DividerModule } from 'primeng/divider';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SupplierService } from '../../services/supplier-service';
 import { AppMessageService } from "../../../../core/services/message.service";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-supplier-ledger',
@@ -19,7 +21,8 @@ import { AppMessageService } from "../../../../core/services/message.service";
   templateUrl: './supplier-ledger.html',
   styleUrl: './supplier-ledger.scss',
 })
-export class SupplierLedger implements OnInit {
+export class SupplierLedger implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private config = inject(DynamicDialogConfig);
   private ref = inject(DynamicDialogRef);
   private supplierService = inject(SupplierService);
@@ -40,7 +43,7 @@ export class SupplierLedger implements OnInit {
 loadLedger() {
     this.loading.set(true);
     
-    this.supplierService.getSupplierDashboard(this.supplierId).subscribe({
+    this.supplierService.getSupplierDashboard(this.supplierId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.dashboardData.set(res.data);
         this.loading.set(false);
@@ -56,7 +59,7 @@ loadLedger() {
   exportLedger() {
     this.exporting.set(true);
     
-    this.supplierService.downloadSupplierLedger(this.supplierId).subscribe({
+    this.supplierService.downloadSupplierLedger(this.supplierId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (blob: Blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -81,4 +84,9 @@ loadLedger() {
   close() {
     this.ref.close();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

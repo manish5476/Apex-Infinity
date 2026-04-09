@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -11,6 +11,8 @@ import { AppMessageService } from '../../../../core/services/message.service';
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-login',
@@ -29,7 +31,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
   styleUrl: './login.scss',
   providers: [AppMessageService]
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private masterListService = inject(MasterListService);
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
@@ -106,7 +109,7 @@ export class LoginComponent implements OnInit {
 
     const loginData = { ...this.loginForm.value, forceLogout };
 
-    this.authService.login(loginData, this.loginForm.value.remember, this.returnUrl).subscribe({
+    this.authService.login(loginData, this.loginForm.value.remember, this.returnUrl).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         this.masterListService.load();
         this.isLoading.set(false);
@@ -134,4 +137,9 @@ export class LoginComponent implements OnInit {
       }
     });
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }

@@ -1,9 +1,9 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { catchError, finalize, map } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 
 // Services
 import { MessageService } from 'primeng/api';
@@ -409,7 +409,8 @@ import { error } from 'console';
     }
   `]
 })
-export class ShiftGroupAssignmentsComponent implements OnInit {
+export class ShiftGroupAssignmentsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private fb = inject(FormBuilder);
@@ -469,7 +470,7 @@ export class ShiftGroupAssignmentsComponent implements OnInit {
         this.messageService.handleHttpError(error)
         return of([]);
       }),
-      finalize(() => this.isLoadingAssignments.set(false))
+      finalize(() => this.isLoadingAssignments.set(false)), takeUntil(this.destroy$)
     ).subscribe(data => {
       this.assignments.set(data);
     });
@@ -491,7 +492,7 @@ export class ShiftGroupAssignmentsComponent implements OnInit {
         this.messageService.handleHttpError(err)
         return of(null);
       }),
-      finalize(() => this.isAssigning.set(false))
+      finalize(() => this.isAssigning.set(false)), takeUntil(this.destroy$)
     ).subscribe((res:any) => {
       if (res) {
         this.messageService.showSuccess(res.message)
@@ -513,7 +514,7 @@ export class ShiftGroupAssignmentsComponent implements OnInit {
         this.messageService.handleHttpError(err)
         return of(null);
       }),
-      finalize(() => this.isGenerating.set(false))
+      finalize(() => this.isGenerating.set(false)), takeUntil(this.destroy$)
     ).subscribe((res:any) => {
       this.messageService.showSuccess(res.message)
       this.generatedSchedule.set({ status: 'success' });
@@ -528,6 +529,11 @@ export class ShiftGroupAssignmentsComponent implements OnInit {
     if (!name || name.trim() === '') return '?';
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 

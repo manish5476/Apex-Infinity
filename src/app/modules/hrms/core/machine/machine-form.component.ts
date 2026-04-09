@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of, catchError, map } from 'rxjs';
+import { of, catchError, map, Subject } from 'rxjs';
 import { MasterListService } from '../../../../core/services/master-list.service';
 import { AppMessageService } from '../../../../core/services/message.service';
 import { HRMSService } from '../../hrms.service';
@@ -12,6 +12,7 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-machine-form',
@@ -290,7 +291,8 @@ import { InputTextModule } from 'primeng/inputtext';
     }
   `]
 })
-export class MachineFormComponent implements OnInit {
+export class MachineFormComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private fb = inject(FormBuilder);
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
@@ -372,7 +374,7 @@ export class MachineFormComponent implements OnInit {
     ];
 
     // Auto-uppercase
-    this.machineForm.get('serialNumber')?.valueChanges.subscribe(val => {
+    this.machineForm.get('serialNumber')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(val => {
       if (val && val !== val.toUpperCase()) {
         this.machineForm.get('serialNumber')?.setValue(val.toUpperCase(), { emitEvent: false });
       }
@@ -380,7 +382,7 @@ export class MachineFormComponent implements OnInit {
   }
 
   private checkEditMode() {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const id = params.get('id');
       if (id) {
         this.isEditMode.set(true);
@@ -401,7 +403,7 @@ export class MachineFormComponent implements OnInit {
         this.machineForm.enable();
         this.messageService.handleHttpError(err)
         return of(null);
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe((data) => {
       if (data) {
         this.patchFormValues(data);
@@ -453,7 +455,7 @@ export class MachineFormComponent implements OnInit {
     const payload = { ...this.machineForm.value };
 
     if (this.isEditMode()) {
-      this.hrmsService.updateMachine(this.machineId!, payload).subscribe({
+      this.hrmsService.updateMachine(this.machineId!, payload).pipe(takeUntil(this.destroy$)).subscribe({
         next: () => {
           this.messageService.showSuccess( 'Machine configuration updated');
           this.isSubmitting.set(false);
@@ -465,7 +467,7 @@ export class MachineFormComponent implements OnInit {
         }
       });
     } else {
-      this.hrmsService.createMachine(payload).subscribe({
+      this.hrmsService.createMachine(payload).pipe(takeUntil(this.destroy$)).subscribe({
         next: (res: any) => {
           // Note: response might contain the new apiKey, could show a modal here
           this.messageService.showSuccess( 'New machine registered successfully');
@@ -483,6 +485,11 @@ export class MachineFormComponent implements OnInit {
   goBack() {
     this.router.navigate(['/hrms/attendance/machines']);
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 

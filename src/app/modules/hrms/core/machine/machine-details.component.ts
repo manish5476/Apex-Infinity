@@ -1,7 +1,7 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, finalize, forkJoin, of } from 'rxjs';
+import { catchError, finalize, forkJoin, of, Subject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 
 // Services
@@ -21,6 +21,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { HRMSService } from '../../hrms.service';
 import { AppMessageService } from '@core/services/message.service';
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-machine-details',
@@ -321,7 +322,8 @@ import { AppMessageService } from '@core/services/message.service';
     }
   `]
 })
-export class MachineDetailsComponent implements OnInit {
+export class MachineDetailsComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private hrmsService = inject(HRMSService);
@@ -363,7 +365,7 @@ export class MachineDetailsComponent implements OnInit {
       logsData: this.hrmsService.getMachineLogs(this.machineId).pipe(catchError(() => of({ data: { logs: [] } }))),
       unmappedData: this.hrmsService.getUnmappedUsers().pipe(catchError(() => of({ data: { users: [] } })))
     }).pipe(
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)), takeUntil(this.destroy$)
     ).subscribe(({ machineData, logsData, unmappedData }) => {
       if (machineData?.data?.machine) {
         this.machine.set(machineData.data.machine);
@@ -390,7 +392,7 @@ export class MachineDetailsComponent implements OnInit {
         // Update local state to offline
         this.machine.update(m => ({ ...m, connectionStatus: 'offline' }));
         return of(null);
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe((res:any) => {
       if (res) {
         this.messageService.showSuccess(res.message)
@@ -419,7 +421,7 @@ export class MachineDetailsComponent implements OnInit {
       catchError(err => {
         this.messageService.handleHttpError(err)
         return of(null);
-      })
+      }), takeUntil(this.destroy$)
     ).subscribe((res:any) => {
       if (res) {
         this.messageService.showSuccess(res.message)
@@ -436,7 +438,7 @@ export class MachineDetailsComponent implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.hrmsService.regenerateMachineApiKey(this.machineId).subscribe({
+        this.hrmsService.regenerateMachineApiKey(this.machineId).pipe(takeUntil(this.destroy$)).subscribe({
           next: (res: any) => {
             if (res?.data?.apiKey) {
               this.newApiKey = res.data.apiKey;
@@ -457,7 +459,7 @@ export class MachineDetailsComponent implements OnInit {
       icon: 'pi pi-trash',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.hrmsService.deleteMachine(this.machineId).subscribe({
+        this.hrmsService.deleteMachine(this.machineId).pipe(takeUntil(this.destroy$)).subscribe({
           next: (res:any) => {
             this.messageService.showSuccess(res.message)
             this.onBack();
@@ -485,6 +487,11 @@ export class MachineDetailsComponent implements OnInit {
       default: return 'info';
     }
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
 
 // import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';

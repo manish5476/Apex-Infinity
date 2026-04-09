@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -6,7 +6,8 @@ import { AppMessageService } from '../../../../core/services/message.service';
 import { AgShareGrid, ActionColumnConfig } from '../../../shared/components/ag-shared-grid';
 import { PERMISSIONS } from '../../../../core/auth/permissions.constants';
 import { HRMSService } from '../../hrms.service';
-
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'app-machine-list',
@@ -101,7 +102,8 @@ import { HRMSService } from '../../hrms.service';
     .select-wrapper::after { content: ""; position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); width: 10px; height: 6px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2364748b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; pointer-events: none; }
   `]
 })
-export class MachineListComponent implements OnInit {
+export class MachineListComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
   private hrmsService = inject(HRMSService);
   private messageService = inject(AppMessageService);
@@ -129,7 +131,7 @@ export class MachineListComponent implements OnInit {
 
   getData() {
     this.isLoading = true;
-    this.hrmsService.getMachines(this.filter).subscribe({
+    this.hrmsService.getMachines(this.filter).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => {
         this.data = res.data?.machines || res.data || [];
         this.isLoading = false;
@@ -152,7 +154,7 @@ export class MachineListComponent implements OnInit {
 
   deleteMachine(id: string, name: string) {
     if(confirm(`Delete machine ${name}?`)) {
-      this.hrmsService.deleteMachine(id).subscribe({
+      this.hrmsService.deleteMachine(id).pipe(takeUntil(this.destroy$)).subscribe({
         next: () => { this.messageService.showSuccess('Machine removed'); this.getData(); },
         error: (err) => this.messageService.handleHttpError(err)
       });
@@ -194,4 +196,9 @@ export class MachineListComponent implements OnInit {
       }
     ];
   }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
