@@ -24,6 +24,7 @@ import { AppSharedGrid, SharedGridEvent } from "../../AgGrid/grid/app-shared-gri
 import { GridColDef } from "../../AgGrid/grid/grid.types";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
+import { AppSharedGridActionButton } from '../../AgGrid/grid/app-shared-grid-action-button/app-shared-grid-action-button';
 
 // --- Interface based on Mongoose Schema ---
 export interface Master {
@@ -58,7 +59,7 @@ export interface Master {
     DialogModule,
     SelectModule,
     AppSharedGrid
-],
+  ],
   providers: [ConfirmationService],
   template: `
     <div class="master-page-container">
@@ -188,7 +189,7 @@ export interface Master {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MasterList implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
   // --- Services ---
   private masterService = inject(MasterService);
   private appMessage = inject(AppMessageService);
@@ -223,60 +224,204 @@ export class MasterList implements OnInit, OnDestroy {
     { label: 'tag', value: 'tag' }
   ];
 
-  // --- Grid Definition ---
+  // Define this within your MasterList class
+  // columns: GridColDef<Master>[] = [
+  //   {
+  //     headerName: 'Identity & Type',
+  //     marryChildren: true,
+  //     children: [
+  //       {
+  //         field: 'type',
+  //         headerName: 'Type',
+  //         width: 140,
+  //         pinned: 'left',
+  //         filter: 'agSetColumnFilter',
+  //         cellConfig: {
+  //           type: 'select',
+  //           options: this.masterTypes,
+  //         },
+  //         // Premium Badge Rendering using your theme tokens
+  //         cellRenderer: (params: any) => {
+  //           if (!params.value) return '';
+  //           const val = params.value.toLowerCase();
+  //           return `
+  //           <div class="type-badge-container">
+  //             <span class="type-badge badge-${val}">
+  //               ${params.value}
+  //             </span>
+  //           </div>
+  //         `;
+  //         }
+  //       },
+  //       {
+  //         field: 'name',
+  //         headerName: 'Display Name',
+  //         flex: 1,
+  //         minWidth: 200,
+  //         pinned: 'left',
+  //         cellClass: 'font-weight-bold text-primary-color',
+  //         cellConfig: {
+  //           type: 'text',
+  //           placeholder: 'e.g. Premium Electronics'
+  //         }
+  //       }
+  //     ]
+  //   },
+  //   {
+  //     headerName: 'Assets & Media',
+  //     children: [
+  //       {
+  //         field: 'imageUrl',
+  //         headerName: 'Visual',
+  //         width: 100,
+  //         sortable: false,
+  //         filter: false,
+  //         cellRenderer: (params: any) => {
+  //           const url = params.value;
+  //           if (url) {
+  //             return `<div class="grid-media-wrapper"><img src="${url}" class="grid-img-thumb" /></div>`;
+  //           }
+  //           return `<div class="grid-media-placeholder"><i class="pi pi-image"></i></div>`;
+  //         },
+  //         cellConfig: { type: 'text', placeholder: 'Image URL' }
+  //       },
+  //       {
+  //         field: 'code',
+  //         headerName: 'System Code',
+  //         width: 120,
+  //         valueFormatter: (params) => params.value ? params.value.toUpperCase() : '-',
+  //         cellClass: 'font-mono text-xs',
+  //         cellConfig: { type: 'text', placeholder: 'UNIT-001' }
+  //       }
+  //     ]
+  //   },
+  //   {
+  //     headerName: 'Operational Status',
+  //     children: [
+  //       {
+  //         field: 'isActive',
+  //         headerName: 'Availability',
+  //         width: 130,
+  //         cellConfig: { type: 'boolean' },
+  //         cellRenderer: (params: any) => {
+  //           const state = params.value ? 'active' : 'inactive';
+  //           const label = params.value ? 'Live' : 'Draft';
+  //           return `
+  //           <div class="status-pill status-${state}">
+  //             <span class="status-dot"></span>
+  //             <span class="status-label">${label}</span>
+  //           </div>
+  //         `;
+  //         }
+  //       },
+  //       {
+  //         field: 'metadata.isFeatured',
+  //         headerName: 'Featured',
+  //         width: 110,
+  //         valueGetter: (p) => p.data?.metadata?.isFeatured,
+  //         cellConfig: { type: 'boolean' },
+  //         // Simple star toggle renderer
+  //         cellRenderer: (params: any) => {
+  //           const color = params.value ? '#eab308' : 'var(--text-tertiary)';
+  //           const icon = params.value ? 'pi-star-fill' : 'pi-star';
+  //           return `<div style="text-align: center; color: ${color}"><i class="pi ${icon}"></i></div>`;
+  //         }
+  //       }
+  //     ]
+  //   },
+  //   {
+  //     field: 'description',
+  //     headerName: 'Notes & Context',
+  //     width: 250,
+  //     cellClass: 'text-muted-sm',
+  //     cellConfig: { type: 'text', placeholder: 'Add a description...' }
+  //   }
+  // ];
   columns: GridColDef<Master>[] = [
     {
       field: 'type',
       headerName: 'Type',
-      width: 130,
+      width: 150,
+      pinned: 'left',
       cellConfig: {
         type: 'select',
-        placeholder: 'Select Type',
         options: this.masterTypes,
         optionLabel: 'label',
-        optionValue: 'value'
+        optionValue: 'value',
+        selectAsBadge: true, // MasterCell renders this as a semantic badge
+        placeholder: 'Select Type'
       }
     },
     {
       field: 'name',
-      headerName: 'Name',
+      headerName: 'Master Name',
       flex: 1,
-      minWidth: 150,
-      cellConfig: { type: 'text', placeholder: 'Enter Name (Required)' }
+      minWidth: 200,
+      pinned: 'left',
+      cellConfig: {
+        type: 'text',
+        placeholder: 'Enter name...',
+        truncateAt: 40
+      }
     },
     {
       field: 'imageUrl',
-      headerName: 'Image URL',
-      width: 150,
-      cellConfig: { type: 'text', placeholder: 'https://example.com/img.png' }
+      headerName: 'Media',
+      width: 120,
+      cellConfig: {
+        type: 'avatar', // MasterCell renders image or initials
+        labelField: 'name'
+      }
     },
     {
       field: 'code',
       headerName: 'Code',
-      width: 100,
-      cellConfig: { type: 'text', placeholder: 'CODE' }
+      width: 120,
+      cellConfig: {
+        type: 'text',
+        placeholder: 'CODE-001'
+      }
     },
     {
       field: 'isActive',
-      headerName: 'Active',
-      width: 90,
-      cellConfig: { type: 'boolean' }
+      headerName: 'Status',
+      width: 120,
+      cellConfig: {
+        type: 'boolean' // MasterCell renders as Yes/No chips
+      }
     },
     {
       field: 'metadata.isFeatured',
       headerName: 'Featured',
-      width: 90,
+      width: 110,
       valueGetter: (p) => p.data?.metadata?.isFeatured,
-      cellConfig: { type: 'boolean' }
+      cellConfig: {
+        type: 'boolean'
+      }
     },
     {
       field: 'description',
       headerName: 'Description',
-      width: 200,
-      cellConfig: { type: 'text', placeholder: 'Optional description' }
-    }
+      width: 250,
+      cellConfig: {
+        type: 'textarea',
+        rows: 2,
+        placeholder: 'Internal notes...'
+      }
+    },
+    // {
+    //   headerName: 'Actions',
+    //   width: 180,
+    //   pinned: 'right',
+    //   sortable: false,
+    //   filter: false,
+    //   resizable: false,
+    //   cellClass: 'action-column-cell',
+    //   cellRenderer: AppSharedGridActionButton,
+    //   cellRendererParams: {
+    //   }
+    // }
   ];
-
   constructor() {
     effect(() => { });
   }
@@ -588,8 +733,8 @@ export class MasterList implements OnInit, OnDestroy {
     return `${slug}-${random}`;
   }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

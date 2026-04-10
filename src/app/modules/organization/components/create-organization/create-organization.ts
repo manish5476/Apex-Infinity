@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { finalize, takeUntil } from 'rxjs/operators';
@@ -17,14 +17,13 @@ import { Subject } from "rxjs";
   selector: 'app-create-organization',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     RouterModule,
     ToastModule,
     PasswordModule,
     StepperModule,
     ButtonModule
-  ],
+],
   providers: [AppMessageService],
   templateUrl: './create-organization.html',
   styleUrl: './create-organization.scss'

@@ -67,6 +67,12 @@ export const routes: Routes = [
     component: MainDashboardComponent,
     canActivate: [authGuard],
     children: [
+      {
+        path: 'create-dashboard',
+        loadComponent: () => import('./projectLayout/create-dashboard/create-dashboard').then(m => m.CreateDashboardComponent),
+        canActivate: [TabRouterGuard],
+        data: { tabLabel: 'Create Dashboard', tabIcon: 'pi pi-plus-circle' }
+      },
       // 1. Data Analytics (Directly mapped to tabs)
       {
         path: 'dashboard',

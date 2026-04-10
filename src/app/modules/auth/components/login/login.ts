@@ -49,10 +49,10 @@ export class LoginComponent implements OnInit, OnDestroy {
   emailDomains = ['gmail.com', 'outlook.com', 'proton.me', 'protonmail.me', 'yahoo.com', 'icloud.com', 'hotmail.com'];
 
   loginForm!: FormGroup;
-  returnUrl = '/dashboard';
+  returnUrl = '/create-dashboard';
 
   ngOnInit(): void {
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/create-dashboard';
     this.initForm();
   }
 

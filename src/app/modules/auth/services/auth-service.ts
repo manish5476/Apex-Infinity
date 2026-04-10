@@ -65,7 +65,7 @@ export class AuthService implements OnDestroy {
     }
   }
 
-  public handleLoginSuccess(response: any, rememberMe: boolean = false, returnUrl: string = '/dashboard'): void {
+  public handleLoginSuccess(response: any, rememberMe: boolean = false, returnUrl: string = '/create-dashboard'): void {
     const user = response.data?.user;
     const token = response.token;
     if (!token || !user) return;
@@ -153,7 +153,7 @@ export class AuthService implements OnDestroy {
   /**
    * Login with email or phone
    */
-  login(data: { email: string; password: string; uniqueShopId: string; forceLogout?: boolean }, rememberMe: boolean = false, returnUrl: string = '/dashboard') {
+  login(data: { email: string; password: string; uniqueShopId: string; forceLogout?: boolean }, rememberMe: boolean = false, returnUrl: string = '/create-dashboard') {
     return this.apiService.login(data).pipe(
       tap((response: LoginResponse) => {
         this.handleLoginSuccess(response, rememberMe, returnUrl);

@@ -1,0 +1,26 @@
+<div class="entity-card" [routerLink]="createRoute">
+  <div class="glass-reflection"></div>
+
+  <div class="card-header">
+    <div class="icon-wrapper">
+      <i [class]="icon"></i>
+    </div>
+    <div class="title-area">
+      <h3>{{ title }}</h3>
+      <span class="category-tag">{{ category }}</span>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <p>{{ description }}</p>
+  </div>
+
+  <div class="card-footer">
+    <button class="btn-create">
+      <span>Create New</span>
+      <div class="arrow-circle">
+        <i class="pi pi-arrow-right"></i>
+      </div>
+    </button>
+  </div>
+</div>

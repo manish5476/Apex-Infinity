@@ -114,7 +114,7 @@ export class Signup implements OnInit, OnDestroy {
         const msg = 'Account created! Welcome to Apex.';
         this.successMessage.set(msg);
         this.messageService.showSuccess(msg);
-        this.router.navigateByUrl('/dashboard');
+        this.router.navigateByUrl('/create-dashboard');
       },
       error: (err) => {
         this.isLoading.set(false);

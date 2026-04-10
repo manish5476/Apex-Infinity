@@ -1,280 +1,189 @@
-/* ==============================================
-   1. CORE LAYOUT & VARIABLES
-   ============================================== */
-:host {
-  display: flex;
-  /* Changed to flex */
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  /* Fill parent */
-  padding: var(--spacing-xl);
-  // background: var(--bg-primary);
-  background: transparent;
-  overflow: hidden;
-  /* Prevent host scroll */
+/* Inside master-list.scss deep selection */
+::ng-deep {
 
-  /* Local Variables for the "Rectangular" look */
-  --radius-sharp: 2px;
-  --shadow-deep: 0 10px 40px -10px rgba(0, 0, 0, 0.3);
-}
-
-.master-page-container {
-  height: 100%;
-  width: 100%;
-  margin: 0 auto;
-  border-radius: var(--radius-2xl);
-  display: flex;
-  /* Ensure container flexes */
-  flex-direction: column;
-}
-
-/* ==============================================
-   2. CARD & TOOLBAR (PREMIUM SHARP LOOK)
-   ============================================== */
-.master-card {
-  flex: 1;
-  /* Grow to fill height */
-  min-height: 0;
-  /* Allow shrinking */
-  display: flex;
-  flex-direction: column;
-  padding: var(--spacing-xl);
-  // background: var(--bg-secondary);
-  background: transparent;
-  border: 1px solid var(--border-primary);
-  /* Optional: overflow hidden if you want rounded corners clipping content */
-  /* overflow: hidden; */
-}
-
-.master-toolbar {
-  background: transparent !important;
-  border: none !important;
-  padding: 0 0 var(--spacing-lg) 0 !important;
-  border-bottom: 1px solid var(--border-primary) !important;
-  margin-bottom: var(--spacing-lg);
-  border-radius: 0 !important;
-  flex-shrink: 0;
-  /* Keep toolbar visible */
-
-  .section-heading {
-    font-size: 1.5rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: var(--text-primary);
-    margin: 0;
-  }
-}
-
-/* ==============================================
-   3. GRID WRAPPER (THE HEIGHT FIX)
-   ============================================== */
-.master-grid-wrapper {
-  flex: 1;
-  /* Grow to fill remaining space */
-  min-height: 0;
-  /* CRITICAL for grid scrolling */
-  border: 1px solid var(--border-primary);
-  background: var(--bg-primary);
-  /* Optional contrast */
-  border-radius: var(--radius-sharp);
-  overflow: hidden;
-
-  app-ag-share-grid {
-    height: 100%;
-    width: 100%;
-    display: block;
-  }
-}
-
-// /* ==============================================
-//    4. SHARP COMPONENT OVERRIDES
-//    ============================================== */
-// :host ::ng-deep {
-
-//     /* --- Buttons: Sharp & Flat --- */
-//     .p-button {
-//         border-radius: var(--radius-sharp) !important;
-//         font-weight: 600;
-
-//         &.p-button-outlined {
-//             border-width: 1px;
-//         }
-//     }
-
-//     /* --- Inputs: Rectangular --- */
-//     .p-inputtext, .p-inputtextarea, .p-select {
-//         border-radius: var(--radius-sharp) !important;
-//         background: var(--bg-ternary);
-//         border: 1px solid var(--border-secondary);
-//         color: var(--text-primary);
-//         transition: border-color 0.2s, box-shadow 0.2s;
-
-//         &:enabled:focus {
-//             border-color: var(--primary-color);
-//             box-shadow: 0 0 0 1px var(--primary-color);
-//         }
-
-//         &::placeholder {
-//             color: var(--text-secondary);
-//             opacity: 0.7;
-//         }
-//     }
-
-//     /* --- Tags: Rectangular --- */
-//     .p-tag {
-//         border-radius: var(--radius-sharp) !important;
-//         font-weight: 600;
-//         letter-spacing: 0.05em;
-//     }
-
-//     /* ==============================================
-//        5. RECTANGULAR DIALOGS
-//        ============================================== */
-//     .master-dialog, .bulk-dialog {
-//         .p-dialog {
-//             border-radius: var(--radius-sharp) !important;
-//             box-shadow: var(--shadow-deep);
-//             border: 1px solid var(--border-primary);
-//             overflow: hidden;
-//         }
-
-//         .p-dialog-header {
-//             background: var(--bg-secondary);
-//             color: var(--text-primary);
-//             border-bottom: 1px solid var(--border-primary);
-//             padding: 1.25rem 1.5rem;
-//             border-radius: 0;
-
-//             .p-dialog-title {
-//                 font-weight: 700;
-//                 font-size: 1.1rem;
-//             }
-//         }
-
-//         .p-dialog-content {
-//             background: var(--bg-secondary);
-//             color: var(--text-primary);
-//             padding: 1.5rem;
-
-//             &::-webkit-scrollbar { width: 6px; }
-//             &::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 3px; }
-//         }
-
-//         .p-dialog-footer {
-//             background: var(--bg-ternary);
-//             border-top: 1px solid var(--border-primary);
-//             padding: 1rem 1.5rem;
-//             border-radius: 0;
-//         }
-
-//         .form-group {
-//             margin-bottom: 0.5rem;
-
-//             label {
-//                 color: var(--text-label);
-//                 font-size: 0.85rem;
-//                 font-weight: 600;
-//                 margin-bottom: 0.4rem;
-//                 display: block;
-//             }
-//         }
-//     }
-// }
-
-/* ==============================================
-   6. BULK EDITOR - SPREADSHEET LOOK
-   ============================================== */
-.bulk-form-layout {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.bulk-control-panel {
-  border-bottom: 1px solid var(--border-primary);
-  padding-bottom: 1rem;
-  margin-bottom: 1rem;
-}
-
-.bulk-data-table {
-  border: 1px solid var(--border-primary);
-  border-radius: var(--radius-sharp);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.bulk-header-row {
-  display: flex;
-  background: var(--bg-ternary);
-  border-bottom: 1px solid var(--border-primary);
-  padding: 0.75rem 1rem;
-
-  span {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    font-weight: 700;
-    color: var(--text-label);
-    letter-spacing: 0.04em;
-  }
-}
-
-.bulk-data-rows {
-  background: var(--bg-secondary);
-
-  .bulk-item-row {
+  /* Media Thumbnails */
+  .grid-media-wrapper {
     display: flex;
-    align-items: flex-start;
-    border-bottom: 1px solid var(--border-secondary);
-    padding: 0.5rem 1rem;
-    background: var(--bg-secondary);
-    transition: background 0.2s;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
 
-    &:hover {
-      background: var(--bg-ternary);
+    .grid-img-thumb {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--ui-border-radius-sm);
+      object-fit: cover;
+      border: 1px solid var(--border-secondary);
+    }
+  }
+
+  .grid-media-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-tertiary);
+    font-size: 1.2rem;
+  }
+
+  /* Status Pills */
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 10px;
+    border-radius: var(--ui-border-radius-pill);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
     }
 
-    &:last-child {
-      border-bottom: none;
+    &.status-active {
+      background: var(--color-success-bg);
+      color: var(--color-success);
+
+      .status-dot {
+        background: var(--color-success);
+        box-shadow: 0 0 6px var(--color-success);
+      }
     }
 
-    .form-group-inline {
-      padding-right: 0.75rem;
-      display: flex;
-      flex-direction: column;
+    &.status-inactive {
+      background: var(--bg-secondary);
+      color: var(--text-tertiary);
 
-      input {
-        height: 2.4rem;
-        font-size: 0.9rem;
+      .status-dot {
+        background: var(--text-tertiary);
       }
+    }
+  }
 
-      .uppercase-input {
-        font-family: monospace;
-        letter-spacing: 1px;
-      }
+  /* Semantic Type Badges */
+  .type-badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+
+    &.badge-category {
+      background: var(--color-info-bg);
+      color: var(--color-info);
+    }
+
+    &.badge-brand {
+      background: var(--color-success-bg);
+      color: var(--color-success);
+    }
+
+    &.badge-unit {
+      background: var(--color-primary-bg);
+      color: var(--accent-primary);
+    }
+
+    &.badge-tag {
+      background: var(--color-warning-bg);
+      color: var(--color-warning);
     }
   }
 }
 
-.bulk-scroll-wrapper {
-  &::-webkit-scrollbar {
-    width: 8px;
+/* Inside master-list.scss deep selection */
+::ng-deep {
+
+  /* Media Thumbnails */
+  .grid-media-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+
+    .grid-img-thumb {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--ui-border-radius-sm);
+      object-fit: cover;
+      border: 1px solid var(--border-secondary);
+    }
   }
 
-  &::-webkit-scrollbar-track {
-    background: var(--bg-secondary);
+  .grid-media-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-tertiary);
+    font-size: 1.2rem;
   }
 
-  &::-webkit-scrollbar-thumb {
-    background: var(--border-secondary);
-    border-radius: 4px;
-  }
-}
+  /* Status Pills */
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 10px;
+    border-radius: var(--ui-border-radius-pill);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
 
-.error-message {
-  color: #ef4444;
-  font-size: 0.75rem;
-  margin-top: 2px;
-  display: block;
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    &.status-active {
+      background: var(--color-success-bg);
+      color: var(--color-success);
+
+      .status-dot {
+        background: var(--color-success);
+        box-shadow: 0 0 6px var(--color-success);
+      }
+    }
+
+    &.status-inactive {
+      background: var(--bg-secondary);
+      color: var(--text-tertiary);
+
+      .status-dot {
+        background: var(--text-tertiary);
+      }
+    }
+  }
+
+  /* Semantic Type Badges */
+  .type-badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+
+    &.badge-category {
+      background: var(--color-info-bg);
+      color: var(--color-info);
+    }
+
+    &.badge-brand {
+      background: var(--color-success-bg);
+      color: var(--color-success);
+    }
+
+    &.badge-unit {
+      background: var(--color-primary-bg);
+      color: var(--accent-primary);
+    }
+
+    &.badge-tag {
+      background: var(--color-warning-bg);
+      color: var(--color-warning);
+    }
+  }
 }

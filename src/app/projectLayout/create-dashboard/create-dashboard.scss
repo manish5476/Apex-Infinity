@@ -1,0 +1,163 @@
+.create-dashboard-container {
+
+  padding: var(--spacing-3xl) var(--spacing-xl);
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+
+  /* --- Header Section --- */
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-4xl);
+    gap: var(--spacing-2xl);
+
+    .header-content {
+      h1 {
+        font-family: var(--font-heading);
+        font-size: var(--font-size-4xl);
+        font-weight: var(--font-weight-bold);
+        letter-spacing: -0.02em;
+        margin-bottom: var(--spacing-xs);
+        background: var(--accent-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      p {
+        color: var(--text-secondary);
+        font-size: var(--font-size-md);
+        font-weight: var(--font-weight-normal);
+      }
+    }
+
+    .search-bar {
+      position: relative;
+      flex: 1;
+      max-width: 420px;
+
+      i {
+        position: absolute;
+        left: var(--spacing-lg);
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-tertiary);
+        font-size: var(--font-size-lg);
+        transition: var(--transition-fast);
+      }
+
+      input {
+        width: 100%;
+        padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-lg) 3rem;
+        border: var(--ui-border-width) solid var(--border-primary);
+        border-radius: var(--ui-border-radius);
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-size: var(--font-size-base);
+        transition: var(--transition-base);
+        box-shadow: var(--shadow-sm);
+
+        &::placeholder {
+          color: var(--text-tertiary);
+        }
+
+        &:focus {
+          outline: none;
+          border-color: var(--accent-primary);
+          background: var(--bg-primary);
+          box-shadow: 0 0 0 var(--focus-outline-width) var(--accent-focus);
+
+          +i {
+            color: var(--accent-primary);
+          }
+        }
+      }
+    }
+  }
+
+  /* --- Category Tabs (The Modern Way) --- */
+  .category-tabs {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-3xl);
+    padding: var(--spacing-xs);
+    background: var(--bg-secondary);
+    border-radius: var(--ui-border-radius-pill);
+    width: fit-content;
+    border: var(--ui-border-width) solid var(--border-secondary);
+
+    .tab-item {
+      padding: var(--spacing-sm) var(--spacing-xl);
+      border-radius: var(--ui-border-radius-pill);
+      color: var(--text-secondary);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      cursor: pointer;
+      transition: var(--transition-base);
+      white-space: nowrap;
+
+      &:hover {
+        color: var(--text-primary);
+        background: var(--component-bg-hover);
+      }
+
+      &.active {
+        background: var(--accent-primary);
+        color: white; // Or use a theme-text-on-accent token
+        box-shadow: var(--shadow-md);
+      }
+    }
+  }
+
+  /* --- Grid Layout --- */
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--spacing-2xl);
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: var(--spacing-5xl);
+      background: var(--bg-secondary);
+      border-radius: var(--ui-border-radius-lg);
+      border: 2px dashed var(--border-secondary);
+
+      i {
+        font-size: 4rem;
+        color: var(--text-tertiary);
+        margin-bottom: var(--spacing-lg);
+      }
+
+      p {
+        font-size: var(--font-size-lg);
+        color: var(--text-secondary);
+      }
+    }
+  }
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+  .create-dashboard-container {
+    .dashboard-header {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .search-bar {
+        max-width: 100%;
+      }
+    }
+
+    .category-tabs {
+      width: 100%;
+      overflow-x: auto;
+      border-radius: var(--ui-border-radius);
+    }
+  }
+}

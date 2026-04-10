@@ -1,0 +1,38 @@
+<div class="create-dashboard-container">
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1>What would you like to create?</h1>
+      <p>Select a form below to add new entities to the system.</p>
+    </div>
+
+    <div class="search-bar">
+      <i class="pi pi-search"></i>
+      <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
+        placeholder="Search for forms (e.g., 'Invoice', 'Product')..." />
+    </div>
+  </div>
+
+  <div class="category-tabs">
+    @for (cat of categories; track cat) {
+      <div class="tab-item" [class.active]="activeCategory() === cat"
+        (click)="setCategory(cat)">
+        {{ cat }}
+      </div>
+    }
+  </div>
+
+  <div class="grid-container">
+    @for (entity of filteredEntities(); track entity) {
+      <app-entity-card [title]="entity.title" [icon]="entity.icon"
+        [description]="entity.description" [createRoute]="entity.createRoute">
+      </app-entity-card>
+    }
+
+    @if (filteredEntities().length === 0) {
+      <div class="empty-state">
+        <i class="pi pi-inbox"></i>
+        <p>No forms found matching your criteria.</p>
+      </div>
+    }
+  </div>
+</div>
